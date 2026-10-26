@@ -1,0 +1,142 @@
+---
+title: Extracting typed values
+description: Get a Rust value from a model reply, checked against a schema, with one retry and a trace of every step.
+---
+
+# Extracting typed values
+
+Typed extraction turns a model reply into a Rust value. The
+`fusion-cortex-extract` crate asks a model for JSON that matches a schema,
+checks the reply, and returns the value with a Trace record of how it was
+made. A small local model writes broken JSON often, and the check and the
+retry are what make its replies usable.
+
+## Describe the value with a schema
+
+A `Schema` is the JSON Schema of the value you want, with a name. Derive it
+from the Rust type the reply becomes, so the schema and the type always agree.
+Bounds that a type cannot express, such as a confidence between 0 and 1, go in
+`schemars` attributes. You can also write a schema by hand with `Schema::new`.
+
+[//]: # (rust:fusion-cortex-extract::Schema)
+
+```rust
+use fusion_cortex_extract::{JsonSchema, Schema};
+
+#[derive(JsonSchema, serde::Deserialize)]
+struct Fact {
+    statement: String,
+    #[schemars(range(min = 0.0, max = 1.0))]
+    confidence: f64,
+}
+
+let schema = Schema::of::<Fact>("fact").unwrap();
+
+assert_eq!(schema.json()["required"], serde_json::json!(["statement", "confidence"]));
+let errors = schema.check(&serde_json::json!({ "statement": "0.11 shipped", "confidence": 2 }));
+assert_eq!(errors[0].at, "/confidence");
+```
+
+[//]: # (/rust)
+
+A name is 1 to 64 letters, digits, `_`, and `-`, because some APIs require a
+name of that form.
+
+## Extract a value
+
+`extract` takes a provider, a prompt, the schema, the input text, and the
+Trace nodes the input came from. It works in four steps:
+
+1. It sends the prompt with the schema written out, and asks the API to
+   decode under the schema where the API can.
+2. It reads the JSON in the reply, inside a code fence or a sentence if the
+   model added one.
+3. It checks the JSON against the schema, and then converts it to your type.
+4. If the reply fails, it sends the reply back once with every violation
+   listed, and checks the second reply the same way.
+
+[//]: # (rust:fusion-cortex-extract::extract)
+
+```rust
+#[derive(Debug, JsonSchema, serde::Deserialize)]
+struct Release {
+    version: String,
+    day: u32,
+}
+
+let schema = Schema::of::<Release>("release").unwrap();
+let prompt = Prompt { text: "Which release does the note describe?".into(), version: "release/v1".into() };
+// The first reply leaves out a field, and the retry puts it back.
+let provider = Scripted::new("scripted/1", vec![
+    Ok(reply(r#"{"version": "0.11.0"}"#)),
+    Ok(reply(r#"{"version": "0.11.0", "day": 8}"#)),
+]);
+
+let release = extract::<Release>(&provider, &prompt, &schema, "0.11.0 shipped on the 8th.", &[])
+    .await
+    .unwrap();
+
+assert_eq!(release.value.day, 8);
+assert_eq!(release.attempts, 2);
+assert!(provider.requests()[1].messages[3].joined().contains("\"day\" is a required property"));
+```
+
+[//]: # (/rust)
+
+When the second reply fails too, `extract` returns `Error::Invalid` with both
+lists of violations, so you can tell a model that misread the schema from one
+that cannot write JSON. Each violation names where in the reply it is, as a
+JSON Pointer such as `/facts/0/confidence`.
+
+## Structured output by API
+
+Each client sends the schema in the field its API reads. The reply is checked
+either way, because an API may enforce only part of a schema.
+
+| Client | Field | What the API enforces |
+| --- | --- | --- |
+| `Ollama` | `format` | The server decodes under the schema |
+| `Chat` | `response_format` | Servers vary; strict mode is off |
+| `Responses` | `text.format` | Strict mode is off |
+| `Gemini` | `generationConfig.responseFormat` | Keywords it does not support are ignored |
+| `Anthropic` | `output_config.format` | Every object is closed, and number and length bounds are left out |
+
+## Trace every step
+
+Every step is a Trace node:
+
+- the request is a context;
+- each reply is an output;
+- each check is a validation, with its violations;
+- the accepted value is an extraction.
+
+`extract` returns the nodes in the order a store appends them, and an error
+carries the nodes written before it, so a failed attempt is traced too.
+`why()` on the extraction walks back to the input.
+
+[//]: # (rust:fusion-cortex-extract::Extraction)
+
+```rust
+let mut graph = Graph::new();
+let note = graph.insert(Node::new(
+    Detail::Source { content: "0.11.0 shipped on the 8th.".into(), uri: None },
+    vec![],
+));
+
+let release = extract::<Release>(&provider, &prompt, &schema, "0.11.0 shipped on the 8th.", &[note])
+    .await
+    .unwrap();
+for node in release.nodes {
+    graph.insert(node);
+}
+
+// The value, the check that passed it, the reply, the request, and the note.
+let why: Vec<NodeKind> = graph.why(release.id).iter().map(|node| node.kind()).collect();
+assert_eq!(why, [NodeKind::Extraction, NodeKind::Validation, NodeKind::Output, NodeKind::Context, NodeKind::Source]);
+```
+
+[//]: # (/rust)
+
+A retry's context derives from the first request and from the validation that
+failed it, so `why()` on a repaired value also shows the reply that was
+refused and why.
