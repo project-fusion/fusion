@@ -133,6 +133,7 @@ fn main() {
             Family::DesignTokens(args) => family::design_tokens(args, &from, cli.json),
             Family::Machines(args) => family::machines(args, &from, cli.json),
             Family::Platforms(args) => family::platforms(args, &from),
+            Family::Print(args) => family::print_sources(args, &from),
             Family::Stylesheets(args) => family::stylesheets(args, &from, cli.json),
             Family::Tokens(args) => family::tokens(args, &from, cli.json),
             Family::Types(args) => family::types(args, &from, cli.json),
