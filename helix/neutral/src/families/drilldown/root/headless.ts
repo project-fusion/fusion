@@ -22,16 +22,16 @@ import {
  *
  * **A press on a row with a page goes into it**, and the arrow along the
  * line does too. The way back in the header over the page, the arrow back,
- * and Escape go up one level. Each move asks `navigate` first, with the
- * `value` of the row whose page would show, empty for the top page, which a
- * handler may refuse. `page` holds the value of the row whose page is
+ * and Escape go up one level. Each move asks `before-navigate` first, with
+ * the `value` of the row whose page would show, empty for the top page,
+ * which a handler may refuse, and says `navigate` once the page shows. `page` holds the value of the row whose page is
  * showing, and writing it shows that page.
  *
  * **Focus moves with the page**: to its first row going in, and to the row
  * whose page was left going back. The arrow keys move among the rows, Home
  * and End go to the first and the last, and a typed letter moves to the
  * next row whose name starts with it. A press on a row with no page sends
- * its `select`, which reaches the drilldown's handler too.
+ * its `before-select` and `select`, which reach the drilldown's handler too.
  *
  * **The page slides in from the side it came from**: the element is
  * `forward` after a move into a page and `back` after a move out of one,
@@ -65,14 +65,17 @@ export default headless('drilldown', {
     'top-name': derive('drilldown-top-name'),
   },
   events: [
-    event('navigate', { cancelable: true, detail: ['value'] }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-navigate', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('navigate', { detail: ['value'] }),
+    event('select', { detail: ['value'] }),
   ],
   host: { label: bind('landmark-name'), role: bind('landmark') },
   props: [
     prop('back-label', 'string', { default: 'Back' }),
     prop('empty-text', 'string', { default: 'Nothing to show' }),
-    prop('label', 'string', { default: 'Navigation' }),
+    prop('fallback-label', 'string', { default: 'Navigation' }),
+    prop('label', 'string', { default: '' }),
     prop('loading', 'boolean', { default: false }),
     prop('loading-text', 'string', { default: 'Loading' }),
     prop('navigation', 'boolean', { default: false }),
@@ -80,7 +83,7 @@ export default headless('drilldown', {
   ],
   stack: stack({
     back: 'back',
-    before: 'navigate',
+    before: 'before-navigate',
     drilled: 'drilled',
     entered: 'forward',
     label: 'page-label',

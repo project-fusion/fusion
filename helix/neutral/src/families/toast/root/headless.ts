@@ -60,9 +60,10 @@ export default headless('toast', {
     ]),
     prop('swipe-direction', ['bottom', 'end', 'start', 'top']),
     /* The landmark's name and the keys, which a phone reaches from no keyboard. */
+    prop('fallback-label', 'string', { default: 'Notifications ({hotkey})', platform: 'web' }),
     prop('hotkey', 'string', { default: 'F8', platform: 'web' }),
     prop('hotkey-label', 'string', { default: 'Go to notifications', platform: 'web' }),
-    prop('label', 'string', { default: 'Notifications ({hotkey})', platform: 'web' }),
+    prop('label', 'string', { default: '', platform: 'web' }),
     prop('undo-hint', 'string', { default: 'Press {keys} to undo.', platform: 'web' }),
     prop('undo-keys', 'string', { default: 'mod+z', platform: 'web' }),
     prop('undo-label', 'string', { default: 'Undo', platform: 'web' }),

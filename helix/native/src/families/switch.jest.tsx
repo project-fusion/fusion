@@ -114,7 +114,7 @@ describe('the generated Switch', () => {
     const told: string[] = []
     await render(
       <Switch
-        onBeforeToggle={(event) => told.push(`before ${event.detail.checked}`)}
+        onBeforeCheck={(event) => told.push(`before ${event.detail.checked}`)}
         onChange={(event) => told.push(`change ${event.target.value}`)}
         onInput={() => told.push('input')}
         value="email"
@@ -141,7 +141,7 @@ describe('the generated Switch', () => {
     const told: string[] = []
     await render(
       <Switch
-        onBeforeToggle={(event) => event.preventDefault()}
+        onBeforeCheck={(event) => event.preventDefault()}
         onChange={() => told.push('change')}
       >
         Email
@@ -177,7 +177,7 @@ describe('the generated Switch', () => {
   test('takes no press while read-only, and still says where it is', async () => {
     const told: string[] = []
     await render(
-      <Switch defaultChecked onBeforeToggle={() => told.push('before')} readonly>
+      <Switch defaultChecked onBeforeCheck={() => told.push('before')} readonly>
         Email
       </Switch>,
     )

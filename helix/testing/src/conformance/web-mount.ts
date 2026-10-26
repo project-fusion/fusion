@@ -34,7 +34,7 @@ export interface Heard {
  * Holds a built setup: its items and panels by value, and each event each
  * of its elements sends, in order. **An event stopped on its way down to
  * the element is one the page cannot hear on it**, as a drilldown stops the
- * `select` of a row that opens a page, so it is left out.
+ * `before-select` of a row that opens a page, so it is left out.
  */
 export const mountSetup = (root: Updatable): { heard: Heard[]; mounted: Mounted } => {
   const children = [...root.children] as Updatable[]

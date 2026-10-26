@@ -15,7 +15,7 @@ beforeAll(async () => {
 type Host = HTMLElement & { active: string; updateComplete: Promise<unknown> }
 type Tab = HTMLElement & { focusItem: () => void }
 
-/* A choice is applied a microtask after its `helix-select`, once every
+/* A choice is applied a microtask after its `helix-before-select`, once every
    listener has had the chance to refuse it, so the update to wait for is
    requested after that. */
 const turn = async (host: Host): Promise<void> => {
@@ -49,7 +49,7 @@ const set = async (tabs: string, attributes = '') => {
     }
   }
   const heard: string[] = []
-  for (const name of ['helix-select', 'helix-before-activate', 'helix-activate']) {
+  for (const name of ['helix-before-select', 'helix-before-activate', 'helix-activate']) {
     host.addEventListener(name, (event) => {
       heard.push(`${name} ${(event as CustomEvent<{ value: string }>).detail.value}`)
     })
@@ -75,7 +75,7 @@ describe('a letter typed on a tab', () => {
     await arrowed.type('ArrowLeft', 't0')
     expect(arrowed.reached).toEqual(['t2'])
     expect(lettered.heard).toEqual([
-      'helix-select t2',
+      'helix-before-select t2',
       'helix-before-activate t2',
       'helix-activate t2',
     ])

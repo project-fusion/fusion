@@ -27,16 +27,16 @@ export const NAVIGATION: readonly Scenario[] = [
       { item: '/three', kind: 'press' },
       { item: '/one', kind: 'press' },
     ],
-    name: 'a press on a destination sends its select and follows its link, and moves no mark',
+    name: 'a press on a destination asks with before-select, says select, follows its link, and moves no mark',
     setup: bar({}, THREE),
   },
   {
     family: 'navigation',
     intents: [
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: '/two', kind: 'press' },
     ],
-    name: 'a refused select keeps the link closed',
+    name: 'a refused before-select keeps the link closed',
     setup: bar({}, THREE),
   },
   {

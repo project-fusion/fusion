@@ -37,8 +37,8 @@ import {
  * closed. A press on the trigger and a destination chosen close it and leave
  * focus where they put it. **One megamenu stands open at a time**: opening
  * one asks the one open to close, and a press on another's trigger opens
- * that one in its place. **Choosing a destination closes it** once the item's `select`
- * stands.
+ * that one in its place. **Choosing a destination closes it** once the
+ * item's `before-select` stands.
  *
  * **The panel's destinations are Megamenu Items**, which a group's heading
  * may name, and the megamenu is `current` while one of them is the page,

@@ -22,7 +22,7 @@ import { carryIntoLayers } from '../render/carry'
 import type { Family, Node } from '../style/form'
 import type { Binder } from './binder'
 import { valued } from './gives'
-import { boundTo, camel, senderOf, tell } from './props'
+import { boundTo, camel, followUpOf, senderOf, tell } from './props'
 
 /** A row of a stack, as it registers: what the stack's tree reads of it. */
 export interface StackRow {
@@ -204,7 +204,9 @@ const landingOn = (
  *
  * **A move asks first**: the stack's `before` event, its `value` the row
  * whose page would show, empty for the top page, and a refusal keeps the
- * page showing. Going in moves focus to the first row of the page, and going
+ * page showing. A move that stood is followed by the notification after
+ * `before`, where the family sends one, as a drilldown's `navigate` with
+ * the `value` of the row whose page shows. Going in moves focus to the first row of the page, and going
  * back to the row whose page was left, as on the web. Writing the page prop
  * shows the page of the row with that value, or the top page.
  *
@@ -219,6 +221,7 @@ const landingOn = (
 export const stacking = (family: Family, use: MachineUse): Binder => {
   const writes = Object.entries(family.api?.stack?.writes ?? {})
   const before = boundTo(use, 'before', 'event')
+  const after = before === undefined ? undefined : followUpOf(family, before)
   const drilled = boundTo(use, 'drilled', 'state')
   const labeled = boundTo(use, 'label', 'state')
   const pageProp = boundTo(use, 'page', 'prop')
@@ -253,6 +256,16 @@ export const stacking = (family: Family, use: MachineUse): Binder => {
         ),
       [rows],
     )
+    /* Says the move stood, once the page it shows is the one showing. */
+    const arrived = useCallback(
+      (to: object | null) => {
+        if (after !== undefined) {
+          const value = to === null ? '' : (rows.get(to)?.value ?? '')
+          tell(family, latest.current.props, after, { value }, senderOf(family, ''))
+        }
+      },
+      [rows],
+    )
     const enter = useCallback(
       (key: object) => {
         const to = enterOf(treeOf(rows), key)
@@ -260,9 +273,10 @@ export const stacking = (family: Family, use: MachineUse): Binder => {
           landing.current = 'first'
           setCurrent(to)
           setMoved((was) => ({ count: was.count + 1, way: 'forward' }))
+          arrived(to)
         }
       },
-      [asks, rows],
+      [arrived, asks, rows],
     )
     const back = useCallback(() => {
       const leaving = latest.current.current
@@ -273,8 +287,9 @@ export const stacking = (family: Family, use: MachineUse): Binder => {
       landing.current = leaving ?? undefined
       setCurrent(to)
       setMoved((was) => ({ count: was.count + 1, way: 'back' }))
+      arrived(to)
       return true
-    }, [asks, rows])
+    }, [arrived, asks, rows])
     const place = useCallback(
       (key: object, row: StackRow) => {
         const was = rows.get(key)

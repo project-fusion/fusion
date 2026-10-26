@@ -48,7 +48,7 @@ import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf }
  *
  * **The page listens on every element**, and records an event once: at the
  * element that holds the items where it hears the event from its items, as
- * a tab set hears a tab's `select`, since that is where a refusal is heard,
+ * a tab set hears a tab's `before-select`, since that is where a refusal is heard,
  * and at the element that sent it otherwise. **A page that removes items
  * draws the setup again without the item** once the intent has run, as an
  * app's list drops a tag on its `dismiss`.

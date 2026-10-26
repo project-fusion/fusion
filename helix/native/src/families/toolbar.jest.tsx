@@ -133,13 +133,15 @@ const Format = (props: HelixToolbarProps & { readonly italic?: boolean }) =>
   )
 
 describe('the generated Toolbar', () => {
-  test('is a toolbar named by its label, which says `Toolbar` until it is given one', async () => {
+  test('is a toolbar named by its label, and by nothing until it is given one', async () => {
     const view = await render(<Format />)
     expect(withRole('toolbar').map((node) => node.props.accessibilityLabel)).toEqual([
       'Text formatting',
     ])
     await view.rerender(themed(<HelixToolbar />))
-    expect(withRole('toolbar').map((node) => node.props.accessibilityLabel)).toEqual(['Toolbar'])
+    expect(withRole('toolbar').map((node) => node.props.accessibilityLabel || undefined)).toEqual([
+      undefined,
+    ])
   })
 
   test('moves focus to the next control with Right and back with Left, from the last round to the first', async () => {

@@ -22,7 +22,7 @@ const LEFT = { chosen: ['b'], focused: 'b', opened: [], shown: [] }
 const steps = (detail: Record<string, unknown>, extra = false): Step[] => [
   {
     events: [
-      { canceled: false, detail, from: 'b', name: 'select' },
+      { canceled: false, detail, from: 'b', name: 'before-select' },
       ...(extra ? [{ canceled: false, detail: {}, from: null, name: 'change' }] : []),
     ],
     intent: 'press b',
@@ -31,7 +31,7 @@ const steps = (detail: Record<string, unknown>, extra = false): Step[] => [
   { events: [], intent: 'key End', left: LEFT },
 ]
 
-const DECLARED = { 'helix-tab': [{ detail: ['value'], name: 'select' }], 'helix-tabs': [] }
+const DECLARED = { 'helix-tab': [{ detail: ['value'], name: 'before-select' }], 'helix-tabs': [] }
 
 const web = (
   platform: 'chromium' | 'webkit',
@@ -53,7 +53,12 @@ const ALL = ['chromium', 'webkit', 'react-native'] as const
 describe('compareWritten', () => {
   test('keeps only what the form declares of either record', () => {
     const kept = keepDeclared(DECLARED)(
-      { canceled: false, detail: { source: 'pointer', value: 'b' }, from: 'b', name: 'select' },
+      {
+        canceled: false,
+        detail: { source: 'pointer', value: 'b' },
+        from: 'b',
+        name: 'before-select',
+      },
       SCENARIO,
     )
     expect(kept?.detail).toEqual({ value: 'b' })
@@ -118,8 +123,8 @@ describe('compareWritten', () => {
     const [failure] = verdict.failures
     expect(failure).toContain(KEY)
     expect(failure).toContain('1. press b')
-    expect(failure).toContain('Chromium: select from b {"value":"b"}')
-    expect(failure).toContain('React Native: select from b {"value":"a"}')
+    expect(failure).toContain('Chromium: before-select from b {"value":"b"}')
+    expect(failure).toContain('React Native: before-select from b {"value":"a"}')
   })
 
   test('reports a known difference, and fails on one that no longer differs', () => {

@@ -36,6 +36,7 @@ export default headless('progress', {
     complete: derive('progress-complete'),
     content: bind('default'),
     fraction: derive('progress-fraction'),
+    name: derive('progress-name'),
     'reading-max': derive('progress-max'),
     'reading-min': derive('progress-min'),
     'reading-now': derive('progress-now'),
@@ -46,7 +47,7 @@ export default headless('progress', {
     event('complete', { detail: ['value'], follows: 'complete', gives: { value: 'reading-max' } }),
   ],
   host: {
-    label: bind('label'),
+    label: bind('name'),
     role: 'progressbar',
     valuemax: bind('reading-max'),
     valuemin: bind('reading-min'),
@@ -58,7 +59,8 @@ export default headless('progress', {
     /* JSON on the web's attribute, such as `{"style":"unit","unit":"megabyte"}`. */
     prop('format-options', 'object'),
     prop('indeterminate', 'boolean', { default: false }),
-    prop('label', 'string', { default: 'Progress' }),
+    prop('fallback-label', 'string', { default: 'Progress' }),
+    prop('label', 'string', { default: '' }),
     prop('locale', 'string', { default: '' }),
     prop('max', 'number'),
     prop('min', 'number'),

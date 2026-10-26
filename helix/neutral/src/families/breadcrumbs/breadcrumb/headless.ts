@@ -21,8 +21,9 @@ import {
  * **The separator comes before the crumb**, and the first crumb draws none.
  * It is decorative, so a screen reader reads the crumbs alone.
  *
- * **A crumb with an `href` is a link** that sends `select`, with the `href`
- * as its value, and opens unless the event was refused: on the web the
+ * **A crumb with an `href` is a link** that asks with `before-select`, with
+ * the `href` as its value, says `select` once it stands, and opens unless
+ * the request was refused: on the web the
  * browser follows it, and on a phone the app's open-link, its router where
  * it set one. **The current page is words, whatever its `href`**, and a
  * phone says it is the current page after its words, since React Native has
@@ -36,8 +37,9 @@ import {
  * **The first crumb of a trail that folds draws the fold after its label**:
  * a separator, and a menu its button opens, named by `fold-label` with the
  * count it folded, whose rows are the crumbs folded away, each a link to
- * its crumb's `href`. Choosing a row sends the crumb's `select`, with the
- * row's `href` as its value, and a refused one keeps its link closed. The
+ * its crumb's `href`. Choosing a row sends the crumb's `before-select` and
+ * `select`, with the row's `href` as its value, and a refused one keeps its
+ * link closed. The
  * trail hands the crumb what it folded.
  *
  * **What the trail writes is the web's**: the last crumb of a trail with
@@ -53,7 +55,10 @@ export default headless('breadcrumb', {
     'fold-mark': derive('breadcrumb-fold-mark'),
     'fold-name': derive('breadcrumb-fold-name'),
   },
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
+  ],
   host: { role: 'listitem' },
   props: [
     prop('current', 'boolean', { default: false }),
@@ -75,7 +80,7 @@ export default headless('breadcrumb', {
        holds a control of your own as a control. */
     unless(
       'current',
-      pressable('link', { href: bind('href'), sends: 'select' }, [
+      pressable('link', { href: bind('href'), sends: 'before-select' }, [
         region('start'),
         region('default'),
       ]),
@@ -94,7 +99,7 @@ export default headless('breadcrumb', {
       wrap(
         'fold',
         {
-          bubbles: 'select',
+          bubbles: 'before-select select',
           draws: 'menu',
           exports: {
             back: true,

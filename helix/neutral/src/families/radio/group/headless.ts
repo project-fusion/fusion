@@ -18,8 +18,8 @@ import {
  * the line under them.
  *
  * **The group is the form control, and the radios are its choices.** It
- * holds the answer in `value`, seeded by `default-value`. A radio's `select`
- * reaches the group, then the group asks with `before-change`, and once the
+ * holds the answer in `value`, seeded by `default-value`. A radio's
+ * `before-select` reaches the group, then the group asks with `before-change`, and once the
  * answer has moved it sends `input` and `change`.
  *
  * **One stop for the keys.** Right and Down choose the next radio, from the
@@ -48,7 +48,7 @@ export default headless('radio-group', {
     event('change', { bare: true }),
     event('input', { bare: true }),
     /* A radio's choice, which reaches the group before the group acts on it. */
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
   props: [
     prop('aria-label', 'string'),

@@ -249,7 +249,7 @@ export interface Item {
   /**
    * The cancelable event an item of a set that `mixes` sends before a press
    * turns it, its detail the `checked` the press asks for, as a menu item's
-   * `before-toggle`. A refusal keeps the item and its run as they were.
+   * `before-check`. A refusal keeps the item and its run as they were.
    */
   readonly before?: string
   /**

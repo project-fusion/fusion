@@ -1,9 +1,10 @@
 /*
  * The generated Drilldown, drawn from its real intermediate forms: a stack
  * of pages of rows, one page drawn at a time, where a row with a page goes
- * into it, the way back goes up one level, and each move asks `navigate`
- * first. A row with no page sends `select`, and follows its link once the
- * event stands. `test:native` writes the components beside this file.
+ * into it, the way back goes up one level, and each move asks
+ * `before-navigate` first and says `navigate` once it stood. A row with no
+ * page asks `before-select`, says `select`, and follows its link once the
+ * request stands. `test:native` writes the components beside this file.
  */
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
 import { type FakeFocus, fakeFocus } from '@fusion.dev/helix-core/capabilities/focus/fake'
@@ -112,10 +113,15 @@ describe('the generated Drilldown', () => {
 
   test('a row with a page goes into it, asking first, and names the page in its header', async () => {
     const asked: string[] = []
-    await render(settings({ onNavigate: (event: Told) => asked.push(event.detail.value) }))
+    await render(
+      settings({
+        onBeforeNavigate: (event: Told) => asked.push(`before ${event.detail.value}`),
+        onNavigate: (event: Told) => asked.push(`navigate ${event.detail.value}`),
+      }),
+    )
     expect(row('Appearance')?.props.accessibilityHint).toBeUndefined()
     await press('Appearance')
-    expect(asked).toEqual(['appearance'])
+    expect(asked).toEqual(['before appearance', 'navigate appearance'])
     expect([shown('Appearance'), shown('Theme'), shown('Density')]).toEqual([false, true, true])
     expect(screen.getAllByText('Appearance').length).toBe(1)
     expect(roleOf(screen.getByLabelText('Appearance'))).toBe('menu')
@@ -143,7 +149,7 @@ describe('the generated Drilldown', () => {
 
   test('the way back goes up one level, asking first, and lands on the row it left', async () => {
     const asked: string[] = []
-    await render(settings({ onNavigate: (event: Told) => asked.push(event.detail.value) }))
+    await render(settings({ onBeforeNavigate: (event: Told) => asked.push(event.detail.value) }))
     await press('Appearance')
     await act(async () => {
       fireEvent.press(screen.getByLabelText('Back'))
@@ -153,19 +159,31 @@ describe('the generated Drilldown', () => {
     expect(focus.focused()).toBe(listened.at(-3))
   })
 
-  test('a refused move keeps the page showing', async () => {
-    await render(settings({ onNavigate: (event: Told) => event.preventDefault() }))
+  test('a refused move keeps the page showing, and says nothing', async () => {
+    const said: string[] = []
+    await render(
+      settings({
+        onBeforeNavigate: (event: Told) => event.preventDefault(),
+        onNavigate: (event: Told) => said.push(event.detail.value),
+      }),
+    )
     await press('Appearance')
     expect([shown('Appearance'), shown('Theme')]).toEqual([true, false])
+    expect(said).toEqual([])
   })
 
-  test('a row with no page sends select, which the drilldown hears, and follows its link', async () => {
+  test('a row with no page asks with before-select, then says select, which the drilldown hears, and follows its link', async () => {
     const chosen: string[] = []
-    await render(settings({ onSelect: (event: Told) => chosen.push(event.detail.value) }))
+    await render(
+      settings({
+        onBeforeSelect: (event: Told) => chosen.push(`before ${event.detail.value}`),
+        onSelect: (event: Told) => chosen.push(`select ${event.detail.value}`),
+      }),
+    )
     await press('Editor')
-    expect(chosen).toEqual(['editor'])
+    expect(chosen).toEqual(['before editor', 'select editor'])
     expect(opened.opened).toEqual(['https://example.com/editor'])
-    await render(settings({ onSelect: (event: Told) => event.preventDefault() }))
+    await render(settings({ onBeforeSelect: (event: Told) => event.preventDefault() }))
     await press('Editor')
     expect(opened.opened).toEqual(['https://example.com/editor'])
   })

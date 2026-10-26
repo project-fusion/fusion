@@ -13,7 +13,7 @@ use crate::family::read::Lit;
 pub struct Item {
     /// The cancelable event an item of a set that mixes sends before a
     /// press turns it, its detail the `checked` the press asks for, as a
-    /// menu item's `before-toggle`.
+    /// menu item's `before-check`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub before: Option<String>,
     /// The prop that makes the item a choice that turns on and off where it

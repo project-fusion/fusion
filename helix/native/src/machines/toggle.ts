@@ -248,7 +248,7 @@ export const useToggle = (
         return false
       }
       /* The set's refusal refuses the element's own request too, as a
-         checkbox group refuses a box's `before-toggle` on the web. */
+         checkbox group refuses a box's `before-check` on the web. */
       if (gate.current.gate?.(proposed.checked) === false) {
         asked?.preventDefault()
         return false

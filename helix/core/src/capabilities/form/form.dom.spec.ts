@@ -5,8 +5,8 @@ import type { TemplateResult } from 'lit'
 import type { webForm as WebForm } from './web.js'
 
 /**
- * The web's form capability, on a Helix control and on an element that keeps
- * its internals as `HelixElement` does.
+ * The web's form capability, on a Helix control and on a bare `HelixElement`
+ * that is form associated.
  *
  * **The test double judges nothing itself**: it records the flags and the
  * message it is handed, so what is asserted is the verdict handed to the
@@ -19,10 +19,11 @@ type Control = HTMLElement & {
   validity: ValidityState
 }
 
-/** An element that keeps its internals in an `internals` field, as `HelixElement` does. */
-type Plain = HTMLElement & { internals: ElementInternals }
+/** A bare `HelixElement` that is form associated, whose internals core holds. */
+type Plain = HTMLElement
 
 let webForm: typeof WebForm
+let internalsOf: (element: HTMLElement) => ElementInternals
 
 beforeAll(async () => {
   registerDom()
@@ -31,6 +32,8 @@ beforeAll(async () => {
      templates are built with whichever `document` it found when it loaded. */
   const { html } = await import('lit')
   const { HelixFormElement } = await import('../../helix-form-element/helix-form-element.js')
+  const core = await import('../../helix-element/helix-element.js')
+  internalsOf = core.internalsOf as unknown as typeof internalsOf
   ;({ webForm } = await import('./web.js'))
   customElements.define(
     'probe-capability-form-control',
@@ -46,9 +49,8 @@ beforeAll(async () => {
   )
   customElements.define(
     'probe-capability-form-plain',
-    class extends HTMLElement {
+    class extends core.HelixElement {
       static readonly formAssociated = true
-      readonly internals = this.attachInternals()
     },
   )
 })
@@ -120,7 +122,7 @@ describe('webForm.validity', () => {
     const node = document.createElement('probe-capability-form-plain') as Plain
     const anchor = document.createElement('input')
     const calls: unknown[][] = []
-    node.internals.setValidity = (...args: unknown[]) => {
+    internalsOf(node).setValidity = (...args: unknown[]) => {
       calls.push(args)
     }
     webForm.validity(node, ['rangeOverflow'], 'Choose 10 or less', anchor)

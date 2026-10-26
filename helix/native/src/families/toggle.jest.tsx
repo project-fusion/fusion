@@ -1,6 +1,6 @@
 /*
  * The generated Toggle, drawn from its real intermediate form: a toggle
- * button on its own, announced as one, that asks with `helix-before-toggle`
+ * button on its own, announced as one, that asks with `helix-before-check`
  * and then turns, in the base layer's look. `test:native` writes the
  * component beside this file, as the styled package's build writes the one it
  * ships.
@@ -16,7 +16,7 @@ import { Dimensions, StyleSheet, View } from 'react-native'
 import { HelixTheme, useTokens } from '../theme/helix-theme'
 import type { GlyphProps } from '../theme/theme'
 import { HelixIcon } from './icon/index.native'
-import { HelixToggle, type HelixToggleBeforeToggleEvent } from './toggle/index.native'
+import { HelixToggle, type HelixToggleBeforeCheckEvent } from './toggle/index.native'
 
 /** A glyph that shows what it was asked to draw, as a view a spec can read. */
 const Recorded = ({ color, name, size }: GlyphProps) => (
@@ -120,7 +120,7 @@ describe('a press on a toggle', () => {
     await render(
       themed(
         <HelixToggle
-          onBeforeToggle={(event) => heard.push(`before ${event.detail.checked}`)}
+          onBeforeCheck={(event) => heard.push(`before ${event.detail.checked}`)}
           onChange={() => heard.push('change')}
         >
           Bold
@@ -134,12 +134,12 @@ describe('a press on a toggle', () => {
     expect(heard).toEqual(['before true', 'change', 'before false', 'change'])
   })
 
-  test('keeps its state and tells nothing where `helix-before-toggle` is refused', async () => {
+  test('keeps its state and tells nothing where `helix-before-check` is refused', async () => {
     const heard: string[] = []
     await render(
       themed(
         <HelixToggle
-          onBeforeToggle={(event: HelixToggleBeforeToggleEvent) => event.preventDefault()}
+          onBeforeCheck={(event: HelixToggleBeforeCheckEvent) => event.preventDefault()}
           onChange={() => heard.push('change')}
         >
           Bold
@@ -180,7 +180,7 @@ describe('a disabled toggle', () => {
     const heard: string[] = []
     await render(
       themed(
-        <HelixToggle disabled onBeforeToggle={() => heard.push('before')}>
+        <HelixToggle disabled onBeforeCheck={() => heard.push('before')}>
           Bold
         </HelixToggle>,
       ),

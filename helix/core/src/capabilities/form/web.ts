@@ -1,3 +1,4 @@
+import { internalsOf as attachedTo, type HelixElement } from '../../helix-element/helix-element.js'
 import { submitImplicitly } from '../../utils/implicit-submit/implicit-submit.js'
 import type { Flag } from '../types.generated.js'
 import type { Form } from './contract.generated.js'
@@ -6,13 +7,14 @@ import type { Form } from './contract.generated.js'
  * The `ElementInternals` a control attached, or `undefined` where it keeps
  * none.
  *
- * **Read from the `internals` field, past `protected`**, as
- * `@fusion.dev/helix-testing` reads it. `HelixElement` attaches the internals
- * once in its constructor and keeps them there, and `attachInternals()` throws
- * on a second call, so the field is the one place to find them.
+ * **Read through core's `internalsOf`**, which holds them off the element.
+ * `HelixElement` attaches the internals once in its constructor, and
+ * `attachInternals()` throws on a second call, so core's record is the one
+ * place to find them. Any other node, such as a native `<input>`, is in no
+ * record and keeps none.
  */
 const internalsOf = (node: HTMLElement): ElementInternals | undefined =>
-  (node as HTMLElement & { internals?: ElementInternals }).internals
+  attachedTo(node as HelixElement) as ElementInternals | undefined
 
 /** The flags `setValidity` takes, each one in `flags` set. */
 const flagsOf = (flags: readonly Flag[]): ValidityStateFlags => {

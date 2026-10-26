@@ -31,7 +31,7 @@ export function Example() {
             current={href === current ? 'page' : undefined}
             href={href}
             key={href}
-            onhelix-select={go}
+            onhelix-before-select={go}
           >
             {name}
           </helix-navigation-item>

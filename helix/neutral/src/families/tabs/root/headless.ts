@@ -40,12 +40,12 @@ export default headless('tabs', {
     event('activate', { detail: ['previous', 'value'] }),
     event('before-activate', { cancelable: true, detail: ['value'] }),
     /* A tab's choice, which reaches the set before the set acts on it. */
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
   props: [
     prop('active', 'string'),
     prop('default-active', 'string', { default: '' }),
-    prop('label', 'string', { default: 'Tabs' }),
+    prop('label', 'string', { default: '' }),
     prop('manual', 'boolean', { default: false }),
     prop('orientation', ['horizontal', 'vertical']),
     prop('scroll-controls', 'boolean', { default: false }),

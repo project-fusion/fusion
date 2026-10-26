@@ -155,7 +155,7 @@ mod tests {
     fn reads_the_press_that_goes_back_the_event_it_asks_and_what_it_computes() {
         let read = stack(&call(vec![
             ("back", "back"),
-            ("before", "navigate"),
+            ("before", "before-navigate"),
             ("drilled", "drilled"),
             ("label", "page-label"),
             ("page", "page"),
@@ -165,7 +165,7 @@ mod tests {
             read.references(),
             vec![
                 ("back", "back", Names::Part),
-                ("before", "navigate", Names::Event),
+                ("before", "before-navigate", Names::Event),
                 ("page", "page", Names::Prop),
             ]
         );

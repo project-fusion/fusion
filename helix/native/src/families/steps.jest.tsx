@@ -123,7 +123,12 @@ const Checkout = (
         <HelixStep content="Your address" current value="two">
           Shipping
         </HelixStep>
-        <HelixStep content="Your card" onSelect={log('select') as never} value="three" {...payment}>
+        <HelixStep
+          content="Your card"
+          onBeforeSelect={log('before-select') as never}
+          value="three"
+          {...payment}
+        >
           Payment
         </HelixStep>
       </HelixSteps>
@@ -164,15 +169,17 @@ describe('the generated Steps', () => {
     const told: string[] = []
     await render(<Checkout told={told} />)
     await fireEvent.press(nameOf('Payment'))
-    expect(told).toEqual(['select three', 'before-activate three', 'activate twothree'])
+    expect(told).toEqual(['before-select three', 'before-activate three', 'activate twothree'])
     expect(nameOf('Payment').props.accessibilityValue).toMatchObject({ text: 'Current step' })
     expect(nameOf('Shipping').props.accessibilityValue?.text).toBeUndefined()
     expect(screen.getAllByTestId('glyph record', { includeHiddenElements: true })).toHaveLength(1)
   })
 
-  test('stays where a handler refused the stage’s `select`', async () => {
+  test('stays where a handler refused the stage’s `before-select`', async () => {
     const told: string[] = []
-    await render(<Checkout payment={{ onSelect: (event) => event.preventDefault() }} told={told} />)
+    await render(
+      <Checkout payment={{ onBeforeSelect: (event) => event.preventDefault() }} told={told} />,
+    )
     await fireEvent.press(nameOf('Payment'))
     expect(told).toEqual([])
     expect(nameOf('Shipping').props.accessibilityValue).toMatchObject({ text: 'Current step' })

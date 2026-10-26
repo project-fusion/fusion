@@ -53,23 +53,25 @@ describe('a navigation item', () => {
     expect(link(off)?.hasAttribute('aria-current')).toBe(false)
   })
 
-  test('sends `select` with its `href` on a plain press, before the browser follows', async () => {
+  test('sends `before-select` with its `href` on a plain press, before the browser follows', async () => {
     const item = await mount(
       '<helix-headless-navigation-item href="#docs">Docs</helix-headless-navigation-item>',
     )
     const told: unknown[] = []
-    item.addEventListener('helix-select', (event) => told.push((event as CustomEvent).detail.value))
+    item.addEventListener('helix-before-select', (event) =>
+      told.push((event as CustomEvent).detail.value),
+    )
     const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
     link(item)?.dispatchEvent(click)
     expect(told).toEqual(['#docs'])
     expect(click.defaultPrevented).toBe(false)
   })
 
-  test('keeps the browser from following where `select` was refused', async () => {
+  test('keeps the browser from following where `before-select` was refused', async () => {
     const item = await mount(
       '<helix-headless-navigation-item href="#docs">Docs</helix-headless-navigation-item>',
     )
-    item.addEventListener('helix-select', (event) => event.preventDefault())
+    item.addEventListener('helix-before-select', (event) => event.preventDefault())
     const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
     link(item)?.dispatchEvent(click)
     expect(click.defaultPrevented).toBe(true)
@@ -80,7 +82,7 @@ describe('a navigation item', () => {
       '<helix-headless-navigation-item href="#docs">Docs</helix-headless-navigation-item>',
     )
     const told: unknown[] = []
-    item.addEventListener('helix-select', () => told.push(true))
+    item.addEventListener('helix-before-select', () => told.push(true))
     /* Kept from opening a window in a browser, after the item has heard it. */
     item.addEventListener('click', (event) => event.preventDefault())
     link(item)?.dispatchEvent(

@@ -52,7 +52,7 @@ export type Shaped<
  * menu's `trigger`. `bubbles` names the drawn element's events, separated by
  * spaces, that reach the element around as its own, which a handler there may
  * refuse, as a composed event leaves a shadow root on the web: a crumb hears
- * the `select` of a row of its fold's menu.
+ * the `before-select` and `select` of a row of its fold's menu.
  *
  * With `glyph`, a phone draws the icon of that name in the box with the
  * `Glyph` its app gives `HelixRoot`, in the color of the words around it. It
@@ -286,7 +286,7 @@ export const wrap = <
   name,
 })
 
-/** Words a prop holds, drawn as text, such as a list's `loading-label`. */
+/** Words a prop holds, drawn as text, such as a list's `loading-text`. */
 export const text = <const Name extends string, const Given extends Attributes>(
   name: Name,
   attributes: Given,

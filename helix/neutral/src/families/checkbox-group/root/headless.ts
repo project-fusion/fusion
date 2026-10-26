@@ -19,7 +19,7 @@ import {
  *
  * **Each box turns on its own, and the group holds the set.** `value` is the
  * values of the boxes that are checked, separated by commas, in the order the
- * boxes stand. A box's `before-toggle` asks first, then the group asks with
+ * boxes stand. A box's `before-check` asks first, then the group asks with
  * `before-change`, carrying the whole set that would result, and a refusal by
  * either keeps the box as it was. Once the set has moved, the group sends
  * `input` and `change`, and then the box sends its own. Writing `value`

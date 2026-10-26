@@ -39,8 +39,8 @@ export const CHECKBOX: readonly Scenario[] = [
   },
   {
     family: 'checkbox',
-    intents: [{ event: 'before-toggle', kind: 'refuse' }, { kind: 'press' }],
-    name: 'a refused toggle leaves the box as it was',
+    intents: [{ event: 'before-check', kind: 'refuse' }, { kind: 'press' }],
+    name: 'a refused turn leaves the box as it was',
     setup: box({ 'default-checked': true }),
   },
   {
@@ -57,7 +57,7 @@ export const CHECKBOX: readonly Scenario[] = [
   },
   {
     family: 'checkbox',
-    intents: [{ event: 'before-toggle', kind: 'refuse' }, { kind: 'press' }],
+    intents: [{ event: 'before-check', kind: 'refuse' }, { kind: 'press' }],
     name: 'a refused press keeps an indeterminate box mixed',
     setup: box({ indeterminate: true }),
   },
@@ -97,8 +97,8 @@ export const SWITCH: readonly Scenario[] = [
   },
   {
     family: 'switch',
-    intents: [{ event: 'before-toggle', kind: 'refuse' }, { kind: 'press' }],
-    name: 'a refused toggle leaves the switch as it was',
+    intents: [{ event: 'before-check', kind: 'refuse' }, { kind: 'press' }],
+    name: 'a refused turn leaves the switch as it was',
     setup: lever(),
   },
   {
@@ -131,8 +131,8 @@ export const TOGGLE: readonly Scenario[] = [
   },
   {
     family: 'toggle',
-    intents: [{ kind: 'press' }, { event: 'before-toggle', kind: 'refuse' }, { kind: 'press' }],
-    name: 'a refused toggle holds a pressed toggle pressed',
+    intents: [{ kind: 'press' }, { event: 'before-check', kind: 'refuse' }, { kind: 'press' }],
+    name: 'a refused turn holds a pressed toggle pressed',
     setup: bold(),
   },
   {
@@ -158,8 +158,8 @@ export const MOTION_TOGGLE: readonly Scenario[] = [
   },
   {
     family: 'motion-toggle',
-    intents: [{ event: 'before-toggle', kind: 'refuse' }, { kind: 'press' }],
-    name: 'a refused toggle leaves the page running',
+    intents: [{ event: 'before-check', kind: 'refuse' }, { kind: 'press' }],
+    name: 'a refused turn leaves the page running',
     setup: el('helix-motion-toggle', {}, ['Motion']),
   },
 ]

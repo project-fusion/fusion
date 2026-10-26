@@ -17,8 +17,9 @@ import {
  *
  * **A row whose `page` holds rows opens that page** in place of the one
  * showing, and its caret says so. The rows passed into `page` are the
- * page's rows. A press on any other row sends `select`, which a handler may
- * refuse, and a row with an `href` follows its link once the event stands:
+ * page's rows. A press on any other row asks with `before-select`, which a
+ * handler may refuse, and says `select` once it stands, and a row with an
+ * `href` follows its link once the request stands:
  * on the web the browser follows it, and on a phone the app's open-link.
  *
  * **The row is named by its label alone.** The words passed into
@@ -45,7 +46,10 @@ export default headless('drilldown-item', {
     popup: derive('drilldown-item-popup'),
     'row-role': derive('drilldown-item-role'),
   },
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
+  ],
   host: { role: bind('host-role') },
   item: item('drilldown', { chooses: true, page: 'page' }),
   props: [
@@ -72,7 +76,7 @@ export default headless('drilldown-item', {
         href: bind('href'),
         popup: bind('popup'),
         role: bind('row-role'),
-        sends: 'select',
+        sends: 'before-select',
       },
       [
         region('start'),

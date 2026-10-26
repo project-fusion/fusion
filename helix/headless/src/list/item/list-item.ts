@@ -324,17 +324,10 @@ export class HelixHeadlessListItem extends HelixElement {
     return nothing
   }
 
-  /**
-   * The label and the description, bare in this tier, which renders no box a
-   * consumer's own layout has to account for: a row styled as a flex line keeps
-   * them as two items. The tier above holds them in a box of their own.
-   *
-   * Each slot is a part, so a stylesheet reaches a region by name.
-   */
+  /** The label and the description, bare here and boxed by the tier above, each slot a part. */
   protected renderBody(): TemplateResult {
     return html`<slot id="label" part="label"></slot><slot name="description" id="description" part="description"></slot>`
   }
-
   protected override render(): TemplateResult {
     /* One wrapper, and it earns its place rather than breaking the bare-slot
        rule. That rule is about optional *regions*, which generate an empty box

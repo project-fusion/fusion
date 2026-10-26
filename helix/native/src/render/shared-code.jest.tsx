@@ -9,7 +9,7 @@ import { sharedCodeWarnings, warnWebTag } from './shared-code'
 const tab: Family = {
   api: {
     events: [
-      { cancelable: true, detail: [], name: 'select' },
+      { cancelable: true, detail: [], name: 'before-select' },
       { cancelable: false, detail: [], name: 'shortcut', platform: 'web' },
     ],
     props: [
@@ -36,7 +36,7 @@ describe('shared code', () => {
       sharedCodeWarnings(tab, {
         className: 'tab',
         maxItems: 2,
-        onSelect: () => {},
+        onBeforeSelect: () => {},
         onShortcut: () => {},
         rel: 'next',
         value: 'one',

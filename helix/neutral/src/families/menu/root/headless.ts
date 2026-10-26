@@ -33,10 +33,10 @@ import {
  * press is the trigger's own, and a press held for half a second, or Alt
  * with Down or Up, opens it, the trigger described by `long-press-label`.
  *
- * **Choosing a row sends its `select`**, which reaches the menu's handler
- * and which a handler may refuse, and closes the menu once it stands, with
+ * **Choosing a row sends its `before-select`**, which reaches the menu's
+ * handler and which a handler may refuse, then its `select`, and closes the menu once it stands, with
  * focus back on the trigger, unless `close-on-select` is false or the row's
- * own says otherwise. A choice row turns first, after its `before-toggle`,
+ * own says otherwise. A choice row turns first, after its `before-check`,
  * and the menu sends `change` as the rows checked change. A close request
  * and a press outside close it too. Every way it opens and closes asks
  * `before-open` or `before-close` first, which a handler may refuse, and
@@ -71,7 +71,7 @@ import {
 export default headless('menu', {
   collection: collection({
     after: 'change',
-    closes: { event: 'select', while: 'close-on-select' },
+    closes: { event: 'before-select', while: 'close-on-select' },
     keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: true },
     mixes: true,
   }),
@@ -90,10 +90,12 @@ export default headless('menu', {
   },
   events: [
     event('before-close', { cancelable: true, detail: ['open'] }),
+    event('before-filter', { cancelable: true, detail: ['value'], platform: 'web' }),
     event('before-open', { cancelable: true, detail: ['open'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
     event('change', { bare: true }),
-    event('filter', { cancelable: true, detail: ['value'], platform: 'web' }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('filter', { detail: ['value'], platform: 'web' }),
+    event('select', { detail: ['value'] }),
     event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
   ],
   props: [
