@@ -209,11 +209,8 @@ pub fn conditions(lit: &Lit) -> Result<Vec<Condition>, String> {
             ("disabled", Lit::Bool(value)) => read.push(Condition::Disabled { value: *value }),
             ("state", value) => around::states(value, &mut read)?,
             /* An attribute that is present, as `[disabled]` on an element no
-            form owns, which `:disabled` does not match. */
-            ("has", Lit::Text(name)) => read.push(Condition::Attribute {
-                name: name.clone(),
-                value: None,
-            }),
+            form owns, which `:disabled` does not match, or each of several. */
+            ("has", value) => present(value, &mut read)?,
             ("dir", Lit::Text(value)) => read.push(Condition::Dir {
                 value: match value.as_str() {
                     "ltr" => Direction::Ltr,
@@ -299,6 +296,29 @@ pub fn conditions(lit: &Lit) -> Result<Vec<Condition>, String> {
         }
     }
     Ok(read)
+}
+
+/// `has: 'name'`, an attribute present, or `has: ['a', 'b']`, each of
+/// several, in the order written.
+fn present(value: &Lit, read: &mut Vec<Condition>) -> Result<(), String> {
+    let names = match value {
+        Lit::Text(name) => vec![name],
+        Lit::Array(names) if !names.is_empty() => names
+            .iter()
+            .map(|name| match name {
+                Lit::Text(name) => Ok(name),
+                _ => Err("`has` lists attributes by name".to_owned()),
+            })
+            .collect::<Result<_, _>>()?,
+        _ => return Err("`has` in `when` does not take that value".to_owned()),
+    };
+    for name in names {
+        read.push(Condition::Attribute {
+            name: name.clone(),
+            value: None,
+        });
+    }
+    Ok(())
 }
 
 /// A prop's condition: a value, any of several, present, absent, or none of
