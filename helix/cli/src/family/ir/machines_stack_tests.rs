@@ -3,12 +3,12 @@
 use super::*;
 use crate::family::resolve::unresolved;
 
-/// A drilldown whose stack is `stack`, with a back press, a title, and a navigate event.
+/// A drilldown whose stack is `stack`, with a back press, a title, and a before-navigate event.
 fn drilldown(stack: &str, cancelable: bool) -> Family {
     family(&format!(
         "export default headless('drilldown', {{
           collection: collection({{ keys: {{ chooses: false, wrap: false }}, mixes: true }}),
-          events: [event('navigate', {{ cancelable: {cancelable} }})],
+          events: [event('before-navigate', {{ cancelable: {cancelable} }})],
           props: [prop('page', 'string')],
           stack: stack({{ {stack} }}),
           tree: [
@@ -22,7 +22,7 @@ fn drilldown(stack: &str, cancelable: bool) -> Family {
 #[test]
 fn a_stack_runs_stack_bound_to_its_press_its_event_its_values_and_its_page() {
     let root = drilldown(
-        "back: 'back', before: 'navigate', drilled: 'drilled', label: 'page-label', page: 'page'",
+        "back: 'back', before: 'before-navigate', drilled: 'drilled', label: 'page-label', page: 'page'",
         true,
     );
     assert_eq!(unresolved(&root), Vec::<String>::new());
@@ -31,7 +31,7 @@ fn a_stack_runs_stack_bound_to_its_press_its_event_its_values_and_its_page() {
         stack.map(|one| one.bind.clone()),
         Some(bound(&[
             ("back", Bound::Part("back".to_owned())),
-            ("before", Bound::Event("navigate".to_owned())),
+            ("before", Bound::Event("before-navigate".to_owned())),
             ("drilled", Bound::State("drilled".to_owned())),
             ("label", Bound::State("page-label".to_owned())),
             ("page", Bound::Prop("page".to_owned())),
@@ -42,13 +42,13 @@ fn a_stack_runs_stack_bound_to_its_press_its_event_its_values_and_its_page() {
 #[test]
 fn a_stack_goes_back_through_a_press_and_asks_through_a_cancelable_event() {
     let root = drilldown(
-        "back: 'title', before: 'navigate', drilled: 'drilled', label: 'page-label'",
+        "back: 'title', before: 'before-navigate', drilled: 'drilled', label: 'page-label'",
         false,
     );
     assert_eq!(
         unresolved(&root),
         vec![
-            "the stack's `before` names `navigate`, which is not cancelable, so a page cannot refuse a move",
+            "the stack's `before` names `before-navigate`, which is not cancelable, so a page cannot refuse a move",
             "the stack's `back` names `title`, which is no pressable",
         ]
     );

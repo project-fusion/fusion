@@ -240,8 +240,10 @@ const nudged = (latest: Latest, send: Send, key: string, forward: boolean): void
 
 /**
  * Asks the page to take a move, with the events the use binds: each in
- * order, with every key in the order the move asks for, until one is
- * refused. Each event's `target` carries the set's value.
+ * order, with every key in the order the move asks for. The request may be
+ * refused, which stops the move, and the notification after it says the
+ * move stood, which nobody refuses, as on the web. Each event's `target`
+ * carries the set's value.
  */
 const asking =
   (family: Family, use: MachineUse, latest: { readonly current: Latest }) =>
@@ -251,8 +253,11 @@ const asking =
     const { props, value } = latest.current
     const keys = [...proposed.order]
     return events.every((event) => {
-      const sent = event === 'before-reorder' ? before : after
-      return sent === undefined || tell(family, props, sent, { keys }, senderOf(family, value))
+      const asks = event === 'before-reorder'
+      const sent = asks ? before : after
+      const stands =
+        sent === undefined || tell(family, props, sent, { keys }, senderOf(family, value))
+      return stands || !asks
     })
   }
 

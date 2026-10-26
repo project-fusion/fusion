@@ -11,10 +11,10 @@ fn platforms() -> Platforms {
     let api = json!({ "families": [
         { "label": "Tabs", "elements": [{
             "entry": "tabs", "tagName": "helix-tab",
-            "events": [{ "name": "helix-select" }, { "name": "helix-dismiss" }],
+            "events": [{ "name": "helix-before-select" }, { "name": "helix-dismiss" }],
             "cssProperties": [{ "name": "--tabs-tab-color" }],
             "platforms": { "react-native": {
-                "events": [{ "name": "helix-select", "prop": "onSelect" }],
+                "events": [{ "name": "helix-before-select", "prop": "onBeforeSelect" }],
                 "omitted": ["rel", "maxItems"]
             } }
         }] },
@@ -72,7 +72,7 @@ fn dom_elements_and_css_are_reported() {
 
 #[test]
 fn web_only_families_props_and_events_are_reported() {
-    let source = "export const Page = () => (\n  <helix-flex>\n    <helix-skip-link></helix-skip-link>\n    <helix-dialog></helix-dialog>\n    <helix-tab rel=\"next\" max-items={2} value=\"one\" onhelix-select={go} onhelix-dismiss={go}>One</helix-tab>\n  </helix-flex>\n)\n";
+    let source = "export const Page = () => (\n  <helix-flex>\n    <helix-skip-link></helix-skip-link>\n    <helix-dialog></helix-dialog>\n    <helix-tab rel=\"next\" max-items={2} value=\"one\" onhelix-before-select={go} onhelix-dismiss={go}>One</helix-tab>\n  </helix-flex>\n)\n";
     assert_eq!(
         kinds(source),
         [
@@ -86,7 +86,7 @@ fn web_only_families_props_and_events_are_reported() {
 
 #[test]
 fn a_page_built_from_families_a_phone_draws_passes() {
-    let source = "import { useState } from 'react'\nimport '@fusion.dev/helix/tabs'\nexport function Page() {\n  const [open, setOpen] = useState(false)\n  return <Shell style=\"auto\"><helix-tab value=\"one\" onhelix-select={() => setOpen(!open)}>One</helix-tab></Shell>\n}\n";
+    let source = "import { useState } from 'react'\nimport '@fusion.dev/helix/tabs'\nexport function Page() {\n  const [open, setOpen] = useState(false)\n  return <Shell style=\"auto\"><helix-tab value=\"one\" onhelix-before-select={() => setOpen(!open)}>One</helix-tab></Shell>\n}\n";
     assert_eq!(kinds(source), []);
 }
 

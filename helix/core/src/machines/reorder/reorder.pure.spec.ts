@@ -346,7 +346,7 @@ describe('the moves the old format could not write (reorder-controller.ts)', () 
   })
 
   /* `requestReorder` sends `helix-before-reorder`, then `helix-reorder`, and
-     stops at the first refused (reorder-controller.dom.spec.ts). */
+     stops where the first is refused (reorder-controller.dom.spec.ts). */
   test('every request asks with helix-before-reorder, then helix-reorder', () => {
     const moved = { ...held, to: 2 }
     const requests = [

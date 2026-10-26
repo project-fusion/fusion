@@ -33,7 +33,7 @@ export const DRILLDOWN: readonly Scenario[] = [
   {
     family: 'drilldown',
     intents: [
-      { event: 'navigate', kind: 'refuse' },
+      { event: 'before-navigate', kind: 'refuse' },
       { item: 'appearance', kind: 'press' },
     ],
     name: 'a refused move keeps the page showing',
@@ -66,10 +66,10 @@ export const DRILLDOWN: readonly Scenario[] = [
     intents: [
       { item: 'about', kind: 'press' },
       { item: 'editor', kind: 'press' },
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'editor', kind: 'press' },
     ],
-    name: 'a row with no page sends select, and a link opens once it stands',
+    name: 'a row with no page asks with before-select, says select, and a link opens once it stands',
     setup: settings(),
   },
   {

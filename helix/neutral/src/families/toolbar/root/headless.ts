@@ -29,7 +29,7 @@ import { bind, box, headless, prop, region, toolbar } from '../../../tree.js'
 export default headless('toolbar', {
   events: [],
   props: [
-    prop('label', 'string', { default: 'Toolbar' }),
+    prop('label', 'string', { default: '' }),
     prop('orientation', ['horizontal', 'vertical']),
     prop('stop-at-ends', 'boolean', { default: false }),
   ],

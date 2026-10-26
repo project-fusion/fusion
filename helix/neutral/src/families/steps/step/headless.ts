@@ -41,7 +41,7 @@ import {
  * the element has.
  */
 export default headless('step', {
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [event('before-select', { cancelable: true, detail: ['value'] })],
   host: { role: 'listitem' },
   item: item('steps', { chooses: true, flag: 'current' }),
   props: [
@@ -77,7 +77,7 @@ export default headless('step', {
           disabled: bind('disabled'),
           platform: 'native',
           role: 'button',
-          sends: 'select',
+          sends: 'before-select',
         },
         [region('default')],
       ),

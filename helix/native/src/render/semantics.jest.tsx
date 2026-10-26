@@ -12,7 +12,7 @@ const tab: Family = {
   api: {
     events: [
       { cancelable: true, detail: ['label'], name: 'dismiss' },
-      { cancelable: true, detail: ['value'], name: 'select' },
+      { cancelable: true, detail: ['value'], name: 'before-select' },
     ],
     item: { chooses: true, of: 'tabs' },
     props: [
@@ -37,7 +37,7 @@ const tab: Family = {
         chooses: true,
         role: 'tab',
         selected: { bind: 'selected' },
-        sends: 'select',
+        sends: 'before-select',
       },
       children: [
         { kind: 'region', name: 'default' },

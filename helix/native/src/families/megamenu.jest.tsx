@@ -3,7 +3,7 @@
  * layer host: a trigger named by its label that a press opens and says is
  * expanded, leaving focus on it, a band of groups under it across the
  * window, Down that takes focus into it, Escape that closes it with focus
- * back on the trigger, a destination that sends `select`, opens its link,
+ * back on the trigger, a destination that asks with `before-select`, opens its link,
  * and closes it, and the navigation around that is open while it is and
  * whose arrow keys reach its trigger. `test:native` writes the components
  * beside this file.
@@ -269,7 +269,7 @@ describe('the generated Megamenu', () => {
     expect(link('Projects')).toBeUndefined()
   })
 
-  test('choosing a destination sends select, opens its link, and closes it', async () => {
+  test('choosing a destination asks, says select, opens its link, and closes it', async () => {
     const heard: string[] = []
     await draw(megamenu({ onBeforeClose: () => heard.push('before-close') }))
     await press(trigger())
@@ -282,11 +282,14 @@ describe('the generated Megamenu', () => {
     expect(panel()).toBeUndefined()
   })
 
-  test('a refused select keeps the link closed and the panel open', async () => {
+  test('a refused before-select keeps the link closed and the panel open', async () => {
     await draw(
       <HelixMegamenu defaultOpen label="Products">
         <HelixMegamenuGroup label="Work">
-          <HelixMegamenuItem href="#projects" onSelect={(event: Told) => event.preventDefault()}>
+          <HelixMegamenuItem
+            href="#projects"
+            onBeforeSelect={(event: Told) => event.preventDefault()}
+          >
             Projects
           </HelixMegamenuItem>
         </HelixMegamenuGroup>

@@ -20,7 +20,7 @@ import { behaviorFor } from './compose'
 const menuForm: Family = {
   api: {
     collection: { keys: { chooses: false, keeps: [], wrap: true }, mixes: true },
-    events: [{ cancelable: true, detail: ['value'], name: 'select' }],
+    events: [{ cancelable: true, detail: ['value'], name: 'before-select' }],
     props: [],
     states: [],
   },
@@ -49,11 +49,11 @@ const switchProp = (name: string) =>
 const itemForm: Family = {
   api: {
     events: [
-      { cancelable: true, detail: ['checked'], name: 'before-toggle' },
-      { cancelable: true, detail: ['value'], name: 'select' },
+      { cancelable: true, detail: ['checked'], name: 'before-check' },
+      { cancelable: true, detail: ['value'], name: 'before-select' },
     ],
     item: {
-      before: 'before-toggle',
+      before: 'before-check',
       checkable: 'checkable',
       checked: 'checked',
       chooses: true,
@@ -69,10 +69,10 @@ const itemForm: Family = {
     states: ['checked'],
   },
   machines: [
-    { bind: { part: { part: 'item' }, sends: { event: 'select' } }, machine: 'press' },
+    { bind: { part: { part: 'item' }, sends: { event: 'before-select' } }, machine: 'press' },
     {
       bind: {
-        before: { event: 'before-toggle' },
+        before: { event: 'before-check' },
         checkable: { prop: 'checkable' },
         checked: { prop: 'checked' },
         exclusive: { prop: 'exclusive' },
@@ -85,7 +85,7 @@ const itemForm: Family = {
   tag: 'helix-menu-item',
   tree: [
     {
-      attributes: { chooses: true, role: 'menuitem', sends: 'select' },
+      attributes: { chooses: true, role: 'menuitem', sends: 'before-select' },
       children: [{ kind: 'region', name: 'default' }],
       kind: 'pressable',
       name: 'item',
@@ -147,10 +147,10 @@ describe('a set that mixes commands and choices', () => {
         <Menu>
           <Item
             checkable
-            onBeforeToggle={(event: { detail: { checked: boolean } }) =>
+            onBeforeCheck={(event: { detail: { checked: boolean } }) =>
               told.push(`before ${event.detail.checked}`)
             }
-            onSelect={() => told.push('select')}
+            onBeforeSelect={() => told.push('select')}
             value="grid"
           >
             <Text>Show grid</Text>
@@ -179,8 +179,8 @@ describe('a set that mixes commands and choices', () => {
         <Menu>
           <Item
             checkable
-            onBeforeToggle={(event: { preventDefault: () => void }) => event.preventDefault()}
-            onSelect={() => told.push('select')}
+            onBeforeCheck={(event: { preventDefault: () => void }) => event.preventDefault()}
+            onBeforeSelect={() => told.push('select')}
             value="grid"
           >
             <Text>Show grid</Text>

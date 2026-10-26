@@ -49,7 +49,7 @@ fn a_set_whose_items_mark_themselves_holds_no_chosen_value() {
 fn a_set_whose_items_mark_themselves_closes_on_its_items_own_event() {
     let source = NAVIGATION.replace(
         "marked: true,",
-        "marked: true, closes: { event: 'select' },",
+        "marked: true, closes: { event: 'before-select' },",
     );
     let closing = family(&source);
     assert_eq!(
@@ -59,7 +59,7 @@ fn a_set_whose_items_mark_themselves_closes_on_its_items_own_event() {
             .as_ref()
             .and_then(|one| one.closes.as_ref())
             .map(|one| one.event.as_str()),
-        Some("select")
+        Some("before-select")
     );
     assert_eq!(
         crate::family::resolve::unresolved(&closing),

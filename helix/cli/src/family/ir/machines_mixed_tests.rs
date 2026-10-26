@@ -26,17 +26,17 @@ fn a_set_that_mixes_runs_the_mixed_set_with_roving_focus_and_typeahead() {
 fn an_item_of_a_set_that_mixes_binds_its_switches_and_the_event_it_asks() {
     let row = family(
         "export default headless('menu-item', {
-          events: [event('before-toggle', { cancelable: true }), event('select', { cancelable: true })],
-          item: item('menu', { before: 'before-toggle', checkable: 'checkable', checked: 'checked', exclusive: 'exclusive' }),
+          events: [event('before-check', { cancelable: true }), event('before-select', { cancelable: true })],
+          item: item('menu', { before: 'before-check', checkable: 'checkable', checked: 'checked', exclusive: 'exclusive' }),
           props: [prop('checkable', 'boolean'), prop('checked', 'boolean'), prop('exclusive', 'boolean')],
-          tree: [pressable('item', { chooses: true, role: 'menuitem', sends: 'select' }, [region('default')])],
+          tree: [pressable('item', { chooses: true, role: 'menuitem', sends: 'before-select' }, [region('default')])],
         })",
     );
     assert_eq!(named(&row.machines), vec!["press", "mixed-item"]);
     assert_eq!(
         row.machines[1].bind,
         bound(&[
-            ("before", Bound::Event("before-toggle".to_owned())),
+            ("before", Bound::Event("before-check".to_owned())),
             ("checkable", Bound::Prop("checkable".to_owned())),
             ("checked", Bound::Prop("checked".to_owned())),
             ("exclusive", Bound::Prop("exclusive".to_owned())),

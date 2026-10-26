@@ -1,6 +1,7 @@
 import {
   bind,
   box,
+  derive,
   event,
   field,
   headless,
@@ -49,11 +50,13 @@ import {
  * the element has.
  */
 export default headless('outline', {
+  derived: { name: derive('outline-name') },
   events: [event('activate', { detail: ['value'] })],
   props: [
     prop('behavior', ['auto', 'instant', 'smooth'], { default: 'auto' }),
     prop('follow', 'boolean', { default: false }),
-    prop('label', 'string', { default: 'On this page' }),
+    prop('fallback-label', 'string', { default: 'On this page' }),
+    prop('label', 'string', { default: '' }),
     prop('marks', ['reading', 'visible'], { default: 'reading' }),
     prop('offset', 'number', { default: 0 }),
   ],
@@ -70,7 +73,7 @@ export default headless('outline', {
   states: ['settled'],
   tree: [
     box('heading', {}, [region('heading')]),
-    box('nav', { label: bind('label'), labelledby: 'heading', role: 'navigation' }, [
+    box('nav', { label: bind('name'), labelledby: 'heading', role: 'navigation' }, [
       region('default', { platform: 'web' }),
       /* A phone's link for each section the page registers. */
       repeat('links', { each: bind('sections'), key: 'id' }, [

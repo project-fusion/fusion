@@ -1,5 +1,6 @@
 import {
   customElement,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixSelectEvent,
   plainClick,
@@ -27,7 +28,7 @@ export type MegamenuItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time'
  * megamenu as its current destination.
  *
  * A router cannot reach an anchor inside a shadow root, so a plain press on
- * the link sends `helix-select` with the `href` as its value first, and
+ * the link sends `helix-before-select` with the `href` as its value first, and
  * canceling it keeps the browser from following, so a client-side router
  * follows it instead, as a `Navigation Item` does. A press with a modifier
  * opens the link where the browser opens it and sends nothing. A plain
@@ -50,7 +51,8 @@ export type MegamenuItemCurrent = 'date' | 'location' | 'page' | 'step' | 'time'
  * @slot description - A line about the destination, drawn under its name.
  * @slot icon - An icon drawn before the name, such as a `helix-icon`.
  *
- * @event {HelixSelectEvent} helix-select - A plain press on the link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixBeforeSelectEvent} helix-before-select - A plain press on the link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixSelectEvent} helix-select - Fired after a plain press on the link stood, with its `href` as the value, before the browser follows it.
  *
  * @csspart description - The slot the line about the destination arrives through.
  * @csspart icon - The slot the icon arrives through.
@@ -108,16 +110,19 @@ export class HelixHeadlessMegamenuItem extends HelixElement {
   target = ''
 
   /**
-   * Sends `helix-select` for a plain press on the link, and keeps the browser
-   * from following where it was canceled.
+   * Sends `helix-before-select` for a plain press on the link, and keeps the
+   * browser from following where it was canceled.
    */
   private readonly handleClick = (event: MouseEvent): void => {
     if (!plainClick(event)) {
       return
     }
-    if (!this.dispatchEvent(new HelixSelectEvent({ value: this.href }))) {
+    const detail = { value: this.href }
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent(detail))) {
       event.preventDefault()
+      return
     }
+    this.dispatchEvent(new HelixSelectEvent(detail))
   }
 
   /* Read after every render as well as on `slotchange`, because a hydrated

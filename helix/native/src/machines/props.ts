@@ -176,6 +176,23 @@ export const tell = (
 ): boolean => !told(family, props, event, detail, target).defaultPrevented
 
 /**
+ * The notification that follows the request `event` once it stands, where
+ * `family` sends one: the plain verb after `before-<verb>`, as `select`
+ * follows a menu row's `before-select`, and none where the family declares
+ * none, as a tab sends no `select` after its `before-select`. The web
+ * element sends the two as one grammar: the request may be refused, and the
+ * notification says the change stood.
+ */
+export const followUpOf = (family: Family, event: string): string | undefined => {
+  if (!event.startsWith('before-')) {
+    return undefined
+  }
+  const plain = event.slice('before-'.length)
+  const declared = family.api?.events.find((one) => one.name === plain)
+  return declared === undefined || declared.cancelable ? undefined : plain
+}
+
+/**
  * The events a machine's binding names, in the order they are sent: one,
  * several, or none.
  */

@@ -7,7 +7,7 @@ import { type Joined, wordsOf } from './join'
 import { linkedBy, linksInside } from './links'
 import { opensOnHold } from './long-press'
 import { type Told, usePress } from './press'
-import { boundTo, camel, senderOf } from './props'
+import { boundTo, camel, followUpOf, given, senderOf, tell } from './props'
 import { scrollingOf } from './scrolling'
 import { turnsAlone } from './turns'
 
@@ -30,7 +30,10 @@ import { turnsAlone } from './turns'
  * mixes commands and choices turns first**, before its event is sent, and a
  * Space that chose a choice keeps the set's element open. **In a
  * stack of pages, the back press goes back one page, and a row that holds a
- * page shows it**, sending nothing of its own.
+ * page shows it**, sending nothing of its own. **A request that stands is
+ * followed by its notification** where the family sends one, as a menu's
+ * row sends `select` once its `before-select` stood, before anything the
+ * choice does.
  */
 const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): Told => {
   const part = boundTo(use, 'part', 'part') ?? ''
@@ -40,10 +43,23 @@ const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): 
     return alone
   }
   const sends = boundTo(use, 'sends', 'event')
+  const after = sends === undefined ? undefined : followUpOf(family, sends)
   if (joined?.offer === undefined) {
     const linked = linkedBy(family, props, part)
     const own = joined === undefined ? {} : { value: joined.value }
-    return { ...linked, detail: { label: wordsOf(props.children), ...linked.detail, ...own } }
+    const detail = { label: wordsOf(props.children), ...linked.detail, ...own }
+    if (after === undefined) {
+      return { ...linked, detail }
+    }
+    const sender = senderOf(family, given(family, props, 'value'))
+    return {
+      ...linked,
+      detail,
+      stood: (key) => {
+        tell(family, props, after, detail, sender)
+        linked.stood?.(key)
+      },
+    }
   }
   const detail = { label: joined.words, value: joined.value }
   if (part !== joined.chooser) {
@@ -54,7 +70,7 @@ const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): 
   }
   const closes = family.api?.item?.closes
   const own = closes === undefined ? undefined : props[camel(closes)]
-  return chosenBy(family, { detail, joined, own, part, sends, stacked })
+  return chosenBy(family, { after, detail, joined, own, part, props, sends, stacked })
 }
 
 /**
@@ -79,20 +95,51 @@ const ownTold = (family: Family, part: string, around: Around): Told | undefined
   return undefined
 }
 
+/**
+ * Whether the set lets the item's event stand, where the item sends one.
+ * **A choice that stood is said**, to the item's consumer and then its
+ * set's, as the web's `helix-select` bubbles from the row.
+ */
+const heardBy = (
+  offer: NonNullable<Joined['offer']>,
+  asked: {
+    readonly after: string | undefined
+    readonly detail: Readonly<Record<string, unknown>>
+    readonly family: Family
+    readonly props: Props
+    readonly sends: string | undefined
+    readonly value: string
+  },
+): boolean => {
+  const { after, detail, family, props, sends, value } = asked
+  const sender = senderOf(family, value)
+  if (sends !== undefined && !offer.hear(sends, detail, sender)) {
+    return false
+  }
+  if (after !== undefined) {
+    tell(family, props, after, detail, sender)
+    offer.hear(after, detail, sender)
+  }
+  return true
+}
+
 /** What a press on the part that chooses an item tells and what follows it. */
 const chosenBy = (
   family: Family,
   press: {
+    /** The notification that follows the press's event once it stands, as `select`. */
+    readonly after: string | undefined
     readonly detail: Readonly<Record<string, unknown>>
     readonly joined: Joined
     /** The item's own prop its item's `closes` names, as a menu row's `close-on-select`. */
     readonly own: unknown
     readonly part: string
+    readonly props: Props
     readonly sends: string | undefined
     readonly stacked: Around['stacked']
   },
 ): Told => {
-  const { detail, joined, own, part, sends, stacked } = press
+  const { after, detail, joined, own, part, props, sends, stacked } = press
   /* **A row that holds a page shows it**, and sends no event of its own, as
      the web's row drills where it holds a page. */
   if (stacked.enter !== undefined) {
@@ -115,8 +162,7 @@ const chosenBy = (
     ...first,
     stood: (key) => {
       const { link, offer, value } = joined
-      const sender = senderOf(family, value)
-      if (offer === undefined || (sends !== undefined && !offer.hear(sends, detail, sender))) {
+      if (offer === undefined || !heardBy(offer, { after, detail, family, props, sends, value })) {
         return
       }
       /* **A Space on a choice keeps the element open**, as a Space on a

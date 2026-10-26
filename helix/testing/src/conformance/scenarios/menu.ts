@@ -32,14 +32,14 @@ export const MENU: readonly Scenario[] = [
       { kind: 'set', prop: 'open', value: true },
       { item: 'rename', kind: 'press' },
     ],
-    name: 'choosing a row sends select and closes the menu',
+    name: 'choosing a row asks, says select, and closes the menu',
     setup: menu(),
   },
   {
     family: 'menu',
     intents: [
       { kind: 'set', prop: 'open', value: true },
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'rename', kind: 'press' },
     ],
     name: 'a refused choice keeps the menu open',
@@ -54,14 +54,14 @@ export const MENU: readonly Scenario[] = [
       { kind: 'set', prop: 'open', value: true },
       { item: 'hidden', kind: 'press' },
     ],
-    name: 'a choice turns over before its select, and back once the menu opens again',
+    name: 'a choice turns over before its before-select, and back once the menu opens again',
     setup: menu(),
   },
   {
     family: 'menu',
     intents: [
       { kind: 'set', prop: 'open', value: true },
-      { event: 'before-toggle', kind: 'refuse' },
+      { event: 'before-check', kind: 'refuse' },
       { item: 'hidden', kind: 'press' },
     ],
     name: 'a refused turn keeps the choice as it was',

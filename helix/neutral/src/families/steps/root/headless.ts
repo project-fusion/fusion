@@ -1,11 +1,11 @@
-import { bind, box, collection, event, headless, prop, region } from '../../../tree.js'
+import { bind, box, collection, derive, event, headless, prop, region } from '../../../tree.js'
 
 /**
  * Steps' headless tier: the stages of a sequence and which one the reader is
  * on.
  *
  * **The sequence holds which stage is current, and its steps join it**, by
- * `value`. A press on a stage's name goes to it: the step sends `select`,
+ * `value`. A press on a stage's name goes to it: the step sends `before-select`,
  * the sequence `before-activate`, and either may refuse, and then it sends
  * `activate`. **It may hold none**: without `active`, each step's own
  * `current` says where the reader is, so a server's markup is right before
@@ -40,20 +40,22 @@ export default headless('steps', {
     optional: true,
     roves: 'arrows',
   }),
+  derived: { name: derive('steps-name') },
   events: [
     event('activate', { detail: ['previous', 'value'] }),
     event('before-activate', { cancelable: true, detail: ['value'] }),
     /* A step's press, which reaches the sequence before it acts on it. */
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
-  host: { label: bind('label'), role: 'list' },
+  host: { label: bind('name'), role: 'list' },
   props: [
     prop('active', 'string'),
     prop('default-active', 'string', { default: '' }),
     /* Unset is no value, so the arrows rove only while it is set. */
     prop('arrows', 'boolean'),
     prop('completion', ['passed'], { platform: 'web' }),
-    prop('label', 'string', { default: 'Steps' }),
+    prop('fallback-label', 'string', { default: 'Steps' }),
+    prop('label', 'string', { default: '' }),
     prop('linear', 'boolean', { default: false, platform: 'web' }),
     prop('orientation', ['vertical']),
     prop('progress-label', 'string', {

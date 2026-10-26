@@ -51,10 +51,10 @@ describe('Motion Toggle', () => {
 
   /* Checkbox, Switch, and Toggle ask with the same event, so one handler
      reads every control that turns on and off. */
-  test('asks with `helix-before-toggle` before each press, with `checked` true where it pauses', async () => {
+  test('asks with `helix-before-check` before each press, with `checked` true where it pauses', async () => {
     const element = await toggle()
     const heard: string[] = []
-    element.addEventListener('helix-before-toggle', (event) => {
+    element.addEventListener('helix-before-check', (event) => {
       const request = event as CustomEvent<{ checked: boolean }>
       heard.push(`before ${request.detail.checked} ${request.cancelable}`)
     })
@@ -68,7 +68,7 @@ describe('Motion Toggle', () => {
   test('a refused press leaves the motion as it was and sends no change', async () => {
     const element = await toggle()
     let changes = 0
-    element.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    element.addEventListener('helix-before-check', (event) => event.preventDefault())
     element.addEventListener('change', () => {
       changes += 1
     })

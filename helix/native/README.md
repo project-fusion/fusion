@@ -404,9 +404,10 @@ trigger passed into `trigger` or a round button it draws, named by `label`,
 with a plus that `icon` replaces. A press on the trigger opens the actions
 on the side `placement` names, `offset` from it, with focus on the first of
 them, and Down and Up open them on the first or the last. **Choosing an
-action sends its `onSelect`**, which reaches the dial's `onSelect` too, and
-closes the dial once it stands, with focus back on the trigger. A handler
-that refuses it keeps the dial open. Under `openOn="long-press"` a quick
+action sends its `onBeforeSelect`**, which reaches the dial's
+`onBeforeSelect` too, then its `onSelect`, and closes the dial once it
+stands, with focus back on the trigger. A handler that refuses the request
+keeps the dial open. Under `openOn="long-press"` a quick
 press is the trigger's own, and a finger held still for half a second, or
 Alt with Down or Up, opens the actions; the trigger is described by
 `longPressLabel`. An action draws its `shortcut` in the keyboard's glyphs,
@@ -426,14 +427,15 @@ window's bottom edge, as wide as the window, its last row clear of the home
 indicator, over a scrim, and a press on the scrim closes it. `presentation`
 draws a sheet or a popover at any width. A press on the trigger opens it
 with focus on its first row, and Down and Up open it on the first row or the
-last. **Choosing a row sends its `onSelect`**, which reaches the menu's
-`onSelect` too, and closes the menu once it stands, with focus back on the
+last. **Choosing a row sends its `onBeforeSelect`**, which reaches the
+menu's `onBeforeSelect` too, then its `onSelect`, and closes the menu once
+it stands, with focus back on the
 trigger where a row held it, unless `closeOnSelect` or the row's own is
 false. A Space from a hardware keyboard on a choice row keeps the menu open,
 unless the row's `closeOnSelect` says otherwise. A `checkable` row turns
 over as it is chosen, and an `exclusive` row turns on and the rest of its
-run off, each after its `onBeforeToggle`, and the menu's `onChange` follows
-the row's `onSelect`. A checked row draws a check at its end.
+run off, each after its `onBeforeCheck`, and the menu's `onChange` follows
+the row's `onBeforeSelect`. A checked row draws a check at its end.
 
 **A row whose `submenu` holds rows opens that page** in place of the one
 showing, under a header with the way back, named by `backLabel`, and the
@@ -473,9 +475,10 @@ once it stands the other way, with `newState` and `oldState`.
 **The panel holds `HelixMegamenuGroup`s of `HelixMegamenuItem`s**, from
 `@fusion.dev/helix/megamenu`. A group is a column under a heading of its
 `label`, or what you pass into `label`, which a screen reader hears as a
-heading. **An item with an `href` is a link**: a press sends `onSelect` with
-the `href` as its value, opens it through the open-link your app sets, and
-closes the megamenu, unless the handler refused it. An item draws what you
+heading. **An item with an `href` is a link**: a press sends
+`onBeforeSelect` with the `href` as its value, then `onSelect`, opens it
+through the open-link your app sets, and closes the megamenu, unless the
+handler refused the request. An item draws what you
 pass into `icon` before its words, what you pass into `description` under
 them, and a dot before its name where it has no icon, filled while it is the
 page. An item that holds its words alone is a plain link of the panel. A
@@ -1231,7 +1234,8 @@ sets.
 ## Toolbars
 
 `HelixToolbar`, from `@fusion.dev/helix/toolbar`, is announced as a toolbar
-named by its `label`. **The arrow keys move focus among its controls**: Right
+named by its `label`, and by nothing until it is given one, since a
+toolbar named "Toolbar" says its role twice. **The arrow keys move focus among its controls**: Right
 and Left in a horizontal toolbar, Down and Up in a vertical one, and Home and
 End to the ends, from the last back to the first unless `stopAtEnds` holds.
 A disabled control is passed over, and the arrows across the toolbar are
@@ -1278,8 +1282,8 @@ the web.
 
 `HelixToggleGroup`, from `@fusion.dev/helix/toggle`, holds its `HelixToggle`
 children as one control. **Where one is chosen**, a press, or an arrow key
-that arrives on a toggle, chooses it: the toggle sends `onSelect`, the group
-asks with `onBeforeChange`, and then sends `onInput` and `onChange`. With
+that arrives on a toggle, chooses it: the toggle sends `onBeforeSelect`, the
+group asks with `onBeforeChange`, and then sends `onInput` and `onChange`. With
 `allowEmptySelection`, a press on the chosen toggle takes it back. **Under
 `selectionMode="multiple"`**, a press presses or releases one toggle, `value`
 holds the pressed values separated by commas, and the arrow keys move focus
@@ -1293,7 +1297,7 @@ own arrow keys, as on the web.
 `HelixCheckboxGroup`, from `@fusion.dev/helix/checkbox-group`, holds its
 `HelixCheckbox` children as one set, and its `value` is the values of the
 boxes that are checked. **A box turns on its own and asks the group first**:
-its own `onBeforeToggle`, then the group's `onBeforeChange` with the whole set
+its own `onBeforeCheck`, then the group's `onBeforeChange` with the whole set
 that would result. Where both stand, the group sends `onInput` and `onChange`,
 and then the box sends its own. Writing `value` checks exactly the boxes it
 names. `selectAll` draws a checkbox above the set that checks every enabled
@@ -1316,7 +1320,7 @@ the runtime hosts the set as `mixed-set` and each item as `mixed-item`:
   which the web's Menu Item reads too. `exclusive` makes it one of a run,
   `checkable` or `checked` a choice, and any other item is a command.
 - **A press turns the item before its press's event is sent**, once its
-  `before` event stands, as `onBeforeToggle` with the `checked` the press
+  `before` event stands, as `onBeforeCheck` with the `checked` the press
   asks for. A choice turns over, an item of a run only turns on, and a
   command never turns. Refusing the turn keeps the item as it was, and the
   press's own event still goes out, as on the web.
@@ -1374,16 +1378,18 @@ into that page** on a press, or on the arrow along the line, and the page
 slides in from the side it came from. The header over a page below the top
 holds the way back, named by `backLabel`, and the page's name, which names
 the page too. The way back, the arrow back, and Escape go up one level, and
-each move asks `onNavigate` first, with the `value` of the row whose page
-would show, empty for the top page. Focus lands on the first row of a page
+each move asks `onBeforeNavigate` first, with the `value` of the row whose
+page would show, empty for the top page, and sends `onNavigate` once the
+page shows. Focus lands on the first row of a page
 going in, and on the row whose page was left going back. `page` holds the
 value of the row whose page shows, and writing it shows that page.
 
-A row with no page sends `onSelect`, which reaches the drilldown's
-`onSelect` too, and a row with an `href` opens it through the open-link your
-app sets once the event stands. A row is named by its label, and described
+A row with no page sends `onBeforeSelect`, which reaches the drilldown's
+`onBeforeSelect` too, then `onSelect`, and a row with an `href` opens it
+through the open-link your app sets once the request stands. A row is named by its label, and described
 by the words passed into `description` and `end`. Under `navigation` the
-drilldown is a navigation landmark named by `label`. While `loading` holds,
+drilldown is a navigation landmark named by `label`, and the top page is
+named by `label`, then `fallbackLabel`, Navigation, where it is no landmark. While `loading` holds,
 it shows `loadingText`, and with no rows `emptyText`, and says each to a
 screen reader. A row's `rel`, `target`, and `download` are the web's. Under
 `navigation` a page is a list and each row a list item that holds a link,
@@ -1425,7 +1431,7 @@ the web draws them, so an app that draws a checkbox installs it.
 ## Links
 
 A tab, a list row, a crumb, or a navigation item with an `href` is a link. A press sends the
-item's event first, and the link opens unless a handler refused the event. An address with a
+item's request first, and the link opens unless a handler refused the request. An address with a
 scheme, such as `https:` or `mailto:`, opens with the phone's own handler, and a
 path goes nowhere. To send paths to your router, such as Expo Router's
 `router.push`, call `setOpenLink` from
@@ -1435,10 +1441,10 @@ after `HelixRoot` first draws, since the root installs the phone's.
 ## Breadcrumbs
 
 `HelixBreadcrumbs`, from `@fusion.dev/helix/breadcrumbs`, is a navigation
-named by its `label`, around a list of `HelixBreadcrumb`s. **A crumb with an
-`href` is a link**: a press sends `onSelect` with the `href` as its value,
-and opens it through the open-link your app sets, unless the handler
-refused it. The `current` crumb is its words, whatever its `href`, and a
+named by its `label`, then `fallbackLabel`, Breadcrumb, around a list of
+`HelixBreadcrumb`s. **A crumb with an `href` is a link**: a press sends
+`onBeforeSelect` with the `href` as its value, then `onSelect`, and opens it
+through the open-link your app sets, unless the handler refused the request. The `current` crumb is its words, whatever its `href`, and a
 screen reader hears "Current page" after them. A crumb with neither is its
 words, or what you pass into it, such as a link of your own. A control in a
 crumb's `end` is a control of its own, drawn beside the link as the second
@@ -1454,9 +1460,9 @@ centered in the same box, before each crumb and before the fold.
 crumb and the last `maxItems` less one stay, and the first draws a ghost
 icon button named by `expandLabel`, `{count}` the crumbs folded, that opens
 a menu of them, each row opening its crumb's `href` through the open-link
-your app sets. Choosing a row sends the first crumb's `onSelect`, with the
-row's `href` as its value, and a handler that refuses it keeps the link
-closed.
+your app sets. Choosing a row sends the first crumb's `onBeforeSelect` and
+`onSelect`, with the row's `href` as its value, and a handler that refuses
+the request keeps the link closed.
 
 These are the web's for now: a trail drawn from `items`, which your app
 maps to crumbs on a phone. On the web, the last crumb of a trail with none
@@ -1725,10 +1731,10 @@ These are the web's:
 ## Navigation
 
 `HelixNavigation`, from `@fusion.dev/helix/navigation`, is a navigation
-landmark named by its `label`, `Main` until it is given one, around its
+landmark named by its `label`, then `fallbackLabel`, `Main`, around its
 `HelixNavigationItem`s. **Each item with an `href` is a link**: a press sends
-`onSelect` with the `href` as its value, and opens it through the open-link
-your app sets, unless the handler refused it. An item with no `href` is its
+`onBeforeSelect` with the `href` as its value, then `onSelect`, and opens it
+through the open-link your app sets, unless the handler refused the request. An item with no `href` is its
 words.
 
 **Your app says which destination is current**, with each item's `current`,
@@ -1736,8 +1742,8 @@ as a router does once it has moved: `page` for the page the reader is on, and
 `location`, `step`, `date`, or `time` for those. A screen reader hears
 "Current page", or the words for the value, after the item's own, and the
 current page's words are drawn at full strength. A press chooses nothing, so
-an app that routes itself refuses `onSelect` and writes `current` where it
-went.
+an app that routes itself refuses `onBeforeSelect` and writes `current`
+where it went.
 
 **One mark stands at the current destination** and glides to the next one
 your app marks, the one marked `page` where several are: a pill on the
@@ -1778,8 +1784,9 @@ bar, as it does.
 ## Steps
 
 `HelixSteps`, from `@fusion.dev/helix/steps`, is a list named by its
-`label`, and each `HelixStep` an item of it. **A press on a stage's name
-goes to it**: the step sends `onSelect`, the sequence `onBeforeActivate`,
+`label`, then `fallbackLabel`, Steps, and each `HelixStep` an item of it.
+**A press on a stage's name goes to it**: the step sends `onBeforeSelect`,
+the sequence `onBeforeActivate`,
 and either handler may refuse, and then it sends `onActivate`. Without
 `active`, each step's own `current` says where the reader is. A disabled
 step takes no press. With `arrows`, the arrow keys along the way the steps
@@ -1867,7 +1874,7 @@ Enter follows a link tag, Control or Command with A selects every tag, and
 Escape lets go. **Delete and Backspace send the focused tag's `onDismiss`**,
 which reaches the group's `onDismiss` too. Once your app takes the tag out,
 focus moves to the next tag, or to the one before after the last, and to the
-group's empty words, `emptyLabel` or what you pass into `empty`, once none
+group's empty words, `emptyText` or what you pass into `empty`, once none
 is left. A selected tag that is removed leaves `value`, and the group sends
 `onChange`.
 
@@ -1882,8 +1889,9 @@ and the words grow fully.
 
 A `reorderable` list lets a reader move its rows. A drag on a row's grip lifts
 the row, the others make room, and a screen reader adjusts the grip to move the
-row one place. The list asks with `onBeforeReorder` and then tells the new
-order in `onReorder`. A page drawn in `ScrollArea` scrolls while a held row is
+row one place. The list asks with `onBeforeReorder`, which a handler may
+refuse, and then tells the new order in `onReorder`, which says the move
+stood. A page drawn in `ScrollArea` scrolls while a held row is
 near its top or bottom.
 
 A list draws its rows as plain views while `reorderable` is off. Turning it on
