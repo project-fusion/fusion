@@ -1,0 +1,15 @@
+{
+  "name": "helix-typings-preact",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "*"
+  },
+  "devDependencies": {
+    "preact": "^11.0.2",
+    "typescript": "^7.0.2"
+  }
+}

@@ -63,6 +63,7 @@
     "smoke:react": "turbo run build --filter=@fusion.dev/helix && bun fusion/scripts/check-react-versions.mjs",
     "smoke:scaffold": "turbo run build analyze && bun fusion/scripts/run-template-build.mjs",
     "smoke:template": "turbo run build analyze --filter=!@fusion.dev/site && bun fusion/scripts/run-template-test.mjs",
+    "smoke:typings": "turbo run build analyze --filter=@fusion.dev/helix... && bun fusion/scripts/run-typings-test.mjs",
     "specs:browser": "turbo run specs frame && bun fusion/scripts/run-browser-specs.mjs",
     "test": "turbo run test",
     "trust": "bun fusion/scripts/trust.mjs",

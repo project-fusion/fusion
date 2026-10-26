@@ -1,0 +1,19 @@
+{
+  // The strictest options a consumer sets: `skipLibCheck` off, so the
+  // declarations themselves are checked, and `exactOptionalPropertyTypes`, which
+  // tells `?: T` apart from `?: T | undefined`.
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": false,
+    "strict": true,
+    "target": "ES2023",
+    "types": ["svelte"],
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte"]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "helix-typings-react",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "*",
+    "@fusion.dev/helix-headless": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "helix-typings-solid",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fusion.dev/helix": "*"
+  },
+  "devDependencies": {
+    "solid-js": "^1.9.15",
+    "typescript": "^7.0.2"
+  }
+}

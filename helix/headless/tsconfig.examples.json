@@ -27,11 +27,22 @@
   // takes the styled tier's the same way, as `@fusion.dev/helix/jsx`.
   // `example-sheets.d.ts` is the `*.css` an example imports for its side
   // effect, and says why it sits beside this file.
+  //
+  // `example-misuse.tsx` is the usage the typings refuse, each line under the
+  // `@ts-expect-error` that says why, and says why it is not an example. It
+  // sits beside this file, outside `src`, so `rootDir` is the package here:
+  // this project writes nothing, so the root it would write from is moot.
   "compilerOptions": {
     "jsx": "preserve",
-    "noEmit": true
+    "noEmit": true,
+    "rootDir": "."
   },
   "exclude": [],
   "extends": "./tsconfig.json",
-  "include": ["src/*/.examples/**/*.tsx", "example-sheets.d.ts", "types/jsx.d.ts"]
+  "include": [
+    "src/*/.examples/**/*.tsx",
+    "example-misuse.tsx",
+    "example-sheets.d.ts",
+    "types/jsx.d.ts"
+  ]
 }
