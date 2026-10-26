@@ -1,0 +1,43 @@
+[package]
+name = "fusion-cortex-cli"
+description = "The Cortex command line: record notes, distill them into facts, ask with the facts that answer, and trace every answer to its sources."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+version = "0.0.0-dev"
+
+# The binary drops the suffix, per the naming rule: the crate is
+# `fusion-cortex-cli` and the command is `cortex`.
+[[bin]]
+name = "cortex"
+path = "src/main.rs"
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+# `env` reads each setting from a `CORTEX_` variable where no flag sets it.
+clap = { version = "4", features = ["derive", "env"] }
+fusion-cortex-core.workspace = true
+fusion-cortex-engram = { workspace = true, features = ["consolidate", "postgres", "sqlite"] }
+fusion-cortex-provider = { workspace = true, features = ["anthropic", "chat", "embeddings", "gemini", "http", "ollama", "responses"] }
+fusion-cortex-recall.workspace = true
+fusion-cortex-trace = { workspace = true, features = ["postgres", "sqlite"] }
+# **The exit table, the error format, and the output that survives a closed
+# pipe**, which `helix` and `fusion` read from the same crate. `fusion cortex`
+# hands its child's code back untouched, which is only honest while the three
+# tables are one table.
+fusion-rules.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+uuid.workspace = true
+
+[dev-dependencies]
+# The scripted session runs on Postgres too, in a schema of its own, where
+# `CORTEX_POSTGRES_URL` names a database.
+fusion-cortex-core = { workspace = true, features = ["postgres"] }
+
+[lints]
+workspace = true
