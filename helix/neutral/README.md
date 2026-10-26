@@ -32,7 +32,7 @@ intermediate form:
 
 ```tsx
 export default headless('tab', {
-  memberOf: set('tabs', { pressChooses: true }),
+  memberOf: set('tabs'),
   props: { disabled: false, dismissLabel: 'Close', href: string() },
   events: { beforeSelect: cancelable(['value']) },
   states: ['selected'],
@@ -58,6 +58,12 @@ export default headless('tab', {
 - An event is its detail's fields, `cancelable([...])`, or `bare([...])`.
 - The nodes are `View`, `Text`, `Image`, `Pressable`, `Slot`, `Layer`,
   `Announce`, `Repeat`, `Wrap`, `Svg`, and the shapes inside a vector.
+- `memberOf: set('tabs')` names the set the element joins, and pressing the
+  element chooses it where a `<Pressable chooses>` in the render says so.
+- A `<Wrap>` always wraps what it holds, and `<Wrap when={props.x}>` wraps it
+  only while `x` holds. A `<Wrap href={props.href}>` is the link around what
+  it holds.
+- `<View draws="button">` draws another family's element in the part.
 - A render reads `props.x`, `derived.x`, `state.x`, and `stack.x`, each typed
   from the keys before it. A child is a node, `x && <Node />`, `!x &&
   <Node />`, or `x ? <A /> : <B />`, and an attribute is a literal, a read,

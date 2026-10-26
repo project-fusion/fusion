@@ -56,7 +56,7 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
     .unwrap();
     let written = rendered(
         "export default headless('tab', {
-          memberOf: set('tabs', { pressChooses: true, state: 'selected' }),
+          memberOf: set('tabs', { state: 'selected' }),
           derived: { holdHint: derive('menu-hold-hint') },
           props: {
             disabled: false,
@@ -109,14 +109,37 @@ fn render_comes_last_and_the_builder_keys_are_refused() {
         kebab.contains("is named in camelCase, as `dismissLabel`"),
         "{kebab}"
     );
-    let chooses = rendered(
-        "export default headless('x', { memberOf: set('y', { chooses: true }), render: () => <View part=\"x\" /> })",
-    )
-    .unwrap_err();
-    assert!(chooses.contains("spells it `pressChooses`"), "{chooses}");
+    for key in ["chooses", "pressChooses"] {
+        let chooses = rendered(&format!(
+            "export default headless('x', {{ memberOf: set('y', {{ {key}: true }}), render: () => <View part=\"x\" /> }})"
+        ))
+        .unwrap_err();
+        assert!(
+            chooses.contains(&format!(
+                "`set()` takes no `{key}`: pressing chooses where a `<Pressable>`"
+            )),
+            "{chooses}"
+        );
+    }
     let spec = rendered(
         "export default headless('x', { props: { a: [1] }, render: () => <View part=\"x\" /> })",
     )
     .unwrap_err();
     assert!(spec.contains("prop `a` is a default"), "{spec}");
+}
+
+#[test]
+fn a_member_chooses_where_its_press_says_chooses_and_only_there() {
+    let item = |render: &str| {
+        let read = rendered(&format!(
+            "export default headless('x', {{ memberOf: set('y'), render: () => (\n{render}\n) }})"
+        ))
+        .unwrap();
+        serde_json::to_string(&read.api.item).unwrap()
+    };
+    assert_eq!(
+        item(r#"<View part="row"><Pressable part="press" chooses /></View>"#),
+        r#"{"chooses":true,"of":"y"}"#
+    );
+    assert_eq!(item(r#"<Pressable part="press" />"#), r#"{"of":"y"}"#);
 }

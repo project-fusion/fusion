@@ -165,14 +165,13 @@ export default styles(
          sets `size` and `padding-inline`: a crumb is 28px, between `sm` at 32
          and nothing, so a button slotted into one stepped the whole trail. */
       rule({
-        web: { all: 'unset' },
+        web: { all: 'unset', cursor: 'pointer' },
         alignItems: 'center',
         backgroundColor: hook.backgroundColor(mix(own.tone, 6, 'transparent')),
         blockSize: hook.size,
         border: [token('border-thin'), 'solid', hook.borderColor],
         boxSizing: 'border-box',
         color: hook.foregroundColor(own.ink),
-        cursor: web('pointer'),
         display: 'inline-flex',
         fontFamily: token('font-sans'),
         fontSize: token('text-control'),

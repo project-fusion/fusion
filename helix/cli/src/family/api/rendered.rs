@@ -2,7 +2,9 @@
 //! form's keys, so [`super::headless`] reads one shape.
 //!
 //! **A spelling of one shape, as the style table's sugar is.** `memberOf:
-//! set(of, { pressChooses })` is `item: item(of, { chooses })`. `props` is an
+//! set(of, { ... })` is `item: item(of, { ... })`, with `chooses` where a
+//! `<Pressable>` in the render says `chooses`: pressing is declared once, on
+//! the press that chooses. `props` is an
 //! object by name in camelCase, each a default or a spec: `dismissLabel:
 //! 'Close'` is `prop('dismiss-label', 'string', { default: 'Close' })`, and
 //! `string()`, `oneOf()`, `property()` and `web()` say the rest. `events` is
@@ -49,10 +51,13 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
     if body.last().is_some_and(|(key, _)| key != "render") {
         return Err("`render` comes last, after the keys it reads".to_owned());
     }
+    let chooses = body
+        .iter()
+        .any(|(key, value)| key == "render" && presses_choose(value));
     let mut fields = Vec::with_capacity(body.len());
     for (key, value) in body {
         let field = match key.as_str() {
-            "memberOf" => ("item".to_owned(), member(value)?),
+            "memberOf" => ("item".to_owned(), member(value, chooses)?),
             "props" => ("props".to_owned(), props(value)?),
             "events" => ("events".to_owned(), events(value)?),
             "derived" => ("derived".to_owned(), derived(value)?),
@@ -77,35 +82,52 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
     ))
 }
 
-/// `set(of, { pressChooses, ... })` as `item(of, { chooses, ... })`.
-fn member(value: &Lit) -> Result<Lit, String> {
+/// `set(of, { ... })` as `item(of, { ... })`, with `chooses` where a press
+/// in the render chooses.
+fn member(value: &Lit, chooses: bool) -> Result<Lit, String> {
     let Lit::Call(helper, arguments) = value else {
         return Err("`memberOf` is `set(family, { ... })`".to_owned());
     };
     let (true, Some(of)) = (helper == "set", arguments.first()) else {
         return Err("`memberOf` is `set(family, { ... })`".to_owned());
     };
-    let mut item = vec![of.clone()];
-    match arguments.get(1) {
-        None => {}
-        Some(Lit::Object(fields)) => item.push(Lit::Object(
-            fields
-                .iter()
-                .map(|(key, value)| {
-                    let key = if key == "chooses" {
-                        return Err("`set()` spells it `pressChooses`".to_owned());
-                    } else if key == "pressChooses" {
-                        "chooses".to_owned()
-                    } else {
-                        key.clone()
-                    };
-                    Ok((key, value.clone()))
-                })
-                .collect::<Result<_, String>>()?,
-        )),
+    let mut fields = match arguments.get(1) {
+        None => Vec::new(),
+        Some(Lit::Object(fields)) => fields.clone(),
         Some(_) => return Err("`set()` takes the family it joins and an object".to_owned()),
+    };
+    if let Some((key, _)) = fields
+        .iter()
+        .find(|(key, _)| key == "chooses" || key == "pressChooses")
+    {
+        return Err(format!(
+            "`set()` takes no `{key}`: pressing chooses where a `<Pressable>` in the render says `chooses`"
+        ));
+    }
+    if chooses {
+        fields.insert(0, ("chooses".to_owned(), Lit::Bool(true)));
+    }
+    let mut item = vec![of.clone()];
+    if !fields.is_empty() || arguments.len() > 1 {
+        item.push(Lit::Object(fields));
     }
     Ok(Lit::Call("item".to_owned(), item))
+}
+
+/// Whether a press in the tree chooses, as `<Pressable chooses>` says.
+fn presses_choose(tree: &Lit) -> bool {
+    match tree {
+        Lit::Call(helper, arguments) => {
+            let own = helper == "pressable"
+                && arguments.iter().any(|argument| {
+                    matches!(argument, Lit::Object(fields)
+                        if fields.iter().any(|(key, value)| key == "chooses" && *value == Lit::Bool(true)))
+                });
+            own || arguments.iter().any(presses_choose)
+        }
+        Lit::Array(nodes) => nodes.iter().any(presses_choose),
+        _ => false,
+    }
 }
 
 /// A key in camelCase, refused in any other case.

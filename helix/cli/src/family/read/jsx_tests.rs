@@ -488,3 +488,45 @@ fn render_is_given_only_what_it_reads_by_its_own_name() {
         "{missing}"
     );
 }
+
+#[test]
+fn a_wrap_with_no_condition_always_wraps_and_a_link_wraps_what_it_links() {
+    assert_eq!(
+        tree(r#"<Wrap part="trigger" platform="native"><Slot name="trigger" /></Wrap>"#),
+        [call(
+            "wrap",
+            vec![
+                text("trigger"),
+                object(&[("platform", text("native")), ("while", Lit::Bool(true))]),
+                Lit::Array(vec![call(
+                    "region",
+                    vec![text("trigger"), object(&[]), Lit::Array(Vec::new())]
+                )]),
+            ],
+        )]
+    );
+    assert_eq!(
+        tree(r#"<Wrap part="link" href={props.dismissLabel}><Slot /></Wrap>"#),
+        [call(
+            "wrap",
+            vec![
+                text("link"),
+                object(&[("href", bind("dismiss-label"))]),
+                Lit::Array(vec![call(
+                    "region",
+                    vec![text("default"), object(&[]), Lit::Array(Vec::new())]
+                )]),
+            ],
+        )]
+    );
+    for always in [
+        r#"<Wrap part="a" when><Slot /></Wrap>"#,
+        r#"<Wrap part="a" when={true}><Slot /></Wrap>"#,
+    ] {
+        let why = refused(always);
+        assert!(
+            why.contains("a wrap that always wraps writes no `when`"),
+            "{why}"
+        );
+    }
+}

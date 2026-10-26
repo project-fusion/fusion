@@ -166,7 +166,6 @@ export default headless('menu', {
       <Wrap
         part="trigger"
         platform="native"
-        when
       >
         <Slot name="trigger" />
       </Wrap>

@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -46,5 +46,35 @@ describe('a button takes the status tones', () => {
       expect(sheet).toContain(`:host([tone="${tone}"])`)
       expect(sheet).toContain(`--helix-color-${tone}-surface`)
     }
+  })
+})
+
+/* `:disabled` on the host is what the style table reads, and a form's disabled
+   fieldset sets it as the button's own `disabled` does. Only a browser
+   resolves the cascade and a fieldset's hold on what it holds. */
+const drawn = hasLayout() ? test : (): void => {}
+
+describe('a disabled button', () => {
+  const opacity = async (markup: string): Promise<string> => {
+    const holder = await mount(markup)
+    const host = (
+      holder.matches('helix-button') ? holder : holder.querySelector('helix-button')
+    ) as HTMLElement & { updateComplete: Promise<unknown> }
+    await host.updateComplete
+    return getComputedStyle(part(host, 'button') as Element).opacity
+  }
+
+  drawn('is drawn at half its opacity, by its own `disabled`', async () => {
+    expect(await opacity('<helix-button disabled>Save</helix-button>')).toBe('0.5')
+  })
+
+  drawn('is drawn at half its opacity inside a disabled fieldset', async () => {
+    expect(await opacity('<fieldset disabled><helix-button>Save</helix-button></fieldset>')).toBe(
+      '0.5',
+    )
+  })
+
+  drawn('is drawn whole inside a fieldset that is not disabled', async () => {
+    expect(await opacity('<fieldset><helix-button>Save</helix-button></fieldset>')).toBe('1')
   })
 })
