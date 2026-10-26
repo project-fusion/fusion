@@ -1,4 +1,4 @@
-import { list, measured, token, web } from '../../../style.js'
+import { list, measured, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -21,21 +21,24 @@ export default styles(
   root,
   {
     prefix: 'tour',
-    hooks: ['scrim-color', 'spotlight-radius'],
+    hooks: {
+      scrimColor: token('color-overlay'),
+      spotlightRadius: token('radii-md'),
+    },
     stylesheet: 'tour/root/tour-root.generated.css',
   },
   ({ hook, on, rule }) => {
-    const scrim = hook.scrimColor(token('color-overlay'))
+    const scrim = hook.scrimColor
     const normal = token('duration-normal')
     const standard = token('easing-standard')
     return [
       on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
       on('spotlight', [
         rule({
-          borderRadius: hook.spotlightRadius(token('radii-md')),
+          borderRadius: hook.spotlightRadius,
           boxShadow: [0, 0, 0, '200vmax', scrim],
           pointerEvents: 'none',
-          position: web('fixed'),
+          web: { position: 'fixed' },
           transition: list(
             ['left', normal, standard],
             ['top', normal, standard],
@@ -45,26 +48,25 @@ export default styles(
           zIndex: token('layer-overlay'),
         }),
         /* The lit box the tour measures, which the web writes on the part. */
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             blockSize: measured('tour-spotlight-height', 0),
             inlineSize: measured('tour-spotlight-width', 0),
             left: measured('tour-spotlight-x', 0),
             position: 'absolute',
             top: measured('tour-spotlight-y', 0),
-          },
-        ),
+          }),
+        ]),
       ]),
       on('backdrop', [
         rule({
           backgroundColor: scrim,
           inset: 0,
           pointerEvents: 'none',
-          position: web('fixed'),
+          web: { position: 'fixed' },
           zIndex: token('layer-overlay'),
         }),
-        rule({ platform: 'native' }, { position: 'absolute' }),
+        native([rule({ position: 'absolute' })]),
       ]),
     ]
   },

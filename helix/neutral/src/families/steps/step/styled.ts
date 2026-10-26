@@ -1,4 +1,4 @@
-import { fit, list, mix, product, sum, token } from '../../../style.js'
+import { first, fit, list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import step from './headless.js'
 
@@ -34,7 +34,11 @@ export default styles(
   step,
   {
     prefix: 'steps',
-    hooks: ['complete-color', 'connector-color', 'current-color'],
+    hooks: ({ own }) => ({
+      completeColor: own.inkComplete(token('color-success')),
+      connectorColor: token('color-border'),
+      currentColor: own.inkCurrent(token('color-primary')),
+    }),
     own: [
       'step-inset',
       'steps-body-align',
@@ -98,30 +102,25 @@ export default styles(
       }),
       /* A phone's step is a column in a row of steps, and a row down a column,
          which wraps what the stage holds under the name. */
-      rule(
-        { platform: 'native' },
-        { display: 'flex', flexDirection: own.flow('column'), flexWrap: 'wrap' },
-      ),
+      native([rule({ display: 'flex', flexDirection: own.flow('column'), flexWrap: 'wrap' })]),
     ]),
     on({ before: 'host' }, [
       rule({
-        backgroundColor: hook.connectorColor(token('color-border')),
+        backgroundColor: hook.connectorColor,
         content: '""',
         position: 'absolute',
         zIndex: 0,
       }),
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           blockSize: own.leadBlockSize(token('border-thin')),
           inlineSize: own.leadInlineSize(0),
           insetBlockStart: own.leadBlockStart('50%'),
           insetInlineStart: own.leadInlineStart(0),
-        },
-      ),
-      rule(
-        { platform: 'native' },
-        {
+        }),
+      ]),
+      native([
+        rule({
           blockSize: own.leadHeight(token('border-thin')),
           inlineSize: own.leadWidth('auto'),
           insetBlockStart: own.leadTop(0),
@@ -129,30 +128,28 @@ export default styles(
           insetInlineStart: own.leadStart(0),
           insetInlineEnd: own.leadEnd('auto'),
           marginInlineEnd: own.railMargin(0),
-        },
-      ),
+        }),
+      ]),
       /* Nothing arrives at the first, and nothing leaves the last. */
       rule({ place: 'first' }, { display: 'none' }),
     ]),
     on({ after: 'host' }, [
       rule({
-        backgroundColor: hook.connectorColor(token('color-border')),
+        backgroundColor: hook.connectorColor,
         content: '""',
         position: 'absolute',
         zIndex: 0,
       }),
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           blockSize: own.trailBlockSize(token('border-thin')),
           inlineSize: own.trailInlineSize(0),
           insetBlockStart: own.trailBlockStart('50%'),
           insetInlineStart: own.trailInlineStart(0),
-        },
-      ),
-      rule(
-        { platform: 'native' },
-        {
+        }),
+      ]),
+      native([
+        rule({
           blockSize: own.trailHeight(token('border-thin')),
           inlineSize: own.trailWidth('auto'),
           insetBlockStart: own.trailTop(0),
@@ -160,8 +157,8 @@ export default styles(
           insetInlineStart: own.trailStart(0),
           insetInlineEnd: own.trailEnd('auto'),
           marginInlineStart: own.railMargin(0),
-        },
-      ),
+        }),
+      ]),
       rule({ place: 'last' }, { display: 'none' }),
     ]),
     /* The square the mark sits in, which down a column is the dense name's
@@ -186,55 +183,50 @@ export default styles(
         transition: ['color', token('duration-fast'), token('easing-standard')],
         zIndex: 1,
       }),
-      rule({ platform: 'native' }, { alignSelf: own.markerJustify('center') }),
+      native([rule({ alignSelf: own.markerJustify('center') })]),
       rule(
         { complete: true },
         {
-          color: hook.completeColor(own.inkComplete(token('color-success'))),
+          color: first(hook.completeColor, own.inkComplete, token('color-success')),
           fontWeight: token('weight-semibold'),
         },
       ),
       rule(
         { current: true },
         {
-          color: hook.currentColor(own.inkCurrent(token('color-primary'))),
+          color: first(hook.currentColor, own.inkCurrent, token('color-primary')),
           fontWeight: token('weight-semibold'),
         },
       ),
       rule(
         { complete: true, current: true },
-        { color: hook.completeColor(own.inkComplete(token('color-success'))) },
+        { color: first(hook.completeColor, own.inkComplete, token('color-success')) },
       ),
     ]),
     on({ part: 'marker', inner: 'slot' }, [
-      rule(
-        { platform: 'web' },
-        { alignItems: 'center', display: 'inline-flex', justifyContent: 'center' },
-      ),
+      web([rule({ alignItems: 'center', display: 'inline-flex', justifyContent: 'center' })]),
     ]),
     /* The number, drawn only where the sequence asks for numbers. Under
        `numeric` the glyph is not drawn, so the two never both show. */
     on({ after: 'marker' }, [rule({ content: own.count('none') })]),
     on({ part: 'marker', inner: 'svg' }, [
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           blockSize: own.m(token('size-icon')),
           display: own.mark('inline'),
           flex: [0, 0, 'auto'],
           inlineSize: own.m(token('size-icon')),
-        },
-      ),
+        }),
+      ]),
     ]),
     on('mark', [
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           blockSize: own.m(token('size-icon')),
           display: own.mark('flex'),
           inlineSize: own.m(token('size-icon')),
-        },
-      ),
+        }),
+      ]),
     ]),
     on({ region: 'marker', slotted: '*' }, [rule({ '--icon-size': own.m(token('size-icon')) })]),
     on('body', [
@@ -248,15 +240,14 @@ export default styles(
         position: 'relative',
         zIndex: 1,
       }),
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           alignSelf: 'stretch',
           flexBasis: own.bodyBasis('auto'),
           flexGrow: own.bodyGrow(0),
           flexShrink: 1,
-        },
-      ),
+        }),
+      ]),
     ]),
     /* The name: a dense control in the step's text size. Button brings its
        hover, focus ring, and disabled look. */
@@ -278,9 +269,8 @@ export default styles(
       rule([{ complete: true }, { current: true }], {
         '--button-foreground-color': token('color-foreground'),
       }),
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           alignItems: 'center',
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
@@ -293,20 +283,14 @@ export default styles(
           lineHeight: token('leading-tight'),
           minBlockSize: token('size-control-sm'),
           paddingInline: own.stepInset,
-        },
-      ),
-      rule(
-        [
-          { complete: true, platform: 'native' },
-          { current: true, platform: 'native' },
-        ],
-        { color: token('color-foreground') },
-      ),
-      rule(
-        { active: true, disabled: false, platform: 'native' },
-        { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
-      ),
-      rule({ disabled: true, platform: 'native' }, { opacity: 0.5 }),
+        }),
+        rule([{ complete: true }, { current: true }], { color: token('color-foreground') }),
+        rule(
+          { active: true, within: { host: { disabled: false } } },
+          { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
+        ),
+        rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+      ]),
     ]),
     /* The same inset the name takes as padding, so the two start on one line. */
     on('description', [
@@ -336,13 +320,12 @@ export default styles(
       rule({ current: true }, { gridTemplateRows: fit(1), visibility: 'visible' }),
       /* A phone's stage opens under the name, past the mark, to the measured
          height of what it holds. */
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           flexBasis: '100%',
           paddingInlineStart: sum(own.markBox, token('space-2xs'), own.stepInset),
-        },
-      ),
+        }),
+      ]),
     ]),
     on({ part: 'content', inner: '> slot' }, [
       rule({ display: 'block', minBlockSize: 0, overflow: 'hidden' }),

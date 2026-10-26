@@ -1,4 +1,4 @@
-import { difference, fn, list, measured, mix, product, sum, token, web } from '../../../style.js'
+import { difference, first, fn, list, measured, mix, product, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import tabs from './headless.js'
@@ -19,15 +19,15 @@ export default styles(
   tabs,
   {
     prefix: 'tabs',
-    hooks: [
-      'gap',
-      'indicator-color',
-      'indicator-radius',
-      'indicator-shadow',
-      'indicator-thickness',
-      'rule-color',
-      'scroll-background-color',
-    ],
+    hooks: ({ own }) => ({
+      gap: token('space-2xs'),
+      indicatorColor: null,
+      indicatorRadius: own.indicatorRadius(token('radii-none')),
+      indicatorShadow: own.indicatorShadow('none'),
+      indicatorThickness: token('border-thick'),
+      ruleColor: token('color-border'),
+      scrollBackgroundColor: token('color-surface'),
+    }),
     own: [
       'indicator-block',
       'indicator-border',
@@ -81,11 +81,7 @@ export default styles(
         { variant: 'underlined' },
         {
           own: {
-            rule: fn(
-              'linear-gradient',
-              hook.ruleColor(token('color-border')),
-              hook.ruleColor(token('color-border')),
-            ),
+            rule: fn('linear-gradient', hook.ruleColor, hook.ruleColor),
             tabRadius: token('radii-none'),
             tabSelectedShadow: 'none',
             tabSelectedSurface: 'transparent',
@@ -140,7 +136,7 @@ export default styles(
         backgroundRepeat: 'repeat-x',
         backgroundSize: ['100%', token('border-thin')],
         display: 'flex',
-        gap: hook.gap(token('space-2xs')),
+        gap: hook.gap,
         overflowX: 'auto',
       }),
       /* Segmented. */
@@ -196,10 +192,10 @@ export default styles(
       [
         rule({
           alignItems: 'center',
-          backgroundColor: hook.scrollBackgroundColor(token('color-surface')),
+          backgroundColor: hook.scrollBackgroundColor,
           border: 'none',
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
+          web: { cursor: 'pointer' },
           display: 'inline-flex',
           flex: 'none',
           justifyContent: 'center',
@@ -259,8 +255,8 @@ export default styles(
            measured 0.004 apart in OKLCH lightness, so the only thing separating the
            tab you are on from the tab under your pointer was a `shadow-sm`. */
         border: [own.indicatorBorder(0), 'solid', own.indicatorBorderColor('transparent')],
-        borderRadius: hook.indicatorRadius(own.indicatorRadius(token('radii-none'))),
-        boxShadow: hook.indicatorShadow(own.indicatorShadow('none')),
+        borderRadius: first(hook.indicatorRadius, own.indicatorRadius, token('radii-none')),
+        boxShadow: first(hook.indicatorShadow, own.indicatorShadow, 'none'),
         inlineSize: measured('indicator-inline-size', 0),
         insetBlockStart: 0,
         insetInlineStart: 0,
@@ -291,11 +287,11 @@ export default styles(
         { variant: 'underlined' },
         {
           own: {
-            indicatorBlock: hook.indicatorThickness(token('border-thick')),
+            indicatorBlock: hook.indicatorThickness,
             indicatorColor: hook.indicatorColor(token('color-primary')),
             indicatorOffset: difference(
               measured('indicator-block-size', '0px'),
-              hook.indicatorThickness(token('border-thick')),
+              hook.indicatorThickness,
             ),
           },
         },
@@ -336,15 +332,12 @@ export default styles(
       rule(
         { orientation: 'vertical', variant: 'underlined' },
         {
-          inlineSize: hook.indicatorThickness(token('border-thick')),
+          inlineSize: hook.indicatorThickness,
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
             indicatorOffset: '0px',
             indicatorOffsetX: product(
-              difference(
-                measured('indicator-inline-size', '0px'),
-                hook.indicatorThickness(token('border-thick')),
-              ),
+              difference(measured('indicator-inline-size', '0px'), hook.indicatorThickness),
               own.inlineSign(1),
             ),
           },
