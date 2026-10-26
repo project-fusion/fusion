@@ -1,4 +1,4 @@
-import { mix, product, quotient, token, web } from '../../../style.js'
+import { mix, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -41,8 +41,11 @@ export default styles(
         /* A fragment longer than the line, a path or an identifier, breaks
            inside itself where it would run out of the text, and each piece
            keeps the wash and the padding. */
-        WebkitBoxDecorationBreak: web('clone'),
-        boxDecorationBreak: web('clone'),
+        web: {
+          WebkitBoxDecorationBreak: 'clone',
+          boxDecorationBreak: 'clone',
+          overflowWrap: 'break-word',
+        },
         /* Never a syntax color: a colored word in running text reads as a
            link. `foreground-muted` alone is too far back at 5.27 light and
            7.42 dark where the prose runs at 21; mixed 30% it measures 9.98 and
@@ -53,7 +56,6 @@ export default styles(
            it and sits on the line like a footnote. `sm` over `md` leaves body
            text unchanged to the pixel. */
         fontSize: hook.size,
-        overflowWrap: web('break-word'),
         paddingBlock: token('space-none'),
         /* Half a step: `2xs` is 4px against a word space of 3.5px, so
            `(code)` renders as `( code )`. A margin would add the same space

@@ -6,6 +6,7 @@ import {
   registerDom,
   slotted,
   type Updatable,
+  unweighted,
 } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -21,10 +22,12 @@ beforeAll(async () => {
 const sheet = (): string => {
   const declared = (customElements.get('helix-button-group') as unknown as { styles: unknown })
     .styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`. */

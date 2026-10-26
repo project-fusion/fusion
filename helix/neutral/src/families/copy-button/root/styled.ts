@@ -71,8 +71,8 @@ export default styles(
         rule({
           display: web('inline-grid'),
           fontWeight: token('weight-medium'),
-          gridArea: web('1 / 2'),
           justifyItems: web('start'),
+          web: { gridArea: '1 / 2' },
         }),
       ]),
       on({ part: 'text', inner: '> span' }, [web([rule({ gridArea: '1 / 1' })])]),
@@ -85,17 +85,7 @@ export default styles(
       /* The confirmation is the one moment this control is loud, under the pointer too. */
       on('button', [
         rule({ part: { 'data-copied': true } }, { color: success }),
-        rule(
-          { formDisabled: false, hover: true, part: { 'data-copied': true } },
-          { color: success },
-        ),
-        rule(
-          [
-            { part: { 'data-failed': true } },
-            { formDisabled: false, hover: true, part: { 'data-failed': true } },
-          ],
-          { color: danger },
-        ),
+        rule({ part: { 'data-failed': true } }, { color: danger }),
       ]),
       /* The marks drawn by default, which an icon passed in replaces. */
       on('mark', [

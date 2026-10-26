@@ -110,14 +110,8 @@ export default styles(
     ]),
     /* `hidden` hides nothing an author gave a display to, so the stand-ins
        say it again. */
-    /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
-    on({ part: 'placeholder', selector: ':host [part="placeholder"][hidden]' }, [
-      web([rule({ display: 'none' })]),
-    ]),
-    /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
-    on({ part: 'fallback', selector: ':host [part="fallback"][hidden]' }, [
-      web([rule({ display: 'none' })]),
-    ]),
+    on('placeholder', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
+    on('fallback', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
     /* A slotted placeholder fills the box rather than sitting in its middle. */
     on({ region: 'placeholder', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
   ],

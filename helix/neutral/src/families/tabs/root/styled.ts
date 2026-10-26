@@ -178,12 +178,13 @@ export default styles(
         },
       ),
       rule({ dir: 'rtl', orientation: 'vertical' }, { backgroundPosition: 'left' }),
-      /* The segmented groove grows down with its tabs. */
+      rule({ width: 'full' }, { inlineSize: 'auto', justifySelf: 'stretch' }),
+      /* The segmented groove grows down with its tabs, and keeps its own width
+         when the tabs fill the row. */
       rule(
         { orientation: 'vertical', variant: 'segmented' },
         { blockSize: 'auto', justifySelf: 'start', own: { tabHeight: 'initial' } },
       ),
-      rule({ width: 'full' }, { inlineSize: 'auto', justifySelf: 'stretch' }),
     ]),
     /* The scroll buttons under `scroll-controls` hold to the ends of the strip as
        it scrolls, over the tabs that pass under them. Hidden, they draw no box. */

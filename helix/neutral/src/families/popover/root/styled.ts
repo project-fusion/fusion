@@ -112,11 +112,14 @@ export default styles(
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
         rule({ placedRight: true }, { transformOrigin: [0, measured('floating-arrow-y', '50%')] }),
-        rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
-          scale: 1,
-          transform: 'none',
-          transition: 'none',
-        }),
+        rule(
+          { reducedMotion: true },
+          {
+            scale: 1,
+            transform: 'none',
+            transition: 'none',
+          },
+        ),
       ]),
       /* The scrolling happens in here, with the inset inside it. */
       on('content', [

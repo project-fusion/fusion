@@ -33,8 +33,7 @@ export default fragment(
        ink. */
     on('content', [
       rule({
-        WebkitBackgroundClip: web('text'),
-        backgroundClip: web('text'),
+        web: { WebkitBackgroundClip: 'text', backgroundClip: 'text' },
         backgroundImage: web(
           fn(
             'linear-gradient',

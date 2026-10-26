@@ -137,8 +137,6 @@ export default styles(
           ),
           translate: [0, rise],
         }),
-        rule({ open: true }, { opacity: 1, translate: [0, 0] }),
-        rule({ startingStyle: true, open: true }, { opacity: 0, translate: [0, rise] }),
         /* A sheet below a phone's width, pinned to the window's bottom edge. */
         rule(
           { window: { below: '30rem' } },
@@ -157,6 +155,8 @@ export default styles(
             translate: [0, '100%'],
           },
         ),
+        rule({ open: true }, { opacity: 1, translate: [0, 0] }),
+        rule({ startingStyle: true, open: true }, { opacity: 0, translate: [0, rise] }),
         rule(
           { startingStyle: true, open: true, window: { below: '30rem' } },
           { translate: [0, '100%'] },
@@ -209,7 +209,7 @@ export default styles(
       /* In the corner and out of the flow, centered on the title's first line. */
       on('dismiss', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           position: 'absolute',
           insetBlockStart: sum(padding, quotient(difference(titleLine, dismissSize), 2)),
@@ -217,7 +217,6 @@ export default styles(
           blockSize: dismissSize,
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
           display: 'inline-flex',
           inlineSize: dismissSize,
           placeContent: 'center',

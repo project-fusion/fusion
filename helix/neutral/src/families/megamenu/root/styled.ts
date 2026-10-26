@@ -112,12 +112,11 @@ export default styles(
       /* The base layer's link shape by hand. */
       on('trigger', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           alignItems: 'center',
           borderRadius: hook.triggerRadius,
           color: hook.triggerColor,
-          cursor: web('pointer'),
           display: 'inline-flex',
           fontFamily: token('font-sans'),
           fontSize: hook.triggerFontSize,
@@ -281,10 +280,7 @@ export default styles(
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       /* Every rule giving the panel a display overrules the UA's own hide. */
-      /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
-      on({ part: 'surface', selector: ':host [part="surface"][hidden]' }, [
-        web([rule({ display: 'none' })]),
-      ]),
+      on('surface', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
     ]
   },
 )

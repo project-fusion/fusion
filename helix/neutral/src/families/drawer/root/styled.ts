@@ -294,7 +294,7 @@ export default styles(
       /* In the corner and out of the flow, centered on the title's first line. */
       on('dismiss', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           position: 'absolute',
           insetBlockStart: sum(
@@ -305,7 +305,6 @@ export default styles(
           blockSize: dismissSize,
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
           display: 'inline-flex',
           inlineSize: dismissSize,
           placeContent: 'center',

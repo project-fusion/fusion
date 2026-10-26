@@ -1,4 +1,4 @@
-import { mix, native, product, token, web } from '../../../style.js'
+import { mix, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -64,13 +64,12 @@ export default styles(
       ]),
       on('back', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           alignItems: 'center',
           blockSize: token('size-control-tight'),
           borderRadius: token('radii-sm'),
           boxSizing: 'border-box',
           color: hook.backColor,
-          cursor: web('pointer'),
           display: 'flex',
           inlineSize: token('size-control-tight'),
           justifyContent: 'center',

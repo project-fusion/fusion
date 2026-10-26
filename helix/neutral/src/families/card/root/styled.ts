@@ -165,19 +165,21 @@ export default styles(
         }),
       ],
     ),
-    /* The actions are always in a row of their own, where `justify-self`
-       places nothing: the web keeps it from before rows were drawn. */
-    on({ region: ['header-actions', 'footer-actions'], slotted: '*' }, [
-      rule({ flex: 'none' }),
-      web([rule({ justifySelf: 'end' })]),
-      rule({ defined: false }, { alignSelf: 'center', gridColumn: 2, marginInlineStart: hook.gap }),
-    ]),
     on({ region: 'footer-actions', slotted: '*' }, [
       rule({ within: 'footer-row' }, { marginInlineStart: 'auto' }),
     ]),
     on({ region: '*', slotted: '*' }, [rule({ defined: false }, { gridColumn: '1 / -1' })]),
     on({ region: ['header', 'footer'], slotted: '*' }, [
       rule({ defined: false }, { gridColumn: 1 }),
+    ]),
+    /* The actions are always in a row of their own, where `justify-self`
+       places nothing: the web keeps it from before rows were drawn. Last, so
+       their place before the upgrade stands over every region's and the
+       footer row's. */
+    on({ region: ['header-actions', 'footer-actions'], slotted: '*' }, [
+      rule({ flex: 'none' }),
+      web([rule({ justifySelf: 'end' })]),
+      rule({ defined: false }, { alignSelf: 'center', gridColumn: 2, marginInlineStart: hook.gap }),
     ]),
   ],
 )

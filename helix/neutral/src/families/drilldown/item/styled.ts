@@ -57,13 +57,12 @@ export default styles(
       on('host', [rule({ display: 'block' })]),
       on('item', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           alignItems: 'center',
           blockSize: height,
           boxSizing: 'border-box',
           inlineSize: '100%',
           color: hook.color,
-          cursor: web('pointer'),
           display: 'flex',
           fontFamily: token('font-sans'),
           fontSize: hook.fontSize,

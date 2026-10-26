@@ -154,10 +154,8 @@ export default styles(
        still what takes the press and the focus. */
     on('control', [
       rule({
-        appearance: web('none'),
+        web: { appearance: 'none', cursor: 'inherit', gridArea: '1 / 1' },
         blockSize: '100%',
-        cursor: web('inherit'),
-        gridArea: web('1 / 1'),
         inlineSize: '100%',
         margin: token('space-none'),
         opacity: 0,

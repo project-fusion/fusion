@@ -225,7 +225,7 @@ export default styles(
       /* The trigger the dial draws where none is passed in. */
       on('trigger', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           '--icon-size': token('size-icon'),
           alignItems: 'center',
           backgroundColor: hook.backgroundColor,
@@ -234,7 +234,6 @@ export default styles(
           boxShadow: hook.shadow,
           boxSizing: 'border-box',
           color: hook.color,
-          cursor: web('pointer'),
           display: 'inline-flex',
           inlineSize: hook.size,
           justifyContent: 'center',

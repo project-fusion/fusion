@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, type Updatable, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,10 +13,12 @@ beforeAll(async () => {
    `shape` lives on this tier alone. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-skeleton') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule whose selector list names `selector`. */
@@ -80,7 +82,7 @@ describe('skeleton', () => {
 
   test('with motion reduced the placeholder simply sits there', () => {
     // The sweep is the whole effect, so nothing else is animated in its place.
-    const reduced = sheet().split('@media (prefers-reduced-motion: reduce)')[1] ?? ''
+    const reduced = sheet().split('@media (prefers-reduced-motion: reduce)').slice(1).join('')
     expect(reduced).toContain('animation: none')
     expect(reduced).toContain('background-image: none')
   })

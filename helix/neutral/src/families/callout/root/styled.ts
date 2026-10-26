@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { list, mix, native, product, sum, token, web } from '../../../style.js'
+import { list, mix, native, product, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -134,12 +134,11 @@ export default styles(
       /* At the end of the first line, as quiet as the mark at the start. */
       on('dismiss', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           blockSize: sum(iconSize, product(token('space-2xs'), 2)),
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
           display: 'inline-flex',
           flex: '0 0 auto',
           inlineSize: sum(iconSize, product(token('space-2xs'), 2)),

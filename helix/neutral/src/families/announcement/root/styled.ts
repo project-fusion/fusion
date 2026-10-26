@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { fn, list, mix, native, product, scheme, sum, token, web } from '../../../style.js'
+import { fn, list, mix, native, product, scheme, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -155,13 +155,12 @@ export default styles(
       /* The glyph and a small pad, out of flow at the end. */
       on('dismiss', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           blockSize: dismissSize,
           inlineSize: dismissSize,
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
           display: 'inline-flex',
           flex: '0 0 auto',
           placeContent: 'center',
