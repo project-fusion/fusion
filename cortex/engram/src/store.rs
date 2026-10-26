@@ -1,7 +1,9 @@
-//! Where memory is kept: one trait, an in-memory reference, and `SQLite`.
+//! Where memory is kept: one trait, an in-memory reference, `SQLite`, and
+//! Postgres.
 //!
 //! [`InMemory`] holds a [`Memory`], which is the reference, and every backend
-//! passes the same conformance suite. Postgres joins it behind the same trait.
+//! passes the same conformance suite. [`open`] picks a backend by its
+//! connection string.
 
 use std::sync::Mutex;
 
@@ -17,7 +19,7 @@ use crate::{Episode, Fact, Memory};
 /// # use fusion_cortex_engram::{store::{InMemory, Store}, Episode, Fact};
 /// # #[tokio::main]
 /// # async fn main() {
-/// let store = InMemory::new(); // or store::Sqlite::open(path).await?
+/// let store = InMemory::new(); // or store::open(location).await?
 /// let session = Id::new();
 /// let episode = Episode::new("tests run with bun", session);
 ///
@@ -224,6 +226,71 @@ impl Store for InMemory {
         Ok(self.lock()?.delete_fact(fact))
     }
 }
+
+// A build with no backend opens nothing, and waits for nothing.
+#[cfg_attr(
+    not(any(feature = "postgres", feature = "sqlite")),
+    allow(clippy::unused_async)
+)]
+/// Opens the store `location` names: a `SQLite` file for `sqlite:` or a
+/// path, a `SQLite` database in memory for `sqlite::memory:`, and Postgres for
+/// `postgres://`. [`fusion_cortex_core::storage`] says how a location is read,
+/// with the setting for a transaction-mode pooler.
+///
+/// ```
+/// # #[tokio::main]
+/// # async fn main() {
+/// // A path, `sqlite:memory.db`, or `postgres://…` opens the same way.
+/// let store = fusion_cortex_engram::store::open("sqlite::memory:").await.unwrap();
+///
+/// assert!(store.episodes().await.unwrap().is_empty());
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// [`Error::Storage`] if `location` names no store, this build lacks the
+/// feature for its backend, or the backend fails to open.
+pub async fn open(location: &str) -> Result<Box<dyn Store>> {
+    use fusion_cortex_core::storage::Location;
+    match Location::parse(location)? {
+        #[cfg(feature = "sqlite")]
+        Location::Sqlite(path) => Ok(Box::new(Sqlite::open(path).await?)),
+        #[cfg(feature = "sqlite")]
+        Location::Memory => Ok(Box::new(Sqlite::in_memory().await?)),
+        #[cfg(feature = "postgres")]
+        Location::Postgres(postgres) => Ok(Box::new(Postgres::connect(&postgres).await?)),
+        #[allow(unreachable_patterns)]
+        Location::Postgres(_) => Err(Error::Storage(
+            "this build has no Postgres store: turn on the postgres feature".into(),
+        )),
+        #[allow(unreachable_patterns)]
+        _ => Err(Error::Storage(
+            "this build has no SQLite store: turn on the sqlite feature".into(),
+        )),
+    }
+}
+
+/// The head of the lineage `from` belongs to, walking `links`, or none for an
+/// unknown id. Stops on a cycle.
+#[cfg(any(feature = "postgres", feature = "sqlite"))]
+fn head(links: &std::collections::HashMap<Id, Option<Id>>, from: Id) -> Option<Id> {
+    let mut current = from;
+    let mut seen = std::collections::HashSet::new();
+    links.get(&current)?;
+    while let Some(Some(next)) = links.get(&current) {
+        if !seen.insert(current) || !links.contains_key(next) {
+            break;
+        }
+        current = *next;
+    }
+    Some(current)
+}
+
+#[cfg(feature = "postgres")]
+mod postgres;
+#[cfg(feature = "postgres")]
+pub use postgres::Postgres;
 
 #[cfg(feature = "sqlite")]
 pub use sqlite::Sqlite;
@@ -603,21 +670,6 @@ mod sqlite {
             Ok(links)
         }
 
-        /// The head of the lineage `from` belongs to, walking `links`, or none
-        /// for an unknown id. Stops on a cycle.
-        fn head(links: &HashMap<Id, Option<Id>>, from: Id) -> Option<Id> {
-            let mut current = from;
-            let mut seen = std::collections::HashSet::new();
-            links.get(&current)?;
-            while let Some(Some(next)) = links.get(&current) {
-                if !seen.insert(current) || !links.contains_key(next) {
-                    break;
-                }
-                current = *next;
-            }
-            Some(current)
-        }
-
         /// The facts `rows` hold, each with its sources.
         async fn read(&self, rows: Vec<SqliteRow>) -> Result<Vec<Fact>> {
             let mut facts = Vec::new();
@@ -703,7 +755,7 @@ mod sqlite {
                 .map_err(storage)?;
             if let Some(old) = supersedes {
                 let links = Self::links(&mut *transaction).await?;
-                if let Some(head) = Self::head(&links, old) {
+                if let Some(head) = super::head(&links, old) {
                     sqlx::query("UPDATE facts SET superseded_by = ? WHERE id = ?")
                         .bind(fact.id.to_string())
                         .bind(head.to_string())
@@ -764,7 +816,7 @@ mod sqlite {
                 .await
                 .map_err(storage)?;
             let links = Self::links(&mut *transaction).await?;
-            let Some(head) = Self::head(&links, fact) else {
+            let Some(head) = super::head(&links, fact) else {
                 return Ok(false);
             };
             let sourced: i64 =
@@ -817,7 +869,7 @@ mod sqlite {
                 .await
                 .map_err(storage)?;
             let links = Self::links(&mut *transaction).await?;
-            let (Some(head), Some(target)) = (Self::head(&links, old), Self::head(&links, new))
+            let (Some(head), Some(target)) = (super::head(&links, old), super::head(&links, new))
             else {
                 return Ok(false);
             };
@@ -886,7 +938,7 @@ mod sqlite {
                 .await
                 .map_err(storage)?;
             let links = Self::links(&mut *transaction).await?;
-            let Some(head) = Self::head(&links, fact) else {
+            let Some(head) = super::head(&links, fact) else {
                 return Ok(false);
             };
             let (head, episode) = (head.to_string(), episode.to_string());
@@ -1440,6 +1492,129 @@ mod tests {
     #[tokio::test]
     async fn the_sqlite_store_conforms() {
         conformance::run(&super::Sqlite::in_memory().await.unwrap()).await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn the_postgres_store_conforms() {
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            conformance::run(&super::Postgres::connect(&location).await.unwrap()).await;
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn two_postgres_stores_writing_one_schema_wait_for_each_other() {
+        use super::{Postgres, Store};
+        use crate::{Episode, Fact};
+        use fusion_cortex_core::Id;
+
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let write = |location: fusion_cortex_core::storage::Postgres| async move {
+                let store = Postgres::connect(&location).await.unwrap();
+                let trace = Id::new();
+                let mut last: Option<Id> = None;
+                for round in 0..40 {
+                    let episode = Episode::new(format!("round {round}"), trace);
+                    store.record(&episode).await.unwrap();
+                    let fact = Fact::new(format!("round {round}"), vec![episode.id], 0.5);
+                    store.assert_fact(&fact, last).await.unwrap();
+                    store.reinforce(fact.id, episode.id).await.unwrap();
+                    last = Some(fact.id);
+                }
+            };
+
+            let (first, second) = tokio::join!(
+                tokio::spawn(write(location.clone())),
+                tokio::spawn(write(location.clone()))
+            );
+
+            first.unwrap();
+            second.unwrap();
+            let store = super::open(&location.url).await.unwrap();
+            assert_eq!(store.current_facts().await.unwrap().len(), 2);
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn forgetting_a_source_prunes_its_postgres_rows() {
+        use super::{Postgres, Store};
+        use crate::{Episode, Fact};
+        use fusion_cortex_core::Id;
+
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let store = Postgres::connect(&location).await.unwrap();
+            let (monday, tuesday) = (
+                Episode::new("bun", Id::new()),
+                Episode::new("bun", Id::new()),
+            );
+            store.record(&monday).await.unwrap();
+            store.record(&tuesday).await.unwrap();
+            let fact = Fact::new("tests run with bun", vec![monday.id, tuesday.id], 0.8);
+            store.assert_fact(&fact, None).await.unwrap();
+            store.reinforce(fact.id, monday.id).await.unwrap();
+
+            store.forget_episode(monday.id).await.unwrap();
+
+            let pool = sqlx::PgPool::connect(&location.url).await.unwrap();
+            let rows: i64 = sqlx::query_scalar(
+                "SELECT (SELECT COUNT(*) FROM sources WHERE episode = $1)
+                      + (SELECT COUNT(*) FROM reinforcements WHERE episode = $1)",
+            )
+            .bind(monday.id.0)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+            assert_eq!(rows, 0, "no row names the forgotten episode");
+            pool.close().await;
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn a_postgres_store_refuses_a_nul_in_text() {
+        use super::{Postgres, Store};
+        use crate::Episode;
+        use fusion_cortex_core::Id;
+
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let store = Postgres::connect(&location).await.unwrap();
+
+            let refused = store.record(&Episode::new("a\0b", Id::new())).await;
+
+            assert!(refused.is_err(), "{refused:?}");
+            assert!(store.episodes().await.unwrap().is_empty());
+        })
+        .await;
+    }
+
+    #[cfg(feature = "sqlite")]
+    #[tokio::test]
+    async fn a_location_picks_the_backend() {
+        use crate::Episode;
+        use fusion_cortex_core::Id;
+
+        let folder = std::env::temp_dir().join(format!("cortex-engram-{}", Id::new()));
+        std::fs::create_dir_all(&folder).unwrap();
+        let path = folder.join("memory.db");
+        let episode = Episode::new("kept", Id::new());
+
+        super::open(&format!("sqlite://{}", path.display()))
+            .await
+            .unwrap()
+            .record(&episode)
+            .await
+            .unwrap();
+        let reopened = super::open(path.to_str().unwrap()).await.unwrap();
+
+        assert_eq!(reopened.episodes().await.unwrap(), [episode]);
+        assert!(super::open("redis://localhost").await.is_err());
+        drop(reopened);
+        std::fs::remove_dir_all(&folder).unwrap();
     }
 
     #[cfg(feature = "sqlite")]

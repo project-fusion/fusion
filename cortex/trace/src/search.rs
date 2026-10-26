@@ -36,6 +36,8 @@ use serde_json::Value;
 
 use crate::{Detail, Part, Placed};
 
+#[cfg(feature = "postgres")]
+pub(crate) mod postgres;
 #[cfg(feature = "sqlite")]
 pub(crate) mod sqlite;
 
@@ -865,12 +867,13 @@ pub(crate) mod conformance {
         }
     }
 
-    /// The traces found, in order, each with the kinds of its hits by name.
-    /// Which of a trace's hits leads is each backend's measure of a better
-    /// match, which `bm25` takes the length of an entry into, so the suite
-    /// holds the order of traces and not of hits.
+    /// The traces found, by id, each with the kinds of its hits by name.
+    /// Which trace and which of its hits leads is each backend's measure of a
+    /// better match: `bm25` takes the length of an entry into account, and
+    /// Postgres's `ts_rank` counts trigrams. The suite holds which entries
+    /// match, and [`ranking`] holds an order a backend may keep.
     async fn kinds(store: &dyn Store, search: &Search) -> Vec<(Id, Vec<Kind>)> {
-        store
+        let mut found: Vec<(Id, Vec<Kind>)> = store
             .find(search)
             .await
             .unwrap()
@@ -881,6 +884,20 @@ pub(crate) mod conformance {
                 kinds.sort_by_key(|kind| kind.name());
                 (found.trace, kinds)
             })
+            .collect();
+        found.sort_by_key(|(trace, _)| *trace);
+        found
+    }
+
+    /// The traces found, in the order the store ranks them.
+    async fn ranked(store: &dyn Store, search: &Search) -> Vec<Id> {
+        store
+            .find(search)
+            .await
+            .unwrap()
+            .found
+            .into_iter()
+            .map(|found| found.trace)
             .collect()
     }
 
@@ -889,7 +906,7 @@ pub(crate) mod conformance {
         a_message_is_found_once_where_it_was_first_said(store).await;
         phrases_prefixes_and_short_words_match_as_typed(store).await;
         nothing_typed_is_an_error(store).await;
-        a_better_match_and_then_a_newer_one_leads(store).await;
+        a_ranked_search_finds_every_match(store).await;
         a_snippet_marks_each_match_on_its_line(store).await;
         pages_count_every_trace(store).await;
         a_title_is_found_until_its_trace_is_gone(store).await;
@@ -1062,7 +1079,54 @@ pub(crate) mod conformance {
             .is_empty());
     }
 
-    async fn a_better_match_and_then_a_newer_one_leads(store: &dyn Store) {
+    /// Every match of a ranked search is found, whatever order a backend
+    /// gives them.
+    async fn a_ranked_search_finds_every_match(store: &dyn Store) {
+        let (once, thrice, old, new) = seeded(store).await;
+
+        let counted = kinds(store, &within("kiwi", &[once, thrice])).await;
+        let dated = kinds(store, &within("mango", &[old, new])).await;
+
+        let mut both = [once, thrice];
+        both.sort();
+        assert_eq!(
+            counted
+                .into_iter()
+                .map(|(trace, _)| trace)
+                .collect::<Vec<_>>(),
+            both
+        );
+        let mut both = [old, new];
+        both.sort();
+        assert_eq!(
+            dated
+                .into_iter()
+                .map(|(trace, _)| trace)
+                .collect::<Vec<_>>(),
+            both
+        );
+    }
+
+    /// The order the reference ranks in: more of a word leads, and of two
+    /// equal matches the newer leads. A backend whose measure keeps it runs
+    /// this beside [`run`].
+    pub(crate) async fn ranking(store: &dyn Store) {
+        let (once, thrice, old, new) = seeded(store).await;
+
+        let counted = ranked(store, &within("kiwi", &[once, thrice])).await;
+        let dated = ranked(store, &within("mango", &[old, new])).await;
+
+        assert_eq!(counted, vec![thrice, once], "more of the word leads");
+        assert_eq!(
+            dated,
+            vec![new, old],
+            "of two equal matches the newer leads"
+        );
+    }
+
+    /// Two traces that say a word once and three times, and two that say
+    /// the same thing now and 90 days ago.
+    async fn seeded(store: &dyn Store) -> (Id, Id, Id, Id) {
         let (once, thrice) = (Id::new(), Id::new());
         store
             .append(thrice, &task("kiwi kiwi kiwi apple pear"))
@@ -1082,24 +1146,7 @@ pub(crate) mod conformance {
             ..task("mango smoothie recipe")
         };
         store.append(old, &aged).await.unwrap();
-
-        let ranked: Vec<Id> = kinds(store, &within("kiwi", &[once, thrice]))
-            .await
-            .into_iter()
-            .map(|(trace, _)| trace)
-            .collect();
-        let dated: Vec<Id> = kinds(store, &within("mango", &[old, new]))
-            .await
-            .into_iter()
-            .map(|(trace, _)| trace)
-            .collect();
-
-        assert_eq!(ranked, vec![thrice, once], "more of the word leads");
-        assert_eq!(
-            dated,
-            vec![new, old],
-            "of two equal matches the newer leads"
-        );
+        (once, thrice, old, new)
     }
 
     async fn a_snippet_marks_each_match_on_its_line(store: &dyn Store) {

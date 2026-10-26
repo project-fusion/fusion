@@ -7,12 +7,21 @@ publish.workspace = true
 rust-version.workspace = true
 version = "0.0.0-dev"
 
+[features]
+# The Postgres connection and migrations the stores share, with TLS for a
+# hosted database.
+postgres = ["dep:sqlx", "dep:tokio", "sqlx/postgres", "sqlx/tls-rustls-aws-lc-rs"]
+
 [dependencies]
 async-trait.workspace = true
 chrono.workspace = true
 futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sqlx = { workspace = true, optional = true }
+# The scratch schema's suite runs in a task of its own, so its schema is
+# dropped when it panics.
+tokio = { workspace = true, optional = true }
 thiserror.workspace = true
 uuid.workspace = true
 

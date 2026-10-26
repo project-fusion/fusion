@@ -8,10 +8,12 @@ rust-version.workspace = true
 version = "0.0.0-dev"
 
 [features]
-default = ["consolidate", "sqlite"]
+default = ["consolidate", "postgres", "sqlite"]
 # The consolidation pass, which asks a model for facts through typed extraction
 # and records each step in Trace.
 consolidate = ["dep:fusion-cortex-extract", "dep:fusion-cortex-trace", "dep:schemars"]
+# The Postgres store, for a local database or a hosted one by its URL.
+postgres = ["dep:sqlx", "fusion-cortex-core/postgres", "sqlx/postgres"]
 # The SQLite store, and the database it bundles.
 sqlite = ["dep:sqlx", "dep:tokio", "sqlx/sqlite-bundled"]
 
