@@ -149,3 +149,55 @@ describe('an element React does not render', () => {
     expect(missing()).toHaveLength(0)
   })
 })
+
+/* **Before a write onto markup a server rendered.** Popover, Menu and
+   Megamenu wait on this before writing `aria-expanded` onto a plain trigger,
+   since React compares a node's attributes as it begins hydrating it and holds
+   its props once it has finished it. */
+describe('waiting for React to hydrate an element', () => {
+  /** How long `untilReactHydrated` took to resolve, or `undefined` if it had not by `within`. */
+  const resolvedIn = async (element: Element, within: number): Promise<number | undefined> => {
+    const { untilReactHydrated } = await import('./react-bridge.js')
+    const since = performance.now()
+    let at: number | undefined
+    void untilReactHydrated(element).then(() => {
+      at = performance.now() - since
+    })
+    await new Promise((done) => setTimeout(done, within))
+    return at
+  }
+
+  test('lets go after the window on a page React never marks', async () => {
+    const element = document.createElement('div')
+    document.body.append(element)
+    const at = await resolvedIn(element, 250)
+    expect(at).toBeGreaterThanOrEqual(90)
+  })
+
+  test('holds on while React has marked the page and not reached the element', async () => {
+    page()
+    container(document.body)
+    const element = document.createElement('div')
+    document.body.append(element)
+    expect(await resolvedIn(element, 250)).toBeUndefined()
+  })
+
+  test('lets go once React holds the element’s props', async () => {
+    page()
+    container(document.body)
+    const element = document.createElement('div')
+    document.body.append(element)
+    const waiting = resolvedIn(element, 250)
+    setTimeout(() => Object.assign(element, { __reactProps$k9x2: {} }), 60)
+    expect(await waiting).toBeGreaterThanOrEqual(55)
+  })
+
+  test('lets go at once for an element outside the node React rendered into', async () => {
+    page()
+    const island = document.createElement('div')
+    container(island)
+    const element = document.createElement('div')
+    document.body.append(island, element)
+    expect(await resolvedIn(element, 50)).toBeLessThan(10)
+  })
+})

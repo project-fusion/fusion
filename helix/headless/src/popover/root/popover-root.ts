@@ -21,6 +21,7 @@ import {
   sideOf,
   tellDisclosure,
   unlockScroll,
+  untilReactHydrated,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -38,7 +39,8 @@ import { hideOutside } from '../hide-outside.js'
  * The trigger is slotted and stays your own element. A Helix trigger is told
  * whether the popover is open inside its own shadow root. On a plain element,
  * such as a `<button>`, the popover writes `aria-expanded`, from a frame after
- * its own first render, or from the first press where that comes sooner. It
+ * its own first render, and on a page React is hydrating once React has
+ * hydrated the popover, or from the first press where that comes sooner. It
  * never writes it where you wrote `aria-expanded` yourself, and writes nothing
  * else onto your markup.
  *
@@ -486,13 +488,18 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     super.connectedCallback()
     this.addEventListener('focusout', this.handleFocusOut)
     this.addEventListener('click', this.notePress, { capture: true })
-    /* A frame after the first render, which is when a closed panel is first
-       said to be closed. Not in the first render itself: a framework that
-       rendered the trigger on a server may still be hydrating it then. */
-    void this.whenSettled.then(() => {
-      this.pressed = true
-      this.tellTrigger()
-    })
+    /* A frame after the first render, and on a page React is hydrating once
+       React has hydrated this element, which is when a closed panel is first
+       said to be closed. Not before: a framework that rendered the trigger on
+       a server may still be hydrating it, and the frame alone came before
+       React did on a page whose definitions load first. See
+       `untilReactHydrated`. */
+    void this.whenSettled
+      .then(() => untilReactHydrated(this))
+      .then(() => {
+        this.pressed = true
+        this.tellTrigger()
+      })
   }
 
   /**
@@ -524,7 +531,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Whether the trigger may be told, from a frame after the first render or a reader's press. */
+  /** Whether the trigger may be told: from a frame after the first render once React is done hydrating, or from a reader's press. */
   private pressed = false
 
   /** The plain trigger this popover writes `aria-expanded` on, once it may. */

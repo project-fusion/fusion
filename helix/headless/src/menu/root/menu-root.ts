@@ -26,6 +26,7 @@ import {
   tellDisclosure,
   typeaheadBy,
   unlinkDescription,
+  untilReactHydrated,
   words,
 } from '@fusion.dev/helix-core'
 import { caretLeft } from '@fusion.dev/helix-icons'
@@ -79,7 +80,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * tells it that it opens a menu and whether the menu is open, inside its own
  * shadow root. On a plain element, such as a `<button>`, the menu writes
  * `aria-haspopup="menu"` and `aria-expanded`, from a frame after its own first
- * render, so a server's markup is never changed while a framework hydrates it.
+ * render, and on a page React is hydrating once React has hydrated the menu,
+ * so a server's markup is never changed while a framework hydrates it.
  * It never writes `aria-expanded` where you wrote it yourself.
  *
  * Submenus drill down by default. A submenu replaces the panel's content, and a
@@ -568,8 +570,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       tellDisclosure(trigger, this.open, 'menu')
       return
     }
-    /* A plain element, by attribute, from a frame after the first render, as
-       `Popover` writes it. One that carries its own `aria-expanded` is the
+    /* A plain element, by attribute, from a frame after the first render and
+       once React has hydrated this element, as `Popover` writes it. One that carries its own `aria-expanded` is the
        consumer's to keep. */
     if (trigger !== this.told) {
       if (!this.settledOnce || trigger.hasAttribute('aria-expanded')) {
@@ -583,7 +585,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     trigger.setAttribute('aria-expanded', String(this.open))
   }
 
-  /** Whether a frame has passed since the first render, after which a plain trigger may be told. */
+  /** Whether a frame has passed since the first render and React is done hydrating, after which a plain trigger may be told. */
   private settledOnce = false
 
   /** The plain trigger this menu writes `aria-expanded` on. */
@@ -1282,18 +1284,24 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('focusin', this.handleTriggerFocusIn)
     this.rowWatch = new MutationObserver(this.followRemoved)
     this.rowWatch.observe(this, { childList: true, subtree: true })
-    /* A frame after the first render, when a plain trigger is first told the
-       menu is closed. Not in the first render: a framework that rendered the
-       trigger on a server may still be hydrating it then. */
     void this.whenSettled.then(() => {
       /* The area `for` names, once the page has drawn it, and again on a
          menu moved and connected anew. */
       this.watchArea()
-      this.settledOnce = true
-      if (!this.context) {
-        this.tellTrigger()
-      }
     })
+    /* A frame after the first render, and on a page React is hydrating once
+       React has hydrated this element, when a plain trigger is first told the
+       menu is closed. Not before: a framework that rendered the trigger on a
+       server may still be hydrating it, and the frame alone came before React
+       did on a page whose definitions load first. See `untilReactHydrated`. */
+    void this.whenSettled
+      .then(() => untilReactHydrated(this))
+      .then(() => {
+        this.settledOnce = true
+        if (!this.context) {
+          this.tellTrigger()
+        }
+      })
   }
 
   override disconnectedCallback(): void {

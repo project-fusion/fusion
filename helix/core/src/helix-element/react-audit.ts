@@ -1,6 +1,7 @@
 import { eventsForTag } from '../events/element-events.js'
 import { helixEventNames } from '../events/names.js'
 import { reportRuntime } from '../utils/report-runtime/report-runtime.js'
+import { insideReact } from './react-root.js'
 
 /*
  * The React prop audit: a warning for a handler prop attached to nothing.
@@ -112,28 +113,8 @@ export const auditReactProps = (host: EventTarget, props: Record<string, unknown
   }
 }
 
-/**
- * The prefix of the mark React leaves on the node it makes a root in.
- *
- * `createRoot` and `hydrateRoot` write it and a random suffix on their
- * container, which is the document itself on a Next.js App Router page and a
- * `<div>` everywhere else. Read from the source of 17.0.2 and 18.2.0 and from
- * react-dom 19.3.1, as the bridge's own two marks were.
- */
-const REACT_CONTAINER = '__reactContainer$'
-
 /** The root marks of the pages already told that no element found React's props. */
 const told = new Set<string>()
-
-/** Whether a node is in the tree React renders into, its root's container or below it. */
-const insideReact = (host: Node): boolean => {
-  for (let node: Node | null = host.parentNode; node !== null; node = node.parentNode) {
-    if (Object.keys(node).some((key) => key.startsWith(REACT_CONTAINER))) {
-      return true
-    }
-  }
-  return false
-}
 
 /**
  * Says so when React has a root on the page and no element found its props.

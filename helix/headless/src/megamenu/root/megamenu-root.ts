@@ -13,6 +13,7 @@ import {
   PopoverController,
   tellDisclosure,
   timeConverter,
+  untilReactHydrated,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -78,8 +79,9 @@ import { HandOver, type Motion } from '../hand-over.js'
  *
  * A Helix trigger, such as `helix-button`, is told whether the panel is open
  * inside its own shadow root. On a plain element, such as a `<button>`, the
- * megamenu writes `aria-expanded`, from a frame after its own first render, so
- * a server's markup is never changed while a framework hydrates it. It never
+ * megamenu writes `aria-expanded` from a frame after its own first render, and
+ * on a page React is hydrating, once React has hydrated the megamenu, so a
+ * server's markup is never changed while a framework hydrates it. It never
  * writes it where you wrote `aria-expanded` yourself.
  *
  * @since 0.1.0
@@ -274,8 +276,9 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    *
    * A Helix trigger by property, through `tellDisclosure`. A plain element,
    * which has no shadow root to keep the state out of the markup, by
-   * `aria-expanded`, from a frame after the first render, as `Popover` writes
-   * it. One that already carries `aria-expanded` is the consumer's to keep.
+   * `aria-expanded`, from a frame after the first render and once React has
+   * hydrated the megamenu, as `Popover` writes it. One that already carries
+   * `aria-expanded` is the consumer's to keep.
    */
   private tellTrigger(): void {
     const slotted = this.slotted
@@ -292,7 +295,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     slotted.setAttribute('aria-expanded', String(this.open))
   }
 
-  /** Whether a frame has passed since the first render, after which a plain trigger may be told. */
+  /** Whether a frame has passed since the first render and React is done hydrating, after which a plain trigger may be told. */
   private settledOnce = false
 
   /** The plain trigger this megamenu writes `aria-expanded` on. */
@@ -641,13 +644,17 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
         subtree: true,
       })
     }
-    /* A frame after the first render, when a plain trigger is first told the
-       panel is closed. Not in the first render: a framework that rendered the
-       trigger on a server may still be hydrating it then. */
-    void this.whenSettled.then(() => {
-      this.settledOnce = true
-      this.tellTrigger()
-    })
+    /* A frame after the first render, and on a page React is hydrating once
+       React has hydrated this element, when a plain trigger is first told the
+       panel is closed. Not before: a framework that rendered the trigger on a
+       server may still be hydrating it, and the frame alone came before React
+       did on a page whose definitions load first. See `untilReactHydrated`. */
+    void this.whenSettled
+      .then(() => untilReactHydrated(this))
+      .then(() => {
+        this.settledOnce = true
+        this.tellTrigger()
+      })
   }
 
   override disconnectedCallback(): void {
@@ -768,8 +775,8 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        `<button slot="trigger">` has no shadow root to hide the state in and no
        property to take it, and a React consumer cannot mirror it themselves
        because the open state is this element's. It gets `aria-expanded` from a
-       frame after the first render, which is after hydration, as `Popover`
-       writes it, and never where the consumer wrote their own.
+       frame after the first render, and once React has hydrated this element,
+       as `Popover` writes it, and never where the consumer wrote their own.
 
        **`aria-controls` is not written here and cannot be.** It would name
        `panel`, an id inside this shadow root, and an IDREF resolves only within

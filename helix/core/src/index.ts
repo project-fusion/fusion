@@ -364,6 +364,7 @@ export {
   TOUCHES_RULE,
   VIRTUAL_RULE,
 } from './helix-element/mark-rules.js'
+export { untilReactHydrated } from './helix-element/react-bridge.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
 export { HelixFormElementBase } from './helix-form-element/helix-form-element-base.js'
 export {
