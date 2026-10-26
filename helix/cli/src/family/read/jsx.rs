@@ -3,9 +3,9 @@
 //!
 //! ```tsx
 //! render: ({ props, send }) => (
-//!   <Pressable part="tab" chooses role="tab" disabled={props.disabled} onPress={send.beforeSelect}>
+//!   <Pressable chooses disabled={props.disabled} onPress={send.beforeSelect} part="tab" role="tab">
 //!     <Slot part="label" />
-//!     {props.dismissible && <View part="dismiss-mark" ariaHidden icon="x" />}
+//!     {props.dismissible && <View ariaHidden icon="x" part="dismiss-mark" />}
 //!   </Pressable>
 //! )
 //! ```

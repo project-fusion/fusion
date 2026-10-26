@@ -9,7 +9,7 @@
  *   events: { dismiss: cancelable(['label']) },
  *   states: ['selected'],
  *   render: ({ props, send }) => (
- *     <Pressable part="tab" chooses role="tab" disabled={props.disabled}>
+ *     <Pressable chooses disabled={props.disabled} part="tab" role="tab">
  *       <Slot part="label" />
  *     </Pressable>
  *   ),

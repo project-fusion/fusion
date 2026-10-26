@@ -38,11 +38,11 @@ export default headless('tab', {
   states: ['selected'],
   render: ({ props, send }) => (
     <Pressable
-      part="tab"
       chooses
-      role="tab"
       disabled={props.disabled}
       onPress={send.beforeSelect}
+      part="tab"
+      role="tab"
     >
       <Slot part="label" />
     </Pressable>
@@ -52,6 +52,10 @@ export default headless('tab', {
 
 - Each prop and event is named in camelCase, and the web's name is its
   hyphenated form: `dismissLabel` is the attribute `dismiss-label`.
+- The props, the events, the computed values, and the states are in
+  alphabetical order, which `helix family` checks, and so are each node's
+  attributes, which Biome sorts. The keys around them are in the order they
+  are read, with `render` last.
 - A prop is its default, which says its type, or `string()`, `boolean()`,
   `number()`, `oneOf([...], default)`, with `property()` for one that is no
   attribute and `web()` for one only the web element has.
