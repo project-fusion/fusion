@@ -2,7 +2,7 @@ import { HelixBreadcrumb, HelixBreadcrumbs } from '@fusion.dev/helix/breadcrumbs
 import { HelixAppRoot, useHelixRoute } from '@fusion.dev/helix/expo-router'
 import { HelixNavigation, HelixNavigationItem } from '@fusion.dev/helix/navigation'
 import { describe, expect, jest, test } from '@jest/globals'
-import { Slot } from 'expo-router'
+import { Slot, Stack } from 'expo-router'
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library'
 import { Linking, Text } from 'react-native'
 
@@ -113,6 +113,32 @@ describe('Helix on Expo Router', () => {
     expect(screen.getByText('Crumb /b/c')).toBeOnTheScreen()
     await press('Crumb /b')
     expect(app.getPathname()).toBe('/b')
+  })
+
+  test('a route at the top of the tree takes the place of the one showing, and a route below it is pushed', async () => {
+    refuse = false
+    const app = await renderRouter(
+      {
+        ...routes,
+        _layout: () => (
+          <HelixAppRoot>
+            <Stack />
+          </HelixAppRoot>
+        ),
+      },
+      { initialUrl: '/a' },
+    )
+    /* The pages of the stack under the root, as the phone's back goes through them. */
+    const depth = () => app.getRouterState()?.routes[0]?.state?.routes.length
+    await press('To /b')
+    expect(app.getPathname()).toBe('/b')
+    expect(depth()).toBe(1)
+    await press('To /b/c')
+    expect(app.getPathname()).toBe('/b/c')
+    expect(depth()).toBe(2)
+    await press('To /a')
+    expect(app.getPathname()).toBe('/a')
+    expect(depth()).toBe(2)
   })
 
   test('an address with a scheme opens with the phone’s own handler', async () => {

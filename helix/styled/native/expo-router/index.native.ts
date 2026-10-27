@@ -60,6 +60,9 @@ export interface HelixRoute {
 /** Whether an address names a scheme, as `https:` and `mailto:` do. */
 const SCHEME = /^[a-z][a-z\d+.-]*:/i
 
+/** Whether a path is a route at the top of the tree, one segment under the root, as `/activity` is. */
+const topLevel = (path: string): boolean => /^\/[^/]+$/.test(routeOf(path))
+
 /**
  * Where a press on a Helix link goes in an app on Expo Router: an address
  * with a scheme to the phone's own handler, a path to the router, and
@@ -67,8 +70,11 @@ const SCHEME = /^[a-z][a-z\d+.-]*:/i
  *
  * **A route above the one showing goes back to it**, as a crumb does with
  * the phone's own back, where the router holds it, and replaces the route
- * showing where it does not. Any other route is pushed. A press on the route
- * showing goes nowhere.
+ * showing where it does not. **A route at the top of the tree does the same**,
+ * as a header's destination, such as `/activity`, does: it takes the place of
+ * the route showing, so moving between an app's sections adds nothing to go
+ * back through. Any other route is pushed. A press on the route showing goes
+ * nowhere.
  */
 const routerLinks = (before: OpenLink, here: () => string): OpenLink => ({
   open: (destination) => {
@@ -84,7 +90,7 @@ const routerLinks = (before: OpenLink, here: () => string): OpenLink => ({
     if (stands === 'page') {
       return
     }
-    if (stands === 'true') {
+    if (stands === 'true' || topLevel(destination)) {
       router.dismissTo(destination)
     } else {
       router.navigate(destination)
