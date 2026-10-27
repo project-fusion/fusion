@@ -30,6 +30,12 @@ export interface Layout {
    * A grid's tracks along its main axis, such as `auto` and `minmax(0, 1fr)`.
    */
   readonly tracks: readonly string[]
+  /**
+   * Whether a grid drawn as a row wraps its line, because content passed in
+   * spans every column, as `grid-column: 1 / -1` puts a meter's label on a
+   * row of its own above its bar.
+   */
+  readonly wraps?: boolean
 }
 
 export const BLOCK: Layout = { flex: false, row: false, tracks: [] }
