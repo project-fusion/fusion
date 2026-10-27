@@ -73,6 +73,10 @@
       "types": "./dist/capabilities/*/fake.d.ts",
       "default": "./dist/capabilities/*/fake.js"
     },
+    "./capabilities/*/web": {
+      "types": "./dist/capabilities/*/web.d.ts",
+      "default": "./dist/capabilities/*/web.js"
+    },
     "./capabilities/types": {
       "types": "./dist/capabilities/types.generated.d.ts",
       "default": "./dist/capabilities/types.generated.js"

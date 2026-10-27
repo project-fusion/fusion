@@ -15,8 +15,10 @@ const DONE: Ty = Ty::Callback(&[], &Ty::Void);
 /// Every contract, in the order the files are written.
 pub const CAPABILITIES: &[Capability] = &[
     ANNOUNCE,
+    CAMERA,
     CLIPBOARD,
     ENVIRONMENT,
+    FILES,
     FOCUS,
     FORM,
     GESTURE,
@@ -27,6 +29,7 @@ pub const CAPABILITIES: &[Capability] = &[
     MOTION,
     OPEN_LINK,
     SCROLL,
+    SHARE,
     TIMERS,
 ];
 
@@ -43,6 +46,26 @@ const ANNOUNCE: Capability = Capability {
         ],
         returns: Ty::Void,
     }],
+};
+
+const CAMERA: Capability = Capability {
+    name: "camera",
+    interface: "Camera",
+    doc: "Takes a photo with the device's camera, or chooses photos from its library: through a file input that asks for an image on the web, and through expo-image-picker on iOS and Android. A device without a camera says so, and the server takes none.",
+    members: &[
+        Member {
+            name: "capture",
+            doc: "Opens the camera, and gives the photo taken, or why there is none. A browser without a camera offers its file chooser.",
+            params: &[],
+            returns: Ty::Promise(&Ty::Named("Picked")),
+        },
+        Member {
+            name: "choose",
+            doc: "Opens the photo library, and gives the photos chosen, one unless `multiple`, or why there are none.",
+            params: &[Param { name: "multiple", ty: Ty::Boolean }],
+            returns: Ty::Promise(&Ty::Named("Picked")),
+        },
+    ],
 };
 
 const CLIPBOARD: Capability = Capability {
@@ -76,6 +99,26 @@ const ENVIRONMENT: Capability = Capability {
                 ty: Ty::Callback(&[Param { name: "conditions", ty: Ty::Named("Conditions") }], &Ty::Void),
             }],
             returns: Ty::Stop,
+        },
+    ],
+};
+
+const FILES: Capability = Capability {
+    name: "files",
+    interface: "Files",
+    doc: "Picks files from the device and saves a file to it: through the browser's file chooser and a download on the web, and through expo-document-picker, expo-file-system, and expo-sharing on iOS and Android. The server picks and saves nothing.",
+    members: &[
+        Member {
+            name: "pick",
+            doc: "Opens the file chooser with the types `options` accepts, and gives the files chosen, or why there are none.",
+            params: &[Param { name: "options", ty: Ty::Named("FilePick") }],
+            returns: Ty::Promise(&Ty::Named("Picked")),
+        },
+        Member {
+            name: "save",
+            doc: "Saves `file` under its name: as a download on the web, and through the share sheet on a phone, where Save to Files is one of its choices. Gives whether the platform took it.",
+            params: &[Param { name: "file", ty: Ty::Named("FileSave") }],
+            returns: Ty::Promise(&Ty::Boolean),
         },
     ],
 };
@@ -299,6 +342,18 @@ const SCROLL: Capability = Capability {
             returns: Ty::Stop,
         },
     ],
+};
+
+const SHARE: Capability = Capability {
+    name: "share",
+    interface: "Share",
+    doc: "Hands words, an address, or a file to the system share sheet: through the browser's share where it has one, and through React Native's share and expo-sharing on iOS and Android. A browser without a share sheet copies the address or the words to the clipboard, and the server shares nothing.",
+    members: &[Member {
+        name: "share",
+        doc: "Opens the share sheet with `item`, and gives what became of it.",
+        params: &[Param { name: "item", ty: Ty::Named("Shareable") }],
+        returns: Ty::Promise(&Ty::Named("Shared")),
+    }],
 };
 
 const TIMERS: Capability = Capability {

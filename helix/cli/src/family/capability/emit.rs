@@ -8,8 +8,8 @@ use std::fmt::Write as _;
 use ts_rs::{Config, TypeVisitor, TS};
 
 use super::types::{
-    Conditions, DragSetup, Dragged, Flag, Frame, Haptic, KeyPress, Point, Rect, Scrolled,
-    Transition, Urgency,
+    Conditions, DragSetup, Dragged, FilePick, FileSave, Flag, Frame, Haptic, KeyPress, Picked,
+    Point, Rect, Scrolled, Shareable, Shared, Transition, Urgency,
 };
 use super::{Capability, Param, Ty};
 use crate::{COMPILER, PRODUCT};
@@ -74,13 +74,18 @@ pub fn types_module() -> String {
     declarations.visit::<Conditions>();
     declarations.visit::<DragSetup>();
     declarations.visit::<Dragged>();
+    declarations.visit::<FilePick>();
+    declarations.visit::<FileSave>();
     declarations.visit::<Flag>();
     declarations.visit::<Frame>();
     declarations.visit::<Haptic>();
     declarations.visit::<KeyPress>();
+    declarations.visit::<Picked>();
     declarations.visit::<Point>();
     declarations.visit::<Rect>();
     declarations.visit::<Scrolled>();
+    declarations.visit::<Shareable>();
+    declarations.visit::<Shared>();
     declarations.visit::<Transition>();
     declarations.visit::<Urgency>();
     declarations.found.insert(

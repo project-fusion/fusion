@@ -150,3 +150,40 @@ fn the_clipboard_gives_whether_it_wrote() {
         "{written}"
     );
 }
+
+#[test]
+fn the_device_capabilities_give_what_became_of_each_request() {
+    let find = |name: &str| CAPABILITIES.iter().find(|one| one.name == name).unwrap();
+    let share = contract(find("share"));
+    assert!(
+        share.contains("  readonly share: (item: Shareable) => Promise<Shared>\n"),
+        "{share}"
+    );
+    let files = contract(find("files"));
+    assert!(
+        files.contains("  readonly pick: (options: FilePick) => Promise<Picked>\n"),
+        "{files}"
+    );
+    assert!(
+        files.contains("  readonly save: (file: FileSave) => Promise<boolean>\n"),
+        "{files}"
+    );
+    let camera = contract(find("camera"));
+    assert!(
+        camera.contains("  readonly capture: () => Promise<Picked>\n"),
+        "{camera}"
+    );
+    assert!(
+        camera.contains("  readonly choose: (multiple: boolean) => Promise<Picked>\n"),
+        "{camera}"
+    );
+    let types = types_module();
+    assert!(
+        types.contains(
+            "export type Outcome = \"chosen\" | \"dismissed\" | \"refused\" | \"unavailable\";"
+        ),
+        "{types}"
+    );
+    assert!(types.contains("type: string"), "{types}");
+    assert!(types.contains("file?: DeviceFile"), "{types}");
+}
