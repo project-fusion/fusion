@@ -10,11 +10,7 @@ import { DESTINATIONS } from './routes'
 export function Header() {
   const route = useHelixRoute()
   return (
-    <helix-app-header
-      content-align="start"
-      sticky
-      style={{ '--app-header-border-color': 'var(--helix-color-border)' }}
-    >
+    <helix-app-header sticky style={{ '--app-header-border-color': 'var(--helix-color-border)' }}>
       <helix-text slot="start" variant="body-strong">
         Helix
       </helix-text>
