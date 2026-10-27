@@ -44,9 +44,15 @@ that its code names no platform are its own, in `helix/proof`.
 | `examples` | Writes the gallery's catalog of examples from the `api.json` and `examples.json` of `@fusion.dev/helix` |
 | `export` | Runs `bundle`, then writes the manifests into `dist` for the base address given as `--base` |
 | `serve` | Serves `dist` as the site does, at the address the export was written for |
-| `start` | Starts Metro, for Expo Go on a simulator or on a phone on your network |
+| `start` | Starts Metro, for Expo Go on a simulator or on a phone on your network, watching every package the app reaches |
 | `test` | Draws the shared-code checks with the native runtime |
 | `typecheck` | Checks the app, and the scripts and Metro config, with their own types |
+
+**`start` watches files even where `CI` is set.** Expo turns Metro's
+watching off under `CI=true`, and Metro then serves each module as it first
+read it, so a package rebuilt while Metro runs reaches the app only after a
+restart. `start` sets `CI=false`, and a rebuilt `@fusion.dev/helix-native`
+reaches the app at its next reload. A restart needs no `--clear`.
 
 The app reaches the workspace packages through what each one exports, so they
 are built first:
