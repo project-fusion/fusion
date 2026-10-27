@@ -11,7 +11,7 @@ import { fakeFocus } from '@fusion.dev/helix-core/capabilities/focus/fake'
 import { setKeys } from '@fusion.dev/helix-core/capabilities/keys'
 import { fakeKeys } from '@fusion.dev/helix-core/capabilities/keys/fake'
 import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
-import { fakeOpenLink } from '@fusion.dev/helix-core/capabilities/open-link/fake'
+import { type FakeOpenLink, fakeOpenLink } from '@fusion.dev/helix-core/capabilities/open-link/fake'
 import { beforeEach, describe, expect, jest, test } from '@jest/globals'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { HelixButton, type HelixButtonPressEvent } from './button/index.native'
@@ -31,10 +31,13 @@ const rowOf = (words: string) => {
   return at
 }
 
+let opened: FakeOpenLink = fakeOpenLink()
+
 beforeEach(() => {
   setKeys(fakeKeys<unknown>())
   setFocus(fakeFocus<unknown>())
-  setOpenLink(fakeOpenLink())
+  opened = fakeOpenLink()
+  setOpenLink(opened)
 })
 
 describe('the generated Tabs', () => {
@@ -145,6 +148,31 @@ describe('the generated List', () => {
     await fireEvent.press(rowOf('Apples'))
     expect(told).toEqual(['row a', 'list a {}'])
   })
+
+  test.each([
+    ['no selection mode', undefined],
+    ['none', 'none'],
+    ['single', 'single'],
+    ['multiple', 'multiple'],
+  ] as const)(
+    'follows the link of a row with href under %s, and chooses nothing',
+    async (_, mode) => {
+      const values: string[] = []
+      await render(
+        <HelixList
+          onChange={(event) => values.push(event.target.value)}
+          {...(mode === undefined ? {} : { selectionMode: mode })}
+        >
+          <HelixListItem href="/projects/website" value="website">
+            Website redesign
+          </HelixListItem>
+        </HelixList>,
+      )
+      await fireEvent.press(rowOf('Website redesign'))
+      expect(opened.opened).toEqual(['/projects/website'])
+      expect(values).toEqual([])
+    },
+  )
 })
 
 describe('the generated Button', () => {

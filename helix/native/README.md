@@ -1440,8 +1440,9 @@ says. With another router, call `setOpenLink` from
 `@fusion.dev/helix-core/capabilities/open-link` with an `open` of your own,
 after `HelixRoot` first draws, since the root installs the phone's.
 
-A list row's link opens in a list with `selectionMode="none"`. A press on a
-row of a list with no `selectionMode` sends nothing on a phone yet.
+A list row with an `href` opens its link on a press, whatever the list's
+`selectionMode`, and the press chooses nothing, as a click on the web row's
+link does.
 
 ## Breadcrumbs
 
