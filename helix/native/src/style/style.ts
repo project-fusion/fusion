@@ -37,6 +37,19 @@ import {
 import { held, lineage, named, oneColumn, REGIONS, tracks } from './tree.js'
 
 /**
+ * Whether a part laid along `within` is as wide as its content: its parent
+ * lays it along a row, and its own style neither grows it nor sets its
+ * width or its basis, as a flex item with an automatic basis is on the web.
+ */
+const hugs = (within: Layout, style: Resolved['style']): boolean =>
+  within.flex &&
+  within.row &&
+  !(Number(style.flexGrow ?? 0) > 0) &&
+  style.flex === undefined &&
+  style.width === undefined &&
+  style.flexBasis === undefined
+
+/**
  * One part's style under a context, its regions' style, its motion, and the
  * private values its content inherits.
  *
@@ -329,6 +342,10 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     ...(main.rule === undefined ? {} : { rule: main.rule }),
     ...(main.scheme === undefined ? {} : { scheme: main.scheme }),
     ...(main.scrolls === undefined ? {} : { scrolls: main.scrolls }),
+    ...(main.scrolls === 'x' && hugs(within, main.out) ? { hugs: true } : {}),
+    ...(within.flex && within.row && grows && holds && main.out.flexGrow === 1
+      ? { shares: true }
+      : {}),
     style: main.out,
     transitions: still(main.transitions),
     values,

@@ -108,6 +108,16 @@ const movesOf = (
 ): { readonly transitions?: Readonly<Record<string, Transition>> } =>
   transitions === undefined ? {} : { transitions }
 
+/**
+ * Whether content that scrolls is laid out at the frame's width, as `useSpread`
+ * says: content across, unless its part hugs it.
+ */
+const spreads = (axis: 'both' | 'x' | 'y', hugs: boolean | undefined): boolean =>
+  axis === 'x' && hugs !== true
+
+/** The scroll view's style: it fills its frame, unless its part hugs its content. */
+const growing = (hugs: boolean | undefined) => ({ flexGrow: hugs === true ? 0 : 1 })
+
 /** What `ScrollingPart` takes. */
 interface ScrollingProps {
   /** The axis the part scrolls along, or both. */
@@ -120,6 +130,11 @@ interface ScrollingProps {
   readonly content: (scrolling: Scrolling) => ReactNode
   /** Draws the scroll buttons, given the axis and which ends have more. */
   readonly controls: (scrolling: Scrolling) => ReactNode
+  /**
+   * Whether the part is as wide as its content along its parent's row, as
+   * `Resolved.hugs` says.
+   */
+  readonly hugs?: boolean | undefined
   /** A line along one edge, where the part's background draws one. */
   readonly line?: Line | undefined
   /** The part's animation, which its frame runs, where it has one. */
@@ -149,6 +164,14 @@ interface ScrollingProps {
  * laid out at the frame's width**, and wider only where what it holds runs
  * past it, as `useSpread` says.
  *
+ * **A part that hugs its content is as wide as what it holds**, as the web's
+ * scroll box with an automatic basis is, and narrower only where its row runs
+ * out of room. Its content is laid out at its own width and its scroll view
+ * does not grow. A scroll view across grows by default, and a phone measures
+ * a part along a row at the most room the row has left, so a growing scroll
+ * view took all of it: a centered App Header's navigation filled the bar, and
+ * the brand and the actions had no room to center it between them.
+ *
  * **An item that grows is never narrower than its own content**, as a flex
  * item's automatic minimum keeps it on the web. A view has no such minimum:
  * tabs at `width="full"` shared the frame however long their labels were,
@@ -177,6 +200,7 @@ export const ScrollingPart = ({
   box,
   content,
   controls,
+  hugs,
   line,
   motion,
   transitions,
@@ -191,7 +215,7 @@ export const ScrollingPart = ({
   usePager(pager, scroller, at, horizontal)
   useScroller(scrollerRef, scroller)
   const laidOut = useContent(contentRef)
-  const spread = useSpread(horizontal, laidOut.node)
+  const spread = useSpread(spreads(axis, hugs), laidOut.node)
   const fill = useFill()
   const buttons = horizontal ? 'x' : 'y'
   const scrolling: Scrolling = horizontal ? { axis: 'x', fill, more } : { axis: 'y', more }
@@ -263,7 +287,7 @@ export const ScrollingPart = ({
             },
             ref: handOff.held,
           })}
-      style={{ flexGrow: 1 }}
+      style={growing(hugs)}
     >
       <WrapWidth.Provider value={twoWays ? wrapWidth(wide, inner) : undefined}>
         {content(scrolling)}

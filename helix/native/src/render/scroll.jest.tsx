@@ -112,6 +112,37 @@ describe('scroll', () => {
     })
   })
 
+  test('a part that scrolls across along a row is as wide as its content, as a centered App Header’s navigation is', async () => {
+    const Bar = element(
+      {
+        ...strip,
+        rules: [
+          rule({
+            order: -1,
+            set: [['display', { text: 'flex' }]],
+            specificity: [0, 1, 0],
+            target: 'host',
+          }),
+          ...strip.rules,
+        ],
+        tag: 'helix-bar',
+      },
+      () => ({ marks: [], parts: {} }),
+    )
+    await render(
+      <ThemeProvider tokens={{}}>
+        <Bar>Words</Bar>
+      </ThemeProvider>,
+    )
+    const view = scrollView()
+    expect(view.props.contentContainerStyle).toEqual({
+      flexDirection: 'row',
+      flexGrow: 1,
+      gap: 4,
+    })
+    expect(StyleSheet.flatten(view.props.style).flexGrow).toBe(0)
+  })
+
   test('a scroll button shows while there is more the way it scrolls, held to that edge', async () => {
     await render(
       <ThemeProvider tokens={{}}>
