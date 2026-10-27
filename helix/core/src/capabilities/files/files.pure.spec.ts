@@ -25,7 +25,7 @@ describe('files', () => {
       outcome: 'unavailable',
     })
     expect(await serverFiles.save({ name: 'a.txt', type: 'text/plain', uri: 'data:,a' })).toBe(
-      false,
+      'unavailable',
     )
   })
 
@@ -44,13 +44,15 @@ describe('files', () => {
     ])
   })
 
-  test('the fake keeps each save it takes, and refuses while it is told to', async () => {
+  test('the fake gives what a spec sets for a save, and keeps each file it takes', async () => {
     const fake = fakeFiles()
     const notes = { name: 'notes.txt', type: 'text/plain', uri: 'data:,Notes' }
-    fake.saves = false
-    expect(await fake.save(notes)).toBe(false)
-    fake.saves = true
-    expect(await fake.save(notes)).toBe(true)
-    expect(fake.saved).toEqual([notes])
+    fake.saves = 'unavailable'
+    expect(await fake.save(notes)).toBe('unavailable')
+    fake.saves = 'opened'
+    expect(await fake.save(notes)).toBe('opened')
+    fake.saves = 'saved'
+    expect(await fake.save(notes)).toBe('saved')
+    expect(fake.saved).toEqual([notes, notes])
   })
 })

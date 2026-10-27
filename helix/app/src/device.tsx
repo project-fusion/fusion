@@ -103,7 +103,7 @@ export function Device() {
           onPress={() => {
             void files()
               .save(NOTES)
-              .then((saved) => setHeard(`Save a file: ${saved ? 'saved' : 'not saved'}`))
+              .then((saved) => setHeard(`Save a file: ${saved}`))
           }}
         >
           Save a file
