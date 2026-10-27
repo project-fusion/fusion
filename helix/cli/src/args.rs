@@ -426,20 +426,23 @@ pub enum Family {
     ///
     /// Writes `<family>/index.native.ts` under `--out`: each element's
     /// intermediate form, its props type, and its component, which draws the
-    /// form with `@fusion.dev/helix-native`. Each prop, slot and event is
-    /// described from the styled manifest, and each event's detail is typed
-    /// from core's event classes. With `--check`, writes nothing and exits 1
-    /// when a written module is missing or out of date.
+    /// form with the native runtime the project's `runtime.native` names,
+    /// `@fusion.dev/helix-native` unless it names another. Each prop, slot and
+    /// event is described from the styled manifest, and each event's detail is
+    /// typed from the event classes the project's `events` names. With
+    /// `--check`, writes nothing and exits 1 when a written module is missing
+    /// or out of date.
     Components(FamilyComponents),
 
     /// Write the token layer as a Design Tokens Format Module file, with a resolver for its modes.
     ///
-    /// Reads the token layer in the styles package and writes
-    /// `dist/helix.tokens.json`, light mode at the default density, and
-    /// `dist/helix.resolver.json`, which adds dark mode and each density stop.
-    /// Refuses a token whose CSS differs from what `tokens.ts` writes for it,
-    /// which `dist/tokens.json` records. With `--check`, writes nothing and
-    /// exits 1 when a written file is missing or out of date.
+    /// Reads the token layer in the project's styles package and writes
+    /// `<prefix>.tokens.json`, light mode at the default density, and
+    /// `<prefix>.resolver.json`, which adds dark mode and each density stop,
+    /// into the project's `outputs.designTokens`. Refuses a token whose CSS
+    /// differs from what `tokens.ts` writes for it, which `dist/tokens.json`
+    /// records. With `--check`, writes nothing and exits 1 when a written file
+    /// is missing or out of date.
     DesignTokens(FamilyDesignTokens),
 
     /// Print what each element is called on each platform, as JSON.
@@ -467,12 +470,12 @@ pub enum Family {
 
     /// Write each mode's native token module into the package's sources.
     ///
-    /// Reads the token layer in the styles package beside it, types every
-    /// token, and writes `src/theme/light.generated.ts` and
-    /// `dark.generated.ts` with each token's value as the native renderer
-    /// takes it. Refuses a token whose value it cannot type. With `--check`,
-    /// writes nothing and exits 1 when a written module is missing or out of
-    /// date.
+    /// Reads the project's token source, a styles package or a Design Tokens
+    /// Format Module file, types every token, and writes `light.generated.ts`,
+    /// `dark.generated.ts`, and `kinds.generated.ts` with each token's value
+    /// as the native renderer takes it. Refuses a token whose value it cannot
+    /// type. With `--check`, writes nothing and exits 1 when a written module
+    /// is missing or out of date.
     Tokens(FamilyTokens),
 
     /// Write the intermediate form's TypeScript types into the package's sources.

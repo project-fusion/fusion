@@ -28,6 +28,9 @@ use crate::config::{discover_named, FAMILY};
 
 mod defaults;
 #[cfg(test)]
+#[path = "literals_tests.rs"]
+mod literals;
+#[cfg(test)]
 mod tests;
 
 #[cfg(test)]
@@ -36,7 +39,6 @@ pub use tests::testing;
 /// `helix.family.json`, as it is written.
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
-#[schemars(title = "helix.family.json")]
 pub struct Config {
     /// The JSON Schema an editor validates the file with. The compiler ignores
     /// it.
@@ -339,43 +341,7 @@ impl Project {
         }
         let tokens = match config.tokens {
             None => Tokens::None,
-            Some(TokenConfig {
-                dtcg: Some(_),
-                styles: Some(_),
-                ..
-            }) => return Err(refuse("`tokens` names both `dtcg` and `styles`: name one")),
-            Some(TokenConfig {
-                dtcg: Some(dtcg),
-                modes,
-                vendor: None,
-                ..
-            }) => Tokens::Dtcg {
-                file: at(&dtcg),
-                modes: modes
-                    .iter()
-                    .map(|(mode, path)| (mode.clone(), at(path)))
-                    .collect(),
-            },
-            Some(TokenConfig { dtcg: Some(_), .. }) => {
-                return Err(refuse(
-                    "`tokens.vendor` is a styles package's: a `dtcg` file is written by hand",
-                ))
-            }
-            Some(TokenConfig {
-                styles: Some(styles),
-                modes,
-                vendor,
-                ..
-            }) => {
-                if !modes.is_empty() {
-                    return Err(refuse("`tokens.modes` is a `dtcg` file's: a styles package declares its own modes"));
-                }
-                Tokens::Styles {
-                    package: at(&styles),
-                    vendor,
-                }
-            }
-            Some(_) => return Err(refuse("`tokens` names neither `dtcg` nor `styles`")),
+            Some(given) => token_source(given, &at).map_err(refuse)?,
         };
         let families = at(&config.families);
         let outputs = Outputs {
@@ -389,22 +355,7 @@ impl Project {
             stylesheets: config.outputs.stylesheets.as_deref().map(at),
             tokens: config.outputs.tokens.as_deref().map(at),
         };
-        let runtime = Runtime {
-            native: config
-                .runtime
-                .native
-                .unwrap_or_else(|| defaults::NATIVE.to_owned()),
-            event_type: config
-                .runtime
-                .event_type
-                .unwrap_or_else(|| defaults::EVENT_TYPE.to_owned()),
-            layer_host: config
-                .runtime
-                .layer_host
-                .unwrap_or_else(|| defaults::LAYER_HOST.to_owned()),
-            core: config.runtime.sources.core.as_deref().map(at),
-            native_package: config.runtime.sources.native.as_deref().map(at),
-        };
+        let runtime = runtime(config.runtime, &at);
         let repository = root
             .ancestors()
             .find(|directory| directory.join(".git").exists())
@@ -455,6 +406,70 @@ impl Project {
             )
             .hint(format!("add `{key}` to {}", self.file.display()))
         })
+    }
+}
+
+/// The token source `given` names, each path made absolute with `at`.
+///
+/// # Errors
+///
+/// A sentence when it names both sources or neither, or a key the source it
+/// names does not take.
+fn token_source(given: TokenConfig, at: &dyn Fn(&str) -> PathBuf) -> Result<Tokens, &'static str> {
+    match given {
+        TokenConfig {
+            dtcg: Some(_),
+            styles: Some(_),
+            ..
+        } => Err("`tokens` names both `dtcg` and `styles`: name one"),
+        TokenConfig {
+            dtcg: Some(_),
+            vendor: Some(_),
+            ..
+        } => Err("`tokens.vendor` is a styles package's: a `dtcg` file is written by hand"),
+        TokenConfig {
+            dtcg: Some(dtcg),
+            modes,
+            ..
+        } => Ok(Tokens::Dtcg {
+            file: at(&dtcg),
+            modes: modes
+                .iter()
+                .map(|(mode, path)| (mode.clone(), at(path)))
+                .collect(),
+        }),
+        TokenConfig {
+            styles: Some(_),
+            modes,
+            ..
+        } if !modes.is_empty() => {
+            Err("`tokens.modes` is a `dtcg` file's: a styles package declares its own modes")
+        }
+        TokenConfig {
+            styles: Some(styles),
+            vendor,
+            ..
+        } => Ok(Tokens::Styles {
+            package: at(&styles),
+            vendor,
+        }),
+        TokenConfig { .. } => Err("`tokens` names neither `dtcg` nor `styles`"),
+    }
+}
+
+/// The runtime `given` names, with Helix's runtime's names where it names
+/// none, and its sources' paths made absolute with `at`.
+fn runtime(given: RuntimeConfig, at: &dyn Fn(&str) -> PathBuf) -> Runtime {
+    Runtime {
+        native: given.native.unwrap_or_else(|| defaults::NATIVE.to_owned()),
+        event_type: given
+            .event_type
+            .unwrap_or_else(|| defaults::EVENT_TYPE.to_owned()),
+        layer_host: given
+            .layer_host
+            .unwrap_or_else(|| defaults::LAYER_HOST.to_owned()),
+        core: given.sources.core.as_deref().map(at),
+        native_package: given.sources.native.as_deref().map(at),
     }
 }
 

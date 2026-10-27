@@ -72,12 +72,10 @@ fn text(source: &str, span: Span) -> String {
 fn modules(events: &Path) -> Result<Vec<PathBuf>, Failure> {
     let entries = fs::read_dir(events).map_err(|error| {
         Failure::input(
-            "cannot read core's event classes",
+            "cannot read the web event classes",
             format!("{}: {error}", events.display()),
         )
-        .hint(
-            "pass the directory that holds `src/families`, such as helix/neutral, beside helix/core",
-        )
+        .hint("name the folder of the web event classes in the project's `events`")
     })?;
     let mut found: Vec<PathBuf> = entries
         .filter_map(Result::ok)

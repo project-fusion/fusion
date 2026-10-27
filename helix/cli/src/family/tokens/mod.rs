@@ -81,7 +81,7 @@ fn read(styles: &Path, file: &str) -> Result<String, Failure> {
             "cannot read the token layer",
             format!("{}: {error}", path.display()),
         )
-        .hint("pass a package beside helix/styles, such as helix/native")
+        .hint("name the styles package in the project's `tokens.styles`")
     })
 }
 
