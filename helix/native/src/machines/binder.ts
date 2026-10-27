@@ -2,6 +2,7 @@ import type { AnchorPress } from '../render/anchored'
 import type { Behavior, Props } from '../render/behavior'
 import type { Pager } from '../render/scroll'
 import type { Copied } from './copy'
+import type { Entered } from './entry'
 import type { Joined } from './join'
 import type { Turned } from './toggle'
 
@@ -20,6 +21,8 @@ export interface Around {
   readonly chosen: { current: string | undefined }
   /** The copy a press on its pressable runs, where the element declares one. */
   readonly copied?: Copied | undefined
+  /** The text the element holds, where a reader types into it. */
+  readonly entered?: Entered | undefined
   /**
    * What a machine bound before the element's layer answers for it, and
    * what the layer tells it back, as a tour stop's: the layer asks
