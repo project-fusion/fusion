@@ -35,8 +35,16 @@ export const pages: DocPage[] = [
   },
   {
     description:
-      'Record notes, distill them into facts, answer questions from the facts, and trace each answer to its notes.',
+      'Install cortex, run two models in Ollama, and trace an answer to your notes, with no API key.',
     order: 2,
+    section: 'Overview',
+    slug: 'quickstart',
+    title: 'Quickstart',
+  },
+  {
+    description:
+      'Record notes, distill them into facts, answer questions from the facts, and trace each answer to its notes.',
+    order: 3,
     section: 'Overview',
     slug: 'command',
     title: 'The cortex command',

@@ -16,15 +16,16 @@ run in Ollama on your machine. A session needs no account and no key.
 
 ## Install the command
 
-Build `cortex` from the repository with cargo:
+Install `cortex` with npm:
 
 ```bash
-cargo install --git https://github.com/project-fusion/fusion fusion-cortex-cli
+npm install --global @fusion.dev/cortex-cli
 ```
 
-In a checkout, `cargo build -p fusion-cortex-cli` builds it into `target`. The
-Fusion command line routes to it, so `fusion cortex ask …` runs `cortex ask …`
-and returns its exit code.
+npm installs the binary for your machine: macOS and Linux on Arm and x86-64,
+and Windows on x86-64. In a checkout, `cargo build -p fusion-cortex-cli` builds
+it into `target`. The Fusion command line routes to it, so
+`fusion cortex ask …` runs `cortex ask …` and returns its exit code.
 
 Then pull the two default models:
 
@@ -91,12 +92,13 @@ Release 0.12 ships on Thursday, October 22. Priya reviews every schema
 migration, but she is out that day, so Sam reviews the 0.12 migration.
 
 01a17a1d-d44e-… from scripted/week, on this machine, given 8 facts ranked by
-weighted/1 (overlap/1 0.30, vector/1 scripted/week 0.70)
+weighted/1 (overlap/1 0.30, vector/1 scripted/week 0.70), each scoring 0.30 or more
 Trace the answer: cortex why 01a17a1d-d44e-…
 ```
 
 Recall ranks the facts in the scopes you read by the words they share with the
-question and by how close their vectors are, and places the best eight. The
+question and by how close their vectors are, and places the best eight that
+score 0.3 or more. `--most` sets the count and `--floor` the least score. The
 question, the context the model was given, and the answer are recorded in
 Trace.
 
