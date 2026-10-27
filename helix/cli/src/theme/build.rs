@@ -74,6 +74,24 @@ pub fn run(args: &Build, from: &Path, json: bool) -> Outcome<Code> {
     };
     let tokens = themes.first().map_or(0, |theme| theme.tokens.len());
 
+    /* **A check writes nothing**, and fails where the file is not what the
+    intent builds, so a project that commits its theme finds out when the two
+    part. */
+    if args.check {
+        let Some(path) = &args.out else {
+            unreachable!("clap requires `--out` with `--check`")
+        };
+        if std::fs::read_to_string(path).ok().as_deref() != Some(artifact.as_str()) {
+            return Err(Failure::new(
+                Code::Failed,
+                format!("{} is missing or out of date", path.display()),
+                format!("it is not what {source} builds"),
+            )
+            .hint("run the same `helix theme build` without `--check`"));
+        }
+        return Ok(Code::Ok);
+    }
+
     let written = match &args.out {
         None => None,
         Some(path) => {

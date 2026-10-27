@@ -151,6 +151,10 @@ module. It exports `theme`, each mode's colors by token name, which
 helix theme build --format native --out src/theme.ts
 ```
 
+`--check` writes nothing, and exits 1 when the file at `--out` is missing or
+differs from what the theme builds. Run it in a build that commits its theme
+files.
+
 ## Color one section
 
 A section in a color of its own, such as a deep teal band on a cream page, is a

@@ -345,6 +345,91 @@ fn the_native_format_writes_each_mode_s_colors_as_the_stylesheet_does() {
     assert!(pairs > 20, "only {pairs} pairs compared");
 }
 
+/// **A check passes on the file a build wrote, and fails once the intent
+/// moves**, and writes nothing either way.
+#[test]
+fn a_check_fails_when_the_written_theme_is_behind_its_intent() {
+    let sandbox = Sandbox::new("build-check", Some(CLEAN));
+    for format in ["css", "native"] {
+        let missing = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&missing), 1, "{format}: {}", err(&missing));
+        assert!(
+            !sandbox.0.join("theme.out").exists(),
+            "{format}: a check wrote"
+        );
+
+        let built = run(
+            &sandbox.0,
+            &["theme", "build", "--format", format, "--out", "theme.out"],
+        );
+        assert_eq!(code(&built), 0, "{format}: {}", err(&built));
+        let checked = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&checked), 0, "{format}: {}", err(&checked));
+        assert_eq!(out(&checked), "", "{format}: a passing check printed");
+        assert_eq!(err(&checked), "", "{format}: a passing check printed");
+
+        std::fs::write(
+            sandbox.0.join("helix.json"),
+            configuration(r##"{ "brand": "#c1272d" }"##),
+        )
+        .expect("a new intent");
+        let stale = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&stale), 1, "{format}");
+        assert_eq!(
+            out(&stale),
+            "",
+            "{format}: a failing check printed to stdout"
+        );
+        assert!(
+            err(&stale).contains("out of date"),
+            "{format}: {}",
+            err(&stale)
+        );
+
+        std::fs::write(sandbox.0.join("helix.json"), configuration(CLEAN)).expect("the intent");
+        std::fs::remove_file(sandbox.0.join("theme.out")).expect("the file");
+    }
+    let unaimed = run(&sandbox.0, &["theme", "build", "--check"]);
+    assert_eq!(
+        code(&unaimed),
+        2,
+        "a check with nothing to read is a usage error"
+    );
+}
+
 #[test]
 fn init_writes_a_file_the_next_command_can_read() {
     let sandbox = Sandbox::new("init", None);
