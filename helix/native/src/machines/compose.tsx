@@ -13,6 +13,7 @@ import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
 import { type Copied, useCopy } from './copy'
 import { standsOpen, useReportOpen } from './disclosed'
+import { type Entered, useEntry } from './entry'
 import { HOOKS, leaving } from './hosted'
 import { useJoin } from './join'
 import { layering } from './layer'
@@ -43,8 +44,9 @@ const SELECTIONS: ReadonlySet<string> = new Set([
 
 /**
  * Hosts the verdict on a form control's answer, where its form binds one: an
- * answer is missing while its toggle is not checked, or while its set has
- * nothing chosen.
+ * answer is missing while its toggle is not checked, while its field holds no
+ * text, or while its set has nothing chosen. A field's text is held to its
+ * own constraint as well.
  */
 const validating = (
   family: Family,
@@ -55,10 +57,49 @@ const validating = (
     return () => undefined
   }
   const toggles = boundTo(use, 'checked', 'prop') !== undefined
+  const types = boundTo(use, 'value', 'prop') !== undefined
   return (props, around) =>
-    useValidation(family, props, use, {
-      empty: toggles ? around.toggled?.checked !== true : (around.chosen.current ?? '') === '',
-    })
+    useValidation(
+      family,
+      props,
+      use,
+      types
+        ? { empty: (around.entered?.value ?? '') === '', text: around.entered }
+        : {
+            empty: toggles
+              ? around.toggled?.checked !== true
+              : (around.chosen.current ?? '') === '',
+          },
+    )
+}
+
+/** What a machine hosted on its own gives the element's drawing, where it is hosted. */
+const behaviorOf = (hosted: { readonly behavior: Behavior } | undefined): readonly Behavior[] =>
+  hosted === undefined ? [] : [hosted.behavior]
+
+/**
+ * The pager each scrolling part hands its binding as it is drawn, kept by
+ * the part's name, and the bindings that take them.
+ */
+const usePagers = (
+  scrollers: readonly string[],
+): { readonly paged: Behavior; readonly pagers: Map<string, Pager> } => {
+  const pagers = useRef(new Map<string, Pager>()).current
+  const paged = useMemo(() => {
+    const parts: Record<string, PartBinding> = {}
+    for (const name of scrollers) {
+      const pager = (handed: Pager | null) => {
+        if (handed === null) {
+          pagers.delete(name)
+        } else {
+          pagers.set(name, handed)
+        }
+      }
+      parts[name] = { view: { pager } }
+    }
+    return { marks: [], parts }
+  }, [pagers, scrollers])
+  return { paged, pagers }
 }
 
 /** Draws an item by the grip its form names, as its set moves it. */
@@ -147,6 +188,12 @@ export const behaviorFor = (family: Family): UseBehavior => {
   const turns = turning(family, uses)
   const judges = validating(family, uses)
   const axisOf = aroundToolbar(family)
+  const entering = uses.find((use) => use.machine === 'entry')
+  const enterer =
+    entering === undefined
+      ? (): Entered | undefined => undefined
+      : (props: Props, touch: () => void): Entered | undefined =>
+          useEntry(family, props, entering, touch)
   const copying = uses.find((use) => use.machine === 'copy')
   const copier =
     copying === undefined
@@ -160,23 +207,10 @@ export const behaviorFor = (family: Family): UseBehavior => {
     const touched = useRef<() => void>(() => undefined)
     const toggled = turns(props, () => touched.current(), joined)
     const axis = axisOf(props)
-    const pagers = useRef(new Map<string, Pager>()).current
-    const paged = useMemo(() => {
-      const parts: Record<string, PartBinding> = {}
-      for (const name of scrollers) {
-        const pager = (handed: Pager | null) => {
-          if (handed === null) {
-            pagers.delete(name)
-          } else {
-            pagers.set(name, handed)
-          }
-        }
-        parts[name] = { view: { pager } }
-      }
-      return { marks: [], parts }
-    }, [pagers])
+    const { paged, pagers } = usePagers(scrollers)
     const chosen = useRef<string | undefined>(undefined)
     const copied = copier(props)
+    const entered = enterer(props, () => touched.current())
     const bound: Behavior[] = []
     const touch = () => touched.current()
     const around: Around = {
@@ -184,6 +218,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       bound,
       chosen,
       copied,
+      entered,
       joined,
       layering: {},
       pagers,
@@ -202,8 +237,9 @@ export const behaviorFor = (family: Family): UseBehavior => {
       /* A set says whether its item is chosen, in place of the item's toggle. */
       ...(toggled === undefined || !turnsAlone(joined) ? [] : [toggled.behavior]),
       ...bound,
-      ...(copied === undefined ? [] : [copied.behavior]),
-      ...(judged === undefined ? [] : [judged.behavior]),
+      ...behaviorOf(copied),
+      ...behaviorOf(entered),
+      ...behaviorOf(judged),
       axis,
     )
     /* An element that stands open tells the element around it, as a

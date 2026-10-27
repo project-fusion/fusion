@@ -248,6 +248,11 @@ export interface Resolved {
   readonly backdrop?: GeneratedBox
   /** The radius of the blur behind what the part holds, in points, where `backdrop-filter` draws one. */
   readonly blur?: number
+  /**
+   * The look of the words a field shows while it is empty, where its
+   * `::placeholder` rules give one: a `TextInput` draws their color.
+   */
+  readonly placeholder?: Style
   /** The inset the part is clipped by, where `clip-path: inset()` draws one. */
   readonly clip?: Clip
   /**
