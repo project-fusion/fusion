@@ -42,9 +42,14 @@ describe('the events example', () => {
     const { screen, ...at } = middle(phone)
     press(screen, 'pointerdown', at)
     press(screen, 'pointerup', at)
+    /* The ring stands for 700 milliseconds, so it is read as soon as the
+       device has drawn it. The six frames `idle()` waits outlasted it in
+       WebKit under x86 emulation, which drew the ring and took it away
+       before it was read. */
+    await (phone as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(phone.shadowRoot?.querySelector('[part~="touch"]')).not.toBeNull()
     await idle()
     expect(logged()).toEqual(['helix-device-tap'])
-    expect(phone.shadowRoot?.querySelector('[part~="touch"]')).not.toBeNull()
   })
 
   run('a press on Back is written in the log', async () => {
