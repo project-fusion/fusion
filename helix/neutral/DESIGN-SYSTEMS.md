@@ -140,6 +140,28 @@ A mode's file sets some tokens to another value. The native theme draws
 Pass the modules to the theme your app wraps itself in, such as
 `<HelixRoot tokens={{ dark, light }}>`.
 
+## The authoring helpers
+
+`@fusion.dev/helix-neutral` publishes the helpers your sources are written
+with. The package is experimental, so its API can change.
+
+```sh
+bun add -d @fusion.dev/helix-neutral
+```
+
+| Entry point | What it holds |
+|---|---|
+| `@fusion.dev/helix-neutral/render` | `headless()`, the nodes of a part tree, and the helpers its props and events take |
+| `@fusion.dev/helix-neutral/style` | The values a style table's declarations take, such as `token()` |
+| `@fusion.dev/helix-neutral/table` | `styles()`, a table's groups and rules, and fragments |
+| `@fusion.dev/helix-neutral/tree` | The features a source declares, and `derive()`, `bind()`, and `not()` |
+| `@fusion.dev/helix-neutral/jsx-runtime` | The JSX runtime a `headless.tsx` render is typed with |
+
+Set `jsxImportSource` to `@fusion.dev/helix-neutral` in your
+`tsconfig.json`, so your editor types each render against the nodes in
+`render`. Acme's `tsconfig.json` does this, and this repository's typecheck
+runs it against the package's published entry points.
+
 ## Write families
 
 Write each element as the [README](README.md) describes. What a design
@@ -151,10 +173,10 @@ system changes:
   unless the source marks it `bare`.
 - **Each hook is the table's own `prefix` and the hook's name**, such as
   `--button-radius`, and each token is your property prefix and its name.
-- **Your sources import the authoring helpers** of `helix/neutral`:
-  `src/render.ts`, `src/style.ts`, `src/table.ts`, and `src/tree.ts`. The
-  compiler reads the calls as syntax, so it reads a source whatever its import
-  paths are.
+- **Your sources import the authoring helpers from
+  `@fusion.dev/helix-neutral`**, as
+  [the authoring helpers](#the-authoring-helpers) lists. The compiler reads
+  the calls as syntax, so it reads a source whatever its import paths are.
 - **Keep the keys of a source in the order they are read.** A formatter that
   sorts keys has to leave `headless.tsx` and `styled.ts` alone, as this
   repository's `biome.json` does for Helix's families and Acme's.
