@@ -2,7 +2,8 @@
 //!
 //! **Helix's runtime is the default provider.** A design system built on the
 //! compiler draws its native components with `@fusion.dev/helix-native`
-//! unless its `runtime` names another package that exports the same names.
+//! unless its `runtime` names another package that meets the runtime
+//! contract, which `helix/native/src/contract.ts` types.
 
 /// The module the native components import the runtime from.
 pub const NATIVE: &str = "@fusion.dev/helix-native";

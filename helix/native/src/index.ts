@@ -17,6 +17,16 @@ import './peers'
 export { type DateTimeSupport, dateTimeSupport } from './capabilities/intl'
 export { useLocale } from './capabilities/locale'
 export { type NumberSupport, numberSupport } from './capabilities/number-format'
+export type {
+  ComponentProps,
+  ElementEvent,
+  FieldHandleContract,
+  LayerHostProps,
+  NativeRuntime,
+  PlatformElementEvent,
+  TokenValues,
+  UseBehavior,
+} from './contract'
 export { useCountdown, useDelay, useWallClock } from './machines/clocks'
 export { behaviorFor } from './machines/compose'
 export { claimLongPress, type HoldRank } from './machines/long-press'
