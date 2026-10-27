@@ -21,6 +21,12 @@ Trend.
 | `src/fragments/<name>.ts` | Rules or declarations several families share, taken in with `include()` |
 | `src/tree.ts` | The features a source declares, each in its own module, and `derive()`, `bind()`, and `not()` |
 
+The package publishes the helpers as `@fusion.dev/helix-neutral`, for a
+design system of your own: `render.ts`, `style.ts`, `table.ts`, and `tree.ts`
+under their names, as `@fusion.dev/helix-neutral/render`, and the JSX
+runtime. The package is experimental, so its API can change. Helix's own
+families import the helpers by path.
+
 The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
 
