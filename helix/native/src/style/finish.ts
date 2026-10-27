@@ -31,6 +31,11 @@ export interface Drawing {
   readonly family: Family
   /** Whether the part's track grows. */
   readonly grows: boolean
+  /**
+   * Whether the part's track is never narrower than its content, as
+   * `minmax(max-content, 1fr)` is.
+   */
+  readonly holds: boolean
   /** Whether the part's only content is one region. */
   readonly lone: boolean
   readonly resolver: Resolver
@@ -77,6 +82,7 @@ export const finisherFor = ({
   dropped,
   family,
   grows,
+  holds,
   lone,
   resolver,
   shrinks,
@@ -209,9 +215,13 @@ export const finisherFor = ({
     if (clips && scrolls === undefined) {
       out.overflow = 'hidden'
     }
+    /* **A track that grows takes a share of the room left**, and gives it
+         back as the line runs short, unless its least is its content: then
+         it keeps its content's width, as App Header's brand does beside
+         wide navigation. */
     if (grows && whole) {
       out.flexGrow = 1
-      out.flexShrink = 1
+      out.flexShrink = holds ? 0 : 1
     }
     /* **A negative basis is none**, as `calc()` clamps to what a property
          takes, which a switch's basis is while its row is wider. */
