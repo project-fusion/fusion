@@ -376,6 +376,10 @@ export const style = (family: Family, part: string, context: Context): Resolved 
      moved by the transitions its rules name. */
   const scrim = declare('::backdrop')
   const backdrop = scrim.size === 0 ? undefined : finish(scrim, new Map())
+  /* **A field's `::placeholder` colors the words it shows while empty**, which
+     a phone's `TextInput` takes as its `placeholderTextColor`. */
+  const typed = declare('::placeholder')
+  const placeholder = typed.size === 0 ? undefined : finish(typed, new Map()).out
   return {
     ...(backdrop === undefined
       ? {}
@@ -391,6 +395,7 @@ export const style = (family: Family, part: string, context: Context): Resolved 
       ]),
     ),
     ...(main.inline ? { inline: true } : {}),
+    ...(placeholder === undefined ? {} : { placeholder }),
     ...(opens ? { opens: true } : {}),
     counting: main.counting,
     custom: Object.fromEntries(custom()),

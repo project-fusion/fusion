@@ -6,6 +6,7 @@ import { described } from './anchored'
 import { wrapped } from './behavior'
 import { Box } from './box'
 import { drawDrawnNode } from './drawn'
+import { drawField } from './field'
 import { PartBox } from './fit'
 import { drawImage } from './image'
 import { drawLayer } from './layer'
@@ -340,6 +341,9 @@ export const draw: Draw = (scope, node, text, regions, inside) => {
   switch (node.kind) {
     case 'box': {
       return drawBox(scope, node, text, inside)
+    }
+    case 'field': {
+      return drawField(scope, node, text)
     }
     case 'image': {
       return drawImage(scope, node, text)

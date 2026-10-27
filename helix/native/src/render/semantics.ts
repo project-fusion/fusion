@@ -318,6 +318,22 @@ const pressedAs = (styling: Styling, node: Node): Readonly<Record<string, unknow
 }
 
 /**
+ * What a screen reader hears of a field: its name, from the region that
+ * labels it or its own `label`, what describes it as its hint, and whether
+ * it is disabled. **React Native has no required state for a field**, and a
+ * read-only field is a `TextInput` that is not editable.
+ */
+export const fieldSemantics = (styling: Styling, node: Node): Readonly<Record<string, unknown>> => {
+  const label = labelOf(styling, node)
+  const off = Boolean(bound(styling, node.attributes?.disabled, node.name))
+  return {
+    ...(label === undefined ? {} : { accessibilityLabel: label }),
+    ...told(styling, node),
+    accessibilityState: { disabled: off },
+  }
+}
+
+/**
  * What a screen reader hears of a press: what it is announced as, its label,
  * its state, its reading where it is a range, and the presses inside it a
  * pointer alone reaches, as actions. A decorative press is hidden, and its label goes to
