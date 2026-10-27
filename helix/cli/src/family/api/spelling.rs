@@ -316,8 +316,26 @@ const STOP: &[Field] = &[
 
 const VALIDATION: &[Field] = &[
     ("feedback", "feedback", Name),
+    ("maxLength", "maxlength", Name),
+    ("message", "message", Name),
+    ("minLength", "minlength", Name),
+    ("pattern", "pattern", Name),
     ("required", "required", Name),
+    ("type", "type", Name),
     ("valueMissing", "missing", Name),
+];
+
+const ENTRY: &[Field] = &[
+    ("blank", "blank", Name),
+    ("clearShown", "shows", Name),
+    ("clearable", "offers", Name),
+    ("defaultProp", "initial", Name),
+    ("onBeforeChange", "before", Name),
+    ("onChange", "change", Name),
+    ("onClear", "clear", Name),
+    ("onInput", "input", Name),
+    ("prop", "value", Name),
+    ("readonly", "readonly", Name),
 ];
 
 /// Each feature a source declares: its key, the intermediate form's key and
@@ -328,6 +346,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("copy", "copy", COPY),
     ("countdown", "countdown", COUNTDOWN),
     ("delay", "delay", DELAY),
+    ("text", "entry", ENTRY),
     ("maxVisible", "fold", MAX_VISIBLE),
     ("notice", "notice", NOTICE),
     ("notices", "notices", NOTICES),

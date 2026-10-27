@@ -31,7 +31,8 @@
  *   passed in, `{ slotted: tag }` for the children the host styles, `{ part,
  *   slotted: '*' }` for the content passed in through a part that is a
  *   region's slot, `{ before: part }` and `{ after: part }` for the
- *   pseudo-elements, `{ backdrop: layer }` for a layer's scrim, `{ part,
+ *   pseudo-elements, `{ backdrop: layer }` for a layer's scrim,
+ *   `{ placeholder: field }` for the words a field shows while empty, `{ part,
  *   exact: true }` for the part alone, and, on the web alone, `{ part, inner }`
  *   for a descendant the tree does not draw and `{ part, selector }`.
  * - `rule(set)` or `rule(when, set)`. `platform` and `supports` are
@@ -243,6 +244,8 @@ export type Target<Part extends string, Region extends string> =
   | { readonly after: One<Part> }
   /* The scrim a layer draws behind itself, `::backdrop` on the web. */
   | { readonly backdrop: Part }
+  /* The words a field shows while it is empty, `::placeholder` on the web. */
+  | { readonly placeholder: Part }
   | { readonly part: Part; readonly exact: true }
   /* The web's alone: a descendant the tree does not draw, `svg` or `> *`. */
   | { readonly part: One<Part>; readonly inner: string }

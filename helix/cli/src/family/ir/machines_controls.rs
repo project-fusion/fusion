@@ -28,17 +28,24 @@ pub(super) fn roving_toolbar(toolbar: &Toolbar, tree: &[Node]) -> MachineUse {
 }
 
 /// The verdict on a form control's answer: the props it reads, and where
-/// the answer is held, the toggle's checked prop or the collection's chosen
-/// one, with the props that bar it from validation, being read-only or
+/// the answer is held, the toggle's checked prop, the entry's text, or the
+/// collection's chosen one, with the props that bar it from validation, being read-only or
 /// disabled.
 pub(super) fn validated(validation: &Validation, api: &Api) -> MachineUse {
     let mut bind = BTreeMap::from([(
         "required".to_owned(),
         Bound::Prop(validation.required.clone()),
     )]);
+    if let Some(message) = &validation.message {
+        bind.insert("message".to_owned(), Bound::State(message.clone()));
+    }
     for (name, value) in [
         ("feedback", &validation.feedback),
+        ("maxlength", &validation.maxlength),
+        ("minlength", &validation.minlength),
         ("missing", &validation.missing),
+        ("pattern", &validation.pattern),
+        ("type", &validation.kind),
     ] {
         if let Some(prop) = value {
             bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
@@ -49,6 +56,11 @@ pub(super) fn validated(validation: &Validation, api: &Api) -> MachineUse {
             bind.insert("checked".to_owned(), Bound::Prop(checked.clone()));
         }
         if let Some(readonly) = &toggle.readonly {
+            bind.insert("readonly".to_owned(), Bound::Prop(readonly.clone()));
+        }
+    } else if let Some(entry) = &api.entry {
+        bind.insert("value".to_owned(), Bound::Prop(entry.value.clone()));
+        if let Some(readonly) = &entry.readonly {
             bind.insert("readonly".to_owned(), Bound::Prop(readonly.clone()));
         }
     } else if let Some(chosen) = api.collection.as_ref().and_then(|set| set.chosen.as_ref()) {

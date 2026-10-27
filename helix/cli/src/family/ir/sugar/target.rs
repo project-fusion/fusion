@@ -91,11 +91,13 @@ impl Names {
                         read.slotted = Some("*".to_owned());
                     }
                     /* A `backdrop` is the scrim a layer draws behind itself,
-                    which a phone draws under the layer, and never the host's. */
-                    [pseudo @ ("before" | "after" | "backdrop")] => {
+                    which a phone draws under the layer, and never the host's.
+                    A `placeholder` is the words a field shows while it is
+                    empty, which a phone colors through its `TextInput`. */
+                    [pseudo @ ("before" | "after" | "backdrop" | "placeholder")] => {
                         read.on = Some(Lit::Text(part(
                             field(pseudo).unwrap_or(&Lit::Bool(false)),
-                            *pseudo != "backdrop",
+                            matches!(*pseudo, "before" | "after"),
                         )?));
                         read.inner = Some(format!("::{pseudo}"));
                     }
@@ -149,7 +151,7 @@ impl Names {
     }
 }
 
-const TARGETS: &str = "a target is `'host'`, a part, an array of parts, `{ region }`, `{ region, slotted }`, `{ slotted: tag }`, `{ part, slotted: '*' }`, `{ before }`, `{ after }`, `{ backdrop }`, `{ part, exact: true }`, `{ part, inner }` or `{ part, selector }`";
+const TARGETS: &str = "a target is `'host'`, a part, an array of parts, `{ region }`, `{ region, slotted }`, `{ slotted: tag }`, `{ part, slotted: '*' }`, `{ before }`, `{ after }`, `{ backdrop }`, `{ placeholder }`, `{ part, exact: true }`, `{ part, inner }` or `{ part, selector }`";
 
 /// A `when` with its platform and feature query taken out, which every
 /// alternative must agree on.

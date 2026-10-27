@@ -19,6 +19,7 @@ export * from './collection.js'
 export * from './copy.js'
 export * from './countdown.js'
 export * from './delay.js'
+export * from './entry.js'
 export * from './fold.js'
 export * from './notices.js'
 export * from './page.js'
@@ -35,6 +36,7 @@ import type { Collection, Item } from './collection.js'
 import type { Copy } from './copy.js'
 import type { Countdown, Queue } from './countdown.js'
 import type { Delay } from './delay.js'
+import type { Entry } from './entry.js'
 import type { Fold } from './fold.js'
 import type { Notice, Notices } from './notices.js'
 import type { Page } from './page.js'
@@ -213,6 +215,8 @@ export interface Headless {
    * while it runs, as a loader waits out its `delay`.
    */
   readonly delay?: Delay
+  /** What it holds where a reader types into it: its text, and the events an edit sends. */
+  readonly text?: Entry
   /**
    * The values the element computes from its props, by name: `derive()`, a
    * derivation in `@fusion.dev/helix-core/derivations`, or `bind()`, a prop
