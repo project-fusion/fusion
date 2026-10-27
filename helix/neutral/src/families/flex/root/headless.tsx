@@ -11,7 +11,7 @@ import { headless, oneOf, Slot } from '../../../render.js'
  * **`wrap` is a switch with one named value**: absent is `false`, present is
  * `true`, and `wrap="reverse"` wraps each new line above the one before.
  *
- * **Held to `helix-flex`.** `helix family check` compares the props, the
+ * **Held to `helix-flex`.** `helix system check` compares the props, the
  * states, and the region with what the manifest says the element has.
  */
 export default headless('flex', {

@@ -83,63 +83,87 @@
     ]
   },
   "helix": {
-    "accepted": {
-      "color-foreground on color-primary-wash": "A wash under Chat's own bubble, over whatever ground the bubble sits on. It holds 1.26:1 against its ground and keeps full ink, so the ink is measured against the ground below it.",
-      "color-surface-media on color-foreground-media": "A QR code paints the media pair the other way up: black modules on white paper in both schemes, from the token layer. The engine emits neither token, and the model holds the pair over a photograph, which no theme can measure."
-    },
-    "chrome": {
-      "app-header": "The bar across the top of the page, which is page chrome by definition.",
-      "sandbox": "A development tool that owns its whole window, not a component put on a page."
-    },
-    "documents": ["helix/styles/src", "fusion/site"],
-    "floors": true,
-    "layer": [
-      "helix/styles/src/primitives.css",
-      "helix/styles/src/tokens.css",
-      "helix/styles/src/base.css"
-    ],
-    "layers": [
-      {
-        "prefix": "helix-headless-",
-        "source": "helix/headless/src"
+    "components": {
+      "accepted": {
+        "color-foreground on color-primary-wash": "A wash under Chat's own bubble, over whatever ground the bubble sits on. It holds 1.26:1 against its ground and keeps full ink, so the ink is measured against the ground below it.",
+        "color-surface-media on color-foreground-media": "A QR code paints the media pair the other way up: black modules on white paper in both schemes, from the token layer. The engine emits neither token, and the model holds the pair over a photograph, which no theme can measure."
       },
-      {
-        "prefix": "helix-",
-        "source": "helix/styled/src"
+      "chrome": {
+        "app-header": "The bar across the top of the page, which is page chrome by definition.",
+        "sandbox": "A development tool that owns its whole window, not a component put on a page."
+      },
+      "documents": ["helix/styles/src", "fusion/site"],
+      "floors": true,
+      "layer": [
+        "helix/styles/src/primitives.css",
+        "helix/styles/src/tokens.css",
+        "helix/styles/src/base.css"
+      ],
+      "layers": [
+        {
+          "prefix": "helix-headless-",
+          "source": "helix/headless/src"
+        },
+        {
+          "prefix": "helix-",
+          "source": "helix/styled/src"
+        }
+      ],
+      "layouts": ["centered", "fullscreen", "hug", "padded"],
+      "leaves": {
+        "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
+      },
+      "lengths": {
+        "canvas": "A card answers with the size the document gave it, in the document's own units, because position and extent are data on a board rather than a policy this library chooses between.",
+        "table": "A column answers with a CSS grid track, 16rem or minmax(0, 2fr), because the question is not which of three behaviors but exactly how wide."
+      },
+      "oracle": "helix/theme/rust/oracle.json",
+      "outside": [
+        "helix/styled/src",
+        "helix/headless/src",
+        "helix/docs/content",
+        "fusion/site",
+        "fusion/docs"
+      ],
+      "platform": "helix/cli/platform-fidelity.json",
+      "seeds": {
+        "pinned": ["color-house-teal", "color-primary"],
+        "planned": {},
+        "sheets": ["helix/styles/src/primitives.css", "helix/styles/src/tokens.css"]
+      },
+      "shared": ["chart", "dictation", "floating", "viewport"],
+      "tiers": [
+        "helix/core/src",
+        "helix/headless/src",
+        "helix/sandbox/src",
+        "helix/styled/src",
+        "helix/workbench/src"
+      ],
+      "unresolved": {
+        "body": "Steps: a step's name and description together, which is a summary rather than a body."
       }
-    ],
-    "layouts": ["centered", "fullscreen", "hug", "padded"],
-    "leaves": {
-      "icon": "A leaf that takes a name and draws it, in fourteen families, and no consumer wants a different icon element that their own plus --icon-size does not already give them."
     },
-    "lengths": {
-      "canvas": "A card answers with the size the document gave it, in the document's own units, because position and extent are data on a board rather than a policy this library chooses between.",
-      "table": "A column answers with a CSS grid track, 16rem or minmax(0, 2fr), because the question is not which of three behaviors but exactly how wide."
-    },
-    "oracle": "helix/theme/rust/oracle.json",
-    "outside": [
-      "helix/styled/src",
-      "helix/headless/src",
-      "helix/docs/content",
-      "fusion/site",
-      "fusion/docs"
-    ],
-    "platform": "helix/cli/platform-fidelity.json",
-    "seeds": {
-      "pinned": ["color-house-teal", "color-primary"],
-      "planned": {},
-      "sheets": ["helix/styles/src/primitives.css", "helix/styles/src/tokens.css"]
-    },
-    "shared": ["chart", "dictation", "floating", "viewport"],
-    "tiers": [
-      "helix/core/src",
-      "helix/headless/src",
-      "helix/sandbox/src",
-      "helix/styled/src",
-      "helix/workbench/src"
-    ],
-    "unresolved": {
-      "body": "Steps: a step's name and description together, which is a summary rather than a body."
+    "system": {
+      "events": "helix/core/src/events",
+      "families": "helix/neutral",
+      "manifest": "helix/styled/custom-elements.json",
+      "name": "Helix",
+      "outputs": {
+        "build": "helix/neutral/build",
+        "components": "helix/styled/native",
+        "designTokens": "helix/styles/dist",
+        "stylesheets": "helix/styled/src",
+        "tokens": "helix/native/src/theme"
+      },
+      "prefix": "helix",
+      "runtime": {
+        "eventType": "HelixEvent",
+        "layerHost": "HelixRoot",
+        "native": "@fusion.dev/helix-native",
+        "sources": { "core": "helix/core", "native": "helix/native" }
+      },
+      "theme": ["helix-mode", "helix-mode-inverted"],
+      "tokens": { "styles": "helix/styles", "vendor": "dev.fusion.helix" }
     }
   },
   "hydrates": ["fusion/site"],

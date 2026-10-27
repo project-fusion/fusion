@@ -21,7 +21,7 @@ import { headless, oneOf, Slot, View, web } from '../../../render.js'
  * **`announced` is the web's.** It is deprecated there, and a phone never
  * had it.
  *
- * **Held to `helix-divider`.** `helix family check` compares the props, the
+ * **Held to `helix-divider`.** `helix system check` compares the props, the
  * states, the region, and the parts with what the manifest says the element
  * has.
  */

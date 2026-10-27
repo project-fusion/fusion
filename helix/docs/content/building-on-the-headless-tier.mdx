@@ -225,10 +225,11 @@ program.
 ## Check your components with `helix component`
 
 `helix component` checks the components you write on Helix's base classes. Name
-the folders that hold them in `helix.json` at your project's root:
+the folders that hold them in the `components` of `helix.json` at your
+project's root:
 
 ```json
-{ "tiers": ["src/components"] }
+{ "components": { "tiers": ["src/components"] } }
 ```
 
 Then run it:

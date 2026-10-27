@@ -51,16 +51,17 @@ impl Answer {
 
 /// What the tools take, described for a client that has never seen Helix.
 ///
-/// **The intent is passed as the same JSON a `helix.theme.json` holds**, rather
-/// than as a flattened set of parameters. One shape to document, one parser, and
-/// an agent that has read the file format can already call the tool. A schema
+/// **The intent is passed as the same JSON the `theme` of `helix.json`
+/// holds**, rather than as a flattened set of parameters. One shape to
+/// document, one parser, and an agent that has read the file format can
+/// already call the tool. A schema
 /// enumerating every optional field here would be a third copy of it, after the
 /// Rust struct and the starter file `helix theme init` writes.
 fn intent_schema() -> Value {
     json!({
         "properties": {
             "intent": {
-                "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
+                "description": "A theme intent, the same JSON the `theme` of `helix.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
                 "type": "object",
             },
         },
@@ -491,6 +492,6 @@ fn theme(name: &str, arguments: &Value) -> Result<Answer, String> {
 fn read(arguments: &Value) -> Result<ThemeIntent, String> {
     let body = arguments.get("intent").unwrap_or(arguments);
     serde_json::from_value(body.clone()).map_err(|failure| {
-        format!("that is not a theme intent: {failure}. It is the JSON `helix.theme.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
+        format!("that is not a theme intent: {failure}. It is the JSON the `theme` of `helix.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
     })
 }

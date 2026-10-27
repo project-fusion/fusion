@@ -1,5 +1,5 @@
 {
-  // The native components: one module per family, which `helix family
+  // The native components: one module per family, which `helix system
   // components` writes into `native/<family>/index.native.ts` and this
   // compiles to `dist/<family>/index.native.js`, beside the family's web
   // entry. Each family's `react-native` export condition names them.

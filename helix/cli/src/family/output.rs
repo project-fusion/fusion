@@ -1,4 +1,4 @@
-//! What `helix family` writes and prints.
+//! What `helix system` writes and prints.
 //!
 //! **A check writes nothing.** Each command that writes files takes `--check`,
 //! which compiles the same outputs and says which written ones are missing or

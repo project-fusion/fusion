@@ -12,7 +12,7 @@ import { derive } from '../../../tree.js'
  * past a navigation bar. So a phone's `HelixSkipLink` draws nothing, and a
  * universal app's shared screens can write it for the web.
  *
- * **Held to `helix-skip-link`.** `helix family check` compares the props,
+ * **Held to `helix-skip-link`.** `helix system check` compares the props,
  * the states, the region, and the part with what the manifest says the
  * element has.
  */

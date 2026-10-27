@@ -20,7 +20,7 @@ import { derive } from '../../../tree.js'
  * **The web's**: `rel`, `target`, `download`, the `shortcut` region, and
  * `aria-keyshortcuts`, which React Native has no equivalent of.
  *
- * **Held to `helix-speed-dial-item`.** `helix family check` compares the
+ * **Held to `helix-speed-dial-item`.** `helix system check` compares the
  * props, the event, the regions, and the parts with what the manifest says
  * the element has.
  */

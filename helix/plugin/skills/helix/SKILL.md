@@ -235,8 +235,8 @@ and hooks change with the library, and they are in a file you can fetch. A list
 of them here would be a second copy that goes stale. Fetch the family.
 
 **The theme a brand color produces.** Helix computes it, so call
-`helix_derive_theme`, or run `helix theme build`. Both take the same JSON that a
-`helix.theme.json` file holds.
+`helix_derive_theme`, or run `helix theme build`. Both take the same JSON as the
+`theme` of `helix.json`.
 
 **Whether a component fits your case.** Read the examples to decide. Every
 family's `.md` file includes them as text, and

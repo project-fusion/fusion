@@ -1031,11 +1031,11 @@ should default to a semantic token.
 **`tokens.ts` writes each value with the builders in `builders.ts`**, such as
 `times(rem(2.5), density)` or `lightDark(primitive('neutral-0'),
 primitive('neutral-1000'))`, so a misspelled builder or a wrong unit is a type
-error. `helix family` reads the calls as syntax and never runs them, so a value
+error. `helix system` reads the calls as syntax and never runs them, so a value
 holds only builders, numbers, quoted strings and the names `builders.ts`
 exports, and each is held to print back as the same calls. The registry writes
 the native modules and the Design Tokens Format Module file from the typed
-values, and `helix family design-tokens` refuses a token whose CSS differs from
+values, and `helix system design-tokens` refuses a token whose CSS differs from
 what its builders return.
 
 **Every panel that floats over the page takes `--helix-radii-sm`, and

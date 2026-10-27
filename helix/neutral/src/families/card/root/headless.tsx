@@ -21,7 +21,7 @@ import { bind } from '../../../tree.js'
  * web's: a phone's styles read whether a region holds something from its
  * prop.
  *
- * **Held to `helix-card`.** `helix family check` compares the props, the
+ * **Held to `helix-card`.** `helix system check` compares the props, the
  * states, the regions, and the parts with what the manifest says the element
  * has.
  */

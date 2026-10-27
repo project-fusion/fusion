@@ -41,7 +41,7 @@ import { derive } from '../../../tree.js'
  * description drawn from the words at the start of its body. React Native
  * has no command or form to take, and a modal layer covers the page.
  *
- * **Held to `helix-dialog`.** `helix family check` compares the props, the
+ * **Held to `helix-dialog`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

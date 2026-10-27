@@ -40,7 +40,7 @@ import {
  * grid of rows: React Native has no grid, and each tag is one press a screen
  * reader reaches, selected or not.
  *
- * **Held to `helix-tag-group`.** `helix family check` compares the props,
+ * **Held to `helix-tag-group`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

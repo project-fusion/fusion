@@ -47,7 +47,7 @@ serde = { workspace = true }
 # `cargo test -p fusion-helix-cli`.
 serde_json = { workspace = true, features = ["float_roundtrip", "preserve_order"] }
 # **The intermediate form's types for TypeScript and its JSON Schema, both
-# derived from the structs `helix family` writes.** The native runtime imports
+# derived from the structs `helix system` writes.** The native runtime imports
 # the generated types, so no hand-written copy of the contract can drift from
 # it, and the schema is published beside the form for any other emitter.
 schemars = "1.2"

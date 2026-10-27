@@ -32,7 +32,7 @@ import {
  * as a radio under `single`. While it is pressed it takes the group's solid
  * fill, as a pressed Button does, on the web and on a phone.
  *
- * **Held to Icon Button's web element.** `helix family check` compares these
+ * **Held to Icon Button's web element.** `helix system check` compares these
  * props, the event, the states, the regions, and the parts with what the
  * manifest says `helix-icon-button` has.
  */

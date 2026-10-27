@@ -45,7 +45,7 @@ import { derive } from '../../../tree.js'
  * region closing on Escape, on focus moving out of the header, and on a
  * press outside it; and the bar shown again as focus moves into it.
  *
- * **Held to `helix-app-header`.** `helix family check` compares the props,
+ * **Held to `helix-app-header`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

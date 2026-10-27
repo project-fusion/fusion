@@ -30,7 +30,7 @@ import { derive } from '../../../tree.js'
  * and the `duplicate-name` warning where two navigations of one document
  * share a name, since a phone has no document to compare them in.
  *
- * **Held to `helix-navigation`.** `helix family check` compares the props,
+ * **Held to `helix-navigation`.** `helix system check` compares the props,
  * the states, the regions, and the parts with what the manifest says the
  * element has.
  */

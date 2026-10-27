@@ -338,7 +338,7 @@ fn types_the_value_a_target_carries_beside_the_detail() {
     }
 }
 
-/// An element `helix family` compiles from `headless`, with no styles of its own.
+/// An element `helix system` compiles from `headless`, with no styles of its own.
 fn headless_family(name: &str, source: &str) -> Family {
     let styles =
         format!("export default family('{name}', {{ stylesheet: '{name}.css', rules: [] }})");

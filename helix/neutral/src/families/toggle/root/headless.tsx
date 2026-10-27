@@ -18,7 +18,7 @@ import { bare, cancelable, headless, Pressable, Slot, set } from '../../../rende
  * **A toggle button is not a form field**, so it has no `readonly`, no form
  * value, and no `disabled` from a fieldset around it.
  *
- * **Held to Toggle's web element.** `helix family check` compares these
+ * **Held to Toggle's web element.** `helix system check` compares these
  * props, the events, the states, the regions, and the part with what the
  * manifest says `helix-toggle` has. The group's own properties, `focusable`
  * and `pressed`, are the group's to write and are left out.

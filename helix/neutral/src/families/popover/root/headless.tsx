@@ -44,7 +44,7 @@ import { derive } from '../../../tree.js'
  * panel closing it. A phone has no command, no document to find an element
  * in by its id, and keeps every layer 8 points from the window's edges.
  *
- * **Held to `helix-popover`.** `helix family check` compares the props, the
+ * **Held to `helix-popover`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

@@ -12,7 +12,7 @@ import { bind } from '../../../tree.js'
  * entry after the last says so: `loading-text`, or content passed into
  * `loading`.
  *
- * **Held to `helix-timeline`.** `helix family check` compares the props, the
+ * **Held to `helix-timeline`.** `helix system check` compares the props, the
  * states, the regions, and the parts with what the manifest says the element
  * has.
  */

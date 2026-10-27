@@ -41,7 +41,7 @@ import { derive } from '../../../tree.js'
  * `show-on`, `skip-delay`, `within`, and the delays, which time a pointer.
  * A phone has no document to find a trigger in and no pointer to time.
  *
- * **Held to `helix-tooltip`.** `helix family check` compares the props, the
+ * **Held to `helix-tooltip`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

@@ -60,7 +60,7 @@ import { bind, derive } from '../../../tree.js'
  * phone has one panel at a time, no pointer to rest, and no document to
  * find an element in by its id.
  *
- * **Held to `helix-menu`.** `helix family check` compares the props, the
+ * **Held to `helix-menu`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

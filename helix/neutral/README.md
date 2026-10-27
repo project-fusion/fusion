@@ -30,13 +30,13 @@ families import the helpers by path.
 The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
 
-`helix family` reads Helix's prefix, its token source, and where each command
-writes from `helix.family.json` at the repository root. To build a design
-system of your own on the compiler, read
+`helix system` reads Helix's prefix, its token source, and where each command
+writes from the `system` of the `helix` key in `fusion.json` at the repository
+root. To build a design system of your own on the compiler, read
 [DESIGN-SYSTEMS.md](DESIGN-SYSTEMS.md).
 
 Every element's headless source is written with its part tree last, as
-JSX, in `headless.tsx`, and `helix family` refuses a `headless.ts`:
+JSX, in `headless.tsx`, and `helix system` refuses a `headless.ts`:
 
 ```tsx
 export default headless('tab', {
@@ -65,7 +65,7 @@ export default headless('tab', {
   writes `prop: 'dismissLabel'`. A part, a region, an element's tag, and a
   derivation keep their hyphens, since the web writes them as they are.
 - The props, the events, the computed values, and the states are in
-  alphabetical order, which `helix family` checks, and so are each node's
+  alphabetical order, which `helix system` checks, and so are each node's
   attributes, which Biome sorts. The keys around them are in the order they
   are read, with `render` last.
 - A prop is its default, which says its type, or `string()`, `boolean()`,
@@ -102,26 +102,26 @@ export default headless('tab', {
   and the field that names the prop holding a feature's state is `prop`, with
   `defaultProp` the one that seeds it, as Radix's controllable state names
   them.
-- `helix family` refuses anything else with its line and the form to write
+- `helix system` refuses anything else with its line and the form to write
   it in, and an older spelling with the one that replaced it.
 
-`helix family build` writes each element's intermediate form to
-`dist/ir/<family>/<element>.json` and its web stylesheet to
-`dist/web/<family>/<element>.css`. The intermediate form keeps the names the
+`helix system build` writes each element's intermediate form to
+`build/ir/<family>/<element>.json` and its web stylesheet to
+`build/web/<family>/<element>.css`, beside the helpers' `dist`. The intermediate form keeps the names the
 native runtime reads, so a source's spelling can change and nothing a
 platform draws does: `helix/cli/src/family/api/spelling.rs` holds each
 feature's field beside its name there.
 
 The other generators read these sources and write into the packages that ship
-what they write, at the paths Helix's `helix.family.json` names:
+what they write, at the paths Helix's `system` names:
 
 | Command | Writes |
 |---|---|
-| `helix family components` | Each family's native components, with their props typed, into `helix/styled/native/<family>/index.native.ts`. The styled build runs it and compiles them into its `dist` |
-| `helix family platforms` | Prints what each element is called on React Native, which the styled `analyze` writes into `api.json` |
-| `helix family stylesheets` | The generated web stylesheets, into `helix/styled/src`, when the styled tier builds |
-| `helix family tokens` | Each mode's token values, into `helix/native/src/theme` |
-| `helix family types` | The intermediate form's types, into `helix/native/src/ir.generated.ts` |
+| `helix system components` | Each family's native components, with their props typed, into `helix/styled/native/<family>/index.native.ts`. The styled build runs it and compiles them into its `dist` |
+| `helix system platforms` | Prints what each element is called on React Native, which the styled `analyze` writes into `api.json` |
+| `helix system stylesheets` | The generated web stylesheets, into `helix/styled/src`, when the styled tier builds |
+| `helix system tokens` | Each mode's token values, into `helix/native/src/theme` |
+| `helix system types` | The intermediate form's types, into `helix/native/src/ir.generated.ts` |
 
 Each element is a component with its web element's class name, drawn from its
 form by `element` with the machines `behaviorFor` binds. Its props are the web
@@ -134,7 +134,7 @@ carries its forms as constants, and the styled manifest describes each prop.
 
 ## Style tables
 
-A style table is the web's stylesheet: `helix family stylesheets` writes it
+A style table is the web's stylesheet: `helix system stylesheets` writes it
 into `helix/styled/src`, at the table's `stylesheet` path, when the styled
 tier builds.
 
@@ -194,7 +194,7 @@ export default styles(
   values, and another family's it reads or sets, as a tab reads
   `own.tabsDismissRest` from the tab set around it. `hooks` may be
   `({ own }) => ({ ... })` to read private values. A rule reads `hook.color`
-  with the default, and `hook.color(fallback)` with its own. `helix family
+  with the default, and `hook.color(fallback)` with its own. `helix system
   build` refuses a fallback that is the default the header gives, which
   `hook.color` reads already.
 - `first(own.tabHeight, hook.blockSize, token('size-control'))` is the first
@@ -221,7 +221,7 @@ export default styles(
   vocabulary does not name. Each one says why in a comment that starts
   `Written out:`.
 
-`helix family build` refuses a name the source does not declare, a declared
+`helix system build` refuses a name the source does not declare, a declared
 name no rule uses, and two rules in groups on different targets, as a part
 and the second name it carries, that set one property on one node to
 different values. It also refuses a hook another family does not read,
@@ -272,7 +272,7 @@ A wrap only a phone draws, `platform="native"`, leaves its children where it
 stands on the web, as a stat's figure and unit share one line on a phone and
 stand in the host's grid on the web.
 
-`helix family check` also holds each element with a part tree to what the
+`helix system check` also holds each element with a part tree to what the
 styled manifest says it has: its attributes, events, slots, parts, and states.
 
 Events follow the web's grammar. A request a handler may refuse is
@@ -471,7 +471,7 @@ as `page` or `location`, and a view that is an `indicator` stands at the item
 marked, the one marked `page` where several are. An item's `value` in
 `memberOf` names the prop it stands for in its set where it has no `value` of
 its own, as a destination stands for its `href`: its events carry it, and a
-phone knows the item by it. `helix family build` refuses a set that is
+phone knows the item by it. `helix system build` refuses a set that is
 `currentFromItems` and names a `prop`, a `selectionMode`, or `openMode`,
 mixes, or says `itemsToggle`.
 
@@ -556,7 +556,7 @@ events are sent as a press turns a choice, as a menu sends `change`.
 
 `@fusion.dev/helix-core/menu-items` says what kind of item it is, its role,
 what a press turns it to, and the other items of its run, for the web's
-Menu Item and a phone alike. `helix family build` refuses a set that mixes
+Menu Item and a phone alike. `helix system build` refuses a set that mixes
 and names a `prop`, a `selectionMode`, or `itemsToggle`; an item's switch
 that is no boolean; an `onBeforeChange` that cannot be canceled; and an item
 that names `checked` and joins a set that does not mix.
@@ -599,7 +599,7 @@ stack: {
 
 `@fusion.dev/helix-core/stack` enters, goes back, and reads the depth, the
 title, and the rows of the page showing from a tree of rows, for the web's
-`DrilldownController` and a phone alike. `helix family build` refuses a
+`DrilldownController` and a phone alike. `helix system build` refuses a
 `back` that is no pressable, an `onBeforeChange` that cannot be canceled, a
 stack with no collection, a `pageSlot` region the row does not draw, and a
 row with a `pageSlot` that joins an element with no stack.
@@ -610,7 +610,7 @@ row with a `pageSlot` that joins an element with no stack.
 `on('select-all-box', [...])` is `[part="select-all"]::part(box)` on the web,
 and on a phone the style the element around gives the drawn element's `box`,
 laid over the box's own. Such a rule reads the props, the states, and the
-media of the element around, and `helix family build` refuses one that reads
+media of the element around, and `helix system build` refuses one that reads
 a state of the part, an interaction on it, its place, a part around it or
 inside it, a region, or generated content, which `::part()` cannot follow.
 
@@ -677,8 +677,8 @@ part inside it that holds one: `[part="field"]:hover [part="control"]`.
 parts a node is as well, and `lacks` an absent attribute.
 
 An element only the web has, such as a skip link, says `platform: 'web'`.
-`helix family components` gives it a component that draws nothing on a
-phone, and `helix family platforms` names no native component for it.
+`helix system components` gives it a component that draws nothing on a
+phone, and `helix system platforms` names no native component for it.
 
 A node asks whether a region holds something by reading `slots.x`: a wrap
 drawn `when={slots.headerActions}`, as a card's header row is, and a view
@@ -692,7 +692,7 @@ that height or at none, and a transition of `grid-template-rows` moves the
 height between them. Once open, the part takes the content's own height, so
 content that reflows while open is never clipped or left short. Closed, what it holds stays
 drawn. Pair `fit(0)` with `visibility: 'hidden'`, as a step's stage does, so
-a screen reader and a press skip it on both platforms. `helix family build` refuses
+a screen reader and a press skip it on both platforms. `helix system build` refuses
 `fit()` on any other property, inside a value of several words, and with any
 share but `0` and `1`.
 
@@ -872,7 +872,7 @@ element is in the state `open` while the layer stands open.
 tour stop's `open` reads `stop.shown` and its `offset` reads `stop.reach`,
 and a layer may open on such a value with no toggle and no `open` state.
 
-`helix family build` refuses a layer with no `open`, one that is not
+`helix system build` refuses a layer with no `open`, one that is not
 `ariaHidden` with nothing inside it, a `placement`, an `offset`, an `arrow`,
 or a `presentation` with no `anchor`, a layer inside another layer, a
 repeat, or a vector, an anchor inside the layer, an arrow outside it, a
@@ -928,7 +928,7 @@ scrolls, as an app header lifts off the page once it has scrolled:
   view the element is drawn in, or the view registered under the id with
   `useTarget`, through the scroll capability's `observe`.
 
-`helix family build` refuses a `pageScroll` with no `scrolled`, and a
+`helix system build` refuses a `pageScroll` with no `scrolled`, and a
 `hideOnScroll` named without its `hidden`.
 
 **One press drawn in two places is one press**, as an app header's toggle
@@ -977,7 +977,7 @@ is pressed, as a copy button copies its `value`:
 Both platforms write through the clipboard capability and end the result
 on the timers capability, so a fake clipboard and a fake clock move both. A
 phone says the result's words to a screen reader as the web's live region
-does. `helix family build` refuses a `copy` with no pressable that `copies`,
+does. `helix system build` refuses a `copy` with no pressable that `copies`,
 or more than one, and a pressable that `copies` in an element with no `copy`.
 
 A source's `countdown` is a time the element spends once it is drawn, as an
@@ -1071,7 +1071,7 @@ stop: { back: 'back', next: 'next', onAsk: 'tourAsk', skip: 'skip', target: 'for
 
 The web's tour is written by hand and reads its stops from its slot. A
 phone's stops join the tour through a context, in the order they are first
-drawn. `helix family build` refuses a name either source holds that the
+drawn. `helix system build` refuses a name either source holds that the
 element does not have.
 
 ## Scroll areas, sections, clocks, and counts

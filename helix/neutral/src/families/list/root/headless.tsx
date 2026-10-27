@@ -25,7 +25,7 @@ import {
  * number and the step as `--list-first` and `--list-step`, which the counters
  * of an ordered list and its rail add up.
  *
- * **Held to `helix-list`.** `helix family check` compares the props, events,
+ * **Held to `helix-list`.** `helix system check` compares the props, events,
  * states, regions, and parts with what the manifest says the element has.
  */
 export default headless('list', {

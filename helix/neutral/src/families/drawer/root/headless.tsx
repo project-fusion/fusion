@@ -52,7 +52,7 @@ import { derive } from '../../../tree.js'
  * of its body. React Native has no command or form to take, and moves the
  * panel itself.
  *
- * **Held to `helix-drawer`.** `helix family check` compares the props, the
+ * **Held to `helix-drawer`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

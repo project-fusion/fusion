@@ -27,7 +27,7 @@ import { bare, headless, oneOf, Slot, View, web } from '../../../render.js'
  * **The web's**: the scrollbars drawn under `scrollbars`, and their
  * `hide-delay`, where a phone shows the platform's own scroll indicators.
  *
- * **Held to `helix-scroll-area`.** `helix family check` compares the props,
+ * **Held to `helix-scroll-area`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

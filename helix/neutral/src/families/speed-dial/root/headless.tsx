@@ -37,7 +37,7 @@ import { derive } from '../../../tree.js'
  * **The web's**: `open-on="hover"`, which a phone opens on a press as it
  * does under `click`, since a phone has no pointer to rest.
  *
- * **Held to `helix-speed-dial`.** `helix family check` compares the props,
+ * **Held to `helix-speed-dial`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the
  * manifest says the element has.
  */

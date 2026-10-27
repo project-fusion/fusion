@@ -45,7 +45,7 @@ import { derive } from '../../../tree.js'
  * **What the trail writes is the web's**: the last crumb of a trail with
  * none marked `current` is said to be the current page there.
  *
- * **Held to `helix-breadcrumb`.** `helix family check` compares the props,
+ * **Held to `helix-breadcrumb`.** `helix system check` compares the props,
  * the event, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

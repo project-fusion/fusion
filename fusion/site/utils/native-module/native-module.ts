@@ -1,5 +1,5 @@
 /**
- * Reads one module `helix family components` writes: each component it
+ * Reads one module `helix system components` writes: each component it
  * declares, with its props, the props that take React nodes, and its
  * handlers, each typed and described as the module types them.
  *

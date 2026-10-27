@@ -21,10 +21,10 @@
 //! argument asked for.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
-//! layout is not this repository's. `helix.json` names the tiers, and in this
-//! repository's builds a `helix` key in `fusion.json` can; without either there
-//! is nothing to read and the command says so rather than reporting that it
-//! found no faults.
+//! layout is not this repository's. The `components` of `helix.json` names the
+//! tiers, and in this repository's builds the `helix` key in `fusion.json` can;
+//! without either there is nothing to read and the command says so rather than
+//! reporting that it found no faults.
 //!
 //! **One list of tiers for every rule, which is a deliberate departure from the
 //! scripts these come from.** Those disagree with each other: the reflected-
@@ -393,7 +393,7 @@ pub struct Seeds {
 }
 
 impl Settings {
-    /// Reads the settings, from the product's file or from this tool's own.
+    /// Reads the settings: the `components` of the configuration at `root`.
     ///
     /// **Precedence is stated rather than discovered**, the way
     /// [`crate::config`] states it, because a reader debugging "why did it use
@@ -404,8 +404,12 @@ impl Settings {
     ///    consumer never installed the product the file is named for.
     /// 2. `helix.json`, for a consumer, and for this repository where the
     ///    first holds no `helix` key.
-    /// 3. Neither, which is an error rather than a default: without `tiers`
-    ///    every rule walks nothing and reports a clean run.
+    /// 3. Neither, or one with no `components`, which is an error rather than
+    ///    a default: without `tiers` every rule walks nothing and reports a
+    ///    clean run.
+    ///
+    /// **Read at the root alone, never above it.** The rules read the tiers
+    /// as paths from the root, so the file that names them is the root's.
     ///
     /// **Which file it came from travels with the settings**, because four
     /// rules report findings against the configuration itself and a finding
@@ -413,42 +417,38 @@ impl Settings {
     ///
     /// # Errors
     ///
-    /// [`Failure`] when neither file is there or the one found is not this
-    /// shape. **The parse error carries serde's own message**, which names the
-    /// key and the line, the way [`crate::config::read`] does: the file is hand
-    /// written and the reader's next action is to open it at that line.
+    /// [`Failure`] when neither file is there, the one found has no
+    /// `components`, or it is not this shape. **The parse error carries
+    /// serde's own message**, which names the key and the line, the way
+    /// [`crate::config::read`] does: the file is hand written and the reader's
+    /// next action is to open it at that line.
     pub fn read(root: &Path) -> Outcome<Self> {
         const WHAT: &str = "component rules need to know where the source is";
-        #[cfg(feature = "internal")]
-        if let Ok(raw) = fs::read_to_string(root.join("fusion.json")) {
-            let product = root.join("fusion.json");
-            let held = serde_json::from_str::<Value>(&raw)
-                .map_err(|error| Failure::input(WHAT, format!("{}: {error}", product.display())))?;
-            if let Some(section) = held.get("helix") {
-                let mut settings: Self =
-                    serde_json::from_value(section.clone()).map_err(|error| {
-                        Failure::input(WHAT, format!("{}: `helix`: {error}", product.display()))
-                    })?;
-                "fusion.json".clone_into(&mut settings.source);
-                return Ok(settings);
-            }
-        }
-
-        let file = root.join("helix.json");
-        let raw = fs::read_to_string(&file).map_err(|_| {
+        let example = "{ \"components\": { \"tiers\": [\"src/components\"] } }";
+        let found = crate::config::here(root)?.ok_or_else(|| {
             Failure::input(
                 WHAT,
                 format!(
-                    "no configuration at {}.\n  Helix reads `helix.json`, which names the \
-                     directories holding component source, without which there is nothing to \
-                     read:\n\n  {{ \"tiers\": [\"src/components\"] }}",
+                    "no configuration at {}.\n  Helix reads `helix.json`. Its `components` names \
+                     the directories holding component source, without which there is nothing to \
+                     read:\n\n  {example}",
                     root.display()
                 ),
             )
         })?;
-        let mut settings: Self = serde_json::from_str(&raw)
-            .map_err(|error| Failure::input(WHAT, format!("{}: {error}", file.display())))?;
-        "helix.json".clone_into(&mut settings.source);
+        let name = found.name();
+        let key = found.key("components");
+        let Some(mut settings) = found.sections.components else {
+            return Err(Failure::input(
+                WHAT,
+                format!(
+                    "{} has no `{key}`. It names the directories holding component source, \
+                     without which there is nothing to read:\n\n  {example}",
+                    found.file.display()
+                ),
+            ));
+        };
+        name.clone_into(&mut settings.source);
         Ok(settings)
     }
 

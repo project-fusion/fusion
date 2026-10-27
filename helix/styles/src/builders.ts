@@ -7,11 +7,11 @@
  * error in `tokens.ts`. `turbo run token-layer` writes `tokens.css` from the
  * CSS these return.
  *
- * **`helix family` reads the calls as syntax and never runs them.** The Rust
+ * **`helix system` reads the calls as syntax and never runs them.** The Rust
  * registry in `helix/theme/rust/tokens` reads a builder by its name, types
  * the value, and holds it to print back as the same calls, so a value only
  * holds builders, numbers, quoted strings, and the names exported here. It
- * prints each typed value as CSS as well, and `helix family design-tokens`
+ * prints each typed value as CSS as well, and `helix system design-tokens`
  * holds that to what these return, token for token.
  *
  * **A reference is typed only by the registry.** `ref()` and `primitive()`

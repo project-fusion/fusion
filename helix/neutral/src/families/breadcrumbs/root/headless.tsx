@@ -17,7 +17,7 @@ import { bind, derive } from '../../../tree.js'
  * opens a menu of them, each a link to its crumb. A trail drawn from `items`
  * is the web's, and folds the same way.
  *
- * **Held to `helix-breadcrumbs`.** `helix family check` compares the props,
+ * **Held to `helix-breadcrumbs`.** `helix system check` compares the props,
  * the region, and the parts with what the manifest says the element has.
  */
 export default headless('breadcrumbs', {

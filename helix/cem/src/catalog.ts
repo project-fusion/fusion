@@ -76,7 +76,7 @@ export interface EventDoc {
 }
 
 /**
- * What an element is called on React Native, as `helix family platforms`
+ * What an element is called on React Native, as `helix system platforms`
  * names it: the component, and the prop each property, slot, and event of the
  * web element becomes.
  */
@@ -94,7 +94,7 @@ export interface NativeElement {
 }
 
 /**
- * What `helix family platforms` prints: each element Helix draws on React
+ * What `helix system platforms` prints: each element Helix draws on React
  * Native, by its tag, and the status its family has there.
  */
 export interface NativeRecord {
@@ -126,7 +126,7 @@ export interface AnatomySide {
 }
 
 /**
- * What an element is made of, as `helix family anatomy` prints it: the web
+ * What an element is made of, as `helix system anatomy` prints it: the web
  * element, and the React Native component where Helix draws one.
  */
 export interface Anatomy {
@@ -965,7 +965,7 @@ export const publishedBy = (families: Family[], name: string): (Contribution | F
   })
 
 /**
- * The families with each styled element's anatomy, from what `helix family
+ * The families with each styled element's anatomy, from what `helix system
  * anatomy` printed, by tag. **Only a styled element**, for the reason
  * `withPlatforms` gives: its tree is the one the styled package draws.
  */
@@ -984,7 +984,7 @@ export const withAnatomy = (
 /**
  * The families with each one's status on every platform, and each element
  * drawn on React Native with the names it takes there, from what
- * `helix family platforms` printed. An empty record names the web alone.
+ * `helix system platforms` printed. An empty record names the web alone.
  *
  * **Only a styled element is drawn natively**, since the components ship from
  * `@fusion.dev/helix`, so a headless element with the same family is left as

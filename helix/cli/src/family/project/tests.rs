@@ -13,16 +13,21 @@ pub fn testing() -> Names {
     }
 }
 
-/// A project read from `text`, written into a folder of its own as
-/// `helix.family.json`.
-fn project(name: &str, text: &str) -> Result<Project, String> {
+/// A design system read from `file`, written as `text` into a folder of its
+/// own.
+fn written(name: &str, file: &str, text: &str) -> Result<Project, String> {
     let folder = std::env::temp_dir().join(format!("family-project-{name}-{}", std::process::id()));
     std::fs::create_dir_all(&folder).unwrap();
-    let file = folder.join("helix.family.json");
+    let file = folder.join(file);
     std::fs::write(&file, text).unwrap();
     let read = Project::read(&file).map_err(|failure| failure.render("helix"));
     std::fs::remove_dir_all(&folder).unwrap();
     read
+}
+
+/// A design system whose `system` is `text`, read from `helix.json`.
+fn project(name: &str, text: &str) -> Result<Project, String> {
+    written(name, "helix.json", &format!(r#"{{ "system": {text} }}"#))
 }
 
 #[test]
@@ -38,7 +43,7 @@ fn one_prefix_names_the_tags_the_events_and_the_tokens() {
     assert_eq!(read.names.token_of("--acme-space-md"), Some("space-md"));
     assert_eq!(read.names.token_of("--acmes-space-md"), None);
     assert_eq!(read.names.bare("acme-tab-panel"), Some("tab-panel"));
-    assert!(read.outputs.build.ends_with("src/dist"));
+    assert!(read.outputs.build.ends_with("src/build"));
     assert!(matches!(read.tokens, Tokens::None));
 }
 
@@ -62,6 +67,42 @@ fn a_key_the_file_does_not_know_is_refused_by_its_name() {
     )
     .unwrap_err();
     assert!(refused.contains("prefixes"), "{refused}");
+}
+
+#[test]
+fn the_helix_key_of_fusion_json_holds_the_same_shape() {
+    let read = written(
+        "product",
+        "fusion.json",
+        r#"{ "domains": ["acme"], "helix": { "system": { "name": "Acme", "prefix": "acme", "families": "." } } }"#,
+    )
+    .unwrap();
+    assert_eq!(read.names.tag("tabs"), "acme-tabs");
+    assert_eq!(read.section, "helix.system");
+}
+
+#[test]
+fn a_file_with_no_system_is_refused_by_the_key_it_lacks() {
+    let refused = written("none", "helix.json", r#"{ "theme": {} }"#).unwrap_err();
+    assert!(refused.contains("has no `system`"), "{refused}");
+    let refused = written(
+        "none-product",
+        "fusion.json",
+        r#"{ "helix": { "components": { "tiers": ["src"] } } }"#,
+    )
+    .unwrap_err();
+    assert!(refused.contains("has no `helix.system`"), "{refused}");
+}
+
+#[test]
+fn a_schema_at_the_top_of_the_file_is_ignored() {
+    let read = written(
+        "schema",
+        "helix.json",
+        r#"{ "$schema": "./helix.schema.json", "system": { "name": "Acme", "prefix": "acme", "families": "." } }"#,
+    )
+    .unwrap();
+    assert_eq!(read.name, "Acme");
 }
 
 #[test]
@@ -96,6 +137,9 @@ fn a_runtime_the_file_leaves_out_is_the_default_provider() {
 fn the_schema_names_every_key() {
     let schema = super::schema();
     for key in [
+        "theme",
+        "components",
+        "system",
         "prefix",
         "eventPrefix",
         "propertyPrefix",
@@ -110,7 +154,7 @@ fn the_schema_names_every_key() {
 
 #[test]
 fn a_generated_file_names_its_source_from_the_repository() {
-    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../helix.family.json");
+    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fusion.json");
     let read = Project::read(&file).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
     assert_eq!(read.named(&read.families), "helix/neutral");
 }

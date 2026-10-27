@@ -10,7 +10,7 @@ import { derive } from '../../../tree.js'
  * of level 3, which a phone announces as a heading with no level, and a
  * group with no name draws none. Its destinations are the megamenu's own.
  *
- * **Held to `helix-megamenu-group`.** `helix family check` compares the
+ * **Held to `helix-megamenu-group`.** `helix system check` compares the
  * props, the regions, and the parts with what the manifest says the element
  * has.
  */

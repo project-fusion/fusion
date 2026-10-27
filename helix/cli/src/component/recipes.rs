@@ -202,7 +202,7 @@ pub fn run(context: &Context) -> Report {
         return empty;
     };
     let recipe_at = context.root.join(layer);
-    /* The stylesheet `helix family stylesheets` writes from Button's table,
+    /* The stylesheet `helix system stylesheets` writes from Button's table,
     or one written by hand where a styled layer has no table. */
     let folder = context.root.join(&styled.source).join("button/root");
     let element_at = ["button-root.generated.css", "button-root.css"]

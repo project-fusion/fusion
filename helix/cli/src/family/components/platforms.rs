@@ -14,7 +14,7 @@ use serde_json::{json, Map, Value as Json};
 
 use super::declaration;
 use super::members::{camel, handler_of, region_prop, regions, slot_of, web_event};
-use crate::args::FamilyArgs;
+use crate::args::SystemArgs;
 use crate::family::api::Prop;
 use crate::family::compile::{self, Compiled};
 use crate::family::{open, read_manifest};
@@ -110,14 +110,14 @@ pub fn platforms(compiled: &[Compiled], manifest: &Json) -> Result<Json, Vec<Str
     }
 }
 
-/// `helix family platforms`: prints, as JSON, what each element with a native
+/// `helix system platforms`: prints, as JSON, what each element with a native
 /// component is called on React Native.
 ///
 /// # Errors
 ///
 /// [`Failure`] when a source cannot be compiled, or the styled manifest cannot
 /// be read or lacks an element the sources have.
-pub fn print(args: &FamilyArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+pub fn print(args: &SystemArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
     let project = open(config, args.package.as_ref(), from)?;
     let named = platforms(&compile::all(&project)?, &read_manifest(&project)?)
         .map_err(|faults| Failure::input("cannot name the native components", faults.join("\n")))?;

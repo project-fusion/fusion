@@ -14,7 +14,7 @@
 //! the sRGB a browser paints for it, mapped into gamut the way `paint.mjs`
 //! maps it; a length to its ems, rems, and points; a duration to milliseconds.
 //! [`native`] turns a value into what the React Native renderer takes, and
-//! `helix family tokens` writes one module of those per mode.
+//! `helix system tokens` writes one module of those per mode.
 //!
 //! **Nothing here reads a file.** The command line reads `tokens.ts`,
 //! `primitives.css`, `_modes.css` and the density stops in `base.css`, and

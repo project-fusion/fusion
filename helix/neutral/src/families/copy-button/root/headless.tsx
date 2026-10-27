@@ -37,7 +37,7 @@ import { derive } from '../../../tree.js'
  * **The web's**: `from`, which copies from another element on the page by
  * its id, and `name`. A phone has no document to find an element in.
  *
- * **Held to `helix-copy-button`.** `helix family check` compares the props,
+ * **Held to `helix-copy-button`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

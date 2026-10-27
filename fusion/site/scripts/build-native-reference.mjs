@@ -3,7 +3,7 @@
  * Writes the React Native reference of each family Helix draws natively, which
  * the component pages show under the native platform.
  *
- * **From the modules `helix family components` writes, and from nothing typed
+ * **From the modules `helix system components` writes, and from nothing typed
  * here.** `@fusion.dev/helix`'s build writes one module per family into its
  * `native` folder, typed from the intermediate form, the styled manifest, and
  * core's event classes; its `analyze` writes which families are drawn natively,

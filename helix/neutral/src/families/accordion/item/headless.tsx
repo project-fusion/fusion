@@ -48,7 +48,7 @@ import { derive } from '../../../tree.js'
  * heading's level. React Native gives a view no heading level, so a phone
  * announces a heading with none, and `heading-level` is the web's.
  *
- * **Held to `helix-accordion-item`.** `helix family check` compares the
+ * **Held to `helix-accordion-item`.** `helix system check` compares the
  * props, the events, the states, the regions, and the parts with what the
  * manifest says the element has.
  */

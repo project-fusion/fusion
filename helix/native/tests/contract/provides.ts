@@ -3,7 +3,7 @@
  *
  * **Each line fails to compile where Helix's runtime stops meeting the
  * contract**, so a change to either is a change to both. The names are the
- * ones Helix's `helix.family.json` gives in `runtime`.
+ * ones Helix's `system` gives in `runtime`.
  */
 import {
   behaviorFor,

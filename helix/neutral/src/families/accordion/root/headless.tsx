@@ -18,7 +18,7 @@ import { headless, number, oneOf, Slot, web } from '../../../render.js'
  * **The web's**: find in page, which opens a closed section where it finds a
  * match, and `hidden-until-found`.
  *
- * **Held to `helix-accordion`.** `helix family check` compares the props,
+ * **Held to `helix-accordion`.** `helix system check` compares the props,
  * the states, the regions, and the parts with what the manifest says the
  * element has.
  */

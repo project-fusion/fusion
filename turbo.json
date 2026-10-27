@@ -206,7 +206,7 @@
     // **The build writes the types and token modules it compiles**, which are
     // never committed, so their sources are its inputs: the neutral sources,
     // the token layer, and the commands that write them. Not the components
-    // `helix family components` writes, which only the specs read, so it waits
+    // `helix system components` writes, which only the specs read, so it waits
     // for nothing the styled package builds on top of this one.
     "@fusion.dev/helix-native#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
@@ -216,7 +216,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -227,7 +227,7 @@
       // puts back what the scripts' specs and the typecheck read.
       "outputs": ["dist/**", "src/ir.generated.ts", "src/theme/*.generated.ts"]
     },
-    // **The native specs draw the components `helix family components` writes
+    // **The native specs draw the components `helix system components` writes
     // for them into `src/families`**, from the neutral sources and the styled
     // manifest, as the styled build writes the ones it ships. So both wait for
     // that manifest and read those sources, and the modules they write are no
@@ -244,7 +244,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -260,7 +260,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -269,15 +269,13 @@
       ],
       "outputs": []
     },
-    // **The authoring helpers alone, the files directly in `dist`.** `helix
-    // family build` writes Helix's compiled forms into `dist/ir` and
-    // `dist/web`, and a cache hit on `dist/**` would put an old run's forms
-    // back over them. The helpers import no workspace package, so nothing
-    // builds first.
+    // **The authoring helpers, which are all of `dist`.** `helix system
+    // build` writes Helix's compiled forms into `build`, beside it. The
+    // helpers import no workspace package, so nothing builds first.
     "@fusion.dev/helix-neutral#build": {
       "dependsOn": [],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
-      "outputs": ["dist/*.d.ts", "dist/*.d.ts.map", "dist/*.js", "dist/*.js.map"]
+      "outputs": ["dist/**"]
     },
     // The style survey's specs sit beside the survey, under `scripts`.
     "@fusion.dev/helix-neutral#test": {
@@ -346,14 +344,14 @@
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/src/family/tokens/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/theme/Cargo.toml",
         "$TURBO_ROOT$/helix/theme/rust/tokens/**"
       ],
       "outputs": ["dist/helix.tokens.json", "dist/helix.resolver.json"]
     },
     // **The styled tier's own `analyze`, because its `api.json` says what each
-    // element is called on React Native.** It asks `helix family platforms`
+    // element is called on React Native.** It asks `helix system platforms`
     // over the neutral sources, so they are inputs beside the generic task's.
     "@fusion.dev/helix#analyze": {
       "dependsOn": ["^build", "styles"],
@@ -364,7 +362,7 @@
         "$TURBO_ROOT$/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/src/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/visual.fingerprint.json"
@@ -382,7 +380,7 @@
       ]
     },
     // **The native components are written here, before `tsc` compiles them.**
-    // `helix family components` reads the neutral sources, this package's
+    // `helix system components` reads the neutral sources, this package's
     // manifest, which `analyze` writes, and core's event classes, which core's
     // build stands for, and writes one module per family into `native`.
     "@fusion.dev/helix#build": {
@@ -393,7 +391,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/Cargo.lock"
       ],
@@ -405,7 +403,7 @@
       ]
     },
     // **The styled tier's own, because it writes stylesheets as well as their
-    // mirrors.** `helix family stylesheets` writes every `*.generated.css` from
+    // mirrors.** `helix system stylesheets` writes every `*.generated.css` from
     // the platform-neutral sources in `helix/neutral` before `build-styles`
     // compiles them, so those sources and the compiler are inputs. The
     // stylesheets it writes are outputs only, for the reason the two layers
@@ -420,7 +418,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
-        "$TURBO_ROOT$/helix.family.json",
+        "$TURBO_ROOT$/fusion.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/Cargo.lock"
       ],
@@ -542,7 +540,7 @@
         "VERCEL_URL"
       ]
     },
-    // **The React Native reference, from the modules `helix family components`
+    // **The React Native reference, from the modules `helix system components`
     // writes.** `@fusion.dev/helix`'s `build` writes them into its `native`
     // folder and its `analyze` writes `api.json`, which says which families
     // are drawn natively, so both wait. Keyed to the site for the reason

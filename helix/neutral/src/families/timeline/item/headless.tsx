@@ -24,7 +24,7 @@ import { derive } from '../../../tree.js'
  * **The web's**: the `<time>` element and its `datetime`, and the whole date
  * as a pointer's title.
  *
- * **Held to `helix-timeline-item`.** `helix family check` compares the props,
+ * **Held to `helix-timeline-item`.** `helix system check` compares the props,
  * the states, the regions, and the parts with what the manifest says the
  * element has.
  */
