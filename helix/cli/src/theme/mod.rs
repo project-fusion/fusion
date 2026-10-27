@@ -3,6 +3,7 @@
 pub mod audit;
 pub mod build;
 pub mod init;
+pub mod native;
 pub mod report;
 pub mod tui;
 

@@ -48,6 +48,7 @@ npx expo start --web
 | `app/projects/[id].tsx` | One project, under Breadcrumbs built from the route |
 | `src/header.tsx` | An App Header with Navigation over the routes |
 | `helix.json` | Your theme |
+| `src/theme.css` and `src/theme.ts` | Your theme's colors for the web and for a phone |
 | `babel.config.js` | Gives your files the Helix JSX runtime |
 
 The app follows the system's light or dark mode on both platforms.
@@ -86,13 +87,16 @@ The `theme` section of `helix.json` holds your brand color:
 }
 ```
 
-After you change it, write the theme for the web:
+After you change it, write the theme:
 
 ```sh
 npm run theme
 ```
 
-`npm run theme` runs `helix theme build`, which writes `src/theme.css` with
-every color in light and dark mode. On a phone, `src/root.native.tsx` passes
-the same section to `HelixAppRoot` as `seeds`, and a development build derives
-the colors on the device. Expo Go draws Helix's own colors.
+`npm run theme` runs `helix theme build` twice. Each run writes every color in
+light and dark mode:
+
+- **For the web**, into `src/theme.css`, which `src/root.web.tsx` imports.
+- **For a phone**, into `src/theme.ts` with `--format native`.
+  `src/root.native.tsx` passes it to `HelixAppRoot` as `tokens`, so Expo Go and
+  a development build draw the colors the web draws.
