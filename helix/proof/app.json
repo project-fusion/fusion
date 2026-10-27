@@ -6,7 +6,17 @@
     "name": "Helix proof",
     "orientation": "portrait",
     "platforms": ["ios", "android", "web"],
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "$(PRODUCT_NAME) uses the camera to take the photos you attach.",
+          "microphonePermission": false,
+          "photosPermission": "$(PRODUCT_NAME) attaches the photos you choose from your library."
+        }
+      ]
+    ],
     "scheme": "helix-proof",
     "slug": "helix-proof",
     "userInterfaceStyle": "automatic",
