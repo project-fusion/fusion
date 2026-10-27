@@ -24,13 +24,15 @@
      development build warns about it once, as `helix shared` reports it
      from the code.
 
-   React Native only: the web draws the elements themselves, through React's
-   own runtime. */
+   On the web, `src/jsx-runtime/jsx-runtime.ts` is React's own runtime, since
+   the web draws the elements themselves, so one `jsxImportSource` serves
+   both platforms. The `JSX` namespace is React's on both. */
 import { HelixTheme, hookPrefix, regionNames, warnWebTag } from '@fusion.dev/helix-native'
 import * as React from 'react'
 import { hasComponent, TAGS } from './tags.native'
 import { Box, camel, Missing, noteFragment, type Props, Section, Span } from './words.native'
 
+export type { JSX } from 'react/jsx-runtime'
 export { hasComponent }
 
 /** Attributes only a browser reads. */
