@@ -4,32 +4,48 @@ import type * as ExpoDocumentPicker from 'expo-document-picker'
 import type * as ExpoFileSystem from 'expo-file-system'
 import type * as ExpoSharing from 'expo-sharing'
 
-/**
- * Loads one optional package once, `null` where the app does not install it.
- *
- * **Each `require` names its package written out, inside a `try`**, which
- * Metro bundles as an optional dependency (`allowOptionalDependencies` is on
- * by default), so an app without the package builds.
- */
-const once = <T>(load: () => T): (() => T | null) => {
+/** Runs `load` once and keeps what it gave. */
+const once = <T>(load: () => T | null): (() => T | null) => {
   let loaded: T | null | undefined
   return () => {
     if (loaded === undefined) {
-      try {
-        loaded = load()
-      } catch {
-        loaded = null
-      }
+      loaded = load()
     }
     return loaded
   }
 }
 
-export const documentPicker = once(
-  () => require('expo-document-picker') as typeof ExpoDocumentPicker,
-)
-export const fileSystem = once(() => require('expo-file-system') as typeof ExpoFileSystem)
-export const sharing = once(() => require('expo-sharing') as typeof ExpoSharing)
+/* Each loader gives its package, or `null` where the app does not install it.
+   **Each `require` names its package written out, inside a `try` of its own**,
+   which Metro bundles as an optional dependency (`allowOptionalDependencies`
+   is on by default), so an app without the package builds. Metro reads the
+   `try` around the call where it is written: a `require` in a function that
+   another function calls inside a `try` is a required dependency, and an app
+   without the package failed to bundle. */
+
+export const documentPicker = once(() => {
+  try {
+    return require('expo-document-picker') as typeof ExpoDocumentPicker
+  } catch {
+    return null
+  }
+})
+
+export const fileSystem = once(() => {
+  try {
+    return require('expo-file-system') as typeof ExpoFileSystem
+  } catch {
+    return null
+  }
+})
+
+export const sharing = once(() => {
+  try {
+    return require('expo-sharing') as typeof ExpoSharing
+  } catch {
+    return null
+  }
+})
 
 /** A request that gives nothing, and why. */
 export const none = (outcome: Exclude<Picked['outcome'], 'chosen'>): Picked => ({
