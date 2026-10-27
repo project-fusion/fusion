@@ -143,10 +143,10 @@ impl Declared<'_> {
             Value::Inherited { name, .. } => {
                 let own = name.strip_prefix('_')?;
                 /* The theme's own, as the mode opposite the page's, which
-                the project's `theme` names. */
+                the project's `inherited` names. */
                 if self
                     .names
-                    .is_some_and(|names| names.theme.iter().any(|one| one == own))
+                    .is_some_and(|names| names.inherited.iter().any(|one| one == own))
                 {
                     return None;
                 }
