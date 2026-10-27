@@ -6,7 +6,9 @@ const late = PROJECTS.filter((project) => project.status === 'at-risk')
 
 /**
  * The first screen: the week in numbers, the projects, and what needs a
- * look. Each row links to its project's route.
+ * look. Each row links to its project's route. The numbers take a gap
+ * narrower than the group's default, so three columns and their rules fit a
+ * phone with each label on one line.
  */
 export function ProjectList() {
   const route = useHelixRoute()
@@ -18,7 +20,12 @@ export function ProjectList() {
         </helix-text>
         <helix-text emphasis="muted">{`${open.length} active, ${late.length} at risk`}</helix-text>
       </helix-flex>
-      <helix-stat-group columns={3} divided label="This week">
+      <helix-stat-group
+        columns={3}
+        divided
+        label="This week"
+        style={{ '--stat-group-gap': 'var(--helix-space-lg)' }}
+      >
         <helix-stat value={42}>
           <helix-text slot="label">Open</helix-text>
           <helix-trend good="down" movement="down" slot="trend">
