@@ -166,9 +166,16 @@ export const choosing = (
       }
     }
   }
+  /* **A set that acts on its items follows their links**, as a list under
+     `selection-mode="none"` acts on a row. A set with no mode reads only,
+     so each item follows its own link, as the web's anchor does in a list
+     that is not interactive. */
   return (props, members) => {
     const selection = useMultipleSelection(family, props, use, members)
     const mode = given(family, props, boundTo(use, 'mode', 'prop'))
-    return { ...selection, follows: mode !== 'single' && mode !== 'multiple' }
+    return {
+      ...selection,
+      follows: mode !== undefined && mode !== 'single' && mode !== 'multiple',
+    }
   }
 }
