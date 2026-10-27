@@ -112,6 +112,10 @@ and skips the rest.
 | `helix-cli-linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-musl` |
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
 
+**`@fusion.dev/cortex-cli` ships `cortex` the same way**, with a
+`cortex-cli-<platform>` package for each row above, built on the same runner
+for the same target. Its launcher is `cortex/cli/npm/bin.mjs`.
+
 **`helix visual` ships inside it.** The visual tests are a library crate,
 `fusion-helix-visual`, that `fusion-helix-cli` links, and their capture driver
 ships in `@fusion.dev/helix-cli` beside the shim, so there is one binary and one
@@ -143,8 +147,8 @@ release has stamped it, which is the arrangement a consumer installs.
 **A Linux binary is static**, linked against musl, so one file runs on a glibc
 distribution and on Alpine alike, and the packages declare no `libc`.
 
-**A Helix release with no binaries refuses in its first step**, before
-a number is allocated. A Cortex release in the same run goes ahead.
+**A release whose binaries did not build refuses in its first step**, before
+a number is allocated. The other domain's release in the same run goes ahead.
 
 **Nothing in a checkout needs them.** The files are gitignored, and the shim runs
 the cargo target's build before a platform package's, so a checkout runs what it
@@ -235,7 +239,7 @@ can be read, and so its reasoning sits with the code rather than above the step.
 | `stamp-manifests.sh` | Writes the published version back into the manifests |
 | `stamp-experimental.sh` | Stamps a preview version into every domain a branch touches |
 | `comment-install.sh` | Comments on the pull request with how to install it |
-| `place-binaries.sh` | Puts each built `helix` in its platform package, executable |
+| `place-binaries.sh` | Puts each built `helix` or `cortex` in its platform package, executable |
 | `touched.sh` | Whether a push can reach the browser, so `verify` can skip |
 
 ## Why the range runs from the tag

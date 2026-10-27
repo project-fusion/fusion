@@ -1,0 +1,46 @@
+{
+  "name": "@fusion.dev/cortex-cli",
+  "description": "The Cortex command line: record notes, distill them into facts, answer questions from the facts, and trace each answer to its sources.",
+  "version": "0.1.2",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "cortex/cli/npm",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "exports": {
+    "./bin.mjs": "./bin.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin.mjs"
+  ],
+  "bin": {
+    "cortex": "./bin.mjs"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "cortex",
+    "cli",
+    "memory",
+    "provenance",
+    "ollama",
+    "local-first"
+  ],
+  "optionalDependencies": {
+    "@fusion.dev/cortex-cli-darwin-arm64": "workspace:*",
+    "@fusion.dev/cortex-cli-darwin-x64": "workspace:*",
+    "@fusion.dev/cortex-cli-linux-arm64": "workspace:*",
+    "@fusion.dev/cortex-cli-linux-x64": "workspace:*",
+    "@fusion.dev/cortex-cli-win32-x64": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

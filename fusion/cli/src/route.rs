@@ -71,14 +71,11 @@ fn installed(name: &str) -> Option<PathBuf> {
 
 /// The command that installs each product's command line.
 ///
-/// `cortex` is not on npm yet, so it installs from the repository with cargo.
+/// `cortex` keeps one memory for the person, so it installs globally.
 fn install(product: &str) -> String {
     match product {
         "helix" => "npm install --save-dev @fusion.dev/helix-cli".to_owned(),
-        "cortex" => {
-            "cargo install --git https://github.com/project-fusion/fusion fusion-cortex-cli"
-                .to_owned()
-        }
+        "cortex" => "npm install --global @fusion.dev/cortex-cli".to_owned(),
         other => format!("npm install --save-dev @fusion.dev/{other}"),
     }
 }

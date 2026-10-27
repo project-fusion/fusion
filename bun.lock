@@ -16,6 +16,40 @@
         "typescript": "^7.0.2",
       },
     },
+    "cortex/cli/npm": {
+      "name": "@fusion.dev/cortex-cli",
+      "version": "0.1.2",
+      "bin": {
+        "cortex": "./bin.mjs",
+      },
+      "optionalDependencies": {
+        "@fusion.dev/cortex-cli-darwin-arm64": "workspace:*",
+        "@fusion.dev/cortex-cli-darwin-x64": "workspace:*",
+        "@fusion.dev/cortex-cli-linux-arm64": "workspace:*",
+        "@fusion.dev/cortex-cli-linux-x64": "workspace:*",
+        "@fusion.dev/cortex-cli-win32-x64": "workspace:*",
+      },
+    },
+    "cortex/cli/platforms/darwin-arm64": {
+      "name": "@fusion.dev/cortex-cli-darwin-arm64",
+      "version": "0.1.2",
+    },
+    "cortex/cli/platforms/darwin-x64": {
+      "name": "@fusion.dev/cortex-cli-darwin-x64",
+      "version": "0.1.2",
+    },
+    "cortex/cli/platforms/linux-arm64": {
+      "name": "@fusion.dev/cortex-cli-linux-arm64",
+      "version": "0.1.2",
+    },
+    "cortex/cli/platforms/linux-x64": {
+      "name": "@fusion.dev/cortex-cli-linux-x64",
+      "version": "0.1.2",
+    },
+    "cortex/cli/platforms/win32-x64": {
+      "name": "@fusion.dev/cortex-cli-win32-x64",
+      "version": "0.1.2",
+    },
     "cortex/docs": {
       "name": "@fusion.dev/cortex-docs",
       "version": "0.1.2",
@@ -619,6 +653,18 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
 
     "@fusion.dev/cli": ["@fusion.dev/cli@workspace:fusion/cli/npm"],
+
+    "@fusion.dev/cortex-cli": ["@fusion.dev/cortex-cli@workspace:cortex/cli/npm"],
+
+    "@fusion.dev/cortex-cli-darwin-arm64": ["@fusion.dev/cortex-cli-darwin-arm64@workspace:cortex/cli/platforms/darwin-arm64"],
+
+    "@fusion.dev/cortex-cli-darwin-x64": ["@fusion.dev/cortex-cli-darwin-x64@workspace:cortex/cli/platforms/darwin-x64"],
+
+    "@fusion.dev/cortex-cli-linux-arm64": ["@fusion.dev/cortex-cli-linux-arm64@workspace:cortex/cli/platforms/linux-arm64"],
+
+    "@fusion.dev/cortex-cli-linux-x64": ["@fusion.dev/cortex-cli-linux-x64@workspace:cortex/cli/platforms/linux-x64"],
+
+    "@fusion.dev/cortex-cli-win32-x64": ["@fusion.dev/cortex-cli-win32-x64@workspace:cortex/cli/platforms/win32-x64"],
 
     "@fusion.dev/cortex-docs": ["@fusion.dev/cortex-docs@workspace:cortex/docs"],
 
