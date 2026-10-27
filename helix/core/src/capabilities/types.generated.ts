@@ -35,6 +35,22 @@ screenReader: boolean,
 window: Size, };
 
 /**
+ * A file the platform hands over: its name, its media type, its size in
+ * bytes, and the address it is read from, an object URL on the web and a
+ * file URI on a phone.
+ */
+export type DeviceFile = { name: string, 
+/**
+ * Its size in bytes, or 0 where the platform does not say.
+ */
+size: number, 
+/**
+ * Its media type, such as `image/jpeg`, or empty where the platform does
+ * not say.
+ */
+type: string, uri: string, };
+
+/**
  * A text direction.
  */
 export type Direction = "ltr" | "rtl";
@@ -78,6 +94,23 @@ export type Easing = "accelerate" | "decelerate" | "emphasized" | "linear" | "sp
  * start, and at its end, with nothing more past it.
  */
 export type Ends = { end: boolean, start: boolean, };
+
+/**
+ * Which files a file chooser offers, and whether it takes more than one.
+ */
+export type FilePick = { 
+/**
+ * Media types such as `image/*` and extensions such as `.pdf`, or none
+ * for any file.
+ */
+accept: Array<string>, multiple: boolean, };
+
+/**
+ * A file to save: the name it is saved under, its media type, and the
+ * address its content is read from, a `data:` URL, an object URL, a web
+ * address, or a file URI on a phone.
+ */
+export type FileSave = { name: string, type: string, uri: string, };
 
 /**
  * One way a value fails, as the web's validity flags name it.
@@ -128,6 +161,19 @@ key: string, meta: boolean,
 repeat: boolean, shift: boolean, };
 
 /**
+ * What became of a request for files: they were chosen, the reader closed
+ * the chooser, the reader or the system refused the permission it needs,
+ * or the device cannot do it.
+ */
+export type Outcome = "chosen" | "dismissed" | "refused" | "unavailable";
+
+/**
+ * The files a chooser gave, in the order chosen, and what became of the
+ * request. Only a request that is `chosen` gives files.
+ */
+export type Picked = { files: Array<DeviceFile>, outcome: Outcome, };
+
+/**
  * Where the components run.
  */
 export type Platform = "android" | "ios" | "server" | "web";
@@ -152,6 +198,19 @@ export type Scrolled = { offset: Point,
  * Whether the scroll has come to rest, as the web's `scrollend` says.
  */
 settled: boolean, x: Ends, y: Ends, };
+
+/**
+ * What the share sheet is handed: words, an address, a file, or several of
+ * them, and a title for the sheet where the platform shows one.
+ */
+export type Shareable = { file?: DeviceFile, text?: string, title?: string, url?: string, };
+
+/**
+ * What became of a share: the sheet took it, the clipboard took the address
+ * or the words where there is no sheet, the reader closed the sheet, or the
+ * platform can share nothing.
+ */
+export type Shared = "copied" | "dismissed" | "shared" | "unavailable";
 
 /**
  * A width and a height, in CSS pixels on the web and points on a phone.
