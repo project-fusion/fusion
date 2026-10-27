@@ -47,7 +47,9 @@ The first needs Xcode, and the second needs Android Studio.
 npm run build
 ```
 
-`build` checks the types and writes the website into `dist`.
+`build` checks the types and writes the website into `dist`. It fails first
+when `src/theme.css` or `src/theme.ts` is not what `helix.json` builds. Run
+`npm run theme` to write them again.
 
 ## What is where
 
