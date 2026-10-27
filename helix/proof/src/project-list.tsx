@@ -45,7 +45,7 @@ export function ProjectList() {
         <helix-text as="h2" slot="header" variant="title">
           All projects
         </helix-text>
-        <helix-list divided label="Projects" selection-mode="none">
+        <helix-list divided label="Projects">
           {PROJECTS.map((project) => (
             <helix-list-item
               href={route.href(`/projects/${project.id}`)}
