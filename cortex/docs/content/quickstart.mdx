@@ -1,0 +1,199 @@
+---
+title: Quickstart
+description: Install cortex, run two models in Ollama, and trace an answer to your notes, with no API key.
+---
+
+# Quickstart
+
+Run Cortex entirely on your machine, with no API key. You install the `cortex`
+command and two models in Ollama, record three notes, ask a question, trace the
+answer back to the notes, and forget a note to watch the answer change.
+
+## Install the command
+
+```bash
+npm install --global @fusion.dev/cortex-cli
+```
+
+npm installs the binary for your machine: macOS and Linux on Arm and x86-64,
+and Windows on x86-64. `cortex` keeps its memory in `cortex.db`, in a `cortex`
+folder of your data directory, such as `~/Library/Application Support` on macOS
+or `~/.local/share` on Linux.
+
+## Install the models
+
+Install Ollama from [ollama.com](https://ollama.com) and start it. Then pull the
+two models `cortex` uses by default:
+
+```bash
+ollama pull qwen3:4b
+ollama pull nomic-embed-text
+```
+
+`qwen3:4b` reads your notes for facts and answers questions. `nomic-embed-text`
+embeds each fact, so a question finds a fact that says the same thing in other
+words.
+
+## Write three notes
+
+```bash
+mkdir notes
+cat > notes/monday.md <<'EOF'
+The plumber comes on Thursday at 9:00 to fix the kitchen sink.
+
+The spare key is under the blue flower pot by the back door.
+EOF
+cat > notes/tuesday.md <<'EOF'
+The basil on the windowsill needs water every two days.
+EOF
+cat > notes/wednesday.md <<'EOF'
+The plumber moved the visit to Friday at 14:00.
+EOF
+```
+
+## Record the notes and distill them into facts
+
+`ingest` records each paragraph as an episode, and `--at` dates it.
+`consolidate` asks `qwen3:4b` for the facts the new episodes state, and gives
+each fact a vector.
+
+```bash
+cortex ingest notes/monday.md notes/tuesday.md --at 2026-10-19
+cortex consolidate
+```
+
+```text
+Read 3 episodes and wrote 3 facts.
+
+  fact The plumber comes on Thursday at 9:00 to fix the kitchen sink.
+    01a17acc-4abe-…  confidence 1.00, personal, vector ollama/nomic-embed-text
+    episode 01a17acb-fd92-…  notes/monday.md, paragraph 1, October 19, 2026
+      The plumber comes on Thursday at 9:00 to fix the kitchen sink.
+
+  fact The spare key is under the blue flower pot by the back door.
+    01a17acc-4abf-…  confidence 1.00, personal, vector ollama/nomic-embed-text
+    episode 01a17acb-fd93-…  notes/monday.md, paragraph 2, October 19, 2026
+      The spare key is under the blue flower pot by the back door.
+
+  fact The basil on the windowsill needs water every two days.
+    01a17acc-4ac0-…  confidence 1.00, personal, vector ollama/nomic-embed-text
+    episode 01a17acb-fd94-…  notes/tuesday.md, paragraph 1, October 19, 2026
+      The basil on the windowsill needs water every two days.
+```
+
+The output lists each fact with the episode it rests on. The transcripts on
+this page come from `qwen3:4b`, which words its facts and answers in its own
+way, so yours can read differently. The ids differ on every run, and they are
+shortened here.
+
+Then record Wednesday's note and consolidate again:
+
+```bash
+cortex ingest notes/wednesday.md --at 2026-10-21
+cortex consolidate
+```
+
+```text
+Read 1 episode and wrote 1 fact.
+
+  fact The plumber moved the visit to Friday at 14:00.
+    01a17acc-d581-…  confidence 1.00, personal, vector ollama/nomic-embed-text
+    episode 01a17acc-6264-…  notes/wednesday.md, paragraph 1, October 21, 2026
+      The plumber moved the visit to Friday at 14:00.
+
+superseded The plumber comes on Thursday at 9:00 to fix the kitchen sink.
+  by The plumber moved the visit to Friday at 14:00.
+```
+
+The new fact supersedes Monday's. Cortex keeps the old fact, so an answer given
+while it was current can still be traced.
+
+## Ask a question
+
+```bash
+cortex ask "When does the plumber come?"
+```
+
+```text
+The plumber comes on Friday at 14:00. This is directly stated in the first fact,
+which specifies "the plumber moved the visit to Friday at 14:00." The other facts
+about basil and the spare key are irrelevant to the question.
+
+01a17acc-e05f-… from qwen3:4b, on this machine, given 3 facts ranked by
+weighted/1 (overlap/1 0.30, vector/1 ollama/nomic-embed-text 0.70), each scoring 0.30 or more
+Trace the answer: cortex why 01a17acc-e05f-…
+```
+
+Cortex ranks the current facts by the words they share with the question and by
+how close their vectors are. The model answered on this machine.
+
+## Trace the answer to your notes
+
+```bash
+cortex why
+```
+
+```text
+answer 01a17acc-e05f-…  local/qwen3:4b, October 27, 2026
+  The plumber comes on Friday at 14:00. This is directly stated in the first fact, …
+  question When does the plumber come?
+  context 01a17acc-d5cc-…  recall/1, 3 facts placed
+    fact The plumber moved the visit to Friday at 14:00.
+      01a17acc-d581-…  confidence 1.00
+      placed: weighted/1 0.66: overlap/1 0.40 weighed 0.30, vector/1 ollama/nomic-embed-text 0.77 weighed 0.70
+      episode 01a17acc-6264-…  notes/wednesday.md, paragraph 1, October 21, 2026
+        The plumber moved the visit to Friday at 14:00.
+    fact The basil on the windowsill needs water every two days.
+      01a17acc-4ac0-…  confidence 1.00
+      placed: weighted/1 0.42: overlap/1 0.12 weighed 0.30, vector/1 ollama/nomic-embed-text 0.54 weighed 0.70
+      episode 01a17acb-fd94-…  notes/tuesday.md, paragraph 1, October 19, 2026
+        The basil on the windowsill needs water every two days.
+    fact The spare key is under the blue flower pot by the back door.
+      01a17acc-4abf-…  confidence 1.00
+      placed: weighted/1 0.38: overlap/1 0.11 weighed 0.30, vector/1 ollama/nomic-embed-text 0.49 weighed 0.70
+      episode 01a17acb-fd93-…  notes/monday.md, paragraph 2, October 19, 2026
+        The spare key is under the blue flower pot by the back door.
+```
+
+`why` prints the question, each fact the model was given with the score that
+placed it, and the note under each fact. The answer rests on Wednesday's note.
+
+## Forget a note
+
+```bash
+cortex forget notes/wednesday.md
+```
+
+```text
+Forgot 1 episode.
+  episode 01a17acc-6264-…  notes/wednesday.md, paragraph 1, October 21, 2026
+    The plumber moved the visit to Friday at 14:00.
+
+Removed 1 fact that rested on nothing else.
+  fact The plumber moved the visit to Friday at 14:00.
+
+1 fact is current again, since what superseded it is forgotten.
+  fact The plumber comes on Thursday at 9:00 to fix the kitchen sink.
+
+Removed 1 answer that drew on them and 8 trace nodes in all.
+```
+
+`forget` removes the episode, the fact that rested on it alone, and the answer
+that drew on it. Monday's fact is current again. Ask the same question:
+
+```bash
+cortex ask "When does the plumber come?"
+```
+
+```text
+The plumber comes on Thursday at 9:00 to fix the kitchen sink, as stated in the
+first fact. The other facts about the basil and the spare key do not provide
+information relevant to when the plumber arrives.
+```
+
+The answer now rests on Monday's note, and `cortex why` shows it.
+
+## Next
+
+The cortex command page walks through a week of notes, with `replay` on another
+model and the settings each command reads.
