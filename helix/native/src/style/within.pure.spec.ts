@@ -46,7 +46,7 @@ const family: Family = {
   ],
   tag: 'helix-tag',
   tree: [{ attributes: { role: 'button', sends: 'press' }, kind: 'pressable', name: 'dismiss' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 describe('within the host', () => {

@@ -45,7 +45,7 @@ const probe: Family = {
   ],
   tag: 'helix-probe',
   tree: [{ children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'face' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 /** An enclosing component that sets the probe's hook on what it holds. */
@@ -62,7 +62,7 @@ const frame: Family = {
   ],
   tag: 'helix-frame',
   tree: [{ children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'body' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 /** A behavior that gives the face a test ID from the element's own `testID` prop. */

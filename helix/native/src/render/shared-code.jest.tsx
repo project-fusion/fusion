@@ -23,7 +23,7 @@ const tab: Family = {
   rules: [],
   tag: 'helix-tab',
   tree: [{ kind: 'box', name: 'tab' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 afterEach(() => {

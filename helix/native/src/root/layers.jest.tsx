@@ -43,7 +43,7 @@ const layerForm = (name: string, attributes: Readonly<Record<string, unknown>>):
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 })
 
 const dialogForm = layerForm('dialog', { modal: true, role: 'dialog' })

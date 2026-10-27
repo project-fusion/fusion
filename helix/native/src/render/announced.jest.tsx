@@ -20,7 +20,7 @@ const family = (tree: Node[]): Family => ({
   rules: [],
   tag: 'helix-sample',
   tree,
-  version: '1.0',
+  version: '2.0',
 })
 
 /** Each part's view takes its name as its test id. */

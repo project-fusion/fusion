@@ -40,7 +40,7 @@ const menuForm: Family = {
       name: 'items',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const switchProp = (name: string) =>
@@ -91,7 +91,7 @@ const itemForm: Family = {
       name: 'item',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Menu = element(menuForm, behaviorFor(menuForm))
