@@ -60,6 +60,12 @@ describe('navigation item', () => {
     expect(rule('[part="link"]:focus-visible')).toContain('outline-offset: calc(')
   })
 
+  test('draws a section above the current page with its words at full strength', () => {
+    expect(rule(':host([current="true"]) [part="link"]')).toContain(
+      '--navigation-item-current-color',
+    )
+  })
+
   if (hasLayout()) {
     /* The item and a link of your own, in one bar, draw alike. */
     test('in a browser, stands in a bar as a link of your own stands', async () => {
@@ -77,6 +83,22 @@ describe('navigation item', () => {
       expect(drawn.fontSize).toBe(mine.fontSize)
       expect(drawn.paddingInlineStart).toBe(mine.paddingInlineStart)
       expect(drawn.borderTopLeftRadius).toBe(mine.borderTopLeftRadius)
+    })
+
+    test('in a browser, draws a section above the current page as a link of your own draws it', async () => {
+      const nav = await mount(`<helix-navigation label="Sections">
+        <helix-navigation-item current="true" href="#one">Projects</helix-navigation-item>
+        <a aria-current="true" href="#two">Projects</a>
+        <helix-navigation-item href="#three">Activity</helix-navigation-item>
+      </helix-navigation>`)
+      await idle()
+      const [above, other] = [...nav.querySelectorAll('helix-navigation-item')] as HTMLElement[]
+      const own = nav.querySelector('a') as HTMLElement
+      const drawn = getComputedStyle(part(above as HTMLElement, 'link') as HTMLElement).color
+      expect(drawn).toBe(getComputedStyle(own).color)
+      expect(drawn).not.toBe(
+        getComputedStyle(part(other as HTMLElement, 'link') as HTMLElement).color,
+      )
     })
 
     test('in a browser, fills a column and reads from its start', async () => {

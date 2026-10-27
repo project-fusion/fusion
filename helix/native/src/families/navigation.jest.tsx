@@ -240,4 +240,12 @@ describe('the generated Navigation', () => {
     expect(current.color).not.toBe(other.color)
     expect(Number(current.fontWeight)).toBeGreaterThan(Number(other.fontWeight))
   })
+
+  test('draws a section above the current page with its words at full strength', async () => {
+    await render(<Sections activity={{ current: 'true' }} current="none" />)
+    const above = styleOf(screen.getByText('Activity'))
+    expect(above.color).not.toBe(styleOf(screen.getByText('Settings')).color)
+    await render(<Sections />)
+    expect(above.color).toBe(styleOf(screen.getByText('Overview')).color)
+  })
 })

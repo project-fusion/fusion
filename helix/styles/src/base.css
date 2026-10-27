@@ -1202,6 +1202,11 @@ helix-toggle[disabled]::part(item) {
   font-weight: var(--navigation-item-current-font-weight, var(--helix-weight-semibold));
 }
 
+/* A section above the page showing: the mark, and its words at full strength. */
+:where([data-navigation-item], helix-navigation a)[aria-current="true"] {
+  color: var(--navigation-item-current-color, var(--helix-color-foreground));
+}
+
 /* Above the marker, which sits behind every item. */
 :where([data-navigation-item], helix-navigation a) {
   position: relative;
