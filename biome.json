@@ -94,6 +94,8 @@
         }
       },
       "includes": [
+        "helix/cli/tests/fixtures/*/src/families/**/headless.tsx",
+        "helix/cli/tests/fixtures/*/src/families/**/styled.ts",
         "helix/neutral/src/families/**/headless.tsx",
         "helix/neutral/src/families/**/styled.ts",
         "helix/neutral/src/fragments/**"
@@ -188,7 +190,7 @@
       }
     },
     {
-      "includes": ["helix/neutral/**/*.tsx"],
+      "includes": ["helix/cli/tests/fixtures/*/src/families/**/*.tsx", "helix/neutral/**/*.tsx"],
       "javascript": {
         "formatter": {
           "attributePosition": "multiline"

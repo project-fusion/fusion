@@ -190,7 +190,7 @@ pub fn native_modules(
         Tokens::Dtcg { file, modes } => {
             let read = file::Read::file(file)?;
             let mut source = project.named(file);
-            for (_, path) in modes {
+            for path in modes.values() {
                 source = format!("{source} and {}", project.named(path));
             }
             read.modules(modes, &system(&project, None), &header(&source, false))?
