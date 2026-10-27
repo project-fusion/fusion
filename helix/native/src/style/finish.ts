@@ -222,6 +222,14 @@ export const finisherFor = ({
     if (grows && whole) {
       out.flexGrow = 1
       out.flexShrink = holds ? 0 : 1
+      /* **On a line that wraps, the share starts from nothing**, as a
+         track's does: a full width would take the line from what shares it. */
+      if (within.wraps === true) {
+        if (typeof out.width === 'string' && out.width.endsWith('%')) {
+          delete out.width
+        }
+        out.flexBasis = 0
+      }
     }
     /* **A negative basis is none**, as `calc()` clamps to what a property
          takes, which a switch's basis is while its row is wider. */
