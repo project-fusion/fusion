@@ -79,7 +79,7 @@ export const picture = (empty?: 'error'): Family => ({
       name: 'image',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 })
 
 /** A picture's component, its image found by `image`. */

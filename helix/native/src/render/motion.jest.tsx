@@ -51,7 +51,7 @@ const spinner: Family = {
   ],
   tag: 'helix-spinner',
   tree: [{ attributes: { decorative: true }, kind: 'box', name: 'ring' }],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A badge in miniature: a count placed half its own size up and over, that
@@ -123,7 +123,7 @@ const badge: Family = {
   ],
   tag: 'helix-badge',
   tree: [{ attributes: { decorative: true }, kind: 'box', name: 'count' }],
-  version: '1.0',
+  version: '2.0',
 }
 
 const TOKENS = {

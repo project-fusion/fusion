@@ -2,7 +2,7 @@
  * List and List Item in miniature, bound as the expansion binds a list whose
  * rows move, for the specs of the native reorder binder. Neutral builds no
  * forms before its specs run, so these are written by hand to the shape
- * `helix family build` writes.
+ * `helix system build` writes.
  */
 import type { Family } from '../style/form'
 
@@ -96,7 +96,7 @@ export const shelf = {
     { children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'list' },
     { attributes: { decorative: true, platform: 'web' }, kind: 'box', name: 'drag-preview' },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 /* A row with a grip, bound as the expansion binds List Item. */
@@ -136,5 +136,5 @@ export const shelfRow = {
       name: 'row',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family

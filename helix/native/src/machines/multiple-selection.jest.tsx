@@ -25,7 +25,7 @@ const LIST = {
   name: 'list',
   rules: [],
   tag: 'helix-list',
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 const USE: MachineUse = {

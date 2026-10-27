@@ -34,7 +34,7 @@ const family = (set: readonly Declaration[], content?: Declaration[1]): Family =
         ]),
   ],
   tag: 'helix-b',
-  version: '1.0',
+  version: '2.0',
 })
 
 const tokens = { 'color-border': '#cccccc', 'space-2xs': '0.25rem' }

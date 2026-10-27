@@ -3,7 +3,7 @@
 //!
 //! **Defined here, and only here.** The web stylesheet, the native runtime and
 //! any emitter a consumer writes all read this shape, so it is the contract,
-//! and its JSON is what `helix family build` writes.
+//! and its JSON is what `helix system build` writes.
 //!
 //! **Each rule carries the specificity of the selector the web output writes
 //! for it.** A browser orders matching rules by specificity and then by source
@@ -16,8 +16,12 @@
 //!
 //! **Versioned as `major.minor`.** A reader refuses a major it does not know.
 //! A minor adds only what an older reader may ignore, such as an optional
-//! field; anything else, a renamed field or a new kind of node a reader must
-//! draw, is a major.
+//! field; anything else, a renamed field, a field that holds another kind of
+//! value, or a new kind of node a reader must draw, is a major.
+//!
+//! **2.0 is the first such change.** A box's `draws` and a total's `of`
+//! held an element's name without the prefix, and hold its tag: a reader of
+//! 1.x that found an element by its name finds none.
 //!
 //! **A rule with several `when`s is several rules.** A selector list means
 //! each of its selectors, so the reader writes one rule per alternative and
@@ -52,7 +56,7 @@ pub use table::styled;
 pub use values::{is_list, quoted, DERIVATIONS, LIST_DERIVATIONS};
 
 /// The version of the intermediate form this compiler writes.
-pub const VERSION: &str = "1.1";
+pub const VERSION: &str = "2.0";
 
 /// One element: what it takes and sends, its parts, and its style table.
 #[derive(Debug, Serialize, JsonSchema, TS)]

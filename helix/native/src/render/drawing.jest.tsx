@@ -70,7 +70,7 @@ const count: Family = {
       name: 'pill',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Count = element(count, () => ({

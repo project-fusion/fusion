@@ -51,7 +51,7 @@ const panelForm: Family = {
       name: 'beside',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 /** An element that draws its words in the foreground. */
@@ -60,7 +60,7 @@ const wordsForm: Family = {
   rules: [rule(0, 'host', [['color', { token: 'color-foreground' }]])],
   tag: 'helix-words',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Panel = element(panelForm)
@@ -83,7 +83,7 @@ const chipForm: Family = {
       name: 'label',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 element(chipForm)
 
@@ -108,7 +108,7 @@ const cardForm: Family = {
       name: 'scoped',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 const Card = element(cardForm)
 

@@ -79,7 +79,7 @@ const button: Family = {
       name: 'live',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /** A behavior that gives each named part a test ID, and nothing else. */
@@ -158,15 +158,15 @@ describe('element', () => {
       rules: [],
       tag: 'helix-plain',
       tree: [{ kind: 'region', name: 'default' }],
-      version: '1.0',
+      version: '2.0',
     }
     await draw(plain, { children: 'Words' })
     expect(screen.getByText('Words')).toHaveStyle({ color: '#000000' })
   })
 
   test('refuses a form in a major it does not read', () => {
-    expect(() => element({ ...button, version: '2.0' })).toThrow(
-      'button: the intermediate form is version 2.0, and this runtime reads 1.x',
+    expect(() => element({ ...button, version: '1.1' })).toThrow(
+      'button: the intermediate form is version 1.1, and this runtime reads 2.x',
     )
   })
 })
@@ -197,7 +197,7 @@ const track: Family = {
       name: 'track',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /**

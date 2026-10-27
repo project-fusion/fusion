@@ -74,7 +74,7 @@ const stopForm: Family = {
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Stop = element(stopForm, behaviorFor(stopForm))

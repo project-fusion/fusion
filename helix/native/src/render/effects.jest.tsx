@@ -36,7 +36,7 @@ const formOf = (set: Rule['set']): Family => ({
   tree: [
     { attributes: {}, children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'panel' },
   ],
-  version: '1.1',
+  version: '2.0',
 })
 
 const draw = async (set: Rule['set']) => {

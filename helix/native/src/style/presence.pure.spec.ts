@@ -16,7 +16,7 @@ const under = (...when: Condition[]): Family => ({
     }),
   ],
   tag: 'helix-timeline-item',
-  version: '1.0',
+  version: '2.0',
 })
 
 const red = (family: Family, context: Partial<Parameters<typeof style>[2]>): boolean =>

@@ -34,7 +34,7 @@ const chord: Family = {
       name: 'keys',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const entries: Family = {
@@ -57,7 +57,7 @@ const entries: Family = {
       name: 'entry',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const section: Family = {
@@ -74,7 +74,7 @@ const section: Family = {
       name: 'content',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Chord = element(chord)

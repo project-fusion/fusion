@@ -62,7 +62,7 @@ const strip: Family = {
       name: 'strip',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Strip = element(strip, () => ({

@@ -31,7 +31,7 @@ const accordionForm: Family = {
   rules: [],
   tag: 'helix-accordion',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 const itemForm: Family = {
@@ -77,7 +77,7 @@ const itemForm: Family = {
       name: 'content',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Accordion = element(accordionForm, behaviorFor(accordionForm))

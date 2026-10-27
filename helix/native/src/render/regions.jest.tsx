@@ -60,7 +60,7 @@ const list: Family = {
       name: 'loading',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A card in miniature: a body that colors what is passed into it. */
@@ -80,7 +80,7 @@ const card: Family = {
     { attributes: { part: 'end' }, kind: 'region', name: 'end' },
     { attributes: { part: 'body' }, kind: 'region', name: 'default' },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A tab panel in miniature: hidden while it is not selected, with content
@@ -103,7 +103,7 @@ const panel: Family = {
       name: 'panel',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /** Draws `family` with `props` under a theme with no tokens. */

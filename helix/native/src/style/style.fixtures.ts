@@ -84,7 +84,7 @@ export const family: Family = {
     }),
   ],
   tag: 'helix-button',
-  version: '1.0',
+  version: '2.0',
 }
 
 export const tokens = {
@@ -149,7 +149,7 @@ export const indicator: Family = {
     }),
   ],
   tag: 'helix-tabs',
-  version: '1.0',
+  version: '2.0',
 }
 
 /* Tabs' strip in miniature: the host and the strip set values, the strip
@@ -234,7 +234,7 @@ export const strip: Family = {
     },
     { kind: 'box', name: 'panels' },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A tab's shape in miniature: an inline host holding a press that is as
@@ -260,6 +260,6 @@ export const lengths: Family = {
   ],
   tag: 'helix-tab',
   tree: [{ kind: 'pressable', name: 'tab' }],
-  version: '1.0',
+  version: '2.0',
 }
 export const row = { flex: true, row: true, tracks: [] }

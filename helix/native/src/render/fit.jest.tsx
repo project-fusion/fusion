@@ -59,7 +59,7 @@ const stage: Family = {
       name: 'content',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Stage = element(stage, () => ({
