@@ -347,6 +347,19 @@ export interface Resolved {
    */
   readonly scrolls?: 'both' | 'x' | 'y'
   /**
+   * Whether the part is as wide as its content along its parent's row: it
+   * neither grows nor sets a width or a basis, so its width is its content's
+   * and it yields only where the row runs out of room, as a flex item with an
+   * automatic basis does on the web.
+   */
+  readonly hugs?: true
+  /**
+   * Whether the part takes an equal share of its row and is never narrower
+   * than its content, as a `minmax(max-content, 1fr)` track is: App Header's
+   * brand and actions, which center the navigation between them.
+   */
+  readonly shares?: true
+  /**
    * The private values the part's content inherits.
    */
   readonly values: Readonly<Record<string, Resolution>>
