@@ -185,8 +185,10 @@ platforms, so a page names no platform. Install `expo-router` beside
   stay with the browser.
 - **On a phone, `HelixAppRoot` is `HelixRoot`.** It also opens each Helix
   link to a path through the router. A route above the page showing goes
-  back to it, as the system's back does, and any other route is pushed. An
-  address with a scheme opens in the app that handles it.
+  back to it, as the system's back does. A route one segment under the root,
+  such as a header's `/activity`, takes the place of the page showing, so
+  moving between sections adds no pages to go back through. Any other route
+  is pushed. An address with a scheme opens in the app that handles it.
 - **A refused request keeps the router where it is.** A Navigation Item, a
   Breadcrumb, a Tab, or a Menu Item with an `href` sends
   `helix-before-select` first on both platforms. Cancel it and the press
