@@ -219,7 +219,7 @@ pub enum Tokens {
     /// A Design Tokens Format Module file, and a file per mode it lays over it.
     Dtcg {
         file: PathBuf,
-        modes: Vec<(String, PathBuf)>,
+        modes: BTreeMap<String, PathBuf>,
     },
     /// A styles package, and the key its design tokens' own data is under.
     Styles {

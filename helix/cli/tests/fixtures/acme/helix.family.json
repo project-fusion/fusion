@@ -1,0 +1,19 @@
+{
+  "events": "src/events",
+  "families": ".",
+  "manifest": "custom-elements.json",
+  "name": "Acme",
+  "outputs": {
+    "build": "out/dist",
+    "components": "out/native",
+    "stylesheets": "out/styled",
+    "tokens": "out/theme"
+  },
+  "prefix": "acme",
+  "runtime": { "native": "@fusion.dev/helix-native" },
+  "theme": ["acme-mode"],
+  "tokens": {
+    "dtcg": "tokens/acme.tokens.json",
+    "modes": { "dark": "tokens/acme.dark.tokens.json" }
+  }
+}
