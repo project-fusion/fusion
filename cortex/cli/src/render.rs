@@ -150,11 +150,12 @@ pub fn asked(report: &Asked, paint: Paint) -> String {
         out,
         "{}",
         paint.dim(&format!(
-            "{} from {}, {place}, given {} ranked by {}",
+            "{} from {}, {place}, given {} ranked by {}, each scoring {:.2} or more",
             report.id,
             report.model,
             plural(report.facts.len(), "fact", "facts"),
-            report.scorer
+            report.scorer,
+            report.floor
         ))
     );
     let _ = write!(

@@ -216,6 +216,15 @@ enum Verb {
         /// The most facts to place.
         #[arg(long, default_value_t = 8, value_name = "COUNT")]
         most: usize,
+
+        /// The least score a fact needs to be placed, from 0 to 1.
+        ///
+        /// A fact that scores below it is left out, however few facts are
+        /// placed. Defaults to 0.3 where the facts have vectors and 0.1 by
+        /// words alone. Zero places the best facts up to `--most`, related to
+        /// the question or not.
+        #[arg(long, value_name = "SCORE")]
+        floor: Option<f32>,
     },
     /// Print how an answer was derived, back to the episodes.
     ///
@@ -253,7 +262,24 @@ enum Verb {
     },
 }
 
+/// What `cortex --version --json` prints: the version as one JSON object that
+/// names the package. `--version` alone prints the line a release is checked
+/// against. The npm launcher runs a `cortex` on `PATH` only when this names
+/// its package, because another program can share the name.
+fn version_json(args: &[String]) -> Option<String> {
+    let mut asked: Vec<&str> = args.iter().map(String::as_str).collect();
+    asked.sort_unstable();
+    matches!(asked.as_slice(), ["--json", "--version" | "-V"]).then(|| {
+        serde_json::json!({ "name": PRODUCT, "package": PACKAGE, "version": shipped() }).to_string()
+    })
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if let Some(said) = version_json(&args) {
+        fusion_rules::say!("{said}");
+        return;
+    }
     let cli: Cli = fusion_rules::args::parse(PRODUCT);
     let json = cli.options.json;
     let paint = if json {
@@ -422,7 +448,11 @@ async fn run(cli: Cli, paint: Paint) -> Outcome<Code> {
                 Code::Failed
             })
         }
-        Verb::Ask { question, most } => {
+        Verb::Ask {
+            question,
+            most,
+            floor,
+        } => {
             let question = question.join(" ");
             let provider = models::provider(&settings.provider, &settings)?;
             let embedder = models::embedder(&settings)?;
@@ -433,6 +463,7 @@ async fn run(cli: Cli, paint: Paint) -> Outcome<Code> {
                     embedder.as_deref(),
                     &settings.read,
                     most,
+                    floor,
                 )
                 .await?;
             warn(&report.warnings, json);

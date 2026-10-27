@@ -732,7 +732,7 @@ impl Scorer for Overlap {
 /// ```
 /// # use fusion_cortex_core::embed::{Embedder, Purpose, Scripted};
 /// # use fusion_cortex_engram::{Fact, Scope};
-/// # use fusion_cortex_recall::{relevant, Overlap, Scorer, Vector, Weighted};
+/// # use fusion_cortex_recall::{relevant, Overlap, Scorer, Selection, Vector, Weighted};
 /// # #[tokio::main]
 /// # async fn main() {
 /// let embedder = Scripted::new("scripted/1", 2)
@@ -750,10 +750,10 @@ impl Scorer for Overlap {
 ///
 /// let vector = Vector::of(&embedder, question).await.unwrap();
 /// let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
-/// let placed = relevant(&facts, &[Scope::Personal], question, &both, 1, |_| 0.0, 30.0);
+/// let placed = relevant(&facts, &[Scope::Personal], question, &both, Selection::top(1), |_| 0.0);
 ///
 /// assert_eq!(placed[0].0.content, "Dana owns the release notes");
-/// let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, 1, |_| 0.0, 30.0);
+/// let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, Selection::top(1), |_| 0.0);
 /// assert_eq!(by_words[0].0.content, "each version changed what the docs site looks like");
 /// # }
 /// ```
@@ -872,18 +872,51 @@ impl Scorer for Weighted<'_> {
     }
 }
 
-/// The facts worth placing for `query`, most worth first, and at most `most`,
-/// from the current facts in `scopes`, the scopes the caller may read. A fact
-/// in any other scope is never placed.
+/// How [`relevant`] chooses facts.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Selection {
+    /// The most facts to place.
+    pub most: usize,
+    /// The least score a fact needs from the scorer to be placed, from zero
+    /// to one. At zero, a fact that shares nothing with the query still
+    /// ranks, at half its confidence.
+    pub floor: f32,
+    /// How many days a fact's confidence takes to halve.
+    pub half_life_days: f32,
+}
+
+impl Selection {
+    /// At most `most` facts, with no floor, and confidence that halves in 30
+    /// days.
+    #[must_use]
+    pub fn top(most: usize) -> Self {
+        Self {
+            most,
+            floor: 0.0,
+            half_life_days: 30.0,
+        }
+    }
+
+    /// The same selection, placing only facts that score `floor` or more.
+    #[must_use]
+    pub fn floor(self, floor: f32) -> Self {
+        Self { floor, ..self }
+    }
+}
+
+/// The facts worth placing for `query`, most worth first, from the current
+/// facts in `scopes`, the scopes the caller may read. A fact in any other
+/// scope is never placed. [`Selection`] says how many, and the least score.
 ///
-/// Each is ranked by its confidence after decay, weighed by its score: a fact
-/// that shares no word with the query still ranks, at half its confidence,
-/// because what a project's sessions learned is often about the project and
-/// not the task. A fact whose decayed confidence is below a tenth is left out.
+/// Each is ranked by its confidence after decay, weighed by its score. With
+/// no floor, a fact that shares no word with the query still ranks, at half
+/// its confidence, because what a project's sessions learned is often about
+/// the project and not the task. A floor leaves out every fact that scores
+/// below it. A fact whose decayed confidence is below a tenth is left out.
 ///
 /// ```
 /// use fusion_cortex_engram::{Fact, Scope};
-/// use fusion_cortex_recall::{relevant, Overlap};
+/// use fusion_cortex_recall::{relevant, Overlap, Selection};
 ///
 /// let core = Scope::Team("core".into());
 /// let facts = vec![
@@ -891,11 +924,15 @@ impl Scorer for Weighted<'_> {
 ///     Fact::new("the docs build with bun", vec![], 0.8),
 ///     Fact::new("the core team fixes flaky tests on Fridays", vec![], 0.9).within(core),
 /// ];
+/// let question = "fix the flaky checkout test";
 ///
-/// let placed = relevant(&facts, &[Scope::Personal], "fix the flaky checkout test", &Overlap, 2, |_| 0.0, 30.0);
+/// let placed = relevant(&facts, &[Scope::Personal], question, &Overlap, Selection::top(2), |_| 0.0);
+/// let above = relevant(&facts, &[Scope::Personal], question, &Overlap, Selection::top(2).floor(0.3), |_| 0.0);
 ///
 /// assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
+/// assert_eq!(placed.len(), 2, "the docs fact fills the last place");
 /// assert!(placed.iter().all(|(fact, _)| fact.scope == Scope::Personal));
+/// assert_eq!(above.len(), 1, "the docs fact shares only `the` with the question");
 /// ```
 #[must_use]
 pub fn relevant<'a>(
@@ -903,21 +940,23 @@ pub fn relevant<'a>(
     scopes: &[Scope],
     query: &str,
     scorer: &dyn Scorer,
-    most: usize,
+    selection: Selection,
     age_days: impl Fn(&Fact) -> f32,
-    half_life_days: f32,
 ) -> Vec<(&'a Fact, f32)> {
     let mut ranked: Vec<(&Fact, f32)> = facts
         .iter()
         .filter(|fact| fact.is_current() && scopes.contains(&fact.scope))
         .filter_map(|fact| {
-            let confidence = fact.decayed_confidence(age_days(fact), half_life_days);
-            (confidence >= 0.1)
-                .then(|| (fact, confidence * (0.5 + 0.5 * scorer.score(query, fact))))
+            let confidence = fact.decayed_confidence(age_days(fact), selection.half_life_days);
+            if confidence < 0.1 {
+                return None;
+            }
+            let score = scorer.score(query, fact);
+            (score >= selection.floor).then_some((fact, confidence * (0.5 + 0.5 * score)))
         })
         .collect();
     ranked.sort_by(|a, b| b.1.total_cmp(&a.1));
-    ranked.truncate(most);
+    ranked.truncate(selection.most);
     ranked
 }
 
@@ -1300,9 +1339,8 @@ mod tests {
                 scopes,
                 "the release checklist",
                 &Overlap,
-                10,
+                Selection::top(10),
                 |_| 0.0,
-                30.0,
             )
             .into_iter()
             .map(|(fact, _)| fact.scope.clone())
@@ -1391,13 +1429,92 @@ mod tests {
             &[Scope::Personal],
             "answer",
             &both,
-            10,
+            Selection::top(10),
             |_| 0.0,
-            30.0,
         );
 
         assert_eq!(placed.len(), 1);
         assert_eq!(placed[0].0.content, "my answer");
+    }
+
+    /// The content of each fact `relevant` places for the release question.
+    fn placed_for_release<'a>(
+        facts: &'a [Fact],
+        scorer: &dyn Scorer,
+        selection: Selection,
+    ) -> Vec<&'a str> {
+        relevant(
+            facts,
+            &[Scope::Personal],
+            "who reviews the schema migration in the release?",
+            scorer,
+            selection,
+            |_| 0.0,
+        )
+        .into_iter()
+        .map(|(fact, _)| fact.content.as_str())
+        .collect()
+    }
+
+    #[test]
+    fn a_floor_leaves_out_an_unrelated_fact_and_keeps_the_related_ones() {
+        let facts = vec![
+            Fact::new("Priya reviews every schema migration", vec![], 0.8),
+            Fact::new("standup moves to 9:30 next week", vec![], 0.9),
+            Fact::new("the 0.12 release ships on Thursday", vec![], 0.8),
+        ];
+
+        let without = placed_for_release(&facts, &Overlap, Selection::top(3));
+        let with = placed_for_release(&facts, &Overlap, Selection::top(3).floor(0.1));
+
+        assert_eq!(
+            without.last(),
+            Some(&"standup moves to 9:30 next week"),
+            "with no floor, it fills the last place"
+        );
+        assert_eq!(
+            with,
+            [
+                "Priya reviews every schema migration",
+                "the 0.12 release ships on Thursday"
+            ]
+        );
+    }
+
+    #[test]
+    fn a_floor_keeps_a_fact_related_by_meaning_alone() {
+        let vector = Vector::new(Embedding::new("scripted/1", vec![1.0, 0.0]));
+        let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
+        let facts = vec![
+            embedded("Priya is out on Thursday", "scripted/1", vec![0.6, 0.8]),
+            embedded(
+                "Priya reviews every schema migration",
+                "scripted/1",
+                vec![0.9, 0.44],
+            ),
+            embedded(
+                "the basil needs water every two days",
+                "scripted/1",
+                vec![0.3, 0.95],
+            ),
+        ];
+
+        let placed = placed_for_release(&facts, &both, Selection::top(8).floor(0.3));
+
+        // No word in common and a cosine of 0.6 scores 0.42. The basil shares
+        // only "the", and with a cosine of 0.3 scores 0.25.
+        assert_eq!(
+            placed,
+            [
+                "Priya reviews every schema migration",
+                "Priya is out on Thursday"
+            ]
+        );
+        assert_eq!(
+            placed_for_release(&facts, &both, Selection::top(8).floor(0.0)).len(),
+            3,
+            "a floor of zero places every fact"
+        );
     }
 
     #[test]
@@ -1413,9 +1530,8 @@ mod tests {
                 &[Scope::Personal],
                 "how do tests run",
                 &Overlap,
-                10,
+                Selection::top(10),
                 |_| 0.0,
-                30.0,
             )
             .len()
         };

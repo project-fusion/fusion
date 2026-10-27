@@ -28,7 +28,7 @@ use fusion_cortex_engram::{
     Episode, Fact, Scope,
 };
 use fusion_cortex_recall::{
-    assemble, relevant, Item, Overlap, Part, Scorer, Vector, Weighted, Window, STRATEGY,
+    assemble, relevant, Item, Overlap, Part, Scorer, Selection, Vector, Weighted, Window, STRATEGY,
 };
 use fusion_cortex_trace::{
     replay::{Exact, Verdict},
@@ -56,22 +56,20 @@ const HALF_LIFE_DAYS: f32 = 30.0;
 const OVERLAP_WEIGHT: f32 = 0.3;
 const VECTOR_WEIGHT: f32 = 0.7;
 
-/// Every kind of node, which is what loading the whole graph reads.
-const KINDS: [NodeKind; 13] = [
-    NodeKind::Source,
-    NodeKind::Memory,
-    NodeKind::Context,
-    NodeKind::ToolCall,
-    NodeKind::Output,
-    NodeKind::Task,
-    NodeKind::Plan,
-    NodeKind::Decision,
-    NodeKind::Check,
-    NodeKind::Edit,
-    NodeKind::Billed,
-    NodeKind::Validation,
-    NodeKind::Extraction,
-];
+/// The least score a fact needs to be placed, where facts rank by words and
+/// meaning.
+///
+/// **Below every related fact measured, so it leaves out only the facts
+/// furthest from the question.** `nomic-embed-text` gave a note on another
+/// subject a cosine from 0.33 to 0.57, depending on the question, and a related
+/// note that shares no word with the question 0.49 or more, which the weights
+/// make 0.34 (measured October 26, 2026, over four questions and nine notes).
+/// The two ranges overlap, so no fixed floor separates them.
+pub const FLOOR_WITH_VECTORS: f32 = 0.3;
+
+/// The least score where facts rank by words alone: a fact that shares no
+/// word with the question scores zero and is left out.
+pub const FLOOR_BY_WORDS: f32 = 0.1;
 
 fn storage(what: &str, error: &fusion_cortex_core::Error) -> Failure {
     Failure::input(what.to_owned(), error.to_string())
@@ -224,6 +222,8 @@ pub struct Given {
 pub struct Asked {
     pub answer: String,
     pub facts: Vec<Given>,
+    /// The least score a fact needed to be placed.
+    pub floor: f32,
     /// The output node, which `why` and `replay` take.
     pub id: Id,
     pub local: bool,
@@ -328,20 +328,73 @@ impl Memory {
         Ok(Self { engram, trace })
     }
 
-    async fn graph(&self) -> Outcome<Graph> {
-        let mut graph = Graph::new();
-        /* **The whole graph, because a derivation crosses traces** and a store
-        finds no node by its id alone: an answer's facts are in a pass's trace,
-        and their episodes in an ingest's. */
-        for (_, node) in self
+    /// The node `id`, where the trace holds it.
+    async fn node(&self, id: Id) -> Outcome<Option<Node>> {
+        Ok(self
             .trace
-            .nodes_of(&KINDS, None)
+            .node(id)
             .await
             .map_err(|error| storage("cannot read the trace", &error))?
-        {
+            .map(|(_, node)| node))
+    }
+
+    /// The nodes `from` derives from, read one at a time: each node reached,
+    /// and the parents of each node `follow` takes.
+    async fn reach(&self, from: Id, follow: impl Fn(&Node) -> bool) -> Outcome<Graph> {
+        /* **A derivation crosses traces**, so it is walked by node: an
+        answer's facts are in a pass's trace, and their episodes in an
+        ingest's. Only the nodes the walk reaches are read. */
+        let mut graph = Graph::new();
+        let mut seen = HashSet::new();
+        let mut queue = VecDeque::from([from]);
+        while let Some(current) = queue.pop_front() {
+            if !seen.insert(current) {
+                continue;
+            }
+            let Some(node) = self.node(current).await? else {
+                continue;
+            };
+            if follow(&node) {
+                queue.extend(node.derived_from.iter().copied());
+            }
             graph.insert(node);
         }
         Ok(graph)
+    }
+
+    /// Every answer, oldest first.
+    async fn answers(&self) -> Outcome<Vec<Node>> {
+        Ok(self
+            .trace
+            .nodes_of(&[NodeKind::Output], None)
+            .await
+            .map_err(|error| storage("cannot read the trace", &error))?
+            .into_iter()
+            .map(|(_, node)| node)
+            .filter(is_answer)
+            .collect())
+    }
+
+    /// The question an answer's context was asked, where it records one.
+    async fn asked(&self, answer: &Node) -> Outcome<Option<String>> {
+        for parent in &answer.derived_from {
+            let Some(context) = self.node(*parent).await? else {
+                continue;
+            };
+            if context.kind() != NodeKind::Context {
+                continue;
+            }
+            for source in &context.derived_from {
+                if let Some(Node {
+                    detail: Detail::Source { content, uri: None },
+                    ..
+                }) = self.node(*source).await?
+                {
+                    return Ok(Some(content));
+                }
+            }
+        }
+        Ok(None)
     }
 
     async fn sources(&self) -> Outcome<HashMap<Id, Option<String>>> {
@@ -359,6 +412,14 @@ impl Memory {
     }
 
     async fn held(&self) -> Outcome<Held> {
+        Ok(Held {
+            sources: self.sources().await?,
+            ..self.remembered().await?
+        })
+    }
+
+    /// What Engram holds, with no source addresses.
+    async fn remembered(&self) -> Outcome<Held> {
         let read = |error: fusion_cortex_core::Error| storage("cannot read memory", &error);
         Ok(Held {
             episodes: self
@@ -377,7 +438,7 @@ impl Memory {
                 .into_iter()
                 .map(|fact| (fact.id, fact))
                 .collect(),
-            sources: self.sources().await?,
+            sources: HashMap::new(),
         })
     }
 
@@ -524,8 +585,11 @@ impl Memory {
         Ok(report)
     }
 
-    /// Answers `question` from the facts in `read` that Recall places, and
-    /// records the question, the context, and the answer in a trace.
+    /// Answers `question` from the facts in `read` that Recall places, at
+    /// most `most` and each scoring `floor` or more, and records the question,
+    /// the context, and the answer in a trace. With no floor, it is
+    /// [`FLOOR_WITH_VECTORS`] where the facts have vectors from `embedder`,
+    /// and [`FLOOR_BY_WORDS`] otherwise.
     ///
     /// # Errors
     ///
@@ -537,6 +601,7 @@ impl Memory {
         embedder: Option<&dyn Embedder>,
         read: &[Scope],
         most: usize,
+        floor: Option<f32>,
     ) -> Outcome<Asked> {
         let facts = self
             .engram
@@ -564,7 +629,17 @@ impl Memory {
             let days = (now - fact.updated_at).num_seconds() as f32 / 86_400.0;
             days
         };
-        let chosen = relevant(&facts, read, question, scorer, most, age, HALF_LIFE_DAYS);
+        let floor = floor.unwrap_or(if vector.is_some() {
+            FLOOR_WITH_VECTORS
+        } else {
+            FLOOR_BY_WORDS
+        });
+        let selection = Selection {
+            floor,
+            half_life_days: HALF_LIFE_DAYS,
+            most,
+        };
+        let chosen = relevant(&facts, read, question, scorer, selection, age);
 
         let (items, given) = placed(question, &chosen, scorer);
         let context = assemble(&items, Window::unbounded(), None);
@@ -599,26 +674,7 @@ impl Memory {
             .await
             .map_err(|error| crate::models::failed(provider.id(), &error))?;
         let answer = response.joined().trim().to_owned();
-        let output = Node::new(
-            Detail::Output {
-                call: Some(Call {
-                    blocks: response.content.clone(),
-                    cost: None,
-                    elapsed_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
-                    local: provider.is_local(),
-                    profile: None,
-                    provider: provider.id().to_owned(),
-                    stop: response.stop.clone(),
-                    usage: response.usage,
-                }),
-                content: answer.clone(),
-                input_tokens: response.usage.input,
-                model: response.model.clone(),
-                output_tokens: response.usage.output,
-                prompt_version: PROMPT_VERSION.to_owned(),
-            },
-            vec![shown.id],
-        );
+        let output = output(&response, provider, &answer, started, shown.id);
         let trace = Id::new();
         let id = output.id;
         self.append(trace, &[asked, shown, output]).await?;
@@ -629,6 +685,7 @@ impl Memory {
         Ok(Asked {
             answer,
             facts: given,
+            floor,
             id,
             local: provider.is_local(),
             model: response.model,
@@ -641,35 +698,40 @@ impl Memory {
 
     /// The answer `target` names: an output node's id, `last`, or text an
     /// answer or its question holds, the latest first. None is `last`.
-    fn find_answer(graph: &Graph, target: Option<&str>) -> Outcome<Id> {
-        let mut answers: Vec<&Node> = graph
-            .nodes()
-            .filter(|node| {
-                matches!(&node.detail, Detail::Output { prompt_version, .. } if prompt_version == PROMPT_VERSION)
-            })
-            .collect();
-        answers.sort_by_key(|node| node.id);
+    async fn find_answer(&self, target: Option<&str>) -> Outcome<Id> {
+        let answers = self.answers().await?;
         let target = target.map(str::trim).filter(|target| !target.is_empty());
         let found = match target {
-            None | Some("last") => answers.last().copied(),
+            None | Some("last") => answers.last().map(|node| node.id),
             Some(text) => {
                 if let Ok(id) = uuid::Uuid::parse_str(text) {
-                    answers.iter().copied().find(|node| node.id == Id(id))
+                    answers
+                        .iter()
+                        .find(|node| node.id == Id(id))
+                        .map(|node| node.id)
                 } else {
                     let text = text.to_lowercase();
-                    answers.iter().rev().copied().find(|node| {
+                    let mut found = None;
+                    for node in answers.iter().rev() {
                         let said = match &node.detail {
                             Detail::Output { content, .. } => content.to_lowercase(),
                             _ => String::new(),
                         };
-                        said.contains(&text)
-                            || question(graph, node)
+                        if said.contains(&text)
+                            || self
+                                .asked(node)
+                                .await?
                                 .is_some_and(|question| question.to_lowercase().contains(&text))
-                    })
+                        {
+                            found = Some(node.id);
+                            break;
+                        }
+                    }
+                    found
                 }
             }
         };
-        found.map(|node| node.id).ok_or_else(|| {
+        found.ok_or_else(|| {
             let why = if answers.is_empty() {
                 "the store holds no answer yet".to_owned()
             } else {
@@ -689,23 +751,44 @@ impl Memory {
     ///
     /// [`Failure`] if a store fails or nothing matches `target`.
     pub async fn why(&self, target: Option<&str>) -> Outcome<Why> {
-        let graph = self.graph().await?;
-        let held = self.held().await?;
+        let mut held = self.remembered().await?;
         if let Some(id) = target.and_then(|text| uuid::Uuid::parse_str(text.trim()).ok()) {
             let id = Id(id);
-            if let Some(fact) = held.fact(id) {
-                return Ok(Why::Fact { fact });
-            }
-            if let Some(node) = graph.get(id) {
-                if !matches!(&node.detail, Detail::Output { prompt_version, .. } if prompt_version == PROMPT_VERSION)
-                {
-                    return Ok(Why::Node {
-                        nodes: graph.why(id).into_iter().map(view).collect(),
-                    });
+            if let Some(fact) = held.facts.get(&id) {
+                let nodes: Vec<Id> = fact
+                    .derived_from
+                    .iter()
+                    .filter_map(|episode| held.episodes.get(episode)?.node)
+                    .collect();
+                for node in nodes {
+                    if let Some(node) = self.node(node).await? {
+                        held.sources.extend(source(&node));
+                    }
                 }
+                return Ok(Why::Fact {
+                    fact: held.fact(id).expect("a fact Engram holds"),
+                });
+            }
+            if self.node(id).await?.is_some_and(|node| !is_answer(&node)) {
+                let graph = self.reach(id, |_| true).await?;
+                return Ok(Why::Node {
+                    nodes: graph.why(id).into_iter().map(view).collect(),
+                });
             }
         }
-        let id = Self::find_answer(&graph, target)?;
+        let id = self.find_answer(target).await?;
+        /* **An answer's derivation runs through its context and the memory
+        nodes it placed**, to the source nodes of their episodes. An
+        extraction is read and not followed, since it read its whole batch. */
+        let graph = self
+            .reach(id, |node| {
+                matches!(
+                    node.kind(),
+                    NodeKind::Output | NodeKind::Context | NodeKind::Memory
+                )
+            })
+            .await?;
+        held.sources = graph.nodes().filter_map(source).collect();
         let node = graph.get(id).expect("an answer the graph holds");
         Ok(Why::Answer {
             answer: answer(node),
@@ -721,7 +804,7 @@ impl Memory {
     /// [`Failure`] if a store fails or nothing matches `target`.
     pub async fn forget(&self, target: &str) -> Outcome<Forgot> {
         let before = self.held().await?;
-        let graph = self.graph().await?;
+        let answers: HashSet<Id> = self.answers().await?.iter().map(|node| node.id).collect();
         let target = target.trim();
         let mut doomed: Vec<&Episode> = Vec::new();
         if let Ok(id) = uuid::Uuid::parse_str(target) {
@@ -753,11 +836,6 @@ impl Memory {
         }
         doomed.sort_by_key(|episode| episode.id);
 
-        let answers: HashSet<Id> = graph
-            .nodes()
-            .filter(|node| matches!(&node.detail, Detail::Output { prompt_version, .. } if prompt_version == PROMPT_VERSION))
-            .map(|node| node.id)
-            .collect();
         let mut removed_facts = Vec::new();
         let mut removed_nodes: HashSet<Id> = HashSet::new();
         for episode in &doomed {
@@ -863,8 +941,8 @@ impl Memory {
     /// [`Failure`] if a store or the provider fails, or nothing matches
     /// `target`.
     pub async fn replay(&self, target: Option<&str>, provider: &dyn Provider) -> Outcome<Replayed> {
-        let graph = self.graph().await?;
-        let id = Self::find_answer(&graph, target)?;
+        let id = self.find_answer(target).await?;
+        let graph = self.reach(id, |node| node.id == id).await?;
         let node = graph.get(id).expect("an answer the graph holds");
         /* **The answer and its context, and nothing before them.** A replay
         recomputes every output in its plan, and an answer's derivation holds
@@ -979,6 +1057,50 @@ fn placed(question: &str, chosen: &[(&Fact, f32)], scorer: &dyn Scorer) -> (Vec<
         "the question",
     ));
     (items, given)
+}
+
+/// The output node that records `answer`, from `response`, derived from the
+/// context `shown`.
+fn output(
+    response: &fusion_cortex_core::provider::Response,
+    provider: &dyn Provider,
+    answer: &str,
+    started: Instant,
+    shown: Id,
+) -> Node {
+    Node::new(
+        Detail::Output {
+            call: Some(Call {
+                blocks: response.content.clone(),
+                cost: None,
+                elapsed_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+                local: provider.is_local(),
+                profile: None,
+                provider: provider.id().to_owned(),
+                stop: response.stop.clone(),
+                usage: response.usage,
+            }),
+            content: answer.to_owned(),
+            input_tokens: response.usage.input,
+            model: response.model.clone(),
+            output_tokens: response.usage.output,
+            prompt_version: PROMPT_VERSION.to_owned(),
+        },
+        vec![shown],
+    )
+}
+
+/// Whether `node` is an answer `ask` wrote.
+fn is_answer(node: &Node) -> bool {
+    matches!(&node.detail, Detail::Output { prompt_version, .. } if prompt_version == PROMPT_VERSION)
+}
+
+/// A source node's address, by the node.
+fn source(node: &Node) -> Option<(Id, Option<String>)> {
+    match &node.detail {
+        Detail::Source { uri, .. } => Some((node.id, uri.clone())),
+        _ => None,
+    }
 }
 
 /// The question an answer's context was asked, where it records one.
