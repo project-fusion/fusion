@@ -78,6 +78,15 @@ pub trait Store: Send + Sync {
         since: Option<DateTime<Utc>>,
     ) -> Result<Vec<(Id, Node)>>;
 
+    /// The node `id`, with its parents, and the trace it is in. A node the
+    /// store does not hold is `None`. A reader that walks a derivation, such
+    /// as `why` from one answer, reads only the nodes it reaches.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn node(&self, id: Id) -> Result<Option<(Id, Node)>>;
+
     /// The page of traces `search` finds, best first, each with its best
     /// matching entries and how many matched, and how many traces matched in
     /// all. [`crate::search`] says what an entry is and how a query matches
@@ -245,6 +254,16 @@ impl Store for InMemory {
             .collect();
         found.sort_by_key(|(_, node)| node.id);
         Ok(found)
+    }
+
+    async fn node(&self, id: Id) -> Result<Option<(Id, Node)>> {
+        let traces = self.lock()?;
+        Ok(traces.iter().find_map(|(trace, nodes)| {
+            nodes
+                .iter()
+                .find(|node| node.id == id)
+                .map(|node| (*trace, node.clone()))
+        }))
     }
 
     async fn find(&self, search: &Search) -> Result<Page> {
@@ -683,6 +702,29 @@ mod sqlite {
             Ok(found)
         }
 
+        async fn node(&self, id: Id) -> Result<Option<(Id, Node)>> {
+            let Some(row) =
+                sqlx::query("SELECT trace, id, created_at, detail FROM nodes WHERE id = ?")
+                    .bind(id.to_string())
+                    .fetch_optional(&self.pool)
+                    .await
+                    .map_err(storage)?
+            else {
+                return Ok(None);
+            };
+            let edges = sqlx::query("SELECT parent FROM edges WHERE child = ? ORDER BY position")
+                .bind(id.to_string())
+                .fetch_all(&self.pool)
+                .await
+                .map_err(storage)?;
+            let parents = edges
+                .iter()
+                .map(|edge| parse(&edge.try_get::<String, _>("parent").map_err(storage)?))
+                .collect::<Result<Vec<Id>>>()?;
+            let trace: String = row.try_get("trace").map_err(storage)?;
+            Ok(Some((parse(&trace)?, node(&row, parents)?)))
+        }
+
         async fn find(&self, search: &Search) -> Result<Page> {
             crate::search::sqlite::find(&self.pool, search).await
         }
@@ -782,6 +824,7 @@ pub(crate) mod conformance {
         a_cascade_crosses_traces(store).await;
         forgetting_a_trace_removes_it_and_what_it_fed(store).await;
         nodes_of_a_kind_come_from_every_trace_from_a_time(store).await;
+        a_node_reads_alone_with_its_parents_and_trace(store).await;
         crate::search::conformance::run(store).await;
     }
 
@@ -827,6 +870,40 @@ pub(crate) mod conformance {
             "a node keeps its parents"
         );
         assert!(store.nodes_of(&[], None).await.unwrap().is_empty());
+    }
+
+    async fn a_node_reads_alone_with_its_parents_and_trace(store: &dyn Store) {
+        let first = Id::new();
+        let second = Id::new();
+        let root = task("one node");
+        let sibling = context(vec![root.id]);
+        let reader = context(vec![sibling.id, root.id]);
+        store.append(first, &root).await.unwrap();
+        store.append(first, &sibling).await.unwrap();
+        store.append(second, &reader).await.unwrap();
+
+        let (trace, read) = store.node(reader.id).await.unwrap().unwrap();
+        let (_, alone) = store.node(root.id).await.unwrap().unwrap();
+
+        assert_eq!(trace, second, "the trace it is in");
+        assert_eq!(read.id, reader.id);
+        assert_eq!(
+            read.derived_from,
+            vec![sibling.id, root.id],
+            "parents keep their order across traces"
+        );
+        assert_eq!(read.kind(), NodeKind::Context);
+        assert_eq!(
+            read.created_at.timestamp_micros(),
+            reader.created_at.timestamp_micros()
+        );
+        assert!(alone.derived_from.is_empty());
+        assert!(store.node(Id::new()).await.unwrap().is_none());
+
+        store.delete_cascade(sibling.id).await.unwrap();
+
+        assert!(store.node(reader.id).await.unwrap().is_none());
+        assert!(store.node(root.id).await.unwrap().is_some());
     }
 
     async fn a_trace_loads_as_it_was_appended(store: &dyn Store) {
