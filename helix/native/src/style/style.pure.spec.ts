@@ -284,6 +284,40 @@ describe('style', () => {
     expect(style(beside, 'tabs', { conditions: {}, tokens }).style.flexGrow).toBeUndefined()
   })
 
+  test("a 1fr track whose least is its content grows and keeps its content's width", () => {
+    const bar: Family = {
+      name: 'app-header',
+      rules: [
+        rule({
+          order: 0,
+          set: [
+            ['display', { text: 'grid' }],
+            [
+              'grid-template-columns',
+              { text: 'minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr)' },
+            ],
+          ],
+          specificity: [0, 1, 0],
+          target: 'host',
+        }),
+      ],
+      tag: 'helix-app-header',
+      tree: [
+        { kind: 'box', name: 'start' },
+        { kind: 'box', name: 'content' },
+        { kind: 'box', name: 'end' },
+      ],
+      version: '2.0',
+    }
+    for (const part of ['start', 'end']) {
+      expect(style(bar, part, { conditions: {}, tokens }).style).toMatchObject({
+        flexGrow: 1,
+        flexShrink: 0,
+      })
+    }
+    expect(style(bar, 'content', { conditions: {}, tokens }).style.flexGrow).toBeUndefined()
+  })
+
   test('an animation resolves to its keyframes, and reduced motion slows it', () => {
     const spinner: Family = {
       name: 'button',
