@@ -3,9 +3,9 @@
   // each compiled into `dist` under its own name.
   //
   // **The entry points alone, so the families stay out of `dist`.** Helix's
-  // own families import the helpers by path, and `helix family build` writes
-  // their compiled forms into `dist/ir` and `dist/web`, which `files` leaves
-  // out of the tarball.
+  // own families import the helpers by path, and `helix system build` writes
+  // their compiled forms into `build`, beside `dist`, so the tarball holds the
+  // helpers alone.
   "compilerOptions": {
     "rootDir": "src"
   },
