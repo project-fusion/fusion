@@ -1,4 +1,4 @@
-use super::render;
+use super::{render, Scope};
 use crate::family::ir::{family, Item, Value};
 use crate::family::read::default_export;
 
@@ -15,7 +15,7 @@ fn written_as(property: &str, value: &str) -> String {
     let Some(Item::Rule(rule)) = read.rules.first() else {
         panic!("a rule");
     };
-    render(&rule.set[0].1, "b")
+    render(&rule.set[0].1, Scope::of(&read))
 }
 
 #[test]
@@ -101,7 +101,16 @@ fn writes_a_keyword_a_quotation_mark_a_scheme_and_a_derived_value() {
 #[test]
 fn writes_a_length_in_characters_and_lines_as_it_is() {
     assert_eq!(written("'46ch'"), "46ch");
-    assert_eq!(render(&Value::Text("1lh".to_owned()), "b"), "1lh");
+    assert_eq!(
+        render(
+            &Value::Text("1lh".to_owned()),
+            Scope {
+                hooks: "b",
+                tokens: "helix"
+            }
+        ),
+        "1lh"
+    );
 }
 
 #[test]

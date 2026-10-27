@@ -3,7 +3,16 @@ use std::path::{Path, PathBuf};
 use fusion_helix_theme::tokens::{Registry, Written};
 use serde_json::{json, Value};
 
-use super::{design_tokens, entries, modules, registry, typed, Layer};
+use super::{design_tokens, entries, modules, registry, typed, Layer, System};
+
+/// Helix, as its project names it.
+fn system() -> System {
+    System {
+        name: "Helix".to_owned(),
+        names: crate::family::project::testing(),
+        vendor: "dev.fusion.helix".to_owned(),
+    }
+}
 
 fn styles() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../styles")
@@ -15,7 +24,8 @@ fn every_entry_of_tokens_ts_is_typed_and_written_in_each_mode() {
     let read = entries(&source).unwrap();
     let layer = registry(&styles()).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
     assert_eq!(layer.tokens().len(), read.len());
-    let written = modules(&layer).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
+    let written = modules(&layer, &system(), "/* A header. */\n")
+        .unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
     let names: Vec<&str> = written.iter().map(|(name, _)| name.as_str()).collect();
     assert_eq!(
         names,
@@ -120,6 +130,7 @@ fn small() -> Layer {
     Layer {
         base,
         densities: Vec::new(),
+        system: system(),
     }
 }
 
@@ -219,8 +230,8 @@ fn a_spring_and_a_length_in_ems_are_kept_in_their_group_extensions() {
 
 #[test]
 fn the_token_layer_is_written_with_its_modes_and_densities() {
-    let layer =
-        Layer::read(&styles()).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
+    let layer = Layer::read(&styles(), system())
+        .unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
     let (file, resolver) = written(&layer);
     assert_eq!(file["size"]["control"]["$value"], "{size.control-md}");
     assert_eq!(file["color"]["background"]["$value"]["hex"], "#ffffff");

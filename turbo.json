@@ -216,6 +216,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -243,6 +244,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -258,6 +260,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/styles/src/builders.ts",
         "$TURBO_ROOT$/helix/styles/src/tokens.ts",
@@ -325,6 +328,7 @@
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/src/family/tokens/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/theme/Cargo.toml",
         "$TURBO_ROOT$/helix/theme/rust/tokens/**"
       ],
@@ -342,6 +346,7 @@
         "$TURBO_ROOT$/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/src/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/visual.fingerprint.json"
@@ -370,6 +375,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/Cargo.lock"
       ],
@@ -396,6 +402,7 @@
         "$TURBO_ROOT$/helix/neutral/src/**",
         "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
         "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/helix.family.json",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
         "$TURBO_ROOT$/Cargo.lock"
       ],

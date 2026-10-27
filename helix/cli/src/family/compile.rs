@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 use fusion_rules::error::Failure;
 
 use crate::family::ir::{self, Family};
+use crate::family::project::{Names, Project};
 use crate::family::{api, css, read, resolve, shared, tokens, underlay};
 
 /// One element, read and compiled.
@@ -29,26 +30,27 @@ pub struct Compiled {
     pub over: Option<String>,
 }
 
-/// Every element under the package's `src/families`, in path order.
+/// Every element under the project's `src/families`, in path order.
 ///
 /// # Errors
 ///
 /// [`Failure`] when a source cannot be read or compiled, or a name it uses
 /// resolves to nothing.
-pub fn all(package: &Path) -> Result<Vec<Compiled>, Failure> {
+pub fn all(project: &Project) -> Result<Vec<Compiled>, Failure> {
+    let package = project.families.as_path();
     let families = package.join("src").join("families");
     fragments(package)?;
     let mut compiled = Vec::new();
     for family in folders(&families)? {
         for element in folders(&family)? {
-            compiled.push(one(&family, &element)?);
+            compiled.push(one(&family, &element, &project.names)?);
         }
     }
     underlay::lay(&mut compiled).map_err(|why| cannot_compile(&families, why))?;
     let every: Vec<&Family> = compiled.iter().map(|one| &one.family).collect();
     let mut unresolved = shared::collections(&every);
-    /* The theme's tokens are the styles package's beside this one. */
-    let theme = tokens::names(&package.parent().unwrap_or(package).join("styles"))?;
+    /* The token names come from the project's token source. */
+    let theme = tokens::project_names(project)?;
     unresolved.extend(shared::cross_family(&every, theme.as_ref()));
     for family in folders(&families)? {
         let elements: Vec<&Family> = compiled
@@ -125,7 +127,7 @@ fn folders(folder: &Path) -> Result<Vec<PathBuf>, Failure> {
     Ok(found)
 }
 
-fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
+fn one(family: &Path, folder: &Path, names: &Names) -> Result<Compiled, Failure> {
     let name = |path: &Path| {
         path.file_name()
             .map(|name| name.to_string_lossy().into_owned())
@@ -148,7 +150,7 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     })?;
     let family_name = name(family);
     let element = name(folder);
-    let compiled = Family::new(styled, headless, &family_name, &element);
+    let compiled = Family::named(styled, headless, &family_name, &element, names.clone());
     let unresolved = resolve::unresolved(&compiled);
     if !unresolved.is_empty() {
         return Err(cannot_compile(folder, unresolved.join("\n")));

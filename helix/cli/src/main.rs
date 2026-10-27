@@ -40,7 +40,7 @@ use crate::args::Family;
 use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
-const PRODUCT: &str = "helix";
+pub const PRODUCT: &str = "helix";
 
 /// The npm package this binary ships in, which is what tells it its version.
 const PACKAGE: &str = "@fusion.dev/helix-cli";
@@ -126,19 +126,23 @@ fn main() {
         Noun::Diagnostics(args) => diagnostics::run(args, &from, cli.json, paint),
         Noun::New(args) => new::run(args, &from, cli.json, paint),
         #[cfg(feature = "internal")]
-        Noun::Family { verb } => match verb {
-            Family::Anatomy(args) => family::anatomy(args, &from),
-            Family::Build(args) => family::build(args, &from, cli.json),
-            Family::Capabilities(args) => family::capabilities(args, &from, cli.json),
-            Family::Check(args) => family::check(args, &from, cli.json),
-            Family::Components(args) => family::components(args, &from, cli.json),
-            Family::DesignTokens(args) => family::design_tokens(args, &from, cli.json),
-            Family::Machines(args) => family::machines(args, &from, cli.json),
-            Family::Platforms(args) => family::platforms(args, &from),
-            Family::Stylesheets(args) => family::stylesheets(args, &from, cli.json),
-            Family::Tokens(args) => family::tokens(args, &from, cli.json),
-            Family::Types(args) => family::types(args, &from, cli.json),
-        },
+        Noun::Family { config, verb } => {
+            let config = config.as_deref();
+            match verb {
+                Family::Anatomy(args) => family::anatomy(args, config, &from),
+                Family::Build(args) => family::build(args, config, &from, cli.json),
+                Family::Capabilities(args) => family::capabilities(args, config, &from, cli.json),
+                Family::Check(args) => family::check(args, config, &from, cli.json),
+                Family::Components(args) => family::components(args, config, &from, cli.json),
+                Family::Config(args) => family::config(args, config, &from),
+                Family::DesignTokens(args) => family::design_tokens(args, config, &from, cli.json),
+                Family::Machines(args) => family::machines(args, config, &from, cli.json),
+                Family::Platforms(args) => family::platforms(args, config, &from),
+                Family::Stylesheets(args) => family::stylesheets(args, config, &from, cli.json),
+                Family::Tokens(args) => family::tokens(args, config, &from, cli.json),
+                Family::Types(args) => family::types(args, config, &from, cli.json),
+            }
+        }
         Noun::Scan(args) => scan::run(args, &from, cli.json, paint),
         Noun::Shared(args) => shared::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {

@@ -19,7 +19,7 @@ use std::fmt::Write as _;
 use crate::family::api::{exported, Attribute, Node};
 use crate::family::ir::{Condition, Family, Item, Rule};
 use selector::selector;
-use value::render;
+use value::{render, Scope};
 
 #[cfg(test)]
 pub use shipped::shipped;
@@ -39,7 +39,7 @@ pub fn emit(family: &Family) -> String {
             Item::Rule(rule) if rule.native_only => {}
             Item::Rule(rule) => {
                 let rule = through_part(rule, &drawn);
-                let written = written(&rule, &family.name, &tokens);
+                let written = written(&rule, Scope::of(family), &tokens);
                 match pieces.last_mut() {
                     Some(Piece::Rule(held))
                         if held.wrappers == written.wrappers && held.body == written.body =>
@@ -54,7 +54,8 @@ pub fn emit(family: &Family) -> String {
                 for (at, declarations) in &keyframes.frames {
                     let _ = writeln!(css, "  {at} {{");
                     for (property, value) in declarations {
-                        let _ = writeln!(css, "    {property}: {};", render(value, &family.name));
+                        let _ =
+                            writeln!(css, "    {property}: {};", render(value, Scope::of(family)));
                     }
                     css.push_str("  }\n");
                 }
@@ -136,7 +137,7 @@ impl Written {
     }
 }
 
-fn written(rule: &Rule, family: &str, tokens: &BTreeSet<String>) -> Written {
+fn written(rule: &Rule, scope: Scope<'_>, tokens: &BTreeSet<String>) -> Written {
     let mut wrappers: Vec<String> = Vec::new();
     if let Some(supports) = &rule.supports {
         wrappers.push(format!("@supports {supports}"));
@@ -166,10 +167,10 @@ fn written(rule: &Rule, family: &str, tokens: &BTreeSet<String>) -> Written {
     }
     let mut body = Vec::new();
     for (name, value) in &rule.values {
-        body.push(format!("--_{name}: {};", render(value, family)));
+        body.push(format!("--_{name}: {};", render(value, scope)));
     }
     for (property, value) in &rule.set {
-        body.push(format!("{property}: {};", render(value, family)));
+        body.push(format!("{property}: {};", render(value, scope)));
     }
     Written {
         body,

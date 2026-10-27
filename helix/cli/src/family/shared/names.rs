@@ -2,31 +2,31 @@
 //! that family declares: another family's hook read with `hookOf()`, another
 //! family's hook set as a quoted custom property, and a private value read
 //! with `inherited('_x')`, and a token, read with `token()` or set as a quoted
-//! `--helix-*` custom property. A typo in any of these is a custom property
-//! that resolves to nothing, which no other check sees.
+//! custom property under the design system's token prefix. A typo in any of
+//! these is a custom property that resolves to nothing, which no other check
+//! sees.
 
 use std::collections::{BTreeMap, BTreeSet};
 
 use crate::family::ir::{Family, Value};
+use crate::family::project::Names;
 use crate::family::resolve::rules;
 
-/// The private values the theme sets on the page, which a family may read
-/// with `inherited()`: the mode the page draws in, and the one opposite it.
-const THEME: &[&str] = &["helix-mode", "helix-mode-inverted"];
-
 /// What every family declares: each prefix's hooks, the private values any
-/// rule sets, and the lengths a script measures, with the theme's tokens.
+/// rule sets, and the lengths a script measures, with the theme's tokens and
+/// the names the design system gives them.
 #[derive(Default)]
 struct Declared<'a> {
     hooks: BTreeMap<&'a str, BTreeSet<&'a str>>,
     own: BTreeSet<&'a str>,
     measured: BTreeSet<&'a str>,
+    names: Option<&'a Names>,
     tokens: Option<&'a BTreeSet<String>>,
 }
 
 /// One sentence for each name a rule uses that the family it names does
 /// not declare, and each token that `tokens`, the theme's token names
-/// without `--helix-`, does not hold. Tokens go unchecked without a list.
+/// without their prefix, does not hold. Tokens go unchecked without a list.
 pub fn cross_family<'a>(
     families: &[&'a Family],
     tokens: Option<&'a BTreeSet<String>>,
@@ -58,7 +58,10 @@ pub fn cross_family<'a>(
 /// Every family's hooks, by its prefix, and every private value and
 /// measured length any rule names.
 fn declared<'a>(families: &[&'a Family]) -> Declared<'a> {
-    let mut declared = Declared::default();
+    let mut declared = Declared {
+        names: families.first().map(|family| &family.names),
+        ..Declared::default()
+    };
     for family in families {
         let hooks = declared.hooks.entry(family.name.as_str()).or_default();
         for rule in rules(family) {
@@ -83,11 +86,11 @@ fn declared<'a>(families: &[&'a Family]) -> Declared<'a> {
 
 impl Declared<'_> {
     /// Why a quoted custom property a rule sets names nothing: another
-    /// family's hook it does not read, or a token, `--helix-*`, the theme
-    /// does not hold. A measured length is the script's.
+    /// family's hook it does not read, or a token, under the token prefix,
+    /// the theme does not hold. A measured length is the script's.
     fn custom_property(&self, property: &str) -> Option<String> {
         let name = property.strip_prefix("--")?;
-        if let Some(token) = name.strip_prefix("helix-") {
+        if let Some(token) = self.names.and_then(|names| names.token_of(property)) {
             return self
                 .no_token(token)
                 .then(|| format!("sets `{property}`, which is no token in the theme"));
@@ -139,8 +142,12 @@ impl Declared<'_> {
             },
             Value::Inherited { name, .. } => {
                 let own = name.strip_prefix('_')?;
-                /* The theme's own, as the mode opposite the page's. */
-                if THEME.contains(&own) {
+                /* The theme's own, as the mode opposite the page's, which
+                the project's `theme` names. */
+                if self
+                    .names
+                    .is_some_and(|names| names.theme.iter().any(|one| one == own))
+                {
                     return None;
                 }
                 (!self.own.contains(own)).then(|| {
