@@ -48,7 +48,7 @@ fn locate(selector: &str) -> Option<Place> {
         .flat_map(|word| split(word, '+'))
         .rfind(|word| !word.trim().is_empty())?
         .trim();
-    let inner = ["::before", "::after", "::backdrop"]
+    let inner = ["::before", "::after", "::backdrop", "::placeholder"]
         .into_iter()
         .find(|pseudo| last.contains(pseudo))
         .map(str::to_owned);

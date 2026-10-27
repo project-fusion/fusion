@@ -19,6 +19,10 @@
 //! - An element that turns on and off runs toggle, bound to the pressable
 //!   that `toggles`, the props that hold, seed, mix and fix its state, the
 //!   prop behind that pressable's `disabled`, and the events a turn sends.
+//! - An element a reader types into runs entry, bound to the field its text
+//!   is typed in, the press that clears it where one does, the props that
+//!   hold, seed and fix its text, the prop behind the field's `disabled`, and
+//!   the events an edit sends.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -66,7 +70,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use ts_rs::TS;
 
-use crate::family::api::{Api, Attribute, Binding, Collection, Node, NodeKind, Toggle};
+use crate::family::api::{Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle};
 
 #[path = "machines_controls.rs"]
 mod controls;
@@ -162,6 +166,9 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(toggle) = &api.toggle {
         uses.push(toggled(toggle, tree));
+    }
+    if let Some(entry) = &api.entry {
+        uses.push(entered(entry, tree));
     }
     if let Some(collection) = &api.collection {
         uses.extend(if collection.mixes {
@@ -299,6 +306,55 @@ fn toggled(toggle: &Toggle, tree: &[Node]) -> MachineUse {
     MachineUse {
         bind,
         machine: "toggle".to_owned(),
+    }
+}
+
+/// The entry, bound to the field its text is typed in, the press that
+/// clears it, and the prop behind the field's `disabled`. **No machine of
+/// core's holds it**: the web's element hears its `<input>`, and the native
+/// runtime hosts it as `entry` over its `TextInput`.
+fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
+    let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(entry.value.clone()))]);
+    for (name, value) in [
+        ("offers", &entry.offers),
+        ("readonly", &entry.readonly),
+        ("seed", &entry.initial),
+    ] {
+        if let Some(prop) = value {
+            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    for (name, value) in [("blank", &entry.blank), ("shows", &entry.shows)] {
+        if let Some(state) = value {
+            bind.insert(name.to_owned(), Bound::State(state.clone()));
+        }
+    }
+    for (name, value) in [
+        ("before", &entry.before),
+        ("change", &entry.change),
+        ("clear", &entry.clear),
+        ("input", &entry.input),
+    ] {
+        if let Some(event) = value {
+            bind.insert(name.to_owned(), Bound::Event(event.clone()));
+        }
+    }
+    if let Some(field) = nodes(tree).find(|node| node.kind == NodeKind::Field) {
+        bind.insert("part".to_owned(), Bound::Part(field.name.clone()));
+        if let Some(Attribute::Bound(Binding::Bind(prop))) = field.attributes.get("disabled") {
+            bind.insert("disabled".to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    let clears = nodes(tree).find(|node| {
+        node.kind == NodeKind::Pressable
+            && matches!(node.attributes.get("clears"), Some(Attribute::Flag(true)))
+    });
+    if let Some(clears) = clears {
+        bind.insert("clears".to_owned(), Bound::Part(clears.name.clone()));
+    }
+    MachineUse {
+        bind,
+        machine: "entry".to_owned(),
     }
 }
 
