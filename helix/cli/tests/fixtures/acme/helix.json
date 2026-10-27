@@ -2,6 +2,7 @@
   "system": {
     "events": "src/events",
     "families": ".",
+    "inherited": ["acme-mode"],
     "manifest": "custom-elements.json",
     "name": "Acme",
     "outputs": {
@@ -12,7 +13,6 @@
     },
     "prefix": "acme",
     "runtime": { "native": "@fusion.dev/helix-native" },
-    "theme": ["acme-mode"],
     "tokens": {
       "dtcg": "tokens/acme.tokens.json",
       "modes": { "dark": "tokens/acme.dark.tokens.json" }

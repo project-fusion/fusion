@@ -55,7 +55,7 @@ file.
 | `tokens.modes` | A file for each mode that sets some tokens to another value, such as `{ "dark": "tokens/dark.tokens.json" }` |
 | `tokens.styles` | A styles package laid out as Helix's, in place of `tokens.dtcg` |
 | `tokens.vendor` | The key `design-tokens` writes your own data under in each `$extensions`, with `tokens.styles` |
-| `theme` | The private values your page sets that a family may read with `inherited()`, each without its leading `_` |
+| `inherited` | The private values your page sets that a family may read with `inherited()`, each without its leading `_` |
 | `manifest` | Your web elements' custom elements manifest |
 | `events` | The folder of your web event classes |
 | `outputs.build` | Where `build` writes `ir/` and `web/`. The families package's `build` when you leave it out, beside the `dist` a package publishes |
@@ -81,6 +81,7 @@ Acme's `helix.json` draws with Helix's runtime:
   "system": {
     "events": "src/events",
     "families": ".",
+    "inherited": ["acme-mode"],
     "manifest": "custom-elements.json",
     "name": "Acme",
     "outputs": {
@@ -91,7 +92,6 @@ Acme's `helix.json` draws with Helix's runtime:
     },
     "prefix": "acme",
     "runtime": { "native": "@fusion.dev/helix-native" },
-    "theme": ["acme-mode"],
     "tokens": {
       "dtcg": "tokens/acme.tokens.json",
       "modes": { "dark": "tokens/acme.dark.tokens.json" }
@@ -108,6 +108,7 @@ the packages of its runtime:
 {
   "events": "helix/core/src/events",
   "families": "helix/neutral",
+  "inherited": ["helix-mode", "helix-mode-inverted"],
   "manifest": "helix/styled/custom-elements.json",
   "name": "Helix",
   "outputs": {
@@ -124,7 +125,6 @@ the packages of its runtime:
     "native": "@fusion.dev/helix-native",
     "sources": { "core": "helix/core", "native": "helix/native" }
   },
-  "theme": ["helix-mode", "helix-mode-inverted"],
   "tokens": { "styles": "helix/styles", "vendor": "dev.fusion.helix" }
 }
 ```
