@@ -146,6 +146,7 @@
     "system": {
       "events": "helix/core/src/events",
       "families": "helix/neutral",
+      "inherited": ["helix-mode", "helix-mode-inverted"],
       "manifest": "helix/styled/custom-elements.json",
       "name": "Helix",
       "outputs": {
@@ -162,7 +163,6 @@
         "native": "@fusion.dev/helix-native",
         "sources": { "core": "helix/core", "native": "helix/native" }
       },
-      "theme": ["helix-mode", "helix-mode-inverted"],
       "tokens": { "styles": "helix/styles", "vendor": "dev.fusion.helix" }
     }
   },

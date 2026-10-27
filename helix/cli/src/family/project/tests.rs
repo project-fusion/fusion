@@ -9,7 +9,7 @@ pub fn testing() -> Names {
         event: "helix".to_owned(),
         property: "helix".to_owned(),
         tag: "helix".to_owned(),
-        theme: vec!["helix-mode".to_owned(), "helix-mode-inverted".to_owned()],
+        inherited: vec!["helix-mode".to_owned(), "helix-mode-inverted".to_owned()],
     }
 }
 
@@ -67,6 +67,22 @@ fn a_key_the_file_does_not_know_is_refused_by_its_name() {
     )
     .unwrap_err();
     assert!(refused.contains("prefixes"), "{refused}");
+}
+
+#[test]
+fn inherited_names_the_private_values_a_family_may_read() {
+    let read = project(
+        "inherited",
+        r#"{ "name": "Acme", "prefix": "acme", "families": ".", "inherited": ["acme-mode"] }"#,
+    )
+    .unwrap();
+    assert_eq!(read.names.inherited, ["acme-mode"]);
+    let refused = project(
+        "inherited-theme",
+        r#"{ "name": "Acme", "prefix": "acme", "families": ".", "theme": ["acme-mode"] }"#,
+    )
+    .unwrap_err();
+    assert!(refused.contains("theme"), "{refused}");
 }
 
 #[test]
@@ -144,6 +160,7 @@ fn the_schema_names_every_key() {
         "eventPrefix",
         "propertyPrefix",
         "families",
+        "inherited",
         "tokens",
         "outputs",
         "runtime",

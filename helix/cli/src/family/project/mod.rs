@@ -71,7 +71,7 @@ pub struct Config {
     /// `inherited()`, such as the mode the page draws in. Each is written
     /// without its leading `_`.
     #[serde(default)]
-    pub theme: Vec<String>,
+    pub inherited: Vec<String>,
     /// The custom elements manifest of the styled elements, which `check`
     /// holds each element's API to and `components` describes each prop from.
     #[serde(default)]
@@ -182,7 +182,7 @@ pub struct Names {
     /// The prefix of every token's custom property.
     pub property: String,
     /// The private values the page sets, which a family may read.
-    pub theme: Vec<String>,
+    pub inherited: Vec<String>,
 }
 
 impl Names {
@@ -410,7 +410,7 @@ impl Project {
                     .property_prefix
                     .unwrap_or_else(|| config.prefix.clone()),
                 tag: config.prefix,
-                theme: config.theme,
+                inherited: config.inherited,
             },
             name: config.name,
             families,
