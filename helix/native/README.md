@@ -9,7 +9,7 @@ The components ship from
 depends on this package. Accordion, Announcement, App Header, Avatar, Avatar Group, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox,
 Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
-Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Kbd,
+Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Outline, Popover,
 Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Speed Dial, Stat,
@@ -1565,6 +1565,46 @@ const save = () => {
 
 A checkbox draws its tick and its dash with `react-native-svg`, at the weight
 the web draws them, so an app that draws a checkbox installs it.
+
+## Text fields
+
+Input draws its text in React Native's `TextInput`, inside the same frame the
+web draws. Each attribute takes the web's word, and a phone maps it:
+
+| Attribute | On a phone |
+|---|---|
+| `type` | `email`, `url`, `tel`, `number`, and `search` pick the keyboard, and `password` hides what is typed. `email`, `url`, and `password` turn off capitals and corrections. |
+| `inputmode` | The keyboard, as `inputMode`, over what the type picks. |
+| `enterkeyhint` | The Enter key, as `enterKeyHint`. |
+| `autocomplete` | The platform's autofill, as `autoComplete`, which iOS maps to its text content types. |
+| `autocapitalize`, `autocorrect` | Capitals and corrections, as on the web. |
+| `maxlength` | The most characters a reader can type. |
+
+**Each edit asks first.** `onBeforeChange` carries the text an edit would
+leave in `event.detail.value`, and refusing it puts the text back. `onInput`
+follows each edit that stands, and `onChange` follows once focus leaves a
+field whose text changed. A `value` your app writes takes the field there with
+nothing sent, and the reader types on from it. The clear button, under
+`clearable`, empties the field, sends `onInput`, `onChange`, and `onClear`,
+and gives the field the keyboard.
+
+**A phone checks the text as the web does**: `required`, `minlength`,
+`maxlength`, `pattern`, and an `email` or a `url` type, once a change has
+given the reader a go. The web says the browser's sentences, and a phone says
+Helix's, such as "Use at least 8 characters." The password reveal button and
+dictation are the web's alone for now.
+
+```tsx
+import { HelixInput } from '@fusion.dev/helix/input'
+
+<HelixInput
+  autocomplete="email"
+  label="Email"
+  onChange={(event) => save(event.target.value)}
+  required
+  type="email"
+/>
+```
 
 ## Links
 

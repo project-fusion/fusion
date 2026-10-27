@@ -3,12 +3,8 @@ import { HelixHeadlessInput } from '@fusion.dev/helix-headless/input'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldGhostStyles } from '../../shared/field/field-ghost.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './input-root.css.js'
+import { styles } from './input-root.generated.css.js'
 import '../../voice-level/index.js'
 
 /**
@@ -65,15 +61,7 @@ export class HelixInput extends HelixHeadlessInput {
   /** The tier its dictation button draws Voice Level from. */
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    glyphStyles,
-    fieldStyles,
-    fieldFrameStyles,
-    fieldGhostStyles,
-    fieldStackedStyles,
-    styles,
-    dictationStyles,
-  ]
+  static override styles: CSSResultGroup = [glyphStyles, styles, dictationStyles]
 }
 
 declare global {
