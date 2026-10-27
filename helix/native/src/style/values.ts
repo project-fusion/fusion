@@ -71,7 +71,7 @@ type Derivation = (props: Readonly<Record<string, unknown>>) => boolean | string
  * something holds, or `undefined` where core has no derivation by that name
  * or the props ask for none.
  *
- * **`helix family` refuses a name core does not export**, so a missing one
+ * **`helix system` refuses a name core does not export**, so a missing one
  * means this runtime and the form came from different versions of core.
  */
 export const compute = (

@@ -27,7 +27,7 @@ import { derive } from '../../../tree.js'
  * draws the glyph of that name with the app's `Glyph`, and an icon passed
  * into `icon` replaces it on both.
  *
- * **Held to Motion Toggle's web element.** `helix family check` compares these
+ * **Held to Motion Toggle's web element.** `helix system check` compares these
  * props, the events, the states, the regions, and the parts with what the
  * manifest says `helix-motion-toggle` has. The two glyphs are a phone's alone.
  */

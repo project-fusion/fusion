@@ -17,7 +17,7 @@ import { Announce, headless, number, Slot, Text, View } from '../../../render.js
  * that is no heading in the heading part reads the element's kind, which is
  * the web's.
  *
- * **Held to `helix-empty`.** `helix family check` compares the props, the
+ * **Held to `helix-empty`.** `helix system check` compares the props, the
  * states, the regions, and the parts with what the manifest says the element
  * has.
  */

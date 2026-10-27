@@ -22,7 +22,7 @@ import { headless, oneOf, Slot, View } from '../../../render.js'
  * `nested`: the outer toolbar's keys walk its controls, and it takes none of
  * its own. It draws in its own direction all the same.
  *
- * **Held to `helix-toolbar`.** `helix family check` compares the props, the
+ * **Held to `helix-toolbar`.** `helix system check` compares the props, the
  * states, the region, and the part with what the manifest says the element
  * has.
  */

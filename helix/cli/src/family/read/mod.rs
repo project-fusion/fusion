@@ -179,6 +179,13 @@ fn module_scope<'a>(program: &'a Program<'a>, source: &str) -> Scope<'a> {
 
 /// A machine's module, read.
 #[derive(Debug)]
+#[cfg_attr(
+    not(feature = "internal"),
+    allow(
+        dead_code,
+        reason = "`machines` is a verb of this repository's builds alone"
+    )
+)]
 pub struct MachineModule {
     /// The machine, with every constant it names read in place.
     pub chart: Lit,
@@ -196,6 +203,13 @@ pub struct MachineModule {
 ///
 /// A sentence naming the line, when the module does not parse, exports no
 /// machine or more than one, or the machine holds anything it may not.
+#[cfg_attr(
+    not(feature = "internal"),
+    allow(
+        dead_code,
+        reason = "`machines` is a verb of this repository's builds alone"
+    )
+)]
 pub fn machine_module(source: &str) -> Result<MachineModule, String> {
     let allocator = Allocator::default();
     let parsed = Parser::new(&allocator, source, SourceType::ts()).parse();

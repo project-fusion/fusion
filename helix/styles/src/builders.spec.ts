@@ -2,7 +2,7 @@
  * The CSS each builder returns.
  *
  * **The same table as `helix/theme/rust/tokens/builder/tests.rs`.** The
- * registry prints each typed value as CSS too, and `helix family
+ * registry prints each typed value as CSS too, and `helix system
  * design-tokens` refuses a token whose two spellings differ, so the cases
  * here are the ones a token in `tokens.ts` does not reach yet: a nested sum,
  * a second-weighted mix, and a quoted family.

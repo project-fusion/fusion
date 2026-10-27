@@ -9,7 +9,7 @@ import { derive } from '../../../tree.js'
  * Its actions are the dial's own: the arrow keys walk them with the rest,
  * and choosing one closes the dial.
  *
- * **Held to `helix-speed-dial-group`.** `helix family check` compares the
+ * **Held to `helix-speed-dial-group`.** `helix system check` compares the
  * props, the regions, and the parts with what the manifest says the element
  * has.
  */

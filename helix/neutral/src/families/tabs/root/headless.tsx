@@ -12,7 +12,7 @@ import { cancelable, headless, oneOf, Pressable, Slot, string, View } from '../.
  * tab's box, which sets `indicator-x`, `indicator-y`, and its size, and
  * `data-placed` once it has been placed.
  *
- * **Held to `helix-tabs`.** `helix family check` compares the props, events,
+ * **Held to `helix-tabs`.** `helix system check` compares the props, events,
  * states, regions, and parts with what the manifest says the element has.
  */
 export default headless('tabs', {

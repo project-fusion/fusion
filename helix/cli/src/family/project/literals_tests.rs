@@ -1,7 +1,7 @@
 //! **The compiler names no design system.** Every string in its source that
 //! names Helix is refused, outside the defaults and the specs, so a name a
-//! design system changes is a key of its `helix.family.json` and no literal
-//! the compiler holds.
+//! design system changes is a key of the `system` of its `helix.json` and no
+//! literal the compiler holds.
 //!
 //! The command's own name is the binary's, `PRODUCT` in `main.rs`, outside
 //! the compiler's folder. A comment is no literal and may name Helix.
@@ -264,7 +264,7 @@ fn no_literal_in_the_compiler_names_helix() {
     }
     assert!(
         named.is_empty(),
-        "move each name into the project's `helix.family.json`, with its default in `project/defaults.rs`:\n{}",
+        "move each name into the `system` of the design system's `helix.json`, with its default in `project/defaults.rs`:\n{}",
         named.join("\n")
     );
 }

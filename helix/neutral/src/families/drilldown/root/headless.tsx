@@ -30,7 +30,7 @@ import { bind, derive } from '../../../tree.js'
  * `loading-text`, and with no rows it says `empty-text`, each told to a
  * screen reader too.
  *
- * **Held to `helix-drilldown`.** `helix family check` compares the props,
+ * **Held to `helix-drilldown`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the
  * manifest says the element has.
  */

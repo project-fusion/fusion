@@ -23,7 +23,7 @@ import { derive } from '../../../tree.js'
  *
  * **What a `linear` sequence writes is the web's**: `locked` and `invalid`.
  *
- * **Held to `helix-step`.** `helix family check` compares the props, the
+ * **Held to `helix-step`.** `helix system check` compares the props, the
  * event, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

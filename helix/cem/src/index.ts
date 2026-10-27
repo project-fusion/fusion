@@ -32,7 +32,7 @@ export interface HelixCemOptions {
   /**
    * The package holding the platform-neutral sources of the families this
    * package also draws on React Native, relative to this one, such as
-   * `../neutral`. `analyze` asks `helix family platforms` there what each
+   * `../neutral`. `analyze` asks `helix system platforms` there what each
    * element is called on a phone, and `api.json` says so. Absent, every
    * family is the web's alone.
    */
@@ -355,7 +355,7 @@ export const peersOf = (cwd: string): Map<string, string> => {
 const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/helix-cli/bin.mjs')
 
 /**
- * What each element is called on React Native, from `helix family platforms`
+ * What each element is called on React Native, from `helix system platforms`
  * over the neutral sources at `native`, which reads the manifest `analyze`
  * has just written. Empty where the package draws nothing natively.
  */
@@ -363,20 +363,20 @@ const nativeOf = (native: string | undefined, cwd: string): NativeRecord => {
   if (native === undefined) {
     return {}
   }
-  const named = spawnSync(process.execPath, [helix(), 'family', 'platforms', native], {
+  const named = spawnSync(process.execPath, [helix(), 'system', 'platforms', native], {
     cwd,
     encoding: 'utf8',
     maxBuffer: 1024 * 1024 * 16,
     stdio: ['ignore', 'pipe', 'inherit'],
   })
   if (named.status !== 0) {
-    throw new Error(`helix family platforms exited ${named.status} in ${cwd}`)
+    throw new Error(`helix system platforms exited ${named.status} in ${cwd}`)
   }
   return JSON.parse(named.stdout) as NativeRecord
 }
 
 /**
- * What each element is made of on each platform, from `helix family anatomy`
+ * What each element is made of on each platform, from `helix system anatomy`
  * over the neutral sources at `native`, by tag. Empty where the package draws
  * nothing from them.
  */
@@ -384,14 +384,14 @@ const anatomyOf = (native: string | undefined, cwd: string): Record<string, Anat
   if (native === undefined) {
     return {}
   }
-  const read = spawnSync(process.execPath, [helix(), 'family', 'anatomy', native], {
+  const read = spawnSync(process.execPath, [helix(), 'system', 'anatomy', native], {
     cwd,
     encoding: 'utf8',
     maxBuffer: 1024 * 1024 * 16,
     stdio: ['ignore', 'pipe', 'inherit'],
   })
   if (read.status !== 0) {
-    throw new Error(`helix family anatomy exited ${read.status} in ${cwd}`)
+    throw new Error(`helix system anatomy exited ${read.status} in ${cwd}`)
   }
   return JSON.parse(read.stdout) as Record<string, Anatomy>
 }

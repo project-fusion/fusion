@@ -39,7 +39,7 @@ import { derive } from '../../../tree.js'
  * `resume()`; and the swipe's travel written as `--toast-swipe-x` and
  * `--toast-swipe-y`.
  *
- * **Held to `helix-toast-item`.** `helix family check` compares the props,
+ * **Held to `helix-toast-item`.** `helix system check` compares the props,
  * the event, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

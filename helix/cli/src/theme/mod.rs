@@ -30,16 +30,15 @@ pub fn load(
     config: Option<&Path>,
     from: &Path,
 ) -> Outcome<(Vec<Theme>, String)> {
-    let path = config::locate(intent, config, from)?;
-    let intent = config::read(&path)?;
+    let (intent, source) = config::theme(intent, config, from)?;
     let themes = modes(&intent).map_err(|failure| {
         Failure::new(
             Code::Input,
-            format!("cannot derive {}", path.display()),
+            format!("cannot derive {source}"),
             failure.to_string(),
         )
     })?;
-    Ok((themes, path.display().to_string()))
+    Ok((themes, source))
 }
 
 /// The theme in each mode it is written for: **both, unless the intent names

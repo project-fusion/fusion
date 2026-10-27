@@ -3,7 +3,7 @@
  * table's own syntax, `styles()`, and the hook and private-value helpers it
  * gives the rules function.
  *
- * **`helix family` reads a table as syntax and never runs it.** Each helper
+ * **`helix system` reads a table as syntax and never runs it.** Each helper
  * returns a tagged value so a table type-checks in an editor, and the compiler
  * recognizes the call by its name. A table holds literals, arrays, objects, and
  * calls to these helpers, and the compiler refuses anything it would have to
@@ -171,7 +171,7 @@ export type Declaration = readonly [property: string, value: Value]
  *
  * The name is one of the derivations in `@fusion.dev/helix-core/derivations`.
  * The web element writes the value, and a native view calls the derivation
- * with the element's props. `helix family` refuses a name with no derivation.
+ * with the element's props. `helix system` refuses a name with no derivation.
  */
 export const derive = (name: string, fallback?: Value): Read =>
   fallback === undefined ? { derived: name } : { derived: name, fallback }
@@ -216,7 +216,7 @@ export const measured = (name: string, fallback?: Value): Read =>
  * property unset, so text takes it from the text around it.
  *
  * It is a whole value, such as `['font', inherit()]`, or the fallback of a
- * hook, such as `hook.fontFamily(inherit())`. `helix family` refuses it
+ * hook, such as `hook.fontFamily(inherit())`. `helix system` refuses it
  * inside arithmetic, a function, or a value of several words.
  */
 export const inherit = (): Tagged => ({ keyword: 'inherit' })
@@ -246,7 +246,7 @@ export const product = (first: Value, second: Value): Tagged => ({
 })
 
 /**
- * `a / b`, where `b` is a number. `helix family` refuses a length or a zero
+ * `a / b`, where `b` is a number. `helix system` refuses a length or a zero
  * written as the divisor.
  */
 export const quotient = (dividend: Value, divisor: Value): Tagged => ({
@@ -261,7 +261,7 @@ export const quotient = (dividend: Value, divisor: Value): Tagged => ({
  *
  * A native view draws the marks of the reader's locale: “ and ” in English,
  * „ and “ in German. A quotation inside another takes the inner pair. The
- * `no-` marks draw nothing. `helix family` refuses a mark in any property
+ * `no-` marks draw nothing. `helix system` refuses a mark in any property
  * other than `content`.
  */
 export const quote = (mark: QuoteMark, alt?: Value): Tagged =>

@@ -12,7 +12,7 @@ import { headless, Slot } from '../../../render.js'
  * `label` is the words its link says, and `level` its heading's level,
  * from 1, as `data-level` says it on a link of yours.
  *
- * **Held to `helix-outline-section`.** `helix family check` compares the
+ * **Held to `helix-outline-section`.** `helix system check` compares the
  * props, the states, and the region with what the manifest says the element
  * has.
  */

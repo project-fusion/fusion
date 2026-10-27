@@ -40,7 +40,7 @@ import { bind, derive } from '../../../tree.js'
  * panel a row's page flies out in under the menu's `submenus="flyout"`,
  * which a phone drills into in place.
  *
- * **Held to `helix-menu-item`.** `helix family check` compares the props,
+ * **Held to `helix-menu-item`.** `helix system check` compares the props,
  * the events, the regions, and the parts with what the manifest says the
  * element has.
  */

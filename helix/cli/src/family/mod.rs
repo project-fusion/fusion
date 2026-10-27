@@ -1,18 +1,29 @@
-//! `helix family`: compiles each family's platform-neutral source.
+//! `helix system`: compiles each family of a design system from its
+//! platform-neutral source.
 //!
-//! **Named for the unit it compiles.** `source` was the first name, and it is
-//! a shell builtin: tooling that vets a command line read `helix source check`
-//! as a request to run a file.
+//! **The command is named for what it builds, and this folder for the unit it
+//! compiles.** `source` was the command's first name, and it is a shell
+//! builtin: tooling that vets a command line read `helix source check` as a
+//! request to run a file. `family` was its second, and a family is one
+//! component and its parts, where the command builds a whole design system.
 //!
 //! **Each folder under the package's `src/families/<family>/<element>` is one
 //! element**: `headless.tsx` holds its API and part tree, written as JSX, and
 //! `styled.ts` its own props, its style table, and the stylesheet the web
 //! build reads it as.
 //!
-//! **A design system's own names come from its `helix.family.json`**, which
-//! [`project`] reads: its prefixes, its token source, where its families are,
-//! and where each output is written. Helix's is at the repository root, and
-//! the compiler names no design system of its own.
+//! **A design system's own names come from the `system` of its
+//! `helix.json`**, which [`project`] reads: its prefixes, its token source,
+//! where its families are, and where each output is written. Helix's is the
+//! `helix` key of `fusion.json` at the repository root, and the compiler names
+//! no design system of its own.
+//!
+//! **The verbs that write into Helix's own runtime are this repository's
+//! alone**: `machines`, `capabilities`, and `types` write into the runtime's
+//! sources, and `design-tokens` writes the token file of a styles package laid
+//! out as Helix's. A published build leaves them out, as it leaves out
+//! `manifest build`; a design system that draws with Helix's runtime installs
+//! what they write.
 //!
 //! **Every element's web stylesheet is generated.** `stylesheets` writes it
 //! into the styled package, which runs it before compiling its sheets, and the
@@ -25,14 +36,16 @@
 #![forbid(clippy::too_many_lines)]
 
 mod api;
+#[cfg(feature = "internal")]
 mod capability;
 mod compile;
 mod components;
 mod css;
 mod ir;
+#[cfg(feature = "internal")]
 mod machine;
 mod output;
-mod project;
+pub mod project;
 mod read;
 mod resolve;
 mod shared;
@@ -47,21 +60,22 @@ use std::path::{Path, PathBuf};
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 
-use crate::args::{
-    FamilyArgs, FamilyBuild, FamilyCapabilities, FamilyComponents, FamilyConfig, FamilyMachines,
-    FamilyStylesheets, FamilyTypes,
-};
+use crate::args::{SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemStylesheets};
+#[cfg(feature = "internal")]
+use crate::args::{SystemCapabilities, SystemMachines, SystemTypes};
 use crate::family::compile::Compiled;
 use crate::family::project::Project;
 use crate::PRODUCT;
 pub use components::anatomy::print as anatomy;
 pub use components::print as platforms;
 
-pub use tokens::{design_files as design_tokens, native_modules as tokens};
+#[cfg(feature = "internal")]
+pub use tokens::design_files as design_tokens;
+pub use tokens::native_modules as tokens;
 
-/// `helix family <verb>`, as an output names the command that writes it.
+/// `helix system <verb>`, as an output names the command that writes it.
 fn command(verb: &str) -> String {
-    format!("{PRODUCT} family {verb}")
+    format!("{PRODUCT} system {verb}")
 }
 
 /// The project `config` or the working directory names, with its families
@@ -87,7 +101,7 @@ fn open(config: Option<&Path>, package: Option<&PathBuf>, from: &Path) -> Result
 /// [`Failure`] when a source cannot be read or compiled, or an output cannot
 /// be written.
 pub fn build(
-    args: &FamilyBuild,
+    args: &SystemBuild,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -95,7 +109,7 @@ pub fn build(
     let project = open(config, args.package.as_ref(), from)?;
     let compiled = compile::all(&project)?;
     let out = match &args.package {
-        Some(_) => project.families.join("dist"),
+        Some(_) => project.families.join(project::BUILD),
         None => project.outputs.build.clone(),
     };
     /* The schema every element's form is held to, published beside them. */
@@ -140,7 +154,7 @@ pub fn build(
 /// [`Failure`] when a source cannot be read or compiled, or the manifest
 /// cannot be read.
 pub fn check(
-    args: &FamilyArgs,
+    args: &SystemArgs,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -185,7 +199,7 @@ pub fn check(
 /// [`Failure`] when a source cannot be compiled, or a stylesheet cannot be
 /// written or read.
 pub fn stylesheets(
-    args: &FamilyStylesheets,
+    args: &SystemStylesheets,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -205,6 +219,7 @@ pub fn stylesheets(
     output::settle(&outputs, args.check, &command("stylesheets"), json)
 }
 
+#[cfg(feature = "internal")]
 /// The runtime package a runtime command reads or writes: the one the
 /// command line gives, or the one the project's `runtime.sources` names
 /// under `key`.
@@ -232,6 +247,7 @@ fn runtime_package(
         .to_path_buf())
 }
 
+#[cfg(feature = "internal")]
 /// Compiles each machine under the package's `src/machines` to the module
 /// beside it, or with `--check` says which written ones are behind.
 ///
@@ -240,7 +256,7 @@ fn runtime_package(
 /// [`Failure`] when a machine cannot be read or breaks a rule a machine
 /// keeps, or a module cannot be written or read.
 pub fn machines(
-    args: &FamilyMachines,
+    args: &SystemMachines,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -323,6 +339,7 @@ pub fn machines(
     }
 }
 
+#[cfg(feature = "internal")]
 /// Writes each capability's contract, and the types they share, under the
 /// package's `src/capabilities`, or with `--check` says which are behind.
 ///
@@ -330,7 +347,7 @@ pub fn machines(
 ///
 /// [`Failure`] when a contract cannot be written or read.
 pub fn capabilities(
-    args: &FamilyCapabilities,
+    args: &SystemCapabilities,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -358,7 +375,7 @@ pub fn capabilities(
 /// [`Failure`] when a source cannot be compiled, the styled manifest or the
 /// event classes cannot be read, or an event's detail cannot be typed.
 pub fn components(
-    args: &FamilyComponents,
+    args: &SystemComponents,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -384,6 +401,7 @@ pub fn components(
     output::settle(&outputs, args.check, &command("components"), json)
 }
 
+#[cfg(feature = "internal")]
 /// Writes the intermediate form's TypeScript types into the package's
 /// `src`, or with `--check` says whether the written ones are behind.
 ///
@@ -391,7 +409,7 @@ pub fn components(
 ///
 /// [`Failure`] when the types cannot be written or read.
 pub fn types(
-    args: &FamilyTypes,
+    args: &SystemTypes,
     config: Option<&Path>,
     from: &Path,
     json: bool,
@@ -406,14 +424,14 @@ pub fn types(
     )
 }
 
-/// Prints the project the working directory names, every path made
+/// Prints the design system the configuration describes, every path made
 /// absolute and every default filled in, or with `--schema` the JSON Schema
-/// of `helix.family.json`.
+/// of `helix.json`.
 ///
 /// # Errors
 ///
 /// [`Failure`] when there is no project, or it cannot be read.
-pub fn config(args: &FamilyConfig, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+pub fn config(args: &SystemConfig, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
     if args.schema {
         print!("{}", project::schema());
         return Ok(Code::Ok);

@@ -40,7 +40,7 @@ fn project() -> &'static Path {
             std::env::temp_dir().join(format!("fusion-helix-extenders-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&project);
         write(&project, "package.json", r#"{ "name": "acme", "private": true }"#);
-        write(&project, "helix.json", r#"{ "tiers": ["src"] }"#);
+        write(&project, "helix.json", r#"{ "components": { "tiers": ["src"] } }"#);
         write(
             &project,
             "node_modules/@fusion.dev/helix-headless/custom-elements.json",
@@ -195,7 +195,11 @@ fn dispatched_holds_an_event_sent_by_name_to_its_documentation() {
         "package.json",
         r#"{ "name": "acme", "private": true }"#,
     );
-    write(&project, "helix.json", r#"{ "tiers": ["src"] }"#);
+    write(
+        &project,
+        "helix.json",
+        r#"{ "components": { "tiers": ["src"] } }"#,
+    );
     write(
         &project,
         "src/badge/badge.ts",

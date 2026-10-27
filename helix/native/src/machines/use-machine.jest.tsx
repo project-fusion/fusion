@@ -86,7 +86,7 @@ interface Count {
 const SHOW = 0
 const TICK = 1
 
-/* A machine of one state, written as `helix family machines` writes one:
+/* A machine of one state, written as `helix system machines` writes one:
    `SHOW` counts what the component draws and `TICK` what it does not, and
    each move asks for `heard`. */
 const counter: Compiled<Count, null> = {

@@ -1,11 +1,11 @@
 /**
  * Holds the native token modules to `paint.mjs`, color for color, in both modes.
  *
- * **Two implementations of one arithmetic, held to the byte.** `helix family
+ * **Two implementations of one arithmetic, held to the byte.** `helix system
  * tokens` evaluates each color with the port in `helix/theme/rust/tokens` and
  * writes its hex into `helix/native/src/theme`, and
  * `check-token-hexes.mjs` holds this file to what Chromium paints, so a color
- * native draws is the color a browser paints. `helix family tokens --check`
+ * native draws is the color a browser paints. `helix system tokens --check`
  * holds the modules to the token layer, which is what makes reading them here
  * a reading of the port.
  */

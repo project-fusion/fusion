@@ -1,6 +1,6 @@
 /**
  * The React Native reference of each family Helix draws natively, read from
- * the modules `helix family components` writes into `@fusion.dev/helix`.
+ * the modules `helix system components` writes into `@fusion.dev/helix`.
  *
  * **Read from what the compiler wrote, and never restated.** A module types
  * its components from the intermediate form, the styled manifest, and core's

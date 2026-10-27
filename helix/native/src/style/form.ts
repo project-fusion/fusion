@@ -15,7 +15,7 @@ import { VERSION } from '../ir.generated.js'
  */
 type Frozen<T> = T extends object ? { readonly [K in keyof T]: Frozen<T[K]> } : T
 
-/** A declaration's value, as `helix family build` writes it. */
+/** A declaration's value, as `helix system build` writes it. */
 export type Value = Frozen<Form.Value>
 
 /** What a rule applies under. */
@@ -43,7 +43,7 @@ export type Family = Frozen<Form.Family>
  * The major version of the intermediate form this runtime reads, from the
  * version its types were generated at.
  *
- * **A form in another major is refused, never guessed at.** `helix family
+ * **A form in another major is refused, never guessed at.** `helix system
  * build` writes `major.minor`. A minor adds only what this runtime may
  * ignore, and anything else is a new major.
  */

@@ -32,9 +32,9 @@
   ],
   "scripts": {
     "build": "bun run generate && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
-    "components": "helix family components --out src/families",
+    "components": "helix system components --out src/families",
     "engine": "bun scripts/engine.mjs",
-    "generate": "helix family types . && helix family tokens .",
+    "generate": "helix system types . && helix system tokens .",
     "test": "bun run generate && bun run components && bun test src && bunx --bun jest",
     "test:native": "bun run generate && bun run components && bunx --bun jest",
     "typecheck": "bun run generate && bun run components && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.pure.json --noEmit && tsc -p tsconfig.tests.json --noEmit"

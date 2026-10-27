@@ -23,7 +23,7 @@ import {
  * **The row is `row-current` as well while it is current**, which is a second
  * token on the same part on the web.
  *
- * **Held to `helix-list-item`.** `helix family check` compares the props,
+ * **Held to `helix-list-item`.** `helix system check` compares the props,
  * events, states, regions, and parts with what the manifest says the element
  * has.
  */

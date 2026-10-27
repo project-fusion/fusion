@@ -34,7 +34,7 @@ import { derive } from '../../../tree.js'
  * through its screen reader. On a phone, render the messages from your own
  * state, as the gallery's examples do.
  *
- * **Held to `helix-toast`.** `helix family check` compares the props, the
+ * **Held to `helix-toast`.** `helix system check` compares the props, the
  * event, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

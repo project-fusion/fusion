@@ -35,7 +35,7 @@ import { derive } from '../../../tree.js'
  * its category first, where it has none. A tag with an `href` is a link: its
  * press opens it, and in a group that selects nothing, the group follows it.
  *
- * **Held to `helix-tag`.** `helix family check` compares the props, the
+ * **Held to `helix-tag`.** `helix system check` compares the props, the
  * event, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

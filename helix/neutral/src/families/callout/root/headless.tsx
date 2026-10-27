@@ -24,7 +24,7 @@ import { derive } from '../../../tree.js'
  * **The web's**: focus handed to the next tab stop where no callout beside
  * it can take it, since a phone has no tab order to read.
  *
- * **Held to `helix-callout`.** `helix family check` compares the props, the
+ * **Held to `helix-callout`.** `helix system check` compares the props, the
  * event, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

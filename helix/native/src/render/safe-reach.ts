@@ -27,7 +27,7 @@ const clamp = (value: number, least: number, most: number): number =>
 
 /**
  * Whether `family`'s rules on its host read the safe area, which only a
- * layer's other parts may, as `helix family build` holds them.
+ * layer's other parts may, as `helix system build` holds them.
  */
 export const readsSafeArea = (family: Family): boolean =>
   (family.rules ?? []).some(

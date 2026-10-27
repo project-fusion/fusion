@@ -3,7 +3,7 @@
  * props, events, features, and part tree, and the helpers a source's
  * `derived` and `host` take, `derive()`, `bind()`, and `not()`.
  *
- * **Read as syntax, like a style table.** `helix family` recognizes each
+ * **Read as syntax, like a style table.** `helix system` recognizes each
  * helper by name and never runs the module. A source is written in
  * `headless.tsx` with `render.ts`'s `headless()`, and these types are what it
  * compiles from.
@@ -168,7 +168,7 @@ export type Attributes = Readonly<Record<string, Attribute | Readonly<Record<str
 /** A node of the part tree. */
 export interface Node {
   /**
-   * Semantics and behavior the node carries, by name. `helix family` holds
+   * Semantics and behavior the node carries, by name. `helix system` holds
    * each to the attributes its kind of node takes, and each value to the
    * shape the attribute has.
    */
@@ -323,7 +323,7 @@ export const bind = (name: string): { readonly bind: string } => ({ bind: name }
  * Words the element computes from its props, by the name of a derivation in
  * `@fusion.dev/helix-core/derivations`, such as a key's chord in the reader's
  * keyboard's glyphs. The web element writes them, and a native view calls the
- * derivation with the element's props. `helix family` refuses a name with no
+ * derivation with the element's props. `helix system` refuses a name with no
  * derivation.
  */
 export const derive = (name: string): { readonly derive: string } => ({ derive: name })

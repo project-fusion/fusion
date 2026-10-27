@@ -10,7 +10,7 @@ import { headless, number, Slot, Text, View } from '../../../render.js'
  * `heading`, or `label` where none is. React Native gives a view no heading
  * level, so a phone announces a heading with none.
  *
- * **Held to `helix-timeline-group`.** `helix family check` compares the
+ * **Held to `helix-timeline-group`.** `helix system check` compares the
  * props, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

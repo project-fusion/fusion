@@ -3,9 +3,9 @@
  * table reads through `derived()`, and the words a part tree's node takes
  * through `derive()`.
  *
- * **Each export is one derivation, named as `helix family` names it.** The
+ * **Each export is one derivation, named as `helix system` names it.** The
  * intermediate form carries the function's name, and the native runtime calls
- * the export of that name with the element's props. `helix family` refuses a
+ * the export of that name with the element's props. `helix system` refuses a
  * `derived()` or a `derive()` whose name it does not map to an export here,
  * and its specs hold each mapped name to an export of this module.
  */
