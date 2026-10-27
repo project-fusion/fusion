@@ -288,6 +288,32 @@ impl Store for Postgres {
             .collect()
     }
 
+    async fn node(&self, id: Id) -> Result<Option<(Id, Node)>> {
+        let database = &self.database;
+        let mut transaction = database.begin().await?;
+        let row = database
+            .query("SELECT trace, id, created_at, detail FROM nodes WHERE id = $1")
+            .bind(id.0)
+            .fetch_optional(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let edges = database
+            .query("SELECT child, parent FROM edges WHERE child = $1 ORDER BY position")
+            .bind(id.0)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        transaction.commit().await.map_err(storage_error)?;
+        let Some(row) = row else {
+            return Ok(None);
+        };
+        let held = parents(&edges)?.remove(&id.0).unwrap_or_default();
+        Ok(Some((
+            Id(row.try_get("trace").map_err(storage_error)?),
+            node(&row, held)?,
+        )))
+    }
+
     async fn find(&self, search: &Search) -> Result<Page> {
         crate::search::postgres::find(&self.database, search).await
     }
