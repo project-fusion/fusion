@@ -24,7 +24,8 @@ pub struct Total {
     pub holds: Option<String>,
     /// The element's prop the sum stands in for.
     pub into: String,
-    /// The family whose elements are summed, by its tag without `helix-`.
+    /// The tag of the elements summed, such as `<prefix>-meter-segment`. A
+    /// source names them without the prefix.
     pub of: String,
     /// The prop of each of them that is summed. A value that is not a number,
     /// or is below zero, adds nothing.

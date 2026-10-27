@@ -98,7 +98,11 @@ const cardForm: Family = {
   tree: [
     {
       children: [
-        { attributes: { draws: 'chip', exports: { label: true } }, kind: 'box', name: 'badge' },
+        {
+          attributes: { draws: 'helix-chip', exports: { label: true } },
+          kind: 'box',
+          name: 'badge',
+        },
       ],
       kind: 'box',
       name: 'scoped',

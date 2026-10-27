@@ -198,7 +198,7 @@ fn imports_the_module_of_each_element_a_box_draws() {
         component: "HelixCheckboxGroup".to_owned(),
         constant: "rootForm".to_owned(),
         events: Vec::new(),
-        form: "{\"tree\":[{\"attributes\":{\"draws\":\"checkbox\"},\"name\":\"select-all\"}]}"
+        form: r#"{"tree":[{"attributes":{"draws":"helix-checkbox"},"name":"select-all"}]}"#
             .to_owned(),
         hooks: Vec::new(),
         members: Vec::new(),
@@ -206,7 +206,21 @@ fn imports_the_module_of_each_element_a_box_draws() {
         tag: "helix-checkbox-group".to_owned(),
         web_only: false,
     };
-    let written = module("checkbox-group", &[part]);
+    /* The form names the element by its tag, and the folder its module is
+    in is the family's. */
+    let folders =
+        std::collections::BTreeMap::from([("helix-checkbox".to_owned(), "checkbox".to_owned())]);
+    let written = module_in(
+        "checkbox-group",
+        &[part],
+        &folders,
+        &Origin {
+            families: "helix/neutral",
+            events: "helix/core/src/events",
+            runtime: "@fusion.dev/helix-native",
+            event_type: "HelixEvent",
+        },
+    );
     assert!(
         written.contains("import '../checkbox/index.native'\n"),
         "{written}"
@@ -219,7 +233,7 @@ fn imports_nothing_for_a_box_only_the_web_draws() {
         component: "HelixStep".to_owned(),
         constant: "stepForm".to_owned(),
         events: Vec::new(),
-        form: r#"{"tree":[{"children":[{"attributes":{"draws":"button","platform":"web"},"name":"label"}],"name":"body"}]}"#
+        form: r#"{"tree":[{"children":[{"attributes":{"draws":"helix-button","platform":"web"},"name":"label"}],"name":"body"}]}"#
             .to_owned(),
         hooks: Vec::new(),
         members: Vec::new(),
@@ -228,10 +242,7 @@ fn imports_nothing_for_a_box_only_the_web_draws() {
         web_only: false,
     };
     let written = module("steps", &[part]);
-    assert!(
-        !written.contains("import '../button/index.native'"),
-        "{written}"
-    );
+    assert!(!written.contains("button/index.native'"), "{written}");
 }
 
 #[test]

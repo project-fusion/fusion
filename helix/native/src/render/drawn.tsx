@@ -153,7 +153,8 @@ const bubbledBy = (scope: Scope, node: Node): Record<string, (heard: HelixEvent)
 
 /**
  * Draws the element `node` draws, with what a wrap holds passed in as its
- * default region, or nothing where no component was made for it.
+ * default region, or nothing where no component was made for it. `draws` is
+ * the element's tag, as the form names it.
  */
 export const drawDrawn = (
   scope: Scope,
@@ -162,7 +163,7 @@ export const drawDrawn = (
   children?: ReactNode,
   regions: Readonly<Record<string, ReactNode>> = {},
 ): ReactNode => {
-  const made = madeFor(`helix-${draws}`)
+  const made = madeFor(draws)
   if (made === undefined) {
     return null
   }

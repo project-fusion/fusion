@@ -86,6 +86,9 @@ helix/testing/src/conformance/record.json
 # What `analyze` writes: nine megabytes nobody reads in a diff. Untracked,
 # it cannot go stale, because every consumer builds it. See d350fe53f.
 custom-elements.json
+# Acme's manifest is written by hand, and the compiler's specs hold its
+# families to it.
+!helix/cli/tests/fixtures/acme/custom-elements.json
 # The lint data `analyze` writes beside each tier's manifest, for diagnostics.
 helix/*/lint.json
 # The catalog and examples `analyze` writes beside it, for `helix mcp`.

@@ -23,8 +23,7 @@ export const summedIn = (family: Family, props: Props): readonly unknown[] => {
   if (total === undefined) {
     return []
   }
-  const tag = `helix-${total.of}`
-  return flat(props.children).filter((child) => (child as Drawn).type?.tag === tag)
+  return flat(props.children).filter((child) => (child as Drawn).type?.tag === total.of)
 }
 
 /**

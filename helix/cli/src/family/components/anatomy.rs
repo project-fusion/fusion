@@ -34,6 +34,7 @@ use crate::family::api::{Attribute, Node, NodeKind, Platform, Prop, PropType};
 use crate::family::compile::{self, Compiled};
 use crate::family::ir::Family;
 use crate::family::open;
+use crate::family::project::Names;
 
 /// One element's anatomy.
 #[derive(Debug, Serialize)]
@@ -139,7 +140,7 @@ fn side(family: &Family, on: On<'_>) -> Side {
             Vec::new()
         },
         sends,
-        tree: tree(&family.tree, on),
+        tree: tree(&family.tree, on, &family.names),
     }
 }
 
@@ -158,7 +159,7 @@ fn holds(prop: &Prop) -> String {
     }
 }
 
-fn tree(nodes: &[Node], on: On<'_>) -> Vec<Drawn> {
+fn tree(nodes: &[Node], on: On<'_>, names: &Names) -> Vec<Drawn> {
     nodes
         .iter()
         .filter(|node| shown(node, on))
@@ -169,8 +170,8 @@ fn tree(nodes: &[Node], on: On<'_>) -> Vec<Drawn> {
             },
             kind: node.kind.helper().to_owned(),
             name: node.name.clone(),
-            says: says(node),
-            children: tree(&node.children, on),
+            says: says(node, names),
+            children: tree(&node.children, on, names),
         })
         .collect()
 }
@@ -242,17 +243,21 @@ fn parts(node: &Node) -> String {
 }
 
 /// What a node says about itself, each attribute as it is written, but the
-/// ones the label already says.
-fn says(node: &Node) -> Vec<String> {
+/// ones the label already says. The element a node `draws` is named as the
+/// source names it, without the prefix its form gives its tag.
+fn says(node: &Node, names: &Names) -> Vec<String> {
     node.attributes
         .iter()
         .filter(|(name, _)| !matches!(name.as_str(), "also" | "platform" | "unless"))
-        .map(
-            |(name, value)| match serde_json::to_value(value).unwrap_or(Json::Null) {
+        .map(|(name, value)| match (name.as_str(), value) {
+            ("draws", Attribute::Text(tag)) => {
+                format!("draws=\"{}\"", names.bare(tag).unwrap_or(tag))
+            }
+            _ => match serde_json::to_value(value).unwrap_or(Json::Null) {
                 Json::Bool(true) => name.clone(),
                 written => format!("{name}={}", value_of(&written)),
             },
-        )
+        })
         .collect()
 }
 

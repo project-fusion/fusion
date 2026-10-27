@@ -13,6 +13,10 @@
  * carry nothing of Helix's into its bundle. `tests/contract/provides.ts`
  * holds Helix's runtime to it.
  *
+ * **A form names another element by its tag**, under the design system's
+ * prefix: the element a box `draws`, and the elements a `total` sums. A
+ * runtime finds each by the tag the form gives it.
+ *
  * **On the web the compiler writes stylesheets and no code**, so the web's
  * half of the contract is what the element that adopts a stylesheet draws,
  * which a type cannot hold. `helix/neutral/DESIGN-SYSTEMS.md` lists it:

@@ -228,9 +228,10 @@ types, name your module in `runtime.native`, and import the types with
 `import type` so nothing of Helix's runtime is bundled. Helix's runtime is
 held to the contract by `helix/native/tests/contract/provides.ts`.
 
-Helix's native runtime still reads two names under Helix's prefix: a box that
-`draws` another element, and a `total` of another family's elements. A design
-system on Helix's runtime with another prefix cannot use either feature yet.
+A form names another element by its tag, under your prefix: the element a
+box `draws`, such as `acme-badge` for Acme's `draws="badge"`, and the
+elements a `total` sums. A runtime finds each by the tag the form gives it,
+so both features work under any prefix.
 
 ## Commands
 
