@@ -571,8 +571,9 @@ each write gives `false`, as a browser that refuses the write does.
 ## Share
 
 The share capability hands words, an address, or a file to the system share
-sheet, and gives what became of it: `shared`, `dismissed`, `copied`, or
-`unavailable`. Call it from a press:
+sheet, and gives what became of it: `shared`, `opened`, `dismissed`,
+`copied`, or `unavailable`. `opened` means the sheet opened and closed, and
+the platform does not say whether you shared anything. Call it from a press:
 
 ```tsx
 import { share } from '@fusion.dev/helix-core/capabilities/share'
@@ -583,11 +584,12 @@ const shared = await share().share({ title: 'Helix', url: 'https://fusion.dev/he
 - **On a phone**, words and an address go through React Native's `Share`, which
   says whether you closed the sheet. Android's sheet takes words alone, so the
   address follows the words there. A file goes through `expo-sharing`, and is
-  `shared` once its sheet closes, since that sheet does not say what you
+  `opened` once its sheet closes, since that sheet does not say what you
   chose.
-- **On the web**, `navigator.share` opens the browser's sheet. A browser
-  without one, or a sheet that refuses the item, copies the address, or the
-  words, through the clipboard capability and gives `copied`.
+- **On the web**, `navigator.share` opens the browser's sheet and gives
+  `shared` or `dismissed`. A browser without one, or a sheet that refuses the
+  item, copies the address, or the words, through the clipboard capability
+  and gives `copied`.
 
 ## Files
 
@@ -595,7 +597,8 @@ The files capability picks files and saves a file. `pick` takes the types it
 accepts, as media types such as `image/*` and extensions such as `.pdf`, and
 whether it takes more than one. It gives the files chosen and an `outcome`:
 `chosen`, `dismissed`, `refused`, or `unavailable`. Each file has a `name`, a
-`type`, a `size` in bytes, and a `uri` to read it from.
+`type`, a `size` in bytes, and a `uri` to read it from. `save` gives what
+became of the file: `saved`, `opened`, or `unavailable`.
 
 ```tsx
 import { files } from '@fusion.dev/helix-core/capabilities/files'
@@ -609,12 +612,13 @@ await files().save({ name: 'notes.txt', type: 'text/plain', uri: 'data:,Release%
   file and the files chosen are kept to it. A save writes a `data:` URL or a
   web address to the cache with `expo-file-system`, then opens the share
   sheet with `expo-sharing`, where Save to Files is one of the choices. It
-  gives `true` once the sheet closes.
+  gives `opened` once the sheet closes, since that sheet does not say whether
+  you saved the file.
 - **On the web**, `showOpenFilePicker` picks where the browser has it, and a
   file input made for the moment where it does not. A file chosen is read from
   an object URL, which stays readable until you call `URL.revokeObjectURL` or
-  the page closes. A save is a download under the file's name. A browser
-  follows an address on another origin as a link.
+  the page closes. A save is a download under the file's name, and gives
+  `saved`. A browser follows an address on another origin as a link.
 
 No component picks files yet. File Input will pick through this capability.
 

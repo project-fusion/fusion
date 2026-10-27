@@ -116,9 +116,9 @@ const FILES: Capability = Capability {
         },
         Member {
             name: "save",
-            doc: "Saves `file` under its name: as a download on the web, and through the share sheet on a phone, where Save to Files is one of its choices. Gives whether the platform took it.",
+            doc: "Saves `file` under its name: as a download on the web, and through the share sheet on a phone, where Save to Files is one of its choices. Gives what became of it: `saved` on the web, and `opened` on a phone, whose sheet does not say whether you saved it.",
             params: &[Param { name: "file", ty: Ty::Named("FileSave") }],
-            returns: Ty::Promise(&Ty::Boolean),
+            returns: Ty::Promise(&Ty::Named("Saved")),
         },
     ],
 };
