@@ -24,6 +24,11 @@ Trend.
 The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
 
+`helix family` reads Helix's prefix, its token source, and where each command
+writes from `helix.family.json` at the repository root. To build a design
+system of your own on the compiler, read
+[DESIGN-SYSTEMS.md](DESIGN-SYSTEMS.md).
+
 Every element's headless source is written with its part tree last, as
 JSX, in `headless.tsx`, and `helix family` refuses a `headless.ts`:
 
@@ -102,7 +107,7 @@ platform draws does: `helix/cli/src/family/api/spelling.rs` holds each
 feature's field beside its name there.
 
 The other generators read these sources and write into the packages that ship
-what they write:
+what they write, at the paths Helix's `helix.family.json` names:
 
 | Command | Writes |
 |---|---|
