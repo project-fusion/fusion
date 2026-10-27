@@ -553,6 +553,114 @@ copies through it as its pressable that `copies` is pressed, and ends the
 result on the timers capability, as Copy Button does. Without the package, or its native module,
 each write gives `false`, as a browser that refuses the write does.
 
+## Share
+
+The share capability hands words, an address, or a file to the system share
+sheet, and gives what became of it: `shared`, `dismissed`, `copied`, or
+`unavailable`. Call it from a press:
+
+```tsx
+import { share } from '@fusion.dev/helix-core/capabilities/share'
+
+const shared = await share().share({ title: 'Helix', url: 'https://fusion.dev/helix' })
+```
+
+- **On a phone**, words and an address go through React Native's `Share`, which
+  says whether you closed the sheet. Android's sheet takes words alone, so the
+  address follows the words there. A file goes through `expo-sharing`, and is
+  `shared` once its sheet closes, since that sheet does not say what you
+  chose.
+- **On the web**, `navigator.share` opens the browser's sheet. A browser
+  without one, or a sheet that refuses the item, copies the address, or the
+  words, through the clipboard capability and gives `copied`.
+
+## Files
+
+The files capability picks files and saves a file. `pick` takes the types it
+accepts, as media types such as `image/*` and extensions such as `.pdf`, and
+whether it takes more than one. It gives the files chosen and an `outcome`:
+`chosen`, `dismissed`, `refused`, or `unavailable`. Each file has a `name`, a
+`type`, a `size` in bytes, and a `uri` to read it from.
+
+```tsx
+import { files } from '@fusion.dev/helix-core/capabilities/files'
+
+const picked = await files().pick({ accept: ['.pdf'], multiple: false })
+await files().save({ name: 'notes.txt', type: 'text/plain', uri: 'data:,Release%20notes' })
+```
+
+- **On a phone**, `expo-document-picker` picks, and each file is a copy in the
+  app's cache. The picker reads media types alone, so an extension offers any
+  file and the files chosen are kept to it. A save writes a `data:` URL or a
+  web address to the cache with `expo-file-system`, then opens the share
+  sheet with `expo-sharing`, where Save to Files is one of the choices. It
+  gives `true` once the sheet closes.
+- **On the web**, `showOpenFilePicker` picks where the browser has it, and a
+  file input made for the moment where it does not. A file chosen is read from
+  an object URL, which stays readable until you call `URL.revokeObjectURL` or
+  the page closes. A save is a download under the file's name. A browser
+  follows an address on another origin as a link.
+
+No component picks files yet. File Input will pick through this capability.
+
+## Camera
+
+The camera capability takes a photo with `capture`, and chooses photos from
+the library with `choose`, which takes whether it chooses more than one. Each
+gives the same `files` and `outcome` as a pick.
+
+```tsx
+import { camera } from '@fusion.dev/helix-core/capabilities/camera'
+
+const taken = await camera().capture()
+const chosen = await camera().choose(true)
+```
+
+- **On a phone**, `expo-image-picker` draws the camera and the library. A
+  capture asks for the camera permission first, and is `refused` without it.
+  A device without a camera is `unavailable`. Choosing asks for no
+  permission: the system's photo picker hands over only the photos you
+  choose.
+- **On the web**, a file input asks for `image/*`. A capture adds `capture`,
+  so a phone's browser opens its camera, and a desktop browser opens its file
+  chooser. The page draws no camera of its own and asks for no permission.
+
+**An app that is built needs the usage strings.** List `expo-image-picker` in
+the `plugins` of your `app.json` with the words iOS shows when it asks:
+
+```json
+["expo-image-picker", {
+  "cameraPermission": "$(PRODUCT_NAME) uses the camera to take the photos you attach.",
+  "microphonePermission": false,
+  "photosPermission": "$(PRODUCT_NAME) attaches the photos you choose from your library."
+}]
+```
+
+The package adds the camera permission on Android, and `false` for the
+microphone leaves Android's audio permission out. Expo Go has its own strings.
+
+## Device capabilities on the web
+
+`HelixRoot` sets each phone's implementation. On the web, a component sets the
+capability it uses as it uses it, as Copy Button sets the clipboard. To call
+share, files, or camera from your own code, set the browser's once as your app
+starts:
+
+```ts
+import { installWebCamera } from '@fusion.dev/helix-core/capabilities/camera/web'
+import { installWebFiles } from '@fusion.dev/helix-core/capabilities/files/web'
+import { installWebShare } from '@fusion.dev/helix-core/capabilities/share/web'
+
+installWebShare()
+installWebFiles()
+installWebCamera()
+```
+
+Each one leaves an implementation you set first in place. A spec sets the
+capability's fake, such as `fakeShare` from
+`@fusion.dev/helix-core/capabilities/share/fake`, which keeps each request and
+answers with what the spec sets.
+
 ## Scrolling
 
 **A part whose overflow scrolls is a scroll view**, along the axis its
@@ -678,7 +786,11 @@ fake clock drives the web's and a phone's alike.
 | `@floating-ui/react-native` | Placing a layer against its anchor, as a popover against its trigger. Optional: an app that draws no such layer does without it, and one that draws one is told to install it |
 | `expo-blur` | The blur `backdrop-filter` draws behind a box on iOS, and behind a layer on Android. Optional: without it, a box draws its own background alone |
 | `expo-clipboard` | Putting text on the clipboard, as a copy button does. Optional: without it, every copy fails and says so |
+| `expo-document-picker` | Picking files. Optional: without it, every pick is `unavailable` |
+| `expo-file-system` | Writing a file to save or share from a `data:` URL or a web address. Optional: without it, only a file on the device is saved or shared |
 | `expo-haptics` | The touch a phone plays as you lift, move, and drop a list row. Optional: without it, nothing plays |
+| `expo-image-picker` | Taking a photo and choosing photos from the library. Optional: without it, every request is `unavailable` |
+| `expo-sharing` | Sharing and saving a file. Optional: without it, a file is `unavailable` to share and a save gives `false` |
 | `react` 19 | Everything |
 | `react-native` | Everything |
 | `react-native-gesture-handler` 3 | Dragging a row by its grip |
@@ -690,8 +802,10 @@ fake clock drives the web's and a phone's alike.
 **Each peer is optional to npm**, since `@fusion.dev/helix` depends on this
 package and a web app installs it too, and npm installs a dependency's
 required peers. A React Native app needs every peer but
-`@floating-ui/react-native`, `expo-blur`, `expo-clipboard`, `expo-haptics`,
-`react-native-safe-area-context`, and `react-native-svg`. Where
+`@floating-ui/react-native`, `expo-blur`, `expo-clipboard`,
+`expo-document-picker`, `expo-file-system`, `expo-haptics`,
+`expo-image-picker`, `expo-sharing`, `react-native-safe-area-context`, and
+`react-native-svg`. Where
 one is missing, Metro stops the bundle and names it, and a runtime that loads
 each module as it runs it, such as Jest, throws one error that names every
 missing peer and the command that installs them.
