@@ -89,6 +89,22 @@ impl<'a> Names<'a> {
                 .chain(family.api.stack.iter().flat_map(api::Stack::computed))
                 /* And the words a copy names the element by, as a copy button `says`. */
                 .chain(family.api.copy.iter().flat_map(api::Copy::computed))
+                /* And whether an entry's press that clears is drawn. */
+                .chain(
+                    family
+                        .api
+                        .entry
+                        .iter()
+                        .filter_map(|entry| entry.shows.as_deref()),
+                )
+                /* And the sentence a verdict shows, as an input's `message`. */
+                .chain(
+                    family
+                        .api
+                        .validation
+                        .iter()
+                        .filter_map(|validation| validation.message.as_deref()),
+                )
                 .collect(),
             regions: held,
             events: family
@@ -121,6 +137,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     events::followed(&family.api, &names, &mut found);
     collection(&family.api, &names, &mut found);
     toggle(family, &names, &mut found);
+    entry(family, &names, &mut found);
     toolbar(family, &names, &mut found);
     sources::timed(family, &names, &mut found);
     layered::layered(family, &names, &mut found);
@@ -128,9 +145,12 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     stack::stacked(family, &names, &mut found);
     if let Some(validation) = &family.api.validation {
         references("validation", validation.references(), &names, &mut found);
-        if family.api.toggle.is_none() && family.api.collection.is_none() {
+        if family.api.toggle.is_none()
+            && family.api.collection.is_none()
+            && family.api.entry.is_none()
+        {
             found.push(
-                "the element declares a `validation`, and neither a `toggle` nor a `collection` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection` or `text` holds its answer"
                     .to_owned(),
             );
         }
@@ -297,6 +317,64 @@ fn toggle(family: &Family, names: &Names, found: &mut Vec<String>) {
             "the element declares a `toggle`, and {} pressables toggle it, where one does",
             toggling.len()
         ));
+    }
+}
+
+/// The entry's fields, each held to what its docs say it names, and the
+/// field a reader types its text into.
+fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
+    let fields = fields(&family.tree);
+    let mut clearing = Vec::new();
+    pressables_marked(&family.tree, "clears", &mut clearing);
+    let Some(entry) = &family.api.entry else {
+        for name in fields {
+            found.push(format!(
+                "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
+            ));
+        }
+        for name in clearing {
+            found.push(format!(
+                "`pressable('{name}')` clears, and the element declares no `text`"
+            ));
+        }
+        return;
+    };
+    references("text", entry.references(), names, found);
+    if !family.tree.is_empty() && fields.len() != 1 {
+        found.push(format!(
+            "the element declares a `text`, and its tree draws {} fields, where one holds its text",
+            fields.len()
+        ));
+    }
+    if !clearing.is_empty() && entry.clear.is_none() {
+        found.push(
+            "a pressable clears the text, and `text` names no `onClear` event to send".to_owned(),
+        );
+    }
+}
+
+/// The name of each field a tree draws, in order.
+pub fn fields(nodes: &[Node]) -> Vec<&str> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if node.kind == NodeKind::Field {
+            found.push(node.name.as_str());
+        }
+        found.extend(fields(&node.children));
+    }
+    found
+}
+
+/// The name of each pressable carrying the flag `attribute`, as `clears`, in
+/// the order the tree draws them.
+pub fn pressables_marked<'a>(nodes: &'a [Node], attribute: &str, into: &mut Vec<&'a str>) {
+    for node in nodes {
+        if node.kind == NodeKind::Pressable
+            && matches!(node.attributes.get(attribute), Some(Attribute::Flag(true)))
+        {
+            into.push(node.name.as_str());
+        }
+        pressables_marked(&node.children, attribute, into);
     }
 }
 
