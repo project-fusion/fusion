@@ -187,10 +187,10 @@ let question = "who writes up what changed in each version?";
 
 let vector = Vector::of(&embedder, question).await.unwrap();
 let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
-let placed = relevant(&facts, &[Scope::Personal], question, &both, 1, |_| 0.0, 30.0);
+let placed = relevant(&facts, &[Scope::Personal], question, &both, Selection::top(1), |_| 0.0);
 
 assert_eq!(placed[0].0.content, "Dana owns the release notes");
-let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, 1, |_| 0.0, 30.0);
+let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, Selection::top(1), |_| 0.0);
 assert_eq!(by_words[0].0.content, "each version changed what the docs site looks like");
 ```
 

@@ -15,7 +15,7 @@ use fusion_cortex_engram::{
     store::{InMemory, Sqlite, Store},
     Episode, Fact, Scope,
 };
-use fusion_cortex_recall::{relevant, Overlap, Scorer, Vector, Weighted};
+use fusion_cortex_recall::{relevant, Overlap, Scorer, Selection, Vector, Weighted};
 
 const OWNER: &str = "Dana owns the release notes.";
 const DISTRACTOR: &str = "Each version changed what the docs site looks like.";
@@ -75,7 +75,14 @@ async fn answer(store: &dyn Store, embedder: &dyn Embedder) -> Option<String> {
         .map(|(fact, _)| fact)
         .collect();
     let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
-    let placed = relevant(&near, &[Scope::Personal], QUESTION, &both, 1, |_| 0.0, 30.0);
+    let placed = relevant(
+        &near,
+        &[Scope::Personal],
+        QUESTION,
+        &both,
+        Selection::top(1),
+        |_| 0.0,
+    );
     placed.first().map(|(fact, _)| fact.content.clone())
 }
 
@@ -116,9 +123,8 @@ async fn a_paraphrase_finds_its_fact(name: &str, store: &dyn Store) {
         &[Scope::Personal],
         QUESTION,
         &Overlap,
-        1,
+        Selection::top(1),
         |_| 0.0,
-        30.0,
     );
     assert_eq!(
         by_words[0].0.content, DISTRACTOR,
