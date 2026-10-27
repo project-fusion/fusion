@@ -5,12 +5,10 @@
    directory and every site build too. The app reaches the workspace packages
    it depends on, and theirs, through the links in the root `node_modules`.
 
-   **On a phone, the app's JSX goes through `@fusion.dev/helix/jsx-runtime`**,
-   which draws each `helix-*` tag as the native component of that name and,
-   in a development build, warns about a tag a phone does not draw. The web
-   build keeps React's own runtime, so each tag is the web element. */
+   `babel.config.cjs` gives the app's own files their JSX runtime,
+   `@fusion.dev/helix/jsx-runtime`, on the web and on a phone. */
 import { readFileSync, realpathSync } from 'node:fs'
-import { dirname, join, sep } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getDefaultConfig } from 'expo/metro-config'
 
@@ -39,27 +37,9 @@ const reached = (directory: string, found: Set<string>): Set<string> => {
   return found
 }
 
-/** The app's own files: its routes and its modules. */
-const own = [join(here, 'app'), join(here, 'src')].map((directory) => `${directory}${sep}`)
-
 const base = getDefaultConfig(here)
-
-type Resolve = NonNullable<typeof base.resolver.resolveRequest>
-
-const resolveRequest: Resolve = (context, moduleName, platform) => {
-  const shared = own.some((directory) => context.originModulePath.startsWith(directory))
-  if (
-    platform !== 'web' &&
-    shared &&
-    (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime')
-  ) {
-    return context.resolveRequest(context, '@fusion.dev/helix/jsx-runtime', platform)
-  }
-  return context.resolveRequest(context, moduleName, platform)
-}
 
 export default {
   ...base,
-  resolver: { ...base.resolver, resolveRequest },
   watchFolders: [modules, ...reached(here, new Set())],
 }

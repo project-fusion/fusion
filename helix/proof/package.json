@@ -62,8 +62,8 @@
       "^@fusion\\.dev/helix-core/route-paths$": "<rootDir>/../core/src/utils/route-paths/route-paths.ts",
       "^@fusion\\.dev/helix-native$": "<rootDir>/../native/src/index.ts",
       "^@fusion\\.dev/helix/expo-router$": "<rootDir>/../styled/native/expo-router/index.native.ts",
-      "^@fusion\\.dev/helix/(.+)$": "<rootDir>/../native/src/families/$1/index.native.ts",
-      "^helix-shared/jsx-(dev-)?runtime$": "<rootDir>/../styled/native/jsx-runtime/index.native.ts"
+      "^@fusion\\.dev/helix/(?!jsx-)(.+)$": "<rootDir>/../native/src/families/$1/index.native.ts",
+      "^@fusion\\.dev/helix/jsx-(dev-)?runtime$": "<rootDir>/../styled/native/jsx-runtime/index.native.ts"
     },
     "preset": "jest-expo",
     "setupFiles": [
@@ -72,32 +72,6 @@
     "testMatch": [
       "<rootDir>/tests/**/*.jest.tsx"
     ],
-    "transform": {
-      "\\.[jt]sx?$": [
-        "babel-jest",
-        {
-          "overrides": [
-            {
-              "presets": [
-                [
-                  "babel-preset-expo",
-                  {
-                    "jsxImportSource": "helix-shared"
-                  }
-                ]
-              ],
-              "test": [
-                "./app",
-                "./src"
-              ]
-            }
-          ],
-          "presets": [
-            "babel-preset-expo"
-          ]
-        }
-      ]
-    },
     "transformIgnorePatterns": [
       "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|expo-router|react-navigation|@react-navigation|@formatjs))",
       "/node_modules/react-native-reanimated/plugin/",

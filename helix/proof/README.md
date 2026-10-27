@@ -21,10 +21,10 @@ routes draw are under `src`.
 
 ## How it runs on both platforms
 
-- **Each page is ordinary React with `helix-*` tags.** On the web each tag is
-  the web element. On a phone, `metro.config.ts` gives the app's files
-  `@fusion.dev/helix/jsx-runtime`, which draws each tag as the native
-  component of that name.
+- **Each page is ordinary React with `helix-*` tags.** `babel.config.cjs`
+  gives the app's files `@fusion.dev/helix/jsx-runtime` on both platforms.
+  On the web it is React's own runtime, and each tag is the web element. On a
+  phone it draws each tag as the native component of that name.
 - **`@fusion.dev/helix/expo-router` follows the router on both platforms.**
   `HelixAppRoot` opens each Helix link through the router, and
   `useHelixRoute` marks the header's destinations current, gives each link
