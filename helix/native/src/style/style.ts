@@ -178,12 +178,16 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     )
   })()
   /* **A track of `1fr` grows, and an `auto` one is its content's size.** */
-  const grows = /\b1fr\b/.test(within.tracks[siblings.indexOf(part)] ?? '')
+  const track = within.tracks[siblings.indexOf(part)] ?? ''
+  const grows = /\b1fr\b/.test(track)
+  /* **A track whose least is its content is never narrower than it.** */
+  const holds = /^(minmax\(\s*)?max-content\b/.test(track)
   const finish = finisherFor({
     context,
     dropped,
     family,
     grows,
+    holds,
     lone,
     resolver,
     shrinks,
