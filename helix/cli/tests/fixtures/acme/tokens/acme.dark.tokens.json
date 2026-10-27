@@ -1,0 +1,8 @@
+{
+  "$description": "The colors of Acme's tokens that move in dark mode, laid over acme.tokens.json.",
+  "color": {
+    "$type": "color",
+    "background": { "$value": "#0f0f0f" },
+    "ink": { "$value": "#f2f2f2" }
+  }
+}
