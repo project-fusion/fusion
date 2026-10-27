@@ -4,7 +4,7 @@ The platform-neutral sources Helix compiles for the web and for React Native.
 This is a pilot, and its families are Accordion, Announcement, App Header, Avatar, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
-Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Kbd, List, Loader,
+Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Popover, Progress, QR Code,
 Quote, Radio, Scroll Area, Skeleton, Skip Link, Speed Dial, Stat, Steps,
 Switch, Tabs, Tag, Text, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
@@ -663,6 +663,18 @@ holds. The native runtime runs core's validation machine behind it, so a
 missing answer shows its message once the reader has changed the control or
 called `validate()` on its ref, and the page's message shows at once. A
 form's submission stays the web's.
+
+**An element a reader types into declares its `text`**: the prop that holds
+it, `prop`, the one that seeds it, `defaultProp`, and the events an edit
+sends, `onBeforeChange`, `onInput`, `onChange`, and `onClear`. Its render
+draws one `<TextInput>`, an `<input>` on the web and a `TextInput` on a phone,
+whose `type`, `inputMode`, `enterKeyHint`, and `autoComplete` take the web's
+words. A `<Pressable clears>` empties it, drawn while `text.clearShown` holds.
+Its `validation` names the props that bound its text as well, `minLength`,
+`maxLength`, `pattern`, and `type`, and `message`, the sentence a render
+reads as `validation.message`. A phone checks the text with core's
+`textVerdict`, and the web asks its `<input>`. A style table colors the words
+a field shows while empty with `{ placeholder: 'control' }`.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest
