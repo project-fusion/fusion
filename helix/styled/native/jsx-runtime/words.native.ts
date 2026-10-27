@@ -31,14 +31,20 @@ export const camel = (name: string): string =>
 /* **A size from the theme is already the reader's text size**, so the words
    that take one leave React Native's own scaling off. */
 
-/** The margins of a box style, which words drawn as a line of their own take. */
+/**
+ * The margins and the width of a box style, which words drawn as a line of
+ * their own take: a width where they span every column of a grid, as a
+ * meter's label is as wide as the row above its bar.
+ */
 const marginsOf = (box: Readonly<Record<string, unknown>>): Record<string, unknown> =>
-  Object.fromEntries(Object.entries(box).filter(([key]) => key.startsWith('margin')))
+  Object.fromEntries(
+    Object.entries(box).filter(([key]) => key.startsWith('margin') || key === 'width'),
+  )
 
 /**
  * Words in the text style the region around gives, as a `span` inherits it,
- * and the margins the host's `::slotted(*)` rules give it, as a drawer's
- * title keeps a step clear of the content under it.
+ * and the margins and the width the host's `::slotted(*)` rules give it, as a
+ * drawer's title keeps a step clear of the content under it.
  */
 export const Span = ({ children }: Props) => {
   const tokens = useTokens()
