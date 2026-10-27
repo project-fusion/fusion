@@ -6,12 +6,13 @@
  */
 import { NO_INSETS } from '@fusion.dev/helix-core/capabilities/environment'
 import type { Insets } from '@fusion.dev/helix-core/capabilities/types'
-import { useCallback, useState } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { type HostInstance, type LayoutChangeEvent, useWindowDimensions } from 'react-native'
 import { scrollViewAbove } from '../capabilities/scroll'
 import { useLayerHost } from '../root/layers'
 import type { Viewport } from '../style/context'
 import type { Family } from '../style/form'
+import { bothRefs } from './behavior'
 
 /** A box in the window, in points. */
 interface Box {
@@ -68,48 +69,64 @@ const NOWHERE: Box = {
  * **A view inside a scroll view reads no safe area**, as it moves under the
  * status bar and out again as the view scrolls, which lays nothing out.
  */
-const boxOf = (event: LayoutChangeEvent): Box | undefined => {
-  const node = event.currentTarget as unknown as {
-    readonly getBoundingClientRect?: () => Box
-  } | null
-  if (node !== null && scrollViewAbove(node as unknown as HostInstance) !== null) {
+const boxOf = (node: unknown): Box | undefined => {
+  const view = node as { readonly getBoundingClientRect?: () => Box } | null
+  if (view !== null && scrollViewAbove(view as unknown as HostInstance) !== null) {
     return NOWHERE
   }
-  const box = node?.getBoundingClientRect?.()
+  const box = view?.getBoundingClientRect?.()
   return box === undefined
     ? undefined
     : { height: box.height, width: box.width, x: box.x, y: box.y }
 }
 
+/** Whether two boxes stand in one place at one size. */
+const same = (one: Box | undefined, other: Box): boolean =>
+  one !== undefined &&
+  one.x === other.x &&
+  one.y === other.y &&
+  one.width === other.width &&
+  one.height === other.height
+
 /**
  * The window a host that reads the safe area is drawn in, with the reach of
- * each inset into it, and what measures where it stands as it is laid out.
- * Nothing for a host that does not read it.
+ * each inset into it, what measures where it stands as it is laid out, and
+ * the ref its view takes. Nothing for a host that does not read it.
+ *
+ * **The first frame is drawn at the reach already**: the view is measured
+ * where it stands once it is laid out, before it is drawn, so an app header
+ * opened at the top of the window is never drawn under the status bar. A
+ * view is measured again each time it is laid out.
  */
 export const useSafeReach = (
   reads: boolean,
 ): {
   readonly context: { readonly viewport?: Viewport }
   readonly measure?: (event: LayoutChangeEvent) => void
+  /** The host's view props with a ref that measures the view before it is first drawn. */
+  readonly placed: (props: Readonly<Record<string, unknown>>) => Readonly<Record<string, unknown>>
 } => {
   const host = useLayerHost()
   const window = useWindowDimensions()
   const [box, setBox] = useState<Box | undefined>(undefined)
-  const measure = useCallback((event: LayoutChangeEvent) => {
-    const next = boxOf(event)
-    setBox((was) =>
-      next === undefined ||
-      (was !== undefined &&
-        was.x === next.x &&
-        was.y === next.y &&
-        was.width === next.width &&
-        was.height === next.height)
-        ? was
-        : next,
-    )
+  const view = useRef<unknown>(null)
+  const hold = useCallback((node: unknown) => {
+    view.current = node
   }, [])
+  const take = useCallback((next: Box | undefined) => {
+    setBox((was) => (next === undefined || same(was, next) ? was : next))
+  }, [])
+  const measure = useCallback(
+    (event: LayoutChangeEvent) => take(boxOf(event.currentTarget)),
+    [take],
+  )
+  useLayoutEffect(() => {
+    if (reads && box === undefined && view.current !== null) {
+      take(boxOf(view.current))
+    }
+  })
   if (!reads) {
-    return { context: {} }
+    return { context: {}, placed: (props) => props }
   }
   const insets = box === undefined ? NO_INSETS : reachOf(host?.insets ?? NO_INSETS, box, window)
   return {
@@ -117,5 +134,12 @@ export const useSafeReach = (
       viewport: { height: window.height, insets, tall: window.height, width: window.width },
     },
     measure,
+    placed: (props) => {
+      const own = props.ref
+      return {
+        ...props,
+        ref: typeof own === 'function' ? bothRefs(own as (node: unknown) => void, hold) : hold,
+      }
+    },
   }
 }
