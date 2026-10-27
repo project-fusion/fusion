@@ -9,6 +9,11 @@
 //! `styled.ts` its own props, its style table, and the stylesheet the web
 //! build reads it as.
 //!
+//! **A design system's own names come from its `helix.family.json`**, which
+//! [`project`] reads: its prefixes, its token source, where its families are,
+//! and where each output is written. Helix's is at the repository root, and
+//! the compiler names no design system of its own.
+//!
 //! **Every element's web stylesheet is generated.** `stylesheets` writes it
 //! into the styled package, which runs it before compiling its sheets, and the
 //! element's own specs and visual baselines judge what it draws.
@@ -27,6 +32,7 @@ mod css;
 mod ir;
 mod machine;
 mod output;
+mod project;
 mod read;
 mod resolve;
 mod shared;
@@ -42,26 +48,56 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 
 use crate::args::{
-    FamilyArgs, FamilyBuild, FamilyCapabilities, FamilyComponents, FamilyMachines,
+    FamilyArgs, FamilyBuild, FamilyCapabilities, FamilyComponents, FamilyConfig, FamilyMachines,
     FamilyStylesheets, FamilyTypes,
 };
 use crate::family::compile::Compiled;
+use crate::family::project::Project;
+use crate::PRODUCT;
 pub use components::anatomy::print as anatomy;
 pub use components::print as platforms;
 
 pub use tokens::{design_files as design_tokens, native_modules as tokens};
 
-/// Writes each element's intermediate form and web stylesheet to `dist`, or
-/// with `--check` says which written ones differ from a fresh compile.
+/// `helix family <verb>`, as an output names the command that writes it.
+fn command(verb: &str) -> String {
+    format!("{PRODUCT} family {verb}")
+}
+
+/// The project `config` or the working directory names, with its families
+/// package replaced by `package` where the command line gives one.
+///
+/// # Errors
+///
+/// [`Failure`] when there is no project, or it cannot be read.
+fn open(config: Option<&Path>, package: Option<&PathBuf>, from: &Path) -> Result<Project, Failure> {
+    let mut project = Project::required(config, from)?;
+    if let Some(package) = package {
+        project.families = locate(package, from);
+    }
+    Ok(project)
+}
+
+/// Writes each element's intermediate form and web stylesheet to the
+/// project's `outputs.build`, or with `--check` says which written ones
+/// differ from a fresh compile.
 ///
 /// # Errors
 ///
 /// [`Failure`] when a source cannot be read or compiled, or an output cannot
 /// be written.
-pub fn build(args: &FamilyBuild, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    let compiled = compile::all(&package)?;
-    let out = package.join("dist");
+pub fn build(
+    args: &FamilyBuild,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let compiled = compile::all(&project)?;
+    let out = match &args.package {
+        Some(_) => project.families.join("dist"),
+        None => project.outputs.build.clone(),
+    };
     /* The schema every element's form is held to, published beside them. */
     let mut outputs = vec![(out.join("ir").join("schema.json"), types::schema())];
     for one in &compiled {
@@ -82,7 +118,7 @@ pub fn build(args: &FamilyBuild, from: &Path, json: bool) -> Result<Code, Failur
         ));
     }
     if args.check {
-        return output::settle(&outputs, true, "helix family build", json);
+        return output::settle(&outputs, true, &command("build"), json);
     }
     for (path, text) in &outputs {
         output::write(path, text)?;
@@ -103,21 +139,32 @@ pub fn build(args: &FamilyBuild, from: &Path, json: bool) -> Result<Code, Failur
 ///
 /// [`Failure`] when a source cannot be read or compiled, or the manifest
 /// cannot be read.
-pub fn check(args: &FamilyArgs, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    let compiled = compile::all(&package)?;
+pub fn check(
+    args: &FamilyArgs,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let compiled = compile::all(&project)?;
     let mut differences = Vec::new();
     let mut manifest = None;
     for one in &compiled {
         if !one.family.tree.is_empty() {
             if manifest.is_none() {
-                manifest = Some(read_manifest(&package)?);
+                manifest = Some(read_manifest(&project)?);
             }
             let manifest = manifest.as_ref().unwrap_or(&serde_json::Value::Null);
             differences.extend(
-                api::parity(&one.family.tag, &one.family.api, &one.family.tree, manifest)
-                    .into_iter()
-                    .map(|why| format!("{}: {why}", one.element)),
+                api::parity(
+                    &one.family.tag,
+                    &one.family.api,
+                    &one.family.tree,
+                    manifest,
+                    &project.names,
+                )
+                .into_iter()
+                .map(|why| format!("{}: {why}", one.element)),
             );
         }
     }
@@ -137,18 +184,52 @@ pub fn check(args: &FamilyArgs, from: &Path, json: bool) -> Result<Code, Failure
 ///
 /// [`Failure`] when a source cannot be compiled, or a stylesheet cannot be
 /// written or read.
-pub fn stylesheets(args: &FamilyStylesheets, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    let out = args
-        .out
-        .as_ref()
-        .map_or_else(|| styled(&package).join("src"), |dir| locate(dir, from));
-    let outputs: Vec<(PathBuf, String)> = compile::all(&package)?
+pub fn stylesheets(
+    args: &FamilyStylesheets,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let out = match &args.out {
+        Some(dir) => locate(dir, from),
+        None => project
+            .needs(project.outputs.stylesheets.as_ref(), "outputs.stylesheets")?
+            .to_path_buf(),
+    };
+    let outputs: Vec<(PathBuf, String)> = compile::all(&project)?
         .iter()
         .filter(|one| !one.family.stylesheet.is_empty())
-        .map(|one| (out.join(&one.family.stylesheet), generated(one, &package)))
+        .map(|one| (out.join(&one.family.stylesheet), generated(one, &project)))
         .collect();
-    output::settle(&outputs, args.check, "helix family stylesheets", json)
+    output::settle(&outputs, args.check, &command("stylesheets"), json)
+}
+
+/// The runtime package a runtime command reads or writes: the one the
+/// command line gives, or the one the project's `runtime.sources` names
+/// under `key`.
+///
+/// # Errors
+///
+/// [`Failure`] when neither names one, or the project cannot be read.
+fn runtime_package(
+    package: Option<&PathBuf>,
+    config: Option<&Path>,
+    from: &Path,
+    key: &str,
+) -> Result<PathBuf, Failure> {
+    if let Some(package) = package {
+        return Ok(locate(package, from));
+    }
+    let project = Project::required(config, from)?;
+    let named = if key == "core" {
+        project.runtime.core.as_ref()
+    } else {
+        project.runtime.native_package.as_ref()
+    };
+    Ok(project
+        .needs(named, &format!("runtime.sources.{key}"))?
+        .to_path_buf())
 }
 
 /// Compiles each machine under the package's `src/machines` to the module
@@ -158,15 +239,20 @@ pub fn stylesheets(args: &FamilyStylesheets, from: &Path, json: bool) -> Result<
 ///
 /// [`Failure`] when a machine cannot be read or breaks a rule a machine
 /// keeps, or a module cannot be written or read.
-pub fn machines(args: &FamilyMachines, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
+pub fn machines(
+    args: &FamilyMachines,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let package = runtime_package(args.package.as_ref(), config, from, "core")?;
     let root = package.join("src").join("machines");
     if !root.is_dir() {
         return Err(Failure::input(
             "the package has no machines",
             format!("{} is not a directory", root.display()),
         )
-        .hint("pass the directory that holds `src/machines`, such as helix/core"));
+        .hint("pass the runtime package that holds `src/machines`"));
     }
     /* Every folder under it holding a `machine.ts`, at any depth, so the
     format's own fixtures compile beside the machines they test. */
@@ -226,7 +312,7 @@ pub fn machines(args: &FamilyMachines, from: &Path, json: bool) -> Result<Code, 
             machine::emit::module(&read),
         ));
     }
-    let code = output::settle(&outputs, args.check, "helix family machines", json)?;
+    let code = output::settle(&outputs, args.check, &command("machines"), json)?;
     if broken.is_empty() {
         Ok(code)
     } else {
@@ -243,8 +329,15 @@ pub fn machines(args: &FamilyMachines, from: &Path, json: bool) -> Result<Code, 
 /// # Errors
 ///
 /// [`Failure`] when a contract cannot be written or read.
-pub fn capabilities(args: &FamilyCapabilities, from: &Path, json: bool) -> Result<Code, Failure> {
-    let root = locate(&args.package, from).join("src").join("capabilities");
+pub fn capabilities(
+    args: &FamilyCapabilities,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let root = runtime_package(args.package.as_ref(), config, from, "core")?
+        .join("src")
+        .join("capabilities");
     let mut outputs = vec![(root.join("types.generated.ts"), capability::types_module())];
     outputs.extend(capability::CAPABILITIES.iter().map(|one| {
         (
@@ -252,35 +345,43 @@ pub fn capabilities(args: &FamilyCapabilities, from: &Path, json: bool) -> Resul
             capability::contract(one),
         )
     }));
-    output::settle(&outputs, args.check, "helix family capabilities", json)
+    output::settle(&outputs, args.check, &command("capabilities"), json)
 }
 
 /// Writes each family's native components, with their props typed, as
-/// `<family>/index.native.ts` under `--out`, the styled package's `native`
-/// folder unless given, or with `--check` says which are behind.
+/// `<family>/index.native.ts` under `--out`, the project's
+/// `outputs.components` unless given, or with `--check` says which are
+/// behind.
 ///
 /// # Errors
 ///
-/// [`Failure`] when a source cannot be compiled, the styled manifest or core's
+/// [`Failure`] when a source cannot be compiled, the styled manifest or the
 /// event classes cannot be read, or an event's detail cannot be typed.
-pub fn components(args: &FamilyComponents, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    let compiled = compile::all(&package)?;
-    let events = package.parent().unwrap_or(&package).join("core/src/events");
-    let details = components::Details::read(&events)?;
-    let root = args
-        .out
-        .as_ref()
-        .map_or_else(|| styled(&package).join("native"), |dir| locate(dir, from));
+pub fn components(
+    args: &FamilyComponents,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let compiled = compile::all(&project)?;
+    let events = project.needs(project.events.as_ref(), "events")?;
+    let details = components::Details::read(events)?;
+    let root = match &args.out {
+        Some(dir) => locate(dir, from),
+        None => project
+            .needs(project.outputs.components.as_ref(), "outputs.components")?
+            .to_path_buf(),
+    };
     let outputs: Vec<(PathBuf, String)> =
-        components::modules(&compiled, &read_manifest(&package)?, &details)
+        components::modules(&compiled, &read_manifest(&project)?, &details, &project)
             .map_err(|faults| {
                 Failure::input("cannot type the native components", faults.join("\n"))
             })?
             .into_iter()
             .map(|(family, text)| (root.join(family).join("index.native.ts"), text))
             .collect();
-    output::settle(&outputs, args.check, "helix family components", json)
+    output::settle(&outputs, args.check, &command("components"), json)
 }
 
 /// Writes the intermediate form's TypeScript types into the package's
@@ -289,28 +390,53 @@ pub fn components(args: &FamilyComponents, from: &Path, json: bool) -> Result<Co
 /// # Errors
 ///
 /// [`Failure`] when the types cannot be written or read.
-pub fn types(args: &FamilyTypes, from: &Path, json: bool) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
+pub fn types(
+    args: &FamilyTypes,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let package = runtime_package(args.package.as_ref(), config, from, "native")?;
     let path = package.join("src").join("ir.generated.ts");
     output::settle(
         &[(path, types::typescript())],
         args.check,
-        "helix family types",
+        &command("types"),
         json,
     )
 }
 
+/// Prints the project the working directory names, every path made
+/// absolute and every default filled in, or with `--schema` the JSON Schema
+/// of `helix.family.json`.
+///
+/// # Errors
+///
+/// [`Failure`] when there is no project, or it cannot be read.
+pub fn config(args: &FamilyConfig, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+    if args.schema {
+        print!("{}", project::schema());
+        return Ok(Code::Ok);
+    }
+    let project = Project::required(config, from)?;
+    let text = serde_json::to_string_pretty(&project).map_err(|error| {
+        Failure::new(
+            Code::Internal,
+            "the project does not serialize",
+            error.to_string(),
+        )
+    })?;
+    println!("{text}");
+    Ok(Code::Ok)
+}
+
 /// A generated stylesheet: what the table compiles to, under a line naming
 /// its source.
-fn generated(one: &Compiled, package: &Path) -> String {
-    let source = one
-        .source
-        .strip_prefix(package.parent().and_then(Path::parent).unwrap_or(package))
-        .unwrap_or(&one.source)
-        .display()
-        .to_string();
+fn generated(one: &Compiled, project: &Project) -> String {
     format!(
-        "/* Generated by `helix family stylesheets` from {source}. Do not edit: the\n   reasoning for each rule is beside it there. */\n\n{}",
+        "/* Generated by `{}` from {}. Do not edit: the\n   reasoning for each rule is beside it there. */\n\n{}",
+        command("stylesheets"),
+        project.named(&one.source),
         one.web
     )
 }
@@ -319,9 +445,8 @@ fn generated(one: &Compiled, package: &Path) -> String {
 /// so a generated file names its source the same from any directory.
 ///
 /// **A relative path is found from `from` or the nearest directory above it
-/// that holds it**, so the styled package's script names the neutral package by
-/// its place in the repository, `helix/neutral`, without naming a path inside
-/// a sibling.
+/// that holds it**, so a package's script names another package by its place
+/// in the repository without naming a path inside a sibling.
 fn locate(path: &Path, from: &Path) -> PathBuf {
     let joined = if path.is_absolute() {
         path.to_path_buf()
@@ -334,20 +459,16 @@ fn locate(path: &Path, from: &Path) -> PathBuf {
     fs::canonicalize(&joined).unwrap_or(joined)
 }
 
-/// The styled package, beside the neutral one.
-fn styled(package: &Path) -> PathBuf {
-    package.parent().unwrap_or(package).join("styled")
-}
-
-/// The styled tier's manifest, which `analyze` writes and the API is held to.
-fn read_manifest(package: &Path) -> Result<serde_json::Value, Failure> {
-    let path = styled(package).join("custom-elements.json");
-    let text = fs::read_to_string(&path).map_err(|error| {
+/// The styled elements' manifest, which the project's `manifest` names, and
+/// which the API is held to.
+fn read_manifest(project: &Project) -> Result<serde_json::Value, Failure> {
+    let path = project.needs(project.manifest.as_ref(), "manifest")?;
+    let text = fs::read_to_string(path).map_err(|error| {
         Failure::input(
             "cannot read the styled manifest",
             format!("{}: {error}", path.display()),
         )
-        .hint("run `turbo run analyze --filter=@fusion.dev/helix`, which writes it")
+        .hint("write the styled elements' custom elements manifest first: their analyzer writes it")
     })?;
     serde_json::from_str(&text).map_err(|error| {
         Failure::input(

@@ -22,8 +22,8 @@ use fusion_helix_theme::tokens::{
 };
 use serde_json::{json, Map, Value as Json};
 
-/// The key Helix's own data is kept under in `$extensions`.
-pub const VENDOR: &str = "dev.fusion.helix";
+use super::System;
+use crate::family::project::Names;
 
 /// A token as the format writes it, or what is kept for one it cannot type.
 #[derive(Clone, Debug, PartialEq)]
@@ -48,7 +48,7 @@ pub fn alias(name: &str) -> String {
 
 /// The token another is, where its whole value is a reference to it with no
 /// fallback.
-pub fn aliased(token: &Token) -> Option<&str> {
+pub fn aliased<'a>(token: &'a Token, names: &Names) -> Option<&'a str> {
     let name = match &token.expr {
         Expr::Color(Color::Var(var)) if var.fallback.is_none() => &var.name,
         Expr::Easing(Easing::Var(var)) if var.fallback.is_none() => &var.name,
@@ -59,7 +59,7 @@ pub fn aliased(token: &Token) -> Option<&str> {
         Expr::Time(Time::Var(var)) if var.fallback.is_none() => &var.name,
         _ => return None,
     };
-    name.strip_prefix("--helix-")
+    names.token_of(name)
 }
 
 fn round(value: f64, places: i32) -> f64 {
@@ -198,9 +198,12 @@ pub fn entry(
     token: &Token,
     mode: Mode,
     typed_alias: &dyn Fn(&str) -> Option<&'static str>,
+    system: &System,
 ) -> Result<Entry, String> {
-    let extensions = json!({ VENDOR: extension(token) });
-    if let Some(target) = aliased(token) {
+    let mut extensions = Map::new();
+    extensions.insert(system.vendor.clone(), extension(token));
+    let extensions = Json::Object(extensions);
+    if let Some(target) = aliased(token, &system.names) {
         if let Some(kind) = typed_alias(target) {
             return Ok(Entry::Typed(json!({
                 "$type": kind,
@@ -222,10 +225,15 @@ pub fn entry(
 
 /// The format's type for `token` in `mode`, following an alias to the token
 /// it names, or none where the format has no type for it.
-pub fn type_of(registry: &Registry, token: &Token, mode: Mode) -> Option<&'static str> {
-    if let Some(target) = aliased(token) {
+pub fn type_of(
+    registry: &Registry,
+    token: &Token,
+    mode: Mode,
+    names: &Names,
+) -> Option<&'static str> {
+    if let Some(target) = aliased(token, names) {
         let target = registry.tokens().iter().find(|one| one.name == target)?;
-        return type_of(registry, target, mode);
+        return type_of(registry, target, mode, names);
     }
     let value = registry.evaluate(token, mode).ok()?;
     typed(token, &value).map(|(kind, _)| kind)

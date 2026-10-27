@@ -1,8 +1,9 @@
 //! The Design Tokens Format Module 2025.10 file and the resolver document that
 //! says how its modes compose.
 //!
-//! **`helix.tokens.json` is light mode at the default density**, every token
-//! grouped by its category. **`helix.resolver.json` holds the rest** as two
+//! **`<prefix>.tokens.json` is light mode at the default density**, every
+//! token grouped by its category, under the design system's token prefix.
+//! **`<prefix>.resolver.json` holds the rest** as two
 //! modifiers over it: `mode`, whose `dark` context holds each token whose value
 //! is different in dark mode, and `density`, whose `sm` and `lg` contexts hold
 //! each token a density stop in `base.css` moves. An alias is written once and
@@ -19,22 +20,18 @@ use fusion_helix_theme::tokens::{declared_under, Mode, Registry, Written};
 use fusion_rules::error::Failure;
 use serde_json::{json, Map, Value as Json};
 
-use super::format::{self, entry, path, Entry, VENDOR};
-use super::{declared, typed, written};
-
-/// The base file's name, which the resolver names as its one set.
-pub const TOKENS_FILE: &str = "helix.tokens.json";
-
-/// The resolver's name.
-pub const RESOLVER_FILE: &str = "helix.resolver.json";
+use super::format::{self, entry, path, Entry};
+use super::{declared, typed, written, System};
 
 /// The density stops, by the value `data-density` takes. `md` is the default.
 pub const DENSITIES: [&str; 3] = ["sm", "md", "lg"];
 
-/// The token layer typed at the default density, and once more at each stop.
+/// The token layer typed at the default density, and once more at each stop,
+/// with the design system it is the layer of.
 pub struct Layer {
     pub base: Registry,
     pub densities: Vec<(&'static str, Registry)>,
+    pub system: System,
 }
 
 impl Layer {
@@ -44,7 +41,7 @@ impl Layer {
     /// # Errors
     ///
     /// [`Failure`] when a source cannot be read or a token cannot be typed.
-    pub fn read(styles: &Path) -> Result<Self, Failure> {
+    pub fn read(styles: &Path, system: System) -> Result<Self, Failure> {
         let declared = declared(styles)?;
         let written = written(styles)?;
         let base_css =
@@ -58,12 +55,16 @@ impl Layer {
             .iter()
             .map(|stop| {
                 let moved = declared_under(&base_css, &format!("[data-density=\"{stop}\"]"));
-                Ok((*stop, typed(&declared, &stopped(&written, &moved))?))
+                Ok((
+                    *stop,
+                    typed(&declared, &stopped(&written, &moved, &system))?,
+                ))
             })
             .collect::<Result<_, Failure>>()?;
         Ok(Self {
             base: typed(&declared, &written)?,
             densities,
+            system,
         })
     }
 
@@ -89,7 +90,7 @@ impl Layer {
             .unwrap_or_default();
         let mut differences = Vec::new();
         for token in self.base.tokens() {
-            let name = format!("--helix-{}", token.name);
+            let name = self.system.names.token(&token.name);
             match values.iter().find(|(one, _)| *one == name) {
                 Some((_, css)) if *css == token.css => {}
                 Some((_, css)) => differences.push(format!(
@@ -119,13 +120,17 @@ impl Layer {
 
 /// `written` with each token a density stop declares replaced by its CSS
 /// there.
-fn stopped(written: &[(String, Written)], moved: &[(String, String)]) -> Vec<(String, Written)> {
+fn stopped(
+    written: &[(String, Written)],
+    moved: &[(String, String)],
+    system: &System,
+) -> Vec<(String, Written)> {
     written
         .iter()
         .map(|(name, value)| {
             let declared = moved
                 .iter()
-                .find(|(property, _)| property.strip_prefix("--helix-") == Some(name.as_str()));
+                .find(|(property, _)| system.names.token_of(property) == Some(name.as_str()));
             match declared {
                 Some((_, css)) => (name.clone(), Written::Css(css.clone())),
                 None => (name.clone(), value.clone()),
@@ -135,22 +140,28 @@ fn stopped(written: &[(String, Written)], moved: &[(String, String)]) -> Vec<(St
 }
 
 /// Every token of `registry` in `mode`, by name, as the format writes it.
-fn entries(registry: &Registry, mode: Mode) -> Result<Vec<(String, Entry)>, Failure> {
+fn entries(
+    registry: &Registry,
+    mode: Mode,
+    system: &System,
+) -> Result<Vec<(String, Entry)>, Failure> {
     let alias_type = |name: &str| {
         let target = registry.tokens().iter().find(|one| one.name == name)?;
-        format::type_of(registry, target, mode)
+        format::type_of(registry, target, mode, &system.names)
     };
     let mut faults = Vec::new();
     let found = registry
         .tokens()
         .iter()
-        .filter_map(|token| match entry(registry, token, mode, &alias_type) {
-            Ok(one) => Some((token.name.clone(), one)),
-            Err(why) => {
-                faults.push(why);
-                None
-            }
-        })
+        .filter_map(
+            |token| match entry(registry, token, mode, &alias_type, system) {
+                Ok(one) => Some((token.name.clone(), one)),
+                Err(why) => {
+                    faults.push(why);
+                    None
+                }
+            },
+        )
         .collect();
     if faults.is_empty() {
         Ok(found)
@@ -164,7 +175,11 @@ fn entries(registry: &Registry, mode: Mode) -> Result<Vec<(String, Entry)>, Fail
 
 /// The tokens of `entries` grouped by category, and each untyped one in its
 /// group's `$extensions`, keeping only those `keep` names.
-fn grouped(entries: &[(String, Entry)], keep: &dyn Fn(&str) -> bool) -> Map<String, Json> {
+fn grouped(
+    entries: &[(String, Entry)],
+    keep: &dyn Fn(&str) -> bool,
+    vendor: &str,
+) -> Map<String, Json> {
     let mut groups: Map<String, Json> = Map::new();
     for (name, entry) in entries.iter().filter(|(name, _)| keep(name)) {
         let (group, rest) = path(name);
@@ -176,10 +191,12 @@ fn grouped(entries: &[(String, Entry)], keep: &dyn Fn(&str) -> bool) -> Map<Stri
                 members.insert(rest.to_owned(), token.clone());
             }
             Entry::Untyped(record) => {
-                let extensions = members
-                    .entry("$extensions")
-                    .or_insert_with(|| json!({ VENDOR: { "untyped": {} } }));
-                extensions[VENDOR]["untyped"][rest] = record.clone();
+                let extensions = members.entry("$extensions").or_insert_with(|| {
+                    let mut own = Map::new();
+                    own.insert(vendor.to_owned(), json!({ "untyped": {} }));
+                    Json::Object(own)
+                });
+                extensions[vendor]["untyped"][rest] = record.clone();
             }
         }
     }
@@ -204,37 +221,53 @@ fn moved(base: &[(String, Entry)], other: &[(String, Entry)]) -> Vec<String> {
 /// [`Failure`] when a token cannot be evaluated, or a density stop moves a
 /// token dark mode moves too.
 pub fn design_tokens(layer: &Layer) -> Result<Vec<(String, String)>, Failure> {
-    let light = entries(&layer.base, Mode::Light)?;
-    let dark = entries(&layer.base, Mode::Dark)?;
+    let system = &layer.system;
+    let vendor = system.vendor.as_str();
+    let set = system.names.property.as_str();
+    let tokens_file = format!("{set}.tokens.json");
+    let resolver_file = format!("{set}.resolver.json");
+    let light = entries(&layer.base, Mode::Light, system)?;
+    let dark = entries(&layer.base, Mode::Dark, system)?;
     let darkened = moved(&light, &dark);
     let mut file = Map::new();
     file.insert(
         "$description".to_owned(),
-        json!("Helix's semantic tokens in light mode at the default density. helix.resolver.json adds dark mode and the other densities."),
+        json!(format!(
+            "{}'s semantic tokens in light mode at the default density. {resolver_file} adds dark mode and the other densities.",
+            system.name
+        )),
     );
-    file.extend(grouped(&light, &|_| true));
+    file.extend(grouped(&light, &|_| true, vendor));
     let mut stops = Map::new();
     for (stop, registry) in &layer.densities {
-        let at = entries(registry, Mode::Light)?;
+        let at = entries(registry, Mode::Light, system)?;
         let shifted = moved(&light, &at);
         if let Some(both) = shifted.iter().find(|name| darkened.contains(name)) {
             return Err(Failure::input(
                 "the modes are not independent",
-                format!("`--helix-{both}` moves in dark mode and at density {stop}"),
+                format!(
+                    "`{}` moves in dark mode and at density {stop}",
+                    system.names.token(both)
+                ),
             ));
         }
-        stops.insert((*stop).to_owned(), sources(&at, &shifted));
+        stops.insert((*stop).to_owned(), sources(&at, &shifted, vendor));
     }
+    let mut sets = Map::new();
+    sets.insert(
+        set.to_owned(),
+        json!({ "sources": [{ "$ref": tokens_file }] }),
+    );
     let resolver = json!({
         "$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
-        "name": "Helix",
+        "name": system.name,
         "version": "2025.10",
-        "description": "Helix's semantic tokens in each color mode and at each density.",
-        "sets": { "helix": { "sources": [{ "$ref": TOKENS_FILE }] } },
+        "description": format!("{}'s semantic tokens in each color mode and at each density.", system.name),
+        "sets": sets,
         "modifiers": {
             "mode": {
                 "description": "The color mode.",
-                "contexts": { "light": [], "dark": sources(&dark, &darkened) },
+                "contexts": { "light": [], "dark": sources(&dark, &darkened, vendor) },
                 "default": "light",
             },
             "density": {
@@ -244,26 +277,28 @@ pub fn design_tokens(layer: &Layer) -> Result<Vec<(String, String)>, Failure> {
             },
         },
         "resolutionOrder": [
-            { "$ref": "#/sets/helix" },
+            { "$ref": format!("#/sets/{set}") },
             { "$ref": "#/modifiers/mode" },
             { "$ref": "#/modifiers/density" },
         ],
     });
     Ok(vec![
-        (TOKENS_FILE.to_owned(), pretty(&Json::Object(file))),
-        (RESOLVER_FILE.to_owned(), pretty(&resolver)),
+        (tokens_file, pretty(&Json::Object(file))),
+        (resolver_file, pretty(&resolver)),
     ])
 }
 
 /// A context's sources: none where nothing moves, or one inline set of the
 /// tokens that do.
-fn sources(entries: &[(String, Entry)], names: &[String]) -> Json {
+fn sources(entries: &[(String, Entry)], names: &[String], vendor: &str) -> Json {
     if names.is_empty() {
         return json!([]);
     }
-    json!([grouped(entries, &|name| names
-        .iter()
-        .any(|one| one == name))])
+    json!([grouped(
+        entries,
+        &|name| names.iter().any(|one| one == name),
+        vendor
+    )])
 }
 
 fn pretty(json: &Json) -> String {
