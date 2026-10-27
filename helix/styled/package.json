@@ -253,13 +253,17 @@
       "react-native": {
         "types": "./dist/jsx-dev-runtime/index.native.d.ts",
         "default": "./dist/jsx-dev-runtime/index.native.js"
-      }
+      },
+      "types": "./dist/jsx-dev-runtime/jsx-dev-runtime.d.ts",
+      "default": "./dist/jsx-dev-runtime/jsx-dev-runtime.js"
     },
     "./jsx-runtime": {
       "react-native": {
         "types": "./dist/jsx-runtime/index.native.d.ts",
         "default": "./dist/jsx-runtime/index.native.js"
-      }
+      },
+      "types": "./dist/jsx-runtime/jsx-runtime.d.ts",
+      "default": "./dist/jsx-runtime/jsx-runtime.js"
     },
     "./kbd": {
       "react-native": {
