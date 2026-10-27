@@ -282,6 +282,9 @@ export default styles(
           lineHeight: token('leading-tight'),
           minBlockSize: token('size-control-sm'),
           paddingInline: own.stepInset,
+          /* The name keeps to one line and runs past a narrow step, as the
+             web's Button keeps its words whole. */
+          whiteSpace: 'nowrap',
         }),
         rule([{ complete: true }, { current: true }], { color: token('color-foreground') }),
         rule(
