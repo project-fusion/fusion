@@ -165,7 +165,7 @@ fn the_device_capabilities_give_what_became_of_each_request() {
         "{files}"
     );
     assert!(
-        files.contains("  readonly save: (file: FileSave) => Promise<boolean>\n"),
+        files.contains("  readonly save: (file: FileSave) => Promise<Saved>\n"),
         "{files}"
     );
     let camera = contract(find("camera"));
@@ -181,6 +181,16 @@ fn the_device_capabilities_give_what_became_of_each_request() {
     assert!(
         types.contains(
             "export type Outcome = \"chosen\" | \"dismissed\" | \"refused\" | \"unavailable\";"
+        ),
+        "{types}"
+    );
+    assert!(
+        types.contains("export type Saved = \"opened\" | \"saved\" | \"unavailable\";"),
+        "{types}"
+    );
+    assert!(
+        types.contains(
+            "export type Shared = \"copied\" | \"dismissed\" | \"opened\" | \"shared\" | \"unavailable\";"
         ),
         "{types}"
     );

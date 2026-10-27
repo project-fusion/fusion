@@ -137,7 +137,7 @@ export const webFiles: Files = {
     document.body.append(link)
     link.click()
     link.remove()
-    return Promise.resolve(true)
+    return Promise.resolve('saved')
   },
 }
 

@@ -60,22 +60,22 @@ describe('nativeFiles', () => {
     expect((await nativeFiles.pick({ accept: [], multiple: false })).outcome).toBe('unavailable')
   })
 
-  test('saves a file on the device through the share sheet', async () => {
+  test('saves a file through the share sheet, and is opened, since the sheet does not say more', async () => {
     sheet.isAvailableAsync.mockResolvedValue(true)
     sheet.shareAsync.mockResolvedValue(undefined)
     expect(
       await nativeFiles.save({ name: 'notes.txt', type: 'text/plain', uri: 'file:///notes.txt' }),
-    ).toBe(true)
+    ).toBe('opened')
     expect(sheet.shareAsync.mock.calls).toEqual([
       ['file:///notes.txt', { dialogTitle: 'notes.txt', mimeType: 'text/plain' }],
     ])
   })
 
-  test('a save gives false where the device cannot share a file', async () => {
+  test('a save is unavailable where the device cannot share a file', async () => {
     sheet.isAvailableAsync.mockResolvedValue(false)
     expect(
       await nativeFiles.save({ name: 'notes.txt', type: 'text/plain', uri: 'file:///notes.txt' }),
-    ).toBe(false)
+    ).toBe('unavailable')
   })
 
   test('a pick is unavailable where the app does not install expo-document-picker', async () => {

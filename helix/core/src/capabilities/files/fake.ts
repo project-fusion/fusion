@@ -1,4 +1,4 @@
-import type { FilePick, FileSave, Picked } from '../types.generated.js'
+import type { FilePick, FileSave, Picked, Saved } from '../types.generated.js'
 import type { Files } from './contract.generated.js'
 
 /** A files capability that keeps each request, and answers with what a spec sets. */
@@ -7,13 +7,13 @@ export interface FakeFiles extends Files {
   next: Picked
   /** The options of every pick, in order. */
   readonly picks: readonly FilePick[]
-  /** Every file saved, in order, while `saves` holds. */
+  /** What the next saves give, as a browser, a phone's sheet, or a platform that cannot save would. */
+  saves: Saved
+  /** Every file the platform took or opened its sheet for, in order. */
   readonly saved: readonly FileSave[]
-  /** Whether the next saves are taken, as a platform without room or permission refuses them. */
-  saves: boolean
 }
 
-/** A fake that keeps each pick and save, gives `next` for a pick, and takes every save while `saves` holds. */
+/** A fake that keeps each pick and save, gives `next` for a pick, and gives `saves` for a save, `saved` unless told otherwise. */
 export const fakeFiles = (): FakeFiles => {
   const picks: FilePick[] = []
   const saved: FileSave[] = []
@@ -25,14 +25,13 @@ export const fakeFiles = (): FakeFiles => {
     },
     picks,
     save: (file) => {
-      if (!fake.saves) {
-        return Promise.resolve(false)
+      if (fake.saves !== 'unavailable') {
+        saved.push(file)
       }
-      saved.push(file)
-      return Promise.resolve(true)
+      return Promise.resolve(fake.saves)
     },
     saved,
-    saves: true,
+    saves: 'saved',
   }
   return fake
 }
