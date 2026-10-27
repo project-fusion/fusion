@@ -232,3 +232,83 @@ pub struct Dragged {
     x: f64,
     y: f64,
 }
+
+/// A file the platform hands over: its name, its media type, its size in
+/// bytes, and the address it is read from, an object URL on the web and a
+/// file URI on a phone.
+#[derive(Serialize, TS)]
+pub struct DeviceFile {
+    name: String,
+    /// Its size in bytes, or 0 where the platform does not say.
+    size: f64,
+    /// Its media type, such as `image/jpeg`, or empty where the platform does
+    /// not say.
+    #[serde(rename = "type")]
+    kind: String,
+    uri: String,
+}
+
+/// Which files a file chooser offers, and whether it takes more than one.
+#[derive(Serialize, TS)]
+pub struct FilePick {
+    /// Media types such as `image/*` and extensions such as `.pdf`, or none
+    /// for any file.
+    accept: Vec<String>,
+    multiple: bool,
+}
+
+/// A file to save: the name it is saved under, its media type, and the
+/// address its content is read from, a `data:` URL, an object URL, a web
+/// address, or a file URI on a phone.
+#[derive(Serialize, TS)]
+pub struct FileSave {
+    name: String,
+    #[serde(rename = "type")]
+    kind: String,
+    uri: String,
+}
+
+/// What became of a request for files: they were chosen, the reader closed
+/// the chooser, the reader or the system refused the permission it needs,
+/// or the device cannot do it.
+#[derive(Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+pub enum Outcome {
+    Chosen,
+    Dismissed,
+    Refused,
+    Unavailable,
+}
+
+/// The files a chooser gave, in the order chosen, and what became of the
+/// request. Only a request that is `chosen` gives files.
+#[derive(Serialize, TS)]
+pub struct Picked {
+    files: Vec<DeviceFile>,
+    outcome: Outcome,
+}
+
+/// What the share sheet is handed: words, an address, a file, or several of
+/// them, and a title for the sheet where the platform shows one.
+#[derive(Serialize, TS)]
+#[ts(optional_fields)]
+pub struct Shareable {
+    file: Option<DeviceFile>,
+    text: Option<String>,
+    title: Option<String>,
+    url: Option<String>,
+}
+
+/// What became of a share: the sheet took it, the clipboard took the address
+/// or the words where there is no sheet, the reader closed the sheet, or the
+/// platform can share nothing.
+#[derive(Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+pub enum Shared {
+    Copied,
+    Dismissed,
+    /// The sheet took it.
+    #[serde(rename = "shared")]
+    Taken,
+    Unavailable,
+}
