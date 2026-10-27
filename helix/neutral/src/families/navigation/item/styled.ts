@@ -82,6 +82,9 @@ export default styles(
           fontWeight: hook.currentFontWeight,
         },
       ),
+      /* A section above the page showing takes the mark too, and its words
+         are at full strength under it. */
+      rule({ current: 'true' }, { color: hook.currentColor }),
       /* The ring turns inward, because the bar has no room to draw it outside. */
       rule(
         { focusVisible: true },
