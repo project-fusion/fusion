@@ -71,7 +71,7 @@ const REFERENCE = 'react-vite'
 const only = process.argv.slice(2).find((argument) => !argument.startsWith('--'))
 
 const run = (command, args, cwd, env = process.env) =>
-  execFileSync(command, args, { cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+  execFileSync(command, args, { cwd, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] })
 
 /**
  * The `helix` this tree built, newest of release and debug, as `bin.mjs`
