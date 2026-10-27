@@ -2,6 +2,7 @@ import { type Left, panelsOf, type Setup } from '@fusion.dev/helix-testing/confo
 import { screen } from '@testing-library/react-native'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { layerIn, PAGE } from './layers'
+import { textLeft } from './text'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
 
 /*
@@ -216,5 +217,6 @@ export const leftBy = (run: Run, opened: number): Left => {
       panelsOf(setup)
         .filter((panel) => screen.queryByText(panel.words) !== null)
         .map((panel) => panel.value),
+    ...textLeft(run),
   }
 }
