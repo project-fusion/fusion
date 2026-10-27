@@ -11,7 +11,7 @@ import { bind } from '../../../tree.js'
  * label no role. On the web, an `aria-label` or an `aria-labelledby` on the
  * host names the list too.
  *
- * **Held to `helix-description-list`.** `helix family check` compares the
+ * **Held to `helix-description-list`.** `helix system check` compares the
  * props, the states, the region, and the part with what the manifest says the
  * element has.
  */

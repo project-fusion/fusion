@@ -15,7 +15,7 @@ import { derive } from '../../../tree.js'
  * says nothing of its own. A segment draws only in the bar: a meter in `ring`
  * or `arc` draws its total.
  *
- * **Held to `helix-meter-segment`.** `helix family check` compares the props
+ * **Held to `helix-meter-segment`.** `helix system check` compares the props
  * and the parts with what the manifest says the element has.
  */
 export default headless('meter-segment', {

@@ -1,7 +1,7 @@
 /*
  * The derivations of Meter, Progress and Skeleton, which
  * `@fusion.dev/helix-core/derivations` exports with the rest. Each export is
- * one derivation, named as `helix family` names it, and reads the props by
+ * one derivation, named as `helix system` names it, and reads the props by
  * the web element's names.
  */
 

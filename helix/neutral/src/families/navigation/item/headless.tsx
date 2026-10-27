@@ -18,7 +18,7 @@ import { cancelable, headless, oneOf, Pressable, Slot, set, web } from '../../..
  * **The item stands for its `href` in its navigation**, so two items with
  * one `href` are one destination to a phone's keys.
  *
- * **Held to `helix-navigation-item`.** `helix family check` compares the
+ * **Held to `helix-navigation-item`.** `helix system check` compares the
  * props, the event, the states, the region, and the part with what the
  * manifest says the element has.
  */

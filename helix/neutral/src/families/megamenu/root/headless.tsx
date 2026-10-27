@@ -59,7 +59,7 @@ import { derive } from '../../../tree.js'
  * a phone takes from the trigger; and a press on any link or control of the
  * panel closing it, which a phone hears from its Megamenu Items alone.
  *
- * **Held to `helix-megamenu`.** `helix family check` compares the props,
+ * **Held to `helix-megamenu`.** `helix system check` compares the props,
  * the events, the states, the regions, and the parts with what the
  * manifest says the element has.
  */

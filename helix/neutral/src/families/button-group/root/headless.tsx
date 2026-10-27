@@ -27,7 +27,7 @@ import { bare, cancelable, headless, oneOf, Slot } from '../../../render.js'
  * **`disabled` disables every button**, and gives each its own state back
  * once it is cleared.
  *
- * **Held to `helix-button-group`.** `helix family check` compares the props,
+ * **Held to `helix-button-group`.** `helix system check` compares the props,
  * the events, the states, and the region with what the manifest says the
  * element has. `values`, the pressed values as a list, is the web's property
  * alone, since a phone reads `value`.

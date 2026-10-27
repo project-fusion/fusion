@@ -5,7 +5,7 @@ import generated from './native.generated.json'
  * The React Native reference, imported rather than read, as the catalog is.
  *
  * `turbo run native-reference` writes the file imported above from the modules
- * `helix family components` writes, and the site runs it before `next build`
+ * `helix system components` writes, and the site runs it before `next build`
  * and `next dev`.
  */
 export type {

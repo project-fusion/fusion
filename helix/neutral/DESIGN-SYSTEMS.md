@@ -1,19 +1,19 @@
 # Build a design system on the family compiler
 
-`helix family` compiles families written in the neutral form into a web
+`helix system` compiles families written in the neutral form into a web
 stylesheet, an intermediate form, and a React Native component for each
 element. Helix is the first design system written for it. You can write your
 own: give it a prefix, a token file, and families, and draw it with Helix's
 runtime or with one of your own.
 
-The compiler runs in this repository's builds of `helix`. The commands below
-are `bun run helix family …` from the repository.
+`helix system` is a command of `helix`, which `@fusion.dev/helix-cli`
+installs. In this repository the commands below are `bun run helix system …`.
 
 ## What a design system holds
 
 | Path | What it is |
 |---|---|
-| `helix.family.json` | The project file: the prefix, the token source, where the families are, and where each command writes |
+| `helix.json` | The configuration. Its `system` holds the prefix, the token source, where the families are, and where each command writes |
 | `src/families/<family>/<element>/headless.tsx` | An element's props, events, states, features, and part tree, written as the [README](README.md) describes |
 | `src/families/<family>/<element>/styled.ts` | The element's styled props and its style table |
 | `src/fragments/<name>.ts` | Rules several families share, which a table takes in with `include()` |
@@ -24,13 +24,27 @@ are `bun run helix family …` from the repository.
 `helix/cli/tests/fixtures/acme` is a small design system laid out this way,
 with a badge, a button, and a tab set. The compiler's specs build it.
 
-## The project file
+## The configuration
 
-`helix family` reads `helix.family.json` from the working directory or the
-nearest directory above it, up to the repository root. `--config <path>`
-names another. Every path in the file is relative to the file.
+`helix.json` configures each command of `helix` that reads a configuration,
+in a section of its own:
 
-| Key | What it does |
+| Section | What reads it |
+|---|---|
+| `theme` | `helix theme`: the intent it derives, written in place, or the path of a theme file such as `"theme": "brand.theme.json"` |
+| `components` | `helix component`: `tiers`, the folders that hold your component source, and the settings its rules read |
+| `system` | `helix system`: your design system, as the table below describes |
+
+A project that uses Fusion writes the same sections under the `helix` key of
+its `fusion.json`. In each directory, the `helix` key of `fusion.json` is read
+first, and `helix.json` where `fusion.json` has no `helix` key.
+
+`helix system` reads the nearest configuration with a `system`, from the
+working directory up to the repository root. `--config <path>` names another
+`helix.json` or `fusion.json`. Every path in the section is relative to the
+file.
+
+| Key of `system` | What it does |
 |---|---|
 | `name` | Your design system's name as a sentence writes it, such as `Acme` |
 | `prefix` | The prefix of every tag, `acme-tabs`, and of every event and token unless the next two keys say otherwise |
@@ -44,7 +58,7 @@ names another. Every path in the file is relative to the file.
 | `theme` | The private values your page sets that a family may read with `inherited()`, each without its leading `_` |
 | `manifest` | Your web elements' custom elements manifest |
 | `events` | The folder of your web event classes |
-| `outputs.build` | Where `build` writes `ir/` and `web/`. The families package's `dist` when you leave it out |
+| `outputs.build` | Where `build` writes `ir/` and `web/`. The families package's `build` when you leave it out, beside the `dist` a package publishes |
 | `outputs.stylesheets` | The folder each element's `stylesheet` path is under |
 | `outputs.components` | Where `components` writes `<family>/index.native.ts` |
 | `outputs.tokens` | Where `tokens` writes each mode's native token module |
@@ -54,37 +68,41 @@ names another. Every path in the file is relative to the file.
 | `runtime.layerHost` | The component your app wraps itself in, as the anatomy names it. `HelixRoot` when you leave it out |
 | `runtime.sources` | The runtime's own packages, `core` and `native`, for a design system that builds its runtime too |
 
-`helix family` refuses a key it does not know, with the key and its line.
-`helix family config` prints the project with every path made absolute and
-every default filled in. `helix family config --schema` prints the file's
-JSON Schema, which an editor validates the file with through `$schema`.
+`helix` refuses a key it does not know, with the key and its line.
+`helix system config` prints the design system with every path made absolute
+and every default filled in. `helix system config --schema` prints the JSON
+Schema of `helix.json`, which an editor validates the file with through
+`$schema`.
 
-Acme's project file draws with Helix's runtime:
+Acme's `helix.json` draws with Helix's runtime:
 
 ```json
 {
-  "events": "src/events",
-  "families": ".",
-  "manifest": "custom-elements.json",
-  "name": "Acme",
-  "outputs": {
-    "build": "out/dist",
-    "components": "out/native",
-    "stylesheets": "out/styled",
-    "tokens": "out/theme"
-  },
-  "prefix": "acme",
-  "runtime": { "native": "@fusion.dev/helix-native" },
-  "theme": ["acme-mode"],
-  "tokens": {
-    "dtcg": "tokens/acme.tokens.json",
-    "modes": { "dark": "tokens/acme.dark.tokens.json" }
+  "system": {
+    "events": "src/events",
+    "families": ".",
+    "manifest": "custom-elements.json",
+    "name": "Acme",
+    "outputs": {
+      "build": "out/dist",
+      "components": "out/native",
+      "stylesheets": "out/styled",
+      "tokens": "out/theme"
+    },
+    "prefix": "acme",
+    "runtime": { "native": "@fusion.dev/helix-native" },
+    "theme": ["acme-mode"],
+    "tokens": {
+      "dtcg": "tokens/acme.tokens.json",
+      "modes": { "dark": "tokens/acme.dark.tokens.json" }
+    }
   }
 }
 ```
 
-Helix's own, at the repository root, names its styles package and the
-packages of its runtime:
+Helix's own `system` is under the `helix` key of `fusion.json` at the
+repository root, beside its `components`. It names its styles package and
+the packages of its runtime:
 
 ```json
 {
@@ -93,7 +111,7 @@ packages of its runtime:
   "manifest": "helix/styled/custom-elements.json",
   "name": "Helix",
   "outputs": {
-    "build": "helix/neutral/dist",
+    "build": "helix/neutral/build",
     "components": "helix/styled/native",
     "designTokens": "helix/styles/dist",
     "stylesheets": "helix/styled/src",
@@ -116,10 +134,10 @@ packages of its runtime:
 A token is a member with a `$value`. Its name is its path joined with `-`:
 `color.accent` is `color-accent`, which a style table reads as
 `token('color-accent')` and the web writes as `var(--acme-color-accent)`.
-`helix family` refuses a `token()` your file does not hold. A group's
+`helix system` refuses a `token()` your file does not hold. A group's
 `$type` is the type of each token in it that names none.
 
-`helix family tokens` writes each token's value as the native theme takes it:
+`helix system tokens` writes each token's value as the native theme takes it:
 
 | `$type` | Native value |
 |---|---|
@@ -181,8 +199,8 @@ system changes:
   sorts keys has to leave `headless.tsx` and `styled.ts` alone, as this
   repository's `biome.json` does for Helix's families and Acme's.
 
-`helix family check` holds each element's attributes, events, slots, parts,
-and custom states to your manifest. `helix family components` describes each
+`helix system check` holds each element's attributes, events, slots, parts,
+and custom states to your manifest. `helix system components` describes each
 prop, slot, and event from it, and types each event's detail from your event
 classes: a class that extends `CustomEvent<Detail>`, with `Detail` an
 interface in the same folder.
@@ -235,16 +253,20 @@ so both features work under any prefix.
 
 ## Commands
 
+The last four commands write into Helix's own packages, and are in this
+repository's builds of `helix` alone. A design system that draws with
+Helix's runtime installs what they write.
+
 | Command | Reads | Writes |
 |---|---|---|
-| `helix family build` | `families`, `tokens` | `outputs.build`: each element's form and web stylesheet |
-| `helix family stylesheets` | `families`, `tokens` | `outputs.stylesheets`: each element's generated stylesheet |
-| `helix family check` | `families`, `manifest` | Nothing. It says where an element differs from the manifest |
-| `helix family components` | `families`, `manifest`, `events`, `runtime` | `outputs.components`: each family's native module |
-| `helix family platforms` | `families`, `manifest` | Prints each element's names on React Native |
-| `helix family anatomy` | `families`, `runtime` | Prints each element's tree on each platform |
-| `helix family tokens` | `tokens` | `outputs.tokens`: each mode's native token module |
-| `helix family design-tokens` | `tokens.styles` | `outputs.designTokens`: the token file of a styles package |
-| `helix family types` | Nothing | `runtime.sources.native`: the form's TypeScript types |
-| `helix family machines` | `runtime.sources.core` | Each machine's compiled module |
-| `helix family capabilities` | Nothing | `runtime.sources.core`: each capability's contract |
+| `helix system build` | `families`, `tokens` | `outputs.build`: each element's form and web stylesheet |
+| `helix system stylesheets` | `families`, `tokens` | `outputs.stylesheets`: each element's generated stylesheet |
+| `helix system check` | `families`, `manifest` | Nothing. It says where an element differs from the manifest |
+| `helix system components` | `families`, `manifest`, `events`, `runtime` | `outputs.components`: each family's native module |
+| `helix system platforms` | `families`, `manifest` | Prints each element's names on React Native |
+| `helix system anatomy` | `families`, `runtime` | Prints each element's tree on each platform |
+| `helix system tokens` | `tokens` | `outputs.tokens`: each mode's native token module |
+| `helix system design-tokens` | `tokens.styles` | `outputs.designTokens`: the token file of a styles package |
+| `helix system types` | Nothing | `runtime.sources.native`: the form's TypeScript types |
+| `helix system machines` | `runtime.sources.core` | Each machine's compiled module |
+| `helix system capabilities` | Nothing | `runtime.sources.core`: each capability's contract |

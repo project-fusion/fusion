@@ -37,7 +37,7 @@ helix/icons/src/generated.ts
 helix/icons/src/*.generated.ts
 helix/*/src/element-events.generated.ts
 helix/styled/src/sandbox/compile-worker.generated.ts
-# The native components `helix family components` writes, each carrying its
+# The native components `helix system components` writes, each carrying its
 # family's intermediate forms, which change with every style rule: the ones
 # the styled package compiles, and the ones the native package's specs draw.
 helix/styled/native/*
@@ -46,12 +46,15 @@ helix/styled/native/*
 !helix/styled/native/jsx-runtime/
 !helix/styled/native/jsx-dev-runtime/
 helix/native/src/families/*/
-# What `helix family types` and `helix family tokens` write into the runtime:
+# What `helix system types` and `helix system tokens` write into the runtime:
 # the intermediate form's types, and a token module per mode. The package's
 # `generate` writes them before it builds, checks, or tests.
 helix/native/src/ir.generated.ts
 helix/native/src/theme/*.generated.ts
 helix/styled/src/**/*.generated.css
+# What `helix system build` writes: each family's intermediate form and web
+# stylesheet, which `check:families` holds to a fresh build.
+helix/neutral/build/
 # The gallery app's catalog of examples, and what Expo writes beside an app:
 # its own folder, and the native projects `expo prebuild` writes for a build.
 helix/app/src/examples.generated.ts

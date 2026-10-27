@@ -9,7 +9,7 @@ use crate::family::ir::{styled, Family};
 use crate::family::read::default_export;
 
 /// A button whose web element has a form's prop and a form's event,
-/// compiled as `helix family` compiles one.
+/// compiled as `helix system` compiles one.
 fn compiled_button() -> Compiled {
     let family = Family::new(
         styled(

@@ -11,7 +11,7 @@ import { derive } from '../../../tree.js'
  * is still the rows next to each other. A section stands on the menu's top
  * page.
  *
- * **Held to `helix-menu-section`.** `helix family check` compares the
+ * **Held to `helix-menu-section`.** `helix system check` compares the
  * props, the regions, and the parts with what the manifest says the element
  * has.
  */

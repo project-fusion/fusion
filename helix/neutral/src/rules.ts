@@ -1,12 +1,12 @@
 /**
  * The shape a style table compiles to: what each rule is on, when it
  * applies, and what it sets. A table is written with `styles()` in
- * `table.ts`, which `helix family` rewrites into this shape, and the `When`
+ * `table.ts`, which `helix system` rewrites into this shape, and the `When`
  * here is what every rule's conditions may say.
  *
  * **Each condition has a web output and a native meaning, or says it has
  * none.** Print, forced colors and an element that has not upgraded are the
- * web's alone, and `helix family` leaves a rule under one out of the native
+ * web's alone, and `helix system` leaves a rule under one out of the native
  * output.
  */
 

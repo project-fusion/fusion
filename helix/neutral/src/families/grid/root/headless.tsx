@@ -18,7 +18,7 @@ import { headless, number, oneOf, Slot, web } from '../../../render.js'
  * order `row` and the default give, and has no column flow and no dense
  * packing.
  *
- * **Held to `helix-grid`.** `helix family check` compares the props, the
+ * **Held to `helix-grid`.** `helix system check` compares the props, the
  * states, and the region with what the manifest says the element has.
  */
 export default headless('grid', {

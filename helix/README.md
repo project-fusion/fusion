@@ -31,7 +31,7 @@ internal to the build.
 | `app` | none | the gallery on a phone: each family with a native version, and its examples, in Expo Go |
 | `cem` | none | writes the framework typings from a Helix manifest |
 | `gallery` | none | rendered component images for the documentation |
-| `neutral` | none | each family's platform-neutral source, which `helix family` compiles for the web and React Native |
+| `neutral` | none | each family's platform-neutral source, which `helix system` compiles for the web and React Native |
 | `testing` | none | the spec harness the other packages share |
 | `workbench` | none | the spec runner and the JSX reader behind the sandbox page on fusion.dev |
 

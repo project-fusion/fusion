@@ -29,7 +29,7 @@ use serde::Serialize;
 use serde_json::{json, Map, Value as Json};
 
 use super::members::{region_prop, slot_of};
-use crate::args::FamilyArgs;
+use crate::args::SystemArgs;
 use crate::family::api::{Attribute, Node, NodeKind, Platform, Prop, PropType};
 use crate::family::compile::{self, Compiled};
 use crate::family::ir::Family;
@@ -300,13 +300,13 @@ pub fn every(compiled: &[Compiled], layer_host: &str) -> Json {
     Json::Object(out)
 }
 
-/// `helix family anatomy`: prints, as JSON, every element's anatomy by its
+/// `helix system anatomy`: prints, as JSON, every element's anatomy by its
 /// tag.
 ///
 /// # Errors
 ///
 /// [`Failure`] when there is no project, or a source cannot be compiled.
-pub fn print(args: &FamilyArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+pub fn print(args: &SystemArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
     let project = open(config, args.package.as_ref(), from)?;
     say!(
         "{}",

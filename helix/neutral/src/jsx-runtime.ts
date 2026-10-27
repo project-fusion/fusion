@@ -2,7 +2,7 @@
  * The JSX runtime a `headless.tsx` source names through `jsxImportSource`,
  * as `#render/jsx-runtime`.
  *
- * **Nothing here draws anything.** `helix family` reads a render as syntax
+ * **Nothing here draws anything.** `helix system` reads a render as syntax
  * and never runs it. This module exists so the editor types the JSX against
  * the nodes in `render.ts`, and so a test that imports a source can load it.
  * No lowercase tag is an element here, so the editor refuses `<div>` as the

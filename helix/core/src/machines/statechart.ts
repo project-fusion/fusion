@@ -2,7 +2,7 @@
  * The format a machine is written in, Layer 2 of the intermediate layer spec
  * as revised on October 11, 2026. A machine is data: its states, the events
  * each state answers, the moves those make with their effects, and the named
- * pure functions its guards and updates call. `helix family machines` reads
+ * pure functions its guards and updates call. `helix system machines` reads
  * it and writes a flat module beside it, `<machine>.generated.ts`, which is
  * what runs. No module the package exports imports the data, so none of it
  * reaches a bundle.

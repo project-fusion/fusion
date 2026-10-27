@@ -47,7 +47,7 @@ import { derive } from '../../../tree.js'
  * the leading words of the content, which a phone has no element to read
  * them from.
  *
- * **Held to `helix-tour-stop`.** `helix family check` compares the props,
+ * **Held to `helix-tour-stop`.** `helix system check` compares the props,
  * the event, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

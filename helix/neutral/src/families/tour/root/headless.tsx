@@ -37,7 +37,7 @@ import { bare, boolean, cancelable, headless, Layer, number, oneOf, Slot } from 
  * as the tour opened; and `next()`, `back()`, and `skip()`, which a phone's
  * page reaches through `index` and `open`, as the gallery's examples do.
  *
- * **Held to `helix-tour`.** `helix family check` compares the props, the
+ * **Held to `helix-tour`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

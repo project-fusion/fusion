@@ -31,7 +31,7 @@
   "sideEffects": true,
   "scripts": {
     "build": "bun run token-layer && bun run elements-css && bun scripts/build-styles-dist.mjs",
-    "design-tokens": "helix family design-tokens",
+    "design-tokens": "helix system design-tokens",
     "elements-css": "build-elements-css",
     "styles-dist": "bun scripts/build-styles-dist.mjs",
     "test": "bun test src",

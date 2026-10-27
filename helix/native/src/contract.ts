@@ -2,11 +2,11 @@
  * The runtime contract: what the output of the family compiler needs from the
  * runtime a design system draws with.
  *
- * **A design system names its runtime in its `helix.family.json`.** Its
- * `runtime.native` is the module each native component imports, and Helix's
- * own runtime, `@fusion.dev/helix-native`, is the default. A design system
- * can build on Helix's runtime, or write a runtime of its own that exports
- * what this module types.
+ * **A design system names its runtime in the `system` of its
+ * `helix.json`.** Its `runtime.native` is the module each native component
+ * imports, and Helix's own runtime, `@fusion.dev/helix-native`, is the
+ * default. A design system can build on Helix's runtime, or write a runtime
+ * of its own that exports what this module types.
  *
  * **This module is types alone.** It imports nothing at run time, so a
  * runtime of another design system can depend on it with `import type` and
