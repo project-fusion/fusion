@@ -2,7 +2,7 @@
 
 use std::fmt::Write as _;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
 use fusion_rules::style::Paint;
 
 use crate::{
@@ -12,8 +12,10 @@ use crate::{
     source,
 };
 
-fn date(time: DateTime<Utc>) -> String {
-    time.format("%B %-d, %Y").to_string()
+/// The day `time` falls on where the reader is: an answer given on an
+/// evening prints that evening's date, and `--at 2026-10-19` prints October 19.
+pub(crate) fn date(time: DateTime<Utc>) -> String {
+    time.with_timezone(&Local).format("%B %-d, %Y").to_string()
 }
 
 fn plural(count: usize, one: &str, many: &str) -> String {
