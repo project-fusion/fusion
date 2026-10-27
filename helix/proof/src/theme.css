@@ -1,0 +1,69 @@
+:root {
+  --helix-color-background: light-dark(#ffffff, #000000);
+  --helix-color-surface: light-dark(#fafafa, #121212);
+  --helix-color-border: light-dark(#d9d9d9, #272727);
+  --helix-color-foreground: light-dark(#000000, #ffffff);
+  --helix-color-foreground-muted: light-dark(#636363, #9d9d9d);
+  --helix-color-surface-raised: light-dark(#f5f5f5, #181818);
+  --helix-color-surface-overlay: light-dark(#ffffff, #181818);
+  --helix-color-surface-sunken: light-dark(#f2f2f2, #0b0b0b);
+  --helix-color-primary: light-dark(#3451b2, #5e81e6);
+  --helix-color-foreground-on-primary: #f8f8f8;
+  --helix-color-foreground-on-accent: #f8f8f8;
+  --helix-color-foreground-on-status: #f8f8f8;
+  --helix-color-primary-hover: light-dark(#2842a2, #6c90f7);
+  --helix-color-primary-active: light-dark(#1c3391, #7fa1ff);
+  --helix-color-primary-subtle: light-dark(#e7eeff, #131e3c);
+  --helix-color-primary-surface: #3451b2;
+  --helix-color-accent: light-dark(#3451b2, #5e81e6);
+  --helix-color-accent-hover: light-dark(#2842a2, #6c90f7);
+  --helix-color-accent-active: light-dark(#1c3391, #7fa1ff);
+  --helix-color-accent-subtle: light-dark(#e7eeff, #131e3c);
+  --helix-color-accent-surface: #3451b2;
+  --helix-color-danger: light-dark(#ce3430, #e44942);
+  --helix-color-info: light-dark(#0073b7, #0088c5);
+  --helix-color-success: light-dark(#007f47, #189356);
+  --helix-color-warning: light-dark(#966500, #ae7500);
+  --helix-color-primary-muted: light-dark(#5b6d9e, #6c80b1);
+  --helix-color-accent-muted: light-dark(#5b6d9e, #6c80b1);
+  --helix-color-danger-muted: light-dark(#a35a53, #b76c64);
+  --helix-color-info-muted: light-dark(#487396, #5486a6);
+  --helix-color-success-muted: light-dark(#4b785b, #5c8b6c);
+  --helix-color-warning-muted: light-dark(#8d6833, #9f7a44);
+  --helix-color-primary-surface-hover: #2842a2;
+  --helix-color-accent-surface-hover: #2842a2;
+  --helix-color-danger-surface: #d33834;
+  --helix-color-danger-surface-hover: #c12424;
+  --helix-color-info-surface: light-dark(#0077bd, #0079b1);
+  --helix-color-info-surface-hover: light-dark(#0069a6, #006a9c);
+  --helix-color-success-surface: #00834a;
+  --helix-color-success-surface-hover: #007340;
+  --helix-color-warning-surface: #9c6800;
+  --helix-color-warning-surface-hover: #895b00;
+  --helix-color-surface-inverse: light-dark(#161616, #eeeeee);
+  --helix-color-foreground-inverse: light-dark(#a4a4a4, #4d4d4d);
+  --helix-color-focus-ring: light-dark(#6487ee, #3f5ec0);
+  --helix-color-brand-mark: light-dark(#3451b2, #4160c3);
+  --helix-seed-accent: light-dark(#3451b2, #5e81e6);
+  --helix-seed-accent-hue: 0;
+  --helix-seed-accent-lightness: 0.47;
+  --helix-seed-brand: light-dark(#3451b2, #5e81e6);
+  --helix-seed-chroma-scale: 1;
+  --helix-seed-density: 1;
+  --helix-seed-neutral-chroma: 0;
+  --helix-seed-neutral-hue: 267.4;
+  --helix-seed-radii: 0.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --helix-seed-accent-lightness: 0.625;
+  }
+}
+:root[data-color-mode="dark"],
+:root [data-color-mode="dark"] {
+  --helix-seed-accent-lightness: 0.625;
+}
+:root[data-color-mode="light"],
+:root [data-color-mode="light"] {
+  --helix-seed-accent-lightness: 0.47;
+}

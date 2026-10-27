@@ -1,4 +1,4 @@
-/* The root on the web: Helix's stylesheet, the page's own frame, and
+/* The root on the web: Helix's stylesheet, the theme, the page's own frame, and
    `HelixAppRoot`, which follows each press on a link to a route with the
    router. A stylesheet is the web's alone, so it is imported here.
 
@@ -9,6 +9,9 @@ import '@fusion.dev/helix-styles/primitives.css'
 import '@fusion.dev/helix-styles/tokens.css'
 import '@fusion.dev/helix-styles/base.css'
 import '@fusion.dev/helix-styles/elements.css'
+/* The theme in `helix.json`, which `bun run theme` writes here. After Helix's
+   stylesheet, so its tokens win. */
+import './theme.css'
 import './web.css'
 import { HelixAppRoot } from '@fusion.dev/helix/expo-router'
 import type { ReactNode } from 'react'

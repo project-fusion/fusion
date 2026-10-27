@@ -36,7 +36,7 @@ routes draw are under `src`.
 
   | Module | Web | Phone |
   |---|---|---|
-  | `src/root` | Helix's stylesheet and the page's frame | Helix's icons and the status bar |
+  | `src/root` | Helix's stylesheet, the theme, and the page's frame | The theme, Helix's icons, and the status bar |
   | `src/navigator` | The route showing, in the document's flow | A stack, with the router's header hidden |
   | `src/page` | A `main` landmark that the document scrolls | A scroll view |
 
@@ -51,6 +51,7 @@ routes draw are under `src`.
 | `bundle` | Writes the website into `dist`, for the base URL `/helix/app/proof` |
 | `start` | Starts Metro, for Expo Go on a simulator or a phone, and the website at `/helix/app/proof` |
 | `test` | Draws the route tree with the native runtime and presses through it |
+| `theme` | Writes the `theme` of `helix.json` into `src/theme.css` for the web and `src/theme.ts` for a phone |
 | `typecheck` | Checks the shared and web files as the web's, the `.native.tsx` files as React Native's, and Metro's config |
 
 The app reaches the workspace packages through what each one exports, so

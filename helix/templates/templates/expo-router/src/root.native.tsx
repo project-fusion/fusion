@@ -6,7 +6,7 @@ import * as icons from '@fusion.dev/helix-icons'
 import { glyphs } from '@fusion.dev/helix-native'
 import { StatusBar } from 'expo-status-bar'
 import type { ReactNode } from 'react'
-import helix from '../helix.json'
+import { theme } from './theme'
 
 type Icon = { readonly content: string; readonly viewBox: string }
 
@@ -18,11 +18,12 @@ const named = (name: string): Icon | undefined =>
 
 const Glyph = glyphs(named)
 
-/* The theme in `helix.json`. A development build derives the colors from it
-   on the phone. Expo Go draws Helix's own colors. */
+/* The theme in `helix.json`, which `npm run theme` writes into
+   `src/theme.ts` as each color in light and dark mode. A phone draws the
+   colors as written, in Expo Go and in a development build alike. */
 export function Root({ children }: { readonly children?: ReactNode }) {
   return (
-    <HelixAppRoot Glyph={Glyph} seeds={helix.theme}>
+    <HelixAppRoot Glyph={Glyph} tokens={theme}>
       <StatusBar style="auto" />
       {children}
     </HelixAppRoot>

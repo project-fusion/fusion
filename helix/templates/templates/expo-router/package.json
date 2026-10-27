@@ -9,7 +9,7 @@
     "dev": "expo start",
     "diagnostics": "helix diagnostics",
     "ios": "expo start --ios",
-    "theme": "helix theme build --out src/theme.css",
+    "theme": "helix theme build --out src/theme.css && helix theme build --format native --out src/theme.ts",
     "web": "expo start --web"
   },
   "dependencies": {

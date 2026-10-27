@@ -271,7 +271,7 @@ pub struct Scan {
 pub enum Theme {
     /// Write a starter intent.
     Init(Init),
-    /// Emit the theme as CSS.
+    /// Emit the theme as CSS, or as a module React Native reads.
     ///
     /// Both modes as one block of `light-dark()` pairs, unless the intent
     /// names a `scheme`.
@@ -324,6 +324,10 @@ pub struct Build {
     #[arg(long, short, value_name = "PATH")]
     pub out: Option<PathBuf>,
 
+    /// What to write: CSS for the web, or a module for React Native.
+    #[arg(long, value_enum, default_value_t = ThemeFormat::Css)]
+    pub format: ThemeFormat,
+
     /// The selector the block is written under.
     ///
     /// `:root` ties the selectors Helix's own stylesheet declares its tokens
@@ -343,6 +347,18 @@ pub struct Build {
     /// see what you have.
     #[arg(long)]
     pub force: bool,
+}
+
+/// What `helix theme build` writes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
+pub enum ThemeFormat {
+    /// A block of custom properties, for the web.
+    Css,
+    /// A TypeScript module exporting `theme`, each color in light and dark
+    /// mode by its token name, for the `tokens` of `HelixRoot` in
+    /// `@fusion.dev/helix-native`. A phone draws it with no theme engine, Expo
+    /// Go included.
+    Native,
 }
 
 #[derive(Args, Debug)]
