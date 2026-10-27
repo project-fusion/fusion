@@ -1,6 +1,8 @@
 import { setAnnounce } from '@fusion.dev/helix-core/capabilities/announce'
+import { setCamera } from '@fusion.dev/helix-core/capabilities/camera'
 import { setClipboard } from '@fusion.dev/helix-core/capabilities/clipboard'
 import { setEnvironment } from '@fusion.dev/helix-core/capabilities/environment'
+import { setFiles } from '@fusion.dev/helix-core/capabilities/files'
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
 import { setForm } from '@fusion.dev/helix-core/capabilities/form'
 import { setGesture } from '@fusion.dev/helix-core/capabilities/gesture'
@@ -11,12 +13,15 @@ import { setMeasure } from '@fusion.dev/helix-core/capabilities/measure'
 import { setMotion } from '@fusion.dev/helix-core/capabilities/motion'
 import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import { setScroll } from '@fusion.dev/helix-core/capabilities/scroll'
+import { setShare } from '@fusion.dev/helix-core/capabilities/share'
 import { setTimers } from '@fusion.dev/helix-core/capabilities/timers'
 import { nativeGesture } from '../drivers/gesture'
 import { nativeMotion } from '../drivers/motion'
 import { nativeAnnounce } from './announce'
+import { nativeCamera } from './camera'
 import { nativeClipboard } from './clipboard'
 import { askReducedMotion, askScreenReader, nativeEnvironment } from './environment'
+import { nativeFiles } from './files'
 import { nativeFocus } from './focus'
 import { nativeForm } from './form'
 import { nativeHaptics } from './haptics'
@@ -26,6 +31,7 @@ import { nativeLocale } from './locale'
 import { nativeMeasure } from './measure'
 import { nativeOpenLink } from './open-link'
 import { nativeScroll } from './scroll'
+import { nativeShare } from './share'
 import { nativeTimers } from './timers'
 
 /**
@@ -40,8 +46,10 @@ import { nativeTimers } from './timers'
 export const installNativeCapabilities = (): void => {
   installIntl()
   setAnnounce(nativeAnnounce)
+  setCamera(nativeCamera)
   setClipboard(nativeClipboard)
   setEnvironment(nativeEnvironment)
+  setFiles(nativeFiles)
   setFocus(nativeFocus)
   setForm(nativeForm)
   setGesture(nativeGesture)
@@ -52,6 +60,7 @@ export const installNativeCapabilities = (): void => {
   setMotion(nativeMotion)
   setOpenLink(nativeOpenLink)
   setScroll(nativeScroll)
+  setShare(nativeShare)
   setTimers(nativeTimers)
   askReducedMotion()
   askScreenReader()
