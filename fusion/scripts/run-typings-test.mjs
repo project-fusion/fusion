@@ -38,7 +38,15 @@
  *                                       whether a change since <base> reaches the typings
  */
 import { execFile, execFileSync } from 'node:child_process'
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { promisify } from 'node:util'
@@ -288,6 +296,10 @@ if (failures.length > 0) {
   console.error(`Scratch projects left at ${scratch}`)
   process.exit(1)
 }
+/* **The scratch tree goes once every project passed**, since each run leaves
+   a project and its `node_modules` per framework: nineteen runs left 10 GB on
+   October 25, 2026. A failure leaves it, to be looked at. */
+rmSync(scratch, { force: true, recursive: true })
 console.log(
   `typings: ${projects.length} projects installed from packed tarballs and type-checked with ` +
     `\`skipLibCheck\` off, every guarded line refused and nothing else: ${projects.join(', ')}`,
