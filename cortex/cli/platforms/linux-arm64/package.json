@@ -1,0 +1,26 @@
+{
+  "name": "@fusion.dev/cortex-cli-linux-arm64",
+  "description": "The `cortex` binary for Linux on 64-bit Arm, statically linked. Installed by `@fusion.dev/cortex-cli`, which runs it.",
+  "version": "0.1.2",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "cortex/cli/platforms/linux-arm64",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "files": [
+    "cortex"
+  ],
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "cpu": [
+    "arm64"
+  ],
+  "homepage": "https://fusion.dev",
+  "os": [
+    "linux"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

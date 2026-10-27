@@ -116,3 +116,7 @@ fusion/site/public/maplibre/
 helix/cli/platforms/*/helix
 helix/cli/platforms/*/helix.exe
 
+# The `cortex` binary each of its platform packages ships, for the same reason.
+cortex/cli/platforms/*/cortex
+cortex/cli/platforms/*/cortex.exe
+

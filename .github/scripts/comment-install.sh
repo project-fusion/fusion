@@ -16,7 +16,12 @@ set -euo pipefail
   done < /tmp/released
   echo
   echo '```bash'
-  echo "bun add @fusion.dev/helix@exp-$NUMBER"
+  while read -r domain _; do
+    case $domain in
+      cortex) echo "npm install --global @fusion.dev/cortex-cli@exp-$NUMBER" ;;
+      helix) echo "bun add @fusion.dev/helix@exp-$NUMBER" ;;
+    esac
+  done < /tmp/released
   echo '```'
   echo
   echo "Tagged \`exp-$NUMBER\`. Nothing resolves to this by asking for" \

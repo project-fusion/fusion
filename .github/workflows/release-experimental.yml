@@ -40,6 +40,7 @@ jobs:
     permissions:
       contents: read
     outputs:
+      cortex: ${{ steps.plan.outputs.cortex }}
       helix: ${{ steps.plan.outputs.helix }}
     env:
       NUMBER: ${{ github.event.pull_request.number }}
@@ -64,6 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           .github/scripts/stamp-experimental.sh
+          echo "cortex=$(awk '$1 == "cortex" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
           echo "helix=$(awk '$1 == "helix" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
 
   helix-binaries:
@@ -74,11 +76,19 @@ jobs:
       domain: helix
       version: ${{ needs.plan.outputs.helix }}
 
+  cortex-binaries:
+    needs: plan
+    if: needs.plan.outputs.cortex != ''
+    uses: ./.github/workflows/binaries.yml
+    with:
+      domain: cortex
+      version: ${{ needs.plan.outputs.cortex }}
+
   # Written out, since the default skips a job whose dependency was skipped and
-  # the binaries job is whenever nothing touches Helix.
+  # a binaries job is whenever nothing touches its domain.
   publish:
-    needs: [plan, helix-binaries]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.helix-binaries.result == 'success') }}  # dialect:quoted, GitHub's function
+    needs: [plan, cortex-binaries, helix-binaries]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.helix-binaries.result == 'success') && (needs.plan.outputs.cortex == '' || needs.cortex-binaries.result == 'success') }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: experimental
@@ -164,6 +174,17 @@ jobs:
       - name: Put each Helix binary in its platform package
         if: needs.plan.outputs.helix != ''
         run: .github/scripts/place-binaries.sh helix "$RUNNER_TEMP/binaries"
+
+      - name: Fetch the Cortex binaries
+        if: needs.plan.outputs.cortex != ''
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: cortex-cli-*
+          path: ${{ runner.temp }}/binaries
+
+      - name: Put each Cortex binary in its platform package
+        if: needs.plan.outputs.cortex != ''
+        run: .github/scripts/place-binaries.sh cortex "$RUNNER_TEMP/binaries"
 
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
