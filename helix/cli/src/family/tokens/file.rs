@@ -16,7 +16,7 @@
 //! **A mode is a second file laid over the first.** It sets some tokens to
 //! another value, and every token it does not name keeps the first file's.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -93,12 +93,12 @@ impl Read {
     /// this file does not hold.
     pub fn modules(
         &self,
-        modes: &[(String, PathBuf)],
+        modes: &BTreeMap<String, PathBuf>,
         system: &System,
         header: &str,
     ) -> Result<Vec<(String, String)>, Failure> {
         let mut faults = Vec::new();
-        for (mode, _) in modes {
+        for mode in modes.keys() {
             if mode != "light" && mode != "dark" {
                 faults.push(format!(
                     "`{mode}`: the native theme draws `light` and `dark`"
@@ -108,8 +108,8 @@ impl Read {
         let mut written = Vec::new();
         let mut kinds: Vec<(String, &str)> = Vec::new();
         for name in ["light", "dark"] {
-            let laid = match modes.iter().find(|(mode, _)| mode == name) {
-                Some((_, path)) => self.laid_under(&Self::file(path)?, &mut faults),
+            let laid = match modes.get(name) {
+                Some(path) => self.laid_under(&Self::file(path)?, &mut faults),
                 None => self.tokens.clone(),
             };
             let mut values = Vec::new();
