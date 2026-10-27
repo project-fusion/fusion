@@ -38,8 +38,6 @@
     }
   },
   "files": [
-    "!dist/ir",
-    "!dist/web",
     "dist"
   ],
   "sideEffects": false,
