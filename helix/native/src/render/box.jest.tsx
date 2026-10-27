@@ -52,7 +52,7 @@ const close: Family = {
       name: 'press',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Close = element(close, () => ({

@@ -139,7 +139,7 @@ const drawerForm: Family = {
       name: 'panel',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const dialForm: Family = {
@@ -197,7 +197,7 @@ const dialForm: Family = {
       name: 'actions',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 export const CheckDrawer = element(drawerForm, behaviorFor(drawerForm))

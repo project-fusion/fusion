@@ -80,7 +80,7 @@ const ring: Family = {
       name: 'drawing',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Ring = element(ring, () => ({
@@ -171,7 +171,7 @@ describe('a vector', () => {
           name: 'drawing',
         },
       ],
-      version: '1.0',
+      version: '2.0',
     }
     const Ticked = element(ticked)
     const view = await render(

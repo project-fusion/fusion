@@ -68,7 +68,7 @@ const drilldownForm: Family = {
     },
     { children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'rows' },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const rowForm: Family = {
@@ -94,7 +94,7 @@ const rowForm: Family = {
     },
     { kind: 'region', name: 'page' },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Drilldown = element(drilldownForm, behaviorFor(drilldownForm))

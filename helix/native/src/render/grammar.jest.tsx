@@ -49,7 +49,7 @@ const item: Family = {
       name: 'face',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 /** A group whose `items` part holds the default region, under `rules`. */
@@ -59,7 +59,7 @@ const group = (rules: Rule[]): Family => ({
   rules,
   tag: 'helix-group',
   tree: [{ children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'items' }],
-  version: '1.1',
+  version: '2.0',
 })
 
 const Item = element(item)

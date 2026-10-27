@@ -93,7 +93,7 @@ const sample: Family = {
     { attributes: { says: 'Said' }, kind: 'text', name: 'said' },
     { kind: 'region', name: 'more' },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A list in miniature, whose items each draw a numbered marker. */
@@ -114,7 +114,7 @@ const list: Family = {
   ],
   tag: 'helix-list',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.0',
+  version: '2.0',
 }
 
 const row: Family = {
@@ -122,7 +122,7 @@ const row: Family = {
   rules: [],
   tag: 'helix-list-item',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.0',
+  version: '2.0',
 }
 
 const Sample = element(sample, () => ({

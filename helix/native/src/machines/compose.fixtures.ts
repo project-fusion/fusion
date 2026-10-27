@@ -1,7 +1,7 @@
 /*
  * The pilot's families in miniature, bound as the expansion binds them, for
  * the specs of the native composer. Neutral builds no forms before its specs
- * run, so these are written by hand to the shape `helix family build` writes.
+ * run, so these are written by hand to the shape `helix system build` writes.
  */
 import type { Family } from '../style/form'
 
@@ -53,7 +53,7 @@ export const tabs = {
       name: 'tabs',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 /* A tab in miniature, bound as the expansion binds Tab. */
@@ -91,7 +91,7 @@ export const tab = {
       name: 'tab',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 /* A list in miniature, bound as the expansion binds List. */
@@ -133,7 +133,7 @@ export const list = {
   rules: [],
   tag: 'helix-list',
   tree: [{ children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'list' }],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 /* A row in miniature, bound as the expansion binds List Item. */
@@ -156,7 +156,7 @@ export const row = {
       name: 'row',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 /* A button in miniature, bound as the expansion binds Button. */
@@ -183,5 +183,5 @@ export const button = {
       name: 'button',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family

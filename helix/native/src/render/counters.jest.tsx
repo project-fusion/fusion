@@ -74,7 +74,7 @@ const list: Family = {
       name: 'empty',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A row in miniature: what is passed into it. */
@@ -83,7 +83,7 @@ const row: Family = {
   rules: [],
   tag: 'helix-list-item',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.0',
+  version: '2.0',
 }
 
 const List = element(list)

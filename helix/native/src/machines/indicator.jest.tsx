@@ -132,7 +132,7 @@ const strip = (scrolls: boolean): Family =>
         name: 'tabs',
       },
     ],
-    version: '1.0',
+    version: '2.0',
   }) as unknown as Family
 
 const USE: MachineUse = { bind: { mark: { part: 'indicator' } }, machine: 'indicator' }

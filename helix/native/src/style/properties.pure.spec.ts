@@ -28,7 +28,7 @@ const one = (set: readonly Declaration[], frames: readonly Keyframes[] = []): Fa
   ],
   tag: 'helix-mark',
   tree: [{ kind: 'box', name: 'mark' }],
-  version: '1.0',
+  version: '2.0',
 })
 
 /** The style `set` resolves to, and what it drops. */

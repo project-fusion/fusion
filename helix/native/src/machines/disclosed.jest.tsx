@@ -36,7 +36,7 @@ const shell = {
   ],
   tag: 'helix-shell',
   tree: [{ kind: 'region', name: 'default' }],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 const Shell = element(shell, behaviorFor(shell))

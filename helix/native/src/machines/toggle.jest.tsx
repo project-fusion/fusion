@@ -79,7 +79,7 @@ const checkbox = {
       name: 'control',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 const Checkbox = element(checkbox, behaviorFor(checkbox))

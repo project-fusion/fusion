@@ -22,7 +22,7 @@ const formOf = (held: unknown): Family =>
     rules: [],
     tag: 'helix-dial',
     tree: [{ attributes: { held }, kind: 'pressable', name: 'trigger' }],
-    version: '1.0',
+    version: '2.0',
   }) as unknown as Family
 
 const USE: MachineUse = {

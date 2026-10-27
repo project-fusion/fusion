@@ -35,7 +35,7 @@ const sheet: Family = {
   ],
   tag: 'helix-sheet',
   tree: [{ children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'sheet' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Sheet = element(sheet, () => ({ marks: [], parts: {} }))

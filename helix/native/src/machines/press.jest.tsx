@@ -22,7 +22,7 @@ const BUTTON = {
   name: 'button',
   rules: [],
   tag: 'helix-button',
-  version: '1.0',
+  version: '2.0',
 } as unknown as Family
 
 const USE: MachineUse = {
