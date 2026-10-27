@@ -181,7 +181,7 @@ const dialogForm: Family = {
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 /** The states of a layer placed against its anchor, as the web's floating controller writes them. */
@@ -258,7 +258,7 @@ const menuForm: Family = {
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 export const CheckDialog = element(dialogForm, behaviorFor(dialogForm))

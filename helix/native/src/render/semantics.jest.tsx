@@ -61,7 +61,7 @@ const tab: Family = {
       name: 'tab',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A row in miniature: a press that wraps a link around its words. */
@@ -93,7 +93,7 @@ const row: Family = {
       name: 'row',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 /* A press that says its pending words, as Button does. */
@@ -128,7 +128,7 @@ const button: Family = {
       name: 'live',
     },
   ],
-  version: '1.0',
+  version: '2.0',
 }
 
 const original: Announce = announce()

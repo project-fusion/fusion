@@ -56,7 +56,7 @@ const dialog: Family = {
   ],
   tag: 'helix-dialog',
   tree: [{ attributes: { open: { bind: 'open' } }, kind: 'layer', name: 'surface' }],
-  version: '1.1',
+  version: '2.0',
 }
 
 describe('a layer, which alone reads the window', () => {

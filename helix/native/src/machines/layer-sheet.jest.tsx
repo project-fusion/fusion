@@ -176,7 +176,7 @@ const menuForm: Family = {
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Menu = element(menuForm, behaviorFor(menuForm))

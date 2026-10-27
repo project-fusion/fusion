@@ -30,7 +30,7 @@ describe('style, which rules apply', () => {
         }),
       ],
       tag: 'helix-button',
-      version: '1.0',
+      version: '2.0',
     }
     for (const interaction of ['hover', 'active']) {
       expect(
@@ -74,7 +74,7 @@ describe('style, which rules apply', () => {
         }),
       ],
       tag: 'helix-button',
-      version: '1.0',
+      version: '2.0',
     })
     const full = [{ kind: 'attribute', name: 'width', value: 'full' }] as const
     expect(style(host(full), 'host', { conditions: {}, tokens }).style).toMatchObject({

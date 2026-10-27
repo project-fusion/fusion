@@ -24,7 +24,7 @@ const of = (rules: Rule[], tree: Family['tree'] = []): Family => ({
   rules,
   tag: 'helix-stat',
   tree,
-  version: '1.1',
+  version: '2.0',
 })
 
 describe('conditions', () => {

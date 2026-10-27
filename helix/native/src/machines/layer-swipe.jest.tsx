@@ -89,7 +89,7 @@ const drawerForm: Family = {
       name: 'panel',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Drawer = element(drawerForm, behaviorFor(drawerForm))

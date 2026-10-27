@@ -57,7 +57,7 @@ const dialogForm = (attributes: Readonly<Record<string, unknown>> = {}): Family 
       name: 'surface',
     },
   ],
-  version: '1.1',
+  version: '2.0',
 })
 
 const Dialog = element(dialogForm(), behaviorFor(dialogForm()))

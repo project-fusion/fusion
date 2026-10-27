@@ -50,7 +50,7 @@ describe('style', () => {
           }),
         ],
         tag: 'helix-heading',
-        version: '1.0',
+        version: '2.0',
       }
       const { dropped, style: drawn } = style(heading, 'host', {
         conditions: {},
@@ -95,7 +95,7 @@ describe('style', () => {
         ],
         tag: 'helix-control',
         tree: [{ kind: 'box', name: 'mark' }],
-        version: '1.0',
+        version: '2.0',
       }
       const context = {
         conditions: {},
@@ -135,7 +135,7 @@ describe('style', () => {
         }),
       ],
       tag: 'helix-button',
-      version: '1.0',
+      version: '2.0',
     }
     expect(
       style(ring, 'spinner', { conditions: {}, currentColor: '#ffffff', tokens }).style.borderColor,
@@ -183,7 +183,7 @@ describe('style', () => {
           name: 'tabs-tab',
           rules: [strip.rules[4] as Rule],
           tag: 'helix-tab',
-          version: '1.0',
+          version: '2.0',
         },
         'panels',
         {
@@ -274,7 +274,7 @@ describe('style', () => {
         { kind: 'box', name: 'tabs' },
         { kind: 'box', name: 'panels' },
       ],
-      version: '1.0',
+      version: '2.0',
     }
     expect(style(beside, 'host', { conditions: {}, tokens }).style.flexDirection).toBe('row')
     expect(style(beside, 'panels', { conditions: {}, tokens }).style).toMatchObject({
@@ -326,7 +326,7 @@ describe('style', () => {
         }),
       ],
       tag: 'helix-button',
-      version: '1.0',
+      version: '2.0',
     }
     expect(style(spinner, 'spinner', { conditions: {}, tokens }).motion).toEqual({
       delay: 0,

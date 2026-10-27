@@ -35,7 +35,7 @@ const form: Family = {
   tree: [
     { attributes: {}, children: [{ kind: 'region', name: 'default' }], kind: 'box', name: 'panel' },
   ],
-  version: '1.1',
+  version: '2.0',
 }
 
 const Sample = element(form, behaviorFor(form))
