@@ -16,13 +16,14 @@ written against.
 |---|---|
 | `react-vite` | React and TypeScript on Vite. The shortest path to a running app. |
 | `react-nextjs` | React and TypeScript on the Next.js App Router, the three pages as real routes. |
+| `expo-router` | React and TypeScript on Expo Router: one app for the web, iOS, and Android. |
 | `vue-vite` | Vue and TypeScript on Vite. |
 | `angular` | Angular and TypeScript on the Angular CLI. |
 | `svelte-vite` | Svelte and TypeScript on Vite. |
 | `solid-vite` | Solid and TypeScript on Vite. |
 
-Every template lays down the same three pages, in the same order and with the
-same copy:
+Every web template lays down the same three pages, in the same order and with
+the same copy:
 
 - a landing page saying what is installed and where it is documented;
 - an overview holding a sorted, paged, selectable data table;
@@ -32,6 +33,11 @@ same copy:
 What differs between them is what each framework requires. `bun run
 smoke:scaffold` builds every template and holds what each renders to React on
 Vite's, in markup and in pictures, so a template that drifts fails CI.
+
+`expo-router` is an app for the web, iOS, and Android, with an App Header
+over its own routes, so `smoke:scaffold` builds it and compares it with
+nothing. Its build checks the web's types and the phone's, and exports the
+website.
 
 Each one starts Helix diagnostics in development, checked against the lint data
 of the Helix it installed. A production build never loads them. Every build but
