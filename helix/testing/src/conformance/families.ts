@@ -20,6 +20,7 @@ export type Family =
   | 'drilldown'
   | 'format-date'
   | 'image'
+  | 'input'
   | 'list'
   | 'loader'
   | 'megamenu'
