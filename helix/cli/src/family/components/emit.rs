@@ -292,8 +292,8 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) 
     out
 }
 
-/// The elements the boxes of `tree` draw on a phone, by their tag without
-/// the prefix: each box that `draws` one and is not the web's alone.
+/// The elements the boxes of `tree` draw on a phone, by their tag: each box
+/// that `draws` one and is not the web's alone.
 fn drawn_by(tree: &serde_json::Value, into: &mut Vec<String>) {
     for node in tree.as_array().into_iter().flatten() {
         let attributes = &node["attributes"];
@@ -309,8 +309,8 @@ fn drawn_by(tree: &serde_json::Value, into: &mut Vec<String>) {
 
 /// One family's module: its forms, then each element's event types, props,
 /// and component, the root first. `folders` names the folder of each family
-/// an element is drawn from by its tag without the prefix, as `menu-item`
-/// is drawn from `menu`.
+/// an element is drawn from by its tag, as `<prefix>-menu-item` is drawn
+/// from `menu`.
 pub fn module_in(
     family: &str,
     parts: &[Part],
