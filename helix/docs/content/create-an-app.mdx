@@ -1,0 +1,98 @@
+---
+description: Start an app that runs on the web, iOS, and Android from one set of pages, on Expo Router.
+parent: installation
+section: Getting started
+title: Create an app
+---
+
+# Create an app
+
+The `expo-router` template writes an app that runs as a website and as an iOS
+and Android app from one set of pages. It uses Expo Router for its routes and
+Helix for every screen.
+
+```sh
+npm create @fusion.dev/helix-app@latest my-app -- --template expo-router
+```
+
+In a project that has `@fusion.dev/helix-cli`, run
+`npx helix new my-app --template expo-router`. Both commands write the same
+app.
+
+## Run the app
+
+Install the dependencies, then start it on the platform you want:
+
+```sh
+cd my-app
+npm install
+npx expo start --web
+```
+
+- **On the web**, `npx expo start --web` opens the app in your browser.
+- **On a phone or a simulator**, `npx expo start` prints a QR code. Scan it with
+  Expo Go on your phone, or press `i` for the iOS Simulator or `a` for an
+  Android emulator.
+- **In a development build**, `npx expo run:ios` and `npx expo run:android`
+  build the app on your machine with Xcode or Android Studio.
+
+`npm run build` checks the types and writes the website into `dist`.
+
+## What the app contains
+
+| File | What it is |
+|---|---|
+| `app/_layout.tsx` | The layout around every route: `HelixAppRoot`, the header, and the screen showing |
+| `app/index.tsx` | The home screen, with a Stat Group and a Card |
+| `app/projects/index.tsx` | A List of projects, each row a link to its route |
+| `app/projects/[id].tsx` | One project, under Breadcrumbs built from the route |
+| `src/header.tsx` | An App Header with Navigation over the routes |
+| `helix.json` | Your theme |
+| `babel.config.js` | Gives your files the Helix JSX runtime |
+
+The app follows the system's light or dark mode on both platforms.
+
+## How one page runs on both platforms
+
+Each page writes Helix tags, such as `helix-card`. `babel.config.js` sets
+`jsxImportSource` to `@fusion.dev/helix` for the files under `app` and `src`:
+
+- **On the web**, `@fusion.dev/helix/jsx-runtime` is React's own runtime, and
+  each tag is the web element.
+- **On a phone**, `@fusion.dev/helix/jsx-runtime` draws each tag as the native
+  component of that name.
+
+What one platform alone has is a pair of files, `.web.tsx` and `.native.tsx`.
+The template has three pairs:
+
+| Module | Web | Phone |
+|---|---|---|
+| `src/root` | Helix's stylesheet and your theme | Your theme, Helix's icons, and the status bar |
+| `src/navigator` | The route showing, in the document's flow | A stack of screens |
+| `src/page` | A `main` landmark that the document scrolls | A scroll view |
+
+[Routing](./routing) describes `HelixAppRoot` and `useHelixRoute`, which send
+each press on a link through the router and mark the destination showing.
+
+## Change the theme
+
+The `theme` section of `helix.json` holds your brand color:
+
+```json
+{
+  "theme": {
+    "brand": "#3451b2"
+  }
+}
+```
+
+After you change it, write the theme for the web:
+
+```sh
+npm run theme
+```
+
+`npm run theme` runs `helix theme build`, which writes `src/theme.css` with
+every color in light and dark mode. On a phone, `src/root.native.tsx` passes
+the same section to `HelixAppRoot` as `seeds`, and a development build derives
+the colors on the device. Expo Go draws Helix's own colors.
