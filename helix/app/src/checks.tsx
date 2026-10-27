@@ -11,6 +11,7 @@ import { dateTimeSupport, numberSupport, ScrollArea, useTokens } from '@fusion.d
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { type ReactNode, useEffect, useState } from 'react'
 import { I18nManager, Text, View } from 'react-native'
+import { Device } from './device'
 import { Gestures } from './gestures'
 import { Layers } from './layers'
 import { styles } from './page'
@@ -157,6 +158,7 @@ export const CHECKS: Readonly<
   Record<string, { readonly draw: () => ReactNode; readonly title: string }>
 > = {
   dates: { draw: () => <Dates />, title: 'Dates' },
+  device: { draw: () => <Device />, title: 'Device' },
   gestures: { draw: () => <Gestures />, title: 'Gestures' },
   layers: { draw: () => <Layers />, title: 'Layers' },
   ltr: { draw: () => <Direction rtl={false} />, title: 'Left to right' },
