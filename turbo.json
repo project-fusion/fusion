@@ -269,10 +269,28 @@
       ],
       "outputs": []
     },
+    // **The authoring helpers alone, the files directly in `dist`.** `helix
+    // family build` writes Helix's compiled forms into `dist/ir` and
+    // `dist/web`, and a cache hit on `dist/**` would put an old run's forms
+    // back over them. The helpers import no workspace package, so nothing
+    // builds first.
+    "@fusion.dev/helix-neutral#build": {
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
+      "outputs": ["dist/*.d.ts", "dist/*.d.ts.map", "dist/*.js", "dist/*.js.map"]
+    },
     // The style survey's specs sit beside the survey, under `scripts`.
     "@fusion.dev/helix-neutral#test": {
       "dependsOn": ["^build", "analyze"],
       "inputs": ["scripts/**", "src/**"],
+      "outputs": []
+    },
+    // **Acme's sources are typed through the helpers' published entry points**,
+    // which resolve to this package's `dist/authoring`, so the typecheck waits
+    // for its own `build` and reads the fixture.
+    "@fusion.dev/helix-neutral#typecheck": {
+      "dependsOn": ["^build", "^analyze", "analyze", "build"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/helix/cli/tests/fixtures/acme/**"],
       "outputs": []
     },
     // The proof app's website: the web export of its route tree, under the
