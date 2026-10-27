@@ -5,7 +5,7 @@
   "main": "expo-router/entry",
   "scripts": {
     "android": "expo start --android",
-    "build": "tsc && tsc -p tsconfig.native.json && expo export --platform web",
+    "build": "helix theme build --check --out src/theme.css && helix theme build --check --format native --out src/theme.ts && tsc && tsc -p tsconfig.native.json && expo export --platform web",
     "dev": "expo start",
     "diagnostics": "helix diagnostics",
     "ios": "expo start --ios",

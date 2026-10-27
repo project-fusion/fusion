@@ -328,6 +328,13 @@ pub struct Build {
     #[arg(long, value_enum, default_value_t = ThemeFormat::Css)]
     pub format: ThemeFormat,
 
+    /// Fail if the file at `--out` is missing or differs from what the theme
+    /// builds, and write nothing.
+    ///
+    /// For a build step that keeps a committed theme in step with its intent.
+    #[arg(long, requires = "out")]
+    pub check: bool,
+
     /// The selector the block is written under.
     ///
     /// `:root` ties the selectors Helix's own stylesheet declares its tokens
