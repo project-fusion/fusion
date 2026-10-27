@@ -31,16 +31,15 @@ Simulator or `a` for an Android emulator. Each one needs Expo Go installed.
 
 ### In a development build
 
-Expo Go draws Helix's own colors. To draw your theme on a phone, build the app
-on your machine:
+A development build is your own app, with its own native modules. Build it on
+your machine:
 
 ```sh
 npx expo run:ios
 npx expo run:android
 ```
 
-The first needs Xcode, and the second needs Android Studio. Both build on your
-machine.
+The first needs Xcode, and the second needs Android Studio.
 
 ## Build the website
 
@@ -62,6 +61,8 @@ npm run build
 | `src/routes.ts` | The destinations, and the words of each crumb |
 | `src/families.ts` | The Helix families the app draws |
 | `helix.json` | Your theme |
+| `src/theme.css` | Your theme's colors for the web, written by `npm run theme` |
+| `src/theme.ts` | Your theme's colors for a phone, written by `npm run theme` |
 
 Each file under `app` is a route. A page writes Helix tags such as
 `helix-card`. On the web each tag is the web element. On a phone,
@@ -78,14 +79,16 @@ What one platform alone has is a pair of files, `.web.tsx` and `.native.tsx`:
 
 ## Change the theme
 
-Set your brand color in `helix.json`, then write the theme for the web:
+Set your brand color in `helix.json`, then write the theme:
 
 ```sh
 npm run theme
 ```
 
-`theme` writes `src/theme.css` with every color in light and dark mode. A
-development build derives the same colors on the phone from `helix.json`.
+`theme` writes every color in light and dark mode twice: into `src/theme.css`
+for the web, and into `src/theme.ts` for a phone. The phone draws the colors
+from `src/theme.ts`, in Expo Go and in a development build alike, so both
+platforms draw the same colors.
 
 ## Learn more
 

@@ -75,6 +75,21 @@ The package carries the engine already built: an XCFramework for iOS devices
 and simulators, and a shared library for each Android ABI. You need no Rust to
 build your app.
 
+**A theme that does not change while the app runs can be derived when you
+build.** `helix theme build --format native` writes the colors of the `theme`
+in `helix.json` as a module, in light and dark mode, and `tokens` takes it.
+No engine runs on the phone, so Expo Go draws your colors too:
+
+```sh
+helix theme build --format native --out src/theme.ts
+```
+
+```tsx
+import { theme } from './theme'
+
+<HelixRoot tokens={theme}>
+```
+
 ## Text size
 
 The reader's text size setting scales Helix on iOS and Android. **Text grows

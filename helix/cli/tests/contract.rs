@@ -301,6 +301,50 @@ fn the_artifact_is_the_only_thing_on_stdout() {
     );
 }
 
+/// **The module a phone reads is the stylesheet's colors**, each mode's under
+/// its own key, so a phone without the engine draws what the web draws.
+#[test]
+fn the_native_format_writes_each_mode_s_colors_as_the_stylesheet_does() {
+    let sandbox = Sandbox::new("native", Some(r##"{ "brand": "#3451b2" }"##));
+    let css = out(&run(&sandbox.0, &["theme", "build"]));
+    let output = run(&sandbox.0, &["theme", "build", "--format", "native"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    let module = out(&output);
+    assert!(module.contains("export const theme = {"), "{module}");
+    let (dark, light) = module
+        .split_once("  light: {")
+        .expect("a light block after the dark one");
+    assert!(dark.contains("  dark: {"), "{module}");
+    /* Each color the stylesheet writes as a pair is the light half under
+    `light` and the dark half under `dark`. */
+    let mut pairs = 0;
+    for line in css.lines() {
+        let Some((name, rest)) = line.trim().split_once(": light-dark(") else {
+            continue;
+        };
+        let Some(name) = name
+            .strip_prefix("--helix-")
+            .filter(|name| name.starts_with("color-"))
+        else {
+            continue;
+        };
+        let (bright, dim) = rest
+            .trim_end_matches(");")
+            .split_once(", ")
+            .expect("a pair");
+        assert!(
+            light.contains(&format!("'{name}': '{bright}',")),
+            "{name} in light"
+        );
+        assert!(
+            dark.contains(&format!("'{name}': '{dim}',")),
+            "{name} in dark"
+        );
+        pairs += 1;
+    }
+    assert!(pairs > 20, "only {pairs} pairs compared");
+}
+
 #[test]
 fn init_writes_a_file_the_next_command_can_read() {
     let sandbox = Sandbox::new("init", None);
