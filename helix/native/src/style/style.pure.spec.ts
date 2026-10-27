@@ -310,12 +310,56 @@ describe('style', () => {
       version: '2.0',
     }
     for (const part of ['start', 'end']) {
-      expect(style(bar, part, { conditions: {}, tokens }).style).toMatchObject({
-        flexGrow: 1,
-        flexShrink: 0,
-      })
+      const resolved = style(bar, part, { conditions: {}, tokens })
+      expect(resolved.style).toMatchObject({ flexGrow: 1, flexShrink: 0 })
+      expect(resolved.shares).toBe(true)
     }
     expect(style(bar, 'content', { conditions: {}, tokens }).style.flexGrow).toBeUndefined()
+    expect(style(bar, 'content', { conditions: {}, tokens }).shares).toBeUndefined()
+  })
+
+  test('a part that scrolls across along a row hugs its content unless it grows or sets a width', () => {
+    const bar = (content: readonly (readonly [string, { readonly text: string }])[]): Family => ({
+      name: 'app-header',
+      rules: [
+        rule({
+          order: 0,
+          set: [
+            ['display', { text: 'grid' }],
+            [
+              'grid-template-columns',
+              { text: 'minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr)' },
+            ],
+          ],
+          specificity: [0, 1, 0],
+          target: 'host',
+        }),
+        rule({
+          order: 1,
+          set: [['overflow-x', { text: 'auto' }], ...content],
+          specificity: [0, 1, 0],
+          target: 'content',
+        }),
+      ],
+      tag: 'helix-app-header',
+      tree: [
+        { kind: 'box', name: 'start' },
+        { kind: 'box', name: 'content' },
+        { kind: 'box', name: 'end' },
+      ],
+      version: '2.0',
+    })
+    const of = (family: Family) => style(family, 'content', { conditions: {}, tokens })
+    expect(of(bar([])).scrolls).toBe('x')
+    expect(of(bar([])).hugs).toBe(true)
+    expect(of(bar([['flex-grow', { text: '1' }]])).hugs).toBeUndefined()
+    expect(of(bar([['inline-size', { text: '200px' }]])).hugs).toBeUndefined()
+    const column: Family = {
+      ...bar([]),
+      rules: bar([]).rules.filter((each) => each.kind !== 'rule' || each.target !== 'host'),
+    }
+    expect(of(column).scrolls).toBe('x')
+    expect(of(column).hugs).toBeUndefined()
   })
 
   test('an animation resolves to its keyframes, and reduced motion slows it', () => {

@@ -222,6 +222,7 @@ const drawScrolling = (
       box={box}
       content={(scrolling) => drawn(scrolling, false)}
       controls={(scrolling) => drawn(scrolling, true)}
+      hugs={resolved.hugs === true}
       key={node.name}
       line={physical(resolved.rule)}
       motion={resolved.motion}
@@ -309,6 +310,7 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
       line={physical(resolved.rule)}
       motion={runOf(scope, node, resolved.motion)}
       moves={movesSometime(scope.family, node.name)}
+      shares={resolved.shares}
       shown={resolved.shown}
       style={box}
       {...(driven ? {} : { transitions: resolved.transitions })}

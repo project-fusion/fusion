@@ -10,6 +10,7 @@ import { Box } from './box'
 import { reducedNow, useReducedMotion } from './motion'
 import { firstPhase, fittedHeight, moving, type OpenPhase, phaseAfter } from './opening'
 import { silent } from './semantics'
+import { SharedBox } from './share'
 
 /**
  * The open phase of a part that opens while `open` holds, moved by `move`,
@@ -164,6 +165,8 @@ export const FittedBox = ({
 type PartProps = ComponentProps<typeof Box> & {
   readonly fit?: 0 | 1 | undefined
   readonly invisible?: true | undefined
+  /** Whether the part takes an equal share of its row and is never narrower than its content. */
+  readonly shares?: true | undefined
   readonly shown?: Style | undefined
 }
 
@@ -172,9 +175,10 @@ type PartProps = ComponentProps<typeof Box> & {
  * which a screen reader passes over while it is `visibility: hidden`.
  * **A part that hides stays seen until its `visibility` transition ends**,
  * as the web keeps a closing part visible, and reachable by a screen
- * reader, for the transition's length. It shows again at once.
+ * reader, for the transition's length. It shows again at once. A part that
+ * `shares` its row is drawn as a `SharedBox`.
  */
-export const PartBox = ({ fit, invisible, shown, style, view, ...rest }: PartProps) => {
+export const PartBox = ({ fit, invisible, shares, shown, style, view, ...rest }: PartProps) => {
   const phase = useOpenPhase(invisible !== true, rest.transitions?.visibility)
   const hidden = invisible === true && phase === 'closed'
   const props = {
@@ -183,6 +187,9 @@ export const PartBox = ({ fit, invisible, shown, style, view, ...rest }: PartPro
     view: hidden ? { ...view, ...silent } : view,
   }
   /* A part a driver moves keeps the height the driver gives it. */
+  if (shares === true && fit === undefined && props.animated !== true) {
+    return <SharedBox {...props} />
+  }
   return fit === undefined || props.animated === true ? (
     <Box {...props} />
   ) : (
