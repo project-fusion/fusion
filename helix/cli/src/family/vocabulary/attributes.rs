@@ -107,12 +107,13 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("describedby", NAMED, Shape::Name),
     ("description", NAMED, Shape::Words),
     ("disabled", PRESS, Shape::Flag),
-    /* Another element a box draws, by its tag without `helix-`, as a
-    checkbox group draws a checkbox above its boxes. Its props are what the
-    element's machines give it and what `gives` names, and `exports` names
-    its parts the element exposes, each as the box's name and the part's. A
-    wrap draws it around what it holds while its `while` holds, as a copy
-    button draws a tooltip around its press. */
+    /* Another element a box draws, by its name without the prefix, as a
+    checkbox group draws a checkbox above its boxes. The form holds the
+    element's tag. Its props are what the element's machines give it and
+    what `gives` names, and `exports` names its parts the element exposes,
+    each as the box's name and the part's. A wrap draws it around what it
+    holds while its `while` holds, as a copy button draws a tooltip around
+    its press. */
     ("draws", DRAWS, Shape::Name),
     /* The events of the element a box or a wrap draws that reach the
     element around as its own, their names separated by spaces, as a

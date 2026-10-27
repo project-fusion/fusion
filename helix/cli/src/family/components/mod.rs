@@ -151,8 +151,8 @@ pub fn modules(
     if !faults.is_empty() {
         return Err(faults);
     }
-    /* The folder each element's module is in, by its tag without the
-    prefix. */
+    /* The folder each element's module is in, by its tag, as a form names
+    an element a box draws. */
     let folders: BTreeMap<String, String> = drawn
         .iter()
         .map(|one| {
@@ -160,14 +160,7 @@ pub fn modules(
                 .element
                 .split_once('/')
                 .map_or(one.element.as_str(), |(f, _)| f);
-            (
-                one.family
-                    .names
-                    .bare(&one.family.tag)
-                    .unwrap_or(&one.family.tag)
-                    .to_owned(),
-                folder.to_owned(),
-            )
+            (one.family.tag.clone(), folder.to_owned())
         })
         .collect();
     Ok(families
