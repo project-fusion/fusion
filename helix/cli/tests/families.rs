@@ -134,6 +134,26 @@ fn each_element_is_tagged_and_sends_its_events_under_its_own_prefix() {
 }
 
 #[test]
+fn a_box_draws_another_element_by_its_tag_under_its_own_prefix() {
+    let acme = Acme::new("draws");
+    acme.ok("build");
+    /* The tab's source writes `draws="badge"`, and the form holds the tag the
+    runtime finds the badge by. */
+    let tree = acme.json("out/dist/ir/tabs/tab.json")["tree"].to_string();
+    assert!(tree.contains(r#""draws":"acme-badge""#), "{tree}");
+    assert!(!tree.contains(r#""draws":"badge""#), "{tree}");
+    acme.ok("components");
+    let module = acme.read("out/native/tabs/index.native.ts");
+    assert!(
+        module.contains("import '../badge/index.native'\n"),
+        "{module}"
+    );
+    /* The anatomy names the element as the source does. */
+    let anatomy = acme.ok("anatomy");
+    assert!(anatomy.contains(r#"draws=\"badge\""#), "{anatomy}");
+}
+
+#[test]
 fn its_stylesheets_read_its_own_tokens_and_hooks() {
     let acme = Acme::new("css");
     acme.ok("build");

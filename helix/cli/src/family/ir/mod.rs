@@ -37,6 +37,7 @@ mod scope;
 mod specificity;
 pub mod sugar;
 mod table;
+mod tagged;
 mod values;
 
 use crate::family::api::{Api, Headless, Node, Prop};
@@ -130,12 +131,13 @@ impl Family {
             || if element == "root" { family } else { element },
             |headless| headless.name.as_str(),
         ));
-        let (mut api, tree) = headless.map_or_else(
+        let (mut api, mut tree) = headless.map_or_else(
             || (Api::default(), Vec::new()),
             |headless| (headless.api, headless.tree),
         );
         api.props.extend(styled.props);
         let machines = machines::expand(&api, &tree);
+        tagged::tag(&mut api, &mut tree, &names);
         Self {
             api,
             machines,
