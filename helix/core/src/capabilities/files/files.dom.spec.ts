@@ -79,7 +79,7 @@ describe('webFiles', () => {
           type: 'text/plain',
           uri: 'data:text/plain,Notes',
         }),
-      ).toBe(true)
+      ).toBe('saved')
     } finally {
       click.mockRestore()
     }

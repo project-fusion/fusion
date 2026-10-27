@@ -45,11 +45,11 @@ describe('nativeShare', () => {
     expect(opened).not.toHaveBeenCalled()
   })
 
-  test('shares a file on the device through expo-sharing', async () => {
+  test('shares a file through expo-sharing, and is opened, since its sheet does not say more', async () => {
     sheet.isAvailableAsync.mockResolvedValue(true)
     sheet.shareAsync.mockResolvedValue(undefined)
     const file = { name: 'report.pdf', size: 4, type: 'application/pdf', uri: 'file:///report.pdf' }
-    expect(await nativeShare.share({ file, title: 'Report' })).toBe('shared')
+    expect(await nativeShare.share({ file, title: 'Report' })).toBe('opened')
     expect(sheet.shareAsync.mock.calls).toEqual([
       ['file:///report.pdf', { dialogTitle: 'Report', mimeType: 'application/pdf' }],
     ])

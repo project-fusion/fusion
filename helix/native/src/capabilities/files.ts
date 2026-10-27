@@ -115,9 +115,12 @@ export const localFile = async (uri: string, name: string): Promise<string> => {
  * `expo-file-system` and the share sheet `expo-sharing` opens, where Save to
  * Files is one of the choices.
  *
+ * **A save is `opened` once the sheet closes**, since the sheet does not say
+ * whether you saved the file.
+ *
  * **Each package is an optional peer.** Without the picker, a pick is
- * `unavailable`, and without the file system or sharing, a save gives
- * `false`. A file chosen is a copy in the app's cache, read from its file URI.
+ * `unavailable`, and without the file system or sharing, so is a save. A
+ * file chosen is a copy in the app's cache, read from its file URI.
  */
 export const nativeFiles: Files = {
   pick: async ({ accept, multiple }) => {
@@ -152,20 +155,20 @@ export const nativeFiles: Files = {
   save: async (file) => {
     const sheet = sharing()
     if (sheet === null) {
-      return false
+      return 'unavailable'
     }
     try {
       if (!(await sheet.isAvailableAsync())) {
-        return false
+        return 'unavailable'
       }
       const local = await localFile(file.uri, file.name)
       await sheet.shareAsync(local, {
         dialogTitle: file.name,
         ...(file.type === '' ? {} : { mimeType: file.type }),
       })
-      return true
+      return 'opened'
     } catch {
-      return false
+      return 'unavailable'
     }
   },
 }

@@ -299,7 +299,8 @@ pub struct Shareable {
     url: Option<String>,
 }
 
-/// What became of a share: the sheet took it, the clipboard took the address
+/// What became of a share: the sheet took it, the sheet opened and the
+/// platform does not say whether it took it, the clipboard took the address
 /// or the words where there is no sheet, the reader closed the sheet, or the
 /// platform can share nothing.
 #[derive(Serialize, TS)]
@@ -307,8 +308,26 @@ pub struct Shareable {
 pub enum Shared {
     Copied,
     Dismissed,
+    /// The sheet opened and closed, and the platform does not say whether
+    /// it took the item, as `expo-sharing`'s does not.
+    Opened,
     /// The sheet took it.
     #[serde(rename = "shared")]
+    Taken,
+    Unavailable,
+}
+
+/// What became of a save: the platform took the file, the sheet a phone
+/// saves through opened and the platform does not say whether it took it, or
+/// the platform cannot save it.
+#[derive(Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+pub enum Saved {
+    /// The sheet opened and closed, and the platform does not say whether
+    /// it took the file, as `expo-sharing`'s does not.
+    Opened,
+    /// The platform took the file, as a browser's download does.
+    #[serde(rename = "saved")]
     Taken,
     Unavailable,
 }

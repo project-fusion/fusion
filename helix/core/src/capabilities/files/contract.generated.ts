@@ -2,7 +2,7 @@
    helix/cli/src/family/capability. Do not edit: change the contract there and
    run it again. */
 
-import type { FilePick, FileSave, Picked } from '../types.generated.js'
+import type { FilePick, FileSave, Picked, Saved } from '../types.generated.js'
 
 /**
  * Picks files from the device and saves a file to it: through the browser's
@@ -20,7 +20,8 @@ export interface Files {
   /**
    * Saves `file` under its name: as a download on the web, and through the
    * share sheet on a phone, where Save to Files is one of its choices. Gives
-   * whether the platform took it.
+   * what became of it: `saved` on the web, and `opened` on a phone, whose sheet
+   * does not say whether you saved it.
    */
-  readonly save: (file: FileSave) => Promise<boolean>
+  readonly save: (file: FileSave) => Promise<Saved>
 }

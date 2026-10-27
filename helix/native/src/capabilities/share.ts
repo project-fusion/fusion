@@ -18,7 +18,7 @@ const shareFile = async (item: Shareable, file: DeviceFile): Promise<Shared> => 
       ...(item.title === undefined ? {} : { dialogTitle: item.title }),
       ...(file.type === '' ? {} : { mimeType: file.type }),
     })
-    return 'shared'
+    return 'opened'
   } catch {
     return 'unavailable'
   }
@@ -54,8 +54,8 @@ const contentOf = (item: Shareable): Parameters<typeof SystemShare.share>[0] | u
  * **A file goes through `expo-sharing`, an optional peer**, and is
  * `unavailable` without it. A web address or a `data:` URL is written to the
  * app's cache first, through `expo-file-system`. The sheet `expo-sharing`
- * opens does not say whether the reader closed it, so a file shared is
- * `shared` once the sheet closes.
+ * opens does not say whether you shared the file, so a file is `opened`
+ * once the sheet closes.
  */
 export const nativeShare: Share = {
   share: async (item) => {

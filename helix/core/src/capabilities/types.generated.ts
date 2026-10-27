@@ -190,6 +190,13 @@ export type Point = { x: number, y: number, };
 export type Rect = { height: number, width: number, x: number, y: number, };
 
 /**
+ * What became of a save: the platform took the file, the sheet a phone
+ * saves through opened and the platform does not say whether it took it, or
+ * the platform cannot save it.
+ */
+export type Saved = "opened" | "saved" | "unavailable";
+
+/**
  * Where a part that scrolls stands: how far it is scrolled, whether it is
  * at each end of each axis, and whether it has come to rest.
  */
@@ -206,11 +213,12 @@ settled: boolean, x: Ends, y: Ends, };
 export type Shareable = { file?: DeviceFile, text?: string, title?: string, url?: string, };
 
 /**
- * What became of a share: the sheet took it, the clipboard took the address
+ * What became of a share: the sheet took it, the sheet opened and the
+ * platform does not say whether it took it, the clipboard took the address
  * or the words where there is no sheet, the reader closed the sheet, or the
  * platform can share nothing.
  */
-export type Shared = "copied" | "dismissed" | "shared" | "unavailable";
+export type Shared = "copied" | "dismissed" | "opened" | "shared" | "unavailable";
 
 /**
  * A width and a height, in CSS pixels on the web and points on a phone.

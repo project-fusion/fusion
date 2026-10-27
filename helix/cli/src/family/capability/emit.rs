@@ -9,7 +9,7 @@ use ts_rs::{Config, TypeVisitor, TS};
 
 use super::types::{
     Conditions, DragSetup, Dragged, FilePick, FileSave, Flag, Frame, Haptic, KeyPress, Picked,
-    Point, Rect, Scrolled, Shareable, Shared, Transition, Urgency,
+    Point, Rect, Saved, Scrolled, Shareable, Shared, Transition, Urgency,
 };
 use super::{Capability, Param, Ty};
 use crate::{COMPILER, PRODUCT};
@@ -83,6 +83,7 @@ pub fn types_module() -> String {
     declarations.visit::<Picked>();
     declarations.visit::<Point>();
     declarations.visit::<Rect>();
+    declarations.visit::<Saved>();
     declarations.visit::<Scrolled>();
     declarations.visit::<Shareable>();
     declarations.visit::<Shared>();
