@@ -14,6 +14,7 @@ import { deepActive, isOpen, leftBy, type Mounted, type Updatable } from './web-
 import { mountSetup } from './web-mount.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
+import { leave, typeInto, watchFocus } from './web-text.js'
 
 /*
  * The web half of the conformance suite: mounts a scenario's setup as
@@ -225,6 +226,12 @@ const perform = async (
     case 'key':
       key(intent.key, intent.held)
       return
+    case 'type':
+      await typeInto(mounted, intent, () => settle(mounted))
+      return
+    case 'leave':
+      leave(mounted)
+      return
     case 'open':
     case 'close': {
       const target = item(intent.item)
@@ -314,9 +321,20 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
   return typeof newState === 'string' ? { newState, oldState } : {}
 }
 
+/**
+ * The families a reader types into, whose `input` on each edit is theirs and
+ * is recorded. Every other family's `input` is the composed one its own
+ * `<input>` sends, which no record holds.
+ */
+const TYPED: ReadonlySet<string> = new Set(['input'])
+
 /** The name an event goes by in a record: its type without `helix-`, and a bare one as it is. */
-const nameOf = (type: string): string | undefined =>
-  type.startsWith('helix-') ? type.slice('helix-'.length) : BARE.has(type) ? type : undefined
+const nameOf = (type: string, family: string): string | undefined => {
+  if (type.startsWith('helix-')) {
+    return type.slice('helix-'.length)
+  }
+  return BARE.has(type) || (type === 'input' && TYPED.has(family)) ? type : undefined
+}
 
 /**
  * Mounts a scenario's setup, performs each intent, and returns what each one
@@ -338,6 +356,7 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
   window.addEventListener('click', follow)
   const real = fakeImages()
   const unlay = laySections(scenario.setup)
+  const unwatch = watchFocus(mounted)
   document.body.append(root)
   try {
     await settle(mounted)
@@ -356,7 +375,7 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
       }
       await settle(mounted)
       const events: Sent[] = heard.flatMap(({ event, from }) => {
-        const name = nameOf(event.type)
+        const name = nameOf(event.type, scenario.family)
         const detail = carried(event)
         return name === undefined ? [] : [{ canceled: event.defaultPrevented, detail, from, name }]
       })
@@ -367,6 +386,7 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
     window.removeEventListener('click', follow)
     real()
     unlay()
+    unwatch()
     removePage()
     ;(deepActive() as HTMLElement | null)?.blur?.()
     root.remove()

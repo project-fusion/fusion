@@ -28,10 +28,16 @@ export const watched =
   (useBehavior: UseBehavior | undefined): UseBehavior =>
   (family, props) => {
     const behavior = (useBehavior ?? (() => STILL))(family, props)
-    HOST_STATES.set(family.tag, behavior.parts.host?.states ?? {})
+    /* The custom states the element is in, as `:state()` reads them, and the
+       states its host's binding gives. */
+    const states = {
+      ...Object.fromEntries(behavior.marks.map((mark) => [mark, true])),
+      ...behavior.parts.host?.states,
+    }
+    HOST_STATES.set(family.tag, states)
     /* And by its value, where the setup names it by one, as a tour's stops. */
     if (typeof props.value === 'string') {
-      HOST_STATES.set(`${family.tag}#${props.value}`, behavior.parts.host?.states ?? {})
+      HOST_STATES.set(`${family.tag}#${props.value}`, states)
     }
     return behavior
   }

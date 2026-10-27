@@ -71,6 +71,8 @@ own input and records, intent by intent:
 - for a family that shows one page of rows at a time, as Drilldown and Menu,
   the rows whose press is drawn on the page showing, which a closed layer
   draws none of, and a row is chosen only where it is drawn
+- for a family a reader types into, as Input, the text its field holds and
+  whether it is marked wrong, and its own `input` on each edit
 
 **A family's scenarios can be written before its native component exists.**
 They are staged in `STAGED`, and the web half runs and records them in the
@@ -110,6 +112,13 @@ and a phone's harness measures each section by where it stands among them.
 The web finds each section as an anchor by its id, and a phone registers it
 by ref. A `press` with `link` presses the link an outline draws to the
 section with that id.
+
+**`type` types into the element's field, a character an edit, and `leave`
+moves focus out of it.** The web makes each edit with the browser's editing
+command, which sends `input`, and the browser sends `change` as the field
+loses focus with other text. A phone changes its `TextInput`'s text and blurs
+it. A script's edit is never held to `minlength` and `maxlength`, so no
+scenario holds them; the native specs do.
 
 `scroll` scrolls the element's part that scrolls to an offset, where it comes
 to rest: the web sets the offset and sends `scroll` and `scrollend`, and a
