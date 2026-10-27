@@ -110,6 +110,19 @@ const currentItem = (item: Element): boolean => {
 /** The families whose words are their reading, whose record says what they read. */
 const READS: ReadonlySet<string> = new Set(['format-date', 'timeline'])
 
+/** The families a reader types into, whose record says what the field holds. */
+const TEXTS: ReadonlySet<string> = new Set(['input'])
+
+/** What the element's field holds, and whether the element is marked wrong. */
+const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
+  const control = mounted.root.shadowRoot?.querySelector('[part~="control"]')
+  const value =
+    control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement
+      ? control.value
+      : ''
+  return { invalid: inState(mounted.root, 'invalid'), value }
+}
+
 /** Whether an element that opens stands open, as its `open` property says. */
 export const isOpen = (element: Element): boolean =>
   (element as { readonly open?: unknown }).open === true
@@ -168,6 +181,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
         .filter(([, item]) => (item as { readonly current?: unknown }).current === true)
         .map(([v]) => v)
     : [...mounted.panels].filter(([, panel]) => inState(panel, 'selected')).map(([v]) => v),
+  ...(TEXTS.has(family) ? { text: textOf(mounted) } : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
 })
 
