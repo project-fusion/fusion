@@ -82,7 +82,11 @@ const ownTold = (family: Family, part: string, around: Around): Told | undefined
   if (scrolling !== undefined) {
     return { stood: () => around.pagers.get(scrolling.scroller)?.page(scrolling.toward) }
   }
-  const { joined, stacked, toggled } = around
+  const { entered, joined, stacked, toggled } = around
+  /* **The press that clears empties the field**, once its own event stands. */
+  if (entered?.clears !== undefined && entered.clears === part) {
+    return { quiet: true, stood: entered.clear }
+  }
   /* **The back press of a stack goes back one page**, once its event stands. */
   if (stacked.back !== undefined && stacked.back.part === part) {
     return { stood: stacked.back.go }
