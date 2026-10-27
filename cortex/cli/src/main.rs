@@ -22,7 +22,7 @@ mod source;
 
 use std::{io::Read as _, path::PathBuf};
 
-use chrono::{DateTime, NaiveDate, Utc};
+use chrono::{DateTime, Local, NaiveDate, NaiveTime, TimeZone as _, Utc};
 use clap::{Args, Parser, Subcommand};
 use fusion_rules::{
     error::{Failure, Outcome},
@@ -191,7 +191,8 @@ enum Verb {
 
         /// When the text was written, as 2026-10-19 or an RFC 3339 time.
         ///
-        /// Defaults to now.
+        /// A date is the start of that day in the local time zone. Defaults to
+        /// now.
         #[arg(long, value_name = "DATE")]
         at: Option<String>,
     },
@@ -329,15 +330,21 @@ fn warn(warnings: &[String], json: bool) {
     }
 }
 
-/// `--at` as a time: a date is its midnight in UTC.
+/// `--at` as a time: a date is the start of that day where the writer is, so
+/// it prints as the same date. Where a clock change skips midnight, the day
+/// starts at the first time that exists, an hour later.
 fn parse_at(text: &str) -> Outcome<DateTime<Utc>> {
     if let Ok(time) = DateTime::parse_from_rfc3339(text) {
         return Ok(time.with_timezone(&Utc));
     }
     NaiveDate::parse_from_str(text, "%Y-%m-%d")
         .ok()
-        .and_then(|date| date.and_hms_opt(0, 0, 0))
-        .map(|time| time.and_utc())
+        .and_then(|date| {
+            [NaiveTime::MIN, NaiveTime::from_hms_opt(1, 0, 0)?]
+                .into_iter()
+                .find_map(|time| Local.from_local_datetime(&date.and_time(time)).earliest())
+        })
+        .map(|time| time.with_timezone(&Utc))
         .ok_or_else(|| {
             Failure::input(
                 format!("`{text}` is not a date"),
@@ -486,5 +493,33 @@ async fn run(cli: Cli, paint: Paint) -> Outcome<Code> {
             emit(&report, json, |report| render::replayed(report, paint));
             Ok(Code::Ok)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_date_prints_as_the_day_it_names() {
+        for day in [
+            "2026-01-01",
+            "2026-03-08",
+            "2026-10-19",
+            "2026-11-01",
+            "2026-12-31",
+        ] {
+            let printed = render::date(parse_at(day).unwrap());
+            let named = NaiveDate::parse_from_str(day, "%Y-%m-%d").unwrap();
+            assert_eq!(printed, named.format("%B %-d, %Y").to_string(), "{day}");
+        }
+    }
+
+    #[test]
+    fn a_time_keeps_its_offset() {
+        assert_eq!(
+            parse_at("2026-10-19T09:30:00-07:00").unwrap().to_rfc3339(),
+            "2026-10-19T16:30:00+00:00"
+        );
     }
 }
