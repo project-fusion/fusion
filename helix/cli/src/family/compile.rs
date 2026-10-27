@@ -116,7 +116,7 @@ fn folders(folder: &Path) -> Result<Vec<PathBuf>, Failure> {
             "the package has no families",
             format!("{}: {error}", folder.display()),
         )
-        .hint("pass the directory that holds `src/families`, such as helix/neutral")
+        .hint("name the package that holds `src/families` in the project's `families`")
     })?;
     let mut found: Vec<PathBuf> = entries
         .filter_map(Result::ok)
