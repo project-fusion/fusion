@@ -22,7 +22,7 @@
  *
  * **Each value is written with the builders in `builders.ts`**, such as
  * `times(rem(2.5), density)`, so a misspelled builder or a wrong unit is a type
- * error here. `helix family` reads the calls as syntax into typed expressions,
+ * error here. `helix system` reads the calls as syntax into typed expressions,
  * which is what the native modules and the Design Tokens Format Module file
  * are written from.
  */

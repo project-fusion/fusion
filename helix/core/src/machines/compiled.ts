@@ -1,7 +1,7 @@
 import type { Argument } from './statechart.js'
 
 /*
- * What every module `helix family machines` compiles exports, as the code
+ * What every module `helix system machines` compiles exports, as the code
  * that runs one and the specs that hold one to its machine read it. Each
  * module declares the same shapes for its own context, so any of them fits
  * these.

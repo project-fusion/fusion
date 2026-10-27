@@ -58,7 +58,7 @@ mod tests {
         )
     }
 
-    /// What `helix family build` says of a headless source, with no rules.
+    /// What `helix system build` says of a headless source, with no rules.
     fn unresolved(source: &str) -> Vec<String> {
         resolved(&family(source))
     }

@@ -27,7 +27,7 @@ import { bind, derive } from '../../../tree.js'
  * **The sequence is a list named by `label`**, and each step a list item,
  * on the web and on a phone.
  *
- * **Held to `helix-steps`.** `helix family check` compares the props, the
+ * **Held to `helix-steps`.** `helix system check` compares the props, the
  * events, the states, the region, and the part with what the manifest says
  * the element has.
  */

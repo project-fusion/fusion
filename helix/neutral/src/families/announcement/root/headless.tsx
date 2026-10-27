@@ -41,7 +41,7 @@ import { bind, derive } from '../../../tree.js'
  * message that a phone says through its screen reader; and the deprecated
  * `icon` slot, read inside `dismiss-icon`.
  *
- * **Held to `helix-announcement`.** `helix family check` compares the props,
+ * **Held to `helix-announcement`.** `helix system check` compares the props,
  * the event, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

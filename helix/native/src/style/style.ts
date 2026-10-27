@@ -1,7 +1,7 @@
 /**
  * Applies a family's intermediate form on React Native.
  *
- * **One runtime for every family.** `helix family build` writes each family's
+ * **One runtime for every family.** `helix system build` writes each family's
  * rules as data, and this reads any of them, so a family needs no native code
  * of its own for its look.
  *

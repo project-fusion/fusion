@@ -33,7 +33,7 @@ import { derive } from '../../../tree.js'
  *
  * **The web's**: `scrollToSection()`.
  *
- * **Held to `helix-outline`.** `helix family check` compares the props, the
+ * **Held to `helix-outline`.** `helix system check` compares the props, the
  * event, the states, the regions, and the parts with what the manifest says
  * the element has.
  */

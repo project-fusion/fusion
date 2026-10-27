@@ -21,7 +21,7 @@
  * )
  * ```
  *
- * **Read as syntax and never run**, as `style.ts` says. `helix family`
+ * **Read as syntax and never run**, as `style.ts` says. `helix system`
  * rewrites a table into the shape `rules.ts` describes before it reads
  * anything else (`helix/cli/src/family/ir/sugar`).
  *

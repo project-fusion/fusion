@@ -14,7 +14,7 @@ import { headless, Slot, Text, View, web } from '../../../render.js'
  * value. A phone has no `<dd>` to pass, so what is passed in is the value,
  * and several elements passed in stack in the value's column.
  *
- * **Held to `helix-description-list-item`.** `helix family check` compares
+ * **Held to `helix-description-list-item`.** `helix system check` compares
  * the props, the states, the regions, and the parts with what the manifest
  * says the element has.
  */

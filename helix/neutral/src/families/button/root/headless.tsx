@@ -22,7 +22,7 @@ import {
  * a group, and in a group without one, it is a button of its own. `pressed`
  * is the group's to write, as on the web.
  *
- * **Held to Button's web element.** `helix family check` compares these props,
+ * **Held to Button's web element.** `helix system check` compares these props,
  * the event, the states, the regions, and the parts with what the manifest
  * says `helix-button` has, so the source cannot drop or invent one unseen.
  */

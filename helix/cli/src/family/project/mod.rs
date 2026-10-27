@@ -1,20 +1,23 @@
-//! The project a `helix family` command compiles, read from `helix.family.json`.
+//! The design system a `helix system` command compiles, read from the
+//! `system` of `helix.json`.
 //!
-//! **One file names everything the compiler takes from a design system**:
+//! **One section names everything the compiler takes from a design system**:
 //!
 //! - its prefixes: the tag's, the event's, and the custom property's;
 //! - its token source, a Design Tokens Format Module file or a styles package;
 //! - where its families are, and where each output is written.
 //!
-//! **Found the way the theme's intent is found**, by [`crate::config`]'s
-//! rules: `--config <path>` first, then `helix.family.json` in the working
-//! directory or the nearest directory above it, up to the repository root.
-//! Every path in the file is relative to the directory the file is in.
+//! **Found by [`crate::config`]'s rules**: `--config <path>` first, then the
+//! nearest configuration with a `system`, from the working directory up to
+//! the repository root, where the `helix` key of `fusion.json` is read before
+//! `helix.json` in each directory. Every path in the section is relative to
+//! the directory the file is in.
 //!
-//! **A key the file does not know is refused**, with serde's message naming
-//! it and its line, so a misspelled key is a failure at the command that
-//! reads it. `$schema` is the one key that is read and ignored, so an editor
-//! can validate the file against `helix family config --schema`.
+//! **A key the section does not know is refused**, with serde's message
+//! naming it and its line, so a misspelled key is a failure at the command
+//! that reads it. `$schema` is the one key at the top of the file that is read
+//! and ignored, so an editor can validate the file against
+//! `helix system config --schema`.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -24,7 +27,8 @@ use fusion_rules::error::Failure;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::config::{discover_named, FAMILY};
+use crate::config::{self, Found, FILE, PRODUCT_FILE};
+use crate::PRODUCT;
 
 mod defaults;
 #[cfg(test)]
@@ -36,14 +40,15 @@ mod tests;
 #[cfg(test)]
 pub use tests::testing;
 
-/// `helix.family.json`, as it is written.
+/// The folder under the families package `build` writes into when
+/// `outputs.build` names none: beside the package's `dist`, never in it, so
+/// the files a package publishes are its own.
+pub const BUILD: &str = "build";
+
+/// The `system` of `helix.json`, as it is written.
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Config {
-    /// The JSON Schema an editor validates the file with. The compiler ignores
-    /// it.
-    #[serde(rename = "$schema", default)]
-    pub _schema: Option<String>,
     /// The design system's name as a sentence writes it, such as `Acme`.
     pub name: String,
     /// The prefix of every element's tag, `<prefix>-tabs`. It is also the
@@ -142,13 +147,14 @@ pub struct TokenConfig {
     pub vendor: Option<String>,
 }
 
-/// Where each command writes. A command whose output the file does not name
-/// refuses to run, except `build`, which writes into the families package's
-/// `dist`.
+/// Where each command writes. A command whose output the section does not
+/// name refuses to run, except `build`, which writes into the families
+/// package's `build`.
 #[derive(Debug, Default, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct OutputConfig {
-    /// The folder `build` writes `ir/` and `web/` into.
+    /// The folder `build` writes `ir/` and `web/` into. The families
+    /// package's `build` unless it names another.
     #[serde(default)]
     pub build: Option<String>,
     /// The folder `components` writes `<family>/index.native.ts` into.
@@ -250,12 +256,16 @@ pub struct Runtime {
     pub native_package: Option<PathBuf>,
 }
 
-/// A project: its configuration, with every path made absolute.
+/// A design system: its configuration, with every path made absolute.
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Project {
     /// The file it was read from.
     pub file: PathBuf,
+    /// The key of its section in that file, `system` or `helix.system`, as a
+    /// message names it.
+    #[serde(skip)]
+    pub section: String,
     /// The directory a generated file names its sources from: the
     /// repository root above the file, or the file's own directory outside a
     /// repository.
@@ -271,25 +281,30 @@ pub struct Project {
 }
 
 impl Project {
-    /// The project `flag` names, or the one `helix.family.json` above `from`
-    /// describes, or none where neither is there.
+    /// The design system the file `flag` names, or the nearest configuration
+    /// above `from` with a `system`, or none where neither is there.
     ///
     /// # Errors
     ///
-    /// [`Failure`] when the file cannot be read or is not a project.
+    /// [`Failure`] when the file cannot be read, or its `system` is not a
+    /// design system.
     pub fn find(flag: Option<&Path>, from: &Path) -> Result<Option<Self>, Failure> {
-        let file = match flag {
-            Some(path) => Some(if path.is_absolute() {
-                path.to_path_buf()
-            } else {
-                from.join(path)
-            }),
-            None => discover_named(from, FAMILY),
-        };
-        file.map(|file| Self::read(&file)).transpose()
+        match flag {
+            Some(path) => {
+                let file = if path.is_absolute() {
+                    path.to_path_buf()
+                } else {
+                    from.join(path)
+                };
+                Self::read(&file).map(Some)
+            }
+            None => config::discover(from, |sections| sections.system.is_some())?
+                .map(Self::of)
+                .transpose(),
+        }
     }
 
-    /// The project, where there must be one.
+    /// The design system, where there must be one.
     ///
     /// # Errors
     ///
@@ -297,45 +312,72 @@ impl Project {
     pub fn required(flag: Option<&Path>, from: &Path) -> Result<Self, Failure> {
         Self::find(flag, from)?.ok_or_else(|| {
             Failure::input(
-                format!("no {FAMILY}"),
+                format!("no `system` in {FILE}"),
                 format!(
-                    "searched {} and every directory above it up to the repository root",
+                    "searched {} and every directory above it up to the repository root for a {FILE}, or a {PRODUCT_FILE} with a `{PRODUCT}` key, that has a `system`",
                     from.display()
                 ),
             )
             .hint(format!(
-                "write a {FAMILY} that names the design system's prefix and its families, or pass --config"
+                "add a `system` to {FILE} that names the design system's prefix and its families, or pass --config"
             ))
         })
     }
 
-    /// Reads and resolves the file at `file`.
+    /// Reads and resolves the `system` of the configuration at `file`.
     ///
     /// # Errors
     ///
-    /// [`Failure`] when the file cannot be read, is not JSON of this shape,
-    /// or names both token sources.
+    /// [`Failure`] when the file cannot be read, has no `system`, or its
+    /// `system` is not this shape or names both token sources.
     pub fn read(file: &Path) -> Result<Self, Failure> {
-        let text = fs::read_to_string(file).map_err(|error| {
-            Failure::input(format!("cannot read {}", file.display()), error.to_string())
+        let found = config::open(file)?.ok_or_else(|| {
+            Failure::input(
+                format!("cannot use {}", file.display()),
+                format!("it has no `{PRODUCT}` key"),
+            )
         })?;
-        let config: Config = serde_json::from_str(&text).map_err(|error| {
-            Failure::input(format!("cannot use {}", file.display()), error.to_string())
-        })?;
-        let file = fs::canonicalize(file).unwrap_or_else(|_| file.to_path_buf());
-        let root = file.parent().map(Path::to_path_buf).unwrap_or_default();
-        Self::resolve(config, file, &root)
+        Self::of(found)
+    }
+
+    /// The design system the `system` of `found` describes.
+    fn of(found: Found) -> Result<Self, Failure> {
+        let section = found.key("system");
+        let Some(system) = found.sections.system else {
+            return Err(Failure::input(
+                format!("{} has no `{section}`", found.file.display()),
+                format!("`{PRODUCT} system` compiles the design system its `system` describes"),
+            )
+            .hint(format!(
+                "add a `{section}` that names the design system's prefix and its families"
+            )));
+        };
+        let root = found
+            .file
+            .parent()
+            .map(Path::to_path_buf)
+            .unwrap_or_default();
+        Self::resolve(system, found.file, section, &root)
     }
 
     /// `config`, read from `file`, with each path made absolute against
     /// `root`.
-    fn resolve(config: Config, file: PathBuf, root: &Path) -> Result<Self, Failure> {
+    fn resolve(
+        config: Config,
+        file: PathBuf,
+        section: String,
+        root: &Path,
+    ) -> Result<Self, Failure> {
         let at = |path: &str| {
             let joined = root.join(path);
             fs::canonicalize(&joined).unwrap_or(joined)
         };
-        let refuse =
-            |why: &str| Failure::input(format!("cannot use {}", file.display()), why.to_owned());
+        let refuse = |why: &str| {
+            Failure::input(
+                format!("cannot use the `{section}` of {}", file.display()),
+                why.to_owned(),
+            )
+        };
         if config.prefix.is_empty() {
             return Err(refuse("`prefix` is empty"));
         }
@@ -349,7 +391,7 @@ impl Project {
                 .outputs
                 .build
                 .as_deref()
-                .map_or_else(|| families.join("dist"), at),
+                .map_or_else(|| families.join(BUILD), at),
             components: config.outputs.components.as_deref().map(at),
             design_tokens: config.outputs.design_tokens.as_deref().map(at),
             stylesheets: config.outputs.stylesheets.as_deref().map(at),
@@ -379,6 +421,7 @@ impl Project {
             runtime,
             repository,
             file,
+            section,
         })
     }
 
@@ -400,6 +443,7 @@ impl Project {
     /// [`Failure`] naming the key when the file leaves it out.
     pub fn needs<'a>(&self, path: Option<&'a PathBuf>, key: &str) -> Result<&'a Path, Failure> {
         path.map(PathBuf::as_path).ok_or_else(|| {
+            let key = format!("{}.{key}", self.section);
             Failure::input(
                 format!("{} names no `{key}`", self.file.display()),
                 format!("the command reads or writes what `{key}` names"),
@@ -473,9 +517,41 @@ fn runtime(given: RuntimeConfig, at: &dyn Fn(&str) -> PathBuf) -> Runtime {
     }
 }
 
-/// The JSON Schema of `helix.family.json`.
+/// `helix.json` as an editor validates it: the `system` in full, and the
+/// other two sections by their shape. The intent and the component settings
+/// are each refused by their own reader, which names the key it does not
+/// know.
+#[derive(JsonSchema)]
+#[serde(deny_unknown_fields)]
+#[allow(dead_code, reason = "a shape the schema is derived from, never built")]
+struct File {
+    /// The JSON Schema an editor validates the file with. Ignored.
+    #[serde(rename = "$schema")]
+    schema: Option<String>,
+    /// The intent `helix theme` derives, written here, or the path of a theme
+    /// file, relative to this one.
+    theme: Option<ThemeSection>,
+    /// What `helix component` reads: `tiers`, the directories holding
+    /// component source, and the settings its rules read.
+    components: Option<BTreeMap<String, serde_json::Value>>,
+    /// The design system `helix system` compiles.
+    system: Option<Config>,
+}
+
+/// A theme as `helix.json` writes it.
+#[derive(JsonSchema)]
+#[serde(untagged)]
+#[allow(dead_code, reason = "a shape the schema is derived from, never built")]
+enum ThemeSection {
+    /// The path of a theme file.
+    Path(String),
+    /// The intent.
+    Intent(BTreeMap<String, serde_json::Value>),
+}
+
+/// The JSON Schema of `helix.json`.
 pub fn schema() -> String {
-    let schema = schemars::schema_for!(Config);
+    let schema = schemars::schema_for!(File);
     let mut text = serde_json::to_string_pretty(&schema).unwrap_or_default();
     text.push('\n');
     text

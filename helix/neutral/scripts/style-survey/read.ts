@@ -20,7 +20,7 @@ export interface Source {
 
 /**
  * True for a component stylesheet: CSS, outside an `.examples` folder, and
- * not written by `helix family stylesheets` from a style table.
+ * not written by `helix system stylesheets` from a style table.
  */
 export const isComponentSheet = (path: string): boolean =>
   path.endsWith('.css') &&

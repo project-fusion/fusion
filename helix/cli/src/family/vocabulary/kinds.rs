@@ -1,7 +1,7 @@
 //! The roles a node may take and the kinds of element a box may be, each
 //! with what the web writes and what a phone announces.
 //!
-//! **Defined here and nowhere else.** `helix family types` writes both
+//! **Defined here and nowhere else.** `helix system types` writes both
 //! tables into the types the native runtime imports, so a role a source may
 //! name and the meaning a phone gives it cannot drift apart.
 

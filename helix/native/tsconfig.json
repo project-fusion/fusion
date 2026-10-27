@@ -1,5 +1,5 @@
 {
-  // The runtime, its Jest specs, and the components `helix family components`
+  // The runtime, its Jest specs, and the components `helix system components`
   // writes for them into `src/families`: React Native's types and JSX, and no
   // DOM. The one spec Bun runs needs Bun's types, which a React Native module
   // must not lean on, so `tsconfig.pure.json` checks it.

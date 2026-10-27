@@ -16,7 +16,7 @@
  * })
  * ```
  *
- * **Read as syntax and never run.** `helix family` parses the module
+ * **Read as syntax and never run.** `helix system` parses the module
  * (`helix/cli/src/family/read/jsx.rs`) and compiles it to the intermediate
  * form, and nothing in it runs.
  *
@@ -264,7 +264,7 @@ export interface Member {
 /**
  * The collection an element joins, by its family, as `item()` says.
  * Pressing the element chooses it where a `<Pressable>` in its render says
- * `chooses`, which `helix family` reads from the render, so it is said once.
+ * `chooses`, which `helix system` reads from the render, so it is said once.
  */
 export const set = (of: string, extra: Omit<NonNullable<Headless['item']>, 'of'> = {}): Member => ({
   item: { of, ...extra },
@@ -340,7 +340,7 @@ const typeOf = (value: boolean | number | string): 'boolean' | 'number' | 'strin
   typeof value as 'boolean' | 'number' | 'string'
 
 /* The nodes. Each is declared for the editor and returns nothing a reader
-   uses: `helix family` reads the JSX as syntax. */
+   uses: `helix system` reads the JSX as syntax. */
 
 const node = (): Drawn => ({}) as Drawn
 

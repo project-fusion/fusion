@@ -182,7 +182,7 @@ import type { Headless, Node } from './tree.js'
 /**
  * An element's source with its tree. A source holds its tree as JSX that
  * nothing runs, so its tree is the compiled one, from the native module
- * `helix family components` writes and `check:families` holds to a fresh
+ * `helix system components` writes and `check:families` holds to a fresh
  * compile.
  */
 const withTree = (family: Headless): Headless => {

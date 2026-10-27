@@ -1,5 +1,5 @@
 /*
- * The components `helix family components` writes, drawn from the pilot's
+ * The components `helix system components` writes, drawn from the pilot's
  * real intermediate forms. `test:native` writes them beside this file, as the
  * styled package's build writes the ones it ships, and they import this
  * package by its name as those do. `typecheck` reads this file too, so each

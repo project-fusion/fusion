@@ -24,7 +24,7 @@ import { bind, derive } from '../../../tree.js'
  * **The web's**: `rel`, `target`, and `download`, which a phone's open-link
  * has no use for.
  *
- * **Held to `helix-drilldown-item`.** `helix family check` compares the
+ * **Held to `helix-drilldown-item`.** `helix system check` compares the
  * props, the event, the regions, and the parts with what the manifest says
  * the element has.
  */
