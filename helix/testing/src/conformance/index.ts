@@ -12,6 +12,7 @@ import { DRAWER } from './scenarios/drawer.js'
 import { DRILLDOWN } from './scenarios/drilldown.js'
 import { FORMAT_DATE } from './scenarios/format-date.js'
 import { IMAGE } from './scenarios/image.js'
+import { INPUT } from './scenarios/input.js'
 import { LIST } from './scenarios/list.js'
 import { LOADER } from './scenarios/loader.js'
 import { MEGAMENU } from './scenarios/megamenu.js'
@@ -54,6 +55,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   drilldown: DRILLDOWN,
   'format-date': FORMAT_DATE,
   image: IMAGE,
+  input: INPUT,
   list: LIST,
   loader: LOADER,
   megamenu: MEGAMENU,

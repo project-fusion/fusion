@@ -248,6 +248,14 @@
       "types": "./dist/image/index.d.ts",
       "default": "./dist/image/index.js"
     },
+    "./input": {
+      "react-native": {
+        "types": "./dist/input/index.native.d.ts",
+        "default": "./dist/input/index.native.js"
+      },
+      "types": "./dist/input/index.d.ts",
+      "default": "./dist/input/index.js"
+    },
     "./jsx": "./types/jsx.d.ts",
     "./jsx-dev-runtime": {
       "react-native": {
