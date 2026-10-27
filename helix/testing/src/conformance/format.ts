@@ -100,6 +100,14 @@ export interface Held {
  *   `y`, where it comes to rest. The web sets the scroller's offset and sends
  *   `scroll` and `scrollend`, and a phone sends its scroll view's scroll and
  *   the end of a glide.
+ * - `type`: types `text` into the element's field, one character an edit,
+ *   with focus in the field first, or `erase`s that many characters from its
+ *   end, one an edit. The web writes each edit into the `<input>` and sends
+ *   `input`, as a keystroke does, and a phone changes its `TextInput`'s text.
+ * - `leave`: focus leaves the element's field, as a reader moves on. The web
+ *   sends `change` where the text differs from the text it gained focus
+ *   with, as a browser does on a reader's edit, and blurs it. A phone blurs
+ *   its `TextInput`.
  */
 export type Intent =
   | { readonly by: -1 | 1; readonly item: string; readonly kind: 'move' }
@@ -132,6 +140,8 @@ export type Intent =
   | { readonly kind: 'show' }
   | { readonly kind: 'wait'; readonly ms: number }
   | { readonly kind: 'scroll'; readonly x: number; readonly y: number }
+  | { readonly erase?: number; readonly kind: 'type'; readonly text?: string }
+  | { readonly kind: 'leave' }
 
 /** A setup and what a reader does to it. */
 export interface Scenario {
@@ -239,6 +249,13 @@ export interface Left {
    * The values of the panels shown, in a set that shows panels.
    */
   readonly shown: readonly string[]
+  /**
+   * The text the element's field holds, and whether it is marked wrong, for
+   * a family a reader types into, as an input: the web reads its `<input>`
+   * and its `invalid` state, and React Native its `TextInput` and the state
+   * its verdict sets.
+   */
+  readonly text?: { readonly invalid: boolean; readonly value: string }
   /**
    * Whether the element is waiting out its delay, unseen and silent, for a
    * family that holds itself back, as a loader. The web reads its `waiting`
@@ -361,6 +378,13 @@ export const say = (intent: Intent): string => {
       return `refuse ${intent.event}`
     case 'remove':
       return `remove on ${intent.event}`
+    case 'type':
+      return [
+        ...(intent.erase === undefined ? [] : [`erase ${intent.erase}`]),
+        ...(intent.text === undefined ? [] : [`type "${intent.text}"`]),
+      ].join(', then ')
+    case 'leave':
+      return 'leave the field'
   }
 }
 

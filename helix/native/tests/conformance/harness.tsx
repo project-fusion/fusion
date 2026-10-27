@@ -30,6 +30,7 @@ import { key, move, scroll, tap } from './input'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { laySections } from './sections'
+import { leave, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
 
 /*
@@ -94,6 +95,7 @@ const hearing = (run: Run, name: string, value: string | null) => {
      toggle's do. */
   const collection = formOf(root.tag).api?.collection
   const announces = [collection?.before, ...[collection?.after ?? []].flat()].includes(name)
+  const typed = formOf(root.tag).api?.entry !== undefined
   const relayed =
     rootSends &&
     !announces &&
@@ -106,10 +108,12 @@ const hearing = (run: Run, name: string, value: string | null) => {
     }
     /* `input` is left out, as the web half leaves it out: it records the
        events an element sends as `helix-` events and `change`, and an
-       element's `input` is the composed one its own `<input>` sends. An
-       item whose event the element hears after it, as a toast's message,
-       says which item sent it, where the event carries no value. */
-    if ((value !== null && relayed) || name === 'input') {
+       element's `input` is the composed one its own `<input>` sends. **An
+       element a reader types into sends its own `input` on each edit**, which
+       both halves record. An item whose event the element hears after it, as
+       a toast's message, says which item sent it, where the event carries no
+       value. */
+    if ((value !== null && relayed) || (name === 'input' && !typed)) {
       relay(event, value)
       return
     }
@@ -234,6 +238,10 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
     case 'key':
       await key(run, intent)
       return undefined
+    case 'type':
+      return typeInto(run, intent)
+    case 'leave':
+      return leave(run)
     case 'open':
     case 'close': {
       const words = wordsOf(setup, intent.item)
