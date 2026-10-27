@@ -42,6 +42,11 @@ use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
 /// The word every printed failure opens with, and the corner of every screen.
 pub const PRODUCT: &str = "helix";
 
+/// The family compiler's folder in the repository, as a module it writes from
+/// its own definitions names its source.
+#[cfg(feature = "internal")]
+pub const COMPILER: &str = "helix/cli/src/family";
+
 /// The npm package this binary ships in, which is what tells it its version.
 const PACKAGE: &str = "@fusion.dev/helix-cli";
 
