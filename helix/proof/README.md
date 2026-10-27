@@ -52,7 +52,7 @@ routes draw are under `src`.
 | `start` | Starts Metro, for Expo Go on a simulator or a phone, and the website at `/helix/app/proof` |
 | `test` | Draws the route tree with the native runtime and presses through it |
 | `theme` | Writes the `theme` of `helix.json` into `src/theme.css` for the web and `src/theme.ts` for a phone |
-| `typecheck` | Checks the shared and web files as the web's, the `.native.tsx` files as React Native's, and Metro's config |
+| `typecheck` | Checks that `src/theme.css` and `src/theme.ts` are what `helix.json` builds, then checks the shared and web files as the web's, the `.native.tsx` files as React Native's, and Metro's config |
 
 The app reaches the workspace packages through what each one exports, so
 they are built first:

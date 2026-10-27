@@ -36,7 +36,8 @@ Vite's, in markup and in pictures, so a template that drifts fails CI.
 
 `expo-router` is an app for the web, iOS, and Android, with an App Header
 over its own routes, so `smoke:scaffold` builds it and compares it with
-nothing. Its build checks the web's types and the phone's, and exports the
+nothing. Its build checks that `src/theme.css` and `src/theme.ts` are what
+`helix.json` builds, checks the web's types and the phone's, and exports the
 website.
 
 Each one starts Helix diagnostics in development, checked against the lint data

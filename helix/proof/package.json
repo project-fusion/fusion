@@ -16,7 +16,7 @@
     "start": "expo start",
     "test": "bun run --filter @fusion.dev/helix-native components && bunx --bun jest",
     "theme": "helix theme build --out src/theme.css && helix theme build --format native --out src/theme.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.native.json --noEmit && tsc -p tsconfig.scripts.json --noEmit"
+    "typecheck": "helix theme build --check --out src/theme.css && helix theme build --check --format native --out src/theme.ts && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.native.json --noEmit && tsc -p tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
     "@expo/metro-runtime": "58.0.14",

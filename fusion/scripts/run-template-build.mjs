@@ -58,7 +58,7 @@ import {
 } from 'node:fs'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
-import { extname, join, relative } from 'node:path'
+import { extname, join, relative, resolve } from 'node:path'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
@@ -70,8 +70,24 @@ const REFERENCE = 'react-vite'
 
 const only = process.argv.slice(2).find((argument) => !argument.startsWith('--'))
 
-const run = (command, args, cwd) =>
-  execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+const run = (command, args, cwd, env = process.env) =>
+  execFileSync(command, args, { cwd, env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+
+/**
+ * The `helix` this tree built, newest of release and debug, as `bin.mjs`
+ * picks it in a checkout. **A project's own scripts run it**, such as the
+ * Expo Router template's theme check. Installed from the tarballs, `bin.mjs`
+ * finds no target in the project and runs the platform package's binary,
+ * which is the release on the registry and lacks what this tree added.
+ */
+const helix = () => {
+  const target = resolve(root, process.env.CARGO_TARGET_DIR ?? 'target')
+  return ['release', 'debug']
+    .map((profile) => join(target, profile, process.platform === 'win32' ? 'helix.exe' : 'helix'))
+    .filter((path) => existsSync(path))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)
+    .at(0)
+}
 
 const scratch = mkdtempSync(join(tmpdir(), 'helix-scaffold-'))
 const tarballs = join(scratch, 'tarballs')
@@ -123,7 +139,11 @@ for (const id of templates) {
 
   try {
     run('bun', ['install'], project)
-    run('bun', ['run', 'build'], project)
+    const binary = helix()
+    run('bun', ['run', 'build'], project, {
+      ...process.env,
+      ...(binary === undefined ? {} : { HELIX_BIN: binary }),
+    })
     built.set(id, project)
     console.log(`  ${id}: installed and built`)
   } catch (error) {

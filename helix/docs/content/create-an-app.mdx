@@ -36,7 +36,8 @@ npx expo start --web
 - **In a development build**, `npx expo run:ios` and `npx expo run:android`
   build the app on your machine with Xcode or Android Studio.
 
-`npm run build` checks the types and writes the website into `dist`.
+`npm run build` checks the types and writes the website into `dist`. It fails
+first when `src/theme.css` or `src/theme.ts` is not what `helix.json` builds.
 
 ## What the app contains
 
