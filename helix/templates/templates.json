@@ -20,6 +20,16 @@
       "title": "React (Next.js)"
     },
     {
+      "description": "React and TypeScript on Expo Router: one app for the web, iOS, and Android.",
+      "id": "expo-router",
+      "named": [
+        "app.json",
+        "package.json",
+        "src/header.tsx"
+      ],
+      "title": "Expo Router (web, iOS, Android)"
+    },
+    {
       "description": "Vue and TypeScript on Vite.",
       "id": "vue-vite",
       "named": [
