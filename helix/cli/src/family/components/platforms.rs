@@ -17,7 +17,7 @@ use super::members::{camel, handler_of, region_prop, regions, slot_of, web_event
 use crate::args::FamilyArgs;
 use crate::family::api::Prop;
 use crate::family::compile::{self, Compiled};
-use crate::family::{locate, read_manifest};
+use crate::family::{open, read_manifest};
 
 #[cfg(test)]
 #[path = "platforms_tests.rs"]
@@ -52,7 +52,7 @@ fn named(compiled: &Compiled, component: &str) -> Json {
         .events
         .iter()
         .filter(|event| event.platform.is_none())
-        .map(|event| (web_event(event), handler_of(event)))
+        .map(|event| (web_event(event, &family.names), handler_of(event)))
         .collect();
     events.sort();
     let mut drawn = Vec::new();
@@ -117,9 +117,9 @@ pub fn platforms(compiled: &[Compiled], manifest: &Json) -> Result<Json, Vec<Str
 ///
 /// [`Failure`] when a source cannot be compiled, or the styled manifest cannot
 /// be read or lacks an element the sources have.
-pub fn print(args: &FamilyArgs, from: &Path) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    let named = platforms(&compile::all(&package)?, &read_manifest(&package)?)
+pub fn print(args: &FamilyArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let named = platforms(&compile::all(&project)?, &read_manifest(&project)?)
         .map_err(|faults| Failure::input("cannot name the native components", faults.join("\n")))?;
     say!("{named}");
     Ok(Code::Ok)

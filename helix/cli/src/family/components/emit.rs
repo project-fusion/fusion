@@ -4,6 +4,7 @@ use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
 use crate::family::components::members::{Member, Sends};
+use crate::PRODUCT;
 
 /// The widest a doc block written on one line may be.
 const WIDTH: usize = 100;
@@ -75,12 +76,23 @@ pub fn doc(indent: &str, paragraphs: &[String]) -> String {
     }
 }
 
+/// Where a family's module comes from and what it imports: the folder of the
+/// family's sources and of the event classes, as its opening comment names
+/// them, the runtime's module, and the type of the event a handler hears,
+/// which the runtime exports.
+pub struct Origin<'a> {
+    pub families: &'a str,
+    pub events: &'a str,
+    pub runtime: &'a str,
+    pub event_type: &'a str,
+}
+
 /// What an event's `target` carries where the element that sent it has a value.
 const VALUE_TARGET: &str = "{ readonly value: string }";
 
 /// The event one handler hears, with its detail's fields typed, and its
 /// `target` where the element that sent it has a value.
-fn event_type(sends: &Sends) -> String {
+fn event_type(sends: &Sends, origin: &Origin) -> String {
     let mut said = if sends.fields.is_empty() {
         format!(
             "What `{}` receives: the web's `{}`, which carries no detail.",
@@ -106,8 +118,8 @@ fn event_type(sends: &Sends) -> String {
         };
         let _ = writeln!(
             out,
-            "export type {} = HelixEvent<Record<never, never>{target}>",
-            sends.type_name
+            "export type {} = {}<Record<never, never>{target}>",
+            sends.type_name, origin.event_type
         );
         return out;
     }
@@ -123,7 +135,7 @@ fn event_type(sends: &Sends) -> String {
     let class = if sends.bare {
         "PlatformEvent"
     } else {
-        "HelixEvent"
+        origin.event_type
     };
     let _ = writeln!(out, "export type {} = {class}{open}", sends.type_name);
     for field in &sends.fields {
@@ -208,7 +220,7 @@ fn component(part: &Part) -> String {
 ///
 /// **The runtime by its package name**, whose entry checks the peers before
 /// anything else in it runs.
-fn imports(parts: &[Part], folders: &BTreeMap<String, String>) -> String {
+fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) -> String {
     let regions = parts
         .iter()
         .flat_map(|part| &part.members)
@@ -230,6 +242,7 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>) -> String {
         react.push("Ref");
     }
     let mut out = format!("import type {{ {} }} from 'react'\n", react.join(", "));
+    let event_type = format!("type {}", origin.event_type);
     let mut names: Vec<&str> = Vec::new();
     if parts.iter().any(|part| !part.web_only) {
         names.extend(["behaviorFor", "element"]);
@@ -239,7 +252,7 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>) -> String {
         names.push("type FieldHandle");
     }
     if events {
-        names.push("type HelixEvent");
+        names.push(&event_type);
     }
     if platform_events {
         names.push("type PlatformEvent");
@@ -249,8 +262,9 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>) -> String {
     }
     let _ = writeln!(
         out,
-        "import {{ {} }} from '@fusion.dev/helix-native'",
-        names.join(", ")
+        "import {{ {} }} from '{}'",
+        names.join(", "),
+        origin.runtime
     );
     /* **A box that draws another family's element imports its module**, whose
     `element` makes the component the box draws. A box only the web draws
@@ -273,13 +287,13 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>) -> String {
         let _ = writeln!(out, "import '../{family}/index.native'");
     }
     if events {
-        out.push_str("\nexport type { HelixEvent }\n");
+        let _ = write!(out, "\nexport type {{ {} }}\n", origin.event_type);
     }
     out
 }
 
 /// The elements the boxes of `tree` draw on a phone, by their tag without
-/// `helix-`: each box that `draws` one and is not the web's alone.
+/// the prefix: each box that `draws` one and is not the web's alone.
 fn drawn_by(tree: &serde_json::Value, into: &mut Vec<String>) {
     for node in tree.as_array().into_iter().flatten() {
         let attributes = &node["attributes"];
@@ -294,25 +308,26 @@ fn drawn_by(tree: &serde_json::Value, into: &mut Vec<String>) {
 }
 
 /// One family's module: its forms, then each element's event types, props,
-/// and component, the root first.
-#[cfg(test)]
-pub fn module(family: &str, parts: &[Part]) -> String {
-    module_in(family, parts, &BTreeMap::new())
-}
-
-/// One family's module, with the folder of each family an element is drawn
-/// from by its tag without `helix-`, as `menu-item` is drawn from `menu`.
-pub fn module_in(family: &str, parts: &[Part], folders: &BTreeMap<String, String>) -> String {
+/// and component, the root first. `folders` names the folder of each family
+/// an element is drawn from by its tag without the prefix, as `menu-item`
+/// is drawn from `menu`.
+pub fn module_in(
+    family: &str,
+    parts: &[Part],
+    folders: &BTreeMap<String, String>,
+    origin: &Origin,
+) -> String {
     let mut out = format!(
-        "/* Generated by `helix family components` from the intermediate forms in\n   helix/neutral/src/families/{family}, the styled manifest, and the event\n   details in helix/core/src/events. Do not edit: change those and run it\n   again. */\n"
+        "/* Generated by `{PRODUCT} family components` from the intermediate forms in\n   {}/src/families/{family}, the styled manifest, and the event\n   details in {}. Do not edit: change those and run it\n   again. */\n",
+        origin.families, origin.events
     );
-    out.push_str(&imports(parts, folders));
+    out.push_str(&imports(parts, folders, origin));
     for part in parts {
         out.push('\n');
         out.push_str(&doc(
             "",
             &[format!(
-                "The intermediate form of `{}`, as `helix family build` writes it.",
+                "The intermediate form of `{}`, as `{PRODUCT} family build` writes it.",
                 part.tag
             )],
         ));
@@ -321,7 +336,7 @@ pub fn module_in(family: &str, parts: &[Part], folders: &BTreeMap<String, String
     for part in parts {
         for sends in &part.events {
             out.push('\n');
-            out.push_str(&event_type(sends));
+            out.push_str(&event_type(sends, origin));
         }
         out.push('\n');
         out.push_str(&hooks_type(part));

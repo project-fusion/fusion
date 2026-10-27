@@ -27,14 +27,26 @@ use fusion_rules::error::{Failure, Outcome};
 /// The name a discovered intent is expected to have.
 pub const FILE: &str = "helix.theme.json";
 
+/// The name of the file that configures `helix family`: the design system's
+/// prefixes, its token source, where its families are, and what it writes.
+#[cfg(feature = "internal")]
+pub const FAMILY: &str = "helix.family.json";
+
 /// Walks up from `start` looking for [`FILE`].
 ///
 /// Returns `None` rather than an error: not finding one is only a failure once
 /// the caller knows nothing more explicit was given, and this function does not.
 #[must_use]
 pub fn discover(start: &Path) -> Option<PathBuf> {
+    discover_named(start, FILE)
+}
+
+/// Walks up from `start` looking for a file called `name`, and stops at the
+/// repository root, as [`discover`] does for the theme.
+#[must_use]
+pub fn discover_named(start: &Path, name: &str) -> Option<PathBuf> {
     for directory in start.ancestors() {
-        let candidate = directory.join(FILE);
+        let candidate = directory.join(name);
         if candidate.is_file() {
             return Some(candidate);
         }

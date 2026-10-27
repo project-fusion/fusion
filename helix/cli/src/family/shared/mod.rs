@@ -26,13 +26,13 @@ pub fn collections(families: &[&Family]) -> Vec<String> {
         .iter()
         .filter_map(|family| {
             let collection = family.api.collection.as_ref()?;
-            Some((family.tag.strip_prefix("helix-")?, collection.mixes))
+            Some((family.names.bare(&family.tag)?, collection.mixes))
         })
         .collect();
     let stacks: BTreeSet<&str> = families
         .iter()
         .filter(|family| family.api.stack.is_some())
-        .filter_map(|family| family.tag.strip_prefix("helix-"))
+        .filter_map(|family| family.names.bare(&family.tag))
         .collect();
     families
         .iter()

@@ -6,27 +6,45 @@ use crate::family::ir::{MixSpace, Op, QuoteMark, Value};
 #[path = "value_tests.rs"]
 mod tests;
 
+/// What a value is written within: the prefix of the element's own hooks,
+/// and the prefix of the design system's tokens.
+#[derive(Clone, Copy, Debug)]
+pub struct Scope<'a> {
+    pub hooks: &'a str,
+    pub tokens: &'a str,
+}
+
+impl<'a> Scope<'a> {
+    /// The scope of `family`'s rules.
+    pub fn of(family: &'a crate::family::ir::Family) -> Self {
+        Self {
+            hooks: &family.name,
+            tokens: &family.names.property,
+        }
+    }
+}
+
 /// A value as CSS.
-pub fn render(value: &Value, family: &str) -> String {
+pub fn render(value: &Value, scope: Scope<'_>) -> String {
     match value {
         Value::Text(text) => text.clone(),
         Value::Number(number) => number_css(*number),
         Value::Fit(share) => format!("{}fr", number_css(*share)),
-        Value::Token(name) => format!("var(--helix-{name})"),
+        Value::Token(name) => format!("var(--{}-{name})", scope.tokens),
         Value::Derived { fallback, name, .. } | Value::Own { fallback, name } => {
-            variable(&format!("--_{name}"), fallback.as_deref(), family)
+            variable(&format!("--_{name}"), fallback.as_deref(), scope)
         }
         Value::Inherited { fallback, name } | Value::Measured { fallback, name } => {
-            variable(&format!("--{name}"), fallback.as_deref(), family)
+            variable(&format!("--{name}"), fallback.as_deref(), scope)
         }
         Value::Hook { fallback, name, of } => variable(
-            &format!("--{}-{name}", of.as_deref().unwrap_or(family)),
+            &format!("--{}-{name}", of.as_deref().unwrap_or(scope.hooks)),
             fallback.as_deref(),
-            family,
+            scope,
         ),
         Value::Keyword(keyword) => keyword.css().to_owned(),
-        Value::Calc { .. } => format!("calc({})", arithmetic(value, family)),
-        Value::Function { arguments, name } => format!("{name}({})", join(arguments, ", ", family)),
+        Value::Calc { .. } => format!("calc({})", arithmetic(value, scope)),
+        Value::Function { arguments, name } => format!("{name}({})", join(arguments, ", ", scope)),
         Value::Mix {
             first,
             percent,
@@ -38,9 +56,9 @@ pub fn render(value: &Value, family: &str) -> String {
                 Some(MixSpace::Srgb) => "srgb",
                 None => "oklab",
             },
-            render(first, family),
+            render(first, scope),
             number_css(*percent),
-            render(second, family)
+            render(second, scope)
         ),
         Value::Quote { alt, mark } => {
             let mark = match mark {
@@ -50,46 +68,46 @@ pub fn render(value: &Value, family: &str) -> String {
                 QuoteMark::Open => "open-quote",
             };
             match alt {
-                Some(alt) => format!("{mark} / {}", render(alt, family)),
+                Some(alt) => format!("{mark} / {}", render(alt, scope)),
                 None => mark.to_owned(),
             }
         }
         Value::Scheme { dark, light } => format!(
             "light-dark({}, {})",
-            render(light, family),
-            render(dark, family)
+            render(light, scope),
+            render(dark, scope)
         ),
-        Value::Web(inner) => render(inner, family),
-        Value::Space(values) => join(values, " ", family),
-        Value::List(values) => join(values, ", ", family),
+        Value::Web(inner) => render(inner, scope),
+        Value::Space(values) => join(values, " ", scope),
+        Value::List(values) => join(values, ", ", scope),
     }
 }
 
 /// `var(--name)`, or `var(--name, fallback)`.
-pub fn variable(name: &str, fallback: Option<&Value>, family: &str) -> String {
+pub fn variable(name: &str, fallback: Option<&Value>, scope: Scope<'_>) -> String {
     match fallback {
-        Some(fallback) => format!("var({name}, {})", render(fallback, family)),
+        Some(fallback) => format!("var({name}, {})", render(fallback, scope)),
         None => format!("var({name})"),
     }
 }
 
 /// The inside of a `calc()`, with parentheses only where precedence needs
 /// them, so `a - b * 2` and `(a - b) * 2` are both one `calc()`.
-pub fn arithmetic(value: &Value, family: &str) -> String {
+pub fn arithmetic(value: &Value, scope: Scope<'_>) -> String {
     match value {
         Value::Calc { op, operands } => operands
             .iter()
             .enumerate()
             .map(|(at, operand)| match operand {
                 Value::Calc { op: inner, .. } if grouped(*op, *inner, at) => {
-                    format!("({})", arithmetic(operand, family))
+                    format!("({})", arithmetic(operand, scope))
                 }
-                operand @ Value::Calc { .. } => arithmetic(operand, family),
-                operand => render(operand, family),
+                operand @ Value::Calc { .. } => arithmetic(operand, scope),
+                operand => render(operand, scope),
             })
             .collect::<Vec<_>>()
             .join(&format!(" {op} ")),
-        value => render(value, family),
+        value => render(value, scope),
     }
 }
 
@@ -109,10 +127,10 @@ fn grouped(outer: Op, inner: Op, at: usize) -> bool {
         || (rank(inner) == rank(outer) && at > 0 && matches!(outer, Op::Divide | Op::Subtract))
 }
 
-pub fn join(values: &[Value], separator: &str, family: &str) -> String {
+pub fn join(values: &[Value], separator: &str, scope: Scope<'_>) -> String {
     values
         .iter()
-        .map(|value| render(value, family))
+        .map(|value| render(value, scope))
         .collect::<Vec<_>>()
         .join(separator)
 }
