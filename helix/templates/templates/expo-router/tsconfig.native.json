@@ -1,0 +1,11 @@
+{
+  // What a phone alone draws: the `.native.tsx` files, with React Native's
+  // types and no DOM.
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "moduleSuffixes": [".native", ""],
+    "strict": true
+  },
+  "include": ["src/**/*.native.tsx"]
+}

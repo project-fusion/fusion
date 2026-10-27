@@ -1,0 +1,13 @@
+{
+  // The app as the web builds it: the routes and the modules they share with
+  // a phone, with each `.web.tsx` file in place of its pair. The
+  // `.native.tsx` files are `tsconfig.native.json`'s.
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "customConditions": [],
+    "moduleSuffixes": [".web", ""],
+    "strict": true
+  },
+  "exclude": ["node_modules", "src/**/*.native.tsx"],
+  "include": ["app", "src", "helix-jsx.d.ts", "web-env.d.ts"]
+}
