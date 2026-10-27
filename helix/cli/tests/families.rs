@@ -275,8 +275,11 @@ fn nothing_it_writes_names_helix_but_the_runtime_it_draws_with() {
     let mut written = Vec::new();
     files(&acme.root.join("out"), &mut written);
     /* The intermediate form's schema is the compiler's, the same for every
-    design system. */
-    written.retain(|path| !path.ends_with("ir/schema.json"));
+    design system, and names the prefix and the layer host by their keys. */
+    assert!(
+        written.iter().any(|path| path.ends_with("ir/schema.json")),
+        "{written:?}"
+    );
     assert!(written.len() >= 18, "{written:?}");
     for path in written {
         printed.push((
