@@ -7,6 +7,7 @@ use crate::family::api::{Event, Literal, Node, NodeKind, Primitive, Prop, PropTy
 use crate::family::components::details::{Details, Field};
 use crate::family::components::hooks;
 use crate::family::ir::{self, Family, Item};
+use crate::family::project::Names;
 
 /// One member of a component's props: a prop, a region, or a handler.
 #[derive(Debug, PartialEq, Eq)]
@@ -172,13 +173,13 @@ pub fn region_prop(region: &str) -> String {
     }
 }
 
-/// The name the web sends an event under: `helix-` and its name, or its name
-/// alone for one the web sends bare.
-pub fn web_event(event: &Event) -> String {
+/// The name the web sends an event under: the event prefix and its name, or
+/// its name alone for one the web sends bare.
+pub fn web_event(event: &Event, names: &Names) -> String {
     if event.bare {
         event.name.clone()
     } else {
-        format!("helix-{}", event.name)
+        names.event(&event.name)
     }
 }
 
@@ -271,8 +272,9 @@ fn event(
     declaration: &Json,
     details: &Details,
     target: bool,
+    names: &Names,
 ) -> Result<(Member, Sends), String> {
-    let web = web_event(event);
+    let web = web_event(event, names);
     let handler = handler_of(event);
     let type_name = format!("{component}{}Event", spelled(event));
     let mut detail = event.detail.clone();
@@ -383,7 +385,7 @@ pub fn typed_members(
         .filter(|one| one.platform.is_none())
     {
         let target = targets_value(family, items, one);
-        match event(one, component, declaration, details, target) {
+        match event(one, component, declaration, details, target, &family.names) {
             Ok((member, sends)) => {
                 members.push(member);
                 typed.events.push(sends);

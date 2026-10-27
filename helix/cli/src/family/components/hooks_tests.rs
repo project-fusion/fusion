@@ -3,8 +3,9 @@ use serde_json::json;
 use super::{members, prop, read};
 use crate::family::api::headless;
 use crate::family::components::details::Details;
-use crate::family::components::emit::{module, Part};
+use crate::family::components::emit::Part;
 use crate::family::components::members::typed_members;
+use crate::family::components::tests::module;
 use crate::family::ir::{styled, Family};
 use crate::family::read::default_export;
 

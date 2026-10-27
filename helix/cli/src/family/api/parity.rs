@@ -5,6 +5,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde_json::Value as Json;
 
 use crate::family::api::{Api, Attribute, Node, NodeKind};
+use crate::family::project::Names;
 
 /// The regions a tree draws, by name.
 fn regions(tree: &[Node], into: &mut BTreeSet<String>) {
@@ -91,7 +92,7 @@ fn drawn_on_the_web(tree: &[Node]) -> Vec<Node> {
 
 /// Where a family's API and tree differ from what the manifest says its
 /// element has, one sentence each.
-pub fn parity(tag: &str, api: &Api, tree: &[Node], manifest: &Json) -> Vec<String> {
+pub fn parity(tag: &str, api: &Api, tree: &[Node], manifest: &Json, system: &Names) -> Vec<String> {
     let declaration = manifest["modules"]
         .as_array()
         .into_iter()
@@ -142,7 +143,7 @@ pub fn parity(tag: &str, api: &Api, tree: &[Node], manifest: &Json) -> Vec<Strin
                 if event.bare {
                     event.name.clone()
                 } else {
-                    format!("helix-{}", event.name)
+                    system.event(&event.name)
                 }
             })
             .collect(),

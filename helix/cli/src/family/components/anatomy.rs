@@ -33,7 +33,7 @@ use crate::args::FamilyArgs;
 use crate::family::api::{Attribute, Node, NodeKind, Platform, Prop, PropType};
 use crate::family::compile::{self, Compiled};
 use crate::family::ir::Family;
-use crate::family::locate;
+use crate::family::open;
 
 /// One element's anatomy.
 #[derive(Debug, Serialize)]
@@ -89,34 +89,35 @@ pub struct Drawn {
 
 /// The two platforms a tree is written for.
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum On {
+enum On<'a> {
     Web,
-    Native,
+    /// React Native, whose layers the component named here draws.
+    Native(&'a str),
 }
 
 /// One element's anatomy, from its intermediate form.
 #[must_use]
-pub fn anatomy(family: &Family) -> Anatomy {
+pub fn anatomy(family: &Family, layer_host: &str) -> Anatomy {
     let drawn_natively = family.api.platform.is_none() && !family.tree.is_empty();
     Anatomy {
         web: side(family, On::Web),
-        native: drawn_natively.then(|| side(family, On::Native)),
+        native: drawn_natively.then(|| side(family, On::Native(layer_host))),
     }
 }
 
-fn side(family: &Family, on: On) -> Side {
+fn side(family: &Family, on: On<'_>) -> Side {
     let takes = family
         .api
         .props
         .iter()
         .filter(|prop| match on {
             On::Web => prop.attribute,
-            On::Native => prop.platform != Some(Platform::Web),
+            On::Native(_) => prop.platform != Some(Platform::Web),
         })
         .map(|prop| Taken {
             name: match on {
                 On::Web => prop.name.clone(),
-                On::Native => super::members::camel(&prop.name),
+                On::Native(_) => super::members::camel(&prop.name),
             },
             holds: holds(prop),
         })
@@ -127,7 +128,7 @@ fn side(family: &Family, on: On) -> Side {
         .iter()
         .map(|event| match on {
             On::Web => event.name.clone(),
-            On::Native => super::members::handler_of(event),
+            On::Native(_) => super::members::handler_of(event),
         })
         .collect();
     Side {
@@ -157,14 +158,14 @@ fn holds(prop: &Prop) -> String {
     }
 }
 
-fn tree(nodes: &[Node], on: On) -> Vec<Drawn> {
+fn tree(nodes: &[Node], on: On<'_>) -> Vec<Drawn> {
     nodes
         .iter()
         .filter(|node| shown(node, on))
         .map(|node| Drawn {
             draws: match on {
                 On::Web => web_label(node),
-                On::Native => native_label(node),
+                On::Native(host) => native_label(node, host),
             },
             kind: node.kind.helper().to_owned(),
             name: node.name.clone(),
@@ -176,11 +177,11 @@ fn tree(nodes: &[Node], on: On) -> Vec<Drawn> {
 
 /// Whether a platform draws the node: a node marked for the other platform
 /// is left out of its tree.
-fn shown(node: &Node, on: On) -> bool {
+fn shown(node: &Node, on: On<'_>) -> bool {
     match node.attributes.get("platform") {
         Some(Attribute::Text(platform)) => match on {
             On::Web => platform != "native",
-            On::Native => platform != "web",
+            On::Native(_) => platform != "web",
         },
         _ => true,
     }
@@ -206,11 +207,11 @@ fn web_label(node: &Node) -> String {
 
 /// What the native runtime draws for a node, in the words
 /// `helix/native/src/render/nodes.tsx` draws it with.
-fn native_label(node: &Node) -> String {
+fn native_label(node: &Node, host: &str) -> String {
     match node.kind {
         NodeKind::Box => format!("View {}", parts(node)),
         NodeKind::Image => format!("Image {}", parts(node)),
-        NodeKind::Layer => format!("View {}, in the layer HelixRoot draws", parts(node)),
+        NodeKind::Layer => format!("View {}, in the layer {host} draws", parts(node)),
         NodeKind::Live => format!("{}, said and not drawn", node.name),
         NodeKind::Pressable => format!("Pressable {}", parts(node)),
         NodeKind::Region => format!("{{{}}}", region_prop(&node.name)),
@@ -283,10 +284,13 @@ fn object(fields: &Map<String, Json>) -> String {
 
 /// Every element's anatomy, by its tag.
 #[must_use]
-pub fn every(compiled: &[Compiled]) -> Json {
+pub fn every(compiled: &[Compiled], layer_host: &str) -> Json {
     let mut out = Map::new();
     for one in compiled {
-        out.insert(one.family.tag.clone(), json!(anatomy(&one.family)));
+        out.insert(
+            one.family.tag.clone(),
+            json!(anatomy(&one.family, layer_host)),
+        );
     }
     Json::Object(out)
 }
@@ -296,9 +300,12 @@ pub fn every(compiled: &[Compiled]) -> Json {
 ///
 /// # Errors
 ///
-/// [`Failure`] when a source cannot be compiled.
-pub fn print(args: &FamilyArgs, from: &Path) -> Result<Code, Failure> {
-    let package = locate(&args.package, from);
-    say!("{}", every(&compile::all(&package)?));
+/// [`Failure`] when there is no project, or a source cannot be compiled.
+pub fn print(args: &FamilyArgs, config: Option<&Path>, from: &Path) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    say!(
+        "{}",
+        every(&compile::all(&project)?, &project.runtime.layer_host)
+    );
     Ok(Code::Ok)
 }

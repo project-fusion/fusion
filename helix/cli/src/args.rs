@@ -102,12 +102,21 @@ pub enum Noun {
     Diagnostics(Diagnostics),
 
     /* **This repository's compiler, so only in its builds**, for the reason
-    `manifest build` gives: it reads Helix's own platform-neutral sources, and
-    what a consumer installs is its output. */
+    `manifest build` gives: Helix is the one design system written for it so
+    far, and what a consumer installs is its output. */
     /// Compile each family's platform-neutral source for the web and for React Native.
+    ///
+    /// Reads the design system's `helix.family.json`, from the working
+    /// directory or the nearest directory above it, for its prefixes, its token
+    /// source, its families, and where each output is written.
     #[cfg(feature = "internal")]
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Family {
+        /// The project file to read, in place of the `helix.family.json`
+        /// found from the working directory.
+        #[arg(long, global = true, value_name = "PATH")]
+        config: Option<PathBuf>,
+
         #[command(subcommand)]
         verb: Family,
     },
@@ -406,6 +415,13 @@ pub enum Family {
     /// differ from the manifest's.
     Check(FamilyArgs),
 
+    /// Print the project `helix.family.json` describes, with every default filled in.
+    ///
+    /// Every path is absolute, and every key the file leaves out holds the
+    /// value the compiler uses for it. With `--schema`, prints the file's JSON
+    /// Schema, which an editor validates the file with.
+    Config(FamilyConfig),
+
     /// Write each family's native components, with their props typed, for the styled package.
     ///
     /// Writes `<family>/index.native.ts` under `--out`: each element's
@@ -474,9 +490,18 @@ pub struct FamilyCapabilities {
     #[arg(long)]
     pub check: bool,
 
-    /// The package holding the capabilities, which is the directory holding its `src`.
-    #[arg(default_value = "helix/core")]
-    pub package: PathBuf,
+    /// The package holding the capabilities, which is the directory holding its
+    /// `src`: the project's `runtime.sources.core` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `family config` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyConfig {
+    /// Print the JSON Schema of `helix.family.json`, and read no project.
+    #[arg(long)]
+    pub schema: bool,
 }
 
 /// What `family components` takes.
@@ -488,14 +513,14 @@ pub struct FamilyComponents {
     pub check: bool,
 
     /// The directory each family's module is written under, as
-    /// `<family>/index.native.ts`: the `native` folder of the styled package
-    /// beside the neutral one, unless given.
+    /// `<family>/index.native.ts`: the project's `outputs.components` unless
+    /// given.
     #[arg(long, value_name = "DIR")]
     pub out: Option<PathBuf>,
 
-    /// The package holding the sources, which is the directory holding its `src`.
-    #[arg(default_value = "helix/neutral")]
-    pub package: PathBuf,
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the project's `families` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family design-tokens` takes.
@@ -506,9 +531,9 @@ pub struct FamilyDesignTokens {
     #[arg(long)]
     pub check: bool,
 
-    /// The styles package, which is the directory holding its `src`.
-    #[arg(default_value = "helix/styles")]
-    pub package: PathBuf,
+    /// The styles package, which is the directory holding its `src`: the
+    /// project's `tokens.styles` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family machines` takes.
@@ -519,9 +544,9 @@ pub struct FamilyMachines {
     #[arg(long)]
     pub check: bool,
 
-    /// The package holding the machines, which is the directory holding its `src`.
-    #[arg(default_value = "helix/core")]
-    pub package: PathBuf,
+    /// The package holding the machines, which is the directory holding its
+    /// `src`: the project's `runtime.sources.core` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family tokens` takes.
@@ -532,9 +557,9 @@ pub struct FamilyTokens {
     #[arg(long)]
     pub check: bool,
 
-    /// The package the modules are written into, which is the directory holding its `src`.
-    #[arg(default_value = "helix/native")]
-    pub package: PathBuf,
+    /// The package the modules are written into, under its `src/theme`: the
+    /// project's `outputs.tokens` folder unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family types` takes.
@@ -545,9 +570,9 @@ pub struct FamilyTypes {
     #[arg(long)]
     pub check: bool,
 
-    /// The package the types are written into, which is the directory holding its `src`.
-    #[arg(default_value = "helix/native")]
-    pub package: PathBuf,
+    /// The package the types are written into, which is the directory holding
+    /// its `src`: the project's `runtime.sources.native` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family stylesheets` takes.
@@ -558,14 +583,14 @@ pub struct FamilyStylesheets {
     #[arg(long)]
     pub check: bool,
 
-    /// The directory a stylesheet's path is under: the `src` of the styled
-    /// package beside the neutral one, unless given.
+    /// The directory a stylesheet's path is under: the project's
+    /// `outputs.stylesheets` unless given.
     #[arg(long, value_name = "DIR")]
     pub out: Option<PathBuf>,
 
-    /// The package holding the sources, which is the directory holding its `src`.
-    #[arg(default_value = "helix/neutral")]
-    pub package: PathBuf,
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the project's `families` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family build` takes.
@@ -576,18 +601,18 @@ pub struct FamilyBuild {
     #[arg(long)]
     pub check: bool,
 
-    /// The package holding the sources, which is the directory holding its `src`.
-    #[arg(default_value = "helix/neutral")]
-    pub package: PathBuf,
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the project's `families` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `family check` takes.
 #[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct FamilyArgs {
-    /// The package holding the sources, which is the directory holding its `src`.
-    #[arg(default_value = "helix/neutral")]
-    pub package: PathBuf,
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the project's `families` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `manifest build` takes.

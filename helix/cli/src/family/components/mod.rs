@@ -35,8 +35,9 @@ use serde_json::Value as Json;
 
 use crate::family::compile::Compiled;
 use crate::family::ir::Family;
+use crate::family::project::Project;
 pub use details::Details;
-use emit::Part;
+use emit::{Origin, Part};
 pub use platforms::print;
 
 /// The manifest's declaration of the element `tag`.
@@ -117,7 +118,20 @@ pub fn modules(
     compiled: &[Compiled],
     manifest: &Json,
     details: &Details,
+    project: &Project,
 ) -> Result<Vec<(String, String)>, Vec<String>> {
+    let families = project.named(&project.families);
+    let events = project
+        .events
+        .as_deref()
+        .map(|events| project.named(events))
+        .unwrap_or_default();
+    let origin = Origin {
+        families: &families,
+        events: &events,
+        runtime: &project.runtime.native,
+        event_type: &project.runtime.event_type,
+    };
     let mut families: BTreeMap<&str, Vec<Part>> = BTreeMap::new();
     let mut faults = Vec::new();
     let drawn: Vec<&Compiled> = compiled
@@ -137,7 +151,8 @@ pub fn modules(
     if !faults.is_empty() {
         return Err(faults);
     }
-    /* The folder each element's module is in, by its tag without `helix-`. */
+    /* The folder each element's module is in, by its tag without the
+    prefix. */
     let folders: BTreeMap<String, String> = drawn
         .iter()
         .map(|one| {
@@ -146,7 +161,11 @@ pub fn modules(
                 .split_once('/')
                 .map_or(one.element.as_str(), |(f, _)| f);
             (
-                one.family.tag.trim_start_matches("helix-").to_owned(),
+                one.family
+                    .names
+                    .bare(&one.family.tag)
+                    .unwrap_or(&one.family.tag)
+                    .to_owned(),
                 folder.to_owned(),
             )
         })
@@ -157,7 +176,10 @@ pub fn modules(
             /* The root first, as the element the family is named for, then
             its parts in path order, which a stable sort keeps. */
             parts.sort_by_key(|part| part.constant != "rootForm");
-            (family.to_owned(), emit::module_in(family, &parts, &folders))
+            (
+                family.to_owned(),
+                emit::module_in(family, &parts, &folders, &origin),
+            )
         })
         .collect())
 }

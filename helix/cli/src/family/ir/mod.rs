@@ -40,6 +40,7 @@ mod table;
 mod values;
 
 use crate::family::api::{Api, Headless, Node, Prop};
+use crate::family::project::Names;
 #[cfg(test)]
 use crate::family::read::Lit;
 
@@ -69,6 +70,11 @@ pub struct Family {
     pub machines: Vec<machines::MachineUse>,
     /// The prefix of the element's hooks, `--<name>-...`.
     pub name: String,
+    /// The names the design system gives its tags, events, and tokens.
+    #[serde(skip)]
+    #[ts(skip)]
+    #[schemars(skip)]
+    pub names: Names,
     pub rules: Vec<Item>,
     /// The stylesheet's path under the styled package's `src`.
     #[serde(skip)]
@@ -98,18 +104,32 @@ pub struct Styled {
 impl Family {
     /// One element from its styled source and, where it has one, its headless
     /// source, which names the tag.
+    #[cfg(test)]
     #[must_use]
     pub fn new(styled: Styled, headless: Option<Headless>, family: &str, element: &str) -> Self {
-        let tag = headless.as_ref().map_or_else(
-            || {
-                if element == "root" {
-                    format!("helix-{family}")
-                } else {
-                    format!("helix-{element}")
-                }
-            },
-            |headless| format!("helix-{}", headless.name),
-        );
+        Self::named(
+            styled,
+            headless,
+            family,
+            element,
+            crate::family::project::testing(),
+        )
+    }
+
+    /// One element from its styled source and, where it has one, its headless
+    /// source, which names the tag under the design system's prefix.
+    #[must_use]
+    pub fn named(
+        styled: Styled,
+        headless: Option<Headless>,
+        family: &str,
+        element: &str,
+        names: Names,
+    ) -> Self {
+        let tag = names.tag(headless.as_ref().map_or_else(
+            || if element == "root" { family } else { element },
+            |headless| headless.name.as_str(),
+        ));
         let (mut api, tree) = headless.map_or_else(
             || (Api::default(), Vec::new()),
             |headless| (headless.api, headless.tree),
@@ -120,6 +140,7 @@ impl Family {
             api,
             machines,
             name: styled.name,
+            names,
             rules: styled.rules,
             stylesheet: styled.stylesheet,
             tag,

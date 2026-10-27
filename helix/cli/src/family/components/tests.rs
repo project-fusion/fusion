@@ -1,11 +1,26 @@
 use serde_json::json;
 
 use super::details::{Details, Field};
-use super::emit::{module, Part};
+use super::emit::{module_in, Origin, Part};
 use super::members::{camel, pascal, typed_members, Member, Sends};
 use crate::family::api::headless;
 use crate::family::ir::{styled, Family};
 use crate::family::read::default_export;
+
+/// One family's module as Helix's project writes it.
+pub fn module(family: &str, parts: &[Part]) -> String {
+    module_in(
+        family,
+        parts,
+        &std::collections::BTreeMap::new(),
+        &Origin {
+            families: "helix/neutral",
+            events: "helix/core/src/events",
+            runtime: "@fusion.dev/helix-native",
+            event_type: "HelixEvent",
+        },
+    )
+}
 
 /// A miniature of core's events: a detail that extends another, an alias, a
 /// class with a detail, and one with none.

@@ -59,7 +59,7 @@ fn draws(side: &Value) -> Vec<String> {
 
 #[test]
 fn the_web_draws_parts_and_slots_and_a_phone_views_and_props() {
-    let anatomy = json!(anatomy(&button()));
+    let anatomy = json!(anatomy(&button(), "HelixRoot"));
     let web = &anatomy["web"];
     assert_eq!(
         web["takes"],
@@ -112,5 +112,5 @@ fn the_web_draws_parts_and_slots_and_a_phone_views_and_props() {
 fn an_element_only_the_web_has_has_no_native_tree() {
     let mut family = button();
     family.api.platform = Some(crate::family::api::Platform::Web);
-    assert!(json!(anatomy(&family))["native"].is_null());
+    assert!(json!(anatomy(&family, "HelixRoot"))["native"].is_null());
 }

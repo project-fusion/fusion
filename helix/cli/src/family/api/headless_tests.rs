@@ -51,7 +51,13 @@ fn says_what_the_element_has_that_the_source_does_not() {
         "cssStates": [{ "name": "pending" }],
     }] }] });
     assert_eq!(
-        parity("helix-button", &read.api, &read.tree, &manifest),
+        parity(
+            "helix-button",
+            &read.api,
+            &read.tree,
+            &manifest,
+            &crate::family::project::testing()
+        ),
         vec!["attribute `label`: the element has it and the source does not".to_owned()]
     );
 }
@@ -259,7 +265,13 @@ fn a_wrap_only_a_phone_draws_leaves_its_children_to_the_web() {
         "cssParts": [{ "name": "value" }],
     }] }] });
     assert_eq!(
-        parity("helix-stat", &read.api, &read.tree, &manifest),
+        parity(
+            "helix-stat",
+            &read.api,
+            &read.tree,
+            &manifest,
+            &crate::family::project::testing()
+        ),
         Vec::<String>::new()
     );
 }
