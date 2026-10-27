@@ -24,9 +24,9 @@ pub enum NodeKind {
     /// it is loading, has loaded, or failed.
     Image,
     /// What the element opens over the page, drawn in the top layer on the
-    /// web and in the layer host `HelixRoot` draws on a phone: a dialog, a
-    /// popover, a menu or a tooltip, placed against its `anchor` where it
-    /// names one.
+    /// web and, on a phone, in the layer host the project's
+    /// `runtime.layerHost` names: a dialog, a popover, a menu or a tooltip,
+    /// placed against its `anchor` where it names one.
     Layer,
     /// Words said to a screen reader.
     Live,

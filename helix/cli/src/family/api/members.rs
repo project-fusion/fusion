@@ -9,7 +9,7 @@ use ts_rs::TS;
 use crate::family::api::Prop;
 use crate::family::read::Lit;
 
-/// An event, named without the `helix-` the web prefixes.
+/// An event, named without the event prefix the web sends it under.
 #[derive(Debug, Serialize, JsonSchema, TS)]
 pub struct Event {
     /// Whether an event that `follows` a value is sent on the first render
@@ -19,8 +19,8 @@ pub struct Event {
     #[ts(optional, as = "Option<bool>")]
     #[schemars(default)]
     pub arrives: bool,
-    /// Whether the web sends it under its own name, as `change`, and not
-    /// under `helix-` and the name.
+    /// Whether the web sends it under its own name alone, as `change`,
+    /// without the event prefix.
     #[serde(skip_serializing_if = "std::ops::Not::not")]
     #[ts(optional, as = "Option<bool>")]
     #[schemars(default)]
