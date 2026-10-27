@@ -1037,6 +1037,11 @@ are measured at their own width once, and again at a new text size or as an
 item arrives or leaves. A list narrower than 22rem stacks each term over its
 value, and each term takes its own width.
 
+**A component whose own parts are a grid of more columns draws them in a
+row.** Content passed in that spans every column, as `grid-column: 1 / -1`
+writes it, takes a line of its own, and the row wraps after it. A meter's and
+a progress bar's label sit above the bar and the reading, as on the web.
+
 `HelixFlex` is a flex view. Its `switch` layout measures its width too, and
 until it has it, its children share one row. A Helix component passed into a
 `flank` or a `switch` takes its basis and its grow from the flex, and a view

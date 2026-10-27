@@ -49,6 +49,30 @@ const hugs = (within: Layout, style: Resolved['style']): boolean =>
   style.width === undefined &&
   style.flexBasis === undefined
 
+/** A region and a tag, as `spanning` keys what spans every column. */
+const spanKey = (region: string | undefined, tag: string): string => `${region ?? ''} ${tag}`
+
+/** Whether a `grid-column` runs from the first line to the last, as `1 / -1` does. */
+const spansAll = (value: Resolution): boolean =>
+  /^1\s*\/\s*-1$/.test((Array.isArray(value) ? value.join(' ') : String(value)).trim())
+
+/**
+ * What a part gives the content passed into it, with each child that spans
+ * every column of a wrapping row as wide as the row, so it takes a line of
+ * its own.
+ */
+const spanned = (
+  given: Readonly<Record<string, Slotted>>,
+  region: string | undefined,
+  spans: ReadonlySet<string>,
+): Record<string, Slotted> =>
+  Object.fromEntries(
+    Object.entries(given).map(([tag, one]) => [
+      tag,
+      spans.has(spanKey(region, tag)) ? { ...one, style: { ...one.style, width: '100%' } } : one,
+    ]),
+  )
+
 /**
  * One part's style under a context, its regions' style, its motion, and the
  * private values its content inherits.
@@ -124,6 +148,23 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     rules,
   })
   const { custom, resolve, valued } = resolver
+  /* **What `target` gives the content passed into it that spans every
+     column**, as `grid-column: 1 / -1` does, by the region and the tag each
+     rule names, the last rule for each winning. */
+  const spanning = (target: string): ReadonlySet<string> => {
+    const last = new Map<string, Resolution>()
+    for (const rule of rules) {
+      if (rule.target !== target || rule.slotted === undefined || rule.inner !== undefined) {
+        continue
+      }
+      for (const [property, value] of rule.set) {
+        if (property === 'grid-column') {
+          last.set(spanKey(rule.region, rule.slotted), resolve(value))
+        }
+      }
+    }
+    return new Set([...last].filter(([, value]) => spansAll(value)).map(([key]) => key))
+  }
   /* How a part lays out what it holds, from the display, direction, and
      tracks its own rules declare. */
   const layoutOf = (target: string): Layout => {
@@ -151,11 +192,21 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     }
     const template = read('grid-template-columns')
     const columns = oneColumn(template) ? undefined : template
+    /* **A grid drawn as a row wraps where content passed in spans every
+       column**, so that content takes a line of its own, as on the web. A
+       grid whose only content is one region is the native grid's, which
+       places a span itself. */
+    const holding =
+      target === 'host' ? (family.tree ?? []) : (named(family.tree ?? [], target)?.children ?? [])
+    const gridded = holding.length === 1 && holding[0]?.kind === 'region'
     return grid
       ? {
           flex: true,
           row: columns !== undefined,
           tracks: tracks(columns ?? read('grid-template-rows')),
+          ...(columns !== undefined && !gridded && spanning(target).size > 0
+            ? { wraps: true }
+            : {}),
         }
       : { flex: true, row: (read('flex-direction') ?? 'row') === 'row', tracks: [] }
   }
@@ -251,6 +302,14 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     }
   }
   const contents = part === 'host' ? regional(family, context, finish, resolve) : {}
+  /* **A grid drawn as a row that wraps** lets its line wrap, and what it
+     gives content that spans every column makes that content as wide as the
+     row. */
+  const layout = layoutOf(part)
+  const spans = layout.wraps === true ? spanning(part) : new Set<string>()
+  if (layout.wraps === true) {
+    main.out.flexWrap = 'wrap'
+  }
   const values: Record<string, Resolution> = { ...context.inherited }
   for (const name of own.keys()) {
     values[name] = valued(name, undefined)
@@ -323,9 +382,14 @@ export const style = (family: Family, part: string, context: Context): Resolved 
       : { backdrop: { style: backdrop.out, transitions: still(backdrop.transitions) } }),
     ...(before === undefined ? {} : { before }),
     ...(main.blur === undefined ? {} : { blur: main.blur }),
-    children,
+    children: spanned(children, undefined, spans),
     ...(main.clip === undefined ? {} : { clip: main.clip }),
-    contents,
+    contents: Object.fromEntries(
+      Object.entries(contents).map(([region, content]) => [
+        region,
+        { ...content, children: spanned(content.children, region, spans) },
+      ]),
+    ),
     ...(main.inline ? { inline: true } : {}),
     ...(opens ? { opens: true } : {}),
     counting: main.counting,
@@ -336,7 +400,7 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     ...(main.shown === undefined ? {} : { shown: main.shown }),
     ...(Object.keys(generated).length === 0 ? {} : { generated }),
     ...(main.gridded === undefined ? {} : { grid: main.gridded }),
-    layout: layoutOf(part),
+    layout,
     ...(main.moving === undefined ? {} : { motion: main.moving }),
     regions,
     ...(main.rule === undefined ? {} : { rule: main.rule }),

@@ -15,8 +15,9 @@ import { Dimensions, Text, View } from 'react-native'
 import { useInheritedText } from '../render/around'
 import { mix } from '../style/color'
 import { HelixTheme, useTokens } from '../theme/helix-theme'
-import { type Drawn, nodes, styleOf } from './drawn'
+import { type Drawn, nodes, styleOf, wordsOf } from './drawn'
 import { HelixMeter, HelixMeterSegment } from './meter/index.native'
+import { HelixText } from './text/index.native'
 
 /** Sets the reader's text size, as iOS and Android report a change to it. */
 const atTextSize = (fontScale: number): void => {
@@ -219,6 +220,28 @@ describe('the generated Meter', () => {
       fontSize: tokens['text-xs'],
       fontVariant: 'tabular-nums',
     })
+  })
+
+  test('draws its label on a line of its own above the bar and its reading, as the web does', async () => {
+    const { all, host } = await drawn(
+      <HelixMeter label={<HelixText>Tasks done</HelixText>} showValue value={42} />,
+    )
+    /* The label spans both columns of the web's grid, so the row wraps
+       after it, and the bar shares the next line with the reading. */
+    expect(styleOf(host)).toMatchObject({ flexDirection: 'row', flexWrap: 'wrap' })
+    const label = all.find(
+      (one) => wordsOf(one) === 'Tasks done' && styleOf(one).width !== undefined,
+    )
+    expect(label === undefined ? undefined : styleOf(label).width).toBe('100%')
+    const track = all.find((one) => styleOf(one).backgroundColor === tokens['color-surface-sunken'])
+    expect(track === undefined ? undefined : styleOf(track)).toMatchObject({
+      flexBasis: 0,
+      flexGrow: 1,
+    })
+    expect(track === undefined ? undefined : styleOf(track).width).toBeUndefined()
+    /* Without a reading the meter is a block, its label above its bar. */
+    const block = await drawn(<HelixMeter label={<HelixText>Tasks done</HelixText>} value={42} />)
+    expect(styleOf(block.host).flexWrap).toBeUndefined()
   })
 
   test('sends `band` as its reading moves into another band, and not as it arrives', async () => {
