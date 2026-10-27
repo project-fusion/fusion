@@ -202,6 +202,11 @@ fn web_label(node: &Node) -> String {
         NodeKind::Text => format!("words of {}", node.name),
         NodeKind::When => when(node),
         NodeKind::Repeat => format!("repeat {}", node.name),
+        /* A field of several lines is a textarea, and one of a line an input. */
+        NodeKind::Field if node.attributes.contains_key("multiline") => {
+            format!("textarea part=\"{}\"", parts(node))
+        }
+        NodeKind::Field => format!("input part=\"{}\"", parts(node)),
         _ => format!("{} part=\"{}\"", node.kind.helper(), parts(node)),
     }
 }
@@ -211,6 +216,7 @@ fn web_label(node: &Node) -> String {
 fn native_label(node: &Node, host: &str) -> String {
     match node.kind {
         NodeKind::Box => format!("View {}", parts(node)),
+        NodeKind::Field => format!("TextInput {}", parts(node)),
         NodeKind::Image => format!("Image {}", parts(node)),
         NodeKind::Layer => format!("View {}, in the layer {host} draws", parts(node)),
         NodeKind::Live => format!("{}, said and not drawn", node.name),

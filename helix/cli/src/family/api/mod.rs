@@ -14,6 +14,7 @@ pub mod computed;
 mod copy;
 mod countdown;
 mod delay;
+mod entry;
 mod fold;
 mod host;
 mod item;
@@ -49,6 +50,7 @@ pub use collection::{Collection, Names};
 pub use copy::Copy;
 pub use countdown::{Countdown, Queue};
 pub use delay::Delay;
+pub use entry::TextEntry;
 pub use fold::Fold;
 pub use item::Item;
 pub use members::{props, Event, Literal, Platform, Primitive, PropType, Tier};
@@ -97,6 +99,10 @@ pub struct Api {
     #[ts(optional, as = "Option<BTreeMap<String, Attribute>>")]
     #[schemars(default)]
     pub derived: BTreeMap<String, Attribute>,
+    /// What the element holds where a reader types into it: the prop that
+    /// holds the text, and the events an edit sends.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry: Option<TextEntry>,
     pub events: Vec<Event>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
@@ -217,6 +223,7 @@ impl Api {
             && self.collection.is_none()
             && self.copy.is_none()
             && self.derived.is_empty()
+            && self.entry.is_none()
             && self.countdown.is_none()
             && self.delay.is_none()
             && self.events.is_empty()
@@ -258,6 +265,7 @@ const FIELDS: &[&str] = &[
     "countdown",
     "delay",
     "derived",
+    "entry",
     "events",
     "fold",
     "host",
@@ -365,6 +373,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             countdown,
             delay: field("delay").map(delay::delay).transpose()?,
             derived,
+            entry: field("entry").map(entry::entry).transpose()?,
             events,
             fold,
             host,

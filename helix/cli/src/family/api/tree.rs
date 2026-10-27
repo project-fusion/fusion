@@ -19,6 +19,10 @@ use crate::family::vocabulary;
 pub enum NodeKind {
     /// A part that groups or draws, with no behavior of its own.
     Box,
+    /// Text a reader types: the web's `<input>` or `<textarea>`, and React
+    /// Native's `TextInput` on a phone, whose value the element's `entry`
+    /// holds.
+    Field,
     /// A picture loaded from its `src`: an `<img>` on the web and React
     /// Native's `Image` on a phone, with a load machine that says whether
     /// it is loading, has loaded, or failed.
@@ -51,7 +55,13 @@ impl NodeKind {
     pub fn is_part(self) -> bool {
         matches!(
             self,
-            Self::Box | Self::Image | Self::Layer | Self::Live | Self::Pressable | Self::Wrap
+            Self::Box
+                | Self::Field
+                | Self::Image
+                | Self::Layer
+                | Self::Live
+                | Self::Pressable
+                | Self::Wrap
         )
     }
 
@@ -59,6 +69,7 @@ impl NodeKind {
     pub fn helper(self) -> &'static str {
         match self {
             Self::Box => "box",
+            Self::Field => "field",
             Self::Image => "image",
             Self::Layer => "layer",
             Self::Live => "live",
@@ -176,12 +187,13 @@ impl Attribute {
 pub fn node(lit: &Lit) -> Result<Node, String> {
     let Lit::Call(helper, arguments) = lit else {
         return Err(
-            "a node is a call to `box()`, `image()`, `layer()`, `live()`, `pressable()`, `region()`, `repeat()`, `text()`, `unless()`, `when()` or `wrap()`"
+            "a node is a call to `box()`, `field()`, `image()`, `layer()`, `live()`, `pressable()`, `region()`, `repeat()`, `text()`, `unless()`, `when()` or `wrap()`"
                 .to_owned(),
         );
     };
     let kind = match helper.as_str() {
         "box" => NodeKind::Box,
+        "field" => NodeKind::Field,
         "image" => NodeKind::Image,
         "layer" => NodeKind::Layer,
         "live" => NodeKind::Live,
@@ -234,7 +246,9 @@ pub fn node(lit: &Lit) -> Result<Node, String> {
         | NodeKind::Region
         | NodeKind::Repeat
         | NodeKind::Wrap => (attributes(1)?, children(2)?),
-        NodeKind::Image | NodeKind::Live | NodeKind::Text => (attributes(1)?, Vec::new()),
+        NodeKind::Field | NodeKind::Image | NodeKind::Live | NodeKind::Text => {
+            (attributes(1)?, Vec::new())
+        }
         NodeKind::When => match arguments.get(1) {
             Some(child) => (
                 if helper == "unless" {

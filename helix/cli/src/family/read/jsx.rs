@@ -57,6 +57,7 @@ const TAGS: &[(&str, &str, Option<&str>)] = &[
     ("Slot", "region", None),
     ("Svg", "box", None),
     ("Text", "text", None),
+    ("TextInput", "field", None),
     ("View", "box", None),
     ("Wrap", "wrap", None),
 ];
@@ -79,8 +80,10 @@ const GIVEN: &[&str] = &[
     "stack",
     "state",
     "stop",
+    "text",
     "total",
     "tour",
+    "validation",
 ];
 
 /// What reading a render needs: the source for lines, and what the keys

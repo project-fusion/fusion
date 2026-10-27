@@ -1,7 +1,8 @@
 //! How a form control says what makes its answer acceptable: the prop that
 //! makes an answer required, the page's own message, and the page's sentence
-//! for a missing answer. What the answer is comes from the element's toggle
-//! or its collection.
+//! for a missing answer. What the answer is comes from the element's toggle,
+//! its collection, or its entry, and an entry's text may be held to the props
+//! that bound its length, its pattern, and its type as well.
 
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -17,6 +18,29 @@ pub struct Validation {
     /// The prop that holds the page's own message, which shows at once.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feedback: Option<String>,
+    /// The prop that holds the most characters an entry's text may have.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maxlength: Option<String>,
+    /// The value the element computes as the sentence it shows under the
+    /// control: the page's message, or the verdict's once the reader has had
+    /// a go, and empty while nothing shows. A render reads it as
+    /// `validation.message`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<String>,
+    /// The prop that holds the fewest characters an entry's text may have.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minlength: Option<String>,
+    /// The prop that holds a regular expression an entry's text matches
+    /// whole, as the web's `pattern` reads it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pattern: Option<String>,
+    /// The prop that holds what an entry's text is, `email` or `url`, which
+    /// the text has to read as.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    #[ts(rename = "type")]
+    #[schemars(rename = "type")]
+    pub kind: Option<String>,
     /// The prop that holds the sentence for a missing answer, whose default
     /// is the control's own.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,8 +54,12 @@ impl Validation {
     pub fn references(&self) -> Vec<(&'static str, &str, Names)> {
         [
             ("feedback", self.feedback.as_ref()),
+            ("maxlength", self.maxlength.as_ref()),
+            ("minlength", self.minlength.as_ref()),
             ("missing", self.missing.as_ref()),
+            ("pattern", self.pattern.as_ref()),
             ("required", Some(&self.required)),
+            ("type", self.kind.as_ref()),
         ]
         .into_iter()
         .filter_map(|(at, name)| name.map(|name| (at, name.as_str(), Names::Prop)))
@@ -55,7 +83,12 @@ pub fn validation(lit: &Lit) -> Result<Validation, String> {
         };
         let slot = match key.as_str() {
             "feedback" => &mut read.feedback,
+            "maxlength" => &mut read.maxlength,
+            "message" => &mut read.message,
+            "minlength" => &mut read.minlength,
             "missing" => &mut read.missing,
+            "pattern" => &mut read.pattern,
+            "type" => &mut read.kind,
             "required" => &mut required,
             _ => return Err(format!("validation: `{key}` is not a field it has")),
         };
@@ -95,6 +128,7 @@ mod tests {
                 feedback: Some("feedback".to_owned()),
                 missing: Some("value-missing-message".to_owned()),
                 required: "required".to_owned(),
+                ..Validation::default()
             }
         );
     }
@@ -106,8 +140,8 @@ mod tests {
             "a validation names the prop that makes an answer required"
         );
         assert_eq!(
-            validation(&call(&[("required", "required"), ("pattern", "pattern")])).unwrap_err(),
-            "validation: `pattern` is not a field it has"
+            validation(&call(&[("required", "required"), ("step", "step")])).unwrap_err(),
+            "validation: `step` is not a field it has"
         );
     }
 }

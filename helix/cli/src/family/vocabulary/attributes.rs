@@ -15,6 +15,7 @@ use crate::family::vocabulary::written::{length, path_data, view_box};
 /// Every kind of node that takes attributes.
 const ALL: &[NodeKind] = &[
     NodeKind::Box,
+    NodeKind::Field,
     NodeKind::Image,
     NodeKind::Layer,
     NodeKind::Live,
@@ -26,6 +27,13 @@ const ALL: &[NodeKind] = &[
 
 const BOX: &[NodeKind] = &[NodeKind::Box];
 const PRESS: &[NodeKind] = &[NodeKind::Pressable];
+/// Text a reader types.
+const FIELD: &[NodeKind] = &[NodeKind::Field];
+/// A press or a field: what a reader acts on, which a prop may disable.
+const CONTROL: &[NodeKind] = &[NodeKind::Field, NodeKind::Pressable];
+/// A box, a press, or a field: what a screen reader reaches as one thing
+/// that may be read-only or required.
+const ANSWER: &[NodeKind] = &[NodeKind::Box, NodeKind::Field, NodeKind::Pressable];
 /// A picture loaded from a source.
 const IMAGE: &[NodeKind] = &[NodeKind::Image];
 /// A box or a press: what a screen reader reaches as one thing.
@@ -59,6 +67,16 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* Live words said as the element arrives, as an empty view says its
     heading, where the web's live region says them once it appears. */
     ("arrives", &[NodeKind::Live], Shape::Set),
+    /* Whether a phone capitalizes as the reader types: `off`, `sentences`,
+    `words` or `characters`, the web's `autocapitalize` and React Native's
+    `autoCapitalize`. */
+    ("autocapitalize", FIELD, Shape::Words),
+    /* What the platform may fill the field with, an HTML `autocomplete`
+    token: React Native's `autoComplete`, and iOS's `textContentType` for the
+    tokens it has one for. */
+    ("autocomplete", FIELD, Shape::Words),
+    /* Whether the platform corrects words as the reader types. */
+    ("autocorrect", FIELD, Shape::Flag),
     /* `aria-busy`: a press at work, or a host whose content is still loading,
     as a skeleton's. */
     ("busy", PART, Shape::Flag),
@@ -70,6 +88,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* Content kept drawn while closed: `hidden="until-found"` and `inert` on
     the web, drawn on a phone with no press and nothing a screen reader reaches. */
     ("closed", BOX, Shape::Flag),
+    /* The press that empties the element's field, as its `entry` says, as
+    an input's clear button. */
+    ("clears", PRESS, Shape::Set),
     /* The press that copies the element's text to the clipboard, as its
     `copy` says, as a copy button's. */
     ("copies", PRESS, Shape::Set),
@@ -104,9 +125,18 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* `aria-describedby` to regions, their names separated by spaces: the
     words passed into them describe the part, as a menu row is described by
     its description and its `end`. A phone's hint. */
-    ("describedby", NAMED, Shape::Name),
+    (
+        "describedby",
+        &[
+            NodeKind::Box,
+            NodeKind::Field,
+            NodeKind::Layer,
+            NodeKind::Pressable,
+        ],
+        Shape::Name,
+    ),
     ("description", NAMED, Shape::Words),
-    ("disabled", PRESS, Shape::Flag),
+    ("disabled", CONTROL, Shape::Flag),
     /* Another element a box draws, by its name without the prefix, as a
     checkbox group draws a checkbox above its boxes. The form holds the
     element's tag. Its props are what the element's machines give it and
@@ -129,6 +159,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     it is not written. */
     ("empty", IMAGE, Shape::OneOf(&["error", "loading"])),
     ("expanded", PRESS, Shape::Flag),
+    /* The key the on-screen keyboard shows for Enter, the web's
+    `enterkeyhint`: React Native's `enterKeyHint`. */
+    ("enterkeyhint", FIELD, Shape::Words),
     ("exports", DRAWS, Shape::Parts),
     /* The props a box or a wrap that draws another element gives it, each
     a value or `bind()`, as a copy button gives its tooltip its words. */
@@ -151,6 +184,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     holds, as a switch's `on` region while the switch is off. */
     ("hidden", &[NodeKind::Box, NodeKind::Region], Shape::Flag),
     ("href", &[NodeKind::Pressable, NodeKind::Wrap], Shape::Words),
+    /* The keyboard a phone offers, the web's `inputmode`: React Native's
+    `inputMode`. */
+    ("inputmode", FIELD, Shape::Words),
     /* `inert`: no press, no focus, and nothing a screen reader reaches.
     `pointerEvents: 'none'` and hidden from accessibility on a phone. */
     ("inert", BOX, Shape::Flag),
@@ -174,6 +210,7 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
         "label",
         &[
             NodeKind::Box,
+            NodeKind::Field,
             NodeKind::Layer,
             NodeKind::Pressable,
             NodeKind::Text,
@@ -182,7 +219,16 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ),
     /* `aria-labelledby` to a region: the words passed into it name the
     part, as a section is named by its summary. A phone's label. */
-    ("labelledby", NAMED, Shape::Name),
+    (
+        "labelledby",
+        &[
+            NodeKind::Box,
+            NodeKind::Field,
+            NodeKind::Layer,
+            NodeKind::Pressable,
+        ],
+        Shape::Name,
+    ),
     ("lazy", &[NodeKind::Region], Shape::Flag),
     /* A heading's `aria-level`, and the `h1` to `h6` its element is. A phone
     announces a header with no level. */
@@ -194,6 +240,12 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* The event a picture sends once it has loaded. */
     ("loads", IMAGE, Shape::Name),
     ("marks", BOX, Shape::OneOf(&["chosen"])),
+    /* The most characters a field takes: `maxlength` on the web and
+    `maxLength` on a phone, which both stop typing at it. */
+    ("maxlength", FIELD, Shape::Number),
+    /* A field of several lines: a `<textarea>` on the web and a multiline
+    `TextInput` on a phone. */
+    ("multiline", FIELD, Shape::Set),
     /* A region whose words name the element, as a meter's `label` region:
     words given to the prop of its name are the element's name and are not
     drawn, and only content passed in is. */
@@ -202,6 +254,8 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("part", &[NodeKind::Region], Shape::Name),
     /* The length a shape's dashes are measured in, as SVG's `pathLength`. */
     ("pathLength", BOX, Shape::Positive),
+    /* The words a field shows while it is empty. */
+    ("placeholder", FIELD, Shape::Words),
     /* `web` for a node only the web draws, and `native` for one only a
     phone draws, as a checkbox's tick, which the web draws as a mask. */
     ("platform", ALL, Shape::OneOf(&["native", "web"])),
@@ -211,9 +265,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("pressed", PRESS, Shape::Flag),
     ("r", BOX, Shape::Length),
     /* `aria-readonly`: a reader sees and reaches it, and cannot change it. */
-    ("readonly", PART, Shape::Flag),
+    ("readonly", ANSWER, Shape::Flag),
     /* `aria-required`. A phone has no such state, and its hint says it. */
-    ("required", PART, Shape::Flag),
+    ("required", ANSWER, Shape::Flag),
     ("role", NAMED, Shape::Role),
     /* `aria-roledescription`: what a screen reader calls the part in place
     of its role, as a timeline entry is an "event". A phone has no such
@@ -236,6 +290,10 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* `translate="no"`: words a page translator leaves as they are, such as
     code. A phone translates nothing. */
     ("translate", BOX, Shape::OneOf(&["no"])),
+    /* What a field holds, the web's `type`: `email`, `password`, `search`,
+    `tel`, `text`, `url` or `number`. A phone picks its keyboard by it, and
+    hides what a password field holds. */
+    ("type", FIELD, Shape::Words),
     /* Live words said assertively, ahead of what a screen reader is saying,
     as a toast says a `danger` message: the web's `role="alert"`. */
     ("urgent", &[NodeKind::Live], Shape::Flag),

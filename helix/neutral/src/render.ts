@@ -176,8 +176,12 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
     readonly words: Computes<'back' | 'next' | 'skip'>
   }
+  /** Whether the press that clears a field is drawn. */
+  readonly text: Computes<'clearShown'>
   /** What a total computes: whether it holds any. */
   readonly total: Computes<'holds'>
+  /** The sentence a form control's verdict shows under it, or `''`. */
+  readonly validation: Computes<'message'>
   /** What a tour computes, and the lit box's lengths. */
   readonly tour: Computes<'lit' | 'veiled'> & {
     readonly spotlight: Computes<'height' | 'width' | 'x' | 'y'>
@@ -447,6 +451,8 @@ export const Image = (_: ImageAttributes): Drawn => node()
 export interface PressableAttributes extends Named {
   readonly checked?: Given
   readonly children?: Child
+  /** The press empties the element's field, as its `entry` says. */
+  readonly clears?: boolean
   readonly copies?: boolean
   readonly current?: Given
   readonly disabled?: Given
@@ -470,6 +476,40 @@ export interface PressableAttributes extends Named {
 
 /** A press. */
 export const Pressable = (_: PressableAttributes): Drawn => node()
+
+/**
+ * Text a reader types, as `field()` says: an `<input>`, or a `<textarea>`
+ * where it is `multiline`, on the web, and React Native's `TextInput` on a
+ * phone. Its text is what the element's `entry` holds.
+ *
+ * **Each attribute takes the web's word, and a phone maps it.** `type` picks
+ * the keyboard and hides a password, `inputMode` and `enterKeyHint` pick the
+ * keyboard and its Enter key, and `autoComplete` the platform's autofill.
+ */
+export interface TextInputAttributes extends Common {
+  readonly autoCapitalize?: Given
+  readonly autoComplete?: Given
+  readonly autoCorrect?: Given
+  /** The regions whose words describe the field, as its hint. */
+  readonly describedby?: string
+  readonly disabled?: Given
+  readonly enterKeyHint?: Given
+  readonly inputMode?: Given
+  readonly label?: Given
+  /** The region whose words name the field, as its label. */
+  readonly labelledby?: string
+  readonly maxLength?: Given
+  /** Several lines, a `<textarea>` on the web. */
+  readonly multiline?: boolean
+  readonly part: string
+  readonly placeholder?: Given
+  readonly readonly?: Given
+  readonly required?: Given
+  readonly type?: Given
+}
+
+/** A field a reader types into. */
+export const TextInput = (_: TextInputAttributes): Drawn => node()
 
 /** Content passed in, as `region()` says: the default region, or the one `name` names. */
 export interface SlotAttributes extends Common {
