@@ -16,7 +16,7 @@
     "examples": "bun scripts/examples.ts",
     "export": "bun run bundle && bun scripts/manifests.ts",
     "serve": "bun scripts/serve.ts",
-    "start": "bun run examples && expo start",
+    "start": "bun run examples && CI=false expo start",
     "test": "bun run --filter @fusion.dev/helix-native components && bunx --bun jest",
     "typecheck": "bun run examples && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.scripts.json --noEmit"
   },
