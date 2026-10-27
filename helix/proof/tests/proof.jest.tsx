@@ -1,6 +1,10 @@
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { HelixTheme, useTokens } from '@fusion.dev/helix-native'
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { Slot } from 'expo-router'
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library'
+import { Root } from '../src/root'
 
 /* The proof app on a phone: its route tree, the one the web exports, drawn
    through `@fusion.dev/helix/jsx-runtime`, which warns about anything a
@@ -105,5 +109,43 @@ describe('the proof app', () => {
   test('a project the data lacks goes back to the list', async () => {
     const app = await renderRouter(APP, { initialUrl: '/projects/nowhere' })
     expect(app.getPathname()).toBe('/projects')
+  })
+
+  test('the root draws the colors of the web’s theme, in light and dark', async () => {
+    /* Each color `src/theme.css` writes, as `[name, light, dark]`. */
+    const css = readFileSync(join(__dirname, '..', 'src', 'theme.css'), 'utf8')
+    const colors = [
+      ...css.matchAll(/--helix-(color-[\w-]+): (?:light-dark\((#\w+), (#\w+)\)|(#\w+));/g),
+    ].map(([, name, light, dark, both]) => [name, light ?? both, dark ?? both])
+    expect(colors.length).toBeGreaterThan(40)
+    const read: Partial<Record<'dark' | 'light', Readonly<Record<string, number | string>>>> = {}
+    function Probe({ mode }: { readonly mode: 'dark' | 'light' }) {
+      read[mode] = useTokens()
+      return null
+    }
+    await renderRouter(
+      {
+        _layout: () => (
+          <Root>
+            <Slot />
+          </Root>
+        ),
+        index: () => (
+          <>
+            <HelixTheme mode="light">
+              <Probe mode="light" />
+            </HelixTheme>
+            <HelixTheme mode="dark">
+              <Probe mode="dark" />
+            </HelixTheme>
+          </>
+        ),
+      },
+      { initialUrl: '/' },
+    )
+    for (const [name, light, dark] of colors) {
+      expect([name, read.light?.[name as string]]).toEqual([name, light])
+      expect([name, read.dark?.[name as string]]).toEqual([name, dark])
+    }
   })
 })

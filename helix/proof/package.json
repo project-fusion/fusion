@@ -15,6 +15,7 @@
     "bundle": "expo export --platform web --output-dir dist",
     "start": "expo start",
     "test": "bun run --filter @fusion.dev/helix-native components && bunx --bun jest",
+    "theme": "helix theme build --out src/theme.css && helix theme build --format native --out src/theme.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.native.json --noEmit && tsc -p tsconfig.scripts.json --noEmit"
   },
   "dependencies": {
