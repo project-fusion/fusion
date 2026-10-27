@@ -247,6 +247,34 @@ describe('app header', () => {
     await act(() => hearInsets({ bottom: 0, left: 0, right: 0, top: 0 }))
   })
 
+  test('stands clear of the status bar from its first frame, measured before it is drawn', async () => {
+    mockAbove.inside = false
+    const view = await render(
+      <HelixRoot mode="light">
+        <Text>Opening</Text>
+      </HelixRoot>,
+    )
+    await act(() => hearInsets({ bottom: 34, left: 0, right: 0, top: 47 }))
+    /* A test renderer's views measure nothing, so each stands at the top of
+       the window while the bar is first drawn, as a device lays it out. */
+    Object.defineProperty(Object.prototype, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ height: 56, width: 390, x: 0, y: 0 }),
+    })
+    try {
+      await view.rerender(
+        <HelixRoot mode="light">
+          <HelixAppHeader start={<Text>Logo</Text>} />
+        </HelixRoot>,
+      )
+    } finally {
+      Reflect.deleteProperty(Object.prototype, 'getBoundingClientRect')
+    }
+    /* No layout event has reached the bar. */
+    expect(styleOf(banner()).paddingTop).toBe(47)
+    await act(() => hearInsets({ bottom: 0, left: 0, right: 0, top: 0 }))
+  })
+
   test('reads the reach of each inset from where a box stands in the window', () => {
     const insets = { bottom: 34, left: 0, right: 0, top: 47 }
     const window = { height: 844, width: 390 }

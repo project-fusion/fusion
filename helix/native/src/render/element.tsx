@@ -367,16 +367,18 @@ export const element = (
       behavior,
       'host',
       <Host
-        {...target(
-          measuring(
-            laid(behavior, 'host', {
-              ...hostSemantics(values),
-              ...languageOf(props),
-              style: hosted,
-            }),
-            outer?.grown,
-            reading.some((rule) => mayHold(rule, base.conditions)) ? width.measure : undefined,
-            reach.measure,
+        {...reach.placed(
+          target(
+            measuring(
+              laid(behavior, 'host', {
+                ...hostSemantics(values),
+                ...languageOf(props),
+                style: hosted,
+              }),
+              outer?.grown,
+              reading.some((rule) => mayHold(rule, base.conditions)) ? width.measure : undefined,
+              reach.measure,
+            ),
           ),
         )}
       >
