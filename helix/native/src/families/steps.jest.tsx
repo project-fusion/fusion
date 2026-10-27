@@ -155,6 +155,13 @@ describe('the generated Steps', () => {
     expect(nameOf('Payment').props.accessibilityHint).toBeUndefined()
   })
 
+  test('keeps each stage’s name on one line, as the web’s Button does', async () => {
+    await render(<Checkout />)
+    for (const words of ['Cart', 'Shipping', 'Payment']) {
+      expect(screen.getByText(words).props.numberOfLines).toBe(1)
+    }
+  })
+
   test('marks each stage with a tick, a dot in a ring, or an empty ring', async () => {
     await render(<Checkout />)
     for (const name of ['check', 'record', 'circle']) {
