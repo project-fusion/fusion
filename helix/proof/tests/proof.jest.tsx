@@ -4,6 +4,7 @@ import { HelixTheme, useTokens } from '@fusion.dev/helix-native'
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
 import { Slot } from 'expo-router'
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library'
+import { StyleSheet } from 'react-native'
 import { Root } from '../src/root'
 
 /* The proof app on a phone: its route tree, the one the web exports, drawn
@@ -109,6 +110,18 @@ describe('the proof app', () => {
   test('a project the data lacks goes back to the list', async () => {
     const app = await renderRouter(APP, { initialUrl: '/projects/nowhere' })
     expect(app.getPathname()).toBe('/projects')
+  })
+
+  test('a project’s meter draws its label on a line of its own above the bar, as the web does', async () => {
+    await renderRouter(APP, { initialUrl: '/projects/website' })
+    const meter = screen.getByRole('progressbar', { name: 'Tasks done' })
+    expect(StyleSheet.flatten(meter.props.style)).toMatchObject({ flexWrap: 'wrap' })
+    const label = screen
+      .getAllByText('Tasks done', { includeHiddenElements: true })
+      .find((one) => StyleSheet.flatten(one.props.style)?.width !== undefined)
+    expect(label === undefined ? undefined : StyleSheet.flatten(label.props.style).width).toBe(
+      '100%',
+    )
   })
 
   test('the root draws the colors of the web’s theme, in light and dark', async () => {
