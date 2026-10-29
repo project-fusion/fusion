@@ -131,7 +131,12 @@ each step. A `key` on a range that nothing took moves it as Chromium does.
 A phone presses its track at that point, and sends its control's increment
 or decrement action. An element that draws a row of `marks`, as a rating,
 takes a finger's press there: the pointer down, a frame, the pointer up, and
-the click, so the score it shows while the finger is down is recorded.
+the click, so the score it shows while the finger is down is recorded. A
+splitter's divider is dragged to that fraction of the splitter: the web
+sends the pointer down on the divider, a move there, and the pointer up, and
+a phone drags its divider there in one move. An element that takes no focus
+itself, as a splitter, has the first stop in its shadow tree focused on the
+web.
 
 **`hold` holds a finger on a part while the fake clock moves, then lets
 go**, as a reader holds a number input's stepper. The web sends a touch's

@@ -256,6 +256,11 @@ const perform = async (
       } else {
         target.focus()
       }
+      /* An element that takes no focus itself, as a splitter, has the first
+         stop in its shadow tree focused, as a reader tabs to it. */
+      if (!pathOf(deepActive() ?? document.body).includes(target)) {
+        target.shadowRoot?.querySelector<HTMLElement>('[tabindex="0"]')?.focus()
+      }
       return
     }
     case 'key':
@@ -363,8 +368,9 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
 }
 
 /**
- * The families a reader types into, moves along a track, or picks a score
- * in, whose `input` on each edit, move, or choice is theirs and is recorded. Every other family's `input`
+ * The families a reader types into, moves along a track, picks a score in,
+ * or moves a divider in, whose `input` on each edit, move, or choice is
+ * theirs and is recorded. Every other family's `input`
  * is the composed one its own `<input>` sends, which no record holds.
  */
 const TYPED: ReadonlySet<string> = new Set([
@@ -373,6 +379,7 @@ const TYPED: ReadonlySet<string> = new Set([
   'pin-input',
   'rating',
   'slider',
+  'splitter',
   'textarea',
 ])
 

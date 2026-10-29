@@ -194,6 +194,13 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
         value: String((mounted.root as { value?: unknown }).value),
       }
     : {}),
+  /* A splitter's value is where its divider stands, as a screen reader hears it. */
+  ...(family === 'splitter'
+    ? {
+        invalid: false,
+        value: String(Math.round(Number((mounted.root as { position?: unknown }).position))),
+      }
+    : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
 })
 
