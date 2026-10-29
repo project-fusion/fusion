@@ -115,7 +115,8 @@ export interface Held {
  *   phone presses its track at that point. An element that draws a row of
  *   `marks`, as a rating, is pressed there: the web sends a finger's
  *   pointer down, a frame later its pointer up, and the click, and a phone
- *   presses its row.
+ *   presses its row. A splitter's divider is dragged to that fraction of
+ *   the splitter.
  * - `adjust`: a screen reader steps the element's control up, `by: 1`, or
  *   down, `by: -1`. The web steps its `<input type="range">` and sends
  *   `input` and `change`, as a browser does for an assistive technology's

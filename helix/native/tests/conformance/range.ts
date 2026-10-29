@@ -8,7 +8,8 @@ import type { Run, View } from './views'
 /*
  * Moving an element along its track, as the React Native half of a
  * conformance scenario performs it: a press on the track at a point, which
- * takes the value there, and a screen reader's increment and decrement.
+ * takes the value there, a drag of a splitter's divider, and a screen
+ * reader's increment and decrement.
  */
 
 /** How long the track is drawn, in points, as the harness lays it out. */
@@ -56,9 +57,55 @@ const pressOn = (control: View): unknown => {
   return undefined
 }
 
+/** The gestures the control's detector holds, the drag first. */
+const gesturesOn = (control: View): readonly unknown[] => {
+  // biome-ignore lint/suspicious/noExplicitAny: the renderer's fibers are untyped
+  for (let fiber: any = control.unstable_fiber; fiber; fiber = fiber.return) {
+    const gesture = fiber.memoizedProps?.gesture as { gestures?: unknown[] } | undefined
+    if (gesture?.gestures !== undefined) {
+      return gesture.gestures
+    }
+  }
+  return []
+}
+
+/**
+ * Drags a splitter's divider to `to`, a fraction of the splitter from its
+ * start, and lets go: the splitter laid out `LENGTH` points each way, and
+ * the drag carried from where the divider stands in one move, as the web
+ * half moves its pointer once.
+ */
+const dragDivider = async (control: View, to: number, vertical: boolean): Promise<void> => {
+  let host: View | null = control.parent
+  while (host !== null && typeof host.props.onLayout !== 'function') {
+    host = host.parent
+  }
+  if (host !== null) {
+    const measured = host
+    await act(async () => {
+      fireEvent(measured, 'layout', {
+        nativeEvent: { layout: { height: LENGTH, width: LENGTH, x: 0, y: 0 } },
+      })
+    })
+  }
+  const now = Number((controlIn()?.props.accessibilityValue as { now?: unknown } | undefined)?.now)
+  const by = ((to * 100 - now) / 100) * LENGTH
+  const moved = (amount: number) =>
+    vertical ? { translationX: 0, translationY: amount } : { translationX: amount, translationY: 0 }
+  const drag = gesturesOn(controlIn() ?? control)[0]
+  await act(async () => {
+    fireGestureHandler(drag as never, [
+      { state: State.BEGAN, ...moved(0) },
+      { state: State.ACTIVE, ...moved(by) },
+      { state: State.END, ...moved(by) },
+    ])
+  })
+}
+
 /**
  * Presses the track at `to`, a fraction of it from its start, as a reader
  * drags the thumb there and lets go. **A disabled control takes no touch.**
+ * A splitter's divider is dragged there.
  */
 export const slideTo = async (
   run: Run,
@@ -67,6 +114,10 @@ export const slideTo = async (
   const control = controlIn()
   if (control === undefined) {
     return 'The setup draws no control to slide.'
+  }
+  if (formOf(run.scenario.setup.tag).api?.range?.basis !== undefined) {
+    await dragDivider(control, intent.to, run.scenario.setup.props?.orientation === 'vertical')
+    return undefined
   }
   const press = pressOn(control)
   if (press === undefined) {
