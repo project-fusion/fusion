@@ -338,6 +338,14 @@
       "types": "./dist/navigation/index.d.ts",
       "default": "./dist/navigation/index.js"
     },
+    "./number-input": {
+      "react-native": {
+        "types": "./dist/number-input/index.native.d.ts",
+        "default": "./dist/number-input/index.native.js"
+      },
+      "types": "./dist/number-input/index.d.ts",
+      "default": "./dist/number-input/index.js"
+    },
     "./outline": {
       "react-native": {
         "types": "./dist/outline/index.native.d.ts",

@@ -367,7 +367,13 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
  * each edit or move is theirs and is recorded. Every other family's `input`
  * is the composed one its own `<input>` sends, which no record holds.
  */
-const TYPED: ReadonlySet<string> = new Set(['input', 'pin-input', 'slider', 'textarea'])
+const TYPED: ReadonlySet<string> = new Set([
+  'input',
+  'number-input',
+  'pin-input',
+  'slider',
+  'textarea',
+])
 
 /** The name an event goes by in a record: its type without `helix-`, and a bare one as it is. */
 const nameOf = (type: string, family: string): string | undefined => {

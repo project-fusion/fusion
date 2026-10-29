@@ -65,7 +65,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
     'color',
   ],
   ['notifications/notification/notification.css', 'slot[name="description"]::slotted(*)', 'color'],
-  ['number-input/root/number-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
+  ['number-input/root/number-input-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['option/group/option-group.css', '[part="label"]', 'color'],
   ['pagination/root/pagination-root.css', '[part="gap"]', 'color'],
   ['pagination/summary/pagination-summary.css', ':host', 'color'],

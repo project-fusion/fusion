@@ -27,6 +27,7 @@ export type Family =
   | 'menu'
   | 'motion-toggle'
   | 'navigation'
+  | 'number-input'
   | 'outline'
   | 'pin-input'
   | 'popover'
