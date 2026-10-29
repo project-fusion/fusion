@@ -95,18 +95,6 @@ const grouped = (text: string, separator: string, decimal: string): boolean => {
 const literal = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 
 /**
- * Reads a number written in a locale with the same options it is shown with,
- * or `null` where the text is no number.
- *
- * The locale's group separators are dropped and its decimal separator read as
- * a point, so `1.234,5` in `de-DE` is 1234.5. A currency sign, a percent sign
- * and a unit the options write are dropped too, in the plural and the
- * singular, and a percent is read back as
- * the fraction it shows: `25 %` is 0.25. A point is read as a decimal point in
- * a locale that groups with something else, which is what a decimal keypad
- * types.
- */
-/**
  * A number's parts as `formatToParts` gives them, or read off `format` where
  * the engine has no `formatToParts`, as iOS's Hermes has none for numbers.
  * Read off: the mark between the digits of `1` and `5` in one and a half is
@@ -139,6 +127,18 @@ export const partsOf = (format: Intl.NumberFormat, value: number): Intl.NumberFo
   return parts
 }
 
+/**
+ * Reads a number written in a locale with the same options it is shown with,
+ * or `null` where the text is no number.
+ *
+ * The locale's group separators are dropped and its decimal separator read as
+ * a point, so `1.234,5` in `de-DE` is 1234.5. A currency sign, a percent sign
+ * and a unit the options write are dropped too, in the plural and the
+ * singular, and a percent is read back as
+ * the fraction it shows: `25 %` is 0.25. A point is read as a decimal point in
+ * a locale that groups with something else, which is what a decimal keypad
+ * types.
+ */
 export const parseNumber = (
   text: string,
   locale = '',
