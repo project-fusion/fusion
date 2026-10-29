@@ -379,8 +379,8 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
 
 /// The range's fields, each held to what its docs say it names, and the
 /// control a reader moves its value with, the node whose role is `slider`,
-/// or the row of steps a reader picks a score from, whose role is
-/// `radiogroup`.
+/// the row of steps a reader picks a score from, whose role is
+/// `radiogroup`, or the divider of a split, whose role is `separator`.
 fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     let mut controls = adjustables(&family.tree);
     let stepping = steppers(&family.tree);
@@ -399,6 +399,7 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     };
     references("range", range.references(), names, found);
     controls.extend(scales(&family.tree));
+    controls.extend(splits(&family.tree));
     if controls
         .iter()
         .any(|name| fields(&family.tree).contains(name))
@@ -411,7 +412,7 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     }
     if !family.tree.is_empty() && controls.len() != 1 {
         found.push(format!(
-            "the element declares a `range`, and its tree draws {} boxes whose role is `slider`, `spinbutton`, or `radiogroup`, where one moves its value",
+            "the element declares a `range`, and its tree draws {} boxes whose role is `slider`, `spinbutton`, `radiogroup`, or `separator`, where one moves its value",
             controls.len()
         ));
     }
@@ -443,6 +444,23 @@ fn scales(nodes: &[Node]) -> Vec<&str> {
             found.push(node.name.as_str());
         }
         found.extend(scales(&node.children));
+    }
+    found
+}
+
+/// The name of each box whose role is `separator`, the divider of a split
+/// a reader moves where the element declares a `range`, in the order the
+/// tree draws them.
+fn splits(nodes: &[Node]) -> Vec<&str> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if matches!(
+            node.attributes.get("role"),
+            Some(Attribute::Text(role)) if role == crate::family::vocabulary::kinds::SPLIT
+        ) {
+            found.push(node.name.as_str());
+        }
+        found.extend(splits(&node.children));
     }
     found
 }

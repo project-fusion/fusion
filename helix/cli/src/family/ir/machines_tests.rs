@@ -284,6 +284,33 @@ fn a_score_picked_from_a_row_of_steps_runs_scale_bound_to_its_row() {
 }
 
 #[test]
+fn a_split_a_reader_moves_between_two_panes_runs_resize_bound_to_its_divider() {
+    let splitter = family(
+        "export default headless('splitter', {
+          events: [event('before-collapse', ['value']), event('collapse', ['value']), event('resized', ['value'])],
+          props: [prop('collapsed', 'string'), prop('collapsed-size', 'number'), prop('end-min', 'string'), prop('position', 'number')],
+          range: { basis: 'basis', collapsed: 'collapsed', collapsedSize: 'collapsedSize', endMin: 'endMin', onBeforeCollapse: 'beforeCollapse', onChange: 'resized', onCollapse: 'collapse', prop: 'position' },
+          tree: [box('start'), box('separator', { role: 'separator' }), box('end')],
+        })",
+    );
+    assert_eq!(named(&splitter.machines), vec!["resize"]);
+    assert_eq!(
+        splitter.machines[0].bind,
+        bound(&[
+            ("basis", Bound::State("basis".to_owned())),
+            ("change", Bound::Event("resized".to_owned())),
+            ("closing", Bound::Event("before-collapse".to_owned())),
+            ("collapse", Bound::Event("collapse".to_owned())),
+            ("collapsed", Bound::Prop("collapsed".to_owned())),
+            ("part", Bound::Part("separator".to_owned())),
+            ("reserve", Bound::Prop("end-min".to_owned())),
+            ("sliver", Bound::Prop("collapsed-size".to_owned())),
+            ("value", Bound::Prop("position".to_owned())),
+        ])
+    );
+}
+
+#[test]
 fn a_number_a_reader_types_and_steps_runs_entry_and_spin_bound_to_its_field_and_steppers() {
     let number = family(
         "export default headless('number-input', {
