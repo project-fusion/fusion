@@ -289,3 +289,20 @@ fn a_source_in_the_family_shape_is_refused() {
         .unwrap_err()
         .contains("exports `fragment("));
 }
+
+#[test]
+fn a_placeholder_target_is_its_field_s_placeholder() {
+    let read = rules(&table(
+        "",
+        "({ on, rule }) => [on({ placeholder: 'control' }, [rule({ color: 'gray' })])]",
+    ));
+    assert_eq!(
+        (read[0].target.as_str(), read[0].inner.as_deref()),
+        ("control", Some("::placeholder"))
+    );
+    assert!(refusal(&table(
+        "",
+        "({ on, rule }) => [on({ placeholder: 'host' }, [rule({ color: 'gray' })])]",
+    ))
+    .contains("a target names a part"));
+}
