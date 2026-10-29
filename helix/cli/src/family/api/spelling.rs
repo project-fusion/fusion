@@ -326,6 +326,33 @@ const VALIDATION: &[Field] = &[
     ("valueMissing", "missing", Name),
 ];
 
+const RANGE: &[Field] = &[
+    ("dragging", "dragging", Name),
+    ("defaultProp", "initial", Name),
+    ("fillFrom", "from", Name),
+    ("fillSpan", "span", Name),
+    ("fillTo", "to", Name),
+    ("focusVisible", "ringed", Name),
+    ("formatOptions", "format", Name),
+    ("fraction", "fraction", Name),
+    ("locale", "locale", Name),
+    ("max", "max", Name),
+    ("min", "min", Name),
+    ("onBeforeChange", "before", Name),
+    ("onChange", "change", Name),
+    ("onInput", "input", Name),
+    ("orientation", "orientation", Name),
+    ("origin", "origin", Name),
+    ("pageStep", "page", Name),
+    ("prop", "value", Name),
+    ("reading", "reading", Name),
+    ("readonly", "readonly", Name),
+    ("said", "said", Name),
+    ("spoken", "spoken", Name),
+    ("step", "step", Name),
+    ("valueText", "template", Name),
+];
+
 const ENTRY: &[Field] = &[
     ("blank", "blank", Name),
     ("caret", "caret", Name),
@@ -358,6 +385,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("notices", "notices", NOTICES),
     ("pageScroll", "page", PAGE_SCROLL),
     ("queue", "queue", QUEUE),
+    ("range", "range", RANGE),
     ("scroll", "scroll", SCROLL),
     ("section", "section", SECTION),
     ("sections", "sections", SECTIONS),

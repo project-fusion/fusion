@@ -22,6 +22,7 @@ import { numberOf, numberOptions, textOf } from '../number-format/props.js'
 import { cleanCode, type PinCase, type PinType, separatorsAfter } from '../pin-code/pin-code.js'
 import { onApple } from '../platform/platform.js'
 import { removeName } from '../remove-name/remove-name.js'
+import { sliderBoundsOf, sliderMarks, sliderSaid } from '../slider/slider.js'
 import { trendReading } from '../trend-figure/trend-props.js'
 
 /* Accordion's, where a section's chevron stands. */
@@ -52,6 +53,8 @@ export * from '../overlay/overlay-derivations.js'
 export * from '../qr-code/qr-derivations.js'
 /* Meter's, Progress's and Skeleton's, each one derivation. */
 export * from '../range-reading/indicator-derivations.js'
+/* Slider's, the marks along its track and the room its readout keeps. */
+export * from '../slider/slider-derivations.js'
 /* Speed Dial's, its long press, its names, and an action's shortcut. */
 export * from '../speed-dial/speed-dial-derivations.js'
 /* Timeline's, an entry's mark and its reading of how long ago. */
@@ -320,4 +323,21 @@ export const pinInputCells: ListDerivation = (props) => {
       unmarked: !(!active && typed === '' && placeholder !== ''),
     }
   })
+}
+
+/**
+ * `slider-markers`: each mark along a slider's track, from its `markers`,
+ * `min`, `max` and `step`. Each mark's fields:
+ *
+ * - `at`, its value, which keys it
+ * - `place`, where it stands along the track, a percentage from the start
+ * - `label`, its value as a reader sees it, which `marker-labels` draws
+ */
+export const sliderMarkers: ListDerivation = (props) => {
+  const bounds = sliderBoundsOf(props)
+  return sliderMarks(props.markers, bounds).map((at) => ({
+    at: String(at),
+    label: sliderSaid(at, props['format-options'], props.locale),
+    place: `${((at - bounds.min) / (bounds.max - bounds.min)) * 100}%`,
+  }))
 }

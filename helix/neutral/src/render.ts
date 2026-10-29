@@ -176,6 +176,14 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
     readonly words: Computes<'back' | 'next' | 'skip'>
   }
+  /**
+   * Where a range's value sits along its track and where its fill starts
+   * and ends, each 0 to 1, its value as a number, and its value as a reader
+   * sees it and as a screen reader says it.
+   */
+  readonly range: Computes<
+    'fillFrom' | 'fillSpan' | 'fillTo' | 'fraction' | 'reading' | 'said' | 'spoken'
+  >
   /** Whether the press that clears a field is drawn. */
   readonly text: Computes<'clearShown'>
   /** What a total computes: whether it holds any. */
@@ -395,6 +403,8 @@ export interface ViewAttributes extends Named, Drawing {
   readonly children?: Child
   readonly style?: Style
   readonly current?: Given
+  /** Whether a reader can move it, where its role is `slider` or `spinbutton`. */
+  readonly disabled?: Given
   readonly element?: Given
   readonly hidden?: Given
   /** A glyph a phone draws in the box, by its name. */
