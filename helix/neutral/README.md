@@ -6,7 +6,7 @@ Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
-Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Stat, Steps,
+Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
 
@@ -717,6 +717,23 @@ over the row: a press or a drag picks the step under the finger, the keys
 and a screen reader pick the step after or before, and core's rating
 arithmetic says where each step stands, the same rules the web lays its
 options out by.
+
+**A split a reader moves between two panes declares a `range` too**, and
+its control is a `<View role="separator">`, the divider. Its value is the
+start pane's share, as a percentage. Its range names `collapsed`,
+`defaultCollapsed`, `collapsedSize`, and `collapsible`, which pane is shut,
+which starts shut, how much of a shut pane still shows, and which panes may
+shut; `onBeforeCollapse` and `onCollapse`, the events a pane shutting or
+opening sends; `collapsedLabel`, the words a screen reader hears while one
+is shut; `endMin`, the least the end pane keeps; `primary`, the pane that
+keeps its length as the element's changes; `snap` and `snapThreshold`; and
+the states `collapsedState` and `vertical`. A render reads `range.basis`,
+where the divider stands as a length for the start pane, `range.flush`,
+whether it stands against an edge with no pane beside it, and
+`range.lowest` and `range.highest`, its bounds as a screen reader hears
+them. A phone runs the `resize` machine over the divider: a drag on the
+resize driver, a double tap, the keys, and a screen reader move it, and
+core's splitter arithmetic bounds it, the same the web element reads.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest
