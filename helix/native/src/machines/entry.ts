@@ -19,10 +19,34 @@ export interface Entered {
   readonly clear: () => void
   /** The press that clears the field, where the tree draws one. */
   readonly clears: string | undefined
+  /** The text the field holds as of the last edit or step, between renders as well. */
+  readonly current: () => string
   /** Whether the reader has typed the text, as HTML's dirty value flag says. */
   readonly edited: boolean
+  /** Whether the field has focus. */
+  readonly focused: boolean
+  /**
+   * Takes the text to `next` as a step does: it asks, sends `input` where
+   * it stands, and commits it with `change` where it moved, and says
+   * whether it moved. A step is no edit of the reader's, and leaving the
+   * field after it commits nothing more, as the web's commits nothing for
+   * text a script wrote.
+   */
+  readonly step: (next: string) => boolean
   /** The text the field holds now. */
   readonly value: string
+}
+
+/**
+ * How an element shapes its text beside the reader's edits, as a number
+ * input shows its number in its format while the field has no focus and
+ * holds it to its range as the reader leaves.
+ */
+export interface Shaping {
+  /** What the field shows for `text`, while it has focus or not. */
+  readonly shown: (text: string, focused: boolean) => string
+  /** The text `text` settles to as the reader leaves the field or presses Enter. */
+  readonly settle: (text: string) => string
 }
 
 /**
@@ -119,12 +143,17 @@ const textOf = (value: unknown): string | undefined =>
  * **The press that clears** asks with `''`, and where that stands empties
  * the field, sends `input`, `change`, and `clear`, and gives the field focus,
  * as the web's clear button does.
+ *
+ * **A shaped entry settles its text** as the reader leaves the field or
+ * presses Enter, asking for the settled text before it commits, and shows
+ * its text as `shaping` says, as a number input does.
  */
 export const useEntry = (
   family: Family,
   props: Props,
   use: MachineUse,
   touch: () => void,
+  shaping?: Shaping,
 ): Entered => {
   const part = boundTo(use, 'part', 'part') ?? ''
   const clears = boundTo(use, 'clears', 'part')
@@ -231,10 +260,45 @@ export const useEntry = (
     committed.current = latest.current.text
     holdFocus(true)
   }, [])
+  /** Asks for the text the shaping settles to, where it moves. */
+  const settle = useCallback(() => {
+    const now = latest.current.text
+    const settled = shaping?.settle(now) ?? now
+    if (settled !== now) {
+      ask(settled)
+    }
+  }, [ask, shaping])
   const onBlur = useCallback(() => {
     holdFocus(false)
+    settle()
     commit()
-  }, [commit])
+  }, [commit, settle])
+  /* Enter commits a settled number where settling moved it, as the web's does. */
+  const onSubmitEditing = useCallback(() => {
+    const before = latest.current.text
+    settle()
+    if (latest.current.text !== before) {
+      commit()
+    }
+  }, [commit, settle])
+  const step = useCallback(
+    (next: string): boolean => {
+      const before = latest.current.text
+      if (next === before || !ask(next)) {
+        return false
+      }
+      /* A step commits as it lands, so leaving the field commits nothing more. */
+      committed.current = next
+      const { events: bound, props: now, touch: touched } = latest.current
+      touched()
+      if (bound.change !== undefined) {
+        tell(family, now, bound.change, {}, senderOf(family, next))
+      }
+      return true
+    },
+    [ask, family],
+  )
+  const current = useCallback(() => latest.current.text, [])
   const view: PartBinding = useMemo(
     () => ({
       view: {
@@ -242,11 +306,23 @@ export const useEntry = (
         onBlur,
         onChangeText,
         onFocus,
+        ...(shaping === undefined ? {} : { onSubmitEditing }),
         ref: fieldRef,
-        value: text,
+        value: shaping === undefined ? text : shaping.shown(text, focused),
       },
     }),
-    [disabled, fieldRef, onBlur, onChangeText, onFocus, readonly, text],
+    [
+      disabled,
+      fieldRef,
+      focused,
+      onBlur,
+      onChangeText,
+      onFocus,
+      onSubmitEditing,
+      readonly,
+      shaping,
+      text,
+    ],
   )
   const behavior = hosted(use, part, view, {
     changes: !disabled && !readonly,
@@ -255,5 +331,5 @@ export const useEntry = (
     offered,
     text,
   })
-  return { behavior, clear, clears, edited, value: text }
+  return { behavior, clear, clears, current, edited, focused, step, value: text }
 }
