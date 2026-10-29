@@ -226,11 +226,15 @@ fn tree(nodes: &[Node], names: &Names, found: &mut Vec<String>) {
                 }
             }
         }
-        if let Some(Attribute::Text(region)) = node.attributes.get("labelledby") {
-            if !names.regions.contains(region.as_str()) {
-                found.push(format!(
-                    "{at} is labeled by `{region}`, and no region has that name"
-                ));
+        if let Some(Attribute::Text(regions)) = node.attributes.get("labelledby") {
+            /* The node's own name reads its own `label`, as the web's
+            `aria-labelledby` lists the element's own id. */
+            for region in regions.split_whitespace() {
+                if region != node.name && !names.regions.contains(region) {
+                    found.push(format!(
+                        "{at} is labeled by `{region}`, and no region has that name"
+                    ));
+                }
             }
         }
         if let Some(Attribute::Text(regions)) = node.attributes.get("describedby") {
