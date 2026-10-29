@@ -319,6 +319,11 @@ describe('a checkbox drawn as a card', () => {
 })
 
 describe('a required checkbox', () => {
+  test('draws its mark after the label’s last word, in the label’s own line', async () => {
+    await render(<Checkbox required>Terms</Checkbox>)
+    expect(screen.getByText('Terms*')).toBeTruthy()
+  })
+
   test('says what is wrong in the hint’s place once the reader clears it, and edges the box', async () => {
     await render(
       <Checkbox hint="We keep a copy." required>

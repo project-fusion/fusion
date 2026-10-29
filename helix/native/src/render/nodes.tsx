@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from 'react'
+import { View } from 'react-native'
 import type { Family, Node } from '../style/form'
 import type { GeneratedBox, Resolved, Style } from '../style/resolved'
 import { HelixTheme } from '../theme/helix-theme'
@@ -91,6 +92,79 @@ export const drawGenerated = (
         <ScaledText style={inherit(text, words)}>{box.words}</ScaledText>
       )}
     </Box>
+  )
+}
+
+/** The lengths a box that flows in a line of words may set: its space along the line. */
+const ALONG = new Set(['marginEnd', 'marginHorizontal', 'marginLeft', 'marginRight', 'marginStart'])
+
+/**
+ * Whether a `::before` or `::after` is words in the line, as the web's
+ * generated box is while it sets no `display` and no `position`: words with
+ * no look of their own beyond their text and their space along the line.
+ */
+const inLine = (box: GeneratedBox | undefined): boolean => {
+  if (box?.words === undefined || box.motion !== undefined) {
+    return false
+  }
+  const [frame] = split(box.style)
+  return Object.entries(frame).every(([key, value]) => value === undefined || ALONG.has(key))
+}
+
+/**
+ * Whether a node draws words alone, as a text node, or a slot or a condition
+ * holding them, does. A slot that holds nothing of its own takes whatever
+ * is passed in, as a passage's paragraphs, so it is not words alone.
+ */
+const wordsOnly = (node: Node): boolean =>
+  node.kind === 'text' ||
+  ((node.kind === 'region' || node.kind === 'when') &&
+    (node.children ?? []).length > 0 &&
+    (node.children ?? []).every(wordsOnly))
+
+/**
+ * Whether a box lays its content out as one line of words: a box in block
+ * flow that holds words alone, with a `::before` or `::after` of words in
+ * the line, as a required field's label is with its mark.
+ */
+const flowsAsWords = (node: Node, resolved: Resolved): boolean =>
+  !resolved.layout.flex &&
+  node.attributes?.glyph === undefined &&
+  node.attributes?.viewBox === undefined &&
+  resolved.scheme === undefined &&
+  (node.children ?? []).length > 0 &&
+  (node.children ?? []).every(wordsOnly) &&
+  (inLine(resolved.generated?.before) || inLine(resolved.generated?.after)) &&
+  [resolved.generated?.before, resolved.generated?.after].every(
+    (box) => box === undefined || inLine(box),
+  )
+
+/** A length along the line, as a margin of a generated box sets it, in points. */
+const along = (frame: Style, ...keys: readonly string[]): number => {
+  const found = keys.map((key) => frame[key]).find((value) => typeof value === 'number')
+  return typeof found === 'number' ? found : 0
+}
+
+/**
+ * The words a `::before` or `::after` in the line draws, nested in the
+ * paragraph of the box's words, with its margins as space on either side,
+ * so the words wrap with the box's own as the web flows them.
+ */
+const wordsInLine = (box: GeneratedBox | undefined, text: Style, key: string): ReactNode => {
+  if (box?.words === undefined) {
+    return null
+  }
+  const [frame, words] = split(box.style)
+  const start = along(frame, 'marginStart', 'marginLeft', 'marginHorizontal')
+  const end = along(frame, 'marginEnd', 'marginRight', 'marginHorizontal')
+  return (
+    <Fragment key={key}>
+      {start === 0 ? null : <View style={{ height: 1, width: start }} />}
+      <ScaledText {...(box.unread ? silent : {})} style={inherit(text, words)}>
+        {box.words}
+      </ScaledText>
+      {end === 0 ? null : <View style={{ height: 1, width: end }} />}
+    </Fragment>
   )
 }
 
@@ -265,6 +339,46 @@ const runOf = (scope: Scope, node: Node, motion: Resolved['motion']): Resolved['
 }
 
 /**
+ * What a box draws inside its frame: its `::before`, its glyph or its
+ * vector, what it holds, and its `::after`. **Words with a `::before` or
+ * `::after` in the line are one paragraph**, so the mark stands after the
+ * last word, as a required field's label draws its asterisk on the web.
+ */
+const drawContent = (
+  scope: Scope,
+  held: Scope,
+  node: Node,
+  resolved: Resolved,
+  inherits: Style,
+  box: Style,
+  inside: Node | 'host',
+): ReactNode => {
+  if (flowsAsWords(node, resolved)) {
+    return (
+      <ScaledText style={inherits}>
+        {wordsInLine(resolved.generated?.before, inherits, `${node.name}-before`)}
+        {resolved.before}
+        {inner(held, node, inherits, resolved.regions, node)}
+        {wordsInLine(resolved.generated?.after, inherits, `${node.name}-after`)}
+      </ScaledText>
+    )
+  }
+  return (
+    <>
+      {drawGenerated(resolved.generated?.before, inherits, `${node.name}-before`)}
+      {resolved.before === undefined ? null : (
+        <ScaledText style={inherits}>{resolved.before}</ScaledText>
+      )}
+      {drawGlyph(scope, node, inherits, box, inside === 'host' ? scope.host.style : undefined)}
+      {typeof node.attributes?.viewBox === 'string'
+        ? drawVector(held, node, fromText(inherits), box)
+        : inScheme(resolved.scheme, inner(held, node, inherits, resolved.regions, node))}
+      {drawGenerated(resolved.generated?.after, inherits, `${node.name}-after`)}
+    </>
+  )
+}
+
+/**
  * A box: its part's view, what a screen reader hears of it, the words its
  * `::before` draws, its glyph, and what it holds, in its own text style.
  */
@@ -317,15 +431,7 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
       {...(driven ? {} : { transitions: resolved.transitions })}
       view={view}
     >
-      {drawGenerated(resolved.generated?.before, inherits, `${node.name}-before`)}
-      {resolved.before === undefined ? null : (
-        <ScaledText style={inherits}>{resolved.before}</ScaledText>
-      )}
-      {drawGlyph(scope, node, inherits, box, inside === 'host' ? scope.host.style : undefined)}
-      {typeof node.attributes?.viewBox === 'string'
-        ? drawVector(held, node, fromText(inherits), box)
-        : inScheme(resolved.scheme, inner(held, node, inherits, resolved.regions, node))}
-      {drawGenerated(resolved.generated?.after, inherits, `${node.name}-after`)}
+      {drawContent(scope, held, node, resolved, inherits, box, inside)}
       {saidStatus(view)}
     </PartBox>,
     node.name,
