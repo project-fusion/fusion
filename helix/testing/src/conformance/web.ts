@@ -268,7 +268,7 @@ const perform = async (
       leave(mounted)
       return
     case 'slide':
-      slide(mounted, intent.to)
+      await slide(mounted, intent.to)
       return
     case 'adjust':
       adjust(mounted, intent.by)
@@ -363,14 +363,15 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
 }
 
 /**
- * The families a reader types into or moves along a track, whose `input` on
- * each edit or move is theirs and is recorded. Every other family's `input`
+ * The families a reader types into, moves along a track, or picks a score
+ * in, whose `input` on each edit, move, or choice is theirs and is recorded. Every other family's `input`
  * is the composed one its own `<input>` sends, which no record holds.
  */
 const TYPED: ReadonlySet<string> = new Set([
   'input',
   'number-input',
   'pin-input',
+  'rating',
   'slider',
   'textarea',
 ])

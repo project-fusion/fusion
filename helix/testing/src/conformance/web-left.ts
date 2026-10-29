@@ -113,8 +113,11 @@ const READS: ReadonlySet<string> = new Set(['format-date', 'timeline'])
 /** The families a reader types into, whose record says what the field holds. */
 const TEXTS: ReadonlySet<string> = new Set(['input', 'number-input', 'pin-input', 'textarea'])
 
-/** The families a reader moves along a track, whose record says the value they hold. */
-const VALUES: ReadonlySet<string> = new Set(['slider'])
+/**
+ * The families a reader moves along a track or picks a score in, whose
+ * record says the value they hold and whether they are marked wrong.
+ */
+const VALUES: ReadonlySet<string> = new Set(['rating', 'slider'])
 
 /** What the element's field holds, and whether the element is marked wrong. */
 const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
@@ -185,7 +188,12 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
         .map(([v]) => v)
     : [...mounted.panels].filter(([, panel]) => inState(panel, 'selected')).map(([v]) => v),
   ...(TEXTS.has(family) ? { text: textOf(mounted) } : {}),
-  ...(VALUES.has(family) ? { value: String((mounted.root as { value?: unknown }).value) } : {}),
+  ...(VALUES.has(family)
+    ? {
+        invalid: inState(mounted.root, 'invalid'),
+        value: String((mounted.root as { value?: unknown }).value),
+      }
+    : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
 })
 

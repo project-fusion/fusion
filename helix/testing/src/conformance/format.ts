@@ -112,7 +112,10 @@ export interface Held {
  *   fraction of the track from its start, 0 to 1, and lets go there. The
  *   web moves its `<input type="range">` there and sends `input`, and
  *   `change` where the value moved, as a browser does as a drag lets go; a
- *   phone presses its track at that point.
+ *   phone presses its track at that point. An element that draws a row of
+ *   `marks`, as a rating, is pressed there: the web sends a finger's
+ *   pointer down, a frame later its pointer up, and the click, and a phone
+ *   presses its row.
  * - `adjust`: a screen reader steps the element's control up, `by: 1`, or
  *   down, `by: -1`. The web steps its `<input type="range">` and sends
  *   `input` and `change`, as a browser does for an assistive technology's
@@ -275,10 +278,16 @@ export interface Left {
   readonly text?: { readonly invalid: boolean; readonly value: string }
   /**
    * The value the element holds, for a family a reader moves along a
-   * track, as a slider: the web reads its `value`, and React Native the
-   * value its range machine holds.
+   * track or picks a score in, as a slider or a rating: the web reads its
+   * `value`, and React Native the value its range or scale machine holds.
    */
   readonly value?: string
+  /**
+   * Whether the element is marked wrong, for a family a reader moves along
+   * a track or picks a score in: the web reads its `invalid` state, and
+   * React Native the state its verdict sets.
+   */
+  readonly invalid?: boolean
   /**
    * Whether the element is waiting out its delay, unseen and silent, for a
    * family that holds itself back, as a loader. The web reads its `waiting`
