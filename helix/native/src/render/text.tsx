@@ -18,6 +18,13 @@ import { type LayoutChangeEvent, StyleSheet, Text, type TextProps } from 'react-
  */
 export const WrapWidth = createContext<number | undefined>(undefined)
 
+/**
+ * The width words wrap at inside a part that scrolls both ways, where they
+ * stand in one, for words a renderer of its own draws, as the JSX runtime's
+ * `span` is.
+ */
+export const useWrapWidth = (): number | undefined => useContext(WrapWidth)
+
 /** Whether the words are drawn inside other words, which lay them out. */
 const InText = createContext(false)
 

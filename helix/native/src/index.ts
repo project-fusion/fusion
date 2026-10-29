@@ -44,6 +44,7 @@ export { type SectionAbout, scrollToSection, useSection } from './render/section
 export { sharedCodeWarnings, warnWebTag } from './render/shared-code'
 export { useSlottedBox } from './render/slotted-box'
 export { useTarget } from './render/targets'
+export { useWrapWidth } from './render/text'
 export {
   type ToolbarAxis,
   ToolbarAxisContext,

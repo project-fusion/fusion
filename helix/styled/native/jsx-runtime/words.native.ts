@@ -10,6 +10,7 @@ import {
   useSlottedBox,
   useTarget,
   useTokens,
+  useWrapWidth,
 } from '@fusion.dev/helix-native'
 import * as React from 'react'
 import { Text, View } from 'react-native'
@@ -44,18 +45,23 @@ const marginsOf = (box: Readonly<Record<string, unknown>>): Record<string, unkno
 /**
  * Words in the text style the region around gives, as a `span` inherits it,
  * and the margins and the width the host's `::slotted(*)` rules give it, as a
- * drawer's title keeps a step clear of the content under it.
+ * drawer's title keeps a step clear of the content under it. Inside a part
+ * that scrolls both ways, they wrap at its width.
  */
 export const Span = ({ children }: Props) => {
   const tokens = useTokens()
   const text = useInheritedText()
   const box = useSlottedBox()
+  /* Inside a part that scrolls both ways, the words wrap at its width, as
+     a paragraph wraps at a scroll box's width on the web. */
+  const wrap = useWrapWidth()
   return React.createElement(
     Text,
     {
       allowFontScaling: false,
       style: [
         { color: color(tokens, 'color-foreground'), fontSize: points(tokens, 'text-md') },
+        wrap === undefined ? {} : { maxWidth: wrap },
         text,
         marginsOf(box),
       ],
