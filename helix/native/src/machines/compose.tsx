@@ -25,6 +25,7 @@ import { pressing } from './pressing'
 import { boundTo } from './props'
 import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
+import { useScale } from './scale'
 import { scrollersOf } from './scrolling'
 import { setting } from './setting'
 import { spinShaping, useSpin } from './spin'
@@ -47,8 +48,9 @@ const SELECTIONS: ReadonlySet<string> = new Set([
 /**
  * Hosts the verdict on a form control's answer, where its form binds one: an
  * answer is missing while its toggle is not checked, while its field holds no
- * text, or while its set has nothing chosen, and never for a range. A field's text is held to its
- * own constraint as well.
+ * text, while its set has nothing chosen, or while its row of steps has no
+ * score, and never for a range moved along a track. A field's text is held
+ * to its own constraint as well.
  */
 const validating = (
   family: Family,
@@ -60,8 +62,11 @@ const validating = (
   }
   const toggles = boundTo(use, 'checked', 'prop') !== undefined
   const types = boundTo(use, 'value', 'prop') !== undefined
-  /* A range always holds a value, so its answer is never missing. */
-  const ranges = boundTo(use, 'ranged', 'prop') !== undefined
+  /* A range moved along a track always holds a value, so its answer is
+     never missing. A score picked from a row of steps is missing until one
+     is picked, which the scale holds as its choice. */
+  const ranges =
+    boundTo(use, 'ranged', 'prop') !== undefined && !uses.some((each) => each.machine === 'scale')
   return (props, around) =>
     useValidation(
       family,
@@ -172,6 +177,18 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useRange(family, props, use, around.touch),
+      ),
+    /* A score picked from a row of steps, which a choice touches the verdict
+       on, and which the verdict reads as its answer. */
+    ...uses
+      .filter((use) => use.machine === 'scale')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, value } = useScale(family, props, use, around.touch)
+            around.chosen.current = value
+            return behavior
+          },
       ),
     /* A number a reader types and steps, which steps the text its entry holds. */
     ...uses
