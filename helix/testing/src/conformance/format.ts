@@ -117,6 +117,11 @@ export interface Held {
  *   down, `by: -1`. The web steps its `<input type="range">` and sends
  *   `input` and `change`, as a browser does for an assistive technology's
  *   increment; a phone sends its control's increment or decrement action.
+ * - `hold`: a finger holds the element's `part` down while `ms`
+ *   milliseconds pass on the fake clock, then lets go, as a reader holds a
+ *   number input's stepper. The web sends a touch's `pointerdown`, moves the
+ *   clock, and sends `pointerup` and the click; a phone sends its press's
+ *   press-in, moves the clock, and sends its press-out and press.
  */
 export type Intent =
   | { readonly by: -1 | 1; readonly item: string; readonly kind: 'move' }
@@ -153,6 +158,7 @@ export type Intent =
   | { readonly kind: 'leave' }
   | { readonly kind: 'slide'; readonly to: number }
   | { readonly by: -1 | 1; readonly kind: 'adjust' }
+  | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
 
 /** A setup and what a reader does to it. */
 export interface Scenario {
@@ -406,6 +412,8 @@ export const say = (intent: Intent): string => {
       return `slide to ${intent.to}`
     case 'adjust':
       return intent.by > 0 ? 'increment' : 'decrement'
+    case 'hold':
+      return `hold ${intent.part} for ${intent.ms} ms`
   }
 }
 

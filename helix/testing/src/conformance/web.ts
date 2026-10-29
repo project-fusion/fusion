@@ -158,6 +158,36 @@ const key = (name: string, held: Held | undefined): void => {
   }
 }
 
+/**
+ * A finger held on a part while `ms` pass on the fake clock: a touch's
+ * `pointerdown`, the clock moved, then `pointerup` and the click a touch
+ * ends with, which a disabled control in the way gets none of.
+ */
+const hold = (
+  mounted: Mounted,
+  intent: Extract<Intent, { kind: 'hold' }>,
+  clock: Clock | undefined,
+): string | undefined => {
+  const part = mounted.root.shadowRoot?.querySelector(`[part~="${intent.part}"]`)
+  if (part === null || part === undefined) {
+    return `The element draws no ${intent.part} part.`
+  }
+  if (clock === undefined) {
+    return 'The harness was given no fake clock.'
+  }
+  const { ms } = intent
+  const { at, x, y } = landing(part)
+  const base = { bubbles: true, cancelable: true, clientX: x, clientY: y, composed: true }
+  const pointer = { ...base, isPrimary: true, pointerId: 2, pointerType: 'touch' }
+  at.dispatchEvent(new PointerEvent('pointerdown', { ...pointer, buttons: 1 }))
+  clock.advance(ms)
+  at.dispatchEvent(new PointerEvent('pointerup', pointer))
+  if (!pathOf(at).some((node) => node instanceof Element && node.matches(':disabled'))) {
+    at.dispatchEvent(new PointerEvent('click', { ...pointer, detail: 1 }))
+  }
+  return undefined
+}
+
 /** Moves an item one place with its grip: Space picks it up, an arrow moves it, Space drops it. */
 const nudge = async (mounted: Mounted, item: Element, by: -1 | 1): Promise<void> => {
   const grip = item.shadowRoot?.querySelector<HTMLElement>('[part~="grip"]')
@@ -201,10 +231,10 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
   send(window, 'pointerup', end)
 }
 
-/** Performs one intent on the mounted setup. A clock's intent is performed by `run`. */
+/** Performs one intent on the mounted setup. A clock's intent and a hold are performed by `run`. */
 const perform = async (
   mounted: Mounted,
-  intent: Exclude<Intent, { kind: 'hide' | 'show' | 'wait' }>,
+  intent: Exclude<Intent, { kind: 'hide' | 'hold' | 'show' | 'wait' }>,
 ): Promise<void> => {
   const item = (value: string | undefined) =>
     value === undefined ? mounted.root : (mounted.items.get(value) ?? mounted.root)
@@ -377,6 +407,12 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
       opened.length = 0
       if (intent.kind === 'hide' || intent.kind === 'show' || intent.kind === 'wait') {
         const cannot = moveClock(clock, intent)
+        if (cannot !== undefined) {
+          steps.push({ cannot, intent: say(intent) })
+          continue
+        }
+      } else if (intent.kind === 'hold') {
+        const cannot = hold(mounted, intent, clock)
         if (cannot !== undefined) {
           steps.push({ cannot, intent: say(intent) })
           continue

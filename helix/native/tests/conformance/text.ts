@@ -17,10 +17,45 @@ const fieldIn = (): View | undefined => {
     : [root, ...root.queryAll(() => true)].find((node) => node.type === 'TextInput')
 }
 
+/**
+ * Where focus stands while the field has it: the node the field hears keys
+ * on, where it hears any, as a number input's field steps with the arrows,
+ * and the field itself otherwise.
+ */
+export const textFocus = (run: Run): unknown => {
+  const field = fieldIn()
+  const listening = new Set(run.listening)
+  // biome-ignore lint/suspicious/noExplicitAny: the renderer's fibers are untyped
+  for (let fiber: any = field?.unstable_fiber; fiber; fiber = fiber.return) {
+    if (listening.has(fiber.stateNode)) {
+      return fiber.stateNode
+    }
+  }
+  return field
+}
+
 /** The text the field holds now. */
 const textIn = (field: View): string => {
   const value = field.props.value
   return typeof value === 'string' ? value : ''
+}
+
+/**
+ * Puts focus in the field, as a reader taps it or tabs to it, where it is
+ * not there already: the node it hears keys on, and its focus. **A disabled
+ * field takes none.**
+ */
+export const focusField = async (run: Run): Promise<void> => {
+  const field = fieldIn()
+  if (field === undefined) {
+    return
+  }
+  const state = field.props.accessibilityState as { readonly disabled?: boolean } | undefined
+  if (state?.disabled === true || run.focus.focused() === textFocus(run)) {
+    return
+  }
+  run.focus.place(textFocus(run))
+  await fireEvent(field, 'focus')
 }
 
 /**
@@ -41,10 +76,7 @@ export const typeInto = async (
   if (state?.disabled === true) {
     return undefined
   }
-  if (run.focus.focused() !== field) {
-    run.focus.place(field)
-    await fireEvent(field, 'focus')
-  }
+  await focusField(run)
   if (field.props.editable === false) {
     return undefined
   }
@@ -69,7 +101,7 @@ export const leave = async (run: Run): Promise<string | undefined> => {
   if (field === undefined) {
     return 'The setup draws no field to leave.'
   }
-  if (run.focus.focused() !== field) {
+  if (run.focus.focused() !== textFocus(run)) {
     return undefined
   }
   run.focus.place(null)
