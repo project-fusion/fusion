@@ -30,6 +30,8 @@
 //!   spin, bound the same way to the field whose role is `spinbutton`, and
 //!   to the presses that step it down and up. A score a reader picks from a
 //!   row of steps runs scale, bound to the box whose role is `radiogroup`.
+//!   A split a reader moves between two panes runs resize, bound to the box
+//!   whose role is `separator`.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -81,7 +83,7 @@ use crate::family::api::{
     Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle, ValueRange,
 };
 use crate::family::ir::DERIVATIONS;
-use crate::family::vocabulary::kinds::SCALE;
+use crate::family::vocabulary::kinds::{SCALE, SPLIT};
 
 #[path = "machines_controls.rs"]
 mod controls;
@@ -384,6 +386,80 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
     }
 }
 
+/// The props, the states, and the events a range binds, by the names its
+/// machine reads them under.
+fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
+    let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
+    for (name, value) in [
+        ("clearable", &range.clearable),
+        ("closed", &range.closed),
+        ("collapsed", &range.collapsed),
+        ("collapsible", &range.collapsible),
+        ("format", &range.format),
+        ("large", &range.large),
+        ("locale", &range.locale),
+        ("max", &range.max),
+        ("min", &range.min),
+        ("option", &range.option),
+        ("orientation", &range.orientation),
+        ("origin", &range.origin),
+        ("page", &range.page),
+        ("primary", &range.primary),
+        ("readonly", &range.readonly),
+        ("reserve", &range.reserve),
+        ("seed", &range.initial),
+        ("shut", &range.shut),
+        ("sliver", &range.sliver),
+        ("snap", &range.snap),
+        ("step", &range.step),
+        ("template", &range.template),
+        ("threshold", &range.threshold),
+    ] {
+        if let Some(prop) = value {
+            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    for (name, value) in [
+        ("basis", &range.basis),
+        ("ceiling", &range.ceiling),
+        ("dragging", &range.dragging),
+        ("floor", &range.floor),
+        ("flush", &range.flush),
+        ("folded", &range.folded),
+        ("fraction", &range.fraction),
+        ("from", &range.from),
+        ("full", &range.full),
+        ("highest", &range.highest),
+        ("lowest", &range.lowest),
+        ("share", &range.share),
+        ("reading", &range.reading),
+        ("ringed", &range.ringed),
+        ("said", &range.said),
+        ("span", &range.span),
+        ("spoken", &range.spoken),
+        ("stacked", &range.stacked),
+        ("to", &range.to),
+    ] {
+        if let Some(state) = value {
+            bind.insert(name.to_owned(), Bound::State(state.clone()));
+        }
+    }
+    for (name, value) in [
+        ("before", &range.before),
+        ("change", &range.change),
+        ("clear", &range.clear),
+        ("closing", &range.closing),
+        ("collapse", &range.collapse),
+        ("input", &range.input),
+        ("preview", &range.preview),
+    ] {
+        if let Some(event) = value {
+            bind.insert(name.to_owned(), Bound::Event(event.clone()));
+        }
+    }
+    bind
+}
+
 /// The range, bound to the box a reader moves it with, whose role is
 /// `slider`, and the prop behind that box's `disabled`. **No machine of
 /// core's holds it**: the web's element hears its `<input type="range">`,
@@ -400,62 +476,18 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
 /// over the row, with a press or a drag across it, the keys, and a screen
 /// reader's steps, and a press on the score chosen takes it back to none
 /// where the element is clearable.
+///
+/// **A range whose control is a `separator` is a split a reader moves
+/// between two panes**, as a splitter's: the native runtime hosts it as
+/// `resize` over the divider, with a drag on it, a double tap, the keys, and
+/// a screen reader's steps.
 fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
-    let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
-    for (name, value) in [
-        ("clearable", &range.clearable),
-        ("format", &range.format),
-        ("large", &range.large),
-        ("locale", &range.locale),
-        ("max", &range.max),
-        ("min", &range.min),
-        ("option", &range.option),
-        ("orientation", &range.orientation),
-        ("origin", &range.origin),
-        ("page", &range.page),
-        ("readonly", &range.readonly),
-        ("seed", &range.initial),
-        ("step", &range.step),
-        ("template", &range.template),
-    ] {
-        if let Some(prop) = value {
-            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
-        }
-    }
-    for (name, value) in [
-        ("ceiling", &range.ceiling),
-        ("dragging", &range.dragging),
-        ("floor", &range.floor),
-        ("fraction", &range.fraction),
-        ("from", &range.from),
-        ("full", &range.full),
-        ("share", &range.share),
-        ("reading", &range.reading),
-        ("ringed", &range.ringed),
-        ("said", &range.said),
-        ("span", &range.span),
-        ("spoken", &range.spoken),
-        ("to", &range.to),
-    ] {
-        if let Some(state) = value {
-            bind.insert(name.to_owned(), Bound::State(state.clone()));
-        }
-    }
-    for (name, value) in [
-        ("before", &range.before),
-        ("change", &range.change),
-        ("clear", &range.clear),
-        ("input", &range.input),
-        ("preview", &range.preview),
-    ] {
-        if let Some(event) = value {
-            bind.insert(name.to_owned(), Bound::Event(event.clone()));
-        }
-    }
+    let mut bind = range_binds(range);
     let control = nodes(tree).find(|node| {
         matches!(
             node.attributes.get("role"),
-            Some(Attribute::Text(role)) if role == "slider" || role == "spinbutton" || role == SCALE
+            Some(Attribute::Text(role))
+                if role == "slider" || role == "spinbutton" || role == SCALE || role == SPLIT
         )
     });
     if let Some(control) = control {
@@ -470,15 +502,19 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
         }
     }
     let typed = control.is_some_and(|control| control.kind == NodeKind::Field);
-    let picked = control.is_some_and(|control| {
-        matches!(control.attributes.get("role"), Some(Attribute::Text(role)) if role == SCALE)
-    });
+    let role = |wanted: &str| {
+        control.is_some_and(|control| {
+            matches!(control.attributes.get("role"), Some(Attribute::Text(role)) if role == wanted)
+        })
+    };
     MachineUse {
         bind,
         machine: if typed {
             "spin"
-        } else if picked {
+        } else if role(SCALE) {
             "scale"
+        } else if role(SPLIT) {
+            "resize"
         } else {
             "range"
         }

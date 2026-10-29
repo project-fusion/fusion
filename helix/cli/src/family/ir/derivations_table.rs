@@ -152,6 +152,7 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("speed-dial-name", "speedDialName"),
     ("speed-dial-shortcut", "speedDialShortcut"),
     ("speed-dial-shows-shortcut", "speedDialShowsShortcut"),
+    ("splitter-name", "splitterName"),
     ("stat-figure", "statFigure"),
     ("stat-label-last", "statLabelLast"),
     ("step-said", "stepSays"),

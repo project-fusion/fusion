@@ -96,7 +96,7 @@ pub const ROLES: &[Role] = &[
 
 /// The roles whose node reads as a range, `valuenow` among `valuemin` and
 /// `valuemax`.
-pub const RANGES: &[&str] = &["meter", "progressbar", "slider", "spinbutton"];
+pub const RANGES: &[&str] = &["meter", "progressbar", "separator", "slider", "spinbutton"];
 
 /// The roles of a range a reader moves, which may be disabled or read-only
 /// as a press or a field may: a box with one is the control.
@@ -106,6 +106,11 @@ pub const ADJUSTABLE: &[&str] = &["slider", "spinbutton"];
 /// a box with it is the control of the element's `range`, where it declares
 /// one, and may be disabled or read-only as a slider may.
 pub const SCALE: &str = "radiogroup";
+
+/// The role of the divider of a split a reader moves between two panes, as
+/// a splitter's: a box with it is the control of the element's `range`,
+/// where it declares one, and its value is where the divider stands.
+pub const SPLIT: &str = "separator";
 
 /// The roles a press that is checked takes.
 pub const CHECKABLE: &[&str] = &[
