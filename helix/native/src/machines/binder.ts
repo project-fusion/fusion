@@ -4,6 +4,7 @@ import type { Pager } from '../render/scroll'
 import type { Copied } from './copy'
 import type { Entered } from './entry'
 import type { Joined } from './join'
+import type { Spun } from './spin'
 import type { Turned } from './toggle'
 
 /** What every machine of one element reads beside its props, at one render. */
@@ -38,6 +39,11 @@ export interface Around {
   readonly joined: Joined | undefined
   /** The pager of each scrolling part, by the part's name, once it is drawn. */
   readonly pagers: ReadonlyMap<string, Pager>
+  /**
+   * What is wrong with a number a reader types and steps, which its spin
+   * writes as it draws, for the verdict on it.
+   */
+  readonly spun: { current: Spun | undefined }
   /**
    * What a press does in a stack of pages, which the stack's machines write
    * before the presses are bound: the part whose press goes back one page,

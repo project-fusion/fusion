@@ -322,13 +322,20 @@ const pressedAs = (styling: Styling, node: Node): Readonly<Record<string, unknow
  * labels it or its own `label`, what describes it as its hint, and whether
  * it is disabled. **React Native has no required state for a field**, and a
  * read-only field is a `TextInput` that is not editable.
+ *
+ * **A field whose role is `spinbutton` is a spin button with its range on
+ * Android.** On iOS it stays a text field, with no role and no range, as
+ * the web's is there: VoiceOver reads an adjustable field as a slider a
+ * reader cannot type in.
  */
 export const fieldSemantics = (styling: Styling, node: Node): Readonly<Record<string, unknown>> => {
   const label = labelOf(styling, node)
   const off = Boolean(bound(styling, node.attributes?.disabled, node.name))
+  const spins = node.attributes?.role === 'spinbutton' && Platform.OS !== 'ios'
   return {
     ...(label === undefined ? {} : { accessibilityLabel: label }),
     ...told(styling, node),
+    ...(spins ? { ...announcedAs(styling, node), ...readingOf(styling, node) } : {}),
     accessibilityState: { disabled: off },
   }
 }

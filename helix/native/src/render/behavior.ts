@@ -147,6 +147,8 @@ const HEARD = [
   'onFocus',
   'onLayout',
   'onPress',
+  'onPressIn',
+  'onPressOut',
   'onTouchCancel',
   'onTouchEnd',
   'onTouchStart',
@@ -175,7 +177,8 @@ const bothHeard = (
  * `binding` laid over `before`, for the same part. **Two bindings that each
  * hand the part a ref callback both get its view**, as an item's join and
  * its press each listen on the view a key is pressed on, and **both hear a
- * focus, a blur, or a touch**, as a press and a countdown's hold do.
+ * focus, a blur, a touch, or a press going in and out**, as a press and a
+ * countdown's hold do, and a press and a stepper's hold.
  */
 const over = (before: PartBinding | undefined, binding: PartBinding): PartBinding => {
   const wrap = around(before?.wrap, binding.wrap)

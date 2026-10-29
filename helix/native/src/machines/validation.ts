@@ -11,12 +11,14 @@ import {
 } from '@fusion.dev/helix-core/machines/validation/machine'
 import { TEXT_SENTENCES, textVerdict } from '@fusion.dev/helix-core/machines/validation/text'
 import * as validation from '@fusion.dev/helix-core/machines/validation/validation.generated'
+import { numberFieldWritten } from '@fusion.dev/helix-core/number-field'
 import { formatMessage } from '@fusion.dev/helix-core/words'
 import { type Ref, useCallback, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import { boundTo, camel, given } from './props'
+import type { Spun } from './spin'
 import { useMachine } from './use-machine'
 
 /** What a form control's ref offers beside its props, as a field's handle does. */
@@ -33,6 +35,8 @@ export interface FieldHandle {
 export interface Answered {
   /** Whether the answer is missing: an unchecked box, an empty field, or a set with nothing chosen. */
   readonly empty: boolean
+  /** What is wrong with a number a reader types and steps, which its range holds it to. */
+  readonly number?: Spun | undefined
   /**
    * The text a field holds, and whether the reader typed it, which its own
    * constraint reads: its length, its pattern, and its type.
@@ -66,6 +70,7 @@ const useConstraint = (
   props: Props,
   use: MachineUse,
   text: Answered['text'],
+  number: Answered['number'],
 ): Verdict => {
   const maxLength = countOf(given(family, props, boundTo(use, 'maxlength', 'prop')))
   const minLength = countOf(given(family, props, boundTo(use, 'minlength', 'prop')))
@@ -76,9 +81,20 @@ const useConstraint = (
   /* A sentence of its own for text that is too short counts the length
      however the text came, as a Pin Input's code is short until it fills. */
   const short = textOf(given(family, props, boundTo(use, 'short', 'prop')))
+  /* A number's sentences, by the flag each says, as the web element's props hold them. */
+  const sentence = (name: string): string =>
+    textOf(given(family, props, boundTo(use, name, 'prop')))
+  const flaw = number?.flaw
+  const verdict = flaw === undefined ? undefined : numberVerdict(flaw, sentence, number?.locale)
+  /* Kept by what it says, so the verdict is taken again only as that changes. */
+  const flag = verdict?.flags[0]
+  const said = verdict?.message ?? ''
   return useMemo(() => {
     if (value === undefined) {
       return VALID
+    }
+    if (flag !== undefined) {
+      return { flags: [flag], message: said }
     }
     if (short !== '' && minLength !== undefined && value !== '' && value.length < minLength) {
       return {
@@ -87,7 +103,43 @@ const useConstraint = (
       }
     }
     return textVerdict({ edited, maxLength, minLength, pattern, type, value })
-  }, [edited, maxLength, minLength, pattern, short, type, value])
+  }, [edited, flag, maxLength, minLength, pattern, said, short, type, value])
+}
+
+/**
+ * What a number's flaw says, with the sentence its prop holds and each
+ * number it names written in the locale, as the web element writes it.
+ */
+const numberVerdict = (
+  flaw: NonNullable<Spun['flaw']>,
+  sentence: (name: string) => string,
+  numbers: string | undefined,
+): Verdict => {
+  const words = locale().read()
+  const written = (at: number) => numberFieldWritten(at, numbers || words)
+  switch (flaw.flag) {
+    case 'badInput':
+      return { flags: ['badInput'], message: sentence('bad') }
+    case 'rangeOverflow':
+      return {
+        flags: ['rangeOverflow'],
+        message: formatMessage(sentence('over'), { max: written(flaw.max) }, words),
+      }
+    case 'rangeUnderflow':
+      return {
+        flags: ['rangeUnderflow'],
+        message: formatMessage(sentence('under'), { min: written(flaw.min) }, words),
+      }
+    case 'stepMismatch':
+      return {
+        flags: ['stepMismatch'],
+        message: formatMessage(
+          sentence('off'),
+          { above: written(flaw.above), below: written(flaw.below) },
+          words,
+        ),
+      }
+  }
 }
 
 /**
@@ -119,7 +171,7 @@ export const useValidation = (
   /* A field whose web element says the browser's sentence says Helix's. */
   const own = textOf(given(family, {}, missingProp))
   const sentence = own === '' && answered.text !== undefined ? TEXT_SENTENCES.missing : own
-  const constraint = useConstraint(family, props, use, answered.text)
+  const constraint = useConstraint(family, props, use, answered.text, answered.number)
   const barred =
     given(family, props, boundTo(use, 'disabled', 'prop')) === true ||
     given(family, props, boundTo(use, 'readonly', 'prop')) === true

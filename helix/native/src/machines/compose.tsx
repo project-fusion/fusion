@@ -27,6 +27,7 @@ import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
 import { scrollersOf } from './scrolling'
 import { setting } from './setting'
+import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
 import { stackRow } from './stack-row'
 import { useTour } from './tour'
@@ -67,7 +68,11 @@ const validating = (
       props,
       use,
       types
-        ? { empty: (around.entered?.value ?? '') === '', text: around.entered }
+        ? {
+            empty: (around.entered?.value ?? '') === '',
+            number: around.spun.current,
+            text: around.entered,
+          }
         : {
             empty: ranges
               ? false
@@ -168,6 +173,17 @@ export const behaviorFor = (family: Family): UseBehavior => {
           (props, around) =>
             useRange(family, props, use, around.touch),
       ),
+    /* A number a reader types and steps, which steps the text its entry holds. */
+    ...uses
+      .filter((use) => use.machine === 'spin')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, spun } = useSpin(family, props, use, around.entered)
+            around.spun.current = spun
+            return behavior
+          },
+      ),
     /* The layer before the presses, which read what it gives its anchor. */
     ...uses.filter((use) => use.machine === 'layer').map((use) => layering(family, use)),
     ...uses.filter((use) => use.machine === 'press').map((use) => pressing(family, use)),
@@ -202,11 +218,19 @@ export const behaviorFor = (family: Family): UseBehavior => {
   const judges = validating(family, uses)
   const axisOf = aroundToolbar(family)
   const entering = uses.find((use) => use.machine === 'entry')
+  /* A number a reader types and steps shapes the text its entry holds. */
+  const spinning = uses.find((use) => use.machine === 'spin')
   const enterer =
     entering === undefined
       ? (): Entered | undefined => undefined
       : (props: Props, touch: () => void): Entered | undefined =>
-          useEntry(family, props, entering, touch)
+          useEntry(
+            family,
+            props,
+            entering,
+            touch,
+            spinning === undefined ? undefined : spinShaping(family, props, spinning),
+          )
   const copying = uses.find((use) => use.machine === 'copy')
   const copier =
     copying === undefined
@@ -235,6 +259,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       joined,
       layering: {},
       pagers,
+      spun: { current: undefined },
       stacked: {},
       toggled,
       touch,
