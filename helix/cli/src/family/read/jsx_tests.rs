@@ -706,3 +706,38 @@ fn a_derivation_and_a_custom_property_are_written_in_place() {
         "{call_of}"
     );
 }
+
+#[test]
+fn a_text_input_is_a_field_with_the_web_s_words() {
+    assert_eq!(
+        tree(
+            r#"<TextInput autoComplete="email" autoGrow={props.loading} enterKeyHint="send" maxRows={4} multiline part="control" rows={3} />"#
+        ),
+        [call(
+            "field",
+            vec![
+                text("control"),
+                object(&[
+                    ("autocomplete", text("email")),
+                    ("grows", bind("loading")),
+                    ("enterkeyhint", text("send")),
+                    ("maxrows", Lit::Number(4.0)),
+                    ("multiline", Lit::Bool(true)),
+                    ("rows", Lit::Number(3.0)),
+                ]),
+            ],
+        )]
+    );
+}
+
+#[test]
+fn a_field_holds_no_nodes_and_takes_its_words_by_react_s_names() {
+    assert!(
+        refused(r#"<TextInput part="control"><View part="x" /></TextInput>"#)
+            .contains("`<TextInput>` holds no nodes")
+    );
+    assert!(
+        refused(r#"<TextInput autocomplete="email" part="control" />"#)
+            .contains("`autocomplete` is written `autoComplete`")
+    );
+}
