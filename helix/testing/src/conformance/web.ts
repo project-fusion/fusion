@@ -12,6 +12,7 @@ import { fakeImages, picturesAnswered } from './web-images.js'
 import { dismiss, focusPage, removePage } from './web-layer.js'
 import { deepActive, isOpen, leftBy, type Mounted, type Updatable } from './web-left.js'
 import { mountSetup } from './web-mount.js'
+import { adjust, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
 import { leave, typeInto, watchFocus } from './web-text.js'
@@ -139,6 +140,10 @@ const key = (name: string, held: Held | undefined): void => {
   const init = { bubbles: true, cancelable: true, composed: true, key: name, ...modifiers(held) }
   const down = new KeyboardEvent('keydown', init)
   at.dispatchEvent(down)
+  /* A script's key moves no range, so the harness takes its step, as a browser does. */
+  if (!down.defaultPrevented) {
+    rangeKey(at, name)
+  }
   const clicks = at instanceof HTMLButtonElement || (at instanceof HTMLAnchorElement && at.href)
   if (!down.defaultPrevented && name === 'Enter' && clicks) {
     ;(at as HTMLElement).click()
@@ -232,6 +237,12 @@ const perform = async (
     case 'leave':
       leave(mounted)
       return
+    case 'slide':
+      slide(mounted, intent.to)
+      return
+    case 'adjust':
+      adjust(mounted, intent.by)
+      return
     case 'open':
     case 'close': {
       const target = item(intent.item)
@@ -322,11 +333,11 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
 }
 
 /**
- * The families a reader types into, whose `input` on each edit is theirs and
- * is recorded. Every other family's `input` is the composed one its own
- * `<input>` sends, which no record holds.
+ * The families a reader types into or moves along a track, whose `input` on
+ * each edit or move is theirs and is recorded. Every other family's `input`
+ * is the composed one its own `<input>` sends, which no record holds.
  */
-const TYPED: ReadonlySet<string> = new Set(['input', 'pin-input', 'textarea'])
+const TYPED: ReadonlySet<string> = new Set(['input', 'pin-input', 'slider', 'textarea'])
 
 /** The name an event goes by in a record: its type without `helix-`, and a bare one as it is. */
 const nameOf = (type: string, family: string): string | undefined => {

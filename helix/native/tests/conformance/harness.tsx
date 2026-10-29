@@ -29,6 +29,7 @@ import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
+import { adjustBy, rangeFocus, ranges, slideTo } from './range'
 import { laySections } from './sections'
 import { leave, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
@@ -95,7 +96,7 @@ const hearing = (run: Run, name: string, value: string | null) => {
      toggle's do. */
   const collection = formOf(root.tag).api?.collection
   const announces = [collection?.before, ...[collection?.after ?? []].flat()].includes(name)
-  const typed = formOf(root.tag).api?.entry !== undefined
+  const typed = formOf(root.tag).api?.entry !== undefined || ranges(root.tag)
   const relayed =
     rootSends &&
     !announces &&
@@ -109,8 +110,8 @@ const hearing = (run: Run, name: string, value: string | null) => {
     /* `input` is left out, as the web half leaves it out: it records the
        events an element sends as `helix-` events and `change`, and an
        element's `input` is the composed one its own `<input>` sends. **An
-       element a reader types into sends its own `input` on each edit**, which
-       both halves record. An item whose event the element hears after it, as
+       element a reader types into or moves sends its own `input` on each
+       edit or move**, which both halves record. An item whose event the element hears after it, as
        a toast's message, says which item sent it, where the event carries no
        value. */
     if ((value !== null && relayed) || (name === 'input' && !typed)) {
@@ -232,7 +233,14 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
     case 'drag':
       return CANNOT.drag
     case 'focus': {
-      run.focus.place(intent.page === true ? PAGE : focusable(run, wordsOf(setup, intent.item)))
+      /* A range's focus is its control, which its label names. */
+      run.focus.place(
+        intent.page === true
+          ? PAGE
+          : intent.item === undefined && ranges(setup.tag)
+            ? rangeFocus(run)
+            : focusable(run, wordsOf(setup, intent.item)),
+      )
       return undefined
     }
     case 'key':
@@ -242,6 +250,10 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return typeInto(run, intent)
     case 'leave':
       return leave(run)
+    case 'slide':
+      return slideTo(run, intent)
+    case 'adjust':
+      return adjustBy(intent)
     case 'open':
     case 'close': {
       const words = wordsOf(setup, intent.item)
