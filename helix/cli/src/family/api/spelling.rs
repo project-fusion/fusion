@@ -321,21 +321,27 @@ const VALIDATION: &[Field] = &[
     ("minLength", "minlength", Name),
     ("pattern", "pattern", Name),
     ("required", "required", Name),
+    ("tooShort", "short", Name),
     ("type", "type", Name),
     ("valueMissing", "missing", Name),
 ];
 
 const ENTRY: &[Field] = &[
     ("blank", "blank", Name),
+    ("caret", "caret", Name),
+    ("clean", "cleans", Literal),
     ("clearShown", "shows", Name),
     ("clearable", "offers", Name),
     ("defaultProp", "initial", Name),
     ("onBeforeChange", "before", Name),
     ("onChange", "change", Name),
     ("onClear", "clear", Name),
+    ("length", "length", Name),
+    ("onComplete", "complete", Name),
     ("onInput", "input", Name),
     ("prop", "value", Name),
     ("readonly", "readonly", Name),
+    ("typed", "typed", Name),
 ];
 
 /// Each feature a source declares: its key, the intermediate form's key and

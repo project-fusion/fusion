@@ -6,7 +6,7 @@
 import { Fragment, type ReactNode } from 'react'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
-import { listedFor } from './computed'
+import { laidOr, listedFor } from './computed'
 import { bound, type Draw, given, type Scope } from './styles'
 
 /** The scope what a copy holds is drawn in: its own place in the tree, with the copy's entry. */
@@ -33,7 +33,7 @@ const entriesOf = (scope: Scope, node: Node): readonly Fields[] | undefined => {
   }
   const listed =
     typeof each === 'object' && each !== null && 'derive' in each
-      ? listedFor(scope, String(each.derive), (name) => given(scope, name))
+      ? listedFor(scope, String(each.derive), (name) => laidOr(scope, name, given(scope, name)))
       : bound(scope, each, node.name)
   return Array.isArray(listed)
     ? listed.filter((entry): entry is Fields => typeof entry === 'object' && entry !== null)

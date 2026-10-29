@@ -19,6 +19,7 @@ import { labelOr } from '../drilldown/drilldown-derivations.js'
 import { gridTracks } from '../grid-template/grid-template.js'
 import { formatNumber } from '../number-format/number-format.js'
 import { numberOf, numberOptions, textOf } from '../number-format/props.js'
+import { cleanCode, type PinCase, type PinType, separatorsAfter } from '../pin-code/pin-code.js'
 import { onApple } from '../platform/platform.js'
 import { removeName } from '../remove-name/remove-name.js'
 import { trendReading } from '../trend-figure/trend-props.js'
@@ -266,3 +267,57 @@ export const stepSays: Derivation = (props) => {
  * Apple".
  */
 export const tagRemoveName: Derivation = (props) => removeName(props)
+
+/** A Pin Input's box count, `length`, at least one. */
+const boxesOf = (props: DerivationProps): number => {
+  const length = Number(props.length ?? 6)
+  return Number.isInteger(length) && length >= 1 ? length : 6
+}
+
+/**
+ * `pin-input-clean`: the text a Pin Input holds after an edit, `value`, as
+ * its code: the characters its `type` accepts, cased as its `case` asks, cut
+ * at its `length`.
+ */
+export const pinInputClean: Derivation = (props) =>
+  cleanCode(
+    typeof props.value === 'string' ? props.value : '',
+    (props.type as PinType | undefined) ?? 'numeric',
+    (props.case as PinCase | undefined) ?? 'preserve',
+  ).slice(0, boxesOf(props))
+
+/**
+ * `pin-input-cells`: each box of a Pin Input, from the code it holds,
+ * `typed`, and the box the caret is in, `caret`, as a number or its digits,
+ * `-1` while the field has no focus. Each box's fields:
+ *
+ * - `shown`, its character, or the mask's in its place
+ * - `active`, the box the caret is in, and `filled`, a box holding a character
+ * - `bare`, a box that draws no caret, which only an empty box the caret is
+ *   in draws
+ * - `unmarked`, a box that draws no placeholder, which an empty box elsewhere
+ *   draws while the field has one
+ * - `separator`, what `format` draws after it
+ */
+export const pinInputCells: ListDerivation = (props) => {
+  const count = boxesOf(props)
+  const code = typeof props.typed === 'string' ? props.typed : ''
+  const caret = Number(props.caret ?? -1)
+  const mask = props.mask === true
+  const character = typeof props['mask-character'] === 'string' ? props['mask-character'] : '•'
+  const placeholder = typeof props.placeholder === 'string' ? props.placeholder : ''
+  const separators = separatorsAfter(typeof props.format === 'string' ? props.format : '', count)
+  return Array.from({ length: count }, (_, at) => {
+    const typed = code[at] ?? ''
+    const active = at === caret
+    return {
+      active,
+      at: String(at),
+      bare: !(active && typed === ''),
+      filled: typed !== '',
+      separator: separators[at] ?? '',
+      shown: typed === '' ? '' : mask ? character : typed,
+      unmarked: !(!active && typed === '' && placeholder !== ''),
+    }
+  })
+}

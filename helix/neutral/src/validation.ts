@@ -39,6 +39,12 @@ export interface Validation {
    */
   readonly pattern?: string
   /**
+   * The prop that holds the sentence for text shorter than `minLength`,
+   * where the length counts however the text came, as a Pin Input's code.
+   * `{length}` in it is how many characters fill the text.
+   */
+  readonly tooShort?: string
+  /**
    * The prop that holds what an entry's text is, as `email` or `url`, which
    * the text has to read as.
    */

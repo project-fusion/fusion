@@ -71,6 +71,7 @@ use serde::Serialize;
 use ts_rs::TS;
 
 use crate::family::api::{Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle};
+use crate::family::ir::DERIVATIONS;
 
 #[path = "machines_controls.rs"]
 mod controls;
@@ -316,6 +317,7 @@ fn toggled(toggle: &Toggle, tree: &[Node]) -> MachineUse {
 fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
     let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(entry.value.clone()))]);
     for (name, value) in [
+        ("length", &entry.length),
         ("offers", &entry.offers),
         ("readonly", &entry.readonly),
         ("seed", &entry.initial),
@@ -324,7 +326,17 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
             bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
         }
     }
-    for (name, value) in [("blank", &entry.blank), ("shows", &entry.shows)] {
+    if let Some(cleans) = &entry.cleans {
+        if let Some((_, function)) = DERIVATIONS.iter().find(|(name, _)| name == cleans) {
+            bind.insert("cleans".to_owned(), Bound::Derive((*function).to_owned()));
+        }
+    }
+    for (name, value) in [
+        ("blank", &entry.blank),
+        ("caret", &entry.caret),
+        ("shows", &entry.shows),
+        ("typed", &entry.typed),
+    ] {
         if let Some(state) = value {
             bind.insert(name.to_owned(), Bound::State(state.clone()));
         }
@@ -333,6 +345,7 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
         ("before", &entry.before),
         ("change", &entry.change),
         ("clear", &entry.clear),
+        ("complete", &entry.complete),
         ("input", &entry.input),
     ] {
         if let Some(event) = value {

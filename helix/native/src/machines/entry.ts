@@ -1,4 +1,5 @@
 import { focus } from '@fusion.dev/helix-core/capabilities/focus'
+import * as derivations from '@fusion.dev/helix-core/derivations'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { TextInputInstance } from 'react-native'
 import type { MachineUse } from '../ir.generated'
@@ -22,6 +23,72 @@ export interface Entered {
   readonly edited: boolean
   /** The text the field holds now. */
   readonly value: string
+}
+
+/**
+ * What a reader typed, as the derivation the form names turns it into the
+ * element's text, as a Pin Input keeps the characters its type accepts. The
+ * derivation reads the element's props by their names, with `value` the
+ * typed text. Typed text stands as it is where the form names none.
+ */
+const cleanerOf = (family: Family, use: MachineUse): ((typed: string, props: Props) => string) => {
+  const name = boundTo(use, 'cleans', 'derive')
+  const derivation =
+    name === undefined ? undefined : (derivations as Readonly<Record<string, unknown>>)[name]
+  if (typeof derivation !== 'function') {
+    return (typed) => typed
+  }
+  return (typed, props) => {
+    const read: Record<string, unknown> = {}
+    for (const prop of family.api?.props ?? []) {
+      read[prop.name] = given(family, props, prop.name)
+    }
+    const cleaned: unknown = derivation({ ...read, value: typed })
+    return typeof cleaned === 'string' ? cleaned : typed
+  }
+}
+
+/**
+ * What an entry gives its element's drawing: the field's view, `blank` while
+ * it holds no text, and on the host whether it has focus, whether the press
+ * that clears is drawn, and its text and caret for a derivation to read. **The
+ * caret stands after the text**, in the box it is in and the last box once
+ * the text fills them, as a phone's hidden field keeps it at the end, and
+ * `-1` while the field has no focus.
+ */
+const hosted = (
+  use: MachineUse,
+  part: string,
+  view: PartBinding,
+  now: {
+    readonly changes: boolean
+    readonly fills: number
+    readonly focused: boolean
+    readonly offered: boolean
+    readonly text: string
+  },
+): Behavior => {
+  const { changes, fills, focused, offered, text } = now
+  const blank = boundTo(use, 'blank', 'state')
+  const shows = boundTo(use, 'shows', 'state')
+  const typed = boundTo(use, 'typed', 'state')
+  const caretAt = boundTo(use, 'caret', 'state')
+  const last = (Number.isInteger(fills) ? fills : 1) - 1
+  const caret = focused ? Math.max(0, Math.min(text.length, last)) : -1
+  return {
+    marks: text === '' && blank !== undefined ? [blank] : [],
+    parts: {
+      [part]: view,
+      host: {
+        states: {
+          focusWithin: focused,
+          ...(shows === undefined ? {} : { [shows]: offered && text !== '' && changes }),
+          ...(typed === undefined ? {} : { [typed]: text }),
+          ...(caretAt === undefined ? {} : { [caretAt]: String(caret) }),
+        },
+      },
+    },
+  }
 }
 
 /** The text a prop holds, where it holds any. */
@@ -84,8 +151,11 @@ export const useEntry = (
     before: boundTo(use, 'before', 'event'),
     change: boundTo(use, 'change', 'event'),
     clear: boundTo(use, 'clear', 'event'),
+    complete: boundTo(use, 'complete', 'event'),
     input: boundTo(use, 'input', 'event'),
   }
+  const clean = useMemo(() => cleanerOf(family, use), [family, use])
+  const fills = Number(given(family, props, boundTo(use, 'length', 'prop')))
   const latest = useRef({ events, props, text, touch })
   latest.current = { events, props, text, touch }
   const disabled = given(family, props, boundTo(use, 'disabled', 'prop')) === true
@@ -135,13 +205,27 @@ export const useEntry = (
       focus().focus(field.current, false)
     }
   }, [ask, commit, family])
+  /* **A reader's edit that fills the text completes it**: `complete`, then
+     `change`, since a filled code is its commit, as on the web. */
   const onChangeText = useCallback(
-    (next: string) => {
-      if (ask(next)) {
-        edit(true)
+    (typed: string) => {
+      const next = clean(typed, latest.current.props)
+      if (next === latest.current.text) {
+        /* A refused character leaves the field's own text to draw again. */
+        hold((was) => ({ ...was }))
+        return
+      }
+      if (!ask(next)) {
+        return
+      }
+      edit(true)
+      const { complete } = latest.current.events
+      if (complete !== undefined && Number.isInteger(fills) && next.length === fills) {
+        tell(family, latest.current.props, complete, { value: next }, senderOf(family, next))
+        commit()
       }
     },
-    [ask],
+    [ask, clean, commit, family, fills],
   )
   const onFocus = useCallback(() => {
     committed.current = latest.current.text
@@ -151,9 +235,6 @@ export const useEntry = (
     holdFocus(false)
     commit()
   }, [commit])
-  const blank = text === ''
-  const blankState = boundTo(use, 'blank', 'state')
-  const shows = boundTo(use, 'shows', 'state')
   const view: PartBinding = useMemo(
     () => ({
       view: {
@@ -167,17 +248,12 @@ export const useEntry = (
     }),
     [disabled, fieldRef, onBlur, onChangeText, onFocus, readonly, text],
   )
-  const behavior: Behavior = {
-    marks: blank && blankState !== undefined ? [blankState] : [],
-    parts: {
-      [part]: view,
-      host: {
-        states: {
-          focusWithin: focused,
-          ...(shows === undefined ? {} : { [shows]: offered && !blank && !disabled && !readonly }),
-        },
-      },
-    },
-  }
+  const behavior = hosted(use, part, view, {
+    changes: !disabled && !readonly,
+    fills,
+    focused,
+    offered,
+    text,
+  })
   return { behavior, clear, clears, edited, value: text }
 }
