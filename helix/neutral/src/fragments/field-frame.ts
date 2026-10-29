@@ -14,7 +14,7 @@ const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as c
  *   at the width of the `<input>` inside it.
  * - **The ring goes on the frame**, in the edge's own color and with no
  *   offset, so a focused field reads as one thicker edge. It is drawn while
- *   focus is anywhere inside the element, after the hover edge, so a focused
+ *   focus is anywhere inside the frame, after the hover edge, so a focused
  *   field under the pointer keeps its ring.
  * - **A wrong field says so on the frame**, its edge and its ring, in a rule
  *   the family writes after taking this in, since a fragment declares no
@@ -29,8 +29,12 @@ export default fragment('field-frame', { parts: ['field', 'control'] }, ({ on, r
   on('host', [rule({ display: 'flex', flexDirection: 'column', gap: token('space-2xs') })]),
   on('field', [
     rule({ formDisabled: false, hover: true }, { borderColor: token('color-primary') }),
+    /* The frame's own focus, which holds whenever the host's does, since
+       every control a reader focuses is inside it. WebKit does not draw a
+       rule on the host's focus written inside `:where()` again as focus
+       moves, so a focused field there kept its resting edge. */
     rule(
-      { within: { host: ['focusWithin'] } },
+      { focusWithin: true },
       { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
     ),
   ]),
