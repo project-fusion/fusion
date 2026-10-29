@@ -73,6 +73,8 @@ own input and records, intent by intent:
   draws none of, and a row is chosen only where it is drawn
 - for a family a reader types into, as Input, the text its field holds and
   whether it is marked wrong, and its own `input` on each edit
+- for a family a reader moves along a track, as Slider, the value it holds,
+  and its own `input` on each move
 
 **A family's scenarios can be written before its native component exists.**
 They are staged in `STAGED`, and the web half runs and records them in the
@@ -119,6 +121,14 @@ command, which sends `input`, and the browser sends `change` as the field
 loses focus with other text. A phone changes its `TextInput`'s text and blurs
 it. A script's edit is never held to `minlength` and `maxlength`, so no
 scenario holds them; the native specs do.
+
+**`slide` drags the element's control to a fraction of its track and lets
+go, and `adjust` steps it as a screen reader does.** A script's event moves
+no `<input type="range">`, so the web sets the range's value where a browser
+would and sends `input`, and `change` as a drag lets go somewhere new or with
+each step. A `key` on a range that nothing took moves it as Chromium does.
+A phone presses its track at that point, and sends its control's increment
+or decrement action.
 
 `scroll` scrolls the element's part that scrolls to an offset, where it comes
 to rest: the web sets the offset and sends `scroll` and `scrollend`, and a

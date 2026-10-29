@@ -108,6 +108,15 @@ export interface Held {
  *   sends `change` where the text differs from the text it gained focus
  *   with, as a browser does on a reader's edit, and blurs it. A phone blurs
  *   its `TextInput`.
+ * - `slide`: drags the element's control along its track to `to`, a
+ *   fraction of the track from its start, 0 to 1, and lets go there. The
+ *   web moves its `<input type="range">` there and sends `input`, and
+ *   `change` where the value moved, as a browser does as a drag lets go; a
+ *   phone presses its track at that point.
+ * - `adjust`: a screen reader steps the element's control up, `by: 1`, or
+ *   down, `by: -1`. The web steps its `<input type="range">` and sends
+ *   `input` and `change`, as a browser does for an assistive technology's
+ *   increment; a phone sends its control's increment or decrement action.
  */
 export type Intent =
   | { readonly by: -1 | 1; readonly item: string; readonly kind: 'move' }
@@ -142,6 +151,8 @@ export type Intent =
   | { readonly kind: 'scroll'; readonly x: number; readonly y: number }
   | { readonly erase?: number; readonly kind: 'type'; readonly text?: string }
   | { readonly kind: 'leave' }
+  | { readonly kind: 'slide'; readonly to: number }
+  | { readonly by: -1 | 1; readonly kind: 'adjust' }
 
 /** A setup and what a reader does to it. */
 export interface Scenario {
@@ -256,6 +267,12 @@ export interface Left {
    * its verdict sets.
    */
   readonly text?: { readonly invalid: boolean; readonly value: string }
+  /**
+   * The value the element holds, for a family a reader moves along a
+   * track, as a slider: the web reads its `value`, and React Native the
+   * value its range machine holds.
+   */
+  readonly value?: string
   /**
    * Whether the element is waiting out its delay, unseen and silent, for a
    * family that holds itself back, as a loader. The web reads its `waiting`
@@ -385,6 +402,10 @@ export const say = (intent: Intent): string => {
       ].join(', then ')
     case 'leave':
       return 'leave the field'
+    case 'slide':
+      return `slide to ${intent.to}`
+    case 'adjust':
+      return intent.by > 0 ? 'increment' : 'decrement'
   }
 }
 
