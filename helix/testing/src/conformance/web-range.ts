@@ -79,10 +79,41 @@ const pressMarks = async (marks: Element, to: number): Promise<void> => {
 }
 
 /**
+ * A finger's drag of a splitter's `separator` to `to`, a fraction of the
+ * splitter from its start, as a reader carries the divider there: the
+ * pointer down on the divider, a frame, the pointer moved to that point
+ * along the splitter's axis, a frame, and the pointer up there.
+ */
+const dragSeparator = async (host: Element, separator: Element, to: number): Promise<void> => {
+  const box = host.getBoundingClientRect()
+  const from = separator.getBoundingClientRect()
+  const vertical = (host as { readonly vertical?: unknown }).vertical === true
+  const rtl = getComputedStyle(host).direction === 'rtl'
+  const along = Math.min(1, Math.max(0, to))
+  const x = vertical
+    ? from.left + from.width / 2
+    : rtl
+      ? box.right - along * box.width
+      : box.left + along * box.width
+  const y = vertical ? box.top + along * box.height : from.top + from.height / 2
+  const base = { bubbles: true, cancelable: true, composed: true }
+  const pointer = { ...base, button: 0, isPrimary: true, pointerId: 2, pointerType: 'touch' }
+  const start = { clientX: from.left + from.width / 2, clientY: from.top + from.height / 2 }
+  separator.dispatchEvent(new PointerEvent('pointerdown', { ...pointer, ...start, buttons: 1 }))
+  await frame()
+  separator.dispatchEvent(
+    new PointerEvent('pointermove', { ...pointer, buttons: 1, clientX: x, clientY: y }),
+  )
+  await frame()
+  separator.dispatchEvent(new PointerEvent('pointerup', { ...pointer, clientX: x, clientY: y }))
+}
+
+/**
  * Drags the range to `to`, a fraction of its track from its start, and lets
  * go: the value there, `input`, and `change` where the value moved, as a
  * browser commits a drag as it lets go. **A disabled range takes no drag.**
- * A row of `marks` is pressed at `to`.
+ * A row of `marks` is pressed at `to`, and a splitter's `separator` is
+ * dragged to `to` of the splitter.
  */
 export const slide = async (mounted: Mounted, to: number): Promise<void> => {
   const range = rangeOf(mounted)
@@ -90,6 +121,10 @@ export const slide = async (mounted: Mounted, to: number): Promise<void> => {
     const marks = mounted.root.shadowRoot?.querySelector('[part~="marks"]')
     if (marks !== null && marks !== undefined) {
       await pressMarks(marks, to)
+    }
+    const separator = mounted.root.shadowRoot?.querySelector('[part~="separator"]')
+    if (separator !== null && separator !== undefined) {
+      await dragSeparator(mounted.root, separator, to)
     }
     return
   }
