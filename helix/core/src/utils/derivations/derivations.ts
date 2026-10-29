@@ -53,6 +53,8 @@ export * from '../overlay/overlay-derivations.js'
 export * from '../qr-code/qr-derivations.js'
 /* Meter's, Progress's and Skeleton's, each one derivation. */
 export * from '../range-reading/indicator-derivations.js'
+/* Rating's, how many marks its row draws. */
+export * from '../rating/rating-derivations.js'
 /* Slider's, the marks along its track and the room its readout keeps. */
 export * from '../slider/slider-derivations.js'
 /* Speed Dial's, its long press, its names, and an action's shortcut. */

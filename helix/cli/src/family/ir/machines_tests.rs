@@ -255,6 +255,35 @@ fn a_form_control_runs_validation_bound_to_where_its_answer_is_held() {
 }
 
 #[test]
+fn a_score_picked_from_a_row_of_steps_runs_scale_bound_to_its_row() {
+    let rating = family(
+        "export default headless('rating', {
+          events: [event('change'), event('clear'), event('preview', ['value'])],
+          props: [prop('clearable', 'boolean'), prop('disabled', 'boolean'), prop('max', 'number'), prop('option-label', 'string'), prop('value', 'string')],
+          range: { clearable: 'clearable', full: 'full', max: 'max', onChange: 'change', onClear: 'clear', onPreview: 'preview', optionLabel: 'optionLabel', part: 'part', prop: 'value' },
+          tree: [box('marks', { disabled: bind('disabled'), role: 'radiogroup' })],
+        })",
+    );
+    assert_eq!(named(&rating.machines), vec!["scale"]);
+    assert_eq!(
+        rating.machines[0].bind,
+        bound(&[
+            ("change", Bound::Event("change".to_owned())),
+            ("clear", Bound::Event("clear".to_owned())),
+            ("clearable", Bound::Prop("clearable".to_owned())),
+            ("disabled", Bound::Prop("disabled".to_owned())),
+            ("full", Bound::State("full".to_owned())),
+            ("max", Bound::Prop("max".to_owned())),
+            ("option", Bound::Prop("option-label".to_owned())),
+            ("part", Bound::Part("marks".to_owned())),
+            ("preview", Bound::Event("preview".to_owned())),
+            ("share", Bound::State("part".to_owned())),
+            ("value", Bound::Prop("value".to_owned())),
+        ])
+    );
+}
+
+#[test]
 fn a_number_a_reader_types_and_steps_runs_entry_and_spin_bound_to_its_field_and_steppers() {
     let number = family(
         "export default headless('number-input', {

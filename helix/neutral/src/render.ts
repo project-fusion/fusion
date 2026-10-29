@@ -179,10 +179,19 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   /**
    * Where a range's value sits along its track and where its fill starts
    * and ends, each 0 to 1, its value as a number, and its value as a reader
-   * sees it and as a screen reader says it.
+   * sees it and as a screen reader says it. A score picked from a row of
+   * steps computes how many marks it fills whole and how much of the next.
    */
   readonly range: Computes<
-    'fillFrom' | 'fillSpan' | 'fillTo' | 'fraction' | 'reading' | 'said' | 'spoken'
+    | 'fillFrom'
+    | 'fillSpan'
+    | 'fillTo'
+    | 'fraction'
+    | 'full'
+    | 'part'
+    | 'reading'
+    | 'said'
+    | 'spoken'
   >
   /** Whether the press that clears a field is drawn. */
   readonly text: Computes<'clearShown'>
@@ -408,7 +417,7 @@ export interface ViewAttributes extends Named, Drawing {
   readonly children?: Child
   readonly style?: Style
   readonly current?: Given
-  /** Whether a reader can move it, where its role is `slider` or `spinbutton`. */
+  /** Whether a reader can move it, where its role is `slider`, `spinbutton`, or a range's `radiogroup`. */
   readonly disabled?: Given
   readonly element?: Given
   readonly hidden?: Given
