@@ -81,6 +81,53 @@ const keyboardOf = (scope: Scope, node: Node): TextInputProps => {
   }
 }
 
+/** A count a field binds, where it binds a whole number of at least one. */
+const countOf = (scope: Scope, node: Node, name: string): number | undefined => {
+  const value = bound(scope, node.attributes?.[name], node.name)
+  const count = typeof value === 'string' && value !== '' ? Number(value) : value
+  return typeof count === 'number' && Number.isInteger(count) && count >= 1 ? count : undefined
+}
+
+/**
+ * How tall a field of several lines stands, as a `<textarea>` stands `rows`
+ * lines tall. **A field that grows** takes its text's height from `rows`
+ * lines up to `maxrows`, and scrolls past them, as the web's `auto-grow`
+ * does. A field of one line takes the height its style gives.
+ */
+const linesOf = (
+  scope: Scope,
+  node: Node,
+  drawn: Readonly<Record<string, unknown>>,
+): Readonly<Record<string, unknown>> => {
+  if (node.attributes?.multiline !== true) {
+    return {}
+  }
+  const size = typeof drawn.fontSize === 'number' ? drawn.fontSize : 16
+  const line = typeof drawn.lineHeight === 'number' ? drawn.lineHeight : size * 1.2
+  const rows = countOf(scope, node, 'rows') ?? 2
+  const most = countOf(scope, node, 'maxrows')
+  const grows = bound(scope, node.attributes?.grows, node.name) === true
+  const tall = rows * line
+  /* iOS sets a multiline `TextInput`'s words in from its top edge, where a
+     stripped `<textarea>` has no padding: the part's own padding, or none. */
+  const inset = {
+    paddingBottom: drawn.paddingBottom ?? 0,
+    paddingTop: drawn.paddingTop ?? 0,
+  }
+  if (!grows) {
+    return { scrollEnabled: true, style: { ...inset, height: tall, textAlignVertical: 'top' } }
+  }
+  return {
+    scrollEnabled: most !== undefined,
+    style: {
+      ...inset,
+      minHeight: tall,
+      ...(most === undefined ? {} : { maxHeight: Math.max(tall, most * line) }),
+      textAlignVertical: 'top',
+    },
+  }
+}
+
 /**
  * Draws a field node: a `TextInput` in its part's style, its words in the
  * text style around it, and its placeholder in the color its `::placeholder`
@@ -96,6 +143,7 @@ export const drawField = (scope: Scope, node: Node, text: Style): ReactNode => {
     (StyleSheet.flatten([box, inherit(text, words)]) ?? {}) as Readonly<Record<string, unknown>>
   const placeholder = wordOf(scope, node, 'placeholder')
   const color = resolved.placeholder?.color
+  const { style: lines, ...scrolling } = linesOf(scope, node, drawn)
   const view = laid(
     scope.behavior,
     node.name,
@@ -106,7 +154,8 @@ export const drawField = (scope: Scope, node: Node, text: Style): ReactNode => {
       ...(typeof color === 'string' ? { placeholderTextColor: color } : {}),
       /* The theme scales the words with the reader's text size already, as every `Text` it draws. */
       allowFontScaling: false,
-      style: drawn,
+      ...scrolling,
+      style: { ...drawn, ...(lines as object | undefined) },
     },
     scope.item,
   )
