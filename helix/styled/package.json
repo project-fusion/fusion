@@ -460,6 +460,14 @@
       "types": "./dist/speed-dial/index.d.ts",
       "default": "./dist/speed-dial/index.js"
     },
+    "./splitter": {
+      "react-native": {
+        "types": "./dist/splitter/index.native.d.ts",
+        "default": "./dist/splitter/index.native.js"
+      },
+      "types": "./dist/splitter/index.d.ts",
+      "default": "./dist/splitter/index.js"
+    },
     "./stat": {
       "react-native": {
         "types": "./dist/stat/index.native.d.ts",

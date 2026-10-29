@@ -12,7 +12,7 @@ Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
-Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Stat,
+Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.
@@ -1710,6 +1710,41 @@ import { HelixRating } from '@fusion.dev/helix/rating'
   defaultValue="3"
   label="Rate your order"
   onChange={(event) => save(event.target.value)}
+/>
+```
+
+## Splitters
+
+`HelixSplitter`, from `@fusion.dev/helix/splitter`, draws the panes passed
+into `start` and `end` with the divider between them, the start pane as long
+as the divider's `position`, a percentage of the splitter. Each pane scrolls
+down where its content is longer. The divider is one adjustable element a
+screen reader reaches, named by `label`, reading its position as a
+percentage, or `collapsedLabel` while a pane is shut.
+
+A drag on the divider moves it with the finger, sending `onInput` at each
+step, and a double tap puts it back at `defaultPosition`. A screen reader's
+increment and decrement and a hardware keyboard's arrows along its axis move
+it by `step`, and Home and End take it to `min` and `max`, each a percentage
+or a length such as `16rem` measured against the splitter. A finger takes
+hold a little past the line on either side.
+
+**Each move asks first.** `onBeforeResize` carries the position in
+`event.detail.value`, and refusing it leaves the divider where it was;
+`onResized` follows a move that stands. A divider that lands at an edge, down
+to `collapsedSize`, shuts that pane, and Enter shuts the start pane and opens
+it again; each asks with `onBeforeCollapse`, and `onCollapse` follows. A shut
+pane opens back to where the divider stood. The corner where two dividers
+cross and F6 between the panes are the web's alone.
+
+```tsx
+import { HelixSplitter } from '@fusion.dev/helix/splitter'
+
+<HelixSplitter
+  defaultPosition={30}
+  end={<Editor />}
+  onResized={(event) => save(event.detail.value)}
+  start={<Files />}
 />
 ```
 

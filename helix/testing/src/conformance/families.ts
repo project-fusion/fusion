@@ -36,6 +36,7 @@ export type Family =
   | 'scroll-area'
   | 'slider'
   | 'speed-dial'
+  | 'splitter'
   | 'switch'
   | 'tabs'
   | 'tag-group'
