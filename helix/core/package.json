@@ -131,6 +131,10 @@
       "types": "./dist/utils/slider/slider.d.ts",
       "default": "./dist/utils/slider/slider.js"
     },
+    "./splitter": {
+      "types": "./dist/utils/splitter/splitter.d.ts",
+      "default": "./dist/utils/splitter/splitter.js"
+    },
     "./stack": {
       "types": "./dist/utils/stack/stack.d.ts",
       "default": "./dist/utils/stack/stack.js"

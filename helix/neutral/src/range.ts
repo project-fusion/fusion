@@ -35,18 +35,48 @@
  * and End the first and the last, and a screen reader's increment and
  * decrement the same. Where `clearable` holds, a press on the score chosen,
  * or Backspace or Delete, takes it back to none, and `onClear` follows.
+ *
+ * **A range whose control is a `<View role="separator">` is the divider of
+ * a split a reader moves between two panes**, as a splitter's: its value is
+ * the first pane's share of the element, as a percentage. A drag on the
+ * divider moves it with the finger and stands as it lets go, a double tap
+ * puts it back at its seed, the arrows along its axis move it by `step`,
+ * Home and End take it to its bounds, Enter shuts the first pane and opens
+ * it again, and a screen reader's increment and decrement move it by a
+ * step. A divider moved to an edge a pane can shut at shuts that pane,
+ * which `collapsed` holds and `onBeforeCollapse` asks for first.
  */
 export interface ValueRange {
   /** The state the element is in while its value stands at its largest. */
   readonly atMax?: string
   /** The state the element is in while its value stands at its smallest. */
   readonly atMin?: string
+  /**
+   * The name of the value the element computes as where a split's divider
+   * stands, as a percentage of the element, such as `40%`. A render reads
+   * it as `range.basis`.
+   */
+  readonly basis?: string
   /** The prop that lets a reader take a score back to none, by a press on the score chosen, or Backspace or Delete. */
   readonly clearable?: string
-  /** The state the element is in while a reader drags it. */
-  readonly dragging?: string
+  /** The prop that holds which pane of a split is shut, `start` or `end`. */
+  readonly collapsed?: string
+  /** The prop that holds the words a screen reader says for a split's divider while a pane is shut. */
+  readonly collapsedLabel?: string
+  /** The prop that holds how much of a shut pane still shows, as a percentage. */
+  readonly collapsedSize?: string
+  /** The state the element is in while a pane of a split is shut. */
+  readonly collapsedState?: string
+  /** The prop that holds which panes a reader can shut: `start`, `end`, `both`, or `none`. */
+  readonly collapsible?: string
+  /** The prop that seeds which pane of a split is shut, where nothing sets it. */
+  readonly defaultCollapsed?: string
   /** The prop that seeds the value where nothing sets it, as `defaultValue`. */
   readonly defaultProp?: string
+  /** The state the element is in while a reader drags it. */
+  readonly dragging?: string
+  /** The prop that holds the least a split's end pane keeps, in the units `min` takes. */
+  readonly endMin?: string
   /**
    * The name of the value the element computes as where its fill starts
    * along the track, 0 to 1: its `origin`, or the value where that is nearer
@@ -63,6 +93,12 @@ export interface ValueRange {
    * along the track, 0 to 1. A render reads it as `range.fillTo`.
    */
   readonly fillTo?: string
+  /**
+   * The name of the value the element computes as whether a split's divider
+   * stands against an edge with no pane beside it. A render reads it as
+   * `range.flush`.
+   */
+  readonly flush?: string
   /** The state the element is in while its control has focus the keyboard brought. */
   readonly focusVisible?: string
   /** The prop that holds the options the value is written with, as `Intl.NumberFormat` takes them. */
@@ -77,10 +113,20 @@ export interface ValueRange {
    * it shows fills whole, as a rating's. A render reads it as `range.full`.
    */
   readonly full?: string
+  /**
+   * The name of the value the element computes as the largest value a
+   * screen reader hears it may take. A render reads it as `range.highest`.
+   */
+  readonly highest?: string
   /** The prop that holds how many steps Page Up and Page Down take, where `pageStep` does not say how far. */
   readonly largeStep?: string
   /** The prop that holds the locale the value is written in. */
   readonly locale?: string
+  /**
+   * The name of the value the element computes as the smallest value a
+   * screen reader hears it may take. A render reads it as `range.lowest`.
+   */
+  readonly lowest?: string
   /** The prop that holds the largest value. */
   readonly max?: string
   /** The prop that holds the smallest value. */
@@ -90,10 +136,17 @@ export interface ValueRange {
    * the value it would leave as `value`.
    */
   readonly onBeforeChange?: string
+  /**
+   * The event sent before a pane of a split shuts or opens, which a handler
+   * can cancel, with the pane shut as `value`, or `''` where both stand open.
+   */
+  readonly onBeforeCollapse?: string
   /** The event sent once a move is done. */
   readonly onChange?: string
   /** The event sent once a score is taken back to none, after `onInput` and `onChange`. */
   readonly onClear?: string
+  /** The event sent once a pane of a split shuts or opens, with the pane shut as `value`. */
+  readonly onCollapse?: string
   /** The event sent once each move stands. */
   readonly onInput?: string
   /**
@@ -115,6 +168,8 @@ export interface ValueRange {
    * A render reads it as `range.part`.
    */
   readonly part?: string
+  /** The prop that holds the pane of a split that keeps its length as the element's own length changes. */
+  readonly primary?: string
   /** The prop that holds the value. */
   readonly prop: string
   /**
@@ -129,6 +184,10 @@ export interface ValueRange {
    * reader sees it, in its format. A render reads it as `range.said`.
    */
   readonly said?: string
+  /** The prop that holds the places a split's dragged divider snaps to, comma separated. */
+  readonly snap?: string
+  /** The prop that holds how close, in points, a drag comes to a snap place to land on it. */
+  readonly snapThreshold?: string
   /**
    * The name of the value the element computes as the words a screen reader
    * says for its value, where its format or its `valueText` asks for any. A
@@ -139,4 +198,6 @@ export interface ValueRange {
   readonly step?: string
   /** The prop that holds the sentence a screen reader says for the value, with `{value}` in its place. */
   readonly valueText?: string
+  /** The state the element is in while a split's panes stand one above the other. */
+  readonly vertical?: string
 }
