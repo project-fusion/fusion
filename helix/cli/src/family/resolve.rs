@@ -378,9 +378,11 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
 }
 
 /// The range's fields, each held to what its docs say it names, and the
-/// control a reader moves its value with, the node whose role is `slider`.
+/// control a reader moves its value with, the node whose role is `slider`,
+/// or the row of steps a reader picks a score from, whose role is
+/// `radiogroup`.
 fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
-    let controls = adjustables(&family.tree);
+    let mut controls = adjustables(&family.tree);
     let stepping = steppers(&family.tree);
     let Some(range) = &family.api.range else {
         for name in controls {
@@ -396,6 +398,7 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
         return;
     };
     references("range", range.references(), names, found);
+    controls.extend(scales(&family.tree));
     if controls
         .iter()
         .any(|name| fields(&family.tree).contains(name))
@@ -408,7 +411,7 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     }
     if !family.tree.is_empty() && controls.len() != 1 {
         found.push(format!(
-            "the element declares a `range`, and its tree draws {} boxes whose role is `slider` or `spinbutton`, where one moves its value",
+            "the element declares a `range`, and its tree draws {} boxes whose role is `slider`, `spinbutton`, or `radiogroup`, where one moves its value",
             controls.len()
         ));
     }
@@ -423,6 +426,23 @@ fn steppers(nodes: &[Node]) -> Vec<&str> {
             found.push(node.name.as_str());
         }
         found.extend(steppers(&node.children));
+    }
+    found
+}
+
+/// The name of each box whose role is `radiogroup`, a row of steps a
+/// reader picks a score from where the element declares a `range`, in the
+/// order the tree draws them.
+fn scales(nodes: &[Node]) -> Vec<&str> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if matches!(
+            node.attributes.get("role"),
+            Some(Attribute::Text(role)) if role == crate::family::vocabulary::kinds::SCALE
+        ) {
+            found.push(node.name.as_str());
+        }
+        found.extend(scales(&node.children));
     }
     found
 }

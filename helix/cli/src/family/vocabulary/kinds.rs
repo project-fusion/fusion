@@ -102,6 +102,11 @@ pub const RANGES: &[&str] = &["meter", "progressbar", "slider", "spinbutton"];
 /// as a press or a field may: a box with one is the control.
 pub const ADJUSTABLE: &[&str] = &["slider", "spinbutton"];
 
+/// The role of a row of steps a reader picks a score from, as a rating's:
+/// a box with it is the control of the element's `range`, where it declares
+/// one, and may be disabled or read-only as a slider may.
+pub const SCALE: &str = "radiogroup";
+
 /// The roles a press that is checked takes.
 pub const CHECKABLE: &[&str] = &[
     "checkbox",

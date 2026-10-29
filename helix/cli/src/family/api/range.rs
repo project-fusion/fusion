@@ -3,7 +3,8 @@
 //! it, and the events a move sends. The node whose role is `slider` is the
 //! control a reader drags, presses, and steps with the keys. A field whose
 //! role is `spinbutton` is a number a reader types and steps, with the keys
-//! and the presses that `steps`.
+//! and the presses that `steps`. A box whose role is `radiogroup` is a row
+//! of steps a reader picks a score from, as a rating's.
 
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -29,6 +30,14 @@ pub struct ValueRange {
     /// so it steps no further up, as a number input's `at-max`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ceiling: Option<String>,
+    /// The event sent once a score is taken back to none, as a rating's
+    /// `clear`, after `input` and `change`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clear: Option<String>,
+    /// The prop that lets a reader take a score back to none: a press on the
+    /// score chosen, or Backspace or Delete, as a rating's `clearable`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clearable: Option<String>,
     /// The state the element is in while a reader drags it, as a slider's
     /// `dragging`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,6 +59,10 @@ pub struct ValueRange {
     /// the start. A render reads it as `range.fillFrom`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub from: Option<String>,
+    /// The value the element computes as how many marks the score it shows
+    /// fills whole, as a rating's. A render reads it as `range.full`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub full: Option<String>,
     /// The prop that seeds the value where nothing sets it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub initial: Option<String>,
@@ -69,6 +82,11 @@ pub struct ValueRange {
     /// The prop that holds the smallest value.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min: Option<String>,
+    /// The prop that holds the words each score a reader picks is named by,
+    /// with `{score}` and `{max}` in their places, as a rating's
+    /// `option-label`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub option: Option<String>,
     /// The prop that holds `vertical` where the track stands on end.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub orientation: Option<String>,
@@ -79,6 +97,11 @@ pub struct ValueRange {
     /// The prop that holds how far Page Up and Page Down move the value.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<String>,
+    /// The event sent as the score a reader's drag shows changes, with that
+    /// score as `value`, or `''` once the element shows its own score again,
+    /// as a rating's `preview`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preview: Option<String>,
     /// The value the element computes as its value, a number, as a screen
     /// reader reads it. A render reads it as `range.reading`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,6 +118,11 @@ pub struct ValueRange {
     /// it, in its format. A render reads it as `range.said`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub said: Option<String>,
+    /// The value the element computes as how much of the mark after the
+    /// whole ones the score it shows fills, 0 to 1, as a rating's. A render
+    /// reads it as `range.part`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub share: Option<String>,
     /// The value the element computes as the words a screen reader says for
     /// its value, where its format or its `template` asks for any. A render
     /// reads it as `range.spoken`.
@@ -128,6 +156,8 @@ impl ValueRange {
             ("before", self.before.as_ref(), Names::Event),
             ("ceiling", self.ceiling.as_ref(), Names::State),
             ("change", self.change.as_ref(), Names::Event),
+            ("clear", self.clear.as_ref(), Names::Event),
+            ("clearable", self.clearable.as_ref(), Names::Prop),
             ("dragging", self.dragging.as_ref(), Names::State),
             ("floor", self.floor.as_ref(), Names::State),
             ("format", self.format.as_ref(), Names::Prop),
@@ -137,9 +167,11 @@ impl ValueRange {
             ("locale", self.locale.as_ref(), Names::Prop),
             ("max", self.max.as_ref(), Names::Prop),
             ("min", self.min.as_ref(), Names::Prop),
+            ("option", self.option.as_ref(), Names::Prop),
             ("orientation", self.orientation.as_ref(), Names::Prop),
             ("origin", self.origin.as_ref(), Names::Prop),
             ("page", self.page.as_ref(), Names::Prop),
+            ("preview", self.preview.as_ref(), Names::Event),
             ("readonly", self.readonly.as_ref(), Names::Prop),
             ("ringed", self.ringed.as_ref(), Names::State),
             ("step", self.step.as_ref(), Names::Prop),
@@ -159,6 +191,8 @@ impl ValueRange {
             ("range.fillSpan", self.span.as_ref()),
             ("range.fillTo", self.to.as_ref()),
             ("range.fraction", self.fraction.as_ref()),
+            ("range.full", self.full.as_ref()),
+            ("range.part", self.share.as_ref()),
             ("range.reading", self.reading.as_ref()),
             ("range.said", self.said.as_ref()),
             ("range.spoken", self.spoken.as_ref()),
@@ -187,24 +221,30 @@ pub fn range(lit: &Lit) -> Result<ValueRange, String> {
             "before" => &mut read.before,
             "ceiling" => &mut read.ceiling,
             "change" => &mut read.change,
+            "clear" => &mut read.clear,
+            "clearable" => &mut read.clearable,
             "dragging" => &mut read.dragging,
             "floor" => &mut read.floor,
             "format" => &mut read.format,
             "fraction" => &mut read.fraction,
             "from" => &mut read.from,
+            "full" => &mut read.full,
             "initial" => &mut read.initial,
             "input" => &mut read.input,
             "large" => &mut read.large,
             "locale" => &mut read.locale,
             "max" => &mut read.max,
             "min" => &mut read.min,
+            "option" => &mut read.option,
             "orientation" => &mut read.orientation,
             "origin" => &mut read.origin,
             "page" => &mut read.page,
+            "preview" => &mut read.preview,
             "reading" => &mut read.reading,
             "readonly" => &mut read.readonly,
             "ringed" => &mut read.ringed,
             "said" => &mut read.said,
+            "share" => &mut read.share,
             "spoken" => &mut read.spoken,
             "span" => &mut read.span,
             "step" => &mut read.step,
