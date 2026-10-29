@@ -8,6 +8,7 @@
 pub const LIST_DERIVATIONS: &[(&str, &str)] = &[
     ("breadcrumb-fold-items", "breadcrumbFoldItems"),
     ("kbd-key-list", "kbdKeyList"),
+    ("pin-input-cells", "pinInputCells"),
 ];
 
 /// Whether `function`, a function in core's derivations, returns a list.
