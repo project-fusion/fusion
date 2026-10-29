@@ -5,7 +5,7 @@ This is a pilot, and its families are Accordion, Announcement, App Header, Avata
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
-Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Pin Input, Popover, Progress, QR Code,
+Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
@@ -690,6 +690,19 @@ a reader sees it and as a screen reader says it. The web element is a native
 `<input type="range">`, and a phone runs the `range` machine over the
 control, with a drag along it, a press that jumps, the keys, and a screen
 reader's increment and decrement.
+
+**A number a reader types and steps declares both**, a `text` and a
+`range` on the same prop, and its control is a `<TextInput
+role="spinbutton">`. Its range names `largeStep`, how many steps Page Up and
+Page Down take, and `atMin` and `atMax`, the states it is in at either end,
+and each `<Pressable steps="down">` or `steps="up"` steps it, again while it
+is held. A phone runs the `spin` machine over the field the entry types
+into: the text settles into the range as the reader leaves the field or
+presses Enter, shows in its format while the field has no focus, and the
+keys, a screen reader, and the steppers step it, with core's number-field
+arithmetic, the same the web element reads. Its `validation` names the
+sentences for text that is no number, `badInput`, a number past either end,
+`rangeUnderflow` and `rangeOverflow`, and one off its step, `stepMismatch`.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest

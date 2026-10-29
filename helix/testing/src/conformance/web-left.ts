@@ -111,7 +111,7 @@ const currentItem = (item: Element): boolean => {
 const READS: ReadonlySet<string> = new Set(['format-date', 'timeline'])
 
 /** The families a reader types into, whose record says what the field holds. */
-const TEXTS: ReadonlySet<string> = new Set(['input', 'pin-input', 'textarea'])
+const TEXTS: ReadonlySet<string> = new Set(['input', 'number-input', 'pin-input', 'textarea'])
 
 /** The families a reader moves along a track, whose record says the value they hold. */
 const VALUES: ReadonlySet<string> = new Set(['slider'])
