@@ -571,19 +571,22 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     this.removeEventListener('pointerleave', this.handleLeave)
   }
 
+  /** The score the last `helix-preview` carried, `''` once the marks show the score again. */
+  private previewSent = ''
+
   /** Whether the console has already been told about a `min` off the scale. */
   private warned = false
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
-    /* Once per change of what is previewed, not per pointer move: Lit records
-       `previewing` only when it differs. */
-    if (changed.has('previewing')) {
-      this.dispatchEvent(
-        new HelixPreviewEvent({
-          value: this.previewing === undefined ? '' : String(this.previewing),
-        }),
-      )
+    /* Once per change of what is previewed, not per pointer move. Lit records
+       `previewing` where it was set to something else, even where it was set
+       back before the update, as a press and its release in one task set it
+       and then cleared it, so the preview last sent is what it is held to. */
+    const previewed = this.previewing === undefined ? '' : String(this.previewing)
+    if (changed.has('previewing') && previewed !== this.previewSent) {
+      this.previewSent = previewed
+      this.dispatchEvent(new HelixPreviewEvent({ value: previewed }))
     }
     // Every update, not only the ones that name `value`: see the note on
     // `MixinPickerField.updated`.
