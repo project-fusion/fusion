@@ -25,6 +25,7 @@ import { pressing } from './pressing'
 import { boundTo } from './props'
 import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
+import { useSplit } from './resize'
 import { useScale } from './scale'
 import { scrollersOf } from './scrolling'
 import { setting } from './setting'
@@ -189,6 +190,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
             around.chosen.current = value
             return behavior
           },
+      ),
+    /* The divider of a split a reader moves between two panes. */
+    ...uses
+      .filter((use) => use.machine === 'resize')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useSplit(family, props, use),
       ),
     /* A number a reader types and steps, which steps the text its entry holds. */
     ...uses
