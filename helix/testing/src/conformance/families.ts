@@ -32,6 +32,7 @@ export type Family =
   | 'popover'
   | 'qr-code'
   | 'scroll-area'
+  | 'slider'
   | 'speed-dial'
   | 'switch'
   | 'tabs'
