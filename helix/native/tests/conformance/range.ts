@@ -111,7 +111,8 @@ export const adjustBy = async (
 export const rangeLeft = (run: Run): Pick<Left, 'value'> => {
   const { tag } = run.scenario.setup
   const reading = formOf(tag).api?.range?.reading
-  if (reading === undefined) {
+  /* A number a reader types holds its text, which its text record says. */
+  if (reading === undefined || formOf(tag).api?.entry !== undefined) {
     return {}
   }
   return { value: String(HOST_STATES.get(tag)?.[reading] ?? '') }
