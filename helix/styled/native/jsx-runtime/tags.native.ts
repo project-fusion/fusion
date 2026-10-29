@@ -47,6 +47,7 @@ import { HelixRadio, HelixRadioGroup } from '../radio/index.native'
 import { HelixScrollArea } from '../scroll-area/index.native'
 import { HelixSkeleton } from '../skeleton/index.native'
 import { HelixSkipLink } from '../skip-link/index.native'
+import { HelixSlider } from '../slider/index.native'
 import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../speed-dial/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
 import { HelixStep, HelixSteps } from '../steps/index.native'
@@ -168,6 +169,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-scroll-area': HelixScrollArea,
   'helix-skeleton': HelixSkeleton,
   'helix-skip-link': HelixSkipLink,
+  'helix-slider': HelixSlider,
   'helix-speed-dial': HelixSpeedDial,
   'helix-speed-dial-group': HelixSpeedDialGroup,
   'helix-speed-dial-item': HelixSpeedDialItem,

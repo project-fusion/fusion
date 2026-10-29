@@ -427,6 +427,14 @@
       "types": "./dist/skip-link/index.d.ts",
       "default": "./dist/skip-link/index.js"
     },
+    "./slider": {
+      "react-native": {
+        "types": "./dist/slider/index.native.d.ts",
+        "default": "./dist/slider/index.native.js"
+      },
+      "types": "./dist/slider/index.d.ts",
+      "default": "./dist/slider/index.js"
+    },
     "./specs": null,
     "./speed-dial": {
       "react-native": {
