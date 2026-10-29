@@ -130,6 +130,12 @@ each step. A `key` on a range that nothing took moves it as Chromium does.
 A phone presses its track at that point, and sends its control's increment
 or decrement action.
 
+**`hold` holds a finger on a part while the fake clock moves, then lets
+go**, as a reader holds a number input's stepper. The web sends a touch's
+`pointerdown`, moves the clock, and sends `pointerup` and the click; a phone
+sends its press's press-in, moves the clock, and sends its press-out and
+press. A scenario with a `hold` moves the clock.
+
 `scroll` scrolls the element's part that scrolls to an offset, where it comes
 to rest: the web sets the offset and sends `scroll` and `scrollend`, and a
 phone sends its scroll view's scroll and the end of a glide.
