@@ -14,8 +14,14 @@
  * pattern it matches, and what its type says it is. The web asks its
  * `<input>`, and a phone works each out in JavaScript with Helix's own
  * sentences.
+ *
+ * **A number a reader types and steps is held to its `range`**: text that
+ * reads as no number, a number past either end, and one off its step, each
+ * with the sentence its prop holds.
  */
 export interface Validation {
+  /** The prop that holds the sentence for text that reads as no number. */
+  readonly badInput?: string
   /**
    * The prop that holds the page's own message, which shows at once.
    */
@@ -38,6 +44,15 @@ export interface Validation {
    * The prop that holds a regular expression an entry's text matches whole.
    */
   readonly pattern?: string
+  /** The prop that holds the sentence for a number above its largest, with `{max}` in its place. */
+  readonly rangeOverflow?: string
+  /** The prop that holds the sentence for a number below its smallest, with `{min}` in its place. */
+  readonly rangeUnderflow?: string
+  /**
+   * The prop that holds the sentence for a number off its step, with
+   * `{below}` and `{above}` in place of the nearest numbers on it.
+   */
+  readonly stepMismatch?: string
   /**
    * The prop that holds the sentence for text shorter than `minLength`,
    * where the length counts however the text came, as a Pin Input's code.

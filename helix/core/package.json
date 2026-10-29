@@ -98,6 +98,10 @@
       "types": "./dist/utils/menu-items/menu-items.d.ts",
       "default": "./dist/utils/menu-items/menu-items.js"
     },
+    "./number-field": {
+      "types": "./dist/utils/number-field/number-field.d.ts",
+      "default": "./dist/utils/number-field/number-field.js"
+    },
     "./numbers": {
       "types": "./dist/utils/number-format/number-format.d.ts",
       "default": "./dist/utils/number-format/number-format.js"

@@ -45,6 +45,16 @@ const PART: &[NodeKind] = &[NodeKind::Box, NodeKind::Pressable];
 const DRAWS: &[NodeKind] = &[NodeKind::Box, NodeKind::Wrap];
 /// A part, or a layer: what a screen reader hears by a role and a name.
 const NAMED: &[NodeKind] = &[NodeKind::Box, NodeKind::Layer, NodeKind::Pressable];
+/// A part, a layer, or a field: what takes a role. A field takes only the
+/// role of a number a reader steps, `spinbutton`.
+const ROLED: &[NodeKind] = &[
+    NodeKind::Box,
+    NodeKind::Field,
+    NodeKind::Layer,
+    NodeKind::Pressable,
+];
+/// A part, or a field a reader steps: what reads as a range.
+const READS: &[NodeKind] = &[NodeKind::Box, NodeKind::Field, NodeKind::Pressable];
 
 /// Each attribute: its name, the kinds of node that take it, and its value.
 ///
@@ -276,7 +286,7 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("readonly", ANSWER, Shape::Flag),
     /* `aria-required`. A phone has no such state, and its hint says it. */
     ("required", ANSWER, Shape::Flag),
-    ("role", NAMED, Shape::Role),
+    ("role", ROLED, Shape::Role),
     /* How many lines tall a field of several lines stands: a `<textarea>`'s
     `rows`, and a phone's `TextInput` that many line heights tall. */
     ("rows", FIELD, Shape::Count),
@@ -291,6 +301,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("scrolls", PRESS, Shape::OneOf(&["end", "start"])),
     ("selected", PRESS, Shape::Flag),
     ("sends", PRESS, Shape::Name),
+    /* The press that steps the element's range down or up, and again while
+    it is held, as a number input's steppers. */
+    ("steps", PRESS, Shape::OneOf(&["down", "up"])),
     /* The shape a box inside a vector draws, at the geometry its own
     attributes give. */
     ("shape", BOX, Shape::OneOf(&["circle", "path"])),
@@ -310,10 +323,10 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("urgent", &[NodeKind::Live], Shape::Flag),
     /* A range's reading, `aria-valuenow` among `aria-valuemin` and
     `aria-valuemax`, and the words it is read as: `accessibilityValue`. */
-    ("valuemax", PART, Shape::Number),
-    ("valuemin", PART, Shape::Number),
-    ("valuenow", PART, Shape::Number),
-    ("valuetext", PART, Shape::Words),
+    ("valuemax", READS, Shape::Number),
+    ("valuemin", READS, Shape::Number),
+    ("valuenow", READS, Shape::Number),
+    ("valuetext", READS, Shape::Words),
     /* A box that draws a vector: an `<svg>` on the web and
     `react-native-svg` on a phone, holding the shapes inside it. */
     ("viewBox", BOX, Shape::ViewBox),

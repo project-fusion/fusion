@@ -377,21 +377,50 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
 /// control a reader moves its value with, the node whose role is `slider`.
 fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     let controls = adjustables(&family.tree);
+    let stepping = steppers(&family.tree);
     let Some(range) = &family.api.range else {
         for name in controls {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"
             ));
         }
+        for name in stepping {
+            found.push(format!(
+                "`pressable('{name}')` steps, and the element declares no `range`"
+            ));
+        }
         return;
     };
     references("range", range.references(), names, found);
+    if controls
+        .iter()
+        .any(|name| fields(&family.tree).contains(name))
+        && family.api.entry.is_none()
+    {
+        found.push(
+            "the range's control is a field, and the element declares no `text` to hold what is typed"
+                .to_owned(),
+        );
+    }
     if !family.tree.is_empty() && controls.len() != 1 {
         found.push(format!(
             "the element declares a `range`, and its tree draws {} boxes whose role is `slider` or `spinbutton`, where one moves its value",
             controls.len()
         ));
     }
+}
+
+/// The name of each press that steps a range down or up, in the order the
+/// tree draws them.
+fn steppers(nodes: &[Node]) -> Vec<&str> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if node.kind == NodeKind::Pressable && node.attributes.contains_key("steps") {
+            found.push(node.name.as_str());
+        }
+        found.extend(steppers(&node.children));
+    }
+    found
 }
 
 /// The name of each box a reader moves, whose role is `slider` or

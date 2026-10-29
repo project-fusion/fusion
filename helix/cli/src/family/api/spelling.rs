@@ -315,18 +315,24 @@ const STOP: &[Field] = &[
 ];
 
 const VALIDATION: &[Field] = &[
+    ("badInput", "bad", Name),
     ("feedback", "feedback", Name),
     ("maxLength", "maxlength", Name),
     ("message", "message", Name),
     ("minLength", "minlength", Name),
     ("pattern", "pattern", Name),
+    ("rangeOverflow", "over", Name),
+    ("rangeUnderflow", "under", Name),
     ("required", "required", Name),
+    ("stepMismatch", "off", Name),
     ("tooShort", "short", Name),
     ("type", "type", Name),
     ("valueMissing", "missing", Name),
 ];
 
 const RANGE: &[Field] = &[
+    ("atMax", "ceiling", Name),
+    ("atMin", "floor", Name),
     ("dragging", "dragging", Name),
     ("defaultProp", "initial", Name),
     ("fillFrom", "from", Name),
@@ -335,6 +341,7 @@ const RANGE: &[Field] = &[
     ("focusVisible", "ringed", Name),
     ("formatOptions", "format", Name),
     ("fraction", "fraction", Name),
+    ("largeStep", "large", Name),
     ("locale", "locale", Name),
     ("max", "max", Name),
     ("min", "min", Name),

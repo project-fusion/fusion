@@ -1,7 +1,9 @@
 //! How an element a reader moves along a track says so, as its source's
 //! `range`: the prop that holds the value, the props that bound it and step
 //! it, and the events a move sends. The node whose role is `slider` is the
-//! control a reader drags, presses, and steps with the keys.
+//! control a reader drags, presses, and steps with the keys. A field whose
+//! role is `spinbutton` is a number a reader types and steps, with the keys
+//! and the presses that `steps`.
 
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -23,10 +25,18 @@ pub struct ValueRange {
     /// `change`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub change: Option<String>,
+    /// The state the element is in while its value stands at its largest,
+    /// so it steps no further up, as a number input's `at-max`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ceiling: Option<String>,
     /// The state the element is in while a reader drags it, as a slider's
     /// `dragging`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dragging: Option<String>,
+    /// The state the element is in while its value stands at its smallest,
+    /// so it steps no further down, as a number input's `at-min`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub floor: Option<String>,
     /// The prop that holds the options the value is written with, as
     /// `Intl.NumberFormat` takes them.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,6 +56,10 @@ pub struct ValueRange {
     /// The event sent once each move stands, as a slider's `input`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub input: Option<String>,
+    /// The prop that holds how many steps Page Up and Page Down take, as a
+    /// number input's `large-step`, where `page` does not say how far.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub large: Option<String>,
     /// The prop that holds the locale the value is written in.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
@@ -112,11 +126,14 @@ impl ValueRange {
     pub fn references(&self) -> Vec<(&'static str, &str, Names)> {
         [
             ("before", self.before.as_ref(), Names::Event),
+            ("ceiling", self.ceiling.as_ref(), Names::State),
             ("change", self.change.as_ref(), Names::Event),
             ("dragging", self.dragging.as_ref(), Names::State),
+            ("floor", self.floor.as_ref(), Names::State),
             ("format", self.format.as_ref(), Names::Prop),
             ("initial", self.initial.as_ref(), Names::Prop),
             ("input", self.input.as_ref(), Names::Event),
+            ("large", self.large.as_ref(), Names::Prop),
             ("locale", self.locale.as_ref(), Names::Prop),
             ("max", self.max.as_ref(), Names::Prop),
             ("min", self.min.as_ref(), Names::Prop),
@@ -168,13 +185,16 @@ pub fn range(lit: &Lit) -> Result<ValueRange, String> {
         };
         let slot = match key.as_str() {
             "before" => &mut read.before,
+            "ceiling" => &mut read.ceiling,
             "change" => &mut read.change,
             "dragging" => &mut read.dragging,
+            "floor" => &mut read.floor,
             "format" => &mut read.format,
             "fraction" => &mut read.fraction,
             "from" => &mut read.from,
             "initial" => &mut read.initial,
             "input" => &mut read.input,
+            "large" => &mut read.large,
             "locale" => &mut read.locale,
             "max" => &mut read.max,
             "min" => &mut read.min,
