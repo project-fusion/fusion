@@ -38,6 +38,7 @@ import { HelixMeter, HelixMeterSegment } from '../meter/index.native'
 import { HelixMotionToggle } from '../motion-toggle/index.native'
 import { HelixNavigation, HelixNavigationItem } from '../navigation/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
+import { HelixPinInput } from '../pin-input/index.native'
 import { HelixPopover } from '../popover/index.native'
 import { HelixProgress } from '../progress/index.native'
 import { HelixQrCode } from '../qr-code/index.native'
@@ -157,6 +158,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-navigation-item': HelixNavigationItem,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
+  'helix-pin-input': HelixPinInput,
   'helix-popover': HelixPopover,
   'helix-progress': HelixProgress,
   'helix-qr-code': HelixQrCode,

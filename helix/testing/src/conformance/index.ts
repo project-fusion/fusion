@@ -19,6 +19,7 @@ import { MEGAMENU } from './scenarios/megamenu.js'
 import { MENU } from './scenarios/menu.js'
 import { NAVIGATION } from './scenarios/navigation.js'
 import { OUTLINE } from './scenarios/outline.js'
+import { PIN_INPUT } from './scenarios/pin-input.js'
 import { POPOVER } from './scenarios/popover.js'
 import { QR_CODE } from './scenarios/qr-code.js'
 import { SCROLL_AREA } from './scenarios/scroll-area.js'
@@ -64,6 +65,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'motion-toggle': MOTION_TOGGLE,
   navigation: NAVIGATION,
   outline: OUTLINE,
+  'pin-input': PIN_INPUT,
   popover: POPOVER,
   'qr-code': QR_CODE,
   'scroll-area': SCROLL_AREA,

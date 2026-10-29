@@ -28,6 +28,7 @@ export type Family =
   | 'motion-toggle'
   | 'navigation'
   | 'outline'
+  | 'pin-input'
   | 'popover'
   | 'qr-code'
   | 'scroll-area'

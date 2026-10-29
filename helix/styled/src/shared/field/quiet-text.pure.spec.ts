@@ -69,7 +69,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['option/group/option-group.css', '[part="label"]', 'color'],
   ['pagination/root/pagination-root.css', '[part="gap"]', 'color'],
   ['pagination/summary/pagination-summary.css', ':host', 'color'],
-  ['pin-input/root/pin-input-root.css', '[part="placeholder"]', 'color'],
+  ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]', 'color'],
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
   ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
@@ -134,7 +134,7 @@ const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field-segments.css', '[part~="segment-placeholder"]'],
   ['combobox/root/combobox-root.css', '[part="control"]::placeholder'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
-  ['pin-input/root/pin-input-root.css', '[part="placeholder"]'],
+  ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],
 ]
 
 describe('quiet text', () => {
