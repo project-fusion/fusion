@@ -144,6 +144,11 @@ export const drawField = (scope: Scope, node: Node, text: Style): ReactNode => {
   const placeholder = wordOf(scope, node, 'placeholder')
   const color = resolved.placeholder?.color
   const { style: lines, ...scrolling } = linesOf(scope, node, drawn)
+  /* **A field of one line takes no line height**, which iOS lays out from
+     the top of a single-line `TextInput`, so its words sat below the middle
+     of the box the web centers them in. */
+  const { lineHeight, ...centered } = drawn
+  const laidStyle = node.attributes?.multiline === true ? drawn : centered
   const view = laid(
     scope.behavior,
     node.name,
@@ -155,7 +160,7 @@ export const drawField = (scope: Scope, node: Node, text: Style): ReactNode => {
       /* The theme scales the words with the reader's text size already, as every `Text` it draws. */
       allowFontScaling: false,
       ...scrolling,
-      style: { ...drawn, ...(lines as object | undefined) },
+      style: { ...laidStyle, ...(lines as object | undefined) },
     },
     scope.item,
   )
