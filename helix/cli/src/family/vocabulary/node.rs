@@ -182,6 +182,12 @@ fn reading(node: &Node, at: &str) -> Result<(), String> {
     if role == Some("meter") && !has(node, "valuenow") {
         return Err(format!("{at}: a meter takes its reading as `valuenow`"));
     }
+    /* A field reads as a range only as a number a reader types and steps. */
+    if node.kind == NodeKind::Field && role.is_some_and(|role| role != "spinbutton") {
+        return Err(format!(
+            "{at}: a field takes the role `spinbutton` alone, as a number a reader steps"
+        ));
+    }
     /* A box a reader acts on is disabled as a press is, and only a box a
     reader moves is one. */
     if node.kind == NodeKind::Box
