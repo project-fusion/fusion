@@ -653,10 +653,29 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     this.endDrag()
   }
 
-  /** Relayed, because `change` does not cross a shadow boundary on its own. */
+  /**
+   * The value the reader last committed, or the one the slider held as focus
+   * arrived, which a `change` from the control is held against.
+   */
+  private committed: string | undefined
+
+  /** Sends `change` and keeps the value it commits. */
+  protected override announceChange(): void {
+    this.committed = this.value
+    super.announceChange()
+  }
+
+  /**
+   * Relayed, because `change` does not cross a shadow boundary on its own.
+   *
+   * **Only where the value moved.** A browser sends `change` after each step
+   * a key or an assistive technology takes, and a step `before-change`
+   * refused leaves the value where it was: relayed, it said the value changed
+   * when it had not.
+   */
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
-    if (!this.readOnly) {
+    if (!this.readOnly && this.value !== this.committed) {
       this.announceChange()
     }
   }
@@ -697,6 +716,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * the whole control: a ring around the track, or the readout in bold.
    */
   private readonly handleFocusChange = (event: FocusEvent): void => {
+    if (event.type === 'focusin') {
+      this.committed = this.value
+    }
     const input = event.target as HTMLElement
     this.toggleState(
       'focus-visible',
@@ -809,6 +831,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     const clean = this.sanitize(this.value)
     if (clean !== this.value) {
       this.value = clean
+    }
+    if (!this.hasUpdated) {
+      this.committed = this.value
     }
   }
 
