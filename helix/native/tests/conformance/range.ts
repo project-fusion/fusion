@@ -107,13 +107,17 @@ export const adjustBy = async (
   return undefined
 }
 
-/** The value the element holds, for a family a reader moves along a track. */
-export const rangeLeft = (run: Run): Pick<Left, 'value'> => {
+/**
+ * The value the element holds, for a family a reader moves along a track or
+ * picks a score in, and whether it is marked wrong.
+ */
+export const rangeLeft = (run: Run): Pick<Left, 'invalid' | 'value'> => {
   const { tag } = run.scenario.setup
   const reading = formOf(tag).api?.range?.reading
   /* A number a reader types holds its text, which its text record says. */
   if (reading === undefined || formOf(tag).api?.entry !== undefined) {
     return {}
   }
-  return { value: String(HOST_STATES.get(tag)?.[reading] ?? '') }
+  const states = HOST_STATES.get(tag)
+  return { invalid: states?.invalid === true, value: String(states?.[reading] ?? '') }
 }

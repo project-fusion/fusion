@@ -5,7 +5,9 @@ import type { Mounted } from './web-left.js'
  * conformance scenario performs it: a drag that lets go at a point of the
  * track, a screen reader's step, and the keys a range takes. **A script's
  * event moves no range**, so each sets the range's value where the browser
- * would and sends what the browser sends.
+ * would and sends what the browser sends. An element that draws a row of
+ * `marks` in place of a range, as a rating, takes a finger's press on the
+ * row instead.
  */
 
 /** Whether `at` is a range a reader moves. */
@@ -49,14 +51,49 @@ const move = (range: HTMLInputElement, value: number, commits: 'always' | 'moved
   }
 }
 
+/** A frame of the page, so what a component schedules for the next one has run. */
+const frame = (): Promise<void> =>
+  new Promise((done) => requestAnimationFrame(() => setTimeout(done, 0)))
+
+/**
+ * A finger's press on the element's row of `marks` at `to`, a fraction of
+ * the row from its start, as a reader taps a rating's star: the pointer
+ * down, a frame, the pointer up there, and the click the target under it
+ * gets, which a disabled control in the way gets none of.
+ */
+const pressMarks = async (marks: Element, to: number): Promise<void> => {
+  const box = marks.getBoundingClientRect()
+  const along = Math.min(1, Math.max(0, to)) * box.width
+  const x = getComputedStyle(marks).direction === 'rtl' ? box.right - along : box.left + along
+  const y = box.top + box.height / 2
+  const base = { bubbles: true, cancelable: true, clientX: x, clientY: y, composed: true }
+  const pointer = { ...base, button: 0, isPrimary: true, pointerId: 2, pointerType: 'touch' }
+  const root = marks.getRootNode() as Document | ShadowRoot
+  const under = root.elementsFromPoint(x, y).find((one) => marks.contains(one)) ?? marks
+  under.dispatchEvent(new PointerEvent('pointerdown', { ...pointer, buttons: 1 }))
+  await frame()
+  under.dispatchEvent(new PointerEvent('pointerup', pointer))
+  if (!(under instanceof HTMLButtonElement && under.disabled)) {
+    under.dispatchEvent(new PointerEvent('click', { ...pointer, detail: 1 }))
+  }
+}
+
 /**
  * Drags the range to `to`, a fraction of its track from its start, and lets
  * go: the value there, `input`, and `change` where the value moved, as a
  * browser commits a drag as it lets go. **A disabled range takes no drag.**
+ * A row of `marks` is pressed at `to`.
  */
-export const slide = (mounted: Mounted, to: number): void => {
+export const slide = async (mounted: Mounted, to: number): Promise<void> => {
   const range = rangeOf(mounted)
-  if (range === undefined || range.disabled) {
+  if (range === undefined) {
+    const marks = mounted.root.shadowRoot?.querySelector('[part~="marks"]')
+    if (marks !== null && marks !== undefined) {
+      await pressMarks(marks, to)
+    }
+    return
+  }
+  if (range.disabled) {
     return
   }
   const { max, min } = boundsOf(range)
