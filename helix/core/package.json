@@ -111,6 +111,10 @@
       "types": "./dist/utils/pin-code/pin-code.d.ts",
       "default": "./dist/utils/pin-code/pin-code.js"
     },
+    "./rating": {
+      "types": "./dist/utils/rating/rating.d.ts",
+      "default": "./dist/utils/rating/rating.js"
+    },
     "./reorder": {
       "types": "./dist/utils/reorder/reorder.d.ts",
       "default": "./dist/utils/reorder/reorder.js"

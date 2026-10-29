@@ -15,7 +15,7 @@ mod tests;
 mod lists_tests;
 
 use crate::family::api::{Attribute, Node, NodeKind};
-use crate::family::vocabulary::kinds::{ADJUSTABLE, CHECKABLE, GEOMETRY, RANGES, SHAPES};
+use crate::family::vocabulary::kinds::{ADJUSTABLE, CHECKABLE, GEOMETRY, RANGES, SCALE, SHAPES};
 use crate::family::vocabulary::layer;
 
 /// The attributes a range's reading is.
@@ -189,13 +189,13 @@ fn reading(node: &Node, at: &str) -> Result<(), String> {
         ));
     }
     /* A box a reader acts on is disabled as a press is, and only a box a
-    reader moves is one. */
+    reader moves or picks a score along is one. */
     if node.kind == NodeKind::Box
         && has(node, "disabled")
-        && !role.is_some_and(|role| ADJUSTABLE.contains(&role))
+        && !role.is_some_and(|role| ADJUSTABLE.contains(&role) || role == SCALE)
     {
         return Err(format!(
-            "{at}: `disabled` on a box is for a role of {}",
+            "{at}: `disabled` on a box is for a role of {}, or `{SCALE}`",
             listed(ADJUSTABLE)
         ));
     }
