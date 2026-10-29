@@ -96,6 +96,15 @@ impl<'a> Names<'a> {
                         .into_iter()
                         .filter_map(|name| name.as_deref())
                 }))
+                /* And where a range's value sits, its fill, and its words, as a
+                slider's. */
+                .chain(family.api.range.iter().flat_map(|range| {
+                    range
+                        .computed()
+                        .into_iter()
+                        .map(|(_, name)| name)
+                        .collect::<Vec<_>>()
+                }))
                 /* And the sentence a verdict shows, as an input's `message`. */
                 .chain(
                     family
@@ -137,6 +146,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     collection(&family.api, &names, &mut found);
     toggle(family, &names, &mut found);
     entry(family, &names, &mut found);
+    ranged(family, &names, &mut found);
     toolbar(family, &names, &mut found);
     sources::timed(family, &names, &mut found);
     layered::layered(family, &names, &mut found);
@@ -147,9 +157,10 @@ pub fn unresolved(family: &Family) -> Vec<String> {
         if family.api.toggle.is_none()
             && family.api.collection.is_none()
             && family.api.entry.is_none()
+            && family.api.range.is_none()
         {
             found.push(
-                "the element declares a `validation`, and no `toggle`, `collection` or `text` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection`, `text` or `range` holds its answer"
                     .to_owned(),
             );
         }
@@ -360,6 +371,42 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
             "a pressable clears the text, and `text` names no `onClear` event to send".to_owned(),
         );
     }
+}
+
+/// The range's fields, each held to what its docs say it names, and the
+/// control a reader moves its value with, the node whose role is `slider`.
+fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
+    let controls = adjustables(&family.tree);
+    let Some(range) = &family.api.range else {
+        for name in controls {
+            found.push(format!(
+                "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"
+            ));
+        }
+        return;
+    };
+    references("range", range.references(), names, found);
+    if !family.tree.is_empty() && controls.len() != 1 {
+        found.push(format!(
+            "the element declares a `range`, and its tree draws {} boxes whose role is `slider` or `spinbutton`, where one moves its value",
+            controls.len()
+        ));
+    }
+}
+
+/// The name of each box a reader moves, whose role is `slider` or
+/// `spinbutton`, in the order the tree draws them.
+pub fn adjustables(nodes: &[Node]) -> Vec<&str> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if let Some(Attribute::Text(role)) = node.attributes.get("role") {
+            if crate::family::vocabulary::kinds::ADJUSTABLE.contains(&role.as_str()) {
+                found.push(node.name.as_str());
+            }
+        }
+        found.extend(adjustables(&node.children));
+    }
+    found
 }
 
 /// The name of each field a tree draws, in order.

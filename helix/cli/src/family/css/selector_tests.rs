@@ -300,3 +300,15 @@ fn writes_the_entering_place_presence_filled_and_pointer_conditions() {
         "@media (hover: none) {[part=\"row\"] {gap: 0}}"
     );
 }
+
+#[test]
+fn keeps_a_pseudo_element_of_one_engine_out_of_a_selector_list() {
+    assert_eq!(
+        css("{ on: 'control', selector: '[part=\"control\"]::-webkit-slider-thumb', set: [['border', 'none']] }, { on: 'control', selector: '[part=\"control\"]::-moz-range-thumb', set: [['border', 'none']] }"),
+        "[part=\"control\"]::-webkit-slider-thumb {border: none}[part=\"control\"]::-moz-range-thumb {border: none}"
+    );
+    assert_eq!(
+        css("{ on: 'a', set: [['border', 'none']] }, { on: 'b', set: [['border', 'none']] }"),
+        "[part=\"a\"], [part=\"b\"] {border: none}"
+    );
+}
