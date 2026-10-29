@@ -477,6 +477,14 @@
       "types": "./dist/text/index.d.ts",
       "default": "./dist/text/index.js"
     },
+    "./textarea": {
+      "react-native": {
+        "types": "./dist/textarea/index.native.d.ts",
+        "default": "./dist/textarea/index.native.js"
+      },
+      "types": "./dist/textarea/index.d.ts",
+      "default": "./dist/textarea/index.js"
+    },
     "./timeline": {
       "react-native": {
         "types": "./dist/timeline/index.native.d.ts",

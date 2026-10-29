@@ -35,6 +35,7 @@ export type Family =
   | 'switch'
   | 'tabs'
   | 'tag-group'
+  | 'textarea'
   | 'timeline'
   | 'toast'
   | 'toggle'

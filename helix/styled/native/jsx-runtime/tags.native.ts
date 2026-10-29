@@ -53,6 +53,7 @@ import { HelixSwitch } from '../switch/index.native'
 import { HelixTab, HelixTabPanel, HelixTabs } from '../tabs/index.native'
 import { HelixTag, HelixTagGroup } from '../tag/index.native'
 import { HelixText } from '../text/index.native'
+import { HelixTextarea } from '../textarea/index.native'
 import { HelixTimeline, HelixTimelineGroup, HelixTimelineItem } from '../timeline/index.native'
 import { HelixToast, HelixToastItem } from '../toast/index.native'
 import { HelixToggle, HelixToggleGroup } from '../toggle/index.native'
@@ -179,6 +180,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tag': HelixTag,
   'helix-tag-group': TagGroup,
   'helix-text': HelixText,
+  'helix-textarea': HelixTextarea,
   'helix-timeline': HelixTimeline,
   'helix-timeline-group': HelixTimelineGroup,
   'helix-timeline-item': HelixTimelineItem,
