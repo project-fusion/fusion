@@ -490,6 +490,8 @@ export interface TextInputAttributes extends Common {
   readonly autoCapitalize?: Given
   readonly autoComplete?: Given
   readonly autoCorrect?: Given
+  /** A field of several lines grows with its text, to `maxRows` lines. */
+  readonly autoGrow?: Given
   /** The regions whose words describe the field, as its hint. */
   readonly describedby?: string
   readonly disabled?: Given
@@ -499,12 +501,15 @@ export interface TextInputAttributes extends Common {
   /** The region whose words name the field, as its label. */
   readonly labelledby?: string
   readonly maxLength?: Given
+  readonly maxRows?: Given
   /** Several lines, a `<textarea>` on the web. */
   readonly multiline?: boolean
   readonly part: string
   readonly placeholder?: Given
   readonly readonly?: Given
   readonly required?: Given
+  /** How many lines tall a field of several lines stands. */
+  readonly rows?: Given
   readonly type?: Given
 }
 
