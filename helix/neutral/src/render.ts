@@ -481,6 +481,8 @@ export interface PressableAttributes extends Named {
   readonly selected?: Given
   /** The press asks the collection its element joins to select it. */
   readonly selects?: boolean
+  /** The press steps the element's range down or up, and again while it is held. */
+  readonly steps?: 'down' | 'up'
   readonly toggles?: boolean
 }
 
@@ -518,9 +520,15 @@ export interface TextInputAttributes extends Common {
   readonly placeholder?: Given
   readonly readonly?: Given
   readonly required?: Given
+  /** `spinbutton` alone, for a number a reader types and steps, which its `range` holds. */
+  readonly role?: 'spinbutton'
   /** How many lines tall a field of several lines stands. */
   readonly rows?: Given
   readonly type?: Given
+  readonly valuemax?: Given
+  readonly valuemin?: Given
+  readonly valuenow?: Given
+  readonly valuetext?: Given
 }
 
 /** A field a reader types into. */

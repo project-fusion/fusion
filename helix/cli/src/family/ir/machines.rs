@@ -26,7 +26,9 @@
 //! - An element a reader moves along a track runs range, bound to the box
 //!   whose role is `slider`, the props that hold, seed, bound and step its
 //!   value, the prop behind that box's `disabled`, the values it computes,
-//!   and the events a move sends.
+//!   and the events a move sends. A number a reader types and steps runs
+//!   spin, bound the same way to the field whose role is `spinbutton`, and
+//!   to the presses that step it down and up.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -385,10 +387,16 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
 /// core's holds it**: the web's element hears its `<input type="range">`,
 /// and the native runtime hosts it as `range` over the box, with a drag
 /// along it, a press that jumps, the keys, and a screen reader's steps.
+///
+/// **A range whose control is a field is a number a reader types and
+/// steps**, as a number input's: the native runtime hosts it as `spin` over
+/// the field the entry binds, with the keys, a screen reader's steps, and
+/// the presses that `steps` it down and up, again while held.
 fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
     let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
     for (name, value) in [
         ("format", &range.format),
+        ("large", &range.large),
         ("locale", &range.locale),
         ("max", &range.max),
         ("min", &range.min),
@@ -405,7 +413,9 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
         }
     }
     for (name, value) in [
+        ("ceiling", &range.ceiling),
         ("dragging", &range.dragging),
+        ("floor", &range.floor),
         ("fraction", &range.fraction),
         ("from", &range.from),
         ("reading", &range.reading),
@@ -440,9 +450,15 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
             bind.insert("disabled".to_owned(), Bound::Prop(prop.clone()));
         }
     }
+    for node in nodes(tree).filter(|node| node.kind == NodeKind::Pressable) {
+        if let Some(Attribute::Text(way)) = node.attributes.get("steps") {
+            bind.insert(way.clone(), Bound::Part(node.name.clone()));
+        }
+    }
+    let typed = control.is_some_and(|control| control.kind == NodeKind::Field);
     MachineUse {
         bind,
-        machine: "range".to_owned(),
+        machine: if typed { "spin" } else { "range" }.to_owned(),
     }
 }
 

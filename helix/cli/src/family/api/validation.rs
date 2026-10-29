@@ -2,7 +2,9 @@
 //! makes an answer required, the page's own message, and the page's sentence
 //! for a missing answer. What the answer is comes from the element's toggle,
 //! its collection, or its entry, and an entry's text may be held to the props
-//! that bound its length, its pattern, and its type as well.
+//! that bound its length, its pattern, and its type as well. A number a
+//! reader types and steps is held to its range, with the sentences for text
+//! that is no number, a number past either end, and one off its step.
 
 use schemars::JsonSchema;
 use serde::Serialize;
@@ -15,6 +17,10 @@ use crate::family::read::Lit;
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema, TS)]
 #[ts(optional_fields)]
 pub struct Validation {
+    /// The prop that holds the sentence for text that reads as no number,
+    /// as a number input's `bad-input-message`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bad: Option<String>,
     /// The prop that holds the page's own message, which shows at once.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feedback: Option<String>,
@@ -30,6 +36,14 @@ pub struct Validation {
     /// The prop that holds the fewest characters an entry's text may have.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minlength: Option<String>,
+    /// The prop that holds the sentence for a number off its step, with
+    /// `{below}` and `{above}` in place of the nearest numbers on it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub off: Option<String>,
+    /// The prop that holds the sentence for a number above its largest,
+    /// with `{max}` in place of it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub over: Option<String>,
     /// The prop that holds a regular expression an entry's text matches
     /// whole, as the web's `pattern` reads it.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,6 +53,10 @@ pub struct Validation {
     /// Input's code: `{length}` is how many characters fill it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub short: Option<String>,
+    /// The prop that holds the sentence for a number below its smallest,
+    /// with `{min}` in place of it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub under: Option<String>,
     /// The prop that holds what an entry's text is, `email` or `url`, which
     /// the text has to read as.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,14 +76,18 @@ impl Validation {
     /// Each name it holds, where a source writes it, and what it names.
     pub fn references(&self) -> Vec<(&'static str, &str, Names)> {
         [
+            ("bad", self.bad.as_ref()),
             ("feedback", self.feedback.as_ref()),
             ("maxlength", self.maxlength.as_ref()),
             ("minlength", self.minlength.as_ref()),
             ("missing", self.missing.as_ref()),
+            ("off", self.off.as_ref()),
+            ("over", self.over.as_ref()),
             ("pattern", self.pattern.as_ref()),
             ("required", Some(&self.required)),
             ("short", self.short.as_ref()),
             ("type", self.kind.as_ref()),
+            ("under", self.under.as_ref()),
         ]
         .into_iter()
         .filter_map(|(at, name)| name.map(|name| (at, name.as_str(), Names::Prop)))
@@ -88,13 +110,17 @@ pub fn validation(lit: &Lit) -> Result<Validation, String> {
             return Err(format!("validation: `{key}` is not a field it has"));
         };
         let slot = match key.as_str() {
+            "bad" => &mut read.bad,
             "feedback" => &mut read.feedback,
             "maxlength" => &mut read.maxlength,
             "message" => &mut read.message,
             "minlength" => &mut read.minlength,
             "missing" => &mut read.missing,
+            "off" => &mut read.off,
+            "over" => &mut read.over,
             "pattern" => &mut read.pattern,
             "short" => &mut read.short,
+            "under" => &mut read.under,
             "type" => &mut read.kind,
             "required" => &mut required,
             _ => return Err(format!("validation: `{key}` is not a field it has")),
