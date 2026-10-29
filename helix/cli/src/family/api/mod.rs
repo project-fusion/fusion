@@ -22,6 +22,7 @@ mod members;
 mod notices;
 mod page;
 mod parity;
+mod range;
 pub mod rendered;
 mod scroll;
 mod sections;
@@ -57,6 +58,7 @@ pub use members::{props, Event, Literal, Platform, Primitive, PropType, Tier};
 pub use notices::{Notice, Notices};
 pub use page::Page;
 pub use parity::{exported, parity, parts};
+pub use range::ValueRange;
 pub use scroll::Scroll;
 pub use sections::{Section, Sections};
 pub use stack::Stack;
@@ -138,6 +140,11 @@ pub struct Api {
     /// before it, as a queued announcement does.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub queue: Option<Queue>,
+    /// What the element holds where a reader moves it along a track: the
+    /// prop that holds the value, the props that bound and step it, and the
+    /// events a move sends.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub range: Option<ValueRange>,
     /// A part that scrolls, the states the element is in as it stands, and
     /// the events it sends as it moves and comes to rest.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -235,6 +242,7 @@ impl Api {
             && self.page.is_none()
             && self.props.is_empty()
             && self.queue.is_none()
+            && self.range.is_none()
             && self.scroll.is_none()
             && self.section.is_none()
             && self.sections.is_none()
@@ -276,6 +284,7 @@ const FIELDS: &[&str] = &[
     "platform",
     "props",
     "queue",
+    "range",
     "scroll",
     "section",
     "sections",
@@ -342,7 +351,6 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
     let toggle = field("toggle").map(toggle::toggle).transpose()?;
     let toolbar = field("toolbar").map(toolbar::toolbar).transpose()?;
     let countdown = field("countdown").map(countdown::countdown).transpose()?;
-    let queue = field("queue").map(countdown::queue).transpose()?;
     let fold = field("fold").map(fold::fold).transpose()?;
     let page = field("page").map(page::page).transpose()?;
     let scroll = field("scroll").map(scroll::scroll).transpose()?;
@@ -383,7 +391,8 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             page,
             platform,
             props,
-            queue,
+            queue: field("queue").map(countdown::queue).transpose()?,
+            range: field("range").map(range::range).transpose()?,
             scroll,
             section,
             sections,

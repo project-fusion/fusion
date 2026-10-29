@@ -64,6 +64,12 @@ pub(super) fn validated(validation: &Validation, api: &Api) -> MachineUse {
         if let Some(readonly) = &entry.readonly {
             bind.insert("readonly".to_owned(), Bound::Prop(readonly.clone()));
         }
+    } else if let Some(range) = &api.range {
+        /* A range always holds a value, so its answer is never missing. */
+        bind.insert("ranged".to_owned(), Bound::Prop(range.value.clone()));
+        if let Some(readonly) = &range.readonly {
+            bind.insert("readonly".to_owned(), Bound::Prop(readonly.clone()));
+        }
     } else if let Some(chosen) = api.collection.as_ref().and_then(|set| set.chosen.as_ref()) {
         bind.insert("chosen".to_owned(), Bound::Prop(chosen.clone()));
     }

@@ -119,6 +119,10 @@
       "types": "./dist/utils/select-all/select-all.d.ts",
       "default": "./dist/utils/select-all/select-all.js"
     },
+    "./slider": {
+      "types": "./dist/utils/slider/slider.d.ts",
+      "default": "./dist/utils/slider/slider.js"
+    },
     "./stack": {
       "types": "./dist/utils/stack/stack.d.ts",
       "default": "./dist/utils/stack/stack.js"

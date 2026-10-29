@@ -24,6 +24,14 @@ use value::{render, Scope};
 #[cfg(test)]
 pub use shipped::shipped;
 
+/// Whether a selector names a pseudo-element of one engine's alone, as
+/// `::-webkit-slider-thumb` and `::-moz-range-thumb` are. **A selector list
+/// holding one another engine does not know is dropped whole**, so such a
+/// rule is never joined to its neighbors in a list.
+fn vendored(selector: &str) -> bool {
+    selector.contains("::-")
+}
+
 /// The stylesheet a family compiles to.
 pub fn emit(family: &Family) -> String {
     let mut tokens = BTreeSet::new();
@@ -42,7 +50,10 @@ pub fn emit(family: &Family) -> String {
                 let written = written(&rule, Scope::of(family), &tokens);
                 match pieces.last_mut() {
                     Some(Piece::Rule(held))
-                        if held.wrappers == written.wrappers && held.body == written.body =>
+                        if held.wrappers == written.wrappers
+                            && held.body == written.body
+                            && !held.selectors.iter().any(|one| vendored(one))
+                            && !vendored(&written.selectors[0]) =>
                     {
                         held.selectors.push(written.selectors[0].clone());
                     }

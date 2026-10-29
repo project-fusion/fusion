@@ -143,6 +143,8 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("skeleton-role", "skeletonRole"),
     ("skeleton-unread", "skeletonIsUnread"),
     ("skip-link-words", "skipLinkWords"),
+    ("slider-marked", "sliderMarked"),
+    ("slider-reserve", "sliderReserve"),
     ("speed-dial-group-named", "speedDialGroupNamed"),
     ("speed-dial-hold-hint", "speedDialHoldHint"),
     ("speed-dial-holds", "speedDialHolds"),

@@ -15,7 +15,7 @@ mod tests;
 mod lists_tests;
 
 use crate::family::api::{Attribute, Node, NodeKind};
-use crate::family::vocabulary::kinds::{CHECKABLE, GEOMETRY, RANGES, SHAPES};
+use crate::family::vocabulary::kinds::{ADJUSTABLE, CHECKABLE, GEOMETRY, RANGES, SHAPES};
 use crate::family::vocabulary::layer;
 
 /// The attributes a range's reading is.
@@ -181,6 +181,17 @@ fn reading(node: &Node, at: &str) -> Result<(), String> {
     }
     if role == Some("meter") && !has(node, "valuenow") {
         return Err(format!("{at}: a meter takes its reading as `valuenow`"));
+    }
+    /* A box a reader acts on is disabled as a press is, and only a box a
+    reader moves is one. */
+    if node.kind == NodeKind::Box
+        && has(node, "disabled")
+        && !role.is_some_and(|role| ADJUSTABLE.contains(&role))
+    {
+        return Err(format!(
+            "{at}: `disabled` on a box is for a role of {}",
+            listed(ADJUSTABLE)
+        ));
     }
     Ok(())
 }

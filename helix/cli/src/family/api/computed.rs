@@ -19,6 +19,7 @@ pub const FEATURES: &[&str] = &[
     "notice",
     "notices",
     "queue",
+    "range",
     "sections",
     "stack",
     "stop",
@@ -89,6 +90,11 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "total" => {
                 if let Some(holds) = total::total(value)?.holds {
                     push("total.holds", &holds);
+                }
+            }
+            "range" => {
+                for (path, name) in super::range::range(value)?.computed() {
+                    push(path, name);
                 }
             }
             "entry" => {

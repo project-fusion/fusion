@@ -23,6 +23,10 @@
 //!   is typed in, the press that clears it where one does, the props that
 //!   hold, seed and fix its text, the prop behind the field's `disabled`, and
 //!   the events an edit sends.
+//! - An element a reader moves along a track runs range, bound to the box
+//!   whose role is `slider`, the props that hold, seed, bound and step its
+//!   value, the prop behind that box's `disabled`, the values it computes,
+//!   and the events a move sends.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -70,7 +74,9 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use ts_rs::TS;
 
-use crate::family::api::{Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle};
+use crate::family::api::{
+    Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle, ValueRange,
+};
 use crate::family::ir::DERIVATIONS;
 
 #[path = "machines_controls.rs"]
@@ -170,6 +176,9 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(entry) = &api.entry {
         uses.push(entered(entry, tree));
+    }
+    if let Some(range) = &api.range {
+        uses.push(ranged(range, tree));
     }
     if let Some(collection) = &api.collection {
         uses.extend(if collection.mixes {
@@ -368,6 +377,72 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
     MachineUse {
         bind,
         machine: "entry".to_owned(),
+    }
+}
+
+/// The range, bound to the box a reader moves it with, whose role is
+/// `slider`, and the prop behind that box's `disabled`. **No machine of
+/// core's holds it**: the web's element hears its `<input type="range">`,
+/// and the native runtime hosts it as `range` over the box, with a drag
+/// along it, a press that jumps, the keys, and a screen reader's steps.
+fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
+    let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
+    for (name, value) in [
+        ("format", &range.format),
+        ("locale", &range.locale),
+        ("max", &range.max),
+        ("min", &range.min),
+        ("orientation", &range.orientation),
+        ("origin", &range.origin),
+        ("page", &range.page),
+        ("readonly", &range.readonly),
+        ("seed", &range.initial),
+        ("step", &range.step),
+        ("template", &range.template),
+    ] {
+        if let Some(prop) = value {
+            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    for (name, value) in [
+        ("dragging", &range.dragging),
+        ("fraction", &range.fraction),
+        ("from", &range.from),
+        ("reading", &range.reading),
+        ("ringed", &range.ringed),
+        ("said", &range.said),
+        ("span", &range.span),
+        ("spoken", &range.spoken),
+        ("to", &range.to),
+    ] {
+        if let Some(state) = value {
+            bind.insert(name.to_owned(), Bound::State(state.clone()));
+        }
+    }
+    for (name, value) in [
+        ("before", &range.before),
+        ("change", &range.change),
+        ("input", &range.input),
+    ] {
+        if let Some(event) = value {
+            bind.insert(name.to_owned(), Bound::Event(event.clone()));
+        }
+    }
+    let control = nodes(tree).find(|node| {
+        matches!(
+            node.attributes.get("role"),
+            Some(Attribute::Text(role)) if role == "slider" || role == "spinbutton"
+        )
+    });
+    if let Some(control) = control {
+        bind.insert("part".to_owned(), Bound::Part(control.name.clone()));
+        if let Some(Attribute::Bound(Binding::Bind(prop))) = control.attributes.get("disabled") {
+            bind.insert("disabled".to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    MachineUse {
+        bind,
+        machine: "range".to_owned(),
     }
 }
 
