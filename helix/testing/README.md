@@ -73,8 +73,9 @@ own input and records, intent by intent:
   draws none of, and a row is chosen only where it is drawn
 - for a family a reader types into, as Input, the text its field holds and
   whether it is marked wrong, and its own `input` on each edit
-- for a family a reader moves along a track, as Slider, the value it holds,
-  and its own `input` on each move
+- for a family a reader moves along a track or picks a score in, as Slider
+  and Rating, the value it holds, whether it is marked wrong, and its own
+  `input` on each move or choice
 
 **A family's scenarios can be written before its native component exists.**
 They are staged in `STAGED`, and the web half runs and records them in the
@@ -128,7 +129,9 @@ no `<input type="range">`, so the web sets the range's value where a browser
 would and sends `input`, and `change` as a drag lets go somewhere new or with
 each step. A `key` on a range that nothing took moves it as Chromium does.
 A phone presses its track at that point, and sends its control's increment
-or decrement action.
+or decrement action. An element that draws a row of `marks`, as a rating,
+takes a finger's press there: the pointer down, a frame, the pointer up, and
+the click, so the score it shows while the finger is down is recorded.
 
 **`hold` holds a finger on a part while the fake clock moves, then lets
 go**, as a reader holds a number input's stepper. The web sends a touch's
