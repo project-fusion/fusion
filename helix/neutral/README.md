@@ -6,7 +6,7 @@ Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
-Quote, Radio, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Stat, Steps,
+Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
 
@@ -703,6 +703,20 @@ keys, a screen reader, and the steppers step it, with core's number-field
 arithmetic, the same the web element reads. Its `validation` names the
 sentences for text that is no number, `badInput`, a number past either end,
 `rangeUnderflow` and `rangeOverflow`, and one off its step, `stepMismatch`.
+
+**A score a reader picks from a row of steps declares a `range` too**, and
+its control is a `<View role="radiogroup">`, as a rating's row of marks. Its
+steps run from `step` to `max`, those below `min` left out, and its value is
+empty until a reader picks one. Its range names `clearable`, the prop that
+lets a reader take the score back to none, `onClear`, the event that says
+so, `onPreview`, the event that says the score a drag shows, and
+`optionLabel`, the words each score is named by, with `{score}` and `{max}`.
+A render reads `range.full` and `range.part`, how many marks the score it
+shows fills whole and how much of the next. A phone runs the `scale` machine
+over the row: a press or a drag picks the step under the finger, the keys
+and a screen reader pick the step after or before, and core's rating
+arithmetic says where each step stands, the same rules the web lays its
+options out by.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest
