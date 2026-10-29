@@ -1,9 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSlider } from '@fusion.dev/helix-headless/slider'
 import type { CSSResultGroup } from 'lit'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './slider-root.css.js'
+import { styles } from './slider-root.generated.css.js'
 
 /**
  * @summary A value chosen from a range by dragging.
@@ -42,7 +40,7 @@ import { styles } from './slider-root.css.js'
  */
 @customElement('helix-slider')
 export class HelixSlider extends HelixHeadlessSlider {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

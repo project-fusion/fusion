@@ -12,7 +12,7 @@ Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Outline, Popover,
-Pin Input, Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Speed Dial, Stat,
+Pin Input, Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Slider, Speed Dial, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.
@@ -1605,6 +1605,38 @@ import { HelixInput } from '@fusion.dev/helix/input'
   onChange={(event) => save(event.target.value)}
   required
   type="email"
+/>
+```
+
+## Sliders
+
+`HelixSlider`, from `@fusion.dev/helix/slider`, draws its track, the fill, the
+thumb, the marks and their labels, the readout, and the bubble as parts, where
+the web paints the browser's range. Its control is one adjustable element a
+screen reader reaches, named by the label and reading the value, in
+`formatOptions` or `valueText` where they ask for words.
+
+A drag along the track moves the value with the finger, and a press on the
+track takes it to the point pressed. A drag across the track is left to the
+page, so a slider in a scrolling page scrolls with it. A screen reader's
+increment and decrement and a hardware keyboard's arrows, Page Up, Page Down,
+Home, and End step it, held to `min`, `max`, and `step`.
+
+**Each move asks first.** `onBeforeChange` carries the value a move would
+leave in `event.detail.value`, and refusing it leaves the value where it was.
+`onInput` follows each move that stands, and `onChange` follows as a drag or
+a press lets go somewhere new, and with each step. Disabled or read-only,
+nothing moves it, and a screen reader still hears it. A range of two or more
+thumbs, `range`, and a `formatter` are the web's alone for now.
+
+```tsx
+import { HelixSlider } from '@fusion.dev/helix/slider'
+
+<HelixSlider
+  defaultValue="40"
+  label="Volume"
+  onChange={(event) => save(event.target.value)}
+  showValue
 />
 ```
 
