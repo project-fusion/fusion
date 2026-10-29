@@ -13,7 +13,7 @@ Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Outline, Popover,
 Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Speed Dial, Stat,
-Steps, Switch, Tabs, Tag, Tag Group, Text, Timeline, Toast, Toast Item,
+Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.
 
@@ -1568,8 +1568,10 @@ the web draws them, so an app that draws a checkbox installs it.
 
 ## Text fields
 
-Input draws its text in React Native's `TextInput`, inside the same frame the
-web draws. Each attribute takes the web's word, and a phone maps it:
+Input and Textarea draw their text in React Native's `TextInput`, inside the
+same frame the web draws. A Textarea stands `rows` lines tall, and under
+`auto-grow` grows with its text to `max-rows` lines, then scrolls; dragging
+its size, `wrap`, `cols`, and `dirname` are the web's alone. Each attribute takes the web's word, and a phone maps it:
 
 | Attribute | On a phone |
 |---|---|
