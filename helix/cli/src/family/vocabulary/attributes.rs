@@ -77,6 +77,10 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("autocomplete", FIELD, Shape::Words),
     /* Whether the platform corrects words as the reader types. */
     ("autocorrect", FIELD, Shape::Flag),
+    /* Whether a field of several lines grows with its text, to `maxrows`
+    lines where that is set: the web's `auto-grow`, and a phone's multiline
+    `TextInput` at its content's height. */
+    ("grows", FIELD, Shape::Flag),
     /* `aria-busy`: a press at work, or a host whose content is still loading,
     as a skeleton's. */
     ("busy", PART, Shape::Flag),
@@ -240,6 +244,8 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* The event a picture sends once it has loaded. */
     ("loads", IMAGE, Shape::Name),
     ("marks", BOX, Shape::OneOf(&["chosen"])),
+    /* The most lines a growing field grows to before it scrolls. */
+    ("maxrows", FIELD, Shape::Count),
     /* The most characters a field takes: `maxlength` on the web and
     `maxLength` on a phone, which both stop typing at it. */
     ("maxlength", FIELD, Shape::Number),
@@ -269,6 +275,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* `aria-required`. A phone has no such state, and its hint says it. */
     ("required", ANSWER, Shape::Flag),
     ("role", NAMED, Shape::Role),
+    /* How many lines tall a field of several lines stands: a `<textarea>`'s
+    `rows`, and a phone's `TextInput` that many line heights tall. */
+    ("rows", FIELD, Shape::Count),
     /* `aria-roledescription`: what a screen reader calls the part in place
     of its role, as a timeline entry is an "event". A phone has no such
     state, and says it first in the hint. */
