@@ -23,6 +23,7 @@ import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
 import { usePage } from './page'
 import { pressing } from './pressing'
 import { boundTo } from './props'
+import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
 import { scrollersOf } from './scrolling'
 import { setting } from './setting'
@@ -45,7 +46,7 @@ const SELECTIONS: ReadonlySet<string> = new Set([
 /**
  * Hosts the verdict on a form control's answer, where its form binds one: an
  * answer is missing while its toggle is not checked, while its field holds no
- * text, or while its set has nothing chosen. A field's text is held to its
+ * text, or while its set has nothing chosen, and never for a range. A field's text is held to its
  * own constraint as well.
  */
 const validating = (
@@ -58,6 +59,8 @@ const validating = (
   }
   const toggles = boundTo(use, 'checked', 'prop') !== undefined
   const types = boundTo(use, 'value', 'prop') !== undefined
+  /* A range always holds a value, so its answer is never missing. */
+  const ranges = boundTo(use, 'ranged', 'prop') !== undefined
   return (props, around) =>
     useValidation(
       family,
@@ -66,9 +69,11 @@ const validating = (
       types
         ? { empty: (around.entered?.value ?? '') === '', text: around.entered }
         : {
-            empty: toggles
-              ? around.toggled?.checked !== true
-              : (around.chosen.current ?? '') === '',
+            empty: ranges
+              ? false
+              : toggles
+                ? around.toggled?.checked !== true
+                : (around.chosen.current ?? '') === '',
           },
     )
 }
@@ -154,6 +159,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useTourStop(family, props, use, around),
+      ),
+    /* A value moved along a track, which a move touches the verdict on. */
+    ...uses
+      .filter((use) => use.machine === 'range')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useRange(family, props, use, around.touch),
       ),
     /* The layer before the presses, which read what it gives its anchor. */
     ...uses.filter((use) => use.machine === 'layer').map((use) => layering(family, use)),

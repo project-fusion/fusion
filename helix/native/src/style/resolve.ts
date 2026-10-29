@@ -269,11 +269,16 @@ export const resolverFor = ({
       )
     }
     if ('measured' in value) {
+      /* **A measured length in characters or lines is one too**, as a
+         slider's readout keeps room for its widest value in `ch`. */
       const set = context.measured?.[value.measured.name]
-      return (
-        set ??
-        (value.measured.fallback === undefined ? undefined : resolve(value.measured.fallback))
-      )
+      return set === undefined
+        ? value.measured.fallback === undefined
+          ? undefined
+          : resolve(value.measured.fallback)
+        : typeof set === 'string'
+          ? units(set)
+          : set
     }
     if ('calc' in value) {
       const operands = value.calc.operands.map(resolve)
