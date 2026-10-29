@@ -180,14 +180,21 @@ export interface Render<Props, Events, States extends readonly string[], Derived
    * Where a range's value sits along its track and where its fill starts
    * and ends, each 0 to 1, its value as a number, and its value as a reader
    * sees it and as a screen reader says it. A score picked from a row of
-   * steps computes how many marks it fills whole and how much of the next.
+   * steps computes how many marks it fills whole and how much of the next,
+   * and a split where its divider stands, as a percentage, whether that is
+   * against an edge with no pane beside it, and the least and the most a
+   * screen reader hears it may take.
    */
   readonly range: Computes<
+    | 'basis'
     | 'fillFrom'
     | 'fillSpan'
     | 'fillTo'
+    | 'flush'
     | 'fraction'
     | 'full'
+    | 'highest'
+    | 'lowest'
     | 'part'
     | 'reading'
     | 'said'

@@ -16,10 +16,10 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { snapTo } from '@fusion.dev/helix-core/splitter'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixBeforeCollapseEvent, HelixCollapseEvent } from '../events/index.js'
-import { snapTo } from '../snap.js'
 
 /**
  * The inline size under which `orientation="auto"` stacks, in pixels.

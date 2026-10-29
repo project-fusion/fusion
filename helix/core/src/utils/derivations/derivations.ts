@@ -59,6 +59,8 @@ export * from '../rating/rating-derivations.js'
 export * from '../slider/slider-derivations.js'
 /* Speed Dial's, its long press, its names, and an action's shortcut. */
 export * from '../speed-dial/speed-dial-derivations.js'
+/* Splitter's, the name its divider is read by. */
+export * from '../splitter/splitter-derivations.js'
 /* Timeline's, an entry's mark and its reading of how long ago. */
 export * from '../timeline/timeline-derivations.js'
 /* Toast's, its stack's name and edge, and each message's mark, words, and names. */
