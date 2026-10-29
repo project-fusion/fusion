@@ -11,7 +11,7 @@ Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox,
 Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
-Toggle, Navigation, Outline, Popover,
+Toggle, Navigation, Number Input, Outline, Popover,
 Pin Input, Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Slider, Speed Dial, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
@@ -1637,6 +1637,41 @@ import { HelixSlider } from '@fusion.dev/helix/slider'
   label="Volume"
   onChange={(event) => save(event.target.value)}
   showValue
+/>
+```
+
+## Number inputs
+
+`HelixNumberInput`, from `@fusion.dev/helix/number-input`, draws a
+`TextInput` between two steppers. The field takes the keypad its range asks
+for, `numeric` or `decimal`, and on an iPhone the full keyboard where the
+number can be negative, since neither keypad there has a minus key.
+
+**Typing asks first, and leaving the field settles the number.** Each edit
+sends `onBeforeChange` and `onInput`. As the reader leaves the field or
+presses Enter, the number is held to `min`, `max`, and `step`, and
+`onChange` follows. Text that is no number stays, and is marked wrong in
+the sentence `badInputMessage` holds. While the field has no focus it shows
+the number in `formatOptions`.
+
+**The steppers, a hardware keyboard, and a screen reader step it**, each
+step sent as `onBeforeChange`, `onInput`, and `onChange`. Up and Down take
+a step, Page Up and Page Down `largeStep` steps, and Home and End go to
+`min` and `max` where there is one. A held stepper steps once, again after
+400 milliseconds, and every 60 after that, on the timers capability, until
+the finger lifts or the number reaches an end, where the stepper is
+disabled. On Android the field is a spin button a screen reader steps; on
+iOS it stays a text field, as the web's does there. Dragging the label,
+`scrub`, and the mouse wheel, `wheel`, are the web's alone.
+
+```tsx
+import { HelixNumberInput } from '@fusion.dev/helix/number-input'
+
+<HelixNumberInput
+  defaultValue="3"
+  label="Guests"
+  min={1}
+  onChange={(event) => save(event.target.value)}
 />
 ```
 
