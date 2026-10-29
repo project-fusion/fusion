@@ -41,6 +41,10 @@ const namesOf = (family: Family): readonly string[] => {
         ...(family.api?.props ?? []).map((prop) => prop.name),
         ...regionsOf(family.tree),
         ...(family.api?.clock === undefined ? [] : ['now']),
+        /* What an entry lays for its derivations: its text and its caret. */
+        ...[family.api?.entry?.typed, family.api?.entry?.caret].filter(
+          (name): name is string => name !== undefined,
+        ),
       ]),
     ]
     named.set(family, names)
@@ -95,7 +99,8 @@ export const listedFor = (
  * A prop as a derivation reads it. **A prop no attribute writes is the
  * element around's to write**, as a drilldown writes its rows `listed`, and
  * a phone's machines lay it over the host: the value laid there, where one
- * is, and `given` otherwise.
+ * is, and `given` otherwise. **A name no prop has is a value a machine
+ * lays**, as an entry lays its text and its caret.
  */
 export const laidOr = (
   values: { readonly behavior: Behavior; readonly family: Family },
@@ -103,7 +108,10 @@ export const laidOr = (
   given: unknown,
 ): unknown => {
   const prop = values.family.api?.props.find((one) => one.name === name)
-  const laid = prop?.attribute === false ? boundBy(values.behavior, 'host', name) : undefined
+  const laid =
+    prop === undefined || prop.attribute === false
+      ? boundBy(values.behavior, 'host', name)
+      : undefined
   return laid ?? given
 }
 

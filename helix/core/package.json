@@ -103,6 +103,10 @@
       "default": "./dist/utils/number-format/number-format.js"
     },
     "./package.json": "./package.json",
+    "./pin-code": {
+      "types": "./dist/utils/pin-code/pin-code.d.ts",
+      "default": "./dist/utils/pin-code/pin-code.js"
+    },
     "./reorder": {
       "types": "./dist/utils/reorder/reorder.d.ts",
       "default": "./dist/utils/reorder/reorder.js"

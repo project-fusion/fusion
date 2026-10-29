@@ -18,6 +18,24 @@ pub struct TextEntry {
     /// input's `blank`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blank: Option<String>,
+    /// The value the element computes as the box the caret is in, `-1` while
+    /// the field has no focus, which a derivation reads, as a Pin Input's
+    /// boxes do.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub caret: Option<String>,
+    /// The derivation, by its name, that turns what a reader typed into the
+    /// text the element holds, as a Pin Input keeps the characters its type
+    /// accepts.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cleans: Option<String>,
+    /// The event sent once the text is as long as `length` says, as a Pin
+    /// Input's `complete`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub complete: Option<String>,
+    /// The prop that holds how many characters fill the text, which
+    /// `complete` waits for.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub length: Option<String>,
     /// The event sent before an edit stands, which a handler can cancel, as
     /// an input's `before-change`. A refused edit puts the text back.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,6 +67,10 @@ pub struct TextEntry {
     /// change it. A render reads it as `text.clearShown`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shows: Option<String>,
+    /// The value the element computes as the text it holds, which a
+    /// derivation reads, as a Pin Input's boxes do.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub typed: Option<String>,
     /// The prop that holds the text.
     pub value: String,
 }
@@ -61,8 +83,10 @@ impl TextEntry {
             ("before", self.before.as_ref(), Names::Event),
             ("change", self.change.as_ref(), Names::Event),
             ("clear", self.clear.as_ref(), Names::Event),
+            ("complete", self.complete.as_ref(), Names::Event),
             ("initial", self.initial.as_ref(), Names::Prop),
             ("input", self.input.as_ref(), Names::Event),
+            ("length", self.length.as_ref(), Names::Prop),
             ("offers", self.offers.as_ref(), Names::Prop),
             ("readonly", self.readonly.as_ref(), Names::Prop),
             ("value", Some(&self.value), Names::Prop),
@@ -90,6 +114,11 @@ pub fn entry(lit: &Lit) -> Result<TextEntry, String> {
         };
         let slot = match key.as_str() {
             "blank" => &mut read.blank,
+            "caret" => &mut read.caret,
+            "cleans" => &mut read.cleans,
+            "complete" => &mut read.complete,
+            "length" => &mut read.length,
+            "typed" => &mut read.typed,
             "before" => &mut read.before,
             "change" => &mut read.change,
             "clear" => &mut read.clear,

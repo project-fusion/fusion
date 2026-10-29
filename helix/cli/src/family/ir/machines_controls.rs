@@ -45,6 +45,7 @@ pub(super) fn validated(validation: &Validation, api: &Api) -> MachineUse {
         ("minlength", &validation.minlength),
         ("missing", &validation.missing),
         ("pattern", &validation.pattern),
+        ("short", &validation.short),
         ("type", &validation.kind),
     ] {
         if let Some(prop) = value {

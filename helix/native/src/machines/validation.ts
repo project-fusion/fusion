@@ -1,3 +1,4 @@
+import { locale } from '@fusion.dev/helix-core/capabilities/locale'
 import { validationHost } from '@fusion.dev/helix-core/machines/validation/host'
 import {
   passes,
@@ -10,6 +11,7 @@ import {
 } from '@fusion.dev/helix-core/machines/validation/machine'
 import { TEXT_SENTENCES, textVerdict } from '@fusion.dev/helix-core/machines/validation/text'
 import * as validation from '@fusion.dev/helix-core/machines/validation/validation.generated'
+import { formatMessage } from '@fusion.dev/helix-core/words'
 import { type Ref, useCallback, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
@@ -71,13 +73,21 @@ const useConstraint = (
   const type = textOf(given(family, props, boundTo(use, 'type', 'prop')))
   const edited = text?.edited === true
   const value = text?.value
-  return useMemo(
-    () =>
-      value === undefined
-        ? VALID
-        : textVerdict({ edited, maxLength, minLength, pattern, type, value }),
-    [edited, maxLength, minLength, pattern, type, value],
-  )
+  /* A sentence of its own for text that is too short counts the length
+     however the text came, as a Pin Input's code is short until it fills. */
+  const short = textOf(given(family, props, boundTo(use, 'short', 'prop')))
+  return useMemo(() => {
+    if (value === undefined) {
+      return VALID
+    }
+    if (short !== '' && minLength !== undefined && value !== '' && value.length < minLength) {
+      return {
+        flags: ['tooShort'],
+        message: formatMessage(short, { length: minLength }, locale().read()),
+      }
+    }
+    return textVerdict({ edited, maxLength, minLength, pattern, type, value })
+  }, [edited, maxLength, minLength, pattern, short, type, value])
 }
 
 /**
