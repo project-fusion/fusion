@@ -72,7 +72,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]', 'color'],
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
-  ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
+  ['slider/root/slider-root.generated.css', '[part="marker-label"]', 'color'],
   ['steps/root/steps-root.generated.css', ':host([variant="numeric"])', '--_steps-marker-color'],
   ['steps/step/step.generated.css', '[part="description"]', 'color'],
   ['tabs/root/tabs-root.generated.css', '[part="scroll-start"]', 'color'],

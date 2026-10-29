@@ -6,7 +6,7 @@ Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Pin Input, Popover, Progress, QR Code,
-Quote, Radio, Scroll Area, Skeleton, Skip Link, Speed Dial, Stat, Steps,
+Quote, Radio, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
 
@@ -675,6 +675,21 @@ Its `validation` names the props that bound its text as well, `minLength`,
 reads as `validation.message`. A phone checks the text with core's
 `textVerdict`, and the web asks its `<input>`. A style table colors the words
 a field shows while empty with `{ placeholder: 'control' }`.
+
+**An element a reader moves along a track declares its `range`**: the prop
+that holds the value, `prop`, the one that seeds it, `defaultProp`, the props
+that bound and step it, `min`, `max`, `step`, and `pageStep`, and the events a
+move sends, `onBeforeChange`, `onInput`, and `onChange`. Its render draws one
+`<View role="slider">`, the control, with its reading, `valuemin`,
+`valuemax`, `valuenow`, and `valuetext`, and it may be `disabled` and
+`readonly`. A render reads what the range computes as `range.fraction`,
+where the value sits along the track, `range.fillFrom`, `range.fillSpan`, and
+`range.fillTo`, where its fill starts, how far it runs and where it ends,
+`range.reading`, the value, and `range.said` and `range.spoken`, the value as
+a reader sees it and as a screen reader says it. The web element is a native
+`<input type="range">`, and a phone runs the `range` machine over the
+control, with a drag along it, a press that jumps, the keys, and a screen
+reader's increment and decrement.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest
