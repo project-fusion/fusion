@@ -5,7 +5,7 @@ This is a pilot, and its families are Accordion, Announcement, App Header, Avata
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
-Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Popover, Progress, QR Code,
+Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Scroll Area, Skeleton, Skip Link, Speed Dial, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
