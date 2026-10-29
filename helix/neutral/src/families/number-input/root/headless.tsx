@@ -143,6 +143,7 @@ export default headless('number-input', {
         <Pressable
           disabled={props.disabled}
           label={props.decrementLabel}
+          labelledby="decrement label"
           part="decrement"
           role="button"
           steps="down"
@@ -176,6 +177,7 @@ export default headless('number-input', {
         <Pressable
           disabled={props.disabled}
           label={props.incrementLabel}
+          labelledby="increment label"
           part="increment"
           role="button"
           steps="up"
