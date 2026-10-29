@@ -40,13 +40,17 @@ pub(super) fn validated(validation: &Validation, api: &Api) -> MachineUse {
         bind.insert("message".to_owned(), Bound::State(message.clone()));
     }
     for (name, value) in [
+        ("bad", &validation.bad),
         ("feedback", &validation.feedback),
         ("maxlength", &validation.maxlength),
         ("minlength", &validation.minlength),
         ("missing", &validation.missing),
+        ("off", &validation.off),
+        ("over", &validation.over),
         ("pattern", &validation.pattern),
         ("short", &validation.short),
         ("type", &validation.kind),
+        ("under", &validation.under),
     ] {
         if let Some(prop) = value {
             bind.insert(name.to_owned(), Bound::Prop(prop.clone()));

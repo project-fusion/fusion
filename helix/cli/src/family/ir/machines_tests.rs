@@ -255,6 +255,42 @@ fn a_form_control_runs_validation_bound_to_where_its_answer_is_held() {
 }
 
 #[test]
+fn a_number_a_reader_types_and_steps_runs_entry_and_spin_bound_to_its_field_and_steppers() {
+    let number = family(
+        "export default headless('number-input', {
+          events: [event('change')],
+          props: [prop('large-step', 'number'), prop('max', 'number'), prop('min', 'number'), prop('value', 'string')],
+          range: { atMax: 'atMax', atMin: 'atMin', largeStep: 'largeStep', max: 'max', min: 'min', onChange: 'change', prop: 'value' },
+          text: { onChange: 'change', prop: 'value' },
+          tree: [
+            pressable('decrement', { steps: 'down' }, []),
+            field('control', { role: 'spinbutton', valuemax: bind('max'), valuemin: bind('min') }),
+            pressable('increment', { steps: 'up' }, []),
+          ],
+        })",
+    );
+    assert_eq!(
+        named(&number.machines),
+        vec!["press", "press", "entry", "spin"]
+    );
+    assert_eq!(
+        number.machines[3].bind,
+        bound(&[
+            ("ceiling", Bound::State("at-max".to_owned())),
+            ("change", Bound::Event("change".to_owned())),
+            ("down", Bound::Part("decrement".to_owned())),
+            ("floor", Bound::State("at-min".to_owned())),
+            ("large", Bound::Prop("large-step".to_owned())),
+            ("max", Bound::Prop("max".to_owned())),
+            ("min", Bound::Prop("min".to_owned())),
+            ("part", Bound::Part("control".to_owned())),
+            ("up", Bound::Part("increment".to_owned())),
+            ("value", Bound::Prop("value".to_owned())),
+        ])
+    );
+}
+
+#[test]
 fn a_set_with_no_letters_runs_no_typeahead_and_binds_what_it_may_hold() {
     let group = family(
         "export default headless('radio-group', {
