@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   appleTouch,
+  capturePointer,
   customElement,
   formatNumber,
   formatWords,
@@ -562,7 +563,10 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     }
     this.repeat?.()
     this.pressStepped = true
-    button.setPointerCapture?.(event.pointerId)
+    /* Through `capturePointer`, so a pointer the platform refuses to capture,
+       a script's, still steps. Measured before this: a synthetic touch threw
+       `NotFoundError` and stepped nothing. */
+    capturePointer(button, event.pointerId)
     /* On the timers capability, so a conformance scenario's fake clock moves a hold. */
     installWebTimers()
     const step = (): void => {
