@@ -66,30 +66,47 @@ const regionIn = (nodes: readonly Node[] | undefined, name: string): Node | unde
   return undefined
 }
 
+/** The words one name a `labelledby` lists gives a node: its own `label`, or a region's words. */
+const labelWords = (values: Styling, node: Node, name: string, own: unknown): string => {
+  if (name === node.name) {
+    return typeof own === 'string' ? own : ''
+  }
+  const named = regionIn(values.family.tree, name)
+  const words =
+    named === undefined ? wordsOf(given(values, name)) : wordsOfNode(values, named).join(' ')
+  return typeof words === 'string' ? words : ''
+}
+
 /**
  * A node's label, where it has words: its `label`, or **the words of the
- * region its `labelledby` names**, as a section is named by its summary,
+ * regions its `labelledby` names**, as a section is named by its summary,
  * where the web points `aria-labelledby` at the region: what is passed into
- * it, or the words it falls back to, as a timeline group's heading falls
- * back to its `label`, and its own `label` where the region holds none, as
+ * each, or the words it falls back to, as a timeline group's heading falls
+ * back to its `label`, and its own `label` where the regions hold none, as
  * an outline is named "On this page" without a heading.
+ *
+ * **A `labelledby` that lists the node's own name reads its `label` there**,
+ * as the web's `aria-labelledby` lists the element's own id: a number
+ * input's stepper is "Decrease Guests", its `label` and then the field's.
  */
 export const labelOf = (values: Styling, node: Node): string | undefined => {
-  const region = node.attributes?.labelledby
-  const named = typeof region === 'string' ? regionIn(values.family.tree, region) : undefined
+  const regions = node.attributes?.labelledby
   const own = bound(values, node.attributes?.label, node.name)
   const label =
-    typeof region !== 'string'
+    typeof regions !== 'string'
       ? own
-      : named === undefined
-        ? wordsOf(given(values, region))
-        : wordsOfNode(values, named).join(' ')
+      : regions
+          .split(/\s+/)
+          .filter((name) => name !== '')
+          .map((name) => labelWords(values, node, name, own))
+          .filter((words) => words !== '')
+          .join(' ')
   if (typeof label === 'string' && label !== '') {
     return label
   }
-  /* A region that holds no words leaves the part its own `label`, as an
+  /* Regions that hold no words leave the part its own `label`, as an
      empty `aria-labelledby` leaves the web's `aria-label`. */
-  return typeof region === 'string' && typeof own === 'string' && own !== '' ? own : undefined
+  return typeof regions === 'string' && typeof own === 'string' && own !== '' ? own : undefined
 }
 
 /**

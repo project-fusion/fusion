@@ -67,8 +67,8 @@ const field = () => {
   return found
 }
 
-/** A stepper, by its name. */
-const stepper = (name: string) => screen.getByLabelText(name)
+/** A stepper, by the start of its name, which the field's label follows. */
+const stepper = (name: string) => screen.getByLabelText(new RegExp(`^${name}`))
 
 /** Each event a handler heard, by its name, with the text its target held. */
 const heard = (): { events: string[]; props: Partial<HelixNumberInputProps> } => {
@@ -110,6 +110,18 @@ describe('the generated Number Input', () => {
     expect(field().props.value).toBe('3')
     expect(stepper('Decrease').props.accessibilityRole).toBe('button')
     expect(stepper('Increase').props.accessibilityRole).toBe('button')
+  })
+
+  test("names each stepper by its words and then the field's label, as the web does", async () => {
+    await render(<NumberInput label="Guests" />)
+    expect(screen.getByLabelText('Decrease Guests').props.accessibilityRole).toBe('button')
+    expect(screen.getByLabelText('Increase Guests').props.accessibilityRole).toBe('button')
+  })
+
+  test('names each stepper by its words alone where the field has no label', async () => {
+    await render(<NumberInput decrementLabel="Fewer" incrementLabel="More" />)
+    expect(screen.getByLabelText('Fewer').props.accessibilityRole).toBe('button')
+    expect(screen.getByLabelText('More').props.accessibilityRole).toBe('button')
   })
 
   test('asks before each edit and settles the number into its range as the reader leaves', async () => {

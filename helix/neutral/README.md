@@ -759,8 +759,10 @@ derivation that computes one, such as `kbd-key-list`, keyed by the entry's
 `key` field. What a copy holds reads the entry's fields as `entry.x` and its
 place, from 0, as `index`. A part whose `labelledby` names a region is named
 by the words passed into it, or the words the region falls back to:
-`aria-labelledby` on the web, and the label a phone reads. A role may be
-picked by a prop and be none otherwise, as open content is a region:
+`aria-labelledby` on the web, and the label a phone reads. It may name
+several, separated by spaces, and the part's own name reads its `label`, as
+a stepper's `labelledby="decrement label"` names it "Decrease Guests". A
+role may be picked by a prop and be none otherwise, as open content is a region:
 `role={props.open ? 'region' : ''}`. A rule on a part that is `exact` is on
 its part alone, `[part="skeleton"]`, and not on a node that is another part
 as well, `skeleton line`. A slot that `names` the element takes words given

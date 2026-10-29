@@ -233,8 +233,10 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
         ],
         Shape::Words,
     ),
-    /* `aria-labelledby` to a region: the words passed into it name the
-    part, as a section is named by its summary. A phone's label. */
+    /* `aria-labelledby` to regions, their names separated by spaces: the
+    words passed into them name the part, as a section is named by its
+    summary, and the part's own name reads its `label`, as a stepper is
+    "Decrease Guests". A phone's label. */
     (
         "labelledby",
         &[

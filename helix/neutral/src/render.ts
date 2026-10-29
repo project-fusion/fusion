@@ -379,6 +379,11 @@ interface Named extends Common {
   readonly describedby?: string
   readonly description?: Given
   readonly label?: Given
+  /**
+   * The regions whose words name the node, separated by spaces, where the
+   * node's own part name reads its `label`, as a stepper is named by
+   * `labelledby="decrement label"`: "Decrease Guests".
+   */
   readonly labelledby?: string
   readonly readonly?: Given
   readonly required?: Given
