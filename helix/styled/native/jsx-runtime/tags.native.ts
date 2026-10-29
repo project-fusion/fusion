@@ -37,6 +37,7 @@ import { HelixMenu, HelixMenuItem, HelixMenuSection } from '../menu/index.native
 import { HelixMeter, HelixMeterSegment } from '../meter/index.native'
 import { HelixMotionToggle } from '../motion-toggle/index.native'
 import { HelixNavigation, HelixNavigationItem } from '../navigation/index.native'
+import { HelixNumberInput } from '../number-input/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
 import { HelixPinInput } from '../pin-input/index.native'
 import { HelixPopover } from '../popover/index.native'
@@ -157,6 +158,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-motion-toggle': HelixMotionToggle,
   'helix-navigation': HelixNavigation,
   'helix-navigation-item': HelixNavigationItem,
+  'helix-number-input': HelixNumberInput,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
   'helix-pin-input': HelixPinInput,
