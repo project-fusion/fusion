@@ -28,7 +28,8 @@
 //!   value, the prop behind that box's `disabled`, the values it computes,
 //!   and the events a move sends. A number a reader types and steps runs
 //!   spin, bound the same way to the field whose role is `spinbutton`, and
-//!   to the presses that step it down and up.
+//!   to the presses that step it down and up. A score a reader picks from a
+//!   row of steps runs scale, bound to the box whose role is `radiogroup`.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -80,6 +81,7 @@ use crate::family::api::{
     Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle, ValueRange,
 };
 use crate::family::ir::DERIVATIONS;
+use crate::family::vocabulary::kinds::SCALE;
 
 #[path = "machines_controls.rs"]
 mod controls;
@@ -392,14 +394,22 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
 /// steps**, as a number input's: the native runtime hosts it as `spin` over
 /// the field the entry binds, with the keys, a screen reader's steps, and
 /// the presses that `steps` it down and up, again while held.
+///
+/// **A range whose control is a `radiogroup` is a score a reader picks from
+/// a row of steps**, as a rating's: the native runtime hosts it as `scale`
+/// over the row, with a press or a drag across it, the keys, and a screen
+/// reader's steps, and a press on the score chosen takes it back to none
+/// where the element is clearable.
 fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
     let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
     for (name, value) in [
+        ("clearable", &range.clearable),
         ("format", &range.format),
         ("large", &range.large),
         ("locale", &range.locale),
         ("max", &range.max),
         ("min", &range.min),
+        ("option", &range.option),
         ("orientation", &range.orientation),
         ("origin", &range.origin),
         ("page", &range.page),
@@ -418,6 +428,8 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
         ("floor", &range.floor),
         ("fraction", &range.fraction),
         ("from", &range.from),
+        ("full", &range.full),
+        ("share", &range.share),
         ("reading", &range.reading),
         ("ringed", &range.ringed),
         ("said", &range.said),
@@ -432,7 +444,9 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
     for (name, value) in [
         ("before", &range.before),
         ("change", &range.change),
+        ("clear", &range.clear),
         ("input", &range.input),
+        ("preview", &range.preview),
     ] {
         if let Some(event) = value {
             bind.insert(name.to_owned(), Bound::Event(event.clone()));
@@ -441,7 +455,7 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
     let control = nodes(tree).find(|node| {
         matches!(
             node.attributes.get("role"),
-            Some(Attribute::Text(role)) if role == "slider" || role == "spinbutton"
+            Some(Attribute::Text(role)) if role == "slider" || role == "spinbutton" || role == SCALE
         )
     });
     if let Some(control) = control {
@@ -456,9 +470,19 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
         }
     }
     let typed = control.is_some_and(|control| control.kind == NodeKind::Field);
+    let picked = control.is_some_and(|control| {
+        matches!(control.attributes.get("role"), Some(Attribute::Text(role)) if role == SCALE)
+    });
     MachineUse {
         bind,
-        machine: if typed { "spin" } else { "range" }.to_owned(),
+        machine: if typed {
+            "spin"
+        } else if picked {
+            "scale"
+        } else {
+            "range"
+        }
+        .to_owned(),
     }
 }
 

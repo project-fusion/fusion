@@ -25,12 +25,24 @@
  * typed, which is held to the bounds and the step as the reader leaves the
  * field, and the keys, a screen reader, and each `<Pressable steps>` step
  * it, again while a press is held.
+ *
+ * **A range whose control is a `<View role="radiogroup">` is a score a
+ * reader picks from a row of steps**, as a rating's: the steps run from
+ * `step` to `max`, those below `min` left out, and its value is empty until
+ * a reader picks one. A press or a drag across the row picks the step under
+ * the finger as it lets go, and shows the step under it while it moves,
+ * sent as `onPreview`. The arrow keys pick the step after or before, Home
+ * and End the first and the last, and a screen reader's increment and
+ * decrement the same. Where `clearable` holds, a press on the score chosen,
+ * or Backspace or Delete, takes it back to none, and `onClear` follows.
  */
 export interface ValueRange {
   /** The state the element is in while its value stands at its largest. */
   readonly atMax?: string
   /** The state the element is in while its value stands at its smallest. */
   readonly atMin?: string
+  /** The prop that lets a reader take a score back to none, by a press on the score chosen, or Backspace or Delete. */
+  readonly clearable?: string
   /** The state the element is in while a reader drags it. */
   readonly dragging?: string
   /** The prop that seeds the value where nothing sets it, as `defaultValue`. */
@@ -60,6 +72,11 @@ export interface ValueRange {
    * along the track, 0 to 1. A render reads it as `range.fraction`.
    */
   readonly fraction?: string
+  /**
+   * The name of the value the element computes as how many marks the score
+   * it shows fills whole, as a rating's. A render reads it as `range.full`.
+   */
+  readonly full?: string
   /** The prop that holds how many steps Page Up and Page Down take, where `pageStep` does not say how far. */
   readonly largeStep?: string
   /** The prop that holds the locale the value is written in. */
@@ -75,14 +92,29 @@ export interface ValueRange {
   readonly onBeforeChange?: string
   /** The event sent once a move is done. */
   readonly onChange?: string
+  /** The event sent once a score is taken back to none, after `onInput` and `onChange`. */
+  readonly onClear?: string
   /** The event sent once each move stands. */
   readonly onInput?: string
+  /**
+   * The event sent as the score a reader's drag shows changes, with that
+   * score as `value`, or `''` once the element shows its own score again.
+   */
+  readonly onPreview?: string
+  /** The prop that holds the words each score is named by, with `{score}` and `{max}` in their places. */
+  readonly optionLabel?: string
   /** The prop that holds `vertical` where the track stands on end, its maximum at the top. */
   readonly orientation?: string
   /** The prop that holds where the fill starts: `start`, `center`, or `end`. */
   readonly origin?: string
   /** The prop that holds how far Page Up and Page Down move the value. */
   readonly pageStep?: string
+  /**
+   * The name of the value the element computes as how much of the mark
+   * after the whole ones the score it shows fills, 0 to 1, as a rating's.
+   * A render reads it as `range.part`.
+   */
+  readonly part?: string
   /** The prop that holds the value. */
   readonly prop: string
   /**

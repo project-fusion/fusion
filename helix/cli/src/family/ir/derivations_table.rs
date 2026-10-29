@@ -137,6 +137,7 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("qr-code-name", "qrCodeName"),
     ("qr-code-overflow", "qrCodeIsOverflow"),
     ("qr-code-overflowed", "qrCodeOverflowed"),
+    ("rating-marks", "ratingMarks"),
     ("skeleton-lines", "skeletonLines"),
     ("skeleton-name", "skeletonName"),
     ("skeleton-paragraph", "skeletonIsParagraph"),
