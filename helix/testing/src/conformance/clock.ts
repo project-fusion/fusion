@@ -19,7 +19,11 @@ export interface Clock {
 /** Whether a scenario moves the fake clock. */
 export const usesClock = (scenario: Scenario): boolean =>
   scenario.intents.some(
-    (intent) => intent.kind === 'wait' || intent.kind === 'hide' || intent.kind === 'show',
+    (intent) =>
+      intent.kind === 'wait' ||
+      intent.kind === 'hide' ||
+      intent.kind === 'show' ||
+      intent.kind === 'hold',
   )
 
 /**

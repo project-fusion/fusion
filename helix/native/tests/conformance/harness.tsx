@@ -19,7 +19,7 @@ import {
   say,
   usesClock,
 } from '@fusion.dev/helix-testing/conformance'
-import { act, render } from '@testing-library/react-native'
+import { act, fireEvent, render } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
 import { Text } from 'react-native'
 import { HelixRoot } from '../../src/index'
@@ -31,7 +31,7 @@ import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { adjustBy, rangeFocus, ranges, slideTo } from './range'
 import { laySections } from './sections'
-import { leave, typeInto } from './text'
+import { focusField, leave, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
 
 /*
@@ -224,6 +224,59 @@ const press = async (
   return undefined
 }
 
+/**
+ * A finger held on a part of the element while the fake clock moves, then
+ * lifted: its press-in, the clock, then its press-out and press, as React
+ * Native reports a long touch. A disabled press hears none of them.
+ */
+const holdOn = async (
+  run: Run,
+  intent: Extract<Intent, { kind: 'hold' }>,
+): Promise<string | undefined> => {
+  const part = partPressOf(wordsOf(run.scenario.setup, undefined), intent.part)
+  if (part === undefined) {
+    return `The element draws no press for its ${intent.part} part.`
+  }
+  if (part.props.accessibilityState?.disabled === true) {
+    await act(() => {
+      moveClock(run.clock, { kind: 'wait', ms: intent.ms })
+    })
+    return undefined
+  }
+  const nativeEvent = { locationX: 0, locationY: 0, pageX: 0, pageY: 0, timestamp: 0 }
+  await fireEvent(part, 'pressIn', { nativeEvent })
+  let cannot: string | undefined
+  await act(() => {
+    cannot = moveClock(run.clock, { kind: 'wait', ms: intent.ms })
+  })
+  await fireEvent(part, 'pressOut', { nativeEvent })
+  await fireEvent.press(part, { nativeEvent })
+  return cannot
+}
+
+/** Whether the element is a range a reader types into, as a number input. */
+const typed = (tag: string): boolean => ranges(tag) && formOf(tag).api?.entry !== undefined
+
+/**
+ * Puts focus where a `focus` intent says: on the page, on an item, on a
+ * range's control, which its label names, or in the field of a number a
+ * reader types, as a tap does.
+ */
+const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+  const { setup } = run.scenario
+  if (intent.page !== true && intent.item === undefined && typed(setup.tag)) {
+    await focusField(run)
+    return
+  }
+  run.focus.place(
+    intent.page === true
+      ? PAGE
+      : intent.item === undefined && ranges(setup.tag)
+        ? rangeFocus(run)
+        : focusable(run, wordsOf(setup, intent.item)),
+  )
+}
+
 /** Performs one intent, or says why it cannot. */
 const perform = async (run: Run, intent: Intent): Promise<string | undefined> => {
   const { setup } = run.scenario
@@ -232,17 +285,9 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return dismissIn(run, intent.by)
     case 'drag':
       return CANNOT.drag
-    case 'focus': {
-      /* A range's focus is its control, which its label names. */
-      run.focus.place(
-        intent.page === true
-          ? PAGE
-          : intent.item === undefined && ranges(setup.tag)
-            ? rangeFocus(run)
-            : focusable(run, wordsOf(setup, intent.item)),
-      )
+    case 'focus':
+      await focusOn(run, intent)
       return undefined
-    }
     case 'key':
       await key(run, intent)
       return undefined
@@ -254,6 +299,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return slideTo(run, intent)
     case 'adjust':
       return adjustBy(intent)
+    case 'hold':
+      return holdOn(run, intent)
     case 'open':
     case 'close': {
       const words = wordsOf(setup, intent.item)
