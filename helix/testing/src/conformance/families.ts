@@ -32,6 +32,7 @@ export type Family =
   | 'pin-input'
   | 'popover'
   | 'qr-code'
+  | 'rating'
   | 'scroll-area'
   | 'slider'
   | 'speed-dial'

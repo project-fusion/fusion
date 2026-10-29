@@ -2,9 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessRating } from '@fusion.dev/helix-headless/rating'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './rating-root.css.js'
+import { styles } from './rating-root.generated.css.js'
 
 /**
  * @summary A row of marks, such as stars, for giving or showing a score.
@@ -33,7 +31,7 @@ import { styles } from './rating-root.css.js'
  */
 @customElement('helix-rating')
 export class HelixRating extends HelixHeadlessRating {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 
   /**
    * The shape of each mark. `dots` draws plain circles.

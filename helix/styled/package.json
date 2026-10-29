@@ -403,6 +403,14 @@
       "types": "./dist/radio/index.d.ts",
       "default": "./dist/radio/index.js"
     },
+    "./rating": {
+      "react-native": {
+        "types": "./dist/rating/index.native.d.ts",
+        "default": "./dist/rating/index.native.js"
+      },
+      "types": "./dist/rating/index.d.ts",
+      "default": "./dist/rating/index.js"
+    },
     "./rehype": {
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
