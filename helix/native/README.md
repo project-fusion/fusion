@@ -12,7 +12,7 @@ Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Outline, Popover,
-Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Speed Dial, Stat,
+Pin Input, Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Speed Dial, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.

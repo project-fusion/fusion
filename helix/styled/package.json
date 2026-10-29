@@ -347,6 +347,14 @@
       "default": "./dist/outline/index.js"
     },
     "./package.json": "./package.json",
+    "./pin-input": {
+      "react-native": {
+        "types": "./dist/pin-input/index.native.d.ts",
+        "default": "./dist/pin-input/index.native.js"
+      },
+      "types": "./dist/pin-input/index.d.ts",
+      "default": "./dist/pin-input/index.js"
+    },
     "./popover": {
       "react-native": {
         "types": "./dist/popover/index.native.d.ts",
