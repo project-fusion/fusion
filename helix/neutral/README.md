@@ -7,7 +7,7 @@ Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Outline, Popover, Progress, QR Code,
 Quote, Radio, Scroll Area, Skeleton, Skip Link, Speed Dial, Stat, Steps,
-Switch, Tabs, Tag, Text, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
+Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend.
 
 | Path | What it is |
