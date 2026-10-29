@@ -23,6 +23,7 @@ export * from './entry.js'
 export * from './fold.js'
 export * from './notices.js'
 export * from './page.js'
+export * from './range.js'
 export * from './scroll.js'
 export * from './stack.js'
 export * from './toggle.js'
@@ -40,6 +41,7 @@ import type { Entry } from './entry.js'
 import type { Fold } from './fold.js'
 import type { Notice, Notices } from './notices.js'
 import type { Page } from './page.js'
+import type { ValueRange } from './range.js'
 import type { Scroll, Section, Sections } from './scroll.js'
 import type { Stack } from './stack.js'
 import type { Toggle } from './toggle.js'
@@ -217,6 +219,11 @@ export interface Headless {
   readonly delay?: Delay
   /** What it holds where a reader types into it: its text, and the events an edit sends. */
   readonly text?: Entry
+  /**
+   * What it holds where a reader moves it along a track: its value, the
+   * props that bound and step it, and the events a move sends.
+   */
+  readonly range?: ValueRange
   /**
    * The values the element computes from its props, by name: `derive()`, a
    * derivation in `@fusion.dev/helix-core/derivations`, or `bind()`, a prop

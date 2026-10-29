@@ -29,8 +29,10 @@ const BOX: &[NodeKind] = &[NodeKind::Box];
 const PRESS: &[NodeKind] = &[NodeKind::Pressable];
 /// Text a reader types.
 const FIELD: &[NodeKind] = &[NodeKind::Field];
-/// A press or a field: what a reader acts on, which a prop may disable.
-const CONTROL: &[NodeKind] = &[NodeKind::Field, NodeKind::Pressable];
+/// A press, a field, or a box a reader moves, as a slider's: what a reader
+/// acts on, which a prop may disable. A box takes it only where its role is
+/// a slider's or a spin button's.
+const CONTROL: &[NodeKind] = &[NodeKind::Box, NodeKind::Field, NodeKind::Pressable];
 /// A box, a press, or a field: what a screen reader reaches as one thing
 /// that may be read-only or required.
 const ANSWER: &[NodeKind] = &[NodeKind::Box, NodeKind::Field, NodeKind::Pressable];

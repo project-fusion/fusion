@@ -74,6 +74,7 @@ const GIVEN: &[&str] = &[
     "notices",
     "props",
     "queue",
+    "range",
     "sections",
     "send",
     "slots",

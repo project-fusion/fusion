@@ -33,7 +33,8 @@ const fn role(name: &'static str, native: Announced) -> Role {
 /// The roles a node may take, by name.
 ///
 /// **A meter is announced as a progress bar on a phone**, which has no
-/// meter, and its reading carries the rest. **A heading is a header**, as
+/// meter, and its reading carries the rest. **A slider is adjustable**, as
+/// iOS names a value a reader swipes up and down. **A heading is a header**, as
 /// iOS and Android name one, with no level. **A menu item that is checked
 /// or one of a run is a menu item**, and its checked state says the rest.
 pub const ROLES: &[Role] = &[
@@ -77,6 +78,11 @@ pub const ROLES: &[Role] = &[
     section is. */
     role("region", Announced::Role("region")),
     role("separator", Announced::Role("separator")),
+    /* A value chosen along a track. iOS adjusts it with a swipe up or down,
+    and both platforms move it by the increment and decrement actions. */
+    role("slider", Announced::Trait("adjustable")),
+    /* A value stepped up and down, as a number input's. */
+    role("spinbutton", Announced::Trait("spinbutton")),
     role("status", Announced::Role("status")),
     role("switch", Announced::Trait("switch")),
     role("tab", Announced::Trait("tab")),
@@ -90,7 +96,11 @@ pub const ROLES: &[Role] = &[
 
 /// The roles whose node reads as a range, `valuenow` among `valuemin` and
 /// `valuemax`.
-pub const RANGES: &[&str] = &["meter", "progressbar"];
+pub const RANGES: &[&str] = &["meter", "progressbar", "slider", "spinbutton"];
+
+/// The roles of a range a reader moves, which may be disabled or read-only
+/// as a press or a field may: a box with one is the control.
+pub const ADJUSTABLE: &[&str] = &["slider", "spinbutton"];
 
 /// The roles a press that is checked takes.
 pub const CHECKABLE: &[&str] = &[
