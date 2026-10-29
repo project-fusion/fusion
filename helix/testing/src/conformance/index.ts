@@ -25,6 +25,7 @@ import { SCROLL_AREA } from './scenarios/scroll-area.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
 import { TABS } from './scenarios/tabs.js'
 import { TAG_GROUP } from './scenarios/tag-group.js'
+import { TEXTAREA } from './scenarios/textarea.js'
 import { TIMELINE } from './scenarios/timeline.js'
 import { TOAST } from './scenarios/toast.js'
 import { CHECKBOX, MOTION_TOGGLE, SWITCH, TOGGLE } from './scenarios/toggle.js'
@@ -70,6 +71,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   switch: SWITCH,
   tabs: TABS,
   'tag-group': TAG_GROUP,
+  textarea: TEXTAREA,
   timeline: TIMELINE,
   toast: TOAST,
   toggle: TOGGLE,
