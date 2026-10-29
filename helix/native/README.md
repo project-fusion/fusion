@@ -1660,7 +1660,8 @@ a step, Page Up and Page Down `largeStep` steps, and Home and End go to
 `min` and `max` where there is one. A held stepper steps once, again after
 400 milliseconds, and every 60 after that, on the timers capability, until
 the finger lifts or the number reaches an end, where the stepper is
-disabled. On Android the field is a spin button a screen reader steps; on
+disabled. A stepper is named by its words and then the field's label, such
+as "Decrease Guests", as on the web. On Android the field is a spin button a screen reader steps; on
 iOS it stays a text field, as the web's does there. Dragging the label,
 `scrub`, and the mouse wheel, `wheel`, are the web's alone.
 
