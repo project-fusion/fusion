@@ -45,6 +45,7 @@ import { HelixProgress } from '../progress/index.native'
 import { HelixQrCode } from '../qr-code/index.native'
 import { HelixQuote } from '../quote/index.native'
 import { HelixRadio, HelixRadioGroup } from '../radio/index.native'
+import { HelixRating } from '../rating/index.native'
 import { HelixScrollArea } from '../scroll-area/index.native'
 import { HelixSkeleton } from '../skeleton/index.native'
 import { HelixSkipLink } from '../skip-link/index.native'
@@ -168,6 +169,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-quote': HelixQuote,
   'helix-radio': HelixRadio,
   'helix-radio-group': HelixRadioGroup,
+  'helix-rating': HelixRating,
   'helix-scroll-area': HelixScrollArea,
   'helix-skeleton': HelixSkeleton,
   'helix-skip-link': HelixSkipLink,

@@ -12,7 +12,7 @@ Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
-Pin Input, Progress, QR Code, Quote, Radio, Scroll Area, Skeleton, Slider, Speed Dial, Stat,
+Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.
@@ -1672,6 +1672,40 @@ import { HelixNumberInput } from '@fusion.dev/helix/number-input'
   defaultValue="3"
   label="Guests"
   min={1}
+  onChange={(event) => save(event.target.value)}
+/>
+```
+
+## Ratings
+
+`HelixRating`, from `@fusion.dev/helix/rating`, draws its row of marks twice,
+the unfilled marks and the filled ones over them, clipped to the score, so a
+half score is half a mark. The marks are the web's star, drawn as a vector, a
+circle under `shape="dots"`, or the shape passed into `mark`. The row is one
+adjustable element a screen reader reaches, named by the label and reading
+the score in the words `optionLabel` or `valueText` give, such as "3 out of
+5"; a read-only row is a picture of its score.
+
+A press on the row picks the score under the finger, and a drag along it
+shows the score under the finger, sent as `onPreview`, and picks it as the
+finger lifts. A screen reader's increment and decrement and a hardware
+keyboard's arrows pick the score after or before, and Home and End the first
+and the last, from `step` up to `max`, leaving out those below `min`.
+
+**Each choice asks first.** `onBeforeChange` carries the score in
+`event.detail.value`, and refusing it leaves the score where it was.
+`onInput` and `onChange` follow a choice that stands. With `clearable`, a
+press on the score chosen, or Backspace or Delete, takes it back to none, and
+`onClear` follows. A required rating with no score says so in
+`valueMissingMessage`'s sentence. The score a mouse hovers over is the web's
+alone, as a finger cannot hover.
+
+```tsx
+import { HelixRating } from '@fusion.dev/helix/rating'
+
+<HelixRating
+  defaultValue="3"
+  label="Rate your order"
   onChange={(event) => save(event.target.value)}
 />
 ```

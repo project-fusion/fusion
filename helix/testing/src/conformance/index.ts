@@ -23,6 +23,7 @@ import { OUTLINE } from './scenarios/outline.js'
 import { PIN_INPUT } from './scenarios/pin-input.js'
 import { POPOVER } from './scenarios/popover.js'
 import { QR_CODE } from './scenarios/qr-code.js'
+import { RATING } from './scenarios/rating.js'
 import { SCROLL_AREA } from './scenarios/scroll-area.js'
 import { SLIDER } from './scenarios/slider.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
@@ -71,6 +72,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'pin-input': PIN_INPUT,
   popover: POPOVER,
   'qr-code': QR_CODE,
+  rating: RATING,
   'scroll-area': SCROLL_AREA,
   slider: SLIDER,
   'speed-dial': SPEED_DIAL,
