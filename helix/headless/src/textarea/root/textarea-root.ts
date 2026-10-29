@@ -21,6 +21,7 @@ import {
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { grownHeight, lineMetrics } from '../grow.js'
 
 /**
@@ -564,12 +565,17 @@ export class HelixHeadlessTextarea extends MixinVoice(
   /**
    * The `<textarea>` itself, behind a seam a family built on this one wraps:
    * Code Input draws its highlighted text under it.
+   *
+   * **The text is written only where the field holds other text**, through
+   * `live()`. Writing the same text marks it as written by the page, and
+   * Chromium then stops checking `minlength` and `maxlength`, which hold only
+   * against a reader's edits, as Input measured on October 27, 2026.
    */
   protected renderControl(): TemplateResult {
     return html`<textarea
       part="control"
       id=${this.controlId}
-      .value=${this.value}
+      .value=${live(this.value)}
       rows=${this.rows}
       cols=${this.cols ?? nothing}
       wrap=${this.wrap}
