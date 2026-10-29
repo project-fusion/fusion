@@ -185,6 +185,13 @@ describe('the generated Input', () => {
 })
 
 describe('a required Input', () => {
+  test('draws its mark after the label’s last word, in the label’s own line', async () => {
+    await render(<Input label="Name" required />)
+    /* One paragraph holds the words and the mark, as the web flows them. */
+    expect(screen.getByText('Name*')).toBeTruthy()
+    expect(StyleSheet.flatten(screen.getByText('*').props.style).color).toBe(token('color-danger'))
+  })
+
   test('says what is wrong in the hint’s place once a change has given the reader a go', async () => {
     await render(<Input hint="As on your card." label="Name" required />)
     expect(screen.getByText('As on your card.')).toBeTruthy()
