@@ -20,6 +20,17 @@ export interface Entry {
    */
   readonly blank?: string
   /**
+   * The name of the value the element computes as the box the caret is in,
+   * `-1` while the field has no focus, which a derivation reads by it.
+   */
+  readonly caret?: string
+  /**
+   * The derivation, by its name in `@fusion.dev/helix-core/derivations`, that
+   * turns what a reader typed into the text the element holds, as a Pin
+   * Input keeps the characters its type accepts.
+   */
+  readonly clean?: string
+  /**
    * The name of the value the element computes as whether its press that
    * clears is drawn: while `clearable` holds, the field holds text, and the
    * reader may change it. A render reads it as `text.clearShown`.
@@ -33,6 +44,11 @@ export interface Entry {
    * The prop that seeds the text where nothing sets it, as `defaultValue`.
    */
   readonly defaultProp?: string
+  /**
+   * The prop that holds how many characters fill the text, which
+   * `onComplete` waits for.
+   */
+  readonly length?: string
   /**
    * The event sent before an edit stands, which a handler can cancel, with
    * the text it would leave as `value`.
@@ -49,6 +65,11 @@ export interface Entry {
    */
   readonly onClear?: string
   /**
+   * The event sent once a reader's edit leaves the text as long as `length`
+   * says, with the text as `value`.
+   */
+  readonly onComplete?: string
+  /**
    * The event sent once each edit stands.
    */
   readonly onInput?: string
@@ -61,4 +82,9 @@ export interface Entry {
    * still read, select, and copy it.
    */
   readonly readonly?: string
+  /**
+   * The name of the value the element computes as the text it holds, which
+   * a derivation reads by it, as a Pin Input's boxes do.
+   */
+  readonly typed?: string
 }

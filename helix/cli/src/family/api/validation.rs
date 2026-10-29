@@ -34,6 +34,11 @@ pub struct Validation {
     /// whole, as the web's `pattern` reads it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern: Option<String>,
+    /// The prop that holds the sentence for text shorter than `minlength`
+    /// says, where the length counts however the text came, as a Pin
+    /// Input's code: `{length}` is how many characters fill it.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub short: Option<String>,
     /// The prop that holds what an entry's text is, `email` or `url`, which
     /// the text has to read as.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,6 +64,7 @@ impl Validation {
             ("missing", self.missing.as_ref()),
             ("pattern", self.pattern.as_ref()),
             ("required", Some(&self.required)),
+            ("short", self.short.as_ref()),
             ("type", self.kind.as_ref()),
         ]
         .into_iter()
@@ -88,6 +94,7 @@ pub fn validation(lit: &Lit) -> Result<Validation, String> {
             "minlength" => &mut read.minlength,
             "missing" => &mut read.missing,
             "pattern" => &mut read.pattern,
+            "short" => &mut read.short,
             "type" => &mut read.kind,
             "required" => &mut required,
             _ => return Err(format!("validation: `{key}` is not a field it has")),

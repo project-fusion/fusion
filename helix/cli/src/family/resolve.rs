@@ -89,14 +89,13 @@ impl<'a> Names<'a> {
                 .chain(family.api.stack.iter().flat_map(api::Stack::computed))
                 /* And the words a copy names the element by, as a copy button `says`. */
                 .chain(family.api.copy.iter().flat_map(api::Copy::computed))
-                /* And whether an entry's press that clears is drawn. */
-                .chain(
-                    family
-                        .api
-                        .entry
-                        .iter()
-                        .filter_map(|entry| entry.shows.as_deref()),
-                )
+                /* And whether an entry's press that clears is drawn, its text,
+                and where its caret is. */
+                .chain(family.api.entry.iter().flat_map(|entry| {
+                    [&entry.shows, &entry.typed, &entry.caret]
+                        .into_iter()
+                        .filter_map(|name| name.as_deref())
+                }))
                 /* And the sentence a verdict shows, as an input's `message`. */
                 .chain(
                     family
@@ -345,6 +344,16 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
             "the element declares a `text`, and its tree draws {} fields, where one holds its text",
             fields.len()
         ));
+    }
+    if let Some(cleans) = &entry.cleans {
+        if !crate::family::ir::DERIVATIONS
+            .iter()
+            .any(|(name, _)| name == cleans)
+        {
+            found.push(format!(
+                "`text.clean` names `{cleans}`, and core's derivations have no function by that name"
+            ));
+        }
     }
     if !clearing.is_empty() && entry.clear.is_none() {
         found.push(

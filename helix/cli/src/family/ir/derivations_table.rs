@@ -121,6 +121,7 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("motion-toggle-name", "motionToggleName"),
     ("navigation-name", "navigationName"),
     ("outline-name", "outlineName"),
+    ("pin-input-clean", "pinInputClean"),
     ("popover-name", "popoverName"),
     ("progress-complete", "progressIsComplete"),
     ("progress-fraction", "progressFraction"),
