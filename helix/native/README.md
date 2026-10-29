@@ -955,7 +955,10 @@ draw on a phone as on the web:
 - **Gradients.** A linear or radial gradient is the box's background image,
   with its size, position, and repeat.
 - **Generated boxes.** A `::before` with empty content and an `::after` each
-  draw a box, and the `::after`'s words are drawn in it.
+  draw a box, and the `::after`'s words are drawn in it. Words in a box in
+  block flow that holds words alone, with a generated box that sets only its
+  text and its margins along the line, are one paragraph, so a required
+  label's asterisk stands after the last word, as on the web.
 - **Slotted values.** A style an element gives what is passed into it reads
   each child's own private value where it names one, as `var(--_avatar-size)`
   does on the web, so an avatar group overlaps each avatar by a quarter of
