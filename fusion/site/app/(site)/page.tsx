@@ -1,4 +1,3 @@
-import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
 import { Band, band } from '@/components/band/band'
 import { Claim } from '@/components/claim/claim'
@@ -33,10 +32,6 @@ export const metadata = pageMetadata({
  * arrives.
  */
 export default async function Home() {
-  /* The pill's words are the page's own title, so the two cannot disagree about
-     what is being announced. */
-  const announcements = findSitePage('/announcements')
-
   return (
     <ThemeScope>
       <div className={`${styles.reel} ${styles.fabClearance} ${styles.noRules}`}>
@@ -49,7 +44,7 @@ export default async function Home() {
             component, so the light behind the page is the product too. */}
         <PageStrands className={styles.reelStrands} />
 
-        <Hero announcement={announcements} />
+        <Hero />
 
         <Band cardId="platform-card" id="platform">
           <PlatformDiagrams className={band.bandSection} />

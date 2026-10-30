@@ -198,10 +198,6 @@
   .heroShell > :nth-child(4) {
     animation-delay: calc(var(--helix-duration-fast) * 4);
   }
-
-  .heroShell > :nth-child(5) {
-    animation-delay: calc(var(--helix-duration-fast) * 5);
-  }
 }
 
 /*
