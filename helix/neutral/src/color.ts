@@ -14,7 +14,8 @@
  * `onChange` follows once a drag, a key, typed text, or a preset settles it.
  * `onCopy` is sent once the sample puts the value on the clipboard.
  *
- * The other fields name what a render reads as `color.x`: `hue`, `saturation`,
+ * The other fields name what a render reads as `color.x`: `reading`, the text
+ * of the color, `hue`, `saturation`,
  * and `brightness`, the numbers; `painted`, the color as CSS; `tint`, the hue at
  * full strength; `markX` and `markY`, where a phone stands the mark on the
  * square, and `wheelX` and `wheelY`, on the ring; `square` and `squareReversed`,
@@ -42,6 +43,7 @@ export interface ColorPicked {
   readonly painted: string
   readonly presets: string
   readonly prop: string
+  readonly reading: string
   readonly readonly?: string
   readonly sampleLabel: string
   readonly saturation: string
