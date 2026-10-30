@@ -1303,11 +1303,12 @@ helix-toast:not([data-color-mode]) {
    document being written. Scoped to the two, since the recipe's other pages
    set their own heading spacing. */
 :where(
-  helix-markdown[data-prose],
-  [data-prose] helix-markdown,
-  helix-editor > [data-prose],
-  helix-headless-editor > [data-prose]
-) > :where(h1, h2, h3, h4, h5, h6) {
+    helix-markdown[data-prose],
+    [data-prose] helix-markdown,
+    helix-editor > [data-prose],
+    helix-headless-editor > [data-prose]
+  )
+  > :where(h1, h2, h3, h4, h5, h6) {
   margin-block: var(--helix-space-md) var(--helix-space-xs);
 }
 
@@ -1533,7 +1534,7 @@ helix-toast:not([data-color-mode]) {
    none, so a heading sat on its paragraph with no space between them. Nothing
    above the first, where the turn's own padding is the space. */
 :where(helix-chat-message[data-prose], helix-chat-message [data-prose])
-:where(h1, h2, h3, h4, h5, h6) {
+  :where(h1, h2, h3, h4, h5, h6) {
   /* The weight of `body-strong`, which is what an answer built from Helix sets
      its headings in, so the two answers read at the same volume. */
   font-weight: var(--helix-weight-medium);
@@ -1646,7 +1647,7 @@ helix-toast:not([data-color-mode]) {
 /* The note's own padding is its space, so what is inside it takes none after
    its last block: the recipe's gap after a paragraph doubled the bottom inset. */
 :where(helix-chat-message[data-prose], helix-chat-message [data-prose])
-:where(blockquote > :last-child) {
+  :where(blockquote > :last-child) {
   margin-block-end: var(--helix-space-none);
 }
 

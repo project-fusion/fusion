@@ -216,7 +216,7 @@ slot[name="dash"]::slotted(*) {
 
 /* The ring goes on the card, because the card is the target. */
 :host(:is([separation="filled"], [separation="outlined"]))
-[part="field"]:has([part="control"]:focus-visible) {
+  [part="field"]:has([part="control"]:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
