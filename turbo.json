@@ -288,7 +288,12 @@
     // for its own `build` and reads the fixture.
     "@fusion.dev/helix-neutral#typecheck": {
       "dependsOn": ["^build", "^analyze", "analyze", "build"],
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/helix/cli/tests/fixtures/acme/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/helix/cli/tests/fixtures/acme/**",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json"
+      ],
       "outputs": []
     },
     // The proof app's website: the web export of its route tree, under the

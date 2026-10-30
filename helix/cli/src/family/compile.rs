@@ -72,6 +72,37 @@ pub fn all(project: &Project) -> Result<Vec<Compiled>, Failure> {
     }
 }
 
+/// Every element's headless source alone, as `(<family>/<element>, its path,
+/// the source)`, its style table left unread.
+///
+/// # Errors
+///
+/// [`Failure`] when a source cannot be read or compiled.
+pub fn headless_sources(
+    project: &Project,
+) -> Result<Vec<(String, PathBuf, api::Headless)>, Failure> {
+    let families = project.families.join("src").join("families");
+    let name = |path: &Path| {
+        path.file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .into_owned()
+    };
+    let mut found = Vec::new();
+    for family in folders(&families)? {
+        for element in folders(&family)? {
+            if let Some(headless) = headless_of(&element)? {
+                found.push((
+                    format!("{}/{}", name(&family), name(&element)),
+                    element.join("headless.tsx"),
+                    headless,
+                ));
+            }
+        }
+    }
+    Ok(found)
+}
+
 /// Reads a fragment's module from the package's `src/fragments`, by name.
 fn loader(src: &Path) -> impl FnMut(&str) -> Result<read::Lit, String> + '_ {
     move |name| {

@@ -70,8 +70,8 @@
  * `difference`, `quotient`, `fn`, `safeArea`, `scheme`, `quote`, `inherit`,
  * `inherited` and `hookOf`.
  *
- * **What the editor refuses**: a part the tree does not draw, a region it
- * does not hold, a `when` key that is none of the family's props, states or
+ * **What the editor refuses**: a part the tree does not draw and a region it
+ * does not hold, from the names `helix system parts` writes, a `when` key that is none of the family's props, states or
  * the conditions every rule takes, a value a prop cannot hold, a CSS property
  * that does not exist, a hook or a private value the source does not
  * declare, and a fragment that styles a part the tree does not draw. The
@@ -80,7 +80,7 @@
  */
 
 import type { Properties } from 'csstype'
-import type { PropsList, PropValue, Rendered } from './render.js'
+import type { PropsList, PropValue } from './render.js'
 import type { Around, When as Conditions, Family, Holds, Interaction } from './rules.js'
 import type { Read, Tagged, Value } from './style.js'
 import type { Headless, Prop } from './tree.js'
@@ -94,60 +94,24 @@ export type Camel<Name extends string> = Name extends `${infer Head}-${infer Tai
   ? `${Head}${Capitalize<Camel<Tail>>}`
   : Name
 
+declare global {
+  /**
+   * The names each element's render draws, by the element's name, which
+   * `helix system parts` writes and `styles()` reads. A render is JSX, whose
+   * type is the same whatever it draws, so only the compiler can read them.
+   */
+  interface DrawnParts {}
+}
+
 /**
- * Every part a tree draws: each node's name but a region's or a `when`'s, a
- * region's `part`, the parts a node is as well through `also`, and the parts
- * of an element a box draws, as its `exports` names them: `select-all-box`.
+ * The names of one kind an element draws, or any name where its module has not
+ * been written, as in an editor before the first `helix system parts`.
  */
-export type PartsOf<Tree> = Tree extends readonly Rendered[]
-  ? string
-  : Tree extends readonly unknown[]
-    ? PartOf<Tree[number]>
-    : never
-type PartOf<One> = One extends { readonly kind: infer Kind; readonly name: infer Name }
-  ? string extends Name
-    ? never
-    :
-        | (Kind extends 'region' | 'when' ? never : Name)
-        | (One extends { readonly attributes: { readonly part: infer Part } } ? Part : never)
-        | (One extends { readonly attributes: { readonly also: infer Also } }
-            ? keyof Also & string
-            : never)
-        | (One extends { readonly attributes: { readonly exports: infer Exports } }
-            ? `${Name & string}-${keyof Exports & string}`
-            : never)
-        | (One extends { readonly children?: infer Children } ? PartsOf<Children> : never)
-  : never
-
-/** Every part a node is as well, through `also`, as a mark is `mark-dash`. */
-export type AliasesOf<Tree> = Tree extends readonly Rendered[]
-  ? string
-  : Tree extends readonly unknown[]
-    ? AliasOf<Tree[number]>
-    : never
-type AliasOf<One> = One extends { readonly kind: unknown; readonly name: infer Name }
-  ? string extends Name
-    ? never
-    :
-        | (One extends { readonly attributes: { readonly also: infer Also } }
-            ? keyof Also & string
-            : never)
-        | (One extends { readonly children?: infer Children } ? AliasesOf<Children> : never)
-  : never
-
-/** Every region a tree holds, by its slot's name. */
-export type RegionsOf<Tree> = Tree extends readonly Rendered[]
-  ? string
-  : Tree extends readonly unknown[]
-    ? RegionOf<Tree[number]>
-    : never
-type RegionOf<One> = One extends { readonly kind: infer Kind; readonly name: infer Name }
-  ? string extends Name
-    ? never
-    :
-        | (Kind extends 'region' ? Name : never)
-        | (One extends { readonly children?: infer Children } ? RegionsOf<Children> : never)
-  : never
+type DrawnBy<Name, Kind extends 'aliases' | 'parts' | 'regions'> = Name extends keyof DrawnParts
+  ? DrawnParts[Name] extends { readonly [Key in Kind]: infer Names extends string }
+    ? Names
+    : string
+  : string
 
 /**
  * What a `when` may ask of a prop. `false` is the prop absent, and `true`
@@ -165,7 +129,7 @@ type Asks<Type> = Type extends readonly (infer Values)[]
 type Common = { [Key in keyof Conditions as string extends Key ? never : Key]: Conditions[Key] }
 
 /** The parts of a headless source the rules are checked against. */
-type Source = Pick<Headless, 'props' | 'states' | 'tree'> & {
+type Source = Pick<Headless, 'name' | 'props' | 'states' | 'tree'> & {
   readonly derived?: Readonly<Record<string, unknown>>
 }
 
@@ -421,13 +385,13 @@ export const styles = <
   },
   rules: (
     given: Given<
-      PartsOf<H['tree']> & string,
-      RegionsOf<H['tree']> & string,
+      DrawnBy<H['name'], 'parts'>,
+      DrawnBy<H['name'], 'regions'>,
       AsksOf<H['props'][number] | PropsList<StyledProps>[number]>,
       StatesOf<H>,
       HookKeys<Hooks>,
       keyof Own & string,
-      AliasesOf<H['tree']> & string
+      DrawnBy<H['name'], 'aliases'>
     >,
   ) => readonly Group[],
 ): Family => {

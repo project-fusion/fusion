@@ -52,6 +52,8 @@ helix/native/src/families/*/
 helix/native/src/ir.generated.ts
 helix/native/src/theme/*.generated.ts
 helix/styled/src/**/*.generated.css
+# The part names `helix system parts` writes for a style table's typecheck.
+**/src/parts.generated/
 # What `helix system build` writes: each family's intermediate form and web
 # stylesheet, which `check:families` holds to a fresh build.
 helix/neutral/build/

@@ -139,7 +139,12 @@ into `helix/styled/src`, at the table's `stylesheet` path, when the styled
 tier builds.
 
 A style table is written with `styles()`, checked against the element's
-headless source as you type:
+headless source as you type. A part or a region the render does not draw fails
+the typecheck: `helix system parts` writes the names each render draws into
+`src/parts.generated`, which is never committed, and `styles()` reads them. This
+package's `typecheck` writes them before it runs `tsc`. While you write a render,
+`bun run parts:watch` keeps them fresh for your editor. Until they are written,
+an editor accepts any name. `part="..."` stays a plain attribute in the render.
 
 ```ts
 import { token } from '../../../style.js'
