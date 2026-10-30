@@ -1,0 +1,23 @@
+<!-- @summary A terminal drawn as its grid, with no header. -->
+<!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+<helix-terminal
+  controls="none"
+  data-preview-terminal
+  id="plain"
+>
+  <div data-preview-terminal-canvas></div>
+</helix-terminal>
+
+<script type="module">
+  const prompt = '\x1b[36m~/project\x1b[0m \x1b[32m❯\x1b[0m '
+
+  document.getElementById('plain').write(
+    [
+      `${prompt}ls`,
+      'src  package.json',
+      `${prompt}bun run dev`,
+      '\x1b[32mready\x1b[0m on http://localhost:3000',
+      prompt,
+    ].join('\r\n'),
+  )
+</script>
