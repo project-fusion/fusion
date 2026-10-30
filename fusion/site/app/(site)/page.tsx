@@ -8,6 +8,7 @@ import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
 import { Lede } from '@/components/lede/lede'
 import { PageStrands } from '@/components/page-strands/page-strands'
+import { PlatformDiagrams } from '@/components/platform-diagram/platform-diagram'
 import { ProofBands } from '@/components/proof-bands/proof-bands'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
@@ -50,9 +51,13 @@ export default async function Home() {
 
         <Hero announcement={announcements} />
 
+        <Band cardId="platform-card" id="platform">
+          <PlatformDiagrams className={band.bandSection} />
+        </Band>
+
         {/* The problem, before the answer. A reader who recognizes themselves in
           this reads the next band; one who does not was never the buyer. */}
-        <Band cardId="problem-card">
+        <Band>
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <SectionTitle>{PROBLEM.title}</SectionTitle>
             <Lede>{PROBLEM.lede}</Lede>
