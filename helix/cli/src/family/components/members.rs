@@ -389,6 +389,14 @@ pub fn typed_members(
             ty: ty.to_owned(),
         });
     }
+    /* A list that windows a long set offers what the web element's methods do. */
+    if family.api.window.is_some() {
+        members.push(Member {
+            doc: vec!["The list's handle. `scrollToIndex()` shows an item, and `range()` says which items are on screen, as the web element's `scrollToIndex()` and `range` do.".to_owned()],
+            name: "ref".to_owned(),
+            ty: "Ref<WindowHandle>".to_owned(),
+        });
+    }
     let mut typed = Typed::default();
     let mut faults = Vec::new();
     for one in family

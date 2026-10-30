@@ -61,7 +61,9 @@ use std::path::{Path, PathBuf};
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 
-use crate::args::{SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemParts, SystemStylesheets};
+use crate::args::{
+    SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemParts, SystemStylesheets,
+};
 #[cfg(feature = "internal")]
 use crate::args::{SystemCapabilities, SystemMachines, SystemTypes};
 use crate::family::compile::Compiled;
