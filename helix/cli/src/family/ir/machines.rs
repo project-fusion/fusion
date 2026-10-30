@@ -382,6 +382,9 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
             bind.insert(name.to_owned(), Bound::Event(event.clone()));
         }
     }
+    if let Some(cell) = &entry.cell {
+        bind.insert("cell".to_owned(), Bound::Part(cell.clone()));
+    }
     if let Some(field) = nodes(tree).find(|node| node.kind == NodeKind::Field) {
         bind.insert("part".to_owned(), Bound::Part(field.name.clone()));
         if let Some(Attribute::Bound(Binding::Bind(prop))) = field.attributes.get("disabled") {

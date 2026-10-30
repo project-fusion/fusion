@@ -54,10 +54,18 @@ export const watchFocus = (mounted: Mounted): (() => void) => {
  * the text written and `input` sent. **Either is a script's edit**, which
  * `minlength` and `maxlength` never hold against.
  */
-const edit = (control: Control, next: string, inputType: string, data: string | null): void => {
+const edit = (
+  control: Control,
+  next: string,
+  inputType: string,
+  data: string | null,
+  selection = false,
+): void => {
   /* An email field has no selection a script may move, and its caret stands at the end. */
   try {
-    control.setSelectionRange(control.value.length, control.value.length)
+    if (!selection) {
+      control.setSelectionRange(control.value.length, control.value.length)
+    }
   } catch {
     /* Typed where the caret stands. */
   }
@@ -92,11 +100,11 @@ export const typeInto = async (
     return
   }
   for (let left = intent.erase ?? 0; left > 0; left -= 1) {
-    edit(control, control.value.slice(0, -1), 'deleteContentBackward', null)
+    edit(control, control.value.slice(0, -1), 'deleteContentBackward', null, intent.selection)
     await settle()
   }
   for (const character of intent.text ?? '') {
-    edit(control, `${control.value}${character}`, 'insertText', character)
+    edit(control, `${control.value}${character}`, 'insertText', character, intent.selection)
     await settle()
   }
 }

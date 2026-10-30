@@ -237,6 +237,9 @@ const perform = async (
   const item = (value: string | undefined) =>
     value === undefined ? mounted.root : (mounted.items.get(value) ?? mounted.root)
   switch (intent.kind) {
+    case 'box':
+      mounted.root.shadowRoot?.querySelectorAll<HTMLElement>('[part~="cell"]')[intent.at]?.click()
+      return
     case 'drag':
       await drag(item(intent.item), item(intent.to), intent.edge)
       return

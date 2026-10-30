@@ -56,3 +56,36 @@ export const separatorsAfter = (format: string, count: number): string[] => {
   }
   return after
 }
+
+/** A code after an edit, and the box the caret is in after it. */
+export interface CodeEdit {
+  /** The box the caret is in, from 0, never past the last box. */
+  caret: number
+  /** The code's characters, as many as there are boxes at most. */
+  code: string
+}
+
+/**
+ * What the one field holds after the platform edited it, as a code: `raw` is
+ * the field's text with the caret at `caret`, cleaned and cut at `count`, and
+ * the caret is moved past only the characters the code kept before it.
+ */
+export const readTyped = (
+  raw: string,
+  caret: number,
+  type: PinType,
+  letterCase: PinCase,
+  count: number,
+): CodeEdit => ({
+  caret: Math.min(cleanCode(raw.slice(0, caret), type, letterCase).length, count - 1),
+  code: cleanCode(raw, type, letterCase).slice(0, count),
+})
+
+/** The field's selection for the caret in box `at`: the character there, or the place after the code. */
+export const caretSelection = (
+  at: number,
+  length: number,
+): { readonly end: number; readonly start: number } => ({
+  end: at < length ? at + 1 : at,
+  start: at,
+})

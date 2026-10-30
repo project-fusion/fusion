@@ -29,6 +29,8 @@ export interface Entry {
    * turns what a reader typed into the text the element holds, as a Pin
    * Input keeps the characters its type accepts.
    */
+  /** The part each box of the text is drawn in, which a press on it puts the caret in. */
+  readonly cell?: string
   readonly clean?: string
   /**
    * The name of the value the element computes as whether its press that

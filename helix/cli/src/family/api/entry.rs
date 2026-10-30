@@ -23,6 +23,10 @@ pub struct TextEntry {
     /// boxes do.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caret: Option<String>,
+    /// The part each box of the text is drawn in, which a press on it puts the
+    /// caret in, as a Pin Input's `cell`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cell: Option<String>,
     /// The derivation, by its name, that turns what a reader typed into the
     /// text the element holds, as a Pin Input keeps the characters its type
     /// accepts.
@@ -115,6 +119,7 @@ pub fn entry(lit: &Lit) -> Result<TextEntry, String> {
         let slot = match key.as_str() {
             "blank" => &mut read.blank,
             "caret" => &mut read.caret,
+            "cell" => &mut read.cell,
             "cleans" => &mut read.cleans,
             "complete" => &mut read.complete,
             "length" => &mut read.length,
