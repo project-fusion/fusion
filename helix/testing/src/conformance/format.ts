@@ -135,6 +135,9 @@ export interface Held {
  * - `box`: a press on the box at `at`, from 0, of the element's row of boxes,
  *   as a Pin Input draws, which puts the caret there. The web clicks the box,
  *   and a phone sends its press.
+ * - `scrub`: a drag on the element's label, `by` that many points along the
+ *   line, which lets go there. The web sends the pointer's down, move, and up on
+ *   the label, and a phone a pan on it.
  * - `hold`: a finger holds the element's `part` down while `ms`
  *   milliseconds pass on the fake clock, then lets go, as a reader holds a
  *   number input's stepper. The web sends a touch's `pointerdown`, moves the
@@ -182,6 +185,7 @@ export type Intent =
   | { readonly kind: 'slide'; readonly to: number }
   | { readonly by: -1 | 1; readonly kind: 'adjust' }
   | { readonly at: number; readonly kind: 'box' }
+  | { readonly by: number; readonly kind: 'scrub' }
   | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
   | { readonly files: readonly PickedFile[]; readonly kind: 'pick' }
   | { readonly kind: 'point'; readonly part: string; readonly x: number; readonly y: number }
@@ -464,6 +468,8 @@ export const say = (intent: Intent): string => {
       return intent.by > 0 ? 'increment' : 'decrement'
     case 'hold':
       return `hold ${intent.part} for ${intent.ms} ms`
+    case 'scrub':
+      return `drag the label by ${intent.by}`
     case 'box':
       return `press box ${intent.at}`
     case 'point':

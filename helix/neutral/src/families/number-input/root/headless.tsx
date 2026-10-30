@@ -41,9 +41,12 @@ import {
  * **A phone checks the number as the web does**, with the sentences the
  * `*-message` props hold.
  *
- * **Web only, for now:** dragging the label to change the number, `scrub`,
- * the mouse wheel, `wheel`, the role's words, `role-label`, and the form's
- * `name`.
+ * **Under `scrub`, a drag on the label changes the number**, a step for each
+ * four points of travel, each move sent as `before-change` and `input`, and
+ * `change` as the drag lets go.
+ *
+ * **Web only:** the mouse wheel, `wheel`, the role's words, `role-label`, the
+ * form's `name`, and Shift and Alt during a scrub, which a finger has none of.
  */
 export default headless('number-input', {
   props: {
@@ -72,7 +75,7 @@ export default headless('number-input', {
     required: false,
     /* What a phone's screen reader calls the role is the platform's own. */
     roleLabel: web('number field'),
-    scrub: web(false),
+    scrub: false,
     /* A number, or `any` for no grid. */
     step: numberOrString(),
     stepMismatchMessage:
@@ -101,6 +104,7 @@ export default headless('number-input', {
     atMin: 'atMin',
     defaultProp: 'defaultValue',
     formatOptions: 'formatOptions',
+    grip: 'label',
     largeStep: 'largeStep',
     locale: 'locale',
     max: 'max',
@@ -111,6 +115,8 @@ export default headless('number-input', {
     prop: 'value',
     reading: 'reading',
     readonly: 'readonly',
+    scrub: 'scrub',
+    scrubbing: 'scrubbing',
     spoken: 'spoken',
     step: 'step',
     valueText: 'valueText',

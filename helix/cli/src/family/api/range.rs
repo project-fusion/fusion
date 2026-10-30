@@ -212,6 +212,16 @@ pub struct ValueRange {
     /// place to land on it, as a splitter's `snap-threshold`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threshold: Option<String>,
+    /// The prop that lets a drag on the part `grip` names change a number, as
+    /// a number input's `scrub`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scrub: Option<String>,
+    /// The part a drag takes hold of under `scrub`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grip: Option<String>,
+    /// The state the element is in while a drag on its `grip` holds.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scrubbing: Option<String>,
     /// The prop that gives the range a thumb for each value of its text, as a
     /// slider's `range`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -290,6 +300,8 @@ impl ValueRange {
             ("step", self.step.as_ref(), Names::Prop),
             ("template", self.template.as_ref(), Names::Prop),
             ("several", self.several.as_ref(), Names::Prop),
+            ("scrub", self.scrub.as_ref(), Names::Prop),
+            ("scrubbing", self.scrubbing.as_ref(), Names::State),
             ("apart", self.apart.as_ref(), Names::Prop),
             ("joins", self.joins.as_ref(), Names::Prop),
             ("least", self.least.as_ref(), Names::Prop),
@@ -393,6 +405,9 @@ pub fn range(lit: &Lit) -> Result<ValueRange, String> {
             "step" => &mut read.step,
             "template" => &mut read.template,
             "several" => &mut read.several,
+            "scrub" => &mut read.scrub,
+            "grip" => &mut read.grip,
+            "scrubbing" => &mut read.scrubbing,
             "apart" => &mut read.apart,
             "joins" => &mut read.joins,
             "least" => &mut read.least,
