@@ -981,10 +981,10 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.isDisabled || (grid && event.composedPath().includes(grid))) {
       return
     }
+    /* Whether or not the capture took, as the square settles: a pointer the
+       browser would not capture still moved the hue, and `change` was lost. */
     if (event.type === 'pointerup' || event.type === 'pointercancel') {
-      if (wheel.hasPointerCapture(event.pointerId)) {
-        this.settle()
-      }
+      this.settle()
       return
     }
     if (event.type === 'pointerdown') {
