@@ -46,6 +46,7 @@ export function Example() {
         items={cards}
         label="Cards"
         layout="waterfall"
+        text-field="name"
       >
         <template dangerouslySetInnerHTML={{ __html: CARD }} />
       </helix-virtual-list>

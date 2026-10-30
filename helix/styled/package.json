@@ -605,6 +605,14 @@
       "types": "./dist/trend/index.d.ts",
       "default": "./dist/trend/index.js"
     },
+    "./virtual-list": {
+      "react-native": {
+        "types": "./dist/virtual-list/index.native.d.ts",
+        "default": "./dist/virtual-list/index.native.js"
+      },
+      "types": "./dist/virtual-list/index.d.ts",
+      "default": "./dist/virtual-list/index.js"
+    },
     "./vue": "./types/vue.d.ts",
     "./words": {
       "types": "./types/words.d.ts",

@@ -8,7 +8,7 @@ Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
-Trend.
+Trend, and Virtual List.
 
 | Path | What it is |
 |---|---|
@@ -783,6 +783,17 @@ it with `hsl()` from a number.
 that was a color, `painted`, the color its swatch paints, and `said`, the
 trigger's name. A phone runs the `color-field` machine over the box that draws
 the picker, so a move in the picker is an edit of the text.
+
+**An element that windows a long set of items declares its `window`**: `list`,
+the value a repeat's `each` reads as `window.list`, and the props, states, and
+events a window reads and sends, each by its name in the source. A `<Repeat
+windowed>` draws its first child once for each row near the screen, and what
+follows stands after the rows, inside what scrolls. Each entry holds `key`,
+`item`, `at`, `words`, `section`, `header`, `notHeader`, `selected`, `disabled`,
+`active`, `dragging`, `dropBefore`, and `dropAfter`. A phone runs the `window`
+machine over `FlatList`, and a waterfall in a scroll view, and core's
+`@fusion.dev/helix-core/virtual-list` says where each key lands, the same the
+web element reads.
 
 **A prop may hold a function**, written `callback()` with the signature a
 phone's component types it by, as `validate` is. No attribute holds one. An
