@@ -74,6 +74,7 @@ const OPENS: ReadonlySet<string> = new Set(['accordion'])
 
 /** The families that open a layer, whose record says whether it stands open. */
 const LAYERS: ReadonlySet<string> = new Set([
+  'color-input',
   'dialog',
   'drawer',
   'megamenu',

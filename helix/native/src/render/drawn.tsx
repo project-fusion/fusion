@@ -151,6 +151,10 @@ const bubbledBy = (scope: Scope, node: Node): Record<string, (heard: HelixEvent)
   return out
 }
 
+/** What a machine gives the element `node` draws in this copy of a repeat, as each ramp of a color picker. */
+const copyViewOf = (scope: Scope, node: Node): Readonly<Record<string, unknown>> | undefined =>
+  scope.item === undefined ? undefined : scope.behavior.parts[node.name]?.copy?.(scope.item)
+
 /**
  * Draws the element `node` draws, with what a wrap holds passed in as its
  * default region, or nothing where no component was made for it. `draws` is
@@ -193,7 +197,7 @@ export const drawDrawn = (
       {...bubbledBy(scope, node)}
       {...into}
       {...scope.behavior.parts[node.name]?.view}
-      {...(scope.item === undefined ? {} : scope.behavior.parts[node.name]?.copy?.(scope.item))}
+      {...copyViewOf(scope, node)}
     >
       {children}
     </made.Component>

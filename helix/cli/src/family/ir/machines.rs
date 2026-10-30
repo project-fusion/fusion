@@ -644,7 +644,10 @@ fn colored(color: &ColorChoice, tree: &[Node]) -> MachineUse {
     }
     for node in nodes(tree) {
         if COLOR_PARTS.contains(&node.name.as_str()) {
-            bind.insert(format!("part-{}", node.name), Bound::Part(node.name.clone()));
+            bind.insert(
+                format!("part-{}", node.name),
+                Bound::Part(node.name.clone()),
+            );
         }
     }
     MachineUse {

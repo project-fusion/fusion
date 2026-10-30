@@ -52,9 +52,10 @@ export const useColorField = (
   }, [])
   const where = locale().read()
   const words = (given(family, props, 'color-words') ?? {}) as Partial<ColorWords>
+  /* The trigger's words, and in the swatch shape the color's. */
   const said =
-    parsed === null
-      ? text || String(given(family, props, 'trigger-label') ?? '')
+    given(family, props, 'variant') !== 'swatch' || parsed === null
+      ? String(given(family, props, 'trigger-label') ?? '')
       : formatMessage(
           String(given(family, props, 'swatch-label') ?? ''),
           { name: colorName(parsed, words, where), value: text },
