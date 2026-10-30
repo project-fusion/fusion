@@ -88,11 +88,10 @@ assert_eq!(fusion_cortex_recall::estimate(&message), 108);
 
 A scorer ranks Engram's facts against a query. `Overlap` counts the words a
 fact shares with the query, leaving out common words such as `the` and `with`.
-`Vector` compares the query's embedding with each
-fact's, and `Weighted` combines the two, as the Scoring memory by meaning guide
-describes. A fact that scores nothing still ranks, at half its confidence after
-decay, because what a project's sessions learned is often about the project and
-not the task.
+`Vector` compares the query's embedding with each fact's, and `Weighted`
+combines the two, as the Scoring memory by meaning guide describes. A fact that
+scores nothing still ranks, at half its confidence after decay, because what a
+project's sessions learned is often about the project and not the task.
 
 `Selection` says how many facts to place and the least score each needs.
 `Selection::top(8)` places up to eight with no floor. `.floor(0.3)` leaves out
