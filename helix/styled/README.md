@@ -1,7 +1,8 @@
 # @fusion.dev/helix
 
-The styled component tier: the headless elements with token-driven presentation
-on top. Custom elements, so they work in any framework or in none.
+The styled component tier of Fusion Helix: the headless elements with
+token-driven presentation on top. Custom elements, so they work in any framework
+or in none.
 
 ```sh
 npm install @fusion.dev/helix @fusion.dev/helix-styles

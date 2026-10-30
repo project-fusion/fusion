@@ -117,7 +117,7 @@ export default function Page() {
         <Band cardId="helix-places">
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Where to go</Eyebrow>
-            <SectionTitle>What Helix ships, and how you work with it</SectionTitle>
+            <SectionTitle>What Fusion Helix ships, and how you work with it</SectionTitle>
             <Lede>
               The components and the two things built with them, the tools you build with, and the
               pages that explain them.

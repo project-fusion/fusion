@@ -18,7 +18,7 @@
   </p>
 </div>
 
-## Helix
+## Fusion Helix
 
 A design system of web components: tokens, a headless tier, a styled tier, and
 the framework typings generated from both. The components are custom elements,
