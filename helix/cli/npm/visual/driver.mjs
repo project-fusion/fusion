@@ -384,6 +384,13 @@ const awaited = async (page, selector, seconds) => {
     if (caught?.name !== 'TimeoutError') {
       throw caught
     }
+    /* A page drawing WebGL in software can hold its main thread for minutes, and
+       the wait polls there: BlocNav's map marked itself ready at 4.8 seconds and
+       answered at 142. So the page is asked once more, and this waits for its
+       answer, within what `bounded` allows the entry. */
+    if ((await page.locator(selector).count()) > 0) {
+      return
+    }
     throw new Error(
       `the selector \`${selector}\` matched nothing after ${seconds} seconds, so nothing was pictured`,
     )

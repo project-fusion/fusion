@@ -27,6 +27,12 @@ const document = (body) =>
 
 const PAGES = {
   '/broken': { body: document('<p>Internal server error</p>'), status: 500 },
+  '/busy': {
+    body: document(`<script>
+      document.body.dataset.ready = ''
+      for (const end = Date.now() + 3000; Date.now() < end; );
+    </script><p>Busy</p>`),
+  },
   '/declared': {
     body: document(
       '<x-declared><template shadowrootmode="open"><p>Declared</p></template></x-declared>',
@@ -140,6 +146,8 @@ const baseline = (one, name) => existsSync(join(one.at, `baselines/${name}.wide.
   const test = await run('error-test', 'test', ['/turns'])
   expect('test fails on a page that came to answer 500', test.code === 1, test.said)
   expect('test names the status', test.said.includes('answered 500'), test.said)
+  expect('test says it could not take it', test.said.includes('could not be taken'), test.said)
+  expect('test offers no retake of it', !test.said.includes('retake the baselines'), test.said)
   const gone = await run('error-named', 'update', [{ name: 'gone', path: '/gone', status: 404 }])
   expect('a route that names its status is pictured', gone.code === 0, gone.said)
   expect('and has its baseline', baseline(gone, 'gone'))
@@ -186,6 +194,10 @@ const baseline = (one, name) => existsSync(join(one.at, `baselines/${name}.wide.
     never.said,
   )
   expect('and writes no baseline', !baseline(never, 'masked'))
+  const busy = await run('selector-busy', 'update', ['/busy'], {
+    settle: { selector: '[data-ready]', timeout: 1 },
+  })
+  expect('a page too busy to answer in time is not given up on', busy.code === 0, busy.said)
   const slow = await run('ready', 'update', ['/slow-ready'], {
     settle: { readyProperty: 'whenDrawn' },
   })
