@@ -184,6 +184,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'markY'
     | 'painted'
     | 'presets'
+    | 'reading'
     | 'sampleLabel'
     | 'saturation'
     | 'square'

@@ -413,7 +413,9 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     let mut controls = adjustables(&family.tree);
     let stepping = steppers(&family.tree);
     let Some(range) = &family.api.range else {
-        for name in controls {
+        /* A color holds what its axes move, as a color picker's square. */
+        let holds = family.api.color.is_some();
+        for name in controls.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"
             ));
