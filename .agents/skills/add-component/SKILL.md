@@ -52,10 +52,21 @@ procedure.
   value that is not a number then keeps the default, where `type: Number`
   reads `NaN`.
 
-New event? Add a class in a module of its own beside
-`helix/core/src/events/events.ts`, named after the event, carrying its own
-`static readonly eventName`. Export it and add it to `registry` in `events.ts`,
-which types `HTMLElementEventMap`, and add its name to `names.ts`. Then
+New event? Add a class in a module of its own in the `events/` folder of its
+family (`helix/headless/src/<family>/events/`), named after the event, carrying
+its own `static readonly eventName`. Its detail type goes in that folder's
+`details.ts`. Export the class and add it to `registry` in the folder's
+`index.ts`, which types `HTMLElementEventMap` and registers the name with core.
+Only an event that more than one family sends goes in
+`helix/core/src/events/`, in `events.ts` and `names.ts`. A styled-only family
+keeps its events in `helix/styled/src/<family>/events/` the same way, and the
+family's `index.ts` adds `export * from './events/index.js'`.
+
+The styled tier does not forward headless, so `@fusion.dev/helix` exports a
+headless event only when the styled family's `index.ts` names it:
+`export { HelixThingEvent, type ThingDetail } from
+'@fusion.dev/helix-headless/<family>/events'`. Add the class and its detail
+type there, or consumers of the styled package cannot import them. Then
 reference it as `@event {HelixThingEvent} thing-change - …`.
 
 **Watch the SSR rules in `helix/CONVENTIONS.md`.** State seeded in
