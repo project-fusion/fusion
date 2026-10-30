@@ -20,6 +20,8 @@
      words and the `data-level` of the link to it, and any other element
      with an `id` registers its view under it, so a tour stop's `for` and
      an app header's `scroller` find it as the web finds an element;
+   - a `fieldset` with `disabled` disables the form controls inside it, as
+     `:disabled` reaches them on the web;
    - a raw `svg` and the shapes it holds draw through `react-native-svg`;
    - a tag a phone has no component for says so where it would be, and a
      development build warns about it once, as `helix shared` reports it
@@ -196,7 +198,9 @@ const make = (
 const DRAWN_AS_THE_WEB = new Set([
   'circle',
   'ellipse',
+  'fieldset',
   'g',
+  'legend',
   'line',
   'path',
   'polygon',

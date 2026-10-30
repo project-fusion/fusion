@@ -333,9 +333,10 @@ impl Reader<'_> {
     }
 }
 
-/// The DOM elements a phone draws as the web does: a raw vector with its shapes.
+/// The DOM elements a phone draws as the web does: a fieldset, which disables
+/// the controls inside it, and a raw vector with its shapes.
 const DRAWN_TAGS: &[&str] = &[
-    "circle", "ellipse", "g", "line", "path", "polygon", "polyline", "rect",
+    "circle", "ellipse", "fieldset", "g", "legend", "line", "path", "polygon", "polyline", "rect",
     "svg",
 ];
 

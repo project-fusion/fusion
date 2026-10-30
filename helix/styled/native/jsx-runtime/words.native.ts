@@ -3,6 +3,7 @@
 import {
   Density,
   densityOf,
+  FieldsetDisabled,
   type SectionAbout,
   type Tokens,
   useInheritedText,
@@ -134,6 +135,32 @@ export const Box = (props: Props) => {
     Density,
     { density: densityOf(props) },
     React.createElement(View, { ref }, worded(props.children)),
+  )
+}
+
+/** A `legend`, which a fieldset around it finds among its children. */
+export const Legend = (props: Props) => React.createElement(Box, props)
+
+/**
+ * **A `<fieldset disabled>` disables the form controls inside**, through a
+ * context the controls read, as `:disabled` reaches them on the web. What its
+ * first `legend` holds stays as the fieldset around it has it, as the HTML
+ * standard says.
+ */
+export const Fieldset = ({ children, disabled, id }: Props) => {
+  const outer = React.useContext(FieldsetDisabled)
+  let legend = false
+  const held = React.Children.map(children, (child) => {
+    if (legend || !React.isValidElement(child) || child.type !== Legend) {
+      return child
+    }
+    legend = true
+    return React.createElement(FieldsetDisabled.Provider, { value: outer }, child)
+  })
+  return React.createElement(
+    FieldsetDisabled.Provider,
+    { value: outer || Boolean(disabled) },
+    React.createElement(Box, { ...(typeof id === 'string' ? { id } : {}) }, held),
   )
 }
 
