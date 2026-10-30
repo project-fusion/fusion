@@ -1,8 +1,9 @@
-import './preview.css'
-
 export function Example() {
   return (
-    <helix-splitter default-position="40">
+    <helix-splitter
+      default-position="40"
+      style={{ blockSize: '12rem' }}
+    >
       <helix-card
         separation="plain"
         slot="start"

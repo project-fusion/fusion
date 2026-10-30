@@ -30,6 +30,33 @@ const square = (): Record<string, unknown> => {
   return all.map((node) => flat(node.props.style)).find((style) => style.aspectRatio === 1) ?? {}
 }
 
+describe('a size in a style', () => {
+  test('sizes the element, in rems as the web does', async () => {
+    await render(
+      <HelixRoot mode="light">
+        {jsx('helix-splitter', {
+          children: [
+            jsx('helix-text', { children: 'A', slot: 'start' }),
+            jsx('helix-text', { children: 'B', slot: 'end' }),
+          ],
+          style: { blockSize: '12rem' },
+        })}
+      </HelixRoot>,
+    )
+    const all: Node[] = []
+    const walk = (node: Node | string | null) => {
+      if (node !== null && typeof node !== 'string') {
+        all.push(node)
+        for (const child of node.children ?? []) {
+          walk(child)
+        }
+      }
+    }
+    walk(screen.toJSON() as unknown as Node)
+    expect(all.some((node) => flat(node.props.style).height === 192)).toBe(true)
+  })
+})
+
 describe('a hook in a style', () => {
   test('sets the hook of the element it is on', async () => {
     await render(

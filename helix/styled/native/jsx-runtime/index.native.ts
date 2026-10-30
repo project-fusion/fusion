@@ -12,6 +12,8 @@
      it under `target`. `onClick` is `onPress`;
    - a custom property in a `style` that names one of the element's hooks,
      `--qr-code-size` on `helix-qr-code`, sets that hook;
+   - a size in a `style`, `blockSize` or `height` and the rest, sizes the
+     element;
    - `data-grid-span` stays on the child, where the native Grid reads it,
      and `data-density` on any element or box, which draws what it holds at
      that density, and `data-color-mode`, `light` or `dark`, which draws it
@@ -149,6 +151,10 @@ const translate = (type: unknown, props: Props): readonly [unknown, Props] => {
   /* The view registers under its id, which the web finds the element by. */
   if (typeof props.id === 'string' && target !== Missing) {
     out.id = props.id
+  }
+  /* The sizes a `style` writes, which the element reads off it. */
+  if (typeof type === 'string' && type.startsWith('helix-') && props.style !== undefined) {
+    out.style = props.style
   }
   const hooks = styledHooks(type, props.style)
   if (hooks !== undefined) {
