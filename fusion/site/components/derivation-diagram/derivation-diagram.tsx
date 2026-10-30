@@ -517,15 +517,21 @@ export const DerivationDiagram = () => (
  */
 export const DerivationDiagramStacked = () => (
   <div className={styles.diagramStacked}>
-    {/* Hidden on the element rather than only on the wrapper: the pair must read
-        once, the wide figure carries the `title` and `desc` for both, and the
-        a11y lint asks the question of the `svg` itself. */}
+    {/* The figure carries its own `title` and `desc`, in the wide figure's words.
+        Below 52rem the wide figure is `display: none`, and above it this one is,
+        so a reader meets one pair at any width. */}
     <svg
-      aria-hidden="true"
+      aria-labelledby="derivation-stacked-title derivation-stacked-desc"
       className={styles.diagramStackedSvg}
-      role="presentation"
+      role="img"
       viewBox="0 0 340 374"
     >
+      <title id="derivation-stacked-title">How a palette is derived from one color</title>
+      <desc id="derivation-stacked-desc">
+        A brand color, a saturation, a density and a radius feed a derivation engine, which emits
+        179 semantic tokens in both schemes with 67 foreground and ground pairs measured.
+      </desc>
+
       <defs>
         <linearGradient id="derivation-chroma-stacked" x1="0" x2="1">
           <stop offset="0" stopColor="var(--helix-color-foreground-subtle)" />
