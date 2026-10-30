@@ -348,7 +348,10 @@ export const sliderMarkers: ListDerivation = (props) => {
   const bounds = sliderBoundsOf(props)
   return sliderMarks(props.markers, bounds).map((at) => ({
     at: String(at),
-    label: sliderSaid(at, props['format-options'], props.locale),
+    label:
+      typeof props.formatter === 'function'
+        ? String(props.formatter(at))
+        : sliderSaid(at, props['format-options'], props.locale),
     place: `${((at - bounds.min) / (bounds.max - bounds.min)) * 100}%`,
   }))
 }

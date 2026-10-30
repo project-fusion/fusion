@@ -14,9 +14,45 @@ const volume = (props: Readonly<Record<string, boolean | number | string>> = {})
 /** Sliders: the keys, the ends, a step, the bounds, a drag, a refusal, and a slider that does not move. */
 export const SLIDER: readonly Scenario[] = [
   {
+    family: 'slider',
+    intents: [
+      { kind: 'focus' },
+      { key: 'ArrowRight', kind: 'key' },
+      { key: 'ArrowLeft', kind: 'key' },
+      { key: 'Home', kind: 'key' },
+    ],
+    name: 'a range moves its first thumb with the keys, and the value holds each thumb',
+    setup: volume({ 'default-value': '20,70', range: true }),
+  },
+  {
+    family: 'slider',
+    intents: [{ kind: 'focus' }, { key: 'End', kind: 'key' }],
+    name: 'a thumb stops at its neighbor, min-steps-between-thumbs steps away',
+    setup: volume({ 'default-value': '20,70', 'min-steps-between-thumbs': 10, range: true }),
+  },
+  {
+    family: 'slider',
+    intents: [
+      { by: 1, kind: 'adjust' },
+      { by: -1, kind: 'adjust' },
+    ],
+    name: 'a screen reader steps a range first thumb',
+    setup: volume({ 'default-value': '20,50,80', range: true }),
+  },
+  {
+    family: 'slider',
+    intents: [
+      { event: 'before-change', kind: 'refuse' },
+      { kind: 'focus' },
+      { key: 'ArrowRight', kind: 'key' },
+    ],
+    name: 'a refused move leaves a range where it stands',
+    setup: volume({ 'default-value': '20,70', range: true }),
+  },
+  {
     disabledFieldset: true,
     family: 'slider',
-    intents: [{ kind: 'slide', to: 0.75 }, { kind: 'focus' }, { key: 'ArrowRight', kind: 'key' }],
+    intents: [{ kind: 'slide', to: 0.75 }],
     name: 'a disabled fieldset around a slider holds it still',
     setup: volume({ 'default-value': '40' }),
   },
