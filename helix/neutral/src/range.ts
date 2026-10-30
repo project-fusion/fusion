@@ -198,6 +198,12 @@ export interface ValueRange {
   readonly step?: string
   /** The prop that holds the sentence a screen reader says for the value, with `{value}` in its place. */
   readonly valueText?: string
+  /** The prop that lets a drag on the part `grip` names change a number. */
+  readonly scrub?: string
+  /** The part a drag takes hold of under `scrub`. */
+  readonly grip?: string
+  /** The state the element is in while a drag on its `grip` holds. */
+  readonly scrubbing?: string
   /** The prop that gives the range a thumb for each value of its text. */
   readonly several?: string
   /** The prop that holds how many steps the thumbs stay apart. */

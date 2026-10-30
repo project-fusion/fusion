@@ -35,22 +35,12 @@ import {
   numberFieldWritten,
   REPEAT_DELAY,
   REPEAT_EVERY,
+  SCRUB_PITCH,
 } from '@fusion.dev/helix-core/number-field'
 import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-
-/**
- * How far a pointer travels for one step of the value, in pixels.
- *
- * Four, measured against the alternatives rather than picked: at one the value
- * runs away from the pointer and a field with `step="1"` crosses a hundred in
- * the width of a word, and at ten a reader has to cross the viewport to reach
- * a useful number. Four is roughly a character's width at the sizes this is set
- * in, so a step reads as "about one glyph of travel".
- */
-const SCRUB_PITCH = 4
 
 /**
  * And the same step over four times the travel, which is what fine means here.

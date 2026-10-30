@@ -436,6 +436,7 @@ fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
         ("locale", &range.locale),
         ("most", &range.most),
         ("named", &range.named),
+        ("scrub", &range.scrub),
         ("several", &range.several),
         ("writes", &range.writes),
         ("max", &range.max),
@@ -476,6 +477,7 @@ fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
         ("ringed", &range.ringed),
         ("said", &range.said),
         ("span", &range.span),
+        ("scrubbing", &range.scrubbing),
         ("spoken", &range.spoken),
         ("stops", &range.stops),
         ("stacked", &range.stacked),
@@ -524,6 +526,9 @@ fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
 /// a screen reader's steps.
 fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
     let mut bind = range_binds(range);
+    if let Some(grip) = &range.grip {
+        bind.insert("grip".to_owned(), Bound::Part(grip.clone()));
+    }
     let control = nodes(tree).find(|node| {
         matches!(
             node.attributes.get("role"),

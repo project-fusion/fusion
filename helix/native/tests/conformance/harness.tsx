@@ -32,7 +32,7 @@ import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
-import { adjustBy, rangeFocus, ranges, slideTo } from './range'
+import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusField, leave, pressBox, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
@@ -314,6 +314,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return pointIn(intent)
     case 'box':
       return pressBox(run, intent.at)
+    case 'scrub':
+      return scrubLabel(run, intent.by)
     case 'open':
     case 'close': {
       if (opensPicker(setup.tag)) {

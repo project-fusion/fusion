@@ -3,6 +3,7 @@ import type { KeyPress, Stop } from '@fusion.dev/helix-core/capabilities/types'
 import {
   type NumberField,
   type NumberFlaw,
+  numberFieldClamp,
   numberFieldEnds,
   numberFieldFlaw,
   numberFieldKeyed,
@@ -13,11 +14,15 @@ import {
   numberFieldSettle,
   numberFieldShown,
   numberFieldSpoken,
+  numberFieldStride,
   type Phone,
+  SCRUB_PITCH,
 } from '@fusion.dev/helix-core/number-field'
-import { useCallback, useMemo, useRef } from 'react'
+import { createElement, type ReactNode, useCallback, useMemo, useRef, useState } from 'react'
 import { type AccessibilityActionEvent, Platform } from 'react-native'
+import { GestureDetector } from 'react-native-gesture-handler'
 import { useHold } from '../drivers/hold'
+import { useResize } from '../drivers/resize'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
@@ -59,6 +64,62 @@ export const spinShaping = (family: Family, props: Props, use: MachineUse): Shap
   }
 }
 
+/** What a drag on a number's grip gives its element: the view that takes it, and its mark. */
+const useScrub = (
+  family: Family,
+  props: Props,
+  use: MachineUse,
+  latest: {
+    readonly current: {
+      readonly entered: Entered | undefined
+      readonly field: NumberField
+      readonly moves: boolean
+    }
+  },
+): { readonly marks: readonly string[]; readonly parts: Readonly<Record<string, PartBinding>> } => {
+  const gripPart = boundTo(use, 'grip', 'part')
+  const offered = given(family, props, boundTo(use, 'scrub', 'prop')) === true
+  const [scrubbing, scrub] = useState(false)
+  const from = useRef(0)
+  const gesture = useResize({
+    drag: (travel) => {
+      const now = latest.current
+      const steps = Math.round(travel / SCRUB_PITCH)
+      const next = String(
+        numberFieldClamp(from.current + steps * numberFieldStride(now.field), now.field),
+      )
+      if (next !== now.entered?.current()) {
+        now.entered?.ask(next)
+      }
+    },
+    enabled: offered && latest.current.moves,
+    press: () => {
+      const now = latest.current
+      from.current = numberFieldParse(now.entered?.current() ?? '', now.field) ?? now.field.min ?? 0
+      scrub(true)
+    },
+    release: () => {
+      scrub(false)
+      latest.current.entered?.commit()
+    },
+    reset: () => undefined,
+    rtl: false,
+    vertical: false,
+  })
+  const mark = boundTo(use, 'scrubbing', 'state')
+  return {
+    marks: scrubbing && mark !== undefined ? [mark] : [],
+    parts:
+      gripPart === undefined || !offered
+        ? {}
+        : {
+            [gripPart]: {
+              wrap: (drawn: ReactNode) => createElement(GestureDetector, { gesture }, drawn),
+            },
+          },
+  }
+}
+
 /** What a spin gives the verdict on its element: what is wrong with its number. */
 export interface Spun {
   /** What core's `numberFieldFlaw` finds wrong with the text, or `undefined`. */
@@ -85,6 +146,10 @@ export interface Spun {
  * again after 400 milliseconds, and every 60 after that, until the finger
  * lifts or the number reaches an end. A screen reader's activation steps
  * once.
+ *
+ * **Under `scrub`, a drag on the part `grip` names changes the number**, read
+ * from where the drag began, a step for each `SCRUB_PITCH` points of travel.
+ * Each move asks, as an edit does, and the drag commits as it lets go.
  *
  * **On iOS the field is a plain text field**, as the web's is there, since
  * VoiceOver reads a spin button as a slider a reader cannot type in; the
@@ -181,6 +246,7 @@ export const useSpin = (
     [hold, nudge],
   )
 
+  const grip = useScrub(family, props, use, latest)
   const { atMax, atMin } = numberFieldEnds(text, field)
   const parsed = numberFieldParse(text, field)
   const template = given(family, props, boundTo(use, 'template', 'prop'))
@@ -217,6 +283,7 @@ export const useSpin = (
     return named === undefined ? {} : { [named]: now }
   }
   const marks = [
+    ...grip.marks,
     ...(atMin && boundTo(use, 'floor', 'state') !== undefined
       ? [boundTo(use, 'floor', 'state') as string]
       : []),
@@ -231,6 +298,7 @@ export const useSpin = (
         [part]: control,
         ...presses(down, -1, !moves || atMin),
         ...presses(up, 1, !moves || atMax),
+        ...grip.parts,
         host: {
           states: {
             ...state('reading', parsed === null ? '' : String(parsed)),

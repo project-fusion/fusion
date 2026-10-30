@@ -16,6 +16,8 @@ import { afterEach, beforeEach, describe, expect, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
 import { Dimensions, Platform } from 'react-native'
+import { GestureHandlerRootView, State } from 'react-native-gesture-handler'
+import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils'
 import type { FieldHandle } from '../machines/validation'
 import { HelixTheme } from '../theme/helix-theme'
 import { HelixNumberInput, type HelixNumberInputProps } from './number-input/index.native'
@@ -105,6 +107,36 @@ const key = async (name: string) => {
 }
 
 describe('the generated Number Input', () => {
+  test('under scrub, a drag on the label moves the number and commits as it lets go', async () => {
+    const seen: string[] = []
+    await render(
+      <GestureHandlerRootView>
+        <NumberInput
+          defaultValue="10"
+          label="Guests"
+          onChange={() => seen.push('change')}
+          onInput={() => seen.push('input')}
+          scrub
+          step={5}
+        />
+      </GestureHandlerRootView>,
+    )
+    // biome-ignore lint/suspicious/noExplicitAny: the renderer's fibers are untyped
+    let fiber: any = screen.getByText('Guests').unstable_fiber
+    while (fiber !== null && fiber.memoizedProps?.gesture?.gestures === undefined) {
+      fiber = fiber.return
+    }
+    await act(async () => {
+      fireGestureHandler(fiber.memoizedProps.gesture.gestures[0], [
+        { state: State.BEGAN, translationX: 0, translationY: 0 },
+        { state: State.ACTIVE, translationX: 8, translationY: 0 },
+        { state: State.END, translationX: 8, translationY: 0 },
+      ])
+    })
+    expect(field().props.value).toBe('20')
+    expect(seen).toEqual(['input', 'change'])
+  })
+
   test('is a field between two steppers, each named and pressable', async () => {
     await render(<NumberInput defaultValue="3" label="Guests" min={1} />)
     expect(field().props.value).toBe('3')
