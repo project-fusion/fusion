@@ -268,6 +268,7 @@ const COLOR: &[Field] = &[
     ("painted", "painted", Name),
     ("presets", "presets", Name),
     ("prop", "value", Name),
+    ("reading", "reading", Name),
     ("readonly", "readonly", Name),
     ("sampleLabel", "sampleLabel", Name),
     ("saturation", "saturation", Name),
