@@ -14,7 +14,7 @@ import { fakeImages, picturesAnswered } from './web-images.js'
 import { dismiss, focusPage, removePage } from './web-layer.js'
 import { deepActive, isOpen, leftBy, type Mounted, type Updatable } from './web-left.js'
 import { mountSetup } from './web-mount.js'
-import { adjust, rangeKey, slide } from './web-range.js'
+import { adjust, pointAt, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
 import { leave, typeInto, watchFocus } from './web-text.js'
@@ -236,7 +236,7 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
 /** Performs one intent on the mounted setup. A clock's intent, a hold, and a pick are performed by `run`. */
 const perform = async (
   mounted: Mounted,
-  intent: Exclude<Intent, { kind: 'hide' | 'hold' | 'pick' | 'show' | 'wait' }>,
+  intent: Exclude<Intent, { kind: 'hide' | 'hold' | 'pick' | 'point' | 'show' | 'wait' }>,
 ): Promise<void> => {
   const item = (value: string | undefined) =>
     value === undefined ? mounted.root : (mounted.items.get(value) ?? mounted.root)
@@ -381,6 +381,8 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
  * is the composed one its own `<input>` sends, which no record holds.
  */
 const TYPED: ReadonlySet<string> = new Set([
+  'color-input',
+  'color-picker',
   'file-input',
   'input',
   'number-input',
@@ -435,6 +437,12 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
         }
       } else if (intent.kind === 'hold') {
         const cannot = hold(mounted, intent, clock)
+        if (cannot !== undefined) {
+          steps.push({ cannot, intent: say(intent) })
+          continue
+        }
+      } else if (intent.kind === 'point') {
+        const cannot = await pointAt(mounted, intent.part, intent.x, intent.y)
         if (cannot !== undefined) {
           steps.push({ cannot, intent: say(intent) })
           continue

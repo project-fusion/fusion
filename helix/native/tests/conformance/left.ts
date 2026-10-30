@@ -1,5 +1,6 @@
 import { type Left, panelsOf, type Setup } from '@fusion.dev/helix-testing/conformance'
 import { screen } from '@testing-library/react-native'
+import { colorLeft } from './color'
 import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { layerIn, PAGE } from './layers'
@@ -222,5 +223,6 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...textLeft(run),
     ...rangeLeft(run),
     ...filesLeft(run),
+    ...colorLeft(run),
   }
 }

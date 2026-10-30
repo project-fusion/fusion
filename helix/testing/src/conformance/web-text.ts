@@ -23,7 +23,10 @@ const isControl = (at: unknown): at is Control =>
 
 /** The element's field, inside its shadow root. */
 export const controlOf = (mounted: Mounted): Control | undefined => {
-  const found = mounted.root.shadowRoot?.querySelector('[part~="control"]')
+  const shadow = mounted.root.shadowRoot
+  /* A color picker's text field is its `value`, its control being none. */
+  const found =
+    shadow?.querySelector('[part~="control"]') ?? shadow?.querySelector('[part~="value"]')
   return isControl(found) ? found : undefined
 }
 

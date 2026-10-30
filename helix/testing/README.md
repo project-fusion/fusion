@@ -76,6 +76,8 @@ own input and records, intent by intent:
 - for a family a reader moves along a track or picks a score in, as Slider
   and Rating, the value it holds, whether it is marked wrong, and its own
   `input` on each move or choice
+- for a color picker, the text of the color it holds, whether it is marked
+  wrong, and its own `input` on each move
 - for a family a reader picks files into, as File Input, the names of the
   files it holds, whether it is marked wrong, and its own `input` on each
   change; a refused file in an event's detail is recorded as its name and
@@ -147,6 +149,11 @@ go**, as a reader holds a number input's stepper. The web sends a touch's
 `pointerdown`, moves the clock, and sends `pointerup` and the click; a phone
 sends its press's press-in, moves the clock, and sends its press-out and
 press. A scenario with a `hold` moves the clock.
+
+**`point` presses the element's `part` at a point**, `x` and `y` fractions of
+it from its top left corner, as a reader presses a color picker's square. The
+web sends a touch's `pointerdown` and `pointerup` there, and a phone lays the
+part out and sends its press.
 
 **`pick` answers the element's file chooser with files**, each a name, a
 size and a type, or closes it where none are given. The web answers the
