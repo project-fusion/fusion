@@ -24,8 +24,9 @@ repository that produces them.
 `sandbox="allow-scripts allow-forms"` with `allow-same-origin` deliberately
 absent, so the code runs against an opaque origin: it cannot read our cookies,
 our storage or our DOM, because as far as the browser is concerned it is not us.
-A report that the sandbox runs arbitrary code is a report that it works. A report that code in it reached something
-outside the frame is a vulnerability and we want it.
+A report that the sandbox runs arbitrary code is a report that it works. A
+report that code in it reached something outside the frame is a vulnerability
+and we want it.
 
 Out of scope: findings from an automated scanner with no demonstrated impact,
 missing headers on a static page with nothing behind it, and anything that
