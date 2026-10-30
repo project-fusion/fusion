@@ -222,7 +222,7 @@
 
 /* Along the run, centered, and offset to the leading side of the line. */
 :host([variant="grip"]:not(:is([orientation="vertical"], [data-axis="vertical"])))
-[part="separator"]::after {
+  [part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
   inline-size: var(--splitter-grip-thickness, var(--helix-border-thick));
   inset-block-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
