@@ -6,7 +6,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Trend's styled tier, which writes `helix/styled/src/trend/root/trend-root.generated.css`.
+ * Trend's styled tier.
  *
  * **The arrow and the metric take the trend's color, and the label stays
  * gray.** The color is gray until `good` judges the move: success for

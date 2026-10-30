@@ -17,8 +17,7 @@ import { styles } from '../../../table.js'
 import slider from './headless.js'
 
 /**
- * Slider's styled tier, which writes
- * `helix/styled/src/slider/root/slider-root.generated.css`.
+ * Slider's styled tier.
  *
  * **A track and a thumb on it, and the value beside them.** The track is the
  * progress bar's thickness, its unfilled half the border color and its

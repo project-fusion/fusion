@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * A description list's styled tier, which writes
- * `helix/styled/src/description-list/root/description-list-root.generated.css`.
+ * A description list's styled tier.
  *
  * **The list is a grid, and each item a subgrid of it**, so a label and its
  * value stay one element while every label lines up with every other. One

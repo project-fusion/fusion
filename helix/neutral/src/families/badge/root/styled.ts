@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Badge's styled tier, which writes `helix/styled/src/badge/root/badge-root.generated.css`.
+ * Badge's styled tier.
  *
  * **The mark is sized by tokens, never by `em`**, so it measures the same
  * beside every size of what it decorates. A phone stops its height, its dot,

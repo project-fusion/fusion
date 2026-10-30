@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import breadcrumb from './headless.js'
 
 /**
- * A crumb's styled tier, which writes
- * `helix/styled/src/breadcrumbs/breadcrumb/breadcrumb.generated.css`. Its
+ * A crumb's styled tier. Its
  * hooks are the trail's, `--breadcrumbs-*`.
  *
  * **A control in a crumb is a crumb-sized target.** The host hands a Button

@@ -7,8 +7,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Progress's styled tier, which writes
- * `helix/styled/src/progress/root/progress-root.generated.css`.
+ * Progress's styled tier.
  *
  * **A row when there is a reading to put beside the bar**, and a bare block
  * when there is not, so a plain bar is the box it always was. A label sits

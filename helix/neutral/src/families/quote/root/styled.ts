@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Quote's styled tier, which writes `helix/styled/src/quote/root/quote-root.generated.css`.
+ * Quote's styled tier.
  *
  * **Quieter than the prose it sits in.** A quotation is somebody else
  * speaking inside a sentence that is yours, so it reads as an aside: the

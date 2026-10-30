@@ -3,7 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A list row's styled tier, which writes `helix/styled/src/list/item/list-item.generated.css`.
+ * A list row's styled tier.
  *
  * **One line of five tracks: the rail, the leading content, the body, the
  * trailing content, and the grip.** The body holds the label and the

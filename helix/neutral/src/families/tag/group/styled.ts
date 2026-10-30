@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * Tag Group's styled tier, which writes
- * `helix/styled/src/tag/group/tag-group.generated.css`.
+ * Tag Group's styled tier.
  *
  * **A row of tags that wraps**, a step of space between them either way, so
  * a set of filters under a search field reads as one block. The `empty` part

@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import scrollArea from './headless.js'
 
 /**
- * Scroll Area's styled tier, which writes
- * `helix/styled/src/scroll-area/root/scroll-area-root.generated.css`.
+ * Scroll Area's styled tier.
  *
  * **The fades are a mask on the viewport on the web**, so the surface behind
  * the scroll area shows through them. Each edge's depth is a private value,

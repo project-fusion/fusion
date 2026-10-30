@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Stat's styled tier, which writes `helix/styled/src/stat/root/stat-root.generated.css`.
+ * Stat's styled tier.
  *
  * **A grid on the web, so the unit sits on the figure's baseline** and the
  * label and the trend span the width above and below it. A phone has no grid

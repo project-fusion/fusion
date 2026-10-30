@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Speed Dial's styled tier, which writes
- * `helix/styled/src/speed-dial/root/speed-dial-root.generated.css`.
+ * Speed Dial's styled tier.
  *
  * **The drawn trigger is a round button in the primary surface**, raised,
  * lifted further under the pointer and set down as it is pressed, with a

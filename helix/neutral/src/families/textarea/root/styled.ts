@@ -20,8 +20,7 @@ const ease = [token('duration-fast'), token('easing-standard')] as const
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
- * Textarea's styled tier, which writes
- * `helix/styled/src/textarea/root/textarea-root.generated.css`.
+ * Textarea's styled tier.
  *
  * **The same frame as Input**, so a form of mixed fields reads as one set:
  * the stack, the hover edge, the focus ring, and the stripped control are

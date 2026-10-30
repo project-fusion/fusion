@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A navigation item's styled tier, which writes
- * `helix/styled/src/navigation/item/navigation-item.generated.css`.
+ * A navigation item's styled tier.
  *
  * **It draws what the `data-navigation-item` recipe gives a link of your
  * own**, hook for hook, so an item and a page's own link stand alike in one

@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Copy Button's styled tier, which writes
- * `helix/styled/src/copy-button/root/copy-button-root.generated.css`.
+ * Copy Button's styled tier.
  *
  * **It is drawn over Icon Button's rules**: the web element adopts Icon
  * Button's stylesheet before this one, and a phone lays Icon Button's rules

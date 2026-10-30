@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Motion Toggle's styled tier, which writes
- * `helix/styled/src/motion-toggle/root/motion-toggle-root.generated.css`.
+ * Motion Toggle's styled tier.
  *
  * **A quiet button on the floating surface**, as the controls over a map and
  * Aura's own pause are, so it reads over a page's header or over a drawing

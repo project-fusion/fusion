@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Loader's styled tier, which writes
- * `helix/styled/src/loader/root/loader-root.generated.css`.
+ * Loader's styled tier.
  *
  * **Sized from the loader size tokens**, so a loader is the same size
  * wherever it is placed. `--loader-size: 1em` matches the text beside it, as

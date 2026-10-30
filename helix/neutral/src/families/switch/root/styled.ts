@@ -6,7 +6,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Switch's styled tier, which writes `helix/styled/src/switch/root/switch-root.generated.css`.
+ * Switch's styled tier.
  *
  * **The width follows the height**, so `--switch-block-size` widens the
  * switch too and keeps its proportion, and the density steps carry the ratio

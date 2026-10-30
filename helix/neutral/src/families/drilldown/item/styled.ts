@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import row from './headless.js'
 
 /**
- * A drilldown row's styled tier, which writes
- * `helix/styled/src/drilldown/item/drilldown-item.generated.css`.
+ * A drilldown row's styled tier.
  *
  * **A row is the width of its page**, its label taking what the row leaves
  * and ending in an ellipsis, with the caret of a row that opens a page at

@@ -16,8 +16,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Menu's styled tier, which writes
- * `helix/styled/src/menu/root/menu-root.generated.css`.
+ * Menu's styled tier.
  *
  * **The panel is the floating surface**, with its edge, its shadow and the
  * house radius, at least `12rem` wide, and compact by nature: it sets the

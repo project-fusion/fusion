@@ -15,8 +15,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Meter's styled tier, which writes
- * `helix/styled/src/meter/root/meter-root.generated.css`.
+ * Meter's styled tier.
  *
  * **A row when there is a reading to put beside the bar**, and a bare block
  * when there is not, as Progress has it, so the two read as one family. A

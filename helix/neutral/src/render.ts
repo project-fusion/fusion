@@ -17,7 +17,7 @@
  * ```
  *
  * **Read as syntax and never run.** `helix system` parses the module
- * (`helix/cli/src/family/read/jsx.rs`) and compiles it to the intermediate
+ * and compiles it to the intermediate
  * form, and nothing in it runs.
  *
  * **What a render may hold.** The nodes below, each with its attributes. An

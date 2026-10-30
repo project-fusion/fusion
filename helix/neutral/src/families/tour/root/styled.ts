@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Tour's styled tier, which writes
- * `helix/styled/src/tour/root/tour-root.generated.css`.
+ * Tour's styled tier.
  *
  * **The root draws one thing: the light.** Everything else is a stop's.
  *

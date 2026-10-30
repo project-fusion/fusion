@@ -6,8 +6,7 @@ import { styles } from '../../../table.js'
 import pinInput from './headless.js'
 
 /**
- * Pin Input's styled tier, which writes
- * `helix/styled/src/pin-input/root/pin-input-root.generated.css`.
+ * Pin Input's styled tier.
  *
  * **A row of boxes, apart, as wide as its boxes**, so the row starts where
  * the label does. Each box is a drawn square, its character centered, in

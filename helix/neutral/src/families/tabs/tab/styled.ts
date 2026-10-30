@@ -3,7 +3,7 @@ import { styles } from '../../../table.js'
 import tab from './headless.js'
 
 /**
- * A tab's styled tier, which writes `helix/styled/src/tabs/tab/tab.generated.css`.
+ * A tab's styled tier.
  *
  * **Every private value a tab reads comes from the tab set**, which sets them
  * all for its default and overrides what a variant changes. The fallbacks are

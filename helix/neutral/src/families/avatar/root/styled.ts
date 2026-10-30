@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Avatar's styled tier, which writes
- * `helix/styled/src/avatar/root/avatar-root.generated.css`.
+ * Avatar's styled tier.
  *
  * **A circle of the avatar size token**, or a rounded square, filled with
  * the raised surface: gray, not a brand tint, since an avatar with no

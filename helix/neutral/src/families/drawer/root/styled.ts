@@ -18,8 +18,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Drawer's styled tier, which writes
- * `helix/styled/src/drawer/root/drawer-root.generated.css`.
+ * Drawer's styled tier.
  *
  * **The panel is the floating surface along an edge**, as long as the
  * window and as wide as `--drawer-size` across it, square where it meets

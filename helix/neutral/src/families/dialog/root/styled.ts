@@ -16,8 +16,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Dialog's styled tier, which writes
- * `helix/styled/src/dialog/root/dialog-root.generated.css`.
+ * Dialog's styled tier.
  *
  * **The panel is the floating surface**, with its edge, its shadow and the
  * house radius, as wide as `size` says and never wider or taller than the

@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Image's styled tier, which writes
- * `helix/styled/src/image/root/image-root.generated.css`.
+ * Image's styled tier.
  *
  * **The box is the element's, and the picture fills it**, fitted by
  * `--image-fit`. The placeholder and the fallback each cover the box exactly,

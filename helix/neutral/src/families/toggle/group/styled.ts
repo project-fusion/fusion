@@ -6,8 +6,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * Toggle Group's styled tier, which writes
- * `helix/styled/src/toggle/group/toggle-group.generated.css`.
+ * Toggle Group's styled tier.
  *
  * **The host is the stack**: a label, the row that holds the track, and one
  * line under it. The track gives its toggles the row's height and its corners

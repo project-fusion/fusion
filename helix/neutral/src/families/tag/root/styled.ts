@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Tag's styled tier, which writes `helix/styled/src/tag/root/tag-root.generated.css`.
+ * Tag's styled tier.
  *
  * **The host is the box, and its height is defined** rather than falling out
  * of padding, so a tag beside a control lines up: the `size-tag` step of the

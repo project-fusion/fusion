@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Skeleton's styled tier, which writes
- * `helix/styled/src/skeleton/root/skeleton-root.generated.css`.
+ * Skeleton's styled tier.
  *
  * **The shape holds still and its sheen moves.** A block fading in and out
  * reads as something broken, and a highlight traveling across it reads as
