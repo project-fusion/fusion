@@ -46,108 +46,89 @@
 # `^__HELIX_VERSION__` for `helix new` to fill in with the version it ships
 # with. Dependabot read the placeholder as a broken requirement, and every
 # template's run failed on those three packages.
+# **Bun, Cargo, and the templates share one pull request a month.** A group
+# cannot span ecosystems, so `groups` alone left one pull request each for
+# production, development, Cargo, and every template. Each entry in the
+# multi-ecosystem group needs its own `patterns`, and the group holds the
+# schedule. Security updates do not wait for it.
+#
+# **`github-actions` keeps its own pull request, weekly**, for the reason above:
+# it is the one that decides what is published, so it is read by itself.
 version: 2
+multi-ecosystem-groups:
+  dependencies:
+    schedule:
+      interval: monthly
 updates:
   - directory: /
-    groups:
-      development:
-        dependency-type: development
-        patterns: ['*']
-      production:
-        dependency-type: production
-        patterns: ['*']
-        update-types: [minor, patch]
     ignore:
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
       - dependency-name: '@luma.gl/*'
         versions: ['>=9.4.0']
-    open-pull-requests-limit: 5
+    multi-ecosystem-group: dependencies
     package-ecosystem: bun
-    schedule:
-      interval: weekly
+    patterns: ['*']
   # The consumer templates are not workspace members, so the root entry never
   # sees them, and what they pin ships to every `helix new` project. Angular's
   # compiler, `vue-tsc`, and `svelte-check` each name the TypeScript they
   # take, so a TypeScript major is theirs to adopt first.
   - directory: /helix/templates/templates/angular
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /helix/templates/templates/react-nextjs
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /helix/templates/templates/react-vite
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /helix/templates/templates/solid-vite
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /helix/templates/templates/svelte-vite
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /helix/templates/templates/vue-vite
-    groups:
-      template:
-        patterns: ['*']
     ignore:
       - dependency-name: '@fusion.dev/*'
       - dependency-name: 'typescript'
         update-types: [version-update:semver-major]
+    multi-ecosystem-group: dependencies
     package-ecosystem: npm
-    schedule:
-      interval: weekly
+    patterns: ['*']
   # **`wit-component` moves with `wasmtime`, so it is ignored here.** The tests
   # take it at the wasm-tools release `wasmtime` is built on, and a newer one
   # compiles a second `wasmparser` and `wasm-encoder`: 0.258 beside 0.260 until
   # October 16, 2026. The root `Cargo.toml` says so where it is pinned.
   - directory: /
-    groups:
-      cargo:
-        patterns: ['*']
     ignore:
       - dependency-name: 'wit-component'
-    open-pull-requests-limit: 3
+    multi-ecosystem-group: dependencies
     package-ecosystem: cargo
-    schedule:
-      interval: weekly
+    patterns: ['*']
   - directory: /
     groups:
       actions:
