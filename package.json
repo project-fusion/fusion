@@ -75,13 +75,13 @@
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
   "devDependencies": {
-    "@anthropic-ai/sdk": "0.135.0",
-    "@biomejs/biome": "^2.5.15",
+    "@anthropic-ai/sdk": "1.3.0",
+    "@biomejs/biome": "^2.6.3",
     "@fusion.dev/scripts": "workspace:*",
-    "@happy-dom/global-registrator": "^21.0.1",
-    "@types/bun": "^1.4.3",
+    "@happy-dom/global-registrator": "^21.0.4",
+    "@types/bun": "^1.4.4",
     "@types/node": "^22.20.5",
-    "turbo": "^2.11.8",
+    "turbo": "^2.11.10",
     "typescript": "^7.0.2"
   },
   "engines": {

@@ -43,11 +43,11 @@
   "devDependencies": {
     "@fusion.dev/helix-headless": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
-    "@types/bun": "^1.4.3",
+    "@types/bun": "^1.4.4",
     "prosemirror-model": "^1.25.12",
     "prosemirror-state": "^1.4.4",
-    "prosemirror-transform": "^1.12.2",
-    "prosemirror-view": "^1.42.6"
+    "prosemirror-transform": "^1.12.4",
+    "prosemirror-view": "^1.42.8"
   },
   "homepage": "https://fusion.dev",
   "keywords": [
