@@ -18,6 +18,7 @@ export type Family =
   | 'dialog'
   | 'drawer'
   | 'drilldown'
+  | 'file-input'
   | 'format-date'
   | 'image'
   | 'input'
