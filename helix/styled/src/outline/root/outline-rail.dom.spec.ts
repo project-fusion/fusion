@@ -61,6 +61,15 @@ describe('outline rail', () => {
     expect(Number(getComputedStyle(surface).opacity)).toBeGreaterThan(0)
   })
 
+  geometry('hides the ticks while the surface is open', async () => {
+    const host = await rail()
+    const ticks = part(host, 'ticks')
+    expect(getComputedStyle(ticks).visibility).toBe('visible')
+    ;(host.querySelector('a') as HTMLElement).focus()
+    await settle(host)
+    expect(getComputedStyle(ticks).visibility).toBe('hidden')
+  })
+
   geometry('takes the hooks', async () => {
     const host = await rail(
       '--outline-tick-color: rgb(3, 3, 3); --outline-tick-current-color: rgb(5, 5, 5); --outline-tick-length: 40px; --outline-surface-max-inline-size: 90px; --outline-surface-background-color: rgb(9, 9, 9)',

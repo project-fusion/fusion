@@ -105,6 +105,62 @@ describe('outline rail', () => {
     expect(hasState(outline, 'open')).toBe(false)
   })
 
+  describe('a tap', () => {
+    const press = (type: string, pointerType: string, target: EventTarget): void => {
+      const event = new Event(type, { bubbles: true, composed: true })
+      Object.assign(event, { pointerType })
+      target.dispatchEvent(event)
+    }
+    test('keeps the rail open once the finger lifts', async () => {
+      const outline = await rail()
+      press('pointerenter', 'touch', outline)
+      press('pointerdown', 'touch', outline)
+      press('pointerup', 'touch', outline)
+      press('pointerleave', 'touch', outline)
+      expect(hasState(outline, 'open')).toBe(false)
+      outline.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+      expect(hasState(outline, 'open')).toBe(true)
+    })
+
+    test('closes on a tap outside, on Escape, and on a tap on a link', async () => {
+      const outline = await rail()
+      const open = (): void => {
+        press('pointerdown', 'touch', outline)
+        outline.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+        expect(hasState(outline, 'open')).toBe(true)
+      }
+      open()
+      press('pointerdown', 'touch', document.body)
+      expect(hasState(outline, 'open')).toBe(false)
+      open()
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }))
+      expect(hasState(outline, 'open')).toBe(false)
+      open()
+      const link = outline.querySelector('a') as HTMLAnchorElement
+      press('pointerdown', 'touch', link)
+      link.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+      expect(hasState(outline, 'open')).toBe(false)
+    })
+
+    test('a tap inside leaves it open', async () => {
+      const outline = await rail()
+      press('pointerdown', 'touch', outline)
+      outline.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+      press('pointerdown', 'touch', outline)
+      expect(hasState(outline, 'open')).toBe(true)
+    })
+
+    test('a mouse click does not hold the rail open', async () => {
+      const outline = await rail()
+      press('pointerdown', 'mouse', outline)
+      outline.dispatchEvent(new Event('click', { bubbles: true, composed: true }))
+      expect(hasState(outline, 'open')).toBe(false)
+      fire(outline, 'pointerenter')
+      fire(outline, 'pointerleave')
+      expect(hasState(outline, 'open')).toBe(false)
+    })
+  })
+
   test('closes when the pointer leaves, unless focus is inside', async () => {
     const outline = await rail()
     fire(outline, 'pointerenter')
