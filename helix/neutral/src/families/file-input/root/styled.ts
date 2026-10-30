@@ -10,8 +10,7 @@ const ease = [token('duration-fast'), token('easing-standard')] as const
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
- * File Input's styled tier, which writes
- * `helix/styled/src/file-input/root/file-input-root.generated.css`.
+ * File Input's styled tier.
  *
  * **The field is a box with room in it**, a dashed edge that marks it as a
  * place to drop files before anything is dragged. The stack, the hover edge,

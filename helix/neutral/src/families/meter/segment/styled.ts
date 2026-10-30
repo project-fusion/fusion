@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import segment from './headless.js'
 
 /**
- * A meter segment's styled tier, which writes
- * `helix/styled/src/meter/segment/meter-segment.generated.css`.
+ * A meter segment's styled tier.
  *
  * **The host takes no box**, so the slice it draws is a flex item of the
  * meter's track, which lets a segment be written inside a meter as one

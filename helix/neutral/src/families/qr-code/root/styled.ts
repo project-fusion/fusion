@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * QR Code's styled tier, which writes
- * `helix/styled/src/qr-code/root/qr-code-root.generated.css`.
+ * QR Code's styled tier.
  *
  * **A square that holds its own shape**, in ink on paper, the media pair the
  * other way up, so a code reads in both schemes. The corner squares take

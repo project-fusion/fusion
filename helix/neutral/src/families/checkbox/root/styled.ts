@@ -19,7 +19,7 @@ const marked = [{ checked: true }, { indeterminate: true }] as const
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
- * Checkbox's styled tier, which writes `helix/styled/src/checkbox/root/checkbox-root.generated.css`.
+ * Checkbox's styled tier.
  *
  * **The box is the input with its own drawing turned off**, so it stays a
  * real control for assistive technology, and the mark lies over it in the

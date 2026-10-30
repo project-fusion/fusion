@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * A megamenu group's styled tier, which writes
- * `helix/styled/src/megamenu/group/megamenu-group.generated.css`.
+ * A megamenu group's styled tier.
  *
  * **It draws what the `data-megamenu-group` and `data-megamenu-heading`
  * recipes give markup of your own**: a column of destinations one gap

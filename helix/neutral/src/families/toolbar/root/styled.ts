@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Toolbar's styled tier, which writes
- * `helix/styled/src/toolbar/root/toolbar-root.generated.css`.
+ * Toolbar's styled tier.
  *
  * **Dense by nature, and it says so once.** The host sets the small steps
  * of every control size, so a control put in it takes them without being

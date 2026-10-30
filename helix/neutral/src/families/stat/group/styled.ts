@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * Stat Group's styled tier, which writes
- * `helix/styled/src/stat/group/stat-group.generated.css`.
+ * Stat Group's styled tier.
  *
  * **The stats wrap onto a new line as they run out of room**, each as wide as
  * its own figure. `columns` shares the row equally among a fixed number,

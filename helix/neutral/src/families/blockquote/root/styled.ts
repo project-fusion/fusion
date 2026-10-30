@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Blockquote's styled tier, which writes `helix/styled/src/blockquote/root/blockquote-root.generated.css`.
+ * Blockquote's styled tier.
  *
  * **Set in the display face, larger than body text**, to mark a change of
  * voice, with the attribution smaller and quieter under it.

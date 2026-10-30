@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import section from './headless.js'
 
 /**
- * A menu section's styled tier, which writes
- * `helix/styled/src/menu/section/menu-section.generated.css`. Its hooks are
+ * A menu section's styled tier. Its hooks are
  * the menu's, `--menu-*`.
  *
  * **A section decides its own leading column**, so a section of plain rows

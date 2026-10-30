@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Drilldown's styled tier, which writes
- * `helix/styled/src/drilldown/root/drilldown-root.generated.css`.
+ * Drilldown's styled tier.
  *
  * **A region, not an overlay**: it sits where it is put, with a fill and a
  * width and no shadow, and clips the page that slides in. The header over a

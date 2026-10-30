@@ -10,8 +10,7 @@ const ease = [token('duration-fast'), token('easing-standard')] as const
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
- * Input's styled tier, which writes
- * `helix/styled/src/input/root/input-root.generated.css`.
+ * Input's styled tier.
  *
  * **The box is the field, and the text is stripped inside it.** The stack,
  * the hover edge, the focus ring, the wrong state, and the stripped control

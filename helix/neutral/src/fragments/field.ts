@@ -3,9 +3,8 @@ import { fragment } from '../table.js'
 import visuallyHidden from './visually-hidden.js'
 
 /**
- * The label, hint, and feedback every field draws, styled once: what
- * `helix/styled/src/shared/field/field.css` holds, for a family whose table
- * writes its stylesheet. A family takes it in with `include(field)`, and
+ * The label, hint, and feedback every field draws, styled once: what the shared
+ * field sheet holds, for a family whose table writes its stylesheet. A family takes it in with `include(field)`, and
  * with `field-inline` or `field-stacked` for where its label sits.
  *
  * **Every placeholder is left to the field that has one.** `::placeholder`

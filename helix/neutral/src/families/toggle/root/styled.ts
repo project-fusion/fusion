@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Toggle's styled tier, which writes
- * `helix/styled/src/toggle/root/toggle-root.generated.css`.
+ * Toggle's styled tier.
  *
  * **On the web, the item's look is the base layer's**, beside the
  * `data-navigation-item` recipe it is paired with, as `helix-toggle::part(item)`

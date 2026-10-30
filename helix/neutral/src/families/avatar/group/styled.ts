@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * Avatar Group's styled tier, which writes
- * `helix/styled/src/avatar/group/avatar-group.generated.css`.
+ * Avatar Group's styled tier.
  *
  * **Each avatar overlaps the one before it** and is drawn over it, ringed in
  * the page's background so the edge between two reads. The overlap is a

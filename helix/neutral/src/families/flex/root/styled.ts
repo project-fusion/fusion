@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Flex's styled tier, which writes `helix/styled/src/flex/root/flex-root.generated.css`.
+ * Flex's styled tier.
  *
  * **The host is the container.** No wrapper part, so the element adds no box
  * of its own and costs exactly the div it replaces. A phone draws it as a

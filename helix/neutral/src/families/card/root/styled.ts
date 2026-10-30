@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Card's styled tier, which writes `helix/styled/src/card/root/card-root.generated.css`.
+ * Card's styled tier.
  *
  * **The host is the surface**: a grid of one column, with one inset for every
  * region so they narrow together, packed at the top with the slack at the

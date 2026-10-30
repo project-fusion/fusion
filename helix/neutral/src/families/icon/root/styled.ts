@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Icon's styled tier, which writes `helix/styled/src/icon/root/icon-root.generated.css`.
+ * Icon's styled tier.
  *
  * **The box is the host, and the glyph fills it.** `--icon-size` sizes the
  * host, falling back to the icon step, so a container resizes the icons in it

@@ -6,8 +6,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Checkbox Group's styled tier, which writes
- * `helix/styled/src/checkbox-group/root/checkbox-group-root.generated.css`.
+ * Checkbox Group's styled tier.
  *
  * **The host is the stack**: a name, the set, and one line under it.
  * `orientation` lays out the boxes alone, so a row of them keeps its name

@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Radio's styled tier, which writes `helix/styled/src/radio/root/radio-root.generated.css`.
+ * Radio's styled tier.
  *
  * **A circle with a dot in it.** The dot scales up from nothing when the
  * radio is chosen, as a checkbox's tick does, and takes no color: a chosen
