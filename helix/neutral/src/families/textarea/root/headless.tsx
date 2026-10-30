@@ -32,6 +32,9 @@ import {
  * **A phone checks `required`, `minlength`, and `maxlength`** as the web's
  * `<textarea>` does, in Helix's sentences.
  *
+ * **Read-only, a reader can still select and copy the text**, and the field
+ * opens no keyboard on a phone.
+ *
  * **Web only:** dragging the field's size, `wrap`, `cols`, `dirname`, and
  * dictation.
  */
