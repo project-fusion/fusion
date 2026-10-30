@@ -668,6 +668,14 @@ export interface WrapAttributes extends Common, Drawing {
   readonly current?: Given
   readonly href?: Given
   readonly part: string
+  /** What a `renders` function is given first, as a row's file. */
+  readonly passes?: Given
+  /**
+   * The prop that holds a function whose content stands in what the wrap
+   * holds, called with `passes` and the copy's place, as a file input's
+   * `renderFile`. Where the prop holds none, the wrap draws what it holds.
+   */
+  readonly renders?: Read
   /** Drawn only while this holds. */
   readonly when?: Read | undefined
 }
