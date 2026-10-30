@@ -2,7 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import { acceptList, accepts, fileKind, fileSize, screenFiles } from './file-input.js'
 
 /** A file as a phone's capability gives it: a record, with no content of its own. */
-const record = (name: string, type: string, size = 10) => ({ name, size, type, uri: `file:///${name}` })
+const record = (name: string, type: string, size = 10) => ({
+  name,
+  size,
+  type,
+  uri: `file:///${name}`,
+})
 
 describe('a file field’s rules', () => {
   test('read a record as they read a File', () => {
