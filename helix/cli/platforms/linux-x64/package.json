@@ -21,6 +21,6 @@
     "linux"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

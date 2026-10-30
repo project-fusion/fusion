@@ -45,6 +45,6 @@
     "contrast"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

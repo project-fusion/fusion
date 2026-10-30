@@ -61,6 +61,6 @@
     "syntax-highlighting"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

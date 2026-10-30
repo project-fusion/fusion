@@ -21,6 +21,6 @@
     "win32"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

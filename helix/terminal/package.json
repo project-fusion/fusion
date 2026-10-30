@@ -55,6 +55,6 @@
     "pseudo-terminal"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
