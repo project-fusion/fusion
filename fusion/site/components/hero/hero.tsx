@@ -26,7 +26,7 @@ export function Hero() {
         <helix-flex class={styles.heroActions} direction="column" gap="md">
           <helix-flex align-items="center" data-density="lg" gap="sm" justify-content="center" wrap>
             <Link data-button="solid" data-button-tone="primary" href="/helix">
-              Open Helix
+              Open Fusion Helix
             </Link>
             <Link data-button="subtle" href="/company/services">
               Work with us

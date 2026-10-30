@@ -34,7 +34,7 @@ export const LANDING: PageCopy = {
     {
       /* The page draws this as a diagram, and these are the words it reads out. */
       body: [
-        'Your brand, your code, and your decisions flow into Fusion. Out of it come Helix, which checks every screen, and Cortex, which keeps every decision with its reason.',
+        'Your brand, your code, and your decisions flow into Fusion. Out of it come Fusion Helix, which checks every screen, and Cortex, which keeps every decision with its reason.',
       ],
       from: 'products',
       title: 'What goes into Fusion and what comes out',
