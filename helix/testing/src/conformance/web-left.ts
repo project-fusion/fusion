@@ -1,4 +1,5 @@
 import type { Left } from './format.js'
+import { filesOf } from './web-files.js'
 
 /*
  * What an intent left in the page, read from the elements a setup mounted:
@@ -202,6 +203,10 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
       }
     : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
+  /* A file input's files, by name, and whether it is marked wrong. */
+  ...(family === 'file-input'
+    ? { files: filesOf(mounted), invalid: inState(mounted.root, 'invalid') }
+    : {}),
 })
 
 /** Where a copy stands, by the web's states: `copied`, `failed`, or `resting`. */
