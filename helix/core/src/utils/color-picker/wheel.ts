@@ -1,4 +1,6 @@
-import { clamp } from '@fusion.dev/helix-core'
+/** A number held between two others. */
+const clamp = (value: number, least: number, most: number): number =>
+  Math.min(most, Math.max(least, value))
 
 /** A box on the screen, as `getBoundingClientRect` gives one. */
 export interface WheelBox {
