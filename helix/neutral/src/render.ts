@@ -247,10 +247,13 @@ export interface Render<Props, Events, States extends readonly string[], Derived
 type Passed = Omit<Headless, 'derived' | 'events' | 'item' | 'name' | 'props' | 'states' | 'tree'>
 
 /** A source written with `render`, typed so a style table is checked against its props and states. */
-export type RenderedHeadless<Props, States extends readonly string[], Derived> = Omit<
-  Headless,
-  'derived' | 'props' | 'states' | 'tree'
-> & {
+export type RenderedHeadless<
+  Props,
+  States extends readonly string[],
+  Derived,
+  Name extends string = string,
+> = Omit<Headless, 'derived' | 'name' | 'props' | 'states' | 'tree'> & {
+  readonly name: Name
   readonly derived: { readonly [Key in keyof Derived & string as Kebab<Key>]: Derived[Key] }
   readonly props: PropsList<Props>
   readonly states: States
@@ -276,8 +279,9 @@ export const headless = <
   const Events extends Readonly<Record<string, EventValue>> = Record<never, never>,
   const States extends readonly string[] = [],
   const Derived extends Readonly<Record<string, unknown>> = Record<never, never>,
+  const Name extends string = string,
 >(
-  name: string,
+  name: Name,
   body: Passed & {
     /** The collection the element joins, as `set('tabs')`. */
     readonly memberOf?: Member
@@ -288,7 +292,7 @@ export const headless = <
     /** The part tree, drawn from what the keys before it declare. */
     readonly render: (given: Render<Props, Events, States, Derived>) => Drawn
   },
-): RenderedHeadless<Props, States, Derived> => {
+): RenderedHeadless<Props, States, Derived, Name> => {
   const { derived, events, memberOf, props, render, states, ...passed } = body
   return {
     ...passed,
@@ -308,7 +312,7 @@ export const headless = <
     render,
     states: states ?? [],
     tree: [],
-  } as unknown as RenderedHeadless<Props, States, Derived>
+  } as unknown as RenderedHeadless<Props, States, Derived, Name>
 }
 
 /** The collection an element joins, as `memberOf` takes it. */

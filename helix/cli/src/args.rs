@@ -475,6 +475,15 @@ pub enum System {
     #[cfg(feature = "internal")]
     DesignTokens(SystemDesignTokens),
 
+    /// Write the names of the parts each render draws, for its style table's typecheck.
+    ///
+    /// Reads each `headless.tsx` and writes `src/parts.generated/` in the
+    /// package holding the sources, which `styles()` reads, so a table naming a
+    /// part its render does not draw fails its typecheck. Never committed: run it
+    /// before `tsc`, or with `--watch` while you write. With `--check`, writes
+    /// nothing and exits 1 when a module is missing or out of date.
+    Parts(SystemParts),
+
     /// Print what each element is called on each platform, as JSON.
     ///
     /// For each element with a native component: the component's name, and
@@ -603,6 +612,22 @@ pub struct SystemTypes {
 
     /// The package the types are written into, which is the directory holding
     /// its `src`: the system's `runtime.sources.native` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system parts` takes.
+#[derive(Args, Debug)]
+pub struct SystemParts {
+    /// Say which modules are missing or out of date, and write nothing.
+    #[arg(long, conflicts_with = "watch")]
+    pub check: bool,
+
+    /// Keep writing them as the headless sources change, until stopped.
+    #[arg(long)]
+    pub watch: bool,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
     pub package: Option<PathBuf>,
 }
 

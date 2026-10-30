@@ -180,6 +180,11 @@ Set `jsxImportSource` to `@fusion.dev/helix-neutral` in your
 `render`. Acme's `tsconfig.json` does this, and this repository's typecheck
 runs it against the package's published entry points.
 
+Run `helix system parts` before `tsc`, and add `src/parts.generated` to your
+`.gitignore`. It writes the names each render draws, so a style table naming a
+part its render does not draw fails your typecheck. `--watch` keeps them fresh
+while you write. Without them, a table is checked against any name.
+
 ## Write families
 
 Write each element as the [README](README.md) describes. What a design
@@ -261,6 +266,7 @@ Helix's runtime installs what they write.
 |---|---|---|
 | `helix system build` | `families`, `tokens` | `outputs.build`: each element's form and web stylesheet |
 | `helix system stylesheets` | `families`, `tokens` | `outputs.stylesheets`: each element's generated stylesheet |
+| `helix system parts` | `families` | `src/parts.generated`: the names each render draws, which `styles()` reads |
 | `helix system check` | `families`, `manifest` | Nothing. It says where an element differs from the manifest |
 | `helix system components` | `families`, `manifest`, `events`, `runtime` | `outputs.components`: each family's native module |
 | `helix system platforms` | `families`, `manifest` | Prints each element's names on React Native |
