@@ -43,6 +43,13 @@ const build = (setup: Setup): Updatable => {
       made.setAttribute(name, value === true ? '' : String(value))
     }
   }
+  if (setup.items !== undefined) {
+    const holds = made as Updatable & { items?: unknown; renderItem?: unknown; textField?: string }
+    holds.items = setup.items
+    const field = String(setup.props?.['text-field'] ?? '')
+    holds.renderItem = (item: Readonly<Record<string, unknown>> | string) =>
+      typeof item === 'string' ? item : String(item[field])
+  }
   if (setup.slot !== undefined) {
     made.setAttribute('slot', setup.slot)
   }
@@ -254,6 +261,10 @@ const perform = async (
         focusPage(mounted)
         return
       }
+      if (intent.row !== undefined) {
+        mounted.root.querySelector<HTMLElement>(`[data-index="${intent.row}"]`)?.focus()
+        return
+      }
       const target = item(intent.item) as Updatable & { focusItem?: () => void }
       if (typeof target.focusItem === 'function') {
         target.focusItem()
@@ -318,6 +329,10 @@ const perform = async (
       if (intent.link !== undefined) {
         tap(mounted.root.querySelector(`a[href="#${intent.link}"]`) ?? mounted.root, intent.held)
         break
+      }
+      if (intent.row !== undefined) {
+        tap(mounted.root.querySelector(`[data-index="${intent.row}"]`) ?? mounted.root, intent.held)
+        return
       }
       const pressed = item(intent.item)
       const part =
@@ -398,6 +413,10 @@ const TYPED: ReadonlySet<string> = new Set([
 
 /** The name an event goes by in a record: its type without `helix-`, and a bare one as it is. */
 const nameOf = (type: string, family: string): string | undefined => {
+  /* Read from laid-out lengths, which a phone's jest spec holds apart. */
+  if (type === 'helix-load-more' || type === 'helix-range-change') {
+    return undefined
+  }
   if (type.startsWith('helix-')) {
     return type.slice('helix-'.length)
   }

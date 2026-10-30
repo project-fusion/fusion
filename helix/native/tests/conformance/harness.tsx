@@ -36,6 +36,7 @@ import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusField, leave, pressBox, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
+import { rowDisabled, rowWords } from './window'
 
 /*
  * The React Native half of the conformance suite: draws a scenario's setup
@@ -121,7 +122,12 @@ const hearing = (run: Run, name: string, value: string | null) => {
        edit or move**, which both halves record. An item whose event the element hears after it, as
        a toast's message, says which item sent it, where the event carries no
        value. */
-    if ((value !== null && relayed) || (name === 'input' && !typed)) {
+    if (
+      (value !== null && relayed) ||
+      (name === 'input' && !typed) ||
+      name === 'load-more' ||
+      name === 'range-change'
+    ) {
       relay(event, value)
       return
     }
@@ -183,6 +189,9 @@ const draw = (run: Run, setup: Setup, value: string | null): ReactElement => {
     throw new Error(`conformance: no generated component draws <${setup.tag}>`)
   }
   const props = propsOf(run, setup, value)
+  if (setup.items !== undefined) {
+    props.items = setup.items
+  }
   const children: (ReactElement | string)[] = []
   for (const child of (setup.children ?? []).filter((one) => !gone(run, one))) {
     const made = drawChild(run, child)
@@ -220,7 +229,10 @@ const press = async (
   if (Object.values(intent.held ?? {}).some((held) => held === true)) {
     return CANNOT.held
   }
-  const words = wordsOf(setup, intent.item)
+  if (intent.row !== undefined && rowDisabled(setup, intent.row)) {
+    return undefined
+  }
+  const words = intent.row === undefined ? wordsOf(setup, intent.item) : rowWords(setup, intent.row)
   /* A part of the item is the press drawn inside the item's own, or
      beside its words. */
   const inner = intent.part === undefined ? pressOf(words) : partPressOf(words, intent.part)
@@ -271,6 +283,10 @@ const typed = (tag: string): boolean => formOf(tag).api?.entry !== undefined
  */
 const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
   const { setup } = run.scenario
+  if (intent.row !== undefined) {
+    run.focus.place(focusable(run, rowWords(setup, intent.row)))
+    return
+  }
   if (intent.page !== true && intent.item === undefined && typed(setup.tag)) {
     await focusField(run)
     return
