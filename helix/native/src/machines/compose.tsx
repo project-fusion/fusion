@@ -39,6 +39,7 @@ import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
 import { settingTurns, turning, turnsAlone } from './turns'
 import { type Judged, useValidation } from './validation'
+import { useWindow } from './window'
 
 export { scrollingOf } from './scrolling'
 
@@ -210,6 +211,17 @@ export const behaviorFor = (family: Family): UseBehavior => {
             const { behavior, handle, names } = useFiles(family, props, use, around.touch)
             around.chosen.current = names
             around.handle.current = handle
+            return behavior
+          },
+      ),
+    /* A window over a long set, whose methods the element's ref holds. */
+    ...uses
+      .filter((use) => use.machine === 'window')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, handle } = useWindow(family, props, use)
+            around.handle.current = handle as unknown as Readonly<Record<string, unknown>>
             return behavior
           },
       ),
