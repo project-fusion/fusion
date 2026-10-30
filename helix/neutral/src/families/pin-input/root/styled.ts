@@ -100,7 +100,9 @@ export default styles(
         blockSize: '1em',
         inlineSize: token('border-thin'),
       }),
+      native([rule({ part: { hidden: true } }, { display: 'none' })]),
     ]),
+    on('placeholder', [native([rule({ part: { hidden: true } }, { display: 'none' })])]),
     include(printExact),
   ],
 )

@@ -1,5 +1,6 @@
 import { focus } from '@fusion.dev/helix-core/capabilities/focus'
 import * as derivations from '@fusion.dev/helix-core/derivations'
+import { caretSelection } from '@fusion.dev/helix-core/pin-code'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type { TextInputInstance } from 'react-native'
 import type { MachineUse } from '../ir.generated'
@@ -84,8 +85,8 @@ const cleanerOf = (family: Family, use: MachineUse): ((typed: string, props: Pro
  * What an entry gives its element's drawing: the field's view, `blank` while
  * it holds no text, and on the host whether it has focus, whether the press
  * that clears is drawn, and its text and caret for a derivation to read. **The
- * caret stands after the text**, in the box it is in and the last box once
- * the text fills them, as a phone's hidden field keeps it at the end, and
+ * caret stands in the box a press or the last edit put it in**, after the text
+ * where neither has, and in the last box once the text fills them, and is
  * `-1` while the field has no focus.
  */
 const hosted = (
@@ -93,20 +94,19 @@ const hosted = (
   part: string,
   view: PartBinding,
   now: {
+    readonly box: number
     readonly changes: boolean
-    readonly fills: number
     readonly focused: boolean
     readonly offered: boolean
     readonly text: string
   },
 ): Behavior => {
-  const { changes, fills, focused, offered, text } = now
+  const { box, changes, focused, offered, text } = now
   const blank = boundTo(use, 'blank', 'state')
   const shows = boundTo(use, 'shows', 'state')
   const typed = boundTo(use, 'typed', 'state')
   const caretAt = boundTo(use, 'caret', 'state')
-  const last = (Number.isInteger(fills) ? fills : 1) - 1
-  const caret = focused ? Math.max(0, Math.min(text.length, last)) : -1
+  const caret = focused ? box : -1
   return {
     marks: text === '' && blank !== undefined ? [blank] : [],
     parts: {
@@ -122,6 +122,10 @@ const hosted = (
     },
   }
 }
+
+/** The box the caret stands in: where it was put, within the text and the boxes. */
+const boxOf = (put: number | null, text: string, fills: number): number =>
+  Math.max(0, Math.min(put ?? text.length, text.length, (Number.isInteger(fills) ? fills : 1) - 1))
 
 /** The text a prop holds, where it holds any. */
 const textOf = (value: unknown): string | undefined =>
@@ -152,6 +156,10 @@ const textOf = (value: unknown): string | undefined =>
  * the field, sends `input`, `change`, and `clear`, and gives the field focus,
  * as the web's clear button does.
  *
+ * **A press on a box puts the caret in it**, where the form names the part a
+ * box is drawn in, and the field's selection stands on the character there, so
+ * typing replaces it, as a Pin Input's does.
+ *
  * **A shaped entry settles its text** as the reader leaves the field or
  * presses Enter, asking for the settled text before it commits, and shows
  * its text as `shaping` says, as a number input does.
@@ -164,6 +172,7 @@ export const useEntry = (
   shaping?: Shaping,
 ): Entered => {
   const part = boundTo(use, 'part', 'part') ?? ''
+  const cell = boundTo(use, 'cell', 'part')
   const clears = boundTo(use, 'clears', 'part')
   const valueProp = boundTo(use, 'value', 'prop')
   const written = textOf(valueProp === undefined ? undefined : props[camel(valueProp)])
@@ -179,6 +188,7 @@ export const useEntry = (
   }
   const [focused, holdFocus] = useState(false)
   const [edited, edit] = useState(false)
+  const [put, putCaret] = useState<number | null>(null)
   const field = useRef<TextInputInstance | null>(null)
   const fieldRef = useCallback((node: TextInputInstance | null) => {
     field.current = node
@@ -193,8 +203,8 @@ export const useEntry = (
   }
   const clean = useMemo(() => cleanerOf(family, use), [family, use])
   const fills = Number(given(family, props, boundTo(use, 'length', 'prop')))
-  const latest = useRef({ events, props, text, touch })
-  latest.current = { events, props, text, touch }
+  const latest = useRef({ events, props, put, text, touch })
+  latest.current = { events, props, put, text, touch }
   const disabled = given(family, props, boundTo(use, 'disabled', 'prop')) === true
   const readonly = given(family, props, boundTo(use, 'readonly', 'prop')) === true
   const offered = given(family, props, boundTo(use, 'offers', 'prop')) === true
@@ -246,8 +256,17 @@ export const useEntry = (
      `change`, since a filled code is its commit, as on the web. */
   const onChangeText = useCallback(
     (typed: string) => {
+      const before = latest.current.text
+      /* Where the edit left the field's caret: past what it put where the
+         selection stood. The field reports its selection only after its text. */
+      const { end, start } = caretSelection(boxOf(latest.current.put, before, fills), before.length)
+      const left = start + typed.length - (before.length - (end - start))
       const next = clean(typed, latest.current.props)
-      if (next === latest.current.text) {
+      const moved = clean(typed.slice(0, Math.max(0, left)), latest.current.props).length
+      if (next === before) {
+        if (cell !== undefined) {
+          putCaret(moved)
+        }
         /* A refused character leaves the field's own text to draw again. */
         hold((was) => ({ ...was }))
         return
@@ -256,13 +275,16 @@ export const useEntry = (
         return
       }
       edit(true)
+      if (cell !== undefined) {
+        putCaret(moved)
+      }
       const { complete } = latest.current.events
       if (complete !== undefined && Number.isInteger(fills) && next.length === fills) {
         tell(family, latest.current.props, complete, { value: next }, senderOf(family, next))
         commit()
       }
     },
-    [ask, clean, commit, family, fills],
+    [ask, cell, clean, commit, family, fills],
   )
   const onFocus = useCallback(() => {
     committed.current = latest.current.text
@@ -278,6 +300,7 @@ export const useEntry = (
   }, [ask, shaping])
   const onBlur = useCallback(() => {
     holdFocus(false)
+    putCaret(null)
     settle()
     commit()
   }, [commit, settle])
@@ -307,6 +330,28 @@ export const useEntry = (
     [ask, family],
   )
   const current = useCallback(() => latest.current.text, [])
+  const caretAt = boxOf(put, text, fills)
+  /* A press on a box puts the caret there, or after the code where the box is past it. */
+  const box: PartBinding | undefined = useMemo(
+    () =>
+      cell === undefined || disabled
+        ? undefined
+        : {
+            copy: (item) => ({
+              onResponderRelease: () => {
+                if (readonly) {
+                  return
+                }
+                putCaret(item.index)
+                if (field.current !== null) {
+                  focus().focus(field.current, false)
+                }
+              },
+              onStartShouldSetResponder: () => true,
+            }),
+          },
+    [cell, disabled, readonly],
+  )
   const view: PartBinding = useMemo(
     () => ({
       view: {
@@ -316,11 +361,16 @@ export const useEntry = (
         onFocus,
         ...(shaping === undefined ? {} : { onSubmitEditing }),
         ref: fieldRef,
+        ...(cell === undefined || !focused
+          ? {}
+          : { selection: caretSelection(caretAt, text.length) }),
         value: shaping === undefined ? text : shaping.shown(text, focused),
       },
     }),
     [
       disabled,
+      caretAt,
+      cell,
       fieldRef,
       focused,
       onBlur,
@@ -332,12 +382,16 @@ export const useEntry = (
       text,
     ],
   )
-  const behavior = hosted(use, part, view, {
+  const drawn = hosted(use, part, view, {
+    box: caretAt,
     changes: !disabled && !readonly,
-    fills,
     focused,
     offered,
     text,
   })
+  const behavior: Behavior =
+    cell === undefined || box === undefined
+      ? drawn
+      : { ...drawn, parts: { ...drawn.parts, [cell]: box } }
   return { ask, behavior, clear, clears, commit, current, edited, focused, step, value: text }
 }

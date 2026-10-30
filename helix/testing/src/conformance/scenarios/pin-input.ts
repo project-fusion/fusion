@@ -16,6 +16,38 @@ export const PIN_INPUT: readonly Scenario[] = [
   {
     family: 'pin-input',
     intents: [
+      { kind: 'type', text: '1234' },
+      { at: 1, kind: 'box' },
+      { kind: 'type', selection: true, text: '9' },
+      { kind: 'type', selection: true, text: '8' },
+    ],
+    name: 'a press on a box puts the caret there, and typing replaces its character and moves on',
+    setup: code(),
+  },
+  {
+    family: 'pin-input',
+    intents: [
+      { kind: 'type', text: '123' },
+      { at: 0, kind: 'box' },
+      { erase: 1, kind: 'type', selection: true },
+      { kind: 'type', selection: true, text: '7' },
+    ],
+    name: 'erasing on a filled box removes its character, and the next one types there',
+    setup: code(),
+  },
+  {
+    family: 'pin-input',
+    intents: [
+      { kind: 'type', text: '1' },
+      { at: 3, kind: 'box' },
+      { kind: 'type', selection: true, text: '2' },
+    ],
+    name: 'a press on a box past the code puts the caret after the code',
+    setup: code(),
+  },
+  {
+    family: 'pin-input',
+    intents: [
       { kind: 'type', text: '12' },
       { kind: 'type', text: '34' },
     ],

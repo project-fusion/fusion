@@ -442,6 +442,7 @@ const RANGE: &[Field] = &[
 const ENTRY: &[Field] = &[
     ("blank", "blank", Name),
     ("caret", "caret", Name),
+    ("cell", "cell", Literal),
     ("clean", "cleans", Literal),
     ("clearShown", "shows", Name),
     ("clearable", "offers", Name),
