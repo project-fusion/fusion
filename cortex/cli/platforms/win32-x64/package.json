@@ -3,7 +3,7 @@
   "description": "The `cortex` binary for Windows on x86-64. Installed by `@fusion.dev/cortex-cli`, which runs it.",
   "version": "0.1.2",
   "license": "MIT",
-  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "author": "Fusion Development Group",
   "repository": {
     "directory": "cortex/cli/platforms/win32-x64",
     "type": "git",
