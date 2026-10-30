@@ -1,4 +1,6 @@
+import { ariaChord } from '../chord/chord.js'
 import { nameText } from '../name-text/name-text.js'
+import { onApple } from '../platform/platform.js'
 
 /*
  * Every labeled Helix control on the page, and every shortcut that belongs to
@@ -183,7 +185,12 @@ export const controlReachable = (element: HTMLElement): boolean => {
 
 /** Each chord a control answers, read from its own words for them. */
 const keysOf = (entry: ControlEntry): string[] => {
-  const written = [entry.element.getAttribute('aria-keyshortcuts'), entry.keys?.()]
+  /* The registered ones too. A Kbd writes its chord once React has hydrated the
+     control, and it is on this list from the start. */
+  const registered = [...registry.shortcuts]
+    .filter((shortcut) => shortcut.target === entry.element)
+    .map((shortcut) => ariaChord(shortcut.keys(), onApple()))
+  const written = [entry.element.getAttribute('aria-keyshortcuts'), entry.keys?.(), ...registered]
     .filter((list): list is string => typeof list === 'string')
     .flatMap((list) => list.split(/\s+/))
     .filter((one) => one !== '')

@@ -32,6 +32,24 @@ const button = (markup: string, kind: 'focus' | 'press' = 'press'): HTMLElement 
 }
 
 describe('listControls', () => {
+  test('lists a registered shortcut on its control before anything writes the attribute', () => {
+    /* A Kbd writes `aria-keyshortcuts` once React has hydrated the control, and
+       an overlay can be asked before then. */
+    const element = button('<button>Bold</button>')
+    const unregister = controls.registerShortcut({
+      keys: () => 'shift+b',
+      label: () => 'Bold',
+      owner: element,
+      target: element,
+    })
+    expect(controls.listControls()[0]?.keys).toEqual(['shift+b'])
+    element.setAttribute('aria-keyshortcuts', 'Shift+B')
+    expect(controls.listControls()[0]?.keys).toEqual(['shift+b'])
+    unregister()
+    element.removeAttribute('aria-keyshortcuts')
+    expect(controls.listControls()[0]?.keys).toEqual([])
+  })
+
   test('lists each control by its name, in document order, with its keys as chords', () => {
     button('<button aria-keyshortcuts="Meta+Shift+K">Second</button>')
     button('<button aria-label="First">x</button>')
