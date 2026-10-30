@@ -51,9 +51,27 @@ const move = (range: HTMLInputElement, value: number, commits: 'always' | 'moved
   }
 }
 
-/** A frame of the page, so what a component schedules for the next one has run. */
-const frame = (): Promise<void> =>
-  new Promise((done) => requestAnimationFrame(() => setTimeout(done, 0)))
+/** The longest the harness waits for a frame, in milliseconds. */
+const FRAME_AT_MOST = 250
+
+/**
+ * A frame of the page, so what a component schedules for the next one has run,
+ * or `FRAME_AT_MOST`, whichever comes first.
+ *
+ * **Paint is no part of what a scenario records.** Linux WebKit on x86 held the
+ * frame after a Color Input's picker closed for 2.4 seconds, measured October
+ * 30, 2026, with timers still firing on time, while every other frame of the
+ * run took under 45 ms. A scenario of two intents ran past the harness's 2
+ * seconds on that one wait.
+ */
+export const frame = (): Promise<void> =>
+  new Promise((done) => {
+    const late = setTimeout(done, FRAME_AT_MOST)
+    requestAnimationFrame(() => {
+      clearTimeout(late)
+      setTimeout(done, 0)
+    })
+  })
 
 /**
  * A finger's press on the element's `part` at `x` and `y`, fractions of it from
