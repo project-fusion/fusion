@@ -193,6 +193,7 @@ export const drawDrawn = (
       {...bubbledBy(scope, node)}
       {...into}
       {...scope.behavior.parts[node.name]?.view}
+      {...(scope.item === undefined ? {} : scope.behavior.parts[node.name]?.copy?.(scope.item))}
     >
       {children}
     </made.Component>

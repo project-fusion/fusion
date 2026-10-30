@@ -12,7 +12,7 @@ import { splitValues } from '../split-values/split-values.js'
 export type { ColorWords } from '../color-name/color-name.js'
 export { colorName, hueName } from '../color-name/color-name.js'
 export type { Color, ColorFormat } from '../css-color/css-color.js'
-export { formatColor, parseColor, toCss } from '../css-color/css-color.js'
+export { formatColor, parseColor, toCss, toRgb } from '../css-color/css-color.js'
 export type { ChannelField, ChannelName } from './channels.js'
 export { channelFields, writeChannel } from './channels.js'
 export type { WheelBox } from './wheel.js'
@@ -78,6 +78,31 @@ export const areaKeyed = (
     Home: { saturation: held(color.saturation - along * 10) },
     PageDown: { brightness: held(color.brightness - 10) },
     PageUp: { brightness: held(color.brightness + 10) },
+  }
+  return moves[key]
+}
+
+/**
+ * The preset a key moves to in the row of `last + 1`, from `from`, or
+ * `undefined` for a key that moves nothing: the arrows follow the line of text,
+ * Up and Down are the previous and the next since the row wraps, focus stops at
+ * the ends, and Home and End go to them.
+ */
+export const swatchKeyed = (
+  key: string,
+  from: number,
+  last: number,
+  rtl: boolean,
+): number | undefined => {
+  const next = Math.min(last, from + 1)
+  const previous = Math.max(0, from - 1)
+  const moves: Record<string, number> = {
+    ArrowDown: next,
+    ArrowLeft: rtl ? next : previous,
+    ArrowRight: rtl ? previous : next,
+    ArrowUp: previous,
+    End: last,
+    Home: 0,
   }
   return moves[key]
 }
