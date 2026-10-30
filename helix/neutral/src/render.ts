@@ -518,6 +518,7 @@ export interface PressableAttributes extends Named {
   readonly children?: Child
   /** The press empties the element's field, as its `entry` says. */
   readonly clears?: boolean
+  readonly reveals?: boolean
   readonly copies?: boolean
   readonly current?: Given
   readonly disabled?: Given

@@ -347,10 +347,15 @@ fn toggled(toggle: &Toggle, tree: &[Node]) -> MachineUse {
 fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
     let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(entry.value.clone()))]);
     for (name, value) in [
+        ("highest", &entry.highest),
+        ("kind", &entry.kind),
         ("length", &entry.length),
+        ("lowest", &entry.lowest),
         ("offers", &entry.offers),
         ("readonly", &entry.readonly),
+        ("reveal", &entry.reveal),
         ("seed", &entry.initial),
+        ("stride", &entry.stride),
     ] {
         if let Some(prop) = value {
             bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
@@ -362,8 +367,10 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
         }
     }
     for (name, value) in [
+        ("bared", &entry.bared),
         ("blank", &entry.blank),
         ("caret", &entry.caret),
+        ("unveils", &entry.unveils),
         ("shows", &entry.shows),
         ("typed", &entry.typed),
     ] {
@@ -397,6 +404,13 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
     });
     if let Some(clears) = clears {
         bind.insert("clears".to_owned(), Bound::Part(clears.name.clone()));
+    }
+    let reveals = nodes(tree).find(|node| {
+        node.kind == NodeKind::Pressable
+            && matches!(node.attributes.get("reveals"), Some(Attribute::Flag(true)))
+    });
+    if let Some(reveals) = reveals {
+        bind.insert("reveals".to_owned(), Bound::Part(reveals.name.clone()));
     }
     MachineUse {
         bind,

@@ -262,7 +262,7 @@ const holdOn = async (
 }
 
 /** Whether the element is a range a reader types into, as a number input. */
-const typed = (tag: string): boolean => ranges(tag) && formOf(tag).api?.entry !== undefined
+const typed = (tag: string): boolean => formOf(tag).api?.entry !== undefined
 
 /**
  * Puts focus where a `focus` intent says: on the page, on an item, on a

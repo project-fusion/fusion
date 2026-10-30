@@ -115,8 +115,15 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
                 }
             }
             "entry" => {
-                if let Some(shows) = super::entry::entry(value)?.shows {
+                let entry = super::entry::entry(value)?;
+                if let Some(shows) = entry.shows {
                     push("text.clearShown", &shows);
+                }
+                if let Some(unveils) = entry.unveils {
+                    push("text.revealShown", &unveils);
+                }
+                if let Some(bared) = entry.bared {
+                    push("text.revealed", &bared);
                 }
             }
             "validation" => {
