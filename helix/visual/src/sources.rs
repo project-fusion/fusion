@@ -17,7 +17,7 @@ use std::process::{Child, Command, Stdio};
 use fusion_rules::error::{Failure, Outcome};
 use serde_json::{json, Value};
 
-use crate::config::{CatalogSource, Config, Route, ServerSource, Source, StorybookSource};
+use crate::config::{CatalogSource, Config, Route, Served, ServerSource, Source, StorybookSource};
 use crate::discover::{self, Entry};
 use crate::driver::Driver;
 
@@ -144,17 +144,24 @@ pub fn start(config: &Config, base: &Path, driver: &mut Driver) -> Outcome<Serve
             .ask(&json!({ "op": "wait", "seconds": served.timeout, "url": served.url }))
             .map_err(|why| Failure::input(format!("the source `{}`", served.name), why))?;
         if waited["up"] != true {
-            return Err(Failure::input(
-                format!("the source `{}`", served.name),
-                format!(
-                    "`{command}` started and nothing answered at {} within {} seconds",
-                    served.url, served.timeout
-                ),
-            ));
+            return Err(unanswered(served, command));
         }
         eprintln!("helix: {} answers, started by `{command}`.", served.url);
     }
     Ok(servers)
+}
+
+/// A `start` command whose server did not answer, with the setting that gives
+/// a slow server longer.
+fn unanswered(served: &Served, command: &str) -> Failure {
+    Failure::input(
+        format!("the source `{}`", served.name),
+        format!(
+            "`{command}` started and nothing answered at {} within {} seconds",
+            served.url, served.timeout
+        ),
+    )
+    .hint("a server that needs longer names it in seconds, in the source's `timeout`")
 }
 
 /// A route as the name its baselines take: `/` is `index`, and every other
@@ -285,6 +292,27 @@ fn fetched(driver: &mut Driver, url: &str, source: &str) -> Outcome<String> {
     Ok(answer["text"].as_str().unwrap_or_default().to_string())
 }
 
+/// The selector and the status each named route gives, by the name its
+/// baselines take.
+fn route_settings(source: &ServerSource) -> BTreeMap<String, (Option<String>, Option<u16>)> {
+    source
+        .routes
+        .iter()
+        .filter_map(|route| match route {
+            Route::Path(_) => None,
+            Route::Named {
+                name,
+                path,
+                selector,
+                status,
+            } => Some((
+                name.clone().unwrap_or_else(|| slug(path)),
+                (selector.clone(), *status),
+            )),
+        })
+        .collect()
+}
+
 /// `(name, url)` for each page a server source pictures.
 fn server_pages(source: &ServerSource, driver: &mut Driver) -> Outcome<Vec<(String, String)>> {
     let mut out: Vec<(String, String)> = source
@@ -292,7 +320,10 @@ fn server_pages(source: &ServerSource, driver: &mut Driver) -> Outcome<Vec<(Stri
         .iter()
         .map(|route| match route {
             Route::Path(path) => (slug(path), on(&source.server.url, path)),
-            Route::Named { name, path } => (name.clone(), on(&source.server.url, path)),
+            Route::Named { name, path, .. } => (
+                name.clone().unwrap_or_else(|| slug(path)),
+                on(&source.server.url, path),
+            ),
         })
         .collect();
     if let Some(sitemap) = &source.sitemap {
@@ -425,6 +456,8 @@ fn pair_entries(
             sides: Some(Box::new([pair["a"].clone(), pair["b"].clone()])),
             source: index,
             stem: String::new(),
+            selector: None,
+            status: None,
             url: None,
         });
     }
@@ -465,6 +498,8 @@ pub fn entries(
                             .map(|stem| stem.to_string_lossy().into_owned())
                             .unwrap_or_default(),
                         file: Some(file),
+                        selector: None,
+                        status: None,
                         url: None,
                     })
                     .collect()
@@ -481,18 +516,27 @@ pub fn entries(
                     .server()
                     .map(|served| base.join(&served.baselines))
                     .unwrap_or_default();
+                let settings = match source {
+                    Source::Server(one) => route_settings(one),
+                    _ => BTreeMap::new(),
+                };
                 pages
                     .into_iter()
-                    .map(|(entry, url)| Entry {
-                        dir: dir.clone(),
-                        file: None,
-                        group: entry.clone(),
-                        id: format!("{name}/{entry}"),
-                        sides: None,
-                        stem: entry.clone(),
-                        name: entry,
-                        source: index,
-                        url: Some(url),
+                    .map(|(entry, url)| {
+                        let (selector, status) = settings.get(&entry).cloned().unwrap_or_default();
+                        Entry {
+                            dir: dir.clone(),
+                            file: None,
+                            group: entry.clone(),
+                            id: format!("{name}/{entry}"),
+                            sides: None,
+                            stem: entry.clone(),
+                            name: entry,
+                            selector,
+                            source: index,
+                            status,
+                            url: Some(url),
+                        }
                     })
                     .collect()
             }
@@ -537,6 +581,34 @@ pub fn entries(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_server_that_never_answers_names_the_setting_that_gives_it_longer() {
+        let served: Served = serde_json::from_value(json!({
+            "baselines": "shots",
+            "name": "site",
+            "url": "http://localhost:3000",
+        }))
+        .unwrap();
+        let said = unanswered(&served, "npm start");
+        assert!(said.why.contains("within 120 seconds"));
+        assert!(said.hint.unwrap().contains("`timeout`"));
+    }
+
+    #[test]
+    fn a_named_route_gives_its_selector_and_its_status() {
+        let source: ServerSource = serde_json::from_value(json!({
+            "baselines": "shots",
+            "name": "site",
+            "routes": ["/plain", { "path": "/map", "selector": "[data-ready]" }, { "name": "gone", "path": "/nope", "status": 404 }],
+            "url": "http://localhost:3000",
+        }))
+        .unwrap();
+        let settings = route_settings(&source);
+        assert_eq!(settings["map"], (Some("[data-ready]".to_string()), None));
+        assert_eq!(settings["gone"], (None, Some(404)));
+        assert!(!settings.contains_key("plain"));
+    }
 
     #[test]
     fn a_route_names_its_baselines() {

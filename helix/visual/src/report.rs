@@ -83,6 +83,10 @@ pub struct Run<'a> {
     pub entries: usize,
     /// What the page checks found, each as `id: sentence`.
     pub findings: Vec<String>,
+    /// What the run says about a setting that did less than it reads.
+    pub notices: Vec<String>,
+    /// The requests each entry made that were refused or blocked, by entry.
+    pub refused: BTreeMap<String, Vec<String>>,
     pub fingerprint: Option<PathBuf>,
     pub inspected_failed: bool,
     pub retake: &'a str,
@@ -111,6 +115,41 @@ fn grouped(run: &Run) -> bool {
     run.groups
         .iter()
         .any(|one| one.members.len() > 1 || one.verdict.is_some())
+}
+
+/// A request's host, from its address.
+fn host_of(url: &str) -> &str {
+    let rest = url.split_once("://").map_or(url, |(_, rest)| rest);
+    let host = rest.split(['/', '?', '#']).next().unwrap_or(rest);
+    host.rsplit('@').next().unwrap_or(host)
+}
+
+/// An entry's refused requests by host, the most asked first: each host, how
+/// many requests went to it, and the first of them.
+fn by_host(urls: &[String]) -> Vec<(&str, usize, &str)> {
+    let mut hosts: Vec<(&str, usize, &str)> = Vec::new();
+    for url in urls {
+        let host = host_of(url);
+        match hosts.iter_mut().find(|one| one.0 == host) {
+            Some(one) => one.1 += 1,
+            None => hosts.push((host, 1, url)),
+        }
+    }
+    hosts.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(b.0)));
+    hosts
+}
+
+/// What was refused on one entry, as a sentence.
+fn refused_line(entry: &str, urls: &[String]) -> String {
+    let hosts: Vec<String> = by_host(urls)
+        .iter()
+        .map(|(host, count, _)| format!("{host} ({count})"))
+        .collect();
+    format!(
+        "{entry}: {} refused or blocked, so what they draw is missing from its pictures: {}.",
+        plural(urls.len(), "request was", "requests were"),
+        hosts.join(", ")
+    )
 }
 
 /// One group, as the terminal prints it.
@@ -329,6 +368,15 @@ pub fn finish(run: &Run) -> Code {
     for note in &notes {
         say!("helix: {note}");
     }
+    for notice in &run.notices {
+        say!("helix: {notice}");
+    }
+    for (entry, urls) in &run.refused {
+        say!("helix: {}", refused_line(entry, urls));
+    }
+    if !run.refused.is_empty() {
+        say!("helix: `network: {{ allow: [...] }}` lets those hosts through, and `network: 'open'` lets every host through.");
+    }
     if !failures.is_empty() {
         say!("\n  {}\n", failures.join("\n  "));
     }
@@ -439,10 +487,11 @@ pub fn stopped(update: bool, failed: bool, verdict: &str) -> Code {
 
 /// What `run.json` holds, and what `--json` prints: each shot with its
 /// result, and the verdict.
-/// Whether a row's pictures go in the report: a shot that failed, and one that
-/// matched only on its second take, whose first take shows what moved.
+/// Whether a row's pictures go in the report: a shot that failed, one that
+/// matched only on its second take, whose first take shows what moved, and one
+/// an update wrote, which the run asks a person to review.
 fn pictured(row: &Row) -> bool {
-    row.fate.fails() || matches!(row.fate, Fate::Steadied)
+    row.fate.fails() || matches!(row.fate, Fate::Steadied | Fate::Written(_))
 }
 
 fn record(run: &Run, verdict: &str, failed: bool) -> Value {
@@ -490,7 +539,15 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
         "findings": run.findings,
         "groups": run.groups.iter().map(crate::triage::Group::record).collect::<Vec<_>>(),
         "mode": if run.update { "update" } else { "test" },
+        "notices": run.notices,
         "painted": run.painted,
+        "refused": run.refused.iter().map(|(entry, urls)| {
+            let hosts: Vec<Value> = by_host(urls)
+                .iter()
+                .map(|(host, requests, first)| json!({ "first": first, "host": host, "requests": requests }))
+                .collect();
+            (entry.clone(), Value::Array(hosts))
+        }).collect::<serde_json::Map<_, _>>(),
         "run": run.origin.record(),
         "shots": rows,
         "skipped": run.skipped,
@@ -588,6 +645,49 @@ fn grouped_html(record: &Value) -> String {
     groups
 }
 
+/// The shots that passed with something to say, what the run said about its
+/// settings, and the requests it refused, as the items of a list.
+fn notes_html(record: &Value) -> String {
+    let empty = Vec::new();
+    let shots = record["shots"].as_array().unwrap_or(&empty);
+    let mut notes = String::new();
+    for one in shots
+        .iter()
+        .filter(|one| matches!(one["result"].as_str(), Some("steadied" | "tolerated")))
+    {
+        let _ = write!(
+            notes,
+            "<li><strong>{}, {}</strong>: {}</li>",
+            escape(one["entry"].as_str().unwrap_or_default()),
+            escape(one["shot"].as_str().unwrap_or_default()),
+            escape(one["detail"].as_str().unwrap_or_default())
+        );
+    }
+    for one in record["notices"]
+        .as_array()
+        .unwrap_or(&empty)
+        .iter()
+        .filter_map(Value::as_str)
+    {
+        let _ = write!(notes, "<li>{}</li>", escape(one));
+    }
+    if let Some(entries) = record["refused"].as_object() {
+        for (entry, hosts) in entries {
+            for host in hosts.as_array().unwrap_or(&empty) {
+                let _ = write!(
+                    notes,
+                    "<li><strong>{}</strong>: {} refused or blocked {}, such as {}.</li>",
+                    escape(entry),
+                    host["requests"],
+                    escape(host["host"].as_str().unwrap_or_default()),
+                    escape(host["first"].as_str().unwrap_or_default()),
+                );
+            }
+        }
+    }
+    notes
+}
+
 /// The page: the verdict, then each failed shot with its baseline, capture and
 /// diff side by side and a swipe between the first two.
 fn html(record: &Value) -> String {
@@ -605,7 +705,7 @@ fn html(record: &Value) -> String {
         );
         let picture = |key: &str, label: &str| {
             match shot[key].as_str() {
-            Some(src) => format!("<figure><figcaption>{label}</figcaption><img src=\"{}\" alt=\"{label} of {}\"></figure>", escape(src), escape(&title)),
+            Some(src) => format!("<figure><figcaption>{label}</figcaption><img loading=\"lazy\" src=\"{}\" alt=\"{label} of {}\"></figure>", escape(src), escape(&title)),
             None => format!("<figure><figcaption>{label}</figcaption><p class=\"none\">None</p></figure>"),
         }
         };
@@ -627,30 +727,26 @@ fn html(record: &Value) -> String {
             ),
             _ => String::new(),
         };
+        /* A written shot is one picture, with nothing to compare it with. */
+        let others = if shot["result"].as_str() == Some("written") {
+            String::new()
+        } else {
+            format!(
+                "{}{}",
+                picture("current", second),
+                picture("diff", "Difference")
+            )
+        };
         let _ = write!(
             cards,
-            "<section><h2>{}</h2><p>{}</p>{}<div class=\"three\">{}{}{}</div>{swipe}</section>",
+            "<section><h2>{}</h2><p>{}</p>{}<div class=\"three\">{}{others}</div>{swipe}</section>",
             escape(&title),
             escape(&sentence(shot["detail"].as_str().unwrap_or_default())),
             changes(shot),
             picture("baseline", first),
-            picture("current", second),
-            picture("diff", "Difference"),
         );
     }
-    let mut notes = String::new();
-    for one in shots
-        .iter()
-        .filter(|one| matches!(one["result"].as_str(), Some("steadied" | "tolerated")))
-    {
-        let _ = write!(
-            notes,
-            "<li><strong>{}, {}</strong>: {}</li>",
-            escape(one["entry"].as_str().unwrap_or_default()),
-            escape(one["shot"].as_str().unwrap_or_default()),
-            escape(one["detail"].as_str().unwrap_or_default())
-        );
-    }
+    let notes = notes_html(record);
     let groups = grouped_html(record);
     let mut findings = String::new();
     for one in record["findings"]
@@ -852,7 +948,60 @@ mod tests {
             source: "pages",
         };
         assert!(pictured(&row(&Fate::Steadied)));
+        assert!(pictured(&row(&Fate::Written("it had no baseline"))));
         assert!(!pictured(&row(&Fate::Held)));
+    }
+
+    #[test]
+    fn the_page_of_an_update_shows_each_picture_it_wrote() {
+        let page = html(&json!({
+            "verdict": "helix: wrote 1 of 1 baselines",
+            "shots": [{
+                "baseline": "shots/0-baseline.png",
+                "detail": "written, because it had no baseline.",
+                "entry": "site/index",
+                "labels": ["Written", "Capture"],
+                "result": "written",
+                "shot": "wide",
+            }],
+        }));
+        assert!(page.contains("<img loading=\"lazy\" src=\"shots/0-baseline.png\""));
+        assert!(page.contains("<figcaption>Written</figcaption>"));
+        assert!(!page.contains("Difference"));
+    }
+
+    #[test]
+    fn refused_requests_are_counted_by_host() {
+        let urls: Vec<String> = [
+            "https://tiles.example.com/1.png",
+            "https://b.example.com/a?x=1",
+            "https://tiles.example.com/2.png",
+        ]
+        .map(str::to_string)
+        .to_vec();
+        assert_eq!(
+            by_host(&urls),
+            [
+                ("tiles.example.com", 2, "https://tiles.example.com/1.png"),
+                ("b.example.com", 1, "https://b.example.com/a?x=1"),
+            ]
+        );
+        assert_eq!(
+            refused_line("site/index", &urls),
+            "site/index: 3 requests were refused or blocked, so what they draw is missing from its pictures: tiles.example.com (2), b.example.com (1)."
+        );
+    }
+
+    #[test]
+    fn the_page_lists_notices_and_refused_requests() {
+        let page = html(&json!({
+            "verdict": "v",
+            "shots": [],
+            "notices": ["the mask `a` matches nothing"],
+            "refused": { "site/index": [{ "first": "https://a.example/1", "host": "a.example", "requests": 2 }] },
+        }));
+        assert!(page.contains("the mask `a` matches nothing"));
+        assert!(page.contains("2 refused or blocked a.example, such as https://a.example/1."));
     }
 
     #[test]

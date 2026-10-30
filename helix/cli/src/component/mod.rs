@@ -21,10 +21,10 @@
 //! argument asked for.
 //!
 //! **Where the source is comes from configuration**, because a consumer's
-//! layout is not this repository's. A `helix` key in `fusion.json` names
-//! the tiers, or `helix.json` does where that product is not in use;
-//! without either there is nothing to read and the command says so rather than
-//! reporting that it found no faults.
+//! layout is not this repository's. `helix.json` names the tiers, and in this
+//! repository's builds a `helix` key in `fusion.json` can; without either there
+//! is nothing to read and the command says so rather than reporting that it
+//! found no faults.
 //!
 //! **One list of tiers for every rule, which is a deliberate departure from the
 //! scripts these come from.** Those disagree with each other: the reflected-
@@ -399,13 +399,11 @@ impl Settings {
     /// [`crate::config`] states it, because a reader debugging "why did it use
     /// that" needs an answer they can read:
     ///
-    /// 1. `fusion.json`, under a `helix` key. Helix is a plugin of that
-    ///    product, and a product's configuration is where its plugins are
-    ///    configured: one file to find, one file to review.
-    /// 2. `helix.json`, for a consumer who has this tool and not that
-    ///    product. Standalone is the constraint every product CLI is built
-    ///    under, and it would be broken by *requiring* a file named for
-    ///    something they never installed.
+    /// 1. `fusion.json`, under a `helix` key, in this repository's builds
+    ///    only. A published binary neither reads nor names it, since a
+    ///    consumer never installed the product the file is named for.
+    /// 2. `helix.json`, for a consumer, and for this repository where the
+    ///    first holds no `helix` key.
     /// 3. Neither, which is an error rather than a default: without `tiers`
     ///    every rule walks nothing and reports a clean run.
     ///
@@ -421,8 +419,9 @@ impl Settings {
     /// written and the reader's next action is to open it at that line.
     pub fn read(root: &Path) -> Outcome<Self> {
         const WHAT: &str = "component rules need to know where the source is";
-        let product = root.join("fusion.json");
-        if let Ok(raw) = fs::read_to_string(&product) {
+        #[cfg(feature = "internal")]
+        if let Ok(raw) = fs::read_to_string(root.join("fusion.json")) {
+            let product = root.join("fusion.json");
             let held = serde_json::from_str::<Value>(&raw)
                 .map_err(|error| Failure::input(WHAT, format!("{}: {error}", product.display())))?;
             if let Some(section) = held.get("helix") {
@@ -440,8 +439,7 @@ impl Settings {
             Failure::input(
                 WHAT,
                 format!(
-                    "no configuration at {}.\n  Helix reads a `helix` key in `fusion.json`, or \
-                     `helix.json` when that product is not in use. Either names the \
+                    "no configuration at {}.\n  Helix reads `helix.json`, which names the \
                      directories holding component source, without which there is nothing to \
                      read:\n\n  {{ \"tiers\": [\"src/components\"] }}",
                     root.display()

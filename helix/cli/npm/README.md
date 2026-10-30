@@ -31,7 +31,7 @@ helix mcp init --client claude
 | `scan` | Reads your project's stylesheets, templates, and modules, and prints each finding with its file and line. `--build <dir>` weighs each Helix family in your bundle, `--out <path>` writes the run to the CI file, `--config <path>` names the settings, `--file <path>` reports one file's findings, and `--stdin <language>` checks a snippet |
 | `api` | Looks up the installed Helix packages: `find` a family, a `family`'s API, an `example` with its imports, the `imports` for a list of tags, and `tokens` |
 | `manifest` | `diff` compares two custom elements manifests and prints each difference. Exits 1 on any difference |
-| `visual` | Pictures each page in a real browser and compares it with a baseline kept in git: `test`, `update` the baselines, open the `report`, and `compare` two PNG files. Reads `visual.config.ts`, and needs Playwright installed. [The guide](https://github.com/project-fusion/fusion/blob/main/helix/cli/npm/visual/README.md) has the config and the GitHub Action |
+| `visual` | Pictures each page in a real browser and compares it with a baseline kept in git: `test`, `update` the baselines, open the `report`, and `compare` two PNG files. Reads `visual.config.ts`, and needs Playwright installed. [The guide](https://github.com/project-fusion/fusion/blob/main/helix/cli/npm/visual/README.md), also in this package at `visual/README.md`, has the config and the GitHub Action |
 | `mcp` | Serves the same lookups, the scan, and the theme derivation to an agent over stdio, as an MCP server. `mcp init --client <client>` writes the configuration for Claude Code, Cursor, VS Code, Gemini CLI, opencode, Roo Code, or Junie |
 
 `--json` is on every verb, in a shape a script can read without parsing

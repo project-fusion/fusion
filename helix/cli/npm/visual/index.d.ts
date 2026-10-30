@@ -101,12 +101,27 @@ interface Served {
   url: string
 }
 
+/** A route with something to say about itself. */
+export interface Route {
+  /** The name its baselines take. Taken from `path` when not given. */
+  name?: string
+  /** The route's path on the server. */
+  path: string
+  /** Waited for on this route, in place of `settle.selector`. */
+  selector?: string
+  /**
+   * The status the route answers on purpose, such as 404 for a not-found page. Any other answer
+   * fails it. When not given, any status of 400 or above fails it.
+   */
+  status?: number
+}
+
 /** Pages of any server, by route or from its sitemap. */
 export interface ServerSource extends Served {
   /** Picks this source out of the others. */
   kind: 'server'
-  /** Routes to picture, each a path or a path and the name its baselines take. `/` is named `index`. */
-  routes?: (string | { name: string; path: string })[]
+  /** Routes to picture, each a path or a {@link Route}. `/` is named `index`. */
+  routes?: (string | Route)[]
   /** A sitemap's path on the server, `/sitemap.xml`, whose every route is pictured too. */
   sitemap?: string
 }
@@ -350,11 +365,16 @@ export interface Config {
   /**
    * Selectors whose elements are painted over in one fixed color in every picture and left out of every
    * accessibility snapshot, for what changes on its own and says nothing about the page, such as a version
-   * number or a date.
+   * number or a date. A mask paints over its elements' boxes and whatever is drawn over them, and a run
+   * names a mask that matches nothing on a page or only elements with no box.
    */
   mask?: string[]
-  /** `origin` refuses every request off the harness origin, and is the default. `open` lets them through. */
-  network?: 'open' | 'origin'
+  /**
+   * `origin` refuses every request off the harness origin, and is the default. `open` lets them
+   * through. `{ allow }` refuses them but those to the hosts it lists, each a host or `*.` and a
+   * domain. A run names every request it refused, in its log and in `run.json`.
+   */
+  network?: 'open' | 'origin' | { allow: string[] }
   /** `linux` takes and compares baselines on Linux alone, and is the default. `any` compares wherever it runs. */
   platform?: 'any' | 'linux'
   /** Where each run writes its report and `run.json`, relative to the config. `.helix/visual` when not given. */
@@ -367,12 +387,25 @@ export interface Config {
   settle?: {
     /**
      * Only custom elements whose tag starts with this are awaited, and one left undefined fails the
-     * entry. Set it for a framework that writes hyphenated tags of its own, such as Next.js's
-     * `next-route-announcer`. Every custom element when not given.
+     * entry. Set it for a framework that writes hyphenated tags and never defines them, such as
+     * Angular's component tags. Every custom element when not given, except a tag a script gave a
+     * shadow root while nothing defined it, which is a plain host, as Next.js's
+     * `next-route-announcer` is.
      */
     elements?: string
-    /** A property each element may carry holding a promise that resolves when it has rendered. */
+    /**
+     * A property each element may carry holding a promise that resolves when it has rendered. A run
+     * waits 5 seconds, then names the tags still waiting and takes the picture.
+     */
     readyProperty?: string
+    /**
+     * A selector that matches once a page has drawn what it draws late, such as a map's tiles, for a
+     * page that sets an attribute or adds an element when it is done. Each entry waits for it after
+     * it loads, and fails when nothing matches in time.
+     */
+    selector?: string
+    /** Seconds to wait for `selector`. 30 when not given. */
+    timeout?: number
   }
   /** How `--shard` packs entries into shards. */
   shard?: {

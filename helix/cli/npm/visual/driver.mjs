@@ -48,6 +48,7 @@ import { extname, resolve, sep } from 'node:path'
 import { StringDecoder } from 'node:string_decoder'
 import { pathToFileURL } from 'node:url'
 import { boxesOf, readPage } from './checks.mjs'
+import { allowed, unanswered, unloadable } from './words.mjs'
 
 /** The `id` of the harness `<style>` the binary writes into every page. */
 const STYLE_ID = 'helix-visual-harness'
@@ -110,6 +111,8 @@ const TYPES = {
 
 /** The run's state, filled in by the requests in the order they come. */
 const state = {
+  /** Hosts requests may reach besides the origins, with `network: { allow }`. */
+  allow: [],
   browser: undefined,
   config: undefined,
   /**
@@ -236,18 +239,46 @@ const respond = (request, response) => {
  */
 const upgrades = (page, prefix) =>
   page.evaluate(
-    async ({ prefix, seconds }) => {
+    async ({ PLAIN_HOSTS, prefix, seconds }) => {
+      const hosts = globalThis[Symbol.for(PLAIN_HOSTS)]
       const pending = [
         ...new Set([...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)),
-      ].filter((tag) => tag.startsWith(prefix))
+      ].filter((tag) => tag.startsWith(prefix) && !hosts?.has(tag))
       await Promise.race([
         Promise.all(pending.map((tag) => customElements.whenDefined(tag))),
         new Promise((done) => setTimeout(done, seconds * 1000)),
       ])
       return pending.filter((tag) => customElements.get(tag) === undefined)
     },
-    { prefix: prefix ?? '', seconds: UPGRADES },
+    { PLAIN_HOSTS, prefix: prefix ?? '', seconds: UPGRADES },
   )
+
+/** Where a page keeps the tags {@link notePlainHosts} saw. */
+const PLAIN_HOSTS = 'fusion.dev/helix/visual/plain-hosts'
+
+/**
+ * Notes each tag a script gives a shadow root while nothing defines it.
+ *
+ * **A plain host is waiting for no definition.** Next.js puts its route
+ * announcer in `<next-route-announcer>` and its dev overlay in
+ * `<nextjs-portal>` this way, and no framework that does this ever registers
+ * the tag. An element waiting for a definition has no shadow root yet, or has
+ * one its HTML declared, which calls nothing, so a page whose bundle failed to
+ * load still fails. A definition's own constructor runs with the tag already
+ * registered, so it is never noted.
+ */
+const notePlainHosts = (context) =>
+  context.addInitScript((key) => {
+    const hosts = new Set()
+    globalThis[Symbol.for(key)] = hosts
+    const attach = Element.prototype.attachShadow
+    Element.prototype.attachShadow = function (...options) {
+      if (customElements.get(this.localName) === undefined) {
+        hosts.add(this.localName)
+      }
+      return attach.apply(this, options)
+    }
+  }, PLAIN_HOSTS)
 
 /**
  * **How long a page has to define its elements after it loads: twenty
@@ -272,7 +303,8 @@ const UPGRADES = 20
  * library that publishes a promise for "rendered and styled" knows better
  * than any frame count. Without it, Fusion's `pagination/footer` differed by
  * 419 pixels on one run and 842 on the next from the same two files.
- * Bounded, so an element that never resolves cannot hang the run.
+ * Bounded, so an element that never resolves cannot hang the run, and the tags
+ * still waiting at the bound come back, for the run to name.
  *
  * **Every picture loaded, lazy ones included.** A whole-page picture is taken
  * without scrolling, so an image marked `loading="lazy"` below the first
@@ -304,12 +336,16 @@ const still = (page, readyProperty) =>
       Promise.all(images.map((image) => image.decode().catch(() => {}))),
       new Promise((done) => setTimeout(done, 10000)),
     ])
+    const late = new Set()
     if (readyProperty) {
       await Promise.race([
         Promise.all(
           [...document.querySelectorAll('*')]
-            .map((one) => one[readyProperty])
-            .filter((one) => one instanceof Promise),
+            .filter((one) => one[readyProperty] instanceof Promise)
+            .map((one) => {
+              late.add(one.localName)
+              return one[readyProperty].then(() => late.delete(one.localName))
+            }),
         ),
         new Promise((done) => setTimeout(done, 5000)),
       ])
@@ -328,7 +364,54 @@ const still = (page, readyProperty) =>
       held = now === last ? held + 1 : 0
       last = now
     }
+    return [...late]
   }, readyProperty ?? null)
+
+/**
+ * Waits for what `settle.selector` or a route's `selector` names, which is how a
+ * page says it has drawn what no frame count can see, such as a map's tiles.
+ * It waits for the element to be in the document, since a host with
+ * `display: contents` is never visible. Giving up fails the entry, because a
+ * picture taken anyway is a baseline of the page before it was ready.
+ */
+const awaited = async (page, selector, seconds) => {
+  try {
+    await page
+      .locator(selector)
+      .first()
+      .waitFor({ state: 'attached', timeout: seconds * 1000 })
+  } catch (caught) {
+    if (caught?.name !== 'TimeoutError') {
+      throw caught
+    }
+    throw new Error(
+      `the selector \`${selector}\` matched nothing after ${seconds} seconds, so nothing was pictured`,
+    )
+  }
+}
+
+/**
+ * What each mask painted on this page: `painted`, `no box` when it matches only
+ * elements with no area, such as a host with `display: contents`, or `nothing`.
+ * Playwright paints over a box, so the last two leave the picture as it was.
+ */
+const maskStates = (page) =>
+  Promise.all(
+    state.mask.map(async (selector) => [
+      selector,
+      await page.locator(selector).evaluateAll((elements) => {
+        if (elements.length === 0) {
+          return 'nothing'
+        }
+        return elements.some((one) => {
+          const box = one.getBoundingClientRect()
+          return box.width > 0 && box.height > 0
+        })
+          ? 'painted'
+          : 'no box'
+      }),
+    ]),
+  )
 
 /**
  * `promise`, or a refusal after `seconds`.
@@ -473,8 +556,14 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
   let aria = null
   /* The color schemes contrast has been read in. */
   const read = new Set()
+  /* What each mask painted, the best of the shots, since one element may hide
+     at one width. */
+  const masks = new Map()
+  /* The tags still holding an unresolved ready promise at the bound. */
+  const unready = new Set()
   lane.errors.length = 0
   lane.messages.length = 0
+  lane.refused.clear()
   /* The width the page was last loaded at. */
   let loaded
   try {
@@ -490,16 +579,24 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
         const address =
           item.url ??
           `${state.origin}${item.path}?visual=${encodeURIComponent(item.key)}${index > 0 ? `&shot=${index}` : ''}`
-        await page.goto(address, { waitUntil: 'load' })
+        const answered = await page.goto(address, { waitUntil: 'load' })
+        const refused = unanswered(answered?.status(), item.status, address)
+        if (refused !== undefined) {
+          throw new Error(refused)
+        }
         loaded = shot.width
         const missing = await upgrades(page, elements)
         if (missing.length > 0) {
           throw new Error(
-            `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after ${UPGRADES} seconds of waiting`,
+            `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after ${UPGRADES} seconds of waiting. If a framework writes that tag and never defines it, set \`settle.elements\` to the prefix of the custom elements you do define`,
           )
         }
         if (item.state) {
           await restore(page, item.state)
+        }
+        if (item.selector) {
+          progress.stage = `waiting for ${item.selector}`
+          await awaited(page, item.selector, item.wait)
         }
       } else if (shot.harness !== null) {
         await page.evaluate(
@@ -513,7 +610,9 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
         )
       }
       progress.stage = `settling for ${shot.name}`
-      await still(page, readyProperty)
+      for (const tag of await still(page, readyProperty)) {
+        unready.add(tag)
+      }
       /* A face the page asked for and could not load draws in the platform's
          fallback, and a baseline taken that way defends the wrong face. */
       const broken = await page.evaluate(() =>
@@ -526,6 +625,12 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
          frame and finishes finite ones, so a picture is of one definite moment:
          Fusion's spinner moved 17 pixels between two takes without it. */
       progress.stage = `capturing ${shot.name}`
+      for (const [selector, drew] of await maskStates(page)) {
+        const before = masks.get(selector)
+        if (before !== 'painted' && !(before === 'no box' && drew === 'nothing')) {
+          masks.set(selector, drew)
+        }
+      }
       /* A masked element is painted over in one fixed color, so what changes
          on its own, a version number, moves no pixel. */
       const png = await page.screenshot({
@@ -601,10 +706,13 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
     errors: item.errors ? [...lane.errors] : [],
     findings,
     key: item.key,
+    masks: [...masks].filter(([, drew]) => drew !== 'painted'),
     op: 'item',
     painted,
     problems,
+    refused: [...lane.refused],
     seconds,
+    unready: [...unready],
   })
 }
 
@@ -625,7 +733,7 @@ const PER_SHOT = 60
  */
 const bounded = async (lane, item, settle) => {
   const progress = { abandoned: false, stage: 'starting' }
-  const limit = PER_SHOT * item.shots.length
+  const limit = PER_SHOT * item.shots.length + (item.wait ?? 0)
   let timer
   const expired = new Promise((done) => {
     timer = setTimeout(() => done(true), limit * 1000)
@@ -658,6 +766,13 @@ const listened = (lane, page) => {
     }
   })
   page.on('pageerror', (caught) => lane.errors.push(caught.message))
+  /* What the browser itself blocked, a policy of the page's among it, beside
+     what the run refused. */
+  page.on('requestfailed', (request) => {
+    if (request.failure()?.errorText.includes('BLOCKED')) {
+      lane.refused.add(request.url())
+    }
+  })
   return page
 }
 
@@ -682,18 +797,27 @@ const lanes = async (count) => {
       viewport: { height: 800, width: 1280 },
     })
     await askForState(context)
+    await notePlainHosts(context)
+    const lane = { errors: [], messages: [], refused: new Set() }
     if (state.network === 'origin') {
       await context.route('**/*', (route) => {
-        let origin
+        const asked = route.request().url()
+        let url
         try {
-          origin = new URL(route.request().url()).origin
+          url = new URL(asked)
         } catch {
-          origin = undefined
+          url = undefined
         }
-        return state.origins.has(origin) ? route.continue() : route.abort()
+        if (
+          url !== undefined &&
+          (state.origins.has(url.origin) || allowed(url.hostname, state.allow))
+        ) {
+          return route.continue()
+        }
+        lane.refused.add(asked)
+        return route.abort()
       })
     }
-    const lane = { errors: [], messages: [] }
     lane.page = listened(lane, await context.newPage())
     state.lanes.push(lane)
   }
@@ -732,7 +856,12 @@ const handlers = {
   },
 
   async config({ path }) {
-    const loaded = await import(pathToFileURL(path).href)
+    let loaded
+    try {
+      loaded = await import(pathToFileURL(path).href)
+    } catch (caught) {
+      throw new Error(unloadable(path, caught, process.version))
+    }
     const config = loaded.default ?? loaded.config
     if (config === null || typeof config !== 'object') {
       throw new Error(`${path} exports no config: export one as the default`)
@@ -853,7 +982,17 @@ const handlers = {
     })
   },
 
-  async start({ hide = [], mask = [], network, origins = [], serve, style = null, workers }) {
+  async start({
+    allow = [],
+    hide = [],
+    mask = [],
+    network,
+    origins = [],
+    serve,
+    style = null,
+    workers,
+  }) {
+    state.allow = allow
     state.hide = hide
     state.mask = mask
     state.style = style ?? undefined

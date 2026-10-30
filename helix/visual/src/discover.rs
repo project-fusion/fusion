@@ -42,6 +42,10 @@ pub struct Entry {
     pub stem: String,
     /// The two sides of a pair, as its source's `prepare` described them.
     pub sides: Option<Box<[serde_json::Value; 2]>>,
+    /// The selector a route waits for, in place of `settle.selector`.
+    pub selector: Option<String>,
+    /// The status a route answers on purpose.
+    pub status: Option<u16>,
     /// The page's address, for an entry on a server.
     pub url: Option<String>,
 }

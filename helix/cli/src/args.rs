@@ -84,8 +84,7 @@ pub enum Noun {
     repository's builds carry Helix's own conventions as well. */
     /// Hold components to the conventions Helix is built on.
     ///
-    /// Reads the tiers named by a `helix` key in `fusion.json`, or by
-    /// `helix.json` where that product is not in use.
+    /// Reads the tiers named by `helix.json`.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Component {
         #[command(subcommand)]

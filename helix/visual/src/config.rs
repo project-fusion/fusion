@@ -371,7 +371,7 @@ pub struct Exception {
     pub unstable: bool,
 }
 
-#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Network {
     /// Every request off the harness origin is refused.
@@ -379,6 +379,9 @@ pub enum Network {
     Origin,
     /// Requests go wherever they ask, and a baseline records what came back.
     Open,
+    /// Every request off the harness origin is refused but those to these
+    /// hosts: a host, or `*.` and a domain.
+    Allow(Vec<String>),
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
@@ -391,16 +394,38 @@ pub enum Platform {
     Any,
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Settle {
     /// Only custom elements whose tag starts with this are awaited, and one
     /// left undefined fails the entry. A framework's own hyphenated tags,
-    /// such as Next.js's `next-route-announcer`, are never defined.
+    /// such as Angular's component tags, are never defined.
     pub elements: Option<String>,
     /// A property each element may carry holding a promise that resolves when
     /// it has finished rendering, awaited before every shot.
     pub ready_property: Option<String>,
+    /// A selector that matches once a page has drawn what it draws late, such
+    /// as a map's tiles. Each entry waits for it after it loads, and fails
+    /// when nothing matches in time.
+    pub selector: Option<String>,
+    /// Seconds to wait for a selector.
+    #[serde(default = "settle_timeout")]
+    pub timeout: u64,
+}
+
+impl Default for Settle {
+    fn default() -> Self {
+        Self {
+            elements: None,
+            ready_property: None,
+            selector: None,
+            timeout: settle_timeout(),
+        }
+    }
+}
+
+fn settle_timeout() -> u64 {
+    30
 }
 
 /// What the shards are packed by.
@@ -560,12 +585,21 @@ pub struct ServerSource {
     pub sitemap: Option<String>,
 }
 
-/// A route, and optionally the name its baselines take.
+/// A route, and optionally the name its baselines take, the selector it waits
+/// for, and the status it answers on purpose.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(untagged)]
 pub enum Route {
     Path(String),
-    Named { name: String, path: String },
+    Named {
+        name: Option<String>,
+        path: String,
+        /// Waited for in place of `settle.selector`.
+        selector: Option<String>,
+        /// What the route answers, for a page that is meant to answer an
+        /// error, such as a not-found page. Any other answer fails it.
+        status: Option<u16>,
+    },
 }
 
 /// Stories from a running Storybook, read from its `index.json`.
@@ -835,6 +869,28 @@ impl Config {
         Ok(())
     }
 
+    /// What a run may serve and reach, and how long it waits for a selector.
+    fn validate_reach(&self) -> Result<(), String> {
+        for path in self.serve.keys() {
+            if !path.starts_with('/') {
+                return Err(format!(
+                    "`serve` maps URL paths, which start with `/`, and `{path}` does not"
+                ));
+            }
+        }
+        if let Network::Allow(hosts) = &self.network {
+            if let Some(host) = hosts.iter().find(|host| host.contains(['/', ':'])) {
+                return Err(format!(
+                    "`network.allow` lists hosts, and `{host}` is not one: write it with no scheme, port, or path"
+                ));
+            }
+        }
+        if self.settle.selector.is_some() && self.settle.timeout == 0 {
+            return Err("`settle.timeout` is a number of seconds above zero".to_string());
+        }
+        Ok(())
+    }
+
     fn validate(&self) -> Result<(), String> {
         if self.sources.is_empty() {
             return Err("`sources` names nothing to picture".to_string());
@@ -869,13 +925,6 @@ impl Config {
             }
             if !sources.insert(name) {
                 return Err(format!("two sources are named `{name}`"));
-            }
-        }
-        for path in self.serve.keys() {
-            if !path.starts_with('/') {
-                return Err(format!(
-                    "`serve` maps URL paths, which start with `/`, and `{path}` does not"
-                ));
             }
         }
         for exception in &self.exceptions {
@@ -931,7 +980,8 @@ impl Config {
                 }
             }
         }
-        self.validate_triage()?;
+        self.validate_triage()
+            .and_then(|()| self.validate_reach())?;
         if !self.shard.per_shot.is_finite() || self.shard.per_shot <= 0.0 {
             return Err("`shard.perShot` is a number of seconds above zero".to_string());
         }
@@ -1056,6 +1106,70 @@ mod tests {
             .contains("which is off"));
         value["exceptions"][0]["checks"] = json!(["clip"]);
         assert!(Config::parse(value).unwrap_err().contains("the checks are"));
+    }
+
+    #[test]
+    fn the_network_is_a_word_or_the_hosts_it_allows() {
+        let mut value = minimal();
+        value["network"] = json!("open");
+        assert_eq!(Config::parse(value).unwrap().network, Network::Open);
+        let mut value = minimal();
+        value["network"] = json!({ "allow": ["tiles.example.com", "*.example.org"] });
+        assert_eq!(
+            Config::parse(value.clone()).unwrap().network,
+            Network::Allow(vec![
+                "tiles.example.com".to_string(),
+                "*.example.org".to_string()
+            ])
+        );
+        value["network"] = json!({ "allow": ["https://tiles.example.com"] });
+        assert!(Config::parse(value).unwrap_err().contains("is not one"));
+    }
+
+    #[test]
+    fn a_selector_is_waited_for_thirty_seconds_unless_it_says_otherwise() {
+        let mut value = minimal();
+        value["settle"] = json!({ "selector": "[data-ready]" });
+        let settle = Config::parse(value.clone()).unwrap().settle;
+        assert_eq!(
+            (settle.selector.as_deref(), settle.timeout),
+            (Some("[data-ready]"), 30)
+        );
+        value["settle"]["timeout"] = json!(0);
+        assert!(Config::parse(value).unwrap_err().contains("above zero"));
+    }
+
+    #[test]
+    fn a_route_may_name_its_selector_and_its_status() {
+        let mut value = minimal();
+        value["sources"] = json!([{
+            "baselines": "shots",
+            "kind": "server",
+            "name": "site",
+            "routes": ["/", { "path": "/map", "selector": "[data-ready]" }, { "name": "gone", "path": "/gone", "status": 404 }],
+            "url": "http://localhost:3000",
+        }]);
+        let config = Config::parse(value).unwrap();
+        let Source::Server(server) = &config.sources[0] else {
+            panic!("the source is a server");
+        };
+        assert!(matches!(
+            &server.routes[1],
+            Route::Named {
+                name: None,
+                selector: Some(_),
+                status: None,
+                ..
+            }
+        ));
+        assert!(matches!(
+            &server.routes[2],
+            Route::Named {
+                name: Some(_),
+                status: Some(404),
+                ..
+            }
+        ));
     }
 
     #[test]

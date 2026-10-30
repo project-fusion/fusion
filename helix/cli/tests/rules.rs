@@ -3665,3 +3665,15 @@ fn vocabulary_of_slots() {
         "src/callout/callout.ts",
     );
 }
+
+/// A consumer never installed the product `fusion.json` is named for.
+#[test]
+fn the_help_names_only_a_file_a_consumer_has() {
+    let ran = std::process::Command::new(env!("CARGO_BIN_EXE_helix"))
+        .args(["component", "--help"])
+        .output()
+        .expect("the binary runs");
+    let help = String::from_utf8_lossy(&ran.stdout);
+    assert!(help.contains("helix.json"), "{help}");
+    assert!(!help.contains("fusion.json"), "{help}");
+}
