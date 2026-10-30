@@ -26,6 +26,7 @@ import { Text } from 'react-native'
 import { HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
+import { colors, pointIn } from './color'
 import { fakePicker, pickIn, picksFiles } from './files'
 import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
@@ -99,7 +100,10 @@ const hearing = (run: Run, name: string, value: string | null) => {
   const collection = formOf(root.tag).api?.collection
   const announces = [collection?.before, ...[collection?.after ?? []].flat()].includes(name)
   const typed =
-    formOf(root.tag).api?.entry !== undefined || ranges(root.tag) || picksFiles(root.tag)
+    formOf(root.tag).api?.entry !== undefined ||
+    ranges(root.tag) ||
+    picksFiles(root.tag) ||
+    colors(root.tag)
   const relayed =
     rootSends &&
     !announces &&
@@ -274,7 +278,7 @@ const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Pr
   run.focus.place(
     intent.page === true
       ? PAGE
-      : intent.item === undefined && ranges(setup.tag)
+      : intent.item === undefined && (ranges(setup.tag) || colors(setup.tag))
         ? rangeFocus(run)
         : focusable(run, wordsOf(setup, intent.item)),
   )
@@ -306,6 +310,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return holdOn(run, intent)
     case 'pick':
       return pickIn(run, intent)
+    case 'point':
+      return pointIn(intent)
     case 'open':
     case 'close': {
       const words = wordsOf(setup, intent.item)
