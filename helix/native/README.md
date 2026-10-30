@@ -8,7 +8,7 @@ The components ship from
 [`@fusion.dev/helix`](https://www.npmjs.com/package/@fusion.dev/helix), which
 depends on this package. Accordion, Announcement, App Header, Avatar, Avatar Group, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox,
-Checkbox Group, Code, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer,
+Checkbox Group, Code, Color Input, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
@@ -1679,6 +1679,15 @@ import { HelixColorPicker } from '@fusion.dev/helix/color-picker'
   swatches="#ff0000, #00aa00, #0000ff"
 />
 ```
+
+## Color inputs
+
+`HelixColorInput`, from `@fusion.dev/helix/color-input`, is a text field for a
+color with a swatch that opens a `HelixColorPicker` over the app. A move in the
+picker is an edit of the text, and refusing `onBeforeChange` leaves both where
+they were. Text that is not a color shows `badInputMessage` once the reader
+leaves the field. `variant="swatch"` draws the swatch alone, and the picker then
+holds the text. Read-only, the text can be read and the picker does not open.
 
 ## Number inputs
 

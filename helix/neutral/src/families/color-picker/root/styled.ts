@@ -383,7 +383,10 @@ export default styles(
           rule({
             aspectRatio: 1,
             inlineSize: product(
-              difference('100%', product(own.colorPickerRing, 2), product(token('space-sm'), 2)),
+              difference(
+                difference('100%', product(own.colorPickerRing, 2)),
+                product(token('space-sm'), 2),
+              ),
               0.7071,
             ),
           }),

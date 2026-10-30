@@ -14,6 +14,7 @@ export type Family =
   | 'callout'
   | 'checkbox'
   | 'checkbox-group'
+  | 'color-input'
   | 'color-picker'
   | 'copy-button'
   | 'dialog'

@@ -37,7 +37,7 @@ const laidOut = async (held: { at?: Pointing }, told: Told, within?: boolean) =>
 }
 
 const gestures = (held: { at?: Pointing }) =>
-  (held.at?.gesture as unknown as { gestures: readonly unknown[] }).gestures
+  ((held.at as Pointing).gesture as unknown as { gestures: readonly unknown[] }).gestures
 
 describe('usePoint', () => {
   test('a press reports the point and the box', async () => {

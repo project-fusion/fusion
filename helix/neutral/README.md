@@ -3,7 +3,7 @@
 The platform-neutral sources Helix compiles for the web and for React Native.
 This is a pilot, and its families are Accordion, Announcement, App Header, Avatar, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
-Group, Code, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
+Group, Code, Color Input, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
@@ -772,6 +772,12 @@ the `color` machine, and core's color picker arithmetic says where each point
 and key takes it, the same the web element reads. A rule reads
 `color-picker-tint`, the hue at full strength, on a phone, where the web builds
 it with `hsl()` from a number.
+
+**A text field that opens a color picker declares a `colorField`** beside its
+`text`: the names of what it computes from the text, `picked`, the last text
+that was a color, `painted`, the color its swatch paints, and `said`, the
+trigger's name. A phone runs the `color-field` machine over the box that draws
+the picker, so a move in the picker is an edit of the text.
 
 **A prop may hold a function**, written `callback()` with the signature a
 phone's component types it by, as `validate` is. No attribute holds one. An
