@@ -14,7 +14,7 @@ import { fakeImages, picturesAnswered } from './web-images.js'
 import { dismiss, focusPage, removePage } from './web-layer.js'
 import { deepActive, isOpen, leftBy, type Mounted, type Updatable } from './web-left.js'
 import { mountSetup } from './web-mount.js'
-import { adjust, pointAt, rangeKey, slide } from './web-range.js'
+import { adjust, frame, pointAt, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
 import { leave, typeInto, watchFocus } from './web-text.js'
@@ -51,10 +51,6 @@ const build = (setup: Setup): Updatable => {
   }
   return made
 }
-
-/** A frame of the page, so what a component schedules for the next one has run. */
-const frame = (): Promise<void> =>
-  new Promise((done) => requestAnimationFrame(() => setTimeout(done, 0)))
 
 /** Waits until the element and everything the setup put in it have stopped updating. */
 const settle = async (mounted: Mounted): Promise<void> => {
