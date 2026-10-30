@@ -12,6 +12,7 @@ import {
   type Intent,
   knownBy,
   moveClock,
+  recordedDetail,
   type Scenario,
   type Sent,
   type Setup,
@@ -25,6 +26,7 @@ import { Text } from 'react-native'
 import { HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
+import { fakePicker, pickIn, picksFiles } from './files'
 import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
 import { dismissIn, PAGE } from './layers'
@@ -96,7 +98,8 @@ const hearing = (run: Run, name: string, value: string | null) => {
      toggle's do. */
   const collection = formOf(root.tag).api?.collection
   const announces = [collection?.before, ...[collection?.after ?? []].flat()].includes(name)
-  const typed = formOf(root.tag).api?.entry !== undefined || ranges(root.tag)
+  const typed =
+    formOf(root.tag).api?.entry !== undefined || ranges(root.tag) || picksFiles(root.tag)
   const relayed =
     rootSends &&
     !announces &&
@@ -124,7 +127,7 @@ const hearing = (run: Run, name: string, value: string | null) => {
 
 /** Records an event where the page hears it, and where the page removes the item that sent it. */
 const record = (run: Run, event: HelixEvent, name: string, from: string | null): void => {
-  run.heard.push({ event, sent: { detail: { ...event.detail }, from, name } })
+  run.heard.push({ event, sent: { detail: recordedDetail({ ...event.detail }), from, name } })
   if (run.removes.has(name)) {
     run.leaving.push({ event, from })
   }
@@ -301,6 +304,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return adjustBy(intent)
     case 'hold':
       return holdOn(run, intent)
+    case 'pick':
+      return pickIn(run, intent)
     case 'open':
     case 'close': {
       const words = wordsOf(setup, intent.item)
@@ -369,6 +374,8 @@ export const run = async (scenario: Scenario): Promise<Step[]> => {
   setKeys(state.keys)
   setFocus(state.focus)
   setOpenLink(state.opened)
+  /* A fake picker answers the files an element picks, as the web half answers its file input. */
+  fakePicker()
   const before = timers()
   if (state.clock !== undefined) {
     setTimers(state.clock)
