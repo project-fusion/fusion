@@ -702,9 +702,10 @@ The line that is drawn, and it is not "value is special":
 - **Payload states do not.** `value` is a string, and so is `active`, which
   names which child is active. Option's `active` is a boolean its listbox
   writes, so it is the first rule rather than an exception to the second: it
-  mirrors to `:state(active)`. It also keeps the `data-active` attribute it
-  had before the state, which the late side of the rule below allows, because
-  the listbox writes it only once a reader moves the highlight.
+  mirrors to `:state(active)`. `data-active` still sets it from markup and is
+  never written back. A listbox with a `default-value` highlights an option
+  before React hydrates, so the late side of the rule below did not hold: the
+  console carried `suppressHydrationWarning` for it.
 
 **A mirror must never be an attribute.** An attribute is in the DOM: an element
 writes it on the first update, so `<helix-checkbox default-checked>` served by a
@@ -729,7 +730,16 @@ help and the fact has to leave the DOM.
 `hydration.dom.spec.ts` is what holds it, and it mounts twice: bare, and again
 with the `default-*` and `label` attributes a consumer would have typed. The
 second mount is the one that catches this class, and adding it found a sixth
-instance nobody had reported, `Notifications.Item` reflecting `read`.
+instance nobody had reported, `Notifications.Item` reflecting `read`. The feed's
+own `unread` count was the next: written to the host in `updated`, it is
+`:state(unread)` now, and a badge reads the `unread` property.
+
+**A write onto another element waits for React too.** Kbd's `for` writes
+`aria-keyshortcuts` onto a control the consumer rendered, and Popover, Menu, and
+Megamenu write `aria-expanded` onto a trigger. Each waits on
+`untilReactHydrated(control)`, since a frame came before React on a page whose
+definitions load first. `fusion/scripts/react-versions` holds this with real
+hydration, because happy-dom shows none of it.
 
 If a payload ever needs a CSS hook, mirror the boolean fact (`data-filled`), not
 the payload: a floating label cares whether there is text, not what it says. And
@@ -1697,6 +1707,12 @@ property name to derive its attribute rather than dash-casing it, so
 `removeLabel` is reachable only as `removelabel` unless it declares
 `@property({ attribute: 'remove-label' })`. Nothing warns: the attribute a
 consumer would guess simply does nothing.
+
+**The lowered name works as well.** React writes an attribute for a prop on an
+element that is not defined yet, and on a server, and HTML lowers its name, so
+`defaultPosition={16}` arrives as `defaultposition`. `HelixElement` observes that
+spelling for every property with a dashed attribute, so a consumer writes either
+`default-position` or `defaultPosition` in either registration order.
 
 ## Built-in words are word properties
 
