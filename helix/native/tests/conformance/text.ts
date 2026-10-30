@@ -62,7 +62,7 @@ export const focusField = async (run: Run): Promise<void> => {
  * Types `text` into the field, a character an edit, and erases `erase`
  * characters from its end first, with focus in the field. **A disabled
  * field takes neither focus nor an edit, and a read-only one takes focus and
- * no edit**, as the web's does: its `TextInput` is not editable.
+ * no edit**, as the web's does: its `TextInput` opens no keyboard, and a Pin Input's is not editable.
  */
 export const typeInto = async (
   run: Run,
@@ -77,7 +77,7 @@ export const typeInto = async (
     return undefined
   }
   await focusField(run)
-  if (field.props.editable === false) {
+  if (field.props.editable === false || field.props.showSoftInputOnFocus === false) {
     return undefined
   }
   /* The text an edit leaves: at the end, or where the field's selection stands. */
