@@ -73,7 +73,7 @@ uuid = { version = "1", features = ["serde", "v4", "v7"] }
 # rule runs for milliseconds, so compiling to native buys nothing a portable
 # interpreter does not already give, and the artifact stays the same on every
 # platform.
-wasmtime = { version = "49", default-features = false, features = [
+wasmtime = { version = "50", default-features = false, features = [
   "component-model",
   "cranelift",
   "pulley",
@@ -84,11 +84,11 @@ wasmtime = { version = "49", default-features = false, features = [
 # toolchain does for them. The plugin tests build each example the long way
 # round so the path an author takes is the path that is measured.
 #
-# **At the wasm-tools release `wasmtime` is built on**, which is 0.258 for
-# `wasmtime` 49, so the tests and the host compile one `wasmparser` and one
+# **At the wasm-tools release `wasmtime` is built on**, which is 0.261 for
+# `wasmtime` 50, so the tests and the host compile one `wasmparser` and one
 # `wasm-encoder`. A newer one here builds a second copy of each. It moves with
 # `wasmtime`, and `.github/dependabot.yml` leaves it to that bump.
-wit-component = "0.258"
+wit-component = "0.261"
 
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
 fusion-cortex-core = { path = "cortex/core", default-features = false }
