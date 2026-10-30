@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import splitter from './headless.js'
 
 /**
- * Splitter's styled tier, which writes
- * `helix/styled/src/splitter/root/splitter-root.generated.css`.
+ * Splitter's styled tier.
  *
  * **Flex, with the start pane as long as the divider's position** and the
  * end pane taking the rest. Both panes scroll, and neither keeps its
@@ -54,6 +53,15 @@ export default styles(
           flexDirection: 'column',
         }),
       ]),
+      /* **A sticky band in a pane stays under the divider.** The divider reaches
+         into the pane beside it, so it has to paint over what is there, and an
+         App Header's sticky layer is ten times higher than the divider's. The
+         sticky layer is a token, so it is moved here, for what is in a pane and
+         nothing outside the splitter. */
+      on(
+        ['start', 'end'],
+        [rule({ '--helix-layer-sticky': difference(token('layer-raised'), 1) })],
+      ),
       on('start', [
         rule({
           flex: [0, 0, measured('splitter-position', '50%')],

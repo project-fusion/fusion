@@ -6,6 +6,6 @@
  * its picks by as well.
  */
 
+export { accepts, type ScreenRules, screenFiles } from '@fusion.dev/helix-core/file-input'
 /* A refused file is the events folder's `RefusedFile`, which `helix-reject` carries. */
 export type { Refusal, RefusedFile } from './events/index.js'
-export { accepts, type ScreenRules, screenFiles } from '@fusion.dev/helix-core/file-input'
