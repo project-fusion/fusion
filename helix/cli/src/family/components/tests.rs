@@ -408,3 +408,36 @@ fn types_a_switch_with_one_named_value_as_a_boolean_or_that_value() {
     let wrap = typed.members.iter().find(|one| one.name == "wrap").unwrap();
     assert_eq!(wrap.ty, "boolean | 'reverse'");
 }
+
+#[test]
+fn a_detail_a_phone_declares_again_is_typed_from_that_on_one_line() {
+    let mut details = Details::default();
+    details
+        .add(
+            "export type Why = 'size' | 'type'
+export type Held = {
+  readonly name: string
+  readonly uri: string
+}
+export type Refused = {
+  readonly file: Held
+  readonly reason: Why
+}
+export interface RejectDetail {
+  files: File[]
+}
+export interface NativeRejectDetail {
+  files: Refused[]
+}
+export class HelixRejectEvent extends CustomEvent<RejectDetail> {}
+",
+        )
+        .unwrap();
+    let fields = details
+        .fields("HelixRejectEvent", &names(&["files"]))
+        .unwrap();
+    assert_eq!(
+        fields[0].ty,
+        "({ readonly file: { readonly name: string; readonly uri: string }; readonly reason: ('size' | 'type') })[]"
+    );
+}
