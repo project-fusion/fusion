@@ -1288,6 +1288,12 @@ of the same file uses React's own runtime and draws the elements.
 - An `onhelix-*` handler hears the native event, and `onClick` is `onPress`.
 - A `section` with an `id` registers itself for Outline, named by the words
   and the `data-level` of the link to it.
+- A `fieldset` with `disabled` disables the form controls inside it, as
+  `:disabled` reaches them on the web, except in its first `legend`.
+- A raw `svg` and the shapes it holds draw through `react-native-svg`, in a
+  slot as anywhere else, in the color of the words around it.
+- A size in a `style`, such as `blockSize` or `height`, sizes the element. A
+  length in rems is the reader's text size, as any length is.
 - A tag a phone does not draw shows a placeholder where it would be.
 
 **A development build warns about what a phone leaves out.** Each component
@@ -1596,8 +1602,12 @@ and gives the field the keyboard.
 **A phone checks the text as the web does**: `required`, `minlength`,
 `maxlength`, `pattern`, and an `email` or a `url` type, once a change has
 given the reader a go. The web says the browser's sentences, and a phone says
-Helix's, such as "Use at least 8 characters." The password reveal button and
-dictation are the web's alone for now.
+Helix's, such as "Use at least 8 characters." A `number` type is held to `min`,
+`max`, and `step` the same way, and the arrow keys and `stepUp` and `stepDown` on
+the ref step it. Under `reveal`, a password's button shows and hides its text.
+Read-only, a field opens no keyboard and takes no edit, and a reader can still
+select and copy its text. Dictation is the web's alone, since a phone's keyboard
+offers its own.
 
 ```tsx
 import { HelixInput } from '@fusion.dev/helix/input'
@@ -1629,8 +1639,14 @@ Home, and End step it, held to `min`, `max`, and `step`.
 leave in `event.detail.value`, and refusing it leaves the value where it was.
 `onInput` follows each move that stands, and `onChange` follows as a drag or
 a press lets go somewhere new, and with each step. Disabled or read-only,
-nothing moves it, and a screen reader still hears it. A range of two or more
-thumbs, `range`, and a `formatter` are the web's alone for now.
+nothing moves it, and a screen reader still hears it.
+
+**A `range` holds a thumb for each value**, written joined by commas, such as
+`20,70`. A press takes the nearest thumb, which then follows the finger, and each
+thumb stops at its neighbors, `minStepsBetweenThumbs` steps away. Each thumb is
+its own control to a screen reader and the keys, named by the label and
+`minimumLabel`, `thumbLabel`, or `maximumLabel`. The readout joins two values with
+`rangeText` and lists more. `formatter` writes a value with a function.
 
 ```tsx
 import { HelixSlider } from '@fusion.dev/helix/slider'
@@ -1711,8 +1727,9 @@ a step, Page Up and Page Down `largeStep` steps, and Home and End go to
 the finger lifts or the number reaches an end, where the stepper is
 disabled. A stepper is named by its words and then the field's label, such
 as "Decrease Guests", as on the web. On Android the field is a spin button a screen reader steps; on
-iOS it stays a text field, as the web's does there. Dragging the label,
-`scrub`, and the mouse wheel, `wheel`, are the web's alone.
+iOS it stays a text field, as the web's does there. Under `scrub`, a drag on the
+label moves the number a step for each four points of travel. The mouse wheel,
+`wheel`, is the web's alone.
 
 ```tsx
 import { HelixNumberInput } from '@fusion.dev/helix/number-input'
