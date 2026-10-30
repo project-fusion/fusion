@@ -11,6 +11,7 @@
  */
 import { announce } from '@fusion.dev/helix-core/capabilities/announce'
 import { files } from '@fusion.dev/helix-core/capabilities/files'
+import { focus } from '@fusion.dev/helix-core/capabilities/focus'
 import { locale } from '@fusion.dev/helix-core/capabilities/locale'
 import type { DeviceFile } from '@fusion.dev/helix-core/capabilities/types'
 import {
@@ -24,7 +25,7 @@ import {
   screenFiles,
 } from '@fusion.dev/helix-core/file-input'
 import { formatMessage } from '@fusion.dev/helix-core/words'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
@@ -114,7 +115,9 @@ type Transform = (
  * nothing.
  *
  * **A press that removes takes its row's file out**, asking first, and a
- * reader hears `removed-text`.
+ * reader hears `removed-text`. Focus moves to the press of the file that
+ * took its place, or the one before it, or to the field once none is left,
+ * as on the web.
  */
 export const useFiles = (
   family: Family,
@@ -260,6 +263,25 @@ export const useFiles = (
       return next
     })
   }, [])
+  /* The view of each row's press that removes, by its place, and the field's,
+     which focus moves to once a press removes its file. */
+  const removers = useRef(new Map<number, unknown>()).current
+  const field = useRef<unknown>(null)
+  const fieldRef = useCallback((node: unknown) => {
+    field.current = node
+  }, [])
+  const refocus = useRef<number | undefined>(undefined)
+  useLayoutEffect(() => {
+    const at = refocus.current
+    if (at === undefined) {
+      return
+    }
+    refocus.current = undefined
+    const target = removers.get(Math.min(at, held.length - 1)) ?? field.current
+    if (target !== null && target !== undefined) {
+      focus().focus(target, false)
+    }
+  })
   const handle = useMemo(
     () => ({ clear, files: () => latest.current.held, removeAt, setFileStatus }),
     [clear, removeAt, setFileStatus],
@@ -274,6 +296,7 @@ export const useFiles = (
       barHidden: bar === undefined,
       done: status?.state === 'done',
       failed: status?.state === 'error',
+      file,
       fill: typeof bar === 'number' ? `${bar * 100}%` : '0%',
       key: `${at}:${file.uri}`,
       kind: fileKind(file),
@@ -295,10 +318,24 @@ export const useFiles = (
     host: { lists: { [list]: rows } },
   }
   if (picks !== undefined) {
-    parts[picks] = { view: { onPress: disabled ? undefined : pick } }
+    parts[picks] = { view: { onPress: disabled ? undefined : pick, ref: fieldRef } }
   }
   if (removes !== undefined) {
-    parts[removes] = { copy: (item) => ({ onPress: () => removeAt(item.index) }) }
+    parts[removes] = {
+      copy: (item) => ({
+        onPress: () => {
+          refocus.current = item.index
+          removeAt(item.index)
+        },
+        ref: (node: unknown) => {
+          if (node === null) {
+            removers.delete(item.index)
+          } else {
+            removers.set(item.index, node)
+          }
+        },
+      }),
+    }
   }
   return {
     behavior: {
