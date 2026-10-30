@@ -249,6 +249,42 @@ const SECTIONS: &[Field] = &[
     ("scrollBehavior", "behavior", Name),
 ];
 
+const COLOR: &[Field] = &[
+    ("alpha", "alpha", Name),
+    ("brightness", "brightness", Name),
+    ("channels", "channels", Name),
+    ("defaultProp", "seed", Name),
+    ("fields", "fields", Name),
+    ("format", "format", Name),
+    ("formatLabel", "formatLabel", Name),
+    ("formatWord", "formatWord", Name),
+    ("hue", "hue", Name),
+    ("markX", "markX", Name),
+    ("markY", "markY", Name),
+    ("onBeforeChange", "before", Name),
+    ("onChange", "change", Name),
+    ("onCopy", "copied", Name),
+    ("onInput", "input", Name),
+    ("painted", "painted", Name),
+    ("presets", "presets", Name),
+    ("prop", "value", Name),
+    ("readonly", "readonly", Name),
+    ("sampleLabel", "sampleLabel", Name),
+    ("saturation", "saturation", Name),
+    ("square", "square", Name),
+    ("squareReversed", "squareReversed", Name),
+    ("swatches", "swatches", Name),
+    ("tint", "tint", Name),
+    ("wheelX", "wheelX", Name),
+    ("wheelY", "wheelY", Name),
+];
+
+const COLOR_FIELD: &[Field] = &[
+    ("painted", "painted", Name),
+    ("picked", "picked", Name),
+    ("said", "said", Name),
+];
+
 const FILES: &[Field] = &[
     ("accept", "accept", Name),
     ("bytesLabel", "bytes", Name),
@@ -425,6 +461,8 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("clock", "clock", CLOCK),
     ("collection", "collection", COLLECTION),
     ("copy", "copy", COPY),
+    ("color", "color", COLOR),
+    ("colorField", "colorField", COLOR_FIELD),
     ("countdown", "countdown", COUNTDOWN),
     ("delay", "delay", DELAY),
     ("text", "entry", ENTRY),

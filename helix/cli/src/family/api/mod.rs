@@ -10,6 +10,7 @@
 mod clock;
 mod collection;
 mod collection_fields;
+mod color;
 pub mod computed;
 mod copy;
 mod countdown;
@@ -49,6 +50,7 @@ use tree::node;
 
 pub use clock::Clock;
 pub use collection::{Collection, Names};
+pub use color::{ColorChoice, ColorField};
 pub use copy::Copy;
 pub use countdown::{Countdown, Queue};
 pub use delay::Delay;
@@ -108,6 +110,13 @@ pub struct Api {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry: Option<TextEntry>,
     pub events: Vec<Event>,
+    /// What the element holds where a reader builds a color in it: the props
+    /// that hold it, the events a move sends, and what it computes.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub color: Option<ColorChoice>,
+    /// What a field that opens a color picker computes from its text.
+    #[serde(rename = "colorField", skip_serializing_if = "Option::is_none")]
+    pub color_field: Option<ColorField>,
     /// What the element holds where a reader picks files into it: the props
     /// that say which files it takes, the events a change sends, and the
     /// list of chosen files its rows are drawn from.
@@ -241,6 +250,8 @@ impl Api {
             && self.countdown.is_none()
             && self.delay.is_none()
             && self.events.is_empty()
+            && self.color.is_none()
+            && self.color_field.is_none()
             && self.files.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
@@ -280,6 +291,8 @@ const FIELDS: &[&str] = &[
     "copy",
     "countdown",
     "delay",
+    "color",
+    "colorField",
     "derived",
     "entry",
     "events",
@@ -388,6 +401,8 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             derived,
             entry: field("entry").map(entry::entry).transpose()?,
             events,
+            color: field("color").map(color::color).transpose()?,
+            color_field: field("colorField").map(color::color_field).transpose()?,
             files: field("files").map(files::files).transpose()?,
             fold,
             host,

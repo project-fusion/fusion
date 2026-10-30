@@ -87,6 +87,22 @@ impl<'a> Names<'a> {
                 .chain(family.api.sections.iter().map(|one| one.list.as_str()))
                 /* And the list of chosen files, as a file input's. */
                 .chain(family.api.files.iter().map(|one| one.list.as_str()))
+                /* And what a color computes as it moves, as a color picker's. */
+                .chain(
+                    family
+                        .api
+                        .color
+                        .iter()
+                        .flat_map(|color| color.computed.values().map(String::as_str)),
+                )
+                /* And what a field that opens a color picker computes. */
+                .chain(family.api.color_field.iter().flat_map(|field| {
+                    [
+                        field.painted.as_str(),
+                        field.picked.as_str(),
+                        field.said.as_str(),
+                    ]
+                }))
                 /* And what a stack computes as it moves, as a drilldown is `drilled`. */
                 .chain(family.api.stack.iter().flat_map(api::Stack::computed))
                 /* And the words a copy names the element by, as a copy button `says`. */
@@ -149,6 +165,9 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     toggle(family, &names, &mut found);
     entry(family, &names, &mut found);
     filed(family, &names, &mut found);
+    if let Some(color) = &family.api.color {
+        references("color", color.references(), &names, &mut found);
+    }
     rendered(&family.tree, &names, &mut found);
     ranged(family, &names, &mut found);
     toolbar(family, &names, &mut found);
@@ -163,9 +182,10 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             && family.api.entry.is_none()
             && family.api.range.is_none()
             && family.api.files.is_none()
+            && family.api.color.is_none()
         {
             found.push(
-                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range` or `files` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files` or `color` holds its answer"
                     .to_owned(),
             );
         }
@@ -346,7 +366,10 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
     let mut clearing = Vec::new();
     pressables_marked(&family.tree, "clears", &mut clearing);
     let Some(entry) = &family.api.entry else {
-        for name in fields {
+        /* A color holds what its fields say, as a color picker's value and its
+        channels. */
+        let holds = family.api.color.is_some();
+        for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
             ));
