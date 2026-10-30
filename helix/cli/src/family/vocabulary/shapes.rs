@@ -20,6 +20,9 @@ pub enum Shape {
     Name,
     /// A number, or the prop that holds it, `bind()`.
     Number,
+    /// The prop that holds a function, `bind()`, as a file input's
+    /// `renderFile`.
+    Function,
     /// One of these strings.
     OneOf(&'static [&'static str]),
     /// Parts the node is as well, each with the flag that adds it.
@@ -61,6 +64,7 @@ pub fn describe(shape: Shape) -> String {
             listed(&mut kinds::ELEMENTS.iter().map(|element| element.name))
         ),
         Shape::Flag => "`true`, `false`, `bind()` or `not()`".to_owned(),
+        Shape::Function => "`bind()` to a prop that holds a function".to_owned(),
         Shape::Length => {
             "a number, a string holding a number or a percentage, `bind()` or `derive()`".to_owned()
         }

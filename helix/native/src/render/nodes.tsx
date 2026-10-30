@@ -438,6 +438,31 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
   )
 }
 
+/**
+ * What a function the element is given draws in place of what a wrap holds,
+ * called with what `passes` names and the copy's place, as a file input's
+ * `renderFile` draws a row, or nothing where the wrap renders no function.
+ * Words it returns are drawn as text.
+ */
+const renderedBy = (scope: Scope, node: Node, text: Style): ReactNode | undefined => {
+  const renders =
+    node.attributes?.renders === undefined
+      ? undefined
+      : bound(scope, node.attributes.renders, node.name)
+  if (typeof renders !== 'function') {
+    return undefined
+  }
+  const drawn: unknown = renders(
+    bound(scope, node.attributes?.passes, node.name),
+    scope.item?.index ?? 0,
+  )
+  return typeof drawn === 'string' || typeof drawn === 'number' ? (
+    <ScaledText style={text}>{drawn}</ScaledText>
+  ) : (
+    ((drawn as ReactNode) ?? null)
+  )
+}
+
 /** Draws one node of the tree as its kind's view. */
 export const draw: Draw = (scope, node, text, regions, inside) => {
   /* A node only the web draws, as a pointer's drag preview. */
@@ -487,6 +512,10 @@ export const draw: Draw = (scope, node, text, regions, inside) => {
        link is a box while its `while` holds**, as a card's header row is
        while its actions region holds something. */
     case 'wrap': {
+      const rendered = renderedBy(scope, node, text)
+      if (rendered !== undefined) {
+        return rendered
+      }
       const boxed =
         node.attributes?.href === undefined &&
         node.attributes?.while !== undefined &&
