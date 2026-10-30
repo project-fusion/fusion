@@ -162,6 +162,7 @@ export const useValidation = (
   family: Family,
   props: Props,
   use: MachineUse,
+  handle: Readonly<Record<string, unknown>>,
   answered: Answered,
 ): Judged => {
   const required = given(family, props, boundTo(use, 'required', 'prop')) === true
@@ -233,7 +234,13 @@ export const useValidation = (
       own: off ? VALID : needed && empty ? { flags: ['valueMissing'], message: '' } : own,
     })
   }, [context, feedback, send])
-  useImperativeHandle(props.ref as Ref<FieldHandle> | undefined, () => ({ validate }), [validate])
+  /* The ref holds what the element's other machines offer beside `validate`,
+     as a file input's `removeAt`. */
+  useImperativeHandle(
+    props.ref as Ref<FieldHandle> | undefined,
+    () => ({ ...handle, validate }),
+    [handle, validate],
+  )
   /* The sentence under the control, which the tree reads by the name the
      form gives it, while a failure shows. */
   const message = boundTo(use, 'message', 'state')

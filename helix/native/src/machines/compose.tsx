@@ -14,6 +14,7 @@ import type { Around, Binder } from './binder'
 import { type Copied, useCopy } from './copy'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
+import { useFiles } from './files'
 import { HOOKS, leaving } from './hosted'
 import { useJoin } from './join'
 import { layering } from './layer'
@@ -38,6 +39,9 @@ import { settingTurns, turning, turnsAlone } from './turns'
 import { type Judged, useValidation } from './validation'
 
 export { scrollingOf } from './scrolling'
+
+/** No methods beside `validate`, one object for every render so the ref keeps its handle. */
+const NO_HANDLE: Readonly<Record<string, unknown>> = {}
 
 /** The machines that hold a set's choice, one of which a set binds. */
 const SELECTIONS: ReadonlySet<string> = new Set([
@@ -73,6 +77,7 @@ const validating = (
       family,
       props,
       use,
+      around.handle.current,
       types
         ? {
             empty: (around.entered?.value ?? '') === '',
@@ -191,6 +196,19 @@ export const behaviorFor = (family: Family): UseBehavior => {
             return behavior
           },
       ),
+    /* The files a reader picks, which the verdict reads as its answer, and
+       whose methods the element's ref holds. */
+    ...uses
+      .filter((use) => use.machine === 'files')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, handle, names } = useFiles(family, props, use, around.touch)
+            around.chosen.current = names
+            around.handle.current = handle
+            return behavior
+          },
+      ),
     /* The divider of a split a reader moves between two panes. */
     ...uses
       .filter((use) => use.machine === 'resize')
@@ -282,6 +300,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       chosen,
       copied,
       entered,
+      handle: { current: NO_HANDLE },
       joined,
       layering: {},
       pagers,

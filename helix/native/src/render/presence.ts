@@ -117,11 +117,33 @@ export const useEntering = (reads: boolean): boolean => {
   return entering
 }
 
+/** The states a family's machines set, by name, worked out once each. */
+const machined = new WeakMap<Family, ReadonlySet<string>>()
+
+/** The states a family's machines set, as its files machine sets `has-files`. */
+const machineStates = (family: Family): ReadonlySet<string> => {
+  let states = machined.get(family)
+  if (states === undefined) {
+    states = new Set(
+      (family.machines ?? []).flatMap((use) =>
+        Object.values(use.bind).flatMap((bound) =>
+          typeof bound === 'object' && bound !== null && 'state' in bound
+            ? [String((bound as { readonly state: unknown }).state)]
+            : [],
+        ),
+      ),
+    )
+    machined.set(family, states)
+  }
+  return states
+}
+
 /**
  * The `has-` states the web element sets while a region holds something,
  * each by the state's name: `has-label` while the `label` region does, or
  * while the prop of that name holds words. **A state the family computes in
- * its `derived` is left to it**, as a card's `has-footer` is.
+ * its `derived` is left to it**, as a card's `has-footer` is, and so is one
+ * a machine sets, as a file input's `has-files`.
  */
 export const hasStates = (
   family: Family,
@@ -129,9 +151,10 @@ export const hasStates = (
   filled: readonly string[],
 ): Record<string, boolean> => {
   const states: Record<string, boolean> = {}
+  const set = machineStates(family)
   for (const state of family.api?.states ?? []) {
     const region = state.startsWith('has-') ? state.slice('has-'.length) : undefined
-    if (region === undefined || family.api?.derived?.[state] !== undefined) {
+    if (region === undefined || family.api?.derived?.[state] !== undefined || set.has(state)) {
       continue
     }
     const words = props[camel(region)]
