@@ -43,9 +43,11 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "parts": "helix system parts",
+    "parts:watch": "helix system parts --watch",
     "survey:style": "bun scripts/style-survey/main.ts",
     "test": "bun test src scripts --conditions helix-development",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p ../cli/tests/fixtures/acme/tsconfig.json"
+    "typecheck": "bun run parts && tsc -p tsconfig.json --noEmit && helix system parts ../cli/tests/fixtures/acme && tsc -p ../cli/tests/fixtures/acme/tsconfig.json"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {

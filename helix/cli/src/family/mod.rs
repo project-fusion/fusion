@@ -45,6 +45,7 @@ mod ir;
 #[cfg(feature = "internal")]
 mod machine;
 mod output;
+mod parts;
 pub mod project;
 mod read;
 mod resolve;
@@ -60,7 +61,7 @@ use std::path::{Path, PathBuf};
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 
-use crate::args::{SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemStylesheets};
+use crate::args::{SystemArgs, SystemBuild, SystemComponents, SystemConfig, SystemParts, SystemStylesheets};
 #[cfg(feature = "internal")]
 use crate::args::{SystemCapabilities, SystemMachines, SystemTypes};
 use crate::family::compile::Compiled;
@@ -217,6 +218,36 @@ pub fn stylesheets(
         .map(|one| (out.join(&one.family.stylesheet), generated(one, &project)))
         .collect();
     output::settle(&outputs, args.check, &command("stylesheets"), json)
+}
+
+/// Writes each element's part names, for its style table's typecheck, and with
+/// `--watch` goes on writing them as the headless sources change.
+///
+/// # Errors
+///
+/// [`Failure`] when the project or a headless source cannot be read, or a
+/// module cannot be written.
+pub fn parts(
+    args: &SystemParts,
+    config: Option<&Path>,
+    from: &Path,
+    json: bool,
+) -> Result<Code, Failure> {
+    let project = open(config, args.package.as_ref(), from)?;
+    let name = command("parts");
+    /* Only what changed, so an editor does not recheck every table on each run. */
+    let settled = |check: bool| -> Result<Code, Failure> {
+        let mut outputs = parts::outputs(&project, &name)?;
+        if !check {
+            parts::sweep(&project, &outputs)?;
+            outputs.retain(|(path, text)| fs::read_to_string(path).ok().as_deref() != Some(text));
+        }
+        output::settle(&outputs, check, &name, json)
+    };
+    if args.watch {
+        parts::watch(&project, || settled(false).map(|_| ()));
+    }
+    settled(args.check)
 }
 
 #[cfg(feature = "internal")]
