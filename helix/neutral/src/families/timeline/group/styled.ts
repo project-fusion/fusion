@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * A timeline group's styled tier, which writes
- * `helix/styled/src/timeline/group/timeline-group.generated.css`.
+ * A timeline group's styled tier.
  *
  * **The heading is a section label**, small and heavy at the start edge, and
  * the space under a group is the space between two entries, so a day reads

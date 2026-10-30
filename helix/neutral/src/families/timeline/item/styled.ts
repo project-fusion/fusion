@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A timeline entry's styled tier, which writes
- * `helix/styled/src/timeline/item/timeline-item.generated.css`.
+ * A timeline entry's styled tier.
  *
  * **On the web the rail is a subgrid, and that is the whole of the
  * alignment.** The mark sits on what happened rather than at the top of the

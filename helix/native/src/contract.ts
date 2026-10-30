@@ -19,7 +19,7 @@
  *
  * **On the web the compiler writes stylesheets and no code**, so the web's
  * half of the contract is what the element that adopts a stylesheet draws,
- * which a type cannot hold. `helix/neutral/DESIGN-SYSTEMS.md` lists it:
+ * which a type cannot hold. The design system guide lists it:
  * the form's tag, each prop reflected as its attribute, each custom state set
  * in its `ElementInternals`, the form's tree in its shadow root, and each
  * event under the design system's event prefix. Helix's elements meet it by

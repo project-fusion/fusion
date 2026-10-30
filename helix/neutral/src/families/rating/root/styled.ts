@@ -15,8 +15,7 @@ const star = web(
 )
 
 /**
- * Rating's styled tier, which writes
- * `helix/styled/src/rating/root/rating-root.generated.css`.
+ * Rating's styled tier.
  *
  * **Two rows of the same marks, one over the other, the top one cut off
  * partway.** The track draws every mark in the unfilled color, and the

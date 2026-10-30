@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import step from './headless.js'
 
 /**
- * A step's styled tier, which writes
- * `helix/styled/src/steps/step/step.generated.css`. Its hooks are the
+ * A step's styled tier. Its hooks are the
  * sequence's, `--steps-*`.
  *
  * **A grid of the mark, the name, and what the stage holds**: the mark and

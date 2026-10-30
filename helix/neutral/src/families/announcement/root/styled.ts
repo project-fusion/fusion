@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Announcement's styled tier, which writes
- * `helix/styled/src/announcement/root/announcement-root.generated.css`.
+ * Announcement's styled tier.
  *
  * **A band across the page, one height whether or not it holds a control.**
  * Its floor is the small control step and its padding, so a button added to

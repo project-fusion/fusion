@@ -6,8 +6,7 @@ import { styles } from '../../../table.js'
 import input from './headless.js'
 
 /**
- * Color Input's styled tier, which writes
- * `helix/styled/src/color-input/root/color-input-root.generated.css`.
+ * Color Input's styled tier.
  *
  * **The frame wraps the whole field**, so the trigger sits inside the same box
  * as the text and one ring surrounds the control. The trigger fills the

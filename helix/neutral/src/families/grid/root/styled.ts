@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Grid's styled tier, which writes `helix/styled/src/grid/root/grid-root.generated.css`.
+ * Grid's styled tier.
  *
  * **The track list is read from hooks no rule here sets**, and the fallback
  * is a single column. `--grid-columns` wins over everything the element works

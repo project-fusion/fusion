@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * An accordion section's styled tier, which writes
- * `helix/styled/src/accordion/item/accordion-item.generated.css`.
+ * An accordion section's styled tier.
  *
  * **The section opens to its content's own height.** The web moves the
  * content's one grid row from `0fr` to `1fr`, which reaches the height

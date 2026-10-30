@@ -4,9 +4,8 @@ import { fragment } from '../table.js'
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
- * The frame a text field wears, styled once: what
- * `helix/styled/src/shared/field/field-frame.css` holds, for a family whose
- * table writes its stylesheet. Taken in with `field` and `field-stacked`,
+ * The frame a text field wears, styled once: what the shared
+ * field frame sheet holds, for a family whose table writes its stylesheet. Taken in with `field` and `field-stacked`,
  * before the family's own rules, which draw the frame's box.
  *
  * - **The host is a column**, so the label, the field, and the line under it

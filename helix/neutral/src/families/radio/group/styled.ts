@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * Radio Group's styled tier, which writes `helix/styled/src/radio/group/radio-group.generated.css`.
+ * Radio Group's styled tier.
  *
  * **The host is the stack**: a question, the choices, and one line under
  * them. `orientation` lays out the choices alone, so a row of them keeps its

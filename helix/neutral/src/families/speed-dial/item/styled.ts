@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A speed dial action's styled tier, which writes
- * `helix/styled/src/speed-dial/item/speed-dial-item.generated.css`. Its
+ * A speed dial action's styled tier. Its
  * hooks are the dial's, `--speed-dial-*`.
  *
  * **The name and the mark share a line**, the name first, so the marks line

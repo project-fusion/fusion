@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import tabs from './headless.js'
 
 /**
- * A tab set's styled tier, which writes `helix/styled/src/tabs/root/tabs-root.generated.css`.
+ * A tab set's styled tier.
  *
  * **The set styles its tabs through private values**, `tab-height`,
  * `tab-radius` and the rest, which reach each slotted tab through the flat tree.

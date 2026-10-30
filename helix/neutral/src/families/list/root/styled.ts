@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * A list's styled tier, which writes `helix/styled/src/list/root/list-root.generated.css`.
+ * A list's styled tier.
  *
  * **The numbers are counters, and the list's.** A row cannot count itself, so
  * the list increments a counter on each row and sets it on the first, which is

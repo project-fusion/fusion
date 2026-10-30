@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
- * A speed dial group's styled tier, which writes
- * `helix/styled/src/speed-dial/group/speed-dial-group.generated.css`. Its
+ * A speed dial group's styled tier. Its
  * hooks are the dial's, `--speed-dial-*`.
  *
  * **A column, lined up on the end the trigger is on**, as the dial's own

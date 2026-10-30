@@ -14,7 +14,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Kbd's styled tier, which writes `helix/styled/src/kbd/root/kbd-root.generated.css`.
+ * Kbd's styled tier.
  *
  * **Drawn as a physical key**: a hairline border, a sunken fill, and one
  * inset shadow along the bottom edge. Sized in `em`, so it stays in

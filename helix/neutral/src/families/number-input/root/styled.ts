@@ -9,8 +9,7 @@ import numberInput from './headless.js'
 const ease = [token('duration-fast'), token('easing-standard')] as const
 
 /**
- * Number Input's styled tier, which writes
- * `helix/styled/src/number-input/root/number-input-root.generated.css`.
+ * Number Input's styled tier.
  *
  * **The frame is a text field's**, `field-frame`'s stack, hover edge, focus
  * ring, and wrong state, so a number lines up with an Input beside it in a

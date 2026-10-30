@@ -14,8 +14,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * Toast Item's styled tier, which writes
- * `helix/styled/src/toast/item/toast-item.generated.css`.
+ * Toast Item's styled tier.
  *
  * **A floating surface with a shadow and a hairline edge**, at the dense
  * control step, so an action beside the dismiss button is the same height.

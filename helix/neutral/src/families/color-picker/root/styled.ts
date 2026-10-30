@@ -16,8 +16,7 @@ import { styles } from '../../../table.js'
 import picker from './headless.js'
 
 /**
- * Color Picker's styled tier, which writes
- * `helix/styled/src/color-picker/root/color-picker-root.generated.css`.
+ * Color Picker's styled tier.
  *
  * **The web paints the square in three layers of gradient**, the hue under
  * white along the line under black from the foot, and draws its mark and its

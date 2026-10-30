@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * App Header's styled tier, which writes
- * `helix/styled/src/app-header/root/app-header-root.generated.css`.
+ * App Header's styled tier.
  *
  * **Opaque by default, flat, and in the flow.** `material` sets how much of
  * the page shows through: `glass` is translucent and blurred, `frosted` the

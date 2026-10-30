@@ -15,8 +15,7 @@ import { styles } from '../../../table.js'
 import row from './headless.js'
 
 /**
- * A menu row's styled tier, which writes
- * `helix/styled/src/menu/item/menu-item.generated.css`. Its panel hooks are
+ * A menu row's styled tier. Its panel hooks are
  * the menu's, `--menu-*`.
  *
  * **A row is four columns**: what stands before the label, the label, the

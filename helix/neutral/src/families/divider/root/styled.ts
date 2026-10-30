@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Divider's styled tier, which writes `helix/styled/src/divider/root/divider-root.generated.css`.
+ * Divider's styled tier.
  *
  * **A line, whatever is set into it, and a line**, in a flex line with no
  * gap, so the two halves take what the content leaves and a divider with

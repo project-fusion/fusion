@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Button Group's styled tier, which writes
- * `helix/styled/src/button-group/root/button-group-root.generated.css`.
+ * Button Group's styled tier.
  *
  * **One shape out of several buttons.** The outer corners keep their radius,
  * the inner ones go flat, and each button after the first is pulled onto its

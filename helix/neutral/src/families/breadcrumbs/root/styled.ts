@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Breadcrumbs' styled tier, which writes
- * `helix/styled/src/breadcrumbs/root/breadcrumbs-root.generated.css`.
+ * Breadcrumbs' styled tier.
  *
  * **The trail decides how a split crumb tells its halves apart**, and hands
  * every crumb two values for it: a light fill across both halves while one

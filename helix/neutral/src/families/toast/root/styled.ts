@@ -13,8 +13,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Toast's styled tier, which writes
- * `helix/styled/src/toast/root/toast-root.generated.css`.
+ * Toast's styled tier.
  *
  * **The host draws nothing. The stack is the `region` layer**, a column along
  * the window's bottom edge, or its top edge under a `top-` placement, kept

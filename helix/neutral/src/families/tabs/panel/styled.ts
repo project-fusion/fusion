@@ -2,7 +2,7 @@ import { token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import panel from './headless.js'
 
-/** A tab panel's styled tier, which writes `helix/styled/src/tabs/panel/tab-panel.generated.css`. */
+/** A tab panel's styled tier. */
 export default styles(
   panel,
   {

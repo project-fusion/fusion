@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * A timeline's styled tier, which writes
- * `helix/styled/src/timeline/root/timeline-root.generated.css`.
+ * A timeline's styled tier.
  *
  * **A column of entries with no gap**, since the line has to be continuous
  * and a gap is empty space between the boxes that draw it. The spacing is

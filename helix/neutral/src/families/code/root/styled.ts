@@ -3,7 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Code's styled tier, which writes `helix/styled/src/code/root/code-root.generated.css`.
+ * Code's styled tier.
  *
  * **A step down from the words around it**, since a monospace face reads
  * larger than the prose it sits in, as a ratio of the sizes so a fragment in

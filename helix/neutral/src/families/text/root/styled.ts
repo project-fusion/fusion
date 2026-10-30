@@ -5,7 +5,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Text's styled tier, which writes `helix/styled/src/text/root/text-root.generated.css`.
+ * Text's styled tier.
  *
  * **`as` sets the element, and `variant` the ramp**: size, weight, leading
  * and tracking together. The two match by default, so `as="h2"` takes the

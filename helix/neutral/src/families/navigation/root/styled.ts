@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import navigation from './headless.js'
 
 /**
- * A navigation's styled tier, which writes
- * `helix/styled/src/navigation/root/navigation-root.generated.css`.
+ * A navigation's styled tier.
  *
  * **One mark moves to the current destination**, placed by measurement: the
  * root measures the current destination and sets `--indicator-x`,

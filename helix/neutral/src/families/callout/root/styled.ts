@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Callout's styled tier, which writes
- * `helix/styled/src/callout/root/callout-root.generated.css`.
+ * Callout's styled tier.
  *
  * **The host is the box, rounded on every corner, and the tone's edge is a
  * bar inside it, clipped by it.** A thick border on one rounded side thins

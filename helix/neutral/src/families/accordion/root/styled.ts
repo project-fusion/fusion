@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * An accordion's styled tier, which writes
- * `helix/styled/src/accordion/root/accordion-root.generated.css`.
+ * An accordion's styled tier.
  *
  * **Plain by default: nothing between the sections and nothing around the
  * stack.** The held sheet wrote a seam between neighbors as

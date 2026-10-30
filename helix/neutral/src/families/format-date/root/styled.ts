@@ -2,8 +2,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Format Date's styled tier, which writes
- * `helix/styled/src/format-date/root/format-date-root.generated.css`.
+ * Format Date's styled tier.
  *
  * **A timestamp is a piece of text and takes the text around it**: no
  * family, no size, no color, and an inline host, so a phone draws it as a

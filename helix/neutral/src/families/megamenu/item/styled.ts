@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A megamenu item's styled tier, which writes
- * `helix/styled/src/megamenu/item/megamenu-item.generated.css`.
+ * A megamenu item's styled tier.
  *
  * **An item with an icon or a line about it draws what the
  * `data-megamenu-item` recipe gives a link of your own**: the icon before
