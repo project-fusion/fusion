@@ -1,0 +1,106 @@
+/* The base layer's recipes for markup rendered in a shadow root, where a rule in
+   the document stops. A column's `cell` is that markup: a link or a tag in a cell
+   is written the way it is on the page. `recipes.pure.spec.ts` holds each rule to
+   the base layer's. */
+[data-link] {
+  color: var(--helix-color-primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+  text-decoration-thickness: 1px;
+  /* One offset, in both states. */
+  text-underline-offset: 0.25em;
+  transition:
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    text-decoration-color var(--helix-duration-fast) var(--helix-easing-standard),
+    text-decoration-thickness var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[data-link]:hover {
+  color: var(--helix-color-primary-hover);
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+[data-link="subtle"],
+[data-link="quiet"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[data-link="subtle"]:hover {
+  color: var(--helix-color-primary);
+}
+
+[data-link="quiet"] {
+  text-decoration: none;
+}
+
+[data-link="quiet"]:hover {
+  color: var(--helix-color-foreground);
+  text-decoration: none;
+}
+
+[data-link-underline="hover"] {
+  text-decoration: none;
+}
+
+[data-link-underline="hover"]:hover {
+  text-decoration: underline;
+}
+
+[data-link-size="xs"] {
+  font-size: var(--helix-text-xs);
+}
+
+[data-link-size="sm"] {
+  font-size: var(--helix-text-sm);
+}
+
+[data-link-size="lg"] {
+  font-size: var(--helix-text-lg);
+}
+
+[data-density="sm"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-text-control: var(--helix-text-xs);
+  --helix-space-control: var(--helix-space-sm);
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-switch: var(--helix-size-switch-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+}
+[data-density="md"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-text-control: var(--helix-text-sm);
+  --helix-space-control: var(--helix-space-md);
+  --helix-size-checkbox: var(--helix-size-checkbox-md);
+  --helix-size-icon: var(--helix-size-icon-md);
+  --helix-size-control: var(--helix-size-control-md);
+  --helix-size-switch: var(--helix-size-switch-md);
+  --helix-size-tag: var(--helix-size-tag-md);
+}
+[data-density="lg"] {
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-text-control: var(--helix-text-md);
+  --helix-space-control: var(--helix-space-lg);
+  --helix-size-checkbox: var(--helix-size-checkbox-lg);
+  --helix-size-icon: var(--helix-size-icon-lg);
+  --helix-size-control: var(--helix-size-control-lg);
+  --helix-size-switch: var(--helix-size-switch-lg);
+  --helix-size-tag: var(--helix-size-tag-lg);
+}

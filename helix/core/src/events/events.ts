@@ -79,6 +79,7 @@ import { HelixBeforeEditEvent } from './before-edit.js'
 import { HelixBeforeExpandEvent } from './before-expand.js'
 import { HelixBeforeFacetEvent } from './before-facet.js'
 import { HelixBeforeFilterEvent } from './before-filter.js'
+import { HelixBeforeFollowEvent } from './before-follow.js'
 import { HelixBeforeGraphFilterEvent } from './before-graph-filter.js'
 import { HelixBeforeListenEvent } from './before-listen.js'
 import { HelixBeforeMoveEvent } from './before-move.js'
@@ -123,6 +124,7 @@ import { HelixEndEvent } from './end.js'
 import { HelixExpandEvent } from './expand.js'
 import { HelixFacetEvent } from './facet.js'
 import { HelixFilterEvent } from './filter.js'
+import { HelixFollowEvent } from './follow.js'
 import { HelixFoundEvent } from './found.js'
 import { HelixGraphFilterEvent } from './graph-filter.js'
 import { HelixGraphLayoutEvent } from './graph-layout.js'
@@ -208,6 +210,7 @@ export type {
   DismissDetail,
   FacetDetail,
   FilterDetail,
+  FollowDetail,
   FoundDetail,
   GraphFilterDetail,
   GraphLayoutDetail,
@@ -271,6 +274,7 @@ export {
   HelixBeforeExpandEvent,
   HelixBeforeFacetEvent,
   HelixBeforeFilterEvent,
+  HelixBeforeFollowEvent,
   HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
@@ -315,6 +319,7 @@ export {
   HelixExpandEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixFollowEvent,
   HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
@@ -403,6 +408,7 @@ const registry = {
   HelixBeforeExpandEvent,
   HelixBeforeFacetEvent,
   HelixBeforeFilterEvent,
+  HelixBeforeFollowEvent,
   HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
@@ -447,6 +453,7 @@ const registry = {
   HelixExpandEvent,
   HelixFacetEvent,
   HelixFilterEvent,
+  HelixFollowEvent,
   HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
