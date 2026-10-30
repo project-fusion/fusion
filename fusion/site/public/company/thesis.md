@@ -61,8 +61,8 @@ person wrote every line of code. It matters now that most lines are generated.
 ## Where the work stands
 
 - **Helix** is Active. Its packages are published, and you can use it today.
-- **Cortex** is Building. Work on Engram and Trace is underway, and Recall is
-  planned.
+- **Cortex** is Active. Its command line and documentation are published, and
+  you can use them today.
 - **Fusion Studio** is Active, and you can hire us today.
 
 We report each stage as it is.

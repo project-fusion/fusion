@@ -70,13 +70,13 @@ export default function Page() {
             gap="lg"
             id="cortex-hero-words"
           >
-            {/* The stage, as the kicker the landing page opens with: what is
-                coming, and a way to the page that says where the work stands.
-                It carries the stage, so nothing under the doors has to. */}
+            {/* The stage, as a kicker, and a way to the page that says where the
+                work stands. It carries the stage, so nothing under the doors
+                has to. */}
             <NewsKicker
               href="/company/thesis#where-the-work-stands"
               label={product.stage}
-              text="Engram and Trace are underway"
+              text="Engram, Trace, and Recall are in the command line"
             />
 
             <h1 className={hero.tDisplay}>

@@ -26,7 +26,7 @@ export interface CortexModule {
   /** The drawing over its name, by the name `site-nav/tiles.tsx` gives it. */
   picture: string
   /** Its own stage, which is never the product's. */
-  stage: 'Building' | 'Declared'
+  stage: 'Active' | 'Building' | 'Declared'
   /** The evocative name, which it earns by carrying a differentiated idea. */
   title: string
 }
@@ -36,21 +36,21 @@ export const CORTEX_MODULES: CortexModule[] = [
     body: 'Engram keeps a store of what a system has seen and a store of what it has learned, and moves facts from the first to the second.',
     job: 'Memory',
     picture: 'engram',
-    stage: 'Building',
+    stage: 'Active',
     title: 'Engram',
   },
   {
     body: 'Trace links every memory, context, and output to its inputs, so you can check where any claim came from. It is the core of Cortex.',
     job: 'Provenance',
     picture: 'trace',
-    stage: 'Building',
+    stage: 'Active',
     title: 'Trace',
   },
   {
     body: 'Recall chooses what a model is shown for each call. It keeps the rules and the task, drops the oldest work to fit the window, and records what it dropped.',
     job: 'Context',
     picture: 'recall',
-    stage: 'Building',
+    stage: 'Active',
     title: 'Recall',
   },
 ]
