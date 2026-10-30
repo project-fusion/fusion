@@ -195,8 +195,8 @@ export class HelixHeadlessCarousel extends HelixElement {
    *
    * **Pointer and not width, which is the distinction this exists to make.** A
    * 375px window on a desktop still has a mouse and still wants the arrows; a
-   * tablet at 1024 has neither. `.claude/rules/helix.md` forbids a component
-   * asking about the viewport, because the viewport is not the component's box,
+   * tablet at 1024 has neither. A component does not ask about the viewport,
+   * because the viewport is not the component's box,
    * and that objection does not reach `hover` and `pointer`: those describe the
    * input device, and the answer is the same whether this carousel is 300px in
    * a sidebar or runs the width of the page.

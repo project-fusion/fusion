@@ -398,9 +398,8 @@ export class HelixHeadlessSplitter extends HelixElement {
    * something untrue. Everything here reads `vertical` rather than this
    * property, which is what makes one getter enough to turn all three together.
    *
-   * **Its own width and not the viewport**, per the responsiveness policy in
-   * `.claude/rules/helix.md`: a splitter in a 300px panel of a 1400px window has
-   * no room for two panes side by side, and a media query would hand it the
+   * **Its own width and not the viewport**: a splitter in a 300px panel of a
+   * 1400px window has no room for two panes side by side, and a media query would hand it the
    * desktop branch. A `ResizeObserver` on the host asks the only question that
    * has an honest answer.
    */
