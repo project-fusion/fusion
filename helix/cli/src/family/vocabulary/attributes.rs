@@ -292,6 +292,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("r", BOX, Shape::Length),
     /* `aria-readonly`: a reader sees and reaches it, and cannot change it. */
     ("readonly", ANSWER, Shape::Flag),
+    /* The press that shows and hides the password of the element's field, as
+    an input's reveal button. */
+    ("reveals", PRESS, Shape::Set),
     /* The press that takes the file of its row out of the element's
     `files`, as a file input's remove button. */
     ("removes", PRESS, Shape::Set),

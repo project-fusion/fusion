@@ -1,8 +1,17 @@
 import { focus } from '@fusion.dev/helix-core/capabilities/focus'
+import { keys } from '@fusion.dev/helix-core/capabilities/keys'
+import type { KeyPress, Stop } from '@fusion.dev/helix-core/capabilities/types'
 import * as derivations from '@fusion.dev/helix-core/derivations'
+import {
+  type NumberFlaw,
+  numberFieldFlaw,
+  numberFieldKeypad,
+  numberFieldOf,
+  numberTypeStep,
+} from '@fusion.dev/helix-core/number-field'
 import { caretSelection } from '@fusion.dev/helix-core/pin-code'
 import { useCallback, useMemo, useRef, useState } from 'react'
-import type { TextInputInstance } from 'react-native'
+import { Platform, type TextInputInstance } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
@@ -30,6 +39,10 @@ export interface Entered {
   readonly clears: string | undefined
   /** The text the field holds as of the last edit or step, between renders as well. */
   readonly current: () => string
+  /** The methods the element's ref offers: `stepUp` and `stepDown`, on a number type. */
+  readonly methods: Readonly<Record<string, unknown>> | undefined
+  /** What is wrong with the number a number type holds, and the locale its sentences write in. */
+  readonly number: { readonly flaw: NumberFlaw | undefined; readonly locale: string } | undefined
   /** Whether the reader has typed the text, as HTML's dirty value flag says. */
   readonly edited: boolean
   /** Whether the field has focus. */
@@ -94,19 +107,23 @@ const hosted = (
   part: string,
   view: PartBinding,
   now: {
+    readonly bared: boolean
     readonly box: number
     readonly changes: boolean
+    readonly unveils: boolean
     readonly focused: boolean
     readonly offered: boolean
     readonly text: string
   },
 ): Behavior => {
-  const { box, changes, focused, offered, text } = now
+  const { bared, box, changes, focused, offered, text, unveils } = now
   const blank = boundTo(use, 'blank', 'state')
   const shows = boundTo(use, 'shows', 'state')
   const typed = boundTo(use, 'typed', 'state')
   const caretAt = boundTo(use, 'caret', 'state')
   const caret = focused ? box : -1
+  const baring = boundTo(use, 'bared', 'state')
+  const unveiling = boundTo(use, 'unveils', 'state')
   return {
     marks: text === '' && blank !== undefined ? [blank] : [],
     parts: {
@@ -116,12 +133,17 @@ const hosted = (
           focusWithin: focused,
           ...(shows === undefined ? {} : { [shows]: offered && text !== '' && changes }),
           ...(typed === undefined ? {} : { [typed]: text }),
+          ...(baring === undefined ? {} : { [baring]: bared }),
+          ...(unveiling === undefined ? {} : { [unveiling]: unveils }),
           ...(caretAt === undefined ? {} : { [caretAt]: String(caret) }),
         },
       },
     },
   }
 }
+
+/** The phone the app runs on, for the keypads it has. */
+const PHONE = Platform.OS === 'ios' ? 'iphone' : Platform.OS === 'android' ? 'android' : ''
 
 /** The box the caret stands in: where it was put, within the text and the boxes. */
 const boxOf = (put: number | null, text: string, fills: number): number =>
@@ -173,6 +195,7 @@ export const useEntry = (
 ): Entered => {
   const part = boundTo(use, 'part', 'part') ?? ''
   const cell = boundTo(use, 'cell', 'part')
+  const reveals = boundTo(use, 'reveals', 'part')
   const clears = boundTo(use, 'clears', 'part')
   const valueProp = boundTo(use, 'value', 'prop')
   const written = textOf(valueProp === undefined ? undefined : props[camel(valueProp)])
@@ -189,10 +212,23 @@ export const useEntry = (
   const [focused, holdFocus] = useState(false)
   const [edited, edit] = useState(false)
   const [put, putCaret] = useState<number | null>(null)
+  /* A reader's choice about their own screen, which no prop sets, as on the web. */
+  const [bared, bare] = useState(false)
   const field = useRef<TextInputInstance | null>(null)
-  const fieldRef = useCallback((node: TextInputInstance | null) => {
-    field.current = node
-  }, [])
+  /* The arrow keys of a hardware keyboard step a number, as a browser's do. */
+  const listening = useRef<Stop | undefined>(undefined)
+  const heard = useRef<(press: KeyPress) => boolean>(() => false)
+  const fieldRef = useCallback(
+    (node: TextInputInstance | null) => {
+      field.current = node
+      listening.current?.()
+      listening.current = undefined
+      if (node !== null && boundTo(use, 'kind', 'prop') !== undefined) {
+        listening.current = keys().listen(node, (press) => heard.current(press))
+      }
+    },
+    [use],
+  )
   const committed = useRef(text)
   const events = {
     before: boundTo(use, 'before', 'event'),
@@ -203,11 +239,29 @@ export const useEntry = (
   }
   const clean = useMemo(() => cleanerOf(family, use), [family, use])
   const fills = Number(given(family, props, boundTo(use, 'length', 'prop')))
-  const latest = useRef({ events, props, put, text, touch })
-  latest.current = { events, props, put, text, touch }
+  const latest = useRef({ events, grid: numberFieldOf({}), props, put, text, touch })
+  latest.current = { events, grid: numberFieldOf({}), props, put, text, touch }
   const disabled = given(family, props, boundTo(use, 'disabled', 'prop')) === true
   const readonly = given(family, props, boundTo(use, 'readonly', 'prop')) === true
   const offered = given(family, props, boundTo(use, 'offers', 'prop')) === true
+  const kind = given(family, props, boundTo(use, 'kind', 'prop'))
+  const unveils =
+    kind === 'password' && given(family, props, boundTo(use, 'reveal', 'prop')) === true
+  /* `step` is 1 where nothing sets it, as HTML has it for a number. */
+  const stride = given(family, props, boundTo(use, 'stride', 'prop'))
+  const lowest = given(family, props, boundTo(use, 'lowest', 'prop'))
+  const highest = given(family, props, boundTo(use, 'highest', 'prop'))
+  const grid = useMemo(
+    () =>
+      numberFieldOf({
+        max: highest,
+        min: lowest,
+        step: stride === '' || stride === undefined ? 1 : stride,
+      }),
+    [highest, lowest, stride],
+  )
+  const numeric = kind === 'number'
+  latest.current = { ...latest.current, grid }
   /** Asks for `next` and takes it where it stands, saying whether it did. */
   const ask = useCallback(
     (next: string): boolean => {
@@ -330,6 +384,35 @@ export const useEntry = (
     [ask, family],
   )
   const current = useCallback(() => latest.current.text, [])
+  const stepBy = useCallback(
+    (steps: number): boolean =>
+      step(numberTypeStep(latest.current.text, steps, latest.current.grid)),
+    [step],
+  )
+  heard.current = (press) => {
+    const by = press.key === 'ArrowUp' ? 1 : press.key === 'ArrowDown' ? -1 : 0
+    if (!numeric || by === 0) {
+      return false
+    }
+    if (!disabled && !readonly) {
+      stepBy(by)
+    }
+    return true
+  }
+  const methods = useMemo(
+    () =>
+      boundTo(use, 'kind', 'prop') === undefined
+        ? undefined
+        : {
+            stepDown: (count = 1) => {
+              stepBy(-count)
+            },
+            stepUp: (count = 1) => {
+              stepBy(count)
+            },
+          },
+    [stepBy, use],
+  )
   const caretAt = boxOf(put, text, fills)
   /* A press on a box puts the caret there, or after the code where the box is past it. */
   const box: PartBinding | undefined = useMemo(
@@ -360,6 +443,8 @@ export const useEntry = (
         onChangeText,
         onFocus,
         ...(shaping === undefined ? {} : { onSubmitEditing }),
+        ...(unveils ? { secureTextEntry: !bared } : {}),
+        ...(numeric ? { inputMode: numberFieldKeypad(PHONE, grid) } : {}),
         ref: fieldRef,
         ...(cell === undefined || !focused
           ? {}
@@ -369,9 +454,13 @@ export const useEntry = (
     }),
     [
       disabled,
+      bared,
       caretAt,
       cell,
       fieldRef,
+      grid,
+      numeric,
+      unveils,
       focused,
       onBlur,
       onChangeText,
@@ -383,15 +472,44 @@ export const useEntry = (
     ],
   )
   const drawn = hosted(use, part, view, {
+    bared,
     box: caretAt,
     changes: !disabled && !readonly,
     focused,
     offered,
     text,
+    unveils,
   })
   const behavior: Behavior =
     cell === undefined || box === undefined
       ? drawn
       : { ...drawn, parts: { ...drawn.parts, [cell]: box } }
-  return { ask, behavior, clear, clears, commit, current, edited, focused, step, value: text }
+  const shown: Behavior =
+    reveals === undefined
+      ? behavior
+      : {
+          ...behavior,
+          parts: {
+            ...behavior.parts,
+            [reveals]: {
+              ...behavior.parts[reveals],
+              view: { onPress: () => bare((was) => !was) },
+            },
+          },
+        }
+  const number = numeric ? { flaw: numberFieldFlaw(text, grid), locale: '' } : undefined
+  return {
+    ask,
+    behavior: shown,
+    clear,
+    clears,
+    commit,
+    current,
+    edited,
+    focused,
+    methods,
+    number,
+    step,
+    value: text,
+  }
 }

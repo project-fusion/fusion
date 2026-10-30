@@ -94,13 +94,18 @@ export default styles(
         rule({ hover: true }, { color: token('color-foreground') }),
         rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
         /* A revealed password is a state the reader chose, said by the mark alone. */
-        web([rule({ also: { 'reveal-pressed': true } }, { color: token('color-foreground') })]),
+        rule({ also: { 'reveal-pressed': true } }, { color: token('color-foreground') }),
       ],
     ),
     /* A phone draws the cross the web draws in `clear-icon`, at the icon size. */
-    on('clear-mark', [
-      native([rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') })]),
-    ]),
+    on(
+      ['clear-mark', 'reveal-mark'],
+      [
+        native([
+          rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
+        ]),
+      ],
+    ),
     /* A control prints the value it holds. */
     include(printExact),
   ],

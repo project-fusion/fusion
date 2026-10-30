@@ -32,6 +32,20 @@ export interface Entry {
   /** The part each box of the text is drawn in, which a press on it puts the caret in. */
   readonly cell?: string
   readonly clean?: string
+  /** The prop that holds the greatest number of a `number` type. */
+  readonly max?: string
+  /** The prop that holds the least number of a `number` type. */
+  readonly min?: string
+  /** The prop that offers a press that shows and hides a password. */
+  readonly reveal?: string
+  /** The value it computes as whether the press that reveals is drawn. */
+  readonly revealShown?: string
+  /** The value it computes as whether the password shows. */
+  readonly revealed?: string
+  /** The prop that holds the step of a `number` type. */
+  readonly step?: string
+  /** The prop that says what the text is: a `number` reads the range, and a `password` hides its text. */
+  readonly type?: string
   /**
    * The name of the value the element computes as whether its press that
    * clears is drawn: while `clearable` holds, the field holds text, and the

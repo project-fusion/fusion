@@ -17,7 +17,7 @@ import { mountSetup } from './web-mount.js'
 import { adjust, frame, pointAt, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
-import { leave, typeInto, watchFocus } from './web-text.js'
+import { leave, stepByKey, typeInto, watchFocus } from './web-text.js'
 
 /*
  * The web half of the conformance suite: mounts a scenario's setup as
@@ -266,6 +266,7 @@ const perform = async (
     }
     case 'key':
       key(intent.key, intent.held)
+      stepByKey(mounted, intent.key)
       return
     case 'type':
       await typeInto(mounted, intent, () => settle(mounted))
