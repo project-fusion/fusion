@@ -141,7 +141,7 @@ const reactMarkOf = (node: Node): string | undefined =>
  * frame after the first update, around 4.5 ms after the frame the second look
  * ran on, so both looks missed every time and the table drew its empty state
  * over data already sitting on the node.
- * `helix/docs/content/react.mdx` documents that prop as working, and nothing had
+ * The React guide documents that prop as working, and nothing had
  * rendered a scaffolded project to find out.
  *
  * **The later looks are timers and never frames**, which is not a detail. A

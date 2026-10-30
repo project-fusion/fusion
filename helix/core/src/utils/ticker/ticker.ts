@@ -17,7 +17,7 @@
  * family and the runner loads them all into one page, so a module-level `Set`
  * has the reach of one bundle while the timer it schedules has the reach of the
  * document. Two families each holding "the" ticker is two timers, and the second
- * one to load quietly gets its own. See `.claude/rules/helix.md`.
+ * one to load quietly gets its own.
  */
 interface Waiting {
   at: number
