@@ -85,25 +85,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
                     }
                 }
             }
-            "stop" => {
-                let stop = tour::stop(value)?;
-                for (path, name) in [
-                    ("stop.counted", &stop.counted),
-                    ("stop.name", &stop.name),
-                    ("stop.place", &stop.place),
-                    ("stop.reach", &stop.reach),
-                    ("stop.said", &stop.said),
-                    ("stop.shown", &stop.shown),
-                ] {
-                    push(path, name);
-                }
-                for one in ["back", "next", "skip"] {
-                    push(
-                        &format!("stop.words.{one}"),
-                        &format!("{one}-{}", stop.words),
-                    );
-                }
-            }
+            "stop" => stop_reads(value, &mut push)?,
             "total" => {
                 if let Some(holds) = total::total(value)?.holds {
                     push("total.holds", &holds);
@@ -148,6 +130,28 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
     Ok(read)
 }
 
+/// What a tour stop computes, as `(path, name)` through `push`.
+fn stop_reads(value: &Lit, push: &mut impl FnMut(&str, &str)) -> Result<(), String> {
+    let stop = tour::stop(value)?;
+    for (path, name) in [
+        ("stop.counted", &stop.counted),
+        ("stop.name", &stop.name),
+        ("stop.place", &stop.place),
+        ("stop.reach", &stop.reach),
+        ("stop.said", &stop.said),
+        ("stop.shown", &stop.shown),
+    ] {
+        push(path, name);
+    }
+    for one in ["back", "next", "skip"] {
+        push(
+            &format!("stop.words.{one}"),
+            &format!("{one}-{}", stop.words),
+        );
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeSet;
@@ -160,9 +164,18 @@ mod tests {
     #[test]
     fn each_feature_value_a_render_reads_is_one_the_compiler_computes() {
         for (key, source) in [
-            ("copy", "{ copied: 'c', duration: 'a', failed: 'f', label: 's', labels: { copied: 'cc', failed: 'ff', idle: 'r' }, onCopy: 'e', onError: 'x', prop: 't', status: 'o' }"),
-            ("stop", "{ back: 'b', counted: 'c', current: 'u', first: 'f', last: 'l', name: 'n', next: 'x', onAsk: 'a', place: 'p', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' }"),
-            ("tour", "{ lit: 'l', onAsk: 'a', onBeforeChange: 'b', onChange: 'm', onComplete: 'c', preparing: 'p', prop: 'i', spotlight: 'spot', veiled: 'v', waiting: 'w' }"),
+            (
+                "copy",
+                "{ copied: 'c', duration: 'a', failed: 'f', label: 's', labels: { copied: 'cc', failed: 'ff', idle: 'r' }, onCopy: 'e', onError: 'x', prop: 't', status: 'o' }",
+            ),
+            (
+                "stop",
+                "{ back: 'b', counted: 'c', current: 'u', first: 'f', last: 'l', name: 'n', next: 'x', onAsk: 'a', place: 'p', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' }",
+            ),
+            (
+                "tour",
+                "{ lit: 'l', onAsk: 'a', onBeforeChange: 'b', onChange: 'm', onComplete: 'c', preparing: 'p', prop: 'i', spotlight: 'spot', veiled: 'v', waiting: 'w' }",
+            ),
             ("total", "{ holds: 'h', itemProp: 'p', of: 'o', prop: 'i' }"),
         ] {
             let lit = default_export(&format!("export default {source}")).unwrap();
@@ -173,10 +186,26 @@ mod tests {
                 .collect();
             let (_, lit) = super::super::spelling::feature(key, &lit).unwrap().unwrap();
             let computed: BTreeSet<String> = match key {
-                "copy" => super::copy::copy(&lit).unwrap().computed().map(str::to_owned).into(),
-                "stop" => super::tour::stop(&lit).unwrap().computed().map(str::to_owned).collect(),
-                "tour" => super::tour::tour(&lit).unwrap().computed().map(str::to_owned).collect(),
-                _ => super::total::total(&lit).unwrap().holds.into_iter().collect(),
+                "copy" => super::copy::copy(&lit)
+                    .unwrap()
+                    .computed()
+                    .map(str::to_owned)
+                    .into(),
+                "stop" => super::tour::stop(&lit)
+                    .unwrap()
+                    .computed()
+                    .map(str::to_owned)
+                    .collect(),
+                "tour" => super::tour::tour(&lit)
+                    .unwrap()
+                    .computed()
+                    .map(str::to_owned)
+                    .collect(),
+                _ => super::total::total(&lit)
+                    .unwrap()
+                    .holds
+                    .into_iter()
+                    .collect(),
             };
             assert_eq!(read, computed, "{key}");
         }
