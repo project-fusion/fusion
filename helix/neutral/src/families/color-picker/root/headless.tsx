@@ -409,7 +409,12 @@ export default headless('color-picker', {
               gives={{ disabled: props.disabled, label: color.formatLabel }}
               part="format"
             >
-              <Text part="format-word">{color.formatWord}</Text>
+              <View
+                part="format-face"
+                platform="native"
+              >
+                <Text part="format-word">{color.formatWord}</Text>
+              </View>
             </Wrap>
           </Wrap>
         )}
