@@ -56,6 +56,14 @@ const focusedIn = (mounted: Mounted): string | null => {
   return null
 }
 
+/** The place in the set of the row a list of data holds focus on. */
+const rowFocused = (mounted: Mounted): number | null => {
+  const at = deepActive()
+  const index =
+    at instanceof HTMLElement && mounted.root.contains(at) ? at.dataset.index : undefined
+  return index === undefined ? null : Number(index)
+}
+
 /** The families whose element turns on and off, whose record says whether it is checked. */
 const TOGGLES: ReadonlySet<string> = new Set(['checkbox', 'motion-toggle', 'switch', 'toggle'])
 
@@ -210,6 +218,15 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
       }
     : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
+  /* What a list of data holds: the keys chosen, and the row with focus. */
+  ...(family === 'virtual-list'
+    ? {
+        window: {
+          chosen: String((mounted.root as { value?: unknown }).value ?? ''),
+          focused: rowFocused(mounted),
+        },
+      }
+    : {}),
   /* A file input's files, by name, and whether it is marked wrong. */
   ...(family === 'file-input'
     ? { files: filesOf(mounted), invalid: inState(mounted.root, 'invalid') }

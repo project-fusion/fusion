@@ -7,6 +7,7 @@ import { layerIn, PAGE } from './layers'
 import { rangeLeft } from './range'
 import { textLeft } from './text'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
+import { windowLeft } from './window'
 
 /*
  * What a scenario's setup shows after an intent, as the React Native half
@@ -223,6 +224,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...textLeft(run),
     ...rangeLeft(run),
     ...filesLeft(run),
+    ...windowLeft(run),
     ...colorLeft(run),
   }
 }

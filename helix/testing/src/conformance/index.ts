@@ -41,6 +41,7 @@ import { TOGGLE_GROUP } from './scenarios/toggle-group.js'
 import { TOOLBAR } from './scenarios/toolbar.js'
 import { TOOLTIP } from './scenarios/tooltip.js'
 import { TOUR } from './scenarios/tour.js'
+import { VIRTUAL_LIST } from './scenarios/virtual-list.js'
 
 export * from './clock.js'
 export * from './compare.js'
@@ -95,6 +96,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   toolbar: TOOLBAR,
   tooltip: TOOLTIP,
   tour: TOUR,
+  'virtual-list': VIRTUAL_LIST,
 }
 
 /**
