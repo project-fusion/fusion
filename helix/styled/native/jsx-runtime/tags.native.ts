@@ -69,7 +69,7 @@ import { HelixToolbar } from '../toolbar/index.native'
 import { HelixTooltip } from '../tooltip/index.native'
 import { HelixTour, HelixTourStop } from '../tour/index.native'
 import { HelixTrend } from '../trend/index.native'
-import { Anchor, Box, type Props, Span } from './words.native'
+import { Anchor, Box, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
 
 type Heard = { detail?: { value?: unknown }; target?: { value?: unknown } }
 
@@ -212,6 +212,8 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   p: Span,
   span: Span,
   strong: Span,
+  svg: RawSvg,
+  ...SVG_SHAPES,
 }
 
 /** Whether a phone draws `tag` as a Helix component. */
