@@ -38,6 +38,18 @@ const PAGES = {
       '<x-declared><template shadowrootmode="open"><p>Declared</p></template></x-declared>',
     ),
   },
+  '/font-local': {
+    body: document(`<style>
+      @font-face { font-family: "Only Local"; src: local("No Such Font Anywhere"); }
+      p { font-family: "Only Local", sans-serif; }
+    </style><p>A fallback the machine does not have</p>`),
+  },
+  '/font-missing': {
+    body: document(`<style>
+      @font-face { font-family: "Not There"; src: url("/no-such-font.woff2") format("woff2"); }
+      p { font-family: "Not There", sans-serif; }
+    </style><p>A file that does not load</p>`),
+  },
   '/gone': { body: document('<h1>Not found</h1>'), status: 404 },
   '/late': {
     body: document(
@@ -153,6 +165,15 @@ const baseline = (one, name) => existsSync(join(one.at, `baselines/${name}.wide.
   expect('and has its baseline', baseline(gone, 'gone'))
   const moved = await run('error-wrong', 'update', [{ name: 'late', path: '/late', status: 404 }])
   expect('a route that answers another status fails', moved.code === 1, moved.said)
+}
+
+/* A face with nothing to download is no failed download. */
+{
+  const local = await run('font-local', 'update', ['/font-local'])
+  expect('a face with only local sources does not fail the entry', local.code === 0, local.said)
+  const missing = await run('font-missing', 'update', ['/font-missing'])
+  expect('a face whose file does not load fails it', missing.code === 1, missing.said)
+  expect('and names the face', missing.said.includes('Not There'), missing.said)
 }
 
 /* An update's report shows what it wrote. */

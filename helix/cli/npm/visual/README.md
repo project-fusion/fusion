@@ -154,8 +154,9 @@ A clock on the page, such as "4 minutes ago", changes on its own. Mask that elem
 ## Baselines on Linux
 
 Linux is the default, so a Mac can take baselines in Playwright's image. Install
-inside the container, which fetches the command's Linux binary, and use the image
-that matches your Playwright version:
+inside the container, which fetches the command's Linux binary, use the image that
+matches your Playwright version, and add `--platform linux/amd64` when your CI runs
+on x86-64:
 
 ```sh
 docker run --rm -v "$PWD":/work -v /work/node_modules -w /work \
@@ -352,7 +353,8 @@ picture is committed.
   element to be defined, the fonts to load, each element's ready promise, and
   the page's boxes and scroll offsets to stay the same for three frames. It
   emulates reduced motion and takes the shot with animations disabled. A font
-  that fails to load fails the entry.
+  file that fails to load fails the entry. A face with only `local()` sources has
+  no file to load, and the page draws the next family in its stack.
 - **One page load for each width an entry is pictured at.** Shots at the same
   width change the color scheme and the harness style on the same page, in the
   order the config lists them. A shot at a new width loads the page again, so
