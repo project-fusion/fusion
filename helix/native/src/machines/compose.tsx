@@ -83,7 +83,7 @@ const validating = (
       types
         ? {
             empty: (around.entered?.value ?? '') === '',
-            number: around.spun.current,
+            number: around.spun.current ?? around.entered?.number,
             text: around.entered,
           }
         : {
@@ -327,7 +327,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       chosen,
       copied,
       entered,
-      handle: { current: NO_HANDLE },
+      handle: { current: entered?.methods ?? NO_HANDLE },
       joined,
       layering: {},
       pagers,

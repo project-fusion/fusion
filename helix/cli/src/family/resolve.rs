@@ -110,7 +110,13 @@ impl<'a> Names<'a> {
                 /* And whether an entry's press that clears is drawn, its text,
                 and where its caret is. */
                 .chain(family.api.entry.iter().flat_map(|entry| {
-                    [&entry.shows, &entry.typed, &entry.caret]
+                    [
+                        &entry.bared,
+                        &entry.caret,
+                        &entry.shows,
+                        &entry.typed,
+                        &entry.unveils,
+                    ]
                         .into_iter()
                         .filter_map(|name| name.as_deref())
                 }))

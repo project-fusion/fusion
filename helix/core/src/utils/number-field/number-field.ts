@@ -356,3 +356,29 @@ export const numberFieldFlaw = (text: string, field: NumberField): NumberFlaw | 
  */
 export const numberFieldWritten = (number: number, locale: string): string =>
   formatNumber(number, locale, { maximumFractionDigits: 20, useGrouping: false })
+
+/**
+ * The text a `number` field's `stepUp` or `stepDown` leaves, as HTML says: from
+ * the number it holds, or 0, `steps` steps along the grid `min` starts, a number
+ * off the grid counting its way to the grid as one, kept within `min` and `max`
+ * on the grid.
+ */
+export const numberTypeStep = (text: string, steps: number, field: NumberField): string => {
+  const grid = field.step === 'any' || field.step === undefined ? 1 : field.step
+  const base = field.min ?? 0
+  const from = (numberFieldParse(text, field) ?? 0) - base
+  const places = Math.max(decimals(grid), decimals(base))
+  const count = from / grid
+  const off = Math.abs(count - Math.round(count)) > 1e-9
+  const landed = off
+    ? (steps > 0 ? Math.ceil(count) : Math.floor(count)) + steps - Math.sign(steps)
+    : Math.round(count) + steps
+  let next = base + landed * grid
+  if (field.min !== undefined && next < field.min) {
+    next = field.min
+  }
+  if (field.max !== undefined && next > field.max) {
+    next = base + Math.floor((field.max - base) / grid + 1e-9) * grid
+  }
+  return String(Number(next.toFixed(places)))
+}

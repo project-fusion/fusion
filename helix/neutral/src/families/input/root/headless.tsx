@@ -33,8 +33,13 @@ import {
  * `minlength`, `maxlength`, `pattern`, and an `email` or a `url` type. The
  * web says the browser's sentences, and a phone says Helix's.
  *
- * **Web only, for now:** the reveal button on a password, dictation, and the
- * number type's `min`, `max`, and `step`, which Number Input draws on both.
+ * **A number type holds its text to `min`, `max`, and `step`**, as the web's
+ * `<input>` does, and the arrow keys and `stepUp` and `stepDown` step it.
+ *
+ * **A password's reveal button** shows and hides the text under `reveal`. It
+ * lasts as long as the element is drawn, and a page cannot set it.
+ *
+ * **Web only:** dictation, which a phone's keyboard offers itself.
  */
 export default headless('input', {
   props: {
@@ -55,9 +60,9 @@ export default headless('input', {
     inputmode: '',
     label: '',
     listeningLabel: web('Listening'),
-    max: web(''),
+    max: '',
     maxlength: number(),
-    min: web(''),
+    min: '',
     minlength: number(),
     /* A form's, which a phone has none of. */
     name: web(''),
@@ -65,9 +70,9 @@ export default headless('input', {
     placeholder: '',
     readonly: false,
     required: false,
-    reveal: web(false),
-    revealLabel: web('Show password'),
-    step: web(''),
+    reveal: false,
+    revealLabel: 'Show password',
+    step: '',
     stoppedListeningLabel: web('Stopped listening'),
     type: oneOf(['email', 'number', 'password', 'search', 'tel', 'text', 'url'], 'text'),
     value: string(),
@@ -90,12 +95,19 @@ export default headless('input', {
     clearShown: 'clearShown',
     clearable: 'clearable',
     defaultProp: 'defaultValue',
+    max: 'max',
+    min: 'min',
     onBeforeChange: 'beforeChange',
     onChange: 'change',
     onClear: 'clear',
     onInput: 'input',
     prop: 'value',
     readonly: 'readonly',
+    reveal: 'reveal',
+    revealed: 'revealed',
+    revealShown: 'revealShown',
+    step: 'step',
+    type: 'type',
   },
   validation: {
     feedback: 'feedback',
@@ -154,15 +166,35 @@ export default headless('input', {
             </Slot>
           </Pressable>
         )}
-        {props.reveal && (
+        {text.revealShown && (
           <Pressable
-            also={{ 'reveal-pressed': false }}
+            also={{ 'reveal-pressed': text.revealed }}
+            disabled={props.disabled}
             label={props.revealLabel}
             part="reveal"
-            platform="web"
+            pressed={text.revealed}
+            reveals
+            role="button"
           >
-            <Slot name="reveal-icon" />
-            <Slot name="conceal-icon" />
+            {text.revealed ? (
+              <Slot name="conceal-icon">
+                <View
+                  ariaHidden
+                  icon="eye-slash"
+                  part="reveal-mark"
+                  platform="native"
+                />
+              </Slot>
+            ) : (
+              <Slot name="reveal-icon">
+                <View
+                  ariaHidden
+                  icon="eye"
+                  part="reveal-mark"
+                  platform="native"
+                />
+              </Slot>
+            )}
           </Pressable>
         )}
         {props.voice && (

@@ -9,7 +9,11 @@ import {
   type ValidationInput,
   type Verdict,
 } from '@fusion.dev/helix-core/machines/validation/machine'
-import { TEXT_SENTENCES, textVerdict } from '@fusion.dev/helix-core/machines/validation/text'
+import {
+  NUMBER_SENTENCES,
+  TEXT_SENTENCES,
+  textVerdict,
+} from '@fusion.dev/helix-core/machines/validation/text'
 import * as validation from '@fusion.dev/helix-core/machines/validation/validation.generated'
 import { numberFieldWritten } from '@fusion.dev/helix-core/number-field'
 import { formatMessage } from '@fusion.dev/helix-core/words'
@@ -83,7 +87,8 @@ const useConstraint = (
   const short = textOf(given(family, props, boundTo(use, 'short', 'prop')))
   /* A number's sentences, by the flag each says, as the web element's props hold them. */
   const sentence = (name: string): string =>
-    textOf(given(family, props, boundTo(use, name, 'prop')))
+    textOf(given(family, props, boundTo(use, name, 'prop'))) ||
+    (NUMBER_SENTENCES[name as keyof typeof NUMBER_SENTENCES] ?? '')
   const flaw = number?.flaw
   const verdict = flaw === undefined ? undefined : numberVerdict(flaw, sentence, number?.locale)
   /* Kept by what it says, so the verdict is taken again only as that changes. */

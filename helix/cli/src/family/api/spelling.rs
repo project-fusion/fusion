@@ -441,6 +441,13 @@ const RANGE: &[Field] = &[
 
 const ENTRY: &[Field] = &[
     ("blank", "blank", Name),
+    ("max", "highest", Name),
+    ("min", "lowest", Name),
+    ("reveal", "reveal", Name),
+    ("revealShown", "unveils", Name),
+    ("revealed", "bared", Name),
+    ("step", "stride", Name),
+    ("type", "kind", Name),
     ("caret", "caret", Name),
     ("cell", "cell", Literal),
     ("clean", "cleans", Literal),
