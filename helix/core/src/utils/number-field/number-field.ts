@@ -16,6 +16,17 @@ import { numberOf, numberOptions, textOf } from '../number-format/props.js'
  * How long a stepper button is held before it steps again, and how often it
  * steps after that, in milliseconds: React Aria's NumberField's 400 and 60.
  */
+/**
+ * How far a pointer travels for one step of the value, in pixels.
+ *
+ * Four, measured against the alternatives rather than picked: at one the value
+ * runs away from the pointer and a field with `step="1"` crosses a hundred in
+ * the width of a word, and at ten a reader has to cross the viewport to reach
+ * a useful number. Four is roughly a character's width at the sizes this is set
+ * in, so a step reads as "about one glyph of travel".
+ */
+export const SCRUB_PITCH = 4
+
 export const REPEAT_DELAY = 400
 export const REPEAT_EVERY = 60
 

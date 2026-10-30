@@ -16,6 +16,51 @@ const guests = (props: Readonly<Record<string, boolean | number | string>> = {})
 export const NUMBER_INPUT: readonly Scenario[] = [
   {
     family: 'number-input',
+    intents: [
+      { by: 20, kind: 'scrub' },
+      { by: -40, kind: 'scrub' },
+    ],
+    name: 'a drag on the label under scrub moves the number a step for each four points',
+    setup: el('helix-number-input', {
+      'default-value': '10',
+      label: 'Guests',
+      scrub: true,
+      step: 5,
+    }),
+  },
+  {
+    family: 'number-input',
+    intents: [{ by: 2000, kind: 'scrub' }],
+    name: 'a drag on the label stops at max',
+    setup: el('helix-number-input', {
+      'default-value': '10',
+      label: 'Guests',
+      max: 12,
+      scrub: true,
+    }),
+  },
+  {
+    family: 'number-input',
+    intents: [
+      { event: 'before-change', kind: 'refuse' },
+      { by: 20, kind: 'scrub' },
+    ],
+    name: 'a refused scrub leaves the number',
+    setup: el('helix-number-input', { 'default-value': '10', label: 'Guests', scrub: true }),
+  },
+  {
+    family: 'number-input',
+    intents: [{ by: 20, kind: 'scrub' }],
+    name: 'a drag on the label moves nothing without scrub, or read-only',
+    setup: el('helix-number-input', {
+      'default-value': '10',
+      label: 'Guests',
+      readonly: true,
+      scrub: true,
+    }),
+  },
+  {
+    family: 'number-input',
     intents: [{ kind: 'type', text: '12' }, { kind: 'leave' }],
     name: 'each character asks, then sends input, and leaving sends change',
     setup: guests(),

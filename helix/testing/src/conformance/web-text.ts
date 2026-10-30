@@ -138,6 +138,32 @@ export const stepByKey = (mounted: Mounted, key: string): void => {
 }
 
 /**
+ * A drag on the element's label, as a finger's pointer events. A script's pointer
+ * has no capture for the element to take, so the label keeps one for the drag.
+ */
+export const scrubBy = (mounted: Mounted, by: number): void => {
+  const label = mounted.root.shadowRoot?.querySelector<HTMLElement>('[part~="label"]')
+  if (label === null || label === undefined) {
+    return
+  }
+  let held = false
+  label.setPointerCapture = () => {
+    held = true
+  }
+  label.releasePointerCapture = () => {
+    held = false
+  }
+  label.hasPointerCapture = () => held
+  const send = (type: string, clientX: number) =>
+    label.dispatchEvent(
+      new PointerEvent(type, { bubbles: true, cancelable: true, clientX, pointerId: 1 }),
+    )
+  send('pointerdown', 100)
+  send('pointermove', 100 + by)
+  send('pointerup', 100 + by)
+}
+
+/**
  * Moves focus out of the field. **The browser commits an edit it made with
  * `change`** as the field loses focus, and the text a script wrote is
  * committed here as the browser would commit a reader's.

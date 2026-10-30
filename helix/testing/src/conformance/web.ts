@@ -17,7 +17,7 @@ import { mountSetup } from './web-mount.js'
 import { adjust, frame, pointAt, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
-import { leave, stepByKey, typeInto, watchFocus } from './web-text.js'
+import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
 
 /*
  * The web half of the conformance suite: mounts a scenario's setup as
@@ -237,6 +237,9 @@ const perform = async (
   const item = (value: string | undefined) =>
     value === undefined ? mounted.root : (mounted.items.get(value) ?? mounted.root)
   switch (intent.kind) {
+    case 'scrub':
+      scrubBy(mounted, intent.by)
+      return
     case 'box':
       mounted.root.shadowRoot?.querySelectorAll<HTMLElement>('[part~="cell"]')[intent.at]?.click()
       return
