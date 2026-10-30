@@ -121,6 +121,10 @@ export interface Held {
  *   down, `by: -1`. The web steps its `<input type="range">` and sends
  *   `input` and `change`, as a browser does for an assistive technology's
  *   increment; a phone sends its control's increment or decrement action.
+ * - `point`: a finger presses the element's `part` at `x` and `y`, each a
+ *   fraction of it from its top left corner, and lets go, as a reader presses
+ *   a color picker's square. The web sends a touch's `pointerdown` and
+ *   `pointerup` there; a phone lays the part out and sends its press.
  * - `pick`: the reader picks `files` from the element's file chooser, each
  *   a name, a size in bytes, and a media type, or closes it where `files`
  *   is empty. The web answers the element's own `<input type="file">` with
@@ -170,6 +174,7 @@ export type Intent =
   | { readonly by: -1 | 1; readonly kind: 'adjust' }
   | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
   | { readonly files: readonly PickedFile[]; readonly kind: 'pick' }
+  | { readonly kind: 'point'; readonly part: string; readonly x: number; readonly y: number }
 
 /** A file a `pick` intent chooses: its name, its size in bytes, and its media type. */
 export interface PickedFile {
@@ -444,6 +449,8 @@ export const say = (intent: Intent): string => {
       return intent.by > 0 ? 'increment' : 'decrement'
     case 'hold':
       return `hold ${intent.part} for ${intent.ms} ms`
+    case 'point':
+      return `press ${intent.part} at ${intent.x}, ${intent.y}`
     case 'pick':
       return intent.files.length === 0
         ? 'close the file chooser'

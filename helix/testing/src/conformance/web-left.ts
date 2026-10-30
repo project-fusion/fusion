@@ -112,13 +112,19 @@ const currentItem = (item: Element): boolean => {
 const READS: ReadonlySet<string> = new Set(['format-date', 'timeline'])
 
 /** The families a reader types into, whose record says what the field holds. */
-const TEXTS: ReadonlySet<string> = new Set(['input', 'number-input', 'pin-input', 'textarea'])
+const TEXTS: ReadonlySet<string> = new Set([
+  'color-input',
+  'input',
+  'number-input',
+  'pin-input',
+  'textarea',
+])
 
 /**
  * The families a reader moves along a track or picks a score in, whose
  * record says the value they hold and whether they are marked wrong.
  */
-const VALUES: ReadonlySet<string> = new Set(['rating', 'slider'])
+const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider'])
 
 /** What the element's field holds, and whether the element is marked wrong. */
 const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
