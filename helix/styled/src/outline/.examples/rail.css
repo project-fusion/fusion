@@ -1,0 +1,26 @@
+/* A reading pane that scrolls, with the rail at its inline-end edge. */
+.frame {
+  display: flex;
+  gap: var(--helix-space-md);
+  max-inline-size: 40rem;
+}
+
+.pane {
+  block-size: 24rem;
+  flex: 1;
+  min-inline-size: 0;
+  overflow-y: auto;
+  padding-inline-end: var(--helix-space-md);
+}
+
+.rail {
+  align-self: flex-start;
+}
+
+/* Tall enough that the sections cross the top of the pane one at a time. */
+.pane section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  min-block-size: 16rem;
+}

@@ -165,9 +165,113 @@
   );
 }
 
+/* The rail: a slim column of ticks at the edge of a long scroll. The host is
+   as wide as the longest tick and the surface opens over it toward the leading
+   edge, so the ticks stay where they were while the titles appear. */
+:host([variant="rail"]) {
+  --_length: var(--outline-tick-length, var(--helix-size-icon-loose));
+
+  inline-size: calc(var(--_length) * 1.5);
+  position: relative;
+}
+
+:host([variant="rail"]) [part="ticks"] {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: var(--outline-tick-gap, var(--helix-space-xs));
+}
+
+/* Each deeper level is a shorter tick: the length over 1, 1.5, 2, 2.5... */
+:host([variant="rail"]) [part="tick"] {
+  --_boost: 1;
+
+  background-color: var(
+    --outline-tick-color,
+    color-mix(in oklab, var(--helix-color-foreground-muted) 55%, transparent)
+  );
+  block-size: var(--helix-border-thick);
+  border-radius: var(--helix-radii-full);
+  inline-size: calc(
+    var(--outline-tick-length, var(--helix-size-icon-loose)) *
+    var(--_boost) /
+    (1 + (var(--outline-depth, 1) - 1) * 0.5)
+  );
+}
+
+:host([variant="rail"]) [part="tick"][data-current] {
+  --_boost: 1.5;
+
+  background-color: var(--outline-tick-current-color, var(--helix-color-primary));
+}
+
+/* Over the rail, hidden until the pointer or focus is in the outline. Never
+   `display: none`, which would take the links out of the tab order and make
+   focus unable to open it. */
+:host([variant="rail"]) [part="surface"] {
+  backdrop-filter: var(--outline-surface-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(
+    --outline-surface-background-color,
+    var(--helix-material-translucent-strong)
+  );
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  box-sizing: border-box;
+  inline-size: max-content;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  max-inline-size: var(--outline-surface-max-inline-size, 20rem);
+  opacity: 0;
+  padding: var(--helix-space-sm);
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-raised);
+}
+
+:host([variant="rail"]:state(open)) [part="surface"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* One line each, cut with an ellipsis where the surface runs out. */
+:host([variant="rail"]) ::slotted(a) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([variant="rail"]) [part="surface"] {
+    transition: none;
+  }
+}
+
 /* Print: a table of contents, which is what paper invented. */
 @media print {
   :host {
     print-color-adjust: economy;
+  }
+
+  /* The titles are the contents on paper, and the ticks mean nothing there. */
+  :host([variant="rail"]) {
+    inline-size: auto;
+  }
+
+  :host([variant="rail"]) [part="ticks"] {
+    display: none;
+  }
+
+  :host([variant="rail"]) [part="surface"] {
+    backdrop-filter: none;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+    opacity: 1;
+    padding: 0;
+    pointer-events: auto;
+    position: static;
   }
 }

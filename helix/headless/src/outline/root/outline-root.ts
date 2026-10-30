@@ -12,7 +12,7 @@ import {
   scrollWithin,
   words,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { render as drawInto, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { type Branch, levelOf, nest } from '../levels.js'
 
@@ -78,6 +78,13 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * marked, so `a[aria-current]` and `a[data-depth="2"]` are the hooks for a
  * rule of yours.
  *
+ * **The rail.** `variant="rail"` draws a slim column of ticks at the edge of a
+ * long scroll, one per link, with the section in view drawn longer and a deeper
+ * level shorter. Hovering or focusing the rail opens a surface holding the
+ * links, each on one line, and Escape closes it. The ticks are decoration and
+ * hidden from assistive technology, so a screen reader hears the same
+ * navigation and lists as the default form.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -96,6 +103,13 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
  *   and animate yourself.
  * @csspart nav - The navigation landmark.
+ * @csspart surface - The box holding the heading and the navigation under `variant="rail"`, which opens over the ticks.
+ * @csspart tick - One tick of the rail, for one link, with `data-current` while its section is in view. It carries the link's depth as `--outline-depth`.
+ * @csspart ticks - The column of ticks under `variant="rail"`, hidden from assistive technology.
+ *
+ * @cssproperty --outline-depth - The depth of the link a tick stands for, from one, set on each tick.
+ *
+ * @cssstate open - The rail is open: the pointer is over it or focus is inside it, and Escape has not closed it.
  */
 @customElement('helix-headless-outline')
 export class HelixHeadlessOutline extends HelixElement {
@@ -219,6 +233,19 @@ export class HelixHeadlessOutline extends HelixElement {
 
   /** What `marked` reports, which only `markTo` writes. */
   private markedIds: string[] = []
+
+  /**
+   * The rail form: a slim column of ticks, one per link, that opens on hover or
+   * focus into a surface holding the links.
+   *
+   * A variant because no registered axis (emphasis, material, nesting,
+   * orientation, separation, shape, size, tone, width) has a value for it, and
+   * a rail is an arrangement of this family alone, as Megamenu's
+   * `variant="band"` is. It has no default: the outline without it is the list
+   * of links.
+   */
+  @property({ reflect: true })
+  variant?: 'rail'
 
   /**
    * What `current` reports, which only `mark` writes.
@@ -394,6 +421,7 @@ export class HelixHeadlessOutline extends HelixElement {
         link.removeAttribute('aria-current')
       }
     }
+    this.markTicks()
     /* And say so. `reading` is derived from scroll position, which is the one
      * fact this component computes that nothing else on the page can, so a
      * consumer syncing a URL hash to it has no other way in short of a
@@ -738,11 +766,99 @@ export class HelixHeadlessOutline extends HelixElement {
       }
     }
     walk(nest(flat.map((link) => levelOf(link.getAttribute('data-level')))), 1)
-    for (const link of links) {
-      const at = String(depth.get(link) ?? items.get(link) ?? 1)
-      if (link.getAttribute('data-depth') !== at) {
-        link.setAttribute('data-depth', at)
+    const depths = links.map((link) => depth.get(link) ?? items.get(link) ?? 1)
+    for (const [at, link] of links.entries()) {
+      const written = String(depths[at])
+      if (link.getAttribute('data-depth') !== written) {
+        link.setAttribute('data-depth', written)
       }
+    }
+    this.drawTicks(depths)
+  }
+
+  /**
+   * Draws one tick per link into the `ticks` part, in the links' order.
+   *
+   * Through lit's `render` and not the template: the ticks follow the links the
+   * consumer wrote, which no property of this element holds, and a reactive
+   * field would schedule a second update from inside `updated`.
+   */
+  private drawTicks(depths: number[]): void {
+    const ticks = this.partNamed('ticks')
+    if (!this.rail || !ticks) {
+      return
+    }
+    drawInto(
+      html`${depths.map((depth) => html`<span part="tick" style="--outline-depth: ${depth}"></span>`)}`,
+      ticks,
+    )
+    this.markTicks()
+  }
+
+  /** Lights the tick of each link that carries `aria-current`. */
+  private markTicks(): void {
+    const ticks = this.renderRoot?.querySelectorAll?.('[part="tick"]')
+    if (!this.rail || !ticks) {
+      return
+    }
+    const links = this.links
+    for (const [at, tick] of [...ticks].entries()) {
+      tick.toggleAttribute('data-current', links[at]?.hasAttribute('aria-current') === true)
+    }
+  }
+
+  /** Whether this is the rail form. */
+  private get rail(): boolean {
+    return this.variant === 'rail'
+  }
+
+  /** Whether the pointer is over the outline, which keeps the rail open. */
+  private pointerInside = false
+
+  /** Whether focus is inside the outline, which keeps the rail open. */
+  private focusInside = false
+
+  /** Opens or closes the rail, as the `open` custom state. */
+  private setOpen(on: boolean): void {
+    if (!on) {
+      this.pointerInside = false
+      this.focusInside = false
+    }
+    this.toggleState('open', on)
+  }
+
+  private readonly handlePointerEnter = (): void => {
+    if (this.rail) {
+      this.pointerInside = true
+      this.toggleState('open', true)
+    }
+  }
+
+  private readonly handlePointerLeave = (): void => {
+    if (this.rail) {
+      this.pointerInside = false
+      this.toggleState('open', this.focusInside)
+    }
+  }
+
+  private readonly handleFocusIn = (): void => {
+    if (this.rail) {
+      this.focusInside = true
+      this.toggleState('open', true)
+    }
+  }
+
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    if (this.rail && !this.contains((event.relatedTarget as Node | null) ?? null)) {
+      this.focusInside = false
+      this.toggleState('open', this.pointerInside)
+    }
+  }
+
+  /** Escape closes the rail, so the surface never holds the page it covers. */
+  private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    if (this.rail && event.key === 'Escape') {
+      this.setOpen(false)
     }
   }
 
@@ -751,6 +867,12 @@ export class HelixHeadlessOutline extends HelixElement {
     this.childWatch?.disconnect()
     this.childWatch = undefined
     this.removeEventListener('click', this.handleClick)
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
+    document.removeEventListener('keydown', this.handleKeyDown)
+    this.removeEventListener('pointerenter', this.handlePointerEnter)
+    this.removeEventListener('pointerleave', this.handlePointerLeave)
+    this.setOpen(false)
     document.removeEventListener('scroll', this.handleScroll, true)
     if (this.frame !== 0) {
       globalThis.cancelAnimationFrame(this.frame)
@@ -790,6 +912,13 @@ export class HelixHeadlessOutline extends HelixElement {
       subtree: true,
     })
     this.addEventListener('click', this.handleClick)
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
+    /* On the document: a rail opened by hover has no focus inside, and a
+       keydown reaches only the focused element and its ancestors. */
+    document.addEventListener('keydown', this.handleKeyDown)
+    this.addEventListener('pointerenter', this.handlePointerEnter)
+    this.addEventListener('pointerleave', this.handlePointerLeave)
     /* The document in capture rather than the window: an element's `scroll`
        does not bubble, so a panel scrolling never reached a window listener,
        and capture on the document hears every scroller and the page alike. */
@@ -881,6 +1010,9 @@ export class HelixHeadlessOutline extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('variant') && !this.rail) {
+      this.setOpen(false)
+    }
     this.assign()
     this.writeDepths()
     this.nameByHeading()
@@ -907,11 +1039,17 @@ export class HelixHeadlessOutline extends HelixElement {
 
   protected override render(): TemplateResult {
     const run = this.run
-    return html`<div part="heading"><slot name="heading" @slotchange=${this.nameByHeading}></slot></div>
+    const body = html`<div part="heading"><slot name="heading" @slotchange=${this.nameByHeading}></slot></div>
       <nav part="nav" aria-label=${this.label || this.fallbackLabel} @slotchange=${this.handleSlotChange}>
       ${run ? this.renderList(nest(run.map((link) => levelOf(link.getAttribute('data-level'))))) : html`<slot></slot>`}
       <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
     </nav>`
+    if (!this.rail) {
+      return body
+    }
+    /* The ticks are empty here: `writeDepths` draws them, because they follow
+       the links the consumer wrote and not any property of this element. */
+    return html`<span part="ticks" aria-hidden="true"></span><div part="surface">${body}</div>`
   }
 
   /**
