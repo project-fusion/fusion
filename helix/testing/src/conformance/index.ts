@@ -10,6 +10,7 @@ import { COPY_BUTTON } from './scenarios/copy-button.js'
 import { DIALOG } from './scenarios/dialog.js'
 import { DRAWER } from './scenarios/drawer.js'
 import { DRILLDOWN } from './scenarios/drilldown.js'
+import { FILE_INPUT } from './scenarios/file-input.js'
 import { FORMAT_DATE } from './scenarios/format-date.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
@@ -59,6 +60,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   dialog: DIALOG,
   drawer: DRAWER,
   drilldown: DRILLDOWN,
+  'file-input': FILE_INPUT,
   'format-date': FORMAT_DATE,
   image: IMAGE,
   input: INPUT,

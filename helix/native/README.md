@@ -9,7 +9,7 @@ The components ship from
 depends on this package. Accordion, Announcement, App Header, Avatar, Avatar Group, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox,
 Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
-Drilldown, Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
+Drilldown, Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
 Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
@@ -620,7 +620,7 @@ await files().save({ name: 'notes.txt', type: 'text/plain', uri: 'data:,Release%
   the page closes. A save is a download under the file's name, and gives
   `saved`. A browser follows an address on another origin as a link.
 
-No component picks files yet. File Input will pick through this capability.
+File Input picks through this capability.
 
 ## Camera
 
@@ -1710,6 +1710,47 @@ import { HelixRating } from '@fusion.dev/helix/rating'
   defaultValue="3"
   label="Rate your order"
   onChange={(event) => save(event.target.value)}
+/>
+```
+
+## File inputs
+
+`HelixFileInput`, from `@fusion.dev/helix/file-input`, draws the field a press
+opens the document picker from, through the files capability, and a row for
+each chosen file: its name, its size and its kind as tags, and a press that
+removes it. Install `expo-document-picker`, an optional peer. Without it, a
+press opens nothing.
+
+A file on a phone is the capability's record: `name`, `size`, `type`, and
+`uri`, the address its content is read from. `validate` and `transformFiles`
+take these records, `renderFile` draws a row's name and tags your own way with
+a native node, given the record and the row's place, and `onReject` carries each
+record left out with its `reason`.
+
+**A pick replaces the files held, and each change asks first.**
+`onBeforeChange` carries the names in `event.detail.value`, and refusing it
+keeps the files as they were; `onInput` and `onChange` follow. `accept`,
+`maxFileSize`, `maxFiles`, and `validate` screen a pick by the web's rules, and
+a screen reader hears `rejectedText` for the files left out and `removedText`
+for a file removed. Once a press removes a file, focus moves to the next remove
+button, or to the field. A closed picker changes nothing.
+
+The ref holds `validate()`, `files()`, `removeAt()`, `clear()`, and
+`setFileStatus()`, which draws how a file's upload is going in its row. Dropping
+and pasting files and `addedText`, `capture`, `directory`, and `name` are the
+web's alone: a phone has no drop or paste on the field, its document picker
+takes no camera or folder request, and it has no form to submit.
+
+```tsx
+import { HelixFileInput } from '@fusion.dev/helix/file-input'
+
+<HelixFileInput
+  accept="image/*"
+  label="Attachments"
+  multiple
+  onChange={(event) => upload(event)}
+  onReject={(event) => log(event.detail.files)}
+  ref={input}
 />
 ```
 

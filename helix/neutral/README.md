@@ -4,7 +4,7 @@ The platform-neutral sources Helix compiles for the web and for React Native.
 This is a pilot, and its families are Accordion, Announcement, App Header, Avatar, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
-Empty, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
+Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
@@ -740,6 +740,29 @@ whether it stands against an edge with no pane beside it, and
 them. A phone runs the `resize` machine over the divider: a drag on the
 resize driver, a double tap, the keys, and a screen reader move it, and
 core's splitter arithmetic bounds it, the same the web element reads.
+
+**An element a reader picks files into declares its `files`**: `list`, the
+value a repeat's `each` reads as `files.list`; `accept`, `maxFileSize`,
+`maxFiles`, and `multiple`, the props that screen a pick; `bytesLabel`,
+`locale`, `removeLabel`, `rejectedText`, and `removedText`, the words its rows
+and its announcements take; `hasFiles`, the state it is in while it holds a
+file; and `onBeforeChange`, `onInput`, `onChange`, and `onReject`, the events a
+change sends. A `<Pressable picks>` opens the picker, and a `<Pressable
+removes>` in the repeat takes its row's file out. Each entry of the list holds
+`key`, `name`, `size`, `kind`, `removeLabel`, and `file`, and how its upload is
+going: `statusHidden`, `barHidden`, `wordsHidden`, `fill`, `statusText`,
+`progressLabel`, `done`, `failed`, and `sending`. A phone runs the `files`
+machine over the files capability, and core's file-field rules screen a pick,
+the same the web element reads. The web element holds `File`s and a phone holds
+the capability's records.
+
+**A prop may hold a function**, written `callback()` with the signature a
+phone's component types it by, as `validate` is. No attribute holds one. An
+event whose detail differs on a phone is declared again in core's
+`events/details.ts` as `Native` and its name, as `NativeRejectDetail` carries
+the capability's records. A `<Wrap renders={props.x} passes={entry.y}>` draws
+what the function returns in place of what it holds, given `passes` and the
+copy's place, and draws what it holds where no function is given.
 
 A node only a phone draws says `platform="native"`, as a checkbox's tick does,
 which the web draws as a mask on the mark. The web element and the manifest
