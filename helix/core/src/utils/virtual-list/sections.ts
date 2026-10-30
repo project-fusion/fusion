@@ -6,8 +6,8 @@
  * grouped, as a server sorts them. Item `i` of section `s` is entry
  * `i + s + 1`, and the header of section `s` is entry `starts[s] + s`.
  */
-import { valueAt } from '@fusion.dev/helix-core'
-import { textOf } from './fill.js'
+import { valueAt } from '../row-data/row-data.js'
+import { textOf } from './fields.js'
 
 /** Where each section starts in the items, and what it is called. */
 export interface Sections {

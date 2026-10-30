@@ -151,6 +151,10 @@
       "types": "./dist/utils/swipe/swipe.d.ts",
       "default": "./dist/utils/swipe/swipe.js"
     },
+    "./virtual-list": {
+      "types": "./dist/utils/virtual-list/virtual-list.d.ts",
+      "default": "./dist/utils/virtual-list/virtual-list.js"
+    },
     "./words": {
       "types": "./dist/words/index.d.ts",
       "default": "./dist/words/index.js"
