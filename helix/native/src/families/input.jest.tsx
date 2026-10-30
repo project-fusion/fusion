@@ -80,6 +80,23 @@ const heard = (): { events: string[]; props: Partial<HelixInputProps> } => {
 const Input = (props: HelixInputProps) => themed(<HelixInput {...props} />)
 
 describe('the generated Input', () => {
+  test('read-only, keeps its text selectable, opens no keyboard, and puts back an edit', async () => {
+    const heard: unknown[] = []
+    await render(
+      <Input
+        defaultValue="Ada"
+        label="Name"
+        onBeforeChange={(event) => heard.push(event.detail.value)}
+        readonly
+      />,
+    )
+    expect(field().props.editable).not.toBe(false)
+    expect(field().props.showSoftInputOnFocus).toBe(false)
+    await fireEvent.changeText(field(), 'Bob')
+    expect(field().props.value).toBe('Ada')
+    expect(heard).toEqual([])
+  })
+
   describe('a password with reveal', () => {
     const toggle = () => screen.getByRole('togglebutton', { name: 'Show password' })
 
@@ -257,7 +274,7 @@ describe('the generated Input', () => {
     expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull()
     expect(styleOf(frame()).opacity).toBe(0.5)
     await render(<Input clearable defaultValue="Ada" label="Name" readonly />)
-    expect(field().props.editable).toBe(false)
+    expect(field().props.showSoftInputOnFocus).toBe(false)
     expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull()
     expect(styleOf(frame()).backgroundColor).toBe('transparent')
   })
