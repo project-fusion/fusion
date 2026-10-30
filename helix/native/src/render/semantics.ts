@@ -321,7 +321,7 @@ const pressedAs = (styling: Styling, node: Node): Readonly<Record<string, unknow
  * What a screen reader hears of a field: its name, from the region that
  * labels it or its own `label`, what describes it as its hint, and whether
  * it is disabled. **React Native has no required state for a field**, and a
- * read-only field is a `TextInput` that is not editable.
+ * read-only field is a `TextInput` that opens no keyboard and takes no edit.
  *
  * **A field whose role is `spinbutton` is a spin button with its range on
  * Android.** On iOS it stays a text field, with no role and no range, as

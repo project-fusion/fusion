@@ -241,7 +241,7 @@ describe('the generated Number Input', () => {
     expect(stepper('Increase').props.accessibilityState).toMatchObject({ disabled: true })
     await render(<NumberInput defaultValue="4" label="Guests" readonly />)
     expect(stepper('Decrease').props.accessibilityState).toMatchObject({ disabled: true })
-    expect(field().props.editable).toBe(false)
+    expect(field().props.showSoftInputOnFocus).toBe(false)
     await key('ArrowUp')
     expect(field().props.value).toBe('4')
   })
