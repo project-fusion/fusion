@@ -24,6 +24,10 @@ import { derive } from '../../../tree.js'
  * the mask in its place, the caret, or the placeholder, from
  * `pin-input-cells`.
  *
+ * **A press on a box puts the caret in it**, or after the code where the box
+ * is past it. The field's selection stands on the character there, so typing
+ * replaces it, as on the web.
+ *
  * **What is typed is cleaned**, by `pin-input-clean`: the characters `type`
  * accepts, cased as `case` asks, cut at `length`. An edit asks first, with
  * the code it would leave, and a code that fills every box sends `complete`
@@ -32,8 +36,9 @@ import { derive } from '../../../tree.js'
  * **A code shorter than `length` is wrong**, whether or not it is required,
  * in `too-short-message`'s words, as on the web.
  *
- * **Web only:** `autosubmit`, since a phone's app owns its forms, the
- * caret moved with the arrow keys, and pasting into a box past the code's end.
+ * **Web only:** `autosubmit`, since a phone has no form to submit and its app
+ * hears `complete`, the caret moved with the arrow keys, and pasting into a
+ * box past the code's end.
  */
 export default headless('pin-input', {
   props: {
@@ -72,6 +77,7 @@ export default headless('pin-input', {
   states: ['complete', 'invalid', 'settled'],
   text: {
     caret: 'caret',
+    cell: 'cell',
     clean: 'pin-input-clean',
     defaultProp: 'defaultValue',
     length: 'length',

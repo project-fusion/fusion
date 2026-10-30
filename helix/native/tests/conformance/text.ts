@@ -80,18 +80,47 @@ export const typeInto = async (
   if (field.props.editable === false) {
     return undefined
   }
+  /* The text an edit leaves: at the end, or where the field's selection stands. */
+  const edited = (now: typeof field, character: string): string => {
+    const text = textIn(now)
+    const selection = now.props.selection as { end: number; start: number } | undefined
+    if (intent.selection !== true || selection === undefined) {
+      return character === '' ? text.slice(0, -1) : `${text}${character}`
+    }
+    const start =
+      character === '' && selection.start === selection.end
+        ? Math.max(0, selection.start - 1)
+        : selection.start
+    return `${text.slice(0, start)}${character}${text.slice(selection.end)}`
+  }
   for (let left = intent.erase ?? 0; left > 0; left -= 1) {
     const now = fieldIn() ?? field
     await act(async () => {
-      await fireEvent.changeText(now, textIn(now).slice(0, -1))
+      await fireEvent.changeText(now, edited(now, ''))
     })
   }
   for (const character of intent.text ?? '') {
     const now = fieldIn() ?? field
     await act(async () => {
-      await fireEvent.changeText(now, `${textIn(now)}${character}`)
+      await fireEvent.changeText(now, edited(now, character))
     })
   }
+  return undefined
+}
+
+/** A press on the box at `at`, which holds the press a Pin Input's machine lays on each. */
+export const pressBox = async (run: Run, at: number): Promise<string | undefined> => {
+  const boxes = screen.root?.queryAll(
+    (node) => typeof node.props.onResponderRelease === 'function' && node.type === 'View',
+  )
+  const box = boxes?.[at]
+  if (box === undefined) {
+    return `The setup draws no box ${at}.`
+  }
+  await focusField(run)
+  await act(async () => {
+    await fireEvent(box, 'responderRelease')
+  })
   return undefined
 }
 

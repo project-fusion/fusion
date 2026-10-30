@@ -34,7 +34,7 @@ import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { adjustBy, rangeFocus, ranges, slideTo } from './range'
 import { laySections } from './sections'
-import { focusField, leave, typeInto } from './text'
+import { focusField, leave, pressBox, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
 
 /*
@@ -312,6 +312,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return pickIn(run, intent)
     case 'point':
       return pointIn(intent)
+    case 'box':
+      return pressBox(run, intent.at)
     case 'open':
     case 'close': {
       if (opensPicker(setup.tag)) {
