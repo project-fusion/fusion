@@ -45,7 +45,8 @@ fn model() -> Scripted {
 }
 
 /// An embedder that places the question near the fact it asks about, which
-/// shares none of its words, and far from the distractor, which shares two once common words are left out.
+/// shares none of its words, and far from the distractor, which shares two once
+/// common words are left out.
 fn embedder(model: &str) -> Embeddings {
     Embeddings::new(model, 4)
         .with(OWNER, vec![0.9, 0.1, 0.0, 0.1])
