@@ -120,15 +120,20 @@ export const slugify = (text: string): string =>
 const slugOf = (node: ReactNode): string => slugify(textOf(node))
 
 /** A heading, at the level markdown asked for, addressed by its own slug. */
-const heading = (as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6') =>
-  function Heading({ children }: { children?: ReactNode }) {
-    const id = slugOf(children)
-    return (
-      <SectionHeading as={as} id={id} label={textOf(children)} target={id}>
-        {children}
-      </SectionHeading>
-    )
-  }
+const Heading = ({
+  as,
+  children,
+}: {
+  as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  children?: ReactNode
+}) => {
+  const id = slugOf(children)
+  return (
+    <SectionHeading as={as} id={id} label={textOf(children)} target={id}>
+      {children}
+    </SectionHeading>
+  )
+}
 
 /** The map handed to every ordinary `renderMdx` call. */
 export const PROSE_COMPONENTS = {
@@ -142,12 +147,12 @@ export const PROSE_COMPONENTS = {
   ),
   code: InlineCode,
   em: ({ children }: { children?: ReactNode }) => <helix-text as="em">{children}</helix-text>,
-  h1: heading('h1'),
-  h2: heading('h2'),
-  h3: heading('h3'),
-  h4: heading('h4'),
-  h5: heading('h5'),
-  h6: heading('h6'),
+  h1: ({ children }: { children?: ReactNode }) => <Heading as="h1">{children}</Heading>,
+  h2: ({ children }: { children?: ReactNode }) => <Heading as="h2">{children}</Heading>,
+  h3: ({ children }: { children?: ReactNode }) => <Heading as="h3">{children}</Heading>,
+  h4: ({ children }: { children?: ReactNode }) => <Heading as="h4">{children}</Heading>,
+  h5: ({ children }: { children?: ReactNode }) => <Heading as="h5">{children}</Heading>,
+  h6: ({ children }: { children?: ReactNode }) => <Heading as="h6">{children}</Heading>,
   hr: () => <helix-divider></helix-divider>,
   img: ({ alt, src }: { alt?: string; src?: string }) => (
     <helix-image alt={alt ?? ''} src={src ?? ''}></helix-image>
