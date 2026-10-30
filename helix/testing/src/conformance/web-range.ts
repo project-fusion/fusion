@@ -56,6 +56,39 @@ const frame = (): Promise<void> =>
   new Promise((done) => requestAnimationFrame(() => setTimeout(done, 0)))
 
 /**
+ * A finger's press on the element's `part` at `x` and `y`, fractions of it from
+ * its top left corner: the pointer down, a frame, and the pointer up there.
+ * **A disabled element's part hears both and moves nothing**, as a finger's do.
+ */
+export const pointAt = async (
+  mounted: Mounted,
+  part: string,
+  x: number,
+  y: number,
+): Promise<string | undefined> => {
+  const target = mounted.root.shadowRoot?.querySelector(`[part~="${part}"]`)
+  if (target === null || target === undefined) {
+    return `The element draws no ${part}.`
+  }
+  const box = target.getBoundingClientRect()
+  const at = {
+    bubbles: true,
+    button: 0,
+    cancelable: true,
+    clientX: box.left + x * box.width,
+    clientY: box.top + y * box.height,
+    composed: true,
+    isPrimary: true,
+    pointerId: 2,
+    pointerType: 'touch',
+  }
+  target.dispatchEvent(new PointerEvent('pointerdown', { ...at, buttons: 1 }))
+  await frame()
+  target.dispatchEvent(new PointerEvent('pointerup', at))
+  return undefined
+}
+
+/**
  * A finger's press on the element's row of `marks` at `to`, a fraction of
  * the row from its start, as a reader taps a rating's star: the pointer
  * down, a frame, the pointer up there, and the click the target under it
