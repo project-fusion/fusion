@@ -35,7 +35,7 @@ export declare class MixinControlSurfaceInterface {
    * Which color the control is drawn in, by what it means. Without it, the tone
    * is `neutral`.
    */
-  tone?: 'accent' | 'danger' | 'neutral' | 'primary'
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 }
 
 export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T) => {
@@ -72,7 +72,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
      * read.
      */
     @property({ reflect: true })
-    tone?: 'accent' | 'danger' | 'neutral' | 'primary'
+    tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
   }
 
   return ControlSurfaceElement as unknown as Constructor<MixinControlSurfaceInterface> & T

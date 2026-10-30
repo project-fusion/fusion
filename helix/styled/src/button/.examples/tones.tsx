@@ -21,6 +21,9 @@ export function Example() {
       >
         Delete
       </helix-button>
+      <helix-button tone="info">Details</helix-button>
+      <helix-button tone="success">Approve</helix-button>
+      <helix-button tone="warning">Review</helix-button>
     </helix-flex>
   )
 }

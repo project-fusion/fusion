@@ -32,3 +32,19 @@ describe('the pending ring under reduced motion', () => {
     expect(sheet()).toContain('--_button-crawl: 4s')
   })
 })
+
+/* A status crosses components: `warning` on a tag and on the filter button that
+   selects it are one color, or the color is decoration. */
+describe('a button takes the status tones', () => {
+  test('each with the fill, ink, and edge of its own token', () => {
+    const declared = (customElements.get('helix-button') as unknown as { styles: unknown }).styles
+    const sheet = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    for (const tone of ['info', 'success', 'warning']) {
+      expect(sheet).toContain(`:host([tone="${tone}"])`)
+      expect(sheet).toContain(`--helix-color-${tone}-surface`)
+    }
+  })
+})
