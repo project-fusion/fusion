@@ -172,6 +172,28 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly queue: Computes<'queued'>
   /** The list of sections an element's sections give it. */
   readonly sections: Computes<'list'>
+  /** What an element a reader builds a color in computes as the color moves. */
+  readonly color: Computes<
+    | 'brightness'
+    | 'channels'
+    | 'fields'
+    | 'formatLabel'
+    | 'formatWord'
+    | 'hue'
+    | 'markX'
+    | 'markY'
+    | 'painted'
+    | 'presets'
+    | 'sampleLabel'
+    | 'saturation'
+    | 'square'
+    | 'squareReversed'
+    | 'tint'
+    | 'wheelX'
+    | 'wheelY'
+  >
+  /** What a field that opens a color picker computes from its text. */
+  readonly colorField: Computes<'painted' | 'picked' | 'said'>
   /** The list of files an element a reader picks files into holds. */
   readonly files: Computes<'list'>
   /** What a tour's stop computes, and the words of its Back, Next, and Skip. */

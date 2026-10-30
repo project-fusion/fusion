@@ -85,7 +85,8 @@ use serde::Serialize;
 use ts_rs::TS;
 
 use crate::family::api::{
-    Api, Attribute, Binding, Collection, FileChoice, Node, NodeKind, TextEntry, Toggle, ValueRange,
+    Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
+    TextEntry, Toggle, ValueRange,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -193,6 +194,12 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(files) = &api.files {
         uses.push(filed(files, tree));
+    }
+    if let Some(color) = &api.color {
+        uses.push(colored(color, tree));
+    }
+    if let Some(field) = &api.color_field {
+        uses.push(color_fielded(field, tree));
     }
     if let Some(collection) = &api.collection {
         uses.extend(if collection.mixes {
@@ -584,6 +591,84 @@ fn filed(files: &FileChoice, tree: &[Node]) -> MachineUse {
     MachineUse {
         bind,
         machine: "files".to_owned(),
+    }
+}
+
+/// The parts a color's machine moves and fills, each where the tree draws it.
+const COLOR_PARTS: &[&str] = &[
+    "channel",
+    "field-input",
+    "format",
+    "grid",
+    "grid-brightness",
+    "grid-mark",
+    "grid-saturation",
+    "sample",
+    "swatch",
+    "value",
+    "wheel",
+    "wheel-band",
+    "wheel-hue",
+    "wheel-ring",
+];
+
+/// The color a reader builds, bound to the parts it moves and fills, the props
+/// that hold and write it, what it computes, and the events a move sends. **No
+/// machine of core's holds it**: the web's element holds its own, and the
+/// native runtime hosts it as `color` over core's color picker arithmetic.
+fn colored(color: &ColorChoice, tree: &[Node]) -> MachineUse {
+    let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(color.value.clone()))]);
+    for (name, value) in [
+        ("alpha", &color.alpha),
+        ("format", &color.format),
+        ("readonly", &color.readonly),
+        ("seed", &color.seed),
+        ("swatches", &color.swatches),
+    ] {
+        if let Some(prop) = value {
+            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    for (name, value) in [
+        ("before", &color.before),
+        ("change", &color.change),
+        ("copied", &color.copied),
+        ("input", &color.input),
+    ] {
+        if let Some(event) = value {
+            bind.insert(name.to_owned(), Bound::Event(event.clone()));
+        }
+    }
+    for (field, name) in &color.computed {
+        bind.insert(field.clone(), Bound::State(name.clone()));
+    }
+    for node in nodes(tree) {
+        if COLOR_PARTS.contains(&node.name.as_str()) {
+            bind.insert(node.name.clone(), Bound::Part(node.name.clone()));
+        }
+    }
+    MachineUse {
+        bind,
+        machine: "color".to_owned(),
+    }
+}
+
+/// The field that opens a color picker, bound to the box that draws the picker
+/// and what it computes from its text, which the field's entry holds.
+fn color_fielded(field: &ColorField, tree: &[Node]) -> MachineUse {
+    let mut bind = BTreeMap::from([
+        ("painted".to_owned(), Bound::State(field.painted.clone())),
+        ("picked".to_owned(), Bound::State(field.picked.clone())),
+        ("said".to_owned(), Bound::State(field.said.clone())),
+    ]);
+    if let Some(picker) = nodes(tree).find(|node| {
+        matches!(node.attributes.get("draws"), Some(Attribute::Text(tag)) if tag.ends_with("color-picker"))
+    }) {
+        bind.insert("picker".to_owned(), Bound::Part(picker.name.clone()));
+    }
+    MachineUse {
+        bind,
+        machine: "color-field".to_owned(),
     }
 }
 

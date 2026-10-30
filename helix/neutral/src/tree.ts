@@ -16,6 +16,7 @@
 
 export * from './clock.js'
 export * from './collection.js'
+export * from './color.js'
 export * from './copy.js'
 export * from './countdown.js'
 export * from './delay.js'
@@ -35,6 +36,7 @@ export * from './validation.js'
 
 import type { Clock } from './clock.js'
 import type { Collection, Item } from './collection.js'
+import type { ColorFieldComputed, ColorPicked } from './color.js'
 import type { Copy } from './copy.js'
 import type { Countdown, Queue } from './countdown.js'
 import type { Delay } from './delay.js'
@@ -250,6 +252,10 @@ export interface Headless {
    * the props that say which it takes, and the events a change sends.
    */
   readonly files?: Files
+  /** What it holds where a reader builds a color in it. */
+  readonly color?: ColorPicked
+  /** What a field that opens a color picker computes from its text. */
+  readonly colorField?: ColorFieldComputed
   /**
    * The prop that says how many of the elements passed in are drawn, as an
    * avatar group folds the people past its `max` into a count.
