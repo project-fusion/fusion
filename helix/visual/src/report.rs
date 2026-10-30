@@ -233,6 +233,15 @@ pub fn finish(run: &Run) -> Code {
     let mut notes = Vec::new();
     let mut written = Vec::new();
     let mut held = 0;
+    /* A page that could not be pictured matches nothing and differs from
+    nothing, so it is neither a difference nor something a retake answers. */
+    let untaken = run
+        .rows
+        .iter()
+        .filter(|row| {
+            matches!(row.fate, Fate::Broken(_)) && row.current.is_none() && row.snapshot.is_none()
+        })
+        .count();
     let mut by_source: BTreeMap<&str, usize> = BTreeMap::new();
     for row in &run.rows {
         *by_source.entry(row.source).or_default() += 1;
@@ -324,7 +333,9 @@ pub fn finish(run: &Run) -> Code {
         );
     } else {
         let one = failures.len() == 1;
-        let failing = if baseline_failures == failures.len() {
+        let failing = if untaken == failures.len() {
+            "could not be taken"
+        } else if baseline_failures == failures.len() {
             if one {
                 "does not match its baseline"
             } else {
@@ -426,7 +437,7 @@ pub fn finish(run: &Run) -> Code {
             plural(acceptable, "capture", "captures")
         );
         say!("helix: or take them again. {}", run.retake);
-    } else if !run.update && baseline_failures > 0 {
+    } else if !run.update && baseline_failures > untaken {
         say!(
             "helix: if the change was meant, retake the baselines. {}",
             run.retake
