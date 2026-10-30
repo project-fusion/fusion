@@ -102,7 +102,8 @@ export interface Held {
  *   the end of a glide.
  * - `type`: types `text` into the element's field, one character an edit,
  *   with focus in the field first, or `erase`s that many characters from its
- *   end, one an edit. The web writes each edit into the `<input>` and sends
+ *   end, one an edit. With `selection`, each edit stands where the field's
+ *   selection does, and `erase` removes what it holds. The web writes each edit into the `<input>` and sends
  *   `input`, as a keystroke does, and a phone changes its `TextInput`'s text.
  * - `leave`: focus leaves the element's field, as a reader moves on. The web
  *   sends `change` where the text differs from the text it gained focus
@@ -131,6 +132,9 @@ export interface Held {
  *   `File`s of those sizes and sends `change`, or `cancel` for a closed
  *   chooser, as a browser does; a phone sets the fake files capability's
  *   answer and presses the element's field.
+ * - `box`: a press on the box at `at`, from 0, of the element's row of boxes,
+ *   as a Pin Input draws, which puts the caret there. The web clicks the box,
+ *   and a phone sends its press.
  * - `hold`: a finger holds the element's `part` down while `ms`
  *   milliseconds pass on the fake clock, then lets go, as a reader holds a
  *   number input's stepper. The web sends a touch's `pointerdown`, moves the
@@ -168,10 +172,16 @@ export type Intent =
   | { readonly kind: 'show' }
   | { readonly kind: 'wait'; readonly ms: number }
   | { readonly kind: 'scroll'; readonly x: number; readonly y: number }
-  | { readonly erase?: number; readonly kind: 'type'; readonly text?: string }
+  | {
+      readonly erase?: number
+      readonly kind: 'type'
+      readonly selection?: boolean
+      readonly text?: string
+    }
   | { readonly kind: 'leave' }
   | { readonly kind: 'slide'; readonly to: number }
   | { readonly by: -1 | 1; readonly kind: 'adjust' }
+  | { readonly at: number; readonly kind: 'box' }
   | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
   | { readonly files: readonly PickedFile[]; readonly kind: 'pick' }
   | { readonly kind: 'point'; readonly part: string; readonly x: number; readonly y: number }
@@ -454,6 +464,8 @@ export const say = (intent: Intent): string => {
       return intent.by > 0 ? 'increment' : 'decrement'
     case 'hold':
       return `hold ${intent.part} for ${intent.ms} ms`
+    case 'box':
+      return `press box ${intent.at}`
     case 'point':
       return `press ${intent.part} at ${intent.x}, ${intent.y}`
     case 'pick':

@@ -40,6 +40,48 @@ const PinInput = (props: HelixPinInputProps) => (
 )
 
 describe('the generated Pin Input', () => {
+  test('a press on a box selects its character, and typing replaces it and moves on', async () => {
+    const heard: unknown[] = []
+    await render(
+      <PinInput
+        defaultValue="1234"
+        label="Code"
+        length={4}
+        onBeforeChange={(event) => heard.push(event.detail.value)}
+      />,
+    )
+    await fireEvent(field(), 'focus')
+    expect(field().props.selection).toEqual({ end: 4, start: 3 })
+    const boxes = screen.root.queryAll(
+      (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
+    )
+    expect(boxes).toHaveLength(4)
+    await fireEvent(boxes[1] as never, 'responderRelease')
+    expect(field().props.selection).toEqual({ end: 2, start: 1 })
+    await fireEvent.changeText(field(), '1934')
+    expect(heard).toEqual(['1934'])
+    expect(field().props.selection).toEqual({ end: 3, start: 2 })
+  })
+
+  test('a press on a box past the code puts the caret after it', async () => {
+    await render(<PinInput defaultValue="1" label="Code" length={4} />)
+    await fireEvent(field(), 'focus')
+    const boxes = screen.root.queryAll(
+      (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
+    )
+    await fireEvent(boxes[3] as never, 'responderRelease')
+    expect(field().props.selection).toEqual({ end: 1, start: 1 })
+  })
+
+  test('a disabled field takes no press on a box', async () => {
+    await render(<PinInput disabled label="Code" length={4} />)
+    expect(
+      screen.root.queryAll(
+        (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
+      ),
+    ).toHaveLength(0)
+  })
+
   test('is one field named by its label, with the keyboard its type asks for and one-time codes', async () => {
     await render(<PinInput label="Code" length={4} />)
     expect(field().props.accessibilityLabel).toBe('Code')

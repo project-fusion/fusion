@@ -215,7 +215,7 @@ export const resolverFor = ({
     if ('text' in value) {
       /* A native view inherits no color, so `currentColor` is resolved here,
          before a mix reads it. */
-      return value.text === 'currentColor'
+      return value.text.toLowerCase() === 'currentcolor'
         ? (context.currentColor ?? context.tokens['color-foreground'])
         : units(value.text)
     }
