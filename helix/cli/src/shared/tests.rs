@@ -71,6 +71,12 @@ fn dom_elements_and_css_are_reported() {
 }
 
 #[test]
+fn a_raw_vector_passes() {
+    let source = "export const Page = () => (\n  <helix-flex>\n    <svg viewBox=\"0 0 24 24\"><path d=\"M0 0\" /></svg>\n  </helix-flex>\n)\n";
+    assert_eq!(kinds(source), []);
+}
+
+#[test]
 fn web_only_families_props_and_events_are_reported() {
     let source = "export const Page = () => (\n  <helix-flex>\n    <helix-skip-link></helix-skip-link>\n    <helix-dialog></helix-dialog>\n    <helix-tab rel=\"next\" max-items={2} value=\"one\" onhelix-before-select={go} onhelix-dismiss={go}>One</helix-tab>\n  </helix-flex>\n)\n";
     assert_eq!(
