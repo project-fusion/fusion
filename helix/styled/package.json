@@ -200,6 +200,14 @@
       "types": "./dist/expo-router/expo-router.d.ts",
       "default": "./dist/expo-router/expo-router.js"
     },
+    "./file-input": {
+      "react-native": {
+        "types": "./dist/file-input/index.native.d.ts",
+        "default": "./dist/file-input/index.native.js"
+      },
+      "types": "./dist/file-input/index.d.ts",
+      "default": "./dist/file-input/index.js"
+    },
     "./flex": {
       "react-native": {
         "types": "./dist/flex/index.native.d.ts",

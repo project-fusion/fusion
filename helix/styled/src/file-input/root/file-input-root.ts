@@ -4,12 +4,9 @@ import type { CSSResultGroup } from 'lit'
 /* Inherited from the base along with the template: the tier below renders a
    `<helix-tag>` for each file's size and kind. */
 import '../../tag/root/index.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './file-input-root.css.js'
+import { styles } from './file-input-root.generated.css.js'
 
 /**
  * @summary A field for choosing files from a picker or by dropping them on it.
@@ -55,14 +52,7 @@ import { styles } from './file-input-root.css.js'
 export class HelixFileInput extends HelixHeadlessFileInput {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    glyphStyles,
-    fieldStyles,
-    fieldFrameStyles,
-    fieldStackedStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = [liveStyles, glyphStyles, styles]
 }
 
 declare global {

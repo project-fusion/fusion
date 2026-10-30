@@ -22,6 +22,7 @@ import { HelixDivider } from '../divider/index.native'
 import { HelixDrawer } from '../drawer/index.native'
 import { HelixDrilldown, HelixDrilldownItem } from '../drilldown/index.native'
 import { HelixEmpty } from '../empty/index.native'
+import { HelixFileInput } from '../file-input/index.native'
 import { HelixFlex } from '../flex/index.native'
 import { HelixFormatDate } from '../format-date/index.native'
 import { HelixGrid } from '../grid/index.native'
@@ -138,6 +139,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-drilldown': HelixDrilldown,
   'helix-drilldown-item': HelixDrilldownItem,
   'helix-empty': HelixEmpty,
+  'helix-file-input': HelixFileInput,
   'helix-flex': HelixFlex,
   'helix-format-date': HelixFormatDate,
   'helix-grid': HelixGrid,
