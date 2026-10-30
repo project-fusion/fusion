@@ -90,7 +90,10 @@ fn exported_names(text: &str) -> HashSet<String> {
     let code = uncommented(text);
     let mut found = HashSet::new();
     for clause in EXPORT_CLAUSE.captures_iter(&code) {
-        found.extend(WORD.find_iter(&clause[1]).map(|one| one.as_str().to_owned()));
+        found.extend(
+            WORD.find_iter(&clause[1])
+                .map(|one| one.as_str().to_owned()),
+        );
     }
     found.extend(
         EXPORT_CLASS
@@ -434,7 +437,10 @@ mod tests {
         let found = messages(
             &["HelixPinEvent", "HelixRejectEvent"],
             &[
-                ("HelixPinEvent", "export { HelixPinEvent } from './events.js'"),
+                (
+                    "HelixPinEvent",
+                    "export { HelixPinEvent } from './events.js'",
+                ),
                 ("HelixRejectEvent", "export { HelixRejectEvent }"),
             ],
         );
