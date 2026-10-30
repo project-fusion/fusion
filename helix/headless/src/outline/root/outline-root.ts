@@ -81,8 +81,9 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * **The rail.** `variant="rail"` draws a slim column of ticks at the edge of a
  * long scroll, one per link, with the section in view drawn longer and a deeper
  * level shorter. Hovering or focusing the rail opens a surface holding the
- * links, each on one line, and Escape closes it. The ticks are decoration and
- * hidden from assistive technology, so a screen reader hears the same
+ * links, each on one line, and Escape closes it. A tap opens it too, and it stays
+ * open until a tap outside, Escape, or a tap on a link. The ticks are decoration
+ * and hidden from assistive technology, so a screen reader hears the same
  * navigation and lists as the default form.
  *
  * @since 0.1.0
@@ -109,7 +110,7 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  *
  * @cssproperty --outline-depth - The depth of the link a tick stands for, from one, set on each tick.
  *
- * @cssstate open - The rail is open: the pointer is over it or focus is inside it, and Escape has not closed it.
+ * @cssstate open - The rail is open: the pointer is over it, focus is inside it, or a tap opened it, and nothing has closed it.
  */
 @customElement('helix-headless-outline')
 export class HelixHeadlessOutline extends HelixElement {
@@ -235,8 +236,8 @@ export class HelixHeadlessOutline extends HelixElement {
   private markedIds: string[] = []
 
   /**
-   * The rail form: a slim column of ticks, one per link, that opens on hover or
-   * focus into a surface holding the links.
+   * The rail form: a slim column of ticks, one per link, that opens on hover,
+   * focus, or a tap into a surface holding the links.
    *
    * A variant because no registered axis (emphasis, material, nesting,
    * orientation, separation, shape, size, tone, width) has a value for it, and
@@ -818,27 +819,59 @@ export class HelixHeadlessOutline extends HelixElement {
   /** Whether focus is inside the outline, which keeps the rail open. */
   private focusInside = false
 
+  /** Whether a tap opened the rail, which keeps it open once the finger lifts. */
+  private tapped = false
+
+  /** Whether the latest press was a finger, which is what makes a click a tap. */
+  private touching = false
+
   /** Opens or closes the rail, as the `open` custom state. */
   private setOpen(on: boolean): void {
     if (!on) {
       this.pointerInside = false
       this.focusInside = false
+      this.tapped = false
     }
     this.toggleState('open', on)
   }
 
-  private readonly handlePointerEnter = (): void => {
-    if (this.rail) {
+  /* A finger enters on the press and leaves on the lift, so it is no hover: a
+     tap would open the rail and close it again before the reader saw it. */
+  private readonly handlePointerEnter = (event: PointerEvent): void => {
+    if (this.rail && event.pointerType !== 'touch') {
       this.pointerInside = true
       this.toggleState('open', true)
     }
   }
 
-  private readonly handlePointerLeave = (): void => {
-    if (this.rail) {
+  private readonly handlePointerLeave = (event: PointerEvent): void => {
+    if (this.rail && event.pointerType !== 'touch') {
       this.pointerInside = false
-      this.toggleState('open', this.focusInside)
+      this.toggleState('open', this.focusInside || this.tapped)
     }
+  }
+
+  /* On the document, since a tap outside is what closes a rail a tap opened. */
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    this.touching = event.pointerType === 'touch'
+    if (this.rail && this.tapped && !event.composedPath().includes(this)) {
+      this.setOpen(false)
+    }
+  }
+
+  /* The click rather than the press, so that a finger scrolling past the rail
+     does not open it. A tap on a link closes it: the surface covers the section
+     the reader just asked to see. */
+  private readonly handleTap = (event: Event): void => {
+    if (!this.rail || !this.touching) {
+      return
+    }
+    if (event.composedPath().some((target) => target instanceof HTMLAnchorElement)) {
+      this.setOpen(false)
+      return
+    }
+    this.tapped = true
+    this.toggleState('open', true)
   }
 
   private readonly handleFocusIn = (): void => {
@@ -851,7 +884,7 @@ export class HelixHeadlessOutline extends HelixElement {
   private readonly handleFocusOut = (event: FocusEvent): void => {
     if (this.rail && !this.contains((event.relatedTarget as Node | null) ?? null)) {
       this.focusInside = false
-      this.toggleState('open', this.pointerInside)
+      this.toggleState('open', this.pointerInside || this.tapped)
     }
   }
 
@@ -870,6 +903,8 @@ export class HelixHeadlessOutline extends HelixElement {
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     document.removeEventListener('keydown', this.handleKeyDown)
+    document.removeEventListener('pointerdown', this.handlePointerDown)
+    this.removeEventListener('click', this.handleTap)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
     this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.setOpen(false)
@@ -917,6 +952,8 @@ export class HelixHeadlessOutline extends HelixElement {
     /* On the document: a rail opened by hover has no focus inside, and a
        keydown reaches only the focused element and its ancestors. */
     document.addEventListener('keydown', this.handleKeyDown)
+    document.addEventListener('pointerdown', this.handlePointerDown)
+    this.addEventListener('click', this.handleTap)
     this.addEventListener('pointerenter', this.handlePointerEnter)
     this.addEventListener('pointerleave', this.handlePointerLeave)
     /* The document in capture rather than the window: an element's `scroll`

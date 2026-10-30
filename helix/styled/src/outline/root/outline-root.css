@@ -235,6 +235,11 @@
   pointer-events: auto;
 }
 
+/* The surface is translucent, so the ticks it covers would show through it. */
+:host([variant="rail"]:state(open)) [part="ticks"] {
+  visibility: hidden;
+}
+
 /* One line each, cut with an ellipsis where the surface runs out. */
 :host([variant="rail"]) ::slotted(a) {
   min-inline-size: 0;
