@@ -76,6 +76,10 @@ own input and records, intent by intent:
 - for a family a reader moves along a track or picks a score in, as Slider
   and Rating, the value it holds, whether it is marked wrong, and its own
   `input` on each move or choice
+- for a family a reader picks files into, as File Input, the names of the
+  files it holds, whether it is marked wrong, and its own `input` on each
+  change; a refused file in an event's detail is recorded as its name and
+  why, since the web's are `File`s and a phone's are records
 
 **A family's scenarios can be written before its native component exists.**
 They are staged in `STAGED`, and the web half runs and records them in the
@@ -143,6 +147,13 @@ go**, as a reader holds a number input's stepper. The web sends a touch's
 `pointerdown`, moves the clock, and sends `pointerup` and the click; a phone
 sends its press's press-in, moves the clock, and sends its press-out and
 press. A scenario with a `hold` moves the clock.
+
+**`pick` answers the element's file chooser with files**, each a name, a
+size and a type, or closes it where none are given. The web answers the
+element's own `<input type="file">` with `File`s of those sizes and sends
+`input` and `change`, or `cancel` for a closed chooser, since a script cannot
+open the chooser; a phone sets the fake files capability's answer and
+presses the element's field.
 
 `scroll` scrolls the element's part that scrolls to an offset, where it comes
 to rest: the web sets the offset and sends `scroll` and `scrollend`, and a

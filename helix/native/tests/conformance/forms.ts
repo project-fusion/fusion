@@ -33,6 +33,8 @@ export const watched =
     const states = {
       ...Object.fromEntries(behavior.marks.map((mark) => [mark, true])),
       ...behavior.parts.host?.states,
+      /* And the lists it gives, as a file input's chosen files. */
+      ...behavior.parts.host?.lists,
     }
     HOST_STATES.set(family.tag, states)
     /* And by its value, where the setup names it by one, as a tour's stops. */
