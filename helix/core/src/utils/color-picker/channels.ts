@@ -1,4 +1,8 @@
-import { type Color, type ColorFormat, clamp, toHsl, toOklch, toRgb } from '@fusion.dev/helix-core'
+import { type Color, type ColorFormat, toHsl, toOklch, toRgb } from '../css-color/css-color.js'
+
+/** A number held between two others. */
+const clamp = (value: number, least: number, most: number): number =>
+  Math.min(most, Math.max(least, value))
 
 /** One number a color is written with, in the syntax the picker writes. */
 export type ChannelName =
