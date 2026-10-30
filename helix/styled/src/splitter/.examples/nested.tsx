@@ -1,8 +1,9 @@
-import './nested.css'
-
 export function Example() {
   return (
-    <helix-splitter default-position="30">
+    <helix-splitter
+      default-position="30"
+      style={{ blockSize: '16rem' }}
+    >
       <helix-card
         separation="plain"
         slot="start"
@@ -13,6 +14,7 @@ export function Example() {
         default-position="65"
         orientation="vertical"
         slot="end"
+        style={{ blockSize: '16rem' }}
       >
         <helix-card
           separation="plain"
