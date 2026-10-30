@@ -32,6 +32,12 @@ export interface Setup {
   /** The elements and the words inside it, in order. */
   readonly children?: readonly (Setup | string)[]
   /**
+   * The data it draws, for a family whose items arrive as data, as a virtual
+   * list. The web sets it as a property with a function that draws each
+   * item's words, and a phone passes it as a prop.
+   */
+  readonly items?: readonly unknown[]
+  /**
    * Its props, by their attribute names, such as `selection-mode`. A prop
    * set to `false` is left out.
    */
@@ -161,8 +167,10 @@ export type Intent =
       readonly kind: 'press'
       readonly link?: string
       readonly part?: string
+      /** The row at this place in the element's `items`, on a family whose items arrive as data. */
+      readonly row?: number
     }
-  | { readonly item?: string; readonly kind: 'focus'; readonly page?: true }
+  | { readonly item?: string; readonly kind: 'focus'; readonly page?: true; readonly row?: number }
   | { readonly by: 'back' | 'escape' | 'outside' | 'reader'; readonly kind: 'dismiss' }
   | { readonly item?: string; readonly kind: 'close' | 'open' }
   | {
@@ -321,6 +329,12 @@ export interface Left {
    * and React Native the list its files machine holds.
    */
   readonly files?: readonly string[]
+  /**
+   * The keys chosen and the row with focus, by its place in the set, for a
+   * family whose items arrive as data: the web reads its `value` and the row
+   * that holds focus, and React Native what its window machine holds.
+   */
+  readonly window?: { readonly chosen: string; readonly focused: number | null }
   /**
    * The value the element holds, for a family a reader moves along a
    * track or picks a score in, as a slider or a rating: the web reads its

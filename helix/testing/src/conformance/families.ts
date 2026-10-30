@@ -21,6 +21,7 @@ export type Family =
   | 'drawer'
   | 'drilldown'
   | 'file-input'
+  | 'virtual-list'
   | 'format-date'
   | 'image'
   | 'input'
