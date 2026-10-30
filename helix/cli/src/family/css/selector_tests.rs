@@ -36,19 +36,19 @@ fn one(rule: &str) -> (String, [u32; 3], bool) {
 fn writes_a_region_by_its_slot_and_its_weight_alone() {
     assert_eq!(
         one("{ on: { region: 'label' }, set: [['color', 'red']] }"),
-        ("slot[name=\"label\"]".to_owned(), [0, 1, 1], false)
+        (":host slot[name=\"label\"]".to_owned(), [0, 2, 1], false)
     );
     assert_eq!(
         one("{ on: { region: 'default' }, set: [['color', 'red']] }"),
-        ("slot:not([name])".to_owned(), [0, 1, 1], false)
+        (":host slot:not([name])".to_owned(), [0, 2, 1], false)
     );
     assert_eq!(
         one("{ on: { region: 'label' }, set: [['margin', 0]], slotted: '*', when: { direction: 'row' } }"),
-        (":where(:host([direction=\"row\"])) slot[name=\"label\"]::slotted(*)".to_owned(), [0, 1, 2], false)
+        (":host(:where([direction=\"row\"])) slot[name=\"label\"]::slotted(*)".to_owned(), [0, 2, 2], false)
     );
     assert_eq!(
         one("{ on: { region: '*' }, set: [['margin', 0]], slotted: '*', when: { within: 'content' } }"),
-        (":where([part=\"content\"]) slot::slotted(*)".to_owned(), [0, 0, 2], false)
+        (":host :where([part=\"content\"]) slot::slotted(*)".to_owned(), [0, 1, 2], false)
     );
 }
 
@@ -56,7 +56,7 @@ fn writes_a_region_by_its_slot_and_its_weight_alone() {
 fn several_regions_are_several_rules_under_one_selector_list() {
     assert_eq!(
         css("{ on: { region: ['icon', 'start-icon'] }, set: [['--icon-size', '1em']], slotted: '*' }"),
-        "slot[name=\"icon\"]::slotted(*), slot[name=\"start-icon\"]::slotted(*) {--icon-size: 1em}"
+        ":host slot[name=\"icon\"]::slotted(*), :host slot[name=\"start-icon\"]::slotted(*) {--icon-size: 1em}"
     );
 }
 
@@ -64,19 +64,19 @@ fn several_regions_are_several_rules_under_one_selector_list() {
 fn writes_an_interaction_and_a_place_inside_slotted() {
     assert_eq!(
         one("{ on: 'host', set: [['z-index', 1]], slotted: '*', when: { focusWithin: true } }").0,
-        "::slotted(*:where(:focus-within))"
+        ":host ::slotted(*:where(:focus-within))"
     );
     assert_eq!(
         one("{ on: 'host', set: [['margin', 0]], slotted: '*', when: { child: 'earlier', variant: { not: 'spaced' } } }"),
         (
-            ":where(:host(:not([variant=\"spaced\"]))) ::slotted(*:where(:not(:last-child)))".to_owned(),
-            [0, 0, 1],
+            ":host(:where(:not([variant=\"spaced\"]))) ::slotted(*:where(:not(:last-child)))".to_owned(),
+            [0, 1, 1],
             false
         )
     );
     assert_eq!(
         one("{ on: 'host', set: [['margin', 0]], slotted: 'helix-toggle', when: { state: 'pressed' } }").0,
-        ":where(:host(:state(pressed))) ::slotted(helix-toggle)"
+        ":host(:where(:state(pressed))) ::slotted(helix-toggle)"
     );
 }
 
@@ -84,7 +84,7 @@ fn writes_an_interaction_and_a_place_inside_slotted() {
 fn writes_values_a_prop_does_not_take_and_any_of_several() {
     assert_eq!(
         one("{ on: 'button', set: [['color', 'red']], when: { emphasis: { not: 'solid' }, raised: true } }"),
-        (":where(:host([raised]:not([emphasis=\"solid\"]))) [part=\"button\"]".to_owned(), [0, 1, 0], false)
+        (":host(:where([raised]:not([emphasis=\"solid\"]))) [part=\"button\"]".to_owned(), [0, 2, 0], false)
     );
     assert_eq!(
         one("{ on: 'host', set: [['block-size', 'auto']], when: { has: 'lines', lines: { not: ['1', '0'] } } }").0,
@@ -93,9 +93,9 @@ fn writes_values_a_prop_does_not_take_and_any_of_several() {
     assert_eq!(
         one("{ on: 'box', set: [['margin', 0]], when: { separation: ['filled', 'outlined'] } }"),
         (
-            ":where(:host(:is([separation=\"filled\"], [separation=\"outlined\"]))) [part=\"box\"]"
+            ":host(:where(:is([separation=\"filled\"], [separation=\"outlined\"]))) [part=\"box\"]"
                 .to_owned(),
-            [0, 1, 0],
+            [0, 2, 0],
             false
         )
     );
@@ -126,8 +126,8 @@ fn writes_the_hosts_place_among_its_own_kind() {
     assert_eq!(
         one("{ on: 'fill', set: [['box-shadow', 'none']], when: { ofType: 1 } }"),
         (
-            ":where(:host(:nth-of-type(1))) [part=\"fill\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:nth-of-type(1))) [part=\"fill\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
@@ -146,8 +146,8 @@ fn writes_the_hosts_own_interaction_and_place() {
     assert_eq!(
         one("{ on: 'separator', set: [['display', 'none']], when: { place: 'first' } }"),
         (
-            ":where(:host(:first-child)) [part=\"separator\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:first-child)) [part=\"separator\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
@@ -165,20 +165,20 @@ fn writes_a_parts_place_its_value_and_the_part_around_it() {
     assert_eq!(
         one("{ on: 'line', set: [['inline-size', '60%']], when: { child: 'last' } }"),
         (
-            "[part=\"line\"]:where(:last-child)".to_owned(),
-            [0, 1, 0],
+            ":host [part=\"line\"]:where(:last-child)".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         one("{ on: 'indicator', set: [['color', 'green']], when: { part: { 'data-band': 'good' } } }").0,
-        "[part=\"indicator\"]:where([data-band=\"good\"])"
+        ":host [part=\"indicator\"]:where([data-band=\"good\"])"
     );
     assert_eq!(
         one("{ on: 'control', set: [['color', 'red']], when: { within: 'field', hover: true } }"),
         (
-            ":where([part=\"field\"]) [part=\"control\"]:where(:hover)".to_owned(),
-            [0, 1, 0],
+            ":host :where([part=\"field\"]) [part=\"control\"]:where(:hover)".to_owned(),
+            [0, 2, 0],
             false
         )
     );
@@ -188,7 +188,7 @@ fn writes_a_parts_place_its_value_and_the_part_around_it() {
 fn joins_media_conditions_and_keeps_the_webs_own_from_native() {
     assert_eq!(
         css("{ on: 'sheen', set: [['forced-color-adjust', 'none']], when: { forcedColors: true, reducedMotion: false } }"),
-        "@media (forced-colors: active) and (prefers-reduced-motion: no-preference) {[part=\"sheen\"] {forced-color-adjust: none}}"
+        "@media (forced-colors: active) and (prefers-reduced-motion: no-preference) {:host [part=\"sheen\"] {forced-color-adjust: none}}"
     );
     assert!(rules("{ on: 'sheen', set: [], when: { forcedColors: true } }")[0].web_only);
     assert!(!rules("{ on: 'sheen', set: [], when: { forcedColors: false } }")[0].web_only);
@@ -224,24 +224,24 @@ fn writes_what_holds_of_a_part_around_and_inside_with_no_weight() {
     assert_eq!(
         one("{ on: 'control', set: [['color', 'red']], when: { disabled: false, within: { field: { hover: true } } } }"),
         (
-            ":where(:host(:not(:disabled)) [part=\"field\"]:hover) [part=\"control\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:not(:disabled))) :where([part=\"field\"]:hover) [part=\"control\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         one("{ on: 'thumb', set: [['color', 'red']], when: { within: { track: { holds: { control: 'focusVisible' } } } } }"),
         (
-            ":where([part=\"track\"]:has([part=\"control\"]:focus-visible)) [part=\"thumb\"]".to_owned(),
-            [0, 1, 0],
+            ":host :where([part=\"track\"]:has([part=\"control\"]:focus-visible)) [part=\"thumb\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         one("{ on: 'field', set: [['color', 'red']], when: { holds: { control: 'focusVisible' } } }"),
         (
-            "[part=\"field\"]:where(:has([part=\"control\"]:focus-visible))".to_owned(),
-            [0, 1, 0],
+            ":host [part=\"field\"]:where(:has([part=\"control\"]:focus-visible))".to_owned(),
+            [0, 2, 0],
             false
         )
     );
@@ -254,16 +254,16 @@ fn writes_the_hosts_own_interaction_on_a_part_inside_host() {
             "{ on: 'dismiss', set: [['opacity', 1]], when: { within: { host: { hover: true } } } }"
         ),
         (
-            ":where(:host(:hover)) [part=\"dismiss\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:hover)) [part=\"dismiss\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         one("{ on: 'dismiss', set: [['opacity', 1]], when: { state: 'selected', within: { host: { focusWithin: true } } } }"),
         (
-            ":where(:host(:state(selected):focus-within)) [part=\"dismiss\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:state(selected):focus-within)) [part=\"dismiss\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
@@ -278,26 +278,26 @@ fn writes_the_entering_place_presence_filled_and_pointer_conditions() {
     assert_eq!(
         one("{ on: 'time', set: [['text-align', 'end']], when: { place: 'even' } }"),
         (
-            ":where(:host(:nth-child(even))) [part=\"time\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:nth-child(even))) [part=\"time\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         one("{ on: 'row', set: [['gap', 0]], when: { holds: { icon: true } } }").0,
-        "[part=\"row\"]:where(:has([part=\"icon\"]))"
+        ":host [part=\"row\"]:where(:has([part=\"icon\"]))"
     );
     assert_eq!(
         one("{ on: 'row', set: [['gap', 0]], when: { filled: 'label' } }"),
         (
-            ":where(:host(:state(has-label))) [part=\"row\"]".to_owned(),
-            [0, 1, 0],
+            ":host(:where(:state(has-label))) [part=\"row\"]".to_owned(),
+            [0, 2, 0],
             false
         )
     );
     assert_eq!(
         css("{ on: 'row', set: [['gap', 0]], when: { canHover: false } }"),
-        "@media (hover: none) {[part=\"row\"] {gap: 0}}"
+        "@media (hover: none) {:host [part=\"row\"] {gap: 0}}"
     );
 }
 
@@ -309,6 +309,6 @@ fn keeps_a_pseudo_element_of_one_engine_out_of_a_selector_list() {
     );
     assert_eq!(
         css("{ on: 'a', set: [['border', 'none']] }, { on: 'b', set: [['border', 'none']] }"),
-        "[part=\"a\"], [part=\"b\"] {border: none}"
+        ":host [part=\"a\"], :host [part=\"b\"] {border: none}"
     );
 }

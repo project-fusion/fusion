@@ -177,7 +177,7 @@ fn the_web_writes_the_window_as_a_media_query_and_the_backdrop_as_its_pseudo_ele
         "{css}"
     );
     assert!(
-        css.contains(":where(:host(:state(open))) [part=\"surface\"]::backdrop {"),
+        css.contains(":host(:where(:state(open))) [part=\"surface\"]::backdrop {"),
         "{css}"
     );
 }
@@ -290,7 +290,7 @@ fn the_host_reads_the_safe_area_and_no_other_part_beside_a_layer_does() {
 fn the_web_writes_the_sheet_as_a_state_and_the_safe_area_as_env() {
     let css = emit(&family(MENU, CLEAR));
     assert!(
-        css.contains(":where(:host(:state(sheet))) [part=\"surface\"] {"),
+        css.contains(":host(:where(:state(sheet))) [part=\"surface\"] {"),
         "{css}"
     );
     assert!(
@@ -343,7 +343,7 @@ fn a_layer_binds_its_offsets_its_flip_and_its_hint_and_is_another_part_while_a_s
         })",
         "{ on: 'surface', set: [['opacity', 0]] }",
     ));
-    assert!(css.contains("[part~=\"surface\"]"), "{css}");
+    assert!(css.contains(":host [part~=\"surface\"]"), "{css}");
 }
 
 #[test]
