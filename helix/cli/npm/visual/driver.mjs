@@ -558,10 +558,12 @@ const restore = async (page, state) => {
  * writes a fallback as `src: local("Arial")`, and Linux has no Arial, so its
  * status is `error` on the platform baselines are taken on, and the page draws
  * the next family in its stack, as it is written to. A sheet the page cannot
- * read leaves a face judged by its status alone.
+ * read leaves a face judged by its status alone. A family with a file among its
+ * faces has something to download, so its failure stands.
  */
 const unloadedFaces = () => {
   const localOnly = new Set()
+  const downloaded = new Set()
   const rulesOf = (sheet) => {
     try {
       return [...sheet.cssRules]
@@ -572,9 +574,9 @@ const unloadedFaces = () => {
   const walk = (rules) => {
     for (const rule of rules) {
       if (rule instanceof CSSFontFaceRule) {
-        if (!rule.style.getPropertyValue('src').includes('url(')) {
-          localOnly.add(rule.style.getPropertyValue('font-family').replace(/["']/g, ''))
-        }
+        const family = rule.style.getPropertyValue('font-family').replace(/["']/g, '')
+        const faces = rule.style.getPropertyValue('src').includes('url(') ? downloaded : localOnly
+        faces.add(family)
       } else if (rule.cssRules) {
         walk([...rule.cssRules])
       }
@@ -586,7 +588,7 @@ const unloadedFaces = () => {
   return [...document.fonts]
     .filter((face) => face.status === 'error')
     .map((face) => face.family.replace(/["']/g, ''))
-    .filter((family) => !localOnly.has(family))
+    .filter((family) => !localOnly.has(family) || downloaded.has(family))
 }
 
 /** One entry, every shot of it from one navigation. */

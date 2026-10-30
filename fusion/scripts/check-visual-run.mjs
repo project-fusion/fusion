@@ -50,6 +50,13 @@ const PAGES = {
       p { font-family: "Not There", sans-serif; }
     </style><p>A file that does not load</p>`),
   },
+  '/font-mixed': {
+    body: document(`<style>
+      @font-face { font-family: "Both Kinds"; font-weight: 400; src: local("No Such Font Anywhere"); }
+      @font-face { font-family: "Both Kinds"; font-weight: 700; src: url("/no-such-font.woff2") format("woff2"); }
+      p { font-family: "Both Kinds", sans-serif; font-weight: 700; }
+    </style><p>A file that does not load, beside a local face</p>`),
+  },
   '/gone': { body: document('<h1>Not found</h1>'), status: 404 },
   '/late': {
     body: document(
@@ -174,6 +181,9 @@ const baseline = (one, name) => existsSync(join(one.at, `baselines/${name}.wide.
   const missing = await run('font-missing', 'update', ['/font-missing'])
   expect('a face whose file does not load fails it', missing.code === 1, missing.said)
   expect('and names the face', missing.said.includes('Not There'), missing.said)
+  const mixed = await run('font-mixed', 'update', ['/font-mixed'])
+  expect('a local face does not excuse a file in its family', mixed.code === 1, mixed.said)
+  expect('and names the family', mixed.said.includes('Both Kinds'), mixed.said)
 }
 
 /* An update's report shows what it wrote. */
