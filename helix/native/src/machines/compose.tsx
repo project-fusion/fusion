@@ -11,6 +11,8 @@ import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
 import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
+import { useColor } from './color'
+import { useColorField } from './color-field'
 import { type Copied, useCopy } from './copy'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
@@ -90,6 +92,8 @@ const validating = (
               : toggles
                 ? around.toggled?.checked !== true
                 : (around.chosen.current ?? '') === '',
+            /* A color's text that is no color is the verdict's as a number's is. */
+            number: around.spun.current,
           },
     )
 }
@@ -206,6 +210,29 @@ export const behaviorFor = (family: Family): UseBehavior => {
             const { behavior, handle, names } = useFiles(family, props, use, around.touch)
             around.chosen.current = names
             around.handle.current = handle
+            return behavior
+          },
+      ),
+    /* The color a reader builds, which the verdict reads as its answer. */
+    ...uses
+      .filter((use) => use.machine === 'color')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, flawed, value } = useColor(family, props, use, around.touch)
+            around.chosen.current = value
+            around.spun.current = flawed ? { flaw: { flag: 'badInput' }, locale: '' } : undefined
+            return behavior
+          },
+      ),
+    /* What a field that opens a color picker computes from its text. */
+    ...uses
+      .filter((use) => use.machine === 'color-field')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, flawed } = useColorField(family, props, use, around.entered)
+            around.spun.current = flawed ? { flaw: { flag: 'badInput' }, locale: '' } : undefined
             return behavior
           },
       ),
