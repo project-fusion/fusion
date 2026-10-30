@@ -93,6 +93,9 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
    * than about the bar, and because a reflected `true` writes an attribute the
    * server's markup does not have. Every default here is the absent attribute.
    *
+   * It sits at `--helix-layer-sticky`. A `Splitter` pane lowers that token, so a
+   * sticky header in a pane stays under the divider.
+   *
    * It pairs with `material`: a bar that does not stick is only ever over the
    * top of the page, so `glass` and `transparent` have nothing to be
    * translucent against and the `scrolled` state never lands.

@@ -32,6 +32,20 @@ describe('splitter appearance', () => {
     expect(accent).toBeGreaterThan(interest)
   })
 
+  /* A sticky App Header sits at the sticky layer and the divider at the raised
+     one, ten times lower, so a band in a pane cut the divider off for its height.
+     Chromium measures the result: the divider is on top where the two overlap. */
+  test('a pane moves the sticky layer under the divider', () => {
+    const declared = (customElements.get('helix-splitter') as unknown as { styles: unknown }).styles
+    const sheet = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    expect(sheet).toMatch(
+      /\[part="?end"?\]\s*\{[^}]*--helix-layer-sticky:\s*calc\(var\(--helix-layer-raised\)\s*-\s*1\)/,
+    )
+  })
+
   /* The line's thickness at rest and under interest, the grip's, and a slotted
      handle's color were fixed values. */
   test('the line, the grip and the handle read their hooks', () => {

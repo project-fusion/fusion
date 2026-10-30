@@ -113,7 +113,9 @@ export class HelixCard extends HelixHeadlessCard {
    *
    * - `outlined` is the default, and a hairline is usually enough. It costs
    *   less attention than a shadow: a screen of shadowed cards reads as a stack
-   *   of things floating, none of them settled.
+   *   of things floating, none of them settled. The card keeps its surface
+   *   color inside the line. For a line and no fill, set
+   *   `--card-background-color: transparent`.
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
