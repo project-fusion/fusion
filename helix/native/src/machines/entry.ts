@@ -239,8 +239,16 @@ export const useEntry = (
   }
   const clean = useMemo(() => cleanerOf(family, use), [family, use])
   const fills = Number(given(family, props, boundTo(use, 'length', 'prop')))
-  const latest = useRef({ events, grid: numberFieldOf({}), props, put, text, touch })
-  latest.current = { events, grid: numberFieldOf({}), props, put, text, touch }
+  const latest = useRef({
+    events,
+    grid: numberFieldOf({}),
+    props,
+    put,
+    readonly: false,
+    text,
+    touch,
+  })
+  latest.current = { events, grid: numberFieldOf({}), props, put, readonly: false, text, touch }
   const disabled = given(family, props, boundTo(use, 'disabled', 'prop')) === true
   const readonly = given(family, props, boundTo(use, 'readonly', 'prop')) === true
   const offered = given(family, props, boundTo(use, 'offers', 'prop')) === true
@@ -261,7 +269,8 @@ export const useEntry = (
     [highest, lowest, stride],
   )
   const numeric = kind === 'number'
-  latest.current = { ...latest.current, grid }
+  const selects = cell === undefined
+  latest.current = { ...latest.current, grid, readonly }
   /** Asks for `next` and takes it where it stands, saying whether it did. */
   const ask = useCallback(
     (next: string): boolean => {
@@ -310,6 +319,10 @@ export const useEntry = (
      `change`, since a filled code is its commit, as on the web. */
   const onChangeText = useCallback(
     (typed: string) => {
+      if (latest.current.readonly) {
+        hold((was) => ({ ...was }))
+        return
+      }
       const before = latest.current.text
       /* Where the edit left the field's caret: past what it put where the
          selection stood. The field reports its selection only after its text. */
@@ -438,7 +451,12 @@ export const useEntry = (
   const view: PartBinding = useMemo(
     () => ({
       view: {
-        editable: !disabled && !readonly,
+        /* A read-only field stays editable to iOS, which lets a reader select
+           and copy only then. It opens no keyboard, and an edit that still
+           comes, a paste from the menu, puts the text back. Boxes drawn from
+           a hidden field have nothing to select. */
+        editable: !disabled && (!readonly || selects),
+        ...(readonly && selects ? { showSoftInputOnFocus: false } : {}),
         onBlur,
         onChangeText,
         onFocus,
@@ -457,6 +475,7 @@ export const useEntry = (
       bared,
       caretAt,
       cell,
+      selects,
       fieldRef,
       grid,
       numeric,
