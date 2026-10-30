@@ -69,7 +69,7 @@ import { HelixToolbar } from '../toolbar/index.native'
 import { HelixTooltip } from '../tooltip/index.native'
 import { HelixTour, HelixTourStop } from '../tour/index.native'
 import { HelixTrend } from '../trend/index.native'
-import { Anchor, Box, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
+import { Anchor, Box, Fieldset, Legend, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
 
 type Heard = { detail?: { value?: unknown }; target?: { value?: unknown } }
 
@@ -113,7 +113,7 @@ const TagGroup = held(HelixTagGroup, 'value', 'onChange', (event) => event.targe
 export const TAGS: Readonly<Record<string, unknown>> = {
   a: Anchor,
   div: Box,
-  fieldset: Box,
+  fieldset: Fieldset,
   form: Box,
   'helix-accordion': HelixAccordion,
   'helix-accordion-item': HelixAccordionItem,
@@ -209,6 +209,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tour': HelixTour,
   'helix-tour-stop': HelixTourStop,
   'helix-trend': HelixTrend,
+  legend: Legend,
   p: Span,
   span: Span,
   strong: Span,

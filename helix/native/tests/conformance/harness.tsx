@@ -23,7 +23,7 @@ import {
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
 import { Text } from 'react-native'
-import { HelixRoot } from '../../src/index'
+import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
 import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
@@ -396,7 +396,14 @@ export const run = async (scenario: Scenario): Promise<Step[]> => {
     setClipboard(fakeClipboard())
   }
   const laid = laySections(scenario.setup)
-  const drawn = await render(<HelixRoot>{draw(state, scenario.setup, null)}</HelixRoot>)
+  const page = () => (
+    <HelixRoot>
+      <FieldsetDisabled.Provider value={scenario.disabledFieldset === true}>
+        {draw(state, scenario.setup, null)}
+      </FieldsetDisabled.Provider>
+    </HelixRoot>
+  )
+  const drawn = await render(page())
   await laid.drawn()
   /* The page takes out each item whose event it heard and nothing refused. */
   const removing = async (): Promise<void> => {
@@ -406,7 +413,7 @@ export const run = async (scenario: Scenario): Promise<Step[]> => {
       for (const one of gone) {
         state.removed.add(String(one.from))
       }
-      await drawn.rerender(<HelixRoot>{draw(state, scenario.setup, null)}</HelixRoot>)
+      await drawn.rerender(page())
       await flush()
     }
   }
@@ -419,7 +426,7 @@ export const run = async (scenario: Scenario): Promise<Step[]> => {
       const cannot = await perform(state, intent)
       /* A prop the page wrote draws the setup again with it. */
       if (intent.kind === 'set') {
-        await drawn.rerender(<HelixRoot>{draw(state, scenario.setup, null)}</HelixRoot>)
+        await drawn.rerender(page())
       }
       await flush()
       await removing()
