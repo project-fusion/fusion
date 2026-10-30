@@ -287,6 +287,35 @@ const COLOR_FIELD: &[Field] = &[
     ("said", "said", Name),
 ];
 
+const WINDOW: &[Field] = &[
+    ("columns", "columns", Name),
+    ("disabledKeys", "disabledKeys", Name),
+    ("empty", "empty", Name),
+    ("estimate", "estimate", Name),
+    ("gap", "gap", Name),
+    ("horizontal", "horizontal", Name),
+    ("items", "items", Name),
+    ("keyField", "keyField", Name),
+    ("layout", "layout", Name),
+    ("list", "list", Name),
+    ("loading", "loading", Name),
+    ("loadingState", "loadingState", Name),
+    ("minColumnWidth", "minColumnWidth", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onBeforeReorder", "onBeforeReorder", Name),
+    ("onChange", "onChange", Name),
+    ("onLoadMore", "onLoadMore", Name),
+    ("onRangeChange", "onRangeChange", Name),
+    ("onReorder", "onReorder", Name),
+    ("orientation", "orientation", Name),
+    ("reorderable", "reorderable", Name),
+    ("sectionField", "sectionField", Name),
+    ("selectionBehavior", "selectionBehavior", Name),
+    ("selectionMode", "selectionMode", Name),
+    ("textField", "textField", Name),
+    ("value", "value", Name),
+];
+
 const FILES: &[Field] = &[
     ("accept", "accept", Name),
     ("bytesLabel", "bytes", Name),
@@ -489,6 +518,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("delay", "delay", DELAY),
     ("text", "entry", ENTRY),
     ("files", "files", FILES),
+    ("window", "window", WINDOW),
     ("maxVisible", "fold", MAX_VISIBLE),
     ("notice", "notice", NOTICE),
     ("notices", "notices", NOTICES),

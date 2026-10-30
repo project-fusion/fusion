@@ -87,6 +87,8 @@ impl<'a> Names<'a> {
                 .chain(family.api.sections.iter().map(|one| one.list.as_str()))
                 /* And the list of chosen files, as a file input's. */
                 .chain(family.api.files.iter().map(|one| one.list.as_str()))
+                /* And the rows a window draws, as a virtual list's. */
+                .chain(family.api.window.iter().map(|one| one.list.as_str()))
                 /* And what a color computes as it moves, as a color picker's. */
                 .chain(
                     family
@@ -117,8 +119,8 @@ impl<'a> Names<'a> {
                         &entry.typed,
                         &entry.unveils,
                     ]
-                        .into_iter()
-                        .filter_map(|name| name.as_deref())
+                    .into_iter()
+                    .filter_map(|name| name.as_deref())
                 }))
                 /* And where a range's value sits, its fill, and its words, as a
                 slider's. */
@@ -171,6 +173,9 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     toggle(family, &names, &mut found);
     entry(family, &names, &mut found);
     filed(family, &names, &mut found);
+    if let Some(window) = &family.api.window {
+        references("window", window.references(), &names, &mut found);
+    }
     if let Some(color) = &family.api.color {
         references("color", color.references(), &names, &mut found);
     }

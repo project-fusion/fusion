@@ -33,6 +33,7 @@ export * from './toolbar.js'
 export * from './total.js'
 export * from './tour.js'
 export * from './validation.js'
+export * from './window.js'
 
 import type { Clock } from './clock.js'
 import type { Collection, Item } from './collection.js'
@@ -53,6 +54,7 @@ import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type { Validation } from './validation.js'
+import type { Window } from './window.js'
 
 /**
  * A prop's type: a primitive, or the values a string may take. `true` among
@@ -252,6 +254,12 @@ export interface Headless {
    * the props that say which it takes, and the events a change sends.
    */
   readonly files?: Files
+  /**
+   * What it reads and sends where it windows a long set of items: the rows
+   * near the screen, the props that lay them out, and the events a reader's
+   * moves send.
+   */
+  readonly window?: Window
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */

@@ -72,6 +72,7 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use validation::Validation;
+pub use window::WindowChoice;
 
 /// What a family takes, sends, and sets, and how its elements find each other.
 #[derive(Debug, Default, Serialize, JsonSchema, TS)]
@@ -122,6 +123,9 @@ pub struct Api {
     /// list of chosen files its rows are drawn from.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub files: Option<FileChoice>,
+    /// What the element reads and sends where it windows a long set of items.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub window: Option<WindowChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -253,6 +257,7 @@ impl Api {
             && self.color.is_none()
             && self.color_field.is_none()
             && self.files.is_none()
+            && self.window.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -297,6 +302,7 @@ const FIELDS: &[&str] = &[
     "entry",
     "events",
     "files",
+    "window",
     "fold",
     "host",
     "item",
@@ -404,6 +410,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             color: field("color").map(color::color).transpose()?,
             color_field: field("colorField").map(color::color_field).transpose()?,
             files: field("files").map(files::files).transpose()?,
+            window: field("window").map(window::window).transpose()?,
             fold,
             host,
             item,
@@ -454,3 +461,4 @@ fn spelled(written: &[(String, Lit)]) -> Result<Vec<(String, Lit)>, String> {
 #[cfg(test)]
 #[path = "headless_tests.rs"]
 mod tests;
+mod window;
