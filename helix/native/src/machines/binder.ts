@@ -25,6 +25,11 @@ export interface Around {
   /** The text the element holds, where a reader types into it. */
   readonly entered?: Entered | undefined
   /**
+   * Methods the element's ref holds beside the verdict's `validate`, which
+   * a machine writes as it draws, as the files machine offers `removeAt`.
+   */
+  readonly handle: { current: Readonly<Record<string, unknown>> }
+  /**
    * What a machine bound before the element's layer answers for it, and
    * what the layer tells it back, as a tour stop's: the layer asks
    * `dismiss` before it dismisses itself, and writes `holds`, whether focus
