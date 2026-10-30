@@ -21,7 +21,15 @@ customElements.define(
 )
 
 const define = () =>
-  Promise.all([import('@fusion.dev/helix/button'), import('@fusion.dev/helix/map/route')])
+  Promise.all([
+    import('@fusion.dev/helix/button'),
+    import('@fusion.dev/helix/kbd'),
+    import('@fusion.dev/helix/listbox'),
+    import('@fusion.dev/helix/map/route'),
+    import('@fusion.dev/helix/notifications'),
+    import('@fusion.dev/helix/option'),
+    import('@fusion.dev/helix/splitter'),
+  ])
 
 const late = new URLSearchParams(location.search).get('order') === 'late'
 if (!late) {

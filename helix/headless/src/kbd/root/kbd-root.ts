@@ -13,6 +13,7 @@ import {
   printableChord,
   registerShortcut,
   SPOKEN_RULE,
+  untilReactHydrated,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -191,9 +192,6 @@ export class HelixHeadlessKbd extends HelixElement {
   override connectedCallback(): void {
     super.connectedCallback()
     this.listen()
-    /* A frame after connecting, which is after a framework has hydrated the
-       control: an attribute it never rendered, arriving while it compares, is
-       one it reports. */
     requestAnimationFrame(() => this.describe())
   }
 
@@ -212,7 +210,15 @@ export class HelixHeadlessKbd extends HelixElement {
     }
     this.undescribe()
     if (control && chord !== '') {
-      claimShortcut(control, chord)
+      /* Once React has hydrated the control. An attribute written earlier is in
+         React's mismatch report on every load, and a Kbd upgrades before React
+         reaches a control whose definitions load first: a frame is not enough.
+         See `untilReactHydrated`. */
+      void untilReactHydrated(control).then(() => {
+        if (this.described?.control === control && this.described.chord === chord) {
+          claimShortcut(control, chord)
+        }
+      })
       /* On the page's list too, for a control Helix did not draw, which no
          registry knows; a list names a control it already has once. */
       const unregister = registerShortcut({

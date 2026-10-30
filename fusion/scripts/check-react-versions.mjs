@@ -22,6 +22,9 @@
  *   React's `onhelix-press`, `helix-map-route` has the array React held for it,
  *   and after a commit hands React a new handler each press still calls one
  *   handler once. In a development build, Helix logged no error.
+ * - **Did React find the markup it rendered?** A Kbd's `for`, a feed's count and
+ *   a listbox's highlight write nothing React reports, and a Kbd's chord still
+ *   arrives. `helix-splitter` takes a camelCase prop in both orders.
  *
  * Both builds, production and development, since only a development build
  * carries the error `auditReactMissing` prints. Both orders: definitions
@@ -174,17 +177,35 @@ const measure = async (browser, origin, order) => {
     }
   })
 
+  /* What Helix writes on upgrade, and what a camelCase prop reached, once React
+     has hydrated. A mismatch is logged only by a development build. */
+  await page.evaluate(() => new Promise((done) => setTimeout(done, 300)))
+  const written = await page.evaluate(() => ({
+    position: document.getElementById('splitter').position,
+    shortcut: document.getElementById('search').getAttribute('aria-keyshortcuts'),
+  }))
+
   await context.close()
   const helix = errors.filter((one) => /Helix|helix-/.test(one))
+  const mismatches = errors.filter((one) => /hydrat|did(?:n't| not) match/i.test(one))
   return {
     afterCommit: presses,
     errors,
     first: first === 1,
+    mismatches,
     needed: !(probe.handler && probe.property),
     probe,
     probeAfterCommit: settled,
     property,
-    works: first === 1 && property && presses.every((one) => one === 1) && helix.length === 0,
+    works:
+      first === 1 &&
+      property &&
+      presses.every((one) => one === 1) &&
+      helix.length === 0 &&
+      mismatches.length === 0 &&
+      written.position === 16 &&
+      written.shortcut !== null,
+    written,
   }
 }
 
@@ -275,7 +296,7 @@ for (const [spec, runs] of rows) {
   const notes = broken.map((one) =>
     one.error !== undefined
       ? `could not run: ${cell(one.error)}`
-      : `${one.mode}, ${one.order}: first press ${yes(one.first)}, array ${yes(one.property)}, calls after commits ${one.afterCommit.join(' and ')}${one.errors.length > 0 ? `, errors: ${one.errors.map(cell).join(' / ')}` : ''}`,
+      : `${one.mode}, ${one.order}: first press ${yes(one.first)}, array ${yes(one.property)}, calls after commits ${one.afterCommit.join(' and ')}, splitter at ${one.written.position}, chord ${one.written.shortcut}${one.errors.length > 0 ? `, errors: ${one.errors.map(cell).join(' / ')}` : ''}`,
   )
   lines.push(
     `| ${version} (\`${spec}\`) | ${yes(supported)} | ${yes(needed)} | ${yes(broken.length === 0)} | ${notes.join('<br>')} |`,

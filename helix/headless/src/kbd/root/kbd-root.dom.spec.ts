@@ -405,8 +405,8 @@ describe('a key that binds', () => {
 /* `aria-keyshortcuts` is how a screen reader learns a control has a shortcut,
    and the key on screen already knows the chord. */
 describe('the control a shortcut works', () => {
-  const frame = (): Promise<void> =>
-    new Promise((resolve) => requestAnimationFrame(() => resolve()))
+  /* Past the frame, and past the look for React on a page that has none. */
+  const frame = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 150))
   const apple = /mac|iphone|ipad|ipod/i.test(navigator.userAgent)
   const chord = apple ? 'Meta+K' : 'Control+K'
 
@@ -426,6 +426,51 @@ describe('the control a shortcut works', () => {
     field.remove()
   })
 
+  test('waits for React to hydrate the control, so React finds the markup it rendered', async () => {
+    /* A Kbd upgrades before React reaches a control whose definitions load
+       first. Judged with real hydration in `fusion/scripts/react-versions`. */
+    const marks = document as unknown as Record<string, unknown>
+    const root = document.body as unknown as Record<string, unknown>
+    marks._reactListening$spec = true
+    root.__reactContainer$spec = {}
+    const field = document.createElement('input') as HTMLInputElement & Record<string, unknown>
+    field.id = 'spec-hydrating'
+    document.body.append(field)
+    const key = document.createElement('helix-headless-kbd') as Kbd & { for: string }
+    key.setAttribute('for', 'spec-hydrating')
+    key.keys = 'mod+k'
+    try {
+      document.body.append(key)
+      await key.updateComplete
+      await frame()
+      expect(field.hasAttribute('aria-keyshortcuts')).toBe(false)
+      field.__reactProps$spec = {}
+      await frame()
+      expect(field.getAttribute('aria-keyshortcuts')).toBe(chord)
+    } finally {
+      key.remove()
+      field.remove()
+      delete marks._reactListening$spec
+      delete root.__reactContainer$spec
+    }
+  })
+
+  test('writes nothing for a key that left before React got there', async () => {
+    const field = document.createElement('input')
+    field.id = 'spec-gone'
+    document.body.append(field)
+    const key = document.createElement('helix-headless-kbd') as Kbd & { for: string }
+    key.setAttribute('for', 'spec-gone')
+    key.keys = 'mod+k'
+    document.body.append(key)
+    await key.updateComplete
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    key.remove()
+    await frame()
+    expect(field.hasAttribute('aria-keyshortcuts')).toBe(false)
+    field.remove()
+  })
+
   test('keeps the shortcuts the page wrote, and follows a new chord', async () => {
     const field = document.createElement('input')
     field.id = 'spec-help'
@@ -440,6 +485,7 @@ describe('the control a shortcut works', () => {
     expect(field.getAttribute('aria-keyshortcuts')).toBe(`? ${chord}`)
     key.keys = 'shift+/'
     await key.updateComplete
+    await frame()
     expect(field.getAttribute('aria-keyshortcuts')).toBe('? Shift+/')
     key.remove()
     expect(field.getAttribute('aria-keyshortcuts')).toBe('?')
