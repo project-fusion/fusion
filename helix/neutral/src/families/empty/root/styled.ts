@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Empty's styled tier, which writes `helix/styled/src/empty/root/empty-root.generated.css`.
+ * Empty's styled tier.
  *
  * **Centered with space around it.** An empty view is the only thing on
  * screen, and pressed against the top edge it looks broken.

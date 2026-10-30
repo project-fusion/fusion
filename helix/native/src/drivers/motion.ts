@@ -32,7 +32,7 @@ const FIELDS: readonly Field[] = ['height', 'opacity', 'width', 'x', 'y']
 const UNSET = -1
 
 /**
- * The curve of each motion token, from `helix/styles/src/tokens.ts`, with
+ * The curve of each motion token, from Helix's token source, with
  * `standard` and `emphasized` resolved from the primitives they name. A
  * theme's own curves do not reach the device: React Native reads no custom
  * properties.

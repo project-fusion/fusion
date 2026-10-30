@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import item from './headless.js'
 
 /**
- * A description list item's styled tier, which writes
- * `helix/styled/src/description-list/item/description-list-item.generated.css`.
+ * A description list item's styled tier.
  * Its hooks carry the list's prefix, `--description-list-label-color`.
  *
  * **A subgrid of the list, across every track it has**: one when the list

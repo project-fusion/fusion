@@ -18,8 +18,7 @@ import root from './headless.js'
 const out = product(token('space-xl'), '-1')
 
 /**
- * Megamenu's styled tier, which writes
- * `helix/styled/src/megamenu/root/megamenu-root.generated.css`.
+ * Megamenu's styled tier.
  *
  * **The trigger is shaped as a destination of the bar**, quiet at rest, at
  * full strength under the pointer, and lit as the current destination while

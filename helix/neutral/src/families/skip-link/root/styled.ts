@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * A skip link's styled tier, which writes
- * `helix/styled/src/skip-link/root/skip-link-root.generated.css`.
+ * A skip link's styled tier.
  *
  * **Hidden until focus reaches it**, by the visually hidden recipe, so it
  * stays in the tab order while nobody can see it, which `display: none`

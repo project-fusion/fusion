@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Steps' styled tier, which writes
- * `helix/styled/src/steps/root/steps-root.generated.css`.
+ * Steps' styled tier.
  *
  * **The arrangement reaches each step as private values**, since a step's
  * own sheet can match only its own host: the tracks its mark and its name

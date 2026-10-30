@@ -4,8 +4,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Tooltip's styled tier, which writes
- * `helix/styled/src/tooltip/root/tooltip-root.generated.css`.
+ * Tooltip's styled tier.
  *
  * **The bubble is the inverse surface**, a dark ground over a light page,
  * with the theme's small words in a row, so what is passed in sits on the

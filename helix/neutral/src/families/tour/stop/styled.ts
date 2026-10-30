@@ -3,8 +3,7 @@ import { styles } from '../../../table.js'
 import stop from './headless.js'
 
 /**
- * Tour Stop's styled tier, which writes
- * `helix/styled/src/tour/stop/tour-stop.generated.css`.
+ * Tour Stop's styled tier.
  *
  * **The panel is Popover's panel by another name**, on purpose: the raised
  * surface, a hairline edge, the floating shadow, and the house's small

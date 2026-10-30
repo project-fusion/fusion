@@ -14,8 +14,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Popover's styled tier, which writes
- * `helix/styled/src/popover/root/popover-root.generated.css`.
+ * Popover's styled tier.
  *
  * **The panel is the floating surface**, with its edge, its shadow and the
  * house radius, as wide as what it holds and never wider than the window
