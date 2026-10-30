@@ -195,10 +195,19 @@ fn unranked(conditions: &str) -> String {
 /// **Every rule on one target ranks the same**, whatever it asks: what holds
 /// of the host, of a part around the target, of the target itself, and of
 /// the children passed in is written inside `:where()`, so a selector's
-/// specificity is its target's alone, and the later of two rules on one
-/// target wins, as the later of two rules of equal specificity does in CSS.
-/// A group that writes `[{ selected: true }, { hover: true, selected: true }]`
-/// to outrank an earlier hover writes `{ selected: true }` after it.
+/// specificity is one `:host` and its target's, and the later of two rules
+/// on one target wins, as the later of two rules of equal specificity does in
+/// CSS. A group that writes `[{ selected: true }, { hover: true, selected:
+/// true }]` to outrank an earlier hover writes `{ selected: true }` after it.
+///
+/// **Every rule starts at the host, as `:host(:where(...))`, or `:host` where
+/// it asks nothing of the host.** Safari does not match a rule again when the
+/// host's state changes if the host's condition is inside `:where()`, as in
+/// `:where(:host(:focus-within)) [part="field"]`: the rule matches only where
+/// the style was first computed after focus arrived. It matches
+/// `:host(:where(:focus-within)) [part="field"]` again as focus moves. The
+/// `:host` adds the same weight to every rule, so the rules on one node still
+/// tie.
 pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
     if let Some(selector) = &rule.selector {
         return selector.clone();
@@ -231,22 +240,18 @@ pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
             })
         );
     }
-    let mut written = if host.is_empty() {
-        String::new()
-    } else {
-        format!(":host({host})")
-    };
+    let mut around = String::new();
     for condition in &rule.when {
-        if let Condition::Within { on, part: around } = condition {
-            if around == "host" {
+        if let Condition::Within { on, part: name } = condition {
+            if name == "host" {
                 continue;
             }
-            if !written.is_empty() {
-                written.push(' ');
+            if !around.is_empty() {
+                around.push(' ');
             }
-            written.push_str(&part(around));
+            around.push_str(&part(name));
             for held in on.iter().flatten() {
-                written.push_str(&simple(held));
+                around.push_str(&simple(held));
             }
         }
     }
@@ -277,12 +282,18 @@ pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
         let _ = write!(target, "::slotted({tag}{})", unranked(&own));
     }
     /* What holds of the host and of the parts around the target ranks
-    nothing either. */
-    let mut written = unranked(&written);
+    nothing either, and `:host` itself weighs the same on every rule. */
+    let mut written = if host.is_empty() {
+        ":host".to_owned()
+    } else {
+        format!(":host({})", unranked(&host))
+    };
+    if !around.is_empty() {
+        written.push(' ');
+        written.push_str(&unranked(&around));
+    }
     if !target.is_empty() {
-        if !written.is_empty() {
-            written.push(' ');
-        }
+        written.push(' ');
         written.push_str(&target);
     }
     /* A pseudo-element, such as `::before`, belongs to the target itself, and

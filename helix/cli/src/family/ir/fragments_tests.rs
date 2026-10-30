@@ -35,7 +35,7 @@ fn reads_a_fragments_rules_and_declarations_where_they_are_taken_in() {
             &[("print-economy", PRINT), ("visually-hidden", HIDDEN)],
         )
         .unwrap(),
-        "[part=\"label\"] {color: red;block-size: 1px;clip-path: inset(50%)}@media print {:host {print-color-adjust: economy}}"
+        ":host [part=\"label\"] {color: red;block-size: 1px;clip-path: inset(50%)}@media print {:host {print-color-adjust: economy}}"
     );
 }
 
@@ -78,7 +78,7 @@ fn takes_declarations_into_a_fragment_of_rules_and_nothing_deeper() {
             &fragments
         )
         .unwrap(),
-        "[part=\"label\"]:where([data-hidden]) {block-size: 1px;clip-path: inset(50%)}"
+        ":host [part=\"label\"]:where([data-hidden]) {block-size: 1px;clip-path: inset(50%)}"
     );
     assert!(alone("field", &mut loader(&fragments)).is_ok());
     let nested = "export default fragment('nested', { rules: [include('print-economy')] })";

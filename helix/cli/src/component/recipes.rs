@@ -73,7 +73,7 @@ fn flatten(value: &str) -> String {
 }
 
 /// A selector with each `:where(...)` replaced by what it holds, so
-/// `:where(:host([emphasis="solid"])) [part="button"]`, as Helix's compiler
+/// `:host(:where([emphasis="solid"])) [part="button"]`, as Helix's compiler
 /// writes a rule whose conditions add no weight, reads as the selector a
 /// hand-written sheet has.
 fn unwrapped(selector: &str) -> String {
@@ -283,7 +283,7 @@ mod tests {
     fn a_selector_with_no_weight_reads_as_one_written_by_hand() {
         assert_eq!(
             unwrapped(
-                r#":where(:host(:not(:disabled)[emphasis="solid"])) [part="button"]:where(:is(:hover, :active))"#
+                r#":host(:where(:not(:disabled)[emphasis="solid"])) [part="button"]:where(:is(:hover, :active))"#
             ),
             r#":host(:not(:disabled)[emphasis="solid"]) [part="button"]:is(:hover, :active)"#
         );
