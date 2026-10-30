@@ -3,6 +3,7 @@ import { act, fireEvent, screen } from '@testing-library/react-native'
 import { State } from 'react-native-gesture-handler'
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils'
 import { formOf, HOST_STATES } from './forms'
+import { tap } from './input'
 import type { Run, View } from './views'
 
 /*
@@ -77,6 +78,34 @@ export const pointIn = async (
     ])
   })
   return gestures.length === 0 ? 'The part holds no press.' : undefined
+}
+
+/** Whether the element is a field that opens a color picker. */
+export const opensPicker = (tag: string): boolean => formOf(tag).api?.colorField !== undefined
+
+/**
+ * Presses the field's trigger, named by its `trigger-label`, where its picker
+ * does not stand as the intent asks. A press on a disabled trigger does nothing.
+ */
+export const turnPicker = async (
+  run: Run,
+  intent: Extract<Intent, { kind: 'close' | 'open' }>,
+): Promise<string | undefined> => {
+  const { props, tag } = run.scenario.setup
+  const open = HOST_STATES.get(tag)?.open === true
+  if (open !== (intent.kind === 'open')) {
+    /* The panel takes the trigger's words as its name too, and only the trigger is a press. */
+    const trigger = screen
+      .getAllByLabelText(String(props?.['trigger-label'] ?? 'Choose a color'), {
+        includeHiddenElements: true,
+      })
+      .find((one) => typeof one.props.onResponderGrant === 'function')
+    if (trigger === undefined) {
+      return 'The field draws no trigger.'
+    }
+    await tap(trigger)
+  }
+  return undefined
 }
 
 /** The text of the color the element holds, and whether it is marked wrong. */

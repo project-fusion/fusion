@@ -15,6 +15,7 @@ import { HelixCard } from '../card/index.native'
 import { HelixCheckbox } from '../checkbox/index.native'
 import { HelixCheckboxGroup } from '../checkbox-group/index.native'
 import { HelixCode } from '../code/index.native'
+import { HelixColorInput } from '../color-input/index.native'
 import { HelixColorPicker } from '../color-picker/index.native'
 import { HelixCopyButton } from '../copy-button/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
@@ -131,6 +132,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-checkbox': HelixCheckbox,
   'helix-checkbox-group': HelixCheckboxGroup,
   'helix-code': HelixCode,
+  'helix-color-input': HelixColorInput,
   'helix-color-picker': HelixColorPicker,
   'helix-copy-button': HelixCopyButton,
   'helix-description-list': HelixDescriptionList,

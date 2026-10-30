@@ -134,6 +134,14 @@
       "types": "./dist/code/index.d.ts",
       "default": "./dist/code/index.js"
     },
+    "./color-input": {
+      "react-native": {
+        "types": "./dist/color-input/index.native.d.ts",
+        "default": "./dist/color-input/index.native.js"
+      },
+      "types": "./dist/color-input/index.d.ts",
+      "default": "./dist/color-input/index.js"
+    },
     "./color-picker": {
       "react-native": {
         "types": "./dist/color-picker/index.native.d.ts",
