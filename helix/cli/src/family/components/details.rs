@@ -68,6 +68,24 @@ fn text(source: &str, span: Span) -> String {
         .to_owned()
 }
 
+/// A type written on one line, its members separated by semicolons, since a
+/// field's type stands on a line of its own in what a native module writes.
+fn one_line(written: &str) -> String {
+    let mut out = String::new();
+    for line in written
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+    {
+        if !out.is_empty() {
+            let flows = out.ends_with('{') || line.starts_with('}') || line.starts_with('|');
+            out.push_str(if flows { " " } else { "; " });
+        }
+        out.push_str(line);
+    }
+    out
+}
+
 /// The modules under `events`, sorted, leaving out specs.
 fn modules(events: &Path) -> Result<Vec<PathBuf>, Failure> {
     let entries = fs::read_dir(events).map_err(|error| {
@@ -152,7 +170,7 @@ impl Details {
                 Declaration::TSTypeAliasDeclaration(alias) => {
                     self.aliases.insert(
                         alias.id.name.to_string(),
-                        text(source, alias.type_annotation.span()),
+                        one_line(&text(source, alias.type_annotation.span())),
                     );
                 }
                 _ => {}

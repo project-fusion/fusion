@@ -116,7 +116,7 @@ pub fn files(lit: &Lit) -> Result<FileChoice, String> {
             "input" => &mut read.input,
             "largest" => &mut read.largest,
             "list" => {
-                read.list = name.to_owned();
+                name.clone_into(&mut read.list);
                 continue;
             }
             "locale" => &mut read.locale,
