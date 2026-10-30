@@ -14,7 +14,7 @@ List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
 Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
-Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, and Trend are drawn on React Native so far, and each is experimental there. Skip
+Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, Trend, and Virtual List are drawn on React Native so far, and each is experimental there. Skip
 Link is the web's alone, and its component draws nothing on a phone.
 
 ```sh
@@ -723,6 +723,38 @@ A key goes on to the views around where a view nearer the focus took it, a
 text field has focus, a modifier is held, or the part already stands at that
 end. The frame draws the focus ring after a key, as the web draws it on
 the viewport.
+
+## Long lists
+
+**Virtual List draws the rows near the screen with `FlatList`.** Give it
+`items`, and `renderItem` to draw each one. An item with no `renderItem` is its
+words: `textField`, or a string or a number item itself.
+
+```tsx
+<HelixVirtualList
+  items={people}
+  keyField="id"
+  label="People"
+  renderItem={(person) => <Text>{person.name}</Text>}
+  selectionMode="multiple"
+/>
+```
+
+- **Its length is the rule's**, `--virtual-list-block-size`, 20em unless you
+  set it, so it scrolls by its own frame inside a page that scrolls.
+- **`columns` or `minColumnWidth` draws lines of cells**, `orientation` a line
+  across, `sectionField` a header row before each section, and
+  `layout="waterfall"` each item under the column that ends highest.
+- **`onRangeChange` and `onLoadMore` read the frame** and the line length
+  `estimate` and `gap` give, so give `estimate` the length of your rows.
+- **The ref holds `scrollToIndex` and `range`**, as the web element does.
+- **Under `reorderable`, a finger held on a row for half a second drags it**,
+  Alt with an arrow from a hardware keyboard moves it, and a screen reader's
+  actions move it. The list moves nothing itself: set `items` on `onReorder`.
+
+These are the web's: the row `<template>`, `for`, `measured`, which a phone's
+list does for every row, each row's place in the set as `aria-posinset`, and the
+`grid`, `row`, and `gridcell` roles.
 
 ## Sections
 
