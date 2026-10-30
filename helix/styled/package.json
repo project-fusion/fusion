@@ -134,6 +134,14 @@
       "types": "./dist/code/index.d.ts",
       "default": "./dist/code/index.js"
     },
+    "./color-picker": {
+      "react-native": {
+        "types": "./dist/color-picker/index.native.d.ts",
+        "default": "./dist/color-picker/index.native.js"
+      },
+      "types": "./dist/color-picker/index.d.ts",
+      "default": "./dist/color-picker/index.js"
+    },
     "./copy-button": {
       "react-native": {
         "types": "./dist/copy-button/index.native.d.ts",

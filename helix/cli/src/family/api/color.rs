@@ -31,6 +31,7 @@ pub const COMPUTED: &[&str] = &[
     "square",
     "squareReversed",
     "tint",
+    "wheelGrid",
     "wheelX",
     "wheelY",
 ];

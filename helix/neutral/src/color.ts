@@ -18,7 +18,8 @@
  * of the color, `hue`, `saturation`,
  * and `brightness`, the numbers; `painted`, the color as CSS; `tint`, the hue at
  * full strength; `markX` and `markY`, where a phone stands the mark on the
- * square, and `wheelX` and `wheelY`, on the ring; `square` and `squareReversed`,
+ * square, and `wheelX` and `wheelY`, on the ring, and
+ * `wheelGrid`, how wide the square inside the ring stands; `square` and `squareReversed`,
  * what a screen reader hears on each axis of the square; `sampleLabel`, the
  * sample's name; `formatWord` and `formatLabel`, what the syntax toggle says;
  * and the lists `channels`, the ramps, `fields`, a number field for each
@@ -51,6 +52,7 @@ export interface ColorPicked {
   readonly squareReversed: string
   readonly swatches?: string
   readonly tint: string
+  readonly wheelGrid: string
   readonly wheelX: string
   readonly wheelY: string
 }

@@ -6,6 +6,7 @@ import { BUTTON } from './scenarios/button.js'
 import { BUTTON_GROUP } from './scenarios/button-group.js'
 import { CALLOUT } from './scenarios/callout.js'
 import { CHECKBOX_GROUP } from './scenarios/checkbox-group.js'
+import { COLOR_PICKER } from './scenarios/color-picker.js'
 import { COPY_BUTTON } from './scenarios/copy-button.js'
 import { DIALOG } from './scenarios/dialog.js'
 import { DRAWER } from './scenarios/drawer.js'
@@ -56,6 +57,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   callout: CALLOUT,
   checkbox: CHECKBOX,
   'checkbox-group': CHECKBOX_GROUP,
+  'color-picker': COLOR_PICKER,
   'copy-button': COPY_BUTTON,
   dialog: DIALOG,
   drawer: DRAWER,
