@@ -198,6 +198,24 @@ export interface ValueRange {
   readonly step?: string
   /** The prop that holds the sentence a screen reader says for the value, with `{value}` in its place. */
   readonly valueText?: string
+  /** The prop that gives the range a thumb for each value of its text. */
+  readonly several?: string
+  /** The prop that holds how many steps the thumbs stay apart. */
+  readonly minStepsBetween?: string
+  /** The prop that holds the words that join the first and the last value. */
+  readonly rangeText?: string
+  /** The prop that holds the name of the lowest thumb. */
+  readonly minimumLabel?: string
+  /** The prop that holds the name of the highest thumb. */
+  readonly maximumLabel?: string
+  /** The prop that holds the name of a thumb between the two. */
+  readonly thumbLabel?: string
+  /** The prop that names the control, which each thumb's name starts with. */
+  readonly label?: string
+  /** The prop that holds the function that writes a value. */
+  readonly formatter?: string
+  /** The value it computes as its thumbs, one entry each, which a repeat reads. */
+  readonly thumbs?: string
   /** The state the element is in while a split's panes stand one above the other. */
   readonly vertical?: string
 }

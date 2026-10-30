@@ -144,3 +144,46 @@ export const sliderSpoken = (
   }
   return numberOptions(options) === undefined ? '' : said
 }
+
+/**
+ * A range's values, one per thumb, in order, each in the bounds on the step. Text
+ * that is no list of two numbers or more opens fully wide, as on the web.
+ */
+export const sliderPoints = (text: unknown, bounds: SliderBounds): readonly number[] => {
+  const parts = String(text ?? '')
+    .split(',')
+    .map((part) => Number.parseFloat(part))
+  return parts.length < 2 || parts.some((part) => !Number.isFinite(part))
+    ? [bounds.min, bounds.max]
+    : parts.map((part) => sliderSettle(part, bounds)).sort((left, right) => left - right)
+}
+
+/** A range's values with the thumb at `at` moved toward `wanted`, stopped `gap` from each neighbor. */
+export const sliderMoved = (
+  points: readonly number[],
+  at: number,
+  wanted: number,
+  gap: number,
+): readonly number[] => {
+  const before = points[at - 1]
+  const after = points[at + 1]
+  const low = before === undefined ? Number.NEGATIVE_INFINITY : before + gap
+  const high = after === undefined ? Number.POSITIVE_INFINITY : after - gap
+  return points.map((one, index) => (index === at ? Math.min(high, Math.max(low, wanted)) : one))
+}
+
+/**
+ * Which thumb a press at `wanted` takes: the nearest, and of two at the same place
+ * the one the press is past, so a press above a closed range opens it upward.
+ */
+export const sliderNearest = (points: readonly number[], wanted: number): number => {
+  let at = 0
+  points.forEach((one, index) => {
+    const distance = Math.abs(one - wanted)
+    const best = Math.abs((points[at] ?? 0) - wanted)
+    if (distance < best || (distance === best && wanted > one)) {
+      at = index
+    }
+  })
+  return at
+}
