@@ -55,7 +55,7 @@
     // the sandbox's `dependencies`: its own run replayed a cached pass, and the
     // next run on `main` (37842746140) failed the spec. The walk also opens the
     // manifests of the registry packages the sandbox names, and `bun.lock` pins
-    // those. `jsx-declared-events.spec.ts` imports core's React table by path,
+    // those. `typings/jsx.spec.ts` imports core's React table by path,
     // which is what `helix/core/src` is here for.
     "@fusion.dev/helix-cem#test": {
       "dependsOn": ["^build", "analyze"],
@@ -301,9 +301,8 @@
     },
     // `analyze` writes six files and this used to claim one, then three.
     // The manifest is the obvious output; `jsx.d.ts`, `vue.d.ts`,
-    // `svelte.d.ts` and `words.d.ts` are written beside it by the typings
-    // generators, and an output a task does not declare is one a cache hit
-    // does not restore.
+    // `svelte.d.ts` and `words.d.ts` are written from it beside it, and an
+    // output a task does not declare is one a cache hit does not restore.
     //
     // **The generator is an input, and it is not in this package.** The
     // manifest is `helix manifest build`'s, so an edit to the Rust that writes

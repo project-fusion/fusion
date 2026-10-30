@@ -1,21 +1,3 @@
-/**
- * A step that runs over a finished manifest.
- *
- * **Only the one hook, because only one is left.** This was the analyzer's
- * `Plugin`, which has four phases and hands each one TypeScript's AST. The
- * phases that read source went with the analyzer: `helix manifest build` does
- * that work in Rust, as ordinary code rather than as plugins, because there is
- * no plugin system in it and the analyzer had one only because it is a
- * framework. What remains reads the manifest once it is written and does
- * something with it, which is to lint it or to write typings from it, and the
- * shape it was called with is kept so the typings generators this repository
- * does not own keep working unchanged.
- */
-export interface Plugin {
-  name: string
-  packageLinkPhase?: (params: { context: HelixContext; customElementsManifest: unknown }) => void
-}
-
 /*
  * Manifest types are declared structurally here rather than imported from
  * `custom-elements-manifest/schema`.
@@ -33,6 +15,8 @@ export interface Plugin {
 
 /** Anything in the manifest that carries a human description. */
 export interface Documented {
+  /** Set where a member is `@deprecated`, to its reason where it gives one. */
+  deprecated?: boolean | string
   description?: string
   name: string
   /** Declared type, where the entry has one. Slots and parts do not. */
@@ -332,16 +316,4 @@ export interface HelixManifest {
    */
   helix?: { package?: string; version?: string }
   modules?: HelixModule[]
-}
-
-/**
- * What a step over the manifest is given beside it.
- *
- * The manifests of the packages this one is built against. Nothing here reads
- * it any more, `convention-lint` having been the one step that did, to walk a
- * class up to `HelixElement`; it is kept because the typings generators this
- * repository does not own are called in the analyzer's shape, which has it.
- */
-export interface HelixContext {
-  thirdPartyCEMs?: HelixManifest[]
 }

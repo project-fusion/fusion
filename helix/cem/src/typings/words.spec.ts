@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { HelixManifest } from '../types.js'
-import { renderWords, wordsOf } from './words-types.js'
+import { renderWords, wordsOf } from './words.js'
 
 /** A headless class on the registry and the styled class that inherits it. */
 const MANIFEST: HelixManifest = {

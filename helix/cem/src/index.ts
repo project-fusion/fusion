@@ -1,48 +1,30 @@
 import { spawnSync } from 'node:child_process'
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
-import { generateJsxTypes } from '@wc-toolkit/jsx-types'
-import { generateVuejsTypes } from '@wc-toolkit/vuejs-types'
 import { catalog, type ExampleSource, publishedBy } from './catalog.js'
-import { jsxBaseProps } from './plugins/jsx-base-props.js'
-import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
-import { jsxFrameworkProps } from './plugins/jsx-framework-props.js'
-import { jsxImports } from './plugins/jsx-imports.js'
-import { jsxNativeEvents } from './plugins/jsx-native-events.js'
-import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
-import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
-import { jsxUnnamedAttributes } from './plugins/jsx-unnamed-attributes.js'
-import { svelteTypes } from './plugins/svelte-types.js'
-import { wordsTypes } from './plugins/words-types.js'
-import type { HelixContext, HelixManifest, HelixMetadata, Plugin } from './types.js'
+import type { HelixManifest, HelixMetadata } from './types.js'
+import { renderJsx } from './typings/jsx.js'
+import { renderSvelte } from './typings/svelte.js'
+import { renderVue } from './typings/vue.js'
+import { renderWords, wordsOf } from './typings/words.js'
 
 export interface HelixCemOptions {
   /**
    * Emit type declarations for the package's elements, per framework.
    *
    * Without them a custom element accepts any attribute, so
-   * `appearance="wrong"` passes silently. Generated from the same manifest
-   * everything else reads: `jsx.d.ts` by `@wc-toolkit/jsx-types` for the whole
-   * JSX family, and `vue.d.ts` by `@wc-toolkit/vuejs-types` for Vue templates,
-   * which are not JSX and augment a different interface.
+   * `appearance="wrong"` passes silently. Written from the same manifest
+   * everything else reads: `jsx.d.ts` for the whole JSX family, and `vue.d.ts`
+   * for Vue templates, which are not JSX and augment a different interface.
    */
   frameworkTypes?: boolean
 
   /**
-   * Package the element classes are imported from in generated JSX types.
-   *
-   * Without it the generator emits raw source paths like
-   * `src/card/root/card-root.ts`, which resolve for nobody downstream.
+   * Package the element classes are imported from in the typings, which
+   * `frameworkTypes` needs: it is the one name a manifest's `path` cannot give,
+   * since `src/card/root/card-root.ts` resolves for nobody downstream.
    */
   packageName?: string
 
@@ -237,159 +219,30 @@ const examplesOnDisk = (cwd: string): ExampleSource[] => {
 }
 
 /**
- * Biome's formatting of a typings file, in Prettier's style.
+ * Writes the framework typings from the finished manifest.
  *
- * **Biome, because the generators' own Prettier was most of every build.**
- * `@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types` format what they write
- * through `@prettier/sync`, about six megabytes per tier, and in `analyze` that
- * sat on the chain every build waits on: the headless tier's manifest, its
- * build, the charts, then the styled tier's manifest. Measured on a laptop on
- * 10 Oct 2026, the styled tier's typings took 21.7 seconds through Prettier and
- * 0.56 through this. Every typings file came out byte for byte the same in all
- * three tiers but one mapped type in `jsx.d.ts`, which Biome keeps on one line.
+ * **Each file is a template over the manifest**, in `src/typings`, and the
+ * projects in `typings/` say whether a framework accepts what it writes.
  *
- * **Every option is said here, and the repository's configuration is kept
- * out.** These are what Prettier defaults to, and a configuration found by
- * walking up from the package would format a published file by this
- * repository's taste: single quotes, and semicolons where needed.
+ * **No formatter runs over the files.** A hover shows the doc comment, and nobody
+ * edits them, so formatting them bought nothing and took about half a second per
+ * tier.
  */
-type JsxTypesOptions = NonNullable<Parameters<typeof generateJsxTypes>[1]>
-type VuejsTypesOptions = NonNullable<Parameters<typeof generateVuejsTypes>[1]>
-
-const formatted = (text: string): string => {
-  const empty = mkdtempSync(join(tmpdir(), 'helix-cem-'))
-  writeFileSync(join(empty, 'biome.json'), '{}\n')
-  const out = spawnSync(
-    process.execPath,
-    [
-      createRequire(import.meta.url).resolve('@biomejs/biome/bin/biome'),
-      'format',
-      '--stdin-file-path=types.d.ts',
-      `--config-path=${empty}`,
-      '--indent-style=space',
-      '--indent-width=2',
-      '--line-width=80',
-      '--javascript-formatter-quote-style=double',
-      '--trailing-commas=all',
-      '--semicolons=always',
-      '--quote-properties=as-needed',
-      '--arrow-parentheses=always',
-      '--bracket-spacing=true',
-    ],
-    { encoding: 'utf8', input: text, maxBuffer: 1024 * 1024 * 256 },
-  )
-  if (out.status !== 0) {
-    throw new Error(`biome format exited ${out.status}: ${out.stderr}`)
+export const writeTypings = (
+  manifest: HelixManifest,
+  packageName: string | undefined,
+  cwd: string,
+): void => {
+  if (packageName === undefined) {
+    throw new Error('frameworkTypes needs packageName, which the typings import the classes from')
   }
-  return out.stdout
+  mkdirSync(join(cwd, TYPES), { recursive: true })
+  const write = (name: string, text: string): void => writeFileSync(join(cwd, TYPES, name), text)
+  write('jsx.d.ts', renderJsx(manifest, packageName))
+  write('vue.d.ts', renderVue(manifest, packageName))
+  write('svelte.d.ts', renderSvelte(manifest, packageName))
+  write('words.d.ts', renderWords(wordsOf(manifest), packageName))
 }
-
-/**
- * A generator run for its text, which is then formatted here and written.
- *
- * Named as the plugin it replaces, because that is what it does, and the order
- * the passes after it depend on is read by name.
- */
-const generated = <Options extends { fileName?: string; outdir?: string }>(
-  name: string,
-  generate: (manifest: never, options: Options) => string | undefined,
-  options: Options & { fileName: string; outdir: string },
-): Plugin => ({
-  name,
-  packageLinkPhase({ customElementsManifest }) {
-    const text = generate(customElementsManifest as never, { ...options, fileName: undefined })
-    if (text === undefined) {
-      throw new Error(`${name} wrote nothing for ${options.fileName}`)
-    }
-    mkdirSync(options.outdir, { recursive: true })
-    writeFileSync(join(options.outdir, options.fileName), formatted(text))
-  },
-})
-
-/**
- * What runs over the finished manifest, in the order it runs.
- *
- * **One job, where this package used to do three.** It held eighteen plugins
- * for `@custom-elements-manifest/analyzer`, and ten of them built the manifest:
- * a tier, a group and a part, an example, a source path, a reference, a React
- * prop, an order. `helix manifest build` does all of that in Rust now, as
- * ordinary code rather than as plugins, which is why they are gone rather than
- * moved. The linter went the same way, to `helix component`'s `conventions`
- * rule, it being a rule over a finished manifest and nothing else. What is
- * left is the typings generators, which never parsed any TypeScript and so
- * never carried the version pin that the move away from the analyzer ended.
- */
-export const afterManifest = ({
-  frameworkTypes = false,
-  packageName,
-}: HelixCemOptions): Plugin[] => [
-  ...(frameworkTypes
-    ? [
-        generated<JsxTypesOptions>('@wc-toolkit/jsx-types', generateJsxTypes, {
-          fileName: 'jsx.d.ts',
-          ...(packageName ? { globalTypePath: packageName } : {}),
-          // Standard React handlers and attributes, so `onClick` and
-          // `className` typecheck alongside the element's own props.
-          includeDefaultDOMEvents: true,
-          outdir: TYPES,
-          // `event.target` typed as the element rather than EventTarget.
-          stronglyTypedEvents: true,
-        }),
-        // Must follow the generator: it references event types it does not
-        // import, and an unresolved name degrades to `any` under skipLibCheck.
-        ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
-        // Before `jsxNativeEvents`, which rewrites the handler lines it reads.
-        jsxBaseProps({ fileName: `${TYPES}/jsx.d.ts` }),
-        jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
-        // After it, which is what makes `BaseEvents` generic, and before
-        // `jsxOptionalUndefined` so these entries get the same `| undefined`.
-        jsxDeclaredEvents({ fileName: `${TYPES}/jsx.d.ts` }),
-        /* After `jsxNativeEvents`, which reads each tag entry's `BaseProps<T>`
-             as the generator wrote it. The generator's `ref` rejects the
-             `useRef` every React and Preact consumer reaches for, and React's
-             and Preact's types reach only their own JSX. */
-        jsxFrameworkProps({ fileName: `${TYPES}/jsx.d.ts` }),
-        /* Vue reads none of the above. Its templates are not JSX, so the
-             types augment `GlobalComponents` rather than `IntrinsicElements`,
-             and a handler is bound with `@helix-input` rather than a prop. Same
-             manifest, same `stronglyTypedEvents`, separate file. */
-        generated<VuejsTypesOptions>('@wc-toolkit/vuejs-types', generateVuejsTypes, {
-          fileName: 'vue.d.ts',
-          ...(packageName ? { globalTypePath: packageName } : {}),
-          outdir: TYPES,
-          stronglyTypedEvents: true,
-        }),
-        // The same imports as the JSX file's, which the Vue generator writes alike.
-        ...(packageName ? [jsxImports({ fileName: `${TYPES}/vue.d.ts`, packageName })] : []),
-        /* After both generators, which write `unknown` for an attribute that
-             names no field, and before Svelte's, which reuses the JSX map. */
-        jsxUnnamedAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
-        /* After everything that rewrites the JSX tag map, because it reuses
-             the finished one. */
-        ...(packageName
-          ? [
-              svelteTypes({
-                fileName: `${TYPES}/jsx.d.ts`,
-                outFile: `${TYPES}/svelte.d.ts`,
-                packageName,
-              }),
-            ]
-          : []),
-        /* What `registerWords` takes for each family, from the word
-             properties the manifest marks. */
-        wordsTypes({ outFile: `${TYPES}/words.d.ts`, ...(packageName ? { packageName } : {}) }),
-        /* After both generators, which type an attribute as its property,
-             and before `jsxOptionalUndefined`, so the string form it admits
-             is wrapped in the same `| undefined`. */
-        jsxNumericAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
-        /* Last of the generators, because it rewrites what two of them wrote.
-             `?: T` is not the same type as `?: T | undefined` under
-             `exactOptionalPropertyTypes`, and it is the one a consumer cannot
-             forward an optional prop into. */
-        jsxOptionalUndefined({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
-      ]
-    : []),
-]
 
 /** Where a dependency is installed, looked for the way node looks for one. */
 const installed = (name: string, from: string): string | undefined => {
@@ -489,9 +342,7 @@ const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/
  *
  * The manifest is `helix manifest build`'s, which is byte for byte what
  * `@custom-elements-manifest/analyzer` wrote across all four tiers when this
- * replaced it. The rest is `afterManifest`, run over the manifest in the shape
- * the analyzer called it with, from the package directory, because the
- * typings generators write where they are told relative to that.
+ * replaced it. The typings are `writeTypings`, from that manifest.
  */
 export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixManifest => {
   const dependencies = dependenciesOf(cwd)
@@ -543,19 +394,8 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
       `${JSON.stringify({ environment: environmentOf(cwd), examples: Object.fromEntries(families.map((family) => [family.slug, family.examples])), package: name })}\n`,
     )
   }
-  const context: HelixContext = {
-    thirdPartyCEMs: [...dependencies.values()].map(
-      (at) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest,
-    ),
-  }
-  const back = process.cwd()
-  process.chdir(cwd)
-  try {
-    for (const step of afterManifest(options)) {
-      step.packageLinkPhase?.({ context, customElementsManifest })
-    }
-  } finally {
-    process.chdir(back)
+  if (options.frameworkTypes) {
+    writeTypings(customElementsManifest, options.packageName, cwd)
   }
   return customElementsManifest
 }
@@ -579,7 +419,6 @@ export { displayName, familyOf, place, startCase, tierOf } from './naming.js'
 export type {
   Documented,
   HelixAttribute,
-  HelixContext,
   HelixCssProperty,
   HelixDeclaration,
   HelixEvent,
@@ -588,18 +427,5 @@ export type {
   HelixMetadata,
   HelixModule,
   InheritedFrom,
-  Plugin,
   TypeText,
 } from './types.js'
-export {
-  jsxBaseProps,
-  jsxDeclaredEvents,
-  jsxFrameworkProps,
-  jsxImports,
-  jsxNativeEvents,
-  jsxNumericAttributes,
-  jsxOptionalUndefined,
-  jsxUnnamedAttributes,
-  svelteTypes,
-  wordsTypes,
-}

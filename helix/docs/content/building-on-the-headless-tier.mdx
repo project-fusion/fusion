@@ -170,10 +170,9 @@ Each flag does one job, and the manifest is incomplete without either:
 - `--litelement` reads Lit's decorators, so the properties you declare with
   `@property` are attributes too.
 
-Then run a typings generator over the manifest. Our own typings start from
-`@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types`. The typings for
-`acme-combobox` then include the members it inherits, as well as the ones you
-wrote.
+Then run a typings generator over the manifest, such as `@wc-toolkit/jsx-types`
+or `@wc-toolkit/vuejs-types`. The typings for `acme-combobox` then include the
+members it inherits, as well as the ones you wrote.
 
 The generated file names Helix's event classes, such as
 `HelixBeforeChangeEvent`, without importing them. Add one line at its top that
@@ -204,9 +203,8 @@ declare module 'react' {
 
 A subclass that adds properties joins its own to them with `&`.
 
-`@fusion.dev/helix-cem`, the step that runs those generators for our packages
-and corrects what they write, is not published. It is build tooling for this
-repository.
+`@fusion.dev/helix-cem`, the step that writes our own typings from our manifests,
+is not published. It is build tooling for this repository.
 
 ### The tag map
 

@@ -1,7 +1,7 @@
 /**
  * Types for the Helix custom elements written directly in JSX.
  *
- * Emitted by `@wc-toolkit/jsx-types` from the same manifest the API pages read,
+ * Written from the same manifest the API pages read,
  * so a wrong attribute or a wrong event detail is a compile error.
  *
  * **A side-effect import in a `.d.ts`.** The typings are the subpath export

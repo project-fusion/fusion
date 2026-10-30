@@ -26,13 +26,13 @@ const total = () => pagination.value?.total
     Alerts
     <span slot="hint">Sent to your email.</span>
   </helix-switch>
-  <!-- `default-page` is bound. `vue-tsc` checks the attribute as the `defaultPage`
-       property, which is a number, so it refuses the string `default-page="2"`
-       even though Vue writes that string to the attribute and the element reads
-       the number out of it. -->
+  <!-- `default-page` as markup writes it, and bound beside it. `vue-tsc` reads the
+       attribute as the `defaultPage` property. Vue writes the string to the
+       attribute, and the element reads the number out of it. -->
+  <helix-pagination :default-page="2" />
   <helix-pagination
     ref="pagination"
-    :default-page="2"
+    default-page="2"
     :page-size="20"
     :total="120"
     @helix-navigate="(event) => event.detail.page ?? total()"
