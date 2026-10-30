@@ -72,14 +72,38 @@ pub(super) fn layered(family: &Family, names: &Names, found: &mut Vec<String>) {
         if !band
             && (layer.attributes.contains_key("anchor") || layer.attributes.contains_key("target"))
         {
-            for state in PLACED {
+            /* A placement written out lands on its side or the one facing it,
+            at its own end, as a color input's panel can land nowhere else, so
+            the element owes those states alone. */
+            let written = match layer.attributes.get("placement") {
+                Some(Attribute::Text(placement)) => Some(placement.as_str()),
+                _ => None,
+            };
+            let reached = |state: &str| match written.map(|one| one.split('-').collect::<Vec<_>>())
+            {
+                Some(words) => {
+                    let side = words.first().copied().unwrap_or_default();
+                    let facing = match side {
+                        "top" => "bottom",
+                        "bottom" => "top",
+                        "left" => "right",
+                        _ => "left",
+                    };
+                    let end = words.get(1).copied();
+                    state == format!("placed-{side}")
+                        || state == format!("placed-{facing}")
+                        || end.is_some_and(|end| state == format!("aligned-{end}"))
+                }
+                None => true,
+            };
+            for state in PLACED.iter().filter(|state| reached(state)) {
                 if !names.states.contains(state) {
                     found.push(format!(
                         "{at} is placed against its anchor, and the element declares no state `{state}` for the side it lands on"
                     ));
                 }
             }
-            for state in ALIGNED {
+            for state in ALIGNED.iter().filter(|state| reached(state)) {
                 if !names.states.contains(state) {
                     found.push(format!(
                         "{at} is placed against its anchor, and the element declares no state `{state}` for the end of the side it is aligned to"

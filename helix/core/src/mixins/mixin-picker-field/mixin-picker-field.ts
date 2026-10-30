@@ -520,7 +520,15 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     protected readonly handleTriggerClick = (event?: Event): void => {
       const opening = !this.open
       this.fromTrigger = opening
+      const held = this.partNamed('surface')?.contains(
+        (this.renderRoot as ShadowRoot).activeElement,
+      )
       this.toggleOpen()
+      /* A press that closes the panel with focus inside it gives focus to the
+         trigger. WebKit focuses no button on a press, and focus fell to the page. */
+      if (!opening && !this.open && held === true) {
+        this.partNamed('trigger')?.focus()
+      }
       /* A press, so Escape goes back to the trigger. Alt+Down from a segment
          calls this with no event, and Escape goes back to that segment. */
       this.pressedOpen = event !== undefined && opening && this.open
