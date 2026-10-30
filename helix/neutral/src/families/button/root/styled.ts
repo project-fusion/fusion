@@ -4,7 +4,7 @@ import { styles } from '../../../table.js'
 import button from './headless.js'
 
 /**
- * Button's styled tier, which writes `helix/styled/src/button/root/button-root.generated.css`.
+ * Button's styled tier.
  *
  * **Two axes.** Each tone sets the private colors, and each emphasis reads
  * them. Written out, `outlined` and `neutral` select nothing and land on the
@@ -59,7 +59,7 @@ export default styles(
     },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
-      tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
       width: oneOf(['auto', 'full']),
     },
     stylesheet: 'button/root/button-root.generated.css',
@@ -125,6 +125,37 @@ export default styles(
             buttonTone: token('color-danger'),
             /* Mixed toward the ink, for the ink states. */
             buttonToneHover: mix(token('color-danger'), 86, token('color-foreground')),
+          },
+        },
+        /* A status reads the same on a button as on the tag beside it. */
+        info: {
+          own: {
+            buttonEdge: token('color-info'),
+            buttonFill: token('color-info-surface'),
+            buttonFillHover: token('color-info-surface-hover'),
+            buttonOnTone: token('color-foreground-on-status'),
+            buttonTone: token('color-info'),
+            buttonToneHover: mix(token('color-info'), 86, token('color-foreground')),
+          },
+        },
+        success: {
+          own: {
+            buttonEdge: token('color-success'),
+            buttonFill: token('color-success-surface'),
+            buttonFillHover: token('color-success-surface-hover'),
+            buttonOnTone: token('color-foreground-on-status'),
+            buttonTone: token('color-success'),
+            buttonToneHover: mix(token('color-success'), 86, token('color-foreground')),
+          },
+        },
+        warning: {
+          own: {
+            buttonEdge: token('color-warning'),
+            buttonFill: token('color-warning-surface'),
+            buttonFillHover: token('color-warning-surface-hover'),
+            buttonOnTone: token('color-foreground-on-status'),
+            buttonTone: token('color-warning'),
+            buttonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
           },
         },
       }),

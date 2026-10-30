@@ -45,11 +45,12 @@ export default headless('outline', {
     label: '',
     marks: oneOf(['reading', 'visible'], 'reading'),
     offset: 0,
+    variant: oneOf(['rail']),
   },
   events: {
     activate: ['value'],
   },
-  states: ['settled'],
+  states: ['open', 'settled'],
   derived: {
     name: derive('outline-name'),
   },
@@ -65,6 +66,22 @@ export default headless('outline', {
   },
   render: ({ derived, entry, sections }) => (
     <>
+      {/* The rail the web's element draws under `variant="rail"`: its ticks follow
+          the links passed in, and its surface wraps the heading and the links. */}
+      <View
+        ariaHidden
+        part="ticks"
+        platform="web"
+      >
+        <View
+          part="tick"
+          platform="web"
+        />
+      </View>
+      <View
+        part="surface"
+        platform="web"
+      />
       <View part="heading">
         <Slot name="heading" />
       </View>
