@@ -50,6 +50,6 @@
     "webassembly"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

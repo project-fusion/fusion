@@ -225,8 +225,8 @@ try {
 } catch (error) {
   if (registryTag !== undefined && !process.env.NPM_TOKEN) {
     console.error(
-      'The published packages did not install, and no `NPM_TOKEN` was set. These packages ' +
-        'are restricted, so an unauthenticated install 404s exactly as a missing package would. ' +
+      'The published packages did not install, and no `NPM_TOKEN` was set. A package that is ' +
+        'still restricted answers an unauthenticated install with a 404, as a missing one does. ' +
         'Log in, or set the token, before reading this as a packaging fault.\n',
     )
   }

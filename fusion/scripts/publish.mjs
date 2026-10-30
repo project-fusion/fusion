@@ -209,7 +209,8 @@ const tokenConfig = () => {
  * number is allocated.
  *
  * **A restricted package answers 404 to a reader without access**, which is
- * what a missing one answers too. So when every package of the domain is
+ * what a missing one answers too. A package stays restricted until a publish or
+ * `npm access` changes it. So when every package of the domain is
  * absent at once, a package of another domain is asked as well, one this
  * credential should be able to see. If it can, the credential reads the scope
  * and the domain is new, which is what a bootstrap is for: a first bootstrap
@@ -296,7 +297,7 @@ if (bootstrap) {
   const absent = new Set(unpublished())
   const staging = mkdtempSync(join(tmpdir(), `${domain}-bootstrap-`))
   const placeholder = tag ?? 'exp-0'
-  for (const [name, { directory, file }] of packages) {
+  for (const [name, { directory, file, manifest }] of packages) {
     if (!absent.has(name)) {
       continue
     }
@@ -322,7 +323,7 @@ if (bootstrap) {
           '--tag',
           placeholder,
           '--access',
-          'restricted',
+          manifest.publishConfig.access,
           ...(otp === undefined ? [] : ['--otp', otp]),
         ],
         `publish the placeholder for ${name}`,
@@ -622,7 +623,7 @@ for (const [name, { directory, manifest }] of packages) {
         '--tag',
         tag,
         '--access',
-        'restricted',
+        manifest.publishConfig.access,
         ...(otp === undefined ? [] : ['--otp', otp]),
       ],
       `publish ${name}@${version}`,

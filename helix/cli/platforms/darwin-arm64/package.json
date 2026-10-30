@@ -21,6 +21,6 @@
     "darwin"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

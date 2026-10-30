@@ -311,10 +311,10 @@ framework typings, and `build` does not produce them: turbo has `analyze`
 depending on `build` rather than the other way round, so a build alone leaves
 them absent and the tarball ships without files its own manifest promises.
 
-**One token, on the two steps that need one and nowhere else.** The packages are
-restricted, so an unauthenticated install 404s exactly as a missing package
-would, and the smoke test is the only step that installs as a consumer rather
-than publishing as the workflow.
+**One token, on the two steps that need one and nowhere else.** A package that
+is still restricted answers an unauthenticated install with a 404, exactly as a
+missing package would, and the smoke test is the only step that installs as a
+consumer rather than publishing as the workflow.
 
 It is the same secret the promote step takes, and it is read-write because
 promotion has to be. A read-only twin was considered and is not worth a second
