@@ -8,7 +8,7 @@ The components ship from
 [`@fusion.dev/helix`](https://www.npmjs.com/package/@fusion.dev/helix), which
 depends on this package. Accordion, Announcement, App Header, Avatar, Avatar Group, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox,
-Checkbox Group, Code, Copy Button, Description List, Dialog, Divider, Drawer,
+Checkbox Group, Code, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer,
 Drilldown, Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
@@ -1640,6 +1640,43 @@ import { HelixSlider } from '@fusion.dev/helix/slider'
   label="Volume"
   onChange={(event) => save(event.target.value)}
   showValue
+/>
+```
+
+## Color pickers
+
+`HelixColorPicker`, from `@fusion.dev/helix/color-picker`, builds a color on a
+square and a ramp of hue, with a ramp of opacity under `alpha`, a text field,
+a number field for each channel under `channelFields`, a syntax toggle, and
+presets under `swatches`. The value is text in the syntax `format` names.
+
+A drag or a press on the square moves saturation and brightness together. A
+hardware keyboard's arrows move them a step, or ten with Shift, Page Up and Page
+Down move brightness by ten, and Home and End move saturation by ten. A screen
+reader reaches the two axes as two adjustable elements, each saying both numbers
+and the color's name. `wheel` draws the hue as a ring, which a finger drags
+around and a screen reader steps.
+
+**Each move asks first.** `onBeforeChange` carries the color a move would leave
+in `event.detail.value`, and refusing it leaves the color where it was.
+`onInput` follows each move that stands, and `onChange` follows once a drag, a
+key, typed text, or a preset settles it. Text that is not a color stays in the
+field and out of the value, and shows `badInputMessage` once the reader leaves.
+
+The ring is 180 wedges of hue and a checkerboard is a dashed path, both drawn
+with `react-native-svg`, since a phone has no conic gradient. The presets are
+buttons, one of them selected, since a phone has no listbox. The eyedropper is
+the web's alone, since a phone cannot sample its screen.
+
+```tsx
+import { HelixColorPicker } from '@fusion.dev/helix/color-picker'
+
+<HelixColorPicker
+  alpha
+  defaultValue="#336699"
+  label="Brand"
+  onChange={(event) => save(event.target.value)}
+  swatches="#ff0000, #00aa00, #0000ff"
 />
 ```
 

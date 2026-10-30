@@ -276,6 +276,7 @@ const COLOR: &[Field] = &[
     ("squareReversed", "squareReversed", Name),
     ("swatches", "swatches", Name),
     ("tint", "tint", Name),
+    ("wheelGrid", "wheelGrid", Name),
     ("wheelX", "wheelX", Name),
     ("wheelY", "wheelY", Name),
 ];

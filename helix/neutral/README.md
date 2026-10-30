@@ -3,7 +3,7 @@
 The platform-neutral sources Helix compiles for the web and for React Native.
 This is a pilot, and its families are Accordion, Announcement, App Header, Avatar, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
-Group, Code, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
+Group, Code, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
@@ -755,6 +755,23 @@ going: `statusHidden`, `barHidden`, `wordsHidden`, `fill`, `statusText`,
 machine over the files capability, and core's file-field rules screen a pick,
 the same the web element reads. The web element holds `File`s and a phone holds
 the capability's records.
+
+**An element a reader builds a color in declares its `color`**: `prop`, the
+prop that holds the text of the color, and `defaultProp`, the one that seeds
+it; `alpha`, `format`, `readonly`, and `swatches`; `onBeforeChange`, `onInput`,
+`onChange`, and `onCopy`, the events it sends; and the names of what it
+computes, which a render reads as `color.x`: `reading`, `hue`, `saturation`,
+`brightness`, `painted`, `tint`, `markX`, `markY`, `wheelX`, `wheelY`, `square`,
+`squareReversed`, `sampleLabel`, `formatWord`, `formatLabel`, and the lists
+`channels`, `fields`, and `presets`. Its render draws the parts the machine
+binds by name: `grid`, `grid-mark`, `grid-saturation`, `grid-brightness`,
+`wheel`, `wheel-hue`, `wheel-band`, `wheel-ring`, `sample`, `channel`, `value`,
+`field-input`, `format`, and `swatch`. `<TextInput>` and a box whose role is
+`slider` are the color's to hold, with no `text` and no `range`. A phone runs
+the `color` machine, and core's color picker arithmetic says where each point
+and key takes it, the same the web element reads. A rule reads
+`color-picker-tint`, the hue at full strength, on a phone, where the web builds
+it with `hsl()` from a number.
 
 **A prop may hold a function**, written `callback()` with the signature a
 phone's component types it by, as `validate` is. No attribute holds one. An
