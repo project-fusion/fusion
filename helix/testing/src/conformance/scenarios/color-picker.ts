@@ -121,6 +121,33 @@ export const COLOR_PICKER: readonly Scenario[] = [
   },
   {
     family: 'color-picker',
+    intents: [{ kind: 'press', part: 'swatch' }],
+    name: 'a preset is written from its own numbers, and settles',
+    setup: brand({ swatches: '#00aa00, #ff0000' }),
+  },
+  {
+    family: 'color-picker',
+    intents: [
+      { event: 'before-change', kind: 'refuse' },
+      { kind: 'press', part: 'swatch' },
+    ],
+    name: 'a refused preset leaves the color',
+    setup: brand({ swatches: '#00aa00, #ff0000' }),
+  },
+  {
+    family: 'color-picker',
+    intents: [{ kind: 'press', part: 'swatch' }],
+    name: 'a read-only picker takes no preset',
+    setup: brand({ readonly: true, swatches: '#00aa00, #ff0000' }),
+  },
+  {
+    family: 'color-picker',
+    intents: [{ erase: 2, kind: 'type', text: '200' }, { kind: 'leave' }],
+    name: 'a number typed into a channel writes that channel',
+    setup: brand({ 'channel-fields': true, 'no-value': true }),
+  },
+  {
+    family: 'color-picker',
     intents: [{ erase: 7, kind: 'type' }, { kind: 'leave' }],
     name: 'a required picker emptied is marked',
     setup: brand({ required: true }),

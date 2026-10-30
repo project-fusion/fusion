@@ -705,7 +705,8 @@ export default styles(
         web([rule({ flex: '1 1 0' })]),
       ]),
       on('format', [
-        native([rule({ flexGrow: 1 })]),
+        /* The web sets it in small capitals, which a phone's fonts do not all have: capitals at that size. */
+        native([rule({ '--helix-text-control': token('text-xs'), flexGrow: 1 })]),
         web([rule({ fontFamily: token('font-mono'), fontVariantCaps: 'all-small-caps' })]),
       ]),
       /* A slotted dropper is sized here, because nothing else sizes it. */
