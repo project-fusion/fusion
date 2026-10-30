@@ -20,6 +20,57 @@ const field = (props: Readonly<Record<string, boolean | number | string>> = {}) 
 export const INPUT: readonly Scenario[] = [
   {
     family: 'input',
+    intents: [
+      { kind: 'press', part: 'reveal' },
+      { kind: 'type', text: 'a' },
+      { kind: 'press', part: 'reveal' },
+    ],
+    name: 'the reveal button shows and hides a password, and sends nothing',
+    setup: field({ 'default-value': 'hunter2', reveal: true, type: 'password' }),
+  },
+  {
+    family: 'input',
+    intents: [
+      { kind: 'focus' },
+      { key: 'ArrowUp', kind: 'key' },
+      { key: 'ArrowDown', kind: 'key' },
+      { key: 'ArrowDown', kind: 'key' },
+    ],
+    name: 'the arrows step a number by its step',
+    setup: field({ 'default-value': '10', step: 5, type: 'number' }),
+  },
+  {
+    family: 'input',
+    intents: [{ kind: 'focus' }, { key: 'ArrowUp', kind: 'key' }, { key: 'ArrowUp', kind: 'key' }],
+    name: 'the arrows keep a number within max, on the step from min',
+    setup: field({ 'default-value': '8', max: 10, min: 1, step: 3, type: 'number' }),
+  },
+  {
+    family: 'input',
+    intents: [{ kind: 'focus' }, { key: 'ArrowUp', kind: 'key' }],
+    name: 'an empty number steps from nothing to min',
+    setup: field({ min: 5, type: 'number' }),
+  },
+  {
+    family: 'input',
+    intents: [{ kind: 'type', text: '20' }, { kind: 'leave' }],
+    name: 'a number above max is wrong once the reader leaves it',
+    setup: field({ max: 10, type: 'number' }),
+  },
+  {
+    family: 'input',
+    intents: [{ kind: 'type', text: '2' }, { kind: 'leave' }],
+    name: 'a number below min is wrong once the reader leaves it',
+    setup: field({ min: 10, type: 'number' }),
+  },
+  {
+    family: 'input',
+    intents: [{ kind: 'type', text: '3' }, { kind: 'leave' }],
+    name: 'a number off its step is wrong once the reader leaves it',
+    setup: field({ step: 2, type: 'number' }),
+  },
+  {
+    family: 'input',
     intents: [{ kind: 'type', text: 'Ada' }, { kind: 'leave' }],
     name: 'each character asks, then sends input, and leaving sends change',
     setup: field(),

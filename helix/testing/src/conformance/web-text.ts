@@ -110,6 +110,34 @@ export const typeInto = async (
 }
 
 /**
+ * What a browser does for an arrow key in a `number` field, which a script's key
+ * never makes it do: the field's own `stepUp` or `stepDown`, then `input` and
+ * `change` where the number moved.
+ */
+export const stepByKey = (mounted: Mounted, key: string): void => {
+  const control = controlOf(mounted)
+  if (
+    !(control instanceof HTMLInputElement) ||
+    control.type !== 'number' ||
+    deepActive() !== control ||
+    control.readOnly ||
+    (key !== 'ArrowUp' && key !== 'ArrowDown')
+  ) {
+    return
+  }
+  const before = control.value
+  if (key === 'ArrowUp') {
+    control.stepUp()
+  } else {
+    control.stepDown()
+  }
+  if (control.value !== before) {
+    control.dispatchEvent(new InputEvent('input', { bubbles: true, composed: true }))
+    control.dispatchEvent(new Event('change', { bubbles: true }))
+  }
+}
+
+/**
  * Moves focus out of the field. **The browser commits an edit it made with
  * `change`** as the field loses focus, and the text a script wrote is
  * committed here as the browser would commit a reader's.

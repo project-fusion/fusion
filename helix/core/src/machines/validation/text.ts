@@ -48,6 +48,14 @@ export interface TextSentences {
   readonly url: string
 }
 
+/** The sentences a phone says for a `number` field's text, by the flag each says. */
+export const NUMBER_SENTENCES: Readonly<Record<'bad' | 'off' | 'over' | 'under', string>> = {
+  bad: 'Enter a number.',
+  off: 'Use {below} or {above}.',
+  over: 'Use {max} or less.',
+  under: 'Use {min} or more.',
+}
+
 /** Helix's own sentences, in English. */
 export const TEXT_SENTENCES: TextSentences = {
   email: 'Enter an email address.',

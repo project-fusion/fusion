@@ -66,6 +66,30 @@ pub struct TextEntry {
     /// can still read, select and copy it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub readonly: Option<String>,
+    /// The prop that offers a press that shows and hides a password, as an
+    /// input's `reveal`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reveal: Option<String>,
+    /// The value the element computes as whether its press that reveals is
+    /// drawn: while `reveal` holds and `kind` is a password.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unveils: Option<String>,
+    /// The value the element computes as whether the password shows.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bared: Option<String>,
+    /// The prop that says what the text is, as an input's `type`: a `number`
+    /// reads `lowest`, `highest`, and `stride`, and a `password` hides its text.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
+    /// The prop that holds the least number of a `number` kind.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lowest: Option<String>,
+    /// The prop that holds the greatest number of a `number` kind.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub highest: Option<String>,
+    /// The prop that holds the step of a `number` kind.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stride: Option<String>,
     /// The value the element computes as whether its press that clears is
     /// drawn: while `offers` holds, the field holds text, and the reader may
     /// change it. A render reads it as `text.clearShown`.
@@ -118,7 +142,14 @@ pub fn entry(lit: &Lit) -> Result<TextEntry, String> {
         };
         let slot = match key.as_str() {
             "blank" => &mut read.blank,
+            "bared" => &mut read.bared,
             "caret" => &mut read.caret,
+            "highest" => &mut read.highest,
+            "kind" => &mut read.kind,
+            "lowest" => &mut read.lowest,
+            "reveal" => &mut read.reveal,
+            "stride" => &mut read.stride,
+            "unveils" => &mut read.unveils,
             "cell" => &mut read.cell,
             "cleans" => &mut read.cleans,
             "complete" => &mut read.complete,

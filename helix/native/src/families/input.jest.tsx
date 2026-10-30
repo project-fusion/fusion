@@ -80,6 +80,92 @@ const heard = (): { events: string[]; props: Partial<HelixInputProps> } => {
 const Input = (props: HelixInputProps) => themed(<HelixInput {...props} />)
 
 describe('the generated Input', () => {
+  describe('a password with reveal', () => {
+    const toggle = () => screen.getByRole('togglebutton', { name: 'Show password' })
+
+    test('hides its text, and the press shows it and hides it again', async () => {
+      const typed = () => screen.getByLabelText('Password')
+      await render(
+        <HelixTheme mode="light">
+          <HelixInput defaultValue="hunter2" label="Password" reveal type="password" />
+        </HelixTheme>,
+      )
+      expect(typed().props.secureTextEntry).toBe(true)
+      expect(toggle().props.accessibilityState.checked).toBe(false)
+      await fireEvent.press(toggle())
+      expect(typed().props.secureTextEntry).toBe(false)
+      expect(toggle().props.accessibilityState.checked).toBe(true)
+      await fireEvent.press(toggle())
+      expect(typed().props.secureTextEntry).toBe(true)
+    })
+
+    test('draws no press on another type, or without reveal', async () => {
+      await render(
+        <HelixTheme mode="light">
+          <HelixInput label="Email" reveal type="email" />
+          <HelixInput label="Password" type="password" />
+        </HelixTheme>,
+      )
+      expect(screen.queryByRole('togglebutton')).toBeNull()
+    })
+
+    test('does nothing while disabled', async () => {
+      await render(
+        <HelixTheme mode="light">
+          <HelixInput defaultValue="x" disabled label="Password" reveal type="password" />
+        </HelixTheme>,
+      )
+      await fireEvent.press(toggle())
+      expect(screen.getByLabelText('Password').props.secureTextEntry).toBe(true)
+    })
+  })
+
+  describe('a number', () => {
+    test('says what is wrong with it once the reader leaves', async () => {
+      await render(
+        <HelixTheme mode="light">
+          <HelixInput label="Age" max="10" min="2" step="2" type="number" />
+        </HelixTheme>,
+      )
+      const age = screen.getByLabelText('Age')
+      for (const [text, said] of [
+        ['20', 'Use 10 or less.'],
+        ['1', 'Use 2 or more.'],
+        ['3', 'Use 2 or 4.'],
+      ] as const) {
+        await fireEvent(age, 'focus')
+        await fireEvent.changeText(age, text)
+        await fireEvent(age, 'blur')
+        expect(screen.getByText(said)).toBeTruthy()
+      }
+    })
+
+    test('stepUp and stepDown on its ref move it and keep it on its grid', async () => {
+      const ref = createRef<
+        FieldHandle & { stepDown: (n?: number) => void; stepUp: (n?: number) => void }
+      >()
+      const seen: unknown[] = []
+      await render(
+        <HelixTheme mode="light">
+          <HelixInput
+            defaultValue="5"
+            label="Age"
+            max="9"
+            min="1"
+            onChange={(event) => seen.push(event.target.value)}
+            ref={ref as never}
+            step="2"
+            type="number"
+          />
+        </HelixTheme>,
+      )
+      await act(async () => ref.current?.stepUp())
+      await act(async () => ref.current?.stepUp(5))
+      await act(async () => ref.current?.stepDown(2))
+      expect(seen).toEqual(['7', '9', '5'])
+    })
+  })
+
   test('is a field named by its label and described by its hint, with its placeholder', async () => {
     await render(<Input hint="We never share it." label="Email" placeholder="you@example.com" />)
     expect(field().props.accessibilityLabel).toBe('Email')
