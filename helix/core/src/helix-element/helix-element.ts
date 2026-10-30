@@ -140,6 +140,9 @@ const attached = new WeakMap<HelixElement, ElementInternals>()
 export const internalsOf = (element: HelixElement): ElementInternals =>
   attached.get(element) as ElementInternals
 
+/** Each class's lower-case spellings, and the attribute each one stands for. */
+const LOWERED = new WeakMap<object, Map<string, string>>()
+
 /**
  * @summary Base class every Helix element extends.
  *
@@ -500,6 +503,40 @@ export class HelixElement extends LitElement {
    * shadow root gets, which is what keeps the other four out of a Button.
    */
   protected static markRules: readonly string[] = []
+
+  /**
+   * Each attribute Lit observes, and each camelCase property's name in lower
+   * case.
+   *
+   * React writes an attribute for a prop on an element that is not defined yet,
+   * and on a server, and HTML lowers its name. So `defaultPosition={16}` arrives
+   * as `defaultposition`, which names no property Lit knows, and the value was
+   * dropped with no error. `attributeChangedCallback` reads the lowered name as
+   * the property's own attribute, so either spelling works in either order.
+   */
+  static override get observedAttributes(): string[] {
+    // biome-ignore lint/complexity/noThisInStatic: Lit finalizes the class it is asked on, so this has to be the class being defined, where the class name would read the base's
+    const attributes = super.observedAttributes
+    const lowered = new Map<string, string>()
+    // biome-ignore lint/complexity/noThisInStatic: Lit finalizes the class it is asked on, so this has to be the class being defined, where the class name would read the base's
+    for (const [name, options] of this.elementProperties) {
+      const attribute = options.attribute
+      if (typeof name === 'string' && typeof attribute === 'string') {
+        const spelled = name.toLowerCase()
+        if (spelled !== attribute && !attributes.includes(spelled)) {
+          lowered.set(spelled, attribute)
+        }
+      }
+    }
+    // biome-ignore lint/complexity/noThisInStatic: Lit finalizes the class it is asked on, so this has to be the class being defined, where the class name would read the base's
+    LOWERED.set(this, lowered)
+    return [...attributes, ...lowered.keys()]
+  }
+
+  /** @internal Called by the browser when an observed attribute changes. */
+  override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
+    super.attributeChangedCallback(LOWERED.get(this.constructor)?.get(name) ?? name, old, value)
+  }
 
   /**
    * Prepends the shadow-root reset to every subclass's styles, so no component
