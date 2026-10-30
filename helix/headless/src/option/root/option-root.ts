@@ -76,11 +76,11 @@ export class HelixHeadlessOption extends HelixElement {
    *
    * Written by the listbox once a reader moves the highlight. Style it with
    * `:state(active)`, or `::part(item-active)` for an option inside another
-   * component's shadow root. The `data-active` attribute sets it from markup;
-   * it is also written back for stylesheets from before the state, and no
-   * stylesheet of the library's own selects it.
+   * component's shadow root. The `data-active` attribute sets it from markup
+   * and is never written back: a listbox can highlight an option before React
+   * hydrates it, and React reports an attribute it did not render.
    */
-  @property({ attribute: 'data-active', reflect: true, type: Boolean })
+  @property({ attribute: 'data-active', type: Boolean })
   active = false
 
   /**
