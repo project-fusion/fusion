@@ -198,6 +198,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly colorField: Computes<'painted' | 'picked' | 'said'>
   /** The list of files an element a reader picks files into holds. */
   readonly files: Computes<'list'>
+  /** The rows near the screen an element that windows a long set draws. */
+  readonly window: Computes<'list'>
   /** What a tour's stop computes, and the words of its Back, Next, and Skip. */
   readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
     readonly words: Computes<'back' | 'next' | 'skip'>
@@ -683,6 +685,8 @@ export interface RepeatAttributes extends Common {
   readonly each?: Read | Derivation
   readonly key?: string
   readonly part: string
+  /** A phone draws it in a list that windows it: its first child is a copy for each row, and what follows stands after the rows. */
+  readonly windowed?: boolean
 }
 
 /** A repeat. */

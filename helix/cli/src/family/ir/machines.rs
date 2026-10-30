@@ -86,7 +86,7 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, ValueRange,
+    TextEntry, Toggle, ValueRange, WindowChoice,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -194,6 +194,9 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(files) = &api.files {
         uses.push(filed(files, tree));
+    }
+    if let Some(window) = &api.window {
+        uses.push(windowed(window));
     }
     if let Some(color) = &api.color {
         uses.push(colored(color, tree));
@@ -565,6 +568,30 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
             "range"
         }
         .to_owned(),
+    }
+}
+
+/// A window over a long set of items, bound to the props it reads, the states
+/// it holds, the events it sends, and the value that holds the rows. **No
+/// machine of core's holds it**: the web's element windows its own rows, and
+/// the native runtime hosts it as `window`.
+fn windowed(window: &WindowChoice) -> MachineUse {
+    use crate::family::api::Names;
+    let mut bind = BTreeMap::from([("list".to_owned(), Bound::State(window.list.clone()))]);
+    for (name, value, names) in window.bound() {
+        bind.insert(
+            name.to_owned(),
+            match names {
+                Names::Prop => Bound::Prop(value.to_owned()),
+                Names::State => Bound::State(value.to_owned()),
+                Names::Event => Bound::Event(value.to_owned()),
+                Names::Part => Bound::Part(value.to_owned()),
+            },
+        );
+    }
+    MachineUse {
+        bind,
+        machine: "window".to_owned(),
     }
 }
 

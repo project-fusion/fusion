@@ -72,6 +72,7 @@ const GIVEN: &[&str] = &[
     "derived",
     "entry",
     "files",
+    "window",
     "index",
     "notice",
     "notices",

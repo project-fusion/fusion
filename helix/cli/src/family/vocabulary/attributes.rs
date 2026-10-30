@@ -355,6 +355,10 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     the text is as wide as the widest of them on both platforms, where the
     web stacks them in one cell and a phone measures each. */
     ("widest", &[NodeKind::Text], Shape::Parts),
+    /* A repeat a phone draws in a list that windows it: its first child is a
+    copy for each row, and what follows stands after the rows, inside what
+    scrolls. */
+    ("windowed", &[NodeKind::Repeat], Shape::Set),
 ];
 
 /// Holds one attribute of a node to the table.

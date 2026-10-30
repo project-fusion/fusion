@@ -40,7 +40,10 @@ fn the_web_reaches_a_drawn_part_through_the_box_that_draws_it() {
     );
     assert_eq!(unresolved(&group), Vec::<String>::new());
     let css = emit(&group);
-    assert!(css.contains(":host [part=\"select-all\"]::part(box) {"), "{css}");
+    assert!(
+        css.contains(":host [part=\"select-all\"]::part(box) {"),
+        "{css}"
+    );
     assert!(
         css.contains(":host(:where(:state(invalid))) [part=\"select-all\"]::part(mark) {"),
         "{css}"
