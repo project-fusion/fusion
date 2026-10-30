@@ -17,6 +17,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { fileKind, fileSize } from '@fusion.dev/helix-core/file-input'
 import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -28,58 +29,6 @@ import { barOf, type FileStatus, saysStatus } from '../status.js'
 export type { FileStatus } from '../status.js'
 
 import '../../tag/root/index.js'
-
-/**
- * A file's size, at the largest unit that leaves a number worth reading.
- *
- * Binary steps, because that is what a file system reports and what the number
- * beside it in a finder will say. One decimal place from kilobytes up and none
- * for bytes: `1.2 MB` is the reading, `1.23 MB` is noise, and `1.5 bytes` is not
- * a thing.
- *
- * `Intl.NumberFormat` for the number rather than `toFixed`, so a decimal comma
- * lands where a decimal comma belongs. The unit is not localized with it: `MB`
- * is written the same way in the places this ships, and `Intl`'s own byte units
- * carry no scale to pick from. A size under a kilobyte is a count of bytes,
- * which `inBytes` writes in words.
- */
-const size = (bytes: number, locale: string, inBytes: (count: number) => string): string => {
-  const units = ['', 'KB', 'MB', 'GB', 'TB']
-  let value = bytes
-  let step = 0
-  while (value >= 1024 && step < units.length - 1) {
-    value /= 1024
-    step += 1
-  }
-  if (step === 0) {
-    return inBytes(value)
-  }
-  const written = new Intl.NumberFormat(locale || undefined, { maximumFractionDigits: 1 }).format(
-    value,
-  )
-  return `${written} ${units[step]}`
-}
-
-/**
- * What kind of file it is, in the shortest honest form.
- *
- * The subtype of the MIME type, so `image/png` reads `PNG`, which is the word a
- * reader already has for it. A browser leaves `type` empty for anything it does
- * not recognize, so the extension is the fallback: it is what the name already
- * shows, which makes it a poor label and a better one than nothing.
- */
-const kind = (file: File): string => {
-  /* The extension first, because it is the word a reader has for the file:
-     a Word document's subtype is a 59-character vendor string and a text
-     file's is `plain`. The subtype only where the name has no extension, and
-     only a short one. */
-  const extension = /\.([a-z0-9]{1,6})$/i.exec(file.name)?.[1]
-  if (extension) {
-    return extension.toUpperCase()
-  }
-  const subtype = file.type.split('/')[1]?.replace(/^x-/, '').split('+')[0] ?? ''
-  return /^[a-z0-9]{1,6}$/i.test(subtype) ? subtype.toUpperCase() : 'File'
-}
 
 /**
  * @summary A field for choosing files from a picker or by dropping them on it.
@@ -807,10 +756,10 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    */
   protected renderMeta(file: File): TemplateResult {
     return html`<${this.tag('tag')} part="size"
-    exportparts="cell: size-cell, dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, link: size-link, start: size-start">${size(file.size, wordsLocale(this), (count) => formatWords(this, 'bytesLabel', { count }))}</${this.tag('tag')}>
+    exportparts="cell: size-cell, dismiss: size-dismiss, dismiss-mark: size-dismiss-mark, label: size-label, link: size-link, start: size-start">${fileSize(file.size, wordsLocale(this), (count) => formatWords(this, 'bytesLabel', { count }))}</${this.tag('tag')}>
       <${this.tag('tag')}
         part="kind"
-      exportparts="cell: kind-cell, dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, link: kind-link, start: kind-start">${kind(file)}</${this.tag('tag')}>`
+      exportparts="cell: kind-cell, dismiss: kind-dismiss, dismiss-mark: kind-dismiss-mark, label: kind-label, link: kind-link, start: kind-start">${fileKind(file)}</${this.tag('tag')}>`
   }
 
   /**
