@@ -1,9 +1,5 @@
 /**
  * The platform diagram, which draws what goes into Fusion and what comes out.
- *
- * It shares its visual language with the derivation diagram and owns its own
- * sheet: a CSS module scopes animation names per file, so the keyframes the
- * drawing uses are defined here and not borrowed from another sheet.
  */
 
 /**
@@ -120,32 +116,6 @@
   }
 }
 
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .platformRing {
-      animation: platform-ring 48s linear infinite;
-      transform-box: fill-box;
-      transform-origin: center;
-    }
-  }
-}
-
-.platformCorners {
-  rx: var(--helix-radii-lg);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .platformStars {
-    animation: platform-twinkle 7s ease-in-out infinite alternate;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .platformField {
-    animation: platform-field-drift 26s linear infinite;
-  }
-}
-
 /* The site's glass, and a grid so the mark sits at its center. */
 .platformGlass {
   backdrop-filter: var(--site-glass-backdrop);
@@ -155,30 +125,4 @@
   display: grid;
   inline-size: 100%;
   place-items: center;
-}
-
-@keyframes platform-ring {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes platform-twinkle {
-  from {
-    opacity: 0.35;
-  }
-
-  to {
-    opacity: 0.7;
-  }
-}
-
-@keyframes platform-field-drift {
-  from {
-    translate: 0 0;
-  }
-
-  to {
-    translate: 40px 0;
-  }
 }
