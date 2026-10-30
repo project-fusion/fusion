@@ -862,6 +862,14 @@ helix-toggle[disabled]::part(item) {
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* In the rail each title is on one line, as the flat links are. */
+:where(helix-outline[variant="rail"]) :where(li) > :where(a) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 :where(helix-outline) :where(li) > :where(a):hover {
   background-color: var(
     --outline-link-hover-background-color,

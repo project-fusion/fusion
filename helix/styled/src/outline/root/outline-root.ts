@@ -23,6 +23,13 @@ import { styles } from './outline-root.css.js'
  *
  * A heading slotted into `heading` is set above the links, lined up with them.
  *
+ * **The rail.** With `variant="rail"` the outline is a slim column of ticks,
+ * one per section, at the edge of a long scroll. The section in view is a longer
+ * tick in the primary color, and a deeper level is a shorter one. Hovering or
+ * focusing the rail opens a frosted surface of the titles, as Popover's frosted
+ * material is drawn, each on one line with the current one lit. Escape,
+ * the pointer leaving and focus leaving close it.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -43,6 +50,13 @@ import { styles } from './outline-root.css.js'
  * @cssproperty --outline-link-radius - The corner radius of a link's hover fill.
  * @cssproperty --outline-rail - The width of the gutter that holds the line and the moving mark.
  * @cssproperty --outline-rule-color - The color of the line down the leading edge.
+ * @cssproperty --outline-surface-backdrop - The backdrop filter of that surface, which blurs what is behind it.
+ * @cssproperty --outline-surface-background-color - The fill of the surface the rail opens into.
+ * @cssproperty --outline-surface-max-inline-size - The widest the surface grows before a title is cut with an ellipsis.
+ * @cssproperty --outline-tick-color - The color of a tick in the rail.
+ * @cssproperty --outline-tick-current-color - The color of the tick of the section in view.
+ * @cssproperty --outline-tick-gap - The space between ticks.
+ * @cssproperty --outline-tick-length - The length of a top-level tick, from which deeper levels are shortened and the current one lengthened.
  */
 @customElement('helix-outline')
 export class HelixOutline extends HelixHeadlessOutline {
