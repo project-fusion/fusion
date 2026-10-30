@@ -329,7 +329,10 @@ impl Reader<'_> {
                     .and_then(|tag| self.platforms.tags.get(tag))
                     .is_some_and(|about| about.native && about.hooks.contains(name));
                 if !hook {
-                    let on = tag.map_or_else(|| "the element it is on".to_owned(), |tag| format!("`{tag}`"));
+                    let on = tag.map_or_else(
+                        || "the element it is on".to_owned(),
+                        |tag| format!("`{tag}`"),
+                    );
                     self.add(property.span.start, "web-style", format!("`{name}` is not a hook of {on}, so a phone does not read it. Set it in a `.web.tsx` file, or set one of the element's own hooks."));
                 }
             } else if !NATIVE_STYLE.contains(&name) {

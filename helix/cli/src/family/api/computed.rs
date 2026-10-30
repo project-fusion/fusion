@@ -9,7 +9,7 @@
 //! `skip-words`, read as `stop.words.back` and the rest.
 
 use super::{
-    color, copy, countdown, delay, files, notices, sections, stack, total, tour, validation,
+    color, copy, countdown, delay, files, notices, sections, stack, total, tour, validation, window,
 };
 use crate::family::read::Lit;
 
@@ -21,6 +21,7 @@ pub const FEATURES: &[&str] = &[
     "countdown",
     "delay",
     "files",
+    "window",
     "notice",
     "notices",
     "queue",
@@ -63,6 +64,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "queue" => push("queue.queued", &countdown::queue(value)?.waiting),
             "sections" => push("sections.list", &sections::sections(value)?.list),
             "files" => push("files.list", &files::files(value)?.list),
+            "window" => push("window.list", &window::window(value)?.list),
             "color" => {
                 for (field, name) in color::color(value)?.computed {
                     push(&format!("color.{field}"), &name);
