@@ -11,6 +11,16 @@
   flex-direction: column;
 }
 
+/* **A sticky band in a pane stays under the divider.** The divider reaches into
+   the pane beside it, so it has to paint over what is there, and an App Header's
+   sticky layer is ten times higher than the divider's. The sticky layer is a
+   token, so it is moved here, for what is in a pane and nothing outside the
+   splitter. */
+[part="start"],
+[part="end"] {
+  --helix-layer-sticky: calc(var(--helix-layer-raised) - 1);
+}
+
 [part="start"] {
   flex: 0 0 var(--splitter-position, 50%);
   /* Both, because a flex item's floor is its content and a pane holding anything
