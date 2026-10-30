@@ -318,11 +318,18 @@ export const PlatformDiagram = () => (
 export const PlatformDiagramStacked = () => (
   <div className={styles.platformStacked}>
     <svg
-      aria-hidden="true"
+      aria-labelledby="platform-stacked-title platform-stacked-desc"
       className={styles.platformStackedSvg}
-      role="presentation"
+      role="img"
       viewBox="0 0 340 380"
     >
+      <title id="platform-stacked-title">What goes into Fusion and what comes out</title>
+      <desc id="platform-stacked-desc">
+        Your brand, your code and your decisions flow into Fusion. Out of it come Helix, which
+        checks every screen, Hartley, which does the work with any model, and Cortex, which keeps
+        every decision with its reason.
+      </desc>
+
       <defs>
         <radialGradient id="platform-bloom-stacked">
           <stop offset="0" stopColor="var(--helix-color-primary)" stopOpacity="0.22" />
@@ -372,14 +379,14 @@ export const PlatformDiagramStacked = () => (
 
       <g className={styles.platformBase} fill="none" strokeLinecap="round" strokeWidth="1.6">
         <g className={styles.platformFan}>
-          <path d="M57 88C57 132,170 128,170 170" />
-          <path d="M170 88V170" />
-          <path d="M283 88C283 132,170 128,170 170" />
+          <path d="M57 88C57 116,170 108,170 136" />
+          <path d="M170 88V136" />
+          <path d="M283 88C283 116,170 108,170 136" />
         </g>
         <g className={styles.platformFan}>
-          <path d="M170 170C170 210,57 206,57 264" />
-          <path d="M170 170V264" />
-          <path d="M170 170C170 210,283 206,283 264" />
+          <path d="M170 204C170 232,57 228,57 264" />
+          <path d="M170 204V264" />
+          <path d="M170 204C170 232,283 228,283 264" />
         </g>
       </g>
 
