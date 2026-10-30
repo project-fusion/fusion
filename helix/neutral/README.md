@@ -168,10 +168,16 @@ export default styles(
 - `rule(set)` or `rule(when, set)`. `platform` and `supports` are conditions
   in `when`.
 - **The later rule on a target wins**, however many conditions either has.
-  The web writes every condition inside `:where()`, so each rule on one
-  part ranks as the part does, and a phone ranks them the same way. A
-  selected tab drawn over its hover writes `{ selected: true }` after
-  `{ hover: true }`. A `{ part, selector }` rule ranks as its selector does.
+  The web starts every rule at the host and writes every condition inside
+  `:where()`, so each rule on one part ranks as `:host` and the part do, and
+  a phone ranks them the same way. A selected tab drawn over its hover writes
+  `{ selected: true }` after `{ hover: true }`. A `{ part, selector }` rule
+  ranks as its selector does.
+- **What the host holds is written inside `:host()`**:
+  `:host(:where(:focus-within)) [part="field"]`, and `:host [part="field"]`
+  where the rule asks nothing of the host. WebKit does not match a rule
+  again as the host's focus or hover changes when `:host()` is itself inside
+  `:where()`.
 - `variants(prop, { value: set })` is one rule for each value of a prop.
 - **A condition's name is resolved in one namespace**, from the headless
   source: `{ hover: true, disabled: false }` on a tab is the part's

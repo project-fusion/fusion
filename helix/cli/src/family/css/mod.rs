@@ -254,7 +254,7 @@ mod tests {
         .tree;
         assert_eq!(
             shipped(&emit(&row)),
-            "[part~=\"row-current\"] {color: red}[part=\"start\"]::slotted(*) {margin: 0}[part=\"rail\"]::before {content: var(--list-item-rail-content, \"\")}:host(:where([disabled])) {opacity: 0.5}"
+            ":host [part~=\"row-current\"] {color: red}:host [part=\"start\"]::slotted(*) {margin: 0}:host [part=\"rail\"]::before {content: var(--list-item-rail-content, \"\")}:host(:where([disabled])) {opacity: 0.5}"
         );
     }
 
@@ -265,7 +265,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            ":where(:host(:not(:disabled))) [part=\"button\"]:where(:is(:hover, :active)) {color: red}"
+            ":host(:where(:not(:disabled))) [part=\"button\"]:where(:is(:hover, :active)) {color: red}"
         );
     }
 
@@ -276,7 +276,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            ":where(:host(:not(:disabled)[emphasis=\"solid\"])) [part=\"button\"]:where(:hover) {color: var(--button-foreground-color, var(--_button-tone))}"
+            ":host(:where(:not(:disabled)[emphasis=\"solid\"])) [part=\"button\"]:where(:hover) {color: var(--button-foreground-color, var(--_button-tone))}"
         );
     }
 
@@ -287,7 +287,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            "@media (prefers-reduced-motion: reduce) {[part=\"spinner\"] {animation-duration: var(--_b-crawl)}}@supports (text-box: trim-both cap alphabetic) {slot:not([name]) {display: block}}"
+            "@media (prefers-reduced-motion: reduce) {:host [part=\"spinner\"] {animation-duration: var(--_b-crawl)}}@supports (text-box: trim-both cap alphabetic) {slot:not([name]) {display: block}}"
         );
     }
 
@@ -298,7 +298,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            "@container (inline-size < 22rem) {:where(:host([direction=\"row\"])) [part=\"list\"] {gap: 0}}"
+            "@container (inline-size < 22rem) {:host(:where([direction=\"row\"])) [part=\"list\"] {gap: 0}}"
         );
     }
 
@@ -309,7 +309,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            "@media (forced-colors: active) {[part=\"track\"] {outline: none}[part=\"fill\"] {color: Highlight}}[part=\"fill\"] {color: red}@media (forced-colors: active) {[part=\"track\"] {color: red}}"
+            "@media (forced-colors: active) {:host [part=\"track\"] {outline: none}:host [part=\"fill\"] {color: Highlight}}:host [part=\"fill\"] {color: red}@media (forced-colors: active) {:host [part=\"track\"] {color: red}}"
         );
     }
 
@@ -332,7 +332,7 @@ mod tests {
         .tree;
         assert_eq!(
             shipped(&emit(&skeleton)),
-            "[part~=\"skeleton\"] {display: block}:where(:host(:state(wrapping))) [part=\"skeleton\"] {inset: 0}[part~=\"line\"]:where(:last-child:not(:first-child)) {inline-size: 60%}"
+            ":host [part~=\"skeleton\"] {display: block}:host(:where(:state(wrapping))) [part=\"skeleton\"] {inset: 0}:host [part~=\"line\"]:where(:last-child:not(:first-child)) {inline-size: 60%}"
         );
         let refused = family(
             &default_export(
@@ -349,7 +349,7 @@ mod tests {
         let written = css(
             "export default family('b', { rules: [{ on: 'svg', platform: 'native', set: [['scale', '-1 1']], when: { dir: 'rtl' } }, { on: 'svg', set: [['color', 'red']] }] })",
         );
-        assert_eq!(shipped(&written), "[part=\"svg\"] {color: red}");
+        assert_eq!(shipped(&written), ":host [part=\"svg\"] {color: red}");
     }
 
     #[test]

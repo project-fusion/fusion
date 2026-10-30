@@ -8,9 +8,9 @@
 //! **Each rule carries the specificity of the selector the web output writes
 //! for it.** A browser orders matching rules by specificity and then by source
 //! order, and the native runtime sorts them the same way. The web output
-//! writes every condition inside `:where()`, so a rule's specificity is its
-//! target's alone: every rule on one part ranks the same, and the later one
-//! wins, whatever it asks. Button's generic hover and an emphasis rule both
+//! starts every rule at the host and writes every condition inside
+//! `:where()`, so a rule's specificity is one `:host` and its target's: every
+//! rule on one part ranks the same, and the later one wins, whatever it asks. Button's generic hover and an emphasis rule both
 //! rank as the button part does, so the emphasis written after the hover
 //! wins, which is why every emphasis declares its own hover after it.
 //!

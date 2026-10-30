@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -17,9 +17,11 @@ describe('the styled motion toggle', () => {
     }
     await element.updateComplete
     expect(part(element, 'button')?.querySelector('svg')).not.toBeNull()
-    const sheet = String(
-      (customElements.get('helix-motion-toggle') as unknown as { styles: { cssText: string } })
-        .styles.cssText,
+    const sheet = unweighted(
+      String(
+        (customElements.get('helix-motion-toggle') as unknown as { styles: { cssText: string } })
+          .styles.cssText,
+      ),
     )
     expect(sheet).toContain('--motion-toggle-background-color')
     expect(sheet).toContain(':host(:state(paused))')

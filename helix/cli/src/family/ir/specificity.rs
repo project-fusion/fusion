@@ -3,9 +3,11 @@
 use crate::family::ir::Rule;
 
 /// The specificity of the selector the web output writes for a rule: its
-/// target's alone, since every condition is written inside `:where()`.
+/// target's and one `:host`, since every condition is written inside
+/// `:where()` and every rule starts at the host.
 ///
-/// `:host` and `[part]` are one class-equivalent each. `::slotted(<tag>)` is
+/// `:host` and `[part]` are one class-equivalent each, so a rule on a part
+/// is two and a rule on the host is one. `::slotted(<tag>)` is
 /// two in the third column, the pseudo-element and its tag, as is a type
 /// selector in `inner`, such as `svg`. A region is its `slot`, a type, and
 /// its name, a class, unless it is every region. A written-out selector is
@@ -27,8 +29,9 @@ pub fn specificity(rule: &Rule) -> [u32; 3] {
                 None if host_rule => (0, 0),
                 None => (1, 0),
             };
+            /* The `:host` every rule starts at. */
             (
-                target_classes,
+                target_classes + 1,
                 target_types + slotted.as_deref().map_or(0, slotted_types),
             )
         }

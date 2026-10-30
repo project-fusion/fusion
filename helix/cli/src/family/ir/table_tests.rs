@@ -26,8 +26,8 @@ fn a_generic_hover_and_an_emphasis_rank_alike_so_the_later_wins() {
     let emphasis = first_rule(
         "export default family('b', { rules: [{ on: 'button', set: [], when: { emphasis: 'solid' } }] })",
     );
-    assert_eq!(hover.specificity, [0, 1, 0]);
-    assert_eq!(emphasis.specificity, [0, 1, 0]);
+    assert_eq!(hover.specificity, [0, 2, 0]);
+    assert_eq!(emphasis.specificity, [0, 2, 0]);
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn several_whens_are_several_rules_in_order() {
     );
     assert_eq!(read.len(), 2);
     assert_eq!((read[0].order, read[1].order), (0, 1));
-    assert_eq!(read[1].specificity, [0, 1, 0]);
+    assert_eq!(read[1].specificity, [0, 2, 0]);
 }
 
 #[test]
