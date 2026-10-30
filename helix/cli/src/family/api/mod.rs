@@ -377,11 +377,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
         .map(host::host)
         .transpose()?
         .unwrap_or_default();
-    let platform = match field("platform") {
-        None => None,
-        Some(Lit::Text(platform)) if platform == "web" => Some(Platform::Web),
-        Some(_) => return Err("`platform` is `'web'`".to_owned()),
-    };
+    let platform = platform_of(field("platform"))?;
     Ok(Headless {
         api: Api {
             clock: field("clock").map(clock::clock).transpose()?,
@@ -418,6 +414,15 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
         name: name.clone(),
         tree,
     })
+}
+
+/// The platform a source says it is only for, `'web'`, where it says one.
+fn platform_of(written: Option<&Lit>) -> Result<Option<Platform>, String> {
+    match written {
+        None => Ok(None),
+        Some(Lit::Text(platform)) if platform == "web" => Ok(Some(Platform::Web)),
+        Some(_) => Err("`platform` is `'web'`".to_owned()),
+    }
 }
 
 /// A headless source's fields with each feature in the intermediate form's
