@@ -212,6 +212,35 @@ pub struct ValueRange {
     /// place to land on it, as a splitter's `snap-threshold`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threshold: Option<String>,
+    /// The prop that gives the range a thumb for each value of its text, as a
+    /// slider's `range`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub several: Option<String>,
+    /// The prop that holds how many steps the thumbs stay apart.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub apart: Option<String>,
+    /// The prop that holds the words that join the first and the last value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub joins: Option<String>,
+    /// The prop that holds the name of the lowest thumb.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub least: Option<String>,
+    /// The prop that holds the name of the highest thumb.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub most: Option<String>,
+    /// The prop that holds the name of a thumb between the two.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub between: Option<String>,
+    /// The prop that names the control, which each thumb's name starts with.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub named: Option<String>,
+    /// The prop that holds the function that writes a value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub writes: Option<String>,
+    /// The value the element computes as its thumbs, one entry each, which a
+    /// repeat reads as `range.thumbs`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stops: Option<String>,
     /// The value the element computes as where its fill ends along the
     /// track, 0 to 1. A render reads it as `range.fillTo`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -260,6 +289,14 @@ impl ValueRange {
             ("stacked", self.stacked.as_ref(), Names::State),
             ("step", self.step.as_ref(), Names::Prop),
             ("template", self.template.as_ref(), Names::Prop),
+            ("several", self.several.as_ref(), Names::Prop),
+            ("apart", self.apart.as_ref(), Names::Prop),
+            ("joins", self.joins.as_ref(), Names::Prop),
+            ("least", self.least.as_ref(), Names::Prop),
+            ("most", self.most.as_ref(), Names::Prop),
+            ("between", self.between.as_ref(), Names::Prop),
+            ("named", self.named.as_ref(), Names::Prop),
+            ("writes", self.writes.as_ref(), Names::Prop),
             ("threshold", self.threshold.as_ref(), Names::Prop),
             ("value", Some(&self.value), Names::Prop),
         ]
@@ -285,6 +322,7 @@ impl ValueRange {
             ("range.reading", self.reading.as_ref()),
             ("range.said", self.said.as_ref()),
             ("range.spoken", self.spoken.as_ref()),
+            ("range.thumbs", self.stops.as_ref()),
         ]
         .into_iter()
         .filter_map(|(path, name)| name.map(|name| (path, name.as_str())))
@@ -354,6 +392,15 @@ pub fn range(lit: &Lit) -> Result<ValueRange, String> {
             "stacked" => &mut read.stacked,
             "step" => &mut read.step,
             "template" => &mut read.template,
+            "several" => &mut read.several,
+            "apart" => &mut read.apart,
+            "joins" => &mut read.joins,
+            "least" => &mut read.least,
+            "most" => &mut read.most,
+            "between" => &mut read.between,
+            "named" => &mut read.named,
+            "writes" => &mut read.writes,
+            "stops" => &mut read.stops,
             "threshold" => &mut read.threshold,
             "to" => &mut read.to,
             "value" => &mut value,

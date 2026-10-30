@@ -89,6 +89,77 @@ const Slider = (props: HelixSliderProps) => (
 )
 
 describe('the generated Slider', () => {
+  describe('a range', () => {
+    const thumbs = () =>
+      (screen.root?.queryAll(
+        (node) =>
+          node.props.accessibilityRole === 'adjustable' &&
+          typeof node.props.onAccessibilityAction === 'function',
+      ) ?? []) as never[]
+    const step = async (at: number, actionName: 'decrement' | 'increment') => {
+      await act(async () => {
+        ;(
+          thumbs()[at] as unknown as {
+            props: { onAccessibilityAction: (event: unknown) => void }
+          }
+        ).props.onAccessibilityAction({ nativeEvent: { actionName } })
+      })
+    }
+
+    test('is a control for each value, named by its place, and each stops at its neighbor', async () => {
+      const values: unknown[] = []
+      await render(
+        <Slider
+          defaultValue="20,21,80"
+          label="Stops"
+          minStepsBetweenThumbs={1}
+          onChange={(event) => values.push(event.target.value)}
+          range
+        />,
+      )
+      const said = thumbs().map(
+        (one) =>
+          (one as unknown as { props: { accessibilityLabel: string } }).props.accessibilityLabel,
+      )
+      expect(said).toEqual(['Stops minimum', 'Stops thumb 2', 'Stops maximum'])
+      expect(
+        (thumbs()[0] as unknown as { props: { accessibilityValue: object } }).props
+          .accessibilityValue,
+      ).toMatchObject({ max: 20, min: 0, now: 20 })
+      await step(0, 'increment')
+      expect(values).toEqual([])
+      await step(2, 'decrement')
+      expect(values).toEqual(['20,21,79'])
+    })
+
+    test('writes its readout with range-text, and a value with formatter', async () => {
+      await render(
+        <Slider
+          defaultValue="20,70"
+          formatter={(value) => `$${value}`}
+          label="Price"
+          range
+          rangeText="{start} until {end}"
+          showValue
+        />,
+      )
+      expect(drawn('$20 until $70')).toBe(1)
+    })
+
+    test('opens fully wide with no value', async () => {
+      await render(<Slider label="Price" range showValue />)
+      expect(drawn('0 to 100')).toBe(1)
+    })
+  })
+
+  test('formatter writes a single value and what a screen reader hears', async () => {
+    await render(
+      <Slider defaultValue="40" formatter={(value) => `${value} dB`} label="Gain" showValue />,
+    )
+    expect(drawn('40 dB')).toBe(1)
+    expect(control().props.accessibilityValue.text).toBe('40 dB')
+  })
+
   test('is one adjustable control named by its label, reading its value', async () => {
     await render(<Slider defaultValue="40" label="Volume" />)
     expect(control().props.accessibilityLabel).toBe('Volume')
