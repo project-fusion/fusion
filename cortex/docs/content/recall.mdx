@@ -87,7 +87,8 @@ assert_eq!(fusion_cortex_recall::estimate(&message), 108);
 ## Retrieval is a strategy
 
 A scorer ranks Engram's facts against a query. `Overlap` counts the words a
-fact shares with the query, leaving out common words such as `the` and `with`. `Vector` compares the query's embedding with each
+fact shares with the query, leaving out common words such as `the` and `with`.
+`Vector` compares the query's embedding with each
 fact's, and `Weighted` combines the two, as the Scoring memory by meaning guide
 describes. A fact that scores nothing still ranks, at half its confidence after
 decay, because what a project's sessions learned is often about the project and
