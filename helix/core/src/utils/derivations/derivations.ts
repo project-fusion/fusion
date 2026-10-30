@@ -57,6 +57,13 @@ export * from '../range-reading/indicator-derivations.js'
 export * from '../rating/rating-derivations.js'
 /* Slider's, the marks along its track and the room its readout keeps. */
 export * from '../slider/slider-derivations.js'
+
+/** `color-input-texted`: whether a color input draws its text field, which its swatch shape does not. */
+export const colorInputTexted: Derivation = (props) => props.variant !== 'swatch'
+
+/** `color-input-locked`: whether a color input's trigger takes no press, disabled or read-only. */
+export const colorInputLocked: Derivation = (props) =>
+  props.disabled === true || props.readonly === true
 /* Speed Dial's, its long press, its names, and an action's shortcut. */
 export * from '../speed-dial/speed-dial-derivations.js'
 /* Splitter's, the name its divider is read by. */
