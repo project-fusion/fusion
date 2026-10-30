@@ -70,7 +70,7 @@
     "@luma.gl/engine": "~9.3.6",
     "@luma.gl/shadertools": "~9.3.6",
     "@luma.gl/webgl": "~9.3.6",
-    "@types/bun": "^1.4.3",
+    "@types/bun": "^1.4.4",
     "@types/three": "^0.186.0",
     "d3-force-3d": "^3.0.6",
     "graphology": "^0.26.0",

@@ -39,7 +39,7 @@
     "@moonshine-ai/moonshine-wasm": "0.1.5"
   },
   "devDependencies": {
-    "@types/bun": "^1.4.3"
+    "@types/bun": "^1.4.4"
   },
   "homepage": "https://fusion.dev",
   "keywords": [
