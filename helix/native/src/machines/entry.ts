@@ -3,6 +3,7 @@ import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import type { KeyPress, Stop } from '@fusion.dev/helix-core/capabilities/types'
 import * as derivations from '@fusion.dev/helix-core/derivations'
 import {
+  type NumberField,
   type NumberFlaw,
   numberFieldFlaw,
   numberFieldKeypad,
@@ -144,6 +145,36 @@ const hosted = (
 
 /** The phone the app runs on, for the keypads it has. */
 const PHONE = Platform.OS === 'ios' ? 'iphone' : Platform.OS === 'android' ? 'android' : ''
+
+/**
+ * Where an edit left the field's caret: past what it put where the selection
+ * stood on `box`. The field reports its selection only after its text.
+ */
+const caretLeft = (typed: string, before: string, box: number): number => {
+  const { end, start } = caretSelection(box, before.length)
+  return Math.max(0, start + typed.length - (before.length - (end - start)))
+}
+
+/**
+ * What a field's kind asks of its `TextInput`. **A read-only field stays
+ * editable to iOS**, which lets a reader select and copy only then. It opens no
+ * keyboard, and an edit that still comes, a paste from the menu, puts the text
+ * back. Boxes drawn from a hidden field have nothing to select.
+ */
+const fieldKind = (kind: {
+  readonly bared: boolean
+  readonly disabled: boolean
+  readonly grid: NumberField
+  readonly numeric: boolean
+  readonly readonly: boolean
+  readonly selects: boolean
+  readonly unveils: boolean
+}): Readonly<Record<string, unknown>> => ({
+  editable: !kind.disabled && (!kind.readonly || kind.selects),
+  ...(kind.readonly && kind.selects ? { showSoftInputOnFocus: false } : {}),
+  ...(kind.unveils ? { secureTextEntry: !kind.bared } : {}),
+  ...(kind.numeric ? { inputMode: numberFieldKeypad(PHONE, kind.grid) } : {}),
+})
 
 /** The box the caret stands in: where it was put, within the text and the boxes. */
 const boxOf = (put: number | null, text: string, fills: number): number =>
@@ -324,16 +355,15 @@ export const useEntry = (
         return
       }
       const before = latest.current.text
-      /* Where the edit left the field's caret: past what it put where the
-         selection stood. The field reports its selection only after its text. */
-      const { end, start } = caretSelection(boxOf(latest.current.put, before, fills), before.length)
-      const left = start + typed.length - (before.length - (end - start))
       const next = clean(typed, latest.current.props)
-      const moved = clean(typed.slice(0, Math.max(0, left)), latest.current.props).length
-      if (next === before) {
+      const follow = () => {
         if (cell !== undefined) {
-          putCaret(moved)
+          const left = caretLeft(typed, before, boxOf(latest.current.put, before, fills))
+          putCaret(clean(typed.slice(0, left), latest.current.props).length)
         }
+      }
+      if (next === before) {
+        follow()
         /* A refused character leaves the field's own text to draw again. */
         hold((was) => ({ ...was }))
         return
@@ -342,9 +372,7 @@ export const useEntry = (
         return
       }
       edit(true)
-      if (cell !== undefined) {
-        putCaret(moved)
-      }
+      follow()
       const { complete } = latest.current.events
       if (complete !== undefined && Number.isInteger(fills) && next.length === fills) {
         tell(family, latest.current.props, complete, { value: next }, senderOf(family, next))
@@ -451,18 +479,11 @@ export const useEntry = (
   const view: PartBinding = useMemo(
     () => ({
       view: {
-        /* A read-only field stays editable to iOS, which lets a reader select
-           and copy only then. It opens no keyboard, and an edit that still
-           comes, a paste from the menu, puts the text back. Boxes drawn from
-           a hidden field have nothing to select. */
-        editable: !disabled && (!readonly || selects),
-        ...(readonly && selects ? { showSoftInputOnFocus: false } : {}),
+        ...fieldKind({ bared, disabled, grid, numeric, readonly, selects, unveils }),
         onBlur,
         onChangeText,
         onFocus,
         ...(shaping === undefined ? {} : { onSubmitEditing }),
-        ...(unveils ? { secureTextEntry: !bared } : {}),
-        ...(numeric ? { inputMode: numberFieldKeypad(PHONE, grid) } : {}),
         ref: fieldRef,
         ...(cell === undefined || !focused
           ? {}
