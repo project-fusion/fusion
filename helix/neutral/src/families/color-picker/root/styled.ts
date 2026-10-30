@@ -705,9 +705,21 @@ export default styles(
         web([rule({ flex: '1 1 0' })]),
       ]),
       on('format', [
-        /* The web sets it in small capitals, which a phone's fonts do not all have: capitals at that size. */
-        native([rule({ '--helix-text-control': token('text-xs'), flexGrow: 1 })]),
+        native([rule({ flexGrow: 1 })]),
         web([rule({ fontFamily: token('font-mono'), fontVariantCaps: 'all-small-caps' })]),
+      ]),
+      /* The web sets the word in small capitals, which a phone's fonts do not all
+         have: capitals of the same face at their height. */
+      on('format-face', [
+        native([
+          rule({
+            alignSelf: 'center',
+            fontFamily: token('font-mono'),
+            fontSize: '0.625rem',
+            fontWeight: token('weight-medium'),
+            textAlign: 'center',
+          }),
+        ]),
       ]),
       /* A slotted dropper is sized here, because nothing else sizes it. */
       on({ region: 'eyedropper-icon', slotted: '*' }, [
