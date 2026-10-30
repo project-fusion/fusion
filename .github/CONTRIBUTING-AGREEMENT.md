@@ -4,7 +4,7 @@ By opening a pull request against this repository, you agree to the terms below.
 There is nothing to sign and no form to fill in. Opening the pull request is the
 agreement.
 
-Last updated September 26, 2026. **Not reviewed by a lawyer.**
+Last updated October 30, 2026. **Not reviewed by a lawyer.**
 
 ## You keep your copyright, and you license it to everyone
 
@@ -59,5 +59,6 @@ treat it as third-party code, as described above, and name it.
 
 ## Questions
 
-Send questions about this agreement to the address in
-[`SECURITY.md`](SECURITY.md) before you open the pull request.
+Ask questions about this agreement in
+[Discussions](https://github.com/project-fusion/fusion/discussions) before you
+open the pull request.

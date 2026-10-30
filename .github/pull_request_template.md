@@ -16,3 +16,5 @@ Leave the checklist below in place. Do not tick what you did not run.
 - [ ] `cargo test --workspace` passes (if Rust changed)
 - [ ] New or changed behavior has a spec
 - [ ] Visual baselines updated with `bun run visual:update` on Linux, or accepted from a failed run with `helix visual accept` or `/accept` (if pixels moved)
+
+Opening this pull request accepts the [contributor agreement](https://github.com/project-fusion/fusion/blob/main/.github/CONTRIBUTING-AGREEMENT.md). Name the origin and license of any code that is not yours.

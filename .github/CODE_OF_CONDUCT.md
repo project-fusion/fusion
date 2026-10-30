@@ -7,7 +7,7 @@ as opposed ends up with people who are neither.
 
 **What we expect:** disagree with the argument, review the code and not the
 person, say "I was wrong" when you were, and assume the other reader is
-competent and busy rather than careless.
+competent and busy.
 
 **What is not acceptable:** harassment of any kind, sexualized language or
 imagery, insults, demeaning comments about someone's identity or background,
@@ -29,15 +29,14 @@ Report through
 if you would rather it not be public, or open an issue if you would. Reports go
 to the maintainers, who will read it and respond.
 
-Today the maintainers are one person, which is worth stating plainly rather than
-implying a committee that does not exist. If your report is about that person,
+Today the maintainers are one person. If your report is about that person,
 GitHub's own [report abuse](https://github.com/contact/report-abuse) is the path
 that does not run through them.
 
 ## Consequences
 
 Warning, then temporary block, then permanent block. We will say which one we
-are applying and why. We would rather explain once than escalate silently.
+are applying and why.
 
 ## Attribution
 
