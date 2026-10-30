@@ -47,7 +47,7 @@ describe('the styled feed', () => {
   })
 
   test('the count reaches a badge through the property and a state, and never the markup', async () => {
-    const element = (await mount(markup)) as Element & { unread: number }
+    const element = (await mount(markup)) as HTMLElement & { unread: number }
     expect(element.unread).toBe(1)
     expect(hasState(element, 'unread')).toBe(true)
     expect(element.hasAttribute('unread')).toBe(false)
