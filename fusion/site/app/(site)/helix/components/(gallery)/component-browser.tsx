@@ -269,19 +269,9 @@ export function ComponentBrowser({
           >
             <helix-icon name="funnel-simple" slot="start"></helix-icon>
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
-            {/* `suppressHydrationWarning`, because the listbox owns this node
-                  once it upgrades. It writes `data-active` onto whichever option
-                  is current, and a custom element registering early can do that
-                  before React hydrates the subtree, so React finds an attribute
-                  on the server HTML that its own render never produced. This is
-                  the case the flag exists for: the DOM here is written by
-                  something that is not React, and the mismatch is expected
-                  rather than a symptom. */}
-            <helix-option suppressHydrationWarning value={ALL}>
-              All categories
-            </helix-option>
+            <helix-option value={ALL}>All categories</helix-option>
             {categories.map((name) => (
-              <helix-option key={name} suppressHydrationWarning value={name}>
+              <helix-option key={name} value={name}>
                 {titleCase(name)}
               </helix-option>
             ))}
@@ -299,11 +289,9 @@ export function ComponentBrowser({
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              <helix-option suppressHydrationWarning value={ALL}>
-                All statuses
-              </helix-option>
+              <helix-option value={ALL}>All statuses</helix-option>
               {statuses.map((name) => (
-                <helix-option key={name} suppressHydrationWarning value={name}>
+                <helix-option key={name} value={name}>
                   {titleCase(name)}
                 </helix-option>
               ))}
@@ -332,7 +320,7 @@ export function ComponentBrowser({
             <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
             {sorts.map((name) => (
-              <helix-option key={name} suppressHydrationWarning value={name}>
+              <helix-option key={name} value={name}>
                 {titleCase(name)}
               </helix-option>
             ))}

@@ -87,16 +87,20 @@ describe('the count', () => {
    * badge reading the attribute shows a count for an item the reader has just
    * opened.
    */
-  test('the attribute follows too, rather than being right once', async () => {
+  test('the state follows the count, and no attribute is written', async () => {
     const element = await feed()
-    expect(element.getAttribute('unread')).toBe('2')
-    element.items[0]?.markRead(true)
+    expect(hasState(element, 'unread')).toBe(true)
+    expect(element.hasAttribute('unread')).toBe(false)
+    for (const item of element.items) {
+      item.markRead(true)
+    }
     await element.updateComplete
     await new Promise((done) => {
       queueMicrotask(() => done(undefined))
     })
     await element.updateComplete
-    expect(element.getAttribute('unread')).toBe('1')
+    expect(hasState(element, 'unread')).toBe(false)
+    expect(element.hasAttribute('unread')).toBe(false)
   })
 
   test('it follows an item being marked read', async () => {
@@ -474,7 +478,6 @@ describe('a row that arrives after the render', () => {
     await settle(host)
     expect(drawn(host, 'items').includes(row)).toBe(true)
     expect(host.unread).toBe(3)
-    expect(host.getAttribute('unread')).toBe('3')
   })
 
   test('clears the empty state of a feed that was emptied', async () => {
@@ -509,7 +512,6 @@ describe('a row that arrives after the render', () => {
     const rows = group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     expect(rows?.assignedElements().includes(row)).toBe(true)
     expect(host.unread).toBe(2)
-    expect(host.getAttribute('unread')).toBe('2')
   })
 
   test('prepended to a feed that rendered empty, is drawn and hides the empty line', async () => {
@@ -543,7 +545,7 @@ describe('a row that arrives after the render', () => {
     await settle(host)
     expect(drawn(host, 'items').length === 1 && drawn(host, 'items')[0] === row).toBe(true)
     expect(part(host, 'empty')).toBeNull()
-    expect(host.getAttribute('unread')).toBe('1')
+    expect(host.unread).toBe(1)
   })
 
   test('in a group, that upgrades after it arrived, is drawn by the group and counted by the feed', async () => {
@@ -566,7 +568,7 @@ describe('a row that arrives after the render', () => {
     await settle(host)
     const rows = group.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
     expect(rows?.assignedElements().includes(row)).toBe(true)
-    expect(host.getAttribute('unread')).toBe('2')
+    expect(host.unread).toBe(2)
   })
 
   test('a header added later is drawn in the header', async () => {

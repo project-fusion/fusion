@@ -113,6 +113,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @cssstate error - While `error-text` is set.
  * @cssstate loading - While `loading` is set.
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
+ * @cssstate unread - While any notification in the feed is unread.
  */
 @customElement('helix-headless-notifications')
 export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
@@ -218,12 +219,9 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * Read-only because it is derived: a count the consumer could set is a second
    * source of truth for something the items already know.
    *
-   * **The attribute is written in `updated`, never reflected.**
-   * `@property({ reflect: true })` on a getter with no setter reflects once: Lit
-   * reflects what is in `changedProperties`, and nothing puts a derived getter
-   * there after the first update. Measured with two items, one marked read: the
-   * property answered 1 and the attribute still said 2, so a badge reading the
-   * attribute showed a count for an item the reader had just opened.
+   * `:state(unread)` says whether any are, for a stylesheet. Nothing writes the
+   * count to an attribute: the host belongs to the consumer's markup, and an
+   * attribute written on upgrade is a mismatch in React's hydration report.
    */
   get unread(): number {
     return this.items.filter((item) => !item.read).length
@@ -678,21 +676,9 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     this.markEmpty()
     this.markMedia()
     this.rove()
-    /* Written after the render rather than reflected during it, so it follows
-       every change rather than only the first.
-
-       **Zero is the absence of the attribute, not `unread="0"`.** Writing it at
-       rest puts an attribute on the host that a consumer's server never sent,
-       and `updated` is no later than hydration: it is the same microtask
-       checkpoint `firstUpdated` runs in. Only a departure from resting writes. */
-    const unread = this.unread > 0 ? String(this.unread) : null
-    if (this.getAttribute('unread') !== unread) {
-      if (unread === null) {
-        this.removeAttribute('unread')
-      } else {
-        this.setAttribute('unread', unread)
-      }
-    }
+    /* After the render, since `unread` reads the items. A custom state, because
+       an attribute on the host is one React's server HTML never had. */
+    this.toggleState('unread', this.unread > 0)
   }
 
   protected override render(): TemplateResult {

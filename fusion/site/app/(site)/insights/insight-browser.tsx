@@ -215,14 +215,9 @@ export function InsightBrowser({
           >
             <helix-icon name="funnel-simple" slot="start"></helix-icon>
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
-            {/* `suppressHydrationWarning`, because the listbox owns this node
-                  once it upgrades: it writes `data-active` onto whichever option
-                  is current, which React's server HTML never produced. */}
-            <helix-option suppressHydrationWarning value={ALL}>
-              All topics
-            </helix-option>
+            <helix-option value={ALL}>All topics</helix-option>
             {topics.map((name) => (
-              <helix-option key={name} suppressHydrationWarning value={name}>
+              <helix-option key={name} value={name}>
                 {name}
               </helix-option>
             ))}
@@ -240,11 +235,9 @@ export function InsightBrowser({
             >
               <helix-icon name="funnel-simple" slot="start"></helix-icon>
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              <helix-option suppressHydrationWarning value={ALL}>
-                All kinds
-              </helix-option>
+              <helix-option value={ALL}>All kinds</helix-option>
               {kinds.map((name) => (
-                <helix-option key={name} suppressHydrationWarning value={name}>
+                <helix-option key={name} value={name}>
                   {name}
                 </helix-option>
               ))}
@@ -271,7 +264,7 @@ export function InsightBrowser({
             <helix-icon name="arrows-out-line-vertical" slot="start"></helix-icon>
             <helix-icon name="caret-down" slot="indicator"></helix-icon>
             {sorts.map((name) => (
-              <helix-option key={name} suppressHydrationWarning value={name}>
+              <helix-option key={name} value={name}>
                 {titleCase(name)}
               </helix-option>
             ))}

@@ -34,6 +34,9 @@ describe('option', () => {
     await host.updateComplete
     expect(names()).toBe('item item-selected item-active')
     expect(hasState(host, 'active')).toBe(true)
+    /* Never in the markup: a listbox can highlight an option before React
+       hydrates it. */
+    expect(host.hasAttribute('data-active')).toBe(false)
     host.selected = false
     host.active = false
     await host.updateComplete
