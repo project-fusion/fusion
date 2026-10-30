@@ -20,11 +20,11 @@ the answer is that it is not one, we say why.
 Every package we publish under the `@fusion.dev` scope, and the code in this
 repository that produces them.
 
-**`/helix/sandbox` executes whatever you type into it, by design.** Its frame is `sandbox="allow-scripts allow-forms"` with
-`allow-same-origin` deliberately absent, so the code runs against an opaque
-origin: it cannot read our cookies, our storage or our DOM, because as far as
-the browser is concerned it is not us. A report that the sandbox runs arbitrary
-code is a report that it works. A report that code in it reached something
+**`/helix/sandbox` executes whatever you type into it, by design.** Its frame is
+`sandbox="allow-scripts allow-forms"` with `allow-same-origin` deliberately
+absent, so the code runs against an opaque origin: it cannot read our cookies,
+our storage or our DOM, because as far as the browser is concerned it is not us.
+A report that the sandbox runs arbitrary code is a report that it works. A report that code in it reached something
 outside the frame is a vulnerability and we want it.
 
 Out of scope: findings from an automated scanner with no demonstrated impact,
