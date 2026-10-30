@@ -25,6 +25,7 @@ pub const COMPUTED: &[&str] = &[
     "markY",
     "painted",
     "presets",
+    "reading",
     "sampleLabel",
     "saturation",
     "square",
