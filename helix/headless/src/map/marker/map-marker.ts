@@ -3,7 +3,6 @@ import {
   formatNumber,
   formatWords,
   HelixElement,
-  HelixMapPartChangeEvent,
   numberConverter,
   PlacementController,
   words,
@@ -11,6 +10,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixMapPartChangeEvent } from '../events/index.js'
 
 /** What the frame and the connector write on a marker, which is not news to either. */
 const BOOKKEEPING = new Set<PropertyKey>([

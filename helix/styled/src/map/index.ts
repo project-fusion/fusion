@@ -1,5 +1,20 @@
 import '@fusion.dev/helix-headless/map'
 
+export {
+  HelixMapClusterEvent,
+  HelixMapPanEvent,
+  HelixMapPartChangeEvent,
+  HelixMapReadyEvent,
+  HelixMapRotateEvent,
+  HelixMapTiltEvent,
+  HelixMapZoomEvent,
+  type MapClusterDetail,
+  type MapPanDetail,
+  type MapPartChangeDetail,
+  type MapRotateDetail,
+  type MapTiltDetail,
+  type MapZoomDetail,
+} from '@fusion.dev/helix-headless/map/events'
 export { HelixMapArea } from './area/map-area.js'
 export { HelixMapBuildings } from './buildings/map-buildings.js'
 export { HelixMapContours } from './contours/map-contours.js'

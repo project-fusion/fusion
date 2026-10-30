@@ -11,7 +11,6 @@ import {
   formatWords,
   type HelixBeforeChangeEvent,
   HelixBeforeFilterEvent,
-  HelixCreateEvent,
   HelixFilterEvent,
   HelixFormElement,
   handedLocale,
@@ -39,6 +38,7 @@ import { html } from 'lit/static-html.js'
 import type { HelixHeadlessListbox } from '../../listbox/root/listbox-root.js'
 import { optionsAmong } from '../../option/among.js'
 import { HelixHeadlessTag } from '../../tag/root/tag-root.js'
+import { HelixCreateEvent } from '../events/index.js'
 /* Relative, so this registers the base listbox and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../listbox/index.js'

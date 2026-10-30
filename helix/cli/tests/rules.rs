@@ -704,18 +704,20 @@ fn disabled() {
     );
 }
 
-/// The barrel is `<tier>/index.ts` of the tier holding the registry, and a
-/// component file must not carry the event class marker or it reads as one.
+/// A class is exported by its own folder's `index.ts` or its tier's, a family
+/// folder holds its own registry, and a component file must not carry the
+/// event class marker or it reads as one.
 #[test]
 fn events() {
     let select = |declared: &str| {
         format!(
             "/**
  * @event {{HelixChangeEvent}} {declared} - Fired after the value changes.
+ * @event {{HelixPickEvent}} helix-pick - Fired when a choice is made.
  */
 @customElement('helix-select')
 export class HelixSelect extends LitElement {{
-  fire() {{ this.dispatchEvent(new HelixChangeEvent()); }}
+  fire() {{ this.dispatchEvent(new HelixChangeEvent()); this.dispatchEvent(new HelixPickEvent()); }}
 }}
 "
         )
@@ -737,6 +739,22 @@ const registry = { HelixChangeEvent } as const;
                 "src/index.ts",
                 "export { HelixChangeEvent } from './events.js';\n",
             ),
+            /* A family keeps the events only it sends in its own folder, which
+            registers them and exports them from its own `index.ts`. */
+            (
+                "src/select/events/pick.ts",
+                r"export class HelixPickEvent extends CustomEvent<void> {
+  static readonly eventName = 'helix-pick';
+}
+",
+            ),
+            (
+                "src/select/events/index.ts",
+                r"export { HelixPickEvent } from './pick.js';
+
+const registry = { HelixPickEvent } as const;
+",
+            ),
             ("src/select/select.ts", &select("helix-change")),
         ],
         |tree| {
@@ -744,6 +762,86 @@ const registry = { HelixChangeEvent } as const;
         },
         "HelixSelect dispatches `helix-change` and no `@event` declares it",
         "src/select/select.ts",
+    );
+}
+
+/// A class in a family folder left out of every registry types as a bare `Event`,
+/// and the registry fault is the one this plants.
+#[test]
+fn events_in_a_family_folder() {
+    let pick = "export class HelixPickEvent extends CustomEvent<void> {
+  static readonly eventName = 'helix-pick';
+}
+";
+    let select = "/**
+ * @event {HelixPickEvent} helix-pick - Fired when a choice is made.
+ */
+@customElement('helix-select')
+export class HelixSelect extends LitElement {
+  fire() { this.dispatchEvent(new HelixPickEvent()); }
+}
+";
+    plant_in(
+        "events_in_a_family_folder",
+        "events",
+        &[
+            ("helix.json", TIERS),
+            ("src/index.ts", "export * from './select/index.js';\n"),
+            ("src/select/events/pick.ts", pick),
+            (
+                "src/select/events/index.ts",
+                "export { HelixPickEvent } from './pick.js';\n\nconst registry = { HelixPickEvent } as const;\n",
+            ),
+            ("src/select/select.ts", select),
+        ],
+        |tree| {
+            tree.write(
+                "src/select/events/index.ts",
+                "export { HelixPickEvent } from './pick.js';\n\nconst registry = {} as const;\n",
+            );
+        },
+        "`HelixPickEvent` is exported and is not in `registry`",
+        "the event registry",
+    );
+}
+
+/// A family folder's `index.ts` imports and registers every class it holds, so
+/// naming one there is not exporting it: only an export clause is.
+#[test]
+fn a_registered_class_in_a_family_folder_is_not_exported_by_importing_it() {
+    let pick = "export class HelixPickEvent extends CustomEvent<void> {
+  static readonly eventName = 'helix-pick';
+}
+";
+    let select = "/**
+ * @event {HelixPickEvent} helix-pick - Fired when a choice is made.
+ */
+@customElement('helix-select')
+export class HelixSelect extends LitElement {
+  fire() { this.dispatchEvent(new HelixPickEvent()); }
+}
+";
+    plant_in(
+        "a_registered_class_in_a_family_folder_is_not_exported_by_importing_it",
+        "events",
+        &[
+            ("helix.json", TIERS),
+            ("src/index.ts", "export * from './select/index.js';\n"),
+            ("src/select/events/pick.ts", pick),
+            (
+                "src/select/events/index.ts",
+                "import { HelixPickEvent } from './pick.js';\nexport { HelixPickEvent };\n\nconst registry = { HelixPickEvent } as const;\n",
+            ),
+            ("src/select/select.ts", select),
+        ],
+        |tree| {
+            tree.write(
+                "src/select/events/index.ts",
+                "import { HelixPickEvent } from './pick.js';\n\nconst registry = { HelixPickEvent } as const;\n",
+            );
+        },
+        "`HelixPickEvent` is registered and is not exported",
+        "the package barrel",
     );
 }
 
@@ -3135,7 +3233,7 @@ fn stable() {
             ),
             (
                 "styled/src/card/root/card-root.ts",
-                "export class Card extends HTMLElement {}\n",
+                "@customElement('hx-card')\nexport class Card extends HTMLElement {}\n",
             ),
             (
                 "styled/src/card/root/card.dom.spec.ts",

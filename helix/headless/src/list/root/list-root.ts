@@ -6,7 +6,6 @@ import {
   drawStatus,
   focusItemOf,
   formatWords,
-  HelixActionEvent,
   HelixElement,
   HelixLoadMoreEvent,
   hostAria,
@@ -34,6 +33,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixActionEvent } from '../events/index.js'
 import { HelixHeadlessListItem } from '../item/list-item.js'
 import { numbering } from '../numbering.js'
 import {

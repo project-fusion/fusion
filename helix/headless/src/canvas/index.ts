@@ -1,4 +1,5 @@
 export { HelixHeadlessCanvasEdge } from './edge/canvas-edge.js'
+export * from './events/index.js'
 export { HelixHeadlessCanvasNode } from './node/canvas-node.js'
 export type {
   CanvasDocument,

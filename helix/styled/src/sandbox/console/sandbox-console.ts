@@ -1,5 +1,4 @@
 import {
-  type ConsoleDetail,
   customElement,
   HelixBeforeChangeEvent,
   HelixElement,
@@ -14,6 +13,7 @@ import { nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
+import type { ConsoleDetail } from '../events/index.js'
 import '../../button/index.js'
 import '../../log/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'

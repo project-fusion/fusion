@@ -6,7 +6,6 @@ import {
   numberAsValue as fromNumber,
   HelixClearEvent,
   HelixFormElement,
-  HelixPreviewEvent,
   internalsOf,
   KeyboardNavigationController,
   MixinControllerValue,
@@ -20,6 +19,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixPreviewEvent } from '../events/index.js'
 
 /**
  * @summary A row of marks, such as stars, for giving or showing a score.

@@ -33,8 +33,10 @@
 //! above by being absent from both, while the name still type-checks against
 //! `addEventListener` and the handler is never called.
 
-use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
+use std::path::{Path, PathBuf};
+use std::rc::Rc;
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -70,8 +72,40 @@ static CONSTRUCTED: LazyLock<Regex> =
 static WORD: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(\w+)").expect("a literal pattern compiles"));
 
+static EXPORT_CLAUSE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(?s)\bexport\s+(?:type\s+)?\{(.*?)\}").expect("a literal pattern compiles")
+});
+
+static EXPORT_CLASS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\bexport\s+(?:declare\s+)?class\s+(\w+)").expect("a literal pattern compiles")
+});
+
 static DEFINED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"@customElement\(").expect("a literal pattern compiles"));
+
+/// The names a barrel exports: those inside an `export { … }` clause, with or
+/// without `from`, and those declared with `export class`. A name that is only
+/// imported, or only listed in a registry, is not one of them.
+fn exported_names(text: &str) -> HashSet<String> {
+    let code = uncommented(text);
+    let mut found = HashSet::new();
+    for clause in EXPORT_CLAUSE.captures_iter(&code) {
+        found.extend(WORD.find_iter(&clause[1]).map(|one| one.as_str().to_owned()));
+    }
+    found.extend(
+        EXPORT_CLASS
+            .captures_iter(&code)
+            .map(|one| one[1].to_owned()),
+    );
+    found
+}
+
+fn barrel_exports(folder: &Path) -> HashSet<String> {
+    exported_names(&fs::read_to_string(folder.join("index.ts")).unwrap_or_default())
+}
+
+/// The sets that may export a class: its own folder's barrel and its tier's.
+type Barrel = Vec<Rc<HashSet<String>>>;
 
 struct Component {
     bases: Vec<String>,
@@ -102,28 +136,34 @@ fn inherited(
     }
 }
 
-/// The event classes, the registry, and the barrel that has to export them.
+/// The event classes, every registry, and the barrels that have to export them.
 ///
-/// Found by content: a file holding `static readonly eventName` is the one,
-/// wherever it lives, which is what lets this read a library that keeps them
-/// somewhere else.
-fn declared(tiers: &[std::path::PathBuf]) -> (BTreeMap<String, String>, BTreeSet<String>, String) {
+/// Found by content: a file holding `static readonly eventName` is a class
+/// module and a file holding `const registry = {…} as const` is a registry,
+/// wherever either lives, which is what lets this read a library that keeps
+/// its events in one folder or in a folder for each family. A class is
+/// exported when the `index.ts` of its own folder or the `index.ts` of its
+/// tier exports it by name, which an import or a registry entry does not, and
+/// registered when any registry names it.
+fn declared(
+    tiers: &[PathBuf],
+) -> (
+    BTreeMap<String, String>,
+    BTreeSet<String>,
+    BTreeMap<String, Barrel>,
+) {
     let mut names: BTreeMap<String, String> = BTreeMap::new();
     let mut registered: BTreeSet<String> = BTreeSet::new();
-    let mut declaring: Option<std::path::PathBuf> = None;
+    let mut barrels: BTreeMap<String, Barrel> = BTreeMap::new();
+    let mut folders: HashMap<PathBuf, Rc<HashSet<String>>> = HashMap::new();
     for tier in tiers {
+        let tier_barrel = Rc::new(barrel_exports(tier));
         let mut files = Vec::new();
         sources(tier, &mut files);
         for file in files {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;
             };
-            if !text.contains("static readonly eventName") {
-                continue;
-            }
-            for found in EVENT_CLASS.captures_iter(&text) {
-                names.insert(found[1].to_owned(), found[2].to_owned());
-            }
             if let Some(found) = REGISTRY.captures(&text) {
                 registered.extend(
                     found[1]
@@ -132,35 +172,50 @@ fn declared(tiers: &[std::path::PathBuf]) -> (BTreeMap<String, String>, BTreeSet
                         .filter(|one| !one.is_empty())
                         .map(str::to_owned),
                 );
-                declaring = Some(tier.clone());
+            }
+            if !text.contains("static readonly eventName") {
+                continue;
+            }
+            let folder_barrel = file.parent().map_or_else(Rc::default, |folder| {
+                Rc::clone(
+                    folders
+                        .entry(folder.to_path_buf())
+                        .or_insert_with(|| Rc::new(barrel_exports(folder))),
+                )
+            });
+            for found in EVENT_CLASS.captures_iter(&text) {
+                names.insert(found[1].to_owned(), found[2].to_owned());
+                barrels.insert(
+                    found[1].to_owned(),
+                    vec![Rc::clone(&folder_barrel), Rc::clone(&tier_barrel)],
+                );
             }
         }
     }
 
-    let barrel = declaring
-        .map(|tier| fs::read_to_string(tier.join("index.ts")).unwrap_or_default())
-        .unwrap_or_default();
-    (names, registered, barrel)
+    (names, registered, barrels)
 }
 
 /// The two lists a person keeps by hand beside the classes.
 fn checked_lists(
     names: &BTreeMap<String, String>,
     registered: &BTreeSet<String>,
-    barrel: &str,
+    barrels: &BTreeMap<String, Barrel>,
     findings: &mut Vec<Finding>,
 ) {
-    /* **Tokenized once and looked up, rather than a pattern per class.** A
-    `\b{class}\b` compiled inside the loop cost a compile per event class, and
-    reading its failure through `is_ok_and` reported a class whose name would
-    not compile as one the barrel had left out. A word is a word; the set is
-    the same answer for every class and can be wrong for none of them. */
-    let exported: HashSet<&str> = WORD.find_iter(barrel).map(|one| one.as_str()).collect();
+    /* **Each barrel is read once, in `declared`, and looked up here.** A
+    `\b{class}\b` compiled inside the loop cost a compile per event class. A
+    name counts only inside an `export { … }` clause or an `export class`, so
+    the import and the registry entry that every family folder also holds do
+    not make a class exported. */
     for (class, event) in names {
         if !WORD.is_match(class) {
             continue;
         }
-        if !exported.contains(class.as_str()) {
+        let exported = barrels
+            .get(class)
+            .is_some_and(|sets| sets.iter().any(|set| set.contains(class.as_str())));
+        if !exported {
             findings.push(Finding {
                 detail: "No other package can import it, and the one that dispatches it cannot \
                          name its type."
@@ -186,7 +241,7 @@ fn checked_lists(
 
 pub fn run(context: &Context) -> Report {
     let tiers = context.settings.roots(&context.root);
-    let (names, registered, barrel) = declared(&tiers);
+    let (names, registered, barrels) = declared(&tiers);
 
     let mut findings = Vec::new();
     if names.is_empty() {
@@ -201,7 +256,7 @@ pub fn run(context: &Context) -> Report {
         };
     }
 
-    checked_lists(&names, &registered, &barrel, &mut findings);
+    checked_lists(&names, &registered, &barrels, &mut findings);
 
     /* The hand-rolled shape, held to the same rule. The prefix is the library's
     own, taken from the names it declares rather than assumed. */
@@ -234,7 +289,7 @@ pub fn run(context: &Context) -> Report {
 /// Every class and mixin, what it declares, and what anything constructs.
 fn survey(
     context: &Context,
-    tiers: &[std::path::PathBuf],
+    tiers: &[PathBuf],
     names: &BTreeMap<String, String>,
     raw: &Regex,
 ) -> (BTreeMap<String, Component>, BTreeSet<String>) {
@@ -349,5 +404,100 @@ fn judge(
             file: "the event classes".to_owned(),
             message: format!("`{class}` declares `{event}` and no component constructs it"),
         });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn names() -> BTreeMap<String, String> {
+        BTreeMap::from([
+            ("HelixPinEvent".to_owned(), "helix-pin".to_owned()),
+            ("HelixRejectEvent".to_owned(), "helix-reject".to_owned()),
+        ])
+    }
+
+    fn messages(registered: &[&str], barrels: &[(&str, &str)]) -> Vec<String> {
+        let registered = registered.iter().map(|one| (*one).to_owned()).collect();
+        let barrels = barrels
+            .iter()
+            .map(|(class, text)| ((*class).to_owned(), vec![Rc::new(exported_names(text))]))
+            .collect();
+        let mut findings = Vec::new();
+        checked_lists(&names(), &registered, &barrels, &mut findings);
+        findings.into_iter().map(|one| one.message).collect()
+    }
+
+    #[test]
+    fn a_class_in_its_own_folders_registry_and_barrel_is_whole() {
+        let found = messages(
+            &["HelixPinEvent", "HelixRejectEvent"],
+            &[
+                ("HelixPinEvent", "export { HelixPinEvent } from './events.js'"),
+                ("HelixRejectEvent", "export { HelixRejectEvent }"),
+            ],
+        );
+        assert!(found.is_empty(), "{found:?}");
+    }
+
+    #[test]
+    fn a_family_class_missing_from_every_registry_is_reported() {
+        let found = messages(
+            &["HelixPinEvent"],
+            &[
+                ("HelixPinEvent", "export { HelixPinEvent }"),
+                ("HelixRejectEvent", "export { HelixRejectEvent }"),
+            ],
+        );
+        assert_eq!(found.len(), 1);
+        assert!(found[0].contains("`HelixRejectEvent` is exported and is not in `registry`"));
+    }
+
+    #[test]
+    fn a_class_named_by_neither_its_folder_nor_its_tier_is_not_exported() {
+        let found = messages(
+            &["HelixPinEvent", "HelixRejectEvent"],
+            &[
+                ("HelixPinEvent", "export { HelixPinEvent }"),
+                ("HelixRejectEvent", "export * from ./x.js"),
+            ],
+        );
+        assert_eq!(
+            found,
+            vec!["`HelixRejectEvent` is registered and is not exported"]
+        );
+    }
+
+    #[test]
+    fn a_class_only_imported_and_registered_is_not_exported() {
+        let folder = "import { HelixRejectEvent } from './reject.js'\n\
+                      const registry = { HelixRejectEvent } as const";
+        let found = messages(
+            &["HelixPinEvent", "HelixRejectEvent"],
+            &[
+                ("HelixPinEvent", "export { HelixPinEvent }"),
+                ("HelixRejectEvent", folder),
+            ],
+        );
+        assert_eq!(
+            found,
+            vec!["`HelixRejectEvent` is registered and is not exported"]
+        );
+    }
+
+    #[test]
+    fn a_class_in_a_forwarding_or_type_export_clause_is_exported() {
+        let found = messages(
+            &["HelixPinEvent", "HelixRejectEvent"],
+            &[
+                ("HelixPinEvent", "export { HelixPinEvent } from './pin.js'"),
+                (
+                    "HelixRejectEvent",
+                    "export type {\n  HelixRejectEvent,\n} from './reject.js'",
+                ),
+            ],
+        );
+        assert!(found.is_empty(), "{found:?}");
     }
 }

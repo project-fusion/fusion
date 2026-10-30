@@ -1,3 +1,4 @@
+export * from './events/index.js'
 export { HelixHeadlessNotificationGroup } from './group/notification-group.js'
 export { HelixHeadlessNotification } from './notification/notification.js'
 export { HelixHeadlessNotifications } from './root/notifications-root.js'

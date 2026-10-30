@@ -6,9 +6,7 @@ import {
   customElement,
   formatPercent,
   formatWords,
-  HelixBeforeCollapseEvent,
   HelixBeforeResizeEvent,
-  HelixCollapseEvent,
   HelixElement,
   HelixResizedEvent,
   inlineStep,
@@ -20,6 +18,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixBeforeCollapseEvent, HelixCollapseEvent } from '../events/index.js'
 import { snapTo } from '../snap.js'
 
 /**

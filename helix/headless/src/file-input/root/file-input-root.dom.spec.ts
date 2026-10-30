@@ -11,13 +11,13 @@ import {
 } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the page exists, as the element is. */
-let HelixRejectEvent: typeof import('@fusion.dev/helix-core').HelixRejectEvent
-type HelixRejectEvent = import('@fusion.dev/helix-core').HelixRejectEvent
+let HelixRejectEvent: typeof import('../events/index.js').HelixRejectEvent
+type HelixRejectEvent = import('../events/index.js').HelixRejectEvent
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
-  ;({ HelixRejectEvent } = await import('@fusion.dev/helix-core'))
+  ;({ HelixRejectEvent } = await import('../events/index.js'))
 })
 
 type InputFile = HTMLElement & {

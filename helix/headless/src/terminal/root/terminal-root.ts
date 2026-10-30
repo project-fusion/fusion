@@ -5,16 +5,9 @@ import {
   FullscreenController,
   formatWords,
   HelixElement,
-  HelixTerminalBellEvent,
-  HelixTerminalInputEvent,
-  HelixTerminalLinkEvent,
-  HelixTerminalResizeEvent,
-  HelixTerminalRestartEvent,
-  HelixTerminalTitleEvent,
   numberConverter,
   onApple,
   stopPress,
-  type TerminalResizeDetail,
   words,
 } from '@fusion.dev/helix-core'
 import {
@@ -34,6 +27,15 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
 import { html } from 'lit/static-html.js'
+import {
+  HelixTerminalBellEvent,
+  HelixTerminalInputEvent,
+  HelixTerminalLinkEvent,
+  HelixTerminalResizeEvent,
+  HelixTerminalRestartEvent,
+  HelixTerminalTitleEvent,
+  type TerminalResizeDetail,
+} from '../events/index.js'
 import '../../button/index.js'
 import '../../find/index.js'
 import type { Finder, FindSink, HelixHeadlessFind } from '../../find/index.js'

@@ -1,7 +1,6 @@
 import {
   customElement,
   HelixElement,
-  HelixMapPartChangeEvent,
   numberConverter,
   PlacementController,
   timeConverter,
@@ -9,6 +8,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixMapPartChangeEvent } from '../events/index.js'
 
 /**
  * @summary A moving point on a map, such as a vehicle or a person.

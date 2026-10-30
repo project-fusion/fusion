@@ -27,7 +27,7 @@
  * handling with no DOM in it: this is the half worth testing directly.
  */
 
-import type { FacetDetail } from '@fusion.dev/helix-core'
+import type { FacetDetail } from './events/index.js'
 
 /** One comparison a field supports, as the grammar needs it. */
 export interface FilterGrammarOperator {

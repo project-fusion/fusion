@@ -2,7 +2,6 @@ import {
   browserSpeech,
   customElement,
   DelayController,
-  HelixConsoleEvent,
   HelixElement,
   HelixResizeEvent,
   pageSpeechEngine,
@@ -11,6 +10,7 @@ import {
   type SpeechSession,
   words,
 } from '@fusion.dev/helix-core'
+import { HelixConsoleEvent } from '../events/index.js'
 
 /**
  * How long the source has to stop changing before the frame is asked to render,

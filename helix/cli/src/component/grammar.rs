@@ -12,15 +12,15 @@
 //!    and the family that declares the request declares one of those names
 //!    too. A request with nothing after it leaves a consumer who wants to know
 //!    where things stand nothing to listen for but a proposal.
-//! 3. **The table in `events.mdx` lists every name in `names.ts`.** The page is
+//! 3. **The table in `events.mdx` lists the name of every event class.** The page is
 //!    where a reader looks a name up, and `helix-toggle` shipped on three
 //!    families with neither page nor convention saying it existed.
 //!
 //! **The classes are found by scanning the configured tiers**, as `cancelable`
 //! finds them, so a class that changes its flag moves every finding at once.
-//! The page and the list are this repository's, read where they are and
-//! skipped where they are not, so a project built on Helix gets the first two
-//! and never a finding about a page it does not have.
+//! The page is this repository's, read where it is and skipped where it is
+//! not, so a project built on Helix gets the first two and never a finding
+//! about a page it does not have.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -51,8 +51,7 @@ pub const COMMANDS: [&str; 5] = [
 /// Native events a request may be followed by, which no Helix class carries.
 const NATIVE: [&str; 4] = ["change", "close", "input", "toggle"];
 
-/// Where this repository keeps the list of names and the page that tables them.
-const NAMES: &str = "helix/core/src/events/names.ts";
+/// Where this repository keeps the page that tables the names.
 const PAGE: &str = "helix/docs/content/events.mdx";
 
 static CLASS: LazyLock<Regex> = LazyLock::new(|| {
@@ -329,10 +328,9 @@ pub fn judge_families(
     findings
 }
 
-/// The names the list holds and the names the page's tables hold, each
+/// The names the classes send and the names the page's tables hold, each
 /// missing from the other.
-pub fn judge_page(names_ts: &str, page: &str) -> Vec<Finding> {
-    let listed: BTreeSet<String> = listed_names(names_ts);
+pub fn judge_page(listed: &BTreeSet<String>, page: &str) -> Vec<Finding> {
     let tabled: BTreeSet<String> = ROW
         .captures_iter(page)
         .flat_map(|row| {
@@ -350,37 +348,14 @@ pub fn judge_page(names_ts: &str, page: &str) -> Vec<Finding> {
             message: format!("`{name}` is dispatched and the events table does not list it"),
         });
     }
-    for name in tabled.difference(&listed) {
+    for name in tabled.difference(listed) {
         findings.push(Finding {
-            detail: "Take the row out, or put the name back in `names.ts` if a class sends it."
-                .to_owned(),
+            detail: "Take the row out, or add the class that sends it.".to_owned(),
             file: PAGE.to_owned(),
             message: format!("`{name}` is in the events table and no class sends it"),
         });
     }
     findings
-}
-
-/// The names `names.ts` writes, each without the shared prefix and separated
-/// by spaces inside string literals.
-fn listed_names(text: &str) -> BTreeSet<String> {
-    static QUOTED: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"'([a-z0-9 -]+)'").expect("a literal pattern compiles"));
-    let Some(start) = text.find("new Set(") else {
-        return BTreeSet::new();
-    };
-    let end = text[start..]
-        .find(".split(")
-        .map_or(text.len(), |one| start + one);
-    QUOTED
-        .captures_iter(&text[start..end])
-        .flat_map(|one| {
-            one[1]
-                .split_whitespace()
-                .map(|name| format!("helix-{name}"))
-                .collect::<Vec<_>>()
-        })
-        .collect()
 }
 
 /// Every finding the grammar makes over a workspace, and how many classes it
@@ -419,11 +394,11 @@ pub fn run(context: &Context) -> (usize, Vec<Finding>) {
             &package,
         ));
     }
-    if let (Ok(names), Ok(page)) = (
-        fs::read_to_string(context.root.join(NAMES)),
-        fs::read_to_string(context.root.join(PAGE)),
-    ) {
-        findings.extend(judge_page(&names, &page));
+    /* Every class the tiers hold, wherever its folder is: the core folder holds
+    the events more than one family sends and each family folder its own. */
+    if let Ok(page) = fs::read_to_string(context.root.join(PAGE)) {
+        let sent: BTreeSet<String> = classes.iter().map(|one| one.name.clone()).collect();
+        findings.extend(judge_page(&sent, &page));
     }
     (classes.len(), findings)
 }
@@ -551,11 +526,15 @@ mod tests {
     }
 
     #[test]
-    fn the_page_tables_every_name_the_list_holds() {
-        let names = "export const helixEventNames = new Set(\n  ('before-sort sort ' + 'check')\n    .split(' ')\n)";
+    fn the_page_tables_every_name_a_class_sends() {
+        let names = BTreeSet::from([
+            "helix-before-sort".to_owned(),
+            "helix-sort".to_owned(),
+            "helix-check".to_owned(),
+        ]);
         let page = "| Event | Meaning |\n|---|---|\n| `helix-before-sort`, `helix-sort` | A sort |\n| `helix-toggle` | Gone |\n";
         assert_eq!(
-            judge_page(names, page)
+            judge_page(&names, page)
                 .into_iter()
                 .map(|one| one.message)
                 .collect::<Vec<_>>(),

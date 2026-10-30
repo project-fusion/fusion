@@ -3,7 +3,6 @@ import {
   customElement,
   drawStatus,
   formatWords,
-  HelixBandEvent,
   HelixElement,
   hostAria,
   internalsOf,
@@ -17,6 +16,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixBandEvent } from '../events/index.js'
 
 /** Which band a value falls in, once `optimum` has said which end is good. */
 export type MeterBand = 'fair' | 'good' | 'poor'

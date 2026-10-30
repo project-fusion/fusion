@@ -1,8 +1,4 @@
 import {
-  HelixGraphPanEvent,
-  HelixGraphPartChangeEvent,
-  HelixGraphSignalEvent,
-  HelixGraphZoomEvent,
   isRtl,
   motionPaused,
   onMotionChange,
@@ -12,6 +8,10 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
+import type {
+  HelixGraphPartChangeEvent,
+  HelixGraphSignalEvent,
+} from '@fusion.dev/helix-headless/graph/events'
 import { arrangeByGroup, hubsOf } from './arrange.js'
 import {
   type DrawnLink,
@@ -721,10 +721,13 @@ export const connectGraph = (
     }
   }
 
-  frame.addEventListener(HelixGraphPartChangeEvent.eventName, handlePartChange)
-  frame.addEventListener(HelixGraphSignalEvent.eventName, handleSignal)
-  frame.addEventListener(HelixGraphPanEvent.eventName, handlePan)
-  frame.addEventListener(HelixGraphZoomEvent.eventName, handleZoom)
+  frame.addEventListener(
+    'helix-graph-part-change' satisfies keyof HTMLElementEventMap,
+    handlePartChange,
+  )
+  frame.addEventListener('helix-graph-signal' satisfies keyof HTMLElementEventMap, handleSignal)
+  frame.addEventListener('helix-graph-pan' satisfies keyof HTMLElementEventMap, handlePan)
+  frame.addEventListener('helix-graph-zoom' satisfies keyof HTMLElementEventMap, handleZoom)
 
   /* A press in the drawing asks the frame, which a page can refuse, and the
      note pressed is not moved: the reader is looking at it. **A press on no
@@ -773,10 +776,16 @@ export const connectGraph = (
       stopPaused()
       stopPress?.()
       stopTheme()
-      frame.removeEventListener(HelixGraphPartChangeEvent.eventName, handlePartChange)
-      frame.removeEventListener(HelixGraphSignalEvent.eventName, handleSignal)
-      frame.removeEventListener(HelixGraphPanEvent.eventName, handlePan)
-      frame.removeEventListener(HelixGraphZoomEvent.eventName, handleZoom)
+      frame.removeEventListener(
+        'helix-graph-part-change' satisfies keyof HTMLElementEventMap,
+        handlePartChange,
+      )
+      frame.removeEventListener(
+        'helix-graph-signal' satisfies keyof HTMLElementEventMap,
+        handleSignal,
+      )
+      frame.removeEventListener('helix-graph-pan' satisfies keyof HTMLElementEventMap, handlePan)
+      frame.removeEventListener('helix-graph-zoom' satisfies keyof HTMLElementEventMap, handleZoom)
       if (focusable) {
         if (tabIndex === null) {
           focusable.removeAttribute('tabindex')

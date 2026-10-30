@@ -8,14 +8,11 @@ import { Annotation, Compartment, EditorState, type Extension } from '@codemirro
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import {
   type CaretDetail,
-  customElement,
   HelixBeforeEditEvent,
   HelixCaretEvent,
   HelixEditEvent,
-  HelixElement,
-  reportRuntime,
-  words,
-} from '@fusion.dev/helix-core'
+} from '@fusion.dev/helix/sandbox/events'
+import { customElement, HelixElement, reportRuntime, words } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, unsafeCSS } from 'lit'
 import { property } from 'lit/decorators.js'

@@ -6,7 +6,6 @@ import {
   elementById,
   HelixElement,
   HelixLoadMoreEvent,
-  HelixRangeChangeEvent,
   inRowOrder,
   isRtl,
   numberConverter,
@@ -28,6 +27,7 @@ import {
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
+import { HelixRangeChangeEvent } from '../events/index.js'
 import { fillHoles, keyOf, textsOf } from '../fill.js'
 import { skipDisabled, stepIndex } from '../keys.js'
 import { drawPlan, itemsOf, stopAfter } from '../plan.js'

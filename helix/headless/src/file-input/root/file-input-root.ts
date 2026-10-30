@@ -6,7 +6,6 @@ import {
   formatWords,
   HelixBeforeChangeEvent,
   HelixFormElement,
-  HelixRejectEvent,
   internalsOf,
   labelWith,
   MixinField,
@@ -22,6 +21,7 @@ import { trash } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { HelixRejectEvent } from '../events/index.js'
 import { type RefusedFile, screenFiles } from '../screen.js'
 import { barOf, type FileStatus, saysStatus } from '../status.js'
 

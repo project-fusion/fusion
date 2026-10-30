@@ -3,20 +3,22 @@ import {
   customElement,
   DelayController,
   formatWords,
-  type HelixBeforeEditEvent,
-  HelixBeforePanelResizeEvent,
   type HelixBeforeResizeEvent,
-  HelixBeforeSplitEvent,
-  type HelixCaretEvent,
-  type HelixConsoleEvent,
   HelixElement,
-  HelixPanelResizeEvent,
-  HelixSplitEvent,
   inlineStep,
   requestChange,
   requestValue,
   words,
 } from '@fusion.dev/helix-core'
+import {
+  type HelixBeforeEditEvent,
+  HelixBeforePanelResizeEvent,
+  HelixBeforeSplitEvent,
+  type HelixCaretEvent,
+  type HelixConsoleEvent,
+  HelixPanelResizeEvent,
+  HelixSplitEvent,
+} from '../events/index.js'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'

@@ -9,7 +9,6 @@ import {
   HelixBeforeActivateEvent,
   HelixCompleteEvent,
   HelixElement,
-  HelixTourStatusEvent,
   hostAria,
   inlineStep,
   internalsOf,
@@ -23,6 +22,7 @@ import {
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, queryAssignedElements, state } from 'lit/decorators.js'
 import { stopBefore } from '../back.js'
+import { HelixTourStatusEvent } from '../events/index.js'
 import type { HelixHeadlessTourStop } from '../stop/tour-stop.js'
 import { onPage, waitFor } from '../wait.js'
 

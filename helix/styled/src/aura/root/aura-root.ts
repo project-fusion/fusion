@@ -1,7 +1,6 @@
 import {
   customElement,
   drawsInSoftware,
-  HelixAuraFallbackEvent,
   HelixElement,
   MAX_FRAME_STEP,
   numberConverter,
@@ -15,6 +14,7 @@ import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { tiltFor } from '../axis.js'
+import { HelixAuraFallbackEvent } from '../events/index.js'
 import { type AuraPalette, paletteOf, RESTING_PALETTE } from '../palette.js'
 import { FRAGMENT, INTERACTIONS, SHAPES, VERTEX } from '../shader.js'
 import { styles } from './aura-root.css.js'

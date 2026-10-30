@@ -3,7 +3,6 @@ import {
   drawStatus,
   formatWords,
   HelixElement,
-  HelixEndEvent,
   inlineStep,
   MixinControllerActive,
   ReorderController,
@@ -12,6 +11,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixEndEvent } from '../events/index.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
 import { playOrder, type Repeat, stepTo } from '../order.js'
 

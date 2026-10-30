@@ -3,9 +3,6 @@ import {
   DelayController,
   deepActiveElement,
   HelixFormElement,
-  HelixSendEvent,
-  HelixStopEvent,
-  HelixTypingEvent,
   hostAria,
   internalsOf,
   MixinVoice,
@@ -25,6 +22,7 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html as staticHtml } from 'lit/static-html.js'
+import { HelixSendEvent, HelixStopEvent, HelixTypingEvent } from '../events/index.js'
 import '../../tooltip/index.js'
 
 /**

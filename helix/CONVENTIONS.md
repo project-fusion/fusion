@@ -1643,9 +1643,14 @@ universal channel, and it needs a name a plain listener can use.
 
 The type in braces is what lets the React generator emit
 `(event: HelixBeforeOpenEvent) => void` instead of `(detail: unknown)`. Each event is a
-class that carries its own name, in a module of its own in `helix/core/src/events/`,
-and `events.ts` there gathers them, registers them and augments
-`HTMLElementEventMap`. One class to a module, because the compiler writes a
+class that carries its own name, in a module of its own. An event that more than
+one family sends is in `helix/core/src/events/`, and `events.ts` there gathers
+them, registers them and augments `HTMLElementEventMap`. An event that one family
+sends is in that family's `events/` folder (`helix/headless/src/<family>/events/`,
+or the styled family's when only the styled tier sends it), whose `index.ts`
+registers it, augments `HTMLElementEventMap` for it and adds its name to core's
+list with `registerEventNames`. A consumer who imports a family gets its events
+typed, and core's map keeps the shared ones. One class to a module, because the compiler writes a
 static name as a static block, which Bun and Rollup keep as a side effect: with
 every class in one file, every element shipped all of them. There is no generic
 `emit(name, detail)` helper: a dispatch through one cannot be named by the
@@ -1898,7 +1903,7 @@ family that declares a request declares one of those names too.
 `conventions` holds the grammar: the name against the flag, the five commands,
 `@followedBy` against the notifications that exist, each family's requests
 against its notifications, and the table in `helix/docs/content/events.mdx`
-against `names.ts`. `decided` reads every dispatch of a class whose
+against the name of every event class in the tiers. `decided` reads every dispatch of a class whose
 constructor passes `cancelable: true`, and passes when the answer is used at
 the dispatch, read off the event afterwards, or read by a file in the family
 that dispatched it or in a family that composes that one.

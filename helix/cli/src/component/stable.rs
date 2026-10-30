@@ -42,7 +42,9 @@ fn families(layer: &Path) -> Vec<String> {
     found
 }
 
-/// The part folders of a family, which are its directories minus the dotted ones.
+/// The part folders of a family: its directories minus the dotted ones, and
+/// minus any that defines no element, such as the `events/` folder that holds
+/// the classes the family sends, which has no behavior to put under a spec.
 fn parts(directory: &Path) -> Vec<String> {
     let Ok(entries) = fs::read_dir(directory) else {
         return Vec::new();
@@ -50,12 +52,23 @@ fn parts(directory: &Path) -> Vec<String> {
     let mut found: Vec<String> = entries
         .flatten()
         .filter(|entry| {
-            entry.path().is_dir() && !entry.file_name().to_string_lossy().starts_with('.')
+            entry.path().is_dir()
+                && !entry.file_name().to_string_lossy().starts_with('.')
+                && defines_element(&entry.path())
         })
         .map(|entry| entry.file_name().to_string_lossy().to_string())
         .collect();
     found.sort();
     found
+}
+
+/// Whether any source file under a folder registers an element.
+fn defines_element(directory: &Path) -> bool {
+    let mut found = Vec::new();
+    crate::component::sources(directory, &mut found);
+    found
+        .iter()
+        .any(|file| fs::read_to_string(file).is_ok_and(|text| text.contains("@customElement(")))
 }
 
 /// Whether any source file under a folder declares the given status.
@@ -166,5 +179,31 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes: Vec::new(),
         unit: "families claiming stable",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parts;
+
+    #[test]
+    fn a_folder_that_defines_no_element_is_not_a_part() {
+        let root = std::env::temp_dir().join(format!("helix-stable-parts-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(root.join("root")).expect("a folder is made");
+        std::fs::create_dir_all(root.join("events")).expect("a folder is made");
+        std::fs::create_dir_all(root.join(".examples")).expect("a folder is made");
+        std::fs::write(
+            root.join("root/card-root.ts"),
+            "@customElement('helix-card')\nexport class HelixCard {}\n",
+        )
+        .expect("a file is written");
+        std::fs::write(
+            root.join("events/index.ts"),
+            "export { HelixCardEvent } from './card.js';\n",
+        )
+        .expect("a file is written");
+        assert_eq!(parts(&root), vec!["root".to_owned()]);
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

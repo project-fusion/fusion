@@ -12,8 +12,6 @@ import {
   FullscreenController,
   formatWords,
   HelixElement,
-  HelixNextEvent,
-  HelixPreviousEvent,
   IdleController,
   type MediaCopy,
   MediaSessionController,
@@ -52,6 +50,7 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { HelixNextEvent, HelixPreviousEvent } from '../events/index.js'
 /* Side-effect, for the menu rows this renders. Both tiers import it, because
    this tier writes the template and the styled tier inherits it without having
    a copy of its own to remind anyone. */

@@ -1,9 +1,6 @@
 import {
   customElement,
   formatWords,
-  HelixBeforeEditEvent,
-  HelixCaretEvent,
-  HelixEditEvent,
   HelixElement,
   onUnlessFalse,
   restoreValue,
@@ -12,6 +9,7 @@ import {
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { HelixBeforeEditEvent, HelixCaretEvent, HelixEditEvent } from '../events/index.js'
 import { drawnRuns, type SandboxToken, type SandboxTokenizer } from '../tokens.js'
 import {
   breakLine,

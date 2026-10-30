@@ -1,17 +1,11 @@
-import {
-  customElement,
-  type FacetDetail,
-  HelixBeforeFacetEvent,
-  HelixElement,
-  HelixFacetEvent,
-  words,
-} from '@fusion.dev/helix-core'
+import { customElement, HelixElement, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* `lit/static-html.js`, because this template interpolates tag names: it renders
    the placeholder as the element otherwise, which shifts every attribute after
    it by one. `Notification` records the same trap. */
 import { html } from 'lit/static-html.js'
+import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import type { FilterGrammarOperator } from '../grammar.js'
 import '../../divider/index.js'

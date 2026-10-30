@@ -1,12 +1,7 @@
-import {
-  customElement,
-  HelixElement,
-  HelixMapPartChangeEvent,
-  numberConverter,
-  words,
-} from '@fusion.dev/helix-core'
+import { customElement, HelixElement, numberConverter, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixMapPartChangeEvent } from '../events/index.js'
 import type { MapTerrainEncoding } from '../terrain/map-terrain.js'
 
 /**

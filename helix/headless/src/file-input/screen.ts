@@ -1,4 +1,5 @@
-import { commaList, type RefusedFile } from '@fusion.dev/helix-core'
+import { commaList } from '@fusion.dev/helix-core'
+import type { RefusedFile } from './events/index.js'
 
 /**
  * Which of the files arriving at a file field it takes, and why it refuses the
@@ -7,8 +8,8 @@ import { commaList, type RefusedFile } from '@fusion.dev/helix-core'
  * with its reason.
  */
 
-/* A refused file is core's `RefusedFile`, which `helix-reject` carries. */
-export type { Refusal, RefusedFile } from '@fusion.dev/helix-core'
+/* A refused file is the events folder's `RefusedFile`, which `helix-reject` carries. */
+export type { Refusal, RefusedFile } from './events/index.js'
 
 /** The rules a field screens arriving files by. */
 export interface ScreenRules {

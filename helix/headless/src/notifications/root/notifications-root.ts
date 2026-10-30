@@ -6,10 +6,8 @@ import {
   deepContains,
   focusableElements,
   formatWords,
-  HelixBeforeReadEvent,
   HelixElement,
   HelixLoadMoreEvent,
-  HelixReadEvent,
   hostAria,
   internalsOf,
   MixinCollection,
@@ -22,6 +20,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixBeforeReadEvent, HelixReadEvent } from '../events/index.js'
 import { feedStep } from '../feed-keys.js'
 import type { HelixHeadlessNotificationGroup } from '../group/notification-group.js'
 import type { HelixHeadlessNotification } from '../notification/notification.js'

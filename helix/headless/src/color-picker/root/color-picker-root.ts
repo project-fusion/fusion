@@ -13,8 +13,6 @@ import {
   formatNumber,
   formatWords,
   HelixFormElement,
-  HelixSampleEndEvent,
-  HelixSampleStartEvent,
   hostAria,
   hueName,
   internalsOf,
@@ -38,6 +36,7 @@ import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import { type ChannelName, channelFields, writeChannel } from '../channels.js'
+import { HelixSampleEndEvent, HelixSampleStartEvent } from '../events/index.js'
 import { areaAt, hueAt } from '../wheel.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
