@@ -478,7 +478,9 @@ fn every_form_outside_the_grammar_is_refused_with_its_line_and_the_form_to_write
 fn render_is_given_only_what_it_reads_by_its_own_name() {
     let unknown = headless_tsx(&source("props, other", "<View part=\"x\" />")).unwrap_err();
     assert!(
-        unknown.contains("`render` is given copy, countdown, delay, derived, entry"),
+        unknown.contains(
+            "`render` is given color, colorField, copy, countdown, delay, derived, entry"
+        ),
         "{unknown}"
     );
     let missing =

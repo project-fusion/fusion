@@ -64,6 +64,8 @@ const TAGS: &[(&str, &str, Option<&str>)] = &[
 
 /// The names a render's parameter gives, each one what it reads.
 const GIVEN: &[&str] = &[
+    "color",
+    "colorField",
     "copy",
     "countdown",
     "delay",
