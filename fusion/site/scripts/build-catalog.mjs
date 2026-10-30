@@ -332,10 +332,11 @@ for (const route of routes()) {
             '',
             '## What we take on',
             '',
-            '| Offer | Duration | What it leaves you |',
-            '| --- | --- | --- |',
+            '| Offer | Duration | What it includes | What it leaves you |',
+            '| --- | --- | --- | --- |',
             ...SERVICES.map(
-              (service) => `| ${service.name} | ${service.duration} | ${service.outcome} |`,
+              (service) =>
+                `| ${service.name} | ${service.duration} | ${service.includes.join('; ')} | ${service.outcome} |`,
             ),
             '',
           ].join('\n')
