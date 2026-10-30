@@ -146,6 +146,7 @@
     "system": {
       "events": "helix/core/src/events",
       "families": "helix/neutral",
+      "familyEvents": "helix/headless/src",
       "inherited": ["helix-mode", "helix-mode-inverted"],
       "manifest": "helix/styled/custom-elements.json",
       "name": "Helix",

@@ -109,14 +109,33 @@ fn modules(events: &Path) -> Result<Vec<PathBuf>, Failure> {
 
 impl Details {
     /// Reads every event class and detail type under `events`, core's
-    /// `src/events`.
+    /// `src/events`, and under the `events` folder of each family in
+    /// `families`, which holds the classes only that family sends.
     ///
     /// # Errors
     ///
-    /// [`Failure`] when the folder or a module cannot be read or parsed.
-    pub fn read(events: &Path) -> Result<Self, Failure> {
+    /// [`Failure`] when a folder or a module cannot be read or parsed.
+    pub fn read(events: &Path, families: Option<&Path>) -> Result<Self, Failure> {
         let mut details = Self::default();
-        for path in modules(events)? {
+        let mut paths = modules(events)?;
+        if let Some(families) = families {
+            let entries = fs::read_dir(families).map_err(|error| {
+                Failure::input(
+                    "cannot read the families' event classes",
+                    format!("{}: {error}", families.display()),
+                )
+            })?;
+            let mut folders: Vec<PathBuf> = entries
+                .filter_map(Result::ok)
+                .map(|entry| entry.path().join("events"))
+                .filter(|folder| folder.is_dir())
+                .collect();
+            folders.sort();
+            for folder in folders {
+                paths.extend(modules(&folder)?);
+            }
+        }
+        for path in paths {
             let source = fs::read_to_string(&path).map_err(|error| {
                 Failure::input(
                     "cannot read an event module",
@@ -270,7 +289,7 @@ impl Details {
         let detail = self
             .classes
             .get(class)
-            .ok_or_else(|| format!("`{class}` carries no detail in core's event classes"))?;
+            .ok_or_else(|| format!("`{class}` carries no detail in the event classes"))?;
         /* **A detail a phone carries in a shape of its own is declared
         beside the web's**, as `Native` and its name: a file field's
         refusal names a `File` on the web, and a phone holds the records its
