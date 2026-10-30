@@ -200,6 +200,24 @@
   border-block-end-color: transparent;
 }
 
+/* **A row's fill is a custom property on the row**, since the row has no box.
+   A rule on `::part(row)` sets it, and each of the row's cells paints it. */
+[part~="row"] > * {
+  background-color: var(--data-table-row-background-color);
+}
+
+/* `row-link` makes the row a target, so the row says so under a pointer. */
+:host([row-link]) [part~="row"] > [part~="cell"] {
+  cursor: pointer;
+}
+
+:host([row-link]) [part~="row"]:not([aria-selected="true"]):hover > * {
+  background-color: var(
+    --data-table-row-hover-background-color,
+    color-mix(in srgb, var(--helix-color-foreground) 4%, var(--helix-color-background))
+  );
+}
+
 /* **A chosen row is washed across every cell**, the checkbox's included, since
    the row has no box of its own to fill. A wash rather than the tone's surface,
    which is the solid fill a button stands on and would make a column of chosen

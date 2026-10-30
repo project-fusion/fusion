@@ -190,6 +190,12 @@ export type MapPanDetail = ViewportPanDetail
 /** What `ViewportZoomDetail` was called when only Map had one. */
 export type MapZoomDetail = ViewportZoomDetail
 
+/** Detail carried by `helix-before-follow` and `helix-follow`. */
+export interface FollowDetail {
+  /** The path, query, and hash the link names, ready for a router. */
+  href: string
+}
+
 /** Detail carried by `helix-before-navigate` and `helix-navigate`. */
 export interface NavigateDetail {
   /**

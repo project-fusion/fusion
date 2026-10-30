@@ -3,6 +3,7 @@ import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
+import { styles as recipeStyles } from '../recipes.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
@@ -79,6 +80,8 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-more-radius - The corner radius of the button in the `load-more` row.
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
+ * @cssproperty --data-table-row-background-color - The fill across a row. A row generates no box, so a `::part(row)` rule sets this for its cells, as `::part(row):hover` does for a hover.
+ * @cssproperty --data-table-row-hover-background-color - The fill across a row while the pointer is over it, with `row-link`.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
  * color only, because it fills the color in a border shorthand, and a full border value
  * makes the rule invalid. It is drawn on the cells, because the row is `display: contents`.
@@ -93,7 +96,7 @@ import '../../pagination/index.js'
 export class HelixDataTable extends HelixHeadlessDataTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, recipeStyles, styles]
 }
 
 declare global {

@@ -19,6 +19,7 @@ import {
   gridMove,
   type HelixBeforeCheckEvent,
   HelixBeforeFilterEvent,
+  HelixBeforeFollowEvent,
   HelixBeforeNavigateEvent,
   HelixBeforeReorderEvent,
   HelixBeforeSelectEvent,
@@ -26,6 +27,7 @@ import {
   HelixElement,
   HelixExpandEvent,
   HelixFilterEvent,
+  HelixFollowEvent,
   HelixLoadMoreEvent,
   HelixNavigateEvent,
   HelixReorderEvent,
@@ -149,6 +151,21 @@ const isControl = (element: HTMLElement): boolean =>
  *   chosen.
  *
  * To act on a single row, such as opening it, put a link or a button in a cell.
+ * `row-link` makes a press anywhere else on the row work that control.
+ *
+ * **A cell renders in the table's shadow root.** Tokens and custom properties
+ * reach it, and so do the base layer's `data-link`, `data-link-underline`, and
+ * `data-density`. A class from your stylesheet does not. Pass the rules as
+ * `cellStyles`, or name an element with `part` and style it with `::part()`.
+ *
+ * `helix-before-follow` hands a press on a link in a cell to your router:
+ *
+ * ```js
+ * table.addEventListener('helix-before-follow', (event) => {
+ *   event.preventDefault()
+ *   router.push(event.detail.href)
+ * })
+ * ```
  *
  * **Keyboard.** The grid is one tab stop, and the arrow keys move between its
  * cells, the headings included.
@@ -256,12 +273,14 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixBeforeFilterEvent} helix-before-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
+ * @event {HelixBeforeFollowEvent} helix-before-follow - A press on a link in a cell is about to load its page, in this tab and on this site. Cancelable: cancel it to keep the page, and hand `detail.href` to your router.
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
  * @event {HelixFilterEvent} helix-filter - Fired after the search query changes, with the new query.
+ * @event {HelixFollowEvent} helix-follow - Fired as the browser loads the page a link in a cell names, with its path.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
  * @event {HelixNavigateEvent} helix-navigate - Fired after the page changes, with the new page in `detail.page` and as a string in `detail.value`.
  * @event {HelixReorderEvent} helix-reorder - Fired after the columns move, with `kind` set to `column` and every field in the new order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
@@ -379,6 +398,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'canceled-label' })
   canceledLabel = 'Canceled'
+
+  /**
+   * Style sheets for the markup a column's `cell` returns, which renders in this
+   * shadow root, where your document's rules stop.
+   *
+   * ```js
+   * const sheet = new CSSStyleSheet()
+   * sheet.replaceSync('.name { font-family: var(--helix-font-mono); }')
+   * table.cellStyles = [sheet]
+   * ```
+   */
+  @property({ attribute: false })
+  cellStyles: CSSStyleSheet[] = []
 
   /**
    * The field that holds a row's child rows, as an array. Set it, and `row-key`,
@@ -755,6 +787,27 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'row-key' })
   rowKey = ''
+
+  /**
+   * Whether a press on a row works the first link or button in its cells.
+   *
+   * The control stays the target: Tab reaches it, and it keeps its own name and
+   * its own middle click. This widens where a pointer may land. Ignored while
+   * `selection-behavior="replace"`, where a press on a row selects it.
+   */
+  @property({ attribute: 'row-link', reflect: true, type: Boolean })
+  rowLink?: boolean
+
+  /**
+   * Returns part names to add to a row, for a row that marks itself, such as
+   * `blocked`, or every second row.
+   *
+   * A row generates no box, so a rule sets a custom property for its cells:
+   * `helix-data-table::part(blocked) { --data-table-row-background-color: ... }`.
+   * Choose names the table does not use.
+   */
+  @property({ attribute: false })
+  rowParts?: (row: DataRow, index: number) => string
 
   /**
    * Every row of the result, in the order it arrived.
@@ -1550,17 +1603,23 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (size <= 0) {
       return 1
     }
-    const count = this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.matched
-    return Math.max(1, Math.ceil(count / size))
+    return Math.max(1, Math.ceil(this.matched / size))
   }
 
   /**
-   * Rows after filtering, computed without paging.
+   * How many rows match the filter, across every page.
+   *
+   * With `mode="server"` it is `total`, or the rows held where `total` is lower.
+   * Read it after you assign `rows` or `filter`, as the count beside a search
+   * field. A tree grid counts the rows open now.
    *
    * Separate from `view` because `pages` needs it and `page` needs `pages`:
    * asking `view` for it would recurse through the clamp in `page`.
    */
-  private get matched(): number {
+  get matched(): number {
+    if (this.mode === 'server') {
+      return Math.max(this.total, this.rows.length)
+    }
     if (this.childField) {
       return this.tree().rows.length
     }
@@ -2154,7 +2213,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       /* A search narrows the rows under a reader who is in the search field,
          so how many it left is said. None left is the empty text, which the
          region says in place of this. */
-      const count = this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.matched
+      const count = this.matched
       said = this.resultLabel
         ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
         : formatWords(this, 'resultsLabel', { count })
@@ -2219,6 +2278,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       this.counts.rows === undefined ? null : String(this.counts.rows)
     internalsOf(this).ariaColCount =
       this.counts.columns === undefined ? null : String(this.counts.columns)
+    if (changed.has('cellStyles') && this.shadowRoot) {
+      this.ownSheets ??= [...this.shadowRoot.adoptedStyleSheets]
+      this.shadowRoot.adoptedStyleSheets = [...this.ownSheets, ...this.cellStyles]
+    }
     this.markEmpty()
     this.toggleState('error', this.errorText !== '')
     this.toggleState('empty', !this.loading && !this.hasRows)
@@ -2449,7 +2512,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
            Alpha" first. */
         const header = named ? `row-header-${index}` : undefined
         return html`<div
-          part="row${index === last ? ' row-last' : ''}${held?.key === moveKey ? ' row-dragging' : ''}${marked === 'before' ? ' row-drop-before' : ''}${marked === 'after' ? ' row-drop-after' : ''}"
+          part="row${index === last ? ' row-last' : ''}${held?.key === moveKey ? ' row-dragging' : ''}${marked === 'before' ? ' row-drop-before' : ''}${marked === 'after' ? ' row-drop-after' : ''}${this.rowPartsOf(row, index)}"
           role="row"
           aria-rowindex=${this.rowIndex(index)}
           aria-labelledby=${header ?? nothing}
@@ -2778,6 +2841,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     auditChildren(this, 'table-column', 'table', 'the table draws no columns')
     this.addEventListener('click', this.handleHeadClick)
     this.addEventListener('click', this.handleRowClick)
+    this.addEventListener('click', this.handleRowLink)
+    this.addEventListener('click', this.handleFollow)
     this.addEventListener('pointerdown', this.notePress, true)
     this.addEventListener('keydown', this.notePress, true)
     this.addEventListener('focusin', this.handleFocusIn)
@@ -2795,6 +2860,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleHeadClick)
     this.removeEventListener('click', this.handleRowClick)
+    this.removeEventListener('click', this.handleRowLink)
+    this.removeEventListener('click', this.handleFollow)
     this.removeEventListener('pointerdown', this.notePress, true)
     this.removeEventListener('keydown', this.notePress, true)
     this.removeEventListener('focusin', this.handleFocusIn)
@@ -2811,6 +2878,96 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private readonly notePress = (event: KeyboardEvent | PointerEvent): void => {
     this.shiftPressed = event.shiftKey
   }
+
+  /**
+   * Handles a press on a link in a cell, for a router that keeps the page.
+   *
+   * The bail-outs hand the press back to the browser, which already knows what
+   * a modified press, a download, and a new tab mean.
+   */
+  private readonly handleFollow = (event: MouseEvent): void => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    ) {
+      return
+    }
+    const path = event.composedPath()
+    const link = path
+      .slice(0, path.indexOf(this))
+      .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement)
+    if (
+      link === undefined ||
+      !URL.canParse(link.href) ||
+      link.hasAttribute('download') ||
+      (link.target !== '' && link.target !== '_self')
+    ) {
+      return
+    }
+    const url = new URL(link.href)
+    if (url.origin !== location.origin || (url.hash !== '' && url.pathname === location.pathname)) {
+      return
+    }
+    const href = `${url.pathname}${url.search}${url.hash}`
+    if (!this.dispatchEvent(new HelixBeforeFollowEvent({ href }))) {
+      event.preventDefault()
+      return
+    }
+    this.dispatchEvent(new HelixFollowEvent({ href }))
+  }
+
+  /**
+   * Hands a press on a row with `row-link` to the first control in its cells.
+   *
+   * Dragging across a name selects it, so a press that leaves a selection
+   * behind does nothing. The modifier keys go with the press, so holding one
+   * still opens a new tab.
+   */
+  private readonly handleRowLink = (event: MouseEvent): void => {
+    if (!this.rowLink || this.replaces || event.defaultPrevented || event.button !== 0) {
+      return
+    }
+    const place = this.placeOf(event)
+    if (!place || place.row < 0 || place.row >= this.drawnPage.length || place.column < this.lead) {
+      return
+    }
+    const origin = event.composedPath()[0]
+    if (origin instanceof Node && this.controlsIn(place).some((one) => deepContains(one, origin))) {
+      return
+    }
+    const selection = globalThis.getSelection?.()
+    if (selection && !selection.isCollapsed) {
+      return
+    }
+    const row = place.cell.closest('[part~="row"]')
+    const control = [...(row?.querySelectorAll<HTMLElement>('[part~="cell"] *') ?? [])].find(
+      (one) => isControl(one) && one.getAttribute('part') !== 'toggle',
+    )
+    control?.dispatchEvent(
+      new MouseEvent('click', {
+        altKey: event.altKey,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      }),
+    )
+  }
+
+  /** The names `rowParts` adds to a row's `part`, each after a space. */
+  private rowPartsOf(row: DataRow, index: number): string {
+    const names = this.rowParts?.(row, index).trim()
+    return names ? ` ${names}` : ''
+  }
+
+  /** The sheets the class adopted, kept so a new `cellStyles` replaces only its own. */
+  private ownSheets: CSSStyleSheet[] | undefined
 
   /** Whether a press or a move on a row selects it alone. */
   private get replaces(): boolean {
