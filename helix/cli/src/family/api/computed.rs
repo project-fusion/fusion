@@ -8,7 +8,7 @@
 //! each, as a stop's `words` names `back-words`, `next-words`, and
 //! `skip-words`, read as `stop.words.back` and the rest.
 
-use super::{copy, countdown, delay, notices, sections, stack, total, tour, validation};
+use super::{copy, countdown, delay, files, notices, sections, stack, total, tour, validation};
 use crate::family::read::Lit;
 
 /// The features a render reads a computed value of, by their key.
@@ -16,6 +16,7 @@ pub const FEATURES: &[&str] = &[
     "copy",
     "countdown",
     "delay",
+    "files",
     "notice",
     "notices",
     "queue",
@@ -57,6 +58,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "notices" => push("notices.showing", &notices::notices(value)?.showing),
             "queue" => push("queue.queued", &countdown::queue(value)?.waiting),
             "sections" => push("sections.list", &sections::sections(value)?.list),
+            "files" => push("files.list", &files::files(value)?.list),
             "stack" => {
                 let stack = stack::stack(value)?;
                 for (path, name) in [

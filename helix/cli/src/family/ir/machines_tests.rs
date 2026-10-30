@@ -255,6 +255,34 @@ fn a_form_control_runs_validation_bound_to_where_its_answer_is_held() {
 }
 
 #[test]
+fn files_a_reader_picks_run_files_bound_to_the_presses_that_pick_and_remove() {
+    let input = family(
+        "export default headless('file-input', {
+          events: [event('before-change', ['value']), event('reject', ['files'])],
+          props: [prop('accept', 'string'), prop('disabled', 'boolean'), prop('multiple', 'boolean')],
+          states: ['has-files'],
+          files: { accept: 'accept', hasFiles: 'hasFiles', list: 'chosen', multiple: 'multiple', onBeforeChange: 'beforeChange', onReject: 'reject' },
+          tree: [pressable('field', { disabled: bind('disabled'), picks: true }), pressable('remove', { removes: true })],
+        })",
+    );
+    assert_eq!(named(&input.machines), vec!["press", "press", "files"]);
+    assert_eq!(
+        input.machines[2].bind,
+        bound(&[
+            ("accept", Bound::Prop("accept".to_owned())),
+            ("before", Bound::Event("before-change".to_owned())),
+            ("disabled", Bound::Prop("disabled".to_owned())),
+            ("filled", Bound::State("has-files".to_owned())),
+            ("list", Bound::State("chosen".to_owned())),
+            ("multiple", Bound::Prop("multiple".to_owned())),
+            ("picks", Bound::Part("field".to_owned())),
+            ("reject", Bound::Event("reject".to_owned())),
+            ("removes", Bound::Part("remove".to_owned())),
+        ])
+    );
+}
+
+#[test]
 fn a_score_picked_from_a_row_of_steps_runs_scale_bound_to_its_row() {
     let rating = family(
         "export default headless('rating', {

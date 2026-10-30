@@ -85,6 +85,8 @@ impl<'a> Names<'a> {
                 .chain(api::Notices::computed(&family.api).chain(api::Tour::of(&family.api)))
                 /* And the list an element's sections give it, as an outline's. */
                 .chain(family.api.sections.iter().map(|one| one.list.as_str()))
+                /* And the list of chosen files, as a file input's. */
+                .chain(family.api.files.iter().map(|one| one.list.as_str()))
                 /* And what a stack computes as it moves, as a drilldown is `drilled`. */
                 .chain(family.api.stack.iter().flat_map(api::Stack::computed))
                 /* And the words a copy names the element by, as a copy button `says`. */
@@ -146,6 +148,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     collection(&family.api, &names, &mut found);
     toggle(family, &names, &mut found);
     entry(family, &names, &mut found);
+    filed(family, &names, &mut found);
     ranged(family, &names, &mut found);
     toolbar(family, &names, &mut found);
     sources::timed(family, &names, &mut found);
@@ -158,9 +161,10 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             && family.api.collection.is_none()
             && family.api.entry.is_none()
             && family.api.range.is_none()
+            && family.api.files.is_none()
         {
             found.push(
-                "the element declares a `validation`, and no `toggle`, `collection`, `text` or `range` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range` or `files` holds its answer"
                     .to_owned(),
             );
         }
@@ -478,6 +482,36 @@ pub fn adjustables(nodes: &[Node]) -> Vec<&str> {
         found.extend(adjustables(&node.children));
     }
     found
+}
+
+/// The files' names, and the one press that `picks` and the one that
+/// `removes` where the tree draws them.
+fn filed(family: &Family, names: &Names, found: &mut Vec<String>) {
+    let mut picking = Vec::new();
+    pressables_marked(&family.tree, "picks", &mut picking);
+    let mut removing = Vec::new();
+    pressables_marked(&family.tree, "removes", &mut removing);
+    let Some(files) = &family.api.files else {
+        for name in picking.iter().chain(&removing) {
+            found.push(format!(
+                "`pressable('{name}')` picks or removes files, and the element declares no `files`"
+            ));
+        }
+        return;
+    };
+    references("files", files.references(), names, found);
+    if !family.tree.is_empty() && picking.len() != 1 {
+        found.push(format!(
+            "the element declares `files`, and {} pressables pick, where one does",
+            picking.len()
+        ));
+    }
+    if removing.len() > 1 {
+        found.push(format!(
+            "the element declares `files`, and {} pressables remove, where one does",
+            removing.len()
+        ));
+    }
 }
 
 /// The name of each field a tree draws, in order.

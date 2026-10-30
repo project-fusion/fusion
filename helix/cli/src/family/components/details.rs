@@ -253,6 +253,16 @@ impl Details {
             .classes
             .get(class)
             .ok_or_else(|| format!("`{class}` carries no detail in core's event classes"))?;
+        /* **A detail a phone carries in a shape of its own is declared
+        beside the web's**, as `Native` and its name: a file field's
+        refusal names a `File` on the web, and a phone holds the records its
+        files capability gives. */
+        let native = format!("Native{detail}");
+        let detail = if self.interfaces.contains_key(&native) {
+            &native
+        } else {
+            detail
+        };
         let all = self.flattened(detail, 0)?;
         names
             .iter()

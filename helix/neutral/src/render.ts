@@ -172,6 +172,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly queue: Computes<'queued'>
   /** The list of sections an element's sections give it. */
   readonly sections: Computes<'list'>
+  /** The list of files an element a reader picks files into holds. */
+  readonly files: Computes<'list'>
   /** What a tour's stop computes, and the words of its Back, Next, and Skip. */
   readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
     readonly words: Computes<'back' | 'next' | 'skip'>
@@ -319,6 +321,14 @@ export const numberOrString = (fallback?: number | string): PropSpec<'number | s
 
 /** A prop that holds an object, which the web's attribute writes as JSON. */
 export const object = (): PropSpec<'object'> => spec('object')
+
+/**
+ * A prop that holds a function the element calls, by the signature a phone's
+ * component types it with, written out whole, as a file input's `validate`.
+ * No attribute holds one, so it is a property alone.
+ */
+export const callback = (signature: string): PropSpec<{ readonly function: string }> =>
+  ({ attribute: false, type: { function: signature } }) as PropSpec<{ readonly function: string }>
 
 /** A prop that holds a moment, as `tree.ts` says of `time`, with its default where it has one. */
 export const time = (fallback?: string): PropSpec<'time'> => spec('time', fallback)
@@ -494,10 +504,14 @@ export interface PressableAttributes extends Named {
   /** The event a press sends first. */
   readonly onPress?: Send
   readonly part: string
+  /** The press opens the picker of the element's `files`. */
+  readonly picks?: boolean
   readonly popup?: Given
   /** The one key that presses it, where Enter and Space do not both, as Space alone presses a checkbox. */
   readonly pressKey?: 'enter' | 'space'
   readonly pressed?: Given
+  /** The press takes the file of its row out of the element's `files`. */
+  readonly removes?: boolean
   readonly scrolls?: 'end' | 'start'
   readonly selected?: Given
   /** The press asks the collection its element joins to select it. */

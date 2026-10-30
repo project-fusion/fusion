@@ -20,6 +20,7 @@ export * from './copy.js'
 export * from './countdown.js'
 export * from './delay.js'
 export * from './entry.js'
+export * from './files.js'
 export * from './fold.js'
 export * from './notices.js'
 export * from './page.js'
@@ -38,6 +39,7 @@ import type { Copy } from './copy.js'
 import type { Countdown, Queue } from './countdown.js'
 import type { Delay } from './delay.js'
 import type { Entry } from './entry.js'
+import type { Files } from './files.js'
 import type { Fold } from './fold.js'
 import type { Notice, Notices } from './notices.js'
 import type { Page } from './page.js'
@@ -60,6 +62,9 @@ import type { Validation } from './validation.js'
  * `Intl.NumberFormat` options are. `time` holds a moment: a `Date`, a count
  * of milliseconds since 1970, or an ISO 8601 string, which the web's
  * attribute writes, as a timeline entry's `datetime` is.
+ *
+ * `{ function }` holds a function the element calls, by the signature a
+ * phone's component types it with, as `callback()` writes it.
  */
 export type PropType =
   | 'boolean'
@@ -69,6 +74,7 @@ export type PropType =
   | 'string'
   | 'time'
   | readonly (string | true)[]
+  | { readonly function: string }
 
 /** A prop, its type, and its default. */
 export interface Prop {
@@ -239,6 +245,11 @@ export interface Headless {
    * What the family sends.
    */
   readonly events: readonly Event[]
+  /**
+   * What it holds where a reader picks files into it: the files chosen,
+   * the props that say which it takes, and the events a change sends.
+   */
+  readonly files?: Files
   /**
    * The prop that says how many of the elements passed in are drawn, as an
    * avatar group folds the people past its `max` into a count.

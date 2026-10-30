@@ -32,6 +32,11 @@
 //!   row of steps runs scale, bound to the box whose role is `radiogroup`.
 //!   A split a reader moves between two panes runs resize, bound to the box
 //!   whose role is `separator`.
+//! - An element a reader picks files into runs files, bound to the press
+//!   that `picks` and the press that `removes`, the props that say which
+//!   files it takes and how its rows are written, the value that holds the
+//!   chosen files, the state it is in while it holds one, and the events a
+//!   change sends.
 //! - A form control that declares a `validation` runs validation, bound to
 //!   the props it reads and to where its answer is held.
 //! - A collection runs single selection, or multiple selection where it names
@@ -80,7 +85,7 @@ use serde::Serialize;
 use ts_rs::TS;
 
 use crate::family::api::{
-    Api, Attribute, Binding, Collection, Node, NodeKind, TextEntry, Toggle, ValueRange,
+    Api, Attribute, Binding, Collection, FileChoice, Node, NodeKind, TextEntry, Toggle, ValueRange,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -185,6 +190,9 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(range) = &api.range {
         uses.push(ranged(range, tree));
+    }
+    if let Some(files) = &api.files {
+        uses.push(filed(files, tree));
     }
     if let Some(collection) = &api.collection {
         uses.extend(if collection.mixes {
@@ -519,6 +527,63 @@ fn ranged(range: &ValueRange, tree: &[Node]) -> MachineUse {
             "range"
         }
         .to_owned(),
+    }
+}
+
+/// The files a reader picks, bound to the press that `picks` and the press
+/// that `removes`, the props that say which files it takes and how its rows
+/// are written, the value that holds the chosen files, the state it is in
+/// while it holds one, and the events a change sends. **No machine of
+/// core's holds it**: the web's element hears its `<input type="file">`, and
+/// the native runtime hosts it as `files` over the files capability.
+fn filed(files: &FileChoice, tree: &[Node]) -> MachineUse {
+    let mut bind = BTreeMap::from([("list".to_owned(), Bound::State(files.list.clone()))]);
+    for (name, value) in [
+        ("accept", &files.accept),
+        ("bytes", &files.bytes),
+        ("largest", &files.largest),
+        ("locale", &files.locale),
+        ("most", &files.most),
+        ("multiple", &files.multiple),
+        ("naming", &files.naming),
+        ("refused", &files.refused),
+        ("removed", &files.removed),
+    ] {
+        if let Some(prop) = value {
+            bind.insert(name.to_owned(), Bound::Prop(prop.clone()));
+        }
+    }
+    if let Some(state) = &files.filled {
+        bind.insert("filled".to_owned(), Bound::State(state.clone()));
+    }
+    for (name, value) in [
+        ("before", &files.before),
+        ("change", &files.change),
+        ("input", &files.input),
+        ("reject", &files.reject),
+    ] {
+        if let Some(event) = value {
+            bind.insert(name.to_owned(), Bound::Event(event.clone()));
+        }
+    }
+    for flag in ["picks", "removes"] {
+        let marked = nodes(tree).find(|node| {
+            node.kind == NodeKind::Pressable
+                && matches!(node.attributes.get(flag), Some(Attribute::Flag(true)))
+        });
+        if let Some(node) = marked {
+            bind.insert(flag.to_owned(), Bound::Part(node.name.clone()));
+            if flag == "picks" {
+                if let Some(Attribute::Bound(Binding::Bind(prop))) = node.attributes.get("disabled")
+                {
+                    bind.insert("disabled".to_owned(), Bound::Prop(prop.clone()));
+                }
+            }
+        }
+    }
+    MachineUse {
+        bind,
+        machine: "files".to_owned(),
     }
 }
 
