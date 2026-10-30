@@ -314,6 +314,44 @@ impl Store for Postgres {
         )))
     }
 
+    async fn nodes(&self, ids: &[Id]) -> Result<Vec<(Id, Node)>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let listed: Vec<uuid::Uuid> = ids.iter().map(|id| id.0).collect();
+        let database = &self.database;
+        let mut transaction = database.begin().await?;
+        let rows = database
+            .query(
+                "SELECT trace, id, created_at, detail FROM nodes
+                 WHERE id = ANY($1::uuid[]) ORDER BY id",
+            )
+            .bind(&listed)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let edges = database
+            .query(
+                "SELECT child, parent FROM edges
+                 WHERE child = ANY($1::uuid[]) ORDER BY child, position",
+            )
+            .bind(&listed)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        transaction.commit().await.map_err(storage_error)?;
+        let mut parents = parents(&edges)?;
+        rows.iter()
+            .map(|row| {
+                let id: uuid::Uuid = row.try_get("id").map_err(storage_error)?;
+                Ok((
+                    Id(row.try_get("trace").map_err(storage_error)?),
+                    node(row, parents.remove(&id).unwrap_or_default())?,
+                ))
+            })
+            .collect()
+    }
+
     async fn find(&self, search: &Search) -> Result<Page> {
         crate::search::postgres::find(&self.database, search).await
     }

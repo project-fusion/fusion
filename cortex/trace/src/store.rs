@@ -87,6 +87,16 @@ pub trait Store: Send + Sync {
     /// [`Error::Storage`] if the backend fails.
     async fn node(&self, id: Id) -> Result<Option<(Id, Node)>>;
 
+    /// Each node in `ids` the store holds, with its parents and the trace it
+    /// is in, in the order the nodes were written, each once. An id the store
+    /// does not hold is skipped, and no ids give no nodes. A reader that needs
+    /// many nodes by id asks once rather than once per node.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn nodes(&self, ids: &[Id]) -> Result<Vec<(Id, Node)>>;
+
     /// The page of traces `search` finds, best first, each with its best
     /// matching entries and how many matched, and how many traces matched in
     /// all. [`crate::search`] says what an entry is and how a query matches
@@ -264,6 +274,19 @@ impl Store for InMemory {
                 .find(|node| node.id == id)
                 .map(|node| (*trace, node.clone()))
         }))
+    }
+
+    async fn nodes(&self, ids: &[Id]) -> Result<Vec<(Id, Node)>> {
+        let wanted: std::collections::HashSet<Id> = ids.iter().copied().collect();
+        let traces = self.lock()?;
+        let mut found: Vec<(Id, Node)> = traces
+            .iter()
+            .flat_map(|(trace, nodes)| nodes.iter().map(move |node| (*trace, node)))
+            .filter(|(_, node)| wanted.contains(&node.id))
+            .map(|(trace, node)| (trace, node.clone()))
+            .collect();
+        found.sort_by_key(|(_, node)| node.id);
+        Ok(found)
     }
 
     async fn find(&self, search: &Search) -> Result<Page> {
@@ -725,6 +748,49 @@ mod sqlite {
             Ok(Some((parse(&trace)?, node(&row, parents)?)))
         }
 
+        async fn nodes(&self, ids: &[Id]) -> Result<Vec<(Id, Node)>> {
+            if ids.is_empty() {
+                return Ok(Vec::new());
+            }
+            let listed = serde_json::to_string(
+                &ids.iter().map(ToString::to_string).collect::<Vec<String>>(),
+            )
+            .map_err(storage)?;
+            let rows = sqlx::query(
+                "SELECT trace, id, created_at, detail FROM nodes
+                 WHERE id IN (SELECT value FROM json_each(?)) ORDER BY id",
+            )
+            .bind(listed.clone())
+            .fetch_all(&self.pool)
+            .await
+            .map_err(storage)?;
+            let edges = sqlx::query(
+                "SELECT child, parent FROM edges
+                 WHERE child IN (SELECT value FROM json_each(?)) ORDER BY child, position",
+            )
+            .bind(listed)
+            .fetch_all(&self.pool)
+            .await
+            .map_err(storage)?;
+            let mut parents: std::collections::HashMap<String, Vec<Id>> =
+                std::collections::HashMap::new();
+            for edge in &edges {
+                let child: String = edge.try_get("child").map_err(storage)?;
+                let parent: String = edge.try_get("parent").map_err(storage)?;
+                parents.entry(child).or_default().push(parse(&parent)?);
+            }
+            let mut found = Vec::with_capacity(rows.len());
+            for row in &rows {
+                let trace: String = row.try_get("trace").map_err(storage)?;
+                let id: String = row.try_get("id").map_err(storage)?;
+                found.push((
+                    parse(&trace)?,
+                    node(row, parents.remove(&id).unwrap_or_default())?,
+                ));
+            }
+            Ok(found)
+        }
+
         async fn find(&self, search: &Search) -> Result<Page> {
             crate::search::sqlite::find(&self.pool, search).await
         }
@@ -825,7 +891,39 @@ pub(crate) mod conformance {
         forgetting_a_trace_removes_it_and_what_it_fed(store).await;
         nodes_of_a_kind_come_from_every_trace_from_a_time(store).await;
         a_node_reads_alone_with_its_parents_and_trace(store).await;
+        nodes_read_by_id_in_one_call(store).await;
         crate::search::conformance::run(store).await;
+    }
+
+    async fn nodes_read_by_id_in_one_call(store: &dyn Store) {
+        let first = Id::new();
+        let second = Id::new();
+        let root = task("batch root");
+        let sibling = context(vec![root.id]);
+        let reader = context(vec![sibling.id, root.id]);
+        store.append(first, &root).await.unwrap();
+        store.append(first, &sibling).await.unwrap();
+        store.append(second, &reader).await.unwrap();
+
+        let found = store
+            .nodes(&[reader.id, root.id, Id::new(), root.id])
+            .await
+            .unwrap();
+
+        assert_eq!(
+            found
+                .iter()
+                .map(|(trace, node)| (*trace, node.id))
+                .collect::<Vec<_>>(),
+            vec![(first, root.id), (second, reader.id)],
+            "each held node once, in the order written, unknown ids skipped"
+        );
+        assert_eq!(found[1].1.derived_from, vec![sibling.id, root.id]);
+        assert!(store.nodes(&[]).await.unwrap().is_empty());
+
+        store.delete_cascade(sibling.id).await.unwrap();
+
+        assert!(store.nodes(&[reader.id]).await.unwrap().is_empty());
     }
 
     async fn nodes_of_a_kind_come_from_every_trace_from_a_time(store: &dyn Store) {
