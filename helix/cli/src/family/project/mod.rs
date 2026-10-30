@@ -80,6 +80,10 @@ pub struct Config {
     /// types each native event from.
     #[serde(default)]
     pub events: Option<String>,
+    /// The folder of the families whose own `events` folders hold the classes
+    /// only that family sends, each read beside `events`.
+    #[serde(default, rename = "familyEvents")]
+    pub family_events: Option<String>,
     /// Where each command writes.
     #[serde(default)]
     pub outputs: OutputConfig,
@@ -276,6 +280,7 @@ pub struct Project {
     pub tokens: Tokens,
     pub manifest: Option<PathBuf>,
     pub events: Option<PathBuf>,
+    pub family_events: Option<PathBuf>,
     pub outputs: Outputs,
     pub runtime: Runtime,
 }
@@ -417,6 +422,7 @@ impl Project {
             tokens,
             manifest: config.manifest.as_deref().map(at),
             events: config.events.as_deref().map(at),
+            family_events: config.family_events.as_deref().map(at),
             outputs,
             runtime,
             repository,

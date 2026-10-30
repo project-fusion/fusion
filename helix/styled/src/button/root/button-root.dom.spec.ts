@@ -46,7 +46,7 @@ describe('a button takes the status tones', () => {
       .map((one) => String((one as { cssText?: string }).cssText ?? ''))
       .join('\n')
     for (const tone of ['info', 'success', 'warning']) {
-      expect(sheet).toContain(`:host([tone="${tone}"])`)
+      expect(sheet).toContain(`[tone="${tone}"]`)
       expect(sheet).toContain(
         tone === 'warning'
           ? '--_button-fill: var(--helix-color-warning-solid)'

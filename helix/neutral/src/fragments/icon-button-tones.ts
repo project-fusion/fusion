@@ -90,6 +90,51 @@ export default fragment(
           },
         },
       ),
+      rule(
+        { tone: 'info' },
+        {
+          own: {
+            iconButtonEdge: token('color-info'),
+            iconButtonInk: token('color-info'),
+            iconButtonInkHover: token('color-info'),
+            iconButtonFill: token('color-info-surface'),
+            iconButtonFillHover: token('color-info-surface-hover'),
+            iconButtonOnTone: token('color-foreground-on-status'),
+            iconButtonTone: token('color-info'),
+            iconButtonToneHover: mix(token('color-info'), 86, token('color-foreground')),
+          },
+        },
+      ),
+      rule(
+        { tone: 'success' },
+        {
+          own: {
+            iconButtonEdge: token('color-success'),
+            iconButtonInk: token('color-success'),
+            iconButtonInkHover: token('color-success'),
+            iconButtonFill: token('color-success-surface'),
+            iconButtonFillHover: token('color-success-surface-hover'),
+            iconButtonOnTone: token('color-foreground-on-status'),
+            iconButtonTone: token('color-success'),
+            iconButtonToneHover: mix(token('color-success'), 86, token('color-foreground')),
+          },
+        },
+      ),
+      rule(
+        { tone: 'warning' },
+        {
+          own: {
+            iconButtonEdge: token('color-warning'),
+            iconButtonInk: token('color-warning'),
+            iconButtonInkHover: token('color-warning'),
+            iconButtonFill: token('color-warning-surface'),
+            iconButtonFillHover: token('color-warning-surface-hover'),
+            iconButtonOnTone: token('color-foreground-on-status'),
+            iconButtonTone: token('color-warning'),
+            iconButtonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
+          },
+        },
+      ),
     ]),
   ],
 )

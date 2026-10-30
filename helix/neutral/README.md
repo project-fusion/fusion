@@ -127,7 +127,7 @@ Each element is a component with its web element's class name, drawn from its
 form by `element` with the machines `behaviorFor` binds. Its props are the web
 element's properties in camel case, each slot is a prop, and each event is a
 handler: `helix-before-activate` is `onBeforeActivate`. A handler gets the
-web's detail under `event.detail`, typed from core's event classes, with
+web's detail under `event.detail`, typed from the event classes, with
 `preventDefault()` and `defaultPrevented`. A prop or an event only the web
 element has is left out, such as an icon's `src` and `load`. The module
 carries its forms as constants, and the styled manifest describes each prop.

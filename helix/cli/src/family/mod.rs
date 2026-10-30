@@ -383,7 +383,7 @@ pub fn components(
     let project = open(config, args.package.as_ref(), from)?;
     let compiled = compile::all(&project)?;
     let events = project.needs(project.events.as_ref(), "events")?;
-    let details = components::Details::read(events)?;
+    let details = components::Details::read(events, project.family_events.as_deref())?;
     let root = match &args.out {
         Some(dir) => locate(dir, from),
         None => project

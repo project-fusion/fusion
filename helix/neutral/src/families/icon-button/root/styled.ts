@@ -6,8 +6,7 @@ import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
- * Icon Button's styled tier, which writes
- * `helix/styled/src/icon-button/root/icon-button-root.generated.css`.
+ * Icon Button's styled tier.
  *
  * **Button's two axes, resting elsewhere.** A text button rests outlined,
  * because a button with words in it is a thing you are meant to see. An icon
@@ -62,7 +61,7 @@ export default styles(
       material: oneOf(['frosted', 'glass', 'transparent']),
       raised: false,
       shape: oneOf(['circle']),
-      tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     },
     stylesheet: 'icon-button/root/icon-button-root.generated.css',
   },
