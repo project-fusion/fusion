@@ -15,6 +15,7 @@ mod copy;
 mod countdown;
 mod delay;
 mod entry;
+mod files;
 mod fold;
 mod host;
 mod item;
@@ -52,6 +53,7 @@ pub use copy::Copy;
 pub use countdown::{Countdown, Queue};
 pub use delay::Delay;
 pub use entry::TextEntry;
+pub use files::FileChoice;
 pub use fold::Fold;
 pub use item::Item;
 pub use members::{props, Event, Literal, Platform, Primitive, PropType, Tier};
@@ -106,6 +108,11 @@ pub struct Api {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry: Option<TextEntry>,
     pub events: Vec<Event>,
+    /// What the element holds where a reader picks files into it: the props
+    /// that say which files it takes, the events a change sends, and the
+    /// list of chosen files its rows are drawn from.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<FileChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -234,6 +241,7 @@ impl Api {
             && self.countdown.is_none()
             && self.delay.is_none()
             && self.events.is_empty()
+            && self.files.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -275,6 +283,7 @@ const FIELDS: &[&str] = &[
     "derived",
     "entry",
     "events",
+    "files",
     "fold",
     "host",
     "item",
@@ -383,6 +392,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             derived,
             entry: field("entry").map(entry::entry).transpose()?,
             events,
+            files: field("files").map(files::files).transpose()?,
             fold,
             host,
             item,

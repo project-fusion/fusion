@@ -286,7 +286,7 @@ pub(crate) fn props(value: &Lit) -> Result<Lit, String> {
 /// One prop's value: a default, which says the type, or a spec.
 fn prop_spec(name: &str, value: &Lit, spec: &mut Spec) -> Result<(), String> {
     let refused = || {
-        format!("prop `{name}` is a default, `string()` and the other types, `oneOf([...], default)`, `property(...)` or `web(...)`")
+        format!("prop `{name}` is a default, `string()` and the other types, `oneOf([...], default)`, `callback('(...) => ...')`, `property(...)` or `web(...)`")
     };
     match value {
         Lit::Bool(_) => (spec.kind, spec.default) = (Some(text("boolean")), Some(value.clone())),
@@ -300,6 +300,15 @@ fn prop_spec(name: &str, value: &Lit, spec: &mut Spec) -> Result<(), String> {
             ("property", [inner]) if !spec.property => {
                 spec.property = true;
                 prop_spec(name, inner, spec)?;
+            }
+            /* A function the element calls, by the signature a phone's
+            component types it with, which no attribute holds. */
+            ("callback", [Lit::Text(signature)]) => {
+                spec.property = true;
+                spec.kind = Some(Lit::Object(vec![(
+                    "function".to_owned(),
+                    Lit::Text(signature.clone()),
+                )]));
             }
             ("oneOf", [values @ Lit::Array(_), rest @ ..]) if rest.len() <= 1 => {
                 spec.kind = Some(values.clone());

@@ -234,11 +234,15 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) 
         .iter()
         .flat_map(|part| &part.members)
         .any(|member| member.ty.contains("FieldHandle"));
+    let file_handles = parts
+        .iter()
+        .flat_map(|part| &part.members)
+        .any(|member| member.ty.contains("FilesHandle"));
     let mut react = vec!["ComponentType"];
     if regions {
         react.push("ReactNode");
     }
-    if handles {
+    if handles || file_handles {
         react.push("Ref");
     }
     let mut out = format!("import type {{ {} }} from 'react'\n", react.join(", "));
@@ -250,6 +254,9 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) 
     names.push("type Family");
     if handles {
         names.push("type FieldHandle");
+    }
+    if file_handles {
+        names.push("type FilesHandle");
     }
     if events {
         names.push(&event_type);
