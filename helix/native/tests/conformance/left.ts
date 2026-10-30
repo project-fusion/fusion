@@ -1,5 +1,6 @@
 import { type Left, panelsOf, type Setup } from '@fusion.dev/helix-testing/conformance'
 import { screen } from '@testing-library/react-native'
+import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { layerIn, PAGE } from './layers'
 import { rangeLeft } from './range'
@@ -220,5 +221,6 @@ export const leftBy = (run: Run, opened: number): Left => {
         .map((panel) => panel.value),
     ...textLeft(run),
     ...rangeLeft(run),
+    ...filesLeft(run),
   }
 }

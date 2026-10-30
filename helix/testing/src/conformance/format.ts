@@ -121,6 +121,12 @@ export interface Held {
  *   down, `by: -1`. The web steps its `<input type="range">` and sends
  *   `input` and `change`, as a browser does for an assistive technology's
  *   increment; a phone sends its control's increment or decrement action.
+ * - `pick`: the reader picks `files` from the element's file chooser, each
+ *   a name, a size in bytes, and a media type, or closes it where `files`
+ *   is empty. The web answers the element's own `<input type="file">` with
+ *   `File`s of those sizes and sends `change`, or `cancel` for a closed
+ *   chooser, as a browser does; a phone sets the fake files capability's
+ *   answer and presses the element's field.
  * - `hold`: a finger holds the element's `part` down while `ms`
  *   milliseconds pass on the fake clock, then lets go, as a reader holds a
  *   number input's stepper. The web sends a touch's `pointerdown`, moves the
@@ -163,6 +169,14 @@ export type Intent =
   | { readonly kind: 'slide'; readonly to: number }
   | { readonly by: -1 | 1; readonly kind: 'adjust' }
   | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
+  | { readonly files: readonly PickedFile[]; readonly kind: 'pick' }
+
+/** A file a `pick` intent chooses: its name, its size in bytes, and its media type. */
+export interface PickedFile {
+  readonly name: string
+  readonly size: number
+  readonly type: string
+}
 
 /** A setup and what a reader does to it. */
 export interface Scenario {
@@ -277,6 +291,12 @@ export interface Left {
    * its verdict sets.
    */
   readonly text?: { readonly invalid: boolean; readonly value: string }
+  /**
+   * The names of the files the element holds, in order, for a family a
+   * reader picks files into, as a file input: the web reads its `files`,
+   * and React Native the list its files machine holds.
+   */
+  readonly files?: readonly string[]
   /**
    * The value the element holds, for a family a reader moves along a
    * track or picks a score in, as a slider or a rating: the web reads its
@@ -424,8 +444,41 @@ export const say = (intent: Intent): string => {
       return intent.by > 0 ? 'increment' : 'decrement'
     case 'hold':
       return `hold ${intent.part} for ${intent.ms} ms`
+    case 'pick':
+      return intent.files.length === 0
+        ? 'close the file chooser'
+        : `pick ${intent.files.map((file) => file.name).join(', ')}`
   }
 }
+
+/**
+ * An event's detail as a record holds it: a list of refused files, as a file
+ * input's `reject` carries, each as its file's name and why, `a.pdf type`,
+ * since the web's are `File`s and a phone's are the files capability's
+ * records. Every other field stands as it is.
+ */
+export const recordedDetail = (
+  detail: Readonly<Record<string, unknown>>,
+): Readonly<Record<string, unknown>> =>
+  Object.fromEntries(
+    Object.entries(detail).map(([key, value]) => [
+      key,
+      Array.isArray(value) && value.length > 0 && value.every(refusedFile)
+        ? value.map((one) => `${one.file.name} ${one.reason}`)
+        : value,
+    ]),
+  )
+
+/** Whether a value is a refused file: a file with a name, and why it was refused. */
+const refusedFile = (
+  value: unknown,
+): value is { readonly file: { readonly name: string }; readonly reason: string } =>
+  typeof value === 'object' &&
+  value !== null &&
+  'reason' in value &&
+  'file' in value &&
+  typeof (value as { file: unknown }).file === 'object' &&
+  typeof (value as { file: { name?: unknown } }).file?.name === 'string'
 
 /** An element of a setup. */
 export const el = (

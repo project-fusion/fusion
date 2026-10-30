@@ -2,12 +2,14 @@ import { type Clock, moveClock } from './clock.js'
 import {
   type Held,
   type Intent,
+  recordedDetail,
   type Scenario,
   type Sent,
   type Setup,
   type Step,
   say,
 } from './format.js'
+import { pick } from './web-files.js'
 import { fakeImages, picturesAnswered } from './web-images.js'
 import { dismiss, focusPage, removePage } from './web-layer.js'
 import { deepActive, isOpen, leftBy, type Mounted, type Updatable } from './web-left.js'
@@ -231,10 +233,10 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
   send(window, 'pointerup', end)
 }
 
-/** Performs one intent on the mounted setup. A clock's intent and a hold are performed by `run`. */
+/** Performs one intent on the mounted setup. A clock's intent, a hold, and a pick are performed by `run`. */
 const perform = async (
   mounted: Mounted,
-  intent: Exclude<Intent, { kind: 'hide' | 'hold' | 'show' | 'wait' }>,
+  intent: Exclude<Intent, { kind: 'hide' | 'hold' | 'pick' | 'show' | 'wait' }>,
 ): Promise<void> => {
   const item = (value: string | undefined) =>
     value === undefined ? mounted.root : (mounted.items.get(value) ?? mounted.root)
@@ -361,7 +363,11 @@ const BARE: ReadonlySet<string> = new Set([
 /** What an event carries: a custom event's detail, or a `toggle`'s two states. */
 const carried = (event: Event): Readonly<Record<string, unknown>> => {
   if (event instanceof CustomEvent) {
-    return plain(event.detail)
+    return plain(
+      event.detail !== null && typeof event.detail === 'object'
+        ? recordedDetail(event.detail as Readonly<Record<string, unknown>>)
+        : event.detail,
+    )
   }
   const { newState, oldState } = event as Event & { newState?: unknown; oldState?: unknown }
   return typeof newState === 'string' ? { newState, oldState } : {}
@@ -369,11 +375,13 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
 
 /**
  * The families a reader types into, moves along a track, picks a score in,
- * or moves a divider in, whose `input` on each edit, move, or choice is
+ * moves a divider in, or picks files into, whose `input` on each edit,
+ * move, choice, or pick is
  * theirs and is recorded. Every other family's `input`
  * is the composed one its own `<input>` sends, which no record holds.
  */
 const TYPED: ReadonlySet<string> = new Set([
+  'file-input',
   'input',
   'number-input',
   'pin-input',
@@ -427,6 +435,12 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
         }
       } else if (intent.kind === 'hold') {
         const cannot = hold(mounted, intent, clock)
+        if (cannot !== undefined) {
+          steps.push({ cannot, intent: say(intent) })
+          continue
+        }
+      } else if (intent.kind === 'pick') {
+        const cannot = pick(mounted, intent)
         if (cannot !== undefined) {
           steps.push({ cannot, intent: say(intent) })
           continue
