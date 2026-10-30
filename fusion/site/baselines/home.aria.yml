@@ -16,7 +16,7 @@
 - main:
   - heading "An intelligent design system, and the engineers behind it" [level=1]
   - paragraph: Ship faster because the system does the checking.
-  - link "Open Helix":
+  - link "Open Fusion Helix":
     - /url: /helix
   - link "Work with us":
     - /url: /company/services
