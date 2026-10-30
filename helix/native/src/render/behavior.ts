@@ -1,4 +1,5 @@
 import { createElement, Fragment, type ReactNode } from 'react'
+import type { WindowDrawing } from '../machines/window'
 import type { Family } from '../style/form'
 import type { Entry } from './entry'
 import type { Layered } from './layered'
@@ -58,6 +59,8 @@ export interface PartBinding {
    * link in view, gives a ref for each copy here.
    */
   readonly copy?: (item: Entry) => Readonly<Record<string, unknown>>
+  /** What a repeat marked `windowed` draws its list with. */
+  readonly windowed?: WindowDrawing
   /**
    * Draws something around the part's view, as Gesture Handler's
    * `GestureDetector` goes around the view whose touches it hears.
@@ -180,7 +183,13 @@ const bothHeard = (
  * focus, a blur, a touch, or a press going in and out**, as a press and a
  * countdown's hold do, and a press and a stepper's hold.
  */
-const over = (before: PartBinding | undefined, binding: PartBinding): PartBinding => {
+const over = (before: PartBinding | undefined, binding: PartBinding): PartBinding => ({
+  ...laidOver(before, binding),
+  ...(binding.windowed === undefined ? {} : { windowed: binding.windowed }),
+})
+
+/** What `over` joins of two bindings. */
+const laidOver = (before: PartBinding | undefined, binding: PartBinding): PartBinding => {
   const wrap = around(before?.wrap, binding.wrap)
   const copy = bothCopies(before?.copy, binding.copy)
   const earlier = before?.view?.ref

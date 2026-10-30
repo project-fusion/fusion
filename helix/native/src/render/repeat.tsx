@@ -8,6 +8,7 @@ import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
 import { laidOr, listedFor } from './computed'
 import { bound, type Draw, given, type Scope } from './styles'
+import { drawWindowed } from './windowed'
 
 /** The scope what a copy holds is drawn in: its own place in the tree, with the copy's entry. */
 export const outOfCopy = (scope: Scope): Scope => {
@@ -71,7 +72,10 @@ export const drawRepeat = (
   regions: Style,
   inside: Node | 'host',
   draw: Draw,
-): ReactNode[] => {
+): ReactNode => {
+  if (node.attributes?.windowed === true) {
+    return drawWindowed(scope, node, text, regions, inside, draw)
+  }
   const entries = entriesOf(scope, node)
   const counted = Math.floor(Number(bound(scope, node.attributes?.count, node.name)))
   const count =
