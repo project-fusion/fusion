@@ -152,6 +152,7 @@ fn holds(prop: &Prop) -> String {
             .map(|value| format!("\"{value}\""))
             .collect::<Vec<_>>()
             .join(" | "),
+        PropType::Function { function } => function.clone(),
         PropType::Primitive(primitive) => serde_json::to_value(primitive)
             .ok()
             .and_then(|value| value.as_str().map(str::to_owned))

@@ -249,6 +249,24 @@ const SECTIONS: &[Field] = &[
     ("scrollBehavior", "behavior", Name),
 ];
 
+const FILES: &[Field] = &[
+    ("accept", "accept", Name),
+    ("bytesLabel", "bytes", Name),
+    ("hasFiles", "filled", Name),
+    ("list", "list", Name),
+    ("locale", "locale", Name),
+    ("maxFileSize", "largest", Name),
+    ("maxFiles", "most", Name),
+    ("multiple", "multiple", Name),
+    ("onBeforeChange", "before", Name),
+    ("onChange", "change", Name),
+    ("onInput", "input", Name),
+    ("onReject", "reject", Name),
+    ("rejectedText", "refused", Name),
+    ("removeLabel", "naming", Name),
+    ("removedText", "removed", Name),
+];
+
 const SECTION: &[Field] = &[
     ("id", "id", Name),
     ("label", "label", Name),
@@ -410,6 +428,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("countdown", "countdown", COUNTDOWN),
     ("delay", "delay", DELAY),
     ("text", "entry", ENTRY),
+    ("files", "files", FILES),
     ("maxVisible", "fold", MAX_VISIBLE),
     ("notice", "notice", NOTICE),
     ("notices", "notices", NOTICES),
