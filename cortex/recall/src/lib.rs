@@ -685,15 +685,29 @@ pub trait Scorer: Send + Sync {
     }
 }
 
-/// Scores a fact by the share of its words the query holds, ignoring case
-/// and words of fewer than three letters.
+/// Scores a fact by the share of its words the query holds, ignoring case,
+/// words of fewer than three letters, and common words such as `the`, `with`,
+/// and `which`.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Overlap;
+
+const COMMON: &[&str] = &[
+    "about", "after", "again", "all", "also", "and", "any", "are", "because", "been", "before",
+    "being", "between", "both", "but", "can", "could", "did", "does", "during", "each", "every",
+    "few", "for", "from", "had", "has", "have", "her", "here", "him", "his", "how", "into", "its",
+    "just", "may", "might", "more", "most", "much", "must", "nor", "not", "now", "off", "only",
+    "onto", "other", "our", "out", "over", "own", "same", "shall", "she", "should", "some", "such",
+    "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "those",
+    "through", "too", "under", "upon", "very", "was", "were", "what", "when", "where", "which",
+    "while", "who", "whom", "whose", "why", "will", "with", "within", "without", "would", "yet",
+    "you", "your",
+];
 
 fn words(text: &str) -> std::collections::HashSet<String> {
     text.split(|c: char| !c.is_alphanumeric())
         .filter(|word| word.chars().count() >= 3)
         .map(str::to_lowercase)
+        .filter(|word| !COMMON.contains(&word.as_str()))
         .collect()
 }
 
@@ -702,7 +716,7 @@ impl Scorer for Overlap {
     // model needs, and that trips the lint.
     #[allow(clippy::unnecessary_literal_bound)]
     fn id(&self) -> &str {
-        "overlap/1"
+        "overlap/2"
     }
 
     fn score(&self, query: &str, fact: &Fact) -> f32 {
@@ -823,7 +837,7 @@ impl std::fmt::Debug for Weighted<'_> {
 
 impl<'a> Weighted<'a> {
     /// The scorers and their weights. The id names each, as in
-    /// `weighted/1 (overlap/1 0.30, vector/1 ollama/nomic-embed-text 0.70)`.
+    /// `weighted/1 (overlap/2 0.30, vector/1 ollama/nomic-embed-text 0.70)`.
     #[must_use]
     pub fn new(parts: Vec<(&'a dyn Scorer, f32)>) -> Self {
         let parts: Vec<(&dyn Scorer, f32)> = parts
@@ -932,7 +946,7 @@ impl Selection {
 /// assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
 /// assert_eq!(placed.len(), 2, "the docs fact fills the last place");
 /// assert!(placed.iter().all(|(fact, _)| fact.scope == Scope::Personal));
-/// assert_eq!(above.len(), 1, "the docs fact shares only `the` with the question");
+/// assert_eq!(above.len(), 1, "the docs fact shares only `the`, which Overlap leaves out");
 /// ```
 #[must_use]
 pub fn relevant<'a>(
@@ -1392,23 +1406,34 @@ mod tests {
     }
 
     #[test]
+    fn overlap_leaves_out_common_words() {
+        let query = "What is the cost of a release?";
+        let unrelated = Fact::new("The basil is a gift of the neighbors.", vec![], 0.5);
+        let related = Fact::new("The cost of a release is one review.", vec![], 0.5);
+
+        assert!(Overlap.score(query, &unrelated) < f32::EPSILON);
+        assert!(Overlap.score(query, &related) > 0.0);
+        assert_eq!(Overlap.id(), "overlap/2");
+    }
+
+    #[test]
     fn a_weighted_scorer_is_the_weighted_mean_and_says_why() {
         let vector = Vector::new(Embedding::new("scripted/1", vec![1.0, 0.0]));
-        let fact = embedded("the release notes", "scripted/1", vec![1.0, 0.0]);
+        let fact = embedded("the release notes draft", "scripted/1", vec![1.0, 0.0]);
         let both = Weighted::new(vec![(&Overlap, 1.0), (&vector, 3.0), (&Overlap, -2.0)]);
 
         let score = both.score("notes about something else", &fact);
 
-        // The query holds one of the fact's three words, and the vector
-        // matches whole.
+        // The query holds one of the fact's three words, `the` left out, and
+        // the vector matches whole.
         assert!((score - (1.0 / 3.0 + 3.0) / 4.0).abs() < 1e-6, "{score}");
         assert_eq!(
             both.id(),
-            "weighted/1 (overlap/1 1.00, vector/1 scripted/1 3.00, overlap/1 0.00)"
+            "weighted/1 (overlap/2 1.00, vector/1 scripted/1 3.00, overlap/2 0.00)"
         );
         let why = both.explain("notes about something else", &fact);
         assert!(
-            why.starts_with("weighted/1 0.83: overlap/1 0.33 weighed 1.00, vector/1 scripted/1 1.00 weighed 3.00"),
+            why.starts_with("weighted/1 0.83: overlap/2 0.33 weighed 1.00, vector/1 scripted/1 1.00 weighed 3.00"),
             "{why}"
         );
         assert!(Weighted::new(vec![]).score("x", &fact).abs() < f32::EPSILON);
@@ -1502,7 +1527,8 @@ mod tests {
         let placed = placed_for_release(&facts, &both, Selection::top(8).floor(0.3));
 
         // No word in common and a cosine of 0.6 scores 0.42. The basil shares
-        // only "the", and with a cosine of 0.3 scores 0.25.
+        // only "the", which Overlap leaves out, and with a cosine of 0.3
+        // scores 0.21.
         assert_eq!(
             placed,
             [

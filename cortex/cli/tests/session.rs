@@ -237,7 +237,7 @@ fn the_scripted_session_answers_from_three_notes_and_forgets_one() {
     assert!(asked["scorer"]
         .as_str()
         .unwrap()
-        .starts_with("weighted/1 (overlap/1 0.30, vector/1 scripted/week 0.70)"));
+        .starts_with("weighted/1 (overlap/2 0.30, vector/1 scripted/week 0.70)"));
     let why = run.json(&["why", asked["id"].as_str().unwrap()]);
     assert_eq!(
         files(&why),

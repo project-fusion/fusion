@@ -120,7 +120,7 @@ which specifies "the plumber moved the visit to Friday at 14:00." The other fact
 about basil and the spare key are irrelevant to the question.
 
 01a17acc-e05f-… from qwen3:4b, on this machine, given 3 facts ranked by
-weighted/1 (overlap/1 0.30, vector/1 ollama/nomic-embed-text 0.70), each scoring 0.30 or more
+weighted/1 (overlap/2 0.30, vector/1 ollama/nomic-embed-text 0.70), each scoring 0.30 or more
 Trace the answer: cortex why 01a17acc-e05f-…
 ```
 
@@ -140,17 +140,17 @@ answer 01a17acc-e05f-…  local/qwen3:4b, October 26, 2026
   context 01a17acc-d5cc-…  recall/1, 3 facts placed
     fact The plumber moved the visit to Friday at 14:00.
       01a17acc-d581-…  confidence 1.00
-      placed: weighted/1 0.66: overlap/1 0.40 weighed 0.30, vector/1 ollama/nomic-embed-text 0.77 weighed 0.70
+      placed: weighted/1 0.61: overlap/2 0.25 weighed 0.30, vector/1 ollama/nomic-embed-text 0.77 weighed 0.70
       episode 01a17acc-6264-…  notes/wednesday.md, paragraph 1, October 21, 2026
         The plumber moved the visit to Friday at 14:00.
     fact The basil on the windowsill needs water every two days.
       01a17acc-4ac0-…  confidence 1.00
-      placed: weighted/1 0.42: overlap/1 0.12 weighed 0.30, vector/1 ollama/nomic-embed-text 0.54 weighed 0.70
+      placed: weighted/1 0.38: overlap/2 0.00 weighed 0.30, vector/1 ollama/nomic-embed-text 0.54 weighed 0.70
       episode 01a17acb-fd94-…  notes/tuesday.md, paragraph 1, October 19, 2026
         The basil on the windowsill needs water every two days.
     fact The spare key is under the blue flower pot by the back door.
       01a17acc-4abf-…  confidence 1.00
-      placed: weighted/1 0.38: overlap/1 0.11 weighed 0.30, vector/1 ollama/nomic-embed-text 0.49 weighed 0.70
+      placed: weighted/1 0.34: overlap/2 0.00 weighed 0.30, vector/1 ollama/nomic-embed-text 0.49 weighed 0.70
       episode 01a17acb-fd93-…  notes/monday.md, paragraph 2, October 19, 2026
         The spare key is under the blue flower pot by the back door.
 ```

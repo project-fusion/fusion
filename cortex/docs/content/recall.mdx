@@ -87,7 +87,7 @@ assert_eq!(fusion_cortex_recall::estimate(&message), 108);
 ## Retrieval is a strategy
 
 A scorer ranks Engram's facts against a query. `Overlap` counts the words a
-fact shares with the query. `Vector` compares the query's embedding with each
+fact shares with the query, leaving out common words such as `the` and `with`. `Vector` compares the query's embedding with each
 fact's, and `Weighted` combines the two, as the Scoring memory by meaning guide
 describes. A fact that scores nothing still ranks, at half its confidence after
 decay, because what a project's sessions learned is often about the project and
@@ -127,7 +127,7 @@ let above = relevant(&facts, &[Scope::Personal], question, &Overlap, Selection::
 assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
 assert_eq!(placed.len(), 2, "the docs fact fills the last place");
 assert!(placed.iter().all(|(fact, _)| fact.scope == Scope::Personal));
-assert_eq!(above.len(), 1, "the docs fact shares only `the` with the question");
+assert_eq!(above.len(), 1, "the docs fact shares only `the`, which Overlap leaves out");
 ```
 
 [//]: # (/rust)
