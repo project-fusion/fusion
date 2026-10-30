@@ -61,8 +61,7 @@ static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
 /// **A line break may fall anywhere in it**, and in a comment the next line
 /// starts with ` * ` or `// `, so those marks count as the space they replace.
 static MEASURED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"[Aa]gainst[\s*/]+React[\s*/]+(\d+\.\d+\.\d+)")
-        .expect("a literal pattern compiles")
+    Regex::new(r"[Aa]gainst[\s*/]+React[\s*/]+(\d+\.\d+\.\d+)").expect("a literal pattern compiles")
 });
 
 /// The bridge's prefixes, each by the name it is declared under, found by

@@ -248,7 +248,11 @@ impl Source for Component {
 
     fn list(&self, since: Option<&str>) -> Result<Page, Error> {
         let since = since.map(str::to_owned);
-        self.call(|store, reader| reader.fusion_sources_source().call_list(store, since.as_ref()))
+        self.call(|store, reader| {
+            reader
+                .fusion_sources_source()
+                .call_list(store, since.as_ref())
+        })
     }
 
     fn get(&self, id: &str) -> Result<Item, Error> {

@@ -663,7 +663,8 @@ fn react_bridge_mark() {
 /// the development warning about the other two reads.
 #[test]
 fn react_bridge_container() {
-    let bridge = "const REACT_PROPS = '__reactProps$'\nconst REACT_CONTAINER = '__reactContainer$'\n";
+    let bridge =
+        "const REACT_PROPS = '__reactProps$'\nconst REACT_CONTAINER = '__reactContainer$'\n";
     let bundle = "var key = '__reactProps$' + suffix;\nvar root = '__reactContainer$' + suffix;\n";
     plant_in(
         "workspace-react-bridge-container",

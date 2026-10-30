@@ -214,7 +214,11 @@ impl Source for Component {
 
     fn list(&self, since: Option<&str>) -> Result<Page, Error> {
         let since = since.map(str::to_owned);
-        self.call(|store, writer| writer.fusion_sources_source().call_list(store, since.as_ref()))
+        self.call(|store, writer| {
+            writer
+                .fusion_sources_source()
+                .call_list(store, since.as_ref())
+        })
     }
 
     fn get(&self, id: &str) -> Result<Item, Error> {
@@ -224,7 +228,11 @@ impl Source for Component {
 
 impl Tracker for Component {
     fn claim(&self, id: &str, holder: Option<&str>) -> Result<(), Error> {
-        self.call(|store, writer| writer.fusion_tracker_tracker().call_claim(store, id, holder))
+        self.call(|store, writer| {
+            writer
+                .fusion_tracker_tracker()
+                .call_claim(store, id, holder)
+        })
     }
 
     fn update(&self, id: &str, version: &str, change: &Change) -> Result<String, Error> {
@@ -236,7 +244,11 @@ impl Tracker for Component {
     }
 
     fn link(&self, id: &str, address: &str) -> Result<(), Error> {
-        self.call(|store, writer| writer.fusion_tracker_tracker().call_link(store, id, address))
+        self.call(|store, writer| {
+            writer
+                .fusion_tracker_tracker()
+                .call_link(store, id, address)
+        })
     }
 
     fn create(&self, draft: &Draft) -> Result<Item, Error> {

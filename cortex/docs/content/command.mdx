@@ -92,7 +92,7 @@ Release 0.12 ships on Thursday, October 22. Priya reviews every schema
 migration, but she is out that day, so Sam reviews the 0.12 migration.
 
 01a17a1d-d44e-… from scripted/week, on this machine, given 8 facts ranked by
-weighted/1 (overlap/1 0.30, vector/1 scripted/week 0.70), each scoring 0.30 or more
+weighted/1 (overlap/2 0.30, vector/1 scripted/week 0.70), each scoring 0.30 or more
 Trace the answer: cortex why 01a17a1d-d44e-…
 ```
 
@@ -119,12 +119,12 @@ answer 01a17a1d-d44e-…  scripted/week, October 26, 2026
   context 01a17a1d-d44e-…  recall/1, 8 facts placed
     fact Sam covers Priya's reviews while she is out.
       01a17a1d-d3b3-…  confidence 0.78
-      placed: weighted/1 0.74: overlap/1 0.14 weighed 0.30, vector/1 scripted/week 0.99 weighed 0.70
+      placed: weighted/1 0.77: overlap/2 0.25 weighed 0.30, vector/1 scripted/week 0.99 weighed 0.70
       episode 01a17a1d-d39a-…  notes/wednesday.md, paragraph 1, October 21, 2026
         Priya is out on Thursday, October 22. Sam covers her reviews while she is out.
     fact Priya is out on Thursday, October 22.
       01a17a1d-d3b2-…  confidence 0.80
-      placed: weighted/1 0.69: overlap/1 0.00 weighed 0.30, vector/1 scripted/week 0.98 weighed 0.70
+      placed: weighted/1 0.69: overlap/2 0.00 weighed 0.30, vector/1 scripted/week 0.98 weighed 0.70
       episode 01a17a1d-d39a-…  notes/wednesday.md, paragraph 1, October 21, 2026
         Priya is out on Thursday, October 22. Sam covers her reviews while she is out.
 ```
