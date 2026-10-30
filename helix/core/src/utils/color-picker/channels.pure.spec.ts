@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type Color, type ColorFormat, parseColor } from '@fusion.dev/helix-core'
+import { type Color, type ColorFormat, parseColor } from '../css-color/css-color.js'
 import { type ChannelName, channelFields, writeChannel } from './channels.js'
 
 const model = (value: string): Color => parseColor(value) as Color
