@@ -1,4 +1,5 @@
 export * from './chip/filter-chip.js'
+export * from './events/index.js'
 export * from './field/filter-field.js'
 export * from './grammar.js'
 export * from './operator/filter-operator.js'

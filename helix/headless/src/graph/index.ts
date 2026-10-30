@@ -1,3 +1,4 @@
+export * from './events/index.js'
 export type {
   Adjacency,
   Entry,

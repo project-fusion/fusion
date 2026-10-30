@@ -3,14 +3,13 @@ import {
   formatWords,
   HelixActivateEvent,
   HelixElement,
-  HelixMapClusterEvent,
-  HelixMapPartChangeEvent,
   isRtl,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
+import { HelixMapClusterEvent, HelixMapPartChangeEvent } from '../events/index.js'
 
 /** A place in a points layer, written as an object with coordinates and an optional name. */
 export interface MapPointsPlace {

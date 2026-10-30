@@ -4,9 +4,7 @@ import {
   deepContains,
   focusableElements,
   formatWords,
-  HelixBeforeReadEvent,
   HelixElement,
-  HelixReadEvent,
   MixinDismissible,
   requestChange,
   slotFilled,
@@ -21,6 +19,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    plain `html` cannot: it renders the placeholder as the element instead, which
    shifts every attribute after it by one. See `renderTime`. */
 import { html } from 'lit/static-html.js'
+import { HelixBeforeReadEvent, HelixReadEvent } from '../events/index.js'
 /* Both tiers import this, the relative path resolving to each tier's own element. */
 import '../../format-date/index.js'
 

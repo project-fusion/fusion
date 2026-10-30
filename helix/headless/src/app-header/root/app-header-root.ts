@@ -4,7 +4,6 @@ import {
   deepContains,
   elementById,
   HelixElement,
-  HelixScrolledEvent,
   hostAria,
   internalsOf,
   MixinControllerOpen,
@@ -22,6 +21,7 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { HelixScrolledEvent } from '../events/index.js'
 import { inSectioningContent } from '../sectioning.js'
 
 /**

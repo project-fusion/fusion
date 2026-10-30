@@ -8,7 +8,6 @@ import { helixEventNames } from './names.js'
 type Module = typeof import('./events.js')
 
 let events: Module
-let HelixRejectEvent: Module['HelixRejectEvent']
 
 /* Imported after registration, because the event classes capture whichever
    `Event` is global when the module is evaluated. Specs share one module cache,
@@ -19,7 +18,6 @@ let HelixRejectEvent: Module['HelixRejectEvent']
 beforeAll(async () => {
   registerDom()
   events = await import('./events.js')
-  ;({ HelixRejectEvent } = events)
 })
 
 describe('the names this library dispatches', () => {
@@ -62,23 +60,6 @@ describe('the names this library dispatches', () => {
   })
 })
 
-describe('the event a file field sends for the files it refused', () => {
-  test('is helix-reject, bubbling out of the shadow root, and cannot be canceled', () => {
-    const file = new File(['x'], 'notes.txt', { type: 'text/plain' })
-    const event = new HelixRejectEvent({ files: [{ file, reason: 'type' }] })
-    expect(event.type).toBe('helix-reject')
-    expect(event.bubbles).toBe(true)
-    expect(event.composed).toBe(true)
-    expect(event.cancelable).toBe(false)
-    expect(event.detail.files[0]?.file).toBe(file)
-    expect(event).toBeInstanceOf(CustomEvent)
-  })
-
-  test('is a name this library dispatches', () => {
-    expect(helixEventNames.has('helix-reject')).toBe(true)
-  })
-})
-
 describe('the events that carried no class before', () => {
   test('helix-clear and helix-copy-error bubble out of the shadow root and cannot be canceled', async () => {
     const { HelixClearEvent, HelixCopyErrorEvent } = await import('./events.js')
@@ -91,60 +72,6 @@ describe('the events that carried no class before', () => {
     expect(new HelixCopyErrorEvent().type).toBe('helix-copy-error')
     expect(helixEventNames.has('helix-clear')).toBe(true)
     expect(helixEventNames.has('helix-copy-error')).toBe(true)
-  })
-
-  test('helix-stop bubbles out of the shadow root and cannot be canceled', async () => {
-    const { HelixStopEvent } = await import('./events.js')
-    const event = new HelixStopEvent()
-    expect([event.type, event.bubbles, event.composed, event.cancelable]).toEqual([
-      'helix-stop',
-      true,
-      true,
-      false,
-    ])
-    expect(helixEventNames.has('helix-stop')).toBe(true)
-  })
-
-  test('helix-aura-fallback says why the gradient shows', async () => {
-    const { HelixAuraFallbackEvent } = await import('./events.js')
-    const event = new HelixAuraFallbackEvent({ reason: 'lost' })
-    expect(event.type).toBe('helix-aura-fallback')
-    expect(event.detail.reason).toBe('lost')
-    expect(event.bubbles).toBe(true)
-    expect(event.cancelable).toBe(false)
-    expect(helixEventNames.has('helix-aura-fallback')).toBe(true)
-  })
-
-  test('helix-strands-fallback says why the gradient shows', async () => {
-    const { HelixStrandsFallbackEvent } = await import('./events.js')
-    const event = new HelixStrandsFallbackEvent({ reason: 'software' })
-    expect(event.type).toBe('helix-strands-fallback')
-    expect(event.detail.reason).toBe('software')
-    expect(event.bubbles).toBe(true)
-    expect(event.cancelable).toBe(false)
-    expect(helixEventNames.has('helix-strands-fallback')).toBe(true)
-  })
-})
-
-describe('the notifications a sandbox sends once a request is applied', () => {
-  test('helix-edit, helix-split and helix-panel-resize carry the new value and cannot be canceled', async () => {
-    const { HelixEditEvent, HelixPanelResizeEvent, HelixSplitEvent } = await import('./events.js')
-    const sent = [
-      new HelixEditEvent({ value: '<p>' }),
-      new HelixSplitEvent({ value: '60' }),
-      new HelixPanelResizeEvent({ value: '120' }),
-    ]
-    expect(sent.map((event) => event.type)).toEqual([
-      'helix-edit',
-      'helix-split',
-      'helix-panel-resize',
-    ])
-    for (const event of sent) {
-      expect(event.cancelable).toBe(false)
-      expect(event.bubbles).toBe(true)
-      expect(event.composed).toBe(true)
-      expect(helixEventNames.has(event.type)).toBe(true)
-    }
   })
 })
 
@@ -162,33 +89,13 @@ describe('the event a reader sends to ask for more items', () => {
 
 describe('the events phase two sent as plain events', () => {
   test('bubble out of the shadow root, cannot be canceled, and are names this library dispatches', async () => {
-    const {
-      HelixActionEvent,
-      HelixEndEvent,
-      HelixExpandEvent,
-      HelixLoadEvent,
-      HelixRangeChangeEvent,
-      HelixCheckEvent,
-      HelixTypingEvent,
-    } = await import('./events.js')
+    const { HelixCheckEvent, HelixExpandEvent, HelixLoadEvent } = await import('./events.js')
     const sent = [
-      new HelixActionEvent(),
-      new HelixEndEvent(),
       new HelixExpandEvent({ value: 'a,b' }),
       new HelixLoadEvent(),
-      new HelixRangeChangeEvent({ first: 2, last: 9 }),
       new HelixCheckEvent({ checked: true }),
-      new HelixTypingEvent({ typing: false }),
     ]
-    expect(sent.map((event) => event.type)).toEqual([
-      'helix-action',
-      'helix-end',
-      'helix-expand',
-      'helix-load',
-      'helix-range-change',
-      'helix-check',
-      'helix-typing',
-    ])
+    expect(sent.map((event) => event.type)).toEqual(['helix-expand', 'helix-load', 'helix-check'])
     for (const event of sent) {
       expect(event.bubbles).toBe(true)
       expect(event.composed).toBe(true)
@@ -198,24 +105,8 @@ describe('the events phase two sent as plain events', () => {
   })
 
   test('carry the state they report, where there is one', async () => {
-    const { HelixExpandEvent, HelixRangeChangeEvent, HelixCheckEvent, HelixTypingEvent } =
-      await import('./events.js')
+    const { HelixCheckEvent, HelixExpandEvent } = await import('./events.js')
     expect(new HelixExpandEvent({ value: 'a,b' }).detail.value).toBe('a,b')
-    expect(new HelixRangeChangeEvent({ first: 2, last: 9 }).detail).toEqual({ first: 2, last: 9 })
     expect(new HelixCheckEvent({ checked: false }).detail.checked).toBe(false)
-    expect(new HelixTypingEvent({ typing: true }).detail.typing).toBe(true)
-  })
-})
-
-describe('the event a control sends once a press has acted', () => {
-  test('is helix-press, carries what pressed it, bubbles out of the shadow root and cannot be canceled', async () => {
-    const { HelixPressEvent } = await import('./events.js')
-    const event = new HelixPressEvent({ pointerType: 'keyboard' })
-    expect(event.type).toBe('helix-press')
-    expect(event.detail.pointerType).toBe('keyboard')
-    expect(event.bubbles).toBe(true)
-    expect(event.composed).toBe(true)
-    expect(event.cancelable).toBe(false)
-    expect(helixEventNames.has('helix-press')).toBe(true)
   })
 })

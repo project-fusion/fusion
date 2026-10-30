@@ -2,17 +2,8 @@ import {
   auditName,
   ChildrenController,
   customElement,
-  type DeviceButton,
   drawIcon,
   FullscreenController,
-  HelixDeviceButtonEvent,
-  HelixDeviceKeyEvent,
-  HelixDeviceScreenshotEvent,
-  HelixDeviceScrollEvent,
-  HelixDeviceSwipeEvent,
-  HelixDeviceTapEvent,
-  HelixDeviceTextEvent,
-  HelixDeviceTouchEvent,
   HelixElement,
   hostAria,
   internalsOf,
@@ -39,6 +30,17 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
+import {
+  type DeviceButton,
+  HelixDeviceButtonEvent,
+  HelixDeviceKeyEvent,
+  HelixDeviceScreenshotEvent,
+  HelixDeviceScrollEvent,
+  HelixDeviceSwipeEvent,
+  HelixDeviceTapEvent,
+  HelixDeviceTextEvent,
+  HelixDeviceTouchEvent,
+} from '../events/index.js'
 /* Side-effect, for the buttons this renders. Both tiers import it, because
    this tier writes the template and the styled tier inherits it. */
 import '../../icon-button/index.js'

@@ -10,7 +10,6 @@ import {
   formatWords,
   HelixBeforePinEvent,
   HelixElement,
-  HelixHistoryEvent,
   HelixPinEvent,
   hostAria,
   internalsOf,
@@ -36,6 +35,7 @@ import { repeat } from 'lit/directives/repeat.js'
 /* `static-html`'s `html`, because a turn fed as data is drawn with the tier's
    own message tag, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
+import { HelixHistoryEvent } from '../events/index.js'
 import '../message/chat-message.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
 import { authorWords, TURN_WORDS, type TurnWords } from '../naming.js'

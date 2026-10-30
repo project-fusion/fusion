@@ -9,13 +9,6 @@ import {
   HelixBeforeCheckEvent,
   HelixCheckEvent,
   HelixElement,
-  HelixMapClusterEvent,
-  HelixMapPanEvent,
-  HelixMapPartChangeEvent,
-  HelixMapReadyEvent,
-  HelixMapRotateEvent,
-  HelixMapTiltEvent,
-  HelixMapZoomEvent,
   hostAria,
   internalsOf,
   KeyboardNavigationController,
@@ -43,6 +36,15 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
+import {
+  HelixMapClusterEvent,
+  HelixMapPanEvent,
+  HelixMapPartChangeEvent,
+  HelixMapReadyEvent,
+  HelixMapRotateEvent,
+  HelixMapTiltEvent,
+  HelixMapZoomEvent,
+} from '../events/index.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
 import { live } from 'lit/directives/live.js'

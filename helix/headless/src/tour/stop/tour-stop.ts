@@ -3,7 +3,6 @@ import {
   customElement,
   elementById,
   HelixElement,
-  HelixTourAskEvent,
   OpenPhaseController,
   type Placement,
   PopoverController,
@@ -15,6 +14,7 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
+import { HelixTourAskEvent } from '../events/index.js'
 import '../../button/index.js'
 import { stopNaming } from '../naming.js'
 

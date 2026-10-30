@@ -34,8 +34,9 @@ ways:
 
 - The class name is in the manifest, so the framework typings can emit a typed
   callback. A bare `CustomEvent` would give `(detail: unknown)`.
-- The package augments `HTMLElementEventMap`, which types `addEventListener`
-  when you write plain HTML.
+- The family augments `HTMLElementEventMap` for its own events, and core does
+  for the events several families share. Importing a family types
+  `addEventListener` for its events when you write plain HTML.
 - The name is defined on the class, so a dispatch and a listener always use the
   same string.
 

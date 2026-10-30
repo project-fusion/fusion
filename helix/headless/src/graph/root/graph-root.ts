@@ -2,16 +2,7 @@ import {
   auditName,
   customElement,
   formatWords,
-  type GraphSignalDetail,
-  HelixBeforeGraphFilterEvent,
   HelixElement,
-  HelixGraphFilterEvent,
-  HelixGraphLayoutEvent,
-  HelixGraphPanEvent,
-  HelixGraphPartChangeEvent,
-  HelixGraphReadyEvent,
-  HelixGraphSignalEvent,
-  HelixGraphZoomEvent,
   isRtl,
   MixinControllerActive,
   MixinViewport,
@@ -33,6 +24,17 @@ import { list, magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
+import {
+  type GraphSignalDetail,
+  HelixBeforeGraphFilterEvent,
+  HelixGraphFilterEvent,
+  HelixGraphLayoutEvent,
+  HelixGraphPanEvent,
+  HelixGraphPartChangeEvent,
+  HelixGraphReadyEvent,
+  HelixGraphSignalEvent,
+  HelixGraphZoomEvent,
+} from '../events/index.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
 import { repeat } from 'lit/directives/repeat.js'

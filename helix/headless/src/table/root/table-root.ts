@@ -12,7 +12,6 @@ import {
   format,
   formatWords,
   type HelixBeforeCheckEvent,
-  HelixBeforeExpandEvent,
   HelixBeforeSelectEvent,
   HelixBeforeSortEvent,
   HelixElement,
@@ -41,6 +40,7 @@ import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
 import { html } from 'lit/static-html.js'
+import { HelixBeforeExpandEvent } from '../events/index.js'
 import '../../checkbox/index.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import { type GridCell, type LeadColumn, TableGridController } from '../grid-controller.js'

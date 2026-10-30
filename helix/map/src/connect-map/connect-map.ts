@@ -1,16 +1,14 @@
 import {
   HelixActivateEvent,
-  HelixMapClusterEvent,
-  HelixMapPanEvent,
-  HelixMapPartChangeEvent,
-  HelixMapRotateEvent,
-  HelixMapTiltEvent,
-  HelixMapZoomEvent,
   isRtl,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
+import type {
+  HelixMapClusterEvent,
+  HelixMapPartChangeEvent,
+} from '@fusion.dev/helix-headless/map/events'
 import { CREDIT, creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
 import { type MapPoints, pointsFrom } from '../points/points.js'
@@ -740,8 +738,8 @@ export const connectMap = (
       driver.zoomBy(by > 0 ? 1 : -1, motionOf(frame, 'step'))
     }
   }
-  frame.addEventListener(HelixMapPanEvent.eventName, handlePan)
-  frame.addEventListener(HelixMapZoomEvent.eventName, handleZoom)
+  frame.addEventListener('helix-map-pan' satisfies keyof HTMLElementEventMap, handlePan)
+  frame.addEventListener('helix-map-zoom' satisfies keyof HTMLElementEventMap, handleZoom)
   /* **Rotate and tilt, where the renderer can.** A driver without them, such
      as Leaflet's, which draws flat, leaves the buttons doing nothing. */
   const handleRotate = (event: Event): void => {
@@ -752,8 +750,8 @@ export const connectMap = (
     const { by, to } = (event as CustomEvent<{ by?: number; to?: number }>).detail
     driver.tilt?.({ by, to }, motionOf(frame, 'step'))
   }
-  frame.addEventListener(HelixMapRotateEvent.eventName, handleRotate)
-  frame.addEventListener(HelixMapTiltEvent.eventName, handleTilt)
+  frame.addEventListener('helix-map-rotate' satisfies keyof HTMLElementEventMap, handleRotate)
+  frame.addEventListener('helix-map-tilt' satisfies keyof HTMLElementEventMap, handleTilt)
   /* The frame's `bearing` and `pitch` follow the view, so its Face north
      needle points north as the map turns, and its 3D button is pressed while
      the map is tilted. Rounded, so a still map writes nothing. */
@@ -1654,7 +1652,10 @@ export const connectMap = (
       soon(kind === 'layer' ? { draw: true } : { place: true })
     }
   }
-  frame.addEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
+  frame.addEventListener(
+    'helix-map-part-change' satisfies keyof HTMLElementEventMap,
+    handlePartChange,
+  )
   /* **A route's color is its stylesheet's**, so what restyles one is watched
      on each route and area themselves, and not over the whole frame, where
      the renderer rebuilds its own controls: a class, an inline token, and the
@@ -1748,7 +1749,7 @@ export const connectMap = (
     }
     driver.fit(bounds, 96, motionOf(frame, 'travel'))
   }
-  frame.addEventListener(HelixMapClusterEvent.eventName, handleCluster)
+  frame.addEventListener('helix-map-cluster' satisfies keyof HTMLElementEventMap, handleCluster)
 
   /* **A fan closes on Escape**, back to the cluster with the focus on it, and
      on a press anywhere on the map that is not one of its places. */
@@ -1801,9 +1802,15 @@ export const connectMap = (
       stopTheming?.()
       styled.disconnect()
       children.disconnect()
-      frame.removeEventListener(HelixMapPartChangeEvent.eventName, handlePartChange)
+      frame.removeEventListener(
+        'helix-map-part-change' satisfies keyof HTMLElementEventMap,
+        handlePartChange,
+      )
       frame.removeEventListener('focusin', reveal)
-      frame.removeEventListener(HelixMapClusterEvent.eventName, handleCluster)
+      frame.removeEventListener(
+        'helix-map-cluster' satisfies keyof HTMLElementEventMap,
+        handleCluster,
+      )
       frame.removeEventListener('keydown', handleFanKey)
       frame.removeEventListener('pointerdown', handleFanDown)
       frame.removeEventListener('click', handleFanPress)
@@ -1839,10 +1846,13 @@ export const connectMap = (
       for (const position of positions()) {
         placeOn(position, UNPLACED_POSITION)
       }
-      frame.removeEventListener(HelixMapPanEvent.eventName, handlePan)
-      frame.removeEventListener(HelixMapZoomEvent.eventName, handleZoom)
-      frame.removeEventListener(HelixMapRotateEvent.eventName, handleRotate)
-      frame.removeEventListener(HelixMapTiltEvent.eventName, handleTilt)
+      frame.removeEventListener('helix-map-pan' satisfies keyof HTMLElementEventMap, handlePan)
+      frame.removeEventListener('helix-map-zoom' satisfies keyof HTMLElementEventMap, handleZoom)
+      frame.removeEventListener(
+        'helix-map-rotate' satisfies keyof HTMLElementEventMap,
+        handleRotate,
+      )
+      frame.removeEventListener('helix-map-tilt' satisfies keyof HTMLElementEventMap, handleTilt)
       stopBearing?.()
       stopView?.()
       stopWatchingPreviews?.()

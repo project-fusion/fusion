@@ -6,10 +6,7 @@ import {
   DelayController,
   drawIcon,
   drawStatus,
-  type FacetDetail,
   formatWords,
-  HelixBeforeFacetEvent,
-  HelixFacetEvent,
   HelixFormElement,
   holdCaret,
   howToRegister,
@@ -33,6 +30,7 @@ import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
+import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
 import {

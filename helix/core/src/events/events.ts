@@ -12,7 +12,15 @@
  * 3. The event name lives on the class as `eventName`, so a listener and a
  *    dispatch cannot disagree about the string.
  *
- * **One module per class, and this file gathers them.** Each class is in a
+ * **Core holds the events more than one family sends, and a family holds its
+ * own.** An event only one family sends lives in that family's `events/` folder
+ * (`helix/headless/src/<family>/events/`, or the styled family's when only the
+ * styled tier sends it), which registers it, types it on `addEventListener`
+ * with its own augmentation of `HTMLElementEventMap`, and adds its name to
+ * `names.ts` through `registerEventNames`. Importing a family therefore types
+ * its events, and this map carries only the shared ones.
+ *
+ * **One module per class, and this file gathers the shared ones.** Each class is in a
  * file of its own beside this one, named after its event (`before-open.ts`
  * holds `HelixBeforeOpenEvent`), and declares its name as `static readonly
  * eventName`, which is how `helix component audit` finds them. What they carry
@@ -22,7 +30,7 @@
  * **Apart because a bundle keeps a class it never uses.** The compiler writes
  * `static readonly eventName` as a static block, and Bun and Rollup both treat
  * one as a side effect, so a class in a shared module stayed in every bundle
- * that imported anything from that module. With the eighty classes in one
+ * that imported anything from that module. With every class in one
  * file, every element shipped all of them, a Badge too. A module whose exports
  * nothing uses is dropped whole, since the package declares no side effects,
  * so a family now ships the classes it dispatches and no others.
@@ -66,325 +74,112 @@
  *   shadow boundary.
  */
 
-import { HelixActionEvent } from './action.js'
 import { HelixActivateEvent } from './activate.js'
-import { HelixAuraFallbackEvent } from './aura-fallback.js'
-import { HelixBandEvent } from './band.js'
 import { HelixBeforeActivateEvent } from './before-activate.js'
 import { HelixBeforeChangeEvent } from './before-change.js'
 import { HelixBeforeCheckEvent } from './before-check.js'
 import { HelixBeforeCloseEvent } from './before-close.js'
-import { HelixBeforeCollapseEvent } from './before-collapse.js'
-import { HelixBeforeEditEvent } from './before-edit.js'
-import { HelixBeforeExpandEvent } from './before-expand.js'
-import { HelixBeforeFacetEvent } from './before-facet.js'
 import { HelixBeforeFilterEvent } from './before-filter.js'
-import { HelixBeforeFollowEvent } from './before-follow.js'
-import { HelixBeforeGraphFilterEvent } from './before-graph-filter.js'
 import { HelixBeforeListenEvent } from './before-listen.js'
-import { HelixBeforeMoveEvent } from './before-move.js'
 import { HelixBeforeNavigateEvent } from './before-navigate.js'
 import { HelixBeforeOpenEvent } from './before-open.js'
-import { HelixBeforePanelResizeEvent } from './before-panel-resize.js'
-import { HelixBeforePasteEvent } from './before-paste.js'
 import { HelixBeforePinEvent } from './before-pin.js'
-import { HelixBeforeReadEvent } from './before-read.js'
-import { HelixBeforeReconnectEvent } from './before-reconnect.js'
-import { HelixBeforeRelabelEvent } from './before-relabel.js'
 import { HelixBeforeReorderEvent } from './before-reorder.js'
 import { HelixBeforeResizeEvent } from './before-resize.js'
 import { HelixBeforeSelectEvent } from './before-select.js'
 import { HelixBeforeSortEvent } from './before-sort.js'
-import { HelixBeforeSplitEvent } from './before-split.js'
-import { HelixCanvasEditEvent } from './canvas-edit.js'
-import { HelixCanvasPanEvent } from './canvas-pan.js'
-import { HelixCanvasViewEvent } from './canvas-view.js'
-import { HelixCanvasZoomEvent } from './canvas-zoom.js'
-import { HelixCaretEvent } from './caret.js'
 import { HelixCheckEvent } from './check.js'
 import { HelixClearEvent } from './clear.js'
-import { HelixCollapseEvent } from './collapse.js'
 import { HelixCompleteEvent } from './complete.js'
-import { HelixConnectEvent } from './connect.js'
-import { HelixConsoleEvent } from './console.js'
 import { HelixCopyEvent } from './copy.js'
 import { HelixCopyErrorEvent } from './copy-error.js'
-import { HelixCreateEvent } from './create.js'
-import { HelixDeviceButtonEvent } from './device-button.js'
-import { HelixDeviceKeyEvent } from './device-key.js'
-import { HelixDeviceScreenshotEvent } from './device-screenshot.js'
-import { HelixDeviceScrollEvent } from './device-scroll.js'
-import { HelixDeviceSwipeEvent } from './device-swipe.js'
-import { HelixDeviceTapEvent } from './device-tap.js'
-import { HelixDeviceTextEvent } from './device-text.js'
-import { HelixDeviceTouchEvent } from './device-touch.js'
 import { HelixDismissEvent } from './dismiss.js'
-import { HelixEditEvent } from './edit.js'
-import { HelixEndEvent } from './end.js'
 import { HelixExpandEvent } from './expand.js'
-import { HelixFacetEvent } from './facet.js'
 import { HelixFilterEvent } from './filter.js'
-import { HelixFollowEvent } from './follow.js'
 import { HelixFoundEvent } from './found.js'
-import { HelixGraphFilterEvent } from './graph-filter.js'
-import { HelixGraphLayoutEvent } from './graph-layout.js'
-import { HelixGraphPanEvent } from './graph-pan.js'
-import { HelixGraphPartChangeEvent } from './graph-part-change.js'
-import { HelixGraphReadyEvent } from './graph-ready.js'
-import { HelixGraphSignalEvent } from './graph-signal.js'
-import { HelixGraphZoomEvent } from './graph-zoom.js'
-import { HelixHistoryEvent } from './history.js'
 import { HelixListenEvent } from './listen.js'
 import { HelixLoadEvent } from './load.js'
 import { HelixLoadMoreEvent } from './load-more.js'
-import { HelixMapClusterEvent } from './map-cluster.js'
-import { HelixMapPanEvent } from './map-pan.js'
-import { HelixMapPartChangeEvent } from './map-part-change.js'
-import { HelixMapReadyEvent } from './map-ready.js'
-import { HelixMapRotateEvent } from './map-rotate.js'
-import { HelixMapTiltEvent } from './map-tilt.js'
-import { HelixMapZoomEvent } from './map-zoom.js'
-import { HelixMoveEvent } from './move.js'
 import { HelixNavigateEvent } from './navigate.js'
-import { HelixNextEvent } from './next.js'
-import { HelixPanelResizeEvent } from './panel-resize.js'
-import { HelixPastedEvent } from './pasted.js'
 import { HelixPinEvent } from './pin.js'
 import { HelixPlotChangeEvent } from './plot-change.js'
 import { HelixPlotTurnEvent } from './plot-turn.js'
-import { HelixPressEvent } from './press.js'
-import { HelixPreviewEvent } from './preview.js'
-import { HelixPreviousEvent } from './previous.js'
-import { HelixRangeChangeEvent } from './range-change.js'
-import { HelixReadEvent } from './read.js'
 import { HelixReadingChangeEvent } from './reading-change.js'
 import { HelixReadingPressEvent } from './reading-press.js'
-import { HelixReconnectEvent } from './reconnect.js'
-import { HelixRejectEvent } from './reject.js'
-import { HelixRelabelEvent } from './relabel.js'
-import { HelixRemoveEvent } from './remove.js'
 import { HelixReorderEvent } from './reorder.js'
 import { HelixResizeEvent } from './resize.js'
 import { HelixResizedEvent } from './resized.js'
-import { HelixSampleEndEvent } from './sample-end.js'
-import { HelixSampleStartEvent } from './sample-start.js'
-import { HelixScrolledEvent } from './scrolled.js'
 import { HelixSelectEvent } from './select.js'
-import { HelixSendEvent } from './send.js'
-import { HelixShortcutEvent } from './shortcut.js'
 import { HelixSortEvent } from './sort.js'
-import { HelixSplitEvent } from './split.js'
-import { HelixStopEvent } from './stop.js'
-import { HelixStrandsFallbackEvent } from './strands-fallback.js'
-import { HelixTerminalBellEvent } from './terminal-bell.js'
-import { HelixTerminalInputEvent } from './terminal-input.js'
-import { HelixTerminalLinkEvent } from './terminal-link.js'
-import { HelixTerminalResizeEvent } from './terminal-resize.js'
-import { HelixTerminalRestartEvent } from './terminal-restart.js'
-import { HelixTerminalTitleEvent } from './terminal-title.js'
-import { HelixTourAskEvent } from './tour-ask.js'
-import { HelixTourStatusEvent } from './tour-status.js'
-import { HelixTypingEvent } from './typing.js'
 
 export type {
   ActivateDetail,
-  AuraFallbackDetail,
-  BandDetail,
-  CanvasView,
-  CaretDetail,
   ChangeDetail,
   CheckDetail,
   CompleteDetail,
-  ConnectDetail,
-  ConsoleDetail,
   CopyDetail,
-  CreateDetail,
-  DeviceButton,
-  DeviceButtonDetail,
-  DeviceKeyDetail,
-  DeviceScrollDetail,
-  DeviceSwipeDetail,
-  DeviceTapDetail,
-  DeviceTextDetail,
-  DeviceTouchDetail,
   DismissDetail,
-  FacetDetail,
   FilterDetail,
-  FollowDetail,
   FoundDetail,
-  GraphFilterDetail,
-  GraphLayoutDetail,
-  GraphPartChangeDetail,
-  GraphSignalDetail,
   ListenDetail,
-  MapClusterDetail,
-  MapPanDetail,
-  MapPartChangeDetail,
-  MapRotateDetail,
-  MapTiltDetail,
-  MapZoomDetail,
-  MoveDetail,
   NavigateDetail,
   OpenDetail,
-  PasteDetail,
   PlotChangeDetail,
   PlotTurnDetail,
-  PressDetail,
   PressPointerType,
-  RangeDetail,
-  ReadDetail,
   ReadingDetail,
-  ReconnectDetail,
-  Refusal,
-  RefusedFile,
-  RejectDetail,
-  RelabelDetail,
-  RemoveDetail,
   ReorderDetail,
   ResizeDetail,
-  ScrolledDetail,
   SelectDetail,
-  SendDetail,
-  ShortcutDetail,
-  SkipDetail,
   SortDetail,
-  StrandsFallbackDetail,
-  TerminalInputDetail,
-  TerminalLinkDetail,
-  TerminalResizeDetail,
-  TerminalTitleDetail,
-  TourAskDetail,
-  TourStatusDetail,
-  TypingDetail,
   ViewportPanDetail,
   ViewportZoomDetail,
 } from './details.js'
 export { helixEventNames } from './names.js'
 export {
-  HelixActionEvent,
   HelixActivateEvent,
-  HelixAuraFallbackEvent,
-  HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCheckEvent,
   HelixBeforeCloseEvent,
-  HelixBeforeCollapseEvent,
-  HelixBeforeEditEvent,
-  HelixBeforeExpandEvent,
-  HelixBeforeFacetEvent,
   HelixBeforeFilterEvent,
-  HelixBeforeFollowEvent,
-  HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
-  HelixBeforeMoveEvent,
   HelixBeforeNavigateEvent,
   HelixBeforeOpenEvent,
-  HelixBeforePanelResizeEvent,
-  HelixBeforePasteEvent,
   HelixBeforePinEvent,
-  HelixBeforeReadEvent,
-  HelixBeforeReconnectEvent,
-  HelixBeforeRelabelEvent,
   HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSelectEvent,
   HelixBeforeSortEvent,
-  HelixBeforeSplitEvent,
-  HelixCanvasEditEvent,
-  HelixCanvasPanEvent,
-  HelixCanvasViewEvent,
-  HelixCanvasZoomEvent,
-  HelixCaretEvent,
   HelixCheckEvent,
   HelixClearEvent,
-  HelixCollapseEvent,
   HelixCompleteEvent,
-  HelixConnectEvent,
-  HelixConsoleEvent,
   HelixCopyErrorEvent,
   HelixCopyEvent,
-  HelixCreateEvent,
-  HelixDeviceButtonEvent,
-  HelixDeviceKeyEvent,
-  HelixDeviceScreenshotEvent,
-  HelixDeviceScrollEvent,
-  HelixDeviceSwipeEvent,
-  HelixDeviceTapEvent,
-  HelixDeviceTextEvent,
-  HelixDeviceTouchEvent,
   HelixDismissEvent,
-  HelixEditEvent,
-  HelixEndEvent,
   HelixExpandEvent,
-  HelixFacetEvent,
   HelixFilterEvent,
-  HelixFollowEvent,
   HelixFoundEvent,
-  HelixGraphFilterEvent,
-  HelixGraphLayoutEvent,
-  HelixGraphPanEvent,
-  HelixGraphPartChangeEvent,
-  HelixGraphReadyEvent,
-  HelixGraphSignalEvent,
-  HelixGraphZoomEvent,
-  HelixHistoryEvent,
   HelixListenEvent,
   HelixLoadEvent,
   HelixLoadMoreEvent,
-  HelixMapClusterEvent,
-  HelixMapPanEvent,
-  HelixMapPartChangeEvent,
-  HelixMapReadyEvent,
-  HelixMapRotateEvent,
-  HelixMapTiltEvent,
-  HelixMapZoomEvent,
-  HelixMoveEvent,
   HelixNavigateEvent,
-  HelixNextEvent,
-  HelixPanelResizeEvent,
-  HelixPastedEvent,
   HelixPinEvent,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
-  HelixPressEvent,
-  HelixPreviewEvent,
-  HelixPreviousEvent,
-  HelixRangeChangeEvent,
-  HelixReadEvent,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
-  HelixReconnectEvent,
-  HelixRejectEvent,
-  HelixRelabelEvent,
-  HelixRemoveEvent,
   HelixReorderEvent,
   HelixResizedEvent,
   HelixResizeEvent,
-  HelixSampleEndEvent,
-  HelixSampleStartEvent,
-  HelixScrolledEvent,
   HelixSelectEvent,
-  HelixSendEvent,
-  HelixShortcutEvent,
   HelixSortEvent,
-  HelixSplitEvent,
-  HelixStopEvent,
-  HelixStrandsFallbackEvent,
-  HelixTerminalBellEvent,
-  HelixTerminalInputEvent,
-  HelixTerminalLinkEvent,
-  HelixTerminalResizeEvent,
-  HelixTerminalRestartEvent,
-  HelixTerminalTitleEvent,
-  HelixTourAskEvent,
-  HelixTourStatusEvent,
-  HelixTypingEvent,
 }
 
 /**
- * Every event class, and the one place a new one is registered: a class in a
- * module of its own, imported above, and named here and in `names.ts`.
+ * Every event class more than one family sends, and the one place a new one is
+ * registered: a class in a module of its own, imported above, and named here and in
+ * `names.ts`. An event one family sends is registered in that family's folder.
  *
  * The map below is derived from this rather than written beside it, so a class
  * that is in here is typed and one that is not is absent from both halves at
@@ -395,125 +190,43 @@ export {
  * forgotten.
  */
 const registry = {
-  HelixActionEvent,
   HelixActivateEvent,
-  HelixAuraFallbackEvent,
-  HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
   HelixBeforeCheckEvent,
   HelixBeforeCloseEvent,
-  HelixBeforeCollapseEvent,
-  HelixBeforeEditEvent,
-  HelixBeforeExpandEvent,
-  HelixBeforeFacetEvent,
   HelixBeforeFilterEvent,
-  HelixBeforeFollowEvent,
-  HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
-  HelixBeforeMoveEvent,
   HelixBeforeNavigateEvent,
   HelixBeforeOpenEvent,
-  HelixBeforePanelResizeEvent,
-  HelixBeforePasteEvent,
   HelixBeforePinEvent,
-  HelixBeforeReadEvent,
-  HelixBeforeReconnectEvent,
-  HelixBeforeRelabelEvent,
   HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
   HelixBeforeSelectEvent,
   HelixBeforeSortEvent,
-  HelixBeforeSplitEvent,
-  HelixCanvasEditEvent,
-  HelixCanvasPanEvent,
-  HelixCanvasViewEvent,
-  HelixCanvasZoomEvent,
-  HelixCaretEvent,
   HelixCheckEvent,
   HelixClearEvent,
-  HelixCollapseEvent,
   HelixCompleteEvent,
-  HelixConnectEvent,
-  HelixConsoleEvent,
   HelixCopyErrorEvent,
   HelixCopyEvent,
-  HelixCreateEvent,
-  HelixDeviceButtonEvent,
-  HelixDeviceKeyEvent,
-  HelixDeviceScreenshotEvent,
-  HelixDeviceScrollEvent,
-  HelixDeviceSwipeEvent,
-  HelixDeviceTapEvent,
-  HelixDeviceTextEvent,
-  HelixDeviceTouchEvent,
   HelixDismissEvent,
-  HelixEditEvent,
-  HelixEndEvent,
   HelixExpandEvent,
-  HelixFacetEvent,
   HelixFilterEvent,
-  HelixFollowEvent,
   HelixFoundEvent,
-  HelixGraphFilterEvent,
-  HelixGraphLayoutEvent,
-  HelixGraphPanEvent,
-  HelixGraphPartChangeEvent,
-  HelixGraphReadyEvent,
-  HelixGraphSignalEvent,
-  HelixGraphZoomEvent,
-  HelixHistoryEvent,
   HelixListenEvent,
   HelixLoadEvent,
   HelixLoadMoreEvent,
-  HelixMapClusterEvent,
-  HelixMapPanEvent,
-  HelixMapPartChangeEvent,
-  HelixMapReadyEvent,
-  HelixMapRotateEvent,
-  HelixMapTiltEvent,
-  HelixMapZoomEvent,
-  HelixMoveEvent,
   HelixNavigateEvent,
-  HelixNextEvent,
-  HelixPanelResizeEvent,
-  HelixPastedEvent,
   HelixPinEvent,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
-  HelixPressEvent,
-  HelixPreviewEvent,
-  HelixPreviousEvent,
-  HelixRangeChangeEvent,
-  HelixReadEvent,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
-  HelixReconnectEvent,
-  HelixRejectEvent,
-  HelixRelabelEvent,
-  HelixRemoveEvent,
   HelixReorderEvent,
   HelixResizedEvent,
   HelixResizeEvent,
-  HelixSampleEndEvent,
-  HelixSampleStartEvent,
-  HelixScrolledEvent,
   HelixSelectEvent,
-  HelixSendEvent,
-  HelixShortcutEvent,
   HelixSortEvent,
-  HelixSplitEvent,
-  HelixStopEvent,
-  HelixStrandsFallbackEvent,
-  HelixTerminalBellEvent,
-  HelixTerminalInputEvent,
-  HelixTerminalLinkEvent,
-  HelixTerminalResizeEvent,
-  HelixTerminalRestartEvent,
-  HelixTerminalTitleEvent,
-  HelixTourAskEvent,
-  HelixTourStatusEvent,
-  HelixTypingEvent,
 } as const
 
 type Registry = typeof registry

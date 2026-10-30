@@ -3,7 +3,6 @@ import {
   drawsInSoftware,
   elementById,
   HelixElement,
-  HelixStrandsFallbackEvent,
   MAX_FRAME_STEP,
   numberConverter,
   PaintGateController,
@@ -12,6 +11,7 @@ import {
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixStrandsFallbackEvent } from '../events/index.js'
 import { paletteOf, RESTING_PALETTE, type StrandsPalette } from '../palette.js'
 import {
   arcLengths,

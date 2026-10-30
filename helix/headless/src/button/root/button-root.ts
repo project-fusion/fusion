@@ -6,7 +6,6 @@ import {
   elementById,
   HelixFallbackCommandEvent,
   HelixFormElementBase,
-  HelixPressEvent,
   internalsOf,
   ListedController,
   pressType,
@@ -18,6 +17,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixPressEvent } from '../events/index.js'
 import { submitAs } from '../submitter.js'
 
 /**

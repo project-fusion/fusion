@@ -16,6 +16,7 @@
 
 export { registerCompilerWorker } from './compile.js'
 export * from './console/sandbox-console.js'
+export * from './events/index.js'
 export {
   isRender,
   LAYOUT_RULES,

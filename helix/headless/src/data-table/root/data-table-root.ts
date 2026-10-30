@@ -19,7 +19,6 @@ import {
   gridMove,
   type HelixBeforeCheckEvent,
   HelixBeforeFilterEvent,
-  HelixBeforeFollowEvent,
   HelixBeforeNavigateEvent,
   HelixBeforeReorderEvent,
   HelixBeforeSelectEvent,
@@ -27,7 +26,6 @@ import {
   HelixElement,
   HelixExpandEvent,
   HelixFilterEvent,
-  HelixFollowEvent,
   HelixLoadMoreEvent,
   HelixNavigateEvent,
   HelixReorderEvent,
@@ -86,6 +84,7 @@ import { edgeOf } from '../../table/edge.js'
 import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
+import { HelixBeforeFollowEvent, HelixFollowEvent } from '../events/index.js'
 import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
 

@@ -1,7 +1,6 @@
 import {
   customElement,
   HelixElement,
-  HelixMapPartChangeEvent,
   motionPaused,
   numberConverter,
   onMotionChange,
@@ -11,6 +10,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixMapPartChangeEvent } from '../events/index.js'
 
 /** Reads a list of tile URLs separated by spaces, and writes it back the same way. */
 const framesConverter = {

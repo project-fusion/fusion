@@ -1,6 +1,7 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { HelixMapPartChangeEvent } from '../events/index.js'
 
 /**
  * @summary What covers the ground on a map: forest, grass, farmland, wetland, sand, rock, and ice.
