@@ -272,6 +272,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("names", &[NodeKind::Region], Shape::Set),
     ("orientation", BOX, Shape::Words),
     ("part", &[NodeKind::Region], Shape::Name),
+    /* What a wrap's `renders` function is given first, as a row's file, a
+    copy's field. */
+    ("passes", &[NodeKind::Wrap], Shape::Words),
     /* The length a shape's dashes are measured in, as SVG's `pathLength`. */
     ("pathLength", BOX, Shape::Positive),
     /* The words a field shows while it is empty. */
@@ -292,6 +295,11 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* The press that takes the file of its row out of the element's
     `files`, as a file input's remove button. */
     ("removes", PRESS, Shape::Set),
+    /* The prop that holds a function whose content stands in what a wrap
+    holds, called with what `passes` names and the copy's place, as a file
+    input's `renderFile` draws a row its own way. Where the prop holds no
+    function, the wrap draws what it holds. */
+    ("renders", &[NodeKind::Wrap], Shape::Function),
     /* `aria-required`. A phone has no such state, and its hint says it. */
     ("required", ANSWER, Shape::Flag),
     ("role", ROLED, Shape::Role),
@@ -430,6 +438,7 @@ fn fits(shape: Shape, value: &Attribute) -> bool {
     }
     match (shape, value) {
         (Shape::Flag, Attribute::Flag(_) | Attribute::Bound(_))
+        | (Shape::Function, Attribute::Bound(Binding::Bind(_)))
         | (Shape::Name | Shape::Words, Attribute::Text(_))
         | (Shape::Words, Attribute::Derived { .. })
         | (Shape::Parts, Attribute::Parts(_))

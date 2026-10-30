@@ -149,6 +149,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     toggle(family, &names, &mut found);
     entry(family, &names, &mut found);
     filed(family, &names, &mut found);
+    rendered(&family.tree, &names, &mut found);
     ranged(family, &names, &mut found);
     toolbar(family, &names, &mut found);
     sources::timed(family, &names, &mut found);
@@ -511,6 +512,24 @@ fn filed(family: &Family, names: &Names, found: &mut Vec<String>) {
             "the element declares `files`, and {} pressables remove, where one does",
             removing.len()
         ));
+    }
+}
+
+/// Each wrap that `renders` a function, held to a prop that holds one.
+fn rendered(nodes: &[Node], names: &Names, found: &mut Vec<String>) {
+    for node in nodes {
+        if let Some(Attribute::Bound(api::Binding::Bind(prop))) = node.attributes.get("renders") {
+            let holds = names
+                .prop(prop)
+                .is_some_and(|one| matches!(one.kind, PropType::Function { .. }));
+            if !holds {
+                found.push(format!(
+                    "`wrap('{}')` renders `{prop}`, and no prop of that name holds a function",
+                    node.name
+                ));
+            }
+        }
+        rendered(&node.children, names, found);
     }
 }
 
