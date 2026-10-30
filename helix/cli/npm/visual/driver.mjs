@@ -551,6 +551,44 @@ const restore = async (page, state) => {
   }
 }
 
+/**
+ * The families of the faces a page failed to load, in the page.
+ *
+ * **A face with only `local()` sources has nothing to download.** `next/font`
+ * writes a fallback as `src: local("Arial")`, and Linux has no Arial, so its
+ * status is `error` on the platform baselines are taken on, and the page draws
+ * the next family in its stack, as it is written to. A sheet the page cannot
+ * read leaves a face judged by its status alone.
+ */
+const unloadedFaces = () => {
+  const localOnly = new Set()
+  const rulesOf = (sheet) => {
+    try {
+      return [...sheet.cssRules]
+    } catch {
+      return []
+    }
+  }
+  const walk = (rules) => {
+    for (const rule of rules) {
+      if (rule instanceof CSSFontFaceRule) {
+        if (!rule.style.getPropertyValue('src').includes('url(')) {
+          localOnly.add(rule.style.getPropertyValue('font-family').replace(/["']/g, ''))
+        }
+      } else if (rule.cssRules) {
+        walk([...rule.cssRules])
+      }
+    }
+  }
+  for (const sheet of document.styleSheets) {
+    walk(rulesOf(sheet))
+  }
+  return [...document.fonts]
+    .filter((face) => face.status === 'error')
+    .map((face) => face.family.replace(/["']/g, ''))
+    .filter((family) => !localOnly.has(family))
+}
+
 /** One entry, every shot of it from one navigation. */
 const take = async (lane, item, { elements, readyProperty }, progress) => {
   const { page } = lane
@@ -622,9 +660,7 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
       }
       /* A face the page asked for and could not load draws in the platform's
          fallback, and a baseline taken that way defends the wrong face. */
-      const broken = await page.evaluate(() =>
-        [...document.fonts].filter((face) => face.status === 'error').map((face) => face.family),
-      )
+      const broken = await page.evaluate(unloadedFaces)
       if (broken.length > 0) {
         throw new Error(`the font ${[...new Set(broken)].join(', ')} did not load`)
       }
