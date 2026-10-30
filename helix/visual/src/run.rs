@@ -475,6 +475,9 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome
         "boxes": false,
         "inspect": first && config.inspect,
         "key": entry.id,
+        "selector": entry.selector.as_ref().or(config.settle.selector.as_ref()),
+        "status": entry.status,
+        "wait": config.settle.timeout,
         "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
     });
     /* A screen's state beside its baselines, `<stem>.state.json`, which the
@@ -540,12 +543,29 @@ pub(crate) struct Captured {
     /// What the config's page checks found on each page, each as the
     /// check's name and its sentence.
     pub(crate) findings: BTreeMap<usize, Vec<(String, String)>>,
+    /// Each mask that painted nothing on a page, with `nothing` when it
+    /// matched nothing and `no box` when it matched only elements with no area.
+    pub(crate) masks: BTreeMap<usize, Vec<(String, String)>>,
     /// Every ink and ground pair contrast measured on each page.
     pub(crate) painted: BTreeMap<usize, Vec<String>>,
     pub(crate) pictures: BTreeMap<(usize, usize), Vec<u8>>,
     /// What a pairs source's `check` found on each page.
     pub(crate) problems: BTreeMap<usize, Vec<String>>,
+    /// The requests each page made that the run refused or the browser blocked.
+    pub(crate) refused: BTreeMap<usize, Vec<String>>,
     pub(crate) seconds: BTreeMap<usize, f64>,
+    /// The tags on each page whose ready promise had not resolved at the bound.
+    pub(crate) unready: BTreeMap<usize, Vec<String>>,
+}
+
+/// Each mask an entry's answer says painted nothing, with why.
+fn masks_in(line: &Value) -> Vec<(String, String)> {
+    line["masks"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|one| Some((one[0].as_str()?.to_string(), one[1].as_str()?.to_string())))
+        .collect()
 }
 
 /// Sends a capture and reads every line it streams back.
@@ -565,10 +585,13 @@ pub(crate) fn capture(
         broken: BTreeMap::new(),
         errors: BTreeMap::new(),
         findings: BTreeMap::new(),
+        masks: BTreeMap::new(),
         painted: BTreeMap::new(),
         pictures: BTreeMap::new(),
         problems: BTreeMap::new(),
+        refused: BTreeMap::new(),
         seconds: BTreeMap::new(),
+        unready: BTreeMap::new(),
     };
     loop {
         let line = driver.next().map_err(internal)?;
@@ -640,6 +663,9 @@ pub(crate) fn capture(
                     .unwrap_or_default();
                 captured.findings.insert(entry, found);
                 captured.painted.insert(entry, strings("painted"));
+                captured.refused.insert(entry, strings("refused"));
+                captured.unready.insert(entry, strings("unready"));
+                captured.masks.insert(entry, masks_in(&line));
                 if let Some(snapshot) = line["aria"].as_str() {
                     captured.aria.insert(entry, snapshot.to_string());
                 }
@@ -665,6 +691,15 @@ fn load(asked: Option<&Path>) -> Outcome<(PathBuf, PathBuf, Driver, Config)> {
     let config = Config::parse(answered["config"].clone())
         .map_err(|why| Failure::input(relative(&base, &path), why))?;
     Ok((path, base, driver, config))
+}
+
+/// What a run on another platform says, which compared nothing.
+fn skipped_on(os: &str) -> String {
+    format!(
+        "helix: skipped on {os}, and nothing was compared. Baselines are taken and compared on linux, because text \
+         rasterization and antialiasing differ by platform, so a comparison across them would differ on nearly every \
+         glyph. To compare on this machine, set `platform: 'any'` in the config, and baselines taken here stay here."
+    )
 }
 
 /// `helix visual report`: opens the last run's report, or prints its summary as
@@ -880,11 +915,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         return Ok(report::stopped(
             options.update,
             false,
-            &format!(
-                "helix: skipped on {}. Baselines are taken and compared on linux, because text rasterization and \
-                 antialiasing differ by platform, so a comparison across them would differ on nearly every glyph.",
-                std::env::consts::OS
-            ),
+            &skipped_on(std::env::consts::OS),
         ));
     }
 
@@ -1033,7 +1064,8 @@ pub fn run(options: &Options) -> Outcome<Code> {
         .collect();
     let started = driver
         .ask(&json!({
-            "network": match config.network { Network::Origin => "origin", Network::Open => "open" },
+            "allow": match &config.network { Network::Allow(hosts) => hosts.as_slice(), _ => &[] },
+            "network": if config.network == Network::Open { "open" } else { "origin" },
             "hide": config.aria.hidden(),
             "mask": config.mask,
             "op": "start",
@@ -1524,6 +1556,8 @@ pub fn run(options: &Options) -> Outcome<Code> {
                 keep: Some(baseline),
                 labels: if matches!(fate, Fate::Steadied) {
                     ["Baseline", "First take"]
+                } else if matches!(fate, Fate::Written(_)) {
+                    ["Written", "Capture"]
                 } else {
                     ["Baseline", "Capture"]
                 },
@@ -1539,6 +1573,13 @@ pub fn run(options: &Options) -> Outcome<Code> {
         dir: base.join(&config.report),
         entries: mine.len(),
         findings,
+        notices: notices(&mine, &first),
+        refused: first
+            .refused
+            .iter()
+            .filter(|(_, urls)| !urls.is_empty())
+            .map(|(&at, urls)| (mine[at].id.clone(), urls.clone()))
+            .collect(),
         fingerprint: write_fingerprint.then_some(fingerprint_path),
         inspected_failed,
         retake: &retake,
@@ -1557,6 +1598,52 @@ pub fn run(options: &Options) -> Outcome<Code> {
             .collect(),
         update: options.update,
     }))
+}
+
+/// What a run says about a setting of the config that did less than it reads:
+/// a mask that painted nothing, by mask, and a ready promise that had not
+/// resolved at its bound.
+fn notices(mine: &[&Entry], first: &Captured) -> Vec<String> {
+    let mut masks: BTreeMap<(&str, &str), Vec<&str>> = BTreeMap::new();
+    for (&at, found) in &first.masks {
+        for (selector, why) in found {
+            masks.entry((selector, why)).or_default().push(&mine[at].id);
+        }
+    }
+    let mut said: Vec<String> = masks
+        .iter()
+        .map(|((selector, why), entries)| {
+            let on = named(entries);
+            if *why == "no box" {
+                format!(
+                    "the mask `{selector}` matches only elements with no box on {on}, so it paints nothing there. Name \
+                     an element inside it that has one."
+                )
+            } else {
+                format!("the mask `{selector}` matches nothing on {on}, so it paints nothing there.")
+            }
+        })
+        .collect();
+    for (&at, tags) in &first.unready {
+        if !tags.is_empty() {
+            said.push(format!(
+                "{} was pictured after 5 seconds with the ready promise of {} unresolved.",
+                mine[at].id,
+                tags.join(", ")
+            ));
+        }
+    }
+    said
+}
+
+/// A list of entries, the first few by name.
+fn named(entries: &[&str]) -> String {
+    const SHOWN: usize = 5;
+    let shown = entries[..entries.len().min(SHOWN)].join(", ");
+    match entries.len().saturating_sub(SHOWN) {
+        0 => shown,
+        more => format!("{shown}, and {more} more"),
+    }
 }
 
 /// Where an entry's accessibility snapshot is kept: beside its baselines, as
@@ -1733,7 +1820,9 @@ mod tests {
             group: "menu".into(),
             id: "pages/menu".into(),
             name: "menu".into(),
+            selector: None,
             source: 0,
+            status: None,
             stem: "menu".into(),
             sides: None,
             url: None,
@@ -1753,6 +1842,63 @@ mod tests {
         fs::write(dir.join("menu.state.json"), "not json").unwrap();
         assert!(item(&config, &entry, &shots, true).is_err());
         fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn a_skip_names_the_setting_that_compares_here() {
+        let said = skipped_on("macos");
+        assert!(said.contains("skipped on macos"));
+        assert!(said.contains("`platform: 'any'`"));
+    }
+
+    #[test]
+    fn a_mask_that_painted_nothing_is_said_once_with_its_entries() {
+        let entry = |id: &str| Entry {
+            dir: PathBuf::new(),
+            file: None,
+            group: id.into(),
+            id: id.into(),
+            name: id.into(),
+            selector: None,
+            sides: None,
+            source: 0,
+            status: None,
+            stem: id.into(),
+            url: None,
+        };
+        let (one, two) = (entry("site/one"), entry("site/two"));
+        let mut first = Captured {
+            aria: BTreeMap::new(),
+            broken: BTreeMap::new(),
+            errors: BTreeMap::new(),
+            findings: BTreeMap::new(),
+            masks: BTreeMap::new(),
+            painted: BTreeMap::new(),
+            pictures: BTreeMap::new(),
+            problems: BTreeMap::new(),
+            refused: BTreeMap::new(),
+            seconds: BTreeMap::new(),
+            unready: BTreeMap::new(),
+        };
+        first.masks.insert(
+            0,
+            vec![
+                ("helix-map".into(), "no box".into()),
+                (".gone".into(), "nothing".into()),
+            ],
+        );
+        first
+            .masks
+            .insert(1, vec![(".gone".into(), "nothing".into())]);
+        first.unready.insert(1, vec!["x-slow".into()]);
+        let said = notices(&[&one, &two], &first);
+        assert_eq!(said.len(), 3);
+        assert!(said
+            .iter()
+            .any(|one| one.starts_with("the mask `.gone` matches nothing on site/one, site/two")));
+        assert!(said.iter().any(|one| one
+            .starts_with("the mask `helix-map` matches only elements with no box on site/one")));
+        assert!(said.iter().any(|one| one.contains("x-slow")));
     }
 
     #[test]

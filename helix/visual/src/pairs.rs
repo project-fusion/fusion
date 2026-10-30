@@ -375,10 +375,13 @@ mod tests {
             broken: BTreeMap::new(),
             errors: BTreeMap::new(),
             findings: BTreeMap::new(),
+            masks: BTreeMap::new(),
             painted: BTreeMap::new(),
             pictures: BTreeMap::new(),
             problems: BTreeMap::new(),
+            refused: BTreeMap::new(),
             seconds: BTreeMap::new(),
+            unready: BTreeMap::new(),
         }
     }
 

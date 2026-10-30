@@ -23,7 +23,13 @@ npx playwright install --with-deps chromium
 
 Capture runs in Playwright, which you install beside the command line. The
 rest of `helix` needs no browser, so Playwright is an optional peer, and
-`helix visual test` names it when it is missing.
+`helix visual test` names it when it is missing. A config in TypeScript needs
+Node 22.18 or later. On an older Node, write it as `visual.config.mjs`.
+
+**On macOS and Windows, a run skips until you choose where baselines are taken.**
+`test` and `update` say so, compare nothing, and exit 0, because text draws
+differently on each platform. Take baselines on Linux, or set `platform: 'any'`
+to compare on the machine in front of you.
 
 ## Commands
 
@@ -53,6 +59,38 @@ helix visual compare a.png b.png     compare two PNG files, with no browser
 Each run ends with one line that says what it compared and what it skipped.
 `helix --json visual …` prints one JSON document on stdout and moves the
 sentences to stderr.
+
+## Picture a site
+
+Picture a production build, because a dev server draws its own overlays, and they
+differ from run to run. `visual.config.ts`, for a Next.js site:
+
+```ts
+import { defineConfig } from '@fusion.dev/helix-cli/visual'
+
+export default defineConfig({
+  sources: [
+    {
+      baselines: 'visual/baselines',
+      kind: 'server',
+      name: 'site',
+      routes: ['/', '/pricing', { name: 'not-found', path: '/nope', status: 404 }],
+      start: 'npm run start -- --port 3100',
+      url: 'http://localhost:3100',
+    },
+  ],
+})
+```
+
+```sh
+npm run build
+npx helix visual update
+```
+
+`update` writes the baselines and the fingerprint, and its report shows each
+picture it wrote. Look at them, commit them, and run `helix visual test` from then
+on. Any page that answers 400 or above fails the entry, unless its route names that
+`status`.
 
 ## The config
 
@@ -90,9 +128,28 @@ export default defineConfig({
   width, and dark when you give none. Each baseline is written beside its
   entry as `<stem>.<name>.png`.
 - **`serve`** is URL paths served from disk, relative to the config.
+- **`baselines`** is, on a server source, the directory its baselines are written
+  in, relative to the config.
+- **`platform`** is where baselines are taken and compared: `linux` unless you set
+  `any`.
+- **`network`** is what a page may reach. `origin`, the default, refuses every
+  request to another host and names each host in the log and in `run.json`.
+  `{ allow: ['tiles.example.com'] }` lets those hosts through, and `open` lets every
+  host through.
+- **`mask`** is selectors whose elements are painted over in every picture, for
+  what changes on its own, such as a clock. A mask paints over the element's box and
+  anything drawn on top of it. The run names a mask that matches nothing on a page,
+  or only elements with no box.
+- **`style`** is a stylesheet applied while each picture is taken, to hold still
+  what `mask` cannot.
+- **`settle.selector`** names what a page matches once it has drawn what it draws
+  late, such as a map's tiles. The entry fails when nothing matches within
+  `settle.timeout`, 30 seconds unless you set it.
 - **`settle.readyProperty`** names a property your elements carry holding a
   promise that resolves once they have rendered. The run awaits it before each
-  shot.
+  shot, for 5 seconds, and then names the tags still waiting.
+- **`settle.elements`** limits the custom elements a run waits for to one tag
+  prefix, for a framework that writes hyphenated tags it never defines.
 - **`aria`** keeps each entry's accessibility snapshot beside its baselines
   and compares it as text, so a lost label fails even when no pixel moved.
 - **`checks`** adds judgments that need no baseline: `code` fails a code block

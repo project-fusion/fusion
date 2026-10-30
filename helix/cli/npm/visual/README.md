@@ -16,7 +16,14 @@ npx playwright install --with-deps chromium
 
 Capture runs in Playwright, which you install beside the command line. The
 rest of `helix` needs no browser, so Playwright is an optional peer, and
-`helix visual test` names it when it is missing.
+`helix visual test` names it when it is missing. A config in TypeScript needs
+Node 22.18 or later. On an older Node, write it as `visual.config.mjs`.
+
+**On macOS and Windows, a run skips until you choose where baselines are taken.**
+`test` and `update` say so, compare nothing, and exit 0, because text draws
+differently on each platform. Take baselines on Linux, as
+[Baselines on Linux](#baselines-on-linux) shows, or set `platform: 'any'` to
+compare on the machine in front of you.
 
 ## Commands
 
@@ -81,6 +88,84 @@ the report's `run.json`, `report` prints the last one, `accept` prints what it
 wrote and what it left, and `compare` prints whether the two pictures match and
 how many pixels differ.
 
+## Picture a site
+
+Picture a production build, because a dev server draws its own overlays, and they
+differ from run to run. `visual.config.ts`, for a Next.js site:
+
+```ts
+import { defineConfig } from '@fusion.dev/helix-cli/visual'
+
+export default defineConfig({
+  sources: [
+    {
+      baselines: 'visual/baselines',
+      kind: 'server',
+      name: 'site',
+      routes: ['/', '/pricing', { name: 'not-found', path: '/nope', status: 404 }],
+      start: 'npm run start -- --port 3100',
+      url: 'http://localhost:3100',
+    },
+  ],
+})
+```
+
+```sh
+npm run build
+npx helix visual update
+```
+
+`update` writes the baselines and the fingerprint, and its report shows each
+picture it wrote. Look at them, commit them, and run `helix visual test` from then
+on. Build before each run, since `start` serves the last build. Any page that
+answers 400 or above fails the entry, unless its route names that `status`.
+
+## Pages that draw late
+
+A page can look finished before it is: a map's tiles arrive after the page loads.
+Name a selector that matches once it has drawn, and the run waits for it after each
+load. The entry fails when nothing matches within `settle.timeout`, 30 seconds
+unless you set it.
+
+```ts
+settle: { selector: '[data-map-ready]', timeout: 60 },
+```
+
+A route can name its own `selector`, for a page the others do not resemble:
+`{ path: '/map', selector: '[data-map-ready]' }`.
+
+**Requests to other hosts are refused**, and the run names each host in its log and
+in `run.json`, under `refused`. A page that draws from another host needs one of
+these:
+
+- **`network: { allow: ['tiles.example.com', '*.example.org'] }`** lets those hosts
+  through. A baseline then records what they returned, and a host that changes its
+  pictures fails the run.
+- **`network: 'open'`** lets every host through, with the same result.
+- **`mask`** paints over the content and needs no network. It paints over the
+  element's whole box and anything drawn on top of it, so name the smallest element
+  that holds the content. The run names a mask that matches nothing on a page, or
+  only elements with no box, such as an element with `display: contents`.
+- **`style`** applies a stylesheet while each picture is taken, to hide an element
+  that a mask would paint too much around.
+
+A clock on the page, such as "4 minutes ago", changes on its own. Mask that element.
+
+## Baselines on Linux
+
+Linux is the default, so a Mac can take baselines in Playwright's image. Install
+inside the container, which fetches the command's Linux binary, and use the image
+that matches your Playwright version:
+
+```sh
+docker run --rm -v "$PWD":/work -v /work/node_modules -w /work \
+  mcr.microsoft.com/playwright:v1.64.1-noble \
+  sh -c 'npm ci && npm run build && npx helix visual update'
+```
+
+The fingerprint records the image's browser and fonts, so CI has to run in the same
+image.
+
 ## The config
 
 `visual.config.ts`, in the directory you run `helix visual` from:
@@ -118,8 +203,9 @@ export default defineConfig({
   - `pairs` compares two renders of each entry with each other, described below.
 
   The three on a server take its `url`, a `start` command that runs only when
-  nothing answers there and is stopped when the run ends, and `baselines`, the
-  directory their baselines are written in. An `html` source reads every file
+  nothing answers there and is stopped when the run ends, `timeout`, the seconds
+  to wait for it to answer, 120 unless you set it, and `baselines`, the directory
+  their baselines are written in. An `html` source reads every file
   its `glob` matches under `root`. `{name}` is the path segment that names the
   entry, `*` matches within a segment, and `**` matches any number of
   directories. Each file is pictured inside a document that links `styles`,
@@ -133,9 +219,14 @@ export default defineConfig({
 - **`serve`**: URL paths served from disk, relative to the config. A path that
   ends in `/` serves a directory.
 - **`settle.readyProperty`**: a property your elements carry holding a promise
-  that resolves once they have rendered. `helix visual` awaits it before each shot.
-  `settle.elements` limits the custom elements a run waits for to one tag
-  prefix, for a framework that writes hyphenated tags it never defines.
+  that resolves once they have rendered. `helix visual` awaits it before each shot,
+  for 5 seconds, and then names the tags still waiting and takes the picture.
+- **`settle.selector`** and **`settle.timeout`**: what a page matches once it has
+  drawn, and how long to wait for it. See [Pages that draw late](#pages-that-draw-late).
+- **`settle.elements`**: limits the custom elements a run waits for to one tag
+  prefix, for a framework that writes hyphenated tags it never defines, such as
+  Angular's component tags. A tag a script gives a shadow root while nothing defines
+  it is a plain host, and is never waited for.
 - **`aria`**: keeps each entry's accessibility snapshot, Playwright's
   `ariaSnapshot()` of its page, beside its baselines as `<stem>.aria.yml`, and
   compares it as text, so a lost label fails even when no pixel moved. A
@@ -220,6 +311,8 @@ export default defineConfig({
 - **`retake`**: a sentence telling your team how to retake baselines, printed
   when a run fails.
 - **`fingerprint`**, **`network`**, and **`platform`** are described below.
+- **`baselines`**: on a server source, the directory its baselines are written
+  in, relative to the config.
 
 ## Pairs
 
@@ -275,11 +368,17 @@ picture is committed.
   read the same, apart from where they are and each element's `id`, are one
   group: a token change that moved one kind of element across 300 pictures is
   one group of 300. No model is involved.
+- **A page that answers an error is not pictured.** A status of 400 or above, or a
+  page that does not load, fails the entry, in `test` and in `update`. No baseline
+  is written.
 - **Requests stay on the harness origin.** Every request to another host is
-  refused, so a baseline never records what another server returned.
-  `network: 'open'` turns that off.
+  refused, so a baseline never records what another server returned, and the run
+  names each refused host. `network: { allow: [...] }` lets some hosts through, and
+  `network: 'open'` lets every host through.
 - **Baselines are taken and compared on Linux.** On another platform `helix
-  visual test` says so and exits 0. `platform: 'any'` compares wherever it runs.
+  visual test` and `helix visual update` say so, compare nothing, and exit 0.
+  `platform: 'any'` compares wherever it runs, and baselines taken that way hold
+  only on that platform.
 - **The environment is recorded.** `helix visual update` of every entry
   writes `visual.fingerprint.json`: the platform, the operating system release, the
   browser version, and a hash of the installed fonts. A run on an environment
@@ -321,7 +420,7 @@ Every `helix visual test` and `helix visual update` writes a report into the con
 `report` directory: `index.html` to look at, and `run.json` for a program to
 read. The page shows each shot that failed with its baseline, its capture, and
 its difference side by side, and a swipe between the baseline and the capture.
-It lists the shots that needed a second take, the exceptions with their
+After an `update`, it shows each picture the run wrote. It lists the shots that needed a second take, the exceptions with their
 measurements, and what was skipped. The directory is emptied at the start of
 each run.
 

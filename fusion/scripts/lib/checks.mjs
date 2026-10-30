@@ -132,6 +132,7 @@ export const EXEMPT = [
      comparing nothing is what they are, whereas a static check that walks an
      empty directory reports a confident zero. */
   'fusion/scripts/check-diagnostics.mjs',
+  'fusion/scripts/check-visual-run.mjs',
   'helix/cli/npm/bin.mjs visual test --config visual.dsd.config.ts',
   'helix/cli/npm/bin.mjs visual test',
   /* The site suite, which `verify.yml` gives a job of its own beside them. */

@@ -18,6 +18,7 @@ The rest lives with the command line that runs it:
 | `helix/cli/src/args.rs` | The `visual` noun, whose verbs are this crate's `Visual` |
 | `helix/cli/npm/visual/` | The capture driver that runs Playwright, `defineConfig`, and the config's types, shipped in `@fusion.dev/helix-cli` |
 | `helix/cli/tests/visual.rs` | The contract tests for `helix visual compare` |
+| `fusion/scripts/check-visual-run.mjs` | A whole run in a real browser, against a server with each fault planted |
 
 Fusion runs it on every Helix example with the root
 [visual.config.ts](../../visual.config.ts), and on five site pages with

@@ -192,7 +192,15 @@ const CHECKS = [
     task: 'dsd',
     units: reach('dsd', markup),
   },
-  { script: 'check:spec:visual', task: 'visual', units: pictured },
+  /* **The faults a run must not pass over ride with the first shard of the
+     pictures**, for the reason the specs' hexes do below, and because this job
+     has built the binary they drive. */
+  {
+    also: ['check:spec:visual-run'],
+    script: 'check:spec:visual',
+    task: 'visual',
+    units: pictured,
+  },
   { script: 'smoke:examples', task: 'smoke', units: styled },
   /* **Hexes and diagnostics ride with the first shard of the specs**, because
      each is about ten seconds of checking behind a job's worth of setup, and a
