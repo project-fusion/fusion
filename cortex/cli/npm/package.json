@@ -41,6 +41,6 @@
     "@fusion.dev/cortex-cli-win32-x64": "workspace:*"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

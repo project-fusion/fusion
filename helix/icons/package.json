@@ -60,6 +60,6 @@
     "design-system"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

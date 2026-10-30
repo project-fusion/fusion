@@ -63,6 +63,6 @@
     "prosemirror-view": "^1.40.0"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

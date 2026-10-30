@@ -216,7 +216,7 @@ jobs:
       # Before a number is allocated. Trusted publishing cannot publish a package
       # the first time, so a release reaching a new one would publish everything
       # before it and stop there, a number spent. The token is for reading: a
-      # restricted package answers 404 to a reader without access.
+      # package that is still restricted answers 404 to a reader without access.
       # [RELEASING.md](../RELEASING.md#a-new-package)
       - name: Refuse a package the registry has never seen
         env:

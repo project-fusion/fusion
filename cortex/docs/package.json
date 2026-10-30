@@ -43,6 +43,6 @@
     "cortex"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }

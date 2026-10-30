@@ -48,9 +48,8 @@ const release = (version) => {
  * The version newer than this one that npm calls latest, or undefined.
  *
  * **Asked through npm rather than over HTTP**, because npm holds the reader's
- * login and these packages are restricted until they are public: an anonymous
- * request is answered 404 for a package that exists. npm is on the path by
- * definition, this having been started by it.
+ * registry and login. npm is on the path by definition, this having been started
+ * by it.
  *
  * **Never in the way.** Given three seconds and killed after them, and every
  * failure is silence: offline, refused, slow, or answering something that is not

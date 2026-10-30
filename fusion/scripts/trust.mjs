@@ -74,7 +74,7 @@
  *
  * It corrects itself at the first real release, when promotion moves `latest`
  * onto a version that was staged and proved. Until then `latest` is a stub, on
- * restricted packages with no consumers, so the window costs nothing. Taking
+ * a new package with no consumers, so the window costs little. Taking
  * the tag off earlier is untested: the npm CLI carries no guard against
  * `dist-tag rm latest` and sends the DELETE, and whether the registry accepts
  * one was not tried, there being no package to try it on but the first publish
