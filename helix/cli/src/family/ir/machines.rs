@@ -423,13 +423,21 @@ fn entered(entry: &TextEntry, tree: &[Node]) -> MachineUse {
 fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
     let mut bind = BTreeMap::from([("value".to_owned(), Bound::Prop(range.value.clone()))]);
     for (name, value) in [
+        ("apart", &range.apart),
+        ("between", &range.between),
         ("clearable", &range.clearable),
         ("closed", &range.closed),
         ("collapsed", &range.collapsed),
         ("collapsible", &range.collapsible),
         ("format", &range.format),
+        ("joins", &range.joins),
         ("large", &range.large),
+        ("least", &range.least),
         ("locale", &range.locale),
+        ("most", &range.most),
+        ("named", &range.named),
+        ("several", &range.several),
+        ("writes", &range.writes),
         ("max", &range.max),
         ("min", &range.min),
         ("option", &range.option),
@@ -469,6 +477,7 @@ fn range_binds(range: &ValueRange) -> BTreeMap<String, Bound> {
         ("said", &range.said),
         ("span", &range.span),
         ("spoken", &range.spoken),
+        ("stops", &range.stops),
         ("stacked", &range.stacked),
         ("to", &range.to),
     ] {

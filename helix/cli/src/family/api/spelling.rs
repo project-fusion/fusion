@@ -436,6 +436,15 @@ const RANGE: &[Field] = &[
     ("spoken", "spoken", Name),
     ("step", "step", Name),
     ("valueText", "template", Name),
+    ("several", "several", Name),
+    ("minStepsBetween", "apart", Name),
+    ("rangeText", "joins", Name),
+    ("minimumLabel", "least", Name),
+    ("maximumLabel", "most", Name),
+    ("thumbLabel", "between", Name),
+    ("label", "named", Name),
+    ("formatter", "writes", Name),
+    ("thumbs", "stops", Name),
     ("vertical", "stacked", Name),
 ];
 

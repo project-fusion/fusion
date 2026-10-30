@@ -1,5 +1,6 @@
 import {
   bare,
+  callback,
   cancelable,
   headless,
   number,
@@ -36,9 +37,12 @@ import { bind, derive } from '../../../tree.js'
  * **Marks, their labels, the readout, and a bubble on the thumb** are drawn
  * on both, from the props that ask for them.
  *
- * **Web only, for now:** a range of two or more thumbs, `range`, with the
- * words its thumbs are named by and how far apart they stay, a `formatter`,
- * which a phone has no attribute for, and the form's `name`.
+ * **A `range` holds a thumb for each value**, written joined by commas, the
+ * lowest first. A press takes the nearest thumb to the point pressed, and each
+ * thumb stops at its neighbors and is its own control to a screen reader and to
+ * the keys. `formatter` writes a value with a function.
+ *
+ * **Web only:** the form's `name`.
  */
 export default headless('slider', {
   props: {
@@ -48,28 +52,29 @@ export default headless('slider', {
     feedback: '',
     /* JSON on the web's attribute, such as `{"style":"percent"}`. */
     formatOptions: object(),
+    formatter: callback('(value: number) => string'),
     hint: '',
     label: '',
     locale: '',
     markerLabels: false,
     markers: 0,
     max: 100,
-    maximumLabel: web('maximum'),
+    maximumLabel: 'maximum',
     min: 0,
-    minimumLabel: web('minimum'),
-    minStepsBetweenThumbs: web(0),
+    minimumLabel: 'minimum',
+    minStepsBetweenThumbs: 0,
     /* A form's, which a phone has none of. */
     name: web(''),
     orientation: oneOf(['horizontal', 'vertical']),
     origin: oneOf(['center', 'end', 'start']),
     pageStep: number(),
-    range: web(false),
-    rangeText: web('{start} to {end}'),
+    range: false,
+    rangeText: '{start} to {end}',
     readonly: false,
     required: false,
     showValue: false,
     step: 1,
-    thumbLabel: web('thumb {index}'),
+    thumbLabel: 'thumb {index}',
     tooltip: false,
     value: string(),
     valueMissingMessage: string(),
@@ -95,10 +100,15 @@ export default headless('slider', {
     fillTo: 'fillTo',
     focusVisible: 'focusVisible',
     formatOptions: 'formatOptions',
+    formatter: 'formatter',
     fraction: 'fraction',
+    label: 'label',
     locale: 'locale',
     max: 'max',
+    maximumLabel: 'maximumLabel',
     min: 'min',
+    minimumLabel: 'minimumLabel',
+    minStepsBetween: 'minStepsBetweenThumbs',
     onBeforeChange: 'beforeChange',
     onChange: 'change',
     onInput: 'input',
@@ -106,11 +116,15 @@ export default headless('slider', {
     origin: 'origin',
     pageStep: 'pageStep',
     prop: 'value',
+    rangeText: 'rangeText',
     reading: 'reading',
     readonly: 'readonly',
     said: 'said',
+    several: 'range',
     spoken: 'spoken',
     step: 'step',
+    thumbLabel: 'thumbLabel',
+    thumbs: 'thumbs',
     valueText: 'valueText',
   },
   validation: {
@@ -202,29 +216,80 @@ export default headless('slider', {
             ariaHidden
             part="thumbs"
           >
-            <View
-              part="thumb"
-              style={{
-                '--slider-at': range.fraction,
-              }}
-            >
-              <Slot name="thumb" />
-              {props.range && <Slot name="thumb-end" />}
-            </View>
+            {props.range ? (
+              <Repeat
+                each={range.thumbs}
+                key="at"
+                part="thumb-stops"
+              >
+                <View
+                  part="thumb"
+                  style={{
+                    '--slider-at': entry.fraction,
+                  }}
+                >
+                  <View
+                    hidden={entry.unlit}
+                    part="thumb-halo"
+                    platform="native"
+                  />
+                  <View
+                    hidden={entry.notStart}
+                    part="thumb-start"
+                    platform="native"
+                  >
+                    <Slot name="thumb" />
+                  </View>
+                  <View
+                    hidden={entry.notEnd}
+                    part="thumb-last"
+                    platform="native"
+                  >
+                    <Slot name="thumb-end" />
+                  </View>
+                </View>
+              </Repeat>
+            ) : (
+              <View
+                part="thumb"
+                style={{
+                  '--slider-at': range.fraction,
+                }}
+              >
+                <Slot name="thumb" />
+              </View>
+            )}
           </View>
           {props.tooltip && (
             <View
               ariaHidden
               part="tooltips"
             >
-              <View
-                part="tooltip"
-                style={{
-                  '--slider-at': range.fraction,
-                }}
-              >
-                <Text part="tooltip-text">{range.said}</Text>
-              </View>
+              {props.range ? (
+                <Repeat
+                  each={range.thumbs}
+                  key="at"
+                  part="tooltip-stops"
+                >
+                  <View
+                    part="tooltip"
+                    style={{
+                      '--slider-at': entry.fraction,
+                    }}
+                  >
+                    <Text part="tooltip-text">{entry.said}</Text>
+                  </View>
+                </Repeat>
+              ) : (
+                <View
+                  part="tooltip"
+                  style={{
+                    '--slider-at': range.fraction,
+                  }}
+                >
+                  <Text part="tooltip-text">{range.said}</Text>
+                </View>
+              )}
             </View>
           )}
         </Wrap>

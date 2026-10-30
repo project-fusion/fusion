@@ -752,6 +752,20 @@ export default styles(
           }),
         ]),
       ]),
+      on(
+        ['thumb-start', 'thumb-last', 'thumb-halo'],
+        [native([rule({ part: { hidden: true } }, { display: 'none' })])],
+      ),
+      on('thumb-halo', [
+        native([
+          rule({
+            borderRadius: own.sliderThumbRadii,
+            boxShadow: haloed,
+            inset: 0,
+            position: 'absolute',
+          }),
+        ]),
+      ]),
       /* The thumb's own look at its size, which the web paints over the
          range's thumb to hold content and a phone draws as the thumb. */
       on('thumb', [
@@ -773,6 +787,8 @@ export default styles(
         native([
           rule({ boxShadow: ringed }),
           rule([{ dragging: true }, { focusVisible: true }], { boxShadow: haloed }),
+          /* A range's thumbs stand apart: its halo draws on the one in hand. */
+          rule({ range: true }, { boxShadow: ringed }),
           rule(
             { invalid: true },
             { boxShadow: [0, 0, 0, token('size-focus-ring'), token('color-danger')] },

@@ -52,9 +52,10 @@ describe('the generated Pin Input', () => {
     )
     await fireEvent(field(), 'focus')
     expect(field().props.selection).toEqual({ end: 4, start: 3 })
-    const boxes = screen.root.queryAll(
-      (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
-    )
+    const boxes =
+      screen.root?.queryAll(
+        (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
+      ) ?? []
     expect(boxes).toHaveLength(4)
     await fireEvent(boxes[1] as never, 'responderRelease')
     expect(field().props.selection).toEqual({ end: 2, start: 1 })
@@ -66,9 +67,10 @@ describe('the generated Pin Input', () => {
   test('a press on a box past the code puts the caret after it', async () => {
     await render(<PinInput defaultValue="1" label="Code" length={4} />)
     await fireEvent(field(), 'focus')
-    const boxes = screen.root.queryAll(
-      (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
-    )
+    const boxes =
+      screen.root?.queryAll(
+        (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
+      ) ?? []
     await fireEvent(boxes[3] as never, 'responderRelease')
     expect(field().props.selection).toEqual({ end: 1, start: 1 })
   })
@@ -76,7 +78,7 @@ describe('the generated Pin Input', () => {
   test('a disabled field takes no press on a box', async () => {
     await render(<PinInput disabled label="Code" length={4} />)
     expect(
-      screen.root.queryAll(
+      screen.root?.queryAll(
         (node) => node.type === 'View' && typeof node.props.onResponderRelease === 'function',
       ),
     ).toHaveLength(0)
