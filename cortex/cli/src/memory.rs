@@ -375,26 +375,68 @@ impl Memory {
             .collect())
     }
 
-    /// The question an answer's context was asked, where it records one.
-    async fn asked(&self, answer: &Node) -> Outcome<Option<String>> {
-        for parent in &answer.derived_from {
-            let Some(context) = self.node(*parent).await? else {
-                continue;
-            };
-            if context.kind() != NodeKind::Context {
-                continue;
-            }
-            for source in &context.derived_from {
-                if let Some(Node {
-                    detail: Detail::Source { content, uri: None },
-                    ..
-                }) = self.node(*source).await?
-                {
-                    return Ok(Some(content));
-                }
+    /// The nodes `ids` name that the trace holds, in one read.
+    async fn nodes(&self, ids: impl IntoIterator<Item = Id>) -> Outcome<HashMap<Id, Node>> {
+        let mut ids: Vec<Id> = ids.into_iter().collect();
+        ids.sort();
+        ids.dedup();
+        if ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+        Ok(self
+            .trace
+            .nodes(&ids)
+            .await
+            .map_err(|error| storage("cannot read the trace", &error))?
+            .into_iter()
+            .map(|(_, node)| (node.id, node))
+            .collect())
+    }
+
+    /// The question each of `answers` was asked, where its context records
+    /// one, by answer id. Two reads serve every answer: the contexts, then
+    /// their sources.
+    async fn questions(&self, answers: &[&Node]) -> Outcome<HashMap<Id, String>> {
+        let contexts: HashMap<Id, Node> = self
+            .nodes(
+                answers
+                    .iter()
+                    .flat_map(|answer| answer.derived_from.iter().copied()),
+            )
+            .await?
+            .into_iter()
+            .filter(|(_, node)| node.kind() == NodeKind::Context)
+            .collect();
+        let sources = self
+            .nodes(
+                contexts
+                    .values()
+                    .flat_map(|context| context.derived_from.iter().copied()),
+            )
+            .await?;
+        let mut asked = HashMap::new();
+        for answer in answers {
+            let question = answer
+                .derived_from
+                .iter()
+                .filter_map(|parent| contexts.get(parent))
+                .find_map(|context| {
+                    context
+                        .derived_from
+                        .iter()
+                        .find_map(|source| match sources.get(source) {
+                            Some(Node {
+                                detail: Detail::Source { content, uri: None },
+                                ..
+                            }) => Some(content.clone()),
+                            _ => None,
+                        })
+                });
+            if let Some(question) = question {
+                asked.insert(answer.id, question);
             }
         }
-        Ok(None)
+        Ok(asked)
     }
 
     async fn sources(&self) -> Outcome<HashMap<Id, Option<String>>> {
@@ -755,23 +797,27 @@ impl Memory {
                         .map(|node| node.id)
                 } else {
                     let text = text.to_lowercase();
-                    let mut found = None;
-                    for node in answers.iter().rev() {
-                        let said = match &node.detail {
-                            Detail::Output { content, .. } => content.to_lowercase(),
-                            _ => String::new(),
-                        };
-                        if said.contains(&text)
-                            || self
-                                .asked(node)
-                                .await?
+                    let newest_said = answers.iter().rposition(|node| match &node.detail {
+                        Detail::Output { content, .. } => content.to_lowercase().contains(&text),
+                        _ => false,
+                    });
+                    // Only answers newer than the newest one that said the
+                    // text can beat it, and their questions are read in two
+                    // batches so the reads do not grow with the answers.
+                    let unsure: Vec<&Node> = answers[newest_said.map_or(0, |at| at + 1)..]
+                        .iter()
+                        .collect();
+                    let questions = self.questions(&unsure).await?;
+                    unsure
+                        .iter()
+                        .rev()
+                        .find(|node| {
+                            questions
+                                .get(&node.id)
                                 .is_some_and(|question| question.to_lowercase().contains(&text))
-                        {
-                            found = Some(node.id);
-                            break;
-                        }
-                    }
-                    found
+                        })
+                        .map(|node| node.id)
+                        .or_else(|| newest_said.map(|at| answers[at].id))
                 }
             }
         };
@@ -1441,6 +1487,123 @@ mod tests {
         ids.sort_by_key(|id| id.0);
         ids.dedup();
         ids
+    }
+
+    /// An in-memory Trace store that records the name of each read.
+    struct CountedTrace {
+        reads: Arc<Mutex<Vec<&'static str>>>,
+        store: fusion_cortex_trace::store::InMemory,
+    }
+
+    impl CountedTrace {
+        fn read(&self, name: &'static str) {
+            self.reads.lock().unwrap().push(name);
+        }
+    }
+
+    #[async_trait]
+    impl fusion_cortex_trace::store::Store for CountedTrace {
+        async fn append(&self, trace: Id, node: &Node) -> Result<()> {
+            self.store.append(trace, node).await
+        }
+
+        async fn load(&self, trace: Id) -> Result<fusion_cortex_trace::Graph> {
+            self.read("load");
+            self.store.load(trace).await
+        }
+
+        async fn traces(&self) -> Result<Vec<fusion_cortex_trace::store::Summary>> {
+            self.read("traces");
+            self.store.traces().await
+        }
+
+        async fn nodes_of(
+            &self,
+            kinds: &[fusion_cortex_trace::NodeKind],
+            since: Option<chrono::DateTime<chrono::Utc>>,
+        ) -> Result<Vec<(Id, Node)>> {
+            self.read("nodes_of");
+            self.store.nodes_of(kinds, since).await
+        }
+
+        async fn node(&self, id: Id) -> Result<Option<(Id, Node)>> {
+            self.read("node");
+            self.store.node(id).await
+        }
+
+        async fn nodes(&self, ids: &[Id]) -> Result<Vec<(Id, Node)>> {
+            self.read("nodes");
+            self.store.nodes(ids).await
+        }
+
+        async fn find(
+            &self,
+            search: &fusion_cortex_trace::search::Search,
+        ) -> Result<fusion_cortex_trace::search::Page> {
+            self.read("find");
+            self.store.find(search).await
+        }
+
+        async fn title(&self, trace: Id, title: Option<&str>) -> Result<()> {
+            self.store.title(trace, title).await
+        }
+
+        async fn delete_cascade(&self, id: Id) -> Result<Vec<Id>> {
+            self.store.delete_cascade(id).await
+        }
+    }
+
+    /// How many reads `why("deploy window")` makes with `later` answers
+    /// after the one that asked about the deploy window.
+    async fn reads_to_find(later: usize) -> usize {
+        let reads = Arc::new(Mutex::new(Vec::new()));
+        let memory = Memory {
+            engram: Box::new(InMemory::new()),
+            trace: Box::new(CountedTrace {
+                reads: Arc::clone(&reads),
+                store: fusion_cortex_trace::store::InMemory::new(),
+            }),
+        };
+        let script: Script =
+            serde_json::from_str(r#"{"replies":[{"when":[],"reply":"Friday."}]}"#).unwrap();
+        let provider = script.provider("scripted");
+        let first = memory
+            .ask(
+                "When is the deploy window?",
+                &provider,
+                None,
+                &[Scope::Personal],
+                10,
+                None,
+            )
+            .await
+            .unwrap();
+        for number in 0..later {
+            memory
+                .ask(
+                    &format!("What is kiwi {number}?"),
+                    &provider,
+                    None,
+                    &[Scope::Personal],
+                    10,
+                    None,
+                )
+                .await
+                .unwrap();
+        }
+        reads.lock().unwrap().clear();
+        let why = memory.why(Some("deploy window")).await.unwrap();
+        let Why::Answer { answer, .. } = why else {
+            panic!("an answer");
+        };
+        assert_eq!(answer.id, first.id, "the oldest matching answer is found");
+        let count = reads.lock().unwrap().len();
+        count
+    }
+
+    #[tokio::test]
+    async fn why_by_text_reads_no_more_nodes_as_answers_grow() {
+        assert_eq!(reads_to_find(1).await, reads_to_find(12).await);
     }
 
     #[tokio::test]
