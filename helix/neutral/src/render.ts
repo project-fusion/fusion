@@ -225,9 +225,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'reading'
     | 'said'
     | 'spoken'
+    | 'thumbs'
   >
-  /** Whether the press that clears a field is drawn. */
-  readonly text: Computes<'clearShown'>
+  /** Whether the presses that clear a field and show its password are drawn, and whether it shows. */
+  readonly text: Computes<'clearShown' | 'revealShown' | 'revealed'>
   /** What a total computes: whether it holds any. */
   readonly total: Computes<'holds'>
   /** The sentence a form control's verdict shows under it, or `''`. */

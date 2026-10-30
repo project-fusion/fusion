@@ -13,10 +13,6 @@ import { formatNumber, parseNumber } from '../number-format/number-format.js'
 import { numberOf, numberOptions, textOf } from '../number-format/props.js'
 
 /**
- * How long a stepper button is held before it steps again, and how often it
- * steps after that, in milliseconds: React Aria's NumberField's 400 and 60.
- */
-/**
  * How far a pointer travels for one step of the value, in pixels.
  *
  * Four, measured against the alternatives rather than picked: at one the value
@@ -27,6 +23,10 @@ import { numberOf, numberOptions, textOf } from '../number-format/props.js'
  */
 export const SCRUB_PITCH = 4
 
+/**
+ * How long a stepper button is held before it steps again, and how often it
+ * steps after that, in milliseconds: React Aria's NumberField's 400 and 60.
+ */
 export const REPEAT_DELAY = 400
 export const REPEAT_EVERY = 60
 

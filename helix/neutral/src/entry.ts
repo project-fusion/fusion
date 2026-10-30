@@ -24,13 +24,13 @@ export interface Entry {
    * `-1` while the field has no focus, which a derivation reads by it.
    */
   readonly caret?: string
+  /** The part each box of the text is drawn in, which a press on it puts the caret in. */
+  readonly cell?: string
   /**
    * The derivation, by its name in `@fusion.dev/helix-core/derivations`, that
    * turns what a reader typed into the text the element holds, as a Pin
    * Input keeps the characters its type accepts.
    */
-  /** The part each box of the text is drawn in, which a press on it puts the caret in. */
-  readonly cell?: string
   readonly clean?: string
   /** The prop that holds the greatest number of a `number` type. */
   readonly max?: string
