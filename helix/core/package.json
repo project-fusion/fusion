@@ -86,6 +86,10 @@
       "types": "./dist/utils/derivations/derivations.d.ts",
       "default": "./dist/utils/derivations/derivations.js"
     },
+    "./file-input": {
+      "types": "./dist/utils/file-input/file-input.d.ts",
+      "default": "./dist/utils/file-input/file-input.js"
+    },
     "./layers": {
       "types": "./dist/utils/layers/layers.d.ts",
       "default": "./dist/utils/layers/layers.js"
