@@ -306,17 +306,14 @@ export default styles(
         ]),
       ]),
       /* One line each, cut with an ellipsis where the surface runs out. */
-      on({ part: 'nav', selector: '::slotted(a)' }, [
+      on({ part: 'nav', selector: ':host([variant="rail"]) ::slotted(a)' }, [
         web([
-          rule(
-            { variant: 'rail' },
-            {
-              minInlineSize: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            },
-          ),
+          rule({
+            minInlineSize: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }),
         ]),
       ]),
     ]
