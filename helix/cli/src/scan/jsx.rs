@@ -107,10 +107,14 @@ impl Reader<'_> {
 fn attribute(name: &JSXAttributeName<'_>, value: Option<&JSXAttributeValue<'_>>) -> Attribute {
     let literal = || match value {
         None => Value::Literal(String::new()),
-        Some(JSXAttributeValue::StringLiteral(text)) => Value::Literal(text.value.to_string()),
+        Some(JSXAttributeValue::StringLiteral(text)) => {
+            Value::Literal(text.value.display().to_string())
+        }
         Some(JSXAttributeValue::ExpressionContainer(container)) => {
             match container.expression.as_expression() {
-                Some(Expression::StringLiteral(text)) => Value::Literal(text.value.to_string()),
+                Some(Expression::StringLiteral(text)) => {
+                    Value::Literal(text.value.display().to_string())
+                }
                 Some(Expression::TemplateLiteral(literal)) if literal.expressions.is_empty() => {
                     Value::Literal(Reader::joined(literal, ""))
                 }
@@ -201,7 +205,7 @@ fn spread_attributes(argument: &Expression<'_>) -> Vec<Attribute> {
             ObjectPropertyKind::ObjectProperty(property) if !property.computed => {
                 let name = match &property.key {
                     PropertyKey::StaticIdentifier(key) => key.name.to_string(),
-                    PropertyKey::StringLiteral(key) => key.value.to_string(),
+                    PropertyKey::StringLiteral(key) => key.value.display().to_string(),
                     _ => return None,
                 };
                 /* A capital is a property, as a written attribute's is. */
@@ -209,7 +213,9 @@ fn spread_attributes(argument: &Expression<'_>) -> Vec<Attribute> {
                     return None;
                 }
                 let value = match &property.value {
-                    Expression::StringLiteral(text) => Value::Literal(text.value.to_string()),
+                    Expression::StringLiteral(text) => {
+                        Value::Literal(text.value.display().to_string())
+                    }
                     _ => Value::Bound,
                 };
                 Some(Attribute { name, value })
@@ -233,15 +239,16 @@ fn created<'c>(call: &'c CallExpression<'_>) -> Option<&'c str> {
     ]
     .into_iter()
     .any(|name| call.callee.is_specific_id(name))
-        || call
-            .callee
-            .get_member_expr()
-            .is_some_and(|member| member.static_property_name() == Some("createElement"));
+        || call.callee.get_member_expr().is_some_and(|member| {
+            member
+                .static_property_name()
+                .is_some_and(|name| name == "createElement")
+        });
     if !creates {
         return None;
     }
     match call.arguments.first() {
-        Some(Argument::StringLiteral(tag)) => Some(tag.value.as_str()),
+        Some(Argument::StringLiteral(tag)) => tag.value.as_str(),
         _ => None,
     }
 }
@@ -261,14 +268,16 @@ fn props_attributes(props: Option<&Argument<'_>>) -> Vec<Attribute> {
             ObjectPropertyKind::ObjectProperty(property) if !property.computed => {
                 let name = match &property.key {
                     PropertyKey::StaticIdentifier(key) => key.name.to_string(),
-                    PropertyKey::StringLiteral(key) => key.value.to_string(),
+                    PropertyKey::StringLiteral(key) => key.value.display().to_string(),
                     _ => return None,
                 };
                 if name == "key" || name == "ref" || name == "children" {
                     return None;
                 }
                 let literal = match &property.value {
-                    Expression::StringLiteral(text) => Value::Literal(text.value.to_string()),
+                    Expression::StringLiteral(text) => {
+                        Value::Literal(text.value.display().to_string())
+                    }
                     Expression::TemplateLiteral(literal) if literal.expressions.is_empty() => {
                         Value::Literal(Reader::joined(literal, ""))
                     }
@@ -297,10 +306,14 @@ fn props_attributes(props: Option<&Argument<'_>>) -> Vec<Attribute> {
 fn defined(call: &CallExpression<'_>) -> Option<String> {
     let names_define = call.callee.is_specific_id("customElement")
         || call.callee.get_member_expr().is_some_and(|member| {
-            member.static_property_name() == Some("define")
+            member
+                .static_property_name()
+                .is_some_and(|name| name == "define")
                 && (member.object().is_specific_id("customElements")
                     || member.object().get_member_expr().is_some_and(|object| {
-                        object.static_property_name() == Some("customElements")
+                        object
+                            .static_property_name()
+                            .is_some_and(|name| name == "customElements")
                     }))
         });
     if !names_define {
@@ -308,7 +321,7 @@ fn defined(call: &CallExpression<'_>) -> Option<String> {
     }
     match call.arguments.first() {
         Some(Argument::StringLiteral(tag)) if tag.value.starts_with("helix-") => {
-            Some(tag.value.to_string())
+            Some(tag.value.display().to_string())
         }
         _ => None,
     }
@@ -409,7 +422,7 @@ impl<'a> Visit<'a> for Reader<'_> {
                         self.markup(&text, literal.span.start + 1);
                     }
                     Expression::StringLiteral(literal) => {
-                        let text = literal.value.to_string();
+                        let text = literal.value.display().to_string();
                         self.markup(&text, literal.span.start + 1);
                     }
                     _ => {}

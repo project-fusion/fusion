@@ -244,7 +244,7 @@ fn key_of(key: &PropertyKey<'_>, source: &str) -> Option<String> {
     match key {
         PropertyKey::StaticIdentifier(id) => Some(id.name.to_string()),
         PropertyKey::PrivateIdentifier(id) => Some(format!("#{}", id.name)),
-        PropertyKey::StringLiteral(one) => Some(one.value.to_string()),
+        PropertyKey::StringLiteral(one) => Some(one.value.display().to_string()),
         /* A computed key is an expression, and what it evaluates to is a
         runtime question. The analyzer takes the text; so does this. */
         other => other
@@ -415,7 +415,7 @@ fn imports(program: &oxc_ast::ast::Program<'_>) -> BTreeMap<String, String> {
         let Statement::ImportDeclaration(import) = statement else {
             continue;
         };
-        let from = import.source.value.to_string();
+        let from = import.source.value.display().to_string();
         for specifier in import.specifiers.iter().flatten() {
             found.insert(specifier.local().name.to_string(), from.clone());
         }
@@ -721,7 +721,7 @@ fn assigned(class: &Class<'_>, source: &str) -> BTreeMap<String, String> {
                 continue;
             }
             found.insert(
-                field.to_string(),
+                field.display().to_string(),
                 one_line(
                     source,
                     assignment.right.span().start,
@@ -1010,7 +1010,7 @@ fn tag_of(class: &Class<'_>) -> Option<String> {
         }
         if let [argument] = call.arguments.as_slice() {
             if let Some(Expression::StringLiteral(tag)) = argument.as_expression() {
-                return Some(tag.value.to_string());
+                return Some(tag.value.display().to_string());
             }
         }
     }
@@ -1072,10 +1072,14 @@ fn attribute_of(
                 let ObjectPropertyKind::ObjectProperty(property) = property else {
                     continue;
                 };
-                let key = property.key.static_name().unwrap_or_default().to_string();
+                let key = property
+                    .key
+                    .static_name()
+                    .map(|name| name.display().to_string())
+                    .unwrap_or_default();
                 match (key.as_str(), &property.value) {
                     ("attribute", Expression::StringLiteral(written)) => {
-                        attribute = Some(written.value.to_string());
+                        attribute = Some(written.value.display().to_string());
                     }
                     ("attribute", Expression::BooleanLiteral(said)) if !said.value => {
                         attribute = None;
@@ -1590,7 +1594,7 @@ pub fn exports(source: &str, path: &str) -> Vec<Exported> {
                 kind: "js",
                 name: "*".to_owned(),
                 declaration: "*".to_owned(),
-                origin: Origin::Resolved(export.source.value.to_string()),
+                origin: Origin::Resolved(export.source.value.display().to_string()),
             }),
             Statement::ExportDeclaration(export) => found.extend(published(&export.declaration)),
             Statement::ExportNamedDeclaration(export) => {
@@ -1609,7 +1613,7 @@ pub fn exports(source: &str, path: &str) -> Vec<Exported> {
                         kind: "js",
                         name: specifier.exported.name().to_string(),
                         declaration: specifier.local.name().to_string(),
-                        origin: Origin::Written(export.source.value.to_string()),
+                        origin: Origin::Written(export.source.value.display().to_string()),
                     });
                 }
             }
