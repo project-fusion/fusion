@@ -46,10 +46,10 @@ export interface Destination {
    *
    * **The real stage, never a softer word standing in for it.** `AGENTS.md`
    * says never to soften these, and the Cortex page two clicks away reports
-   * Engram and Trace as Building and Recall as Declared. A menu calling all
-   * three the same thing disagrees with the page as well as with the rule.
+   * the stage of each module. A menu saying otherwise disagrees with the page
+   * as well as with the rule.
    */
-  stage?: 'Building' | 'Declared'
+  stage?: 'Active' | 'Building' | 'Declared'
   /**
    * The name on the row.
    */
@@ -262,9 +262,7 @@ export const PRODUCTS: Product[] = [
     body: 'A memory and provenance layer for AI systems. Cortex records what a system knows, where each fact came from, and how far to trust it. The record stays when you replace the model.',
     /* The three modules that have earned an evocative name, per `AGENTS.md`:
        inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
-       descriptive. They are named here before they are built because the
-       division of the thing is what Cortex *is*, and a panel showing only what
-       already ships describes a smaller idea than the one on offer. */
+       descriptive. The `cortex` command line ships all three. */
     destinations: [
       {
         href: '/cortex',
@@ -272,26 +270,27 @@ export const PRODUCTS: Product[] = [
         title: 'Docs',
       },
       {
-        stage: 'Building',
+        stage: 'Active',
         summary: 'Memory: what a system keeps, and for how long.',
         title: 'Engram',
       },
       {
-        stage: 'Building',
+        stage: 'Active',
         summary: 'Provenance: where each fact came from.',
         title: 'Trace',
       },
       {
-        stage: 'Declared',
+        stage: 'Active',
         summary: 'Context: what to give a model, and why.',
         title: 'Recall',
       },
     ],
     href: '/cortex',
+    install: 'npm install --global @fusion.dev/cortex-cli',
     mark: 'cortex',
     name: 'Cortex',
     role: 'The mind',
-    stage: 'Building',
+    stage: 'Active',
     summary: 'Memory and provenance for AI systems, kept when you change models.',
   },
 ]
