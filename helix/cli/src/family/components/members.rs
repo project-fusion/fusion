@@ -105,6 +105,8 @@ fn typed(kind: &PropType) -> String {
         PropType::Primitive(Primitive::Time) => "Date | number | string".to_owned(),
         /* The empty string is the attribute present with no value, which a
         phone takes as `true`, and `false` beside it is the attribute absent. */
+        /* A function, by the signature its source writes out. */
+        PropType::Function { function } => function.clone(),
         PropType::Values(values) => values
             .iter()
             .map(|value| {
@@ -368,12 +370,23 @@ pub fn typed_members(
     );
     /* A form control's ref is its handle, as a field's is on the web. */
     if family.api.validation.is_some() {
+        /* A control that holds files offers them on its handle too, as the
+        web element's methods do. */
+        let (ty, doc) = if family.api.files.is_some() {
+            (
+                "Ref<FilesHandle>",
+                "The control's handle. `validate()` shows what is wrong with the answer, as the web's `reportValidity()` does, and returns whether it is acceptable. `files()`, `removeAt()`, `clear()` and `setFileStatus()` read and change the files it holds, as the web element's methods do.",
+            )
+        } else {
+            (
+                "Ref<FieldHandle>",
+                "The control's handle. `validate()` shows what is wrong with the answer, as the web's `reportValidity()` does, and returns whether it is acceptable.",
+            )
+        };
         members.push(Member {
-            doc: vec![
-                "The control's handle. `validate()` shows what is wrong with the answer, as the web's `reportValidity()` does, and returns whether it is acceptable.".to_owned(),
-            ],
+            doc: vec![doc.to_owned()],
             name: "ref".to_owned(),
-            ty: "Ref<FieldHandle>".to_owned(),
+            ty: ty.to_owned(),
         });
     }
     let mut typed = Typed::default();

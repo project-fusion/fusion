@@ -276,6 +276,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("pathLength", BOX, Shape::Positive),
     /* The words a field shows while it is empty. */
     ("placeholder", FIELD, Shape::Words),
+    /* The press that opens the picker of the element's `files`, as a file
+    input's field. */
+    ("picks", PRESS, Shape::Set),
     /* `web` for a node only the web draws, and `native` for one only a
     phone draws, as a checkbox's tick, which the web draws as a mask. */
     ("platform", ALL, Shape::OneOf(&["native", "web"])),
@@ -286,6 +289,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("r", BOX, Shape::Length),
     /* `aria-readonly`: a reader sees and reaches it, and cannot change it. */
     ("readonly", ANSWER, Shape::Flag),
+    /* The press that takes the file of its row out of the element's
+    `files`, as a file input's remove button. */
+    ("removes", PRESS, Shape::Set),
     /* `aria-required`. A phone has no such state, and its hint says it. */
     ("required", ANSWER, Shape::Flag),
     ("role", ROLED, Shape::Role),

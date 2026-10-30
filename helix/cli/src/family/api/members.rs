@@ -50,12 +50,18 @@ pub struct Event {
     pub platform: Option<Platform>,
 }
 
-/// What a prop holds: a primitive, or the strings it may take.
+/// What a prop holds: a primitive, the strings it may take, or a function.
 #[derive(Clone, Debug, PartialEq, Serialize, JsonSchema, TS)]
 #[serde(untagged)]
 pub enum PropType {
     Primitive(Primitive),
     Values(Vec<String>),
+    /// A function the element calls, by its signature as a phone's
+    /// component types it, as a file input's `validate`. No attribute holds
+    /// one, so it is a property alone.
+    Function {
+        function: String,
+    },
 }
 
 /// A primitive a prop holds.
@@ -155,7 +161,7 @@ pub fn props(items: &[Lit], tier: Tier) -> Result<Vec<Prop>, String> {
 /// named value.
 fn prop_type(name: &str, kind: Option<&Lit>) -> Result<PropType, String> {
     let refused = || {
-        format!("prop `{name}` takes `boolean`, `number`, `number | string`, `object`, `string`, `time`, or an array of values")
+        format!("prop `{name}` takes `boolean`, `number`, `number | string`, `object`, `string`, `time`, an array of values, or `{{ function }}`")
     };
     match kind {
         Some(Lit::Text(kind)) => match kind.as_str() {
@@ -176,6 +182,14 @@ fn prop_type(name: &str, kind: Option<&Lit>) -> Result<PropType, String> {
             })
             .collect::<Result<_, _>>()
             .map(PropType::Values),
+        Some(Lit::Object(fields)) => match fields.as_slice() {
+            [(key, Lit::Text(signature))] if key == "function" && !signature.trim().is_empty() => {
+                Ok(PropType::Function {
+                    function: signature.clone(),
+                })
+            }
+            _ => Err(refused()),
+        },
         _ => Err(refused()),
     }
 }

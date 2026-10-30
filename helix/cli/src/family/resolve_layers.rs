@@ -148,7 +148,7 @@ fn presented(family: &Family, layer: &Node, names: &Names, at: &str, found: &mut
             PropType::Values(values) => PRESENTATIONS
                 .iter()
                 .all(|one| values.iter().any(|value| value == one)),
-            PropType::Primitive(_) => false,
+            PropType::Function { .. } | PropType::Primitive(_) => false,
         });
         if !takes {
             found.push(format!(
