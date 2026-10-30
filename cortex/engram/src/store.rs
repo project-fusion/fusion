@@ -91,6 +91,17 @@ pub trait Store: Send + Sync {
     /// [`Error::Storage`] if the backend fails.
     async fn facts(&self) -> Result<Vec<Fact>>;
 
+    /// The fact with this id, superseded or not, or `None` where none has it.
+    /// The default reads every fact and keeps the one that matches; a store
+    /// overrides it to read one.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn fact(&self, id: Id) -> Result<Option<Fact>> {
+        Ok(self.facts().await?.into_iter().find(|fact| fact.id == id))
+    }
+
     /// Adds `episode` to what reinforced `fact`'s lineage, as
     /// [`Memory::reinforce`] does, and returns whether a fact had the id.
     ///
@@ -130,6 +141,21 @@ pub trait Store: Send + Sync {
     ///
     /// [`Error::Storage`] if the backend fails.
     async fn episodes(&self) -> Result<Vec<Episode>>;
+
+    /// The episode with this id, or `None` where none has it. The default
+    /// reads every episode and keeps the one that matches; a store overrides
+    /// it to read one.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn episode(&self, id: Id) -> Result<Option<Episode>> {
+        Ok(self
+            .episodes()
+            .await?
+            .into_iter()
+            .find(|episode| episode.id == id))
+    }
 
     /// Episodes no consolidation pass has read and no fact rests on or was
     /// reinforced by, in the order they were recorded.
@@ -235,6 +261,15 @@ impl Store for InMemory {
         Ok(self.lock()?.facts().to_vec())
     }
 
+    async fn fact(&self, id: Id) -> Result<Option<Fact>> {
+        Ok(self
+            .lock()?
+            .facts()
+            .iter()
+            .find(|fact| fact.id == id)
+            .cloned())
+    }
+
     async fn reinforce(&self, fact: Id, episode: Id) -> Result<bool> {
         Ok(self.lock()?.reinforce(fact, episode))
     }
@@ -245,6 +280,15 @@ impl Store for InMemory {
 
     async fn episodes(&self) -> Result<Vec<Episode>> {
         Ok(self.lock()?.episodes().to_vec())
+    }
+
+    async fn episode(&self, id: Id) -> Result<Option<Episode>> {
+        Ok(self
+            .lock()?
+            .episodes()
+            .iter()
+            .find(|episode| episode.id == id)
+            .cloned())
     }
 
     async fn unconsolidated(&self) -> Result<Vec<Episode>> {
@@ -980,6 +1024,15 @@ mod sqlite {
             self.read(rows).await
         }
 
+        async fn fact(&self, id: Id) -> Result<Option<Fact>> {
+            let rows = sqlx::query("SELECT * FROM facts WHERE id = ?")
+                .bind(id.to_string())
+                .fetch_all(&self.pool)
+                .await
+                .map_err(storage)?;
+            Ok(self.read(rows).await?.pop())
+        }
+
         async fn supersede(&self, old: Id, new: Id) -> Result<bool> {
             let mut transaction = self
                 .pool
@@ -1012,6 +1065,17 @@ mod sqlite {
                 .iter()
                 .map(episode)
                 .collect()
+        }
+
+        async fn episode(&self, id: Id) -> Result<Option<Episode>> {
+            sqlx::query("SELECT * FROM episodes WHERE id = ?")
+                .bind(id.to_string())
+                .fetch_optional(&self.pool)
+                .await
+                .map_err(storage)?
+                .as_ref()
+                .map(episode)
+                .transpose()
         }
 
         async fn unconsolidated(&self) -> Result<Vec<Episode>> {
@@ -1177,6 +1241,7 @@ pub(crate) mod conformance {
         another_models_vectors_are_never_compared(store).await;
         a_new_embedding_replaces_another_models(store).await;
         a_vector_that_cannot_be_compared_is_refused(store).await;
+        a_fact_and_an_episode_read_by_their_id(store).await;
     }
 
     /// The vectors a scripted model gives the facts and questions below. The
@@ -1552,6 +1617,36 @@ pub(crate) mod conformance {
             .find(|held| held.id == fact)
     }
 
+    async fn a_fact_and_an_episode_read_by_their_id(store: &dyn Store) {
+        let trace = Id::new();
+        let first = record(store, "read by id a", trace).await;
+        let second = record(store, "read by id b", trace).await;
+        let mut fact = Fact::new("read by id", vec![first.id], 0.7);
+        fact.embedding = Some(Embedding::new("model", vec![1.0, 0.0]));
+        store.assert_fact(&fact, None).await.unwrap();
+        store.reinforce(fact.id, second.id).await.unwrap();
+        let newer = Fact::new("read by id, newer", vec![second.id], 0.9);
+        store.assert_fact(&newer, Some(fact.id)).await.unwrap();
+
+        let current = store.fact(newer.id).await.unwrap();
+        assert!(current.is_some());
+        assert_eq!(current, held(store, newer.id).await);
+        let old = store.fact(fact.id).await.unwrap().unwrap();
+        assert_eq!(Some(&old), held(store, fact.id).await.as_ref());
+        assert_eq!(old.superseded_by, Some(newer.id));
+        assert!(old.embedding.is_some());
+        assert_eq!(old.reinforced_by, vec![second.id]);
+        assert_eq!(store.episode(first.id).await.unwrap(), Some(first.clone()));
+        assert_eq!(store.episode(second.id).await.unwrap(), Some(second));
+        assert_eq!(store.fact(Id::new()).await.unwrap(), None);
+        assert_eq!(store.episode(Id::new()).await.unwrap(), None);
+
+        store.forget(trace).await.unwrap();
+        assert_eq!(store.fact(fact.id).await.unwrap(), None);
+        assert_eq!(store.fact(newer.id).await.unwrap(), None);
+        assert_eq!(store.episode(first.id).await.unwrap(), None);
+    }
+
     async fn record_within(store: &dyn Store, content: &str, trace: Id, scope: Scope) -> Episode {
         let episode = Episode::new(content, trace).within(scope);
         store.record(&episode).await.unwrap();
@@ -1802,7 +1897,88 @@ pub(crate) mod conformance {
 
 #[cfg(test)]
 mod tests {
-    use super::{conformance, InMemory};
+    use async_trait::async_trait;
+    use fusion_cortex_core::{embed::Embedding, Id, Result};
+
+    use super::{conformance, InMemory, Store};
+    use crate::{Episode, Fact, Scope};
+
+    /// An in-memory store that keeps the trait's default `fact` and
+    /// `episode`, so the conformance suite covers them.
+    struct Scanning(InMemory);
+
+    #[async_trait]
+    impl Store for Scanning {
+        async fn record(&self, episode: &Episode) -> Result<()> {
+            self.0.record(episode).await
+        }
+
+        async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()> {
+            self.0.assert_fact(fact, supersedes).await
+        }
+
+        async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool> {
+            self.0.set_embedding(fact, embedding).await
+        }
+
+        async fn nearest(
+            &self,
+            query: &Embedding,
+            scopes: &[Scope],
+            most: usize,
+        ) -> Result<Vec<(Fact, f32)>> {
+            self.0.nearest(query, scopes, most).await
+        }
+
+        async fn supersede(&self, old: Id, new: Id) -> Result<bool> {
+            self.0.supersede(old, new).await
+        }
+
+        async fn facts(&self) -> Result<Vec<Fact>> {
+            self.0.facts().await
+        }
+
+        async fn reinforce(&self, fact: Id, episode: Id) -> Result<bool> {
+            self.0.reinforce(fact, episode).await
+        }
+
+        async fn add_source(&self, fact: Id, episode: Id, node: Option<Id>) -> Result<bool> {
+            self.0.add_source(fact, episode, node).await
+        }
+
+        async fn mark_consolidated(&self, episodes: &[Id]) -> Result<()> {
+            self.0.mark_consolidated(episodes).await
+        }
+
+        async fn current_facts(&self) -> Result<Vec<Fact>> {
+            self.0.current_facts().await
+        }
+
+        async fn episodes(&self) -> Result<Vec<Episode>> {
+            self.0.episodes().await
+        }
+
+        async fn unconsolidated(&self) -> Result<Vec<Episode>> {
+            self.0.unconsolidated().await
+        }
+
+        async fn forget(&self, trace: Id) -> Result<Vec<Id>> {
+            self.0.forget(trace).await
+        }
+
+        async fn forget_episode(&self, episode: Id) -> Result<Vec<Id>> {
+            self.0.forget_episode(episode).await
+        }
+
+        async fn delete_fact(&self, fact: Id) -> Result<bool> {
+            self.0.delete_fact(fact).await
+        }
+    }
+
+    #[tokio::test]
+    async fn the_default_lookups_conform() {
+        conformance::run(&Scanning(InMemory::new())).await;
+    }
 
     #[tokio::test]
     async fn the_in_memory_store_conforms() {

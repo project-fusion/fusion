@@ -894,6 +894,24 @@ impl Store for Postgres {
         Ok(true)
     }
 
+    async fn fact(&self, id: Id) -> Result<Option<Fact>> {
+        let mut transaction = self.database.begin().await?;
+        let rows = self
+            .database
+            .query(concat!(
+                "SELECT ",
+                fact_columns!(),
+                " FROM facts WHERE id = $1"
+            ))
+            .bind(id.0)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let facts = self.read(&mut transaction, rows).await?;
+        transaction.commit().await.map_err(storage_error)?;
+        Ok(facts.into_iter().next())
+    }
+
     async fn facts(&self) -> Result<Vec<Fact>> {
         self.facts_where(concat!(
             "SELECT ",
@@ -1021,6 +1039,19 @@ impl Store for Postgres {
     async fn episodes(&self) -> Result<Vec<Episode>> {
         self.episodes_where("SELECT * FROM episodes ORDER BY seq")
             .await
+    }
+
+    async fn episode(&self, id: Id) -> Result<Option<Episode>> {
+        let mut transaction = self.database.begin().await?;
+        let row = self
+            .database
+            .query("SELECT * FROM episodes WHERE id = $1")
+            .bind(id.0)
+            .fetch_optional(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        transaction.commit().await.map_err(storage_error)?;
+        row.as_ref().map(episode).transpose()
     }
 
     async fn unconsolidated(&self) -> Result<Vec<Episode>> {

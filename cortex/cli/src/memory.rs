@@ -33,7 +33,7 @@ use fusion_cortex_recall::{
 use fusion_cortex_trace::{
     replay::{Exact, Verdict},
     store::Store as Trace,
-    Call, Detail, Graph, Node, NodeKind,
+    Call, Detail, Graph, Node, NodeKind, Placed,
 };
 use fusion_rules::error::{Failure, Outcome};
 use serde::Serialize;
@@ -442,6 +442,50 @@ impl Memory {
         })
     }
 
+    /// The facts `facts` name and the episodes they derive from, each read by
+    /// its id, with no source addresses.
+    async fn cited(&self, facts: impl IntoIterator<Item = Id>) -> Outcome<Held> {
+        let mut held = Held {
+            episodes: HashMap::new(),
+            facts: HashMap::new(),
+            sources: HashMap::new(),
+        };
+        for id in facts {
+            if held.facts.contains_key(&id) {
+                continue;
+            }
+            let fact = self
+                .engram
+                .fact(id)
+                .await
+                .map_err(|error| storage("cannot read memory", &error))?;
+            if let Some(fact) = fact {
+                self.cite(&mut held, fact).await?;
+            }
+        }
+        Ok(held)
+    }
+
+    /// Adds `fact` to `held`, with each episode it derives from that `held`
+    /// does not have.
+    async fn cite(&self, held: &mut Held, fact: Fact) -> Outcome<()> {
+        for id in &fact.derived_from {
+            if held.episodes.contains_key(id) {
+                continue;
+            }
+            let episode = self
+                .engram
+                .episode(*id)
+                .await
+                .map_err(|error| storage("cannot read memory", &error))?;
+            if let Some(episode) = episode {
+                held.episodes.insert(episode.id, episode);
+            }
+        }
+        held.facts.insert(fact.id, fact);
+        Ok(())
+    }
+
     async fn append(&self, trace: Id, nodes: &[Node]) -> Outcome<()> {
         for node in nodes {
             self.trace
@@ -751,13 +795,21 @@ impl Memory {
     ///
     /// [`Failure`] if a store fails or nothing matches `target`.
     pub async fn why(&self, target: Option<&str>) -> Outcome<Why> {
-        let mut held = self.remembered().await?;
         if let Some(id) = target.and_then(|text| uuid::Uuid::parse_str(text.trim()).ok()) {
             let id = Id(id);
-            if let Some(fact) = held.facts.get(&id) {
-                let nodes: Vec<Id> = fact
-                    .derived_from
-                    .iter()
+            let fact = self
+                .engram
+                .fact(id)
+                .await
+                .map_err(|error| storage("cannot read memory", &error))?;
+            if let Some(fact) = fact {
+                let mut held = self.cited([]).await?;
+                self.cite(&mut held, fact).await?;
+                let nodes: Vec<Id> = held
+                    .facts
+                    .get(&id)
+                    .into_iter()
+                    .flat_map(|fact| &fact.derived_from)
                     .filter_map(|episode| held.episodes.get(episode)?.node)
                     .collect();
                 for node in nodes {
@@ -788,8 +840,9 @@ impl Memory {
                 )
             })
             .await?;
-        held.sources = graph.nodes().filter_map(source).collect();
         let node = graph.get(id).expect("an answer the graph holds");
+        let mut held = self.cited(cited_facts(&graph, node)).await?;
+        held.sources = graph.nodes().filter_map(source).collect();
         Ok(Why::Answer {
             answer: answer(node),
             derivation: derivation(&graph, &held, node),
@@ -1176,12 +1229,7 @@ fn derivation(graph: &Graph, held: &Held, answer: &Node) -> Derived {
         .filter(|placed| placed.part == Part::Facts)
         .map(|placed| {
             let node = placed.sources.first().copied();
-            let fact = node
-                .and_then(|node| match &graph.get(node)?.detail {
-                    Detail::Memory { fact_ids } => fact_ids.first().copied(),
-                    _ => None,
-                })
-                .and_then(|fact| held.fact(fact));
+            let fact = placed_fact(graph, placed).and_then(|fact| held.fact(fact));
             let rests_on: Vec<EpisodeView> = node
                 .map(|node| sources_under(graph, node))
                 .unwrap_or_default()
@@ -1202,6 +1250,27 @@ fn derivation(graph: &Graph, held: &Held, answer: &Node) -> Derived {
         question: question(graph, answer),
         strategy: Some(strategy.clone()),
     }
+}
+
+/// The fact a placed part shows, where its first source is a memory node.
+fn placed_fact(graph: &Graph, placed: &Placed) -> Option<Id> {
+    match &graph.get(placed.sources.first().copied()?)?.detail {
+        Detail::Memory { fact_ids } => fact_ids.first().copied(),
+        _ => None,
+    }
+}
+
+/// The facts `answer`'s context placed.
+fn cited_facts(graph: &Graph, answer: &Node) -> Vec<Id> {
+    let Some(Detail::Context { placed, .. }) = context(graph, answer).map(|node| &node.detail)
+    else {
+        return vec![];
+    };
+    placed
+        .iter()
+        .filter(|placed| placed.part == Part::Facts)
+        .filter_map(|placed| placed_fact(graph, placed))
+        .collect()
 }
 
 /// The source nodes a memory node rests on, through earlier memory nodes and
@@ -1249,5 +1318,215 @@ fn view(node: &Node) -> NodeView {
         id: node.id,
         kind: node.kind(),
         text,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::{Arc, Mutex};
+
+    use async_trait::async_trait;
+    use fusion_cortex_core::{embed::Embedding, Id, Result};
+    use fusion_cortex_engram::{store::InMemory, Episode, Fact, Scope};
+    use fusion_cortex_trace::{Detail, Node};
+
+    use super::{Engram, Memory, Why};
+    use crate::script::Script;
+
+    /// What a [`Counted`] store was asked to read.
+    #[derive(Default)]
+    struct Reads {
+        /// The bulk reads, by method name.
+        bulk: Vec<&'static str>,
+        episodes: Vec<Id>,
+        facts: Vec<Id>,
+    }
+
+    /// An in-memory Engram store that records each read.
+    struct Counted {
+        reads: Arc<Mutex<Reads>>,
+        store: InMemory,
+    }
+
+    impl Counted {
+        fn bulk(&self, name: &'static str) {
+            self.reads.lock().unwrap().bulk.push(name);
+        }
+    }
+
+    #[async_trait]
+    impl Engram for Counted {
+        async fn record(&self, episode: &Episode) -> Result<()> {
+            self.store.record(episode).await
+        }
+
+        async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()> {
+            self.store.assert_fact(fact, supersedes).await
+        }
+
+        async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool> {
+            self.store.set_embedding(fact, embedding).await
+        }
+
+        async fn nearest(
+            &self,
+            query: &Embedding,
+            scopes: &[Scope],
+            most: usize,
+        ) -> Result<Vec<(Fact, f32)>> {
+            self.bulk("nearest");
+            self.store.nearest(query, scopes, most).await
+        }
+
+        async fn supersede(&self, old: Id, new: Id) -> Result<bool> {
+            self.store.supersede(old, new).await
+        }
+
+        async fn facts(&self) -> Result<Vec<Fact>> {
+            self.bulk("facts");
+            self.store.facts().await
+        }
+
+        async fn fact(&self, id: Id) -> Result<Option<Fact>> {
+            self.reads.lock().unwrap().facts.push(id);
+            self.store.fact(id).await
+        }
+
+        async fn reinforce(&self, fact: Id, episode: Id) -> Result<bool> {
+            self.store.reinforce(fact, episode).await
+        }
+
+        async fn add_source(&self, fact: Id, episode: Id, node: Option<Id>) -> Result<bool> {
+            self.store.add_source(fact, episode, node).await
+        }
+
+        async fn mark_consolidated(&self, episodes: &[Id]) -> Result<()> {
+            self.store.mark_consolidated(episodes).await
+        }
+
+        async fn current_facts(&self) -> Result<Vec<Fact>> {
+            self.bulk("current_facts");
+            self.store.current_facts().await
+        }
+
+        async fn episodes(&self) -> Result<Vec<Episode>> {
+            self.bulk("episodes");
+            self.store.episodes().await
+        }
+
+        async fn episode(&self, id: Id) -> Result<Option<Episode>> {
+            self.reads.lock().unwrap().episodes.push(id);
+            self.store.episode(id).await
+        }
+
+        async fn unconsolidated(&self) -> Result<Vec<Episode>> {
+            self.bulk("unconsolidated");
+            self.store.unconsolidated().await
+        }
+
+        async fn forget(&self, trace: Id) -> Result<Vec<Id>> {
+            self.store.forget(trace).await
+        }
+
+        async fn forget_episode(&self, episode: Id) -> Result<Vec<Id>> {
+            self.store.forget_episode(episode).await
+        }
+
+        async fn delete_fact(&self, fact: Id) -> Result<bool> {
+            self.store.delete_fact(fact).await
+        }
+    }
+
+    fn sorted(mut ids: Vec<Id>) -> Vec<Id> {
+        ids.sort_by_key(|id| id.0);
+        ids.dedup();
+        ids
+    }
+
+    #[tokio::test]
+    async fn why_reads_only_the_facts_and_episodes_it_cites() {
+        let reads = Arc::new(Mutex::new(Reads::default()));
+        let memory = Memory {
+            engram: Box::new(Counted {
+                reads: Arc::clone(&reads),
+                store: InMemory::new(),
+            }),
+            trace: Box::new(fusion_cortex_trace::store::InMemory::new()),
+        };
+        let trace = Id::new();
+        let mut cited = Vec::new();
+        let mut episodes = Vec::new();
+        for content in ["deploy window", "release open"] {
+            let source = Node::new(
+                Detail::Source {
+                    content: content.to_owned(),
+                    uri: None,
+                },
+                vec![],
+            );
+            let episode = Episode::new(content, trace).at(source.id);
+            let mut fact = Fact::new(content, vec![episode.id], 0.9);
+            let shown = Node::new(
+                Detail::Memory {
+                    fact_ids: vec![fact.id],
+                },
+                vec![source.id],
+            );
+            fact.node = Some(shown.id);
+            memory.append(trace, &[source, shown]).await.unwrap();
+            memory.engram.record(&episode).await.unwrap();
+            memory.engram.assert_fact(&fact, None).await.unwrap();
+            cited.push(fact.id);
+            episodes.push(episode.id);
+        }
+        for number in 0..45 {
+            let episode = Episode::new(format!("kiwi {number}"), trace);
+            memory.engram.record(&episode).await.unwrap();
+            let fact = Fact::new(format!("kiwi mango {number}"), vec![episode.id], 0.9);
+            memory.engram.assert_fact(&fact, None).await.unwrap();
+        }
+        let script: Script =
+            serde_json::from_str(r#"{"replies":[{"when":[],"reply":"Friday."}]}"#).unwrap();
+        let provider = script.provider("scripted");
+        let asked = memory
+            .ask(
+                "When does the deploy window and release open?",
+                &provider,
+                None,
+                &[Scope::Personal],
+                10,
+                None,
+            )
+            .await
+            .unwrap();
+        assert_eq!(asked.facts.len(), 2, "the two cited facts are placed");
+
+        reads.lock().unwrap().bulk.clear();
+        let why = memory.why(None).await.unwrap();
+        {
+            let reads = reads.lock().unwrap();
+            assert!(reads.bulk.is_empty(), "why read in bulk: {:?}", reads.bulk);
+            assert_eq!(sorted(reads.facts.clone()), sorted(cited.clone()));
+            assert_eq!(sorted(reads.episodes.clone()), sorted(episodes.clone()));
+        }
+        let Why::Answer { derivation, .. } = why else {
+            panic!("an answer");
+        };
+        assert_eq!(derivation.facts.len(), 2);
+        for placement in &derivation.facts {
+            assert!(placement.fact.is_some());
+            assert_eq!(placement.episodes.len(), 1);
+        }
+
+        *reads.lock().unwrap() = Reads::default();
+        let why = memory.why(Some(&cited[0].to_string())).await.unwrap();
+        let reads = reads.lock().unwrap();
+        assert!(reads.bulk.is_empty(), "why read in bulk: {:?}", reads.bulk);
+        assert_eq!(sorted(reads.facts.clone()), vec![cited[0]]);
+        assert_eq!(sorted(reads.episodes.clone()), vec![episodes[0]]);
+        let Why::Fact { fact } = why else {
+            panic!("a fact");
+        };
+        assert_eq!(fact.sources.len(), 1);
     }
 }
