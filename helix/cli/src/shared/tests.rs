@@ -71,8 +71,8 @@ fn dom_elements_and_css_are_reported() {
 }
 
 #[test]
-fn a_raw_vector_passes() {
-    let source = "export const Page = () => (\n  <helix-flex>\n    <svg viewBox=\"0 0 24 24\"><path d=\"M0 0\" /></svg>\n  </helix-flex>\n)\n";
+fn a_fieldset_and_a_raw_vector_pass() {
+    let source = "export const Page = () => (\n  <fieldset disabled>\n    <legend>Plan</legend>\n    <svg viewBox=\"0 0 24 24\"><path d=\"M0 0\" /></svg>\n  </fieldset>\n)\n";
     assert_eq!(kinds(source), []);
 }
 

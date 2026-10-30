@@ -23,6 +23,7 @@ import { Backdrop } from './backdrop'
 import { type Behavior, merged, type Props, STILL, type UseBehavior, wrapped } from './behavior'
 import { marker, numbering } from './counters'
 import { dense, densityOf, useDensity } from './density'
+import { useFieldset } from './fieldset'
 import { folded } from './fold'
 import { useFollowed } from './follows'
 import { hostSemantics } from './host'
@@ -294,8 +295,9 @@ export const element = (
   const present = presenceOf(family)
   const presence = readsCondition(family, 'holds')
   const safe = readsSafeArea(family)
-  const Drawn = (passed: Props) => {
-    warnSharedCode(family, passed)
+  const Drawn = (given: Props) => {
+    warnSharedCode(family, given)
+    const passed = useFieldset(family, given)
     const props = folded(family, totaled(family, passed))
     const place = useRef({}).current
     const entering = useEntering(enters)

@@ -3,6 +3,7 @@ import { type SetBox, selectAllPress, selectAllState } from '@fusion.dev/helix-c
 import { type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
+import { FieldsetDisabled } from '../render/fieldset'
 import type { Family } from '../style/form'
 import { listed } from './choice'
 import { collection, type Member, type Offer, useMembers } from './collection'
@@ -273,7 +274,13 @@ export const useToggleSet = (
                 },
               },
             },
-      provide: (drawn: ReactNode) => <Offered.Provider value={offer}>{drawn}</Offered.Provider>,
+      /* A disabled set draws each box as its own `disabled` draws it, as the
+         web's set writes `disabled` on each box. */
+      provide: (drawn: ReactNode) => (
+        <Offered.Provider value={offer}>
+          {off ? <FieldsetDisabled.Provider value>{drawn}</FieldsetDisabled.Provider> : drawn}
+        </Offered.Provider>
+      ),
     },
     value,
   }
