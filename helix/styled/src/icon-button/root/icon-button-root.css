@@ -74,6 +74,49 @@
   );
 }
 
+:host([tone="info"]) {
+  --_icon-button-edge: var(--helix-color-info);
+  --_icon-button-ink: var(--helix-color-info);
+  --_icon-button-ink-hover: var(--helix-color-info);
+  --_icon-button-fill: var(--helix-color-info-surface);
+  --_icon-button-fill-hover: var(--helix-color-info-surface-hover);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-status);
+  --_icon-button-tone: var(--helix-color-info);
+  --_icon-button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-info) 86%,
+    var(--helix-color-foreground)
+  );
+}
+:host([tone="success"]) {
+  --_icon-button-edge: var(--helix-color-success);
+  --_icon-button-ink: var(--helix-color-success);
+  --_icon-button-ink-hover: var(--helix-color-success);
+  --_icon-button-fill: var(--helix-color-success-surface);
+  --_icon-button-fill-hover: var(--helix-color-success-surface-hover);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-status);
+  --_icon-button-tone: var(--helix-color-success);
+  --_icon-button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-success) 86%,
+    var(--helix-color-foreground)
+  );
+}
+:host([tone="warning"]) {
+  --_icon-button-edge: var(--helix-color-warning);
+  --_icon-button-ink: var(--helix-color-warning);
+  --_icon-button-ink-hover: var(--helix-color-warning);
+  --_icon-button-fill: var(--helix-color-warning-surface);
+  --_icon-button-fill-hover: var(--helix-color-warning-surface-hover);
+  --_icon-button-on-tone: var(--helix-color-foreground-on-status);
+  --_icon-button-tone: var(--helix-color-warning);
+  --_icon-button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-warning) 86%,
+    var(--helix-color-foreground)
+  );
+}
+
 /* Square by construction: one dimension for both axes, so the control stays a
    circle-of-influence around the glyph rather than drifting wider as the icon
    changes. */

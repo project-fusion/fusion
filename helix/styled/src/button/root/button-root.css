@@ -64,6 +64,44 @@
   );
 }
 
+/* A status reads the same on a button as on the tag beside it. */
+:host([tone="info"]) {
+  --_button-edge: var(--helix-color-info);
+  --_button-fill: var(--helix-color-info-surface);
+  --_button-fill-hover: var(--helix-color-info-surface-hover);
+  --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-tone: var(--helix-color-info);
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-info) 86%,
+    var(--helix-color-foreground)
+  );
+}
+:host([tone="success"]) {
+  --_button-edge: var(--helix-color-success);
+  --_button-fill: var(--helix-color-success-surface);
+  --_button-fill-hover: var(--helix-color-success-surface-hover);
+  --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-tone: var(--helix-color-success);
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-success) 86%,
+    var(--helix-color-foreground)
+  );
+}
+:host([tone="warning"]) {
+  --_button-edge: var(--helix-color-warning);
+  --_button-fill: var(--helix-color-warning-surface);
+  --_button-fill-hover: var(--helix-color-warning-surface-hover);
+  --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-tone: var(--helix-color-warning);
+  --_button-tone-hover: color-mix(
+    in oklab,
+    var(--helix-color-warning) 86%,
+    var(--helix-color-foreground)
+  );
+}
+
 /* `all: unset` first, so the UA's own button styling is gone before anything
    below lands. */
 [part="button"] {
