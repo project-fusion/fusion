@@ -15,6 +15,14 @@ export interface Entered {
    * has focus, and whether the press that clears is drawn.
    */
   readonly behavior: Behavior
+  /**
+   * Asks for `next` and takes it where it stands, saying whether it did, as
+   * an edit of the reader's does, for a machine that edits the text from
+   * elsewhere, as a color input's picker does.
+   */
+  readonly ask: (next: string) => boolean
+  /** Sends `change` where the text moved since the last commit. */
+  readonly commit: () => void
   /** Empties the field, as its press that clears does, and gives it focus. */
   readonly clear: () => void
   /** The press that clears the field, where the tree draws one. */
@@ -331,5 +339,5 @@ export const useEntry = (
     offered,
     text,
   })
-  return { behavior, clear, clears, current, edited, focused, step, value: text }
+  return { ask, behavior, clear, clears, commit, current, edited, focused, step, value: text }
 }

@@ -90,11 +90,11 @@ const useConstraint = (
   const flag = verdict?.flags[0]
   const said = verdict?.message ?? ''
   return useMemo(() => {
-    if (value === undefined) {
-      return VALID
-    }
     if (flag !== undefined) {
       return { flags: [flag], message: said }
+    }
+    if (value === undefined) {
+      return VALID
     }
     if (short !== '' && minLength !== undefined && value !== '' && value.length < minLength) {
       return {
