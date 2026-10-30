@@ -1,7 +1,7 @@
 import type { PageCopy } from '@/content/copy/copy'
 import { AGENT_EXCHANGE, AGENT_SURFACES } from '@/content/landing/agents'
 import { CHECKS_INTENT, GENERATOR_CHECKS } from '@/content/landing/checks'
-import { DELIVERY, ENGAGEMENT, MECHANISMS } from '@/content/landing/helix-landing'
+import { DELIVERY, ENGAGEMENT, HERO, MECHANISMS, PROBLEM } from '@/content/landing/helix-landing'
 
 /** One mechanism card, named the way its proof band is. */
 const mechanism = (name: string) => {
@@ -28,22 +28,29 @@ const agents = mechanism('Agents')
 export const LANDING: PageCopy = {
   blocks: [
     {
-      /* No kicker and no title. Two named cards and a services block below them
-         are already legible as a choice; a heading above saying some version of
-         "here are the things" is a row of chrome that names what the reader can
-         already see. */
-      body: ['Two products that install from npm and ship as custom elements.'],
+      /* No kicker and no title: this is the rest of the hero. */
+      body: [`\`${HERO.install}\``, HERO.works],
+    },
+    {
+      /* The page draws this as a diagram, and these are the words it reads out. */
+      body: [
+        'Your brand, your code, and your decisions flow into Fusion. Out of it come Helix, which checks every screen, and Cortex, which keeps every decision with its reason.',
+      ],
       from: 'products',
+      title: 'What goes into Fusion and what comes out',
     },
     {
-      body: [DELIVERY.lede],
-      from: 'services',
-      items: ENGAGEMENT,
-      kicker: 'Services',
-      title: DELIVERY.title,
+      body: [PROBLEM.lede],
+      items: MECHANISMS.map((one) => ({ body: `${one.bullets.join('. ')}.`, name: one.claim })),
+      title: PROBLEM.title,
     },
     {
-      body: ['Each control in the panel is a custom element from the Helix package.'],
+      body: ['You enter one brand color, and Helix computes every token from it.'],
+      kicker: 'Theming',
+      title: 'Every pair Helix solves, checked for contrast',
+    },
+    {
+      body: ['Each control in it is a custom element from the Helix package.'],
       kicker: 'Components',
       title: 'The panel runs in your browser',
     },
@@ -73,6 +80,21 @@ export const LANDING: PageCopy = {
       title: agents.claim,
     },
     {
+      body: [
+        'Charts, data tables, chat, and date pickers use the same tokens as your buttons.',
+        'Compare the systems: /helix/docs/metrics#what-each-system-ships',
+      ],
+      kicker: 'Coverage',
+      title: 'Every component in one package',
+    },
+    {
+      body: [DELIVERY.lede],
+      from: 'services',
+      items: ENGAGEMENT,
+      kicker: 'Services',
+      title: DELIVERY.title,
+    },
+    {
       from: 'insights',
       kicker: 'Insights',
       title: 'How we decide, and why',
@@ -83,11 +105,10 @@ export const LANDING: PageCopy = {
     },
   ],
   /**
-   * Both halves of the offer in one line: the system is takeable and the
-   * engineering is hireable. It is the route registry's description of `/` and
-   * the frontmatter of `/index.md`.
+   * The hero's line, because this document is that page. It is the route
+   * registry's description of `/` and the frontmatter of `/index.md`.
    */
-  lede: 'Use Helix on your own, or hire us to build with it.',
+  lede: HERO.lede,
   /**
    * **The hero's headline, because this document is that page.**
    *
@@ -100,6 +121,3 @@ export const LANDING: PageCopy = {
    */
   title: 'An intelligent design system, and the engineers behind it',
 }
-
-/** The one line the hero asks a reader to run rather than to read. */
-export const INSTALL = 'bun add @fusion.dev/helix'

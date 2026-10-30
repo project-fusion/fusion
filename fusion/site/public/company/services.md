@@ -7,6 +7,8 @@ path: /company/services
 title: The work we take on
 ---
 
+Interface and intelligence work, shipped into your repository.
+
 ## What you have at the end
 
 You have working software in your repository, under your license, and it keeps
@@ -25,8 +27,8 @@ will tell you whether we are the right team for it.
 
 ## What we take on
 
-| Offer | Duration | What it leaves you |
-| --- | --- | --- |
-| AI capability audit | One to two weeks, two days a week | A document you own and can act on without us. If you do not need a larger engagement, the audit says so. |
-| Design system sprint | Four weeks, two days a week | Your design system, in your repository, under your license. It keeps working after we leave. |
-| Conversational build | Six weeks or more, two days a week | Working software and the reasoning behind it, in your hands. It keeps running after we leave. |
+| Offer | Duration | What it includes | What it leaves you |
+| --- | --- | --- | --- |
+| AI capability audit | One to two weeks, two days a week | A written account of where AI work would help your product, and where it would not; A review of your models, tools, and costs against your goals; A ranked list of what to build, what to buy, and what to leave alone; The first thing to do, and why | A document you own and can act on without us. If you do not need a larger engagement, the audit says so. |
+| Design system sprint | Four weeks, two days a week | Color tokens computed from your brand color; The components your product uses, built as custom elements; Types for the frameworks you use; A component manifest, documentation, and build checks | Your design system, in your repository, under your license. It keeps working after we leave. |
+| Conversational build | Six weeks or more, two days a week | We work in your team, in your codebase; Interface and AI work built on Helix and Cortex; Architecture decisions written down with their trade-offs; We hand the work over as we go | Working software and the reasoning behind it, in your hands. It keeps running after we leave. |
