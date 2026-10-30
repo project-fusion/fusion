@@ -108,6 +108,22 @@ export const turnPicker = async (
   return undefined
 }
 
+/** Presses the first preset, the press that says whether it is chosen. */
+export const pressSwatch = async (): Promise<string | undefined> => {
+  const swatch = screen.root
+    ?.queryAll(() => true)
+    .find(
+      (node) =>
+        typeof node.props.onResponderGrant === 'function' &&
+        typeof node.props.accessibilityState?.selected === 'boolean',
+    )
+  if (swatch === undefined) {
+    return 'The setup draws no preset.'
+  }
+  await tap(swatch)
+  return undefined
+}
+
 /** The text of the color the element holds, and whether it is marked wrong. */
 export const colorLeft = (run: Run): Pick<Left, 'invalid' | 'value'> => {
   const { tag } = run.scenario.setup

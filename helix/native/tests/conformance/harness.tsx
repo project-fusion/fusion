@@ -26,7 +26,7 @@ import { Text } from 'react-native'
 import { HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
-import { colors, opensPicker, pointIn, turnPicker } from './color'
+import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
 import { fakePicker, pickIn, picksFiles } from './files'
 import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
@@ -342,7 +342,7 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return cannot
     }
     case 'press':
-      return press(setup, intent)
+      return colors(setup.tag) && intent.part === 'swatch' ? pressSwatch() : press(setup, intent)
     case 'refuse':
       run.refused.add(intent.event)
       return undefined
