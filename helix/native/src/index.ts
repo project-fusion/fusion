@@ -55,7 +55,7 @@ export {
   useToolbarAxis,
   useToolbarStops,
 } from './render/toolbar'
-export { glyphs, type Icon } from './render/vector'
+export { glyphs, type Icon, svg as vectorPackage } from './render/vector'
 export { webOnly } from './render/web-only'
 export type { KeyboardHandling } from './root/layers'
 export { HelixRoot, type HelixRootProps, useInsideHelixRoot } from './root/root'

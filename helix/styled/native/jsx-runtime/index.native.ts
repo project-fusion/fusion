@@ -20,6 +20,7 @@
      words and the `data-level` of the link to it, and any other element
      with an `id` registers its view under it, so a tour stop's `for` and
      an app header's `scroller` find it as the web finds an element;
+   - a raw `svg` and the shapes it holds draw through `react-native-svg`;
    - a tag a phone has no component for says so where it would be, and a
      development build warns about it once, as `helix shared` reports it
      from the code.
@@ -191,9 +192,22 @@ const make = (
     : React.createElement(HelixTheme, key === undefined ? { mode } : { key, mode }, drawn)
 }
 
+/** The DOM elements a phone draws as the web does, which `helix shared` passes too. */
+const DRAWN_AS_THE_WEB = new Set([
+  'circle',
+  'ellipse',
+  'g',
+  'line',
+  'path',
+  'polygon',
+  'polyline',
+  'rect',
+  'svg',
+])
+
 /** Warns about a tag a phone does not draw. A component's own type passes. */
 const checked = (type: unknown): void => {
-  if (typeof type === 'string' && !hasComponent(type)) {
+  if (typeof type === 'string' && !hasComponent(type) && !DRAWN_AS_THE_WEB.has(type)) {
     warnWebTag(type)
   }
 }

@@ -11,6 +11,7 @@ import {
   useTarget,
   useTokens,
   useWrapWidth,
+  vectorPackage,
 } from '@fusion.dev/helix-native'
 import * as React from 'react'
 import { Text, View } from 'react-native'
@@ -134,6 +135,63 @@ export const Box = (props: Props) => {
     { density: densityOf(props) },
     React.createElement(View, { ref }, worded(props.children)),
   )
+}
+
+/** The attributes of a shape a browser alone reads. */
+const SVG_WEB = /^(aria[A-Z]|focusable$|role$|slot$|xmlns)/
+
+/** The attributes `react-native-svg` takes, as the runtime has already written them in camel case. */
+const svgAttributes = (props: Props): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(props).filter(([name]) => name !== 'children' && !SVG_WEB.test(name)),
+  )
+
+/**
+ * **A raw `<svg>` draws through `react-native-svg`**, in the color of the words
+ * around it, as `currentColor` reads them on the web. It takes the width and
+ * the height its attributes give, then those the region gives its child, and
+ * fills the box around it where neither names one.
+ */
+export const RawSvg = (props: Props) => {
+  const tokens = useTokens()
+  const text = useInheritedText()
+  const box = useSlottedBox()
+  return React.createElement(
+    vectorPackage().Svg as unknown as React.ElementType,
+    {
+      ...svgAttributes(props),
+      color: text.color ?? color(tokens, 'color-foreground'),
+      height: props.height ?? box.height ?? '100%',
+      width: props.width ?? box.width ?? '100%',
+    },
+    props.children,
+  )
+}
+
+/**
+ * The shapes a raw `<svg>` holds, each `react-native-svg`'s component of that
+ * name, loaded as the first one is drawn.
+ */
+const shape = (name: string) => {
+  const Shape = (props: Props) =>
+    React.createElement(
+      (vectorPackage() as unknown as Record<string, React.ElementType>)[name] as React.ElementType,
+      svgAttributes(props),
+      props.children,
+    )
+  Shape.displayName = name
+  return Shape
+}
+
+export const SVG_SHAPES: Readonly<Record<string, unknown>> = {
+  circle: shape('Circle'),
+  ellipse: shape('Ellipse'),
+  g: shape('G'),
+  line: shape('Line'),
+  path: shape('Path'),
+  polygon: shape('Polygon'),
+  polyline: shape('Polyline'),
+  rect: shape('Rect'),
 }
 
 /**

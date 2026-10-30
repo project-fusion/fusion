@@ -333,6 +333,12 @@ impl Reader<'_> {
     }
 }
 
+/// The DOM elements a phone draws as the web does: a raw vector with its shapes.
+const DRAWN_TAGS: &[&str] = &[
+    "circle", "ellipse", "g", "line", "path", "polygon", "polyline", "rect",
+    "svg",
+];
+
 impl<'a> Visit<'a> for Reader<'_> {
     fn visit_import_declaration(&mut self, it: &ImportDeclaration<'a>) {
         let source = it.source.value.as_str();
@@ -357,6 +363,7 @@ impl<'a> Visit<'a> for Reader<'_> {
         };
         let helix = tag.filter(|tag| tag.starts_with("helix-"));
         match (tag, helix) {
+            (Some(tag), None) if DRAWN_TAGS.contains(&tag) => {}
             (Some(tag), None) => {
                 self.add(it.span.start, "dom-element", format!("`<{tag}>` is a DOM element, which a phone does not draw. Use a Helix element, such as `helix-flex` for a box or `helix-text` for words."));
             }
