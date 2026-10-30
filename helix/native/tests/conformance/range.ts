@@ -142,6 +142,27 @@ export const slideTo = async (
   return undefined
 }
 
+/** A drag on the element's label, `by` points along the line, which lets go there. */
+export const scrubLabel = async (run: Run, by: number): Promise<string | undefined> => {
+  const words = run.scenario.setup.props?.label
+  const label = screen.queryByText(String(words))
+  if (label === null) {
+    return 'The setup draws no label to drag.'
+  }
+  const drag = gesturesOn(label)[0]
+  if (drag === undefined) {
+    return undefined
+  }
+  await act(async () => {
+    fireGestureHandler(drag as never, [
+      { state: State.BEGAN, translationX: 0, translationY: 0 },
+      { state: State.ACTIVE, translationX: by, translationY: 0 },
+      { state: State.END, translationX: by, translationY: 0 },
+    ])
+  })
+  return undefined
+}
+
 /** A screen reader's increment or decrement on the control. */
 export const adjustBy = async (
   intent: Extract<Intent, { kind: 'adjust' }>,
