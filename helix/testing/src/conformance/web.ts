@@ -418,7 +418,14 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
   const real = fakeImages()
   const unlay = laySections(scenario.setup)
   const unwatch = watchFocus(mounted)
-  document.body.append(root)
+  if (scenario.disabledFieldset === true) {
+    const fieldset = document.createElement('fieldset')
+    fieldset.disabled = true
+    fieldset.append(root)
+    document.body.append(fieldset)
+  } else {
+    document.body.append(root)
+  }
   try {
     await settle(mounted)
     const steps: Step[] = []

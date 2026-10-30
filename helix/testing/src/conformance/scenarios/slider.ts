@@ -14,6 +14,13 @@ const volume = (props: Readonly<Record<string, boolean | number | string>> = {})
 /** Sliders: the keys, the ends, a step, the bounds, a drag, a refusal, and a slider that does not move. */
 export const SLIDER: readonly Scenario[] = [
   {
+    disabledFieldset: true,
+    family: 'slider',
+    intents: [{ kind: 'slide', to: 0.75 }, { kind: 'focus' }, { key: 'ArrowRight', kind: 'key' }],
+    name: 'a disabled fieldset around a slider holds it still',
+    setup: volume({ 'default-value': '40' }),
+  },
+  {
     family: 'slider',
     intents: [
       { kind: 'focus' },

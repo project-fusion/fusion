@@ -186,6 +186,11 @@ export interface PickedFile {
 /** A setup and what a reader does to it. */
 export interface Scenario {
   /**
+   * Whether a disabled fieldset stands around the setup. The web draws a
+   * `<fieldset disabled>`, and a phone the context its JSX runtime draws one as.
+   */
+  readonly disabledFieldset?: boolean
+  /**
    * The family whose elements the setup draws.
    */
   readonly family: Family | Staged
