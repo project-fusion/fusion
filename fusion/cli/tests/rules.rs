@@ -1267,6 +1267,34 @@ fn notes() {
     );
 }
 
+/// A path into the checkout is a note to us. An address, a package's own file
+/// and a bare folder name are not, so the clean tree carries one of each.
+#[test]
+fn notes_repository_path() {
+    plant_in(
+        "prose-notes-repository-path",
+        "prose",
+        "notes",
+        &[
+            ("fusion.json", EMPTY),
+            ("package.json", ROOT),
+            ("packages/kit/package.json", r#"{ "name": "@acme/kit" }"#),
+            (
+                "packages/kit/src/kit.ts",
+                "/**\n * See https://example.com/helix/docs/kit.html, `@fusion.dev/helix/kit.js`\n * and `helix/styled`.\n */\nexport const kit = 1\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/kit/src/kit.ts",
+                "/**\n * Written by `fusion/scripts/version.mjs`.\n */\nexport const kit = 1\n",
+            );
+        },
+        "a published doc comment names a file in this repository's checkout: `fusion/scripts/version.mjs`",
+        "packages/kit/src/kit.ts:2",
+    );
+}
+
 /// The file's own block is held by position, so the fault is the block after
 /// it that sits on a third.
 #[test]

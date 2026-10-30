@@ -3,8 +3,9 @@
 //!
 //! **A doc comment ships.** Declarations build with comments kept, so a `/** */`
 //! block in a published package's source is what an editor shows a consumer on
-//! hover. A queue row, a pointer to `AGENTS.md`, or "measured on this
-//! repository" is a note to us, and a consumer has no queue and no checkout to
+//! hover. A queue row, a pointer to `AGENTS.md`, a path such as
+//! `fusion/scripts/version.mjs`, or "measured on this repository" is a note to
+//! us, and a consumer has no queue and no checkout to
 //! follow it into.
 //!
 //! **Only `/** */` blocks, and only in packages that publish.** A `/* */` or a
@@ -26,7 +27,7 @@ static DOC: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)/\*\*.*?\*/").expect("a literal pattern compiles"));
 
 /// What a note to us looks like, and what a consumer reads it as.
-static NOTES: LazyLock<[(Regex, &'static str); 4]> = LazyLock::new(|| {
+static NOTES: LazyLock<[(Regex, &'static str); 5]> = LazyLock::new(|| {
     [
         (
             Regex::new(r"queue\.md|\[#\d+\]").expect("a literal pattern compiles"),
@@ -35,6 +36,17 @@ static NOTES: LazyLock<[(Regex, &'static str); 4]> = LazyLock::new(|| {
         (
             Regex::new(r"AGENTS\.md|CONVENTIONS\.md|CLAUDE\.md|\.local/")
                 .expect("a literal pattern compiles"),
+            "a file in this repository's checkout",
+        ),
+        /* The first group is the path. What comes before it keeps out an address
+           (`fusion.dev/helix/docs.html`) and a package (`@fusion.dev/helix/a.js`),
+           which a consumer can follow. A file extension keeps out a bare folder
+           such as `helix/styled`, which names a tier and not a file. */
+        (
+            Regex::new(
+                r"(?:^|[^\w./@-])((?:\.agents|\.claude|\.github)/[\w./-]*|(?:cortex|fusion|helix)/[\w./-]*\.\w+)",
+            )
+            .expect("a literal pattern compiles"),
             "a file in this repository's checkout",
         ),
         (
@@ -78,7 +90,10 @@ pub fn run(context: &Context) -> Report {
             for block in DOC.find_iter(&text) {
                 checked += 1;
                 for (pattern, what) in NOTES.iter() {
-                    let Some(found) = pattern.find(block.as_str()) else {
+                    let Some(captures) = pattern.captures(block.as_str()) else {
+                        continue;
+                    };
+                    let Some(found) = captures.get(1).or_else(|| captures.get(0)) else {
                         continue;
                     };
                     let line = text[..block.start() + found.start()].lines().count().max(1);
