@@ -11,6 +11,7 @@ import {
 import ansiColors from '../.examples/ansi-colors.html' with { type: 'text' }
 import exited from '../.examples/exited.html' with { type: 'text' }
 import inAPane from '../.examples/in-a-pane.html' with { type: 'text' }
+import plain from '../.examples/plain.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
 import transcript from '../.examples/transcript.html' with { type: 'text' }
 
@@ -146,6 +147,17 @@ describe('the pane example', () => {
     await example(inAPane)
     const { written } = await attached()
     expect(written.join('')).toContain('Development')
+  })
+})
+
+describe('the plain example', () => {
+  run('writes a shell into a frame whose header is hidden', async () => {
+    await example(plain)
+    const { frame, written } = await attached()
+    expect(written.join('')).toContain('localhost:3000')
+    expect(part(frame, 'header')?.hasAttribute('hidden')).toBe(true)
+    expect(part(frame, 'find')).toBeNull()
+    expect(part(frame, 'clear')).toBeNull()
   })
 })
 
