@@ -1,0 +1,184 @@
+/**
+ * The platform diagram, which draws what goes into Fusion and what comes out.
+ *
+ * It shares its visual language with the derivation diagram and owns its own
+ * sheet: a CSS module scopes animation names per file, so the keyframes the
+ * drawing uses are defined here and not borrowed from another sheet.
+ */
+
+/**
+ * A wide figure with a floor under how small it may be drawn. Everything in the
+ * drawing is sized in user units, so the type scales with the container.
+ */
+.platform {
+  margin: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.platformSvg {
+  block-size: auto;
+  inline-size: 100%;
+  min-inline-size: 52rem;
+}
+
+/**
+ * Which of the two figures shows is decided by the width of the container, and
+ * never by the width of the viewport. Size containment keeps the wide figure's
+ * floor from widening the column.
+ */
+.platforms {
+  container-type: inline-size;
+}
+
+.platformStacked {
+  display: none;
+}
+
+/* Capped and centered: 32rem is about the width a tablet column gives it. */
+.platformStackedSvg {
+  block-size: auto;
+  display: block;
+  inline-size: 100%;
+  margin-inline: auto;
+  max-inline-size: 32rem;
+}
+
+@container (inline-size < 52rem) {
+  .platform {
+    display: none;
+  }
+
+  .platformStacked {
+    display: block;
+  }
+}
+
+/* Sizes live on the elements: these are user units inside a scaling viewBox. */
+.platformMeta {
+  fill: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+}
+
+.platformLabel {
+  fill: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  letter-spacing: 0.01em;
+}
+
+.platformName {
+  fill: var(--helix-color-foreground);
+  font-family: var(--helix-font-sans);
+  font-weight: var(--helix-weight-semibold);
+}
+
+/* A quiet permanent base with a moving highlight over it. */
+.platformBase path {
+  stroke: var(--helix-color-foreground-muted);
+  stroke-opacity: 0.45;
+}
+
+/* The fan composites as one shape, declared after the base to win the tie. */
+.platformFan {
+  opacity: 0.45;
+}
+
+.platformFan path {
+  stroke-opacity: 1;
+}
+
+/* One pulse per path. Each carries its own length, so the loop never seams. */
+.platformPulse path {
+  stroke: var(--helix-color-primary);
+  stroke-opacity: 0.92;
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+}
+
+/* A glowing node where a run meets its label. */
+.platformNode {
+  fill: var(--helix-color-primary);
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+}
+
+/* The mark, glowing the way the ring does. */
+.platformMark {
+  display: grid;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
+    drop-shadow(0 0 18px color-mix(in oklab, var(--helix-color-primary) 35%, transparent));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platformPulse {
+    display: none;
+  }
+
+  .platformBase path {
+    stroke: var(--helix-color-primary);
+    stroke-opacity: 0.75;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .platformRing {
+      animation: platform-ring 48s linear infinite;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+  }
+}
+
+.platformCorners {
+  rx: var(--helix-radii-lg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .platformStars {
+    animation: platform-twinkle 7s ease-in-out infinite alternate;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .platformField {
+    animation: platform-field-drift 26s linear infinite;
+  }
+}
+
+/* The site's glass, and a grid so the mark sits at its center. */
+.platformGlass {
+  backdrop-filter: var(--site-glass-backdrop);
+  background: var(--site-glass);
+  block-size: 100%;
+  border-radius: var(--helix-radii-full);
+  display: grid;
+  inline-size: 100%;
+  place-items: center;
+}
+
+@keyframes platform-ring {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes platform-twinkle {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 0.7;
+  }
+}
+
+@keyframes platform-field-drift {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 40px 0;
+  }
+}

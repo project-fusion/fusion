@@ -20,7 +20,7 @@ export function PageStrands({ className }: { className: string }) {
       speed={motion === 'off' ? 0 : 1.2}
       travel
     >
-      <helix-strands-stop at={0.9} for="problem-card" variant="sweep"></helix-strands-stop>
+      <helix-strands-stop at={0.9} for="platform-card" variant="sweep"></helix-strands-stop>
       <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
       <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
     </helix-strands>
