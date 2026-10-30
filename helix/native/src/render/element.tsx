@@ -55,6 +55,7 @@ import {
 import { ScaledText } from './text'
 import { totaled } from './total'
 import { isSubgrid, sizedParts, useSubgrid, useTracks } from './tracks'
+import { writtenSize } from './written-size'
 import { readsZero, useZero } from './zero'
 
 /**
@@ -355,7 +356,7 @@ export const element = (
     const hostText = inherit(text, split(scope.host.style)[1], textOf(slotted))
     const { moves, style } = hostStyle(
       scope,
-      sized(slotted?.style, outer?.grown),
+      { ...sized(slotted?.style, outer?.grown), ...writtenSize(passed.style, theme.rem) },
       slotted?.transitions,
     )
     const { Host, style: hosted } = hostOf(scope, moves, style, hostText)
