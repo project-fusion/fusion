@@ -81,6 +81,10 @@
       "types": "./dist/capabilities/types.generated.d.ts",
       "default": "./dist/capabilities/types.generated.js"
     },
+    "./color-picker": {
+      "types": "./dist/utils/color-picker/color-picker.d.ts",
+      "default": "./dist/utils/color-picker/color-picker.js"
+    },
     "./custom-elements.json": "./custom-elements.json",
     "./derivations": {
       "types": "./dist/utils/derivations/derivations.d.ts",
