@@ -3,12 +3,11 @@
  * Type-checks a project per framework against the framework typings Helix
  * ships, installed from packed tarballs, with `skipLibCheck` off.
  *
- * **The typings are generated text, and a regex over generated text cannot say
+ * **The typings are generated text, and a pattern over generated text cannot say
  * whether a framework accepts it.** `@fusion.dev/helix-cem` writes `jsx.d.ts`,
- * `vue.d.ts`, and `svelte.d.ts` from the manifest and corrects the generators'
- * output with a chain of plugins, and its specs hold the text to patterns. These
- * projects hold it to the checkers a consumer runs: `tsc` for React, Preact,
- * and Solid, `vue-tsc` for Vue, and `svelte-check` for Svelte.
+ * `vue.d.ts`, and `svelte.d.ts` from the manifest, and its specs hold the text to
+ * patterns. These projects hold it to the checkers a consumer runs: `tsc` for
+ * React, Preact, and Solid, `vue-tsc` for Vue, and `svelte-check` for Svelte.
  *
  * **Each project writes the bad usage beside the good.** A wrong enum value, a
  * misspelled prop or event, a wrong `detail` field read in a handler, a word

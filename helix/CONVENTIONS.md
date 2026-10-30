@@ -2199,10 +2199,10 @@ several commits. The assertion that means something is
 
 ## Framework typings, and the names they carry
 
-**There are no wrappers and there is no `helix/react`.** The typings are emitted
-by cem plugins during `bun run analyze`: `jsx.d.ts` by `@wc-toolkit/jsx-types`
-with `jsxFrameworkProps` and `jsxImports` on top of it, and `vue.d.ts` and
-`svelte.d.ts` beside them. Consumers write `<helix-card>` directly.
+**There are no wrappers and there is no `helix/react`.** The typings are written
+from the manifest during `bun run analyze`, by the templates in
+`helix/cem/src/typings`: `jsx.d.ts`, `vue.d.ts`, and `svelte.d.ts`. Consumers write
+`<helix-card>` directly.
 
 The naming, which was never about wrappers:
 
@@ -2319,19 +2319,21 @@ The naming, which was never about wrappers:
   one that holds it.
 - **`ref` is typed to the element class**, not `HTMLElement`, or a component's
   imperative methods are unreachable through it, and as the framework's own
-  type: React's `Ref` in React and Preact's in Preact. The `jsxFrameworkProps`
-  plugin writes it, reading each framework's types only in that framework's
-  JSX, so a project without React's types compiles the file.
+  type: React's `Ref` in React and Preact's in Preact. `BaseProps` takes the
+  framework as a parameter and reads each framework's types only in that
+  framework's JSX, so a project without React's types compiles the file.
 - **The generated props sit beside React's own**, so `onClick`, `className`,
   `style`, ARIA, `slot`, `part` and `data-*` typecheck on a Helix tag without
   being declared per component.
 - **A numeric attribute takes the string that spells one.** `default-page="1"`
   reaches `setAttribute`, because React assigns a name the element has no
   property for as an attribute, and Lit's converter reads the number back out;
-  the generator typed it `number` all the same. `jsxNumericAttributes` widens
-  the attribute entry to `` number | `${number}` `` and leaves the property
-  entry, `defaultPage`, and every same-named attribute alone: those reach the
-  property verbatim, which is the `value={42}` rule above.
+  so the attribute entry is `` number | `${number}` ``. The property entry,
+  `defaultPage`, and every same-named attribute stay `number`: those reach the
+  property verbatim, which is the `value={42}` rule above. Vue is the exception
+  for the property entry, since `vue-tsc` reads `default-page="2"` as
+  `defaultPage` and cannot tell the two spellings apart, so there it takes the
+  string as well.
 
 ## Responsiveness
 

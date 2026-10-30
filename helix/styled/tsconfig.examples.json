@@ -17,7 +17,7 @@
   // dependency by design, and nothing here needs the runtime: `preserve` asks
   // for no `react/jsx-runtime`. The tags are still typed beside React's own,
   // because that is what the typings do. `types/jsx.d.ts` names `react` itself,
-  // for the `import('react').Ref` that `jsxFrameworkProps` writes into it and the
+  // for the `import('react').Ref` that the typings write into it and the
   // augmentation it declares, which is what puts `@types/react` from the
   // workspace root in scope. So `<time dateTime>` and `className` are checked
   // here the way a consumer's build checks them, and an example is written the

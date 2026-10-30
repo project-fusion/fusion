@@ -2,36 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterManifest, dependenciesOf, peersOf } from './index.js'
-import type { Plugin } from './types.js'
-
-describe('afterManifest', () => {
-  const names = (steps: Plugin[]): string[] => steps.map((one) => one.name)
-
-  test('writes no typings unless asked to', () => {
-    expect(names(afterManifest({ tier: 'core' }))).toEqual([])
-  })
-
-  test('writes the typings in the order each one needs the last', () => {
-    const steps = names(
-      afterManifest({ frameworkTypes: true, packageName: '@x/y', tier: 'styled' }),
-    )
-    // Svelte's reuses the finished JSX tag map, so it follows every pass over it.
-    expect(steps.indexOf('helix-svelte-types')).toBeGreaterThan(
-      steps.indexOf('helix-jsx-declared-events'),
-    )
-    expect(steps.indexOf('helix-svelte-types')).toBeGreaterThan(
-      steps.indexOf('helix-jsx-framework-props'),
-    )
-    // Each tag entry's `BaseProps<T>` is read as the generator wrote it, then
-    // given the framework parameter.
-    expect(steps.indexOf('helix-jsx-framework-props')).toBeGreaterThan(
-      steps.indexOf('helix-jsx-native-events'),
-    )
-    // Last of the generators, because it rewrites what two of them wrote.
-    expect(steps.at(-1)).toBe('helix-jsx-optional-undefined')
-  })
-})
+import { dependenciesOf, peersOf } from './index.js'
 
 describe('dependenciesOf', () => {
   const at = (name: string) => join(import.meta.dir, '..', '..', name)

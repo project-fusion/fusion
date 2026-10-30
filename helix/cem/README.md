@@ -23,16 +23,16 @@ Then it does two things in order:
 1. **Writes `custom-elements.json`** with `helix manifest build`, against the
    manifests of every helix package reachable through `dependencies`.
 2. **Writes the framework typings**, where `frameworkTypes` is set:
-   `types/jsx.d.ts`, `types/vue.d.ts` and `types/svelte.d.ts`, with
-   `@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types` and the `jsx-*`
-   passes that correct what those write.
+   `types/jsx.d.ts`, `types/vue.d.ts`, `types/svelte.d.ts` and
+   `types/words.d.ts`, each a template over the manifest in
+   [src/typings](src/typings). The classes are the source of each prop's type,
+   `HelixPagination["defaultPage"]`, so a prop cannot drift from its property.
 
 **It used to be the configuration for `@custom-elements-manifest/analyzer`,**
 and eighteen plugins for it. Ten of those built the manifest, and the Rust
 generator does that work as ordinary code now, byte for byte what the analyzer
 wrote. What is left here is what reads a finished manifest, which never parsed
-any TypeScript and so never carried the version pin that replacing the
-analyzer ended. The linter it also held is `helix component`'s `conventions`
+any TypeScript. The linter it also held is `helix component`'s `conventions`
 rule now, which is what [the JSDoc contract](../CONVENTIONS.md#jsdoc-contract)
 is checked by.
 
@@ -57,9 +57,22 @@ line. `bun run smoke:typings --list` prints every guarded line with the error it
 raises. [run-typings-test.mjs](../../fusion/scripts/run-typings-test.mjs) says how
 the guards are judged.
 
-**A misspelled event written as a JSX prop compiles.** TypeScript checks
-a JSX attribute whose name holds a dash only when the element's props declare
-that name, so `onhelix-before-chek` and Solid's `on:helix-before-chek` compile on
-every tag. The JSX
-projects catch the misspelling through `addEventListener`, which reads the event
-map. Vue, with `strictTemplates`, and Svelte refuse it in the template.
+**A misspelled event written as a JSX prop compiles, and no emitted type can
+change that.** TypeScript treats a JSX attribute whose name holds a dash as known
+whatever the element's props say, so `onhelix-before-chek` and Solid's
+`on:helix-before-chek` compile on every tag. On TypeScript 7.0.2 a pattern index
+signature such as `` [key: `onhelix-${string}`]: never `` is not consulted for
+such a name, alone, in an intersection, or through a mapped type, and the mapped
+forms also lose the type of the handlers they declare. The JSX projects catch the
+misspelling through `addEventListener`, which reads the event map, and an element
+warns in a development build. Vue, with `strictTemplates`, and Svelte refuse it in
+the template.
+
+**`defaultPage="2"` compiles in Vue.** `vue-tsc` reads a kebab attribute that has
+a value as its camelCase property, so the numeric string that `default-page="2"`
+needs is on `defaultPage` too. Vue assigns the second spelling as a string
+property, and the checker cannot tell the two apart. `default-page="abc"` is still
+refused.
+
+**Vue passes an unknown prop unless the project sets `strictTemplates`.** That is
+a setting of the consumer's project, which the typings cannot reach.
