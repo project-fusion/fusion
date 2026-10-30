@@ -84,7 +84,7 @@ export const VERTICALS: Vertical[] = [
     icon: 'pulse',
     label: 'Mind',
     name: 'Fusion Mind',
-    stage: 'Building',
+    stage: 'Active',
     summary: 'Home of Cortex, our memory layer.',
   },
 ]
