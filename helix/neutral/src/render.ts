@@ -190,6 +190,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'square'
     | 'squareReversed'
     | 'tint'
+    | 'wheelGrid'
     | 'wheelX'
     | 'wheelY'
   >

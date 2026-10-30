@@ -108,7 +108,7 @@ export const swatchKeyed = (
 }
 
 /** How many wedges a phone draws its hue ring from. */
-export const WHEEL_SLICES = 120
+export const WHEEL_SLICES = 180
 
 /** One wedge of a hue ring: its outline, in a box 100 units square, and its hue. */
 export interface WheelSlice {

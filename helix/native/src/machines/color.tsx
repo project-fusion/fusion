@@ -248,7 +248,14 @@ const computedWords = (at: {
   readonly color: Color
   readonly copied: boolean
   readonly format: ColorFormat
-  readonly laid: { readonly height: number; readonly mark: number; readonly width: number }
+  readonly laid: {
+    readonly band: number
+    readonly gap: number
+    readonly height: number
+    readonly mark: number
+    readonly ring: number
+    readonly width: number
+  }
   readonly painted: string
   readonly said: Said
   readonly value: string
@@ -273,7 +280,8 @@ const computedWords = (at: {
   return {
     brightness: String(color.brightness),
     formatLabel: formatMessage(word('format-label'), { format }, where),
-    formatWord: format,
+    /* The web sets it in small capitals, which a phone's fonts do not all have. */
+    formatWord: format.toUpperCase(),
     hue: String(color.hue),
     markX: alongSquare(color.saturation / 100, laid.width, laid.mark),
     markY: alongSquare(1 - color.brightness / 100, laid.height, laid.mark),
@@ -286,6 +294,9 @@ const computedWords = (at: {
     square: square('saturation'),
     squareReversed: square('brightness'),
     tint: tintOf(color.hue),
+    /* The square's corners keep the gap a ramp keeps from the band. */
+    wheelGrid:
+      laid.ring > 0 ? `${(laid.ring - laid.band * 2 - laid.gap * 2) * Math.SQRT1_2}px` : '60%',
     wheelX: `${mark.x * 100}%`,
     wheelY: `${mark.y * 100}%`,
   }
@@ -507,7 +518,7 @@ export const useColor = (
   const ringedHue = useFocusVisible(() => hueNode.current)
 
   /* What the drawing measures: the square, its mark, the ring, and its band. */
-  const [laid, lay] = useState({ band: 0, height: 0, mark: 0, ring: 0, width: 0 })
+  const [laid, lay] = useState({ band: 0, gap: 0, height: 0, mark: 0, ring: 0, width: 0 })
   const measured = useCallback(
     (name: keyof typeof laid, along: 'height' | 'width') => (event: LayoutChangeEvent) => {
       const length = event.nativeEvent.layout[along]
@@ -516,7 +527,12 @@ export const useColor = (
     [],
   )
   const onMarkLayout = useMemo(() => measured('mark', 'width'), [measured])
-  const onBandLayout = useMemo(() => measured('band', 'width'), [measured])
+  const onBandLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height, width } = event.nativeEvent.layout
+    lay((was) =>
+      was.band === width && was.gap === height ? was : { ...was, band: width, gap: height },
+    )
+  }, [])
 
   const moves = !disabled && !readonly
   const rtl = direction() === 'rtl'

@@ -7,7 +7,7 @@ import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './color-picker-root.css.js'
+import { styles } from './color-picker-root.generated.css.js'
 
 /**
  * @summary A color picker made of a square and two ramps.
