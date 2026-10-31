@@ -75,6 +75,46 @@ const heardOfLine = (line: Element): string =>
     .join('')
     .replace(/\s/g, '')
 
+/** A part's words, with no spaces. */
+const squeezed = (part: Element | null | undefined): string =>
+  (part?.textContent ?? '').replace(/\s/g, '')
+
+/** The block a tab shows, among those a code block holds, or the block itself. */
+const shownBlock = (root: Element): Element => {
+  const held = [...root.children].filter((child) => child.localName === root.localName)
+  return held.find((child) => !child.hasAttribute('hidden')) ?? root
+}
+
+/** The code a block draws, in the slot that holds it or the lines it drew. */
+const blockCode = (block: Element): string =>
+  block.shadowRoot?.querySelector('[part="split"], [part="hunk"]') ? '' : squeezed(block)
+
+/** What a code block says, as the record holds it. */
+const codeBlockOf = (mounted: Mounted): NonNullable<Left['codeBlock']> => {
+  const shadow = mounted.root.shadowRoot
+  const shown = shownBlock(mounted.root)
+  const inner = shown.shadowRoot
+  const lineSelector = '[part="added"], [part="removed"], [part="context"]'
+  return {
+    code: blockCode(shown),
+    copy: inner?.querySelector('[part="copy"]')?.getAttribute('label') ?? '',
+    folds: [...(inner?.querySelectorAll('button[part="fold"]') ?? [])].map((fold) => ({
+      expanded: fold.getAttribute('aria-expanded') === 'true',
+      words: squeezed(fold),
+    })),
+    lines: [...(inner?.querySelectorAll(lineSelector) ?? [])].map((line) =>
+      [...line.querySelectorAll('[part="marker"], [part="text"]')]
+        .map((part) => squeezed(part))
+        .join(''),
+    ),
+    pressed: inner?.querySelector('[part="wrap-toggle"]')?.getAttribute('aria-pressed') === 'true',
+    tabs: [...(shadow?.querySelectorAll('[part="file-tab"]') ?? [])].map((tab) => ({
+      selected: tab.getAttribute('aria-selected') === 'true',
+      words: squeezed(tab),
+    })),
+  }
+}
+
 /** What each row of a log says, as the record holds it. */
 const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   const shadow = mounted.root.shadowRoot
@@ -339,6 +379,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
+  ...(family === 'code-block' ? { codeBlock: codeBlockOf(mounted) } : {}),
   /* A row holds no value, so a row with focus is named by the feed it stands in. */
   ...(family === 'notifications'
     ? {
