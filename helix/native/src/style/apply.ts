@@ -143,6 +143,14 @@ export interface Scale {
   readonly within: Layout
 }
 
+/** The native names of the two ends of a margin or a padding along one axis. */
+const AXIS_ENDS: Readonly<Record<string, readonly [string, string]>> = {
+  'margin-block': ['marginTop', 'marginBottom'],
+  'margin-inline': ['marginStart', 'marginEnd'],
+  'padding-block': ['paddingTop', 'paddingBottom'],
+  'padding-inline': ['paddingStart', 'paddingEnd'],
+}
+
 /** Writes one CSS declaration into a React Native style, or says why it cannot. */
 export const apply = (
   out: Record<string, number | string>,
@@ -244,15 +252,17 @@ export const apply = (
     out[`${prefix}Start`] = left as number | string
     return undefined
   }
-  if (property === 'margin-inline') {
+  /* A margin or a padding along one axis, whose two lengths are its two ends. */
+  const ends = AXIS_ENDS[property]
+  if (ends !== undefined && (property === 'margin-inline' || Array.isArray(value))) {
     const [start, end = start] = Array.isArray(value) ? value : [value]
     const before = length(start, scale.spaceRem, scale.spaceEm)
     const after = length(end, scale.spaceRem, scale.spaceEm)
     if (before === undefined || after === undefined) {
       return 'not a length'
     }
-    out.marginStart = before
-    out.marginEnd = after
+    out[ends[0]] = before
+    out[ends[1]] = after
     return undefined
   }
   if (property === 'font-family') {

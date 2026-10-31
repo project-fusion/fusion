@@ -82,6 +82,8 @@ export default styles(
         gap: token('space-xs'),
       }),
       web([rule({ formDisabled: true }, { cursor: 'default' })]),
+      /* A phone draws the label's box whatever it holds, so nothing to read closes the gap. */
+      native([rule({ hasLabel: false }, { gap: token('space-none') })]),
       rule(card, {
         alignItems: 'start',
         backgroundColor: hook.cardBackgroundColor,
