@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from '@jest/globals'
 import { render } from '@testing-library/react-native'
-import { Cell, HeldRow } from './windowed'
+import { Cell, Cells } from './windowed'
 
 const ROW = { at: 0, header: false, key: 'held' }
 
@@ -8,9 +8,9 @@ describe('a cell of a windowed list', () => {
   const draw = (held: string | undefined, item: typeof ROW | readonly (typeof ROW)[]) => {
     const focused = jest.fn()
     return render(
-      <HeldRow.Provider value={held}>
+      <Cells.Provider value={{ held }}>
         <Cell item={item} onFocusCapture={focused} />
-      </HeldRow.Provider>,
+      </Cells.Provider>,
     ).then(() => focused)
   }
 
