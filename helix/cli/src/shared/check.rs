@@ -321,7 +321,13 @@ impl Reader<'_> {
             };
             let name = match &property.key {
                 PropertyKey::StaticIdentifier(name) => name.name.as_str(),
-                PropertyKey::StringLiteral(name) => name.value.as_str(),
+                PropertyKey::StringLiteral(name) => {
+                    /* A key that is not valid UTF-8 is no custom property name. */
+                    let Some(name) = name.value.as_str() else {
+                        continue;
+                    };
+                    name
+                }
                 _ => continue,
             };
             if name.starts_with("--") {
@@ -351,7 +357,7 @@ const DRAWN_TAGS: &[&str] = &[
 
 impl<'a> Visit<'a> for Reader<'_> {
     fn visit_import_declaration(&mut self, it: &ImportDeclaration<'a>) {
-        let source = it.source.value.as_str();
+        let source = it.source.value.display().to_string();
         if SHEETS.iter().any(|sheet| source.ends_with(sheet)) {
             self.add(it.span.start, "css-import", format!("`{source}` is a stylesheet, which a phone does not load. Import it from a `.web.tsx` file."));
         }
