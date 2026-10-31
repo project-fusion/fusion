@@ -285,12 +285,63 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly notificationGroup: Computes<'counted' | 'countWords'>
   /** What a block of code computes for its parts. */
   readonly codeBlock: Computes<'expandHidden' | 'expandWords' | 'panes' | 'several' | 'tabs'>
+  /** What a carousel computes for its parts. */
+  readonly carousel: Computes<
+    | 'arrows'
+    | 'atEnd'
+    | 'atStart'
+    | 'dotted'
+    | 'dotsName'
+    | 'named'
+    | 'panes'
+    | 'rotationIcon'
+    | 'rotationName'
+    | 'rotationShown'
+    | 'spoken'
+    | 'stops'
+  >
   /** What a conversation computes for its parts. */
-  readonly chatRoot: Computes<'actionsEmpty' | 'blank' | 'busy' | 'composerEmpty' | 'headerEmpty' | 'historyShown' | 'list' | 'loadingShown' | 'named' | 'said' | 'scrolls' | 'statusEmpty' | 'typingWords' | 'windowed'>
+  readonly chatRoot: Computes<
+    | 'actionsEmpty'
+    | 'blank'
+    | 'busy'
+    | 'composerEmpty'
+    | 'headerEmpty'
+    | 'historyShown'
+    | 'list'
+    | 'loadingShown'
+    | 'named'
+    | 'said'
+    | 'scrolls'
+    | 'statusEmpty'
+    | 'typingWords'
+    | 'windowed'
+  >
   /** What a turn in a conversation computes for its parts. */
-  readonly chatMessage: Computes<'actionsEmpty' | 'attachmentsEmpty' | 'contentEmpty' | 'failed' | 'inline' | 'named' | 'reading' | 'sending' | 'sourcesEmpty' | 'waiting' | 'workEmpty'>
+  readonly chatMessage: Computes<
+    | 'actionsEmpty'
+    | 'attachmentsEmpty'
+    | 'contentEmpty'
+    | 'failed'
+    | 'inline'
+    | 'named'
+    | 'reading'
+    | 'sending'
+    | 'sourcesEmpty'
+    | 'waiting'
+    | 'workEmpty'
+  >
   /** What a field for writing a turn computes for its parts. */
-  readonly chatComposer: Computes<'attachmentsEmpty' | 'endEmpty' | 'idling' | 'mark' | 'sendHeld' | 'sendName' | 'shownPlaceholder' | 'startEmpty'>
+  readonly chatComposer: Computes<
+    | 'attachmentsEmpty'
+    | 'endEmpty'
+    | 'idling'
+    | 'mark'
+    | 'sendHeld'
+    | 'sendName'
+    | 'shownPlaceholder'
+    | 'startEmpty'
+  >
   /** What a box that follows its newest content computes for its parts. */
   readonly tail: Computes<'away' | 'following'>
   /** What a tree computes. */
