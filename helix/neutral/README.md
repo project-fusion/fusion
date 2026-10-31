@@ -795,6 +795,18 @@ machine over `FlatList`, and a waterfall in a scroll view, and core's
 `@fusion.dev/helix-core/virtual-list` says where each key lands, the same the
 web element reads.
 
+**An element that shows a value as a tree of rows declares its `inspector`**:
+`list`, the rows a `<Repeat windowed>` reads as `inspector.list`, the props and
+events the machine reads and sends, and what it computes for its parts. Each
+entry holds `key`, `at`, `name`, `colon`, `depth`, `caret`, `branch`, `leaf`,
+`keyed`, `unkeyed`, `active`, `match`, `drawn`, `value`, `about`, `counted`, the
+words of each kind of value, and `notBranch`, `notString`, `notNumber`,
+`notBoolean`, and `notNull` for `hidden`. A condition reads no entry, so a copy
+holds a node for each kind and hides those it does not draw, with a rule
+`{ part: { hidden: true } }`, since `hidden` alone draws the box. A phone runs
+the `inspector` machine, which reads core's
+`@fusion.dev/helix-core/object-inspector` as the web element does.
+
 **A prop may hold a function**, written `callback()` with the signature a
 phone's component types it by, as `validate` is. No attribute holds one. An
 event whose detail differs on a phone is declared again in core's

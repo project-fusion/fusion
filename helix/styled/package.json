@@ -370,6 +370,14 @@
       "types": "./dist/number-input/index.d.ts",
       "default": "./dist/number-input/index.js"
     },
+    "./object-inspector": {
+      "react-native": {
+        "types": "./dist/object-inspector/index.native.d.ts",
+        "default": "./dist/object-inspector/index.native.js"
+      },
+      "types": "./dist/object-inspector/index.d.ts",
+      "default": "./dist/object-inspector/index.js"
+    },
     "./outline": {
       "react-native": {
         "types": "./dist/outline/index.native.d.ts",

@@ -2398,3 +2398,22 @@ with fresh state.
 [Documentation](https://fusion.dev/helix) · [Components](https://fusion.dev/helix/components)
 
 MIT
+
+## Object Inspector
+
+The `inspector` machine works its rows out with core's
+`@fusion.dev/helix-core/object-inspector`, the arithmetic the web element reads,
+in `machines/inspector-model.ts`. A `<Repeat windowed>` draws them: the `window`
+list's `FlatList` under `windowed`, and a plain run of rows otherwise, which its
+drawing says as `plain`. A row says its level and place in its value, under
+`treeItemPlace` in `helix-tree`, since a phone has no trait for a tree grid's
+roles. The active row takes its ground once a reader has touched the tree, which
+is what a phone has for the web's focus within.
+
+`renderValue` is told what the copy's entry holds under `about`, which is what
+any `<Wrap renders>` passes second where the entry has one. An element a part
+places with `position: absolute` stands in a box at that place.
+
+A press on a row of ten thousand takes seconds in a development build in Expo
+Go, since each one draws the rows of the window anew. It has not been measured
+in a release build.
