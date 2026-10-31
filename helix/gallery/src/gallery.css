@@ -482,6 +482,13 @@
    answers loses on specificity and does nothing, which is the trap
    `helix component`'s `motion` exists to catch in the library. */
 @media (prefers-reduced-motion: reduce) {
+  .artTravel,
+  .artFill,
+  .artLift,
+  .artLiftShadow {
+    transition: none;
+  }
+
   :has(> .componentArt):hover .artBody:not(:has(.artMotion, .artSweep, .artSpin)),
   :has(> .componentArt):hover .artSweep,
   :has(> .componentArt):hover .artSpin,
@@ -500,13 +507,6 @@
   :has(> .componentArt):hover .artMark,
   :has(> .componentArt):hover .artKnob {
     animation: none;
-  }
-
-  .artTravel,
-  .artFill,
-  .artLift,
-  .artLiftShadow {
-    transition: none;
   }
 
   /* Only the lift's shadow needs restoring. Everything else is already drawn in
