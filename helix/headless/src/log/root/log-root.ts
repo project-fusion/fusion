@@ -21,6 +21,22 @@ import {
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
+import { type TailStanding, tailTurn } from '@fusion.dev/helix-core/follow-tail'
+import {
+  LOG_FORMATS,
+  LogBuffer,
+  type LogGroup,
+  type LogLevel,
+  type LogLine,
+  type LogParser,
+  type LogRow,
+  type LogRows,
+  type LogStatus,
+  logRows,
+  loudEnough,
+  stripAnsi,
+  timeOf,
+} from '@fusion.dev/helix-core/log'
 import { arrowDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -30,21 +46,8 @@ import { repeat } from 'lit/directives/repeat.js'
    group tags, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
 import { lineRuns } from '../../code-block/lines.js'
-import { stripAnsi } from '../ansi.js'
-import {
-  LogBuffer,
-  type LogGroup,
-  type LogLevel,
-  type LogLine,
-  type LogParser,
-  type LogStatus,
-  loudEnough,
-  timeOf,
-} from '../buffer.js'
 import type { HelixHeadlessLogGroup } from '../group/log-group.js'
 import type { HelixHeadlessLogLine, LogTimes } from '../line/log-line.js'
-import { LOG_FORMATS } from '../parsers.js'
-import { type LogRow, type LogRows, logRows } from '../rows.js'
 
 /** A line the log draws from data, as the log finds it in its own shadow root. */
 type HTMLHeadlessLine = HelixHeadlessLogLine & HTMLElement
@@ -187,6 +190,7 @@ interface Heard {
  * @csspart before - The space the rows above the drawn ones would take. Only for lines drawn from data.
  * @csspart dropped - The line above the log that says how many earlier lines `limit` let go.
  * @csspart empty - Shown when the log has no lines and no steps.
+ * @csspart group - A step drawn from `groups`.
  * @csspart group-content - Not drawn: a group drawn from data stands for its heading, and its lines are rows beside it.
  * @csspart group-duration - How long a step drawn from `groups` took.
  * @csspart group-heading - The heading of a step drawn from `groups`.
@@ -420,6 +424,8 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   set lines(next: readonly LogLine[]) {
     const previous = this.buffer.lines
+    /* What `limit` and `collapse` say holds for lines set in the same breath. */
+    this.buffer.collapse = this.collapse
     this.buffer.replace(next ?? [])
     this.fresh = true
     this.requestUpdate('lines', previous)
@@ -1044,13 +1050,9 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     }
   }
 
-  /** Whether the reader is within `threshold` of the newest line right now. */
-  private get atBottom(): boolean {
-    const log = this.log
-    if (!log) {
-      return true
-    }
-    return log.scrollHeight - log.scrollTop - log.clientHeight <= Math.max(0, this.threshold)
+  /** Where the box stands, as the follow-tail arithmetic reads it. */
+  private standing(log: HTMLElement): TailStanding {
+    return { content: log.scrollHeight, frame: log.clientHeight, offset: log.scrollTop }
   }
 
   /** Scrolls to the newest line, and remembers where that was. */
@@ -1428,13 +1430,13 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
    */
   private readonly handleScroll = (): void => {
     const log = this.log
-    if (this.pinned && log && log.scrollTop >= this.stuckAt - 1 && !this.atBottom) {
+    const turn = log
+      ? tailTurn(this.standing(log), this.pinned, this.stuckAt, this.threshold)
+      : 'stay'
+    if (turn === 'stick') {
       this.stick()
-      return
-    }
-    const wanted = this.atBottom
-    if (wanted !== this.pinned) {
-      this.requestPinned(wanted)
+    } else if (turn !== 'stay') {
+      this.requestPinned(turn === 'follow')
     }
   }
 
@@ -1468,6 +1470,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       return html`<${group}
         exportparts="content: group-content, duration: group-duration, heading: group-heading,
           mark: group-mark, status: group-status, summary: group-summary${secondNames(STATUS_NAMES, status)}"
+        part="group"
         data-group=${id}
         duration=${duration ?? nothing}
         heading=${heading}

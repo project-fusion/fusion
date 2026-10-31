@@ -94,9 +94,17 @@
       "types": "./dist/utils/file-input/file-input.d.ts",
       "default": "./dist/utils/file-input/file-input.js"
     },
+    "./follow-tail": {
+      "types": "./dist/utils/follow-tail/follow-tail.d.ts",
+      "default": "./dist/utils/follow-tail/follow-tail.js"
+    },
     "./layers": {
       "types": "./dist/utils/layers/layers.d.ts",
       "default": "./dist/utils/layers/layers.js"
+    },
+    "./log": {
+      "types": "./dist/utils/log/log.d.ts",
+      "default": "./dist/utils/log/log.js"
     },
     "./machines/*": {
       "types": "./dist/machines/*.d.ts",
