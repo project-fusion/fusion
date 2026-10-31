@@ -87,7 +87,8 @@ use ts_rs::TS;
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, LOG_GROUP, LOG_LINE,
-    LOG_ROOT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE, TABLE_COLUMN,
+    TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -630,6 +631,13 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.log_root, LOG_ROOT, "log"),
         (&api.log_line, LOG_LINE, "log-line"),
         (&api.log_group, LOG_GROUP, "log-group"),
+        (&api.notifications_root, NOTIFICATIONS_ROOT, "notifications"),
+        (&api.notification_row, NOTIFICATION_ROW, "notification"),
+        (
+            &api.notification_group,
+            NOTIFICATION_GROUP,
+            "notification-group",
+        ),
     ]
     .into_iter()
     .filter_map(|(choice, table, machine)| {

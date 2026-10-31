@@ -59,6 +59,9 @@ import type {
   LogGroupChoice,
   LogLineChoice,
   LogRootChoice,
+  NotificationGroupChoice,
+  NotificationRowChoice,
+  NotificationsRootChoice,
   TableChoice,
   TableColumnChoice,
   TableRowChoice,
@@ -293,6 +296,12 @@ export interface Headless {
   readonly logGroup?: LogGroupChoice
   /** What the element reads, sends, and computes where a box follows its newest content. */
   readonly tail?: TailChoice
+  /** What the element reads, sends, and computes where it is a feed of notifications. */
+  readonly notificationsRoot?: NotificationsRootChoice
+  /** What the element reads, sends, and computes where it is a notification. */
+  readonly notificationRow?: NotificationRowChoice
+  /** What the element reads and computes where it is a group of notifications. */
+  readonly notificationGroup?: NotificationGroupChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */
