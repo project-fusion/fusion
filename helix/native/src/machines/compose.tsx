@@ -39,6 +39,8 @@ import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
 import { settingTurns, turning, turnsAlone } from './turns'
 import { type Judged, useValidation } from './validation'
+import { useTree } from './tree'
+import { useTreeItem } from './tree-item'
 import { useWindow } from './window'
 
 export { scrollingOf } from './scrolling'
@@ -224,6 +226,21 @@ export const behaviorFor = (family: Family): UseBehavior => {
             around.handle.current = handle as unknown as Readonly<Record<string, unknown>>
             return behavior
           },
+      ),
+    /* A tree, and an item of one, which opens by the toggle hosted before it. */
+    ...uses
+      .filter((use) => use.machine === 'tree')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTree(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'tree-item')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useTreeItem(family, props, use, around.toggled),
       ),
     /* The color a reader builds, which the verdict reads as its answer. */
     ...uses
