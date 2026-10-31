@@ -67,17 +67,10 @@ describe('a table on a phone', () => {
     const rows = ['a', 'b', 'c', 'd', 'e', 'f']
     await render(
       <HelixRoot>
-        <HelixTable
-          label="Rows"
-          reorderable
-          windowed
-        >
+        <HelixTable label="Rows" reorderable windowed>
           <HelixTableColumn>Name</HelixTableColumn>
           {rows.map((row) => (
-            <HelixTableRow
-              key={row}
-              value={row}
-            >
+            <HelixTableRow key={row} value={row}>
               <HelixTableCell>{row}</HelixTableCell>
             </HelixTableRow>
           ))}
