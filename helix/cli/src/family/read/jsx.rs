@@ -182,7 +182,11 @@ pub(super) fn render(
             ));
         };
         for property in &pattern.properties {
-            let name = property.key.static_name().unwrap_or_default().to_string();
+            let name = property
+                .key
+                .static_name()
+                .map(|name| name.display().to_string())
+                .unwrap_or_default();
             if !property.shorthand || !GIVEN.contains(&name.as_str()) {
                 return Err(at(
                     property.span,

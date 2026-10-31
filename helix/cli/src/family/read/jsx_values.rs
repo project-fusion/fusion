@@ -33,7 +33,7 @@ impl Render<'_> {
                     (Expression::Identifier(object), Expression::StringLiteral(name))
                         if object.name == "entry" && self.has("entry") =>
                     {
-                        return Ok(Read::Field(name.value.to_string()))
+                        return Ok(Read::Field(name.value.display().to_string()))
                     }
                     _ => return Err(refuse(member.span)),
                 }
@@ -152,7 +152,9 @@ impl Render<'_> {
     ) -> Result<Lit, String> {
         match value {
             None => Ok(Lit::Bool(true)),
-            Some(JSXAttributeValue::StringLiteral(text)) => Ok(Lit::Text(text.value.to_string())),
+            Some(JSXAttributeValue::StringLiteral(text)) => {
+                Ok(Lit::Text(text.value.display().to_string()))
+            }
             Some(JSXAttributeValue::ExpressionContainer(container)) => {
                 match container.expression.as_expression() {
                     Some(expression) => self.expression(expression),
@@ -169,7 +171,7 @@ impl Render<'_> {
     pub(super) fn expression(&self, expression: &Expression) -> Result<Lit, String> {
         match expression {
             Expression::ParenthesizedExpression(inner) => self.expression(&inner.expression),
-            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.to_string())),
+            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.display().to_string())),
             Expression::NumericLiteral(number) => Ok(Lit::Number(number.value)),
             Expression::BooleanLiteral(flag) => Ok(Lit::Bool(flag.value)),
             Expression::UnaryExpression(unary)
@@ -203,7 +205,7 @@ impl Render<'_> {
                             self.at(property.span, "a computed key: write each part's name")
                         );
                     };
-                    entries.push((key.to_string(), self.expression(&property.value)?));
+                    entries.push((key.display().to_string(), self.expression(&property.value)?));
                 }
                 Ok(Lit::Object(entries))
             }
@@ -241,7 +243,7 @@ impl Render<'_> {
         match (callee.name.as_str(), argument.as_expression()) {
             ("derive", Some(Expression::StringLiteral(name))) => Ok(Lit::Call(
                 "derive".to_owned(),
-                vec![Lit::Text(name.value.to_string())],
+                vec![Lit::Text(name.value.display().to_string())],
             )),
             _ => Err(refuse()),
         }
@@ -252,7 +254,7 @@ impl Render<'_> {
     /// read's value.
     fn pick(&self, expression: &Expression) -> Result<Lit, String> {
         let words = |branch: &Expression| match branch {
-            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.to_string())),
+            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.display().to_string())),
             other => Err(self.at(
                 other.span(),
                 "a choice of values picks between strings: write `props.x ? 'a' : 'b'`",
@@ -323,7 +325,7 @@ impl Render<'_> {
             return Err(self.at(binary.span, "a test of a value is `props.x === 'v'`"));
         }
         let value = match &binary.right {
-            Expression::StringLiteral(literal) => literal.value.to_string(),
+            Expression::StringLiteral(literal) => literal.value.display().to_string(),
             Expression::BooleanLiteral(flag) => flag.value.to_string(),
             Expression::NumericLiteral(number) => number.value.to_string(),
             other => {
@@ -347,32 +349,33 @@ impl Render<'_> {
     pub(super) fn words(&self, children: &[JSXChild]) -> Result<Option<Lit>, String> {
         let mut said = None;
         for child in children {
-            let words = match child {
-                JSXChild::Text(text) if text.value.trim().is_empty() => continue,
-                JSXChild::Text(text) => Lit::Text(text.value.trim().to_owned()),
-                JSXChild::ExpressionContainer(container) => {
-                    match container.expression.as_expression() {
-                        None => continue,
-                        Some(Expression::StringLiteral(text)) => Lit::Text(text.value.to_string()),
-                        Some(Expression::CallExpression(call)) => self.derive(call)?,
-                        Some(expression) => {
-                            match self.read(expression)? {
+            let words =
+                match child {
+                    JSXChild::Text(text) if text.value.trim().is_empty() => continue,
+                    JSXChild::Text(text) => Lit::Text(text.value.trim().to_owned()),
+                    JSXChild::ExpressionContainer(container) => {
+                        match container.expression.as_expression() {
+                            None => continue,
+                            Some(Expression::StringLiteral(text)) => {
+                                Lit::Text(text.value.display().to_string())
+                            }
+                            Some(Expression::CallExpression(call)) => self.derive(call)?,
+                            Some(expression) => match self.read(expression)? {
                                 Read::Slot(_) => return Err(self.at(
                                     expression.span(),
                                     "words are a read or a string: `slots.x` is a `<Wrap when>`'s",
                                 )),
                                 read => bound(read),
-                            }
+                            },
                         }
                     }
-                }
-                other => {
-                    return Err(self.at(
-                        other.span(),
-                        "words hold no node: write `<Text part=\"...\">{props.x}</Text>`",
-                    ))
-                }
-            };
+                    other => {
+                        return Err(self.at(
+                            other.span(),
+                            "words hold no node: write `<Text part=\"...\">{props.x}</Text>`",
+                        ))
+                    }
+                };
             if said.is_some() {
                 return Err(self.at(child.span(), "words are one read or one string"));
             }

@@ -284,7 +284,12 @@ impl Render<'_> {
             let oxc_ast::ast::ObjectPropertyKind::ObjectProperty(property) = property else {
                 return Err(refuse());
             };
-            let Some(name) = property.key.static_name().filter(|_| !property.computed) else {
+            let Some(name) = property
+                .key
+                .static_name()
+                .filter(|_| !property.computed)
+                .map(|name| name.display().to_string())
+            else {
                 return Err(refuse());
             };
             if !name.starts_with("--") {
@@ -293,7 +298,7 @@ impl Render<'_> {
                     &format!("`{name}` in `style` is not a CSS custom property: a style table sets the rest"),
                 ));
             }
-            read.push((name.to_string(), self.expression(&property.value)?));
+            read.push((name, self.expression(&property.value)?));
         }
         Ok(read)
     }
@@ -301,7 +306,7 @@ impl Render<'_> {
     /// A name written as a literal string, as `part="tab"`.
     fn literal(&self, attribute: &JSXAttribute, key: &str) -> Result<String, String> {
         match &attribute.value {
-            Some(JSXAttributeValue::StringLiteral(text)) => Ok(text.value.to_string()),
+            Some(JSXAttributeValue::StringLiteral(text)) => Ok(text.value.display().to_string()),
             _ => Err(self.at(
                 attribute.span,
                 &format!("`{key}` is a name written as a string, as `{key}=\"label\"`"),

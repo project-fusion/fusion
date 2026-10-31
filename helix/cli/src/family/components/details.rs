@@ -243,7 +243,7 @@ impl Details {
             .filter_map(|signature| match signature {
                 TSSignature::TSPropertySignature(field) => Some(Field {
                     doc: docs.get(&field.span.start).cloned(),
-                    name: field.key.static_name()?.to_string(),
+                    name: field.key.static_name()?.display().to_string(),
                     optional: field.optional,
                     ty: text(
                         source,
