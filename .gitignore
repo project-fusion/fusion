@@ -98,9 +98,9 @@ fusion/site/public/maplibre/
 *.diff.png
 # The reports `helix visual` writes on every run, beside each config: the
 # examples', parity's, and hydration's.
-.helix/visual/
-.helix/parity/
-.helix/dsd/
+**/.helix/visual/
+**/.helix/parity/
+**/.helix/dsd/
 
 # A second checkout of this repo, so tracking it would track everything twice.
 .claude/worktrees/
