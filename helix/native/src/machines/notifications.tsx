@@ -49,13 +49,13 @@ export interface FeedRow {
 }
 
 /** Rows in the order they stand: what a feed and a group each hold. */
-export interface RowOrder {
+export interface RowOrder<Row = FeedRow> {
   /** Tells the holder a row joined or left, so every row reports again. */
   readonly changed: () => void
   /** Moves each time every row is asked to report. */
   readonly epoch: number
   /** A row saying it stands here, in its turn. */
-  readonly report: (row: FeedRow) => void
+  readonly report: (row: Row) => void
 }
 
 /** A group of rows, as a feed asks it to fold. */
@@ -90,16 +90,16 @@ export interface FeedOffer extends RowOrder {
 export const FeedContext = createContext<FeedOffer | undefined>(undefined)
 
 /** Holds rows in the order they stand, as they report through a change. */
-export const useRowOrder = (): RowOrder & { readonly rows: readonly FeedRow[] } => {
+export const useRowOrder = <Row = FeedRow>(): RowOrder<Row> & { readonly rows: readonly Row[] } => {
   const [epoch, setEpoch] = useState(0)
-  const [rows, setRows] = useState<readonly FeedRow[]>([])
-  const pending = useRef<FeedRow[]>([])
+  const [rows, setRows] = useState<readonly Row[]>([])
+  const pending = useRef<Row[]>([])
   const asked = useRef(epoch)
   if (asked.current !== epoch) {
     asked.current = epoch
     pending.current = []
   }
-  const report = useCallback((row: FeedRow) => {
+  const report = useCallback((row: Row) => {
     pending.current.push(row)
   }, [])
   const changed = useCallback(() => setEpoch((now) => now + 1), [])

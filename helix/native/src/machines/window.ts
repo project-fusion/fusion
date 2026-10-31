@@ -111,6 +111,8 @@ export interface WindowDrawing {
   readonly plain?: boolean
   /** The rows, in order. */
   readonly rows: readonly DrawnRow[]
+  /** How many rows a list draws at once as it opens, as one that opens at its end must. */
+  readonly initial?: number
   /**
    * The drawings of rows that have not changed, by each row's own object, so a
    * list appended to quickly draws only what it gained.
