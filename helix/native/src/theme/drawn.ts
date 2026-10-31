@@ -25,7 +25,7 @@ const GENERIC: Readonly<Record<string, 'mono' | 'sans' | 'serif'>> = {
 const SYSTEM: Readonly<Record<FontPlatform, Readonly<Record<'mono' | 'sans' | 'serif', string>>>> =
   {
     android: { mono: 'monospace', sans: 'sans-serif', serif: 'serif' },
-    ios: { mono: 'Menlo', sans: 'System', serif: 'Georgia' },
+    ios: { mono: 'ui-monospace', sans: 'System', serif: 'Georgia' },
   }
 
 /**
