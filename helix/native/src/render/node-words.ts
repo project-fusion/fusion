@@ -2,11 +2,12 @@
  * The words a screen reader hears in a node, and the label a node takes
  * from its own `label` or from the region its `labelledby` names.
  */
-import { regionContent } from './region-content'
+
 import { wordsOf } from '../machines/words'
 import type { Node } from '../style/form'
 import { holds } from './announced'
 import { drawsOwn } from './passed'
+import { regionContent } from './region-content'
 import { bound, given, type Styling } from './styles'
 
 /** Whether a `when` draws what it holds: while its prop or state holds, or does not, for an `unless()`. */
@@ -48,8 +49,7 @@ const saidWords = (styling: Styling, text: Node): string[] => {
 
 /** The words passed into a region, or `''` where it draws its own. */
 const passedWords = (styling: Styling, region: Node): string => {
-  const content =
-    regionContent(styling.props, region.name)
+  const content = regionContent(styling.props, region.name)
   return typeof content === 'string' && drawsOwn(region) ? '' : wordsOf(content)
 }
 
