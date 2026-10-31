@@ -53,6 +53,8 @@ export interface Setup {
   readonly logGroups?: readonly object[] | undefined
   /** A log's lines as data. The web sets them as a property, and a phone passes a prop. */
   readonly logLines?: readonly object[]
+  /** The turns a chat holds as data. */
+  readonly turns?: readonly object[]
   /**
    * The value it shows, for a family whose value is data, as an object
    * inspector. The web sets it as a property, and a phone passes it as a prop.
@@ -376,6 +378,16 @@ export interface Left {
    * What a screen reader hears of each row a log draws, whether a step is open,
    * what the log says it let go, and the lines selected.
    */
+  readonly chat?: {
+    /** The words under a turn that say what has happened to it. */
+    readonly lines: readonly string[]
+    /** What a screen reader calls each turn. */
+    readonly named: readonly string[]
+    /** What a composer's button is called. */
+    readonly send: string
+    /** What stands in place of turns, and who is typing. */
+    readonly status: string
+  }
   readonly feed?: {
     /** The count the last group in the setup shows, or `null` where it holds none. */
     readonly count: string | null
