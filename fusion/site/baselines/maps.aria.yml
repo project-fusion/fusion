@@ -106,6 +106,13 @@
       - button "Zoom in": +
       - button "Zoom out": −
       - button "Face north"
+    - link "OpenFreeMap":
+      - /url: https://openfreemap.org
+    - link "© OpenMapTiles":
+      - /url: https://www.openmaptiles.org/
+    - text: Data from
+    - link "OpenStreetMap":
+      - /url: https://www.openstreetmap.org/copyright
     - status
   - text: Press a count to zoom in. Press a point to see its name.
   - paragraph: What you can add
