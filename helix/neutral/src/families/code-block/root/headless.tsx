@@ -183,8 +183,8 @@ export default headless('code-block', {
             </View>
             <Pressable
               data-after={entry.afterActions}
-              data-pressed={entry.wrapPressed}
               data-gone={entry.wrapHidden}
+              data-pressed={entry.wrapPressed}
               label={props.wrapLabel}
               part="wrap-toggle"
             >
@@ -220,7 +220,6 @@ export default headless('code-block', {
               hidden={entry.copyInHeaderHidden}
               part="copy"
             />
-
           </View>
           <View part="frame">
             <View
@@ -351,12 +350,12 @@ export default headless('code-block', {
                       hidden={entry.hunkHidden}
                       part="hunk"
                     >
-                      <Text
-                        lines={1}
-                        part="hunk-words"
+                      <View
+                        part="text"
+                        run
                       >
-                        {entry.words}
-                      </Text>
+                        <Text part="hunk-words">{entry.words}</Text>
+                      </View>
                     </View>
                     <View
                       ariaHidden
@@ -367,12 +366,12 @@ export default headless('code-block', {
                       data-gone={entry.foldHidden}
                       part="fold"
                     >
-                      <Text
-                        lines={1}
-                        part="fold-words"
+                      <View
+                        part="text"
+                        run
                       >
-                        {entry.words}
-                      </Text>
+                        <Text part="fold-words">{entry.words}</Text>
+                      </View>
                     </Pressable>
                   </Repeat>
                 </View>
@@ -380,6 +379,7 @@ export default headless('code-block', {
             </View>
             <View
               bubbles="copy copy-error"
+              data-beside
               draws="copy-button"
               exports={{
                 button: true,
@@ -404,11 +404,9 @@ export default headless('code-block', {
                 label: entry.copyName,
                 value: entry.copyText,
               }}
-              data-beside
               hidden={entry.copyInFrameHidden}
               part="copy"
             />
-
           </View>
         </View>
       </Repeat>
