@@ -1,5 +1,5 @@
-import { native, product, sum, token, web } from '../../../style.js'
 import { oneOf } from '../../../render.js'
+import { native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -82,10 +82,7 @@ export default styles(
     ]),
     on('list', [
       rule({ overflowY: 'auto' }),
-      rule(
-        { separation: ['filled', 'outlined'] },
-        { paddingBlockStart: hook.itemGap },
-      ),
+      rule({ separation: ['filled', 'outlined'] }, { paddingBlockStart: hook.itemGap }),
       web([rule({ print: true }, { overflowY: 'visible' })]),
       native([rule({ flexShrink: 1, minBlockSize: 0 })]),
     ]),
@@ -158,14 +155,10 @@ export default styles(
     /* While the next page is on its way, it keeps its place and its focus, and
        reads as resting, under a pointer as well. */
     on({ part: 'more', selector: '[part="more"][aria-disabled="true"]' }, [
-      web([
-        rule({ color: token('color-foreground-subtle'), cursor: 'default' }),
-      ]),
+      web([rule({ color: token('color-foreground-subtle'), cursor: 'default' })]),
     ]),
     on({ part: 'more', selector: '[part="more"][aria-disabled="true"]:hover' }, [
-      web([
-        rule({ color: token('color-foreground-subtle'), cursor: 'default' }),
-      ]),
+      web([rule({ color: token('color-foreground-subtle'), cursor: 'default' })]),
     ]),
     on(
       ['empty', 'loading'],

@@ -386,7 +386,7 @@ export default styles(
                 difference('100%', product(own.colorPickerRing, 2)),
                 product(token('space-sm'), 2),
               ),
-              0.7071,
+              '0.7071',
             ),
           }),
         ]),
