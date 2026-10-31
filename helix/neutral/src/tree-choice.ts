@@ -160,3 +160,68 @@ export interface InspectorChoice {
   /** The prop that says the rows are drawn in a window. */
   readonly windowed?: string
 }
+
+/** What a table reads, sends, and computes. Each computed value is the name a render binds. */
+export interface TableChoice {
+  readonly columns?: string
+  readonly defaultExpanded?: string
+  readonly defaultSelected?: string
+  readonly defaultSort?: string
+  readonly empty?: string
+  readonly every?: string
+  readonly expanded?: string
+  readonly grid?: string
+  readonly heads?: string
+  readonly label?: string
+  readonly loadMore?: string
+  readonly nests?: string
+  readonly onBeforeExpand?: string
+  readonly onBeforeReorder?: string
+  readonly onBeforeSelect?: string
+  readonly onBeforeSort?: string
+  readonly onExpand?: string
+  readonly onLoadMore?: string
+  readonly onReorder?: string
+  readonly onSelect?: string
+  readonly onSort?: string
+  readonly reorderable?: string
+  readonly rows?: string
+  readonly selectable?: string
+  readonly selected?: string
+  readonly selectionBehavior?: string
+  readonly selectionMode?: string
+  readonly sort?: string
+  readonly waiting?: string
+  readonly windowed?: string
+}
+
+/** What a row of a table reads and computes. Each computed value is the name a render binds. */
+export interface TableRowChoice {
+  readonly branch?: string
+  readonly cells?: string
+  readonly disabled?: string
+  readonly grips?: string
+  readonly gripStill?: string
+  readonly href?: string
+  readonly nests?: string
+  readonly parent?: string
+  readonly selectable?: string
+  readonly selectedCell?: string
+  readonly value?: string
+}
+
+/** What a column of a table reads, sends, and computes. Each computed value is the name a render binds. */
+export interface TableColumnChoice {
+  readonly field?: string
+  readonly movable?: string
+  readonly onBeforeResize?: string
+  readonly onResized?: string
+  readonly resizable?: string
+  readonly resizeLabel?: string
+  readonly sortable?: string
+  readonly sorts?: string
+  readonly still?: string
+  readonly textAlign?: string
+  readonly width?: string
+  readonly widthLabel?: string
+}

@@ -40,7 +40,7 @@ fn takes_a_picked_string_where_each_string_it_picks_fits() {
         values: [("multiple".to_owned(), toolbar.to_owned())].into(),
     };
     assert!(attribute(NodeKind::Box, "row", "role", &picked("toolbar")).is_ok());
-    let why = attribute(NodeKind::Box, "row", "role", &picked("treegrid")).unwrap_err();
+    let why = attribute(NodeKind::Box, "row", "role", &picked("nonsense")).unwrap_err();
     assert!(why.starts_with("`box('row')`: `role` takes one of"));
 }
 
@@ -58,7 +58,7 @@ fn refuses_an_attribute_on_a_node_that_does_not_take_it() {
 
 #[test]
 fn refuses_a_value_of_the_wrong_shape() {
-    let role = attribute(NodeKind::Box, "tabs", "role", &text("treegrid")).unwrap_err();
+    let role = attribute(NodeKind::Box, "tabs", "role", &text("nonsense")).unwrap_err();
     assert!(role.contains("one of `alert`, `alertdialog`, `banner`, `button`"));
     let says = attribute(NodeKind::Live, "live", "says", &not("pending")).unwrap_err();
     assert!(says.contains("a string, `bind()` or `derive()`"));
