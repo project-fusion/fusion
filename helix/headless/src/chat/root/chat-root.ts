@@ -27,6 +27,15 @@ import {
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
+import {
+  authorWords,
+  type HeardTurn,
+  openingTurns,
+  TURN_WORDS,
+  type TurnMemory,
+  type TurnWords,
+  turnsToSay,
+} from '@fusion.dev/helix-core/chat'
 import { arrowDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -38,7 +47,6 @@ import { html } from 'lit/static-html.js'
 import { HelixHistoryEvent } from '../events/index.js'
 import '../message/chat-message.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
-import { authorWords, TURN_WORDS, type TurnWords } from '../naming.js'
 
 /**
  * The regions a consumer fills, in the order they are rendered.
@@ -108,29 +116,6 @@ const secondNames = (table: Readonly<Record<string, string>>, key: string | unde
   const names = ownEntry(table, key)
   return names === undefined ? '' : `, ${names}`
 }
-
-/** A turn as the announcer reads it, whichever way it was handed over. */
-interface Heard {
-  author: string | undefined
-  /** Who wrote it, in words a reader can be told, or empty where there are none. */
-  by: string
-  failed: string
-  id: unknown
-  state: string | undefined
-  text: string
-}
-
-/** Whether a turn has finished arriving, which is when it is worth saying. */
-const settled = (turn: Heard): boolean => turn.state !== 'sending' && turn.state !== 'streaming'
-
-/**
- * Whether a turn is news to the reader.
- *
- * Their own words are not, since they have just written them, unless those
- * words did not send: a failure is the one thing about their own turn a reader
- * has to be told.
- */
-const newsworthy = (turn: Heard): boolean => turn.author !== 'me' || turn.state === 'failed'
 
 /** What a turn says, without the controls and sources slotted beside it. */
 const spoken = (message: Element): string =>
@@ -586,8 +571,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   private opening = true
 
   /** The newest turn already accounted for, and the turns still arriving. */
-  private newest: unknown = undefined
-  private pending = new Set<unknown>()
+  private memory: TurnMemory = { newest: undefined, pending: new Set() }
 
   /* No `overscan`: the controller's four is a frame of fast scrolling, and a
      turn is taller than the row that number was chosen for. */
@@ -711,7 +695,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /** Every turn as the announcer reads it. */
-  private heard(): Heard[] {
+  private heard(): HeardTurn[] {
     if (this.fed) {
       return this.turns.map((turn) => ({
         author: turn.author,
@@ -942,58 +926,21 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Says the turns that have settled since the last time it looked.
-   *
-   * **New means after the newest turn already accounted for.** Turns loaded
-   * above it are history and are not said; if the newest turn is gone, the set
-   * was replaced rather than added to, and nothing is said either. A single turn
-   * arriving in an empty transcript is a conversation starting and is said;
-   * several at once is a transcript loading and is not.
-   *
-   * A turn still `sending` or `streaming` waits, and is said when it settles.
+   * Says the turns that have settled since the last time it looked, which core's
+   * `turnsToSay` finds, the same as a phone.
    */
   private announce(): void {
     const turns = this.heard()
     if (this.opening) {
-      this.newest = turns.at(-1)?.id
-      this.pending = new Set(turns.filter((turn) => !settled(turn)).map((turn) => turn.id))
+      this.memory = openingTurns(turns)
       return
     }
-    const fresh = this.arrived(turns)
-    const words: string[] = []
-    for (const turn of turns) {
-      if (this.pending.has(turn.id) && settled(turn) && !fresh.includes(turn)) {
-        this.pending.delete(turn.id)
-        if (newsworthy(turn)) {
-          words.push(this.phrase(turn))
-        }
-      }
-    }
-    for (const turn of fresh) {
-      if (!settled(turn)) {
-        this.pending.add(turn.id)
-      } else if (newsworthy(turn)) {
-        words.push(this.phrase(turn))
-      }
-    }
-    if (this.pending.size > 0) {
-      const present = new Set(turns.map((turn) => turn.id))
-      this.pending = new Set([...this.pending].filter((id) => present.has(id)))
-    }
-    this.newest = turns.at(-1)?.id
-    if (words.length > 0) {
-      this.announcement = words.join(' ')
+    const { memory, say } = turnsToSay(turns, this.memory)
+    this.memory = memory
+    if (say.length > 0) {
+      this.announcement = say.map((turn) => this.phrase(turn)).join(' ')
       this.said += 1
     }
-  }
-
-  /** The turns after the newest one already accounted for, by the rules above. */
-  private arrived(turns: Heard[]): Heard[] {
-    if (this.newest === undefined) {
-      return turns.length === 1 ? turns : []
-    }
-    const at = turns.findIndex((turn) => turn.id === this.newest)
-    return at < 0 ? [] : turns.slice(at + 1)
   }
 
   /**
@@ -1001,7 +948,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * another with `arrival-label` where its author can be named, so a reader
    * in a conversation of several knows who spoke.
    */
-  private phrase(turn: Heard): string {
+  private phrase(turn: HeardTurn): string {
     if (turn.state === 'failed') {
       return formatWords(this, 'failedTurnLabel', { failed: turn.failed, text: turn.text })
     }

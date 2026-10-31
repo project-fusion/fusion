@@ -11,11 +11,11 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { authorWords, TURN_WORDS, turnName } from '@fusion.dev/helix-core/chat'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixSendEvent } from '../events/index.js'
-import { authorWords, TURN_WORDS, turnName } from '../naming.js'
 
 /**
  * What a turn that did not send is called, where nobody said otherwise.

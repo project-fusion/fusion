@@ -81,6 +81,10 @@
       "types": "./dist/capabilities/types.generated.d.ts",
       "default": "./dist/capabilities/types.generated.js"
     },
+    "./chat": {
+      "types": "./dist/utils/chat/turns.d.ts",
+      "default": "./dist/utils/chat/turns.js"
+    },
     "./code-block": {
       "types": "./dist/utils/code-block/code-block.d.ts",
       "default": "./dist/utils/code-block/code-block.js"
