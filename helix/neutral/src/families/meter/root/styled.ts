@@ -123,6 +123,23 @@ export default styles(
       }),
       /* In the middle, which is why the round shapes exist at all. */
       rule([{ shape: 'arc' }, { shape: 'ring' }], { gridArea: '1 / 1' }),
+      /* A phone has no grid cell for it to share, so it lies over the drawing's
+         own box, and the host stands the caption under the drawing. */
+      native([
+        rule([{ shape: 'arc' }, { shape: 'ring' }], {
+          alignItems: 'center',
+          blockSize: hook.ringSize,
+          display: 'flex',
+          insetBlockStart: 0,
+          insetInlineEnd: 0,
+          insetInlineStart: 0,
+          justifyContent: 'center',
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on('host', [
+      native([rule([{ shape: 'arc' }, { shape: 'ring' }], { flexDirection: 'column-reverse' })]),
     ]),
     /* The whole range, always drawn. */
     on('track', [
