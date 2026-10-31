@@ -308,7 +308,9 @@ const drawContent = (
      content inherits and the rest its box, over what the part around gives
      every region it holds. */
   const regions = { ...around, ...scope.host.contents[node.name]?.style }
-  const content = regionContent(scope.props, node.name)
+  /* A copy that holds a slide of its own draws it in its slot, as a carousel's pane. */
+  const own = scope.item?.fields.slide
+  const content = own === undefined ? regionContent(scope.props, node.name) : own
   /* **A flag is not content.** A list's `loading` is a prop and a region
      both, so `loading` on its own draws the words the region falls back to,
      as React draws nothing for `true`. */

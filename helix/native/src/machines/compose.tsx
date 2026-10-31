@@ -11,6 +11,7 @@ import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
 import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
+import { useCarousel } from './carousel'
 import { useChat } from './chat'
 import { useChatComposer } from './chat-composer'
 import { useChatMessage } from './chat-message'
@@ -331,6 +332,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLogGroup(family, props, use, around.toggled),
+      ),
+    /* A carousel. */
+    ...uses
+      .filter((use) => use.machine === 'carousel')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useCarousel(family, props, use),
       ),
     /* A block of code. */
     ...uses
