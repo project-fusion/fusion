@@ -73,8 +73,8 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
-    NOTIFICATION_ROW, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    TreeChoice, CODE_BLOCK, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -172,6 +172,9 @@ pub struct Api {
     /// What the element reads and computes where it is a group of notifications.
     #[serde(rename = "notificationGroup", skip_serializing_if = "Option::is_none")]
     pub notification_group: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a block of code.
+    #[serde(rename = "codeBlock", skip_serializing_if = "Option::is_none")]
+    pub code_block: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -317,6 +320,7 @@ impl Api {
             && self.notifications_root.is_none()
             && self.notification_row.is_none()
             && self.notification_group.is_none()
+            && self.code_block.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -389,6 +393,7 @@ const FIELDS: &[&str] = &[
     "notificationsRoot",
     "notificationRow",
     "notificationGroup",
+    "codeBlock",
     "fold",
     "host",
     "item",
@@ -429,6 +434,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         notification_group: field("notificationGroup")
             .map(tree_choice::notification_group)
+            .transpose()?,
+        code_block: field("codeBlock")
+            .map(tree_choice::code_block)
             .transpose()?,
         ..Api::default()
     })

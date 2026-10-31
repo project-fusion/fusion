@@ -458,10 +458,10 @@ fn fits(shape: Shape, value: &Attribute) -> bool {
             Attribute::Bound(Binding::Bind(_)) | Attribute::Derived { .. },
         )
         | (Shape::List, Attribute::Derived { .. })
-        /* A copy's field may stand for any value but a list, and its place
-        for a number or words. */
+        /* A copy's field may stand for any value, a list of its own among them,
+        as the rows of a file, and its place for a number or words. */
         | (
-            Shape::Count | Shape::Flag | Shape::Function | Shape::Length | Shape::Number | Shape::Path | Shape::Words,
+            Shape::Count | Shape::Flag | Shape::Function | Shape::Length | Shape::List | Shape::Number | Shape::Path | Shape::Words,
             Attribute::Field { .. },
         )
         | (
