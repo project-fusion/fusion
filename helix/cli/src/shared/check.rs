@@ -348,11 +348,44 @@ impl Reader<'_> {
     }
 }
 
-/// The DOM elements a phone draws as the web does: a fieldset, which disables
-/// the controls inside it, and a raw vector with its shapes.
+/// The DOM elements a phone draws as the web does: a link, a fieldset, which
+/// disables the controls inside it, a raw vector with its shapes, and the HTML a
+/// Markdown library writes under `data-prose`.
 const DRAWN_TAGS: &[&str] = &[
-    "circle", "ellipse", "fieldset", "g", "legend", "line", "path", "polygon", "polyline", "rect",
+    "a",
+    "b",
+    "blockquote",
+    "circle",
+    "ellipse",
+    "em",
+    "fieldset",
+    "g",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "hr",
+    "i",
+    "legend",
+    "li",
+    "line",
+    "ol",
+    "path",
+    "polygon",
+    "polyline",
+    "pre",
+    "rect",
     "svg",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "tr",
+    "ul",
 ];
 
 impl<'a> Visit<'a> for Reader<'_> {

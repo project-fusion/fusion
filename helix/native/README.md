@@ -769,6 +769,10 @@ words: `textField`, or a string or a number item itself.
 - **Under `reorderable`, a finger held on a row for half a second drags it**,
   Alt with an arrow from a hardware keyboard moves it, and a screen reader's
   actions move it. The list moves nothing itself: set `items` on `onReorder`.
+- **A finger holding a row near an edge scrolls the list**, and it keeps
+  scrolling while the finger rests there, at the speed core's `edgeSpeed` gives
+  the web. A Table's row does the same from its grip, in its own list or in the
+  scroll view it stands in, and a finger on a grip never scrolls what is behind it.
 
 These are the web's: the row `<template>`, `for`, `measured`, which a phone's
 list does for every row, each row's place in the set as `aria-posinset`, and the
@@ -1022,6 +1026,24 @@ draw on a phone as on the web:
 A property with no native meaning yet is left out, and the component's
 `dropped` list names it.
 
+## HTML in shared code
+
+**An `a` opens its `href` as it is pressed**, as a browser follows one: a
+fragment goes to its section, and anything else goes through the open-link
+capability. A press handler that calls `preventDefault()` keeps it where it is.
+`followLink` does the same from your own code. An `a` under `data-button` is a
+Button, and a screen reader hears it as a button.
+
+**`data-prose` gives the HTML a Markdown library writes the base layer's
+recipe**: headings, paragraphs, lists with their markers, quotes, `pre`, `hr`, and
+tables. In a chat message they take the values of a turn. A table's column takes
+a share of the width for the longest words in it, the nearest a phone comes to a
+browser's automatic table layout.
+
+**A font's ligatures are the font's.** Helix's `font-mono` is the system's
+monospace on a phone and on a page that names no other, and it has none. A page
+or an app that loads a font with ligatures sets it in `tokens`.
+
 ## Density
 
 `data-density` on a component, `sm`, `md`, or `lg`, draws it and the
@@ -1114,7 +1136,9 @@ or `error` as its picture stands, as on the web, and sends the events its
 `image()` node names once each picture loads or fails. A new `src` starts over at `loading`.
 The `load` event's `target` gives the picture's `naturalWidth` and
 `naturalHeight`, as the web element does, and a picture that fails gives 0
-by 0. An image with no `--image-aspect` is 16 by 9 on a phone, which has no
+by 0. A `data:` address that holds SVG draws through
+`react-native-svg`, since `Image` decodes no SVG, and takes the part's
+`object-fit`. An image with no `--image-aspect` is 16 by 9 on a phone, which has no
 picture's size to read before it loads. A picture that fails is a box 16 by 9
 that holds the fallback, on a phone and on the web, until `--image-aspect`
 says otherwise.
