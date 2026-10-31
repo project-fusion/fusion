@@ -1,6 +1,7 @@
-import { describe, expect, test } from '@jest/globals'
-import { render, screen } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
+import { measure, setMeasure } from '@fusion.dev/helix-core/capabilities/measure'
+import { describe, expect, jest, test } from '@jest/globals'
+import { fireEvent, render, screen } from '@testing-library/react-native'
+import { FlatList, StyleSheet } from 'react-native'
 import { HelixRoot } from '../index'
 import { pinShift } from '../machines/table'
 import { travelTo } from '../machines/table-moves'
@@ -57,6 +58,50 @@ describe('a table on a phone', () => {
     expect(travelTo(order, heights, 0, 80)).toBe(2)
     expect(travelTo(order, heights, 0, 900)).toBe(2)
     expect(travelTo(order, heights, 2, -30)).toBe(1)
+  })
+
+  test('a row dragged near the edge of a windowed table scrolls it, and the scroll carries its place', async () => {
+    const before = measure()
+    setMeasure({ ...before, box: () => ({ height: 400, width: 300, x: 0, y: 100 }) })
+    const scrollTo = jest.spyOn(FlatList.prototype, 'scrollToOffset').mockImplementation(() => {})
+    const rows = ['a', 'b', 'c', 'd', 'e', 'f']
+    await render(
+      <HelixRoot>
+        <HelixTable
+          label="Rows"
+          reorderable
+          windowed
+        >
+          <HelixTableColumn>Name</HelixTableColumn>
+          {rows.map((row) => (
+            <HelixTableRow
+              key={row}
+              value={row}
+            >
+              <HelixTableCell>{row}</HelixTableCell>
+            </HelixTableRow>
+          ))}
+        </HelixTable>
+      </HelixRoot>,
+    )
+    const button = screen.getByTestId('table:a:grip-button')
+    let grip = button.parent
+    while (grip !== null && grip.props.onResponderMove === undefined) {
+      grip = grip.parent
+    }
+    const at = (pageY: number) => ({ nativeEvent: { pageY } })
+    if (grip === null) {
+      throw new Error('The grip hears no drag.')
+    }
+    await fireEvent(grip, 'touchStart', at(300))
+    await fireEvent(grip, 'responderGrant', at(300))
+    await fireEvent(grip, 'responderMove', at(310))
+    expect(scrollTo).not.toHaveBeenCalled()
+    await fireEvent(grip, 'responderMove', at(480))
+    expect(scrollTo).toHaveBeenLastCalledWith({ animated: false, offset: 16 })
+    await fireEvent(grip, 'responderTerminate', at(480))
+    scrollTo.mockRestore()
+    setMeasure(before)
   })
 
   test("a cell draws its column's edge, and the inset after its words", async () => {

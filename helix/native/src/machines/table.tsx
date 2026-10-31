@@ -97,7 +97,7 @@ export interface TableOffer {
   readonly grip: {
     readonly drag: {
       readonly end: (dropped: boolean) => void
-      readonly move: (travel: number) => void
+      readonly move: (travel: number, pageY: number) => void
       readonly start: (key: string) => void
     }
     readonly key: (key: string, press: KeyPress) => boolean
@@ -282,16 +282,17 @@ const drawingOf = (
   windowed: boolean,
   entries: readonly TableEntry[],
   nearEnd: () => void,
-  held: string | undefined,
+  moves: Pick<TableState['moves'], 'edge' | 'held'>,
 ): WindowDrawing => ({
   across: 1,
   gap: 0,
-  ...(held === undefined ? {} : { held }),
+  ...(moves.held === undefined ? {} : { held: moves.held }),
   horizontal: false,
   laid: () => undefined,
-  listRef: () => undefined,
+  listRef: moves.edge.listRef,
   measured: () => undefined,
   moved: (offset, frame, content) => {
+    moves.edge.moved(offset)
     if (offset + frame * 2 >= content) {
       nearEnd()
     }
@@ -620,7 +621,7 @@ export const useTable = (family: Family, props: Props, use: MachineUse): Behavio
           ref: endRef,
         },
       },
-      rows: { windowed: drawingOf(windowed, entries.entries, nearEnd, state.moves.held) },
+      rows: { windowed: drawingOf(windowed, entries.entries, nearEnd, state.moves) },
       'select-all': leadPart('select-all', lead.indexOf('select')),
       table: {
         view: {

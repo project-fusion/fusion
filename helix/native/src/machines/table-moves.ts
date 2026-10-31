@@ -3,14 +3,17 @@
  * drag carry it, and a screen reader's actions step it.
  */
 import { announce } from '@fusion.dev/helix-core/capabilities/announce'
+import { measure } from '@fusion.dev/helix-core/capabilities/measure'
 import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import type { HostInstance } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import { boundTo, tell } from './props'
 import type { RowModel } from './table-model'
 import { worded } from './table-words'
+import { edgeStep, type WindowScroller } from './window'
 
 /** What a row draws of a move. */
 export type MoveState = 'dragging' | 'drop-after' | 'drop-before' | undefined
@@ -49,6 +52,50 @@ export const travelTo = (
   }
 }
 
+/** A windowed table's list, as a drag scrolls it. */
+type RowsList = WindowScroller & { readonly getNativeScrollRef?: () => unknown }
+
+/**
+ * The list a windowed table draws its rows in, scrolled by a finger near either
+ * edge of its frame, so a far place is reached by dragging there, as a Virtual
+ * List's is. A plain table has no list of its own, and `travel` stays 0.
+ */
+const useEdgeScroll = () => {
+  const list = useRef<RowsList | null>(null)
+  const offset = useRef(0)
+  const began = useRef(0)
+  const frame = useRef<{ readonly height: number; readonly y: number } | null>(null)
+  return useMemo(
+    () => ({
+      /* How far the list has scrolled since the drag began, as the finger moves
+         it there. A row the list carried is as far along as one the finger did. */
+      at: (pageY: number): number => {
+        const box = frame.current
+        const by = box === null ? 0 : edgeStep(pageY - box.y, box.height)
+        if (by !== 0) {
+          list.current?.scrollToOffset?.({
+            animated: false,
+            offset: Math.max(0, offset.current + by),
+          })
+        }
+        return offset.current - began.current
+      },
+      begin: () => {
+        const node = list.current?.getNativeScrollRef?.() as HostInstance | null | undefined
+        began.current = offset.current
+        frame.current = node ? measure().box(node) : null
+      },
+      listRef: (next: RowsList | null) => {
+        list.current = next
+      },
+      moved: (at: number) => {
+        offset.current = at
+      },
+    }),
+    [],
+  )
+}
+
 /** The state a row draws for where the held row would land. */
 const moveState = (hold: Hold | undefined, rowKey: string, at: number): MoveState => {
   if (hold === undefined) {
@@ -72,6 +119,7 @@ export const useMoves = (
   rows: readonly RowModel[],
   still: boolean,
 ) => {
+  const edge = useEdgeScroll()
   const [hold, setHold] = useState<Hold>()
   const holding = useRef(hold)
   holding.current = hold
@@ -172,20 +220,22 @@ export const useMoves = (
   const moveOf = (rowKey: string): MoveState => moveState(hold, rowKey, everyKey.indexOf(rowKey))
   return {
     dropOn,
+    edge,
     grip: {
       drag: {
         end: (dropped: boolean) => drop(dropped),
-        move: (travel: number) => {
+        move: (travel: number, pageY: number) => {
           const now = holding.current
           if (now === undefined) {
             return
           }
-          const to = travelTo(everyKey, heights, now.from, travel)
+          const to = travelTo(everyKey, heights, now.from, travel + edge.at(pageY))
           if (to !== now.to) {
             step(to)
           }
         },
         start: (held: string) => {
+          edge.begin()
           if (holding.current?.key !== held) {
             pick(held)
           }

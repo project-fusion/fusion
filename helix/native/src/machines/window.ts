@@ -162,6 +162,10 @@ const DRAG_EDGE = 48
 /** How far each move of a finger near an edge scrolls the list, in points. */
 const DRAG_STEP = 16
 
+/** How far a finger `shown` points into a frame scrolls what the frame holds, at each move. */
+export const edgeStep = (shown: number, frame: number): number =>
+  shown < DRAG_EDGE ? -DRAG_STEP : shown > frame - DRAG_EDGE ? DRAG_STEP : 0
+
 /** The words of a move a screen reader hears, where the page names none. */
 const MOVED = '{name} moved to position {position} of {count}'
 
@@ -287,7 +291,7 @@ const dragged = (
   const line = Math.max(1, now.estimate + now.gap)
   const point = at * line + along
   const shown = point - standing.offset
-  const by = shown < DRAG_EDGE ? -DRAG_STEP : shown > standing.frame - DRAG_EDGE ? DRAG_STEP : 0
+  const by = edgeStep(shown, standing.frame)
   if (by !== 0) {
     list?.scrollToOffset?.({ animated: false, offset: Math.max(0, standing.offset + by) })
   }

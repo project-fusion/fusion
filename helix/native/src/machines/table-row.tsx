@@ -105,7 +105,8 @@ const gripDrag = (
     onMoveShouldSetResponderCapture: (event: Touch) =>
       offer?.grip.still === false && Math.abs(pageY(event) - start.current) > TRAVEL,
     onResponderGrant: () => offer?.grip.drag.start(key),
-    onResponderMove: (event: Touch) => offer?.grip.drag.move(pageY(event) - start.current),
+    onResponderMove: (event: Touch) =>
+      offer?.grip.drag.move(pageY(event) - start.current, pageY(event)),
     onResponderRelease: () => offer?.grip.drag.end(true),
     onResponderTerminate: () => offer?.grip.drag.end(false),
     /* A drag on the grip moves the row, and the page around it stays. */
