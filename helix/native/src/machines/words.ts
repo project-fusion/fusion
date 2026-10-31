@@ -18,12 +18,14 @@ const flat = (content: unknown): unknown[] =>
         : [content]
 
 /** The text of one child and of everything it holds, in order, as `textContent` reads a node. */
-const textOf = (child: unknown): string =>
+export const textOf = (child: unknown): string =>
   typeof child === 'string' || typeof child === 'number'
     ? String(child)
-    : isValidElement(child)
-      ? flat(childrenOf(child)).map(textOf).join('')
-      : ''
+    : Array.isArray(child)
+      ? child.map(textOf).join('')
+      : isValidElement(child)
+        ? flat(childrenOf(child)).map(textOf).join('')
+        : ''
 
 /**
  * The words among some content, as an item's name, or `''` where it has
