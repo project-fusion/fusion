@@ -12,6 +12,8 @@ import { HelixButton } from '../button/index.native'
 import { HelixButtonGroup } from '../button-group/index.native'
 import { HelixCallout } from '../callout/index.native'
 import { HelixCard } from '../card/index.native'
+import { HelixCarousel } from '../carousel/index.native'
+import { HelixChat, HelixChatComposer, HelixChatMessage } from '../chat/index.native'
 import { HelixCheckbox } from '../checkbox/index.native'
 import { HelixCheckboxGroup } from '../checkbox-group/index.native'
 import { HelixCode } from '../code/index.native'
@@ -20,8 +22,6 @@ import { HelixColorInput } from '../color-input/index.native'
 import { HelixColorPicker } from '../color-picker/index.native'
 import { HelixCopyButton } from '../copy-button/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
-import { HelixCarousel } from '../carousel/index.native'
-import { HelixChat, HelixChatComposer, HelixChatMessage } from '../chat/index.native'
 import { HelixDialog } from '../dialog/index.native'
 import { HelixDivider } from '../divider/index.native'
 import { HelixDrawer } from '../drawer/index.native'
@@ -152,6 +152,10 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-button-group': ButtonGroup,
   'helix-callout': HelixCallout,
   'helix-card': HelixCard,
+  'helix-carousel': HelixCarousel,
+  'helix-chat': HelixChat,
+  'helix-chat-composer': HelixChatComposer,
+  'helix-chat-message': HelixChatMessage,
   'helix-checkbox': HelixCheckbox,
   'helix-checkbox-group': HelixCheckboxGroup,
   'helix-code': HelixCode,
@@ -161,10 +165,6 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-copy-button': HelixCopyButton,
   'helix-description-list': HelixDescriptionList,
   'helix-description-list-item': HelixDescriptionListItem,
-  'helix-carousel': HelixCarousel,
-  'helix-chat': HelixChat,
-  'helix-chat-composer': HelixChatComposer,
-  'helix-chat-message': HelixChatMessage,
   'helix-dialog': HelixDialog,
   'helix-divider': HelixDivider,
   'helix-drawer': HelixDrawer,
