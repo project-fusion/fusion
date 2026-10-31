@@ -1,4 +1,4 @@
-import { difference, measured, product, quotient, token } from '../style.js'
+import { difference, measured, native, product, quotient, token } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -135,6 +135,30 @@ export default fragment(
         },
       ),
     ]),
+    /* A phone has no grid cell for them to share, so the reading and the words
+       lie over the ring's own box, and the host stands its caption under it, as
+       the web's grid does. */
+    on(
+      ['content', 'value'],
+      [
+        native([
+          rule(
+            { shape: 'ring' },
+            {
+              alignItems: 'center',
+              blockSize: hook.ringSize('4rem'),
+              display: 'flex',
+              insetBlockStart: 0,
+              insetInlineEnd: 0,
+              insetInlineStart: 0,
+              justifyContent: 'center',
+              position: 'absolute',
+            },
+          ),
+        ]),
+      ],
+    ),
+    on('host', [native([rule({ shape: 'ring' }, { flexDirection: 'column-reverse' })])]),
     keyframes('helix-progress-ring', { from: { rotate: '-90deg' }, to: { rotate: '270deg' } }),
     keyframes('helix-progress-ring-sweep', {
       '0%': { strokeDasharray: '10 100', strokeDashoffset: 0 },
