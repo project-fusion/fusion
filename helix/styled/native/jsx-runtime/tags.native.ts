@@ -133,8 +133,22 @@ const Tabs = held(HelixTabs, 'active', 'onActivate', (event) => event.detail?.va
 const Steps = held(HelixSteps, 'active', 'onActivate', (event) => event.detail?.value)
 const TagGroup = held(HelixTagGroup, 'value', 'onChange', (event) => event.target?.value)
 
+/** An `a` under the `data-button` recipe is a Button, with the recipe's emphasis and tone. */
+const Link = (props: Props) =>
+  props['data-button'] === undefined
+    ? React.createElement(Anchor, props)
+    : React.createElement(
+        HelixButton,
+        {
+          emphasis: props['data-button'] === '' ? undefined : props['data-button'],
+          tone: props['data-button-tone'],
+        } as React.ComponentProps<typeof HelixButton>,
+        props.children as React.ReactNode,
+      )
+
 export const TAGS: Readonly<Record<string, unknown>> = {
-  a: Anchor,
+  a: Link,
+  code: HelixCode,
   div: Box,
   fieldset: Fieldset,
   form: Box,
