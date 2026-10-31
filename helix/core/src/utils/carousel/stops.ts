@@ -52,3 +52,35 @@ export const stepStop = (
   }
   return stops[next] ?? 0
 }
+
+/** How many panes of at least `least` fit `room` with `gap` between each pair, and one at least. */
+export const fittedAcross = (room: number, gap: number, least: number): number => {
+  const pane = least + gap
+  return pane > 0 ? Math.max(1, Math.floor((room + gap) / pane)) : 1
+}
+
+/** A declared count as a track reads it: a whole number, one at least. */
+export const acrossOf = (asked: unknown): number =>
+  typeof asked === 'number' && Number.isFinite(asked) ? Math.max(1, Math.floor(asked)) : 1
+
+/** One pane's length, when `across` panes with `gap` between them share `room`. */
+export const paneLength = (room: number, gap: number, across: number): number =>
+  Math.max(0, (room - (across - 1) * gap) / across)
+
+/** How many places `slides` panes `across` at a time can stand: one at least. */
+export const positionsOf = (slides: number, across: number): number =>
+  Math.max(1, slides - across + 1)
+
+/**
+ * Which of `offsets` stands nearest `at`, as an index into them, for a scroller
+ * that has come to rest and is asked where it stands. Zero where there are none.
+ */
+export const nearestOffset = (offsets: readonly number[], at: number): number => {
+  let found = 0
+  offsets.forEach((offset, index) => {
+    if (Math.abs(offset - at) < Math.abs((offsets[found] ?? 0) - at)) {
+      found = index
+    }
+  })
+  return found
+}

@@ -22,11 +22,11 @@ import {
   timeConverter,
   words,
 } from '@fusion.dev/helix-core'
+import { stepStop, stopFor, stopsOf } from '@fusion.dev/helix-core/carousel'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { stepStop, stopFor, stopsOf } from '../stops.js'
 
 /**
  * `per-view` as the two things it can be: a count, or the word that is not one.
