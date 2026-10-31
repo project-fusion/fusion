@@ -32,7 +32,7 @@ import { useHostTarget } from './host-target'
 import { keepMade } from './made'
 import { useReducedMotion } from './motion'
 import { draw, drawEach, drawGenerated } from './nodes'
-import { ownHooks } from './own-hooks'
+import { ownHooks, styleCustom } from './own-hooks'
 import { heldBy, readsCondition, useEntering } from './presence'
 import { type Presence, presenceOf, usePresencePhase } from './presence-phase'
 import { useLazy } from './regions'
@@ -89,9 +89,9 @@ export const contextOf = (
   const { empty, numbers } = numbering(values)
   return {
     conditions: { ...conditionsOf(values), ...empty },
-    /* What the part around sets inherits, and what the element around sets
-       on this one directly stands over it. */
-    custom: customOf({ ...outer?.custom, ...slotted?.custom }),
+    /* What the part around sets inherits, what the element around sets on this
+       one directly stands over it, and the element's own `style` over both. */
+    custom: customOf({ ...outer?.custom, ...slotted?.custom, ...styleCustom(values.props.style) }),
     dir: direction(),
     hooks: { ...hooksOf(values.family, slotted), ...ownHooks(values.props.hooks) },
     inherited: { ...outer?.values, ...slotted?.values, ...numbers },

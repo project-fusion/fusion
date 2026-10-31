@@ -36,11 +36,24 @@ export const mix = (first: string, percent: number, second: string, space?: 'srg
 
 type Rgba = [number, number, number, number]
 
-/** `#rgb`, `#rrggbb`, `#rrggbbaa`, or `transparent`, as channels from 0 to 1. */
+/** `rgb()` or `rgba()` with commas, as channels from 0 to 1. */
+const parseRgb = (value: string): Rgba | undefined => {
+  const channels = /^rgba?\(([^)]*)\)$/.exec(value)?.[1]?.split(',').map(Number)
+  if (channels === undefined || channels.length < 3 || channels.some(Number.isNaN)) {
+    return undefined
+  }
+  const [red = 0, green = 0, blue = 0, alpha = 1] = channels
+  return [red / 255, green / 255, blue / 255, alpha]
+}
+
+/** `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()`, or `transparent`, as channels from 0 to 1. */
 const parse = (color: string): Rgba | undefined => {
   const value = color.trim().toLowerCase()
   if (value === 'transparent') {
     return [0, 0, 0, 0]
+  }
+  if (value.startsWith('rgb')) {
+    return parseRgb(value)
   }
   const hex = /^#([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/.exec(value)?.[1]
   if (hex === undefined) {
@@ -87,4 +100,74 @@ const srgb = ([lightness, a, b]: [number, number, number]): [number, number, num
     number,
     number,
   ]
+}
+
+/** What a written color's `var()` reads, by its name without the two dashes. */
+type ReadVariable = (name: string) => unknown
+
+/** A function's arguments: the commas at its own depth divide them. */
+const argumentsOf = (inside: string): readonly string[] => {
+  const all: string[] = []
+  let depth = 0
+  let current = ''
+  for (const character of inside) {
+    depth += character === '(' ? 1 : character === ')' ? -1 : 0
+    if (character === ',' && depth === 0) {
+      all.push(current.trim())
+      current = ''
+    } else {
+      current += character
+    }
+  }
+  return [...all, current.trim()]
+}
+
+/** One side of a written mix: its color, and its share where the side writes one. */
+const sideOf = (written: string): { readonly color: string; readonly share?: number } => {
+  const share = /\s(\d+(?:\.\d+)?)%$/.exec(written)
+  return share?.[1] === undefined
+    ? { color: written }
+    : { color: written.slice(0, share.index).trim(), share: Number(share[1]) }
+}
+
+/** The share of the first color: what the sides write, scaled to 100 as CSS scales it. */
+const shareOf = (first: number | undefined, second: number | undefined): number => {
+  if (first !== undefined && second !== undefined) {
+    return first + second === 0 ? 50 : (first / (first + second)) * 100
+  }
+  return first ?? (second === undefined ? 50 : 100 - second)
+}
+
+/**
+ * A color as a `style` writes it, with each `var()` read and each `color-mix()`
+ * in OKLab or sRGB worked out, as CSS does on the element. It returns
+ * `undefined` for a variable that reads nothing or a mix in another space.
+ */
+export const writtenColor = (written: string, read: ReadVariable): string | undefined => {
+  const value = written.trim()
+  const variable = /^var\(\s*--([\w-]+)\s*(?:,(.*))?\)$/s.exec(value)
+  if (variable?.[1] !== undefined) {
+    const set = read(variable[1])
+    if (typeof set === 'string') {
+      return writtenColor(set, read)
+    }
+    return variable[2] === undefined ? undefined : writtenColor(variable[2], read)
+  }
+  const inside = /^color-mix\((.*)\)$/is.exec(value)?.[1]
+  if (inside === undefined) {
+    return value
+  }
+  const [space, one, two] = argumentsOf(inside)
+  const named = /^in\s+(oklab|srgb)$/i.exec(space ?? '')?.[1]?.toLowerCase()
+  if (named === undefined || one === undefined || two === undefined) {
+    return undefined
+  }
+  const first = sideOf(one)
+  const second = sideOf(two)
+  const left = writtenColor(first.color, read)
+  const right = writtenColor(second.color, read)
+  if (left === undefined || right === undefined) {
+    return undefined
+  }
+  return mix(left, shareOf(first.share, second.share), right, named === 'srgb' ? 'srgb' : undefined)
 }
