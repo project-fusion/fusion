@@ -73,8 +73,8 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL,
-    TREE, TREE_ITEM,
+    TreeChoice, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
+    NOTIFICATION_ROW, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -163,6 +163,15 @@ pub struct Api {
     /// newest content, as a log and a chat do.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tail: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a feed of notifications.
+    #[serde(rename = "notificationsRoot", skip_serializing_if = "Option::is_none")]
+    pub notifications_root: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a notification.
+    #[serde(rename = "notificationRow", skip_serializing_if = "Option::is_none")]
+    pub notification_row: Option<TreeChoice>,
+    /// What the element reads and computes where it is a group of notifications.
+    #[serde(rename = "notificationGroup", skip_serializing_if = "Option::is_none")]
+    pub notification_group: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -305,6 +314,9 @@ impl Api {
             && self.log_line.is_none()
             && self.log_group.is_none()
             && self.tail.is_none()
+            && self.notifications_root.is_none()
+            && self.notification_row.is_none()
+            && self.notification_group.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -374,6 +386,9 @@ const FIELDS: &[&str] = &[
     "logLine",
     "logGroup",
     "tail",
+    "notificationsRoot",
+    "notificationRow",
+    "notificationGroup",
     "fold",
     "host",
     "item",
@@ -406,6 +421,15 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         log_line: field("logLine").map(tree_choice::log_line).transpose()?,
         log_group: field("logGroup").map(tree_choice::log_group).transpose()?,
         tail: field("tail").map(tree_choice::tail).transpose()?,
+        notifications_root: field("notificationsRoot")
+            .map(tree_choice::notifications_root)
+            .transpose()?,
+        notification_row: field("notificationRow")
+            .map(tree_choice::notification_row)
+            .transpose()?,
+        notification_group: field("notificationGroup")
+            .map(tree_choice::notification_group)
+            .transpose()?,
         ..Api::default()
     })
 }

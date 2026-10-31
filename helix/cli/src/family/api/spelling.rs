@@ -432,6 +432,59 @@ const LOG_LINE: &[Field] = &[
     ("written", "written", Name),
 ];
 
+const NOTIFICATIONS_ROOT: &[Field] = &[
+    ("arrivedLabel", "arrivedLabel", Name),
+    ("blank", "blank", Name),
+    ("emptyText", "emptyText", Name),
+    ("errorShown", "errorShown", Name),
+    ("errorText", "errorText", Name),
+    ("errorWords", "errorWords", Name),
+    ("fallbackLabel", "fallbackLabel", Name),
+    ("footerEmpty", "footerEmpty", Name),
+    ("headerEmpty", "headerEmpty", Name),
+    ("label", "label", Name),
+    ("loading", "loading", Name),
+    ("loadingShown", "loadingShown", Name),
+    ("loadingText", "loadingText", Name),
+    ("marksAll", "marksAll", Name),
+    ("named", "named", Name),
+    ("onBeforeRead", "onBeforeRead", Name),
+    ("onDismiss", "onDismiss", Name),
+    ("onLoadMore", "onLoadMore", Name),
+    ("onRead", "onRead", Name),
+    ("said", "said", Name),
+    ("separation", "separation", Name),
+    ("total", "total", Name),
+];
+
+const NOTIFICATION_ROW: &[Field] = &[
+    ("actionsFilled", "actionsFilled", Name),
+    ("at", "at", Name),
+    ("defaultRead", "defaultRead", Name),
+    ("dismissLabel", "dismissLabel", Name),
+    ("dismissName", "dismissName", Name),
+    ("dismissible", "dismissible", Name),
+    ("gone", "gone", Name),
+    ("heard", "heard", Name),
+    ("last", "last", Name),
+    ("media", "media", Name),
+    ("onBeforeRead", "onBeforeRead", Name),
+    ("onDismiss", "onDismiss", Name),
+    ("onRead", "onRead", Name),
+    ("read", "read", Name),
+    ("separation", "separation", Name),
+    ("stamped", "stamped", Name),
+    ("unreadLabel", "unreadLabel", Name),
+];
+
+const NOTIFICATION_GROUP: &[Field] = &[
+    ("collapsible", "collapsible", Name),
+    ("count", "count", Name),
+    ("countWords", "countWords", Name),
+    ("counted", "counted", Name),
+    ("label", "label", Name),
+];
+
 const LOG_GROUP: &[Field] = &[
     ("frame", "frame", Name),
     ("digits", "digits", Name),
@@ -773,6 +826,9 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("logLine", "logLine", LOG_LINE),
     ("logGroup", "logGroup", LOG_GROUP),
     ("tail", "tail", TAIL),
+    ("notificationsRoot", "notificationsRoot", NOTIFICATIONS_ROOT),
+    ("notificationRow", "notificationRow", NOTIFICATION_ROW),
+    ("notificationGroup", "notificationGroup", NOTIFICATION_GROUP),
     ("treeRoot", "treeRoot", TREE),
     ("treeItem", "treeItem", TREE_ITEM),
     ("maxVisible", "fold", MAX_VISIBLE),
