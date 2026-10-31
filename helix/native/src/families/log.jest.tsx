@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
+import { StyleSheet, type ViewStyle } from 'react-native'
 import { HelixRoot } from '../index'
 import type { LogHandle } from '../machines/log'
 import { HelixLog, HelixLogGroup, HelixLogLine } from './log/index.native'
@@ -117,4 +118,28 @@ describe('log', () => {
     const again = onPin.mock.calls.at(-1)?.[0] as { detail: { value: string } }
     expect(again.detail.value).toBe('true')
   })
+})
+
+describe('a long log', () => {
+  test('adds what clears a sliver of a row from the top of its frame', async () => {
+    const lines = Array.from({ length: 50 }, (_, at) => ({ level: 'log', text: `Line ${at}` }))
+    await draw({ lines })
+    const scroller = () =>
+      screen.root?.queryAll((node) => typeof node.props.onMomentumScrollEnd === 'function')[0]
+    const padded = (by: number) =>
+      screen.root?.queryAll(
+        (node) => (StyleSheet.flatten(node.props.style) as ViewStyle)?.paddingBottom === by,
+      ).length
+    const cell = screen.root?.queryAll((node) => node.props.onFocusCapture !== undefined)[0]
+    const layout = (height: number) => ({
+      nativeEvent: { layout: { height, width: 300, x: 0, y: 0 } },
+    })
+    await act(async () => cell?.props.onLayout(layout(20)))
+    await fireEvent(scroller() as never, 'layout', layout(281))
+    await fireEvent(scroller() as never, 'contentSizeChange', 300, 1000)
+    expect(padded(1)).toBe(1)
+    await fireEvent(scroller() as never, 'contentSizeChange', 300, 1011)
+    expect(padded(1)).toBe(0)
+  })
+
 })
