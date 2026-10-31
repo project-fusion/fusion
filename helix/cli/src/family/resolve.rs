@@ -57,6 +57,22 @@ fn regions<'a>(nodes: &'a [Node], into: &mut BTreeSet<&'a str>) {
     }
 }
 
+/// What a log, a feed of notifications, and a block of code compute.
+fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
+    [
+        &api.log_root,
+        &api.log_line,
+        &api.log_group,
+        &api.tail,
+        &api.notifications_root,
+        &api.notification_row,
+        &api.notification_group,
+        &api.code_block,
+    ]
+    .into_iter()
+    .flatten()
+}
+
 impl<'a> Names<'a> {
     fn of(family: &'a Family) -> Self {
         let mut parts = BTreeSet::new();
@@ -100,13 +116,7 @@ impl<'a> Names<'a> {
                         .chain(family.api.table.iter())
                         .chain(family.api.table_row.iter())
                         .chain(family.api.table_column.iter())
-                        .chain(family.api.log_root.iter())
-                        .chain(family.api.log_line.iter())
-                        .chain(family.api.log_group.iter())
-                        .chain(family.api.tail.iter())
-                        .chain(family.api.notifications_root.iter())
-                        .chain(family.api.notification_row.iter())
-                        .chain(family.api.notification_group.iter())
+                        .chain(later_choices(&family.api))
                         .flat_map(|item| item.computed.values().map(String::as_str)),
                 )
                 /* And what a color computes as it moves, as a color picker's. */
@@ -205,6 +215,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
             &family.api.notification_group,
             api::NOTIFICATION_GROUP,
         ),
+        ("codeBlock", &family.api.code_block, api::CODE_BLOCK),
     ] {
         if let Some(choice) = choice {
             references(feature, choice.references(table), names, found);
