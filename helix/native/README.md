@@ -2475,7 +2475,7 @@ each row's drawing by the row's object, flushed when what every row reads change
 and a write draws once a frame, or as long as the last drawing took where that is
 longer. Measured on the iPhone 18 Pro simulator in a development build in Expo Go,
 writing 3 lines every 16 ms: a drawing took 2 to 3 seconds at 50 lines before these,
-growing with the rows, and stays near 350 ms at 2,000 after. Lines arrive in steps of
+growing with the rows, and stays near 350 ms after, measured to about 200 lines. Lines arrive in steps of
 that length there. A release build has not been measured.
 
 A `source` is an async iterable, read with `for await`. A phone has no
