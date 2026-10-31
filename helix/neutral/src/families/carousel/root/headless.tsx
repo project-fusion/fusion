@@ -91,9 +91,10 @@ export default headless('carousel', {
     perView: 'perView',
     previousLabel: 'previousLabel',
     roleLabel: 'roleLabel',
+    rotationFirst: 'rotationFirst',
     rotationIcon: 'rotationIcon',
+    rotationLast: 'rotationLast',
     rotationName: 'rotationName',
-    rotationShown: 'rotationShown',
     slideLabel: 'slideLabel',
     slideRoleLabel: 'slideRoleLabel',
     slidesPerMove: 'slidesPerMove',
@@ -105,7 +106,7 @@ export default headless('carousel', {
   render: ({ carousel, entry, props }) => (
     <>
       <View part="controls">
-        {carousel.rotationShown && (
+        {carousel.rotationFirst && (
           <Pressable
             label={carousel.rotationName}
             part="rotation"
@@ -150,6 +151,20 @@ export default headless('carousel', {
                 part="next-mark"
               />
             </Slot>
+          </Pressable>
+        )}
+        {carousel.rotationLast && (
+          <Pressable
+            label={carousel.rotationName}
+            part="rotation"
+            platform="native"
+            role="button"
+          >
+            <View
+              ariaHidden
+              icon={carousel.rotationIcon}
+              part="rotation-mark"
+            />
           </Pressable>
         )}
       </View>
