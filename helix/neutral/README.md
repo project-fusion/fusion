@@ -1390,3 +1390,14 @@ tag's fill is mixed, and a phone mixes the same channels. A rule under
 `canHover: true` holds where a pointer can hover, `@media (hover: hover)`, the
 web's alone. A link part's `href` is a part condition, `[part="link"][href]`,
 while the link has somewhere to go.
+
+## Table
+
+`tableRoot`, `tableRow`, and `tableColumn` say what a phone's machines read. A
+`<Repeat>` over `tableRoot.heads`, `tableRoot.rows`, and `tableRow.cells` draws
+elements the page passed in: each entry's `draw` is the function a `<Wrap renders>`
+calls, the one place `renders` reads a copy's `field()` and no prop.
+
+`--_table-heading-*` are read with `measured()` by their whole names, since Data
+Table's hand-written sheet sets them on the column. Its source takes them over in
+wave 6.

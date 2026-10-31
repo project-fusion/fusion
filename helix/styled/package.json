@@ -525,6 +525,14 @@
       "types": "./dist/switch/index.d.ts",
       "default": "./dist/switch/index.js"
     },
+    "./table": {
+      "react-native": {
+        "types": "./dist/table/index.native.d.ts",
+        "default": "./dist/table/index.native.js"
+      },
+      "types": "./dist/table/index.d.ts",
+      "default": "./dist/table/index.js"
+    },
     "./tabs": {
       "react-native": {
         "types": "./dist/tabs/index.native.d.ts",

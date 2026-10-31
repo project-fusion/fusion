@@ -35,7 +35,7 @@ const rule = (tag: 'helix-table' | 'helix-table-row', selector: string): string 
 
 describe('a reorderable table', () => {
   test('draws the grip cell and its heading as the checkbox column is drawn', () => {
-    const cell = rule('helix-table-row', '[part~="grip"]')
+    const cell = rule('helix-table-row', '[part="grip"]')
     expect(cell).toContain(
       'border-block-end: var(--helix-border-thin) solid var(--helix-color-border)',
     )
@@ -58,12 +58,14 @@ describe('a reorderable table', () => {
   test('fades the row being moved and draws a line on every cell where it lands', () => {
     const rows = sheet('helix-table-row')
     expect(rows).toContain(
-      ':host(:state(dragging)) ::slotted(*) {opacity: var(--table-dragging-opacity, 0.5)',
+      ':host(:state(dragging)) slot:not([name])::slotted(*) {opacity: var(--table-dragging-opacity, 0.5)',
     )
     expect(rows).toContain(
-      ':host(:state(drop-before)) ::slotted(*) {box-shadow: inset 0 var(--table-drop-indicator-size, var(--helix-border-thick)) 0 0',
+      ':host(:state(drop-before)) slot:not([name])::slotted(*) {box-shadow: inset 0 var(--table-drop-indicator-size, var(--helix-border-thick)) 0 0',
     )
-    expect(rows).toContain(':host(:state(drop-after)) ::slotted(*) {box-shadow: inset 0 calc(')
+    expect(rows).toContain(
+      ':host(:state(drop-after)) slot:not([name])::slotted(*) {box-shadow: inset 0 calc(',
+    )
   })
 
   test('draws the grips and says each step in the styled tier too', async () => {
