@@ -4,16 +4,20 @@
  */
 import { announce } from '@fusion.dev/helix-core/capabilities/announce'
 import { measure } from '@fusion.dev/helix-core/capabilities/measure'
+import { scroll } from '@fusion.dev/helix-core/capabilities/scroll'
 import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
-import { useMemo, useRef, useState } from 'react'
+import { edgeSpeed } from '@fusion.dev/helix-core/reorder'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { HostInstance } from 'react-native'
+import { scrollViewAbove } from '../capabilities/scroll'
 import type { MachineUse } from '../ir.generated'
 import type { Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import { edgeFollow } from './edge-follow'
 import { boundTo, tell } from './props'
 import type { RowModel } from './table-model'
 import { worded } from './table-words'
-import { edgeStep, type WindowScroller } from './window'
+import type { WindowScroller } from './window'
 
 /** What a row draws of a move. */
 export type MoveState = 'dragging' | 'drop-after' | 'drop-before' | undefined
@@ -55,35 +59,59 @@ export const travelTo = (
 /** A windowed table's list, as a drag scrolls it. */
 type RowsList = WindowScroller & { readonly getNativeScrollRef?: () => unknown }
 
+/** How fast a finger at `pageY` scrolls a frame, as core's `edgeSpeed` says. */
+const speedAt = (box: { readonly height: number; readonly y: number } | null, pageY: number) =>
+  box === null ? 0 : edgeSpeed(pageY, box.y, box.y + box.height)
+
+/** Scrolls the scroll view a plain table stands in, or a windowed table's list. */
+const scrollTarget = (page: HostInstance | null, list: RowsList | null, at: number): void => {
+  if (page) {
+    scroll().to(page, scroll().offset(page).x, at, false)
+  } else {
+    list?.scrollToOffset?.({ animated: false, offset: at })
+  }
+}
+
 /**
- * The list a windowed table draws its rows in, scrolled by a finger near either
- * edge of its frame, so a far place is reached by dragging there, as a Virtual
- * List's is. A plain table has no list of its own, and `travel` stays 0.
+ * The list a windowed table draws its rows in, or the scroll view a plain table
+ * stands in, scrolled by a finger near either edge of its frame, a frame at a
+ * time while the finger rests there, as core's `edgeSpeed` says on the web.
  */
 const useEdgeScroll = () => {
   const list = useRef<RowsList | null>(null)
   const offset = useRef(0)
   const began = useRef(0)
   const frame = useRef<{ readonly height: number; readonly y: number } | null>(null)
+  const page = useRef<HostInstance | null>(null)
+  const edge = useRef(edgeFollow()).current
+  useEffect(() => edge.stop, [edge])
   return useMemo(
     () => ({
-      /* How far the list has scrolled since the drag began, as the finger moves
-         it there. A row the list carried is as far along as one the finger did. */
-      at: (pageY: number): number => {
-        const box = frame.current
-        const by = box === null ? 0 : edgeStep(pageY - box.y, box.height)
-        if (by !== 0) {
-          list.current?.scrollToOffset?.({
-            animated: false,
-            offset: Math.max(0, offset.current + by),
-          })
-        }
-        return offset.current - began.current
-      },
-      begin: () => {
+      begin: (grip: HostInstance | null) => {
         const node = list.current?.getNativeScrollRef?.() as HostInstance | null | undefined
+        page.current = node ? null : grip && scrollViewAbove(grip)
+        const held = node ?? page.current
+        offset.current = page.current ? scroll().offset(page.current).y : offset.current
         began.current = offset.current
-        frame.current = node ? measure().box(node) : null
+        frame.current = held ? measure().box(held) : null
+      },
+      /* Scrolls on from where the list stands, and tells `carried` how far the
+         list has scrolled since the drag began: a row the list carried is as
+         far along as one the finger did. */
+      follow: (pageY: number, carried: (by: number) => void) => {
+        let at = offset.current
+        edge.follow((frames) => {
+          const by = speedAt(frame.current, pageY)
+          if (by !== 0) {
+            at = Math.max(0, at + by * frames)
+            if (page.current) {
+              offset.current = at
+            }
+            scrollTarget(page.current, list.current, at)
+          }
+          carried(at - began.current)
+          return by !== 0
+        })
       },
       listRef: (next: RowsList | null) => {
         list.current = next
@@ -91,8 +119,9 @@ const useEdgeScroll = () => {
       moved: (at: number) => {
         offset.current = at
       },
+      stop: edge.stop,
     }),
-    [],
+    [edge],
   )
 }
 
@@ -223,19 +252,24 @@ export const useMoves = (
     edge,
     grip: {
       drag: {
-        end: (dropped: boolean) => drop(dropped),
+        end: (dropped: boolean) => {
+          edge.stop()
+          drop(dropped)
+        },
         move: (travel: number, pageY: number) => {
-          const now = holding.current
-          if (now === undefined) {
+          if (holding.current === undefined) {
             return
           }
-          const to = travelTo(everyKey, heights, now.from, travel + edge.at(pageY))
-          if (to !== now.to) {
-            step(to)
-          }
+          edge.follow(pageY, (by) => {
+            const now = holding.current
+            const to = now && travelTo(everyKey, heights, now.from, travel + by)
+            if (now && to !== now.to) {
+              step(to as number)
+            }
+          })
         },
-        start: (held: string) => {
-          edge.begin()
+        start: (held: string, grip: HostInstance | null) => {
+          edge.begin(grip)
           if (holding.current?.key !== held) {
             pick(held)
           }

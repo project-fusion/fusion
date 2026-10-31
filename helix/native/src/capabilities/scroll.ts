@@ -225,6 +225,28 @@ export const scrollViewAbove = (node: HostInstance): ScrollViewInstance | null =
 }
 
 /**
+ * Holds every scroll view above `node` still until the stop is called, as
+ * `touch-action: none` keeps a browser from scrolling under a touch. A
+ * programmatic scroll still moves them.
+ */
+export const holdScrollViewsAbove = (node: HostInstance): (() => void) => {
+  const held: ScrollViewInstance[] = []
+  let up = node.parentElement as HostInstance | null
+  while (up) {
+    if (isScrollView(up)) {
+      held.push(up)
+      up.setNativeProps({ scrollEnabled: false })
+    }
+    up = up.parentElement as HostInstance | null
+  }
+  return () => {
+    for (const view of held) {
+      view.setNativeProps({ scrollEnabled: true })
+    }
+  }
+}
+
+/**
  * How far to scroll along one axis to show a part: back to its start where it
  * begins before the view, on to its end where it runs past it, and nowhere
  * where it is inside. A part longer than the view shows its start.
