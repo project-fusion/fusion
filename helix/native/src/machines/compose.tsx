@@ -36,6 +36,8 @@ import { setting } from './setting'
 import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
 import { stackRow } from './stack-row'
+import { useTable } from './table'
+import { useTableColumn, useTableRow } from './table-row'
 import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
 import { useTree } from './tree'
@@ -242,6 +244,28 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useTreeItem(family, props, use, around.toggled),
+      ),
+    /* A table, and a row and a column of one. */
+    ...uses
+      .filter((use) => use.machine === 'table')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTable(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'table-row')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTableRow(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'table-column')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTableColumn(family, props, use),
       ),
     /* An object inspector's rows, which its field's text narrows. */
     ...uses
