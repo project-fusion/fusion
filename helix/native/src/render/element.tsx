@@ -10,7 +10,7 @@
  * passed down to the text inside it.
  */
 import { type ComponentType, useRef, useState } from 'react'
-import { type LayoutChangeEvent, View } from 'react-native'
+import { Dimensions, type LayoutChangeEvent, View } from 'react-native'
 import Reanimated from 'react-native-reanimated'
 import { useLocale } from '../capabilities/locale'
 import type { Context } from '../style/context'
@@ -164,7 +164,10 @@ const textOf = (slotted: Slotted | undefined): Style => (slotted ? split(slotted
 const useOwnWidth = (reads: boolean) => {
   const [width, setWidth] = useState<number | undefined>(undefined)
   return {
-    context: width === undefined ? {} : { width },
+    /* A host stands within the window, so one that fits a window under a rule's
+       width holds that rule from its first frame. */
+    context:
+      width === undefined ? (reads ? { widest: Dimensions.get('window').width } : {}) : { width },
     measure: reads ? setWidth : undefined,
   }
 }

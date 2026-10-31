@@ -204,6 +204,8 @@ export interface Context {
    * against. Absent outside a layer, where no rule reads the window.
    */
   readonly viewport?: Viewport
+  /** The most the host can measure until it is laid out, which is the window's width. */
+  readonly widest?: number
   /**
    * The host's own laid-out width, in points, which a width condition reads.
    * No width condition holds before the host is laid out.
