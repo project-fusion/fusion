@@ -324,6 +324,10 @@ const perform = async (
         rowAt(mounted, intent.row)?.focus()
         return
       }
+      if (intent.item === undefined && mounted.root.localName === 'helix-listbox') {
+        mounted.root.shadowRoot?.querySelector<HTMLElement>('[part="items"]')?.focus()
+        return
+      }
       if (intent.item === undefined && mounted.root.localName === 'helix-table') {
         tableStop(mounted.root)?.focus()
         return
