@@ -364,9 +364,10 @@ export interface CarouselChoice {
   readonly perView?: string
   readonly previousLabel?: string
   readonly roleLabel?: string
+  readonly rotationFirst?: string
   readonly rotationIcon?: string
+  readonly rotationLast?: string
   readonly rotationName?: string
-  readonly rotationShown?: string
   readonly slideLabel?: string
   readonly slideRoleLabel?: string
   readonly slidesPerMove?: string

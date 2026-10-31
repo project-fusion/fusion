@@ -294,9 +294,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'dotsName'
     | 'named'
     | 'panes'
+    | 'rotationFirst'
     | 'rotationIcon'
+    | 'rotationLast'
     | 'rotationName'
-    | 'rotationShown'
     | 'spoken'
     | 'stops'
   >
