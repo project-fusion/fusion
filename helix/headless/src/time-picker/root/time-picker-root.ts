@@ -639,7 +639,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     if (from === undefined || to === '' || this.held.length > 2) {
       return false
     }
-    return at > (from < to ? from : to) && at < (from < to ? to : from)
+    const [low = from, high = to] = [from, to].sort()
+    return at > low && at < high
   }
 
   /** The readings the wheels show, from the value or from `min`. */

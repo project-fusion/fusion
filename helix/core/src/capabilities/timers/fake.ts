@@ -96,7 +96,7 @@ export const fakeTimers = (wall = FAKE_WALL_START): FakeTimers => {
   return {
     advance: (ms) => {
       /* The clock only moves forward, so a step below zero is no step. */
-      const until = now + (ms > 0 ? ms : 0)
+      const until = now + Math.max(ms, 0)
       let runs = 0
       for (let due = soonest(timeouts, until); due; due = soonest(timeouts, until)) {
         runs += 1
@@ -160,7 +160,7 @@ export const fakeTimers = (wall = FAKE_WALL_START): FakeTimers => {
       asked.push(ms)
       /* As `setTimeout` does, a wait below zero, or one that is not a number,
          is no wait at all. */
-      const entry: Waiting = { at: now + (ms > 0 ? ms : 0), done }
+      const entry: Waiting = { at: now + Math.max(ms, 0), done }
       timeouts.add(entry)
       return () => {
         timeouts.delete(entry)
