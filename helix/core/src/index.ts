@@ -607,6 +607,7 @@ export {
   qrModules,
   qrPath,
 } from './utils/qr-code/qr-code.js'
+export { highlightStep } from './utils/listbox/highlight-step.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
 export { type RangeExtension, rangeExtend } from './utils/range-extend/range-extend.js'
 export {

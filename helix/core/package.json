@@ -179,6 +179,10 @@
       "types": "./dist/utils/swipe/swipe.d.ts",
       "default": "./dist/utils/swipe/swipe.js"
     },
+    "./listbox": {
+      "types": "./dist/utils/listbox/listbox.d.ts",
+      "default": "./dist/utils/listbox/listbox.js"
+    },
     "./table": {
       "types": "./dist/utils/table/table.d.ts",
       "default": "./dist/utils/table/table.js"
