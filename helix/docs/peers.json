@@ -1,6 +1,6 @@
 {
-  "bun": "1.1.43",
-  "measured": "2026-10-09",
+  "bun": "1.4.3",
+  "measured": "2026-10-31",
   "systems": [
     {
       "elements": [
@@ -236,45 +236,45 @@
       "package": "@carbon/web-components",
       "parts": {
         "button": {
-          "brotli": 17685,
-          "gzip": 20959,
-          "raw": 133058,
+          "brotli": 17673,
+          "gzip": 20696,
+          "raw": 133019,
           "specifier": "@carbon/web-components/es/components/button/index.js"
         },
         "checkbox": {
-          "brotli": 13550,
-          "gzip": 15609,
-          "raw": 60255,
+          "brotli": 13476,
+          "gzip": 15349,
+          "raw": 60226,
           "specifier": "@carbon/web-components/es/components/checkbox/index.js"
         },
         "dialog": {
-          "brotli": 39189,
-          "gzip": 67390,
-          "raw": 510866,
+          "brotli": 39054,
+          "gzip": 66753,
+          "raw": 510751,
           "specifier": "@carbon/web-components/es/components/modal/index.js"
         },
         "radio": {
-          "brotli": 14605,
-          "gzip": 16887,
-          "raw": 63055,
+          "brotli": 14519,
+          "gzip": 16599,
+          "raw": 62982,
           "specifier": "@carbon/web-components/es/components/radio-button/index.js"
         },
         "switch": {
-          "brotli": 14764,
-          "gzip": 17127,
-          "raw": 69423,
+          "brotli": 14710,
+          "gzip": 16861,
+          "raw": 69388,
           "specifier": "@carbon/web-components/es/components/toggle/index.js"
         },
         "tabs": {
-          "brotli": 43235,
-          "gzip": 73537,
-          "raw": 578766,
+          "brotli": 43044,
+          "gzip": 72708,
+          "raw": 578657,
           "specifier": "@carbon/web-components/es/components/tabs/index.js"
         },
         "tooltip": {
-          "brotli": 22273,
-          "gzip": 30354,
-          "raw": 189382,
+          "brotli": 22169,
+          "gzip": 29833,
+          "raw": 189319,
           "specifier": "@carbon/web-components/es/components/tooltip/index.js"
         }
       },
@@ -356,39 +356,39 @@
       "package": "@material/web",
       "parts": {
         "button": {
-          "brotli": 12591,
-          "gzip": 14173,
-          "raw": 47060,
+          "brotli": 12488,
+          "gzip": 13980,
+          "raw": 47039,
           "specifier": "@material/web/button/filled-button.js"
         },
         "checkbox": {
-          "brotli": 12015,
-          "gzip": 13556,
-          "raw": 43785,
+          "brotli": 11940,
+          "gzip": 13361,
+          "raw": 43770,
           "specifier": "@material/web/checkbox/checkbox.js"
         },
         "dialog": {
-          "brotli": 10229,
-          "gzip": 11510,
-          "raw": 34238,
+          "brotli": 10171,
+          "gzip": 11327,
+          "raw": 34234,
           "specifier": "@material/web/dialog/dialog.js"
         },
         "radio": {
-          "brotli": 11757,
-          "gzip": 13234,
-          "raw": 41044,
+          "brotli": 11659,
+          "gzip": 13048,
+          "raw": 41029,
           "specifier": "@material/web/radio/radio.js"
         },
         "switch": {
-          "brotli": 12935,
-          "gzip": 14577,
-          "raw": 50155,
+          "brotli": 12869,
+          "gzip": 14355,
+          "raw": 50129,
           "specifier": "@material/web/switch/switch.js"
         },
         "tabs": {
-          "brotli": 11368,
-          "gzip": 12820,
-          "raw": 38883,
+          "brotli": 11290,
+          "gzip": 12619,
+          "raw": 38875,
           "specifier": "@material/web/tabs/tabs.js"
         }
       },
@@ -496,45 +496,45 @@
       "package": "@spectrum-web-components/button",
       "parts": {
         "button": {
-          "brotli": 18674,
-          "gzip": 22045,
-          "raw": 98792,
+          "brotli": 18547,
+          "gzip": 21731,
+          "raw": 98861,
           "specifier": "@spectrum-web-components/button/sp-button.js"
         },
         "checkbox": {
-          "brotli": 13481,
-          "gzip": 15437,
-          "raw": 62492,
+          "brotli": 12834,
+          "gzip": 14720,
+          "raw": 60006,
           "specifier": "@spectrum-web-components/checkbox/sp-checkbox.js"
         },
         "dialog": {
-          "brotli": 26262,
-          "gzip": 31899,
-          "raw": 155708,
+          "brotli": 25567,
+          "gzip": 30766,
+          "raw": 152934,
           "specifier": "@spectrum-web-components/dialog/sp-dialog.js"
         },
         "radio": {
-          "brotli": 9370,
-          "gzip": 10660,
-          "raw": 38685,
+          "brotli": 9337,
+          "gzip": 10485,
+          "raw": 38765,
           "specifier": "@spectrum-web-components/radio/sp-radio.js"
         },
         "switch": {
-          "brotli": 13321,
-          "gzip": 15059,
-          "raw": 62322,
+          "brotli": 13259,
+          "gzip": 14852,
+          "raw": 62390,
           "specifier": "@spectrum-web-components/switch/sp-switch.js"
         },
         "tabs": {
-          "brotli": 16283,
-          "gzip": 18298,
-          "raw": 64875,
+          "brotli": 16004,
+          "gzip": 17857,
+          "raw": 64371,
           "specifier": "@spectrum-web-components/tabs/sp-tabs.js"
         },
         "tooltip": {
-          "brotli": 35286,
-          "gzip": 40552,
-          "raw": 136599,
+          "brotli": 34997,
+          "gzip": 39731,
+          "raw": 136084,
           "specifier": "@spectrum-web-components/tooltip/sp-tooltip.js"
         }
       },
@@ -630,45 +630,45 @@
       "package": "@awesome.me/webawesome",
       "parts": {
         "button": {
-          "brotli": 28760,
-          "gzip": 33730,
-          "raw": 136044,
+          "brotli": 28815,
+          "gzip": 34015,
+          "raw": 136082,
           "specifier": "@awesome.me/webawesome/dist/components/button/button.js"
         },
         "checkbox": {
-          "brotli": 24420,
-          "gzip": 28728,
-          "raw": 115251,
+          "brotli": 24391,
+          "gzip": 28720,
+          "raw": 115313,
           "specifier": "@awesome.me/webawesome/dist/components/checkbox/checkbox.js"
         },
         "dialog": {
-          "brotli": 31388,
-          "gzip": 36692,
-          "raw": 148657,
+          "brotli": 31476,
+          "gzip": 36894,
+          "raw": 148696,
           "specifier": "@awesome.me/webawesome/dist/components/dialog/dialog.js"
         },
         "radio": {
-          "brotli": 23128,
-          "gzip": 27416,
-          "raw": 112026,
+          "brotli": 23157,
+          "gzip": 27426,
+          "raw": 112100,
           "specifier": "@awesome.me/webawesome/dist/components/radio/radio.js"
         },
         "switch": {
-          "brotli": 13475,
-          "gzip": 15003,
-          "raw": 45876,
+          "brotli": 13489,
+          "gzip": 15043,
+          "raw": 45922,
           "specifier": "@awesome.me/webawesome/dist/components/switch/switch.js"
         },
         "tabs": {
-          "brotli": 31737,
-          "gzip": 37030,
-          "raw": 153439,
+          "brotli": 31779,
+          "gzip": 37241,
+          "raw": 153457,
           "specifier": "@awesome.me/webawesome/dist/components/tab-group/tab-group.js"
         },
         "tooltip": {
-          "brotli": 21107,
-          "gzip": 24005,
-          "raw": 70568,
+          "brotli": 21032,
+          "gzip": 23540,
+          "raw": 70482,
           "specifier": "@awesome.me/webawesome/dist/components/tooltip/tooltip.js"
         }
       },
