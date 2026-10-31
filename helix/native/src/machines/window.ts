@@ -25,6 +25,7 @@ import {
 } from '@fusion.dev/helix-core/virtual-list'
 import { formatMessage } from '@fusion.dev/helix-core/words'
 import {
+  type ReactNode,
   type Ref,
   type RefObject,
   useCallback,
@@ -110,6 +111,17 @@ export interface WindowDrawing {
   readonly plain?: boolean
   /** The rows, in order. */
   readonly rows: readonly DrawnRow[]
+  /**
+   * The drawings of rows that have not changed, by each row's own object, so a
+   * list appended to quickly draws only what it gained.
+   */
+  readonly kept?: WeakMap<DrawnRow, ReactNode>
+  /** What holds a reader's place as content above them goes. */
+  readonly maintainVisibleContentPosition?: { readonly minIndexForVisible: number }
+  /** Whether a row may run past the frame, which then scrolls across as well. */
+  readonly sideways?: boolean
+  /** Whether the list is as long as what it holds, up to the room it has. */
+  readonly shrinks?: boolean
   /** Where a waterfall stands each item, where the list is one. */
   readonly waterfall?: WindowWall
 }
@@ -123,6 +135,7 @@ export interface WindowScroller {
     viewPosition?: number
   }) => void
   readonly scrollToOffset?: (to: { animated?: boolean; offset: number }) => void
+  readonly scrollToEnd?: (to: { animated?: boolean }) => void
 }
 
 /** What a list's `ref` holds, as the web element's methods offer them. */

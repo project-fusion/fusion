@@ -5,6 +5,7 @@ import type { Copied } from './copy'
 import type { Entered } from './entry'
 import type { Joined } from './join'
 import type { Spun } from './spin'
+import type { Tail } from './tail'
 import type { Turned } from './toggle'
 
 /** What every machine of one element reads beside its props, at one render. */
@@ -62,6 +63,8 @@ export interface Around {
   }
   /** The element's toggle, where it turns on and off. */
   readonly toggled: Turned | undefined
+  /** The box that follows its newest content, which a machine draws in. */
+  readonly tail: { current: Tail | undefined }
   /** Touches the verdict on the element's answer, as a change does. */
   readonly touch: () => void
 }
