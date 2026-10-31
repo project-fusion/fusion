@@ -49,6 +49,9 @@ const WEB = new Set(['class', 'className', 'id', 'style'])
  */
 const READ = new Set(['data-color-mode', 'data-density', 'data-grid-span'])
 
+/** The recipes an `a` draws by, which only it reads. */
+const LINK = new Set(['data-button', 'data-button-tone', 'data-card', 'data-link'])
+
 /** An attribute as the native prop of the same meaning. */
 const propOf = (name: string, value: unknown, out: Record<string, unknown>): void => {
   if (READ.has(name)) {
@@ -84,6 +87,42 @@ const joined = (children: React.ReactNode): React.ReactNode =>
     ? children.join('')
     : children
 
+/** Whether a child flows in a line of words, as `code` or a `span` does on the web. */
+const flows = (child: React.ReactNode): boolean =>
+  typeof child === 'string' ||
+  typeof child === 'number' ||
+  (React.isValidElement(child) &&
+    (child.type === TAGS.code || child.type === TAGS.span || child.type === TAGS.strong))
+
+/**
+ * **Words and what flows among them are one paragraph**, as the web lays them
+ * out, and not a box for each piece: `Pause <code>orders</code>.` in a list item.
+ * A run with no words in it stays as it is.
+ */
+const runsOf = (children: readonly React.ReactNode[]): React.ReactNode[] => {
+  const out: React.ReactNode[] = []
+  let run: React.ReactNode[] = []
+  const close = () => {
+    const said = run.some((one) => typeof one === 'string' && one.trim() !== '')
+    if (said && run.length > 1) {
+      out.push(React.createElement(Span, { key: `run-${out.length}` }, ...run))
+    } else {
+      out.push(...run)
+    }
+    run = []
+  }
+  for (const child of children) {
+    if (flows(child)) {
+      run.push(child)
+    } else {
+      close()
+      out.push(child)
+    }
+  }
+  close()
+  return out
+}
+
 /* **A slotted child is the region prop it names.** Words alone are the
    region's words, except in a region that names the element, as a meter's
    `label`: there words are its name and draw nothing, so the words a web
@@ -110,8 +149,9 @@ const regionsOf = (tag: string, children: React.ReactNode, out: Record<string, u
   for (const [name, values] of Object.entries(lifted)) {
     out[name] = name === 'panels' || values.length > 1 ? values : values[0]
   }
-  if (rest.length > 0) {
-    out.children = rest.length === 1 ? rest[0] : rest
+  const flowed = tag === 'helix-text' ? rest : runsOf(rest)
+  if (flowed.length > 0) {
+    out.children = flowed.length === 1 ? flowed[0] : flowed
   }
 }
 
@@ -160,6 +200,13 @@ const translate = (type: unknown, props: Props): readonly [unknown, Props] => {
   const hooks = styledHooks(type, props.style)
   if (hooks !== undefined) {
     out.hooks = { ...hooks, ...(out.hooks as Record<string, unknown> | undefined) }
+  }
+  if (type === 'a') {
+    for (const name of LINK) {
+      if (props[name] !== undefined) {
+        out[name] = props[name]
+      }
+    }
   }
   regionsOf(type, props.children, out)
   return [target, out]
