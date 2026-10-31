@@ -52,6 +52,7 @@ export type Family =
   | 'toolbar'
   | 'tooltip'
   | 'tour'
+  | 'tree'
 
 /** The families the web half alone records until a phone draws them. None is staged now. */
 export type Staged = never

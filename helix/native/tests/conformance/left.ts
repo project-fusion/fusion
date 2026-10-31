@@ -6,6 +6,7 @@ import { formOf, HOST_STATES, isElement } from './forms'
 import { layerIn, PAGE } from './layers'
 import { rangeLeft } from './range'
 import { textLeft } from './text'
+import { treeLeft } from './tree'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
 import { windowLeft } from './window'
 
@@ -98,6 +99,7 @@ const opens = (run: Run): boolean => {
   return (
     typeof child === 'object' &&
     isElement(child.tag) &&
+    formOf(child.tag).api?.treeItem === undefined &&
     formOf(child.tag).api?.toggle?.opens !== undefined
   )
 }
@@ -225,6 +227,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...rangeLeft(run),
     ...filesLeft(run),
     ...windowLeft(run),
+    ...treeLeft(run),
     ...colorLeft(run),
   }
 }

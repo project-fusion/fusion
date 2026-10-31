@@ -330,6 +330,21 @@ export interface Left {
    */
   readonly files?: readonly string[]
   /**
+   * What a screen reader hears of each row a reader can reach in a tree, in
+   * order: the web reads the row's `aria-` attributes, and React Native what
+   * its row says in its state and its value.
+   */
+  readonly tree?: readonly {
+    readonly checked: boolean | 'mixed' | null
+    readonly disabled: boolean
+    readonly expanded: boolean | null
+    readonly level: number
+    readonly position: number
+    readonly selected: boolean | null
+    readonly size: number
+    readonly value: string
+  }[]
+  /**
    * The keys chosen and the row with focus, by its place in the set, for a
    * family whose items arrive as data: the web reads its `value` and the row
    * that holds focus, and React Native what its window machine holds.

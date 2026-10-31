@@ -22,6 +22,7 @@ import {
 } from '@fusion.dev/helix-testing/conformance'
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { ReactElement } from 'react'
+import { cloneElement } from 'react'
 import { Text } from 'react-native'
 import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
@@ -197,6 +198,9 @@ const draw = (run: Run, setup: Setup, value: string | null): ReactElement => {
     const made = drawChild(run, child)
     if (typeof child === 'string' || child.slot === undefined) {
       children.push(made)
+    } else if (child.slot === 'children') {
+      /* A region named `children` stands among `children`, which no prop can name apart. */
+      children.push(cloneElement(made as ReactElement<{ slot?: string }>, { slot: 'children' }))
     } else {
       const region = camel(child.slot)
       props[region] = [...((props[region] as ReactElement[] | undefined) ?? []), made]
