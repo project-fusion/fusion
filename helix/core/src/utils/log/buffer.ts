@@ -395,3 +395,45 @@ export class LogBuffer {
     }
   }
 }
+
+/**
+ * The runs of lines a list of numbers and ranges names, such as `2, 4-6`, as
+ * `[first, last]` pairs counted from 1, in order and merged where they touch.
+ * Anything that is not a whole number or a range of them is passed over, and
+ * a range written backward is read forward.
+ */
+export const lineRuns = (list: string): Array<[number, number]> => {
+  const runs: Array<[number, number]> = []
+  for (const piece of list.split(/[\s,]+/)) {
+    const range = /^(\d+)(?:-(\d+))?$/.exec(piece)
+    if (!range) {
+      continue
+    }
+    const a = Number(range[1])
+    const b = Number(range[2] ?? range[1])
+    if (a < 1 || b < 1) {
+      continue
+    }
+    runs.push([Math.min(a, b), Math.max(a, b)])
+  }
+  runs.sort((x, y) => x[0] - y[0])
+  const merged: Array<[number, number]> = []
+  for (const run of runs) {
+    const last = merged.at(-1)
+    if (last && run[0] <= last[1] + 1) {
+      last[1] = Math.max(last[1], run[1])
+    } else {
+      merged.push([run[0], run[1]])
+    }
+  }
+  return merged
+}
+
+/** `seconds` as `m:ss`, or `h:mm:ss` from an hour, which is how far into a run reads. */
+export const elapsedClock = (seconds: number): string => {
+  const whole = Math.max(0, Math.floor(seconds))
+  const hours = Math.floor(whole / 3600)
+  const minutes = Math.floor((whole % 3600) / 60)
+  const rest = String(whole % 60).padStart(2, '0')
+  return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${rest}` : `${minutes}:${rest}`
+}
