@@ -15,7 +15,7 @@ export const lineCount = (code: string): number =>
 export const gutterNumbers = (count: number): string =>
   Array.from({ length: count }, (_, index) => String(index + 1)).join('\n')
 
-export { lineRuns } from '@fusion.dev/helix-core/log'
+export { lineRuns } from '../log/log.js'
 
 /**
  * Where each line of `text` starts and ends, as character offsets, the line

@@ -81,6 +81,10 @@
       "types": "./dist/capabilities/types.generated.d.ts",
       "default": "./dist/capabilities/types.generated.js"
     },
+    "./code-block": {
+      "types": "./dist/utils/code-block/code-block.d.ts",
+      "default": "./dist/utils/code-block/code-block.js"
+    },
     "./color-picker": {
       "types": "./dist/utils/color-picker/color-picker.d.ts",
       "default": "./dist/utils/color-picker/color-picker.js"

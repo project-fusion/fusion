@@ -10,23 +10,30 @@ import {
   stopPress,
   words,
 } from '@fusion.dev/helix-core'
-import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import { html } from 'lit/static-html.js'
-import '../../copy-button/index.js'
-import { highlightedLines } from '../highlight.js'
-import { HighlighterController, registeredHighlighter } from '../highlighter.js'
-import { keyedLines } from '../keyed-lines.js'
-import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import {
+  type CodeBlockTokens,
   type DiffFile,
   type DiffHunk,
   type DiffLine,
   type DiffRun,
   foldContext,
+  gutterNumbers,
+  hearTokens,
+  highlightedLines,
+  lineCount,
+  lineRuns,
+  lineSpans,
   pairLines,
   parsePatch,
-} from '../patch.js'
+  registeredTokens,
+  runsMarkup,
+} from '@fusion.dev/helix-core/code-block'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
+import '../../copy-button/index.js'
+import { HighlighterController, registeredHighlighter } from '../highlighter.js'
+import { keyedLines } from '../keyed-lines.js'
 
 /** Whether an element is a Code Block, of either tier, by its tag. */
 const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>
@@ -406,14 +413,18 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   language = ''
 
   /**
-   * How a diff's two versions are arranged. It has no effect without `diff`.
+   * Turns the code into runs of one look each, where a highlighter gives those
+   * and not HTML, such as `shikiTokens` over Shiki's `codeToTokensWithThemes`.
+   * Called with the code as written and the block's `language`, and returning
+   * nothing for a language it does not read, which the block draws plain. A
+   * `highlight` wins over it. It is what a phone draws, as a phone has no HTML
+   * to draw, and a phone reads a `highlight` as well, from the tags and inline
+   * styles of what it returns. Not called on a server, nor for a diff.
    *
-   * Absent is unified, each removal above its replacement, which fits any
-   * width. `split` sets the old version beside the new one. Optional rather
-   * than defaulted, so the host carries no attribute the consumer did not write.
+   * Absent, the block draws with what `registerTokens` gave every block.
    */
-  @property({ reflect: true })
-  layout?: 'split'
+  @property({ attribute: false })
+  tokens?: CodeBlockTokens
 
   /**
    * Whether the lines are numbered in a gutter beside the code.
@@ -916,6 +927,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       this.observer ??= new MutationObserver(() => this.requestUpdate())
       this.observer.observe(this, { characterData: true, childList: true, subtree: true })
     }
+    this.stopTokens = hearTokens(() => this.requestUpdate())
   }
 
   override disconnectedCallback(): void {
@@ -923,6 +935,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     this.sizes?.disconnect()
     this.sizes = undefined
     this.observer?.disconnect()
+    this.stopTokens?.()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -932,6 +945,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   /** On the page's list of elements a highlighter registration reaches. */
   protected readonly highlighting = new HighlighterController(this)
+
+  /** Stops hearing the page register other tokens. */
+  private stopTokens: (() => void) | undefined
 
   /** The page registered another highlighter: draws again with it. */
   highlighterChanged(): void {
@@ -952,9 +968,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        is reported as uncaught and the code is drawn plain, as Sandbox Source
        draws its source. */
     let highlighted: string | undefined
-    const highlight = this.highlight ?? registeredHighlighter()
     try {
-      const markup = highlight && text !== '' ? highlight(text, this.language) : undefined
+      const markup = text === '' ? undefined : this.markup(text)
       highlighted = markup === undefined ? undefined : highlightedLines(markup)
     } catch (error) {
       globalThis.reportError?.(error)
@@ -1022,6 +1037,19 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         <pre id="block" part="block" translate="no">${gutter}${code}</pre>
         ${this.headed(drawn) ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
+  }
+
+  /**
+   * What the block draws its code with: its own `highlight`, then its own
+   * `tokens`, then what the page registered, in the same order.
+   */
+  private markup(text: string): string | undefined {
+    const highlight = this.highlight ?? (this.tokens ? undefined : registeredHighlighter())
+    if (highlight) {
+      return highlight(text, this.language)
+    }
+    const runs = (this.tokens ?? registeredTokens())?.(text, this.language)
+    return runs === undefined ? undefined : runsMarkup(runs)
   }
 
   /**
