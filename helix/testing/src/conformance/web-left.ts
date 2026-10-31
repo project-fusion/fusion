@@ -133,6 +133,27 @@ const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   }
 }
 
+/** What a carousel says of its panes and its dots, and which dot has focus. */
+const carouselOf = (mounted: Mounted): NonNullable<Left['carousel']> => {
+  const shadow = mounted.root.shadowRoot
+  const all = (selector: string): Element[] => [...(shadow?.querySelectorAll(selector) ?? [])]
+  const named = (one: Element | null | undefined): string => one?.getAttribute('aria-label') ?? ''
+  const dots = all('[part~="indicator"]')
+  const stuck = (part: string): boolean =>
+    shadow?.querySelector(`[part="${part}"]`)?.getAttribute('aria-disabled') === 'true'
+  const at = dots.findIndex((one) => one.getAttribute('aria-current') === 'true')
+  const held = dots.indexOf(shadow?.activeElement as Element)
+  return {
+    current: at < 0 ? null : at,
+    dots: dots.map(named),
+    focused: held < 0 ? null : held,
+    next: stuck('next'),
+    panes: all('[part="slide"]').map(named),
+    previous: stuck('previous'),
+    rotation: named(shadow?.querySelector('[part="rotation"]')),
+  }
+}
+
 /** What a chat or a composer says, as the record holds it. */
 const chatOf = (mounted: Mounted): NonNullable<Left['chat']> => {
   const shadow = mounted.root.shadowRoot
@@ -417,6 +438,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
+  ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
   ...(family === 'code-block' ? { codeBlock: codeBlockOf(mounted) } : {}),
   ...(family === 'chat'
     ? {
