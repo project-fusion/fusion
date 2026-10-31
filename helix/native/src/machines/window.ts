@@ -97,6 +97,8 @@ export interface WindowDrawing {
   readonly dragging?: WindowDrag
   /** The space between two rows, and between two columns. */
   readonly gap: number
+  /** The key of the row a reader holds in a move, which stays drawn while it is out of view. */
+  readonly held?: string
   /** Whether the list runs across. */
   readonly horizontal: boolean
   /** Hears the frame's width and height. */
@@ -769,6 +771,8 @@ export const useWindow = (
   const { across, columns, data, estimate, gap, horizontal, mode, reorderable, waterfall } = layout
   const rows = useRows(layout, chosen, Math.min(active, Math.max(0, data.length - 1)), drag)
 
+  const heldKey = drag === undefined ? undefined : rows.find((row) => row.dragging)?.key
+
   const measured = useCallback((at: number, height: number) => {
     setLengths((was) => (was.get(at) === height ? was : new Map(was).set(at, height)))
   }, [])
@@ -819,6 +823,7 @@ export const useWindow = (
     moved,
     rows,
     ...(reorderable ? { dragging } : {}),
+    ...(heldKey === undefined ? {} : { held: heldKey }),
     ...(wall === undefined ? {} : { waterfall: wall }),
   }
   const marks = [

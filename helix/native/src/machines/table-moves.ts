@@ -207,6 +207,7 @@ export const useMoves = (
       pick,
       still,
     },
+    held: hold?.key,
     moveOf,
   }
 }

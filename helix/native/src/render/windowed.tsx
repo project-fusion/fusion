@@ -4,7 +4,17 @@
  * what scrolls. A waterfall stands each item in a scroll view at the place
  * core's `Waterfall` gives it, and draws those that reach the screen.
  */
-import { Fragment, type ReactNode, type Ref, useCallback, useRef, useState } from 'react'
+import {
+  createContext,
+  Fragment,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import {
   FlatList,
   type LayoutChangeEvent,
@@ -13,6 +23,7 @@ import {
   type ScrollViewInstance,
   type ScrollViewProps,
   View,
+  type ViewProps,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import type { DrawnRow, WindowDrawing } from '../machines/window'
@@ -69,6 +80,36 @@ const Held = ({
   )
 }
 
+/** The key of the row a reader holds in a move, which its cell reads. */
+export const HeldRow = createContext<string | undefined>(undefined)
+
+/**
+ * A cell of a list. **The cell holding the held row stays drawn however far the
+ * list scrolls from it**, as a list keeps its focused cell: a row that left the
+ * window would end the touch on it. The list keeps the cell until another takes
+ * its place or its key goes, which a drop does when the row moves.
+ */
+export const Cell = ({
+  children,
+  item,
+  onFocusCapture,
+  onLayout,
+  style,
+}: ViewProps & { readonly item: DrawnRow | readonly DrawnRow[] }) => {
+  const held = useContext(HeldRow)
+  const holds = held !== undefined && [item].flat().some((row) => row.key === held)
+  useEffect(() => {
+    if (holds) {
+      onFocusCapture?.(undefined as never)
+    }
+  }, [holds, onFocusCapture])
+  return (
+    <View onFocusCapture={onFocusCapture} onLayout={onLayout} style={style}>
+      {children}
+    </View>
+  )
+}
+
 /** Each row's key. */
 const keyed = (row: DrawnRow): string => row.key
 
@@ -89,7 +130,7 @@ const lengthOf = (horizontal: boolean, shrinks: boolean) => {
 
 /** A list of rows, lines of columns, or a line across, in `FlatList`. */
 const Listed = ({ drawing, footer, row }: Drawing) => {
-  const { across, gap, horizontal, laid, listRef, moved, rows, shrinks, sideways } = drawing
+  const { across, gap, held, horizontal, laid, listRef, moved, rows, shrinks, sideways } = drawing
   const [width, setWidth] = useState(0)
   const list = useRef<FlatList<DrawnRow> | null>(null)
   const own = useCallback(
@@ -117,57 +158,60 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
   const lengthwise = lengthOf(horizontal, shrinks === true)
   const listed = (
     <ScrollView.Context.Provider value={null}>
-      <FlatList
-        columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
-        contentContainerStyle={gap > 0 && across > 1 ? { rowGap: gap } : undefined}
-        data={rows}
-        horizontal={horizontal}
-        ItemSeparatorComponent={
-          gap > 0 && across === 1
-            ? () => <View style={horizontal ? { width: gap } : { height: gap }} />
-            : undefined
-        }
-        key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
-        keyExtractor={keyed}
-        {...followingOf(drawing)}
-        ListFooterComponent={<View>{footer}</View>}
-        nestedScrollEnabled
-        numColumns={across}
-        onContentSizeChange={(contentWidth, contentHeight) => {
-          standing.current.content = horizontal ? contentWidth : contentHeight
-          tell()
-        }}
-        onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-          if (sideways !== true) {
-            setWidth(layout.width)
+      <HeldRow.Provider value={held}>
+        <FlatList
+          CellRendererComponent={Cell}
+          columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
+          contentContainerStyle={gap > 0 && across > 1 ? { rowGap: gap } : undefined}
+          data={rows}
+          horizontal={horizontal}
+          ItemSeparatorComponent={
+            gap > 0 && across === 1
+              ? () => <View style={horizontal ? { width: gap } : { height: gap }} />
+              : undefined
           }
-          standing.current.frame = horizontal ? layout.width : layout.height
-          laid(layout.width, layout.height)
-          tell()
-        }}
-        onScroll={({ nativeEvent }: Scrolled) => {
-          standing.current = {
-            content: horizontal ? nativeEvent.contentSize.width : nativeEvent.contentSize.height,
-            frame: horizontal
-              ? nativeEvent.layoutMeasurement.width
-              : nativeEvent.layoutMeasurement.height,
-            offset: horizontal ? nativeEvent.contentOffset.x : nativeEvent.contentOffset.y,
-          }
-          tell()
-        }}
-        onScrollToIndexFailed={(info) => {
-          const line = Math.max(1, info.averageItemLength)
-          list.current?.scrollToOffset({ animated: false, offset: line * info.index })
-          requestAnimationFrame(() =>
-            list.current?.scrollToIndex({ animated: false, index: info.index }),
-          )
-        }}
-        ref={own}
-        renderItem={drawCell}
-        renderScrollComponent={scrollIn}
-        scrollEventThrottle={16}
-        style={lengthwise}
-      />
+          key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
+          keyExtractor={keyed}
+          {...followingOf(drawing)}
+          ListFooterComponent={<View>{footer}</View>}
+          nestedScrollEnabled
+          numColumns={across}
+          onContentSizeChange={(contentWidth, contentHeight) => {
+            standing.current.content = horizontal ? contentWidth : contentHeight
+            tell()
+            }}
+          onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+            if (sideways !== true) {
+              setWidth(layout.width)
+            }
+            standing.current.frame = horizontal ? layout.width : layout.height
+            laid(layout.width, layout.height)
+            tell()
+            }}
+          onScroll={({ nativeEvent }: Scrolled) => {
+            standing.current = {
+              content: horizontal ? nativeEvent.contentSize.width : nativeEvent.contentSize.height,
+              frame: horizontal
+                ? nativeEvent.layoutMeasurement.width
+                : nativeEvent.layoutMeasurement.height,
+              offset: horizontal ? nativeEvent.contentOffset.x : nativeEvent.contentOffset.y,
+            }
+            tell()
+          }}
+          onScrollToIndexFailed={(info) => {
+            const line = Math.max(1, info.averageItemLength)
+            list.current?.scrollToOffset({ animated: false, offset: line * info.index })
+            requestAnimationFrame(() =>
+              list.current?.scrollToIndex({ animated: false, index: info.index }),
+            )
+          }}
+          ref={own}
+          renderItem={drawCell}
+          renderScrollComponent={scrollIn}
+          scrollEventThrottle={16}
+          style={lengthwise}
+        />
+      </HeldRow.Provider>
     </ScrollView.Context.Provider>
   )
   /* A row that runs past the frame scrolls across around the list, which scrolls
