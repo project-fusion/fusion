@@ -200,6 +200,27 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly files: Computes<'list'>
   /** The rows near the screen an element that windows a long set draws. */
   readonly window: Computes<'list'>
+  /** What a tree computes. */
+  readonly treeRoot: Computes<'empty'>
+  /** What an item of a tree computes for its parts. */
+  readonly treeItem: Computes<
+    | 'branch'
+    | 'checkable'
+    | 'checkMark'
+    | 'chevronEnd'
+    | 'chevronLabel'
+    | 'chevronStart'
+    | 'dashMark'
+    | 'grip'
+    | 'heading'
+    | 'leaf'
+    | 'level'
+    | 'linked'
+    | 'nested'
+    | 'place'
+    | 'reserved'
+    | 'subordinate'
+  >
   /** What a tour's stop computes, and the words of its Back, Next, and Skip. */
   readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
     readonly words: Computes<'back' | 'next' | 'skip'>
@@ -521,6 +542,8 @@ export const Image = (_: ImageAttributes): Drawn => node()
 
 /** What a person presses, as `pressable()` says. */
 export interface PressableAttributes extends Named {
+  /** Custom properties a rule's `measured()` reads, as a tree row's level. */
+  readonly style?: Style
   readonly checked?: Given
   readonly children?: Child
   /** The press empties the element's field, as its `entry` says. */

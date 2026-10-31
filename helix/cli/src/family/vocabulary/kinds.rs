@@ -73,6 +73,10 @@ pub const ROLES: &[Role] = &[
     role("presentation", Announced::Nothing),
     role("progressbar", Announced::Trait("progressbar")),
     role("radio", Announced::Trait("radio")),
+    /* A hierarchy and one of its items. iOS and Android have no trait for
+    either, so a row's level and its place are said in its value. */
+    role("tree", Announced::Role("tree")),
+    role("treeitem", Announced::Role("treeitem")),
     role("radiogroup", Announced::Trait("radiogroup")),
     /* A landmark of its own, named by its label, as an open accordion
     section is. */
