@@ -28,6 +28,27 @@ fn family(source: &str) -> Family {
 }
 
 #[test]
+fn a_repeat_inside_a_copy_reads_a_list_from_a_field_of_that_copy() {
+    let block = read(
+        "export default headless('kbd', {
+          props: [prop('keys', 'object')],
+          tree: [repeat('rows', { each: bind('keys'), key: 'at' }, [
+            repeat('cells', { each: field('cells'), key: 'at' }, [
+              text('cell', { says: field('words') }),
+            ]),
+          ])],
+        })",
+    )
+    .unwrap();
+    assert_eq!(
+        block.tree[0].children[0].attributes["each"],
+        Attribute::Field {
+            field: "cells".to_owned()
+        }
+    );
+}
+
+#[test]
 fn a_repeat_draws_a_copy_for_each_entry_of_a_list_a_derivation_computes() {
     let kbd = read(
         "export default headless('kbd', {

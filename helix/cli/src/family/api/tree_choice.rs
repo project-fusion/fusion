@@ -242,6 +242,44 @@ pub const NOTIFICATION_ROW_COMPUTED: &[&str] = &[
     "stamped",
 ];
 
+/// What a block of code reads and sends, by the name the machine binds.
+pub const CODE_BLOCK: &[(&str, Names)] = &[
+    ("addedLines", Names::Prop),
+    ("codeLabel", Names::Prop),
+    ("codeNameLabel", Names::Prop),
+    ("collapseLabel", Names::Prop),
+    ("contextLines", Names::Prop),
+    ("copyLabel", Names::Prop),
+    ("copyNameLabel", Names::Prop),
+    ("diff", Names::Prop),
+    ("expandLabel", Names::Prop),
+    ("expandable", Names::Prop),
+    ("file", Names::Prop),
+    ("filesLabel", Names::Prop),
+    ("hideUnchangedLabel", Names::Prop),
+    ("highlight", Names::Prop),
+    ("label", Names::Prop),
+    ("language", Names::Prop),
+    ("lineNumbers", Names::Prop),
+    ("markLines", Names::Prop),
+    ("noCopy", Names::Prop),
+    ("removedLines", Names::Prop),
+    ("showUnchangedLabel", Names::Prop),
+    ("tokens", Names::Prop),
+    ("variant", Names::Prop),
+    ("wrap", Names::Prop),
+    ("wrapLabel", Names::Prop),
+    ("wrappable", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onBeforeCheck", Names::Event),
+    ("onChange", Names::Event),
+    ("onCheck", Names::Event),
+];
+
+/// What a block of code computes for its parts, each read as `codeBlock.x`.
+pub const CODE_BLOCK_COMPUTED: &[&str] =
+    &["expandHidden", "expandWords", "panes", "several", "tabs"];
+
 /// What a group of notifications reads and sends, by the name the machine binds.
 pub const NOTIFICATION_GROUP: &[(&str, Names)] = &[
     ("collapsible", Names::Prop),
@@ -468,6 +506,11 @@ pub fn notification_row(lit: &Lit) -> Result<TreeChoice, String> {
     )
 }
 
+/// `codeBlock({ ... })`, each field a name.
+pub fn code_block(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "codeBlock", CODE_BLOCK, CODE_BLOCK_COMPUTED)
+}
+
 /// `notificationGroup({ ... })`, each field a name.
 pub fn notification_group(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -493,6 +536,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationsRoot" => notifications_root(value),
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
+        "codeBlock" => code_block(value),
         _ => inspector(value),
     }
 }
