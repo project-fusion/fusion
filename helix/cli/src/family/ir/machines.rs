@@ -86,8 +86,8 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, TABLE, TABLE_COLUMN,
-    TABLE_ROW, TREE, TREE_ITEM,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, LOG_GROUP, LOG_LINE,
+    LOG_ROOT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -221,6 +221,7 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
         uses.push(treed(inspector, INSPECTOR, "inspector"));
     }
     uses.extend(tabled(api));
+    uses.extend(logged(api));
     if let Some(color) = &api.color {
         uses.push(colored(color, tree));
     }
@@ -621,6 +622,22 @@ fn windowed(window: &WindowChoice) -> MachineUse {
 /// A tree or an item of one, bound to what it reads, holds, and sends, and to
 /// the values it computes. **No machine of core's holds it**: the web's elements
 /// walk their own items, and the native runtime hosts it by the name given.
+/// The tail before the log, which draws its rows in the box the tail follows, and
+/// a line and a step of one.
+fn logged(api: &Api) -> Vec<MachineUse> {
+    [
+        (&api.tail, TAIL, "tail"),
+        (&api.log_root, LOG_ROOT, "log"),
+        (&api.log_line, LOG_LINE, "log-line"),
+        (&api.log_group, LOG_GROUP, "log-group"),
+    ]
+    .into_iter()
+    .filter_map(|(choice, table, machine)| {
+        choice.as_ref().map(|choice| treed(choice, table, machine))
+    })
+    .collect()
+}
+
 fn treed(
     choice: &TreeChoice,
     table: &'static [(&'static str, crate::family::api::Names)],

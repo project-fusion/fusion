@@ -100,6 +100,10 @@ impl<'a> Names<'a> {
                         .chain(family.api.table.iter())
                         .chain(family.api.table_row.iter())
                         .chain(family.api.table_column.iter())
+                        .chain(family.api.log_root.iter())
+                        .chain(family.api.log_line.iter())
+                        .chain(family.api.log_group.iter())
+                        .chain(family.api.tail.iter())
                         .flat_map(|item| item.computed.values().map(String::as_str)),
                 )
                 /* And what a color computes as it moves, as a color picker's. */
@@ -223,6 +227,16 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             &names,
             &mut found,
         );
+    }
+    for (feature, choice, table) in [
+        ("logRoot", &family.api.log_root, api::LOG_ROOT),
+        ("logLine", &family.api.log_line, api::LOG_LINE),
+        ("logGroup", &family.api.log_group, api::LOG_GROUP),
+        ("tail", &family.api.tail, api::TAIL),
+    ] {
+        if let Some(choice) = choice {
+            references(feature, choice.references(table), &names, &mut found);
+        }
     }
     if let Some(inspector) = &family.api.inspector {
         references(

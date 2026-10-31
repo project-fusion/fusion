@@ -56,9 +56,13 @@ import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
   InspectorChoice,
+  LogGroupChoice,
+  LogLineChoice,
+  LogRootChoice,
   TableChoice,
   TableColumnChoice,
   TableRowChoice,
+  TailChoice,
   TreeChoice,
   TreeItemChoice,
 } from './tree-choice.js'
@@ -281,6 +285,14 @@ export interface Headless {
   readonly tableRow?: TableRowChoice
   /** What it reads, sends, and computes where it is a column of a table. */
   readonly tableColumn?: TableColumnChoice
+  /** What the element reads, sends, and computes where it is a log. */
+  readonly logRoot?: LogRootChoice
+  /** What the element reads and computes where it is a line of a log. */
+  readonly logLine?: LogLineChoice
+  /** What the element reads and computes where it is a step of a log. */
+  readonly logGroup?: LogGroupChoice
+  /** What the element reads, sends, and computes where a box follows its newest content. */
+  readonly tail?: TailChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */
