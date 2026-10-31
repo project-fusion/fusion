@@ -296,7 +296,7 @@ export const element = (
   const present = presenceOf(family)
   const presence = readsCondition(family, 'holds')
   const safe = readsSafeArea(family)
-  const Drawn = (given: Props) => {
+  const drawing = (given: Props) => {
     warnSharedCode(family, given)
     const passed = useFieldset(family, given)
     const props = folded(family, totaled(family, passed))
@@ -398,7 +398,7 @@ export const element = (
     return dense(theme, stop, behavior.provide === undefined ? placed : behavior.provide(placed))
   }
   /* The tag the element around finds this one's `::slotted()` style by. */
-  const made = Object.assign(Drawn, { displayName: family.tag, tag: family.tag })
+  const made = Object.assign(drawing, { displayName: family.tag, tag: family.tag })
   keepMade(family, made)
   return made
 }

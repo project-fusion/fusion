@@ -111,6 +111,19 @@ const frames = (json: unknown): string[] => {
   })
 }
 
+const Counted = ({
+  children,
+  mounted,
+}: {
+  readonly children: string
+  readonly mounted: () => void
+}) => {
+  useEffect(() => {
+    mounted()
+  }, [mounted])
+  return <Text>{children}</Text>
+}
+
 describe('the generated Grid', () => {
   test('is a column with no role, and its cells one to a line until it is measured', async () => {
     const view = await render(
@@ -273,17 +286,16 @@ describe('the generated Grid', () => {
 
   test('keeps each cell drawn where it was as it reflows, so what it holds keeps its state', async () => {
     let mounts = 0
-    const Counted = ({ children }: { readonly children: string }) => {
-      useEffect(() => {
-        mounts += 1
-      }, [])
-      return <Text>{children}</Text>
+    const mounted = () => {
+      mounts += 1
     }
     await render(
       themed(
         <HelixGrid min="10rem">
           {['A', 'B', 'C'].map((words) => (
-            <Counted key={words}>{words}</Counted>
+            <Counted key={words} mounted={mounted}>
+              {words}
+            </Counted>
           ))}
         </HelixGrid>,
       ),

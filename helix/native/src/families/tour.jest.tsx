@@ -137,6 +137,10 @@ beforeEach(() => {
   setAnnounce(announced)
 })
 
+function Later({ shown }: { readonly shown: boolean }) {
+  return shown ? <Measured box={[0, 0, 10, 10]} id="later" /> : null
+}
+
 describe('the generated Tour', () => {
   test('shows its first stop, with Skip and Next and no Back, and says its name, its words, and its place', async () => {
     await draw(tour())
@@ -235,9 +239,6 @@ describe('the generated Tour', () => {
 
   test('a `wait` stop waits for its target to register, then moves on by itself', async () => {
     const status = jest.fn()
-    function Later({ shown }: { readonly shown: boolean }) {
-      return shown ? <Measured box={[0, 0, 10, 10]} id="later" /> : null
-    }
     const stops = (
       <>
         <HelixTourStop for="save">
