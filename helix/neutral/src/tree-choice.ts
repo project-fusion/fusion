@@ -336,6 +336,46 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a carousel reads, sends, and computes, by the names the element gives them. */
+export interface CarouselChoice {
+  readonly arrows?: string
+  readonly atEnd?: string
+  readonly atStart?: string
+  readonly autoplay?: string
+  readonly controls?: string
+  readonly controlsPlacement?: string
+  readonly defaultIndex?: string
+  readonly dotsName?: string
+  readonly dotted?: string
+  readonly fallbackLabel?: string
+  readonly index?: string
+  readonly indicatorLabel?: string
+  readonly indicatorPlacement?: string
+  readonly indicatorsLabel?: string
+  readonly interval?: string
+  readonly label?: string
+  readonly loop?: string
+  readonly named?: string
+  readonly nextLabel?: string
+  readonly onActivate?: string
+  readonly onBeforeActivate?: string
+  readonly orientation?: string
+  readonly panes?: string
+  readonly perView?: string
+  readonly previousLabel?: string
+  readonly roleLabel?: string
+  readonly rotationIcon?: string
+  readonly rotationName?: string
+  readonly rotationShown?: string
+  readonly slideLabel?: string
+  readonly slideRoleLabel?: string
+  readonly slidesPerMove?: string
+  readonly spoken?: string
+  readonly startLabel?: string
+  readonly stopLabel?: string
+  readonly stops?: string
+}
+
 /** What a conversation binds, by the name the machine reads. */
 export interface ChatRootChoice {
   readonly actionsEmpty?: string

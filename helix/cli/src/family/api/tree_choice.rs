@@ -310,6 +310,50 @@ pub const CHAT_ROOT: &[(&str, Names)] = &[
     ("typingLabel", Names::Prop),
 ];
 
+/// What a carousel reads and sends, by the name the machine binds.
+pub const CAROUSEL: &[(&str, Names)] = &[
+    ("autoplay", Names::Prop),
+    ("controls", Names::Prop),
+    ("controlsPlacement", Names::Prop),
+    ("defaultIndex", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("index", Names::Prop),
+    ("indicatorLabel", Names::Prop),
+    ("indicatorPlacement", Names::Prop),
+    ("indicatorsLabel", Names::Prop),
+    ("interval", Names::Prop),
+    ("label", Names::Prop),
+    ("loop", Names::Prop),
+    ("nextLabel", Names::Prop),
+    ("orientation", Names::Prop),
+    ("perView", Names::Prop),
+    ("previousLabel", Names::Prop),
+    ("roleLabel", Names::Prop),
+    ("slideLabel", Names::Prop),
+    ("slideRoleLabel", Names::Prop),
+    ("slidesPerMove", Names::Prop),
+    ("startLabel", Names::Prop),
+    ("stopLabel", Names::Prop),
+    ("onActivate", Names::Event),
+    ("onBeforeActivate", Names::Event),
+];
+
+/// What a carousel computes for its parts, each read as `carousel.x`.
+pub const CAROUSEL_COMPUTED: &[&str] = &[
+    "arrows",
+    "atEnd",
+    "atStart",
+    "dotted",
+    "dotsName",
+    "named",
+    "panes",
+    "rotationIcon",
+    "rotationName",
+    "rotationShown",
+    "spoken",
+    "stops",
+];
+
 /// What a conversation computes for its parts, each read as `chatRoot.x`.
 pub const CHAT_ROOT_COMPUTED: &[&str] = &[
     "actionsEmpty",
@@ -577,6 +621,11 @@ pub fn log_group(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "logGroup", LOG_GROUP, LOG_GROUP_COMPUTED)
 }
 
+/// `carousel({ ... })`, each field a name.
+pub fn carousel(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "carousel", CAROUSEL, CAROUSEL_COMPUTED)
+}
+
 /// `chatRoot({ ... })`, each field a name.
 pub fn chat_root(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "chatRoot", CHAT_ROOT, CHAT_ROOT_COMPUTED)
@@ -647,6 +696,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationsRoot" => notifications_root(value),
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
+        "carousel" => carousel(value),
         "chatRoot" => chat_root(value),
         "chatMessage" => chat_message(value),
         "chatComposer" => chat_composer(value),
