@@ -17,6 +17,7 @@ import { mountSetup } from './web-mount.js'
 import { adjust, frame, pointAt, rangeKey, slide } from './web-range.js'
 import { scroll } from './web-scroll.js'
 import { laySections } from './web-sections.js'
+import { tableStop } from './web-table.js'
 import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
 
 /*
@@ -198,6 +199,18 @@ const hold = (
 
 /** Moves an item one place with its grip: Space picks it up, an arrow moves it, Space drops it. */
 const nudge = async (mounted: Mounted, item: Element, by: -1 | 1): Promise<void> => {
+  /* A table's grip is a button in a cell: a click picks the row up, and a second drops it. */
+  const button = item.shadowRoot?.querySelector<HTMLElement>('[part~="grip-button"]')
+  if (button) {
+    button.focus()
+    button.click()
+    await settle(mounted)
+    key(by > 0 ? 'ArrowDown' : 'ArrowUp', undefined)
+    await settle(mounted)
+    button.click()
+    await settle(mounted)
+    return
+  }
   const grip = item.shadowRoot?.querySelector<HTMLElement>('[part~="grip"]')
   grip?.focus()
   for (const name of [' ', by > 0 ? 'ArrowDown' : 'ArrowUp', ' ']) {
@@ -276,6 +289,10 @@ const perform = async (
       }
       if (intent.row !== undefined) {
         rowAt(mounted, intent.row)?.focus()
+        return
+      }
+      if (intent.item === undefined && mounted.root.localName === 'helix-table') {
+        tableStop(mounted.root)?.focus()
         return
       }
       const target = item(intent.item) as Updatable & { focusItem?: () => void }
