@@ -1,4 +1,3 @@
-import { regionContent } from './region-content'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import type { Node } from '../style/form'
@@ -9,17 +8,9 @@ import { type Props, wrapped } from './behavior'
 import { flat, step } from './counters'
 import { celled, gridded, inCell, placementFor, within } from './grid'
 import { drawsOwn, eachChild, insideOf, wordsOf } from './passed'
+import { regionContent } from './region-content'
 import { silent } from './semantics'
-import {
-  bound,
-  type Draw,
-  inherit,
-  type Lazy,
-  laid,
-  resolve,
-  type Scope,
-  split,
-} from './styles'
+import { bound, type Draw, inherit, type Lazy, laid, resolve, type Scope, split } from './styles'
 import { ScaledText } from './text'
 
 /** Sends `load` to its handler. It cannot be canceled. */
@@ -137,7 +128,12 @@ const provided = (
      color and its size from it. */
   const [, inherits] = split(words)
   const counters: Record<string, number> = { ...scope.host.counting.reset }
-  const children = flat(content)
+  /* White space beside elements draws nothing, as HTML collapses it between boxes. */
+  const flattened = flat(content)
+  const children =
+    flattened.length > 1
+      ? flattened.filter((child) => typeof child !== 'string' || child.trim() !== '')
+      : flattened
   /* Each child's measured width, where the line around has one for every
      child: a child added or taken away is measured again with the rest. */
   const fill = scope.scrolling?.fill

@@ -319,19 +319,21 @@ export const drawDrawnNode = (
       regions[region] = held([child])
     }
   }
+  const heldHere = children.filter((child) => into(child) === undefined)
   return drawDrawn(
     scope,
     node,
     draws,
-    children
-      .filter((child) => into(child) === undefined)
-      .map((child) =>
-        child.kind === 'text' ? (
-          <RegionText key={child.name} node={child} scope={scope} />
-        ) : (
-          held([child])
+    /* A wrap that holds nothing leaves what a machine's copy gives, as a chat's turn. */
+    heldHere.length === 0
+      ? undefined
+      : heldHere.map((child) =>
+          child.kind === 'text' ? (
+            <RegionText key={child.name} node={child} scope={scope} />
+          ) : (
+            held([child])
+          ),
         ),
-      ),
     regions,
   )
 }

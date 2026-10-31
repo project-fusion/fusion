@@ -10,6 +10,7 @@ import {
   type LayoutChangeEvent,
   ScrollView,
   type ScrollViewInstance,
+  type ScrollViewProps,
   type StyleProp,
   type ViewStyle,
 } from 'react-native'
@@ -211,7 +212,15 @@ export const ScrollingPart = ({
   const scroller = useRef<ScrollViewInstance>(null)
   const { at, more, track } = useMore()
   const [frame, inner] = parted(box)
-  const { contentRef, indicators, pager, scrollerRef, style: over, ...props } = view
+  const {
+    contentRef,
+    indicators,
+    maintainVisibleContentPosition,
+    pager,
+    scrollerRef,
+    style: over,
+    ...props
+  } = view
   usePager(pager, scroller, at, horizontal)
   useScroller(scrollerRef, scroller)
   const laidOut = useContent(contentRef)
@@ -253,6 +262,9 @@ export const ScrollingPart = ({
       }}
       horizontal={horizontal || twoWays}
       innerViewRef={laidOut.held}
+      maintainVisibleContentPosition={
+        maintainVisibleContentPosition as ScrollViewProps['maintainVisibleContentPosition']
+      }
       onContentSizeChange={(width, height) => {
         track({ content: buttons === 'x' ? width : height })
         laidOut.sized(width, height)
