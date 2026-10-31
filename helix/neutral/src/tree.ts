@@ -54,7 +54,14 @@ import type { Toggle } from './toggle.js'
 import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
-import type { InspectorChoice, TreeChoice, TreeItemChoice } from './tree-choice.js'
+import type {
+  InspectorChoice,
+  TableChoice,
+  TableColumnChoice,
+  TableRowChoice,
+  TreeChoice,
+  TreeItemChoice,
+} from './tree-choice.js'
 import type { Validation } from './validation.js'
 import type { Window } from './window.js'
 
@@ -268,6 +275,12 @@ export interface Headless {
   readonly treeItem?: TreeItemChoice
   /** What it reads, sends, and computes where it shows a value as a tree of rows. */
   readonly inspector?: InspectorChoice
+  /** What it reads, sends, and computes where it is a table. */
+  readonly tableRoot?: TableChoice
+  /** What it reads and computes where it is a row of a table. */
+  readonly tableRow?: TableRowChoice
+  /** What it reads, sends, and computes where it is a column of a table. */
+  readonly tableColumn?: TableColumnChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */

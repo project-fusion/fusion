@@ -47,6 +47,7 @@ use ts_rs::TS;
 use crate::family::read::Lit;
 use members::event;
 use tree::node;
+use tree_choice::table_column as column_of;
 
 pub use clock::Clock;
 pub use collection::{Collection, Names};
@@ -71,7 +72,7 @@ pub use toolbar::Toolbar;
 pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
-pub use tree_choice::{TreeChoice, INSPECTOR, TREE, TREE_ITEM};
+pub use tree_choice::{TreeChoice, INSPECTOR, TABLE, TABLE_COLUMN, TABLE_ROW, TREE, TREE_ITEM};
 pub use validation::Validation;
 pub use window::WindowChoice;
 
@@ -137,6 +138,15 @@ pub struct Api {
     /// tree of rows, as an object inspector.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inspector: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a table.
+    #[serde(rename = "tableRoot", skip_serializing_if = "Option::is_none")]
+    pub table: Option<TreeChoice>,
+    /// What the element reads and computes where it is a row of a table.
+    #[serde(rename = "tableRow", skip_serializing_if = "Option::is_none")]
+    pub table_row: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a column of a table.
+    #[serde(rename = "tableColumn", skip_serializing_if = "Option::is_none")]
+    pub table_column: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -272,6 +282,9 @@ impl Api {
             && self.tree.is_none()
             && self.tree_item.is_none()
             && self.inspector.is_none()
+            && self.table.is_none()
+            && self.table_row.is_none()
+            && self.table_column.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -334,6 +347,9 @@ const FIELDS: &[&str] = &[
     "treeRoot",
     "treeItem",
     "inspector",
+    "tableRoot",
+    "tableRow",
+    "tableColumn",
     "fold",
     "host",
     "item",
@@ -438,6 +454,9 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             tree: field("treeRoot").map(tree_choice::tree).transpose()?,
             tree_item: field("treeItem").map(tree_choice::tree_item).transpose()?,
             inspector: field("inspector").map(tree_choice::inspector).transpose()?,
+            table: field("tableRoot").map(tree_choice::table).transpose()?,
+            table_row: field("tableRow").map(tree_choice::table_row).transpose()?,
+            table_column: field("tableColumn").map(column_of).transpose()?,
             fold,
             host,
             item,

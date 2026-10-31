@@ -64,7 +64,9 @@ pub fn describe(shape: Shape) -> String {
             listed(&mut kinds::ELEMENTS.iter().map(|element| element.name))
         ),
         Shape::Flag => "`true`, `false`, `bind()` or `not()`".to_owned(),
-        Shape::Function => "`bind()` to a prop that holds a function".to_owned(),
+        Shape::Function => {
+            "`bind()` to a prop that holds a function, or a copy's `field()`".to_owned()
+        }
         Shape::Length => {
             "a number, a string holding a number or a percentage, `bind()` or `derive()`".to_owned()
         }

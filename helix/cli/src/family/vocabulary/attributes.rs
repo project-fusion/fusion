@@ -461,7 +461,7 @@ fn fits(shape: Shape, value: &Attribute) -> bool {
         /* A copy's field may stand for any value but a list, and its place
         for a number or words. */
         | (
-            Shape::Count | Shape::Flag | Shape::Length | Shape::Number | Shape::Path | Shape::Words,
+            Shape::Count | Shape::Flag | Shape::Function | Shape::Length | Shape::Number | Shape::Path | Shape::Words,
             Attribute::Field { .. },
         )
         | (

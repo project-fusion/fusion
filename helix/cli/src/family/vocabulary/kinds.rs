@@ -75,6 +75,16 @@ pub const ROLES: &[Role] = &[
     role("radio", Announced::Trait("radio")),
     /* A hierarchy and one of its items. iOS and Android have no trait for
     either, so a row's level and its place are said in its value. */
+    /* A table and what it holds. iOS and Android have no trait for any of
+    them, so a cell says its column's heading with its words. */
+    role("cell", Announced::Role("cell")),
+    role("columnheader", Announced::Role("columnheader")),
+    role("grid", Announced::Role("grid")),
+    role("gridcell", Announced::Role("gridcell")),
+    role("row", Announced::Role("row")),
+    role("rowheader", Announced::Role("rowheader")),
+    role("table", Announced::Role("table")),
+    role("treegrid", Announced::Role("treegrid")),
     role("tree", Announced::Role("tree")),
     role("treeitem", Announced::Role("treeitem")),
     role("radiogroup", Announced::Trait("radiogroup")),
