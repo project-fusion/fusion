@@ -7,7 +7,9 @@ import { HelixObjectInspector } from './object-inspector/index.native'
 const VALUE = { id: 'dpl', link: 'https://fusion.dev', meta: { author: 'Ada' }, open: true }
 
 const draw = async (props: Record<string, unknown> = {}) => {
-  const Inspector = HelixObjectInspector as unknown as (given: Record<string, unknown>) => React.ReactNode
+  const Inspector = HelixObjectInspector as unknown as (
+    given: Record<string, unknown>,
+  ) => React.ReactNode
   return render(
     <HelixRoot>
       <Inspector label="Deployment" value={VALUE} {...props} />
@@ -61,7 +63,9 @@ describe('object inspector', () => {
   test('a new value keeps the branches a reader opened', async () => {
     const view = await draw()
     await fireEvent.press(screen.getByText('meta'))
-    const Inspector = HelixObjectInspector as unknown as (given: Record<string, unknown>) => React.ReactNode
+    const Inspector = HelixObjectInspector as unknown as (
+      given: Record<string, unknown>,
+    ) => React.ReactNode
     await view.rerender(
       <HelixRoot>
         <Inspector label="Deployment" value={{ ...VALUE, id: 'next' }} />
