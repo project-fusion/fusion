@@ -220,8 +220,36 @@ writeFileSync(
   )}\n`,
 )
 
+/* **A public package reaches readers minutes after its publish.** Measured
+   October 31, 2026, the first release after the packages went public: every
+   package published, the install two seconds later found no `0.225.0` of
+   `helix-cli`, and that version answered within four minutes. Cortex's platform
+   packages arrived one at a time over a longer stretch. So an install that names
+   a version or tag the registry does not show yet is asked again, and one still
+   missing at the deadline fails below as a package that did not ship. Only this:
+   any other install error is real on its first answer.
+
+   `--no-cache` on the retries, because bun keeps the packument it just read. */
+const NOT_VISIBLE_YET = /No version matching|with tag "[^"]+" not found/
+const VISIBLE_WITHIN_MS = 15 * 60 * 1000
+const installStarted = Date.now()
+
+const installFromRegistry = (again = false) => {
+  try {
+    run('bun', again ? ['install', '--no-cache'] : ['install'], project)
+  } catch (error) {
+    const missing = NOT_VISIBLE_YET.test(`${error.stdout ?? ''}${error.stderr ?? ''}`)
+    if (registryTag === undefined || !missing || Date.now() - installStarted > VISIBLE_WITHIN_MS) {
+      throw error
+    }
+    console.log('The registry does not show every package yet. Asking again in 20 seconds.')
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20_000)
+    installFromRegistry(true)
+  }
+}
+
 try {
-  run('bun', ['install'], project)
+  installFromRegistry()
 } catch (error) {
   if (registryTag !== undefined && !process.env.NPM_TOKEN) {
     console.error(
