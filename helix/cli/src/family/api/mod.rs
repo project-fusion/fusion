@@ -71,6 +71,7 @@ pub use toolbar::Toolbar;
 pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
+pub use tree_choice::{TreeChoice, TREE, TREE_ITEM};
 pub use validation::Validation;
 pub use window::WindowChoice;
 
@@ -126,6 +127,12 @@ pub struct Api {
     /// What the element reads and sends where it windows a long set of items.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub window: Option<WindowChoice>,
+    /// What the element reads and sends where it holds the items of a tree.
+    #[serde(rename = "treeRoot", skip_serializing_if = "Option::is_none")]
+    pub tree: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is an item of a tree.
+    #[serde(rename = "treeItem", skip_serializing_if = "Option::is_none")]
+    pub tree_item: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -258,6 +265,8 @@ impl Api {
             && self.color_field.is_none()
             && self.files.is_none()
             && self.window.is_none()
+            && self.tree.is_none()
+            && self.tree_item.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -279,6 +288,20 @@ impl Api {
             && self.tour.is_none()
             && self.validation.is_none()
     }
+}
+
+/// Attributes by their names.
+type Attributes = BTreeMap<String, Attribute>;
+
+/// What an element computes from its props, and what its host says.
+fn derived_and_host(
+    derived: Option<&Lit>,
+    host: Option<&Lit>,
+) -> Result<(Attributes, Attributes), String> {
+    Ok((
+        derived.map(host::computed).transpose()?.unwrap_or_default(),
+        host.map(host::host).transpose()?.unwrap_or_default(),
+    ))
 }
 
 /// A headless source, read.
@@ -303,6 +326,8 @@ const FIELDS: &[&str] = &[
     "events",
     "files",
     "window",
+    "treeRoot",
+    "treeItem",
     "fold",
     "host",
     "item",
@@ -388,14 +413,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
     let validation = field("validation")
         .map(validation::validation)
         .transpose()?;
-    let derived = field("derived")
-        .map(host::computed)
-        .transpose()?
-        .unwrap_or_default();
-    let host = field("host")
-        .map(host::host)
-        .transpose()?
-        .unwrap_or_default();
+    let (derived, host) = derived_and_host(field("derived"), field("host"))?;
     let platform = platform_of(field("platform"))?;
     Ok(Headless {
         api: Api {
@@ -411,6 +429,8 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             color_field: field("colorField").map(color::color_field).transpose()?,
             files: field("files").map(files::files).transpose()?,
             window: field("window").map(window::window).transpose()?,
+            tree: field("treeRoot").map(tree_choice::tree).transpose()?,
+            tree_item: field("treeItem").map(tree_choice::tree_item).transpose()?,
             fold,
             host,
             item,
@@ -461,4 +481,5 @@ fn spelled(written: &[(String, Lit)]) -> Result<Vec<(String, Lit)>, String> {
 #[cfg(test)]
 #[path = "headless_tests.rs"]
 mod tests;
+mod tree_choice;
 mod window;
