@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTableColumn } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './table-column.css.js'
+import { styles } from './table-column.generated.css.js'
 
 /**
  * @summary One column of a table: its heading and its width.
