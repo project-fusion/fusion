@@ -1,4 +1,5 @@
-import { toggleEvery } from '@fusion.dev/helix-core'
+import { toggleEvery } from '../written-list/written-list.js'
+
 /** What the multiple selection reads of a row. */
 export interface CheckableRow {
   /** Whether the row is a branch, holding rows of its own. */

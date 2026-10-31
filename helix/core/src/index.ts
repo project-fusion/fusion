@@ -880,6 +880,12 @@ export {
   trackIndicator,
 } from './utils/track-indicator/track-indicator.js'
 export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
+export {
+  type CheckableRow,
+  checkedState,
+  checkRows,
+  pressRow,
+} from './utils/tree-selection/tree-selection.js'
 export { figureOf, movementOf } from './utils/trend-figure/trend-figure.js'
 export {
   Typeahead,
