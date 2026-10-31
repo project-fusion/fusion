@@ -1,11 +1,13 @@
+import { type CodeBlockTokens, markupRuns } from '@fusion.dev/helix-core/code-block'
 import { parser as cssParser } from '@lezer/css'
 import { classHighlighter, type Highlighter, highlightCode } from '@lezer/highlight'
 import { configureNesting, parser as htmlParser } from '@lezer/html'
 import { parser as jsParser } from '@lezer/javascript'
 import { parser as jsonParser } from '@lezer/json'
-import type { HighlightLanguage } from './language.js'
+import { type HighlightLanguage, languageOf } from './language.js'
 import { shellMode, shellTokens } from './shell.js'
 import { highlightStream } from './stream.js'
+import { syntaxHighlighter } from './syntax.js'
 
 /** The event attributes whose values are read as JavaScript, as CodeMirror's HTML reads them. */
 const EVENT_ATTRIBUTES = [
@@ -103,6 +105,17 @@ const PARSERS = {
   ts: typescript,
   tsx,
 } as const
+
+/**
+ * Highlights a snippet into runs, each naming its `--helix-color-syntax-*`
+ * token, for a Code Block's `tokens` and for a phone, which draws no HTML. Pure
+ * JavaScript and no DOM, so it runs on Hermes, and returns nothing for a language
+ * no grammar here reads.
+ */
+export const syntaxTokens: CodeBlockTokens = (code, language) => {
+  const grammar = languageOf(language)
+  return grammar ? markupRuns(highlight(code, grammar, syntaxHighlighter)) : undefined
+}
 
 const escapeHtml = (text: string): string =>
   text.replace(

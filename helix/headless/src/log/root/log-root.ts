@@ -45,7 +45,7 @@ import { repeat } from 'lit/directives/repeat.js'
 /* `static-html`'s `html`, because a row is drawn with the tier's own line and
    group tags, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
-import { lineRuns } from '../../code-block/lines.js'
+import { lineRuns } from '@fusion.dev/helix-core/log'
 import type { HelixHeadlessLogGroup } from '../group/log-group.js'
 import type { HelixHeadlessLogLine, LogTimes } from '../line/log-line.js'
 
