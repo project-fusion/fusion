@@ -86,7 +86,8 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, TREE, TREE_ITEM,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, TABLE, TABLE_COLUMN,
+    TABLE_ROW, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -160,6 +161,18 @@ pub enum Bound {
     State(String),
 }
 
+/// The machines an element runs where it is a table, or a row or a column of one.
+fn tabled(api: &Api) -> Vec<MachineUse> {
+    [
+        (&api.table, TABLE, "table"),
+        (&api.table_row, TABLE_ROW, "table-row"),
+        (&api.table_column, TABLE_COLUMN, "table-column"),
+    ]
+    .into_iter()
+    .filter_map(|(choice, names, name)| choice.as_ref().map(|one| treed(one, names, name)))
+    .collect()
+}
+
 /// The machines an element with this API and tree runs, the parts' presses
 /// first, in the order the tree draws them, then its toggle.
 pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
@@ -207,6 +220,7 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     if let Some(inspector) = &api.inspector {
         uses.push(treed(inspector, INSPECTOR, "inspector"));
     }
+    uses.extend(tabled(api));
     if let Some(color) = &api.color {
         uses.push(colored(color, tree));
     }

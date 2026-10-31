@@ -97,6 +97,72 @@ pub const COMPUTED: &[&str] = &[
     "subordinate",
 ];
 
+/// What a table reads and sends, by the name the machine binds.
+pub const TABLE: &[(&str, Names)] = &[
+    ("columns", Names::Prop),
+    ("defaultExpanded", Names::Prop),
+    ("defaultSelected", Names::Prop),
+    ("defaultSort", Names::Prop),
+    ("expanded", Names::Prop),
+    ("grid", Names::Prop),
+    ("label", Names::Prop),
+    ("loadMore", Names::Prop),
+    ("onBeforeExpand", Names::Event),
+    ("onBeforeReorder", Names::Event),
+    ("onBeforeSelect", Names::Event),
+    ("onBeforeSort", Names::Event),
+    ("onExpand", Names::Event),
+    ("onLoadMore", Names::Event),
+    ("onReorder", Names::Event),
+    ("onSelect", Names::Event),
+    ("onSort", Names::Event),
+    ("reorderable", Names::Prop),
+    ("selectable", Names::Prop),
+    ("selected", Names::Prop),
+    ("selectionBehavior", Names::Prop),
+    ("selectionMode", Names::Prop),
+    ("sort", Names::Prop),
+    ("windowed", Names::Prop),
+];
+
+/// What a table computes for its parts, each read as `tableRoot.x`.
+pub const TABLE_COMPUTED: &[&str] = &["empty", "every", "heads", "nests", "rows", "waiting"];
+
+/// What a row of a table reads, by the name the machine binds.
+pub const TABLE_ROW: &[(&str, Names)] = &[
+    ("disabled", Names::Prop),
+    ("href", Names::Prop),
+    ("parent", Names::Prop),
+    ("value", Names::Prop),
+];
+
+/// What a row of a table computes for its parts, each read as `tableRow.x`.
+pub const TABLE_ROW_COMPUTED: &[&str] = &[
+    "branch",
+    "cells",
+    "grips",
+    "gripStill",
+    "nests",
+    "selectable",
+    "selectedCell",
+];
+
+/// What a column of a table reads and sends, by the name the machine binds.
+pub const TABLE_COLUMN: &[(&str, Names)] = &[
+    ("field", Names::Prop),
+    ("onBeforeResize", Names::Event),
+    ("onResized", Names::Event),
+    ("resizable", Names::Prop),
+    ("resizeLabel", Names::Prop),
+    ("sortable", Names::Prop),
+    ("textAlign", Names::Prop),
+    ("width", Names::Prop),
+    ("widthLabel", Names::Prop),
+];
+
+/// What a column of a table computes for its parts, each read as `tableColumn.x`.
+pub const TABLE_COLUMN_COMPUTED: &[&str] = &["movable", "sorts", "still"];
+
 /// One element's reading of a tree: each name it binds, by the machine's name
 /// for it, and what the element computes.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema, TS)]
@@ -156,4 +222,31 @@ pub fn tree_item(lit: &Lit) -> Result<TreeChoice, String> {
 /// `inspector({ ... })`, each field a name.
 pub fn inspector(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "inspector", INSPECTOR, INSPECTOR_COMPUTED)
+}
+
+/// `tableRoot({ ... })`, each field a name.
+pub fn table(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "tableRoot", TABLE, TABLE_COMPUTED)
+}
+
+/// `tableRow({ ... })`, each field a name.
+pub fn table_row(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "tableRow", TABLE_ROW, TABLE_ROW_COMPUTED)
+}
+
+/// `tableColumn({ ... })`, each field a name.
+pub fn table_column(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "tableColumn", TABLE_COLUMN, TABLE_COLUMN_COMPUTED)
+}
+
+/// A tree, an inspector, or a part of a table, by the key its source writes it under.
+pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
+    match key {
+        "treeRoot" => tree(value),
+        "treeItem" => tree_item(value),
+        "tableRoot" => table(value),
+        "tableRow" => table_row(value),
+        "tableColumn" => table_column(value),
+        _ => inspector(value),
+    }
 }

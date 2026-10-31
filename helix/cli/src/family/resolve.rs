@@ -97,6 +97,9 @@ impl<'a> Names<'a> {
                         .iter()
                         .chain(family.api.tree.iter())
                         .chain(family.api.inspector.iter())
+                        .chain(family.api.table.iter())
+                        .chain(family.api.table_row.iter())
+                        .chain(family.api.table_column.iter())
                         .flat_map(|item| item.computed.values().map(String::as_str)),
                 )
                 /* And what a color computes as it moves, as a color picker's. */
@@ -193,6 +196,30 @@ pub fn unresolved(family: &Family) -> Vec<String> {
         references(
             "treeItem",
             item.references(api::TREE_ITEM),
+            &names,
+            &mut found,
+        );
+    }
+    if let Some(table) = &family.api.table {
+        references(
+            "tableRoot",
+            table.references(api::TABLE),
+            &names,
+            &mut found,
+        );
+    }
+    if let Some(row) = &family.api.table_row {
+        references(
+            "tableRow",
+            row.references(api::TABLE_ROW),
+            &names,
+            &mut found,
+        );
+    }
+    if let Some(column) = &family.api.table_column {
+        references(
+            "tableColumn",
+            column.references(api::TABLE_COLUMN),
             &names,
             &mut found,
         );
