@@ -180,9 +180,9 @@ jobs:
       # version was stamped into `helix/cli/Cargo.toml` here, which is what left
       # `Cargo.lock` naming a version the tree no longer had.
       # **`--no-default-features`, because the default is this repository's.**
-      # Each CLI's `internal` feature, on in every build here, holds the commands
-      # that check Fusion's own sources, such as `helix component`, and nobody
-      # who installs the binary runs them.
+      # Each CLI's `internal` feature, on in every build here, holds what checks
+      # Fusion's own sources, such as Helix's own component rules and `helix
+      # manifest build`, and nobody who installs the binary runs them.
       - name: Build
         if: steps.built.outputs.cache-hit != 'true'
         run: cargo build --release --locked --no-default-features -p fusion-${{ matrix.domain }}-cli --target ${{ matrix.target }}

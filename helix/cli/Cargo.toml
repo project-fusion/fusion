@@ -63,8 +63,9 @@ wit-component = { workspace = true }
 png = "0.18"
 
 # **On in every build here, and off in the binaries `binaries.yml` publishes**,
-# which build with `--no-default-features`. It holds `helix component`, the rules Helix's own components are held to:
-# this repository's tooling, which serves nobody who installs the command.
+# which build with `--no-default-features`. It holds the rules Helix's own components
+# are held to and `helix manifest build`: this repository's tooling, which serves nobody
+# who installs the command. `helix component` itself stays, with the public rules.
 [features]
 default = ["internal"]
 internal = []
