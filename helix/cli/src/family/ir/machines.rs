@@ -86,7 +86,7 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, TREE, TREE_ITEM,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, INSPECTOR, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -203,6 +203,9 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(item) = &api.tree_item {
         uses.push(treed(item, TREE_ITEM, "tree-item"));
+    }
+    if let Some(inspector) = &api.inspector {
+        uses.push(treed(inspector, INSPECTOR, "inspector"));
     }
     if let Some(color) = &api.color {
         uses.push(colored(color, tree));

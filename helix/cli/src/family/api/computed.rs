@@ -17,6 +17,7 @@ use crate::family::read::Lit;
 pub const FEATURES: &[&str] = &[
     "color",
     "colorField",
+    "inspector",
     "treeItem",
     "treeRoot",
     "copy",
@@ -67,14 +68,14 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "sections" => push("sections.list", &sections::sections(value)?.list),
             "files" => push("files.list", &files::files(value)?.list),
             "window" => push("window.list", &window::window(value)?.list),
-            "treeRoot" => {
-                for (field, name) in super::tree_choice::tree(value)?.computed {
-                    push(&format!("treeRoot.{field}"), &name);
-                }
-            }
-            "treeItem" => {
-                for (field, name) in super::tree_choice::tree_item(value)?.computed {
-                    push(&format!("treeItem.{field}"), &name);
+            "treeRoot" | "treeItem" | "inspector" => {
+                let choice = match key.as_str() {
+                    "treeRoot" => super::tree_choice::tree(value)?,
+                    "treeItem" => super::tree_choice::tree_item(value)?,
+                    _ => super::tree_choice::inspector(value)?,
+                };
+                for (field, name) in choice.computed {
+                    push(&format!("{key}.{field}"), &name);
                 }
             }
             "color" => {

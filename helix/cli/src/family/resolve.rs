@@ -96,6 +96,7 @@ impl<'a> Names<'a> {
                         .tree_item
                         .iter()
                         .chain(family.api.tree.iter())
+                        .chain(family.api.inspector.iter())
                         .flat_map(|item| item.computed.values().map(String::as_str)),
                 )
                 /* And what a color computes as it moves, as a color picker's. */
@@ -192,6 +193,14 @@ pub fn unresolved(family: &Family) -> Vec<String> {
         references(
             "treeItem",
             item.references(api::TREE_ITEM),
+            &names,
+            &mut found,
+        );
+    }
+    if let Some(inspector) = &family.api.inspector {
+        references(
+            "inspector",
+            inspector.references(api::INSPECTOR),
             &names,
             &mut found,
         );
