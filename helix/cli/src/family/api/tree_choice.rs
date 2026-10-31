@@ -349,7 +349,8 @@ pub const CAROUSEL_COMPUTED: &[&str] = &[
     "panes",
     "rotationIcon",
     "rotationName",
-    "rotationShown",
+    "rotationFirst",
+    "rotationLast",
     "spoken",
     "stops",
 ];

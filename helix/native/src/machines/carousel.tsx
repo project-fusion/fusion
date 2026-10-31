@@ -103,6 +103,15 @@ const slidesOf = (children: unknown): readonly ReactNode[] =>
       !isValidElement(child) || (child.props as { readonly slot?: unknown }).slot === undefined,
   )
 
+/**
+ * Where the rotation control stands among the arrows. The web's overlay moves it
+ * after them by `order`, and a phone stands it there in the tree.
+ */
+const rotationPlaces = (flag: (name: string) => string, autoplay: boolean, overlaid: boolean) => ({
+  [flag('rotationFirst')]: autoplay && !overlaid,
+  [flag('rotationLast')]: autoplay && overlaid,
+})
+
 /** Where a group of chrome stands in the host, given what each edge is padded by. */
 const insetOf = (
   side: Side,
@@ -117,7 +126,9 @@ const insetOf = (
     case 'bottom':
       return { bottom: 0, minHeight: bottom }
     case 'overlay':
-      return over === 'controls' ? { bottom, end: 0, start: 0, top } : { bottom }
+      return over === 'controls'
+        ? { bottom, end: 0, start: 0, top, zIndex: 1 }
+        : { bottom, zIndex: 1 }
     default:
       return { bottom, [side]: 0, top }
   }
@@ -385,6 +396,7 @@ const useChrome = (props: Props, vertical: boolean, controlsDrawn: boolean, dott
         style: insetOf(indicatorsSide, 'indicators', pads.top, pads.bottom),
       },
     },
+    overlaid: controlsSide === 'overlay',
     padding: {
       paddingBottom: pads.bottom,
       paddingEnd: pads.end,
@@ -587,7 +599,7 @@ export const useCarousel = (family: Family, props: Props, use: MachineUse): Beha
           [flag('named')]: named,
           [flag('rotationIcon')]: rotating ? 'stop' : 'play',
           [flag('rotationName')]: wordsIn(read(rotating ? 'stopLabel' : 'startLabel')),
-          [flag('rotationShown')]: autoplay,
+          ...rotationPlaces(flag, autoplay, chrome.overlaid),
         },
         view: {
           accessibilityLabel: [named, wordsIn(read('roleLabel'))].filter(Boolean).join(', '),
