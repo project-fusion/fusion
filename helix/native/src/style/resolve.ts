@@ -9,7 +9,7 @@
 
 import { length } from './apply.js'
 import { calc, LINED, percentCalc, rounded, viewported } from './calc.js'
-import { mix } from './color.js'
+import { mix, writtenColor } from './color.js'
 import type { Context } from './context.js'
 import type { Family, Rule, Value } from './form.js'
 import { measuredCalc } from './grid/form.js'
@@ -211,6 +211,13 @@ export const resolverFor = ({
     }
     return false
   }
+  /* **A hook set to a `color-mix()` is the color it works out to**, as an
+     author's fill is in a chat's `author-styles`: a device draws nothing for
+     the words. */
+  const variable = (name: string) =>
+    custom().get(name) ?? (name.startsWith('helix-') ? context.tokens[name.slice(6)] : undefined)
+  const writtenMix = (set: Resolution): Resolution =>
+    typeof set === 'string' && set.includes('color-mix(') ? writtenColor(set, variable) : set
   const resolve = (value: Value): Resolution => {
     if ('text' in value) {
       /* A native view inherits no color, so `currentColor` is resolved here,
@@ -250,7 +257,7 @@ export const resolverFor = ({
       const ref = typeof hookSet === 'string' ? TOKEN_REF.exec(hookSet.trim()) : null
       const set =
         ref?.[1] === undefined
-          ? hookSet
+          ? writtenMix(hookSet)
           : (custom().get(`helix-${ref[1]}`) ?? context.tokens[ref[1]])
       if (set !== undefined) {
         return typeof set === 'string'
