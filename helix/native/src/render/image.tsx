@@ -12,6 +12,7 @@ import { wrapped } from './behavior'
 import { pictureView } from './picture'
 import { silent } from './semantics'
 import { bound, fromText, laid, resolve, type Scope, split } from './styles'
+import { SvgPicture, svgFromUri } from './svg-picture'
 
 /**
  * Draws an image node: its picture from its `src`, read by a screen reader
@@ -35,14 +36,14 @@ export const drawImage = (scope: Scope, node: Node, text: Style): ReactNode => {
         }
   const view = laid(scope.behavior, node.name, { ...said, style: box }, scope.item)
   const Image = pictureView()
-  return wrapped(
-    scope.behavior,
-    node.name,
-    typeof src === 'string' && src !== '' ? (
+  const markup = typeof src === 'string' ? svgFromUri(src) : undefined
+  const picture =
+    markup !== undefined ? (
+      <SvgPicture key={node.name} {...view} markup={markup} />
+    ) : typeof src === 'string' && src !== '' ? (
       <Image key={node.name} {...view} source={{ uri: src }} />
     ) : (
       <View key={node.name} {...view} />
-    ),
-    node.name,
-  )
+    )
+  return wrapped(scope.behavior, node.name, picture, node.name)
 }
