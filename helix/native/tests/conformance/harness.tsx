@@ -36,6 +36,7 @@ import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { logPress, logProps, logRows, logs } from './log'
+import { chatPress, chatProps, chats } from './chat'
 import { feedFocus, feedPress, feeds } from './notifications'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
@@ -189,6 +190,7 @@ const drawChild = (run: Run, child: Setup | string): ReactElement | string => {
 const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
   ...(setup.items === undefined ? {} : { items: setup.items }),
   ...logProps(setup),
+  ...chatProps(setup),
   ...(setup.value === undefined ? {} : { value: setup.value }),
 })
 
@@ -278,6 +280,13 @@ const press = async (
   setup: Setup,
   intent: Extract<Intent, { kind: 'press' }>,
 ): Promise<string | undefined> => {
+  if (chats(setup)) {
+    const pressed = intent.part === undefined ? undefined : chatPress(intent.part)
+    if (pressed !== undefined) {
+      await tap(pressed)
+    }
+    return undefined
+  }
   if (!feeds(setup)) {
     return pressPlain(setup, intent)
   }

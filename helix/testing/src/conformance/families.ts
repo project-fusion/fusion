@@ -34,6 +34,7 @@ export type Family =
   | 'number-input'
   | 'code-block'
   | 'log'
+  | 'chat'
   | 'notifications'
   | 'object-inspector'
   | 'table'
