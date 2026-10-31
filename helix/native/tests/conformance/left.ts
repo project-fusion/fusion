@@ -1,5 +1,7 @@
 import { type Left, panelsOf, type Setup } from '@fusion.dev/helix-testing/conformance'
 import { screen } from '@testing-library/react-native'
+import { carouselLeft } from './carousel'
+import { chatLeft } from './chat'
 import { codeBlockLeft } from './code-block'
 import { colorLeft } from './color'
 import { filesLeft } from './files'
@@ -7,7 +9,6 @@ import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
 import { logLeft } from './log'
-import { chatLeft } from './chat'
 import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
@@ -239,6 +240,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...treeLeft(run),
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
+    ...carouselLeft(run),
     ...chatLeft(run),
     ...feedLeft(run),
     ...tableLeft(run),

@@ -27,6 +27,8 @@ import { Text } from 'react-native'
 import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
+import { carouselDot, carouselPress, carousels } from './carousel'
+import { chatPress, chatProps, chats } from './chat'
 import { codeBlockPresses, codeBlocks } from './code-block'
 import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
 import { fakePicker, pickIn, picksFiles } from './files'
@@ -36,7 +38,6 @@ import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { logPress, logProps, logRows, logs } from './log'
-import { chatPress, chatProps, chats } from './chat'
 import { feedFocus, feedPress, feeds } from './notifications'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
@@ -280,6 +281,13 @@ const press = async (
   setup: Setup,
   intent: Extract<Intent, { kind: 'press' }>,
 ): Promise<string | undefined> => {
+  if (carousels(setup)) {
+    const pressed = carouselPress(setup, intent.part, intent.row)
+    if (pressed !== undefined && pressed.props.accessibilityState?.disabled !== true) {
+      await tap(pressed)
+    }
+    return undefined
+  }
   if (chats(setup)) {
     const pressed = intent.part === undefined ? undefined : chatPress(intent.part)
     if (pressed !== undefined) {
@@ -299,6 +307,10 @@ const press = async (
 
 /** Puts focus on a row of a feed, or where a `focus` intent says. */
 const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+  if (intent.row !== undefined && carousels(run.scenario.setup)) {
+    run.focus.place(rowNode(run, carouselDot(run.scenario.setup, intent.row)))
+    return
+  }
   if (intent.row !== undefined && codeBlocks(run.scenario.setup)) {
     run.focus.place(rowNode(run, codeBlockPresses()[intent.row]))
     return
