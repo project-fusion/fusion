@@ -402,8 +402,13 @@ const pressing = async (
 }
 
 /** Focus on what the setup draws. */
-const focusing = (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> =>
-  isTable(run.scenario) ? focusStop(run) : focusOn(run, intent)
+const focusing = (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+  /* A list's option holds focus from the press before it, where the web's is the list's. */
+  if (formOf(run.scenario.setup.tag).api?.listbox !== undefined && intent.item === undefined) {
+    return Promise.resolve()
+  }
+  return isTable(run.scenario) ? focusStop(run) : focusOn(run, intent)
+}
 
 /** A screen reader's move of an item. */
 const moving = (
