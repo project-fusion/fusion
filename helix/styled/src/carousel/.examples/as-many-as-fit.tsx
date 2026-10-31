@@ -5,6 +5,7 @@ export function Example() {
     <helix-carousel
       label="Folders"
       per-view="auto"
+      style={{ '--carousel-slide-min': '14rem' } as React.CSSProperties}
     >
       <helix-card separation="outlined">Reports</helix-card>
       <helix-card separation="outlined">Invoices</helix-card>
