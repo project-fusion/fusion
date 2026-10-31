@@ -46,7 +46,7 @@ impl<'a> Reader<'a, '_> {
 
     pub(super) fn read(&mut self, expression: &'a Expression<'a>) -> Result<Lit, String> {
         match expression {
-            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.to_string())),
+            Expression::StringLiteral(text) => Ok(Lit::Text(text.value.display().to_string())),
             Expression::NumericLiteral(number) => Ok(Lit::Number(number.value)),
             Expression::BooleanLiteral(flag) => Ok(Lit::Bool(flag.value)),
             Expression::NullLiteral(_) => Ok(Lit::Null),
@@ -70,7 +70,8 @@ impl<'a> Reader<'a, '_> {
                             } else {
                                 self.read(&property.value)?
                             };
-                            (vec![(key.to_string(), value)], property.span)
+                            let key = key.display().to_string();
+                            (vec![(key, value)], property.span)
                         }
                         ObjectPropertyKind::SpreadProperty(spread) => {
                             (self.spreads(&spread.argument, spread.span)?, spread.span)

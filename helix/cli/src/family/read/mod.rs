@@ -168,7 +168,7 @@ fn module_scope<'a>(program: &'a Program<'a>, source: &str) -> Scope<'a> {
                     };
                     scope
                         .imports
-                        .insert(local.to_string(), import.source.value.to_string());
+                        .insert(local.to_string(), import.source.value.display().to_string());
                 }
             }
             _ => {}
