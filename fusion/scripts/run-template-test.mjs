@@ -224,10 +224,10 @@ writeFileSync(
    October 31, 2026, the first release after the packages went public: every
    package published, the install two seconds later found no `0.225.0` of
    `helix-cli`, and that version answered within four minutes. Cortex's platform
-   packages arrived one at a time over a longer stretch. So an install that names
-   a version or tag the registry does not show yet is asked again, and one still
-   missing at the deadline fails below as a package that did not ship. Only this:
-   any other install error is real on its first answer.
+   packages arrived one at a time. So an install that names a version or tag the
+   registry does not show yet is asked again, and one still missing at the deadline
+   fails below as a package that did not ship. Only this: any other install error
+   is real on its first answer.
 
    `--no-cache` on the retries, because bun keeps the packument it just read. */
 const NOT_VISIBLE_YET = /No version matching|with tag "[^"]+" not found/
