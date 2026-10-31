@@ -26,6 +26,7 @@ import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
+import { useListbox } from './listbox'
 import { useLog } from './log'
 import { useLogGroup } from './log-group'
 import { useLogLine } from './log-line'
@@ -35,6 +36,7 @@ import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
 import { useNotification } from './notification'
 import { useNotificationGroup } from './notification-group'
 import { useNotifications } from './notifications'
+import { useOption, useOptionGroup } from './option'
 import { usePage } from './page'
 import { pressing } from './pressing'
 import { boundTo } from './props'
@@ -332,6 +334,31 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLogGroup(family, props, use, around.toggled),
+      ),
+    /* A list of options, and an option, a group, and a rule of one. */
+    ...uses
+      .filter((use) => use.machine === 'listbox')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, value } = useListbox(family, props, use, around.touch)
+            around.chosen.current = value
+            return behavior
+          },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'option')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useOption(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'option-group')
+      .map(
+        (use): Binder =>
+          () =>
+            useOptionGroup(use),
       ),
     /* A carousel. */
     ...uses
