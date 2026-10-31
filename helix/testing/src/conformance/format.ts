@@ -375,6 +375,20 @@ export interface Left {
     readonly tabs: readonly { readonly selected: boolean; readonly words: string }[]
   }
   /**
+   * What a carousel says of its panes and its dots, which dot is current and which
+   * has focus, whether each arrow has nowhere to go, and what its rotation control
+   * is called.
+   */
+  readonly carousel?: {
+    readonly current: number | null
+    readonly dots: readonly string[]
+    readonly focused: number | null
+    readonly next: boolean
+    readonly panes: readonly string[]
+    readonly previous: boolean
+    readonly rotation: string
+  }
+  /**
    * What a screen reader hears of each row a log draws, whether a step is open,
    * what the log says it let go, and the lines selected.
    */
