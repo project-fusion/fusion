@@ -151,6 +151,21 @@ const AXIS_ENDS: Readonly<Record<string, readonly [string, string]>> = {
   'padding-inline': ['paddingStart', 'paddingEnd'],
 }
 
+/** The properties a view reads as a number, and draws as if unset when given words. */
+const NUMBERS: ReadonlySet<string> = new Set(['flex-grow', 'flex-shrink', 'opacity'])
+
+/** `value` as a number, a percentage as its share of one, or `undefined` where it is neither. */
+const numberOf = (value: Resolution): number | undefined => {
+  if (typeof value === 'number') {
+    return value
+  }
+  if (typeof value !== 'string' || value.trim() === '') {
+    return undefined
+  }
+  const amount = value.endsWith('%') ? Number(value.slice(0, -1)) / 100 : Number(value)
+  return Number.isNaN(amount) ? undefined : amount
+}
+
 /** Writes one CSS declaration into a React Native style, or says why it cannot. */
 export const apply = (
   out: Record<string, number | string>,
@@ -340,6 +355,17 @@ export const apply = (
   const renamed = RENAMED[property]
   if (renamed === undefined) {
     return 'no native equivalent yet'
+  }
+  /* **A view takes these as numbers only.** A device ignores `opacity: '0.5'`
+     and draws the part whole, though jest renders it happily, and a hook or a
+     private property arrives as words whichever way a page writes it. */
+  if (NUMBERS.has(property)) {
+    const amount = numberOf(value)
+    if (amount === undefined) {
+      return 'not a number'
+    }
+    out[renamed] = amount
+    return undefined
   }
   if (LENGTHS.has(property)) {
     /* **A font size takes the whole text size, and every other length the
