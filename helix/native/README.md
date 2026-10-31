@@ -2481,6 +2481,38 @@ that length there. A release build has not been measured.
 A `source` is an async iterable, read with `for await`. A phone has no
 `ReadableStream` on `fetch`.
 
+## Code Block
+
+The `code-block` machine reads the code from its children and works out panes with
+core's `@fusion.dev/helix-core/code-block`, the lines, the diff, and the folds the
+web element reads: one pane of plain code, or one for each file of a diff. A block
+that holds Code Blocks draws tabs, and each block it holds asks it whether its file
+is shown.
+
+**Plain code is one paragraph**, a `Text` with a nested `Text` for each run, so a
+selection and a wrap cross its lines. It scrolls both ways, or down alone under
+`wrap`, and it reads `onTextLayout` to learn where each line was laid out. A band
+stands at those lengths, a number in a wrapping gutter is as tall as its line, and
+the expand button stands while the words are taller than the box.
+
+**Runs come from what the page gave.** `highlight` returns HTML on both platforms,
+and a phone reads the tags, the inline styles, and `helix-syntax-*` classes of it
+with `markupRuns`. `tokens` returns runs. `registerTokens` from
+`@fusion.dev/helix-core/code-block` gives every block runs, and
+`syntaxTokens` from `@fusion.dev/helix-sandbox/highlight` is one such function, in
+Lezer's grammars. Static sources can be run through it at build time and handed in
+as data, as the gallery does.
+
+**Shiki stays the page's dependency.** `shikiTokens` reads a highlighter the page
+made, and imports nothing of Shiki's. On Hermes, make it with Shiki's JavaScript
+engine and its `ES2018` target. Shiki 3.23.0 with TypeScript and both GitHub themes
+loaded and colored code on the iPhone 18 Pro simulator in Expo Go, as a 516 KB bundle.
+
+**What a phone has no use for.** A scrolling box is a tab stop and a region on the
+web, for a keyboard to scroll it, and a finger scrolls it here. A `class` from a
+highlighter other than Helix's own colors nothing, since a phone has no sheet to
+ask, so a highlighter for both platforms writes inline styles.
+
 ## Notifications
 
 The `notifications`, `notification`, and `notification-group` machines hold a feed

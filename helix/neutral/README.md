@@ -3,7 +3,7 @@
 The platform-neutral sources Helix compiles for the web and for React Native.
 This is a pilot, and its families are Accordion, Announcement, App Header, Avatar, Badge,
 Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
-Group, Code, Color Input, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
+Group, Code, Code Block, Color Input, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
 Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
@@ -1419,6 +1419,11 @@ its parts. The web's list slot is named `items` and assigned by hand, so a rule 
 rows there is written with its own selector. A phone's row has no pseudo-element and
 draws its unread dot as a `platform="native"` part, and its gap as a margin on the
 item, since a dismissed row's host draws nothing and keeps no room.
+
+`codeBlock` declares a block of code: what it reads, what it sends, and what it
+computes, `panes` for each pane of code, `tabs` for its files, `several`,
+`expandHidden`, and `expandWords`. A `<Repeat>` reads `each` from a copy's own field
+too, as a pane's rows and a row's numbers, so one list can stand inside another.
 
 **An element whose host is `display: inline`, drawn by a wrap, takes the text style of
 the rules on the wrap**, as a web host inherits them, as a row's Format Date does.
