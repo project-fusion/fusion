@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { HelixRoot } from '../index'
 import type { WindowHandle } from '../machines/window'
 import { HelixVirtualList } from './virtual-list/index.native'
@@ -150,5 +150,29 @@ describe('Virtual List on a phone', () => {
       ref.current?.scrollToIndex(40, { align: 'start' })
     })
     expect(ref.current?.range()).toEqual({ first: 0, last: 0 })
+  })
+
+  test('a disabled row draws its words, dimmed', async () => {
+    await render(
+      <HelixRoot>
+        <HelixVirtualList
+          disabledKeys="b"
+          items={[
+            { id: 'a', name: 'First' },
+            { id: 'b', name: 'Second' },
+          ]}
+          keyField="id"
+          label="Rows"
+          textField="name"
+        />
+      </HelixRoot>,
+    )
+    const words = screen.getByText('Second', { includeHiddenElements: true })
+    let dimmed = false
+    for (let at = words.parent; at; at = at.parent) {
+      dimmed ||=
+        (StyleSheet.flatten(at.props.style) as { opacity?: number } | undefined)?.opacity === 0.5
+    }
+    expect(dimmed).toBe(true)
   })
 })

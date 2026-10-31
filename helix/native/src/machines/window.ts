@@ -182,6 +182,7 @@ interface Latest extends WindowState {
   readonly loading: boolean
   readonly props: Props
   readonly texts: readonly string[]
+  readonly typed: readonly string[]
 }
 
 /** Where the list stands along the axis it scrolls. */
@@ -437,9 +438,11 @@ const useLayout = (family: Family, props: Props, use: MachineUse, frameWidth: nu
   )
   const disabledKeys = wordsIn(read('disabledKeys'))
   const off = useMemo(() => new Set(commaList(disabledKeys)), [disabledKeys])
-  const texts = useMemo(
-    () => textsOf(data, textField).map((text, at) => (off.has(keysOfItems[at] ?? '') ? '' : text)),
-    [data, keysOfItems, off, textField],
+  const texts = useMemo(() => textsOf(data, textField), [data, textField])
+  /* What typing matches: a disabled item is passed over, and still draws its words. */
+  const typed = useMemo(
+    () => texts.map((text, at) => (off.has(keysOfItems[at] ?? '') ? '' : text)),
+    [keysOfItems, off, texts],
   )
   return {
     across,
@@ -456,6 +459,7 @@ const useLayout = (family: Family, props: Props, use: MachineUse, frameWidth: nu
     reorderable: read('reorderable') === true,
     sections,
     texts,
+    typed,
     value: wordsIn(read('value')),
     waterfall,
   }
@@ -745,7 +749,7 @@ export const useWindow = (
       return false
     }
     if (typed(pressed, typeahead)) {
-      const found = typeahead.match(pressed.key, now.texts, at)
+      const found = typeahead.match(pressed.key, now.typed, at)
       if (found >= 0 && found !== at) {
         focusIndex(found)
       }
