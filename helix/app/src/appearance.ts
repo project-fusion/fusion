@@ -1,4 +1,5 @@
-import { ActionSheetIOS, Alert, Appearance, Platform } from 'react-native'
+import { Appearance } from 'react-native'
+import { askWith } from './appearance-ask'
 
 /* **Light and dark, as the sandbox's color mode has them**: the gallery
    follows the phone until you pick one. React Native's own override sets the
@@ -30,26 +31,5 @@ export const askAppearance = (then: (choice: Choice) => void): void => {
     Appearance.setColorScheme(value)
     then(value)
   }
-  if (Platform.OS === 'ios') {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        cancelButtonIndex: CHOICES.length,
-        options: [...CHOICES.map((choice) => choice.label), 'Cancel'],
-        title: 'Appearance',
-      },
-      (index) => {
-        const picked = CHOICES[index]
-        if (picked !== undefined) {
-          apply(picked.value)
-        }
-      },
-    )
-  } else {
-    Alert.alert(
-      'Appearance',
-      undefined,
-      CHOICES.map((choice) => ({ onPress: () => apply(choice.value), text: choice.label })),
-      { cancelable: true },
-    )
-  }
+  askWith(CHOICES, apply)
 }
