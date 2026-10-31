@@ -290,6 +290,102 @@ pub const NOTIFICATION_GROUP: &[(&str, Names)] = &[
 /// What a group of notifications computes for its parts, each read as `notificationGroup.x`.
 pub const NOTIFICATION_GROUP_COMPUTED: &[&str] = &["counted", "countWords"];
 
+/// What a conversation reads and sends, by the name the machine binds.
+pub const CHAT_ROOT: &[(&str, Names)] = &[
+    ("arrivalLabel", Names::Prop),
+    ("authorStyles", Names::Prop),
+    ("failedLabel", Names::Prop),
+    ("failedTurnLabel", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("history", Names::Prop),
+    ("historyText", Names::Prop),
+    ("label", Names::Prop),
+    ("meLabel", Names::Prop),
+    ("messageLabel", Names::Prop),
+    ("onHistory", Names::Event),
+    ("onSend", Names::Event),
+    ("turnLabel", Names::Prop),
+    ("turns", Names::Prop),
+    ("typing", Names::Prop),
+    ("typingLabel", Names::Prop),
+];
+
+/// What a conversation computes for its parts, each read as `chatRoot.x`.
+pub const CHAT_ROOT_COMPUTED: &[&str] = &[
+    "actionsEmpty",
+    "blank",
+    "busy",
+    "composerEmpty",
+    "headerEmpty",
+    "historyShown",
+    "list",
+    "loadingShown",
+    "named",
+    "said",
+    "scrolls",
+    "statusEmpty",
+    "typingWords",
+    "windowed",
+];
+
+/// What a turn in a conversation reads and sends, by the name the machine binds.
+pub const CHAT_MESSAGE: &[(&str, Names)] = &[
+    ("at", Names::Prop),
+    ("author", Names::Prop),
+    ("authorLabel", Names::Prop),
+    ("failedLabel", Names::Prop),
+    ("locale", Names::Prop),
+    ("onSend", Names::Event),
+    ("retryLabel", Names::Prop),
+    ("sendingLabel", Names::Prop),
+    ("state", Names::Prop),
+];
+
+/// What a turn in a conversation computes for its parts, each read as `chatMessage.x`.
+pub const CHAT_MESSAGE_COMPUTED: &[&str] = &[
+    "actionsEmpty",
+    "attachmentsEmpty",
+    "contentEmpty",
+    "failed",
+    "inline",
+    "named",
+    "reading",
+    "sending",
+    "sourcesEmpty",
+    "waiting",
+    "workEmpty",
+];
+
+/// What a field for writing a turn reads and sends, by the name the machine binds.
+pub const CHAT_COMPOSER: &[(&str, Names)] = &[
+    ("attached", Names::Prop),
+    ("busy", Names::Prop),
+    ("onSend", Names::Event),
+    ("onStop", Names::Event),
+    ("onTyping", Names::Event),
+    ("placeholder", Names::Prop),
+    ("placeholders", Names::Prop),
+    ("queue", Names::Prop),
+    ("sendDisabled", Names::Prop),
+    ("sendLabel", Names::Prop),
+    ("sendReason", Names::Prop),
+    ("stopLabel", Names::Prop),
+    ("submitOn", Names::Prop),
+    ("typingTimeout", Names::Prop),
+];
+
+/// What a field for writing a turn computes for its parts, each read as `chatComposer.x`.
+pub const CHAT_COMPOSER_COMPUTED: &[&str] = &[
+    "attachmentsEmpty",
+    "endEmpty",
+    "idling",
+    "mark",
+    "sendHeld",
+    "sendName",
+    "shownPlaceholder",
+    "startEmpty",
+];
+
 /// What tail reads and sends, by the name the machine binds.
 pub const TAIL: &[(&str, Names)] = &[
     ("defaultPinned", Names::Prop),
@@ -481,6 +577,21 @@ pub fn log_group(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "logGroup", LOG_GROUP, LOG_GROUP_COMPUTED)
 }
 
+/// `chatRoot({ ... })`, each field a name.
+pub fn chat_root(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "chatRoot", CHAT_ROOT, CHAT_ROOT_COMPUTED)
+}
+
+/// `chatMessage({ ... })`, each field a name.
+pub fn chat_message(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "chatMessage", CHAT_MESSAGE, CHAT_MESSAGE_COMPUTED)
+}
+
+/// `chatComposer({ ... })`, each field a name.
+pub fn chat_composer(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "chatComposer", CHAT_COMPOSER, CHAT_COMPOSER_COMPUTED)
+}
+
 /// `tail({ ... })`, each field a name.
 pub fn tail(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "tail", TAIL, TAIL_COMPUTED)
@@ -536,6 +647,9 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationsRoot" => notifications_root(value),
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
+        "chatRoot" => chat_root(value),
+        "chatMessage" => chat_message(value),
+        "chatComposer" => chat_composer(value),
         "codeBlock" => code_block(value),
         _ => inspector(value),
     }
