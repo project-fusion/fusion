@@ -174,9 +174,7 @@ export const runsMarkup = (runs: readonly CodeRun[]): string =>
       ]
         .filter(Boolean)
         .join(';')
-      return style === ''
-        ? escaped(run.text)
-        : `<span style="${style}">${escaped(run.text)}</span>`
+      return style === '' ? escaped(run.text) : `<span style="${style}">${escaped(run.text)}</span>`
     })
     .join('')
 

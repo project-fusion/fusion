@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
@@ -11,7 +12,6 @@ import {
   token,
   web,
 } from '../../../style.js'
-import { oneOf } from '../../../render.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -74,10 +74,7 @@ export default styles(
       own.notificationsPadBlock,
       quotient(difference(own.notificationsLine, own.notificationsUnread), '2'),
     )
-    const unreadStart = quotient(
-      difference(own.notificationsPadInline, hook.unreadInlineSize),
-      '2',
-    )
+    const unreadStart = quotient(difference(own.notificationsPadInline, hook.unreadInlineSize), '2')
     const boxed = [
       { separation: 'filled' as const },
       { separation: 'outlined' as const },
@@ -174,15 +171,17 @@ export default styles(
         ]),
       ]),
       on('unread-dot', [
-        native([rule({
-          backgroundColor: hook.unreadMark,
-          blockSize: own.notificationsUnread,
-          borderRadius: hook.unreadRadius,
-          inlineSize: hook.unreadInlineSize,
-          insetBlockStart: hook.unreadOffset(unreadTop),
-          insetInlineStart: hook.unreadInset(unreadStart),
-          position: 'absolute',
-        })]),
+        native([
+          rule({
+            backgroundColor: hook.unreadMark,
+            blockSize: own.notificationsUnread,
+            borderRadius: hook.unreadRadius,
+            inlineSize: hook.unreadInlineSize,
+            insetBlockStart: hook.unreadOffset(unreadTop),
+            insetInlineStart: hook.unreadInset(unreadStart),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('media', [
         rule({
@@ -252,10 +251,7 @@ export default styles(
         rule({
           alignItems: 'center',
           display: 'flex',
-          marginInlineEnd: quotient(
-            difference(token('size-control'), token('size-icon')),
-            '-2',
-          ),
+          marginInlineEnd: quotient(difference(token('size-control'), token('size-icon')), '-2'),
           opacity: own.notificationsSwap,
           web: { pointerEvents: 'none' },
         }),
@@ -309,7 +305,10 @@ export default styles(
             display: 'flex',
             flexDirection: 'row',
           }),
-          rule({ inlineSize: { below: '18rem' } }, { inlineSize: '100%', justifyContent: 'flex-end' }),
+          rule(
+            { inlineSize: { below: '18rem' } },
+            { inlineSize: '100%', justifyContent: 'flex-end' },
+          ),
         ]),
       ]),
       /* The time and the controls, stacked in one place: which of the two shows is
