@@ -96,3 +96,67 @@ export interface TreeItemChoice {
   /** The prop that holds the item's value. */
   readonly value?: string
 }
+
+/**
+ * What an element that shows a value as a tree of rows reads, sends, and
+ * computes. **The web's element draws its own rows**, and a phone hosts the
+ * `inspector` machine, whose rows core's arithmetic works out for both.
+ */
+export interface InspectorChoice {
+  /** The prop that holds the active row's path. */
+  readonly active?: string
+  /** Whether the tree has no entries to show, the name a render binds. */
+  readonly blank?: string
+  /** The prop that holds the copy button's name on a row with a key. */
+  readonly copyLabel?: string
+  /** What the copy button is named, the name a render binds. */
+  readonly copyName?: string
+  /** What the copy button copies, the name a render binds. */
+  readonly copyText?: string
+  /** The prop that holds the copy button's name on a row with no key. */
+  readonly copyValueLabel?: string
+  /** The prop that says how many levels start open. */
+  readonly defaultDepth?: string
+  /** The prop that holds what the tree says while it has no value. */
+  readonly emptyText?: string
+  /** The prop that holds the open branches by path. */
+  readonly expanded?: string
+  /** The prop that holds how an array counts its entries. */
+  readonly itemsLabel?: string
+  /** The prop that holds how an object counts its keys. */
+  readonly keysLabel?: string
+  /** The prop that names the tree and draws the header. */
+  readonly label?: string
+  /** The rows a repeat's `each` reads as `inspector.list`, the name a render binds. */
+  readonly list?: string
+  /** What names the tree, the name a render binds. */
+  readonly named?: string
+  /** The prop that holds what the tree says while a filter matched nothing. */
+  readonly noMatchesLabel?: string
+  /** The event sent once the active row moved. */
+  readonly onActivate?: string
+  /** The event sent before the active row moves, which a handler can cancel. */
+  readonly onBeforeActivate?: string
+  /** The event sent before a branch closes, which a handler can cancel. */
+  readonly onBeforeClose?: string
+  /** The event sent before a branch opens, which a handler can cancel. */
+  readonly onBeforeOpen?: string
+  /** The event sent once a key copied the active row. */
+  readonly onCopy?: string
+  /** The event sent once a branch opened or closed. */
+  readonly onToggle?: string
+  /** The prop that holds a function drawing a value. */
+  readonly renderValue?: string
+  /** The prop that holds what a screen reader hears of a filter's matches. */
+  readonly resultsLabel?: string
+  /** What the tree says while it has no entries, the name a render binds. */
+  readonly said?: string
+  /** Whether a header or a field stands above the tree, the name a render binds. */
+  readonly topped?: string
+  /** The prop that names the tree where `label` is empty. */
+  readonly treeLabel?: string
+  /** The prop that holds the value. */
+  readonly value?: string
+  /** The prop that says the rows are drawn in a window. */
+  readonly windowed?: string
+}

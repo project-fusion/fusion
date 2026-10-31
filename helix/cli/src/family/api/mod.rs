@@ -71,7 +71,7 @@ pub use toolbar::Toolbar;
 pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
-pub use tree_choice::{TreeChoice, TREE, TREE_ITEM};
+pub use tree_choice::{TreeChoice, INSPECTOR, TREE, TREE_ITEM};
 pub use validation::Validation;
 pub use window::WindowChoice;
 
@@ -133,6 +133,10 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is an item of a tree.
     #[serde(rename = "treeItem", skip_serializing_if = "Option::is_none")]
     pub tree_item: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it shows a value as a
+    /// tree of rows, as an object inspector.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inspector: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -267,6 +271,7 @@ impl Api {
             && self.window.is_none()
             && self.tree.is_none()
             && self.tree_item.is_none()
+            && self.inspector.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -328,6 +333,7 @@ const FIELDS: &[&str] = &[
     "window",
     "treeRoot",
     "treeItem",
+    "inspector",
     "fold",
     "host",
     "item",
@@ -431,6 +437,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             window: field("window").map(window::window).transpose()?,
             tree: field("treeRoot").map(tree_choice::tree).transpose()?,
             tree_item: field("treeItem").map(tree_choice::tree_item).transpose()?,
+            inspector: field("inspector").map(tree_choice::inspector).transpose()?,
             fold,
             host,
             item,

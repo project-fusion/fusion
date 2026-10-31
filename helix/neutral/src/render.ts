@@ -200,6 +200,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly files: Computes<'list'>
   /** The rows near the screen an element that windows a long set draws. */
   readonly window: Computes<'list'>
+  /** What an object inspector computes for its parts. */
+  readonly inspector: Computes<
+    'blank' | 'copyName' | 'copyText' | 'list' | 'named' | 'said' | 'topped'
+  >
   /** What a tree computes. */
   readonly treeRoot: Computes<'empty'>
   /** What an item of a tree computes for its parts. */
