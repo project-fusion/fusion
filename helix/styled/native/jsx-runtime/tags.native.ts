@@ -69,6 +69,7 @@ import { HelixToolbar } from '../toolbar/index.native'
 import { HelixTooltip } from '../tooltip/index.native'
 import { HelixTour, HelixTourStop } from '../tour/index.native'
 import { HelixTrend } from '../trend/index.native'
+import { HelixTree, HelixTreeItem } from '../tree/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import { Anchor, Box, Fieldset, Legend, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
 
@@ -210,6 +211,8 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tour': HelixTour,
   'helix-tour-stop': HelixTourStop,
   'helix-trend': HelixTrend,
+  'helix-tree': HelixTree,
+  'helix-tree-item': HelixTreeItem,
   'helix-virtual-list': HelixVirtualList,
   legend: Legend,
   p: Span,

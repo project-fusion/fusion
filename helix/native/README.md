@@ -2347,6 +2347,41 @@ the ones Shift with an arrow moves back over. The height, the corners, the
 gaps, and the remove mark stop growing at 1.353 times the default text size,
 and the words grow fully.
 
+## Trees
+
+`HelixTree` holds `HelixTreeItem`s, each nested item with `slot="children"`:
+
+```tsx
+<HelixTree defaultActive="budget" label="Files">
+  <HelixTreeItem defaultOpen value="documents">
+    Documents
+    <HelixTreeItem slot="children" value="budget">
+      Budget
+    </HelixTreeItem>
+  </HelixTreeItem>
+</HelixTree>
+```
+
+An item takes its level and its place from where it stands, so a page that moves
+an item writes nothing else. A press on a branch opens or closes it and chooses
+it where it has a `value`. `selectionMode="multiple"` draws a check mark on each
+row: a branch checks every enabled item under it, and reads mixed where some are
+checked.
+
+iOS and Android have no trait for a tree or for a level, so a row says
+`Level 2, 1 of 3` as its value. Register the words in your language under
+`helix-tree`, as `treeItemPlace`. A row also says whether it is expanded,
+selected, checked, disabled, and busy.
+
+Under `reorderable`, a drag on a grip moves an item among its siblings, and so do
+a press on a grip and a press on a sibling, a screen reader's Move up and Move
+down on the row, and Alt with an arrow on a hardware keyboard. Alt with the arrow
+along the line moves an item into a branch or out of one. The tree moves nothing
+itself: render the items in the order `onReorder` carries.
+
+A closed branch's items stay drawn, with no press and nothing a screen reader
+reaches. A focus a hardware key moves does not scroll the page around the tree.
+
 ## Reordering
 
 A `reorderable` list lets a reader move its rows. A drag on a row's grip lifts
