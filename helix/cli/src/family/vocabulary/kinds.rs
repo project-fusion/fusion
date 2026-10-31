@@ -86,6 +86,12 @@ pub const ROLES: &[Role] = &[
     role("table", Announced::Role("table")),
     role("treegrid", Announced::Role("treegrid")),
     role("tree", Announced::Role("tree")),
+    /* A list of options, one of them, and a field that opens a list. iOS and
+    Android have no trait for the list and the field, and an option says it is
+    chosen through its selected state. */
+    role("combobox", Announced::Role("combobox")),
+    role("listbox", Announced::Role("listbox")),
+    role("option", Announced::Trait("button")),
     role("treeitem", Announced::Role("treeitem")),
     role("radiogroup", Announced::Trait("radiogroup")),
     /* A landmark of its own, named by its label, as an open accordion

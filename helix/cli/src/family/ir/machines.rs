@@ -86,7 +86,7 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, LISTBOX, OPTION, OPTION_GROUP, CHAT_MESSAGE,
     CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
     NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
@@ -631,6 +631,9 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.code_block, CODE_BLOCK, "code-block"),
         (&api.log_root, LOG_ROOT, "log"),
         (&api.carousel, CAROUSEL, "carousel"),
+        (&api.listbox, LISTBOX, "listbox"),
+        (&api.option, OPTION, "option"),
+        (&api.option_group, OPTION_GROUP, "option-group"),
         (&api.chat_root, CHAT_ROOT, "chat"),
         (&api.chat_message, CHAT_MESSAGE, "chat-message"),
         (&api.chat_composer, CHAT_COMPOSER, "chat-composer"),
