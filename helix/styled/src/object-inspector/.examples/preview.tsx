@@ -11,21 +11,10 @@ const RESPONSE = {
 
 export function Example() {
   return (
-    <>
-      {/* The JSON is written into the page because React hydration drops object
-          properties on custom elements. The text survives server rendering. */}
-      <script
-        id="response"
-        type="application/json"
-      >
-        {JSON.stringify(RESPONSE)}
-      </script>
-
-      <helix-object-inspector
-        default-depth="2"
-        for="response"
-        label="GET /v1/deployments/dpl_8f2c"
-      ></helix-object-inspector>
-    </>
+    <helix-object-inspector
+      default-depth="2"
+      label="GET /v1/deployments/dpl_8f2c"
+      value={RESPONSE}
+    ></helix-object-inspector>
   )
 }
