@@ -76,18 +76,30 @@ export const Span = ({ bold, children }: Props & { readonly bold?: boolean }) =>
 /** Words a page marks as important, as a browser sets `strong` bolder than what is around it. */
 export const Strong = ({ children }: Props) => React.createElement(Span, { bold: true }, children)
 
-/** A link's words. A press on a phone is the app's to handle. */
-export const Anchor = ({ children }: Props) => {
+/**
+ * A link's words, in the size the text around gives, and in its ink with no line
+ * under `data-link="quiet"`, as a breadcrumb's link is. `data-card` is a box
+ * around the card it holds, which gives way in a row, and `data-button` draws
+ * in `tags.native.ts`. A press on a phone is the app's to handle.
+ */
+export const Anchor = ({ children, ...props }: Props) => {
   const tokens = useTokens()
+  const text = useInheritedText()
+  if (props['data-card'] !== undefined) {
+    return React.createElement(View, { style: { flexShrink: 1 } }, children)
+  }
+  const quiet = props['data-link'] === 'quiet'
   return React.createElement(
     Text,
     {
       allowFontScaling: false,
-      style: {
-        color: color(tokens, 'color-primary'),
-        fontSize: points(tokens, 'text-md'),
-        textDecorationLine: 'underline',
-      },
+      style: [
+        { fontSize: points(tokens, 'text-md') },
+        text,
+        quiet
+          ? { color: text.color ?? color(tokens, 'color-foreground') }
+          : { color: color(tokens, 'color-primary'), textDecorationLine: 'underline' as const },
+      ],
     },
     children,
   )
