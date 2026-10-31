@@ -6,6 +6,7 @@ import {
   SPOKEN_RULE,
   words,
 } from '@fusion.dev/helix-core'
+import type { LogStatus } from '@fusion.dev/helix-core/log'
 import {
   caretDown,
   checkCircleFill,
@@ -17,7 +18,6 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import type { LogStatus } from '../buffer.js'
 
 /** The mark each status draws. */
 const MARKS = {
