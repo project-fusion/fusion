@@ -65,6 +65,34 @@ const rowFocused = (mounted: Mounted): number | null => {
   return index === undefined ? null : Number(index)
 }
 
+/** The words of the parts a line holds that a screen reader hears, with no spaces. */
+const heardOfLine = (line: Element): string =>
+  [
+    ...(line.shadowRoot?.querySelectorAll('[part="level"], [part="text"], [part="count-label"]') ??
+      []),
+  ]
+    .map((part) => part.textContent ?? '')
+    .join('')
+    .replace(/\s/g, '')
+
+/** What each row of a log says, as the record holds it. */
+const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
+  const shadow = mounted.root.shadowRoot
+  return {
+    dropped: (shadow?.querySelector('[part="dropped"]')?.textContent ?? '').trim(),
+    rows: [...(shadow?.querySelectorAll('[part="row"] > *') ?? [])].map((row) => {
+      const summary = row.shadowRoot?.querySelector('[part="summary"]')
+      return summary
+        ? {
+            expanded: summary.getAttribute('aria-expanded') === 'true',
+            words: (summary.textContent ?? '').replace(/\s/g, ''),
+          }
+        : { expanded: null, words: heardOfLine(row) }
+    }),
+    selected: String((mounted.root as { selectedLines?: unknown }).selectedLines ?? ''),
+  }
+}
+
 /** What each row of an object inspector says, as the record holds it. */
 const inspectorRows = (mounted: Mounted): NonNullable<Left['inspector']> => {
   const shadow = mounted.root.shadowRoot
@@ -275,6 +303,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
+  ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'table' ? { table: tableOf(mounted.root) } : {}),
   /* What a list of data holds: the keys chosen, and the row with focus. */
   ...(family === 'virtual-list'

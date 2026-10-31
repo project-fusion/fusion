@@ -49,6 +49,10 @@ export interface Setup {
   readonly slot?: string
   /** The web element's tag, such as `helix-tabs`. */
   readonly tag: string
+  /** The steps a log's lines name. The web sets them as a property, and a phone passes a prop. */
+  readonly logGroups?: readonly object[] | undefined
+  /** A log's lines as data. The web sets them as a property, and a phone passes a prop. */
+  readonly logLines?: readonly object[]
   /**
    * The value it shows, for a family whose value is data, as an object
    * inspector. The web sets it as a property, and a phone passes it as a prop.
@@ -355,6 +359,18 @@ export interface Left {
    * that holds focus, and React Native what its window machine holds.
    */
   readonly window?: { readonly chosen: string; readonly focused: number | null }
+  /**
+   * What a screen reader hears of each row a log draws, whether a step is open,
+   * what the log says it let go, and the lines selected.
+   */
+  readonly log?: {
+    readonly dropped: string
+    readonly rows: readonly {
+      readonly expanded: boolean | null
+      readonly words: string
+    }[]
+    readonly selected: string
+  }
   /**
    * What a screen reader hears of each row an object inspector draws, what
    * the row reads with no spaces, the places of the rows a filter matched,
