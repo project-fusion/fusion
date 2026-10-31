@@ -64,6 +64,35 @@ const rowFocused = (mounted: Mounted): number | null => {
   return index === undefined ? null : Number(index)
 }
 
+/** What a screen reader hears of each row a reader can reach in a tree. */
+const treeRows = (mounted: Mounted): NonNullable<Left['tree']> =>
+  [...mounted.items]
+    .filter(([, item]) => {
+      let up = item.parentElement
+      while (up !== null && up !== mounted.root) {
+        if (up.localName === item.localName && !isOpen(up)) {
+          return false
+        }
+        up = up.parentElement
+      }
+      return true
+    })
+    .map(([value, item]) => {
+      const row = item.shadowRoot?.querySelector('[role="treeitem"]')
+      const said = (name: string) => row?.getAttribute(`aria-${name}`) ?? null
+      const yes = (name: string) => (said(name) === null ? null : said(name) === 'true')
+      return {
+        checked: said('checked') === 'mixed' ? 'mixed' : yes('checked'),
+        disabled: said('disabled') === 'true',
+        expanded: yes('expanded'),
+        level: Number(said('level')),
+        position: Number(said('posinset')),
+        selected: yes('selected'),
+        size: Number(said('setsize')),
+        value,
+      }
+    })
+
 /** The families whose element turns on and off, whose record says whether it is checked. */
 const TOGGLES: ReadonlySet<string> = new Set(['checkbox', 'motion-toggle', 'switch', 'toggle'])
 
@@ -78,7 +107,7 @@ const checkedOf = (element: Element): boolean | 'mixed' =>
     : ['checked', 'paused', 'pressed'].some((name) => inState(element, name))
 
 /** The families whose items open and close, whose record says which stand open. */
-const OPENS: ReadonlySet<string> = new Set(['accordion'])
+const OPENS: ReadonlySet<string> = new Set(['accordion', 'tree'])
 
 /** The families that open a layer, whose record says whether it stands open. */
 const LAYERS: ReadonlySet<string> = new Set([
@@ -218,6 +247,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
       }
     : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
+  ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   /* What a list of data holds: the keys chosen, and the row with focus. */
   ...(family === 'virtual-list'
     ? {
