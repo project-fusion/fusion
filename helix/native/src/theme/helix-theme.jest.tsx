@@ -157,7 +157,7 @@ describe('familyOn', () => {
   test("names the system's fonts as each platform does, and keeps a family an app loads", () => {
     expect(familyOn(light['font-sans'], 'ios')).toBe('System')
     expect(familyOn(light['font-sans'], 'android')).toBe('sans-serif')
-    expect(familyOn(light['font-mono'], 'ios')).toBe('Menlo')
+    expect(familyOn(light['font-mono'], 'ios')).toBe('ui-monospace')
     expect(familyOn(light['font-mono'], 'android')).toBe('monospace')
     expect(familyOn('"Inter", sans-serif', 'ios')).toBe('Inter')
   })
