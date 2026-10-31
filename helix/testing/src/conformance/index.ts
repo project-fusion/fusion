@@ -18,6 +18,7 @@ import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
 import { LIST } from './scenarios/list.js'
 import { LOADER } from './scenarios/loader.js'
+import { LOG } from './scenarios/log.js'
 import { MEGAMENU } from './scenarios/megamenu.js'
 import { MENU } from './scenarios/menu.js'
 import { NAVIGATION } from './scenarios/navigation.js'
@@ -74,6 +75,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   input: INPUT,
   list: LIST,
   loader: LOADER,
+  log: LOG,
   megamenu: MEGAMENU,
   menu: MENU,
   'motion-toggle': MOTION_TOGGLE,
