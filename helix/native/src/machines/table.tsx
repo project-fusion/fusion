@@ -282,9 +282,11 @@ const drawingOf = (
   windowed: boolean,
   entries: readonly TableEntry[],
   nearEnd: () => void,
+  held: string | undefined,
 ): WindowDrawing => ({
   across: 1,
   gap: 0,
+  ...(held === undefined ? {} : { held }),
   horizontal: false,
   laid: () => undefined,
   listRef: () => undefined,
@@ -618,7 +620,7 @@ export const useTable = (family: Family, props: Props, use: MachineUse): Behavio
           ref: endRef,
         },
       },
-      rows: { windowed: drawingOf(windowed, entries.entries, nearEnd) },
+      rows: { windowed: drawingOf(windowed, entries.entries, nearEnd, state.moves.held) },
       'select-all': leadPart('select-all', lead.indexOf('select')),
       table: {
         view: {
