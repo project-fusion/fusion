@@ -1,5 +1,14 @@
 import { describe, expect, test } from 'bun:test'
-import { stepStop, stopFor, stopsOf } from './stops.js'
+import {
+  acrossOf,
+  fittedAcross,
+  nearestOffset,
+  paneLength,
+  positionsOf,
+  stepStop,
+  stopFor,
+  stopsOf,
+} from './stops.js'
 
 describe('stopsOf', () => {
   test('stops at every position one slide at a time', () => {
@@ -46,5 +55,36 @@ describe('stepStop', () => {
     expect(stepStop(stops, 0, -1, true)).toBe(7)
     expect(stepStop(stops, 7, 1, false)).toBe(7)
     expect(stepStop(stops, 0, -1, false)).toBe(0)
+  })
+})
+
+describe('the track as lengths', () => {
+  test('fits as many panes of a least length as the room holds, one at least', () => {
+    expect(fittedAcross(660, 16, 200)).toBe(3)
+    expect(fittedAcross(100, 16, 200)).toBe(1)
+    expect(fittedAcross(100, 0, 0)).toBe(1)
+  })
+
+  test('reads a declared count as a whole number, one at least', () => {
+    expect(acrossOf(2.5)).toBe(2)
+    expect(acrossOf(0)).toBe(1)
+    expect(acrossOf('auto')).toBe(1)
+    expect(acrossOf(Number.NaN)).toBe(1)
+  })
+
+  test('shares the room between panes and the gaps between them', () => {
+    expect(paneLength(692, 16, 2)).toBe(338)
+    expect(paneLength(0, 16, 3)).toBe(0)
+  })
+
+  test('counts the places a window of panes can stand', () => {
+    expect(positionsOf(6, 4)).toBe(3)
+    expect(positionsOf(2, 4)).toBe(1)
+  })
+
+  test('finds the offset nearest where a scroller rests', () => {
+    expect(nearestOffset([0, 100, 200], 140)).toBe(1)
+    expect(nearestOffset([0, 100, 200], 160)).toBe(2)
+    expect(nearestOffset([], 160)).toBe(0)
   })
 })
