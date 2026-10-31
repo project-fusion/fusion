@@ -76,17 +76,37 @@ export const Span = ({ bold, children }: Props & { readonly bold?: boolean }) =>
 /** Words a page marks as important, as a browser sets `strong` bolder than what is around it. */
 export const Strong = ({ children }: Props) => React.createElement(Span, { bold: true }, children)
 
+/** Each element in `children`, with the border color of a card a link marks as current. */
+const currentCards = (children: React.ReactNode, border: string): React.ReactNode =>
+  React.Children.map(children, (child) =>
+    React.isValidElement<Props>(child)
+      ? React.cloneElement(child, {
+          style: {
+            ...(child.props.style as Record<string, unknown> | undefined),
+            '--card-border-color': border,
+          },
+        })
+      : child,
+  )
+
 /**
  * A link's words, in the size the text around gives, and in its ink with no line
  * under `data-link="quiet"`, as a breadcrumb's link is. `data-card` is a box
  * around the card it holds, which gives way in a row, and `data-button` draws
  * in `tags.native.ts`. A press on a phone is the app's to handle.
+ *
+ * **`aria-current` on a `data-card` gives the card its border color**, as the
+ * web's `--card-border-color` reaches the card inside the link.
  */
 export const Anchor = ({ children, ...props }: Props) => {
   const tokens = useTokens()
   const text = useInheritedText()
   if (props['data-card'] !== undefined) {
-    return React.createElement(View, { style: { flexShrink: 1 } }, children)
+    const held =
+      props['aria-current'] === undefined
+        ? children
+        : currentCards(children, color(tokens, 'color-primary'))
+    return React.createElement(View, { style: { flexShrink: 1 } }, held)
   }
   const quiet = props['data-link'] === 'quiet'
   return React.createElement(

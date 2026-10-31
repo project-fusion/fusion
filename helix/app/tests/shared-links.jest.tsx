@@ -34,6 +34,18 @@ describe('an a in shared code', () => {
     expect(styleOf('Home').textDecorationLine).toBe('underline')
   })
 
+  test('under data-card with aria-current gives its card the border color', async () => {
+    const borders = async (props: Record<string, unknown>): Promise<string[]> => {
+      const card = jsx('helix-card', { children: 'Words' })
+      await drawn(jsx('a', { ...props, children: card, 'data-card': '', href: '#one' }))
+      return JSON.stringify(screen.toJSON()).match(/"border\w*Color":"[^"]+"/g) ?? []
+    }
+    const plain = await borders({})
+    const held = await borders({ 'aria-current': 'page' })
+    expect(plain.length).toBeGreaterThan(0)
+    expect(held).not.toEqual(plain)
+  })
+
   test('under data-button is a button', async () => {
     await drawn(jsx('a', { children: 'Visit', 'data-button': 'solid', href: '#visit' }))
     expect(screen.getByRole('button', { name: 'Visit' })).toBeTruthy()
