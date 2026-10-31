@@ -202,6 +202,10 @@ describe('layout', () => {
     })
   })
 
+  test('a box can pass touches to what it holds', () => {
+    expect(drawn(['pointer-events', text('box-none')]).style).toEqual({ pointerEvents: 'box-none' })
+  })
+
   test('a hidden or clipped overflow clips', () => {
     expect(drawn(['overflow', text('hidden')]).style).toEqual({ overflow: 'hidden' })
     expect(drawn(['overflow-x', text('clip')]).style).toEqual({ overflow: 'hidden' })
