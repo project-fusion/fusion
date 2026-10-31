@@ -33,6 +33,7 @@ export type Family =
   | 'navigation'
   | 'number-input'
   | 'log'
+  | 'notifications'
   | 'object-inspector'
   | 'table'
   | 'outline'

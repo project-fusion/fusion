@@ -93,6 +93,41 @@ const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   }
 }
 
+/** A row of a feed, by what the record reads of it. */
+interface FeedItem extends HTMLElement {
+  readonly read: boolean
+  readonly unreadLabel: string
+}
+
+/** What a feed of notifications says, as the record holds it. */
+const feedOf = (mounted: Mounted): NonNullable<Left['feed']> => {
+  const root = mounted.root as HTMLElement & { readonly items: readonly FeedItem[] }
+  const shadow = root.shadowRoot
+  const rows = root.items.filter((row) => row.assignedSlot !== null)
+  const words = (row: FeedItem) =>
+    [...row.childNodes]
+      .filter((node) => !(node instanceof Element && node.hasAttribute('slot')))
+      .map((node) => node.textContent ?? '')
+      .join('')
+  const at = rows.findIndex(
+    (row) =>
+      row.shadowRoot?.activeElement === row.shadowRoot?.querySelector('[part="item"]') &&
+      row.shadowRoot?.activeElement !== null,
+  )
+  const group = root.querySelector('helix-notification-group')
+  return {
+    count: group?.shadowRoot?.querySelector('[part="count"]')?.textContent?.trim() ?? null,
+    focused: at < 0 ? null : at,
+    live: (shadow?.querySelector('[part="live"]')?.textContent ?? '').trim(),
+    marksAll: shadow?.querySelector('[part="mark-all"]') !== null,
+    more: shadow?.querySelector('[part="more"]') !== null,
+    rows: rows.map((row) => `${row.read ? '' : row.unreadLabel}${words(row)}`.replace(/\s/g, '')),
+    status: (
+      shadow?.querySelector('[part="error"], [part="loading"], [part="empty"]')?.textContent ?? ''
+    ).trim(),
+  }
+}
+
 /** What each row of an object inspector says, as the record holds it. */
 const inspectorRows = (mounted: Mounted): NonNullable<Left['inspector']> => {
   const shadow = mounted.root.shadowRoot
@@ -304,6 +339,13 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
+  /* A row holds no value, so a row with focus is named by the feed it stands in. */
+  ...(family === 'notifications'
+    ? {
+        feed: feedOf(mounted),
+        focused: mounted.root.matches(':focus-within') ? mounted.root.localName : null,
+      }
+    : {}),
   ...(family === 'table' ? { table: tableOf(mounted.root) } : {}),
   /* What a list of data holds: the keys chosen, and the row with focus. */
   ...(family === 'virtual-list'
