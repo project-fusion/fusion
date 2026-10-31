@@ -2417,3 +2417,40 @@ places with `position: absolute` stands in a box at that place.
 A press on a row of ten thousand takes seconds in a development build in Expo
 Go, since each one draws the rows of the window anew. It has not been measured
 in a release build.
+
+## Tables
+
+A table's rows line up under one set of tracks, which the table works out once
+in points from `columns` and each column's `width`, as the web's grid does: a
+length is itself, `max-content` is the widest cell drawn so far, a share of `fr`
+divides what is left above its least, and `auto` takes the rest. A column of
+sentences wraps above a floor, from core's `fittedTracks`.
+
+- **A wide table scrolls across, and its first column stays**, as a box moved by
+  the scroll's offset on the UI thread. What is drawn before it, a grip, a
+  checkbox, or a disclosure, scrolls away. `--table-heading-background-color`
+  fills what the other cells pass under.
+- **A screen reader hears each cell of words with its column's heading**, under
+  the words `cellReading` in `helix-table`. A cell that holds controls leaves
+  them to be reached.
+- **There is no stacked-card variant.** A phone that wants cards uses Card or List.
+- **`windowed` draws the rows in `FlatList`**, under headings that stand outside
+  what scrolls. A track sized by its content takes the widest cell of the rows
+  drawn so far, and a wider row that arrives moves the track.
+- **The table reads the elements passed in**: a column by its tag, and a row by
+  every other child. A column or a row a page wraps in a component of its own says
+  only what its props say, so a sort and the columns' fit do not reach inside it.
+- **`grid`'s keys are core's `gridMove`**, on a hardware keyboard. A row is a
+  press only where it has `href`, a table selects by `replace`, or rows move.
+- **A grip moves its row by a drag, or by a press and then a press on another
+  row.** The cell around the button takes the touch once it has traveled 4 points,
+  and a screen reader has two actions on the button.
+- **`load-more` with no `windowed`** reads the table's own box on a timer, every
+  400 milliseconds while it is asked for, since a table hears of no scroll around
+  it.
+- **A column's edge reaches a cell as two hooks**, `cellAlign` and `cellJustify`,
+  which the row sets on the element the page passed in.
+
+The web's alone: `--table-columns`, Tab's two ends of a grid, moving into a cell's
+controls with Enter or F2, the drag's preview, a row's hover, printing, and a
+`Column`'s `cell` and `compare`, which only Data Table reads.

@@ -59,6 +59,7 @@ import { HelixSplitter } from '../splitter/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
 import { HelixStep, HelixSteps } from '../steps/index.native'
 import { HelixSwitch } from '../switch/index.native'
+import { HelixTable, HelixTableCell, HelixTableColumn, HelixTableRow } from '../table/index.native'
 import { HelixTab, HelixTabPanel, HelixTabs } from '../tabs/index.native'
 import { HelixTag, HelixTagGroup } from '../tag/index.native'
 import { HelixText } from '../text/index.native'
@@ -196,6 +197,10 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-switch': HelixSwitch,
   'helix-tab': HelixTab,
   'helix-tab-panel': HelixTabPanel,
+  'helix-table': HelixTable,
+  'helix-table-cell': HelixTableCell,
+  'helix-table-column': HelixTableColumn,
+  'helix-table-row': HelixTableRow,
   'helix-tabs': Tabs,
   'helix-tag': HelixTag,
   'helix-tag-group': TagGroup,
