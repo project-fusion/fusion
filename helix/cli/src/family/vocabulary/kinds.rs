@@ -106,6 +106,12 @@ pub const ROLES: &[Role] = &[
     role("toolbar", Announced::Trait("toolbar")),
     /* Words that describe the part a tooltip is placed against. */
     role("tooltip", Announced::Role("tooltip")),
+    /* Output that arrives as it is written, one entry of a feed, and a feed. iOS
+    and Android have no trait for any of them, so a phone reads what they hold
+    in order. */
+    role("article", Announced::Nothing),
+    role("feed", Announced::Nothing),
+    role("log", Announced::Nothing),
 ];
 
 /// The roles whose node reads as a range, `valuenow` among `valuemin` and

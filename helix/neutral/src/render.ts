@@ -212,6 +212,61 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What a column of a table computes. */
   readonly tableColumn: Computes<'movable' | 'sorts' | 'still'>
+  /** What a log computes for its parts. */
+  readonly logRoot: Computes<
+    | 'blank'
+    | 'busy'
+    | 'digits'
+    | 'droppedHidden'
+    | 'droppedWords'
+    | 'list'
+    | 'named'
+    | 'said'
+    | 'scrolls'
+  >
+  /** What a line of a log computes for its parts. */
+  readonly logLine: Computes<
+    | 'unwrapped'
+    | 'unnumbered'
+    | 'count'
+    | 'countHidden'
+    | 'countWords'
+    | 'debug'
+    | 'error'
+    | 'grouped'
+    | 'levelHidden'
+    | 'levelWords'
+    | 'linked'
+    | 'marked'
+    | 'digits'
+    | 'heard'
+    | 'numberHidden'
+    | 'numberName'
+    | 'numberWords'
+    | 'plainNumber'
+    | 'pressNumber'
+    | 'runs'
+    | 'selected'
+    | 'textHidden'
+    | 'timeHidden'
+    | 'timeWords'
+    | 'warn'
+    | 'written'
+  >
+  /** What a step of a log computes for its parts. */
+  readonly logGroup: Computes<
+    | 'frame'
+    | 'digits'
+    | 'heard'
+    | 'durationHidden'
+    | 'markIcon'
+    | 'spokenHidden'
+    | 'spokenWords'
+    | 'statusHidden'
+    | 'statusIcon'
+  >
+  /** What a box that follows its newest content computes for its parts. */
+  readonly tail: Computes<'away' | 'following'>
   /** What a tree computes. */
   readonly treeRoot: Computes<'empty'>
   /** What an item of a tree computes for its parts. */

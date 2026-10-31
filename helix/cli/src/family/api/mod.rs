@@ -72,7 +72,10 @@ pub use toolbar::Toolbar;
 pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
-pub use tree_choice::{TreeChoice, INSPECTOR, TABLE, TABLE_COLUMN, TABLE_ROW, TREE, TREE_ITEM};
+pub use tree_choice::{
+    TreeChoice, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL,
+    TREE, TREE_ITEM,
+};
 pub use validation::Validation;
 pub use window::WindowChoice;
 
@@ -147,6 +150,19 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a column of a table.
     #[serde(rename = "tableColumn", skip_serializing_if = "Option::is_none")]
     pub table_column: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a log.
+    #[serde(rename = "logRoot", skip_serializing_if = "Option::is_none")]
+    pub log_root: Option<TreeChoice>,
+    /// What the element reads and computes where it is a line of a log.
+    #[serde(rename = "logLine", skip_serializing_if = "Option::is_none")]
+    pub log_line: Option<TreeChoice>,
+    /// What the element reads and computes where it is a step of a log.
+    #[serde(rename = "logGroup", skip_serializing_if = "Option::is_none")]
+    pub log_group: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where a box follows its
+    /// newest content, as a log and a chat do.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tail: Option<TreeChoice>,
     /// The prop that says how many of the elements passed in are drawn, as an
     /// avatar group folds the people past its `max` into a count.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -285,6 +301,10 @@ impl Api {
             && self.table.is_none()
             && self.table_row.is_none()
             && self.table_column.is_none()
+            && self.log_root.is_none()
+            && self.log_line.is_none()
+            && self.log_group.is_none()
+            && self.tail.is_none()
             && self.fold.is_none()
             && self.host.is_empty()
             && self.item.is_none()
@@ -350,6 +370,10 @@ const FIELDS: &[&str] = &[
     "tableRoot",
     "tableRow",
     "tableColumn",
+    "logRoot",
+    "logLine",
+    "logGroup",
+    "tail",
     "fold",
     "host",
     "item",
@@ -373,6 +397,18 @@ const FIELDS: &[&str] = &[
     "tree",
     "validation",
 ];
+
+/// What an element reads where it is a log, a part of one, or a box that follows
+/// its newest content, with nothing else of an `Api` set.
+fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
+    Ok(Api {
+        log_root: field("logRoot").map(tree_choice::log_root).transpose()?,
+        log_line: field("logLine").map(tree_choice::log_line).transpose()?,
+        log_group: field("logGroup").map(tree_choice::log_group).transpose()?,
+        tail: field("tail").map(tree_choice::tail).transpose()?,
+        ..Api::default()
+    })
+}
 
 /// Reads a headless source in the compiler's own shape, which
 /// [`rendered::rewrite`] writes from a `headless.tsx` and the compiler's
@@ -478,6 +514,7 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
             total: field("total").map(total::total).transpose()?,
             tour: field("tour").map(tour::tour).transpose()?,
             validation,
+            ..logged(&field)?
         },
         name: name.clone(),
         tree,

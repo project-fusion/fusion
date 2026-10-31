@@ -225,3 +225,113 @@ export interface TableColumnChoice {
   readonly width?: string
   readonly widthLabel?: string
 }
+
+/** What log-root reads, sends, and computes, each a name the source holds. */
+export interface LogRootChoice {
+  readonly blank?: string
+  readonly busy?: string
+  readonly collapse?: string
+  readonly digits?: string
+  readonly done?: string
+  readonly doneLabel?: string
+  readonly droppedHidden?: string
+  readonly droppedLabel?: string
+  readonly droppedWords?: string
+  readonly emptyText?: string
+  readonly errorLabel?: string
+  readonly fallbackLabel?: string
+  readonly format?: string
+  readonly groupLabel?: string
+  readonly groups?: string
+  readonly label?: string
+  readonly level?: string
+  readonly limit?: string
+  readonly lineHref?: string
+  readonly lineLabel?: string
+  readonly lineNumbers?: string
+  readonly lines?: string
+  readonly list?: string
+  readonly loading?: string
+  readonly loadingText?: string
+  readonly markLines?: string
+  readonly matchesLabel?: string
+  readonly named?: string
+  readonly onBeforeSelect?: string
+  readonly onExpand?: string
+  readonly onSelect?: string
+  readonly parse?: string
+  readonly query?: string
+  readonly quiet?: string
+  readonly said?: string
+  readonly scrolls?: string
+  readonly selectable?: string
+  readonly selectedLines?: string
+  readonly source?: string
+  readonly timestamps?: string
+  readonly wrap?: string
+}
+
+/** What log-line reads, sends, and computes, each a name the source holds. */
+export interface LogLineChoice {
+  readonly unwrapped?: string
+  readonly unnumbered?: string
+  readonly at?: string
+  readonly count?: string
+  readonly countHidden?: string
+  readonly countWords?: string
+  readonly debug?: string
+  readonly error?: string
+  readonly grouped?: string
+  readonly level?: string
+  readonly levelHidden?: string
+  readonly levelWords?: string
+  readonly lineLabel?: string
+  readonly linked?: string
+  readonly logRow?: string
+  readonly marked?: string
+  readonly digits?: string
+  readonly heard?: string
+  readonly numberHidden?: string
+  readonly numberName?: string
+  readonly numberWords?: string
+  readonly plainNumber?: string
+  readonly pressNumber?: string
+  readonly runs?: string
+  readonly selected?: string
+  readonly textHidden?: string
+  readonly timeHidden?: string
+  readonly timeWords?: string
+  readonly timesLabel?: string
+  readonly warn?: string
+  readonly written?: string
+}
+
+/** What log-group reads, sends, and computes, each a name the source holds. */
+export interface LogGroupChoice {
+  readonly frame?: string
+  readonly digits?: string
+  readonly heard?: string
+  readonly duration?: string
+  readonly durationHidden?: string
+  readonly heading?: string
+  readonly logDrawn?: string
+  readonly markIcon?: string
+  readonly spokenHidden?: string
+  readonly spokenWords?: string
+  readonly status?: string
+  readonly statusHidden?: string
+  readonly statusIcon?: string
+  readonly statusLabel?: string
+}
+
+/** What tail reads, sends, and computes, each a name the source holds. */
+export interface TailChoice {
+  readonly following?: string
+  readonly away?: string
+  readonly defaultPinned?: string
+  readonly onBeforePin?: string
+  readonly onPin?: string
+  readonly pinned?: string
+  readonly resume?: string
+  readonly threshold?: string
+}
