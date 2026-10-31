@@ -357,7 +357,7 @@ export interface Icon {
  * ```
  */
 export const glyphs = (named: (name: string) => Icon | undefined): ComponentType<GlyphProps> => {
-  const Glyph = ({ color, name, size }: GlyphProps) => {
+  const drawing = ({ color, name, size }: GlyphProps) => {
     const tokens = useTokens()
     const icon = named(name)
     if (icon === undefined) {
@@ -374,5 +374,5 @@ export const glyphs = (named: (name: string) => Icon | undefined): ComponentType
       />
     )
   }
-  return Glyph
+  return Object.assign(drawing, { displayName: 'Glyph' })
 }

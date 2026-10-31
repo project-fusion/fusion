@@ -117,6 +117,14 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
+const Carried = createContext('outside')
+
+const Probe = () => (
+  <Text>
+    {useTheme().tokens['color-foreground']} {use(Carried)}
+  </Text>
+)
+
 describe('the layer host', () => {
   test('a closed layer draws nothing, and an open one is drawn over the app, holding the reader', async () => {
     await draw(<Dialog>Delete</Dialog>)
@@ -133,13 +141,7 @@ describe('the layer host', () => {
   })
 
   test('what a layer holds reads the theme and the contexts it carries from its element', async () => {
-    const Carried = createContext('outside')
     carryIntoLayers(Carried)
-    const Probe = () => (
-      <Text>
-        {useTheme().tokens['color-foreground']} {use(Carried)}
-      </Text>
-    )
     await draw(
       <ThemeProvider tokens={{ 'color-foreground': '#123456' }}>
         <Carried.Provider value="inside">

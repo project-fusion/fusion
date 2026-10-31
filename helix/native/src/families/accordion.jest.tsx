@@ -110,6 +110,10 @@ const turned = (chevron: Drawn): number | undefined =>
 const chevrons = (): Drawn[] =>
   nodes(screen.toJSON()).filter((node) => styleOf(node).transform !== undefined)
 
+const Glyph = ({ color, name }: { readonly color: string; readonly name: string }) => (
+  <Text>{`${name} ${color}`}</Text>
+)
+
 describe('the generated Accordion', () => {
   test('draws each trigger inside a heading, and says whether it is expanded', async () => {
     await render(drawn({}))
@@ -174,9 +178,6 @@ describe('the generated Accordion', () => {
   })
 
   test('draws the chevron in its own subtle ink, as the web does, not the summary’s', async () => {
-    const Glyph = ({ color, name }: { readonly color: string; readonly name: string }) => (
-      <Text>{`${name} ${color}`}</Text>
-    )
     await render(
       <HelixTheme Glyph={Glyph} mode="light">
         <HelixAccordion>
