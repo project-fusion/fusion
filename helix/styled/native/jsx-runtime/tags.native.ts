@@ -41,6 +41,7 @@ import { HelixMeter, HelixMeterSegment } from '../meter/index.native'
 import { HelixMotionToggle } from '../motion-toggle/index.native'
 import { HelixNavigation, HelixNavigationItem } from '../navigation/index.native'
 import { HelixNumberInput } from '../number-input/index.native'
+import { HelixObjectInspector } from '../object-inspector/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
 import { HelixPinInput } from '../pin-input/index.native'
 import { HelixPopover } from '../popover/index.native'
@@ -68,8 +69,8 @@ import { HelixToggle, HelixToggleGroup } from '../toggle/index.native'
 import { HelixToolbar } from '../toolbar/index.native'
 import { HelixTooltip } from '../tooltip/index.native'
 import { HelixTour, HelixTourStop } from '../tour/index.native'
-import { HelixTrend } from '../trend/index.native'
 import { HelixTree, HelixTreeItem } from '../tree/index.native'
+import { HelixTrend } from '../trend/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import { Anchor, Box, Fieldset, Legend, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
 
@@ -169,6 +170,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-navigation': HelixNavigation,
   'helix-navigation-item': HelixNavigationItem,
   'helix-number-input': HelixNumberInput,
+  'helix-object-inspector': HelixObjectInspector,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
   'helix-pin-input': HelixPinInput,
@@ -210,9 +212,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tooltip': HelixTooltip,
   'helix-tour': HelixTour,
   'helix-tour-stop': HelixTourStop,
-  'helix-trend': HelixTrend,
   'helix-tree': HelixTree,
   'helix-tree-item': HelixTreeItem,
+  'helix-trend': HelixTrend,
   'helix-virtual-list': HelixVirtualList,
   legend: Legend,
   p: Span,
