@@ -12,6 +12,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -80,8 +81,46 @@ const Held = ({
   )
 }
 
-/** The key of the row a reader holds in a move, which its cell reads. */
-export const HeldRow = createContext<string | undefined>(undefined)
+/** What a list's cells read and tell: the row a reader holds in a move, and each cell's length. */
+export const Cells = createContext<{
+  readonly held?: string | undefined
+  readonly laid?: ((length: number) => void) | undefined
+}>({})
+
+/**
+ * The most of a row, in points, that may stand at the top of a list at its end
+ * before it reads as part of a line: less than this is the foot of a letter
+ * such as a `g`, cut off from the rest and drawn alone as a dot.
+ */
+const SLIVER = 6
+
+/**
+ * What a list that follows its end adds after its rows so that no sliver of a
+ * row stands at the top of the frame, where the frame is not a whole number of
+ * lines. `line` is the shortest cell, which is a line that does not wrap.
+ */
+const useSliver = (on: boolean) => {
+  const line = useRef(Number.POSITIVE_INFINITY)
+  const added = useRef(0)
+  const [pad, setPad] = useState(0)
+  const settle = (content: number, frame: number) => {
+    const over = content - added.current - frame
+    if (on && frame > 0 && over > 0 && Number.isFinite(line.current)) {
+      const sliver = (line.current - (over % line.current)) % line.current
+      added.current = sliver <= SLIVER ? sliver : 0
+      setPad(added.current)
+    }
+  }
+  const laid = useCallback(
+    (length: number) => {
+      if (on && length > 0) {
+        line.current = Math.min(line.current, length)
+      }
+    },
+    [on],
+  )
+  return { laid, pad, settle }
+}
 
 /**
  * A cell of a list. **The cell holding the held row stays drawn however far the
@@ -96,7 +135,7 @@ export const Cell = ({
   onLayout,
   style,
 }: ViewProps & { readonly item: DrawnRow | readonly DrawnRow[] }) => {
-  const held = useContext(HeldRow)
+  const { held, laid } = useContext(Cells)
   const holds = held !== undefined && [item].flat().some((row) => row.key === held)
   useEffect(() => {
     if (holds) {
@@ -104,7 +143,14 @@ export const Cell = ({
     }
   }, [holds, onFocusCapture])
   return (
-    <View onFocusCapture={onFocusCapture} onLayout={onLayout} style={style}>
+    <View
+      onFocusCapture={onFocusCapture}
+      onLayout={(event) => {
+        onLayout?.(event)
+        laid?.(event.nativeEvent.layout.height)
+      }}
+      style={style}
+    >
       {children}
     </View>
   )
@@ -141,6 +187,8 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
     [listRef],
   )
   const standing = useRef({ content: 0, frame: 0, offset: 0 })
+  const { laid: lined, pad, settle } = useSliver(shrinks === true && !horizontal)
+  const cells = useMemo(() => ({ held, laid: lined }), [held, lined])
   const tell = () =>
     moved(standing.current.offset, standing.current.frame, standing.current.content)
   const cell = across > 1 && width > 0 ? (width - gap * (across - 1)) / across : undefined
@@ -158,7 +206,7 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
   const lengthwise = lengthOf(horizontal, shrinks === true)
   const listed = (
     <ScrollView.Context.Provider value={null}>
-      <HeldRow.Provider value={held}>
+      <Cells.Provider value={cells}>
         <FlatList
           CellRendererComponent={Cell}
           columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
@@ -173,13 +221,14 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
           key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
           keyExtractor={keyed}
           {...followingOf(drawing)}
-          ListFooterComponent={<View>{footer}</View>}
+          ListFooterComponent={<View style={{ paddingBottom: pad }}>{footer}</View>}
           nestedScrollEnabled
           numColumns={across}
           onContentSizeChange={(contentWidth, contentHeight) => {
             standing.current.content = horizontal ? contentWidth : contentHeight
             tell()
-            }}
+            settle(standing.current.content, standing.current.frame)
+          }}
           onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
             if (sideways !== true) {
               setWidth(layout.width)
@@ -187,7 +236,8 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
             standing.current.frame = horizontal ? layout.width : layout.height
             laid(layout.width, layout.height)
             tell()
-            }}
+            settle(standing.current.content, standing.current.frame)
+          }}
           onScroll={({ nativeEvent }: Scrolled) => {
             standing.current = {
               content: horizontal ? nativeEvent.contentSize.width : nativeEvent.contentSize.height,
@@ -211,7 +261,7 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
           scrollEventThrottle={16}
           style={lengthwise}
         />
-      </HeldRow.Provider>
+      </Cells.Provider>
     </ScrollView.Context.Provider>
   )
   /* A row that runs past the frame scrolls across around the list, which scrolls
