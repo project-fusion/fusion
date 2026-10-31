@@ -32,6 +32,7 @@ import { SCROLL_AREA } from './scenarios/scroll-area.js'
 import { SLIDER } from './scenarios/slider.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
 import { SPLITTER } from './scenarios/splitter.js'
+import { TABLE } from './scenarios/table.js'
 import { TABS } from './scenarios/tabs.js'
 import { TAG_GROUP } from './scenarios/tag-group.js'
 import { TEXTAREA } from './scenarios/textarea.js'
@@ -89,6 +90,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'speed-dial': SPEED_DIAL,
   splitter: SPLITTER,
   switch: SWITCH,
+  table: TABLE,
   tabs: TABS,
   'tag-group': TAG_GROUP,
   textarea: TEXTAREA,

@@ -33,6 +33,7 @@ export type Family =
   | 'navigation'
   | 'number-input'
   | 'object-inspector'
+  | 'table'
   | 'outline'
   | 'pin-input'
   | 'popover'

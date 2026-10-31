@@ -373,6 +373,23 @@ export interface Left {
     }[]
   }
   /**
+   * What a table says: each heading and which way it is sorted, each row drawn
+   * with what a screen reader hears of each cell, what is selected and sorted,
+   * and where a grid's one stop stands, as a row's key and a column.
+   */
+  readonly table?: {
+    readonly heads: readonly { readonly sorted: string | null; readonly words: string }[]
+    readonly rows: readonly {
+      readonly cells: readonly string[]
+      readonly disabled: boolean
+      readonly expanded: boolean | null
+      readonly key: string
+    }[]
+    readonly selected: string
+    readonly sort: string
+    readonly stop: string
+  }
+  /**
    * The value the element holds, for a family a reader moves along a
    * track or picks a score in, as a slider or a rating: the web reads its
    * `value`, and React Native the value its range or scale machine holds.

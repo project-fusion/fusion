@@ -1,5 +1,6 @@
 import type { Left } from './format.js'
 import { filesOf } from './web-files.js'
+import { tableOf } from './web-table.js'
 
 /*
  * What an intent left in the page, read from the elements a setup mounted:
@@ -274,6 +275,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
+  ...(family === 'table' ? { table: tableOf(mounted.root) } : {}),
   /* What a list of data holds: the keys chosen, and the row with focus. */
   ...(family === 'virtual-list'
     ? {
