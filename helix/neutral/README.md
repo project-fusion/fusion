@@ -1412,6 +1412,15 @@ nothing of its own, so a family can bind it over a list or a scroll view. `logRo
 `article` announce nothing of their own on a phone, which reads what they hold in
 order.
 
+## Chat
+
+**A conversation declares a `tail` and a `chatRoot`**, the tail the machine Log binds.
+`chatRoot` reads `turns` into a windowed repeat, tells a screen reader what settles
+through core's `turnsToSay`, and asks for `history` at the top. `chatMessage` names a
+turn with core's `authorWords` and `turnName`, and `chatComposer` sits on a `text` and a
+`validation`, as a field does. A web-only wrap's part, as a composer's `reason`, must be
+a real part of the web element for `helix system check`.
+
 ## Notifications
 
 `notificationsRoot`, `notificationRow`, and `notificationGroup` declare a feed and

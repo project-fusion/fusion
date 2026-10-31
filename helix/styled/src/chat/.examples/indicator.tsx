@@ -3,6 +3,7 @@ export function Example() {
     <helix-chat
       className="indicator"
       label="Assistant"
+      style={{ '--chat-max-block-size': '12rem' } as React.CSSProperties}
     >
       <strong slot="header">Assistant</strong>
 

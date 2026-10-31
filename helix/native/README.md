@@ -1607,6 +1607,27 @@ const save = () => {
 A checkbox draws its tick and its dash with `react-native-svg`, at the weight
 the web draws them, so an app that draws a checkbox installs it.
 
+## Chat
+
+`HelixChat`, `HelixChatMessage`, and `HelixChatComposer`, from
+`@fusion.dev/helix/chat`, draw a conversation. Pass `turns` as data, which a
+`FlatList` windows, or pass messages as children. Give the chat a height, as the
+web's needs a block size.
+
+- **The transcript follows its newest turn** until the reader scrolls away, by the
+  `tail` machine Log binds. `maintainVisibleContentPosition` holds a reader's place as
+  older turns arrive above them, and `onHistory` fires once each time they reach the top.
+- **The composer stays above the software keyboard.** The chat measures how much of
+  the keyboard covers the composer and gives that room up from the transcript. An app
+  that moves its content out of the way itself leaves nothing to give up.
+- **The return key sends** under `submitOn="enter"`, the default, on a software keyboard
+  and a hardware one alike, and `submitOn="button"` makes it a new line. The draft
+  clears only after nothing refused `onSend`.
+- **`placeholders` turn in the field's own placeholder**, without the web's roll.
+
+The web's alone: the `glow`, dictation, the status region and the keys that move between
+turns, and the tooltip for `sendReason`, which a phone says as the button's hint.
+
 ## Text fields
 
 Input and Textarea draw their text in React Native's `TextInput`, inside the
