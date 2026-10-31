@@ -50,7 +50,7 @@ const WEB = new Set(['class', 'className', 'id', 'style'])
 const READ = new Set(['data-color-mode', 'data-density', 'data-grid-span'])
 
 /** The recipes an `a` draws by, which only it reads. */
-const LINK = new Set(['data-button', 'data-button-tone', 'data-card', 'data-link'])
+const LINK = new Set(['aria-current', 'data-button', 'data-button-tone', 'data-card', 'data-link'])
 
 /** An attribute as the native prop of the same meaning. */
 const propOf = (name: string, value: unknown, out: Record<string, unknown>): void => {
