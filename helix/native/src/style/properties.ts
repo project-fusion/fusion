@@ -196,7 +196,9 @@ export const DRAWN: Readonly<Record<string, Mapping>> = {
     return undefined
   },
   'pointer-events': (out, value) => {
-    out.pointerEvents = value === 'none' ? 'none' : 'auto'
+    /* `box-none` is a phone's way of a web rule that gives a child `auto` back:
+       a phone's `none` holds for everything inside. */
+    out.pointerEvents = value === 'none' || value === 'box-none' ? value : 'auto'
     return undefined
   },
   r: paintLength('r'),

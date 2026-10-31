@@ -153,7 +153,15 @@ export default styles(
         position: 'relative',
         web: { display: 'grid', gridRow: 3, justifyItems: 'center' },
       }),
-      native([rule({ alignItems: 'center', display: 'flex', flexDirection: 'column' })]),
+      native([
+        rule({
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          /* The button inside still takes a press, as the web's `auto` gives it. */
+          pointerEvents: 'box-none',
+        }),
+      ]),
       rule({ part: { hidden: true } }, { display: 'none' }),
       rule({ print: true }, { display: 'none' }),
     ]),
