@@ -76,6 +76,130 @@ pub const INSPECTOR_COMPUTED: &[&str] = &[
     "blank", "copyName", "copyText", "list", "named", "said", "topped",
 ];
 
+/// What log-root reads and sends, by the name the machine binds.
+pub const LOG_ROOT: &[(&str, Names)] = &[
+    ("collapse", Names::Prop),
+    ("done", Names::Prop),
+    ("doneLabel", Names::Prop),
+    ("droppedLabel", Names::Prop),
+    ("emptyText", Names::Prop),
+    ("errorLabel", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("format", Names::Prop),
+    ("groupLabel", Names::Prop),
+    ("groups", Names::Prop),
+    ("label", Names::Prop),
+    ("level", Names::Prop),
+    ("limit", Names::Prop),
+    ("lineHref", Names::Prop),
+    ("lineLabel", Names::Prop),
+    ("lineNumbers", Names::Prop),
+    ("lines", Names::Prop),
+    ("loading", Names::Prop),
+    ("loadingText", Names::Prop),
+    ("markLines", Names::Prop),
+    ("matchesLabel", Names::Prop),
+    ("onBeforeSelect", Names::Event),
+    ("onExpand", Names::Event),
+    ("onSelect", Names::Event),
+    ("parse", Names::Prop),
+    ("query", Names::Prop),
+    ("quiet", Names::Prop),
+    ("selectable", Names::Prop),
+    ("selectedLines", Names::Prop),
+    ("source", Names::Prop),
+    ("timestamps", Names::Prop),
+    ("wrap", Names::Prop),
+];
+
+/// What log-root computes for its parts, each read as `logRoot.x`.
+pub const LOG_ROOT_COMPUTED: &[&str] = &[
+    "blank",
+    "busy",
+    "digits",
+    "droppedHidden",
+    "droppedWords",
+    "list",
+    "named",
+    "said",
+    "scrolls",
+];
+
+/// What log-line reads and sends, by the name the machine binds.
+pub const LOG_LINE: &[(&str, Names)] = &[
+    ("at", Names::Prop),
+    ("level", Names::Prop),
+    ("levelWords", Names::Prop),
+    ("lineLabel", Names::Prop),
+    ("logRow", Names::Prop),
+    ("timesLabel", Names::Prop),
+];
+
+/// What log-line computes for its parts, each read as `logLine.x`.
+pub const LOG_LINE_COMPUTED: &[&str] = &[
+    "unwrapped",
+    "unnumbered",
+    "count",
+    "countHidden",
+    "countWords",
+    "debug",
+    "error",
+    "grouped",
+    "levelHidden",
+    "levelWords",
+    "linked",
+    "marked",
+    "heard",
+    "digits",
+    "numberHidden",
+    "numberName",
+    "numberWords",
+    "plainNumber",
+    "pressNumber",
+    "runs",
+    "selected",
+    "textHidden",
+    "timeHidden",
+    "timeWords",
+    "warn",
+    "written",
+];
+
+/// What log-group reads and sends, by the name the machine binds.
+pub const LOG_GROUP: &[(&str, Names)] = &[
+    ("duration", Names::Prop),
+    ("heading", Names::Prop),
+    ("logDrawn", Names::Prop),
+    ("status", Names::Prop),
+    ("statusLabel", Names::Prop),
+];
+
+/// What log-group computes for its parts, each read as `logGroup.x`.
+pub const LOG_GROUP_COMPUTED: &[&str] = &[
+    "frame",
+    "digits",
+    "heard",
+    "durationHidden",
+    "markIcon",
+    "spokenHidden",
+    "spokenWords",
+    "statusHidden",
+    "statusIcon",
+];
+
+/// What tail reads and sends, by the name the machine binds.
+pub const TAIL: &[(&str, Names)] = &[
+    ("defaultPinned", Names::Prop),
+    ("onBeforePin", Names::Event),
+    ("onPin", Names::Event),
+    ("pinned", Names::Prop),
+    ("resume", Names::Part),
+    ("threshold", Names::Prop),
+];
+
+/// What tail computes for its parts, each read as `tail.x`.
+pub const TAIL_COMPUTED: &[&str] = &["following", "away"];
+
 /// What an item computes for its parts, each read as `treeItem.x`. The element
 /// around them computes `empty`, read as `treeRoot.empty`.
 pub const COMPUTED: &[&str] = &[
@@ -239,7 +363,27 @@ pub fn table_column(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "tableColumn", TABLE_COLUMN, TABLE_COLUMN_COMPUTED)
 }
 
-/// A tree, an inspector, or a part of a table, by the key its source writes it under.
+/// `logRoot({ ... })`, each field a name.
+pub fn log_root(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "logRoot", LOG_ROOT, LOG_ROOT_COMPUTED)
+}
+
+/// `logLine({ ... })`, each field a name.
+pub fn log_line(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "logLine", LOG_LINE, LOG_LINE_COMPUTED)
+}
+
+/// `logGroup({ ... })`, each field a name.
+pub fn log_group(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "logGroup", LOG_GROUP, LOG_GROUP_COMPUTED)
+}
+
+/// `tail({ ... })`, each field a name.
+pub fn tail(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "tail", TAIL, TAIL_COMPUTED)
+}
+
+/// A tree, an inspector, a part of a table, or a part of a log, by the key its source writes it under.
 pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
     match key {
         "treeRoot" => tree(value),
@@ -247,6 +391,10 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "tableRoot" => table(value),
         "tableRow" => table_row(value),
         "tableColumn" => table_column(value),
+        "logRoot" => log_root(value),
+        "logLine" => log_line(value),
+        "logGroup" => log_group(value),
+        "tail" => tail(value),
         _ => inspector(value),
     }
 }
