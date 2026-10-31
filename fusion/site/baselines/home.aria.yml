@@ -23,6 +23,8 @@
   - code: bun add @fusion.dev/helix
   - button "Copy the install command"
   - paragraph: Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.
+  - figure:
+    - img "What goes into Fusion and what comes out Your brand, your code and your decisions flow into Fusion. Out of it come Helix, which checks every screen, and Cortex, which keeps every decision with its reason.": What you bring your brand your code your decisions What comes out Helix every screen, checked Cortex every decision kept with its reason
   - heading "An interface is cheap to start and expensive to keep" [level=2]
   - paragraph: The first screen takes a morning. A second brand, a framework migration, and an accessibility audit take the rest of the year, and none of them is visible on the day you start. Helix is built for that later work.
   - paragraph: Theming
@@ -39,7 +41,7 @@
   - paragraph: Find problems before an audit does
   - list:
     - listitem: Contrast is measured on every release
-    - listitem: Twelve generators check the code and fail the build when it drifts
+    - listitem: Ten generators check the code and fail the build when it drifts
   - paragraph: Agents
   - paragraph: Give AI agents the reference you read
   - list:
@@ -107,6 +109,41 @@
   - radio "Fine"
   - radio "Good" [checked]
   - radio "Great"
+  - paragraph: Checks
+  - heading "Find problems before an audit does" [level=2]
+  - paragraph: Contrast is measured on every release
+  - text: One pair that failed
+  - paragraph: Body text in this gray
+  - text: 3.03:1 against a target of 4.5:1 Fails
+  - paragraph: "color-foreground on color-background: 3.03:1 below target 4.5:1"
+  - text: 10 generator checks
+  - code: content
+  - code: register
+  - code: docs
+  - code: element-events
+  - code: eval
+  - code: metrics
+  - code: routes
+  - code: samples
+  - code: themed-page
+  - code: token-layer
+  - paragraph: Agents
+  - heading "Give AI agents the reference you read" [level=2]
+  - paragraph: Every tag, property, and event in one manifest at a URL
+  - text: Question
+  - paragraph: What attributes and events does helix-button have?
+  - text: Request Manifest URL
+  - button "Copy code, Manifest URL"
+  - code: https://fusion.dev/helix/custom-elements.json
+  - text: Answer
+  - paragraph: The manifest's entry for helix-button, cut to the fields the question asks for.
+  - text: Manifest excerpt
+  - button "Copy code, Manifest excerpt"
+  - code: "{ \"attributes\": [\"width\", \"emphasis\", \"tone\", \"command\", \"commandfor\", \"focusable-when-disabled\", \"formaction\", \"formenctype\", \"formmethod\", \"formnovalidate\", \"formtarget\", \"label\", \"pending\", \"pending-label\", \"type\", \"value\", \"disabled\", \"name\"], \"events\": [\"helix-press\"], \"tagName\": \"helix-button\" }"
+  - link "Read the index":
+    - /url: /llms.txt
+  - link "Read the button family":
+    - /url: /helix/components/button.json
   - paragraph: Coverage
   - heading "components in one package" [level=2]
   - paragraph: Charts, data tables, chat, and date pickers use the same tokens as your buttons.
