@@ -51,6 +51,11 @@ const build = (setup: Setup): Updatable => {
     holds.renderItem = (item: Readonly<Record<string, unknown>> | string) =>
       typeof item === 'string' ? item : String(item[field])
   }
+  if (setup.logLines !== undefined) {
+    const log = made as Updatable & { groups?: unknown; lines?: unknown }
+    log.groups = setup.logGroups ?? []
+    log.lines = setup.logLines
+  }
   if (setup.value !== undefined) {
     ;(made as Updatable & { value?: unknown }).value = setup.value
   }
@@ -255,6 +260,11 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
 /** The row at a place in the set, in the light DOM or in the element's own. */
 const rowAt = (mounted: Mounted, row: number): HTMLElement | null => {
   const selector = `[data-index="${row}"]`
+  const drawn = mounted.root.shadowRoot?.querySelectorAll('[part="row"] > *')[row]
+  if (drawn?.shadowRoot) {
+    /* A row of a log: a press lands on a step's heading, or a line's number. */
+    return drawn.shadowRoot.querySelector<HTMLElement>('[part="summary"], [part~="number"]')
+  }
   return (
     mounted.root.querySelector<HTMLElement>(selector) ??
     mounted.root.shadowRoot?.querySelector<HTMLElement>(selector) ??

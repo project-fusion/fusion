@@ -5,6 +5,7 @@ import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
+import { logLeft } from './log'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
 import { textLeft } from './text'
@@ -231,6 +232,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...windowLeft(run),
     ...treeLeft(run),
     ...inspectorLeft(run),
+    ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
     ...tableLeft(run),
     ...colorLeft(run),
   }
