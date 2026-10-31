@@ -204,6 +204,14 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly inspector: Computes<
     'blank' | 'copyName' | 'copyText' | 'list' | 'named' | 'said' | 'topped'
   >
+  /** What a table computes. */
+  readonly tableRoot: Computes<'empty' | 'every' | 'heads' | 'nests' | 'rows' | 'waiting'>
+  /** What a row of a table computes. */
+  readonly tableRow: Computes<
+    'branch' | 'cells' | 'grips' | 'gripStill' | 'nests' | 'selectable' | 'selectedCell'
+  >
+  /** What a column of a table computes. */
+  readonly tableColumn: Computes<'movable' | 'sorts' | 'still'>
   /** What a tree computes. */
   readonly treeRoot: Computes<'empty'>
   /** What an item of a tree computes for its parts. */
@@ -736,7 +744,7 @@ export interface WrapAttributes extends Common, Drawing {
    * holds, called with `passes` and the copy's place, as a file input's
    * `renderFile`. Where the prop holds none, the wrap draws what it holds.
    */
-  readonly renders?: Read
+  readonly renders?: Read | undefined
   /** Drawn only while this holds. */
   readonly when?: Read | undefined
 }

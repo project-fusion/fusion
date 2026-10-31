@@ -18,6 +18,9 @@ pub const FEATURES: &[&str] = &[
     "color",
     "colorField",
     "inspector",
+    "tableColumn",
+    "tableRoot",
+    "tableRow",
     "treeItem",
     "treeRoot",
     "copy",
@@ -68,12 +71,8 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "sections" => push("sections.list", &sections::sections(value)?.list),
             "files" => push("files.list", &files::files(value)?.list),
             "window" => push("window.list", &window::window(value)?.list),
-            "treeRoot" | "treeItem" | "inspector" => {
-                let choice = match key.as_str() {
-                    "treeRoot" => super::tree_choice::tree(value)?,
-                    "treeItem" => super::tree_choice::tree_item(value)?,
-                    _ => super::tree_choice::inspector(value)?,
-                };
+            "treeRoot" | "treeItem" | "inspector" | "tableRoot" | "tableRow" | "tableColumn" => {
+                let choice = super::tree_choice::by_key(&key, value)?;
                 for (field, name) in choice.computed {
                     push(&format!("{key}.{field}"), &name);
                 }
