@@ -134,6 +134,14 @@
       "types": "./dist/code/index.d.ts",
       "default": "./dist/code/index.js"
     },
+    "./code-block": {
+      "react-native": {
+        "types": "./dist/code-block/index.native.d.ts",
+        "default": "./dist/code-block/index.native.js"
+      },
+      "types": "./dist/code-block/index.d.ts",
+      "default": "./dist/code-block/index.js"
+    },
     "./color-input": {
       "react-native": {
         "types": "./dist/color-input/index.native.d.ts",
