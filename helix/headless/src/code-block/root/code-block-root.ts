@@ -413,20 +413,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   language = ''
 
   /**
-   * Turns the code into runs of one look each, where a highlighter gives those
-   * and not HTML, such as `shikiTokens` over Shiki's `codeToTokensWithThemes`.
-   * Called with the code as written and the block's `language`, and returning
-   * nothing for a language it does not read, which the block draws plain. A
-   * `highlight` wins over it. It is what a phone draws, as a phone has no HTML
-   * to draw, and a phone reads a `highlight` as well, from the tags and inline
-   * styles of what it returns. Not called on a server, nor for a diff.
-   *
-   * Absent, the block draws with what `registerTokens` gave every block.
-   */
-  @property({ attribute: false })
-  tokens?: CodeBlockTokens
-
-  /**
    * Whether the lines are numbered in a gutter beside the code.
    *
    * The numbers are hidden from the accessibility tree and are not part of a
@@ -483,6 +469,30 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @words
   @property({ attribute: 'show-unchanged-label' })
   showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
+
+  /**
+   * Turns the code into runs of one look each, where a highlighter gives those
+   * and not HTML, such as `shikiTokens` over Shiki's `codeToTokensWithThemes`.
+   * Called with the code as written and the block's `language`, and returning
+   * nothing for a language it does not read, which the block draws plain. A
+   * `highlight` wins over it. It is what a phone draws, as a phone has no HTML
+   * to draw, and a phone reads a `highlight` as well, from the tags and inline
+   * styles of what it returns. Not called on a server, nor for a diff.
+   *
+   * Absent, the block draws with what `registerTokens` gave every block.
+   */
+  @property({ attribute: false })
+  tokens?: CodeBlockTokens
+
+  /**
+   * How a diff's two versions are arranged. It has no effect without `diff`.
+   *
+   * Absent is unified, each removal above its replacement, which fits any
+   * width. `split` sets the old version beside the new one. Optional rather
+   * than defaulted, so the host carries no attribute the consumer did not write.
+   */
+  @property({ reflect: true })
+  variant?: 'split'
 
   /**
    * Whether long lines wrap. Without it they scroll.
