@@ -11,6 +11,9 @@ import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
 import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
+import { useChat } from './chat'
+import { useChatComposer } from './chat-composer'
+import { useChatMessage } from './chat-message'
 import { useCodeBlock } from './code-block'
 import { useColor } from './color'
 import { useColorField } from './color-field'
@@ -286,6 +289,27 @@ export const behaviorFor = (family: Family): UseBehavior => {
             around.tail.current = tail
             return behavior
           },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'chat')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useChat(family, props, use, around.tail.current),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'chat-message')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useChatMessage(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'chat-composer')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useChatComposer(family, props, use, around.entered, around.touch),
       ),
     ...uses
       .filter((use) => use.machine === 'log')

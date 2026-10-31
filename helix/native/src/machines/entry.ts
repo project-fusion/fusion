@@ -38,6 +38,8 @@ export interface Entered {
   readonly clear: () => void
   /** The press that clears the field, where the tree draws one. */
   readonly clears: string | undefined
+  /** Sets the text with nothing sent, as a composer empties its field after a send. */
+  readonly quietly: (next: string) => void
   /** The text the field holds as of the last edit or step, between renders as well. */
   readonly current: () => string
   /** The methods the element's ref offers: `stepUp` and `stepDown`, on a number type. */
@@ -320,6 +322,12 @@ export const useEntry = (
     },
     [family],
   )
+  const quietly = useCallback((next: string) => {
+    latest.current = { ...latest.current, text: next }
+    committed.current = next
+    hold((was) => ({ ...was, text: next }))
+    edit(false)
+  }, [])
   const commit = useCallback(() => {
     const { events: bound, props: now, text: settled, touch: touched } = latest.current
     if (settled === committed.current) {
@@ -549,6 +557,7 @@ export const useEntry = (
     focused,
     methods,
     number,
+    quietly,
     step,
     value: text,
   }
