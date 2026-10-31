@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { type CheckableRow, checkedState, checkRows, pressRow } from './selection.js'
+import { type CheckableRow, checkedState, checkRows, pressRow } from './tree-selection.js'
 
 const leaf = (value: string, disabled = false): CheckableRow => ({
   branch: false,
