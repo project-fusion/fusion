@@ -110,6 +110,14 @@
       "types": "./dist/card/index.d.ts",
       "default": "./dist/card/index.js"
     },
+    "./chat": {
+      "react-native": {
+        "types": "./dist/chat/index.native.d.ts",
+        "default": "./dist/chat/index.native.js"
+      },
+      "types": "./dist/chat/index.d.ts",
+      "default": "./dist/chat/index.js"
+    },
     "./checkbox": {
       "react-native": {
         "types": "./dist/checkbox/index.native.d.ts",
