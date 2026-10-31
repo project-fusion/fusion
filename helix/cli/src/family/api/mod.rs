@@ -73,7 +73,7 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP,
+    TreeChoice, CAROUSEL, LISTBOX, OPTION, OPTION_GROUP, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP,
     LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE,
     TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
@@ -174,6 +174,15 @@ pub struct Api {
     #[serde(rename = "notificationGroup", skip_serializing_if = "Option::is_none")]
     pub notification_group: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a conversation.
+    /// What the element reads, sends, and computes where it is a list of options.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub listbox: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is an option.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub option: Option<TreeChoice>,
+    /// What the element reads where it is a group of options, or a rule between runs.
+    #[serde(rename = "optionGroup", skip_serializing_if = "Option::is_none")]
+    pub option_group: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a carousel.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub carousel: Option<TreeChoice>,
@@ -334,6 +343,9 @@ impl Api {
             && self.notification_row.is_none()
             && self.notification_group.is_none()
             && self.carousel.is_none()
+            && self.listbox.is_none()
+            && self.option.is_none()
+            && self.option_group.is_none()
             && self.chat_root.is_none()
             && self.chat_message.is_none()
             && self.chat_composer.is_none()
@@ -411,6 +423,9 @@ const FIELDS: &[&str] = &[
     "notificationRow",
     "notificationGroup",
     "carousel",
+    "listbox",
+    "option",
+    "optionGroup",
     "chatRoot",
     "chatMessage",
     "chatComposer",
@@ -457,6 +472,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::notification_group)
             .transpose()?,
         carousel: field("carousel").map(tree_choice::carousel).transpose()?,
+        listbox: field("listbox").map(tree_choice::listbox).transpose()?,
+        option: field("option").map(tree_choice::option).transpose()?,
+        option_group: field("optionGroup").map(tree_choice::option_group).transpose()?,
         chat_root: field("chatRoot").map(tree_choice::chat_root).transpose()?,
         chat_message: field("chatMessage")
             .map(tree_choice::chat_message)
