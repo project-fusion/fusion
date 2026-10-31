@@ -30,7 +30,7 @@ export default styles(
     prefix: 'virtual-list',
     hooks: {
       blockSize: '20em',
-      disabledOpacity: '0.5',
+      disabledOpacity: 0.5,
       emptyColor: token('color-foreground-muted'),
       emptyPadding: token('space-md'),
       loadingColor: token('color-foreground-muted'),
@@ -147,7 +147,7 @@ export default styles(
           },
         ),
         rule({ also: { 'row-disabled': true } }, { opacity: hook.disabledOpacity }),
-        rule({ also: { 'row-dragging': true } }, { opacity: '0.5' }),
+        rule({ also: { 'row-dragging': true } }, { opacity: 0.5 }),
         rule(
           { also: { 'row-drop-before': true } },
           { boxShadow: ['inset', '0', token('border-thick'), '0', '0', token('color-primary')] },
