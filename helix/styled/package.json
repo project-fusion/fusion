@@ -597,6 +597,14 @@
       "types": "./dist/tour/index.d.ts",
       "default": "./dist/tour/index.js"
     },
+    "./tree": {
+      "react-native": {
+        "types": "./dist/tree/index.native.d.ts",
+        "default": "./dist/tree/index.native.js"
+      },
+      "types": "./dist/tree/index.d.ts",
+      "default": "./dist/tree/index.js"
+    },
     "./trend": {
       "react-native": {
         "types": "./dist/trend/index.native.d.ts",
