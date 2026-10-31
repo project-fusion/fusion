@@ -155,6 +155,10 @@
       "types": "./dist/utils/swipe/swipe.d.ts",
       "default": "./dist/utils/swipe/swipe.js"
     },
+    "./table": {
+      "types": "./dist/utils/table/table.d.ts",
+      "default": "./dist/utils/table/table.js"
+    },
     "./tree": {
       "types": "./dist/utils/tree-selection/tree.d.ts",
       "default": "./dist/utils/tree-selection/tree.js"
