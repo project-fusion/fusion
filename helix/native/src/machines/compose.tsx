@@ -11,6 +11,7 @@ import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
 import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
+import { useCodeBlock } from './code-block'
 import { useColor } from './color'
 import { useColorField } from './color-field'
 import { type Copied, useCopy } from './copy'
@@ -306,6 +307,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLogGroup(family, props, use, around.toggled),
+      ),
+    /* A block of code. */
+    ...uses
+      .filter((use) => use.machine === 'code-block')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useCodeBlock(family, props, use),
       ),
     /* A feed of notifications, a row, and a group, which folds by the toggle hosted before it. */
     ...uses

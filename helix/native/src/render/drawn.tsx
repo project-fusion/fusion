@@ -220,7 +220,9 @@ export const drawDrawn = (
   regions: Readonly<Record<string, ReactNode>> = {},
 ): ReactNode => {
   const made = madeFor(draws)
-  if (made === undefined) {
+  /* `hidden` is the rule's on a box, and an element drawn here has no box of its
+     own to take it, so a drawn element that is hidden draws nothing. */
+  if (made === undefined || bound(scope, node.attributes?.hidden, node.name) === true) {
     return null
   }
   const box = resolve(scope, node)
@@ -229,6 +231,7 @@ export const drawDrawn = (
   for (const [region, held] of Object.entries(regions)) {
     into[camel(region)] = held
   }
+  const copied = copyViewOf(scope, node)
   const element = (
     <made.Component
       key={node.name}
@@ -236,9 +239,9 @@ export const drawDrawn = (
       {...bubbledBy(scope, node)}
       {...into}
       {...scope.behavior.parts[node.name]?.view}
-      {...copyViewOf(scope, node)}
+      {...copied}
     >
-      {children}
+      {children ?? (copied?.children as ReactNode)}
     </made.Component>
   )
   /* **An item drawn inside an element another one draws is that element's**:
