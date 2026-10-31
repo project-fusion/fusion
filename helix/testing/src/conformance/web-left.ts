@@ -249,6 +249,15 @@ const inspectorRows = (mounted: Mounted): NonNullable<Left['inspector']> => {
   }
 }
 
+/** What a screen reader hears of each option a filter leaves showing. */
+const optionRows = (mounted: Mounted): NonNullable<Left['options']> =>
+  [...mounted.items]
+    .filter(([, item]) => !(item as HTMLElement).hidden)
+    .map(([value, item]) => {
+      const one = item as HTMLElement & { readonly disabled: boolean; readonly selected: boolean }
+      return { disabled: one.disabled, selected: one.selected, value }
+    })
+
 /** What a screen reader hears of each row a reader can reach in a tree. */
 const treeRows = (mounted: Mounted): NonNullable<Left['tree']> =>
   [...mounted.items]
@@ -436,6 +445,8 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
     : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
+  /* Focus on the list is the web's, and a phone's option holds it for the keys. */
+  ...(family === 'listbox' ? { focused: null, options: optionRows(mounted) } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
