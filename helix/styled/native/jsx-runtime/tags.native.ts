@@ -20,6 +20,7 @@ import { HelixColorInput } from '../color-input/index.native'
 import { HelixColorPicker } from '../color-picker/index.native'
 import { HelixCopyButton } from '../copy-button/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
+import { HelixCarousel } from '../carousel/index.native'
 import { HelixChat, HelixChatComposer, HelixChatMessage } from '../chat/index.native'
 import { HelixDialog } from '../dialog/index.native'
 import { HelixDivider } from '../divider/index.native'
@@ -160,6 +161,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-copy-button': HelixCopyButton,
   'helix-description-list': HelixDescriptionList,
   'helix-description-list-item': HelixDescriptionListItem,
+  'helix-carousel': HelixCarousel,
   'helix-chat': HelixChat,
   'helix-chat-composer': HelixChatComposer,
   'helix-chat-message': HelixChatMessage,

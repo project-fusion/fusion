@@ -694,6 +694,24 @@ web sends `scrollend`, and again as its frame or its content changes length.
 `to` scrolls a part to an offset. `ScrollArea` takes a `ref`, which
 `observe` and `to` take as its node.
 
+**A part that snaps comes to rest on the boxes in it that say where.** A part's
+`scroll-snap-type` is a scroll view with a glide that stops soon, and under
+`mandatory` one swipe moves one place. Each box's `scroll-snap-align` gives a
+place, clear of the part's `scroll-padding`. `usePaging` is what a machine moves
+such a part with: `go` scrolls to a place, `onRest` hears where a reader's move
+came to rest, `onMove` hears the nearest place on the way, and `pick` keeps the
+places it stops at. A scroll of its own never reads as a reader's move. A wheel
+of Time Picker pages the same way.
+
+**Carousel's chrome stands absolutely, since the native grid has no cells that
+overlap.** The dots and the arrows share a cell on the web. On a phone each group
+is measured, and the host is padded by what each edge holds, so the tree keeps the
+web's reading order. The slot in each pane draws its slide, as the copy's `slide`
+field says. Web only: `mouse-drag`, its `dragging` state, and the arrows on a touch
+screen, which the web hides there too unless `controls="always"`. Under an overlay
+with `controls="always"` and `autoplay`, the rotation control stands before the
+arrows on a phone, which has no `order`.
+
 **Scroll Area is in a state for each edge with more past it**, as on the
 web, from where its viewport's scroll view stands, and sends `onScroll` as
 it moves and `onScrollEnd` once it comes to rest. It shows the platform's
