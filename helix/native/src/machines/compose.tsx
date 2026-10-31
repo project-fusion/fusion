@@ -27,6 +27,9 @@ import { useLogLine } from './log-line'
 import { mixedItem } from './mixed-item'
 import { mixingSet } from './mixed-set'
 import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
+import { useNotification } from './notification'
+import { useNotificationGroup } from './notification-group'
+import { useNotifications } from './notifications'
 import { usePage } from './page'
 import { pressing } from './pressing'
 import { boundTo } from './props'
@@ -303,6 +306,28 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLogGroup(family, props, use, around.toggled),
+      ),
+    /* A feed of notifications, a row, and a group, which folds by the toggle hosted before it. */
+    ...uses
+      .filter((use) => use.machine === 'notifications')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useNotifications(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'notification')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useNotification(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'notification-group')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useNotificationGroup(family, props, use, around.toggled),
       ),
     /* An object inspector's rows, which its field's text narrows. */
     ...uses
