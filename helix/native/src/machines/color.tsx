@@ -740,7 +740,7 @@ export const useColor = (
   const painted = rnColor(color)
   const swatches = swatchList(presets, painted, said)
   const chosenAt = swatches.findIndex((one) => one.chosen)
-  const swatchStop = swatchAt ?? (chosenAt >= 0 ? chosenAt : 0)
+  const swatchStop = swatchAt ?? Math.max(chosenAt, 0)
   const bandShare = laid.ring > 0 ? (laid.band * 2) / laid.ring : 0
 
   const fieldsLatest = useRef(fieldRows)
