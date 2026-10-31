@@ -8,6 +8,7 @@
  * under that id.
  */
 import { measure } from '@fusion.dev/helix-core/capabilities/measure'
+import { openLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import { scroll } from '@fusion.dev/helix-core/capabilities/scroll'
 import { useCallback, useRef } from 'react'
 import type { HostInstance } from 'react-native'
@@ -111,6 +112,19 @@ export const goToSection = (id: string): boolean => {
     }
   }
   return scrollToSection(id, false)
+}
+
+/**
+ * Follows a link as a browser does: a fragment goes to its section, and
+ * anything else goes through the open-link capability.
+ */
+export const followLink = (href: string): void => {
+  const id = fragmentOf(href)
+  if (id === undefined) {
+    openLink().open(href)
+  } else {
+    goToSection(id)
+  }
 }
 
 /**
