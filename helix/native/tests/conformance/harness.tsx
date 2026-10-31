@@ -36,6 +36,7 @@ import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
+import { focusStop, isTable, moveRow, tablePress } from './table'
 import { focusField, leave, pressBox, typeInto } from './text'
 import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
 import { rowDisabled, rowWords } from './window'
@@ -323,6 +324,31 @@ const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Pr
   )
 }
 
+/** A press on what the setup draws. */
+const pressing = async (
+  run: Run,
+  intent: Extract<Intent, { kind: 'press' }>,
+): Promise<string | undefined> => {
+  const { setup } = run.scenario
+  if (isTable(run.scenario)) {
+    const pressed = tablePress(intent.item, intent.part)
+    await (pressed === undefined ? undefined : tap(pressed))
+    return undefined
+  }
+  return colors(setup.tag) && intent.part === 'swatch' ? pressSwatch() : press(setup, intent)
+}
+
+/** Focus on what the setup draws. */
+const focusing = (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> =>
+  isTable(run.scenario) ? focusStop(run) : focusOn(run, intent)
+
+/** A screen reader's move of an item. */
+const moving = (
+  run: Run,
+  intent: Extract<Intent, { kind: 'move' }>,
+): Promise<string | undefined> =>
+  isTable(run.scenario) ? moveRow(run, intent.item, intent.by) : move(run, intent)
+
 /** Performs one intent, or says why it cannot. */
 const perform = async (run: Run, intent: Intent): Promise<string | undefined> => {
   const { setup } = run.scenario
@@ -332,7 +358,7 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
     case 'drag':
       return CANNOT.drag
     case 'focus':
-      await focusOn(run, intent)
+      await focusing(run, intent)
       return undefined
     case 'key':
       await key(run, intent)
@@ -372,7 +398,7 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return undefined
     }
     case 'move':
-      return move(run, intent)
+      return moving(run, intent)
     case 'scroll':
       return scroll(intent)
     case 'hide':
@@ -385,7 +411,7 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return cannot
     }
     case 'press':
-      return colors(setup.tag) && intent.part === 'swatch' ? pressSwatch() : press(setup, intent)
+      return pressing(run, intent)
     case 'refuse':
       run.refused.add(intent.event)
       return undefined
