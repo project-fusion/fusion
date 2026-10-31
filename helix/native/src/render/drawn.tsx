@@ -31,8 +31,50 @@ import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
 import { type Around, AroundContext, useInheritedText } from './around'
 import { type Made, madeFor } from './made'
-import { bound, camel, resolve, type Scope } from './styles'
+import { bound, camel, resolve, type Scope, split } from './styles'
 import { drawText } from './words-node'
+
+/** What a box or a wrap gives the element it draws. */
+const aroundOf = (
+  scope: Scope,
+  node: Node,
+  made: Made,
+  box: ReturnType<typeof resolve>,
+): Around => {
+  const parts: Record<string, Style> = {}
+  for (const part of exportsOf(node)) {
+    const { style } = resolve(scope, `${node.name}-${part}`)
+    if (Object.keys(style).length > 0) {
+      parts[part] = style
+    }
+  }
+  return {
+    children: placedBy(box.style),
+    custom: box.custom,
+    ...(Object.keys(parts).length === 0 ? {} : { parts }),
+    /* The web's host inherits what a rule on it sets, and an inline host draws
+       with nothing else. */
+    ...(isInlineHost(made) ? { text: split(box.style)[1] } : {}),
+    values: box.values,
+    within: box.layout,
+  }
+}
+
+/**
+ * Whether an element's host is `display: inline`, a piece of text that takes the
+ * text around it and sets none of its own, as Format Date is.
+ */
+const isInlineHost = (made: Made): boolean =>
+  (made.family.rules ?? []).some(
+    (rule) =>
+      rule.kind === 'rule' &&
+      rule.target === 'host' &&
+      (rule.when ?? []).length === 0 &&
+      rule.set?.some(
+        ([name, value]) =>
+          name === 'display' && (value as { readonly text?: string }).text === 'inline',
+      ),
+  )
 
 /** The parts the box exports, by their names in the drawn element. */
 const exportsOf = (node: Node): readonly string[] => {
@@ -181,21 +223,8 @@ export const drawDrawn = (
   if (made === undefined) {
     return null
   }
-  const parts: Record<string, Style> = {}
-  for (const part of exportsOf(node)) {
-    const { style } = resolve(scope, `${node.name}-${part}`)
-    if (Object.keys(style).length > 0) {
-      parts[part] = style
-    }
-  }
   const box = resolve(scope, node)
-  const around: Around = {
-    children: placedBy(box.style),
-    custom: box.custom,
-    ...(Object.keys(parts).length === 0 ? {} : { parts }),
-    values: box.values,
-    within: box.layout,
-  }
+  const around = aroundOf(scope, node, made, box)
   const into: Record<string, ReactNode> = {}
   for (const [region, held] of Object.entries(regions)) {
     into[camel(region)] = held
