@@ -372,7 +372,7 @@ const useSelection = (
 }
 
 /** The list a log from data draws in, or the scroll view of lines passed in. */
-const useBox = (tail: Tail | undefined, fed: boolean) => {
+export const useBox = (tail: Tail | undefined, fed: boolean) => {
   const list = useRef<WindowScroller | null>(null)
   const listRef = useCallback(
     (next: WindowScroller | null) => {
