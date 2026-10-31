@@ -6,6 +6,7 @@ import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
 import { rangeLeft } from './range'
+import { tableLeft } from './table'
 import { textLeft } from './text'
 import { treeLeft } from './tree'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
@@ -230,6 +231,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...windowLeft(run),
     ...treeLeft(run),
     ...inspectorLeft(run),
+    ...tableLeft(run),
     ...colorLeft(run),
   }
 }
