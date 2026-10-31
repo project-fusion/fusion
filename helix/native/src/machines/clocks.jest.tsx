@@ -18,13 +18,13 @@ afterEach(() => {
   setTimers(original)
 })
 
-describe('useDelay', () => {
-  const Shown = ({ ms }: { ms: number }) => {
-    const wait = useDelay()
-    useEffect(() => wait.start(ms), [ms, wait])
-    return <Text>{wait.elapsed ? 'shown' : 'waiting'}</Text>
-  }
+const Shown = ({ ms }: { ms: number }) => {
+  const wait = useDelay()
+  useEffect(() => wait.start(ms), [ms, wait])
+  return <Text>{wait.elapsed ? 'shown' : 'waiting'}</Text>
+}
 
+describe('useDelay', () => {
   test('draws again once its time has passed', async () => {
     await render(<Shown ms={300} />)
     expect(screen.getByText('waiting')).toBeTruthy()
@@ -39,15 +39,16 @@ describe('useDelay', () => {
   })
 })
 
+const Message = ({ spent }: { readonly spent: number[] }) => {
+  const timer = useCountdown({ done: () => spent.push(clock.now()), holdWhileHidden: true })
+  useEffect(() => timer.start(1000), [timer])
+  return null
+}
+
 describe('useCountdown', () => {
   test('runs out once its time is spent, held while the app is in the background', async () => {
     const spent: number[] = []
-    const Message = () => {
-      const timer = useCountdown({ done: () => spent.push(clock.now()), holdWhileHidden: true })
-      useEffect(() => timer.start(1000), [timer])
-      return null
-    }
-    const drawn = await render(<Message />)
+    const drawn = await render(<Message spent={spent} />)
     clock.advance(400)
     clock.setVisible(false)
     clock.advance(10_000)
@@ -59,12 +60,12 @@ describe('useCountdown', () => {
   })
 })
 
-describe('useWallClock', () => {
-  const Minutes = () => {
-    const now = useWallClock((at) => 60_000 - (at % 60_000))
-    return <Text>{now === undefined ? 'none' : new Date(now).toISOString().slice(11, 16)}</Text>
-  }
+const Minutes = () => {
+  const now = useWallClock((at) => 60_000 - (at % 60_000))
+  return <Text>{now === undefined ? 'none' : new Date(now).toISOString().slice(11, 16)}</Text>
+}
 
+describe('useWallClock', () => {
   test('draws the time of day, again each minute, and catches up as the app comes back', async () => {
     await render(<Minutes />)
     expect(screen.getByText('09:00')).toBeTruthy()

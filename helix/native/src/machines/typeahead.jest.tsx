@@ -44,19 +44,44 @@ beforeEach(() => {
   setTimers(timers)
 })
 
+const Items = ({
+  arrived,
+  chosen,
+  keep,
+  members,
+  selects,
+}: {
+  readonly arrived: string[]
+  readonly chosen: string[]
+  readonly keep: (made: Typing) => void
+  readonly members: readonly Member[]
+  readonly selects: boolean
+}) => {
+  keep(
+    useTypeahead(members, selects, (value) => chosen.push(value), {
+      arrived: (value, from) => arrived.push(`${from}>${value}`),
+      reachesDisabled: members !== COUNTRIES,
+    }),
+  )
+  return null
+}
+
 /** Renders a set searching these countries, and hands back its typing and the choices it made. */
 const search = async (selects = true, members: readonly Member[] = COUNTRIES) => {
   const arrived: string[] = []
   const chosen: string[] = []
   let typing: Typing | undefined
-  const Items = () => {
-    typing = useTypeahead(members, selects, (value) => chosen.push(value), {
-      arrived: (value, from) => arrived.push(`${from}>${value}`),
-      reachesDisabled: members !== COUNTRIES,
-    })
-    return null
-  }
-  await render(<Items />)
+  await render(
+    <Items
+      arrived={arrived}
+      chosen={chosen}
+      keep={(made) => {
+        typing = made
+      }}
+      members={members}
+      selects={selects}
+    />,
+  )
   const type = async (from: string, key: string, held: Partial<KeyPress> = {}) => {
     let took = false
     await act(() => {

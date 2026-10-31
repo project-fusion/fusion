@@ -79,23 +79,37 @@ test('a press that moves nothing at once waits for nothing', () => {
   expect(clock.pending().timeouts).toBe(0)
 })
 
+const Holder = ({
+  by,
+  held,
+  keep,
+  step,
+}: {
+  readonly by: number
+  readonly held: { count: number }
+  readonly keep: (made: Hold) => void
+  readonly step: () => boolean
+}) => {
+  const kept = useHold(() => {
+    held.count += by - 1
+    return step()
+  })
+  useEffect(() => {
+    keep(kept)
+  }, [keep, kept])
+  return null
+}
+
 test('a hold kept by a view reads its latest step and stops as the view goes', async () => {
   const { held, step } = counter()
   let hold: Hold | undefined
-  const Holder = ({ by }: { readonly by: number }) => {
-    const kept = useHold(() => {
-      held.count += by - 1
-      return step()
-    })
-    useEffect(() => {
-      hold = kept
-    }, [kept])
-    return null
+  const keep = (made: Hold) => {
+    hold = made
   }
-  const drawn = await render(<Holder by={1} />)
+  const drawn = await render(<Holder by={1} held={held} keep={keep} step={step} />)
   await act(() => hold?.start())
   expect(held.count).toBe(1)
-  await drawn.rerender(<Holder by={2} />)
+  await drawn.rerender(<Holder by={2} held={held} keep={keep} step={step} />)
   await act(() => clock.advance(400))
   expect(held.count).toBe(3)
   await drawn.unmount()

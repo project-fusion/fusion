@@ -12,6 +12,5 @@ import type { Props } from './behavior'
  */
 export const webOnly = (family: Family): ComponentType<Props> => {
   readable(family)
-  const Nothing = (_props: Props) => null
-  return Object.assign(Nothing, { displayName: family.tag, tag: family.tag })
+  return Object.assign((_props: Props) => null, { displayName: family.tag, tag: family.tag })
 }

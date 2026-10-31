@@ -25,6 +25,8 @@ const all = (): Drawn[] => nodes(screen.toJSON())
 const paths = (): Drawn[] => all().filter((node) => node.type === 'RNSVGPath')
 const host = (): Drawn | undefined => all()[0]
 
+const Scheme = () => <Text>{useTheme().mode}</Text>
+
 describe('the generated QR Code', () => {
   test('is a picture named by the word for a code and the address it opens', async () => {
     await render(themed(<HelixQrCode value="https://fusion.dev/helix" />))
@@ -121,7 +123,6 @@ describe('the generated QR Code', () => {
   })
 
   test('draws the mark on its paper in the light scheme, in a dark page', async () => {
-    const Scheme = () => <Text>{useTheme().mode}</Text>
     await render(themed(<HelixQrCode logo={<Scheme />} value="hello" />, 'dark'))
     expect(screen.getByText('light')).toBeTruthy()
   })

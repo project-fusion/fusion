@@ -296,6 +296,13 @@ describe('useReorder when Escape stops a drag', () => {
   })
 })
 
+const Held = ({ mounted, name }: { readonly mounted: () => void; readonly name: string }) => {
+  useEffect(() => {
+    mounted()
+  }, [mounted])
+  return <Text>{name}</Text>
+}
+
 describe('useReorder while rows may not move', () => {
   test('draws no grip and hears no drag', async () => {
     const { view } = await drawn()
@@ -335,18 +342,15 @@ describe('useReorder while rows may not move', () => {
 
   test('mounts what each row holds again as rows begin or stop moving', async () => {
     let mounts = 0
-    const Held = ({ name }: { readonly name: string }) => {
-      useEffect(() => {
-        mounts += 1
-      }, [])
-      return <Text>{name}</Text>
+    const mounted = () => {
+      mounts += 1
     }
     const rows = (reorderable: boolean) => (
       <GestureHandlerRootView>
         <List reorderable={reorderable}>
           {['a', 'b', 'c'].map((key) => (
             <Row key={key} value={key}>
-              <Held name={NAMES[key] ?? key} />
+              <Held mounted={mounted} name={NAMES[key] ?? key} />
             </Row>
           ))}
         </List>

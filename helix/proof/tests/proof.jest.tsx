@@ -31,6 +31,17 @@ const press = async (words: string | RegExp) => {
   })
 }
 
+function Probe({
+  mode,
+  read,
+}: {
+  readonly mode: 'dark' | 'light'
+  readonly read: Partial<Record<'dark' | 'light', Readonly<Record<string, number | string>>>>
+}) {
+  read[mode] = useTokens()
+  return null
+}
+
 describe('the proof app', () => {
   test('opens on the projects, which the header marks current', async () => {
     const app = await renderRouter(APP, { initialUrl: '/' })
@@ -132,10 +143,6 @@ describe('the proof app', () => {
     ].map(([, name, light, dark, both]) => [name, light ?? both, dark ?? both])
     expect(colors.length).toBeGreaterThan(40)
     const read: Partial<Record<'dark' | 'light', Readonly<Record<string, number | string>>>> = {}
-    function Probe({ mode }: { readonly mode: 'dark' | 'light' }) {
-      read[mode] = useTokens()
-      return null
-    }
     await renderRouter(
       {
         _layout: () => (
@@ -146,10 +153,10 @@ describe('the proof app', () => {
         index: () => (
           <>
             <HelixTheme mode="light">
-              <Probe mode="light" />
+              <Probe mode="light" read={read} />
             </HelixTheme>
             <HelixTheme mode="dark">
-              <Probe mode="dark" />
+              <Probe mode="dark" read={read} />
             </HelixTheme>
           </>
         ),

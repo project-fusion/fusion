@@ -46,6 +46,25 @@ const press = async (words: string) => {
   })
 }
 
+const Moved = () => {
+  const [order, setOrder] = useState(['a', 'b', 'c'])
+  return (
+    <HelixRoot>
+      <HelixTree
+        label="Moved"
+        onReorder={(event: { detail: { keys: string[] } }) => setOrder(event.detail.keys)}
+        reorderable
+      >
+        {order.map((value) => (
+          <Item key={value} value={value}>
+            {value}
+          </Item>
+        ))}
+      </HelixTree>
+    </HelixRoot>
+  )
+}
+
 describe('Tree on a phone', () => {
   test('nested items draw under their branch, and each row says its level and its place', async () => {
     await draw()
@@ -79,24 +98,6 @@ describe('Tree on a phone', () => {
   })
 
   test('a screen reader moves an item, and the page moving it takes its new place', async () => {
-    const Moved = () => {
-      const [order, setOrder] = useState(['a', 'b', 'c'])
-      return (
-        <HelixRoot>
-          <HelixTree
-            label="Moved"
-            onReorder={(event: { detail: { keys: string[] } }) => setOrder(event.detail.keys)}
-            reorderable
-          >
-            {order.map((value) => (
-              <Item key={value} value={value}>
-                {value}
-              </Item>
-            ))}
-          </HelixTree>
-        </HelixRoot>
-      )
-    }
     await render(<Moved />)
     expect(row('a').props.accessibilityValue.text).toBe('Level 1, 1 of 3')
     await act(async () => {

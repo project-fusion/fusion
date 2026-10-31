@@ -111,6 +111,16 @@ const order = (...words: string[]) => {
   return words.map((one) => drawn.indexOf(one))
 }
 
+const Page = () => {
+  const content = useTarget('content')
+  return (
+    <HelixTheme mode="light">
+      <HelixAppHeader scroller="content" start={<Text>Logo</Text>} />
+      <View ref={content} testID="content" />
+    </HelixTheme>
+  )
+}
+
 describe('app header', () => {
   test('is the page banner, its start, its middle, and its end in that order, with no toggle', async () => {
     await render(<Bar />)
@@ -208,15 +218,6 @@ describe('app header', () => {
   })
 
   test('follows the view registered under scroller, where the app draws its page beside the bar', async () => {
-    const Page = () => {
-      const content = useTarget('content')
-      return (
-        <HelixTheme mode="light">
-          <HelixAppHeader scroller="content" start={<Text>Logo</Text>} />
-          <View ref={content} testID="content" />
-        </HelixTheme>
-      )
-    }
     await render(<Page />)
     const followed = observers.at(-1)?.node
     expect(followed === undefined || followed === mockView).toBe(false)
