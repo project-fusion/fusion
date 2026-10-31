@@ -49,6 +49,11 @@ export interface Setup {
   readonly slot?: string
   /** The web element's tag, such as `helix-tabs`. */
   readonly tag: string
+  /**
+   * The value it shows, for a family whose value is data, as an object
+   * inspector. The web sets it as a property, and a phone passes it as a prop.
+   */
+  readonly value?: unknown
 }
 
 /** The modifier keys held with a press or a key. Each one left out is not held. */
@@ -350,6 +355,23 @@ export interface Left {
    * that holds focus, and React Native what its window machine holds.
    */
   readonly window?: { readonly chosen: string; readonly focused: number | null }
+  /**
+   * What a screen reader hears of each row an object inspector draws, what
+   * the row reads with no spaces, the places of the rows a filter matched,
+   * the active row's path, and the place of the row with focus.
+   */
+  readonly inspector?: {
+    readonly active: string
+    readonly focused: number | null
+    readonly matched: string
+    readonly rows: readonly {
+      readonly expanded: boolean | null
+      readonly level: number
+      readonly position: number
+      readonly size: number
+      readonly words: string
+    }[]
+  }
   /**
    * The value the element holds, for a family a reader moves along a
    * track or picks a score in, as a slider or a rating: the web reads its

@@ -32,6 +32,7 @@ export type Family =
   | 'motion-toggle'
   | 'navigation'
   | 'number-input'
+  | 'object-inspector'
   | 'outline'
   | 'pin-input'
   | 'popover'

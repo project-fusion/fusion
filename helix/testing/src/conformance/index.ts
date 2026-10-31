@@ -22,6 +22,7 @@ import { MEGAMENU } from './scenarios/megamenu.js'
 import { MENU } from './scenarios/menu.js'
 import { NAVIGATION } from './scenarios/navigation.js'
 import { NUMBER_INPUT } from './scenarios/number-input.js'
+import { OBJECT_INSPECTOR } from './scenarios/object-inspector.js'
 import { OUTLINE } from './scenarios/outline.js'
 import { PIN_INPUT } from './scenarios/pin-input.js'
 import { POPOVER } from './scenarios/popover.js'
@@ -77,6 +78,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'motion-toggle': MOTION_TOGGLE,
   navigation: NAVIGATION,
   'number-input': NUMBER_INPUT,
+  'object-inspector': OBJECT_INSPECTOR,
   outline: OUTLINE,
   'pin-input': PIN_INPUT,
   popover: POPOVER,

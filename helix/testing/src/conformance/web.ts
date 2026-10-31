@@ -50,6 +50,9 @@ const build = (setup: Setup): Updatable => {
     holds.renderItem = (item: Readonly<Record<string, unknown>> | string) =>
       typeof item === 'string' ? item : String(item[field])
   }
+  if (setup.value !== undefined) {
+    ;(made as Updatable & { value?: unknown }).value = setup.value
+  }
   if (setup.slot !== undefined) {
     made.setAttribute('slot', setup.slot)
   }
@@ -236,6 +239,16 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
   send(window, 'pointerup', end)
 }
 
+/** The row at a place in the set, in the light DOM or in the element's own. */
+const rowAt = (mounted: Mounted, row: number): HTMLElement | null => {
+  const selector = `[data-index="${row}"]`
+  return (
+    mounted.root.querySelector<HTMLElement>(selector) ??
+    mounted.root.shadowRoot?.querySelector<HTMLElement>(selector) ??
+    null
+  )
+}
+
 /** Performs one intent on the mounted setup. A clock's intent, a hold, and a pick are performed by `run`. */
 const perform = async (
   mounted: Mounted,
@@ -262,7 +275,7 @@ const perform = async (
         return
       }
       if (intent.row !== undefined) {
-        mounted.root.querySelector<HTMLElement>(`[data-index="${intent.row}"]`)?.focus()
+        rowAt(mounted, intent.row)?.focus()
         return
       }
       const target = item(intent.item) as Updatable & { focusItem?: () => void }
@@ -331,7 +344,7 @@ const perform = async (
         break
       }
       if (intent.row !== undefined) {
-        tap(mounted.root.querySelector(`[data-index="${intent.row}"]`) ?? mounted.root, intent.held)
+        tap(rowAt(mounted, intent.row) ?? mounted.root, intent.held)
         return
       }
       const pressed = item(intent.item)

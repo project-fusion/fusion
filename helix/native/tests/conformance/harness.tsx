@@ -31,6 +31,7 @@ import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
 import { fakePicker, pickIn, picksFiles } from './files'
 import { DRAWN, formOf, isElement } from './forms'
 import { key, move, scroll, tap } from './input'
+import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
@@ -193,6 +194,9 @@ const draw = (run: Run, setup: Setup, value: string | null): ReactElement => {
   if (setup.items !== undefined) {
     props.items = setup.items
   }
+  if (setup.value !== undefined) {
+    props.value = setup.value
+  }
   const children: (ReactElement | string)[] = []
   for (const child of (setup.children ?? []).filter((one) => !gone(run, one))) {
     const made = drawChild(run, child)
@@ -232,6 +236,13 @@ const press = async (
   }
   if (Object.values(intent.held ?? {}).some((held) => held === true)) {
     return CANNOT.held
+  }
+  if (intent.row !== undefined && setup.items === undefined) {
+    const row = inspectorRows()[intent.row]
+    if (row !== undefined) {
+      await tap(row)
+    }
+    return undefined
   }
   if (intent.row !== undefined && rowDisabled(setup, intent.row)) {
     return undefined
@@ -287,6 +298,14 @@ const typed = (tag: string): boolean => formOf(tag).api?.entry !== undefined
  */
 const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
   const { setup } = run.scenario
+  if (intent.row !== undefined && inspects(run)) {
+    const row = inspectorRows()[intent.row]
+    run.focus.place(rowNode(run, row))
+    if (row !== undefined) {
+      await fireEvent(row, 'focus')
+    }
+    return
+  }
   if (intent.row !== undefined) {
     run.focus.place(focusable(run, rowWords(setup, intent.row)))
     return
@@ -416,7 +435,8 @@ export const run = async (scenario: Scenario): Promise<Step[]> => {
   /* A fake clipboard takes the copies of an element that copies, as the web
      half's does. */
   const copiedBefore = clipboard()
-  if (isElement(scenario.setup.tag) && formOf(scenario.setup.tag).api?.copy !== undefined) {
+  const copies = isElement(scenario.setup.tag) ? formOf(scenario.setup.tag).api : undefined
+  if (copies?.copy !== undefined || copies?.inspector !== undefined) {
     setClipboard(fakeClipboard())
   }
   const laid = laySections(scenario.setup)
