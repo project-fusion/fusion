@@ -13,6 +13,7 @@ import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
 import { textLeft } from './text'
+import { listboxLeft } from './listbox'
 import { treeLeft } from './tree'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
 import { windowLeft } from './window'
@@ -238,6 +239,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...filesLeft(run),
     ...windowLeft(run),
     ...treeLeft(run),
+    ...listboxLeft(run),
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
     ...carouselLeft(run),

@@ -341,6 +341,15 @@ export interface Left {
    */
   readonly files?: readonly string[]
   /**
+   * What a screen reader hears of each option a filter leaves showing, in order:
+   * the web reads what the element holds, and React Native what its row says.
+   */
+  readonly options?: readonly {
+    readonly disabled: boolean
+    readonly selected: boolean
+    readonly value: string
+  }[]
+  /**
    * What a screen reader hears of each row a reader can reach in a tree, in
    * order: the web reads the row's `aria-` attributes, and React Native what
    * its row says in its state and its value.

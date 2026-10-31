@@ -48,6 +48,7 @@ import { TOGGLE_GROUP } from './scenarios/toggle-group.js'
 import { TOOLBAR } from './scenarios/toolbar.js'
 import { TOOLTIP } from './scenarios/tooltip.js'
 import { TOUR } from './scenarios/tour.js'
+import { LISTBOX } from './scenarios/listbox.js'
 import { TREE } from './scenarios/tree.js'
 import { VIRTUAL_LIST } from './scenarios/virtual-list.js'
 
@@ -111,6 +112,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   toolbar: TOOLBAR,
   tooltip: TOOLTIP,
   tour: TOUR,
+  listbox: LISTBOX,
   tree: TREE,
   'virtual-list': VIRTUAL_LIST,
 }
