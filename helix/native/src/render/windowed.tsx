@@ -64,7 +64,8 @@ const Held = ({
 const keyed = (row: DrawnRow): string => row.key
 
 /** What a list that follows its newest content draws with. */
-const followingOf = ({ maintainVisibleContentPosition, shrinks }: WindowDrawing) => ({
+const followingOf = ({ initial, maintainVisibleContentPosition, shrinks }: WindowDrawing) => ({
+  ...(initial === undefined ? {} : { initialNumToRender: initial }),
   ...(maintainVisibleContentPosition === undefined ? {} : { maintainVisibleContentPosition }),
   ...(shrinks === true ? { maxToRenderPerBatch: 20, windowSize: 5 } : {}),
 })
