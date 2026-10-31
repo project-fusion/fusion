@@ -243,6 +243,8 @@ export default styles(
       native([
         rule({
           alignItems: 'center',
+          /* A line tall, as the web's `1lh` is. */
+          blockSize: product(token('leading-normal'), token('text-md')),
           display: 'flex',
           flexDirection: 'row',
           gap: token('space-2xs'),
