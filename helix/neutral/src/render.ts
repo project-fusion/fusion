@@ -283,6 +283,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What a group of notifications computes for its parts. */
   readonly notificationGroup: Computes<'counted' | 'countWords'>
+  /** What a block of code computes for its parts. */
+  readonly codeBlock: Computes<'expandHidden' | 'expandWords' | 'panes' | 'several' | 'tabs'>
   /** What a box that follows its newest content computes for its parts. */
   readonly tail: Computes<'away' | 'following'>
   /** What a tree computes. */
@@ -790,7 +792,7 @@ export const Announce = (_: AnnounceAttributes): Drawn => node()
 export interface RepeatAttributes extends Common {
   readonly children?: Child
   readonly count?: number | Read
-  readonly each?: Read | Derivation
+  readonly each?: Read | Derivation | undefined
   readonly key?: string
   readonly part: string
   /** A phone draws it in a list that windows it: its first child is a copy for each row, and what follows stands after the rows. */

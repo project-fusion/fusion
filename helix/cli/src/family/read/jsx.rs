@@ -82,6 +82,7 @@ const GIVEN: &[&str] = &[
     "notificationsRoot",
     "notificationRow",
     "notificationGroup",
+    "codeBlock",
     "tableRoot",
     "tableRow",
     "treeRoot",

@@ -78,7 +78,7 @@ pub fn describe(shape: Shape) -> String {
         }
         Shape::Path => "a string of SVG path data, `bind()` or `derive()`".to_owned(),
         Shape::Positive => "a number above zero".to_owned(),
-        Shape::List => "`bind()` to a prop or `derive()` of a list".to_owned(),
+        Shape::List => "`bind()` to a prop, `derive()` of a list, or a copy's field".to_owned(),
         Shape::Role => listed(&mut kinds::ROLES.iter().map(|role| role.name)),
         Shape::Set => "`true` alone".to_owned(),
         Shape::ViewBox => {

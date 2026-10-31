@@ -383,6 +383,45 @@ export interface NotificationRowChoice {
   readonly unreadLabel?: string
 }
 
+/** What a block of code binds, by the name the machine reads. */
+export interface CodeBlockChoice {
+  readonly addedLines?: string
+  readonly codeLabel?: string
+  readonly codeNameLabel?: string
+  readonly collapseLabel?: string
+  readonly contextLines?: string
+  readonly copyLabel?: string
+  readonly copyNameLabel?: string
+  readonly diff?: string
+  readonly expandHidden?: string
+  readonly expandLabel?: string
+  readonly expandWords?: string
+  readonly expandable?: string
+  readonly file?: string
+  readonly filesLabel?: string
+  readonly hideUnchangedLabel?: string
+  readonly highlight?: string
+  readonly label?: string
+  readonly language?: string
+  readonly lineNumbers?: string
+  readonly markLines?: string
+  readonly noCopy?: string
+  readonly onBeforeChange?: string
+  readonly onBeforeCheck?: string
+  readonly onChange?: string
+  readonly onCheck?: string
+  readonly panes?: string
+  readonly removedLines?: string
+  readonly several?: string
+  readonly showUnchangedLabel?: string
+  readonly tabs?: string
+  readonly tokens?: string
+  readonly variant?: string
+  readonly wrap?: string
+  readonly wrapLabel?: string
+  readonly wrappable?: string
+}
+
 /** What a group of notifications binds, by the name the machine reads. */
 export interface NotificationGroupChoice {
   readonly collapsible?: string

@@ -55,6 +55,7 @@ import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
+  CodeBlockChoice,
   InspectorChoice,
   LogGroupChoice,
   LogLineChoice,
@@ -302,6 +303,8 @@ export interface Headless {
   readonly notificationRow?: NotificationRowChoice
   /** What the element reads and computes where it is a group of notifications. */
   readonly notificationGroup?: NotificationGroupChoice
+  /** What the element reads, sends, and computes where it is a block of code. */
+  readonly codeBlock?: CodeBlockChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */
