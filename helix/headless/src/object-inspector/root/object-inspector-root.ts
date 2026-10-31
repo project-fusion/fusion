@@ -30,13 +30,6 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import { repeat } from 'lit/directives/repeat.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { html as staticHtml } from 'lit/static-html.js'
-import '../../copy-button/index.js'
 import {
   cursorFor,
   entries,
@@ -46,7 +39,14 @@ import {
   seed,
   siblingBranches,
   withAncestors,
-} from '../rows.js'
+} from '@fusion.dev/helix-core/object-inspector'
+import { caretDown, caretRight } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html as staticHtml } from 'lit/static-html.js'
+import '../../copy-button/index.js'
 
 /** What a `renderValue` function is told about the entry it draws. */
 export interface ObjectInspectorEntry {

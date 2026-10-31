@@ -114,6 +114,10 @@
       "types": "./dist/utils/number-format/number-format.d.ts",
       "default": "./dist/utils/number-format/number-format.js"
     },
+    "./object-inspector": {
+      "types": "./dist/utils/object-inspector/object-inspector.d.ts",
+      "default": "./dist/utils/object-inspector/object-inspector.js"
+    },
     "./package.json": "./package.json",
     "./pin-code": {
       "types": "./dist/utils/pin-code/pin-code.d.ts",
