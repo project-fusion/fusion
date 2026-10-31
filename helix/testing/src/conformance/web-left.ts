@@ -64,6 +64,28 @@ const rowFocused = (mounted: Mounted): number | null => {
   return index === undefined ? null : Number(index)
 }
 
+/** What each row of an object inspector says, as the record holds it. */
+const inspectorRows = (mounted: Mounted): NonNullable<Left['inspector']> => {
+  const shadow = mounted.root.shadowRoot
+  const rows = [...(shadow?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])]
+  const active = shadow?.activeElement as HTMLElement | null | undefined
+  return {
+    active: String((mounted.root as { active?: unknown }).active ?? ''),
+    focused: active?.dataset?.index === undefined ? null : Number(active.dataset.index),
+    matched: rows.flatMap((row, at) => (row.part.contains('row-match') ? [at] : [])).join(','),
+    rows: rows.map((row) => {
+      const expanded = row.getAttribute('aria-expanded')
+      return {
+        expanded: expanded === null ? null : expanded === 'true',
+        level: Number(row.getAttribute('aria-level')),
+        position: Number(row.getAttribute('aria-posinset')),
+        size: Number(row.getAttribute('aria-setsize')),
+        words: (row.textContent ?? '').replace(/\s/g, ''),
+      }
+    }),
+  }
+}
+
 /** What a screen reader hears of each row a reader can reach in a tree. */
 const treeRows = (mounted: Mounted): NonNullable<Left['tree']> =>
   [...mounted.items]
@@ -151,6 +173,7 @@ const READS: ReadonlySet<string> = new Set(['format-date', 'timeline'])
 
 /** The families a reader types into, whose record says what the field holds. */
 const TEXTS: ReadonlySet<string> = new Set([
+  'object-inspector',
   'color-input',
   'input',
   'number-input',
@@ -166,7 +189,9 @@ const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider']
 
 /** What the element's field holds, and whether the element is marked wrong. */
 const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
-  const control = mounted.root.shadowRoot?.querySelector('[part~="control"]')
+  const control = mounted.root.shadowRoot?.querySelector(
+    '[part~="control"], [part~="search-field"]',
+  )
   const value =
     control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement
       ? control.value
@@ -248,6 +273,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
     : {}),
   ...(WAITS.has(family) ? { waiting: inState(mounted.root, 'waiting') } : {}),
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
+  ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   /* What a list of data holds: the keys chosen, and the row with focus. */
   ...(family === 'virtual-list'
     ? {

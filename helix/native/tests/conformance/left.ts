@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react-native'
 import { colorLeft } from './color'
 import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
+import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
 import { rangeLeft } from './range'
 import { textLeft } from './text'
@@ -228,6 +229,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...filesLeft(run),
     ...windowLeft(run),
     ...treeLeft(run),
+    ...inspectorLeft(run),
     ...colorLeft(run),
   }
 }
