@@ -34,6 +34,7 @@ import { key, move, scroll, tap } from './input'
 import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
+import { logPress, logProps, logRows, logs } from './log'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusStop, isTable, moveRow, tablePress } from './table'
@@ -182,6 +183,13 @@ const drawChild = (run: Run, child: Setup | string): ReactElement | string => {
   return isElement(child.tag) ? draw(run, child, value) : plain(child)
 }
 
+/** What a setup hands a family whose content is data. */
+const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
+  ...(setup.items === undefined ? {} : { items: setup.items }),
+  ...logProps(setup),
+  ...(setup.value === undefined ? {} : { value: setup.value }),
+})
+
 /**
  * The element a setup draws: its default region as children, and each named
  * region as a prop. A plain element is its words.
@@ -192,12 +200,7 @@ const draw = (run: Run, setup: Setup, value: string | null): ReactElement => {
     throw new Error(`conformance: no generated component draws <${setup.tag}>`)
   }
   const props = propsOf(run, setup, value)
-  if (setup.items !== undefined) {
-    props.items = setup.items
-  }
-  if (setup.value !== undefined) {
-    props.value = setup.value
-  }
+  Object.assign(props, dataOf(setup))
   const children: (ReactElement | string)[] = []
   for (const child of (setup.children ?? []).filter((one) => !gone(run, one))) {
     const made = drawChild(run, child)
@@ -226,6 +229,14 @@ const flush = async (): Promise<void> => {
   }
 }
 
+/** A press on a row of a family that draws its own rows. */
+const pressRow = async (setup: Setup, at: number): Promise<void> => {
+  const row = logs(setup) ? logPress(logRows(setup)[at]) : inspectorRows()[at]
+  if (row !== undefined) {
+    await tap(row)
+  }
+}
+
 /** A press on an item, a part of it, or a link an outline draws, or why it cannot be made. */
 const press = async (
   setup: Setup,
@@ -239,10 +250,7 @@ const press = async (
     return CANNOT.held
   }
   if (intent.row !== undefined && setup.items === undefined) {
-    const row = inspectorRows()[intent.row]
-    if (row !== undefined) {
-      await tap(row)
-    }
+    await pressRow(setup, intent.row)
     return undefined
   }
   if (intent.row !== undefined && rowDisabled(setup, intent.row)) {
