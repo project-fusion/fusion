@@ -360,6 +360,19 @@ export interface Left {
    */
   readonly window?: { readonly chosen: string; readonly focused: number | null }
   /**
+   * What a code block says: the code drawn as one paragraph, the name on its copy
+   * button, what a screen reader hears of each line of a diff, its folds, its file
+   * tabs, and whether the wrap button is pressed. Words hold no spaces.
+   */
+  readonly codeBlock?: {
+    readonly code: string
+    readonly copy: string
+    readonly folds: readonly { readonly expanded: boolean; readonly words: string }[]
+    readonly lines: readonly string[]
+    readonly pressed: boolean
+    readonly tabs: readonly { readonly selected: boolean; readonly words: string }[]
+  }
+  /**
    * What a screen reader hears of each row a log draws, whether a step is open,
    * what the log says it let go, and the lines selected.
    */

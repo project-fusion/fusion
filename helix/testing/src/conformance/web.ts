@@ -259,6 +259,16 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
 
 /** The row at a place in the set, in the light DOM or in the element's own. */
 const rowAt = (mounted: Mounted, row: number): HTMLElement | null => {
+  if (mounted.root.localName === 'helix-code-block') {
+    /* The presses of a code block, in the order they stand. */
+    return (
+      [
+        ...(mounted.root.shadowRoot?.querySelectorAll<HTMLElement>(
+          '[part="file-tab"], [part="wrap-toggle"], button[part="fold"]',
+        ) ?? []),
+      ][row] ?? null
+    )
+  }
   if (mounted.root.localName === 'helix-notifications') {
     const items = (mounted.root as unknown as { readonly items: readonly HTMLElement[] }).items
     const drawn = items.filter((one) => one.assignedSlot !== null)[row]
