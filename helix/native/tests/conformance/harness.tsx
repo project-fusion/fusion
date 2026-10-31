@@ -27,6 +27,7 @@ import { Text } from 'react-native'
 import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
+import { codeBlockPresses, codeBlocks } from './code-block'
 import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
 import { fakePicker, pickIn, picksFiles } from './files'
 import { DRAWN, formOf, isElement } from './forms'
@@ -232,7 +233,11 @@ const flush = async (): Promise<void> => {
 
 /** A press on a row of a family that draws its own rows. */
 const pressRow = async (setup: Setup, at: number): Promise<void> => {
-  const row = logs(setup) ? logPress(logRows(setup)[at]) : inspectorRows()[at]
+  const row = codeBlocks(setup)
+    ? codeBlockPresses()[at]
+    : logs(setup)
+      ? logPress(logRows(setup)[at])
+      : inspectorRows()[at]
   if (row !== undefined) {
     await tap(row)
   }
@@ -285,6 +290,10 @@ const press = async (
 
 /** Puts focus on a row of a feed, or where a `focus` intent says. */
 const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+  if (intent.row !== undefined && codeBlocks(run.scenario.setup)) {
+    run.focus.place(rowNode(run, codeBlockPresses()[intent.row]))
+    return
+  }
   if (intent.row !== undefined && feeds(run.scenario.setup)) {
     run.focus.place(feedFocus(run, intent.row))
     return
