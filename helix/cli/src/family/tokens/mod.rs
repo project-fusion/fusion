@@ -463,7 +463,7 @@ pub fn entries(source: &str) -> Result<Vec<(String, String)>, String> {
                 [Expression::StringLiteral(name), value, ..] => {
                     let span = value.span();
                     let text = &source[span.start as usize..span.end as usize];
-                    Ok((name.value.to_string(), text.to_owned()))
+                    Ok((name.value.display().to_string(), text.to_owned()))
                 }
                 _ => Err(format!(
                     "entry {} of `TOKENS` does not open with a name and a value",
