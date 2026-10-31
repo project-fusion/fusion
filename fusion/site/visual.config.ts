@@ -53,16 +53,21 @@ export default defineConfig({
      A highlighted block is a `helix-code-block` holding the highlighter's one
      `span`, and the sandbox's editor draws its lines in `.cm-content`. The home
      page's install block is two lines of plain text by design, so it holds no
-     `span` and is not judged. */
+     `span` and is not judged. The Manifest URL holds spans to wrap, and one URL
+     is one color by design. */
   checks: {
     clipped: true,
-    code: { selector: 'helix-code-block:has(> span), .cm-content' },
+    code: { selector: "helix-code-block:has(> span):not([label='Manifest URL']), .cm-content" },
     /* Every ink on every page in light and dark, which nothing measured on
        the site before. `color-border` draws lines that separate, and answers
        to no target. A loading stand-in's `data-skeleton` boxes hold the words
        they stand in for in transparent ink, to wrap where the page's text
-       will, and are drawn as bars. */
-    contrast: { ignore: ['[data-skeleton]'], rules: ['var(--helix-color-border)'] },
+       will, and are drawn as bars. `data-site-failing-pair` is the home page's
+       sample of a pair that fails, drawn in the colors it reports. */
+    contrast: {
+      ignore: ['[data-skeleton]', '[data-site-failing-pair]'],
+      rules: ['var(--helix-color-border)'],
+    },
     overlap: true,
   },
   manifest: [

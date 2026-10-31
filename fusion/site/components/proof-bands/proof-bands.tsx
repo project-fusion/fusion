@@ -49,6 +49,7 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
                 token, so the sample is the pair the ratio describes. */}
             <p
               className={styles.sample}
+              data-site-failing-pair
               style={{ backgroundColor: caught.background, color: caught.foreground }}
             >
               Body text in this gray
