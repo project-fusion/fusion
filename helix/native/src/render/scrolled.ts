@@ -12,6 +12,14 @@ export interface Fill {
   readonly report: (place: number, width: number, count: number) => void
 }
 
+/** Where a box is laid out in what scrolls. */
+export interface SnapBox {
+  readonly height: number
+  readonly width: number
+  readonly x: number
+  readonly y: number
+}
+
 /** The scrolling part whose children are being drawn. */
 export interface Scrolling {
   /** The axis it scrolls along. */
@@ -20,4 +28,6 @@ export interface Scrolling {
   readonly fill?: Fill
   /** Whether there is more past each end, which shows the scroll button at that end. */
   readonly more: { readonly end: boolean; readonly start: boolean }
+  /** Tells a scroller that snaps where a box it snaps to is laid out. */
+  readonly snapAt?: (key: string, align: string, layout: SnapBox) => void
 }
