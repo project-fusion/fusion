@@ -1,7 +1,7 @@
 import { noChange } from 'lit'
 import { type ChildPart, Directive, directive, type PartInfo, PartType } from 'lit/directive.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
-import { highlightedLineList } from './highlight.js'
+import { highlightedLineList } from '@fusion.dev/helix-core/code-block'
 
 /**
  * Draws highlighted markup line by line, and on each change replaces only the
