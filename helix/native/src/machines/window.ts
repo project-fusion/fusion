@@ -12,6 +12,7 @@ import { announce } from '@fusion.dev/helix-core/capabilities/announce'
 import { focus } from '@fusion.dev/helix-core/capabilities/focus'
 import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
+import { edgeSpeed } from '@fusion.dev/helix-core/reorder'
 import {
   commaList,
   entryOf,
@@ -38,6 +39,7 @@ import {
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import { edgeFollow } from './edge-follow'
 import { boundTo, given, tell, told } from './props'
 import { type KeyAction, keyAction, pressedValue, type WindowState } from './window-keys'
 
@@ -156,16 +158,6 @@ export interface WindowHandle {
   ) => void
 }
 
-/** How near an edge of the frame a dragged row scrolls the list, in points. */
-const DRAG_EDGE = 48
-
-/** How far each move of a finger near an edge scrolls the list, in points. */
-const DRAG_STEP = 16
-
-/** How far a finger `shown` points into a frame scrolls what the frame holds, at each move. */
-export const edgeStep = (shown: number, frame: number): number =>
-  shown < DRAG_EDGE ? -DRAG_STEP : shown > frame - DRAG_EDGE ? DRAG_STEP : 0
-
 /** The words of a move a screen reader hears, where the page names none. */
 const MOVED = '{name} moved to position {position} of {count}'
 
@@ -280,22 +272,31 @@ const useReport = (
   }, [family, latest, loadMore, range, standing])
 }
 
-/** Where a finger's travel from row `at` would land, scrolling the list near either edge. */
-const dragged = (
-  now: Latest,
-  standing: Standing,
-  list: WindowScroller | null,
-  at: number,
-  along: number,
-): number => {
-  const line = Math.max(1, now.estimate + now.gap)
-  const point = at * line + along
-  const shown = point - standing.offset
-  const by = edgeStep(shown, standing.frame)
-  if (by !== 0) {
-    list?.scrollToOffset?.({ animated: false, offset: Math.max(0, standing.offset + by) })
+/**
+ * **While a finger near an edge rests, the list keeps scrolling**, a frame at a
+ * time, as core's `edgeSpeed` says on the web. It scrolls on from where the list
+ * stands, and the row lands under where the finger is in the frame.
+ */
+const edgeStepper = (
+  latest: RefObject<Latest>,
+  standing: RefObject<Standing>,
+  list: RefObject<WindowScroller | null>,
+  finger: number,
+  land: (to: number) => void,
+): ((frames: number) => boolean) => {
+  let offset = standing.current.offset
+  return (frames) => {
+    const { content, frame } = standing.current
+    const by = edgeSpeed(finger, 0, frame)
+    if (by !== 0) {
+      offset = Math.max(0, Math.min(Math.max(content - frame, 0), offset + by * frames))
+      list.current?.scrollToOffset?.({ animated: false, offset })
+    }
+    const now = latest.current
+    const line = Math.max(1, now.estimate + now.gap)
+    land(Math.max(0, Math.min(now.count - 1, Math.floor((offset + finger) / line))))
+    return by !== 0
   }
-  return Math.max(0, Math.min(now.count - 1, Math.floor(point / line)))
 }
 
 /** A finger held on a row lifts it, and its travel says where it would land. */
@@ -307,9 +308,12 @@ const useDrag = (
 ) => {
   const [drag, setDrag] = useState<{ from: number; to: number } | undefined>(undefined)
   const held = useRef<{ from: number; to: number } | undefined>(undefined)
+  const edge = useRef(edgeFollow()).current
+  useEffect(() => edge.stop, [edge])
   const dragging = useMemo<WindowDrag>(
     () => ({
       end: () => {
+        edge.stop()
         const was = held.current
         held.current = undefined
         setDrag(undefined)
@@ -320,21 +324,27 @@ const useDrag = (
       /* Near either edge of the frame the list scrolls, so a far place is
          reached by dragging there, as the web's does. */
       move: (at, along) => {
-        const was = held.current
-        if (was !== undefined) {
-          const to = dragged(latest.current, standing.current, list.current, at, along)
-          if (to !== was.to) {
-            held.current = { ...was, to }
-            setDrag({ from: was.from, to })
-          }
+        if (held.current === undefined) {
+          return
         }
+        const now = latest.current
+        const finger = at * Math.max(1, now.estimate + now.gap) + along - standing.current.offset
+        edge.follow(
+          edgeStepper(latest, standing, list, finger, (to) => {
+            const was = held.current
+            if (was !== undefined && to !== was.to) {
+              held.current = { ...was, to }
+              setDrag({ from: was.from, to })
+            }
+          }),
+        )
       },
       start: (at) => {
         held.current = { from: at, to: at }
         setDrag({ from: at, to: at })
       },
     }),
-    [latest, list, reorder, standing],
+    [edge, latest, list, reorder, standing],
   )
   return { drag, dragging }
 }
