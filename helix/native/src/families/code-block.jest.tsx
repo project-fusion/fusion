@@ -1,7 +1,7 @@
 import { registerTokens } from '@fusion.dev/helix-core/code-block'
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
-import { StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import { HelixRoot } from '../index'
 import { lineBoxes } from '../machines/code-block-model'
 import { HelixCodeBlock } from './code-block/index.native'
@@ -169,5 +169,26 @@ describe('code block', () => {
     await fireEvent.press(screen.getByText('b.ts'))
     expect(screen.queryByText('first')).toBeNull()
     expect(screen.getByText('second')).toBeTruthy()
+  })
+})
+
+describe('a split on a phone', () => {
+  const PATCH = '--- a/a.ts\n+++ b/a.ts\n@@ -1,1 +1,1 @@\n-old line\n+new line\n'
+
+  /** What a split draws before anything is laid out, in a window `width` wide. */
+  const firstFrame = async (width: number) => {
+    const window = jest.spyOn(Dimensions, 'get').mockReturnValue({
+      fontScale: 1,
+      height: 800,
+      scale: 3,
+      width,
+    })
+    await draw({ diff: true, variant: 'split' }, PATCH)
+    window.mockRestore()
+    return JSON.stringify(screen.toJSON())
+  }
+
+  test('a window too narrow for two columns stacks them from the first frame', async () => {
+    expect(await firstFrame(390)).not.toBe(await firstFrame(1000))
   })
 })

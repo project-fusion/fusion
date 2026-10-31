@@ -74,10 +74,11 @@ const matches = (
     case 'defined': {
       return true
     }
-    /* The host's own width, once it is laid out. */
+    /* The host's own width, once it is laid out, and until then the most it can be. */
     case 'container': {
       const below = length(condition.below, context.rem ?? 16, context.rem ?? 16)
-      return context.width !== undefined && typeof below === 'number' && context.width < below
+      const width = context.width ?? context.widest
+      return width !== undefined && typeof below === 'number' && width < below
     }
     /* The window a layer is placed in, at the reader's text size, as a
        media query's rem is the reader's font size on the web. */
