@@ -46,6 +46,36 @@ pub const TREE_ITEM: &[(&str, Names)] = &[
     ("value", Names::Prop),
 ];
 
+/// What an object inspector reads and sends, by the name the machine binds.
+pub const INSPECTOR: &[(&str, Names)] = &[
+    ("active", Names::Prop),
+    ("copyLabel", Names::Prop),
+    ("copyValueLabel", Names::Prop),
+    ("defaultDepth", Names::Prop),
+    ("emptyText", Names::Prop),
+    ("expanded", Names::Prop),
+    ("itemsLabel", Names::Prop),
+    ("keysLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("noMatchesLabel", Names::Prop),
+    ("onActivate", Names::Event),
+    ("onBeforeActivate", Names::Event),
+    ("onBeforeClose", Names::Event),
+    ("onBeforeOpen", Names::Event),
+    ("onCopy", Names::Event),
+    ("onToggle", Names::Event),
+    ("renderValue", Names::Prop),
+    ("resultsLabel", Names::Prop),
+    ("treeLabel", Names::Prop),
+    ("value", Names::Prop),
+    ("windowed", Names::Prop),
+];
+
+/// What an object inspector computes for its parts, each read as `inspector.x`.
+pub const INSPECTOR_COMPUTED: &[&str] = &[
+    "blank", "copyName", "copyText", "list", "named", "said", "topped",
+];
+
 /// What an item computes for its parts, each read as `treeItem.x`. The element
 /// around them computes `empty`, read as `treeRoot.empty`.
 pub const COMPUTED: &[&str] = &[
@@ -121,4 +151,9 @@ pub fn tree(lit: &Lit) -> Result<TreeChoice, String> {
 /// `treeItem({ ... })`, each field a name.
 pub fn tree_item(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "treeItem", TREE_ITEM, COMPUTED)
+}
+
+/// `inspector({ ... })`, each field a name.
+pub fn inspector(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "inspector", INSPECTOR, INSPECTOR_COMPUTED)
 }
