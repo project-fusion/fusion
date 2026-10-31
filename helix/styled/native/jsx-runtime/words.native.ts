@@ -4,6 +4,7 @@ import {
   Density,
   densityOf,
   FieldsetDisabled,
+  followLink,
   type SectionAbout,
   type Tokens,
   useInheritedText,
@@ -15,7 +16,7 @@ import {
   vectorPackage,
 } from '@fusion.dev/helix-native'
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 
 export type Props = Readonly<Record<string, unknown>> & { readonly children?: React.ReactNode }
 
@@ -44,6 +45,9 @@ const marginsOf = (box: Readonly<Record<string, unknown>>): Record<string, unkno
     Object.entries(box).filter(([key]) => key.startsWith('margin') || key === 'width'),
   )
 
+/** The text style a quote, or a heading cell of a table, gives the words inside it. */
+export const proseInk = React.createContext<Readonly<Record<string, string>>>({})
+
 /**
  * Words in the text style the region around gives, as a `span` inherits it,
  * and the margins and the width the host's `::slotted(*)` rules give it, as a
@@ -57,6 +61,7 @@ export const Span = ({ bold, children }: Props & { readonly bold?: boolean }) =>
   /* Inside a part that scrolls both ways, the words wrap at its width, as
      a paragraph wraps at a scroll box's width on the web. */
   const wrap = useWrapWidth()
+  const ink = React.useContext(proseInk)
   return React.createElement(
     Text,
     {
@@ -65,6 +70,7 @@ export const Span = ({ bold, children }: Props & { readonly bold?: boolean }) =>
         { color: color(tokens, 'color-foreground'), fontSize: points(tokens, 'text-md') },
         wrap === undefined ? {} : { maxWidth: wrap },
         text,
+        ink,
         bold === true ? { fontWeight: '700' as const } : {},
         marginsOf(box),
       ],
@@ -89,11 +95,35 @@ const currentCards = (children: React.ReactNode, border: string): React.ReactNod
       : child,
   )
 
+/** A press as a view sends it and as a Helix element sends it. */
+type PressEvent =
+  | { readonly defaultPrevented?: boolean; readonly isDefaultPrevented?: () => boolean }
+  | undefined
+
+/**
+ * What a press on a link does: the page's own `onClick` first, then, unless
+ * that prevents the default as it does on the web, the link's destination.
+ */
+export const linkPress =
+  (props: Props) =>
+  (given: unknown): void => {
+    const event = given as PressEvent
+    const heard = props.onPress
+    if (typeof heard === 'function') {
+      heard(event)
+    }
+    const prevented = event?.defaultPrevented === true || event?.isDefaultPrevented?.() === true
+    if (typeof props.href === 'string' && !prevented) {
+      followLink(props.href)
+    }
+  }
+
 /**
  * A link's words, in the size the text around gives, and in its ink with no line
  * under `data-link="quiet"`, as a breadcrumb's link is. `data-card` is a box
  * around the card it holds, which gives way in a row, and `data-button` draws
- * in `tags.native.ts`. A press on a phone is the app's to handle.
+ * in `tags.native.ts`. **A press opens its `href`**, as a browser follows one,
+ * through `followLink`.
  *
  * **`aria-current` on a `data-card` gives the card its border color**, as the
  * web's `--card-border-color` reaches the card inside the link.
@@ -101,18 +131,30 @@ const currentCards = (children: React.ReactNode, border: string): React.ReactNod
 export const Anchor = ({ children, ...props }: Props) => {
   const tokens = useTokens()
   const text = useInheritedText()
+  const press = linkPress(props)
+  const presses = props.href !== undefined || props.onPress !== undefined
   if (props['data-card'] !== undefined) {
     const held =
       props['aria-current'] === undefined
         ? children
         : currentCards(children, color(tokens, 'color-primary'))
-    return React.createElement(View, { style: { flexShrink: 1 } }, held)
+    return React.createElement(
+      Pressable,
+      {
+        accessibilityRole: 'link' as const,
+        ...(presses ? { onPress: press } : {}),
+        style: { flexShrink: 1 },
+      },
+      held,
+    )
   }
   const quiet = props['data-link'] === 'quiet'
   return React.createElement(
     Text,
     {
+      accessibilityRole: 'link' as const,
       allowFontScaling: false,
+      ...(presses ? { onPress: press } : {}),
       style: [
         { fontSize: points(tokens, 'text-md') },
         text,

@@ -25,6 +25,8 @@
    - a `fieldset` with `disabled` disables the form controls inside it, as
      `:disabled` reaches them on the web;
    - a raw `svg` and the shapes it holds draw through `react-native-svg`;
+   - an `a` opens its `href` as it is pressed, and `data-prose` gives the HTML
+     a Markdown library writes the recipe of the base layer;
    - a tag a phone has no component for says so where it would be, and a
      development build warns about it once, as `helix shared` reports it
      from the code.
@@ -34,7 +36,8 @@
    both platforms. The `JSX` namespace is React's on both. */
 import { HelixTheme, hookPrefix, regionNames, warnWebTag } from '@fusion.dev/helix-native'
 import * as React from 'react'
-import { hasComponent, TAGS } from './tags.native'
+import { Paragraph, Prose } from './prose.native'
+import { hasComponent, PROSE_SPACED, TAGS } from './tags.native'
 import { Box, camel, Missing, noteFragment, type Props, Section, Span } from './words.native'
 
 export type { JSX } from 'react/jsx-runtime'
@@ -77,6 +80,7 @@ const propOf = (name: string, value: unknown, out: Record<string, unknown>): voi
  */
 const wordsOnly = (element: React.ReactElement<Props>): boolean =>
   element.type === Span ||
+  element.type === Paragraph ||
   (element.type === TAGS['helix-text'] &&
     Object.keys(element.props).every((name) => name === 'slot' || name === 'children'))
 
@@ -209,6 +213,10 @@ const translate = (type: unknown, props: Props): readonly [unknown, Props] => {
     }
   }
   regionsOf(type, props.children, out)
+  /* **`data-prose` gives the HTML inside it the recipe of the base layer.** */
+  if (props['data-prose'] !== undefined && out.children !== undefined) {
+    out.children = React.createElement(Prose, { spaced: PROSE_SPACED }, out.children as never)
+  }
   return [target, out]
 }
 
@@ -250,17 +258,40 @@ const make = (
 
 /** The DOM elements a phone draws as the web does, which `helix shared` passes too. */
 const DRAWN_AS_THE_WEB = new Set([
+  'a',
+  'b',
+  'blockquote',
   'circle',
   'ellipse',
+  'em',
   'fieldset',
   'g',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
   'legend',
+  'li',
   'line',
+  'ol',
   'path',
   'polygon',
   'polyline',
+  'pre',
   'rect',
   'svg',
+  'table',
+  'tbody',
+  'td',
+  'tfoot',
+  'th',
+  'thead',
+  'tr',
+  'ul',
 ])
 
 /** Warns about a tag a phone does not draw. A component's own type passes. */
