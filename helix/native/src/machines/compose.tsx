@@ -21,6 +21,9 @@ import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
+import { useLog } from './log'
+import { useLogGroup } from './log-group'
+import { useLogLine } from './log-line'
 import { mixedItem } from './mixed-item'
 import { mixingSet } from './mixed-set'
 import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
@@ -38,6 +41,7 @@ import { stacking } from './stack'
 import { stackRow } from './stack-row'
 import { useTable } from './table'
 import { useTableColumn, useTableRow } from './table-row'
+import { useTail } from './tail'
 import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
 import { useTree } from './tree'
@@ -267,6 +271,39 @@ export const behaviorFor = (family: Family): UseBehavior => {
           (props) =>
             useTableColumn(family, props, use),
       ),
+    /* A box that follows its newest content, then the log drawn in it, and a
+       line and a step of one, the step opening by the toggle hosted before it. */
+    ...uses
+      .filter((use) => use.machine === 'tail')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, tail } = useTail(family, props, use)
+            around.tail.current = tail
+            return behavior
+          },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'log')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useLog(family, props, use, around.tail.current),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'log-line')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useLogLine(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'log-group')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useLogGroup(family, props, use, around.toggled),
+      ),
     /* An object inspector's rows, which its field's text narrows. */
     ...uses
       .filter((use) => use.machine === 'inspector')
@@ -395,6 +432,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       pagers,
       spun: { current: undefined },
       stacked: {},
+      tail: { current: undefined },
       toggled,
       touch,
     }
