@@ -1411,3 +1411,14 @@ nothing of its own, so a family can bind it over a list or a scroll view. `logRo
 `logLine`, and `logGroup` declare a log and its parts. The roles `log`, `feed`, and
 `article` announce nothing of their own on a phone, which reads what they hold in
 order.
+
+## Notifications
+
+`notificationsRoot`, `notificationRow`, and `notificationGroup` declare a feed and
+its parts. The web's list slot is named `items` and assigned by hand, so a rule on the
+rows there is written with its own selector. A phone's row has no pseudo-element and
+draws its unread dot as a `platform="native"` part, and its gap as a margin on the
+item, since a dismissed row's host draws nothing and keeps no room.
+
+**An element whose host is `display: inline`, drawn by a wrap, takes the text style of
+the rules on the wrap**, as a web host inherits them, as a row's Format Date does.

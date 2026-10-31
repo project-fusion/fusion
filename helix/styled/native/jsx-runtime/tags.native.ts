@@ -41,6 +41,11 @@ import { HelixMenu, HelixMenuItem, HelixMenuSection } from '../menu/index.native
 import { HelixMeter, HelixMeterSegment } from '../meter/index.native'
 import { HelixMotionToggle } from '../motion-toggle/index.native'
 import { HelixNavigation, HelixNavigationItem } from '../navigation/index.native'
+import {
+  HelixNotification,
+  HelixNotificationGroup,
+  HelixNotifications,
+} from '../notifications/index.native'
 import { HelixNumberInput } from '../number-input/index.native'
 import { HelixObjectInspector } from '../object-inspector/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
@@ -74,7 +79,17 @@ import { HelixTour, HelixTourStop } from '../tour/index.native'
 import { HelixTree, HelixTreeItem } from '../tree/index.native'
 import { HelixTrend } from '../trend/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
-import { Anchor, Box, Fieldset, Legend, type Props, RawSvg, Span, SVG_SHAPES } from './words.native'
+import {
+  Anchor,
+  Box,
+  Fieldset,
+  Legend,
+  type Props,
+  RawSvg,
+  Span,
+  Strong,
+  SVG_SHAPES,
+} from './words.native'
 
 type Heard = { detail?: { value?: unknown }; target?: { value?: unknown } }
 
@@ -174,6 +189,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-motion-toggle': HelixMotionToggle,
   'helix-navigation': HelixNavigation,
   'helix-navigation-item': HelixNavigationItem,
+  'helix-notification': HelixNotification,
+  'helix-notification-group': HelixNotificationGroup,
+  'helix-notifications': HelixNotifications,
   'helix-number-input': HelixNumberInput,
   'helix-object-inspector': HelixObjectInspector,
   'helix-outline': HelixOutline,
@@ -228,7 +246,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   legend: Legend,
   p: Span,
   span: Span,
-  strong: Span,
+  strong: Strong,
   svg: RawSvg,
   ...SVG_SHAPES,
 }

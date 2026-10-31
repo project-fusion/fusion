@@ -2480,3 +2480,24 @@ that length there. A release build has not been measured.
 
 A `source` is an async iterable, read with `for await`. A phone has no
 `ReadableStream` on `fetch`.
+
+## Notifications
+
+The `notifications`, `notification`, and `notification-group` machines hold a feed
+written in the page's own markup, so the rows are React children no machine can walk
+through a wrapper. **Every row reports itself in its turn**: a row joining or leaving
+moves an epoch, each row's layout effect reports again, children first and in the
+order they stand, and the feed's effect reads the round as it ends. A group holds
+its rows the same way, which gives it its count and the first row it draws folded.
+
+A row marked read asks of itself and then of the feed, as the web's event bubbles. A
+dismissed row stops drawing and leaves, and the page may also take it out. **The label
+box is one element for a screen reader, and the row is not**, so the controls in the
+row stay reachable.
+
+The arrows, Home, End, Page Up, and Page Down move between rows by core's `feedStep`,
+as a hardware keyboard's keys.
+
+The web's alone: `load-error`, Control with Home and End, each row's place in `total`,
+the crossfade of the time under a pointer, and printing. A count returned by
+`foldEveryGroup` is the groups asked, since a toggle's request answers nothing there.
