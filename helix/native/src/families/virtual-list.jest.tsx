@@ -1,7 +1,8 @@
-import { describe, expect, test } from '@jest/globals'
+import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
 import { StyleSheet, Text } from 'react-native'
+import { Gesture } from 'react-native-gesture-handler'
 import { HelixRoot } from '../index'
 import type { WindowHandle } from '../machines/window'
 import { HelixVirtualList } from './virtual-list/index.native'
@@ -174,5 +175,28 @@ describe('Virtual List on a phone', () => {
         (StyleSheet.flatten(at.props.style) as { opacity?: number } | undefined)?.opacity === 0.5
     }
     expect(dimmed).toBe(true)
+  })
+})
+
+describe('a reorderable list', () => {
+  /** The gesture each row makes as it draws, which lifts it. */
+  const pans = () => jest.spyOn(Gesture, 'Pan')
+  const list = () =>
+    render(
+      <HelixRoot>
+        <HelixVirtualList items={LONG} label="Rows" reorderable />
+      </HelixRoot>,
+    )
+
+  test('a finger that strays before the hold is up lets the list scroll', async () => {
+    const pan = pans()
+    await list()
+    const made = pan.mock.results[0]?.value as unknown as {
+      config: Readonly<Record<string, number>>
+    }
+    pan.mockRestore()
+    expect(made.config.activateAfterLongPress).toBe(500)
+    expect(made.config.failOffsetYEnd).toBeLessThan(10)
+    expect(made.config.failOffsetXEnd).toBeLessThan(10)
   })
 })

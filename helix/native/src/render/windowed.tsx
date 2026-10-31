@@ -35,6 +35,13 @@ const scrollIn = (props: ScrollViewProps & { readonly ref?: Ref<ScrollViewInstan
   <ScrollArea {...props} />
 )
 
+/**
+ * How far a finger may stray, in points, and still be holding a row. A touch
+ * that travels further before the hold is up is a swipe, however slow, and the
+ * list scrolls.
+ */
+const HOLD_STRAY = 5
+
 /** A row a finger held on lifts and drags, where the list lets a reader move items. */
 const Held = ({
   at,
@@ -49,6 +56,8 @@ const Held = ({
 }) => {
   const pan = Gesture.Pan()
     .activateAfterLongPress(500)
+    .failOffsetX([-HOLD_STRAY, HOLD_STRAY])
+    .failOffsetY([-HOLD_STRAY, HOLD_STRAY])
     .runOnJS(true)
     .onStart(() => dragging.start(at))
     .onUpdate((event) => dragging.move(at, horizontal ? event.x : event.y))
