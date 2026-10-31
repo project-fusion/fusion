@@ -27,6 +27,7 @@ export const controlOf = (mounted: Mounted): Control | undefined => {
   /* A color picker's text field is its `value`, or its first channel's without one. */
   const found =
     shadow?.querySelector('[part~="control"]') ??
+    shadow?.querySelector('[part~="search-field"]') ??
     shadow?.querySelector('[part~="value"]') ??
     shadow?.querySelector('[part~="field-input"]')
   return isControl(found) ? found : undefined
