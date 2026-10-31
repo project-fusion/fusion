@@ -50,7 +50,7 @@ const marginsOf = (box: Readonly<Record<string, unknown>>): Record<string, unkno
  * drawer's title keeps a step clear of the content under it. Inside a part
  * that scrolls both ways, they wrap at its width.
  */
-export const Span = ({ children }: Props) => {
+export const Span = ({ bold, children }: Props & { readonly bold?: boolean }) => {
   const tokens = useTokens()
   const text = useInheritedText()
   const box = useSlottedBox()
@@ -65,12 +65,16 @@ export const Span = ({ children }: Props) => {
         { color: color(tokens, 'color-foreground'), fontSize: points(tokens, 'text-md') },
         wrap === undefined ? {} : { maxWidth: wrap },
         text,
+        bold === true ? { fontWeight: '700' as const } : {},
         marginsOf(box),
       ],
     },
     children,
   )
 }
+
+/** Words a page marks as important, as a browser sets `strong` bolder than what is around it. */
+export const Strong = ({ children }: Props) => React.createElement(Span, { bold: true }, children)
 
 /** A link's words. A press on a phone is the app's to handle. */
 export const Anchor = ({ children }: Props) => {
