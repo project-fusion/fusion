@@ -322,6 +322,14 @@
       "types": "./dist/loader/index.d.ts",
       "default": "./dist/loader/index.js"
     },
+    "./log": {
+      "react-native": {
+        "types": "./dist/log/index.native.d.ts",
+        "default": "./dist/log/index.native.js"
+      },
+      "types": "./dist/log/index.d.ts",
+      "default": "./dist/log/index.js"
+    },
     "./megamenu": {
       "react-native": {
         "types": "./dist/megamenu/index.native.d.ts",
