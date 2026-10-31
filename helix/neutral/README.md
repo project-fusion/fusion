@@ -1436,3 +1436,9 @@ too, as a pane's rows and a row's numbers, so one list can stand inside another.
 
 **An element whose host is `display: inline`, drawn by a wrap, takes the text style of
 the rules on the wrap**, as a web host inherits them, as a row's Format Date does.
+
+## Scroll snapping
+
+`scrollSnapType`, `scrollSnapAlign`, and `scrollPaddingInline` and
+`scrollPaddingBlock` mean the same on both platforms, on a part that scrolls and
+the boxes in it. A machine moves such a part with `usePaging` on a phone.
