@@ -7,6 +7,7 @@ import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
 import { logLeft } from './log'
+import { chatLeft } from './chat'
 import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
@@ -238,6 +239,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...treeLeft(run),
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
+    ...chatLeft(run),
     ...feedLeft(run),
     ...tableLeft(run),
     ...codeBlockLeft(run),

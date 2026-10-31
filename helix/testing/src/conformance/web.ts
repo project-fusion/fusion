@@ -56,6 +56,9 @@ const build = (setup: Setup): Updatable => {
     log.groups = setup.logGroups ?? []
     log.lines = setup.logLines
   }
+  if (setup.turns !== undefined) {
+    ;(made as Updatable & { turns?: unknown }).turns = setup.turns
+  }
   if (setup.value !== undefined) {
     ;(made as Updatable & { value?: unknown }).value = setup.value
   }
@@ -391,6 +394,12 @@ const perform = async (
         tap(box?.querySelector(`[part~="${intent.part}"]`) ?? mounted.root, intent.held)
         return
       }
+      if (intent.part === 'retry') {
+        /* A retry stands in the failed turn, in its own root. */
+        const turn = mounted.root.querySelector('helix-chat-message')
+        tap(turn?.shadowRoot?.querySelector('[part="retry"]') ?? mounted.root, intent.held)
+        return
+      }
       if (intent.part === 'trigger') {
         /* A feed's group folds by its own press. */
         const group = mounted.root.querySelector('helix-notification-group')
@@ -466,6 +475,7 @@ const carried = (event: Event): Readonly<Record<string, unknown>> => {
  * is the composed one its own `<input>` sends, which no record holds.
  */
 const TYPED: ReadonlySet<string> = new Set([
+  'chat',
   'color-input',
   'color-picker',
   'file-input',

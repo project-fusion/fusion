@@ -133,6 +133,44 @@ const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   }
 }
 
+/** What a chat or a composer says, as the record holds it. */
+const chatOf = (mounted: Mounted): NonNullable<Left['chat']> => {
+  const shadow = mounted.root.shadowRoot
+  if (mounted.root.localName === 'helix-chat-composer') {
+    return {
+      lines: [],
+      named: [],
+      send: shadow?.querySelector('[part="send"]')?.getAttribute('aria-label') ?? '',
+      status: '',
+    }
+  }
+  const drawn = [
+    ...[...(shadow?.querySelectorAll('[part="turn"] > *') ?? [])],
+    ...(mounted.root.querySelectorAll('helix-chat-message') ?? []),
+  ]
+  const stateWord = (one: Element): string => {
+    const state = one.shadowRoot?.querySelector('[part="state"]')
+    return [...(state?.childNodes ?? [])]
+      .filter((node) => node.nodeType === 3 || (node as Element).localName === 'span')
+      .map((node) => node.textContent ?? '')
+      .join('')
+      .trim()
+  }
+  const typing = shadow?.querySelector('[part="typing"]')?.textContent?.trim() ?? ''
+  return {
+    lines: drawn.map(stateWord).filter((one) => one !== ''),
+    named: drawn.map((one) => (one as unknown as { readonly name: string }).name),
+    send: '',
+    status: [
+      typing,
+      shadow?.querySelector('[part="history"]')?.textContent?.trim() ?? '',
+      shadow?.querySelector('[part="loading"], [part="empty"]')?.textContent?.trim() ?? '',
+    ]
+      .filter((one) => one !== '')
+      .join(' '),
+  }
+}
+
 /** A row of a feed, by what the record reads of it. */
 interface FeedItem extends HTMLElement {
   readonly read: boolean
@@ -294,7 +332,7 @@ const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider']
 /** What the element's field holds, and whether the element is marked wrong. */
 const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
   const control = mounted.root.shadowRoot?.querySelector(
-    '[part~="control"], [part~="search-field"]',
+    '[part~="control"], [part~="search-field"], textarea[part~="field"]',
   )
   const value =
     control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement
@@ -380,6 +418,12 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'code-block' ? { codeBlock: codeBlockOf(mounted) } : {}),
+  ...(family === 'chat'
+    ? {
+        chat: chatOf(mounted),
+        ...(mounted.root.localName === 'helix-chat-composer' ? { text: textOf(mounted) } : {}),
+      }
+    : {}),
   /* A row holds no value, so a row with focus is named by the feed it stands in. */
   ...(family === 'notifications'
     ? {

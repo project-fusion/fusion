@@ -29,7 +29,8 @@ export const controlOf = (mounted: Mounted): Control | undefined => {
     shadow?.querySelector('[part~="control"]') ??
     shadow?.querySelector('[part~="search-field"]') ??
     shadow?.querySelector('[part~="value"]') ??
-    shadow?.querySelector('[part~="field-input"]')
+    shadow?.querySelector('[part~="field-input"]') ??
+    shadow?.querySelector('textarea[part~="field"]')
   return isControl(found) ? found : undefined
 }
 
