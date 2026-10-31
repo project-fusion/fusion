@@ -69,13 +69,13 @@ jobs:
         # and the platform package is read from the tree.
         include:
           - platform: darwin-arm64
-            runner: macos-14
+            runner: macos-15
             target: aarch64-apple-darwin
             runs: true
           # Cross-compiled on Apple silicon, which builds it and cannot be
           # relied on to run it.
           - platform: darwin-x64
-            runner: macos-14
+            runner: macos-15
             target: x86_64-apple-darwin
             runs: false
           - platform: linux-arm64

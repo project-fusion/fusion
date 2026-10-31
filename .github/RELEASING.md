@@ -106,8 +106,8 @@ and skips the rest.
 
 | Package | Built on | Target |
 |---|---|---|
-| `helix-cli-darwin-arm64` | `macos-14` | `aarch64-apple-darwin` |
-| `helix-cli-darwin-x64` | `macos-14` | `x86_64-apple-darwin`, cross-compiled |
+| `helix-cli-darwin-arm64` | `macos-15` | `aarch64-apple-darwin` |
+| `helix-cli-darwin-x64` | `macos-15` | `x86_64-apple-darwin`, cross-compiled |
 | `helix-cli-linux-arm64` | `ubuntu-24.04-arm` | `aarch64-unknown-linux-musl` |
 | `helix-cli-linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-musl` |
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
