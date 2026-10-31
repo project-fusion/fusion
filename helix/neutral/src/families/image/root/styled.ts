@@ -93,6 +93,9 @@ export default styles(
           justifyContent: 'center',
           position: 'absolute',
         }),
+        /* A phone's "fill the height" is a grow, which a column gives the
+           height, as a skeleton passed in fills the box. */
+        native([rule({ flexDirection: 'column' })]),
       ],
     ),
     on('placeholder', [
