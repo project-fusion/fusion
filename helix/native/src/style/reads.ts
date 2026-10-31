@@ -89,6 +89,44 @@ export const overflow = (resolved: Map<string, Resolution>): 'both' | 'x' | 'y' 
   return scrolls(across) ? 'x' : scrolls(down) ? 'y' : undefined
 }
 
+/** A scroller's snapping, from its `scroll-snap-type`, which is consumed either way. */
+export const snapType = (
+  resolved: Map<string, Resolution>,
+): 'mandatory' | 'proximity' | undefined => {
+  const type = resolved.get('scroll-snap-type')
+  resolved.delete('scroll-snap-type')
+  const written = Array.isArray(type) ? type.join(' ') : type
+  if (typeof written !== 'string' || written === 'none') {
+    return undefined
+  }
+  return written.includes('mandatory') ? 'mandatory' : 'proximity'
+}
+
+/** Where a box comes to rest in a scroller that snaps, from its `scroll-snap-align`. */
+export const snapAlign = (
+  resolved: Map<string, Resolution>,
+): 'center' | 'end' | 'start' | undefined => {
+  const align = resolved.get('scroll-snap-align')
+  resolved.delete('scroll-snap-align')
+  return align === 'center' || align === 'end' || align === 'start' ? align : undefined
+}
+
+/**
+ * What a scroller keeps clear of a snap, as it was written, along the axis it
+ * scrolls: `scroll-padding-inline` across and `scroll-padding-block` down. Both
+ * are consumed either way.
+ */
+export const snapPadding = (
+  resolved: Map<string, Resolution>,
+  axis: 'both' | 'x' | 'y' | undefined,
+): Resolution | undefined => {
+  const across = resolved.get('scroll-padding-inline')
+  const down = resolved.get('scroll-padding-block')
+  resolved.delete('scroll-padding-inline')
+  resolved.delete('scroll-padding-block')
+  return axis === 'y' ? down : across
+}
+
 /**
  * What an element does to the counters, from `counter-reset`,
  * `counter-increment`, and `counter-set`, each a name and an amount. The

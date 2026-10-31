@@ -3,6 +3,15 @@
 import type { Deferred } from './deferred.js'
 import type { Clip } from './effects.js'
 
+/**
+ * How a scroller snaps: whether it always comes to rest on a snap, as `mandatory`
+ * says, and what it keeps clear of one, in points, as `scroll-padding` does.
+ */
+export interface Snap {
+  readonly padding: number
+  readonly strict: boolean
+}
+
 /** Where a node stands among its siblings. */
 export interface Placed {
   readonly first: boolean
@@ -357,6 +366,10 @@ export interface Resolved {
    * it is.
    */
   readonly scrolls?: 'both' | 'x' | 'y'
+  /** How the part snaps what scrolls in it, as its `scroll-snap-type` says. */
+  readonly snap?: Snap
+  /** Where the part comes to rest in a scroller that snaps, as its `scroll-snap-align` says. */
+  readonly snapAlign?: 'center' | 'end' | 'start'
   /**
    * Whether the part is as wide as its content along its parent's row: it
    * neither grows nor sets a width or a basis, so its width is its content's

@@ -3,11 +3,13 @@
  * more past them, the pager its scroll buttons step with, the view its
  * content is laid out in, and the widths of the items that grow in it.
  */
-import { type RefObject, useCallback, useLayoutEffect, useRef, useState } from 'react'
-import type { HostInstance, ScrollViewInstance } from 'react-native'
+import { type RefObject, useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { HostInstance, ScrollViewInstance, ScrollViewProps } from 'react-native'
 import { layoutChanged } from '../capabilities/measure'
+import type { Snap } from '../style/resolved'
 import { useTheme } from '../theme/theme'
 import { useReducedMotion } from './motion'
+import type { SnapBox } from './scrolled'
 import type { Fill } from './styles'
 
 /** How long a scroll view's content and frame are along its axis, and how far it has scrolled. */
@@ -196,4 +198,82 @@ export const useSpread = (
      took then, and an entry would keep its longest line. */
   const laid: number | '100%' = spread?.key === key ? spread.width : '100%'
   return { framed, width: on ? laid : undefined }
+}
+
+/** A box a scroller snaps to, as it was laid out along the axis. */
+interface Snapped {
+  readonly align: string
+  readonly length: number
+  readonly start: number
+}
+
+/** The offset a scroller stands at to rest on a box. */
+const snapOffset = (box: Snapped, padding: number, frame: number): number => {
+  const place =
+    box.align === 'center'
+      ? box.start + box.length / 2 - frame / 2
+      : box.align === 'end'
+        ? box.start + box.length - frame + padding
+        : box.start - padding
+  return Math.max(0, place)
+}
+
+/**
+ * What a part that snaps gives its scroll view: **the offsets of the boxes in it
+ * that say where to rest**, by their `scroll-snap-align` and clear of its
+ * `scroll-padding`, and a glide that stops soon, as a browser's snap does. Under
+ * `mandatory` one swipe moves one place. `told` hears each new set of offsets,
+ * and `offsets`, where it is given, is what the scroll view rests at in their place.
+ */
+export const useSnap = (
+  snap: Snap | undefined,
+  horizontal: boolean,
+  told: unknown,
+  offsets: unknown,
+) => {
+  const [boxes, setBoxes] = useState<Readonly<Record<string, Snapped>>>({})
+  const [frame, setFrame] = useState(0)
+  const at = useCallback(
+    (key: string, align: string, layout: SnapBox) => {
+      const box = {
+        align,
+        length: horizontal ? layout.width : layout.height,
+        start: horizontal ? layout.x : layout.y,
+      }
+      setBoxes((was) => {
+        const held = was[key]
+        return held?.align === box.align && held.length === box.length && held.start === box.start
+          ? was
+          : { ...was, [key]: box }
+      })
+    },
+    [horizontal],
+  )
+  const padding = snap?.padding ?? 0
+  const found = useMemo(
+    () =>
+      Object.values(boxes)
+        .sort((one, other) => one.start - other.start)
+        .map((box) => snapOffset(box, padding, frame)),
+    [boxes, frame, padding],
+  )
+  const heard = useRef(told)
+  heard.current = told
+  useLayoutEffect(() => {
+    if (typeof heard.current === 'function') {
+      heard.current(found)
+    }
+  }, [found])
+  const framed = useCallback((laid: number) => {
+    setFrame((was) => (was === laid ? was : laid))
+  }, [])
+  const scroller: Partial<ScrollViewProps> =
+    snap === undefined
+      ? {}
+      : {
+          decelerationRate: 'fast',
+          disableIntervalMomentum: snap.strict,
+          snapToOffsets: Array.isArray(offsets) ? (offsets as number[]) : [...found],
+        }
+  return { framed, reports: snap === undefined ? {} : { snapAt: at }, scroller }
 }

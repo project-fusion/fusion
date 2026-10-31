@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from 'react'
+import type { LayoutChangeEvent } from 'react-native'
 import { View } from 'react-native'
 import type { Family, Node } from '../style/form'
 import type { GeneratedBox, Resolved, Style } from '../style/resolved'
@@ -301,6 +302,7 @@ const drawScrolling = (
       key={node.name}
       line={physical(resolved.rule)}
       motion={resolved.motion}
+      snap={resolved.snap}
       transitions={resolved.transitions}
       view={view}
     />,
@@ -379,6 +381,32 @@ const drawContent = (
 }
 
 /**
+ * A box's view, telling the scroller it stands in where it is laid out, where
+ * its `scroll-snap-align` makes it a place to come to rest.
+ */
+const reportingSnap = (
+  scope: Scope,
+  node: Node,
+  resolved: Resolved,
+  view: Readonly<Record<string, unknown>>,
+): Readonly<Record<string, unknown>> => {
+  const { snapAlign } = resolved
+  const snapAt = scope.scrolling?.snapAt
+  if (snapAlign === undefined || snapAt === undefined) {
+    return view
+  }
+  const own = view.onLayout as ((event: LayoutChangeEvent) => void) | undefined
+  const key = `${node.name}:${scope.item?.index ?? ''}`
+  return {
+    ...view,
+    onLayout: (event: LayoutChangeEvent) => {
+      own?.(event)
+      snapAt(key, snapAlign, event.nativeEvent.layout)
+    },
+  }
+}
+
+/**
  * A box: its part's view, what a screen reader hears of it, the words its
  * `::before` draws, its glyph, and what it holds, in its own text style.
  */
@@ -404,7 +432,12 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
   const held = outOfCopy(scope)
   const [box, words] = split(resolved.style)
   const inherits = inherit(text, words)
-  const view = laid(scope.behavior, node.name, boxSemantics(scope, node), scope.item)
+  const view = reportingSnap(
+    scope,
+    node,
+    resolved,
+    laid(scope.behavior, node.name, boxSemantics(scope, node), scope.item),
+  )
   const { scrolls } = resolved
   if (scrolls !== undefined) {
     return drawScrolling(held, node, { ...resolved, scrolls }, inherits, view)
