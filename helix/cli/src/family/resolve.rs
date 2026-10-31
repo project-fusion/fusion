@@ -69,6 +69,9 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.notification_group,
         &api.code_block,
         &api.carousel,
+        &api.listbox,
+        &api.option,
+        &api.option_group,
         &api.chat_root,
         &api.chat_message,
         &api.chat_composer,
@@ -221,6 +224,9 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
         ),
         ("codeBlock", &family.api.code_block, api::CODE_BLOCK),
         ("carousel", &family.api.carousel, api::CAROUSEL),
+        ("listbox", &family.api.listbox, api::LISTBOX),
+        ("option", &family.api.option, api::OPTION),
+        ("optionGroup", &family.api.option_group, api::OPTION_GROUP),
         ("chatRoot", &family.api.chat_root, api::CHAT_ROOT),
         ("chatMessage", &family.api.chat_message, api::CHAT_MESSAGE),
         (
@@ -311,9 +317,10 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             && family.api.range.is_none()
             && family.api.files.is_none()
             && family.api.color.is_none()
+            && family.api.listbox.is_none()
         {
             found.push(
-                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files` or `color` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files`, `color` or `listbox` holds its answer"
                     .to_owned(),
             );
         }
@@ -498,7 +505,7 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
     let Some(entry) = &family.api.entry else {
         /* A color holds what its fields say, as a color picker's value and its
         channels. */
-        let holds = family.api.color.is_some();
+        let holds = family.api.color.is_some() || family.api.listbox.is_some();
         for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
@@ -544,7 +551,7 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
     let stepping = steppers(&family.tree);
     let Some(range) = &family.api.range else {
         /* A color holds what its axes move, as a color picker's square. */
-        let holds = family.api.color.is_some();
+        let holds = family.api.color.is_some() || family.api.listbox.is_some();
         for name in controls.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"

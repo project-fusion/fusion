@@ -336,6 +336,74 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a list of options reads, sends, and computes, by the names the element gives them. */
+export interface ListboxChoice {
+  readonly childrenShown?: string
+  readonly defaultFilter?: string
+  readonly defaultValue?: string
+  readonly disabled?: string
+  readonly emptyShown?: string
+  readonly emptyText?: string
+  readonly emptyWords?: string
+  readonly errorShown?: string
+  readonly errorText?: string
+  readonly errorWords?: string
+  readonly filter?: string
+  readonly filterDelay?: string
+  readonly filterMatch?: string
+  readonly filterable?: string
+  readonly items?: string
+  readonly layout?: string
+  readonly loadError?: string
+  readonly loading?: string
+  readonly loadingShown?: string
+  readonly loadingText?: string
+  readonly manual?: string
+  readonly multiple?: string
+  readonly noResultsText?: string
+  readonly onBeforeChange?: string
+  readonly onBeforeFilter?: string
+  readonly onBeforeReorder?: string
+  readonly onChange?: string
+  readonly onFilter?: string
+  readonly onInput?: string
+  readonly onLoadMore?: string
+  readonly onReorder?: string
+  readonly reorderable?: string
+  readonly resultLabel?: string
+  readonly resultsLabel?: string
+  readonly rows?: string
+  readonly selectedLabel?: string
+  readonly value?: string
+  readonly windowed?: string
+}
+
+/** What an option reads, sends, and computes, by the names the element gives them. */
+export interface OptionChoice {
+  readonly highlighted?: string
+  readonly dragging?: string
+  readonly dropAfter?: string
+  readonly dropBefore?: string
+  readonly dropShown?: string
+  readonly checkShown?: string
+  readonly described?: string
+  readonly description?: string
+  readonly disabled?: string
+  readonly href?: string
+  readonly label?: string
+  readonly onBeforeSelect?: string
+  readonly selected?: string
+  readonly textValue?: string
+  readonly value?: string
+}
+
+/** What a group of options, or a rule between runs, reads. */
+export interface OptionGroupChoice {
+  readonly emptied?: string
+  readonly later?: string
+  readonly label?: string
+}
+
 /** What a carousel reads, sends, and computes, by the names the element gives them. */
 export interface CarouselChoice {
   readonly arrows?: string

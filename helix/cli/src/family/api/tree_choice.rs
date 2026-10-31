@@ -310,6 +310,66 @@ pub const CHAT_ROOT: &[(&str, Names)] = &[
     ("typingLabel", Names::Prop),
 ];
 
+/// What a list of options reads and sends, by the name the machine binds.
+pub const LISTBOX: &[(&str, Names)] = &[
+    ("defaultFilter", Names::Prop),
+    ("defaultValue", Names::Prop),
+    ("disabled", Names::Prop),
+    ("emptyText", Names::Prop),
+    ("errorText", Names::Prop),
+    ("filter", Names::Prop),
+    ("filterDelay", Names::Prop),
+    ("filterMatch", Names::Prop),
+    ("filterable", Names::Prop),
+    ("items", Names::Prop),
+    ("layout", Names::Prop),
+    ("loadError", Names::Prop),
+    ("loading", Names::Prop),
+    ("loadingText", Names::Prop),
+    ("manual", Names::Prop),
+    ("multiple", Names::Prop),
+    ("noResultsText", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onBeforeFilter", Names::Event),
+    ("onBeforeReorder", Names::Event),
+    ("onChange", Names::Event),
+    ("onFilter", Names::Event),
+    ("onInput", Names::Event),
+    ("onLoadMore", Names::Event),
+    ("onReorder", Names::Event),
+    ("reorderable", Names::Prop),
+    ("resultLabel", Names::Prop),
+    ("resultsLabel", Names::Prop),
+    ("selectedLabel", Names::Prop),
+    ("value", Names::Prop),
+];
+
+/// What a list of options computes for its parts, each read as `listbox.x`.
+pub const LISTBOX_COMPUTED: &[&str] = &["childrenShown", "emptyShown", "emptyWords", "errorShown", "errorWords", "loadingShown", "rows", "windowed"];
+
+/// What an option reads and sends, by the name the machine binds.
+pub const OPTION: &[(&str, Names)] = &[
+    ("description", Names::Prop),
+    ("disabled", Names::Prop),
+    ("href", Names::Prop),
+    ("label", Names::Prop),
+    ("onBeforeSelect", Names::Event),
+    ("selected", Names::Prop),
+    ("textValue", Names::Prop),
+    ("value", Names::Prop),
+];
+
+/// What an option computes for its parts, each read as `option.x`.
+pub const OPTION_COMPUTED: &[&str] = &["checkShown", "described", "dragging", "dropAfter", "dropBefore", "dropShown", "highlighted"];
+
+/// What a group of options, or a rule between runs, reads and sends, by the name the machine binds.
+pub const OPTION_GROUP: &[(&str, Names)] = &[
+    ("label", Names::Prop),
+];
+
+/// What a group of options computes for its parts, each read as `optionGroup.x`.
+pub const OPTION_GROUP_COMPUTED: &[&str] = &["emptied", "later"];
+
 /// What a carousel reads and sends, by the name the machine binds.
 pub const CAROUSEL: &[(&str, Names)] = &[
     ("autoplay", Names::Prop),
@@ -622,6 +682,21 @@ pub fn log_group(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "logGroup", LOG_GROUP, LOG_GROUP_COMPUTED)
 }
 
+/// `listbox({ ... })`, each field a name.
+pub fn listbox(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "listbox", LISTBOX, LISTBOX_COMPUTED)
+}
+
+/// `option({ ... })`, each field a name.
+pub fn option(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "option", OPTION, OPTION_COMPUTED)
+}
+
+/// `optionGroup({ ... })`, each field a name. A rule between runs is one too.
+pub fn option_group(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "optionGroup", OPTION_GROUP, OPTION_GROUP_COMPUTED)
+}
+
 /// `carousel({ ... })`, each field a name.
 pub fn carousel(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "carousel", CAROUSEL, CAROUSEL_COMPUTED)
@@ -698,6 +773,9 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
         "carousel" => carousel(value),
+        "listbox" => listbox(value),
+        "option" => option(value),
+        "optionGroup" => option_group(value),
         "chatRoot" => chat_root(value),
         "chatMessage" => chat_message(value),
         "chatComposer" => chat_composer(value),

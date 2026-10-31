@@ -56,6 +56,9 @@ import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
   CarouselChoice,
+  ListboxChoice,
+  OptionChoice,
+  OptionGroupChoice,
   ChatComposerChoice,
   ChatMessageChoice,
   ChatRootChoice,
@@ -309,6 +312,12 @@ export interface Headless {
   readonly notificationGroup?: NotificationGroupChoice
   /** What the element reads, sends, and computes where it is a block of code. */
   readonly codeBlock?: CodeBlockChoice
+  /** What the element reads, sends, and computes where it is a list of options. */
+  readonly listbox?: ListboxChoice
+  /** What the element reads, sends, and computes where it is an option. */
+  readonly option?: OptionChoice
+  /** What the element reads where it is a group of options, or a rule between runs. */
+  readonly optionGroup?: OptionGroupChoice
   /** What the element reads, sends, and computes where it is a carousel. */
   readonly carousel?: CarouselChoice
   /** What the element reads, sends, and computes where it is a conversation. */
