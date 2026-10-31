@@ -1,4 +1,5 @@
 import { describe, expect, test } from '@jest/globals'
+import { createElement, Fragment } from 'react'
 import { Text } from 'react-native'
 import { wordsOf } from './join'
 
@@ -17,14 +18,7 @@ describe('wordsOf', () => {
   })
 
   test('reads a fragment as the children it holds', () => {
-    expect(
-      wordsOf(
-        <>
-          New
-          <Text>York</Text>
-        </>,
-      ),
-    ).toBe('New York')
+    expect(wordsOf(createElement(Fragment, null, 'New', <Text>York</Text>))).toBe('New York')
   })
 
   test('makes each run of white space one space, and drops what draws nothing', () => {
