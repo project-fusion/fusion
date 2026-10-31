@@ -285,6 +285,23 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly notificationGroup: Computes<'counted' | 'countWords'>
   /** What a block of code computes for its parts. */
   readonly codeBlock: Computes<'expandHidden' | 'expandWords' | 'panes' | 'several' | 'tabs'>
+  /** What a list of options computes for its parts. */
+  readonly listbox: Computes<
+    | 'childrenShown'
+    | 'emptyShown'
+    | 'emptyWords'
+    | 'errorShown'
+    | 'errorWords'
+    | 'loadingShown'
+    | 'rows'
+    | 'windowed'
+  >
+  /** What an option computes for its parts. */
+  readonly option: Computes<
+    'checkShown' | 'described' | 'dragging' | 'dropAfter' | 'dropBefore' | 'dropShown' | 'highlighted'
+  >
+  /** What a group of options computes for its parts. */
+  readonly optionGroup: Computes<'emptied' | 'later'>
   /** What a carousel computes for its parts. */
   readonly carousel: Computes<
     | 'arrows'
