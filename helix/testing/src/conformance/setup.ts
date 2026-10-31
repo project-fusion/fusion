@@ -8,9 +8,10 @@ import type { Setup } from './format.js'
 
 /**
  * The regions that hold an item's own rows, as a drilldown row's `page` and
- * a menu row's `submenu` hold the rows of the page they open.
+ * a menu row's `submenu` hold the rows of the page they open, and a tree
+ * item's `children` the items under it.
  */
-export const PAGE_SLOTS: ReadonlySet<string> = new Set(['page', 'submenu'])
+export const PAGE_SLOTS: ReadonlySet<string> = new Set(['children', 'page', 'submenu'])
 
 /** The elements that group items under a heading, whose items are the set's own. */
 export const GROUP_TAGS: ReadonlySet<string> = new Set([
