@@ -9,7 +9,17 @@ import { blurOf, type Clip, clipOf } from './effects.js'
 import type { Family, Value } from './form.js'
 import { gapped, placing } from './grid/form.js'
 import { FUNCTIONAL, LISTED } from './properties.js'
-import { clipped, counted, grid, line, markerOf, overflow } from './reads.js'
+import {
+  clipped,
+  counted,
+  grid,
+  line,
+  markerOf,
+  overflow,
+  snapAlign,
+  snapPadding,
+  snapType,
+} from './reads.js'
 import { COMPARED, type Resolver } from './resolve.js'
 import type {
   Counting,
@@ -19,6 +29,7 @@ import type {
   Motion,
   Placing,
   Resolution,
+  Snap,
   Style,
   Transition,
 } from './resolved.js'
@@ -67,6 +78,8 @@ export interface Finished {
   readonly placement: Placing | undefined
   readonly rule: Line | undefined
   readonly scrolls: 'both' | 'x' | 'y' | undefined
+  readonly snap: Snap | undefined
+  readonly snapAlign: 'center' | 'end' | 'start' | undefined
   /** The color scheme what the part holds draws in, where `color-scheme` names one. */
   readonly scheme: 'dark' | 'light' | undefined
   readonly transitions: Record<string, Transition>
@@ -165,6 +178,9 @@ export const finisherFor = ({
     const invisible = resolved.get('visibility') === 'hidden'
     const clips = clipped(resolved)
     const scrolls = overflow(resolved)
+    const snaps = snapType(resolved)
+    const clear = snapPadding(resolved, scrolls)
+    const aligned = snapAlign(resolved)
     const schemed = resolved.get('color-scheme')
     resolved.delete('color-scheme')
     const scheme = schemed === 'light' || schemed === 'dark' ? schemed : undefined
@@ -189,6 +205,14 @@ export const finisherFor = ({
     const set = resolved.get('font-size')
     const fontSize = set === undefined ? inherits : length(set, rem, inherits)
     const spaceEm = set === undefined ? inheritsSpace : length(set, spaceRem, inheritsSpace)
+    const kept =
+      clear === undefined
+        ? 0
+        : length(clear, spaceRem, typeof spaceEm === 'number' ? spaceEm : spaceRem)
+    const snap: Snap | undefined =
+      snaps === undefined
+        ? undefined
+        : { padding: typeof kept === 'number' ? kept : 0, strict: snaps === 'mandatory' }
     const out: Record<string, number | string> = {}
     /* `display` first, so a box's own alignment stands over what its kind of
          box implies. */
@@ -277,6 +301,8 @@ export const finisherFor = ({
       scheme,
       scrolls,
       shown,
+      snap,
+      snapAlign: aligned,
       transitions,
     }
   }

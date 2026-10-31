@@ -16,10 +16,18 @@ import {
 } from 'react-native'
 import { pairAcross } from '../capabilities/scroll'
 import type { Node } from '../style/form'
-import type { Line, Motion, Style, Transition } from '../style/resolved'
+import type { Line, Motion, Snap, Style, Transition } from '../style/resolved'
 import { Box } from './box'
 import { holding, useHandOff } from './hand-off'
-import { useContent, useFill, useMore, usePager, useScroller, useSpread } from './scroll-parts'
+import {
+  useContent,
+  useFill,
+  useMore,
+  usePager,
+  useScroller,
+  useSnap,
+  useSpread,
+} from './scroll-parts'
 import { reporting, type Scrolled, useScrollLocked } from './scroll-view'
 import type { Scrolling } from './styles'
 import { WrapWidth } from './text'
@@ -111,10 +119,14 @@ const movesOf = (
 
 /**
  * Whether content that scrolls is laid out at the frame's width, as `useSpread`
- * says: content across, unless its part hugs it.
+ * says: content across, unless its part hugs it or snaps, whose content is as
+ * long as the boxes in it make it.
  */
-const spreads = (axis: 'both' | 'x' | 'y', hugs: boolean | undefined): boolean =>
-  axis === 'x' && hugs !== true
+const spreads = (
+  axis: 'both' | 'x' | 'y',
+  hugs: boolean | undefined,
+  snap: Snap | undefined,
+): boolean => axis === 'x' && hugs !== true && snap === undefined
 
 /** The scroll view's style: it fills its frame, unless its part hugs its content. */
 const growing = (hugs: boolean | undefined) => ({ flexGrow: hugs === true ? 0 : 1 })
@@ -140,6 +152,8 @@ interface ScrollingProps {
   readonly line?: Line | undefined
   /** The part's animation, which its frame runs, where it has one. */
   readonly motion?: Motion | undefined
+  /** How the part snaps what scrolls in it, as its `scroll-snap-type` says. */
+  readonly snap?: Snap | undefined
   /** How each property of the frame's style moves to a new value. */
   readonly transitions?: Readonly<Record<string, Transition>> | undefined
   /**
@@ -148,7 +162,9 @@ interface ScrollingProps {
    * a `pager` is handed the part's `Pager` once it is drawn, a
    * `contentRef` is handed the view its content is laid out in, a
    * `scrollerRef` the scroll view the scroll capability takes as the part,
-   * and `indicators` shows the platform's scroll indicators.
+   * `indicators` shows the platform's scroll indicators, `onSnapOffsets` hears
+   * the offsets a part that snaps can rest at, and `snapOffsets` takes the place
+   * of those, as a carousel stops only at its stops.
    */
   readonly view: Readonly<Record<string, unknown>>
 }
@@ -187,6 +203,9 @@ interface ScrollingProps {
  * otherwise**: React Native lays a scroll view across in a row, which drew
  * a scroll area's notes side by side on one line.
  *
+ * **A part that snaps comes to rest on the boxes in it that say where**, as
+ * `useSnap` works out, and its content is as long as they make it.
+ *
  * **Inside a layer that swipes along its axis, the part hands its drag to the
  * layer at its start**, as `useSwipe` says: its gesture runs beside the
  * layer's swipe, and the swipe reads where it stands and holds it there.
@@ -204,6 +223,7 @@ export const ScrollingPart = ({
   hugs,
   line,
   motion,
+  snap,
   transitions,
   view,
 }: ScrollingProps) => {
@@ -216,18 +236,24 @@ export const ScrollingPart = ({
     contentRef,
     indicators,
     maintainVisibleContentPosition,
+    onSnapOffsets,
     pager,
     scrollerRef,
+    snapOffsets,
     style: over,
     ...props
   } = view
   usePager(pager, scroller, at, horizontal)
   useScroller(scrollerRef, scroller)
   const laidOut = useContent(contentRef)
-  const spread = useSpread(spreads(axis, hugs), laidOut.node)
+  const spread = useSpread(spreads(axis, hugs, snap), laidOut.node)
+  const snapping = useSnap(snap, horizontal, onSnapOffsets, snapOffsets)
   const fill = useFill()
   const buttons = horizontal ? 'x' : 'y'
-  const scrolling: Scrolling = horizontal ? { axis: 'x', fill, more } : { axis: 'y', more }
+  const scrolling: Scrolling = {
+    ...(horizontal ? { axis: 'x', fill, more } : { axis: 'y', more }),
+    ...snapping.reports,
+  } as Scrolling
   const twoWays = axis === 'both'
   /* The frame's width, which words inside wrap at, less the content's
      padding, when it scrolls both ways. */
@@ -254,6 +280,7 @@ export const ScrollingPart = ({
   const laid = (
     <ScrollView
       {...shared}
+      {...snapping.scroller}
       contentContainerStyle={{
         ...(twoWays ? { flexDirection: 'column' } : {}),
         ...inner,
@@ -283,6 +310,7 @@ export const ScrollingPart = ({
               const { layout } = event.nativeEvent
               track({ frame: horizontal ? layout.width : layout.height })
               spread.framed(layout.width)
+              snapping.framed(horizontal ? layout.width : layout.height)
               told.onLayout(event)
             },
             onMomentumScrollBegin: told.onMomentumScrollBegin,

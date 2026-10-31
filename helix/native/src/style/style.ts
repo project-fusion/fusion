@@ -411,6 +411,8 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     ...(main.rule === undefined ? {} : { rule: main.rule }),
     ...(main.scheme === undefined ? {} : { scheme: main.scheme }),
     ...(main.scrolls === undefined ? {} : { scrolls: main.scrolls }),
+    ...(main.snap === undefined ? {} : { snap: main.snap }),
+    ...(main.snapAlign === undefined ? {} : { snapAlign: main.snapAlign }),
     ...(main.scrolls === 'x' && hugs(within, main.out) ? { hugs: true } : {}),
     ...(within.flex && within.row && grows && holds && main.out.flexGrow === 1
       ? { shares: true }
