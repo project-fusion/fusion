@@ -454,6 +454,8 @@ export const useCodeBlock = (family: Family, props: Props, use: MachineUse): Beh
           [list('several')]: several,
         },
       },
+      /* A row of a diff runs past the box and scrolls, as a `<pre>` holds its lines. */
+      text: { view: { style: { maxWidth: UNBOUNDED } } },
       'wrap-toggle': {
         view: {
           accessibilityRole: 'togglebutton',
