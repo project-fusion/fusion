@@ -242,7 +242,10 @@ export default styles(
       native([
         rule({ flexGrow: 1, flexShrink: 1, minBlockSize: 0 }),
         rule({ part: { 'data-scrolls': true } }, { overflow: 'auto' }),
-        rule({ part: { 'data-scrolls': true }, wrap: true }, { overflowY: 'auto' }),
+        rule(
+          { part: { 'data-scrolls': true }, wrap: true },
+          { overflowX: 'hidden', overflowY: 'auto' },
+        ),
       ]),
     ]),
     /* A row drawn from data keeps every line's width, so a row with a background
@@ -261,7 +264,15 @@ export default styles(
         position: 'relative',
         web: { display: 'grid', gridRow: 4, justifyItems: 'center' },
       }),
-      native([rule({ alignItems: 'center', display: 'flex', flexDirection: 'column' })]),
+      native([
+        rule({
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          /* The button inside still takes a press, as the web's `auto` gives it. */
+          pointerEvents: 'box-none',
+        }),
+      ]),
       rule({ part: { hidden: true } }, { display: 'none' }),
       rule({ print: true }, { display: 'none' }),
     ]),
