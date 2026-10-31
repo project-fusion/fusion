@@ -47,14 +47,14 @@ describe('a reorderable tree', () => {
     expect(rule(':host(:state(dragging)) [part="item"]')).toContain(
       'opacity: var(--tree-dragging-opacity, 0.5)',
     )
-    const line = rule(
-      ':host(:state(drop-before)) [part="item"]::before, :host(:state(drop-after)) [part="item"]::after',
-    )
-    expect(line).toContain('var(--tree-drop-indicator-color, var(--helix-color-primary))')
-    expect(line).toContain('var(--tree-drop-indicator-size, var(--helix-border-thick))')
-    expect(rule(':host(:state(drop-before)) [part="item"]::before')).toContain(
-      'inset-block-start: 0',
-    )
+    const before = rule(':host(:state(drop-before)) [part="item"]::before')
+    const after = rule(':host(:state(drop-after)) [part="item"]::after')
+    for (const line of [before, after]) {
+      expect(line).toContain('var(--tree-drop-indicator-color, var(--helix-color-primary))')
+      expect(line).toContain('var(--tree-drop-indicator-size, var(--helix-border-thick))')
+    }
+    expect(before).toContain('inset-block-start: 0')
+    expect(after).toContain('inset-block-end: 0')
   })
 
   test('draws the grip and says each step in the styled tier too', async () => {

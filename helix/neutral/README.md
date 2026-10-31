@@ -1322,6 +1322,21 @@ too long from the start sends `error`. `gives` names what each field of its
 detail holds, a computed value or a prop, on any event: a callout's `dismiss`
 gives its `label` from its heading's words, or its content's.
 
+## Trees
+
+A tree holds its items wherever they stand, as its source's `treeRoot`, and each
+item says what it reads and computes as its `treeItem`. **The web's elements walk
+their own items**, and a phone's items join through a context, so an item's level
+and its place among its siblings come from where it stands. Every value a
+`treeItem` names is a value the render binds, as `treeItem.branch`, and a rule
+reads what a phone needs by `also`, since the web hands the same facts down as
+custom properties.
+
+**A region named `children` stands among `children`**, since no prop can name it
+apart: an item is passed in with `slot="children"` on both platforms, and the
+default region holds the rest. A page that wraps an item in a component of its own
+gives that component the `slot`.
+
 ## Sets whose items a reader removes
 
 A set whose items a reader removes says how in its collection: `removeOn`
