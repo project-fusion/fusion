@@ -68,6 +68,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.notification_row,
         &api.notification_group,
         &api.code_block,
+        &api.carousel,
         &api.chat_root,
         &api.chat_message,
         &api.chat_composer,
@@ -219,6 +220,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
             api::NOTIFICATION_GROUP,
         ),
         ("codeBlock", &family.api.code_block, api::CODE_BLOCK),
+        ("carousel", &family.api.carousel, api::CAROUSEL),
         ("chatRoot", &family.api.chat_root, api::CHAT_ROOT),
         ("chatMessage", &family.api.chat_message, api::CHAT_MESSAGE),
         (
