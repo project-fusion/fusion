@@ -335,3 +335,59 @@ export interface TailChoice {
   readonly resume?: string
   readonly threshold?: string
 }
+
+/** What a feed of notifications binds, by the name the machine reads. */
+export interface NotificationsRootChoice {
+  readonly arrivedLabel?: string
+  readonly blank?: string
+  readonly emptyText?: string
+  readonly errorShown?: string
+  readonly errorText?: string
+  readonly errorWords?: string
+  readonly fallbackLabel?: string
+  readonly footerEmpty?: string
+  readonly headerEmpty?: string
+  readonly label?: string
+  readonly loading?: string
+  readonly loadingShown?: string
+  readonly loadingText?: string
+  readonly marksAll?: string
+  readonly named?: string
+  readonly onBeforeRead?: string
+  readonly onDismiss?: string
+  readonly onLoadMore?: string
+  readonly onRead?: string
+  readonly said?: string
+  readonly separation?: string
+  readonly total?: string
+}
+
+/** What a notification binds, by the name the machine reads. */
+export interface NotificationRowChoice {
+  readonly actionsFilled?: string
+  readonly at?: string
+  readonly defaultRead?: string
+  readonly dismissLabel?: string
+  readonly dismissName?: string
+  readonly dismissible?: string
+  readonly gone?: string
+  readonly heard?: string
+  readonly last?: string
+  readonly media?: string
+  readonly onBeforeRead?: string
+  readonly onDismiss?: string
+  readonly onRead?: string
+  readonly read?: string
+  readonly separation?: string
+  readonly stamped?: string
+  readonly unreadLabel?: string
+}
+
+/** What a group of notifications binds, by the name the machine reads. */
+export interface NotificationGroupChoice {
+  readonly collapsible?: string
+  readonly count?: string
+  readonly countWords?: string
+  readonly counted?: string
+  readonly label?: string
+}

@@ -104,6 +104,9 @@ impl<'a> Names<'a> {
                         .chain(family.api.log_line.iter())
                         .chain(family.api.log_group.iter())
                         .chain(family.api.tail.iter())
+                        .chain(family.api.notifications_root.iter())
+                        .chain(family.api.notification_row.iter())
+                        .chain(family.api.notification_group.iter())
                         .flat_map(|item| item.computed.values().map(String::as_str)),
                 )
                 /* And what a color computes as it moves, as a color picker's. */
@@ -179,6 +182,36 @@ impl<'a> Names<'a> {
     }
 }
 
+/// Where what a log, a box that follows its content, or a feed names resolves to
+/// nothing.
+fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
+    for (feature, choice, table) in [
+        ("logRoot", &family.api.log_root, api::LOG_ROOT),
+        ("logLine", &family.api.log_line, api::LOG_LINE),
+        ("logGroup", &family.api.log_group, api::LOG_GROUP),
+        ("tail", &family.api.tail, api::TAIL),
+        (
+            "notificationsRoot",
+            &family.api.notifications_root,
+            api::NOTIFICATIONS_ROOT,
+        ),
+        (
+            "notificationRow",
+            &family.api.notification_row,
+            api::NOTIFICATION_ROW,
+        ),
+        (
+            "notificationGroup",
+            &family.api.notification_group,
+            api::NOTIFICATION_GROUP,
+        ),
+    ] {
+        if let Some(choice) = choice {
+            references(feature, choice.references(table), names, found);
+        }
+    }
+}
+
 /// Where one element's names resolve to nothing, one sentence each.
 pub fn unresolved(family: &Family) -> Vec<String> {
     let names = Names::of(family);
@@ -228,16 +261,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             &mut found,
         );
     }
-    for (feature, choice, table) in [
-        ("logRoot", &family.api.log_root, api::LOG_ROOT),
-        ("logLine", &family.api.log_line, api::LOG_LINE),
-        ("logGroup", &family.api.log_group, api::LOG_GROUP),
-        ("tail", &family.api.tail, api::TAIL),
-    ] {
-        if let Some(choice) = choice {
-            references(feature, choice.references(table), &names, &mut found);
-        }
-    }
+    logs_and_feeds(family, &names, &mut found);
     if let Some(inspector) = &family.api.inspector {
         references(
             "inspector",

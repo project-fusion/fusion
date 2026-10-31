@@ -265,6 +265,24 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'statusHidden'
     | 'statusIcon'
   >
+  /** What a feed of notifications computes for its parts. */
+  readonly notificationsRoot: Computes<
+    | 'blank'
+    | 'errorShown'
+    | 'errorWords'
+    | 'footerEmpty'
+    | 'headerEmpty'
+    | 'loadingShown'
+    | 'marksAll'
+    | 'named'
+    | 'said'
+  >
+  /** What a notification computes for its parts. */
+  readonly notificationRow: Computes<
+    'actionsFilled' | 'dismissName' | 'gone' | 'heard' | 'last' | 'media' | 'stamped'
+  >
+  /** What a group of notifications computes for its parts. */
+  readonly notificationGroup: Computes<'counted' | 'countWords'>
   /** What a box that follows its newest content computes for its parts. */
   readonly tail: Computes<'away' | 'following'>
   /** What a tree computes. */

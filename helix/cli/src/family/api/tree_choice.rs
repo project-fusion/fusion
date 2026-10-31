@@ -187,6 +187,71 @@ pub const LOG_GROUP_COMPUTED: &[&str] = &[
     "statusIcon",
 ];
 
+/// What a feed of notifications reads and sends, by the name the machine binds.
+pub const NOTIFICATIONS_ROOT: &[(&str, Names)] = &[
+    ("arrivedLabel", Names::Prop),
+    ("emptyText", Names::Prop),
+    ("errorText", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("loading", Names::Prop),
+    ("loadingText", Names::Prop),
+    ("onBeforeRead", Names::Event),
+    ("onDismiss", Names::Event),
+    ("onLoadMore", Names::Event),
+    ("onRead", Names::Event),
+    ("separation", Names::Prop),
+    ("total", Names::Prop),
+];
+
+/// What a feed of notifications computes for its parts, each read as `notificationsRoot.x`.
+pub const NOTIFICATIONS_ROOT_COMPUTED: &[&str] = &[
+    "blank",
+    "errorShown",
+    "errorWords",
+    "footerEmpty",
+    "headerEmpty",
+    "loadingShown",
+    "marksAll",
+    "named",
+    "said",
+];
+
+/// What a notification reads and sends, by the name the machine binds.
+pub const NOTIFICATION_ROW: &[(&str, Names)] = &[
+    ("at", Names::Prop),
+    ("defaultRead", Names::Prop),
+    ("dismissLabel", Names::Prop),
+    ("dismissible", Names::Prop),
+    ("onBeforeRead", Names::Event),
+    ("onDismiss", Names::Event),
+    ("onRead", Names::Event),
+    ("read", Names::Prop),
+    ("separation", Names::Prop),
+    ("unreadLabel", Names::Prop),
+];
+
+/// What a notification computes for its parts, each read as `notificationRow.x`.
+pub const NOTIFICATION_ROW_COMPUTED: &[&str] = &[
+    "actionsFilled",
+    "dismissName",
+    "gone",
+    "heard",
+    "last",
+    "media",
+    "stamped",
+];
+
+/// What a group of notifications reads and sends, by the name the machine binds.
+pub const NOTIFICATION_GROUP: &[(&str, Names)] = &[
+    ("collapsible", Names::Prop),
+    ("count", Names::Prop),
+    ("label", Names::Prop),
+];
+
+/// What a group of notifications computes for its parts, each read as `notificationGroup.x`.
+pub const NOTIFICATION_GROUP_COMPUTED: &[&str] = &["counted", "countWords"];
+
 /// What tail reads and sends, by the name the machine binds.
 pub const TAIL: &[(&str, Names)] = &[
     ("defaultPinned", Names::Prop),
@@ -383,7 +448,37 @@ pub fn tail(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "tail", TAIL, TAIL_COMPUTED)
 }
 
-/// A tree, an inspector, a part of a table, or a part of a log, by the key its source writes it under.
+/// `notificationsRoot({ ... })`, each field a name.
+pub fn notifications_root(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "notificationsRoot",
+        NOTIFICATIONS_ROOT,
+        NOTIFICATIONS_ROOT_COMPUTED,
+    )
+}
+
+/// `notificationRow({ ... })`, each field a name.
+pub fn notification_row(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "notificationRow",
+        NOTIFICATION_ROW,
+        NOTIFICATION_ROW_COMPUTED,
+    )
+}
+
+/// `notificationGroup({ ... })`, each field a name.
+pub fn notification_group(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "notificationGroup",
+        NOTIFICATION_GROUP,
+        NOTIFICATION_GROUP_COMPUTED,
+    )
+}
+
+/// A tree, an inspector, a part of a table, a part of a log, or a part of a feed, by the key its source writes it under.
 pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
     match key {
         "treeRoot" => tree(value),
@@ -395,6 +490,9 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "logLine" => log_line(value),
         "logGroup" => log_group(value),
         "tail" => tail(value),
+        "notificationsRoot" => notifications_root(value),
+        "notificationRow" => notification_row(value),
+        "notificationGroup" => notification_group(value),
         _ => inspector(value),
     }
 }
