@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { authorWords, TURN_WORDS, turnName } from './naming.js'
+import { authorWords, TURN_WORDS, turnName } from './turns.js'
 
 /* What a screen reader calls a turn, which is who wrote it and when. */
 
