@@ -83,10 +83,29 @@ import { HelixTree, HelixTreeItem } from '../tree/index.native'
 import { HelixTrend } from '../trend/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import {
+  BulletList,
+  DataCell,
+  Emphasis,
+  HEADINGS,
+  HeadCell,
+  ListItem,
+  OrderedList,
+  Paragraph,
+  Pre,
+  Quote,
+  Row,
+  Rule,
+  Table,
+  TableBody,
+  TableHead,
+  Turn,
+} from './prose.native'
+import {
   Anchor,
   Box,
   Fieldset,
   Legend,
+  linkPress,
   type Props,
   RawSvg,
   Span,
@@ -141,17 +160,33 @@ const Link = (props: Props) =>
         HelixButton,
         {
           emphasis: props['data-button'] === '' ? undefined : props['data-button'],
+          onPress: linkPress(props),
           tone: props['data-button-tone'],
         } as React.ComponentProps<typeof HelixButton>,
         props.children as React.ReactNode,
       )
 
+/** A chat message, whose passage takes the values the base layer gives a turn. */
+const ChatMessage = (props: React.ComponentProps<typeof HelixChatMessage>) =>
+  React.createElement(Turn, null, React.createElement(HelixChatMessage, props))
+
+/** The components a passage under `data-prose` spaces as its own blocks. */
+export const PROSE_SPACED: ReadonlySet<unknown> = new Set([
+  HelixCallout,
+  HelixCodeBlock,
+  HelixTable,
+])
+
 export const TAGS: Readonly<Record<string, unknown>> = {
   a: Link,
+  b: Strong,
+  blockquote: Quote,
   code: HelixCode,
   div: Box,
+  em: Emphasis,
   fieldset: Fieldset,
   form: Box,
+  ...HEADINGS,
   'helix-accordion': HelixAccordion,
   'helix-accordion-item': HelixAccordionItem,
   'helix-announcement': HelixAnnouncement,
@@ -169,7 +204,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-carousel': HelixCarousel,
   'helix-chat': HelixChat,
   'helix-chat-composer': HelixChatComposer,
-  'helix-chat-message': HelixChatMessage,
+  'helix-chat-message': ChatMessage,
   'helix-checkbox': HelixCheckbox,
   'helix-checkbox-group': HelixCheckboxGroup,
   'helix-code': HelixCode,
@@ -265,11 +300,24 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tree-item': HelixTreeItem,
   'helix-trend': HelixTrend,
   'helix-virtual-list': HelixVirtualList,
+  hr: Rule,
+  i: Emphasis,
   legend: Legend,
-  p: Span,
+  li: ListItem,
+  ol: OrderedList,
+  p: Paragraph,
+  pre: Pre,
   span: Span,
   strong: Strong,
   svg: RawSvg,
+  table: Table,
+  tbody: TableBody,
+  td: DataCell,
+  tfoot: TableBody,
+  th: HeadCell,
+  thead: TableHead,
+  tr: Row,
+  ul: BulletList,
   ...SVG_SHAPES,
 }
 
