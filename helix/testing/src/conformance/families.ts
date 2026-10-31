@@ -32,6 +32,7 @@ export type Family =
   | 'motion-toggle'
   | 'navigation'
   | 'number-input'
+  | 'code-block'
   | 'log'
   | 'notifications'
   | 'object-inspector'
