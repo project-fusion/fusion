@@ -336,6 +336,90 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a conversation binds, by the name the machine reads. */
+export interface ChatRootChoice {
+  readonly actionsEmpty?: string
+  readonly arrivalLabel?: string
+  readonly authorStyles?: string
+  readonly blank?: string
+  readonly busy?: string
+  readonly composerEmpty?: string
+  readonly failedLabel?: string
+  readonly failedTurnLabel?: string
+  readonly fallbackLabel?: string
+  readonly headerEmpty?: string
+  readonly history?: string
+  readonly historyShown?: string
+  readonly historyText?: string
+  readonly label?: string
+  readonly list?: string
+  readonly meLabel?: string
+  readonly messageLabel?: string
+  readonly named?: string
+  readonly onHistory?: string
+  readonly onSend?: string
+  readonly loadingShown?: string
+  readonly said?: string
+  readonly scrolls?: string
+  readonly statusEmpty?: string
+  readonly windowed?: string
+  readonly turnLabel?: string
+  readonly turns?: string
+  readonly typing?: string
+  readonly typingLabel?: string
+  readonly typingWords?: string
+}
+
+/** What a turn in a conversation binds, by the name the machine reads. */
+export interface ChatMessageChoice {
+  readonly actionsEmpty?: string
+  readonly at?: string
+  readonly attachmentsEmpty?: string
+  readonly author?: string
+  readonly authorLabel?: string
+  readonly contentEmpty?: string
+  readonly failed?: string
+  readonly failedLabel?: string
+  readonly inline?: string
+  readonly locale?: string
+  readonly named?: string
+  readonly onSend?: string
+  readonly reading?: string
+  readonly retryLabel?: string
+  readonly sending?: string
+  readonly sendingLabel?: string
+  readonly sourcesEmpty?: string
+  readonly state?: string
+  readonly waiting?: string
+  readonly workEmpty?: string
+}
+
+/** What a field for writing a turn binds, by the name the machine reads. */
+export interface ChatComposerChoice {
+  readonly attached?: string
+  readonly attachmentsEmpty?: string
+  readonly busy?: string
+  readonly endEmpty?: string
+  readonly idling?: string
+  readonly mark?: string
+  readonly onSend?: string
+  readonly onStop?: string
+  readonly onTyping?: string
+  readonly placeholder?: string
+  readonly placeholders?: string
+  readonly queue?: string
+  readonly sendDisabled?: string
+  readonly sendHeld?: string
+  readonly sendLabel?: string
+  readonly sendName?: string
+  readonly sendReason?: string
+  readonly shownPlaceholder?: string
+  readonly startEmpty?: string
+  readonly stopLabel?: string
+  readonly submitOn?: string
+  readonly typingTimeout?: string
+}
+
 /** What a feed of notifications binds, by the name the machine reads. */
 export interface NotificationsRootChoice {
   readonly arrivedLabel?: string
