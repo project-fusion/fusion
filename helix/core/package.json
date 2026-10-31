@@ -81,6 +81,10 @@
       "types": "./dist/capabilities/types.generated.d.ts",
       "default": "./dist/capabilities/types.generated.js"
     },
+    "./carousel": {
+      "types": "./dist/utils/carousel/stops.d.ts",
+      "default": "./dist/utils/carousel/stops.js"
+    },
     "./chat": {
       "types": "./dist/utils/chat/turns.d.ts",
       "default": "./dist/utils/chat/turns.js"
