@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import type { WindowDrawing, WindowRow } from '../machines/window'
+import type { DrawnRow, WindowDrawing } from '../machines/window'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
 import { ScrollArea, type Scrolled } from './scroll-view'
@@ -27,7 +27,7 @@ interface Drawing {
   /** What stands after the rows, inside what scrolls. */
   readonly footer: ReactNode
   /** A copy for one row, at its place among the rows. */
-  readonly row: (row: WindowRow, place: number) => ReactNode
+  readonly row: (row: DrawnRow, place: number) => ReactNode
 }
 
 /** The scroll view a list scrolls in: the adapter's, which takes the screen's hold and a layer's hand-off. */
@@ -61,15 +61,15 @@ const Held = ({
 }
 
 /** Each row's key. */
-const keyed = (row: WindowRow): string => row.key
+const keyed = (row: DrawnRow): string => row.key
 
 /** A list of rows, lines of columns, or a line across, in `FlatList`. */
 const Listed = ({ drawing, footer, row }: Drawing) => {
   const { across, gap, horizontal, laid, listRef, moved, rows } = drawing
   const [width, setWidth] = useState(0)
-  const list = useRef<FlatList<WindowRow> | null>(null)
+  const list = useRef<FlatList<DrawnRow> | null>(null)
   const own = useCallback(
-    (next: FlatList<WindowRow> | null) => {
+    (next: FlatList<DrawnRow> | null) => {
       list.current = next
       listRef(next)
     },
@@ -79,7 +79,7 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
   const tell = () =>
     moved(standing.current.offset, standing.current.frame, standing.current.content)
   const cell = across > 1 && width > 0 ? (width - gap * (across - 1)) / across : undefined
-  const drawCell = ({ index, item }: ListRenderItemInfo<WindowRow>) =>
+  const drawCell = ({ index, item }: ListRenderItemInfo<DrawnRow>) =>
     across > 1 ? (
       <View style={{ width: cell ?? `${100 / across}%` }}>{row(item, index)}</View>
     ) : (
@@ -204,7 +204,7 @@ export const drawWindowed = (
     <Fragment key={`${child.name}-${index}`}>{draw(scope, child, text, regions, inside)}</Fragment>
   ))
   const count = drawing.rows.length
-  const row = (entry: WindowRow, place: number): ReactNode => {
+  const row = (entry: DrawnRow, place: number): ReactNode => {
     const drawn = (
       <Fragment key={entry.key}>
         {draw(
@@ -239,6 +239,14 @@ export const drawWindowed = (
       >
         {drawn}
       </Held>
+    )
+  }
+  if (drawing.plain === true) {
+    return (
+      <Fragment key={node.name}>
+        {drawing.rows.map((entry, place) => row(entry, place))}
+        {footer}
+      </Fragment>
     )
   }
   return drawing.waterfall === undefined ? (

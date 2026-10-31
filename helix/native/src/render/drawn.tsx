@@ -22,7 +22,9 @@
  * `select` of a row of the menu its fold draws, and a refusal there refuses
  * the row's.
  */
+
 import { type ReactNode, useContext } from 'react'
+import { View } from 'react-native'
 import { collection } from '../machines/collection'
 import { type HelixEvent, handlerOf, tell } from '../machines/props'
 import type { Node } from '../style/form'
@@ -151,6 +153,14 @@ const bubbledBy = (scope: Scope, node: Node): Record<string, (heard: HelixEvent)
   return out
 }
 
+/** What places a box out of the flow, of the style a part resolves to. */
+const pinnedBy = (style: Style): Style =>
+  Object.fromEntries(
+    Object.entries(style).filter(([name]) =>
+      ['bottom', 'end', 'left', 'position', 'right', 'start', 'top', 'zIndex'].includes(name),
+    ),
+  ) as Style
+
 /** What a machine gives the element `node` draws in this copy of a repeat, as each ramp of a color picker. */
 const copyViewOf = (scope: Scope, node: Node): Readonly<Record<string, unknown>> | undefined =>
   scope.item === undefined ? undefined : scope.behavior.parts[node.name]?.copy?.(scope.item)
@@ -227,9 +237,16 @@ export const drawDrawn = (
     )
   /* **It joins no set of the element that draws it**, as the web draws it in
      that element's shadow root, as a checkbox group's select-all is no box
-     of the group. */
+     of the group. An element a part places out of the flow stands in a box
+     at that place, as an object inspector's copy button stands in the corner. */
   if (of === undefined) {
-    return drawn
+    return box.style.position === 'absolute' ? (
+      <View key={node.name} style={pinnedBy(box.style)}>
+        {drawn}
+      </View>
+    ) : (
+      drawn
+    )
   }
   const Outside = collection(of).Provider
   return (

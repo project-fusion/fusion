@@ -40,8 +40,17 @@ import type { Family } from '../style/form'
 import { boundTo, given, tell, told } from './props'
 import { type KeyAction, keyAction, pressedValue, type WindowState } from './window-keys'
 
-/** One row a windowed repeat draws: a section's header, or an item. */
-export interface WindowRow {
+/** What a windowed repeat reads of each row it draws. */
+export interface DrawnRow {
+  /** The row's place, which a finger held on it drags from. */
+  readonly at: number
+  /** Whether the row heads a section, which no finger lifts. */
+  readonly header: boolean
+  readonly key: string
+}
+
+/** One row a window over a set draws: a section's header, or an item. */
+export interface WindowRow extends DrawnRow {
   readonly active: boolean
   /** The item's place in the set, or the section's among the sections. */
   readonly at: number
@@ -97,8 +106,10 @@ export interface WindowDrawing {
   readonly measured: (at: number, height: number) => void
   /** Hears where the list stands, and how long its frame and content are. */
   readonly moved: (offset: number, frame: number, content: number) => void
+  /** Whether the rows stand in the part, every one drawn, with no list around them. */
+  readonly plain?: boolean
   /** The rows, in order. */
-  readonly rows: readonly WindowRow[]
+  readonly rows: readonly DrawnRow[]
   /** Where a waterfall stands each item, where the list is one. */
   readonly waterfall?: WindowWall
 }
@@ -307,7 +318,7 @@ const useDrag = (
 }
 
 /** Each drawn row's view, which hears its keys, and takes focus as a move reaches it. */
-const useRowViews = (onKey: (at: number, pressed: KeyPress) => boolean) => {
+export const useRowViews = (onKey: (at: number, pressed: KeyPress) => boolean) => {
   const views = useRef(new Map<number, unknown>()).current
   const listeners = useRef(new Map<number, () => void>()).current
   const moveTo = useRef<number | undefined>(undefined)

@@ -441,7 +441,9 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
 /**
  * What a function the element is given draws in place of what a wrap holds,
  * called with what `passes` names and the copy's place, as a file input's
- * `renderFile` draws a row, or nothing where the wrap renders no function.
+ * `renderFile` draws a row, or what the copy's entry says of itself under
+ * `about`, as an object inspector's `renderValue` is told a row's path, or
+ * nothing where the wrap renders no function.
  * Words it returns are drawn as text.
  */
 const renderedBy = (scope: Scope, node: Node, text: Style): ReactNode | undefined => {
@@ -454,7 +456,7 @@ const renderedBy = (scope: Scope, node: Node, text: Style): ReactNode | undefine
   }
   const drawn: unknown = renders(
     bound(scope, node.attributes?.passes, node.name),
-    scope.item?.index ?? 0,
+    scope.item?.fields?.about ?? scope.item?.index ?? 0,
   )
   return typeof drawn === 'string' || typeof drawn === 'number' ? (
     <ScaledText style={text}>{drawn}</ScaledText>
