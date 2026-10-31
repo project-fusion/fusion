@@ -63,9 +63,23 @@ const Held = ({
 /** Each row's key. */
 const keyed = (row: DrawnRow): string => row.key
 
+/** What a list that follows its newest content draws with. */
+const followingOf = ({ maintainVisibleContentPosition, shrinks }: WindowDrawing) => ({
+  ...(maintainVisibleContentPosition === undefined ? {} : { maintainVisibleContentPosition }),
+  ...(shrinks === true ? { maxToRenderPerBatch: 20, windowSize: 5 } : {}),
+})
+
+/** How a list takes the length it is given. */
+const lengthOf = (horizontal: boolean, shrinks: boolean) => {
+  if (horizontal) {
+    return { flexGrow: 0 }
+  }
+  return shrinks ? { flexGrow: 0, flexShrink: 1 } : { flex: 1 }
+}
+
 /** A list of rows, lines of columns, or a line across, in `FlatList`. */
 const Listed = ({ drawing, footer, row }: Drawing) => {
-  const { across, gap, horizontal, laid, listRef, moved, rows } = drawing
+  const { across, gap, horizontal, laid, listRef, moved, rows, shrinks, sideways } = drawing
   const [width, setWidth] = useState(0)
   const list = useRef<FlatList<DrawnRow> | null>(null)
   const own = useCallback(
@@ -82,13 +96,16 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
   const drawCell = ({ index, item }: ListRenderItemInfo<DrawnRow>) =>
     across > 1 ? (
       <View style={{ width: cell ?? `${100 / across}%` }}>{row(item, index)}</View>
+    ) : sideways === true ? (
+      <View style={{ minWidth: width }}>{row(item, index)}</View>
     ) : (
       row(item, index)
     )
   /* A list stands in a frame of its own length, so it windows by its own
      frame inside a page that scrolls, as the web's box does: it reads no
      scroll view around it. */
-  return (
+  const lengthwise = lengthOf(horizontal, shrinks === true)
+  const listed = (
     <ScrollView.Context.Provider value={null}>
       <FlatList
         columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
@@ -102,6 +119,7 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
         }
         key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
         keyExtractor={keyed}
+        {...followingOf(drawing)}
         ListFooterComponent={<View>{footer}</View>}
         nestedScrollEnabled
         numColumns={across}
@@ -110,7 +128,9 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
           tell()
         }}
         onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-          setWidth(layout.width)
+          if (sideways !== true) {
+            setWidth(layout.width)
+          }
           standing.current.frame = horizontal ? layout.width : layout.height
           laid(layout.width, layout.height)
           tell()
@@ -136,9 +156,25 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
         renderItem={drawCell}
         renderScrollComponent={scrollIn}
         scrollEventThrottle={16}
-        style={horizontal ? { flexGrow: 0 } : { flex: 1 }}
+        style={lengthwise}
       />
     </ScrollView.Context.Provider>
+  )
+  /* A row that runs past the frame scrolls across around the list, which scrolls
+     down: the list is as wide as its widest row drawn, as the web's box is. */
+  return sideways === true ? (
+    <ScrollView
+      contentContainerStyle={{ flexDirection: 'column' }}
+      horizontal
+      nestedScrollEnabled
+      onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => setWidth(layout.width)}
+      showsVerticalScrollIndicator={false}
+      style={lengthwise}
+    >
+      {listed}
+    </ScrollView>
+  ) : (
+    listed
   )
 }
 
@@ -205,6 +241,10 @@ export const drawWindowed = (
   ))
   const count = drawing.rows.length
   const row = (entry: DrawnRow, place: number): ReactNode => {
+    const kept = drawing.kept?.get(entry)
+    if (kept !== undefined) {
+      return kept
+    }
     const drawn = (
       <Fragment key={entry.key}>
         {draw(
@@ -228,6 +268,7 @@ export const drawWindowed = (
         )}
       </Fragment>
     )
+    drawing.kept?.set(entry, drawn)
     return drawing.dragging === undefined || entry.header ? (
       drawn
     ) : (
