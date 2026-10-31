@@ -146,11 +146,11 @@ describe('a row that fits its content', () => {
   })
 })
 
-describe('useOpenPhase', () => {
-  const Phase = ({ open, settled }: { open: boolean; settled: (phase: string) => void }) => (
-    <Text testID="phase">{useOpenPhase(open, { duration: 100, easing: 'ease' }, settled)}</Text>
-  )
+const Phase = ({ open, settled }: { open: boolean; settled: (phase: string) => void }) => (
+  <Text testID="phase">{useOpenPhase(open, { duration: 100, easing: 'ease' }, settled)}</Text>
+)
 
+describe('useOpenPhase', () => {
   test('moves through opening and signals when its motion is done', async () => {
     const settled = jest.fn()
     const view = await render(<Phase open={false} settled={settled} />)

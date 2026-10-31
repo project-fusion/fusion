@@ -6,11 +6,14 @@ import type * as SafeAreaContext from 'react-native-safe-area-context'
 import { hearInsets, nativeEnvironment } from '../capabilities/environment'
 import { resetSafeArea, SafeArea } from './safe-area'
 
+/** The package's provider, as this suite needs it: it draws what it holds. */
+const Provider = ({ children }: { children?: ReactNode }) => children
+
 /** A stand-in for the package, whose provider measures `insets` and draws what it holds. */
 const measuring = (insets: { bottom: number; left: number; right: number; top: number }) =>
   ({
     initialWindowMetrics: null,
-    SafeAreaProvider: ({ children }: { children?: ReactNode }) => children,
+    SafeAreaProvider: Provider,
     useSafeAreaInsets: () => insets,
   }) as unknown as typeof SafeAreaContext
 

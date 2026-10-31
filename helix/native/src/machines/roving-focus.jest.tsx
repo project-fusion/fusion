@@ -53,6 +53,35 @@ beforeEach(() => {
   setEnvironment(fakeEnvironment())
 })
 
+const Items = ({
+  arrived,
+  chosen,
+  keep,
+  keys,
+  manual,
+  members,
+}: {
+  readonly arrived: string[]
+  readonly chosen: string[]
+  readonly keep: (key: (from: string, pressed: KeyPress) => boolean) => void
+  readonly keys: Rove
+  readonly manual: boolean
+  readonly members: readonly Member[]
+}) => {
+  keep(
+    useRovingFocus(
+      TABS,
+      { manual },
+      USE,
+      members,
+      (value) => chosen.push(value),
+      keys,
+      (value, from, pressed) => arrived.push(`${from}>${value}${pressed.shift ? ' shift' : ''}`),
+    ),
+  )
+  return null
+}
+
 /**
  * Renders a set with these items and hands back its key handler, the choices
  * it made, and each arrival it told, with the item it came from and Shift.
@@ -61,19 +90,18 @@ const rove = async (members: readonly Member[], manual = false, keys: Rove = TAB
   const arrived: string[] = []
   const chosen: string[] = []
   let key: ((from: string, pressed: KeyPress) => boolean) | undefined
-  const Items = () => {
-    key = useRovingFocus(
-      TABS,
-      { manual },
-      USE,
-      members,
-      (value) => chosen.push(value),
-      keys,
-      (value, from, pressed) => arrived.push(`${from}>${value}${pressed.shift ? ' shift' : ''}`),
-    )
-    return null
-  }
-  await render(<Items />)
+  await render(
+    <Items
+      arrived={arrived}
+      chosen={chosen}
+      keep={(made) => {
+        key = made
+      }}
+      keys={keys}
+      manual={manual}
+      members={members}
+    />,
+  )
   return {
     arrived,
     chosen,

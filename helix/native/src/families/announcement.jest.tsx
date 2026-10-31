@@ -64,6 +64,34 @@ const wait = (ms: number) =>
     clock.advance(ms)
   })
 
+const Queued = () => {
+  const [first, setFirst] = useState(true)
+  return themed(
+    <>
+      {first ? (
+        <HelixAnnouncement dismissible onDismiss={() => setFirst(false)} queued>
+          First
+        </HelixAnnouncement>
+      ) : null}
+      <HelixAnnouncement queued>Second</HelixAnnouncement>
+    </>,
+  )
+}
+
+const Dismissible = () => {
+  const [first, setFirst] = useState(true)
+  return themed(
+    <>
+      {first ? (
+        <HelixAnnouncement dismissible onDismiss={() => setFirst(false)}>
+          <Text>First</Text>
+        </HelixAnnouncement>
+      ) : null}
+      <HelixAnnouncement dismissible>Second</HelixAnnouncement>
+    </>,
+  )
+}
+
 describe('the generated Announcement', () => {
   test('is a region named Announcement, and tells its message as it arrives', async () => {
     const said = fakeAnnounce()
@@ -161,20 +189,7 @@ describe('the generated Announcement', () => {
   test('waits its turn when queued, and takes it as the one before leaves', async () => {
     const said = fakeAnnounce()
     setAnnounce(said)
-    const Two = () => {
-      const [first, setFirst] = useState(true)
-      return themed(
-        <>
-          {first ? (
-            <HelixAnnouncement dismissible onDismiss={() => setFirst(false)} queued>
-              First
-            </HelixAnnouncement>
-          ) : null}
-          <HelixAnnouncement queued>Second</HelixAnnouncement>
-        </>,
-      )
-    }
-    await render(<Two />)
+    await render(<Queued />)
     const second = () => nodes(screen.toJSON()).filter((node) => node.props.role === 'region')
     expect(said.said.map((one) => one.message)).toEqual(['First'])
     expect(nodes(screen.toJSON()).some((node) => styleOf(node).display === 'none')).toBe(true)
@@ -188,20 +203,7 @@ describe('the generated Announcement', () => {
   test('hands focus to the dismiss button beside it as the page takes it out', async () => {
     const focus = fakeFocus<unknown>()
     setFocus(focus)
-    const Two = () => {
-      const [first, setFirst] = useState(true)
-      return themed(
-        <>
-          {first ? (
-            <HelixAnnouncement dismissible onDismiss={() => setFirst(false)}>
-              <Text>First</Text>
-            </HelixAnnouncement>
-          ) : null}
-          <HelixAnnouncement dismissible>Second</HelixAnnouncement>
-        </>,
-      )
-    }
-    await render(<Two />)
+    await render(<Dismissible />)
     await fireEvent.press(screen.getAllByLabelText('Dismiss')[0] as never)
     await act(async () => undefined)
     expect(focus.moved).toHaveLength(1)
