@@ -72,6 +72,8 @@ const GIVEN: &[&str] = &[
     "derived",
     "entry",
     "files",
+    "treeItem",
+    "treeRoot",
     "window",
     "index",
     "notice",

@@ -89,6 +89,15 @@ impl<'a> Names<'a> {
                 .chain(family.api.files.iter().map(|one| one.list.as_str()))
                 /* And the rows a window draws, as a virtual list's. */
                 .chain(family.api.window.iter().map(|one| one.list.as_str()))
+                /* And what a tree and an item of one compute. */
+                .chain(
+                    family
+                        .api
+                        .tree_item
+                        .iter()
+                        .chain(family.api.tree.iter())
+                        .flat_map(|item| item.computed.values().map(String::as_str)),
+                )
                 /* And what a color computes as it moves, as a color picker's. */
                 .chain(
                     family
@@ -175,6 +184,17 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     filed(family, &names, &mut found);
     if let Some(window) = &family.api.window {
         references("window", window.references(), &names, &mut found);
+    }
+    if let Some(tree) = &family.api.tree {
+        references("treeRoot", tree.references(api::TREE), &names, &mut found);
+    }
+    if let Some(item) = &family.api.tree_item {
+        references(
+            "treeItem",
+            item.references(api::TREE_ITEM),
+            &names,
+            &mut found,
+        );
     }
     if let Some(color) = &family.api.color {
         references("color", color.references(), &names, &mut found);
@@ -356,8 +376,10 @@ fn toggle(family: &Family, names: &Names, found: &mut Vec<String>) {
     };
     references("toggle", toggle.references(), names, found);
     /* A layer's toggle may have no pressable: the page or the layer's
-    anchor opens it, and a dismissal closes it. */
-    let unpressed = toggling.is_empty() && layered::opened_by(family, toggle);
+    anchor opens it, and a dismissal closes it. An item of a tree is turned by
+    its machine, as a press on its row and a key on it both do. */
+    let unpressed = toggling.is_empty()
+        && (layered::opened_by(family, toggle) || family.api.tree_item.is_some());
     /* An element with no headless source has no tree to look in. One press
     drawn in either of two places, as an app header's toggle, is one. */
     toggling.sort_unstable();

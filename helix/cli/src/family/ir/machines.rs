@@ -86,7 +86,7 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, ValueRange, WindowChoice,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -197,6 +197,12 @@ pub fn expand(api: &Api, tree: &[Node]) -> Vec<MachineUse> {
     }
     if let Some(window) = &api.window {
         uses.push(windowed(window));
+    }
+    if let Some(held) = &api.tree {
+        uses.push(treed(held, TREE, "tree"));
+    }
+    if let Some(item) = &api.tree_item {
+        uses.push(treed(item, TREE_ITEM, "tree-item"));
     }
     if let Some(color) = &api.color {
         uses.push(colored(color, tree));
@@ -592,6 +598,37 @@ fn windowed(window: &WindowChoice) -> MachineUse {
     MachineUse {
         bind,
         machine: "window".to_owned(),
+    }
+}
+
+/// A tree or an item of one, bound to what it reads, holds, and sends, and to
+/// the values it computes. **No machine of core's holds it**: the web's elements
+/// walk their own items, and the native runtime hosts it by the name given.
+fn treed(
+    choice: &TreeChoice,
+    table: &'static [(&'static str, crate::family::api::Names)],
+    machine: &str,
+) -> MachineUse {
+    use crate::family::api::Names;
+    let mut bind: BTreeMap<String, Bound> = choice
+        .computed
+        .iter()
+        .map(|(field, name)| (field.clone(), Bound::State(name.clone())))
+        .collect();
+    for (name, value, names) in choice.references(table) {
+        bind.insert(
+            name.to_owned(),
+            match names {
+                Names::Prop => Bound::Prop(value.to_owned()),
+                Names::State => Bound::State(value.to_owned()),
+                Names::Event => Bound::Event(value.to_owned()),
+                Names::Part => Bound::Part(value.to_owned()),
+            },
+        );
+    }
+    MachineUse {
+        bind,
+        machine: machine.to_owned(),
     }
 }
 
