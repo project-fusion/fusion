@@ -60,6 +60,9 @@ import type {
   LogGroupChoice,
   LogLineChoice,
   LogRootChoice,
+  ChatComposerChoice,
+  ChatMessageChoice,
+  ChatRootChoice,
   NotificationGroupChoice,
   NotificationRowChoice,
   NotificationsRootChoice,
@@ -305,6 +308,12 @@ export interface Headless {
   readonly notificationGroup?: NotificationGroupChoice
   /** What the element reads, sends, and computes where it is a block of code. */
   readonly codeBlock?: CodeBlockChoice
+  /** What the element reads, sends, and computes where it is a conversation. */
+  readonly chatRoot?: ChatRootChoice
+  /** What the element reads, sends, and computes where it is a turn in a conversation. */
+  readonly chatMessage?: ChatMessageChoice
+  /** What the element reads, sends, and computes where it is a field for writing a turn. */
+  readonly chatComposer?: ChatComposerChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */
