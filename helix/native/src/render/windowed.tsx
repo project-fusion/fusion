@@ -55,23 +55,29 @@ const scrollIn = (props: ScrollViewProps & { readonly ref?: Ref<ScrollViewInstan
 const HOLD_STRAY = 5
 
 /** A row a finger held on lifts and drags, where the list lets a reader move items. */
-const Held = ({
+export const Held = ({
   at,
   children,
   dragging,
   horizontal,
+  onLift,
 }: {
   readonly at: number
   readonly children: ReactNode
   readonly dragging: NonNullable<WindowDrawing['dragging']>
   readonly horizontal: boolean
+  /** Hears the lift, where the row is told apart by more than its place. */
+  readonly onLift?: () => void
 }) => {
   const pan = Gesture.Pan()
     .activateAfterLongPress(500)
     .failOffsetX([-HOLD_STRAY, HOLD_STRAY])
     .failOffsetY([-HOLD_STRAY, HOLD_STRAY])
     .runOnJS(true)
-    .onStart(() => dragging.start(at))
+    .onStart(() => {
+      onLift?.()
+      dragging.start(at)
+    })
     .onUpdate((event) => dragging.move(at, horizontal ? event.x : event.y))
     .onFinalize(() => dragging.end())
   return (

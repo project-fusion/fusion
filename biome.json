@@ -231,6 +231,8 @@
                   "HelixListItem",
                   "HelixMegamenuItem",
                   "HelixMenuItem",
+                  "HelixOption",
+                  "HelixOptionGroup",
                   "HelixMotionToggle",
                   "HelixNavigationItem",
                   "HelixProgress",
