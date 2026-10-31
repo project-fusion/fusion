@@ -93,7 +93,8 @@ const regionsOf = (tag: string, children: React.ReactNode, out: Record<string, u
   const rest: React.ReactNode[] = []
   for (const child of React.Children.toArray(children)) {
     const slot = React.isValidElement(child) ? (child.props as { slot?: unknown }).slot : undefined
-    if (typeof slot !== 'string' || slot === '') {
+    /* A region named `children` stands among `children`, which no prop can name apart. */
+    if (typeof slot !== 'string' || slot === '' || slot === 'children') {
       rest.push(child)
       continue
     }

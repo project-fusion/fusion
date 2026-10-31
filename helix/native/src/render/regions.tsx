@@ -1,3 +1,4 @@
+import { regionContent } from './region-content'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import type { Node } from '../style/form'
@@ -11,7 +12,6 @@ import { drawsOwn, eachChild, insideOf, wordsOf } from './passed'
 import { silent } from './semantics'
 import {
   bound,
-  camel,
   type Draw,
   inherit,
   type Lazy,
@@ -312,7 +312,7 @@ const drawContent = (
      content inherits and the rest its box, over what the part around gives
      every region it holds. */
   const regions = { ...around, ...scope.host.contents[node.name]?.style }
-  const content = node.name === 'default' ? scope.props.children : scope.props[camel(node.name)]
+  const content = regionContent(scope.props, node.name)
   /* **A flag is not content.** A list's `loading` is a prop and a region
      both, so `loading` on its own draws the words the region falls back to,
      as React draws nothing for `true`. */
