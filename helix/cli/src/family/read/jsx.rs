@@ -73,6 +73,7 @@ const GIVEN: &[&str] = &[
     "entry",
     "files",
     "treeItem",
+    "inspector",
     "treeRoot",
     "window",
     "index",
