@@ -419,7 +419,13 @@ describe('the control a shortcut works', () => {
     key.keys = 'mod+k'
     document.body.append(key)
     await key.updateComplete
-    await frame()
+    /* A frame, then the look for React, each on the browser's own clock: 150 ms
+       was too few for WebKit on CI's Linux runners. A chord never written still
+       fails here, at the deadline. */
+    const deadline = performance.now() + 2000
+    while (!field.hasAttribute('aria-keyshortcuts') && performance.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 16))
+    }
     expect(field.getAttribute('aria-keyshortcuts')).toBe(chord)
     key.remove()
     expect(field.hasAttribute('aria-keyshortcuts')).toBe(false)
