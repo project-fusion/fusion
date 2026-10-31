@@ -314,7 +314,7 @@ export const useEntry = (
       latest.current = { ...now, text: next }
       hold((was) => ({ ...was, text: next }))
       if (input !== undefined) {
-        tell(family, now.props, input, {}, senderOf(family, next))
+        tell(family, now.props, input, { value: next }, senderOf(family, next))
       }
       return true
     },

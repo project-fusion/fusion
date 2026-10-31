@@ -18,6 +18,7 @@ import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
 import { HOOKS, leaving } from './hosted'
+import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
 import { mixedItem } from './mixed-item'
@@ -37,10 +38,10 @@ import { stacking } from './stack'
 import { stackRow } from './stack-row'
 import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
-import { settingTurns, turning, turnsAlone } from './turns'
-import { type Judged, useValidation } from './validation'
 import { useTree } from './tree'
 import { useTreeItem } from './tree-item'
+import { settingTurns, turning, turnsAlone } from './turns'
+import { type Judged, useValidation } from './validation'
 import { useWindow } from './window'
 
 export { scrollingOf } from './scrolling'
@@ -241,6 +242,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useTreeItem(family, props, use, around.toggled),
+      ),
+    /* An object inspector's rows, which its field's text narrows. */
+    ...uses
+      .filter((use) => use.machine === 'inspector')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useInspector(family, props, use, around.entered),
       ),
     /* The color a reader builds, which the verdict reads as its answer. */
     ...uses
