@@ -373,8 +373,8 @@ pub fn attribute(kind: NodeKind, node: &str, name: &str, value: &Attribute) -> R
     part's state. */
     if name.len() > "data-".len() && name.starts_with("data-") {
         return match (kind, fits(Shape::Flag, value)) {
-            (NodeKind::Box, true) => Ok(()),
-            (NodeKind::Box, false) => Err(format!(
+            (NodeKind::Box | NodeKind::Pressable, true) => Ok(()),
+            (NodeKind::Box | NodeKind::Pressable, false) => Err(format!(
                 "`{kind}('{node}')`: `{name}` takes {}",
                 describe(Shape::Flag)
             )),
@@ -392,8 +392,8 @@ pub fn attribute(kind: NodeKind, node: &str, name: &str, value: &Attribute) -> R
             kind,
             fits(Shape::Number, value) || fits(Shape::Words, value),
         ) {
-            (NodeKind::Box | NodeKind::Layer, true) => Ok(()),
-            (NodeKind::Box | NodeKind::Layer, false) => Err(format!(
+            (NodeKind::Box | NodeKind::Layer | NodeKind::Pressable, true) => Ok(()),
+            (NodeKind::Box | NodeKind::Layer | NodeKind::Pressable, false) => Err(format!(
                 "`{kind}('{node}')`: `{name}` takes a number, a string, `bind()` or `derive()`"
             )),
             _ => Err(format!(

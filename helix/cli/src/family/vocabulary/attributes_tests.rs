@@ -272,7 +272,7 @@ fn takes_a_run_on_a_box_alone() {
 }
 
 #[test]
-fn takes_a_data_flag_on_a_box_alone() {
+fn takes_a_data_flag_on_a_box_and_a_press() {
     assert!(attribute(NodeKind::Box, "indicator", "data-dot", &bind("unset")).is_ok());
     assert!(attribute(
         NodeKind::Box,
@@ -283,12 +283,13 @@ fn takes_a_data_flag_on_a_box_alone() {
     .is_ok());
     let worded = attribute(NodeKind::Box, "indicator", "data-dot", &text("yes")).unwrap_err();
     assert!(worded.contains("`data-dot` takes `true`, `false`, `bind()` or `not()`"));
-    let pressed = attribute(NodeKind::Pressable, "button", "data-dot", &bind("unset")).unwrap_err();
-    assert!(pressed.contains("a pressable does not take `data-dot`"));
+    assert!(attribute(NodeKind::Pressable, "row", "data-dot", &bind("unset")).is_ok());
+    let word = attribute(NodeKind::Text, "words", "data-dot", &bind("unset")).unwrap_err();
+    assert!(word.contains("does not take `data-dot`"));
 }
 
 #[test]
-fn takes_a_custom_property_on_a_box_alone() {
+fn takes_a_custom_property_on_a_box_and_a_press() {
     for value in [
         bind("fraction"),
         text("20%"),
@@ -307,8 +308,9 @@ fn takes_a_custom_property_on_a_box_alone() {
     )
     .unwrap_err();
     assert!(flag.contains("takes a number, a string, `bind()` or `derive()`"));
-    let pressed = attribute(NodeKind::Pressable, "button", "--x", &text("1")).unwrap_err();
-    assert!(pressed.contains("a pressable does not take `--x`"));
+    assert!(attribute(NodeKind::Pressable, "row", "--x", &text("1")).is_ok());
+    let worded = attribute(NodeKind::Text, "words", "--x", &text("1")).unwrap_err();
+    assert!(worded.contains("does not take `--x`"));
 }
 
 #[test]

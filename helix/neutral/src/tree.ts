@@ -32,6 +32,7 @@ export * from './toggle.js'
 export * from './toolbar.js'
 export * from './total.js'
 export * from './tour.js'
+export * from './tree-choice.js'
 export * from './validation.js'
 export * from './window.js'
 
@@ -53,6 +54,7 @@ import type { Toggle } from './toggle.js'
 import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
+import type { TreeChoice, TreeItemChoice } from './tree-choice.js'
 import type { Validation } from './validation.js'
 import type { Window } from './window.js'
 
@@ -260,6 +262,10 @@ export interface Headless {
    * moves send.
    */
   readonly window?: Window
+  /** What it reads and sends where it holds the items of a tree. */
+  readonly treeRoot?: TreeChoice
+  /** What it reads, sends, and computes where it is an item of a tree. */
+  readonly treeItem?: TreeItemChoice
   /** What it holds where a reader builds a color in it. */
   readonly color?: ColorPicked
   /** What a field that opens a color picker computes from its text. */
