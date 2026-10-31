@@ -357,8 +357,18 @@ pub fn typed_members(
         .collect();
     let mut drawn = Vec::new();
     regions(&family.tree, &mut drawn);
+    /* A region named `children` is filled from among `children`, so an element
+    that nests in one says so itself. */
+    let nests = drawn.contains(&"children");
     for name in drawn {
         region(name, declaration, &mut members);
+    }
+    if nests {
+        members.push(Member {
+            doc: vec!["Where the element stands in the item around it: `children` nests it under that item.".to_owned()],
+            name: "slot".to_owned(),
+            ty: "'children'".to_owned(),
+        });
     }
     if quotes(family) {
         members.push(language());

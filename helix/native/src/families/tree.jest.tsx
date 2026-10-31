@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native'
 import { HelixRoot } from '../index'
 import { HelixTree, HelixTreeItem } from './tree/index.native'
 
-const Item = HelixTreeItem as unknown as (props: Record<string, unknown>) => React.ReactNode
+const Item = HelixTreeItem
 
 /** The row that says these words. */
 const row = (words: string) => {
