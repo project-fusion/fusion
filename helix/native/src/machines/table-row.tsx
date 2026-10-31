@@ -13,10 +13,12 @@ import {
   type ReactElement,
   type ReactNode,
   useContext,
+  useMemo,
   useRef,
   useState,
 } from 'react'
-import { type LayoutChangeEvent, Pressable } from 'react-native'
+import { type HostInstance, type LayoutChangeEvent, Pressable } from 'react-native'
+import { holdScrollViewsAbove } from '../capabilities/scroll'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
@@ -90,6 +92,36 @@ interface Touch {
 /** How far a finger travels on a grip before it drags, in points. */
 const TRAVEL = 4
 
+/** What a touch on a grip holds still while it lasts. */
+interface GripTouch {
+  readonly hold: () => void
+  readonly node: () => HostInstance | null
+  readonly release: () => void
+}
+
+/** A grip's touch, which holds the scroll views above its row still. */
+const useGripTouch = (): GripTouch & { readonly ref: (view: HostInstance | null) => void } => {
+  const node = useRef<HostInstance | null>(null)
+  const letGo = useRef<(() => void) | undefined>(undefined)
+  return useMemo(
+    () => ({
+      hold: () => {
+        letGo.current?.()
+        letGo.current = node.current ? holdScrollViewsAbove(node.current) : undefined
+      },
+      node: () => node.current,
+      ref: (view: HostInstance | null) => {
+        node.current = view
+      },
+      release: () => {
+        letGo.current?.()
+        letGo.current = undefined
+      },
+    }),
+    [],
+  )
+}
+
 /**
  * A drag on a grip carries its row, and a press stays the button's own: the cell
  * around the button takes the touch once it has traveled.
@@ -98,21 +130,30 @@ const gripDrag = (
   offer: TableOffer | undefined,
   key: string,
   start: { current: number },
+  touch: GripTouch,
 ): Readonly<Record<string, unknown>> => {
   const pageY = (event: { readonly nativeEvent: { readonly pageY: number } }) =>
     event.nativeEvent.pageY
   return {
     onMoveShouldSetResponderCapture: (event: Touch) =>
       offer?.grip.still === false && Math.abs(pageY(event) - start.current) > TRAVEL,
-    onResponderGrant: () => offer?.grip.drag.start(key),
+    onResponderGrant: () => offer?.grip.drag.start(key, touch.node()),
     onResponderMove: (event: Touch) =>
       offer?.grip.drag.move(pageY(event) - start.current, pageY(event)),
     onResponderRelease: () => offer?.grip.drag.end(true),
     onResponderTerminate: () => offer?.grip.drag.end(false),
     /* A drag on the grip moves the row, and the page around it stays. */
     onResponderTerminationRequest: () => false,
+    onTouchCancel: touch.release,
+    onTouchEnd: touch.release,
     onTouchStart: (event: Touch) => {
       start.current = pageY(event)
+      /* **A finger on the grip never scrolls**, as the web's grip takes
+         `touch-action: none`. Without it a quick drag starts the scroll view
+         behind the row before the responder takes the touch, and nothing lifts. */
+      if (offer?.grip.still === false) {
+        touch.hold()
+      }
     },
   }
 }
@@ -204,6 +245,7 @@ export const useTableRow = (family: Family, props: Props, use: MachineUse): Beha
     }
   }
   const gripStart = useRef({ current: 0 })
+  const touch = useGripTouch()
   const heard = useRef<(press: KeyPress) => boolean>(() => false)
   heard.current = (press) => offer?.grip.key(key, press) === true
   const gripRef = useRef((view: unknown) =>
@@ -243,7 +285,13 @@ export const useTableRow = (family: Family, props: Props, use: MachineUse): Beha
         testID: `table:${key}:expand-button`,
       },
     },
-    grip: { view: { ...leadBox('grip'), ...gripDrag(offer, key, gripStart.current) } },
+    grip: {
+      view: {
+        ...leadBox('grip'),
+        ...gripDrag(offer, key, gripStart.current, touch),
+        ref: touch.ref,
+      },
+    },
     'grip-button': gripBinding(offer, key, named, gripRef.current),
     host: {
       lists: { cells: entries },

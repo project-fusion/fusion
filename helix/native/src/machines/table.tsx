@@ -30,7 +30,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { Dimensions, type LayoutChangeEvent } from 'react-native'
+import { Dimensions, type HostInstance, type LayoutChangeEvent } from 'react-native'
 import Reanimated, {
   type SharedValue,
   useAnimatedScrollHandler,
@@ -98,7 +98,7 @@ export interface TableOffer {
     readonly drag: {
       readonly end: (dropped: boolean) => void
       readonly move: (travel: number, pageY: number) => void
-      readonly start: (key: string) => void
+      readonly start: (key: string, grip: HostInstance | null) => void
     }
     readonly key: (key: string, press: KeyPress) => boolean
     readonly measured: (key: string, height: number) => void
