@@ -22,6 +22,7 @@ import { LOG } from './scenarios/log.js'
 import { MEGAMENU } from './scenarios/megamenu.js'
 import { MENU } from './scenarios/menu.js'
 import { NAVIGATION } from './scenarios/navigation.js'
+import { NOTIFICATIONS } from './scenarios/notifications.js'
 import { NUMBER_INPUT } from './scenarios/number-input.js'
 import { OBJECT_INSPECTOR } from './scenarios/object-inspector.js'
 import { OUTLINE } from './scenarios/outline.js'
@@ -80,6 +81,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   menu: MENU,
   'motion-toggle': MOTION_TOGGLE,
   navigation: NAVIGATION,
+  notifications: NOTIFICATIONS,
   'number-input': NUMBER_INPUT,
   'object-inspector': OBJECT_INSPECTOR,
   outline: OUTLINE,

@@ -6,6 +6,7 @@ import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
 import { logLeft } from './log'
+import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
 import { textLeft } from './text'
@@ -109,13 +110,16 @@ const opens = (run: Run): boolean => {
 
 /** The values of the items that stand open, where the items' forms open and close. */
 const openIn = (run: Run): Pick<Left, 'open'> =>
-  opens(run)
-    ? {
-        open: itemsIn(run)
-          .filter((item) => expanded(item.words))
-          .map((item) => item.value),
-      }
-    : {}
+  /* A feed's groups say what they draw in its record, as they hold no value. */
+  feeds(run.scenario.setup)
+    ? {}
+    : opens(run)
+      ? {
+          open: itemsIn(run)
+            .filter((item) => expanded(item.words))
+            .map((item) => item.value),
+        }
+      : {}
 
 /** Where a copy stands, by the states its machine last gave its host. */
 const resultOf = (
@@ -233,6 +237,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...treeLeft(run),
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
+    ...feedLeft(run),
     ...tableLeft(run),
     ...colorLeft(run),
   }

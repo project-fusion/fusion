@@ -259,6 +259,11 @@ const drag = async (item: Element, to: Element, edge: 'after' | 'before'): Promi
 
 /** The row at a place in the set, in the light DOM or in the element's own. */
 const rowAt = (mounted: Mounted, row: number): HTMLElement | null => {
+  if (mounted.root.localName === 'helix-notifications') {
+    const items = (mounted.root as unknown as { readonly items: readonly HTMLElement[] }).items
+    const drawn = items.filter((one) => one.assignedSlot !== null)[row]
+    return drawn?.shadowRoot?.querySelector<HTMLElement>('[part="item"]') ?? null
+  }
   const selector = `[data-index="${row}"]`
   const drawn = mounted.root.shadowRoot?.querySelectorAll('[part="row"] > *')[row]
   if (drawn?.shadowRoot) {
@@ -369,6 +374,18 @@ const perform = async (
       if (intent.link !== undefined) {
         tap(mounted.root.querySelector(`a[href="#${intent.link}"]`) ?? mounted.root, intent.held)
         break
+      }
+      if (intent.row !== undefined && intent.part !== undefined) {
+        /* A part of a row of a feed, as its dismiss press. */
+        const box = rowAt(mounted, intent.row)
+        tap(box?.querySelector(`[part~="${intent.part}"]`) ?? mounted.root, intent.held)
+        return
+      }
+      if (intent.part === 'trigger') {
+        /* A feed's group folds by its own press. */
+        const group = mounted.root.querySelector('helix-notification-group')
+        tap(group?.shadowRoot?.querySelector('[part="trigger"]') ?? mounted.root, intent.held)
+        return
       }
       if (intent.row !== undefined) {
         tap(rowAt(mounted, intent.row) ?? mounted.root, intent.held)

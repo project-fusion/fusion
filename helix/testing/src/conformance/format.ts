@@ -363,6 +363,22 @@ export interface Left {
    * What a screen reader hears of each row a log draws, whether a step is open,
    * what the log says it let go, and the lines selected.
    */
+  readonly feed?: {
+    /** The count the last group in the setup shows, or `null` where it holds none. */
+    readonly count: string | null
+    /** The place of the row with focus among those drawn. */
+    readonly focused: number | null
+    /** What its live region says. */
+    readonly live: string
+    /** Whether the mark-all press is drawn. */
+    readonly marksAll: boolean
+    /** Whether the load-more press is drawn. */
+    readonly more: boolean
+    /** Each drawn row's words, with no spaces, its unread word first while it is unread. */
+    readonly rows: readonly string[]
+    /** The line that says why there is nothing more, or what went wrong. */
+    readonly status: string
+  }
   readonly log?: {
     readonly dropped: string
     readonly rows: readonly {
