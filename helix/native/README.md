@@ -2454,3 +2454,29 @@ sentences wraps above a floor, from core's `fittedTracks`.
 The web's alone: `--table-columns`, Tab's two ends of a grid, moving into a cell's
 controls with Enter or F2, the drag's preview, a row's hover, printing, and a
 `Column`'s `cell` and `compare`, which only Data Table reads.
+
+## Log
+
+The `tail` machine (`machines/tail.ts`) follows a box's newest content with core's
+`@fusion.dev/helix-core/follow-tail`, the arithmetic the web's Log reads. It knows
+only lengths: whatever draws the box tells it `moved` and hands it the box through
+`held`, so Chat can bind it. A list holds a reader's place as older lines go with
+`maintainVisibleContentPosition`, which the machine gives its drawing.
+
+The `log` machine reads text with core's `@fusion.dev/helix-core/log`, the
+`LogBuffer` and `logRows` the web element reads, and draws each row as a
+`helix-log-line` or a `helix-log-group` in a `<Repeat windowed>`. Lines passed in
+take their numbers from a context, in the order they draw. A row that runs past the
+frame scrolls across in a horizontal scroll view around the list, and `wrap` turns
+that off.
+
+**A list appended to quickly draws only what it gained.** `WindowDrawing.kept` holds
+each row's drawing by the row's object, flushed when what every row reads changes,
+and a write draws once a frame, or as long as the last drawing took where that is
+longer. Measured on the iPhone 18 Pro simulator in a development build in Expo Go,
+writing 3 lines every 16 ms: a drawing took 2 to 3 seconds at 50 lines before these,
+growing with the rows, and stays near 350 ms at 2,000 after. Lines arrive in steps of
+that length there. A release build has not been measured.
+
+A `source` is an async iterable, read with `for await`. A phone has no
+`ReadableStream` on `fetch`.

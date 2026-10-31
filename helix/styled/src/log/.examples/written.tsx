@@ -26,6 +26,7 @@ export function Example() {
     if (!element) {
       return
     }
+    element.clear()
     element.write(`${OUTPUT.join('\n')}\n`)
     element.done = true
     return () => clearTimeout(timer.current)
@@ -40,7 +41,7 @@ export function Example() {
     element.clear()
     element.done = false
     // With reduced motion, the whole run is written at once.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       element.write(`${OUTPUT.join('\n')}\n`)
       element.done = true
       return

@@ -35,6 +35,7 @@ import { HelixInput } from '../input/index.native'
 import { HelixKbd } from '../kbd/index.native'
 import { HelixList, HelixListItem } from '../list/index.native'
 import { HelixLoader } from '../loader/index.native'
+import { HelixLog, HelixLogGroup, HelixLogLine } from '../log/index.native'
 import { HelixMegamenu, HelixMegamenuGroup, HelixMegamenuItem } from '../megamenu/index.native'
 import { HelixMenu, HelixMenuItem, HelixMenuSection } from '../menu/index.native'
 import { HelixMeter, HelixMeterSegment } from '../meter/index.native'
@@ -159,6 +160,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-list': List,
   'helix-list-item': HelixListItem,
   'helix-loader': HelixLoader,
+  'helix-log': HelixLog,
+  'helix-log-group': HelixLogGroup,
+  'helix-log-line': HelixLogLine,
   'helix-megamenu': HelixMegamenu,
   'helix-megamenu-group': HelixMegamenuGroup,
   'helix-megamenu-item': HelixMegamenuItem,

@@ -1401,3 +1401,13 @@ calls, the one place `renders` reads a copy's `field()` and no prop.
 `--_table-heading-*` are read with `measured()` by their whole names, since Data
 Table's hand-written sheet sets them on the column. Its source takes them over in
 wave 6.
+
+## Log and following a box's newest content
+
+**An element whose box follows its newest content declares a `tail`**: `pinned`,
+`defaultPinned`, `threshold`, `onBeforePin`, `onPin`, and `resume`, the press that
+goes back, with `tail.following` and `tail.away` for its parts. The machine draws
+nothing of its own, so a family can bind it over a list or a scroll view. `logRoot`,
+`logLine`, and `logGroup` declare a log and its parts. The roles `log`, `feed`, and
+`article` announce nothing of their own on a phone, which reads what they hold in
+order.
