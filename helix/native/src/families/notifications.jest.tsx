@@ -1,3 +1,4 @@
+import { clearWords, registerWords } from '@fusion.dev/helix-core/words'
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
@@ -100,5 +101,24 @@ describe('a feed of notifications on a phone', () => {
     expect(feed.current?.unread).toBe(2)
     await fireEvent.press(screen.getByRole('button'))
     expect(heard()).toEqual(['Unread One', 'Unread Two'])
+  })
+})
+
+describe('notifications on the words registry', () => {
+  test('the feed and a row read the words registered for their language', async () => {
+    registerWords('de', {
+      'helix-notification': { dismissLabel: 'Schliessen {label}' },
+      'helix-notifications': { markAllLabel: 'Alle gelesen' },
+    })
+    await draw(
+      <Feed lang="de" markAll>
+        <Row dismissible lang="de" value="one">
+          Ready
+        </Row>
+      </Feed>,
+    )
+    expect(screen.getByText('Alle gelesen')).toBeTruthy()
+    expect(screen.getByLabelText('Schliessen Ready')).toBeTruthy()
+    clearWords()
   })
 })

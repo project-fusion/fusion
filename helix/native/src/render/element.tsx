@@ -36,6 +36,7 @@ import { ownHooks, styleCustom } from './own-hooks'
 import { heldBy, readsCondition, useEntering } from './presence'
 import { type Presence, presenceOf, usePresencePhase } from './presence-phase'
 import { useLazy } from './regions'
+import { withWords } from './registered-words'
 import { readsSafeArea, useSafeReach } from './safe-reach'
 import { warnSharedCode } from './shared-code'
 import { PlaceOf } from './siblings'
@@ -302,7 +303,9 @@ export const element = (
   const drawing = (given: Props) => {
     warnSharedCode(family, given)
     const passed = useFieldset(family, given)
-    const props = folded(family, totaled(family, passed))
+    const outer = useAround()
+    const locale = useLocale(languageIn(passed, outer))
+    const props = withWords(family, folded(family, totaled(family, passed)), locale)
     const place = useRef({}).current
     const entering = useEntering(enters)
     const width = useOwnWidth(reading.length > 0)
@@ -312,12 +315,10 @@ export const element = (
     const stop = densityOf(passed)
     const theme = useDensity(useTheme(), stop)
     const tracks = useTracks(theme.rem)
-    const outer = useAround()
     const behavior = useBehavior(family, props)
     const target = useHostTarget(passed.id)
     const reducedMotion = useReducedMotion()
     const lazy = useLazy(props)
-    const locale = useLocale(languageIn(props, outer))
     const values: Values = {
       behavior,
       family,
