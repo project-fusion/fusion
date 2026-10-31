@@ -263,7 +263,7 @@ export default styles(
             ],
             { pointerEvents: 'auto' },
           ),
-          rule({ canHover: false, coarsePointer: true }, { pointerEvents: 'auto' }),
+          rule({ canHover: false, coarsePointer: true }, { opacity: '1', pointerEvents: 'auto' }),
         ]),
         native([rule({ flexDirection: 'row', opacity: 1 })]),
       ]),
