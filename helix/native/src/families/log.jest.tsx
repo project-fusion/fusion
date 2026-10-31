@@ -1,3 +1,4 @@
+import { clearWords, registerWords } from '@fusion.dev/helix-core/words'
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef } from 'react'
@@ -142,4 +143,17 @@ describe('a long log', () => {
     expect(padded(1)).toBe(0)
   })
 
+  test('reads the words registered for its language', async () => {
+    registerWords('de', { 'helix-log': { emptyText: 'Noch nichts' } })
+    await draw({ lang: 'de' })
+    expect(screen.getByText('Noch nichts')).toBeTruthy()
+    clearWords()
+  })
+
+  test('a word it is given stands over a registered one', async () => {
+    registerWords('de', { 'helix-log': { emptyText: 'Noch nichts' } })
+    await draw({ emptyText: 'Empty', lang: 'de' })
+    expect(screen.getByText('Empty')).toBeTruthy()
+    clearWords()
+  })
 })
