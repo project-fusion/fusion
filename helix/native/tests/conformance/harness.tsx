@@ -35,6 +35,7 @@ import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { logPress, logProps, logRows, logs } from './log'
+import { feedFocus, feedPress, feeds } from './notifications'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusStop, isTable, moveRow, tablePress } from './table'
@@ -238,7 +239,7 @@ const pressRow = async (setup: Setup, at: number): Promise<void> => {
 }
 
 /** A press on an item, a part of it, or a link an outline draws, or why it cannot be made. */
-const press = async (
+const pressPlain = async (
   setup: Setup,
   intent: Extract<Intent, { kind: 'press' }>,
 ): Promise<string | undefined> => {
@@ -265,6 +266,30 @@ const press = async (
   }
   await tap(inner)
   return undefined
+}
+
+/** A press, on a part of a feed where the setup draws one. */
+const press = async (
+  setup: Setup,
+  intent: Extract<Intent, { kind: 'press' }>,
+): Promise<string | undefined> => {
+  if (!feeds(setup)) {
+    return pressPlain(setup, intent)
+  }
+  const target = intent.part === undefined ? undefined : feedPress(intent.part, intent.row)
+  if (target !== undefined) {
+    await tap(target)
+  }
+  return undefined
+}
+
+/** Puts focus on a row of a feed, or where a `focus` intent says. */
+const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+  if (intent.row !== undefined && feeds(run.scenario.setup)) {
+    run.focus.place(feedFocus(run, intent.row))
+    return
+  }
+  await focusPlain(run, intent)
 }
 
 /**
@@ -305,7 +330,7 @@ const typed = (tag: string): boolean => formOf(tag).api?.entry !== undefined
  * range's control, which its label names, or in the field of a number a
  * reader types, as a tap does.
  */
-const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
+const focusPlain = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
   const { setup } = run.scenario
   if (intent.row !== undefined && inspects(run)) {
     const row = inspectorRows()[intent.row]
