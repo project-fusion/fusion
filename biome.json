@@ -198,10 +198,90 @@
       }
     },
     {
+      "includes": ["helix/app/**", "helix/native/**", "helix/proof/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noReactNativeRawText": {
+              "level": "error",
+              "options": {
+                "skip": [
+                  "Bar",
+                  "Block",
+                  "Button",
+                  "Checkbox",
+                  "Count",
+                  "Dialog",
+                  "Dismissible",
+                  "Handing",
+                  "HelixAccordionItem",
+                  "HelixAnnouncement",
+                  "HelixBreadcrumb",
+                  "HelixButton",
+                  "HelixCallout",
+                  "HelixCard",
+                  "HelixCheckbox",
+                  "HelixCode",
+                  "HelixDescriptionListItem",
+                  "HelixDivider",
+                  "HelixDrilldown",
+                  "HelixDrilldownItem",
+                  "HelixEmpty",
+                  "HelixKbd",
+                  "HelixListItem",
+                  "HelixMegamenuItem",
+                  "HelixMenuItem",
+                  "HelixMotionToggle",
+                  "HelixNavigationItem",
+                  "HelixProgress",
+                  "HelixQuote",
+                  "HelixRadio",
+                  "HelixScrollArea",
+                  "HelixSpeedDialItem",
+                  "HelixStat",
+                  "HelixStep",
+                  "HelixTab",
+                  "HelixTableCell",
+                  "HelixTableColumn",
+                  "HelixTabPanel",
+                  "HelixTag",
+                  "HelixText",
+                  "HelixToastItem",
+                  "HelixToggle",
+                  "HelixTrend",
+                  "Item",
+                  "Light",
+                  "Line",
+                  "Message",
+                  "Note",
+                  "Paged",
+                  "Panel",
+                  "Row",
+                  "Sample",
+                  "ScaledText",
+                  "Strip",
+                  "Switch",
+                  "Tab",
+                  "ToggleButton",
+                  "Words",
+                  "helix-button",
+                  "helix-callout",
+                  "helix-radio",
+                  "helix-text",
+                  "helix-trend"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["helix/styled/**"],
       "linter": {
         "domains": {
-          "react": "none"
+          "react": "none",
+          "reactNative": "none"
         }
       }
     }
