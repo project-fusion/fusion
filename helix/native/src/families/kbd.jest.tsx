@@ -70,7 +70,7 @@ describe('the generated Kbd', () => {
   test('sets its label in the mono face, on one line, with no ligatures', async () => {
     await render(themed(<HelixKbd>{'=>'}</HelixKbd>))
     const label = textOf('=>')
-    expect(styleOf(label).fontFamily).toBe('Menlo')
+    expect(styleOf(label).fontFamily).toBe('ui-monospace')
     expect(String(styleOf(label).fontVariant)).toContain('no-common-ligatures')
     expect(String(styleOf(label).fontVariant)).toContain('no-contextual')
     expect(label.props.numberOfLines).toBe(1)

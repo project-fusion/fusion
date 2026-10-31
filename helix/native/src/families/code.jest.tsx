@@ -57,7 +57,7 @@ describe('the generated Code', () => {
     await render(themed(<HelixCode>size</HelixCode>))
     const run = styleOf(washed())
     expect(run.backgroundColor).toBe('rgba(0, 0, 0, 0.06)')
-    expect(run.fontFamily).toBe('Menlo')
+    expect(run.fontFamily).toBe('ui-monospace')
     expect(run.color).not.toBe('#000000')
   })
 
