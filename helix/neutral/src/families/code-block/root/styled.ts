@@ -207,10 +207,7 @@ export default styles(
           minInlineSize: 0,
           web: { overflowWrap: 'anywhere' },
         }),
-        native([
-          rule({ flexShrink: 1 }),
-          rule({ part: { hidden: true } }, { display: 'none' }),
-        ]),
+        native([rule({ flexShrink: 1 }), rule({ part: { hidden: true } }, { display: 'none' })]),
       ]),
       on('block', [
         rule({ blockSize: '100%' }),
@@ -397,10 +394,7 @@ export default styles(
         /* A long file scrolls both ways on a phone, with nothing past a wrap across. */
         native([
           rule({ flex: 1, minInlineSize: 0, overflow: 'auto' }),
-          rule(
-            { part: { 'data-wrapped': true } },
-            { overflowX: 'visible', overflowY: 'auto' },
-          ),
+          rule({ part: { 'data-wrapped': true } }, { overflowX: 'visible', overflowY: 'auto' }),
         ]),
       ]),
       on({ part: 'code', selector: ':host([wrap]:not([diff])) [part="code"]' }, [
@@ -521,7 +515,7 @@ export default styles(
             display: 'flex',
             flexDirection: 'column',
             minInlineSize: 0,
-            overflowX: 'auto',
+            overflow: 'auto',
             paddingBlockEnd: token('space-sm'),
           }),
           rule({ part: { 'data-banded': true } }, { paddingBlockStart: own.codeBlockGutter }),
@@ -547,7 +541,11 @@ export default styles(
         [web([rule({ borderBlockStartWidth: token('space-none'), ...flatTop })])],
       ),
       on('split', [
-        rule({ display: 'grid', gap: token('space-xs'), gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)' }),
+        rule({
+          display: 'grid',
+          gap: token('space-xs'),
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)',
+        }),
         rule({ inlineSize: { below: '40rem' } }, { gridTemplateColumns: 'minmax(0, 1fr)' }),
         native([
           rule({ inlineSize: { below: '40rem' } }, { display: 'flex', flexDirection: 'column' }),
@@ -568,18 +566,25 @@ export default styles(
           selector:
             ':host([diff]:not([no-copy])) [part="frame"]:not([part="header"] + *) [part="new"] > [part="code"]',
         },
-        [web([rule({ inlineSize: { below: '40rem' } }, { marginBlockStart: token('space-none') })])],
+        [
+          web([
+            rule({ inlineSize: { below: '40rem' } }, { marginBlockStart: token('space-none') }),
+          ]),
+        ],
       ),
       on({ part: 'code', selector: ':host([diff]) [part="code"]' }, [
         web([rule({ display: 'inline-block', minInlineSize: '100%' })]),
       ]),
-      on(['hunk', 'context', 'filler'], [
-        rule({
-          display: 'flex',
-          paddingInline: token('space-md'),
-          textDecoration: 'none',
-        }),
-      ]),
+      on(
+        ['hunk', 'context', 'filler'],
+        [
+          rule({
+            display: 'flex',
+            paddingInline: token('space-md'),
+            textDecoration: 'none',
+          }),
+        ],
+      ),
       on('hunk', [
         rule({
           backgroundColor: token('color-surface-sunken'),
