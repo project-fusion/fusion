@@ -25,3 +25,21 @@ export const ownHooks = (own: unknown): Record<string, number | string> => {
   }
   return hooks
 }
+
+/**
+ * **The custom properties a `style` writes on an element**, by their names after
+ * the two dashes, as an inline style sets them on the web:
+ * `style={{ '--chat-message-background-color': '#3366cc' }}`.
+ */
+export const styleCustom = (style: unknown): Record<string, number | string> => {
+  const custom: Record<string, number | string> = {}
+  if (typeof style !== 'object' || style === null) {
+    return custom
+  }
+  for (const [name, said] of Object.entries(style)) {
+    if (name.startsWith('--') && (typeof said === 'string' || typeof said === 'number')) {
+      custom[name.slice(2)] = said
+    }
+  }
+  return custom
+}

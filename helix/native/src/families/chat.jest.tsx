@@ -1,5 +1,6 @@
 import { describe, expect, jest, test } from '@jest/globals'
 import { fireEvent, render, screen } from '@testing-library/react-native'
+import { StyleSheet } from 'react-native'
 import { HelixRoot } from '../index'
 import { HelixChat, HelixChatComposer, HelixChatMessage } from './chat/index.native'
 
@@ -86,5 +87,25 @@ describe('Chat on a phone', () => {
       </HelixRoot>,
     )
     expect(await screen.findByText('Ada is typing')).toBeTruthy()
+  })
+
+  test('a turn takes the fill `author-styles` writes as a mix of a token', async () => {
+    await render(
+      <HelixRoot>
+        <Chat
+          authorStyles={{
+            Ada: '--chat-message-background-color: color-mix(in oklab, var(--helix-color-success) 24%, transparent)',
+          }}
+          label="Release"
+          turns={[{ author: 'Ada', authorLabel: 'Ada', key: '1', text: 'Green' }]}
+        />
+      </HelixRoot>,
+    )
+    const fill = StyleSheet.flatten(
+      screen.getByText('Green', { includeHiddenElements: true }).parent?.props.style,
+    ) as {
+      backgroundColor?: string
+    }
+    expect(fill.backgroundColor).toMatch(/^rgba\(\d+, \d+, \d+, 0\.24\)$/)
   })
 })
