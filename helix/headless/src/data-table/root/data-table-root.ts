@@ -68,6 +68,7 @@ import {
   wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
+import { tracksOf } from '@fusion.dev/helix-core/table'
 import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -82,7 +83,6 @@ import { html } from 'lit/static-html.js'
 import type { ColumnMenuDrawer, HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import { edgeOf } from '../../table/edge.js'
 import { droppedAt } from '../../table/fit.js'
-import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
 import '../../divider/index.js'
 import '../../menu/index.js'
