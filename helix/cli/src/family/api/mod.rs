@@ -73,9 +73,9 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP, LOG_LINE,
-    LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE, TABLE_COLUMN,
-    TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP,
+    LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -174,6 +174,9 @@ pub struct Api {
     #[serde(rename = "notificationGroup", skip_serializing_if = "Option::is_none")]
     pub notification_group: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a conversation.
+    /// What the element reads, sends, and computes where it is a carousel.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub carousel: Option<TreeChoice>,
     #[serde(rename = "chatRoot", skip_serializing_if = "Option::is_none")]
     pub chat_root: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a turn in a conversation.
@@ -330,6 +333,7 @@ impl Api {
             && self.notifications_root.is_none()
             && self.notification_row.is_none()
             && self.notification_group.is_none()
+            && self.carousel.is_none()
             && self.chat_root.is_none()
             && self.chat_message.is_none()
             && self.chat_composer.is_none()
@@ -406,6 +410,7 @@ const FIELDS: &[&str] = &[
     "notificationsRoot",
     "notificationRow",
     "notificationGroup",
+    "carousel",
     "chatRoot",
     "chatMessage",
     "chatComposer",
@@ -451,6 +456,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         notification_group: field("notificationGroup")
             .map(tree_choice::notification_group)
             .transpose()?,
+        carousel: field("carousel").map(tree_choice::carousel).transpose()?,
         chat_root: field("chatRoot").map(tree_choice::chat_root).transpose()?,
         chat_message: field("chatMessage")
             .map(tree_choice::chat_message)

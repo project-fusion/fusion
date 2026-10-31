@@ -82,6 +82,7 @@ const GIVEN: &[&str] = &[
     "notificationsRoot",
     "notificationRow",
     "notificationGroup",
+    "carousel",
     "chatRoot",
     "chatMessage",
     "chatComposer",

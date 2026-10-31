@@ -55,14 +55,15 @@ import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
+  CarouselChoice,
+  ChatComposerChoice,
+  ChatMessageChoice,
+  ChatRootChoice,
   CodeBlockChoice,
   InspectorChoice,
   LogGroupChoice,
   LogLineChoice,
   LogRootChoice,
-  ChatComposerChoice,
-  ChatMessageChoice,
-  ChatRootChoice,
   NotificationGroupChoice,
   NotificationRowChoice,
   NotificationsRootChoice,
@@ -308,6 +309,8 @@ export interface Headless {
   readonly notificationGroup?: NotificationGroupChoice
   /** What the element reads, sends, and computes where it is a block of code. */
   readonly codeBlock?: CodeBlockChoice
+  /** What the element reads, sends, and computes where it is a carousel. */
+  readonly carousel?: CarouselChoice
   /** What the element reads, sends, and computes where it is a conversation. */
   readonly chatRoot?: ChatRootChoice
   /** What the element reads, sends, and computes where it is a turn in a conversation. */
