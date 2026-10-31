@@ -3,7 +3,7 @@ import { HelixHeadlessNotification } from '@fusion.dev/helix-headless/notificati
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './notification.css.js'
+import { styles } from './notification.generated.css.js'
 import '../../format-date/index.js'
 
 /**

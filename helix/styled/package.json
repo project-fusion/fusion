@@ -370,6 +370,14 @@
       "types": "./dist/navigation/index.d.ts",
       "default": "./dist/navigation/index.js"
     },
+    "./notifications": {
+      "react-native": {
+        "types": "./dist/notifications/index.native.d.ts",
+        "default": "./dist/notifications/index.native.js"
+      },
+      "types": "./dist/notifications/index.d.ts",
+      "default": "./dist/notifications/index.js"
+    },
     "./number-input": {
       "react-native": {
         "types": "./dist/number-input/index.native.d.ts",
