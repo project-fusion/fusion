@@ -110,6 +110,14 @@
       "types": "./dist/card/index.d.ts",
       "default": "./dist/card/index.js"
     },
+    "./carousel": {
+      "react-native": {
+        "types": "./dist/carousel/index.native.d.ts",
+        "default": "./dist/carousel/index.native.js"
+      },
+      "types": "./dist/carousel/index.d.ts",
+      "default": "./dist/carousel/index.js"
+    },
     "./chat": {
       "react-native": {
         "types": "./dist/chat/index.native.d.ts",
