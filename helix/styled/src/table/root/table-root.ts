@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './table-root.css.js'
+import { styles } from './table-root.generated.css.js'
 import '../../checkbox/index.js'
 
 /**
