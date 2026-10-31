@@ -152,4 +152,23 @@ describe('Carousel on a phone', () => {
     )
     expect(screen.queryByLabelText('Slide 1')).toBeNull()
   })
+
+  test('the rotation control stands first, and after the arrows under an overlay', async () => {
+    const order = async (placement: string) => {
+      const view = await render(
+        <HelixRoot>
+          <Carousel autoplay controls="always" controlsPlacement={placement} label="Places">
+            {SLIDES}
+          </Carousel>
+        </HelixRoot>,
+      )
+      const said = (screen.root?.queryAll((node: Host) => node.type === 'View') ?? [])
+        .map((node) => (node as unknown as Host).props.accessibilityLabel)
+        .filter((label) => typeof label === 'string' && /rotation|next|previous/i.test(label))
+      await view.unmount()
+      return said.findIndex((label) => /rotation/i.test(String(label))) === 0
+    }
+    expect(await order('top')).toBe(true)
+    expect(await order('overlay')).toBe(false)
+  })
 })
