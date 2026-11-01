@@ -28,7 +28,7 @@ describe('notifications visual axes', () => {
     // separation: where one notice ends and the next begins.
     const served = ssr(html`<helix-notification .separation=${'filled'}></helix-notification>`)
     expect(hostTag(served, TAG)).toContain('separation="filled"')
-    expect(styles(served)).toContain(':host(:where([separation="filled"]))')
+    expect(styles(served)).toContain(':host([separation="filled"])')
   })
 
   test('and one that asked for no axis carries none', () => {
@@ -48,9 +48,9 @@ describe('the feed’s separation', () => {
       html`<helix-notifications .separation=${'filled'}><helix-notification></helix-notification></helix-notifications>`,
     )
     expect(hostTag(served, 'helix-notifications')).toContain('separation="filled"')
-    expect(styles(served)).toContain(':host(:where(:state(feed-filled))) [part="item"]')
+    expect(styles(served)).toContain(':host(:state(feed-filled)) [part="item"]')
     expect(styles(served)).toContain(
-      ':host(:where(:is([separation="filled"], [separation="outlined"]))) [part="header"]',
+      ':host(:is([separation="filled"], [separation="outlined"])) [part="header"]',
     )
   })
 
