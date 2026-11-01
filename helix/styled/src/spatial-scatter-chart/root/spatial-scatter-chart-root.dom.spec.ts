@@ -39,7 +39,9 @@ describe('the styled spatial scatter chart', () => {
     await element.updateComplete
     expect(part(element, 'plot')?.getAttribute('tabindex')).toBe('0')
     expect(element.shadowRoot?.querySelectorAll('[part~="point"]')).toHaveLength(2)
-    expect(sheet()).toMatch(/--chart-series-2:\s*light-dark\(var\(--helix-color-series-2\), var\(--helix-color-series-10\)\)/)
+    expect(sheet()).toMatch(
+      /--chart-series-2:\s*light-dark\(var\(--helix-color-series-2\), var\(--helix-color-series-10\)\)/,
+    )
   })
 
   test('under forced colors, a point keeps its color and takes an edge in the text color', () => {

@@ -30,7 +30,13 @@ import '../../tooltip/index.js'
 export class HelixSpatialTreemap extends HelixHeadlessSpatialTreemap {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [spatialStyles, seriesStyles, tooltipStyles, styles, sonifyStyles]
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    seriesStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
 
   /**
    * How strongly the blocks are drawn, as on every chart.

@@ -50,10 +50,7 @@ slot[name="back-icon"]::slotted(*) {
 }
 
 [part="back"]:hover {
-  background-color: var(
-    --drilldown-back-hover-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--drilldown-back-hover-background-color, var(--helix-color-hover));
   color: var(--helix-color-foreground);
 }
 

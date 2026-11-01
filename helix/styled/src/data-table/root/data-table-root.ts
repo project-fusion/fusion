@@ -97,7 +97,13 @@ import '../../pagination/index.js'
 export class HelixDataTable extends HelixHeadlessDataTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, collectionErrorStyles, recipeStyles, styles]
+  static override styles: CSSResultGroup = [
+    liveStyles,
+    collectionStateStyles,
+    collectionErrorStyles,
+    recipeStyles,
+    styles,
+  ]
 }
 
 declare global {

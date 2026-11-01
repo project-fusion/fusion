@@ -96,10 +96,7 @@
 }
 
 ::slotted(a):hover {
-  background-color: var(
-    --outline-link-hover-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--outline-link-hover-background-color, var(--helix-color-hover));
   color: var(--outline-link-hover-color, var(--helix-color-foreground));
   text-decoration: none;
 }

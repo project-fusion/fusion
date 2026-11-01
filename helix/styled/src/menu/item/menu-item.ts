@@ -34,7 +34,12 @@ import { styles } from './menu-item.css.js'
 export class HelixMenuItem extends HelixHeadlessMenuItem {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [rowStyles, floatingPanelStyles, floatingEntranceStyles, styles]
+  static override styles: CSSResultGroup = [
+    rowStyles,
+    floatingPanelStyles,
+    floatingEntranceStyles,
+    styles,
+  ]
 }
 
 declare global {

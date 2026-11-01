@@ -1,5 +1,3 @@
-
-
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
@@ -19,15 +17,11 @@
   position: relative;
 }
 
-
-
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"] {
   background-color: transparent;
 }
-
-
 
 /* Each face of a block in its group's color, darkened by how far it turns
    from the light: the top whole, and the sides the steps the projection
@@ -82,8 +76,6 @@
 :host([material="frosted"]) {
   --_spatial-treemap-through: calc(0.88 * var(--helix-material-opacity));
 }
-
-
 
 /* The outline again over every block, faint and dashed: where the block shows,
    the ring covers it, and where others hide it, this says where it stands. */

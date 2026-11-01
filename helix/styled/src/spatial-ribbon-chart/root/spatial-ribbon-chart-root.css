@@ -1,5 +1,3 @@
-
-
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
@@ -19,15 +17,11 @@
   position: relative;
 }
 
-
-
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"] {
   background-color: transparent;
 }
-
-
 
 /* Each face of a ribbon in its series' color, darkened by how far it turns
    from the light: a level top whole, a steep one and the side shaded, so a

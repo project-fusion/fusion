@@ -128,7 +128,9 @@ describe('a chip with nothing to compare against', () => {
     const withValues = (await mount(
       `<helix-headless-filter-chip label="Disposition">refunded</helix-headless-filter-chip>`,
     )) as HTMLElement
-    expect((withValues.shadowRoot?.querySelector('[part="values"]') as HTMLElement).hidden).toBe(false)
+    expect((withValues.shadowRoot?.querySelector('[part="values"]') as HTMLElement).hidden).toBe(
+      false,
+    )
     expect(withValues.shadowRoot?.querySelector('[part="values"]')).not.toBeNull()
 
     const without = (await mount(

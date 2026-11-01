@@ -777,11 +777,7 @@ export const TOKENS: Token[] = [
   ],
   /* A control lifted over content: a raised Icon Button, a Carousel arrow, a Speed
      Dial. The same lift as a panel, and a control keeps its own corner. */
-  [
-    'shadow-raised',
-    'var(--helix-shadow-floating)',
-    'The shadow of a control lifted over content.',
-  ],
+  ['shadow-raised', 'var(--helix-shadow-floating)', 'The shadow of a control lifted over content.'],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through
      it. */

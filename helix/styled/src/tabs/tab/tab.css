@@ -90,10 +90,7 @@
  * behave alike.
  */
 [part="tab"]:hover:not(:disabled, [aria-disabled="true"]) {
-  background-color: var(
-    --tabs-tab-hover-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--tabs-tab-hover-background-color, var(--helix-color-hover));
   color: var(--tabs-tab-hover-color, var(--helix-color-foreground));
 }
 

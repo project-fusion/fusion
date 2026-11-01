@@ -124,10 +124,7 @@
    it. The alpha is the only lever that leaves the filter running. */
 :host([material="glass"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
-  background-color: var(
-    --drawer-background-color,
-    var(--helix-material-modal)
-  );
+  background-color: var(--drawer-background-color, var(--helix-material-modal));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and

@@ -31,15 +31,11 @@
   position: relative;
 }
 
-
-
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"] {
   background-color: transparent;
 }
-
-
 
 /* **A face takes its height's color on the ramp, less light as it turns
    from the light**, which the component writes as its shade. **It is ruled

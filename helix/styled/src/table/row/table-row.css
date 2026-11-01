@@ -55,10 +55,7 @@
 }
 
 :host(:state(link):hover) ::slotted(*) {
-  background-color: var(
-    --table-row-hover-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--table-row-hover-background-color, var(--helix-color-hover));
 }
 
 /* The checkbox cell takes focus in a `grid` table, inset as a cell's ring is. */

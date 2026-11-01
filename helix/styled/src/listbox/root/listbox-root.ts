@@ -49,7 +49,8 @@ export class HelixListbox extends HelixHeadlessListbox {
 
   static override styles: CSSResultGroup = [
     liveStyles,
-    collectionStateStyles, collectionErrorStyles,
+    collectionStateStyles,
+    collectionErrorStyles,
     fieldStyles,
     fieldStackedStyles,
     styles,

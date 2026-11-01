@@ -52,7 +52,12 @@ import '../../checkbox/index.js'
 export class HelixTable extends HelixHeadlessTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, collectionErrorStyles, styles]
+  static override styles: CSSResultGroup = [
+    liveStyles,
+    collectionStateStyles,
+    collectionErrorStyles,
+    styles,
+  ]
 }
 
 declare global {

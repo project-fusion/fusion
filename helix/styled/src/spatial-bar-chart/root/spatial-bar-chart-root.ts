@@ -31,7 +31,13 @@ import '../../tooltip/index.js'
 export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [spatialStyles, seriesStyles, tooltipStyles, styles, sonifyStyles]
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    seriesStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
 
   /**
    * How strongly the bars are drawn, as on every chart.

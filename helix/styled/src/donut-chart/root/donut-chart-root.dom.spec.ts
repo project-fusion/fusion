@@ -122,7 +122,9 @@ describe('donut chart', () => {
     expect(part(host, 'segment')?.getAttribute('style')).toContain(
       '--chart-series: var(--chart-series-1)',
     )
-    expect(sheet()).toContain('--chart-series-1: light-dark(var(--helix-color-series-1), var(--helix-color-series-9))')
+    expect(sheet()).toContain(
+      '--chart-series-1: light-dark(var(--helix-color-series-1), var(--helix-color-series-9))',
+    )
     for (const hook of [
       '--donut-chart-edge-stroke',
       '--donut-chart-size',

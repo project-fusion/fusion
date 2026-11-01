@@ -3,10 +3,7 @@
      trail. A crumb draws a shared fill and a divider from these two and
      decides nothing itself, so the trail's `separation` is the one place the
      choice is made. `plain` is the resting value: a fill and no line. */
-  --_breadcrumbs-split-fill: var(
-    --breadcrumbs-split-fill,
-    var(--helix-color-well)
-  );
+  --_breadcrumbs-split-fill: var(--breadcrumbs-split-fill, var(--helix-color-well));
   --_breadcrumbs-split-rule: transparent;
 
   display: block;
@@ -45,10 +42,7 @@
 }
 
 [part="expand"]:hover {
-  background-color: var(
-    --breadcrumbs-hover-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--breadcrumbs-hover-color, var(--helix-color-hover));
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 

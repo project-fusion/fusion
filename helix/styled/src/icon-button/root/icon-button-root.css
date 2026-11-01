@@ -477,7 +477,10 @@
 :host(:not(:disabled)) [part="button"]:active {
   background-color: var(
     --_icon-button-pressed-fill,
-    var(--icon-button-background-color, color-mix(in oklab, var(--_icon-button-tone) 16%, transparent))
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 16%, transparent)
+    )
   );
 }
 
@@ -486,7 +489,9 @@
     --_icon-button-pressed-fill,
     var(
       --icon-button-background-color,
-      oklch(from var(--_icon-button-fill-hover) calc(l + 0.05 * var(--_icon-button-press-way, -1)) c h)
+      oklch(
+        from var(--_icon-button-fill-hover) calc(l + 0.05 * var(--_icon-button-press-way, -1)) c h
+      )
     )
   );
 }
@@ -494,14 +499,20 @@
 :host(:not(:disabled)[emphasis="outlined"]) [part="button"]:active {
   background-color: var(
     --_icon-button-pressed-fill,
-    var(--icon-button-background-color, color-mix(in oklab, var(--_icon-button-tone) 20%, transparent))
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 20%, transparent)
+    )
   );
 }
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:active {
   background-color: var(
     --_icon-button-pressed-fill,
-    var(--icon-button-background-color, color-mix(in oklab, var(--_icon-button-tone) 30%, transparent))
+    var(
+      --icon-button-background-color,
+      color-mix(in oklab, var(--_icon-button-tone) 30%, transparent)
+    )
   );
 }
 

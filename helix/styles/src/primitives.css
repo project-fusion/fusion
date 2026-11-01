@@ -280,7 +280,11 @@
      0.05 under the seed, and white falls under 4.5:1 near 0.63. Measured with
      `oklch(0.92 0.21 115)`: 1.44:1 before, October 31, 2026. */
   --_helix-brand-on: oklch(from var(--_helix-seed-brand) clamp(0, (0.68 - l) * 1000, 1) 0 0);
-  --_helix-brand-wash: color-mix(in oklab, light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 28%, transparent);
+  --_helix-brand-wash: color-mix(
+    in oklab,
+    light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 28%,
+    transparent
+  );
 
   /* ------------------------------------------------------- ink --------- */
   /* **Ink: the emphasis of a palette that names no brand.** The neutral's own

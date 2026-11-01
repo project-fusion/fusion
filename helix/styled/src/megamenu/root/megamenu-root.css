@@ -52,10 +52,7 @@
 
 /* Open reads like the current destination. */
 [part="trigger"][aria-expanded="true"] {
-  background-color: var(
-    --megamenu-trigger-open-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--megamenu-trigger-open-background-color, var(--helix-color-hover));
   color: var(--megamenu-trigger-open-color, var(--helix-color-foreground));
 }
 

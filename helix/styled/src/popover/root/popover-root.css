@@ -169,10 +169,7 @@
 :host([material="glass"]) [part="surface"],
 :host([material="glass"]) [part~="arrow"] {
   backdrop-filter: var(--popover-backdrop, var(--helix-material-backdrop));
-  background-color: var(
-    --popover-background-color,
-    var(--helix-material-panel)
-  );
+  background-color: var(--popover-background-color, var(--helix-material-panel));
 }
 
 :host([material="frosted"]) [part="surface"],
