@@ -512,6 +512,14 @@
       "types": "./dist/scroll-area/index.d.ts",
       "default": "./dist/scroll-area/index.js"
     },
+    "./select": {
+      "react-native": {
+        "types": "./dist/select/index.native.d.ts",
+        "default": "./dist/select/index.native.js"
+      },
+      "types": "./dist/select/index.d.ts",
+      "default": "./dist/select/index.js"
+    },
     "./shared": null,
     "./shared/*": null,
     "./skeleton": {
