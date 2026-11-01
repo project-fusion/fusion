@@ -264,8 +264,7 @@ export default styles(
         ),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
-         drawn moves. Where the control is already that size the box sits inside it.
-         A phone gives a press the view's own frame. */
+         drawn moves. Where the control is already that size the box sits inside it. */
       on({ after: 'toggle' }, [
         web([
           rule({

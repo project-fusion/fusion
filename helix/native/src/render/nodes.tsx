@@ -14,6 +14,7 @@ import { drawImage } from './image'
 import { drawLayer } from './layer'
 import { drawLive, saidStatus } from './live'
 import { placeIn } from './placed'
+import { pressReach } from './press-reach'
 import { pressView } from './press-view'
 import { drawRegion } from './regions'
 import { drawRepeat, outOfCopy } from './repeat'
@@ -219,6 +220,7 @@ const drawPressable = (scope: Scope, node: Node, text: Style, inside: Node | 'ho
       {drawGenerated(resolved.generated?.before, inherit(text, words), `${node.name}-before`)}
       {inner(scope, node, inherit(text, words), resolved.regions, node)}
       {drawGenerated(resolved.generated?.after, inherit(text, words), `${node.name}-after`)}
+      {pressReach(scope.family, node.name, scope.theme.tokens['size-target'], scope.theme.spaceRem)}
     </View>,
     node.name,
   )
