@@ -1,4 +1,4 @@
-import { fn, native, product, token, web } from '../style.js'
+import { fn, native, product, token } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -15,7 +15,7 @@ export default fragment('density-sm', { parts: [] }, ({ on, rule }) => [
       '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
       '--helix-size-control': token('size-control-sm'),
       '--helix-size-control-loose': product(token('size-control'), 1.2),
-      '--helix-size-control-tight': web(fn('round', product(token('size-control'), 0.8), '1px')),
+      '--helix-size-control-tight': fn('round', product(token('size-control'), 0.8), '1px'),
       '--helix-size-icon': token('size-icon-sm'),
       '--helix-size-icon-loose': product(token('size-icon'), 1.2),
       '--helix-size-icon-tight': product(token('size-icon'), 0.8),

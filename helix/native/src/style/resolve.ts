@@ -25,12 +25,15 @@ const TOKEN_REF = /^var\(\s*--helix-([a-z0-9-]+)\s*\)$/
 const SAFE_AREA = /^safe-area-inset-(bottom|left|right|top)$/
 
 /**
- * The CSS functions that compare lengths, which a native view resolves where
- * every argument is a length in points, and leaves as words otherwise.
+ * The CSS functions that compare or round lengths, which a native view
+ * resolves where every argument is a length in points, and leaves as words
+ * otherwise. `round()` takes a value and a step, and a tie goes up, as CSS has
+ * it.
  */
 export const COMPARED: Readonly<Record<string, (...lengths: number[]) => number>> = {
   max: Math.max,
   min: Math.min,
+  round: (value = 0, step = 1) => Math.round(value / step) * step,
 }
 
 /** What `resolverFor` reads: the part, the rules that reach it, and its own values. */
