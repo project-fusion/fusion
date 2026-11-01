@@ -57,7 +57,7 @@
 }
 
 .platformLabel {
-  fill: var(--helix-color-foreground-subtle);
+  fill: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   letter-spacing: 0.01em;
 }
