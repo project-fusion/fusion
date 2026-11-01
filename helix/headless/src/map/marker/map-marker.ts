@@ -52,10 +52,10 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * @csspart marker - The button, holding the point and the name.
  * @csspart point - The dot on the place, holding the icon if there is one.
  *
+ * @cssstate active - Holds the map's tab stop.
  * @cssstate behind - On the far side of a globe, out of sight until the globe turns it into view.
  * @cssstate cluster - Shows several markers as one count.
  * @cssstate clustered - Hidden inside another marker's cluster.
- * @cssstate active - Holds the map's tab stop.
  * @cssstate fanned - Spread out from a location it shares with other markers, after their cluster was pressed.
  * @cssstate icon - Has content in the icon slot.
  * @cssstate passed - Marked as passed.
