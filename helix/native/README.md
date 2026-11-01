@@ -2481,6 +2481,38 @@ A press on a row of ten thousand takes seconds in a development build in Expo
 Go, since each one draws the rows of the window anew. It has not been measured
 in a release build.
 
+## Lists of options
+
+`HelixListbox` holds `HelixOption`s, and groups of them, wherever they stand:
+
+```tsx
+<HelixListbox defaultValue="pear" filterable label="Fruit" multiple>
+  <HelixOptionGroup label="Crisp">
+    <HelixOption value="apple">Apple</HelixOption>
+    <HelixOption value="pear">Pear</HelixOption>
+  </HelixOptionGroup>
+  <HelixOptionSeparator />
+  <HelixOption disabled value="date">Date</HelixOption>
+</HelixListbox>
+```
+
+`items` draws options from data, in a `FlatList`, and the list then reads no children.
+A press chooses, and under `multiple` toggles. A press with Shift has no finger to
+hold it, and a hardware keyboard's Shift with Space takes in a range, adding every
+option from the one last chosen and letting none go, as the web's does.
+
+**The highlight is the keys'.** A phone has no `aria-activedescendant`, so the highlight
+is drawn for a hardware keyboard and scrolled into the list, and each option takes a
+screen reader's focus of its own. Its label names it, its description is the hint, and
+it says whether it is selected. `resultsLabel` is said as a filter narrows the list.
+
+Under `reorderable`, a long press and a drag, Alt with an arrow, and a screen reader's
+actions move an option within its group. The page moves it on `reorder`.
+
+Web only: dictation, which a phone's keyboard offers, the hidden select `autocomplete`
+draws for a browser's autofill, `name`, and the marks a filter paints over the words it
+matched through `CSS.highlights`.
+
 ## Tables
 
 A table's rows line up under one set of tracks, which the table works out once
