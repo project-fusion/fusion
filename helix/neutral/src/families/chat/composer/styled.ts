@@ -1,4 +1,15 @@
-import { fn, list, mix, native, product, quotient, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import composer from './headless.js'
 
@@ -11,7 +22,17 @@ const FIELD_INSET = sum(
 const STEP_DOWN = {
   '--helix-size-control': token('size-control-sm'),
   '--helix-size-control-loose': product(token('size-control'), '1.2'),
-  '--helix-size-control-tight': product(token('size-control'), '0.8'),
+  '--helix-size-control-tight': web(fn('round', product(token('size-control'), '0.8'), '1px')),
+  '--helix-size-checkbox': token('size-checkbox-sm'),
+  '--helix-size-checkbox-loose': product(token('size-checkbox'), '1.2'),
+  '--helix-size-checkbox-tight': product(token('size-checkbox'), '0.8'),
+  '--helix-size-switch': token('size-switch-sm'),
+  '--helix-size-tag': token('size-tag-sm'),
+  '--helix-text-control': token('text-control-sm'),
+  '--helix-space-control': token('space-sm'),
+  '--helix-text-field': token('text-sm'),
+  '--helix-text-field-label': token('text-xs'),
+  '--helix-space-field': token('space-xs'),
   '--helix-size-icon': token('size-icon-sm'),
   '--helix-size-icon-loose': product(token('size-icon'), '1.2'),
   '--helix-size-icon-tight': product(token('size-icon'), '0.8'),
@@ -430,11 +451,14 @@ export default styles(
         rule(
           { disabled: false, hover: true },
           {
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+            backgroundColor: token('color-hover'),
             color: token('color-foreground'),
           },
         ),
-        rule({ disabled: true }, { opacity: 0.5, web: { cursor: 'not-allowed' } }),
+        rule(
+          { disabled: true },
+          { opacity: token('opacity-disabled'), web: { cursor: 'not-allowed' } },
+        ),
         rule(
           { focusVisible: true },
           {
@@ -445,11 +469,23 @@ export default styles(
       ],
     ),
     on('send', [
+      rule({ position: 'relative' }),
       web([
         rule({
           animation: ['helix-composer-swap', token('duration-fast'), token('easing-standard')],
         }),
         rule({ reducedMotion: true }, { animation: 'none' }),
+      ]),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'send' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
       ]),
     ]),
     on('mark', [

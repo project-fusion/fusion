@@ -37,7 +37,7 @@ export default styles(
     prefix: 'table',
     hooks: {
       cellMinBlockSize: token('size-control'),
-      paddingBlock: token('space-xs'),
+      paddingBlock: product(token('space-control'), 0.5),
       ruleColor: token('color-border'),
     },
     stylesheet: 'table/cell/table-cell.generated.css',
@@ -50,7 +50,9 @@ export default styles(
         boxSizing: 'border-box',
         color: token('color-foreground'),
         display: 'flex',
-        fontSize: token('text-sm'),
+        fontSize: token('text-control'),
+        /* Figures take one width each, so a column of amounts lines up by place. */
+        fontVariantNumeric: 'tabular-nums',
         minBlockSize: hook.cellMinBlockSize,
         minInlineSize: 0,
         paddingBlock: hook.paddingBlock,
@@ -61,6 +63,10 @@ export default styles(
           textAlign: measured('table-cell-align'),
         },
       }),
+      /* The last column ends on the rule, level with the controls above the table.
+         The inset is what separates a column from the next, and this one has no
+         next. */
+      rule({ child: 'last' }, { paddingInlineEnd: token('space-none') }),
       rule({ header: true }, { fontWeight: token('weight-medium') }),
       web([
         rule(

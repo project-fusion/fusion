@@ -22,7 +22,6 @@ export default headless('meter-segment', {
   props: {
     /* Names the slice where a pointer rests on it, on the web. */
     label: '',
-    tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     value: number(),
   },
   events: {},

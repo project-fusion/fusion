@@ -53,7 +53,7 @@ export default headless('option', {
   events: {
     beforeSelect: cancelable(['href', 'value']),
   },
-  states: ['active', 'disabled', 'hasIndicator', 'hovered', 'pressed', 'selected', 'settled'],
+  states: ['active', 'disabled', 'hasIndicator', 'hovered', 'pressing', 'selected', 'settled'],
   option: {
     checkShown: 'checkShown',
     described: 'described',

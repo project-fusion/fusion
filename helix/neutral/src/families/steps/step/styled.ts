@@ -1,4 +1,4 @@
-import { fit, list, mix, native, product, sum, token, web } from '../../../style.js'
+import { fit, fn, list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import step from './headless.js'
 
@@ -23,7 +23,7 @@ import step from './headless.js'
  * **The name is a Button on the web**, sized here as a dense control in the
  * step's text. A phone draws it as a press in a ghost button's look: its ink
  * muted ahead and full where the reader is or has been, a wash while a
- * finger holds it, and half the opacity while it is disabled.
+ * finger holds it, and the disabled opacity while it is disabled.
  *
  * **The current stage opens what it holds, down a column alone**, and a
  * closed one is out of sight, out of the tab order, and out of what a screen
@@ -170,7 +170,7 @@ export default styles(
         justifySelf: own.stepsMarkerJustify('center'),
         blockSize: own.stepsMarkBox(token('size-icon')),
         boxSizing: 'border-box',
-        color: own.stepsMarkerColor(token('color-border')),
+        color: own.stepsMarkerColor(token('color-foreground-subtle')),
         display: 'inline-flex',
         flex: [0, 0, 'auto'],
         fontFamily: token('font-sans'),
@@ -252,13 +252,21 @@ export default styles(
     on('label', [
       rule({
         '--helix-size-control': token('size-control-sm'),
+        '--helix-size-checkbox': token('size-checkbox-sm'),
+        '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
+        '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
+        '--helix-size-switch': token('size-switch-sm'),
+        '--helix-size-tag': token('size-tag-sm'),
+        '--helix-text-field': token('text-sm'),
+        '--helix-text-field-label': token('text-xs'),
+        '--helix-space-field': token('space-xs'),
         '--helix-size-control-loose': product(token('size-control'), 1.2),
-        '--helix-size-control-tight': product(token('size-control'), 0.8),
+        '--helix-size-control-tight': web(fn('round', product(token('size-control'), 0.8), '1px')),
         '--helix-size-icon': token('size-icon-sm'),
         '--helix-size-icon-loose': product(token('size-icon'), 1.2),
         '--helix-size-icon-tight': product(token('size-icon'), 0.8),
         '--helix-space-control': own.stepInset,
-        '--helix-text-control': token('text-sm'),
+        '--helix-text-control': token('text-control-md'),
         '--button-foreground-color': token('color-foreground-muted'),
         maxInlineSize: '100%',
       }),
@@ -290,7 +298,7 @@ export default styles(
           { active: true, formDisabled: false },
           { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
         ),
-        rule({ formDisabled: true }, { opacity: 0.5 }),
+        rule({ formDisabled: true }, { opacity: token('opacity-disabled') }),
       ]),
     ]),
     /* The same inset the name takes as padding, so the two start on one line. */
@@ -302,7 +310,10 @@ export default styles(
         paddingInline: own.stepInset,
       }),
     ]),
-    on(['marker', 'description'], [rule({ has: 'disabled' }, { opacity: 0.5 })]),
+    on(
+      ['marker', 'description'],
+      [rule({ has: 'disabled' }, { opacity: token('opacity-disabled') })],
+    ),
     /* What the stage holds, in the name's column, from no height to its own
        as the stage opens. */
     on('content', [

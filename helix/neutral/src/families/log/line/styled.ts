@@ -96,7 +96,7 @@ export default styles(
         web: { inlineSize: first(own.logLineSize, 'max-content') },
       }),
       native([rule({ flexDirection: 'row' })]),
-      rule({ hover: true }, { backgroundColor: mix(token('color-foreground'), 4, 'transparent') }),
+      rule({ hover: true }, { backgroundColor: token('color-hover') }),
       rule({ print: true }, { web: { printColorAdjust: 'exact' } }),
       /* A line in a step keeps a step from the end of the surface it stands on. */
       rule(

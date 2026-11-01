@@ -91,7 +91,7 @@ export default styles(
           variants('material', {
             glass: {
               backdropFilter: hook.backdrop(token('material-backdrop')),
-              backgroundColor: hook.backgroundColor(token('material-translucent')),
+              backgroundColor: hook.backgroundColor(token('material-panel')),
             },
             frosted: {
               backdropFilter: hook.backdrop(fn('blur', token('material-blur-lg'))),

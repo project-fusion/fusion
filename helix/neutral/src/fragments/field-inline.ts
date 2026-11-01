@@ -10,8 +10,10 @@ import { fragment } from '../table.js'
  */
 export default fragment(
   'field-inline',
-  { parts: ['hint', 'feedback'], own: { fieldControlInlineSize: null } },
+  { parts: ['label', 'hint', 'feedback'], own: { fieldControlInlineSize: null } },
   ({ on, own, rule }) => [
+    /* The words beside a mark read at the density they are in, as a button's do. */
+    on('label', [rule({ fontSize: token('text-control') })]),
     on(
       ['hint', 'feedback'],
       [rule({ paddingInlineStart: sum(own.fieldControlInlineSize('0px'), token('space-xs')) })],

@@ -43,7 +43,7 @@ export default styles(
     on('host', [
       rule({ own: { radioSize: hook.size } }),
       rule({ display: 'block' }),
-      rule({ has: 'disabled' }, { opacity: 0.5 }),
+      rule({ has: 'disabled' }, { opacity: token('opacity-disabled') }),
       /* A card is the same radio in a bounded surface. */
       rule({ separation: ['filled', 'outlined'] }, { display: 'block' }),
       /* A chosen dot must print, or the answer prints empty. */
@@ -57,6 +57,7 @@ export default styles(
         boxSizing: 'border-box',
         display: 'inline-flex',
         gap: token('space-xs'),
+        position: 'relative',
       }),
       web([rule({ has: 'disabled' }, { cursor: 'default' })]),
       rule(
@@ -78,6 +79,11 @@ export default styles(
       ),
       /* The ground carries it and the edge goes, transparent so the card keeps its size. */
       rule({ separation: 'filled' }, { borderColor: 'transparent' }),
+      /* An edge and no fill, as `outlined` is wherever it is offered. */
+      rule(
+        { separation: 'outlined' },
+        { backgroundColor: hook.cardBackgroundColor('transparent') },
+      ),
       /* Chosen: the brand color, as a ring laid outside the edge. */
       rule(
         { separation: ['filled', 'outlined'], selected: true },
@@ -144,6 +150,10 @@ export default styles(
         },
       ),
       rule({ reducedMotion: true, variant: 'chip' }, { transition: 'none', translate: 'none' }),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches the
+         target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
     ]),
     /* One cell, so the dot is centered in the circle. No fill of its own, so an
        unchosen circle is an empty ring on whatever it sits on: the page's own
@@ -166,7 +176,7 @@ export default styles(
          saying "these are wrong" is not undone by a pointer, chosen or not. */
       rule(
         { lacks: 'disabled', within: { item: { hover: true } } },
-        { borderColor: hook.borderColor(token('color-foreground-muted')) },
+        { borderColor: hook.borderColor(token('color-foreground')) },
       ),
       /* Offset, because the ring surrounds a circle whose own edge is not moving. */
       rule(
@@ -194,6 +204,10 @@ export default styles(
       rule({ hideControl: true, separation: ['filled', 'outlined'] }, { display: 'none' }),
       /* A chip is a card that gave up its words. */
       rule({ variant: 'chip' }, { display: 'none' }),
+      rule(
+        { lacks: 'disabled', within: { item: { active: true } } },
+        { backgroundColor: token('color-press') },
+      ),
     ]),
     /* A dot under half the circle, so the pair reads as a mark in a circle. */
     on({ after: 'box' }, [
@@ -209,6 +223,9 @@ export default styles(
       rule({ selected: true }, { scale: 1 }),
       /* A slotted indicator is the mark, so the dot goes. */
       rule({ hasIndicator: true }, { content: 'none' }),
+      /* Forced colors paint every background Canvas, so a mark drawn as one
+         disappears and a chosen control looks like the others. */
+      rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
     ]),
     on({ region: 'indicator', slotted: '*' }, [
       rule({
@@ -225,9 +242,12 @@ export default styles(
       rule({
         color: token('color-foreground'),
         fontFamily: token('font-sans'),
-        fontSize: token('text-sm'),
+        fontSize: token('text-control'),
         fontWeight: token('weight-medium'),
         lineHeight: token('leading-tight'),
+        /* A long unbroken word breaks inside the column it was given. */
+        minInlineSize: 0,
+        web: { overflowWrap: 'anywhere' },
       }),
       /* A card's first line is a sentence somebody reads. */
       rule(

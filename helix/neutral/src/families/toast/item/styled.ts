@@ -1,8 +1,8 @@
+import densitySm from '../../../fragments/density-sm.js'
 import {
   difference,
   list,
   measured,
-  mix,
   native,
   product,
   quotient,
@@ -67,7 +67,7 @@ export default styles(
     },
     stylesheet: 'toast/item/toast-item.generated.css',
   },
-  ({ hook, keyframes, on, own, rule, variants }) => {
+  ({ hook, include, keyframes, on, own, rule, variants }) => {
     const normal = token('duration-normal')
     const decelerate = token('easing-decelerate')
     const accelerate = token('easing-accelerate')
@@ -76,14 +76,9 @@ export default styles(
     const enter = own.toastEnter(token('space-lg'))
     const drain = ['helix-toast-drain', measured('toast-duration', '0ms'), 'linear', 'forwards']
     return [
+      include(densitySm),
       on('host', [
         rule({
-          '--helix-size-icon': token('size-icon-sm'),
-          '--helix-size-icon-loose': product(token('size-icon'), 1.2),
-          '--helix-size-icon-tight': product(token('size-icon'), 0.8),
-          '--helix-size-control': token('size-control-sm'),
-          '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
           own: { toastLine: product(hook.fontSize, token('leading-normal')) },
           display: 'grid',
           web: { gridTemplateRows: 'minmax(0, 1fr)' },
@@ -103,7 +98,7 @@ export default styles(
           danger: { own: { toastSeverity: token('color-danger') } },
           info: { own: { toastSeverity: token('color-primary') } },
           success: { own: { toastSeverity: token('color-success') } },
-          warning: { own: { toastSeverity: token('color-warning') } },
+          warning: { own: { toastSeverity: token('color-warning-mark') } },
         }),
         /* Held back by the stack's `max-visible`, until a message before it goes. */
         rule({ waiting: true }, { display: 'none' }),
@@ -280,10 +275,7 @@ export default styles(
         web([rule({ touchAction: 'pan-y' })]),
         rule(
           { hover: true },
-          {
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
-            color: token('color-foreground'),
-          },
+          { backgroundColor: token('color-hover'), color: token('color-foreground') },
         ),
         rule(
           { focusVisible: true },
@@ -311,6 +303,17 @@ export default styles(
         /* Under reduced motion as well: the bar is the one place that says how long is left. */
         rule({ reducedMotion: true }, { animation: drain }),
         rule({ paused: true }, { animationPlayState: 'paused' }),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+         moves. Where the control is already that size the box sits inside it. */
+      on({ after: 'dismiss' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       keyframes('helix-toast-drain', { to: { scale: '0 1' } }),
       keyframes('helix-toast-in', { from: { opacity: 0, translate: [0, enter] } }),

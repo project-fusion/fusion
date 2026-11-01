@@ -1,5 +1,7 @@
+import collectionError from '../../../fragments/collection-error.js'
+import densitySm from '../../../fragments/density-sm.js'
 import { oneOf } from '../../../render.js'
-import { native, product, sum, token, web } from '../../../style.js'
+import { difference, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -11,8 +13,8 @@ import root from './headless.js'
  * and avatar sizes a step down for everything inside it, so a control put in a row
  * takes the row's height without being told.
  *
- * **Mark-all and the next page are chrome**, in the muted ink, since the accent is
- * the unread mark's. **A page that could not be fetched** says so in the danger
+ * **Mark-all and the next page are chrome**, in the muted ink, since the primary color
+ * is the unread mark's. **A page that could not be fetched** says so in the danger
  * ink, set as the empty line is.
  *
  * **A feed of boxes** takes away the rule under the header, which reads as a stray
@@ -37,19 +39,10 @@ export default styles(
     },
     stylesheet: 'notifications/root/notifications-root.generated.css',
   },
-  ({ hook, on, own, rule }) => [
+  ({ hook, include, on, own, rule }) => [
+    include(densitySm),
     on('host', [
       rule({
-        '--helix-size-checkbox': token('size-checkbox-sm'),
-        '--helix-size-checkbox-loose': product(token('size-checkbox'), '1.2'),
-        '--helix-size-checkbox-tight': product(token('size-checkbox'), '0.8'),
-        '--helix-size-control': token('size-control-sm'),
-        '--helix-size-control-loose': product(token('size-control'), '1.2'),
-        '--helix-size-control-tight': product(token('size-control'), '0.8'),
-        '--helix-size-icon': token('size-icon-sm'),
-        '--helix-size-icon-loose': product(token('size-icon'), '1.2'),
-        '--helix-size-icon-tight': product(token('size-icon'), '0.8'),
-        '--helix-size-tag': token('size-tag-sm'),
         '--helix-size-avatar': token('size-avatar-sm'),
         display: 'grid',
         maxBlockSize: hook.maxBlockSize,
@@ -108,6 +101,7 @@ export default styles(
         fontSize: token('text-sm'),
         paddingBlock: token('space-2xs'),
         paddingInline: token('space-2xs'),
+        position: 'relative',
         transitionDuration: token('duration-fast'),
         transitionProperty: 'color',
         transitionTimingFunction: token('easing-standard'),
@@ -122,6 +116,17 @@ export default styles(
         },
       ),
       web([rule({ print: true }, { display: 'none' })]),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. */
+    on({ after: 'mark-all' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on('more', [
       rule({
@@ -182,15 +187,12 @@ export default styles(
         ]),
       ],
     ),
+    include(collectionError),
     on('error', [
       rule({
         color: hook.errorColor,
-        fontFamily: token('font-sans'),
-        fontSize: token('text-sm'),
-        margin: token('space-none'),
         paddingBlock: token('space-lg'),
         paddingInline: token('space-md'),
-        textAlign: 'center',
       }),
     ]),
   ],

@@ -1,4 +1,4 @@
-import { mix, native, product, token } from '../../../style.js'
+import { native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -20,7 +20,7 @@ export default styles(
     prefix: 'drilldown',
     hooks: {
       backColor: token('color-foreground-muted'),
-      backHoverBackgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+      backHoverBackgroundColor: token('color-hover'),
       backgroundColor: token('color-surface'),
       duration: token('duration-normal'),
       headerBlockSize: token('size-control'),
@@ -146,7 +146,7 @@ export default styles(
         ],
       ),
       /* Rows that are already there dim, and hold still, while new ones load. */
-      on('page', [rule({ loading: true }, { opacity: 0.5 })]),
+      on('page', [rule({ loading: true }, { opacity: token('opacity-busy') })]),
     ]
   },
 )

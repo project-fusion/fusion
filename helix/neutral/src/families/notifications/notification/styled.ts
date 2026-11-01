@@ -56,7 +56,7 @@ export default styles(
       unreadBlockSize: token('space-xs'),
       unreadInlineSize: own.notificationsUnread,
       unreadInset: null,
-      unreadMark: token('color-accent'),
+      unreadMark: token('color-primary'),
       unreadOffset: null,
       unreadRadius: token('radii-full'),
     }),
@@ -126,10 +126,12 @@ export default styles(
           },
         }),
         rule(boxed, {
-          border: [token('border-thin'), 'solid', hook.itemEdge],
+          border: [token('border-surface'), 'solid', hook.itemEdge],
           borderRadius: hook.itemRadius,
+          boxShadow: token('shadow-surface'),
         }),
-        rule(filled, { backgroundColor: hook.itemFill }),
+        /* `filled` is the fill alone. */
+        rule(filled, { backgroundColor: hook.itemFill, borderColor: 'transparent' }),
         rule(
           { focusVisible: true },
           {
@@ -380,6 +382,7 @@ export default styles(
           inlineSize: token('size-control'),
           marginInlineStart: token('space-2xs'),
           padding: token('space-none'),
+          position: 'relative',
           web: { cursor: 'pointer', placeItems: 'center' },
         }),
         rule({ hover: true }, { backgroundColor: mix('currentcolor', 12, 'transparent') }),
@@ -392,6 +395,17 @@ export default styles(
         ),
         web([rule({ print: true }, { display: 'none' })]),
         native([rule({ alignItems: 'center', justifyContent: 'center' })]),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. */
+      on({ after: 'dismiss' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on({ region: 'dismiss', slotted: '*' }, [
         rule({

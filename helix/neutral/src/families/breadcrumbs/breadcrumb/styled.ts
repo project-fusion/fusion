@@ -1,4 +1,4 @@
-import { mix, native, product, sum, token, web } from '../../../style.js'
+import { native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import breadcrumb from './headless.js'
 
@@ -41,7 +41,7 @@ export default styles(
       currentColor: token('color-foreground'),
       fontWeight: token('weight-medium'),
       gap: token('space-xs'),
-      hoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      hoverColor: token('color-hover'),
       linkColor: token('color-foreground-muted'),
       radius: token('radii-sm'),
       separatorColor: token('color-foreground-subtle'),
@@ -128,6 +128,9 @@ export default styles(
             borderRadius: hook.radius,
             padding: [token('space-2xs'), token('space-xs')],
             transition: ['background-color', token('duration-fast'), token('easing-standard')],
+            /* A long unbroken word breaks inside the column it was given. */
+            minInlineSize: 0,
+            overflowWrap: 'anywhere',
           }),
           rule({ place: 'first' }, pulled),
           rule({ end: true }, split),

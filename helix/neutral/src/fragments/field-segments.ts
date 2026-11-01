@@ -32,7 +32,7 @@ export default fragment(
         display: 'flex',
         flex: '1 1 auto',
         fontFamily: token('font-sans'),
-        fontSize: fn('max', token('text-field-min'), token('text-md')),
+        fontSize: fn('max', token('text-field-min'), token('text-field')),
         fontVariantNumeric: 'tabular-nums',
         fontWeight: token('weight-medium'),
         minInlineSize: 0,

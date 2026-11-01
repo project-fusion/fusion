@@ -51,7 +51,7 @@ export default styles(
       markColor: token('color-foreground'),
       size: token('size-checkbox'),
     },
-    own: { checkboxSize: null, fieldControlInlineSize: null },
+    own: { checkboxSize: null, fieldControlInlineSize: null, fieldDisabledOpacity: null },
     props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'checkbox/root/checkbox-root.generated.css',
   },
@@ -67,7 +67,10 @@ export default styles(
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ formDisabled: true }, { opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { own: { fieldDisabledOpacity: 1 }, opacity: token('opacity-disabled') },
+      ),
       /* A card is the same checkbox in a bounded surface. */
       rule(card, { display: 'block' }),
       /* A tick that is a fill must print, or the box prints empty. */
@@ -97,6 +100,11 @@ export default styles(
       }),
       /* The ground carries it and the edge goes, transparent so the box keeps its size. */
       rule({ separation: 'filled' }, { borderColor: 'transparent' }),
+      /* An edge and no fill, as `outlined` is wherever it is offered. */
+      rule(
+        { separation: 'outlined' },
+        { backgroundColor: hook.cardBackgroundColor('transparent') },
+      ),
       /* Chosen, as a chosen radio card is: a ring drawn outside the edge. */
       rule(
         { ...card, checked: true },
@@ -116,6 +124,11 @@ export default styles(
         { holds: { control: 'focusVisible' }, ...card },
         { outline: ring, outlineOffset: token('size-focus-offset') },
       ),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches the
+         target. */
+      rule({ position: 'relative' }),
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
     ]),
     on('box', [
       rule({ display: 'grid', flex: '0 0 auto', placeItems: 'center' }),
@@ -150,7 +163,14 @@ export default styles(
          ticked or not. */
       rule(
         { formDisabled: false, within: { field: { hover: true } } },
-        { borderColor: hook.borderColor(token('color-foreground-muted')) },
+        {
+          backgroundColor: token('color-hover'),
+          borderColor: hook.borderColor(token('color-foreground')),
+        },
+      ),
+      rule(
+        { formDisabled: false, within: { field: { active: true } } },
+        { backgroundColor: token('color-press') },
       ),
       /* Offset, because the ring surrounds a box whose own edge is not moving. */
       rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
@@ -166,6 +186,13 @@ export default styles(
         },
       ),
       rule({ focusVisible: true, ...card }, { outline: 'none' }),
+      rule(
+        [
+          { forcedColors: true, checked: true },
+          { forcedColors: true, indeterminate: true },
+        ],
+        { borderColor: 'Highlight' },
+      ),
     ]),
     /* The tick by default, and not only when the box is ticked, which stops
        the mark flashing on the way out. Nothing to see until it is checked.
@@ -210,6 +237,13 @@ export default styles(
           web: { maskImage: 'none' },
           placeItems: 'center',
         },
+      ),
+      /* Forced colors paint every background Canvas, so a mark drawn as one
+         disappears and a chosen control looks like the others. Measured in
+         Chromium on October 31, 2026. */
+      rule(
+        { forcedColors: true },
+        { backgroundColor: 'Highlight', web: { forcedColorAdjust: 'none' } },
       ),
     ]),
     /* A phone strokes the same paths, at the same weight, in the mark's ink. */

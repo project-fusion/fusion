@@ -78,14 +78,17 @@ export default styles(
           position: web('fixed'),
           zIndex: web(token('layer-toast')),
         }),
-        rule({ placement: false }, { web: { insetBlockEnd: own.toastInset } }),
+        rule(
+          { placement: false },
+          { web: { insetBlockEnd: sum(own.toastInset, safeArea('bottom')) } },
+        ),
         rule(
           { placement: ['bottom-center', 'bottom-end', 'bottom-start'] },
-          { web: { insetBlockEnd: own.toastInset } },
+          { web: { insetBlockEnd: sum(own.toastInset, safeArea('bottom')) } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
-          { web: { insetBlockStart: own.toastInset } },
+          { web: { insetBlockStart: sum(own.toastInset, safeArea('top')) } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },

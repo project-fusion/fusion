@@ -73,7 +73,7 @@ export default headless('log', {
     resumeLabel: 'Jump to latest',
     selectable: false,
     selectedLines: '',
-    separation: oneOf(['outlined', 'plain']),
+    separation: oneOf(['plain']),
     source: property(object()),
     threshold: 48,
     timestamps: oneOf(['absolute', 'relative']),

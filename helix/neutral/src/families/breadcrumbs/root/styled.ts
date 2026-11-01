@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { mix, native, token } from '../../../style.js'
+import { native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -22,7 +22,7 @@ export default styles(
       fontSize: token('text-sm'),
       gap: token('space-xs'),
       splitDividerColor: token('color-border'),
-      splitFill: mix(token('color-foreground'), 4, 'transparent'),
+      splitFill: token('color-well'),
     },
     own: {
       breadcrumbsMarkGlyph: null,

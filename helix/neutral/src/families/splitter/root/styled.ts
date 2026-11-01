@@ -39,10 +39,11 @@ export default styles(
       target: token('space-xs'),
       thickness: token('border-thin'),
     },
+    own: { splitterReach: null },
     props: { variant: oneOf(['grip', 'line']) },
     stylesheet: 'splitter/root/splitter-root.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, on, own, rule }) => {
     const fade = token('duration-fast')
     const ease = token('easing-standard')
     return [
@@ -52,6 +53,12 @@ export default styles(
         rule([{ orientation: 'vertical' }, { orientation: 'auto', vertical: true }], {
           flexDirection: 'column',
         }),
+        rule({ own: { splitterReach: hook.target } }),
+        /* A finger needs the full target, and the line stays centered in it. */
+        rule(
+          { coarsePointer: true },
+          { own: { splitterReach: hook.target(token('size-target')) } },
+        ),
       ]),
       /* **A sticky band in a pane stays under the divider.** The divider reaches
          into the pane beside it, so it has to paint over what is there, and an
@@ -82,16 +89,16 @@ export default styles(
           flex: 'none',
           placeContent: 'center',
           placeItems: 'center',
-          inlineSize: hook.target,
-          marginInline: quotient(hook.target, '-2'),
+          inlineSize: own.splitterReach,
+          marginInline: quotient(own.splitterReach, '-2'),
           position: 'relative',
           web: { cursor: 'col-resize', touchAction: 'none', userSelect: 'none' },
           zIndex: token('layer-raised'),
         }),
         rule([{ orientation: 'vertical' }, { orientation: 'auto', vertical: true }], {
-          blockSize: hook.target,
+          blockSize: own.splitterReach,
           inlineSize: 'auto',
-          marginBlock: quotient(hook.target, '-2'),
+          marginBlock: quotient(own.splitterReach, '-2'),
           marginInline: 0,
           web: { cursor: 'row-resize' },
         }),

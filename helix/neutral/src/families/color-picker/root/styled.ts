@@ -44,6 +44,7 @@ export default styles(
       wheelThickness: token('space-lg'),
     },
     own: {
+      fieldDisabledOpacity: null,
       colorPickerAlong: null,
       colorPickerMarkHalf: null,
       colorPickerRing: null,
@@ -536,7 +537,7 @@ export default styles(
       /* A phone lays each ramp under the slider, across the middle of its thumb. */
       /* A phone reads no `hidden` of its own. */
       on(
-        ['ramp-tile', 'ramp-alpha', 'ramp-hue', 'swatches'],
+        ['ramp-tile', 'ramp-alpha', 'ramp-hue'],
         [native([rule({ part: { hidden: true } }, { display: 'none' })])],
       ),
       on('channel-row', [native([rule({ position: 'relative' })])]),
@@ -741,7 +742,10 @@ export default styles(
           paddingBlockStart: token('space-sm'),
           paddingInline: hook.padding,
         }),
-        native([rule({ flexDirection: 'row' })]),
+        native([
+          rule({ flexDirection: 'row' }),
+          rule({ part: { hidden: true } }, { display: 'none' }),
+        ]),
       ]),
       on('swatch', [
         rule({
@@ -793,9 +797,19 @@ export default styles(
         }),
       ]),
       on('host', [
-        rule({ formDisabled: true }, { opacity: 0.5, web: { cursor: 'not-allowed' } }),
+        rule(
+          { formDisabled: true },
+          {
+            own: { fieldDisabledOpacity: 1 },
+            opacity: token('opacity-disabled'),
+            web: { cursor: 'not-allowed' },
+          },
+        ),
         rule({ print: true }, { boxShadow: 'none', printColorAdjust: web('exact') }),
       ]),
+      /* The fields inside are disabled with the picker, and the picker has already
+         faded, so they keep full strength and fade once. */
+      on('channel', [rule({ formDisabled: true }, { '--helix-opacity-disabled': 1 })]),
     ]
   },
 )

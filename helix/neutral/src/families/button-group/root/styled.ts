@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { hookOf, product, token, web } from '../../../style.js'
+import { fn, hookOf, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -47,39 +47,77 @@ export default styles(
   },
   ({ hook, on, rule, variants }) => [
     on('host', [
-      rule({ display: 'inline-flex' }),
+      /* The group stays in its column, and its buttons cut their labels. */
+      rule({ display: 'inline-flex', maxInlineSize: '100%' }),
       variants('size', {
         sm: {
+          '--helix-size-checkbox': token('size-checkbox-sm'),
           '--helix-size-control': token('size-control-sm'),
           '--helix-size-icon': token('size-icon-sm'),
+          '--helix-size-switch': token('size-switch-sm'),
+          '--helix-size-tag': token('size-tag-sm'),
           '--helix-space-control': token('space-sm'),
-          '--helix-text-control': token('text-xs'),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
+          '--helix-space-field': token('space-xs'),
+          '--helix-text-control': token('text-control-sm'),
+          '--helix-text-field': token('text-sm'),
+          '--helix-text-field-label': token('text-xs'),
+          '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
+          '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
+          '--helix-size-control-tight': web(
+            fn('round', product(token('size-control'), 0.8), '1px'),
+          ),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-icon-loose': product(token('size-icon'), 1.2),
         },
         md: {
+          '--helix-size-checkbox': token('size-checkbox-md'),
           '--helix-size-control': token('size-control-md'),
           '--helix-size-icon': token('size-icon-md'),
+          '--helix-size-switch': token('size-switch-md'),
+          '--helix-size-tag': token('size-tag-md'),
           '--helix-space-control': token('space-md'),
-          '--helix-text-control': token('text-sm'),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
+          '--helix-space-field': token('space-sm'),
+          '--helix-text-control': token('text-control-md'),
+          '--helix-text-field': token('text-md'),
+          '--helix-text-field-label': token('text-sm'),
+          '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
+          '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
+          '--helix-size-control-tight': web(
+            fn('round', product(token('size-control'), 0.8), '1px'),
+          ),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-icon-loose': product(token('size-icon'), 1.2),
         },
         lg: {
+          '--helix-size-checkbox': token('size-checkbox-lg'),
           '--helix-size-control': token('size-control-lg'),
           '--helix-size-icon': token('size-icon-lg'),
+          '--helix-size-switch': token('size-switch-lg'),
+          '--helix-size-tag': token('size-tag-lg'),
           '--helix-space-control': token('space-lg'),
-          '--helix-text-control': token('text-md'),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
+          '--helix-space-field': token('space-md'),
+          '--helix-text-control': token('text-control-lg'),
+          '--helix-text-field': token('text-md'),
+          '--helix-text-field-label': token('text-sm'),
+          '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
+          '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
+          '--helix-size-control-tight': web(
+            fn('round', product(token('size-control'), 0.8), '1px'),
+          ),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-icon-loose': product(token('size-icon'), 1.2),
         },
       }),
+      /* A phone has no `round()`, and takes the step as it falls. */
+      native([
+        rule(
+          { size: ['sm', 'md', 'lg'] },
+          { '--helix-size-control-tight': product(token('size-control'), 0.8) },
+        ),
+      ]),
       /* The look of a pressed button, in a selection mode: the solid fill,
          resolved here so a hook set on the group or above it reaches every
          button. */
@@ -114,6 +152,9 @@ export default styles(
     /* Each button after the first is pulled onto its neighbor's border, so
        the two share one line. */
     on({ slotted: '*' }, [
+      /* The floor is one control, so a long label beside a short one cannot
+         squeeze the short one to nothing. */
+      web([rule({ minInlineSize: fn('min', token('size-control'), '100%') })]),
       rule(
         { child: 'later', variant: { not: 'spaced' } },
         { marginInlineStart: product(token('border-thin'), '-1') },

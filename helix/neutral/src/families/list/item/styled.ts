@@ -20,12 +20,12 @@ export default styles(
     prefix: 'list-item',
     hooks: {
       currentBackgroundColor: token('color-well'),
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       draggingOpacity: 0.5,
       dropIndicatorColor: token('color-primary'),
       dropIndicatorSize: token('border-thick'),
       gripColor: token('color-foreground-muted'),
-      padding: [token('space-sm'), token('space-md')],
+      padding: [product(token('space-control'), '0.5'), token('space-md')],
       railContent: '""',
       railDisplay: 'none',
       selectedBackgroundColor: token('color-primary-subtle'),
@@ -47,7 +47,12 @@ export default styles(
         alignItems: 'center',
         display: 'grid',
         gridTemplateColumns: 'auto auto 1fr auto auto',
+        /* The height of a control at this density, and two lines grow from it. */
+        minBlockSize: token('size-control'),
+        /* A long unbroken word breaks inside the column it was given. */
+        minInlineSize: 0,
         padding: hook.padding,
+        web: { overflowWrap: 'anywhere' },
       }),
       /* The row a reader is on, by the part it is as well, `row-current`, which
          a property sets with no attribute. A chosen row keeps its own ground. */

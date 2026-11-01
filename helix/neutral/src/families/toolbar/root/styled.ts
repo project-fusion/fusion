@@ -1,5 +1,6 @@
+import densitySm from '../../../fragments/density-sm.js'
 import { oneOf } from '../../../render.js'
-import { product, token } from '../../../style.js'
+import { fn, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -33,27 +34,13 @@ export default styles(
       radius: token('radii-none'),
       separatorGap: 0,
     },
-    props: { size: oneOf(['sm', 'md', 'lg']) },
+    props: { scrollable: false, size: oneOf(['sm', 'md', 'lg']) },
     stylesheet: 'toolbar/root/toolbar-root.generated.css',
   },
-  ({ hook, on, rule, variants }) => [
+  ({ hook, include, on, rule, variants }) => [
+    include(densitySm),
     on('host', [
-      rule({
-        '--helix-size-checkbox': token('size-checkbox-sm'),
-        '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
-        '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
-        /* The icon step with it. Declaring the control size alone leaves an
-           icon at the `md` step inside `sm` controls: 20 pixels in a 32 pixel
-           row. */
-        '--helix-size-icon': token('size-icon-sm'),
-        '--helix-size-icon-loose': product(token('size-icon'), 1.2),
-        '--helix-size-icon-tight': product(token('size-icon'), 0.8),
-        '--helix-size-control': token('size-control-sm'),
-        '--helix-size-control-loose': product(token('size-control'), 1.2),
-        '--helix-size-control-tight': product(token('size-control'), 0.8),
-        '--helix-size-tag': token('size-tag-sm'),
-        display: 'inline-flex',
-      }),
+      rule({ display: 'inline-flex', maxInlineSize: '100%' }),
       variants('size', {
         md: {
           '--helix-size-checkbox': token('size-checkbox-md'),
@@ -64,7 +51,15 @@ export default styles(
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-control': token('size-control-md'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
+          '--helix-size-control-tight': web(
+            fn('round', product(token('size-control'), 0.8), '1px'),
+          ),
+          '--helix-size-switch': token('size-switch-md'),
+          '--helix-text-control': token('text-control-md'),
+          '--helix-space-control': token('space-md'),
+          '--helix-text-field': token('text-md'),
+          '--helix-text-field-label': token('text-sm'),
+          '--helix-space-field': token('space-sm'),
           '--helix-size-tag': token('size-tag-md'),
         },
         lg: {
@@ -76,7 +71,15 @@ export default styles(
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-control': token('size-control-lg'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
+          '--helix-size-control-tight': web(
+            fn('round', product(token('size-control'), 0.8), '1px'),
+          ),
+          '--helix-size-switch': token('size-switch-lg'),
+          '--helix-text-control': token('text-control-lg'),
+          '--helix-space-control': token('space-lg'),
+          '--helix-text-field': token('text-md'),
+          '--helix-text-field-label': token('text-sm'),
+          '--helix-space-field': token('space-md'),
           '--helix-size-tag': token('size-tag-lg'),
         },
       }),
@@ -93,10 +96,24 @@ export default styles(
         border: [hook.borderWidth, 'solid', hook.borderColor],
         borderRadius: hook.radius,
         display: 'flex',
+        /* Wraps where it runs out of room, so a row of controls cannot widen the
+           page. Measured October 31, 2026: seven controls took a 390 page to 644. */
+        flexWrap: 'wrap',
         gap: hook.gap,
+        /* A control wider than the toolbar cuts its label, so the row stays inside it. */
+        maxInlineSize: '100%',
+        minInlineSize: 0,
         padding: hook.padding,
       }),
+      rule(
+        { scrollable: true },
+        { flexWrap: 'nowrap', web: { overflowX: 'auto', scrollbarWidth: 'none' } },
+      ),
       rule({ orientation: 'vertical' }, { flexDirection: 'column' }),
+    ]),
+    on({ slotted: '*' }, [
+      rule({ maxInlineSize: '100%', minInlineSize: 0 }),
+      rule({ scrollable: true }, { flex: 'none' }),
     ]),
     /* A divider between controls, and the space either side of it along the
        toolbar's axis. None unless set: the toolbar's gap already parts them. */

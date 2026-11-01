@@ -1,3 +1,4 @@
+import collectionError from '../../../fragments/collection-error.js'
 import collectionState from '../../../fragments/collection-state.js'
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
@@ -42,10 +43,11 @@ export default styles(
     own: {
       collectionInsetBlock: null,
       collectionInsetInline: null,
+      fieldDisabledOpacity: null,
     },
     stylesheet: 'listbox/root/listbox-root.generated.css',
   },
-  ({ hook, include, on, rule }) => {
+  ({ hook, include, on, own, rule }) => {
     const columns = fn(
       'repeat',
       'auto-fill',
@@ -55,9 +57,13 @@ export default styles(
       include(field),
       include(fieldStacked),
       include(collectionState),
+      include(collectionError),
       on('host', [
         rule({ display: 'flex', flexDirection: 'column', gap: token('space-2xs') }),
-        rule({ formDisabled: true }, { opacity: 0.5 }),
+        rule(
+          { formDisabled: true },
+          { opacity: token('opacity-disabled'), own: { fieldDisabledOpacity: 1 } },
+        ),
       ]),
       on('items', [
         rule({
@@ -83,7 +89,7 @@ export default styles(
           { borderColor: token('color-danger'), outlineColor: token('color-danger') },
         ),
         rule({ formDisabled: true, platform: 'web' }, { cursor: 'not-allowed' }),
-        rule({ loading: true }, { opacity: 0.5 }),
+        rule({ loading: true }, { opacity: token('opacity-busy') }),
         /* A phone's move draws on the option, and the web's reorder entry adopts a sheet. */
         native([
           rule({
@@ -113,11 +119,7 @@ export default styles(
       on('error', [
         rule({
           color: hook.errorColor,
-          fontFamily: token('font-sans'),
-          fontSize: token('text-sm'),
-          margin: token('space-none'),
           padding: token('space-xs'),
-          textAlign: 'center',
         }),
       ]),
       on('filter-icon', [

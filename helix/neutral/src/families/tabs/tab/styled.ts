@@ -1,4 +1,4 @@
-import { difference, first, list, mix, product, quotient, token, web } from '../../../style.js'
+import { difference, first, list, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import tab from './headless.js'
 
@@ -17,11 +17,11 @@ export default styles(
     hooks: ({ own }) => ({
       blockSize: token('size-control'),
       color: token('color-foreground-muted'),
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       dismissColor: 'currentColor',
       fontSize: token('text-control'),
       fontWeight: token('weight-medium'),
-      hoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      hoverBackgroundColor: token('color-hover'),
       hoverColor: token('color-foreground'),
       maxInlineSize: 'none',
       paddingInline: token('space-sm'),
@@ -46,7 +46,7 @@ export default styles(
       /* A label longer than the tab may be ends in an ellipsis, as a tag's does.
          Only once a page caps a tab: unset, a tab is its label's width, so a strip
          with more than fits scrolls rather than squeezing every name. */
-      rule({ maxInlineSize: '100%', minInlineSize: 0 }),
+      rule({ maxInlineSize: '100%', minInlineSize: 0, position: 'relative' }),
       rule({
         alignItems: 'center',
         backgroundColor: 'transparent',
@@ -119,6 +119,18 @@ export default styles(
           outlineOffset: product(token('size-focus-offset'), '-1'),
         },
       ),
+      rule({ active: true, disabled: false }, { backgroundColor: token('color-press') }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'tab' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on('label', [
       rule({
@@ -153,13 +165,26 @@ export default styles(
            still holding its room, so the label does not move as it comes and goes. */
         opacity: own.tabsDismissRest(1),
         padding: token('space-none'),
+        position: 'relative',
         transition: ['opacity', token('duration-fast'), token('easing-standard')],
       }),
       /* The mark shows on the current tab, under the pointer, and while the tab
-         holds focus. A phone has no pointer, and draws it on the current tab. */
+         holds focus. Where nothing can hover, as on a phone, it always shows. */
       rule({ selected: true }, { opacity: 1 }),
-      rule({ hover: true }, { backgroundColor: mix(token('color-foreground'), 10, 'transparent') }),
+      rule({ hover: true }, { backgroundColor: token('color-hover') }),
       web([rule({ within: { host: ['hover', 'focusWithin'] } }, { opacity: 1 })]),
+      rule({ canHover: false }, { opacity: 1 }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'dismiss' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on('dismiss-mark', [rule({ blockSize: '1em', inlineSize: '1em' })]),
     on({ region: 'dismiss-icon', slotted: '*' }, [

@@ -2,7 +2,7 @@ import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { list, native, token, web } from '../../../style.js'
+import { difference, list, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import input from './headless.js'
 
@@ -27,7 +27,7 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
-      paddingInline: token('space-xs'),
+      paddingInline: token('space-field'),
       radius: token('radii-sm'),
       size: token('size-control'),
     },
@@ -59,8 +59,12 @@ export default styles(
         { invalid: true },
         { borderColor: token('color-danger'), outlineColor: token('color-danger') },
       ),
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       rule({ readonly: true }, { backgroundColor: 'transparent' }),
+      rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
     ]),
     on('control', [rule({ blockSize: '100%' })]),
     /* Written out: the clear mark a search field draws itself, a different
@@ -96,6 +100,27 @@ export default styles(
         rule({ also: { 'reveal-pressed': true } }, { color: token('color-foreground') }),
       ],
     ),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it. */
+    on(['clear', 'reveal'], [rule({ position: 'relative' })]),
+    on({ after: 'clear' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'reveal' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
     /* A phone draws the cross the web draws in `clear-icon`, at the icon size. */
     on(
       ['clear-mark', 'reveal-mark'],

@@ -58,11 +58,11 @@ export default styles(
       rowCheckedBackgroundColor: 'transparent',
       rowCheckedColor: null,
       rowColor: token('color-foreground-muted'),
-      rowDisabledOpacity: 0.5,
-      rowHoverBackgroundColor: token('color-surface-raised'),
+      rowDisabledOpacity: token('opacity-disabled'),
+      rowHoverBackgroundColor: token('color-hover'),
       rowHoverColor: token('color-foreground'),
       rowRadius: token('radii-sm'),
-      rowSelectedBackgroundColor: token('color-surface-sunken'),
+      rowSelectedBackgroundColor: token('color-primary-subtle'),
       rowSelectedColor: token('color-foreground'),
       rowSize: token('size-control-tight'),
     },
@@ -149,6 +149,7 @@ export default styles(
           paddingBlock: own.treePad,
           paddingInline: token('space-xs'),
           paddingInlineStart: inset,
+          position: 'relative',
           web: {
             /* One line plus the padding, floored at the target size. */
             blockSize: fn('max', hook.rowSize, sum('1lh', product(own.treePad, 2))),
@@ -184,7 +185,7 @@ export default styles(
             { backgroundColor: hook.rowHoverBackgroundColor, color: hook.rowHoverColor },
           ),
         ]),
-        /* A surface, not the accent. */
+        /* The primary wash. */
         rule(
           { selected: true },
           { backgroundColor: hook.rowSelectedBackgroundColor, color: hook.rowSelectedColor },
@@ -463,6 +464,12 @@ export default styles(
             { backgroundColor: 'transparent', color: hook.rowColor },
           ),
         ]),
+        rule({ active: true }, { backgroundColor: token('color-press') }),
+        web([rule({ active: true, has: 'disabled' }, { backgroundColor: 'transparent' })]),
+        /* Rows sit against each other, so a box reaching past a row would take the
+           press from the row beside it. On a touch screen the row itself reaches
+           the target. */
+        rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       ]),
     ]
   },

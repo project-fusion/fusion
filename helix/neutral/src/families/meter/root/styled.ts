@@ -201,7 +201,10 @@ export default styles(
       ),
       rule(
         { 'data-band': 'fair' },
-        { backgroundColor: own.meterHue, own: { meterHue: hook.color(token('color-warning')) } },
+        {
+          backgroundColor: own.meterHue,
+          own: { meterHue: hook.color(token('color-warning-mark')) },
+        },
       ),
       rule(
         { 'data-band': 'poor' },
@@ -238,7 +241,7 @@ export default styles(
           { 'data-band': 'fair', shape: 'arc' },
           { 'data-band': 'fair', shape: 'ring' },
         ],
-        { stroke: own.meterHue, own: { meterHue: hook.color(token('color-warning')) } },
+        { stroke: own.meterHue, own: { meterHue: hook.color(token('color-warning-mark')) } },
       ),
       rule(
         [
