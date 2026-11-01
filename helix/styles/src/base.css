@@ -355,8 +355,6 @@ helix-text[tone="warning"][emphasis="muted"] {
    the color, matching the component exactly. */
 [data-button] {
   --_button-edge: var(--helix-color-border);
-  /* An icon beside the words, at the size the element draws it. */
-  --icon-size: 1.15em;
   min-inline-size: var(--button-inline-size, auto);
   max-inline-size: 100%;
   /* The solid fill, separate from the tone, and it has to be separate. Pointing
@@ -409,6 +407,11 @@ helix-text[tone="warning"][emphasis="muted"] {
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
+}
+
+/* An icon beside the words, at the size the element draws it. */
+[data-button] helix-icon {
+  --icon-size: 1.15em;
 }
 
 /* The tones, paired with the component's as everything here is. */
