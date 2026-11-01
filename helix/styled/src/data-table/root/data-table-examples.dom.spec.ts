@@ -1,6 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, registerDom } from '@fusion.dev/helix-testing/dom'
+import columnMenu from '../.examples/column-menu.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import movingRows from '../.examples/moving-rows.html' with { type: 'text' }
@@ -44,6 +45,21 @@ const next = (table: HTMLElement): void => {
   const pagination = table.shadowRoot?.querySelector('[part~="pagination"]') as HTMLElement | null
   ;(pagination?.shadowRoot?.querySelector('[part~="next"]') as HTMLElement | null)?.click()
 }
+
+describe('the column menu example', () => {
+  run('each heading holds a menu button, and a sortable one still sorts', async () => {
+    await example(columnMenu)
+    await idle()
+    const table = document.getElementById('assets') as HTMLElement & { sort: string }
+    const columns = [...table.querySelectorAll('helix-table-column')]
+    expect(columns.every((one) => one.shadowRoot?.querySelector('[part="menu-button"]'))).toBe(true)
+    const button = columns[0]?.shadowRoot?.querySelector('[part="menu-button"]') as HTMLElement
+    button.click()
+    await idle()
+    expect(table.sort).toBe('')
+    expect(logged()).toEqual([])
+  })
+})
 
 describe('the arranging example', () => {
   run(
