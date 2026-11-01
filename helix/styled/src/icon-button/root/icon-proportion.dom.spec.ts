@@ -27,6 +27,9 @@ beforeAll(async () => {
 /* Every svg drawn under a root, through shadow roots, with the button that holds
    it. Nothing is reached by part, so a family that moves its mark stays covered. */
 const marks = (root: Element | ShadowRoot, found: SVGElement[] = []): SVGElement[] => {
+  if (root instanceof Element && root.shadowRoot) {
+    marks(root.shadowRoot, found)
+  }
   for (const element of root.querySelectorAll('*')) {
     if (element.shadowRoot) {
       marks(element.shadowRoot, found)
@@ -118,10 +121,12 @@ if (hasLayout()) {
   describe('a slotted caret is the size of the default', () => {
     for (const tag of ['helix-select', 'helix-combobox']) {
       test(tag, async () => {
-        const plain = await mount(`<${tag} label="Plain"></${tag}>`)
-        const own = await mount(
-          `<${tag} label="Own"><helix-icon name="caret-down" slot="indicator"></helix-icon></${tag}>`,
+        const plain = await mount(
+          `<${tag} label="Plain"></${tag}>
+          <${tag} label="Own"><helix-icon name="caret-down" slot="indicator"></helix-icon></${tag}>`,
         )
+        const own = plain.nextElementSibling as HTMLElement & { updateComplete: Promise<unknown> }
+        await own.updateComplete
         const drawn = plain.shadowRoot?.querySelector('[part="indicator"]')
         const slotted = own.querySelector('helix-icon')
         expect(slotted?.getBoundingClientRect().height).toBe(drawn?.getBoundingClientRect().height)
