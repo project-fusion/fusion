@@ -239,6 +239,11 @@
   opacity: var(--helix-opacity-disabled);
 }
 
+/* Wrong, and the frame says so, as a field's edge does. */
+:host(:state(invalid)) [part="field"] {
+  border-color: var(--helix-color-danger);
+}
+
 /* Print: the code prints as it is drawn, and the controls, the find bar and
    the status line are hidden, a printed page having nothing to press.
 
