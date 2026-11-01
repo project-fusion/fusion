@@ -645,6 +645,22 @@
       "types": "./dist/tooltip/index.d.ts",
       "default": "./dist/tooltip/index.js"
     },
+    "./listbox": {
+      "react-native": {
+        "types": "./dist/listbox/index.native.d.ts",
+        "default": "./dist/listbox/index.native.js"
+      },
+      "types": "./dist/listbox/index.d.ts",
+      "default": "./dist/listbox/index.js"
+    },
+    "./option": {
+      "react-native": {
+        "types": "./dist/option/index.native.d.ts",
+        "default": "./dist/option/index.native.js"
+      },
+      "types": "./dist/option/index.d.ts",
+      "default": "./dist/option/index.js"
+    },
     "./tour": {
       "react-native": {
         "types": "./dist/tour/index.native.d.ts",

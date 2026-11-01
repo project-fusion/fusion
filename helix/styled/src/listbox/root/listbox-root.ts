@@ -4,10 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './listbox-root.css.js'
+import { styles } from './listbox-root.generated.css.js'
 import '../../voice-level/index.js'
 
 /**
@@ -51,8 +49,6 @@ export class HelixListbox extends HelixHeadlessListbox {
     liveStyles,
     collectionStateStyles,
     collectionErrorStyles,
-    fieldStyles,
-    fieldStackedStyles,
     styles,
     dictationStyles,
   ]
