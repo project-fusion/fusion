@@ -1185,6 +1185,36 @@ fn documented() {
     );
 }
 
+/// `npm create @acme/app` runs `@acme/create-app`, so that is the name to find.
+#[test]
+fn documented_create_command() {
+    plant_in(
+        "prose-documented-create",
+        "prose",
+        "documented",
+        &[
+            ("fusion.json", r#"{ "scope": "@acme/" }"#),
+            ("ui/package.json", r#"{ "name": "@acme/create-app" }"#),
+            (
+                "ui/custom-elements.json",
+                r#"{ "modules": [ { "declarations": [ { "tagName": "helix-button" } ] } ] }"#,
+            ),
+            (
+                "ui/docs/content/start.mdx",
+                "Run npm create @acme/app@latest here.\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "ui/docs/content/start.mdx",
+                "Run npm create @acme/apps@latest here.\n",
+            );
+        },
+        "`@acme/create-apps` is not a package in this workspace",
+        "ui/docs/content/start.mdx",
+    );
+}
+
 /// Two faults, because the rule answers two questions: a host the site does
 /// not publish, and a path it does not serve. The fixture declares its own
 /// address, so nothing here is a link into the site this repository publishes.
