@@ -385,7 +385,6 @@
     "helix/neutral/src/families/code-block/root/styled.ts",
     "helix/neutral/src/families/color-picker/root/headless.tsx",
     "helix/neutral/src/families/color-picker/root/styled.ts",
-    "helix/neutral/src/families/icon-button/root/styled.ts",
     "helix/neutral/src/families/notifications/notification/styled.ts",
     "helix/neutral/src/families/scroll-area/root/styled.ts",
     "helix/neutral/src/families/slider/root/styled.ts",
