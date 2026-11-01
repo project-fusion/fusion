@@ -80,18 +80,18 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-surface',
-    'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))',
+    'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-925))',
     'A surface on the page, such as a card or a panel. The separation policy sets it apart with a fill, a border, or a shadow.',
   ],
   /* Two kinds of "above", and they want opposite fills in light mode. */
   [
     'color-surface-raised',
-    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
+    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-850))',
     'A raised surface on the page, such as a selected tab or a hovered row. Its fill is one step down the ramp.',
   ],
   [
     'color-surface-overlay',
-    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
+    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-850))',
     'A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
@@ -109,7 +109,7 @@ export const TOKENS: Token[] = [
      leaves the toggle group's thumb 0.14 above its track. */
   [
     'color-surface-sunken',
-    'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-950))',
+    'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-975))',
     'A recessed surface that holds a value, such as an input, a track, or a groove. Its fill sets it apart.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
