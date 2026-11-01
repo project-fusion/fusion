@@ -555,6 +555,7 @@ const SELECT: &[Field] = &[
     ("position", "position", Name),
     ("said", "said", Name),
     ("status", "status", Name),
+    ("unchosen", "unchosen", Name),
     ("value", "value", Name),
     ("words", "words", Name),
 ];

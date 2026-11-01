@@ -359,6 +359,7 @@ export const useSelect = (
             chosen: chosen.join('\n'),
             ...namesOf(state, label, wordsIn(read('listLabel')), words),
             [state('status')]: status,
+            [state('unchosen')]: chosen.length === 0,
             [state('words')]: words,
           },
         },

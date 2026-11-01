@@ -111,6 +111,7 @@ export default headless('select', {
     position: 'position',
     said: 'said',
     status: 'status',
+    unchosen: 'unchosen',
     value: 'value',
     words: 'words',
   },
@@ -160,6 +161,7 @@ export default headless('select', {
         >
           <Slot name="start" />
           <View
+            data-placeholder={select.unchosen}
             part="value"
             run
           >
