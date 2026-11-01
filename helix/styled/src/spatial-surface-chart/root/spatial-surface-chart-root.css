@@ -31,33 +31,6 @@
   position: relative;
 }
 
-::slotted(*) {
-  inset: 0;
-  position: absolute;
-}
-
-/* With no box, the readings stand on the page itself, as a picture on a
-   landing page does, with nothing drawn behind them. */
-:host([no-box]) [part="plot"] {
-  background-color: transparent;
-}
-
-[part="plot"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-/* The chart's own drawing, inset from the box so the names along its edges
-   have room. It scales as a whole through its `viewBox`. */
-[part="fallback"] {
-  inset: var(--helix-space-md);
-  position: absolute;
-}
-
-[part="fallback"][hidden] {
-  display: none;
-}
-
 [part="drawing"] {
   block-size: 100%;
   display: block;
@@ -78,16 +51,6 @@
   stroke: var(--helix-color-foreground-muted);
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
-}
-
-[part="tick"] {
-  fill: var(--helix-color-foreground-muted);
-  font-weight: var(--helix-weight-medium);
-}
-
-[part="axis-name"] {
-  fill: var(--helix-color-foreground);
-  font-weight: var(--helix-weight-semibold);
 }
 
 /* **A face takes its height's color on the ramp, less light as it turns
@@ -168,43 +131,6 @@
   --_spatial-surface-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
-/* **Centered on the reading**: inside the drawing, the mark's one pixel is
-   one of the `viewBox`'s units, many pixels on the page, and a bubble
-   pointed at its middle missed the reading by half of it. */
-foreignObject > [part="mark"] {
-  translate: -50% -50%;
-}
-
-[part="ring"] {
-  fill: none;
-  pointer-events: none;
-  stroke: var(--helix-color-foreground);
-  stroke-width: var(--helix-border-thick);
-  vector-effect: non-scaling-stroke;
-}
-
-/* The readout, the summary, and the table drawn from `data` are for screen readers. */
-[part="live"],
-[part="summary"],
-[part="table"] {
-  block-size: 1px;
-  clip-path: inset(50%);
-  inline-size: 1px;
-  margin: var(--helix-space-none);
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-}
-
-[part="empty"],
-[part="loading"] {
-  color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
-  text-align: center;
-}
-
 @media print {
   [part="face"] {
     stroke: var(--helix-color-border);
@@ -225,11 +151,6 @@ foreignObject > [part="mark"] {
 
   [part="grid"] {
     stroke: CanvasText;
-  }
-
-  [part="tick"],
-  [part="axis-name"] {
-    fill: CanvasText;
   }
 
   [part="ring"] {

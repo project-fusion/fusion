@@ -272,15 +272,6 @@
   display: none;
 }
 
-[part="empty"],
-[part="loading"] {
-  color: var(--helix-color-foreground-muted);
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
-  text-align: center;
-}
-
 /* Print: an edge on every face, so the prisms stay countable whatever the
    fills come out as. */
 @media print {
