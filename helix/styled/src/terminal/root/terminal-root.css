@@ -98,7 +98,8 @@
 [part="region"] {
   background-color: var(--terminal-background-color);
   block-size: var(--terminal-block-size, 24rem);
-  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--terminal-border-color, var(--helix-color-border));
   border-radius: var(--terminal-radius, var(--helix-radii-md));
   box-sizing: border-box;
   display: grid;

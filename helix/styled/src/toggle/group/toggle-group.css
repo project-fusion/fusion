@@ -107,7 +107,8 @@
   --_indicator-surface: var(--helix-color-surface-overlay);
   background-color: var(--toggle-group-background-color, var(--helix-color-surface-sunken));
   box-shadow: var(--helix-shadow-surface);
-  border: var(--helix-border-surface) solid var(--toggle-group-border-color, var(--helix-color-border));
+  border: var(--helix-border-surface) solid
+    var(--toggle-group-border-color, var(--helix-color-border));
   border-radius: var(--toggle-group-radius, var(--helix-radii-sm));
 }
 

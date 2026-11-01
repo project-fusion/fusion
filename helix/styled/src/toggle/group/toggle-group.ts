@@ -47,9 +47,8 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
    * Separation rather than emphasis, because what `plain` drops is the
    * background *and* the border: the question is where the group ends, not how
    * much ink it claims. `outlined` because the frame is a border over the
-   * group's own ground, exactly as a Card's is; the track's sunken fill stays
-   * either way, being a groove for the thumb to sit in rather than a way of
-   * being seen.
+   * group's own ground, exactly as a Card's is; `plain` takes the track's fill
+   * and edge away with it.
    *
    * **The track itself is not on this axis, and `Tabs` reaches the same one
    * from the other side.** There it is `variant="segmented"`, opted into,

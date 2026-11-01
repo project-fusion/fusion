@@ -198,10 +198,7 @@
     --_icon-button-pressed-fill,
     var(
       --icon-button-background-color-hover,
-      var(
-        --icon-button-background-color,
-        var(--_icon-button-wash)
-      )
+      var(--icon-button-background-color, var(--_icon-button-wash))
     )
   );
   color: var(

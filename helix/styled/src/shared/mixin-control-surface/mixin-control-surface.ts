@@ -61,7 +61,7 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
     /**
      * Which color the control is drawn in, by what it means.
      *
-     * Three and an accent, not the full status set. A tag reports a state and a
+     * Every tone, the four statuses included. A tag reports a state and a
      * button performs an action: a success button and a warning button are not
      * things anybody writes, and offering them invites a page where the color
      * of a control means nothing in particular. `accent` is the second

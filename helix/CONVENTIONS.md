@@ -874,7 +874,8 @@ what `megamenu-root.css` derived from the inside before there was a registry to
 put the answer in: a panel can be glass *and* outlined.
 
 **The resting state is the absence of every axis**, per the reflected-property
-rule above: `outlined` on Button, `ghost` on IconButton, `neutral` everywhere.
+rule above: `outlined` on Button, `ghost` on IconButton, and on most families
+`neutral`, while Badge rests `primary` and Callout `info`, each recorded at its property.
 Written out, those values select nothing and land on the base rule.
 
 **Card is the one exception, decided by the owner on October 31, 2026.** An unset
@@ -924,7 +925,7 @@ to get wrong, and one question to ask per region rather than one per element.
   and is never written.
 - **Containers that are dense by nature declare it themselves**: app header,
   toolbar and announcement do, so a control put in one is already right.
-- **`size` is the axis for pictures and regions**, never for controls, and the
+- **`size` is the axis for pictures and regions**, never for one control, and the
   registry holds it so nobody has to remember who is in it. The test is the one
   above, whether two of these sitting together could legitimately differ in
   height, and a picture is not a control: an avatar at 24 in a list and 96 on a

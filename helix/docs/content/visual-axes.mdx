@@ -114,8 +114,9 @@ reached the same rule in their own declarations, so the rule is stated here.
 
 **A family that reports a status accepts only the status values.** `Callout` and
 `Toast` both state this. A callout reports a status and never a brand role, so
-it accepts four of the seven tones. There is no neutral status. Accepting a
-value the family cannot draw is worse than leaving the value out.
+it accepts five of the seven tones, the four statuses and `neutral`, which is a
+note that reports no status. Accepting a value the family cannot draw is worse
+than leaving the value out.
 
 **A family whose resting state has no tone does not need `neutral`.** `Text`
 gives this reason for having no `default` value. A value that matches no rule
@@ -159,9 +160,9 @@ and this section explains why.
 | Value | What it draws |
 |---|---|
 | `elevated` | A surface lifted off the page, with a shadow under it |
-| `filled` | A ground of its own, and no edge |
+| `filled` | A ground of its own, and no edge. What the ground is belongs to the family |
 | `outlined` | An edge over the ground it already has |
-| `plain` | Neither, so the box ends where its content does |
+| `plain` | No frame of its own. A family keeps what its content needs to stay readable, and its reference says what stays |
 
 **Most families leave out `elevated` because of what the value means.** A shadow
 shows that the box floats above the page. That is true of a card picked up off a
@@ -203,19 +204,20 @@ value changes meaning partway along.
 | Value | What it draws |
 |---|---|
 | `solid` | The tone as a full ground, with the ink flipped to read on it |
-| `subtle` | A wash of the tone and no edge, the quietest thing that still has a surface |
+| `subtle` | A wash of the tone and no edge, the quietest thing that still has a surface. A chart mark keeps its edge |
 | `outlined` | An edge in the tone |
 | `ghost` | Nothing at rest, the tone carried by the ink alone |
 | `muted` | Quieter ink, where there is no surface to quiet |
 
 **`outlined` is the value that changes meaning.** On a control, it adds an edge
-and removes the fill, which makes it quieter than `solid`. On a chart mark, the
+and at most a faint wash of the tone, which makes it quieter than `solid`. On a chart mark, the
 fill stays under the edge, because the area shows a value and removing the fill
 would hide that value. In both cases, `outlined` sets how much ink the element
 uses, based on what the element needs the ink for.
 
-**`muted` is for something whose only ink is its letterforms.** Only text takes
-it, because everything else has a surface to make quieter first. Leaving it off
+**`muted` is for something whose only ink is its letterforms.** Text takes it,
+because everything else has a surface to make quieter first. Spatial Bar Chart
+also takes it, to draw neutral bars with one lit in its tone. Leaving it off
 other families is intentional.
 
 ## What each material draws
@@ -229,7 +231,7 @@ smeared, and a filter behind an opaque ground cannot be seen. With no
 | Value | What it draws |
 |---|---|
 | `glass` | A translucent ground and the backdrop filter that makes it read |
-| `frosted` | The same pair turned up, a heavier ground under a heavier blur |
+| `frosted` | The same pair turned up, a heavier ground under a heavier blur. A Dialog or Drawer's `glass` is already as heavy in light, so there the two differ by blur alone |
 | `transparent` | Neither, so the page shows through structure and spacing |
 
 Use `frosted` for a surface that has to stay readable over a busy page. A theme
@@ -260,15 +262,17 @@ the width the splitter actually has.
 
 ## What each size draws
 
-`size` applies to pictures and regions, and never to controls. That rule sets
-the scope of the axis. One of the four values is a different kind of step.
+`size` applies to pictures and regions, and never to one control. Toolbar and
+Button Group take it because they are regions: it sets every control inside
+them at once, as `data-density` does for a block. That rule sets the scope of
+the axis. One of the four values is a different kind of step.
 
 | Value | What it draws |
 |---|---|
 | `sm` | The small step |
-| `md` | The middle step, and the resting state for a family that has one |
+| `md` | The middle step, and the resting state for most families. Toolbar rests at `sm`, being dense by nature |
 | `lg` | The large step |
-| `full` | The whole region, less the same inset every other step already leaves |
+| `full` | The whole width of the region, less the same inset every other step already leaves |
 
 **`full` is one more step on the `size` axis.** A takeover dialog is the same
 setting taken further, so it belongs on this axis. A separate `fullscreen`
@@ -291,7 +295,7 @@ The table at the top describes `tone` in words and names four of its values.
 | `danger` | Destructive, or already wrong |
 
 The first three are intents, and the last four are statuses. A family that
-accepts a subset is choosing between these two groups. The section on `neutral`
+accepts a subset usually chooses between these two groups. The section on `neutral`
 above says when to accept it.
 
 ## What each width value does
@@ -302,7 +306,7 @@ component, separate from `size`.
 
 | Value | What it draws |
 |---|---|
-| `auto` | As wide as its content. This is the resting behavior, written out |
+| `auto` | As wide as its content. This is the resting behavior on most families, written out. On Description List, which fills the row at rest, it is the departure |
 | `full` | All the inline space its parent gives it |
 
 **A `width` that takes a number is a different property with the same name.** A

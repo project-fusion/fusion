@@ -15,7 +15,8 @@
    document scrolls under it. */
 [part="region"] {
   background-color: var(--editor-background-color, var(--helix-color-background));
-  border: var(--helix-border-thin) solid var(--editor-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--editor-border-color, var(--helix-color-border));
   border-radius: var(--editor-radius, var(--helix-radii-md));
   box-sizing: border-box;
   display: flex;
