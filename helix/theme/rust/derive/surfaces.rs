@@ -136,7 +136,7 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
             Some(page) => kept_contrast(white_or_black, scaled, page.lightness),
         }
     };
-    let base = if dark { 0.182 } else { 0.985 };
+    let base = if dark { 0.154 } else { 0.985 };
     /* Where `surface` sits before the policy scales it, which the dark tint
     of the emphasis phase is measured from: on the page, by the same rule. */
     let surface_base_lightness = page.map_or(base, |page| {
@@ -150,7 +150,7 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
         `neutral-0`: a menu on a white page is white, which is what every desktop
         menu does. */
         raw_overlay: if dark {
-            step(0.21)
+            step(0.218)
         } else {
             Oklch {
                 chroma: 0.0,
@@ -158,8 +158,8 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
                 lightness: 1.0,
             }
         },
-        raw_raised: step(if dark { 0.21 } else { 0.97 }),
-        raw_sunken: step(if dark { 0.15 } else { 0.96 }),
+        raw_raised: step(if dark { 0.218 } else { 0.97 }),
+        raw_sunken: step(if dark { 0.122 } else { 0.96 }),
         /* Declared after the ladder, since `surface` is on it: it is the ground a
         card uses, so a fill-first theme has to move it too or the one surface the
         policy is most about is the one it does not reach. */

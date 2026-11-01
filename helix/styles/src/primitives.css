@@ -207,6 +207,13 @@
      chosen for and one that renders it on this machine. */
   --_helix-neutral-900: oklch(0.182 var(--_helix-neutral-cast));
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
+  /* The dark surface ladder, decided by the owner on October 31, 2026 from pictures
+     of four options: cards at `#0c0c0c`, so they read near black on a black page and
+     an input or a raised panel stands out on them, raised and overlay at `#1a1a1a`,
+     and sunken at `#060606`, under the card. */
+  --_helix-neutral-850: oklch(0.218 var(--_helix-neutral-cast));
+  --_helix-neutral-925: oklch(0.154 var(--_helix-neutral-cast));
+  --_helix-neutral-975: oklch(0.122 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
   /* Eight colors for eight things that are not each other.
