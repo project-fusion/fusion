@@ -70,6 +70,16 @@ describe('a notice', () => {
     expect(order.map(([key]) => key)).toEqual([dialog, popover, toast])
   })
 
+  test('a guide draws over a layer opened after it, and under a notice', () => {
+    const [menu, stop, toast] = [{}, {}, {}]
+    const order = drawnOrder([
+      [stop, { guide: true }],
+      [toast, { notice: true }],
+      [menu, {}],
+    ])
+    expect(order.map(([key]) => key)).toEqual([menu, stop, toast])
+  })
+
   test('opened before a modal dialog stays read and pressable over it, and leaves the dialog the close requests', async () => {
     const pressed = jest.fn()
     const dialogCloses = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
