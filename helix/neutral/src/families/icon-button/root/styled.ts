@@ -326,41 +326,26 @@ export default styles(
           ),
         },
       ),
-      /* A step past the hover fill, which way the tone's press goes. A phone
-         reads no relative color, and stays on the hover fill. */
-      web([
-        rule(
-          { active: true, emphasis: 'solid', formDisabled: false },
-          {
-            backgroundColor: first(
-              own.iconButtonPressedFill,
-              hook.backgroundColor,
-              own.iconButtonSolidPress,
-            ),
-            own: {
-              iconButtonSolidPress: fn('oklch', [
-                'from',
-                own.iconButtonFillHover,
-                sum('l', product('0.05', own.iconButtonPressWay('-1'))),
-                'c',
-                'h',
-              ]),
-            },
-          },
-        ),
-      ]),
-      native([
-        rule(
-          { active: true, emphasis: 'solid', formDisabled: false },
-          {
-            backgroundColor: first(
-              own.iconButtonPressedFill,
-              hook.backgroundColor,
+      /* A step past the hover fill, which way the tone's press goes. */
+      rule(
+        { active: true, emphasis: 'solid', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            own.iconButtonSolidPress,
+          ),
+          own: {
+            iconButtonSolidPress: fn('oklch', [
+              'from',
               own.iconButtonFillHover,
-            ),
+              sum('l', product('0.05', own.iconButtonPressWay('-1'))),
+              'c',
+              'h',
+            ]),
           },
-        ),
-      ]),
+        },
+      ),
       rule(
         { active: true, emphasis: 'outlined', formDisabled: false },
         {
