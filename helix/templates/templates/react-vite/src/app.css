@@ -45,6 +45,7 @@
  */
 .page {
   flex-grow: 1;
+  inline-size: 100%;
   margin-inline: auto;
   max-inline-size: 56rem;
   padding-block: var(--helix-space-2xl) var(--helix-space-3xl);
