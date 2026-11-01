@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/cortex-cli",
   "description": "The Cortex command line: record notes, distill them into facts, answer questions from the facts, and trace each answer to its sources.",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

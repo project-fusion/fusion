@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/cortex-cli-darwin-x64",
   "description": "The `cortex` binary for macOS on Intel. Installed by `@fusion.dev/cortex-cli`, which runs it.",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

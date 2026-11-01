@@ -17,7 +17,7 @@
     },
     "cortex/cli/npm": {
       "name": "@fusion.dev/cortex-cli",
-      "version": "0.1.2",
+      "version": "0.5.0",
       "bin": {
         "cortex": "./bin.mjs",
       },
@@ -31,27 +31,27 @@
     },
     "cortex/cli/platforms/darwin-arm64": {
       "name": "@fusion.dev/cortex-cli-darwin-arm64",
-      "version": "0.1.2",
+      "version": "0.5.0",
     },
     "cortex/cli/platforms/darwin-x64": {
       "name": "@fusion.dev/cortex-cli-darwin-x64",
-      "version": "0.1.2",
+      "version": "0.5.0",
     },
     "cortex/cli/platforms/linux-arm64": {
       "name": "@fusion.dev/cortex-cli-linux-arm64",
-      "version": "0.1.2",
+      "version": "0.5.0",
     },
     "cortex/cli/platforms/linux-x64": {
       "name": "@fusion.dev/cortex-cli-linux-x64",
-      "version": "0.1.2",
+      "version": "0.5.0",
     },
     "cortex/cli/platforms/win32-x64": {
       "name": "@fusion.dev/cortex-cli-win32-x64",
-      "version": "0.1.2",
+      "version": "0.5.0",
     },
     "cortex/docs": {
       "name": "@fusion.dev/cortex-docs",
-      "version": "0.1.2",
+      "version": "0.5.0",
       "devDependencies": {
         "@fusion.dev/scripts": "workspace:*",
       },

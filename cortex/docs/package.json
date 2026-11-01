@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/cortex-docs",
   "description": "Versioned documentation content and registry for Cortex.",
-  "version": "0.1.2",
+  "version": "0.5.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {
