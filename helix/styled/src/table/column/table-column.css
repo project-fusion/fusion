@@ -162,3 +162,8 @@
   inset: calc((var(--helix-size-target) - 100%) / -2);
   position: absolute;
 }
+
+/* The last heading ends on the rule with the values under it. */
+:host(:last-of-type) {
+  padding-inline: var(--_table-heading-padding-inline, var(--helix-space-none));
+}

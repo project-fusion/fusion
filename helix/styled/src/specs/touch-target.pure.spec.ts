@@ -50,12 +50,18 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['megamenu/root/megamenu-root.css', '[part="trigger"]::after'],
   ['table/column/table-column.css', '[part="sort"]::after'],
   ['notifications/notification/notification.css', '[part="dismiss"]::after'],
+  ['chat/composer/chat-composer.css', '[part="send"]::after'],
+  ['chat/message/chat-message.css', '[part="retry"]::after'],
+  ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
 ]
 
 /* Rows sit against each other, so the row itself is the target on a touch screen. */
 const ROWS = [
   'accordion/item/accordion-item.css',
   'checkbox/root/checkbox-root.css',
+  'drilldown/item/drilldown-item.css',
+  'log/root/log-root.css',
+  'outline/root/outline-root.css',
   'radio/root/radio-root.css',
   'shared/row/row.css',
   'switch/root/switch-root.css',

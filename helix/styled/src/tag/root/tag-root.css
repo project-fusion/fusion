@@ -2,6 +2,7 @@
    so a tag beside a control lines up predictably: 24px at md, 20px at sm,
    against a 40px control and a 32px dense one. */
 :host {
+  max-inline-size: 100%;
   --_tag-height: var(--helix-size-tag);
 
   /* Every tone is one status color, tinted for the fill and used at full

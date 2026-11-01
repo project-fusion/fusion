@@ -251,6 +251,14 @@
   }
 }
 
+/* Rows sit against each other, so a box reaching past a row would take the press
+   from the row beside it. On a touch screen the row itself reaches the target. */
+@media (pointer: coarse) {
+  ::slotted(a) {
+    min-block-size: var(--helix-size-target);
+  }
+}
+
 /* Print: a table of contents, which is what paper invented. */
 @media print {
   :host {

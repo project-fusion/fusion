@@ -208,6 +208,23 @@
   position: relative;
 }
 
+/* `translate` is physical, so on a right-to-left page the thumb travels the other
+   way. Measured October 31, 2026: 16 pixels outside its track. */
+:host(:state(checked):dir(rtl)) [part="thumb"] {
+  translate: calc(var(--_switch-height) - var(--_switch-width)) -50%;
+}
+
+/* A thumb off in light is white on a near-white groove, so it takes the mark ink at
+   its edge: thumb against track was 1.12:1. */
+:host(:not(:state(checked))) [part="thumb"] {
+  border-color: var(--helix-color-foreground-subtle);
+}
+
+/* A press firms the edge, and a press on the on state lifts the fill. */
+:host(:not(:disabled)) [part="field"]:active [part="track"] {
+  background-color: var(--helix-color-press);
+}
+
 /*
  *  Print: a control prints the value it holds, and the state has to survive.
  * A switch carries no mark, so the fill is the whole difference between on and

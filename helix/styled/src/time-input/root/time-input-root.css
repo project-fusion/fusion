@@ -34,7 +34,8 @@ slot[name="end"]::slotted(*) {
 }
 
 :host(:disabled) [part="field"] {
-  color: var(--helix-color-foreground-subtle);
+  cursor: not-allowed;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* The trigger is a mark inside the field rather than a button beside it: a

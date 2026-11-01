@@ -2,6 +2,8 @@
    out as a paragraph without a second property saying so. */
 :host {
   display: inline;
+  /* A long unbroken word breaks inside the column it was given. */
+  overflow-wrap: anywhere;
 
   /* Each value of the ramp reads its hook first. Unset, a declaration whose
      only value is an unset property inherits, which is what these inherited

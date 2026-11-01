@@ -747,6 +747,39 @@
   translate: 50% 50%;
 }
 
+/* Forced colors drop a background image, which is the whole track, and paint the
+   thumb Canvas: measured October 31, 2026, the slider drew nothing at all. The
+   platform's own range control is what survives. */
+@media (forced-colors: active) {
+  [part="control"]::-webkit-slider-runnable-track {
+    background: Canvas;
+    border: var(--helix-border-thin) solid CanvasText;
+    forced-color-adjust: none;
+  }
+
+  [part="control"]::-moz-range-track {
+    background: Canvas;
+    border: var(--helix-border-thin) solid CanvasText;
+    forced-color-adjust: none;
+  }
+
+  [part="control"]::-webkit-slider-thumb {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  [part="control"]::-moz-range-thumb {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  [part="thumb"] {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}
+
 /* Print: a control prints the value it holds, and here the value is the fill, so
  * a track printed without it is a document saying nothing was set.
  *

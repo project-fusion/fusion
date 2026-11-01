@@ -173,6 +173,7 @@ describe('navigation', () => {
     test('in a browser, the hover rule reads its two hooks', () => {
       const hover = [...document.styleSheets]
         .flatMap((one) => [...one.cssRules])
+        .flatMap((one) => (one instanceof CSSMediaRule ? [...one.cssRules] : [one]))
         .find(
           (one): one is CSSStyleRule =>
             one instanceof CSSStyleRule &&

@@ -38,6 +38,9 @@ slot[name="label"]::slotted(*) {
 /* The inherited half on the slot, the rest on what was slotted. The same
    part is the figure `value` writes, which takes all of it. */
 [part="value"] {
+  /* Figures take one width each, and a long value breaks inside its column. */
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
   color: var(--stat-value-color, var(--helix-color-foreground));
   font-family: var(--helix-font-display);
   font-size: var(--stat-value-size, calc(var(--helix-text-3xl) / var(--helix-text-md) * 1em));
