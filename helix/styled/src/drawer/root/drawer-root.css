@@ -163,7 +163,8 @@
   inset-block-end: 0;
   inset-inline: 0;
   padding-block-end: calc(
-    var(--drawer-padding, var(--helix-space-lg)) + env(safe-area-inset-bottom, 0px)
+    var(--drawer-padding, var(--helix-space-lg)) +
+    env(safe-area-inset-bottom, 0px)
   );
   --_drawer-away: translateY(100%);
 }
