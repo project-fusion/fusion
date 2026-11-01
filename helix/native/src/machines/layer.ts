@@ -105,6 +105,9 @@ export interface LayerAround {
   readonly stated?: (name: string) => unknown
 }
 
+/** Whether a family's layer is a tour's stop, which stands over what its tour opens, as the web's shows after it. */
+const guidesTour = (family: Family): boolean => family.api?.stop !== undefined
+
 /**
  * Hosts a layer: the states it gives the host, `open` and the side it
  * landed on, and what its drawing reads.
@@ -119,8 +122,7 @@ export const useLayer = (
     readLayer(family, props, use, stated)
   /* A look alone, as a tour's spotlight: no touch, no key, no focus. */
   const decorative = node?.attributes?.decorative === true
-  /* A tour's stop stands over what its tour opens, as the web's shows after it. */
-  const guide = family.api?.stop !== undefined
+  const guide = guidesTour(family)
   const open = openOf(toggled?.checked, shown, read.open)
   const targeted = useTargetView(read.target)
   const host = useLayerHost()
@@ -244,7 +246,7 @@ export const useLayer = (
       decorative,
       ...(swiped.edge === undefined ? {} : { edge: swiped.edge }),
       floating: placed.floating,
-      ...(guide ? { guide } : {}),
+      guide,
       key,
       measured: placed.measured,
       modal: holdsReader,
