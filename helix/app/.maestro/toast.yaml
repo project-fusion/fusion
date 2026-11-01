@@ -32,16 +32,22 @@ tags:
     timeout: 5000
 - assertVisible: Could not reach the server.
 - takeScreenshot: toast-preview-dismissed
-# Maestro drags from the words' middle to 90% of the screen, under half the
-# message's width, so this is a fling: core's `settleSwipe` springs a slower
-# drag that short back, on the web as well.
-- swipe:
-    from: Could not reach the server.
-    direction: RIGHT
-    duration: 150
-- extendedWaitUntil:
-    notVisible: Could not reach the server.
-    timeout: 5000
+# This drag passes half the message's width, which `settleSwipe` takes out at
+# any speed. A drag from the words' middle to 90% of the screen stops short of
+# half and goes only as a fling, and on the Android emulator in run 41356179392
+# the message followed that drag and sprang back. The points stand in the
+# message's first line on both platforms. The retry covers a drag whose moves
+# reach a busy emulator as one, which moves nothing.
+- retry:
+    maxRetries: 1
+    commands:
+      - swipe:
+          start: 20%, 87%
+          end: 95%, 87%
+          duration: 600
+      - extendedWaitUntil:
+          notVisible: Could not reach the server.
+          timeout: 5000
 - openLink: helix://toast/queue/preview
 - extendedWaitUntil:
     visible: Project saved.
@@ -80,9 +86,22 @@ tags:
 - tapOn:
     point: 50%, 40%
     retryTapIfNoChange: false
-- tapOn:
-    text: Archive
-    index: 0
+# iOS reads the row as one label, "Quarterly report.pdf, Archive", so its button
+# is a point on that row. Android reads the button by its own words.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          text: Quarterly report.pdf.*
+          point: 83%, 50%
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          text: Archive
+          index: 0
 - extendedWaitUntil:
     visible: Archived Quarterly report.pdf
     timeout: 5000
