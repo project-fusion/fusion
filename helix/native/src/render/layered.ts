@@ -66,6 +66,8 @@ export interface Layered {
   readonly measured: Readonly<Record<string, number>>
   /** Whether it holds the reader now: a modal layer that stands open. */
   readonly modal: boolean
+  /** Whether it stands in the page's stacking, under a decorative layer, as a drawer that is no modal does. */
+  readonly inPage?: boolean
   /** Whether it is a guide, drawn above every layer but a notice, as a tour's stop is. */
   readonly guide?: boolean
   /**
