@@ -1,4 +1,4 @@
-import { fn, quotient, token } from '../style.js'
+import { fn, quotient, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -45,13 +45,15 @@ export default fragment(
         borderRadius: token('radii-sm'),
         paddingInline: quotient(token('space-2xs'), 2),
       }),
-      rule(
-        { focus: true },
-        {
+    ]),
+    /* Written out: the vocabulary's focus is the host's, and this is the segment's own. */
+    on({ part: 'segment', selector: '[part~="segment"]:focus' }, [
+      web([
+        rule({
           backgroundColor: own.segmentFocusBackgroundColor(token('color-primary-surface')),
           color: own.segmentFocusColor(token('color-foreground-on-primary')),
-        },
-      ),
+        }),
+      ]),
     ]),
     on('segment-placeholder', [
       rule({

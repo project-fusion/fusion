@@ -298,7 +298,13 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What an option computes for its parts. */
   readonly option: Computes<
-    'checkShown' | 'described' | 'dragging' | 'dropAfter' | 'dropBefore' | 'dropShown' | 'highlighted'
+    | 'checkShown'
+    | 'described'
+    | 'dragging'
+    | 'dropAfter'
+    | 'dropBefore'
+    | 'dropShown'
+    | 'highlighted'
   >
   /** What a group of options computes for its parts. */
   readonly optionGroup: Computes<'emptied' | 'later'>

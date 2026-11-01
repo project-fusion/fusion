@@ -9,13 +9,11 @@ import { itemsIn, pressOf, type Run } from './views'
  */
 
 /** What each option showing says. */
-export const listboxLeft = (run: Run): Pick<Left, 'focused' | 'options'> => {
+export const listboxLeft = (run: Run): Pick<Left, 'options'> => {
   if (formOf(run.scenario.setup.tag).api?.listbox === undefined) {
     return {}
   }
-  /* The web keeps focus on the list, and a phone's option holds it for the keys. */
   return {
-    focused: null,
     options: itemsIn(run).flatMap((item) => {
       if (screen.queryByText(item.words) === null) {
         return []

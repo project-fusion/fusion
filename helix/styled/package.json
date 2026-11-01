@@ -338,6 +338,14 @@
       "types": "./dist/list/index.d.ts",
       "default": "./dist/list/index.js"
     },
+    "./listbox": {
+      "react-native": {
+        "types": "./dist/listbox/index.native.d.ts",
+        "default": "./dist/listbox/index.native.js"
+      },
+      "types": "./dist/listbox/index.d.ts",
+      "default": "./dist/listbox/index.js"
+    },
     "./loader": {
       "react-native": {
         "types": "./dist/loader/index.native.d.ts",
@@ -417,6 +425,14 @@
       },
       "types": "./dist/object-inspector/index.d.ts",
       "default": "./dist/object-inspector/index.js"
+    },
+    "./option": {
+      "react-native": {
+        "types": "./dist/option/index.native.d.ts",
+        "default": "./dist/option/index.native.js"
+      },
+      "types": "./dist/option/index.d.ts",
+      "default": "./dist/option/index.js"
     },
     "./outline": {
       "react-native": {
@@ -644,22 +660,6 @@
       },
       "types": "./dist/tooltip/index.d.ts",
       "default": "./dist/tooltip/index.js"
-    },
-    "./listbox": {
-      "react-native": {
-        "types": "./dist/listbox/index.native.d.ts",
-        "default": "./dist/listbox/index.native.js"
-      },
-      "types": "./dist/listbox/index.d.ts",
-      "default": "./dist/listbox/index.js"
-    },
-    "./option": {
-      "react-native": {
-        "types": "./dist/option/index.native.d.ts",
-        "default": "./dist/option/index.native.js"
-      },
-      "types": "./dist/option/index.d.ts",
-      "default": "./dist/option/index.js"
     },
     "./tour": {
       "react-native": {

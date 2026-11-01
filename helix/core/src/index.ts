@@ -555,6 +555,7 @@ export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { labelsOf } from './utils/labels-of/labels-of.js'
 export { placedStates } from './utils/layers/layers.js'
 export { type Curve, columnPoints, linePath, type Point } from './utils/line-path/line-path.js'
+export { highlightStep } from './utils/listbox/highlight-step.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
@@ -607,7 +608,6 @@ export {
   qrModules,
   qrPath,
 } from './utils/qr-code/qr-code.js'
-export { highlightStep } from './utils/listbox/highlight-step.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
 export { type RangeExtension, rangeExtend } from './utils/range-extend/range-extend.js'
 export {

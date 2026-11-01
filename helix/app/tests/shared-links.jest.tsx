@@ -47,10 +47,10 @@ describe('an a in shared code', () => {
 
   test('under data-card opens its link as it is pressed', async () => {
     const card = jsx('helix-card', { children: 'Words' })
-    await drawn(jsx('a', { children: card, 'data-card': '', href: 'https://fusion.dev/card' }))
+    await drawn(jsx('a', { children: card, 'data-card': '', href: 'https://example.com/card' }))
     hearing()
     await fireEvent.press(screen.getByRole('link'))
-    expect(opened).toEqual(['https://fusion.dev/card'])
+    expect(opened).toEqual(['https://example.com/card'])
   })
 
   test('that prevents the default stays where it is', async () => {
