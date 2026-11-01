@@ -77,7 +77,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
   ['slider/root/slider-root.generated.css', '[part="marker-label"]', 'color'],
-  ['steps/root/steps-root.generated.css', ':host([variant="numeric"])', '--_steps-marker-color'],
+  ['steps/root/steps-root.generated.css', ':host([marker="numeric"])', '--_steps-marker-color'],
   ['steps/step/step.generated.css', '[part="description"]', 'color'],
   ['tabs/root/tabs-root.generated.css', '[part="scroll-start"]', 'color'],
   ['tabs/tab/tab.generated.css', '[part="tab"]', 'color'],
