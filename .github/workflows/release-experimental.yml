@@ -25,6 +25,32 @@ env:
   NODE_VERSION: "22.20.0"
 
 jobs:
+  # TEMPORARY, dropped before merge: proves npm dist-tag under trusted publishing,
+  # spending no release number. The first package is the one with the permission
+  # turned on, and the second is the control.
+  oidc-probe:
+    if: github.head_ref == 'fix/release-oidc-promote'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: experimental
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install -g npm@11.21.1 && npm --version
+      - name: Move a throwaway tag with no credential
+        run: |
+          [ -z "${NPM_TOKEN:-}" ] && echo "no NPM_TOKEN"
+          for package in @fusion.dev/cortex-cli-win32-x64 @fusion.dev/helix-cli-win32-x64; do
+            echo "=== $package"
+            version=$(npm view "$package" version)
+            npm dist-tag add "$package@$version" promote-check --loglevel verbose 2>&1 | grep -E "oidc|npm error|^\+" || true
+            npm dist-tag ls "$package" 2>&1 | head -8 || true
+            npm dist-tag rm "$package" promote-check 2>&1 | grep -E "npm error|^-" || true
+          done
+
   # The version each domain would publish at, worked out once for the binaries,
   # which report it and are built before `publish` stamps the same numbers from
   # the same tags. `publish.mjs` checks the two agree.
