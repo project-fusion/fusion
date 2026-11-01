@@ -51,19 +51,22 @@ slot[name="end"]::slotted(*) {
 [part="trigger"] {
   all: unset;
   position: relative;
-  block-size: var(--helix-size-icon);
+  /* The press reaches the target. A mask clips a pseudo-element, so the box is the
+     target and the stencil stays the icon's size inside it. */
+  block-size: var(--helix-size-target);
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   flex: none;
-  inline-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-target);
+  margin: calc((var(--helix-size-icon) - var(--helix-size-target)) / 2);
   /* Drawn rather than slotted, the same stencil the checkbox uses, so a date
      field costs no icon dependency and no second element to fill. Slotting into
      `trigger` replaces it. */
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E");
   mask-position: center;
   mask-repeat: no-repeat;
-  mask-size: 100%;
+  mask-size: var(--helix-size-icon);
   background-color: currentColor;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -200,18 +203,6 @@ slot[name="end"]::slotted(*) {
     --date-input-segment-placeholder-color,
     var(--helix-color-foreground-muted)
   );
-}
-
-/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
-   moves. Where the control is already that size the box sits inside it. */
-[part="trigger"] {
-  position: relative;
-}
-
-[part="trigger"]::after {
-  content: "";
-  inset: calc((var(--helix-size-target) - 100%) / -2);
-  position: absolute;
 }
 
 /* Print: a control prints the value it holds, and a state carried by a fill has

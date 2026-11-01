@@ -164,6 +164,8 @@
     max-inline-size: 100vw;
     /* Room above, so the page is still visibly there behind it. */
     max-block-size: calc(100dvh - var(--helix-space-3xl));
+    /* Clear of the home indicator in an app with no browser bar under it. */
+    padding-block-end: env(safe-area-inset-bottom, 0px);
     /* Square where it meets the window, curved where it meets the page, the same
        pair Drawer draws for the same reason. */
     border-start-start-radius: var(--helix-radii-sm);
