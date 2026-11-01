@@ -3,8 +3,8 @@ import { fragment } from '../table.js'
 
 /**
  * What a collection says when its rows did not load: the same line as
- * `collection-state`, in the danger ink, since it is news you act on. A family
- * writes its own color hook and inset over this.
+ * `collection-state`, except that each family writes its own color hook in the
+ * danger ink, since it is news you act on, and its own inset.
  */
 export default fragment(
   'collection-error',
@@ -15,7 +15,6 @@ export default fragment(
   ({ on, own, rule }) => [
     on('error', [
       rule({
-        color: token('color-danger'),
         fontFamily: token('font-sans'),
         fontSize: token('text-sm'),
         margin: token('space-none'),

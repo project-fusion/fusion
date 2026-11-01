@@ -65,7 +65,7 @@ const ROWS = [
   'object-inspector/root/object-inspector-root.css',
   'outline/root/outline-root.css',
   'radio/root/radio-root.css',
-  'shared/row/row.css',
+  'option/root/option-root.generated.css',
   'switch/root/switch-root.css',
   'tree/item/tree-item.css',
 ]

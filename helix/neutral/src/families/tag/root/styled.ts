@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { inherit, mix, product, token, web } from '../../../style.js'
+import { difference, inherit, mix, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
