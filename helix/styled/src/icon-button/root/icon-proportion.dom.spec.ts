@@ -13,14 +13,22 @@ beforeAll(async () => {
     import('../../code-block/index.js'),
     import('../../combobox/index.js'),
     import('../../copy-button/index.js'),
+    import('../../data-table/index.js'),
+    import('../../date-input/index.js'),
     import('../../date-picker/index.js'),
     import('../../filter-input/index.js'),
     import('../../icon/index.js'),
     import('../../input/index.js'),
+    import('../../list/index.js'),
+    import('../../map/index.js'),
     import('../../menu/index.js'),
     import('../../pagination/index.js'),
     import('../../select/index.js'),
+    import('../../speed-dial/index.js'),
+    import('../../table/index.js'),
     import('../../tag/index.js'),
+    import('../../time-input/index.js'),
+    import('../../toggle/index.js'),
   ])
 })
 
@@ -58,13 +66,24 @@ const buttonOf = (mark: Element): Element | null => {
    the small type such a button stands beside. Nothing fills more than three
    quarters of its button at any size: 12 in 16 is the smallest pair that reads
    as a mark in a well. Half a pixel for a size written in `em`. */
-const proportioned = (markup: string, name: string): void => {
+const proportioned = (
+  markup: string,
+  name: string,
+  setup?: (host: HTMLElement & Record<string, unknown>) => void,
+): void => {
   test(name, async () => {
     const host = await mount(markup)
+    setup?.(host as HTMLElement & Record<string, unknown>)
+    await (host as HTMLElement & { updateComplete?: Promise<unknown> }).updateComplete
     await new Promise((resolve) => requestAnimationFrame(resolve))
     const drawn = marks(host)
     expect(drawn.length).toBeGreaterThan(0)
     for (const mark of drawn) {
+      /* Map's compass needle stands at 20 in its 32 button on purpose: a compass is
+         read at a glance, and its needle is the control's whole face. */
+      if (mark.getAttribute('part') === 'needle') {
+        continue
+      }
       const button = buttonOf(mark)
       if (!button) {
         continue
@@ -102,6 +121,51 @@ if (hasLayout()) {
     proportioned('<helix-pagination default-page="4" pages="12"></helix-pagination>', 'Pagination')
     proportioned('<helix-carousel><div>One</div><div>Two</div></helix-carousel>', 'Carousel')
     proportioned('<helix-date-picker></helix-date-picker>', 'Date Picker')
+    proportioned('<helix-date-input label="Due"></helix-date-input>', 'Date Input')
+    proportioned('<helix-time-input label="Start"></helix-time-input>', 'Time Input')
+    proportioned('<helix-map label="City"></helix-map>', 'Map')
+    proportioned(
+      '<helix-toggle-group default-value="a"><helix-toggle value="a"><helix-icon name="sun" slot="start"></helix-icon>Light</helix-toggle></helix-toggle-group>',
+      'Toggle',
+    )
+    proportioned(
+      '<helix-list label="Steps" reorderable><helix-list-item value="a">One</helix-list-item></helix-list>',
+      'List grip',
+    )
+    proportioned(
+      `<helix-table label="Queue" reorderable>
+        <helix-table-column>Document</helix-table-column>
+        <helix-table-row value="a"><helix-table-cell>One</helix-table-cell></helix-table-row>
+      </helix-table>`,
+      'Table row grip',
+    )
+    proportioned(
+      `<helix-data-table label="Queue" reorderable-rows row-key="id">
+        <helix-table-column field="name">Document</helix-table-column>
+      </helix-data-table>`,
+      'Data Table row grip',
+      (host) => {
+        host.rows = [{ id: 'a', name: 'One' }]
+      },
+    )
+    proportioned(
+      `<helix-data-table label="Queue" reorderable row-key="id">
+        <helix-table-column field="name">Document</helix-table-column>
+      </helix-data-table>`,
+      'Table column grip',
+      (host) => {
+        host.rows = [{ id: 'a', name: 'One' }]
+      },
+    )
+    proportioned(
+      `<helix-speed-dial label="Actions">
+        <helix-speed-dial-item value="a"><helix-icon name="plus"></helix-icon></helix-speed-dial-item>
+      </helix-speed-dial>`,
+      'Speed Dial item',
+      (host) => {
+        host.open = true
+      },
+    )
     proportioned(
       `<helix-breadcrumbs aria-label="Trail">
         <helix-breadcrumb href="#a"><helix-icon name="house" slot="start"></helix-icon>Home</helix-breadcrumb>

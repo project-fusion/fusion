@@ -38,7 +38,8 @@
 /* Round, raised and the size of a small control: the same shape as the button
    that opened it, one step down, which is what says these belong to it. */
 [part="icon"] {
-  --icon-size: var(--helix-size-icon);
+  /* The small icon, for a well 32 tall: the default 20 outweighed the label. */
+  --icon-size: var(--helix-size-icon-sm);
 
   align-items: center;
   aspect-ratio: 1;
