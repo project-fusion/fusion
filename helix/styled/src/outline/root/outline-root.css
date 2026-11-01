@@ -98,7 +98,7 @@
 ::slotted(a):hover {
   background-color: var(
     --outline-link-hover-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--outline-link-hover-color, var(--helix-color-foreground));
   text-decoration: none;

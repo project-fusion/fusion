@@ -90,7 +90,7 @@
      step. */
   background-color: var(
     --breadcrumbs-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
 }
 
@@ -157,7 +157,7 @@
 a[part="link"]:hover {
   background-color: var(
     --breadcrumbs-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
@@ -218,7 +218,7 @@ a[part="link"]:focus-visible {
   --helix-size-focus-offset: calc(var(--helix-size-focus-ring) * -1);
   --icon-button-background-color-hover: var(
     --breadcrumbs-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   --icon-button-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
   --icon-size: 1.15em;
@@ -314,7 +314,7 @@ a[part="link"]:focus-visible {
 [part="expand"]:hover {
   background-color: var(
     --breadcrumbs-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }

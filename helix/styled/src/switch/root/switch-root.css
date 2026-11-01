@@ -49,7 +49,9 @@
 [part="track"] {
   background-color: var(--helix-color-surface-sunken);
   block-size: var(--_switch-height);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  /* The edge in the mark ink, as a Checkbox's: an off Switch is a white thumb on
+     a near-white groove, and it is still a control you can press. */
+  border: var(--helix-border-thin) solid var(--helix-color-foreground-subtle);
   border-radius: var(--helix-radii-full);
   display: grid;
   flex: 0 0 auto;
@@ -173,9 +175,14 @@
 
 /* `:has()` rather than the adjacent combinator the element took: the thumb is
    no longer a sibling of anything, and the input is the groove's only child. */
-[part="track"]:has([part="control"]:focus-visible) [part="thumb"] {
+[part="track"]:has([part="control"]:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The edge firms up under the pointer, as a Checkbox's and a Radio's do. */
+:host(:not(:disabled)) [part="field"]:hover [part="track"] {
+  border-color: var(--helix-color-foreground);
 }
 
 :host(:state(invalid)) [part="track"] {

@@ -239,6 +239,7 @@
   --_helix-brand-500: var(--_helix-seed-brand);
   --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
   --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
+  --_helix-brand-800: oklch(from var(--_helix-brand-700) calc(l - 0.05) c h);
   /* **`0.13`, and it was once the difference between passing and not.** This rung
      is `--helix-color-primary` in dark, and against the 0.29 that
      `surface-raised` and `surface-overlay` then held, `+ 0.12` measured 4.431:1
@@ -301,6 +302,13 @@
   --_helix-ink-200: var(--_helix-neutral-0);
   --_helix-ink-50: oklch(0.95 var(--_helix-neutral-cast));
   --_helix-ink-900: oklch(0.28 var(--_helix-neutral-cast));
+  /* A solid fill with no brand under the pointer, moved toward the page so it can
+     move at all: near black has nothing darker. At least 1.3:1 from rest in both
+     modes, against 1.09 and 1.17 before October 31, 2026. */
+  --_helix-ink-surface-hover: oklch(from var(--_helix-ink-500) calc(l + 0.09) c h);
+  --_helix-ink-surface-hover-dark: oklch(from var(--_helix-ink-400) calc(l - 0.09) c h);
+  --_helix-ink-surface-active: oklch(from var(--_helix-ink-500) calc(l + 0.16) c h);
+  --_helix-ink-surface-active-dark: oklch(from var(--_helix-ink-400) calc(l - 0.17) c h);
 
   /* ------------------------------------------------------- accent ------ */
   /* The same six steps the brand takes, from the accent seed, so `accent`

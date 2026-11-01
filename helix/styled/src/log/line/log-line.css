@@ -61,7 +61,7 @@
 }
 
 [part~="line"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  background-color: var(--helix-color-hover);
 }
 
 /* The numbers are one column, right-aligned to the widest the log holds, and

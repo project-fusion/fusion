@@ -104,7 +104,7 @@ slot[name="end"]::slotted(*) {
 }
 
 [part~="voice"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
 }
 
 /* Nothing to drag when the box is following the content itself. */

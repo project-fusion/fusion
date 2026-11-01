@@ -788,6 +788,10 @@ helix-toggle-group helix-toggle::part(item):hover {
   background-color: transparent;
 }
 
+helix-toggle:not([disabled])::part(item):active {
+  background-color: var(--helix-color-press);
+}
+
 /* The traveling thumb is behind this item, so the label goes to full strength.
    Measured, the same text came out 94.2px selected against 92.34 unselected, so
    choosing a file nudged the row it was in. */

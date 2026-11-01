@@ -261,7 +261,7 @@
    fill *is* `surface-sunken` on an untoned announcement: a well taken from the
    ladder is the identical color to what it sits on, which is no well at all. */
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
 }
 

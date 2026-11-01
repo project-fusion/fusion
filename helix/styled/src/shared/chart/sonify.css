@@ -25,7 +25,7 @@
 }
 
 [part="sonify"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
 }
 

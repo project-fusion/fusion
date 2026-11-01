@@ -126,3 +126,7 @@ slot[name="indicator"]::slotted(*) {
     forced-color-adjust: none;
   }
 }
+
+:host(:not([disabled])) [part~="item"]:active {
+  background-color: var(--helix-color-press);
+}

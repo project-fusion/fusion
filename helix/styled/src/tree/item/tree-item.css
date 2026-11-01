@@ -417,3 +417,11 @@ slot[name="chevron"]::slotted(*) {
     animation: none;
   }
 }
+
+[part="row"]:active {
+  background-color: var(--helix-color-press);
+}
+
+:host([disabled]) [part="row"]:active {
+  background-color: transparent;
+}

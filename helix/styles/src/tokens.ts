@@ -138,6 +138,20 @@ export const TOKENS: Token[] = [
     'color-hover',
     'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
   ],
+  /* What a control is lit with under a press, a step past `color-hover`. A press
+     has to read on a phone, where no hover comes first. */
+  [
+    'color-press',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 16%, transparent), color-mix(in oklab, var(--helix-color-foreground) 20%, transparent) )',
+    'A wash under a control being pressed, a step past the hover wash.',
+  ],
+  /* A chosen thing that stays chosen and is not a fill of its own: a range of
+     days, a pressed toggle in a find bar. */
+  [
+    'color-selected',
+    'color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)',
+    'A wash under something chosen that keeps its ground, such as a range of days.',
+  ],
   /* Two whole colors, not one color with a `light-dark()` strength.
      `light-dark()` resolves to a `<color>` and is not valid in a percentage
      slot, so `color-mix(in oklab, neutral-950 light-dark(40%, 64%),
@@ -284,7 +298,19 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-primary-surface-hover',
-    'light-dark(var(--_helix-brand-700, var(--_helix-ink-600)), var(--_helix-brand-700, var(--_helix-ink-450)))',
+    'light-dark(var(--_helix-brand-700, var(--_helix-ink-surface-hover)), var(--_helix-brand-700, var(--_helix-ink-surface-hover-dark)))',
+  ],
+  [
+    'color-primary-surface-active',
+    'light-dark(var(--_helix-brand-800, var(--_helix-ink-surface-active)), var(--_helix-brand-800, var(--_helix-ink-surface-active-dark)))',
+  ],
+  /* The edge of a field under the pointer. A brand's own color, and with no brand
+     a gray at 3:1 on the page, where the primary is near black and the edge went
+     from 1.23:1 to 17.76:1, measured October 31, 2026. Focus keeps `primary`. */
+  [
+    'color-border-hover',
+    'light-dark(var(--_helix-brand-500, var(--_helix-neutral-450)), var(--_helix-brand-400, var(--_helix-neutral-550)))',
+    'The edge of a field under the pointer.',
   ],
   /* **The ring is the border's color, said as an alias so the two cannot drift
      again.** Both were a bare `--_helix-brand-500`, and the note above records

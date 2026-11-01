@@ -54,7 +54,7 @@
 [part="trigger"][aria-expanded="true"] {
   background-color: var(
     --megamenu-trigger-open-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--megamenu-trigger-open-color, var(--helix-color-foreground));
 }

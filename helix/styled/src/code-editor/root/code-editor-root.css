@@ -97,11 +97,7 @@
 /* Find says it is on with a wash of the ink while its bar is open, as
    Terminal's does. The bar's options say it in the bar. */
 :host(:state(find-open)) [part="find-toggle"] {
-  --icon-button-background-color: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 12%,
-    transparent
-  );
+  --icon-button-background-color: var(--helix-color-selected);
   --icon-button-foreground-color: var(--helix-color-foreground);
 }
 
@@ -195,7 +191,7 @@
 }
 
 [part~="diagnostic"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+  background-color: var(--helix-color-hover);
 }
 
 [part~="diagnostic"]:focus-visible {

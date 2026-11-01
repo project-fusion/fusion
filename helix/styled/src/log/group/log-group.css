@@ -33,7 +33,7 @@
 }
 
 [part="summary"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
 }
 

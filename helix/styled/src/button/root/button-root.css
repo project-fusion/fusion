@@ -24,16 +24,22 @@
   --_button-turn: 0.8s;
   /* Softened toward the page rather than deepened, because neutral's tone is
      already the darkest ink there is and there is nothing past it to go to. */
-  --_button-tone-hover: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 86%,
-    var(--helix-color-background)
+  /* Two whole colors, since `light-dark()` is not valid in a percentage. Each
+     moves at least 1.3:1 from rest, from a fill with nothing past it. */
+  --_button-tone-hover: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 72%, var(--helix-color-background)),
+    color-mix(in oklab, var(--helix-color-foreground) 90%, var(--helix-color-background))
+  );
+  --_button-fill-press: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-background)),
+    color-mix(in oklab, var(--helix-color-foreground) 80%, var(--helix-color-background))
   );
 }
 :host([tone="primary"]) {
   --_button-edge: var(--helix-color-primary);
   --_button-fill: var(--helix-color-primary-surface);
   --_button-fill-hover: var(--helix-color-primary-surface-hover);
+  --_button-fill-press: var(--helix-color-primary-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-primary);
   --_button-tone: var(--helix-color-primary);
   --_button-tone-hover: var(--helix-color-primary-hover);
@@ -46,6 +52,7 @@
   --_button-edge: var(--helix-color-accent);
   --_button-fill: var(--helix-color-accent-surface);
   --_button-fill-hover: var(--helix-color-accent-surface-hover);
+  --_button-fill-press: oklch(from var(--helix-color-accent-surface-hover) calc(l - 0.05) c h);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-accent);
   --_button-tone-hover: var(--helix-color-accent-hover);
@@ -54,6 +61,7 @@
   --_button-edge: var(--helix-color-danger);
   --_button-fill: var(--helix-color-danger-surface);
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
+  --_button-fill-press: oklch(from var(--helix-color-danger-surface-hover) calc(l - 0.05) c h);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-danger);
   /* Mixed toward the ink, for the ink states rather than the fill. */
@@ -69,6 +77,7 @@
   --_button-edge: var(--helix-color-info);
   --_button-fill: var(--helix-color-info-surface);
   --_button-fill-hover: var(--helix-color-info-surface-hover);
+  --_button-fill-press: oklch(from var(--helix-color-info-surface-hover) calc(l - 0.05) c h);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-info);
   --_button-tone-hover: color-mix(
@@ -81,6 +90,7 @@
   --_button-edge: var(--helix-color-success);
   --_button-fill: var(--helix-color-success-surface);
   --_button-fill-hover: var(--helix-color-success-surface-hover);
+  --_button-fill-press: oklch(from var(--helix-color-success-surface-hover) calc(l - 0.05) c h);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-success);
   --_button-tone-hover: color-mix(
@@ -93,6 +103,7 @@
   --_button-edge: var(--helix-color-warning);
   --_button-fill: var(--helix-color-warning-surface);
   --_button-fill-hover: var(--helix-color-warning-surface-hover);
+  --_button-fill-press: oklch(from var(--helix-color-warning-surface-hover) calc(l - 0.05) c h);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-warning);
   --_button-tone-hover: color-mix(
@@ -256,6 +267,33 @@
   );
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-ink));
+}
+
+/* A press, one step past each hover. After the hovers and at their specificity,
+   since a press happens under the pointer. */
+:host(:not(:disabled)) [part="button"]:active {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 16%, transparent)
+  );
+}
+
+:host(:not(:disabled)[emphasis="solid"]) [part="button"]:active {
+  background-color: var(--button-background-color, var(--_button-fill-press));
+}
+
+:host(:not(:disabled)[emphasis="subtle"]) [part="button"]:active {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 30%, transparent)
+  );
+}
+
+:host(:not(:disabled)[emphasis="ghost"]) [part="button"]:active {
+  background-color: var(
+    --button-background-color,
+    color-mix(in oklab, var(--_button-tone) 16%, transparent)
+  );
 }
 
 /* Block-level, not the resting `inline-flex`. */
