@@ -38,7 +38,10 @@ describe('callout', () => {
        a rule for it would be the resting state written twice. */
     expect(rule(':host')).toContain('--_callout-tone: var(--helix-color-info)')
     expect(sheet()).not.toContain(':host([tone="info"])')
-    for (const tone of ['success', 'warning', 'danger']) {
+    expect(rule(':host([tone="warning"])')).toContain(
+      '--_callout-tone: var(--helix-color-warning-mark)',
+    )
+    for (const tone of ['success', 'danger']) {
       expect(rule(`:host([tone="${tone}"])`)).toContain(
         `--_callout-tone: var(--helix-color-${tone})`,
       )
@@ -51,10 +54,10 @@ describe('callout', () => {
   })
 
   test('the tone survives grayscale as a bar on the inline start, clipped by the box', () => {
-    /* A bar drawn inside and clipped rather than a border: a thick border on
-       one side of a rounded box thins to a crescent at each end. */
+    /* A hairline of the tone at rest. The bar a hook asks for is drawn inside and
+       clipped: a thick border on one side of a rounded box thins to a crescent. */
     expect(rule(':host')).toContain(
-      '--_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick))',
+      '--_callout-bar: var(--callout-bar-thickness, 0px)',
     )
     expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
     expect(rule(':host::before')).toContain('background-color: var(--_callout-color)')
@@ -115,7 +118,7 @@ describe('callout separation and hooks', () => {
     const host = rule(':host')
     expect(host).toContain('--_callout-color: var(--callout-accent-color, var(--_callout-tone))')
     expect(host).toContain(
-      '--_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick))',
+      '--_callout-bar: var(--callout-bar-thickness, 0px)',
     )
     /* The control steps, `space-md` and `text-sm` at rest, so a callout in a
        `data-density` region follows it as the controls beside it do. */
@@ -129,7 +132,7 @@ describe('callout separation and hooks', () => {
 describe('the dismiss button', () => {
   test('stands at the end of the line, with a hover well and the focus ring', () => {
     expect(rule('[part="dismiss"]')).toContain('margin-inline: auto')
-    expect(rule('[part="dismiss"]:hover')).toContain('background-color: color-mix(')
+    expect(rule('[part="dismiss"]:hover')).toContain('background-color: var(--helix-color-hover)')
     expect(rule('[part="dismiss"]:focus-visible')).toContain(
       'outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring)',
     )

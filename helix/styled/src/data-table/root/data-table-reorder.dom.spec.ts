@@ -65,7 +65,7 @@ describe('a data table with reorderable-rows', () => {
     expect(grip).toContain('cursor: grab')
     expect(grip).toContain('touch-action: none')
     expect(rule('[part="row-grip-button"][aria-disabled="true"]')).toContain(
-      'opacity: var(--data-table-grip-disabled-opacity, 0.4)',
+      'opacity: var(--data-table-grip-disabled-opacity, var(--helix-opacity-disabled))',
     )
   })
 
