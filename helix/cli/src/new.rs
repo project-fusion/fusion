@@ -17,6 +17,7 @@
 //! is for a binary run without the shim, such as one cargo installed.
 
 use std::fs;
+use std::io::{BufRead, IsTerminal, Write};
 use std::path::{Path, PathBuf};
 
 use fusion_rules::error::{Failure, Outcome};
@@ -28,6 +29,8 @@ use crate::args::New;
 
 const PACKAGE: &str = "@fusion.dev/helix-templates";
 const REGISTER: &str = "templates.json";
+/// The name offered when a person is asked for one and presses Return.
+const SUGGESTED: &str = "my-app";
 
 /// Files a template carries under another name, and the name each is written
 /// under.
@@ -104,7 +107,7 @@ fn locate(from: &Path) -> Result<PathBuf, Failure> {
         format!("cannot find {PACKAGE}"),
         "it is resolved from node_modules, and nothing above this directory has it",
     )
-    .hint("npm create @fusion.dev/helix-app@latest <name>"))
+    .hint("npm create @fusion.dev/helix-app@latest"))
 }
 
 /// Holds `name` to being usable as both of the things it is.
@@ -139,6 +142,133 @@ fn usable(name: &str) -> Result<(), Failure> {
     )
 }
 
+/// Refuses a target that holds anything.
+///
+/// **An empty directory or none at all.** Writing into a directory that holds
+/// something is how a scaffolder overwrites work somebody wanted, and there is
+/// no undo. Merging into an existing project is a real feature and is a
+/// different one: it has to decide what to do with a manifest that already
+/// exists, and this release does not.
+fn vacant(target: &Path) -> Result<(), Failure> {
+    if target.exists() {
+        let empty = fs::read_dir(target).is_ok_and(|mut entries| entries.next().is_none());
+        if !empty {
+            return Err(Failure::input(
+                format!("{} is not empty", target.display()),
+                "a new project is written into an empty directory, so nothing here is overwritten",
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// One line from a person, trimmed. Input that ends leaves no way to go on.
+fn answer<R: BufRead, W: Write>(
+    input: &mut R,
+    output: &mut W,
+    question: &str,
+) -> Result<String, Failure> {
+    let broken = |failure: std::io::Error| {
+        Failure::new(
+            Code::Internal,
+            "cannot read an answer from the terminal",
+            failure.to_string(),
+        )
+    };
+    write!(output, "{question}").map_err(broken)?;
+    output.flush().map_err(broken)?;
+    let mut line = String::new();
+    if input.read_line(&mut line).map_err(broken)? == 0 {
+        return Err(Failure::input(
+            "no answer was given",
+            "the input ended before the question was answered",
+        )
+        .hint("helix new my-app --template react-vite"));
+    }
+    Ok(line.trim().to_owned())
+}
+
+/// Asks for a project name until one can be written, and returns it.
+fn ask_name<R: BufRead, W: Write>(
+    input: &mut R,
+    output: &mut W,
+    into: Option<&Path>,
+    from: &Path,
+) -> Result<String, Failure> {
+    loop {
+        let given = answer(input, output, &format!("Project name ({SUGGESTED}): "))?;
+        let name = if given.is_empty() {
+            SUGGESTED.to_owned()
+        } else {
+            given
+        };
+        let target = into.map_or_else(|| from.join(&name), Path::to_path_buf);
+        match usable(&name).and_then(|()| vacant(&target)) {
+            Ok(()) => return Ok(name),
+            Err(failure) => {
+                /* The first line says what is wrong. The hint under it is a
+                command to type, and the person is being asked for a name. */
+                let said = failure.render("helix");
+                let _ = writeln!(output, "{}", said.lines().next().unwrap_or_default());
+            }
+        }
+    }
+}
+
+/// Asks which template to write, by its number or its id.
+///
+/// **No default.** A scaffolder that picks for you writes a project the person
+/// did not choose, so Return asks again.
+fn ask_template<'a, R: BufRead, W: Write>(
+    input: &mut R,
+    output: &mut W,
+    templates: &'a [Template],
+    paint: Paint,
+) -> Result<&'a Template, Failure> {
+    let _ = writeln!(output, "\nTemplates:");
+    for (index, one) in templates.iter().enumerate() {
+        let _ = writeln!(
+            output,
+            "  {}  {:<14} {}",
+            index + 1,
+            paint.pass(&one.id),
+            one.description
+        );
+    }
+    loop {
+        let given = answer(
+            input,
+            output,
+            &format!("Choose a template (1-{}): ", templates.len()),
+        )?;
+        let picked = given
+            .parse::<usize>()
+            .ok()
+            .and_then(|number| templates.get(number.checked_sub(1)?))
+            .or_else(|| templates.iter().find(|one| one.id == given));
+        if let Some(template) = picked {
+            return Ok(template);
+        }
+    }
+}
+
+/// The commands that start a project, for the package manager that ran this.
+///
+/// Package managers name themselves in `npm_config_user_agent`, as
+/// `pnpm/9.0.0 npm/? node/v22.0.0 darwin arm64`. Anything else gets npm, which
+/// comes with Node.
+fn start_commands(agent: Option<&str>) -> [&'static str; 2] {
+    match agent
+        .and_then(|said| said.split('/').next())
+        .unwrap_or_default()
+    {
+        "bun" => ["bun install", "bun run dev"],
+        "pnpm" => ["pnpm install", "pnpm dev"],
+        "yarn" => ["yarn install", "yarn dev"],
+        _ => ["npm install", "npm run dev"],
+    }
+}
+
 /// Every file under `directory`, as paths relative to it, in a stable order.
 fn walk(directory: &Path, base: &Path, found: &mut Vec<PathBuf>) {
     let Ok(entries) = fs::read_dir(directory) else {
@@ -167,10 +297,25 @@ fn walk(directory: &Path, base: &Path, found: &mut Vec<PathBuf>) {
 
 /// # Errors
 ///
-/// [`Failure`] when the templates package is not resolvable, when the template
-/// is unknown, or when the target directory exists and holds anything.
+/// [`Failure`] when no name was given and none can be asked for, when the
+/// templates package is not resolvable, when the template is unknown, or when
+/// the target directory exists and holds anything.
 pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
-    usable(&args.name)?;
+    /* **A person is asked and a script is told.** A prompt with nobody at it
+    waits forever, so one runs only with a terminal at both ends. */
+    let interactive = !json && std::io::stdin().is_terminal() && std::io::stdout().is_terminal();
+    match args.name.as_deref() {
+        Some(name) => usable(name)?,
+        None if interactive => {}
+        None => {
+            return Err(Failure::new(
+                Code::Usage,
+                "`helix new` needs a project name",
+                "it asks for one only in a terminal, and this is not one",
+            )
+            .hint("helix new my-app --template react-vite"));
+        }
+    }
     let package = locate(from)?;
 
     let raw = fs::read_to_string(package.join(REGISTER)).map_err(|failure| {
@@ -188,14 +333,29 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         )
     })?;
 
-    /* **Listing is what an absent or wrong `--template` gets**, rather than a
-    default. A scaffolder that picks for you writes a project the reader did not
-    choose, and the choice is two words. */
-    let Some(wanted) = args.template.as_deref() else {
-        return Ok(offer(&register, json, paint, None));
+    /* **Listing is what a wrong `--template` gets, and an absent one with nobody
+    to ask**, rather than a default. A scaffolder that picks for you writes a
+    project the reader did not choose, and the choice is two words. */
+    let named = match args.template.as_deref() {
+        Some(wanted) => match register.templates.iter().find(|one| one.id == wanted) {
+            Some(template) => Some(template),
+            None => return Ok(offer(&register, json, paint, Some(wanted))),
+        },
+        None if interactive => None,
+        None => return Ok(offer(&register, json, paint, None)),
     };
-    let Some(template) = register.templates.iter().find(|one| one.id == wanted) else {
-        return Ok(offer(&register, json, paint, Some(wanted)));
+
+    let mut input = std::io::stdin().lock();
+    let mut output = std::io::stdout();
+    let name = match args.name.clone() {
+        Some(name) => name,
+        None => ask_name(&mut input, &mut output, args.into.as_deref(), from)?,
+    };
+    let target = args.into.clone().unwrap_or_else(|| from.join(&name));
+    vacant(&target)?;
+    let template = match named {
+        Some(template) => template,
+        None => ask_template(&mut input, &mut output, &register.templates, paint)?,
     };
 
     /* **The Helix a project asks for is the one these templates shipped with.**
@@ -213,23 +373,6 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
                 failure,
             )
         })?;
-
-    let target = args.into.clone().unwrap_or_else(|| from.join(&args.name));
-
-    /* **An empty directory or none at all.** Writing into a directory that holds
-    something is how a scaffolder overwrites work somebody wanted, and there is
-    no undo. Merging into an existing project is a real feature and is a
-    different one: it has to decide what to do with a manifest that already
-    exists, and this release does not. */
-    if target.exists() {
-        let empty = fs::read_dir(&target).is_ok_and(|mut entries| entries.next().is_none());
-        if !empty {
-            return Err(Failure::input(
-                format!("{} is not empty", target.display()),
-                "a new project is written into an empty directory, so nothing here is overwritten",
-            ));
-        }
-    }
 
     /* `templates/<id>`, so the directory is the id rather than a decoration of
     it. Flat at the package root, a tenth template is a tenth entry beside
@@ -252,20 +395,46 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         &files,
         template,
         &[
-            (register.placeholder.as_str(), args.name.as_str()),
+            (register.placeholder.as_str(), name.as_str()),
             (register.version.as_str(), helix.version.as_str()),
         ],
     )?;
 
+    report(
+        &Written {
+            count: files.len(),
+            helix: &helix.version,
+            name: &name,
+            target: &target,
+            template,
+        },
+        from,
+        json,
+        paint,
+    );
+    Ok(Code::Ok)
+}
+
+/// What was written, for [`report`].
+struct Written<'a> {
+    count: usize,
+    helix: &'a str,
+    name: &'a str,
+    target: &'a Path,
+    template: &'a Template,
+}
+
+/// Says what was written and how to start it.
+fn report(written: &Written, from: &Path, json: bool, paint: Paint) {
     if json {
         fusion_rules::say!(
             "{}",
             serde_json::json!({
-                "files": files.len(),
-                "helix": helix.version,
-                "into": target.display().to_string(),
-                "name": args.name,
-                "template": template.id,
+                "files": written.count,
+                "helix": written.helix,
+                "into": written.target.display().to_string(),
+                "name": written.name,
+                "template": written.template.id,
             })
         );
     } else {
@@ -275,20 +444,20 @@ pub fn run(args: &New, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
         fusion_rules::say!(
             "{} {} files from {}, Helix {}, into {}",
             paint.pass("wrote"),
-            files.len(),
-            template.title,
-            helix.version,
-            target.display()
+            written.count,
+            written.template.title,
+            written.helix,
+            written.target.display()
         );
         /* **The target rather than the name, and relative where it can be.**
         With `--into` the two are different directories, and printing the name
         handed a reader a `cd` into one this had just not created. Printing the
         absolute path instead is correct and unreadable for the ordinary case, so
         it is shortened back against where they are standing. */
-        let where_ = target.strip_prefix(from).unwrap_or(&target);
-        fusion_rules::say!("\n  cd {}\n  npm install\n  npm run dev", where_.display());
+        let where_ = written.target.strip_prefix(from).unwrap_or(written.target);
+        let [install, dev] = start_commands(std::env::var("npm_config_user_agent").ok().as_deref());
+        fusion_rules::say!("\n  cd {}\n  {install}\n  {dev}", where_.display());
     }
-    Ok(Code::Ok)
 }
 
 /// What there is, printed when no template was chosen or the choice was unknown.
@@ -396,4 +565,102 @@ fn lay_down(
         })?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Cursor;
+
+    use super::*;
+
+    fn templates() -> Vec<Template> {
+        ["react-vite", "vue-vite"]
+            .map(|id| Template {
+                description: format!("{id} described"),
+                id: id.to_owned(),
+                named: Vec::new(),
+                title: id.to_owned(),
+            })
+            .into()
+    }
+
+    fn name_from(typed: &str, from: &Path) -> (Result<String, Failure>, String) {
+        let mut said = Vec::new();
+        let name = ask_name(&mut Cursor::new(typed), &mut said, None, from);
+        (name, String::from_utf8_lossy(&said).into_owned())
+    }
+
+    fn scratch(name: &str) -> PathBuf {
+        let path = std::env::temp_dir().join(format!("helix-ask-{name}"));
+        let _ = fs::remove_dir_all(&path);
+        fs::create_dir_all(&path).expect("a scratch directory");
+        path
+    }
+
+    #[test]
+    fn return_takes_the_suggested_name() {
+        let (name, said) = name_from("\n", &scratch("suggested"));
+        assert_eq!(name.expect("a name"), SUGGESTED);
+        assert!(said.contains(SUGGESTED), "{said}");
+    }
+
+    #[test]
+    fn a_name_that_cannot_be_used_is_asked_for_again() {
+        let (name, said) = name_from("My App\ngood-name\n", &scratch("unusable"));
+        assert_eq!(name.expect("a name"), "good-name");
+        assert!(said.contains("cannot be a project name"), "{said}");
+    }
+
+    #[test]
+    fn a_name_whose_directory_holds_anything_is_asked_for_again() {
+        let at = scratch("occupied");
+        fs::create_dir_all(at.join("taken")).expect("a directory");
+        fs::write(at.join("taken").join("README.md"), "mine").expect("a file");
+        let (name, said) = name_from("taken\nfree\n", &at);
+        assert_eq!(name.expect("a name"), "free");
+        assert!(said.contains("is not empty"), "{said}");
+    }
+
+    #[test]
+    fn input_that_ends_is_a_failure_and_does_not_ask_forever() {
+        let (name, _) = name_from("", &scratch("ended"));
+        assert!(name.is_err());
+    }
+
+    #[test]
+    fn a_template_is_chosen_by_number_or_id_and_return_picks_none() {
+        let templates = templates();
+        for (typed, id) in [("2\n", "vue-vite"), ("\n9\n0\nreact-vite\n", "react-vite")] {
+            let mut said = Vec::new();
+            let picked = ask_template(
+                &mut Cursor::new(typed),
+                &mut said,
+                &templates,
+                Paint::decide("helix", true),
+            );
+            assert_eq!(picked.expect("a template").id, id);
+        }
+    }
+
+    #[test]
+    fn the_next_steps_name_the_package_manager_that_ran_it() {
+        for (agent, install) in [
+            (
+                Some("bun/1.4.3 npm/? node/v22.0.0 darwin arm64"),
+                "bun install",
+            ),
+            (
+                Some("pnpm/9.0.0 npm/? node/v22.0.0 darwin arm64"),
+                "pnpm install",
+            ),
+            (
+                Some("yarn/1.22.0 npm/? node/v22.0.0 darwin arm64"),
+                "yarn install",
+            ),
+            (Some("npm/11.0.0 node/v22.0.0 darwin arm64"), "npm install"),
+            (None, "npm install"),
+        ] {
+            assert_eq!(start_commands(agent)[0], install);
+        }
+    }
 }

@@ -4,7 +4,7 @@ The Helix starter templates, as data. Read by `helix new` and by
 `npm create @fusion.dev/helix-app`, which are one capability behind two doors.
 
 ```sh
-npm create @fusion.dev/helix-app@latest my-app
+npm create @fusion.dev/helix-app@latest
 ```
 
 You are unlikely to install this package yourself. It exists so that the thing

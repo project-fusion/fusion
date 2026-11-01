@@ -95,7 +95,24 @@ const newer = () => {
    the registry only if it is slower than the scaffold. */
 const checking = newer()
 
-const running = spawn(process.execPath, [helix, 'new', ...process.argv.slice(2)], {
+/**
+ * What was asked, with the template put back where npm took it from.
+ *
+ * **npm reads `--template` as its own setting.** It drops the flag and passes the
+ * value on, so `npm create @fusion.dev/helix-app my-app --template react-vite`
+ * arrives here as two bare words, and `helix new` refused the second. Nothing
+ * else is two bare words, so every package manager can use the one command.
+ */
+const asked = (args) =>
+  args.length === 2 && !args.some((one) => one.startsWith('-'))
+    ? [args[0], '--template', args[1]]
+    : args
+
+/** The package manager that ran this, from what each one sets, or npm. */
+const manager = () =>
+  /^(bun|pnpm|yarn)\//.exec(process.env.npm_config_user_agent ?? '')?.[1] ?? 'npm'
+
+const running = spawn(process.execPath, [helix, 'new', ...asked(process.argv.slice(2))], {
   env: { ...process.env, HELIX_TEMPLATES: process.env.HELIX_TEMPLATES ?? templates },
   stdio: 'inherit',
 })
@@ -109,7 +126,7 @@ running.on('close', async (status) => {
   if (latest !== undefined) {
     console.error(
       `\nHelix ${latest} is out, and this is ${own.version}. For the newest templates:\n\n` +
-        `  npm create ${own.name.replace('create-', '')}@latest\n`,
+        `  ${manager()} create ${own.name.replace('create-', '')}@latest\n`,
     )
   }
   process.exit(status ?? 70)
