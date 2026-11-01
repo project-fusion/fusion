@@ -1,10 +1,18 @@
 /* The host draws nothing. */
 :host {
+  --_dialog-ground: var(--dialog-background-color, var(--helix-color-surface-overlay));
   display: contents;
 }
 
 [part="surface"] {
-  background-color: var(--dialog-background-color, var(--helix-color-surface-overlay));
+  /* A panel opened from inside, such as a Select's list, takes `surface-overlay`
+     too. In dark a shadow does not show and the two were one fill, so inside the
+     dialog the token sits a step above it. In light the shadow separates them. */
+  --helix-color-surface-overlay: light-dark(
+    var(--_dialog-ground),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_dialog-ground))
+  );
+  background-color: var(--_dialog-ground);
   border: var(--dialog-border-width, var(--helix-border-floating)) solid
     var(--dialog-border-color, var(--helix-color-border));
   /* The house radius. */

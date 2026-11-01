@@ -220,6 +220,16 @@
   resize: none;
 }
 
+/* This sheet does not take `field.css`, so the rule that sheet gives every field
+   is written here too. Without it the placeholder took the browser's #757575,
+   measured 4.41:1 in light and 4.25:1 in dark, where the muted ink is 5.76:1 and
+   7.57:1. */
+[part="field"]::placeholder,
+[part~="example"]::placeholder {
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
+}
+
 /* What the draft carries, inside the box and above the field: a row that
    wraps, so several thumbnails sit side by side before they stack. **Its
    inset is the field's**, so the first thumbnail starts on the line the

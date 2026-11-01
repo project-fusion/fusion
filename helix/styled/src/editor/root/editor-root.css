@@ -210,6 +210,12 @@
   padding-inline: var(--helix-space-xs);
 }
 
+/* This sheet does not take `field.css`, so the placeholder is set here. */
+[part="link-field"]::placeholder {
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
+}
+
 [part="link-field"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

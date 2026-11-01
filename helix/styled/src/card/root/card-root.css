@@ -35,8 +35,10 @@
   grid-template-columns: minmax(0, 1fr);
   line-height: var(--card-line-height, var(--helix-leading-normal));
   /* Clips the media to the corner radius, so a full-bleed image needs no corner
-     handling of its own. */
+     handling of its own. It would clip a long unbroken word too, so the word
+     breaks. */
   overflow: hidden;
+  overflow-wrap: anywhere;
   padding: var(--_card-inset);
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),

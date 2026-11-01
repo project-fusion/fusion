@@ -33,8 +33,10 @@ import {
   drawBox,
   nearestTo,
   type Placed,
+  PlotRoomWatch,
   SPATIAL_VIEW,
   turned,
+  wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
 import { type DrawnRibbon, type RibbonField, ribbonsDrawn, ribbonsOf } from '../ribbons.js'
 
@@ -209,6 +211,8 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
   private camera: Camera = SPATIAL_VIEW
 
   /** A drag across the chart's own drawing, which turns its view. */
+  private readonly plotRoom = new PlotRoomWatch(this)
+
   private readonly drag = new DragTurn(
     (next) => {
       this.camera = next(this.camera)
@@ -434,7 +438,9 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
    * drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: RibbonField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera, [], this.noBox)
+    const view = wordsFitted(this.plotRoom.room, (words) =>
+      boxView(field.axes, this.camera, [], this.noBox, words),
+    )
     const ribbons = ribbonsDrawn(field, view.projection).sort(
       (one, other) => one.depth - other.depth,
     )

@@ -28,6 +28,8 @@
    content beside it and not a note under it. `subtle` was `neutral-500` when
    this was written, `#808080` and 3.95, and the ramp has moved since. */
 slot[name="label"]::slotted(*) {
+  /* A long unbroken word breaks inside the column it was given. */
+  overflow-wrap: anywhere;
   color: var(--stat-label-color, var(--helix-color-foreground-muted));
   font-size: var(--stat-label-size, calc(var(--helix-text-xs) / var(--helix-text-md) * 1em));
   font-weight: var(--helix-weight-medium);
@@ -39,9 +41,11 @@ slot[name="label"]::slotted(*) {
    part is the figure `value` writes, which takes all of it. */
 [part="value"] {
   /* Figures take one width each. A value breaks only where a word is wider than
-     the whole column, so "99.9%" stays together. */
+     the whole column, so "99.9%" stays together. `anywhere`, since `break-word`
+     leaves the word's full width as the `auto` column's minimum, and the column
+     then runs past the host. */
   font-variant-numeric: tabular-nums;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   color: var(--stat-value-color, var(--helix-color-foreground));
   font-family: var(--helix-font-display);
   font-size: var(--stat-value-size, calc(var(--helix-text-3xl) / var(--helix-text-md) * 1em));
@@ -59,6 +63,7 @@ slot[name="unit"]::slotted(*) {
 /* A trend under the figure it qualifies, across the whole width. */
 slot[name="trend"]::slotted(*) {
   grid-column: 1 / -1;
+  overflow-wrap: anywhere;
 }
 
 /* Which way the pair goes. */
