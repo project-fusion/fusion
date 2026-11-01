@@ -45,6 +45,7 @@ import { useReorderItem } from './reorder-item'
 import { useSplit } from './resize'
 import { useScale } from './scale'
 import { scrollersOf } from './scrolling'
+import { useSelect } from './select'
 import { setting } from './setting'
 import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
@@ -342,6 +343,16 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) => {
             const { behavior, value } = useListbox(family, props, use, around.touch)
+            around.chosen.current = value
+            return behavior
+          },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'select')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, value } = useSelect(family, props, use, around.toggled, around.touch)
             around.chosen.current = value
             return behavior
           },

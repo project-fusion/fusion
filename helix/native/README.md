@@ -2628,3 +2628,10 @@ as a hardware keyboard's keys.
 The web's alone: `load-error`, Control with Home and End, each row's place in `total`,
 the crossfade of the time under a pointer, and printing. A count returned by
 `foldEveryGroup` is the groups asked, since a toggle's request answers nothing there.
+
+## Select
+
+A Select draws a Listbox in its layer and hands it the value, so the value lives in
+one place. A layer that is closed holds nothing, so the options also join a hidden
+copy of themselves, which draws nothing, for the trigger's words, its keys, and the
+verdict. `position="item-aligned"` opens under the trigger for now.

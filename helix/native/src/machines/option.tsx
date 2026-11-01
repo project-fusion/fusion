@@ -219,11 +219,12 @@ const pressOf = (
     void openLink().open(href)
     return
   }
-  owner?.choose(member)
+  /* Focus first: a choice may close the list, which gives focus back to its trigger. */
   const view = node()
   if (view) {
     focus().focus(view, false)
   }
+  owner?.choose(member)
 }
 
 /** What an option's parts read of where it stands. */
