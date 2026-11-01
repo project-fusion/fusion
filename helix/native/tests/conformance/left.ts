@@ -8,7 +8,7 @@ import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
-import { listboxLeft } from './listbox'
+import { listboxLeft, selectLeft } from './listbox'
 import { logLeft } from './log'
 import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
@@ -241,6 +241,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...windowLeft(run),
     ...treeLeft(run),
     ...listboxLeft(run),
+    ...selectLeft(run),
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
     ...carouselLeft(run),

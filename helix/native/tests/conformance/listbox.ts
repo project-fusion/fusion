@@ -1,6 +1,6 @@
 import type { Left } from '@fusion.dev/helix-testing/conformance'
 import { screen } from '@testing-library/react-native'
-import { formOf } from './forms'
+import { formOf, HOST_STATES } from './forms'
 import { itemsIn, pressOf, type Run } from './views'
 
 /*
@@ -27,5 +27,22 @@ export const listboxLeft = (run: Run): Pick<Left, 'options'> => {
         },
       ]
     }),
+  }
+}
+
+/** What a Select holds, which a closed list does not draw, and focus while its list stands open. */
+export const selectLeft = (run: Run): Partial<Pick<Left, 'chosen' | 'focused'>> => {
+  const { family, setup } = run.scenario
+  if (family !== 'select') {
+    return {}
+  }
+  const states = HOST_STATES.get(setup.tag)
+  return {
+    chosen: String(states?.chosen ?? '')
+      .split('\n')
+      .filter(Boolean),
+    /* Open, an option holds focus, and the list on the web. Closed, focus can only be on the
+       trigger, whose words are an option's, which would name that option. */
+    focused: states?.open === true || run.focus.focused() === null ? null : setup.tag,
   }
 }

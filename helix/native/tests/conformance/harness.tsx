@@ -43,7 +43,16 @@ import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusStop, isTable, moveRow, tablePress } from './table'
 import { focusField, leave, pressBox, typeInto } from './text'
-import { focusable, linkOf, partPressOf, pressOf, type Run, triggerOf, wordsOf } from './views'
+import {
+  focusable,
+  itemsIn,
+  linkOf,
+  partPressOf,
+  pressOf,
+  type Run,
+  triggerOf,
+  wordsOf,
+} from './views'
 import { rowDisabled, rowWords } from './window'
 
 /*
@@ -268,7 +277,10 @@ const pressPlain = async (
   const words = intent.row === undefined ? wordsOf(setup, intent.item) : rowWords(setup, intent.row)
   /* A part of the item is the press drawn inside the item's own, or
      beside its words. */
-  const inner = intent.part === undefined ? pressOf(words) : partPressOf(words, intent.part)
+  const inner =
+    intent.part === undefined
+      ? pressOf(words, setup.tag === 'helix-select')
+      : partPressOf(words, intent.part)
   if (inner === undefined) {
     return `The item draws no press inside its own for its ${intent.part} part.`
   }
@@ -405,6 +417,13 @@ const pressing = async (
 const focusing = (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Promise<void> => {
   /* A list's option holds focus from the press before it, where the web's is the list's. */
   if (formOf(run.scenario.setup.tag).api?.listbox !== undefined && intent.item === undefined) {
+    return Promise.resolve()
+  }
+  /* A Select's trigger, whose words are its value, the first press that says them. */
+  if (run.scenario.setup.tag === 'helix-select' && intent.item === undefined) {
+    const { props } = run.scenario.setup
+    const chosen = itemsIn(run).find((one) => one.value === props?.defaultValue)
+    run.focus.place(rowNode(run, pressOf(chosen?.words ?? 'Choose')))
     return Promise.resolve()
   }
   return isTable(run.scenario) ? focusStop(run) : focusOn(run, intent)

@@ -60,11 +60,11 @@ export const inPress = (words: string): boolean =>
   })
 
 /** The press around an element's words: the nearest view that answers a touch. */
-export const pressOf = (words: string): View => {
+export const pressOf = (words: string, last = false): View => {
   /* The first of the words drawn inside a press, where a title says them too. */
   const texts = screen.queryAllByText(words, { includeHiddenElements: true })
   let at: View | null = null
-  for (const text of texts) {
+  for (const text of last ? [...texts].reverse() : texts) {
     let up: View | null = text
     while (up !== null && typeof up.props.onResponderGrant !== 'function') {
       up = up.parent
