@@ -386,10 +386,7 @@ helix-text[tone="warning"][emphasis="muted"] {
      slightly different faintness. Button groups are fine: the group pulls its
      members together by exactly the border width, so the seams measure -1.0px
      and no edge is drawn twice. */
-  background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 6%, transparent)
-  );
+  background-color: var(--button-background-color, transparent);
   block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
   border-radius: var(--button-radius, var(--helix-radii-sm));
@@ -787,6 +784,9 @@ helix-toggle::part(item) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   justify-content: center;
   padding-inline: var(--toggle-item-padding-inline, var(--helix-space-sm));
   text-decoration: none;

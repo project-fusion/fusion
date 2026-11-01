@@ -52,7 +52,7 @@
 
 /* The unfilled marks, which are also the ones that give the row its size. */
 [part="track"] {
-  color: var(--rating-empty-color, var(--helix-color-border));
+  color: var(--rating-empty-color, var(--helix-color-foreground-subtle));
 }
 
 /* And the filled ones, clipped to the score.
@@ -211,6 +211,13 @@
 /* Wrong, and the empty marks say so, as a field's edge does. */
 :host(:state(invalid)) [part="track"] {
   color: var(--helix-color-danger);
+}
+
+/* A star filled and a star empty are told apart by more than the system color. */
+@media (forced-colors: active) {
+  [part="track"] {
+    opacity: var(--helix-opacity-disabled);
+  }
 }
 
 /* Print: the filled marks are the score.

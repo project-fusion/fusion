@@ -191,8 +191,8 @@
 
      `neutral-900` is dark `surface` *and* light `surface-inverse` *and* the dark
      translucent material, so a light tooltip went to #121212 with the dark page
-     it was named after. `neutral-950` is dark `surface-sunken` and the modal
-     scrim in both modes, and stayed.
+     it was named after. `neutral-950` is the modal scrim in both modes, and
+     stayed.
 
      **What is left is one thing rather than a ramp.** `surface-overlay` in light
      is `neutral-0`, the page color exactly, so its separation is zero by all
@@ -212,10 +212,10 @@
   --_helix-neutral-950: oklch(0.15 var(--_helix-neutral-cast));
   /* The dark surface ladder, decided by the owner on October 31, 2026 from pictures
      of four options: cards at `#0c0c0c`, so they read near black on a black page and
-     an input or a raised panel stands out on them, and sunken at `#060606`, under
-     the card. Raised and overlay stay at `neutral-800`. */
+     an input or a raised panel stands out on them. Raised and overlay stay at
+     `neutral-800`. Sunken stays at `neutral-900`, up from the page: there is nothing
+     under black, and `#060606` measured 1.04:1 for a Meter's track. */
   --_helix-neutral-925: oklch(0.154 var(--_helix-neutral-cast));
-  --_helix-neutral-975: oklch(0.122 var(--_helix-neutral-cast));
 
   /* ------------------------------------------------------ series ------ */
   /* Eight colors for eight things that are not each other.
@@ -291,7 +291,7 @@
   --_helix-brand-on: oklch(from var(--_helix-seed-brand) clamp(0, (0.68 - l) * 1000, 1) 0 0);
   --_helix-brand-wash: color-mix(
     in oklab,
-    light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 28%,
+    light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 20%,
     transparent
   );
 
@@ -348,10 +348,12 @@
   --_helix-accent-600: oklch(from var(--_helix-seed-accent) calc(l - 0.05) c h);
   --_helix-accent-700: oklch(from var(--_helix-seed-accent) calc(l - 0.1) c h);
   --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.13) c h);
+  --_helix-accent-300: oklch(from var(--_helix-seed-accent) calc(l + 0.18) c h);
+  --_helix-accent-200: oklch(from var(--_helix-seed-accent) calc(l + 0.23) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
   --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
   /* The label on an accent fill, and its quiet ink, for the brand's reasons. */
-  --_helix-accent-on: oklch(from var(--_helix-seed-accent) 1 0 0);
+  --_helix-accent-on: oklch(from var(--_helix-seed-accent) clamp(0, (0.68 - l) * 1000, 1) 0 0);
   --_helix-accent-quiet-500: oklch(from var(--_helix-accent-500) l calc(c * 0.5) h);
   --_helix-accent-quiet-400: oklch(from var(--_helix-accent-400) l calc(c * 0.5) h);
 

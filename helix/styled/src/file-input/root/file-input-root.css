@@ -225,7 +225,7 @@
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="field"] {
   border-style: solid;
-  color: var(--helix-color-foreground-subtle);
+  opacity: var(--helix-opacity-disabled);
 }
 
 :host(:disabled) [part="control"],

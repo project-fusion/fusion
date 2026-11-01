@@ -185,6 +185,11 @@
   opacity: var(--table-drag-preview-opacity, 0.9);
 }
 
+/* The message spans the columns, as Data Table's does. */
+[part="empty"] {
+  grid-column: 1 / -1;
+}
+
 /* Print: rows of text, which print. The striping an earlier answer flattened is
    Data Table's, and nothing here draws a fill. */
 @media print {

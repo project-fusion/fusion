@@ -159,7 +159,7 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
             }
         },
         raw_raised: step(if dark { 0.21 } else { 0.97 }),
-        raw_sunken: step(if dark { 0.122 } else { 0.94 }),
+        raw_sunken: step(if dark { 0.182 } else { 0.94 }),
         /* Declared after the ladder, since `surface` is on it: it is the ground a
         card uses, so a fill-first theme has to move it too or the one surface the
         policy is most about is the one it does not reach. */

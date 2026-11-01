@@ -621,6 +621,10 @@ slot[name$="-icon"]::slotted(*) {
   position: absolute;
 }
 
+[part="controls"] :where(a, button):hover {
+  background-color: var(--helix-color-hover);
+}
+
 /* Print: a moving picture, and its controls are the only part that would print.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
