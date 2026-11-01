@@ -55,9 +55,8 @@ step. To change the rounding everywhere, set the seed.
 They all have the same corner, whatever their size. You compare a radius with
 the corners next to it, so the size of the panel does not matter.
 
-Circles do not use these tokens. An avatar, a loader, and a radio are circles by
-design, so they set `50%` directly. A theme that squares off everything else
-does not change them.
+An avatar and a radio are circles by design, so they read `--helix-radii-full`.
+A theme that squares off everything else does not change them.
 
 ## Border widths
 
