@@ -1,22 +1,34 @@
 import { oneOf } from '../../../render.js'
-import { list, mix, native, product, sum, token } from '../../../style.js'
+import {
+  difference,
+  list,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
 /**
  * Callout's styled tier.
  *
- * **The host is the box, rounded on every corner, and the tone's edge is a
- * bar inside it, clipped by it.** A thick border on one rounded side thins
- * to nothing at each end, and squaring two corners gives up the shape. A
- * straight bar the box clips has neither problem.
+ * **The host is the box, rounded on every corner, with a hairline of the tone
+ * inside it**, as a Tag draws, so a callout sits with its nearest relative.
+ * **A bar is drawn inside the box and clipped by it**, where `plain` or
+ * `--callout-bar-thickness` asks for one. A thick border on one rounded side
+ * thins to nothing at each end, and squaring two corners gives up the shape.
+ * A straight bar the box clips has neither problem.
  *
- * **The tint, the bar and the mark are the tone**, or a color of the page's
- * own through `--callout-accent-color`, and `neutral` keeps to the muted ink,
- * since a note that reports no status has no hue to say. `separation` is
- * where the box ends: the tint with the bar, an edge of the tone with no
- * fill, or the bar and the mark alone. The bar stays in every one, being
- * what says the tone where the hue is not seen.
+ * **The tint, the hairline and the mark are the tone**, or a color of the
+ * page's own through `--callout-accent-color`, and `neutral` keeps to the muted
+ * ink, since a note that reports no status has no hue to say. `separation` is
+ * where the box ends: the tint with the hairline, an edge of the tone with no
+ * fill, or a bar and the mark alone. The bar says the tone where there is no
+ * box to carry it.
  *
  * **The inset and the type are the controls' steps**, so a callout in a
  * `data-density` region is as tight as the controls beside it.
@@ -32,7 +44,7 @@ export default styles(
     hooks: ({ own }) => ({
       accentColor: own.calloutTone,
       backgroundColor: null,
-      barThickness: token('border-thick'),
+      barThickness: '0px',
       fontSize: token('text-control'),
       gap: token('space-sm'),
       padding: token('space-control'),
@@ -55,6 +67,15 @@ export default styles(
           },
           fontSize: hook.fontSize,
           backgroundColor: hook.backgroundColor(mix(own.calloutColor, 10, 'transparent')),
+          /* A hairline of the tone. */
+          boxShadow: [
+            'inset',
+            0,
+            0,
+            0,
+            token('border-thin'),
+            mix(own.calloutColor, 28, token('color-background')),
+          ],
           overflow: 'hidden',
           position: 'relative',
           borderRadius: hook.radius,
@@ -68,7 +89,7 @@ export default styles(
           danger: { own: { calloutTone: token('color-danger') } },
           neutral: { own: { calloutTone: token('color-foreground-muted') } },
           success: { own: { calloutTone: token('color-success') } },
-          warning: { own: { calloutTone: token('color-warning') } },
+          warning: { own: { calloutTone: token('color-warning-mark') } },
         }),
         rule(
           { separation: 'outlined' },
@@ -84,7 +105,16 @@ export default styles(
             ],
           },
         ),
-        rule({ separation: 'plain' }, { backgroundColor: hook.backgroundColor('transparent') }),
+        /* The bar and the mark and nothing behind them, for an aside in running
+           prose. */
+        rule(
+          { separation: 'plain' },
+          {
+            own: { calloutBar: hook.barThickness(token('border-thick')) },
+            backgroundColor: hook.backgroundColor('transparent'),
+            boxShadow: 'none',
+          },
+        ),
         rule(
           { exiting: true },
           {
@@ -106,7 +136,20 @@ export default styles(
         ),
         /* A phone draws nothing of a callout once it has faded out. */
         native([rule({ closed: true }, { display: 'none' })]),
+        /* The hairline is an inset shadow, which forced colors drop. */
+        rule(
+          { forcedColors: true },
+          {
+            outline: [token('border-thin'), 'solid', 'CanvasText'],
+            outlineOffset: product(token('border-thin'), '-1'),
+          },
+        ),
         rule({ print: true }, { backgroundColor: 'transparent' }),
+      ]),
+      /* Written out: `tone` lists no `primary`, on the element as here, and the
+         sheet draws one. A phone's callout takes the tones the prop lists. */
+      on({ part: 'host', selector: ':host([tone="primary"])' }, [
+        web([rule({ own: { calloutTone: token('color-primary') } })]),
       ]),
       /* The tone's edge. Straight, and clipped to the host's corners. */
       on({ before: 'host' }, [
@@ -127,7 +170,12 @@ export default styles(
       /* A view does not shrink as a browser's flex item does, so on a phone
          the content takes the room the dismiss button leaves it. */
       on('content', [
-        rule({ lineHeight: token('leading-normal'), minInlineSize: 0 }),
+        /* A long unbroken word breaks inside the column it was given. */
+        rule({
+          lineHeight: token('leading-normal'),
+          minInlineSize: 0,
+          web: { overflowWrap: 'anywhere' },
+        }),
         native([rule({ flex: '1 1 auto' })]),
       ]),
       /* At the end of the first line, as quiet as the mark at the start. */
@@ -135,6 +183,7 @@ export default styles(
         rule({
           web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
+          position: 'relative',
           blockSize: sum(iconSize, product(token('space-2xs'), 2)),
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
@@ -153,7 +202,7 @@ export default styles(
         rule(
           { hover: true },
           {
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+            backgroundColor: token('color-hover'),
             color: token('color-foreground'),
           },
         ),
@@ -165,6 +214,18 @@ export default styles(
           },
         ),
         rule({ reducedMotion: true }, { transition: 'none' }),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. Where the control is already that size the box sits inside it.
+         A phone gives a press the view's own frame. */
+      on({ after: 'dismiss' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on(
         ['dismiss-mark'],

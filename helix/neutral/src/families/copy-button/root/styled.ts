@@ -25,7 +25,7 @@ export default styles(
       color: null,
       colorHover: null,
       errorColor: token('color-danger'),
-      iconSize: token('size-icon-tight'),
+      iconSize: token('size-icon'),
       size: hookOf('icon-button', 'size', token('size-control')),
       successColor: token('color-success'),
     },

@@ -1,4 +1,4 @@
-import { mix, native, product, token, web } from '../../../style.js'
+import { native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -25,9 +25,9 @@ export default styles(
       blockSize: token('size-control-tight'),
       color: token('color-foreground'),
       descriptionColor: token('color-foreground-muted'),
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       fontSize: token('text-sm'),
-      hoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      hoverColor: token('color-hover'),
       markColor: token('color-foreground-subtle'),
       paddingInline: token('space-sm'),
     },
@@ -172,6 +172,11 @@ export default styles(
           },
         ),
         rule({ has: 'disabled' }, { web: { cursor: 'default' }, opacity: hook.disabledOpacity }),
+        rule({ active: true }, { backgroundColor: token('color-press') }),
+        /* Rows sit against each other, so a box reaching past a row would take the
+           press from the row beside it. On a touch screen the row itself reaches the
+           target. */
+        rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       ]),
     ]
   },

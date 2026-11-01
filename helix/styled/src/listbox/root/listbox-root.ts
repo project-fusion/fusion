@@ -2,8 +2,6 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessListbox } from '@fusion.dev/helix-headless/listbox'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
-import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './listbox-root.generated.css.js'
@@ -58,13 +56,7 @@ export class HelixListbox extends HelixHeadlessListbox {
   /* The options drawn for `items` are this tier's. */
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    collectionStateStyles,
-    collectionErrorStyles,
-    styles,
-    dictationStyles,
-  ]
+  static override styles: CSSResultGroup = [liveStyles, styles, dictationStyles]
 }
 
 declare global {

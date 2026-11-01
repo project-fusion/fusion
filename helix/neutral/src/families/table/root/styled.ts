@@ -1,4 +1,5 @@
-import { first, measured, native, product, token, web } from '../../../style.js'
+import collectionError from '../../../fragments/collection-error.js'
+import { difference, first, fn, measured, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import table from './headless.js'
 
@@ -40,20 +41,23 @@ export default styles(
       dragPreviewOpacity: 0.9,
       dragPreviewRadius: token('radii-sm'),
       dragPreviewShadow: token('shadow-floating'),
-      errorColor: token('color-foreground'),
+      errorColor: token('color-danger'),
       headingBackgroundColor: token('color-background'),
       titleColor: token('color-foreground'),
       titleGap: token('space-sm'),
       titleText: token('text-md'),
     },
     own: {
+      tableFade: null,
+      collectionInsetBlock: null,
+      collectionInsetInline: null,
       tableHeadingBackgroundColor: null,
       tableHeadingLayer: null,
       tableHeadingPosition: null,
     },
     stylesheet: 'table/root/table-root.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, include, keyframes, on, own, rule }) => {
     const heading = {
       borderBlockEnd: [token('border-thin'), 'solid', token('color-border')],
       boxSizing: 'border-box',
@@ -90,7 +94,34 @@ export default styles(
     } as const
     return [
       on('host', [
-        rule({ display: 'block', web: { overflowX: 'auto' } }),
+        rule({
+          display: 'block',
+          own: {
+            collectionInsetBlock: token('space-md'),
+            collectionInsetInline: token('space-sm'),
+          },
+          web: { overflowX: 'auto' },
+        }),
+        /* A table wider than its box says so by fading the edge with more behind
+           it, as Data Table does. A timeline over a box with nothing to scroll is
+           inactive, so a table that fits is never masked. */
+        web([
+          rule({
+            animation: ['table-edges', 'linear', 'both'],
+            animationTimeline: fn('scroll', 'self inline'),
+            maskImage: fn(
+              'linear-gradient',
+              own.tableFade,
+              'transparent',
+              ['#000', measured('_table-fade-start', '0rem')],
+              ['#000', difference('100%', measured('_table-fade-end', '0rem'))],
+              'transparent',
+            ),
+            own: { tableFade: 'to right' },
+          }),
+          rule({ dir: 'rtl' }, { own: { tableFade: 'to left' } }),
+          rule({ reducedMotion: true }, { animation: 'none' }),
+        ]),
         rule({ print: true }, { printColorAdjust: 'economy' }),
       ]),
       on({ part: 'table', selector: ':host(:not(:defined))' }, [
@@ -117,7 +148,7 @@ export default styles(
           ),
         ]),
         native([rule({ windowed: true }, { blockSize: hook.blockSize })]),
-        rule({ loading: true }, { opacity: 0.5 }),
+        rule({ loading: true }, { opacity: token('opacity-busy') }),
       ]),
       on('head', [
         web([rule({ display: 'contents' })]),
@@ -155,19 +186,11 @@ export default styles(
           ),
         ]),
       ]),
-      on('error', [
-        rule({
-          color: hook.errorColor,
-          fontFamily: token('font-sans'),
-          fontSize: token('text-sm'),
-          margin: token('space-none'),
-          paddingBlock: token('space-md'),
-          paddingInline: token('space-sm'),
-          textAlign: 'center',
-        }),
-      ]),
+      include(collectionError),
+      on('error', [rule({ color: hook.errorColor })]),
       on('loading', [native([rule(said)])]),
-      on('empty', [native([rule(said)])]),
+      /* The message spans the columns, as Data Table's does. */
+      on('empty', [native([rule(said)]), web([rule({ gridColumn: '1 / -1' })])]),
       on({ slotted: 'helix-table-column' }, [
         web([
           rule(
@@ -194,6 +217,14 @@ export default styles(
           }),
         ]),
       ]),
+      keyframes('table-edges', {
+        '0%': { '--_table-fade-end': token('space-xl'), '--_table-fade-start': '0rem' },
+        '5%, 95%': {
+          '--_table-fade-end': token('space-xl'),
+          '--_table-fade-start': token('space-xl'),
+        },
+        '100%': { '--_table-fade-end': '0rem', '--_table-fade-start': token('space-xl') },
+      }),
     ]
   },
 )

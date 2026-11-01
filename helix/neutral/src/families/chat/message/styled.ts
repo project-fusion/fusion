@@ -1,5 +1,5 @@
 import chatTyping from '../../../fragments/chat-typing.js'
-import { fn, mix, native, product, sum, token, web } from '../../../style.js'
+import { difference, fn, mix, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import message from './headless.js'
 
@@ -9,7 +9,8 @@ import message from './headless.js'
  * **`author="me"` is the only paint that says whose turn it is**: the turn sits
  * against the trailing edge, in a wash of the brand. A bubble is a wash of the
  * foreground and never a rung on the surface ladder, so it holds its contrast on
- * whatever ground it sits on.
+ * whatever ground it sits on. 8%, because at 14% a bubble was the heaviest fill on
+ * the screen, decided by the owner on November 1, 2026.
  *
  * **`plain` takes the ground away and leaves the words**, for an assistant's side of
  * a conversation, and the width goes with the bubble.
@@ -25,8 +26,8 @@ export default styles(
     prefix: 'chat',
     hooks: {
       indicatorBackgroundColor: token('color-surface-sunken'),
-      messageBackgroundColor: mix(token('color-foreground'), 14, 'transparent'),
-      messageBackgroundColorMe: mix(token('color-primary'), 28, 'transparent'),
+      messageBackgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+      messageBackgroundColorMe: token('color-primary-wash'),
       messageColor: token('color-foreground'),
       messageColorMe: null,
       messageMeasure: '42rem',
@@ -100,7 +101,19 @@ export default styles(
       rule({
         '--helix-size-control': sum(token('size-control-sm'), product(token('space-2xs'), '-1')),
         '--helix-size-control-loose': product(token('size-control'), '1.2'),
-        '--helix-size-control-tight': product(token('size-control'), '0.8'),
+        '--helix-size-control-tight': web(
+          fn('round', product(token('size-control'), '0.8'), '1px'),
+        ),
+        '--helix-size-checkbox': token('size-checkbox-sm'),
+        '--helix-size-checkbox-loose': product(token('size-checkbox'), '1.2'),
+        '--helix-size-checkbox-tight': product(token('size-checkbox'), '0.8'),
+        '--helix-size-switch': token('size-switch-sm'),
+        '--helix-size-tag': token('size-tag-sm'),
+        '--helix-text-control': token('text-control-sm'),
+        '--helix-space-control': token('space-sm'),
+        '--helix-text-field': token('text-sm'),
+        '--helix-text-field-label': token('text-xs'),
+        '--helix-space-field': token('space-xs'),
         '--helix-size-icon': token('size-icon-sm'),
         '--helix-size-icon-loose': product(token('size-icon'), '1.2'),
         '--helix-size-icon-tight': product(token('size-icon'), '0.8'),
@@ -296,6 +309,7 @@ export default styles(
     ]),
     on('retry', [
       rule({
+        position: 'relative',
         backgroundColor: 'transparent',
         border: 'none',
         borderRadius: token('radii-sm'),
@@ -318,6 +332,17 @@ export default styles(
         },
       ),
       web([rule({ print: true }, { display: 'none' })]),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'retry' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     keyframes('helix-chat-typing', {
       '0%, 60%, 100%': { backgroundPosition: '0% 50%, 50% 50%, 100% 50%' },

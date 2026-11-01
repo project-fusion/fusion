@@ -38,7 +38,7 @@ export default headless('list', {
     droppedLabel: 'Dropped',
     /* The old name of `empty-text`, which the web reads for one release. */
     emptyLabel: web(string()),
-    emptyText: '',
+    emptyText: 'No items',
     kind: oneOf(['default', 'description', 'ordered', 'unordered']),
     label: '',
     loading: false,

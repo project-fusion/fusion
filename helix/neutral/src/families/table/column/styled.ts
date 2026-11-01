@@ -1,4 +1,14 @@
-import { first, list, measured, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  first,
+  list,
+  measured,
+  native,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import column from './headless.js'
 
@@ -71,7 +81,7 @@ export default styles(
           color: measured('_table-heading-color', token('color-foreground-muted')),
           display: 'flex',
           fontFamily: token('font-sans'),
-          fontSize: measured('_table-heading-text', token('text-sm')),
+          fontSize: measured('_table-heading-text', token('text-control')),
           fontWeight: token('weight-semibold'),
           minBlockSize: token('size-control-loose'),
           minInlineSize: 0,
@@ -111,10 +121,32 @@ export default styles(
           flex: '1',
           gap: token('space-2xs'),
           minInlineSize: 0,
+          position: 'relative',
         }),
         rule({ textAlign: 'center' }, { justifyContent: 'center' }),
         rule({ textAlign: 'end' }, { justifyContent: 'flex-end' }),
+        web([rule({ hover: true }, { color: token('color-foreground') })]),
         web(ring),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. */
+      on({ after: 'sort' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
+      ]),
+      /* Written out: the vocabulary names no last of a kind. The last heading ends
+         on the rule with the values under it. */
+      on({ part: 'column', selector: ':host(:last-of-type) [part="column"]' }, [
+        web([
+          rule({
+            paddingInline: measured('_table-heading-padding-inline', token('space-none')),
+          }),
+        ]),
       ]),
       on('grip', [
         rule({

@@ -30,7 +30,7 @@ export default styles(
     prefix: 'virtual-list',
     hooks: {
       blockSize: '20em',
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       emptyColor: token('color-foreground-muted'),
       emptyPadding: token('space-md'),
       loadingColor: token('color-foreground-muted'),
