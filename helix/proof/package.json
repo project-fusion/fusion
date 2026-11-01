@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-proof",
   "description": "The Helix proof app: a project dashboard on Expo Router, written once and run as a website and in a phone app.",
-  "version": "0.223.1",
+  "version": "0.228.0",
   "private": true,
   "license": "MIT",
   "repository": {

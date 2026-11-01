@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-native",
   "description": "The React Native runtime Helix's components draw with: the renderer, the machines, the theme, and the capabilities a phone provides.",
-  "version": "0.223.1",
+  "version": "0.228.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
@@ -172,6 +172,6 @@
     }
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   }
 }
