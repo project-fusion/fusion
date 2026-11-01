@@ -20,7 +20,11 @@ tags:
     point: 50%, 90%
     retryTapIfNoChange: false
 - startRecording: copy-button
-- tapOn: Copy
+# No retry: the tooltip passes while Maestro waits to see whether the press
+# changed the screen, which took 10 seconds on Android.
+- tapOn:
+    text: Copy
+    retryTapIfNoChange: false
 - extendedWaitUntil:
     visible: Copied
     timeout: 5000
