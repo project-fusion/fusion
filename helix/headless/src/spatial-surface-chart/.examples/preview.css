@@ -44,6 +44,7 @@ helix-headless-spatial-surface-chart::part(plot):focus-visible {
 /* The chart's own drawing: the box and its grid, see-through, its numbers
    and names, and the ring on the reading the pointer or the keys rest on. */
 helix-headless-spatial-surface-chart::part(fallback) {
+  font-size: 0.75rem;
   inset: 1rem;
   position: absolute;
 }
