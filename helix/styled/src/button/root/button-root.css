@@ -117,6 +117,7 @@
    below lands. */
 [part="button"] {
   all: unset;
+  position: relative;
   align-items: center;
   /* A wash of the foreground, inside a hairline. */
   background-color: var(
@@ -324,6 +325,15 @@
   }
 }
 
+/* A label longer than the button cuts at the end, so the button stays inside a
+   narrow column. */
+slot:not([name]) {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Icons scale with the label rather than holding the global icon size, so a
    large button does not end up with a small glyph beside big text. */
 [part="button"] ::slotted(helix-icon) {
@@ -372,6 +382,18 @@
   [part="spinner"] {
     animation-duration: var(--_button-crawl);
   }
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="button"] {
+  position: relative;
+}
+
+[part="button"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Not printed, being a control. */

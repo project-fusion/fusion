@@ -86,6 +86,7 @@
    The same pointer raises a control's text a step, up to `text-md`, so a Button
    at 13 does not stand beside a field at 16 on a phone. Heights stay as drawn. */
 :root {
+  --_helix-size-target: 1.5rem;
   --_helix-text-field-min: 0px;
   --_helix-text-control-sm: var(--helix-text-xs);
   --_helix-text-control-md: var(--helix-text-sm);
@@ -94,6 +95,7 @@
 
 @media (pointer: coarse) {
   :root {
+    --_helix-size-target: 2.75rem;
     --_helix-text-field-min: 16px;
     --_helix-text-control-sm: var(--helix-text-sm);
     --_helix-text-control-md: var(--helix-text-md);

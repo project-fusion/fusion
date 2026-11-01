@@ -198,6 +198,14 @@
   mask-image: none;
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="option"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: the filled marks are the score.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

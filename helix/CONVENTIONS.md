@@ -2429,6 +2429,11 @@ viewport. Everything else in here is `@media print` or
   or a comment starting `hover stays on touch` directly before the rule keeps the
   tap as the way in.
 
+**A press reaches `--helix-size-target`**: 24 under a mouse and 44 on a touch
+screen, in a transparent `::after` around the control, so nothing drawn moves.
+Decided by the owner on October 31, 2026, and held by
+`touch-target.pure.spec.ts`. A new standalone control adds the same box.
+
 **What narrow looks like now, measured rather than asserted.** Every styled
 family was rendered at 390 and at 320 on August 25, 2026. At 390 the library is
 clean. At 320 exactly two families overflowed, Button Group by 26 pixels and

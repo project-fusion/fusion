@@ -11,6 +11,7 @@
    rather than an answer. */
 [part="trigger"] {
   all: unset;
+  position: relative;
   align-items: center;
   background-color: var(--helix-color-well);
   block-size: var(--helix-size-control);
@@ -167,6 +168,18 @@
 
 :host(:not(:disabled)) [part="trigger"]:active {
   background-color: var(--helix-color-press);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="trigger"] {
+  position: relative;
+}
+
+[part="trigger"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive. */

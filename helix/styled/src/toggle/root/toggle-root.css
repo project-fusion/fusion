@@ -16,6 +16,7 @@
 
 [part="item"] {
   all: unset;
+  position: relative;
   box-sizing: border-box;
 }
 
@@ -32,6 +33,18 @@
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="item"] {
+  position: relative;
+}
+
+[part="item"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: not at all. Paper cannot be pressed, and the chrome that says press me

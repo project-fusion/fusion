@@ -164,3 +164,25 @@ slot[name="dismiss-icon"]::slotted(*) {
 [part="tab"]:active:not(:disabled, [aria-disabled="true"]) {
   background-color: var(--helix-color-press);
 }
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="tab"] {
+  position: relative;
+}
+
+[part="tab"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="dismiss"] {
+  position: relative;
+}
+
+[part="dismiss"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}

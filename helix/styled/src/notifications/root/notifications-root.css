@@ -187,6 +187,18 @@
   padding-inline: var(--helix-space-md);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="mark-all"] {
+  position: relative;
+}
+
+[part="mark-all"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 @media print {
   :host {
     max-block-size: none;

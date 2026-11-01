@@ -425,3 +425,15 @@ slot[name="chevron"]::slotted(*) {
 :host([disabled]) [part="row"]:active {
   background-color: transparent;
 }
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="row"] {
+  position: relative;
+}
+
+[part="row"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}

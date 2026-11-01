@@ -416,6 +416,30 @@
   margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-none);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="previous"] {
+  position: relative;
+}
+
+[part="previous"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="next"] {
+  position: relative;
+}
+
+[part="next"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

@@ -150,3 +150,15 @@
 [part="resizer"]:focus-visible::after {
   border-inline-end-color: var(--helix-color-foreground-muted);
 }
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="sort"] {
+  position: relative;
+}
+
+[part="sort"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}

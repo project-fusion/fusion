@@ -509,6 +509,18 @@ slot[name="detail"]::slotted(*) {
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="dismiss"] {
+  position: relative;
+}
+
+[part="dismiss"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: the dismiss control is not a thing on paper, and the unread mark is a
    fill printers drop unevenly. */
 @media print {

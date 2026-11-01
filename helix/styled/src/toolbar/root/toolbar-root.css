@@ -22,6 +22,7 @@
   --helix-size-tag: var(--helix-size-tag-sm);
 
   display: inline-flex;
+  max-inline-size: 100%;
 }
 
 /* A larger toolbar says so once as well, with every step it moves and the
@@ -73,8 +74,21 @@
   border: var(--toolbar-border-width, 0) solid var(--toolbar-border-color, transparent);
   border-radius: var(--toolbar-radius, var(--helix-radii-none));
   display: flex;
+  /* Wraps where it runs out of room, so a row of controls cannot widen the page.
+     Measured October 31, 2026: seven controls took a 390 page to 644. */
+  flex-wrap: wrap;
   gap: var(--toolbar-gap, var(--helix-space-2xs));
   padding: var(--toolbar-padding, var(--helix-space-none));
+}
+
+:host([scrollable]) [part="toolbar"] {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+:host([scrollable]) ::slotted(*) {
+  flex: none;
 }
 
 :host([orientation="vertical"]) [part="toolbar"] {

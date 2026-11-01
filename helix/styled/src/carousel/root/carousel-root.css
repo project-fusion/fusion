@@ -690,6 +690,19 @@
   outline-offset: calc(var(--helix-size-focus-ring) * -1);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part~="indicator"] {
+  position: relative;
+}
+
+[part~="indicator"]::after {
+  content: "";
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: 0;
+  position: absolute;
+}
+
 /* Print: the slide that is showing, without the controls that would change it. */
 @media print {
   :host {

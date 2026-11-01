@@ -9,6 +9,7 @@
    of its own: the group is. */
 [part="item"] {
   all: unset;
+  position: relative;
   align-items: center;
   box-sizing: border-box;
   cursor: pointer;
@@ -308,6 +309,18 @@ slot[name="indicator"]::slotted(*) {
   :host(:not([disabled])[variant="chip"]) [part="item"]:hover {
     translate: none;
   }
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="item"] {
+  position: relative;
+}
+
+[part="item"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.

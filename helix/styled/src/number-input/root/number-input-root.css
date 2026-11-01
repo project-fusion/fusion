@@ -80,6 +80,7 @@ slot[name="end"]::slotted(*) {
 [part="decrement"],
 [part="increment"] {
   all: unset;
+  position: relative;
   align-items: center;
   align-self: stretch;
   background-color: var(--number-input-stepper-background-color, transparent);
@@ -141,6 +142,28 @@ slot[name="increment-icon"]::slotted(*) {
 :host([scrub]:disabled) [part="label"],
 :host([scrub][readonly]) [part="label"] {
   cursor: default;
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="increment"] {
+  position: relative;
+}
+
+[part="increment"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="decrement"] {
+  position: relative;
+}
+
+[part="decrement"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive.

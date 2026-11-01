@@ -15,6 +15,7 @@
   align-self: start;
   display: flex;
   gap: var(--pin-input-gap, var(--helix-space-xs));
+  max-inline-size: 100%;
 }
 
 /* Square at the control height, so the row reads as boxes rather than as short
@@ -42,7 +43,10 @@
      a code is typed into it. */
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-medium);
+  /* The box gives up width in a narrow column, so the row stays inside it. */
+  flex: 0 1 auto;
   inline-size: var(--pin-input-cell-size, var(--helix-size-control));
+  min-inline-size: 0;
   justify-content: center;
   text-align: center;
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);

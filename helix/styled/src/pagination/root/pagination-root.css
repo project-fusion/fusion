@@ -14,16 +14,22 @@
   gap: var(--pagination-gap, var(--helix-space-2xs));
 }
 
+/* One line of pages, scrolling in a column too narrow for it, since three lines
+   of numbers read as three lists. The block padding holds the focus ring. */
 [part="list"] {
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
   gap: var(--pagination-gap, var(--helix-space-2xs));
+  max-inline-size: 100%;
+  overflow-x: auto;
+  padding-block: var(--helix-space-2xs);
+  scrollbar-width: none;
   /* Markers are removed, which is why the headless tier sets `role="list"`:
      Safari drops list semantics when it sees this. */
   list-style: none;
-  margin: var(--helix-space-none);
-  padding: var(--helix-space-none);
+  margin-block: calc(var(--helix-space-2xs) * -1);
+  margin-inline: var(--helix-space-none);
+  padding-inline: var(--helix-space-none);
 }
 
 /* `inline-flex` and not `display: contents`, which is what this wants
@@ -176,6 +182,58 @@
   font-variant-numeric: tabular-nums;
   font-weight: var(--pagination-font-weight, var(--helix-weight-medium));
   padding-inline: var(--helix-space-xs);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part~="page"] {
+  position: relative;
+}
+
+[part~="page"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="previous"] {
+  position: relative;
+}
+
+[part="previous"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="next"] {
+  position: relative;
+}
+
+[part="next"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="first"] {
+  position: relative;
+}
+
+[part="first"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part="last"] {
+  position: relative;
+}
+
+[part="last"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: a control for reaching pages this one is not.

@@ -45,6 +45,17 @@
    misses), a real flex item takes its whole width out of the second pane, and
    hovering lights an eight pixel box beside a one pixel line, which reads as the
    divider changing width and jumping sideways. */
+:host {
+  --_splitter-reach: var(--splitter-target, var(--helix-space-xs));
+}
+
+/* A finger needs the full target, and the line stays centered in it. */
+@media (pointer: coarse) {
+  :host {
+    --_splitter-reach: var(--splitter-target, var(--helix-size-target));
+  }
+}
+
 [part="separator"] {
   background-color: transparent;
   box-sizing: border-box;
@@ -57,8 +68,8 @@
   flex: none;
   place-content: center;
   place-items: center;
-  inline-size: var(--splitter-target, var(--helix-space-xs));
-  margin-inline: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
+  inline-size: var(--_splitter-reach);
+  margin-inline: calc(var(--_splitter-reach) / -2);
   position: relative;
   /* The pointer stays with the divider once it has it, and a drag that crosses a
      pane must not select the text under it. */
@@ -85,10 +96,10 @@
 }
 
 :host(:is([orientation="vertical"], [data-axis="vertical"])) [part="separator"] {
-  block-size: var(--splitter-target, var(--helix-space-xs));
+  block-size: var(--_splitter-reach);
   cursor: row-resize;
   inline-size: auto;
-  margin-block: calc(var(--splitter-target, var(--helix-space-xs)) / -2);
+  margin-block: calc(var(--_splitter-reach) / -2);
   margin-inline: 0;
 }
 
