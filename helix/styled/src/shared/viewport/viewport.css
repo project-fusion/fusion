@@ -29,6 +29,9 @@
   );
   --icon-button-foreground-color: var(--helix-color-foreground);
   --icon-button-size: var(--helix-size-control-sm);
+  /* The pan and zoom marks are characters, so this sets them to an icon's size: at
+     body size a plus measured 6.5 pixels in a 32 pixel box. */
+  font-size: var(--helix-size-icon);
 
   display: grid;
   gap: var(--helix-space-2xs);

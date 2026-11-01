@@ -493,7 +493,7 @@
      the pill had arrived before the eye found it. */
   --_carousel-indicator-motion: var(--helix-duration-slow) var(--helix-easing-emphasized);
   all: unset;
-  background-color: var(--helix-color-border);
+  background-color: var(--helix-color-foreground-subtle);
   block-size: var(--helix-space-xs);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;

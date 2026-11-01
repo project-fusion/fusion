@@ -190,35 +190,35 @@
    groups' names: the order `connectGraph` hands out the series in, so each
    mark is the color its notes are drawn in. */
 [part~="legend-item"]:nth-child(24n + 1) {
-  --_graph-swatch: var(--helix-color-series-1);
+  --_graph-swatch: light-dark(var(--helix-color-series-1), var(--helix-color-series-9));
 }
 
 [part~="legend-item"]:nth-child(24n + 2) {
-  --_graph-swatch: var(--helix-color-series-2);
+  --_graph-swatch: light-dark(var(--helix-color-series-2), var(--helix-color-series-10));
 }
 
 [part~="legend-item"]:nth-child(24n + 3) {
-  --_graph-swatch: var(--helix-color-series-3);
+  --_graph-swatch: light-dark(var(--helix-color-series-3), var(--helix-color-series-11));
 }
 
 [part~="legend-item"]:nth-child(24n + 4) {
-  --_graph-swatch: var(--helix-color-series-4);
+  --_graph-swatch: light-dark(var(--helix-color-series-4), var(--helix-color-series-12));
 }
 
 [part~="legend-item"]:nth-child(24n + 5) {
-  --_graph-swatch: var(--helix-color-series-5);
+  --_graph-swatch: light-dark(var(--helix-color-series-5), var(--helix-color-series-13));
 }
 
 [part~="legend-item"]:nth-child(24n + 6) {
-  --_graph-swatch: var(--helix-color-series-6);
+  --_graph-swatch: light-dark(var(--helix-color-series-6), var(--helix-color-series-14));
 }
 
 [part~="legend-item"]:nth-child(24n + 7) {
-  --_graph-swatch: var(--helix-color-series-7);
+  --_graph-swatch: light-dark(var(--helix-color-series-7), var(--helix-color-series-15));
 }
 
 [part~="legend-item"]:nth-child(24n + 8) {
-  --_graph-swatch: var(--helix-color-series-8);
+  --_graph-swatch: light-dark(var(--helix-color-series-8), var(--helix-color-series-16));
 }
 
 [part~="legend-item"]:nth-child(24n + 9) {

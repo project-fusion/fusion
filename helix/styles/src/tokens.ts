@@ -139,10 +139,11 @@ export const TOKENS: Token[] = [
     'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
   ],
   /* The bubble of your own message: a brand's wash, or at no brand a lighter one,
-     since 28% of near black is `#bfbfbf`, heavier than the other speaker. */
+     since 28% of near black is `#bfbfbf`, and 16% matched the other speaker's bubble
+     at `#dbdbdb` against `#dadada`. */
   [
     'color-primary-wash',
-    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 16%, transparent))',
+    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 22%, transparent))',
     'A wash of the primary color, such as the bubble of your own Chat message.',
   ],
   /* What a control is lit with under a press, a step past `color-hover`. A press

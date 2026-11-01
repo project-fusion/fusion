@@ -198,6 +198,14 @@
   position: absolute;
 }
 
+/* Rows sit against each other, so a box reaching past a row would take the press
+   from the row beside it. On a touch screen the row itself reaches the target. */
+@media (pointer: coarse) {
+  [part~="row"] {
+    min-block-size: var(--helix-size-target);
+  }
+}
+
 /* Print: what is open, all of it. A clipped tail and a control are neither of
    them on paper. */
 @media print {

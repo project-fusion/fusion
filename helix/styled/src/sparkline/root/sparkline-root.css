@@ -1,5 +1,8 @@
 :host {
-  --_sparkline-ink: var(--sparkline-color, var(--helix-color-series-1));
+  --_sparkline-ink: var(
+    --sparkline-color,
+    light-dark(var(--helix-color-series-1), var(--helix-color-series-9))
+  );
   block-size: var(--sparkline-block-size, 2.5em);
   /* Set once and read by the line, the wash and the terminus, so a consumer
      moving `--sparkline-color` cannot end up with three that disagree. */
