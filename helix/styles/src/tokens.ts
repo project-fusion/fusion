@@ -416,14 +416,21 @@ export const TOKENS: Token[] = [
      dark surface 6.16, raised 4.92, sunken 6.83. **3.08 is the number to design
      against**, not the 3.45 a measurement against `surface` alone reports. The
      weakest pair under deuteranopia is 1 and 8 of the balanced eight in light,
-     and they are closer than is comfortable. */
+     and they are closer than is comfortable.
+
+     **Re-measured October 31, 2026, with no brand at origin 270 and series 2 at
+     chroma 0.18.** Series 2 sits 18 degrees from danger and series 5 15 from
+     warning, against 6 and 3. The light bright eight clear 3.28 on the page and
+     3.01 on raised. Charts in dark start from the balanced eight, 7.36 to 10.98 on
+     the page, against 5.09 to 16.00. The closest pair under deuteranopia moved
+     from 0.017 to 0.013 in light, and from 0.003 to 0.011 in dark. */
   [
     'color-series-1',
     'light-dark( oklch( from var(--_helix-series-origin) 0.595 calc(0.221 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.206 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
   ],
   [
     'color-series-2',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.645 calc(0.238 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.645 calc(0.18 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.645 calc(0.18 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
   ],
   [
     'color-series-3',
