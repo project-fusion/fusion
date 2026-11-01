@@ -31,7 +31,7 @@ export default function ProjectScreen() {
         </helix-breadcrumbs>
         <helix-flex direction="column" gap="2xs">
           <helix-flex align-items="center" gap="sm">
-            <helix-text as="h1" variant="heading">
+            <helix-text as="h1" scale="heading">
               {project.name}
             </helix-text>
             <helix-tag emphasis="subtle" tone={STATUS[project.status].tone}>

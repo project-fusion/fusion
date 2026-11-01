@@ -115,6 +115,7 @@ export function ExampleScreen({ route }: NativeStackScreenProps<Routes, 'Example
       <HelixTabs
         defaultActive="preview"
         label="View"
+        marker="segmented"
         panels={[
           <HelixTabPanel key="preview" value="preview">
             {preview}
@@ -131,7 +132,6 @@ export function ExampleScreen({ route }: NativeStackScreenProps<Routes, 'Example
             </Text>
           </HelixTabPanel>,
         ]}
-        variant="segmented"
         width="full"
       >
         <HelixTab value="preview">Preview</HelixTab>

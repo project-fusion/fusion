@@ -63,7 +63,7 @@ export const byName = <T extends { name: string }>(rows: T[]): T[] =>
 
 export function Code({ children }: { children: string }) {
   return (
-    <helix-text class={api.apiName} variant="code">
+    <helix-text class={api.apiName} scale="code">
       {children}
     </helix-text>
   )
@@ -123,7 +123,7 @@ const kindOf = (token: string): string => {
  */
 export function DefaultText({ children }: { children: string }) {
   return (
-    <helix-text class={api.apiDefault} variant="code">
+    <helix-text class={api.apiDefault} scale="code">
       {tokens(children.replace(/'([^']*)'/g, '"$1"'))}
     </helix-text>
   )
@@ -146,7 +146,7 @@ export function TypeText({ children }: { children: string }) {
    * member, and it has spaces it would otherwise be glad to break at. */
   const held = members.length > 1
   return (
-    <helix-text class={api.apiType} variant="code">
+    <helix-text class={api.apiType} scale="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
         <Fragment key={at}>
@@ -293,7 +293,7 @@ export function Described({
 }) {
   return (
     <helix-table-cell>
-      <helix-text emphasis="muted" variant="caption">
+      <helix-text emphasis="muted" scale="caption">
         <CodeText>{first(description)}</CodeText>
       </helix-text>
       {references.map((reference) => (

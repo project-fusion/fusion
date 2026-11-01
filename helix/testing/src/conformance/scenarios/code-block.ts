@@ -99,7 +99,7 @@ export const CODE_BLOCK: readonly Scenario[] = [
     family: 'code-block',
     intents: [READ],
     name: 'a split says the old lines and then the new',
-    setup: block(PAIRLESS, { diff: true, variant: 'split' }),
+    setup: block(PAIRLESS, { diff: true, layout: 'split' }),
   },
   {
     family: 'code-block',

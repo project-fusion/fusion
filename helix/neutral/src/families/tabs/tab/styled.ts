@@ -6,7 +6,7 @@ import tab from './headless.js'
  * A tab's styled tier.
  *
  * **Every private value a tab reads comes from the tab set**, which sets them
- * all for its default and overrides what a variant changes. The fallbacks are
+ * all for its default and overrides what a marker changes. The fallbacks are
  * what a tab would look like with no set around it. That arrangement does not
  * ship, so they are the plainest values that draw a tab.
  */
@@ -51,10 +51,10 @@ export default styles(
         alignItems: 'center',
         backgroundColor: 'transparent',
         /* The height a control is. Left to its own text plus whatever padding the
-           variant asks for, a tab comes out at 31px beside a 40px button and a
+           marker asks for, a tab comes out at 31px beside a 40px button and a
            toolbar looks assembled from parts.
 
-           Through a private value, because a variant that puts a frame around the
+           Through a private value, because a marker that puts a frame around the
            row has to hand the tab a share of the frame, which the whole control
            height would overflow. `segmented` does exactly that. */
         blockSize: first(own.tabHeight, hook.blockSize),

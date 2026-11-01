@@ -238,7 +238,7 @@ describe('the generated Steps', () => {
   })
 
   test('numbers its stages under `numeric`, and draws no mark', async () => {
-    await render(<Checkout variant="numeric" />)
+    await render(<Checkout marker="numeric" />)
     for (const number of ['1', '2', '3']) {
       expect(screen.getByText(number, { includeHiddenElements: true })).toBeTruthy()
     }

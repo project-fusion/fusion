@@ -112,7 +112,7 @@ describe('the generated Loader', () => {
   })
 
   test('pulse draws neither the arc nor the track, and a larger box for the mark', async () => {
-    await render(themed(<HelixLoader variant="pulse" />))
+    await render(themed(<HelixLoader pattern="pulse" />))
     expect([styleOf(drawing() ?? { props: {} }).width]).toEqual([64])
     expect(circles()).toHaveLength(0)
   })

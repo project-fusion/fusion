@@ -9,7 +9,7 @@ export default function Projects() {
     <Page>
       <helix-flex direction="column" gap="xl">
         <helix-flex direction="column" gap="2xs">
-          <helix-text as="h1" variant="heading">
+          <helix-text as="h1" scale="heading">
             Projects
           </helix-text>
           <helix-text emphasis="muted">{`${PROJECTS.length} projects`}</helix-text>

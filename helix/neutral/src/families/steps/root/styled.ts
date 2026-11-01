@@ -145,7 +145,7 @@ export default styles(
       /* Numbers, where the order is the point: ink on the digits, a step
          darker on the current one, and a lighter weight ahead. */
       rule(
-        { variant: 'numeric' },
+        { marker: 'numeric' },
         {
           own: {
             stepsMark: 'none',
@@ -247,7 +247,7 @@ export default styles(
          own number. */
       native([
         rule({ counterIncrement: 'helix-step' }),
-        rule({ variant: 'numeric' }, { own: { stepsCount: fn('counter', 'helix-step') } }),
+        rule({ marker: 'numeric' }, { own: { stepsCount: fn('counter', 'helix-step') } }),
       ]),
     ]),
   ],

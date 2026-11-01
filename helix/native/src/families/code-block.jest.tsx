@@ -183,7 +183,7 @@ describe('a split on a phone', () => {
       scale: 3,
       width,
     })
-    await draw({ diff: true, variant: 'split' }, PATCH)
+    await draw({ diff: true, layout: 'split' }, PATCH)
     window.mockRestore()
     return JSON.stringify(screen.toJSON())
   }

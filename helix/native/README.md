@@ -479,7 +479,7 @@ row's `rel`, `target`, `download`, and `aria-keyshortcuts`; and the panel's
 
 **Megamenu is a trigger that discloses a band of destinations** under it,
 across the window, as the web draws the panel in a page narrower than
-`bandBelow` and under `variant="band"`. The trigger is a button named by
+`bandBelow` and under `layout="band"`. The trigger is a button named by
 `label`, or the trigger passed into `trigger`, and says whether the panel is
 expanded. **A press on the trigger opens the panel and closes it**, under
 either `openOn`, and leaves focus on the trigger. Down from a hardware
@@ -1488,7 +1488,7 @@ it is no longer in the toolbar, and its controls are not the toolbar's.
 `HelixButtonGroup`, from `@fusion.dev/helix/button-group`, joins its Buttons
 and Icon Buttons into one shape: the inner corners go flat and each button
 after the first sits on its neighbor's edge, in a row or, under
-`orientation="vertical"`, in a column. `variant="spaced"` parts them with a
+`orientation="vertical"`, in a column. `layout="spaced"` parts them with a
 gap, and `size` sets every button's size.
 
 **Under `selectionMode`, a button with a `value` stays pressed.** Its own
@@ -1800,7 +1800,7 @@ import { HelixColorPicker } from '@fusion.dev/helix/color-picker'
 color with a swatch that opens a `HelixColorPicker` over the app. A move in the
 picker is an edit of the text, and refusing `onBeforeChange` leaves both where
 they were. Text that is not a color shows `badInputMessage` once the reader
-leaves the field. `variant="swatch"` draws the swatch alone, and the picker then
+leaves the field. `trigger="swatch"` draws the swatch alone, and the picker then
 holds the text. Read-only, the text can be read and the picker does not open.
 
 ## Number inputs
@@ -2275,8 +2275,8 @@ where it went.
 
 **One mark stands at the current destination** and glides to the next one
 your app marks, the one marked `page` where several are: a pill on the
-destination, a bar on a rule under the row under `variant="underlined"`, and
-a raised pill in a sunken track under `variant="segmented"`. Under
+destination, a bar on a rule under the row under `marker="underlined"`, and
+a raised pill in a sunken track under `marker="segmented"`. Under
 `orientation="vertical"` the destinations stand in a column, each the
 column's width with its words at its start, and the mark moves down it, or
 stands along the column's end edge under `underlined`. A row longer than the
@@ -2325,7 +2325,7 @@ the steps run are left to the page, as on the web.
 
 The mark is a tick on a finished stage, a dot in a ring where the reader
 is, and an empty ring ahead, or the stage's number under
-`variant="numeric"`. A screen reader hears "Current step" after the current
+`marker="numeric"`. A screen reader hears "Current step" after the current
 stage's name, and its `complete-label` after a finished one's. A line in two
 halves joins each mark to its neighbors, along a row or down a column under
 `orientation="vertical"`, where the current stage opens what its `content`

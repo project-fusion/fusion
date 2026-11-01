@@ -42,7 +42,7 @@ export default styles(
       buttonGroupPressedBorder: null,
       buttonGroupPressedForeground: null,
     },
-    props: { size: oneOf(['sm', 'md', 'lg']), variant: oneOf(['joined', 'spaced']) },
+    props: { size: oneOf(['sm', 'md', 'lg']), layout: oneOf(['joined', 'spaced']) },
     stylesheet: 'button-group/root/button-group-root.generated.css',
   },
   ({ hook, on, rule, variants }) => [
@@ -130,7 +130,7 @@ export default styles(
          along the block axis. */
       rule({ orientation: 'vertical' }, { alignItems: 'stretch', flexDirection: 'column' }),
       /* The same set, spaced. */
-      rule({ variant: 'spaced' }, { gap: hook.gap }),
+      rule({ layout: 'spaced' }, { gap: hook.gap }),
       /* A control is not printed. */
       rule({ print: true }, { display: 'none' }),
     ]),
@@ -150,15 +150,15 @@ export default styles(
          squeeze the short one to nothing. */
       web([rule({ minInlineSize: fn('min', token('size-control'), '100%') })]),
       rule(
-        { child: 'later', variant: { not: 'spaced' } },
+        { child: 'later', layout: { not: 'spaced' } },
         { marginInlineStart: product(token('border-thin'), '-1') },
       ),
       /* One shape, so the inner corners go flat and the outer ones keep their
          radius. */
-      rule({ child: 'later', variant: { not: 'spaced' } }, { '--button-radius-start': 0 }),
-      rule({ child: 'earlier', variant: { not: 'spaced' } }, { '--button-radius-end': 0 }),
+      rule({ child: 'later', layout: { not: 'spaced' } }, { '--button-radius-start': 0 }),
+      rule({ child: 'earlier', layout: { not: 'spaced' } }, { '--button-radius-end': 0 }),
       rule(
-        { child: 'later', orientation: 'vertical', variant: { not: 'spaced' } },
+        { child: 'later', orientation: 'vertical', layout: { not: 'spaced' } },
         {
           '--button-radius-start-start': 0,
           '--button-radius-start-end': 0,
@@ -171,7 +171,7 @@ export default styles(
         },
       ),
       rule(
-        { child: 'earlier', orientation: 'vertical', variant: { not: 'spaced' } },
+        { child: 'earlier', orientation: 'vertical', layout: { not: 'spaced' } },
         {
           '--button-radius-end-end': 0,
           '--button-radius-end-start': 0,
