@@ -1,4 +1,4 @@
-import { headless, number, oneOf, View } from '../../../render.js'
+import { headless, number, View } from '../../../render.js'
 import { derive } from '../../../tree.js'
 
 /**

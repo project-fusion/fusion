@@ -296,7 +296,10 @@ export interface Given<
     fragment: Fragment<Need, Props>,
   ) => Group
   /** An animation and its frames, each an object of declarations. */
-  readonly keyframes: (name: string, frames: Readonly<Record<string, Css>>) => Group
+  readonly keyframes: (
+    name: string,
+    frames: Readonly<Record<string, Css & { readonly [custom: `--${string}`]: Value }>>,
+  ) => Group
   /** A group: every rule in it is on `target`. */
   readonly on: (target: Target<Part, Region>, rules: readonly Rule[]) => Group
   /** Each private value `own` declares, by its whole name in camelCase. */

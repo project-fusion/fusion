@@ -12,7 +12,6 @@ import {
   native,
   product,
   quotient,
-  scheme,
   sum,
   token,
   web,
@@ -66,11 +65,11 @@ export default styles(
       iconButtonInkHover: null,
       iconButtonOnTone: null,
       iconButtonPressWay: null,
+      iconButtonSolidPress: null,
       iconButtonPressedFill: null,
       iconButtonPressedInk: null,
       iconButtonSize: null,
       iconButtonTone: null,
-      iconButtonToneHover: null,
       iconButtonTurn: null,
       iconButtonWash: null,
     },
@@ -91,12 +90,6 @@ export default styles(
         own: {
           /* Near black has nothing darker, so a neutral press goes toward the page. */
           iconButtonPressWay: 1,
-          /* Two whole colors, since a scheme is not valid in a percentage. Each
-             moves at least 1.3:1 from rest, from a fill with nothing past it. */
-          iconButtonToneHover: scheme(
-            mix(token('color-foreground'), 72, token('color-background')),
-            mix(token('color-foreground'), 90, token('color-background')),
-          ),
           iconButtonWash: token('color-hover'),
         },
       }),
@@ -342,14 +335,17 @@ export default styles(
             backgroundColor: first(
               own.iconButtonPressedFill,
               hook.backgroundColor,
-              fn('oklch', [
+              own.iconButtonSolidPress,
+            ),
+            own: {
+              iconButtonSolidPress: fn('oklch', [
                 'from',
                 own.iconButtonFillHover,
                 sum('l', product('0.05', own.iconButtonPressWay('-1'))),
                 'c',
                 'h',
               ]),
-            ),
+            },
           },
         ),
       ]),
