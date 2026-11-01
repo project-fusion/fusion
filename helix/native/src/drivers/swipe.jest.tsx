@@ -172,6 +172,19 @@ describe('useSwipe', () => {
     expect(held.settled).toEqual([])
   })
 
+  test("hands over a drag that bounces the list at its top, since iOS's bounce past an end is no move of the list's", async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(30_000)
+    const held = await drawn()
+    const scroller = held.swiping?.scroller
+    scroller?.scrolled(0, 900, 300)
+    now.mockReturnValue(30_000 + SCROLL_LOCK)
+    fireGestureHandler(scroller?.gesture as never, [{ state: State.BEGAN }])
+    scroller?.scrolled(-24, 900, 300)
+    drag(held, 260)
+    await settle()
+    expect(held.settled).toEqual([0])
+  })
+
   test('tells a refused dismissal, and the surface stays open', async () => {
     const held = await drawn(undefined, true)
     drag(held, 300)
