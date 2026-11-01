@@ -161,7 +161,9 @@ pass() {
     elif emulator_back "$name"; then
       say "Running $name again on the reconnected emulator"
       driver=--reinstall-driver
-      rm -rf "$out/debug/$name"
+      # Kept apart: a failure in the first run before the drop may not come
+      # back in the second, as in run 41272571475.
+      mv "$out/debug/$name" "$out/debug/$name-first"
       run_maestro "$name" "$@" || result=failed
     else
       result=failed

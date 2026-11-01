@@ -23,9 +23,13 @@ tags:
 - extendedWaitUntil:
     visible: .*Show projects by owner.*
     timeout: 5000
+# The sheet rests half open, as the web's does, with its title low on the
+# screen. Maestro drags from a title to 90% of the screen, which is too short
+# to pass the snap point at a quarter, so this drag names its points, on the
+# sheet's header.
 - swipe:
-    from: Filters
-    direction: DOWN
+    start: 50%, 86%
+    end: 50%, 99%
     duration: 300
 - extendedWaitUntil:
     notVisible: .*Show projects by owner.*
