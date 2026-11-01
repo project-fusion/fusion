@@ -430,7 +430,7 @@ export default async function FamilyDocs({
                         reads as data that failed to load; a dash reads as a
                         blank someone still has to fill. */}
                       <helix-table-cell>
-                        <helix-text emphasis="muted" variant="caption">
+                        <helix-text emphasis="muted" scale="caption">
                           <ExampleSummary example={example} native={native !== undefined} />
                         </helix-text>
                       </helix-table-cell>
