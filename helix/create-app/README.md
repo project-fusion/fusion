@@ -3,16 +3,21 @@
 Starts a Helix project.
 
 ```sh
-npm create @fusion.dev/helix-app@latest my-app
+npm create @fusion.dev/helix-app@latest
 ```
 
-Named without a template, it lists the templates and writes nothing: a
-scaffolder that picks for you writes a project you didn't choose. Name one after
-`--`, which is how `npm create` passes a flag on rather than reading it itself:
+It asks for a project name and a template, then writes the project. It prints the
+commands that install and start it, for the package manager you ran it with.
+
+Name both on the command line to skip the questions. Outside a terminal, such as
+in a script, a missing name is an error and a missing template lists the templates
+and writes nothing.
 
 ```sh
-npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
+npm create @fusion.dev/helix-app@latest my-app --template react-vite
 ```
+
+The same command works with `yarn create`, `pnpm create`, and `bun create`.
 
 | Template | What it is |
 |---|---|

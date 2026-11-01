@@ -87,6 +87,16 @@ if (process.platform !== 'win32') {
       expect(ran.stdout).toContain('args: new my-app --template react-vite')
     })
 
+    test('takes the template back from npm, which passes the value of `--template` bare', () => {
+      const ran = launch(['my-app', 'react-vite'])
+      expect(ran.stdout).toContain('args: new my-app --template react-vite')
+    })
+
+    test('and leaves a name alone, or nothing at all', () => {
+      expect(launch(['my-app']).stdout).toContain('args: new my-app\n')
+      expect(launch([]).stdout).toContain('args: new\n')
+    })
+
     test('names the templates it came with, since where it runs has none', () => {
       const named = /templates: (.*)/.exec(launch(['my-app']).stdout)?.[1] ?? ''
       expect(realpathSync(named)).toBe(TEMPLATES)
@@ -103,6 +113,14 @@ if (process.platform !== 'win32') {
       expect(ran.stderr).toContain(`Helix ${ahead} is out, and this is ${OWN}`)
       expect(ran.stderr).toContain('npm create @fusion.dev/helix-app@latest')
       expect(ran.status).toBe(3)
+    })
+
+    test('and names the package manager that ran it', () => {
+      const ran = launch(['my-app'], {
+        environment: { npm_config_user_agent: 'pnpm/9.0.0 npm/? node/v22.0.0 darwin arm64' },
+        npm: registry(ahead),
+      })
+      expect(ran.stderr).toContain('pnpm create @fusion.dev/helix-app@latest')
     })
 
     test('and says nothing when this is the newest', () => {

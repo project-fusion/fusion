@@ -117,8 +117,8 @@ pub enum Noun {
     /// Scaffold a project from a Helix template.
     ///
     /// Reads the templates in `@fusion.dev/helix-templates`, which npm installs
-    /// with `@fusion.dev/helix-cli`. Omit `--template` to be shown what there
-    /// is.
+    /// with `@fusion.dev/helix-cli`. Omit the name or `--template` in a terminal
+    /// to be asked for it.
     New(New),
 
     /* **A noun with no verb, like `diagnostics`**: it does one thing to one
@@ -431,13 +431,15 @@ pub struct New {
     /// The project's name, and the directory it is written into.
     ///
     /// Written wherever the template's register says the name belongs, which is
-    /// its manifest and whatever else that template names.
-    pub name: String,
+    /// its manifest and whatever else that template names. Omitted, a terminal
+    /// asks for it and anything else is refused.
+    pub name: Option<String>,
 
     /// Which template to use.
     ///
-    /// Omitted, the templates are listed and nothing is written: a scaffolder
-    /// that picks for you writes a project the reader did not choose.
+    /// Omitted, a terminal asks which one. Anywhere else the templates are
+    /// listed and nothing is written: a scaffolder that picks for you writes a
+    /// project the reader did not choose.
     #[arg(long)]
     pub template: Option<String>,
 

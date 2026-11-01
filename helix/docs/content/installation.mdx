@@ -22,10 +22,16 @@ If you do not have a project yet, the scaffolder writes one with Helix
 installed, the stylesheets imported, and every element registered:
 
 ```sh
-npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
+npm create @fusion.dev/helix-app@latest
 ```
 
-Leave out `--template`, and the command lists the templates and writes nothing.
+The command asks for a project name and a template. To skip the questions, name
+both:
+
+```sh
+npm create @fusion.dev/helix-app@latest my-app --template react-vite
+```
+
 Each template starts with the same three pages:
 
 - a landing page
