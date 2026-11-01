@@ -345,7 +345,16 @@ pub const LISTBOX: &[(&str, Names)] = &[
 ];
 
 /// What a list of options computes for its parts, each read as `listbox.x`.
-pub const LISTBOX_COMPUTED: &[&str] = &["childrenShown", "emptyShown", "emptyWords", "errorShown", "errorWords", "loadingShown", "rows", "windowed"];
+pub const LISTBOX_COMPUTED: &[&str] = &[
+    "childrenShown",
+    "emptyShown",
+    "emptyWords",
+    "errorShown",
+    "errorWords",
+    "loadingShown",
+    "rows",
+    "windowed",
+];
 
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[
@@ -360,12 +369,18 @@ pub const OPTION: &[(&str, Names)] = &[
 ];
 
 /// What an option computes for its parts, each read as `option.x`.
-pub const OPTION_COMPUTED: &[&str] = &["checkShown", "described", "dragging", "dropAfter", "dropBefore", "dropShown", "highlighted"];
+pub const OPTION_COMPUTED: &[&str] = &[
+    "checkShown",
+    "described",
+    "dragging",
+    "dropAfter",
+    "dropBefore",
+    "dropShown",
+    "highlighted",
+];
 
 /// What a group of options, or a rule between runs, reads and sends, by the name the machine binds.
-pub const OPTION_GROUP: &[(&str, Names)] = &[
-    ("label", Names::Prop),
-];
+pub const OPTION_GROUP: &[(&str, Names)] = &[("label", Names::Prop)];
 
 /// What a group of options computes for its parts, each read as `optionGroup.x`.
 pub const OPTION_GROUP_COMPUTED: &[&str] = &["emptied", "later"];

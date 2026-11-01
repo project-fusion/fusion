@@ -86,9 +86,10 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, LISTBOX, OPTION, OPTION_GROUP, CHAT_MESSAGE,
-    CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
-    NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
+    CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, TABLE, TABLE_COLUMN, TABLE_ROW,
+    TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
