@@ -26,7 +26,7 @@
 /* The status, as a word rather than a number in a headline. A large "404" is a
    server talking to itself; the reader needs the sentence under it. */
 .troubleKicker {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   letter-spacing: var(--helix-tracking-wide);
@@ -54,7 +54,7 @@
    us is this hash and nothing else. Printing it turns "it broke" into a line we
    can find in the logs. Monospace and quiet: it is for copying, not reading. */
 .troubleDigest {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   margin: 0;

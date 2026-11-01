@@ -148,7 +148,7 @@
 
 /* Quiet at rest and plainly a link on hover. */
 .siteFooterLink {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
   text-decoration: none;
   width: fit-content;

@@ -27,7 +27,7 @@
      same mark at every level. */
   --icon-size: var(--helix-size-icon-sm);
   align-items: center;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: flex;
   inset-block-start: 50%;
   inset-inline-end: 100%;

@@ -95,7 +95,7 @@
 }
 
 .apiDefaultLabel {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
 }
 
@@ -156,14 +156,14 @@
    together, and holding it together anyway is what made `"Show password"`
    overflow an 83px cell and print itself over the description. */
 .apiDefault {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: block;
   overflow-wrap: anywhere;
 }
 
 /* The type beside the name, colored by what each part of it is. */
 .apiType {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: block;
   /* Never narrower than the longest thing in it that cannot break. Carousel is
      the case: `"block-start"` measures 116px and the column had settled at 112,
@@ -185,7 +185,7 @@
 }
 
 .apiTypeBar {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   /* Space on both sides, and it has to be margin rather than a space in the
      markup: the members are adjacent inline spans with no whitespace between
      them, so text alone would run the bar into the value before it. `2xs` rather
@@ -206,7 +206,7 @@
 }
 
 .apiUnnamed {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-style: italic;
 }
 

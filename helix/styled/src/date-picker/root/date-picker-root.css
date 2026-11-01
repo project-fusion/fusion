@@ -253,7 +253,7 @@
    whole rows rather than ragged ones. They are filler: the tier below renders
    them with no click handler at all. */
 [part~="cell"][data-outside] [part~="day"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 /* **And the cursor says so, which the color alone does not.** The base rule

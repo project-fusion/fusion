@@ -542,11 +542,11 @@ export const TOKENS: Token[] = [
   ['color-success', 'light-dark(var(--_helix-success-600), var(--_helix-success-400))'],
   ['color-warning', 'light-dark(var(--_helix-warning-600), var(--_helix-warning-400))'],
   /* Warning as a mark: a star, a Meter's fill, a Callout's icon. The ink is solved
-     for text at 5.62:1 and reads brown as a shape, so a mark takes this, solved at
-     3:1 on the light page. */
+     for text at 5.62:1 and reads brown as a shape, so a mark takes this, at least 3:1
+     on the light page and on its own tint. */
   [
     'color-warning-mark',
-    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.14) calc(c * 1.25) h), var(--helix-color-warning))',
+    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.25) h), var(--helix-color-warning))',
     'Warning as a mark that is not text, such as a star or a Meter fill.',
   ],
   /* The one severity whose two arms are two steps apart rather than one: `600`

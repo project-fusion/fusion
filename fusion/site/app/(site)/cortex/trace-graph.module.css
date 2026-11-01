@@ -56,7 +56,7 @@
 }
 
 .rungKind {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
 }

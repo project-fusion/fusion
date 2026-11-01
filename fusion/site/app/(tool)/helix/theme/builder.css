@@ -148,7 +148,7 @@ helix-sandbox-editor {
  * ramp and does not compete for the row. Centered in the column's fixed width,
  * so each face sits on one vertical. */
 .themeFaceSample {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-lg);
   inline-size: 3ch;
   line-height: var(--helix-leading-tight);
@@ -175,7 +175,7 @@ helix-sandbox-editor {
 }
 
 .themeFaceSample {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-lg);
   line-height: var(--helix-leading-tight);
 }
