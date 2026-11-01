@@ -34,7 +34,8 @@ import root from './headless.js'
  * control size from the `density-sm` fragment, as Toolbar does.
  *
  * **The bar stands clear of the status bar and the notch** where it is at
- * the top of the window: its host is padded by the window's top safe area.
+ * the top of the window: on the web a `sticky` or `overlay` bar's host is
+ * padded by the window's top safe area, and on a phone every bar's.
  * On a phone that is the share of the inset that reaches into the host,
  * which is none where the bar stands lower, as under a router's own header,
  * or inside a scroll view. On the web it is `env(safe-area-inset-top)`,
@@ -78,9 +79,6 @@ export default styles(
           web: { containerType: 'inline-size' },
           display: 'block',
           inlineSize: '100%',
-          /* Clear of the status bar and the notch, by the window's top safe
-             area, or on a phone the share of it that reaches into the bar. */
-          paddingBlockStart: safeArea('top'),
           /* The fill and the edge fade with the blur, or `transparent` takes
              its surface in a single frame. */
           transition: list(
@@ -114,6 +112,11 @@ export default styles(
           { sticky: true },
           { insetBlockStart: 0, web: { position: 'sticky' }, zIndex: token('layer-sticky') },
         ),
+        /* Clear of the status bar and the notch: on the web a bar that stays at
+           the top of the window, or lies over the page, and on a phone every
+           bar, by the share of the safe area that reaches into it. */
+        web([rule([{ sticky: true }, { overlay: true }], { paddingBlockStart: safeArea('top') })]),
+        native([rule({ paddingBlockStart: safeArea('top') })]),
         /* Out of the way under `hide-on-scroll`: a sticky bar slides up by
            its own height, and one that is not has scrolled away already. */
         rule(
