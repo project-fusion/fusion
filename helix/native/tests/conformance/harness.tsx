@@ -90,16 +90,31 @@ const eventsOf = (tag: string): readonly string[] =>
 /** The item an event the element hears after it came from, where its handler heard it first. */
 const relays = new WeakMap<object, string>()
 
+/**
+ * The item each event was last heard from, by its name. **An item's machine
+ * tells the element around it with an event of its own**, as a tree item's
+ * `before-select` is told twice, so the element's handler may not hear the
+ * object the item's did.
+ */
+const lastHeard = new WeakMap<object, Map<string, string>>()
+
 /** Keeps which item an event came from, where the item's handler hears it before the element's. */
-const relay = (event: HelixEvent, value: string | null): void => {
+const relay = (run: Run, name: string, event: HelixEvent, value: string | null): void => {
   if (value !== null) {
     relays.set(event, value)
+    const heard = lastHeard.get(run) ?? new Map<string, string>()
+    heard.set(name, value)
+    lastHeard.set(run, heard)
   }
 }
 
 /** The item an event the element hears came from: the value it carries, or the item that relayed it. */
-const senderOf = (event: HelixEvent): string | null =>
-  (event.target as { readonly value?: string }).value ?? relays.get(event) ?? null
+const senderOf = (run: Run, name: string, event: HelixEvent): string | null => {
+  const heard = lastHeard.get(run)
+  const last = heard?.get(name)
+  heard?.delete(name)
+  return (event.target as { readonly value?: string }).value ?? relays.get(event) ?? last ?? null
+}
 
 /**
  * The handler for one event of one element: it refuses what the page
@@ -145,10 +160,10 @@ const hearing = (run: Run, name: string, value: string | null) => {
       name === 'load-more' ||
       name === 'range-change'
     ) {
-      relay(event, value)
+      relay(run, name, event, value)
       return
     }
-    record(run, event, name, value ?? (relayed ? senderOf(event) : null))
+    record(run, event, name, value ?? (relayed ? senderOf(run, name, event) : null))
   }
 }
 
