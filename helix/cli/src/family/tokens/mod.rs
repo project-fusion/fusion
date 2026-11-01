@@ -25,7 +25,9 @@ use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use fusion_helix_theme::tokens::{declarations, native, Kind, Mode, Native, Registry, Written};
+use fusion_helix_theme::tokens::{
+    declarations, declared_on_coarse, native, Kind, Mode, Native, Registry, Written,
+};
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use oxc_allocator::Allocator;
@@ -182,7 +184,7 @@ pub fn native_modules(
         Tokens::Styles { package, vendor } => {
             let source = format!("{}/src/tokens.ts", project.named(package));
             modules(
-                &registry(package)?,
+                &phone_registry(package)?,
                 &system(&project, vendor.as_ref()),
                 &header(&source, true),
             )?
@@ -265,14 +267,21 @@ pub fn design_files(
     )
 }
 
-/// The token layer under `styles`, typed.
+/// The token layer under `styles` as a phone holds it, which is a coarse
+/// pointer: what `pointer: coarse` sets stands over the modes' defaults, as it
+/// does on a page on a phone. The design files stay at the defaults.
 ///
 /// # Errors
 ///
 /// [`Failure`] when a source cannot be read, `tokens.ts` holds an entry that is
 /// not a name and a value, or a token cannot be typed.
-pub fn registry(styles: &Path) -> Result<Registry, Failure> {
-    typed(&declared(styles)?, &written(styles)?)
+pub fn phone_registry(styles: &Path) -> Result<Registry, Failure> {
+    let mut held = declared(styles)?;
+    for (name, value) in declared_on_coarse(&read(styles, "_modes.css")?) {
+        held.retain(|(known, _)| *known != name);
+        held.push((name, value));
+    }
+    typed(&held, &written(styles)?)
 }
 
 /// The tokens `written` typed over `declared`.

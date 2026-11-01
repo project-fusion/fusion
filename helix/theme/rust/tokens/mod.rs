@@ -44,4 +44,4 @@ pub use native::{native, Native};
 pub use paint::{to_hex, to_srgb, Lab, Polar};
 pub use print::{expr as print, normalized};
 pub use registry::{Declared, Registry, Token, Written};
-pub use sheet::{declarations, declared_under};
+pub use sheet::{declarations, declared_on_coarse, declared_under};
