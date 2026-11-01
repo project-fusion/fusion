@@ -12,7 +12,7 @@ import {
   valueAt,
   words,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretUp, dotsSixVertical } from '@fusion.dev/helix-icons'
+import { dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -632,9 +632,9 @@ export class HelixHeadlessTableColumn extends HelixElement {
         : nothing
     }${
       this.canSort
-        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot><svg aria-hidden="true" fill="currentColor" part="sort-mark" viewBox=${caretUp.viewBox}>
-            <g part="sort-up" transform="translate(0 -52)">${unsafeSVG(caretUp.content)}</g>
-            <g part="sort-down" transform="translate(0 52)">${unsafeSVG(caretDown.content)}</g>
+        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot><svg aria-hidden="true" fill="none" part="sort-mark" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 18 18">
+            <path d="M5.5 7.2 9 3.7l3.5 3.5" part="sort-up" />
+            <path d="M5.5 10.8 9 14.3l3.5-3.5" part="sort-down" />
           </svg></button>`
         : html`<slot></slot>`
     }${

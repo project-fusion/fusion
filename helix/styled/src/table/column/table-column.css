@@ -55,9 +55,8 @@
   z-index: var(--_table-heading-layer, auto);
 }
 
-/* **The heading's words are the button**, so a sortable heading looks exactly
-   like one that is not until a pointer or a keyboard reaches it. Unset rather
-   than restyled: a button's own padding, border and font would make a sortable
+/* **The heading's words and chevrons are one button.** Unset rather than
+   restyled: a button's own padding, border and font would make a sortable
    heading a different height from the plain one beside it. */
 [part="sort"] {
   all: unset;
@@ -92,16 +91,25 @@
   justify-content: flex-start;
 }
 
-/* Two chevrons, quiet until one of them is the current direction. */
+/* Two chevrons, quiet until one of them is the current direction. The box is
+   wider than the chevrons so the hover has room to draw behind them. */
 [part="sort-mark"] {
-  block-size: 1em;
+  block-size: 1.07em;
+  border-radius: var(--helix-radii-sm);
   flex: none;
-  inline-size: 1em;
+  inline-size: 1.07em;
+  stroke-width: 1.9;
+}
+
+/* The whole heading is the button, so the highlight answers a pointer anywhere
+   on it. */
+[part="sort"]:hover [part="sort-mark"] {
+  background-color: var(--helix-color-hover);
 }
 
 [part="sort-up"],
 [part="sort-down"] {
-  fill: var(--helix-color-foreground-subtle);
+  stroke: var(--helix-color-foreground-subtle);
 }
 
 :host(:state(sorted-ascending)) [part="sort"],
@@ -111,7 +119,7 @@
 
 :host(:state(sorted-ascending)) [part="sort-up"],
 :host(:state(sorted-descending)) [part="sort-down"] {
-  fill: var(--helix-color-foreground);
+  stroke: var(--helix-color-foreground);
 }
 
 [part="sort"]:focus-visible,
