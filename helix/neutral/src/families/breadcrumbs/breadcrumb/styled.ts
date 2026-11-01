@@ -276,6 +276,12 @@ export default styles(
       /* The fold after the first crumb of a long slotted trail: a chevron, and
          the ghost icon button that opens its menu, which the host sizes as
          any control in a crumb. */
+      /* The fold's button takes a crumb's hover, its fill and its ink, by the
+         same hooks: the Icon Button stands where a plain button stood. */
+      on('expand', [
+        rule({ '--icon-button-background-color-hover': hover }),
+        rule({ hover: true }, { '--icon-button-foreground-color': hook.currentColor }),
+      ]),
       on('fold-separator', [rule(separator)]),
       on({ part: 'fold-separator', inner: 'svg' }, [web([rule(chevron)])]),
       /* The fold's slash takes the same box as the slash before a crumb. */
