@@ -311,16 +311,16 @@ slot[name="indicator"]::slotted(*) {
   }
 }
 
-/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
-   moves. Where the control is already that size the box sits inside it. */
-[part="item"] {
-  position: relative;
+/* Rows sit against each other, so a box reaching past a row would take the press
+   from the row beside it. On a touch screen the row itself reaches the target. */
+@media (pointer: coarse) {
+  [part="item"] {
+    min-block-size: var(--helix-size-target);
+  }
 }
 
-[part="item"]::after {
-  content: "";
-  inset: calc((var(--helix-size-target) - 100%) / -2);
-  position: absolute;
+[part="item"] {
+  position: relative;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.

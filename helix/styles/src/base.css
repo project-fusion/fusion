@@ -867,6 +867,14 @@ helix-toggle[disabled]::part(item) {
    floor above is the bar's, and the track is a control's height less its
    frame and padding, which is under the floor: held to it, a destination
    overflowed the track it sits in. */
+/* A vertical list of destinations grows to the target on a touch screen. Rows sit
+   against each other, so a box past a row would take the press from its neighbor. */
+@media (pointer: coarse) {
+  :where(helix-navigation[orientation="vertical"]) :where([data-navigation-item], a) {
+    min-block-size: var(--helix-size-target);
+  }
+}
+
 :where(helix-navigation[variant="segmented"]) :where([data-navigation-item], a) {
   min-block-size: 0;
 }
