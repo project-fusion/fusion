@@ -162,7 +162,11 @@ export default styles(
         web([rule({ active: true }, { cursor: 'grabbing' })]),
         web(ring),
       ]),
-      on('grip-mark', [rule({ blockSize: '1em', inlineSize: '1em' })]),
+      /* The row's and the list item's grip, which the heading's smaller type
+         would otherwise draw a pixel smaller. */
+      on('grip-mark', [
+        rule({ blockSize: token('text-control'), inlineSize: token('text-control') }),
+      ]),
       on('resizer', [
         rule({
           inlineSize: token('space-sm'),

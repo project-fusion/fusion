@@ -59,7 +59,7 @@ export * from '../rating/rating-derivations.js'
 export * from '../slider/slider-derivations.js'
 
 /** `color-input-texted`: whether a color input draws its text field, which its swatch shape does not. */
-export const colorInputTexted: Derivation = (props) => props.variant !== 'swatch'
+export const colorInputTexted: Derivation = (props) => props.trigger !== 'swatch'
 
 /** `color-input-locked`: whether a color input's trigger takes no press, disabled or read-only. */
 export const colorInputLocked: Derivation = (props) =>

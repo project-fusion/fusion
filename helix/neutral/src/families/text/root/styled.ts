@@ -7,9 +7,9 @@ import root from './headless.js'
 /**
  * Text's styled tier.
  *
- * **`as` sets the element, and `variant` the ramp**: size, weight, leading
+ * **`as` sets the element, and `scale` the ramp**: size, weight, leading
  * and tracking together. The two match by default, so `as="h2"` takes the
- * heading ramp and a `variant` overrides it. Each `--text-*` hook overrides
+ * heading ramp and a `scale` overrides it. Each `--text-*` hook overrides
  * one value of the ramp, and with none set the words keep the type around
  * them.
  *
@@ -34,8 +34,7 @@ export default styles(
     },
     props: {
       emphasis: oneOf(['muted']),
-      tone: oneOf(['accent', 'danger', 'info', 'primary', 'success', 'warning']),
-      variant: oneOf([
+      scale: oneOf([
         'display',
         'heading',
         'subheading',
@@ -46,6 +45,7 @@ export default styles(
         'label',
         'code',
       ]),
+      tone: oneOf(['accent', 'danger', 'info', 'primary', 'success', 'warning']),
     },
     stylesheet: 'text/root/text-root.generated.css',
   },
@@ -71,35 +71,35 @@ export default styles(
          stays in the base layer. A document rule reaches inside every component
          that slots a `helix-text` and beats that component's own stylesheet, so
          a dialog asking for a smaller title would get the ramp's instead. */
-      rule([{ variant: 'display' }, { as: 'h1', variant: false }], {
+      rule([{ scale: 'display' }, { as: 'h1', scale: false }], {
         fontFamily: hook.fontFamily(token('font-display')),
         fontSize: hook.fontSize(token('text-3xl')),
         fontWeight: hook.fontWeight(token('weight-semibold')),
         letterSpacing: hook.letterSpacing(token('tracking-tight')),
         lineHeight: hook.lineHeight(token('leading-heading')),
       }),
-      rule([{ variant: 'heading' }, { as: 'h2', variant: false }], {
+      rule([{ scale: 'heading' }, { as: 'h2', scale: false }], {
         fontFamily: hook.fontFamily(token('font-sans')),
         fontSize: hook.fontSize(token('text-2xl')),
         fontWeight: hook.fontWeight(token('weight-semibold')),
         letterSpacing: hook.letterSpacing(token('tracking-tight')),
         lineHeight: hook.lineHeight(token('leading-heading')),
       }),
-      rule([{ variant: 'subheading' }, { as: 'h3', variant: false }], {
+      rule([{ scale: 'subheading' }, { as: 'h3', scale: false }], {
         fontFamily: hook.fontFamily(token('font-sans')),
         fontSize: hook.fontSize(token('text-xl')),
         fontWeight: hook.fontWeight(token('weight-semibold')),
         letterSpacing: hook.letterSpacing(token('tracking-tight')),
         lineHeight: hook.lineHeight(token('leading-heading')),
       }),
-      rule([{ variant: 'title' }, { as: 'h4', variant: false }], {
+      rule([{ scale: 'title' }, { as: 'h4', scale: false }], {
         fontFamily: hook.fontFamily(token('font-sans')),
         fontSize: hook.fontSize(token('text-lg')),
         fontWeight: hook.fontWeight(token('weight-semibold')),
         letterSpacing: hook.letterSpacing(token('tracking-normal')),
         lineHeight: hook.lineHeight(token('leading-heading')),
       }),
-      rule([{ variant: 'body' }, { as: 'p', variant: false }], {
+      rule([{ scale: 'body' }, { as: 'p', scale: false }], {
         fontFamily: hook.fontFamily(token('font-sans')),
         fontSize: hook.fontSize(token('text-md')),
         fontWeight: hook.fontWeight(token('weight-regular')),
@@ -108,10 +108,10 @@ export default styles(
       }),
       rule(
         [
-          { variant: 'body-strong' },
-          { as: 'h5', variant: false },
-          { as: 'h6', variant: false },
-          { as: 'strong', variant: false },
+          { scale: 'body-strong' },
+          { as: 'h5', scale: false },
+          { as: 'h6', scale: false },
+          { as: 'strong', scale: false },
         ],
         {
           fontFamily: hook.fontFamily(token('font-sans')),
@@ -122,7 +122,7 @@ export default styles(
         },
       ),
       rule(
-        { variant: 'caption' },
+        { scale: 'caption' },
         {
           fontFamily: hook.fontFamily(token('font-sans')),
           fontSize: hook.fontSize(token('text-sm')),
@@ -133,14 +133,14 @@ export default styles(
       ),
       /* `as="label"` is deprecated and no longer listed, and still takes the
          label ramp on the web, which reads the attribute as written. */
-      rule([{ variant: 'label' }, { as: 'label', variant: false }], {
+      rule([{ scale: 'label' }, { as: 'label', scale: false }], {
         fontFamily: hook.fontFamily(token('font-sans')),
         fontSize: hook.fontSize(token('text-xs')),
         fontWeight: hook.fontWeight(token('weight-medium')),
         letterSpacing: hook.letterSpacing(token('tracking-wide')),
         lineHeight: hook.lineHeight(token('leading-normal')),
       }),
-      rule([{ variant: 'code' }, { as: 'code', variant: false }], {
+      rule([{ scale: 'code' }, { as: 'code', scale: false }], {
         fontFamily: hook.fontFamily(token('font-mono')),
         fontSize: hook.fontSize(token('text-xs')),
         fontWeight: hook.fontWeight(token('weight-regular')),
@@ -154,7 +154,7 @@ export default styles(
       rule(
         [
           { as: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] },
-          { variant: ['display', 'heading', 'subheading', 'title'] },
+          { scale: ['display', 'heading', 'subheading', 'title'] },
         ],
         { color: inherited('_heading-ink', 'currentColor') },
       ),

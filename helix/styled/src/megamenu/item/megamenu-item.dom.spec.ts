@@ -16,7 +16,7 @@ type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
    Megamenu Items in a Megamenu Group, which have to draw as the recipes draw:
    the heading, a row with an icon, a row with a dot, and a plain link. */
 const RECIPE = `<div data-megamenu-group>
-  <helix-text as="h3" data-megamenu-heading variant="title">Work</helix-text>
+  <helix-text as="h3" data-megamenu-heading scale="title">Work</helix-text>
   <a data-megamenu-item href="#a"><helix-icon name="cube"></helix-icon><strong>Projects</strong><span>Plan and track work.</span></a>
   <a data-megamenu-item href="#b" aria-current="page"><strong>Documents</strong><span>Write and share files.</span></a>
   <a href="#c">Changelog</a>

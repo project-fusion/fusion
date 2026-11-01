@@ -41,9 +41,9 @@ export default headless('steps', {
     fallbackLabel: 'Steps',
     label: '',
     linear: web(false),
+    marker: oneOf(['numeric']),
     orientation: oneOf(['vertical']),
     progressLabel: web('{share, number, percent} complete'),
-    variant: oneOf(['numeric']),
   },
   events: {
     activate: ['previous', 'value'],

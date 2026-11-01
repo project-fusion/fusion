@@ -100,7 +100,7 @@ describe('style, which rules apply', () => {
       'background: linear-gradient() has no native equivalent yet',
     )
     expect(
-      style(indicator, 'indicator', { conditions: { variant: 'segmented' }, tokens }).dropped,
+      style(indicator, 'indicator', { conditions: { marker: 'segmented' }, tokens }).dropped,
     ).not.toContain('background: linear-gradient() has no native equivalent yet')
   })
 })

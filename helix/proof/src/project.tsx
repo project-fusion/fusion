@@ -34,7 +34,7 @@ export function ProjectFrame({ children, project, tab }: Props) {
       <helix-flex align-items="center" gap="md" justify-content="between" wrap>
         <helix-flex direction="column" gap="2xs">
           <helix-flex align-items="center" gap="sm">
-            <helix-text as="h1" variant="heading">
+            <helix-text as="h1" scale="heading">
               {project.name}
             </helix-text>
             <helix-tag emphasis="subtle" tone={STATUS[project.status].tone}>

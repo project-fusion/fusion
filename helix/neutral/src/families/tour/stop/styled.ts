@@ -30,12 +30,12 @@ export default styles(
       bubbleSize: '22rem',
       padding: token('space-md'),
       shadow: token('shadow-floating'),
-      surfaceColor: token('color-surface-overlay'),
+      surfaceBackgroundColor: token('color-surface-overlay'),
     },
     stylesheet: 'tour/stop/tour-stop.generated.css',
   },
   ({ hook, on, rule }) => {
-    const fill = hook.surfaceColor
+    const fill = hook.surfaceBackgroundColor
     const edge = [token('border-thin'), 'solid', token('color-border')] as const
     const muted = token('color-foreground-muted')
     return [

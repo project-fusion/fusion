@@ -161,7 +161,7 @@ describe('the generated Button Group', () => {
   })
 
   test('keeps every corner and parts its buttons with a gap while spaced', async () => {
-    await render(<Calendar variant="spaced" />)
+    await render(<Calendar layout="spaced" />)
     expect(styleOf(group('Calendar view')).gap).toBe(Number(token('space-xs')))
     for (const name of ['Day', 'Week', 'Month']) {
       expect(corners(name)).toEqual([4, 4, 4, 4])

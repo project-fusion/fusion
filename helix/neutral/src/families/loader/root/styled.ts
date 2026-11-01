@@ -47,7 +47,7 @@ export default styles(
       loaderTurn: null,
       markSize: null,
     },
-    props: { size: oneOf(['sm', 'md', 'lg']), variant: oneOf(['pulse']) },
+    props: { size: oneOf(['sm', 'md', 'lg']), pattern: oneOf(['pulse']) },
     stylesheet: 'loader/root/loader-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => [
@@ -70,10 +70,10 @@ export default styles(
       rule({ size: 'sm' }, { own: { loaderSize: token('size-loader-sm') } }),
       rule({ size: 'lg' }, { own: { loaderSize: token('size-loader-lg') } }),
       /* Bigger under `pulse`, because the mark is the whole of it. */
-      rule({ variant: 'pulse' }, { own: { loaderSize: product(token('size-loader-lg'), 2) } }),
-      rule({ size: 'sm', variant: 'pulse' }, { own: { loaderSize: token('size-loader-lg') } }),
+      rule({ pattern: 'pulse' }, { own: { loaderSize: product(token('size-loader-lg'), 2) } }),
+      rule({ size: 'sm', pattern: 'pulse' }, { own: { loaderSize: token('size-loader-lg') } }),
       rule(
-        { size: 'lg', variant: 'pulse' },
+        { size: 'lg', pattern: 'pulse' },
         { own: { loaderSize: product(token('size-loader-lg'), 3) } },
       ),
       /* A phone has no grid to stack the cell: the host is at least the
@@ -102,7 +102,7 @@ export default styles(
         inlineSize: hook.size,
       }),
       rule({ reducedMotion: true }, { animationDuration: own.loaderCrawl }),
-      rule({ variant: 'pulse' }, { animation: 'none' }),
+      rule({ pattern: 'pulse' }, { animation: 'none' }),
       native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
     ]),
     on('track', [
@@ -115,7 +115,7 @@ export default styles(
         strokeWidth: hook.trackWidth,
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
-      rule({ variant: 'pulse' }, { display: 'none' }),
+      rule({ pattern: 'pulse' }, { display: 'none' }),
     ]),
     /* A gap in the dash is what makes the turn visible. */
     on('indicator', [
@@ -126,7 +126,7 @@ export default styles(
         strokeLinecap: 'round',
         strokeWidth: hook.trackWidth,
       }),
-      rule({ variant: 'pulse' }, { display: 'none' }),
+      rule({ pattern: 'pulse' }, { display: 'none' }),
     ]),
     /* The center, sized against the loader, so a mark stays in proportion at
        every size, and breathing with the ring. */
@@ -144,8 +144,8 @@ export default styles(
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
       /* Opacity alone, where the default appearance also scales. */
-      rule({ variant: 'pulse' }, { animationName: 'helix-loader-pulse-mark' }),
-      rule({ reducedMotion: true, variant: 'pulse' }, { animation: 'none', opacity: 1 }),
+      rule({ pattern: 'pulse' }, { animationName: 'helix-loader-pulse-mark' }),
+      rule({ reducedMotion: true, pattern: 'pulse' }, { animation: 'none', opacity: 1 }),
       native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
     ]),
     on({ region: 'default', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),

@@ -49,7 +49,7 @@ export function NativeUsage({ native }: { native: NativeFamily }) {
           dangerouslySetInnerHTML={{ __html: highlight(code, 'tsx') }}
         />
       </helix-code-block>
-      <helix-text as="p" data-platform="native" emphasis="muted" variant="caption">
+      <helix-text as="p" data-platform="native" emphasis="muted" scale="caption">
         <CodeText>
           {
             "Wrap your app in `HelixRoot` once. A universal Expo app's web build draws the web elements."
@@ -107,12 +107,12 @@ function NativeComponentApi({ component, part }: { component: NativeComponent; p
           {part}
         </SectionHeading>
         <helix-tag>
-          <helix-text variant="code">{component.name}</helix-text>
+          <helix-text scale="code">{component.name}</helix-text>
         </helix-tag>
       </helix-flex>
 
       {component.summary && (
-        <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
+        <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
           <CodeText>{component.summary}</CodeText>
         </helix-text>
       )}
@@ -148,7 +148,7 @@ function NativeTheme() {
       <SectionHeading as="h3" label="Theme" target={THEME_ID}>
         Theme
       </SectionHeading>
-      <helix-text as="p" emphasis="muted" variant="caption">
+      <helix-text as="p" emphasis="muted" scale="caption">
         <CodeText>
           {
             "`HelixRoot` gives every component its theme. Set its `mode` and `tokens`, and read the values in your own styles with `useTokens`. Set one component’s hooks with its `hooks` prop, such as `hooks={{ backgroundColor: '#0a84ff' }}`. The components inside it inherit them."
@@ -202,7 +202,7 @@ export const railLinks = (
 /** The line a family Helix draws on the web only shows under the native preference. */
 export function WebOnly({ label }: { label: string }) {
   return (
-    <helix-text as="p" data-platform="native" emphasis="muted" variant="caption">
+    <helix-text as="p" data-platform="native" emphasis="muted" scale="caption">
       {label} has no React Native component yet.
     </helix-text>
   )
