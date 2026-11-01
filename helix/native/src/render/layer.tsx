@@ -199,11 +199,13 @@ const LayerPortal = ({ backdrop, draw, layered, move, runs }: PortalProps) => {
       host.remove(key)
       return
     }
-    const { decorative = false, guide = false, modal, notice = false, outside } = layered
+    const { decorative = false, guide = false, inPage = false, modal, notice = false, outside } =
+      layered
     host.place(key, {
       content,
       decorative,
       guide,
+      inPage,
       modal,
       notice,
       ...(outside === undefined ? {} : { outside }),
