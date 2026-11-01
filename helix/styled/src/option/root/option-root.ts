@@ -20,9 +20,6 @@ import { styles } from './option-root.generated.css.js'
  *
  * @cssproperty --option-active-background-color - The background of the option the keyboard is on.
  * @cssproperty --option-block-padding - The space above and below the option. `Command` increases it for its longer list of rows.
- * @cssproperty --option-dragging-opacity - The opacity of an option a finger moves on a phone. A list sets it from `--listbox-dragging-opacity`.
- * @cssproperty --option-drop-color - The color of the line where a moved option would land on a phone. A list sets it from `--listbox-drop-indicator-color`.
- * @cssproperty --option-drop-size - The thickness of the line where a moved option would land on a phone. A list sets it from `--listbox-drop-indicator-size`.
  * @cssproperty --option-hover-background-color - The background of an option under the pointer that is not the active one. A listbox clears it, since its highlight follows the pointer.
  * @cssproperty --option-media-aspect-ratio - The shape of the image in `media`, as a width over a height. Defaults to `4 / 3`.
  * @cssproperty --option-media-radius - The corner radius of the image in `media`.

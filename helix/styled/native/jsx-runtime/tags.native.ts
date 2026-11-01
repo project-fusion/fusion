@@ -37,6 +37,7 @@ import { HelixImage } from '../image/index.native'
 import { HelixInput } from '../input/index.native'
 import { HelixKbd } from '../kbd/index.native'
 import { HelixList, HelixListItem } from '../list/index.native'
+import { HelixListbox } from '../listbox/index.native'
 import { HelixLoader } from '../loader/index.native'
 import { HelixLog, HelixLogGroup, HelixLogLine } from '../log/index.native'
 import { HelixMegamenu, HelixMegamenuGroup, HelixMegamenuItem } from '../megamenu/index.native'
@@ -51,6 +52,7 @@ import {
 } from '../notifications/index.native'
 import { HelixNumberInput } from '../number-input/index.native'
 import { HelixObjectInspector } from '../object-inspector/index.native'
+import { HelixOption, HelixOptionGroup, HelixOptionSeparator } from '../option/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
 import { HelixPinInput } from '../pin-input/index.native'
 import { HelixPopover } from '../popover/index.native'
@@ -76,8 +78,6 @@ import { HelixTextarea } from '../textarea/index.native'
 import { HelixTimeline, HelixTimelineGroup, HelixTimelineItem } from '../timeline/index.native'
 import { HelixToast, HelixToastItem } from '../toast/index.native'
 import { HelixToggle, HelixToggleGroup } from '../toggle/index.native'
-import { HelixListbox } from '../listbox/index.native'
-import { HelixOption, HelixOptionGroup, HelixOptionSeparator } from '../option/index.native'
 import { HelixToolbar } from '../toolbar/index.native'
 import { HelixTooltip } from '../tooltip/index.native'
 import { HelixTour, HelixTourStop } from '../tour/index.native'
@@ -233,6 +233,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-kbd': HelixKbd,
   'helix-list': List,
   'helix-list-item': HelixListItem,
+  'helix-listbox': HelixListbox,
   'helix-loader': HelixLoader,
   'helix-log': HelixLog,
   'helix-log-group': HelixLogGroup,
@@ -253,6 +254,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-notifications': HelixNotifications,
   'helix-number-input': HelixNumberInput,
   'helix-object-inspector': HelixObjectInspector,
+  'helix-option': HelixOption,
+  'helix-option-group': HelixOptionGroup,
+  'helix-option-separator': HelixOptionSeparator,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
   'helix-pin-input': HelixPinInput,
@@ -296,10 +300,6 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-toggle-group': HelixToggleGroup,
   'helix-toolbar': HelixToolbar,
   'helix-tooltip': HelixTooltip,
-  'helix-listbox': HelixListbox,
-  'helix-option': HelixOption,
-  'helix-option-group': HelixOptionGroup,
-  'helix-option-separator': HelixOptionSeparator,
   'helix-tour': HelixTour,
   'helix-tour-stop': HelixTourStop,
   'helix-tree': HelixTree,
