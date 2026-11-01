@@ -239,6 +239,10 @@ slot[name="start"]::slotted(*) {
   --_tag-label: var(--helix-color-foreground-inverse);
 }
 
+[part="dismiss"]:active {
+  background-color: var(--helix-color-press);
+}
+
 /* Print: a label. */
 @media print {
   :host {

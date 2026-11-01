@@ -3,6 +3,7 @@ import { property, state } from 'lit/decorators.js'
 import { auditField } from '#audit-name'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { internalsOf } from '../../helix-element/helix-element.js'
+import { reportInPlace } from '../../helix-form-element/report-in-place.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -736,9 +737,10 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       /* Not for the `invalid` a script's `checkValidity()` fires, which
          `HelixFormElement` flags: a check reports and shows nothing. Read
          through a cast because the base this grafts onto is any element. */
-      this.addEventListener('invalid', () => {
+      this.addEventListener('invalid', (event) => {
         if (!(this as unknown as { checkingValidity?: boolean }).checkingValidity) {
           touch()
+          reportInPlace(this, event)
         }
       })
       this.addEventListener('change', touch)

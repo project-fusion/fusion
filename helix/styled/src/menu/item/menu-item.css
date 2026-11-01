@@ -37,7 +37,7 @@
 [part="item"]:hover {
   background-color: var(
     --menu-item-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
 }
 
@@ -46,7 +46,7 @@
 :host(:state(highlighted)) [part="item"] {
   background-color: var(
     --menu-item-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
 }
 
@@ -247,4 +247,8 @@ slot[name="submenu"]::slotted(helix-divider) {
 
 [part="surface"][data-placement^="right"] {
   transform-origin: 0 0;
+}
+
+[part="item"]:active {
+  background-color: var(--helix-color-press);
 }

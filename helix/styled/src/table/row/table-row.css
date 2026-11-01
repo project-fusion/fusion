@@ -57,7 +57,7 @@
 :host(:state(link):hover) ::slotted(*) {
   background-color: var(
     --table-row-hover-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+    var(--helix-color-hover)
   );
 }
 

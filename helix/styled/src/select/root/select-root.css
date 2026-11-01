@@ -31,7 +31,7 @@
 
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:not(:disabled)) [part="trigger"]:hover {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-border-hover);
 }
 
 /* One edge rather than two rings, the same as the input. */
@@ -72,7 +72,7 @@
 }
 
 :host([emphasis="ghost"]:not(:disabled)) [part="trigger"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
   border-color: transparent;
 }
 
@@ -89,6 +89,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Nothing chosen yet, drawn as a field's `::placeholder` is, so "Choose" does not
+   read as an answer. */
+[part="value"][data-placeholder] {
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
 }
 
 /* Over the page rather than on it, which is what `overlay` means and what its
@@ -156,6 +163,10 @@
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
+}
+
+:host(:not(:disabled)) [part="trigger"]:active {
+  background-color: var(--helix-color-press);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive. */

@@ -64,7 +64,7 @@
 /* Monotone, for the reason under the checked rule: a box that turns brand-blue
    under a pointer says "recommended" about whichever one it happens to be over. */
 :host(:not(:disabled)) [part="field"]:hover [part="control"] {
-  border-color: var(--checkbox-border-color, var(--helix-color-foreground-muted));
+  border-color: var(--checkbox-border-color, var(--helix-color-foreground));
 }
 
 /* No color, which is the same rule the segmented control's thumb follows: color

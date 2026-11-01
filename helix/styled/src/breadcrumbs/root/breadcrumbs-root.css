@@ -5,7 +5,7 @@
      choice is made. `plain` is the resting value: a fill and no line. */
   --_breadcrumbs-split-fill: var(
     --breadcrumbs-split-fill,
-    color-mix(in oklab, var(--helix-color-foreground) 4%, transparent)
+    var(--helix-color-well)
   );
   --_breadcrumbs-split-rule: transparent;
 
@@ -47,7 +47,7 @@
 [part="expand"]:hover {
   background-color: var(
     --breadcrumbs-hover-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }

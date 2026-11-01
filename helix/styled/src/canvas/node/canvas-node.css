@@ -57,7 +57,7 @@
    placed in the same coordinates, so a group that painted itself opaque would
    cover them. */
 :host([group]) {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  background-color: var(--helix-color-well);
   border-style: dashed;
   /* Its name is drawn above the box, and a card's clipping cut it off. */
   overflow: visible;

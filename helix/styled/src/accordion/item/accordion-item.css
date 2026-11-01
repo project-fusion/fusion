@@ -123,3 +123,7 @@
 :host([chevron-placement="start"]) [part="content-inner"] > slot {
   margin-inline-start: calc(var(--helix-text-md) + var(--helix-space-xs));
 }
+
+[part="trigger"]:active:not(:disabled) {
+  background-color: var(--helix-color-press);
+}

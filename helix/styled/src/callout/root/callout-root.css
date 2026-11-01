@@ -144,7 +144,7 @@ slot[name="icon"]::slotted(*) {
 /* A well under the pointer, mixed from the foreground so it shows on the
    tone's tint as on no fill at all. */
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
 }
 

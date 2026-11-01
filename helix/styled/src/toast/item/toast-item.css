@@ -216,7 +216,7 @@ slot[name="icon"]::slotted(*) {
 /* A well under the pointer, not only a brighter glyph, and mixed from the
    foreground rather than taken from `surface-sunken`. */
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
 }
 

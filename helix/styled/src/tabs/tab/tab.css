@@ -92,7 +92,7 @@
 [part="tab"]:hover:not(:disabled, [aria-disabled="true"]) {
   background-color: var(
     --tabs-tab-hover-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--tabs-tab-hover-color, var(--helix-color-foreground));
 }
@@ -158,5 +158,9 @@ slot[name="dismiss-icon"]::slotted(*) {
 }
 
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
+  background-color: var(--helix-color-hover);
+}
+
+[part="tab"]:active:not(:disabled, [aria-disabled="true"]) {
+  background-color: var(--helix-color-press);
 }

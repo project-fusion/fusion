@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
+import { reportInPlace } from '../../helix-form-element/report-in-place.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -136,9 +137,10 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
       const touch = (): void => {
         this.touched = true
       }
-      this.addEventListener('invalid', () => {
+      this.addEventListener('invalid', (event) => {
         if (!this.checkingValidity) {
           touch()
+          reportInPlace(this, event)
         }
       })
       this.addEventListener('change', touch)

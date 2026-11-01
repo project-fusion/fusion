@@ -140,7 +140,7 @@
 }
 
 [part="wrap-toggle"][aria-pressed="true"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  background-color: var(--helix-color-hover);
 }
 
 [part="wrap-toggle"]:focus-visible {

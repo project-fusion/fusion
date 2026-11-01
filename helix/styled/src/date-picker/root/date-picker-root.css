@@ -281,7 +281,7 @@
     --date-picker-range-color,
     light-dark(
       color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+      var(--helix-color-selected)
     )
   );
 }
@@ -293,8 +293,8 @@
   background-color: var(
     --date-picker-range-preview-color,
     light-dark(
-      color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+      var(--helix-color-well),
+      var(--helix-color-hover)
     )
   );
 }
@@ -306,7 +306,7 @@
       --date-picker-range-color,
       light-dark(
         color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
-        color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+        var(--helix-color-selected)
       )
     );
 }

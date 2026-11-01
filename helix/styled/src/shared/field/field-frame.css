@@ -30,7 +30,7 @@
    element's own attribute and an ancestor `<fieldset disabled>` alike, where the
    attribute selector only ever sees the first. */
 :host(:not(:disabled)) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-border-hover);
 }
 
 /* On the box, because `delegatesFocus` puts focus on the input inside it and a

@@ -9,7 +9,7 @@
      6% measures 1.14 and 1.10. */
   background-color: var(
     --code-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+    var(--helix-color-well)
   );
   border-radius: var(--code-radius, var(--helix-radii-sm));
   /* A fragment longer than the line, a path or an identifier, breaks inside

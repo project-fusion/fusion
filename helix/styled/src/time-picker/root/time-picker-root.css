@@ -54,7 +54,7 @@
     --time-picker-range-color,
     light-dark(
       color-mix(in oklab, var(--helix-color-foreground) 10%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+      var(--helix-color-selected)
     )
   );
 }

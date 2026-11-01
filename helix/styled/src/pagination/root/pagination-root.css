@@ -200,3 +200,12 @@
     forced-color-adjust: none;
   }
 }
+
+[part="first"]:active,
+[part="gap"]:active,
+[part="last"]:active,
+[part~="page"]:active,
+[part="previous"]:active,
+[part="next"]:active {
+  background-color: var(--helix-color-press);
+}

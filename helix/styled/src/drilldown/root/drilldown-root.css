@@ -52,7 +52,7 @@ slot[name="back-icon"]::slotted(*) {
 [part="back"]:hover {
   background-color: var(
     --drilldown-back-hover-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    var(--helix-color-hover)
   );
   color: var(--helix-color-foreground);
 }

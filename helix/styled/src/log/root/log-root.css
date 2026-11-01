@@ -107,7 +107,7 @@
     var(--log-border-color, var(--helix-color-border));
   --_log-step-rule-start: calc(var(--helix-size-icon-sm) / 2 - var(--helix-border-thin));
   --_log-step-start: calc(var(--helix-size-icon-sm) + var(--helix-space-xs));
-  --_log-step-surface: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  --_log-step-surface: var(--helix-color-well);
   --_log-wrap-indent: 2ch;
 
   background-color: transparent;
