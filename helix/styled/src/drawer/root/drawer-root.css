@@ -162,7 +162,9 @@
   block-size: min(var(--_drawer-size), 100%);
   inset-block-end: 0;
   inset-inline: 0;
-  padding-block-end: env(safe-area-inset-bottom, 0px);
+  padding-block-end: calc(
+    var(--drawer-padding, var(--helix-space-lg)) + env(safe-area-inset-bottom, 0px)
+  );
   --_drawer-away: translateY(100%);
 }
 
@@ -172,7 +174,10 @@
   block-size: min(var(--_drawer-size), 100%);
   inset-block-start: 0;
   inset-inline: 0;
-  padding-block-start: env(safe-area-inset-top, 0px);
+  padding-block-start: calc(
+    var(--drawer-padding-block-start, var(--drawer-padding, var(--helix-space-2xl))) +
+    env(safe-area-inset-top, 0px)
+  );
   --_drawer-away: translateY(-100%);
 }
 
