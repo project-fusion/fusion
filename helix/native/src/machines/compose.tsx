@@ -352,7 +352,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
       .map(
         (use): Binder =>
           (props, around) => {
-            const { behavior, value } = useSelect(family, props, use, around.toggled, around.touch)
+            const { behavior, value } = useSelect(
+              family,
+              props,
+              use,
+              around.toggled,
+              around.touch,
+              around.layering,
+            )
             around.chosen.current = value
             return behavior
           },

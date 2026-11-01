@@ -39,8 +39,9 @@ import {
  * popover. `presentation` forces either.
  *
  * **The web's**: `autocomplete`'s hidden select, `name`, `focusable`, a toolbar's
- * coordination on the web, `value-content`, a function that returns a template, and
- * for now `position="item-aligned"`: a phone's popover opens under the trigger.
+ * coordination on the web, and `value-content`, a function that returns a template.
+ * `position="item-aligned"` stands a popover's chosen option on the trigger on both;
+ * a sheet ignores it, on both.
  *
  * **Held to `helix-select`.** `helix system check` compares the props, the events,
  * the states, the regions, and the parts with what the manifest says the element

@@ -21,6 +21,7 @@ import { I18nManager, Platform } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import type { Around } from './binder'
 import { holdMember, useOrder } from './listbox'
 import { useMembers, useWritten, wordsIn } from './listbox-hooks'
 import { type Entry, entriesOf, type Held } from './listbox-model'
@@ -40,6 +41,8 @@ export interface ListOpening {
 export interface ListOwner {
   /** Closes the list, as the chosen option pressed again does. */
   readonly again: () => void
+  /** Hears the view of the option the list opened on. */
+  readonly landed: (row: unknown) => void
   /** Where the highlight goes as the list opens. */
   readonly opening: ListOpening
   /** Closes the list and lets focus move on, as Tab does. */
@@ -263,6 +266,7 @@ export const useSelect = (
   use: MachineUse,
   toggled: Turned | undefined,
   touch: () => void,
+  layering: Around['layering'],
 ): { readonly behavior: Behavior; readonly value: string } => {
   const read = (name: string): unknown => given(family, props, boundTo(use, name, 'prop'))
   const multiple = read('multiple') === true
@@ -330,8 +334,16 @@ export const useSelect = (
   }
   const listening = useRef<(() => void) | undefined>(undefined)
   const owner = useMemo(() => heldOwner(held, schedule), [held, schedule])
+  /* The option the list opened on, which the layer stands on the trigger. */
+  const row = useRef<unknown>(null)
+  if (props.position === 'item-aligned') {
+    layering.over = { option: () => row.current }
+  }
   const listOwner: ListOwner = {
     again: close,
+    landed: (view) => {
+      row.current = view
+    },
     get opening() {
       return opening.current
     },
