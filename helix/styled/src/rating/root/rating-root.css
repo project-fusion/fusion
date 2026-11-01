@@ -202,7 +202,9 @@
    moves. */
 [part="option"]::after {
   content: "";
-  inset: calc((var(--helix-size-target) - 100%) / -2);
+  /* Along the row only, where stars sit side by side. */
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: 0;
   position: absolute;
 }
 

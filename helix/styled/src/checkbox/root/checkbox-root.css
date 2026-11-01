@@ -251,16 +251,16 @@ slot[name="dash"]::slotted(*) {
   min-block-size: 1lh;
 }
 
-/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
-   moves. Where the control is already that size the box sits inside it. */
-[part="field"] {
-  position: relative;
+/* Rows sit against each other, so a box reaching past a row would take the press
+   from the row beside it. On a touch screen the row itself reaches the target. */
+@media (pointer: coarse) {
+  [part="field"] {
+    min-block-size: var(--helix-size-target);
+  }
 }
 
-[part="field"]::after {
-  content: "";
-  inset: calc((var(--helix-size-target) - 100%) / -2);
-  position: absolute;
+[part="field"] {
+  position: relative;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a

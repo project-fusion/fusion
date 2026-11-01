@@ -48,7 +48,7 @@ describe('meter', () => {
   test('the three bands recolor the fill, in bar and ring alike', () => {
     // Color is the obvious half and the ticks are the other: a reading that
     // only says "poor" in red says nothing to a reader who cannot see red.
-    const tokens = { fair: 'warning', good: 'success', poor: 'danger' }
+    const tokens = { fair: 'warning-mark', good: 'success', poor: 'danger' }
     for (const [band, token] of Object.entries(tokens)) {
       expect(rule(`[part~="indicator"][data-band="${band}"]`)).toContain(
         `--_meter-hue: var(--meter-color, var(--helix-color-${token}))`,

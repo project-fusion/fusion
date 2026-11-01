@@ -29,9 +29,6 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['number-input/root/number-input-root.css', '[part="increment"]::after'],
   ['number-input/root/number-input-root.css', '[part="decrement"]::after'],
   ['select/root/select-root.css', '[part="trigger"]::after'],
-  ['checkbox/root/checkbox-root.css', '[part="field"]::after'],
-  ['radio/root/radio-root.css', '[part="item"]::after'],
-  ['switch/root/switch-root.css', '[part="field"]::after'],
   ['pagination/root/pagination-root.css', '[part~="page"]::after'],
   ['pagination/root/pagination-root.css', '[part="previous"]::after'],
   ['pagination/root/pagination-root.css', '[part="next"]::after'],
@@ -42,13 +39,10 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['toast/item/toast-item.css', '[part="dismiss"]::after'],
   ['callout/root/callout-root.css', '[part="dismiss"]::after'],
   ['announcement/root/announcement-root.css', '[part="dismiss"]::after'],
-  ['accordion/item/accordion-item.css', '[part="trigger"]::after'],
-  ['tree/item/tree-item.css', '[part="row"]::after'],
   ['toggle/root/toggle-root.css', '[part="item"]::after'],
   ['app-header/root/app-header-root.css', '[part="toggle"]::after'],
   ['carousel/root/carousel-root.css', '[part~="indicator"]::after'],
   ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
-  ['shared/row/row.css', '[part~="item"]::before'],
   ['rating/root/rating-root.css', '[part="option"]::after'],
   ['date-picker/root/date-picker-root.css', '[part="previous"]::after'],
   ['date-picker/root/date-picker-root.css', '[part="next"]::after'],
@@ -58,6 +52,16 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['notifications/notification/notification.css', '[part="dismiss"]::after'],
 ]
 
+/* Rows sit against each other, so the row itself is the target on a touch screen. */
+const ROWS = [
+  'accordion/item/accordion-item.css',
+  'checkbox/root/checkbox-root.css',
+  'radio/root/radio-root.css',
+  'shared/row/row.css',
+  'switch/root/switch-root.css',
+  'tree/item/tree-item.css',
+]
+
 describe('a control reaches the target', () => {
   for (const [sheet, selector] of TARGETS) {
     test(`${sheet} ${selector}`, () => {
@@ -65,6 +69,13 @@ describe('a control reaches the target', () => {
       const start = css.indexOf(`${selector} {`)
       expect(start).toBeGreaterThan(-1)
       expect(css.slice(start, css.indexOf('}', start))).toContain('var(--helix-size-target)')
+    })
+  }
+
+  for (const sheet of ROWS) {
+    test(`${sheet} grows to the target under a coarse pointer`, () => {
+      const css = readFileSync(join(SRC, sheet), 'utf8')
+      expect(css).toMatch(/@media \(pointer: coarse\)[^@]*min-block-size: var\(--helix-size-target\)/)
     })
   }
 })
