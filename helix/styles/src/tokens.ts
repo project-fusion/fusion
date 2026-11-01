@@ -86,12 +86,12 @@ export const TOKENS: Token[] = [
   /* Two kinds of "above", and they want opposite fills in light mode. */
   [
     'color-surface-raised',
-    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-850))',
+    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
     'A raised surface on the page, such as a selected tab or a hovered row. Its fill is one step down the ramp.',
   ],
   [
     'color-surface-overlay',
-    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-850))',
+    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
     'A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
