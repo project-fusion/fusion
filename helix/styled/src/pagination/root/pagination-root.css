@@ -80,7 +80,7 @@
 [part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
-  background-color: var(--pagination-hover-color, var(--helix-color-surface-sunken));
+  background-color: var(--pagination-hover-color, var(--helix-color-hover));
   color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
 

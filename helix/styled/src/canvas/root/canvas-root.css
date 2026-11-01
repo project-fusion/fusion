@@ -6,7 +6,8 @@
 [part="region"] {
   background-color: var(--canvas-background-color, var(--helix-color-surface-sunken));
   block-size: var(--canvas-block-size, 30rem);
-  border: var(--helix-border-thin) solid var(--canvas-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--canvas-border-color, var(--helix-color-border));
   border-radius: var(--canvas-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   display: grid;

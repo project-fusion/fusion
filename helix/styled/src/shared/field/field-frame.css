@@ -68,6 +68,13 @@
   outline-color: var(--helix-color-danger);
 }
 
+/* Flush with its ground, which is what `transparent` says and no absolute color
+   can: read-only on a raised panel would otherwise rise out of the surface it
+   belongs to. In this sheet so every field that takes the frame draws it. */
+:host([readonly]) [part="field"] {
+  background-color: transparent;
+}
+
 /* Stripped rather than replaced, so the caret, the selection and the keyboard a
    phone chooses are all the platform's. `all: unset` takes `box-sizing` with it,
    back to `content-box`, and the `border-box` every shadow root is given comes

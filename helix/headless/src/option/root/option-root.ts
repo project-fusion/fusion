@@ -66,7 +66,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @cssstate disabled - While the option cannot be chosen.
  * @cssstate has-indicator - An icon is slotted into `indicator`.
  * @cssstate hovered - While a mouse or a pen is over the option. A touch sets no hover, as React Aria's `data-hovered` does not.
- * @cssstate pressed - While a pointer presses the option, from the press to the release.
+ * @cssstate pressing - While a pointer presses the option, from the press to the release.
  * @cssstate selected - While the option is chosen.
  */
 @customElement('helix-headless-option')
@@ -410,15 +410,15 @@ export class HelixHeadlessOption extends HelixElement {
 
   private readonly handlePointerLeave = (): void => {
     this.toggleState('hovered', false)
-    this.toggleState('pressed', false)
+    this.toggleState('pressing', false)
   }
 
   private readonly handlePointerDown = (event: PointerEvent): void => {
-    this.toggleState('pressed', event.button === 0 && !this.disabled)
+    this.toggleState('pressing', event.button === 0 && !this.disabled)
   }
 
   private readonly handlePointerUp = (): void => {
-    this.toggleState('pressed', false)
+    this.toggleState('pressing', false)
   }
 
   protected override render(): TemplateResult {

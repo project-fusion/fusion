@@ -22,7 +22,8 @@
 }
 
 :host([separation="outlined"]) ::slotted(*) {
-  border: var(--helix-border-thin) solid var(--accordion-border-color, var(--helix-color-border));
+  border: var(--helix-border-surface) solid var(--accordion-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
   /* The house radius. */
   border-radius: var(--accordion-radius, var(--helix-radii-sm));
   /* Clips the trigger's own hover fill to the item's corners. */

@@ -137,8 +137,15 @@
 :host([separation="outlined"]) [part="item"],
 :host(:state(feed-filled)) [part="item"],
 :host(:state(feed-outlined)) [part="item"] {
-  border: var(--helix-border-thin) solid var(--notifications-item-edge, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--notifications-item-edge, var(--helix-color-border));
   border-radius: var(--notifications-item-radius, var(--helix-radii-md));
+}
+
+/* `filled` is the fill alone. */
+:host([separation="filled"]) [part="item"],
+:host(:state(feed-filled)) [part="item"] {
+  border-color: transparent;
 }
 
 /* A fill as well as an edge. `surface-raised` rather than `surface`, because the

@@ -20,6 +20,7 @@
   --_icon-button-ink-hover: var(--helix-color-foreground);
   /* Near black has nothing darker, so a neutral press goes toward the page. */
   --_icon-button-press-way: 1;
+  --_icon-button-wash: var(--helix-color-hover);
   /*
  *  The solid fill, separate from the tone, and it has to be separate.
  *
@@ -199,7 +200,7 @@
       --icon-button-background-color-hover,
       var(
         --icon-button-background-color,
-        color-mix(in oklab, var(--_icon-button-tone) 8%, transparent)
+        var(--_icon-button-wash)
       )
     )
   );
@@ -214,6 +215,7 @@
    neither hook set a press looks as it always did. */
 :host([tone]:not([tone="neutral"])) {
   --_icon-button-press-way: -1;
+  --_icon-button-wash: color-mix(in oklab, var(--_icon-button-tone) 8%, transparent);
 }
 
 :host(:not(:disabled)) [part="button"]:active {

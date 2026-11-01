@@ -66,7 +66,7 @@ describe('map marker', () => {
   test('the map has one tab stop among its markers, on the first until a reader moves it', async () => {
     const host = await frame()
     expect(stops(host)).toEqual(['Depot'])
-    expect(hasState(markers(host)[0] as Marker, 'current')).toBe(true)
+    expect(hasState(markers(host)[0] as Marker, 'active')).toBe(true)
   })
 
   test('the arrow keys walk the markers in the order they are written, and wrap', async () => {

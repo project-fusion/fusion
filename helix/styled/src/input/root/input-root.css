@@ -45,14 +45,6 @@ slot[name="end"]::slotted(*) {
   opacity: var(--helix-opacity-disabled);
 }
 
-/* Flush with its ground, which is what `transparent` says and no absolute color
-   can: on a card, `surface` *is* the card, so read-only would be flush by
-   coincidence; on a raised panel it comes out lighter than the thing it sits on,
-   a field rising out of the surface it belongs to. */
-:host([readonly]) [part="field"] {
-  background-color: transparent;
-}
-
 /* The two marks the field owns, dressed as one thing. */
 [part="clear"],
 [part~="reveal"],

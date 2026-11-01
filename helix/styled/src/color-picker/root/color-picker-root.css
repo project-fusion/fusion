@@ -605,8 +605,15 @@
  * `:host(:disabled)` rather than the attribute, so an ancestor
  * `<fieldset disabled>` reaches it too. Listbox carries the longer note. */
 :host(:disabled) {
+  --_field-disabled-opacity: 1;
   cursor: not-allowed;
   opacity: var(--helix-opacity-disabled);
+}
+
+/* The fields inside are disabled with the picker, and the picker has already
+   faded, so they keep full strength rather than fading a second time. */
+:host(:disabled) [part="channel"] {
+  --helix-opacity-disabled: 1;
 }
 
 /* Read-only, which is not this control at half opacity.

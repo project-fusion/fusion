@@ -305,6 +305,7 @@
 }
 
 :host(:disabled) {
+  --_field-disabled-opacity: 1;
   opacity: var(--helix-opacity-disabled);
 }
 

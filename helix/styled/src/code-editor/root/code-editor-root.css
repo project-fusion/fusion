@@ -228,6 +228,10 @@
   padding-inline: var(--helix-space-sm);
 }
 
+:host(:disabled) {
+  --_field-disabled-opacity: 1;
+}
+
 :host(:disabled) [part="field"] {
   cursor: not-allowed;
   opacity: var(--helix-opacity-disabled);

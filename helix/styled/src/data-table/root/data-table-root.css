@@ -233,7 +233,7 @@
 [part~="row"][aria-selected="true"] > * {
   background-color: var(
     --data-table-selected-background-color,
-    color-mix(in srgb, var(--helix-color-primary) 10%, var(--helix-color-background))
+    var(--helix-color-primary-subtle)
   );
 }
 

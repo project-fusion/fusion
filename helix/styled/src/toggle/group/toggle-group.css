@@ -106,7 +106,8 @@
   /* A groove, so the thumb is over it rather than on it. */
   --_indicator-surface: var(--helix-color-surface-overlay);
   background-color: var(--toggle-group-background-color, var(--helix-color-surface-sunken));
-  border: var(--helix-border-thin) solid var(--toggle-group-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--toggle-group-border-color, var(--helix-color-border));
   border-radius: var(--toggle-group-radius, var(--helix-radii-sm));
 }
 

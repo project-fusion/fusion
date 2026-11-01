@@ -72,7 +72,8 @@
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="label"],
 :host(:disabled) [part="hint"] {
-  opacity: var(--helix-opacity-disabled);
+  /* A family that fades its whole host sets this to 1, so a label fades once. */
+  opacity: var(--_field-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* Named but not shown, which is what an `aria-label` on the host becomes: the

@@ -34,11 +34,7 @@
 :host(:state(selected)) [part~="select"],
 :host(:state(selected)) [part~="expand"],
 :host(:state(selected)) ::slotted(*) {
-  background-color: color-mix(
-    in srgb,
-    var(--helix-color-primary) 10%,
-    var(--helix-color-background)
-  );
+  background-color: var(--helix-color-primary-subtle);
 }
 
 /* Out of reach, and drawn so, across every cell since the row has no box. */
