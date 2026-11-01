@@ -73,9 +73,9 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CAROUSEL, LISTBOX, OPTION, OPTION_GROUP, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LOG_GROUP,
-    LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, TABLE,
-    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX,
+    LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
+    OPTION, OPTION_GROUP, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -474,7 +474,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         carousel: field("carousel").map(tree_choice::carousel).transpose()?,
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
-        option_group: field("optionGroup").map(tree_choice::option_group).transpose()?,
+        option_group: field("optionGroup")
+            .map(tree_choice::option_group)
+            .transpose()?,
         chat_root: field("chatRoot").map(tree_choice::chat_root).transpose()?,
         chat_message: field("chatMessage")
             .map(tree_choice::chat_message)
