@@ -202,8 +202,10 @@ export const useLayerFocus = (scoped: Scoped): Scope => {
       const enabled = enabledIn(stops)
       const first = (landing === 'last' ? enabled.at(-1) : enabled[0]) ?? latest.current.layer()
       if (drawn(first)) {
+        /* Only a move inside the open layer reveals: on opening, a sheet rests
+           at its smallest snap point as the web's does, though its first
+           control stands past the window's edge. */
         focus().focus(first, false)
-        latest.current.reveal?.(first)
       }
     })
     return () => {
