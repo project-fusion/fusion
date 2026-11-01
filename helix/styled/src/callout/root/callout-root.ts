@@ -16,7 +16,7 @@ import { styles } from './callout-root.css.js'
  *
  * `tone` is set on the headless tier and carries the meaning, and this tier
  * draws it. `separation` is where the box ends: absent is the tint with the
- * bar, `outlined` an edge with no fill, and `plain` the bar and the mark alone.
+ * hairline, `outlined` an edge with no fill, and `plain` the bar and the mark alone.
  *
  * The inset and the type follow `data-density`, as the controls around a
  * callout do: set it on a region for tighter or looser callouts, or on one
@@ -53,10 +53,11 @@ export class HelixCallout extends HelixHeadlessCallout {
   /**
    * Where the callout's box ends, whatever its tone.
    *
-   * Absent, or `filled`, is the tint with the bar, the resting look.
+   * Absent, or `filled`, is the tint with a hairline, the resting look.
    * `outlined` draws the tone at the edge with no fill, and `plain` keeps only
-   * the bar and the mark, for an aside in running prose. The bar stays in
-   * every one, being what says the tone where the hue is not seen.
+   * a bar and the mark, for an aside in running prose. The bar says the tone
+   * where there is no box to carry it. `--callout-bar-thickness` adds it to the
+   * others.
    *
    * Web Awesome calls this `appearance`. It is `separation` here, as on
    * `Announcement` and `Card`, since a box's edge and its meaning are two

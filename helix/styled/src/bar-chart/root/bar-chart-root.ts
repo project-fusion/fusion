@@ -54,7 +54,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    * How strongly the columns are drawn.
    *
    * The chart's treatment, which every series takes unless `outlined` or
-   * `subtle` names it. `outlined` is the mark as its edge alone, `subtle` a wash
+   * `subtle` names it. `outlined` is a faded mark with its edge, `subtle` a wash
    * of the series color with that edge on it, and absent is the filled column,
    * per the rule that a reflected property takes no default.
    *

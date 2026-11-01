@@ -231,10 +231,7 @@
    which is the solid fill a button stands on and would make a column of chosen
    rows read as an alarm; this is the primary at the strength Tag rests at. */
 [part~="row"][aria-selected="true"] > * {
-  background-color: var(
-    --data-table-selected-background-color,
-    var(--helix-color-primary-subtle)
-  );
+  background-color: var(--data-table-selected-background-color, var(--helix-color-primary-subtle));
 }
 
 /* A row's grip, with `reorderable-rows`: quiet until held, as a column's grip

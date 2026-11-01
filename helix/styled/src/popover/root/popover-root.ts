@@ -64,8 +64,8 @@ export class HelixPopover extends HelixHeadlessPopover {
    * content nobody can predict has to be readable.
    *
    * Unset is a surface with an inset, which is what a panel of content wants.
-   * `plain` removes both, for a panel holding something that brings its own,
-   * such as a list whose rows run to the edges.
+   * `plain` removes the inset and keeps the surface, for a panel holding
+   * something that brings its own, such as a list whose rows run to the edges.
    */
   @property({ reflect: true })
   separation?: 'plain'

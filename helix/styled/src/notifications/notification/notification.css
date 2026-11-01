@@ -138,7 +138,8 @@
 :host(:state(feed-filled)) [part="item"],
 :host(:state(feed-outlined)) [part="item"] {
   box-shadow: var(--helix-shadow-surface);
-  border: var(--helix-border-surface) solid var(--notifications-item-edge, var(--helix-color-border));
+  border: var(--helix-border-surface) solid
+    var(--notifications-item-edge, var(--helix-color-border));
   border-radius: var(--notifications-item-radius, var(--helix-radii-md));
 }
 

@@ -150,9 +150,8 @@ export class HelixHeadlessButtonGroup extends HelixElement {
    * Unset is a row and stays unset, so a reflected default cannot appear on a
    * host whose server output never had it.
    *
-   * **A property and not an `auto`, which the splitter and the carousel earned
-   * and this has not.** Turning those two changes what they *do*: a drag axis,
-   * arrow keys, how many slides a page holds. A group of buttons turning is
+   * **A property and not an `auto`, which the splitter earned and this has not.**
+   * Turning a splitter changes what it *does*: a drag axis and arrow keys. A group of buttons turning is
    * paint, so there is no state to resolve and nothing to observe; what it needs
    * is for a consumer who knows the column is narrow to be able to say so.
    *

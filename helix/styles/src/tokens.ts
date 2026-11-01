@@ -87,7 +87,7 @@ export const TOKENS: Token[] = [
   [
     'color-surface-raised',
     'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
-    'A raised surface on the page, such as a selected tab or a hovered row. Its fill is one step down the ramp.',
+    'A panel raised inside a surface, such as a card inside a card. Its fill is one step down the ramp.',
   ],
   [
     'color-surface-overlay',
@@ -110,7 +110,7 @@ export const TOKENS: Token[] = [
   [
     'color-surface-sunken',
     'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-975))',
-    'A recessed surface that holds a value, such as an input, a track, or a groove. Its fill sets it apart.',
+    'A recessed surface, such as a track or a groove. Its fill sets it apart. A field reads `well`.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
      as a color.** A control that names an absolute surface is only correct on
@@ -190,7 +190,7 @@ export const TOKENS: Token[] = [
   [
     'color-foreground-subtle',
     'light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))',
-    'A mark that is not text, such as a separator, a chevron, or a grip, and the text of a disabled control. Its contrast is not guaranteed.',
+    'A mark that is not text, such as a separator, a chevron, or a grip. Its contrast is not guaranteed.',
   ],
   /* **The label on a fill, one per role.** A brand fill and a status fill are
      dark enough to carry white in both modes. An ink fill is the opposite of
@@ -787,7 +787,7 @@ export const TOKENS: Token[] = [
   [
     'material-backdrop',
     'blur(var(--helix-material-blur-md)) saturate(1.5)',
-    'The tint behind a modal.',
+    'The blur and saturation behind a translucent surface.',
   ],
   /* *The scalar the policy moves, where the others are values it sets.** A
      line chart's area wash, a bar chart's faded group and a header's backdrop
