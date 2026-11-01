@@ -10,6 +10,6 @@
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-display);
   font-size: var(--site-text-wordmark);
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--helix-weight-medium);
   letter-spacing: var(--helix-tracking-tight);
 }
