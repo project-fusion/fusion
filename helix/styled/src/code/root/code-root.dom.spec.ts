@@ -40,11 +40,11 @@ describe('code', () => {
     )
   })
 
-  test('the wash is a mix of the ink, so it composites the same on either scheme', () => {
+  test('the wash is the well, so it composites the same on either scheme', () => {
     // A surface rung is absolute lightness and steps differently against a
     // light page and a dark one; a percentage of the foreground does not.
     expect(rule('[part="code"]')).toContain(
-      'color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)',
+      'var(--helix-color-well)',
     )
   })
 

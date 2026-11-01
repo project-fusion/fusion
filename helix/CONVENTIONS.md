@@ -1000,8 +1000,9 @@ Two layers. Components see only the second.
 | Primitive | `primitives.css` | `--_helix-neutral-500` | `helix/styles` only |
 | Semantic | `tokens.css` | `--helix-color-primary` | everything |
 
-Fifteen categories, every token in exactly one: `color` `space` `radii` `font`
-`text` `weight` `leading` `tracking` `border` `shadow` `material` `duration`
+Every token sits in exactly one category: `color` `space` `radii` `font`
+`text` `weight` `leading` `tracking` `border` `shadow` `material` `opacity`
+`duration` `easing` `size` `layer`.
 `easing` `size` `layer`.
 
 `helix component --only tokens` enforces three rules: no raw values where a token exists,

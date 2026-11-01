@@ -65,10 +65,14 @@ describe('an empty list', () => {
     expect(hasState(list, 'empty')).toBe(true)
   })
 
-  test('shows no row without words or content, and still takes the empty state', async () => {
+  test('says "No items" by default, and an empty string shows no row', async () => {
     const list = await settled('<helix-headless-list label="Files"></helix-headless-list>')
-    expect((part(list, 'empty') as HTMLElement).hidden).toBe(true)
+    expect((part(list, 'empty') as HTMLElement).hidden).toBe(false)
     expect(hasState(list, 'empty')).toBe(true)
+    const quiet = await settled(
+      '<helix-headless-list label="Files" empty-text=""></helix-headless-list>',
+    )
+    expect((part(quiet, 'empty') as HTMLElement).hidden).toBe(true)
   })
 
   test('takes your own content, as one grid cell in a list that selects', async () => {
