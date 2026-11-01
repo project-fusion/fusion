@@ -28,7 +28,7 @@ export function Example() {
           >
             <helix-text
               as="h2"
-              variant="title"
+              scale="title"
             >
               Install
             </helix-text>
@@ -48,7 +48,7 @@ export function Example() {
           >
             <helix-text
               as="h2"
-              variant="title"
+              scale="title"
             >
               Usage
             </helix-text>
@@ -67,7 +67,7 @@ export function Example() {
           >
             <helix-text
               as="h2"
-              variant="title"
+              scale="title"
             >
               API
             </helix-text>

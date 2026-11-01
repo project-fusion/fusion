@@ -68,7 +68,7 @@ export function Example() {
           <helix-text emphasis="muted">Start a new email.</helix-text>
           <helix-text
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             {count}
           </helix-text>
@@ -90,7 +90,7 @@ export function Example() {
           <helix-text emphasis="muted">Show only unread, flagged, or starred messages.</helix-text>
           <helix-text
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             {count}
           </helix-text>
@@ -119,7 +119,7 @@ export function Example() {
           <helix-text emphasis="muted">Check for new messages.</helix-text>
           <helix-text
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             {count}
           </helix-text>

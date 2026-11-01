@@ -842,17 +842,23 @@ own quiet ink, the one step the readable range holds. **Text takes `muted` and
 no `subtle`**: `foreground-subtle` is the ink the engine does not solve, so text
 set in it had no contrast guarantee.
 
-`variant` is the escape hatch and takes no registry, being component-specific by
-definition: `segmented` against `underlined`, `list` against `wheels`, `grip`
-against `line`. **A variant changes how one family's semantics look or fit**:
-the same tabs drawn as a track or over a rule, the same time chosen from a list
-or from wheels. It lives on either tier, because what a variant draws can
-change the markup as well as the paint. What it may not be is a place to put
-something that *is* on an axis, or a second family's job. Where a presentation
-reproduces another family's semantics, structure, and behavior, the developer
-picks that family, and Helix does not add it as a variant. [Framework
-typings](#framework-typings-and-the-names-they-carry) says the same further
-down: variants are props, and alternatives are separate components.
+A choice that is none of those is named for what it chooses, and takes no
+registry, being component-specific by definition: `marker` for `segmented` against
+`underlined`, `layout`, `picker` for `list` against `wheels`, `stroke`, `handle` for
+`grip` against `line`, and `pattern`. It lives on either tier, because a choice
+between two widgets is structural wherever it is made. It may not be a place to put
+something that *is* on an axis, and no property is named `variant`, which says
+nothing about what it chooses.
+
+A choice changes how one family's semantics look or fit: the same tabs drawn as a track or
+over a rule, the same time chosen from a list or from wheels. Where a presentation reproduces
+another family's semantics, structure, and behavior, the developer picks that family, and
+Helix does not add it as a choice. [Framework
+typings](#framework-typings-and-the-names-they-carry) says the same further down: a choice is
+a prop, and an alternative is a separate component.
+
+A hook that fills an area ends in `-background-color`. A hook ending in `-color` is ink, or a mark
+or a line whatever draws it: a thumb, a track that is also a ring's stroke, a Divider.
 
 **A styled axis never appears on the headless tier**, which has nothing to paint
 and no box to size. The exceptions are each principled: `tone` says what a thing

@@ -10,7 +10,7 @@ export function Example() {
           slot="marker"
         ></helix-icon>
         <helix-text slot="time">09:12</helix-text>
-        <helix-text variant="body-strong">Deployed to production</helix-text>
+        <helix-text scale="body-strong">Deployed to production</helix-text>
         <helix-text
           emphasis="muted"
           scale="caption"
@@ -27,7 +27,7 @@ export function Example() {
           slot="marker"
         ></helix-icon>
         <helix-text slot="time">08:47</helix-text>
-        <helix-text variant="body-strong">Rolled back</helix-text>
+        <helix-text scale="body-strong">Rolled back</helix-text>
         <helix-text
           emphasis="muted"
           scale="caption"
@@ -40,7 +40,7 @@ export function Example() {
         tone="primary"
       >
         <helix-text slot="time">08:30</helix-text>
-        <helix-text variant="body-strong">Build passed</helix-text>
+        <helix-text scale="body-strong">Build passed</helix-text>
         <helix-text
           emphasis="muted"
           scale="caption"
@@ -50,7 +50,7 @@ export function Example() {
       </helix-timeline-item>
       <helix-timeline-item datetime="2026-08-19T08:04">
         <helix-text slot="time">08:04</helix-text>
-        <helix-text variant="body-strong">Pull request opened</helix-text>
+        <helix-text scale="body-strong">Pull request opened</helix-text>
         <helix-text
           emphasis="muted"
           scale="caption"

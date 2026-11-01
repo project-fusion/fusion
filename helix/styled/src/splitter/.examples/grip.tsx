@@ -3,7 +3,7 @@ export function Example() {
     <helix-splitter
       default-position="40"
       style={{ blockSize: '12rem' }}
-      variant="grip"
+      handle="grip"
     >
       <helix-card
         separation="plain"
