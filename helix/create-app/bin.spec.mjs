@@ -59,7 +59,9 @@ const registry = (says) => {
 
 /** The launcher, with the update check off unless an `npm` is handed in. */
 const launch = (args, { npm, environment = {} } = {}) => {
-  const env = { ...process.env, HELIX_BIN: helix(), ...environment }
+  /* The agent is cleared because the runner sets its own, which would otherwise
+     decide which package manager the launcher names. */
+  const env = { ...process.env, HELIX_BIN: helix(), npm_config_user_agent: '', ...environment }
   delete env.CI
   delete env.HELIX_TEMPLATES
   if (npm === undefined) {

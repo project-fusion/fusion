@@ -331,11 +331,9 @@ fn init_refuses_to_overwrite_without_force() {
         &["theme", "init", "--brand", "#c1272d", "--force"],
     );
     assert_eq!(code(&forced), 0);
-    assert!(
-        std::fs::read_to_string(sandbox.0.join("helix.theme.json"))
-            .expect("rewritten")
-            .contains("#c1272d")
-    );
+    assert!(std::fs::read_to_string(sandbox.0.join("helix.theme.json"))
+        .expect("rewritten")
+        .contains("#c1272d"));
 }
 
 /// A bare noun prints help and exits 2, rather than guessing at a verb.
@@ -719,11 +717,9 @@ fn json_wins_over_plain() {
     assert_eq!(code(&output), 0);
     let parsed: serde_json::Value =
         serde_json::from_str(&out(&output)).expect("--json --plain is still JSON");
-    assert!(parsed.get("pairings").is_some_and(|pairings| {
-        pairings
-            .as_array()
-            .is_some_and(|pairings| !pairings.is_empty())
-    }));
+    assert!(parsed.get("pairings").is_some_and(|pairings| pairings
+        .as_array()
+        .is_some_and(|pairings| !pairings.is_empty())));
 }
 
 /* `helix new`, which is the one verb that writes a tree rather than a file.
