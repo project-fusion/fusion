@@ -287,6 +287,14 @@
   display: none;
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="dismiss"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a line across the page, and its fill is the part a printer fights.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

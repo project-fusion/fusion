@@ -129,6 +129,7 @@ slot[name="icon"]::slotted(*) {
    with a small pad, which is chrome and not the passage's point. */
 [part="dismiss"] {
   all: unset;
+  position: relative;
   /* `all: unset` takes `box-sizing` with it; restored here, as everywhere. */
   box-sizing: border-box;
   block-size: calc(var(--helix-size-icon) + var(--helix-space-2xs) * 2);
@@ -204,6 +205,18 @@ slot[name="heading"]::slotted(*) {
   font-size: var(--callout-font-size, var(--helix-text-control));
   font-weight: var(--helix-weight-semibold);
   margin: var(--helix-space-none);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="dismiss"] {
+  position: relative;
+}
+
+[part="dismiss"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* Print: the tone is a fill; the edge and the mark say the same thing in ink.

@@ -264,6 +264,18 @@
   }
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="trigger"] {
+  position: relative;
+}
+
+[part="trigger"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 @media print {
   :host {
     display: none;

@@ -901,6 +901,11 @@ export const TOKENS: Token[] = [
      touch screen. */
   ['text-field-min', 'var(--_helix-text-field-min)'],
   ['space-control', 'var(--helix-space-md)'],
+  /* *How far a control's press reaches.** 24 under a mouse, which is WCAG 2.5.8,
+     and 44 on a touch screen, which is Apple's hit region. A transparent box
+     around the control reaches this, so nothing drawn moves. Decided by the
+     pointer in `_modes.css`. */
+  ['size-target', 'var(--_helix-size-target)'],
   ['size-control-lg', 'calc(3rem * var(--_helix-seed-density))'],
   /* *A step either side of whatever step is current**, for a control that is
      deliberately not the same size as its neighbors: a row in a floating

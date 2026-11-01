@@ -251,6 +251,18 @@ slot[name="dash"]::slotted(*) {
   min-block-size: 1lh;
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="field"] {
+  position: relative;
+}
+
+[part="field"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a control prints the value it holds, and the state has to survive: a
    tick that is a fill prints as an empty box, which is a document saying the
    opposite of the truth. */

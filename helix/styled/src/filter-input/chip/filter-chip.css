@@ -127,6 +127,18 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="dismiss"] {
+  position: relative;
+}
+
+[part="dismiss"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a filter is part of what the page was showing, so it stays, and the
    control that would remove it is not a thing on paper.
  *

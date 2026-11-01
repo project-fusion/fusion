@@ -92,6 +92,28 @@ slot[name="end"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the control is already that size the box sits inside it. */
+[part="clear"] {
+  position: relative;
+}
+
+[part="clear"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+[part~="reveal"] {
+  position: relative;
+}
+
+[part~="reveal"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a control prints the value it holds, and a state carried by a fill has
    to survive, or the paper says the opposite of the truth. */
 @media print {
