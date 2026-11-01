@@ -111,11 +111,12 @@ export class HelixCard extends HelixHeadlessCard {
    * `ThemeIntent.separation` is `border | fill | shadow | space`, so these are
    * the component's words for what a theme states as a policy, one to one.
    *
-   * - `outlined` is the default, and a hairline is usually enough. It costs
-   *   less attention than a shadow: a screen of shadowed cards reads as a stack
-   *   of things floating, none of them settled. The card keeps its surface
-   *   color inside the line. For a line and no fill, set
-   *   `--card-background-color: transparent`.
+   * - Unset, the card keeps its surface color inside a hairline. A hairline
+   *   costs less attention than a shadow: a screen of shadowed cards reads as a
+   *   stack of things floating, none of them settled.
+   * - `outlined` is the hairline and no fill, so the page shows through. Use it
+   *   on a black or white page where a fill adds nothing. On a ground as light
+   *   as a panel, the hairline is faint, so use `filled` or `plain` there.
    * - `elevated` is lifted off the page instead of framed, for a card on a
    *   colored or busy background, where a line has to compete with whatever is
    *   behind it and a shadow does not.
