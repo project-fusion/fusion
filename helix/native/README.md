@@ -286,6 +286,9 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   no close request, and no focus, and no screen reader reaches it. It may
   hold nothing, and its rules read the lengths its attributes hold, as the
   spotlight reads the lit box its tour measures.
+- **A tour's stop is a guide**: drawn above every layer but a notice, so it
+  stays pressable over a menu or a drawer its tour opens to point into,
+  whichever opened first.
 - **A machine bound before a layer may answer for it**: the attributes it
   binds read what that machine computes, as a tour stop's `offset` reads the
   spotlight's padding, and a close request or a press outside asks that
@@ -2634,4 +2637,5 @@ the crossfade of the time under a pointer, and printing. A count returned by
 A Select draws a Listbox in its layer and hands it the value, so the value lives in
 one place. A layer that is closed holds nothing, so the options also join a hidden
 copy of themselves, which draws nothing, for the trigger's words, its keys, and the
-verdict. `position="item-aligned"` opens under the trigger for now.
+verdict. `position="item-aligned"` stands a popover's chosen option on the trigger,
+by core's `over`, as the web's does, and a sheet ignores it, as the web's does.
