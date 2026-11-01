@@ -1,0 +1,82 @@
+/* What the spatial charts draw alike. Compose with `series.css` and the family's
+   own sheet, which comes after and so changes what it needs to. */
+
+:host {
+  display: block;
+}
+
+::slotted(*) {
+  inset: 0;
+  position: absolute;
+}
+
+[part="plot"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="fallback"][hidden] {
+  display: none;
+}
+
+[part="tick"] {
+  fill: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="axis-name"] {
+  fill: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+[part="ring"] {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--helix-color-foreground);
+  stroke-width: var(--helix-border-thick);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="live"],
+[part="summary"],
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+:host([no-box]) [part="plot"] {
+  background-color: transparent;
+}
+
+[part="fallback"] {
+  inset: var(--helix-space-md);
+  position: absolute;
+}
+
+foreignObject > [part="mark"] {
+  translate: -50% -50%;
+}
+
+[part="tick"],
+[part="axis-name"] {
+  fill: CanvasText;
+}
+
+/* Figures on an axis take one width each, so a tick does not shift as it updates. */
+[part="tick"] {
+  font-variant-numeric: tabular-nums;
+}
