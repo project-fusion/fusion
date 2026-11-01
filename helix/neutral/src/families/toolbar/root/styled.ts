@@ -103,7 +103,7 @@ export default styles(
       }),
       rule(
         { scrollable: true },
-        { flexWrap: 'nowrap', web: { overflowX: 'auto', scrollbarWidth: 'none' } },
+        { flexWrap: 'nowrap', overflowX: 'auto', web: { scrollbarWidth: 'none' } },
       ),
       rule({ orientation: 'vertical' }, { flexDirection: 'column' }),
     ]),
