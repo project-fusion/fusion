@@ -41,6 +41,13 @@
  *     That makes it answerable rather than fatal, at two registrations per
  *     package. "Authorization only" still makes the run unattended.
  *
+ * **Moving `latest` needs a second permission, and this cannot grant it.**
+ * "Allow npm dist-tag" is off by default, and npm 12.2.1's `npm trust github`
+ * accepts only `--allow-publish` and `--allow-stage-publish`. So a person turns
+ * it on in each package's settings, for `release.yml` alone, since only that
+ * workflow promotes. This prints the addresses, and `publish.mjs --preflight`
+ * refuses a release with any package still missing it.
+ *
  * The package does have to exist, and npm/cli#8544 asks for that to change and
  * is still open. It is simply not what a 403 tells you.
  *
@@ -202,11 +209,19 @@ for (const name of packages) {
   }
 }
 
+/** The step no command can do, printed where a person running this will read it. */
+const allowDistTag = () =>
+  '\nThen turn on "Allow npm dist-tag" by hand: `npm trust` has no flag for it. Open each ' +
+  'package below, edit the trusted publisher for `.github/workflows/release.yml` in the ' +
+  '`production` environment, turn the option on, and save. A package that already has it is ' +
+  `finished.\n\n${packages.map((name) => `  https://www.npmjs.com/package/${name}/access`).join('\n')}\n`
+
 if (!apply) {
   console.log(
     `\n${packages.length} packages x ${PUBLISHERS.length} workflows = ` +
       `${packages.length * PUBLISHERS.length} registrations. Re-run with --apply to make them.`,
   )
+  console.log(allowDistTag())
   process.exit(0)
 }
 if (failed > 0) {
@@ -246,3 +261,4 @@ console.log(
   `\ntrust: ${packages.length * PUBLISHERS.length} registrations in place` +
     (existing > 0 ? ` (${existing} already were)` : ''),
 )
+console.log(allowDistTag())

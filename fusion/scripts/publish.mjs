@@ -22,14 +22,11 @@
  * takes it. This refuses to publish when it sees it, and `test:template` says
  * the same thing from the consumer's side.
  *
- * **Open question, and it decides whether promotion works at all.** Trusted
- * publishing grants `--allow-publish`, and `npm trust` has no flag for moving a
- * dist-tag. If the OIDC token authorizes publishing but not
- * `npm dist-tag add`, the promotion step below cannot authenticate and the
- * release stops after staging. Verify this on the first real release rather
- * than at the moment it is needed. If it turns out unauthorized, the narrowest
- * fix is a granular token scoped to these two scopes used by the promote step
- * only, which leaves the publish itself credential-free.
+ * **Promotion authenticates the way publishing does, by trusted publishing.**
+ * `npm dist-tag` performs the OIDC exchange from npm 11.21.0 and 12.2.0, and each
+ * package's trusted publisher needs "Allow npm dist-tag" turned on, which is off
+ * by default and has no `npm trust` flag. `trust.mjs` prints where to turn it on.
+ * `--preflight` proves it for every package before the release spends a number.
  *
  * Related and worth reading before building around this: npm now has
  * `npm stage publish`, a first-class staged release that may express exactly
@@ -170,6 +167,12 @@ function npm(args, doing) {
           'is the whole reason it is worth having.',
       )
     }
+    if (promote !== undefined && /\b40[13]\b|ENEEDAUTH|dist-tag/i.test(output)) {
+      const name = args[2].slice(0, args[2].lastIndexOf('@'))
+      console.error(
+        `\n  The trusted publisher may not allow moving tags.\n\n${allowDistTag([name])}`,
+      )
+    }
     if (/payment required|402|paid|private packages/i.test(output)) {
       console.error(
         '\n  Restricted packages need a paid organization. Either upgrade the org, or set ' +
@@ -181,25 +184,6 @@ function npm(args, doing) {
 }
 
 /**
- * A config file holding `NPM_TOKEN`, for a step that reads or moves a tag
- * rather than publishing, or undefined where none is set.
- *
- * A file named on the command line and never the environment or `~/.npmrc`:
- * the publish has to keep finding no credential, which the promotion below
- * says why.
- */
-const tokenConfig = () => {
-  if (!process.env.NPM_TOKEN) {
-    return undefined
-  }
-  const file = join(mkdtempSync(join(tmpdir(), 'npm-')), '.npmrc')
-  writeFileSync(file, `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`, {
-    mode: 0o600,
-  })
-  return file
-}
-
-/**
  * The domain's packages the registry has never seen.
  *
  * **Trusted publishing cannot publish a package for the first time**, npm
@@ -207,39 +191,12 @@ const tokenConfig = () => {
  * reaches a new one has published every package before it, and stops: the
  * domain half out under `next` and a number spent. So it is asked before the
  * number is allocated.
- *
- * **A restricted package answers 404 to a reader without access**, which is
- * what a missing one answers too. A package stays restricted until a publish or
- * `npm access` changes it. So when every package of the domain is
- * absent at once, a package of another domain is asked as well, one this
- * credential should be able to see. If it can, the credential reads the scope
- * and the domain is new, which is what a bootstrap is for: a first bootstrap
- * stopped here on October 8, 2026, logged in, with every package genuinely
- * absent. If it cannot, the credential is the fault.
  */
-const visible = (name, config) => {
-  try {
-    run(
-      'npm',
-      ['view', name, 'name', ...(config === undefined ? [] : ['--userconfig', config])],
-      root,
-    )
-    return true
-  } catch {
-    return false
-  }
-}
-
 const unpublished = () => {
-  const config = tokenConfig()
   const absent = []
   for (const [name] of packages) {
     try {
-      run(
-        'npm',
-        ['view', name, 'name', ...(config === undefined ? [] : ['--userconfig', config])],
-        root,
-      )
+      run('npm', ['view', name, 'name'], root)
     } catch (error) {
       const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.trim()
       if (!/E404|404 Not Found/.test(said)) {
@@ -248,22 +205,48 @@ const unpublished = () => {
       absent.push(name)
     }
   }
-  const witness = [...manifests()].find(
-    ([name, { manifest }]) => domainOf(name) !== domain && publishes(manifest),
-  )?.[0]
-  if (
-    packages.length > 1 &&
-    absent.length === packages.length &&
-    (witness === undefined || !visible(witness, config))
-  ) {
-    fail(
-      `The registry shows none of the ${packages.length} ${domain} packages, which is a ` +
-        `credential rather than a domain nobody has published: ${witness ?? 'no package of another domain'} ` +
-        'is hidden too, and a restricted package answers 404 to a reader without access. Set ' +
-        '`NPM_TOKEN`, or log in.',
-    )
-  }
   return absent
+}
+
+/** The steps that let a trusted publisher move a package's tags, for a person to follow. */
+const allowDistTag = (names) =>
+  `  On npmjs.com, open each package's settings and edit the trusted publisher for ` +
+  `\`.github/workflows/release.yml\` in the \`production\` environment. Turn on "Allow npm ` +
+  `dist-tag" and save.\n\n${names.map((name) => `    https://www.npmjs.com/package/${name}/access`).join('\n')}\n`
+
+/**
+ * The domain's packages whose trusted publisher cannot move a tag.
+ *
+ * **"Allow npm dist-tag" is set per package and is off by default**, and a new
+ * package starts without it. A release that reached such a package would publish
+ * the domain, prove it, and move `latest` on the packages before that one, with a
+ * number spent. So this moves a tag on every package, before the number is
+ * allocated, and names every package that refuses.
+ *
+ * **Only where the job can make the exchange.** On a laptop this would ask for a
+ * one-time password per package and prove nothing about the workflow.
+ *
+ * The tag points at the version `latest` already names, and is removed at once.
+ */
+const CHECK_TAG = 'promote-check'
+
+const cannotPromote = () => {
+  if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+    return []
+  }
+  const refused = []
+  for (const [name] of packages) {
+    try {
+      const version = run('npm', ['view', name, 'version'], root).trim()
+      run('npm', ['dist-tag', 'add', `${name}@${version}`, CHECK_TAG], root)
+      run('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
+    } catch (error) {
+      const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.split('\n')
+      console.error(`  ${name}: ${said.find((line) => line.includes('npm error')) ?? said[0]}`)
+      refused.push(name)
+    }
+  }
+  return refused
 }
 
 if (preflight) {
@@ -275,6 +258,13 @@ if (preflight) {
         '  Once, from a machine that is logged in, publish the placeholder and register the ' +
         `workflows:\n\n    bun run build\n    node fusion/scripts/publish.mjs --domain ${domain} ` +
         '--bootstrap\n    bun run trust --apply\n',
+    )
+  }
+  const refused = cannotPromote()
+  if (refused.length > 0) {
+    fail(
+      `${domain}: trusted publishing cannot move a tag on ${refused.length} of ${packages.length} ` +
+        `packages, so the release would stop after staging.\n\n${allowDistTag(refused)}`,
     )
   }
   console.log(`${domain}: every one of ${packages.length} packages is on the registry`)
@@ -344,39 +334,16 @@ if (promote !== undefined) {
   if (pinned === undefined) {
     fail('--promote needs --version, so the tag is moved onto a release rather than onto "newest".')
   }
-  /* **Promotion needs a credential, and trusted publishing cannot grant one.**
-     Measured 31 Aug 2026 on the first release that got this far: the publish
-     succeeded by OIDC and `dist-tag add` came back
-     `401 Unauthorized - GET .../@fusion.dev%2fhelix-core/dist-tags`. npm's
-     trusted publisher page offers `npm publish` and `npm stage publish` and
-     nothing else, so moving a tag is not a permission it can hand out at all.
-
-     So the token goes here and only here, written to a config file passed on
-     the command line rather than into the environment or into `~/.npmrc`. The
-     publish above has to keep finding no credential: `registry-url` on
-     `setup-node` once left an empty `_authToken` behind, npm read itself as
-     configured, never exchanged the OIDC token, and the registry refused the
-     write as a 404. */
-  const userconfig = tokenConfig()
-  if (userconfig === undefined) {
-    console.error(
-      'promote: no `NPM_TOKEN`. Trusted publishing grants `npm publish` and not ' +
-        '`dist-tag add`, so this step needs a token of its own and will fail without one.',
-    )
-  }
+  /* **Trusted publishing moves the tag**, so this finds no credential in CI and
+     npm makes the exchange per package. It came back `401` on the dist-tags
+     endpoint on August 31, 2026, before npm 11.21.0 and the "Allow npm dist-tag"
+     permission. On a machine that is logged in, it uses that session. */
   for (const [name] of packages) {
     const target = `${name}@${pinned}`
     console.log(`  ${target} -> ${promote}`)
     if (!dry) {
       npm(
-        [
-          'dist-tag',
-          'add',
-          target,
-          promote,
-          ...(userconfig === undefined ? [] : ['--userconfig', userconfig]),
-          ...(otp === undefined ? [] : ['--otp', otp]),
-        ],
+        ['dist-tag', 'add', target, promote, ...(otp === undefined ? [] : ['--otp', otp])],
         `move \`${promote}\` onto ${target}`,
       )
     }

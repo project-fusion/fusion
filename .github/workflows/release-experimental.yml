@@ -130,7 +130,7 @@ jobs:
       # Node 22.20.0 ships npm 10.9.x, so the floor above is not what
       # `setup-node` leaves behind. Same pin as `release.yml`, same reasoning.
       - name: Install an npm that can do trusted publishing
-        run: npm install -g npm@11.18.0
+        run: npm install -g npm@11.21.1
 
       - name: Stamp the experimental version into every domain this touches
         env:

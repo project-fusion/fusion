@@ -154,11 +154,10 @@ jobs:
         target: ${{ fromJson(needs.intent.outputs.domains) }}
     environment: production
     permissions:
-      # `id-token` is how the publish step authenticates: npm trusted
-      # publishing exchanges a short-lived OIDC token for publish rights. The
-      # one npm token is on the two steps trusted publishing cannot cover, the
-      # install proof and the promotion, and never on the job. `contents` is for
-      # the tag and the GitHub release that records it. The stamp-back does not
+      # `id-token` is how the publish and promote steps authenticate: npm trusted
+      # publishing exchanges a short-lived OIDC token for rights on one package.
+      # No npm token exists here. `contents` is for the tag and the GitHub
+      # release that records it. The stamp-back does not
       # use this token at all: `main` requires a pull request, so a direct push
       # from `GITHUB_TOKEN` is declined, and the App installation token it uses
       # instead is minted in the step above and named in the branch rule's
@@ -208,19 +207,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # 22.20.0 ships npm 10.9.x, which predates trusted publishing.
+      # 22.20.0 ships npm 10.9.x, which predates trusted publishing. `npm dist-tag`
+      # makes the exchange from 11.21.0. 12.x needs a newer Node than this pin.
       # [RELEASING.md](../RELEASING.md#two-traps-in-the-runner-setup)
       - name: Install an npm that can do trusted publishing
-        run: npm install -g npm@11.18.0
+        run: npm install -g npm@11.21.1
 
       # Before a number is allocated. Trusted publishing cannot publish a package
-      # the first time, so a release reaching a new one would publish everything
-      # before it and stop there, a number spent. The token is for reading: a
-      # package that is still restricted answers 404 to a reader without access.
+      # the first time, and cannot move a tag on a package without "Allow npm
+      # dist-tag", so a release reaching either would stop partway, a number spent.
       # [RELEASING.md](../RELEASING.md#a-new-package)
-      - name: Refuse a package the registry has never seen
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Refuse a package that cannot be published and promoted
         run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --preflight
 
       - name: Compute the version from the tags
@@ -274,7 +271,7 @@ jobs:
 
       # `files` names these and `build` does not produce them, turbo having
       # `analyze` depend on `build` rather than the reverse:
-      # [RELEASING.md](../RELEASING.md#tokens-and-which-step-gets-one).
+      # [RELEASING.md](../RELEASING.md#what-packing-needs).
       - name: Write the manifests and framework typings
         run: bun run analyze
 
@@ -294,21 +291,17 @@ jobs:
         run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next
 
       # Against what was published rather than a rebuild of it: installed from
-      # the registry, from outside the workspace, the way a consumer gets it.
-      # The token is on the step and must not reach the publish step, which
-      # authenticates by OIDC: [RELEASING.md](../RELEASING.md#tokens-and-which-step-gets-one).
+      # the registry, from outside the workspace, the way a consumer gets it, with
+      # no credential.
       - name: Prove the staged release installs
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: bun run smoke:template --domain "${{ matrix.target.domain }}" --registry-tag next
+        run: >-
+          bun run smoke:template --domain "${{ matrix.target.domain }}" --registry-tag next
+          --version "${{ steps.version.outputs.version }}"
 
       # Only at `on`: `experimental` leaves the version at `next`, so `latest`
-      # does not move. Trusted publishing grants `publish` and not `dist-tag add`,
-      # which is why this step has a token:
-      # [RELEASING.md](../RELEASING.md#tokens-and-which-step-gets-one).
+      # does not move. Trusted publishing moves the tag, as it publishes:
+      # [RELEASING.md](../RELEASING.md#how-promotion-authenticates).
       - name: Promote to production
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         if: vars.PUBLISHING == 'on'
         run: |
           bun fusion/scripts/publish.mjs \
