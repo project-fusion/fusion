@@ -275,6 +275,7 @@ export const useLayer = (
       insets,
       key,
       keyboard,
+      modal,
       notice,
       open,
       outside,

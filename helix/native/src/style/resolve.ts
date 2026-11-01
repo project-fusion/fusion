@@ -40,7 +40,10 @@ export const COMPARED: Readonly<Record<string, (...lengths: number[]) => number>
  * How far `written` moves a color's lightness, `calc(l - 0.05)` as words or a
  * sum of `l` and a number. Undefined for anything else.
  */
-const lightnessStep = (written: Value, resolve: (value: Value) => Resolution): number | undefined => {
+const lightnessStep = (
+  written: Value,
+  resolve: (value: Value) => Resolution,
+): number | undefined => {
   if ('text' in written) {
     const found = /^calc\(l ([-+]) ([\d.]+)\)$/.exec(written.text)
     return found === null ? undefined : Number(found[2]) * (found[1] === '-' ? -1 : 1)
