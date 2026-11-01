@@ -178,11 +178,12 @@ bun run trust --apply
 resting `0.0.0-dev` under `exp-0`. A pre-release spends no number and nothing
 resolves to it by asking for a range, so a platform package can go out as a
 placeholder without its binary. `trust --apply` then registers both release
-workflows for every package. After that the release publishes them like any
-other.
+workflows for every package. Then turn on "Allow npm dist-tag" for each new package
+in its settings on npmjs.com, for `release.yml`. The command prints the addresses.
+After that the release publishes them like any other.
 
-An experimental release has no token to ask with, so it doesn't preflight. A
-new package stops it at that package, which spends no number.
+An experimental release doesn't preflight. A new package stops it at that package,
+which spends no number.
 
 ## A held domain
 
@@ -218,7 +219,8 @@ reads the list.
 1. Publish the placeholders, once, from a machine that is logged in to npm:
    `bun run build`, then
    `node fusion/scripts/publish.mjs --domain <domain> --bootstrap`.
-2. Register trusted publishing for them: `bun run trust --apply`.
+2. Register trusted publishing for them: `bun run trust --apply`. Turn on "Allow
+   npm dist-tag" at each address it prints.
 3. Delete the domain's entry under `held` in `fusion.json`. Merging that
    change releases the domain, because the intent reads `fusion.json` from the
    merged tree and the domain's earlier subjects are still in its window.
@@ -303,45 +305,46 @@ is the only one that survives the thing it detects. Writing about the marker is
 writing the marker, which is how this happened the first time, so describe it
 rather than quoting it.
 
-## Tokens, and which step gets one
+## What packing needs
 
 **`analyze` is on the critical path of packing**, and only since the manifests
 stopped being tracked. `files` names `custom-elements.json` and the three
 framework typings, and `build` does not produce them: turbo has `analyze`
-depending on `build` rather than the other way round, so a build alone leaves
-them absent and the tarball ships without files its own manifest promises.
+depending on `build`, so a build alone leaves them absent and the tarball ships
+without files its own manifest promises.
 
-**One token, on the two steps that need one and nowhere else.** A package that
-is still restricted answers an unauthenticated install with a 404, exactly as a
-missing package would, and the smoke test is the only step that installs as a
-consumer rather than publishing as the workflow.
+## How promotion authenticates
 
-It is the same secret the promote step takes, and it is read-write because
-promotion has to be. A read-only twin was considered and is not worth a second
-secret to rotate: both steps run in the same job on the same runner.
+**The release holds no npm token.** Publishing and promotion both authenticate by
+trusted publishing, and every package is public, so the preflight and the install
+proof read without a credential.
 
-**It must not reach the publish step**, which authenticates by OIDC and has to
-find no credential at all. A token in the job's environment would make npm read
-itself as configured and skip the exchange, which is why it sits on the step
-rather than on the job. `run-template-test.mjs` writes the `.npmrc` into the
-scratch project itself, so nothing outside that directory is authenticated.
+**Promotion needs a permission that publishing does not.** Each package's trusted
+publisher for `release.yml` needs "Allow npm dist-tag", which is off by default.
+`npm trust github` has no flag for it, so a person turns it on in the package's
+settings on npmjs.com. `bun run trust` prints the address of every package.
+
+**A release checks that permission before it spends a number.** At the preflight,
+`publish.mjs` adds and removes a `promote-check` tag on every package and refuses
+with the name of each package that declines.
+
+**The publish and the promotion have to find no credential.** A token in the
+environment or in an `.npmrc` makes npm read itself as configured and skip the
+exchange.
 
 **Promotion runs only at `on`.** At `experimental` the version is published,
 proved, and left at `next`: it exists, a consumer can install it by name, and
 `latest` still points where it did. The number is already burnt by the attempt
 tag, so stopping there costs nothing and repeats nothing.
 
-**Promotion needs a credential where publishing does not.** Trusted publishing
-grants `npm publish` and not `dist-tag add`: npm's publisher page offers
-`npm publish` and `npm stage publish` and nothing else, and a promote by OIDC
-came back `401` on the dist-tags endpoint. `publish.mjs` writes the token to a
-temporary config it passes on the command line, so it never reaches `~/.npmrc`.
+**A failed promotion can leave some packages moved.** The step stops at the first
+refusal, and the packages before it stay on the new version.
 
 ## Two traps in the runner setup
 
 **Never add `registry-url` to `setup-node`.** Given one it writes an `.npmrc`
-carrying `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`, its own variable
-rather than the `NPM_TOKEN` the steps read. Nothing sets it, so npm reads itself
+carrying `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}`. Nothing sets that
+variable, so npm reads itself
 as configured with a credential, stops before the OIDC exchange, publishes as
 nobody, and the registry refuses the write. **A refused write is reported as a
 404**, naming the package as if it did not exist, so it does not look like an
@@ -349,6 +352,7 @@ auth failure. The default registry is already npmjs.org, so the line buys nothin
 
 **npm has to be installed over the one Node ships.** `setup-node` installs
 whatever npm comes with the Node it pins, and 22.20.0 ships npm 10.9.x, which
-predates trusted publishing. Without the explicit install the run reports an
+predates trusted publishing. `npm dist-tag` makes the exchange from 11.21.0, and
+npm 12 needs Node 22.22.2. Without the explicit install the run reports an
 authentication failure rather than naming a version, so it reads as a registry
 problem and is a runner one.
