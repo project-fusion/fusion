@@ -795,12 +795,12 @@ export const TOKENS: Token[] = [
      a component keeps the strength it was drawn at and the theme moves all of
      them together: 1 is what ships, below 1 is more see-through, above 1 more
      solid. */
+  ['material-opacity', '1', 'How opaque a translucent surface is.'],
   /* How far a control that does not take a press fades. Every family keeps its own
      hook and reads this behind it. */
   ['opacity-disabled', '0.5', 'How far a disabled control fades.'],
   /* Rows that stay on screen while a new set arrives. */
   ['opacity-busy', '0.5', 'How far rows fade while a new set loads.'],
-  ['material-opacity', '1', 'How opaque a translucent surface is.'],
   /* *Two facts about glass that no token can express, written where the blurs
      are because they are what a consumer needs before reaching for one.** Both
      were found building a masthead and a menu that share an edge, and neither
