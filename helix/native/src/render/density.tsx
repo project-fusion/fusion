@@ -28,9 +28,9 @@ const SHARES = [
 
 /** What each stop sets the control's text and inset from. */
 const CONTROL: Readonly<Record<DensityStop, { readonly space: string; readonly text: string }>> = {
-  lg: { space: 'space-lg', text: 'text-md' },
-  md: { space: 'space-md', text: 'text-sm' },
-  sm: { space: 'space-sm', text: 'text-xs' },
+  lg: { space: 'space-lg', text: 'text-control-lg' },
+  md: { space: 'space-md', text: 'text-control-md' },
+  sm: { space: 'space-sm', text: 'text-control-sm' },
 }
 
 /** The stop an element's props name in `data-density`, where they name one. */

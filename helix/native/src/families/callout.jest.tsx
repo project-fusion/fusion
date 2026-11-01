@@ -78,9 +78,10 @@ describe('the generated Callout', () => {
     const [restingInset, restingSize] = await at()
     const [tightInset, tightSize] = await at('sm')
     const [looseInset, looseSize] = await at('lg')
-    /* space-sm, space-md, and space-lg; text-xs, text-sm, and text-md, at 16 points a rem. */
+    /* space-sm, space-md, and space-lg; a coarse pointer's control text, text-sm and
+       text-md, and text-md at the top, at 16 points a rem. */
     expect([tightInset, restingInset, looseInset]).toEqual([12, 16, 24])
-    expect([tightSize, restingSize, looseSize]).toEqual([12, 13, 14])
+    expect([tightSize, restingSize, looseSize]).toEqual([13, 14, 14])
   })
 
   test('names its dismiss button for its heading, and fades out once dismissed', async () => {

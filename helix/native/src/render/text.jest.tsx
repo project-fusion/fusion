@@ -259,8 +259,8 @@ describe('text at the reader’s text size', () => {
     expect(words.lineHeight).toBeCloseTo(21 * size, 1)
     /* A tab's label sets its own size, and keeps the page's multiple for its line. */
     const label = styleOf(screen.getByText('Overview'))
-    expect(label.fontSize).toBe(points(13 * size))
-    expect(label.lineHeight).toBeCloseTo(19.5 * size, 1)
+    expect(label.fontSize).toBe(points(14 * size))
+    expect(label.lineHeight).toBeCloseTo(21 * size, 1)
   })
 
   test('every text the renderer draws leaves React Native’s own scaling off', async () => {
@@ -303,7 +303,7 @@ describe('text at the reader’s text size', () => {
         [String(text.props.children)]: false,
       })
     }
-    expect(styleOf(screen.getByText('Save')).fontSize).toBe(points(13 * 3.571))
+    expect(styleOf(screen.getByText('Save')).fontSize).toBe(points(14 * 3.571))
   })
 
   test('draws again at the new size when the reader changes the setting', async () => {
