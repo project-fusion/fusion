@@ -28,7 +28,7 @@ export type { Side }
  *
  * **And a public attribute should not be defined by a dependency.** Floating UI
  * adding a placement would widen five components' published API with nobody
- * deciding to, which is the same argument that keeps a `variant` union out of a
+ * deciding to, which is the same argument that keeps a `layout` union out of a
  * shared type. The two are held equal in this controller's spec, where a type
  * assertion is a test and is typechecked like one, so the day theirs widens is
  * a failed build rather than a quiet change out there.

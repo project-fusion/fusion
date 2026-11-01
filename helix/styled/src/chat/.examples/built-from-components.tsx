@@ -8,8 +8,8 @@ export function Example() {
     >
       <helix-text
         as="strong"
+        scale="body-strong"
         slot="header"
-        variant="body-strong"
       >
         Assistant
       </helix-text>
@@ -34,7 +34,7 @@ export function Example() {
         >
           <helix-text
             as="h3"
-            variant="body-strong"
+            scale="body-strong"
           >
             Roll back 0042_add_order_status
           </helix-text>

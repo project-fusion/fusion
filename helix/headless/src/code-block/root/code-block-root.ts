@@ -120,7 +120,7 @@ const nameOf = (block: Element): string => {
  * depend on color. Where a removed line is paired with the added line that
  * replaced it, the words each does not share with the other are the `changed`
  * part, so the eye goes to what changed within the line. Each file in the patch is its own block under its own name,
- * and its copy button copies the new version of the file. `variant="split"`
+ * and its copy button copies the new version of the file. `layout="split"`
  * shows the old version beside the new, each removal opposite its replacement.
  * `context-lines` folds each long run of unchanged lines, keeping that many
  * beside each change, behind a button that shows them and hides them again,
@@ -470,7 +470,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * than defaulted, so the host carries no attribute the consumer did not write.
    */
   @property({ reflect: true })
-  variant?: 'split'
+  layout?: 'split'
 
   /**
    * Whether long lines wrap. Without it they scroll.
@@ -1254,7 +1254,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         ${this.renderHeader(name, now)}
         <div part="frame">
           ${
-            this.variant === 'split'
+            this.layout === 'split'
               ? this.renderSplit(file, width, at)
               : html`<pre part="block" translate="no"><code part="code">${file.hunks.map(
                   (hunk, h) =>

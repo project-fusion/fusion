@@ -165,14 +165,14 @@
 /* The rail: a slim column of ticks at the edge of a long scroll. The host is
    as wide as the longest tick and the surface opens over it toward the leading
    edge, so the ticks stay where they were while the titles appear. */
-:host([variant="rail"]) {
+:host([marker="rail"]) {
   --_length: var(--outline-tick-length, var(--helix-size-icon-loose));
 
   inline-size: calc(var(--_length) * 1.5);
   position: relative;
 }
 
-:host([variant="rail"]) [part="ticks"] {
+:host([marker="rail"]) [part="ticks"] {
   align-items: flex-end;
   display: flex;
   flex-direction: column;
@@ -180,7 +180,7 @@
 }
 
 /* Each deeper level is a shorter tick: the length over 1, 1.5, 2, 2.5... */
-:host([variant="rail"]) [part="tick"] {
+:host([marker="rail"]) [part="tick"] {
   --_boost: 1;
 
   background-color: var(
@@ -196,7 +196,7 @@
   );
 }
 
-:host([variant="rail"]) [part="tick"][data-current] {
+:host([marker="rail"]) [part="tick"][data-current] {
   --_boost: 1.5;
 
   background-color: var(--outline-tick-current-color, var(--helix-color-primary));
@@ -205,7 +205,7 @@
 /* Over the rail, hidden until the pointer or focus is in the outline. Never
    `display: none`, which would take the links out of the tab order and make
    focus unable to open it. */
-:host([variant="rail"]) [part="surface"] {
+:host([marker="rail"]) [part="surface"] {
   backdrop-filter: var(--outline-surface-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(
     --outline-surface-background-color,
@@ -227,18 +227,18 @@
   z-index: var(--helix-layer-raised);
 }
 
-:host([variant="rail"]:state(open)) [part="surface"] {
+:host([marker="rail"]:state(open)) [part="surface"] {
   opacity: 1;
   pointer-events: auto;
 }
 
 /* The surface is translucent, so the ticks it covers would show through it. */
-:host([variant="rail"]:state(open)) [part="ticks"] {
+:host([marker="rail"]:state(open)) [part="ticks"] {
   visibility: hidden;
 }
 
 /* One line each, cut with an ellipsis where the surface runs out. */
-:host([variant="rail"]) ::slotted(a) {
+:host([marker="rail"]) ::slotted(a) {
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -246,7 +246,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host([variant="rail"]) [part="surface"] {
+  :host([marker="rail"]) [part="surface"] {
     transition: none;
   }
 }
@@ -266,15 +266,15 @@
   }
 
   /* The titles are the contents on paper, and the ticks mean nothing there. */
-  :host([variant="rail"]) {
+  :host([marker="rail"]) {
     inline-size: auto;
   }
 
-  :host([variant="rail"]) [part="ticks"] {
+  :host([marker="rail"]) [part="ticks"] {
     display: none;
   }
 
-  :host([variant="rail"]) [part="surface"] {
+  :host([marker="rail"]) [part="surface"] {
     backdrop-filter: none;
     background-color: transparent;
     border: 0;

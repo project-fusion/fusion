@@ -36,7 +36,7 @@ function Footer(context: Context) {
       <helix-flex align-items="center" gap="md" justify-content="between" wrap>
         <helix-flex align-items="center" gap="xs">
           <Mark mark={context.mark} />
-          <helix-text variant="caption">
+          <helix-text scale="caption">
             &copy; {company} {new Date().getFullYear()}
           </helix-text>
         </helix-flex>
@@ -113,17 +113,17 @@ function Detail(context: Context) {
       </helix-text>
       <helix-flex direction="column" gap="md">
         <helix-flex direction="column" gap="xs">
-          <helix-text variant="caption">{detail.lead.caption}</helix-text>
+          <helix-text scale="caption">{detail.lead.caption}</helix-text>
           <helix-text>{detail.lead.value}</helix-text>
         </helix-flex>
         <helix-flex direction="column" gap="xs">
-          <helix-text variant="caption">{detail.status.caption}</helix-text>
+          <helix-text scale="caption">{detail.status.caption}</helix-text>
           <helix-tag emphasis="subtle" tone={detail.status.state}>
             {detail.status.words}
           </helix-tag>
         </helix-flex>
         <helix-flex direction="column" gap="xs">
-          <helix-text variant="caption">{detail.trail.caption}</helix-text>
+          <helix-text scale="caption">{detail.trail.caption}</helix-text>
           <helix-text>{detail.trail.value}</helix-text>
         </helix-flex>
         <helix-button command="--close" commandfor="lane" emphasis="solid" tone="primary">
@@ -143,7 +143,7 @@ function ChartCard(context: Context) {
   return (
     <helix-card material="glass">
       <helix-flex direction="column" gap="md">
-        <helix-text as="h2" variant="subheading">
+        <helix-text as="h2" scale="subheading">
           {chart.heading}
         </helix-text>
         <table data-hidden-visually id="arrivals">
@@ -197,7 +197,7 @@ function MarketingPage(context: Context) {
             can find it here even when every button has moved away from it. */}
         <helix-flex align-items="center" gap="xs" slot="start">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </helix-flex>
 
         {/* Plain anchors carrying `data-navigation-item`, which is the base
@@ -234,12 +234,12 @@ function MarketingPage(context: Context) {
             <helix-tag emphasis="subtle" tone="accent">
               {hero.badge}
             </helix-tag>
-            <helix-text variant="caption">{hero.note}</helix-text>
+            <helix-text scale="caption">{hero.note}</helix-text>
           </helix-flex>
-          <helix-text as="h1" variant="display">
+          <helix-text as="h1" scale="display">
             {hero.headline}
           </helix-text>
-          <helix-text variant="body">{hero.body}</helix-text>
+          <helix-text scale="body">{hero.body}</helix-text>
           {/* **Wrapping, because two labeled buttons do not fit a phone.**
               Measured at 320 the pair ran 61 pixels past the pane on the
               storefront, whose calls to action are the longest, and 11 on the
@@ -264,7 +264,7 @@ function MarketingPage(context: Context) {
               it belongs to the sentence and matches the feature icons below. */}
           <helix-flex align-items="center" className="themedAssurance" gap="xs">
             <helix-icon name="check-circle-fill"></helix-icon>
-            <helix-text variant="caption">{hero.assurance}</helix-text>
+            <helix-text scale="caption">{hero.assurance}</helix-text>
           </helix-flex>
         </helix-flex>
       </section>
@@ -286,10 +286,10 @@ function MarketingPage(context: Context) {
             <helix-card key={feature.title}>
               <helix-flex direction="column" gap="sm">
                 <helix-icon className="themedFeatureIcon" name={feature.icon}></helix-icon>
-                <helix-text as="h2" variant="subheading">
+                <helix-text as="h2" scale="subheading">
                   {feature.title}
                 </helix-text>
-                <helix-text variant="caption">{feature.body}</helix-text>
+                <helix-text scale="caption">{feature.body}</helix-text>
               </helix-flex>
             </helix-card>
           ))}
@@ -302,7 +302,7 @@ function MarketingPage(context: Context) {
         <helix-card>
           <helix-flex direction="column" gap="md">
             <helix-flex align-items="center" gap="sm" justify-content="between">
-              <helix-text as="h2" variant="subheading">
+              <helix-text as="h2" scale="subheading">
                 {table.heading}
               </helix-text>
               {/* **A menu, which is where motion is most visible.** It is the
@@ -341,7 +341,7 @@ function MarketingPage(context: Context) {
             <helix-flex align-items="center" gap="sm" justify-content="between" wrap>
               <helix-flex align-items="center" gap="sm">
                 <helix-progress value={68}></helix-progress>
-                <helix-text variant="caption">{context.progress}</helix-text>
+                <helix-text scale="caption">{context.progress}</helix-text>
               </helix-flex>
               <helix-button command="--show" commandfor="lane" emphasis="ghost">
                 {table.link}
@@ -353,7 +353,7 @@ function MarketingPage(context: Context) {
 
         <helix-card>
           <helix-flex direction="column" gap="md">
-            <helix-text as="h2" variant="subheading">
+            <helix-text as="h2" scale="subheading">
               {trial.heading}
             </helix-text>
             <helix-input
@@ -389,10 +389,10 @@ function MarketingPage(context: Context) {
       <section className="themedClose">
         <helix-flex align-items="center" gap="md" justify-content="between" wrap>
           <helix-flex direction="column" gap="2xs">
-            <helix-text as="h2" variant="subheading">
+            <helix-text as="h2" scale="subheading">
               {close.heading}
             </helix-text>
-            <helix-text variant="caption">{close.body}</helix-text>
+            <helix-text scale="caption">{close.body}</helix-text>
           </helix-flex>
           <helix-button emphasis="solid">{close.cta}</helix-button>
         </helix-flex>
@@ -418,7 +418,7 @@ function MinimalPage(context: Context) {
       <helix-app-header className="themedHeader">
         <helix-flex align-items="center" gap="xs" slot="start">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </helix-flex>
 
         <helix-flex align-items="center" gap="xs" slot="end">
@@ -432,10 +432,10 @@ function MinimalPage(context: Context) {
           wide that nothing reads as related to anything. */}
       <section className="themedMinimalHero">
         <helix-flex direction="column" gap="lg">
-          <helix-text as="h1" variant="display">
+          <helix-text as="h1" scale="display">
             {hero.headline}
           </helix-text>
-          <helix-text variant="body">{hero.body}</helix-text>
+          <helix-text scale="body">{hero.body}</helix-text>
           {/* **Wrapping, because two labeled buttons do not fit a phone.**
               Measured at 320 the pair ran 61 pixels past the pane on the
               storefront, whose calls to action are the longest, and 11 on the
@@ -460,7 +460,7 @@ function MinimalPage(context: Context) {
               it belongs to the sentence and matches the feature icons below. */}
           <helix-flex align-items="center" className="themedAssurance" gap="xs">
             <helix-icon name="check-circle-fill"></helix-icon>
-            <helix-text variant="caption">{hero.assurance}</helix-text>
+            <helix-text scale="caption">{hero.assurance}</helix-text>
           </helix-flex>
         </helix-flex>
       </section>
@@ -469,10 +469,10 @@ function MinimalPage(context: Context) {
         {features.map((feature) => (
           <helix-flex direction="column" gap="xs" key={feature.title}>
             <helix-icon className="themedFeatureIcon" name={feature.icon}></helix-icon>
-            <helix-text as="h2" variant="subheading">
+            <helix-text as="h2" scale="subheading">
               {feature.title}
             </helix-text>
-            <helix-text variant="caption">{feature.body}</helix-text>
+            <helix-text scale="caption">{feature.body}</helix-text>
           </helix-flex>
         ))}
       </section>
@@ -494,7 +494,7 @@ function WorkspacePage(context: Context) {
       <aside className="themedAppRail">
         <helix-flex align-items="center" gap="xs">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </helix-flex>
 
         {/* **The rail says where you are.** A sidebar with three identical rows
@@ -522,7 +522,7 @@ function WorkspacePage(context: Context) {
             rather than anything arranged here. */}
         <helix-flex align-items="center" className="themedAppUser" gap="xs">
           <helix-avatar name="Ada Lovelace" size="sm"></helix-avatar>
-          <helix-text variant="caption">Ada Lovelace</helix-text>
+          <helix-text scale="caption">Ada Lovelace</helix-text>
         </helix-flex>
       </aside>
 
@@ -540,7 +540,7 @@ function WorkspacePage(context: Context) {
           justify-content="between"
           wrap
         >
-          <helix-text as="h1" variant="subheading">
+          <helix-text as="h1" scale="subheading">
             {table.heading}
           </helix-text>
           <helix-flex align-items="center" gap="xs">
@@ -599,7 +599,7 @@ function WorkspacePage(context: Context) {
               <helix-flex align-items="center" gap="sm" justify-content="between" wrap>
                 <helix-flex align-items="center" gap="sm">
                   <helix-progress value={68}></helix-progress>
-                  <helix-text variant="caption">{context.progress}</helix-text>
+                  <helix-text scale="caption">{context.progress}</helix-text>
                 </helix-flex>
                 <helix-button command="--show" commandfor="lane" emphasis="ghost">
                   {table.link}
@@ -634,7 +634,7 @@ function EditorialPage(context: Context) {
             and muted and would set a masthead in the voice of a margin note. */}
         <div className="themedWordmark">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </div>
         <div className="themedMeasure">
           {/* The real element, because this is a set of destinations that marks
@@ -658,12 +658,12 @@ function EditorialPage(context: Context) {
       <main className="themedEditorialMain">
         <div className="themedRail">
           <div className="themedRailLabel">
-            <helix-text emphasis="muted" variant="code">
+            <helix-text emphasis="muted" scale="code">
               {editorial.place}
             </helix-text>
           </div>
           <div className="themedMeasure">
-            <helix-text as="p" variant="display">
+            <helix-text as="p" scale="display">
               {editorial.lead}
             </helix-text>
           </div>
@@ -672,13 +672,13 @@ function EditorialPage(context: Context) {
         {editorial.sections.map((section) => (
           <div className="themedRail" key={section.rail}>
             <div className="themedRailLabel">
-              <helix-text emphasis="muted" variant="code">
+              <helix-text emphasis="muted" scale="code">
                 {section.rail}
               </helix-text>
             </div>
             <div className="themedMeasure">
               {section.body.map((paragraph) => (
-                <helix-text as="p" key={paragraph} variant="body">
+                <helix-text as="p" key={paragraph} scale="body">
                   {paragraph}
                 </helix-text>
               ))}
@@ -693,7 +693,7 @@ function EditorialPage(context: Context) {
             built here. */}
         <div className="themedRail">
           <div className="themedRailLabel">
-            <helix-text emphasis="muted" variant="code">
+            <helix-text emphasis="muted" scale="code">
               Writing
             </helix-text>
           </div>
@@ -702,7 +702,7 @@ function EditorialPage(context: Context) {
               {editorial.posts.map((post) => (
                 <helix-list-item href="#writing" key={post.title}>
                   {post.title}
-                  <helix-text as="span" slot="description" variant="caption">
+                  <helix-text as="span" scale="caption" slot="description">
                     {post.when} &middot; {post.minutes} min
                   </helix-text>
                 </helix-list-item>
@@ -715,7 +715,7 @@ function EditorialPage(context: Context) {
                 before it. `data-link-underline="hover"` is the published recipe
                 for a link that should not carry a rule at rest, so this asks for
                 it rather than turning the decoration off and drawing its own. */}
-            <helix-text as="p" variant="body">
+            <helix-text as="p" scale="body">
               <a className="themedMore" data-link data-link-underline="hover" href="#writing">
                 All writing
                 <helix-icon name="arrow-right"></helix-icon>
@@ -741,12 +741,12 @@ function EditorialPage(context: Context) {
               Status
             </a>
           </helix-flex>
-          <helix-text as="p" variant="caption">
+          <helix-text as="p" scale="caption">
             <a data-link href={`mailto:${editorial.contact}`}>
               {editorial.contact}
             </a>
           </helix-text>
-          <helix-text as="p" variant="caption">
+          <helix-text as="p" scale="caption">
             &copy; {company} {new Date().getFullYear()}
           </helix-text>
         </div>
@@ -777,7 +777,7 @@ function MapPage(context: Context) {
       <helix-flex align-items="center" className="themedMapBar" gap="sm" justify-content="between">
         <helix-flex align-items="center" gap="xs">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </helix-flex>
         <helix-button emphasis="solid" tone="primary">
           {action}
@@ -844,10 +844,10 @@ function MapPage(context: Context) {
             marker could take focus with nobody able to see it. */}
         <aside className="themedMapPanel" data-preview-map-clear>
           <helix-flex direction="column" gap="2xs">
-            <helix-text as="h1" variant="subheading">
+            <helix-text as="h1" scale="subheading">
               {map.heading}
             </helix-text>
-            <helix-text emphasis="muted" variant="caption">
+            <helix-text emphasis="muted" scale="caption">
               {map.lead}
             </helix-text>
           </helix-flex>
@@ -855,7 +855,7 @@ function MapPage(context: Context) {
             {map.places.map((place) => (
               <helix-list-item key={place.label}>
                 {place.detail}
-                <helix-text as="span" slot="description" variant="caption">
+                <helix-text as="span" scale="caption" slot="description">
                   {place.label}
                 </helix-text>
                 <helix-tag emphasis="subtle" slot="end" tone={place.state}>
@@ -890,7 +890,7 @@ function LocalPage(context: Context) {
       <helix-app-header className="themedHeader">
         <helix-flex align-items="center" gap="xs" slot="start">
           <Mark mark={context.mark} />
-          <helix-text variant="label">{company}</helix-text>
+          <helix-text scale="label">{company}</helix-text>
         </helix-flex>
         <helix-flex align-items="center" gap="xs" slot="end">
           <helix-button emphasis="solid" tone="primary">
@@ -901,7 +901,7 @@ function LocalPage(context: Context) {
 
       <section className="themedLocalHero">
         <helix-flex align-items="center" direction="column" gap="lg">
-          <helix-text as="h1" variant="display">
+          <helix-text as="h1" scale="display">
             {hero.headline}
           </helix-text>
           <helix-button data-density="lg" emphasis="solid" tone="primary">
@@ -914,13 +914,13 @@ function LocalPage(context: Context) {
               show-value
               value-text={`${local.rating.score} out of 5, ${local.rating.count}`}
             ></helix-rating>
-            <helix-text variant="caption">{local.rating.count}</helix-text>
+            <helix-text scale="caption">{local.rating.count}</helix-text>
           </helix-flex>
         </helix-flex>
       </section>
 
       <section className="themedLocalSection">
-        <helix-text as="h2" variant="heading">
+        <helix-text as="h2" scale="heading">
           {local.tiersHeading}
         </helix-text>
         <helix-grid columns={3} gap="md">
@@ -928,10 +928,10 @@ function LocalPage(context: Context) {
             <helix-card key={tier.name}>
               <helix-flex direction="column" gap="md">
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text as="h3" variant="title">
+                  <helix-text as="h3" scale="title">
                     {tier.name}
                   </helix-text>
-                  <helix-text className="themedLocalPrice" variant="subheading">
+                  <helix-text className="themedLocalPrice" scale="subheading">
                     {tier.price}
                   </helix-text>
                 </helix-flex>
@@ -948,7 +948,7 @@ function LocalPage(context: Context) {
       </section>
 
       <section className="themedLocalSection">
-        <helix-text as="h2" variant="heading">
+        <helix-text as="h2" scale="heading">
           {local.stepsHeading}
         </helix-text>
         {/* **An ordered list, not Steps**: Steps is a control whose stages are
@@ -964,7 +964,7 @@ function LocalPage(context: Context) {
       </section>
 
       <section className="themedLocalSection">
-        <helix-text as="h2" variant="heading">
+        <helix-text as="h2" scale="heading">
           {local.faqHeading}
         </helix-text>
         <helix-accordion>
@@ -980,10 +980,10 @@ function LocalPage(context: Context) {
       <section className="themedLocalSection themedLocalVisit">
         <helix-card>
           <helix-flex direction="column" gap="md">
-            <helix-text as="h2" variant="subheading">
+            <helix-text as="h2" scale="subheading">
               {local.visit.heading}
             </helix-text>
-            <helix-text variant="caption">{local.visit.body}</helix-text>
+            <helix-text scale="caption">{local.visit.body}</helix-text>
             <helix-list label={local.visit.heading}>
               <helix-list-item>
                 <helix-icon name="building" slot="start"></helix-icon>
@@ -998,7 +998,7 @@ function LocalPage(context: Context) {
         </helix-card>
         <helix-card>
           <helix-flex direction="column" gap="md">
-            <helix-text as="h2" variant="subheading">
+            <helix-text as="h2" scale="subheading">
               {local.contact.heading}
             </helix-text>
             <helix-input label="Name" name="name"></helix-input>

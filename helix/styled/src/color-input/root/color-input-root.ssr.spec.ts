@@ -69,7 +69,7 @@ describe('input color server output', () => {
     /* The one shape where the label has nothing to point at unless the trigger
        takes the id, and a block of color with no name is a button announced as
        "button". */
-    const swatch = ssr(html`<helix-color-input label="Brand" variant="swatch"></helix-color-input>`)
+    const swatch = ssr(html`<helix-color-input label="Brand" trigger="swatch"></helix-color-input>`)
     expect(partTag(swatch, 'trigger')).toContain('id="control"')
     expect(namesControl(swatch)).toBe(true)
   })

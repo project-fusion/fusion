@@ -6,8 +6,8 @@ export function Example() {
     >
       <helix-text
         as="h3"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Storage
       </helix-text>

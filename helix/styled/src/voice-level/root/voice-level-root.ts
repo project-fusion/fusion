@@ -23,7 +23,7 @@ import {
   STILL_TIME,
   stillLength,
   unit,
-  type VoiceLevelVariant,
+  type VoiceLevelPattern,
   WAVE_LINES,
   waveAt,
 } from '../draw.js'
@@ -51,7 +51,7 @@ const ink = (value: string, alpha = 1): string => {
  * @summary A live level of a voice, drawn as a row of bars or as moving waves.
  *
  * @description
- * Two drawings, chosen with `variant`:
+ * Two drawings, chosen with `pattern`:
  *
  * - `spectrum`: a row of thin rounded bars, one for each frequency band in
  *   `bands`, tallest in the middle. The middle half of the row takes the
@@ -160,7 +160,7 @@ export class HelixVoiceLevel extends HelixElement {
    * is `spectrum`, the resting value, which selects nothing.
    */
   @property({ reflect: true })
-  variant?: VoiceLevelVariant
+  pattern?: VoiceLevelPattern
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null
@@ -218,7 +218,7 @@ export class HelixVoiceLevel extends HelixElement {
       changed.has('level') ||
       changed.has('bands') ||
       changed.has('still') ||
-      changed.has('variant')
+      changed.has('pattern')
     ) {
       this.wake()
     }
@@ -283,7 +283,7 @@ export class HelixVoiceLevel extends HelixElement {
       this.quiet = 0
       this.gate.play()
     } else if (!this.gate.running) {
-      /* A level at rest drawn again, such as one whose variant changed. */
+      /* A level at rest drawn again, such as one whose pattern changed. */
       this.paint()
     }
   }
@@ -415,7 +415,7 @@ export class HelixVoiceLevel extends HelixElement {
     return this.canvas ? barCount(getComputedStyle(this.canvas).animationIterationCount) : 0
   }
 
-  /** One frame of whichever drawing `variant` names, or the still one. */
+  /** One frame of whichever drawing `pattern` names, or the still one. */
   private paint(): void {
     const ctx = this.context
     const canvas = this.canvas
@@ -433,7 +433,7 @@ export class HelixVoiceLevel extends HelixElement {
     }
     if (this.gate.reduced && !this.still) {
       this.paintStill(ctx, main, ink(painted.color, TRACK))
-    } else if (this.variant === 'waves') {
+    } else if (this.pattern === 'waves') {
       this.paintWaves(ctx, main, painted, this.still ? STILL_TIME : this.time)
     } else {
       this.paintSpectrum(ctx, main, ink(painted.textDecorationColor))
@@ -502,7 +502,7 @@ export class HelixVoiceLevel extends HelixElement {
    */
   private paintStill(ctx: CanvasRenderingContext2D, main: string, faint: string): void {
     const thickness =
-      this.variant === 'waves'
+      this.pattern === 'waves'
         ? 2
         : Math.min(4, Math.max(1.5, (this.width / (this.bars || 1)) * 0.5))
     const readings = this.readings

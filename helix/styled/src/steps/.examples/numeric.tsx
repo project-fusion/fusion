@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-steps
       label="Checkout"
-      variant="numeric"
+      marker="numeric"
     >
       <helix-step
         complete

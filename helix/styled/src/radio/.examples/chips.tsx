@@ -6,8 +6,8 @@ export function Example() {
       orientation="horizontal"
     >
       <helix-radio
+        chip
         value="-2"
-        variant="chip"
       >
         <svg
           aria-hidden="true"
@@ -23,8 +23,8 @@ export function Example() {
         Very dissatisfied
       </helix-radio>
       <helix-radio
+        chip
         value="-1"
-        variant="chip"
       >
         <svg
           aria-hidden="true"
@@ -40,8 +40,8 @@ export function Example() {
         Dissatisfied
       </helix-radio>
       <helix-radio
+        chip
         value="0"
-        variant="chip"
       >
         <svg
           aria-hidden="true"
@@ -57,8 +57,8 @@ export function Example() {
         Neutral
       </helix-radio>
       <helix-radio
+        chip
         value="1"
-        variant="chip"
       >
         <svg
           aria-hidden="true"
@@ -74,8 +74,8 @@ export function Example() {
         Satisfied
       </helix-radio>
       <helix-radio
+        chip
         value="2"
-        variant="chip"
       >
         <svg
           aria-hidden="true"

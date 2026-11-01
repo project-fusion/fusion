@@ -364,7 +364,7 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       const tier = (this.constructor as typeof HelixElement & { tier: string }).tier
       if (this.heard && customElements.get(`${tier}voice-level`)) {
         const meter = this.tag('voice-level')
-        return html`<${meter} part="voice-level" exportparts="canvas: voice-level-canvas" aria-hidden="true" variant="spectrum"></${meter}>`
+        return html`<${meter} part="voice-level" exportparts="canvas: voice-level-canvas" aria-hidden="true" pattern="spectrum"></${meter}>`
       }
       return drawIcon(microphone)
     }

@@ -98,7 +98,7 @@ describe('breadcrumbs', () => {
       '--breadcrumbs-control-size',
       '--breadcrumbs-current-color',
       '--breadcrumbs-font-weight',
-      '--breadcrumbs-hover-color',
+      '--breadcrumbs-hover-background-color',
       '--breadcrumbs-link-color',
       '--breadcrumbs-radius',
       '--breadcrumbs-separator-color',

@@ -10,7 +10,7 @@ beforeAll(async () => {
 if (hasLayout()) {
   describe('a loader drawn as a pulse', () => {
     const pulse = async (): Promise<HTMLElement> =>
-      mount('<helix-loader variant="pulse" label="Loading"><i></i></helix-loader>')
+      mount('<helix-loader pattern="pulse" label="Loading"><i></i></helix-loader>')
 
     test('draws neither the arc nor the ring', async () => {
       /* The turning rim is what this component is named for and it is wrong

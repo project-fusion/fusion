@@ -90,7 +90,7 @@
 /* The row the keyboard is on, in the brand's own subtle ground rather than the
    neutral wash a select uses. */
 .siteCommand {
-  --option-active-color: var(--helix-color-primary-subtle);
+  --option-active-background-color: var(--helix-color-primary-subtle);
   --option-radius: var(--helix-radii-sm);
 }
 

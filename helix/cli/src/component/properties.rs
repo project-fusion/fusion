@@ -15,7 +15,7 @@
 //!
 //! **A property is its doc block, its decorator and its member.** They move
 //! together or the fix is a corruption, and the block is the biggest part: one
-//! carries twelve lines of reasoning about why a name is `variant` rather than
+//! carries twelve lines of reasoning about why a name is `handle` rather than
 //! `shape`. So the unit is the whole run from the first line of the comment to
 //! the end of the declaration, and everything between two properties that is not
 //! part of either stays where it is.

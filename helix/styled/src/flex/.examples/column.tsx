@@ -4,10 +4,10 @@ export function Example() {
       direction="column"
       gap="sm"
     >
-      <helix-text variant="subheading">Account settings</helix-text>
+      <helix-text scale="subheading">Account settings</helix-text>
       <helix-text
         emphasis="muted"
-        variant="body"
+        scale="body"
       >
         Manage your profile, password, and notifications.
       </helix-text>

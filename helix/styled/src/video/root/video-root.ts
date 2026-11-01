@@ -37,7 +37,7 @@ import { styles } from './video-root.css.js'
  * @cssproperty --video-speed-size - Width of the playback speed control, fixed so the row
  * does not shift when the number changes.
  * @cssproperty --video-start-size - Width of the large play button.
- * @cssproperty --video-well-color - Color behind the picture and in the letterbox bars.
+ * @cssproperty --video-well-background-color - Color behind the picture and in the letterbox bars.
  *
  * @replaces video
  */

@@ -47,11 +47,11 @@ describe('input color', () => {
     expect(picker.shadowRoot?.querySelector('[part="value"]')).toBeNull()
   })
 
-  test('the swatch variant is the block alone, and the panel states the value', async () => {
+  test('the swatch trigger is the block alone, and the panel states the value', async () => {
     /* The two shapes between them state the value exactly once. The default
        field is the input, so the panel is told to leave its row out; a swatch
        states nothing, so the panel keeps it. */
-    const host = await field('variant="swatch" default-value="#ff0000"')
+    const host = await field('trigger="swatch" default-value="#ff0000"')
     expect(host.shadowRoot?.querySelector('[part="control"]')).toBeNull()
     const picker = part(host, 'picker') as HTMLElement
     expect(picker.hasAttribute('no-value')).toBe(false)
@@ -61,7 +61,7 @@ describe('input color', () => {
   test('and the label names the trigger there, since it is the only control', async () => {
     // An IDREF has to resolve to something focusable, and in this shape the
     // input it used to name does not exist.
-    const host = await field('variant="swatch"')
+    const host = await field('trigger="swatch"')
     const trigger = part(host, 'trigger') as HTMLElement
     expect(trigger.id).toBe('control')
     const label = host.shadowRoot?.querySelector('[part="label"]') as HTMLLabelElement
@@ -71,9 +71,9 @@ describe('input color', () => {
   })
 
   test('a required swatch is checked here, since a block of color has no validity', async () => {
-    const empty = await field('variant="swatch" required')
+    const empty = await field('trigger="swatch" required')
     expect(internals(empty).validationMessage).toBe('Choose a color.')
-    const filled = await field('variant="swatch" default-value="#ff0000" required')
+    const filled = await field('trigger="swatch" default-value="#ff0000" required')
     expect(internals(filled).validationMessage).toBe('')
   })
 
@@ -215,7 +215,7 @@ describe('the swatch as the field', () => {
     /* The field's label points at the swatch, and the trigger's own words
        overrode it, so "Brand color" was read as "Choose a color" and the color
        itself was never said. */
-    const host = await field('variant="swatch" default-value="#ff0000"')
+    const host = await field('trigger="swatch" default-value="#ff0000"')
     const trigger = part(host, 'trigger') as HTMLElement
     const scope = trigger.getRootNode() as ShadowRoot
     const name = (trigger.getAttribute('aria-labelledby') ?? '')
@@ -227,7 +227,7 @@ describe('the swatch as the field', () => {
   })
 
   test('and opens what it says it opens: a dialog, named for what it is for', async () => {
-    const host = await field('variant="swatch"')
+    const host = await field('trigger="swatch"')
     const trigger = part(host, 'trigger') as HTMLElement
     expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
     const surface = part(host, 'surface') as HTMLElement

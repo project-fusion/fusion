@@ -11,8 +11,8 @@ export function Example() {
       </helix-text>
       <helix-button-group
         label="Dialog actions"
+        layout="spaced"
         slot="footer"
-        variant="spaced"
       >
         <helix-button
           command="--close"

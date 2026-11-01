@@ -8,7 +8,7 @@ export function Example() {
       <helix-card>
         <helix-text
           as="h3"
-          variant="title"
+          scale="title"
         >
           Starter
         </helix-text>
@@ -16,7 +16,7 @@ export function Example() {
       <helix-card>
         <helix-text
           as="h3"
-          variant="title"
+          scale="title"
         >
           Team
         </helix-text>
@@ -27,7 +27,7 @@ export function Example() {
       <helix-card>
         <helix-text
           as="h3"
-          variant="title"
+          scale="title"
         >
           Business
         </helix-text>

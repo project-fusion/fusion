@@ -371,6 +371,7 @@ export function SiteNav({
                 class={styles.navPanel}
                 key={product.href}
                 label={product.name}
+                layout="band"
                 onhelix-before-close={() => setOpenPanel(null)}
                 /* Both fire before the panel moves and both are cancelable, so
                    the bar starts changing on the same frame the reveal starts
@@ -378,7 +379,6 @@ export function SiteNav({
                    so the sheet measures the panel that is actually down. */
                 onhelix-before-open={(event) => setOpenPanel(event.currentTarget as HelixMegamenu)}
                 suppressHydrationWarning
-                variant="band"
               >
                 {/* **The word is the product, so it goes to the product's
                     page.** The panel opens on hover and the press goes

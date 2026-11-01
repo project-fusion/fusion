@@ -25,7 +25,7 @@ import '../../button/index.js'
  * @cssproperty --tour-shadow - The shadow under the panel. It follows
  *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
  *   shadow by default.
- * @cssproperty --tour-surface-color - The color of the panel's surface.
+ * @cssproperty --tour-surface-background-color - The color of the panel's surface.
  */
 @customElement('helix-tour-stop')
 export class HelixTourStop extends HelixHeadlessTourStop {

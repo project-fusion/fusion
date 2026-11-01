@@ -24,8 +24,8 @@ export function Example() {
         <helix-text>The project becomes read-only for everyone on the team.</helix-text>
         <helix-button-group
           label="Dialog actions"
+          layout="spaced"
           slot="footer"
-          variant="spaced"
         >
           <helix-button
             command="--close"

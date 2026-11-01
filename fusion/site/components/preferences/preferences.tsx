@@ -154,7 +154,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           default and is what a column of fields wants: they share an edge, and a
           group that fills its column has segments wide enough to read. */}
       <helix-flex direction="column" gap="lg">
-        <helix-text as="h2" variant="subheading">
+        <helix-text as="h2" scale="subheading">
           Preferences
         </helix-text>
 
@@ -209,7 +209,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
          */}
         {themed && (
           <helix-flex direction="column" gap="xs">
-            <helix-text variant="label">Site theme</helix-text>
+            <helix-text scale="label">Site theme</helix-text>
             {/* **`subtle` rather than `outlined`, which light mode decided.** The
                 drawer is glass over a near-white page, so an outlined control is
                 a hairline and a transparent fill on a ground already close to

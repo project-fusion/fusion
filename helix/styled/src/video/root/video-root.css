@@ -64,7 +64,7 @@
  *      near-white in dark mode, putting a white well behind an unloaded video on a
  *      black page with the bar's light ink vanishing into it.
  */
-  background-color: var(--video-well-color, var(--helix-color-surface-media));
+  background-color: var(--video-well-background-color, var(--helix-color-surface-media));
   block-size: auto;
   display: block;
   inline-size: 100%;

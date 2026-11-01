@@ -226,7 +226,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
    * a reader is told to come back to by number.
    */
   @property({ reflect: true })
-  variant?: 'numeric'
+  marker?: 'numeric'
 
   /* The arrows along the way the steps run, from where focus is, choosing
      nothing and stopping at the ends, as Navigation's do. */

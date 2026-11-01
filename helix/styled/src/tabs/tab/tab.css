@@ -31,7 +31,7 @@
 
 /*
  *  Every one of these comes from the tab set, which sets them all for its
- *    default and overrides what a variant changes. The fallbacks are what a tab
+ *    default and overrides what a marker changes. The fallbacks are what a tab
  *    would look like with no set around it, which is not an arrangement that
  *    ships, so they are the plainest thing rather than a second design.
  */
@@ -39,10 +39,10 @@
   align-items: center;
   background-color: transparent;
   /* The height a control is. Left to its own text plus whatever padding the
-     variant asks for, a tab comes out at 31px beside a 40px button and a toolbar
+     marker asks for, a tab comes out at 31px beside a 40px button and a toolbar
      looks assembled from parts.
 
-     Through a variable, because a variant that puts a frame around the row has
+     Through a variable, because a marker that puts a frame around the row has
      to hand the tab a share of the frame rather than the whole control height.
      `segmented` does exactly that. */
   block-size: var(--_tab-height, var(--tabs-tab-block-size, var(--helix-size-control)));

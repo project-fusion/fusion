@@ -171,11 +171,11 @@
  * wrong around a wordmark: a logo with something orbiting it reads as chrome
  * bolted to the brand rather than as the brand waiting. Take the arc away and
  * what is left is the mark, already breathing under the turn. */
-:host([variant="pulse"]) [part="indicator"] {
+:host([pattern="pulse"]) [part="indicator"] {
   display: none;
 }
 
-:host([variant="pulse"]) [part="svg"] {
+:host([pattern="pulse"]) [part="svg"] {
   animation: none;
 }
 
@@ -186,15 +186,15 @@
  * with no rim around it to give it scale, that reads as a stray dot rather than
  * a brand waiting. Two steps up puts the default at the size the `lg` ring was
  * and keeps `size` meaning what it does elsewhere. */
-:host([variant="pulse"]) {
+:host([pattern="pulse"]) {
   --_loader-size: calc(var(--helix-size-loader-lg) * 2);
 }
 
-:host([variant="pulse"][size="sm"]) {
+:host([pattern="pulse"][size="sm"]) {
   --_loader-size: var(--helix-size-loader-lg);
 }
 
-:host([variant="pulse"][size="lg"]) {
+:host([pattern="pulse"][size="lg"]) {
   --_loader-size: calc(var(--helix-size-loader-lg) * 3);
 }
 
@@ -202,14 +202,14 @@
  * moving, and the outer one is the chrome this appearance exists to remove. A
  * pulse with nothing slotted therefore shows nothing, which is the honest
  * reading of asking for a mark that pulses and giving it no mark. */
-:host([variant="pulse"]) [part="track"] {
+:host([pattern="pulse"]) [part="track"] {
   display: none;
 }
 
 /*
  *  Opacity alone, where the default appearance also scales.
  */
-:host([variant="pulse"]) [part="mark"] {
+:host([pattern="pulse"]) [part="mark"] {
   animation-name: helix-loader-pulse-mark;
 }
 
@@ -230,7 +230,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* The mark, because the mark is the whole of this appearance: the ring no
      longer draws, so a rule answering for it would leave a fading logo. */
-  :host([variant="pulse"]) [part="mark"] {
+  :host([pattern="pulse"]) [part="mark"] {
     animation: none;
     opacity: 1;
   }

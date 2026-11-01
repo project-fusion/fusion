@@ -21,7 +21,7 @@ import {
   type PathPoint,
   type PlacedStop,
   pagePath,
-  type StrandsVariant,
+  type StrandsPattern,
   visibleRange,
 } from '../path.js'
 import {
@@ -70,7 +70,7 @@ const PACE = 0.25
  * `--helix-color-background`. On a light page the light becomes ink, because
  * light added to near-white cannot be seen.
  *
- * **Four forms, set with `variant`.** `bend` turns bright strands through one
+ * **Four forms, set with `pattern`.** `bend` turns bright strands through one
  * tight point, with its arms opening to the right. `ribbon`, the default, is a
  * broad, soft ribbon in long curves. `sweep` enters at a top corner, the one
  * `at` is nearer, and crosses in one diagonal to the far side. `waves` is sharp
@@ -93,7 +93,7 @@ const PACE = 0.25
  * bottom, so scrolling travels along it. Put `helix-strands-stop` elements
  * inside to pin a form to a section: each names an element with `for` and says
  * which form the ribbon takes there. Between stops the ribbon fills the gap in
- * its own `variant`, and between two waves less than a screen and a half
+ * its own `pattern`, and between two waves less than a screen and a half
  * apart it turns off screen so each wave reads alone. Set `z-index` on the
  * element to move it.
  *
@@ -252,7 +252,7 @@ export class HelixStrands extends HelixElement {
    * `travel`, the form of every stretch no stop claims.
    */
   @property()
-  variant?: StrandsVariant
+  pattern?: StrandsPattern
 
   /** The colors, resolved from what the canvas carries. Aura's approach, in `readPalette`. */
   private palette: StrandsPalette = { ...RESTING_PALETTE }
@@ -354,7 +354,7 @@ export class HelixStrands extends HelixElement {
       this.watchPage(this.travel)
     }
     if (
-      changed.has('variant') ||
+      changed.has('pattern') ||
       changed.has('at') ||
       changed.has('travel') ||
       changed.has('quiet')
@@ -597,18 +597,18 @@ export class HelixStrands extends HelixElement {
    */
   private layout(): void {
     let path: PathPoint[]
-    const variant = this.variant ?? 'ribbon'
+    const pattern = this.pattern ?? 'ribbon'
     if (this.travel) {
       path = pagePath(
         this.placedStops(),
-        variant,
+        pattern,
         this.box.width,
         this.box.height,
         document.documentElement.scrollHeight,
       )
       this.table = lookup(path)
     } else {
-      path = boxPath(variant, this.at, this.box.height, this.box.width)
+      path = boxPath(pattern, this.at, this.box.height, this.box.width)
     }
     this.points.fill(0)
     path.forEach((point, i) => {
@@ -659,15 +659,15 @@ export class HelixStrands extends HelixElement {
       }
       const rect = target.getBoundingClientRect()
       const at = Number.parseFloat(stop.getAttribute('at') ?? '')
-      const variant = stop.getAttribute('variant')
+      const pattern = stop.getAttribute('pattern')
       placed.push({
         at: Number.isFinite(at) ? at : undefined,
         height: rect.height,
         left: this.box.width ? rect.left / this.box.width : undefined,
+        pattern:
+          pattern === 'bend' || pattern === 'sweep' || pattern === 'waves' ? pattern : 'ribbon',
         right: this.box.width ? rect.right / this.box.width : undefined,
         top: rect.top + scroll,
-        variant:
-          variant === 'bend' || variant === 'sweep' || variant === 'waves' ? variant : 'ribbon',
       })
     }
     return placed
@@ -692,7 +692,7 @@ export class HelixStrands extends HelixElement {
     this.pageObserver.observe(document.documentElement)
     this.stopObserver = new MutationObserver(this.relayout)
     this.stopObserver.observe(this, {
-      attributeFilter: ['at', 'for', 'variant'],
+      attributeFilter: ['at', 'for', 'pattern'],
       attributes: true,
       childList: true,
       subtree: true,

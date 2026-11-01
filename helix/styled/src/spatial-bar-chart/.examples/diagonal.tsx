@@ -55,7 +55,7 @@ export function Example() {
         for="runs"
         grow
         label="Runs per day, this week"
-        variant="diagonal"
+        layout="diagonal"
       ></helix-spatial-bar-chart>
     </>
   )

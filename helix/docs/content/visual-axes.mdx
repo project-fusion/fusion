@@ -66,25 +66,26 @@ sit on two axes:
 If you are adding a property and cannot decide which axis it belongs on, it is
 usually two properties.
 
-## Use `variant` for a choice between widgets
+## Name a choice between widgets for what it chooses
 
 ```html
-<helix-tabs variant="segmented">…</helix-tabs>
-<helix-time-picker variant="wheels">…</helix-time-picker>
+<helix-tabs marker="segmented">…</helix-tabs>
+<helix-time-picker picker="wheels">…</helix-time-picker>
+<helix-splitter handle="grip">…</helix-splitter>
 ```
 
-`variant` has no registry, because its values belong to one component. For
-example:
+These words have no registry, because their values belong to the families that take them:
 
-- `segmented` or `underlined`
-- `list` or `wheels`
-- `grip` or `line`
+- `marker` is how the current item is marked, on Tabs, Navigation, Outline, and Steps.
+- `layout` is how parts are arranged, on Code Block, Megamenu, Spatial Bar Chart, and Button Group.
+- `picker` is which control picks, on Time Input and Time Picker.
+- `stroke` is the line's style, on Canvas Edge and Map Route.
+- `handle` is what you grab, on Splitter.
+- `pattern` is which drawing, on Aura, Strands, Voice Level, and Loader.
 
-A variant is a choice between two widgets. That choice changes structure
-wherever it is made, so `variant` can appear on either tier.
+A choice between two widgets changes structure wherever it is made, so these can appear on either tier.
 
-**Do not use `variant` for anything an axis already covers.** That is the
-problem `appearance` had.
+**Do not use one of these for anything an axis already covers, and do not name a property `variant`.** A word that names no choice is the problem `appearance` had.
 
 ## Axes on both tiers
 

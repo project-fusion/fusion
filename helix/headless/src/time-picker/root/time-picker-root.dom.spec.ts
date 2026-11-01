@@ -107,7 +107,7 @@ describe('time', () => {
 describe('time as wheels', () => {
   const wheels = async (attrs = ''): Promise<Time> => {
     const host = (await mount(
-      `<helix-headless-time-picker variant="wheels" ${attrs}></helix-headless-time-picker>`,
+      `<helix-headless-time-picker picker="wheels" ${attrs}></helix-headless-time-picker>`,
     )) as Time
     await host.updateComplete
     return host
@@ -257,7 +257,7 @@ describe('time holds more than one', () => {
   test('a mode falls back to the list, because a wheel holds one value', async () => {
     // A range on wheels is two sets of wheels, which is two controls, and a
     // multiple is a set, which a wheel cannot hold by construction.
-    const host = await many('variant="wheels" mode="range"')
+    const host = await many('picker="wheels" mode="range"')
     expect(part(host, 'list')).not.toBeNull()
     expect(host.shadowRoot?.querySelector('[part="column"]')).toBeNull()
   })
@@ -295,7 +295,7 @@ describe('time is off', () => {
   test('and the wheels refuse on the same terms, which is a separate path in', async () => {
     // `moveColumn` rebuilds the value from three columns and never reaches
     // `handleChange`, so a guard on one says nothing about the other.
-    const host = await picker('variant="wheels" default-value="09:00" disabled')
+    const host = await picker('picker="wheels" default-value="09:00" disabled')
     const column = host.shadowRoot?.querySelector('[part="column"]') as HTMLElement
     expect(column.hasAttribute('disabled')).toBe(true)
 
@@ -356,7 +356,7 @@ describe('times can be taken out of the list by name', () => {
        moving the hour to 10 lands on 10:00 without any option in the hour
        column having been disabled. */
     const host = await picker(
-      'variant="wheels" default-value="09:00" disable-times="10:00" max="12:00" min="09:00" step="60"',
+      'picker="wheels" default-value="09:00" disable-times="10:00" max="12:00" min="09:00" step="60"',
     )
     const hour = host.shadowRoot?.querySelector('[data-column="hour"]') as HTMLElement
     hour.dispatchEvent(
@@ -373,7 +373,7 @@ describe('times can be taken out of the list by name', () => {
   test('an hour is only closed when every time in it is', async () => {
     // One free minute is a reason to open the wheel, not to close it.
     const host = await picker(
-      'variant="wheels" disable-times="10:00,10:15,10:30,10:45,11:00" max="11:59" min="10:00"',
+      'picker="wheels" disable-times="10:00,10:15,10:30,10:45,11:00" max="11:59" min="10:00"',
     )
     const shut = [...(host.shadowRoot?.querySelectorAll('[data-column="hour"] [disabled]') ?? [])]
       .map((one) => one.getAttribute('value'))
@@ -510,7 +510,7 @@ describe('a grid of times that refuses or insists', () => {
     expect(list?.getAttribute('aria-required')).toBe('true')
     const control = list?.shadowRoot?.querySelector('[role="listbox"]')
     expect(control?.getAttribute('aria-required')).toBe('true')
-    const wheels = await picker('required variant="wheels"')
+    const wheels = await picker('required picker="wheels"')
     const columns = [...(wheels.shadowRoot?.querySelectorAll('[part="column"]') ?? [])]
     expect(columns.length).toBeGreaterThan(1)
     expect(columns.every((one) => one.getAttribute('aria-required') === 'true')).toBe(true)
@@ -549,7 +549,7 @@ describe('the wheels stay inside the bounds', () => {
   /* Measured before this: from 16:45, the hour 5 built 17:45 against a max of
      17:00, and AM built 05:45 against a min of 09:00, and both were valid. */
   test('a turn that would leave them lands on the nearest time on offer', async () => {
-    const attrs = 'variant="wheels" locale="en-US" min="09:00" max="17:00" default-value="16:45"'
+    const attrs = 'picker="wheels" locale="en-US" min="09:00" max="17:00" default-value="16:45"'
     const late = await picker(attrs)
     await turn(late, 'hour', '5')
     expect(late.value).toBe('17:00')
@@ -633,7 +633,7 @@ describe('the words on the wheels', () => {
 
   test('are properties, and the halves of the day are the locale’s', async () => {
     const host = await picker(
-      'variant="wheels" locale="ko-KR" hour-label="시" minute-label="분" meridiem-label="오전 또는 오후"',
+      'picker="wheels" locale="ko-KR" hour-label="시" minute-label="분" meridiem-label="오전 또는 오후"',
     )
     expect(column(host, 'hour').getAttribute('aria-label')).toBe('시')
     expect(column(host, 'minute').getAttribute('aria-label')).toBe('분')
@@ -643,11 +643,11 @@ describe('the words on the wheels', () => {
   })
 
   test('are the locale’s own names where no property is set', async () => {
-    const english = await picker('variant="wheels" locale="en-US" seconds')
+    const english = await picker('picker="wheels" locale="en-US" seconds')
     expect(column(english, 'hour').getAttribute('aria-label')).toBe('Hour')
     expect(column(english, 'second').getAttribute('aria-label')).toBe('Second')
     expect(column(english, 'meridiem').getAttribute('aria-label')).toBe('AM/PM')
-    const german = await picker('variant="wheels" locale="de-DE" hour-cycle="h12"')
+    const german = await picker('picker="wheels" locale="de-DE" hour-cycle="h12"')
     expect(column(german, 'hour').getAttribute('aria-label')).toBe('Stunde')
     expect(column(german, 'minute').getAttribute('aria-label')).toBe('Minute')
     expect(column(german, 'meridiem').getAttribute('aria-label')).toBe('Tageshälfte')
@@ -683,7 +683,7 @@ describe('the name of a time picker', () => {
 
   test('and names the wheels', async () => {
     const host = (await mount(
-      '<helix-headless-time-picker variant="wheels"><b slot="label">Alarm</b></helix-headless-time-picker>',
+      '<helix-headless-time-picker picker="wheels"><b slot="label">Alarm</b></helix-headless-time-picker>',
     )) as Time
     host.shadowRoot?.querySelector('slot[name="label"]')?.dispatchEvent(new Event('slotchange'))
     await host.updateComplete
@@ -707,7 +707,7 @@ describe('a time picker with no time to offer', () => {
 
 describe('focus on a time picker', () => {
   test('goes to the first wheel where there is no list', async () => {
-    const host = await picker('variant="wheels" locale="en-GB"')
+    const host = await picker('picker="wheels" locale="en-GB"')
     host.focus()
     expect(host.shadowRoot?.activeElement?.getAttribute('data-column')).toBe('hour')
   })
@@ -718,7 +718,7 @@ describe('a clock and a precision of your choosing', () => {
      clock; Helix had neither. */
   const wheels = async (attrs = ''): Promise<Time> => {
     const host = (await mount(
-      `<helix-headless-time-picker variant="wheels" ${attrs}></helix-headless-time-picker>`,
+      `<helix-headless-time-picker picker="wheels" ${attrs}></helix-headless-time-picker>`,
     )) as Time
     await host.updateComplete
     return host
@@ -808,7 +808,7 @@ describe('a time picker in a page written in another language', () => {
   test('names its wheels in that language', async () => {
     const host = await inLang<Time>(
       'de-DE',
-      '<helix-headless-time-picker variant="wheels"></helix-headless-time-picker>',
+      '<helix-headless-time-picker picker="wheels"></helix-headless-time-picker>',
     )
     const hour = host.shadowRoot?.querySelector('[data-column="hour"]')
     expect(hour?.getAttribute('aria-label')).toBe('Stunde')
@@ -850,7 +850,7 @@ describe('a time picker’s own message', () => {
        why, where RAC describes the field it marks. */
     const host = await picker('value="09:15" feedback="Pick a time after lunch"')
     expect(part(host, 'list')?.getAttribute('aria-describedby')).toBe('feedback')
-    const wheels = await picker('variant="wheels" value="09:15" feedback="Too early"')
+    const wheels = await picker('picker="wheels" value="09:15" feedback="Too early"')
     const columns = [...(wheels.shadowRoot?.querySelectorAll('[part="column"]') ?? [])]
     expect(columns.length).toBeGreaterThan(1)
     for (const column of columns) {

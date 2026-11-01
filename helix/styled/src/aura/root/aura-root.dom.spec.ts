@@ -217,7 +217,7 @@ describe('aura', () => {
        reader on a refused context gets. The element must render and stay
        usable: the canvas simply never paints, and the host's own token
        gradient is what shows. Nothing detects this, which is the point. */
-    const host = (await mount(undrawn('variant="rays"'))) as HTMLElement & {
+    const host = (await mount(undrawn('pattern="rays"'))) as HTMLElement & {
       updateComplete: Promise<boolean>
     }
     await host.updateComplete
@@ -285,18 +285,18 @@ describe('aura', () => {
     expect(moving.paused).toBe(false)
   })
 
-  test('the variant reflects and the numbers do not', async () => {
+  test('the pattern reflects and the numbers do not', async () => {
     // Reflection exists so a selector can reach a value. The fallback gradient
-    // selects on `variant`; nothing selects on `speed`.
+    // selects on `pattern`; nothing selects on `speed`.
     const host = (await mount(undrawn())) as HTMLElement & {
-      variant: string
+      pattern: string
       speed: number
       updateComplete: Promise<boolean>
     }
-    host.variant = 'aurora'
+    host.pattern = 'aurora'
     host.speed = 2
     await host.updateComplete
-    expect(host.getAttribute('variant')).toBe('aurora')
+    expect(host.getAttribute('pattern')).toBe('aurora')
     expect(host.getAttribute('speed')).toBeNull()
   })
   test('takes no pointer events at rest, and takes them when asked', async () => {
@@ -824,7 +824,7 @@ describe('aura axis', () => {
  * spread through a helper instead would read as inert here, and the answer then
  * is to follow the helper rather than to widen the list. */
 describe('aura variance', () => {
-  /** Every shape `variant` offers, which is the set this asks about. */
+  /** Every shape `pattern` offers, which is the set this asks about. */
   const SHAPES = [
     'aurora',
     'braid',

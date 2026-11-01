@@ -18,7 +18,7 @@ import { styles } from './option-root.css.js'
  * @aliases Item, Choice
  * @documentation https://fusion.dev/helix/components/option
  *
- * @cssproperty --option-active-color - The background of the option the keyboard is on.
+ * @cssproperty --option-active-background-color - The background of the option the keyboard is on.
  * @cssproperty --option-block-padding - The space above and below the option. `Command` increases it for its longer list of rows.
  * @cssproperty --option-padding - The space before the label, shared with a group heading.
  * @cssproperty --option-radius - The corner radius of the row. A listbox and a select remove it.

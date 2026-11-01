@@ -9,7 +9,7 @@ describe('strands server output', () => {
        emitted a uniform, a program or a frame would be a server pretending to
        have a GPU, so the whole list is asked for rather than a few things a
        spec author thought to rule out. */
-    expect(servedParts(ssr(html`<helix-strands variant="bend"></helix-strands>`))).toEqual([
+    expect(servedParts(ssr(html`<helix-strands pattern="bend"></helix-strands>`))).toEqual([
       'canvas',
       'content',
     ])
@@ -21,11 +21,11 @@ describe('strands server output', () => {
 
   test('and reflects travel, set as a property, which the stylesheet selects on', () => {
     /* Set through the property, so the attribute in the output is the
-       element's reflection and not markup the consumer wrote. The variant is
+       element's reflection and not markup the consumer wrote. The pattern is
        set the same way and stays a property. */
     expect(
       hostAttributes(
-        ssr(html`<helix-strands .travel=${true} .variant=${'waves'}></helix-strands>`),
+        ssr(html`<helix-strands .travel=${true} .pattern=${'waves'}></helix-strands>`),
         'helix-strands',
       ),
     ).toEqual(['travel'])

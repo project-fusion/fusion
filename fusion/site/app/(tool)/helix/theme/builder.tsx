@@ -836,7 +836,7 @@ export function ThemeBuilder({
           <helix-flex direction="column" gap="lg">
             <helix-flex direction="column" gap="xs">
               <helix-flex align-items="center" gap="sm" justify-content="between">
-                <helix-text as="h1" variant="subheading">
+                <helix-text as="h1" scale="subheading">
                   Theme builder
                 </helix-text>
                 <helix-tooltip content="Back to the shipped values" placement="bottom">
@@ -845,7 +845,7 @@ export function ThemeBuilder({
                   </helix-icon-button>
                 </helix-tooltip>
               </helix-flex>
-              <helix-text variant="caption">
+              <helix-text scale="caption">
                 Start from ink, or describe a brand. Each foreground Helix solves is measured
                 against the ground it lands on.
               </helix-text>
@@ -935,7 +935,7 @@ export function ThemeBuilder({
                   <span className="themeShiftArrow" />
                   <span className="themeSwatch" style={{ background: derivedPrimary }} />
                 </div>
-                <helix-text variant="caption">
+                <helix-text scale="caption">
                   {shift > 0 ? 'Lightened' : 'Darkened'} to clear {contrastTarget}:1. Hue and chroma
                   are kept.
                 </helix-text>
@@ -985,7 +985,7 @@ export function ThemeBuilder({
               value={pageDarkText}
             ></helix-color-input>
             {refused ? (
-              <helix-text variant="caption">
+              <helix-text scale="caption">
                 No text reaches {contrastTarget}:1 on the{' '}
                 {refused.startsWith('background.dark') ? 'dark' : 'light'} page, so the preview
                 leaves it out.
@@ -1021,12 +1021,12 @@ export function ThemeBuilder({
               ></helix-color-input>
             ) : null}
             {banded && 'refused' in banded ? (
-              <helix-text variant="caption">
+              <helix-text scale="caption">
                 No text reaches {contrastTarget}:1 on that band, so the preview leaves it the
                 page's.
               </helix-text>
             ) : bandBlock && bandBlock.theme.violations.length > 0 ? (
-              <helix-text variant="caption">
+              <helix-text scale="caption">
                 On the band, {bandBlock.theme.violations.length} pair
                 {bandBlock.theme.violations.length === 1 ? '' : 's'} fall short of {contrastTarget}
                 :1.
@@ -1503,7 +1503,7 @@ export function ThemeBuilder({
               <helix-tab-panel slot="panels" value="contrast">
                 <div className="themeFindings">
                   {failures.length === 0 ? (
-                    <helix-text variant="caption">
+                    <helix-text scale="caption">
                       All {counts.pass ?? 0} measured pairs clear their target. Each is a foreground
                       against a ground the surface model says it lands on, rather than against the
                       page alone.
@@ -1530,7 +1530,7 @@ export function ThemeBuilder({
               <helix-tab-panel slot="panels" value="collisions">
                 <div className="themeFindings">
                   {theme.collisions.length === 0 ? (
-                    <helix-text variant="caption">
+                    <helix-text scale="caption">
                       Every role is distinguishable from every other. A collision is two roles a
                       reader cannot tell apart, which no contrast measurement can see: both may
                       clear the page and still say the same thing.
@@ -1542,7 +1542,7 @@ export function ThemeBuilder({
                           <helix-text>{collision}</helix-text>
                         </helix-callout>
                       ))}
-                      <helix-text variant="caption">
+                      <helix-text scale="caption">
                         The accent yields on its own, and a status may rotate within its meaning up
                         to the allowance. What is left here could not be repaired by either.
                       </helix-text>
@@ -1554,7 +1554,7 @@ export function ThemeBuilder({
               <helix-tab-panel slot="panels" value="unmeasured">
                 <div className="themeFindings">
                   <helix-flex direction="column" gap="sm">
-                    <helix-text variant="caption">
+                    <helix-text scale="caption">
                       Not a softer failure: these pairs were never measured, because the ground is
                       not knowable: what sits behind a caption over a photograph is the photograph.
                       Folding them into the passes is how a guarantee becomes a claim about the

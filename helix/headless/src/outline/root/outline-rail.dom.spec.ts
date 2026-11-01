@@ -21,7 +21,7 @@ const SECTIONS = ['one', 'two', 'three', 'four']
   .map((id) => `<section id="${id}"><h2>${id}</h2></section>`)
   .join('')
 
-const rail = async (attrs = 'variant="rail"', links = FLAT): Promise<Rail> => {
+const rail = async (attrs = 'marker="rail"', links = FLAT): Promise<Rail> => {
   const root = await mount(
     `<div><helix-headless-outline ${attrs} label="On this page">${links}</helix-headless-outline>${SECTIONS}</div>`,
   )
@@ -46,7 +46,7 @@ describe('outline rail', () => {
 
   test('counts the links of nested lists too', async () => {
     const outline = await rail(
-      'variant="rail"',
+      'marker="rail"',
       '<ul><li><a href="#one">One</a><ul><li><a href="#two">Two</a></li></ul></li><li><a href="#four">Four</a></li></ul>',
     )
     const drawn = ticks(outline)
@@ -174,7 +174,7 @@ describe('outline rail', () => {
     expect(hasState(outline, 'open')).toBe(false)
   })
 
-  test('draws no ticks and no surface without the variant, and never opens', async () => {
+  test('draws no ticks and no surface without the marker, and never opens', async () => {
     const outline = await rail('')
     expect(outline.shadowRoot?.querySelector('[part="ticks"]')).toBeNull()
     expect(outline.shadowRoot?.querySelector('[part="surface"]')).toBeNull()
@@ -183,12 +183,12 @@ describe('outline rail', () => {
   })
 })
 
-describe('outline rail variant', () => {
+describe('outline rail marker', () => {
   test('reflects to the attribute', async () => {
     const outline = await rail('')
-    ;(outline as unknown as { variant: string }).variant = 'rail'
+    ;(outline as unknown as { marker: string }).marker = 'rail'
     await outline.updateComplete
-    expect(outline.getAttribute('variant')).toBe('rail')
+    expect(outline.getAttribute('marker')).toBe('rail')
     expect(outline.shadowRoot?.querySelector('[part="surface"]')).not.toBeNull()
   })
 })

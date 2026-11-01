@@ -354,11 +354,11 @@
 
 /* A weaker or optional connection, drawn broken. Dotted is a dash of nothing
    with a round cap, which is how a stroke draws a row of dots. */
-[part="edge"][data-variant="dashed"] {
+[part="edge"][data-stroke="dashed"] {
   stroke-dasharray: 6 4;
 }
 
-[part="edge"][data-variant="dotted"] {
+[part="edge"][data-stroke="dotted"] {
   stroke-dasharray: 0 5;
   stroke-linecap: round;
 }

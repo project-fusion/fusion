@@ -27,24 +27,24 @@ const TAGS: Record<string, StaticValue> = {
  *
  * @description
  * `as` sets the element, which decides the document outline and what a screen
- * reader announces. `variant` sets the type ramp, which decides size, weight,
+ * reader announces. `scale` sets the type ramp, which decides size, weight,
  * leading, and tracking together.
  *
  * The two match by default, so usually you set only `as`, such as `as="h2"`.
- * Set `variant` when the look and the element differ, such as a heading that
+ * Set `scale` when the look and the element differ, such as a heading that
  * looks smaller or a `<p>` styled as a caption.
  *
  * The pairing is resolved in CSS, so the element writes nothing to its host.
- * `as="h2"` picks up the heading ramp through a selector, and setting `variant`
+ * `as="h2"` picks up the heading ramp through a selector, and setting `scale`
  * overrides the pairing. Do not derive it in `willUpdate`, because that adds a
  * host attribute the server markup does not have, which causes a hydration
  * mismatch in React.
  *
  * Size, weight, and leading are not separate properties. Choose a named ramp
- * with `variant`.
+ * with `scale`.
  *
- * `tone` and `emphasis` are separate from `variant`, because color carries
- * state. Combining them would need a variant for every pair, such as
+ * `tone` and `emphasis` are separate from `scale`, because color carries
+ * state. Combining them would need a scale for every pair, such as
  * `caption-danger` and `label-muted`.
  *
  * `lines` cuts the text off after that many lines and ends it with an
@@ -83,7 +83,7 @@ export class HelixText extends HelixElement {
    * **`label` is deprecated and no longer listed.** The element is in this
    * one's shadow root, which neither `for` nor a wrapped control can reach, so
    * it labeled nothing. Written anyway, it still renders a `<label>` in the
-   * label ramp and warns. Use `variant="label"` for the look, a native
+   * label ramp and warns. Use `scale="label"` for the look, a native
    * `<label data-text="label">` to label a native control, and a Helix field's
    * own `label`.
    */
@@ -147,7 +147,7 @@ export class HelixText extends HelixElement {
 
   /**
    * The meaning of the text, shown by its color, such as `danger` or `success`.
-   * It is set separately from `variant`.
+   * It is set separately from `scale`.
    *
    * **There is no `default` value**, and one must not be added: it would match
    * no rule and fall through to the inherited ink, reading as working while
@@ -166,7 +166,7 @@ export class HelixText extends HelixElement {
    * `strong`, `h5` and `h6`. A `span` or an `em` keeps the type around it.
    */
   @property({ reflect: true })
-  variant?:
+  scale?:
     | 'display'
     | 'heading'
     | 'subheading'
@@ -184,7 +184,7 @@ export class HelixText extends HelixElement {
         kind: 'unreachable-label',
         message:
           '<helix-text as="label"> is deprecated: its label is in a shadow root, which `for` ' +
-          'and a wrapped control cannot reach, so it labels nothing. Write `variant="label"` ' +
+          'and a wrapped control cannot reach, so it labels nothing. Write `scale="label"` ' +
           'for the look, `<label data-text="label">` for a native control, and give a Helix ' +
           'field its own `label`.',
         tag: this.localName,

@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-navigation
       label="Sections"
-      variant="underlined"
+      marker="underlined"
     >
       <a
         aria-current="page"

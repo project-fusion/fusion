@@ -44,7 +44,7 @@ describe('a strip of tabs', () => {
 
   test('subtle draws the mark as a tint, with no edge or shadow', () => {
     const css = sheet('helix-tabs')
-    expect(css).toContain(':host([emphasis="subtle"]:not([variant])) [part="indicator"]')
+    expect(css).toContain(':host([emphasis="subtle"]:not([marker])) [part="indicator"]')
     expect(css).toContain('--_indicator-border: 0')
     expect(css).toContain('--_indicator-shadow: none')
     expect(css).toContain(':host([dismiss-marks="hover"]) {--_tabs-dismiss-rest: 0}')
@@ -103,12 +103,12 @@ describe("a tab's label, in the middle of its tab", () => {
     '<span data-probe style="block-size: 1cap; display: inline-block; inline-size: 0"></span>'
 
   for (const density of ['sm', 'md', 'lg']) {
-    for (const variant of ['', 'segmented', 'underlined']) {
+    for (const marker of ['', 'segmented', 'underlined']) {
       if (hasLayout()) {
-        test(`is centered on its capitals at ${density}${variant ? `, ${variant}` : ''}`, async () => {
+        test(`is centered on its capitals at ${density}${marker ? `, ${marker}` : ''}`, async () => {
           const region = await mount(`
             <div data-density="${density}">
-              <helix-tabs label="The audit"${variant ? ` variant="${variant}"` : ''}>
+              <helix-tabs label="The audit"${marker ? ` marker="${marker}"` : ''}>
                 <helix-tab value="contrast">Contrast${PROBE}</helix-tab>
                 <helix-tab value="collisions">Collisions</helix-tab>
               </helix-tabs>

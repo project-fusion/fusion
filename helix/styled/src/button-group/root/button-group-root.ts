@@ -73,7 +73,7 @@ export class HelixButtonGroup extends HelixHeadlessButtonGroup {
    * `helix-flex` gives the spacing without the group.
    */
   @property({ reflect: true })
-  variant?: 'joined' | 'spaced'
+  layout?: 'joined' | 'spaced'
 
   /**
    * Draws a pressed button as well as saying so. On the control inside the

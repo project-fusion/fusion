@@ -83,7 +83,7 @@ import '../../color-picker/index.js'
  * @event {Event} input - Fired as the value changes.
  * @event {ToggleEvent} toggle - The panel opened or closed. The event carries `newState` and `oldState`.
  *
- * @csspart control - The text input that holds the value. Absent in the `swatch` variant.
+ * @csspart control - The text input that holds the value. Absent in the `swatch` trigger.
  * @csspart feedback - The message that says what is wrong with the value.
  * @csspart field - The box holding the text and the trigger.
  * @csspart hint - Help text under the field, shown while there is no feedback.
@@ -260,7 +260,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   swatches = ''
 
   /**
-   * What the swatch says in `variant="swatch"`, after the field's label, once
+   * What the swatch says in `trigger="swatch"`, after the field's label, once
    * there is a color. `{name}` is the color's name, such as "vibrant red", and
    * `{value}` the value as written.
    */
@@ -293,7 +293,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    * where the color is the answer rather than a setting.
    */
   @property({ reflect: true })
-  variant?: 'swatch'
+  trigger?: 'swatch'
 
   /**
    * Draws the panel's hue as a wheel around the square, in place of the hue
@@ -333,7 +333,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
 
   /** The swatch's words in `swatch`, which its label points at, and never drawn. */
   private renderSwatchValue(): TemplateResult | typeof nothing {
-    return this.variant === 'swatch'
+    return this.trigger === 'swatch'
       ? html`<span id="swatch-value" hidden>${this.swatchWords}</span>`
       : nothing
   }
@@ -523,7 +523,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
       ?wheel=${this.wheel}
       ?channel-fields=${this.channelFields}
       ?no-format=${this.noFormat}
-      ?no-value=${this.variant !== 'swatch'}
+      ?no-value=${this.trigger !== 'swatch'}
       .colorWords=${this.colorWords}
       .format=${this.format ?? 'hex'}
       .value=${this.picked}
@@ -549,7 +549,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
              literal and the error lands on a line further down. -->
         <slot name="start"></slot>
         ${
-          this.variant === 'swatch'
+          this.trigger === 'swatch'
             ? nothing
             : html`<input
           part="control"
@@ -573,15 +573,15 @@ export class HelixHeadlessColorInput extends MixinPickerField(
         <slot name="end"></slot>
         <button
           part="trigger"
-          id=${this.variant === 'swatch' ? 'control' : nothing}
+          id=${this.trigger === 'swatch' ? 'control' : nothing}
           type="button"
           aria-controls="surface"
           aria-disabled=${this.readOnly ? 'true' : nothing}
           aria-expanded=${this.open ? 'true' : 'false'}
           aria-haspopup="dialog"
-          aria-label=${this.variant === 'swatch' ? nothing : this.triggerLabel}
+          aria-label=${this.trigger === 'swatch' ? nothing : this.triggerLabel}
           aria-labelledby=${
-            this.variant === 'swatch'
+            this.trigger === 'swatch'
               ? this.labeled
                 ? `${this.labelId} swatch-value`
                 : 'swatch-value'

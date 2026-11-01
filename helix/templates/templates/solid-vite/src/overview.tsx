@@ -22,13 +22,13 @@ export function Overview() {
   return (
     <div class="stack">
       <header class="hero">
-        <helix-text emphasis="muted" variant="label">
+        <helix-text emphasis="muted" scale="label">
           Data view
         </helix-text>
-        <helix-text as="h1" variant="heading">
+        <helix-text as="h1" scale="heading">
           Roster
         </helix-text>
-        <helix-text as="p" class="lede" emphasis="muted" variant="body">
+        <helix-text as="p" class="lede" emphasis="muted" scale="body">
           Twelve people from a local module. Sort a column, turn a page, or tick a row and watch the
           rule in <helix-code>src/app.css</helix-code> paint it.
         </helix-text>
@@ -77,13 +77,13 @@ export function Overview() {
 
           {/* The footer is a row across the table: anything you slot goes at the
               start, and the table's own pagination sits at the end. */}
-          <helix-text emphasis="muted" slot="footer" variant="caption">
+          <helix-text emphasis="muted" slot="footer" scale="caption">
             {members.length} people
           </helix-text>
         </helix-data-table>
 
         {/* A footnote to the table, so it takes the section's gap. */}
-        <helix-text as="p" emphasis="muted" variant="caption">
+        <helix-text as="p" emphasis="muted" scale="caption">
           Filtering, column reordering, resizing, virtualized rows, and a server mode for large
           results are on{' '}
           <a data-link href={DOCS.table}>

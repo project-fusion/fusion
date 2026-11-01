@@ -15,7 +15,7 @@ export default function Page() {
     <>
       <section data-band>
         <helix-flex data-shell direction="column" gap="lg">
-          <helix-text emphasis="muted" variant="label">
+          <helix-text emphasis="muted" scale="label">
             Contact
           </helix-text>
           <helix-text as="h1" data-measure data-section-title>
@@ -86,7 +86,7 @@ export default function Page() {
           <helix-flex direction="column">
             {NEXT.map((item, index) => (
               <helix-flex align-items="start" data-row gap="lg" key={item.name} wrap>
-                <helix-text emphasis="muted" variant="label">
+                <helix-text emphasis="muted" scale="label">
                   {String(index + 1).padStart(2, '0')}
                 </helix-text>
                 {/* The name and the body side by side, not stacked.

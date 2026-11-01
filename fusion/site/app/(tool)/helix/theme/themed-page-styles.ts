@@ -88,8 +88,8 @@ export const THEMED_PAGE_STYLES = css`
 
      One rule for every layout, because a heading that wraps badly does it in
      all four and the fix is the same one. */
-  helix-text[variant="display"],
-  helix-text[variant="subheading"] {
+  helix-text[scale="display"],
+  helix-text[scale="subheading"] {
     text-wrap: balance;
   }
 
@@ -627,14 +627,14 @@ export const THEMED_PAGE_STYLES = css`
        width and this is that, one step down the same scale the theme is
        deriving, so it still moves when a reader moves the type scale.
 
-       A document rule setting \`font-size\` beats the \`:host([variant="display"])\`
+       A document rule setting \`font-size\` beats the \`:host([scale="display"])\`
        rule inside the component, which is the ordering the area rules describe
        and here is the wanted one: sizing text for the space it was given is a
        consumer's decision, not a component's.
 
        \`break-word\` under it as the floor, for a word long enough to overflow
        even at this size. Ugly and better than gone. */
-    helix-text[variant="display"] {
+    helix-text[scale="display"] {
       font-size: var(--helix-text-2xl);
       overflow-wrap: break-word;
     }

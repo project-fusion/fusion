@@ -1,5 +1,5 @@
 :host {
-  /* The default look, and where every variant starts from: a raised pill on the
+  /* The default look, and where every marker starts from: a raised pill on the
      selected tab and nothing at all behind the row. */
   --_tabs-rule: none;
   --_tab-radius: var(--helix-radii-sm);
@@ -90,7 +90,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* Underlined. */
-:host([variant="underlined"]) {
+:host([marker="underlined"]) {
   --_tabs-rule: linear-gradient(
     var(--tabs-rule-color, var(--helix-color-border)),
     var(--tabs-rule-color, var(--helix-color-border))
@@ -101,7 +101,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* Segmented. */
-:host([variant="segmented"]) [part="tabs"] {
+:host([marker="segmented"]) [part="tabs"] {
   /* A groove, so the pill in it is over the page rather than on it. */
   --_tab-selected-surface: var(--helix-color-surface-overlay);
 
@@ -180,7 +180,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
-:host([variant="underlined"]) [part="indicator"] {
+:host([marker="underlined"]) [part="indicator"] {
   --_indicator-block: var(--tabs-indicator-thickness, var(--helix-border-thick));
   --_indicator-color: var(--tabs-indicator-color, var(--helix-color-primary));
   --_indicator-offset: calc(
@@ -190,7 +190,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* Segmented: the same mark, grown to the tab's own box. */
-:host([variant="segmented"]) [part="indicator"] {
+:host([marker="segmented"]) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
   --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-overlay));
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
@@ -198,12 +198,12 @@ slot[name="scroll-end-icon"]::slotted(*) {
   --_indicator-offset: 0px;
 }
 
-:host([variant="segmented"]) {
+:host([marker="segmented"]) {
   --_tab-selected-surface: transparent;
 }
 
 /* The default is a pill too, so it travels for the same reason. */
-:host(:not([variant])) [part="indicator"] {
+:host(:not([marker])) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
   /* *`overlay` with an edge, not `raised`.** This pill lies on the page with
      nothing framing it, and `raised` put it a three per cent step off a white
@@ -217,7 +217,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
   --_indicator-offset: 0px;
 }
 
-:host(:not([variant])) {
+:host(:not([marker])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
 }
@@ -258,7 +258,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* The segmented groove grows down with its tabs. */
-:host([orientation="vertical"][variant="segmented"]) [part="tabs"] {
+:host([orientation="vertical"][marker="segmented"]) [part="tabs"] {
   --_tab-height: initial;
 
   block-size: auto;
@@ -266,7 +266,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 }
 
 /* The bar stands along the column's inline end, on the rule it replaces. */
-:host([orientation="vertical"][variant="underlined"]) [part="indicator"] {
+:host([orientation="vertical"][marker="underlined"]) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
   --_indicator-offset: 0px;
   --_indicator-offset-x: calc(
@@ -291,8 +291,8 @@ slot[name="scroll-end-icon"]::slotted(*) {
 /* `subtle`: the mark as a tint, with no edge and no shadow. The same wash the
    tab under the pointer takes, a step stronger, so the current tab still reads
    as current beside one being hovered. */
-:host([emphasis="subtle"]:not([variant])) [part="indicator"],
-:host([emphasis="subtle"][variant="segmented"]) [part="indicator"] {
+:host([emphasis="subtle"]:not([marker])) [part="indicator"],
+:host([emphasis="subtle"][marker="segmented"]) [part="indicator"] {
   --_indicator-border: 0;
   --_indicator-color: var(
     --tabs-indicator-color,
@@ -301,7 +301,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
   --_indicator-shadow: none;
 }
 
-:host([emphasis="subtle"][variant="underlined"]) [part="indicator"] {
+:host([emphasis="subtle"][marker="underlined"]) [part="indicator"] {
   --_indicator-color: var(--tabs-indicator-color, var(--helix-color-foreground));
 }
 

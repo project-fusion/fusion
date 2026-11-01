@@ -3,7 +3,7 @@ export function Example() {
     <helix-tabs
       default-active="one"
       label="Project"
-      variant="segmented"
+      marker="segmented"
     >
       <helix-tab value="one">Overview</helix-tab>
       <helix-tab value="two">Activity</helix-tab>

@@ -108,7 +108,7 @@ slot[name="description"][data-empty] {
 }
 
 :host(:not([disabled])) [part="item"]:hover {
-  background-color: var(--drilldown-item-hover-color, var(--helix-color-hover));
+  background-color: var(--drilldown-item-hover-background-color, var(--helix-color-hover));
 }
 
 [part="item"]:focus-visible {

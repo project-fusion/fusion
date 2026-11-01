@@ -16,8 +16,8 @@
 //! actually reads: the reference page is generated from these blocks, so the
 //! word reaches them under the library's own name while the property it names
 //! does not exist. Two survived the retirement that way, `ColorInput`'s
-//! `--color-input-swatch-size` naming `appearance="swatch"` for a `variant`, and
-//! `Rating` explaining why `variant` is undefaulted in terms of
+//! `--color-input-swatch-size` naming `appearance="swatch"` for a `trigger`, and
+//! `Rating` explaining why its choice is undefaulted in terms of
 //! `appearance="marks"`. Both were found by reading, which is what a check is
 //! for.
 //!
@@ -331,13 +331,24 @@ fn attribute_of(
                                      ends, `emphasis` is how much ink a control claims, \
                                      `material` is what it is made of, `tone` is what it means, \
                                      and a component-specific choice that is none of those is \
-                                     `variant`."
+                                     named for what it chooses."
                                 .to_owned(),
                             file: family.to_owned(),
                             message: format!(
                                 "`{tag}` declares `appearance`, which is not a word this library \
                                  uses"
                             ),
+                        });
+                        continue;
+                    }
+                    if name == "variant" {
+                        findings.push(Finding {
+                            detail: "It says that something varies and not what. Name it for \
+                                     what it chooses, as `marker`, `layout`, `picker`, `stroke`, \
+                                     `handle`, and `pattern` do."
+                                .to_owned(),
+                            file: family.to_owned(),
+                            message: format!("`{tag}` declares `variant`, which names no choice"),
                         });
                         continue;
                     }
@@ -361,7 +372,7 @@ fn attribute_of(
                     if !paints && !UNPAINTED.contains(&name) {
                         findings.push(Finding {
                             detail: "A visual axis belongs to the layer that paints; a structural \
-                                     choice is `variant`."
+                                     choice is named for what it chooses."
                                 .to_owned(),
                             file: family.to_owned(),
                             message: format!(
@@ -454,7 +465,7 @@ fn reintroduced(context: &Context, findings: &mut Vec<Finding>) {
                     detail: "It held four axes at once: `separation` is where a surface ends, \
                              `emphasis` is how much ink a control claims, `material` is what it \
                              is made of, `tone` is what it means, and a component-specific \
-                             choice that is none of those is `variant`."
+                             choice that is none of those is named for what it chooses."
                         .to_owned(),
                     file: file
                         .strip_prefix(&context.root)

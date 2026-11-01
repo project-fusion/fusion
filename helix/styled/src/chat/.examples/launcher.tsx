@@ -27,8 +27,8 @@ export function Example() {
       >
         <helix-text
           as="strong"
+          scale="body-strong"
           slot="header"
-          variant="body-strong"
         >
           Support
         </helix-text>

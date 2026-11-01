@@ -1125,7 +1125,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
       <div className={styles.examplesScroll} ref={scroller}>
         {shown.length === 0 ? (
-          <helix-text emphasis="muted" variant="caption">
+          <helix-text emphasis="muted" scale="caption">
             Nothing matches {filter}.
           </helix-text>
         ) : (

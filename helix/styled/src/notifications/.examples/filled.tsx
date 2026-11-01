@@ -9,8 +9,8 @@ export function Example() {
     >
       <helix-text
         as="h2"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Notifications
       </helix-text>

@@ -8,8 +8,8 @@ export function Example() {
     >
       <helix-text
         as="h2"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Support
       </helix-text>

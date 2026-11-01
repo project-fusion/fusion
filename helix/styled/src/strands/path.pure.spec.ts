@@ -99,8 +99,8 @@ describe('strands box path', () => {
       [800, 400],
       [300, 400],
     ] as const) {
-      for (const variant of ['bend', 'ribbon', 'waves'] as const) {
-        const points = boxPath(variant, undefined, height, width)
+      for (const pattern of ['bend', 'ribbon', 'waves'] as const) {
+        const points = boxPath(pattern, undefined, height, width)
         expect(tightest(points, width, height)).toBeGreaterThan(height * TURN * 0.9)
       }
     }
@@ -125,11 +125,11 @@ describe('strands box path', () => {
 
 describe('strands page path', () => {
   const view = { height: 800, width: 1280 }
-  const stop = (top: number, variant: PlacedStop['variant'], at?: number): PlacedStop => ({
+  const stop = (top: number, pattern: PlacedStop['pattern'], at?: number): PlacedStop => ({
     at,
     height: 700,
+    pattern,
     top,
-    variant,
   })
 
   test('places the stops in page order, whatever order they were written in', () => {
@@ -244,7 +244,7 @@ describe('strands page path', () => {
     }
   })
 
-  test('without stops, the root variant runs the length of the page', () => {
+  test('without stops, the root pattern runs the length of the page', () => {
     const ribbon = pagePath([], 'ribbon', view.width, view.height, 8000)
     expect(Math.max(...lit(ribbon).map(([, y]) => y))).toBeGreaterThan(7000)
     const waves = pagePath([], 'waves', view.width, view.height, 8000)
@@ -271,11 +271,11 @@ describe('strands reach', () => {
        over themselves. Measured with the same reach the path is laid by, at
        the default spread, on a page whose bend sits far to the right, which
        is what folded the hand-over into the ribbon. */
-    const stop = (top: number, variant: PlacedStop['variant'], at?: number): PlacedStop => ({
+    const stop = (top: number, pattern: PlacedStop['pattern'], at?: number): PlacedStop => ({
       at,
       height: 900,
+      pattern,
       top,
-      variant,
     })
     for (const [width, height] of [
       [1440, 900],
@@ -322,9 +322,9 @@ describe('strands sweep', () => {
     at: 0.9,
     height: 600,
     left: 0.06,
+    pattern: 'sweep',
     right: 0.94,
     top: 1000,
-    variant: 'sweep',
   }
   const points = pagePath([card], 'ribbon', 1440, 900, 6000)
   const shown = points.filter(([, y, , brightness]) => brightness > 0 && y > 0)
@@ -362,11 +362,11 @@ describe('strands arc length', () => {
   })
 
   test('only grows across a wave that sweeps left', () => {
-    const stop = (top: number, variant: PlacedStop['variant']): PlacedStop => ({
+    const stop = (top: number, pattern: PlacedStop['pattern']): PlacedStop => ({
       at: undefined,
       height: 700,
+      pattern,
       top,
-      variant,
     })
     const points = pagePath([stop(0, 'bend'), stop(3000, 'waves')], 'ribbon', 1280, 800, 6000)
     expect(grows(arcLengths(points, 1280))).toBe(true)

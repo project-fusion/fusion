@@ -10,10 +10,10 @@ export function Example() {
           slot="marker"
         ></helix-icon>
         <span slot="time">09:12</span>
-        <helix-text variant="body-strong">Deployed to production</helix-text>
+        <helix-text scale="body-strong">Deployed to production</helix-text>
         <helix-text
           emphasis="muted"
-          variant="caption"
+          scale="caption"
         >
           Version 4.2.0, by the release job.
         </helix-text>
@@ -27,10 +27,10 @@ export function Example() {
           slot="marker"
         ></helix-icon>
         <span slot="time">08:47</span>
-        <helix-text variant="body-strong">Rolled back</helix-text>
+        <helix-text scale="body-strong">Rolled back</helix-text>
         <helix-text
           emphasis="muted"
-          variant="caption"
+          scale="caption"
         >
           Error rate above the threshold for four minutes.
         </helix-text>
@@ -40,20 +40,20 @@ export function Example() {
         tone="primary"
       >
         <span slot="time">08:30</span>
-        <helix-text variant="body-strong">Build passed</helix-text>
+        <helix-text scale="body-strong">Build passed</helix-text>
         <helix-text
           emphasis="muted"
-          variant="caption"
+          scale="caption"
         >
           1,089 tests across 75 packages.
         </helix-text>
       </helix-timeline-item>
       <helix-timeline-item datetime="2026-08-19T08:04">
         <span slot="time">08:04</span>
-        <helix-text variant="body-strong">Pull request opened</helix-text>
+        <helix-text scale="body-strong">Pull request opened</helix-text>
         <helix-text
           emphasis="muted"
-          variant="caption"
+          scale="caption"
         >
           A new branch with its first commit.
         </helix-text>

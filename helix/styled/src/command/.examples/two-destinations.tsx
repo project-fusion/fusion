@@ -36,7 +36,7 @@ export function Example() {
           <helix-kbd keys="enter"></helix-kbd>
           <helix-text
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             Reference
           </helix-text>
@@ -48,7 +48,7 @@ export function Example() {
           <helix-kbd keys="mod+enter"></helix-kbd>
           <helix-text
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             Sandbox
           </helix-text>

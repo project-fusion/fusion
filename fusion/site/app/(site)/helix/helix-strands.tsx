@@ -20,8 +20,8 @@ export function HelixStrands({ className }: { className: string }) {
       speed={motion === 'off' ? 0 : 1.2}
       travel
     >
-      <helix-strands-stop at={0.9} for="helix-places" variant="sweep"></helix-strands-stop>
-      <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
+      <helix-strands-stop at={0.9} for="helix-places" pattern="sweep"></helix-strands-stop>
+      <helix-strands-stop for="close" pattern="waves"></helix-strands-stop>
     </helix-strands>
   )
 }

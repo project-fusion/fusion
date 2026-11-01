@@ -19,7 +19,7 @@ export function Example() {
       <div className="words">
         <helix-text
           as="h2"
-          variant="heading"
+          scale="heading"
         >
           Every stop, one map
         </helix-text>

@@ -56,7 +56,7 @@ export function SiteHeader() {
           It names the library the starter is built on, and it is the place for
           your own name or logo. */}
       <Link className="wordmark" data-link="quiet" href="/" slot="start">
-        <helix-text variant="body-strong">Helix</helix-text>
+        <helix-text scale="body-strong">Helix</helix-text>
       </Link>
 
       {/* The links are yours. Navigation owns the marker that travels between

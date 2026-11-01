@@ -5,7 +5,7 @@ export function Example() {
     <div className="stage">
       <helix-aura
         interactive
-        variant="particles"
+        pattern="particles"
       ></helix-aura>
     </div>
   )

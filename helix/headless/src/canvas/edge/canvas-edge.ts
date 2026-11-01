@@ -107,13 +107,13 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   /**
    * How the line is drawn: `dashed` or `dotted`. Unset is solid.
    *
-   * **A variant rather than an axis**, which is what the registry keeps it for:
+   * **A stroke rather than an axis**, which is what the registry keeps it for:
    * no other family draws a line whose stroke says something, and a dashed
    * connection is the ordinary way to draw a weaker or an optional one. On the
    * headless tier because the board that draws the line is.
    */
   @property({ reflect: true })
-  variant?: 'dashed' | 'dotted'
+  stroke?: 'dashed' | 'dotted'
 
   /**
    * Tells the board the connector changed, since the board is what draws it.

@@ -199,7 +199,7 @@ export function Showcase(): React.ReactElement {
     <div className={styles.showcaseStage} ref={stage}>
       <helix-card class={styles.showcaseAnchor} data-filled>
         <helix-flex direction="column" gap="md">
-          <helix-text variant="label">Helix</helix-text>
+          <helix-text scale="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
             Use the behavior with your own design
           </helix-text>
@@ -405,11 +405,11 @@ export function Showcase(): React.ReactElement {
               <helix-timeline-item datetime="2026-08-21T09:12" tone="success">
                 <helix-icon name="check" slot="marker"></helix-icon>
                 <span slot="time">09:12</span>
-                <helix-text variant="body-strong">Contrast pass</helix-text>
+                <helix-text scale="body-strong">Contrast pass</helix-text>
               </helix-timeline-item>
               <helix-timeline-item datetime="2026-08-21T08:40">
                 <span slot="time">08:40</span>
-                <helix-text variant="body-strong">Tokens regenerated</helix-text>
+                <helix-text scale="body-strong">Tokens regenerated</helix-text>
               </helix-timeline-item>
             </helix-timeline>
           </helix-card>
@@ -559,14 +559,14 @@ export function Showcase(): React.ReactElement {
             wrap
           >
             <helix-tag>Experimental</helix-tag>
-            <helix-text emphasis="muted" variant="caption">
+            <helix-text emphasis="muted" scale="caption">
               Drag a chart to turn it.
             </helix-text>
           </helix-flex>
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="sm">
-              <helix-text variant="body-strong">Load over a week</helix-text>
+              <helix-text scale="body-strong">Load over a week</helix-text>
               <table data-hidden-visually id="showcase-load">
                 <caption>Requests a minute over a week</caption>
                 <thead>
@@ -601,7 +601,7 @@ export function Showcase(): React.ReactElement {
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="sm">
-              <helix-text variant="body-strong">Signups by region</helix-text>
+              <helix-text scale="body-strong">Signups by region</helix-text>
               <table data-hidden-visually id="showcase-signups">
                 <caption>Signups by region and quarter</caption>
                 <thead>
@@ -636,7 +636,7 @@ export function Showcase(): React.ReactElement {
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="sm">
-              <helix-text variant="body-strong">Customers by age and spend</helix-text>
+              <helix-text scale="body-strong">Customers by age and spend</helix-text>
               <table data-hidden-visually id="showcase-customers">
                 <caption>Customers</caption>
                 <thead>
@@ -672,7 +672,7 @@ export function Showcase(): React.ReactElement {
 
           <helix-card class="showcaseCard" data-card-edge separation="outlined">
             <helix-flex direction="column" gap="sm">
-              <helix-text variant="body-strong">Requests by service</helix-text>
+              <helix-text scale="body-strong">Requests by service</helix-text>
               <table data-hidden-visually id="showcase-services">
                 <caption>Requests and response time by service</caption>
                 <thead>
@@ -710,7 +710,7 @@ export function Showcase(): React.ReactElement {
               it is a second surface a few pixels outside the first, and the two
               edges argue about which one is the callout. */}
           <helix-callout class={styles.showcaseWide} tone="info">
-            <helix-text slot="heading" variant="body-strong">
+            <helix-text scale="body-strong" slot="heading">
               Nothing here needs us to keep running
             </helix-text>
             The packages install from npm and ship as custom elements.

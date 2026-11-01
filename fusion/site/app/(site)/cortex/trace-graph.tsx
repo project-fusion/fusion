@@ -229,12 +229,12 @@ export function TraceGraph() {
             />
           ))}
           {failed ? (
-            <helix-text slot="footer" variant="caption">
+            <helix-text scale="caption" slot="footer">
               The trace could not load. Reload the page to try again.
             </helix-text>
           ) : null}
         </helix-graph>
-        <helix-text class={styles.traceCaption} emphasis="muted" variant="caption">
+        <helix-text class={styles.traceCaption} emphasis="muted" scale="caption">
           {layout === 'rows' ? 'Read from the top down' : 'Read from left to right'}: what came in,
           the facts Engram kept from it, what was retrieved and looked up, the context the model was
           given, and the answer it gave. The chosen answer is lit back to where it came from. An
@@ -267,7 +267,7 @@ export function TraceGraph() {
         {/* The derivation in words, the same walk the drawing lights: a
             ladder down from the answer to what came in. */}
         <div className={styles.derivation}>
-          <helix-text as="h3" variant="subheading">
+          <helix-text as="h3" scale="subheading">
             {active ? `What ${nameOf(active)} came from` : 'Choose an answer'}
           </helix-text>
           {kinds.length > 0 ? (
@@ -298,7 +298,7 @@ export function TraceGraph() {
           >
             {deleted ? 'Restore the trace' : `Delete “${DELETED}”`}
           </helix-button>
-          <helix-text aria-live="polite" emphasis="muted" variant="caption">
+          <helix-text aria-live="polite" emphasis="muted" scale="caption">
             {deleted
               ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
               : 'Deleting a memory removes everything derived from it, as Trace does. The September answer cites the superseded price, which is why Engram keeps it.'}

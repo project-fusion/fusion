@@ -6,13 +6,13 @@ export function Example() {
       <div className="stage">
         <helix-strands
           at={0.25}
-          variant="bend"
+          pattern="bend"
         ></helix-strands>
       </div>
       <div className="stage">
         <helix-strands
           at={0.75}
-          variant="bend"
+          pattern="bend"
         ></helix-strands>
       </div>
     </div>

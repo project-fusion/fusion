@@ -21,7 +21,7 @@ export function Example() {
           <helix-card>
             <helix-text
               as="h3"
-              variant="title"
+              scale="title"
             >
               Quarterly review
             </helix-text>

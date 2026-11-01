@@ -6,11 +6,11 @@ export function Example() {
       <helix-strands travel>
         <helix-strands-stop
           for="travel-opening"
-          variant="bend"
+          pattern="bend"
         ></helix-strands-stop>
         <helix-strands-stop
           for="travel-closing"
-          variant="waves"
+          pattern="waves"
         ></helix-strands-stop>
       </helix-strands>
 
@@ -20,14 +20,14 @@ export function Example() {
       >
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Automate the steps between your apps
         </helix-text>
       </section>
       <section className="section">
         <helix-text as="p">
-          Between the stops, the ribbon fills the gap in its own variant.
+          Between the stops, the ribbon fills the gap in its own pattern.
         </helix-text>
       </section>
       <section

@@ -31,8 +31,8 @@ export function Example() {
         <helix-text>You have nine unsaved changes. If you close now, they will be lost.</helix-text>
         <helix-button-group
           label="Dialog actions"
+          layout="spaced"
           slot="footer"
-          variant="spaced"
         >
           <helix-button
             emphasis="solid"

@@ -10,8 +10,8 @@ export function Example() {
       <helix-card separation="outlined">
         <helix-text
           as="h3"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Plan
         </helix-text>
@@ -20,8 +20,8 @@ export function Example() {
       <helix-card separation="outlined">
         <helix-text
           as="h3"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Team
         </helix-text>
@@ -30,8 +30,8 @@ export function Example() {
       <helix-card separation="outlined">
         <helix-text
           as="h3"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Support
         </helix-text>

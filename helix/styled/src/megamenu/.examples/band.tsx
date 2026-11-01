@@ -5,13 +5,13 @@ export function Example() {
       <helix-navigation label="Main">
         <helix-megamenu
           label="Products"
-          variant="band"
+          layout="band"
         >
           <div data-megamenu-group>
             <helix-text
               as="h3"
               data-megamenu-heading
-              variant="title"
+              scale="title"
             >
               Work
             </helix-text>
@@ -36,7 +36,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
-              variant="title"
+              scale="title"
             >
               Insights
             </helix-text>
@@ -61,7 +61,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
-              variant="title"
+              scale="title"
             >
               Connect
             </helix-text>
@@ -86,7 +86,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
-              variant="title"
+              scale="title"
             >
               More
             </helix-text>

@@ -50,7 +50,7 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
    * `outlined`: with no fill, a white thumb on a white page disappears.
    *
    * **The track itself is not on this axis, and `Tabs` reaches the same one
-   * from the other side.** There it is `variant="segmented"`, opted into,
+   * from the other side.** There it is `marker="segmented"`, opted into,
    * because a row of tabs is a row until asked; here it is the resting state,
    * because a group of toggles is one control. Same groove, opposite polarity,
    * and what decides the polarity is which reading is ordinary for the family.

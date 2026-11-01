@@ -136,24 +136,24 @@
    the target**: the target is eight pixels of hit area and the divider is a
    line, so lighting the first to say something about the second makes the line
    appear to change width. */
-:host(:not([variant="grip"])) [part="separator"]:hover::before,
-:host(:not([variant="grip"])) [part="separator"]:focus-visible::before,
-:host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
+:host(:not([handle="grip"])) [part="separator"]:hover::before,
+:host(:not([handle="grip"])) [part="separator"]:focus-visible::before,
+:host(:not([handle="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-hover-color, var(--helix-color-foreground-muted));
   inline-size: var(--splitter-hover-thickness, var(--helix-border-thick));
 }
 
 /* *And a divider that is actually moving goes primary.** Hover is a question and
    a drag is an answer, so they should not look the same. */
-:host(:not([variant="grip"])) [part="separator"][data-dragging]::before {
+:host(:not([handle="grip"])) [part="separator"][data-dragging]::before {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 
-:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([handle="grip"]))
   [part="separator"]:hover::before,
-:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([handle="grip"]))
   [part="separator"]:focus-visible::before,
-:host(:is([orientation="vertical"], [data-axis="vertical"]):not([variant="grip"]))
+:host(:is([orientation="vertical"], [data-axis="vertical"]):not([handle="grip"]))
   [part="separator"][data-dragging]::before {
   block-size: var(--splitter-hover-thickness, var(--helix-border-thick));
   inline-size: auto;
@@ -218,9 +218,9 @@
    rest, a page of nested splitters is a page of pills saying "boundary" at
    something that already looks like a boundary, and the line under each one is
    the mark that belongs there. **And it answers alone.** The line keeps its
-   color and its width in this shape, which is what the `:not([variant="grip"])`
+   color and its width in this shape, which is what the `:not([handle="grip"])`
    on the interest rules above is doing. */
-:host([variant="grip"]) [part="separator"]::after {
+:host([handle="grip"]) [part="separator"]::after {
   background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
   border-radius: var(--helix-radii-full);
   content: "";
@@ -232,7 +232,7 @@
 }
 
 /* Along the run, centered, and offset to the leading side of the line. */
-:host([variant="grip"]:not(:is([orientation="vertical"], [data-axis="vertical"])))
+:host([handle="grip"]:not(:is([orientation="vertical"], [data-axis="vertical"])))
   [part="separator"]::after {
   block-size: var(--splitter-grip-length, 2rem);
   inline-size: var(--splitter-grip-thickness, var(--helix-border-thick));
@@ -244,7 +244,7 @@
   );
 }
 
-:host([variant="grip"]:is([orientation="vertical"], [data-axis="vertical"]))
+:host([handle="grip"]:is([orientation="vertical"], [data-axis="vertical"]))
   [part="separator"]::after {
   block-size: var(--splitter-grip-thickness, var(--helix-border-thick));
   inline-size: var(--splitter-grip-length, 2rem);
@@ -257,16 +257,16 @@
 }
 
 /* Interest brings it in. */
-:host([variant="grip"]) [part="separator"]:hover::after,
-:host([variant="grip"]) [part="separator"]:focus-visible::after,
-:host([variant="grip"]) [part="separator"][data-dragging]::after {
+:host([handle="grip"]) [part="separator"]:hover::after,
+:host([handle="grip"]) [part="separator"]:focus-visible::after,
+:host([handle="grip"]) [part="separator"][data-dragging]::after {
   opacity: 1;
 }
 
 /* And a drag goes accent, for the reason the corner records: hover is a question
    and a drag is an answer, and a corner moving two dividers at once needs the
    pair to read as one gesture. */
-:host([variant="grip"]) [part="separator"][data-dragging]::after {
+:host([handle="grip"]) [part="separator"][data-dragging]::after {
   background-color: var(--splitter-drag-color, var(--helix-color-primary));
 }
 

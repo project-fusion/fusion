@@ -29,7 +29,7 @@ describe('image hooks', () => {
       /color: var\(--image-fallback-color, var\(--helix-color-foreground-muted\)\)/,
     )
     expect(sheet()).toMatch(
-      /--image-fallback-background-color,\s*var\(--image-placeholder-color, var\(--helix-color-surface-sunken\)\)/,
+      /--image-fallback-background-color,\s*var\(--image-placeholder-background-color, var\(--helix-color-surface-sunken\)\)/,
     )
   })
 

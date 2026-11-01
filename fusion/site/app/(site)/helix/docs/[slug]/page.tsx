@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         {/*
          *  The section, and then the document.
          */}
-        <helix-text emphasis="muted" variant="label">
+        <helix-text emphasis="muted" scale="label">
           {sectionOf(slug)}
         </helix-text>
 

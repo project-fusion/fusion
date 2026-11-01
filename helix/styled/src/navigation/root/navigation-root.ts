@@ -11,7 +11,7 @@ import { styles } from './navigation-root.css.js'
  * follow than a background that switches from one item to another, and the
  * movement shows which page you came from as well as which one is current.
  *
- * The marker depends on `variant`, as `Tabs`' mark does:
+ * The marker depends on `marker`, as `Tabs`' mark does:
  *
  * - Unset, it is a pill on the current destination, with nothing behind the
  *   row.

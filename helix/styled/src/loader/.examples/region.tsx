@@ -12,7 +12,7 @@ export function Example() {
         aria-label="Orders"
         id="orders"
       >
-        <helix-text variant="body">Orders appear here once they load.</helix-text>
+        <helix-text scale="body">Orders appear here once they load.</helix-text>
       </section>
     </helix-flex>
   )

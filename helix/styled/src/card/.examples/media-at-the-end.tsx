@@ -11,14 +11,14 @@ export function Example() {
       <helix-text
         as="h3"
         id="sessions-title"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Sessions
       </helix-text>
       <helix-text
         as="p"
-        variant="display"
+        scale="display"
       >
         12,481
       </helix-text>

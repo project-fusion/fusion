@@ -10,7 +10,7 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <helix-text variant="body">
+      <helix-text scale="body">
         Press <helix-kbd keys="mod+k" /> to search. The shortcut <helix-code>mod+k</helix-code>{' '}
         shows as ⌘K on a Mac and Ctrl+K on other computers.
       </helix-text>
@@ -29,7 +29,7 @@ export function Example() {
 
       <helix-text
         emphasis="muted"
-        variant="caption"
+        scale="caption"
       >
         {said}
       </helix-text>

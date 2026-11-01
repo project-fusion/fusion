@@ -6,7 +6,7 @@ export function Example() {
       hint="Choose an hour and a minute"
       label="Starts"
       name="starts"
-      variant="wheels"
+      picker="wheels"
     ></helix-time-input>
   )
 }

@@ -8,7 +8,7 @@
  */
 
 /** The three forms the ribbon takes. */
-export type StrandsVariant = 'bend' | 'ribbon' | 'sweep' | 'waves'
+export type StrandsPattern = 'bend' | 'ribbon' | 'sweep' | 'waves'
 
 /**
  * One point on the centerline: `x` as a share of the width, `y` in CSS pixels,
@@ -34,7 +34,7 @@ export interface PlacedStop {
   left?: number | undefined
   /** The target's right edge, as a share of the width, where it is known. */
   right?: number | undefined
-  variant: StrandsVariant
+  pattern: StrandsPattern
 }
 
 /**
@@ -361,7 +361,7 @@ const ribbon = (
  * The ribbon drawn inside its own box, which is what an element without
  * `travel` shows.
  *
- * @param variant The form to draw.
+ * @param pattern The form to draw.
  * @param at Where it sits across the box, as a share of the width. A wave
  *   crosses the whole width and does not read it.
  * @param height The box's height, in CSS pixels.
@@ -369,7 +369,7 @@ const ribbon = (
  *   bend's apex is drawn in pixels so it keeps its radius at any shape.
  */
 export const boxPath = (
-  variant: StrandsVariant,
+  pattern: StrandsPattern,
   at: number | undefined,
   height: number,
   width: number,
@@ -378,16 +378,16 @@ export const boxPath = (
      pushing each form to the edge of the viewport; a box is the frame the
      consumer chose, so its form stays where `at` puts it at any width. */
   const narrow = false
-  if (variant === 'bend') {
+  if (pattern === 'bend') {
     return bend(0, height, at ?? BEND_AT, narrow, width, 0.6)
   }
-  if (variant === 'waves') {
+  if (pattern === 'waves') {
     return wave(height * 0.5, height, false, narrow, width)
   }
-  if (variant === 'sweep') {
+  if (pattern === 'sweep') {
     /* From above the corner `at` names to the far side below the box. */
     return pagePath(
-      [{ at, height: height * 0.6, left: 0.08, right: 0.92, top: height * 0.4, variant: 'sweep' }],
+      [{ at, height: height * 0.6, left: 0.08, pattern: 'sweep', right: 0.92, top: height * 0.4 }],
       'ribbon',
       width,
       height,
@@ -526,7 +526,7 @@ const relax = (
  */
 export const pagePath = (
   stops: readonly PlacedStop[],
-  fill: StrandsVariant,
+  fill: StrandsPattern,
   width: number,
   height: number,
   page: number,
@@ -540,10 +540,10 @@ export const pagePath = (
   if (placed.length === 0) {
     if (fill === 'waves') {
       for (let y = height * 0.6; y < page; y += height * 1.3) {
-        placed.push({ at: undefined, height, top: y, variant: 'waves' })
+        placed.push({ at: undefined, height, pattern: 'waves', top: y })
       }
     } else if (fill === 'bend' || fill === 'sweep') {
-      placed.push({ at: undefined, height, top: 0, variant: fill })
+      placed.push({ at: undefined, height, pattern: fill, top: 0 })
     }
   }
 
@@ -553,7 +553,7 @@ export const pagePath = (
   let phase = 1.2
   let cursor = 0
   let fromRight = true
-  let previous: StrandsVariant | undefined
+  let previous: StrandsPattern | undefined
   /* Where the ribbon last laid down ended, which a wave then leans out of. */
   let joined: number | undefined
   /* The axis the next stretch of ribbon swings about, which a bend sets so the
@@ -565,7 +565,7 @@ export const pagePath = (
   /* Points a form laid with tight turns on purpose, which `relax` leaves. */
   const kept = new Set<number>()
 
-  const gap = (to: number, next: StrandsVariant | undefined): void => {
+  const gap = (to: number, next: StrandsPattern | undefined): void => {
     /* **A ribbon a wave carried on runs on to the next form**, however near
        it is: the wave has already turned down into it, and dropping it left
        the strand ending in the middle of the page. */
@@ -659,16 +659,16 @@ export const pagePath = (
   const ribbonAfter = (from: number, next: PlacedStop | undefined): boolean =>
     next !== undefined &&
     next.top - from >= height * 0.7 &&
-    !(next.variant === 'waves' && next.top - from < height * 1.5)
+    !(next.pattern === 'waves' && next.top - from < height * 1.5)
 
   for (const [index, stop] of placed.entries()) {
     joined = undefined
     /* A sweep comes in from the page's top corner, so no ribbon leads to it. */
-    if (stop.variant !== 'sweep') {
-      gap(stop.top, stop.variant)
+    if (stop.pattern !== 'sweep') {
+      gap(stop.top, stop.pattern)
     }
     carried = false
-    if (stop.variant === 'bend') {
+    if (stop.pattern === 'bend') {
       const span = Math.min(stop.height, height)
       const at = stop.at ?? BEND_AT
       /* The ribbon takes over where its curve runs at the arm's slope, and
@@ -736,7 +736,7 @@ export const pagePath = (
         phase = Math.PI / 2 - turn
       }
       fromRight = true
-    } else if (stop.variant === 'sweep') {
+    } else if (stop.pattern === 'sweep') {
       /* **A sweep crosses the page in one diagonal**, half a sine from a crest
          above the page's top corner on the side `at` is nearer to a crest
          at its target's far top corner, where the ribbon carries on down the
@@ -781,7 +781,7 @@ export const pagePath = (
         ])
       }
       carryFrom(way, allowed(radiusAt(1)), glow, descent / count)
-    } else if (stop.variant === 'waves') {
+    } else if (stop.pattern === 'waves') {
       const carries =
         joined !== undefined && ribbonAfter(stop.top + height * 0.5, placed[index + 1])
       const end = points.at(-1)
@@ -864,7 +864,7 @@ export const pagePath = (
       points.push([stop.at ?? 0.5, y, WIDTH.ribbon, GLOW.ribbon])
       cursor = y
     }
-    previous = stop.variant
+    previous = stop.pattern
   }
   if (previous !== 'waves') {
     gap(page + height * 0.4, undefined)

@@ -47,7 +47,7 @@ import '../../option/root/index.js'
  * @description
  * Shows the times at each `step` as a `Listbox`, which provides the keyboard
  * behavior, typeahead, scrolling into view, and announcements for a set of
- * options. `variant="wheels"` shows a column each for the hour, the minute, and
+ * options. `picker="wheels"` shows a column each for the hour, the minute, and
  * the meridiem, and one for the second with `seconds`. Left and Right move
  * between the wheels, and Tab does too.
  *
@@ -334,7 +334,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * separate "from" and "to" control, is two answers to what a product asks as
    * one, and it makes the between part impossible to show.
    *
-   * **Neither works on wheels and the variant falls back.** A range on
+   * **Neither works on wheels and the picker falls back.** A range on
    * wheels is two sets of wheels, which is two controls; a multiple is a set,
    * and a wheel has exactly one value by construction. Rather than draw
    * something that cannot say what it holds, `wheels` renders as a list
@@ -716,7 +716,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     if (this.mode !== undefined) {
       return
     }
-    if (this.variant !== 'wheels') {
+    if (this.picker !== 'wheels') {
       this.highlightNearest()
       this.partNamed<HTMLElement & { reveal?: () => void }>('list')?.reveal?.()
       return
@@ -907,7 +907,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * only the departure has to be named.
    */
   @property({ reflect: true })
-  variant?: 'list' | 'wheels'
+  picker?: 'list' | 'wheels'
 
   /**
    * Reports "required and empty", or clears it.
@@ -1165,7 +1165,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.reportRequired()
-    if (this.variant === 'wheels') {
+    if (this.picker === 'wheels') {
       this.reveal()
       void this.revealWhenSettled()
     } else if (!this.listRevealed) {
@@ -1327,7 +1327,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   }
 
   /**
-   * The flat list of times, for the variant that is not wheels, behind a seam the styled tier can move.
+   * The flat list of times, for the picker that is not wheels, behind a seam the styled tier can move.
    *
    * A method rather than a fragment inline, so a tier above can render its own,
    * wrap this one, pass it a property the base does not know about, or leave it
@@ -1386,7 +1386,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     /* A mode falls back to the list, for the reason the property records: a
        range on wheels is two sets of wheels and a multiple is a set, which a
        wheel cannot hold. */
-    if (this.variant === 'wheels' && this.mode === undefined) {
+    if (this.picker === 'wheels' && this.mode === undefined) {
       return html`${this.renderSlottedLabel()}${this.renderSpinner()}${this.renderNow()}${this.renderHint()}${this.renderPickerFeedback()}`
     }
     return html`${this.renderSlottedLabel()}${this.renderList()}${this.renderNow()}${this.renderHint()}${this.renderPickerFeedback()}`

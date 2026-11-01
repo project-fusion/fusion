@@ -4,7 +4,7 @@ export function Example() {
   return (
     <helix-splitter
       default-position="40"
-      variant="grip"
+      handle="grip"
     >
       <helix-card
         separation="plain"

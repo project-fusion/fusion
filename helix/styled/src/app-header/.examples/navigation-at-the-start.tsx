@@ -2,8 +2,8 @@ export function Example() {
   return (
     <helix-app-header content-align="start">
       <helix-text
+        scale="label"
         slot="start"
-        variant="label"
       >
         Logo
       </helix-text>

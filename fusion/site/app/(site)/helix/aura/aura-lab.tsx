@@ -137,20 +137,20 @@ export function AuraLab(): React.ReactElement {
           gain={knobs.gain}
           interaction={interaction === 'native' ? undefined : interaction}
           interactive={interactive || undefined}
+          pattern={current?.name}
           reach={knobs.reach}
           scale={knobs.scale}
           speed={knobs.speed}
           terminus={aim === 'terminus' ? knobs.terminus : undefined}
           tilt={aim === 'tilt' ? knobs.tilt : undefined}
           variance={knobs.variance}
-          variant={current?.name}
         ></helix-aura>
       </div>
       <div className="auraScrim" />
 
       <helix-flex class={`auraShell`} data-shell direction="column" gap="xl">
         <helix-flex direction="column" gap="sm">
-          <helix-text emphasis="muted" variant="label">
+          <helix-text emphasis="muted" scale="label">
             Helix. Aura
           </helix-text>
           <HeroCopy lede={current?.body} title={current?.name} />

@@ -197,7 +197,7 @@ export class HelixAura extends HelixElement {
 
   /**
    * What the pointer does to the field. Set it to override the default for the
-   * `variant`.
+   * `pattern`.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
    * of: braid leans, rays are occluded, threads pinch, particles scatter, a
@@ -341,14 +341,14 @@ export class HelixAura extends HelixElement {
    * for the same reason every axis here has none: a default on a reflected
    * property writes the attribute onto every host anybody renders.
    *
-   * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * **`pattern` and not `shape`.** `shape` is an axis about geometry, `circle`
    * against `square`, `arc` against `ring`, and it is registered as one.
    * Aurora, braid and caustics are not geometries; they are twelve names for a
-   * look, which is what `variant` is for by the rule the registry already
+   * look, which is what `pattern` is for by the rule the registry already
    * states.
    */
   @property({ reflect: true })
-  variant?:
+  pattern?:
     | 'aurora'
     | 'braid'
     | 'caustics'
@@ -1088,7 +1088,7 @@ export class HelixAura extends HelixElement {
     gl.uniform3fv(uniforms.uPeak ?? null, peak)
 
     gl.uniform1f(uniforms.uTime ?? null, this.elapsed)
-    gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.variant ?? 'braid'))
+    gl.uniform1i(uniforms.uShape ?? null, SHAPES.indexOf(this.pattern ?? 'braid'))
     /* Each axis wanders on its own period. The seeds are deliberately not
        simple ratios of each other: two axes on periods that divide would come
        back into phase and give the whole field a beat. */

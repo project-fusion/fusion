@@ -174,7 +174,10 @@
  * `surface-inverse` is the ground that stays dark while the page goes light,
  * and `foreground-inverse` is the ink solved against it. */
 [part="column"] [part~="option"]:state(selected)::part(label) {
-  background-color: var(--time-picker-selected-color, var(--helix-color-surface-inverse));
+  background-color: var(
+    --time-picker-selected-background-color,
+    var(--helix-color-surface-inverse)
+  );
   color: var(--time-picker-selected-foreground-color, var(--helix-color-foreground-inverse));
 }
 

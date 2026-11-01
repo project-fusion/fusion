@@ -5,7 +5,7 @@ export function Example() {
     <div className="stage">
       <helix-strands
         className="field"
-        variant="waves"
+        pattern="waves"
       ></helix-strands>
     </div>
   )

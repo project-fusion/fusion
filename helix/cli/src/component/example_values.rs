@@ -274,7 +274,7 @@ fn read(document: &str, declared: &Declared, where_: &str, findings: &mut Vec<Fi
                     detail: "It held four axes at once: `separation` is where a surface ends, \
                              `emphasis` is how much ink a control claims, `material` is what it \
                              is made of, `tone` is what it means, and a component-specific \
-                             choice that is none of those is `variant`."
+                             choice that is none of those is named for what it chooses."
                         .to_owned(),
                     file: where_.to_owned(),
                     message: format!(

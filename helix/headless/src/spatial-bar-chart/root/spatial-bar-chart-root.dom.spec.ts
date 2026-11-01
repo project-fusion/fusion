@@ -240,7 +240,7 @@ describe('a toned bar', () => {
 
 describe('a row', () => {
   test('draws its floor, a plate for each day, and the days under it, the toned one in its tone', async () => {
-    const element = await days('variant="row"')
+    const element = await days('layout="row"')
     expect(all(element, 'floor')).toHaveLength(3)
     const names = all(element, 'tick')
     expect(names.map((name) => name.textContent)).toEqual(['Mon', 'Tue', 'Wed'])
@@ -249,14 +249,14 @@ describe('a row', () => {
   })
 
   test('with no box, draws the bars and the lit value alone', async () => {
-    const element = await days('variant="row" no-box')
+    const element = await days('layout="row" no-box')
     expect(all(element, 'floor')).toHaveLength(0)
     expect(all(element, 'tick')).toHaveLength(0)
     expect(all(element, 'value')).toHaveLength(1)
   })
 
   test('a diagonal draws its floor and names climbing to the right', async () => {
-    const element = await days('variant="diagonal"')
+    const element = await days('layout="diagonal"')
     expect(all(element, 'floor')).toHaveLength(3)
     const names = all(element, 'tick')
     expect(names.map((name) => name.textContent)).toEqual(['Mon', 'Tue', 'Wed'])
@@ -268,7 +268,7 @@ describe('a row', () => {
 
   test('says how many bars fit only where a row is measured with a bar size', async () => {
     /* No layout here, so nothing is measured and the page shows every row. */
-    const element = (await days('variant="diagonal"')) as Plot & { fits?: number }
+    const element = (await days('layout="diagonal"')) as Plot & { fits?: number }
     element.style.setProperty('--spatial-bar-chart-bar-size', '18px')
     expect(element.fits).toBeUndefined()
     const grid = (await days()) as Plot & { fits?: number }
@@ -280,7 +280,7 @@ describe('a row', () => {
    the table says, "64,200" and not "64200". */
 describe('the tooltip', () => {
   test('is centered on the bar and points at the top of its outline', async () => {
-    const element = await days('variant="diagonal"')
+    const element = await days('layout="diagonal"')
     element.requestActive(1)
     await element.updateComplete
     const anchor = element.shadowRoot?.querySelector('foreignObject')
@@ -303,7 +303,7 @@ describe('the tooltip', () => {
   })
 
   test("shows the cell's own text, as the page wrote it", async () => {
-    const element = await days('variant="diagonal"')
+    const element = await days('layout="diagonal"')
     element.requestActive(1)
     await element.updateComplete
     const value = element.shadowRoot?.querySelector('[part="tooltip-value"]')
@@ -316,7 +316,7 @@ describe('growing in', () => {
     bars(element).map((bar) => bar.querySelectorAll('[part="face"]').length)
 
   test('waits flat on the floor until the chart is seen', async () => {
-    const element = await days('grow variant="row"')
+    const element = await days('grow layout="row"')
     /* No side is drawn on a bar with no height, only its top. */
     expect(faces(element)).toEqual([1, 1, 1])
   })
@@ -324,7 +324,7 @@ describe('growing in', () => {
   test('stands at its height at once where the page has paused its motion', async () => {
     document.documentElement.setAttribute('data-helix-motion', 'paused')
     try {
-      const element = await days('grow variant="row"')
+      const element = await days('grow layout="row"')
       expect(faces(element)).toEqual([3, 3, 3])
     } finally {
       document.documentElement.removeAttribute('data-helix-motion')
@@ -332,7 +332,7 @@ describe('growing in', () => {
   })
 
   test('without grow, the bars stand at their height', async () => {
-    const element = await days('variant="row"')
+    const element = await days('layout="row"')
     expect(faces(element)).toEqual([3, 3, 3])
   })
 })
@@ -401,7 +401,7 @@ describe('growing in again', () => {
     bars(element).map((bar) => bar.querySelectorAll('[part="face"]').length)
 
   test('stand at the floor again once the chart has left the view, and grow when it returns', async () => {
-    const element = await days('grow grow-again variant="row"')
+    const element = await days('grow grow-again layout="row"')
     sees(true)
     await settle(element)
     expect(faces(element)).toEqual([3, 3, 3])
@@ -415,7 +415,7 @@ describe('growing in again', () => {
   })
 
   test('stand where they are, without grow-again, when the chart leaves the view', async () => {
-    const element = await days('grow variant="row"')
+    const element = await days('grow layout="row"')
     sees(true)
     await settle(element)
     sees(false)
@@ -424,7 +424,7 @@ describe('growing in again', () => {
   })
 
   test('a bar a later table adds grows from the floor while the others stand', async () => {
-    const element = await days('grow variant="row"')
+    const element = await days('grow layout="row"')
     sees(true)
     await settle(element)
     const row = document.createElement('tr')

@@ -64,7 +64,7 @@ export function DocumentPage({
         <helix-text
           class={styles.documentKicker}
           emphasis={hero ? undefined : 'muted'}
-          variant="label"
+          scale="label"
         >
           {kicker}
         </helix-text>

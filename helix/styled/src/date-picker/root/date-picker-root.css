@@ -147,12 +147,18 @@
 }
 
 [part~="period-selected"] {
-  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+  background-color: var(
+    --date-picker-selected-background-color,
+    var(--helix-color-surface-inverse)
+  );
   color: var(--helix-color-foreground-inverse);
 }
 
 [part~="period-selected"]:hover:not([aria-disabled]) {
-  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+  background-color: var(
+    --date-picker-selected-background-color,
+    var(--helix-color-surface-inverse)
+  );
 }
 
 :host(:not(:disabled)) [part~="period-disabled"] {
@@ -329,7 +335,10 @@
    inverting with it. A ground that must stay dark while the page goes light is
    `surface-inverse`, which is what it says. */
 [part~="cell"][aria-selected]:not([data-range-middle]) [part~="day"] {
-  background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
+  background-color: var(
+    --date-picker-selected-background-color,
+    var(--helix-color-surface-inverse)
+  );
   color: var(--helix-color-foreground-inverse);
 }
 

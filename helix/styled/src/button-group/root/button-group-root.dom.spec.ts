@@ -40,12 +40,12 @@ describe('button group', () => {
     expect(slotted(await mount(group))).toHaveLength(3)
   })
 
-  test('variant reflects, since joining is a rule keyed on it, and rests on nothing', async () => {
-    const host = (await mount(group)) as Updatable & { variant?: string }
-    expect(host.hasAttribute('variant')).toBe(false)
-    host.variant = 'spaced'
+  test('layout reflects, since joining is a rule keyed on it, and rests on nothing', async () => {
+    const host = (await mount(group)) as Updatable & { layout?: string }
+    expect(host.hasAttribute('layout')).toBe(false)
+    host.layout = 'spaced'
     await host.updateComplete
-    expect(host.getAttribute('variant')).toBe('spaced')
+    expect(host.getAttribute('layout')).toBe('spaced')
   })
 
   test('joined by default: each button is pulled onto its neighbor and the inner corners go flat', () => {
@@ -53,18 +53,18 @@ describe('button group', () => {
        control inside each button's shadow root and a rule in here cannot reach
        it. The same hooks serve a consumer's own anchor styled as a button. */
     const joined = sheet()
-      .split(':host(:not([variant="spaced"])) ::slotted(*:not(:first-child))')
+      .split(':host(:not([layout="spaced"])) ::slotted(*:not(:first-child))')
       .slice(1)
       .join('\n')
     expect(joined).toContain('margin-inline-start: calc(var(--helix-border-thin) * -1)')
     expect(joined).toContain('--button-radius-start: 0')
-    expect(rule(':host(:not([variant="spaced"])) ::slotted(*:not(:last-child))')).toContain(
+    expect(rule(':host(:not([layout="spaced"])) ::slotted(*:not(:last-child))')).toContain(
       '--button-radius-end: 0',
     )
   })
 
   test('spaced puts air between them, and only then', () => {
-    expect(rule(':host([variant="spaced"])')).toContain('gap: var(--button-group-gap,')
+    expect(rule(':host([layout="spaced"])')).toContain('gap: var(--button-group-gap,')
     expect(rule(':host')).not.toContain('gap:')
   })
 
@@ -74,7 +74,7 @@ describe('button group', () => {
        pull cleared, or every button after the first sits a border to the left
        of the one above it. */
     const stacked = rule(
-      ':host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:first-child))',
+      ':host([orientation="vertical"]:not([layout="spaced"])) ::slotted(*:not(:first-child))',
     )
     expect(stacked).toContain('margin-block-start: calc(var(--helix-border-thin) * -1)')
     expect(stacked).toContain('--button-radius-start-start: 0')
@@ -192,7 +192,7 @@ describe('button group', () => {
         ['0px', '0px', '0px', '0px'],
         ['0px', '0px', '8px', '8px'],
       ])
-      expect(await corners('variant="spaced"')).toEqual([
+      expect(await corners('layout="spaced"')).toEqual([
         ['8px', '8px', '8px', '8px'],
         ['8px', '8px', '8px', '8px'],
         ['8px', '8px', '8px', '8px'],

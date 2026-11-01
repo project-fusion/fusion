@@ -60,7 +60,7 @@
 /* The resting placeholder, drawn here rather than slotted, so an image with
    nothing slotted still reserves a surface instead of a hole. */
 [part="placeholder"] {
-  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
+  background-color: var(--image-placeholder-background-color, var(--helix-color-surface-sunken));
 }
 
 /* A slotted placeholder fills the box rather than sitting in the middle of it.
@@ -75,7 +75,7 @@
 [part="fallback"] {
   background-color: var(
     --image-fallback-background-color,
-    var(--image-placeholder-color, var(--helix-color-surface-sunken))
+    var(--image-placeholder-background-color, var(--helix-color-surface-sunken))
   );
   color: var(--image-fallback-color, var(--helix-color-foreground-muted));
 }

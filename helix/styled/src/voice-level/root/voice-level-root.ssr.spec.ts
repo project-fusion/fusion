@@ -12,12 +12,12 @@ describe('voice level server output', () => {
     /* There is no canvas to draw on a server, so the frame is the whole of
        what it sends, whatever the level. */
     expect(
-      servedParts(ssr(html`<helix-voice-level level="0.6" variant="waves"></helix-voice-level>`)),
+      servedParts(ssr(html`<helix-voice-level level="0.6" pattern="waves"></helix-voice-level>`)),
     ).toEqual(['canvas'])
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    /* `variant` is the only reflected property and it takes no default. */
+    /* `pattern` is the only reflected property and it takes no default. */
     expect(
       hostAttributes(ssr(html`<helix-voice-level></helix-voice-level>`), 'helix-voice-level'),
     ).toEqual([])
@@ -32,12 +32,12 @@ describe('voice level server output', () => {
     ).toEqual([])
   })
 
-  test('the variant is reflected, which the stylesheet sizes by', () => {
+  test('the pattern is reflected, which the stylesheet sizes by', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-voice-level .variant=${'waves'}></helix-voice-level>`),
+        ssr(html`<helix-voice-level .pattern=${'waves'}></helix-voice-level>`),
         'helix-voice-level',
       ),
-    ).toEqual(['variant'])
+    ).toEqual(['pattern'])
   })
 })

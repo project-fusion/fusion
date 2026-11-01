@@ -11,7 +11,7 @@ type Stop = HTMLElement & {
   at: number | undefined
   for: string | undefined
   updateComplete: Promise<boolean>
-  variant: string | undefined
+  pattern: string | undefined
 }
 
 describe('strands stop', () => {
@@ -33,11 +33,11 @@ describe('strands stop', () => {
        old value. */
     const stop = (await mount('<helix-strands-stop></helix-strands-stop>')) as Stop
     stop.for = 'pricing'
-    stop.variant = 'waves'
+    stop.pattern = 'waves'
     stop.at = 0.25
     await stop.updateComplete
     expect(stop.getAttribute('for')).toBe('pricing')
-    expect(stop.getAttribute('variant')).toBe('waves')
+    expect(stop.getAttribute('pattern')).toBe('waves')
     expect(stop.getAttribute('at')).toBe('0.25')
   })
 

@@ -227,7 +227,7 @@ describe('the list a time input opens', () => {
   /* Measured before this: turning the hour wheel closed the panel before a
      minute could be chosen. */
   test('stays open while the wheels turn', async () => {
-    const host = await field('default-value="09:30" variant="wheels"')
+    const host = await field('default-value="09:30" picker="wheels"')
     host.open = true
     await host.updateComplete
     await pick(host, '10:30')

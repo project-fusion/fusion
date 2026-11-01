@@ -19,7 +19,7 @@ const PATCH = `--- a/a.ts
  end
 `
 
-type Block = Updatable & { variant?: string }
+type Block = Updatable & { layout?: string }
 
 const block = async (attrs = 'diff', content = PATCH): Promise<Block> => {
   const host = (await mount(
@@ -124,13 +124,13 @@ describe('a code block reading a diff', () => {
   })
 
   test('writes no arrangement onto markup nobody asked for one on', async () => {
-    expect((await block()).hasAttribute('variant')).toBe(false)
+    expect((await block()).hasAttribute('layout')).toBe(false)
   })
 })
 
 describe('a split diff', () => {
   test('puts the old and the new version in blocks of their own, row for row', async () => {
-    const host = await block('diff variant="split"')
+    const host = await block('diff layout="split"')
     const [old] = parts(host, 'old')
     const [now] = parts(host, 'new')
     expect(old?.querySelectorAll('[part="removed"]')).toHaveLength(1)
@@ -143,7 +143,7 @@ describe('a split diff', () => {
 
   test('folds on both sides, with one control a reader reaches', async () => {
     const long = `--- a/a.ts\n+++ b/a.ts\n@@ -1,6 +1,6 @@\n a\n b\n c\n d\n-e\n+E\n f\n`
-    const host = await block('diff variant="split" context-lines="0"', long)
+    const host = await block('diff layout="split" context-lines="0"', long)
     const [old] = parts(host, 'old')
     const [now] = parts(host, 'new')
     const shadow = now?.querySelector('[part="fold"]') as HTMLElement
