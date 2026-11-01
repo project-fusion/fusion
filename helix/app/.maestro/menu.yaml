@@ -2,6 +2,8 @@
 # under the way back, which returns to the top page, and choosing a row
 # closes the menu. The events example logs what the menu sends as it opens,
 # as a row is chosen, and as it closes. Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
 appId: dev.fusion.helix.app
 name: Menu
 tags:
@@ -46,5 +48,5 @@ tags:
 - extendedWaitUntil:
     visible: .*"rename".*
     timeout: 5000
-- assertVisible: helix-before-close
+- assertVisible: .*helix-before-close.*
 - stopRecording
