@@ -1,4 +1,4 @@
-import { mix, token } from '../style.js'
+import { mix, scheme, token } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -42,7 +42,12 @@ export default fragment(
           iconButtonFillHover: own.iconButtonToneHover,
           iconButtonOnTone: token('color-background'),
           iconButtonTone: token('color-foreground'),
-          iconButtonToneHover: mix(token('color-foreground'), 86, token('color-background')),
+          /* Two whole colors, since a scheme is not valid in a percentage. Each
+             moves at least 1.3:1 from rest, from a fill with nothing past it. */
+          iconButtonToneHover: scheme(
+            mix(token('color-foreground'), 72, token('color-background')),
+            mix(token('color-foreground'), 90, token('color-background')),
+          ),
         },
       }),
       rule(

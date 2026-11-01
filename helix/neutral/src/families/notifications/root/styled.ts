@@ -188,12 +188,6 @@ export default styles(
       ],
     ),
     include(collectionError),
-    on('error', [
-      rule({
-        color: hook.errorColor,
-        paddingBlock: token('space-lg'),
-        paddingInline: token('space-md'),
-      }),
-    ]),
+    on('error', [rule({ color: hook.errorColor })]),
   ],
 )

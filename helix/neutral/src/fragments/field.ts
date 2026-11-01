@@ -19,7 +19,6 @@ export default fragment(
       rule({
         color: token('color-foreground'),
         fontFamily: token('font-sans'),
-        fontSize: token('text-field-label'),
         fontWeight: token('weight-medium'),
         lineHeight: token('leading-tight'),
         /* A long unbroken word breaks inside the column it was given. */
