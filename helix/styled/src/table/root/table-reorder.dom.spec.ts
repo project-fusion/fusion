@@ -41,7 +41,7 @@ describe('a reorderable table', () => {
     expect(grip).toContain('var(--table-grip-color, var(--helix-color-foreground-muted))')
     expect(grip).toContain('touch-action: none')
     expect(rule('helix-table-row', '[part="grip-button"][aria-disabled="true"]')).toContain(
-      'opacity: var(--table-grip-disabled-opacity, 0.4)',
+      'opacity: var(--table-grip-disabled-opacity, var(--helix-opacity-disabled))',
     )
   })
 
