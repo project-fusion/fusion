@@ -25,23 +25,23 @@
   - paragraph: Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.
   - figure:
     - img "What goes into Fusion and what comes out Your brand, your code and your decisions flow into Fusion. Out of it come Helix, which checks every screen, and Cortex, which keeps every decision with its reason.": What you bring your brand your code your decisions What comes out Helix every screen, checked Cortex every decision kept with its reason
-  - heading "An interface is cheap to start and expensive to keep" [level=2]
-  - paragraph: The first screen takes a morning. A second brand, a framework migration, and an accessibility audit take the rest of the year, and none of them is visible on the day you start. Helix is built for that later work.
+  - heading "AI writes a screen in seconds, and every agent writes a different one" [level=2]
+  - paragraph: Each agent chooses its own colors, spacing, and components. Your product drifts with every change, and nothing reports it. Helix gives every agent the same components and checks what each one writes.
   - paragraph: Theming
-  - paragraph: Add a second brand with one color
+  - paragraph: Set your brand with one color
   - list:
     - listitem: Enter one brand color and get a full palette
     - listitem: Helix rejects a palette it cannot make readable
   - paragraph: Components
-  - paragraph: Switch frameworks without a rewrite
+  - paragraph: Use one system in every framework
   - list:
     - listitem: Custom elements that run in any framework, or in none
     - listitem: Types for React, Vue, and Svelte from one manifest
   - paragraph: Checks
-  - paragraph: Find problems before an audit does
+  - paragraph: Catch what an agent gets wrong
   - list:
     - listitem: Contrast is measured on every release
-    - listitem: Ten generators check the code and fail the build when it drifts
+    - listitem: The helix scan command checks your code against the Helix version you installed
   - paragraph: Agents
   - paragraph: Give AI agents the reference you read
   - list:
@@ -110,7 +110,7 @@
   - radio "Good" [checked]
   - radio "Great"
   - paragraph: Checks
-  - heading "Find problems before an audit does" [level=2]
+  - heading "Catch what an agent gets wrong" [level=2]
   - paragraph: Contrast is measured on every release
   - text: One pair that failed
   - paragraph: Body text in this gray
