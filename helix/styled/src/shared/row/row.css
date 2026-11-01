@@ -1,0 +1,13 @@
+/* The row of a list that opens from a control: Option in a Select, Combobox, or
+   Listbox, and Item in a Menu. One height, type, and weight, so a menu and a
+   select opened side by side read as one kind of list. A step below the control
+   they open from, at whatever density that control is in. Compose with the
+   family's own sheet. */
+[part~="item"] {
+  box-sizing: border-box;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-control);
+  font-weight: var(--helix-weight-regular);
+  min-block-size: var(--helix-size-control-tight);
+  user-select: none;
+}

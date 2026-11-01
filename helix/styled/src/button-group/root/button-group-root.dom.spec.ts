@@ -104,7 +104,7 @@ describe('button group', () => {
       '--helix-size-control: var(--helix-size-control-lg)',
     )
     expect(rule(':host([size="sm"])')).toContain(
-      '--helix-size-control-tight: calc(var(--helix-size-control) * 0.8)',
+      '--helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px)',
     )
   })
 

@@ -848,7 +848,9 @@ export const TOKENS: Token[] = [
      density region, which is most pages, and losing it is not a subtle
      failure: measured with it absent, a select's caret drew at 950px and a
      menu item at 18. */
-  ['size-control-tight', 'calc(var(--helix-size-control) * 0.8)'],
+  /* Rounded, so a row does not land between pixels: 25.6 and 38.4 at `sm` and
+     `lg` before October 31, 2026. */
+  ['size-control-tight', 'round(calc(var(--helix-size-control) * 0.8), 1px)'],
   ['size-control-loose', 'calc(var(--helix-size-control) * 1.2)'],
   ['size-icon-tight', 'calc(var(--helix-size-icon) * 0.8)'],
   ['size-icon-loose', 'calc(var(--helix-size-icon) * 1.2)'],

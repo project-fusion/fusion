@@ -5,7 +5,7 @@
      range can paint the whole track and stay continuous. */
   --_calendar-track: var(--date-picker-track-size, 2.5rem);
   --_calendar-row: var(--date-picker-row-size, 2.25rem);
-  --_calendar-day: var(--date-picker-day-size, 1.875rem);
+  --_calendar-day: var(--date-picker-day-size, calc(var(--helix-size-control) * 0.75));
   display: inline-block;
 }
 

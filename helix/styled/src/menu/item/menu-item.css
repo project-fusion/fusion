@@ -12,13 +12,6 @@
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: grid;
-  /* Chrome, at the size the rest of the chrome is. A menu is a compact surface
-     by nature, the way a toolbar and a status bar are, and 14px next to a
-     toolbar whose buttons read at 12 made the menu the one thing not following
-     the room it was opened from. */
-  font-size: var(--helix-text-xs);
-  /* A shade heavier than body text. */
-  font-weight: var(--helix-weight-medium);
   /* **No `column-gap`, and the seams are inside the tracks instead.** A zero
      width track still has a gap beside it, so a page that reserves nothing would
      keep the eight pixels that used to separate a column from the label and the
@@ -35,18 +28,9 @@
     minmax(0, 1fr)
     auto
     var(--menu-item-end, 0px);
-  /* **The menu's own step, not a step inside it.** The surface already moves
-     `--helix-size-control` to `sm` so that "a control slotted into a row is the
-     size the rows are"; that only held while `-tight` here was substituted at
-     the root, where it happened to equal `sm` too. Re-derived where the surface
-     moves it, `-tight` is a step below `sm` and rows came out at 25.6 while a
-     slotted control stayed at 32. Reading the step the surface set says what
-     the surface's note means. */
-  min-block-size: var(--helix-size-control);
   /* The inset is padding on the row and nothing else. */
   padding-inline: var(--helix-space-sm);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
-  user-select: none;
 }
 
 /* Relative to the menu's own surface. */

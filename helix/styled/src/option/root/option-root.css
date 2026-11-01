@@ -18,15 +18,7 @@
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: flex;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-control);
   gap: var(--helix-space-xs);
-  /* A stated size rather than one that falls out of the padding, so every row in
-     a list is the same height whatever is slotted into it: a row with an icon in
-     it is otherwise taller than the one above it, and a list whose rows differ
-     by two pixels reads as a list nobody measured. */
-  min-block-size: var(--helix-size-control-tight);
-  box-sizing: border-box;
   /* Through a hook, for the reason the inline inset above is: a panel that wants
      roomier rows says one thing and the group headings move with them. */
   padding-block: var(--option-block-padding, var(--helix-space-2xs));
@@ -34,8 +26,6 @@
      it came from have to hold their words on the same column, or the chosen
      answer shifts sideways when the panel opens. */
   padding-inline: var(--option-padding, var(--helix-space-xs));
-  /* A picker, not prose. */
-  user-select: none;
 }
 
 /* *The column that carries the words, and the caption when there is one.** It

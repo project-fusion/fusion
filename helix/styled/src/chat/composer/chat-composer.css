@@ -381,7 +381,7 @@
 [part="end"] {
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);

@@ -16,7 +16,9 @@
      until a list turns it on, and an `auto` track with no items takes no space.
      The grip's track is the same: a list that does not reorder draws no grip. */
   grid-template-columns: auto auto 1fr auto auto;
-  padding: var(--list-item-padding, var(--helix-space-sm) var(--helix-space-md));
+  /* The height of a control at this density, and two lines grow from it. */
+  min-block-size: var(--helix-size-control);
+  padding: var(--list-item-padding, calc(var(--helix-space-control) * 0.5) var(--helix-space-md));
 }
 
 /* The rail: the ordinal, at the start edge of the block rather than beside the
