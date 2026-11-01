@@ -62,9 +62,7 @@ export const pressReach = (
         marginTop: -size / 2,
         position: 'absolute',
         top: '50%',
-        ...(across
-          ? { left: '50%', marginLeft: -size / 2, width: size }
-          : { left: 0, right: 0 }),
+        ...(across ? { left: '50%', marginLeft: -size / 2, width: size } : { left: 0, right: 0 }),
       }}
       testID="press-reach"
     />
