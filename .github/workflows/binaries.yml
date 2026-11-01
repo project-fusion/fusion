@@ -129,7 +129,7 @@ jobs:
       # one domain's Rust restores the other's binary.
       - name: Restore a binary built from these sources
         id: built
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: >-
             ${{ matrix.domain }}-cli-${{ matrix.target }}-${{ matrix.domain == 'helix' && hashFiles(
@@ -247,6 +247,17 @@ jobs:
         if: matrix.runs && matrix.domain == 'helix'
         shell: bash
         run: '"$BINARY" visual compare --help >/dev/null'
+
+      # **Its own step, before the job ends.** Saved at the end of the job, this
+      # ran after the Cargo cache had cleaned `target`, so the binary was gone
+      # whenever that cache saved, as `Path(s) ... do not exist` said on November 1,
+      # 2026, and the next release with the same sources would build it again.
+      - name: Save the binary for these sources
+        if: steps.built.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: ${{ steps.built.outputs.cache-primary-key }}
+          path: ${{ env.BINARY }}
 
       - name: Upload
         if: inputs.version != ''

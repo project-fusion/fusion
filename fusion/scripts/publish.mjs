@@ -39,7 +39,7 @@
  *   node fusion/scripts/publish.mjs --domain helix --preflight
  *   node fusion/scripts/publish.mjs --domain helix --bootstrap
  */
-import { execFileSync } from 'node:child_process'
+import { execFile, execFileSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
@@ -96,6 +96,43 @@ if (packages.length === 0) {
 
 const run = (command, args, cwd) =>
   execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+
+/** `run`, for the steps that go through the packages a few at a time. */
+const runLater = (command, args, cwd) =>
+  new Promise((resolve, reject) => {
+    execFile(command, args, { cwd, encoding: 'utf8' }, (error, stdout, stderr) => {
+      if (error) {
+        reject(Object.assign(error, { stderr, stdout }))
+      } else {
+        resolve(stdout)
+      }
+    })
+  })
+
+/**
+ * Whether this job authenticates by OIDC, where nothing stops to ask a person.
+ * Only there do tags move several at a time: a logged-in machine answers a
+ * browser challenge for each package, one after another.
+ */
+const canExchange = Boolean(process.env.ACTIONS_ID_TOKEN_REQUEST_URL)
+
+/**
+ * `work` for each package, six at a time.
+ *
+ * **Tags only, and `npm publish` stays one at a time.** A tag moves in about two
+ * seconds and can be moved again, so most of the time a release spends on one is
+ * waiting for the one before. A publish that stops partway leaves versions that
+ * cannot be taken back, and publishing them in order keeps that simple to read.
+ */
+const eachOfThem = async (work) => {
+  const waiting = [...packages]
+  const worker = async () => {
+    while (waiting.length > 0) {
+      await work(waiting.shift())
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(6, waiting.length) }, worker))
+}
 
 /**
  * npm, with its own error message kept.
@@ -237,35 +274,35 @@ const CHECK_TAG = 'promote-check'
  * consumer installs, so a removal that keeps failing warns and the release goes on.
  * The add has already proved the permission.
  */
-const removeCheckTag = (name) => {
+const removeCheckTag = async (name) => {
   for (let attempt = 1; attempt <= 6; attempt += 1) {
     try {
-      run('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
+      await runLater('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
       return
     } catch {
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5_000)
+      await new Promise((resolve) => setTimeout(resolve, 5_000))
     }
   }
   console.error(`::warning::${name} still carries the \`${CHECK_TAG}\` tag. Remove it by hand.`)
 }
 
-const cannotPromote = () => {
-  if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
+const cannotPromote = async () => {
+  if (!canExchange) {
     return []
   }
   const refused = []
-  for (const [name] of packages) {
+  await eachOfThem(async ([name]) => {
     try {
-      const version = run('npm', ['view', name, 'version'], root).trim()
-      run('npm', ['dist-tag', 'add', `${name}@${version}`, CHECK_TAG], root)
+      const version = (await runLater('npm', ['view', name, 'version'], root)).trim()
+      await runLater('npm', ['dist-tag', 'add', `${name}@${version}`, CHECK_TAG], root)
     } catch (error) {
       const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.split('\n')
       console.error(`  ${name}: ${said.find((line) => /npm error 4\d\d/.test(line)) ?? said[0]}`)
       refused.push(name)
-      continue
+      return
     }
-    removeCheckTag(name)
-  }
+    await removeCheckTag(name)
+  })
   return refused
 }
 
@@ -280,7 +317,7 @@ if (preflight) {
         '--bootstrap\n    bun run trust --apply\n',
     )
   }
-  const refused = cannotPromote()
+  const refused = await cannotPromote()
   if (refused.length > 0) {
     fail(
       `${domain}: trusted publishing cannot move a tag on ${refused.length} of ${packages.length} ` +
@@ -358,15 +395,32 @@ if (promote !== undefined) {
      npm makes the exchange per package. It came back `401` on the dist-tags
      endpoint on August 31, 2026, before npm 11.21.0 and the "Allow npm dist-tag"
      permission. On a machine that is logged in, it uses that session. */
-  for (const [name] of packages) {
+  const failed = []
+  await eachOfThem(async ([name]) => {
     const target = `${name}@${pinned}`
     console.log(`  ${target} -> ${promote}`)
-    if (!dry) {
-      npm(
-        ['dist-tag', 'add', target, promote, ...(otp === undefined ? [] : ['--otp', otp])],
-        `move \`${promote}\` onto ${target}`,
-      )
+    if (dry) {
+      return
     }
+    const args = ['dist-tag', 'add', target, promote, ...(otp === undefined ? [] : ['--otp', otp])]
+    if (!canExchange) {
+      npm(args, `move \`${promote}\` onto ${target}`)
+      return
+    }
+    try {
+      await runLater('npm', args, root)
+    } catch (error) {
+      console.error(`\nnpm could not move \`${promote}\` onto ${target}.\n`)
+      console.error(
+        `  ${`${error.stderr ?? ''}${error.stdout ?? ''}`.trim().split('\n').join('\n  ')}`,
+      )
+      failed.push(name)
+    }
+  })
+  if (failed.length > 0) {
+    fail(
+      `${domain} ${pinned}: \`${promote}\` did not move on ${failed.length} of ${packages.length} packages.`,
+    )
   }
   console.log(`${domain} ${pinned}: ${packages.length} packages now ${promote}`)
   process.exit(0)
