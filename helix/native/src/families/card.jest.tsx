@@ -62,7 +62,7 @@ describe('the generated Card', () => {
     const view = await render(themed(<HelixCard>Body</HelixCard>))
     expect(styleOf(hostOf(view.toJSON()))).toMatchObject({
       backgroundColor: tokens['color-surface'],
-      borderRadius: tokens['radii-lg'],
+      borderRadius: tokens['radii-md'],
       flexDirection: 'column',
       gap: tokens['space-sm'],
       overflow: 'hidden',

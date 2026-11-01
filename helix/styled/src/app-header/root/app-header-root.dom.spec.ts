@@ -51,7 +51,7 @@ describe('app header', () => {
   })
 
   test('stands clear of the notch by the top safe area, as a phone’s bar does', () => {
-    expect(rule(':host')).toContain('padding-block-start: env(safe-area-inset-top, 0px)')
+    expect(sheet()).toContain('padding-block-start: env(safe-area-inset-top, 0px)')
   })
 
   test('draws the generated sheet, with the glass a transparent bar takes once scrolled', () => {
