@@ -3,7 +3,7 @@
      ones below, and the peak, which only the ribbon draws. */
   --_strands-glow: var(--strands-glow, var(--helix-color-primary));
   --_strands-ground: var(--strands-ground, var(--helix-color-background));
-  --_strands-tint: var(--strands-tint, var(--helix-color-accent));
+  --_strands-tint: var(--strands-tint, var(--helix-color-primary));
 
   position: relative;
   display: block;

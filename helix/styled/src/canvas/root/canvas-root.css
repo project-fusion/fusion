@@ -64,8 +64,8 @@
 }
 
 [part="minimap-view"] {
-  fill: color-mix(in oklab, var(--helix-color-accent) 12%, transparent);
-  stroke: var(--helix-color-accent);
+  fill: color-mix(in oklab, var(--helix-color-primary) 12%, transparent);
+  stroke: var(--helix-color-primary);
   stroke-width: var(--helix-border-thick);
   vector-effect: non-scaling-stroke;
 }
@@ -212,7 +212,7 @@
    arrives at, and filled, so it reads as the connection's rather than the
    card's hollow point under it. */
 [part="edge-end"] {
-  background-color: var(--canvas-selected-color, var(--helix-color-accent));
+  background-color: var(--canvas-selected-color, var(--helix-color-primary));
   block-size: var(--canvas-handle-size, 0.625rem);
   border: var(--helix-border-thick) solid var(--helix-color-surface);
   border-radius: var(--helix-radii-full);
@@ -252,7 +252,7 @@
    field is too. */
 [part="label-editor"] {
   background-color: var(--helix-color-surface);
-  border: var(--helix-border-thin) solid var(--helix-color-accent);
+  border: var(--helix-border-thin) solid var(--helix-color-primary);
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
   color: var(--helix-color-foreground);
@@ -282,11 +282,11 @@
 [part="marquee"] {
   background-color: color-mix(
     in oklab,
-    var(--canvas-selected-color, var(--helix-color-accent)) 10%,
+    var(--canvas-selected-color, var(--helix-color-primary)) 10%,
     transparent
   );
   block-size: var(--_canvas-marquee-block-size);
-  border: var(--helix-border-thin) dashed var(--canvas-selected-color, var(--helix-color-accent));
+  border: var(--helix-border-thin) dashed var(--canvas-selected-color, var(--helix-color-primary));
   box-sizing: border-box;
   inline-size: var(--_canvas-marquee-inline-size);
   left: var(--_canvas-marquee-x);
@@ -299,7 +299,7 @@
 /* The connection being drawn, dashed until it is asked for. */
 [part="draft"] {
   pointer-events: none;
-  stroke: var(--canvas-connect-color, var(--helix-color-accent));
+  stroke: var(--canvas-connect-color, var(--helix-color-primary));
   stroke-dasharray: 6 4;
   stroke-width: var(--helix-border-thick);
 }
@@ -347,7 +347,7 @@
    the tones, which match as closely: before them, a connection with a tone
    kept it when selected and only grew heavier. */
 [part="edge"][data-selected] {
-  stroke: var(--canvas-selected-color, var(--helix-color-accent));
+  stroke: var(--canvas-selected-color, var(--helix-color-primary));
   stroke-width: calc(var(--canvas-edge-width, var(--helix-border-thick)) * 2);
 }
 

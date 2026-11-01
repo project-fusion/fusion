@@ -225,7 +225,6 @@ export function Showcase(): React.ReactElement {
         onChange={(event) => {
           setView(event.currentTarget.value as View)
         }}
-        separation="outlined"
         value={view}
       >
         {VIEWS.map((one) => (

@@ -52,13 +52,6 @@ export class HelixHeadlessMeterSegment extends HelixElement {
   label = ''
 
   /**
-   * What the segment means, as it does on a callout. Takes the tone's color in
-   * place of the next color in the series.
-   */
-  @property({ reflect: true })
-  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
-
-  /**
    * How much of the meter's range the segment takes, in the units of the meter's
    * `min` and `max`.
    *

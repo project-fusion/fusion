@@ -141,7 +141,7 @@
 [part~="row-match"] {
   background-color: var(
     --object-inspector-match-background-color,
-    var(--helix-color-accent-subtle)
+    var(--helix-color-primary-subtle)
   );
 }
 

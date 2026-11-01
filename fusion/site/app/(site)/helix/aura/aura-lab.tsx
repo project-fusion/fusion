@@ -191,7 +191,6 @@ export function AuraLab(): React.ReactElement {
                   setShape(next)
                 }
               }}
-              separation="outlined"
               value={current?.name}
             >
               {SHAPES.map((entry) => (
@@ -210,7 +209,6 @@ export function AuraLab(): React.ReactElement {
                   setInteraction(next)
                 }
               }}
-              separation="outlined"
               value={interaction}
             >
               {INTERACTIONS.map((one) => (
@@ -234,7 +232,6 @@ export function AuraLab(): React.ReactElement {
                   setAim(next)
                 }
               }}
-              separation="outlined"
               value={aim}
             >
               {AIMS.map((one) => (

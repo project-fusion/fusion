@@ -83,7 +83,7 @@
 }
 
 [part~="file"][aria-selected="true"] {
-  border-block-end-color: var(--helix-color-accent);
+  border-block-end-color: var(--helix-color-primary);
   color: var(--helix-color-foreground);
 }
 
