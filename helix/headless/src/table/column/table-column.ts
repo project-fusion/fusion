@@ -12,7 +12,7 @@ import {
   valueAt,
   words,
 } from '@fusion.dev/helix-core'
-import { dotsSixVertical } from '@fusion.dev/helix-icons'
+import { caretDown, caretUp, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -78,6 +78,10 @@ export { edgeOf } from '../edge.js'
  * `separator` on its end edge, moved by dragging or with the arrow keys. In a
  * table with reorderable columns, each column has a grip that the table moves.
  *
+ * A sortable heading draws two chevrons after its words. The chevron for the
+ * current direction takes the heading's ink, so you can see which columns sort
+ * and which way the table is sorted.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Column header, Th
@@ -93,6 +97,9 @@ export { edgeOf } from '../edge.js'
  * @csspart grip-mark - The icon on the grip.
  * @csspart resizer - The edge that is dragged to change the width, when the column is resizable.
  * @csspart sort - The button that a sortable heading renders as.
+ * @csspart sort-down - The lower chevron of `sort-mark`, which shows a descending sort.
+ * @csspart sort-mark - The two chevrons on a sortable heading. To remove them, set `display: none` on this part.
+ * @csspart sort-up - The upper chevron of `sort-mark`, which shows an ascending sort.
  *
  * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
  * @cssstate sorted-descending - While the table is sorted by this column, largest first.
@@ -625,7 +632,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
         : nothing
     }${
       this.canSort
-        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot></button>`
+        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot><svg aria-hidden="true" fill="currentColor" part="sort-mark" viewBox=${caretUp.viewBox}>
+            <g part="sort-up" transform="translate(0 -52)">${unsafeSVG(caretUp.content)}</g>
+            <g part="sort-down" transform="translate(0 52)">${unsafeSVG(caretDown.content)}</g>
+          </svg></button>`
         : html`<slot></slot>`
     }${
       this.resizable

@@ -85,6 +85,35 @@
   justify-content: flex-end;
 }
 
+/* The chevrons come before the words here, so the words stay over the values
+   they name. `flex-start` because `row-reverse` turns the main axis around. */
+:host([text-align="end"]) [part="sort"] {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+}
+
+/* Two chevrons, quiet until one of them is the current direction. */
+[part="sort-mark"] {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
+[part="sort-up"],
+[part="sort-down"] {
+  fill: var(--helix-color-foreground-subtle);
+}
+
+:host(:state(sorted-ascending)) [part="sort"],
+:host(:state(sorted-descending)) [part="sort"] {
+  color: var(--helix-color-foreground);
+}
+
+:host(:state(sorted-ascending)) [part="sort-up"],
+:host(:state(sorted-descending)) [part="sort-down"] {
+  fill: var(--helix-color-foreground);
+}
+
 [part="sort"]:focus-visible,
 [part="grip"]:focus-visible,
 [part="resizer"]:focus-visible {
