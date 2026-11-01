@@ -214,6 +214,7 @@ const ownerOf = ({
   active,
   choose,
   chosen,
+  disabled,
   drag,
   dragging,
   entries,
@@ -227,6 +228,7 @@ const ownerOf = ({
   readonly active: string
   readonly choose: (member: OptionMember) => void
   readonly chosen: readonly string[]
+  readonly disabled: boolean
   readonly drag: Drag | undefined
   readonly dragging: ReturnType<typeof useOptionDrag>['dragging']
   readonly entries: readonly Entry[]
@@ -238,6 +240,7 @@ const ownerOf = ({
   readonly schedule: () => void
 }): OptionOwner => ({
   choose,
+  disabled,
   drag: moving ? dragging : undefined,
   filtering,
   group: (group) => {
@@ -450,6 +453,7 @@ const useInView = (
   held: Held,
   scrolling: ReturnType<typeof useScrolling>,
   windowed: boolean,
+  byKeys: { readonly current: boolean },
 ): void => {
   useFollow(current, {
     item: () => {
@@ -463,10 +467,11 @@ const useInView = (
   const shownAt = entries.filter((one) => !one.hidden).findIndex((one) => one.value === current)
   const { list } = scrolling
   useEffect(() => {
-    if (windowed && shownAt >= 0) {
+    /* A press leaves the list where it stands, and the keys bring what they reach in view. */
+    if (windowed && shownAt >= 0 && byKeys.current) {
       list.current?.scrollToIndex?.({ animated: false, index: shownAt, viewPosition: 0.5 })
     }
-  }, [list, shownAt, windowed])
+  }, [byKeys, list, shownAt, windowed])
 }
 
 /**
@@ -512,6 +517,7 @@ export const useListbox = (
   const moving = read.reorderable && !read.disabled && !filtering && !read.grid
   const { drag, dragging, moveBy, moveTo } = useMoves(family, props, use, entries, held, scrolling)
   const current = focus.active || (chosen[0] ?? '')
+  const byKeys = useRef(false)
   const run: ListRun = {
     arrive: (one, forwarded) => {
       focus.to(one)
@@ -535,17 +541,19 @@ export const useListbox = (
     page: () => pageOf(scrolling.frame.current, entries, held),
     request,
   }
-  useInView(current, entries, held, scrolling, windowed)
+  useInView(current, entries, held, scrolling, windowed, byKeys)
   const rows = useRows(entries)
   const owner = ownerOf({
     active: focus.active,
     choose: (member) => {
+      byKeys.current = false
       focus.to(member.value)
       if (!read.disabled) {
         choose(member.value)
       }
     },
     chosen,
+    disabled: read.disabled,
     drag,
     dragging,
     entries,
@@ -553,6 +561,7 @@ export const useListbox = (
     held,
     key: (press) => {
       keysHere.current = true
+      byKeys.current = true
       return heardKey(run, press, false)
     },
     moveTo: moveBy,
@@ -563,6 +572,7 @@ export const useListbox = (
   const fieldKey = useRef<(press: KeyPress) => boolean>(() => false)
   fieldKey.current = (press) => {
     keysHere.current = false
+    byKeys.current = true
     return heardKey(run, press, true)
   }
   const state = (name: string): string => boundTo(use, name, 'state') ?? name

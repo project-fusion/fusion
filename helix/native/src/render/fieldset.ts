@@ -26,6 +26,7 @@ const FORM_CONTROLS = new Set([
   'helix-file-input',
   'helix-icon-button',
   'helix-input',
+  'helix-listbox',
   'helix-number-input',
   'helix-pin-input',
   'helix-radio-group',
