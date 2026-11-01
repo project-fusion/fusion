@@ -55,6 +55,7 @@
  *
  *   bun run smoke:template
  *   bun run smoke:template --domain helix --registry-tag next
+ *   bun run smoke:template --domain helix --registry-tag next --version 1.4.0
  */
 import { execFileSync } from 'node:child_process'
 import {
@@ -75,6 +76,12 @@ const run = (command, args, cwd) =>
 
 const only = argument('domain')
 const registryTag = argument('registry-tag')
+const expected = argument('version')
+
+if (expected !== undefined && (only === undefined || registryTag === undefined)) {
+  console.error("--version names one domain's release, so it needs --domain and --registry-tag.")
+  process.exit(1)
+}
 
 const published = [...manifests()].filter(
   ([name, { manifest }]) =>
@@ -192,18 +199,6 @@ const typeTools = {
   'typescript-5': 'npm:typescript@5.9.3',
 }
 
-/* Restricted packages need credentials, and the scratch project is outside the
-   repository precisely so that it inherits nothing. Without this the install
-   404s and the failure reads as "the package did not ship" rather than "you are
-   not logged in", which is the most expensive kind of wrong error message.
-   Written into the project rather than relying on `$HOME/.npmrc` being found,
-   so this behaves the same in CI and on a laptop. */
-if (registryTag !== undefined && process.env.NPM_TOKEN) {
-  writeFileSync(
-    join(project, '.npmrc'),
-    `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`,
-  )
-}
 writeFileSync(
   join(project, 'package.json'),
   `${JSON.stringify(
@@ -229,10 +224,47 @@ writeFileSync(
    fails below as a package that did not ship. Only this: any other install error
    is real on its first answer.
 
-   `--no-cache` on the retries, because bun keeps the packument it just read. */
+   `--no-cache` on the retries, because bun keeps the packument it just read.
+
+   **An optional dependency that is not there yet gives no error.** On October
+   31, 2026, `cortex-cli@next` answered, its `linux-x64` package did not, and bun
+   dropped that package and reported success. So `--version` waits for every
+   package of the domain first, at that version and with the header bun sends,
+   because the registry serves that shorter document separately. The last platform
+   package of Cortex 0.4.0 took about eight minutes to show. */
 const NOT_VISIBLE_YET = /No version matching|with tag "[^"]+" not found/
 const VISIBLE_WITHIN_MS = 15 * 60 * 1000
 const installStarted = Date.now()
+
+const notVisible = async () => {
+  const missing = []
+  for (const [name] of published) {
+    const answer = await fetch(`https://registry.npmjs.org/${name.replace('/', '%2f')}`, {
+      headers: { accept: 'application/vnd.npm.install-v1+json' },
+    })
+    const versions = answer.ok ? (await answer.json()).versions : {}
+    if (versions?.[expected] === undefined) {
+      missing.push(`${name}@${expected}`)
+    }
+  }
+  return missing
+}
+
+if (expected !== undefined) {
+  let missing = await notVisible()
+  while (missing.length > 0) {
+    if (Date.now() - installStarted > VISIBLE_WITHIN_MS) {
+      console.error(
+        `The registry did not show ${missing.length} packages within ${VISIBLE_WITHIN_MS / 60_000} ` +
+          `minutes of asking:\n\n  ${missing.join('\n  ')}`,
+      )
+      process.exit(1)
+    }
+    console.log(`Waiting for the registry to show: ${missing.join(', ')}`)
+    await new Promise((resolve) => setTimeout(resolve, 20_000))
+    missing = await notVisible()
+  }
+}
 
 const installFromRegistry = (again = false) => {
   try {
@@ -251,13 +283,6 @@ const installFromRegistry = (again = false) => {
 try {
   installFromRegistry()
 } catch (error) {
-  if (registryTag !== undefined && !process.env.NPM_TOKEN) {
-    console.error(
-      'The published packages did not install, and no `NPM_TOKEN` was set. A package that is ' +
-        'still restricted answers an unauthenticated install with a 404, as a missing one does. ' +
-        'Log in, or set the token, before reading this as a packaging fault.\n',
-    )
-  }
   console.error('The packages do not install together.\n')
   console.error(error.stdout ?? '')
   console.error(error.stderr ?? '')
