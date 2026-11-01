@@ -75,7 +75,7 @@ pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
     TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX,
     LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
-    OPTION, OPTION_GROUP, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    OPTION, OPTION_GROUP, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -177,6 +177,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a list of options.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub listbox: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it opens a list of options.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub select: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is an option.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub option: Option<TreeChoice>,
@@ -344,6 +347,7 @@ impl Api {
             && self.notification_group.is_none()
             && self.carousel.is_none()
             && self.listbox.is_none()
+            && self.select.is_none()
             && self.option.is_none()
             && self.option_group.is_none()
             && self.chat_root.is_none()
@@ -424,6 +428,7 @@ const FIELDS: &[&str] = &[
     "notificationGroup",
     "carousel",
     "listbox",
+    "select",
     "option",
     "optionGroup",
     "chatRoot",
@@ -473,6 +478,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         carousel: field("carousel").map(tree_choice::carousel).transpose()?,
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
+        select: field("select").map(tree_choice::select).transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
         option_group: field("optionGroup")
             .map(tree_choice::option_group)
