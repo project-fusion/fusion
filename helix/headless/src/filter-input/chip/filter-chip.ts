@@ -208,7 +208,11 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
      *
      * Drawn where the children cannot be known, a server and the render that
      * has to be its: without the slot, the values a server sends are not shown
-     * until hydration, and an empty box for a moment is the smaller fault. */
+     * until hydration, and an empty box for a moment is the smaller fault.
+     *
+     * The slot is always there and only its box hides. With no slot, text that
+     * arrives after the first render fires no `slotchange`, and the value never
+     * appears. */
     const values =
       !this.childrenKnown ||
       [...this.childNodes].some((node) =>
@@ -221,7 +225,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
           ? html`<span part="operator"><slot name="operator">${this.operatorLabel}</slot></span>`
           : nothing
       }
-      ${values ? html`<span part="values"><slot></slot></span>` : nothing}
+      <span part="values" ?hidden=${!values}><slot></slot></span>
       ${
         this.dismissible
           ? html`<button
