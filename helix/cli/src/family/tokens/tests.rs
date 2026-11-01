@@ -22,7 +22,8 @@ fn styles() -> PathBuf {
 fn every_entry_of_tokens_ts_is_typed_and_written_in_each_mode() {
     let source = std::fs::read_to_string(styles().join("src/tokens.ts")).unwrap();
     let read = entries(&source).unwrap();
-    let layer = phone_registry(&styles()).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
+    let layer =
+        phone_registry(&styles()).unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
     assert_eq!(layer.tokens().len(), read.len());
     let written = modules(&layer, &system(), "/* A header. */\n")
         .unwrap_or_else(|failure| panic!("{}", failure.render("helix")));
