@@ -16,7 +16,6 @@
  */
 
 import type { CopyItem } from '@/content/copy/copy'
-import { countWord, GENERATOR_CHECKS } from '@/content/landing/checks'
 
 /** One capability, stated the way the feature blocks state them. */
 export interface Capability {
@@ -99,17 +98,18 @@ export const HERO = {
 } as const
 
 /**
- * The problem, before the answer: the cost of an interface arrives after the
- * first screen ships.
+ * The problem, before the answer: AI writes screens quickly, and each agent makes
+ * its own choices.
  */
 export const PROBLEM = {
   /**
-   * About the interface in general, so the section also speaks to someone who
-   * does not think of their problem as a design system. The last sentence names
-   * Helix, because the four cards under it start from that subject.
+   * The cost of a first screen, a second brand, and a migration fell with AI, so
+   * the section starts from what is left: agents that disagree with each other.
+   * The last sentence names Helix, because the four cards under it start from
+   * that subject.
    */
-  lede: 'The first screen takes a morning. A second brand, a framework migration, and an accessibility audit take the rest of the year, and none of them is visible on the day you start. Helix is built for that later work.',
-  title: 'An interface is cheap to start and expensive to keep',
+  lede: 'Each agent chooses its own colors, spacing, and components. Your product drifts with every change, and nothing reports it. Helix gives every agent the same components and checks what each one writes.',
+  title: 'AI writes a screen in seconds, and every agent writes a different one',
 } as const
 
 /**
@@ -122,7 +122,7 @@ export const MECHANISMS: readonly Capability[] = [
       'Enter one brand color and get a full palette',
       'Helix rejects a palette it cannot make readable',
     ],
-    claim: 'Add a second brand with one color',
+    claim: 'Set your brand with one color',
     name: 'Theming',
   },
   {
@@ -130,15 +130,15 @@ export const MECHANISMS: readonly Capability[] = [
       'Custom elements that run in any framework, or in none',
       'Types for React, Vue, and Svelte from one manifest',
     ],
-    claim: 'Switch frameworks without a rewrite',
+    claim: 'Use one system in every framework',
     name: 'Components',
   },
   {
     bullets: [
       'Contrast is measured on every release',
-      `${countWord(GENERATOR_CHECKS.length)} generators check the code and fail the build when it drifts`,
+      'The helix scan command checks your code against the Helix version you installed',
     ],
-    claim: 'Find problems before an audit does',
+    claim: 'Catch what an agent gets wrong',
     name: 'Checks',
   },
   {

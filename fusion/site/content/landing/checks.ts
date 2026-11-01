@@ -99,38 +99,3 @@ export const GENERATOR_CHECKS: readonly string[] =
 if (GENERATOR_CHECKS.length === 0) {
   throw new Error('checks: the root package.json has no check:gen steps to count')
 }
-
-const ONES = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine']
-const TEENS = [
-  'Ten',
-  'Eleven',
-  'Twelve',
-  'Thirteen',
-  'Fourteen',
-  'Fifteen',
-  'Sixteen',
-  'Seventeen',
-  'Eighteen',
-  'Nineteen',
-]
-const TENS = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
-
-/**
- * A count as a word, for a sentence. A count past ninety-nine stays a numeral,
- * which is where a word stops being the way the sentence is read.
- */
-export const countWord = (count: number): string => {
-  const whole = Math.trunc(count)
-  if (whole < 0 || whole > 99) {
-    return String(count)
-  }
-  if (whole < 10) {
-    return ONES[whole] ?? String(whole)
-  }
-  if (whole < 20) {
-    return TEENS[whole - 10] ?? String(whole)
-  }
-  const tens = TENS[Math.trunc(whole / 10) - 2]
-  const ones = whole % 10
-  return ones === 0 ? (tens ?? String(whole)) : `${tens}-${(ONES[ones] ?? '').toLowerCase()}`
-}
