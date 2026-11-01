@@ -239,9 +239,9 @@
    scroll the table. While a sort decides the order, it does nothing and says so. */
 [part="row-grip-button"] {
   all: unset;
-  /* A sixth of the mark above and below, so the mark is three quarters of the
+  /* Room above and below the mark, so the mark stays under three quarters of the
      button's height. Along the row it stays the mark's width. */
-  padding-block: calc(1em / 6);
+  padding-block: var(--helix-space-2xs);
   align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
