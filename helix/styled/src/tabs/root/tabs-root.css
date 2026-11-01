@@ -102,8 +102,9 @@ slot[name="scroll-end-icon"]::slotted(*) {
 
 /* Segmented. */
 :host([marker="segmented"]) [part="tabs"] {
-  /* A groove, so the pill in it is over the page rather than on it. */
-  --_tab-selected-surface: var(--helix-color-surface-overlay);
+  /* The selected tab paints nothing of its own: the pill behind it is the mark,
+     and a fill here covered the pill and stopped its slide. */
+  --_tab-selected-surface: transparent;
 
   /* The control is the height of a control, and the tabs are what is left inside
      it. The same fix Toggle Group carries, and the same reason `100%` rather
@@ -192,7 +193,12 @@ slot[name="scroll-end-icon"]::slotted(*) {
 /* Segmented: the same mark, grown to the tab's own box. */
 :host([marker="segmented"]) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
-  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-overlay));
+  /* The press wash in dark, as Toggle Group's thumb: `overlay` on the groove
+     measured 1.06:1, and the wash is 1.84:1, a step past the hover wash at 1.38:1. */
+  --_indicator-color: var(
+    --tabs-indicator-color,
+    light-dark(var(--helix-color-surface-overlay), var(--helix-color-press))
+  );
   --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;

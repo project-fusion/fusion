@@ -31,8 +31,10 @@ import {
   boxView,
   DragTurn,
   drawBox,
+  PlotRoomWatch,
   SPATIAL_VIEW,
   turned,
+  wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
 import {
   blocksDrawn,
@@ -210,6 +212,8 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
   private camera: Camera = SPATIAL_VIEW
 
   /** A drag across the chart's own drawing, which turns its view. */
+  private readonly plotRoom = new PlotRoomWatch(this)
+
   private readonly drag = new DragTurn(
     (next) => {
       this.camera = next(this.camera)
@@ -430,7 +434,9 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    * none is connected.
    */
   private renderFallback(field: TreemapField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera, [], this.noBox)
+    const view = wordsFitted(this.plotRoom.room, (words) =>
+      boxView(field.axes, this.camera, [], this.noBox, words),
+    )
     const blocks = blocksDrawn(field, view.projection)
     const active = blocks[at]
     const bounds = this.drag.frame(

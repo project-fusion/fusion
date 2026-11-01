@@ -30,8 +30,10 @@ import {
   inBox,
   nearestTo,
   type Placed,
+  PlotRoomWatch,
   SPATIAL_VIEW,
   turned,
+  wordsFitted,
 } from '../view.js'
 
 /** How many series colors the palette has, after which the groups take them again. */
@@ -204,6 +206,8 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   private camera: Camera = SPATIAL_VIEW
 
   /** A drag across the chart's own drawing, which turns its view. */
+  private readonly plotRoom = new PlotRoomWatch(this)
+
   private readonly drag = new DragTurn(
     (next) => {
       this.camera = next(this.camera)
@@ -428,7 +432,9 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * own drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: PlotField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera, [], this.noBox)
+    const view = wordsFitted(this.plotRoom.room, (words) =>
+      boxView(field.axes, this.camera, [], this.noBox, words),
+    )
     const places = field.points.map((point, index) => {
       const box: BoxPoint = [
         inBox(field.axes.x, point.x),
