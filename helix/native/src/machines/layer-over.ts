@@ -51,7 +51,7 @@ const boxOf = (view: unknown, done: (box: Box | undefined) => void): void => {
 export interface OverAround {
   readonly active: boolean
   readonly anchor: unknown
-  readonly asked: OverAsked | undefined
+  readonly asked: { readonly over?: OverAsked } | undefined
   readonly keyboard: number
   readonly origin: { readonly x: number; readonly y: number }
   readonly view: unknown
@@ -95,7 +95,8 @@ export const overAt = (
  * window, and no side.
  */
 export const useOver = (placed: Placed, around: OverAround): Placed => {
-  const { active, anchor, asked, keyboard, origin, view } = around
+  const { active, anchor, keyboard, origin, view } = around
+  const asked = around.asked?.over
   const on = active && asked !== undefined
   const window = useWindowDimensions()
   const height = Math.max(0, window.height - keyboard)

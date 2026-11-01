@@ -133,6 +133,7 @@ export const useLayer = (
   const keyboard = host?.keyboard ?? 0
   const sheet = useSheet(read.presentation, window.width)
   const arrow = useArrow(boundTo(use, 'arrow', 'part'))
+  const origin = host?.origin ?? ORIGIN
   const floated = place({
     active: open && !sheet && placedAgainst,
     ...(arrow.pointer === undefined ? {} : { arrow: arrow.pointer }),
@@ -140,15 +141,15 @@ export const useLayer = (
     flip: read.flip,
     keyboard,
     offset,
-    origin: host?.origin ?? ORIGIN,
+    origin,
     placement: read.placement,
   })
   const placed = useOver(floated, {
     active: open && !sheet && placedAgainst,
     anchor,
-    asked: asked?.over,
+    asked,
     keyboard,
-    origin: host?.origin ?? ORIGIN,
+    origin,
     view,
   })
   /* The anchor, measured as a touch outside the layers starts, so a press on
