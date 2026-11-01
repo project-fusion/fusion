@@ -227,6 +227,8 @@ const allowDistTag = (names) =>
  * one-time password per package and prove nothing about the workflow.
  *
  * The tag points at the version `latest` already names, and is removed at once.
+ * A package without the permission answers `403`, "This trusted publisher cannot
+ * manage dist-tags", measured November 1, 2026, on npm 11.21.1.
  */
 const CHECK_TAG = 'promote-check'
 
@@ -242,7 +244,7 @@ const cannotPromote = () => {
       run('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
     } catch (error) {
       const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.split('\n')
-      console.error(`  ${name}: ${said.find((line) => line.includes('npm error')) ?? said[0]}`)
+      console.error(`  ${name}: ${said.find((line) => /npm error 4\d\d/.test(line)) ?? said[0]}`)
       refused.push(name)
     }
   }
