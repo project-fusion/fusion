@@ -1,6 +1,6 @@
 import densitySm from '../../../fragments/density-sm.js'
 import { oneOf } from '../../../render.js'
-import { fn, product, token, web } from '../../../style.js'
+import { fn, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
