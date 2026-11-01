@@ -126,6 +126,9 @@ slot[name="indicator"]::slotted(*) {
   font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-tight);
+  /* A long unbroken word breaks inside the column it was given. */
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 /*
@@ -317,6 +320,10 @@ slot[name="indicator"]::slotted(*) {
   [part="item"] {
     min-block-size: var(--helix-size-target);
   }
+}
+
+:host(:not([disabled])) [part="item"]:active [part="box"] {
+  background-color: var(--helix-color-press);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.

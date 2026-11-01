@@ -67,6 +67,10 @@
   border-color: var(--checkbox-border-color, var(--helix-color-foreground));
 }
 
+:host(:not(:disabled)) [part="field"]:active [part="control"] {
+  background-color: var(--helix-color-press);
+}
+
 /* No color, which is the same rule the segmented control's thumb follows: color
    is reserved for state, and being ticked is not state, it is an answer. */
 :host(:state(checked)) [part="control"],

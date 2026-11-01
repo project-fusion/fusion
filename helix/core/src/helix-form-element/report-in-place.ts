@@ -11,7 +11,7 @@ export const reportInPlace = (control: HTMLElement, event: Event): void => {
   event.preventDefault()
   const form = (control as HTMLElement & { form?: HTMLFormElement | null }).form
   const first = form ? [...form.elements].find((element) => element.matches(':invalid')) : control
-  if (first === control) {
+  if (first === control && event.isTrusted) {
     control.focus()
   }
 }

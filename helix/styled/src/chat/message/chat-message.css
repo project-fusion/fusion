@@ -439,6 +439,18 @@ slot[name="indicator"]::slotted(helix-orb) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="retry"] {
+  position: relative;
+}
+
+[part="retry"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 @media print {
   [part="retry"] {
     display: none;

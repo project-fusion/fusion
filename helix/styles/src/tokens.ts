@@ -824,7 +824,7 @@ export const TOKENS: Token[] = [
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 30%, transparent), color-mix(in oklab, var(--_helix-neutral-900) 48%, transparent) )',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 30%, transparent), color-mix(in oklab, var(--_helix-neutral-900) 60%, transparent) )',
 
     'The translucent background, for a surface that shows what is behind it.',
   ],
@@ -837,8 +837,8 @@ export const TOKENS: Token[] = [
   /* **Glass over a page, and glass over its own scrim.** A modal samples the scrim
      behind it, so it needs more coverage to stay a surface: at 30% it landed at L
      0.76 in light. A menu or a popover has no scrim, so it can show more of the
-     page. Dark takes 48% in both: white ink over high-contrast stripes measured
-     3.42:1 at 30% and 5.40:1 at 48%, October 31, 2026. */
+     page. Dark takes 60% in both, where white ink holds 4.5:1 over a white page; at
+     30% and 48% it measured 2.4:1 and 3.41:1, October 31, 2026. */
   [
     'material-modal',
     'light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))',

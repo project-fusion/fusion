@@ -141,6 +141,32 @@ fn by_base(
     by_base
 }
 
+/// A scope that moves the control height declares every step a control reads.
+fn check_control_steps(
+    declared: &BTreeMap<String, String>,
+    block: &str,
+    selector: &str,
+    file: &str,
+    findings: &mut Vec<Finding>,
+) {
+    if !declared.contains_key("--helix-size-control") {
+        return;
+    }
+    for step in CONTROL_STEPS {
+        if !block.contains(&format!("{step}:")) {
+            findings.push(Finding {
+                detail: "A control takes its height, type, inset, and marks from these steps \
+                         together. Declare every one in the block that moves \
+                         `--helix-size-control`, so a control here matches the same control \
+                         under `data-density`."
+                    .to_string(),
+                file: file.to_string(),
+                message: format!("`{selector}` moves `--helix-size-control` and leaves `{step}`"),
+            });
+        }
+    }
+}
+
 pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -186,23 +212,7 @@ pub fn run(context: &Context) -> Report {
                     .captures_iter(&rule[2])
                     .map(|one| (one[1].to_string(), flatten(&one[2])))
                     .collect();
-                if declared.contains_key("--helix-size-control") {
-                    for step in CONTROL_STEPS {
-                        if !rule[2].contains(&format!("{step}:")) {
-                            findings.push(Finding {
-                                detail: "A control takes its height, type, inset, and marks \
-                                         from these steps together. Declare every one in the \
-                                         block that moves `--helix-size-control`, so a control \
-                                         here matches the same control under `data-density`."
-                                    .to_string(),
-                                file: where_.clone(),
-                                message: format!(
-                                    "`{selector}` moves `--helix-size-control` and leaves `{step}`"
-                                ),
-                            });
-                        }
-                    }
-                }
+                check_control_steps(&declared, &rule[2], &selector, &where_, &mut findings);
                 for (base, steps) in &by_base {
                     if !declared.contains_key(base) {
                         continue;

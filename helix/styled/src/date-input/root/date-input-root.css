@@ -144,7 +144,8 @@ slot[name="end"]::slotted(*) {
 }
 
 :host(:disabled) [part="field"] {
-  color: var(--helix-color-foreground-subtle);
+  cursor: not-allowed;
+  opacity: var(--helix-opacity-disabled);
 }
 
 :host(:disabled) [part="control"],

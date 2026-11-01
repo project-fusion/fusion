@@ -273,6 +273,10 @@
   position: absolute;
 }
 
+[part="trigger"]:active {
+  background-color: var(--helix-color-press);
+}
+
 @media print {
   :host {
     display: none;

@@ -21,6 +21,8 @@
   font-size: var(--helix-text-field-label);
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-tight);
+  /* A long unbroken word breaks inside the column it was given. */
+  overflow-wrap: anywhere;
 }
 
 /* The mark is drawn and not named: a screen reader says "required" from the

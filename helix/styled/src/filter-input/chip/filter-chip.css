@@ -39,7 +39,8 @@
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-switch: var(--helix-size-switch-sm);
-  --helix-size-tag: var(--helix-size-tag-sm);
+  /* The field sizes its chips, so this keeps the step the field set. */
+  --helix-size-tag: inherit;
   --helix-text-control: var(--helix-text-control-sm);
   --helix-space-control: var(--helix-space-sm);
   --helix-text-field: var(--helix-text-sm);

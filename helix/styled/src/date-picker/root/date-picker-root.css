@@ -437,6 +437,11 @@
   position: absolute;
 }
 
+[part="previous"]:active,
+[part="next"]:active {
+  background-color: var(--helix-color-press);
+}
+
 /* Print: a control prints the value it holds, and the state has to survive: a tick that is a fill prints as an empty box, which is a document saying the opposite of the truth.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

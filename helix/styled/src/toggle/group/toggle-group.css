@@ -194,3 +194,13 @@
     forced-color-adjust: none;
   }
 }
+
+/* A label longer than its segment cuts inside it, so the group stays in its
+   column. */
+:host {
+  max-inline-size: 100%;
+}
+
+::slotted(helix-toggle) {
+  min-inline-size: 0;
+}

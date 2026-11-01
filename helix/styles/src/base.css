@@ -920,6 +920,10 @@ helix-toggle[disabled]::part(item) {
   display: flex;
 }
 
+:where([data-navigation-item], helix-navigation a):active {
+  background-color: var(--helix-color-press);
+}
+
 :where([data-navigation-item], helix-navigation a):hover {
   background-color: var(
     --navigation-item-hover-background-color,

@@ -609,6 +609,18 @@ slot[name$="-icon"]::slotted(*) {
   display: none;
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="controls"] :where(a, button) {
+  position: relative;
+}
+
+[part="controls"] :where(a, button)::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Print: a moving picture, and its controls are the only part that would print.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

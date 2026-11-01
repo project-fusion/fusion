@@ -47,7 +47,8 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
   placeholder, a hint, or a caption. The engine solves it to the contrast
   target.
 - `foreground-subtle` recedes further. It is for marks that are not text, such
-  as a separator, a chevron, or a grip, and for the text of a disabled control.
+  as a separator, a chevron, or a grip. A disabled control fades whole, through
+  `--helix-opacity-disabled`.
   It is a fixed step of the gray ramp, and the engine does not solve it, so its
   contrast is not guaranteed. Use `foreground-muted` for text that is read.
 - Text on a filled color takes the ink named for that fill:
@@ -139,7 +140,7 @@ readable grays has room for one quiet ink, and `foreground-muted` is that ink, s
 `foreground-subtle` stays a fixed step of the stylesheet's gray ramp and its
 contrast is not guaranteed. A component paints its quiet text in
 `foreground-muted`, and keeps `foreground-subtle` for marks that are not text and
-for the text of a disabled control.
+for a mark that recedes.
 
 The engine can solve only the pairs it knows about, so we check two things:
 

@@ -703,6 +703,10 @@
   position: absolute;
 }
 
+[part~="indicator"]:active {
+  background-color: var(--helix-color-press);
+}
+
 /* Print: the slide that is showing, without the controls that would change it. */
 @media print {
   :host {
