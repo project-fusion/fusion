@@ -1,18 +1,37 @@
 //! The custom properties a stylesheet declares on `:root`, which is where the
 //! primitives, the seeds and the modes' defaults are.
 //!
-//! **Only rules whose selector names `:root`, and none inside an at-rule.**
-//! `_modes.css` also declares under `[data-color-mode]`, under
-//! `prefers-color-scheme` and under `pointer: coarse`, and each of those is a
-//! condition a page meets or does not. The defaults are what a page holds with
-//! none of them met, which is what a native app has: it picks its mode itself,
-//! and a touch screen there has no browser to zoom into a small field, so
-//! `--_helix-text-field-min` keeps its `0px`.
+//! **Only rules whose selector names `:root`, and the rules under
+//! `pointer: coarse`.** `_modes.css` also declares under `[data-color-mode]` and
+//! under `prefers-color-scheme`, and each of those is a condition a page meets
+//! or does not. A native app picks its mode itself, so it holds the defaults
+//! there. A phone is a coarse pointer, so what `pointer: coarse` sets is what a
+//! phone holds, as a page on a phone does: the touch target, and the larger text
+//! on a control and in a field.
 
 /// `(name, value)` for each custom property the `:root` rules declare, in the
 /// order written. A later declaration of a name wins, as the cascade has it.
 pub fn declarations(css: &str) -> Vec<(String, String)> {
     declared_under(css, ":root")
+}
+
+/// `(name, value)` for each custom property a `:root` rule declares inside
+/// `@media (pointer: coarse)`, which a phone always meets. Lay them after
+/// [`declarations`], since they stand over the defaults.
+pub fn declared_on_coarse(css: &str) -> Vec<(String, String)> {
+    let text = uncommented(css);
+    let mut found = Vec::new();
+    let mut rest = text.as_str();
+    while let Some(open) = rest.find('{') {
+        let Some(close) = closing(rest, open) else {
+            break;
+        };
+        if rest[..open].trim() == "@media (pointer: coarse)" {
+            found.extend(declared_under(&rest[open + 1..close], ":root"));
+        }
+        rest = &rest[close + 1..];
+    }
+    found
 }
 
 /// `(name, value)` for each custom property the rules whose selector list

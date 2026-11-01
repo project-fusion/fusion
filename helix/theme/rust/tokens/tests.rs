@@ -5,7 +5,7 @@
 //! reads it with a TypeScript parser, so the two readers check each other.
 
 use super::syntax::{self, Node};
-use super::{declarations, native, Kind, Mode, Native, Registry, Written};
+use super::{declarations, declared_on_coarse, native, Kind, Mode, Native, Registry, Written};
 
 const PRIMITIVES: &str = include_str!("../../../styles/src/primitives.css");
 const MODES: &str = include_str!("../../../styles/src/_modes.css");
@@ -196,6 +196,19 @@ fn lengths_keep_their_rems_and_the_rest_is_what_native_reads() {
     assert_eq!(light("text-field-min"), Native::Number(0.0));
     assert_eq!(light("size-target"), text("1.5rem"));
     assert_eq!(light("text-control-md"), text("0.8125rem"));
+    let coarse = declared_on_coarse(MODES);
+    let coarsely = |name: &str| {
+        coarse
+            .iter()
+            .find(|(known, _)| known == name)
+            .map(|(_, value)| value.as_str())
+    };
+    assert_eq!(coarsely("--_helix-size-target"), Some("2.75rem"));
+    assert_eq!(coarsely("--_helix-text-field-min"), Some("16px"));
+    assert_eq!(
+        coarsely("--_helix-text-control-md"),
+        Some("var(--helix-text-md)")
+    );
     assert_eq!(light("text-field"), text("0.875rem"));
     assert_eq!(light("opacity-disabled"), Native::Number(0.5));
     assert_eq!(light("tracking-tight"), text("-0.01em"));
