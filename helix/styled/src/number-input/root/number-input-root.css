@@ -51,7 +51,7 @@
    jump about under a repeated press. */
 [part="control"] {
   font-variant-numeric: tabular-nums;
-  padding-inline: var(--number-input-padding-inline, var(--helix-space-xs));
+  padding-inline: var(--number-input-padding-inline, var(--helix-space-field));
   text-align: center;
 }
 

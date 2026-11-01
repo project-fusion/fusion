@@ -18,7 +18,7 @@
 [part="label"] {
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-field-label);
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-tight);
 }

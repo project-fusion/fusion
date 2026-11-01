@@ -808,8 +808,21 @@ export const TOKENS: Token[] = [
   ['size-control-sm', 'calc(2rem * var(--_helix-seed-density))'],
   /* The height a control is here. */
   ['size-control', 'var(--helix-size-control-md)'],
-  /* The type and the inset a control takes at the current density. */
-  ['text-control', 'var(--helix-text-sm)'],
+  /* The type and the inset a control takes at the current density. The three
+     steps are decided by the pointer in `_modes.css`: a touch screen sets them a
+     step larger, up to `text-md`, to sit beside a field's 16px. */
+  ['text-control-sm', 'var(--_helix-text-control-sm)'],
+  ['text-control-md', 'var(--_helix-text-control-md)'],
+  ['text-control-lg', 'var(--_helix-text-control-lg)'],
+  ['text-control', 'var(--helix-text-control-md)'],
+  /* *What a field you type into takes at the current density.** The value is
+     content, so it sits a step over its label: label 12 and value 13 at `sm`,
+     label 13 and value 14 at `md` and `lg`. Button and field share an inset
+     nowhere: a field's text starts close to its edge, at 8, 12 and 16 against a
+     button's 12, 16 and 24. */
+  ['text-field', 'var(--helix-text-md)'],
+  ['text-field-label', 'var(--helix-text-sm)'],
+  ['space-field', 'var(--helix-space-sm)'],
   /* *The smallest type a field you type into may take.** iOS Safari zooms the
      page into a focused input, textarea or select whose text is under 16px, so
      on a touch screen this is 16px and everywhere else it is 0, which leaves

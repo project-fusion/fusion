@@ -938,6 +938,18 @@ It works through custom properties (`--helix-size-control`,
 any API and crosses every shadow boundary on its own. The `-sm` / `-md` / `-lg`
 tokens are the scale and never move; the unsuffixed ones are the current step.
 
+**A dense scope declares every step a control reads.** A sheet that moves
+`--helix-size-control` moves the checkbox, icon, switch, and tag sizes, the
+control text and inset, and the field text and inset in the same block, and
+`helix component --only derived-steps` holds it. A control in a Toolbar then
+matches the same control under `data-density="sm"`.
+
+**A field has its own text and inset, a step from a button's.** Label 12 and
+value 13 at `sm`, label 13 and value 14 at `md` and `lg`, and an inset of 8, 12,
+and 16 against a button's 12, 16, and 24, decided by the owner on October 31,
+2026. On a touch screen a field's value is at least 16, and control text is a
+step larger, up to 14. Heights do not move.
+
 **`-tight` and `-loose` are a step either side of the current one, and they are
 derived at the root.** A custom property is substituted where it is declared, so
 a scope that moves a base step has to move the steps derived from it in the same

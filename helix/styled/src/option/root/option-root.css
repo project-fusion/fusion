@@ -19,7 +19,7 @@
   cursor: pointer;
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-control);
   gap: var(--helix-space-xs);
   /* A stated size rather than one that falls out of the padding, so every row in
      a list is the same height whatever is slotted into it: a row with an icon in

@@ -13,6 +13,12 @@
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-switch: var(--helix-size-switch-sm);
+  --helix-text-control: var(--helix-text-control-sm);
+  --helix-space-control: var(--helix-space-sm);
+  --helix-text-field: var(--helix-text-sm);
+  --helix-text-field-label: var(--helix-text-xs);
+  --helix-space-field: var(--helix-space-xs);
   --helix-size-tag: var(--helix-size-tag-sm);
 
   display: inline-flex;
@@ -31,6 +37,12 @@
   --helix-size-control: var(--helix-size-control-md);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-switch: var(--helix-size-switch-md);
+  --helix-text-control: var(--helix-text-control-md);
+  --helix-space-control: var(--helix-space-md);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-sm);
   --helix-size-tag: var(--helix-size-tag-md);
 }
 
@@ -44,6 +56,12 @@
   --helix-size-control: var(--helix-size-control-lg);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-switch: var(--helix-size-switch-lg);
+  --helix-text-control: var(--helix-text-control-lg);
+  --helix-space-control: var(--helix-space-lg);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-md);
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 

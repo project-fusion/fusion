@@ -18,7 +18,7 @@
   box-sizing: border-box;
   display: flex;
   gap: var(--helix-space-xs);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--helix-space-field);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -35,7 +35,7 @@
   padding-block: var(--helix-space-2xs);
   /* Off the same token the caret is, so the room follows it rather than being a
      second opinion about how wide it is. */
-  padding-inline-end: calc(var(--helix-space-xs) + var(--helix-size-icon-tight));
+  padding-inline-end: calc(var(--helix-space-field) + var(--helix-size-icon-tight));
   position: relative;
 }
 

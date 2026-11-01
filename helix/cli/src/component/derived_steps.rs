@@ -27,6 +27,11 @@
 //! without building it. `base.css` is committed, so the density region is the
 //! copy every run can see; where both are present they have to agree, and a
 //! step derived two ways is reported rather than one of them picked.
+//!
+//! **A scope that moves the control height moves every step a control reads.**
+//! A Toolbar that set only the height drew a button 32 tall with `md` type and
+//! inset, measured October 31, 2026 at 32, 13, 16 against 32, 12, 12 under
+//! `data-density="sm"`, and a Switch stayed 24 beside a 16 Checkbox.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -51,6 +56,19 @@ static BASE: LazyLock<Regex> = LazyLock::new(|| {
 static DERIVING: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^\s*(:root|html|\[data-density\])\s*$").expect("a literal pattern compiles")
 });
+
+/// What a control reads besides its height, so a scope moving the height moves
+/// these in the same block.
+const CONTROL_STEPS: [&str; 8] = [
+    "--helix-size-checkbox",
+    "--helix-size-icon",
+    "--helix-size-switch",
+    "--helix-size-tag",
+    "--helix-space-control",
+    "--helix-space-field",
+    "--helix-text-control",
+    "--helix-text-field",
+];
 
 /// One space between tokens, so a wrapped value reads as its own spelling.
 fn flatten(value: &str) -> String {
@@ -168,6 +186,23 @@ pub fn run(context: &Context) -> Report {
                     .captures_iter(&rule[2])
                     .map(|one| (one[1].to_string(), flatten(&one[2])))
                     .collect();
+                if declared.contains_key("--helix-size-control") {
+                    for step in CONTROL_STEPS {
+                        if !rule[2].contains(&format!("{step}:")) {
+                            findings.push(Finding {
+                                detail: "A control takes its height, type, inset, and marks \
+                                         from these steps together. Declare every one in the \
+                                         block that moves `--helix-size-control`, so a control \
+                                         here matches the same control under `data-density`."
+                                    .to_string(),
+                                file: where_.clone(),
+                                message: format!(
+                                    "`{selector}` moves `--helix-size-control` and leaves `{step}`"
+                                ),
+                            });
+                        }
+                    }
+                }
                 for (base, steps) in &by_base {
                     if !declared.contains_key(base) {
                         continue;

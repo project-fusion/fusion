@@ -8,7 +8,7 @@
   border-radius: var(--textarea-radius, var(--helix-radii-sm));
   display: flex;
   gap: var(--helix-space-2xs);
-  padding: var(--textarea-padding, var(--helix-space-xs));
+  padding: var(--textarea-padding, var(--helix-space-field));
   position: relative;
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -90,11 +90,11 @@ slot[name="end"]::slotted(*) {
   block-size: var(--helix-size-icon-loose);
   inline-size: var(--helix-size-icon-loose);
   inset-block-start: calc(
-    var(--textarea-padding, var(--helix-space-xs)) +
+    var(--textarea-padding, var(--helix-space-field)) +
     (1em * var(--helix-leading-normal) - var(--helix-size-icon-loose)) /
     2
   );
-  inset-inline-end: var(--textarea-padding, var(--helix-space-xs));
+  inset-inline-end: var(--textarea-padding, var(--helix-space-field));
   overflow: hidden;
   position: absolute;
 }
