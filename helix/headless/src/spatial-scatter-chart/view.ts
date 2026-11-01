@@ -141,10 +141,15 @@ export const boxView = (
   /* Along the edges that face the reader, which a turn changes. */
   const text = (axis: PlotAxis): BoxAxisText => ({
     name: axis.name,
-    ticks: axis.ticks.map((tick, index) => ({
-      at: inBox(axis, tick),
-      text: axis.labels?.[index] ?? tickText(tick),
-    })),
+    ticks: axis.ticks.map((tick, index) => {
+      const label = axis.labels?.[index]
+      return {
+        at: inBox(axis, tick),
+        /* A label with a number in it, such as a date, reads from the labels beside it. */
+        category: label !== undefined && !/\d/.test(label),
+        text: label ?? tickText(tick),
+      }
+    }),
   })
   /* A bare box writes nothing along its edges. */
   const labels: ViewLabel[] = bare

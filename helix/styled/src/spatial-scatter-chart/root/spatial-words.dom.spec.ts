@@ -54,4 +54,29 @@ describe('a spatial chart keeps its words readable in a narrow plot', () => {
       }
     })
   }
+
+  /* At 12 in that plot, with the numbers' margin, Bar lost South and West and Ribbon
+     lost Virginia and São Paulo. */
+  for (const [tag, names] of [
+    ['helix-spatial-bar-chart', ['North', 'South', 'East', 'West', 'Central']],
+    ['helix-spatial-ribbon-chart', ['Frankfurt', 'Virginia', 'Singapore', 'São Paulo']],
+  ] as const) {
+    run(`${tag} keeps every category's name`, async () => {
+      await example(CHARTS[tag] as string)
+      const chart = document.querySelector(tag) as HTMLElement & {
+        updateComplete: Promise<unknown>
+      }
+      chart.style.inlineSize = '342px'
+      for (let pass = 0; pass < 6; pass += 1) {
+        await new Promise((resolve) => requestAnimationFrame(resolve))
+        await chart.updateComplete
+      }
+      const words = [...(chart.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].map(
+        (word) => word.textContent ?? '',
+      )
+      for (const name of names) {
+        expect(words.some((word) => word.startsWith(name))).toBe(true)
+      }
+    })
+  }
 })

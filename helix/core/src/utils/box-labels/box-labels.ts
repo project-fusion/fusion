@@ -14,7 +14,8 @@
  * **A number that would cover another label is left out**, which thins an
  * axis seen at a slant, and an axis whose edge is seen end on is left out
  * whole. Every name is kept, and where two axes' labels meet, the axis with
- * fewer keeps its own.
+ * fewer keeps its own. A category has no neighbor to read it from, so it is
+ * left out only where its ink would meet another label's.
  *
  * Pure, and measured in the page's own units: the SVG drawing passes its
  * drawing's units, and three.js passes pixels.
@@ -33,7 +34,12 @@ export interface SeenPlace extends PagePoint {
 /** One axis' name, and its numbers at their places along it, from -1 to 1. */
 export interface BoxAxisText {
   name: string
-  ticks: readonly { at: number; text: string }[]
+  ticks: readonly {
+    at: number
+    /** Whether this is a category's name, which the labels beside it do not give. */
+    category?: boolean
+    text: string
+  }[]
 }
 
 /** A number or a name, centered on its place on the page. */
@@ -138,7 +144,7 @@ export const boxLabels = (
     y: at.y + out.y * by + (out.y * box.height) / 2,
   })
   const names: Array<Area & { text: string }> = []
-  const ticks: Array<Area & { text: string; of: number }> = []
+  const ticks: Array<Area & { category: boolean; text: string; of: number }> = []
   for (const { along, key } of edges) {
     const axis = axes[key]
     const [from, to] = [seen(along(-1)), seen(along(1))]
@@ -158,6 +164,7 @@ export const boxLabels = (
       const box = size(tick.text, false)
       ticks.push({
         ...off(seen(along(tick.at)), out, box, sizes.gap),
+        category: tick.category === true,
         of: axis.ticks.length,
         text: tick.text,
       })
@@ -189,7 +196,7 @@ export const boxLabels = (
      four series' names keeps them where they meet the last of fourteen
      dates. Stable, so each axis keeps its own order. */
   for (const tick of [...ticks].sort((one, other) => one.of - other.of)) {
-    if (kept.some((other) => overlaps(tick, other, sizes.gap / 2))) {
+    if (kept.some((other) => overlaps(tick, other, tick.category ? 0 : sizes.gap / 2))) {
       continue
     }
     kept.push(tick)
