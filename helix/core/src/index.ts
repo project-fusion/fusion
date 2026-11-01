@@ -556,7 +556,6 @@ export { labelsOf } from './utils/labels-of/labels-of.js'
 export { placedStates } from './utils/layers/layers.js'
 export { type Curve, columnPoints, linePath, type Point } from './utils/line-path/line-path.js'
 export { highlightStep } from './utils/listbox/highlight-step.js'
-export { over } from './utils/option-over/option-over.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
@@ -575,6 +574,7 @@ export {
   readingText,
 } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { over } from './utils/option-over/option-over.js'
 export { applyOwnRule, type OwnRule } from './utils/own-rule/own-rule.js'
 export {
   MOTION_ATTRIBUTE,

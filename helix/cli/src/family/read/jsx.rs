@@ -84,6 +84,7 @@ const GIVEN: &[&str] = &[
     "notificationGroup",
     "carousel",
     "listbox",
+    "select",
     "option",
     "optionGroup",
     "chatRoot",

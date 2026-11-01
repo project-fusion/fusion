@@ -356,6 +356,25 @@ pub const LISTBOX_COMPUTED: &[&str] = &[
     "windowed",
 ];
 
+/// What a field that opens a list of options reads and sends, by the name the machine binds.
+pub const SELECT: &[(&str, Names)] = &[
+    ("defaultValue", Names::Prop),
+    ("disabled", Names::Prop),
+    ("filterable", Names::Prop),
+    ("items", Names::Prop),
+    ("listLabel", Names::Prop),
+    ("multiple", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onInput", Names::Event),
+    ("placeholder", Names::Prop),
+    ("position", Names::Prop),
+    ("value", Names::Prop),
+];
+
+/// What a field that opens a list computes for its parts, each read as `select.x`.
+pub const SELECT_COMPUTED: &[&str] = &["listName", "said", "status", "words"];
+
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[
     ("description", Names::Prop),
@@ -702,6 +721,11 @@ pub fn listbox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "listbox", LISTBOX, LISTBOX_COMPUTED)
 }
 
+/// `select({ ... })`, each field a name.
+pub fn select(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "select", SELECT, SELECT_COMPUTED)
+}
+
 /// `option({ ... })`, each field a name.
 pub fn option(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "option", OPTION, OPTION_COMPUTED)
@@ -789,6 +813,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationGroup" => notification_group(value),
         "carousel" => carousel(value),
         "listbox" => listbox(value),
+        "select" => select(value),
         "option" => option(value),
         "optionGroup" => option_group(value),
         "chatRoot" => chat_root(value),
