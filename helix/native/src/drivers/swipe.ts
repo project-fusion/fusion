@@ -369,12 +369,16 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
       ref: scrollerRef,
       scrolled: (offset: number, content: number, frame: number) => {
         /* **A move the swipe makes is no move of the scroller's own**, so
-           holding it where it stands keeps the lock from starting. */
-        if (Math.abs(offset - scrolled.value) > 0.5 && !moved.value) {
+           holding it where it stands keeps the lock from starting. **Nor is
+           iOS's bounce past an end**: a drag at the list's top bounced it, and
+           the lock never let the sheet take that drag. */
+        const last = Math.max(0, content - frame)
+        const standing = Math.min(last, Math.max(0, offset))
+        if (Math.abs(standing - scrolled.value) > 0.5 && !moved.value) {
           scrolledAt.value = Date.now()
         }
-        scrolled.value = offset
-        end.value = Math.max(0, content - frame)
+        scrolled.value = standing
+        end.value = last
       },
     }),
     [across, end, moved, scrolled, scrolledAt, scrollerGesture, scrollerRef],
