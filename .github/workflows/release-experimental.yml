@@ -25,6 +25,37 @@ env:
   NODE_VERSION: "22.20.0"
 
 jobs:
+  # TEMPORARY, reverted once it answers: proves npm dist-tag add and rm under
+  # trusted publishing, spending no release number.
+  oidc-probe:
+    if: github.head_ref == 'fix/release-oidc-promote'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: experimental
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: npm install -g npm@11.21.1 && npm --version
+      - name: Add and remove a throwaway tag with no credential
+        run: |
+          package=@fusion.dev/cortex-docs
+          [ -z "${NPM_TOKEN:-}" ] && echo "no NPM_TOKEN"
+          version=$(npm view "$package" version)
+          echo "=== add $package@$version"
+          npm dist-tag add "$package@$version" promote-check --loglevel verbose 2>&1 | grep -E "oidc|npm error|^\+"
+          added=${PIPESTATUS[0]}
+          echo "add exit $added"
+          echo "=== remove"
+          npm dist-tag rm "$package" promote-check 2>&1 | grep -E "npm error|^-"
+          removed=${PIPESTATUS[0]}
+          echo "rm exit $removed"
+          echo "=== tags"
+          npm dist-tag ls "$package" 2>&1 | grep -v "npm notice"
+          [ "$added" = 0 ] && [ "$removed" = 0 ]
+
   # The version each domain would publish at, worked out once for the binaries,
   # which report it and are built before `publish` stamps the same numbers from
   # the same tags. `publish.mjs` checks the two agree.
