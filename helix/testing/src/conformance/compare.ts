@@ -96,6 +96,12 @@ const sendersOf = (setup: Setup, from: string | null): Setup[] =>
           (child.props?.value === undefined ? '' : String(child.props.value)) === from,
       )
 
+/** The fields of an event's detail its form says it carries. */
+const heldDetail = (event: DeclaredEvent, sent: Sent): Record<string, unknown> =>
+  JSON.parse(
+    JSON.stringify(Object.fromEntries(event.detail.map((field) => [field, sent.detail[field]]))),
+  )
+
 /**
  * Keeps an event the sender's neutral form declares, with the detail fields
  * the form says it carries. The rest is one platform's own. Of the elements
@@ -113,10 +119,14 @@ export const keepDeclared =
       .map((sender) => declared[sender.tag]?.find((one) => one.name === sent.name))
       .find((one) => one !== undefined)
     if (event === undefined) {
-      return undefined
+      /* **A part with no form of its own**, as a Table's row: the element around
+         declares what the row sends, and a page hears it there. */
+      const around = declared[scenario.setup.tag]?.find((one) => one.name === sent.name)
+      return around === undefined || sent.from === null
+        ? undefined
+        : { ...sent, detail: heldDetail(around, sent), from: null }
     }
-    const detail = Object.fromEntries(event.detail.map((field) => [field, sent.detail[field]]))
-    return { ...sent, detail: JSON.parse(JSON.stringify(detail)) }
+    return { ...sent, detail: heldDetail(event, sent) }
   }
 
 /**
