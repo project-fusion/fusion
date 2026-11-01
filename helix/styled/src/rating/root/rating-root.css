@@ -208,6 +208,11 @@
   position: absolute;
 }
 
+/* Wrong, and the empty marks say so, as a field's edge does. */
+:host(:state(invalid)) [part="track"] {
+  color: var(--helix-color-danger);
+}
+
 /* Print: the filled marks are the score.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
