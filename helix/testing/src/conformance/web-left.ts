@@ -305,6 +305,7 @@ const OPENS: ReadonlySet<string> = new Set(['accordion', 'tree'])
 
 /** The families that open a layer, whose record says whether it stands open. */
 const LAYERS: ReadonlySet<string> = new Set([
+  'select',
   'color-input',
   'dialog',
   'drawer',
@@ -447,6 +448,8 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'tree' ? { tree: treeRows(mounted) } : {}),
   /* Focus on the list is the web's, and a phone's option holds it for the keys. */
   ...(family === 'listbox' ? { focused: null, options: optionRows(mounted) } : {}),
+  /* While its list stands open, focus is on the list on the web, and on an option on a phone. */
+  ...(family === 'select' && inState(mounted.root, 'open') ? { focused: null } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
