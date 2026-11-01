@@ -61,7 +61,7 @@
 .footerVersion {
   /* The tagline's ink rather than the tag's own, so the outline sets it apart
      and the label does not outshine the line above it. */
-  --tag-foreground-color: var(--helix-color-foreground-subtle);
+  --tag-foreground-color: var(--helix-color-foreground-muted);
 
   justify-self: start;
 }
