@@ -4,6 +4,7 @@ import type { Pager } from '../render/scroll'
 import type { Copied } from './copy'
 import type { Entered } from './entry'
 import type { Joined } from './join'
+import type { OverAsked } from './layer-over'
 import type { Spun } from './spin'
 import type { Tail } from './tail'
 import type { Turned } from './toggle'
@@ -39,6 +40,8 @@ export interface Around {
   readonly layering: {
     dismiss?: (by: 'outside' | 'request' | 'swipe') => boolean
     holds?: () => boolean
+    /** Stands the layer over its anchor, as a Select's `position="item-aligned"`. */
+    over?: OverAsked
     view?: () => unknown
   }
   /** The set the element joined as an item, where it is one. */

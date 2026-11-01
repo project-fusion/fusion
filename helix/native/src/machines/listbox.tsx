@@ -191,6 +191,23 @@ const useOpening = (
     })
     return () => cancelAnimationFrame(frame)
   }, [active, held, owned])
+  /* The option the list opened on, or its first, tells the Select where it stands. */
+  const told = useRef(false)
+  useEffect(() => {
+    if (owned === undefined || told.current) {
+      return undefined
+    }
+    const entries = latest.current
+    const key = (entries.find((one) => one.value === active) ?? entries[0])?.key
+    const node = key === undefined ? undefined : held.members.get(key)?.node()
+    if (!node) {
+      return undefined
+    }
+    /* The highlight lands a draw after the first, so the first option is told until it does. */
+    told.current = active !== ''
+    owned.landed(node)
+    return undefined
+  })
 }
 
 /** The rows of `items`, the same objects while they say the same. */
