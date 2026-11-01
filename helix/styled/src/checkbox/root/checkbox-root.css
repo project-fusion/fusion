@@ -24,7 +24,7 @@
 }
 
 :host(:disabled) {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Drawn here rather than by the browser, and the trade is worth naming. */

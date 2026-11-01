@@ -16,7 +16,7 @@
   background-color: var(--code-editor-background-color, var(--helix-color-background));
   block-size: var(--code-editor-block-size, 24rem);
   border: var(--helix-border-thin) solid var(--code-editor-border-color, var(--helix-color-border));
-  border-radius: var(--code-editor-radius, var(--helix-radii-lg));
+  border-radius: var(--code-editor-radius, var(--helix-radii-md));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -230,7 +230,7 @@
 
 :host(:disabled) [part="field"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Print: the code prints as it is drawn, and the controls, the find bar and

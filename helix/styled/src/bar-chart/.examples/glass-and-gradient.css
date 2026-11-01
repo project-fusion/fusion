@@ -16,7 +16,7 @@
 .panel {
   background-color: var(--helix-color-surface);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-md);
   display: grid;
   gap: var(--helix-space-lg);
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));

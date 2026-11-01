@@ -70,7 +70,7 @@
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="label"],
 :host(:disabled) [part="hint"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Named but not shown, which is what an `aria-label` on the host becomes: the

@@ -515,6 +515,13 @@ slot[name="filter-icon"]::slotted(*) {
   }
 }
 
+/* The region takes keyboard focus for its arrow keys, and the ring sits inside it
+   so the edge of the page or a clipping parent cannot cut it. */
+[part="region"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+}
+
 @media print {
   :host {
     print-color-adjust: economy;

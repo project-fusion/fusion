@@ -16,8 +16,8 @@
   border: var(--helix-border-thin) solid
     var(--object-inspector-border-color, var(--helix-color-border));
   border-block-end: none;
-  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-lg));
-  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-md));
+  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-md));
   display: flex;
   padding-block: var(--helix-space-xs);
   padding-inline: var(--helix-space-md);
@@ -39,7 +39,7 @@
   background-color: var(--object-inspector-background-color, var(--helix-color-background));
   border: var(--helix-border-thin) solid
     var(--object-inspector-border-color, var(--helix-color-border));
-  border-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  border-radius: var(--object-inspector-radius, var(--helix-radii-md));
   font-family: var(--helix-font-mono);
   line-height: var(--helix-leading-normal);
   padding-block: var(--helix-space-xs);
@@ -53,8 +53,8 @@
   border: var(--helix-border-thin) solid
     var(--object-inspector-border-color, var(--helix-color-border));
   border-block-end: none;
-  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-lg));
-  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-lg));
+  border-start-end-radius: var(--object-inspector-radius, var(--helix-radii-md));
+  border-start-start-radius: var(--object-inspector-radius, var(--helix-radii-md));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-sans);

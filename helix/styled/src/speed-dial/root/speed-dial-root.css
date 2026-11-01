@@ -173,7 +173,7 @@
   background-color: var(--speed-dial-background-color, var(--helix-color-primary-surface));
   block-size: var(--speed-dial-size, var(--helix-size-control));
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--speed-dial-shadow, var(--helix-shadow-md));
+  box-shadow: var(--speed-dial-shadow, var(--helix-shadow-raised));
   box-sizing: border-box;
   color: var(--speed-dial-color, var(--helix-color-foreground-on-primary));
   cursor: pointer;

@@ -27,6 +27,16 @@
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* One line where one date is held, so a narrow field keeps its calendar icon in
+   place and cuts the value. Only `multiple` holds tags that wrap. */
+:host(:not([mode="multiple"])) [part="field"] {
+  flex-wrap: nowrap;
+}
+
+:host(:not([mode="multiple"])) [part="control"] {
+  text-overflow: ellipsis;
+}
+
 /* An icon or a unit at either end of the text: quieter than the value, and
    never shrinking when the field is narrow, as `Input` draws them. */
 slot[name="start"]::slotted(*),

@@ -131,7 +131,7 @@ slot[name="back-icon"]::slotted(*) {
    them would collapse the box and throw the page around under the reader for
    as long as the request takes; dimming says the same thing and holds still. */
 :host([loading]) [part="page"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-busy);
 }
 
 /* Print: a way into a hierarchy, which paper cannot descend.

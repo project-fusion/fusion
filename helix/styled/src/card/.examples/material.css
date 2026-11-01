@@ -51,7 +51,7 @@
       transparent 0 2.5rem,
       color-mix(in oklab, var(--helix-color-foreground) 26%, transparent) 2.5rem 2.625rem
     );
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-md);
   display: grid;
   gap: var(--helix-space-lg);
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));

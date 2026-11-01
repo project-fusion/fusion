@@ -200,10 +200,10 @@ export class HelixHeadlessList extends HelixElement {
 
   /**
    * The text of the row shown while the list has no rows, where the `empty`
-   * slot is empty. Empty, the default, shows no row.
+   * slot is empty. An empty string shows no row.
    */
   @property({ attribute: 'empty-text' })
-  emptyText = ''
+  emptyText = 'No items'
 
   /**
    * The kind of list, which follows from the content.

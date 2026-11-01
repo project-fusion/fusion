@@ -77,7 +77,7 @@
   --_meter-segment-hue: var(--helix-color-success);
 }
 :host([tone="warning"]) {
-  --_meter-segment-hue: var(--helix-color-warning);
+  --_meter-segment-hue: var(--helix-color-warning-mark);
 }
 
 /* A hairline between neighbors, in the track's own ground, so the boundary is

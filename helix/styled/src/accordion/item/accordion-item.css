@@ -68,7 +68,7 @@
 
 [part="trigger"]:disabled {
   cursor: not-allowed;
-  opacity: var(--accordion-item-disabled-opacity, 0.5);
+  opacity: var(--accordion-item-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* Inset, because the trigger runs to the item's edge and an outset ring would be

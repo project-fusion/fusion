@@ -69,7 +69,7 @@
 :host([material="glass"]) [part~="surface"],
 :host([material="glass"]) [part~="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));
-  background-color: var(--tooltip-background-color, var(--helix-material-translucent));
+  background-color: var(--tooltip-background-color, var(--helix-material-panel));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and

@@ -14,7 +14,7 @@
 .words {
   backdrop-filter: var(--helix-material-backdrop);
   background-color: var(--helix-material-translucent);
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-md);
   display: grid;
   gap: var(--helix-space-sm);
   max-inline-size: 26rem;

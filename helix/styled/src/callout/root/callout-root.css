@@ -13,7 +13,7 @@
   --_callout-tone: var(--helix-color-info);
   /* The tone, or a color of the page's own through the hook. */
   --_callout-color: var(--callout-accent-color, var(--_callout-tone));
-  --_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick));
+  --_callout-bar: var(--callout-bar-thickness, 0px);
   /* The control steps, which are `space-md` and `text-sm` at the resting
      density, so a callout in a `data-density` region is set as tight or as
      loose as the controls beside it, as Card is, rather than through a `size`
@@ -28,6 +28,10 @@
     --callout-background-color,
     color-mix(in oklab, var(--_callout-color) 10%, transparent)
   );
+  /* A hairline of the tone, as a Tag draws, so a callout sits with its nearest
+     relative. `--callout-bar-thickness` still draws the clipped bar. */
+  box-shadow: inset 0 0 0 var(--helix-border-thin)
+    color-mix(in oklab, var(--_callout-color) 28%, var(--helix-color-background));
   overflow: hidden;
   position: relative;
   /* The house radius, and everything a callout sits beside is `sm`. At `md` the
@@ -66,7 +70,7 @@
 }
 
 :host([tone="warning"]) {
-  --_callout-tone: var(--helix-color-warning);
+  --_callout-tone: var(--helix-color-warning-mark);
 }
 
 :host([tone="danger"]) {
@@ -74,7 +78,7 @@
 }
 
 /* *Separation is where the box ends, and tone what it says**, so either can
-   change without the other. Absent, or `filled`, is the tint with the bar. */
+   change without the other. Absent, or `filled`, is the tint with the hairline. */
 
 /* The tone at the edge, with no fill: for a page where a tinted box is too
    much. An inset line, so the box is the same size as the tinted one. A hairline
@@ -89,7 +93,9 @@
 /* The bar and the mark and nothing behind them, for an aside in running
    prose. The bar stays, being what says the tone where the hue is not seen. */
 :host([separation="plain"]) {
+  --_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick));
   background-color: var(--callout-background-color, transparent);
+  box-shadow: none;
 }
 
 [part="icon"] {

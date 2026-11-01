@@ -129,7 +129,7 @@ slot[name="label"]::slotted(*) {
 }
 
 [part~="indicator"][data-band="fair"] {
-  --_meter-hue: var(--meter-color, var(--helix-color-warning));
+  --_meter-hue: var(--meter-color, var(--helix-color-warning-mark));
   background-color: var(--_meter-hue);
 }
 
@@ -299,7 +299,7 @@ slot[name="label"]::slotted(*) {
 
 :host([shape="arc"]) [part~="indicator"][data-band="fair"],
 :host([shape="ring"]) [part~="indicator"][data-band="fair"] {
-  --_meter-hue: var(--meter-color, var(--helix-color-warning));
+  --_meter-hue: var(--meter-color, var(--helix-color-warning-mark));
   stroke: var(--_meter-hue);
 }
 

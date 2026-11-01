@@ -171,7 +171,7 @@
   backdrop-filter: var(--popover-backdrop, var(--helix-material-backdrop));
   background-color: var(
     --popover-background-color,
-    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+    var(--helix-material-panel)
   );
 }
 

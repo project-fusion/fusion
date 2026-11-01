@@ -126,7 +126,7 @@
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
   background-color: var(
     --drawer-background-color,
-    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+    var(--helix-material-modal)
   );
 }
 

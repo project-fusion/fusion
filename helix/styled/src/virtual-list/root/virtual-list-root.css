@@ -76,7 +76,7 @@
    press on it chooses anything. */
 ::slotted([aria-disabled="true"]) {
   cursor: not-allowed;
-  opacity: var(--virtual-list-disabled-opacity, 0.5);
+  opacity: var(--virtual-list-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* The row after the last item while more are fetched: quiet, and centered

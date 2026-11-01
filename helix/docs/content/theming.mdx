@@ -60,7 +60,9 @@ Tuned does not guarantee contrast. CSS has no contrast function.
 `oklch(from …)` can step and rotate a color, but it cannot search for the
 lightness that meets a target. The contrast figures built into the ramp were
 measured on one blue seed, so they are exact for that seed and approximate for
-any other.
+any other. The label on a solid button turns black on a seed lighter than L 0.68.
+The focus ring still follows the seed, so use the verified engine for a very
+light brand, where the ring measures 1.23:1 on white.
 
 **Verified** uses the theme engine. It searches for each color that meets its
 target, measures every pair, and returns the theme with any violations:

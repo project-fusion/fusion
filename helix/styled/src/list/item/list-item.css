@@ -195,5 +195,5 @@ slot[name="end"]::slotted(*) {
 
 /* Out of reach, and drawn so: the platform's own disabled step. */
 :host([disabled]) {
-  opacity: var(--list-item-disabled-opacity, 0.5);
+  opacity: var(--list-item-disabled-opacity, var(--helix-opacity-disabled));
 }

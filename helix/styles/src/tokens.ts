@@ -138,6 +138,13 @@ export const TOKENS: Token[] = [
     'color-hover',
     'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
   ],
+  /* The bubble of your own message: a brand's wash, or at no brand a lighter one,
+     since 28% of near black is `#bfbfbf`, heavier than the other speaker. */
+  [
+    'color-primary-wash',
+    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 16%, transparent))',
+    'A wash of the primary color, such as the bubble of your own Chat message.',
+  ],
   /* What a control is lit with under a press, a step past `color-hover`. A press
      has to read on a phone, where no hover comes first. */
   [
@@ -526,6 +533,14 @@ export const TOKENS: Token[] = [
      toast, danger at 2.85:1 against a 3:1 floor. */
   ['color-success', 'light-dark(var(--_helix-success-600), var(--_helix-success-400))'],
   ['color-warning', 'light-dark(var(--_helix-warning-600), var(--_helix-warning-400))'],
+  /* Warning as a mark: a star, a Meter's fill, a Callout's icon. The ink is solved
+     for text at 5.62:1 and reads brown as a shape, so a mark takes this, solved at
+     3:1 on the light page. */
+  [
+    'color-warning-mark',
+    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.14) calc(c * 1.25) h), var(--helix-color-warning))',
+    'Warning as a mark that is not text, such as a star or a Meter fill.',
+  ],
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. */
   ['color-danger', 'light-dark(var(--_helix-danger-600), var(--_helix-danger-400))'],
@@ -753,6 +768,13 @@ export const TOKENS: Token[] = [
     'var(--helix-shadow-lg)',
     'The shadow of a surface that floats over content.',
   ],
+  /* A control lifted over content: a raised Icon Button, a Carousel arrow, a Speed
+     Dial. The same lift as a panel, and a control keeps its own corner. */
+  [
+    'shadow-raised',
+    'var(--helix-shadow-floating)',
+    'The shadow of a control lifted over content.',
+  ],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through
      it. */
@@ -769,6 +791,11 @@ export const TOKENS: Token[] = [
      a component keeps the strength it was drawn at and the theme moves all of
      them together: 1 is what ships, below 1 is more see-through, above 1 more
      solid. */
+  /* How far a control that does not take a press fades. Every family keeps its own
+     hook and reads this behind it. */
+  ['opacity-disabled', '0.5', 'How far a disabled control fades.'],
+  /* Rows that stay on screen while a new set arrives. */
+  ['opacity-busy', '0.5', 'How far rows fade while a new set loads.'],
   ['material-opacity', '1', 'How opaque a translucent surface is.'],
   /* *Two facts about glass that no token can express, written where the blurs
      are because they are what a consumer needs before reaching for one.** Both
@@ -794,7 +821,7 @@ export const TOKENS: Token[] = [
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 30%, transparent )',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 30%, transparent), color-mix(in oklab, var(--_helix-neutral-900) 48%, transparent) )',
 
     'The translucent background, for a surface that shows what is behind it.',
   ],
@@ -803,6 +830,21 @@ export const TOKENS: Token[] = [
     'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )',
 
     'The stronger translucent background, for a surface that shows less of what is behind it.',
+  ],
+  /* **Glass over a page, and glass over its own scrim.** A modal samples the scrim
+     behind it, so it needs more coverage to stay a surface: at 30% it landed at L
+     0.76 in light. A menu or a popover has no scrim, so it can show more of the
+     page. Dark takes 48% in both: white ink over high-contrast stripes measured
+     3.42:1 at 30% and 5.40:1 at 48%, October 31, 2026. */
+  [
+    'material-modal',
+    'light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))',
+    'The glass of a Dialog or Drawer, which sits over its own scrim.',
+  ],
+  [
+    'material-panel',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent), var(--helix-material-translucent) )',
+    'The glass of a panel over the page, such as a Menu, Popover, or Tooltip.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the
      same bug: `light-dark()` in `color-mix()`'s percentage slot, sitting two

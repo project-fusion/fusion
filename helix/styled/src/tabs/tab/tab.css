@@ -110,7 +110,7 @@
 [part="tab"]:disabled,
 [part="tab"][aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: var(--tabs-tab-disabled-opacity, 0.5);
+  opacity: var(--tabs-tab-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* Inset, because the tab sits against the list's own rule and an outset ring

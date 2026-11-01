@@ -55,8 +55,8 @@
      the block's `border-radius`, so a consumer wanting a different corner would
      otherwise have to reach past the component in all three or get a bar and a
      body that disagreed. */
-  border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
-  border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-start-end-radius: var(--code-block-radius, var(--helix-radii-md));
+  border-start-start-radius: var(--code-block-radius, var(--helix-radii-md));
   display: flex;
   gap: var(--helix-space-sm);
   /* `2xs` around a line of `xs` text is a 24px strip, which reads as squeezed
@@ -164,7 +164,7 @@
   backdrop-filter: var(--code-block-backdrop, none);
   background-color: var(--code-block-background-color, var(--helix-color-background));
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
-  border-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-radius: var(--code-block-radius, var(--helix-radii-md));
   margin: var(--helix-space-none);
   overflow-x: auto;
   padding-block: var(--helix-space-sm);
@@ -194,8 +194,8 @@
   background-color: var(--code-block-header-background-color, var(--helix-color-surface-raised));
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
   border-block-end-width: var(--helix-space-none);
-  border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
-  border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-start-end-radius: var(--code-block-radius, var(--helix-radii-md));
+  border-start-start-radius: var(--code-block-radius, var(--helix-radii-md));
   display: flex;
   overflow-x: auto;
   padding-inline: var(--helix-space-xs);
@@ -395,7 +395,7 @@
   backdrop-filter: var(--code-block-backdrop, none);
   background-color: var(--code-block-background-color, var(--helix-color-background));
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
-  border-radius: var(--code-block-radius, var(--helix-radii-lg));
+  border-radius: var(--code-block-radius, var(--helix-radii-md));
   margin: var(--helix-space-none);
   min-inline-size: 0;
   overflow-x: auto;
@@ -445,8 +445,8 @@
      so it keeps its top edge and corners. */
   [part="header"] + [part="frame"] [part="new"] {
     border-block-start-width: var(--helix-border-thin);
-    border-start-end-radius: var(--code-block-radius, var(--helix-radii-lg));
-    border-start-start-radius: var(--code-block-radius, var(--helix-radii-lg));
+    border-start-end-radius: var(--code-block-radius, var(--helix-radii-md));
+    border-start-start-radius: var(--code-block-radius, var(--helix-radii-md));
   }
 
   /* Stacked, the button's band is the old version's alone, at the top. */

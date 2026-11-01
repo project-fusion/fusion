@@ -206,7 +206,7 @@ slot[name="marker"]::slotted(*) {
 
 :host([disabled]) [part="marker"],
 :host([disabled]) [part="description"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* What the stage holds, open on the current step and only down a column. A row

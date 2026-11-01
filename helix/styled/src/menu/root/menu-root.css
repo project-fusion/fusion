@@ -61,10 +61,7 @@
    opened a solid panel beside it. The two privates inherit through the slot the
    rows are assigned to, and `menu-item.css` reads them. */
 :host([material="glass"]) [part="surface"] {
-  --_menu-material-fill: light-dark(
-    var(--helix-material-translucent-strong),
-    var(--helix-material-translucent)
-  );
+  --_menu-material-fill: var(--helix-material-panel);
   --_menu-material-backdrop: var(--menu-backdrop, var(--helix-material-backdrop));
   --_floating-background-color: var(--menu-background-color, var(--_menu-material-fill));
   backdrop-filter: var(--_menu-material-backdrop);
@@ -178,7 +175,7 @@
    them would collapse the box and throw the page around under the reader for
    as long as the request takes; dimming says the same thing and holds still. */
 :host([loading]) [part="surface"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-busy);
 }
 
 /*

@@ -41,7 +41,7 @@
 }
 
 :host(:disabled) {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* The groove. One cell, so the input lies over the whole of it and the thumb

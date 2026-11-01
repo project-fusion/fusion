@@ -96,7 +96,7 @@
 ::slotted([slot="footer"]) {
   display: flex;
   gap: var(--helix-space-xs);
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 
 /* It arrives *and* it leaves. **The rise is `lg`, twenty-four pixels rather than
@@ -290,7 +290,7 @@
   backdrop-filter: var(--dialog-backdrop, var(--helix-material-backdrop));
   background-color: var(
     --dialog-background-color,
-    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+    var(--helix-material-modal)
   );
 }
 

@@ -481,7 +481,7 @@
 [part="send"][aria-disabled="true"],
 [part~="voice"]:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* The empty draft's own action, such as starting a voice conversation, in

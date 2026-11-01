@@ -257,7 +257,7 @@
 
 [part="row-grip-button"][aria-disabled="true"] {
   cursor: default;
-  opacity: var(--data-table-grip-disabled-opacity, 0.4);
+  opacity: var(--data-table-grip-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 [part="row-grip-mark"] {
@@ -514,7 +514,7 @@
    as the request takes, which is the whole of what a server-mode table does on
    every sort. */
 :host([loading]) [part="table"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-busy);
 }
 
 /* The copy of a row a pointer drags, drawn in the top layer and raised over
