@@ -373,7 +373,7 @@ pub const SELECT: &[(&str, Names)] = &[
 ];
 
 /// What a field that opens a list computes for its parts, each read as `select.x`.
-pub const SELECT_COMPUTED: &[&str] = &["listName", "said", "status", "words"];
+pub const SELECT_COMPUTED: &[&str] = &["listName", "said", "status", "unchosen", "words"];
 
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[

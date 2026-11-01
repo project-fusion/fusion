@@ -352,6 +352,8 @@ export interface SelectChoice {
   readonly position?: string
   readonly said?: string
   readonly status?: string
+  /** Whether nothing is chosen, so the words are the placeholder, the name a render binds. */
+  readonly unchosen?: string
   readonly value?: string
   readonly words?: string
 }
