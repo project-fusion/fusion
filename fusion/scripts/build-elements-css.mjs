@@ -301,9 +301,15 @@ helix-table:not(:defined) > helix-table-column::part(column) {
 }
 
 helix-table:not(:defined) > helix-table-row > helix-table-cell {
+  font-variant-numeric: tabular-nums;
   min-block-size: var(--helix-size-control);
   overflow-wrap: anywhere;
-  padding-block: var(--helix-space-xs);
+  padding-block: calc(var(--helix-space-control) * 0.5);
+}
+
+helix-table:not(:defined) > helix-table-column:last-of-type,
+helix-table:not(:defined) > helix-table-row > helix-table-cell:last-child {
+  padding-inline-end: var(--helix-space-none);
 }
 
 helix-table:not(:defined) > helix-table-row > helix-table-cell[header] {
@@ -355,6 +361,10 @@ ${SERVED} > ${VISIBLE} {
   padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
 }
 
+${SERVED} > helix-table-column:last-of-type {
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-none));
+}
+
 ${SERVED} > helix-table-column[text-align="center"] {
   justify-content: center;
 }
@@ -384,12 +394,17 @@ helix-data-table > helix-table-row > helix-table-cell {
   display: block;
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-sm));
+  font-variant-numeric: tabular-nums;
   font-weight: inherit;
   min-block-size: auto;
   min-inline-size: auto;
   overflow-wrap: normal;
   padding-block: var(--data-table-padding-block, var(--helix-space-sm));
   padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
+}
+
+helix-data-table > helix-table-row > helix-table-cell:last-child {
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-none));
 }
 
 helix-data-table > helix-table-row:last-of-type > helix-table-cell {
