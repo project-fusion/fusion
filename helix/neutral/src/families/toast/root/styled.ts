@@ -21,8 +21,8 @@ import root from './headless.js'
  * at the start, the middle, or the end of the line as `placement` says. The
  * stack has no surface of its own and takes no touch between its messages,
  * so the page beside a message stays pressable. **Below a window of 30rem
- * each message takes the whole width of the stack.** A phone keeps the stack
- * clear of the home indicator and the status bar.
+ * a phone's message takes the whole width of the stack.** A phone keeps the
+ * stack clear of the home indicator and the status bar.
  *
  * **The messages are drawn in the scheme opposite the page's**, unless the
  * stack names its own mode with `data-color-mode`. The stack is not printed,
@@ -97,8 +97,10 @@ export default styles(
         rule({ placement: ['bottom-center', 'top-center'] }, { alignItems: 'center' }),
         /* A message is never wider than the window less a margin. */
         web([rule({ own: { toastMost: difference('100vw', token('space-xl')) } })]),
-        /* Each message the whole width of the stack where the window is narrow. */
-        rule({ window: { below: '30rem' } }, { own: { toastWidth: '100%' } }),
+        /* The web's message keeps its own width at every window, capped by `toastMost`,
+           and a phone's takes the whole width of the stack where its window is narrow. */
+        web([rule({ own: { toastWidth: '22rem' } })]),
+        native([rule({ window: { below: '30rem' } }, { own: { toastWidth: '100%' } })]),
         /* A phone keeps the stack from the edges, clear of the home indicator
            at the bottom and of the status bar at the top. */
         native([
