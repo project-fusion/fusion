@@ -297,7 +297,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'windowed'
   >
   /** What a field that opens a list of options computes for its parts. */
-  readonly select: Computes<'listName' | 'said' | 'status' | 'words'>
+  readonly select: Computes<'listName' | 'said' | 'status' | 'unchosen' | 'words'>
   /** What an option computes for its parts. */
   readonly option: Computes<
     | 'checkShown'
