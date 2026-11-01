@@ -244,11 +244,11 @@ fn the_token_layer_is_written_with_its_modes_and_densities() {
     );
     assert_eq!(
         density["contexts"]["lg"][0]["text"]["control"]["$value"],
-        "{text.md}"
+        "{text.control-lg}"
     );
     assert_eq!(
         density["contexts"]["sm"][0]["size"]["control-tight"]["$value"],
-        json!({ "value": 1.6, "unit": "rem" })
+        json!({ "value": 1.625, "unit": "rem" })
     );
     let dark = &resolver["modifiers"]["mode"]["contexts"]["dark"][0];
     assert_eq!(dark["color"]["background"]["$value"]["hex"], "#000000");
