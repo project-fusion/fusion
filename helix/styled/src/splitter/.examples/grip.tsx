@@ -2,8 +2,8 @@ export function Example() {
   return (
     <helix-splitter
       default-position="40"
-      style={{ blockSize: '12rem' }}
       handle="grip"
+      style={{ blockSize: '12rem' }}
     >
       <helix-card
         separation="plain"

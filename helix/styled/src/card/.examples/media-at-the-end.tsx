@@ -10,8 +10,8 @@ export function Example() {
         <helix-text
           as="h3"
           id="sessions-title"
-          slot="header"
           scale="title"
+          slot="header"
         >
           Sessions
         </helix-text>
