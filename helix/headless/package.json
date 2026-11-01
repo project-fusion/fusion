@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-headless",
   "description": "Headless component tier. Structure, accessibility, state, and form participation. No styling.",
-  "version": "0.229.0",
+  "version": "0.229.1",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

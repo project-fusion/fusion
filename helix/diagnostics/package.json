@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-diagnostics",
   "description": "Finds the Helix mistakes that are valid CSS: dead parts, misnamed hooks, two copies of the library.",
-  "version": "0.229.0",
+  "version": "0.229.1",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {
