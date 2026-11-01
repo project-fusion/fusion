@@ -118,6 +118,8 @@ export const useLayer = (
     readLayer(family, props, use, stated)
   /* A look alone, as a tour's spotlight: no touch, no key, no focus. */
   const decorative = node?.attributes?.decorative === true
+  /* A tour's stop stands over what its tour opens, as the web's shows after it. */
+  const guide = family.api?.stop !== undefined
   const open = openOf(toggled?.checked, shown, read.open)
   const targeted = useTargetView(read.target)
   const host = useLayerHost()
@@ -233,6 +235,7 @@ export const useLayer = (
       decorative,
       ...(swiped.edge === undefined ? {} : { edge: swiped.edge }),
       floating: placed.floating,
+      ...(guide ? { guide } : {}),
       key,
       measured: placed.measured,
       modal: holdsReader,
@@ -254,6 +257,7 @@ export const useLayer = (
       arrow.corner,
       decorative,
       dismiss,
+      guide,
       holdsReader,
       insets,
       key,

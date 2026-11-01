@@ -66,6 +66,8 @@ export interface Layered {
   readonly measured: Readonly<Record<string, number>>
   /** Whether it holds the reader now: a modal layer that stands open. */
   readonly modal: boolean
+  /** Whether it is a guide, drawn above every layer but a notice, as a tour's stop is. */
+  readonly guide?: boolean
   /**
    * Whether it is a notice, drawn above every other layer and read and
    * pressable while a modal one holds the reader, as a toast's stack is.

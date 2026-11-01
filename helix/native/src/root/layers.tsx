@@ -18,6 +18,10 @@
  * spotlight dims the app under the tour's stops and any menu it points
  * into: it takes no touch, no key, and nothing a screen reader reaches.
  *
+ * **A guide stands above every layer but a notice**, as a tour's stop stands
+ * over a menu or a drawer its tour opens to point into, whichever opened
+ * first, so its controls stay pressable over the scrim of what it points at.
+ *
  * **A notice stands above every other layer**, as a toast's stack does: it
  * is drawn after the rest whenever it opened, and stays read and pressable
  * while a modal layer holds the reader. It takes a close request only while
@@ -60,6 +64,8 @@ export interface HostedLayer {
   readonly modal: boolean
   /** Whether it is a look alone, drawn under every other layer and never the top one. */
   readonly decorative?: boolean
+  /** Whether it is a guide, drawn above every layer but a notice and the top one while it is open. */
+  readonly guide?: boolean
   /** Whether it is a notice, drawn above every other layer and never hidden by one. */
   readonly notice?: boolean
   /** Hears a touch that starts on the app outside every layer, in window points. */
@@ -124,14 +130,16 @@ const hearInsets = (changed: () => void) => environment().observe(() => changed(
 
 /**
  * The layers in the order they are drawn: each decorative layer, then each
- * other layer, each in the order it opened, then each notice in the order it
- * opened.
+ * other layer, then each guide, then each notice, each in the order it opened.
  */
-export const drawnOrder = <Layer extends Pick<HostedLayer, 'decorative' | 'notice'>>(
+export const drawnOrder = <Layer extends Pick<HostedLayer, 'decorative' | 'guide' | 'notice'>>(
   layers: readonly (readonly [object, Layer])[],
 ): (readonly [object, Layer])[] => [
   ...layers.filter(([, layer]) => layer.decorative === true),
-  ...layers.filter(([, layer]) => layer.notice !== true && layer.decorative !== true),
+  ...layers.filter(
+    ([, layer]) => layer.notice !== true && layer.decorative !== true && layer.guide !== true,
+  ),
+  ...layers.filter(([, layer]) => layer.guide === true),
   ...layers.filter(([, layer]) => layer.notice === true),
 ]
 
@@ -151,6 +159,7 @@ export const LayerHostView = ({ children, keyboard = 'avoid' }: LayerHostProps) 
   const order = useRef<object[]>([])
   const notices = useRef(new WeakSet<object>())
   const looks = useRef(new WeakSet<object>())
+  const guides = useRef(new WeakSet<object>())
   /* Each layer's own number, which keys its view while layers come and go. */
   const ids = useRef(new WeakMap<object, number>())
   const next = useRef(0)
@@ -173,6 +182,9 @@ export const LayerHostView = ({ children, keyboard = 'avoid' }: LayerHostProps) 
     if (layer.decorative === true) {
       looks.current.add(key)
     }
+    if (layer.guide === true) {
+      guides.current.add(key)
+    }
     if (!ids.current.has(key)) {
       ids.current.set(key, next.current)
       next.current += 1
@@ -190,7 +202,9 @@ export const LayerHostView = ({ children, keyboard = 'avoid' }: LayerHostProps) 
   const top = useCallback((key: object) => {
     const drawn = order.current.filter((one) => !looks.current.has(one))
     const others = drawn.filter((one) => !notices.current.has(one))
-    return (others.length === 0 ? drawn : others).at(-1) === key
+    const standing = others.filter((one) => guides.current.has(one))
+    const ranked = standing.length > 0 ? standing : others
+    return (ranked.length === 0 ? drawn : ranked).at(-1) === key
   }, [])
   const insets = useMemo<Insets>(() => (height > 0 ? { ...safe, bottom: 0 } : safe), [height, safe])
   const host = useMemo<LayerHost>(
