@@ -51,9 +51,7 @@ export default styles(
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-control': token('size-control-md'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': web(
-            fn('round', product(token('size-control'), 0.8), '1px'),
-          ),
+          '--helix-size-control-tight': fn('round', product(token('size-control'), 0.8), '1px'),
           '--helix-size-switch': token('size-switch-md'),
           '--helix-text-control': token('text-control-md'),
           '--helix-space-control': token('space-md'),
@@ -71,9 +69,7 @@ export default styles(
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
           '--helix-size-control': token('size-control-lg'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': web(
-            fn('round', product(token('size-control'), 0.8), '1px'),
-          ),
+          '--helix-size-control-tight': fn('round', product(token('size-control'), 0.8), '1px'),
           '--helix-size-switch': token('size-switch-lg'),
           '--helix-text-control': token('text-control-lg'),
           '--helix-space-control': token('space-lg'),

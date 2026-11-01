@@ -22,7 +22,7 @@ const FIELD_INSET = sum(
 const STEP_DOWN = {
   '--helix-size-control': token('size-control-sm'),
   '--helix-size-control-loose': product(token('size-control'), '1.2'),
-  '--helix-size-control-tight': web(fn('round', product(token('size-control'), '0.8'), '1px')),
+  '--helix-size-control-tight': fn('round', product(token('size-control'), '0.8'), '1px'),
   '--helix-size-checkbox': token('size-checkbox-sm'),
   '--helix-size-checkbox-loose': product(token('size-checkbox'), '1.2'),
   '--helix-size-checkbox-tight': product(token('size-checkbox'), '0.8'),
