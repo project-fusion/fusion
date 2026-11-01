@@ -2,6 +2,8 @@
 # it; a press on the trigger again opens it, and a press outside closes it.
 # The events example logs what the panel sends as its trigger opens and
 # closes it. Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
 appId: dev.fusion.helix.app
 name: Popover
 tags:
@@ -44,10 +46,10 @@ tags:
 - extendedWaitUntil:
     visible: .*Last edited by Alex Kim.*
     timeout: 5000
-- assertVisible: helix-before-open
+- assertVisible: .*helix-before-open.*
 - tapOn: Details
 - extendedWaitUntil:
     notVisible: .*Last edited by Alex Kim.*
     timeout: 5000
-- assertVisible: helix-before-close
+- assertVisible: .*helix-before-close.*
 - stopRecording

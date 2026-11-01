@@ -2,6 +2,8 @@
 # tooltip for a moment, then the button is named Copy again; the label
 # example draws its words beside the icon and swaps them for the result.
 # The events example logs the copied text. Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
 appId: dev.fusion.helix.app
 name: Copy Button
 tags:
@@ -36,7 +38,7 @@ tags:
     timeout: 5000
 - openLink: helix://copy-button/events/preview
 - extendedWaitUntil:
-    visible: No events yet
+    visible: .*No events yet.*
     timeout: 15000
 - tapOn: Copy
 - extendedWaitUntil:

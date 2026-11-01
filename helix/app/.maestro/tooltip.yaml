@@ -2,6 +2,8 @@
 # touch elsewhere takes it down; a quick press on the button presses it and
 # shows nothing. The events example logs what the bubble sends as a long
 # press shows it. Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
 appId: dev.fusion.helix.app
 name: Tooltip
 tags:
@@ -38,5 +40,5 @@ tags:
 - extendedWaitUntil:
     visible: Make the page visible to everyone
     timeout: 5000
-- assertVisible: helix-before-open
+- assertVisible: .*helix-before-open.*
 - stopRecording
