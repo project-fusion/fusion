@@ -103,9 +103,9 @@
    own ink it would read as part of the heading's words. */
 [part="grip"] {
   all: unset;
-  /* A sixth of the mark above and below, so the mark is three quarters of the
+  /* Room above and below the mark, so the mark stays under three quarters of the
      button's height. Along the row it stays the mark's width. */
-  padding-block: calc(var(--helix-text-control) / 6);
+  padding-block: var(--helix-space-2xs);
   align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;

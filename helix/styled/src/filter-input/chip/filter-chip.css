@@ -5,9 +5,17 @@
    "is not" changes what the chip means and has to be read. */
 :host {
   align-items: center;
-  background-color: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
+  --_chip-fill: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--_chip-fill);
+  /* The edge is a step from the chip's own fill. `color-border` is a step from the
+     page, and on the sunken fill in light it measured 1.03:1. This mix measures
+     1.27:1 in light, near the 1.23:1 `color-border` has on the page, and is the
+     1.16:1 `color-border` already drew in dark. */
   border: var(--helix-border-thin) solid
-    var(--filter-input-chip-border-color, var(--helix-color-border));
+    var(
+      --filter-input-chip-border-color,
+      color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_chip-fill))
+    );
   border-radius: var(--filter-input-chip-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   display: inline-flex;
