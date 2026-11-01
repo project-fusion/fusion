@@ -1391,6 +1391,18 @@ tag's fill is mixed, and a phone mixes the same channels. A rule under
 web's alone. A link part's `href` is a part condition, `[part="link"][href]`,
 while the link has somewhere to go.
 
+## Options and their owners
+
+An option says what it reads as its source's `option`, and joins whichever owner
+stands around it through `OptionOwnerContext` in the native runtime, whatever the
+owner is. An owner hosts core's arithmetic from `@fusion.dev/helix-core/listbox` and
+`useVirtualFocus` for its highlight. A list says what it reads as its `listbox`,
+and holds its own answer and its own filter, so a `validation` and a `TextInput`
+need no `text` beside it. `optionGroup` is a group, or with no `label`, a rule.
+
+The fragments `floating-panel`, `floating-entrance`, `tags`, `field-segments`, and
+`collection-state` hold what the shared sheets of the same names hold.
+
 ## Table
 
 `tableRoot`, `tableRow`, and `tableColumn` say what a phone's machines read. A

@@ -24,7 +24,7 @@ const FIELDS: [sheet: string, selector: string][] = [
   ['shared/field/field-frame.css', '[part="control"] {'],
   ['shared/field/field-segments.css', '[part="segments"] {'],
   ['select/root/select-root.css', '[part="trigger"] {'],
-  ['listbox/root/listbox-root.css', '[part="search-field"] {'],
+  ['listbox/root/listbox-root.generated.css', '[part="search-field"] {'],
   ['command/root/command-root.css', 'helix-listbox::part(search-field) {'],
   ['color-picker/root/color-picker-root.generated.css', ':host [part="value"] {'],
   ['color-picker/root/color-picker-root.generated.css', ':host [part="field-input"] {'],
