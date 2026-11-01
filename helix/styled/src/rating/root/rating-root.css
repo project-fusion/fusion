@@ -70,7 +70,7 @@
  * pitch and the remainder across the mark itself, which puts a fifth of a mark
  * where a fifth of a mark belongs. */
 [part="fill"] {
-  color: var(--rating-color, var(--helix-color-warning));
+  color: var(--rating-color, var(--helix-color-warning-mark));
   inline-size: calc(
     var(--rating-full, 0) *
     (var(--_rating-mark-size) + var(--_rating-mark-gap)) +
@@ -180,7 +180,7 @@
 }
 
 :host(:disabled) [part="marks"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* A readout is not a control: nothing to press, so nothing that looks pressable. */

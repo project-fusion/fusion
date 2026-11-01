@@ -572,7 +572,7 @@
 :host([controls-placement="overlay"]) [part="rotation"] {
   background-color: var(--helix-color-surface-overlay);
   border-color: transparent;
-  box-shadow: var(--helix-shadow-md);
+  box-shadow: var(--helix-shadow-raised);
   pointer-events: auto;
 }
 
@@ -599,7 +599,7 @@
 :host([indicator-placement="overlay"]) [part="indicators"] {
   background-color: var(--helix-color-surface-overlay);
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-md);
+  box-shadow: var(--helix-shadow-raised);
   margin-block-end: calc(var(--_carousel-bleed) + var(--helix-space-md));
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-xs);
@@ -681,6 +681,13 @@
 :host([orientation="vertical"]:not([indicator-placement])) [part~="indicator"][data-current] {
   block-size: var(--helix-space-lg);
   inline-size: var(--helix-space-xs);
+}
+
+/* The region takes keyboard focus for its arrow keys, and the ring sits inside it
+   so the edge of the page or a clipping parent cannot cut it. */
+[part="track"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
 }
 
 /* Print: the slide that is showing, without the controls that would change it. */

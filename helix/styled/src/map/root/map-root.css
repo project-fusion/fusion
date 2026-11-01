@@ -140,6 +140,13 @@
    draws the pair, the filter and the translucent ground, and its pointed-at
    wash. */
 
+/* The region takes keyboard focus for its arrow keys, and the ring sits inside it
+   so the edge of the page or a clipping parent cannot cut it. */
+[part="region"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+}
+
 /* **Printed as it stands rather than hidden.** A map is the content of the page
    it is on often enough that dropping it would be the surprising answer, and
    the controls are the part that means nothing on paper. */

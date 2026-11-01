@@ -631,7 +631,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
 
 [data-button][aria-disabled="true"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Density. */
@@ -820,7 +820,7 @@ helix-toggle:state(pressed)::part(item) {
 
 helix-toggle[disabled]::part(item) {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* The nav item. */

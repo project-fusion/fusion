@@ -606,7 +606,7 @@
  * `<fieldset disabled>` reaches it too. Listbox carries the longer note. */
 :host(:disabled) {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Read-only, which is not this control at half opacity.

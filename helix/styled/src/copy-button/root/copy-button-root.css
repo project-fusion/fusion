@@ -80,8 +80,8 @@ slot[hidden] {
    Measured: both glyphs rendered, both took the right color, and both came out
    0x0, so the button was a correctly sized box containing nothing. */
 slot > svg {
-  block-size: var(--copy-button-icon-size, var(--helix-size-icon-tight));
-  inline-size: var(--copy-button-icon-size, var(--helix-size-icon-tight));
+  block-size: var(--copy-button-icon-size, var(--helix-size-icon));
+  inline-size: var(--copy-button-icon-size, var(--helix-size-icon));
 }
 
 /* Not printed, being a control. */

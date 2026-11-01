@@ -32,7 +32,7 @@
 
 [part="item"]:disabled {
   cursor: not-allowed;
-  opacity: var(--speed-dial-item-disabled-opacity, 0.5);
+  opacity: var(--speed-dial-item-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* Round, raised and the size of a small control: the same shape as the button
@@ -44,7 +44,7 @@
   aspect-ratio: 1;
   background-color: var(--speed-dial-item-background-color, var(--helix-color-surface-overlay));
   border-radius: var(--helix-radii-full);
-  box-shadow: var(--helix-shadow-md);
+  box-shadow: var(--helix-shadow-raised);
   color: var(--speed-dial-item-color, var(--helix-color-foreground));
   display: inline-flex;
   inline-size: var(--speed-dial-item-size, var(--helix-size-control-tight));

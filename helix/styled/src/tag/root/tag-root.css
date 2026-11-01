@@ -160,8 +160,10 @@ slot:not([name])::slotted(helix-icon) {
 }
 
 [part="dismiss"] svg {
-  block-size: 0.85em;
-  inline-size: 0.85em;
+  /* From the icon steps, so the mark follows density with the tag around it. */
+  --_tag-dismiss-size: calc(var(--helix-size-icon-tight) * 0.75);
+  block-size: var(--_tag-dismiss-size);
+  inline-size: var(--_tag-dismiss-size);
 }
 
 /* The category a tag belongs to, before the label it qualifies. **Every
@@ -202,7 +204,7 @@ slot[name="start"]::slotted(*) {
 
 /* Out of reach, and drawn so: the platform's own disabled step. */
 :host([disabled]) {
-  opacity: var(--tag-disabled-opacity, 0.5);
+  opacity: var(--tag-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 :host([disabled]) [part="dismiss"] {

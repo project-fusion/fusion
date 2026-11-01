@@ -14,7 +14,7 @@
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
   /* `lg`: a container corner rather than the `sm` the controls inside it take. */
-  border-radius: var(--card-radius, var(--helix-radii-lg));
+  border-radius: var(--card-radius, var(--helix-radii-md));
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. */
   box-shadow: var(--card-shadow, var(--helix-shadow-surface));
@@ -196,6 +196,8 @@ slot[name="footer-actions"]::slotted(*) {
    component owns both and a consumer says what it wants rather than assembling
    it. */
 :host([material="glass"]) {
+  /* Full ink: muted ink over a busy page falls under 4.5:1 through glass. */
+  color: var(--card-color, var(--helix-color-foreground));
   backdrop-filter: var(--card-backdrop, var(--helix-material-backdrop));
   background-color: var(--card-background-color, var(--helix-material-translucent));
 }

@@ -32,7 +32,9 @@
   /* The color the chart series rotate from: the brand where there is one, and
      hue 258 where there is not, which is where they have always started. Only
      its hue is read, each series stating its own lightness and chroma. */
-  --_helix-series-origin: var(--helix-seed-brand, oklch(0.539 0.19 258));
+  /* 270 with no brand, since 258 put series 2 six degrees from danger and series 5
+     three from warning. A brand's own hue decides otherwise. */
+  --_helix-series-origin: var(--helix-seed-brand, oklch(0.539 0.19 270));
   /*
    *  The second color, and by default there is not one.
    *
@@ -274,7 +276,11 @@
      it exists only where a brand does.** A brand fill is dark in both modes.
      With no brand this is unset like the ramp above, and the label falls back
      to the page's own color, which is what reads on an ink fill. */
-  --_helix-brand-on: oklch(from var(--_helix-seed-brand) 1 0 0);
+  /* White on a brand, or black on one too light to carry white: the surface sits
+     0.05 under the seed, and white falls under 4.5:1 near 0.63. Measured with
+     `oklch(0.92 0.21 115)`: 1.44:1 before, October 31, 2026. */
+  --_helix-brand-on: oklch(from var(--_helix-seed-brand) clamp(0, (0.68 - l) * 1000, 1) 0 0);
+  --_helix-brand-wash: color-mix(in oklab, light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 28%, transparent);
 
   /* ------------------------------------------------------- ink --------- */
   /* **Ink: the emphasis of a palette that names no brand.** The neutral's own

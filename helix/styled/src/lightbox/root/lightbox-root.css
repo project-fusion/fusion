@@ -240,7 +240,7 @@
 [part="zoom-in"][aria-disabled="true"],
 [part="zoom-out"][aria-disabled="true"] {
   cursor: default;
-  opacity: 0.4;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* The place in the set, drawn with `counter`, in the top corner at the start

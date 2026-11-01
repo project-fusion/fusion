@@ -21,7 +21,7 @@
 }
 
 :host([disabled]) {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* One cell, both children in it, so the dot is centered in the circle with no

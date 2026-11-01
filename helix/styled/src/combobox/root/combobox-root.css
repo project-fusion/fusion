@@ -83,7 +83,7 @@
 :host(:disabled) [part="field"] {
   color: var(--helix-color-foreground-subtle);
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* **The tight size, which is what Select's caret already is**, and the two were

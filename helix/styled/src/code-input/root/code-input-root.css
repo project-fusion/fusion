@@ -81,7 +81,7 @@ slot[name="end"]::slotted(*) {
 
 :host(:disabled) [part="field"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Flush with its ground, as a read-only Textarea is. */

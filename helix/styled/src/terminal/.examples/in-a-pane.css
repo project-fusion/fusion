@@ -1,7 +1,7 @@
 helix-splitter {
   block-size: 24rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-md);
   overflow: hidden;
 }
 

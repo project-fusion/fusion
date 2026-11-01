@@ -50,7 +50,7 @@
 
 :host(:disabled) [part="trigger"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* *Inline: a control in a row of prose or of tools, rather than a field in a

@@ -37,6 +37,19 @@
   position: absolute;
 }
 
+/* A failed image with nothing slotted says so, in the ground a placeholder has. */
+[part="fallback"] {
+  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
+}
+
+[part="fallback-mark"] {
+  background-color: var(--helix-color-foreground-muted);
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v14H4zM4 16l5-5 3 3M20 15l-3-3M15 5 9 19'/%3E%3C/svg%3E");
+  mask-size: 100%;
+}
+
 /* And stop covering it when they are told to. **`hidden` does not hide a thing
    an author gave a display to.** The rule above is an author rule and `[hidden]
    { display: none }` is the user agent's, and an author rule beats a user agent

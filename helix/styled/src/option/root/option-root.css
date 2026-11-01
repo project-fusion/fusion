@@ -105,7 +105,7 @@ slot[name="indicator"]::slotted(*) {
 
 :host([disabled]) [part~="item"] {
   cursor: default;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a

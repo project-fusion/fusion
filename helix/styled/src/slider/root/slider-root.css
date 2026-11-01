@@ -305,7 +305,7 @@
 }
 
 :host(:disabled) {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* Filled with a gradient rather than by a second element over it. One element

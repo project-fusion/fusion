@@ -48,6 +48,7 @@ import { property, state } from 'lit/decorators.js'
  * @event {Event} load - The image loaded. Relayed from the inner image, whose own event stays inside the shadow root.
  *
  * @csspart fallback - The fallback, shown when the image fails to load.
+ * @csspart fallback-mark - The mark drawn where a failed image has no `fallback` slot.
  * @csspart image - The image itself.
  * @csspart placeholder - The placeholder, shown until the image loads.
  *
@@ -433,7 +434,7 @@ export class HelixHeadlessImage extends HelixElement {
         part="fallback"
         aria-hidden=${this.status === 'error' ? nothing : 'true'}
         ?hidden=${this.status !== 'error'}
-        ><slot name="fallback"></slot
+        ><slot name="fallback"><span part="fallback-mark"></span></slot
       ></span>`
   }
 }

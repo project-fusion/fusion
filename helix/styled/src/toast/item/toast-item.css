@@ -168,7 +168,7 @@ slot[name="icon"]::slotted(*) {
 }
 
 :host([tone="warning"]) {
-  --_toast-severity: var(--helix-color-warning);
+  --_toast-severity: var(--helix-color-warning-mark);
 }
 
 :host([tone="danger"]) {

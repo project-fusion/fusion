@@ -391,7 +391,7 @@ slot[name="chevron"]::slotted(*) {
 /* A row out of play is seen and reached, and does nothing under the pointer. */
 :host([disabled]) [part="row"] {
   cursor: not-allowed;
-  opacity: var(--tree-row-disabled-opacity, 0.5);
+  opacity: var(--tree-row-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 :host([disabled]) [part="row"]:hover {

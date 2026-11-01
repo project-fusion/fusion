@@ -73,7 +73,7 @@
  * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
  */
 :host(:disabled) {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 :host(:disabled) [part="items"] {
@@ -94,11 +94,7 @@
    empty one, in the danger ink: of the three, it is the one that is a fault. */
 [part="error"] {
   color: var(--listbox-error-color, var(--helix-color-danger));
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-  margin: var(--helix-space-none);
   padding: var(--helix-space-xs);
-  text-align: center;
 }
 
 /*
@@ -191,7 +187,7 @@ slot[name="filter-icon"]::slotted(*) {
    would collapse the panel and move everything under the reader for as long as
    the request takes. */
 :host([loading]) [part="items"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-busy);
 }
 
 /* Print: the list prints the options it holds, and a chosen row is a fill that

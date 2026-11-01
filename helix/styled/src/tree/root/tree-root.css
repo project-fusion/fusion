@@ -55,7 +55,7 @@
 
 /* Rows that are already there stay, and dim, while a new set arrives. */
 :host([loading]) [part="tree"] {
-  opacity: 0.5;
+  opacity: var(--helix-opacity-busy);
 }
 
 /* The copy of a row a pointer drags, drawn in the top layer and raised over

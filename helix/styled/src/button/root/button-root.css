@@ -305,7 +305,7 @@
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="button"] {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: var(--helix-opacity-disabled);
 }
 
 /* **The letters at the middle, in any font**, as the tag's are. The line box

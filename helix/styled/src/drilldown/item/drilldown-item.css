@@ -124,5 +124,5 @@ slot[name="description"][data-empty] {
 
 :host([disabled]) [part="item"] {
   cursor: default;
-  opacity: var(--drilldown-item-disabled-opacity, 0.5);
+  opacity: var(--drilldown-item-disabled-opacity, var(--helix-opacity-disabled));
 }

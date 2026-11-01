@@ -45,7 +45,7 @@
 :host([disabled]) [part~="select"],
 :host([disabled]) [part~="expand"],
 :host([disabled]) ::slotted(*) {
-  opacity: var(--table-row-disabled-opacity, 0.5);
+  opacity: var(--table-row-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 /* A row with `href` is a link across every cell: the pointer says so, and the
@@ -146,7 +146,7 @@
 
 [part="grip-button"][aria-disabled="true"] {
   cursor: default;
-  opacity: var(--table-grip-disabled-opacity, 0.4);
+  opacity: var(--table-grip-disabled-opacity, var(--helix-opacity-disabled));
 }
 
 [part="grip-mark"] {
