@@ -33,7 +33,7 @@ import { styles } from './time-picker-root.css.js'
  * @cssproperty --time-picker-now-color - The ink of the button that chooses the current time, with `show-now`.
  * @cssproperty --time-picker-range-color - Fill behind the times inside a range.
  * @cssproperty --time-picker-row-size - Height and minimum width of one row in a wheel.
- * @cssproperty --time-picker-selected-color - Fill on the chosen row of a wheel.
+ * @cssproperty --time-picker-selected-background-color - Fill on the chosen row of a wheel.
  * @cssproperty --time-picker-selected-foreground-color - Ink on the chosen row of a wheel.
  * @cssproperty --time-picker-wheel-block-size - How tall a wheel is. Five rows by default.
  * @cssproperty --time-picker-wheel-mask - The mask that fades a wheel toward its ends, as a `mask-image`. Set `none` for no fade.

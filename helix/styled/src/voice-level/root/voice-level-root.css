@@ -18,7 +18,7 @@
   vertical-align: middle;
 }
 
-:host([variant="waves"]) {
+:host([pattern="waves"]) {
   --_voice-level-block-size: var(--voice-level-block-size, var(--helix-size-control));
   --_voice-level-ratio: 3;
 }

@@ -39,8 +39,8 @@ import { styles } from './pagination-root.css.js'
  * @csspart previous - The control that moves back one page.
  * @csspart status - The text that says which page you are on, in `compact`.
  *
+ * @cssproperty --pagination-current-background-color - Fill behind the page you are on.
  * @cssproperty --pagination-current-border-color - Edge of the page you are on.
- * @cssproperty --pagination-current-color - Fill behind the page you are on.
  * @cssproperty --pagination-current-font-weight - Weight of the number of the page you are on.
  * @cssproperty --pagination-current-foreground-color - Color of the number of the page you are on.
  * @cssproperty --pagination-disabled-foreground-color - Color of a first, previous, next or last control with nowhere to go.
@@ -50,7 +50,7 @@ import { styles } from './pagination-root.css.js'
  * @cssproperty --pagination-font-weight - Weight of the numbers and the status text.
  * @cssproperty --pagination-foreground-color - Color of the numbers and the marks on every control.
  * @cssproperty --pagination-gap - Space between one control and the next.
- * @cssproperty --pagination-hover-color - Fill behind a control under the pointer.
+ * @cssproperty --pagination-hover-background-color - Fill behind a control under the pointer.
  * @cssproperty --pagination-hover-foreground-color - Color of a control's number or mark under the pointer.
  * @cssproperty --pagination-icon-size - Size of the mark on a first, previous, next or last control, drawn or slotted.
  * @cssproperty --pagination-padding - Space either side of a control's number or mark.

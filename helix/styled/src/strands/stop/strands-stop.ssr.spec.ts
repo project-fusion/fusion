@@ -6,16 +6,16 @@ import '../index.js'
 describe('strands stop server output', () => {
   test('serves no parts, because a stop draws nothing', () => {
     expect(
-      servedParts(ssr(html`<helix-strands-stop for="hero" variant="bend"></helix-strands-stop>`)),
+      servedParts(ssr(html`<helix-strands-stop for="hero" pattern="bend"></helix-strands-stop>`)),
     ).toEqual([])
   })
 
   test('carries exactly what it was given', () => {
     expect(
       hostAttributes(
-        ssr(html`<helix-strands-stop for="hero" variant="bend"></helix-strands-stop>`),
+        ssr(html`<helix-strands-stop for="hero" pattern="bend"></helix-strands-stop>`),
         'helix-strands-stop',
       ),
-    ).toEqual(['for', 'variant'])
+    ).toEqual(['for', 'pattern'])
   })
 })

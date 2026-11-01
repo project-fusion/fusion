@@ -242,11 +242,11 @@ slot[name="indicator"]::slotted(*) {
 /*
  *  A chip is a card that gave up its words.
  */
-:host([variant="chip"]) [part="box"] {
+:host([chip]) [part="box"] {
   display: none;
 }
 
-:host([variant="chip"]) [part="item"] {
+:host([chip]) [part="item"] {
   /* How far a chosen chip comes forward, and a hovered one half of it. Two
      pixels, which the space scale cannot say: its first rung is four. */
   --_radio-chip-lift: 2px;
@@ -273,18 +273,18 @@ slot[name="indicator"]::slotted(*) {
  * and reads at a glance across a row of five. Tinting the background instead
  * says "this one is a slightly different color", a hue a reader has to
  * interpret rather than a state they can see. */
-:host([variant="chip"]:state(selected)) [part="item"] {
+:host([chip]:state(selected)) [part="item"] {
   background-color: var(--helix-color-surface-inverse);
   box-shadow: var(--helix-shadow-md);
   color: var(--helix-color-foreground-inverse);
   translate: 0 calc(var(--_radio-chip-lift) * -1);
 }
 
-:host(:not([disabled])[variant="chip"]) [part="item"]:hover {
+:host(:not([disabled])[chip]) [part="item"]:hover {
   translate: 0 calc(var(--_radio-chip-lift) / -2);
 }
 
-:host([variant="chip"]) [part="item"]:focus-visible {
+:host([chip]) [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -292,7 +292,7 @@ slot[name="indicator"]::slotted(*) {
 /*
  *  The words name the choice without taking room in it.
  */
-:host([variant="chip"]) [part="label"] {
+:host([chip]) [part="label"] {
   clip-path: inset(50%);
   block-size: 1px;
   inline-size: 1px;
@@ -304,12 +304,12 @@ slot[name="indicator"]::slotted(*) {
 /* Repeating the selector exactly, because a looser one loses on specificity and
    answers nothing. */
 @media (prefers-reduced-motion: reduce) {
-  :host([variant="chip"]) [part="item"] {
+  :host([chip]) [part="item"] {
     transition: none;
   }
 
-  :host([variant="chip"]:state(selected)) [part="item"],
-  :host(:not([disabled])[variant="chip"]) [part="item"]:hover {
+  :host([chip]:state(selected)) [part="item"],
+  :host(:not([disabled])[chip]) [part="item"]:hover {
     translate: none;
   }
 }

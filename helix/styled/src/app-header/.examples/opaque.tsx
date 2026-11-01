@@ -25,7 +25,7 @@ export function Example() {
       <div className="band">
         <helix-text
           as="h1"
-          variant="display"
+          scale="display"
         >
           Your projects
         </helix-text>
@@ -35,7 +35,7 @@ export function Example() {
       <div className="prose">
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Recent activity
         </helix-text>
@@ -43,7 +43,7 @@ export function Example() {
 
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Team members
         </helix-text>
@@ -53,7 +53,7 @@ export function Example() {
 
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Billing
         </helix-text>

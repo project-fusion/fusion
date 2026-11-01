@@ -56,7 +56,7 @@ export function Example() {
       <helix-voice-level
         label="Your voice"
         level={now.level}
-        variant="waves"
+        pattern="waves"
       ></helix-voice-level>
     </helix-flex>
   )

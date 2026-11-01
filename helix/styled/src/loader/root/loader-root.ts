@@ -52,7 +52,7 @@ export class HelixLoader extends HelixHeadlessLoader {
    * around a logo reads as chrome bolted to the brand.
    */
   @property({ reflect: true })
-  variant?: 'pulse'
+  pattern?: 'pulse'
 
   static override styles: CSSResultGroup = styles
 }

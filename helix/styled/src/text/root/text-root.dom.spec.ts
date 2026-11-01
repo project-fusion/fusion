@@ -11,9 +11,9 @@ describe('text', () => {
   test('the ramp is presentation, `as` is semantics, and they are separate', async () => {
     // A heading that should not look like one is the whole reason these are
     // two properties rather than one.
-    const text = await mount('<helix-text variant="body" as="h3">Title</helix-text>')
+    const text = await mount('<helix-text scale="body" as="h3">Title</helix-text>')
     expect(part(text, 'text')?.tagName).toBe('H3')
-    expect(text.getAttribute('variant')).toBe('body')
+    expect(text.getAttribute('scale')).toBe('body')
   })
 
   test('renders its content through a slot', async () => {
@@ -32,7 +32,7 @@ describe('text', () => {
       expect(part(wrapped, 'text')?.tagName).toBe('LABEL')
       await mount('<helix-text as="label" for="phone">Phone</helix-text>')
       await mount('<helix-text as="label">Section</helix-text>')
-      await mount('<helix-text variant="label">Section</helix-text>')
+      await mount('<helix-text scale="label">Section</helix-text>')
     } finally {
       console.warn = original
     }
@@ -193,10 +193,10 @@ describe('tone and emphasis inside another shadow root', () => {
 
 describe('the ramp a paragraph takes', () => {
   /* A paragraph in a large header slot read at the slot's size, while the
-     variant's description promised the ramp matching `as`. */
+     scale's description promised the ramp matching `as`. */
   painted('is the body ramp, whatever size surrounds it', async () => {
     const wrapper = await mount(
-      '<div style="font-size: 40px"><helix-text as="p">Para</helix-text><helix-text as="p" variant="body">Body</helix-text></div>',
+      '<div style="font-size: 40px"><helix-text as="p">Para</helix-text><helix-text as="p" scale="body">Body</helix-text></div>',
     )
     const [plain, body] = [...wrapper.querySelectorAll('helix-text')]
     expect(getComputedStyle(plain as Element).fontSize).toBe(

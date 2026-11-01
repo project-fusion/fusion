@@ -90,14 +90,14 @@ export default function Loading() {
                 <helix-card separation="outlined">
                   <div className={loading.cardArt} data-skeleton slot="media" />
                   <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
-                    <helix-text as="h3" variant="title">
+                    <helix-text as="h3" scale="title">
                       <span data-skeleton="words">{family.label}</span>
                     </helix-text>
                     {family.status === 'experimental' && (
                       <div className={loading.cardMark} data-skeleton />
                     )}
                   </helix-flex>
-                  <helix-text variant="caption">
+                  <helix-text scale="caption">
                     <span data-skeleton="words">
                       <CodeText>{family.summary}</CodeText>
                     </span>

@@ -7,8 +7,8 @@ export function Example() {
     >
       <helix-text
         emphasis="muted"
+        scale="caption"
         slot="end"
-        variant="caption"
       >
         px
       </helix-text>

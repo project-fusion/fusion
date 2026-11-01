@@ -13,7 +13,7 @@ import { styles } from './tabs-root.css.js'
  * from. A fill that switches from tab to tab changes two things at once and
  * looks like a flicker. `Navigation` marks its destinations the same way.
  *
- * The mark depends on `variant`:
+ * The mark depends on `marker`:
  *
  * - Unset, it is a raised pill on the selected tab, with nothing behind the
  *   row.
@@ -79,13 +79,13 @@ export class HelixTabs extends HelixHeadlessTabs {
   /**
    * How loud the mark on the current tab is.
    *
-   * Unset is the mark `variant` draws at rest. `subtle` is a tint with no
+   * Unset is the mark `marker` draws at rest. `subtle` is a tint with no
    * edge or shadow: the raised pill becomes a wash, the `segmented` track's
    * pill does the same inside it, and the `underlined` bar takes the
    * foreground's ink in place of the primary color. For tabs inside other
    * chrome, where a raised mark reads as a control laid on top of it.
    *
-   * Independent of `variant`, since each of its marks has a quiet form: the two
+   * Independent of `marker`, since each of its marks has a quiet form: the two
    * answer different questions, which is the test the axis registry applies.
    */
   @property({ reflect: true })

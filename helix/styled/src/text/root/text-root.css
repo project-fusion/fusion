@@ -35,8 +35,8 @@
  *    and nothing says why. Split, the mapping is written twice and the values once,
  *    since both sides reference the same tokens.
  */
-:host([variant="display"]),
-:host(:not([variant])[as="h1"]) {
+:host([scale="display"]),
+:host(:not([scale])[as="h1"]) {
   font-family: var(--text-font-family, var(--helix-font-display));
   font-size: var(--text-font-size, var(--helix-text-3xl));
   font-weight: var(--text-font-weight, var(--helix-weight-semibold));
@@ -44,8 +44,8 @@
   line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
-:host([variant="heading"]),
-:host(:not([variant])[as="h2"]) {
+:host([scale="heading"]),
+:host(:not([scale])[as="h2"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-2xl));
   font-weight: var(--text-font-weight, var(--helix-weight-semibold));
@@ -53,8 +53,8 @@
   line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
-:host([variant="subheading"]),
-:host(:not([variant])[as="h3"]) {
+:host([scale="subheading"]),
+:host(:not([scale])[as="h3"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-xl));
   font-weight: var(--text-font-weight, var(--helix-weight-semibold));
@@ -62,8 +62,8 @@
   line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
-:host([variant="title"]),
-:host(:not([variant])[as="h4"]) {
+:host([scale="title"]),
+:host(:not([scale])[as="h4"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-lg));
   font-weight: var(--text-font-weight, var(--helix-weight-semibold));
@@ -71,8 +71,8 @@
   line-height: var(--text-line-height, var(--helix-leading-heading));
 }
 
-:host([variant="body"]),
-:host(:not([variant])[as="p"]) {
+:host([scale="body"]),
+:host(:not([scale])[as="p"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-md));
   font-weight: var(--text-font-weight, var(--helix-weight-regular));
@@ -80,10 +80,10 @@
   line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
-:host([variant="body-strong"]),
-:host(:not([variant])[as="h5"]),
-:host(:not([variant])[as="h6"]),
-:host(:not([variant])[as="strong"]) {
+:host([scale="body-strong"]),
+:host(:not([scale])[as="h5"]),
+:host(:not([scale])[as="h6"]),
+:host(:not([scale])[as="strong"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-md));
   font-weight: var(--text-font-weight, var(--helix-weight-medium));
@@ -91,7 +91,7 @@
   line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
-:host([variant="caption"]) {
+:host([scale="caption"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-sm));
   font-weight: var(--text-font-weight, var(--helix-weight-regular));
@@ -99,8 +99,8 @@
   line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
-:host([variant="label"]),
-:host(:not([variant])[as="label"]) {
+:host([scale="label"]),
+:host(:not([scale])[as="label"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-xs));
   font-weight: var(--text-font-weight, var(--helix-weight-medium));
@@ -108,8 +108,8 @@
   line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
-:host([variant="code"]),
-:host(:not([variant])[as="code"]) {
+:host([scale="code"]),
+:host(:not([scale])[as="code"]) {
   font-family: var(--text-font-family, var(--helix-font-mono));
   font-size: var(--text-font-size, var(--helix-text-xs));
   font-weight: var(--text-font-weight, var(--helix-weight-regular));
@@ -132,10 +132,10 @@
     [as="h4"],
     [as="h5"],
     [as="h6"],
-    [variant="display"],
-    [variant="heading"],
-    [variant="subheading"],
-    [variant="title"]
+    [scale="display"],
+    [scale="heading"],
+    [scale="subheading"],
+    [scale="title"]
   )
 ) {
   color: var(--_heading-ink, currentColor);

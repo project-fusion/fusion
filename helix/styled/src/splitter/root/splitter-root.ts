@@ -69,7 +69,7 @@ export class HelixSplitter extends HelixHeadlessSplitter {
    * relying on the absence of an attribute.
    */
   @property({ reflect: true })
-  variant?: 'grip' | 'line'
+  handle?: 'grip' | 'line'
 
   static override styles: CSSResultGroup = styles
 }

@@ -112,7 +112,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @cssstate current - A link in the panel carries `aria-current="page"`, so the trigger can show the section you are in.
  * @cssstate from-end - The panel opened in place of one earlier in the bar, so it can enter from the end side.
  * @cssstate from-start - The panel opened in place of one later in the bar, so it can enter from the start side.
- * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its variant.
+ * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its layout.
  * @cssstate open - The panel is open, and the trigger is shown as current.
  * @cssstate to-end - The panel closed because one earlier in the bar opened, so it can leave toward the end.
  * @cssstate to-start - The panel closed because one later in the bar opened, so it can leave toward the start.
@@ -218,12 +218,12 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * for a width, and `Button` and `Dialog` are the two families answering that
    * question; borrowing it here would put a third meaning on it.
    *
-   * `variant` and not an axis, for the reason the registry gives: a card under
+   * `layout` and not an axis, for the reason the registry gives: a card under
    * a word and a band under a header are two arrangements this family has, and
    * no other family is being asked the same question.
    */
   @property({ reflect: true })
-  variant?: 'band'
+  layout?: 'band'
 
   @state()
   private narrow = false
@@ -232,7 +232,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
 
   /** A band, whether because it was asked for or because there is no room. */
   private get banded(): boolean {
-    return this.variant === 'band' || this.narrow
+    return this.layout === 'band' || this.narrow
   }
 
   private readonly handleWidth = (event: MediaQueryListEvent | MediaQueryList): void => {

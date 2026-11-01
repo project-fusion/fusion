@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-tabs
       label="Project"
-      variant="underlined"
+      marker="underlined"
     >
       <helix-tab
         href="#overview"

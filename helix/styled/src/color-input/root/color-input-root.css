@@ -128,7 +128,7 @@
 /*
  *  The swatch shape: the block of color is the whole control.
  */
-:host([variant="swatch"]) [part="field"] {
+:host([trigger="swatch"]) [part="field"] {
   background-color: transparent;
   border: none;
   inline-size: max-content;
@@ -138,18 +138,18 @@
 /*
  *  One edge and one corner, on the preview.
  */
-:host([variant="swatch"]) [part="trigger"] {
+:host([trigger="swatch"]) [part="trigger"] {
   block-size: var(--color-input-swatch-size, var(--helix-size-control));
   inline-size: var(--color-input-swatch-size, var(--helix-size-control));
 }
 
 /* The ring goes on the trigger rather than around the field, since in this shape
    they are the same box and `:focus-within` on the field would draw it twice. */
-:host([variant="swatch"]:focus-within) [part="field"] {
+:host([trigger="swatch"]:focus-within) [part="field"] {
   outline: none;
 }
 
-:host([variant="swatch"]) [part="preview"] {
+:host([trigger="swatch"]) [part="preview"] {
   block-size: 100%;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--color-input-swatch-radius, var(--helix-radii-sm));

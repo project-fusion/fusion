@@ -33,8 +33,8 @@
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"],
-:host([variant="row"]) [part="plot"],
-:host([variant="diagonal"]) [part="plot"] {
+:host([layout="row"]) [part="plot"],
+:host([layout="diagonal"]) [part="plot"] {
   background-color: transparent;
 }
 
@@ -50,7 +50,7 @@
 /* **A row's bar size rides on the gap**, which a block box lays nothing out
    with and the browser resolves to pixels from any length, `em` and `calc()`
    included. The component reads it back and draws each bar that wide. */
-:host([variant]) [part="fallback"] {
+:host([layout]) [part="fallback"] {
   column-gap: var(--spatial-bar-chart-bar-size, normal);
 }
 

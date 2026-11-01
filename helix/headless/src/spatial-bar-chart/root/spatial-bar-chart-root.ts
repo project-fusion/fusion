@@ -346,7 +346,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * size changes.
    */
   @property({ reflect: true })
-  variant?: 'diagonal' | 'row'
+  layout?: 'diagonal' | 'row'
 
   /** Whether a renderer has drawn the bars, which hides the chart's own drawing. */
   @state()
@@ -592,7 +592,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    */
   get fits(): number | undefined {
     const box = this.partNamed('fallback')
-    if (!box || !this.variant || typeof getComputedStyle !== 'function') {
+    if (!box || !this.layout || typeof getComputedStyle !== 'function') {
       return undefined
     }
     const style = getComputedStyle(box)
@@ -841,7 +841,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(read: BarField, at: number): TemplateResult {
-    const layout: BarLayout = this.variant ?? 'grid'
+    const layout: BarLayout = this.layout ?? 'grid'
     const lined = layout === 'grid' ? undefined : layout
     const bare = this.noBox || lined !== undefined
     const view = boxView(read.axes, this.camera, [], bare)

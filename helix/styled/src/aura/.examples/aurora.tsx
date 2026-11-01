@@ -4,8 +4,8 @@ export function Example() {
   return (
     <div className="stage">
       <helix-aura
+        pattern="aurora"
         tilt={0}
-        variant="aurora"
       ></helix-aura>
     </div>
   )

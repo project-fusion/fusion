@@ -48,8 +48,8 @@ export function Example() {
           >
             <helix-text
               emphasis="muted"
+              scale="caption"
               slot="start"
-              variant="caption"
             >
               <helix-kbd>Esc</helix-kbd> to dismiss
             </helix-text>

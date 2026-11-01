@@ -15,10 +15,10 @@ import { useMotion } from '@/hooks/use-motion/use-motion'
  */
 export function CortexAura({
   className,
-  variant = 'constellation',
+  pattern = 'constellation',
 }: {
   className: string
-  variant?: 'constellation' | 'lattice' | 'particles' | 'threads' | 'flow'
+  pattern?: 'constellation' | 'lattice' | 'particles' | 'threads' | 'flow'
 }) {
   const motion = useMotion()
   return (
@@ -26,11 +26,11 @@ export function CortexAura({
       class={className}
       data-layer
       gain={0.8}
+      pattern={pattern}
       paused={motion === 'off' || undefined}
       scale={4.5}
       speed={0.3}
       terminus={0.5625}
-      variant={variant}
     ></helix-aura>
   )
 }

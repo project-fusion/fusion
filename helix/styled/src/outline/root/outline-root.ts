@@ -23,7 +23,7 @@ import { styles } from './outline-root.css.js'
  *
  * A heading slotted into `heading` is set above the links, lined up with them.
  *
- * **The rail.** With `variant="rail"` the outline is a slim column of ticks,
+ * **The rail.** With `marker="rail"` the outline is a slim column of ticks,
  * one per section, at the edge of a long scroll. The section in view is a longer
  * tick in the primary color, and a deeper level is a shorter one. Hovering or
  * focusing the rail opens a frosted surface of the titles, as Popover's frosted

@@ -1,7 +1,7 @@
 /*
  *  Everything about the arrangement is handed down as custom properties rather
  *    than read from this host's attribute, because a step cannot see it.
- *    `orientation` and `variant` are on this element, and a slotted step's own
+ *    `orientation` and `marker` are on this element, and a slotted step's own
  *    stylesheet can only match `:host(...)`, which is the step. The selector that
  *    would answer it, `:host-context()`, is Chromium-only. Custom properties
  *    inherit through the flat tree into slotted content, which is the one portable
@@ -143,7 +143,7 @@
  * with a finished step, because the readable range holds one quiet ink and a
  * digit is read; the regular weight is what sets it below the finished one.
  */
-:host([variant="numeric"]) {
+:host([marker="numeric"]) {
   --_steps-mark: none;
   --_steps-count: counter(helix-step);
   --_steps-marker-color: var(--helix-color-foreground-muted);

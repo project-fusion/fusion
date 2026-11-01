@@ -736,7 +736,7 @@ describe('connectMap with routes and areas', () => {
       `<helix-headless-map-route label="The last steps" points="1,2 3,4" style="color: rgb(1, 2, 3); border-color: rgb(250, 250, 250)"></helix-headless-map-route>`,
     )
     const route = host.querySelector('helix-headless-map-route') as HTMLElement & {
-      variant?: string
+      stroke?: string
     }
     route.variant = 'dotted'
     const { driver, drawn } = layering()

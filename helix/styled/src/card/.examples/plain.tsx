@@ -7,8 +7,8 @@ export function Example() {
       <helix-text
         as="h3"
         id="plain-title"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Profile
       </helix-text>

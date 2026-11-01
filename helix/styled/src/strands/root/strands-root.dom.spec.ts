@@ -68,7 +68,7 @@ type Strands = HTMLElement & {
   speed: number
   travel: boolean
   updateComplete: Promise<boolean>
-  variant: string | undefined
+  pattern: string | undefined
 }
 
 describe('strands', () => {
@@ -119,17 +119,17 @@ describe('strands', () => {
     expect(slot?.assignedElements()).toEqual([host.querySelector('h1') as Element])
   })
 
-  test('travel reflects, and the variant and the numbers do not', async () => {
+  test('travel reflects, and the pattern and the numbers do not', async () => {
     /* Reflection exists so a selector can reach a value. The stylesheet fixes
        a traveling host to the viewport; nothing selects on the rest. */
     const host = (await mount(undrawn())) as Strands
     host.travel = true
-    host.variant = 'bend'
+    host.pattern = 'bend'
     host.density = 0.4
     host.speed = 2
     await host.updateComplete
     expect(host.hasAttribute('travel')).toBe(true)
-    expect(host.getAttribute('variant')).toBeNull()
+    expect(host.getAttribute('pattern')).toBeNull()
     expect(host.getAttribute('density')).toBeNull()
     expect(host.getAttribute('speed')).toBeNull()
   })

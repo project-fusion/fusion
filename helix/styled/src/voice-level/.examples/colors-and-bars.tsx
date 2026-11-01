@@ -14,7 +14,7 @@ export function Example() {
       <helix-voice-level
         className="two-colors"
         level={0.7}
-        variant="waves"
+        pattern="waves"
       ></helix-voice-level>
     </helix-flex>
   )

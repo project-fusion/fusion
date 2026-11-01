@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 const chip = async (attrs = ''): Promise<HTMLElement> =>
   mount(
-    `<helix-headless-radio variant="chip" value="-2" ${attrs}><i slot="icon"></i>Very dissatisfied</helix-headless-radio>`,
+    `<helix-headless-radio chip value="-2" ${attrs}><i slot="icon"></i>Very dissatisfied</helix-headless-radio>`,
   )
 
 describe('a radio drawn as a chip', () => {

@@ -107,7 +107,7 @@ const byExample = (rows: Example[]): Example[] =>
 
 function Code({ children }: { children: string }) {
   return (
-    <helix-text class={api.apiName} variant="code">
+    <helix-text class={api.apiName} scale="code">
       {children}
     </helix-text>
   )
@@ -167,7 +167,7 @@ const kindOf = (token: string): string => {
  */
 function DefaultText({ children }: { children: string }) {
   return (
-    <helix-text class={api.apiDefault} variant="code">
+    <helix-text class={api.apiDefault} scale="code">
       {tokens(children.replace(/'([^']*)'/g, '"$1"'))}
     </helix-text>
   )
@@ -190,7 +190,7 @@ function TypeText({ children }: { children: string }) {
    * member, and it has spaces it would otherwise be glad to break at. */
   const held = members.length > 1
   return (
-    <helix-text class={api.apiType} variant="code">
+    <helix-text class={api.apiType} scale="code">
       {members.map((member, at) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a type is a fixed string, so position is its identity
         <Fragment key={at}>
@@ -337,7 +337,7 @@ function Described({
 }) {
   return (
     <helix-table-cell>
-      <helix-text emphasis="muted" variant="caption">
+      <helix-text emphasis="muted" scale="caption">
         <CodeText>{first(description)}</CodeText>
       </helix-text>
       {references.map((reference) => (
@@ -424,7 +424,7 @@ function ElementApi({ element, familyStatus }: { element: Element; familyStatus:
           {element.part || element.label}
         </SectionHeading>
         <helix-tag>
-          <helix-text variant="code">{element.tagName}</helix-text>
+          <helix-text scale="code">{element.tagName}</helix-text>
         </helix-tag>
         {element.status && element.status !== familyStatus && (
           <helix-tag>{startCase(element.status)}</helix-tag>
@@ -432,7 +432,7 @@ function ElementApi({ element, familyStatus }: { element: Element; familyStatus:
       </helix-flex>
 
       {element.summary && (
-        <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
+        <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
           <CodeText>{element.summary}</CodeText>
         </helix-text>
       )}
@@ -602,7 +602,7 @@ export default async function FamilyDocs({
               </helix-flex>
             </helix-flex>
 
-            <helix-text as="p" class={api.description} emphasis="muted" variant="caption">
+            <helix-text as="p" class={api.description} emphasis="muted" scale="caption">
               <CodeText>{first(prose)}</CodeText>
             </helix-text>
 
@@ -677,7 +677,7 @@ export default async function FamilyDocs({
               ))
             ) : (
               <helix-empty>
-                <helix-text emphasis="muted" variant="caption">
+                <helix-text emphasis="muted" scale="caption">
                   No example yet.
                 </helix-text>
               </helix-empty>
@@ -744,7 +744,7 @@ export default async function FamilyDocs({
                         reads as data that failed to load; a dash reads as a
                         blank someone still has to fill. */}
                       <helix-table-cell>
-                        <helix-text emphasis="muted" variant="caption">
+                        <helix-text emphasis="muted" scale="caption">
                           {example.description ? <CodeText>{example.description}</CodeText> : '-'}
                         </helix-text>
                       </helix-table-cell>
@@ -764,7 +764,7 @@ export default async function FamilyDocs({
          *             these anchors, so the rail says where you are and not only where you
          *             could go.
          */}
-        <helix-text class={docsShell.docsRailTitle} emphasis="muted" variant="label">
+        <helix-text class={docsShell.docsRailTitle} emphasis="muted" scale="label">
           On this page
         </helix-text>
         <helix-outline label="On this page">

@@ -167,9 +167,9 @@ export function InsightBrowser({
               bloom={0.62}
               class={styles.insightsAura}
               gain={1.15}
+              pattern="rays"
               scale={0.45}
               speed={0.5}
-              variant="rays"
             ></helix-aura>
           </>
         }

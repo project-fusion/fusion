@@ -91,15 +91,15 @@ export class HelixRadio extends HelixHeadlessRadio {
   /**
    * Draws the choice as a small chip, for a row of short choices.
    *
-   * **Not a separation, which is why it is still `variant`.** The other values
+   * **Not a separation, which is why it is its own attribute.** The other values
    * pick where a surface ends around a row that keeps its circle and its words;
    * a chip has neither. It hides the circle, the surface being the whole mark,
    * which is why `hide-control` says it is unnecessary here, and it takes the
    * words out of the flow to be the accessible name. That removes the
    * distinction `separation` exists to make rather than answering it.
    */
-  @property({ reflect: true })
-  variant?: 'chip'
+  @property({ reflect: true, type: Boolean })
+  chip = false
 }
 
 declare global {

@@ -217,7 +217,7 @@ export class HelixHeadlessNavigation extends HelixElement {
    * consumer's server markup does not already have.
    */
   @property({ reflect: true })
-  variant?: 'segmented' | 'underlined'
+  marker?: 'segmented' | 'underlined'
 
   private current: MutationObserver | undefined
 

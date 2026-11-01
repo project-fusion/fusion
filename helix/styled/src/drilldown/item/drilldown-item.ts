@@ -20,7 +20,7 @@ import { styles } from './drilldown-item.css.js'
  * @cssproperty --drilldown-item-description-color - Color of the line under a row's label.
  * @cssproperty --drilldown-item-disabled-opacity - How faint a disabled row is drawn.
  * @cssproperty --drilldown-item-font-size - Size of a row's words.
- * @cssproperty --drilldown-item-hover-color - Fill when a row is under the pointer.
+ * @cssproperty --drilldown-item-hover-background-color - Fill when a row is under the pointer.
  * @cssproperty --drilldown-item-mark-color - Color of the caret on a row that opens a page.
  * @cssproperty --drilldown-item-padding-inline - Space at either end of a row.
  */

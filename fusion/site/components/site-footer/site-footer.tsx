@@ -77,8 +77,8 @@ export function SiteFooter() {
               small-and-firm variant meant for a field's name, 500 against a
               caption's 400 and one pixel smaller, so that pairing reads as the
               company being the caption of its own slogan. */}
-          <helix-text variant="body-strong">Fusion Development Group</helix-text>
-          <helix-text emphasis="muted" variant="caption">
+          <helix-text scale="body-strong">Fusion Development Group</helix-text>
+          <helix-text emphasis="muted" scale="caption">
             Interface and AI software.
           </helix-text>
           {/* **The Helix release the site runs on**, as a tag: a piece of
@@ -121,7 +121,7 @@ export function SiteFooter() {
         <nav aria-label="Footer" className={styles.footerNav}>
           {FOOTER_GROUPS.map((group) => (
             <div className={styles.footerGroup} key={group.heading}>
-              <helix-text emphasis="muted" variant="label">
+              <helix-text emphasis="muted" scale="label">
                 {group.heading}
               </helix-text>
               {group.items.map((item) => (

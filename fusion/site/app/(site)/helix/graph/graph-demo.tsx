@@ -298,7 +298,7 @@ export function GraphDemo({
           : null}
       </div>
       {failed ? (
-        <helix-text slot="footer" variant="caption">
+        <helix-text scale="caption" slot="footer">
           {GRAPH_FAILED}
         </helix-text>
       ) : null}

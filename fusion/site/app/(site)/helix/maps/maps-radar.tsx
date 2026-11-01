@@ -116,7 +116,7 @@ export function MapsRadar() {
       >
         <div className={styles.mapsCanvas} ref={container} />
         {failed ? (
-          <helix-text slot="footer" variant="caption">
+          <helix-text scale="caption" slot="footer">
             {MAP_FAILED}
           </helix-text>
         ) : null}

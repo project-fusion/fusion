@@ -94,7 +94,7 @@ export default async function Page({
             <helix-card separation="outlined">
               <ComponentArt slug={family.slug} />
               <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
-                <helix-text as="h3" variant="title">
+                <helix-text as="h3" scale="title">
                   {family.label}
                 </helix-text>
                 {/* An icon for the stage, beside the name. A worded tag
@@ -114,7 +114,7 @@ export default async function Page({
                   </helix-tooltip>
                 )}
               </helix-flex>
-              <helix-text emphasis="muted" variant="caption">
+              <helix-text emphasis="muted" scale="caption">
                 <CodeText>{family.summary}</CodeText>
               </helix-text>
             </helix-card>

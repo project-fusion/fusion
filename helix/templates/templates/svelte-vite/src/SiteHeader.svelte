@@ -40,7 +40,7 @@
        destination in the bar saying the same thing. It names the library the
        starter is built on, and it is the place for your own name or logo. -->
   <a class="wordmark" data-link="quiet" href="#/" slot="start">
-    <helix-text variant="body-strong">Helix</helix-text>
+    <helix-text scale="body-strong">Helix</helix-text>
   </a>
 
   <!-- The links are yours. Navigation owns the marker that travels between them

@@ -68,21 +68,21 @@ describe('navigation', () => {
   })
 
   test('underlined draws a rule under the row and the marker as a bar on it', () => {
-    expect(rule(':host([variant="underlined"]) [part="nav"]')).toContain('--navigation-rule-color')
-    const bar = rule(':host([variant="underlined"]) [part="indicator"]')
+    expect(rule(':host([marker="underlined"]) [part="nav"]')).toContain('--navigation-rule-color')
+    const bar = rule(':host([marker="underlined"]) [part="indicator"]')
     expect(bar).toContain('--navigation-indicator-thickness')
     expect(bar).toContain('inset-block-end: 0')
   })
 
   test('segmented puts the marker in a sunken, framed track', () => {
-    const track = rule(':host([variant="segmented"]) [part="nav"]')
+    const track = rule(':host([marker="segmented"]) [part="nav"]')
     expect(track).toContain('var(--helix-color-surface-sunken)')
     expect(track).toContain('border: var(--helix-border-thin) solid')
   })
 
   if (hasLayout()) {
     test('in a browser, underlined puts the bar along the bottom of the current destination', async () => {
-      const nav = await mount(`<helix-navigation label="Sections" variant="underlined">
+      const nav = await mount(`<helix-navigation label="Sections" marker="underlined">
         <a href="#one">One</a>
         <a aria-current="page" href="#two">Two, the longest</a>
       </helix-navigation>`)
@@ -97,7 +97,7 @@ describe('navigation', () => {
     })
 
     test('in a browser, segmented keeps every destination inside its track', async () => {
-      const nav = await mount(`<helix-navigation label="Sections" variant="segmented">
+      const nav = await mount(`<helix-navigation label="Sections" marker="segmented">
         <a aria-current="page" href="#one">One</a>
         <a href="#two">Two</a>
       </helix-navigation>`)

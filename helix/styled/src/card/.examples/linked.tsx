@@ -9,8 +9,8 @@ export function Example() {
           <helix-text
             as="h3"
             id="redesign-title"
+            scale="title"
             slot="header"
-            variant="title"
           >
             Website redesign
           </helix-text>
@@ -26,8 +26,8 @@ export function Example() {
           <helix-text
             as="h3"
             id="app-title"
+            scale="title"
             slot="header"
-            variant="title"
           >
             Mobile app
           </helix-text>

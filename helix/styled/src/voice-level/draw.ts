@@ -7,7 +7,7 @@
  */
 
 /** What a voice level draws. */
-export type VoiceLevelVariant = 'spectrum' | 'waves'
+export type VoiceLevelPattern = 'spectrum' | 'waves'
 
 /** The bar count the spectrum draws where `--voice-level-bars` says nothing. */
 export const DEFAULT_BARS = 24

@@ -16,14 +16,14 @@ export function Example() {
         >
           <helix-text
             as="span"
-            variant="body-strong"
+            scale="body-strong"
           >
             Personal
           </helix-text>
           <helix-text
             as="span"
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             One seat with every feature.
           </helix-text>
@@ -39,14 +39,14 @@ export function Example() {
         >
           <helix-text
             as="span"
-            variant="body-strong"
+            scale="body-strong"
           >
             Team
           </helix-text>
           <helix-text
             as="span"
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             Up to 10 seats, with shared billing.
           </helix-text>

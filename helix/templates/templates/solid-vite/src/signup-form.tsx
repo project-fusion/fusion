@@ -37,13 +37,13 @@ export function SignupForm() {
   return (
     <div class="stack">
       <header class="hero">
-        <helix-text emphasis="muted" variant="label">
+        <helix-text emphasis="muted" scale="label">
           Form
         </helix-text>
-        <helix-text as="h1" variant="heading">
+        <helix-text as="h1" scale="heading">
           Join the roster
         </helix-text>
-        <helix-text as="p" class="lede" emphasis="muted" variant="body">
+        <helix-text as="p" class="lede" emphasis="muted" scale="body">
           Five controls, and a <helix-code>&lt;form&gt;</helix-code> reads every one of them the way
           it reads an <helix-code>input</helix-code>.
         </helix-text>
@@ -105,15 +105,15 @@ export function SignupForm() {
             The form posts nothing. Submit it, and a message shows exactly what a server would
             receive.
           </helix-callout>
-          <helix-text as="h2" variant="title">
+          <helix-text as="h2" scale="title">
             What the form shows
           </helix-text>
-          <helix-text as="p" emphasis="muted" variant="body">
+          <helix-text as="p" emphasis="muted" scale="body">
             Every control is a form-associated custom element, so the submit reads them all
             with <helix-code>new FormData(form)</helix-code>. Reset the form and they all go back,
             the way an <helix-code>input</helix-code> does.
           </helix-text>
-          <helix-text as="p" emphasis="muted" variant="body">
+          <helix-text as="p" emphasis="muted" scale="body">
             Leave the email wrong and the browser shows its own message, in your language. Handle is
             the controlled field: the page refuses each change and writes back a cleaned value.
           </helix-text>
@@ -139,8 +139,8 @@ export function SignupForm() {
               tone="success"
             >
               <helix-flex direction="column" gap="2xs">
-                <helix-text variant="body-strong">Read by the form</helix-text>
-                <helix-text variant="code">{message.text}</helix-text>
+                <helix-text scale="body-strong">Read by the form</helix-text>
+                <helix-text scale="code">{message.text}</helix-text>
               </helix-flex>
             </helix-toast-item>
           )}

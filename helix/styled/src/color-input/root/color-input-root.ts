@@ -39,8 +39,8 @@ import { styles } from './color-input-root.css.js'
  * @cssproperty --color-input-shadow - Shadow under the panel. Defaults to `--helix-shadow-floating`, so the panel keeps a shadow over any content below it.
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it
  *   keeps a lift by default.
- * @cssproperty --color-input-swatch-radius - Corner radius of the swatch in `variant="swatch"`.
- * @cssproperty --color-input-swatch-size - Edge length of the swatch in `variant="swatch"`.
+ * @cssproperty --color-input-swatch-radius - Corner radius of the swatch in `trigger="swatch"`.
+ * @cssproperty --color-input-swatch-size - Edge length of the swatch in `trigger="swatch"`.
  *
  * @replaces input[type=color]
  */

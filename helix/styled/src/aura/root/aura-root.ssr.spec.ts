@@ -12,17 +12,17 @@ describe('aura server output', () => {
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    /* `variant` is the only reflected property and it takes no default, so an
+    /* `pattern` is the only reflected property and it takes no default, so an
        unconfigured aura writes no attribute and hydration reconciles nothing.
        The numeric axes are not reflected at all, because no CSS selects on
        them: reflection exists so a selector can reach a value. */
     expect(hostAttributes(ssr(html`<helix-aura></helix-aura>`), 'helix-aura')).toEqual([])
   })
 
-  test('and reflects the variant, which the fallback gradient selects on', () => {
+  test('and reflects the pattern, which the fallback gradient selects on', () => {
     expect(
-      hostAttributes(ssr(html`<helix-aura variant="rays"></helix-aura>`), 'helix-aura'),
-    ).toEqual(['variant'])
+      hostAttributes(ssr(html`<helix-aura pattern="rays"></helix-aura>`), 'helix-aura'),
+    ).toEqual(['pattern'])
   })
 
   test('nothing about the shader reaches the server', () => {
@@ -36,7 +36,7 @@ describe('aura server output', () => {
        exists to replace: the frame here is one empty canvas over the host's own
        gradient, and the empty box the content sits in, and that is the entire
        claim. */
-    expect(servedParts(ssr(html`<helix-aura variant="rays"></helix-aura>`))).toEqual([
+    expect(servedParts(ssr(html`<helix-aura pattern="rays"></helix-aura>`))).toEqual([
       'canvas',
       'content',
     ])

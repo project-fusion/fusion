@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-navigation
       label="Sections"
-      variant="segmented"
+      marker="segmented"
     >
       <a
         aria-current="page"

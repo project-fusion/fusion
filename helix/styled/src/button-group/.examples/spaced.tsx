@@ -2,7 +2,7 @@ export function Example() {
   return (
     <helix-button-group
       label="Record actions"
-      variant="spaced"
+      layout="spaced"
     >
       <helix-button
         emphasis="solid"

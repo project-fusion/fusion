@@ -13,7 +13,7 @@ import '../index.js'
 
 describe('button group server output', () => {
   const served = ssr(
-    html`<helix-button-group label="Record actions" variant="spaced">
+    html`<helix-button-group label="Record actions" layout="spaced">
       <helix-button>Save</helix-button>
     </helix-button-group>`,
   )
@@ -32,9 +32,9 @@ describe('button group server output', () => {
   })
 
   test('the host carries only what the consumer wrote', () => {
-    // `variant` and `orientation` reflect with no default, so a bare group
+    // `layout` and `orientation` reflect with no default, so a bare group
     // writes nothing and a written one echoes what it was given.
-    expect(hostAttributes(served, 'helix-button-group')).toEqual(['label', 'variant'])
+    expect(hostAttributes(served, 'helix-button-group')).toEqual(['label', 'layout'])
     expect(
       hostAttributes(ssr(html`<helix-button-group>x</helix-button-group>`), 'helix-button-group'),
     ).toEqual([])

@@ -40,7 +40,7 @@ const total = () => pagination.value?.total
   <helix-tabs
     active="billing"
     orientation="vertical"
-    variant="underlined"
+    marker="underlined"
     @helix-before-select="(event) => event.detail.value"
   >
     <helix-tab value="billing">Billing</helix-tab>

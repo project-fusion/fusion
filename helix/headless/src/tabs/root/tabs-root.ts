@@ -215,7 +215,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    * consumer's server markup does not already have.
    */
   @property({ reflect: true })
-  variant?: 'segmented' | 'underlined'
+  marker?: 'segmented' | 'underlined'
 
   private get tabs(): HelixHeadlessTab[] {
     return [...this.children].filter(

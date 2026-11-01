@@ -6,7 +6,7 @@ export function Example() {
       <helix-aura
         className="hero"
         interactive
-        variant="aurora"
+        pattern="aurora"
       >
         <helix-text as="h2">Ship the release on Friday</helix-text>
         <helix-button

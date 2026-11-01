@@ -70,7 +70,7 @@ export function Example() {
         justify-content="between"
         slot="toolbar"
       >
-        <helix-text variant="body-strong">Test and build on main</helix-text>
+        <helix-text scale="body-strong">Test and build on main</helix-text>
         <helix-button onClick={again}>Run again</helix-button>
       </helix-flex>
     </helix-log>

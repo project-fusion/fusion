@@ -6,7 +6,7 @@ export function Example() {
       separation="plain"
     >
       <helix-button slot="trigger">Details</helix-button>
-      <helix-text variant="body">
+      <helix-text scale="body">
         Your file was uploaded and is ready to share with your team.
       </helix-text>
     </helix-popover>

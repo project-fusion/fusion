@@ -13,7 +13,7 @@ export function Example() {
         direction="column"
         gap="md"
       >
-        <helix-text variant="body">
+        <helix-text scale="body">
           You can now share folders. Files you add to a folder later are shared too.
         </helix-text>
         <helix-flex justify-content="end">

@@ -82,7 +82,7 @@
 /* **Underlined: a rule under the row, and the marker a bar on it.** The rule is
    a background so it takes no room, and the bar stands on it at the same place
    `Tabs` draws its own, in the same tokens. */
-:host([variant="underlined"]) [part="nav"] {
+:host([marker="underlined"]) [part="nav"] {
   background-image: linear-gradient(
     var(--navigation-rule-color, var(--helix-color-border)),
     var(--navigation-rule-color, var(--helix-color-border))
@@ -92,7 +92,7 @@
   background-size: 100% var(--helix-border-thin);
 }
 
-:host([variant="underlined"]) [part="indicator"] {
+:host([marker="underlined"]) [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-primary));
   block-size: var(--navigation-indicator-thickness, var(--helix-border-thick));
   border-radius: var(--navigation-indicator-radius, var(--helix-radii-none));
@@ -104,7 +104,7 @@
 /* **Segmented: the pill in a sunken, framed track**, `Tabs`' and
    `ToggleGroup`'s groove token for token. The track is a control's height and
    the destinations are what is left inside it. */
-:host([variant="segmented"]) [part="nav"] {
+:host([marker="segmented"]) [part="nav"] {
   background-color: var(--helix-color-surface-sunken);
   block-size: var(--navigation-block-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -115,7 +115,7 @@
   padding: var(--helix-space-2xs);
 }
 
-:host([variant="segmented"]) [part="indicator"] {
+:host([marker="segmented"]) [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-overlay));
   border-radius: var(
     --navigation-indicator-radius,
@@ -127,13 +127,13 @@
 /* Down a column the rule and the bar stand along the inline end. Logical
    insets carry the bar to the left in a right-to-left document; the rule is a
    background, which has no logical position, so it is moved by hand. */
-:host([orientation="vertical"][variant="underlined"]) [part="nav"] {
+:host([orientation="vertical"][marker="underlined"]) [part="nav"] {
   background-position: right;
   background-repeat: repeat-y;
   background-size: var(--helix-border-thin) 100%;
 }
 
-:host([orientation="vertical"][variant="underlined"]) [part="indicator"] {
+:host([orientation="vertical"][marker="underlined"]) [part="indicator"] {
   block-size: var(--indicator-block-size, 0);
   inline-size: var(--navigation-indicator-thickness, var(--helix-border-thick));
   inset-block-start: 0;
@@ -143,12 +143,12 @@
 }
 
 /* A column is as tall as its destinations, in a track as in a bar. */
-:host([orientation="vertical"][variant="segmented"]) [part="nav"] {
+:host([orientation="vertical"][marker="segmented"]) [part="nav"] {
   block-size: auto;
 }
 
 /* The rule moves to the left with the bar in a right-to-left column. */
-:host([orientation="vertical"][variant="underlined"]:dir(rtl)) [part="nav"] {
+:host([orientation="vertical"][marker="underlined"]:dir(rtl)) [part="nav"] {
   background-position: left;
 }
 

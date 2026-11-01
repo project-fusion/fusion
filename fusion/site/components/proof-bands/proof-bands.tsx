@@ -42,7 +42,7 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
         </helix-flex>
         <div className={`${band.bandSplit} ${styles.proof}`}>
           <helix-flex class={band.bandSection} direction="column" gap="sm">
-            <helix-text class={styles.kicker} emphasis="muted" variant="label">
+            <helix-text class={styles.kicker} emphasis="muted" scale="label">
               One pair that failed
             </helix-text>
             {/* **Drawn in the colors it measured.** The engine's hex for each
@@ -55,18 +55,18 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
               Body text in this gray
             </p>
             <helix-flex align-items="center" gap="sm" wrap>
-              <helix-text variant="body-strong">{caught.ratio.toFixed(2)}:1</helix-text>
+              <helix-text scale="body-strong">{caught.ratio.toFixed(2)}:1</helix-text>
               <helix-text emphasis="muted">against a target of {caught.target}:1</helix-text>
               <helix-tag emphasis="subtle" tone="danger">
                 Fails
               </helix-tag>
             </helix-flex>
-            <helix-text as="p" class={styles.finding} emphasis="muted" variant="caption">
+            <helix-text as="p" class={styles.finding} emphasis="muted" scale="caption">
               {caught.sentence}
             </helix-text>
           </helix-flex>
           <helix-flex class={band.bandSection} direction="column" gap="sm">
-            <helix-text class={styles.kicker} emphasis="muted" variant="label">
+            <helix-text class={styles.kicker} emphasis="muted" scale="label">
               {GENERATOR_CHECKS.length} generator checks
             </helix-text>
             <helix-flex class={styles.steps} gap="xs" wrap>
@@ -87,13 +87,13 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
         <div className={band.bandSection}>
           <helix-list class={styles.exchange} kind="ordered">
             <helix-list-item>
-              <helix-text class={styles.kicker} emphasis="muted" variant="label">
+              <helix-text class={styles.kicker} emphasis="muted" scale="label">
                 Question
               </helix-text>
               <helix-text as="p">{AGENT_EXCHANGE.question}</helix-text>
             </helix-list-item>
             <helix-list-item>
-              <helix-text class={styles.kicker} emphasis="muted" variant="label">
+              <helix-text class={styles.kicker} emphasis="muted" scale="label">
                 Request
               </helix-text>
               {/* `html`, where a bare URL is text: as `sh` the scheme read as a
@@ -101,10 +101,10 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
               <Snippet code={AGENT_EXCHANGE.url} label="Manifest URL" language="html" wrap />
             </helix-list-item>
             <helix-list-item>
-              <helix-text class={styles.kicker} emphasis="muted" variant="label">
+              <helix-text class={styles.kicker} emphasis="muted" scale="label">
                 Answer
               </helix-text>
-              <helix-text as="p" emphasis="muted" variant="caption">
+              <helix-text as="p" emphasis="muted" scale="caption">
                 {AGENT_EXCHANGE.answer}
               </helix-text>
               <Snippet code={AGENT_EXCHANGE.excerpt} label="Manifest excerpt" language="js" wrap />

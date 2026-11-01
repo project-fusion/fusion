@@ -4,7 +4,7 @@ export function Example() {
       align-items="center"
       gap="sm"
     >
-      <helix-text variant="body">Sort by</helix-text>
+      <helix-text scale="body">Sort by</helix-text>
 
       {/* The select has no visible label, so `aria-label` names it for screen
           readers. */}

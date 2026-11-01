@@ -69,7 +69,7 @@ export function Example() {
             <helix-text
               className="count"
               emphasis="muted"
-              variant="caption"
+              scale="caption"
             >
               {count}
             </helix-text>
@@ -97,7 +97,7 @@ export function Example() {
             <helix-text
               className="count"
               emphasis="muted"
-              variant="caption"
+              scale="caption"
             >
               {count}
             </helix-text>
@@ -131,7 +131,7 @@ export function Example() {
             <helix-text
               className="count"
               emphasis="muted"
-              variant="caption"
+              scale="caption"
             >
               {count}
             </helix-text>

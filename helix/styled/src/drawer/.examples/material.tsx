@@ -6,7 +6,7 @@ export function Example() {
       <div className="page">
         <helix-text
           as="h1"
-          variant="display"
+          scale="display"
         >
           Projects
         </helix-text>
@@ -29,7 +29,7 @@ export function Example() {
           direction="column"
           gap="md"
         >
-          <helix-text variant="body">You have no new notifications.</helix-text>
+          <helix-text scale="body">You have no new notifications.</helix-text>
         </helix-flex>
       </helix-drawer>
     </>

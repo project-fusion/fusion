@@ -26,11 +26,11 @@ const figure = new Intl.NumberFormat('en-US')
            the theme's colors, so a new brand color relights it. It shows one still
            frame where motion is reduced, and a gradient where the browser draws
            without a GPU. -->
-      <helix-aura class="first-light" :speed="0.4" :terminus="0.8" variant="braid" />
+      <helix-aura class="first-light" :speed="0.4" :terminus="0.8" pattern="braid" />
       <div class="hero">
         <helix-tag emphasis="subtle" tone="primary">Starter</helix-tag>
-        <helix-text as="h1" variant="display">Helix design system</helix-text>
-        <helix-text as="p" class="lede" variant="body">
+        <helix-text as="h1" scale="display">Helix design system</helix-text>
+        <helix-text as="p" class="lede" scale="body">
           Web components in your brand's colors, drawn from one set of tokens.
         </helix-text>
         <div class="actions">
@@ -44,7 +44,7 @@ const figure = new Intl.NumberFormat('en-US')
            is the app itself, on glass over the light. It has no link of its own:
            the button beside it goes to the same page. -->
       <helix-card class="specimen" material="glass" separation="outlined">
-        <helix-text as="h2" slot="header" variant="title">Roster</helix-text>
+        <helix-text as="h2" slot="header" scale="title">Roster</helix-text>
         <helix-stat-group>
           <helix-stat>
             {{ roster.people }}
@@ -63,7 +63,7 @@ const figure = new Intl.NumberFormat('en-US')
     </header>
 
     <section class="section">
-      <helix-text as="h2" variant="subheading">What you have</helix-text>
+      <helix-text as="h2" scale="subheading">What you have</helix-text>
       <!-- **Each tile is a link, which is what `data-card` is for.** The base layer
            draws the ring, moves the card's border to the brand on hover, and leaves
            focus alone. Nothing inside may be interactive, since a link inside a link
@@ -72,8 +72,8 @@ const figure = new Intl.NumberFormat('en-US')
         <a data-card :href="DOCS.elements">
           <helix-card separation="outlined">
             <span class="feature-mark"><helix-icon name="cube" /></span>
-            <helix-text as="h3" variant="title">Custom elements</helix-text>
-            <helix-text as="p" emphasis="muted" variant="body">
+            <helix-text as="h3" scale="title">Custom elements</helix-text>
+            <helix-text as="p" emphasis="muted" scale="body">
               One import in <helix-code>src/main.ts</helix-code> registers every tag.
             </helix-text>
           </helix-card>
@@ -81,8 +81,8 @@ const figure = new Intl.NumberFormat('en-US')
         <a data-card :href="DOCS.tokens">
           <helix-card separation="outlined">
             <span class="feature-mark"><helix-icon name="palette" /></span>
-            <helix-text as="h3" variant="title">One set of tokens</helix-text>
-            <helix-text as="p" emphasis="muted" variant="body">
+            <helix-text as="h3" scale="title">One set of tokens</helix-text>
+            <helix-text as="p" emphasis="muted" scale="body">
               Every color, size, and space, in light and dark.
             </helix-text>
           </helix-card>
@@ -90,8 +90,8 @@ const figure = new Intl.NumberFormat('en-US')
         <a data-card :href="DOCS.parts">
           <helix-card separation="outlined">
             <span class="feature-mark"><helix-icon name="sliders-horizontal" /></span>
-            <helix-text as="h3" variant="title">Parts to style</helix-text>
-            <helix-text as="p" emphasis="muted" variant="body">
+            <helix-text as="h3" scale="title">Parts to style</helix-text>
+            <helix-text as="p" emphasis="muted" scale="body">
               Reach inside a component with <helix-code>::part()</helix-code>.
             </helix-text>
           </helix-card>

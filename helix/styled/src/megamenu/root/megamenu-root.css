@@ -142,11 +142,11 @@
  * would never appear at all. The open state is restated at a weight that beats
  * it, and the starting style is what actually names where the growth begins.
  */
-:host(:not([variant="band"])) [part="surface"] {
+:host(:not([layout="band"])) [part="surface"] {
   clip-path: inset(0 100% 100% calc(var(--helix-space-xl) * -1));
 }
 
-:host(:not([variant="band"])) [part="surface"]:popover-open {
+:host(:not([layout="band"])) [part="surface"]:popover-open {
   clip-path: inset(
     0 calc(var(--helix-space-xl) * -1) calc(var(--helix-space-xl) * -1)
       calc(var(--helix-space-xl) * -1)
@@ -154,7 +154,7 @@
 }
 
 @starting-style {
-  :host(:not([variant="band"])) [part="surface"]:popover-open {
+  :host(:not([layout="band"])) [part="surface"]:popover-open {
     clip-path: inset(0 100% 100% calc(var(--helix-space-xl) * -1));
   }
 }
@@ -162,7 +162,7 @@
 /* A band from edge to edge. Both insets rather than a width, or it overflows:
    `100vw` counts the scrollbar's gutter and `100dvw` is the same measurement
    with browser chrome out of the way, so it fixed nothing. */
-:host([variant="band"]) [part="surface"],
+:host([layout="band"]) [part="surface"],
 :host(:state(narrow)) [part="surface"] {
   /* The header's ground, so the band reads as it continuing. Both follow the
      hooks, or a glass bar over an opaque band leaves a seam. */
@@ -200,13 +200,13 @@
 
 /* The band's resting clip is not the card's: flush to both sides, so they clip
    at zero rather than being let out. */
-:host([variant="band"]) [part="surface"]:popover-open,
+:host([layout="band"]) [part="surface"]:popover-open,
 :host(:state(narrow)) [part="surface"]:popover-open {
   clip-path: inset(0 0 calc(var(--helix-space-xl) * -1) 0);
 }
 
 @starting-style {
-  :host([variant="band"]) [part="surface"]:popover-open,
+  :host([layout="band"]) [part="surface"]:popover-open,
   :host(:state(narrow)) [part="surface"]:popover-open {
     clip-path: inset(0 0 100% 0);
   }

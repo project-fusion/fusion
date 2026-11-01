@@ -75,22 +75,22 @@ export default function Loading() {
                   </helix-flex>
 
                   <helix-flex direction="column" gap="xs">
-                    <helix-text as="h3" variant="title">
+                    <helix-text as="h3" scale="title">
                       <span data-skeleton="words">{insight.title}</span>
                     </helix-text>
                     <helix-text
                       class={`${card.insightSummary} ${loading.cardSummary}`}
-                      variant="caption"
+                      scale="caption"
                     >
                       <span data-skeleton="words">{insight.summary}</span>
                     </helix-text>
                   </helix-flex>
 
                   <helix-flex align-items="center" gap="sm" slot="footer">
-                    <helix-text variant="caption">
+                    <helix-text scale="caption">
                       <span data-skeleton="words">{formatDate(insight.date)}</span>
                     </helix-text>
-                    <helix-text variant="caption">
+                    <helix-text scale="caption">
                       <span data-skeleton="words">{insight.minutes} min</span>
                     </helix-text>
                   </helix-flex>

@@ -17,7 +17,7 @@ export function Example() {
         >
           <helix-text
             emphasis="muted"
-            variant="label"
+            scale="label"
           >
             Project
           </helix-text>

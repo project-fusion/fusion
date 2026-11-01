@@ -72,7 +72,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
   ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
-  ['steps/root/steps-root.css', ':host([variant="numeric"])', '--_steps-marker-color'],
+  ['steps/root/steps-root.css', ':host([marker="numeric"])', '--_steps-marker-color'],
   ['steps/step/step.css', '[part="description"]', 'color'],
   ['tabs/root/tabs-root.css', '[part="scroll-start"]', 'color'],
   ['tabs/tab/tab.css', '[part="tab"]', 'color'],
@@ -152,7 +152,7 @@ describe('quiet text', () => {
     const root = readFileSync(join(SRC, 'steps/root/steps-root.css'), 'utf8')
     const step = readFileSync(join(SRC, 'steps/step/step.css'), 'utf8')
     expect(root).toMatch(
-      /:host\(\[variant="numeric"\]\) \{[^}]*--_steps-marker-weight: var\(--helix-weight-regular\);/,
+      /:host\(\[marker="numeric"\]\) \{[^}]*--_steps-marker-weight: var\(--helix-weight-regular\);/,
     )
     expect(step).toMatch(
       /\[part="marker"\] \{[^}]*font-weight: var\(--_steps-marker-weight, var\(--helix-weight-semibold\)\);/,

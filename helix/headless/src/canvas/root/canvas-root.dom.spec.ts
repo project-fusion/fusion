@@ -2260,7 +2260,7 @@ describe('canvas document detail', () => {
       '',
       `<helix-headless-canvas-node name="toned" tone="accent" x="0" y="0" width="80" height="40">Toned</helix-headless-canvas-node>
        <helix-headless-canvas-node name="own" style="--canvas-node-color: #ff8800" x="120" y="0" width="80" height="40">Own</helix-headless-canvas-node>
-       <helix-headless-canvas-edge name="line" from="toned" to="own" tone="danger" variant="dashed" style="--canvas-edge-color: #00aa88"></helix-headless-canvas-edge>`,
+       <helix-headless-canvas-edge name="line" from="toned" to="own" tone="danger" stroke="dashed" style="--canvas-edge-color: #00aa88"></helix-headless-canvas-edge>`,
     )) as Canvas & {
       toJsonCanvas(): {
         nodes: Array<{ id: string; color?: string }>
@@ -2268,9 +2268,9 @@ describe('canvas document detail', () => {
       }
     }
     const painted = host.shadowRoot?.querySelector('[part="edge"]') as SVGPathElement
-    // The stylesheet matches the tone and the variant; a custom color is carried across.
+    // The stylesheet matches the tone and the stroke; a custom color is carried across.
     expect(painted.getAttribute('data-tone')).toBe('danger')
-    expect(painted.getAttribute('data-variant')).toBe('dashed')
+    expect(painted.getAttribute('data-stroke')).toBe('dashed')
     expect(painted.getAttribute('style')).toContain('--_canvas-edge-color: #00aa88')
     // The tone goes out as its preset, and a custom color as itself.
     const saved = host.toJsonCanvas()

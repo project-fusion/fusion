@@ -53,7 +53,7 @@ export function Example() {
         justify-content="between"
         slot="toolbar"
       >
-        <helix-text variant="body-strong">Dev server</helix-text>
+        <helix-text scale="body-strong">Dev server</helix-text>
         <helix-select
           aria-label="Levels shown"
           default-value="log"

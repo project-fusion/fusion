@@ -14,7 +14,7 @@ import { styles } from './step.css.js'
  * A step draws its mark, its name as a `helix-button`, and the line that joins
  * it to the steps either side. The mark is a tick on a finished step, a dot
  * on the current one, and an empty ring on one nobody has reached. Where the
- * list sets `variant="numeric"`, it is the step's number.
+ * list sets `marker="numeric"`, it is the step's number.
  *
  * Down a column, the current step opens to show what is in its `content` slot,
  * and the others collapse it. A collapsed stage's content is hidden, so Tab and

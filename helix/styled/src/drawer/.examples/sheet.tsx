@@ -17,13 +17,13 @@ export function Example() {
         snap-points="0.5 1"
       >
         <span slot="header">Filters</span>
-        <helix-text variant="body">
+        <helix-text scale="body">
           Show projects by owner, status, and the date they last changed.
         </helix-text>
         <helix-button-group
           label="Filter actions"
+          layout="spaced"
           slot="footer"
-          variant="spaced"
         >
           <helix-button
             command="--close"

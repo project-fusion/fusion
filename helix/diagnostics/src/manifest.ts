@@ -340,7 +340,7 @@ export const versionsOf = (tiers: Tier[]): Record<string, string> => {
  * **A suggestion is the difference between a finding and a chore.**
  * `--breadcrumb-hover-color` is wrong because the family is `breadcrumbs`, and
  * a reader told only that the hook is unknown has to go and read the manifest;
- * told that `--breadcrumbs-hover-color` exists, they are done.
+ * told that `--breadcrumbs-hover-background-color` exists, they are done.
  *
  * Levenshtein with a ceiling of a third of the name's length. The ceiling is
  * what stops a suggestion from being noise: `--button-x` is not a typo for

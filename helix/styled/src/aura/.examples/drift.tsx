@@ -5,7 +5,7 @@ export function Example() {
     <div className="stage">
       <helix-aura
         drift={1}
-        variant="rays"
+        pattern="rays"
       ></helix-aura>
     </div>
   )

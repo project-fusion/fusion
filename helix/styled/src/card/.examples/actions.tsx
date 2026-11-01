@@ -4,8 +4,8 @@ export function Example() {
       <helix-text
         as="h3"
         id="actions-title"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Weekly report
       </helix-text>

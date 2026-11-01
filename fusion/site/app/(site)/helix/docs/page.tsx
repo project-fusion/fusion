@@ -46,16 +46,16 @@ export default function DocsIndex() {
        */}
       {navigation().map((section) => (
         <helix-flex class={styles.section} direction="column" gap="md" key={section.title}>
-          <helix-text as="h2" variant="subheading">
+          <helix-text as="h2" scale="subheading">
             {section.title}
           </helix-text>
           <div className={styles.pages}>
             {section.pages.map((page) => (
               <Link className={styles.page} href={`/helix/docs/${page.slug}`} key={page.slug}>
-                <helix-text class={styles.title} variant="body-strong">
+                <helix-text class={styles.title} scale="body-strong">
                   {page.title}
                 </helix-text>
-                <helix-text as="span" class={styles.summary} variant="caption">
+                <helix-text as="span" class={styles.summary} scale="caption">
                   <CodeText>{page.description}</CodeText>
                 </helix-text>
               </Link>

@@ -84,7 +84,7 @@
   padding-block: var(--helix-space-2xl) var(--site-band);
 }
 
-/* **The eyebrow, which is a register rather than a label.** `variant="label"`
+/* **The eyebrow, which is a register rather than a label.** `scale="label"`
    sets the kicker at `text-xs` with `tracking-wide`, right for a form label and
    too quiet for the line above a document's title: it reads as a stray word
    rather than as the class of thing the page is. **Sentence case, not

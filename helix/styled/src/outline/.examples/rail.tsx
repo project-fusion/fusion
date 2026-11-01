@@ -7,7 +7,7 @@ export function Example() {
         <section id="overview">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Overview
           </helix-text>
@@ -19,7 +19,7 @@ export function Example() {
         <section id="install">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Install
           </helix-text>
@@ -31,7 +31,7 @@ export function Example() {
         <section id="requirements">
           <helix-text
             as="h3"
-            variant="subheading"
+            scale="subheading"
           >
             Requirements
           </helix-text>
@@ -42,7 +42,7 @@ export function Example() {
         <section id="usage">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Usage
           </helix-text>
@@ -53,7 +53,7 @@ export function Example() {
         <section id="options">
           <helix-text
             as="h3"
-            variant="subheading"
+            scale="subheading"
           >
             Options
           </helix-text>
@@ -62,7 +62,7 @@ export function Example() {
         <section id="timeouts">
           <helix-text
             as="h4"
-            variant="subheading"
+            scale="subheading"
           >
             Timeouts
           </helix-text>
@@ -73,7 +73,7 @@ export function Example() {
         <section id="api">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             API
           </helix-text>
@@ -85,7 +85,7 @@ export function Example() {
         <section id="support">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Support
           </helix-text>
@@ -98,7 +98,7 @@ export function Example() {
       <helix-outline
         className="rail"
         label="On this page"
-        variant="rail"
+        marker="rail"
       >
         <a href="#overview">Overview</a>
         <a href="#install">Install</a>

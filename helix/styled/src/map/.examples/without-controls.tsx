@@ -7,8 +7,8 @@ export function Example() {
       label="Edinburgh city center"
     >
       <helix-text
+        scale="caption"
         slot="header"
-        variant="caption"
       >
         Edinburgh city center
       </helix-text>

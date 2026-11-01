@@ -12,7 +12,7 @@ export function Example() {
         direction="column"
         gap="md"
       >
-        <helix-text variant="body">
+        <helix-text scale="body">
           The project has 12 members and 48 files. It was last updated on September 15, 2026.
         </helix-text>
         <helix-flex justify-content="end">

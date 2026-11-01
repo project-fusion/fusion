@@ -103,7 +103,7 @@ function Showcase({
         {/* The graph, and under it what to try, as each map on Maps has. */}
         <div className={`${band.bandSection} ${styles.graphShowcase}`}>
           <GraphDemo className={styles.graphDemo} kind={kind} legend={legend} noPanel={noPanel} />
-          <helix-text emphasis="muted" variant="caption">
+          <helix-text emphasis="muted" scale="caption">
             {copy?.body?.[1]}
           </helix-text>
         </div>
@@ -142,10 +142,10 @@ export default function Page() {
           class={styles.graphAura}
           data-layer
           gain={1.05}
+          pattern="flow"
           scale={3}
           speed={0.5}
           terminus={0.5625}
-          variant="flow"
         ></helix-aura>
 
         <Band>
@@ -199,10 +199,10 @@ export default function Page() {
           class={styles.graphAura}
           data-layer
           gain={1.05}
+          pattern="flow"
           scale={2.5}
           speed={0.5}
           terminus={0.5625}
-          variant="flow"
         ></helix-aura>
 
         <Band id="get-started">

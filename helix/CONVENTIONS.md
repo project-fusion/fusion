@@ -621,7 +621,7 @@ draws come out identical.
 value. `href`, `target`, and `rel` reflected on Button until they were told not
 to, which wrote a destination onto a host that is not a link and put a bare
 `target rel` pair into every button ever rendered. The visual axes reflect, and so do
-`variant` and `disabled`; the rest do not.
+the named choices and `disabled`; the rest do not.
 
 **Read it the other way as well, which nothing did for months.** The sentence is
 a biconditional and only one side of it was ever enforced: a property a
@@ -842,11 +842,16 @@ own quiet ink, the one step the readable range holds. **Text takes `muted` and
 no `subtle`**: `foreground-subtle` is the ink the engine does not solve, so text
 set in it had no contrast guarantee.
 
-`variant` is the escape hatch and takes no registry, being component-specific by
-definition: `segmented` against `underlined`, `list` against `wheels`, `grip`
-against `line`. It lives on either tier, because a choice between two widgets is
-structural wherever it is made. What it may not be is a place to put something
-that *is* on an axis.
+A choice that is none of those is named for what it chooses, and takes no
+registry, being component-specific by definition: `marker` for `segmented` against
+`underlined`, `layout`, `picker` for `list` against `wheels`, `stroke`, `handle` for
+`grip` against `line`, and `pattern`. It lives on either tier, because a choice
+between two widgets is structural wherever it is made. It may not be a place to put
+something that *is* on an axis, and no property is named `variant`, which says
+nothing about what it chooses.
+
+A hook that fills an area ends in `-background-color`. A hook ending in `-color` is ink, or a mark
+or a line whatever draws it: a thumb, a track that is also a ring's stroke, a Divider.
 
 **A styled axis never appears on the headless tier**, which has nothing to paint
 and no box to size. The exceptions are each principled: `tone` says what a thing
@@ -1184,7 +1189,7 @@ against Helix reaches for `Text`, `Flex` and `Grid` rather than raw tags, so
 dropping a component in works without the app knowing which token to apply.
 
 **There is no `Heading` and no `Link`.** `Text` absorbed the first: `as="h2"`
-picks the element while `variant` picks the ramp, which is the separation the
+picks the element while `scale` picks the ramp, which is the separation the
 paragraph below describes under the other name. A link is the `[data-link]`
 recipe in the base layer, which exists precisely because the *outer* tree styles
 a slotted anchor and a component cannot.
@@ -1192,9 +1197,9 @@ a slotted anchor and a component cannot.
 **Behavior is what earns an element, not what decides an app should write one.**
 `Flex` has no behavior and still removes every hand-rolled layout div.
 
-`Text` keeps `as` and `variant` separate, which is the risk that killed the
+`Text` keeps `as` and `scale` separate, which is the risk that killed the
 first version of it. They default to matching, so a heading is correct by
-writing `as="h2"` and nothing else, and `variant` is only ever a deliberate
+writing `as="h2"` and nothing else, and `scale` is only ever a deliberate
 exception: a section's second heading that has to look smaller without lying
 about the outline, or a `<p>` that has to read as a caption. The pairing is
 resolved in CSS rather than by computing an attribute, so the element writes

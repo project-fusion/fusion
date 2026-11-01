@@ -35,13 +35,13 @@
 
 /* Relative to the menu's own surface. */
 [part="item"]:hover {
-  background-color: var(--menu-item-hover-color, var(--helix-color-hover));
+  background-color: var(--menu-item-hover-background-color, var(--helix-color-hover));
 }
 
 /* The row the keys reached while focus stays in a filter field, lit as a
    row under the pointer is. */
 :host(:state(highlighted)) [part="item"] {
-  background-color: var(--menu-item-hover-color, var(--helix-color-hover));
+  background-color: var(--menu-item-hover-background-color, var(--helix-color-hover));
 }
 
 [part="item"]:focus-visible {

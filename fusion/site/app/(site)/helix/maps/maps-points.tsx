@@ -154,7 +154,7 @@ export function MapsPoints() {
       >
         <div className={styles.mapsCanvas} ref={container} />
         {failed ? (
-          <helix-text slot="footer" variant="caption">
+          <helix-text scale="caption" slot="footer">
             {MAP_FAILED}
           </helix-text>
         ) : null}
@@ -177,7 +177,7 @@ export function MapsPoints() {
           src="/maps/austin-food-and-drink.geojson"
         />
       </helix-map>
-      <helix-text aria-live="polite" emphasis="muted" variant="caption">
+      <helix-text aria-live="polite" emphasis="muted" scale="caption">
         {pressed
           ? `Pressed: ${pressed}`
           : 'Press a count to zoom in. Press a point to see its name.'}

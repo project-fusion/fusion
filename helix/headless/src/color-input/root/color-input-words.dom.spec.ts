@@ -25,7 +25,7 @@ afterEach(() => {
 })
 
 const swatch = async (around: string): Promise<string | null | undefined> => {
-  document.body.innerHTML = `<div ${around}><helix-headless-color-input label="Brand" variant="swatch" default-value="#ff0000"></helix-headless-color-input></div>`
+  document.body.innerHTML = `<div ${around}><helix-headless-color-input label="Brand" trigger="swatch" default-value="#ff0000"></helix-headless-color-input></div>`
   const host = document.querySelector('helix-headless-color-input') as Updatable
   await settle(host)
   return host.shadowRoot?.querySelector('#swatch-value')?.textContent

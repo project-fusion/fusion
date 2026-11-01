@@ -32,7 +32,7 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/radio
  *
  * @slot - The radio's label.
- * @slot icon - An icon shown beside the label. With `variant="chip"`, the icon
+ * @slot icon - An icon shown beside the label. With `chip`, the icon
  * replaces the visible label, and the label becomes the name read by screen
  * readers. The icon has its own slot so the chip can hide the label and show
  * the icon.

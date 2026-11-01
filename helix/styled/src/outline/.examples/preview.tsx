@@ -28,7 +28,7 @@ export function Example() {
         <section id="install">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Install
           </helix-text>
@@ -40,7 +40,7 @@ export function Example() {
         <section id="requirements">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Requirements
           </helix-text>
@@ -52,7 +52,7 @@ export function Example() {
         <section id="usage">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Usage
           </helix-text>
@@ -64,7 +64,7 @@ export function Example() {
         <section id="options">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             Options
           </helix-text>
@@ -76,7 +76,7 @@ export function Example() {
         <section id="api">
           <helix-text
             as="h2"
-            variant="title"
+            scale="title"
           >
             API
           </helix-text>

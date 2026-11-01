@@ -29,7 +29,7 @@ export function Example() {
       </div>
 
       <helix-sandbox-status-bar slot="status">
-        <helix-text variant="caption">HTML</helix-text>
+        <helix-text scale="caption">HTML</helix-text>
       </helix-sandbox-status-bar>
     </helix-sandbox>
   )

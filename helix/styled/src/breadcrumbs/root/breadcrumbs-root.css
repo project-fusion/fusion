@@ -42,7 +42,7 @@
 }
 
 [part="expand"]:hover {
-  background-color: var(--breadcrumbs-hover-color, var(--helix-color-hover));
+  background-color: var(--breadcrumbs-hover-background-color, var(--helix-color-hover));
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 

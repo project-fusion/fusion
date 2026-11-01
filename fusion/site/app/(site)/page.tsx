@@ -187,10 +187,10 @@ export default async function Home() {
           <div className={`${band.bandSection} ${styles.terms}`}>
             {ENGAGEMENT.map((one) => (
               <helix-flex direction="column" gap="2xs" key={one.name}>
-                <helix-text as="h3" variant="body-strong">
+                <helix-text as="h3" scale="body-strong">
                   {one.name}
                 </helix-text>
-                <helix-text as="p" emphasis="muted" variant="caption">
+                <helix-text as="p" emphasis="muted" scale="caption">
                   {one.body}
                 </helix-text>
               </helix-flex>
@@ -241,10 +241,10 @@ export default async function Home() {
                   <helix-tag tone="primary">{insight.topic}</helix-tag>
                   <helix-tag>{insight.kind}</helix-tag>
                 </helix-flex>
-                <helix-text as="h3" variant="title">
+                <helix-text as="h3" scale="title">
                   {insight.title}
                 </helix-text>
-                <helix-text emphasis="muted" variant="caption">
+                <helix-text emphasis="muted" scale="caption">
                   {insight.summary}
                 </helix-text>
               </Link>

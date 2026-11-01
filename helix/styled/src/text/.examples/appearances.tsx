@@ -1,5 +1,5 @@
-/* Every variant on the scale, from largest to smallest. Each sample shows the
-   name of its variant. */
+/* Every scale on the scale, from largest to smallest. Each sample shows the
+   name of its scale. */
 const VARIANTS = [
   'display',
   'heading',
@@ -12,9 +12,8 @@ const VARIANTS = [
   'code',
 ] as const
 
-/** Turns a variant name into a label, such as `body-strong` to `Body strong`. */
-const title = (variant: string) =>
-  `${variant[0]?.toUpperCase()}${variant.slice(1)}`.replace('-', ' ')
+/** Turns a scale name into a label, such as `body-strong` to `Body strong`. */
+const title = (scale: string) => `${scale[0]?.toUpperCase()}${scale.slice(1)}`.replace('-', ' ')
 
 export function Example() {
   return (
@@ -22,14 +21,14 @@ export function Example() {
       direction="column"
       gap="sm"
     >
-      {/* Each sample is a paragraph. `variant` sets only the type style. */}
-      {VARIANTS.map((variant) => (
+      {/* Each sample is a paragraph. `scale` sets only the type style. */}
+      {VARIANTS.map((scale) => (
         <helix-text
           as="p"
-          key={variant}
-          variant={variant}
+          key={scale}
+          scale={scale}
         >
-          {title(variant)}
+          {title(scale)}
         </helix-text>
       ))}
     </helix-flex>

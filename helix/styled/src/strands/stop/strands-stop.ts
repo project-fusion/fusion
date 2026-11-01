@@ -2,7 +2,7 @@ import { customElement, HelixElement, numberConverter } from '@fusion.dev/helix-
 import type { CSSResultGroup } from 'lit'
 import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { StrandsVariant } from '../path.js'
+import type { StrandsPattern } from '../path.js'
 import { styles } from './strands-stop.css.js'
 
 /**
@@ -46,7 +46,7 @@ export class HelixStrandsStop extends HelixElement {
 
   /** The form the ribbon takes at the element. When it is not set, the form is `ribbon`. */
   @property({ reflect: true })
-  variant?: StrandsVariant
+  pattern?: StrandsPattern
 
   protected override render(): typeof nothing {
     return nothing

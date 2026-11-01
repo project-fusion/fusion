@@ -20,7 +20,7 @@ const geometry = hasLayout() ? test : (): void => {}
 
 const wheels = async (style = '', attrs = ''): Promise<HTMLElement & Updatable> => {
   const host = (await mount(
-    `<helix-time-picker variant="wheels" value="09:15" style="${style}" ${attrs}></helix-time-picker>`,
+    `<helix-time-picker picker="wheels" value="09:15" style="${style}" ${attrs}></helix-time-picker>`,
   )) as HTMLElement & Updatable
   await settle(host)
   for (const column of host.shadowRoot?.querySelectorAll<HTMLElement & Updatable>(

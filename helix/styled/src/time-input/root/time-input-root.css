@@ -171,7 +171,7 @@ slot[name="end"]::slotted(*) {
  * shows and which reads as an extension of it. Three columns of two digits are
  * not that: stretched to a 400 pixel field they are three wide bands with a
  * number lost in the middle of each. */
-:host([variant="wheels"]) [part="surface"] {
+:host([picker="wheels"]) [part="surface"] {
   inline-size: max-content;
 }
 

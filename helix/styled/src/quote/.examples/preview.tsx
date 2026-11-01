@@ -1,6 +1,6 @@
 export function Example() {
   return (
-    <helix-text variant="body">
+    <helix-text scale="body">
       {' '}
       Alex said{' '}
       <helix-quote cite="https://example.com/source">

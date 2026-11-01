@@ -65,7 +65,7 @@ import '../../time-picker/index.js'
  * with `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls`, since
  * Down opens the list from it. In the list, the arrow keys, typed digits and PageUp and PageDown
  * move through the times, and Enter, Space or a click chooses one and closes
- * the panel. With `variant="wheels"` each wheel moves the time as you turn it,
+ * the panel. With `picker="wheels"` each wheel moves the time as you turn it,
  * the panel stays open, and Enter or Escape closes it.
  *
  * With `segmented`, the field is a row of segments in place of the text: an
@@ -606,7 +606,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
        Nor on the wheels, where turning the hour is a third of a time. Measured
        before this: choosing an hour closed the panel before a minute could be
        chosen. Enter or Escape closes them. */
-    if (this.mode === undefined && this.variant !== 'wheels') {
+    if (this.mode === undefined && this.picker !== 'wheels') {
       this.requestOpen(false)
       this.updateComplete.then(() => this.returnFocus())
     }
@@ -620,7 +620,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * what says the reader is done.
    */
   private readonly handleWheelEnter = (event: KeyboardEvent): void => {
-    if (event.key === 'Enter' && this.variant === 'wheels' && this.open) {
+    if (event.key === 'Enter' && this.picker === 'wheels' && this.open) {
       event.preventDefault()
       this.requestOpen(false)
       this.returnFocus()
@@ -712,7 +712,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * only the departure has to be named.
    */
   @property({ reflect: true })
-  variant?: 'list' | 'wheels'
+  picker?: 'list' | 'wheels'
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
@@ -756,7 +756,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         option-label: picker-option-label, option-text: picker-option-text"
       ?invalid=${this.resolvedFeedback !== ''}
       mode=${this.mode ?? nothing}
-      variant=${this.variant ?? nothing}
+      picker=${this.picker ?? nothing}
       disable-times=${this.disableTimes || nothing}
       manual
       label=${hostWords(this, slottedWords(this, ['label']) || this.label) || 'Time'}

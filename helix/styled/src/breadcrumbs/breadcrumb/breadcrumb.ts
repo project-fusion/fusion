@@ -30,7 +30,7 @@ import { styles } from './breadcrumb.css.js'
  * @cssproperty --breadcrumbs-control-size - How tall a control slotted into a crumb is.
  * @cssproperty --breadcrumbs-current-color - Text color of the current page's crumb.
  * @cssproperty --breadcrumbs-font-weight - Weight of every crumb's text.
- * @cssproperty --breadcrumbs-hover-color - Fill behind a step under the pointer.
+ * @cssproperty --breadcrumbs-hover-background-color - Fill behind a step under the pointer.
  * @cssproperty --breadcrumbs-link-color - Text color of a crumb that is not the current page. A link
  *   you slot inherits it unless your own styles set a color.
  * @cssproperty --breadcrumbs-radius - Corner radius of the fill behind a step under the pointer.

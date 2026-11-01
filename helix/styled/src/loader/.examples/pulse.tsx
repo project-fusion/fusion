@@ -1,8 +1,8 @@
 export function Example() {
   return (
     <helix-loader
+      pattern="pulse"
       size="lg"
-      variant="pulse"
     >
       <helix-icon name="fusion"></helix-icon>
     </helix-loader>

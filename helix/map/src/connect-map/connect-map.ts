@@ -535,7 +535,7 @@ interface Layer extends HTMLElement {
   walk?: Walked[] | undefined
   progress?: number | undefined
   /** The styled route's line, which is dotted or solid. */
-  variant?: string | undefined
+  stroke?: string | undefined
 }
 
 /**
@@ -1246,7 +1246,7 @@ export const connectMap = (
         const edge = layer.layerKind === 'route' ? settledColor(layer, 'border-top-color') : color
         /* A dotted leg takes no casing: an edge under a line of dots is a
            dashed band, not a line of dots. */
-        const dotted = layer.layerKind === 'route' && layer.variant === 'dotted'
+        const dotted = layer.layerKind === 'route' && layer.stroke === 'dotted'
         const words = layer.layerKind === 'area' ? layer.caption?.trim() : undefined
         const spec: MapLayerSpec = {
           ...(words ? { caption: captionOf(layer, words, color) } : {}),
@@ -1659,14 +1659,14 @@ export const connectMap = (
   /* **A route's color is its stylesheet's**, so what restyles one is watched
      on each route and area themselves, and not over the whole frame, where
      the renderer rebuilds its own controls: a class, an inline token, and the
-     tone and variant axes for a part whose tier does not hear them. `hidden`
+     tone and stroke axes for a part whose tier does not hear them. `hidden`
      turns a layer off. */
   const styled = new MutationObserver(() => soon({ draw: true }))
   const watchLayers = (): void => {
     styled.disconnect()
     for (const layer of [...frame.children].filter(isLayer)) {
       styled.observe(layer, {
-        attributeFilter: ['class', 'hidden', 'style', 'tone', 'variant'],
+        attributeFilter: ['class', 'hidden', 'style', 'tone', 'stroke'],
         attributes: true,
       })
     }

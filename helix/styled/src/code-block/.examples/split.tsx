@@ -18,7 +18,7 @@ export function Example() {
   return (
     <helix-code-block
       diff
-      variant="split"
+      layout="split"
     >
       {PATCH}
     </helix-code-block>

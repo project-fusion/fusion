@@ -145,7 +145,7 @@ export const CoverageBand = () => {
 
           {alone.length > 0 && (
             <div className={styles.alone}>
-              <helix-text as="p" variant="label">
+              <helix-text as="p" scale="label">
                 {alone.length} jobs only Helix covers
               </helix-text>
               <helix-flex data-density="sm" gap="xs" wrap>
@@ -165,7 +165,7 @@ export const CoverageBand = () => {
             <helix-text as="p" class={styles.addedValue} data-site-measure>
               {ADDED}
             </helix-text>
-            <helix-text as="p" emphasis="muted" variant="caption">
+            <helix-text as="p" emphasis="muted" scale="caption">
               A typical extra component, compressed.
             </helix-text>
           </div>
@@ -278,7 +278,7 @@ export const CoverageBand = () => {
               ))}
             </table>
           </CoverageCards>
-          <helix-text as="p" class={styles.source} emphasis="muted" variant="caption">
+          <helix-text as="p" class={styles.source} emphasis="muted" scale="caption">
             Every system ships buttons, form controls, menus, and dialogs, so the table lists the
             rest. Read from each system's manifest on {measuredOn(MEASURED)}.{' '}
             <span className={styles.hint}>Hover a mark to see the elements.</span>

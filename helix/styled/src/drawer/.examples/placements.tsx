@@ -34,7 +34,7 @@ export function Example() {
         placement="start"
       >
         <span slot="header">Menu</span>
-        <helix-text variant="body">Browse your projects, files, and settings.</helix-text>
+        <helix-text scale="body">Browse your projects, files, and settings.</helix-text>
       </helix-drawer>
 
       <helix-drawer
@@ -43,7 +43,7 @@ export function Example() {
         placement="end"
       >
         <span slot="header">Details</span>
-        <helix-text variant="body">Review the details of the selected file.</helix-text>
+        <helix-text scale="body">Review the details of the selected file.</helix-text>
       </helix-drawer>
 
       <helix-drawer
@@ -52,7 +52,7 @@ export function Example() {
         placement="top"
       >
         <span slot="header">Search</span>
-        <helix-text variant="body">Search projects, files, and people.</helix-text>
+        <helix-text scale="body">Search projects, files, and people.</helix-text>
       </helix-drawer>
 
       <helix-drawer
@@ -61,7 +61,7 @@ export function Example() {
         placement="bottom"
       >
         <span slot="header">Share</span>
-        <helix-text variant="body">Share a link to the project with your team.</helix-text>
+        <helix-text scale="body">Share a link to the project with your team.</helix-text>
       </helix-drawer>
     </>
   )

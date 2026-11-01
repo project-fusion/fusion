@@ -72,10 +72,10 @@ export default async function Page() {
           class={styles.servicesAura}
           data-layer
           gain={1.05}
+          pattern="flow"
           scale={3}
           speed={0.5}
           terminus={0.5625}
-          variant="flow"
         ></helix-aura>
 
         {/* The head on the same lit field the galleries use. The page opened on
@@ -84,7 +84,7 @@ export default async function Page() {
           because the section had padding, not because anything filled it. */}
         <PageHero className={styles.servicesHero} shell="plain">
           <helix-flex class={styles.servicesHeroInner} data-shell direction="column" gap="lg">
-            <helix-text emphasis="muted" variant="label">
+            <helix-text emphasis="muted" scale="label">
               {page?.kicker}
             </helix-text>
             <helix-text as="h1" data-measure data-section-title>
@@ -117,7 +117,7 @@ export default async function Page() {
            *                 table rather than as a panel making a point.
            */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
-            <helix-text emphasis="muted" variant="label">
+            <helix-text emphasis="muted" scale="label">
               What we take on
             </helix-text>
             <helix-text as="h2" data-section-title>
@@ -134,7 +134,7 @@ export default async function Page() {
                 {/*
                  * *The name, and no summary under it.**
                  */}
-                <helix-text as="h3" variant="title">
+                <helix-text as="h3" scale="title">
                   {service.name}
                 </helix-text>
 
@@ -146,14 +146,14 @@ export default async function Page() {
                       and on a page with no number on it that is the commitment
                       being described. */}
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text emphasis="muted" variant="label">
+                  <helix-text emphasis="muted" scale="label">
                     How long it runs
                   </helix-text>
                   <helix-text as="p">{service.duration}</helix-text>
                 </helix-flex>
 
                 <helix-flex direction="column" gap="sm">
-                  <helix-text emphasis="muted" variant="label">
+                  <helix-text emphasis="muted" scale="label">
                     What is in it
                   </helix-text>
                   {/* `unordered`, because these are a set and the order does
@@ -172,10 +172,10 @@ export default async function Page() {
                       reader should leave with. The shared row is what lands the
                       three labels on one line. */}
                 <helix-flex direction="column" gap="2xs">
-                  <helix-text emphasis="muted" variant="label">
+                  <helix-text emphasis="muted" scale="label">
                     What you keep
                   </helix-text>
-                  <helix-text as="p" emphasis="muted" variant="caption">
+                  <helix-text as="p" emphasis="muted" scale="caption">
                     {service.outcome}
                   </helix-text>
                 </helix-flex>

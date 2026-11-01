@@ -76,12 +76,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
            */}
           <helix-flex align-items="center" gap="sm">
             <helix-avatar name={insight.author}></helix-avatar>
-            <helix-text variant="caption">{insight.author}</helix-text>
+            <helix-text scale="caption">{insight.author}</helix-text>
           </helix-flex>
 
           <helix-divider></helix-divider>
           <helix-flex align-items="center" gap="md" justify-content="between" wrap>
-            <helix-text as="h2" variant="title">
+            <helix-text as="h2" scale="title">
               Keep reading
             </helix-text>
             {/* Quiet rather than the default link treatment: a bright underlined
@@ -115,12 +115,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                   <helix-flex direction="column" gap="2xs">
                     <helix-flex align-items="center" data-density="sm" gap="xs">
                       <helix-tag>{other.topic}</helix-tag>
-                      <helix-text emphasis="muted" variant="caption">
+                      <helix-text emphasis="muted" scale="caption">
                         {other.minutes} min
                       </helix-text>
                     </helix-flex>
-                    <helix-text variant="title">{other.title}</helix-text>
-                    <helix-text data-measure emphasis="muted" variant="caption">
+                    <helix-text scale="title">{other.title}</helix-text>
+                    <helix-text data-measure emphasis="muted" scale="caption">
                       {other.summary}
                     </helix-text>
                   </helix-flex>
@@ -158,7 +158,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
             <helix-tag tone="primary">{insight.topic}</helix-tag>
           </Link>
-          <helix-text variant="caption">
+          <helix-text scale="caption">
             <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>
           </helix-text>
         </helix-flex>

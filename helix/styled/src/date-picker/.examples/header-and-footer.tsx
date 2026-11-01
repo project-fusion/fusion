@@ -5,15 +5,15 @@ export function Example() {
       label="Check-in"
     >
       <helix-text
+        scale="label"
         slot="header"
-        variant="label"
       >
         Check-in after 3 PM
       </helix-text>
       <helix-text
         emphasis="muted"
+        scale="caption"
         slot="footer"
-        variant="caption"
       >
         Prices are per night.
       </helix-text>

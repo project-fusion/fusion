@@ -4416,7 +4416,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
         d=${drawn.d}
         data-selected=${pickedKeys.has(key) ? '' : nothing}
         data-tone=${element?.tone ?? nothing}
-        data-variant=${element?.variant ?? nothing}
+        data-stroke=${element?.stroke ?? nothing}
         fill="none"
         marker-end=${ends.end ? `url(#${ARROW})` : nothing}
         marker-start=${ends.start ? `url(#${ARROW})` : nothing}

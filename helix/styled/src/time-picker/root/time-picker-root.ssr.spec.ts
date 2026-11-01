@@ -61,7 +61,7 @@ describe('time server output', () => {
   test('the wheels serve their mark too, a wheel being a listbox like the list', () => {
     const markup = rendered(
       ssr(
-        html`<helix-time-picker locale="en-GB" value="09:15" variant="wheels"></helix-time-picker>`,
+        html`<helix-time-picker locale="en-GB" value="09:15" picker="wheels"></helix-time-picker>`,
       ),
       'helix-time-picker',
     )

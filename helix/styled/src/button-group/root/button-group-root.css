@@ -93,16 +93,16 @@
 
 /* Each button after the first is pulled onto its neighbor's border, so the two
    share one line rather than drawing two against each other. */
-:host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
+:host(:not([layout="spaced"])) ::slotted(*:not(:first-child)) {
   margin-inline-start: calc(var(--helix-border-thin) * -1);
 }
 
 /* One shape, so the inner corners go flat and the outer ones keep their radius. */
-:host(:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
+:host(:not([layout="spaced"])) ::slotted(*:not(:first-child)) {
   --button-radius-start: 0;
 }
 
-:host(:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
+:host(:not([layout="spaced"])) ::slotted(*:not(:last-child)) {
   --button-radius-end: 0;
 }
 
@@ -114,7 +114,7 @@
   flex-direction: column;
 }
 
-:host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:first-child)) {
+:host([orientation="vertical"]:not([layout="spaced"])) ::slotted(*:not(:first-child)) {
   --button-radius-start-start: 0;
   --button-radius-start-end: 0;
   --button-radius-start: var(--button-radius, var(--helix-radii-sm));
@@ -124,7 +124,7 @@
   margin-inline-start: 0;
 }
 
-:host([orientation="vertical"]:not([variant="spaced"])) ::slotted(*:not(:last-child)) {
+:host([orientation="vertical"]:not([layout="spaced"])) ::slotted(*:not(:last-child)) {
   --button-radius-end-end: 0;
   --button-radius-end-start: 0;
   --button-radius-end: var(--button-radius, var(--helix-radii-sm));
@@ -141,7 +141,7 @@
 }
 
 /* The same set, spaced. */
-:host([variant="spaced"]) {
+:host([layout="spaced"]) {
   gap: var(--button-group-gap, var(--helix-space-xs));
 }
 

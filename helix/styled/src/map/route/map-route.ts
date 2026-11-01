@@ -29,7 +29,7 @@ export class HelixMapRoute extends HelixHeadlessMapRoute {
 
   /** `dotted` draws the route as dots, for a walk off the road network. */
   @property({ reflect: true })
-  variant?: 'dotted'
+  stroke?: 'dotted'
 
   static override styles: CSSResultGroup = styles
 }

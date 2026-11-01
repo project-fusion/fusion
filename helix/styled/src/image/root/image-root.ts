@@ -23,7 +23,7 @@ import { styles } from './image-root.css.js'
  * @cssproperty --image-fallback-background-color - The background behind the fallback. Defaults to the placeholder's.
  * @cssproperty --image-fallback-color - The color of the fallback's text.
  * @cssproperty --image-fit - How the image fills the box, as an `object-fit` value.
- * @cssproperty --image-placeholder-color - The background behind the placeholder and the fallback.
+ * @cssproperty --image-placeholder-background-color - The background behind the placeholder and the fallback.
  * @cssproperty --image-position - Which part of the image stays in view when it is cropped, as an `object-position` value.
  * @cssproperty --image-radius - The corner radius when `shape` is `rounded`.
  *

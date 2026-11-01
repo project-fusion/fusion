@@ -36,7 +36,7 @@ type Level = HTMLElement & {
   level: number
   still: boolean
   updateComplete: Promise<boolean>
-  variant?: 'spectrum' | 'waves'
+  pattern?: 'spectrum' | 'waves'
 }
 
 const level = async (markup: string): Promise<Level> => {
@@ -95,19 +95,19 @@ describe('voice level', () => {
     expect(host.hasAttribute('still')).toBe(false)
   })
 
-  test('reflects the variant, and writes nothing for the resting one', async () => {
+  test('reflects the pattern, and writes nothing for the resting one', async () => {
     const host = await level('<helix-voice-level></helix-voice-level>')
-    expect(host.hasAttribute('variant')).toBe(false)
-    host.variant = 'waves'
+    expect(host.hasAttribute('pattern')).toBe(false)
+    host.pattern = 'waves'
     await host.updateComplete
-    expect(host.getAttribute('variant')).toBe('waves')
+    expect(host.getAttribute('pattern')).toBe('waves')
   })
 
   test('survives a machine that refuses a 2D context', async () => {
     /* happy-dom returns null from `getContext`, which is what a reader on a
        refused context gets: the element renders and stays connected, and a
        reading draws nothing. */
-    const host = await level('<helix-voice-level variant="waves"></helix-voice-level>')
+    const host = await level('<helix-voice-level pattern="waves"></helix-voice-level>')
     host.level = 0.8
     host.bands = [0.4, 0.9]
     await host.updateComplete
@@ -118,7 +118,7 @@ describe('voice level', () => {
   /* Browser only: happy-dom has no 2D context and runs no frames. */
   if (hasLayout()) {
     test('draws while there is a level, and stops once it has been zero for a while', async () => {
-      const host = await level('<helix-voice-level variant="waves"></helix-voice-level>')
+      const host = await level('<helix-voice-level pattern="waves"></helix-voice-level>')
       host.level = 0.7
       await host.updateComplete
       expect(await framesBooked(10)).toBeGreaterThan(5)
@@ -141,7 +141,7 @@ describe('voice level', () => {
     })
 
     test('a still level runs no frames, and clearing still starts them', async () => {
-      const host = await level('<helix-voice-level still variant="waves"></helix-voice-level>')
+      const host = await level('<helix-voice-level still pattern="waves"></helix-voice-level>')
       host.level = 0.8
       await host.updateComplete
       expect(await framesBooked(10)).toBe(0)
@@ -168,7 +168,7 @@ describe('voice level', () => {
     test('still waves are the same picture on every load, and swing with the level', async () => {
       const picture = async (loudness = 0.7): Promise<string> => {
         const host = await level(
-          `<helix-voice-level still level="${loudness}" variant="waves" style="inline-size: 90px; block-size: 30px"></helix-voice-level>`,
+          `<helix-voice-level still level="${loudness}" pattern="waves" style="inline-size: 90px; block-size: 30px"></helix-voice-level>`,
         )
         const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
         const url = canvas.toDataURL()

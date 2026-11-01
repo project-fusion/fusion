@@ -199,11 +199,11 @@ export function MapsHero({
          that announced every leg forever would be a page that never stopped
          talking. The route behind it is drawn quieter than the route ahead. */
       const walker = host.querySelector('helix-map-position')
-      const route = host.querySelector<HelixMapRoute>('helix-map-route:not([variant])')
+      const route = host.querySelector<HelixMapRoute>('helix-map-route:not([stroke])')
       /* The walk's stops, in the order they are walked, the places off it after them. */
       const walked = [...host.querySelectorAll('helix-map-marker')].slice(0, PLACES.length)
       const [setOff, arrive] = [
-        ...host.querySelectorAll<HelixMapRoute>('helix-map-route[variant="dotted"]'),
+        ...host.querySelectorAll<HelixMapRoute>('helix-map-route[stroke="dotted"]'),
       ]
       let ticking = 0
       let onScreen = true
@@ -406,7 +406,7 @@ export function MapsHero({
         {/* What the first swatch is, in words: a color alone does not say it is
             a whole theme, or where it came from, or that there is a way back. */}
         {sent ? (
-          <helix-text variant="caption">
+          <helix-text scale="caption">
             Showing your theme from the theme builder.{' '}
             <a data-link="true" href={`/helix/theme?${sent.query}`}>
               Back to the theme builder
@@ -426,7 +426,7 @@ export function MapsHero({
       >
         <div className={styles.mapsCanvas} ref={container} />
         {failed ? (
-          <helix-text slot="footer" variant="caption">
+          <helix-text scale="caption" slot="footer">
             {MAP_FAILED}
           </helix-text>
         ) : null}
@@ -486,7 +486,7 @@ export function MapsHero({
             { lat: PLACES[0]?.lat ?? 0, lng: PLACES[0]?.lng ?? 0 },
             { lat: WALK.path[0]?.[0] ?? 0, lng: WALK.path[0]?.[1] ?? 0 },
           ]}
-          variant="dotted"
+          stroke="dotted"
         />
         <helix-map-route
           group="walk"
@@ -495,7 +495,7 @@ export function MapsHero({
             { lat: WALK.path.at(-1)?.[0] ?? 0, lng: WALK.path.at(-1)?.[1] ?? 0 },
             { lat: PLACES.at(-1)?.lat ?? 0, lng: PLACES.at(-1)?.lng ?? 0 },
           ]}
-          variant="dotted"
+          stroke="dotted"
         />
         {/* **The city in 3D, and the ground from above**: the buildings are
             shown, and the aerial photographs are the Hybrid and Satellite

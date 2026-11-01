@@ -7,8 +7,8 @@ export function Example() {
       <helix-text
         as="h3"
         id="elevated-title"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Team plan
       </helix-text>

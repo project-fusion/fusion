@@ -10,7 +10,7 @@ export function Example() {
           <helix-text
             as="h3"
             data-megamenu-heading
-            variant="title"
+            scale="title"
           >
             Build
           </helix-text>
@@ -27,7 +27,7 @@ export function Example() {
           <helix-text
             as="h3"
             data-megamenu-heading
-            variant="title"
+            scale="title"
           >
             Run
           </helix-text>

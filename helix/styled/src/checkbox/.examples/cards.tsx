@@ -15,14 +15,14 @@ export function Example() {
         >
           <helix-text
             as="span"
-            variant="body-strong"
+            scale="body-strong"
           >
             Backups
           </helix-text>
           <helix-text
             as="span"
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             Nightly backups, kept for 30 days.
           </helix-text>
@@ -38,14 +38,14 @@ export function Example() {
         >
           <helix-text
             as="span"
-            variant="body-strong"
+            scale="body-strong"
           >
             Audit log
           </helix-text>
           <helix-text
             as="span"
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             A record of each change and who made it.
           </helix-text>

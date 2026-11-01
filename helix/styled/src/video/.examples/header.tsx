@@ -14,8 +14,8 @@ export function Example() {
       </helix-icon-button>
       <helix-text
         as="h2"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Getting started, part 2
       </helix-text>

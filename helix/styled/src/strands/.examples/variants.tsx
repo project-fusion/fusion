@@ -4,13 +4,13 @@ export function Example() {
   return (
     <div className="forms">
       <div className="stage">
-        <helix-strands variant="bend"></helix-strands>
+        <helix-strands pattern="bend"></helix-strands>
       </div>
       <div className="stage">
-        <helix-strands variant="ribbon"></helix-strands>
+        <helix-strands pattern="ribbon"></helix-strands>
       </div>
       <div className="stage">
-        <helix-strands variant="waves"></helix-strands>
+        <helix-strands pattern="waves"></helix-strands>
       </div>
     </div>
   )

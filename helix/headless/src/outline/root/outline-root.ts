@@ -78,7 +78,7 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * marked, so `a[aria-current]` and `a[data-depth="2"]` are the hooks for a
  * rule of yours.
  *
- * **The rail.** `variant="rail"` draws a slim column of ticks at the edge of a
+ * **The rail.** `marker="rail"` draws a slim column of ticks at the edge of a
  * long scroll, one per link, with the section in view drawn longer and a deeper
  * level shorter. Hovering or focusing the rail opens a surface holding the
  * links, each on one line, and Escape closes it. A tap opens it too, and it stays
@@ -104,9 +104,9 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
  *   and animate yourself.
  * @csspart nav - The navigation landmark.
- * @csspart surface - The box holding the heading and the navigation under `variant="rail"`, which opens over the ticks.
+ * @csspart surface - The box holding the heading and the navigation under `marker="rail"`, which opens over the ticks.
  * @csspart tick - One tick of the rail, for one link, with `data-current` while its section is in view. It carries the link's depth as `--outline-depth`.
- * @csspart ticks - The column of ticks under `variant="rail"`, hidden from assistive technology.
+ * @csspart ticks - The column of ticks under `marker="rail"`, hidden from assistive technology.
  *
  * @cssproperty --outline-depth - The depth of the link a tick stands for, from one, set on each tick.
  *
@@ -239,14 +239,14 @@ export class HelixHeadlessOutline extends HelixElement {
    * The rail form: a slim column of ticks, one per link, that opens on hover,
    * focus, or a tap into a surface holding the links.
    *
-   * A variant because no registered axis (emphasis, material, nesting,
+   * A marker because no registered axis (emphasis, material, nesting,
    * orientation, separation, shape, size, tone, width) has a value for it, and
    * a rail is an arrangement of this family alone, as Megamenu's
-   * `variant="band"` is. It has no default: the outline without it is the list
+   * `marker="band"` is. It has no default: the outline without it is the list
    * of links.
    */
   @property({ reflect: true })
-  variant?: 'rail'
+  marker?: 'rail'
 
   /**
    * What `current` reports, which only `mark` writes.
@@ -810,7 +810,7 @@ export class HelixHeadlessOutline extends HelixElement {
 
   /** Whether this is the rail form. */
   private get rail(): boolean {
-    return this.variant === 'rail'
+    return this.marker === 'rail'
   }
 
   /** Whether the pointer is over the outline, which keeps the rail open. */
@@ -1047,7 +1047,7 @@ export class HelixHeadlessOutline extends HelixElement {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('variant') && !this.rail) {
+    if (changed.has('marker') && !this.rail) {
       this.setOpen(false)
     }
     this.assign()

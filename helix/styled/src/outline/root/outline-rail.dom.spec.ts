@@ -22,7 +22,7 @@ type Rail = HTMLElement & Updatable & { scrollToSection(id: string): boolean }
 
 const rail = async (style = ''): Promise<Rail> => {
   const root = await mount(
-    `<div><helix-outline variant="rail" style="${style}">` +
+    `<div><helix-outline marker="rail" style="${style}">` +
       '<a href="#one">One</a><a href="#two" data-level="2">Two</a><a href="#three">Three</a>' +
       '</helix-outline><section id="one"><h2>One</h2></section>' +
       '<section id="two"><h2>Two</h2></section><section id="three"><h2>Three</h2></section></div>',

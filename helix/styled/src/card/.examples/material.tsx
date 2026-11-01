@@ -10,8 +10,8 @@ export function Example() {
         <helix-text
           as="h3"
           id="glass-title"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Storage
         </helix-text>
@@ -25,8 +25,8 @@ export function Example() {
         <helix-text
           as="h3"
           id="frosted-title"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Team members
         </helix-text>
@@ -40,8 +40,8 @@ export function Example() {
         <helix-text
           as="h3"
           id="transparent-title"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Next invoice
         </helix-text>
@@ -55,8 +55,8 @@ export function Example() {
         <helix-text
           as="h3"
           id="opaque-title"
+          scale="title"
           slot="header"
-          variant="title"
         >
           Notifications
         </helix-text>

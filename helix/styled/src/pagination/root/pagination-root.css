@@ -80,7 +80,7 @@
 [part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
-  background-color: var(--pagination-hover-color, var(--helix-color-hover));
+  background-color: var(--pagination-hover-background-color, var(--helix-color-hover));
   color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
 
@@ -106,7 +106,7 @@
  */
 [part~="page"][aria-current="page"],
 [part~="page"][aria-current="page"]:hover {
-  background-color: var(--pagination-current-color, var(--helix-color-surface-raised));
+  background-color: var(--pagination-current-background-color, var(--helix-color-surface-raised));
   border-color: var(--pagination-current-border-color, var(--helix-color-border));
   color: var(--pagination-current-foreground-color, var(--helix-color-foreground));
   font-weight: var(--pagination-current-font-weight, var(--helix-weight-semibold));

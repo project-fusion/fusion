@@ -7,8 +7,8 @@ export function Example() {
       <helix-text
         as="h3"
         id="card-title"
+        scale="title"
         slot="header"
-        variant="title"
       >
         Storage
       </helix-text>

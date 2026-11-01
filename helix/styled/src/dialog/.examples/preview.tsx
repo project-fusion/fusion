@@ -25,8 +25,8 @@ export function Example() {
         <helix-text>This removes the project and everything in it. It cannot be undone.</helix-text>
         <helix-button-group
           label="Dialog actions"
+          layout="spaced"
           slot="footer"
-          variant="spaced"
         >
           <helix-button
             command="--close"

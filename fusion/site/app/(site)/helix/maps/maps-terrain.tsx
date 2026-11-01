@@ -91,7 +91,7 @@ export function MapsTerrain() {
       >
         <div className={styles.mapsCanvas} ref={container} />
         {failed ? (
-          <helix-text slot="footer" variant="caption">
+          <helix-text scale="caption" slot="footer">
             {MAP_FAILED}
           </helix-text>
         ) : null}
@@ -112,7 +112,7 @@ export function MapsTerrain() {
         />
         <helix-map-contours max-zoom="15" src={ELEVATION.src} unit="feet" />
       </helix-map>
-      <helix-text emphasis="muted" variant="caption">
+      <helix-text emphasis="muted" scale="caption">
         Press 3D to lay the valley flat. Open the layers menu for satellite imagery.
       </helix-text>
     </div>

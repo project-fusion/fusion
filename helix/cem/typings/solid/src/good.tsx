@@ -41,8 +41,8 @@ export function Good() {
       <helix-tabs
         active="billing"
         on:helix-before-select={(event) => event.detail.value}
+        marker="underlined"
         orientation="vertical"
-        variant="underlined"
       >
         <helix-tab value="billing">Billing</helix-tab>
         <helix-tab-panel value="billing">Invoices</helix-tab-panel>
