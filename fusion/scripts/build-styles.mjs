@@ -19,6 +19,7 @@
  */
 import { readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { join, relative, sep } from 'node:path'
+import { gateHover } from '@fusion.dev/scripts/gate-hover'
 import { joinLines } from '@fusion.dev/scripts/join-lines'
 import { template } from '@fusion.dev/scripts/literal'
 import { tighten } from '@fusion.dev/scripts/tighten'
@@ -130,7 +131,7 @@ for (const file of walk(root, '.css')) {
   const source = `// Generated from ${rel} by \`turbo run styles\`. Do not edit.
 import { createSheet } from '@fusion.dev/helix-core'
 
-export const styles = createSheet(\`${template(tighten(stripComments(css)))}\`)
+export const styles = createSheet(\`${template(tighten(stripComments(gateHover(css))))}\`)
 `
 
   // Only write on change, so an unchanged run does not invalidate the cache.

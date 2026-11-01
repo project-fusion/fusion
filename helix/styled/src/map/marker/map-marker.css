@@ -378,11 +378,14 @@
   background: transparent;
 }
 
+/* hover stays on touch: a tap is how a name comes up on a phone, and every name
+   at rest would cover the map. */
 :host(:hover) [part="label"],
 [part="marker"]:focus-visible [part="label"] {
   opacity: 1;
 }
 
+/* hover stays on touch: the point grows with the name a tap brings up. */
 :host(:hover) [part="point"],
 [part="marker"]:focus-visible [part="point"] {
   transform: scale(1.15);

@@ -27,6 +27,7 @@
  */
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { gateHover } from '@fusion.dev/scripts/gate-hover'
 import { root, SOURCE } from '@fusion.dev/scripts/workspace'
 
 /* Resolved from this file rather than from the working directory, because
@@ -139,7 +140,7 @@ for (const name of readdirSync(INPUT)
     process.exit(1)
   }
 
-  const body = `/* ${name} from @fusion.dev/helix-styles. The source, with the reasoning in it, is in the repository. */\n${stripped}\n`
+  const body = `/* ${name} from @fusion.dev/helix-styles. The source, with the reasoning in it, is in the repository. */\n${gateHover(stripped)}\n`
   writeFileSync(join(OUT, name), body)
   raw += source.length
   shipped += body.length

@@ -315,6 +315,7 @@ slot[name$="-icon"]::slotted(*) {
   translate: -50% 0;
 }
 
+/* hover stays on touch: a tap on the speaker is how the level comes up. */
 [part="sound"]:hover [part="volume"],
 [part="sound"]:focus-within [part="volume"] {
   opacity: 1;
@@ -324,6 +325,7 @@ slot[name$="-icon"]::slotted(*) {
 /*
  *  The gap between the speaker and the level, made hoverable.
  */
+/* hover stays on touch: a tap on the speaker is how the level comes up. */
 [part="sound"]:hover::after,
 [part="sound"]:focus-within::after {
   block-size: var(--_video-level-gap);
@@ -339,6 +341,7 @@ slot[name$="-icon"]::slotted(*) {
  *  The little ground it stands on, so the track is legible over a bright frame
  *    the way the bar's own controls are.
  */
+/* hover stays on touch: a tap on the speaker is how the level comes up. */
 [part="sound"]:hover::before,
 [part="sound"]:focus-within::before {
   background-color: var(--helix-color-overlay);

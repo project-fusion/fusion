@@ -140,6 +140,12 @@
   opacity: 1;
 }
 
+@media (hover: none) {
+  [part="dismiss"] {
+    opacity: 1;
+  }
+}
+
 [part="dismiss"] svg {
   block-size: 1em;
   inline-size: 1em;
