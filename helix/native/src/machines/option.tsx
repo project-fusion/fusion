@@ -282,7 +282,7 @@ export const useOption = (family: Family, props: Props, use: MachineUse): Behavi
   return {
     marks: [
       ...(active ? ['active'] : []),
-      ...(member.disabled ? ['disabled'] : []),
+      ...(own.disabled ? ['disabled'] : []),
       ...(hasIndicator ? ['has-indicator'] : []),
       ...(selected ? ['selected'] : []),
     ],
