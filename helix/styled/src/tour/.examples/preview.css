@@ -6,12 +6,11 @@
   --card-shadow: none;
 }
 
-/* The rail takes 11rem, and the document needs 17.8rem beside it, which a frame
-   holds from a 32rem page. Under that the rail goes over the document, which is
-   what an app does on a phone. */
+/* The rail stands beside the document at every width, so the one vertical rule
+   is the right one on a phone too, which reads no stylesheet and no page width. */
 .shell {
-  --flex-flank-min: 17.8rem;
-  --flex-flank-size: 11rem;
+  --flex-flank-min: 0;
+  --flex-flank-size: 8rem;
 }
 
 #rail {
@@ -23,24 +22,10 @@
 
 .bar {
   --card-border-width: 0;
-  --card-padding: var(--helix-space-sm) var(--helix-space-md);
+  --card-padding: var(--helix-space-md);
 }
 
 #sheet {
   --card-border-width: 0;
-  --card-padding: var(--helix-space-lg) var(--helix-space-md);
-}
-
-/* The page's width picks the one rule that stands between the rail and the
-   document. A phone has no stylesheet and draws both. */
-@media (width < 32rem) {
-  #rule-beside-rail {
-    display: none;
-  }
-}
-
-@media (width >= 32rem) {
-  #rule-under-rail {
-    display: none;
-  }
+  --card-padding: var(--helix-space-md);
 }
