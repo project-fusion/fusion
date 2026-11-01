@@ -1,7 +1,48 @@
 /* The table scrolls its own box rather than squeezing its columns. */
 :host {
+  --_table-fade: to right;
+  animation: table-edges linear both;
+  animation-timeline: scroll(self inline);
   display: block;
+  /* A table wider than its box says so by fading the edge with more behind it,
+     as Data Table does. A timeline over a box with nothing to scroll is
+     inactive, so a table that fits is never masked. */
+  mask-image: linear-gradient(
+    var(--_table-fade),
+    transparent,
+    #000 var(--_table-fade-start, 0rem),
+    #000 calc(100% - var(--_table-fade-end, 0rem)),
+    transparent
+  );
   overflow-x: auto;
+}
+
+:host(:dir(rtl)) {
+  --_table-fade: to left;
+}
+
+@keyframes table-edges {
+  0% {
+    --_table-fade-end: var(--helix-space-xl);
+    --_table-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_table-fade-end: var(--helix-space-xl);
+    --_table-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_table-fade-end: 0rem;
+    --_table-fade-start: var(--helix-space-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
 }
 
 /* **A box of its own before it upgrades, with declarative shadow DOM too.**
