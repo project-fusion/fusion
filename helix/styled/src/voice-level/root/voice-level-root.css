@@ -37,7 +37,7 @@
      `column-rule-color` paint nothing here: a canvas draws no text and has no
      columns. */
   color: var(--_voice-level-color);
-  column-rule-color: var(--voice-level-accent-color, var(--helix-color-accent));
+  column-rule-color: var(--voice-level-accent-color, var(--helix-color-primary));
   display: block;
   inline-size: 100%;
   text-decoration-color: var(

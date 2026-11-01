@@ -114,7 +114,8 @@ if (hasLayout()) {
       const filled = edge(find('filled'), 'item')
       const outlined = edge(find('outlined'), 'item')
 
-      expect(filled.backgroundColor).toBe(outlined.backgroundColor)
+      expect(filled.backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
+      expect(outlined.backgroundColor).toBe('rgba(0, 0, 0, 0)')
       expect(filled.borderTopWidth).toBe(outlined.borderTopWidth)
       expect(filled.borderTopColor).toBe('rgba(0, 0, 0, 0)')
       expect(outlined.borderTopColor).not.toBe('rgba(0, 0, 0, 0)')

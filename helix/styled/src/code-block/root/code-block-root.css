@@ -221,7 +221,7 @@
 }
 
 [part="file-tab"][aria-selected="true"] {
-  border-block-end-color: var(--helix-color-accent);
+  border-block-end-color: var(--helix-color-primary);
 }
 
 [part="file-tab"]:focus-visible {

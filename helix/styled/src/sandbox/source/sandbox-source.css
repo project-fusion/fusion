@@ -137,7 +137,7 @@
 /* Under `match-brackets`, the bracket beside the caret and its pair, while
    the field has focus. A bracket with no pair is drawn as invalid. */
 [part="field"]:focus-within [part~="bracket"] {
-  background-color: var(--sandbox-source-bracket-color, var(--helix-color-accent-subtle));
+  background-color: var(--sandbox-source-bracket-color, var(--helix-color-primary-subtle));
   border-radius: var(--helix-radii-sm);
 }
 
@@ -177,5 +177,5 @@
 }
 
 [part~="completion-active"] {
-  background-color: var(--helix-color-accent-surface);
+  background-color: var(--helix-color-primary-surface);
 }

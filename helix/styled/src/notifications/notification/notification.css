@@ -80,7 +80,7 @@
  * Every dimension is still a hook, so a consumer who wants the bar back writes
  * two of them. */
 :host(:not(:state(read))) [part="item"]::before {
-  background-color: var(--notifications-unread-mark, var(--helix-color-accent));
+  background-color: var(--notifications-unread-mark, var(--helix-color-primary));
   block-size: var(--_notifications-unread);
   border-radius: var(--notifications-unread-radius, var(--helix-radii-full));
   content: "";

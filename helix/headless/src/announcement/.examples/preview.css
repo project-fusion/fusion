@@ -30,7 +30,7 @@ helix-headless-announcement {
   position: relative;
 }
 
-helix-headless-announcement[tone]:not([tone="neutral"]) {
+helix-headless-announcement[data-tone]:not([data-tone="neutral"]) {
   background-color: var(--_gray-fill);
 }
 

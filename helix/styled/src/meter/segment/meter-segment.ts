@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMeterSegment } from '@fusion.dev/helix-headless/meter'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './meter-segment.css.js'
 
 /**
@@ -35,6 +36,13 @@ import { styles } from './meter-segment.css.js'
 @customElement('helix-meter-segment')
 export class HelixMeterSegment extends HelixHeadlessMeterSegment {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * What the segment means, as it does on a callout. Takes the tone's color in
+   * place of the next color in the series.
+   */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 }
 
 declare global {
