@@ -232,6 +232,23 @@ const allowDistTag = (names) =>
  */
 const CHECK_TAG = 'promote-check'
 
+/**
+ * Takes the tag off again. A tag left behind is untidy and changes nothing a
+ * consumer installs, so a removal that keeps failing warns and the release goes on.
+ * The add has already proved the permission.
+ */
+const removeCheckTag = (name) => {
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      run('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
+      return
+    } catch {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5_000)
+    }
+  }
+  console.error(`::warning::${name} still carries the \`${CHECK_TAG}\` tag. Remove it by hand.`)
+}
+
 const cannotPromote = () => {
   if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL) {
     return []
@@ -241,12 +258,13 @@ const cannotPromote = () => {
     try {
       const version = run('npm', ['view', name, 'version'], root).trim()
       run('npm', ['dist-tag', 'add', `${name}@${version}`, CHECK_TAG], root)
-      run('npm', ['dist-tag', 'rm', name, CHECK_TAG], root)
     } catch (error) {
       const said = `${error.stderr ?? ''}${error.stdout ?? ''}`.split('\n')
       console.error(`  ${name}: ${said.find((line) => /npm error 4\d\d/.test(line)) ?? said[0]}`)
       refused.push(name)
+      continue
     }
+    removeCheckTag(name)
   }
   return refused
 }
