@@ -23,7 +23,7 @@ const SRC = join(import.meta.dir, '..', '..')
 const FIELDS: [sheet: string, selector: string][] = [
   ['shared/field/field-frame.css', '[part="control"] {'],
   ['shared/field/field-segments.css', '[part="segments"] {'],
-  ['select/root/select-root.css', '[part="trigger"] {'],
+  ['select/root/select-root.generated.css', ':host [part="trigger"] {'],
   ['listbox/root/listbox-root.generated.css', ':host [part="search-field"] {'],
   ['command/root/command-root.css', 'helix-listbox::part(search-field) {'],
   ['color-picker/root/color-picker-root.generated.css', ':host [part="value"] {'],

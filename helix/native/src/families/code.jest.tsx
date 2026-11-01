@@ -56,7 +56,7 @@ describe('the generated Code', () => {
   test('is washed in the ink and set in the mono face', async () => {
     await render(themed(<HelixCode>size</HelixCode>))
     const run = styleOf(washed())
-    expect(run.backgroundColor).toBe('rgba(0, 0, 0, 0.06)')
+    expect(run.backgroundColor).toBe('#0000000d')
     expect(run.fontFamily).toBe('ui-monospace')
     expect(run.color).not.toBe('#000000')
   })
