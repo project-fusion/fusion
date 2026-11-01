@@ -134,15 +134,13 @@ export default styles(
             buttonEdge: token('color-accent'),
             buttonFill: token('color-accent-surface'),
             buttonFillHover: token('color-accent-surface-hover'),
-            buttonFillPress: web(
-              fn('oklch', [
+            buttonFillPress: fn('oklch', [
                 'from',
                 token('color-accent-surface-hover'),
                 'calc(l - 0.05)',
                 'c',
                 'h',
               ]),
-            ),
             buttonOnTone: token('color-foreground-on-accent'),
             buttonTone: token('color-accent'),
             buttonToneHover: token('color-accent-hover'),
@@ -153,15 +151,13 @@ export default styles(
             buttonEdge: token('color-danger'),
             buttonFill: token('color-danger-surface'),
             buttonFillHover: token('color-danger-surface-hover'),
-            buttonFillPress: web(
-              fn('oklch', [
+            buttonFillPress: fn('oklch', [
                 'from',
                 token('color-danger-surface-hover'),
                 'calc(l - 0.05)',
                 'c',
                 'h',
               ]),
-            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-danger'),
             /* Mixed toward the ink, for the ink states. */
@@ -174,9 +170,7 @@ export default styles(
             buttonEdge: token('color-info'),
             buttonFill: token('color-info-surface'),
             buttonFillHover: token('color-info-surface-hover'),
-            buttonFillPress: web(
-              fn('oklch', ['from', token('color-info-surface-hover'), 'calc(l - 0.05)', 'c', 'h']),
-            ),
+            buttonFillPress: fn('oklch', ['from', token('color-info-surface-hover'), 'calc(l - 0.05)', 'c', 'h']),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-info'),
             buttonToneHover: mix(token('color-info'), 86, token('color-foreground')),
@@ -187,15 +181,13 @@ export default styles(
             buttonEdge: token('color-success'),
             buttonFill: token('color-success-surface'),
             buttonFillHover: token('color-success-surface-hover'),
-            buttonFillPress: web(
-              fn('oklch', [
+            buttonFillPress: fn('oklch', [
                 'from',
                 token('color-success-surface-hover'),
                 'calc(l - 0.05)',
                 'c',
                 'h',
               ]),
-            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-success'),
             buttonToneHover: mix(token('color-success'), 86, token('color-foreground')),
@@ -206,29 +198,19 @@ export default styles(
             buttonEdge: token('color-warning'),
             buttonFill: token('color-warning-surface'),
             buttonFillHover: token('color-warning-surface-hover'),
-            buttonFillPress: web(
-              fn('oklch', [
+            buttonFillPress: fn('oklch', [
                 'from',
                 token('color-warning-surface-hover'),
                 'calc(l - 0.05)',
                 'c',
                 'h',
               ]),
-            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-warning'),
             buttonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
           },
         },
       }),
-      /* A phone has no relative color to darken a fill by, so its press on a
-         solid tone stays on the hover's fill. */
-      native([
-        rule(
-          { tone: ['accent', 'danger', 'info', 'success', 'warning'] },
-          { own: { buttonFillPress: own.buttonFillHover } },
-        ),
-      ]),
       /* **Pressed by a Button Group, the solid fill.** The web group writes
          these hooks onto a pressed button's control. A phone's button reads
          the group's own hooks, with the same fallbacks. */
@@ -491,8 +473,7 @@ export default styles(
       rule({ reducedMotion: true }, { animationDuration: own.buttonCrawl }),
     ]),
     /* The press reaches `--helix-size-target`, in a transparent box, so nothing
-       drawn moves. Where the control is already that size the box sits inside it.
-       A phone gives a press the view's own frame. */
+       drawn moves. Where the control is already that size the box sits inside it. */
     on({ after: 'button' }, [
       web([
         rule({
