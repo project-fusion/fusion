@@ -164,6 +164,6 @@
 }
 
 /* The last heading ends on the rule with the values under it. */
-:host(:last-of-type) {
+:host(:last-of-type) [part="column"] {
   padding-inline: var(--_table-heading-padding-inline, var(--helix-space-none));
 }
