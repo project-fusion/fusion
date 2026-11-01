@@ -339,6 +339,28 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart head - The row that holds the column headings. It is `display: contents`, so it takes no space.
  * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart loading - Shown while the rows are loading.
+ * @csspart menu-back - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no submenu.
+ * @csspart menu-back-mark - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no submenu.
+ * @csspart menu-divider - The line between groups of rows in a column's menu, on the column.
+ * @csspart menu-divider-content - Forwarded from the divider, on the column. Not shown in the table.
+ * @csspart menu-divider-line - The line inside `menu-divider`, on the column.
+ * @csspart menu-empty - Forwarded from the column's menu, on the column. Not shown in the table, whose menu always has a row.
+ * @csspart menu-entry - One row of a column's menu, on the column.
+ * @csspart menu-entry-end - The trailing column of a row in a column's menu, on the column.
+ * @csspart menu-entry-item - The row inside `menu-entry`, on the column.
+ * @csspart menu-entry-mark - The check mark on the sort row that is current, on the column.
+ * @csspart menu-entry-shortcut - Forwarded from the row, on the column. Not shown in the table.
+ * @csspart menu-entry-shortcut-kbd - Forwarded from the row, on the column. Not shown in the table.
+ * @csspart menu-entry-shortcut-key - Forwarded from the row, on the column. Not shown in the table.
+ * @csspart menu-entry-shortcut-separator - Forwarded from the row, on the column. Not shown in the table.
+ * @csspart menu-entry-start - The leading column of a row in a column's menu, on the column.
+ * @csspart menu-entry-surface - Forwarded from the row, on the column. Not shown in the table.
+ * @csspart menu-header - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no submenu.
+ * @csspart menu-live - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no loading or empty text.
+ * @csspart menu-loading - Forwarded from the column's menu, on the column. Not shown in the table.
+ * @csspart menu-search-field - Forwarded from the column's menu, on the column. Not shown in the table.
+ * @csspart menu-surface - The panel a column's menu opens in, on the column: `helix-table-column::part(menu-surface)`.
+ * @csspart menu-title - Forwarded from the column's menu, on the column. Not shown in the table, whose menu has no submenu.
  * @csspart more - The row after the last one that holds the button for more rows, while `load-more` is set.
  * @csspart more-button - The button that asks for more rows.
  * @csspart more-cell - The cell of the `more` row, which spans every column.
@@ -589,6 +611,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'gap-label' })
   gapLabel = 'Skip to page {page}'
 
+  /** The name of the row in a column's menu that hides the column. */
+  @words
+  @property({ attribute: 'hide-column-label' })
+  hideColumnLabel = 'Hide column'
+
   /**
    * The grid's name, read by screen readers.
    */
@@ -640,6 +667,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to position {position} of {count}'
+
+  /** The name of the row in a column's menu that moves the column left. */
+  @words
+  @property({ attribute: 'move-left-label' })
+  moveLeftLabel = 'Move left'
+
+  /** The name of the row in a column's menu that moves the column right. */
+  @words
+  @property({ attribute: 'move-right-label' })
+  moveRightLabel = 'Move right'
 
   /**
    * The name of a row's grip, with `reorderable-rows`. `{row}` is replaced with
@@ -914,6 +951,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'select-row-label' })
   selectRowLabel = 'Select {row}'
 
+  /** The name of the row in a column's menu that brings back the columns it hid. */
+  @words
+  @property({ attribute: 'show-columns-label' })
+  showColumnsLabel = 'Show hidden columns'
+
   /**
    * The sort order, as `field:direction`.
    *
@@ -942,26 +984,6 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'sort-descending-label' })
   sortDescendingLabel = 'Sort descending'
-
-  /** The name of the row in a column's menu that moves the column left. */
-  @words
-  @property({ attribute: 'move-left-label' })
-  moveLeftLabel = 'Move left'
-
-  /** The name of the row in a column's menu that moves the column right. */
-  @words
-  @property({ attribute: 'move-right-label' })
-  moveRightLabel = 'Move right'
-
-  /** The name of the row in a column's menu that hides the column. */
-  @words
-  @property({ attribute: 'hide-column-label' })
-  hideColumnLabel = 'Hide column'
-
-  /** The name of the row in a column's menu that brings back the columns it hid. */
-  @words
-  @property({ attribute: 'show-columns-label' })
-  showColumnsLabel = 'Show hidden columns'
 
   /**
    * What screen readers hear when the table is sorted. `{column}` is the
@@ -2457,14 +2479,30 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const shown = this.shownFields
     const at = shown.indexOf(column.field)
     const left = inlineStep(this, 'ArrowLeft')
-    const row = (value: string, label: string, disabled = false): TemplateResult =>
-      html`<${item} value=${value} ?disabled=${disabled}>${label}</${item}>`
+    const row = (
+      value: string,
+      label: string,
+      disabled = false,
+      sorted?: boolean,
+    ): TemplateResult =>
+      html`<${item}
+        part="menu-entry"
+        exportparts="end: menu-entry-end, item: menu-entry-item, mark: menu-entry-mark, shortcut: menu-entry-shortcut,
+          shortcut-kbd: menu-entry-shortcut-kbd, shortcut-key: menu-entry-shortcut-key,
+          shortcut-separator: menu-entry-shortcut-separator, start: menu-entry-start, surface: menu-entry-surface"
+        value=${value}
+        ?disabled=${disabled}
+        ?exclusive=${sorted !== undefined}
+        .checked=${sorted ?? false}
+        >${label}</${item}>`
     const groups = [
       column.canSort
-        ? html`<${item} exclusive value="ascending" .checked=${column.sorted === 'ascending'}
-            >${this.sortAscendingLabel}</${item}
-          ><${item} exclusive value="descending" .checked=${column.sorted === 'descending'}
-            >${this.sortDescendingLabel}</${item}>`
+        ? html`${row('ascending', this.sortAscendingLabel, false, column.sorted === 'ascending')}${row(
+            'descending',
+            this.sortDescendingLabel,
+            false,
+            column.sorted === 'descending',
+          )}`
         : nothing,
       column.movable
         ? html`${row('left', this.moveLeftLabel, shown[at + left] === undefined)}${row(
@@ -2478,6 +2516,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }`,
     ].filter((group) => group !== nothing)
     return html`<${menu}
+      exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
+        live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface,
+        title: menu-title"
       @helix-before-check=${this.keepMenuCheck}
       @helix-before-close=${this.stopMenuEvent}
       @helix-before-open=${this.stopMenuEvent}
@@ -2488,7 +2529,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }}
     >
       ${button}${groups.map(
-        (group, index) => html`${index > 0 ? html`<${divider}></${divider}>` : nothing}${group}`,
+        (group, index) =>
+          html`${
+            index > 0
+              ? html`<${divider} part="menu-divider" exportparts="content: menu-divider-content, line: menu-divider-line"></${divider}>`
+              : nothing
+          }${group}`,
       )}
     </${menu}>`
   }
