@@ -128,7 +128,7 @@
    fact a reader needs before they can want anything else on the page, and it is
    not a claim worth the size of one. */
 .heroWorks {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
   max-inline-size: 46ch;
   text-wrap: pretty;

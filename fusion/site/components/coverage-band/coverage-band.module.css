@@ -172,7 +172,7 @@
 
 /* What the counts count, in the corner above the row names. */
 .corner {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   padding: var(--helix-space-sm);
   text-align: start;
@@ -182,7 +182,7 @@
 /* A group's name opens its rows, in the eyebrow's voice: sentence case and
    its tracking, since a name in capitals is read as a label being shouted. */
 .group th {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   letter-spacing: 0.01em;
@@ -418,7 +418,7 @@
 }
 
 .cardGo {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-sm);
   grid-column: 3;
   grid-row: 1 / span 2;

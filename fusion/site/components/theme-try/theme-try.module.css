@@ -53,7 +53,7 @@ fieldset.tryControl {
    takes the caption's voice through its part. */
 .tryLegend,
 .tryControl helix-toggle-group::part(label) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-regular);
   padding: 0;

@@ -149,7 +149,7 @@ helix-megamenu {
 }
 
 [data-megamenu-item][data-soon] > span {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 helix-megamenu::part(surface) {
@@ -534,7 +534,7 @@ helix-code-block .tok-bool {
 
 helix-code-block .tok-punctuation,
 helix-code-block .tok-operator {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 /* The panel is a bar and a console, and the two take opposite sides of a line. */
