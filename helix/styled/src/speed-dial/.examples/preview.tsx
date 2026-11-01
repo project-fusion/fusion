@@ -1,7 +1,11 @@
 export function Example() {
   return (
-    <helix-flex justify-content="end">
-      <helix-speed-dial label="Actions">
+    <div className="page">
+      <helix-speed-dial
+        data-dock="bottom-end"
+        data-dock-within
+        label="Actions"
+      >
         <helix-speed-dial-item value="share">
           Share
           <helix-icon
@@ -27,6 +31,6 @@ export function Example() {
           ></helix-icon>
         </helix-speed-dial-item>
       </helix-speed-dial>
-    </helix-flex>
+    </div>
   )
 }
