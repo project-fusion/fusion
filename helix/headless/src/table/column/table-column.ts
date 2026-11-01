@@ -12,7 +12,7 @@ import {
   valueAt,
   words,
 } from '@fusion.dev/helix-core'
-import { dotsSixVertical } from '@fusion.dev/helix-icons'
+import { dotsSixVertical, dotsThree } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
@@ -27,6 +27,16 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `undefined` falls back to the field.
  */
 export type CellReader = (row: Readonly<Record<string, unknown>>) => unknown
+
+/**
+ * @internal What a table hands a column to draw its menu: the menu, holding the
+ * button the column draws. The table draws the menu, so a page that only uses
+ * `Table` carries no menu code.
+ */
+export type ColumnMenuDrawer = (
+  column: HelixHeadlessTableColumn,
+  button: TemplateResult,
+) => TemplateResult
 
 /* Re-exported, so the family's entry still offers it: Data Table imports it
    from `edge.ts`, which registers nothing. */
@@ -82,6 +92,10 @@ export { edgeOf } from '../edge.js'
  * current direction takes the heading's ink, so you can see which columns sort
  * and which way the table is sorted.
  *
+ * `menu` adds a small button after the chevrons, in a `DataTable`. The button
+ * opens a menu of what you can do with the column, and a press anywhere else on
+ * the heading still sorts. `DataTable` describes the rows.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Column header, Th
@@ -95,12 +109,15 @@ export { edgeOf } from '../edge.js'
  * @csspart column - The heading cell.
  * @csspart grip - The handle for moving the column, when the table allows it.
  * @csspart grip-mark - The icon on the grip.
+ * @csspart menu-button - The button that opens the column's menu, with `menu` in a `DataTable`.
+ * @csspart menu-mark - The icon on the menu button.
  * @csspart resizer - The edge that is dragged to change the width, when the column is resizable.
  * @csspart sort - The button that a sortable heading renders as.
  * @csspart sort-down - The lower chevron of `sort-mark`, which shows a descending sort.
  * @csspart sort-mark - The two chevrons on a sortable heading. To remove them, set `display: none` on this part.
  * @csspart sort-up - The upper chevron of `sort-mark`, which shows an ascending sort.
  *
+ * @cssstate has-menu - While the heading draws its menu button.
  * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
  * @cssstate sorted-descending - While the table is sorted by this column, largest first.
  */
@@ -154,6 +171,25 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property()
   field = ''
+
+  /**
+   * Draws a button in the heading that opens a menu of what you can do with the
+   * column, in a `DataTable`.
+   *
+   * The menu offers sorting where the column is `sortable`, moving where the
+   * table is `reorderable`, and hiding. It needs a `field`, and a `Table` ignores
+   * it.
+   */
+  @property({ type: Boolean })
+  menu = false
+
+  /**
+   * The accessible name of the menu button. `{name}` is the heading text, and
+   * `{named}` is `no` for a column without one.
+   */
+  @words
+  @property({ attribute: 'menu-label' })
+  menuLabel = '{named, select, no {Column menu} other {{name} column menu}}'
 
   /**
    * The accessible name of the grip that moves the column. `{name}` is the
@@ -341,6 +377,21 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @state()
   sortWords = ''
 
+  /**
+   * @internal Draws the menu around the button, written by a table that offers
+   * one. Not a consumer's to set: `menu` is the setting.
+   */
+  @state()
+  menuDrawer: ColumnMenuDrawer | undefined = undefined
+
+  /**
+   * @internal What the menu shows, written by the table that draws it. Not a
+   * consumer's to set. The table's own state changes nothing here, and this is
+   * what draws the rows again when it does.
+   */
+  @state()
+  menuFacts = ''
+
   /** How wide the heading drew, for the separator to report. */
   @state()
   private drawn = 0
@@ -428,7 +479,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
        name from its content, and a grip and a separator are content: "Move File
        File 412 pixels" was the name every cell under it was read with. The
        controls keep their own names. */
-    const named = this.movable || this.resizable
+    const named = this.movable || this.resizable || this.drawsMenu
     const host = !this.gridCell
     hostAria(internalsOf(this), {
       label: host && named ? this.name : '',
@@ -448,6 +499,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
        `internals.states.delete` is a `TypeError` thrown from `willUpdate`: the
        column would fail to render rather than render without a caret. Each
        name written out, since a state is read from the source as a literal. */
+    this.toggleState('has-menu', this.drawsMenu)
     this.toggleState('sorted-ascending', this.sorted === 'ascending')
     this.toggleState('sorted-descending', this.sorted === 'descending')
   }
@@ -465,10 +517,25 @@ export class HelixHeadlessTableColumn extends HelixElement {
    * sets `gridCell` to move focus into them. Not a consumer's to call.
    */
   get controls(): HTMLElement[] {
-    return ['grip', 'sort', 'resizer'].flatMap((name) => {
+    return ['grip', 'sort', 'menu-button', 'resizer'].flatMap((name) => {
       const control = this.partNamed(name)
       return control ? [control] : []
     })
+  }
+
+  /**
+   * @internal Opens the column's menu with focus on its first row, read by the
+   * table that draws it. Not a consumer's to call.
+   */
+  openMenu(): void {
+    const button = this.partNamed('menu-button')
+    button?.focus()
+    button?.click()
+  }
+
+  /** Whether the heading holds a menu button: `menu`, in a table that draws the menu. */
+  get drawsMenu(): boolean {
+    return this.menu && this.menuDrawer !== undefined
   }
 
   /** The words of the heading, for naming the controls on it. */
@@ -525,7 +592,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
        the column rather than of a table by name: both tables are Lit elements
        that read it when they render, and a column held by anything else has
        nobody to tell. */
-    if (changed.has('textAlign') || changed.has('width')) {
+    if (changed.has('menu') || changed.has('textAlign') || changed.has('width')) {
       this.tellHolder()
     }
   }
@@ -616,12 +683,13 @@ export class HelixHeadlessTableColumn extends HelixElement {
        its words agree for a heading not drawn yet or drawn narrower than the
        floor. */
     const width = Math.min(4096, Math.max(HelixHeadlessTableColumn.NARROWEST, this.drawn))
+    const hasMenu = this.drawsMenu
     return html`<span
       part="column"
       role=${grid ? 'columnheader' : nothing}
       tabindex=${grid ? (this.tabStop ? '0' : '-1') : nothing}
       aria-sort=${grid && this.canSort ? (this.sorted ?? 'none') : nothing}
-      aria-label=${grid && (this.movable || this.resizable) && name ? name : nothing}
+      aria-label=${grid && (this.movable || this.resizable || hasMenu) && name ? name : nothing}
     >${
       this.movable
         ? html`<button part="grip" type="button" tabindex=${control} aria-label=${formatWords(this, 'moveLabel', named)}>
@@ -637,6 +705,23 @@ export class HelixHeadlessTableColumn extends HelixElement {
             <path d="M5.5 10.8 9 14.3l3.5-3.5" part="sort-down" />
           </svg></button>`
         : html`<slot></slot>`
+    }${
+      hasMenu
+        ? this.menuDrawer?.(
+            this,
+            html`<button
+              part="menu-button"
+              slot="trigger"
+              type="button"
+              tabindex=${control}
+              aria-label=${formatWords(this, 'menuLabel', named)}
+            >
+              <svg aria-hidden="true" fill="currentColor" part="menu-mark" viewBox=${dotsThree.viewBox}>
+                ${unsafeSVG(dotsThree.content)}
+              </svg>
+            </button>`,
+          )
+        : nothing
     }${
       this.resizable
         ? html`<span

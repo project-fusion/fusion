@@ -7,6 +7,8 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as recipeStyles } from '../recipes.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
+import '../../divider/index.js'
+import '../../menu/index.js'
 import '../../pagination/index.js'
 
 /**
