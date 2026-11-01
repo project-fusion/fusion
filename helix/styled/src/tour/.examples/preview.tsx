@@ -23,7 +23,7 @@ export function Example() {
         <helix-flex
           align-items="stretch"
           layout="flank"
-          style={{ '--flex-flank-min': '17.8rem', '--flex-flank-size': '11rem' }}
+          style={{ '--flex-flank-min': '0', '--flex-flank-size': '8rem' }}
         >
           <helix-card
             id="rail"
@@ -53,21 +53,15 @@ export function Example() {
 
           <helix-divider
             decorative
-            id="rule-beside-rail"
             orientation="vertical"
           ></helix-divider>
 
           <helix-flex direction="column">
-            <helix-divider
-              decorative
-              id="rule-under-rail"
-            ></helix-divider>
-
             <helix-card
               separation="plain"
               style={{
                 '--card-border-width': '0',
-                '--card-padding': 'var(--helix-space-sm) var(--helix-space-md)',
+                '--card-padding': 'var(--helix-space-md)',
               }}
             >
               <helix-flex
@@ -104,7 +98,7 @@ export function Example() {
               separation="plain"
               style={{
                 '--card-border-width': '0',
-                '--card-padding': 'var(--helix-space-lg) var(--helix-space-md)',
+                '--card-padding': 'var(--helix-space-md)',
               }}
             >
               <helix-text as="h2">Quarterly review</helix-text>
