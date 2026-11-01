@@ -25,7 +25,7 @@ env:
   NODE_VERSION: "22.20.0"
 
 jobs:
-  # TEMPORARY, dropped before merge: proves npm dist-tag under trusted publishing,
+  # TEMPORARY, reverted before merge: proves npm dist-tag under trusted publishing,
   # spending no release number. The first package is the one with the permission
   # turned on, and the second is the control.
   oidc-probe:
