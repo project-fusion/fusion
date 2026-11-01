@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-editor",
   "description": "Connects the Helix Editor frame to ProseMirror: a schema whose blocks keep their ids, the editing plugins, and a document drawn in your tokens.",
-  "version": "0.223.1",
+  "version": "0.227.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

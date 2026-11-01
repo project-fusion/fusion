@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/create-helix-app",
   "description": "Starts a Helix project: `npm create @fusion.dev/helix-app`, which is `helix new` for somebody with no project yet.",
-  "version": "0.223.1",
+  "version": "0.227.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {
