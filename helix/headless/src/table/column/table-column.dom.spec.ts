@@ -40,6 +40,18 @@ describe('one table column', () => {
     expect((await column()).track).toBe('minmax(max-content, 1fr)')
   })
 
+  /* Without the mark, a sortable heading looks the same as any other, and a
+     sorted table does not show which way it is sorted. */
+  test('draws its two chevrons only where it can sort', async () => {
+    const sorting = await column('field="name" sortable')
+    await sorting.updateComplete
+    expect(part(sorting, 'sort-mark')).not.toBeNull()
+    expect(part(sorting, 'sort-up')).not.toBeNull()
+    expect(part(sorting, 'sort-down')).not.toBeNull()
+    expect(part(await column('field="name"'), 'sort-mark')).toBeNull()
+    expect(part(await column('sortable'), 'sort-mark')).toBeNull()
+  })
+
   /* Anything valid in a track list works, and the column hands it through
      untouched: the table composes the list and does not parse the parts. */
   test('hands through whatever track it was given', async () => {
