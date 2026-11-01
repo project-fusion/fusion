@@ -129,7 +129,7 @@ export default styles(
           color: hook.contentColor,
           display: 'block',
           lineHeight: token('leading-normal'),
-          padding: hook.padding,
+          padding: hook.padding([token('space-sm'), token('space-md')]),
           paddingBlockStart: 0,
         }),
         rule(
