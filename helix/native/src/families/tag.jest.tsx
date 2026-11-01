@@ -104,14 +104,12 @@ describe('a tag on its own', () => {
     expect(screen.getByText('Design')).toBeTruthy()
   })
 
-  test('fills with a tint of its tone and edges with a stronger one, mixed in sRGB', async () => {
+  test('fills with a tint of its tone and draws no edge, mixed in sRGB', async () => {
     await render(tag({ children: 'Done', tone: 'success' }))
     const look = styleOf(hostOf('Done'))
     const success = color('color-success')
     expect(look.backgroundColor).toBe(mix(success, 14, color('color-background'), 'srgb'))
-    expect(look.borderTopColor ?? look.borderColor).toBe(
-      mix(success, 28, color('color-background'), 'srgb'),
-    )
+    expect(look.borderTopColor ?? look.borderColor).toBe('transparent')
     expect(styleOf(screen.getByText('Done')).color).toBe(
       mix(success, 55, color('color-foreground')),
     )
@@ -211,6 +209,6 @@ describe('large text', () => {
     expect(look.borderRadius).toBeCloseTo(radius * 1.353, 1)
     expect(styleOf(screen.getByText('Design')).fontSize).toBeCloseTo(words * 3.571, 1)
     const mark = styleOf(screen.getByTestId('glyph x', { includeHiddenElements: true }))
-    expect(mark.height).toBeCloseTo(words * 1.353 * 0.85, 1)
+    expect(mark.height).toBeCloseTo(words * 1.353, 1)
   })
 })
