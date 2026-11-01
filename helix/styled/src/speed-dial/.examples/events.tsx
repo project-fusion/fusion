@@ -40,8 +40,10 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <helix-flex justify-content="end">
+      <div className="stage">
         <helix-speed-dial
+          data-dock="bottom-end"
+          data-dock-within
           label="Actions"
           onhelix-before-close={closing}
           onhelix-before-open={opening}
@@ -63,7 +65,7 @@ export function Example() {
             />
           </helix-speed-dial-item>
         </helix-speed-dial>
-      </helix-flex>
+      </div>
 
       <helix-list
         divided
