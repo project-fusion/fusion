@@ -50,7 +50,7 @@ pub(super) fn check(rule: &Rule, names: &Names, found: &mut Vec<String>) {
         return;
     }
     for condition in &rule.when {
-        if let Some(why) = condition_names(condition, names, &rule.target) {
+        if let Some(why) = condition_names(condition, names, &rule.target, !rule.native_only) {
             found.push(why);
         }
     }
@@ -61,7 +61,12 @@ pub(super) fn check(rule: &Rule, names: &Names, found: &mut Vec<String>) {
 /// in, which a phone reads from the same attribute in shared code.
 const PAGE: &[&str] = &["data-color-mode"];
 
-fn condition_names(condition: &Condition, names: &Names, target: &str) -> Option<String> {
+fn condition_names(
+    condition: &Condition,
+    names: &Names,
+    target: &str,
+    on_web: bool,
+) -> Option<String> {
     let at = format!("a rule on `{target}`");
     match condition {
         Condition::Absent { name } | Condition::Attribute { name, value: None } => (!PAGE
@@ -76,7 +81,7 @@ fn condition_names(condition: &Condition, names: &Names, target: &str) -> Option
             .iter()
             .find_map(|value| attribute_value(names.prop(name), name, value))
             .map(|why| format!("{at} {why}")),
-        Condition::Not { condition } => condition_names(condition, names, target),
+        Condition::Not { condition } => condition_names(condition, names, target, on_web),
         Condition::Also { name, .. } => (!names.parts.contains(name))
             .then(|| format!("{at} reads `also` `{name}`, and no part has that name")),
         /* A value the element computes holds as a state does, as a native
@@ -85,11 +90,12 @@ fn condition_names(condition: &Condition, names: &Names, target: &str) -> Option
             && !names.derived.contains(name.as_str()))
         .then(|| format!("{at} reads the state `{name}`, and no state has that name")),
         /* The web element sets `has-<region>` while the region holds
-        something, so the element declares both. */
+        something, so the element declares both. A phone's own rule reads what
+        it draws, and no web element sets anything for it. */
         Condition::Filled { region } => {
             if !names.regions.contains(region.as_str()) {
                 Some(format!("{at} reads `filled` `{region}`, and no region has that name"))
-            } else if !names.states.contains(format!("has-{region}").as_str()) {
+            } else if on_web && !names.states.contains(format!("has-{region}").as_str()) {
                 Some(format!(
                     "{at} reads `filled` `{region}`, and the element declares no state `has-{region}` for the web to set"
                 ))

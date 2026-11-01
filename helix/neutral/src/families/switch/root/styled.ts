@@ -1,7 +1,17 @@
 import field from '../../../fragments/field.js'
 import fieldInline from '../../../fragments/field-inline.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, first, list, product, quotient, scheme, token, web } from '../../../style.js'
+import {
+  difference,
+  first,
+  list,
+  native,
+  product,
+  quotient,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -206,7 +216,12 @@ export default styles(
       }),
     ]),
     /* Nothing in it, so no box and no gap beside it. */
-    on('label', [rule({ part: { 'data-empty': true } }, { display: 'none' })]),
+    on('label', [
+      rule({ part: { 'data-empty': true } }, { display: 'none' }),
+      /* The web's element marks the region as a slot fills, which a phone reads
+         from what it draws. */
+      native([rule({ filled: { default: false }, label: false }, { display: 'none' })]),
+    ]),
     /* A switch carries no mark, so the fill must print. */
     include(printExact),
   ],
