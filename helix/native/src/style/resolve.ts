@@ -9,12 +9,13 @@
 
 import { length } from './apply.js'
 import { calc, LINED, percentCalc, rounded, viewported } from './calc.js'
-import { mix, movedLightness, writtenColor } from './color.js'
+import { mix, writtenColor } from './color.js'
 import type { Context } from './context.js'
 import type { Family, Rule, Value } from './form.js'
 import { measuredCalc } from './grid/form.js'
 import { fromOklch } from './oklch.js'
 import { numeral } from './reads.js'
+import { relativeLightness } from './relative-lightness.js'
 import type { Resolution } from './resolved.js'
 import { derive, quotationMark } from './values.js'
 
@@ -34,61 +35,6 @@ export const COMPARED: Readonly<Record<string, (...lengths: number[]) => number>
   max: Math.max,
   min: Math.min,
   round: (value = 0, step = 1) => Math.round(value / step) * step,
-}
-
-/**
- * How far `written` moves a color's lightness, `calc(l - 0.05)` as words or a
- * sum of `l` and a number. Undefined for anything else.
- */
-const lightnessStep = (
-  written: Value,
-  resolve: (value: Value) => Resolution,
-): number | undefined => {
-  if ('text' in written) {
-    const found = /^calc\(l ([-+]) ([\d.]+)\)$/.exec(written.text)
-    return found === null ? undefined : Number(found[2]) * (found[1] === '-' ? -1 : 1)
-  }
-  if ('calc' in written && written.calc.op === '+') {
-    const [lightness, step] = written.calc.operands
-    const amount = step === undefined ? undefined : resolve(step)
-    return lightness !== undefined &&
-      'text' in lightness &&
-      lightness.text === 'l' &&
-      typeof amount === 'number'
-      ? amount
-      : undefined
-  }
-  return undefined
-}
-
-/**
- * **A relative color that moves only lightness**, `oklch(from <color> <l> c h)`,
- * which React Native does not draw, as the color it comes to, so a solid
- * control's press steps past its hover fill as it does on the web. Undefined for
- * any other `oklch()`, and where its color has no value.
- */
-const relativeLightness = (
-  written: readonly Value[],
-  resolve: (value: Value) => Resolution,
-): string | undefined => {
-  const whole = written[0]
-  if (whole === undefined || !('space' in whole) || whole.space.length !== 5) {
-    return undefined
-  }
-  const [from, color, lightness, chroma, hue] = whole.space as readonly [
-    Value,
-    Value,
-    Value,
-    Value,
-    Value,
-  ]
-  const kept = (one: Value, word: string): boolean => 'text' in one && one.text === word
-  if (!kept(from, 'from') || !kept(chroma, 'c') || !kept(hue, 'h')) {
-    return undefined
-  }
-  const base = resolve(color)
-  const step = lightnessStep(lightness, resolve)
-  return typeof base === 'string' && step !== undefined ? movedLightness(base, step) : undefined
 }
 
 /** What `resolverFor` reads: the part, the rules that reach it, and its own values. */
