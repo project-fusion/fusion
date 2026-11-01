@@ -102,6 +102,22 @@ const srgb = ([lightness, a, b]: [number, number, number]): [number, number, num
   ]
 }
 
+/**
+ * `written` with its OKLCH lightness moved by `step`, its chroma and hue kept,
+ * as `oklch(from <written> calc(l + <step>) c h)` draws it. In OKLab a change of
+ * lightness leaves the other two axes where they stand. Undefined where it is
+ * not a color.
+ */
+export const movedLightness = (written: string, step: number): string | undefined => {
+  const color = parse(written)
+  if (color === undefined) {
+    return undefined
+  }
+  const [lightness, a, b] = oklab(color)
+  const [red, green, blue] = srgb([Math.min(1, Math.max(0, lightness + step)), a, b])
+  return `rgba(${red}, ${green}, ${blue}, ${color[3]})`
+}
+
 /** What a written color's `var()` reads, by its name without the two dashes. */
 type ReadVariable = (name: string) => unknown
 
