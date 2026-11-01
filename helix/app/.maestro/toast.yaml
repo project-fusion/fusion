@@ -71,9 +71,11 @@ tags:
     visible: .*helix-dismiss.*
     timeout: 5000
 - takeScreenshot: toast-events-heard
+# The row is one label on iOS, its name and its button. Matching from the start
+# of the words keeps the message "Archived Quarterly report.pdf" from answering.
 - openLink: helix://toast/undo/preview
 - extendedWaitUntil:
-    visible: Quarterly report.pdf
+    visible: Quarterly report.pdf.*
     timeout: 15000
 - tapOn:
     point: 50%, 40%
@@ -87,6 +89,6 @@ tags:
 - takeScreenshot: toast-undo-offered
 - tapOn: Undo
 - extendedWaitUntil:
-    visible: Quarterly report.pdf
+    visible: Quarterly report.pdf.*
     timeout: 5000
 - stopRecording
