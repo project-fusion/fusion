@@ -54,6 +54,14 @@
   border-color: light-dark(transparent, var(--helix-color-border));
 }
 
+/* An edge and no fill, so the page shows through: one mechanism, as the others
+   are, and what a Callout's `outlined` draws. An unset card keeps its fill inside
+   the same edge. Decided by the owner on October 31, 2026. A `material` comes after
+   this and still sets the fill. */
+:host([separation="outlined"]) {
+  background-color: var(--card-background-color, transparent);
+}
+
 /* Told apart by its own color and nothing else, which is the fourth mechanism
    `ThemeIntent.separation` carries and no component could ask for. */
 :host([separation="filled"]) {

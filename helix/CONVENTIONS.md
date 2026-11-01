@@ -877,6 +877,10 @@ put the answer in: a panel can be glass *and* outlined.
 rule above: `outlined` on Button, `ghost` on IconButton, `neutral` everywhere.
 Written out, those values select nothing and land on the base rule.
 
+**Card is the one exception, decided by the owner on October 31, 2026.** An unset
+card has a fill and an edge, and `separation="outlined"` has the edge alone, so
+each value names one mechanism.
+
 **Every emphasis names its own hover.** A generic
 `:host(:not(:disabled)) [part="button"]:hover` is four class-equivalents and an
 emphasis rule is three, so an emphasis without a hover of its own loses its fill
