@@ -39,7 +39,7 @@
   /* Logical, as the heading's is, so the inset sits on the inline end in either
      direction. Written physically it stayed on the right, and in a right-to-left
      table a column set to the end ended its values 16px from its heading. */
-  padding-block: var(--table-padding-block, var(--helix-space-xs));
+  padding-block: var(--table-padding-block, calc(var(--helix-space-control) * 0.5));
   padding-inline: var(--helix-space-none) var(--helix-space-md);
   text-align: var(--table-cell-align);
 }

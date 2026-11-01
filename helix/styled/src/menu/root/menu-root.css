@@ -5,11 +5,8 @@
 }
 
 [part="surface"] {
-  /* Compact by nature, and it says so once, so a control slotted into a row is
-     the size the rows are rather than the size a page is. */
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  /* Rows take the step below the control that opened them, from `row.css`, and
+     icons stay small beside them. */
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);

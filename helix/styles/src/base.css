@@ -657,7 +657,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
      once on `:root` against the `md` step is what every descendant inherits,
      whatever region it is in: measured, an option row stayed 32px in all three
      while the trigger above it moved 32, 40, 48. */
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -676,7 +676,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
 }
 
 [data-density="sm"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -702,7 +702,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
    data-density="md" style="--helix-density: .6">`, a button 40px tall wearing
    7.8px type and 9.6px insets. */
 [data-density="md"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -721,7 +721,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
 }
 
 [data-density="lg"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);

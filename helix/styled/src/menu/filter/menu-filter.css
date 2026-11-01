@@ -19,12 +19,12 @@ input {
   color: var(--helix-color-foreground);
   display: block;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
+  font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
   inline-size: 100%;
   inset-block-start: calc(var(--helix-space-xs) * -1);
   margin-block: calc(var(--helix-space-xs) * -1) var(--helix-space-xs);
-  min-block-size: var(--helix-size-control);
+  min-block-size: var(--helix-size-control-tight);
   padding-inline: var(--helix-space-sm);
   position: sticky;
   z-index: 1;

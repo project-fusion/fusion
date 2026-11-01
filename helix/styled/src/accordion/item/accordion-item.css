@@ -18,7 +18,10 @@
   gap: var(--helix-space-xs);
   /* The current step, not the fixed `md` one. */
   min-block-size: var(--helix-size-control);
-  padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
+  padding: var(
+    --accordion-item-padding,
+    calc(var(--helix-space-control) * 0.5) var(--helix-space-md)
+  );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

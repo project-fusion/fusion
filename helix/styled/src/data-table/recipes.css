@@ -60,7 +60,7 @@
 }
 
 [data-density="sm"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -78,7 +78,7 @@
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 [data-density="md"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -96,7 +96,7 @@
   --helix-size-tag: var(--helix-size-tag-md);
 }
 [data-density="lg"] {
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
