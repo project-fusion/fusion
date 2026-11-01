@@ -128,12 +128,13 @@ describe('a chip with nothing to compare against', () => {
     const withValues = (await mount(
       `<helix-headless-filter-chip label="Disposition">refunded</helix-headless-filter-chip>`,
     )) as HTMLElement
+    expect((withValues.shadowRoot?.querySelector('[part="values"]') as HTMLElement).hidden).toBe(false)
     expect(withValues.shadowRoot?.querySelector('[part="values"]')).not.toBeNull()
 
     const without = (await mount(
       `<helix-headless-filter-chip label="Assignee" operator-label="is empty"></helix-headless-filter-chip>`,
     )) as HTMLElement
-    expect(without.shadowRoot?.querySelector('[part="values"]')).toBeNull()
+    expect((without.shadowRoot?.querySelector('[part="values"]') as HTMLElement).hidden).toBe(true)
     // The word it does carry is still there, which is the whole chip.
     expect(without.shadowRoot?.querySelector('[part="operator"]')?.textContent?.trim()).toBe(
       'is empty',
