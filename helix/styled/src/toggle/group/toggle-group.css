@@ -89,8 +89,7 @@
 }
 
 /* A framed track, and it is what makes the whole control read. */
-:host(:not([separation])) [part="track"],
-:host([separation="outlined"]) [part="track"] {
+:host(:not([separation])) [part="track"] {
   /* Concentric, which is the outer radius less everything between the two
      curves: the border and the padding. */
   --_toggle-radius: var(

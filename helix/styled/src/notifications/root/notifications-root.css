@@ -9,22 +9,6 @@
      height because somebody slotted it later. Measured before this line, a
      ghost button in a row drew at the `md` step, 40 pixels inside a 43 pixel
      row, which is what left it nothing to align to. */
-  --helix-size-checkbox: var(--helix-size-checkbox-sm);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
-  --helix-size-switch: var(--helix-size-switch-sm);
-  --helix-text-control: var(--helix-text-control-sm);
-  --helix-space-control: var(--helix-space-sm);
-  --helix-text-field: var(--helix-text-sm);
-  --helix-text-field-label: var(--helix-text-xs);
-  --helix-space-field: var(--helix-space-xs);
-  --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
-  --helix-size-tag: var(--helix-size-tag-sm);
   /* The avatar steps down with them, as it does in `ChatMessage`'s sources. At
      `md` it is 32 pixels centered on a 19.5 pixel line, and at the `xs` row
      padding that left it under two pixels from the rule on a one-line row. */

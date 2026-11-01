@@ -161,12 +161,12 @@ and this section explains why.
 |---|---|
 | `elevated` | A surface lifted off the page, with a shadow under it |
 | `filled` | A ground of its own, and no edge. What the ground is belongs to the family |
-| `outlined` | An edge over the ground it already has |
+| `outlined` | An edge and no fill. A family whose text or thumb needs its ground to read, such as Log or Toggle Group, does not offer it. On Card, this differs from unset, which has a fill and an edge |
 | `plain` | No frame of its own. A family keeps what its content needs to stay readable, and its reference says what stays |
 
 **Most families leave out `elevated` because of what the value means.** A shadow
 shows that the box floats above the page. That is true of a card picked up off a
-grid and of an announcement laid over the content. It is false of:
+grid and of a node on a board. It is false of:
 
 - a row in a feed
 - a groove a thumb sits in
@@ -174,7 +174,7 @@ grid and of an announcement laid over the content. It is false of:
 - a bar across a video
 
 A family that accepts only the other three values needs no reason for it. A
-family that accepts `elevated` has made a choice, and `Card` and `Announcement`
+family that accepts `elevated` has made a choice, and `Card` and `Canvas Node`
 both accept it.
 
 ## What each nesting value does

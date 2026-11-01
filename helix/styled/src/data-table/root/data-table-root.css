@@ -97,7 +97,7 @@
     var(--data-table-rule-color, var(--helix-color-border));
   color: var(--data-table-color, var(--helix-color-foreground));
   font-family: var(--helix-font-sans);
-  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-size: var(--data-table-text, var(--helix-text-control));
   /* Figures take one width each, so a column of amounts lines up by place. */
   font-variant-numeric: tabular-nums;
   padding-block: var(--data-table-padding-block, var(--helix-space-sm));
@@ -431,7 +431,7 @@
   color: var(--data-table-color, var(--helix-color-foreground));
   cursor: pointer;
   font-family: var(--helix-font-sans);
-  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-size: var(--data-table-text, var(--helix-text-control));
   padding-block: var(--data-table-more-padding-block, var(--helix-space-2xs));
   padding-inline: var(--data-table-more-padding-inline, var(--helix-space-sm));
 }

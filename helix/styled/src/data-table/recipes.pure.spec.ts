@@ -12,10 +12,7 @@ const rulesOf = (sheet: string): Map<string, string> => {
     for (const selector of (match[1] ?? '').split(',')) {
       const name = selector.trim()
       if (name !== '') {
-        rules.set(
-          `${name} ${rules.has(name) ? rules.size : ''}`,
-          (match[2] ?? '').replace(/\s+/g, ' ').trim(),
-        )
+        rules.set(`${name} ${rules.size}`, (match[2] ?? '').replace(/\s+/g, ' ').trim())
       }
     }
   }

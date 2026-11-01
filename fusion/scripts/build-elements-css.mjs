@@ -283,7 +283,7 @@ helix-table:not(:defined) > helix-table-row > helix-table-cell {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   box-sizing: border-box;
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-control);
   min-inline-size: 0;
   padding-inline: var(--helix-space-none) var(--helix-space-md);
 }
@@ -353,7 +353,7 @@ ${SERVED} > ${VISIBLE} {
   color: var(--data-table-heading-color, var(--helix-color-foreground-muted));
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-size: var(--data-table-text, var(--helix-text-control));
   font-weight: var(--helix-weight-semibold);
   min-block-size: var(--helix-size-control-loose);
   min-inline-size: 0;
@@ -393,7 +393,7 @@ helix-data-table > helix-table-row > helix-table-cell {
   color: var(--data-table-color, var(--helix-color-foreground));
   display: block;
   font-family: var(--helix-font-sans);
-  font-size: var(--data-table-text, var(--helix-text-sm));
+  font-size: var(--data-table-text, var(--helix-text-control));
   font-variant-numeric: tabular-nums;
   font-weight: inherit;
   min-block-size: auto;

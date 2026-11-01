@@ -52,6 +52,5 @@
 }
 
 :host(:disabled) [part="segments"] {
-  color: var(--helix-color-foreground-subtle);
   cursor: not-allowed;
 }

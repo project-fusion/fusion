@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAnnouncement } from '@fusion.dev/helix-headless/announcement'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './announcement-root.css.js'
 
@@ -32,13 +33,15 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
   /**
    * The surface level the band sits on.
    *
-   * `filled` is the resting one, a well sunk below the page. `elevated` brings
-   * it up to the surface step, for a band that reads as part of the furniture
-   * rather than as a slot cut into it. `outlined` draws a hairline under the
-   * band, in its tone where it has one; no other value draws a line.
+   * Unset, the band is a well sunk below the page. `filled` brings it up to the
+   * surface step, for a band that reads as part of the furniture rather than as
+   * a slot cut into it. `outlined` has no fill and draws a hairline under the
+   * band, in its tone where it has one; no other value draws a line. There is no
+   * `elevated`: the band usually sits at the top of the page with nothing under
+   * it to lift off.
    *
    * **`separation` and not `tone`, because a rung is not a meaning.** A band
-   * can be `info` and elevated at the same time, and two values that can both
+   * can be `info` and filled at the same time, and two values that can both
    * be true are two axes, which is the test the registry answers to.
    *
    * Styled and not headless, because a rung of a ladder is paint: the headless
@@ -46,9 +49,9 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
    * survives having nothing to paint with, and it is the only axis that does.
    */
   @property({ reflect: true })
-  separation?: 'elevated' | 'filled' | 'outlined'
+  separation?: 'filled' | 'outlined'
 
-  static override styles: CSSResultGroup = [liveStyles, styles]
+  static override styles: CSSResultGroup = [densityStyles, liveStyles, styles]
 }
 
 declare global {

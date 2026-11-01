@@ -27,7 +27,7 @@
   color: var(--_table-heading-color, var(--helix-color-foreground-muted));
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--_table-heading-text, var(--helix-text-sm));
+  font-size: var(--_table-heading-text, var(--helix-text-control));
   font-weight: var(--helix-weight-semibold);
   /* Taller than a row, because the header is a band rather than the first row
      of data: at the same height it read as one, and the rule under it as the

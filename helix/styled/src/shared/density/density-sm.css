@@ -1,0 +1,21 @@
+/* A component that is dense by nature, as a whole: every step a control reads, at
+   `sm`, so a control inside matches the same control under `data-density="sm"`.
+   Compose before the family's own sheet. A scope on one part writes these itself. */
+:host {
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-switch: var(--helix-size-switch-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+  --helix-space-control: var(--helix-space-sm);
+  --helix-space-field: var(--helix-space-xs);
+  --helix-text-control: var(--helix-text-control-sm);
+  --helix-text-field: var(--helix-text-sm);
+  --helix-text-field-label: var(--helix-text-xs);
+}

@@ -109,7 +109,7 @@ export const TOKENS: Token[] = [
      leaves the toggle group's thumb 0.14 above its track. */
   [
     'color-surface-sunken',
-    'light-dark(var(--_helix-neutral-200), var(--_helix-neutral-975))',
+    'light-dark(var(--_helix-neutral-225), var(--_helix-neutral-975))',
     'A recessed surface, such as a track or a groove. Its fill sets it apart. A field reads `well`.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
@@ -189,7 +189,7 @@ export const TOKENS: Token[] = [
      dark. */
   [
     'color-foreground-subtle',
-    'light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))',
+    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
     'A mark that is not text, such as a separator, a chevron, or a grip. Its contrast is not guaranteed.',
   ],
   /* **The label on a fill, one per role.** A brand fill and a status fill are

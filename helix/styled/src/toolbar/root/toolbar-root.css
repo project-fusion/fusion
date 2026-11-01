@@ -1,25 +1,5 @@
 :host {
-  /* Dense by nature, and it says so once. A control put in here takes this
-     without being told, so a row cannot end up with one member the wrong height
-     because somebody added it later and forgot. */
-  --helix-size-checkbox: var(--helix-size-checkbox-sm);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
-  /* The icon step with it. Declaring the control size alone leaves an icon at
-     the `md` step inside `sm` controls: 20 pixels in a 32 pixel row. */
-  --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
-  --helix-size-switch: var(--helix-size-switch-sm);
-  --helix-text-control: var(--helix-text-control-sm);
-  --helix-space-control: var(--helix-space-sm);
-  --helix-text-field: var(--helix-text-sm);
-  --helix-text-field-label: var(--helix-text-xs);
-  --helix-space-field: var(--helix-space-xs);
-  --helix-size-tag: var(--helix-size-tag-sm);
+  /* Dense by nature, and `density-sm.css` says so once. */
 
   display: inline-flex;
   max-inline-size: 100%;

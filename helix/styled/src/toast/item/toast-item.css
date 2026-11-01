@@ -5,22 +5,6 @@
   /* The icon step with it. A container that declares the control size and stops
      there draws an icon in the message at the `md` step inside `sm` controls: 20
      pixels in a 32 pixel row. */
-  --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
-  --helix-size-checkbox: var(--helix-size-checkbox-sm);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
-  --helix-size-switch: var(--helix-size-switch-sm);
-  --helix-size-tag: var(--helix-size-tag-sm);
-  --helix-text-control: var(--helix-text-control-sm);
-  --helix-space-control: var(--helix-space-sm);
-  --helix-text-field: var(--helix-text-sm);
-  --helix-text-field-label: var(--helix-text-xs);
-  --helix-space-field: var(--helix-space-xs);
   /* The height of one line of the message, which is what everything in the row
      is aligned against. */
   --_toast-line: calc(var(--toast-font-size, var(--helix-text-sm)) * var(--helix-leading-normal));

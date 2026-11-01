@@ -56,11 +56,12 @@ export class HelixEditor extends HelixHeadlessEditor {
   fill = false
 
   /**
-   * How the frame stands off the page. Unset, it is outlined. `plain` draws
+   * How the frame stands off the page. Unset, it has a fill and an edge, and
+   * its text is colored against that fill, so there is no `outlined`. `plain` draws
    * no edge or corners, for a document that fills a page or a pane of its own.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
 
   /** The block menu's button is drawn as the tools beside it are. */
   protected override get blockEmphasis(): 'ghost' | undefined {
