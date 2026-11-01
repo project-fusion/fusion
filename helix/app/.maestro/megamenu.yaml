@@ -37,9 +37,10 @@ tags:
     notVisible: .*Track the numbers you care about.*
     timeout: 5000
 # The gallery answers a link in an example with an alert, which a next step
-# cannot reach past: Android's tree holds the alert alone.
+# cannot reach past: Android's tree holds the alert alone. The words are quoted,
+# since YAML reads an unquoted " #" as the start of a comment.
 - extendedWaitUntil:
-    visible: Opens #trace
+    visible: "Opens #trace"
     timeout: 5000
 - tapOn: OK
 - openLink: helix://megamenu/events/preview

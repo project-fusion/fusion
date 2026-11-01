@@ -1,8 +1,10 @@
 # Scroll Area: the release notes are a region named by their label, and a
 # swipe brings the last note into view. Recorded.
 #
-# The example's size is its stylesheet's, which a phone does not read, so
-# the area is as tall as its notes and the gallery's page scrolls them.
+# The example's `max-block-size` stands the area 12rem tall at the top of the
+# screen, so the page has nothing to scroll and a drag goes on the area itself.
+# Android's tree holds only what the area shows, so there the last note appears
+# only once it has scrolled.
 appId: dev.fusion.helix.app
 name: Scroll Area
 tags:
@@ -19,9 +21,13 @@ tags:
     point: 50%, 90%
     retryTapIfNoChange: false
 - startRecording: scroll-area
-- scrollUntilVisible:
-    element: .*remove members.*
-    direction: DOWN
+- repeat:
+    times: 3
+    commands:
+      - swipe:
+          start: 50%, 30%
+          end: 50%, 14%
+          duration: 400
 - assertVisible: .*remove members.*
 - takeScreenshot: scroll-area-scrolled
 - stopRecording

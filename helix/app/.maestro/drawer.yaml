@@ -67,10 +67,19 @@ tags:
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 3000
-# Named points and a quick drag: from a row, Maestro's drag to 90% of the screen
-# ends short of what takes a whole sheet out.
+# Named points and a quick drag. A fling goes on to the next snap point, as
+# core's `settleSwipe` has it on the web as well, so the whole sheet rests half
+# open with its list still shown.
 - swipe:
     start: 50%, 78%
+    end: 50%, 99%
+    duration: 200
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: .*Quarterly report.*
+# A second fling from the header at half open takes it out.
+- swipe:
+    start: 50%, 70%
     end: 50%, 99%
     duration: 200
 - extendedWaitUntil:
