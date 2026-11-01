@@ -1,4 +1,5 @@
 :host {
+  --_drawer-ground: var(--drawer-background-color, var(--helix-color-surface-overlay));
   --_drawer-size: var(--drawer-size, 20rem);
   /* No box at all. The `[hidden]` rule from `HelixElement.finalizeStyles` still
      wins over it, being (0,3,0). */
@@ -72,7 +73,14 @@
      `material` rules below: a consumer setting it on an opaque drawer, which is
      the resting one, changed nothing and was told nothing. `Card` reads its own
      the same way in the rule this pair was copied from. */
-  background-color: var(--drawer-background-color, var(--helix-color-surface-overlay));
+  background-color: var(--_drawer-ground);
+  /* A panel opened from inside takes `surface-overlay` too, and in dark a shadow
+     does not show, so inside the drawer the token sits a step above it. See
+     Dialog's note. */
+  --helix-color-surface-overlay: light-dark(
+    var(--_drawer-ground),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_drawer-ground))
+  );
   /* A drawer's own inset, and nothing about anyone's header. A drawer is
      `position: fixed` with `inset-block: 0`, so it spans the strip a sticky
      header occupies and its first line of content sits behind one. */

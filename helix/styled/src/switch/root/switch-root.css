@@ -221,9 +221,15 @@
   border-color: var(--helix-color-foreground-subtle);
 }
 
-/* A press firms the edge, and a press on the on state lifts the fill. */
+/* A press firms the edge and washes an off groove. */
 :host(:not(:disabled)) [part="field"]:active [part="track"] {
   background-color: var(--helix-color-press);
+}
+
+/* On, the press takes the fill's own step, as a solid Button does. The wash above
+   replaced the fill: the thumb fell from 17.76:1 to 1.45:1 under the press. */
+:host(:state(checked):not(:disabled)) [part="field"]:active [part="track"] {
+  background-color: var(--switch-on-color, var(--helix-color-primary-surface-active));
 }
 
 /* A checked track is a fill, which forced colors paint Canvas. */

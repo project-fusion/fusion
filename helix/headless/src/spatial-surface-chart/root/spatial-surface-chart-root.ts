@@ -35,9 +35,11 @@ import {
   inBox,
   nearestTo,
   type Placed,
+  PlotRoomWatch,
   SPATIAL_VIEW,
   shape,
   turned,
+  wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
 import { levelOf, type SurfaceField, surfaceOf } from '../grid.js'
 
@@ -232,6 +234,8 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   private camera: Camera = SPATIAL_VIEW
 
   /** A drag across the chart's own drawing, which turns its view. */
+  private readonly plotRoom = new PlotRoomWatch(this)
+
   private readonly drag = new DragTurn(
     (next) => {
       this.camera = next(this.camera)
@@ -474,7 +478,9 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * has drawn and where none is connected.
    */
   private renderFallback(field: SurfaceField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera, [], this.noBox)
+    const view = wordsFitted(this.plotRoom.room, (words) =>
+      boxView(field.axes, this.camera, [], this.noBox, words),
+    )
     const depths = field.depths.length
     const boxed = field.cells.map((cell): BoxPoint | undefined =>
       cell.value === undefined
