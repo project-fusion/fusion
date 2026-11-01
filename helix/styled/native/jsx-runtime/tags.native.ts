@@ -62,6 +62,7 @@ import { HelixQuote } from '../quote/index.native'
 import { HelixRadio, HelixRadioGroup } from '../radio/index.native'
 import { HelixRating } from '../rating/index.native'
 import { HelixScrollArea } from '../scroll-area/index.native'
+import { HelixSelect } from '../select/index.native'
 import { HelixSkeleton } from '../skeleton/index.native'
 import { HelixSkipLink } from '../skip-link/index.native'
 import { HelixSlider } from '../slider/index.native'
@@ -268,6 +269,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-radio-group': HelixRadioGroup,
   'helix-rating': HelixRating,
   'helix-scroll-area': HelixScrollArea,
+  'helix-select': HelixSelect,
   'helix-skeleton': HelixSkeleton,
   'helix-skip-link': HelixSkipLink,
   'helix-slider': HelixSlider,
