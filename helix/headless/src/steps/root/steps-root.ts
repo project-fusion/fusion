@@ -172,6 +172,21 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   linear = false
 
   /**
+   * What each step is marked with.
+   *
+   * Absent is the state itself: a check where a stage is done, a target where
+   * the reader is, an empty ring ahead of them. Three marks that need no
+   * legend, which a number does: "3" says where a stage sits in the order and
+   * nothing about whether it is finished.
+   *
+   * `numeric` is the older convention and is still the right one where the
+   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
+   * a reader is told to come back to by number.
+   */
+  @property({ reflect: true })
+  marker?: 'numeric'
+
+  /**
    * Which way the steps run.
    *
    * Absent is a row, which is what a form header wants, with each name under
@@ -198,14 +213,6 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   progressLabel = '{share, number, percent} complete'
 
   /**
-   * A function that answers whether a stage is valid, asked about the stage a
-   * reader is on before they move forward from it. Return `false` to keep them
-   * there. Not asked of an `optional` stage, nor for a move back.
-   */
-  @property({ attribute: false })
-  validate?: (step: HelixHeadlessStep) => boolean
-
-  /**
    * How far through the sequence is, from 0 to 100: the share of its stages
    * that are `complete`, rounded to a whole number.
    */
@@ -214,19 +221,12 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   }
 
   /**
-   * What each step is marked with.
-   *
-   * Absent is the state itself: a check where a stage is done, a target where
-   * the reader is, an empty ring ahead of them. Three marks that need no
-   * legend, which a number does: "3" says where a stage sits in the order and
-   * nothing about whether it is finished.
-   *
-   * `numeric` is the older convention and is still the right one where the
-   * order is the point, a form that says "step 3 of 5" beside it, or a sequence
-   * a reader is told to come back to by number.
+   * A function that answers whether a stage is valid, asked about the stage a
+   * reader is on before they move forward from it. Return `false` to keep them
+   * there. Not asked of an `optional` stage, nor for a move back.
    */
-  @property({ reflect: true })
-  marker?: 'numeric'
+  @property({ attribute: false })
+  validate?: (step: HelixHeadlessStep) => boolean
 
   /* The arrows along the way the steps run, from where focus is, choosing
      nothing and stopping at the ends, as Navigation's do. */

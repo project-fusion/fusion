@@ -296,6 +296,30 @@ struct Where<'a> {
     tag: &'a str,
 }
 
+/// The finding for a property named with a word this library does not use.
+fn refused_name(name: &str, tag: &str, family: &str) -> Option<Finding> {
+    let (detail, why) = match name {
+        REFUSED => (
+            "It held four axes at once: `separation` is where a surface ends, `emphasis` is how \
+             much ink a control claims, `material` is what it is made of, `tone` is what it \
+             means, and a component-specific choice that is none of those is named for what it \
+             chooses.",
+            "is not a word this library uses",
+        ),
+        "variant" => (
+            "It says that something varies and not what. Name it for what it chooses, as \
+             `marker`, `layout`, `picker`, `stroke`, `handle`, and `pattern` do.",
+            "names no choice",
+        ),
+        _ => return None,
+    };
+    Some(Finding {
+        detail: detail.to_owned(),
+        file: family.to_owned(),
+        message: format!("`{tag}` declares `{name}`, which {why}"),
+    })
+}
+
 /// Every axis one declaration names, judged against the registry.
 fn attribute_of(
     declaration: &Value,
@@ -325,31 +349,8 @@ fn attribute_of(
                     let Some(name) = attribute.get("name").and_then(Value::as_str) else {
                         continue;
                     };
-                    if name == REFUSED {
-                        findings.push(Finding {
-                            detail: "It held four axes at once: `separation` is where a surface \
-                                     ends, `emphasis` is how much ink a control claims, \
-                                     `material` is what it is made of, `tone` is what it means, \
-                                     and a component-specific choice that is none of those is \
-                                     named for what it chooses."
-                                .to_owned(),
-                            file: family.to_owned(),
-                            message: format!(
-                                "`{tag}` declares `appearance`, which is not a word this library \
-                                 uses"
-                            ),
-                        });
-                        continue;
-                    }
-                    if name == "variant" {
-                        findings.push(Finding {
-                            detail: "It says that something varies and not what. Name it for \
-                                     what it chooses, as `marker`, `layout`, `picker`, `stroke`, \
-                                     `handle`, and `pattern` do."
-                                .to_owned(),
-                            file: family.to_owned(),
-                            message: format!("`{tag}` declares `variant`, which names no choice"),
-                        });
+                    if let Some(finding) = refused_name(name, tag, family) {
+                        findings.push(finding);
                         continue;
                     }
                     let Some(values) = axes.get(name) else {

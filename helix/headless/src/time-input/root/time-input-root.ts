@@ -310,6 +310,25 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   nowLabel = 'Now'
 
   /**
+   * Whether the panel shows one list of times or a column for each part of the
+   * time.
+   *
+   * `list` offers whole times, which is what a product with slots or opening
+   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
+   * the locale uses one, which is the only way to reach `23:45` without
+   * scrolling most of a day. `TimePicker` carries the longer note on the trade.
+   *
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
+   */
+  @property({ reflect: true })
+  picker?: 'list' | 'wheels'
+
+  /**
    * Placeholder text shown before a time is entered.
    */
   @words
@@ -401,21 +420,6 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   @words
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a time that is available.'
-
-  /**
-   * The message for text that is no time, where `bad-input-message` is not
-   * set. `{mode}` is `single`, `range`, or `multiple`, `{example}` is a time
-   * written as the field writes one, `2:30 PM` in `en-US` and `14:30` in
-   * `de-DE`, and `{shape}` is `HH:mm`, or `HH:mm:ss` with `seconds`.
-   *
-   * **The default names a time the field reads back.** It said "Enter a time
-   * as HH:mm." to a reader whose field showed `2:30 PM`, and a pattern token
-   * is words for a developer.
-   */
-  @words
-  @property({ attribute: 'unreadable-message' })
-  unreadableMessage =
-    '{mode, select, single {Enter a time such as {example}.} other {Enter times such as {example}, separated by commas.}}'
 
   /** Every time in the value, which may hold more than one. */
   private get held(): string[] {
@@ -696,23 +700,19 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   }
 
   /**
-   * Whether the panel shows one list of times or a column for each part of the
-   * time.
+   * The message for text that is no time, where `bad-input-message` is not
+   * set. `{mode}` is `single`, `range`, or `multiple`, `{example}` is a time
+   * written as the field writes one, `2:30 PM` in `en-US` and `14:30` in
+   * `de-DE`, and `{shape}` is `HH:mm`, or `HH:mm:ss` with `seconds`.
    *
-   * `list` offers whole times, which is what a product with slots or opening
-   * hours has. `wheels` splits them into an hour, a minute and a meridiem where
-   * the locale uses one, which is the only way to reach `23:45` without
-   * scrolling most of a day. `TimePicker` carries the longer note on the trade.
-   *
-   * **Optional rather than defaulted, which is not a style preference.** A
-   * reflecting property with a default writes its attribute onto every host the
-   * moment the element upgrades, including the ones a consumer rendered and did
-   * not touch, and React reads that as a hydration mismatch. The absent
-   * attribute *is* the list, which the stylesheet reads as the base rule, so
-   * only the departure has to be named.
+   * **The default names a time the field reads back.** It said "Enter a time
+   * as HH:mm." to a reader whose field showed `2:30 PM`, and a pattern token
+   * is words for a developer.
    */
-  @property({ reflect: true })
-  picker?: 'list' | 'wheels'
+  @words
+  @property({ attribute: 'unreadable-message' })
+  unreadableMessage =
+    '{mode, select, single {Enter a time such as {example}.} other {Enter times such as {example}, separated by commas.}}'
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)

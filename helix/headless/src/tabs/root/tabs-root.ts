@@ -175,22 +175,6 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   manual = false
 
   /**
-   * The direction the tabs run. `vertical` sets them in a column beside the
-   * panels and tells a screen reader the list is vertical.
-   *
-   * Optional, so the resting row writes no attribute onto the host.
-   */
-  @property({ reflect: true })
-  orientation?: 'horizontal' | 'vertical'
-
-  /**
-   * Whether a strip with more tabs than fit shows a button at each end it can
-   * scroll toward.
-   */
-  @property({ attribute: 'scroll-controls', reflect: true, type: Boolean })
-  scrollControls = false
-
-  /**
    * How the row of tabs is drawn.
    *
    * Unset is a raised pill on the selected tab with nothing behind the row,
@@ -216,6 +200,22 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   @property({ reflect: true })
   marker?: 'segmented' | 'underlined'
+
+  /**
+   * The direction the tabs run. `vertical` sets them in a column beside the
+   * panels and tells a screen reader the list is vertical.
+   *
+   * Optional, so the resting row writes no attribute onto the host.
+   */
+  @property({ reflect: true })
+  orientation?: 'horizontal' | 'vertical'
+
+  /**
+   * Whether a strip with more tabs than fit shows a button at each end it can
+   * scroll toward.
+   */
+  @property({ attribute: 'scroll-controls', reflect: true, type: Boolean })
+  scrollControls = false
 
   private get tabs(): HelixHeadlessTab[] {
     return [...this.children].filter(

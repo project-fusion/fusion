@@ -141,6 +141,15 @@ export class HelixVoiceLevel extends HelixElement {
   level = 0
 
   /**
+   * The drawing: a row of bars, one for each band, or three moving waves.
+   *
+   * Reflected because the stylesheet sizes each drawing differently. Absent
+   * is `spectrum`, the resting value, which selects nothing.
+   */
+  @property({ reflect: true })
+  pattern?: VoiceLevelPattern
+
+  /**
    * Draws the readings as a still picture: each bar at its band and the waves
    * at one fixed moment, swung as far as `level`.
    *
@@ -152,15 +161,6 @@ export class HelixVoiceLevel extends HelixElement {
    */
   @property({ type: Boolean })
   still = false
-
-  /**
-   * The drawing: a row of bars, one for each band, or three moving waves.
-   *
-   * Reflected because the stylesheet sizes each drawing differently. Absent
-   * is `spectrum`, the resting value, which selects nothing.
-   */
-  @property({ reflect: true })
-  pattern?: VoiceLevelPattern
 
   private canvas: HTMLCanvasElement | undefined
   private context: CanvasRenderingContext2D | null = null

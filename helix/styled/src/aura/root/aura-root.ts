@@ -225,6 +225,34 @@ export class HelixAura extends HelixElement {
   interactive = false
 
   /**
+   * The form the light takes. When it is not set, the form is `braid`.
+   *
+   * Reflected because the fallback gradient selects on it, and given no default
+   * for the same reason every axis here has none: a default on a reflected
+   * property writes the attribute onto every host anybody renders.
+   *
+   * **`pattern` and not `shape`.** `shape` is an axis about geometry, `circle`
+   * against `square`, `arc` against `ring`, and it is registered as one.
+   * Aurora, braid and caustics are not geometries; they are twelve names for a
+   * look, which is what `pattern` is for by the rule the registry already
+   * states.
+   */
+  @property({ reflect: true })
+  pattern?:
+    | 'aurora'
+    | 'braid'
+    | 'caustics'
+    | 'constellation'
+    | 'flow'
+    | 'fracture'
+    | 'lattice'
+    | 'particles'
+    | 'rays'
+    | 'streaks'
+    | 'threads'
+    | 'waves'
+
+  /**
    * Whether the aura draws its own control that pauses the field and starts it
    * again, in its trailing corner. Absent draws none, for a page with a pause
    * control of its own.
@@ -333,34 +361,6 @@ export class HelixAura extends HelixElement {
    */
   @property({ converter: numberConverter('variance', 1) })
   variance = 1
-
-  /**
-   * The form the light takes. When it is not set, the form is `braid`.
-   *
-   * Reflected because the fallback gradient selects on it, and given no default
-   * for the same reason every axis here has none: a default on a reflected
-   * property writes the attribute onto every host anybody renders.
-   *
-   * **`pattern` and not `shape`.** `shape` is an axis about geometry, `circle`
-   * against `square`, `arc` against `ring`, and it is registered as one.
-   * Aurora, braid and caustics are not geometries; they are twelve names for a
-   * look, which is what `pattern` is for by the rule the registry already
-   * states.
-   */
-  @property({ reflect: true })
-  pattern?:
-    | 'aurora'
-    | 'braid'
-    | 'caustics'
-    | 'constellation'
-    | 'flow'
-    | 'fracture'
-    | 'lattice'
-    | 'particles'
-    | 'rays'
-    | 'streaks'
-    | 'threads'
-    | 'waves'
 
   /**
    * The four ramp stops, resolved.

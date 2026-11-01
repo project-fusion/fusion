@@ -188,14 +188,6 @@ export class HelixHeadlessNavigation extends HelixElement {
   })
 
   /**
-   * Stacks the destinations in a column, for a sidebar, where unset is a row
-   * for a header or a footer. The marker follows the current destination down
-   * the column as it does along the row.
-   */
-  @property({ reflect: true })
-  orientation?: 'vertical'
-
-  /**
    * How the destinations are drawn, with `Tabs`' three values and for the same
    * reasons.
    *
@@ -218,6 +210,14 @@ export class HelixHeadlessNavigation extends HelixElement {
    */
   @property({ reflect: true })
   marker?: 'segmented' | 'underlined'
+
+  /**
+   * Stacks the destinations in a column, for a sidebar, where unset is a row
+   * for a header or a footer. The marker follows the current destination down
+   * the column as it does along the row.
+   */
+  @property({ reflect: true })
+  orientation?: 'vertical'
 
   private current: MutationObserver | undefined
 
