@@ -90,6 +90,17 @@
   margin-inline: 0;
 }
 
+/* A control wider than the toolbar cuts its label, so the row stays inside it. */
+[part="toolbar"] {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+::slotted(*) {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
 /* Print: not at all. A row of controls is ink spent on actions a page cannot
  * take.
  *

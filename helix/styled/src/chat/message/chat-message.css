@@ -201,7 +201,8 @@
    answer `Option` already wrote down: a rung is an absolute color, and a bubble
    has no idea what it is sitting on. Measured across six grounds, a rung ran
    1.07 to 1.12 in five of them (a bubble nobody can see) and moved with the
-   ground, where the wash holds 1.35 to 1.57.
+   ground, where the wash holds. 8%, because at 14% a bubble was the heaviest fill
+   on the screen, decided by the owner on November 1, 2026.
 
    **One percentage rather than `light-dark()` of two**, which is where this
    differs from `Option`'s hover: that mixes a fixed ink and needs 8 in light
@@ -210,7 +211,7 @@
 [part="content"] {
   background-color: var(
     --chat-message-background-color,
-    color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
   );
   border-radius: var(--chat-message-radius, var(--helix-radii-md));
   color: var(--chat-message-color, var(--helix-color-foreground));

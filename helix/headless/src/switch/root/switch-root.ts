@@ -148,6 +148,13 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
     this.resetChecked()
   }
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Text that arrives after the first render changes no property, so nothing
+       else would look at the region again. */
+    this.renderRoot.addEventListener('slotchange', () => this.markEmpty())
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()

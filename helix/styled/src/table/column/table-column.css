@@ -167,3 +167,7 @@
 :host(:last-of-type) [part="column"] {
   padding-inline: var(--_table-heading-padding-inline, var(--helix-space-none));
 }
+
+[part="sort"]:hover {
+  color: var(--helix-color-foreground);
+}

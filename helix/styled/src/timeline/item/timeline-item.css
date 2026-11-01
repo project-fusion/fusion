@@ -211,3 +211,8 @@
   grid-column: var(--_timeline-even-column, var(--_timeline-content-column, 2));
   text-align: var(--_timeline-even-align);
 }
+
+/* A long unbroken word breaks inside the column it was given. */
+:host {
+  overflow-wrap: anywhere;
+}

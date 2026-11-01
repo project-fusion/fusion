@@ -81,7 +81,7 @@
   justify-self: var(--_steps-marker-justify, center);
   block-size: var(--_steps-mark-box, var(--helix-size-icon));
   box-sizing: border-box;
-  color: var(--_steps-marker-color, var(--helix-color-border));
+  color: var(--_steps-marker-color, var(--helix-color-foreground-subtle));
   display: inline-flex;
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);

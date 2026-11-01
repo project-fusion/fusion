@@ -197,3 +197,9 @@ slot[name="end"]::slotted(*) {
 :host([disabled]) {
   opacity: var(--list-item-disabled-opacity, var(--helix-opacity-disabled));
 }
+
+/* A long unbroken word breaks inside the column it was given. */
+[part~="row"] {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}

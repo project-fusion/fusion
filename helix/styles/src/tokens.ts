@@ -98,7 +98,7 @@ export const TOKENS: Token[] = [
      of the two modes has room in it. At 0.91, the step where the ramp starts
      opening up, everything filled with it came out as a gray slab on a white
      page: the checkbox, the input, the textarea, the segmented control's
-     track, a selected tab. `neutral-200` is 0.94, and what made the room for
+     track, a selected tab. `neutral-225` is 0.94, and what made the room for
      that is a thumb being `overlay` rather than `raised`: `raised` had been
      asked to be darker than a white page and lighter than a groove at once,
      which on white are opposite directions, and it is what pinned this token
@@ -109,7 +109,7 @@ export const TOKENS: Token[] = [
      leaves the toggle group's thumb 0.14 above its track. */
   [
     'color-surface-sunken',
-    'light-dark(var(--_helix-neutral-225), var(--_helix-neutral-975))',
+    'light-dark(var(--_helix-neutral-225), var(--_helix-neutral-900))',
     'A recessed surface, such as a track or a groove. Its fill sets it apart. A field reads `well`.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
@@ -143,7 +143,7 @@ export const TOKENS: Token[] = [
      at `#dbdbdb` against `#dadada`. */
   [
     'color-primary-wash',
-    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 22%, transparent))',
+    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 14%, transparent))',
     'A wash of the primary color, such as the bubble of your own Chat message.',
   ],
   /* What a control is lit with under a press, a step past `color-hover`. A press
@@ -259,7 +259,7 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-primary-subtle',
-    'light-dark(var(--_helix-brand-50, var(--_helix-ink-50)), var(--_helix-brand-900, var(--_helix-ink-900)))',
+    'light-dark(var(--_helix-brand-50, var(--_helix-ink-50)), oklch(from var(--_helix-brand-900, var(--_helix-ink-900)) l calc(c * 0.5) h))',
   ],
   /* A brand fill, which carries white, and that was the one job no accent
      token in this set was doing. Measured by painting each pair
@@ -280,15 +280,15 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-accent-hover',
-    'light-dark(var(--_helix-accent-600, var(--_helix-ink-600)), var(--_helix-accent-600, var(--_helix-ink-300)))',
+    'light-dark(var(--_helix-accent-600, var(--_helix-ink-600)), var(--_helix-accent-300, var(--_helix-ink-300)))',
   ],
   [
     'color-accent-active',
-    'light-dark(var(--_helix-accent-700, var(--_helix-ink-700)), var(--_helix-accent-700, var(--_helix-ink-200)))',
+    'light-dark(var(--_helix-accent-700, var(--_helix-ink-700)), var(--_helix-accent-200, var(--_helix-ink-200)))',
   ],
   [
     'color-accent-subtle',
-    'light-dark(var(--_helix-accent-50, var(--_helix-ink-50)), var(--_helix-accent-900, var(--_helix-ink-900)))',
+    'light-dark(var(--_helix-accent-50, var(--_helix-ink-50)), oklch(from var(--_helix-accent-900, var(--_helix-ink-900)) l calc(c * 0.5) h))',
   ],
   /* An ink fill is the ink itself, light in the dark, and its hover darkens
      from there like a brand fill's does. */

@@ -8,7 +8,7 @@
  *    be a second answer to a question the library has already answered.
  */
 [part="surface"] {
-  background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
+  background-color: var(--tour-surface-color, var(--helix-color-surface-overlay));
   border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--tour-shadow, var(--helix-shadow-floating));
@@ -103,7 +103,7 @@
  *  The point, half outside the panel and pointing at the target.
  */
 [part~="arrow"] {
-  background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
+  background-color: var(--tour-surface-color, var(--helix-color-surface-overlay));
   /* `0.5rem`, which is Tooltip's point: one shape, one size. No size token
      holds it, the size scale being controls, icons and marks. Settled 14 Sep
      2026 from `0.625rem` here against `0.5rem` there. */

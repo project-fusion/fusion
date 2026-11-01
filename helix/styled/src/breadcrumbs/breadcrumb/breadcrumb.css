@@ -311,3 +311,9 @@ a[part="link"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* A long unbroken word breaks inside the column it was given. */
+::slotted(a) {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}

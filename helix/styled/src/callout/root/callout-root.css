@@ -127,6 +127,7 @@ slot[name="icon"]::slotted(*) {
 [part="content"] {
   line-height: var(--helix-leading-normal);
   min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 /* At the end of the first line, as quiet as the mark at the start: the glyph
@@ -217,6 +218,15 @@ slot[name="heading"]::slotted(*) {
   content: "";
   inset: calc((var(--helix-size-target) - 100%) / -2);
   position: absolute;
+}
+
+/* A long unbroken word breaks inside the column it was given. */
+/* The hairline is an inset shadow, which forced colors drop. */
+@media (forced-colors: active) {
+  :host {
+    outline: var(--helix-border-thin) solid CanvasText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
 }
 
 /* Print: the tone is a fill; the edge and the mark say the same thing in ink.

@@ -65,10 +65,10 @@ A surface's ground color token names where the surface sits:
 
 [//]: # (/tokens)
 
-**`raised` goes one step down the ramp.** A selected tab's pill, a hovered row,
-and an option under the pointer all have the page on every side. Only their
-fill separates them, and on a white page a fill has to be a step darker to be
-seen. `overlay` works the other way. Its edge and its shadow separate it, so on
+**`raised` goes one step down the ramp.** A panel inside a surface has a surface
+on every side. Only its fill separates it, and on a white page a fill has to be a
+step darker to be seen. A lit row is different: it takes `hover`, a wash measured
+against whatever it sits on. `overlay` works the other way. Its edge and its shadow separate it, so on
 a white page it is white.
 
 ## Using the page color inside a component

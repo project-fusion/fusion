@@ -226,6 +226,20 @@
   background-color: var(--helix-color-press);
 }
 
+/* A checked track is a fill, which forced colors paint Canvas. */
+@media (forced-colors: active) {
+  :host(:state(checked)) [part="track"] {
+    background-color: Highlight;
+    border-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :host(:state(checked)) [part="thumb"] {
+    background-color: HighlightText;
+    forced-color-adjust: none;
+  }
+}
+
 /*
  *  Print: a control prints the value it holds, and the state has to survive.
  * A switch carries no mark, so the fill is the whole difference between on and

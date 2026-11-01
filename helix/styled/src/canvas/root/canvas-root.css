@@ -132,7 +132,8 @@
 
 :host([grid="dots"]) [part="viewport"] {
   background-image: radial-gradient(
-    var(--helix-color-border) var(--helix-border-thin),
+    color-mix(in oklab, var(--helix-color-foreground-subtle) 50%, transparent)
+      var(--helix-border-thin),
     transparent 0
   );
 }
@@ -170,7 +171,7 @@
 }
 
 [part="edge"] {
-  stroke: var(--_canvas-edge-color, var(--canvas-edge-color, var(--helix-color-border)));
+  stroke: var(--_canvas-edge-color, var(--canvas-edge-color, var(--helix-color-foreground-subtle)));
   stroke-width: var(--canvas-edge-width, var(--helix-border-thick));
 }
 
@@ -314,7 +315,7 @@
    write the color twice. The plain declaration above it is what a browser
    without it falls back to, rather than the black an unset fill would give. */
 [part="arrow"] {
-  fill: var(--canvas-edge-color, var(--helix-color-border));
+  fill: var(--canvas-edge-color, var(--helix-color-foreground-subtle));
 }
 
 @supports (fill: context-stroke) {

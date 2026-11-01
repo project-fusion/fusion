@@ -165,6 +165,7 @@
 [part="content"] {
   flex: 1 1 auto;
   min-inline-size: 0;
+  overflow-wrap: anywhere;
   text-align: var(--announcement-text-align, center);
 }
 
@@ -273,6 +274,7 @@
   position: absolute;
 }
 
+/* A long unbroken word breaks inside the column it was given. */
 /* Print: a line across the page, and its fill is the part a printer fights.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

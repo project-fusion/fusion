@@ -61,6 +61,8 @@
   display: inline-flex;
   /* It grows inside the row, which is always what holds it. */
   flex: 1 1 auto;
+  max-inline-size: 100%;
+  min-inline-size: 0;
   position: relative;
 
   /* *It wraps, because the alternative is a segment nobody can reach.** The

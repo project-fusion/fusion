@@ -235,7 +235,6 @@ helix-app-header {
     --button-inline-size: 100%;
 
     flex: 1 1 0;
-    min-inline-size: 0;
   }
 }
 

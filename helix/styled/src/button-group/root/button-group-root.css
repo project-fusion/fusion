@@ -145,6 +145,17 @@
   gap: var(--button-group-gap, var(--helix-space-xs));
 }
 
+/* The group stays in its column, and its buttons cut their labels. The floor
+   is one control, so a long label beside a short one cannot squeeze the short
+   one to nothing. */
+:host {
+  max-inline-size: 100%;
+}
+
+::slotted(*) {
+  min-inline-size: min(var(--helix-size-control), 100%);
+}
+
 /* Not printed, being a control. */
 @media print {
   :host {

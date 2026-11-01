@@ -262,7 +262,7 @@
  * transparent button next to it reads as a box with something floating after
  * it rather than as one piece of chrome.
  *
- * The same 6% wash `Button` uses, not a fixed neutral. An opaque neutral puts
+ * No fill, as `Button` has, and not a fixed neutral. An opaque neutral puts
  * two different background colors behind the same border and radius, measured
  * side by side, so a row holding an icon button and a text button reads as two
  * kinds of control. A percentage of the ink is a step away from whatever it sits
@@ -270,10 +270,7 @@
 :host([emphasis="outlined"]) [part="button"] {
   background-color: var(
     --_icon-button-pressed-fill,
-    var(
-      --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 6%, transparent)
-    )
+    var(--icon-button-background-color, transparent)
   );
   border-color: var(--icon-button-border-color, var(--_icon-button-edge));
   color: var(

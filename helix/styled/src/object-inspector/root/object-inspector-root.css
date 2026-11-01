@@ -206,6 +206,10 @@
   }
 }
 
+[part~="row"]:hover {
+  background-color: var(--helix-color-hover);
+}
+
 /* Print: what is open, all of it. A clipped tail and a control are neither of
    them on paper. */
 @media print {

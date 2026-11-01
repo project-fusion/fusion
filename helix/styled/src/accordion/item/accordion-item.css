@@ -136,3 +136,9 @@
     min-block-size: var(--helix-size-target);
   }
 }
+
+/* A long unbroken word breaks inside the column it was given. */
+[part="trigger"] {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}

@@ -97,3 +97,10 @@
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
 }
+
+/* A danger edge is painted the system color, so a wrong field thickens its edge. */
+@media (forced-colors: active) {
+  :host(:state(invalid)) [part="field"] {
+    border-width: var(--helix-border-thick);
+  }
+}

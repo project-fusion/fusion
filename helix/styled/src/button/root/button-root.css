@@ -119,11 +119,8 @@
   all: unset;
   position: relative;
   align-items: center;
-  /* A wash of the foreground, inside a hairline. */
-  background-color: var(
-    --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 6%, transparent)
-  );
+  /* An edge and no fill, as `outlined` is on every axis. */
+  background-color: var(--button-background-color, transparent);
   /* A container that has already sized its own row can say so. A crumb is `1lh`
      plus `2xs` either side, 28px, which is between `sm` at 32 and nothing, so a
      button slotted into one steps the whole trail: measured 40 at the default
