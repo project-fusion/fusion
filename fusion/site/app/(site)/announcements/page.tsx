@@ -16,7 +16,7 @@ export default function Page() {
   return (
     <MdxPage
       path="/announcements"
-      shape={{ centered: true, meta: <helix-tag tone="primary">Announcement</helix-tag> }}
+      shape={{ centered: true, meta: <helix-tag tone="accent">Announcement</helix-tag> }}
     />
   )
 }

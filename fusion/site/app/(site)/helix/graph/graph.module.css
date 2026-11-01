@@ -217,7 +217,7 @@
 }
 
 .graphFacts li {
-  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-accent) 70%, transparent);
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-md);
   line-height: 1.5;

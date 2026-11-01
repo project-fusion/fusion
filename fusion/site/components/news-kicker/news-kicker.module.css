@@ -10,7 +10,7 @@
  */
 .kicker {
   align-items: center;
-  background: color-mix(in oklab, var(--helix-color-primary) 12%, transparent);
+  background: color-mix(in oklab, var(--helix-color-accent) 12%, transparent);
   /* **The theme's corner, not a pill.** Every card, button and control on the
      page answers to the radius slider, so a `radii-full` banner and chip stay
      capsules while the page squares off around them. `md` on the banner and `sm`
@@ -28,16 +28,16 @@
 }
 
 .kicker:hover {
-  background: color-mix(in oklab, var(--helix-color-primary) 20%, transparent);
+  background: color-mix(in oklab, var(--helix-color-accent) 20%, transparent);
 }
 
 /* **On `primary-surface`, the fill its label is solved against.** `primary`
    is an ink, which dark mode lightens so it reads as text on a dark page, and
    white on it measured 3.10:1. */
 .kickerBadge {
-  background: var(--helix-color-primary-surface);
+  background: var(--helix-color-accent-surface);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-semibold);
   padding-block: var(--helix-space-2xs);
@@ -51,7 +51,7 @@
 /* Slides on hover, which is the only motion a link this small can carry without
    becoming a distraction next to a display line. */
 .kickerArrow {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
   transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

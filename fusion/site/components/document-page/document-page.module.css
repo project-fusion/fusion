@@ -11,7 +11,7 @@
    cover rather than a place: `/insights` opens on a lattice, something to look
    at while a reader decides what to read. **Diagonal, because the light has to
    come from somewhere**: a vertical ramp over a full-width band reads as a
-   printing artifact. Mixed from `--helix-color-primary` into
+   printing artifact. Mixed from `--helix-color-accent` into
    `--helix-color-background`, so one declaration serves both modes.
 
    **The brand no darker than 0.54, so a dark brand cannot darken the band.**
@@ -21,7 +21,7 @@
    is that blue's own lightness, so a blue band is unchanged. A dark mode
    primary is lighter than the floor, so no dark band changes either. */
 .documentHero {
-  --_band-light: oklch(from var(--helix-color-primary) max(l, 0.54) c h);
+  --_band-light: oklch(from var(--helix-color-accent) max(l, 0.54) c h);
 
   background-color: var(--helix-color-background);
   background-image: linear-gradient(
