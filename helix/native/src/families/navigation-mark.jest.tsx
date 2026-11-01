@@ -2,7 +2,7 @@
  * The generated Navigation's mark, drawn from its real intermediate forms:
  * it stands at the item the page marks current, the one marked `page`
  * where several are, travels as the page moves the mark, takes each
- * variant's shape, and stands open while a popover among the destinations
+ * marker's shape, and stands open while a popover among the destinations
  * does. `test:native` writes the components beside this file.
  */
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
@@ -152,7 +152,7 @@ describe('the generated Navigation’s mark', () => {
   })
 
   test('under `underlined`, is a bar along the bottom of the current item', async () => {
-    await drawn({ variant: 'underlined' }, [undefined, 'page'])
+    await drawn({ marker: 'underlined' }, [undefined, 'page'])
     await handOver()
     const at = mark()
     expect(at?.x).toBe(64)

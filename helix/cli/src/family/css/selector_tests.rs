@@ -67,9 +67,9 @@ fn writes_an_interaction_and_a_place_inside_slotted() {
         ":host ::slotted(*:where(:focus-within))"
     );
     assert_eq!(
-        one("{ on: 'host', set: [['margin', 0]], slotted: '*', when: { child: 'earlier', variant: { not: 'spaced' } } }"),
+        one("{ on: 'host', set: [['margin', 0]], slotted: '*', when: { child: 'earlier', layout: { not: 'spaced' } } }"),
         (
-            ":host(:where(:not([variant=\"spaced\"]))) ::slotted(*:where(:not(:last-child)))".to_owned(),
+            ":host(:where(:not([layout=\"spaced\"]))) ::slotted(*:where(:not(:last-child)))".to_owned(),
             [0, 1, 1],
             false
         )

@@ -8,7 +8,11 @@ const ring = {
   outlineOffset: token('size-focus-offset'),
 } as const
 
-const glyph = { blockSize: '1em', inlineSize: '1em' } as const
+const glyph = {
+  '--icon-size': token('size-icon-tight'),
+  blockSize: token('size-icon-tight'),
+  inlineSize: token('size-icon-tight'),
+} as const
 
 const fills = { flex: '1 1 0', minBlockSize: 0, minInlineSize: 0 } as const
 
@@ -389,11 +393,7 @@ export default styles(
     on({ inner: 'svg', part: 'next' }, [web([rule(glyph)])]),
     on(
       ['next-mark', 'previous-mark', 'rotation-mark'],
-      [
-        native([
-          rule({ blockSize: '1em', color: token('color-foreground-muted'), inlineSize: '1em' }),
-        ]),
-      ],
+      [native([rule({ ...glyph, color: token('color-foreground-muted') })])],
     ),
     on({ region: 'next-icon', slotted: '*' }, [
       rule(glyph),

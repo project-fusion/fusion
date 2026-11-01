@@ -42,7 +42,7 @@ export default styles(
       itemDescriptionColor: token('color-foreground-muted'),
       itemDetailColor: token('color-foreground-muted'),
       itemEnd: '0px',
-      itemHoverColor: token('color-hover'),
+      itemHoverBackgroundColor: token('color-hover'),
       itemStart: '0px',
     },
     own: { menuFrom: null, menuMaterialBackdrop: null, menuMaterialFill: null, menuTravel: null },
@@ -52,7 +52,7 @@ export default styles(
     const fast = token('duration-fast')
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const column = sum(token('size-icon'), token('space-xs'))
-    const lit = hook.itemHoverColor
+    const lit = hook.itemHoverBackgroundColor
     const mark = {
       blockSize: token('size-icon'),
       gridColumn: 4,

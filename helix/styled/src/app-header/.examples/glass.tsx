@@ -96,7 +96,7 @@ export function Example() {
 
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Integrations
         </helix-text>
@@ -106,7 +106,7 @@ export function Example() {
 
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Notifications
         </helix-text>
@@ -116,7 +116,7 @@ export function Example() {
 
         <helix-text
           as="h2"
-          variant="title"
+          scale="title"
         >
           Security
         </helix-text>

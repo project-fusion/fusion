@@ -43,9 +43,9 @@ export default headless('outline', {
     fallbackLabel: 'On this page',
     follow: false,
     label: '',
+    marker: oneOf(['rail']),
     marks: oneOf(['reading', 'visible'], 'reading'),
     offset: 0,
-    variant: oneOf(['rail']),
   },
   events: {
     activate: ['value'],
@@ -66,7 +66,7 @@ export default headless('outline', {
   },
   render: ({ derived, entry, sections }) => (
     <>
-      {/* The rail the web's element draws under `variant="rail"`: its ticks follow
+      {/* The rail the web's element draws under `marker="rail"`: its ticks follow
           the links passed in, and its surface wraps the heading and the links. */}
       <View
         ariaHidden

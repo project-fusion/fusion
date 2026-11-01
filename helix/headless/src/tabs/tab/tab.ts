@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
  * gestures follow. `helix-before-select` is sent first, and canceling it
  * keeps the browser from following, so a client-side router follows it
  * instead and renders the route in the tab's panel. Link-only tabs with no panels belong
- * in Navigation, whose `variant="underlined"` draws the same bar.
+ * in Navigation, whose `marker="underlined"` draws the same bar.
  *
  * With `dismissible`, the tab can be closed, as Web Awesome's closable tab
  * can: a press on its `dismiss` mark, or Delete or Backspace while the tab
@@ -98,7 +98,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
    * tab as a link, and the tab still controls its panel.
    *
    * Link-only tabs with no panels belong in Navigation, whose
-   * `variant="underlined"` draws the same bar.
+   * `marker="underlined"` draws the same bar.
    */
   @property()
   href?: string

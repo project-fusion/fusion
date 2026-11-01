@@ -49,7 +49,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * never leaves the page and the list answers the keys one way. Mark the tab of
  * the route you are on with `selected`, or set `active` to its value. Links
  * with no panels, such as the sections of a site, belong in Navigation, whose
- * `variant="underlined"` draws the same bar.
+ * `marker="underlined"` draws the same bar.
  *
  * Each tab says which panel it controls through `aria-controls`, set as an
  * element reference to the panel's host, where the engine has reflection.

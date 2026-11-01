@@ -56,6 +56,11 @@ export default styles(
   },
   ({ hook, on, own, rule, variants }) => {
     const iconSize = token('size-icon')
+    const dismissGlyph = {
+      '--icon-size': token('size-icon-tight'),
+      blockSize: token('size-icon-tight'),
+      inlineSize: token('size-icon-tight'),
+    } as const
     return [
       on('host', [
         rule({
@@ -226,13 +231,11 @@ export default styles(
           }),
         ]),
       ]),
-      on(
-        ['dismiss-mark'],
-        [rule({ '--icon-size': iconSize, blockSize: iconSize, inlineSize: iconSize })],
-      ),
-      on({ region: 'dismiss-icon', slotted: '*' }, [
-        rule({ '--icon-size': iconSize, blockSize: iconSize, inlineSize: iconSize }),
-      ]),
+      /* Smaller than the callout's own mark, which leads the message: the dismiss
+         is a control at the end of it, drawn as Announcement, Notification and
+         Toast draw theirs. */
+      on(['dismiss-mark'], [rule(dismissGlyph)]),
+      on({ region: 'dismiss-icon', slotted: '*' }, [rule(dismissGlyph)]),
       /* The heading on a line of its own, over the content. */
       on({ region: 'heading', slotted: '*' }, [
         rule({

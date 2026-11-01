@@ -1694,7 +1694,7 @@ export function SandboxWorkbench({ families, findable = [], native = [] }: Props
                 </helix-list>
               </helix-flex>
             </div>
-            <helix-button-group label="Dialog actions" slot="footer" variant="spaced">
+            <helix-button-group label="Dialog actions" layout="spaced" slot="footer">
               {narrow ? (
                 <>
                   {/* A link, since it leaves the page for Expo Go: Helix's

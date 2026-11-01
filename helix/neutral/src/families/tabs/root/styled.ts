@@ -13,7 +13,7 @@ import tabs from './headless.js'
  *
  * **The indicator is placed by measurement.** The root measures the selected
  * tab and sets `--indicator-x`, `--indicator-y` and its size, and the rules
- * below add the offset each variant wants.
+ * below add the offset each marker wants.
  */
 export default styles(
   tabs,
@@ -67,7 +67,7 @@ export default styles(
            content. */
         gridTemplateRows: 'auto minmax(0, 1fr)',
         minBlockSize: 0,
-        /* The default look, and where every variant starts from: a raised pill on
+        /* The default look, and where every marker starts from: a raised pill on
            the selected tab and nothing at all behind the row. */
         own: {
           tabsRule: 'none',
@@ -78,7 +78,7 @@ export default styles(
       }),
       /* Underlined. */
       rule(
-        { variant: 'underlined' },
+        { marker: 'underlined' },
         {
           own: {
             tabsRule: fn('linear-gradient', hook.ruleColor, hook.ruleColor),
@@ -88,9 +88,9 @@ export default styles(
           },
         },
       ),
-      rule({ variant: 'segmented' }, { own: { tabSelectedSurface: 'transparent' } }),
+      rule({ marker: 'segmented' }, { own: { tabSelectedSurface: 'transparent' } }),
       rule(
-        { variant: false },
+        { marker: false },
         { own: { tabSelectedSurface: 'transparent', tabSelectedShadow: 'none' } },
       ),
       /* Vertical: the tabs in a column at the inline start, the panels beside them. */
@@ -125,7 +125,7 @@ export default styles(
       ),
       /* **`width="full"`: the strip fills its row, and the tabs share it
          evenly**, as a segmented control does across a phone. After the
-         variants, which keep the strip as wide as its tabs. */
+         markers, which keep the strip as wide as its tabs. */
       rule({ width: 'full' }, { flex: 1, own: { tabInlineSize: '100%' } }),
     ]),
     on('tabs', [
@@ -141,7 +141,7 @@ export default styles(
       }),
       /* Segmented. */
       rule(
-        { variant: 'segmented' },
+        { marker: 'segmented' },
         {
           backgroundColor: token('color-surface-sunken'),
           blockSize: token('size-control'),
@@ -182,7 +182,7 @@ export default styles(
       /* The segmented groove grows down with its tabs, and keeps its own width
          when the tabs fill the row. */
       rule(
-        { orientation: 'vertical', variant: 'segmented' },
+        { orientation: 'vertical', marker: 'segmented' },
         { blockSize: 'auto', justifySelf: 'start', own: { tabHeight: 'initial' } },
       ),
     ]),
@@ -285,7 +285,7 @@ export default styles(
       rule({ part: { 'data-placed': true } }, { opacity: 1 }),
       /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
       rule(
-        { variant: 'underlined' },
+        { marker: 'underlined' },
         {
           own: {
             indicatorBlock: hook.indicatorThickness,
@@ -299,7 +299,7 @@ export default styles(
       ),
       /* Segmented: the same mark, grown to the tab's own box. */
       rule(
-        { variant: 'segmented' },
+        { marker: 'segmented' },
         {
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
@@ -312,7 +312,7 @@ export default styles(
       ),
       /* The default is a pill too, so it travels for the same reason. */
       rule(
-        { variant: false },
+        { marker: false },
         {
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
@@ -331,7 +331,7 @@ export default styles(
       ),
       /* The bar stands along the column's inline end, on the rule it replaces. */
       rule(
-        { orientation: 'vertical', variant: 'underlined' },
+        { orientation: 'vertical', marker: 'underlined' },
         {
           inlineSize: hook.indicatorThickness,
           own: {
@@ -349,8 +349,8 @@ export default styles(
          as current beside one being hovered. */
       rule(
         [
-          { emphasis: 'subtle', variant: false },
-          { emphasis: 'subtle', variant: 'segmented' },
+          { emphasis: 'subtle', marker: false },
+          { emphasis: 'subtle', marker: 'segmented' },
         ],
         {
           own: {
@@ -361,7 +361,7 @@ export default styles(
         },
       ),
       rule(
-        { emphasis: 'subtle', variant: 'underlined' },
+        { emphasis: 'subtle', marker: 'underlined' },
         { own: { indicatorColor: hook.indicatorColor(token('color-foreground')) } },
       ),
     ]),

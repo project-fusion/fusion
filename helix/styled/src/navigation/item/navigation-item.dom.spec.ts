@@ -115,7 +115,7 @@ describe('navigation item', () => {
     })
 
     test('in a browser, keeps inside a segmented track', async () => {
-      const nav = await mount(`<helix-navigation label="Sections" variant="segmented">
+      const nav = await mount(`<helix-navigation label="Sections" marker="segmented">
         <helix-navigation-item current="page" href="#one">One</helix-navigation-item>
         <helix-navigation-item href="#two">Two</helix-navigation-item>
       </helix-navigation>`)

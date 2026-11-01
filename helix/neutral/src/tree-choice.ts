@@ -618,6 +618,7 @@ export interface CodeBlockChoice {
   readonly highlight?: string
   readonly label?: string
   readonly language?: string
+  readonly layout?: string
   readonly lineNumbers?: string
   readonly markLines?: string
   readonly noCopy?: string
@@ -631,7 +632,6 @@ export interface CodeBlockChoice {
   readonly showUnchangedLabel?: string
   readonly tabs?: string
   readonly tokens?: string
-  readonly variant?: string
   readonly wrap?: string
   readonly wrapLabel?: string
   readonly wrappable?: string

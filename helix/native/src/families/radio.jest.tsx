@@ -260,7 +260,7 @@ describe('a radio drawn as a chip', () => {
     await render(
       themed(
         <HelixRadioGroup defaultValue="1" label="Rating">
-          <HelixRadio value="1" variant="chip">
+          <HelixRadio chip value="1">
             One star
           </HelixRadio>
         </HelixRadioGroup>,

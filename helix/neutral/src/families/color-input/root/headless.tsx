@@ -24,7 +24,7 @@ import { derive } from '../../../tree.js'
  * picked from the picker it opens.
  *
  * **The field is the box around the text and a swatch of the color**, which
- * opens the picker. `variant="swatch"` is the swatch alone, and the picker
+ * opens the picker. `trigger="swatch"` is the swatch alone, and the picker
  * then shows the text. A move in the picker is an edit of the text: it asks
  * first with `before-change`, and a refusal leaves the square on the color
  * the field holds.
@@ -61,10 +61,10 @@ export default headless('color-input', {
     required: false,
     swatches: '',
     swatchLabel: '{name} {value}',
+    trigger: oneOf(['swatch']),
     triggerLabel: 'Choose a color',
     value: string(),
     valueMissingMessage: 'Choose a color.',
-    variant: oneOf(['swatch']),
     wheel: false,
   },
   events: {

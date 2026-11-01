@@ -27,7 +27,7 @@ export default styles(
       descriptionColor: token('color-foreground-muted'),
       disabledOpacity: token('opacity-disabled'),
       fontSize: token('text-sm'),
-      hoverColor: token('color-hover'),
+      hoverBackgroundColor: token('color-hover'),
       markColor: token('color-foreground-subtle'),
       paddingInline: token('space-sm'),
     },
@@ -163,7 +163,7 @@ export default styles(
         ]),
       ]),
       on('item', [
-        rule({ hover: true, lacks: 'disabled' }, { backgroundColor: hook.hoverColor }),
+        rule({ hover: true, lacks: 'disabled' }, { backgroundColor: hook.hoverBackgroundColor }),
         rule(
           { focusVisible: true },
           {

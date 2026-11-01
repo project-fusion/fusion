@@ -198,7 +198,7 @@ describe('style', () => {
 
   test('a one-color gradient sized to an edge is a line along it', () => {
     expect(style(strip, 'tabs', { conditions: {}, tokens }).rule).toBeUndefined()
-    expect(style(strip, 'tabs', { conditions: { variant: 'underlined' }, tokens }).rule).toEqual({
+    expect(style(strip, 'tabs', { conditions: { marker: 'underlined' }, tokens }).rule).toEqual({
       color: '#cccccc',
       edge: 'bottom',
       thickness: 1,

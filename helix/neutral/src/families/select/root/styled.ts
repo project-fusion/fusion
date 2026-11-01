@@ -57,6 +57,13 @@ export default styles(
     stylesheet: 'select/root/select-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => {
+    const caret = {
+      '--icon-size': token('size-icon-tight'),
+      blockSize: token('size-icon-tight'),
+      color: token('color-foreground-muted'),
+      flex: '0 0 auto',
+      inlineSize: token('size-icon-tight'),
+    } as const
     const room = difference('100vw', product(token('space-xs'), 2))
     return [
       /* Before the rest, so a sheet below can still place its region. */
@@ -231,14 +238,10 @@ export default styles(
       on({ part: 'listbox-items', selector: '[part="listbox"]::part(items):focus-visible' }, [
         web([rule({ outline: 'none' })]),
       ]),
-      on('indicator', [
-        rule({
-          blockSize: token('size-icon-tight'),
-          color: token('color-foreground-muted'),
-          flex: '0 0 auto',
-          inlineSize: token('size-icon-tight'),
-        }),
-      ]),
+      /* A caret of the page's own takes the same size and ink, so swapping it
+         changes the glyph and nothing else. */
+      on('indicator', [rule(caret)]),
+      on({ region: 'indicator', slotted: '*' }, [rule(caret)]),
       on('trigger', [
         rule({ active: true, formDisabled: false }, { backgroundColor: token('color-press') }),
       ]),

@@ -138,7 +138,7 @@ export const indicator: Family = {
       set: [['background', { function: { arguments: [], name: 'linear-gradient' } }]],
       specificity: [0, 2, 0],
       target: 'indicator',
-      when: [{ kind: 'absent', name: 'variant' }],
+      when: [{ kind: 'absent', name: 'marker' }],
     }),
     rule({
       order: 4,
@@ -196,7 +196,7 @@ export const strip: Family = {
           },
         ],
       ],
-      when: [{ kind: 'attribute', name: 'variant', value: 'underlined' }],
+      when: [{ kind: 'attribute', name: 'marker', value: 'underlined' }],
     }),
     rule({
       order: 3,

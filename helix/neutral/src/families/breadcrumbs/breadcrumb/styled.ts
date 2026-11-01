@@ -41,7 +41,7 @@ export default styles(
       currentColor: token('color-foreground'),
       fontWeight: token('weight-medium'),
       gap: token('space-xs'),
-      hoverColor: token('color-hover'),
+      hoverBackgroundColor: token('color-hover'),
       linkColor: token('color-foreground-muted'),
       radius: token('radii-sm'),
       separatorColor: token('color-foreground-subtle'),
@@ -58,7 +58,7 @@ export default styles(
   ({ hook, on, own, rule }) => {
     /* A crumb's height: the text size times the leading, and never `1lh`. */
     const control = hook.controlSize
-    const hover = hook.hoverColor
+    const hover = hook.hoverBackgroundColor
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const separator = {
       color: hook.separatorColor,
@@ -87,6 +87,10 @@ export default styles(
           '--button-padding-inline': hook.controlPaddingInline,
           /* What sits between a trigger's label and its chevron. */
           '--button-gap': token('space-2xs'),
+          /* An icon in a crumb is drawn to the crumb's text, in the link, in the
+             trigger and in a control alike. At the default 20 a house stood over
+             13px words. */
+          '--icon-size': '1.15em',
           alignItems: 'center',
           display: 'inline-flex',
           gap: hook.gap,
@@ -260,7 +264,6 @@ export default styles(
             '--helix-size-focus-offset': product(token('size-focus-ring'), '-1'),
             '--icon-button-background-color-hover': hover,
             '--icon-button-radius': hook.radius,
-            '--icon-size': '1.15em',
             alignItems: 'center',
             display: 'inline-flex',
             marginInlineStart: product(hook.gap, '-1'),

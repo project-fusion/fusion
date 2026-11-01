@@ -82,7 +82,7 @@ export default styles(
         rule({ reducedMotion: true }, { transition: 'none' }),
         /* The swatch shape: the block of color is the whole control. */
         rule(
-          { variant: 'swatch' },
+          { trigger: 'swatch' },
           {
             backgroundColor: 'transparent',
             border: 'none',
@@ -90,8 +90,8 @@ export default styles(
             paddingInline: token('space-none'),
           },
         ),
-        rule({ variant: 'swatch', within: { host: ['focusWithin'] } }, { outline: 'none' }),
-        native([rule({ variant: 'swatch' }, { paddingInlineStart: token('space-none') })]),
+        rule({ trigger: 'swatch', within: { host: ['focusWithin'] } }, { outline: 'none' }),
+        native([rule({ trigger: 'swatch' }, { paddingInlineStart: token('space-none') })]),
       ]),
       /* The trigger fills the trailing end of the field. */
       on('trigger', [
@@ -111,7 +111,7 @@ export default styles(
           },
         ),
         web([rule({ formDisabled: true }, { cursor: 'not-allowed' })]),
-        rule({ variant: 'swatch' }, { blockSize: hook.swatchSize, inlineSize: hook.swatchSize }),
+        rule({ trigger: 'swatch' }, { blockSize: hook.swatchSize, inlineSize: hook.swatchSize }),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
          moves. Where the control is already that size the box sits inside it. */
@@ -148,7 +148,7 @@ export default styles(
         ]),
         native([rule({ overflow: 'hidden', position: 'relative' })]),
         rule(
-          { variant: 'swatch' },
+          { trigger: 'swatch' },
           {
             blockSize: '100%',
             border: line,
