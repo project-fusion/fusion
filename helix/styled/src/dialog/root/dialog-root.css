@@ -290,10 +290,7 @@
    `frosted` the same pair turned up, as the other floating panels draw it. */
 :host([material="glass"]) [part="surface"] {
   backdrop-filter: var(--dialog-backdrop, var(--helix-material-backdrop));
-  background-color: var(
-    --dialog-background-color,
-    var(--helix-material-modal)
-  );
+  background-color: var(--dialog-background-color, var(--helix-material-modal));
 }
 
 :host([material="frosted"]) [part="surface"] {

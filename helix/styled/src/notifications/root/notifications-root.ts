@@ -64,7 +64,12 @@ export class HelixNotifications extends HelixHeadlessNotifications {
   @property({ reflect: true })
   separation?: 'filled' | 'outlined' | 'plain'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, collectionErrorStyles, styles]
+  static override styles: CSSResultGroup = [
+    liveStyles,
+    collectionStateStyles,
+    collectionErrorStyles,
+    styles,
+  ]
 
   /** Tells each row the feed's `separation`, which a row that sets none takes. */
   protected override updated(changed: PropertyValues): void {

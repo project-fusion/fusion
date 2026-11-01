@@ -55,7 +55,9 @@ describe('a field on a touch screen', () => {
 
   test('the floor is 16px under a coarse pointer and 0 otherwise', () => {
     const modes = readFileSync(join(SRC, '..', '..', 'styles', 'src', '_modes.css'), 'utf8')
-    expect(modes).toMatch(/:root \{\s*--_helix-size-target: 1\.5rem;\s*--_helix-text-field-min: 0px;/)
+    expect(modes).toMatch(
+      /:root \{\s*--_helix-size-target: 1\.5rem;\s*--_helix-text-field-min: 0px;/,
+    )
     expect(modes).toMatch(
       /@media \(pointer: coarse\) \{\s*:root \{\s*--_helix-size-target: 2\.75rem;\s*--_helix-text-field-min: 16px;/,
     )

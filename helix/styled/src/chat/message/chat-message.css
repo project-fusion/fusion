@@ -255,10 +255,7 @@
 }
 
 :host([author="me"]) [part="content"] {
-  background-color: var(
-    --chat-message-background-color-me,
-    var(--helix-color-primary-wash)
-  );
+  background-color: var(--chat-message-background-color-me, var(--helix-color-primary-wash));
   color: var(--chat-message-color-me, var(--chat-message-color, var(--helix-color-foreground)));
 }
 

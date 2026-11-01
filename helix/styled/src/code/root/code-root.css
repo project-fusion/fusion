@@ -7,10 +7,7 @@
   /* A wash of the ink, not a surface: `surface-raised` is absolute lightness and
      stepped 1.09 against the page in light, 1.48 in dark. A mix composites, so
      6% measures 1.14 and 1.10. */
-  background-color: var(
-    --code-background-color,
-    var(--helix-color-well)
-  );
+  background-color: var(--code-background-color, var(--helix-color-well));
   border-radius: var(--code-radius, var(--helix-radii-sm));
   /* A fragment longer than the line, a path or an identifier, breaks inside
      itself where it would run out of the text, and each piece keeps the wash

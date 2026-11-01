@@ -75,7 +75,9 @@ describe('a control reaches the target', () => {
   for (const sheet of ROWS) {
     test(`${sheet} grows to the target under a coarse pointer`, () => {
       const css = readFileSync(join(SRC, sheet), 'utf8')
-      expect(css).toMatch(/@media \(pointer: coarse\)[^@]*min-block-size: var\(--helix-size-target\)/)
+      expect(css).toMatch(
+        /@media \(pointer: coarse\)[^@]*min-block-size: var\(--helix-size-target\)/,
+      )
     })
   }
 })

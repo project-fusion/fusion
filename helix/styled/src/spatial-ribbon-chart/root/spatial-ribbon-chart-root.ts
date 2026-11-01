@@ -30,7 +30,13 @@ import '../../tooltip/index.js'
 export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [spatialStyles, seriesStyles, tooltipStyles, styles, sonifyStyles]
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    seriesStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
 
   /**
    * How strongly the ribbons are drawn, as on every chart.

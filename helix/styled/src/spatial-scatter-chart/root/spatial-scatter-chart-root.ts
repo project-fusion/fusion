@@ -29,7 +29,13 @@ import '../../tooltip/index.js'
 export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [spatialStyles, seriesStyles, tooltipStyles, styles, sonifyStyles]
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    seriesStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
 
   /**
    * How strongly the points are drawn, as on every chart.

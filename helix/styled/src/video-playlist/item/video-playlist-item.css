@@ -34,10 +34,7 @@
    button records: a playlist sits on a page, a card or a panel, and an absolute
    neutral is a step away from exactly one of them. */
 :host(:not([disabled])) [part~="item"]:hover {
-  background-color: var(
-    --video-playlist-item-hover-background-color,
-    var(--helix-color-hover)
-  );
+  background-color: var(--video-playlist-item-hover-background-color, var(--helix-color-hover));
 }
 
 /*
@@ -57,10 +54,7 @@
  *  The one playing, and it stays marked under the pointer.
  */
 [part~="item"][aria-current="true"] {
-  background-color: var(
-    --video-playlist-item-current-background-color,
-    var(--helix-color-well)
-  );
+  background-color: var(--video-playlist-item-current-background-color, var(--helix-color-well));
   color: var(--helix-color-foreground);
 }
 

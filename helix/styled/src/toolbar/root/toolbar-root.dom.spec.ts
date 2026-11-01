@@ -93,7 +93,9 @@ describe('toolbar', () => {
     for (const size of ['md', 'lg']) {
       const block = rule(`:host([size="${size}"])`)
       expect(block).toContain(`--helix-size-control: var(--helix-size-control-${size})`)
-      expect(block).toContain('--helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px)')
+      expect(block).toContain(
+        '--helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px)',
+      )
     }
   })
 

@@ -56,9 +56,7 @@ describe('callout', () => {
   test('the tone survives grayscale as a bar on the inline start, clipped by the box', () => {
     /* A hairline of the tone at rest. The bar a hook asks for is drawn inside and
        clipped: a thick border on one side of a rounded box thins to a crescent. */
-    expect(rule(':host')).toContain(
-      '--_callout-bar: var(--callout-bar-thickness, 0px)',
-    )
+    expect(rule(':host')).toContain('--_callout-bar: var(--callout-bar-thickness, 0px)')
     expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
     expect(rule(':host::before')).toContain('background-color: var(--_callout-color)')
     expect(rule(':host')).toContain('overflow: hidden')
@@ -117,9 +115,7 @@ describe('callout separation and hooks', () => {
   test('every hook falls back to the value it replaced', () => {
     const host = rule(':host')
     expect(host).toContain('--_callout-color: var(--callout-accent-color, var(--_callout-tone))')
-    expect(host).toContain(
-      '--_callout-bar: var(--callout-bar-thickness, 0px)',
-    )
+    expect(host).toContain('--_callout-bar: var(--callout-bar-thickness, 0px)')
     /* The control steps, `space-md` and `text-sm` at rest, so a callout in a
        `data-density` region follows it as the controls beside it do. */
     expect(host).toContain('--_callout-inset: var(--callout-padding, var(--helix-space-control))')

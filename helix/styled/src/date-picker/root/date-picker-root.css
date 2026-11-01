@@ -292,10 +292,7 @@
 [part~="cell"][data-range-preview]:is([data-range-start], [data-range-middle], [data-range-end]) {
   background-color: var(
     --date-picker-range-preview-color,
-    light-dark(
-      var(--helix-color-well),
-      var(--helix-color-hover)
-    )
+    light-dark(var(--helix-color-well), var(--helix-color-hover))
   );
 }
 
