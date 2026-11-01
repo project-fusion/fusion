@@ -893,7 +893,7 @@ export default styles(
       ]),
       /* A thumb and a thin track are hard to reach with a finger, so the input takes
          the target's height. The track stays centered in it. */
-      on('control', [web([rule({ coarsePointer: true }, { minBlockSize: token('size-target') })])]),
+      on('control', [rule({ coarsePointer: true }, { minBlockSize: token('size-target') })]),
     ]
   },
 )
