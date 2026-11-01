@@ -39,6 +39,13 @@ export class HelixToolbar extends HelixHeadlessToolbar {
   static override styles: CSSResultGroup = styles
 
   /**
+   * Whether the toolbar holds one line and scrolls where it runs out of room.
+   * Unset, the controls wrap. The toolbar stays one tab stop either way.
+   */
+  @property({ reflect: true, type: Boolean })
+  scrollable?: boolean
+
+  /**
    * The size of every control in the toolbar: their height, icons, boxes and
    * tags. Unset is the small size, as a toolbar is dense by nature.
    */

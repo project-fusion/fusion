@@ -55,7 +55,8 @@
      rows below it would move up a track with that track's sizing, which is
      what `Chat` measured. Only the lines scroll. */
   background-color: var(--log-background-color, var(--helix-color-background));
-  border: var(--helix-border-thin) solid var(--log-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-surface);
+  border: var(--helix-border-surface) solid var(--log-border-color, var(--helix-color-border));
   border-radius: var(--log-radius, var(--helix-radii-md));
   color: var(--log-color, var(--helix-color-foreground));
   display: grid;

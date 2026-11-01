@@ -131,13 +131,6 @@ export class HelixHeadlessToolbar extends HelixElement {
   orientation?: 'horizontal' | 'vertical'
 
   /**
-   * Whether the toolbar holds one line and scrolls where it runs out of room.
-   * Unset, the controls wrap. The toolbar stays one tab stop either way.
-   */
-  @property({ reflect: true, type: Boolean })
-  scrollable?: boolean
-
-  /**
    * Whether the arrow keys stop at the first and the last control. Unset, they
    * wrap around from one end to the other.
    */

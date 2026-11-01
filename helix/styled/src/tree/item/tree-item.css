@@ -139,13 +139,13 @@ slot[name="children"]::slotted(*) {
 }
 
 [part="row"]:hover {
-  background-color: var(--tree-row-hover-background-color, var(--helix-color-surface-raised));
+  background-color: var(--tree-row-hover-background-color, var(--helix-color-hover));
   color: var(--tree-row-hover-color, var(--helix-color-foreground));
 }
 
 /* A surface, not the accent. */
 :host(:state(selected)) [part="row"] {
-  background-color: var(--tree-row-selected-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--tree-row-selected-background-color, var(--helix-color-primary-subtle));
   color: var(--tree-row-selected-color, var(--helix-color-foreground));
 }
 

@@ -23,7 +23,7 @@
      light and by **4 to 10 in dark**, where the same mix in sRGB gives 26 to 37
      in both. */
   --_tag-fill: color-mix(in srgb, var(--_tag-color) 14%, var(--helix-color-background));
-  --_tag-edge: color-mix(in srgb, var(--_tag-color) 28%, var(--helix-color-background));
+  --_tag-edge: transparent;
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
   align-items: center;
   background-color: var(--tag-background-color, var(--_tag-fill));

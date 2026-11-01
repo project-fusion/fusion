@@ -73,6 +73,7 @@
  * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
  */
 :host(:disabled) {
+  --_field-disabled-opacity: 1;
   opacity: var(--helix-opacity-disabled);
 }
 

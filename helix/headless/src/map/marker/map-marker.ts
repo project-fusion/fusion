@@ -55,7 +55,7 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * @cssstate behind - On the far side of a globe, out of sight until the globe turns it into view.
  * @cssstate cluster - Shows several markers as one count.
  * @cssstate clustered - Hidden inside another marker's cluster.
- * @cssstate current - Holds the map's tab stop.
+ * @cssstate active - Holds the map's tab stop.
  * @cssstate fanned - Spread out from a location it shares with other markers, after their cluster was pressed.
  * @cssstate icon - Has content in the icon slot.
  * @cssstate passed - Marked as passed.
@@ -189,7 +189,7 @@ export class HelixHeadlessMapMarker extends HelixElement {
     this.toggleState('behind', this.behind)
     this.toggleState('cluster', this.gathered.length > 1)
     this.toggleState('clustered', this.gatheredBy !== undefined)
-    this.toggleState('current', this.current)
+    this.toggleState('active', this.current)
     this.toggleState('fanned', this.fanned)
     this.toggleState('passed', this.passed)
     this.toggleState('start', this.side === 'start')

@@ -83,7 +83,7 @@ const DRAWN = [
  * @csspart outline - The drawn outline of a `diamond` card, a shape a box cannot draw.
  *
  * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
- * @cssstate current - The card that receives focus when you tab into the board.
+ * @cssstate active - The card that receives focus when you tab into the board.
  * @cssstate placed - Placed on the board.
  * @cssstate selected - The card is selected.
  * @cssstate target - A connection being drawn would end here if you released it.
@@ -280,7 +280,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('candidate', this.candidate)
-    this.toggleState('current', this.current)
+    this.toggleState('active', this.current)
     this.toggleState('selected', this.selected)
     this.toggleState('target', this.target)
   }

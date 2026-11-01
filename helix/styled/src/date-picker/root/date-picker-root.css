@@ -155,7 +155,7 @@
   background-color: var(--date-picker-selected-color, var(--helix-color-surface-inverse));
 }
 
-[part~="period-disabled"] {
+:host(:not(:disabled)) [part~="period-disabled"] {
   color: var(--helix-color-foreground-subtle);
   cursor: default;
   opacity: var(--helix-opacity-disabled);
@@ -169,10 +169,10 @@
 /* At `min` or `max` there is no month to move to, and the control says so.
    Still focusable there, so the press that reached the bound keeps the reader
    on it. */
-[part="previous"]:disabled,
-[part="previous"][aria-disabled="true"],
-[part="next"]:disabled,
-[part="next"][aria-disabled="true"] {
+:host(:not(:disabled)) [part="previous"]:disabled,
+:host(:not(:disabled)) [part="previous"][aria-disabled="true"],
+:host(:not(:disabled)) [part="next"]:disabled,
+:host(:not(:disabled)) [part="next"][aria-disabled="true"] {
   cursor: default;
   opacity: var(--helix-opacity-disabled);
 }
@@ -340,7 +340,7 @@
 /* Read off the day's own part rather than the cell's `aria-disabled`, which a
    filler day from a neighboring month carries too: it takes no press, and it
    keeps the quieter look above rather than this one. */
-[part~="day-disabled"] {
+:host(:not(:disabled)) [part~="day-disabled"] {
   color: var(--helix-color-foreground-subtle);
   opacity: var(--helix-opacity-disabled);
 }
@@ -371,6 +371,7 @@
  * `:host(:disabled)` rather than the attribute, so an ancestor
  * `<fieldset disabled>` reaches it too. Listbox carries the longer note. */
 :host(:disabled) {
+  --_field-disabled-opacity: 1;
   cursor: not-allowed;
   opacity: var(--helix-opacity-disabled);
 }

@@ -52,7 +52,7 @@ describe('canvas node', () => {
     const host = await node()
     host.current = true
     await host.updateComplete
-    expect(hasState(host, 'current')).toBe(true)
+    expect(hasState(host, 'active')).toBe(true)
     expect(host.hasAttribute('current')).toBe(false)
   })
 
