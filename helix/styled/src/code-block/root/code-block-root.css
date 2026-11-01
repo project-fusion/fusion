@@ -96,7 +96,10 @@
   block-size: 100%;
 }
 
+/* The small icon goes with the small button: at the default 20px the mark
+   outweighs the 14px code beside it. */
 [part="copy"] {
+  --copy-button-icon-size: var(--helix-size-icon-sm);
   --icon-button-size: var(--helix-size-control-sm);
 }
 
