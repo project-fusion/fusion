@@ -30,11 +30,11 @@ export default styles(
       chevronHoverColor: token('color-foreground'),
       color: token('color-foreground'),
       contentColor: token('color-foreground-muted'),
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       fontSize: token('text-md'),
       fontWeight: token('weight-medium'),
       hoverBackgroundColor: 'transparent',
-      padding: [token('space-sm'), token('space-md')],
+      padding: [product(token('space-control'), 0.5), token('space-md')],
     },
     stylesheet: 'accordion/item/accordion-item.generated.css',
   },
@@ -49,7 +49,8 @@ export default styles(
       on('host', [rule({ display: 'block' })]),
       on('trigger', [
         rule({
-          web: { all: 'unset', cursor: 'pointer' },
+          web: { all: 'unset', cursor: 'pointer', overflowWrap: 'anywhere' },
+          position: 'relative',
           boxSizing: 'border-box',
           alignItems: 'center',
           color: hook.color,
@@ -59,6 +60,8 @@ export default styles(
           inlineSize: '100%',
           gap: token('space-xs'),
           minBlockSize: token('size-control'),
+          /* A long unbroken word breaks inside the column it was given. */
+          minInlineSize: 0,
           padding: hook.padding,
           transition: ['background-color', token('duration-fast'), token('easing-standard')],
         }),
@@ -77,6 +80,11 @@ export default styles(
             outlineOffset: product(token('size-focus-offset'), '-1'),
           },
         ),
+        rule({ active: true, lacks: 'disabled' }, { backgroundColor: token('color-press') }),
+        /* Rows sit against each other, so a box reaching past a row would take the
+           press from the row beside it. On a touch screen the row itself reaches
+           the target. */
+        rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       ]),
       on('chevron', [
         rule({

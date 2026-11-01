@@ -20,7 +20,7 @@ export default styles(
     hooks: {
       itemBackgroundColor: token('color-surface-overlay'),
       itemColor: token('color-foreground'),
-      itemDisabledOpacity: 0.5,
+      itemDisabledOpacity: token('opacity-disabled'),
       itemHoverBackgroundColor: mix(token('color-foreground'), 6, token('color-surface-overlay')),
       itemSize: token('size-control-tight'),
       labelBackgroundColor: token('color-surface-overlay'),
@@ -59,7 +59,7 @@ export default styles(
           aspectRatio: 1,
           backgroundColor: hook.itemBackgroundColor,
           borderRadius: token('radii-full'),
-          boxShadow: token('shadow-md'),
+          boxShadow: token('shadow-raised'),
           color: hook.itemColor,
           display: 'inline-flex',
           inlineSize: hook.itemSize,
@@ -108,6 +108,7 @@ export default styles(
           [{ within: { item: { hover: true } } }, { within: { item: { focusVisible: true } } }],
           { opacity: 1 },
         ),
+        rule({ canHover: false }, { opacity: 1 }),
       ]),
       on('shortcut', [
         rule({

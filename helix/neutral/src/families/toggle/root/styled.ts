@@ -1,4 +1,4 @@
-import { list, mix, native, token } from '../../../style.js'
+import { difference, list, mix, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -14,8 +14,8 @@ import root from './headless.js'
  *
  * **A phone has no base layer**, so the item's look is written here for a
  * phone alone, as the base layer draws it: muted words with no ground of their
- * own, the full foreground while pressed, a wash under a finger, and half the
- * opacity while disabled. On its own the item is as tall as its words. A
+ * own, the full foreground while pressed, a wash under a finger, and the
+ * disabled opacity while disabled. On its own the item is as tall as its words. A
  * group gives its items the row's height and its own corners through private
  * values, `toggle-height` and `toggle-radius`, which the base layer reads on
  * the web. A phone's toggle reads two more of the group's: the wash under a
@@ -59,7 +59,7 @@ export default styles(
       rule({ print: true }, { display: 'none' }),
     ]),
     on('item', [
-      rule({ web: { all: 'unset' }, boxSizing: 'border-box' }),
+      rule({ web: { all: 'unset' }, boxSizing: 'border-box', position: 'relative' }),
       rule(
         { focusVisible: true },
         {
@@ -102,7 +102,18 @@ export default styles(
             color: token('color-foreground'),
           },
         ),
-        rule({ formDisabled: true }, { opacity: 0.5 }),
+        rule({ formDisabled: true }, { opacity: token('opacity-disabled') }),
+      ]),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'item' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
       ]),
     ]),
     /* An icon before the label, or a count after it, set off by a step. */

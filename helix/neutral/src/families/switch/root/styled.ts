@@ -19,7 +19,7 @@ import root from './headless.js'
  *
  * **The input is the track on the web**: stretched over it, invisible, and
  * still what takes the press and the focus. A phone presses the row, and the
- * focus ring goes on the thumb either way.
+ * focus ring goes on the track either way.
  */
 export default styles(
   root,
@@ -32,7 +32,13 @@ export default styles(
       onColor: token('color-primary-surface'),
       thumbColor: null,
     }),
-    own: { fieldControlInlineSize: null, switchHeight: null, switchInset: null, switchWidth: null },
+    own: {
+      fieldControlInlineSize: null,
+      fieldDisabledOpacity: null,
+      switchHeight: null,
+      switchInset: null,
+      switchWidth: null,
+    },
     stylesheet: 'switch/root/switch-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -52,7 +58,10 @@ export default styles(
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ formDisabled: true }, { opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { opacity: token('opacity-disabled'), own: { fieldDisabledOpacity: 1 } },
+      ),
     ]),
     on('field', [
       rule({
@@ -60,7 +69,12 @@ export default styles(
         web: { cursor: 'pointer' },
         display: 'inline-flex',
         gap: token('space-xs'),
+        position: 'relative',
       }),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches
+         the target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       /* `:disabled` matches a disabled fieldset around the switch as well. */
       web([rule({ formDisabled: true }, { cursor: 'default' })]),
     ]),
@@ -69,7 +83,9 @@ export default styles(
       rule({
         backgroundColor: token('color-surface-sunken'),
         blockSize: own.switchHeight,
-        border: [token('border-thin'), 'solid', token('color-border')],
+        /* The edge in the mark ink, as a Checkbox's: an off Switch is a white thumb
+           on a near-white groove, and it is still a control you can press. */
+        border: [token('border-thin'), 'solid', token('color-foreground-subtle')],
         borderRadius: token('radii-full'),
         display: 'grid',
         flex: '0 0 auto',
@@ -87,7 +103,29 @@ export default styles(
           borderColor: hook.onColor,
         },
       ),
+      rule(
+        { holds: { control: 'focusVisible' } },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      /* The edge firms up under the pointer, as a Checkbox's and a Radio's do. */
+      rule(
+        { formDisabled: false, within: { field: { hover: true } } },
+        { borderColor: token('color-foreground') },
+      ),
       rule({ invalid: true }, { borderColor: token('color-danger') }),
+      /* A press firms the edge, and a press on the on state lifts the fill. */
+      rule(
+        { formDisabled: false, within: { field: { active: true } } },
+        { backgroundColor: token('color-press') },
+      ),
+      /* A checked track is a fill, which forced colors paint Canvas. */
+      rule(
+        { checked: true, forcedColors: true },
+        { backgroundColor: 'Highlight', borderColor: 'Highlight', forcedColorAdjust: 'none' },
+      ),
     ]),
     /* A hairline, which is symmetric where a shadow is not. Over the groove,
        which is `overlay`: lighter than the groove in light, a step up in
@@ -136,12 +174,18 @@ export default styles(
           translate: [difference(own.switchWidth, own.switchHeight), '-50%'],
         },
       ),
+      /* `translate` is physical, so on a right-to-left page the thumb travels the
+         other way. Measured October 31, 2026: 16 pixels outside its track. */
       rule(
-        { within: { track: { holds: { control: 'focusVisible' } } } },
-        {
-          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-          outlineOffset: token('size-focus-offset'),
-        },
+        { checked: true, dir: 'rtl' },
+        { translate: [difference(own.switchHeight, own.switchWidth), '-50%'] },
+      ),
+      /* A thumb off in light is white on a near-white groove, so it takes the mark
+         ink at its edge: thumb against track was 1.12:1. */
+      rule({ checked: false }, { borderColor: token('color-foreground-subtle') }),
+      rule(
+        { checked: true, forcedColors: true },
+        { backgroundColor: 'HighlightText', forcedColorAdjust: 'none' },
       ),
     ]),
     /* An icon takes most of the thumb, and the thumb's own color. */

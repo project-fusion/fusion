@@ -1,5 +1,18 @@
+import densitySm from '../../../fragments/density-sm.js'
 import { oneOf } from '../../../render.js'
-import { fn, list, mix, native, product, scheme, sum, token } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -14,8 +27,10 @@ import root from './headless.js'
  * **The tone tints the band and never the words**, in a gradient mixed with
  * the ground the band rides, with more of the hue in the dark scheme, where
  * a little of it into near black is near black. `neutral` keeps the resting
- * fill. `separation` is the rung: sunk below the page, the surface step, or
- * a hairline under the band in its tone.
+ * fill. `separation` is the rung: unset is sunk below the page, `filled` the
+ * surface step, and `outlined` no fill and a hairline under the band in its
+ * tone. There is no `elevated`: the band usually sits at the top of the page
+ * with nothing under it to lift off.
  *
  * **The message is centered, and the dismiss button stands out of flow** at
  * the end, with the message and the actions kept clear of it on both sides,
@@ -40,10 +55,13 @@ export default styles(
       toneColor: own.announcementColor,
     }),
     own: { announcementColor: null, announcementGround: null, announcementTint: null },
-    props: { separation: oneOf(['elevated', 'filled', 'outlined']) },
+    props: {
+      separation: oneOf(['filled', 'outlined']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    },
     stylesheet: 'announcement/root/announcement-root.generated.css',
   },
-  ({ hook, on, own, rule, variants }) => {
+  ({ hook, include, on, own, rule, variants }) => {
     const iconSize = token('size-icon')
     /* The dismiss button's side, and the room kept clear of it. */
     const dismissSize = sum(iconSize, product(token('space-2xs'), 2))
@@ -58,14 +76,9 @@ export default styles(
       mix(own.announcementTint, 20, own.announcementGround),
     )
     return [
+      include(densitySm),
       on('host', [
         rule({
-          '--helix-size-icon': token('size-icon-sm'),
-          '--helix-size-icon-loose': product(token('size-icon'), 1.2),
-          '--helix-size-icon-tight': product(token('size-icon'), 0.8),
-          '--helix-size-control': token('size-control-sm'),
-          '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
           own: {
             announcementColor: token('color-foreground-muted'),
             announcementGround: token('color-background'),
@@ -100,12 +113,9 @@ export default styles(
           { tone: ['accent', 'danger', 'info', 'primary', 'success', 'warning'] },
           { backgroundImage: fn('linear-gradient', 'to right', tintStart, tintEnd) },
         ),
+        /* A ground of its own, a step up off the page. */
         rule(
           { separation: 'filled' },
-          { backgroundColor: hook.backgroundColor(token('color-surface-sunken')) },
-        ),
-        rule(
-          { separation: 'elevated' },
           {
             own: { announcementGround: token('color-surface') },
             backgroundColor: hook.backgroundColor(token('color-surface')),
@@ -113,7 +123,10 @@ export default styles(
         ),
         rule(
           { separation: 'outlined' },
-          { borderBlockEnd: [token('border-thin'), 'solid', token('color-border')] },
+          {
+            backgroundColor: hook.backgroundColor('transparent'),
+            borderBlockEnd: [token('border-thin'), 'solid', token('color-border')],
+          },
         ),
         rule(
           {
@@ -127,7 +140,13 @@ export default styles(
       ]),
       /* Centered, and clear of the dismiss button where there is one. */
       on('content', [
-        rule({ flex: '1 1 auto', minInlineSize: 0, textAlign: hook.textAlign }),
+        rule({
+          flex: '1 1 auto',
+          minInlineSize: 0,
+          textAlign: hook.textAlign,
+          /* A long unbroken word breaks inside the column it was given. */
+          web: { overflowWrap: 'anywhere' },
+        }),
         /* A phone breaks the line from a basis that does not shrink, since
            it lays the words out at the room they are given, so the message
            asks for sixteen ems, and no more than the line, before the
@@ -174,7 +193,7 @@ export default styles(
         rule(
           { hover: true },
           {
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+            backgroundColor: token('color-hover'),
             color: token('color-foreground'),
           },
         ),
@@ -185,6 +204,18 @@ export default styles(
             outlineOffset: token('size-focus-offset'),
           },
         ),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. Where the control is already that size the box sits inside it.
+         A phone gives a press the view's own frame. */
+      on({ after: 'dismiss' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('dismiss-mark', [rule({ blockSize: iconSize, inlineSize: iconSize })]),
     ]

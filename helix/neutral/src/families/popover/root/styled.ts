@@ -1,15 +1,5 @@
 import { oneOf } from '../../../render.js'
-import {
-  difference,
-  fn,
-  list,
-  measured,
-  native,
-  product,
-  scheme,
-  token,
-  web,
-} from '../../../style.js'
+import { difference, fn, list, measured, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -161,9 +151,7 @@ export default styles(
           variants('material', {
             glass: {
               backdropFilter: hook.backdrop(token('material-backdrop')),
-              backgroundColor: hook.backgroundColor(
-                scheme(token('material-translucent-strong'), token('material-translucent')),
-              ),
+              backgroundColor: hook.backgroundColor(token('material-panel')),
             },
             frosted: {
               backdropFilter: hook.backdrop(fn('blur', token('material-blur-lg'))),

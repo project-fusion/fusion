@@ -2,17 +2,7 @@ import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import {
-  difference,
-  list,
-  mix,
-  native,
-  product,
-  quotient,
-  sum,
-  token,
-  web,
-} from '../../../style.js'
+import { difference, list, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import textarea from './headless.js'
 
@@ -38,7 +28,7 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
-      padding: token('space-xs'),
+      padding: token('space-field'),
       radius: token('radii-sm'),
       resize: 'vertical',
     },
@@ -118,6 +108,18 @@ export default styles(
         rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
       ],
     ),
+    on('clear', [rule({ position: 'relative' })]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'clear' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
     /* The dictation button sits on the first line, inset by the padding as
        the text is. */
     on('voice', [
@@ -137,16 +139,18 @@ export default styles(
           overflow: 'hidden',
           position: 'absolute',
         }),
-        rule(
-          { hover: true },
-          { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
-        ),
+        rule({ hover: true }, { backgroundColor: token('color-hover') }),
       ]),
     ]),
     on('field', [
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       /* Flush with its ground. */
       rule({ readonly: true }, { backgroundColor: 'transparent' }),
+      /* Forced colors flatten the danger hue, so a wrong field keeps a heavier edge. */
+      rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
     ]),
     /* A phone draws the cross the web draws in `clear-icon`, at the icon size. */
     on('clear-mark', [

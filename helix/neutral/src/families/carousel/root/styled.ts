@@ -23,7 +23,7 @@ const fills = { flex: '1 1 0', minBlockSize: 0, minInlineSize: 0 } as const
  * pads the host by what each edge holds. Both keep the source's reading order.
  *
  * **A scroller clips at its padding box, so the track keeps room inside itself**,
- * `--carousel-bleed`, on the axis that scrolls, sized to clear `shadow-md`.
+ * `--carousel-bleed`, on the axis that scrolls, sized to clear `shadow-raised`.
  * `scroll-padding` keeps it from a snap, which would otherwise rest a slide's
  * edge on the clip edge.
  *
@@ -97,6 +97,15 @@ export default styles(
         scrollPaddingInline: own.carouselBleed,
         scrollSnapType: 'x mandatory',
       }),
+      /* The region takes keyboard focus for its arrow keys, and the ring sits
+         inside it so the edge of the page or a clipping parent cannot cut it. */
+      rule(
+        { focusVisible: true },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: product(token('size-focus-offset'), '-1'),
+        },
+      ),
       web([
         rule({
           '--carousel-gap': own.carouselGap,
@@ -207,7 +216,7 @@ export default styles(
         {
           backgroundColor: token('color-surface-overlay'),
           borderRadius: token('radii-full'),
-          boxShadow: token('shadow-md'),
+          boxShadow: token('shadow-raised'),
           marginBlockEnd: sum(own.carouselBleed, token('space-md')),
           paddingBlock: token('space-2xs'),
           paddingInline: token('space-xs'),
@@ -369,7 +378,7 @@ export default styles(
           {
             backgroundColor: token('color-surface-overlay'),
             borderColor: 'transparent',
-            boxShadow: token('shadow-md'),
+            boxShadow: token('shadow-raised'),
           },
         ),
         web([rule({ controlsPlacement: 'overlay' }, { pointerEvents: 'auto' })]),
@@ -411,8 +420,9 @@ export default styles(
     on('indicator', [
       web([rule({ all: 'unset', boxSizing: 'border-box', cursor: 'pointer' })]),
       rule({
-        backgroundColor: token('color-border'),
+        backgroundColor: token('color-foreground-subtle'),
         blockSize: token('space-xs'),
+        position: 'relative',
         borderRadius: token('radii-full'),
         inlineSize: token('space-xs'),
         own: {
@@ -459,6 +469,20 @@ export default styles(
         { indicatorPlacement: 'overlay', part: { 'data-current': true } },
         { backgroundColor: token('color-primary') },
       ),
+      rule({ active: true }, { backgroundColor: token('color-press') }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it.
+       A phone gives a press the view's own frame. */
+    on({ after: 'indicator' }, [
+      web([
+        rule({
+          content: '""',
+          insetBlock: quotient(difference(token('size-target'), '100%'), '-2'),
+          insetInline: 0,
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on(
       ['next', 'previous'],

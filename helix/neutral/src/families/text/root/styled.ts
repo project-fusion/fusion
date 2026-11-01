@@ -58,6 +58,8 @@ export default styles(
     on('host', [
       rule({
         display: 'inline',
+        /* A long unbroken word breaks inside the column it was given. */
+        web: { overflowWrap: 'anywhere' },
         fontFamily: hook.fontFamily(),
         fontSize: hook.fontSize(),
         fontWeight: hook.fontWeight(),

@@ -93,7 +93,7 @@ export default styles(
       markColor: mix(token('color-primary'), 12, 'transparent'),
       markEdgeColor: token('color-primary'),
       maxBlockSize: null,
-      radius: token('radii-lg'),
+      radius: token('radii-md'),
       removedColor: token('color-danger'),
     },
     own: {
@@ -290,17 +290,14 @@ export default styles(
         native([
           rule({ part: { 'data-after': true } }, { marginInlineStart: token('space-none') }),
           rule({ part: { 'data-pressed': true } }, { color: token('color-foreground') }),
-          rule(
-            { part: { 'data-pressed': true } },
-            { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
-          ),
+          rule({ part: { 'data-pressed': true } }, { backgroundColor: token('color-hover') }),
           rule({ part: { 'data-gone': true } }, { display: 'none' }),
         ]),
       ]),
       on({ part: 'wrap-toggle', selector: '[part="wrap-toggle"][aria-pressed="true"]' }, [
         web([
           rule({
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+            backgroundColor: token('color-hover'),
             color: token('color-foreground'),
           }),
         ]),
@@ -353,14 +350,14 @@ export default styles(
         native([
           rule(
             { part: { 'data-selected': true } },
-            { borderBlockEndColor: token('color-accent'), color: token('color-foreground') },
+            { borderBlockEndColor: token('color-primary'), color: token('color-foreground') },
           ),
         ]),
         rule({ focusVisible: true }, ringInside),
       ]),
       on({ part: 'file-tab', selector: '[part="file-tab"][aria-selected="true"]' }, [
         web([
-          rule({ borderBlockEndColor: token('color-accent'), color: token('color-foreground') }),
+          rule({ borderBlockEndColor: token('color-primary'), color: token('color-foreground') }),
         ]),
       ]),
       on({ part: 'file-tab', selector: 'button[part="file-tab"]' }, [

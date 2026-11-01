@@ -2,7 +2,6 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToolbar } from '@fusion.dev/helix-headless/toolbar'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles } from './toolbar-root.generated.css.js'
 
 /**
@@ -37,7 +36,7 @@ import { styles } from './toolbar-root.generated.css.js'
  */
 @customElement('helix-toolbar')
 export class HelixToolbar extends HelixHeadlessToolbar {
-  static override styles: CSSResultGroup = [densityStyles, styles]
+  static override styles: CSSResultGroup = styles
 
   /**
    * Whether the toolbar holds one line and scrolls where it runs out of room.

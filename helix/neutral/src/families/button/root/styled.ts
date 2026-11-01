@@ -1,5 +1,17 @@
 import { oneOf } from '../../../render.js'
-import { first, hookOf, list, mix, native, token, web } from '../../../style.js'
+import {
+  difference,
+  first,
+  fn,
+  hookOf,
+  list,
+  mix,
+  native,
+  quotient,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import button from './headless.js'
 
@@ -12,8 +24,8 @@ import button from './headless.js'
  *
  * **Every hover is gated on the control being live.** A disabled button is
  * half the opacity and nothing else, so an ungated fill would still deepen
- * under the pointer. **A press looks as a hover does**: a touch screen has no
- * hover, and a tap showed nothing until the button acted.
+ * under the pointer. **A press is one step past each hover**: a touch screen
+ * has no hover, and a tap showed nothing until the button acted.
  *
  * **Every emphasis names its own hover, including the ones whose fill does
  * not change.** The generic hover is four class-equivalents and an emphasis
@@ -51,6 +63,7 @@ export default styles(
       buttonEdge: null,
       buttonFill: null,
       buttonFillHover: null,
+      buttonFillPress: null,
       buttonInk: null,
       buttonOnTone: null,
       buttonTone: null,
@@ -90,10 +103,19 @@ export default styles(
           buttonTurn: '0.8s',
           /* Softened toward the page, because neutral's tone is already the
              darkest ink there is and there is nothing past it to go to. */
-          buttonToneHover: mix(token('color-foreground'), 86, token('color-background')),
+          /* Two whole colors, since a scheme is no percentage. Each moves at
+             least 1.3:1 from rest, from a fill with nothing past it. */
+          buttonToneHover: scheme(
+            mix(token('color-foreground'), 72, token('color-background')),
+            mix(token('color-foreground'), 90, token('color-background')),
+          ),
+          buttonFillPress: scheme(
+            mix(token('color-foreground'), 60, token('color-background')),
+            mix(token('color-foreground'), 80, token('color-background')),
+          ),
         },
       }),
-      /* Each tone takes the same six values, so a consumer learns one tone
+      /* Each tone takes the same seven values, so a consumer learns one tone
          and knows the rest. */
       variants('tone', {
         primary: {
@@ -101,6 +123,7 @@ export default styles(
             buttonEdge: token('color-primary'),
             buttonFill: token('color-primary-surface'),
             buttonFillHover: token('color-primary-surface-hover'),
+            buttonFillPress: token('color-primary-surface-active'),
             buttonOnTone: token('color-foreground-on-primary'),
             buttonTone: token('color-primary'),
             buttonToneHover: token('color-primary-hover'),
@@ -111,6 +134,15 @@ export default styles(
             buttonEdge: token('color-accent'),
             buttonFill: token('color-accent-surface'),
             buttonFillHover: token('color-accent-surface-hover'),
+            buttonFillPress: web(
+              fn('oklch', [
+                'from',
+                token('color-accent-surface-hover'),
+                'calc(l - 0.05)',
+                'c',
+                'h',
+              ]),
+            ),
             buttonOnTone: token('color-foreground-on-accent'),
             buttonTone: token('color-accent'),
             buttonToneHover: token('color-accent-hover'),
@@ -121,6 +153,15 @@ export default styles(
             buttonEdge: token('color-danger'),
             buttonFill: token('color-danger-surface'),
             buttonFillHover: token('color-danger-surface-hover'),
+            buttonFillPress: web(
+              fn('oklch', [
+                'from',
+                token('color-danger-surface-hover'),
+                'calc(l - 0.05)',
+                'c',
+                'h',
+              ]),
+            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-danger'),
             /* Mixed toward the ink, for the ink states. */
@@ -133,6 +174,9 @@ export default styles(
             buttonEdge: token('color-info'),
             buttonFill: token('color-info-surface'),
             buttonFillHover: token('color-info-surface-hover'),
+            buttonFillPress: web(
+              fn('oklch', ['from', token('color-info-surface-hover'), 'calc(l - 0.05)', 'c', 'h']),
+            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-info'),
             buttonToneHover: mix(token('color-info'), 86, token('color-foreground')),
@@ -143,6 +187,15 @@ export default styles(
             buttonEdge: token('color-success'),
             buttonFill: token('color-success-surface'),
             buttonFillHover: token('color-success-surface-hover'),
+            buttonFillPress: web(
+              fn('oklch', [
+                'from',
+                token('color-success-surface-hover'),
+                'calc(l - 0.05)',
+                'c',
+                'h',
+              ]),
+            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-success'),
             buttonToneHover: mix(token('color-success'), 86, token('color-foreground')),
@@ -153,12 +206,29 @@ export default styles(
             buttonEdge: token('color-warning'),
             buttonFill: token('color-warning-surface'),
             buttonFillHover: token('color-warning-surface-hover'),
+            buttonFillPress: web(
+              fn('oklch', [
+                'from',
+                token('color-warning-surface-hover'),
+                'calc(l - 0.05)',
+                'c',
+                'h',
+              ]),
+            ),
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-warning'),
             buttonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
           },
         },
       }),
+      /* A phone has no relative color to darken a fill by, so its press on a
+         solid tone stays on the hover's fill. */
+      native([
+        rule(
+          { tone: ['accent', 'danger', 'info', 'success', 'warning'] },
+          { own: { buttonFillPress: own.buttonFillHover } },
+        ),
+      ]),
       /* **Pressed by a Button Group, the solid fill.** The web group writes
          these hooks onto a pressed button's control. A phone's button reads
          the group's own hooks, with the same fallbacks. */
@@ -191,14 +261,15 @@ export default styles(
     ]),
     on('button', [
       /* `all: unset` first, so the browser's own button styling is gone
-         before anything below lands. At rest, a wash of the foreground
-         inside a hairline. A container that has already sized its own row
+         before anything below lands. At rest, an edge and no fill, as
+         `outlined` is on every axis. A container that has already sized its own row
          sets `size` and `padding-inline`: a crumb is 28px, between `sm` at 32
          and nothing, so a button slotted into one stepped the whole trail. */
       rule({
         web: { all: 'unset', cursor: 'pointer' },
+        position: 'relative',
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(mix(own.buttonTone, 6, 'transparent')),
+        backgroundColor: hook.backgroundColor('transparent'),
         blockSize: hook.size,
         border: [token('border-thin'), 'solid', hook.borderColor],
         boxSizing: 'border-box',
@@ -338,13 +409,34 @@ export default styles(
           color: hook.foregroundColor(own.buttonInk),
         },
       ),
+      /* A press, one step past each hover. After the hovers, since a press
+         happens under the pointer. */
+      rule(
+        { active: true, formDisabled: false },
+        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 16, 'transparent')) },
+      ),
+      rule(
+        { active: true, emphasis: 'solid', formDisabled: false },
+        { backgroundColor: hook.backgroundColor(own.buttonFillPress) },
+      ),
+      rule(
+        { active: true, emphasis: 'subtle', formDisabled: false },
+        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 30, 'transparent')) },
+      ),
+      rule(
+        { active: true, emphasis: 'ghost', formDisabled: false },
+        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 16, 'transparent')) },
+      ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       /* **Pending: the words stay where they are, unseen, and a ring turns
          over them**, so the button keeps its width and nothing beside it
          moves. The ring is the `spinner` part, drawn only while pending. The
          cursor says the press is held. */
-      rule({ pending: true }, { web: { cursor: 'progress' }, position: 'relative' }),
+      rule({ pending: true }, { web: { cursor: 'progress' } }),
     ]),
     /* **The letters at the middle, in any font.** The line box is centered
        and the letters sit in it where the font's ascent and descent put
@@ -364,6 +456,14 @@ export default styles(
             textBox: 'trim-both cap alphabetic',
           },
         ),
+        /* A label longer than the button cuts at the end, so the button stays
+           inside a narrow column. */
+        rule({
+          display: 'block',
+          minInlineSize: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }),
       ]),
     ]),
     /* Icons scale with the label, so a large button does not draw a small
@@ -389,6 +489,18 @@ export default styles(
          0.01ms under the preference, so a rate scaled from one turned the
          ring about eight thousand times a second. */
       rule({ reducedMotion: true }, { animationDuration: own.buttonCrawl }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it.
+       A phone gives a press the view's own frame. */
+    on({ after: 'button' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     keyframes('helix-button-turn', { to: { rotate: '1turn' } }),
   ],

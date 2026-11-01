@@ -1,7 +1,22 @@
 import iconButtonFloating from '../../../fragments/icon-button-floating.js'
 import iconButtonTones from '../../../fragments/icon-button-tones.js'
 import { oneOf } from '../../../render.js'
-import { first, hookOf, inherit, list, mix, native, token } from '../../../style.js'
+import {
+  difference,
+  first,
+  fn,
+  hookOf,
+  inherit,
+  list,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -50,11 +65,14 @@ export default styles(
       iconButtonInk: null,
       iconButtonInkHover: null,
       iconButtonOnTone: null,
+      iconButtonPressWay: null,
       iconButtonPressedFill: null,
       iconButtonPressedInk: null,
       iconButtonSize: null,
       iconButtonTone: null,
+      iconButtonToneHover: null,
       iconButtonTurn: null,
+      iconButtonWash: null,
     },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
@@ -68,6 +86,30 @@ export default styles(
   ({ hook, include, keyframes, on, own, rule }) => [
     on('host', [rule({ display: 'inline-flex', own: { iconButtonSize: hook.size } })]),
     include(iconButtonTones),
+    on('host', [
+      rule({
+        own: {
+          /* Near black has nothing darker, so a neutral press goes toward the page. */
+          iconButtonPressWay: 1,
+          /* Two whole colors, since a scheme is not valid in a percentage. Each
+             moves at least 1.3:1 from rest, from a fill with nothing past it. */
+          iconButtonToneHover: scheme(
+            mix(token('color-foreground'), 72, token('color-background')),
+            mix(token('color-foreground'), 90, token('color-background')),
+          ),
+          iconButtonWash: token('color-hover'),
+        },
+      }),
+      rule(
+        { has: 'tone', tone: { not: 'neutral' } },
+        {
+          own: {
+            iconButtonPressWay: '-1',
+            iconButtonWash: mix(own.iconButtonTone, 8, 'transparent'),
+          },
+        },
+      ),
+    ]),
     /* Square by construction: one length for both sides, so the control stays
        the same box whatever glyph it holds. The edge is written in longhands,
        so `--icon-button-border-width` takes one to four widths, for a control
@@ -111,6 +153,7 @@ export default styles(
         inlineSize: own.iconButtonSize,
         justifyContent: 'center',
         padding: token('space-none'),
+        position: 'relative',
         transition: list(
           ['background-color', token('duration-fast'), token('easing-standard')],
           ['color', token('duration-fast'), token('easing-standard')],
@@ -126,7 +169,7 @@ export default styles(
             own.iconButtonPressedFill,
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.iconButtonTone, 8, 'transparent'),
+            own.iconButtonWash,
           ),
           color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonInkHover),
         },
@@ -175,17 +218,12 @@ export default styles(
           color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonOnTone),
         },
       ),
-      /* Framed, for a control beside a field, with the same 6% wash Button
-         rests on, so a row of an icon button and a text button reads as one
-         kind of control. */
+      /* Framed, for a control beside a field, with no fill, as Button has, so a
+         row of an icon button and a text button reads as one kind of control. */
       rule(
         { emphasis: 'outlined' },
         {
-          backgroundColor: first(
-            own.iconButtonPressedFill,
-            hook.backgroundColor,
-            mix(own.iconButtonTone, 6, 'transparent'),
-          ),
+          backgroundColor: first(own.iconButtonPressedFill, hook.backgroundColor, 'transparent'),
           borderColor: first(hook.borderColor, own.iconButtonEdge),
           color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
         },
@@ -227,11 +265,14 @@ export default styles(
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       /* **Pending: the icon stays where it is, unseen, and a ring turns over
          it**, as on Button. The ring is the `spinner` part, drawn only while
          pending. */
-      rule({ pending: true }, { web: { cursor: 'progress' }, position: 'relative' }),
+      rule({ pending: true }, { web: { cursor: 'progress' } }),
     ]),
     /* **Pressed by a Button Group, the solid fill**, as a Button takes it. The
        web group writes these hooks onto a pressed button's control. A phone's
@@ -281,6 +322,81 @@ export default styles(
     ]),
     keyframes('helix-icon-button-turn', { to: { rotate: '1turn' } }),
     include(iconButtonFloating),
+    on('button', [
+      rule(
+        { active: true, formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 16, 'transparent'),
+          ),
+        },
+      ),
+      /* A step past the hover fill, which way the tone's press goes. A phone
+         reads no relative color, and stays on the hover fill. */
+      web([
+        rule(
+          { active: true, emphasis: 'solid', formDisabled: false },
+          {
+            backgroundColor: first(
+              own.iconButtonPressedFill,
+              hook.backgroundColor,
+              fn('oklch', [
+                'from',
+                own.iconButtonFillHover,
+                sum('l', product('0.05', own.iconButtonPressWay('-1'))),
+                'c',
+                'h',
+              ]),
+            ),
+          },
+        ),
+      ]),
+      native([
+        rule(
+          { active: true, emphasis: 'solid', formDisabled: false },
+          {
+            backgroundColor: first(
+              own.iconButtonPressedFill,
+              hook.backgroundColor,
+              own.iconButtonFillHover,
+            ),
+          },
+        ),
+      ]),
+      rule(
+        { active: true, emphasis: 'outlined', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 20, 'transparent'),
+          ),
+        },
+      ),
+      rule(
+        { active: true, emphasis: 'subtle', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 30, 'transparent'),
+          ),
+        },
+      ),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'button' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
     /* A control is not printed. */
     on('host', [rule({ print: true }, { display: 'none' })]),
   ],

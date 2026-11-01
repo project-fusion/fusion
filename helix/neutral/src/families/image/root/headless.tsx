@@ -1,4 +1,15 @@
-import { bare, headless, Image, oneOf, Slot, string, View, web } from '../../../render.js'
+import {
+  bare,
+  headless,
+  Image,
+  oneOf,
+  Path,
+  Slot,
+  string,
+  Svg,
+  View,
+  web,
+} from '../../../render.js'
 
 /**
  * Image's headless tier: a picture that shows a placeholder while it loads
@@ -55,7 +66,22 @@ export default headless('image', {
       </View>
       {/* Drawn only once the picture fails, so a screen reader reaches it then. */}
       <View part="fallback">
-        <Slot name="fallback" />
+        <Slot name="fallback">
+          <View
+            part="fallback-mark"
+            platform="web"
+          />
+          <Svg
+            part="fallback-glyph"
+            platform="native"
+            viewBox="0 0 24 24"
+          >
+            <Path
+              d="M4 5h16v14H4zM4 16l5-5 3 3M20 15l-3-3M15 5 9 19"
+              part="fallback-line"
+            />
+          </Svg>
+        </Slot>
       </View>
     </>
   ),

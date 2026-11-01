@@ -42,8 +42,8 @@ export default styles(
   {
     prefix: 'rating',
     hooks: {
-      color: token('color-warning'),
-      emptyColor: token('color-border'),
+      color: token('color-warning-mark'),
+      emptyColor: token('color-foreground-subtle'),
       gap: token('space-2xs'),
       mark: null,
       size: token('size-icon-md'),
@@ -152,7 +152,7 @@ export default styles(
       rule({ formDisabled: true }, { web: { cursor: 'not-allowed' } }),
     ]),
     on('marks', [
-      rule({ formDisabled: true }, { opacity: 0.5 }),
+      rule({ formDisabled: true }, { opacity: token('opacity-disabled') }),
       /* A readout is not a control: nothing to press, so nothing that looks pressable. */
       rule({ readonly: true }, { web: { cursor: 'default' } }),
     ]),
@@ -160,13 +160,30 @@ export default styles(
     on({ part: 'mark', selector: '[data-slotted] [part="mark"]' }, [
       web([rule({ backgroundColor: 'transparent', maskImage: 'none' })]),
     ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Along the row only, where stars sit side by side. */
+    on({ after: 'option' }, [
+      web([
+        rule({
+          content: '""',
+          insetBlock: quotient(difference(token('size-target'), '100%'), '-2'),
+          insetInline: 0,
+          position: 'absolute',
+        }),
+      ]),
+    ]),
     include(printExact),
     /* Forced colors paint every background Canvas, and a mark is a
        background seen through its shape, so the filled marks take Highlight
        and the empty ones GrayText. */
     on(['track', 'fill'], [rule({ forcedColors: true }, { forcedColorAdjust: 'none' })]),
-    on('track', [rule({ forcedColors: true }, { color: 'GrayText' })]),
+    /* A star filled and a star empty are told apart by more than the system color. */
+    on('track', [
+      rule({ forcedColors: true }, { color: 'GrayText', opacity: token('opacity-disabled') }),
+    ]),
     on('fill', [rule({ forcedColors: true }, { color: 'Highlight' })]),
+    /* Wrong, and the empty marks say so, as a field's edge does. */
+    on('track', [rule({ invalid: true }, { color: token('color-danger') })]),
     /* A phone draws the star as a vector the mark's size, in its color, and
        a circle as the mark itself. */
     on('star', [

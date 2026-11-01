@@ -20,7 +20,7 @@ export default styles(
   {
     prefix: 'code',
     hooks: {
-      backgroundColor: mix(token('color-foreground'), 6, 'transparent'),
+      backgroundColor: token('color-well'),
       fontFamily: token('font-mono'),
       foregroundColor: mix(token('color-foreground'), 30, token('color-foreground-muted')),
       padding: product(token('space-2xs'), 0.5),
@@ -33,9 +33,9 @@ export default styles(
     on('host', [rule({ display: 'inline' })]),
     on('code', [
       rule({
-        /* A wash of the ink, not a surface: `surface-raised` is absolute
-           lightness and stepped 1.09 against the page in light, 1.48 in dark.
-           A mix composites, so 6% measures 1.14 and 1.10. */
+        /* The well, which composites the same on either scheme: `surface-raised`
+           is absolute lightness and stepped 1.09 against the page in light,
+           1.48 in dark. */
         backgroundColor: hook.backgroundColor,
         borderRadius: hook.radius,
         /* A fragment longer than the line, a path or an identifier, breaks

@@ -12,7 +12,9 @@ import root from './headless.js'
  *
  * **A lift in the light, and a hairline in the dark**, under `elevated`,
  * because a shadow is a light-mode device. `filled` is told apart by its own
- * color, and `plain` has no frame.
+ * color, and `plain` has no frame. **`outlined` is an edge and no fill**, so the
+ * page shows through, and an unset card keeps its fill inside the same edge. A
+ * `material` comes after and still sets the fill.
  *
  * **Served, the actions stand at the end of their line already.** Before the
  * element is defined there is no row around them, so the card is a grid of
@@ -39,7 +41,7 @@ export default styles(
       mediaFit: 'cover',
       mediaSize: '12rem',
       padding: token('space-control'),
-      radius: token('radii-lg'),
+      radius: token('radii-md'),
       shadow: token('shadow-surface'),
     },
     own: { cardInset: null, cardMedia: null, headingInk: null },
@@ -81,6 +83,7 @@ export default styles(
           borderColor: scheme('transparent', token('color-border')),
         },
         filled: { '--card-shadow': 'none', borderColor: 'transparent' },
+        outlined: { backgroundColor: hook.backgroundColor('transparent') },
         plain: {
           '--card-shadow': 'none',
           backgroundColor: 'transparent',
@@ -101,6 +104,8 @@ export default styles(
       rule({ reducedMotion: true }, { transition: 'none' }),
       variants('material', {
         glass: {
+          /* Full ink: muted ink over a busy page falls under 4.5:1 through glass. */
+          color: hook.color(token('color-foreground')),
           backdropFilter: hook.backdrop(token('material-backdrop')),
           backgroundColor: hook.backgroundColor(token('material-translucent')),
         },

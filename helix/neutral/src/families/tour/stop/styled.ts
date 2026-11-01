@@ -5,7 +5,7 @@ import stop from './headless.js'
 /**
  * Tour Stop's styled tier.
  *
- * **The panel is Popover's panel by another name**, on purpose: the raised
+ * **The panel is Popover's panel by another name**, on purpose: the overlay
  * surface, a hairline edge, the floating shadow, and the house's small
  * radius, as wide as what it holds and never wider than 22rem. It grows
  * rather than scrolls. A dialog stop stands in the middle of the window,
@@ -30,7 +30,7 @@ export default styles(
       bubbleSize: '22rem',
       padding: token('space-md'),
       shadow: token('shadow-floating'),
-      surfaceColor: token('color-surface-raised'),
+      surfaceColor: token('color-surface-overlay'),
     },
     stylesheet: 'tour/stop/tour-stop.generated.css',
   },

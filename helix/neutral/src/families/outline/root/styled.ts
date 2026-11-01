@@ -40,7 +40,7 @@ export default styles(
       linkCurrentColor: token('color-foreground'),
       linkCurrentWeight: token('weight-semibold'),
       linkFontSize: token('text-xs'),
-      linkHoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      linkHoverBackgroundColor: token('color-hover'),
       linkHoverColor: token('color-foreground'),
       linkPaddingBlock: token('space-2xs'),
       linkPaddingInline: token('space-sm'),
@@ -156,6 +156,12 @@ export default styles(
       on({ part: 'nav', selector: '::slotted(a)' }, [
         web([rule({ ...link, marginInlineStart: hook.rail(token('border-thick')) })]),
       ]),
+      /* Written out, as the link above. Rows sit against each other, so a box reaching
+         past a row would take the press from the row beside it. On a touch screen the
+         row itself reaches the target. */
+      on({ part: 'nav', selector: '::slotted(a)' }, [
+        web([rule({ coarsePointer: true }, { minBlockSize: token('size-target') })]),
+      ]),
       /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a):hover' }, [
         web([
@@ -181,7 +187,12 @@ export default styles(
       /* The links a phone draws, with the same values. */
       on('link', [
         native([
-          rule({ ...link, marginInlineStart: rail, position: 'relative' }),
+          rule({
+            ...link,
+            marginInlineStart: rail,
+            minBlockSize: token('size-target'),
+            position: 'relative',
+          }),
           rule({ also: { 'link-current': true } }, current),
           rule({ also: { 'link-depth-2': true } }, level2),
           rule({ also: { 'link-depth-3': true } }, level3),

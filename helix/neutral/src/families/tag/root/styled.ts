@@ -11,9 +11,9 @@ import root from './headless.js'
  * region it is in, 24px at `md` and 20px at `sm`, against a 40px control and
  * a 32px dense one.
  *
- * **Every tone is one status color**, tinted for the fill and the edge and
- * deepened toward the foreground for the label. The fill and the edge mix in
- * sRGB: measured in Chromium at 14 percent, an OKLab fill separated from a
+ * **Every tone is one status color**, tinted for the fill and
+ * deepened toward the foreground for the label, with no edge at rest. The fill
+ * mixes in sRGB: measured in Chromium at 14 percent, an OKLab fill separated from a
  * near-black page by 4 to 10 sRGB levels, where sRGB gives 26 to 37 in light
  * and dark alike. The label mixes in OKLab, where four of five tones at full
  * strength failed 4.5:1 at 12px on their own wash.
@@ -41,7 +41,7 @@ export default styles(
     hooks: ({ own }) => ({
       backgroundColor: own.tagFill,
       borderColor: own.tagEdge,
-      disabledOpacity: 0.5,
+      disabledOpacity: token('opacity-disabled'),
       fontWeight: token('weight-medium'),
       foregroundColor: own.tagLabel,
       gap: token('space-2xs'),
@@ -77,6 +77,7 @@ export default styles(
         fontWeight: hook.fontWeight,
         gap: hook.gap,
         lineHeight: token('leading-tight'),
+        maxInlineSize: '100%',
         paddingInline: own.tagInset,
         whiteSpace: 'nowrap',
         own: {
@@ -85,7 +86,7 @@ export default styles(
           tagText: token('text-xs'),
           tagInset: token('space-xs'),
           tagFill: mix(own.tagColor, 14, token('color-background'), 'srgb'),
-          tagEdge: mix(own.tagColor, 28, token('color-background'), 'srgb'),
+          tagEdge: 'transparent',
           tagLabel: mix(own.tagColor, 55, token('color-foreground')),
         },
       }),
@@ -142,6 +143,7 @@ export default styles(
         display: 'inline-flex',
         marginInlineEnd: product(token('space-2xs'), '-1'),
         padding: token('space-2xs'),
+        position: 'relative',
       }),
       rule({ shape: 'pill' }, { borderRadius: token('radii-full') }),
       rule({ hover: true }, { backgroundColor: mix(own.tagColor, 20, 'transparent') }),
@@ -153,6 +155,18 @@ export default styles(
         },
       ),
       rule({ has: 'disabled' }, { web: { cursor: 'not-allowed' } }),
+      rule({ active: true }, { backgroundColor: token('color-press') }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+       moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'dismiss' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     /* A `<slot>` is `display: contents` and draws no box to end in an
        ellipsis, and the block it becomes is a flex item, which keeps an
@@ -172,7 +186,13 @@ export default styles(
     /* An icon in the label sits on the middle of the line, not on its
        baseline. */
     on({ region: 'default', slotted: 'helix-icon' }, [rule({ verticalAlign: 'middle' })]),
-    on('dismiss-mark', [rule({ blockSize: '0.85em', inlineSize: '0.85em' })]),
+    /* From the icon steps, so the mark follows density with the tag around it. */
+    on('dismiss-mark', [
+      rule({
+        blockSize: product(token('size-icon-tight'), 0.75),
+        inlineSize: product(token('size-icon-tight'), 0.75),
+      }),
+    ]),
     /* The category a tag belongs to, before the label it qualifies, every
        declaration on what is passed in, so an empty `start` draws nothing. */
     on({ region: 'start', slotted: '*' }, [

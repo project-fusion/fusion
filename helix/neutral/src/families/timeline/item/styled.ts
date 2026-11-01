@@ -88,6 +88,8 @@ export default styles(
       ['transparent', token('space-2xs'), token('space-xs')],
     )
     return [
+      /* A long unbroken word breaks inside the column it was given. */
+      on('host', [web([rule({ overflowWrap: 'anywhere' })])]),
       on('host', [
         web([
           rule([

@@ -26,7 +26,7 @@ export default styles(
       backgroundColor: token('color-primary-surface'),
       color: token('color-foreground-on-primary'),
       gap: token('space-sm'),
-      shadow: token('shadow-md'),
+      shadow: token('shadow-raised'),
       size: token('size-control'),
       stagger: null,
       travel: token('space-md'),

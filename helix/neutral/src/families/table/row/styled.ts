@@ -1,4 +1,4 @@
-import { difference, measured, mix, native, product, token, web } from '../../../style.js'
+import { difference, measured, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -32,16 +32,16 @@ export default styles(
       dropIndicatorSize: token('border-thick'),
       expandColor: token('color-foreground-muted'),
       gripColor: token('color-foreground-muted'),
-      gripDisabledOpacity: 0.4,
+      gripDisabledOpacity: token('opacity-disabled'),
       headingBackgroundColor: token('color-background'),
       indent: token('space-lg'),
-      rowDisabledOpacity: 0.5,
-      rowHoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      rowDisabledOpacity: token('opacity-disabled'),
+      rowHoverBackgroundColor: token('color-hover'),
     },
     stylesheet: 'table/row/table-row.generated.css',
   },
   ({ hook, on, rule }) => {
-    const wash = mix(token('color-primary'), 10, token('color-background'), 'srgb')
+    const wash = token('color-primary-subtle')
     const ring = [
       rule(
         { focusVisible: true },

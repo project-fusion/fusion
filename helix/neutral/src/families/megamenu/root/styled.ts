@@ -3,7 +3,6 @@ import {
   fn,
   list,
   measured,
-  mix,
   native,
   product,
   quotient,
@@ -54,7 +53,7 @@ export default styles(
       triggerFontSize: token('text-sm'),
       triggerFontWeight: token('weight-medium'),
       triggerHoverColor: token('color-foreground'),
-      triggerOpenBackgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+      triggerOpenBackgroundColor: token('color-hover'),
       triggerOpenColor: token('color-foreground'),
       triggerPaddingInline: token('space-xs'),
       triggerRadius: token('radii-sm'),
@@ -123,12 +122,15 @@ export default styles(
           gap: token('space-2xs'),
           minBlockSize: token('size-control-tight'),
           paddingInline: hook.triggerPaddingInline,
+          position: 'relative',
           transition: list(
             ['background-color', fast, token('easing-standard')],
             ['color', fast, token('easing-standard')],
           ),
         }),
         rule({ hover: true }, { color: hook.triggerHoverColor }),
+        /* Before the open rule, which holds over a press. */
+        rule({ active: true }, { backgroundColor: token('color-press') }),
         rule(
           { focusVisible: true },
           {
@@ -145,6 +147,17 @@ export default styles(
           },
         ),
         rule({ reducedMotion: true }, { transition: 'none' }),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. */
+      on({ after: 'trigger' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('surface', [
         rule({

@@ -2,7 +2,6 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAppHeader } from '@fusion.dev/helix-headless/app-header'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles } from './app-header-root.generated.css.js'
 
 /**
@@ -124,7 +123,7 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
   @property({ reflect: true, type: Boolean })
   sticky = false
 
-  static override styles: CSSResultGroup = [densityStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

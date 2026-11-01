@@ -89,7 +89,7 @@ export default styles(
     on('tree', [
       rule({ display: 'flex', flexDirection: 'column' }),
       /* Rows that are already there stay, and dim, while a new set arrives. */
-      rule({ loading: true }, { opacity: 0.5 }),
+      rule({ loading: true }, { opacity: token('opacity-busy') }),
     ]),
     /* The copy of a row a pointer drags, drawn in the top layer and raised over
        the page while the row itself stays in place, faded. It has no transition,

@@ -48,8 +48,8 @@ export default styles(
       blockSize: '24em',
       borderColor: token('color-border'),
       headerBackgroundColor: token('color-surface-raised'),
-      matchBackgroundColor: token('color-accent-subtle'),
-      radius: token('radii-lg'),
+      matchBackgroundColor: token('color-primary-subtle'),
+      radius: token('radii-md'),
     },
     stylesheet: 'object-inspector/root/object-inspector-root.generated.css',
   },
@@ -206,6 +206,11 @@ export default styles(
       ),
       /* What a filter matched, under the ground the active row takes. */
       rule({ also: { 'row-match': true } }, { backgroundColor: hook.matchBackgroundColor }),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches the
+         target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
+      rule({ hover: true }, { backgroundColor: token('color-hover') }),
     ]),
     on('toggle', [
       rule({

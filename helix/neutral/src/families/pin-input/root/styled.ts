@@ -41,7 +41,7 @@ export default styles(
     include(fieldStacked),
     on('host', [rule({ display: 'flex', flexDirection: 'column', gap: token('space-2xs') })]),
     on('field', [
-      rule({ alignSelf: 'start', display: 'flex', gap: hook.gap }),
+      rule({ alignSelf: 'start', display: 'flex', gap: hook.gap, maxInlineSize: '100%' }),
       /* The field that holds the code lies over the row. */
       native([rule({ position: 'relative' })]),
     ]),
@@ -59,12 +59,15 @@ export default styles(
         boxSizing: 'border-box',
         color: hook.cellColor,
         display: 'flex',
+        /* The box gives up width in a narrow column, so the row stays inside it. */
+        flex: '0 1 auto',
         fontFamily: token('font-sans'),
         fontSize: hook.cellFontSize,
         fontVariantNumeric: 'tabular-nums',
         fontWeight: token('weight-medium'),
         inlineSize: hook.cellSize,
         justifyContent: 'center',
+        minInlineSize: 0,
         textAlign: 'center',
         transition: ['border-color', token('duration-fast'), token('easing-standard')],
       }),
@@ -81,7 +84,10 @@ export default styles(
       /* Under the pointer the edge is muted, over the ring's edge and a
          wrong box's alike. */
       rule({ formDisabled: false, hover: true }, { borderColor: token('color-foreground-muted') }),
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       rule({ readonly: true }, { backgroundColor: 'transparent' }),
       /* A bullet sits high in a small box, so a masked code is a step larger. */
       rule({ mask: true }, { fontSize: token('text-xl') }),
