@@ -49,6 +49,8 @@
    direction rather than a sign of one, since nothing about it answers the
    pointer. */
 .insightNext helix-icon {
+  --icon-size: var(--helix-size-icon-sm);
+
   transition: translate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

@@ -355,6 +355,8 @@ helix-text[tone="warning"][emphasis="muted"] {
    the color, matching the component exactly. */
 [data-button] {
   --_button-edge: var(--helix-color-border);
+  /* An icon beside the words, at the size the element draws it. */
+  --icon-size: 1.15em;
   min-inline-size: var(--button-inline-size, auto);
   max-inline-size: 100%;
   /* The solid fill, separate from the tone, and it has to be separate. Pointing

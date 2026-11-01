@@ -158,8 +158,12 @@
 
 /* The fallback caret, sized. An `<svg>` with no dimensions fills the box it is
    given, and this one sat in a flex trigger with room to spare: measured at 247
-   pixels wide before this. */
-[part="indicator"] {
+   pixels wide before this. A caret of the page's own takes the same size and
+   ink, so swapping it changes the glyph and nothing else. */
+[part="indicator"],
+::slotted([slot="indicator"]) {
+  --icon-size: var(--helix-size-icon-tight);
+
   block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;

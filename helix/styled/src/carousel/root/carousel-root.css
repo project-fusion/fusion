@@ -198,8 +198,10 @@
 [part="next"] svg,
 ::slotted([slot="previous-icon"]),
 ::slotted([slot="next-icon"]) {
-  block-size: 1em;
-  inline-size: 1em;
+  --icon-size: var(--helix-size-icon-tight);
+
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* An icon slotted in place of a caret turns on a right-to-left page as the

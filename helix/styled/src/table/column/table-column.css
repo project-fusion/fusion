@@ -118,9 +118,11 @@
   cursor: grabbing;
 }
 
+/* The row's and the list item's grip, which the heading's smaller type would
+   otherwise draw a pixel smaller. */
 [part="grip-mark"] {
-  block-size: 1em;
-  inline-size: 1em;
+  block-size: var(--helix-text-control);
+  inline-size: var(--helix-text-control);
 }
 
 /* **A strip on the edge, wider than the line it draws**, because a one pixel

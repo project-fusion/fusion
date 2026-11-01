@@ -103,6 +103,9 @@
    both slotted into `tags` and a consumer mixes them, so an X drawn to a
    different rule in each is two marks that should be one.
  *
+   Three quarters of `icon-sm`, which the chip's own icon size does not move, is
+   the 12 a tag draws.
+
    It was `--helix-size-icon-tight`, and that token cannot do this job here. It
    is declared once at the root as `icon * 0.8`, and a custom property is
    substituted where it is *declared*, so it carries the root's icon size
@@ -112,8 +115,8 @@
    as an X far too big for the chip. `Breadcrumb` records the same trap with
    `1lh`, which is the same mistake in the other unit. */
 [part="dismiss-mark"] {
-  block-size: var(--icon-size, 0.85em);
-  inline-size: var(--icon-size, 0.85em);
+  block-size: var(--icon-size, calc(var(--helix-size-icon-sm) * 0.75));
+  inline-size: var(--icon-size, calc(var(--helix-size-icon-sm) * 0.75));
 }
 
 /* The well is mixed from the ink the control is already drawn in, so the hover

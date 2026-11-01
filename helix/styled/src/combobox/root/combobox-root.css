@@ -89,8 +89,12 @@
    a step apart: this drew at the full icon size and Select's at 0.8 of it, so
    the same mark in the same kind of field came out visibly bigger here. A caret
    is not content, it is a hint about what the control does, and Select's own
-   note is the one that measured the case. */
-[part="indicator"] {
+   note is the one that measured the case. A caret of the page's own takes the
+   same size and ink. */
+[part="indicator"],
+::slotted([slot="indicator"]) {
+  --icon-size: var(--helix-size-icon-tight);
+
   block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;

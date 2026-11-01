@@ -105,6 +105,7 @@
 }
 
 .heroInstall helix-copy-button {
+  --copy-button-icon-size: var(--helix-size-icon-sm);
   /*
  * Sized to the line, not to a control.
  *
