@@ -61,10 +61,9 @@ export const MixinControlSurface = <T extends Constructor<HelixElement>>(Base: T
     /**
      * Which color the control is drawn in, by what it means.
      *
-     * Every tone, the four statuses included. A tag reports a state and a
-     * button performs an action: a success button and a warning button are not
-     * things anybody writes, and offering them invites a page where the color
-     * of a control means nothing in particular. `accent` is the second
+     * Every tone, the four statuses included, drawn and held by the specs.
+     * Reach for `danger` on a control most often: a color on a button should
+     * say what pressing it does. `accent` is the second
      * emphasis: the second color a theme names, and the brand itself until one
      * is named. It used to be a rotation off the brand seed whether or not
      * anybody asked for a second color, which handed every theme a complement
