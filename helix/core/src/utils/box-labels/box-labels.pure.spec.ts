@@ -118,4 +118,17 @@ describe('the box labels', () => {
       }
     }
   })
+
+  test('a category is left out only where its ink meets another label', () => {
+    const place = (category: boolean): string[] => {
+      const row = (at: number, text: string) => ({ at, category, text })
+      const y = { name: '', ticks: [row(-1, 'North'), row(0, 'South')] }
+      const seen = ([, up]: readonly number[]) => ({ depth: 0, x: 0, y: -(up ?? 0) * 0.112 })
+      return boxLabels(seen, { x: { name: '', ticks: [] }, y, z: { name: '', ticks: [] } }, SIZES)
+        .map((label) => label.text)
+        .sort()
+    }
+    expect(place(true)).toEqual(['North', 'South'])
+    expect(place(false)).toEqual(['North'])
+  })
 })
