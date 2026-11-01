@@ -36,11 +36,19 @@ tags:
     timeout: 5000
 - openLink: helix://drawer/list/preview
 - extendedWaitUntil:
-    visible: .*Quarterly report.*
+    visible: Open recent files
     timeout: 15000
-# Half open, a drag up on the list opens the sheet to the whole.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Open recent files
+- extendedWaitUntil:
+    visible: .*Quarterly report.*
+    timeout: 5000
+# Half open, a drag up on the list opens the sheet to the whole. The list's
+# first row is the one well inside the window.
 - swipe:
-    from: .*Launch plan.*
+    from: .*Quarterly report.*
     direction: UP
     duration: 400
 - waitForAnimationToEnd:
@@ -59,10 +67,12 @@ tags:
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 3000
+# Named points and a quick drag: from a row, Maestro's drag to 90% of the screen
+# ends short of what takes a whole sheet out.
 - swipe:
-    from: .*Hiring tracker.*
-    direction: DOWN
-    duration: 300
+    start: 50%, 78%
+    end: 50%, 99%
+    duration: 200
 - extendedWaitUntil:
     notVisible: .*Quarterly report.*
     timeout: 5000
