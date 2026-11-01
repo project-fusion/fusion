@@ -31,6 +31,7 @@ const FORM_CONTROLS = new Set([
   'helix-pin-input',
   'helix-radio-group',
   'helix-rating',
+  'helix-select',
   'helix-slider',
   'helix-switch',
   'helix-textarea',
