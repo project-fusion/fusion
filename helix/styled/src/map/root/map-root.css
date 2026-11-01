@@ -144,7 +144,7 @@
    so the edge of the page or a clipping parent cannot cut it. */
 [part="region"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-ring) * -1);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* **Printed as it stands rather than hidden.** A map is the content of the page

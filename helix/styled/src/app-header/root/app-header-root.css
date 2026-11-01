@@ -244,10 +244,6 @@ slot[name="start"]::slotted(*) {
 
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. Where the control is already that size the box sits inside it. */
-[part="toggle"] {
-  position: relative;
-}
-
 [part="toggle"]::after {
   content: "";
   inset: calc((var(--helix-size-target) - 100%) / -2);

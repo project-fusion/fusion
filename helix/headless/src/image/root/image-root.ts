@@ -409,6 +409,16 @@ export class HelixHeadlessImage extends HelixElement {
     return this.image?.naturalWidth ?? 0
   }
 
+  /** What a failed image shows, a mark where the `fallback` slot is empty. */
+  protected renderFallback(): TemplateResult {
+    return html`<span
+      part="fallback"
+      aria-hidden=${this.status === 'error' ? nothing : 'true'}
+      ?hidden=${this.status !== 'error'}
+      ><slot name="fallback"><span part="fallback-mark"></span></slot
+    ></span>`
+  }
+
   protected override render(): TemplateResult {
     return html`<img
         part="image"
@@ -430,12 +440,7 @@ export class HelixHeadlessImage extends HelixElement {
         ?hidden=${this.status !== 'loading' || this.waiting}
         ><slot name="placeholder"></slot
       ></span>
-      <span
-        part="fallback"
-        aria-hidden=${this.status === 'error' ? nothing : 'true'}
-        ?hidden=${this.status !== 'error'}
-        ><slot name="fallback"><span part="fallback-mark"></span></slot
-      ></span>`
+      ${this.renderFallback()}`
   }
 }
 

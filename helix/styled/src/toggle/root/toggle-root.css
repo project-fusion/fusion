@@ -37,10 +37,6 @@
 
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. Where the control is already that size the box sits inside it. */
-[part="item"] {
-  position: relative;
-}
-
 [part="item"]::after {
   content: "";
   inset: calc((var(--helix-size-target) - 100%) / -2);

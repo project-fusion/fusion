@@ -1,0 +1,12 @@
+/* What a collection says when its rows did not load: the same line in the danger
+   ink, since it is news you act on. A family writes its own color hook and inset
+   over this. */
+[part="error"] {
+  color: var(--helix-color-danger);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  padding-block: var(--_collection-inset-block, var(--helix-space-md));
+  padding-inline: var(--_collection-inset-inline, var(--helix-space-sm));
+  text-align: center;
+}
