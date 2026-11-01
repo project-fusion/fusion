@@ -23,6 +23,9 @@
 /* An icon before the label, or a count after it, set off by a step. The slots
    are bare, so a toggle with neither lays out as it did. */
 ::slotted([slot="start"]) {
+  /* The small icon: a segment is 30 tall in its track, and the default 20 outweighed
+     the label beside it. */
+  --icon-size: var(--helix-size-icon-sm);
   margin-inline-end: var(--helix-space-xs);
 }
 

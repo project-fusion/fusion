@@ -41,16 +41,22 @@ slot[name="end"]::slotted(*) {
 /* The trigger is a mark inside the field rather than a button beside it: a
    second frame inside the first is two controls where a reader sees one. */
 [part="trigger"] {
-  --icon-size: var(--helix-size-icon);
+  /* The small icon, as Date Input's: 20 filled a 20 tall button. The box is the
+     target, and the negative margin keeps it from widening the field. */
+  --icon-size: var(--helix-size-icon-sm);
   all: unset;
 
   align-items: center;
+  block-size: var(--helix-size-target);
   /* Restored in the same rule, `all` having taken it back to `content-box`. */
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
   flex: none;
+  inline-size: var(--helix-size-target);
+  justify-content: center;
+  margin: calc((var(--helix-size-icon-sm) - var(--helix-size-target)) / 2);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
