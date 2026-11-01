@@ -11,7 +11,7 @@
   display: flex;
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-md));
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
   /* Figures of one width, so a segment does not move the ones after it as its
      number changes under the arrow keys. */
   font-variant-numeric: tabular-nums;

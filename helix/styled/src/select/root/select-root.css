@@ -21,10 +21,11 @@
   cursor: pointer;
   display: flex;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
+  font-weight: var(--helix-weight-medium);
   gap: var(--helix-space-xs);
   justify-content: space-between;
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--helix-space-field);
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

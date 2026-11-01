@@ -29,7 +29,7 @@
   min-block-size: var(--_filter-input-size);
   /* Room above and below a token, which a fixed-height field does not need. */
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--filter-input-padding-inline, var(--helix-space-xs));
+  padding-inline: var(--filter-input-padding-inline, var(--helix-space-field));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);

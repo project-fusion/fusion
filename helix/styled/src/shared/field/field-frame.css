@@ -73,11 +73,11 @@
    back to `content-box`, and the `border-box` every shadow root is given comes
    from a rule this one outranks, so it is restored here.
 
-   `text-md`, and one size for every field. The value is content rather than a
-   caption: the label above it is `text-sm` in `field.css`, and a value set at
-   the label's size reads as a second caption in a box. Settled 14 Sep 2026
-   from a split nothing had recorded a reason for, Input, Textarea and Filter
-   Input at `sm` and the four pickers at `md`. On a touch screen the type is
+   `--helix-text-field`, one size for every field and a step over the label in
+   `field.css` at every density: a value set at the label's size reads as a
+   second caption in a box. Settled 14 Sep 2026 at `text-md` everywhere, and
+   October 31, 2026 for `sm`, where label 12 and value 13 keep the step and sit
+   beside a 12 button. On a touch screen the type is
    at least `--helix-text-field-min`, 16px, the size below which iOS Safari
    zooms the page into a focused field. */
 [part="control"] {
@@ -86,7 +86,7 @@
   color: var(--helix-color-foreground);
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-md));
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
 }

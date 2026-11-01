@@ -23,6 +23,7 @@ const SRC = join(import.meta.dir, '..', '..')
 const FIELDS: [sheet: string, selector: string][] = [
   ['shared/field/field-frame.css', '[part="control"] {'],
   ['shared/field/field-segments.css', '[part="segments"] {'],
+  ['select/root/select-root.css', '[part="trigger"] {'],
   ['listbox/root/listbox-root.css', '[part="search-field"] {'],
   ['command/root/command-root.css', 'helix-listbox::part(search-field) {'],
   ['color-picker/root/color-picker-root.css', '[part="value"] {'],
@@ -54,9 +55,9 @@ describe('a field on a touch screen', () => {
 
   test('the floor is 16px under a coarse pointer and 0 otherwise', () => {
     const modes = readFileSync(join(SRC, '..', '..', 'styles', 'src', '_modes.css'), 'utf8')
-    expect(modes).toMatch(/:root \{\s*--_helix-text-field-min: 0px;\s*\}/)
+    expect(modes).toMatch(/:root \{\s*--_helix-text-field-min: 0px;/)
     expect(modes).toMatch(
-      /@media \(pointer: coarse\) \{\s*:root \{\s*--_helix-text-field-min: 16px;\s*\}\s*\}/,
+      /@media \(pointer: coarse\) \{\s*:root \{\s*--_helix-text-field-min: 16px;/,
     )
   })
 })

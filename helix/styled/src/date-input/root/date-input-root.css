@@ -21,7 +21,7 @@
   gap: var(--helix-space-2xs);
   min-block-size: var(--helix-size-control);
   padding-block: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--helix-space-field);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);

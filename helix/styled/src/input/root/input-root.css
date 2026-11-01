@@ -15,7 +15,7 @@
   color: var(--helix-color-foreground-muted);
   display: flex;
   gap: var(--helix-space-2xs);
-  padding-inline: var(--input-padding-inline, var(--helix-space-xs));
+  padding-inline: var(--input-padding-inline, var(--helix-space-field));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);

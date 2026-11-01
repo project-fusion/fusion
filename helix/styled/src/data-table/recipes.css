@@ -66,7 +66,10 @@
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-xs);
+  --helix-text-control: var(--helix-text-control-sm);
+  --helix-text-field: var(--helix-text-sm);
+  --helix-text-field-label: var(--helix-text-xs);
+  --helix-space-field: var(--helix-space-xs);
   --helix-space-control: var(--helix-space-sm);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
@@ -81,7 +84,10 @@
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-sm);
+  --helix-text-control: var(--helix-text-control-md);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-sm);
   --helix-space-control: var(--helix-space-md);
   --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-icon: var(--helix-size-icon-md);
@@ -96,7 +102,10 @@
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-md);
+  --helix-text-control: var(--helix-text-control-lg);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-md);
   --helix-space-control: var(--helix-space-lg);
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-icon: var(--helix-size-icon-lg);

@@ -10,3 +10,8 @@
      the control and the description is about what the words say. */
   padding-inline-start: calc(var(--_field-control-inline-size, 0px) + var(--helix-space-xs));
 }
+
+/* The words beside a mark read at the density they are in, as a button's do. */
+[part="label"] {
+  font-size: var(--helix-text-control);
+}

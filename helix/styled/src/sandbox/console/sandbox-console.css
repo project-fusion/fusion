@@ -20,6 +20,19 @@
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-switch: var(--helix-size-switch-sm);
+  --helix-size-tag: var(--helix-size-tag-sm);
+  --helix-text-control: var(--helix-text-control-sm);
+  --helix-space-control: var(--helix-space-sm);
+  --helix-text-field: var(--helix-text-sm);
+  --helix-text-field-label: var(--helix-text-xs);
+  --helix-space-field: var(--helix-space-xs);
 
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

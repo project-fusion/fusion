@@ -629,15 +629,6 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
    40/13/16 and 48/14/24 for height, type and inset, identical for an `<a
    data-button>` and a `<helix-button>` at every stop. */
 
-/* A checkbox's label reads at the density it is in, the same as a button's. */
-[data-density="sm"] helix-checkbox::part(label) {
-  font-size: var(--helix-text-xs);
-}
-
-[data-density="lg"] helix-checkbox::part(label) {
-  font-size: var(--helix-text-md);
-}
-
 [data-button][aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
@@ -672,8 +663,11 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: calc(var(--helix-text-sm) * var(--helix-density, 1));
+  --helix-text-control: calc(var(--helix-text-control-md) * var(--helix-density, 1));
   --helix-space-control: calc(var(--helix-space-md) * var(--helix-density, 1));
+  --helix-text-field: calc(var(--helix-text-md) * var(--helix-density, 1));
+  --helix-text-field-label: calc(var(--helix-text-sm) * var(--helix-density, 1));
+  --helix-space-field: calc(var(--helix-space-sm) * var(--helix-density, 1));
   --helix-size-checkbox: calc(var(--helix-size-checkbox-md) * var(--helix-density, 1));
   --helix-size-icon: calc(var(--helix-size-icon-md) * var(--helix-density, 1));
   --helix-size-control: calc(var(--helix-size-control-md) * var(--helix-density, 1));
@@ -688,8 +682,11 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-xs);
+  --helix-text-control: var(--helix-text-control-sm);
   --helix-space-control: var(--helix-space-sm);
+  --helix-text-field: var(--helix-text-sm);
+  --helix-text-field-label: var(--helix-text-xs);
+  --helix-space-field: var(--helix-space-xs);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
@@ -697,7 +694,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
   --helix-size-tag: var(--helix-size-tag-sm);
 }
 
-/* *Every stop declares all seven.** Each re-declares from its own step rather
+/* *Every stop declares every step.** Each re-declares from its own step rather
    than inheriting, which is what makes nesting not compound. Omit one and it
    falls through to the `[data-density]` rule above and keeps that rule's
    `--helix-density` multiplier while the rest of the stop does not: measured
@@ -711,8 +708,11 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-sm);
+  --helix-text-control: var(--helix-text-control-md);
   --helix-space-control: var(--helix-space-md);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-sm);
   --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-size-control: var(--helix-size-control-md);
@@ -727,8 +727,11 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-text-control: var(--helix-text-md);
+  --helix-text-control: var(--helix-text-control-lg);
   --helix-space-control: var(--helix-space-lg);
+  --helix-text-field: var(--helix-text-md);
+  --helix-text-field-label: var(--helix-text-sm);
+  --helix-space-field: var(--helix-space-md);
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-size-control: var(--helix-size-control-lg);
@@ -757,7 +760,7 @@ helix-toggle::part(item) {
   /* Fills the segment rather than sitting at its label width inside it. */
   flex: 1 1 auto;
   font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
   justify-content: center;
   padding-inline: var(--toggle-item-padding-inline, var(--helix-space-sm));
