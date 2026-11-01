@@ -1,3 +1,5 @@
+
+
 /* The tones a cell can name with `data-tone`, from the tokens, as Bar
    Chart's are. A bar whose tone has no property here takes its series'
    color, which the headless tier writes as the fallback. */
@@ -30,6 +32,8 @@
   position: relative;
 }
 
+
+
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"],
@@ -37,6 +41,8 @@
 :host([variant="diagonal"]) [part="plot"] {
   background-color: transparent;
 }
+
+
 
 /* The chart's own drawing, inset from the box so the names along its edges
    have room. It scales as a whole through its `viewBox`. A row's names and
@@ -54,27 +60,7 @@
   column-gap: var(--spatial-bar-chart-bar-size, normal);
 }
 
-[part="drawing"] {
-  block-size: 100%;
-  display: block;
-  font-family: var(--helix-font-sans);
-  inline-size: 100%;
-  overflow: visible;
-  /* A touch moving across turns the view, and one moving up and down scrolls
-     the page. A drag selects no text on its way, the names along the box
-     included. */
-  touch-action: pan-y;
-  user-select: none;
-}
 
-/* The box and its grid: the muted ink, see-through, as the renderer draws them. */
-[part="grid"] {
-  fill: none;
-  opacity: 0.35;
-  stroke: var(--helix-color-foreground-muted);
-  stroke-width: var(--helix-border-thin);
-  vector-effect: non-scaling-stroke;
-}
 
 /* A row's floor: each place as a thin outline in the border's ink. */
 [part="floor"] {
@@ -192,6 +178,8 @@ foreignObject > [part="mark"] {
   inline-size: calc(var(--helix-border-thin) / 50);
   translate: -50% -50%;
 }
+
+
 
 /* The outline again over every bar, faint and dashed: where the bar shows,
    the ring covers it, and where others hide it, this says where it stands. */

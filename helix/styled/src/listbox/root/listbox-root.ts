@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessListbox } from '@fusion.dev/helix-headless/listbox'
 import type { CSSResultGroup } from 'lit'
+import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
@@ -48,7 +49,7 @@ export class HelixListbox extends HelixHeadlessListbox {
 
   static override styles: CSSResultGroup = [
     liveStyles,
-    collectionStateStyles,
+    collectionStateStyles, collectionErrorStyles,
     fieldStyles,
     fieldStackedStyles,
     styles,

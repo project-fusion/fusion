@@ -19,9 +19,28 @@
   display: none;
 }
 
+[part="drawing"] {
+  block-size: 100%;
+  display: block;
+  font-family: var(--helix-font-sans);
+  inline-size: 100%;
+  overflow: visible;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+[part="grid"] {
+  fill: none;
+  opacity: 0.35;
+  stroke: var(--helix-color-foreground-muted);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
 [part="tick"] {
   fill: var(--helix-color-foreground-muted);
   font-weight: var(--helix-weight-medium);
+  font-variant-numeric: tabular-nums;
 }
 
 [part="axis-name"] {
@@ -58,10 +77,6 @@
   text-align: center;
 }
 
-:host([no-box]) [part="plot"] {
-  background-color: transparent;
-}
-
 [part="fallback"] {
   inset: var(--helix-space-md);
   position: absolute;
@@ -69,14 +84,4 @@
 
 foreignObject > [part="mark"] {
   translate: -50% -50%;
-}
-
-[part="tick"],
-[part="axis-name"] {
-  fill: CanvasText;
-}
-
-/* Figures on an axis take one width each, so a tick does not shift as it updates. */
-[part="tick"] {
-  font-variant-numeric: tabular-nums;
 }

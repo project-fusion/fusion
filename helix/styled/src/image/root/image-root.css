@@ -37,11 +37,7 @@
   position: absolute;
 }
 
-/* A failed image with nothing slotted says so, in the ground a placeholder has. */
-[part="fallback"] {
-  background-color: var(--image-placeholder-color, var(--helix-color-surface-sunken));
-}
-
+/* A failed image with nothing slotted says so. */
 [part="fallback-mark"] {
   background-color: var(--helix-color-foreground-muted);
   block-size: var(--helix-size-icon);

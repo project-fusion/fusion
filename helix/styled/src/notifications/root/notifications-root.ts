@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotifications } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { HelixNotification } from '../notification/notification.js'
@@ -63,7 +64,7 @@ export class HelixNotifications extends HelixHeadlessNotifications {
   @property({ reflect: true })
   separation?: 'filled' | 'outlined' | 'plain'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, collectionErrorStyles, styles]
 
   /** Tells each row the feed's `separation`, which a row that sets none takes. */
   protected override updated(changed: PropertyValues): void {

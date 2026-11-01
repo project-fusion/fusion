@@ -84,6 +84,7 @@
   },
   "helix": {
     "accepted": {
+      "color-foreground on color-primary-wash": "A wash under Chat's own bubble, over whatever ground the bubble sits on. It holds 1.26:1 against its ground and keeps full ink, so the ink is measured against the ground below it.",
       "color-surface-media on color-foreground-media": "A QR code paints the media pair the other way up: black modules on white paper in both schemes, from the token layer. The engine emits neither token, and the model holds the pair over a photograph, which no theme can measure."
     },
     "chrome": {
