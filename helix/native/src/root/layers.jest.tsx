@@ -70,6 +70,16 @@ describe('a notice', () => {
     expect(order.map(([key]) => key)).toEqual([dialog, popover, toast])
   })
 
+  test('a spotlight dims a drawer in the page and stands under a menu', () => {
+    const [drawer, spotlight, menu] = [{}, {}, {}]
+    const order = drawnOrder([
+      [spotlight, { decorative: true }],
+      [menu, {}],
+      [drawer, { inPage: true }],
+    ])
+    expect(order.map(([key]) => key)).toEqual([drawer, spotlight, menu])
+  })
+
   test('a guide draws over a layer opened after it, and under a notice', () => {
     const [menu, stop, toast] = [{}, {}, {}]
     const order = drawnOrder([

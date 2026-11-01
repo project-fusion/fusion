@@ -14,9 +14,11 @@
  * and `importantForAccessibility` on Android. The modal layer's own view is
  * `accessibilityViewIsModal`, and its scrim takes every touch outside it.
  *
- * **A decorative layer stands under every other layer**, as a tour's
- * spotlight dims the app under the tour's stops and any menu it points
- * into: it takes no touch, no key, and nothing a screen reader reaches.
+ * **A decorative layer stands over what is in the page, and under every other
+ * layer**, as a tour's spotlight dims the app and a drawer that is no modal,
+ * which on the web is `dialog.show()` in the page's own stacking, and stands
+ * under a menu it points into, which on the web is in the top layer. It takes no
+ * touch, no key, and nothing a screen reader reaches.
  *
  * **A guide stands above every layer but a notice**, as a tour's stop stands
  * over a menu or a drawer its tour opens to point into, whichever opened
@@ -62,8 +64,10 @@ export interface HostedLayer {
   readonly content: ReactNode
   /** Whether it holds the reader, hiding the app and the layers under it. */
   readonly modal: boolean
-  /** Whether it is a look alone, drawn under every other layer and never the top one. */
+  /** Whether it is a look alone, drawn over what is in the page and never the top one. */
   readonly decorative?: boolean
+  /** Whether it stands in the page's own stacking on the web: open, not modal, and placed against nothing. */
+  readonly inPage?: boolean
   /** Whether it is a guide, drawn above every layer but a notice and the top one while it is open. */
   readonly guide?: boolean
   /** Whether it is a notice, drawn above every other layer and never hidden by one. */
@@ -129,15 +133,23 @@ const insetsNow = (): Insets => {
 const hearInsets = (changed: () => void) => environment().observe(() => changed())
 
 /**
- * The layers in the order they are drawn: each decorative layer, then each
- * other layer, then each guide, then each notice, each in the order it opened.
+ * The layers in the order they are drawn: each layer in the page's stacking,
+ * then each decorative layer, then each other layer, then each guide, then each
+ * notice, each in the order it opened.
  */
-export const drawnOrder = <Layer extends Pick<HostedLayer, 'decorative' | 'guide' | 'notice'>>(
+export const drawnOrder = <
+  Layer extends Pick<HostedLayer, 'decorative' | 'guide' | 'inPage' | 'notice'>,
+>(
   layers: readonly (readonly [object, Layer])[],
 ): (readonly [object, Layer])[] => [
+  ...layers.filter(([, layer]) => layer.inPage === true),
   ...layers.filter(([, layer]) => layer.decorative === true),
   ...layers.filter(
-    ([, layer]) => layer.notice !== true && layer.decorative !== true && layer.guide !== true,
+    ([, layer]) =>
+      layer.notice !== true &&
+      layer.decorative !== true &&
+      layer.guide !== true &&
+      layer.inPage !== true,
   ),
   ...layers.filter(([, layer]) => layer.guide === true),
   ...layers.filter(([, layer]) => layer.notice === true),
