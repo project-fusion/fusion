@@ -64,7 +64,11 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
     '[part="trailing"] > :not([part="controls"])',
     'color',
   ],
-  ['notifications/notification/notification.generated.css', 'slot[name="description"]::slotted(*)', 'color'],
+  [
+    'notifications/notification/notification.generated.css',
+    'slot[name="description"]::slotted(*)',
+    'color',
+  ],
   ['number-input/root/number-input-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['option/group/option-group.generated.css', '[part="label"]', 'color'],
   ['pagination/root/pagination-root.css', '[part="gap"]', 'color'],
