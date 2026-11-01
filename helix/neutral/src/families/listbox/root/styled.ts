@@ -45,156 +45,160 @@ export default styles(
     },
     stylesheet: 'listbox/root/listbox-root.generated.css',
   },
-  ({ hook, include, on, rule }) => [
-    include(field),
-    include(fieldStacked),
-    include(collectionState),
-    on('host', [
-      rule({ display: 'flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ formDisabled: true }, { opacity: 0.5 }),
-    ]),
-    on('items', [
-      rule({
-        '--option-radius': token('radii-none'),
-        backgroundColor: hook.backgroundColor,
-        border: hook.border,
-        borderRadius: token('radii-sm'),
-        display: 'flex',
-        flexDirection: 'column',
-        gap: token('space-none'),
-        maxBlockSize: hook.maxBlockSize,
-        overflowY: 'auto',
-        paddingBlock: token('space-2xs'),
-        paddingInline: token('space-none'),
-      }),
-      rule(
-        { layout: 'grid' },
-        {
-          display: 'grid',
-          gridTemplateColumns: fn(
-            'repeat',
-            'auto-fill',
-            fn('minmax', fn('min', hook.columnMinInlineSize, '100%'), '1fr'),
-          ),
-        },
-      ),
-      rule(
-        { focusVisible: true },
-        { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
-      ),
-      rule(
-        { invalid: true },
-        { borderColor: token('color-danger'), outlineColor: token('color-danger') },
-      ),
-      rule({ formDisabled: true, platform: 'web' }, { cursor: 'not-allowed' }),
-      rule({ loading: true }, { opacity: 0.5 }),
-      /* A phone's move draws on the option, and the web's reorder entry adopts a sheet. */
-      native([
-        rule({
-          '--option-dragging-opacity': first(hook.draggingOpacity, 0.5),
-          '--option-drop-color': first(hook.dropIndicatorColor, token('color-primary')),
-          '--option-drop-size': first(hook.dropIndicatorSize, token('border-thick')),
-        }),
+  ({ hook, include, on, rule }) => {
+    const columns = fn(
+      'repeat',
+      'auto-fill',
+      fn('minmax', fn('min', hook.columnMinInlineSize, '100%'), '1fr'),
+    )
+    return [
+      include(field),
+      include(fieldStacked),
+      include(collectionState),
+      on('host', [
+        rule({ display: 'flex', flexDirection: 'column', gap: token('space-2xs') }),
+        rule({ formDisabled: true }, { opacity: 0.5 }),
       ]),
-      /* A list of `items` scrolls in the list that windows it. */
-      native([rule({ part: { 'data-windowed': true } }, { overflowY: 'visible' })]),
-    ]),
-    on(
-      ['empty', 'loading'],
-      [
+      on('items', [
         rule({
-          own: {
-            collectionInsetBlock: token('space-xs'),
-            collectionInsetInline: token('space-xs'),
-          },
-        }),
-      ],
-    ),
-    on('error', [
-      rule({
-        color: hook.errorColor,
-        fontFamily: token('font-sans'),
-        fontSize: token('text-sm'),
-        margin: token('space-none'),
-        padding: token('space-xs'),
-        textAlign: 'center',
-      }),
-    ]),
-    on('filter-icon', [
-      rule({
-        alignItems: 'center',
-        color: token('color-foreground-subtle'),
-        display: 'inline-flex',
-        flex: '0 0 auto',
-      }),
-    ]),
-    on('filter-mark', [
-      rule({
-        '--icon-size': token('size-icon-tight'),
-        blockSize: token('size-icon-tight'),
-        inlineSize: token('size-icon-tight'),
-      }),
-    ]),
-    on({ region: 'filter-icon', slotted: '*' }, [
-      rule({
-        '--icon-size': token('size-icon-tight'),
-        blockSize: token('size-icon-tight'),
-        inlineSize: token('size-icon-tight'),
-      }),
-    ]),
-    on('search', [
-      rule({
-        alignItems: 'center',
-        borderBlockEnd: [token('border-thin'), 'solid', token('color-border')],
-        display: 'flex',
-        gap: token('space-2xs'),
-        padding: token('space-2xs'),
-        paddingInlineStart: token('space-xs'),
-      }),
-    ]),
-    on('search-field', [
-      rule({
-        web: { appearance: 'none' },
-        backgroundColor: 'transparent',
-        blockSize: token('size-control-tight'),
-        border: 'none',
-        boxSizing: 'border-box',
-        color: token('color-foreground'),
-        flex: '1 1 auto',
-        fontFamily: token('font-sans'),
-        fontSize: fn('max', token('text-field-min'), token('text-sm')),
-        fontWeight: token('weight-medium'),
-        inlineSize: '100%',
-        minInlineSize: 0,
-        paddingInline: token('space-xs'),
-      }),
-      rule({ focusVisible: true, platform: 'web' }, { outline: 'none' }),
-    ]),
-    on({ placeholder: 'search-field' }, [
-      rule({ color: token('color-foreground-muted'), fontWeight: token('weight-regular') }),
-    ]),
-    /* The dictation button at the end of the field, a muted mark a pointer darkens. */
-    on('voice', [
-      web([
-        rule({
-          all: 'unset',
-          '--icon-size': token('size-icon-tight'),
-          alignItems: 'center',
+          '--option-radius': token('radii-none'),
+          backgroundColor: hook.backgroundColor,
+          border: hook.border,
           borderRadius: token('radii-sm'),
-          boxSizing: 'border-box',
-          color: token('color-foreground-muted'),
-          cursor: 'pointer',
           display: 'flex',
-          flex: '0 0 auto',
-          justifyContent: 'center',
-          minBlockSize: token('size-icon-loose'),
-          minInlineSize: token('size-icon-loose'),
-          transition: ['color', token('duration-fast'), token('easing-standard')],
+          flexDirection: 'column',
+          gap: token('space-none'),
+          maxBlockSize: hook.maxBlockSize,
+          overflowY: 'auto',
+          paddingBlock: token('space-2xs'),
+          paddingInline: token('space-none'),
         }),
-        rule({ hover: true }, { color: token('color-foreground') }),
-        rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
+        web([rule({ layout: 'grid' }, { display: 'grid', gridTemplateColumns: columns })]),
+        rule(
+          { focusVisible: true },
+          { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
+        ),
+        rule(
+          { invalid: true },
+          { borderColor: token('color-danger'), outlineColor: token('color-danger') },
+        ),
+        rule({ formDisabled: true, platform: 'web' }, { cursor: 'not-allowed' }),
+        rule({ loading: true }, { opacity: 0.5 }),
+        /* A phone's move draws on the option, and the web's reorder entry adopts a sheet. */
+        native([
+          rule({
+            '--option-dragging-opacity': first(hook.draggingOpacity, 0.5),
+            '--option-drop-color': first(hook.dropIndicatorColor, token('color-primary')),
+            '--option-drop-size': first(hook.dropIndicatorSize, token('border-thick')),
+          }),
+        ]),
+        /* A list of `items` scrolls in the list that windows it. */
+        native([rule({ part: { 'data-windowed': true } }, { overflowY: 'visible' })]),
       ]),
-    ]),
-    include(printExact),
-  ],
+      /* A phone's grid lays out one region, so the options stand in a part of their own. */
+      on('options', [
+        native([rule({ layout: 'grid' }, { display: 'grid', gridTemplateColumns: columns })]),
+      ]),
+      on(
+        ['empty', 'loading'],
+        [
+          rule({
+            own: {
+              collectionInsetBlock: token('space-xs'),
+              collectionInsetInline: token('space-xs'),
+            },
+          }),
+        ],
+      ),
+      on('error', [
+        rule({
+          color: hook.errorColor,
+          fontFamily: token('font-sans'),
+          fontSize: token('text-sm'),
+          margin: token('space-none'),
+          padding: token('space-xs'),
+          textAlign: 'center',
+        }),
+      ]),
+      on('filter-icon', [
+        rule({
+          alignItems: 'center',
+          color: token('color-foreground-subtle'),
+          display: 'inline-flex',
+          flex: '0 0 auto',
+        }),
+      ]),
+      on('filter-mark', [
+        rule({
+          '--icon-size': token('size-icon-tight'),
+          blockSize: token('size-icon-tight'),
+          inlineSize: token('size-icon-tight'),
+        }),
+      ]),
+      on({ region: 'filter-icon', slotted: '*' }, [
+        rule({
+          '--icon-size': token('size-icon-tight'),
+          blockSize: token('size-icon-tight'),
+          inlineSize: token('size-icon-tight'),
+        }),
+      ]),
+      on('search', [
+        rule({
+          alignItems: 'center',
+          borderBlockEnd: [token('border-thin'), 'solid', token('color-border')],
+          display: 'flex',
+          gap: token('space-2xs'),
+          padding: token('space-2xs'),
+          paddingInlineStart: token('space-xs'),
+        }),
+      ]),
+      on('search-field', [
+        rule({
+          web: { appearance: 'none' },
+          backgroundColor: 'transparent',
+          blockSize: token('size-control-tight'),
+          border: 'none',
+          boxSizing: 'border-box',
+          color: token('color-foreground'),
+          flex: '1 1 auto',
+          fontFamily: token('font-sans'),
+          fontSize: fn('max', token('text-field-min'), token('text-sm')),
+          fontWeight: token('weight-medium'),
+          inlineSize: '100%',
+          minInlineSize: 0,
+          paddingInline: token('space-xs'),
+        }),
+        rule({ focusVisible: true, platform: 'web' }, { outline: 'none' }),
+      ]),
+      on({ placeholder: 'search-field' }, [
+        rule({ color: token('color-foreground-muted'), fontWeight: token('weight-regular') }),
+      ]),
+      /* The dictation button at the end of the field, a muted mark a pointer darkens. */
+      on('voice', [
+        web([
+          rule({
+            all: 'unset',
+            '--icon-size': token('size-icon-tight'),
+            alignItems: 'center',
+            borderRadius: token('radii-sm'),
+            boxSizing: 'border-box',
+            color: token('color-foreground-muted'),
+            cursor: 'pointer',
+            display: 'flex',
+            flex: '0 0 auto',
+            justifyContent: 'center',
+            minBlockSize: token('size-icon-loose'),
+            minInlineSize: token('size-icon-loose'),
+            transition: ['color', token('duration-fast'), token('easing-standard')],
+          }),
+          rule({ hover: true }, { color: token('color-foreground') }),
+          rule(
+            { focusVisible: true },
+            { outline: ring, outlineOffset: token('size-focus-offset') },
+          ),
+        ]),
+      ]),
+      include(printExact),
+    ]
+  },
 )

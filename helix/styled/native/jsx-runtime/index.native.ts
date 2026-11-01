@@ -50,7 +50,7 @@ const WEB = new Set(['class', 'className', 'id', 'style'])
  * `data-` attributes a native component reads, as a grid reads a cell's
  * span, any element its density, and a rule whether a color mode is named.
  */
-const READ = new Set(['data-color-mode', 'data-density', 'data-grid-span'])
+const READ = new Set(['data-active', 'data-color-mode', 'data-density', 'data-grid-span'])
 
 /** The recipes an `a` draws by, which only it reads. */
 const LINK = new Set(['aria-current', 'data-button', 'data-button-tone', 'data-card', 'data-link'])

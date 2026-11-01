@@ -226,7 +226,14 @@ export default headless('listbox', {
         part="items"
         role="listbox"
       >
-        {listbox.childrenShown && <Slot />}
+        {listbox.childrenShown && (
+          <View
+            part="options"
+            platform="native"
+          >
+            <Slot />
+          </View>
+        )}
         {listbox.windowed && (
           <Repeat
             each={listbox.rows}
