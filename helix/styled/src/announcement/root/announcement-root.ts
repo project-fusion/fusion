@@ -2,7 +2,6 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAnnouncement } from '@fusion.dev/helix-headless/announcement'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './announcement-root.generated.css.js'
 
@@ -51,7 +50,7 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
   @property({ reflect: true })
   separation?: 'filled' | 'outlined'
 
-  static override styles: CSSResultGroup = [densityStyles, liveStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, styles]
 
   /**
    * The band's color.

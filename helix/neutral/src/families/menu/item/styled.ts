@@ -1,10 +1,10 @@
+import rowFragment from '../../../fragments/row.js'
 import {
   first,
   fn,
   hookOf,
   list,
   measured,
-  mix,
   native,
   product,
   sum,
@@ -42,13 +42,13 @@ export default styles(
       itemDescriptionColor: token('color-foreground-muted'),
       itemDetailColor: token('color-foreground-muted'),
       itemEnd: '0px',
-      itemHoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      itemHoverColor: token('color-hover'),
       itemStart: '0px',
     },
     own: { menuFrom: null, menuMaterialBackdrop: null, menuMaterialFill: null, menuTravel: null },
     stylesheet: 'menu/item/menu-item.generated.css',
   },
-  ({ hook, on, own, rule }) => {
+  ({ hook, include, on, own, rule }) => {
     const fast = token('duration-fast')
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const column = sum(token('size-icon'), token('space-xs'))
@@ -62,6 +62,7 @@ export default styles(
     } as const
     return [
       on('host', [rule({ display: 'block' })]),
+      include(rowFragment),
       on('item', [
         rule({
           alignItems: 'center',
@@ -70,13 +71,9 @@ export default styles(
           color: token('color-foreground'),
           web: { cursor: 'pointer' },
           display: 'grid',
-          fontSize: token('text-xs'),
-          fontWeight: token('weight-medium'),
           gridTemplateColumns: [hook.itemStart, fn('minmax', 0, '1fr'), 'auto', hook.itemEnd],
-          minBlockSize: token('size-control'),
           paddingInline: token('space-sm'),
           transition: ['background-color', fast, token('easing-standard')],
-          userSelect: 'none',
         }),
         rule({ hover: true }, { backgroundColor: lit }),
         rule({ highlighted: true }, { backgroundColor: lit }),
@@ -86,7 +83,11 @@ export default styles(
         ),
         /* Dimmed by the row's own `disabled`, which holds in a filtered
            menu too, where the web marks the host disabled for the filter. */
-        rule({ has: 'disabled' }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+        rule(
+          { has: 'disabled' },
+          { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+        ),
+        rule({ active: true }, { backgroundColor: token('color-press') }),
       ]),
       on('start', [
         rule({

@@ -116,5 +116,32 @@ export default styles(
     on('fallback', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
     /* A slotted placeholder fills the box rather than sitting in its middle. */
     on({ region: 'placeholder', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
+    /* A failed image with nothing slotted says so: a mask on the web, and the
+       same drawing on a phone. */
+    on('fallback-glyph', [
+      native([rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
+    ]),
+    on('fallback-line', [
+      native([
+        rule({
+          fill: 'none',
+          stroke: token('color-foreground-muted'),
+          strokeLinecap: 'round',
+          strokeLinejoin: 'round',
+          strokeWidth: 1.5,
+        }),
+      ]),
+    ]),
+    on('fallback-mark', [
+      rule({
+        backgroundColor: web(token('color-foreground-muted')),
+        blockSize: token('size-icon'),
+        inlineSize: token('size-icon'),
+        maskImage: web(
+          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v14H4zM4 16l5-5 3 3M20 15l-3-3M15 5 9 19'/%3E%3C/svg%3E\")",
+        ),
+        web: { maskSize: '100%' },
+      }),
+    ]),
   ],
 )

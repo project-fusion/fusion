@@ -3,7 +3,6 @@ import {
   first,
   fn,
   measured,
-  mix,
   native,
   product,
   sum,
@@ -106,10 +105,14 @@ export default styles(
       }),
       /* As wide as the box, while the lines beside it run past its edge. */
       native([rule({ flexDirection: 'row', maxInlineSize: measured('log-frame', '100%') })]),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches
+         the target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       rule(
         { hover: true },
         {
-          backgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+          backgroundColor: token('color-hover'),
           color: token('color-foreground'),
         },
       ),

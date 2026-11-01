@@ -1,4 +1,5 @@
 import printExact from '../../../fragments/print-exact.js'
+import row from '../../../fragments/row.js'
 import { native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import option from './headless.js'
@@ -14,8 +15,8 @@ const tick =
  * or runs the full width, and only a row with space around it has corners worth
  * rounding.
  *
- * **A stated height, so a row with an icon in it stands as tall as the row above
- * it.** The words and the caption stay on one line and are cut, since a list
+ * **The height, the type, and the touch reach are `row`'s**, so a row with an icon
+ * in it stands as tall as the row above it. The words and the caption stay on one line and are cut, since a list
  * whose rows differ in height is one the keys move through unevenly.
  *
  * **Active and selected are two facts.** Active is a wash of the foreground, as a
@@ -32,12 +33,13 @@ export default styles(
       draggingOpacity: 0.5,
       dropColor: token('color-primary'),
       dropSize: token('border-thick'),
-      padding: token('space-xs'),
+      padding: token('space-field'),
       radius: token('radii-sm'),
     },
     stylesheet: 'option/root/option-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
+    include(row),
     on('host', [rule({ display: 'block' })]),
     /* Written out: an owner hides what a filter leaves out with the attribute, and a
        phone's owner draws nothing for it. */
@@ -46,20 +48,16 @@ export default styles(
       rule({
         alignItems: 'center',
         borderRadius: hook.radius,
-        boxSizing: 'border-box',
         color: token('color-foreground'),
         display: 'flex',
-        fontFamily: token('font-sans'),
-        fontSize: token('text-sm'),
         gap: token('space-xs'),
-        minBlockSize: token('size-control-tight'),
         paddingBlock: hook.blockPadding,
         paddingInline: hook.padding,
-        web: { cursor: 'pointer', userSelect: 'none' },
+        web: { cursor: 'pointer' },
       }),
       native([rule({ part: { 'data-highlight': true } }, { backgroundColor: hook.activeColor })]),
       rule({ disabled: false, hover: true }, { backgroundColor: hook.activeColor }),
-      rule({ disabled: true }, { opacity: 0.5, web: { cursor: 'default' } }),
+      rule({ disabled: true }, { opacity: token('opacity-disabled'), web: { cursor: 'default' } }),
       /* A phone's move draws here, and the web's reorder entry adopts a sheet of its own. */
       native([rule({ part: { 'data-dragging': true } }, { opacity: hook.draggingOpacity })]),
     ]),
@@ -134,6 +132,12 @@ export default styles(
         },
       ),
       rule({ hasIndicator: true, platform: 'web' }, { content: 'none' }),
+      /* Forced colors paint every background Canvas, so a mark drawn as one
+         disappears and a chosen control looks like the others. */
+      rule(
+        { forcedColors: true, selected: true },
+        { backgroundColor: 'Highlight', forcedColorAdjust: 'none' },
+      ),
     ]),
     on('check', [
       native([
@@ -160,5 +164,8 @@ export default styles(
       ]),
     ]),
     include(printExact),
+    on('item', [
+      rule({ active: true, disabled: false }, { backgroundColor: token('color-press') }),
+    ]),
   ],
 )

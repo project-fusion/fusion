@@ -1,7 +1,17 @@
 import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
-import { fn, list, measured, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  native,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import input from './headless.js'
 
@@ -51,7 +61,7 @@ export default styles(
           display: 'flex',
           gap: token('space-2xs'),
           overflow: 'hidden',
-          paddingInlineStart: token('space-xs'),
+          paddingInlineStart: token('space-field'),
           transition: list(['background-color', ...ease], ['border-color', ...ease]),
         }),
       ]),
@@ -62,7 +72,13 @@ export default styles(
           { invalid: true },
           { borderColor: token('color-danger'), outlineColor: token('color-danger') },
         ),
-        rule({ formDisabled: true }, { color: token('color-foreground-subtle') }),
+        /* Forced colors paint a danger edge the system color, so it thickens as well. */
+        rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
+        rule({ readonly: true }, { backgroundColor: 'transparent' }),
+        rule(
+          { formDisabled: true },
+          { opacity: token('opacity-disabled'), web: { cursor: 'not-allowed' } },
+        ),
         rule({ reducedMotion: true }, { transition: 'none' }),
         /* The swatch shape: the block of color is the whole control. */
         rule(
@@ -81,6 +97,7 @@ export default styles(
       on('trigger', [
         rule({
           web: { all: 'unset', boxSizing: 'border-box', cursor: 'pointer' },
+          position: 'relative',
           alignItems: 'stretch',
           alignSelf: 'stretch',
           display: 'flex',
@@ -95,6 +112,17 @@ export default styles(
         ),
         web([rule({ formDisabled: true }, { cursor: 'not-allowed' })]),
         rule({ variant: 'swatch' }, { blockSize: hook.swatchSize, inlineSize: hook.swatchSize }),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+         moves. Where the control is already that size the box sits inside it. */
+      on({ after: 'trigger' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('preview', [
         rule({

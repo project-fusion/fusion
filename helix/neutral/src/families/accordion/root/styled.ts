@@ -41,7 +41,8 @@ export default styles(
       rule(
         { separation: 'outlined' },
         {
-          border: [token('border-thin'), 'solid', hook.borderColor],
+          border: [token('border-surface'), 'solid', hook.borderColor],
+          boxShadow: token('shadow-surface'),
           borderRadius: hook.radius,
           /* Clips the trigger's own hover fill to the section's corners. */
           overflow: 'hidden',

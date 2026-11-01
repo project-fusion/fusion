@@ -39,14 +39,21 @@ export default styles(
       togglePressedSurface: null,
       toggleRadius: null,
     },
-    props: { separation: oneOf(['outlined', 'plain']) },
+    props: { separation: oneOf(['plain']) },
     stylesheet: 'toggle/group/toggle-group.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
     include(field),
     include(fieldStacked),
     on('host', [
-      rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
+      rule({
+        display: 'inline-flex',
+        flexDirection: 'column',
+        gap: token('space-2xs'),
+        /* A label longer than its segment cuts inside it, so the group stays in its
+           column. */
+        maxInlineSize: '100%',
+      }),
       rule({ labelPlacement: 'start' }, { alignItems: 'start' }),
     ]),
     /* The label inside the track, with a rule after it. Ahead of the rule,
@@ -90,6 +97,8 @@ export default styles(
         display: 'inline-flex',
         /* It grows inside the row, which is always what holds it. */
         flex: '1 1 auto',
+        maxInlineSize: '100%',
+        minInlineSize: 0,
         position: 'relative',
         /* It wraps, so a group with more labels than room keeps every toggle
            in reach. */
@@ -107,21 +116,25 @@ export default styles(
         },
       }),
       /* A framed track, concentric: the outer radius less the border. */
-      rule([{ separation: false }, { separation: 'outlined' }], {
-        backgroundColor: hook.backgroundColor,
-        border: [token('border-thin'), 'solid', hook.borderColor],
-        borderRadius: hook.radius,
-        own: {
-          toggleRadius: hook.itemRadius(difference(hook.radius, token('border-thin'))),
-          /* The border joins the padding in what the row gives back. */
-          toggleHeight: difference(
-            token('size-control'),
-            product(sum(token('space-2xs'), token('border-thin')), 2),
-          ),
-          /* A groove, so the indicator is over it. */
-          indicatorSurface: token('color-surface-overlay'),
+      rule(
+        { separation: false },
+        {
+          backgroundColor: hook.backgroundColor,
+          border: [token('border-surface'), 'solid', hook.borderColor],
+          boxShadow: token('shadow-surface'),
+          borderRadius: hook.radius,
+          own: {
+            toggleRadius: hook.itemRadius(difference(hook.radius, token('border-thin'))),
+            /* The border joins the padding in what the row gives back. */
+            toggleHeight: difference(
+              token('size-control'),
+              product(sum(token('space-2xs'), token('border-thin')), 2),
+            ),
+            /* A groove, so the indicator is over it. */
+            indicatorSurface: token('color-surface-overlay'),
+          },
         },
-      }),
+      ),
       /* Wrong, and the strip says so. */
       rule(
         { invalid: true },
@@ -153,7 +166,7 @@ export default styles(
     ]),
     /* The toggles share the row, each at its own width and the row's height. */
     on({ slotted: 'helix-toggle' }, [
-      rule({ blockSize: own.toggleHeight, flex: '1 1 auto' }),
+      rule({ blockSize: own.toggleHeight, flex: '1 1 auto', minInlineSize: 0 }),
       rule({ orientation: 'vertical' }, { flex: '0 0 auto' }),
     ]),
     /* The marker's look, which a pressed toggle shares where several can be
@@ -182,6 +195,10 @@ export default styles(
       }),
       /* Hidden until it has somewhere to be. */
       rule({ part: { 'data-placed': false } }, { opacity: 0 }),
+      /* Forced colors paint every background Canvas, so a mark drawn as one
+         disappears and a chosen control looks like the others. Measured in Chromium
+         on October 31, 2026. */
+      rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
     ]),
     /* Written out: a rule on an element passed in reads no state of that element. */
     on(
@@ -196,6 +213,7 @@ export default styles(
             borderRadius: own.toggleRadius,
             boxShadow: hook.indicatorShadow,
           }),
+          rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
         ]),
       ],
     ),

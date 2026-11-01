@@ -4,10 +4,8 @@ import {
   fn,
   list,
   measured,
-  mix,
   product,
   safeArea,
-  scheme,
   sum,
   token,
   web,
@@ -19,8 +17,8 @@ import root from './headless.js'
  * Menu's styled tier.
  *
  * **The panel is the floating surface**, with its edge, its shadow and the
- * house radius, at least `12rem` wide, and compact by nature: it sets the
- * small control and icon sizes for what it holds. It scrolls where it is
+ * house radius, at least `12rem` wide. Its rows take the step below the
+ * control that opened them, from `row`, and icons stay small beside them. It scrolls where it is
  * taller than the room below the trigger. The inset is the rows', so a
  * row's light reaches the panel's edges. `glass` and `frosted` are the
  * translucent grounds over the theme's blur, which a row's flyout reads too.
@@ -67,7 +65,7 @@ export default styles(
     const fast = token('duration-fast')
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const column = sum(token('size-icon'), token('space-xs'))
-    const hover = mix(token('color-foreground'), 8, 'transparent')
+    const hover = token('color-hover')
     return [
       /* No box of its own: the trigger is passed in and the panel is in the top layer. */
       on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
@@ -144,9 +142,6 @@ export default styles(
       ]),
       on('surface', [
         rule({
-          '--helix-size-control': token('size-control-sm'),
-          '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
           '--helix-size-icon': token('size-icon-sm'),
           '--helix-size-icon-loose': product(token('size-icon'), 1.2),
           '--helix-size-icon-tight': product(token('size-icon'), 0.8),
@@ -172,10 +167,7 @@ export default styles(
         variants('material', {
           glass: {
             own: {
-              menuMaterialFill: scheme(
-                token('material-translucent-strong'),
-                token('material-translucent'),
-              ),
+              menuMaterialFill: token('material-panel'),
               menuMaterialBackdrop: hook.backdrop(token('material-backdrop')),
             },
             backgroundColor: hook.backgroundColor(own.menuMaterialFill),
@@ -305,7 +297,7 @@ export default styles(
         ],
       ),
       /* Rows that are already there dim, and hold still, while new ones load. */
-      on('surface', [rule({ loading: true }, { opacity: 0.5 })]),
+      on('surface', [rule({ loading: true }, { opacity: token('opacity-busy') })]),
     ]
   },
 )

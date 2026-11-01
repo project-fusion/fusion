@@ -1,14 +1,4 @@
-import {
-  Announce,
-  headless,
-  number,
-  oneOf,
-  Pressable,
-  Slot,
-  string,
-  View,
-  web,
-} from '../../../render.js'
+import { Announce, headless, number, Pressable, Slot, string, View, web } from '../../../render.js'
 import { bind, derive } from '../../../tree.js'
 
 /**
@@ -55,7 +45,6 @@ export default headless('announcement', {
     hotkey: web('F6'),
     label: string(),
     queued: false,
-    tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
   },
   events: {
     dismiss: { cancelable: true, detail: ['label'], gives: { label: 'words' } },

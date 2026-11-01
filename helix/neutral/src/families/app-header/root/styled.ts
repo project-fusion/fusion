@@ -1,5 +1,16 @@
+import densitySm from '../../../fragments/density-sm.js'
 import { boolean, oneOf } from '../../../render.js'
-import { difference, fn, list, mix, native, product, safeArea, token } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  native,
+  product,
+  quotient,
+  safeArea,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -19,8 +30,8 @@ import root from './headless.js'
  * **The row is what is centered**, with the middle region in the middle of
  * the bar while the brand and the actions leave it room, and in a bar
  * narrower than 24rem the insets step down so two destinations fit a 360
- * point phone. **Dense by nature**: the host sets the small steps of every
- * control size, as Toolbar does.
+ * point phone. **Dense by nature**: the host takes the small steps of every
+ * control size from the `density-sm` fragment, as Toolbar does.
  *
  * **The bar stands clear of the status bar and the notch** where it is at
  * the top of the window: its host is padded by the window's top safe area.
@@ -49,7 +60,7 @@ export default styles(
     },
     stylesheet: 'app-header/root/app-header-root.generated.css',
   },
-  ({ hook, on, rule, variants }) => {
+  ({ hook, include, on, rule, variants }) => {
     const header = hook.blockSize
     const pace = token('duration-normal')
     const easing = token('easing-standard')
@@ -58,20 +69,9 @@ export default styles(
       backgroundColor: hook.backgroundColor(token('material-translucent')),
     }
     return [
+      include(densitySm),
       on('host', [
         rule({
-          '--helix-size-checkbox': token('size-checkbox-sm'),
-          '--helix-size-checkbox-loose': product(token('size-checkbox'), 1.2),
-          '--helix-size-checkbox-tight': product(token('size-checkbox'), 0.8),
-          /* The icon step with it. Declaring the control size and stopping
-             there draws an icon at the `md` step inside `sm` controls. */
-          '--helix-size-icon': token('size-icon-sm'),
-          '--helix-size-icon-loose': product(token('size-icon'), 1.2),
-          '--helix-size-icon-tight': product(token('size-icon'), 0.8),
-          '--helix-size-control': token('size-control-sm'),
-          '--helix-size-control-loose': product(token('size-control'), 1.2),
-          '--helix-size-control-tight': product(token('size-control'), 0.8),
-          '--helix-size-tag': token('size-tag-sm'),
           backgroundColor: hook.backgroundColor(token('color-background')),
           borderBlockEnd: [token('border-thin'), 'solid', hook.borderColor],
           /* What the narrow row measures itself against: the bar's own width. */
@@ -240,6 +240,7 @@ export default styles(
           web: { all: 'unset', cursor: 'pointer' },
           /* `all: unset` takes the `border-box` every shadow root is given. */
           boxSizing: 'border-box',
+          position: 'relative',
           alignItems: 'center',
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),
@@ -251,7 +252,7 @@ export default styles(
         /* At the start, the toggle leads the brand by the gap the actions keep. */
         rule({ within: 'start' }, { marginInlineEnd: token('space-xs') }),
         rule([{ hover: true }, { open: true }], {
-          backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+          backgroundColor: token('color-hover'),
           color: token('color-foreground'),
         }),
         rule(
@@ -261,6 +262,18 @@ export default styles(
             outlineOffset: token('size-focus-offset'),
           },
         ),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. Where the control is already that size the box sits inside it.
+         A phone gives a press the view's own frame. */
+      on({ after: 'toggle' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('toggle-mark', [rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
     ]

@@ -59,6 +59,7 @@ export default styles(
       trackSize: token('size-progress'),
     },
     own: {
+      fieldDisabledOpacity: null,
       sliderAlong: null,
       sliderHalo: null,
       sliderHole: null,
@@ -204,7 +205,10 @@ export default styles(
            page. */
         web([rule({ own: { sliderAlong: 'to right' } })]),
         web([rule({ dir: 'rtl' }, { own: { sliderAlong: 'to left' } })]),
-        rule({ formDisabled: true }, { opacity: 0.5 }),
+        rule(
+          { formDisabled: true },
+          { own: { fieldDisabledOpacity: 1 }, opacity: token('opacity-disabled') },
+        ),
         rule({ print: true }, { boxShadow: 'none', printColorAdjust: web('exact') }),
       ]),
       /* A grid where something lies over the track, in the track's own cell,
@@ -848,6 +852,48 @@ export default styles(
         ),
         rule({ dir: 'rtl', orientation: 'vertical' }, { translate: ['50%', '50%'] }),
       ]),
+      /* Forced colors drop a background image, which is the whole track, and paint
+         the thumb Canvas, so the slider drew nothing at all. The platform's own range
+         control is what survives. */
+      on({ part: 'control', selector: '[part="control"]::-webkit-slider-runnable-track' }, [
+        web([
+          rule(
+            { forcedColors: true },
+            {
+              background: 'Canvas',
+              border: [token('border-thin'), 'solid', 'CanvasText'],
+              forcedColorAdjust: 'none',
+            },
+          ),
+        ]),
+      ]),
+      on({ part: 'control', selector: '[part="control"]::-moz-range-track' }, [
+        web([
+          rule(
+            { forcedColors: true },
+            {
+              background: 'Canvas',
+              border: [token('border-thin'), 'solid', 'CanvasText'],
+              forcedColorAdjust: 'none',
+            },
+          ),
+        ]),
+      ]),
+      on({ part: 'control', selector: '[part="control"]::-webkit-slider-thumb' }, [
+        web([rule({ forcedColors: true }, { background: 'Highlight', forcedColorAdjust: 'none' })]),
+      ]),
+      on({ part: 'control', selector: '[part="control"]::-moz-range-thumb' }, [
+        web([rule({ forcedColors: true }, { background: 'Highlight', forcedColorAdjust: 'none' })]),
+      ]),
+      on('thumb', [
+        rule(
+          { forcedColors: true },
+          { backgroundColor: 'Highlight', color: 'HighlightText', forcedColorAdjust: 'none' },
+        ),
+      ]),
+      /* A thumb and a thin track are hard to reach with a finger, so the input takes
+         the target's height. The track stays centered in it. */
+      on('control', [web([rule({ coarsePointer: true }, { minBlockSize: token('size-target') })])]),
     ]
   },
 )

@@ -9,9 +9,9 @@ import {
   difference,
   fn,
   measured,
-  mix,
   native,
   product,
+  quotient,
   safeArea,
   sum,
   token,
@@ -77,6 +77,7 @@ export default styles(
       on('trigger', [
         rule({
           all: web('unset'),
+          position: web('relative'),
           alignItems: 'center',
           backgroundColor: token('color-well'),
           blockSize: token('size-control'),
@@ -88,16 +89,17 @@ export default styles(
           display: 'flex',
           flexDirection: 'row',
           fontFamily: token('font-sans'),
-          fontSize: token('text-sm'),
+          fontSize: fn('max', token('text-field-min'), token('text-field')),
+          fontWeight: token('weight-medium'),
           gap: token('space-xs'),
           justifyContent: 'space-between',
-          paddingInline: token('space-xs'),
+          paddingInline: token('space-field'),
           transition: web(['border-color', token('duration-fast'), token('easing-standard')]),
         }),
       ]),
       /* Written out: `:host(:disabled)`, a fieldset's too, and never `[disabled]`. */
       on({ part: 'trigger', selector: ':host(:not(:disabled)) [part="trigger"]:hover' }, [
-        web([rule({ borderColor: token('color-primary') })]),
+        web([rule({ borderColor: token('color-border-hover') })]),
       ]),
       on('trigger', [
         rule(
@@ -120,9 +122,11 @@ export default styles(
       ]),
       on('trigger', [native([rule({ invalid: true }, { borderColor: token('color-danger') })])]),
       on({ part: 'trigger', selector: ':host(:disabled) [part="trigger"]' }, [
-        web([rule({ cursor: 'not-allowed', opacity: 0.5 })]),
+        web([rule({ cursor: 'not-allowed', opacity: token('opacity-disabled') })]),
       ]),
-      on('trigger', [native([rule({ formDisabled: true }, { opacity: 0.5 })])]),
+      on('trigger', [
+        native([rule({ formDisabled: true }, { opacity: token('opacity-disabled') })]),
+      ]),
       on('host', [variants('emphasis', { ghost: { inlineSize: 'fit-content' } })]),
       on('trigger', [
         variants('emphasis', {
@@ -143,7 +147,7 @@ export default styles(
         [
           web([
             rule({
-              backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+              backgroundColor: token('color-hover'),
               borderColor: 'transparent',
             }),
           ]),
@@ -162,6 +166,12 @@ export default styles(
         }),
         /* A phone's zero basis would leave no room in a ghost trigger as wide as its value. */
         native([rule({ flexGrow: 1, flexShrink: 1 })]),
+        /* Nothing chosen yet, drawn as a field's `::placeholder` is, so "Choose" does
+           not read as an answer. */
+        rule(
+          { part: { 'data-placeholder': true } },
+          { color: token('color-foreground-muted'), fontWeight: token('weight-regular') },
+        ),
       ]),
       on('surface', [
         rule({
@@ -228,6 +238,20 @@ export default styles(
           flex: '0 0 auto',
           inlineSize: token('size-icon-tight'),
         }),
+      ]),
+      on('trigger', [
+        rule({ active: true, formDisabled: false }, { backgroundColor: token('color-press') }),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. Where the control is already that size the box sits inside it. */
+      on({ after: 'trigger' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       include(printExact),
     ]

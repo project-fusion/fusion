@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import { fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import segment from './headless.js'
@@ -29,6 +30,11 @@ export default styles(
       gapColor: token('color-background'),
     }),
     own: { meterSegmentHue: null },
+    props: {
+      /* What the segment means, which takes the tone's color in place of the next
+         color in the series. */
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    },
     stylesheet: 'meter/segment/meter-segment.generated.css',
   },
   ({ hook, on, rule }) => [
@@ -51,7 +57,7 @@ export default styles(
       rule({ tone: 'neutral' }, { own: { meterSegmentHue: token('color-foreground-subtle') } }),
       rule({ tone: 'primary' }, { own: { meterSegmentHue: token('color-primary') } }),
       rule({ tone: 'success' }, { own: { meterSegmentHue: token('color-success') } }),
-      rule({ tone: 'warning' }, { own: { meterSegmentHue: token('color-warning') } }),
+      rule({ tone: 'warning' }, { own: { meterSegmentHue: token('color-warning-mark') } }),
     ]),
     on('fill', [
       rule({

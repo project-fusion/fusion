@@ -3,11 +3,9 @@ import {
   difference,
   fn,
   list,
-  mix,
   product,
   quotient,
   safeArea,
-  scheme,
   sum,
   token,
   web,
@@ -122,7 +120,7 @@ export default styles(
         }),
       ]),
       on({ region: 'footer', slotted: '*' }, [
-        rule({ display: 'flex', gap: token('space-xs'), justifyContent: 'flex-start' }),
+        rule({ display: 'flex', gap: token('space-xs'), justifyContent: 'flex-end' }),
       ]),
       /* It arrives and it leaves, rising as it fades in. */
       on('surface', [
@@ -223,6 +221,17 @@ export default styles(
           transition: ['color', token('duration-fast'), token('easing-standard')],
         }),
       ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+         moves. Where the control is already that size the box sits inside it. */
+      on({ after: 'dismiss' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
+      ]),
       on('dismiss-mark', [
         rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') }),
       ]),
@@ -230,7 +239,7 @@ export default styles(
         rule(
           { hover: true },
           {
-            backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+            backgroundColor: token('color-hover'),
             color: token('color-foreground'),
           },
         ),
@@ -251,9 +260,7 @@ export default styles(
         variants('material', {
           glass: {
             backdropFilter: hook.backdrop(token('material-backdrop')),
-            backgroundColor: hook.backgroundColor(
-              scheme(token('material-translucent-strong'), token('material-translucent')),
-            ),
+            backgroundColor: hook.backgroundColor(token('material-modal')),
           },
           frosted: {
             backdropFilter: hook.backdrop(fn('blur', token('material-blur-lg'))),

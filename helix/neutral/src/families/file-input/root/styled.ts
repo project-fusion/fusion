@@ -86,10 +86,9 @@ export default styles(
         { invalid: true },
         { borderColor: token('color-danger'), outlineColor: token('color-danger') },
       ),
-      rule(
-        { formDisabled: true },
-        { borderStyle: 'solid', color: token('color-foreground-subtle') },
-      ),
+      rule({ formDisabled: true }, { borderStyle: 'solid', opacity: token('opacity-disabled') }),
+      /* Forced colors paint a danger edge the system color, so it thickens as well. */
+      rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
     ]),
     /* The control is kept and laid over the field at zero opacity, so a
        press anywhere on the box lands on it. */

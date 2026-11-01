@@ -86,6 +86,10 @@ export default styles(
         color: hook.valueColor,
         fontFamily: token('font-display'),
         fontSize: hook.valueSize,
+        /* Figures take one width each. A value breaks only where a word is wider than
+           the whole column, so "99.9%" stays together. */
+        fontVariantNumeric: 'tabular-nums',
+        web: { overflowWrap: 'break-word' },
         fontWeight: token('weight-semibold'),
         letterSpacing: token('tracking-tight'),
         lineHeight: token('leading-tight'),

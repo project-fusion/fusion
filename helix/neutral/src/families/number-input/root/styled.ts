@@ -2,7 +2,7 @@ import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { list, token, web } from '../../../style.js'
+import { difference, list, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import numberInput from './headless.js'
 
@@ -29,7 +29,7 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
-      paddingInline: token('space-xs'),
+      paddingInline: token('space-field'),
       radius: token('radii-sm'),
       size: token('size-control'),
       stepperBackgroundColor: 'transparent',
@@ -37,7 +37,7 @@ export default styles(
       stepperBorderColor: token('color-border'),
       stepperColor: token('color-foreground-muted'),
       stepperColorHover: token('color-foreground'),
-      stepperIconSize: token('size-icon-tight'),
+      stepperIconSize: token('size-icon'),
       stepperSize: token('size-control'),
     },
     stylesheet: 'number-input/root/number-input-root.generated.css',
@@ -66,7 +66,12 @@ export default styles(
         { invalid: true },
         { borderColor: token('color-danger'), outlineColor: token('color-danger') },
       ),
-      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
+      /* A danger edge is painted the system color, so a wrong field thickens its edge. */
+      rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
       /* Read-only is flush with its ground: no recess, the ground showing through. */
       rule({ readonly: true }, { backgroundColor: 'transparent' }),
     ]),
@@ -92,6 +97,7 @@ export default styles(
           alignItems: 'center',
           alignSelf: 'stretch',
           backgroundColor: hook.stepperBackgroundColor,
+          position: 'relative',
           boxSizing: 'border-box',
           color: hook.stepperColor,
           display: 'flex',
@@ -115,8 +121,12 @@ export default styles(
           { disabled: false, hover: true },
           { backgroundColor: hook.stepperBackgroundColorHover, color: hook.stepperColorHover },
         ),
-        /* Spent at an end, and dimmed, so the field keeps its width. */
-        rule({ disabled: true }, { web: { cursor: 'default' }, opacity: 0.4 }),
+        /* Spent at an end, and dimmed, so the field keeps its width. A field that
+           is disabled has faded already, so a stepper does not fade again. */
+        rule(
+          { disabled: true, formDisabled: false },
+          { web: { cursor: 'default' }, opacity: token('opacity-disabled') },
+        ),
       ],
     ),
     /* The icons, drawn or passed in, at one size. */
@@ -126,6 +136,26 @@ export default styles(
     ),
     on({ region: ['decrement-icon', 'increment-icon'], slotted: '*' }, [
       rule({ blockSize: hook.stepperIconSize, inlineSize: hook.stepperIconSize }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'increment' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'decrement' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     /* The label is the surface a reader drags under `scrub`, and says so with the cursor. */
     on('label', [
