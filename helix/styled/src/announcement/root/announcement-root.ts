@@ -72,7 +72,7 @@ export class HelixAnnouncement extends HelixHeadlessAnnouncement {
    * **`surface` was never a color and has moved to `separation`**, which is the
    * axis that owns where a box sits relative to the page. It said the band rode
    * the surface step instead of the sunken one, which is an elevation, and a
-   * band can be `info` and elevated at once: two values true together are two
+   * band can be `info` and filled at once: two values true together are two
    * axes, which is the test the registry answers to.
    */
   @property({ reflect: true })
