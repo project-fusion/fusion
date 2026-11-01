@@ -88,8 +88,8 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "window" => push("window.list", &window::window(value)?.list),
             "treeRoot" | "treeItem" | "inspector" | "tableRoot" | "tableRow" | "tableColumn"
             | "logRoot" | "logLine" | "logGroup" | "tail" | "notificationsRoot"
-            | "notificationRow" | "notificationGroup" | "codeBlock" | "carousel" | "listbox" | "option" | "optionGroup" | "chatRoot"
-            | "chatMessage" | "chatComposer" => {
+            | "notificationRow" | "notificationGroup" | "codeBlock" | "carousel" | "listbox"
+            | "option" | "optionGroup" | "chatRoot" | "chatMessage" | "chatComposer" => {
                 let choice = super::tree_choice::by_key(&key, value)?;
                 for (field, name) in choice.computed {
                     push(&format!("{key}.{field}"), &name);
