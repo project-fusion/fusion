@@ -102,6 +102,12 @@
   opacity: 1;
 }
 
+@media (hover: none) {
+  [part="label"] {
+    opacity: 1;
+  }
+}
+
 /* The shortcut, after the name on its chip, in the muted step: a detail of the
    action, as a menu row's shortcut is. Hidden while nothing is in it, so a
    chip without one is the chip it always was. */

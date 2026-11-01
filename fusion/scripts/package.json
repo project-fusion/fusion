@@ -19,6 +19,7 @@
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",
     "./frontmatter": "./lib/frontmatter.mjs",
+    "./gate-hover": "./lib/gate-hover.mjs",
     "./harnesses": "./lib/harnesses.mjs",
     "./join-lines": "./lib/join-lines.mjs",
     "./known-in-webkit": "./lib/known-in-webkit.mjs",

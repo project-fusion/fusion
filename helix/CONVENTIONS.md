@@ -2406,7 +2406,16 @@ viewport. Everything else in here is `@media print` or
   touch device is a touch device whether the component sits in a 300px sidebar
   or fills the window, so nothing about the containing element can contradict
   it. Carousel uses it to drop its arrows where a swipe already does the job.
-  This is the only media feature a component may read.
+  `hover` and `pointer` are the only media features a component may read.
+
+  **Every `:hover` selector compiles under `@media (hover: hover)`.** A touch
+  screen keeps `:hover` on the last thing tapped: measured in Safari on an iOS
+  27 simulator on October 31, 2026, a Button still read its hover fill two
+  seconds after a tap. `fusion/scripts/lib/gate-hover.mjs` does it for every
+  sheet, so a sheet writes no wrapper. A rule that shows something on hover says
+  what happens on touch: it shows the thing at rest under `@media (hover: none)`,
+  or a comment starting `hover stays on touch` directly before the rule keeps the
+  tap as the way in.
 
 **What narrow looks like now, measured rather than asserted.** Every styled
 family was rendered at 390 and at 320 on August 25, 2026. At 390 the library is
