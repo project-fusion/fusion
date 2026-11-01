@@ -554,10 +554,18 @@ pub fn run(context: &Context) -> Report {
             let whole = caught.as_str();
             let name: String = whole.split('/').take(2).collect::<Vec<&str>>().join("/");
             checked += 1;
-            let Some(package) = api.packages.get(&name) else {
+            /* **A package manager's `create` adds a prefix.** `npm create
+            @fusion.dev/helix-app` runs `@fusion.dev/create-helix-app`, so that is
+            the package the command has to find. */
+            let runs = if text[..caught.start()].ends_with(" create ") {
+                format!("{scope}create-{}", &name[scope.len()..])
+            } else {
+                name.clone()
+            };
+            let Some(package) = api.packages.get(&runs) else {
                 fault(
                     caught.start(),
-                    format!("`{name}` is not a package in this workspace"),
+                    format!("`{runs}` is not a package in this workspace"),
                     "A package name is the cheapest of these to verify.",
                 );
                 continue;
