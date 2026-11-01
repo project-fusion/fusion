@@ -5,8 +5,8 @@ import {
   oneOf,
   Path,
   Slot,
-  string,
   Svg,
+  string,
   View,
   web,
 } from '../../../render.js'

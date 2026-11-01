@@ -47,7 +47,7 @@ export default styles(
     },
     stylesheet: 'listbox/root/listbox-root.generated.css',
   },
-  ({ hook, include, on, own, rule }) => {
+  ({ hook, include, on, rule }) => {
     const columns = fn(
       'repeat',
       'auto-fill',

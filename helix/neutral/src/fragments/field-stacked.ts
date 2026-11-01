@@ -8,5 +8,11 @@ import { fragment } from '../table.js'
  * which would move both. Taken in with `field`, never instead of it.
  */
 export default fragment('field-stacked', { parts: ['label'] }, ({ on, rule }) => [
-  on('label', [rule({ display: 'block', paddingBlockEnd: token('space-2xs') })]),
+  on('label', [
+    rule({
+      display: 'block',
+      fontSize: token('text-field-label'),
+      paddingBlockEnd: token('space-2xs'),
+    }),
+  ]),
 ])
