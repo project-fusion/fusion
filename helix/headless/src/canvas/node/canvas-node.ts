@@ -82,8 +82,8 @@ const DRAWN = [
  * @csspart node - The box the content sits in.
  * @csspart outline - The drawn outline of a `diamond` card, a shape a box cannot draw.
  *
- * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate active - The card that receives focus when you tab into the board.
+ * @cssstate candidate - While a connection is being drawn and this card is somewhere it could arrive.
  * @cssstate placed - Placed on the board.
  * @cssstate selected - The card is selected.
  * @cssstate target - A connection being drawn would end here if you released it.
