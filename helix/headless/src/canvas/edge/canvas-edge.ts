@@ -81,6 +81,17 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
 
+  /**
+   * How the line is drawn: `dashed` or `dotted`. Unset is solid.
+   *
+   * **A stroke rather than an axis**, which is what the registry keeps it for:
+   * no other family draws a line whose stroke says something, and a dashed
+   * connection is the ordinary way to draw a weaker or an optional one. On the
+   * headless tier because the board that draws the line is.
+   */
+  @property({ reflect: true })
+  stroke?: 'dashed' | 'dotted'
+
   /** The name of the card the connection ends at. */
   @property()
   to = ''
@@ -103,17 +114,6 @@ export class HelixHeadlessCanvasEdge extends HelixElement {
   /** The side of the `to` card the connection arrives at, when the document sets one. */
   @property({ attribute: 'to-side' })
   toSide?: CanvasSide | undefined
-
-  /**
-   * How the line is drawn: `dashed` or `dotted`. Unset is solid.
-   *
-   * **A stroke rather than an axis**, which is what the registry keeps it for:
-   * no other family draws a line whose stroke says something, and a dashed
-   * connection is the ordinary way to draw a weaker or an optional one. On the
-   * headless tier because the board that draws the line is.
-   */
-  @property({ reflect: true })
-  stroke?: 'dashed' | 'dotted'
 
   /**
    * Tells the board the connector changed, since the board is what draws it.

@@ -259,10 +259,10 @@ mod tests {
 
     #[test]
     fn a_suggestion_is_within_a_third_of_the_name() {
-        let hooks = ["--breadcrumbs-hover-background-color", "--breadcrumbs-gap"];
+        let hooks = ["--breadcrumbs-hover-color", "--breadcrumbs-gap"];
         assert_eq!(
             nearest("--breadcrumb-hover-color", hooks, Some(2)),
-            Some("--breadcrumbs-hover-background-color")
+            Some("--breadcrumbs-hover-color")
         );
         assert_eq!(
             nearest("--button-x", ["--button-background-color"], None),

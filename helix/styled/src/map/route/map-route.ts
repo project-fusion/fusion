@@ -23,13 +23,13 @@ import { styles } from './map-route.css.js'
  */
 @customElement('helix-map-route')
 export class HelixMapRoute extends HelixHeadlessMapRoute {
-  /** The route's color. Uses your primary color unless set. */
-  @property({ reflect: true })
-  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
-
   /** `dotted` draws the route as dots, for a walk off the road network. */
   @property({ reflect: true })
   stroke?: 'dotted'
+
+  /** The route's color. Uses your primary color unless set. */
+  @property({ reflect: true })
+  tone?: 'accent' | 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'warning'
 
   static override styles: CSSResultGroup = styles
 }

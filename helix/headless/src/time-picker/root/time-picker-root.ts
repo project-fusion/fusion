@@ -352,20 +352,42 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   nowLabel = 'Now'
 
   /**
+   * Shows the times as one `list`, or as `wheels` with a column for each part
+   * of the time.
+   *
+   * `list` is the default and offers whole times, which is what a product with
+   * opening hours or slots actually has. `wheels` splits them into an hour, a
+   * minute and, where the locale uses one, a meridiem: three short columns
+   * instead of ninety-six rows, and the only way to reach `23:45` without
+   * scrolling most of a day.
+   *
+   * The trade is that a wheel cannot say which *combinations* are on offer. A
+   * list of half hours from nine to five is seventeen rows and every one of them
+   * is a time the product has; the same thing as columns is an hour column and a
+   * minute column, and nothing in either says the two are only valid together.
+   * The bounds are still enforced, so a reader can be refused after the fact,
+   * which is worse than not being offered it.
+   *
+   * So: `list` where the set is the point, `wheels` where any time is allowed
+   * and the range is a whole day.
+   *
+   * **Optional rather than defaulted, which is not a style preference.** A
+   * reflecting property with a default writes its attribute onto every host the
+   * moment the element upgrades, including the ones a consumer rendered and did
+   * not touch, and React reads that as a hydration mismatch. The absent
+   * attribute *is* the list, which the stylesheet reads as the base rule, so
+   * only the departure has to be named.
+   */
+  @property({ reflect: true })
+  picker?: 'list' | 'wheels'
+
+  /**
    * The validation message for a time after `max`. `{max}` is replaced with
    * `max`, written in `locale`.
    */
   @words
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage = 'Choose a time at or before {max}.'
-
-  /**
-   * The validation message for a time before `min`. `{min}` is replaced with
-   * `min`, written in `locale`.
-   */
-  @words
-  @property({ attribute: 'range-underflow-message' })
-  rangeUnderflowMessage = 'Choose a time at or after {min}.'
 
   /**
    * Every time on offer, as seconds since midnight.
@@ -729,6 +751,22 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   }
 
   /**
+   * The validation message for a time before `min`. `{min}` is replaced with
+   * `min`, written in `locale`.
+   */
+  @words
+  @property({ attribute: 'range-underflow-message' })
+  rangeUnderflowMessage = 'Choose a time at or after {min}.'
+
+  /** Refuses every change while read-only. See `readOnly`. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /**
    * Blocks changes to the time. The value is still submitted with the form.
    *
    * **Enforced by refusing every request in one place**, which is the seam this
@@ -743,14 +781,6 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    */
   @property({ attribute: 'readonly', reflect: true, type: Boolean })
   readOnly = false
-
-  /** Refuses every change while read-only. See `readOnly`. */
-  override requestValue(next: string): boolean {
-    if (this.readOnly) {
-      return false
-    }
-    return super.requestValue(next)
-  }
 
   /**
    * Stops the form from submitting while no time is chosen.
@@ -833,13 +863,6 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   unavailableMessage = 'Choose a time that is available.'
 
   /**
-   * The validation message for a required time picker with no time chosen.
-   */
-  @words
-  @property({ attribute: 'value-missing-message' })
-  valueMissingMessage = 'Choose a time.'
-
-  /**
    * What is wrong with a time the picker can read, as a validity flag and a
    * message, or nothing.
    *
@@ -880,34 +903,11 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   }
 
   /**
-   * Shows the times as one `list`, or as `wheels` with a column for each part
-   * of the time.
-   *
-   * `list` is the default and offers whole times, which is what a product with
-   * opening hours or slots actually has. `wheels` splits them into an hour, a
-   * minute and, where the locale uses one, a meridiem: three short columns
-   * instead of ninety-six rows, and the only way to reach `23:45` without
-   * scrolling most of a day.
-   *
-   * The trade is that a wheel cannot say which *combinations* are on offer. A
-   * list of half hours from nine to five is seventeen rows and every one of them
-   * is a time the product has; the same thing as columns is an hour column and a
-   * minute column, and nothing in either says the two are only valid together.
-   * The bounds are still enforced, so a reader can be refused after the fact,
-   * which is worse than not being offered it.
-   *
-   * So: `list` where the set is the point, `wheels` where any time is allowed
-   * and the range is a whole day.
-   *
-   * **Optional rather than defaulted, which is not a style preference.** A
-   * reflecting property with a default writes its attribute onto every host the
-   * moment the element upgrades, including the ones a consumer rendered and did
-   * not touch, and React reads that as a hydration mismatch. The absent
-   * attribute *is* the list, which the stylesheet reads as the base rule, so
-   * only the departure has to be named.
+   * The validation message for a required time picker with no time chosen.
    */
-  @property({ reflect: true })
-  picker?: 'list' | 'wheels'
+  @words
+  @property({ attribute: 'value-missing-message' })
+  valueMissingMessage = 'Choose a time.'
 
   /**
    * Reports "required and empty", or clears it.

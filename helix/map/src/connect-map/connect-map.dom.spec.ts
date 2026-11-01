@@ -738,7 +738,7 @@ describe('connectMap with routes and areas', () => {
     const route = host.querySelector('helix-headless-map-route') as HTMLElement & {
       stroke?: string
     }
-    route.variant = 'dotted'
+    route.stroke = 'dotted'
     const { driver, drawn } = layering()
     connectMap(host, driver)
     expect(drawn[0]?.map(({ casing, pattern }) => ({ casing, pattern }))).toEqual([

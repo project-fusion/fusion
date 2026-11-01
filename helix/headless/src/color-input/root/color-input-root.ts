@@ -269,13 +269,6 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   swatchLabel = '{name} {value}'
 
   /**
-   * Accessible name for the control that opens the panel.
-   */
-  @words
-  @property({ attribute: 'trigger-label' })
-  triggerLabel = 'Choose a color'
-
-  /**
    * Whether the field is a text box with a swatch on it, or only the swatch.
    *
    * `swatch` is the native control's shape: a block of color that opens a
@@ -294,6 +287,13 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    */
   @property({ reflect: true })
   trigger?: 'swatch'
+
+  /**
+   * Accessible name for the control that opens the panel.
+   */
+  @words
+  @property({ attribute: 'trigger-label' })
+  triggerLabel = 'Choose a color'
 
   /**
    * Draws the panel's hue as a wheel around the square, in place of the hue

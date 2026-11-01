@@ -168,6 +168,31 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   label = ''
 
   /**
+   * Whether the panel is a card under the trigger or a band across the page.
+   *
+   * The resting one is the card, hanging off the trigger and as wide as it
+   * needs to be. `band` is the other shape navigations use: a run from edge to
+   * edge under the header, with its contents held to the page's own measure, so
+   * a set of destinations too wide to sit under one word gets the whole width
+   * to lay out in.
+   *
+   * **A band and not a width, which is why the word is not `full`.** It changes
+   * where the panel goes as well as how wide it is, which is why this tier
+   * knows about it at all: a band spans the viewport, so there is nothing to
+   * measure it against and nothing to flip or shift to, and the placing pass is
+   * told not to run. Everything else the popover gives, the top layer and the
+   * dismissal, is exactly what such a band needs. `full` is the registry's word
+   * for a width, and `Button` and `Dialog` are the two families answering that
+   * question; borrowing it here would put a third meaning on it.
+   *
+   * `layout` and not an axis, for the reason the registry gives: a card under
+   * a word and a band under a header are two arrangements this family has, and
+   * no other family is being asked the same question.
+   */
+  @property({ reflect: true })
+  layout?: 'band'
+
+  /**
    * How long a pointer rests on the trigger before the panel opens, in
    * milliseconds, under `open-on="hover"`. A pointer crossing the bar on its
    * way somewhere else opens nothing. The attribute also takes a CSS time, such
@@ -199,31 +224,6 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    */
   @property()
   placement: Placement = 'bottom-start'
-
-  /**
-   * Whether the panel is a card under the trigger or a band across the page.
-   *
-   * The resting one is the card, hanging off the trigger and as wide as it
-   * needs to be. `band` is the other shape navigations use: a run from edge to
-   * edge under the header, with its contents held to the page's own measure, so
-   * a set of destinations too wide to sit under one word gets the whole width
-   * to lay out in.
-   *
-   * **A band and not a width, which is why the word is not `full`.** It changes
-   * where the panel goes as well as how wide it is, which is why this tier
-   * knows about it at all: a band spans the viewport, so there is nothing to
-   * measure it against and nothing to flip or shift to, and the placing pass is
-   * told not to run. Everything else the popover gives, the top layer and the
-   * dismissal, is exactly what such a band needs. `full` is the registry's word
-   * for a width, and `Button` and `Dialog` are the two families answering that
-   * question; borrowing it here would put a third meaning on it.
-   *
-   * `layout` and not an axis, for the reason the registry gives: a card under
-   * a word and a band under a header are two arrangements this family has, and
-   * no other family is being asked the same question.
-   */
-  @property({ reflect: true })
-  layout?: 'band'
 
   @state()
   private narrow = false

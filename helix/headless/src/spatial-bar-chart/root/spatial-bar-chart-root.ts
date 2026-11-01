@@ -267,6 +267,42 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   growAgain = false
 
   /**
+   * How the bars stand.
+   *
+   * Unset, they stand on a grid of categories across and series in depth,
+   * in a box the camera looks at from a corner, so the grid recedes at an
+   * angle. `row` lays the categories in a straight line across the page and
+   * turns each bar to the camera, showing its top and two sides, for one row
+   * of readings in a small space such as a pane: turning the view turns each
+   * bar where it stands, and the row stays level. It is the chart's own
+   * drawing that lays the row: a renderer connected through
+   * `@fusion.dev/helix-plot` stands the bars on the grid.
+   *
+   * `diagonal` is the same row climbing to the right as it recedes, each
+   * place a step further back than the one before, as a row of days on a
+   * product's page is drawn: the row rises one part in five across the page
+   * from any turn, and its floor and names climb with it. A row whose bars
+   * have a size climbs at most a quarter of the plot's height, so the bars
+   * of a long row keep theirs.
+   *
+   * **A row draws its floor in place of a box**: each place as an outline a
+   * little wider than its bar, and each category's name under it, as many
+   * names as fit without touching. A name whose bar names a tone is written
+   * first, in that tone. `no-box` leaves the floor and the names out.
+   *
+   * **A `column-gap` on the `fallback` part gives a row's bars one width**,
+   * which the styled tier sets from `--spatial-bar-chart-bar-size`: one bar
+   * stands as wide as each of twenty, the row is as long as its bars and
+   * centered, the tallest bar stands as high as the plot has room for and
+   * no taller than the row is long and a quarter again, so one bar stands
+   * as a block, and `fits` says how many bars the plot holds, so a page
+   * can give it the latest of a longer table. It is read when the plot's
+   * size changes.
+   */
+  @property({ reflect: true })
+  layout?: 'diagonal' | 'row'
+
+  /**
    * Draws no box: no edges, grid, numbers, or names, and in a `row` no
    * floor, so the readings stand alone and fill the plot, as a picture on a
    * product's own page does. The
@@ -311,42 +347,6 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   @property({ attribute: 'summary-label' })
   summaryLabel =
     '{count, plural, one {# bar} other {# bars}} in {series, plural, one {# series} other {# series}} over {categories, plural, one {# category} other {# categories}}, from {low} to {high}.'
-
-  /**
-   * How the bars stand.
-   *
-   * Unset, they stand on a grid of categories across and series in depth,
-   * in a box the camera looks at from a corner, so the grid recedes at an
-   * angle. `row` lays the categories in a straight line across the page and
-   * turns each bar to the camera, showing its top and two sides, for one row
-   * of readings in a small space such as a pane: turning the view turns each
-   * bar where it stands, and the row stays level. It is the chart's own
-   * drawing that lays the row: a renderer connected through
-   * `@fusion.dev/helix-plot` stands the bars on the grid.
-   *
-   * `diagonal` is the same row climbing to the right as it recedes, each
-   * place a step further back than the one before, as a row of days on a
-   * product's page is drawn: the row rises one part in five across the page
-   * from any turn, and its floor and names climb with it. A row whose bars
-   * have a size climbs at most a quarter of the plot's height, so the bars
-   * of a long row keep theirs.
-   *
-   * **A row draws its floor in place of a box**: each place as an outline a
-   * little wider than its bar, and each category's name under it, as many
-   * names as fit without touching. A name whose bar names a tone is written
-   * first, in that tone. `no-box` leaves the floor and the names out.
-   *
-   * **A `column-gap` on the `fallback` part gives a row's bars one width**,
-   * which the styled tier sets from `--spatial-bar-chart-bar-size`: one bar
-   * stands as wide as each of twenty, the row is as long as its bars and
-   * centered, the tallest bar stands as high as the plot has room for and
-   * no taller than the row is long and a quarter again, so one bar stands
-   * as a block, and `fits` says how many bars the plot holds, so a page
-   * can give it the latest of a longer table. It is read when the plot's
-   * size changes.
-   */
-  @property({ reflect: true })
-  layout?: 'diagonal' | 'row'
 
   /** Whether a renderer has drawn the bars, which hides the chart's own drawing. */
   @state()

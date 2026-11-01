@@ -405,6 +405,16 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   language = ''
 
   /**
+   * How a diff's two versions are arranged. It has no effect without `diff`.
+   *
+   * Absent is unified, each removal above its replacement, which fits any
+   * width. `split` sets the old version beside the new one. Optional rather
+   * than defaulted, so the host carries no attribute the consumer did not write.
+   */
+  @property({ reflect: true })
+  layout?: 'split'
+
+  /**
    * Whether the lines are numbered in a gutter beside the code.
    *
    * The numbers are hidden from the accessibility tree and are not part of a
@@ -461,16 +471,6 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @words
   @property({ attribute: 'show-unchanged-label' })
   showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
-
-  /**
-   * How a diff's two versions are arranged. It has no effect without `diff`.
-   *
-   * Absent is unified, each removal above its replacement, which fits any
-   * width. `split` sets the old version beside the new one. Optional rather
-   * than defaulted, so the host carries no attribute the consumer did not write.
-   */
-  @property({ reflect: true })
-  layout?: 'split'
 
   /**
    * Whether long lines wrap. Without it they scroll.

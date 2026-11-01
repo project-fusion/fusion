@@ -125,6 +125,24 @@ export class HelixText extends HelixElement {
   lines?: number
 
   /**
+   * The type style, which sets the size, weight, leading, and tracking.
+   *
+   * Defaults to the one that matches `as`: `body` for `p`, `body-strong` for
+   * `strong`, `h5` and `h6`. A `span` or an `em` keeps the type around it.
+   */
+  @property({ reflect: true })
+  scale?:
+    | 'display'
+    | 'heading'
+    | 'subheading'
+    | 'title'
+    | 'body'
+    | 'body-strong'
+    | 'caption'
+    | 'label'
+    | 'code'
+
+  /**
    * How the lines align, set as `text-align`.
    *
    * Named for the CSS property it sets. `align` alone is a legacy HTML
@@ -158,24 +176,6 @@ export class HelixText extends HelixElement {
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'primary' | 'success' | 'warning'
-
-  /**
-   * The type style, which sets the size, weight, leading, and tracking.
-   *
-   * Defaults to the one that matches `as`: `body` for `p`, `body-strong` for
-   * `strong`, `h5` and `h6`. A `span` or an `em` keeps the type around it.
-   */
-  @property({ reflect: true })
-  scale?:
-    | 'display'
-    | 'heading'
-    | 'subheading'
-    | 'title'
-    | 'body'
-    | 'body-strong'
-    | 'caption'
-    | 'label'
-    | 'code'
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)

@@ -190,24 +190,25 @@ export class HelixHeadlessOutline extends HelixElement {
   label = ''
 
   /**
+   * The rail form: a slim column of ticks, one per link, that opens on hover,
+   * focus, or a tap into a surface holding the links.
+   *
+   * A marker because no registered axis (emphasis, material, nesting,
+   * orientation, separation, shape, size, tone, width) has a value for it, and
+   * a rail is an arrangement of this family alone, as Megamenu's
+   * `marker="band"` is. It has no default: the outline without it is the list
+   * of links.
+   */
+  @property({ reflect: true })
+  marker?: 'rail'
+
+  /**
    * Which links are marked. `reading` marks the one section being read, the
    * last whose heading has passed the reading line. `visible` marks every
    * section with part of it on screen, and the mark runs across their links.
    */
   @property()
   marks: 'reading' | 'visible' = 'reading'
-
-  /**
-   * How far below the top of the scroll container a heading counts as reached,
-   * in pixels. The scroll container is the window or the panel the sections
-   * scroll in.
-   *
-   * The reading line. A page with a sticky masthead sets this to its height, or
-   * a little more: without it the current section changes as a heading slides
-   * under the chrome rather than as it reaches the top of what can be seen.
-   */
-  @property({ converter: numberConverter('offset', 0, 'pixels') })
-  offset = 0
 
   /**
    * The id of the section in view, or empty before anything is measured.
@@ -236,17 +237,16 @@ export class HelixHeadlessOutline extends HelixElement {
   private markedIds: string[] = []
 
   /**
-   * The rail form: a slim column of ticks, one per link, that opens on hover,
-   * focus, or a tap into a surface holding the links.
+   * How far below the top of the scroll container a heading counts as reached,
+   * in pixels. The scroll container is the window or the panel the sections
+   * scroll in.
    *
-   * A marker because no registered axis (emphasis, material, nesting,
-   * orientation, separation, shape, size, tone, width) has a value for it, and
-   * a rail is an arrangement of this family alone, as Megamenu's
-   * `marker="band"` is. It has no default: the outline without it is the list
-   * of links.
+   * The reading line. A page with a sticky masthead sets this to its height, or
+   * a little more: without it the current section changes as a heading slides
+   * under the chrome rather than as it reaches the top of what can be seen.
    */
-  @property({ reflect: true })
-  marker?: 'rail'
+  @property({ converter: numberConverter('offset', 0, 'pixels') })
+  offset = 0
 
   /**
    * What `current` reports, which only `mark` writes.

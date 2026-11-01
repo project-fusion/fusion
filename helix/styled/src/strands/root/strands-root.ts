@@ -213,6 +213,13 @@ export class HelixStrands extends HelixElement {
   gain = 1
 
   /**
+   * The form the ribbon takes. When it is not set, the form is `ribbon`. In
+   * `travel`, the form of every stretch no stop claims.
+   */
+  @property()
+  pattern?: StrandsPattern
+
+  /**
    * The ids of elements the light dims behind, separated by spaces, such as
    * a hero's words. Inside each, the ribbon keeps a faint glow, so words over
    * it stay crisp and nothing busy runs under them, and it eases back to full
@@ -246,13 +253,6 @@ export class HelixStrands extends HelixElement {
    */
   @property({ reflect: true, type: Boolean })
   travel = false
-
-  /**
-   * The form the ribbon takes. When it is not set, the form is `ribbon`. In
-   * `travel`, the form of every stretch no stop claims.
-   */
-  @property()
-  pattern?: StrandsPattern
 
   /** The colors, resolved from what the canvas carries. Aura's approach, in `readPalette`. */
   private palette: StrandsPalette = { ...RESTING_PALETTE }
