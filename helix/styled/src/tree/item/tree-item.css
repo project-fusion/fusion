@@ -245,6 +245,8 @@ slot[name="end"] {
 /* A mark beside the name reads as being about the name, so it takes the muted
    color the row has rather than full strength. */
 slot[name="start"]::slotted(*) {
+  --icon-size: var(--helix-size-icon-tight);
+
   color: var(--helix-color-foreground-subtle);
 }
 

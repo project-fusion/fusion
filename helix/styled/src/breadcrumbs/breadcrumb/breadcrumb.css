@@ -1,4 +1,8 @@
 :host {
+  /* An icon in a crumb is drawn to the crumb's text, in the link, in the trigger
+     and in a control alike. At the default 20 a house stood over 13px words. */
+  --icon-size: 1.15em;
+
   /* A control in a crumb is a crumb-sized target, not an icon-sized one.
      `::slotted(a)` below is a line box with `2xs` above and below, which comes
      out at 28. An `IconButton` slotted beside it takes the control size, 40, so
@@ -215,7 +219,6 @@ a[part="link"]:focus-visible {
     var(--helix-color-hover)
   );
   --icon-button-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
-  --icon-size: 1.15em;
 
   align-items: center;
   display: inline-flex;

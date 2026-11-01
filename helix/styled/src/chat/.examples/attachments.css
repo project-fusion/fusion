@@ -25,3 +25,7 @@
   inset-inline-end: var(--helix-space-2xs);
   position: absolute;
 }
+
+.remove helix-icon {
+  --icon-size: calc(var(--helix-size-icon) * 0.75);
+}

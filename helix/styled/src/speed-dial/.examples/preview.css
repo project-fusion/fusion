@@ -10,6 +10,7 @@
 
 helix-icon-button[slot="trigger"] {
   --icon-button-size: var(--helix-size-control-lg);
+  --icon-size: var(--helix-size-icon-lg);
 }
 
 /* The plus turns into a cross while the dial is open.
