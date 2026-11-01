@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-app",
   "description": "The Helix gallery on a phone: each component with a native version, and its examples drawn by the native renderer in Expo Go.",
-  "version": "0.228.0",
+  "version": "0.229.0",
   "private": true,
   "license": "MIT",
   "repository": {
