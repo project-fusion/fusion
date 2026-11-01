@@ -53,6 +53,7 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['chat/composer/chat-composer.css', '[part="send"]::after'],
   ['chat/message/chat-message.css', '[part="retry"]::after'],
   ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
+  ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
 ]
 
 /* Rows sit against each other, so the row itself is the target on a touch screen. */
@@ -60,7 +61,8 @@ const ROWS = [
   'accordion/item/accordion-item.css',
   'checkbox/root/checkbox-root.css',
   'drilldown/item/drilldown-item.css',
-  'log/root/log-root.css',
+  'log/group/log-group.css',
+  'object-inspector/root/object-inspector-root.css',
   'outline/root/outline-root.css',
   'radio/root/radio-root.css',
   'shared/row/row.css',

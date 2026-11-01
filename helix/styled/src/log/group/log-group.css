@@ -239,3 +239,11 @@
   max-block-size: none;
   padding: 0;
 }
+
+/* Rows sit against each other, so a box reaching past a row would take the press
+   from the row beside it. On a touch screen the row itself reaches the target. */
+@media (pointer: coarse) {
+  [part="summary"] {
+    min-block-size: var(--helix-size-target);
+  }
+}

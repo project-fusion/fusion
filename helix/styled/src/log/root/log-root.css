@@ -295,15 +295,6 @@
   --_collection-inset-block: var(--helix-space-lg);
   --_collection-inset-inline: var(--helix-space-md);
 }
-
-/* Rows sit against each other, so a box reaching past a row would take the press
-   from the row beside it. On a touch screen the row itself reaches the target. */
-@media (pointer: coarse) {
-  [part="summary"] {
-    min-block-size: var(--helix-size-target);
-  }
-}
-
 @media print {
   :host {
     max-block-size: none;

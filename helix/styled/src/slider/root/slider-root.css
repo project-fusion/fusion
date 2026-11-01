@@ -780,6 +780,14 @@
   }
 }
 
+/* A thumb and a thin track are hard to reach with a finger, so the input takes the
+   target's height. The track stays centered in it. */
+@media (pointer: coarse) {
+  [part="control"] {
+    min-block-size: var(--helix-size-target);
+  }
+}
+
 /* Print: a control prints the value it holds, and here the value is the fill, so
  * a track printed without it is a document saying nothing was set.
  *
