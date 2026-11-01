@@ -336,6 +336,26 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a field that opens a list of options reads, sends, and computes. */
+export interface SelectChoice {
+  readonly defaultValue?: string
+  readonly disabled?: string
+  readonly filterable?: string
+  readonly items?: string
+  readonly listLabel?: string
+  readonly listName?: string
+  readonly multiple?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onInput?: string
+  readonly placeholder?: string
+  readonly position?: string
+  readonly said?: string
+  readonly status?: string
+  readonly value?: string
+  readonly words?: string
+}
+
 /** What a list of options reads, sends, and computes, by the names the element gives them. */
 export interface ListboxChoice {
   readonly childrenShown?: string

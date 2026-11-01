@@ -88,8 +88,8 @@ use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
     CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
-    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, TABLE, TABLE_COLUMN, TABLE_ROW,
-    TAIL, TREE, TREE_ITEM,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, SELECT, TABLE, TABLE_COLUMN,
+    TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -633,6 +633,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.log_root, LOG_ROOT, "log"),
         (&api.carousel, CAROUSEL, "carousel"),
         (&api.listbox, LISTBOX, "listbox"),
+        (&api.select, SELECT, "select"),
         (&api.option, OPTION, "option"),
         (&api.option_group, OPTION_GROUP, "option-group"),
         (&api.chat_root, CHAT_ROOT, "chat"),

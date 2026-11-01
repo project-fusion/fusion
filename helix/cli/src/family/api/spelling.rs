@@ -540,6 +540,25 @@ const LOG_GROUP: &[Field] = &[
     ("statusLabel", "statusLabel", Name),
 ];
 
+const SELECT: &[Field] = &[
+    ("defaultValue", "defaultValue", Name),
+    ("disabled", "disabled", Name),
+    ("filterable", "filterable", Name),
+    ("items", "items", Name),
+    ("listLabel", "listLabel", Name),
+    ("listName", "listName", Name),
+    ("multiple", "multiple", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onChange", "onChange", Name),
+    ("onInput", "onInput", Name),
+    ("placeholder", "placeholder", Name),
+    ("position", "position", Name),
+    ("said", "said", Name),
+    ("status", "status", Name),
+    ("value", "value", Name),
+    ("words", "words", Name),
+];
+
 const LISTBOX: &[Field] = &[
     ("childrenShown", "childrenShown", Name),
     ("defaultFilter", "defaultFilter", Name),
@@ -1055,6 +1074,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("notificationGroup", "notificationGroup", NOTIFICATION_GROUP),
     ("carousel", "carousel", CAROUSEL),
     ("listbox", "listbox", LISTBOX),
+    ("select", "select", SELECT),
     ("option", "option", OPTION),
     ("optionGroup", "optionGroup", OPTION_GROUP),
     ("chatRoot", "chatRoot", CHAT_ROOT),
