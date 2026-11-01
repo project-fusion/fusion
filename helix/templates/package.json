@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-templates",
   "description": "Starter templates for Helix, as data. Read by `helix new` and by `npm create @fusion.dev/helix-app`.",
-  "version": "0.227.0",
+  "version": "0.228.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

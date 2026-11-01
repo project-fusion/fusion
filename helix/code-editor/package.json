@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-code-editor",
   "description": "Connects the Helix Code Editor to CodeMirror, themed with your tokens: highlighting, line numbers, folding, search, and diagnostics.",
-  "version": "0.227.0",
+  "version": "0.228.0",
   "license": "MIT",
   "author": "Fusion Development Group",
   "repository": {

@@ -146,7 +146,7 @@
     },
     "helix/cem": {
       "name": "@fusion.dev/helix-cem",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "bin": {
         "helix-cem": "./src/cli.ts",
       },
@@ -157,7 +157,7 @@
     },
     "helix/cli/npm": {
       "name": "@fusion.dev/helix-cli",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "bin": {
         "helix": "./bin.mjs",
       },
@@ -182,27 +182,27 @@
     },
     "helix/cli/platforms/darwin-arm64": {
       "name": "@fusion.dev/helix-cli-darwin-arm64",
-      "version": "0.227.0",
+      "version": "0.228.0",
     },
     "helix/cli/platforms/darwin-x64": {
       "name": "@fusion.dev/helix-cli-darwin-x64",
-      "version": "0.227.0",
+      "version": "0.228.0",
     },
     "helix/cli/platforms/linux-arm64": {
       "name": "@fusion.dev/helix-cli-linux-arm64",
-      "version": "0.227.0",
+      "version": "0.228.0",
     },
     "helix/cli/platforms/linux-x64": {
       "name": "@fusion.dev/helix-cli-linux-x64",
-      "version": "0.227.0",
+      "version": "0.228.0",
     },
     "helix/cli/platforms/win32-x64": {
       "name": "@fusion.dev/helix-cli-win32-x64",
-      "version": "0.227.0",
+      "version": "0.228.0",
     },
     "helix/code-editor": {
       "name": "@fusion.dev/helix-code-editor",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lang-css": "^6.3.1",
@@ -228,7 +228,7 @@
     },
     "helix/core": {
       "name": "@fusion.dev/helix-core",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@fusion.dev/helix-icons": "workspace:*",
@@ -246,7 +246,7 @@
     },
     "helix/create-app": {
       "name": "@fusion.dev/create-helix-app",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "bin": {
         "create-helix-app": "./bin.mjs",
       },
@@ -257,7 +257,7 @@
     },
     "helix/diagnostics": {
       "name": "@fusion.dev/helix-diagnostics",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@fusion.dev/helix-testing": "workspace:*",
         "@types/bun": "^1.4.4",
@@ -265,7 +265,7 @@
     },
     "helix/docs": {
       "name": "@fusion.dev/helix-docs",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@fusion.dev/helix": "workspace:*",
         "@fusion.dev/helix-cem": "workspace:*",
@@ -285,7 +285,7 @@
     },
     "helix/editor": {
       "name": "@fusion.dev/helix-editor",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "prosemirror-commands": "^1.7.2",
         "prosemirror-dropcursor": "^1.8.4",
@@ -313,7 +313,7 @@
     },
     "helix/gallery": {
       "name": "@fusion.dev/helix-gallery",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@types/react": "^19.3.0",
         "react": "^19.3.1",
@@ -324,7 +324,7 @@
     },
     "helix/graph": {
       "name": "@fusion.dev/helix-graph",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
       },
@@ -361,7 +361,7 @@
     },
     "helix/headless": {
       "name": "@fusion.dev/helix-headless",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
         "@fusion.dev/helix-icons": "workspace:*",
@@ -383,7 +383,7 @@
     },
     "helix/icons": {
       "name": "@fusion.dev/helix-icons",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "bin": {
         "helix-icons": "./dist/cli.js",
       },
@@ -396,7 +396,7 @@
     },
     "helix/map": {
       "name": "@fusion.dev/helix-map",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
         "@fusion.dev/helix-icons": "workspace:*",
@@ -415,7 +415,7 @@
     },
     "helix/plot": {
       "name": "@fusion.dev/helix-plot",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
       },
@@ -435,7 +435,7 @@
     },
     "helix/sandbox": {
       "name": "@fusion.dev/helix-sandbox",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lang-css": "^6.3.1",
@@ -475,7 +475,7 @@
     },
     "helix/speech": {
       "name": "@fusion.dev/helix-speech",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
         "@moonshine-ai/moonshine-wasm": "0.1.5",
@@ -486,7 +486,7 @@
     },
     "helix/styled": {
       "name": "@fusion.dev/helix",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
         "@fusion.dev/helix-headless": "workspace:*",
@@ -512,21 +512,21 @@
     },
     "helix/styles": {
       "name": "@fusion.dev/helix-styles",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@fusion.dev/scripts": "workspace:*",
       },
     },
     "helix/templates": {
       "name": "@fusion.dev/helix-templates",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@fusion.dev/scripts": "workspace:*",
       },
     },
     "helix/terminal": {
       "name": "@fusion.dev/helix-terminal",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
       },
@@ -542,7 +542,7 @@
     },
     "helix/testing": {
       "name": "@fusion.dev/helix-testing",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@happy-dom/global-registrator": "^21.0.4",
         "@lit-labs/ssr": "^4.1.0",
@@ -552,14 +552,14 @@
     },
     "helix/theme": {
       "name": "@fusion.dev/helix-theme",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "devDependencies": {
         "@fusion.dev/scripts": "workspace:*",
       },
     },
     "helix/workbench": {
       "name": "@fusion.dev/helix-workbench",
-      "version": "0.227.0",
+      "version": "0.228.0",
       "dependencies": {
         "@fusion.dev/helix-core": "workspace:*",
       },
