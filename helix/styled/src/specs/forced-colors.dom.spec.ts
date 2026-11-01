@@ -27,6 +27,11 @@ beforeAll(async () => {
       'legend',
       'graph',
       'map',
+      'checkbox',
+      'radio',
+      'toggle',
+      'pagination',
+      'option',
     ].map((family) => import(`../${family}/index.js`)),
   )
 })
@@ -97,6 +102,14 @@ describe('under forced colors', () => {
     expect(sheet).toMatch(/\[part="fill"\] \{\s*forced-color-adjust: none/u)
     expect(sheet).toMatch(/\[part="track"\] \{\s*color: GrayText/u)
     expect(sheet).toMatch(/\[part="fill"\] \{\s*color: Highlight/u)
+  })
+
+  test('a chosen control draws its mark in Highlight', () => {
+    expect(rule('helix-checkbox', '[part~="mark"]')).toContain('Highlight')
+    expect(rule('helix-radio', '[part="box"]::after')).toContain('Highlight')
+    expect(forced('helix-toggle-group')).toContain('Highlight')
+    expect(forced('helix-pagination')).toContain('HighlightText')
+    expect(forced('helix-option')).toContain('Highlight')
   })
 
   test('a skeleton is outlined in GrayText', () => {

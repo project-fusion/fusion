@@ -801,6 +801,16 @@ helix-toggle:state(pressed)::part(item) {
   color: var(--toggle-item-color-selected, var(--helix-color-foreground));
 }
 
+/* The group draws the thumb in Highlight under forced colors, and the label
+   has to read on it. */
+@media (forced-colors: active) {
+  helix-toggle:state(selected)::part(item),
+  helix-toggle:state(pressed)::part(item) {
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+}
+
 helix-toggle[disabled]::part(item) {
   cursor: not-allowed;
   opacity: 0.5;

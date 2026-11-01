@@ -260,3 +260,18 @@ slot[name="dash"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* Forced colors paint every background Canvas, so a mark drawn as one disappears
+   and a chosen control looks like the others. Measured in Chromium on October
+   31, 2026. */
+@media (forced-colors: active) {
+  [part~="mark"] {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+
+  :host(:state(checked)) [part="control"],
+  :host(:state(indeterminate)) [part="control"] {
+    border-color: Highlight;
+  }
+}
