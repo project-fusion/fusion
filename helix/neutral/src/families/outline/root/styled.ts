@@ -221,7 +221,7 @@ export default styles(
       on('host', [
         web([
           rule(
-            { variant: 'rail' },
+            { marker: 'rail' },
             {
               own: { length: hook.tickLength },
               inlineSize: product(own.length, 1.5),
@@ -229,13 +229,13 @@ export default styles(
             },
           ),
           /* The titles are the contents on paper, and the ticks mean nothing there. */
-          rule({ print: true, variant: 'rail' }, { inlineSize: 'auto' }),
+          rule({ print: true, marker: 'rail' }, { inlineSize: 'auto' }),
         ]),
       ]),
       on('ticks', [
         web([
           rule(
-            { variant: 'rail' },
+            { marker: 'rail' },
             {
               alignItems: 'flex-end',
               display: 'flex',
@@ -244,15 +244,15 @@ export default styles(
             },
           ),
           /* The surface is translucent, so the ticks it covers would show through it. */
-          rule({ open: true, variant: 'rail' }, { visibility: 'hidden' }),
-          rule({ print: true, variant: 'rail' }, { display: 'none' }),
+          rule({ open: true, marker: 'rail' }, { visibility: 'hidden' }),
+          rule({ print: true, marker: 'rail' }, { display: 'none' }),
         ]),
       ]),
       /* Each deeper level is a shorter tick: the length over 1, 1.5, 2, 2.5... */
       on('tick', [
         web([
           rule(
-            { variant: 'rail' },
+            { marker: 'rail' },
             {
               own: { boost: 1 },
               backgroundColor: hook.tickColor,
@@ -265,7 +265,7 @@ export default styles(
             },
           ),
           rule(
-            { part: { 'data-current': true }, variant: 'rail' },
+            { part: { 'data-current': true }, marker: 'rail' },
             {
               own: { boost: 1.5 },
               backgroundColor: hook.tickCurrentColor,
@@ -279,7 +279,7 @@ export default styles(
       on('surface', [
         web([
           rule(
-            { variant: 'rail' },
+            { marker: 'rail' },
             {
               backdropFilter: hook.surfaceBackdrop,
               backgroundColor: hook.surfaceBackgroundColor,
@@ -299,10 +299,10 @@ export default styles(
               zIndex: token('layer-raised'),
             },
           ),
-          rule({ open: true, variant: 'rail' }, { opacity: 1, pointerEvents: 'auto' }),
-          rule({ reducedMotion: true, variant: 'rail' }, { transition: 'none' }),
+          rule({ open: true, marker: 'rail' }, { opacity: 1, pointerEvents: 'auto' }),
+          rule({ reducedMotion: true, marker: 'rail' }, { transition: 'none' }),
           rule(
-            { print: true, variant: 'rail' },
+            { print: true, marker: 'rail' },
             {
               backdropFilter: 'none',
               backgroundColor: 'transparent',
@@ -317,7 +317,7 @@ export default styles(
         ]),
       ]),
       /* One line each, cut with an ellipsis where the surface runs out. */
-      on({ part: 'nav', selector: ':host([variant="rail"]) ::slotted(a)' }, [
+      on({ part: 'nav', selector: ':host([marker="rail"]) ::slotted(a)' }, [
         web([
           rule({
             minInlineSize: 0,

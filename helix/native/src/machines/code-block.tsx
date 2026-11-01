@@ -231,7 +231,7 @@ const readGiven = (family: Family, props: Props, use: MachineUse) => {
     noCopy: read('noCopy') === true,
     removedLines: words('removedLines'),
     showUnchangedLabel: words('showUnchangedLabel'),
-    split: read('variant') === 'split',
+    split: read('layout') === 'split',
     tokens: read('tokens') as CodeBlockTokens | undefined,
     wrap: read('wrap') === true,
     wrappable: read('wrappable') === true,

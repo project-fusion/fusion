@@ -28,7 +28,7 @@ export default styles(
   {
     prefix: 'option',
     hooks: {
-      activeColor: token('color-hover'),
+      activeBackgroundColor: token('color-hover'),
       blockPadding: token('space-2xs'),
       draggingOpacity: 0.5,
       dropColor: token('color-primary'),
@@ -55,8 +55,10 @@ export default styles(
         paddingInline: hook.padding,
         web: { cursor: 'pointer' },
       }),
-      native([rule({ part: { 'data-highlight': true } }, { backgroundColor: hook.activeColor })]),
-      rule({ disabled: false, hover: true }, { backgroundColor: hook.activeColor }),
+      native([
+        rule({ part: { 'data-highlight': true } }, { backgroundColor: hook.activeBackgroundColor }),
+      ]),
+      rule({ disabled: false, hover: true }, { backgroundColor: hook.activeBackgroundColor }),
       rule({ disabled: true }, { opacity: token('opacity-disabled'), web: { cursor: 'default' } }),
       /* A phone's move draws here, and the web's reorder entry adopts a sheet of its own. */
       native([rule({ part: { 'data-dragging': true } }, { opacity: hook.draggingOpacity })]),
@@ -64,7 +66,7 @@ export default styles(
     /* Written out: `active` in a `when` is the pointer's `:active`, and this is the
        state of the same name. */
     on({ part: 'item', selector: ':host(:state(active)) [part~="item"]' }, [
-      web([rule({ backgroundColor: hook.activeColor })]),
+      web([rule({ backgroundColor: hook.activeBackgroundColor })]),
     ]),
     on('text', [
       rule({ display: 'flex', flex: '1 1 auto', flexDirection: 'column', minInlineSize: 0 }),

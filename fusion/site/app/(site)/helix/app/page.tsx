@@ -16,7 +16,7 @@ export default function Page() {
   return (
     <section data-band>
       <helix-flex data-shell direction="column" gap="lg">
-        <helix-text emphasis="muted" variant="label">
+        <helix-text emphasis="muted" scale="label">
           Helix gallery
         </helix-text>
         <helix-text as="h1" data-measure data-section-title>

@@ -251,7 +251,16 @@ export default styles(
           part: 'copy',
           selector: '[part="copy"]',
         },
-        [web([rule({ '--icon-button-size': token('size-control-sm') })])],
+        [
+          /* The small icon goes with the small button: at the default 20px the mark
+             outweighs the 14px code beside it. */
+          web([
+            rule({
+              '--copy-button-icon-size': token('size-icon-sm'),
+              '--icon-button-size': token('size-control-sm'),
+            }),
+          ]),
+        ],
       ),
       on({ part: 'copy', selector: '[part="header"] > [part="copy"]' }, [
         web([rule({ marginInlineStart: 'auto' })]),

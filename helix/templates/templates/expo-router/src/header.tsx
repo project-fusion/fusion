@@ -17,7 +17,7 @@ export function Header() {
         '--app-header-max-inline-size': '56rem',
       }}
     >
-      <helix-text slot="start" variant="body-strong">
+      <helix-text slot="start" scale="body-strong">
         __PROJECT_NAME__
       </helix-text>
       <helix-navigation label="Sections">

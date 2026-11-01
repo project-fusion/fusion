@@ -26,7 +26,7 @@ import { derive } from '../../../tree.js'
  *
  * **The panel is a band across the window under the trigger** on a phone,
  * as the web draws it in a page narrower than `band-below` and under
- * `variant="band"`: its groups stand in a column while the window is
+ * `layout="band"`: its groups stand in a column while the window is
  * narrower than `band-below`, the element's `narrow` state, and side by side
  * otherwise. It is a group named by `label`. A press outside closes it, and
  * a close request, which is Escape, a phone's back, or a screen reader's
@@ -72,6 +72,7 @@ export default headless('megamenu', {
     closeDelay: web(220),
     defaultOpen: false,
     label: '',
+    layout: oneOf(['band']),
     open: boolean(),
     openDelay: web(120),
     /* A phone opens on a press under either, having no pointer to rest. */
@@ -95,7 +96,6 @@ export default headless('megamenu', {
         'bottom-start',
       ),
     ),
-    variant: oneOf(['band']),
   },
   events: {
     beforeClose: cancelable(['open']),

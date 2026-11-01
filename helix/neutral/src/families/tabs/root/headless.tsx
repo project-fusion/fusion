@@ -21,9 +21,9 @@ export default headless('tabs', {
     defaultActive: '',
     label: '',
     manual: false,
+    marker: oneOf(['segmented', 'underlined']),
     orientation: oneOf(['horizontal', 'vertical']),
     scrollControls: false,
-    variant: oneOf(['segmented', 'underlined']),
   },
   events: {
     activate: ['previous', 'value'],

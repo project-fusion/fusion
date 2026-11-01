@@ -54,7 +54,7 @@ export const useColorField = (
   const words = (given(family, props, 'color-words') ?? {}) as Partial<ColorWords>
   /* The trigger's words, and in the swatch shape the color's. */
   const said =
-    given(family, props, 'variant') !== 'swatch' || parsed === null
+    given(family, props, 'trigger') !== 'swatch' || parsed === null
       ? String(given(family, props, 'trigger-label') ?? '')
       : formatMessage(
           String(given(family, props, 'swatch-label') ?? ''),

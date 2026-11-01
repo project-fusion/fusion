@@ -1,6 +1,6 @@
 /*
  * The generated Text, drawn from its real intermediate form: a run of words
- * in the ramp `as` and `variant` choose, a header where `as` is a heading,
+ * in the ramp `as` and `scale` choose, a header where `as` is a heading,
  * cut off after `lines`, and nested in the words around it where it is
  * inline. `test:native` writes the component beside this file, as the styled
  * package's build writes the one it ships.
@@ -76,12 +76,12 @@ describe('the generated Text', () => {
     expect(wordsOf(partOf('Set'))).toBe('Set strong and code inline.')
   })
 
-  test('takes the ramp `as` matches, and a variant over it', async () => {
+  test('takes the ramp `as` matches, and a scale over it', async () => {
     await render(
       themed(
         <>
           <HelixText as="h2">Heading</HelixText>
-          <HelixText as="h2" variant="caption">
+          <HelixText as="h2" scale="caption">
             Caption
           </HelixText>
         </>,

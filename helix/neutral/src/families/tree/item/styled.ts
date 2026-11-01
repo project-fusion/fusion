@@ -306,7 +306,9 @@ export default styles(
         }),
       ]),
       /* A mark beside the name reads as being about the name. */
-      on({ region: 'start', slotted: '*' }, [rule({ color: token('color-foreground-subtle') })]),
+      on({ region: 'start', slotted: '*' }, [
+        rule({ '--icon-size': token('size-icon-tight'), color: token('color-foreground-subtle') }),
+      ]),
       /* Opening a branch is a movement. A closed branch's children are hidden
          until found, through `content-visibility`, which holds while the rows
          close, so the children fold away with them. No `display: none`, which

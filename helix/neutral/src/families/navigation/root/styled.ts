@@ -8,7 +8,7 @@ import navigation from './headless.js'
  * **One mark moves to the current destination**, placed by measurement: the
  * root measures the current destination and sets `--indicator-x`,
  * `--indicator-y` and its size, and the rules below draw the mark there as
- * each variant wants it. Unset, a pill on the destination; `underlined`, a
+ * each marker wants it. Unset, a pill on the destination; `underlined`, a
  * bar on a rule under the row; `segmented`, a raised pill in a sunken track.
  *
  * **The navigation hands its items their layout through private values**:
@@ -45,7 +45,7 @@ export default styles(
         ),
         /* Inside a segmented track the items take the track's height, which
            is under the floor an item keeps in a bar. */
-        rule({ variant: 'segmented' }, { own: { navigationItemFloor: 0 } }),
+        rule({ marker: 'segmented' }, { own: { navigationItemFloor: 0 } }),
         /* Print: the bar, and the mark under it marks a page nobody is on. */
         rule({ print: true }, { display: 'none' }),
       ]),
@@ -75,7 +75,7 @@ export default styles(
         ),
         /* Underlined: a rule under the row, a background so it takes no room. */
         rule(
-          { variant: 'underlined' },
+          { marker: 'underlined' },
           {
             backgroundImage: fn('linear-gradient', ruled, ruled),
             backgroundPosition: 'bottom',
@@ -85,7 +85,7 @@ export default styles(
         ),
         /* Segmented: the pill in a sunken, framed track, a control's height. */
         rule(
-          { variant: 'segmented' },
+          { marker: 'segmented' },
           {
             backgroundColor: token('color-surface-sunken'),
             blockSize: hook.blockSize(token('size-control')),
@@ -99,18 +99,18 @@ export default styles(
         ),
         /* Down a column the rule stands along the inline end. */
         rule(
-          { orientation: 'vertical', variant: 'underlined' },
+          { orientation: 'vertical', marker: 'underlined' },
           {
             backgroundPosition: 'right',
             backgroundRepeat: 'repeat-y',
             backgroundSize: [token('border-thin'), '100%'],
           },
         ),
-        rule({ orientation: 'vertical', variant: 'segmented' }, { blockSize: 'auto' }),
+        rule({ orientation: 'vertical', marker: 'segmented' }, { blockSize: 'auto' }),
         /* The rule is a background, which has no logical position, so it
            moves to the left by hand in a right-to-left column. */
         rule(
-          { dir: 'rtl', orientation: 'vertical', variant: 'underlined' },
+          { dir: 'rtl', orientation: 'vertical', marker: 'underlined' },
           { backgroundPosition: 'left' },
         ),
       ]),
@@ -161,7 +161,7 @@ export default styles(
            destination fills the bar, so the two are one place. */
         native([
           rule(
-            { orientation: false, variant: { not: 'underlined' } },
+            { orientation: false, marker: { not: 'underlined' } },
             {
               insetBlockStart: 0,
               translate: [measured('indicator-x', 0), measured('indicator-y', 0)],
@@ -177,7 +177,7 @@ export default styles(
         ),
         /* Underlined: a bar on the rule, where `Tabs` draws its own. */
         rule(
-          { variant: 'underlined' },
+          { marker: 'underlined' },
           {
             backgroundColor: hook.indicatorColor(token('color-primary')),
             blockSize: hook.indicatorThickness,
@@ -189,7 +189,7 @@ export default styles(
         ),
         /* Segmented: a raised pill in the track, `Tabs`' token for token. */
         rule(
-          { variant: 'segmented' },
+          { marker: 'segmented' },
           {
             backgroundColor: hook.indicatorColor(token('color-surface-overlay')),
             borderRadius: hook.indicatorRadius(difference(token('radii-sm'), token('border-thin'))),
@@ -199,7 +199,7 @@ export default styles(
         /* Down a column the bar stands along the inline end, which logical
            insets carry to the left in a right-to-left document. */
         rule(
-          { orientation: 'vertical', variant: 'underlined' },
+          { orientation: 'vertical', marker: 'underlined' },
           {
             blockSize: measured('indicator-block-size', 0),
             inlineSize: hook.indicatorThickness,

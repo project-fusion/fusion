@@ -8,7 +8,7 @@ import { environment } from '../../capabilities/environment/index.js'
 import type { Derivation, DerivationProps } from '../derivations/derivations.js'
 import { holdsRows } from '../drilldown/drilldown-derivations.js'
 
-/** The width below which a panel is a band whatever its variant, as the web's `band-below` defaults. */
+/** The width below which a panel is a band whatever its layout, as the web's `band-below` defaults. */
 export const MEGAMENU_BAND_BELOW = 640
 
 /**

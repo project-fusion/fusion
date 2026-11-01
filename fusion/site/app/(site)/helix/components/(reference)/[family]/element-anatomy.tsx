@@ -134,7 +134,7 @@ export function Anatomy({
           class={api.description}
           data-platform={web}
           emphasis="muted"
-          variant="caption"
+          scale="caption"
         >
           <CodeText>
             {
@@ -148,7 +148,7 @@ export function Anatomy({
             class={api.description}
             data-platform="native"
             emphasis="muted"
-            variant="caption"
+            scale="caption"
           >
             <CodeText>
               {'What each component draws, and the prop that fills each region in braces.'}

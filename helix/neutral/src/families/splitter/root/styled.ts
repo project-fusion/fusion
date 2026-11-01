@@ -18,7 +18,7 @@ import splitter from './headless.js'
  * darkens and thickens its line, and one moving goes primary. A pane shut to
  * nothing gets no line, there being an edge there already.
  *
- * **`variant="grip"` adds a capsule beside the line** that shows on
+ * **`handle="grip"` adds a capsule beside the line** that shows on
  * approach, and the line then keeps its look. The corner where a nested
  * splitter crosses is drawn by the outer one, on the web.
  */
@@ -40,7 +40,7 @@ export default styles(
       thickness: token('border-thin'),
     },
     own: { splitterReach: null },
-    props: { variant: oneOf(['grip', 'line']) },
+    props: { handle: oneOf(['grip', 'line']) },
     stylesheet: 'splitter/root/splitter-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -131,24 +131,24 @@ export default styles(
         rule({ 'data-flush': true }, { backgroundColor: 'transparent' }),
         rule(
           [
-            { hover: true, variant: { not: 'grip' } },
-            { focusVisible: true, variant: { not: 'grip' } },
-            { dragging: true, variant: { not: 'grip' } },
+            { hover: true, handle: { not: 'grip' } },
+            { focusVisible: true, handle: { not: 'grip' } },
+            { dragging: true, handle: { not: 'grip' } },
           ],
           { backgroundColor: hook.hoverColor, inlineSize: hook.hoverThickness },
         ),
-        rule({ dragging: true, variant: { not: 'grip' } }, { backgroundColor: hook.dragColor }),
+        rule({ dragging: true, handle: { not: 'grip' } }, { backgroundColor: hook.dragColor }),
         rule(
           [
-            { hover: true, orientation: 'vertical', variant: { not: 'grip' } },
-            { focusVisible: true, orientation: 'vertical', variant: { not: 'grip' } },
-            { dragging: true, orientation: 'vertical', variant: { not: 'grip' } },
-            { hover: true, orientation: 'auto', variant: { not: 'grip' }, vertical: true },
-            { focusVisible: true, orientation: 'auto', variant: { not: 'grip' }, vertical: true },
+            { hover: true, orientation: 'vertical', handle: { not: 'grip' } },
+            { focusVisible: true, orientation: 'vertical', handle: { not: 'grip' } },
+            { dragging: true, orientation: 'vertical', handle: { not: 'grip' } },
+            { hover: true, orientation: 'auto', handle: { not: 'grip' }, vertical: true },
+            { focusVisible: true, orientation: 'auto', handle: { not: 'grip' }, vertical: true },
             {
               dragging: true,
               orientation: 'auto',
-              variant: { not: 'grip' },
+              handle: { not: 'grip' },
               vertical: true,
             },
           ],
@@ -196,7 +196,7 @@ export default styles(
       /* A grip beside the line, nothing at rest, which approach brings in. */
       on({ after: 'separator' }, [
         rule(
-          { variant: 'grip' },
+          { handle: 'grip' },
           {
             backgroundColor: hook.gripColor,
             borderRadius: token('radii-full'),
@@ -208,7 +208,7 @@ export default styles(
         ),
         /* Along the run, centered, and to the leading side of the line. */
         rule(
-          { orientation: { not: 'vertical' }, variant: 'grip', vertical: false },
+          { orientation: { not: 'vertical' }, handle: 'grip', vertical: false },
           {
             blockSize: hook.gripLength,
             inlineSize: hook.gripThickness,
@@ -218,8 +218,8 @@ export default styles(
         ),
         rule(
           [
-            { orientation: 'vertical', variant: 'grip' },
-            { orientation: 'auto', variant: 'grip', vertical: true },
+            { orientation: 'vertical', handle: 'grip' },
+            { orientation: 'auto', handle: 'grip', vertical: true },
           ],
           {
             blockSize: hook.gripThickness,
@@ -230,13 +230,13 @@ export default styles(
         ),
         rule(
           [
-            { hover: true, variant: 'grip' },
-            { focusVisible: true, variant: 'grip' },
-            { dragging: true, variant: 'grip' },
+            { hover: true, handle: 'grip' },
+            { focusVisible: true, handle: 'grip' },
+            { dragging: true, handle: 'grip' },
           ],
           { opacity: 1 },
         ),
-        rule({ dragging: true, variant: 'grip' }, { backgroundColor: hook.dragColor }),
+        rule({ dragging: true, handle: 'grip' }, { backgroundColor: hook.dragColor }),
       ]),
       /* A mark passed in at the middle of the line, over it, with no target
          of its own: a press on it is the divider's. */

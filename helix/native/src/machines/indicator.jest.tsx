@@ -42,7 +42,7 @@ const TOKENS = {
 /** A length the mark's style reads where it is placed, and `0px` before. */
 const measured = (name: string) => ({ measured: { fallback: { text: '0px' }, name } })
 
-/* The mark as Tabs' underlined variant draws it: as wide as the chosen tab,
+/* The mark as Tabs' underlined marker draws it: as wide as the chosen tab,
    two high, at the tab's bottom edge, hidden until it is placed, and
    traveling along `translate`'s transition. */
 const MARK: readonly Rule[] = [

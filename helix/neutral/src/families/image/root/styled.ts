@@ -33,7 +33,7 @@ export default styles(
       fallbackBackgroundColor: null,
       fallbackColor: token('color-foreground-muted'),
       fit: 'cover',
-      placeholderColor: token('color-surface-sunken'),
+      placeholderBackgroundColor: token('color-surface-sunken'),
       position: 'center',
       radius: token('radii-md'),
     },
@@ -99,13 +99,13 @@ export default styles(
       ],
     ),
     on('placeholder', [
-      rule({ backgroundColor: hook.placeholderColor }),
+      rule({ backgroundColor: hook.placeholderBackgroundColor }),
       /* Shown only while the picture is on its way and the wait is over. */
       native([rule([{ loaded: true }, { error: true }, { waiting: true }], { display: 'none' })]),
     ]),
     on('fallback', [
       rule({
-        backgroundColor: first(hook.fallbackBackgroundColor, hook.placeholderColor),
+        backgroundColor: first(hook.fallbackBackgroundColor, hook.placeholderBackgroundColor),
         color: hook.fallbackColor,
       }),
       native([rule({ error: false }, { display: 'none' })]),

@@ -11,7 +11,7 @@ export function Header() {
   const route = useHelixRoute()
   return (
     <helix-app-header sticky style={{ '--app-header-border-color': 'var(--helix-color-border)' }}>
-      <helix-text slot="start" variant="body-strong">
+      <helix-text scale="body-strong" slot="start">
         Helix
       </helix-text>
       <helix-navigation label="Sections">

@@ -15,7 +15,7 @@ export function ProjectList() {
   return (
     <helix-flex direction="column" gap="lg">
       <helix-flex direction="column" gap="2xs">
-        <helix-text as="h1" variant="heading">
+        <helix-text as="h1" scale="heading">
           Projects
         </helix-text>
         <helix-text emphasis="muted">{`${open.length} active, ${late.length} at risk`}</helix-text>
@@ -49,7 +49,7 @@ export function ProjectList() {
         </helix-callout>
       ))}
       <helix-card label="Projects">
-        <helix-text as="h2" slot="header" variant="title">
+        <helix-text as="h2" scale="title" slot="header">
           All projects
         </helix-text>
         <helix-list divided label="Projects">

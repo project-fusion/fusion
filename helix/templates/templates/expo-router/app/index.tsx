@@ -18,7 +18,7 @@ export default function Home() {
     <Page>
       <helix-flex direction="column" gap="xl">
         <helix-flex direction="column" gap="2xs">
-          <helix-text as="h1" variant="heading">
+          <helix-text as="h1" scale="heading">
             Home
           </helix-text>
           <helix-text emphasis="muted">
@@ -42,7 +42,7 @@ export default function Home() {
           </helix-stat>
         </helix-stat-group>
         <helix-card>
-          <helix-text as="h2" slot="header" variant="title">
+          <helix-text as="h2" slot="header" scale="title">
             Start here
           </helix-text>
           <helix-list divided label="Files to open first">

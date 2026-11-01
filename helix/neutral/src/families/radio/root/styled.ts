@@ -33,9 +33,9 @@ export default styles(
     }),
     own: { radioChipLift: null, radioSize: null },
     props: {
+      chip: false,
       hideControl: false,
       separation: oneOf(['filled', 'outlined', 'plain']),
-      variant: oneOf(['chip']),
     },
     stylesheet: 'radio/root/radio-root.generated.css',
   },
@@ -108,7 +108,7 @@ export default styles(
       ),
       /* How far a chosen chip comes forward, and a hovered one half of it. */
       rule(
-        { variant: 'chip' },
+        { chip: true },
         {
           alignItems: 'center',
           backgroundColor: token('color-surface-sunken'),
@@ -130,7 +130,7 @@ export default styles(
       ),
       /* Weight and height carry the choice: solid, and forward. */
       rule(
-        { selected: true, variant: 'chip' },
+        { selected: true, chip: true },
         {
           backgroundColor: token('color-surface-inverse'),
           boxShadow: token('shadow-md'),
@@ -139,17 +139,17 @@ export default styles(
         },
       ),
       rule(
-        { hover: true, lacks: 'disabled', variant: 'chip' },
+        { hover: true, lacks: 'disabled', chip: true },
         { translate: ['0', quotient(own.radioChipLift, '-2')] },
       ),
       rule(
-        { focusVisible: true, variant: 'chip' },
+        { focusVisible: true, chip: true },
         {
           outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
           outlineOffset: token('size-focus-offset'),
         },
       ),
-      rule({ reducedMotion: true, variant: 'chip' }, { transition: 'none', translate: 'none' }),
+      rule({ reducedMotion: true, chip: true }, { transition: 'none', translate: 'none' }),
       /* Rows sit against each other, so a box reaching past a row would take the
          press from the row beside it. On a touch screen the row itself reaches the
          target. */
@@ -203,7 +203,7 @@ export default styles(
       /* The card is the control, so the circle can go. */
       rule({ hideControl: true, separation: ['filled', 'outlined'] }, { display: 'none' }),
       /* A chip is a card that gave up its words. */
-      rule({ variant: 'chip' }, { display: 'none' }),
+      rule({ chip: true }, { display: 'none' }),
       rule(
         { lacks: 'disabled', within: { item: { active: true } } },
         { backgroundColor: token('color-press') },
@@ -255,7 +255,7 @@ export default styles(
         { fontSize: token('text-md'), lineHeight: token('leading-normal') },
       ),
       /* The words name the choice without taking room in it. */
-      rule({ variant: 'chip' }, [visuallyHidden]),
+      rule({ chip: true }, [visuallyHidden]),
     ]),
   ],
 )

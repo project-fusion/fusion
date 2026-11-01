@@ -10,7 +10,7 @@ export function Overview({ project }: Props) {
   return (
     <helix-grid align-items="start" gap="md" min="18rem">
       <helix-card>
-        <helix-text as="h2" slot="header" variant="title">
+        <helix-text as="h2" scale="title" slot="header">
           Progress
         </helix-text>
         <helix-flex direction="column" gap="md">
@@ -38,7 +38,7 @@ export function Overview({ project }: Props) {
         </helix-flex>
       </helix-card>
       <helix-card>
-        <helix-text as="h2" slot="header" variant="title">
+        <helix-text as="h2" scale="title" slot="header">
           Details
         </helix-text>
         <helix-description-list divided>
@@ -98,8 +98,8 @@ export function Activity({ project }: Props) {
             slot="time"
             time-zone="UTC"
           ></helix-format-date>
-          <helix-text variant="body-strong">{change.title}</helix-text>
-          <helix-text emphasis="muted" variant="caption">
+          <helix-text scale="body-strong">{change.title}</helix-text>
+          <helix-text emphasis="muted" scale="caption">
             {`${change.detail} ${change.by}.`}
           </helix-text>
         </helix-timeline-item>
@@ -148,7 +148,7 @@ export function Settings({ project }: Props) {
           </helix-callout>
         ) : (
           <helix-flex direction="column" gap="sm">
-            <helix-text as="h2" variant="title">
+            <helix-text as="h2" scale="title">
               Archive the project
             </helix-text>
             <helix-text emphasis="muted">

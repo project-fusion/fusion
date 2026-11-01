@@ -27,7 +27,7 @@ const out = product(token('space-xl'), '-1')
  * **The panel is the page's ground, revealed top to bottom**, laid out at
  * full size so nothing inside moves. On the web it is a card hung off the
  * trigger, its groups side by side in columns, that grows out of the corner
- * it hangs from; under `variant="band"`, and in a page narrower than
+ * it hangs from; under `layout="band"`, and in a page narrower than
  * `band-below`, a band from edge to edge under the bar. **A phone draws the
  * band**: its layer stands under the trigger across the window. Narrow, the
  * groups stand in one column and the band scrolls to the bottom of the
@@ -192,23 +192,23 @@ export default styles(
            downwards, where a band sweeps down across its whole width. */
         web([
           rule(
-            { variant: { not: 'band' } },
+            { layout: { not: 'band' } },
             {
               clipPath: fn('inset', [0, '100%', '100%', out]),
             },
           ),
           rule(
-            { open: true, variant: { not: 'band' } },
+            { open: true, layout: { not: 'band' } },
             { clipPath: fn('inset', [0, out, out, out]) },
           ),
           rule(
-            { startingStyle: true, open: true, variant: { not: 'band' } },
+            { startingStyle: true, open: true, layout: { not: 'band' } },
             { clipPath: fn('inset', [0, '100%', '100%', out]) },
           ),
         ]),
-        /* A band from edge to edge, under `variant="band"` and in a narrow
+        /* A band from edge to edge, under `layout="band"` and in a narrow
            page. */
-        rule([{ variant: 'band' }, { narrow: true }], {
+        rule([{ layout: 'band' }, { narrow: true }], {
           ...band,
           web: {
             paddingInline: fn(
@@ -221,7 +221,7 @@ export default styles(
         }),
         rule(
           [
-            { open: true, variant: 'band' },
+            { open: true, layout: 'band' },
             { narrow: true, open: true },
           ],
           {
@@ -230,12 +230,12 @@ export default styles(
         ),
         rule(
           [
-            { startingStyle: true, open: true, variant: 'band' },
+            { startingStyle: true, open: true, layout: 'band' },
             { startingStyle: true, narrow: true, open: true },
           ],
           { clipPath: fn('inset', [0, 0, '100%', 0]) },
         ),
-        /* A phone draws the band whatever the variant, which its layer
+        /* A phone draws the band whatever the layout, which its layer
            stands under the trigger across the window. */
         native([
           rule({ ...band, paddingInline: token('space-xl') }),

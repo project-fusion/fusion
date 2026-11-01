@@ -5,7 +5,7 @@ export function AllActivity() {
   return (
     <helix-flex direction="column" gap="lg">
       <helix-flex direction="column" gap="2xs">
-        <helix-text as="h1" variant="heading">
+        <helix-text as="h1" scale="heading">
           Activity
         </helix-text>
         <helix-text emphasis="muted">{`${ACTIVITY.length} changes across every project`}</helix-text>
@@ -27,8 +27,8 @@ export function AllActivity() {
                 slot="time"
                 time-zone="UTC"
               ></helix-format-date>
-              <helix-text variant="body-strong">{change.title}</helix-text>
-              <helix-text emphasis="muted" variant="caption">
+              <helix-text scale="body-strong">{change.title}</helix-text>
+              <helix-text emphasis="muted" scale="caption">
                 {`${change.project.name}. ${change.detail} ${change.by}.`}
               </helix-text>
             </helix-timeline-item>
