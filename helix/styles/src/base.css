@@ -1299,10 +1299,10 @@ helix-toggle[disabled]::part(item) {
 :where([data-card]) {
   /* Matched to the card so the focus ring traces the surface rather than a
      rectangle around it. `--helix-radii-sm` here against `Card`'s
-     `--helix-radii-lg` draws the ring at 4px around a surface drawn at 12px for
+     `--helix-radii-md` draws the ring at 4px around a surface drawn at 8px for
      every consumer who does not set `--card-radius`, which reads as the border
      looking off kilter. */
-  border-radius: var(--card-radius, var(--helix-radii-lg));
+  border-radius: var(--card-radius, var(--helix-radii-md));
   color: inherit;
   display: block;
   /* Drawn transparent at rest rather than appearing on hover. */
