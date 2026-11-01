@@ -281,12 +281,16 @@ varying float vRoom;
 
 void main() {
   vec2 q = (gl_PointCoord * 2.0 - 1.0) * vRoom;
-  float d = vShape > 1.5 ? (abs(q.x) + abs(q.y)) * 0.78 : vShape > 0.5 ? max(abs(q.x), abs(q.y)) * 1.08 : length(q);
-  /* From just inside the body's edge, under its antialiasing, so no seam of
-     dark ground shows between the body and its halo. */
-  if (d < 0.965) discard;
+  float d = length(q);
+  /* A sphere's halo starts just inside its edge, under its antialiasing, so no
+     seam of dark ground shows between the body and its halo. */
+  if (vShape < 0.5 && d < 0.965) discard;
   float past = clamp((d - 0.965) / max(vRoom - 0.965, 0.001), 0.0, 1.0);
-  float alpha = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * vTint.a * vFade;
+  /* A mesh turns and its sprite does not, so a hole cut to the mesh's outline
+     showed as a dark box beside it. Its halo is round and fades in from the
+     middle, and shows through the mesh's clear faces. */
+  float inside = vShape < 0.5 ? 1.0 : smoothstep(0.0, 0.965, d);
+  float alpha = (bloom + vGlow * 0.6) * pow(1.0 - past, 2.4) * inside * vTint.a * vFade;
   if (alpha < 0.01) discard;
   gl_FragColor = vec4(vTint.rgb, alpha);
 }
