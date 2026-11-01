@@ -85,6 +85,9 @@ export interface Finished {
   readonly transitions: Record<string, Transition>
 }
 
+/** The properties that hold a list of a grid's tracks. */
+const GRID_TRACKS: ReadonlySet<string> = new Set(['grid-template-columns', 'grid-template-rows'])
+
 /**
  * What finishes the declarations of the part `drawing` describes. `whole` is
  * the part itself, where a track's growth and the native grid apply, and
@@ -145,6 +148,20 @@ export const finisherFor = ({
       }
       if ('list' in value && !LISTED.has(property)) {
         dropped.push(`${property}: no native equivalent yet`)
+        continue
+      }
+      /* **A track list is written out with its hooks read**, as
+         `repeat(auto-fill, minmax(min(8rem, 100%), 1fr))`, so a track's width or
+         a count can come from a hook, and the native grid reads the words. */
+      if (GRID_TRACKS.has(property) && 'function' in value) {
+        const written = (one: Value): string => {
+          if ('function' in one) {
+            return `${one.function.name}(${one.function.arguments.map(written).join(', ')})`
+          }
+          const read = resolve(one)
+          return typeof read === 'number' ? `${read}px` : String(read)
+        }
+        resolved.set(property, written(value))
         continue
       }
       /* **The safe area resolves to points**, as `safeArea('top')` alone

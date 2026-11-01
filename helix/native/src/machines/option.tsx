@@ -59,6 +59,8 @@ export interface OptionStanding {
 export interface OptionOwner {
   /** Tells the owner an option's press stood, with Shift or without. */
   readonly choose: (member: OptionMember) => void
+  /** Whether the owner is disabled, which every option it holds is too. */
+  readonly disabled: boolean
   /** What a finger held on an option drags it through, where the owner lets one move. */
   readonly drag: WindowDrag | undefined
   /** Lifts the option a finger held on, which a drag then moves. */
@@ -253,7 +255,8 @@ export const useOption = (family: Family, props: Props, use: MachineUse): Behavi
   const group = useContext(OptionGroupContext)
   const key = useRef({}).current
   const node = useRef<unknown>(null)
-  const member = memberOf(family, props, use, key, () => node.current, group)
+  const own = memberOf(family, props, use, key, () => node.current, group)
+  const member = owner?.disabled === true ? { ...own, disabled: true } : own
   useLayoutEffect(() => {
     owner?.hold(member)
   })
@@ -262,7 +265,10 @@ export const useOption = (family: Family, props: Props, use: MachineUse): Behavi
   useEffect(() => () => latest.current?.leave(key), [key])
   const standing = owner?.standing(member.value)
   const selected = standing === undefined ? member.declared : standing.selected
-  const active = standing === undefined ? props.dataActive === true : standing.active
+  const active =
+    standing === undefined
+      ? props.dataActive === true || props['data-active'] === true
+      : standing.active
   const hasIndicator = named('indicator', props.children)
   const listening = useRef<(() => void) | undefined>(undefined)
   const on = (view: unknown): void => {
