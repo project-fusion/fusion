@@ -1,4 +1,46 @@
-/* The rail's width beside the document, which the TSX sets in its style. */
+/* A shell to point at, written in families so a phone draws it. The hooks below
+   are the ones the TSX sets in its styles. */
+.frame {
+  --card-color: var(--helix-color-foreground);
+  --card-padding: 0;
+  --card-shadow: none;
+}
+
+/* The rail takes 11rem, and the document needs 17.8rem beside it, which a frame
+   holds from a 32rem page. Under that the rail goes over the document, which is
+   what an app does on a phone. */
 .shell {
+  --flex-flank-min: 17.8rem;
   --flex-flank-size: 11rem;
+}
+
+#rail {
+  --card-background-color: var(--helix-color-surface-sunken);
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-md);
+  --card-radius: 0;
+}
+
+.bar {
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-sm) var(--helix-space-md);
+}
+
+#sheet {
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-lg) var(--helix-space-md);
+}
+
+/* The page's width picks the one rule that stands between the rail and the
+   document. A phone has no stylesheet and draws both. */
+@media (width < 32rem) {
+  #rule-beside-rail {
+    display: none;
+  }
+}
+
+@media (width >= 32rem) {
+  #rule-under-rail {
+    display: none;
+  }
 }
