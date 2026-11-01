@@ -65,6 +65,8 @@
 }
 
 :host([sticky]) {
+  /* A sticky bar sits under a notch in a window with no browser bar. */
+  padding-block-start: env(safe-area-inset-top, 0px);
   inset-block-start: 0;
   position: sticky;
   z-index: var(--helix-layer-sticky);

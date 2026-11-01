@@ -25,7 +25,7 @@
          the theme's colors, so a new brand color relights it. It shows one still
          frame where motion is reduced, and a gradient where the browser draws
          without a GPU. -->
-    <helix-aura class="first-light" data-layer speed={0.4} terminus={0.8} variant="braid"></helix-aura>
+    <helix-aura class="first-light" speed={0.4} terminus={0.8} variant="braid"></helix-aura>
     <div class="hero">
       <helix-tag emphasis="subtle" tone="primary">Starter</helix-tag>
       <helix-text as="h1" variant="display">Helix design system</helix-text>
@@ -68,7 +68,7 @@
          focus alone. Nothing inside may be interactive, since a link inside a link
          is neither valid nor reachable. -->
     <div class="features">
-      <a class="feature" data-card href={DOCS.elements}>
+      <a data-card href={DOCS.elements}>
         <helix-card separation="outlined">
           <span class="feature-mark"><helix-icon name="cube"></helix-icon></span>
           <helix-text as="h3" variant="title">Custom elements</helix-text>
@@ -77,7 +77,7 @@
           </helix-text>
         </helix-card>
       </a>
-      <a class="feature" data-card href={DOCS.tokens}>
+      <a data-card href={DOCS.tokens}>
         <helix-card separation="outlined">
           <span class="feature-mark"><helix-icon name="palette"></helix-icon></span>
           <helix-text as="h3" variant="title">One set of tokens</helix-text>
@@ -86,7 +86,7 @@
           </helix-text>
         </helix-card>
       </a>
-      <a class="feature" data-card href={DOCS.parts}>
+      <a data-card href={DOCS.parts}>
         <helix-card separation="outlined">
           <span class="feature-mark"><helix-icon name="sliders-horizontal"></helix-icon></span>
           <helix-text as="h3" variant="title">Parts to style</helix-text>

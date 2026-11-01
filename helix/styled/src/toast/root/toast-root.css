@@ -37,7 +37,7 @@
 }
 
 :host(:not([placement])) [part="region"] {
-  inset-block-end: var(--_toast-inset);
+  inset-block-end: calc(var(--_toast-inset) + env(safe-area-inset-bottom, 0px));
 }
 
 /* The UA hides a popover that is not showing. Said again here, because the
@@ -58,7 +58,7 @@
 }
 
 :host([placement^="bottom"]) [part="region"] {
-  inset-block-end: var(--_toast-inset);
+  inset-block-end: calc(var(--_toast-inset) + env(safe-area-inset-bottom, 0px));
 }
 
 :host([placement^="top"]) {
@@ -66,7 +66,7 @@
 }
 
 :host([placement^="top"]) [part="region"] {
-  inset-block-start: var(--_toast-inset);
+  inset-block-start: calc(var(--_toast-inset) + env(safe-area-inset-top, 0px));
 }
 
 :host([placement^="top"]) [part="region"] {

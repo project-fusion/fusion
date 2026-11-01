@@ -43,11 +43,15 @@
  *
  * `flex-grow` gives the spare height to the page, and the footer keeps its own.
  */
+:root {
+  --page-measure: 56rem;
+}
+
 .page {
   flex-grow: 1;
   inline-size: 100%;
   margin-inline: auto;
-  max-inline-size: 56rem;
+  max-inline-size: var(--page-measure);
   padding-block: var(--helix-space-2xl) var(--helix-space-3xl);
   padding-inline: var(--helix-space-lg);
 }
@@ -61,7 +65,7 @@
  */
 helix-app-header {
   --app-header-border-color: var(--helix-color-border);
-  --app-header-max-inline-size: 56rem;
+  --app-header-max-inline-size: var(--page-measure);
 }
 
 /* The wordmark, a word for now, in the foreground: a quiet link is muted until
@@ -297,7 +301,7 @@ helix-app-header {
   gap: var(--helix-space-md);
   justify-content: space-between;
   margin-inline: auto;
-  max-inline-size: 56rem;
+  max-inline-size: var(--page-measure);
   padding-block: var(--helix-space-lg);
   padding-inline: var(--helix-space-lg);
 }
@@ -327,6 +331,10 @@ helix-app-header {
   .footer-row {
     padding-inline: var(--helix-space-md);
   }
+
+  helix-app-header {
+    --app-header-padding: var(--helix-space-md);
+  }
 }
 
 /*
@@ -354,4 +362,9 @@ helix-data-table::part(select-selected) {
 
 helix-data-table::part(cell-selected) {
   font-weight: var(--helix-weight-semibold);
+}
+
+/* A path in a sentence stays whole. */
+helix-code {
+  white-space: nowrap;
 }
