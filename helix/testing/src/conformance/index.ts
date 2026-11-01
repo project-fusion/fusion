@@ -20,6 +20,7 @@ import { FORMAT_DATE } from './scenarios/format-date.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
 import { LIST } from './scenarios/list.js'
+import { LISTBOX } from './scenarios/listbox.js'
 import { LOADER } from './scenarios/loader.js'
 import { LOG } from './scenarios/log.js'
 import { MEGAMENU } from './scenarios/megamenu.js'
@@ -48,7 +49,6 @@ import { TOGGLE_GROUP } from './scenarios/toggle-group.js'
 import { TOOLBAR } from './scenarios/toolbar.js'
 import { TOOLTIP } from './scenarios/tooltip.js'
 import { TOUR } from './scenarios/tour.js'
-import { LISTBOX } from './scenarios/listbox.js'
 import { TREE } from './scenarios/tree.js'
 import { VIRTUAL_LIST } from './scenarios/virtual-list.js'
 
@@ -82,6 +82,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   image: IMAGE,
   input: INPUT,
   list: LIST,
+  listbox: LISTBOX,
   loader: LOADER,
   log: LOG,
   megamenu: MEGAMENU,
@@ -112,7 +113,6 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   toolbar: TOOLBAR,
   tooltip: TOOLTIP,
   tour: TOUR,
-  listbox: LISTBOX,
   tree: TREE,
   'virtual-list': VIRTUAL_LIST,
 }

@@ -8,12 +8,12 @@ import { filesLeft } from './files'
 import { formOf, HOST_STATES, isElement } from './forms'
 import { inspectorLeft } from './inspector'
 import { layerIn, PAGE } from './layers'
+import { listboxLeft } from './listbox'
 import { logLeft } from './log'
 import { feedLeft, feeds } from './notifications'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
 import { textLeft } from './text'
-import { listboxLeft } from './listbox'
 import { treeLeft } from './tree'
 import { inPress, itemsIn, nodeOf, pressOf, type Run, readsIn, triggerOf, wordsOf } from './views'
 import { windowLeft } from './window'
@@ -225,7 +225,8 @@ export const leftBy = (run: Run, opened: number): Left => {
       })
       .map((item) => item.value),
     ...currentIn(run),
-    focused: focusedIn(run),
+    /* The web keeps focus on a list of options, and a phone's option holds it for the keys. */
+    focused: formOf(setup.tag).api?.listbox === undefined ? focusedIn(run) : null,
     opened: run.opened.opened.slice(opened),
     ...readsIn(run),
     ...rowsIn(run),

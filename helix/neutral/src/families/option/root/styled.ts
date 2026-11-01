@@ -136,24 +136,28 @@ export default styles(
       rule({ hasIndicator: true, platform: 'web' }, { content: 'none' }),
     ]),
     on('check', [
-      rule({
-        blockSize: token('size-icon-tight'),
-        flex: '0 0 auto',
-        inlineSize: token('size-icon-tight'),
-        marginInlineStart: 'auto',
-      }),
+      native([
+        rule({
+          blockSize: token('size-icon-tight'),
+          flex: '0 0 auto',
+          inlineSize: token('size-icon-tight'),
+          marginInlineStart: 'auto',
+        }),
+      ]),
     ]),
     on('drop', [
-      rule({
-        backgroundColor: hook.dropColor,
-        blockSize: hook.dropSize,
-        insetInlineEnd: 0,
-        insetInlineStart: 0,
-        pointerEvents: 'none',
-        position: 'absolute',
-      }),
-      rule({ part: { 'data-before': true } }, { insetBlockStart: 0 }),
-      rule({ part: { 'data-after': true } }, { insetBlockEnd: 0 }),
+      native([
+        rule({
+          backgroundColor: hook.dropColor,
+          blockSize: hook.dropSize,
+          insetInlineEnd: 0,
+          insetInlineStart: 0,
+          pointerEvents: 'none',
+          position: 'absolute',
+        }),
+        rule({ part: { 'data-before': true } }, { insetBlockStart: 0 }),
+        rule({ part: { 'data-after': true } }, { insetBlockEnd: 0 }),
+      ]),
     ]),
     include(printExact),
   ],

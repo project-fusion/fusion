@@ -120,6 +120,10 @@
       "types": "./dist/utils/layers/layers.d.ts",
       "default": "./dist/utils/layers/layers.js"
     },
+    "./listbox": {
+      "types": "./dist/utils/listbox/listbox.d.ts",
+      "default": "./dist/utils/listbox/listbox.js"
+    },
     "./log": {
       "types": "./dist/utils/log/log.d.ts",
       "default": "./dist/utils/log/log.js"
@@ -184,10 +188,6 @@
     "./swipe": {
       "types": "./dist/utils/swipe/swipe.d.ts",
       "default": "./dist/utils/swipe/swipe.js"
-    },
-    "./listbox": {
-      "types": "./dist/utils/listbox/listbox.d.ts",
-      "default": "./dist/utils/listbox/listbox.js"
     },
     "./table": {
       "types": "./dist/utils/table/table.d.ts",
