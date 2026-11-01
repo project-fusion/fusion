@@ -20,11 +20,14 @@ tags:
     point: 50%, 90%
     retryTapIfNoChange: false
 - startRecording: copy-button
-# No retry: the tooltip passes while Maestro waits to see whether the press
-# changed the screen, which took 10 seconds on Android.
+# "Copied" stands 1.2 seconds. Without a limit, Maestro's tap waits for the screen
+# to settle before the next step, and Android's clipboard preview rises in that
+# time: 6.5 seconds in run 41356179392, whose video shows the check and "Copied"
+# come and go inside the tap.
 - tapOn:
     text: Copy
     retryTapIfNoChange: false
+    waitToSettleTimeoutMs: 200
 - extendedWaitUntil:
     visible: Copied
     timeout: 5000
@@ -36,7 +39,10 @@ tags:
 - extendedWaitUntil:
     visible: Copy link
     timeout: 15000
-- tapOn: Copy link
+- tapOn:
+    text: Copy link
+    retryTapIfNoChange: false
+    waitToSettleTimeoutMs: 200
 - extendedWaitUntil:
     visible: Copied
     timeout: 5000
