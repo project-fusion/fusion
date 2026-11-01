@@ -3,14 +3,23 @@
  * table and registered with core's list of names.
  */
 import { registerEventNames } from '@fusion.dev/helix-core'
+import { HelixBeforeColumnToggleEvent } from './before-column-toggle.js'
 import { HelixBeforeFollowEvent } from './before-follow.js'
+import { HelixColumnToggleEvent } from './column-toggle.js'
 import { HelixFollowEvent } from './follow.js'
 
-export type { FollowDetail } from './details.js'
-export { HelixBeforeFollowEvent, HelixFollowEvent }
+export type { ColumnToggleDetail, FollowDetail } from './details.js'
+export {
+  HelixBeforeColumnToggleEvent,
+  HelixBeforeFollowEvent,
+  HelixColumnToggleEvent,
+  HelixFollowEvent,
+}
 
 const registry = {
+  HelixBeforeColumnToggleEvent,
   HelixBeforeFollowEvent,
+  HelixColumnToggleEvent,
   HelixFollowEvent,
 } as const
 

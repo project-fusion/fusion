@@ -79,12 +79,20 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
    text, which renders an element called `lit$…$` that lays out as nothing.
    Measured: the styled spec read `localName` as `lit$640177303$`. */
 import { html } from 'lit/static-html.js'
-import type { HelixHeadlessTableColumn } from '../../table/column/table-column.js'
+import type { ColumnMenuDrawer, HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import { edgeOf } from '../../table/edge.js'
 import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
+import '../../divider/index.js'
+import '../../menu/index.js'
+import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import '../../pagination/index.js'
-import { HelixBeforeFollowEvent, HelixFollowEvent } from '../events/index.js'
+import {
+  HelixBeforeColumnToggleEvent,
+  HelixBeforeFollowEvent,
+  HelixColumnToggleEvent,
+  HelixFollowEvent,
+} from '../events/index.js'
 import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
 
@@ -223,6 +231,25 @@ const isControl = (element: HTMLElement): boolean =>
  * is written to `order` as a list of fields. Your markup is not rewritten: the
  * table assigns the headings to its header in that order.
  *
+ * **`menu` on a column adds a menu to its heading.** A small button after the
+ * sort chevrons opens it, and a press anywhere else on the heading still sorts.
+ * The rows depend on the column:
+ *
+ * - Sort ascending and Sort descending, where the column is `sortable`.
+ * - Move left and Move right, where the table is `reorderable`.
+ * - Hide column, which is disabled on the last column showing.
+ * - Show hidden columns, once the menu has hidden a column.
+ *
+ * Sorting and moving ask first with `helix-before-sort` and
+ * `helix-before-reorder`, as a press on the heading or a drag of the grip does.
+ * Hiding asks with `helix-before-column-toggle`, then sets `hidden` on the column
+ * and fires `helix-column-toggle`. Your own column picker can call `hideColumn`
+ * and `showColumn`. Show hidden columns restores only the columns that went
+ * through them, so a column you hid with `hidden` stays hidden.
+ *
+ * In the grid, Alt+Down on a heading opens its menu, and F2 and Tab reach the
+ * button.
+ *
  * **`reorderable-rows` lets people move rows.** A column of grips leads each
  * row, named by `move-row-label`. Drag a grip to move its row, and the table
  * scrolls near an edge. Or press Space or Enter on a grip, or click it, to pick
@@ -271,12 +298,14 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
+ * @event {HelixBeforeColumnToggleEvent} helix-before-column-toggle - A column is about to be hidden or shown, with its `field` and `hidden`. Cancelable: cancel it to keep the column as it is.
  * @event {HelixBeforeFilterEvent} helix-before-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixBeforeFollowEvent} helix-before-follow - A press on a link in a cell is about to load its page, in this tab and on this site. Cancelable: cancel it to keep the page, and hand `detail.href` to your router.
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
+ * @event {HelixColumnToggleEvent} helix-column-toggle - Fired after a column is hidden or shown, with its `field` and `hidden`.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
  * @event {HelixFilterEvent} helix-filter - Fired after the search query changes, with the new query.
  * @event {HelixFollowEvent} helix-follow - Fired as the browser loads the page a link in a cell names, with its path.
@@ -903,6 +932,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.sortState = next
     this.requestUpdate('sort', previous)
   }
+
+  /** The name of the row in a column's menu that sorts smallest first. */
+  @words
+  @property({ attribute: 'sort-ascending-label' })
+  sortAscendingLabel = 'Sort ascending'
+
+  /** The name of the row in a column's menu that sorts largest first. */
+  @words
+  @property({ attribute: 'sort-descending-label' })
+  sortDescendingLabel = 'Sort descending'
+
+  /** The name of the row in a column's menu that moves the column left. */
+  @words
+  @property({ attribute: 'move-left-label' })
+  moveLeftLabel = 'Move left'
+
+  /** The name of the row in a column's menu that moves the column right. */
+  @words
+  @property({ attribute: 'move-right-label' })
+  moveRightLabel = 'Move right'
+
+  /** The name of the row in a column's menu that hides the column. */
+  @words
+  @property({ attribute: 'hide-column-label' })
+  hideColumnLabel = 'Hide column'
+
+  /** The name of the row in a column's menu that brings back the columns it hid. */
+  @words
+  @property({ attribute: 'show-columns-label' })
+  showColumnsLabel = 'Show hidden columns'
 
   /**
    * What screen readers hear when the table is sorted. `{column}` is the
@@ -2337,6 +2396,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         /* Whether a reader may move it, pushed down for the same reason: the order
            is the table's, and the grip is drawn by the column. */
         column.movable = this.reorderable && column.field !== ''
+        column.menuDrawer = column.field === '' ? undefined : this.drawColumnMenu
         /* A cell of this grid, and its one tab stop when the stop is on it. */
         column.gridCell = true
         column.tabStop = shown.indexOf(column) + offset === stop
@@ -2352,8 +2412,173 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
           android && column.sorted
             ? this.sortSaid(column.textContent?.trim() || column.field, column.sorted)
             : ''
+        column.menuFacts = column.menu ? this.columnMenuFacts(column) : ''
       })
     }
+  }
+
+  /** The columns the menu or `hideColumn` hid, which Show hidden columns brings back. */
+  private readonly hiddenByTable = new Set<string>()
+
+  /** The fields in `hiddenByTable` still hidden, since a page can show one itself. */
+  private get restorable(): string[] {
+    return this.tableColumns
+      .filter((column) => !column.shown && this.hiddenByTable.has(column.field))
+      .map((column) => column.field)
+  }
+
+  /** Everything a column's menu draws from the table, so a change draws it again. */
+  private columnMenuFacts(column: HelixHeadlessTableColumn): string {
+    return [
+      this.shownFields.indexOf(column.field),
+      this.shownFields.length,
+      this.restorable.length,
+      inlineStep(this, 'ArrowLeft'),
+      this.sortAscendingLabel,
+      this.sortDescendingLabel,
+      this.moveLeftLabel,
+      this.moveRightLabel,
+      this.hideColumnLabel,
+      this.showColumnsLabel,
+    ].join('|')
+  }
+
+  /**
+   * Draws a column's menu around the button the column draws.
+   *
+   * In the column's shadow root and from here, so the menu has its trigger beside
+   * it and only a page with a `DataTable` carries the menu's code. Every event a
+   * menu sends stops here: `helix-select` from a row is no row selection.
+   */
+  private readonly drawColumnMenu: ColumnMenuDrawer = (column, button) => {
+    const menu = this.tag('menu')
+    const item = this.tag('menu-item')
+    const divider = this.tag('divider')
+    const shown = this.shownFields
+    const at = shown.indexOf(column.field)
+    const left = inlineStep(this, 'ArrowLeft')
+    const row = (value: string, label: string, disabled = false): TemplateResult =>
+      html`<${item} value=${value} ?disabled=${disabled}>${label}</${item}>`
+    const groups = [
+      column.canSort
+        ? html`<${item} exclusive value="ascending" .checked=${column.sorted === 'ascending'}
+            >${this.sortAscendingLabel}</${item}
+          ><${item} exclusive value="descending" .checked=${column.sorted === 'descending'}
+            >${this.sortDescendingLabel}</${item}>`
+        : nothing,
+      column.movable
+        ? html`${row('left', this.moveLeftLabel, shown[at + left] === undefined)}${row(
+            'right',
+            this.moveRightLabel,
+            shown[at - left] === undefined,
+          )}`
+        : nothing,
+      html`${row('hide', this.hideColumnLabel, shown.length <= 1)}${
+        this.restorable.length > 0 ? row('restore', this.showColumnsLabel) : nothing
+      }`,
+    ].filter((group) => group !== nothing)
+    return html`<${menu}
+      @helix-before-check=${this.keepMenuCheck}
+      @helix-before-close=${this.stopMenuEvent}
+      @helix-before-open=${this.stopMenuEvent}
+      @helix-before-select=${this.stopMenuEvent}
+      @helix-select=${(event: HelixSelectEvent) => {
+        event.stopPropagation()
+        this.chooseInColumnMenu(column, event.detail.value)
+      }}
+    >
+      ${button}${groups.map(
+        (group, index) => html`${index > 0 ? html`<${divider}></${divider}>` : nothing}${group}`,
+      )}
+    </${menu}>`
+  }
+
+  /** A menu's own event, which is no event of this table's. */
+  private readonly stopMenuEvent = (event: Event): void => {
+    event.stopPropagation()
+  }
+
+  /** The two sort rows show the table's sort, so a press never checks one itself. */
+  private readonly keepMenuCheck = (event: Event): void => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  /**
+   * Does what a menu row says.
+   *
+   * A microtask on, because the menu closes a microtask after `helix-select`
+   * and returns focus to the button. Hide then has a focus to move away from the
+   * button it removes.
+   */
+  private chooseInColumnMenu(column: HelixHeadlessTableColumn, value: string): void {
+    queueMicrotask(() => {
+      const left = inlineStep(this, 'ArrowLeft')
+      if (value === 'ascending' || value === 'descending') {
+        const next = format({
+          direction: value === 'ascending' ? 'asc' : 'desc',
+          field: column.field,
+        })
+        if (next !== this.sort) {
+          this.requestSort(next)
+        }
+      } else if (value === 'left' || value === 'right') {
+        this.moveColumn(column.field, value === 'left' ? left : -left)
+      } else if (value === 'restore') {
+        for (const field of this.restorable) {
+          this.showColumn(field)
+        }
+      } else if (value === 'hide') {
+        const at = this.shownColumns.indexOf(column)
+        if (this.hideColumn(column.field)) {
+          this.moveTo(-1, this.lead + Math.min(at, this.shownColumns.length - 1))
+        }
+      }
+    })
+  }
+
+  /**
+   * Hides a column, as Hide column in its menu does.
+   *
+   * Public for the same reason `toggleSort` is: your own column picker needs a
+   * way to ask. Asks with `helix-before-column-toggle`, and keeps the last column
+   * showing. Returns whether the column was hidden.
+   */
+  hideColumn(field: string): boolean {
+    return this.requestHidden(field, true)
+  }
+
+  /**
+   * Shows a hidden column. Asks with `helix-before-column-toggle`, and returns
+   * whether the column was shown.
+   */
+  showColumn(field: string): boolean {
+    return this.requestHidden(field, false)
+  }
+
+  /** Asks for a column to be hidden or shown. */
+  private requestHidden(field: string, hidden: boolean): boolean {
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column || field === '' || column.shown !== hidden) {
+      return false
+    }
+    if (hidden && this.shownFields.length <= 1) {
+      return false
+    }
+    return requestChange({
+      apply: (value) => {
+        column.hidden = value
+        if (value) {
+          this.hiddenByTable.add(field)
+        } else {
+          this.hiddenByTable.delete(field)
+        }
+        this.dispatchEvent(new HelixColumnToggleEvent({ field, hidden: value }))
+      },
+      event: (value) => new HelixBeforeColumnToggleEvent({ field, hidden: value }),
+      host: this,
+      next: hidden,
+    })
   }
 
   /** Columns arrive from the light DOM, which changes no property here. */
@@ -3029,7 +3254,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * makes of them, so a keyboard needs nothing of its own.
    */
   private readonly handleHeadClick = (event: Event): void => {
-    if (this.partIn(event, 'grip') || this.partIn(event, 'resizer')) {
+    if (this.partIn(event, 'grip') || this.partIn(event, 'resizer') || this.inColumnMenu(event)) {
       return
     }
     const column = this.columnFrom(event)
@@ -3257,7 +3482,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * alone.
    */
   private readonly handleGridKey = (event: KeyboardEvent): void => {
-    if (event.defaultPrevented || event.altKey) {
+    /* An open column menu holds its own keys, and its rows sit inside a heading. */
+    if (
+      event.defaultPrevented ||
+      (this.inColumnMenu(event) && !this.partIn(event, 'menu-button'))
+    ) {
+      return
+    }
+    if (event.altKey) {
+      this.openColumnMenuFrom(event)
       return
     }
     const place = this.placeOf(event)
@@ -3369,6 +3602,23 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return true
     }
     return false
+  }
+
+  /** Whether the event came from a heading's menu, its button included. */
+  private inColumnMenu(event: Event): boolean {
+    return (
+      this.columnFrom(event) !== undefined &&
+      event.composedPath().some((node) => node instanceof HelixHeadlessMenu)
+    )
+  }
+
+  /** Alt+Down on a heading opens its menu. */
+  private openColumnMenuFrom(event: KeyboardEvent): void {
+    const column = event.key === 'ArrowDown' ? this.columnFrom(event) : undefined
+    if (column?.drawsMenu) {
+      event.preventDefault()
+      column.openMenu()
+    }
   }
 
   /** Enter, Space and F2 on a cell. */

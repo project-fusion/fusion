@@ -1,0 +1,40 @@
+<!-- @summary A menu on each heading that sorts, moves, and hides the column. A press on the rest of the heading still sorts. -->
+
+<helix-data-table
+  id="assets"
+  label="Assets"
+  page-size="6"
+  reorderable
+  row-key="name"
+>
+  <helix-table-column
+    field="name"
+    menu
+    sortable
+    width="minmax(12rem, 1fr)"
+  >File</helix-table-column>
+  <helix-table-column
+    field="size"
+    menu
+    sortable
+    text-align="end"
+  >Size</helix-table-column>
+  <helix-table-column
+    field="kind"
+    menu
+  >Kind</helix-table-column>
+  <helix-table-column
+    field="owner"
+    menu
+    sortable
+  >Owner</helix-table-column>
+</helix-data-table>
+
+<script>
+  document.getElementById('assets').rows = Array.from({ length: 18 }, (_, index) => ({
+    kind: index % 4 === 0 ? 'font' : 'image',
+    name: `asset-${String(index + 1).padStart(3, '0')}.webp`,
+    owner: index % 3 === 0 ? 'Brand' : 'Product',
+    size: 12000 + index * 837,
+  }))
+</script>

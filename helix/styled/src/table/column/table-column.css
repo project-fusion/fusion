@@ -121,7 +121,60 @@
   stroke: var(--helix-color-foreground);
 }
 
+/* The sort button shrinks to its words so the menu button sits beside the
+   chevrons. A press on the rest of the heading still sorts: the table listens on
+   the whole column. */
+:host(:state(has-menu)) [part="sort"] {
+  flex: 0 1 auto;
+}
+
+/* The same quiet ink and hover as the chevrons, so the two marks read as one
+   group and neither competes with the words. */
+[part="menu-button"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-subtle);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  margin-inline-start: var(--helix-space-2xs);
+  position: relative;
+}
+
+/* The words stay over the values they name, so the button goes before the
+   chevrons, and the grip stays first. */
+:host([text-align="end"]) [part="grip"] {
+  order: -2;
+}
+
+:host([text-align="end"]) [part="menu-button"] {
+  margin-inline: var(--helix-space-none) var(--helix-space-2xs);
+  order: -1;
+}
+
+[part="menu-mark"] {
+  block-size: 1.07em;
+  inline-size: 1.07em;
+}
+
+[part="menu-button"]:hover,
+[part="menu-button"][aria-expanded="true"] {
+  background-color: var(--helix-color-hover);
+  color: var(--helix-color-foreground);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing
+   drawn moves. */
+[part="menu-button"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 [part="sort"]:focus-visible,
+[part="menu-button"]:focus-visible,
 [part="grip"]:focus-visible,
 [part="resizer"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
