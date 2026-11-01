@@ -32,6 +32,13 @@ tags:
     timeout: 5000
 - tapOn: Back
 - openLink: helix://drilldown/events/preview
+# The screen before it draws the same words and stays in the tree through the
+# move, so a step waits for the new screen's title and the move's end.
+- extendedWaitUntil:
+    visible: Events
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
 - extendedWaitUntil:
     visible: Appearance
     timeout: 15000

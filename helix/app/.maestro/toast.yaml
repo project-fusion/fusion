@@ -6,6 +6,8 @@
 # Each message's dismiss button is named "Dismiss", so a step names the one
 # it presses by its place. The stack stands at the bottom of the window, so
 # the touch the iOS simulator loses on a new screen lands in its middle.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
 appId: dev.fusion.helix.app
 name: Toast
 tags:
@@ -30,9 +32,13 @@ tags:
     timeout: 5000
 - assertVisible: Could not reach the server.
 - takeScreenshot: toast-preview-dismissed
+# Maestro drags from the words' middle to 90% of the screen, under half the
+# message's width, so this is a fling: core's `settleSwipe` springs a slower
+# drag that short back, on the web as well.
 - swipe:
     from: Could not reach the server.
     direction: RIGHT
+    duration: 150
 - extendedWaitUntil:
     notVisible: Could not reach the server.
     timeout: 5000
@@ -53,7 +59,7 @@ tags:
 - takeScreenshot: toast-queue-next
 - openLink: helix://toast/events/preview
 - extendedWaitUntil:
-    visible: No events yet
+    visible: .*No events yet.*
     timeout: 15000
 - tapOn:
     point: 50%, 40%
@@ -62,7 +68,7 @@ tags:
     text: Dismiss
     index: 1
 - extendedWaitUntil:
-    visible: helix-dismiss
+    visible: .*helix-dismiss.*
     timeout: 5000
 - takeScreenshot: toast-events-heard
 - openLink: helix://toast/undo/preview
