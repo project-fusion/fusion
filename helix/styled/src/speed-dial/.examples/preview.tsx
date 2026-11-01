@@ -4,8 +4,10 @@ export function Example() {
   const [open, setOpen] = useState(false)
 
   return (
-    <helix-flex justify-content="end">
+    <div className="page">
       <helix-speed-dial
+        data-dock="bottom-end"
+        data-dock-within
         label="Actions"
         onToggle={(event: Event & { newState?: string }) => setOpen(event.newState === 'open')}
       >
@@ -46,6 +48,6 @@ export function Example() {
           ></helix-icon>
         </helix-speed-dial-item>
       </helix-speed-dial>
-    </helix-flex>
+    </div>
   )
 }
