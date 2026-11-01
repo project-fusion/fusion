@@ -179,7 +179,7 @@ describe('the generated Meter', () => {
         ).all,
       ).backgroundColor
     expect(await colorAt(34)).toBe(tokens['color-success'])
-    expect(await colorAt(66)).toBe(tokens['color-warning'])
+    expect(await colorAt(66)).toBe(tokens['color-warning-mark'])
     expect(await colorAt(94)).toBe(tokens['color-danger'])
     expect(await colorAt(34, 'poor')).toBe(tokens['color-danger'])
     const unbanded = await drawn(<HelixMeter label="Disk" value={34} />)
