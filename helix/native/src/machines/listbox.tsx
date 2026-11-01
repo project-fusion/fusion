@@ -44,7 +44,8 @@ import {
 } from './listbox-model'
 import { heardKey, type ListRun } from './listbox-run'
 import { type OptionMember, type OptionOwner, OptionOwnerContext } from './option'
-import { boundTo, given, tell, told } from './props'
+import { boundTo, given, senderOf, tell, told } from './props'
+import type { ListOwner } from './select'
 import { useFollow, useVirtualFocus, type VirtualFocus } from './virtual-focus'
 import type { DrawnRow, WindowDrawing, WindowScroller } from './window'
 
@@ -68,7 +69,7 @@ interface Scrolled {
 type Scroller = { readonly scrollTo?: (to: { animated?: boolean; y: number }) => void } | null
 
 /** Takes what the options said in this draw in as their order, the page's. */
-const useOrder = (held: Held, schedule: () => void): void => {
+export const useOrder = (held: Held, schedule: () => void): void => {
   held.pass = []
   useLayoutEffect(() => {
     if (held.pass.length === 0) {
@@ -143,6 +144,55 @@ const useHighlight = (
   return keysHere
 }
 
+/**
+ * Puts the highlight where the key that opened it says, once the options have
+ * joined, and focus on it, as the web's Select does as its list opens.
+ */
+const useOpening = (
+  owned: ListOwner | undefined,
+  focus: VirtualFocus,
+  held: Held,
+  entries: readonly Entry[],
+  chosen: readonly string[],
+  keysHere: { current: boolean },
+  byKeys: { current: boolean },
+): void => {
+  const done = useRef(false)
+  const latest = useRef(entries)
+  latest.current = entries
+  useLayoutEffect(() => {
+    if (owned === undefined || done.current || entries.length === 0) {
+      return
+    }
+    done.current = true
+    keysHere.current = true
+    byKeys.current = true
+    const { value, where } = owned.opening
+    if (value === undefined) {
+      focus.highlight(where, entries, chosen)
+    } else {
+      focus.to(value)
+    }
+  })
+  /* A frame later than the layer, which moves focus to its first control as it opens. */
+  const { active } = focus
+  const landed = useRef(false)
+  useEffect(() => {
+    if (owned === undefined || landed.current || active === '') {
+      return undefined
+    }
+    landed.current = true
+    const frame = requestAnimationFrame(() => {
+      const key = latest.current.find((one) => one.value === active)?.key
+      const node = key === undefined ? undefined : held.members.get(key)?.node()
+      if (node) {
+        realFocus().focus(node, false)
+      }
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [active, held, owned])
+}
+
 /** The rows of `items`, the same objects while they say the same. */
 const useRows = (entries: readonly Entry[]): readonly ListRow[] => {
   const said = entries
@@ -195,7 +245,7 @@ const useScrolling = (
 }
 
 /** Takes an option's latest in, and the place it drew in. */
-const holdMember = (held: Held, member: OptionMember, schedule: () => void): void => {
+export const holdMember = (held: Held, member: OptionMember, schedule: () => void): void => {
   const had = held.members.get(member.key)
   held.members.set(member.key, member)
   if (!held.pass.includes(member.key)) {
@@ -327,7 +377,11 @@ const requester =
   ) =>
   (next: string): void => {
     const before = boundTo(use, 'onBeforeChange', 'event')
-    if (next === value || (before !== undefined && !tell(family, props, before, { value: next }))) {
+    if (
+      next === value ||
+      (before !== undefined &&
+        !tell(family, props, before, { value: next }, senderOf(family, value)))
+    ) {
       return
     }
     setValue(next)
@@ -335,7 +389,7 @@ const requester =
     for (const name of ['onInput', 'onChange']) {
       const event = boundTo(use, name, 'event')
       if (event !== undefined) {
-        told(family, props, event, {})
+        told(family, props, event, {}, senderOf(family, next))
       }
     }
   }
@@ -409,7 +463,14 @@ const useChoice = (
   useDeclared(held, read.multiple, open, setValue)
   const chosen = chosenValues(value, new Set(entries.map((one) => one.value)), read.multiple)
   const anchor = useRef('')
-  const request = requester(family, props, use, value, setValue, touch)
+  const owned = props.listOwner as ListOwner | undefined
+  const asked = requester(family, props, use, value, setValue, touch)
+  const request = (next: string): void => {
+    if (next === value) {
+      owned?.again()
+    }
+    asked(next)
+  }
   const choose = (one: string): void => request(toggled(one, chosen, read.multiple, anchor))
   const extend = (to: string): void => {
     const taken = extended(entries, chosen, anchor, to)
@@ -518,6 +579,8 @@ export const useListbox = (
   const { drag, dragging, moveBy, moveTo } = useMoves(family, props, use, entries, held, scrolling)
   const current = focus.active || (chosen[0] ?? '')
   const byKeys = useRef(false)
+  const owned = props.listOwner as ListOwner | undefined
+  useOpening(owned, focus, held, entries, chosen, keysHere, byKeys)
   const run: ListRun = {
     arrive: (one, forwarded) => {
       focus.to(one)
@@ -560,6 +623,10 @@ export const useListbox = (
     filtering,
     held,
     key: (press) => {
+      if (press.key === 'Tab') {
+        owned?.tab()
+        return false
+      }
       keysHere.current = true
       byKeys.current = true
       return heardKey(run, press, false)
@@ -571,6 +638,10 @@ export const useListbox = (
   const listening = useRef<(() => void) | undefined>(undefined)
   const fieldKey = useRef<(press: KeyPress) => boolean>(() => false)
   fieldKey.current = (press) => {
+    if (press.key === 'Tab') {
+      owned?.tab()
+      return false
+    }
     keysHere.current = false
     byKeys.current = true
     return heardKey(run, press, true)

@@ -170,6 +170,8 @@ import '../../listbox/index.js'
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
  *
+ * @cssstate aligned-end - While the open list lines up with the trigger's end edge.
+ * @cssstate aligned-start - While the open list lines up with the trigger's start edge.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
  * @cssstate placed-bottom - While the open list sits below the trigger.
@@ -458,6 +460,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
        as Popover says it. */
     onPlace: (placement) => {
       const side = sideOf(placement)
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-top', side === 'top')
     },
@@ -465,6 +469,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     onPresent: (sheet) => {
       this.toggleState('sheet', sheet)
       if (sheet) {
+        this.toggleState('aligned-end', false)
+        this.toggleState('aligned-start', false)
         this.toggleState('placed-bottom', false)
         this.toggleState('placed-top', false)
       }
@@ -643,7 +649,13 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   private readonly alignOver = (): void => {
     const surface = this.partNamed('surface')
     const trigger = this.partNamed('trigger')
-    if (!this.open || this.position !== 'item-aligned' || this.panel.sheet || !surface || !trigger) {
+    if (
+      !this.open ||
+      this.position !== 'item-aligned' ||
+      this.panel.sheet ||
+      !surface ||
+      !trigger
+    ) {
       return
     }
     const margin = 8
@@ -944,6 +956,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       /* The side is the open list's, so a closed one sits on neither. Measured
          before this: `:state(placed-bottom)` still matched after a press
          outside closed the list. */
+      this.toggleState('aligned-end', false)
+      this.toggleState('aligned-start', false)
       this.toggleState('placed-bottom', false)
       this.toggleState('placed-top', false)
       /* The filter goes with a close. Without this a filterable select reopens
