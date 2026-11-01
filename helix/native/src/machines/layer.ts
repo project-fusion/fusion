@@ -248,6 +248,7 @@ export const useLayer = (
       ...(swiped.edge === undefined ? {} : { edge: swiped.edge }),
       floating: placed.floating,
       guide,
+      inPage: !placedAgainst && !modal && !decorative && !guide && !notice,
       key,
       measured: placed.measured,
       modal: holdsReader,
