@@ -213,6 +213,11 @@ pub fn run(context: &Context) -> Report {
                     .map(|one| (one[1].to_string(), flatten(&one[2])))
                     .collect();
                 check_control_steps(&declared, &rule[2], &selector, &where_, &mut findings);
+                /* A named stop takes its derived steps from `[data-density]`, which
+                matches the same element. */
+                if selector.starts_with("[data-density=") {
+                    continue;
+                }
                 for (base, steps) in &by_base {
                     if !declared.contains_key(base) {
                         continue;

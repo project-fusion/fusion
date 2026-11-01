@@ -46,9 +46,8 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
    *
    * Separation rather than emphasis, because what `plain` drops is the
    * background *and* the border: the question is where the group ends, not how
-   * much ink it claims. `outlined` because the frame is a border over the
-   * group's own ground, exactly as a Card's is; `plain` takes the track's fill
-   * and edge away with it.
+   * much ink it claims. Unset, the track has a fill and an edge. There is no
+   * `outlined`: with no fill, a white thumb on a white page disappears.
    *
    * **The track itself is not on this axis, and `Tabs` reaches the same one
    * from the other side.** There it is `variant="segmented"`, opted into,
@@ -57,7 +56,7 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
    * and what decides the polarity is which reading is ordinary for the family.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
 
   static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
 }

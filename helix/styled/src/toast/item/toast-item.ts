@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToastItem } from '@fusion.dev/helix-headless/toast'
 import type { CSSResultGroup } from 'lit'
+import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles } from './toast-item.css.js'
 
 /**
@@ -34,7 +35,7 @@ import { styles } from './toast-item.css.js'
  */
 @customElement('helix-toast-item')
 export class HelixToastItem extends HelixHeadlessToastItem {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [densityStyles, styles]
 }
 
 declare global {

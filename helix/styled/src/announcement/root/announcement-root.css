@@ -4,22 +4,6 @@
      The icon step comes down with it. A container that is dense by nature and
      declares only the control size leaves its icons at the `md` step inside
      `sm` controls: measured, 20 pixels in a 32 pixel row. */
-  --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
-  --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
-  --helix-size-checkbox: var(--helix-size-checkbox-sm);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
-  --helix-size-switch: var(--helix-size-switch-sm);
-  --helix-size-tag: var(--helix-size-tag-sm);
-  --helix-text-control: var(--helix-text-control-sm);
-  --helix-space-control: var(--helix-space-sm);
-  --helix-text-field: var(--helix-text-sm);
-  --helix-text-field-label: var(--helix-text-xs);
-  --helix-space-field: var(--helix-space-xs);
 
   --_announcement-color: var(--helix-color-foreground-muted);
   /* What a tint is mixed against, so `separation` can move the whole band
@@ -140,23 +124,16 @@
 }
 
 /* Which rung the band rides, which is not what color it is: the two are set
-   independently and an elevated band still takes its tone's tint, now mixed
+   independently and a filled band still takes its tone's tint, now mixed
    against the rung it is on.
 
-   Written after the tone rules on purpose. `:host([separation="elevated"])` and
+   Written after the tone rules on purpose. `:host([separation="filled"])` and
    `:host([tone="neutral"])` are the same specificity, so nothing but order
-   decides which ground a neutral elevated band gets, and the rung is the answer:
+   decides which ground a neutral filled band gets, and the rung is the answer:
    `neutral` says the band carries no meaning, not that it sits in a well. */
 
-/* The resting rung, said as well as defaulted, for the reason `neutral` is: a
-   generated page should be able to put a band back rather than delete an
-   attribute to get there. */
+/* A ground of its own, a step up off the page rather than a tint of anything. */
 :host([separation="filled"]) {
-  background-color: var(--announcement-background-color, var(--helix-color-surface-sunken));
-}
-
-/* A step up off the page rather than a tint of anything. */
-:host([separation="elevated"]) {
   --_announcement-ground: var(--helix-color-surface);
 
   background-color: var(--announcement-background-color, var(--helix-color-surface));
@@ -166,6 +143,7 @@
    bounded by the page's own edges on three sides already. Its color is the
    tone's where the band has one, set by the tone rules above. */
 :host([separation="outlined"]) {
+  background-color: var(--announcement-background-color, transparent);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
 }
 

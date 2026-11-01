@@ -4,14 +4,12 @@ export function Example() {
       direction="column"
       gap="sm"
     >
+      <helix-announcement>Scheduled maintenance begins at 10 PM.</helix-announcement>
       <helix-announcement separation="filled">
-        Scheduled maintenance begins at 10 PM.
-      </helix-announcement>
-      <helix-announcement separation="elevated">
         New team members can now be invited by email.
       </helix-announcement>
       <helix-announcement
-        separation="elevated"
+        separation="filled"
         tone="info"
       >
         Your workspace was moved to a new server.

@@ -121,6 +121,9 @@
      the ramp can accelerate as much as it likes: 300 onwards are borders and
      text, where the eye wants the gaps to open up. */
   --_helix-neutral-200: oklch(0.96 var(--_helix-neutral-cast));
+  /* Light `surface-sunken`, decided by the owner on October 31, 2026, so a groove
+     stands clear of `raised` at 0.97. */
+  --_helix-neutral-225: oklch(0.94 var(--_helix-neutral-cast));
   /* This rung and 700 below it are read by exactly one token,
      `--helix-color-border`, so moving them moves every resting border in the
      library and nothing else: twenty-eight components in all. Against the

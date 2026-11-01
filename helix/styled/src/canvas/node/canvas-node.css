@@ -104,6 +104,10 @@
    colored cards reads at a glance. Elevated lifts it, keeping the color's edge,
    since on a board the color is what the card means. Plain is text on the
    board, with no box at all. */
+:host([separation="outlined"]:not([group])) {
+  background-color: var(--canvas-node-background-color, transparent);
+}
+
 :host([separation="filled"]:not([group])) {
   background-color: color-mix(in oklab, var(--_canvas-card-color) 16%, var(--helix-color-surface));
   border-color: transparent;

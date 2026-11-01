@@ -84,7 +84,7 @@ export class HelixCanvas extends HelixHeadlessCanvas {
    * app's working area, where the container is already the frame.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
   /* The surface's sheet first, this family's after, so a board's own rules win
      where the two speak about the same box. */
   static override styles: CSSResultGroup = [liveStyles, viewportStyles, styles]

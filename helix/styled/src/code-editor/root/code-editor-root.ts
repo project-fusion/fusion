@@ -50,11 +50,12 @@ export class HelixCodeEditor extends HelixHeadlessCodeEditor {
   fill = false
 
   /**
-   * How the frame stands off the page. Unset, it is outlined. `plain` draws
+   * How the frame stands off the page. Unset, it has a fill and an edge, and
+   * its text is colored against that fill, so there is no `outlined`. `plain` draws
    * no edge or corners, for a pane that draws its own.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
 
   static override styles: CSSResultGroup = [fieldStyles, glyphStyles, styles]
 }

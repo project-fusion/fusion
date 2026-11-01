@@ -50,8 +50,9 @@ export class HelixLog extends HelixHeadlessLog {
   /**
    * How the log is set apart from what is around it.
    *
-   * - `outlined`, the resting look, is a box with an edge and a fill of its
-   *   own, which scrolls after `--log-max-block-size`.
+   * - Unset, the log is a box with an edge and a fill of its own, which scrolls
+   *   after `--log-max-block-size`. Its lines are colored against that fill, so
+   *   there is no `outlined`.
    * - `plain` has no edge, no fill, no inset and no height of its own: the
    *   lines start where the text around them does and the log grows with
    *   them. For a log inside something that already frames it, such as an
@@ -59,12 +60,9 @@ export class HelixLog extends HelixHeadlessLog {
    *   status mark on that edge and its caret after the heading. A step that
    *   holds steps draws a rule beside them, and a step that holds lines draws
    *   them on a quiet surface that scrolls after `--log-step-max-block-size`.
-   *
-   * Both are writable, so a page can say which it means rather than relying
-   * on the absence of an attribute.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
 
   static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }

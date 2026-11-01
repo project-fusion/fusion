@@ -16,7 +16,7 @@
      or as a footnote. The rules and the column headings are what recede. */
   color: var(--helix-color-foreground);
   display: flex;
-  font-size: var(--helix-text-sm);
+  font-size: var(--helix-text-control);
   /* Figures take one width each, so a column of amounts lines up by place. */
   font-variant-numeric: tabular-nums;
   /* The edge the column is set to, which the table publishes because the cell

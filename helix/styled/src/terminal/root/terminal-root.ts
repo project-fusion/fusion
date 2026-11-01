@@ -61,11 +61,12 @@ export class HelixTerminal extends HelixHeadlessTerminal {
   fill = false
 
   /**
-   * How the frame stands off the page. Unset, it is outlined. `plain` draws
+   * How the frame stands off the page. Unset, it has a fill and an edge, and
+   * its text is colored against that fill, so there is no `outlined`. `plain` draws
    * no edge or corners, for a pane that draws its own.
    */
   @property({ reflect: true })
-  separation?: 'outlined' | 'plain'
+  separation?: 'plain'
 
   /* The live region's clip first, as that sheet asks, and the glyphs'
      size before this family's own rules. */

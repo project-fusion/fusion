@@ -26,9 +26,9 @@ const TAG = 'helix-toggle-group'
 describe('toggle visual axes', () => {
   test('separation reflects, which is the only channel the sheet has to it', () => {
     // separation: where the row of choices ends.
-    const served = ssr(html`<helix-toggle-group .separation=${'outlined'}></helix-toggle-group>`)
-    expect(hostTag(served, TAG)).toContain('separation="outlined"')
-    expect(styles(served)).toContain(':host([separation="outlined"])')
+    const served = ssr(html`<helix-toggle-group .separation=${'plain'}></helix-toggle-group>`)
+    expect(hostTag(served, TAG)).toContain('separation="plain"')
+    expect(styles(served)).toContain(':host(:not([separation]))')
   })
 
   test('and one that asked for no axis carries none', () => {

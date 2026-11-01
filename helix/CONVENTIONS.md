@@ -878,9 +878,11 @@ rule above: `outlined` on Button, `ghost` on IconButton, and on most families
 `neutral`, while Badge rests `primary` and Callout `info`, each recorded at its property.
 Written out, those values select nothing and land on the base rule.
 
-**Card is the one exception, decided by the owner on October 31, 2026.** An unset
-card has a fill and an edge, and `separation="outlined"` has the edge alone, so
-each value names one mechanism.
+**`separation="outlined"` is an edge and no fill wherever it is offered, decided by
+the owner on October 31, 2026.** So on Card, Canvas Node, Checkbox, and Radio it
+differs from the resting state, an exception to the sentence above. A family whose
+content needs its ground to read, such as Log, Toggle Group, Code Editor, Terminal,
+Editor, and Canvas, does not offer it. An unset one keeps its fill and edge.
 
 **Every emphasis names its own hover.** A generic
 `:host(:not(:disabled)) [part="button"]:hover` is four class-equivalents and an
