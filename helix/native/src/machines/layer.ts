@@ -59,6 +59,7 @@ import { type Landing, returnsOf, useAnchorOut } from './layer-anchor'
 import { useArrow } from './layer-arrow'
 import { useBanded } from './layer-band'
 import { useLayerFocus } from './layer-focus'
+import { useOver } from './layer-over'
 import { type Placer, placerFor } from './layer-place'
 import { layerNode, readLayer, useSheet } from './layer-read'
 import { useRefusal } from './layer-refusal'
@@ -130,7 +131,7 @@ export const useLayer = (
   const keyboard = host?.keyboard ?? 0
   const sheet = useSheet(read.presentation, window.width)
   const arrow = useArrow(boundTo(use, 'arrow', 'part'))
-  const placed = place({
+  const floated = place({
     active: open && !sheet && placedAgainst,
     ...(arrow.pointer === undefined ? {} : { arrow: arrow.pointer }),
     crossOffset: read.crossOffset,
@@ -139,6 +140,14 @@ export const useLayer = (
     offset,
     origin: host?.origin ?? ORIGIN,
     placement: read.placement,
+  })
+  const placed = useOver(floated, {
+    active: open && !sheet && placedAgainst,
+    anchor,
+    asked: asked?.over,
+    keyboard,
+    origin: host?.origin ?? ORIGIN,
+    view,
   })
   /* The anchor, measured as a touch outside the layers starts, so a press on
      it is the anchor's own. */
