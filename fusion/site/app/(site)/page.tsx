@@ -238,7 +238,7 @@ export default async function Home() {
                 key={insight.slug}
               >
                 <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
-                  <helix-tag tone="primary">{insight.topic}</helix-tag>
+                  <helix-tag tone="accent">{insight.topic}</helix-tag>
                   <helix-tag>{insight.kind}</helix-tag>
                 </helix-flex>
                 <helix-text as="h3" scale="title">

@@ -16,9 +16,9 @@
 /* The hovered element, washed in the brand color over its outline. Fixed and
    never hit, so the pointer keeps reaching the page under it. */
 .highlight {
-  background: color-mix(in oklab, var(--helix-color-primary) 14%, transparent);
+  background: color-mix(in oklab, var(--helix-color-accent) 14%, transparent);
   border-radius: var(--helix-radii-sm);
-  outline: 2px solid var(--helix-color-primary);
+  outline: 2px solid var(--helix-color-accent);
   outline-offset: -1px;
   pointer-events: none;
   position: fixed;
@@ -28,9 +28,9 @@
 /* The hovered element's tag, on its top edge, or under it when the top edge
    is too close to the window's to hold a label. */
 .name {
-  background: var(--helix-color-primary-surface);
+  background: var(--helix-color-accent-surface);
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
   line-height: var(--helix-leading-tight);
@@ -69,7 +69,7 @@
 }
 
 .close {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
   font-weight: var(--helix-weight-medium);
 }
 

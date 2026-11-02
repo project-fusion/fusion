@@ -55,7 +55,7 @@
 }
 
 .anchor:hover {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
 }
 
 /* No margin to hide in on a narrow screen, so it sits after the words instead

@@ -132,15 +132,15 @@
  * what `pathLength` was supposed to buy and does not deliver in WebKit.
  */
 .diagramPulse path {
-  stroke: var(--helix-color-primary);
+  stroke: var(--helix-color-accent);
   /* Lifted above the brand so the traveling head reads against a field that is
      itself brand-colored. At the token value it disappeared into the aura. */
   stroke-opacity: 0.92;
   /* Wide and weak rather than tight and bright: a tight halo on a short fast
      dash reads as a hard object with an outline, and what a light moving along a
      wire does is bleed. Two shadows so the falloff is not a single hard ring. */
-  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
-    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-accent) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-accent) 28%, transparent));
 }
 
 /* With no motion the highlight would sit frozen mid-path, which reads as a
@@ -151,7 +151,7 @@
   }
 
   .diagramBase path {
-    stroke: var(--helix-color-primary);
+    stroke: var(--helix-color-accent);
     stroke-opacity: 0.75;
   }
 }
@@ -199,7 +199,7 @@
 }
 
 .diagramSample {
-  fill: var(--helix-color-primary);
+  fill: var(--helix-color-accent);
   font-family: var(--helix-font-display);
   font-weight: var(--helix-weight-semibold);
   text-anchor: middle;
@@ -244,9 +244,9 @@
 }
 
 .diagramGaugeValue {
-  stroke: var(--helix-color-primary);
+  stroke: var(--helix-color-accent);
   stroke-opacity: 0.9;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-primary) 45%, transparent));
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-accent) 45%, transparent));
 }
 
 .diagramGaugeTick {
@@ -310,7 +310,7 @@
 .diagramSvg:has([data-ch="saturation"]:hover) .diagramBase [data-ch="saturation"],
 .diagramSvg:has([data-ch="density"]:hover) .diagramBase [data-ch="density"],
 .diagramSvg:has([data-ch="radius"]:hover) .diagramBase [data-ch="radius"] {
-  stroke: var(--helix-color-primary);
+  stroke: var(--helix-color-accent);
   stroke-opacity: 0.9;
 }
 

@@ -85,24 +85,24 @@
 
 /* One pulse per path. Each carries its own length, so the loop never seams. */
 .platformPulse path {
-  stroke: var(--helix-color-primary);
+  stroke: var(--helix-color-accent);
   stroke-opacity: 0.92;
-  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
-    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-accent) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-accent) 28%, transparent));
 }
 
 /* A glowing node where a run meets its label. */
 .platformNode {
-  fill: var(--helix-color-primary);
-  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
-    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-primary) 28%, transparent));
+  fill: var(--helix-color-accent);
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--helix-color-accent) 55%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-accent) 28%, transparent));
 }
 
 /* The mark, glowing the way the ring does. */
 .platformMark {
   display: grid;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-primary) 55%, transparent))
-    drop-shadow(0 0 18px color-mix(in oklab, var(--helix-color-primary) 35%, transparent));
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-accent) 55%, transparent))
+    drop-shadow(0 0 18px color-mix(in oklab, var(--helix-color-accent) 35%, transparent));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -111,7 +111,7 @@
   }
 
   .platformBase path {
-    stroke: var(--helix-color-primary);
+    stroke: var(--helix-color-accent);
     stroke-opacity: 0.75;
   }
 }

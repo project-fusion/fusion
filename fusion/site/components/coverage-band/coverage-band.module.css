@@ -101,15 +101,15 @@
 .column {
   background: linear-gradient(
     to bottom,
-    color-mix(in oklab, var(--helix-color-primary) 24%, transparent),
-    color-mix(in oklab, var(--helix-color-primary) 8%, transparent) 45%,
-    color-mix(in oklab, var(--helix-color-primary) 4%, transparent)
+    color-mix(in oklab, var(--helix-color-accent) 24%, transparent),
+    color-mix(in oklab, var(--helix-color-accent) 8%, transparent) 45%,
+    color-mix(in oklab, var(--helix-color-accent) 4%, transparent)
   );
   border: var(--helix-border-thin) solid
-    color-mix(in oklab, var(--helix-color-primary) 45%, transparent);
+    color-mix(in oklab, var(--helix-color-accent) 45%, transparent);
   border-radius: var(--helix-radii-lg);
   box-shadow:
-    0 0 2.5rem -0.75rem color-mix(in oklab, var(--helix-color-primary) 60%, transparent),
+    0 0 2.5rem -0.75rem color-mix(in oklab, var(--helix-color-accent) 60%, transparent),
     inset 0 1px 0 color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
   inline-size: var(--col);
   inset-block: 0;
@@ -270,19 +270,19 @@
 
 [data-ours][data-state="ships"] > .mark,
 .legend [data-state="ships"] > .mark {
-  background: var(--helix-color-primary);
+  background: var(--helix-color-accent);
   block-size: 0.75rem;
   box-shadow:
-    0 0 0 0.25rem color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
-    0 0 1rem color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+    0 0 0 0.25rem color-mix(in oklab, var(--helix-color-accent) 22%, transparent),
+    0 0 1rem color-mix(in oklab, var(--helix-color-accent) 70%, transparent);
   inline-size: 0.75rem;
 }
 
 [data-ours][data-state="experimental"] > .mark,
 .legend [data-state="experimental"] > .mark {
   block-size: 0.75rem;
-  border-color: var(--helix-color-primary);
-  box-shadow: 0 0 0.75rem color-mix(in oklab, var(--helix-color-primary) 45%, transparent);
+  border-color: var(--helix-color-accent);
+  box-shadow: 0 0 0.75rem color-mix(in oklab, var(--helix-color-accent) 45%, transparent);
   inline-size: 0.75rem;
 }
 
@@ -433,7 +433,7 @@ a.cardItem {
 
 a.cardItem:hover,
 a.cardItem:focus-visible {
-  background-color: var(--helix-color-primary-subtle);
+  background-color: var(--helix-color-accent-subtle);
 }
 
 a.cardItem:focus-visible {
@@ -443,7 +443,7 @@ a.cardItem:focus-visible {
 
 a.cardItem:hover .cardGo,
 a.cardItem:focus-visible .cardGo {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
   transform: translateX(0.125rem);
 }
 

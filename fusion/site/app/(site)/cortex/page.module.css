@@ -67,11 +67,11 @@
    object on the page, in the brand's own fill, with its words and button
    inverted. The same recipe as the landing page's close. */
 .closingCard {
-  background: var(--helix-color-primary-surface);
+  background: var(--helix-color-accent-surface);
   border-radius: var(--helix-radii-lg);
   box-shadow: 0 24px 60px -30px
-    color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
-  color: var(--helix-color-foreground-on-primary);
+    color-mix(in oklab, var(--helix-color-accent-surface) 70%, transparent);
+  color: var(--helix-color-foreground-on-accent);
   margin-block-start: var(--site-band);
   margin-inline: auto;
   max-inline-size: min(var(--site-band-measure), calc(100% - 2 * var(--site-inset)));
@@ -80,18 +80,18 @@
 .closingCard :global([data-section-title]),
 .closingCard :global(helix-text),
 .closingCard :global(p) {
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 .closingCard :global([data-button][data-button]) {
-  background: var(--helix-color-foreground-on-primary);
-  border-color: var(--helix-color-foreground-on-primary);
-  color: var(--helix-color-primary-surface);
+  background: var(--helix-color-foreground-on-accent);
+  border-color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-accent-surface);
 }
 
 /* The quiet second door on the close keeps the inverted ink. */
 .closingCard :global([data-link]) {
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 @media (max-width: 40rem) {
