@@ -304,4 +304,20 @@ describe('the generated Toolbar', () => {
     await act(() => atTextSize(3.571))
     expect(save().minHeight).toBeCloseTo(medium * 1.353, 1)
   })
+
+  test('holds a text button at its own width in a toolbar that scrolls', async () => {
+    const drawn = await render(
+      themed(
+        <HelixToolbar label="Actions" scrollable>
+          <HelixButton>Save the draft</HelixButton>
+        </HelixToolbar>,
+      ),
+    )
+    /* A share would resolve against the room the row has, and stand as wide as the frame. */
+    const widths = drawn.container
+      .queryAll((node) => node.type === 'View')
+      .map((node) => StyleSheet.flatten(node.props.style as never) as { width?: unknown } | null)
+      .map((style) => style?.width)
+    expect(widths).not.toContain('100%')
+  })
 })
