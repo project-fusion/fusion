@@ -149,7 +149,7 @@
     },
     "helix/app": {
       "name": "@fusion.dev/helix-app",
-      "version": "0.231.0",
+      "version": "0.231.1",
       "dependencies": {
         "@floating-ui/react-native": "0.10.10",
         "@fusion.dev/helix": "workspace:*",
