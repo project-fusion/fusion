@@ -22,6 +22,7 @@ import { holding, useHandOff } from './hand-off'
 import {
   useContent,
   useFill,
+  useHeldEnd,
   useMore,
   usePager,
   useScroller,
@@ -131,6 +132,25 @@ const spreads = (
 /** The scroll view's style: it fills its frame, unless its part hugs its content. */
 const growing = (hugs: boolean | undefined) => ({ flexGrow: hugs === true ? 0 : 1 })
 
+/**
+ * What a part that may take no touch between what it holds gives its scroll
+ * view: `box-none` on its content, on the scroll view while nothing scrolls,
+ * and no scrolling then, so nothing bounces under a finger.
+ */
+const passingThrough = (
+  pointerEvents: unknown,
+  more: { readonly end: boolean; readonly start: boolean },
+  locked: boolean,
+) => {
+  const passes = pointerEvents === 'box-none'
+  const still = passes && !more.end && !more.start
+  return {
+    content: passes ? { pointerEvents: 'box-none' as const } : {},
+    scrollEnabled: !locked && !still,
+    scroller: still ? { pointerEvents: 'box-none' as const } : {},
+  }
+}
+
 /** What `ScrollingPart` takes. */
 interface ScrollingProps {
   /** The axis the part scrolls along, or both. */
@@ -162,7 +182,8 @@ interface ScrollingProps {
    * a `pager` is handed the part's `Pager` once it is drawn, a
    * `contentRef` is handed the view its content is laid out in, a
    * `scrollerRef` the scroll view the scroll capability takes as the part,
-   * `indicators` shows the platform's scroll indicators, `onSnapOffsets` hears
+   * `indicators` shows the platform's scroll indicators, `holdsEnd` keeps the
+   * end of the content showing as it grows, `onSnapOffsets` hears
    * the offsets a part that snaps can rest at, and `snapOffsets` takes the place
    * of those, as a carousel stops only at its stops.
    */
@@ -210,6 +231,12 @@ interface ScrollingProps {
  * layer at its start**, as `useSwipe` says: its gesture runs beside the
  * layer's swipe, and the swipe reads where it stands and holds it there.
  *
+ * **A part that takes no touch of its own between what it holds**, as a
+ * toast's stack, passes those touches through its scroll view while nothing
+ * scrolls, and does not bounce under a finger. Its scroll view takes them once its content is longer than its
+ * frame, since a scroll view that passes its touches through scrolls on iOS
+ * alone.
+ *
  * **The frame is the part's box**, so it moves as the part's transitions and
  * its animation say, and blurs what is behind it, as a dialog's panel that
  * scrolls fades and rises in and swells.
@@ -234,6 +261,7 @@ export const ScrollingPart = ({
   const [frame, inner] = parted(box)
   const {
     contentRef,
+    holdsEnd,
     indicators,
     maintainVisibleContentPosition,
     onSnapOffsets,
@@ -250,6 +278,8 @@ export const ScrollingPart = ({
   const snapping = useSnap(snap, horizontal, onSnapOffsets, snapOffsets)
   const fill = useFill()
   const buttons = horizontal ? 'x' : 'y'
+  const heldEnd = useHeldEnd(holdsEnd === true, scroller, at)
+  const through = passingThrough(props.pointerEvents, more, locked)
   const scrolling: Scrolling = {
     ...(horizontal ? { axis: 'x', fill, more } : { axis: 'y', more }),
     ...snapping.reports,
@@ -272,7 +302,7 @@ export const ScrollingPart = ({
   const own = useCallback((node: ScrollViewInstance | null) => holding(scroller)(node), [])
   const handOff = useHandOff(twoWays ? undefined : horizontal ? 'x' : 'y', own)
   const shared = {
-    scrollEnabled: !locked,
+    scrollEnabled: through.scrollEnabled,
     scrollEventThrottle: 16,
     showsHorizontalScrollIndicator: indicators === true,
     showsVerticalScrollIndicator: indicators === true,
@@ -285,6 +315,7 @@ export const ScrollingPart = ({
         ...(twoWays ? { flexDirection: 'column' } : {}),
         ...inner,
         flexGrow: 1,
+        ...through.content,
         ...(spread.width === undefined ? {} : { width: spread.width }),
       }}
       horizontal={horizontal || twoWays}
@@ -294,6 +325,7 @@ export const ScrollingPart = ({
       }
       onContentSizeChange={(width, height) => {
         track({ content: buttons === 'x' ? width : height })
+        heldEnd(height)
         laidOut.sized(width, height)
         ;(twoWays ? reporting(() => scroller.current, 'x') : told).onContentSizeChange(
           width,
@@ -328,6 +360,7 @@ export const ScrollingPart = ({
             ref: handOff.held,
           })}
       style={growing(hugs)}
+      {...through.scroller}
     >
       <WrapWidth.Provider value={twoWays ? wrapWidth(wide, inner) : undefined}>
         {content(scrolling)}

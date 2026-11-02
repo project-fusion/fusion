@@ -54,22 +54,26 @@ export const tellBack = (
  * What the layer's own view takes beside its handlers: a modal layer holds
  * the reader, what the layer holds is reached on its own, where a tooltip
  * is one thing a reader hears, a notice takes no touch of its own, so a
- * touch between its messages reaches the app under it, and a look alone
+ * touch between its messages reaches the app under it, a notice along the
+ * bottom keeps its newest message showing where it scrolls, and a look alone
  * takes none and reaches no screen reader.
  */
 export const partView = ({
   decorative,
+  edge,
   modal,
   notice,
   tooltip,
 }: {
   readonly decorative: boolean
+  readonly edge?: string | undefined
   readonly modal: boolean
   readonly notice: boolean
   readonly tooltip: boolean
 }): Readonly<Record<string, unknown>> => ({
   ...(modal ? { accessibilityViewIsModal: true } : {}),
   ...(tooltip ? {} : { accessible: false }),
-  ...(notice ? { pointerEvents: 'box-none' } : {}),
+  ...(notice ? { indicators: true, pointerEvents: 'box-none' } : {}),
+  ...(notice && edge === 'bottom' ? { holdsEnd: true } : {}),
   ...(decorative ? HIDDEN : {}),
 })

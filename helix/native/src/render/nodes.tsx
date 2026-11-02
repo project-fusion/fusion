@@ -298,7 +298,7 @@ const drawScrolling = (
       axis={resolved.scrolls}
       blur={resolved.blur}
       box={box}
-      content={(scrolling) => drawn(scrolling, false)}
+      content={(scrolling) => inScheme(resolved.scheme, drawn(scrolling, false))}
       controls={(scrolling) => drawn(scrolling, true)}
       hugs={resolved.hugs === true}
       key={node.name}
