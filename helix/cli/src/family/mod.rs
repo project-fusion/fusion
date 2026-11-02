@@ -44,6 +44,7 @@ mod css;
 #[cfg(feature = "internal")]
 mod host_states;
 mod ir;
+#[cfg(feature = "internal")]
 mod machine;
 mod output;
 mod parts;
