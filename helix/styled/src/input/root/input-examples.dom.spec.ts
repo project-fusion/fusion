@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import focused from '../.examples/focused.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -24,6 +25,16 @@ const type = (control: HTMLInputElement | HTMLTextAreaElement, text: string): vo
 const commit = (control: HTMLElement): void => {
   control.dispatchEvent(new Event('change', { bubbles: true }))
 }
+
+describe('the focused example', () => {
+  run('takes focus, on its input', async () => {
+    await example(focused)
+    await idle()
+    const host = document.getElementById('email') as HTMLElement
+    expect(document.activeElement).toBe(host)
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'control'))
+  })
+})
 
 describe('the events example', () => {
   run('typing proposes and announces each edit, and clicking away commits', async () => {
