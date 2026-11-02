@@ -40,7 +40,7 @@
 }
 
 .host {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-foreground);
   font-weight: var(--helix-weight-medium);
 }
 
