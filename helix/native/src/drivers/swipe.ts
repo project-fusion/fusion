@@ -50,9 +50,9 @@ import {
 import { scheduleOnRN } from 'react-native-worklets'
 import { reducedNow } from '../render/motion'
 import { CURVES } from './motion'
-import { type Held, stepped, towardEdge } from './swipe-step'
+import { type Held, released, stepped, towardEdge } from './swipe-step'
 
-export { type Held, type Step, stepped, towardEdge } from './swipe-step'
+export { type Held, released, type Step, stepped, towardEdge } from './swipe-step'
 
 /** How far a press travels along the axis before it is a swipe, in points, as the web's `SwipeController` waits. */
 export const SWIPE_SLOP = 8
@@ -123,6 +123,8 @@ interface Shared {
   readonly moved: SharedValue<boolean>
   /** When the scroller last moved on its own, in milliseconds of the wall clock. */
   readonly scrolledAt: SharedValue<number>
+  /** How far the pan stood at its last update. */
+  readonly seen: SharedValue<{ readonly x: number; readonly y: number }>
   /** How far the scroller stands past its start. */
   readonly scrolled: SharedValue<number>
   /** How far past its start the scroller stands at its end. */
@@ -186,6 +188,7 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
   const scrolled = useSharedValue(0)
   const scrolledAt = useSharedValue(0)
   const end = useSharedValue(0)
+  const seen = useSharedValue({ x: 0, y: 0 })
   const travel = useSharedValue(0)
   const [shared] = useState<Shared>(() => ({
     edge,
@@ -195,6 +198,7 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
     moved,
     scrolled,
     scrolledAt,
+    seen,
     travel,
   }))
   edge.value = setup.edge
@@ -307,15 +311,24 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
         onBegin: () => {
           'worklet'
           moved.value = false
+          seen.value = { x: 0, y: 0 }
         },
         /* The release, with how fast the finger went toward the edge, in
            points a millisecond, as the web's controller measures it. */
         onDeactivate: (event: PanGestureActiveEvent) => {
           'worklet'
           if (moved.value) {
+            const to = released(
+              edge.value,
+              travel.value,
+              seen.value,
+              { x: event.translationX, y: event.translationY },
+              inside.value ? heldOf(shared) : undefined,
+            )
+            travel.value = to
             scheduleOnRN(
               release,
-              travel.value,
+              to,
               towardEdge(edge.value, event.velocityX, event.velocityY) / 1000,
             )
           }
@@ -328,10 +341,23 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
         onUpdate: (event: PanGestureActiveEvent) => {
           'worklet'
           follow(shared, scrollerRef, across, event)
+          seen.value = { x: event.translationX, y: event.translationY }
         },
         simultaneousWith: scrollerGesture,
       }),
-      [across, edge, enabled, inside, moved, release, scrollerGesture, scrollerRef, shared, travel],
+      [
+        across,
+        edge,
+        enabled,
+        inside,
+        moved,
+        release,
+        scrollerGesture,
+        scrollerRef,
+        seen,
+        shared,
+        travel,
+      ],
     ),
   )
   const style = useAnimatedStyle(() => {

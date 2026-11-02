@@ -4,7 +4,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { GestureDetector, GestureHandlerRootView, State } from 'react-native-gesture-handler'
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils'
 import Animated from 'react-native-reanimated'
-import { type Swiping, stepped, towardEdge, useSwipe } from './swipe'
+import { released, type Swiping, stepped, towardEdge, useSwipe } from './swipe'
 
 afterEach(() => {
   jest.restoreAllMocks()
@@ -195,5 +195,21 @@ describe('useSwipe', () => {
     drag(held, 300)
     await settle()
     expect(held.settled).toEqual([0])
+  })
+})
+
+describe('released', () => {
+  const lifted = { x: 0, y: 336 }
+
+  test('takes the move between the last update and the release', () => {
+    expect(released('bottom', 580, { x: 0, y: 160 }, lifted, undefined)).toBe(756)
+  })
+
+  test('adds nothing where the release stands at the last update', () => {
+    expect(released('bottom', 580, lifted, lifted, undefined)).toBe(580)
+  })
+
+  test('leaves the last of a drag to a scroller that holds it', () => {
+    expect(released('bottom', 0, { x: 0, y: 160 }, lifted, { room: 40, still: false })).toBe(0)
   })
 })
