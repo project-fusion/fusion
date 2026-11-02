@@ -38,6 +38,7 @@ use crate::family::api::{Attribute, Node as TreeNode, NodeKind};
 use crate::family::ir::{Condition, Family, Item, Rule, Value};
 use shorthands::{overlap, resets};
 
+mod font;
 mod selector;
 pub mod shorthands;
 
@@ -87,7 +88,7 @@ pub fn check(family: &Family) -> Result<Vec<String>, String> {
         .collect();
     let mut drawn = Vec::new();
     tree(&family.tree, &mut drawn);
-    let mut refused = BTreeSet::new();
+    let mut refused: BTreeSet<String> = rules.iter().filter_map(|rule| font::fault(rule)).collect();
     let mut notes = BTreeSet::new();
     for (index, first) in rules.iter().enumerate() {
         for second in &rules[index + 1..] {

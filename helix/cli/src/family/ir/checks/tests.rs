@@ -136,3 +136,23 @@ fn a_selector_is_ranked_as_a_browser_ranks_it() {
     assert_eq!(selector::specificity("a[part=\"link\"]:hover"), [0, 2, 1]);
     assert_eq!(selector::specificity("::slotted(a:hover)"), [0, 1, 2]);
 }
+
+#[test]
+fn refuses_a_font_with_no_size_and_family() {
+    let refused = checked("box('mark')", "on('mark', [rule({ font: 'bold' })])").unwrap_err();
+    assert!(refused.contains("`font: bold`"), "{refused}");
+}
+
+#[test]
+fn refuses_a_web_font_that_does_not_parse() {
+    let refused = checked("box('mark')", "on('mark', [rule({ font: web('Inter') })])").unwrap_err();
+    assert!(refused.contains("`font: Inter`"), "{refused}");
+}
+
+#[test]
+fn takes_a_font_keyword_a_size_and_family_and_a_token() {
+    for font in ["inherit()", "'inherit'", "'14px Inter'", "token('text-sm')"] {
+        let rules = format!("on('mark', [rule({{ font: {font} }})])");
+        assert!(checked("box('mark')", &rules).is_ok(), "{font}");
+    }
+}
