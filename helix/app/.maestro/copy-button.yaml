@@ -20,29 +20,27 @@ tags:
     point: 50%, 90%
     retryTapIfNoChange: false
 - startRecording: copy-button
-# "Copied" stands 1.2 seconds. Without a limit, Maestro's tap waits for the screen
-# to settle before the next step, and Android's clipboard preview rises in that
-# time: 6.5 seconds in run 41356179392, whose video shows the check and "Copied"
-# come and go inside the tap.
+# "Copied" stands 1.6 seconds, and Maestro's tap on Android can return after that,
+# even with `waitToSettleTimeoutMs: 200`: in run 41361727088 it returned 4.4
+# seconds after the press, and the video shows "Copied" come and go inside it.
+# The check `standing-copy` draws the same buttons with a confirmation that stands
+# 20 seconds, so nothing here races the tap. Jest holds the 1.6 seconds.
+- openLink: helix://checks/standing-copy
+- extendedWaitUntil:
+    visible: Copy link
+    timeout: 15000
 - tapOn:
-    text: Copy
+    point: 50%, 90%
     retryTapIfNoChange: false
-    waitToSettleTimeoutMs: 200
+- tapOn: Copy
 - extendedWaitUntil:
     visible: Copied
     timeout: 5000
 - takeScreenshot: copy-button-copied
 - extendedWaitUntil:
     notVisible: Copied
-    timeout: 5000
-- openLink: helix://copy-button/label/preview
-- extendedWaitUntil:
-    visible: Copy link
-    timeout: 15000
-- tapOn:
-    text: Copy link
-    retryTapIfNoChange: false
-    waitToSettleTimeoutMs: 200
+    timeout: 30000
+- tapOn: Copy link
 - extendedWaitUntil:
     visible: Copied
     timeout: 5000
