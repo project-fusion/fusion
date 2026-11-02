@@ -2,7 +2,7 @@
  * What a scroll view does inside a layer that swipes along its axis: hands
  * the layer its drag at its start, as `useSwipe` says. Its gesture runs
  * beside the layer's swipe, and the swipe reads where it stands and holds it
- * there.
+ * there, and it does not scroll while the layer rests short of the whole.
  */
 import { type ReactNode, type RefObject, useCallback } from 'react'
 import type { ScrollViewInstance } from 'react-native'
@@ -25,6 +25,8 @@ export interface HandOff {
    * long its content and its frame are, as its scroll events tell them.
    */
   readonly scrolled: (at: Scrolled) => void
+  /** Whether the layer rests short of the whole, where the scroll view does not scroll. */
+  readonly waits: boolean
   /** Draws the scroll view inside the gesture the swipe runs beside, where it hands off. */
   readonly wrap: (view: ReactNode) => ReactNode
 }
@@ -65,6 +67,7 @@ export const useHandOff = (
         )
       }
     },
+    waits: handing && swipe.waits,
     wrap: (view) =>
       handing ? <GestureDetector gesture={swipe.gesture}>{view}</GestureDetector> : view,
   }
