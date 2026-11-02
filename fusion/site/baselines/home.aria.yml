@@ -14,7 +14,7 @@
   - /url: https://github.com/project-fusion
 - button "Preferences"
 - main:
-  - heading "An intelligent design system, and the engineers behind it" [level=1]
+  - heading "The foundation for building software with AI agents" [level=1]
   - paragraph: Ship faster because the system does the checking.
   - link "Open Fusion Helix":
     - /url: /helix
@@ -22,31 +22,27 @@
     - /url: /company/services
   - code: bun add @fusion.dev/helix
   - button "Copy the install command"
-  - paragraph: Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.
+  - paragraph: Works in React, Angular, Vue, Svelte, or no framework.
   - figure:
     - img "What goes into Fusion and what comes out Your brand, your code and your decisions flow into Fusion. Out of it come Helix, which checks every screen, and Cortex, which keeps every decision with its reason.": What you bring your brand your code your decisions What comes out Helix every screen, checked Cortex every decision kept with its reason
   - heading "AI writes a screen in seconds, and every agent writes a different one" [level=2]
-  - paragraph: Each agent chooses its own colors, spacing, and components. Your product drifts with every change, and nothing reports it. Helix gives every agent the same components and checks what each one writes.
+  - paragraph: Helix gives every agent the same components and checks what each one writes.
   - paragraph: Theming
   - paragraph: Set your brand with one color
   - list:
     - listitem: Enter one brand color and get a full palette
-    - listitem: Helix rejects a palette it cannot make readable
   - paragraph: Components
   - paragraph: Use one system in every framework
   - list:
     - listitem: Custom elements that run in any framework, or in none
-    - listitem: Types for React, Vue, and Svelte from one manifest
   - paragraph: Checks
   - paragraph: Catch what an agent gets wrong
   - list:
     - listitem: Contrast is measured on every release
-    - listitem: The helix scan command checks your code against the Helix version you installed
   - paragraph: Agents
   - paragraph: Give AI agents the reference you read
   - list:
     - listitem: Every tag, property, and event in one manifest at a URL
-    - listitem: Every page as Markdown, and every component family as JSON
   - paragraph: Theming
   - heading "Every pair Helix solves, checked for contrast" [level=2]
   - paragraph: You enter one brand color, and Helix computes every token from it.
@@ -66,7 +62,7 @@
   - status
   - text: Helix
   - heading "Use the behavior with your own design" [level=3]
-  - text: Every component comes in two tiers. The headless tier holds its structure, state, and form behavior, and you write all of its styling.
+  - text: The headless tier holds structure, state, and form behavior. You write the styling.
   - link "Read about the tiers":
     - /url: /helix/docs/tiers
   - text: Showing
@@ -114,9 +110,7 @@
   - paragraph: Contrast is measured on every release
   - text: One pair that failed
   - paragraph: Body text in this gray
-  - text: 3.03:1 against a target of 4.5:1 Fails
-  - paragraph: "color-foreground on color-background: 3.03:1 below target 4.5:1"
-  - text: 10 generator checks
+  - text: 3.03:1 against a target of 4.5:1 Fails 10 generator checks
   - code: content
   - code: register
   - code: docs
@@ -135,9 +129,7 @@
   - text: Request Manifest URL
   - button "Copy code, Manifest URL"
   - code: https://fusion.dev/helix/custom-elements.json
-  - text: Answer
-  - paragraph: The manifest's entry for helix-button, cut to the fields the question asks for.
-  - text: Manifest excerpt
+  - text: Answer Manifest excerpt
   - button "Copy code, Manifest excerpt"
   - code: "{ \"attributes\": [\"width\", \"emphasis\", \"tone\", \"command\", \"commandfor\", \"focusable-when-disabled\", \"formaction\", \"formenctype\", \"formmethod\", \"formnovalidate\", \"formtarget\", \"label\", \"pending\", \"pending-label\", \"type\", \"value\", \"disabled\", \"name\"], \"events\": [\"helix-press\"], \"tagName\": \"helix-button\" }"
   - link "Read the index":
@@ -150,8 +142,6 @@
   - list "Key":
     - listitem: Ships an element
     - listitem: Ships it as experimental
-  - paragraph: 7 jobs only Helix covers
-  - text: Charts 3D charts Chat Command palette Node diagrams Maps Video player
   - paragraph: A typical extra component, compressed.
   - link "Compare the systems":
     - /url: /helix/docs/metrics#what-each-system-ships
@@ -318,46 +308,42 @@
         - cell "None"
         - cell "wa-carousel (experimental)":
           - button "wa-carousel (experimental)"
-  - paragraph: Every system ships buttons, form controls, menus, and dialogs, so the table lists the rest. Read from each system's manifest on October 31, 2026. Hover a mark to see the elements.
+  - paragraph: The table leaves out what every system ships. Read from each system's manifest on October 31, 2026. Hover a mark to see the elements.
   - paragraph: Services
   - heading "Hire our engineers" [level=2]
   - paragraph: Every service runs two days a week, alongside your team.
   - paragraph: AI capability audit
-  - paragraph: Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.
+  - paragraph: Up to two weeks to find out which AI work is worth building.
   - paragraph: Design system sprint
-  - paragraph: Helix, applied to your product. We build your components in your repository, as working code.
+  - paragraph: Helix, applied to your product, as working code in your repository.
   - paragraph: Conversational build
-  - paragraph: We build software with you while the specification is still changing, and agree the next step in each conversation.
+  - paragraph: We build software with you while the specification is still changing.
   - heading "You keep all of it" [level=3]
-  - paragraph: The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.
+  - paragraph: The work lands in your repository under your license.
   - heading "We tell you what is not done" [level=3]
-  - paragraph: Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.
+  - paragraph: Every product shows whether it ships, is underway, or is planned.
   - link "Compare the services":
     - /url: /company/services
   - paragraph: Insights
   - heading "How we decide, and why" [level=2]
   - link "Read all articles":
     - /url: /insights
-  - link "Design Decision Helix ships as one open tier Every Helix component is free and open source. A paid tier would hide components from the AI agents that write code with Helix.":
+  - link "Design Decision Helix ships as one open tier":
     - /url: /insights/helix-ships-as-one-open-tier
     - text: Design Decision
     - heading "Helix ships as one open tier" [level=3]
-    - text: Every Helix component is free and open source. A paid tier would hide components from the AI agents that write code with Helix.
-  - link "Design Essay A palette from one brand color Helix computes its palette from one brand color. Contrast follows from how the colors are computed, so no one has to review each pair.":
+  - link "Design Essay A palette from one brand color":
     - /url: /insights/a-palette-from-one-brand-color
     - text: Design Essay
     - heading "A palette from one brand color" [level=3]
-    - text: Helix computes its palette from one brand color. Contrast follows from how the colors are computed, so no one has to review each pair.
-  - link "Design Essay Why Helix has two tiers Large companies have many brands and frameworks. A team that needs a different look can use the headless tier and keep the same components, parts, and events.":
+  - link "Design Essay Why Helix has two tiers":
     - /url: /insights/why-helix-has-two-tiers
     - text: Design Essay
     - heading "Why Helix has two tiers" [level=3]
-    - text: Large companies have many brands and frameworks. A team that needs a different look can use the headless tier and keep the same components, parts, and events.
-  - link "Engineering Decision Lockstep versioning, one domain at a time The packages in each domain, such as Helix, share one version number, so a Cortex fix does not change the version of the Helix docs.":
+  - link "Engineering Decision Lockstep versioning, one domain at a time":
     - /url: /insights/lockstep-per-domain
     - text: Engineering Decision
     - heading "Lockstep versioning, one domain at a time" [level=3]
-    - text: The packages in each domain, such as Helix, share one version number, so a Cortex fix does not change the version of the Helix docs.
   - heading "Work with us" [level=2]
   - paragraph: Tell us what you need built. If we are not the right team for it, we will tell you.
   - link "Start a conversation":
