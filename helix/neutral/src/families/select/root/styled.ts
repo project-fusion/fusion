@@ -112,7 +112,7 @@ export default styles(
         rule(
           { focusVisible: true },
           {
-            borderColor: token('color-primary'),
+            borderColor: token('color-focus-ring'),
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
             outlineOffset: 0,
           },
@@ -162,7 +162,7 @@ export default styles(
       ),
       on(
         { part: 'trigger', selector: ':host([emphasis="ghost"]) [part="trigger"]:focus-visible' },
-        [web([rule({ borderColor: token('color-primary') })])],
+        [web([rule({ borderColor: token('color-focus-ring') })])],
       ),
       on('value', [
         rule({

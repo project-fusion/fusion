@@ -25,7 +25,7 @@ export default styles(
       caretColor: 'currentcolor',
       cellBackgroundColor: token('color-well'),
       cellBorderColor: token('color-border'),
-      cellBorderColorFocus: token('color-primary'),
+      cellBorderColorFocus: token('color-focus-ring'),
       cellColor: token('color-foreground'),
       cellFontSize: token('text-lg'),
       cellRadius: token('radii-sm'),

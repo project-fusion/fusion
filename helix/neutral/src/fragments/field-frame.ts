@@ -34,7 +34,7 @@ export default fragment('field-frame', { parts: ['field', 'control'] }, ({ on, r
     rule({ formDisabled: false, hover: true }, { borderColor: token('color-border-hover') }),
     rule(
       { within: { host: ['focusWithin'] } },
-      { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
+      { borderColor: token('color-focus-ring'), outline: ring, outlineOffset: 0 },
     ),
   ]),
   on('control', [

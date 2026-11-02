@@ -82,7 +82,7 @@ export default styles(
         web([rule({ layout: 'grid' }, { display: 'grid', gridTemplateColumns: columns })]),
         rule(
           { focusVisible: true },
-          { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
+          { borderColor: token('color-focus-ring'), outline: ring, outlineOffset: 0 },
         ),
         rule(
           { invalid: true },
