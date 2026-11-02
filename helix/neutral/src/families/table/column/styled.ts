@@ -66,14 +66,13 @@ export default styles(
         },
       ),
     ]
-    /* What each chevron draws with: the quiet ink and the mark's round stroke. */
-    const chevron = {
-      fill: 'none',
-      stroke: token('color-foreground-subtle'),
-      strokeLinecap: 'round',
-      strokeLinejoin: 'round',
-      strokeWidth: 1.9,
-    } as const
+    /* The quiet ink. The web's chevrons carry the rest as attributes on the element. */
+    const chevron = [
+      rule({ stroke: token('color-foreground-subtle') }),
+      native([
+        rule({ fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 1.9 }),
+      ]),
+    ]
     return [
       on('host', [web([rule({ display: 'contents' })]), native([rule({ flexGrow: 1 })])]),
       on('column', [
@@ -161,11 +160,11 @@ export default styles(
         ]),
       ]),
       on('sort-up', [
-        rule(chevron),
+        ...chevron,
         rule({ sortedAscending: true }, { stroke: token('color-foreground') }),
       ]),
       on('sort-down', [
-        rule(chevron),
+        ...chevron,
         rule({ sortedDescending: true }, { stroke: token('color-foreground') }),
       ]),
       /* The same quiet ink and hover as the chevrons, so the two marks read as one
