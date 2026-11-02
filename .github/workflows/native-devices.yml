@@ -9,12 +9,21 @@
 # says what each one does. What they make stays in the run's artifacts for
 # seven days, and the run's summary says what passed.
 #
-# **Each platform builds the gallery once and runs it on two devices at
-# once**: one for the flows and the frame rate, one for the screenshots, each
-# with a timeout of its own. On October 16, 2026, before wave 1's families
-# joined, one iOS job built and ran everything in 29 of its 60 minutes (run
-# 38940363277). Wave 1's screenshots and flows add an estimated 35 minutes of
-# device time on each platform, more than one job's timeout leaves room for.
+# **Each platform builds the gallery once and runs it on five devices at
+# once**: one for the flows and the frame rate, and one for each of the four
+# passes of screenshots, each with a timeout of its own. In run 41367807734, on
+# November 1, 2026, with 57 families, a pass of screenshots took 16 minutes on
+# Android and 12 to 16 on iOS, about 17 seconds a family. Four of them on one
+# device ran out its 60 minutes on both platforms, and a job cancelled inside a
+# pass kept nothing. The flows took 25 minutes on Android and 39 on iOS.
+#
+# **That split still fits with every family in.** Helix has 122 families with
+# examples, so one pass of them all would take about 35 minutes of device time,
+# and starting the device takes about 5 more on iOS and 2 on Android, under the
+# timeout of 60. Against one screens job on each platform, each platform pays
+# that start three more times: about 15 minutes on iOS, which bills 150 while
+# the repository is private, and 6 on Android. A job stopped by its timeout
+# still keeps the passes that ended and what the pass in progress left.
 #
 # **A night with nothing new for the devices runs nothing.** `changed`
 # compares the night's commit with the last run that passed on `main`, over
@@ -223,18 +232,18 @@ jobs:
           path: ${{ runner.temp }}/gallery-ios.tgz
           retention-days: 1
 
-  # **Two simulators, one for each part `devices.sh` runs**: `flows`, with the
-  # frame rate, estimated at 20 minutes, and `screens`, four passes of every
-  # family's screenshots, estimated at 40.
+  # **Five simulators, one for each part `devices.sh` runs**: `flows`, with the
+  # frame rate, and each pass of the screenshots. The header says what each
+  # takes.
   ios:
     needs: [changed, ios-build]
     if: needs.changed.outputs.run == 'true'
     runs-on: xcode-27
-    timeout-minutes: ${{ matrix.part == 'screens' && 60 || 45 }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        part: [flows, screens]
+        part: [flows, screens-light-default, screens-light-largest, screens-dark-default, screens-dark-largest]
     env:
       MAESTRO_CLI_NO_ANALYTICS: 1
       # Maestro's driver starts slowly on a simulator's first boot.
@@ -292,6 +301,10 @@ jobs:
           PART: ${{ matrix.part }}
           UDID: ${{ steps.simulator.outputs.udid }}
         run: helix/app/scripts/devices.sh ios "$UDID" "$RUNNER_TEMP/Helix.app" "$RUNNER_TEMP/devices" "$PART"
+
+      - name: Ready what a stopped job left for the upload
+        if: always() && steps.simulator.outcome == 'success'
+        run: helix/app/scripts/devices.sh keep "$RUNNER_TEMP/devices"
 
       - name: Write the summary
         if: always() && steps.simulator.outcome == 'success'
@@ -382,17 +395,17 @@ jobs:
           path: helix/app/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 1
 
-  # **Two emulators, one for each part `devices.sh` runs**, as on iOS, on
+  # **Five emulators, one for each part `devices.sh` runs**, as on iOS, on
   # Linux with KVM, which an emulator needs to run at a usable speed.
   android:
     needs: [changed, android-build]
     if: needs.changed.outputs.run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ matrix.part == 'screens' && 60 || 45 }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        part: [flows, screens]
+        part: [flows, screens-light-default, screens-light-largest, screens-dark-default, screens-dark-largest]
     env:
       MAESTRO_CLI_NO_ANALYTICS: 1
     steps:
@@ -441,6 +454,10 @@ jobs:
           profile: pixel_6
           script: helix/app/scripts/devices.sh android emulator-5554 "$RUNNER_TEMP/app-release.apk" "$RUNNER_TEMP/devices" ${{ matrix.part }}
           target: google_apis
+
+      - name: Ready what a stopped job left for the upload
+        if: always() && steps.emulator.outcome != 'skipped'
+        run: helix/app/scripts/devices.sh keep "$RUNNER_TEMP/devices"
 
       - name: Write the summary
         if: always() && steps.emulator.outcome != 'skipped'

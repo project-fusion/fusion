@@ -4,13 +4,19 @@
 # folder. `.github/workflows/native-devices.yml` runs it each night.
 #
 #   helix/app/scripts/devices.sh <ios|android> <device> <app> <out> [part]
+#   helix/app/scripts/devices.sh keep <out>
 #
 # <device> is the simulator's UDID or the emulator's serial, such as
 # `emulator-5554`. <app> is the build: the `.app` for iOS, the `.apk` for
 # Android. Run it from the repository's root, with `maestro` on the path.
-# [part] is `flows`, `screens`, or `all`, which is the default. The workflow
-# runs `flows` and `screens` on two devices at once, each with its own
-# timeout.
+# [part] is `flows`, `screens`, one pass of the screens by its name, such as
+# `screens-dark-largest`, or `all`, which is the default. The workflow runs
+# `flows` and each pass of the screens on a device of its own, at once, each
+# with its own timeout.
+#
+# `keep <out>` readies a folder the job was stopped in for the upload, which a
+# finished run has done already. It writes no summary of its own, so the
+# summary says the passes that ended.
 #
 # Each pass is one `maestro test`, and there are as few as the device settings
 # allow: each run on an iOS simulator spent one to two minutes starting in CI
@@ -32,24 +38,50 @@
 #
 # `screens`:
 #
-# 1. `links`, on iOS alone, where `screens` runs on its own: the flow that
-#    accepts iOS's prompt for links on a new simulator.
-# 2. `screens-<mode>-<size>`, four times: light and dark, at the default and
-#    the largest text size, with a screenshot of each family's examples in
-#    each, from the flows in `screens`. The script sets the appearance between
-#    them, since Maestro's `setDarkMode` left an iOS 27 simulator light (run
-#    38196585542).
+# 1. `links`, on iOS alone, where a part of the screens runs on its own: the
+#    flow that accepts iOS's prompt for links on a new simulator.
+# 2. `screens-<mode>-<size>`, light and dark, at the default and the largest
+#    text size, with a screenshot of each family's examples in each, from the
+#    flows in `screens`. The script sets the appearance before each, since
+#    Maestro's `setDarkMode` left an iOS 27 simulator light (run 38196585542).
 #
 # `all` runs the passes of `flows`, then those of `screens`, on one device.
+# `screens` runs its four passes on one device.
 #
 # <out> gets `screenshots`, `videos`, `frame-rate`, a JUnit report of each
 # pass in `reports`, what Maestro keeps of each pass that fails in `debug`,
 # and `summary.md`. A pass that fails leaves the next ones to run, and the
-# script fails at the end.
+# script fails at the end. Each pass that ends is written up as it ends, so a
+# job stopped by its timeout keeps the passes before.
 set -uo pipefail
 
-if [[ ($# -ne 4 && $# -ne 5) || ($1 != ios && $1 != android) || (${5:-all} != all && ${5:-all} != flows && ${5:-all} != screens) ]]; then
-  echo "Usage: $0 <ios|android> <device> <app> <out> [flows|screens|all]" >&2
+# The pictures and videos the flows took, out of Maestro's folders, and each
+# name in what stays made fit for the upload.
+#
+# Maestro names a failed flow's folder by the flow, and the upload refuses the
+# whole artifact over one path with a colon in it, such as `Screens: Badge`:
+# runs 38957410938 and 41367807734 kept nothing of their screens jobs. Each
+# character the upload refuses becomes a hyphen, the deepest paths first.
+tidy() {
+  find "$1/debug" -path '*/takeScreenshot/*.png' -exec mv {} "$1/screenshots/" \;
+  find "$1/debug" -path '*/startRecording/*.mp4' -exec mv {} "$1/videos/" \;
+  find "$1/debug" -depth -name '*[":<>|*?]*' | while IFS= read -r path; do
+    mv "$path" "$(dirname "$path")/$(basename "$path" | tr '":<>|*?' '-------')"
+  done
+}
+
+if [[ $# -eq 2 && $1 == keep ]]; then
+  [[ -d $2/debug ]] && tidy "$2"
+  exit 0
+fi
+
+case ${5:-all} in
+  all | flows | screens | screens-light-default | screens-light-largest | screens-dark-default | screens-dark-largest) known=yes ;;
+  *) known=no ;;
+esac
+if [[ ($# -ne 4 && $# -ne 5) || ($1 != ios && $1 != android) || $known == no ]]; then
+  echo "Usage: $0 <ios|android> <device> <app> <out> [flows|screens|screens-<light|dark>-<default|largest>|all]" >&2
+  echo "       $0 keep <out>" >&2
   exit 2
 fi
 
@@ -147,6 +179,45 @@ emulator_back() {
   return 1
 }
 
+# Writes `summary.md` from the passes that have ended.
+summarize() {
+  {
+    case $part in
+      flows) said="the flows" ;;
+      screens) said="the screenshots" ;;
+      screens-*) said="the screenshots, \`$part\`" ;;
+      all) said="the flows and the screenshots" ;;
+    esac
+    if [[ $platform == ios ]]; then
+      echo "## iOS simulator: $said"
+    else
+      echo "## Android emulator: $said"
+    fi
+    echo
+    echo "| Pass | Result | Time |"
+    echo "|---|---|---|"
+    printf '%s\n' "${passes[@]}"
+    echo
+    echo "$(find "$out/screenshots" -name '*.png' | wc -l | tr -d ' ') screenshots and $(find "$out/videos" -name '*.mp4' | wc -l | tr -d ' ') videos are in the job's artifact, after $((SECONDS - started)) s on the device."
+    if [[ -s $out/frame-rate/screen.txt ]]; then
+      echo
+      echo "### Frame rate of the list of 1,000 rows"
+      echo
+      echo "The screen's own count, on the UI thread: $(cat "$out/frame-rate/screen.txt")"
+      if [[ -s $out/frame-rate/gfxinfo.txt ]]; then
+        echo
+        echo "\`dumpsys gfxinfo\`, from the end of drawing the rows to the end of the scroll:"
+        echo
+        echo '```'
+        grep -E '^(Total frames rendered|Janky frames|[0-9]+th percentile|Number [A-Z])' "$out/frame-rate/gfxinfo.txt"
+        echo '```'
+      fi
+      echo
+      echo "A simulator and an emulator draw with the computer's processor and graphics, so these numbers follow changes from night to night and say nothing about a phone."
+    fi
+  } > "$out/summary.md"
+}
+
 pass() {
   local name=$1 began=$SECONDS result=passed
   shift
@@ -173,6 +244,15 @@ pass() {
   driver=--no-reinstall-driver
   [[ -n ${GITHUB_ACTIONS:-} ]] && echo "::endgroup::"
   passes+=("| \`$name\` | $result | $((SECONDS - began)) s |")
+  # What Maestro keeps of a pass that passed goes: mostly the simulator's own
+  # log, 158 MB over the passes of run 38196585542.
+  tidy "$out"
+  for kept in "$out"/debug/*; do
+    if [[ -d $kept && " ${failed[*]:-} " != *" $(basename "$kept") "* ]]; then
+      rm -rf "$kept"
+    fi
+  done
+  summarize
   if [[ $result == failed && -n ${GITHUB_ACTIONS:-} ]]; then
     echo "::error title=$platform $name::The $name pass failed. Its report and what Maestro kept of it are in the run's artifacts."
   fi
@@ -191,7 +271,7 @@ if [[ $platform == android ]]; then
   adb -s "$device" shell settings put global hide_error_dialogs 1
 fi
 
-if [[ $part != screens ]]; then
+if [[ $part == all || $part == flows ]]; then
   say "Setting light mode and the default text size"
   appearance light
   text_size default
@@ -216,7 +296,7 @@ fi
 if [[ $part != flows ]]; then
   # A new simulator asks before a link opens the gallery the first time, and
   # `interactions` has not run on it to accept.
-  if [[ $part == screens && $platform == ios ]]; then
+  if [[ $part != all && $platform == ios ]]; then
     say "Setting light mode and the default text size"
     appearance light
     text_size default
@@ -224,6 +304,7 @@ if [[ $part != flows ]]; then
   fi
   for mode in light dark; do
     for size in default largest; do
+      [[ $part == all || $part == screens || $part == "screens-$mode-$size" ]] || continue
       say "Setting $mode mode and the $size text size"
       appearance "$mode"
       text_size "$size"
@@ -235,59 +316,7 @@ if [[ $part != flows ]]; then
   text_size default
 fi
 say "Done"
-
-# The pictures and videos the flows took, out of Maestro's folders. What
-# Maestro keeps of a pass that passed goes: mostly the simulator's own log,
-# 158 MB over the passes of run 38196585542.
-find "$out/debug" -path '*/takeScreenshot/*.png' -exec mv {} "$out/screenshots/" \;
-find "$out/debug" -path '*/startRecording/*.mp4' -exec mv {} "$out/videos/" \;
-for kept in "$out"/debug/*; do
-  if [[ -d $kept && " ${failed[*]:-} " != *" $(basename "$kept") "* ]]; then
-    rm -rf "$kept"
-  fi
-done
-# Maestro names a failed flow's folder by the flow, and the upload refuses
-# the whole artifact over one path with a colon in it, such as
-# `Screens: Badge`: run 38957410938 kept nothing of either screens job. Each
-# character the upload refuses becomes a hyphen, the deepest paths first.
-find "$out/debug" -depth -name '*[":<>|*?]*' | while IFS= read -r path; do
-  mv "$path" "$(dirname "$path")/$(basename "$path" | tr '":<>|*?' '-------')"
-done
-
-{
-  case $part in
-    flows) said="the flows" ;;
-    screens) said="the screenshots" ;;
-    all) said="the flows and the screenshots" ;;
-  esac
-  if [[ $platform == ios ]]; then
-    echo "## iOS simulator: $said"
-  else
-    echo "## Android emulator: $said"
-  fi
-  echo
-  echo "| Pass | Result | Time |"
-  echo "|---|---|---|"
-  printf '%s\n' "${passes[@]}"
-  echo
-  echo "$(find "$out/screenshots" -name '*.png' | wc -l | tr -d ' ') screenshots and $(find "$out/videos" -name '*.mp4' | wc -l | tr -d ' ') videos are in the job's artifact, after $((SECONDS - started)) s on the device."
-  if [[ -s $out/frame-rate/screen.txt ]]; then
-    echo
-    echo "### Frame rate of the list of 1,000 rows"
-    echo
-    echo "The screen's own count, on the UI thread: $(cat "$out/frame-rate/screen.txt")"
-    if [[ -s $out/frame-rate/gfxinfo.txt ]]; then
-      echo
-      echo "\`dumpsys gfxinfo\`, from the end of drawing the rows to the end of the scroll:"
-      echo
-      echo '```'
-      grep -E '^(Total frames rendered|Janky frames|[0-9]+th percentile|Number [A-Z])' "$out/frame-rate/gfxinfo.txt"
-      echo '```'
-    fi
-    echo
-    echo "A simulator and an emulator draw with the computer's processor and graphics, so these numbers follow changes from night to night and say nothing about a phone."
-  fi
-} > "$out/summary.md"
+summarize
 
 if [[ ${#failed[@]} -gt 0 ]]; then
   echo "These passes failed: ${failed[*]}" >&2
