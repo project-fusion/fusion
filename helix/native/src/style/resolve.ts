@@ -195,8 +195,7 @@ export const resolverFor = ({
     return set === 'initial' ? undefined : set
   }
   /* **A private value the element around sets is read by its name on the
-     web**, `--_avatar-group-clear`, which the element around declares as
-     `avatar-group-clear`. **A custom property set on the element**, as a
+     web**, `--_name`, which the element around declares as `name`. **A custom property set on the element**, as a
      list's `--list-rail-style` is from its `style`, is read as the web reads
      it there. */
   const inheritedOf = (name: string): Resolution =>
