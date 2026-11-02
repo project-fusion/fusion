@@ -180,6 +180,17 @@ failed_flows() {
   sed -nE -e '/status="SUCCESS"/d' -e 's/.*<testcase id="([^"]*)".* file="([^"]*)".*/\1'$'\t''\2/p' "$out/reports/$1.xml" 2> /dev/null
 }
 
+# Whether a drop in run `$1` cut off the log of flow `$2` before it could say so:
+# another flow of the run names a drop, and this one has a command still running
+# and none that failed. In run 41391811482 Tour and Steps failed in under 200 ms,
+# their logs ending on `Opening link`, as the 25 flows around them named the drop.
+cut_short() {
+  local tests="$out/debug/$1/.maestro/tests"
+  grep -qsE "$drop_words" "$tests"/*/*/logs/maestro.log &&
+    grep -qsE '"status" *: *"RUNNING"' "$tests"/*/"$2"/commands.json &&
+    ! grep -qsE '"status" *: *"FAILED"' "$tests"/*/"$2"/commands.json
+}
+
 # After a run of a pass failed: runs again each flow whose own log names a drop,
 # up to three times, and says whether nothing else is left failed.
 #
@@ -187,7 +198,8 @@ failed_flows() {
 # meantime: run 41374589645 lost 15 flows in 0.3 s and passed the next 20 on the
 # same emulator. Running the whole pass once more can lose others, and gives a
 # flow that failed before the drop a second chance. A flow whose log names no
-# drop stays failed, and so does one whose log is missing. The first argument is
+# drop stays failed, unless `cut_short` says the drop cut its log off, and so does
+# one whose log is missing. The first argument is
 # the pass's name, the last the folder or file it ran, and the ones between go to
 # `maestro test`.
 rerun_dropped() {
@@ -196,7 +208,8 @@ rerun_dropped() {
   while true; do
     again=()
     while IFS=$'\t' read -r id file; do
-      if grep -qsE "$drop_words" "$out/debug/$run/.maestro/tests"/*/"$id"/logs/maestro.log; then
+      if grep -qsE "$drop_words" "$out/debug/$run/.maestro/tests"/*/"$id"/logs/maestro.log ||
+        cut_short "$run" "$id"; then
         again+=("$file")
       else
         stayed+=("$id")
