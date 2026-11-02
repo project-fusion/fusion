@@ -68,6 +68,7 @@ import {
   wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
+import { type Grown, grow, toggledOpen } from '@fusion.dev/helix-core/data-table'
 import { tracksOf } from '@fusion.dev/helix-core/table'
 import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -94,8 +95,6 @@ import {
   HelixColumnToggleEvent,
   HelixFollowEvent,
 } from '../events/index.js'
-import { toggledOpen } from '../keys.js'
-import { type Grown, grow } from '../tree.js'
 
 /** What makes an element a control the grid moves focus into, whatever its tab index. */
 const CONTROL = [
