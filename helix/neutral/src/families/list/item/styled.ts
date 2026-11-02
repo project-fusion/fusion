@@ -202,6 +202,9 @@ export default styles(
         borderRadius: token('radii-sm'),
         boxSizing: 'border-box',
         color: hook.gripColor,
+        /* Room above and below the mark, so the mark stays under three quarters of the
+           button's height. Along the row it stays the mark's width. */
+        paddingBlock: token('space-2xs'),
         display: 'inline-flex',
         gridColumn: 5,
         gridRow: '1 / span 2',

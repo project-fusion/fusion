@@ -1,7 +1,17 @@
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import { oneOf } from '../../../render.js'
-import { difference, list, measured, native, product, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  list,
+  measured,
+  native,
+  product,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import group from './headless.js'
 
@@ -111,8 +121,10 @@ export default styles(
           toggleHeight: difference(token('size-control'), product(token('space-2xs'), 2)),
           /* No track, so nothing to be concentric with. */
           toggleRadius: hook.itemRadius(token('radii-sm')),
-          /* And no groove either, which decides the indicator's color. */
-          indicatorSurface: token('color-surface-raised'),
+          /* And no groove either, which decides the indicator's color. In dark every surface
+             above the page is the same 0.21, so a fill would vanish on a card or in a
+             dialog. A wash holds a step from any ground. */
+          indicatorSurface: scheme(token('color-surface-raised'), token('color-press')),
         },
       }),
       /* A framed track, concentric: the outer radius less the border. */
@@ -130,8 +142,11 @@ export default styles(
               token('size-control'),
               product(sum(token('space-2xs'), token('border-thin')), 2),
             ),
-            /* A groove, so the indicator is over it. */
-            indicatorSurface: token('color-surface-overlay'),
+            /* A groove, so the indicator is over it. In dark the shadow that lifts the
+               indicator in light does not show, and `overlay` on `sunken` measured 1.06:1,
+               fainter than the 1.38:1 of the hover wash on an unselected segment. The press
+               wash is 1.84:1, a step past hover, on any track color. */
+            indicatorSurface: scheme(token('color-surface-overlay'), token('color-press')),
           },
         },
       ),

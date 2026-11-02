@@ -29,8 +29,8 @@ import column from './headless.js'
  * on the column and they inherit in here. Unset, each falls back to what a
  * heading is in either table.
  *
- * **The heading's words are the button**, so a sortable heading looks exactly
- * like one that is not until a pointer or a keyboard reaches it.
+ * **The heading's words and chevrons are one button.** The chevrons stay quiet
+ * until one of them is the current direction.
  *
  * **The heading goes to the edge its values go to**, so `Size` sits over digits
  * set to the end rather than at the start above them.
@@ -66,6 +66,14 @@ export default styles(
         },
       ),
     ]
+    /* What each chevron draws with: the quiet ink and the mark's round stroke. */
+    const chevron = {
+      fill: 'none',
+      stroke: token('color-foreground-subtle'),
+      strokeLinecap: 'round',
+      strokeLinejoin: 'round',
+      strokeWidth: 1.9,
+    } as const
     return [
       on('host', [web([rule({ display: 'contents' })]), native([rule({ flexGrow: 1 })])]),
       on('column', [
@@ -124,10 +132,90 @@ export default styles(
           position: 'relative',
         }),
         rule({ textAlign: 'center' }, { justifyContent: 'center' }),
-        rule({ textAlign: 'end' }, { justifyContent: 'flex-end' }),
+        /* The chevrons come before the words here, so the words stay over the values
+           they name. `flex-start` because `row-reverse` turns the main axis around. */
+        rule({ textAlign: 'end' }, { flexDirection: 'row-reverse', justifyContent: 'flex-start' }),
         web([rule({ hover: true }, { color: token('color-foreground') })]),
+        rule([{ sortedAscending: true }, { sortedDescending: true }], {
+          color: token('color-foreground'),
+        }),
+        /* The sort button shrinks to its words so the menu button sits beside the
+           chevrons. A press on the rest of the heading still sorts: the table listens on
+           the whole column. */
+        web([rule({ hasMenu: true }, { flex: '0 1 auto' })]),
         web(ring),
       ]),
+      /* Two chevrons, quiet until one of them is the current direction. The box is
+         wider than the chevrons so the hover has room to draw behind them. */
+      on('sort-mark', [
+        rule({
+          blockSize: '1.07em',
+          borderRadius: token('radii-sm'),
+          flex: 'none',
+          inlineSize: '1.07em',
+        }),
+        /* The whole heading is the button, so the highlight answers a pointer anywhere
+           on it. */
+        web([
+          rule({ within: { sort: { hover: true } } }, { backgroundColor: token('color-hover') }),
+        ]),
+      ]),
+      on('sort-up', [
+        rule(chevron),
+        rule({ sortedAscending: true }, { stroke: token('color-foreground') }),
+      ]),
+      on('sort-down', [
+        rule(chevron),
+        rule({ sortedDescending: true }, { stroke: token('color-foreground') }),
+      ]),
+      /* The same quiet ink and hover as the chevrons, so the two marks read as one
+         group and neither competes with the words. */
+      on('menu-button', [
+        web([
+          rule({
+            all: 'unset',
+            alignItems: 'center',
+            borderRadius: token('radii-sm'),
+            boxSizing: 'border-box',
+            color: token('color-foreground-subtle'),
+            cursor: 'pointer',
+            display: 'inline-flex',
+            flex: 'none',
+            marginInlineStart: token('space-2xs'),
+            position: 'relative',
+          }),
+          /* The words stay over the values they name, so the button goes before the
+             chevrons, and the grip stays first. */
+          rule(
+            { textAlign: 'end' },
+            {
+              marginInline: list([token('space-none'), token('space-2xs')]),
+              order: '-1',
+            },
+          ),
+          rule(
+            { hover: true },
+            { backgroundColor: token('color-hover'), color: token('color-foreground') },
+          ),
+        ]),
+        web(ring),
+      ]),
+      /* Written out: the vocabulary names no open menu's button. */
+      on({ part: 'menu-button', selector: '[part="menu-button"][aria-expanded="true"]' }, [
+        web([rule({ backgroundColor: token('color-hover'), color: token('color-foreground') })]),
+      ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+         drawn moves. */
+      on({ after: 'menu-button' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
+      ]),
+      on('menu-mark', [web([rule({ blockSize: '1.07em', inlineSize: '1.07em' })])]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
          drawn moves. */
       on({ after: 'sort' }, [
@@ -155,10 +243,14 @@ export default styles(
           borderRadius: token('radii-sm'),
           boxSizing: 'border-box',
           color: token('color-foreground-muted'),
+          /* Room above and below the mark, so the mark stays under three quarters of the
+             button's height. Along the row it stays the mark's width. */
+          paddingBlock: token('space-2xs'),
           display: 'inline-flex',
           flex: 'none',
           marginInlineEnd: token('space-2xs'),
         }),
+        web([rule({ textAlign: 'end' }, { order: '-2' })]),
         web([rule({ active: true }, { cursor: 'grabbing' })]),
         web(ring),
       ]),

@@ -357,6 +357,7 @@ export const useTableColumn = (family: Family, props: Props, use: MachineUse): B
       },
       host: {
         states: {
+          'has-menu': false,
           movable: false,
           'sorted-ascending': sorted === 'ascending',
           'sorted-descending': sorted === 'descending',
