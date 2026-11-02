@@ -404,6 +404,51 @@ pub const OPTION_GROUP: &[(&str, Names)] = &[("label", Names::Prop)];
 /// What a group of options computes for its parts, each read as `optionGroup.x`.
 pub const OPTION_GROUP_COMPUTED: &[&str] = &["emptied", "later"];
 
+/// What a pagination reads and sends, by the name the machine binds.
+pub const PAGINATION: &[(&str, Names)] = &[
+    ("boundaries", Names::Prop),
+    ("compact", Names::Prop),
+    ("defaultPage", Names::Prop),
+    ("ends", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("firstLabel", Names::Prop),
+    ("gapLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("lastLabel", Names::Prop),
+    ("locale", Names::Prop),
+    ("nextLabel", Names::Prop),
+    ("page", Names::Prop),
+    ("pageLabel", Names::Prop),
+    ("pageSize", Names::Prop),
+    ("pages", Names::Prop),
+    ("previousLabel", Names::Prop),
+    ("siblings", Names::Prop),
+    ("statusLabel", Names::Prop),
+    ("total", Names::Prop),
+    ("onBeforeNavigate", Names::Event),
+    ("onNavigate", Names::Event),
+];
+
+/// What a pagination computes for its parts, each read as `paginationRoot.x`.
+pub const PAGINATION_COMPUTED: &[&str] = &["atEnd", "atStart", "empty", "slots", "status"];
+
+/// What a page-size control reads and sends, by the name the machine binds.
+pub const PAGINATION_SIZE: &[(&str, Names)] = &[
+    ("defaultValue", Names::Prop),
+    ("disabled", Names::Prop),
+    ("fallbackLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("locale", Names::Prop),
+    ("sizes", Names::Prop),
+    ("value", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onInput", Names::Event),
+];
+
+/// What a page-size control computes for its parts, each read as `paginationSize.x`.
+pub const PAGINATION_SIZE_COMPUTED: &[&str] = &["empty", "options", "shown"];
+
 /// What a carousel reads and sends, by the name the machine binds.
 pub const CAROUSEL: &[(&str, Names)] = &[
     ("autoplay", Names::Prop),
@@ -736,6 +781,21 @@ pub fn option_group(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "optionGroup", OPTION_GROUP, OPTION_GROUP_COMPUTED)
 }
 
+/// `paginationRoot({ ... })`, each field a name.
+pub fn pagination_root(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "paginationRoot", PAGINATION, PAGINATION_COMPUTED)
+}
+
+/// `paginationSize({ ... })`, each field a name.
+pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "paginationSize",
+        PAGINATION_SIZE,
+        PAGINATION_SIZE_COMPUTED,
+    )
+}
+
 /// `carousel({ ... })`, each field a name.
 pub fn carousel(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "carousel", CAROUSEL, CAROUSEL_COMPUTED)
@@ -812,6 +872,8 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
         "carousel" => carousel(value),
+        "paginationRoot" => pagination_root(value),
+        "paginationSize" => pagination_size(value),
         "listbox" => listbox(value),
         "select" => select(value),
         "option" => option(value),

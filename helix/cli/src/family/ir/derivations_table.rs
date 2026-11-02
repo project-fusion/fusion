@@ -166,6 +166,7 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("timeline-item-mark-unnamed", "timelineItemMarkIsUnnamed"),
     ("timeline-item-reading", "timelineItemReading"),
     ("timeline-item-whole", "timelineItemWhole"),
+    ("pagination-summary-words", "paginationSummaryWords"),
     ("toast-edge", "toastEdge"),
     ("toast-item-dismiss-name", "toastItemDismissName"),
     ("toast-item-dismissed", "toastItemDismissed"),

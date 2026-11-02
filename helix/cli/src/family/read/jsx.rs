@@ -83,6 +83,8 @@ const GIVEN: &[&str] = &[
     "notificationRow",
     "notificationGroup",
     "carousel",
+    "paginationRoot",
+    "paginationSize",
     "listbox",
     "select",
     "option",
