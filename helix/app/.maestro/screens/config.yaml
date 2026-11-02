@@ -13,6 +13,22 @@
 # into the running gallery. A wave 1 family's example opens alone, at
 # `/preview`, so it starts at the top of the screen at the largest text size
 # too, and its screenshot shows that top.
+#
+# **What these flows hold to:**
+#
+# - **A link replaces the screen, and on Android the old screen stays in the
+#   tree while it goes.** A wait on words both screens draw passes at once, and
+#   the next press lands on the old screen. In run 41367807734 that took Dialog's
+#   large or full example and Popover's offset example, by chance, one pass at a
+#   time. A step whose words the screen before also draws waits first for what
+#   the old screen had open to go, or for the new screen's title.
+# - **An iOS list row, menu row, or link is one label**, so a flow matches one by
+#   a part of its words, `.*words.*`.
+# - **The largest text size pushes things off the screen.** Down, a flow scrolls
+#   to them. Across, a Navigation in a narrow bar scrolls, and a flow finds the
+#   destination that shows.
+# - **A state that stands for a moment is read on a `helix://checks/standing-*`
+#   screen**, since Maestro's tap on Android can return seconds after the press.
 executionOrder:
   continueOnFailure: true
   flowsOrder:

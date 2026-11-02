@@ -54,6 +54,9 @@ name: "Screens: Dialog"
 - takeScreenshot: dialog-small-${MODE}-${SIZE}
 - openLink: helix://dialog/large/preview
 - extendedWaitUntil:
+    notVisible: .*becomes read-only.*
+    timeout: 15000
+- extendedWaitUntil:
     visible: Open dialog
     timeout: 15000
 - tapOn:
@@ -67,6 +70,9 @@ name: "Screens: Dialog"
     timeout: 5000
 - takeScreenshot: dialog-large-${MODE}-${SIZE}
 - openLink: helix://dialog/full/preview
+- extendedWaitUntil:
+    notVisible: .*Update your name.*
+    timeout: 15000
 - extendedWaitUntil:
     visible: Open dialog
     timeout: 15000
