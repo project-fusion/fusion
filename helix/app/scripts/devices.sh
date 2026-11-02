@@ -50,8 +50,9 @@
 #
 # <out> gets `screenshots`, `videos`, `frame-rate`, a JUnit report of each
 # pass in `reports`, what Maestro keeps of each pass that fails in `debug`,
-# and `summary.md`. A pass that fails leaves the next ones to run, and the
-# script fails at the end. Each pass that ends is written up as it ends, so a
+# and `summary.md`. A flow an emulator's drop failed runs again, under
+# `<pass>-again-<n>`, as `rerun_dropped` says. A pass that fails leaves the next
+# ones to run, and the script fails at the end. Each pass that ends is written up as it ends, so a
 # job stopped by its timeout keeps the passes before.
 set -uo pipefail
 
@@ -96,6 +97,7 @@ started=$SECONDS
 
 mkdir -p "$out"/{debug,frame-rate,reports,screenshots,videos}
 failed=()
+interrupted=()
 passes=()
 
 # Says what the script does next, and how long it has run.
@@ -150,33 +152,91 @@ driver_late() {
   grep -q "driver not ready in time" "$out/debug/$1.log" 2> /dev/null
 }
 
-# Whether the Android emulator dropped off adb during a pass, which a CI
-# runner's emulator did three times by October 20, 2026 ("adb: device
-# offline"); every flow after the drop then fails in milliseconds without
-# reaching the gallery. It reconnects, waits for the boot to finish, and says
-# whether the device came back.
-#
-# The emulator can also drop off for under a second and come back before the
-# pass ends, which failed three flows of run 39622908821 in milliseconds each.
-# Maestro's log of each flow, in the pass's debug folder, names that drop
-# (its console output does not, as run 39633692694 showed), so a pass whose
-# flows' logs say "device offline", that the device was not found, or that
-# Maestro's server on it died (run 39640601450) counts as one the emulator
-# dropped off during, even when it is back.
-emulator_back() {
+# What Maestro's log of a flow says when the emulator dropped off adb, which a
+# CI runner's emulator does: "device offline", that the device was not found,
+# or that Maestro's server on it died (runs 39622908821 and 39640601450). Its
+# console output does not say so (run 39633692694).
+drop_words="device offline|device '[^']*' not found|Device server died"
+
+# Waits for the Android emulator to stand on adb with its boot finished, and
+# says whether it does.
+emulator_ready() {
   [[ $platform == android ]] || return 1
-  if [[ $(adb -s "$device" get-state 2> /dev/null) == device ]]; then
-    grep -rqsE "device offline|device '[^']*' not found|Device server died" "$out/debug/$1"
-    return
+  if [[ $(adb -s "$device" get-state 2> /dev/null) != device ]]; then
+    say "The emulator went offline; reconnecting"
+    adb reconnect offline > /dev/null 2>&1 || true
+    timeout 180 adb -s "$device" wait-for-device || return 1
   fi
-  say "The emulator went offline; reconnecting"
-  adb reconnect offline > /dev/null 2>&1 || true
-  timeout 180 adb -s "$device" wait-for-device || return 1
   for _ in $(seq 1 60); do
     [[ $(adb -s "$device" shell getprop sys.boot_completed 2> /dev/null | tr -d '\r') == 1 ]] && return 0
     sleep 2
   done
   return 1
+}
+
+# Each flow of a run that did not succeed, from the run's report, as its name
+# and its file with a tab between.
+failed_flows() {
+  sed -nE -e '/status="SUCCESS"/d' -e 's/.*<testcase id="([^"]*)".* file="([^"]*)".*/\1'$'\t''\2/p' "$out/reports/$1.xml" 2> /dev/null
+}
+
+# After a run of a pass failed: runs again each flow whose own log names a drop,
+# up to three times, and says whether nothing else is left failed.
+#
+# A drop can last under a second, and Maestro goes on through its list in the
+# meantime: run 41374589645 lost 15 flows in 0.3 s and passed the next 20 on the
+# same emulator. Running the whole pass once more can lose others, and gives a
+# flow that failed before the drop a second chance. A flow whose log names no
+# drop stays failed, and so does one whose log is missing. The first argument is
+# the pass's name, the last the folder or file it ran, and the ones between go to
+# `maestro test`.
+rerun_dropped() {
+  local name=$1 run=$1 round=0 status=1 id file
+  local options=("${@:2:$#-2}") again=() stayed=()
+  while true; do
+    again=()
+    while IFS=$'\t' read -r id file; do
+      if grep -qsE "$drop_words" "$out/debug/$run/.maestro/tests"/*/"$id"/logs/maestro.log; then
+        again+=("$file")
+      else
+        stayed+=("$id")
+      fi
+    done < <(failed_flows "$run")
+    if [[ ${#again[@]} -eq 0 ]]; then
+      break
+    fi
+    if [[ $round -eq 3 ]] || ! emulator_ready; then
+      say "Flows of $name that lost the emulator each time: ${#again[@]}"
+      status=1
+      stayed+=("${again[@]}")
+      break
+    fi
+    round=$((round + 1))
+    run=$name-again-$round
+    say "The emulator dropped off during $name. Flows to run again: ${#again[@]}"
+    # Between runs, so a video from the run that follows replaces its own.
+    tidy "$out"
+    driver=--reinstall-driver
+    interrupted+=("$name" "$run")
+    reran=$((reran + ${#again[@]}))
+    status=0
+    run_maestro "$run" ${options[@]+"${options[@]}"} "${again[@]}" || status=$?
+  done
+  if [[ ${#stayed[@]} -gt 0 ]]; then
+    say "These flows of $name failed: ${stayed[*]}"
+    return 1
+  fi
+  return "$status"
+}
+
+# Whether a run that wrote no report ended on a drop, with the emulator back.
+emulator_back() {
+  [[ $platform == android ]] || return 1
+  if [[ $(adb -s "$device" get-state 2> /dev/null) == device ]]; then
+    grep -rqsE "$drop_words" "$out/debug/$1"
+    return
+  fi
+  emulator_ready
 }
 
 # Writes `summary.md` from the passes that have ended.
@@ -219,7 +279,7 @@ summarize() {
 }
 
 pass() {
-  local name=$1 began=$SECONDS result=passed
+  local name=$1 began=$SECONDS result=passed reran=0
   shift
   [[ -n ${GITHUB_ACTIONS:-} ]] && echo "::group::$name"
   say "Running $name"
@@ -229,11 +289,12 @@ pass() {
       driver=--reinstall-driver
       rm -rf "$out/debug/$name"
       run_maestro "$name" "$@" || result=failed
+    elif [[ $platform == android && -n $(failed_flows "$name") ]]; then
+      rerun_dropped "$name" "$@" || result=failed
     elif emulator_back "$name"; then
       say "Running $name again on the reconnected emulator"
       driver=--reinstall-driver
-      # Kept apart: a failure in the first run before the drop may not come
-      # back in the second, as in run 41272571475.
+      interrupted+=("$name-first")
       mv "$out/debug/$name" "$out/debug/$name-first"
       run_maestro "$name" "$@" || result=failed
     else
@@ -243,17 +304,19 @@ pass() {
   fi
   driver=--no-reinstall-driver
   [[ -n ${GITHUB_ACTIONS:-} ]] && echo "::endgroup::"
+  [[ $reran -gt 0 ]] && result="$result. Flows run again after the emulator dropped off: $reran"
   passes+=("| \`$name\` | $result | $((SECONDS - began)) s |")
   # What Maestro keeps of a pass that passed goes: mostly the simulator's own
-  # log, 158 MB over the passes of run 38196585542.
+  # log, 158 MB over the passes of run 38196585542. A run a drop interrupted
+  # stays: run 41374589645 lost the logs of the failures before its drop.
   tidy "$out"
   for kept in "$out"/debug/*; do
-    if [[ -d $kept && " ${failed[*]:-} " != *" $(basename "$kept") "* ]]; then
+    if [[ -d $kept && " ${failed[*]:-} ${interrupted[*]:-} " != *" $(basename "$kept") "* ]]; then
       rm -rf "$kept"
     fi
   done
   summarize
-  if [[ $result == failed && -n ${GITHUB_ACTIONS:-} ]]; then
+  if [[ $result == failed* && -n ${GITHUB_ACTIONS:-} ]]; then
     echo "::error title=$platform $name::The $name pass failed. Its report and what Maestro kept of it are in the run's artifacts."
   fi
 }
