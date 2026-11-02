@@ -69,7 +69,7 @@
    component than on any other, because the cells sit a few pixels apart and a
    ring standing off one of them reaches toward its neighbors. */
 [part~="cell-active"] {
-  border-color: var(--pin-input-cell-border-color-focus, var(--helix-color-primary));
+  border-color: var(--pin-input-cell-border-color-focus, var(--helix-color-focus-ring));
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }
