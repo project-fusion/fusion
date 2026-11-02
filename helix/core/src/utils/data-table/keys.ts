@@ -2,11 +2,11 @@
  * The row keys a data table holds in `selected` and `expanded`, as arithmetic
  * over comma-separated lists.
  *
- * Pure and beside the family's `index.ts`, so a spec holds the rules without a
+ * Pure, so a spec holds the rules without a
  * page: which rows a toggle leaves open. The order a list of keys is written
  * in and where a Shift range runs from are core's `inRowOrder` and `anchorAt`.
  */
-import { commaList, inRowOrder } from '@fusion.dev/helix-core'
+import { commaList, inRowOrder } from '../written-list/written-list.js'
 
 /**
  * The `expanded` a toggle of row `key` leaves, in row order, or `undefined`
