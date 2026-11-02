@@ -307,6 +307,11 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
           'worklet'
           inside.value = true
         },
+        /* **A drag that leaves the scroller stays the scroller's.** On Android
+           this gesture otherwise fails at the scroller's bounds and cancels the
+           touch the scroller is following, so a drag up from a row near its top
+           moved no row. Gesture Handler's own `ScrollView` says the same. */
+        shouldCancelWhenOutside: false,
       }),
       [inside],
     ),
