@@ -64,6 +64,8 @@ export const colorInputTexted: Derivation = (props) => props.trigger !== 'swatch
 /** `color-input-locked`: whether a color input's trigger takes no press, disabled or read-only. */
 export const colorInputLocked: Derivation = (props) =>
   props.disabled === true || props.readonly === true
+/* Pagination's, the words a summary says. */
+export * from '../pagination/pagination-derivations.js'
 /* Speed Dial's, its long press, its names, and an action's shortcut. */
 export * from '../speed-dial/speed-dial-derivations.js'
 /* Splitter's, the name its divider is read by. */
