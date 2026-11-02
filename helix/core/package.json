@@ -104,6 +104,10 @@
       "default": "./dist/utils/color-picker/color-picker.js"
     },
     "./custom-elements.json": "./custom-elements.json",
+    "./data-table": {
+      "types": "./dist/utils/data-table/data-table.d.ts",
+      "default": "./dist/utils/data-table/data-table.js"
+    },
     "./derivations": {
       "types": "./dist/utils/derivations/derivations.d.ts",
       "default": "./dist/utils/derivations/derivations.js"

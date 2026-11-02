@@ -71,6 +71,7 @@ import {
   wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
+import { type Grown, grow, toggledOpen } from '@fusion.dev/helix-core/data-table'
 import { tracksOf } from '@fusion.dev/helix-core/table'
 import { caretDown, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -114,8 +115,6 @@ import {
   HelixViewChangeEvent,
 } from '../events/index.js'
 import { EXPORT_TYPES, type ExportData, type ExportOptions, exportText } from '../export.js'
-import { toggledOpen } from '../keys.js'
-import { type Grown, grow } from '../tree.js'
 import {
   type ColumnType,
   type DataTableView,

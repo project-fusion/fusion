@@ -3,7 +3,7 @@
  * parent, and laid out flat in reading order with the open rows' children under
  * them.
  *
- * Pure and beside the family's `index.ts`, because which rows show and at what
+ * Pure, because which rows show and at what
  * depth is a fact about the data, and a spec can hold it without a page.
  *
  * **Filtered by descent.** A row stays when it matches the query or any row
@@ -14,7 +14,8 @@
  * row under its parent, which is the only order a tree can be read in.
  */
 
-import { type Axis, type DataRow, filter, parse, sort, valueAt } from '@fusion.dev/helix-core'
+import { valueAt } from '../row-data/row-data.js'
+import { type Axis, type DataRow, filter, parse, sort } from '../row-order/row-order.js'
 
 /** Where a row sits in the tree. */
 export interface Placement {
