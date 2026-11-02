@@ -108,6 +108,11 @@ const drag = (held: Held, by: number, speed = 0) => {
 }
 
 describe('useSwipe', () => {
+  test('keeps a scroller following a drag that leaves its bounds', async () => {
+    const held = await drawn('0.5 1')
+    expect(held.swiping?.scroller.gesture.config.shouldCancelWhenOutside).toBe(false)
+  })
+
   test('dismisses a surface dragged more than halfway toward its edge', async () => {
     const held = await drawn()
     drag(held, 260)
