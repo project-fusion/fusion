@@ -182,6 +182,17 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    /* A preview is at rest, so what focus draws is pictured apart, for the
+       families that hold an example of it. */
+    {
+      files,
+      glob: '{name}/.examples/focused.html',
+      kind: 'html',
+      name: 'focused',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
   ],
   /* `verify`'s browser jobs and `measure-browser.mjs` name a file here, and
      `measure:browser --from` merges a run's worth of them. */

@@ -1,0 +1,15 @@
+<!-- @summary A field with focus, so its edge and the ring around it can be seen together. -->
+<helix-input
+  id="email"
+  label="Email"
+  placeholder="name@example.com"
+  type="email"
+></helix-input>
+
+<script type="module">
+  const email = document.getElementById('email')
+
+  await customElements.whenDefined('helix-input')
+  await email.updateComplete
+  email.focus()
+</script>

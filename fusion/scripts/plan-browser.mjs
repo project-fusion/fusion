@@ -146,7 +146,10 @@ const styled = tally(
   (family) => examples(TIERS[1], family).filter((one) => one.endsWith('.html')).length,
 )
 const pictured = tally(
-  (family) => 3 * TIERS.filter((tier) => examples(tier, family).includes('preview.html')).length,
+  (family) =>
+    3 *
+    (TIERS.filter((tier) => examples(tier, family).includes('preview.html')).length +
+      (examples(TIERS[1], family).includes('focused.html') ? 1 : 0)),
 )
 const specced = tally((family) =>
   TIERS.some((tier) => {

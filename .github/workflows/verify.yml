@@ -1315,6 +1315,7 @@ jobs:
           path: |
             helix/headless/src/*/.examples/preview*.diff.png
             helix/styled/src/*/.examples/preview*.diff.png
+            helix/styled/src/*/.examples/focused*.diff.png
             .helix/parity
             .helix/visual
             .helix/dsd
