@@ -100,22 +100,26 @@ tags:
           duration: 300
 - waitForAnimationToEnd:
     timeout: 3000
-# A fling goes on to the next snap point, as core's `settleSwipe` has it on the web
-# as well. This one is shorter than the half, so the sheet rests half open with its
-# list still shown. A longer one would pass the half and take the sheet out.
+# A drag rests the sheet at the nearest point: this one ends nearer the half than the
+# whole, with the list still shown.
 - swipe:
     start: 50%, 78%
     end: 50%, 90%
-    duration: 200
+    duration: 600
 - waitForAnimationToEnd:
     timeout: 3000
 - assertVisible: .*Quarterly report.*
 - assertNotVisible: .*Brand guidelines.*
-# A second fling from the header, which stands near 85% at half open, takes it out.
+# A drag from the header, which stands near 85% at half open, ends past the middle of
+# what is left, and takes the sheet out. No flow proves a fling on Android. `input
+# swipe` waits for the app to finish each move, and a slow frame leaves more than the
+# 40 ms between its last move and its release after which Android's `VelocityTracker`
+# reads no speed. In run 41374589645 a drag of this length over 200 ms stopped at about
+# a quarter shown and came back.
 - swipe:
     start: 50%, 85%
     end: 50%, 99%
-    duration: 200
+    duration: 600
 - extendedWaitUntil:
     notVisible: .*Quarterly report.*
     timeout: 5000
