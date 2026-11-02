@@ -87,7 +87,12 @@ name: "Screens: Megamenu"
       - swipe:
           from: Products
           direction: LEFT
-- tapOn: Solutions
+# Where the bar's drag leaves the word running past the clip, its middle stands outside
+# the bar, as Products' does above (run 41489332691: the word from x 269, the bar ending
+# at 364), so the press lands near the word's start.
+- tapOn:
+    text: Solutions
+    point: 10%, 50%
 - extendedWaitUntil:
     visible: .*Engineering.*
     timeout: 5000
