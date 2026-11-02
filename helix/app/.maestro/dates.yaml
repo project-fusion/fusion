@@ -29,3 +29,10 @@ tags:
 - assertVisible:
     optional: true
     text: 'dayPeriod: writes'
+# Whether the engine honors a calendar named in a locale and says a week's first
+# day: words the date pickers rely on, pictured so a run shows each platform's answer.
+- openLink: helix://checks/calendars
+- extendedWaitUntil:
+    visible: .*first day.*
+    timeout: 15000
+- takeScreenshot: calendars
