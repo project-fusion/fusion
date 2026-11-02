@@ -6,7 +6,6 @@
   --helix-seed-accent: oklch(0.539 0.19 258);
   --helix-seed-neutral-chroma: 0.004;
   --helix-seed-neutral-hue: 258;
-  --helix-seed-density: 0.8;
   --helix-weight-medium: 510;
   --helix-tracking-normal: -0.011em;
   --helix-tracking-tight: -0.022em;
@@ -20,13 +19,6 @@
   --_helix-series-origin: oklch(0.539 0.19 258);
   /* Text a step off pure black and white, which is harsh on a true black page. */
   --helix-color-foreground: light-dark(oklch(0.2 0.006 258), oklch(0.97 0.002 258));
-}
-
-/* A finger needs the full-size control. Compact is for a mouse. */
-@media (pointer: coarse) {
-  :root {
-    --helix-seed-density: 1;
-  }
 }
 
 /* Links in the accent. Buttons stay ink. */
