@@ -123,7 +123,7 @@ export const ScrollArea = ({
       onMomentumScrollEnd={both(told.onMomentumScrollEnd, props.onMomentumScrollEnd)}
       onScroll={both(both(told.onScroll, scrolledBy), props.onScroll)}
       ref={handOff.held}
-      scrollEnabled={!locked && props.scrollEnabled !== false}
+      scrollEnabled={!locked && !handOff.waits && props.scrollEnabled !== false}
       scrollEventThrottle={props.scrollEventThrottle ?? 16}
     />
   )
