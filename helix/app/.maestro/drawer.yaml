@@ -45,17 +45,24 @@ tags:
 - extendedWaitUntil:
     visible: .*Quarterly report.*
     timeout: 5000
-# The sheet is still rising when its words first show. In run 41356179392 the
-# first row was read at 94% of the Android screen, against 77% at rest, and the
-# drag that followed moved nothing. The scroll below then started on the scrim,
-# which closed the sheet.
+# The sheet is still rising when its words first show, and this wait can end
+# inside the rise: in run 41361727088 the first row was read at 94% of the Android
+# screen, against 77% at rest.
 - waitForAnimationToEnd:
     timeout: 3000
 # Half open, a drag up on the list opens the sheet to the whole, which shows the
-# sixth file. The retry covers a drag whose moves reach a busy emulator as one,
-# which moves nothing.
-- retry:
-    maxRetries: 1
+# sixth file. The second drag starts from the row at rest.
+- swipe:
+    from: .*Quarterly report.*
+    direction: UP
+    duration: 600
+- extendedWaitUntil:
+    visible: .*Customer interviews.*
+    timeout: 5000
+    optional: true
+- runFlow:
+    when:
+      notVisible: .*Customer interviews.*
     commands:
       - swipe:
           from: .*Quarterly report.*
@@ -64,6 +71,31 @@ tags:
       - extendedWaitUntil:
           visible: .*Customer interviews.*
           timeout: 5000
+          optional: true
+# In run 41361727088 the drag at rest moved no pixel on Android, sheet or list, and
+# that run cannot say why. Where both drags stand still, these take pictures of what
+# does move, and the flow still fails: a short drag on the list as Scroll Area drags,
+# which passes there, and then a drag on the header, where no scroller stands.
+- runFlow:
+    when:
+      notVisible: .*Customer interviews.*
+    commands:
+      - takeScreenshot: drawer-list-drag-stood
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 69%
+          duration: 400
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - takeScreenshot: drawer-list-short-drag
+      - swipe:
+          start: 50%, 71%
+          end: 50%, 30%
+          duration: 600
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - takeScreenshot: drawer-header-drag
+      - assertVisible: A drag on the list opened the sheet
 - waitForAnimationToEnd:
     timeout: 3000
 # Whole, a drag up scrolls the list to its last file.
