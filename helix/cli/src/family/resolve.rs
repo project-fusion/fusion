@@ -124,6 +124,7 @@ impl<'a> Names<'a> {
                         .chain(family.api.tree.iter())
                         .chain(family.api.inspector.iter())
                         .chain(family.api.table.iter())
+                        .chain(family.api.data_table.iter())
                         .chain(family.api.table_row.iter())
                         .chain(family.api.table_column.iter())
                         .chain(later_choices(&family.api))
@@ -284,6 +285,14 @@ pub fn unresolved(family: &Family) -> Vec<String> {
         references(
             "tableRoot",
             table.references(api::TABLE),
+            &names,
+            &mut found,
+        );
+    }
+    if let Some(table) = &family.api.data_table {
+        references(
+            "dataTableRoot",
+            table.references(api::DATA_TABLE),
             &names,
             &mut found,
         );

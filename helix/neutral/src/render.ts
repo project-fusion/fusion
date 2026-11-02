@@ -206,6 +206,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What a table computes. */
   readonly tableRoot: Computes<'empty' | 'every' | 'heads' | 'nests' | 'rows' | 'waiting'>
+  /** What a table drawn from an array computes. */
+  readonly dataTableRoot: Computes<
+    'empty' | 'every' | 'heads' | 'more' | 'nests' | 'pagination' | 'rows' | 'waiting'
+  >
   /** What a row of a table computes. */
   readonly tableRow: Computes<
     'branch' | 'cells' | 'grips' | 'gripStill' | 'nests' | 'selectable' | 'selectedCell'

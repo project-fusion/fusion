@@ -73,10 +73,10 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX,
-    LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
-    OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW,
-    TAIL, TREE, TREE_ITEM,
+    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, DATA_TABLE,
+    INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
+    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -146,6 +146,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a table.
     #[serde(rename = "tableRoot", skip_serializing_if = "Option::is_none")]
     pub table: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a table drawn from an array.
+    #[serde(rename = "dataTableRoot", skip_serializing_if = "Option::is_none")]
+    pub data_table: Option<TreeChoice>,
     /// What the element reads and computes where it is a row of a table.
     #[serde(rename = "tableRow", skip_serializing_if = "Option::is_none")]
     pub table_row: Option<TreeChoice>,
@@ -343,6 +346,7 @@ impl Api {
             && self.tree_item.is_none()
             && self.inspector.is_none()
             && self.table.is_none()
+            && self.data_table.is_none()
             && self.table_row.is_none()
             && self.table_column.is_none()
             && self.log_root.is_none()
@@ -426,6 +430,7 @@ const FIELDS: &[&str] = &[
     "treeItem",
     "inspector",
     "tableRoot",
+    "dataTableRoot",
     "tableRow",
     "tableColumn",
     "logRoot",
@@ -488,6 +493,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::notification_group)
             .transpose()?,
         carousel: field("carousel").map(tree_choice::carousel).transpose()?,
+        data_table: field("dataTableRoot")
+            .map(tree_choice::data_table)
+            .transpose()?,
         pagination_root: field("paginationRoot")
             .map(tree_choice::pagination_root)
             .transpose()?,

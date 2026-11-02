@@ -27,6 +27,7 @@ pub const FEATURES: &[&str] = &[
     "notificationRow",
     "notificationGroup",
     "carousel",
+    "dataTableRoot",
     "paginationRoot",
     "paginationSize",
     "listbox",
@@ -92,8 +93,8 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "treeRoot" | "treeItem" | "inspector" | "tableRoot" | "tableRow" | "tableColumn"
             | "logRoot" | "logLine" | "logGroup" | "tail" | "notificationsRoot"
             | "notificationRow" | "notificationGroup" | "codeBlock" | "carousel"
-            | "paginationRoot" | "paginationSize" | "listbox" | "select" | "option"
-            | "optionGroup" | "chatRoot" | "chatMessage" | "chatComposer" => {
+            | "dataTableRoot" | "paginationRoot" | "paginationSize" | "listbox" | "select"
+            | "option" | "optionGroup" | "chatRoot" | "chatMessage" | "chatComposer" => {
                 let choice = super::tree_choice::by_key(&key, value)?;
                 for (field, name) in choice.computed {
                     push(&format!("{key}.{field}"), &name);
