@@ -63,8 +63,7 @@ export const SERVICES: Service[] = [
     name: 'AI capability audit',
     outcome:
       'A document you own and can act on without us. If you do not need a larger engagement, the audit says so.',
-    summary:
-      'Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.',
+    summary: 'Up to two weeks to find out which AI work is worth building.',
   },
   {
     duration: 'Four weeks, two days a week',
@@ -77,8 +76,7 @@ export const SERVICES: Service[] = [
     name: 'Design system sprint',
     outcome:
       'Your design system, in your repository, under your license. It keeps working after we leave.',
-    summary:
-      'Helix, applied to your product. We build your components in your repository, as working code.',
+    summary: 'Helix, applied to your product, as working code in your repository.',
   },
   {
     duration: 'Six weeks or more, two days a week',
@@ -91,7 +89,6 @@ export const SERVICES: Service[] = [
     name: 'Conversational build',
     outcome:
       'Working software and the reasoning behind it, in your hands. It keeps running after we leave.',
-    summary:
-      'We build software with you while the specification is still changing, and agree the next step in each conversation.',
+    summary: 'We build software with you while the specification is still changing.',
   },
 ]

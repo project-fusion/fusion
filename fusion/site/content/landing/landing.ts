@@ -119,5 +119,5 @@ export const LANDING: PageCopy = {
    * The site's own name stays the *route* title, which is what a sitemap and a
    * search result want. This is the `h1`, and the `h1` is the heading.
    */
-  title: 'An intelligent design system, and the engineers behind it',
+  title: `${HERO.title} ${HERO.accent}`,
 }

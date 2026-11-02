@@ -114,10 +114,6 @@ const Card = ({
 export const CoverageBand = () => {
   const ours = COVERAGE.systems.findIndex((one) => one.ours)
   const rows = COVERAGE.groups.flatMap((group) => group.rows)
-  /* The jobs no other system in the table publishes an element for. */
-  const alone = rows.filter((row) =>
-    row.cells.every((cell, index) => (index === ours) === (cell !== null)),
-  )
   return (
     <Band id="coverage">
       <div className={`${band.bandSplit} ${styles.split}`}>
@@ -142,21 +138,6 @@ export const CoverageBand = () => {
               Ships it as experimental
             </li>
           </ul>
-
-          {alone.length > 0 && (
-            <div className={styles.alone}>
-              <helix-text as="p" scale="label">
-                {alone.length} jobs only Helix covers
-              </helix-text>
-              <helix-flex data-density="sm" gap="xs" wrap>
-                {alone.map((row) => (
-                  <helix-tag key={row.name} tone="accent">
-                    {row.name}
-                  </helix-tag>
-                ))}
-              </helix-flex>
-            </div>
-          )}
 
           <div className={styles.added}>
             {/* `data-site-measure` is what the site's visual check masks: the
@@ -279,8 +260,8 @@ export const CoverageBand = () => {
             </table>
           </CoverageCards>
           <helix-text as="p" class={styles.source} emphasis="muted" scale="caption">
-            Every system ships buttons, form controls, menus, and dialogs, so the table lists the
-            rest. Read from each system's manifest on {measuredOn(MEASURED)}.{' '}
+            The table leaves out what every system ships. Read from each system's manifest on{' '}
+            {measuredOn(MEASURED)}.{' '}
             <span className={styles.hint}>Hover a mark to see the elements.</span>
             <span className={styles.hintTouch}>Press a mark to see the elements.</span>
           </helix-text>

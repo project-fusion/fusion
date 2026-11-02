@@ -8,10 +8,6 @@
   font-weight: var(--helix-weight-medium);
 }
 
-.finding {
-  overflow-wrap: anywhere;
-}
-
 /* The failing pair, in its own colors. A hairline keeps the page's background
    from swallowing the sample's edge, since the two are nearly the same. */
 .sample {
