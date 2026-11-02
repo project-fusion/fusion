@@ -1,8 +1,7 @@
 /* **Fusion's blue, named the way any site names its brand.** Helix draws in
    ink when no brand is set, so the site sets the seed, and the stylesheet
    derives the rest from it. The value is the blue Helix shipped before ink. The
-   same blue is `SITE_BRAND` in `utils/theme-defaults`, and the fallbacks in
-   `app/icon.svg`. */
+   same blue is `SITE_BRAND` in `utils/theme-defaults`. */
 :root {
   --helix-seed-brand: oklch(0.539 0.19 258);
 }

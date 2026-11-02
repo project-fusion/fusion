@@ -68,11 +68,9 @@
 
 /* The mark set to its glyph rather than to its box. **An icon is padded and a
    logo in a lockup is not.** `fusion.svg` draws into a 256 viewBox with the
-   artwork spanning 42.5 to 213.9, which is 16.6 percent of clear space on each
-   side. Measured in the footer at a 1.25rem mark: the glyph began 3.3px right of
-   "Developing" below it, and the 8px between mark and name read as 11.3. */
+   artwork spanning 10.2 to 245.8, which is 4 percent of clear space on each side. */
 .footerBrand helix-icon {
-  margin-inline: calc(var(--icon-size) * -0.166);
+  margin-inline: calc(var(--icon-size) * -0.04);
 }
 
 .footerNav {

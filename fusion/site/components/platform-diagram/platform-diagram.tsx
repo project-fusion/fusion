@@ -152,7 +152,7 @@ export const PlatformDiagram = () => (
       <foreignObject height="224" width="224" x="488" y="128">
         <div className={styles.platformGlass}>
           <span className={styles.platformMark}>
-            <FusionMark size="120px" />
+            <FusionMark detail size="120px" />
           </span>
         </div>
       </foreignObject>
