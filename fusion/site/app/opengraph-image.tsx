@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 
 /** The mark's small cut, as `helix/icons/raw/fusion.svg` draws it, for a renderer with no Helix in it. */
 const MARK = `data:image/svg+xml,${encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#f7f8f8" transform="rotate(-30 50 50)"><path d="M54.5 4.221A46 46 0 0 1 54.5 95.779L54.5 65.354A16 16 0 0 0 54.5 34.646Z"/><path d="M45.5 4.221A46 46 0 0 0 45.5 95.779L45.5 85.718A36 36 0 0 1 45.5 14.282Z"/><path d="M45.5 23.378A27 27 0 0 0 45.5 76.622L45.5 65.354A16 16 0 0 1 45.5 34.646Z"/></g></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#f7f8f8" transform="rotate(-30 50 50)"><path d="M54.5 4.221A46 46 0 0 1 54.5 95.779L54.5 65.354A16 16 0 0 0 54.5 34.646Z"/><path d="M45.5 4.221A46 46 0 0 0 45.5 95.779L45.5 85.718A36 36 0 0 1 45.5 14.282Z"/><path fill="#3b8cff" d="M45.5 23.378A27 27 0 0 0 45.5 76.622L45.5 65.354A16 16 0 0 1 45.5 34.646Z"/></g></svg>',
 )}`
 
 /**
