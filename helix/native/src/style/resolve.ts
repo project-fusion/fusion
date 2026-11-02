@@ -47,6 +47,8 @@ export interface Scope {
   readonly levels: readonly string[]
   /** The private values the part's own rules set. */
   readonly own: ReadonlyMap<string, Value>
+  /** The private values a part above this one set, which it read before this part's tokens. */
+  readonly ownAbove: ReadonlySet<string>
   readonly part: string
   /** Whether a rule is on a part, and not on a region. */
   readonly plain: (rule: Rule) => boolean
@@ -76,18 +78,26 @@ export const resolverFor = ({
   family,
   levels,
   own,
+  ownAbove,
   part,
   plain,
   rules,
 }: Scope): Resolver => {
   let across: number | undefined
+  let outside = false
   const rem = context.rem ?? 16
   const spaceRem = context.spaceRem ?? rem
   /* `initial` as a custom property's value is the guaranteed-invalid value,
      so a `var()` that reads it takes its fallback. */
   const valued = (name: string, fallback: Value | undefined): Resolution => {
     const set = own.get(name)
+    /* **A private value set above this part does not see a token this part sets**, since
+       on the web it was worked out where it was set. A dialog's ground reads
+       `surface-overlay`, and its panel sets that token a step up for what it holds. */
+    const before = outside
+    outside = ownAbove.has(name)
     const value = set === undefined ? context.inherited?.[name] : resolve(set)
+    outside = before
     if (value === undefined || value === 'initial') {
       return fallback === undefined ? undefined : resolve(fallback)
     }
@@ -146,6 +156,7 @@ export const resolverFor = ({
      name reads the value from outside it. Built the first time a hook or a
      token reads it. */
   const customs = new Map<string, Resolution>()
+  let customsAbove: ReadonlyMap<string, Resolution> = customs
   let customsBuilt = false
   const custom = (): ReadonlyMap<string, Resolution> => {
     if (customsBuilt) {
@@ -153,6 +164,9 @@ export const resolverFor = ({
     }
     customsBuilt = true
     for (const level of levels) {
+      if (level === part) {
+        customsAbove = new Map(customs)
+      }
       for (const rule of rules) {
         if (rule.target !== level || !plain(rule) || rule.slotted !== undefined) {
           continue
@@ -249,7 +263,11 @@ export const resolverFor = ({
     if ('token' in value) {
       /* A token the element or the one around it overrides, as a toolbar
          sets a smaller control height for what it holds. */
-      return custom().get(`helix-${value.token}`) ?? context.tokens[value.token]
+      custom()
+      return (
+        (outside ? customsAbove : customs).get(`helix-${value.token}`) ??
+        context.tokens[value.token]
+      )
     }
     if ('own' in value) {
       return valued(value.own.name, value.own.fallback)

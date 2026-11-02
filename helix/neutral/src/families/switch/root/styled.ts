@@ -4,8 +4,8 @@ import printExact from '../../../fragments/print-exact.js'
 import {
   difference,
   first,
+  inherited,
   list,
-  measured,
   native,
   product,
   quotient,
@@ -136,7 +136,7 @@ export default styles(
          replaced the fill: the thumb fell from 17.76:1 to 1.45:1 under the press. */
       rule(
         { checked: true, formDisabled: false, within: { field: { active: true } } },
-        { backgroundColor: measured('switch-on-color', token('color-primary-surface-active')) },
+        { backgroundColor: inherited('switch-on-color', token('color-primary-surface-active')) },
       ),
       /* A checked track is a fill, which forced colors paint Canvas. */
       rule(

@@ -21,6 +21,7 @@ import { act, fireEvent, render } from '@testing-library/react-native'
 import type { ReactNode } from 'react'
 import { Dimensions, Text } from 'react-native'
 import { LayerHostView } from '../root/layers'
+import { dark } from '../theme/dark.generated'
 import { light } from '../theme/light.generated'
 import { ThemeProvider } from '../theme/theme'
 import { HelixDialog } from './dialog/index.native'
@@ -209,5 +210,38 @@ describe('the generated Dialog', () => {
     const style = styleOf(panel() ?? { props: {} })
     expect(style.width).toBe(22 * 16)
     expect(style.marginTop).toBeUndefined()
+  })
+})
+
+describe('a panel opened inside a Dialog', () => {
+  test('stands a step above it in dark, where a shadow does not show, and shares its fill in light', async () => {
+    const nested = (
+      <HelixDialog label="Outer" open>
+        <HelixDialog label="Inner" open>
+          <Text>Inside.</Text>
+        </HelixDialog>
+      </HelixDialog>
+    )
+    const fills = () => {
+      const panels = viewsWhere(
+        (props) => props.role === 'dialog' || props.accessibilityRole === 'dialog',
+      ).map((node) => styleOf(node).backgroundColor)
+      return [...new Set(panels)]
+    }
+    drawn = await render(
+      <ThemeProvider mode="dark" rem={16} tokens={dark}>
+        <LayerHostView>{nested}</LayerHostView>
+      </ThemeProvider>,
+    )
+    await frames()
+    expect(fills()).toHaveLength(2)
+    expect(fills()).toContain(dark['color-surface-overlay'])
+    drawn = await render(
+      <ThemeProvider mode="light" rem={16} tokens={light}>
+        <LayerHostView>{nested}</LayerHostView>
+      </ThemeProvider>,
+    )
+    await frames()
+    expect(fills()).toEqual([light['color-surface-overlay']])
   })
 })

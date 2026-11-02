@@ -103,11 +103,17 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     alone(rule) &&
     (rule.target === part || (context.also ?? []).includes(rule.target))
   const own = new Map<string, Value>()
+  const ownAbove = new Set<string>()
   for (const level of levels) {
     for (const rule of rules) {
       if (rule.target === level && rule.slotted === undefined && plain(rule)) {
         for (const [name, value] of rule.values) {
           own.set(name, value)
+          if (level === part) {
+            ownAbove.delete(name)
+          } else {
+            ownAbove.add(name)
+          }
         }
       }
     }
@@ -143,6 +149,7 @@ export const style = (family: Family, part: string, context: Context): Resolved 
     family,
     levels,
     own,
+    ownAbove,
     part,
     plain,
     rules,
