@@ -92,11 +92,11 @@ describe('what follows the lead', () => {
   const lead = '<helix-button emphasis="ghost" slot="start">Filter</helix-button>'
   const chip = (name: string): string =>
     `<helix-filter-chip label="${name}" name="${name}" slot="tags">A value</helix-filter-chip>`
-  const fromField = (filter: Element, element: Element | null): number => {
+  const fromField = (filter: HTMLElement, element: Element | null): number => {
     const field = part(filter, 'field') as HTMLElement
     return box(element).left - box(field).left - field.clientLeft
   }
-  const fromSeam = (filter: Element, element: Element | null): number =>
+  const fromSeam = (filter: HTMLElement, element: Element | null): number =>
     box(element).left - box(part(filter, 'lead')).right
 
   /* Each is read before the next mounts, which takes the last one off the page. */
@@ -123,7 +123,7 @@ describe('what follows the lead', () => {
     const led = await mount(
       `<div style="inline-size: 240px"><helix-filter-input label="Filter rows">${lead}${chip('one')}${chip('two')}${chip('three')}</helix-filter-input></div>`,
     )
-    const filter = led.querySelector('helix-filter-input') as Element
+    const filter = led.querySelector('helix-filter-input') as HTMLElement
     const chips = [...filter.querySelectorAll('helix-filter-chip')]
     const [first] = chips
     const later = chips.find((one) => box(one).top > box(first ?? null).top)
