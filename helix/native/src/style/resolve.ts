@@ -87,13 +87,10 @@ export const resolverFor = ({
   let outside = false
   const rem = context.rem ?? 16
   const spaceRem = context.spaceRem ?? rem
-  /* `initial` as a custom property's value is the guaranteed-invalid value,
-     so a `var()` that reads it takes its fallback. */
+  /* `initial` is the guaranteed-invalid value, so a `var()` reading it takes its fallback. */
   const valued = (name: string, fallback: Value | undefined): Resolution => {
     const set = own.get(name)
-    /* **A private value set above this part does not see a token this part sets**, since
-       on the web it was worked out where it was set. A dialog's ground reads
-       `surface-overlay`, and its panel sets that token a step up for what it holds. */
+    /* A private value set above this part does not read a token this part sets. */
     const before = outside
     outside = ownAbove.has(name)
     const value = set === undefined ? context.inherited?.[name] : resolve(set)
@@ -261,13 +258,10 @@ export const resolverFor = ({
       return value.number
     }
     if ('token' in value) {
-      /* A token the element or the one around it overrides, as a toolbar
-         sets a smaller control height for what it holds. */
+      /* A token the element or the one around it overrides, as a toolbar's control height. */
       custom()
-      return (
-        (outside ? customsAbove : customs).get(`helix-${value.token}`) ??
-        context.tokens[value.token]
-      )
+      const scope = outside ? customsAbove : customs
+      return scope.get(`helix-${value.token}`) ?? context.tokens[value.token]
     }
     if ('own' in value) {
       return valued(value.own.name, value.own.fallback)
