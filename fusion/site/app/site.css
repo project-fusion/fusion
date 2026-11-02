@@ -1,10 +1,36 @@
-/* **Fusion's blue, named the way any site names its brand.** Helix draws in
-   ink when no brand is set, so the site sets the seed, and the stylesheet
-   derives the rest from it. The value is the blue Helix shipped before ink. The
-   same blue is `SITE_BRAND` in `utils/theme-defaults`, and the fallbacks in
-   `app/icon.svg`. */
+/* **Fusion's theme.** Actions are ink, which Helix draws when no brand is set,
+   and Fusion's blue is the accent. The site reads the accent for the mark, links,
+   focus, what is current, and its own art. The same blue is `SITE_BRAND` in
+   `utils/theme-defaults`, and the fallbacks in `app/icon.svg`. */
 :root {
-  --helix-seed-brand: oklch(0.539 0.19 258);
+  --helix-seed-accent: oklch(0.539 0.19 258);
+  --helix-seed-neutral-chroma: 0.004;
+  --helix-seed-neutral-hue: 258;
+  --helix-weight-medium: 510;
+  --helix-tracking-normal: -0.011em;
+  --helix-tracking-tight: -0.022em;
+  --helix-color-focus-ring: var(--helix-color-accent);
+  --aura-glow: var(--helix-color-accent);
+  --aura-haze: var(--helix-color-accent-subtle);
+  --strands-glow: var(--helix-color-accent);
+  --strands-tint: var(--helix-color-accent);
+  --strands-peak: var(--helix-color-accent-hover);
+  /* Charts start from the brand, and fall back to another hue without one. */
+  --_helix-series-origin: oklch(0.539 0.19 258);
+  /* Text a step off pure black and white, which is harsh on a true black page. */
+  --helix-color-foreground: light-dark(oklch(0.2 0.006 258), oklch(0.97 0.002 258));
+}
+
+/* Links in the accent. Buttons stay ink. */
+[data-prose] a,
+[data-link]:not([data-link="subtle"], [data-link="quiet"]) {
+  color: var(--helix-color-accent);
+}
+
+[data-prose] a:hover,
+[data-link]:not([data-link="subtle"], [data-link="quiet"]):hover,
+[data-link="subtle"]:hover {
+  color: var(--helix-color-accent-hover);
 }
 
 /* The brand faces, mapped onto the design system's tokens. */
@@ -385,10 +411,10 @@ helix-drawer[material="glass"] {
     background: conic-gradient(
       from var(--card-edge-angle),
       transparent 0%,
-      color-mix(in oklab, var(--helix-color-primary) 55%, transparent) 8%,
+      color-mix(in oklab, var(--helix-color-accent) 55%, transparent) 8%,
       transparent 22%,
       transparent 58%,
-      color-mix(in oklab, var(--helix-color-primary) 28%, transparent) 66%,
+      color-mix(in oklab, var(--helix-color-accent) 28%, transparent) 66%,
       transparent 82%
     );
     /* Correct once the box below is the border box, and wrong before it: the
@@ -715,7 +741,7 @@ helix-app-header {
    only thing there is to copy. */
 [data-pulse] {
   animation: sitePulse var(--helix-duration-slow) ease-in-out infinite alternate;
-  background-color: var(--helix-color-primary);
+  background-color: var(--helix-color-accent);
   border-radius: var(--helix-radii-full);
   block-size: var(--helix-size-icon-lg);
   inline-size: var(--helix-size-icon-lg);
@@ -751,22 +777,22 @@ helix-app-header {
    `muted` for the stroke and not the primary itself, a line of the full color
    being the loudest thing in a row of quiet pictures. */
 .artBrand {
-  fill: var(--helix-color-primary);
+  fill: var(--helix-color-accent);
 }
 
 .artOnBrand {
-  fill: var(--helix-color-foreground-on-primary);
+  fill: var(--helix-color-foreground-on-accent);
 }
 
 .artBrandMuted {
-  fill: var(--helix-color-primary-muted);
+  fill: var(--helix-color-accent-muted);
 }
 
 .artBrandSubtle {
-  fill: var(--helix-color-primary-subtle);
+  fill: var(--helix-color-accent-subtle);
 }
 
 .artBrandStroke {
   fill: none;
-  stroke: var(--helix-color-primary-muted);
+  stroke: var(--helix-color-accent-muted);
 }

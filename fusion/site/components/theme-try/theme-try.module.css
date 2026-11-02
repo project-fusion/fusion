@@ -69,7 +69,7 @@ fieldset.tryControl {
 
 /* A swatch is its color and nothing else, ringed when it is the one chosen. */
 .trySwatch {
-  background: var(--swatch, var(--helix-color-primary));
+  background: var(--swatch, var(--helix-color-accent));
   block-size: 1.5rem;
   border: var(--helix-border-thin) solid
     color-mix(in oklab, var(--helix-color-foreground) 15%, transparent);

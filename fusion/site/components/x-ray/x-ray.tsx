@@ -71,7 +71,7 @@ export function XRay(): React.ReactElement {
       setCounts(found)
       const selector = [...found.keys()].join(',\n')
       style.textContent = selector
-        ? `${selector} { outline: 1px solid color-mix(in oklab, var(--helix-color-primary) 55%, transparent); outline-offset: -1px; }`
+        ? `${selector} { outline: 1px solid color-mix(in oklab, var(--helix-color-accent) 55%, transparent); outline-offset: -1px; }`
         : ''
     }
     draw()

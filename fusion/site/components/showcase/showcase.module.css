@@ -37,16 +37,16 @@
  * needs to know it is on a filled ground. */
 .showcaseAnchor {
   /*
- * *Not `--helix-color-primary`, which does not carry text.** It is solved to
+ * *Not `--helix-color-accent`, which does not carry text.** It is solved to
  *      be legible *on* the background, so in a dark theme it is light by
  *      construction and a card filled with it carries dark text: measured with
  *      `foreground-on-accent` over it in dark mode, 2.8 to 1, under the 4.5 body
  *      text wants and under the 3 even large text wants.
  */
-  --card-background-color: var(--helix-color-primary-surface);
-  --card-border-color: var(--helix-color-primary-surface);
+  --card-background-color: var(--helix-color-accent-surface);
+  --card-border-color: var(--helix-color-accent-surface);
 
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 /* **The title takes the card's text color.** A card gives the headings in it
@@ -54,7 +54,7 @@
    measured black on `oklch(0.21 0 258)` in light mode, and white on
    `oklch(0.91 0 258)` in dark. */
 .anchorTitle {
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
   font-size: var(--helix-text-xl);
   font-weight: var(--helix-weight-semibold);
   line-height: var(--helix-leading-tight);

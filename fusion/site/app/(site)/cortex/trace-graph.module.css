@@ -50,7 +50,7 @@
 }
 
 .rung {
-  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-accent) 70%, transparent);
   display: grid;
   padding-inline-start: var(--helix-space-md);
 }

@@ -150,7 +150,7 @@ export const CoverageBand = () => {
               </helix-text>
               <helix-flex data-density="sm" gap="xs" wrap>
                 {alone.map((row) => (
-                  <helix-tag key={row.name} tone="primary">
+                  <helix-tag key={row.name} tone="accent">
                     {row.name}
                   </helix-tag>
                 ))}

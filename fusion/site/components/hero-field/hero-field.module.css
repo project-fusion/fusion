@@ -13,8 +13,8 @@
   /* A hard core the size of the lattice dot, then a halo. */
   background: radial-gradient(
     circle,
-    var(--helix-color-primary) 0 16%,
-    color-mix(in oklab, var(--helix-color-primary) 40%, transparent) 30%,
+    var(--helix-color-accent) 0 16%,
+    color-mix(in oklab, var(--helix-color-accent) 40%, transparent) 30%,
     transparent 68%
   );
   border-radius: var(--helix-radii-full);

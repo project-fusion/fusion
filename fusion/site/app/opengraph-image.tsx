@@ -12,7 +12,7 @@ export default function Image() {
   return new ImageResponse(
     <div
       style={{
-        background: '#0b0d10',
+        background: '#000000',
         color: '#f7f8f8',
         display: 'flex',
         flexDirection: 'column',

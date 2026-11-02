@@ -45,7 +45,7 @@
    amount of color reads as identity rather than as decoration: it is the thing
    the eye lands on first and it is already the panel's subject. */
 .siteCommand::part(search) {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
 }
 
 .siteCommand::part(search-field) {
@@ -90,7 +90,7 @@
 /* The row the keyboard is on, in the brand's own subtle ground rather than the
    neutral wash a select uses. */
 .siteCommand {
-  --option-active-background-color: var(--helix-color-primary-subtle);
+  --option-active-background-color: var(--helix-color-accent-subtle);
   --option-radius: var(--helix-radii-sm);
 }
 
