@@ -293,6 +293,16 @@ export default styles(
       native([rule({ fontSize: token('text-sm') })]),
       web([rule({ focusVisible: true }, { outline: 'none' })]),
     ]),
+    /* This sheet does not take the field fragment, so the rule it gives every field is
+       written here too. Without it the placeholder took the browser's #757575, measured
+       4.41:1 in light and 4.25:1 in dark, where the muted ink is 5.76:1 and 7.57:1. */
+    on({ placeholder: 'field' }, [
+      rule({ color: token('color-foreground-muted') }),
+      web([rule({ fontWeight: token('weight-regular') })]),
+    ]),
+    on({ placeholder: 'example' }, [
+      web([rule({ color: token('color-foreground-muted'), fontWeight: token('weight-regular') })]),
+    ]),
     /* The examples under `placeholders` roll into each other: a second field placed
        on the field's box, whose own placeholder turns transparent behind it and stays
        the one a screen reader hears. Without anchor positioning, the field's own
@@ -411,16 +421,6 @@ export default styles(
       }),
       native([rule({ flexDirection: 'row' })]),
       rule({ part: { hidden: true } }, { display: 'none' }),
-    ]),
-    /* This sheet does not take the field fragment, so the rule it gives every field is
-       written here too. Without it the placeholder took the browser's #757575, measured
-       4.41:1 in light and 4.25:1 in dark, where the muted ink is 5.76:1 and 7.57:1. */
-    on({ placeholder: 'field' }, [
-      rule({ color: token('color-foreground-muted') }),
-      web([rule({ fontWeight: token('weight-regular') })]),
-    ]),
-    on({ placeholder: 'example' }, [
-      web([rule({ color: token('color-foreground-muted'), fontWeight: token('weight-regular') })]),
     ]),
     on('tools', [
       rule({
