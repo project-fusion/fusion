@@ -105,18 +105,20 @@ export const growing = (hugs: boolean | undefined) => ({ flexGrow: hugs === true
 /**
  * What a part that may take no touch between what it holds gives its scroll
  * view: `box-none` on its content, on the scroll view while nothing scrolls,
- * and no scrolling then, so nothing bounces under a finger.
+ * and no scrolling then, so nothing bounces under a finger. A part scrolls
+ * neither while a lock holds it nor while the layer around it `waits`.
  */
 export const passingThrough = (
   pointerEvents: unknown,
   more: { readonly end: boolean; readonly start: boolean },
   locked: boolean,
+  waits: boolean,
 ) => {
   const passes = pointerEvents === 'box-none'
   const still = passes && !more.end && !more.start
   return {
     content: passes ? { pointerEvents: 'box-none' as const } : {},
-    scrollEnabled: !locked && !still,
+    scrollEnabled: !locked && !waits && !still,
     scroller: still ? { pointerEvents: 'box-none' as const } : {},
   }
 }

@@ -164,7 +164,6 @@ export const ScrollingPart = ({
   const fill = useFill()
   const buttons = horizontal ? 'x' : 'y'
   const heldEnd = useHeldEnd(holdsEnd === true, scroller, at)
-  const through = passingThrough(props.pointerEvents, more, locked)
   const scrolling: Scrolling = {
     ...(horizontal ? { axis: 'x', fill, more } : { axis: 'y', more }),
     ...snapping.reports,
@@ -186,6 +185,7 @@ export const ScrollingPart = ({
   const told = reporting(() => scroller.current, twoWays ? 'y' : 'both')
   const own = useCallback((node: ScrollViewInstance | null) => holding(scroller)(node), [])
   const handOff = useHandOff(twoWays ? undefined : horizontal ? 'x' : 'y', own)
+  const through = passingThrough(props.pointerEvents, more, locked, handOff.waits)
   const shared = {
     scrollEnabled: through.scrollEnabled,
     scrollEventThrottle: 16,

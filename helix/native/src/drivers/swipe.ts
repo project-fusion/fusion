@@ -13,6 +13,10 @@
  * stood still for `SCROLL_LOCK`, so a list flung to its top carries no
  * surface with it. A drag away from the edge moves it while it rests short of
  * the whole. While the surface moves, the scroller is held where it stands.
+ * **While it rests short of the whole the scroller does not scroll at all**: a
+ * hold from the UI thread lost to iOS's own pan, and a half open sheet's list ran
+ * several rows while the sheet rose, or took the drag and left the sheet where it
+ * stood.
  */
 
 import { timers } from '@fusion.dev/helix-core/capabilities/timers'
@@ -46,47 +50,15 @@ import {
 import { scheduleOnRN } from 'react-native-worklets'
 import { reducedNow } from '../render/motion'
 import { CURVES } from './motion'
+import { type Held, stepped, towardEdge } from './swipe-step'
+
+export { type Held, type Step, stepped, towardEdge } from './swipe-step'
 
 /** How far a press travels along the axis before it is a swipe, in points, as the web's `SwipeController` waits. */
 export const SWIPE_SLOP = 8
 
 /** How long a released surface takes to come to rest, in milliseconds: the web drawer's `duration-normal`. */
 const SETTLE = 200
-
-/** How far a move of `x` and `y` went toward `edge`, negative where it went away. */
-export const towardEdge = (edge: SwipeEdge, x: number, y: number): number => {
-  'worklet'
-  return edge === 'bottom' ? y : edge === 'top' ? -y : edge === 'right' ? x : -x
-}
-
-/** Where the surface stands after a move, and whether the surface took it from the scroller. */
-export interface Step {
-  readonly takes: boolean
-  readonly travel: number
-}
-
-/** Where a scroller a touch began inside stands, as a swipe reads it. */
-export interface Held {
-  /** How far it can still scroll the way a drag toward the edge scrolls it, in points. */
-  readonly room: number
-  /** Whether it has stood still for `SCROLL_LOCK`. */
-  readonly still: boolean
-}
-
-/**
- * Where a surface `travel` points toward its edge stands after a move of
- * `delta` toward it, from a touch that began inside a scroller that stands
- * as `held` says, or outside every scroller. **The surface takes a move
- * toward the edge once the scroller can scroll no further that way and has
- * stood still, and a move away while it rests short of the whole**, as core's
- * `handsOver` says. Any other move is the scroller's. The surface never
- * moves past the whole, as the web's does not.
- */
-export const stepped = (travel: number, delta: number, held: Held | undefined): Step => {
-  'worklet'
-  const takes = held === undefined || (delta > 0 ? held.room <= 0 && held.still : travel > 0)
-  return { takes, travel: takes ? Math.max(0, travel + delta) : travel }
-}
 
 /** What a swipe reads of the surface it moves. */
 export interface SwipeSetup {
@@ -118,6 +90,11 @@ export interface SwipeScroller {
    * start, with how long its content and its frame are along it.
    */
   readonly scrolled: (offset: number, content: number, frame: number) => void
+  /**
+   * Whether the surface rests short of the whole, where a drag away from its
+   * edge is the surface's. The scroller does not scroll then.
+   */
+  readonly waits: boolean
 }
 
 /** What a swiping surface draws with. */
@@ -385,8 +362,9 @@ export const useSwipe = (setup: SwipeSetup): Swiping => {
         scrolled.value = standing
         end.value = last
       },
+      waits: shown < 1,
     }),
-    [across, end, moved, scrolled, scrolledAt, scrollerGesture, scrollerRef],
+    [across, end, moved, scrolled, scrolledAt, scrollerGesture, scrollerRef, shown],
   )
   const whole = useCallback(() => restAt(latest.current.points.at(-1) ?? 1, 'glide'), [restAt])
   return { gesture, measure, scroller, shown, style, whole }
