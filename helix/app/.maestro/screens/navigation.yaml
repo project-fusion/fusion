@@ -17,11 +17,15 @@ name: "Screens: Navigation"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-- tapOn: Settings
+# Settings runs off the bar at iOS's largest text size, and Activity shows.
+- tapOn: Activity
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: navigation-preview-moved-${MODE}-${SIZE}
 - openLink: helix://navigation/underlined/preview
+- extendedWaitUntil:
+    visible: Underlined
+    timeout: 15000
 - extendedWaitUntil:
     visible: Activity
     timeout: 15000
@@ -36,6 +40,9 @@ name: "Screens: Navigation"
     timeout: 5000
 - takeScreenshot: navigation-underlined-moved-${MODE}-${SIZE}
 - openLink: helix://navigation/segmented/preview
+- extendedWaitUntil:
+    visible: Segmented
+    timeout: 15000
 - extendedWaitUntil:
     visible: Activity
     timeout: 15000
