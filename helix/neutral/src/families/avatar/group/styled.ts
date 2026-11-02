@@ -6,13 +6,9 @@ import group from './headless.js'
  * Avatar Group's styled tier.
  *
  * **Each avatar overlaps the one before it** and is drawn over it, ringed in
- * the page's background so the edge between two reads. The overlap is a
- * quarter of the avatar's own size, so the initials of a small avatar stay
- * clear of the next one, as a fixed overlap covered half of them. **The
- * initials of an avatar the next one overlaps are centered in the part left
- * showing**, so the next circle covers no letter. A phone reads each
- * avatar's own size as well. Nothing is positioned, so painting
- * follows the order they stand in.
+ * the page's background so the edge between two reads. The overlap is
+ * `space-sm`, whatever the avatars' size, unless the hook sets another.
+ * Nothing is positioned, so painting follows the order they stand in.
  *
  * **Past `max`, the web hides the avatars from its sheet** as soon as they
  * arrive, before the element's next update: one selector per count up to
@@ -28,15 +24,13 @@ export default styles(
       overflowBackgroundColor: token('color-surface-sunken'),
       overflowColor: token('color-foreground-muted'),
       overflowFontSize: token('text-xs'),
-      overlap: null,
+      overlap: token('space-sm'),
       ringColor: token('color-background'),
     },
-    own: { avatarGroupClear: null, avatarGroupRing: null },
+    own: { avatarGroupRing: null },
     stylesheet: 'avatar/group/avatar-group.generated.css',
   },
   ({ hook, on, own, rule }) => {
-    /* A quarter of the size each avatar sets on itself. */
-    const overlap = product(inherited('_avatar-size', token('size-avatar-sm')), 0.25)
     return [
       on('host', [
         rule({
@@ -50,10 +44,7 @@ export default styles(
           boxShadow: [0, 0, 0, token('border-thick'), own.avatarGroupRing],
           flex: '0 0 auto',
         }),
-        rule({ child: 'later' }, { marginInlineStart: product(hook.overlap(overlap), '-1') }),
-        /* The share of each avatar the next one covers, which its initials
-           keep clear of. */
-        rule({ child: 'earlier' }, { own: { avatarGroupClear: 0.25 } }),
+        rule({ child: 'later' }, { marginInlineStart: product(hook.overlap, '-1') }),
       ]),
       /* Written out: one rule for each value of a prop, each on the children past it. */
       on(
@@ -79,7 +70,7 @@ export default styles(
           fontWeight: token('weight-medium'),
           inlineSize: inherited('avatar-size', token('size-control-md')),
           justifyContent: 'center',
-          marginInlineStart: product(hook.overlap(overlap), '-1'),
+          marginInlineStart: product(hook.overlap, '-1'),
         }),
         /* A phone's circle is space, which stops growing at the largest
            standard text size, so the count stops there too and fits it, as

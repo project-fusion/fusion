@@ -151,11 +151,6 @@ export default styles(
         ),
         rule({ print: true }, { backgroundColor: 'transparent' }),
       ]),
-      /* Written out: `tone` lists no `primary`, on the element as here, and the
-         sheet draws one. A phone's callout takes the tones the prop lists. */
-      on({ part: 'host', selector: ':host([tone="primary"])' }, [
-        web([rule({ own: { calloutTone: token('color-primary') } })]),
-      ]),
       /* The tone's edge. Straight, and clipped to the host's corners. */
       on({ before: 'host' }, [
         rule({

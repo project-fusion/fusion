@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { fn, inherited, native, product, token } from '../../../style.js'
+import { fn, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -77,9 +77,6 @@ export default styles(
         fontWeight: hook.fontWeight,
         letterSpacing: token('tracking-wide'),
         lineHeight: 1,
-        /* Clear of the avatar that overlaps this one in a group, by the
-           share of it the group says the next one covers. */
-        marginInlineEnd: product(own.avatarSize, inherited('_avatar-group-clear', 0)),
         userSelect: 'none',
       }),
       /* A phone's circle is space, which stops growing at the largest

@@ -34,9 +34,9 @@ import root from './headless.js'
  *
  * **The message is centered, and the dismiss button stands out of flow** at
  * the end, with the message and the actions kept clear of it on both sides,
- * so the middle stays the middle. **The actions go under the message where
- * the line has no room for both**, centered, so the message keeps its width
- * at any width and text size.
+ * so the middle stays the middle. **On a phone the actions go under the
+ * message where the line has no room for both**, centered, so the message
+ * keeps its width at any text size. The web's stay beside it on one line.
  *
  * A queued announcement that waits draws nothing. Print draws no fill, and is
  * the web's.
@@ -87,19 +87,24 @@ export default styles(
           alignItems: 'center',
           backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
           color: hook.foregroundColor,
-          columnGap: token('space-md'),
           display: 'flex',
-          flexWrap: 'wrap',
           fontSize: hook.fontSize,
           fontWeight: token('weight-medium'),
           inlineSize: '100%',
-          justifyContent: 'center',
           minBlockSize: hook.blockSize,
           paddingBlock: token('space-xs'),
           paddingInline: hook.inset,
           position: 'relative',
-          rowGap: token('space-2xs'),
         }),
+        /* A phone's band wraps where the message and the actions do not fit a line. */
+        native([
+          rule({
+            columnGap: token('space-md'),
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            rowGap: token('space-2xs'),
+          }),
+        ]),
         variants('tone', {
           accent: { own: { announcementColor: token('color-accent') } },
           danger: { own: { announcementColor: token('color-danger') } },
@@ -155,20 +160,21 @@ export default styles(
         rule({ dismissible: true }, { paddingInline: clearance }),
       ]),
       on('actions', [
-        /* On a line of their own, the actions narrow to fit it, so they never run
-           past the band. */
         rule({
           alignItems: 'center',
           display: 'flex',
-          flex: '0 1 auto',
+          flex: '0 0 auto',
           gap: token('space-xs'),
-          minInlineSize: 0,
         }),
+        /* On a line of their own on a phone, the actions narrow to fit it, so they
+           never run past the band. */
+        native([rule({ flex: '0 1 auto', minInlineSize: 0 })]),
         rule({ dismissible: true }, { marginInlineEnd: clearance }),
         rule({ 'data-empty': true }, { display: 'none' }),
       ]),
       on({ region: 'actions', slotted: '*' }, [
-        rule({ child: 'later' }, { marginInlineStart: token('space-md') }),
+        web([rule({ marginInlineStart: token('space-md') })]),
+        native([rule({ child: 'later' }, { marginInlineStart: token('space-md') })]),
       ]),
       /* The glyph and a small pad, out of flow at the end. */
       on('dismiss', [
