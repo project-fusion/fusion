@@ -1,5 +1,5 @@
-/* Full strength in either mode, the same as the name beside it. The mark is one
-   color, so nothing here depends on the brand. */
+/* Full strength in either mode, the same as the name beside it. The inner line
+   draws itself in the accent. */
 .mark {
   color: var(--helix-color-foreground);
 }
