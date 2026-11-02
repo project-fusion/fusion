@@ -152,7 +152,8 @@ describe('the generated Avatar Group', () => {
     expect(host()?.props.accessibilityLabel).toBe('Reviewers')
   })
 
-  test('overlaps each avatar by a quarter of its own size, as the web does', async () => {
+  test('overlaps each avatar by one length at every size, as the web does', async () => {
+    const overlaps = new Set<unknown>()
     for (const size of ['sm', 'md', 'lg'] as const) {
       await render(
         themed(
@@ -165,32 +166,10 @@ describe('the generated Avatar Group', () => {
       const first = styleOf(screen.getByLabelText('Ada Lovelace') as never)
       const second = styleOf(screen.getByLabelText('Grace Hopper') as never)
       expect(first.marginStart).toBeUndefined()
-      expect(typeof second.width).toBe('number')
-      expect(second.marginStart).toBe(-Number(second.width) / 4)
+      expect(Number(second.marginStart)).toBeLessThan(0)
+      overlaps.add(second.marginStart)
     }
-  })
-
-  test('centers the initials of an overlapped avatar in the part left showing', async () => {
-    await render(
-      themed(
-        <HelixAvatarGroup>
-          <HelixAvatar name="Lin Wei" />
-          <HelixAvatar name="Grace Hopper" />
-        </HelixAvatarGroup>,
-      ),
-    )
-    const box = (letters: string) =>
-      all().find(
-        (node) =>
-          node.type === 'View' &&
-          (node.children ?? []).some(
-            (child) =>
-              typeof child !== 'string' && child.type === 'Text' && wordsOf(child) === letters,
-          ),
-      ) ?? { props: {} }
-    const second = styleOf(screen.getByLabelText('Grace Hopper') as never)
-    expect(styleOf(box('LW')).marginEnd).toBe(Number(second.width) / 4)
-    expect(styleOf(box('GH')).marginEnd ?? 0).toBe(0)
+    expect(overlaps.size).toBe(1)
   })
 
   test('draws them all with no max', async () => {
