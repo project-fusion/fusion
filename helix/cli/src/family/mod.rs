@@ -316,6 +316,7 @@ fn host_state_faults(folder: &Path) -> Result<Vec<String>, Failure> {
     Ok(broken)
 }
 
+#[cfg(feature = "internal")]
 /// Compiles each machine under the package's `src/machines` to the module
 /// beside it, or with `--check` says which written ones are behind.
 ///
