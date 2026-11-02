@@ -8,6 +8,17 @@
   inline-size: 100%;
 }
 
+/* **The demos draw in the accent.** The site's actions are ink, and a map in its
+   brand's colors shows the blue the first swatch offers, and a reader's own brand. */
+.mapsHero helix-map,
+.mapsDemo helix-map,
+.mapsPoints helix-map {
+  --helix-color-primary: var(--helix-color-accent);
+  --helix-color-primary-surface: var(--helix-color-accent-surface);
+  --helix-color-primary-surface-hover: var(--helix-color-accent-surface-hover);
+  --helix-color-foreground-on-primary: var(--helix-color-foreground-on-accent);
+}
+
 /* =============================================================== hero === */
 
 /* **The map drawn on the server**, over the canvas and under the markers,
