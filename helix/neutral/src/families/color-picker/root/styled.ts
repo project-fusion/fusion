@@ -632,7 +632,7 @@ export default styles(
         rule({ hover: true }, { borderColor: token('color-foreground-muted') }),
         rule(
           { focusVisible: true },
-          { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
+          { borderColor: token('color-focus-ring'), outline: ring, outlineOffset: 0 },
         ),
         /* Wrong, and the field says so, under the pointer and the caret too. */
         rule(
@@ -686,7 +686,7 @@ export default styles(
         rule({ hover: true }, { borderColor: token('color-foreground-muted') }),
         rule(
           { focusVisible: true },
-          { borderColor: token('color-primary'), outline: ring, outlineOffset: 0 },
+          { borderColor: token('color-focus-ring'), outline: ring, outlineOffset: 0 },
         ),
       ]),
       /* Written out: the browser's spinners, which no vocabulary names. */
