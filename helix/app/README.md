@@ -120,8 +120,8 @@ Each night, `.github/workflows/native-devices.yml` builds the gallery in
 Release and runs the Maestro flows in `.maestro` on an iOS simulator and an
 Android emulator. `scripts/devices.sh` runs them in passes, with the
 appearance and the text size each pass sets first, and its header lists the
-passes. Each platform runs the flows on one device and the screenshots on
-another, at once. The run keeps these for seven days:
+passes. Each platform runs the flows on one device and each pass of the
+screenshots on another, at once. The run keeps these for seven days:
 
 - a video of each family with a behavior
 - a screenshot of each family's examples in light and dark, at the default
