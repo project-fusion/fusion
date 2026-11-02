@@ -16,6 +16,7 @@ import { Gestures } from './gestures'
 import { Layers } from './layers'
 import { styles } from './page'
 import type { Routes } from './routes'
+import { StandingCopy, StandingUndo } from './standing'
 import { color } from './tokens'
 
 /* **What the device runs check that no example shows.** Each check is a
@@ -166,6 +167,8 @@ export const CHECKS: Readonly<
   numbers: { draw: () => <Numbers />, title: 'Numbers in German' },
   rtl: { draw: () => <Direction rtl />, title: 'Right to left' },
   'select-all': { draw: () => <SelectAll />, title: 'Checkbox Group' },
+  'standing-copy': { draw: () => <StandingCopy />, title: 'Copy Button' },
+  'standing-undo': { draw: () => <StandingUndo />, title: 'Toast' },
 }
 
 /** One check, by its name. */
