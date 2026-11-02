@@ -1,0 +1,19 @@
+<!-- @summary A select with focus, so its edge and the ring around it can be seen together. -->
+<helix-select
+  default-value="two"
+  id="choice"
+  label="Language"
+  name="choice"
+>
+  <helix-option value="one">English</helix-option>
+  <helix-option value="two">Spanish</helix-option>
+  <helix-option value="three">French</helix-option>
+</helix-select>
+
+<script type="module">
+  const choice = document.getElementById('choice')
+
+  await customElements.whenDefined('helix-select')
+  await choice.updateComplete
+  choice.focus()
+</script>
