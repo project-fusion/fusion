@@ -59,6 +59,9 @@ name: "Screens: Popover"
 - takeScreenshot: popover-plain-${MODE}-${SIZE}
 - openLink: helix://popover/offset/preview
 - extendedWaitUntil:
+    notVisible: .*ready to share with your team.*
+    timeout: 15000
+- extendedWaitUntil:
     visible: Details
     timeout: 15000
 - tapOn:
