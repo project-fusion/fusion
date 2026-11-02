@@ -36,6 +36,36 @@ export const useMore = () => {
 }
 
 /**
+ * Keeps a scroll view at its end as its content grows, and inside its content
+ * as its content shrinks, where `holds` says, as a toast's stack along the
+ * bottom keeps its newest message showing. It answers what the scroll view
+ * tells of its content's new length.
+ */
+export const useHeldEnd = (
+  holds: boolean,
+  scroller: RefObject<ScrollViewInstance | null>,
+  at: RefObject<Track>,
+) => {
+  const was = useRef(0)
+  return (content: number) => {
+    const grew = content > was.current
+    was.current = content
+    if (!holds) {
+      return
+    }
+    if (grew) {
+      scroller.current?.scrollToEnd({ animated: false })
+      return
+    }
+    const { frame, offset } = at.current
+    scroller.current?.scrollTo({
+      animated: false,
+      y: Math.min(offset, Math.max(0, content - frame)),
+    })
+  }
+}
+
+/**
  * What a scrolling part hands the binding that asks for it with a `pager`
  * prop: a step toward one end, as the web's scroll buttons take one.
  */
