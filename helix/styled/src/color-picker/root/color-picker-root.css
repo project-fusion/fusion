@@ -385,7 +385,7 @@
 }
 
 [part="value"]:focus-visible {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }
@@ -473,7 +473,7 @@
 }
 
 [part="field-input"]:focus-visible {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

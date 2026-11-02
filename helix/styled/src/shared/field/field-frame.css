@@ -40,13 +40,13 @@
    pointed at, so it has to say so.
 
    No offset, so the ring thickens the edge instead of drawing a second one. The
-   border turns `primary` and the ring is `focus-ring`, which are the same color:
-   at an offset the pair read as two blue lines with a gap of page between them,
-   a double-struck border rather than a focused field. Against the edge they are
-   one 3px edge in one color. */
+   border and the ring both read `focus-ring`: at an offset the pair read as two
+   lines with a gap of page between them, a double-struck border rather than a
+   focused field. Against the edge they are one 3px edge in one color, and a theme
+   that sets `focus-ring` apart from `primary` keeps it one. */
 :host(:focus-within) [part="field"],
 :host(:focus-within) [part="field"]:hover {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

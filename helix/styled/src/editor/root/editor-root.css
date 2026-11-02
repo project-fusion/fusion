@@ -41,7 +41,7 @@
    focus: the edge thickens rather than drawing a second one. Focus on a tool
    draws that tool's own ring and not this one. */
 :host(:state(document-focused):not([separation="plain"])) [part="region"] {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }

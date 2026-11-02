@@ -37,7 +37,7 @@
 
 /* One edge rather than two rings, the same as the input. */
 [part="trigger"]:focus-visible {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: 0;
 }
@@ -80,7 +80,7 @@
 /* Focus still draws an edge, because a control with no resting frame has nothing
    else to say where the keyboard is. */
 :host([emphasis="ghost"]) [part="trigger"]:focus-visible {
-  border-color: var(--helix-color-primary);
+  border-color: var(--helix-color-focus-ring);
 }
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed
