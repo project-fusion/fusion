@@ -1,18 +1,3 @@
-/* *The search in the masthead, and the space between its two halves.** A
-   button's `gap` is one number for everything it holds, which is right when the
-   parts are a mark and a word. */
-/* *The same glass as the panel it opens.** A trigger and the thing it summons
-   reading as one material is what makes the palette feel like it came out of the
-   button rather than over it. */
-.siteFind {
-  --button-background-color: var(--site-glass);
-  backdrop-filter: var(--site-glass-backdrop);
-}
-
-.siteFind helix-kbd {
-  margin-inline-start: var(--helix-space-sm);
-}
-
 /* *The palette, dressed as ours.** The component decides how a palette behaves
    and most of how it looks. */
 /* *A lighter wash than a modal's, which is what makes the glass legible.**
@@ -94,15 +79,14 @@
   --option-radius: var(--helix-radii-sm);
 }
 
-/* **Nothing to press them with.** The chip on the search button and the four
-   hints in the palette's footer are teaching: they exist so a reader with a
-   keyboard finds out there is a faster way in than the button they just used.
+/* **Nothing to press them with.** The four hints in the palette's footer are
+   teaching: they exist so a reader with a keyboard finds out there is a faster
+   way in than the button they just used.
    **On a wrapper of ours rather than on the key itself.** `Kbd` sets `display`
    on its own host, and a document rule setting it again wins whatever the
    specificity, which is a component quietly overruled from outside, and `helix
    component`'s `overruled` rule says so. */
 @media (max-width: 40rem) {
-  .keysOnly,
   .siteCommandHints {
     display: none;
   }
