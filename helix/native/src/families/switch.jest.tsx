@@ -6,6 +6,8 @@
  * this file, as the styled package's build writes the one it ships.
  */
 
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
 import { fakeFocus } from '@fusion.dev/helix-core/capabilities/focus/fake'
 import { setKeys } from '@fusion.dev/helix-core/capabilities/keys'
@@ -19,7 +21,11 @@ import type { Family } from '../style/form'
 import { HelixTheme, useTokens } from '../theme/helix-theme'
 import { HelixSwitch, type HelixSwitchProps } from './switch/index.native'
 
-const switchForm = require('../../../neutral/build/ir/switch/root.json') as Family
+/* The form the generated component holds, since `test:native` writes that and no build of the neutral sources. */
+const generated = readFileSync(join(__dirname, 'switch/index.native.ts'), 'utf8')
+const switchForm = JSON.parse(
+  /^const rootForm: Family = (.+)$/m.exec(generated)?.[1] ?? '{}',
+) as Family
 
 /** Sets the reader's text size, as iOS and Android report a change to it. */
 const atTextSize = (fontScale: number): void => {
