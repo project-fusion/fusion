@@ -70,6 +70,8 @@ import type {
   NotificationsRootChoice,
   OptionChoice,
   OptionGroupChoice,
+  PaginationRootChoice,
+  PaginationSizeChoice,
   SelectChoice,
   TableChoice,
   TableColumnChoice,
@@ -321,6 +323,10 @@ export interface Headless {
   readonly option?: OptionChoice
   /** What the element reads where it is a group of options, or a rule between runs. */
   readonly optionGroup?: OptionGroupChoice
+  /** What the element reads, sends, and computes where it is a row of pages. */
+  readonly paginationRoot?: PaginationRootChoice
+  /** What the element reads, sends, and computes where it chooses a page size. */
+  readonly paginationSize?: PaginationSizeChoice
   /** What the element reads, sends, and computes where it is a carousel. */
   readonly carousel?: CarouselChoice
   /** What the element reads, sends, and computes where it is a conversation. */

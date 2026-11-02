@@ -645,3 +645,50 @@ export interface NotificationGroupChoice {
   readonly counted?: string
   readonly label?: string
 }
+
+/** A row of pages's names, each read as `paginationRoot.x`. */
+export interface PaginationRootChoice {
+  readonly atEnd?: string
+  readonly atStart?: string
+  readonly boundaries?: string
+  readonly compact?: string
+  readonly defaultPage?: string
+  readonly empty?: string
+  readonly ends?: string
+  readonly fallbackLabel?: string
+  readonly firstLabel?: string
+  readonly gapLabel?: string
+  readonly label?: string
+  readonly lastLabel?: string
+  readonly locale?: string
+  readonly nextLabel?: string
+  readonly onBeforeNavigate?: string
+  readonly onNavigate?: string
+  readonly page?: string
+  readonly pageLabel?: string
+  readonly pageSize?: string
+  readonly pages?: string
+  readonly previousLabel?: string
+  readonly siblings?: string
+  readonly slots?: string
+  readonly status?: string
+  readonly statusLabel?: string
+  readonly total?: string
+}
+
+/** A page-size control's names, each read as `paginationSize.x`. */
+export interface PaginationSizeChoice {
+  readonly defaultValue?: string
+  readonly disabled?: string
+  readonly empty?: string
+  readonly fallbackLabel?: string
+  readonly label?: string
+  readonly locale?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onInput?: string
+  readonly options?: string
+  readonly shown?: string
+  readonly sizes?: string
+  readonly value?: string
+}

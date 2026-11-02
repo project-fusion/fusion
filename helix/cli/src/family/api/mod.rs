@@ -75,7 +75,8 @@ pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
     TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, INSPECTOR, LISTBOX,
     LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
-    OPTION, OPTION_GROUP, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW,
+    TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -189,6 +190,12 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a carousel.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub carousel: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a row of pages.
+    #[serde(rename = "paginationRoot", skip_serializing_if = "Option::is_none")]
+    pub pagination_root: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it chooses a page size.
+    #[serde(rename = "paginationSize", skip_serializing_if = "Option::is_none")]
+    pub pagination_size: Option<TreeChoice>,
     #[serde(rename = "chatRoot", skip_serializing_if = "Option::is_none")]
     pub chat_root: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a turn in a conversation.
@@ -346,6 +353,8 @@ impl Api {
             && self.notification_row.is_none()
             && self.notification_group.is_none()
             && self.carousel.is_none()
+            && self.pagination_root.is_none()
+            && self.pagination_size.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
             && self.option.is_none()
@@ -427,6 +436,8 @@ const FIELDS: &[&str] = &[
     "notificationRow",
     "notificationGroup",
     "carousel",
+    "paginationRoot",
+    "paginationSize",
     "listbox",
     "select",
     "option",
@@ -477,6 +488,12 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::notification_group)
             .transpose()?,
         carousel: field("carousel").map(tree_choice::carousel).transpose()?,
+        pagination_root: field("paginationRoot")
+            .map(tree_choice::pagination_root)
+            .transpose()?,
+        pagination_size: field("paginationSize")
+            .map(tree_choice::pagination_size)
+            .transpose()?,
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
         select: field("select").map(tree_choice::select).transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
