@@ -78,6 +78,15 @@ export default styles(
     const clearBottom = sum(padding, safeArea('bottom'))
     /* The title's first line, where the close control is centered. */
     const titleLine = product(token('text-lg'), token('leading-tight'))
+    /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
+       show and the two were one fill, so inside the drawer the token sits a step above it. In
+       light the shadow separates them. */
+    const step = rule({
+      '--helix-color-surface-overlay': scheme(
+        own.drawerGround,
+        mix(token('color-foreground'), 8, own.drawerGround),
+      ),
+    })
     return [
       /* The host draws nothing, and holds the panel's size and the scrim's tint. */
       on('host', [
@@ -105,6 +114,7 @@ export default styles(
         rule({ startingStyle: true, open: true }, { opacity: 0 }),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
+      on('panel', [step]),
       on('panel', [
         rule({
           borderRadius: hook.radius,
@@ -115,13 +125,6 @@ export default styles(
           inset: web('auto'),
           inlineSize: 'auto',
           blockSize: 'auto',
-          /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
-             show and the two were one fill, so inside the drawer the token sits a step above it. In
-             light the shadow separates them. */
-          '--helix-color-surface-overlay': scheme(
-            own.drawerGround,
-            mix(token('color-foreground'), 8, own.drawerGround),
-          ),
           backgroundColor: own.drawerGround,
           padding,
           paddingBlockStart: own.drawerLead(paddingTop),

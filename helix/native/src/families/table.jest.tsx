@@ -136,3 +136,28 @@ describe('a table on a phone', () => {
     expect(screen.getByLabelText('Pick us-east-1')).toBeTruthy()
   })
 })
+
+describe('a heading on a phone', () => {
+  test('draws its two chevrons where it sorts, in one ink until it is sorted', async () => {
+    const drawn = await render(
+      <HelixRoot>
+        <HelixTable label="Services">
+          <HelixTableColumn field="region" sortable>
+            Region
+          </HelixTableColumn>
+          <HelixTableColumn>Owner</HelixTableColumn>
+          <HelixTableRow>
+            <HelixTableCell>us-east-1</HelixTableCell>
+            <HelixTableCell>Sam</HelixTableCell>
+          </HelixTableRow>
+        </HelixTable>
+      </HelixRoot>,
+    )
+    const shapes = (d: string) => drawn.container.queryAll((node) => node.props.d === d)
+    const up = 'M5.5 7.2 9 3.7l3.5 3.5'
+    const down = 'M5.5 10.8 9 14.3l3.5-3.5'
+    expect(shapes(up).length).toBeGreaterThan(0)
+    expect(shapes(down).length).toBeGreaterThan(0)
+    expect(new Set(shapes(up).map((node) => node.props.stroke)).size).toBe(1)
+  })
+})
