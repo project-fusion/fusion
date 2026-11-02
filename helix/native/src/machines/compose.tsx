@@ -38,6 +38,7 @@ import { useNotificationGroup } from './notification-group'
 import { useNotifications } from './notifications'
 import { useOption, useOptionGroup } from './option'
 import { usePage } from './page'
+import { usePagination, usePaginationSize } from './pagination'
 import { pressing } from './pressing'
 import { boundTo } from './props'
 import { useRange } from './range'
@@ -377,6 +378,21 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           () =>
             useOptionGroup(use),
+      ),
+    /* A row of pages, and a page-size control. */
+    ...uses
+      .filter((use) => use.machine === 'pagination')
+      .map(
+        (use): Binder =>
+          (props) =>
+            usePagination(family, props, use),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'pagination-size')
+      .map(
+        (use): Binder =>
+          (props) =>
+            usePaginationSize(family, props, use),
       ),
     /* A carousel. */
     ...uses

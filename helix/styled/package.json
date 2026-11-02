@@ -443,6 +443,14 @@
       "default": "./dist/outline/index.js"
     },
     "./package.json": "./package.json",
+    "./pagination": {
+      "react-native": {
+        "types": "./dist/pagination/index.native.d.ts",
+        "default": "./dist/pagination/index.native.js"
+      },
+      "types": "./dist/pagination/index.d.ts",
+      "default": "./dist/pagination/index.js"
+    },
     "./pin-input": {
       "react-native": {
         "types": "./dist/pin-input/index.native.d.ts",

@@ -3,7 +3,7 @@ import { HelixHeadlessPaginationSize } from '@fusion.dev/helix-headless/paginati
 import type { CSSResultGroup } from 'lit'
 import '../../option/index.js'
 import '../../select/index.js'
-import { styles } from './pagination-size.css.js'
+import { styles } from './pagination-size.generated.css.js'
 
 /**
  * @summary A control for choosing how many items each page shows.
