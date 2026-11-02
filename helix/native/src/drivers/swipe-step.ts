@@ -39,3 +39,26 @@ export const stepped = (travel: number, delta: number, held: Held | undefined): 
   const takes = held === undefined || (delta > 0 ? held.room <= 0 && held.still : travel > 0)
   return { takes, travel: takes ? Math.max(0, travel + delta) : travel }
 }
+
+/** How far a pan stands from where it began, along both axes. */
+export interface Travelled {
+  readonly x: number
+  readonly y: number
+}
+
+/**
+ * Where a surface stands once a finger lifts: the last update, and the part of the
+ * move between that update and the release. **A release can stand well past the
+ * last update**, as a slow frame coalesces the moves before it, and the surface
+ * would rest by where the last update left it: a drag past the middle came back.
+ */
+export const released = (
+  edge: SwipeEdge,
+  travel: number,
+  seen: Travelled,
+  lifted: Travelled,
+  held: Held | undefined,
+): number => {
+  'worklet'
+  return stepped(travel, towardEdge(edge, lifted.x - seen.x, lifted.y - seen.y), held).travel
+}
