@@ -117,6 +117,12 @@ helix-headless-table-column::part(sort) {
   min-inline-size: 0;
 }
 
+helix-headless-table-column::part(sort-mark) {
+  block-size: 1em;
+  flex: none;
+  inline-size: 1em;
+}
+
 helix-headless-table-column[text-align="end"]::part(column),
 helix-headless-table-column[text-align="end"]::part(sort) {
   justify-content: flex-end;
