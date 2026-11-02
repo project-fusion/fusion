@@ -34,7 +34,7 @@ export const DerivationDiagram = () => (
       <defs>
         <linearGradient id="derivation-chroma" x1="0" x2="1">
           <stop offset="0" stopColor="var(--helix-color-foreground-subtle)" />
-          <stop offset="1" stopColor="var(--helix-color-primary)" />
+          <stop offset="1" stopColor="var(--helix-color-accent)" />
         </linearGradient>
         <linearGradient id="derivation-fade" x1="0" x2="1">
           <stop offset="0" stopColor="white" stopOpacity="0" />
@@ -59,9 +59,9 @@ export const DerivationDiagram = () => (
           />
         </pattern>
         <radialGradient id="derivation-bloom">
-          <stop offset="0" stopColor="var(--helix-color-primary)" stopOpacity="0.22" />
-          <stop offset="0.6" stopColor="var(--helix-color-primary)" stopOpacity="0.05" />
-          <stop offset="1" stopColor="var(--helix-color-primary)" stopOpacity="0" />
+          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.22" />
+          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.05" />
+          <stop offset="1" stopColor="var(--helix-color-accent)" stopOpacity="0" />
         </radialGradient>
         {/* Four squares at the frame's corners. Unpainted area in a mask is
             black and therefore hidden, so the squares are the whole of it. 24
@@ -228,7 +228,7 @@ export const DerivationDiagram = () => (
           enough that none of this affects what is clickable. */}
       <g data-ch="brand">
         <rect fill="transparent" height="64" width="200" x="64" y="88" />
-        <rect fill="var(--helix-color-primary)" height="32" rx="9" width="32" x="158.5" y="104" />
+        <rect fill="var(--helix-color-accent)" height="32" rx="9" width="32" x="158.5" y="104" />
         <text className={styles.diagramMeta} fontSize="15" textAnchor="end" x="246" y="126">
           brand
         </text>
@@ -535,7 +535,7 @@ export const DerivationDiagramStacked = () => (
       <defs>
         <linearGradient id="derivation-chroma-stacked" x1="0" x2="1">
           <stop offset="0" stopColor="var(--helix-color-foreground-subtle)" />
-          <stop offset="1" stopColor="var(--helix-color-primary)" />
+          <stop offset="1" stopColor="var(--helix-color-accent)" />
         </linearGradient>
       </defs>
 
@@ -546,7 +546,7 @@ export const DerivationDiagramStacked = () => (
       {/* Four across, each icon over its word. The columns are 85 apart, which
           is what `saturation` needs at 11 and the widest of the four. */}
       <g>
-        <rect fill="var(--helix-color-primary)" height="24" rx="7" width="24" x="30" y="34" />
+        <rect fill="var(--helix-color-accent)" height="24" rx="7" width="24" x="30" y="34" />
         <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="42" y="76">
           brand
         </text>
@@ -602,7 +602,7 @@ export const DerivationDiagramStacked = () => (
         </g>
       </g>
 
-      <circle cx="170" cy="168" fill="var(--helix-color-primary)" r="3.5" />
+      <circle cx="170" cy="168" fill="var(--helix-color-accent)" r="3.5" />
 
       {/* Three across, each number over its two words. Split onto two lines
           rather than shrunk: 113 units a column will not hold `semantic tokens`

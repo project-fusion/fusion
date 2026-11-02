@@ -222,13 +222,13 @@
  *
  * **In the brand, and in the muted gray under ink.** A brand is a second tone
  * on its own, and muted it read as washed out, so the site's blue and a brand a
- * reader picks both take `primary`. A reader who picks ink has `primary` as the
+ * reader picks both take the accent. A reader who picks ink has the accent as the
  * ink itself, and beside a heading already in the foreground it was the same
  * color: near-white on white in dark mode, and near-black on black in light. So
  * a theme painted without `data-site-brand` takes `primary-muted`.
  */
 .tDisplayAccent {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
   /* **Its own line, so the color break and the line break are the same break.**
      `text-wrap: balance` on the heading optimises for even line lengths and
      knows nothing about the two tones: it stranded "and" at the end of the first

@@ -4,7 +4,7 @@
    `transform-origin` at the start edge, because the component scales it on X
    from 0 and a bar that grows from its middle is not a progress bar. */
 .readingProgress {
-  background-color: var(--helix-color-primary);
+  background-color: var(--helix-color-accent);
   block-size: 2px;
   inset-block-start: var(--helix-size-header);
   inset-inline: 0;

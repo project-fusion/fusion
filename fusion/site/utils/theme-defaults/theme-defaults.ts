@@ -74,8 +74,8 @@ export const INITIAL: Settings = {
 }
 
 /**
- * The brand the site wears, which its theme panel, its showcase, and its share
- * cards start from: Fusion's blue, the seed `app/site.css` sets.
+ * The blue the site's theme panel, its showcase, and its share cards start from:
+ * Fusion's blue, the accent seed `app/site.css` sets.
  *
  * **Its own constant, apart from `INITIAL`**, which is the builder's: the
  * builder starts from ink, the palette Helix ships, and the site is Fusion's,

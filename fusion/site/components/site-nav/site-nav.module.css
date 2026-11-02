@@ -219,7 +219,7 @@
    left in the band; a dot beside a picture reads as a bullet; the name in the
    primary is the row recipe's dot, carried by the word. */
 .tile[aria-current="page"] .tileName {
-  color: var(--helix-color-primary);
+  color: var(--helix-color-accent);
 }
 
 .tileSummary {

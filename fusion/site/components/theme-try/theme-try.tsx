@@ -27,7 +27,7 @@ const BRANDS = [
  */
 const siteBrand = (): string => {
   const probe = document.createElement('span')
-  probe.style.color = 'var(--helix-color-primary)'
+  probe.style.color = 'var(--helix-color-accent)'
   document.body.append(probe)
   const color = getComputedStyle(probe).color
   probe.remove()

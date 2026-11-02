@@ -66,9 +66,9 @@ export const PlatformDiagram = () => (
 
       <defs>
         <radialGradient id="platform-bloom">
-          <stop offset="0" stopColor="var(--helix-color-primary)" stopOpacity="0.22" />
-          <stop offset="0.6" stopColor="var(--helix-color-primary)" stopOpacity="0.05" />
-          <stop offset="1" stopColor="var(--helix-color-primary)" stopOpacity="0" />
+          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.22" />
+          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.05" />
+          <stop offset="1" stopColor="var(--helix-color-accent)" stopOpacity="0" />
         </radialGradient>
       </defs>
 
@@ -80,7 +80,7 @@ export const PlatformDiagram = () => (
       {/* Each glyph sits 16 units left of its measured label, so the gap is the
           same on every row. The x values assume Fusion Sans at 15. */}
       <g>
-        <rect fill="var(--helix-color-primary)" height="32" rx="9" width="32" x="122" y="124" />
+        <rect fill="var(--helix-color-accent)" height="32" rx="9" width="32" x="122" y="124" />
         <text className={styles.platformMeta} fontSize="15" textAnchor="end" x="246" y="145">
           your brand
         </text>
@@ -210,9 +210,9 @@ export const PlatformDiagramStacked = () => (
 
       <defs>
         <radialGradient id="platform-bloom-stacked">
-          <stop offset="0" stopColor="var(--helix-color-primary)" stopOpacity="0.22" />
-          <stop offset="0.6" stopColor="var(--helix-color-primary)" stopOpacity="0.05" />
-          <stop offset="1" stopColor="var(--helix-color-primary)" stopOpacity="0" />
+          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.22" />
+          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.05" />
+          <stop offset="1" stopColor="var(--helix-color-accent)" stopOpacity="0" />
         </radialGradient>
       </defs>
 
@@ -220,7 +220,7 @@ export const PlatformDiagramStacked = () => (
         What you bring
       </text>
 
-      <rect fill="var(--helix-color-primary)" height="24" rx="7" width="24" x="45" y="34" />
+      <rect fill="var(--helix-color-accent)" height="24" rx="7" width="24" x="45" y="34" />
       <text className={styles.platformMeta} fontSize="11" textAnchor="middle" x="57" y="76">
         your brand
       </text>

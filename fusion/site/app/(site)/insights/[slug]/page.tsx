@@ -156,7 +156,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
          * the title. */
         <helix-flex align-items="center" class={styles.insightFiling} gap="sm" wrap>
           <Link data-link="quiet" href={`/insights?topic=${encodeURIComponent(insight.topic)}`}>
-            <helix-tag tone="primary">{insight.topic}</helix-tag>
+            <helix-tag tone="accent">{insight.topic}</helix-tag>
           </Link>
           <helix-text scale="caption">
             <PublishedOn date={insight.date}>{formatDate(insight.date)}</PublishedOn>

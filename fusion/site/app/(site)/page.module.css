@@ -230,7 +230,7 @@
  * the evidence rather than skipping it.
  */
 .proofList li {
-  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-accent) 70%, transparent);
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-md);
   line-height: 1.5;
@@ -374,22 +374,22 @@
    on it, and its words and button invert to stay readable on the fill. */
 .noRules :global([data-closing][data-closing][data-closing]) {
   backdrop-filter: none;
-  background: var(--helix-color-primary-surface);
+  background: var(--helix-color-accent-surface);
   border-color: transparent;
   box-shadow: 0 24px 60px -30px
-    color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
-  color: var(--helix-color-foreground-on-primary);
+    color-mix(in oklab, var(--helix-color-accent-surface) 70%, transparent);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 .closingCard :global([data-section-title]),
 .closingCard :global(helix-text) {
-  color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 .closingCard :global([data-button][data-button]) {
-  background: var(--helix-color-foreground-on-primary);
-  border-color: var(--helix-color-foreground-on-primary);
-  color: var(--helix-color-primary-surface);
+  background: var(--helix-color-foreground-on-accent);
+  border-color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-accent-surface);
 }
 
 /* ── The figure answers the pointer ────────────────────────────────── */

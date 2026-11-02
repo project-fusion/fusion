@@ -26,7 +26,7 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
             the subject carries the brand and the kind of writing stays neutral
             beside it. */}
         <helix-flex align-items="center" data-density="sm" gap="sm" slot="header" wrap>
-          <helix-tag tone="primary">{insight.topic}</helix-tag>
+          <helix-tag tone="accent">{insight.topic}</helix-tag>
           <helix-tag>{insight.kind}</helix-tag>
         </helix-flex>
 
