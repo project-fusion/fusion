@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import type { MapSnapshot } from '@fusion.dev/helix-map/snapshot'
+import type { CreditPart, MapSnapshot } from '@fusion.dev/helix-map/snapshot'
 import { useEffect, useRef, useState } from 'react'
 import { MapCredit } from '@/components/map-credit/map-credit'
 import { MAP_FAILED } from '@/content/maps/maps'
@@ -35,8 +35,13 @@ const COUNTED = AUSTIN_PLACES.toLocaleString('en-US')
  * **What was pressed is said under it**, the point's name through the same
  * `helix-activate` a marker sends, in a polite live region, so pressing one
  * does something a reader can see and hear without the demo opening panels.
+ *
+ * **Its credit is in the page, from `credit`**, so the frame credits the tiles
+ * before anyone nears it. Read only from the snapshot, it arrived with that
+ * answer: a whole-page picture is taken without scrolling, so the visual check
+ * pictured the frame with the credit or without it, by which finished first.
  */
-export function MapsPoints() {
+export function MapsPoints({ credit }: { credit: readonly CreditPart[] }) {
   const frame = useRef<HelixMap>(null)
   const container = useRef<HTMLDivElement>(null)
   /* Said in the map's footer, where a failed load would leave an empty box. */
@@ -169,7 +174,7 @@ export function MapsPoints() {
             data-helix-map-snapshot=""
           />
         ) : null}
-        <MapCredit credit={snapshot?.credit ?? []} />
+        <MapCredit credit={snapshot?.credit?.length ? snapshot.credit : credit} />
         <helix-map-points
           cluster
           description={`${COUNTED} places from OpenStreetMap`}
