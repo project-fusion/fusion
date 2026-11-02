@@ -66,6 +66,12 @@
  * 3.5px from each edge and 4.3px from the top and the bottom, a control set in
  * its box rather than pushed against one wall of it.
  *
+ * **What follows the seam starts at the field's inset**, so text stands the same
+ * distance from the seam as it does from the border of a field with no lead. The
+ * row's gap alone left the text 4 pixels from the seam against that 12. On the lead
+ * rather than on what follows it, so chips and text take the same start, and a
+ * later line of the wrapped row starts at the field's padding as it did.
+ *
  * Hidden rather than absent when nothing is slotted, because a second template
  * branch would rebuild the slot inside it, and a rebuilt slot fires `slotchange`
  * on its way out with nothing assigned. `Menu.Item` records that trap.
@@ -77,6 +83,10 @@
     var(--filter-input-lead-border-color, var(--helix-color-border));
   display: flex;
   margin-block: calc(var(--helix-space-2xs) * -1);
+  margin-inline-end: calc(
+    var(--filter-input-padding-inline, var(--helix-space-field)) -
+    var(--helix-space-2xs)
+  );
   margin-inline-start: calc(var(--helix-space-xs) * -1);
   padding-inline: var(--helix-space-2xs);
 }
