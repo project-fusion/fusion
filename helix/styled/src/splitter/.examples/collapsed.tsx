@@ -1,11 +1,10 @@
-import './collapsed.css'
-
 export function Example() {
   return (
     <helix-splitter
       collapsed-size="8"
       default-collapsed="end"
       default-position="60"
+      style={{ blockSize: '12rem' }}
     >
       <helix-card
         separation="plain"

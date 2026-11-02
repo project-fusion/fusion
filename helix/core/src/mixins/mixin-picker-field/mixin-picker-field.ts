@@ -4,6 +4,7 @@ import { PopoverController } from '../../controllers/popover-controller/popover-
 import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { submitImplicitly } from '../../utils/implicit-submit/implicit-submit.js'
+import { placedStates } from '../../utils/layers/layers.js'
 import { reportValues } from '../../utils/report-values/report-values.js'
 import { tabStops } from '../../utils/tab-stops/tab-stops.js'
 import { type PickerVerdict, verdictFlags } from '../../utils/verdict-flags/verdict-flags.js'
@@ -234,7 +235,17 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
          says the two are separate things rather than one control that grew. */
       offset: () => 8,
       onDismiss: () => this.requestOpen(false),
-      onPlace: (_placement, room) => this.placed(room),
+      /* The side the panel landed on and the end it lines up on, which the
+         shared entrance grows it out of, as Popover records them. */
+      onPlace: (placement, room) => {
+        /* A panel that asks for `bottom-start` lands below or above, at the
+           start, so these three are the states it can be in. */
+        const placed = placedStates(placement)
+        this.toggleState('aligned-start', placed['aligned-start'] === true)
+        this.toggleState('placed-bottom', placed['placed-bottom'] === true)
+        this.toggleState('placed-top', placed['placed-top'] === true)
+        this.placed(room)
+      },
       open: () => this.open,
       placement: 'bottom-start',
       surface: () => this.partNamed('surface'),
@@ -509,7 +520,15 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     protected readonly handleTriggerClick = (event?: Event): void => {
       const opening = !this.open
       this.fromTrigger = opening
+      const held = this.partNamed('surface')?.contains(
+        (this.renderRoot as ShadowRoot).activeElement,
+      )
       this.toggleOpen()
+      /* A press that closes the panel with focus inside it gives focus to the
+         trigger. WebKit focuses no button on a press, and focus fell to the page. */
+      if (!opening && !this.open && held === true) {
+        this.partNamed('trigger')?.focus()
+      }
       /* A press, so Escape goes back to the trigger. Alt+Down from a segment
          calls this with no event, and Escape goes back to that segment. */
       this.pressedOpen = event !== undefined && opening && this.open

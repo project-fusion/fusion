@@ -850,6 +850,13 @@ between two widgets is structural wherever it is made. It may not be a place to 
 something that *is* on an axis, and no property is named `variant`, which says
 nothing about what it chooses.
 
+A choice changes how one family's semantics look or fit: the same tabs drawn as a track or
+over a rule, the same time chosen from a list or from wheels. Where a presentation reproduces
+another family's semantics, structure, and behavior, the developer picks that family, and
+Helix does not add it as a choice. [Framework
+typings](#framework-typings-and-the-names-they-carry) says the same further down: a choice is
+a prop, and an alternative is a separate component.
+
 A hook that fills an area ends in `-background-color`. A hook ending in `-color` is ink, or a mark
 or a line whatever draws it: a thumb, a track that is also a ring's stroke, a Divider.
 
@@ -894,7 +901,8 @@ Editor, and Canvas, does not offer it. An unset one keeps its fill and edge.
 emphasis rule is three, so an emphasis without a hover of its own loses its fill
 the moment a pointer touches it. Measured on the old `danger`, which had no hover
 rule and turned neutral gray under the pointer in every build since it was
-written. `button-root.css` carries the count beside the rules it explains.
+written. Button's style table, `helix/neutral/src/families/button/root/styled.ts`,
+carries the count beside the rules it explains.
 
 ## Size and density
 
@@ -1025,6 +1033,16 @@ looks correct and the component is quietly unstyled.
 
 Per-component hooks (`--card-padding`) are not Helix tokens and are exempt. They
 should default to a semantic token.
+
+**`tokens.ts` writes each value with the builders in `builders.ts`**, such as
+`times(rem(2.5), density)` or `lightDark(primitive('neutral-0'),
+primitive('neutral-1000'))`, so a misspelled builder or a wrong unit is a type
+error. `helix system` reads the calls as syntax and never runs them, so a value
+holds only builders, numbers, quoted strings and the names `builders.ts`
+exports, and each is held to print back as the same calls. The registry writes
+the native modules and the Design Tokens Format Module file from the typed
+values, and `helix system design-tokens` refuses a token whose CSS differs from
+what its builders return.
 
 **Every panel that floats over the page takes `--helix-radii-sm`, and
 `helix component`'s `corners` holds it.** A radius is read against the corner
@@ -2753,6 +2771,17 @@ positional precisely because of the paragraph above: a leading comment already
 means "scaffolding", and read by position the Form example's description would
 tell a reader it is about a swallowed submit. `@summary` rather than
 `@description`, because that is already this codebase's word for a single line.
+
+**A summary holds on every device it is read on.** It says what the example
+does, and "press" is the word for a click, a tap, or a key that activates:
+"sorts when you press a heading". It names an input only when that input is the
+instruction, such as a shortcut, Shift with an arrow, or a right-click. Where a
+phone does it another way, `<!-- @react-native-summary … -->` beside it says
+how, and the manifest carries it under the example's `platforms`, keyed by
+`react-native`, because "native" alone already means the browser's own elements
+here. List's
+`reordering` has one, because a phone moves a row with a screen reader where
+the web uses the arrow keys.
 
 **Examples reach the manifest, not the site.** `helix-examples` walks
 `src/<family>/.examples` and records slug and description on the family's root

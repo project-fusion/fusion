@@ -1,45 +1,47 @@
 export function Example() {
   return (
-    <helix-timeline
-      label="Deployment history"
-      orientation="horizontal"
-    >
-      <helix-timeline-item
-        datetime="2026-08-19T09:12"
-        tone="success"
+    <helix-scroll-area orientation="horizontal">
+      <helix-timeline
+        label="Deployment history"
+        orientation="horizontal"
       >
-        <span slot="time">09:12</span>
-        <helix-text scale="body-strong">Deployed to production</helix-text>
-        <helix-text
-          emphasis="muted"
-          scale="caption"
+        <helix-timeline-item
+          datetime="2026-08-19T09:12"
+          tone="success"
         >
-          Version 4.2.0, by the release job.
-        </helix-text>
-      </helix-timeline-item>
-      <helix-timeline-item
-        datetime="2026-08-19T08:47"
-        tone="danger"
-      >
-        <span slot="time">08:47</span>
-        <helix-text scale="body-strong">Rolled back</helix-text>
-        <helix-text
-          emphasis="muted"
-          scale="caption"
+          <helix-text slot="time">09:12</helix-text>
+          <helix-text scale="body-strong">Deployed to production</helix-text>
+          <helix-text
+            emphasis="muted"
+            scale="caption"
+          >
+            Version 4.2.0, by the release job.
+          </helix-text>
+        </helix-timeline-item>
+        <helix-timeline-item
+          datetime="2026-08-19T08:47"
+          tone="danger"
         >
-          The health check failed on two regions.
-        </helix-text>
-      </helix-timeline-item>
-      <helix-timeline-item datetime="2026-08-18T16:30">
-        <span slot="time">16:30</span>
-        <helix-text scale="body-strong">Opened the release</helix-text>
-        <helix-text
-          emphasis="muted"
-          scale="caption"
-        >
-          Three changes waiting for review.
-        </helix-text>
-      </helix-timeline-item>
-    </helix-timeline>
+          <helix-text slot="time">08:47</helix-text>
+          <helix-text scale="body-strong">Rolled back</helix-text>
+          <helix-text
+            emphasis="muted"
+            scale="caption"
+          >
+            The health check failed on two regions.
+          </helix-text>
+        </helix-timeline-item>
+        <helix-timeline-item datetime="2026-08-18T16:30">
+          <helix-text slot="time">16:30</helix-text>
+          <helix-text scale="body-strong">Opened the release</helix-text>
+          <helix-text
+            emphasis="muted"
+            scale="caption"
+          >
+            Three changes waiting for review.
+          </helix-text>
+        </helix-timeline-item>
+      </helix-timeline>
+    </helix-scroll-area>
   )
 }

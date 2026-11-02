@@ -639,7 +639,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     if (from === undefined || to === '' || this.held.length > 2) {
       return false
     }
-    return at > (from < to ? from : to) && at < (from < to ? to : from)
+    const [low = from, high = to] = [from, to].sort()
+    return at > low && at < high
   }
 
   /** The readings the wheels show, from the value or from `min`. */
@@ -1337,6 +1338,9 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * from the same template.
    */
   protected renderList(): TemplateResult {
+    /* Read once for the list rather than once a row: a day in 15 second steps
+       is 5,760 rows. */
+    const clock = this.clock
     return html`<${this.tag('listbox')}
       part="list"
       aria-describedby=${this.describedBy}
@@ -1362,7 +1366,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       ${this.times.map((seconds) => {
         const at = this.valueFor(seconds)
         const between = this.between(at)
-        const written = writeClock(at, this.clock, this.seconds)
+        const written = writeClock(at, clock, this.seconds)
         const drawn = this.timeContent
         return html`<${this.tag('option')}
           part="option${between ? ' option-between' : ''}"

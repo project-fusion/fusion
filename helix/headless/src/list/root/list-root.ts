@@ -1,4 +1,5 @@
 import {
+  auditDescription,
   auditName,
   commaList,
   customElement,
@@ -75,20 +76,31 @@ import {
  * | A letter or a word | Moves to the next row whose words start with what you typed. |
  * | Left, Right | Moves between the row and the controls in its `end` slot. |
  * | Space | Selects the row, or lets it go. |
- * | Shift with Down, Up, Home, End, Page Down, Page Up or Space | Selects every row from the last one pressed, in `multiple`. |
+ * | Shift with Down, Up, Home, End, Page Down, Page Up or Space | Selects every row from the last one pressed, in `multiple`, in place of the rows the last such key selected. |
  * | Control or Command with Down, Up, Home, End, Page Down or Page Up | Moves without selecting, under `replace`. |
  * | Control or Command with A | Selects every row, in `multiple`. |
  * | Escape | Lets go of every selected row, asking first, and keeps the key from the dialog or menu around the list. With nothing selected, the key goes on to them. |
  * | Enter | Acts on the row: follows its link, or sends `helix-action` from it. |
  *
  * A press with Shift selects every row from the last one pressed, and a press
- * with Control or Command adds or takes out one row under `replace`.
+ * with Control or Command adds or takes out one row under `replace`. A Shift
+ * range takes the place of the last one, as React Aria's does: moving back
+ * toward the row the range runs from lets go of the rows it passed, and rows
+ * selected before the range began stay selected.
  *
  * **Leave `selection-mode` unset for a list a reader reads**, and set it for
  * one a reader chooses from or acts on. The rows of an interactive list are
  * grid rows, which hold controls as a list box option cannot. Give a control
  * in `end` `tabindex="-1"` to leave it to the arrow keys and out of the tab
  * order.
+ *
+ * **`kind="description"` is for a list whose rows are pressed, selected, or
+ * reordered**, such as settings whose rows each open a page, with the
+ * setting's name over its current value. A static list of terms and their
+ * meanings is a Description List, whose items are a real `<dt>` and `<dd>`. A
+ * development build warns once, with the runtime kind `static-description`,
+ * where a list at `description` has no `selection-mode`, no `reorderable`, and
+ * no row with an `href`.
  *
  * **`reorderable` lets you move rows.** Each row gets a grip after its `end`
  * slot, named by `move-label`. Drag a grip to move its row, and the list
@@ -133,7 +145,7 @@ import {
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Rows, Stack, Menu
+ * @aliases Grid list, Rows, Stack
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.
@@ -220,13 +232,15 @@ export class HelixHeadlessList extends HelixElement {
    * - `ordered` numbers them, for steps.
    * - `unordered` bullets them, for a set.
    * - `description` pairs each row's label with its supporting text as a term
-   *   and what the term means.
+   *   and what the term means, in a list whose rows are pressed, selected, or
+   *   reordered. A static list of terms and their meanings is a Description
+   *   List.
    *
-   * **`description` reuses the row's existing slots rather than inventing a
-   *   second kind of row.** A term and its description is exactly the label and
-   *   the supporting text `List.Item` already has, so the kind changes how the
-   *   pair is drawn and nothing about what a consumer writes. A separate
-   *   `List.Term` element would be a second row shape for one attribute's sake.
+   * **`description` reuses the row's existing slots.** A term and its
+   * description is exactly the label and the supporting text `List.Item`
+   * already has, so the kind changes how the pair is drawn and nothing about
+   * what a consumer writes. A separate `List.Term` element would be a second
+   * row shape for one attribute's sake.
    */
   @property({ reflect: true })
   kind?: 'default' | 'description' | 'ordered' | 'unordered'
@@ -368,6 +382,12 @@ export class HelixHeadlessList extends HelixElement {
 
   /** The value of the row a Shift range runs from: the last row pressed. */
   private anchor: string | undefined
+
+  /**
+   * The value of the row the last Shift range reached, whose rows from the
+   * anchor the next range lets go of: the anchor where it was set since.
+   */
+  private reached: string | undefined
 
   /**
    * Shift and Control or Command on the key that is moving focus, read when
@@ -626,6 +646,8 @@ export class HelixHeadlessList extends HelixElement {
       extend,
       mode: this.selectionMode ?? 'none',
       pressed: this.valueFor(row),
+      reached: this.reached,
+      rows: this.rows.map((one) => this.valueFor(one)),
       shown: this.selectable.map((one) => this.valueFor(one)),
       toggle,
       value: this.value,
@@ -633,9 +655,10 @@ export class HelixHeadlessList extends HelixElement {
   }
 
   /**
-   * Selects the row, or lets it go, by `selection-behavior`: Shift takes in
-   * the rows from the last one pressed, and Control or Command toggles one row
-   * under `replace`. The row is where the next range runs from.
+   * Selects the row, or lets it go, by `selection-behavior`: Shift selects
+   * the rows from the last one pressed in place of the last range, and Control
+   * or Command toggles one row under `replace`. Without Shift, the row is
+   * where the next range runs from.
    */
   protected press(row: HelixHeadlessListItem, extend = false, toggle = false): void {
     const mode = this.selectionMode
@@ -643,10 +666,26 @@ export class HelixHeadlessList extends HelixElement {
       return
     }
     const next = choiceValue(this.choice(row, extend, toggle, false))
-    if (!extend) {
-      this.anchor = this.valueFor(row)
-    }
+    this.reach(row, extend)
     this.choose(next)
+  }
+
+  /**
+   * Moves where the next range runs from and reaches, before the change is
+   * asked for. Without Shift, the row is both. With Shift, in `multiple`, the
+   * range reaches the row and runs from it where no row has the anchor, as
+   * React Aria's `extendSelection` keeps its anchor and moves its current key.
+   */
+  private reach(row: HelixHeadlessListItem, extend: boolean): void {
+    const value = this.valueFor(row)
+    if (!extend) {
+      this.anchor = value
+      this.reached = value
+    } else if (this.selectionMode === 'multiple') {
+      const known = this.rows.some((one) => this.valueFor(one) === this.anchor)
+      this.anchor = known ? this.anchor : value
+      this.reached = value
+    }
   }
 
   /**
@@ -668,8 +707,8 @@ export class HelixHeadlessList extends HelixElement {
       this.anchor = this.valueFor(from)
     }
     const next = choiceValue(this.choice(row, moving.extend, moving.toggle, true))
-    if (!moving.extend && next !== null) {
-      this.anchor = this.valueFor(row)
+    if (moving.extend || next !== null) {
+      this.reach(row, moving.extend)
     }
     this.choose(next)
   }
@@ -851,6 +890,14 @@ export class HelixHeadlessList extends HelixElement {
     }
     if (this.childrenKnown) {
       this.toggleState('empty', this.rows.length === 0)
+      if (this.kind === 'description') {
+        /* A static list of terms is a Description List's job. Development
+           builds only. */
+        auditDescription(
+          this,
+          this.interactive || this.reorderable || this.rows.some((row) => row.href !== ''),
+        )
+      }
     }
     this.toggleState('loading', this.loading)
     this.watchEnd()

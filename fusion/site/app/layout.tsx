@@ -8,6 +8,7 @@ import type { ReactNode } from 'react'
 import { COLOR_MODE_KEY } from '@/utils/color-mode/color-mode'
 import { siteUrl } from '@/utils/metadata/metadata'
 import { MOTION_KEY } from '@/utils/motion/motion'
+import { PLATFORM_KEY } from '@/utils/platform/platform'
 import { SITE } from '@/utils/site/site'
 import {
   BRAND_FLAG,
@@ -102,8 +103,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/*
          * *What the reader chose, applied before the first pixel.**
          *
-         * Three things: the color mode, whether the light behind a page may
-         * move, and the palette they derived on the landing page. One script,
+         * Four things: the color mode, whether the light behind a page may
+         * move, the platform a reference page documents, and the palette they
+         * derived on the landing page. One script,
          * because they are one concern (appearance restored from storage), and because the second of two
          * `beforeInteractive` scripts is not emitted, measured: only the first
          * reached the document, so the palette silently never restored.
@@ -119,7 +121,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
          * on the page changing one frame in.
          */}
         <Script id="site-appearance" strategy="beforeInteractive">
-          {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;if(localStorage.getItem(${JSON.stringify(MOTION_KEY)})==='off')d.dataset.motion='off';var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&typeof t.css==='string'){var e=document.createElement('style');e.id=${JSON.stringify(THEME_STYLE_ID)};e.textContent=t.css;document.head.appendChild(e);d.dataset.helixTheme='';if(t.settings&&t.settings.brand)d.dataset[${JSON.stringify(BRAND_FLAG)}]=''}}catch(e){}`}
+          {`try{var d=document.documentElement;var m=localStorage.getItem(${JSON.stringify(COLOR_MODE_KEY)});if(m==='light'||m==='dark')d.dataset.colorMode=m;if(localStorage.getItem(${JSON.stringify(MOTION_KEY)})==='off')d.dataset.motion='off';if(localStorage.getItem(${JSON.stringify(PLATFORM_KEY)})==='native')d.dataset.platform='native';var t=JSON.parse(localStorage.getItem(${JSON.stringify(SITE_THEME_KEY)})||'null');if(t&&t.version===${THEME_VERSION}&&typeof t.css==='string'){var e=document.createElement('style');e.id=${JSON.stringify(THEME_STYLE_ID)};e.textContent=t.css;document.head.appendChild(e);d.dataset.helixTheme='';if(t.settings&&t.settings.brand)d.dataset[${JSON.stringify(BRAND_FLAG)}]=''}}catch(e){}`}
         </Script>
       </head>
       <body>{children}</body>

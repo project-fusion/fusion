@@ -8,6 +8,7 @@ import {
   registerDom,
   role,
   settle,
+  unweighted,
 } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless behavior.
@@ -82,10 +83,12 @@ describe('a row that arrives after the render', () => {
 const feedSheet = (): string => {
   const declared = (customElements.get('helix-notifications') as unknown as { styles: unknown })
     .styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 describe('separation on the feed', () => {
@@ -135,10 +138,10 @@ describe('separation on the feed', () => {
   test('takes the rule under the header away and puts the gap between boxes before the first', () => {
     const text = feedSheet()
     expect(text).toContain(
-      ':host([separation="filled"]) [part="header"], :host([separation="outlined"]) [part="header"] {border-block-end: none}',
+      ':host(:is([separation="filled"], [separation="outlined"])) [part="header"] {border-block-end: none}',
     )
     expect(text).toContain(
-      ':host([separation="filled"]) [part="list"], :host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs))}',
+      ':host(:is([separation="filled"], [separation="outlined"])) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs))}',
     )
   })
 })

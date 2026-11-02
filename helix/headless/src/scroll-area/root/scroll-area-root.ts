@@ -109,6 +109,15 @@ export class HelixHeadlessScrollArea extends HelixElement {
   label = ''
 
   /**
+   * How tall the area grows before it scrolls: `sm` is 8rem, `md` 12rem, `lg`
+   * 16rem, and `xl` 24rem. Unset, the area is as tall as its own style or its
+   * container makes it. A phone reads the same scale, so code shared with one
+   * can size the area without a stylesheet.
+   */
+  @property({ attribute: 'max-block-size', reflect: true })
+  maxBlockSize?: 'sm' | 'md' | 'lg' | 'xl'
+
+  /**
    * The one axis the content scrolls along: `vertical` or `horizontal`. The
    * other axis clips what is past it and has no scrollbar. Unset scrolls both.
    */

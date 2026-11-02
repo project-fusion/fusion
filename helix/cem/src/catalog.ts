@@ -75,7 +75,77 @@ export interface EventDoc {
   type: string
 }
 
+/**
+ * What an element is called on React Native, as `helix system platforms`
+ * names it: the component, and the prop each property, slot, and event of the
+ * web element becomes.
+ */
+export interface NativeElement {
+  /** The component's name, the web element's class name, such as `HelixTabs`. */
+  component: string
+  /** Each event the component sends, by its web name, and the prop that hears it. */
+  events: { name: string; prop: string }[]
+  /** The web element's properties the component leaves out, such as a form's. */
+  omitted: string[]
+  /** The web element's properties the component takes, under the same names. */
+  properties: string[]
+  /** Each slot, by its web name, empty for the default, and the prop that fills it. */
+  slots: { name: string; prop: string }[]
+}
+
+/**
+ * What `helix system platforms` prints: each element Helix draws on React
+ * Native, by its tag, and the status its family has there.
+ */
+export interface NativeRecord {
+  'react-native'?: { elements: Record<string, NativeElement>; status: string }
+}
+
+/** One node of an element's tree, as one platform draws it. */
+export interface AnatomyNode {
+  children?: AnatomyNode[]
+  /** What the platform draws: `slot name="start"` on the web, `Pressable button` on a phone. */
+  draws: string
+  /** The node's kind in the source: `box`, `pressable`, `region`. */
+  kind: string
+  /** The part it is, the region, or the prop a `when` reads. */
+  name: string
+  /** What the node says about itself, each as `name` or `name=value`, `{prop}` for a prop's. */
+  says?: string[]
+}
+
+/** An element's host and tree on one platform. */
+export interface AnatomySide {
+  /** The events it sends, by the name the platform gives them. */
+  sends?: string[]
+  /** The custom states the web host carries. */
+  states?: string[]
+  /** The attributes the web element takes, or the props the component takes, with what each holds. */
+  takes: { holds: string; name: string }[]
+  tree: AnatomyNode[]
+}
+
+/**
+ * What an element is made of, as `helix system anatomy` prints it: the web
+ * element, and the React Native component where Helix draws one.
+ */
+export interface Anatomy {
+  native?: AnatomySide
+  web: AnatomySide
+}
+
+/**
+ * A family's status on each platform it ships for. `web` is the family's own
+ * `status`, and `react-native` is present where the family is drawn there.
+ */
+export interface Platforms {
+  'react-native'?: { status: string }
+  web: { status: string }
+}
+
 export interface Element {
+  /** What the element is made of on each platform. Written by `withAnatomy`. */
+  anatomy?: Anatomy
   attributes: ApiMember[]
   cssParts: ApiMember[]
   cssProperties: ApiMember[]
@@ -98,6 +168,11 @@ export interface Element {
   package: string
   /** Role within the family. `Root` for its primary element. */
   part: string
+  /**
+   * What the element is called on each platform beside the web, where Helix
+   * draws it there. Written by `withPlatforms`.
+   */
+  platforms?: { 'react-native'?: NativeElement }
   properties: PropertyDoc[]
   slots: ApiMember[]
   /**
@@ -167,6 +242,13 @@ export interface Example {
    * open is `position: fixed` and excluded from measurement by design.
    */
   min?: number
+  /**
+   * What the example shows on another platform, keyed by the platform, from
+   * its `@react-native-summary` comment, where `description` names something
+   * that platform does not have, such as the arrow keys in React Native.
+   * Absent where `description` is true everywhere.
+   */
+  platforms?: { 'react-native'?: { description: string } }
   slug: string
   /**
    * The same example authored in TSX, which is a file and never a conversion.
@@ -250,6 +332,11 @@ export interface Family {
    * it.
    */
   package: string
+  /**
+   * The family's status on each platform it ships for. Written by
+   * `withPlatforms`, which every package's `api.json` passes through.
+   */
+  platforms?: Platforms
   since: string
   slug: string
   /** The family's source directory, relative to the repository root. */
@@ -449,6 +536,12 @@ const examplesOf = (
   const minimums = new Map(
     (declared?.examples ?? []).map((entry) => [entry.slug ?? '', entry.min ?? 0]),
   )
+  const native = new Map(
+    (declared?.examples ?? []).map((entry) => [
+      entry.slug ?? '',
+      entry.platforms?.['react-native']?.description ?? '',
+    ]),
+  )
   return (
     sources
       .filter((source) => source.family === slug)
@@ -486,6 +579,7 @@ const examplesOf = (
            `undefined`. */
         const layout = layouts.get(source.slug)
         const min = minimums.get(source.slug)
+        const reactNative = native.get(source.slug)
         const mirrored =
           source.slug === HEADLESS ? CANONICAL : source.slug.replace(HEADLESS_SUFFIX, '')
         return {
@@ -505,6 +599,7 @@ const examplesOf = (
           label: startCase(mirrored),
           ...(layout ? { layout } : {}),
           ...(min ? { min } : {}),
+          ...(reactNative ? { platforms: { 'react-native': { description: reactNative } } } : {}),
           renders: rendersOf(source.slug, source.pictures ?? []),
           slug: source.slug,
           tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
@@ -867,4 +962,51 @@ export const publishedBy = (families: Family[], name: string): (Contribution | F
         slug: family.slug,
       },
     ]
+  })
+
+/**
+ * The families with each styled element's anatomy, from what `helix system
+ * anatomy` printed, by tag. **Only a styled element**, for the reason
+ * `withPlatforms` gives: its tree is the one the styled package draws.
+ */
+export const withAnatomy = (
+  families: (Contribution | Family)[],
+  anatomy: Record<string, Anatomy>,
+): (Contribution | Family)[] =>
+  families.map((family) => ({
+    ...family,
+    elements: family.elements.map((element) => {
+      const found = element.tier === 'styled' ? anatomy[element.tagName] : undefined
+      return found === undefined ? element : { ...element, anatomy: found }
+    }),
+  }))
+
+/**
+ * The families with each one's status on every platform, and each element
+ * drawn on React Native with the names it takes there, from what
+ * `helix system platforms` printed. An empty record names the web alone.
+ *
+ * **Only a styled element is drawn natively**, since the components ship from
+ * `@fusion.dev/helix`, so a headless element with the same family is left as
+ * it is. **A family contributed to by another package states no status**,
+ * the package holding its root doing that.
+ */
+export const withPlatforms = (
+  families: (Contribution | Family)[],
+  native: NativeRecord,
+): (Contribution | Family)[] =>
+  families.map((family) => {
+    const drawn = native['react-native']
+    const elements = family.elements.map((element) => {
+      const named = element.tier === 'styled' ? drawn?.elements[element.tagName] : undefined
+      return named === undefined ? element : { ...element, platforms: { 'react-native': named } }
+    })
+    if ('contributes' in family) {
+      return { ...family, elements }
+    }
+    const onPhones =
+      drawn !== undefined && elements.some((element) => element.platforms !== undefined)
+        ? { 'react-native': { status: drawn.status } }
+        : {}
+    return { ...family, elements, platforms: { ...onPhones, web: { status: family.status } } }
   })

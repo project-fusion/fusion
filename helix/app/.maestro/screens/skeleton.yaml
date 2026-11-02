@@ -1,0 +1,27 @@
+# Skeleton, each example drawn alone: a skeleton over a button, an avatar and
+# lines with the sheen, and the three effects. One screenshot of each, named
+# by the example, `MODE`, and `SIZE`.
+#
+# A skeleton carries no words. `loading` comes first, and the flow waits for
+# the title of each screen after it.
+appId: dev.fusion.helix.app
+name: "Screens: Skeleton"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://skeleton/loading/preview
+- extendedWaitUntil:
+    visible: '.*Save the profile.*'
+    timeout: 30000
+- takeScreenshot: skeleton-loading-${MODE}-${SIZE}
+- openLink: helix://skeleton/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 15000
+- takeScreenshot: skeleton-preview-${MODE}-${SIZE}
+- openLink: helix://skeleton/effects/preview
+- extendedWaitUntil:
+    visible: 'Effects'
+    timeout: 15000
+- takeScreenshot: skeleton-effects-${MODE}-${SIZE}

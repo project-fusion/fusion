@@ -1,0 +1,38 @@
+# Timeline, each example drawn alone: entries down the start edge, grouped
+# by day, the time on the other side of the line, entries on alternate
+# sides, and entries across the page. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`. At the largest text the second day is below
+# the screen, so the flow scrolls to it.
+appId: dev.fusion.helix.app
+name: "Screens: Timeline"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://timeline/preview/preview
+- extendedWaitUntil:
+    visible: '.*Deployed to production.*'
+    timeout: 30000
+- takeScreenshot: timeline-preview-${MODE}-${SIZE}
+- openLink: helix://timeline/grouped/preview
+- scrollUntilVisible:
+    centerElement: true
+    element: '.*Yesterday.*'
+    timeout: 60000
+    visibilityPercentage: 25
+- takeScreenshot: timeline-grouped-${MODE}-${SIZE}
+- openLink: helix://timeline/opposite/preview
+- extendedWaitUntil:
+    visible: '.*Deployed to production.*'
+    timeout: 15000
+- takeScreenshot: timeline-opposite-${MODE}-${SIZE}
+- openLink: helix://timeline/alternate/preview
+- extendedWaitUntil:
+    visible: '.*Deployed to production.*'
+    timeout: 15000
+- takeScreenshot: timeline-alternate-${MODE}-${SIZE}
+- openLink: helix://timeline/horizontal/preview
+- extendedWaitUntil:
+    visible: '.*Deployed to production.*'
+    timeout: 15000
+- takeScreenshot: timeline-horizontal-${MODE}-${SIZE}

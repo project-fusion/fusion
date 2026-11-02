@@ -6,15 +6,16 @@
    **The hooks are private, and each family points them at its own.** A public
    name cannot be shared, so `--menu-shadow` and `--select-shadow` stay each
    family's API, and each writes its own into `--_floating-shadow` for this rule
-   to read. One rule, seven names, and a consumer who learned the family's hook
-   is never asked to learn a second one.
+   to read. One rule, six names, and a consumer who learned the family's hook
+   is never asked to learn a second one. The fill is the overlay surface for
+   every family that composes this sheet, so it reads no private.
 
    `border`, `inset` and `margin` said rather than left out: the UA stylesheet
    gives `[popover]` `border: solid`, an inset that centers it in the window and
    a margin that offsets it from wherever the positioning put it, so dropping any
    of the three leaves the UA's answer standing. */
 [part="surface"] {
-  background-color: var(--_floating-background-color, var(--helix-color-surface-overlay));
+  background-color: var(--helix-color-surface-overlay);
   border: var(--_floating-border-width, var(--helix-border-floating)) solid
     var(--_floating-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
@@ -44,4 +45,25 @@
 
 [part="surface"]:not(:popover-open) {
   display: none;
+}
+
+/* **A sheet along the window's bottom edge**, for a panel that turns into one
+   in a window narrower than 30rem, as `PopoverController` tells its host from
+   `presentation`, and as Menu's own sheet draws it. The family sets its
+   `sheet` state. As wide as the window, square where it meets the edge, never
+   taller than most of it, its last row clear of the home indicator, and over
+   a scrim. */
+:host(:state(sheet)) [part="surface"] {
+  border-end-end-radius: var(--helix-radii-none);
+  border-end-start-radius: var(--helix-radii-none);
+  inline-size: auto;
+  inset-block-end: 0;
+  inset-inline: 0;
+  max-block-size: calc(100dvh - var(--helix-space-3xl));
+  max-inline-size: none;
+  padding-block-end: calc(var(--helix-space-xs) + env(safe-area-inset-bottom, 0px));
+}
+
+:host(:state(sheet)) [part="surface"]::backdrop {
+  background-color: var(--helix-color-overlay);
 }

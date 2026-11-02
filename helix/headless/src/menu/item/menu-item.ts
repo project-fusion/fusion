@@ -17,8 +17,16 @@ import {
   onUnlessFalse,
   PopoverController,
   requestChange,
+  sideOf,
   slotFilled,
 } from '@fusion.dev/helix-core'
+import {
+  checkedStateOf,
+  kindOf,
+  nextChecked,
+  roleOf,
+  runAround,
+} from '@fusion.dev/helix-core/menu-items'
 import { caretRight, check } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -95,7 +103,7 @@ import '../../kbd/index.js'
  *
  * @event {HelixBeforeCheckEvent} helix-before-check - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The row was chosen. Cancelable: cancel it to keep the menu open.
- * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands.
+ * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands. A row that opens a submenu chooses nothing and sends none.
  *
  * @csspart end - The trailing column that holds the shortcut and the `end` slot. It is always rendered.
  * @csspart item - The row, which is an `<a>` where `href` is set.
@@ -112,6 +120,10 @@ import '../../kbd/index.js'
  * @cssstate disabled - The row is disabled.
  * @cssstate expanded - Under `submenus="flyout"`, the row's submenu is open beside it.
  * @cssstate highlighted - In a menu with `filterable`, the arrow keys or the pointer reached the row while focus stays in the filter field.
+ * @cssstate placed-bottom - Under `submenus="flyout"`, the row's open submenu sits below it.
+ * @cssstate placed-left - Under `submenus="flyout"`, the row's open submenu sits to its left.
+ * @cssstate placed-right - Under `submenus="flyout"`, the row's open submenu sits to its right.
+ * @cssstate placed-top - Under `submenus="flyout"`, the row's open submenu sits above it.
  * @cssstate submenu-mark - Under `submenus="flyout"`, a row in this row's submenu can be ticked or opens a submenu, so the submenu keeps its trailing column.
  * @cssstate submenu-start - Under `submenus="flyout"`, a row in this row's submenu has content before its label, so the submenu keeps its leading column.
  */
@@ -304,7 +316,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * set. Read by the menu to reserve the trailing column.
    */
   get choice(): boolean {
-    return this.checkable || this.checked || this.exclusive
+    return kindOf(this) !== 'command'
   }
 
   /**
@@ -559,6 +571,15 @@ export class HelixHeadlessMenuItem extends HelixElement {
     anchor: () => this.partNamed('item'),
     boundary: () => this,
     onDismiss: () => {},
+    /* The side the flyout landed on, which the sheet grows it out of, as
+       `Menu` records its own panel's. */
+    onPlace: (placement) => {
+      const side = sideOf(placement)
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+    },
     open: () => this.flyout && this.expanded && this.onPage && this.submenu,
     placement: () => (isRtl(this) ? 'left-start' : 'right-start'),
     surface: () => (this.flyout ? this.partNamed('surface') : null),
@@ -613,8 +634,8 @@ export class HelixHeadlessMenuItem extends HelixElement {
     if (!this.choice || this.hasSubmenu) {
       return
     }
-    const next = this.exclusive ? true : !this.checked
-    if (next === this.checked) {
+    const next = nextChecked(this)
+    if (next === undefined) {
       return
     }
     const applied = requestChange({
@@ -634,20 +655,13 @@ export class HelixHeadlessMenuItem extends HelixElement {
 
   /** The other `exclusive` rows in this row's run of siblings. */
   private exclusivePeers(): HelixHeadlessMenuItem[] {
-    const peers: HelixHeadlessMenuItem[] = []
-    const inSet = (node: Element | null): node is HelixHeadlessMenuItem =>
-      node !== null &&
+    const inSet = (node: Element): boolean =>
       (node as Partial<HelixHeadlessMenuItem>).isMenuItem === true &&
       (node as HelixHeadlessMenuItem).exclusive &&
       node.slot === this.slot
-    for (const step of ['previousElementSibling', 'nextElementSibling'] as const) {
-      let node = this[step]
-      while (inSet(node)) {
-        peers.push(node)
-        node = node[step]
-      }
-    }
-    return peers
+    /* The parent node, which is a shadow root for a row a component draws. */
+    const siblings = [...((this.parentNode as ParentNode | null)?.children ?? [this])]
+    return runAround(siblings, siblings.indexOf(this), inSet) as HelixHeadlessMenuItem[]
   }
 
   /**
@@ -666,7 +680,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
     if (!this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    /* A row that opens a submenu has chosen nothing, so nothing is said to
+       stand: its menu shows the page, and a consumer listening for a choice
+       does not hear navigation as one. */
+    if (!this.hasSubmenu) {
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    }
     if (this.virtual && this.href !== '') {
       followLink(this.ownerDocument, this)
     }
@@ -774,9 +793,8 @@ export class HelixHeadlessMenuItem extends HelixElement {
 
   protected override render(): TemplateResult | typeof nothing {
     const submenu = this.hasSubmenu
-    const ticks = this.choice
-    const role = ticks ? (this.exclusive ? 'menuitemradio' : 'menuitemcheckbox') : 'menuitem'
-    const checkedState = ticks ? (this.checked ? 'true' : 'false') : null
+    const role = roleOf(kindOf(this))
+    const checkedState = checkedStateOf(this)
     /* In this reader's platform's words, and in the server's while hydrating
        what one sent, which has no keyboard to ask. */
     const keys =

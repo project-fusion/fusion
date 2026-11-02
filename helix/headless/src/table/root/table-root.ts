@@ -6,7 +6,6 @@ import {
   commaList,
   customElement,
   cycle,
-  type DataRow,
   everyState,
   followLink,
   format,
@@ -28,7 +27,6 @@ import {
   reflectElements,
   requestChange,
   scrollingAncestor,
-  sort,
   toggleEvery,
   treeArrow,
   VIRTUAL_RULE,
@@ -36,6 +34,14 @@ import {
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
+import {
+  fittedTracks,
+  nestedRows,
+  rowShapes,
+  SAMPLE,
+  sortedRows,
+  tracksOf,
+} from '@fusion.dev/helix-core/table'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 /* `static-html`'s `html`, because the checkbox's tag is interpolated. */
@@ -45,47 +51,15 @@ import '../../checkbox/index.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import { type GridCell, type LeadColumn, TableGridController } from '../grid-controller.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
-import { tracksOf } from '../tracks.js'
 
 /** A row as the table reads it: the consumer's element, a table row where it is one. */
 type Row = Element & Partial<HelixHeadlessTableRow>
-
-/**
- * The most characters a column may hold at its widest and still never wrap.
- *
- * Set from what tables actually hold: `--helix-color-background` is 24
- * characters and `@fusion.dev/helix-headless` is 26, and both are values a
- * reader copies whole. Above this a column is carrying a sentence, and
- * wrapping is the only thing it can do.
- */
-const SHORT = 32
-
-/**
- * The least room a column of sentences is given before the table scrolls.
- *
- * **Never `0`.** A zero floor lets a track vanish: measured at a 900 pixel
- * viewport, a `max-content` name column asking for 250 starved two columns of
- * sentences to exactly `0px` and wrapped their text to forty-eight lines. A
- * floor turns that into an overflow, which the table's own box scrolls.
- */
-const FLOOR = '14ch'
-
-/**
- * How many rows are read to size the columns.
- *
- * Enough for the text a table holds to show its shape, and a ceiling on the
- * work a render does for a table of thousands of rows.
- */
-const SAMPLE = 200
 
 /** An element's text as a reader sees it, with the markup's indentation folded away. */
 const textOf = (element: Element | undefined): string =>
   (element?.textContent ?? '').replace(/\s+/g, ' ').trim()
 
 const lengthOf = (element: Element | undefined): number => textOf(element).length
-
-/** A cell's text as a number, with the commas that group its digits taken out. */
-const numberOf = (value: string): number => Number(value.replaceAll(',', ''))
 
 /** The slots a child names for itself, which hold content other than rows. */
 const STATUS = new Set(['empty', 'error', 'loading'])
@@ -927,82 +901,27 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     const index = spec
       ? declared.findIndex((column) => column.canSort && column.field === spec.field)
       : -1
-    let ordered = rows
-    if (spec && index >= 0) {
-      const records = rows.map((element) => ({ element, value: textOf(element.children[index]) }))
-      /* A column of numbers compares as numbers, so `980` comes before `1,204`
-         and a negative sorts below zero. A column with any word in it collates
-         as text, digits by their value. */
-      const numeric = records.every(({ value }) => value === '' || Number.isFinite(numberOf(value)))
-      const order = numeric
-        ? (row: DataRow): unknown => (row.value === '' ? '' : numberOf(row.value as string))
-        : (row: DataRow): unknown => row.value
-      const sorted = sort(records, spec, [
-        { field: spec.field, order },
-      ]) as unknown as typeof records
-      ordered = sorted.map((record) => record.element)
-    }
-    return this.nests ? this.nested(ordered) : ordered
+    const ordered =
+      spec && index >= 0
+        ? sortedRows(rows, this.sort, (element) => textOf(element.children[index]))
+        : rows
+    return this.nests ? this.nested([...ordered]) : [...ordered]
   }
 
-  /**
-   * The rows of a tree in the order they are drawn: each row followed by the
-   * rows under it while it is open, at every depth, keeping the order `rows`
-   * is in among the rows under one row. A row under a key no row has is drawn
-   * at the top.
-   */
+  /** The rows of a tree in the order they are drawn: see `nestedRows`. */
   private nested(rows: Element[]): Element[] {
     const keys = new Map(this.keyed.map(({ key, row }) => [row as Element, key]))
-    const present = new Set(keys.values())
-    const under = new Map<string, Element[]>()
-    for (const row of rows) {
-      const parent = (row as Row).parent ?? ''
-      const at = parent !== '' && present.has(parent) ? parent : ''
-      under.set(at, [...(under.get(at) ?? []), row])
-    }
-    const open = this.open
-    const drawn: Element[] = []
-    const seen = new Set<Element>()
-    const walk = (parent: string): void => {
-      for (const row of under.get(parent) ?? []) {
-        /* A row set under one of its own rows would walk for ever. */
-        if (seen.has(row)) {
-          continue
-        }
-        seen.add(row)
-        drawn.push(row)
-        const key = keys.get(row) ?? ''
-        if (open.has(key)) {
-          walk(key)
-        }
-      }
-    }
-    walk('')
-    return drawn
+    const nesting = rows.map((row) => ({
+      key: keys.get(row) ?? '',
+      parent: (row as Row).parent ?? '',
+      row,
+    }))
+    return nestedRows(nesting, this.open).map(({ row }) => row)
   }
 
   /** How deep each row sits, from 1, and whether rows sit under it, by key. */
   private shape(): Map<string, { branch: boolean; level: number }> {
-    const parents = new Map(this.keyed.map(({ key, row }) => [key, row.parent ?? '']))
-    const shapes = new Map<string, { branch: boolean; level: number }>()
-    for (const key of parents.keys()) {
-      let level = 1
-      let at = parents.get(key) ?? ''
-      const passed = new Set([key])
-      while (at !== '' && parents.has(at) && !passed.has(at)) {
-        passed.add(at)
-        level += 1
-        at = parents.get(at) ?? ''
-      }
-      shapes.set(key, { branch: false, level })
-    }
-    for (const parent of parents.values()) {
-      const shape = shapes.get(parent)
-      if (shape) {
-        shape.branch = true
-      }
-    }
-    return shapes
+    return rowShapes(this.keyed.map(({ key, row }) => ({ key, parent: row.parent ?? '' })))
   }
 
   /** The sort last heard, so a render that changed nothing says nothing. */
@@ -1512,25 +1431,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       .join(' ')
   }
 
-  /**
-   * Tracks for the columns that set nothing, from how much text each holds.
-   *
-   * **A column of sentences wraps and a column of values does not.** Every
-   * column left at `minmax(max-content, 1fr)` asks for its longest cell on one
-   * line, which is right for `eu-central-1` and wrong for a description: the
-   * table grows as wide as its longest sentence and scrolls, on a phone and on
-   * a desktop alike. So once any column holds more than `SHORT` characters,
-   * the short columns keep `max-content`, and each long one wraps above a
-   * `FLOOR`, taking a share of the room in proportion to its text.
-   *
-   * A table with no long column keeps the default, so a table of values lays
-   * out as it always has. A column's `width` and a track in `columns` are both
-   * statements an author made, and each wins over this.
-   *
-   * Characters stand in for width. They only have to rank columns against each
-   * other, and a count needs no layout, so it reads the same before paint as
-   * after. Sampled, so a table of thousands of rows reads `SAMPLE` of them.
-   */
+  /** Tracks for the columns that set nothing, from how much text each holds: see `fittedTracks`. */
   private fitted(declared: HelixHeadlessTableColumn[], listed: string[]): string[] {
     const open = declared.map((column, index) => column.shown && !column.width && !listed[index])
     if (!open.includes(true)) {
@@ -1542,22 +1443,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         widths[at] = Math.max(width, lengthOf(row.children[at]))
       }
     }
-    const long = widths.filter((width, at) => open[at] && width > SHORT)
-    if (long.length === 0) {
-      return []
-    }
-    /* Measured against the narrowest long column, so the numbers stay small
-       and readable in the inspector: a column with twice the text of its
-       neighbor asks for twice the room. */
-    const narrowest = Math.min(...long)
-    return widths.map((width, at) => {
-      if (!open[at]) {
-        return ''
-      }
-      return width > SHORT
-        ? `minmax(${FLOOR}, ${Number((width / narrowest).toFixed(2))}fr)`
-        : 'max-content'
-    })
+    return fittedTracks(open, widths)
   }
 
   /* Columns arrive from the light DOM, which changes no property here, so

@@ -249,6 +249,17 @@ Each component's page lists the events it sends, with the class and the detail.
 | `helix-tour-ask`, `helix-tour-status` | A tour stop asked the tour to move, or the tour's progress changed |
 | `helix-typing` | A reader started or stopped writing in a chat composer |
 
+**Every control that turns on and off sends `helix-before-check`**: Checkbox,
+Switch, a Toggle on its own, and Motion Toggle. Its `detail.checked` is the
+state a press turns the control to. Once the control has turned, it sends
+`change`. A Toggle in a Toggle Group sends `helix-before-select`, because a
+press there chooses one of the group's items.
+
+*Until October 14, 2026, a Toggle on its own sent its group's request with its
+`value`, and Motion Toggle sent only `change`, which you could not cancel. If
+you listened for that request on a Toggle outside a group, listen for
+`helix-before-check` and read `detail.checked`.*
+
 Every stateful component also sends native events once the change is applied:
 
 - `input` and `change` on a value control

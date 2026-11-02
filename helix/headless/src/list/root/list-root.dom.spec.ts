@@ -136,6 +136,34 @@ describe('an interactive list with no name', () => {
   })
 })
 
+/* `kind="description"` is for rows a reader presses, selects, or reorders. A
+   static list of terms is a Description List, which renders `<dt>` and `<dd>`. */
+describe('a description list that nobody interacts with', () => {
+  const pair =
+    '<helix-headless-list-item>Plan<span slot="description">Team</span></helix-headless-list-item>'
+
+  test('is reported once, naming Description List', async () => {
+    const warnings = await warnedOn(
+      `<helix-headless-list kind="description" label="Account">${pair}${pair}</helix-headless-list>`,
+    )
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-list kind="description">')
+    expect(warnings[0]).toContain('<helix-headless-description-list>')
+  })
+
+  test('and one whose rows are selected, pressed, reordered, or linked is not', async () => {
+    for (const markup of [
+      `<helix-headless-list kind="description" label="Account" selection-mode="single">${pair}</helix-headless-list>`,
+      `<helix-headless-list kind="description" label="Account" selection-mode="none">${pair}</helix-headless-list>`,
+      `<helix-headless-list kind="description" label="Account" reorderable>${pair}</helix-headless-list>`,
+      '<helix-headless-list kind="description" label="Account"><helix-headless-list-item href="/plan">Plan<span slot="description">Team</span></helix-headless-list-item></helix-headless-list>',
+      `<helix-headless-list kind="unordered" label="Account">${pair}</helix-headless-list>`,
+    ]) {
+      expect([markup, ...(await warnedOn(markup))]).toEqual([markup])
+    }
+  })
+})
+
 /* A list had no way to ask for its next rows, so a long one had to arrive whole
    or be paged by a control of your own. */
 describe('a list that loads more', () => {

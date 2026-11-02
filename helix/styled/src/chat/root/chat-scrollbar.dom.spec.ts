@@ -38,7 +38,7 @@ describe("the transcript's scrollbar", () => {
   })
 
   test('steps up while the pointer is over the transcript', () => {
-    const hovered = sheet().split('[part="log"]:hover {')[1]?.split('}')[0] ?? ''
+    const hovered = sheet().split('[part="log"]:where(:hover) {')[1]?.split('}')[0] ?? ''
     expect(hovered).toContain('scrollbar-color')
     expect(hovered).toContain('--helix-scrollbar-thumb-hover-color')
   })

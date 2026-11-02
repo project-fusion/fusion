@@ -194,9 +194,12 @@ import '../../time-picker/index.js'
  * @csspart trigger - The control that opens the list.
  * @csspart trigger-icon - The icon on the button that opens the clock.
  *
+ * @cssstate aligned-start - While the clock lines up with the start of the field.
  * @cssstate blank - The field holds no time.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the clock is open.
+ * @cssstate placed-bottom - While the clock sits below the field.
+ * @cssstate placed-top - While the clock sits above the field, where there was no room below.
  */
 @customElement('helix-headless-time-input')
 export class HelixHeadlessTimeInput extends MixinSegmentedField(

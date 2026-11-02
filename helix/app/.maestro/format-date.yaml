@@ -1,0 +1,24 @@
+# Format Date: a reading of how long ago is drawn in words at each style,
+# and a day still to come reads ahead. Recorded.
+#
+# A reading is named in full, so iOS reads "3 hours ago" for each style; the
+# short and narrow words are what is drawn.
+appId: dev.fusion.helix.app
+name: Format Date
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://format-date/relative/preview
+      SHOWS: .*3 hours ago.*
+- assertVisible:
+    text: .*in 2 days.*
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://format-date/preview/preview
+      SHOWS: .*Mar 14, 2026.*
+- assertVisible:
+    text: .*Saturday, March 14.*

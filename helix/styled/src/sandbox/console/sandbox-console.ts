@@ -90,6 +90,7 @@ const stop = (event: Event): void => event.stopPropagation()
  * @csspart output-before - The log's `before` part.
  * @csspart output-dropped - The log's `dropped` part.
  * @csspart output-empty - The log's `empty` part.
+ * @csspart output-group - The log's `group` part.
  * @csspart output-group-content - The log's `group-content` part.
  * @csspart output-group-duration - The log's `group-duration` part.
  * @csspart output-group-heading - The log's `group-heading` part.
@@ -354,7 +355,7 @@ export class HelixSandboxConsole extends HelixElement {
     return html`${this.renderControls()}<${log}
         part="output"
         exportparts="after: output-after, before: output-before, dropped: output-dropped, empty: output-empty,
-        group-content: output-group-content, group-duration: output-group-duration,
+        group: output-group, group-content: output-group-content, group-duration: output-group-duration,
         group-heading: output-group-heading, group-mark: output-group-mark,
         group-status: output-group-status, group-summary: output-group-summary,
         group-summary-done: output-group-summary-done,

@@ -95,6 +95,11 @@ export type RuntimeKind =
   | 'solid-handler-syntax'
   /** A page's copy of the sandbox's compiler worker file is from another release. */
   | 'stale-worker'
+  /**
+   * A List at `kind="description"` has no row a reader presses, selects, or reorders, which is a
+   * Description List's job. Development builds only.
+   */
+  | 'static-description'
   /** A stencil's regions went unused: no named parts, or parts too small. */
   | 'stencil-regions-unused'
   /** A stencil has no inside to place the notes in. */

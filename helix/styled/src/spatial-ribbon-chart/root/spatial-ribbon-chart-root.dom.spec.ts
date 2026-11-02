@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless frame. The bars, the
  * keys, and the connection are the headless tier's and the plot package's. */
@@ -15,10 +15,12 @@ const sheet = (): string => {
   const declared = (
     customElements.get('helix-spatial-ribbon-chart') as unknown as { styles: unknown }
   ).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 describe('the styled spatial ribbon chart', () => {

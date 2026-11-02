@@ -1,5 +1,3 @@
-/* The width below which the cards stack, one to a line. Wider than three
-   cards need, so the narrow picture shows the stack. */
-.plans {
+helix-flex {
   --flex-switch-at: 36rem;
 }

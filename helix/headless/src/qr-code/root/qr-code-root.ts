@@ -2,6 +2,11 @@ import {
   customElement,
   formatWords,
   HelixElement,
+  qrPath as pathFor,
+  type QrCorrection,
+  type QrStyle,
+  QR_QUIET as QUIET,
+  qrModules,
   reportRuntime,
   rgbOf,
   slotFilled,
@@ -16,18 +21,11 @@ import {
   type TemplateResult,
 } from 'lit'
 import { property } from 'lit/decorators.js'
-import { encode } from 'uqr'
 import { boxIn, logoBox, type QrLogo, qrSvg } from '../export.js'
 import { qrName } from '../name.js'
 
-/** How much of the code can be lost and still read. */
-export type QrCorrection = 'H' | 'L' | 'M' | 'Q'
-
-/** How the modules are drawn. */
-export type QrStyle = 'dots' | 'rounded' | 'square'
-
-/** The quiet zone in modules, which the specification requires around a code. */
-const QUIET = 4
+/* The drawing is core's, which a phone draws from too. */
+export type { QrCorrection, QrStyle }
 
 /**
  * An image's pixels as a data address, where the page may read them, and its
@@ -44,88 +42,6 @@ const pixelsOf = (image: HTMLImageElement): string => {
   } catch {
     return image.currentSrc || image.src
   }
-}
-
-/** Whether a module is one of the three finder squares, or their separators. */
-const isFinder = (x: number, y: number, size: number): boolean => {
-  const near = (a: number, b: number): boolean => a < 8 && b < 8
-  return near(x, y) || near(size - 1 - x, y) || near(x, size - 1 - y)
-}
-
-/**
- * The dark modules of a matrix, as one path.
- *
- * One `<path>` rather than a rect per module. A modest code is 33 by 33, so a
- * rect apiece is a thousand elements the browser lays out and the accessibility
- * tree walks, and every one of them is a one-unit square.
- *
- * **`square` joins runs and the other styles cannot.** A row of eight square
- * modules is one `h8`; a row of eight *rounded* ones is eight shapes, because
- * the corners are what is being drawn and a joined run has none in the middle.
- *
- * `only` splits the drawing in two without walking the matrix twice: the finder
- * squares are structural, at three known corners, so a caller can ask for them
- * alone and get a second path to paint differently.
- */
-const pathFor = (
-  matrix: readonly (readonly boolean[])[],
-  style: QrStyle,
-  only: 'all' | 'body' | 'finders' = 'all',
-): string => {
-  const size = matrix.length
-  const wanted = (x: number, y: number): boolean => {
-    if (!matrix[y]?.[x]) {
-      return false
-    }
-    if (only === 'all') {
-      return true
-    }
-    return only === 'finders' ? isFinder(x, y, size) : !isFinder(x, y, size)
-  }
-
-  const parts: string[] = []
-  if (style === 'square') {
-    for (let y = 0; y < size; y += 1) {
-      let run = 0
-      for (let x = 0; x <= size; x += 1) {
-        if (wanted(x, y)) {
-          run += 1
-          continue
-        }
-        if (run > 0) {
-          parts.push(`M${x - run} ${y}h${run}v1h-${run}z`)
-          run = 0
-        }
-      }
-    }
-    return parts.join('')
-  }
-
-  /* A circle for `dots` and a squircle for `rounded`, both drawn as arcs on a
-     one-unit square. The radius is a little under half so neighboring dots do
-     not touch, which is what makes a dotted code read as dots rather than as a
-     square one with soft edges. */
-  const r = style === 'dots' ? 0.45 : 0.28
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      if (!wanted(x, y)) {
-        continue
-      }
-      if (style === 'dots') {
-        parts.push(
-          `M${x + 0.5 - r} ${y + 0.5}a${r} ${r} 0 1 0 ${r * 2} 0a${r} ${r} 0 1 0 ${-r * 2} 0z`,
-        )
-      } else {
-        parts.push(
-          `M${x + r} ${y}h${1 - r * 2}a${r} ${r} 0 0 1 ${r} ${r}` +
-            `v${1 - r * 2}a${r} ${r} 0 0 1 ${-r} ${r}` +
-            `h${-(1 - r * 2)}a${r} ${r} 0 0 1 ${-r} ${-r}` +
-            `v${-(1 - r * 2)}a${r} ${r} 0 0 1 ${r} ${-r}z`,
-        )
-      }
-    }
-  }
-  return parts.join('')
 }
 
 /**
@@ -309,20 +225,14 @@ export class HelixHeadlessQrCode extends HelixElement {
    * The code for the value at the level, or undefined where the value is too
    * long for it.
    *
-   * `encode` throws for a value past the level's capacity, and it threw inside
-   * the render: the update rejected and the last code stayed on screen. A
-   * logo raising the level to `H` was the easy way to get there, since `H`
-   * holds the fewest characters.
+   * Encoding throws for a value past the level's capacity, and it threw
+   * inside the render: the update rejected and the last code stayed on
+   * screen. A logo raising the level to `H` was the easy way to get there,
+   * since `H` holds the fewest characters. Core's `qrModules` answers nothing
+   * there.
    */
-  private encoded(): ReturnType<typeof encode> | undefined {
-    try {
-      return encode(this.value, { border: 0, ecc: this.level })
-    } catch (error) {
-      if (error instanceof RangeError) {
-        return undefined
-      }
-      throw error
-    }
+  private encoded(): readonly (readonly boolean[])[] | undefined {
+    return qrModules(this.value, this.level)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -459,12 +369,13 @@ export class HelixHeadlessQrCode extends HelixElement {
   }
 
   private renderCode(
-    result: ReturnType<typeof encode> | undefined,
+    matrix: readonly (readonly boolean[])[] | undefined,
   ): SVGTemplateResult | typeof nothing {
-    if (result === undefined) {
+    if (matrix === undefined) {
       return nothing
     }
-    const size = result.size
+    const result = { data: matrix }
+    const size = matrix.length
     /* The quiet zone, in the `viewBox` rather than in a wrapper's padding. Four
        modules is what the specification requires and what a scanner looks for,
        so it has to scale with the code and not with whatever box the component

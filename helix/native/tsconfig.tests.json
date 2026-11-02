@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@fusion.dev/helix-core/machines/*/vectors": ["../core/src/machines/*/vectors.ts"],
+      "@fusion.dev/helix-core/machines/reference": ["../core/src/machines/reference.ts"],
+      "@fusion.dev/helix-native": ["./src/index.ts"]
+    },
+    "rootDir": ".."
+  },
+  // The specs under `tests`, which hold the package to other platforms and
+  // import packages it does not publish, so its build leaves them out.
+  //
+  // **Core's reference interpreter and each machine's test vectors resolve
+  // to their source**, here and in Jest's `moduleNameMapper`, because core's
+  // build leaves them out: they ship nowhere, the conformance coverage reads
+  // each step through the interpreter, and a host's spec presses through the
+  // vectors.
+  "extends": "./tsconfig.json",
+  "include": ["tests/**/*.ts", "tests/**/*.tsx"]
+}

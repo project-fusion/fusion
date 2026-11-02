@@ -16,6 +16,7 @@ export {
   clearWords,
   type HelixWords,
   localeChain,
+  lookupWord,
   refreshWords,
   registerWords,
   setDefaultWordsLocale,

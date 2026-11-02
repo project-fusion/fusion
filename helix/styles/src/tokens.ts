@@ -19,7 +19,123 @@
  * written so the generated stylesheet reads the way a hand-written one would.
  * An object per token would put a `description` key beside prose that is often
  * about the six tokens after it rather than about one.
+ *
+ * **Each value is written with the builders in `builders.ts`**, such as
+ * `times(rem(2.5), density)`, so a misspelled builder or a wrong unit is a type
+ * error here. `helix system` reads the calls as syntax into typed expressions,
+ * which is what the native modules and the Design Tokens Format Module file
+ * are written from.
  */
+
+import {
+  type Amount,
+  alpha,
+  blur,
+  type Category,
+  type Color,
+  chroma,
+  cubicBezier,
+  density,
+  type Easing,
+  em,
+  type Families,
+  type Filters,
+  filters,
+  hue,
+  type Length,
+  lightDark,
+  lightness,
+  linear,
+  mix,
+  ms,
+  none,
+  plus,
+  primitive,
+  px,
+  ref,
+  relative,
+  rem,
+  round,
+  type Shadow,
+  saturate,
+  shadow,
+  spring,
+  type Time,
+  times,
+  transparent,
+} from './builders.js'
+
+/** What a token of each category may hold. */
+interface Slots {
+  /**
+   * A border width.
+   */
+  border: Length
+  /**
+   * A color.
+   */
+  color: Color
+  /**
+   * A duration.
+   */
+  duration: Time
+  /**
+   * A timing function.
+   */
+  easing: Easing
+  /**
+   * A font family list.
+   */
+  font: Families
+  /**
+   * A position in the stack.
+   */
+  layer: Amount
+  /**
+   * A line height: a multiple of the font size, or a length.
+   */
+  leading: Amount | Length
+  /**
+   * A translucent material: a color, a filter, a blur radius, or an opacity.
+   */
+  material: Amount | Color | Filters | Length
+  /**
+   * How far a thing fades, from 0 to 1.
+   */
+  opacity: Amount
+  /**
+   * A corner radius.
+   */
+  radii: Length
+  /**
+   * A scrollbar color.
+   */
+  scrollbar: Color
+  /**
+   * A shadow.
+   */
+  shadow: Shadow
+  /**
+   * A size.
+   */
+  size: Length
+  /**
+   * A space.
+   */
+  space: Length
+  /**
+   * A font size.
+   */
+  text: Length
+  /**
+   * Letter spacing.
+   */
+  tracking: Length
+  /**
+   * A font weight.
+   */
+  weight: Amount
+}
 
 /**
  * A token: the name after `--helix-`, the value it resolves to, and what it is
@@ -31,7 +147,9 @@
  * it. Describe a category or leave it alone; a sentence repeating a token's own
  * name is not a description.
  */
-export type Token = readonly [name: string, value: string, description?: string]
+export type Token = {
+  [C in Category]: readonly [name: `${C}-${string}`, value: Slots[C], description?: string]
+}[Category]
 
 /**
  * Sets of tokens this design system has a name for.
@@ -75,23 +193,23 @@ export const TOKENS: Token[] = [
      to be lifted into: a raised surface has to go down the ramp, not up. */
   [
     'color-background',
-    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-1000))',
+    lightDark(primitive('neutral-0'), primitive('neutral-1000')),
     'The page background. Every other surface sits on it.',
   ],
   [
     'color-surface',
-    'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-925))',
+    lightDark(primitive('neutral-50'), primitive('neutral-925')),
     'A surface on the page, such as a card or a panel. The separation policy sets it apart with a fill, a border, or a shadow.',
   ],
   /* Two kinds of "above", and they want opposite fills in light mode. */
   [
     'color-surface-raised',
-    'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
+    lightDark(primitive('neutral-100'), primitive('neutral-800')),
     'A panel raised inside a surface, such as a card inside a card. Its fill is one step down the ramp.',
   ],
   [
     'color-surface-overlay',
-    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
+    lightDark(primitive('neutral-0'), primitive('neutral-800')),
     'A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
@@ -109,7 +227,7 @@ export const TOKENS: Token[] = [
      leaves the toggle group's thumb 0.14 above its track. */
   [
     'color-surface-sunken',
-    'light-dark(var(--_helix-neutral-225), var(--_helix-neutral-900))',
+    lightDark(primitive('neutral-225'), primitive('neutral-900')),
     'A recessed surface, such as a track or a groove. Its fill sets it apart. A field reads `well`.',
   ],
   /* *What a field is filled with, stated as a step from its ground rather than
@@ -126,7 +244,7 @@ export const TOKENS: Token[] = [
      At 5% it reproduces the field on the light page exactly, 1.119, and then
      holds: 1.119, 1.112, 1.114 across page, card and raised, against the
      absolute token's 1.027 to 1.119. */
-  ['color-well', 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)'],
+  ['color-well', alpha(ref('color-foreground'), 5)],
   /* **What a row is lit with under the pointer or the keyboard**: an option, a
      suggestion, a note in a graph's list. A step from its ground for the
      reason the well is one, and 12% in dark because the same alpha over a dark
@@ -134,30 +252,27 @@ export const TOKENS: Token[] = [
      gives below. The theme engine solves `foreground-muted` against this wash
      over every surface, as `HOVER` in `helix/theme/rust/model.rs`, so a change
      to either strength here is a change there as well. */
-  [
-    'color-hover',
-    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
-  ],
+  ['color-hover', lightDark(alpha(ref('color-foreground'), 8), alpha(ref('color-foreground'), 12))],
   /* The bubble of your own message: a brand's wash, or at no brand a lighter one,
      since 28% of near black is `#bfbfbf`, and 16% matched the other speaker's bubble
      at `#dbdbdb` against `#dadada`. */
   [
     'color-primary-wash',
-    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 14%, transparent))',
+    primitive('brand-wash', alpha(ref('color-primary'), 14)),
     'A wash of the primary color, such as the bubble of your own Chat message.',
   ],
   /* What a control is lit with under a press, a step past `color-hover`. A press
      has to read on a phone, where no hover comes first. */
   [
     'color-press',
-    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 16%, transparent), color-mix(in oklab, var(--helix-color-foreground) 20%, transparent) )',
+    lightDark(alpha(ref('color-foreground'), 16), alpha(ref('color-foreground'), 20)),
     'A wash under a control being pressed, a step past the hover wash.',
   ],
   /* A chosen thing that stays chosen and is not a fill of its own: a range of
      days, a pressed toggle in a find bar. */
   [
     'color-selected',
-    'color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)',
+    alpha(ref('color-foreground'), 14),
     'A wash under something chosen that keeps its ground, such as a range of days.',
   ],
   /* Two whole colors, not one color with a `light-dark()` strength.
@@ -167,17 +282,17 @@ export const TOKENS: Token[] = [
      every scrim in the library goes transparent, silently. */
   [
     'color-overlay',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )',
+    lightDark(alpha(primitive('neutral-950'), 40), alpha(primitive('neutral-950'), 64)),
   ],
   /* Text and icons, by prominence. */
   /* The ends of the ramp, matching the page. */
-  ['color-foreground', 'light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))'],
+  ['color-foreground', lightDark(primitive('neutral-1000'), primitive('neutral-0'))],
   /* **The quiet ink for text that is read**: a placeholder, a hint, a caption,
      an inactive tab. The engine solves it against every ground in its surface
      model. */
   [
     'color-foreground-muted',
-    'light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))',
+    lightDark(primitive('neutral-600'), primitive('neutral-400')),
     'Text that recedes and is still read, such as a placeholder, a hint, or a caption.',
   ],
   /* **The quieter ink, for marks that are not text**: a separator, a chevron, a
@@ -189,7 +304,7 @@ export const TOKENS: Token[] = [
      dark. */
   [
     'color-foreground-subtle',
-    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
+    lightDark(primitive('neutral-500'), primitive('neutral-550')),
     'A mark that is not text, such as a separator, a chevron, or a grip. Its contrast is not guaranteed.',
   ],
   /* **The label on a fill, one per role.** A brand fill and a status fill are
@@ -198,16 +313,16 @@ export const TOKENS: Token[] = [
      name could not be dark on the ink fill and white on the danger fill beside
      it. The primary and the accent read their label off their own seed, which
      is white where the seed is set and unset where it is not. */
-  ['color-foreground-on-primary', 'var(--_helix-brand-on, var(--helix-color-background))'],
-  ['color-foreground-on-accent', 'var(--_helix-accent-on, var(--helix-color-background))'],
-  ['color-foreground-on-status', 'var(--_helix-neutral-0)'],
+  ['color-foreground-on-primary', primitive('brand-on', ref('color-background'))],
+  ['color-foreground-on-accent', primitive('accent-on', ref('color-background'))],
+  ['color-foreground-on-status', primitive('neutral-0')],
   /* The mode's opposite, for a surface that has to read as separate from the
      page rather than as part of it: a tooltip, a toast. */
-  ['color-surface-inverse', 'light-dark(var(--_helix-neutral-900), var(--_helix-neutral-100))'],
-  ['color-foreground-inverse', 'light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900))'],
+  ['color-surface-inverse', lightDark(primitive('neutral-900'), primitive('neutral-100'))],
+  ['color-foreground-inverse', lightDark(primitive('neutral-50'), primitive('neutral-900'))],
   /* The one pair that does not turn over with the mode. */
-  ['color-surface-media', 'light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-1000))'],
-  ['color-foreground-media', 'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-0))'],
+  ['color-surface-media', lightDark(primitive('neutral-1000'), primitive('neutral-1000'))],
+  ['color-foreground-media', lightDark(primitive('neutral-0'), primitive('neutral-0'))],
   /* Lines. The light pair sits a step out from the `neutral-200`
      `surface-sunken` takes: a track drawn in the same neutral as its own
      border has no border. The first resolved to `var(--_helix-brand-500)`,
@@ -241,25 +356,40 @@ export const TOKENS: Token[] = [
      **And it is what 700 is for**: that rung was read by nothing until this. */
   [
     'color-border',
-    'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))',
+    lightDark(
+      mix(primitive('neutral-300'), 60, primitive('neutral-200')),
+      mix(primitive('neutral-700'), 30, primitive('neutral-800')),
+    ),
   ],
   /* Interaction. Each brand step falls back to the ink step it stands in for,
      which is the whole palette when no brand is named. */
   [
     'color-primary',
-    'light-dark(var(--_helix-brand-500, var(--_helix-ink-500)), var(--_helix-brand-400, var(--_helix-ink-400)))',
+    lightDark(
+      primitive('brand-500', primitive('ink-500')),
+      primitive('brand-400', primitive('ink-400')),
+    ),
   ],
   [
     'color-primary-hover',
-    'light-dark(var(--_helix-brand-600, var(--_helix-ink-600)), var(--_helix-brand-300, var(--_helix-ink-300)))',
+    lightDark(
+      primitive('brand-600', primitive('ink-600')),
+      primitive('brand-300', primitive('ink-300')),
+    ),
   ],
   [
     'color-primary-active',
-    'light-dark(var(--_helix-brand-700, var(--_helix-ink-700)), var(--_helix-brand-200, var(--_helix-ink-200)))',
+    lightDark(
+      primitive('brand-700', primitive('ink-700')),
+      primitive('brand-200', primitive('ink-200')),
+    ),
   ],
   [
     'color-primary-subtle',
-    'light-dark(var(--_helix-brand-50, var(--_helix-ink-50)), oklch(from var(--_helix-brand-900, var(--_helix-ink-900)) l calc(c * 0.5) h))',
+    lightDark(
+      primitive('brand-50', primitive('ink-50')),
+      relative(primitive('brand-900', primitive('ink-900')), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   /* A brand fill, which carries white, and that was the one job no accent
      token in this set was doing. Measured by painting each pair
@@ -276,48 +406,78 @@ export const TOKENS: Token[] = [
      separately. */
   [
     'color-accent',
-    'light-dark(var(--_helix-accent-500, var(--_helix-ink-500)), var(--_helix-accent-400, var(--_helix-ink-400)))',
+    lightDark(
+      primitive('accent-500', primitive('ink-500')),
+      primitive('accent-400', primitive('ink-400')),
+    ),
   ],
   [
     'color-accent-hover',
-    'light-dark(var(--_helix-accent-600, var(--_helix-ink-600)), var(--_helix-accent-300, var(--_helix-ink-300)))',
+    lightDark(
+      primitive('accent-600', primitive('ink-600')),
+      primitive('accent-300', primitive('ink-300')),
+    ),
   ],
   [
     'color-accent-active',
-    'light-dark(var(--_helix-accent-700, var(--_helix-ink-700)), var(--_helix-accent-200, var(--_helix-ink-200)))',
+    lightDark(
+      primitive('accent-700', primitive('ink-700')),
+      primitive('accent-200', primitive('ink-200')),
+    ),
   ],
   [
     'color-accent-subtle',
-    'light-dark(var(--_helix-accent-50, var(--_helix-ink-50)), oklch(from var(--_helix-accent-900, var(--_helix-ink-900)) l calc(c * 0.5) h))',
+    lightDark(
+      primitive('accent-50', primitive('ink-50')),
+      relative(primitive('accent-900', primitive('ink-900')), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   /* An ink fill is the ink itself, light in the dark, and its hover darkens
      from there like a brand fill's does. */
   [
     'color-accent-surface',
-    'light-dark(var(--_helix-accent-600, var(--_helix-ink-500)), var(--_helix-accent-600, var(--_helix-ink-400)))',
+    lightDark(
+      primitive('accent-600', primitive('ink-500')),
+      primitive('accent-600', primitive('ink-400')),
+    ),
   ],
   [
     'color-accent-surface-hover',
-    'light-dark(var(--_helix-accent-700, var(--_helix-ink-600)), var(--_helix-accent-700, var(--_helix-ink-450)))',
+    lightDark(
+      primitive('accent-700', primitive('ink-600')),
+      primitive('accent-700', primitive('ink-450')),
+    ),
   ],
   [
     'color-primary-surface',
-    'light-dark(var(--_helix-brand-600, var(--_helix-ink-500)), var(--_helix-brand-600, var(--_helix-ink-400)))',
+    lightDark(
+      primitive('brand-600', primitive('ink-500')),
+      primitive('brand-600', primitive('ink-400')),
+    ),
   ],
   [
     'color-primary-surface-hover',
-    'light-dark(var(--_helix-brand-700, var(--_helix-ink-surface-hover)), var(--_helix-brand-700, var(--_helix-ink-surface-hover-dark)))',
+    lightDark(
+      primitive('brand-700', primitive('ink-surface-hover')),
+      primitive('brand-700', primitive('ink-surface-hover-dark')),
+    ),
   ],
   [
     'color-primary-surface-active',
-    'light-dark(var(--_helix-brand-800, var(--_helix-ink-surface-active)), var(--_helix-brand-800, var(--_helix-ink-surface-active-dark)))',
+    lightDark(
+      primitive('brand-800', primitive('ink-surface-active')),
+      primitive('brand-800', primitive('ink-surface-active-dark')),
+    ),
   ],
   /* The edge of a field under the pointer. A brand's own color, and with no brand
      a gray at 3:1 on the page, where the primary is near black and the edge went
      from 1.23:1 to 17.76:1, measured October 31, 2026. Focus keeps `primary`. */
   [
     'color-border-hover',
-    'light-dark(var(--_helix-brand-500, var(--_helix-neutral-450)), var(--_helix-brand-400, var(--_helix-neutral-550)))',
+    lightDark(
+      primitive('brand-500', primitive('neutral-450')),
+      primitive('brand-400', primitive('neutral-550')),
+    ),
     'The edge of a field under the pointer.',
   ],
   /* **The ring is the border's color, said as an alias so the two cannot drift
@@ -336,7 +496,7 @@ export const TOKENS: Token[] = [
      for two components to disagree about which one to reach for." Two names
      holding the same *value* is that place. One name pointing at the other is
      not, and cannot become one. */
-  ['color-focus-ring', 'var(--helix-color-primary)'],
+  ['color-focus-ring', ref('color-primary')],
   /* The brand as a mark, which is the one place it appears as itself.
      Everywhere else it is solved for a word: `primary` has to clear 4.5:1 as
      text and `primary-surface` further still to carry white on a fill. A mark
@@ -349,41 +509,38 @@ export const TOKENS: Token[] = [
      readable as text travels much less here. */
   [
     'color-brand-mark',
-    'light-dark(var(--_helix-brand-500, var(--_helix-ink-500)), var(--_helix-brand-400, var(--_helix-ink-400)))',
+    lightDark(
+      primitive('brand-500', primitive('ink-500')),
+      primitive('brand-400', primitive('ink-400')),
+    ),
   ],
   /* Syntax. */
   [
     'color-syntax-callable',
-    'light-dark( var(--_helix-syntax-callable-light), var(--_helix-syntax-callable-dark) )',
+    lightDark(primitive('syntax-callable-light'), primitive('syntax-callable-dark')),
   ],
   [
     'color-syntax-comment',
-    'light-dark( var(--_helix-syntax-comment-light), var(--_helix-syntax-comment-dark) )',
+    lightDark(primitive('syntax-comment-light'), primitive('syntax-comment-dark')),
   ],
   [
     'color-syntax-constant',
-    'light-dark( var(--_helix-syntax-constant-light), var(--_helix-syntax-constant-dark) )',
+    lightDark(primitive('syntax-constant-light'), primitive('syntax-constant-dark')),
   ],
   [
     'color-syntax-invalid',
-    'light-dark( var(--_helix-syntax-invalid-light), var(--_helix-syntax-invalid-dark) )',
+    lightDark(primitive('syntax-invalid-light'), primitive('syntax-invalid-dark')),
   ],
   [
     'color-syntax-keyword',
-    'light-dark( var(--_helix-syntax-keyword-light), var(--_helix-syntax-keyword-dark) )',
+    lightDark(primitive('syntax-keyword-light'), primitive('syntax-keyword-dark')),
   ],
-  [
-    'color-syntax-name',
-    'light-dark( var(--_helix-syntax-name-light), var(--_helix-syntax-name-dark) )',
-  ],
+  ['color-syntax-name', lightDark(primitive('syntax-name-light'), primitive('syntax-name-dark'))],
   [
     'color-syntax-string',
-    'light-dark( var(--_helix-syntax-string-light), var(--_helix-syntax-string-dark) )',
+    lightDark(primitive('syntax-string-light'), primitive('syntax-string-dark')),
   ],
-  [
-    'color-syntax-tag',
-    'light-dark( var(--_helix-syntax-tag-light), var(--_helix-syntax-tag-dark) )',
-  ],
+  ['color-syntax-tag', lightDark(primitive('syntax-tag-light'), primitive('syntax-tag-dark'))],
   /* Status. The light half takes the 600 and the dark half the 400, for every
      severity rather than for danger alone. A 500 measures between 2.63 and
      3.80 against the light surfaces, which is enough for a fill or a mark and
@@ -427,67 +584,275 @@ export const TOKENS: Token[] = [
      from 0.017 to 0.013 in light, and from 0.003 to 0.011 in dark. */
   [
     'color-series-1',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.595 calc(0.221 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.206 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.595,
+        times(0.221, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.62,
+        times(0.206, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+    ),
   ],
   [
     'color-series-2',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.645 calc(0.18 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.645 calc(0.18 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.645,
+        times(0.18, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.645,
+        times(0.18, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+    ),
   ],
   [
     'color-series-3',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.625 calc(0.126 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.885 calc(0.179 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.625,
+        times(0.126, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.885,
+        times(0.179, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+    ),
   ],
   [
     'color-series-4',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.565 calc(0.295 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.252 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.565,
+        times(0.295, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.62,
+        times(0.252, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+    ),
   ],
   [
     'color-series-5',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.64 calc(0.133 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.815 calc(0.17 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.64,
+        times(0.133, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.815,
+        times(0.17, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+    ),
   ],
   [
     'color-series-6',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.63 calc(0.11 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.825 calc(0.144 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.63,
+        times(0.11, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.825,
+        times(0.144, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+    ),
   ],
   [
     'color-series-7',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.66,
+        times(0.277, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.66,
+        times(0.277, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+    ),
   ],
   [
     'color-series-8',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.63 calc(0.154 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.895 calc(0.219 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.63,
+        times(0.154, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.895,
+        times(0.219, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+    ),
   ],
   [
     'color-series-9',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.145, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+    ),
   ],
   [
     'color-series-10',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.129 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.145, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.129, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+    ),
   ],
   [
     'color-series-11',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.105, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+    ),
   ],
   [
     'color-series-12',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.145, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+    ),
   ],
   [
     'color-series-13',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.108 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.108, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+    ),
   ],
   [
     'color-series-14',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.105 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.105, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+    ),
   ],
   [
     'color-series-15',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.145, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+    ),
   ],
   [
     'color-series-16',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.145 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.135 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.145, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.135, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+    ),
   ],
   /* The quiet eight, at chroma 0.07. *Muted is a treatment, not a license to
      be indistinguishable.** At 0.05 the closest pair of the eight measured
@@ -505,53 +870,160 @@ export const TOKENS: Token[] = [
      Measured across 0.046 to 0.10 in both modes. */
   [
     'color-series-17',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-1)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-1')),
+      ),
+    ),
   ],
   [
     'color-series-18',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-2)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-2')),
+      ),
+    ),
   ],
   [
     'color-series-19',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-3)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-3')),
+      ),
+    ),
   ],
   [
     'color-series-20',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-4')),
+      ),
+    ),
   ],
   [
     'color-series-21',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-5)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-5')),
+      ),
+    ),
   ],
   [
     'color-series-22',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-6)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-6')),
+      ),
+    ),
   ],
   [
     'color-series-23',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.52 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.7 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.52,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.7,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-7')),
+      ),
+    ),
   ],
   [
     'color-series-24',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.6 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ), oklch( from var(--_helix-series-origin) 0.78 calc(0.07 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-8)) ) )',
+    lightDark(
+      relative(
+        primitive('series-origin'),
+        0.6,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+      relative(
+        primitive('series-origin'),
+        0.78,
+        times(0.07, primitive('seed-chroma-scale')),
+        plus(hue, primitive('series-hue-8')),
+      ),
+    ),
   ],
-  ['color-info', 'light-dark(var(--_helix-info-600), var(--_helix-info-400))'],
+  ['color-info', lightDark(primitive('info-600'), primitive('info-400'))],
   /* Both arms, like every other color here. A single value leaves a severity
      mark in its light-mode color on a dark surface: measured on an inverted
      toast, danger at 2.85:1 against a 3:1 floor. */
-  ['color-success', 'light-dark(var(--_helix-success-600), var(--_helix-success-400))'],
-  ['color-warning', 'light-dark(var(--_helix-warning-600), var(--_helix-warning-400))'],
+  ['color-success', lightDark(primitive('success-600'), primitive('success-400'))],
+  ['color-warning', lightDark(primitive('warning-600'), primitive('warning-400'))],
   /* Warning as a mark: a star, a Meter's fill, a Callout's icon. The ink is solved
      for text at 5.62:1 and reads brown as a shape, so a mark takes this, at least 3:1
      on the light page and on its own tint. */
   [
     'color-warning-mark',
-    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.25) h), var(--helix-color-warning))',
+    lightDark(
+      relative(ref('color-warning'), plus(lightness, 0.11), times(chroma, 1.25), hue),
+      ref('color-warning'),
+    ),
     'Warning as a mark that is not text, such as a star or a Meter fill.',
   ],
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. */
-  ['color-danger', 'light-dark(var(--_helix-danger-600), var(--_helix-danger-400))'],
+  ['color-danger', lightDark(primitive('danger-600'), primitive('danger-400'))],
   /* **Which way a value moved, for a page that colors by direction.** Markets
      disagree about the color of a rise: mainland China, Taiwan, and Japan draw
      it in red and a fall in green, and Hong Kong and most other markets draw a
@@ -568,8 +1040,8 @@ export const TOKENS: Token[] = [
      **Not switched by `lang`.** A page's language does not name its market:
      Hong Kong writes Chinese and draws a rise in green, and a page in English
      can show Shanghai prices. The page sets these for the market it shows. */
-  ['color-rise', 'var(--helix-color-success)'],
-  ['color-fall', 'var(--helix-color-danger)'],
+  ['color-rise', ref('color-success')],
+  ['color-fall', ref('color-danger')],
   /* **Each tone's quiet ink, one step and not two.** A tone's own ink is
      already at the contrast floor, so it cannot go quieter the way
      `foreground-muted` does, by giving up contrast; it gives up color instead:
@@ -582,37 +1054,55 @@ export const TOKENS: Token[] = [
      the neutral's own, `foreground-muted`. */
   [
     'color-primary-muted',
-    'light-dark(var(--_helix-brand-quiet-500, var(--helix-color-foreground-muted)), var(--_helix-brand-quiet-400, var(--helix-color-foreground-muted)))',
+    lightDark(
+      primitive('brand-quiet-500', ref('color-foreground-muted')),
+      primitive('brand-quiet-400', ref('color-foreground-muted')),
+    ),
   ],
   [
     'color-accent-muted',
-    'light-dark(var(--_helix-accent-quiet-500, var(--helix-color-foreground-muted)), var(--_helix-accent-quiet-400, var(--helix-color-foreground-muted)))',
+    lightDark(
+      primitive('accent-quiet-500', ref('color-foreground-muted')),
+      primitive('accent-quiet-400', ref('color-foreground-muted')),
+    ),
   ],
   [
     'color-danger-muted',
-    'light-dark(oklch(from var(--_helix-danger-600) l calc(c * 0.5) h), oklch(from var(--_helix-danger-400) l calc(c * 0.5) h))',
+    lightDark(
+      relative(primitive('danger-600'), lightness, times(chroma, 0.5), hue),
+      relative(primitive('danger-400'), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   [
     'color-info-muted',
-    'light-dark(oklch(from var(--_helix-info-600) l calc(c * 0.5) h), oklch(from var(--_helix-info-400) l calc(c * 0.5) h))',
+    lightDark(
+      relative(primitive('info-600'), lightness, times(chroma, 0.5), hue),
+      relative(primitive('info-400'), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   [
     'color-success-muted',
-    'light-dark(oklch(from var(--_helix-success-600) l calc(c * 0.5) h), oklch(from var(--_helix-success-400) l calc(c * 0.5) h))',
+    lightDark(
+      relative(primitive('success-600'), lightness, times(chroma, 0.5), hue),
+      relative(primitive('success-400'), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   [
     'color-warning-muted',
-    'light-dark(oklch(from var(--_helix-warning-600) l calc(c * 0.5) h), oklch(from var(--_helix-warning-400) l calc(c * 0.5) h))',
+    lightDark(
+      relative(primitive('warning-600'), lightness, times(chroma, 0.5), hue),
+      relative(primitive('warning-400'), lightness, times(chroma, 0.5), hue),
+    ),
   ],
   /* Fills that carry `foreground-on-status`. */
-  ['color-danger-surface', 'var(--_helix-danger-600)'],
-  ['color-danger-surface-hover', 'var(--_helix-danger-700)'],
-  ['color-info-surface', 'var(--_helix-info-600)'],
-  ['color-info-surface-hover', 'var(--_helix-info-700)'],
-  ['color-success-surface', 'var(--_helix-success-600)'],
-  ['color-success-surface-hover', 'var(--_helix-success-700)'],
-  ['color-warning-surface', 'var(--_helix-warning-600)'],
-  ['color-warning-surface-hover', 'var(--_helix-warning-700)'],
+  ['color-danger-surface', primitive('danger-600')],
+  ['color-danger-surface-hover', primitive('danger-700')],
+  ['color-info-surface', primitive('info-600')],
+  ['color-info-surface-hover', primitive('info-700')],
+  ['color-success-surface', primitive('success-600')],
+  ['color-success-surface-hover', primitive('success-700')],
+  ['color-warning-surface', primitive('warning-600')],
+  ['color-warning-surface-hover', primitive('warning-700')],
   /* ======================================================== scrollbar === */
   /* A scrollbar the library colors has to clear 3:1 against what it sits on.
      The browser's own thumb is exempt from WCAG 1.4.11 as a user-agent
@@ -635,39 +1125,39 @@ export const TOKENS: Token[] = [
      hook first, so one scroller can differ without moving these. */
   [
     'scrollbar-thumb-color',
-    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
+    lightDark(primitive('neutral-500'), primitive('neutral-550')),
     'The thumb of a scrollbar Helix colors, at rest.',
   ],
   [
     'scrollbar-thumb-hover-color',
-    'var(--helix-color-foreground-subtle)',
+    ref('color-foreground-subtle'),
     'The thumb while the pointer is over its scroller.',
   ],
-  ['scrollbar-track-color', 'transparent', 'The track behind the thumb.'],
+  ['scrollbar-track-color', transparent, 'The track behind the thumb.'],
   /* ======================================================== space ======= */
-  ['space-none', 'var(--_helix-scale-0)'],
-  ['space-2xs', 'var(--_helix-scale-1)'],
-  ['space-xs', 'var(--_helix-scale-2)'],
-  ['space-sm', 'var(--_helix-scale-3)'],
-  ['space-md', 'var(--_helix-scale-4)'],
-  ['space-lg', 'var(--_helix-scale-6)'],
-  ['space-xl', 'var(--_helix-scale-8)'],
-  ['space-2xl', 'var(--_helix-scale-12)'],
-  ['space-3xl', 'var(--_helix-scale-16)'],
+  ['space-none', primitive('scale-0')],
+  ['space-2xs', primitive('scale-1')],
+  ['space-xs', primitive('scale-2')],
+  ['space-sm', primitive('scale-3')],
+  ['space-md', primitive('scale-4')],
+  ['space-lg', primitive('scale-6')],
+  ['space-xl', primitive('scale-8')],
+  ['space-2xl', primitive('scale-12')],
+  ['space-3xl', primitive('scale-16')],
   /* ======================================================== radii ======= */
-  ['radii-none', '0'],
-  ['radii-sm', 'calc(var(--_helix-seed-radii) * 0.5)'],
-  ['radii-md', 'var(--_helix-seed-radii)'],
-  ['radii-lg', 'calc(var(--_helix-seed-radii) * 1.5)'],
-  ['radii-full', '9999px'],
+  ['radii-none', 0],
+  ['radii-sm', times(primitive('seed-radii'), 0.5)],
+  ['radii-md', primitive('seed-radii')],
+  ['radii-lg', times(primitive('seed-radii'), 1.5)],
+  ['radii-full', px(9999)],
   /* ======================================================== type ======== */
-  ['font-sans', 'var(--_helix-family-sans)', 'All text except code and display headings.'],
-  ['font-mono', 'var(--_helix-family-mono)', 'Code, and text that needs to line up in columns.'],
+  ['font-sans', primitive('family-sans'), 'All text except code and display headings.'],
+  ['font-mono', primitive('family-mono'), 'Code, and text that needs to line up in columns.'],
   /* Falls back to the sans stack, so a product that never sets a display face
      still renders rather than dropping to a serif default. */
   [
     'font-display',
-    'var(--_helix-family-display, var(--_helix-family-sans))',
+    primitive('family-display', primitive('family-sans')),
     'Large display headings. Falls back to the sans face.',
   ],
   /* The body size is `md`, and it is 14. 14 is the size a dense product
@@ -682,19 +1172,19 @@ export const TOKENS: Token[] = [
      the ramp with the engine's own, so a step that differed here would change
      size under a theme that sets the default size and ratio. A test in
      `helix/theme/rust/css.rs` holds the two equal. */
-  ['text-xs', 'var(--_helix-size-12)'],
-  ['text-sm', 'var(--_helix-size-13)'],
-  ['text-md', 'var(--_helix-size-14)'],
-  ['text-lg', 'var(--_helix-size-18)'],
-  ['text-xl', 'var(--_helix-size-24)'],
-  ['text-2xl', 'var(--_helix-size-32)'],
-  ['text-3xl', 'var(--_helix-size-42)'],
-  ['weight-regular', '400', 'Body text. Most of a page uses this weight.'],
-  ['weight-medium', '500', 'Labels, and quieter headings.'],
-  ['weight-semibold', '600', 'Headings. The heaviest weight in Helix.'],
-  ['leading-tight', '1.2', 'Body text set close, for short lines.'],
-  ['leading-normal', '1.5', 'Body text. The default line height for a paragraph.'],
-  ['leading-loose', '1.7', 'Body text set open, for long lines or small sizes.'],
+  ['text-xs', primitive('size-12')],
+  ['text-sm', primitive('size-13')],
+  ['text-md', primitive('size-14')],
+  ['text-lg', primitive('size-18')],
+  ['text-xl', primitive('size-24')],
+  ['text-2xl', primitive('size-32')],
+  ['text-3xl', primitive('size-42')],
+  ['weight-regular', 400, 'Body text. Most of a page uses this weight.'],
+  ['weight-medium', 500, 'Labels, and quieter headings.'],
+  ['weight-semibold', 600, 'Headings. The heaviest weight in Helix.'],
+  ['leading-tight', 1.2, 'Body text set close, for short lines.'],
+  ['leading-normal', 1.5, 'Body text. The default line height for a paragraph.'],
+  ['leading-loose', 1.7, 'Body text set open, for long lines or small sizes.'],
   /* **A heading derives its leading from its size instead of picking a rung**,
      because picking is what kept getting it wrong. Every heading took `tight`,
      and measured against real ink extents rather than em boxes, four of them set
@@ -713,12 +1203,12 @@ export const TOKENS: Token[] = [
      control metric now as much as a type one. */
   [
     'leading-heading',
-    'calc(0.99em + 0.5rem)',
+    plus(em(0.99), rem(0.5)),
     'Headings, which need less line height than a paragraph. It is a length plus an em, so it tightens as the type grows.',
   ],
-  ['tracking-tight', '-0.01em', 'Large type, which needs tighter letter spacing than a paragraph.'],
-  ['tracking-normal', '0', 'Body text. The default letter spacing.'],
-  ['tracking-wide', '0.02em', 'Labels and small capitals, which need extra letter spacing.'],
+  ['tracking-tight', em(-0.01), 'Large type, which needs tighter letter spacing than a paragraph.'],
+  ['tracking-normal', 0, 'Body text. The default letter spacing.'],
+  ['tracking-wide', em(0.02), 'Labels and small capitals, which need extra letter spacing.'],
   /* *The eyebrow step, which is a different job from `wide`.** `wide` at
      0.02em is a nudge, for a label in sentence case that wants a little air.
      An eyebrow is set in capitals, and capitals need more than a nudge:
@@ -728,10 +1218,10 @@ export const TOKENS: Token[] = [
      deliberate, measured against the 0.18em on the legacy marketing site,
      which is loose enough that a four-word kicker begins to come apart, and
      `Acceptable use` is two of four. */
-  ['tracking-wider', '0.12em', 'Uppercase eyebrows, which need more letter spacing than a label.'],
+  ['tracking-wider', em(0.12), 'Uppercase eyebrows, which need more letter spacing than a label.'],
   /* ======================================================== border ====== */
-  ['border-thin', '1px'],
-  ['border-thick', '2px'],
+  ['border-thin', px(1)],
+  ['border-thick', px(2)],
   /* *How a surface is told apart from what is behind it, said once.** A design
      language leads with one of four mechanisms, fill, border, shadow or space,
      and without these the library could express none of them: border
@@ -740,7 +1230,7 @@ export const TOKENS: Token[] = [
      wrote `border: none` outright, so one could never be added either. */
   [
     'border-surface',
-    'var(--helix-border-thin)',
+    ref('border-thin'),
     'The border of a surface in the page flow. Set it to zero to separate surfaces with shadows.',
   ],
   /* *A floating surface draws a hairline as well as its shadow, decided by the
@@ -754,31 +1244,27 @@ export const TOKENS: Token[] = [
      family's own `--*-border-width` hook still takes 0 for one surface. */
   [
     'border-floating',
-    'var(--helix-border-thin)',
+    ref('border-thin'),
     'The border of a surface that floats over content. Set it to zero to separate floating surfaces by their shadow alone.',
   ],
   /* ======================================================== shadow ====== */
   /* Used sparingly. */
-  ['shadow-none', 'none'],
+  ['shadow-none', none],
   /* The ink is per mode, and `--_helix-shadow-ink-*` at the top of
      `tokens.css` carries why, along with the measurement. */
-  ['shadow-sm', '0 1px 2px var(--_helix-shadow-ink-sm)'],
-  ['shadow-md', '0 4px 12px var(--_helix-shadow-ink-md)'],
-  ['shadow-lg', '0 12px 32px var(--_helix-shadow-ink-lg)'],
+  ['shadow-sm', shadow([0, px(1), px(2)], primitive('shadow-ink-sm'))],
+  ['shadow-md', shadow([0, px(4), px(12)], primitive('shadow-ink-md'))],
+  ['shadow-lg', shadow([0, px(12), px(32)], primitive('shadow-ink-lg'))],
   /* The lift half of the separation policy above. */
   [
     'shadow-surface',
-    'var(--helix-shadow-none)',
+    ref('shadow-none'),
     'The shadow of a surface in the page flow. Set it to none to separate surfaces with borders.',
   ],
-  [
-    'shadow-floating',
-    'var(--helix-shadow-lg)',
-    'The shadow of a surface that floats over content.',
-  ],
+  ['shadow-floating', ref('shadow-lg'), 'The shadow of a surface that floats over content.'],
   /* A control lifted over content: a raised Icon Button, a Carousel arrow, a Speed
      Dial. The same lift as a panel, and a control keeps its own corner. */
-  ['shadow-raised', 'var(--helix-shadow-floating)', 'The shadow of a control lifted over content.'],
+  ['shadow-raised', ref('shadow-floating'), 'The shadow of a control lifted over content.'],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through
      it. */
@@ -786,7 +1272,7 @@ export const TOKENS: Token[] = [
      admits what is behind it. */
   [
     'material-backdrop',
-    'blur(var(--helix-material-blur-md)) saturate(1.5)',
+    filters(blur(ref('material-blur-md')), saturate(1.5)),
     'The blur and saturation behind a translucent surface.',
   ],
   /* *The scalar the policy moves, where the others are values it sets.** A
@@ -795,12 +1281,12 @@ export const TOKENS: Token[] = [
      a component keeps the strength it was drawn at and the theme moves all of
      them together: 1 is what ships, below 1 is more see-through, above 1 more
      solid. */
-  ['material-opacity', '1', 'How opaque a translucent surface is.'],
+  ['material-opacity', 1, 'How opaque a translucent surface is.'],
   /* How far a control that does not take a press fades. Every family keeps its own
      hook and reads this behind it. */
-  ['opacity-disabled', '0.5', 'How far a disabled control fades.'],
+  ['opacity-disabled', 0.5, 'How far a disabled control fades.'],
   /* Rows that stay on screen while a new set arrives. */
-  ['opacity-busy', '0.5', 'How far rows fade while a new set loads.'],
+  ['opacity-busy', 0.5, 'How far rows fade while a new set loads.'],
   /* *Two facts about glass that no token can express, written where the blurs
      are because they are what a consumer needs before reaching for one.** Both
      were found building a masthead and a menu that share an edge, and neither
@@ -820,18 +1306,18 @@ export const TOKENS: Token[] = [
      is dark `surface` *and* light `surface-inverse` *and* this, so moving it
      drags two unrelated roles, and pointing the material at `neutral-800`
      makes a glass panel read as a *lifted surface* rather than as glass. */
-  ['material-blur-sm', '8px', 'The lightest backdrop blur.'],
-  ['material-blur-md', '16px', 'The backdrop blur behind a modal.'],
-  ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
+  ['material-blur-sm', px(8), 'The lightest backdrop blur.'],
+  ['material-blur-md', px(16), 'The backdrop blur behind a modal.'],
+  ['material-blur-lg', px(32), 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 30%, transparent), color-mix(in oklab, var(--_helix-neutral-900) 60%, transparent) )',
+    lightDark(alpha(primitive('neutral-0'), 30), alpha(primitive('neutral-900'), 60)),
 
     'The translucent background, for a surface that shows what is behind it.',
   ],
   [
     'material-translucent-strong',
-    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )',
+    alpha(lightDark(primitive('neutral-0'), primitive('neutral-900')), 88),
 
     'The stronger translucent background, for a surface that shows less of what is behind it.',
   ],
@@ -842,12 +1328,12 @@ export const TOKENS: Token[] = [
      30% and 48% it measured 2.4:1 and 3.41:1, October 31, 2026. */
   [
     'material-modal',
-    'light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))',
+    lightDark(ref('material-translucent-strong'), ref('material-translucent')),
     'The glass of a Dialog or Drawer, which sits over its own scrim.',
   ],
   [
     'material-panel',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent), var(--helix-material-translucent) )',
+    lightDark(alpha(primitive('neutral-0'), 72), ref('material-translucent')),
     'The glass of a panel over the page, such as a Menu, Popover, or Tooltip.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the
@@ -855,46 +1341,53 @@ export const TOKENS: Token[] = [
      tokens below the comment explaining why that cannot work. */
   [
     'material-border',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 14%, transparent), color-mix(in oklab, var(--_helix-neutral-0) 12%, transparent) )',
+    lightDark(alpha(primitive('neutral-950'), 14), alpha(primitive('neutral-0'), 12)),
 
     'The border a translucent surface needs to keep a visible edge.',
   ],
   /* ======================================================== motion ====== */
-  ['duration-instant', '0ms'],
-  ['duration-fast', 'var(--_helix-ms-120)'],
-  ['duration-normal', 'var(--_helix-ms-200)'],
-  ['duration-slow', 'var(--_helix-ms-320)'],
+  ['duration-instant', ms(0)],
+  ['duration-fast', primitive('ms-120')],
+  ['duration-normal', primitive('ms-200')],
+  ['duration-slow', primitive('ms-320')],
   /* `standard` for most state changes, `emphasized` for things entering the
      screen, `decelerate` for things arriving and settling, `spring` for the
      one or two places a gesture should feel physical. */
-  ['easing-standard', 'var(--_helix-curve-standard)'],
-  ['easing-emphasized', 'var(--_helix-curve-emphasized)'],
-  ['easing-decelerate', 'cubic-bezier(0, 0, 0, 1)'],
-  ['easing-accelerate', 'cubic-bezier(0.3, 0, 1, 1)'],
+  ['easing-standard', primitive('curve-standard')],
+  ['easing-emphasized', primitive('curve-emphasized')],
+  ['easing-decelerate', cubicBezier(0, 0, 0, 1)],
+  ['easing-accelerate', cubicBezier(0.3, 0, 1, 1)],
+  // A damping ratio of 0.71, the ratio the native motion driver springs with,
+  // at a mass of 1 and a stiffness of 100. A line comment, so it stays out of
+  // tokens.css: the stylesheet draws the curve, and only the registry reads
+  // the physics.
   [
     'easing-spring',
-    'linear( 0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1 )',
+    spring(
+      { damping: 14.2, mass: 1, stiffness: 100 },
+      linear(0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1),
+    ),
   ],
   /* ======================================================== size ======== */
-  ['size-control-md', 'calc(2.5rem * var(--_helix-seed-density))'],
-  ['size-control-sm', 'calc(2rem * var(--_helix-seed-density))'],
+  ['size-control-md', times(rem(2.5), density)],
+  ['size-control-sm', times(rem(2), density)],
   /* The height a control is here. */
-  ['size-control', 'var(--helix-size-control-md)'],
+  ['size-control', ref('size-control-md')],
   /* The type and the inset a control takes at the current density. The three
      steps are decided by the pointer in `_modes.css`: a touch screen sets them a
      step larger, up to `text-md`, to sit beside a field's 16px. */
-  ['text-control-sm', 'var(--_helix-text-control-sm)'],
-  ['text-control-md', 'var(--_helix-text-control-md)'],
-  ['text-control-lg', 'var(--_helix-text-control-lg)'],
-  ['text-control', 'var(--helix-text-control-md)'],
+  ['text-control-sm', primitive('text-control-sm')],
+  ['text-control-md', primitive('text-control-md')],
+  ['text-control-lg', primitive('text-control-lg')],
+  ['text-control', ref('text-control-md')],
   /* *What a field you type into takes at the current density.** The value is
      content, so it sits a step over its label: label 12 and value 13 at `sm`,
      label 13 and value 14 at `md` and `lg`. Button and field share an inset
      nowhere: a field's text starts close to its edge, at 8, 12 and 16 against a
      button's 12, 16 and 24. */
-  ['text-field', 'var(--helix-text-md)'],
-  ['text-field-label', 'var(--helix-text-sm)'],
-  ['space-field', 'var(--helix-space-sm)'],
+  ['text-field', ref('text-md')],
+  ['text-field-label', ref('text-sm')],
+  ['space-field', ref('space-sm')],
   /* *The smallest type a field you type into may take.** iOS Safari zooms the
      page into a focused input, textarea or select whose text is under 16px, so
      on a touch screen this is 16px and everywhere else it is 0, which leaves
@@ -903,14 +1396,14 @@ export const TOKENS: Token[] = [
      The value is decided by the pointer in `_modes.css`, since a token here
      cannot carry a media query. Set it to `0px` to keep the desktop sizes on a
      touch screen. */
-  ['text-field-min', 'var(--_helix-text-field-min)'],
-  ['space-control', 'var(--helix-space-md)'],
+  ['text-field-min', primitive('text-field-min')],
+  ['space-control', ref('space-md')],
   /* *How far a control's press reaches.** 24 under a mouse, which is WCAG 2.5.8,
      and 44 on a touch screen, which is Apple's hit region. A transparent box
      around the control reaches this, so nothing drawn moves. Decided by the
      pointer in `_modes.css`. */
-  ['size-target', 'var(--_helix-size-target)'],
-  ['size-control-lg', 'calc(3rem * var(--_helix-seed-density))'],
+  ['size-target', primitive('size-target')],
+  ['size-control-lg', times(rem(3), density)],
   /* *A step either side of whatever step is current**, for a control that is
      deliberately not the same size as its neighbors: a row in a floating
      panel, a caret inside a trigger, the arrows on a carousel. The named steps
@@ -927,77 +1420,77 @@ export const TOKENS: Token[] = [
      menu item at 18. */
   /* Rounded, so a row does not land between pixels: 25.6 and 38.4 at `sm` and
      `lg` before October 31, 2026. */
-  ['size-control-tight', 'round(calc(var(--helix-size-control) * 0.8), 1px)'],
-  ['size-control-loose', 'calc(var(--helix-size-control) * 1.2)'],
-  ['size-icon-tight', 'calc(var(--helix-size-icon) * 0.8)'],
-  ['size-icon-loose', 'calc(var(--helix-size-icon) * 1.2)'],
-  ['size-checkbox-tight', 'calc(var(--helix-size-checkbox) * 0.8)'],
-  ['size-checkbox-loose', 'calc(var(--helix-size-checkbox) * 1.2)'],
+  ['size-control-tight', round(times(ref('size-control'), 0.8), px(1))],
+  ['size-control-loose', times(ref('size-control'), 1.2)],
+  ['size-icon-tight', times(ref('size-icon'), 0.8)],
+  ['size-icon-loose', times(ref('size-icon'), 1.2)],
+  ['size-checkbox-tight', times(ref('size-checkbox'), 0.8)],
+  ['size-checkbox-loose', times(ref('size-checkbox'), 1.2)],
   /* How wide a button is when it is asked to take a standard width rather than
      its label's. */
-  ['size-button', 'calc(12.5rem * var(--_helix-seed-density))'],
+  ['size-button', times(rem(12.5), density)],
   /* A mark pinned to something else, so it is sized against that rather than
      against a control. */
-  ['size-badge', 'calc(1rem * var(--_helix-seed-density))'],
+  ['size-badge', times(rem(1), density)],
   /* An avatar's own scale, and not the control scale. On the control scale
      `md` is 40px, which reads as a portrait beside a line of text. */
-  ['size-avatar', 'var(--helix-size-avatar-md)'],
-  ['size-avatar-sm', 'calc(1.5rem * var(--_helix-seed-density))'],
-  ['size-avatar-md', 'calc(2rem * var(--_helix-seed-density))'],
-  ['size-avatar-lg', 'calc(2.5rem * var(--_helix-seed-density))'],
+  ['size-avatar', ref('size-avatar-md')],
+  ['size-avatar-sm', times(rem(1.5), density)],
+  ['size-avatar-md', times(rem(2), density)],
+  ['size-avatar-lg', times(rem(2.5), density)],
   /* Smaller than a control on purpose: a tag is a label, not something to
      press, and matching control height would make a row of them read as a row
      of buttons. 24, 28, 32, a four-pixel step throughout, so the three read as
      one scale rather than as three separate decisions. */
-  ['size-tag', 'var(--helix-size-tag-md)'],
-  ['size-tag-lg', 'calc(2rem * var(--_helix-seed-density))'],
-  ['size-tag-md', 'calc(1.75rem * var(--_helix-seed-density))'],
-  ['size-tag-sm', 'calc(1.5rem * var(--_helix-seed-density))'],
+  ['size-tag', ref('size-tag-md')],
+  ['size-tag-lg', times(rem(2), density)],
+  ['size-tag-md', times(rem(1.75), density)],
+  ['size-tag-sm', times(rem(1.5), density)],
   /* How thick a bar reporting a proportion is drawn. */
-  ['size-progress', 'calc(0.5rem * var(--_helix-seed-density))'],
+  ['size-progress', times(rem(0.5), density)],
   /* And a meter is half again as thick, which is a difference on purpose. */
-  ['size-meter', 'calc(1rem * var(--_helix-seed-density))'],
+  ['size-meter', times(rem(1), density)],
   /* Sixteen, twenty, twenty-four: an even four pixels a step. */
-  ['size-checkbox', 'var(--helix-size-checkbox-md)'],
-  ['size-checkbox-lg', 'calc(1.5rem * var(--_helix-seed-density))'],
-  ['size-checkbox-md', 'calc(1.25rem * var(--_helix-seed-density))'],
-  ['size-checkbox-sm', 'calc(1rem * var(--_helix-seed-density))'],
+  ['size-checkbox', ref('size-checkbox-md')],
+  ['size-checkbox-lg', times(rem(1.5), density)],
+  ['size-checkbox-md', times(rem(1.25), density)],
+  ['size-checkbox-sm', times(rem(1), density)],
   /* Its own step, and one taller than the checkbox at every one of them. */
-  ['size-switch', 'var(--helix-size-switch-md)'],
-  ['size-switch-lg', 'calc(1.75rem * var(--_helix-seed-density))'],
-  ['size-switch-md', 'calc(1.5rem * var(--_helix-seed-density))'],
-  ['size-switch-sm', 'calc(1.25rem * var(--_helix-seed-density))'],
+  ['size-switch', ref('size-switch-md')],
+  ['size-switch-lg', times(rem(1.75), density)],
+  ['size-switch-md', times(rem(1.5), density)],
+  ['size-switch-sm', times(rem(1.25), density)],
   /* 16, 24, 32, stepping evenly like avatar by eight and tag by four, because
      a spinner is read beside those. */
-  ['size-loader-md', 'calc(1.5rem * var(--_helix-seed-density))'],
-  ['size-loader-sm', 'calc(1rem * var(--_helix-seed-density))'],
-  ['size-loader-lg', 'calc(2rem * var(--_helix-seed-density))'],
-  ['size-header', 'calc(3.5rem * var(--_helix-seed-density))'],
+  ['size-loader-md', times(rem(1.5), density)],
+  ['size-loader-sm', times(rem(1), density)],
+  ['size-loader-lg', times(rem(2), density)],
+  ['size-header', times(rem(3.5), density)],
   /* The current step, which density moves, and the scale it moves along. An
      icon is chrome: in a dense row it has to come down with the rest of it, or
      a 20px mark sits beside 12px text and reads as the loudest thing there.
      The seed is a single global knob for rescaling the whole system and it
      sits at `1`, so an unseeded scale costs nothing today and is one that
      would not move when the seed does. */
-  ['size-icon', 'var(--helix-size-icon-md)'],
-  ['size-icon-lg', 'calc(1.5rem * var(--_helix-seed-density))'],
-  ['size-icon-md', 'calc(1.25rem * var(--_helix-seed-density))'],
-  ['size-icon-sm', 'calc(1rem * var(--_helix-seed-density))'],
-  ['size-focus-ring', 'var(--helix-border-thick)'],
-  ['size-focus-offset', '2px'],
+  ['size-icon', ref('size-icon-md')],
+  ['size-icon-lg', times(rem(1.5), density)],
+  ['size-icon-md', times(rem(1.25), density)],
+  ['size-icon-sm', times(rem(1), density)],
+  ['size-focus-ring', ref('border-thick')],
+  ['size-focus-offset', px(2)],
   /* *How far a focus ring reaches past the box it is on**, which is the two
      above added together, because an outline is drawn outside the border edge
      and then pushed out again by its offset. */
-  ['size-focus-reach', 'calc(var(--helix-size-focus-ring) + var(--helix-size-focus-offset))'],
+  ['size-focus-reach', plus(ref('size-focus-ring'), ref('size-focus-offset'))],
   /* ======================================================== layer =======
      Positions in a stack, not components. */
   /* Beneath the content of the box that declares it, and not beneath the page.
      The ramp began at the document with nothing under it, so the only way to
      write this was a raw -1, which is the thing a token ramp exists to stop. */
-  ['layer-beneath', '-1'],
-  ['layer-base', '0'],
-  ['layer-raised', '10'],
-  ['layer-sticky', '100'],
-  ['layer-overlay', '1000'],
-  ['layer-toast', '1200'],
+  ['layer-beneath', -1],
+  ['layer-base', 0],
+  ['layer-raised', 10],
+  ['layer-sticky', 100],
+  ['layer-overlay', 1000],
+  ['layer-toast', 1200],
 ]

@@ -28,10 +28,10 @@ const reorder = (chapters: Chapter[], keys: string[]): Chapter[] =>
         chapter.children ? { ...chapter, children: reorder(chapter.children, keys) } : chapter,
       )
 
-const Item = ({ chapter, nested }: { chapter: Chapter; nested?: boolean }) => (
+const Item = ({ chapter, slot }: { chapter: Chapter; slot?: string }) => (
   <helix-tree-item
     open={chapter.children ? true : undefined}
-    slot={nested ? 'children' : undefined}
+    slot={slot}
     value={chapter.value}
   >
     {chapter.label}
@@ -39,7 +39,7 @@ const Item = ({ chapter, nested }: { chapter: Chapter; nested?: boolean }) => (
       <Item
         chapter={child}
         key={child.value}
-        nested
+        slot="children"
       />
     ))}
   </helix-tree-item>

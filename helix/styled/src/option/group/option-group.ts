@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessOptionGroup } from '@fusion.dev/helix-headless/option'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './option-group.css.js'
+import { styles } from './option-group.generated.css.js'
 
 /**
  * @summary A labeled group of options inside a listbox.

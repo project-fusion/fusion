@@ -1,12 +1,6 @@
-import './arriving.css'
-
 export function Example() {
   return (
-    <helix-toast
-      className="stack"
-      label="Notifications"
-      placement="bottom-end"
-    >
+    <helix-toast placement="bottom-end">
       <helix-toast-item
         dismissible
         tone="success"

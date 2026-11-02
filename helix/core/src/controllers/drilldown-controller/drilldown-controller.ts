@@ -1,4 +1,13 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import {
+  backOf,
+  depthOf,
+  enterOf,
+  hereOf,
+  labelOf,
+  rowsOn,
+  type StackTree,
+} from '../../utils/stack/stack.js'
 
 /** How the controller is told what it is drilling through. */
 export interface DrilldownOptions {
@@ -80,7 +89,31 @@ export class DrilldownController<Row extends Element = Element> implements React
    * question is asked here, once, and every reader below goes through it.
    */
   private get here(): Row | null {
-    return this.current?.isConnected ? this.current : null
+    return hereOf(this.tree, this.current)
+  }
+
+  /**
+   * The document as the tree core's stack walks, which a phone's stack
+   * walks through the rows that registered with their parent.
+   */
+  private readonly tree: StackTree<Row> = {
+    hasPage: (row) => this.hasPage(row),
+    labelOf: (row) =>
+      [...row.childNodes]
+        .filter((node) => node.nodeType === Node.TEXT_NODE)
+        .map((node) => node.textContent?.trim() ?? '')
+        .filter(Boolean)
+        .join(' '),
+    parentOf: (row) => this.parentOf(row),
+    present: (row) => row.isConnected,
+    rowsOf: (page) => {
+      const slot = this.options.slot ?? 'page'
+      const isRow = this.options.isRow ?? (() => true)
+      const source = page
+        ? [...page.children].filter((child) => child.slot === slot)
+        : this.options.root()
+      return source.filter(isRow) as Row[]
+    },
   }
 
   /** The row whose page is showing, or `null` at the top. */
@@ -100,11 +133,7 @@ export class DrilldownController<Row extends Element = Element> implements React
    * stack is: a count can be wrong about a tree, and the tree is what renders.
    */
   get depth(): number {
-    let depth = 0
-    for (let row = this.here; row; row = this.parentOf(row)) {
-      depth += 1
-    }
-    return depth
+    return depthOf(this.tree, this.current)
   }
 
   /**
@@ -115,21 +144,12 @@ export class DrilldownController<Row extends Element = Element> implements React
    * Empty at the top, where the panel's own label is the name of the place.
    */
   get label(): string {
-    return [...(this.here?.childNodes ?? [])]
-      .filter((node) => node.nodeType === Node.TEXT_NODE)
-      .map((node) => node.textContent?.trim() ?? '')
-      .filter(Boolean)
-      .join(' ')
+    return labelOf(this.tree, this.current)
   }
 
   /** The rows on the page showing, which is what the keyboard moves over. */
   get rows(): Row[] {
-    const slot = this.options.slot ?? 'page'
-    const isRow = this.options.isRow ?? (() => true)
-    const source = this.here
-      ? [...this.here.children].filter((child) => child.slot === slot)
-      : this.options.root()
-    return source.filter(isRow) as Row[]
+    return rowsOn(this.tree, this.current)
   }
 
   /** Whether a row has a page to drill into. */
@@ -146,26 +166,25 @@ export class DrilldownController<Row extends Element = Element> implements React
    * content and nothing saying why.
    */
   enter(row: Row): boolean {
-    if (!this.hasPage(row)) {
+    const entered = enterOf(this.tree, row)
+    if (entered === undefined) {
       return false
     }
-    this.current = row
+    this.current = entered
     this.host.requestUpdate()
     return true
   }
 
   /** Returns to the page above, and reports whether there was one. */
   back(): boolean {
-    const from = this.here
-    if (from === null) {
-      /* Which includes a reader whose page has been taken out from under them:
-         they are already at the top, whatever this was still holding. */
-      this.current = null
-      return false
+    const { moved, to } = backOf(this.tree, this.current)
+    /* Which includes a reader whose page has been taken out from under them:
+       they are already at the top, whatever this was still holding. */
+    this.current = to
+    if (moved) {
+      this.host.requestUpdate()
     }
-    this.current = this.parentOf(from)
-    this.host.requestUpdate()
-    return true
+    return moved
   }
 
   /**

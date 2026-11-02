@@ -317,6 +317,24 @@ if (hasLayout()) {
       expect(style.outlineColor).toBe(style.borderTopColor)
     })
 
+    test('the ring comes and goes with focus after the field was first drawn', async () => {
+      /* The ring is a rule on the host's focus. WebKit matched such a rule
+         only where the style was first computed after focus arrived, while
+         the compiler wrote the host's state inside `:where()`, so a field
+         drawn at rest and then focused kept its resting edge. The style is
+         read at rest first, so the rule has to match again as focus moves. */
+      const host = await mount('<helix-input label="A"></helix-input>')
+      const field = part(host, 'field') as HTMLElement
+      expect(getComputedStyle(field).outlineStyle).toBe('none')
+
+      host.focus()
+      expect(field.matches(':focus-within')).toBe(true)
+      expect(getComputedStyle(field).outlineStyle).not.toBe('none')
+
+      ;(document.activeElement as HTMLElement | null)?.blur()
+      expect(getComputedStyle(field).outlineStyle).toBe('none')
+    })
+
     test('a field with every part is taller than one with none, by all of them', async () => {
       const bare = await heightOf('<helix-input placeholder="P"></helix-input>')
       const full = await heightOf('<helix-input label="L" hint="C" feedback="F"></helix-input>')

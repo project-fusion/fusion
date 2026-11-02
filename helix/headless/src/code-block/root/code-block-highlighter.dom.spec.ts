@@ -36,6 +36,26 @@ const drawn = (el: Element): string | undefined =>
 const plain = (el: Element): boolean =>
   el.shadowRoot?.querySelector('slot:not([name])')?.hasAttribute('hidden') === false
 
+describe('tokens', () => {
+  test('a block draws the runs `tokens` returns, and `highlight` wins over them', async () => {
+    const block = (await mount(
+      '<helix-headless-code-block language="ts">a &lt; b</helix-headless-code-block>',
+    )) as HTMLElement & {
+      highlight?: unknown
+      tokens?: unknown
+      updateComplete: Promise<boolean>
+    }
+    block.tokens = () => [{ text: 'a ' }, { bold: true, color: '#111', text: '< b' }]
+    await block.updateComplete
+    const code = block.shadowRoot?.querySelector('[part="code"]')
+    expect(code?.querySelector('span')?.getAttribute('style')).toBe('color:#111;font-weight:bold')
+    expect(code?.textContent).toBe('a < b')
+    block.highlight = () => '<b>marked</b>'
+    await block.updateComplete
+    expect(block.shadowRoot?.querySelector('[part="code"] b')?.textContent).toBe('marked')
+  })
+})
+
 describe('a highlighter registered for every block', () => {
   test('draws a block that sets no highlight of its own, by its language', async () => {
     registerHighlighter(tsOnly)

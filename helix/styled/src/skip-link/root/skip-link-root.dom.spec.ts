@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -12,10 +12,12 @@ beforeAll(async () => {
    1px box in a browser. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-skip-link') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 describe('skip link', () => {

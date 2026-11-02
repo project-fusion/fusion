@@ -39,16 +39,18 @@ Choose a chart by the question it answers.
   exactly.
 - **How something moved over time.** `Line Chart`. It measures from the data's
   own range, so a small change still shows. Its `area` puts a light wash under
-  each line. Each wash is drawn from the floor on its own and overlaps the
-  others.
+  each line, down to the floor of that range. Each wash is drawn on its own and
+  overlaps the others.
 - **How several series moved over the same places, each apart.** `Spatial
   Ribbon Chart`, with a ribbon for each series, one behind another, in a box
   you can turn. Use it where series cross and a line chart tangles them. `Line
   Chart` is read more exactly.
-- **How a total is made up over time.** `Area Chart`. Each column is stacked on
-  the one below, so the top edge is the total and a band's thickness is its
-  share. Use it when the parts add up to a total. `Line Chart` with `area`
-  overlaps the series, and `Area Chart` adds them.
+- **How a total is made up over time.** `Area Chart`. It measures from zero.
+  Each column is stacked on the one below, so the top edge is the total and a
+  band's thickness is its share. Use it when the parts add up to a total. Its
+  `overlap` draws every band from zero, one in front of another, so a band's
+  height is its own amount. A `Line Chart` with `area` overlaps its washes too,
+  and measures them from the data's range, so a small change still shows.
 - **Parts of one whole, at one moment.** `Donut Chart`.
 - **How large each item is within its group, and how it stands on a second
   measure.** `Spatial Treemap`, with a block for each row, its area its size

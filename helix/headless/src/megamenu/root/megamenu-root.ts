@@ -19,6 +19,18 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HandOver, type Motion } from '../hand-over.js'
 
+/** A Megamenu Item, which draws its link in its own shadow root. */
+const ITEM = 'helix-megamenu-item, helix-headless-megamenu-item'
+
+/** What says a destination in the panel is the page you are on. */
+const CURRENT = `[aria-current="page"], :is(${ITEM})[current="page"]`
+
+/**
+ * What a reader chooses in the panel: a link or a control of your own, or a
+ * Megamenu Item with somewhere to go, whose click reaches here from its host.
+ */
+const CHOSEN = `a[href], button:not([disabled]), [role="menuitem"], :is(${ITEM})[href]:not([href=""])`
+
 /**
  * @summary A section of a navigation with a trigger that opens a panel of links.
  *
@@ -31,8 +43,9 @@ import { HandOver, type Motion } from '../hand-over.js'
  * Use `Menu` for a row of commands.
  *
  * It renders no links. A router renders its own anchors and cannot render them
- * inside this shadow root, so the panel is a slot for the lists and headings
- * you write.
+ * inside this shadow root, so the panel is a slot for what you write:
+ * `MegamenuGroup`s of `MegamenuItem`s, which a page that shares its code with
+ * a phone app writes, or lists and headings of your own.
  *
  * It opens on hover by default, and a press always opens it too. `open-on` sets
  * which. Hover is the default because in a navigation bar people expect to move
@@ -57,7 +70,8 @@ import { HandOver, type Motion } from '../hand-over.js'
  * navigation menu publishes the same pair from its shared viewport, so a
  * stylesheet can grow or shrink one panel into the next.
  *
- * While a link in the panel carries `aria-current="page"`, the host has
+ * While a link in the panel carries `aria-current="page"`, or a Megamenu Item
+ * in it `current="page"`, the host has
  * `:state(current)`, so the trigger of the section holding the page you are
  * on can say so, as Radix's navigation menu marks its active link.
  *
@@ -109,7 +123,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @cssproperty --megamenu-surface-inline-size - The panel's own width, written on the surface while it is open.
  * @cssproperty --megamenu-top - Where the panel starts, measured from the bar above it.
  *
- * @cssstate current - A link in the panel carries `aria-current="page"`, so the trigger can show the section you are in.
+ * @cssstate current - A link in the panel carries `aria-current="page"`, or an item in it `current="page"`, so the trigger can show the section you are in.
  * @cssstate from-end - The panel opened in place of one earlier in the bar, so it can enter from the end side.
  * @cssstate from-start - The panel opened in place of one later in the bar, so it can enter from the start side.
  * @cssstate narrow - The page is narrower than `band-below`, so the panel is shown as a band whatever its layout.
@@ -380,9 +394,13 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /** Watches the panel's links for the one that is the page you are on. */
   private currentWatch: MutationObserver | undefined
 
-  /** Records whether a link in the panel is the page you are on. */
+  /**
+   * Records whether a link in the panel is the page you are on: a link of
+   * your own with `aria-current="page"`, or a Megamenu Item with
+   * `current="page"`.
+   */
   private markCurrent(): void {
-    const current = [...this.querySelectorAll('[aria-current="page"]')].some(
+    const current = [...this.querySelectorAll(CURRENT)].some(
       (link) => !link.closest('[slot="trigger"]'),
     )
     this.toggleState('current', current)
@@ -607,12 +625,18 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     /* Asking for the destination rather than for any click, so the headings,
        the gaps between rows and a reader's stray click on the panel's own
        padding leave it where it is. */
-    const target = event.target as Element | null
-    const chosen = target?.closest?.('a[href], button:not([disabled]), [role="menuitem"]')
-    /* Inside this element and not the trigger. A press on the trigger is the
-       trigger's to answer, and a shadow-rendered one retargets to the host, so
-       `closest` there climbs past this element entirely. */
-    if (!chosen || !this.contains(chosen) || chosen.closest('[slot="trigger"]')) {
+    /* Along the path rather than from the target, so a Megamenu Item's own
+       link, inside its shadow root, finds the item that holds it. Inside
+       this element and not the trigger: a press on the trigger is the
+       trigger's to answer, and a shadow-rendered one is not in this
+       element's light DOM at all. */
+    const chosen = event
+      .composedPath()
+      .find(
+        (node): node is Element =>
+          node instanceof Element && node.matches(CHOSEN) && this.contains(node),
+      )
+    if (!chosen || chosen.closest('[slot="trigger"]')) {
       return
     }
     this.requestOpen(false)
@@ -639,7 +663,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     if (typeof MutationObserver === 'function') {
       this.currentWatch = new MutationObserver(() => this.markCurrent())
       this.currentWatch.observe(this, {
-        attributeFilter: ['aria-current'],
+        attributeFilter: ['aria-current', 'current'],
         childList: true,
         subtree: true,
       })

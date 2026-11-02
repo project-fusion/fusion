@@ -488,11 +488,11 @@ mod tests {
             .lines()
             .filter_map(|line| {
                 let rest = line.trim().strip_prefix("['text-")?;
-                let (name, rest) = rest.split_once("', 'var(--")?;
-                let primitive = rest.strip_suffix(")'],")?;
+                let (name, rest) = rest.split_once("', primitive('")?;
+                let primitive = rest.strip_suffix("')],")?;
                 primitive
-                    .starts_with("_helix-size-")
-                    .then(|| (name.to_owned(), size(primitive)))
+                    .starts_with("size-")
+                    .then(|| (name.to_owned(), size(&format!("_helix-{primitive}"))))
             })
             .collect()
     }

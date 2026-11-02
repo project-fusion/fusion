@@ -1,0 +1,35 @@
+# Button from a hardware keyboard, on Android: Enter presses the pending
+# button. Maestro sends each key with `adb shell input keyevent`, as a
+# keyboard does. `scripts/devices.sh` runs this folder on Android alone, since
+# Maestro sends an iOS simulator no arrow keys.
+#
+# The first arrow key takes the screen out of touch mode and focuses its first
+# view that takes focus. Each Down after it moves focus on down the screen, to
+# the button.
+appId: dev.fusion.helix.app
+name: Button from a keyboard
+---
+- stopApp
+- openLink: helix://button/pending/preview
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 30000
+- repeat:
+    times: 8
+    while:
+      notVisible:
+        text: Save changes
+        focused: true
+    commands:
+      - pressKey: Remote Dpad Down
+- pressKey: Enter
+# Busy for two seconds, which reading the screen on an emulator can outlast.
+- assertVisible:
+    enabled: false
+    optional: true
+    text: Save changes
+- extendedWaitUntil:
+    visible:
+      text: Save changes
+      enabled: true
+    timeout: 5000

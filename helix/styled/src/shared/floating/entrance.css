@@ -1,8 +1,10 @@
 /* The entrance every floating panel makes, in one sheet: it travels a little out
    of the edge it opened against, gated on `data-placed` so it never moves before
-   the controller has said where it goes. Keyed to the open state it would run a
-   frame early, placement being a microtask later than the reveal. Compose with
-   the family's own sheet, never instead of it.
+   the controller has said where it goes. The host is in the `placed-` state of
+   the side its panel landed on, as Popover's is, so a family that composes this
+   sheet sets those states. Keyed to the open state it would run a frame early,
+   placement being a microtask later than the reveal. Compose with the family's
+   own sheet, never instead of it.
 
    **On `transform`, never on `translate`.** The floating controller writes the
    panel's position onto `translate`, and a keyframe animating that property took
@@ -39,14 +41,21 @@
    screen. A panel with no arrow takes the fallback and grows from the middle of
    the near edge. Menu adds the two side placements in its own sheet, being the
    one family here that opens sideways. */
-[part="surface"][data-placement^="top"] {
+:host(:state(placed-top)) [part="surface"] {
   --_travel: var(--helix-space-2xs);
 
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
-[part="surface"][data-placement^="bottom"] {
+:host(:state(placed-bottom)) [part="surface"] {
   transform-origin: var(--floating-arrow-x, 50%) 0;
+}
+
+/* A sheet rises from under the window's bottom edge, at its own size. */
+:host(:state(sheet)) [part="surface"] {
+  --_travel: 100%;
+
+  scale: 1;
 }
 
 [part="surface"][data-placed] {

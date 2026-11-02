@@ -1,0 +1,120 @@
+# Toast: a press on a message's dismiss button closes it, a stack that
+# holds two at a time shows the next one, the page hears each dismissal, a
+# message that offers to undo puts the file back, and a swipe toward the end
+# of the line dismisses a message. Recorded.
+#
+# Each message's dismiss button is named "Dismiss", so a step names the one
+# it presses by its place. The stack stands at the bottom of the window, so
+# the touch the iOS simulator loses on a new screen lands in its middle.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
+appId: dev.fusion.helix.app
+name: Toast
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://toast/preview/preview
+      SHOWS: Project saved.
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- startRecording: toast
+- tapOn:
+    text: Dismiss
+    index: 0
+- extendedWaitUntil:
+    notVisible: Project saved.
+    timeout: 5000
+- assertVisible: Could not reach the server.
+- takeScreenshot: toast-preview-dismissed
+# This drag passes half the message's width, which `settleSwipe` takes out at
+# any speed. A drag from the words' middle to 90% of the screen stops short of
+# half and goes only as a fling, and on the Android emulator in run 41356179392
+# the message followed that drag and sprang back. The points stand in the
+# message's first line on both platforms. The retry covers a drag whose moves
+# reach a busy emulator as one, which moves nothing.
+- retry:
+    maxRetries: 1
+    commands:
+      - swipe:
+          start: 20%, 87%
+          end: 95%, 87%
+          duration: 600
+      - extendedWaitUntil:
+          notVisible: Could not reach the server.
+          timeout: 5000
+- openLink: helix://toast/queue/preview
+- extendedWaitUntil:
+    visible: Project saved.
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- assertNotVisible: A comment was added to Roadmap.
+- tapOn:
+    text: Dismiss
+    index: 0
+- extendedWaitUntil:
+    visible: A comment was added to Roadmap.
+    timeout: 5000
+- takeScreenshot: toast-queue-next
+- openLink: helix://toast/events/preview
+- extendedWaitUntil:
+    visible: .*No events yet.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Dismiss
+    index: 1
+- extendedWaitUntil:
+    visible: .*helix-dismiss.*
+    timeout: 5000
+- takeScreenshot: toast-events-heard
+# The row is one label on iOS, its name and its button. Matching from the start
+# of the words keeps the message "Archived Quarterly report.pdf" from answering.
+#
+# The check `standing-undo` is the undo example with a message that stands a
+# minute. In run 41361727088 the example's 8 seconds ran out inside the steps: on
+# Android the tap on Archive returned 9.6 seconds after the press, and on iOS "Undo"
+# was aimed at the screen's title, which the example's screen is also named, and
+# pressed 9.5 seconds after Archive, with the message gone. This screen's title is
+# Toast, so "Undo" names the message's button alone.
+- openLink: helix://checks/standing-undo
+- extendedWaitUntil:
+    visible: Quarterly report.pdf.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+# iOS reads the row as one label, "Quarterly report.pdf, Archive", so its button
+# is a point on that row. Android reads the button by its own words.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn:
+          text: Quarterly report.pdf.*
+          point: 83%, 50%
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          text: Archive
+          index: 0
+- extendedWaitUntil:
+    visible: Archived Quarterly report.pdf
+    timeout: 5000
+- takeScreenshot: toast-undo-offered
+- tapOn: Undo
+- extendedWaitUntil:
+    visible: Quarterly report.pdf.*
+    timeout: 5000
+- stopRecording

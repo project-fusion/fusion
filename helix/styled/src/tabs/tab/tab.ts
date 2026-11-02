@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTab } from '@fusion.dev/helix-headless/tabs'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './tab.css.js'
+import { styles } from './tab.generated.css.js'
 
 /**
  * @summary One tab in a tab list.

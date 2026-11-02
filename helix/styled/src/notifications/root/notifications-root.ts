@@ -7,7 +7,7 @@ import { styles as collectionStateStyles } from '../../shared/collection/state.c
 import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { HelixNotification } from '../notification/notification.js'
-import { styles } from './notifications-root.css.js'
+import { styles } from './notifications-root.generated.css.js'
 
 /**
  * @summary A feed of notifications, each marked read or unread.

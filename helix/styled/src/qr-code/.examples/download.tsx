@@ -15,7 +15,7 @@ export function Example() {
         ref={code}
         value="https://fusion.dev/helix"
       ></helix-qr-code>
-      <helix-button onClick={() => code.current?.download('helix-docs.png')}>
+      <helix-button onClick={() => code.current?.download?.('helix-docs.png')}>
         Download the code
       </helix-button>
     </helix-flex>

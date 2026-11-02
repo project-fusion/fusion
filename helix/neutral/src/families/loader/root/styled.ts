@@ -1,0 +1,174 @@
+import { oneOf } from '../../../render.js'
+import { native, product, token, web } from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Loader's styled tier.
+ *
+ * **Sized from the loader size tokens**, so a loader is the same size
+ * wherever it is placed. `--loader-size: 1em` matches the text beside it, as
+ * inside a button. The ink is the words' color around it.
+ *
+ * **One cell.** The drawing, the mark and the content each take the grid's
+ * one cell, so the mark centers over the ring and the loader takes the larger
+ * of the ring and the content.
+ *
+ * **The arc turns while the ring breathes**, out of step: a turn of 0.8
+ * seconds, the rate a spinner is read as busy rather than frantic, over a
+ * swell of 2.4. The mark breathes with the ring. No rate is on the duration
+ * scale, whose longest rung is for a control answering a hand. With motion
+ * reduced the swell stops, and the turn slows to one in four seconds, since
+ * a loader that stands still reads as broken.
+ *
+ * **`pulse` takes the arc and the ring away**, and the mark carries the
+ * motion alone, larger, as a wordmark waiting on a splash. With motion
+ * reduced it stops.
+ *
+ * **While it waits out its `delay`, the drawing keeps its box** and is not
+ * drawn, so the line it sits in does not move when it appears.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'loader',
+    hooks: ({ own }) => ({
+      color: 'currentColor',
+      duration: own.loaderTurn,
+      size: own.loaderSize,
+      trackColor: 'currentColor',
+      trackWidth: own.loaderStroke,
+    }),
+    own: {
+      loaderBreathe: null,
+      loaderCrawl: null,
+      loaderSize: null,
+      loaderStroke: null,
+      loaderTurn: null,
+      markSize: null,
+    },
+    props: { size: oneOf(['sm', 'md', 'lg']), pattern: oneOf(['pulse']) },
+    stylesheet: 'loader/root/loader-root.generated.css',
+  },
+  ({ hook, keyframes, on, own, rule }) => [
+    on('host', [
+      rule({
+        /* A phone's words already take the color around them. */
+        web: { color: 'inherit' },
+        display: 'inline-grid',
+        flexShrink: 0,
+        own: {
+          loaderBreathe: '2.4s',
+          loaderCrawl: '4s',
+          loaderSize: token('size-loader-md'),
+          loaderStroke: 2,
+          loaderTurn: '0.8s',
+        },
+        placeItems: 'center',
+        verticalAlign: 'middle',
+      }),
+      rule({ size: 'sm' }, { own: { loaderSize: token('size-loader-sm') } }),
+      rule({ size: 'lg' }, { own: { loaderSize: token('size-loader-lg') } }),
+      /* Bigger under `pulse`, because the mark is the whole of it. */
+      rule({ pattern: 'pulse' }, { own: { loaderSize: product(token('size-loader-lg'), 2) } }),
+      rule({ size: 'sm', pattern: 'pulse' }, { own: { loaderSize: token('size-loader-lg') } }),
+      rule(
+        { size: 'lg', pattern: 'pulse' },
+        { own: { loaderSize: product(token('size-loader-lg'), 3) } },
+      ),
+      /* A phone has no grid to stack the cell: the host is at least the
+         ring, the content lies in it, and the ring and the mark lie over it
+         in the middle. */
+      native([
+        rule({
+          justifyContent: 'center',
+          minBlockSize: hook.size,
+          minInlineSize: hook.size,
+        }),
+      ]),
+      /* On paper, a loader promises what will not come. */
+      rule({ print: true }, { display: 'none' }),
+    ]),
+    on('content', [
+      rule({ gridArea: '1 / 1' }),
+      /* The web hides it in its markup, on every tier; a phone here. */
+      native([rule({ idle: false }, { visibility: 'hidden' })]),
+    ]),
+    on('svg', [
+      rule({
+        animation: ['helix-loader-turn', hook.duration, 'linear', 'infinite'],
+        blockSize: hook.size,
+        gridArea: '1 / 1',
+        inlineSize: hook.size,
+      }),
+      rule({ reducedMotion: true }, { animationDuration: own.loaderCrawl }),
+      rule({ pattern: 'pulse' }, { animation: 'none' }),
+      native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
+    ]),
+    on('track', [
+      rule({
+        animation: ['helix-loader-breathe', own.loaderBreathe, 'ease-in-out', 'infinite'],
+        /* The web's circles say `fill="none"` in their markup. */
+        fill: 'none',
+        opacity: 0.18,
+        stroke: hook.trackColor,
+        strokeWidth: hook.trackWidth,
+      }),
+      rule({ reducedMotion: true }, { animation: 'none' }),
+      rule({ pattern: 'pulse' }, { display: 'none' }),
+    ]),
+    /* A gap in the dash is what makes the turn visible. */
+    on('indicator', [
+      rule({
+        fill: 'none',
+        stroke: hook.color,
+        strokeDasharray: '50, 100',
+        strokeLinecap: 'round',
+        strokeWidth: hook.trackWidth,
+      }),
+      rule({ pattern: 'pulse' }, { display: 'none' }),
+    ]),
+    /* The center, sized against the loader, so a mark stays in proportion at
+       every size, and breathing with the ring. */
+    on('mark', [
+      rule({
+        '--icon-size': own.markSize,
+        alignItems: 'center',
+        animation: ['helix-loader-breathe-mark', own.loaderBreathe, 'ease-in-out', 'infinite'],
+        blockSize: own.markSize,
+        display: 'flex',
+        gridArea: '1 / 1',
+        inlineSize: own.markSize,
+        justifyContent: 'center',
+        own: { markSize: product(hook.size, 0.4) },
+      }),
+      rule({ reducedMotion: true }, { animation: 'none' }),
+      /* Opacity alone, where the default appearance also scales. */
+      rule({ pattern: 'pulse' }, { animationName: 'helix-loader-pulse-mark' }),
+      rule({ reducedMotion: true, pattern: 'pulse' }, { animation: 'none', opacity: 1 }),
+      native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
+    ]),
+    on({ region: 'default', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
+    /* Waiting out `delay`: the web marks the drawing `hidden`, and keeps its
+       box. */
+    on('svg', [
+      web([rule({ part: { hidden: true } }, { display: 'inline', visibility: 'hidden' })]),
+    ]),
+    on('mark', [
+      web([rule({ part: { hidden: true } }, { display: 'flex', visibility: 'hidden' })]),
+    ]),
+    keyframes('helix-loader-breathe', {
+      '0%, 100%': { opacity: 0.12 },
+      '50%': { opacity: 0.24 },
+    }),
+    keyframes('helix-loader-breathe-mark', {
+      '0%, 100%': { opacity: 0.45, scale: 0.82 },
+      '50%': { opacity: 1, scale: 1 },
+    }),
+    keyframes('helix-loader-pulse-mark', {
+      '0%, 100%': { opacity: 0.35 },
+      '50%': { opacity: 1 },
+    }),
+    keyframes('helix-loader-turn', { to: { transform: 'rotate(1turn)' } }),
+  ],
+)

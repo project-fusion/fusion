@@ -1,0 +1,24 @@
+# Toggle, each example drawn alone: a group with one chosen, a group that
+# chooses several, and disabled toggles. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Toggle"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://toggle/preview/preview
+- extendedWaitUntil:
+    visible: '.*Board.*'
+    timeout: 30000
+- takeScreenshot: toggle-preview-${MODE}-${SIZE}
+- openLink: helix://toggle/multiple/preview
+- extendedWaitUntil:
+    visible: '.*Closed.*'
+    timeout: 15000
+- takeScreenshot: toggle-multiple-${MODE}-${SIZE}
+- openLink: helix://toggle/states/preview
+- extendedWaitUntil:
+    visible: '.*Center.*'
+    timeout: 15000
+- takeScreenshot: toggle-states-${MODE}-${SIZE}

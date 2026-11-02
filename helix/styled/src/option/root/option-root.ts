@@ -1,8 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessOption } from '@fusion.dev/helix-headless/option/root'
 import type { CSSResultGroup } from 'lit'
-import { styles as rowStyles } from '../../shared/row/row.css.js'
-import { styles } from './option-root.css.js'
+import { styles } from './option-root.generated.css.js'
 
 /**
  * @summary One choice in a listbox.
@@ -25,7 +24,7 @@ import { styles } from './option-root.css.js'
  */
 @customElement('helix-option')
 export class HelixOption extends HelixHeadlessOption {
-  static override styles: CSSResultGroup = [rowStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

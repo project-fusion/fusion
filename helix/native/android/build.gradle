@@ -1,0 +1,48 @@
+import groovy.json.JsonSlurper
+
+plugins {
+  id 'com.android.library'
+  id 'expo-module-gradle-plugin'
+}
+
+// The keys and theme capabilities' native modules, which Expo autolinks into a
+// development build of an app that depends on @fusion.dev/helix-native. Its
+// version is the package's, which the release stamps.
+def manifest = new JsonSlurper().parseText(file('../package.json').text)
+
+group = 'dev.fusion.helix'
+version = manifest.version
+
+// **The theme engine is in `src/engine` where it was built**, as the package on
+// npm carries it: `libfusion_helix_native.so` for each ABI, from
+// `fusion-helix-native`, and the Kotlin UniFFI writes for it. `bun run engine
+// android` builds both. Without them the theme module compiles
+// `src/withoutEngine`, which defines no `deriveModes`, and the theme draws the
+// colors derived at build time.
+def engine = file('src/engine/jniLibs').isDirectory()
+
+android {
+  namespace 'dev.fusion.helix.keys'
+
+  defaultConfig {
+    consumerProguardFiles 'proguard-rules.pro'
+  }
+
+  sourceSets {
+    main {
+      if (engine) {
+        java.srcDirs += ['src/engine/java', 'src/withEngine/java']
+        jniLibs.srcDirs += ['src/engine/jniLibs']
+      } else {
+        java.srcDirs += ['src/withoutEngine/java']
+      }
+    }
+  }
+}
+
+dependencies {
+  if (engine) {
+    // The Kotlin UniFFI writes calls the library through JNA.
+    implementation 'net.java.dev.jna:jna:5.19.1@aar'
+  }
+}

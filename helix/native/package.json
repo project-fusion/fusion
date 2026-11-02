@@ -1,0 +1,177 @@
+{
+  "name": "@fusion.dev/helix-native",
+  "description": "The React Native runtime Helix's components draw with: the renderer, the machines, the theme, and the capabilities a phone provides.",
+  "version": "0.229.1",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/native",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "android/build.gradle",
+    "android/proguard-rules.pro",
+    "android/src",
+    "dist",
+    "expo-module.config.json",
+    "ios"
+  ],
+  "sideEffects": [
+    "./dist/peers.js"
+  ],
+  "scripts": {
+    "build": "bun run generate && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "components": "helix system components --out src/families",
+    "engine": "bun scripts/engine.mjs",
+    "generate": "helix system types . && helix system tokens .",
+    "test": "bun run generate && bun run components && bun test src && bunx --bun jest",
+    "test:native": "bun run generate && bun run components && bunx --bun jest",
+    "typecheck": "bun run generate && bun run components && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.pure.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@formatjs/intl-displaynames": "^7.3.15",
+    "@formatjs/intl-getcanonicallocales": "^3.2.12",
+    "@formatjs/intl-listformat": "^8.3.15",
+    "@formatjs/intl-locale": "^5.3.12",
+    "@formatjs/intl-numberformat": "^9.4.3",
+    "@formatjs/intl-pluralrules": "^6.3.15",
+    "@formatjs/intl-relativetimeformat": "^12.3.15",
+    "@fusion.dev/helix-core": "workspace:*",
+    "@fusion.dev/helix-theme": "workspace:*"
+  },
+  "devDependencies": {
+    "@floating-ui/react-native": "0.10.10",
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/react": "^19.3.0",
+    "expo": "58.0.7",
+    "expo-blur": "~58.0.5",
+    "expo-clipboard": "~58.0.4",
+    "expo-document-picker": "~58.0.4",
+    "expo-file-system": "~58.0.10",
+    "expo-haptics": "~58.0.5",
+    "expo-image-picker": "~58.0.10",
+    "expo-sharing": "~58.0.16",
+    "jest-expo": "~58.0.9",
+    "react": "19.3.1",
+    "react-native": "0.88.0-rc.4",
+    "react-native-gesture-handler": "~3.2.1",
+    "react-native-reanimated": "4.7.0",
+    "react-native-safe-area-context": "~5.9.1",
+    "react-native-svg": "15.15.5",
+    "react-native-worklets": "0.13.0",
+    "react-test-renderer": "19.3.1"
+  },
+  "homepage": "https://fusion.dev",
+  "jest": {
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@fusion\\.dev/helix-native$": "<rootDir>/src/index.ts",
+      "^@fusion\\.dev/helix-core/machines/reference$": "<rootDir>/../core/src/machines/reference.ts",
+      "^@fusion\\.dev/helix-core/machines/(.+)/vectors$": "<rootDir>/../core/src/machines/$1/vectors.ts"
+    },
+    "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/tests/native.setup.cjs"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/*.jest.tsx",
+      "<rootDir>/tests/**/*.jest.tsx"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|@formatjs))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ]
+  },
+  "keywords": [
+    "design-system",
+    "react-native",
+    "expo",
+    "components",
+    "ui"
+  ],
+  "peerDependencies": {
+    "@floating-ui/react-native": ">=0.10",
+    "expo": "*",
+    "expo-blur": "*",
+    "expo-clipboard": "*",
+    "expo-document-picker": "*",
+    "expo-file-system": "*",
+    "expo-haptics": "*",
+    "expo-image-picker": "*",
+    "expo-sharing": "*",
+    "react": "^19",
+    "react-native": "*",
+    "react-native-gesture-handler": "^3",
+    "react-native-reanimated": "^4",
+    "react-native-safe-area-context": ">=5",
+    "react-native-svg": ">=15",
+    "react-native-worklets": "*"
+  },
+  "peerDependenciesMeta": {
+    "@floating-ui/react-native": {
+      "optional": true
+    },
+    "expo": {
+      "optional": true
+    },
+    "expo-blur": {
+      "optional": true
+    },
+    "expo-clipboard": {
+      "optional": true
+    },
+    "expo-document-picker": {
+      "optional": true
+    },
+    "expo-file-system": {
+      "optional": true
+    },
+    "expo-haptics": {
+      "optional": true
+    },
+    "expo-image-picker": {
+      "optional": true
+    },
+    "expo-sharing": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-gesture-handler": {
+      "optional": true
+    },
+    "react-native-reanimated": {
+      "optional": true
+    },
+    "react-native-safe-area-context": {
+      "optional": true
+    },
+    "react-native-svg": {
+      "optional": true
+    },
+    "react-native-worklets": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

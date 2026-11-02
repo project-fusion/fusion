@@ -1,0 +1,53 @@
+# iOS shows "Open in Helix?" before a link opens the gallery, until the first
+# time you press Open on that simulator, and then never again: seen on October
+# 11, 2026, with the gallery running and stopped. It runs first among the
+# flows `maestro test helix/app/.maestro` runs, as `config.yaml` orders it. On
+# Android no prompt shows, and it opens the gallery and passes.
+#
+# The prompt is iOS's own, outside the gallery. Where Maestro cannot find its
+# Open button by name, the tap goes where the button stands on an iPhone 17.
+# The workflow's simulators start with the answer already given, as
+# `native-devices.yml` writes it, so there this flow only opens the gallery.
+appId: dev.fusion.helix.app
+name: "Allow the gallery's links"
+tags:
+  - interactions
+---
+- stopApp
+- openLink: helix://button/preview
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 5000
+    optional: true
+- runFlow:
+    when:
+      notVisible: Save changes
+    commands:
+      - tapOn:
+          point: 68%, 54%
+          retryTapIfNoChange: false
+# The gallery's first launch on a new simulator is the slowest, so this waits
+# as long as the other flows do for their first screen: on October 14, 2026
+# it was still black after 20 seconds.
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 30000
+    optional: true
+# A press on Open can leave the gallery closed until the next link, which
+# then opens the link that waited: the home screen stayed up for 30 seconds
+# here, and the next flow found Button's screen in place of its own, in run
+# 38957410938. So the link opens again.
+- runFlow:
+    when:
+      notVisible: Save changes
+    commands:
+      - openLink: helix://button/preview
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 30000

@@ -51,16 +51,17 @@ impl Answer {
 
 /// What the tools take, described for a client that has never seen Helix.
 ///
-/// **The intent is passed as the same JSON a `helix.theme.json` holds**, rather
-/// than as a flattened set of parameters. One shape to document, one parser, and
-/// an agent that has read the file format can already call the tool. A schema
+/// **The intent is passed as the same JSON the `theme` of `helix.json`
+/// holds**, rather than as a flattened set of parameters. One shape to
+/// document, one parser, and an agent that has read the file format can
+/// already call the tool. A schema
 /// enumerating every optional field here would be a third copy of it, after the
 /// Rust struct and the starter file `helix theme init` writes.
 fn intent_schema() -> Value {
     json!({
         "properties": {
             "intent": {
-                "description": "A theme intent, the same JSON `helix.theme.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
+                "description": "A theme intent, the same JSON the `theme` of `helix.json` holds. Every key is optional. `brand` is a hex color, or `{ \"light\": hex, \"dark\": hex }` for one per mode, and without one the theme is ink: near-black on a light page and near-white on a dark one. Without `scheme` (\"light\" or \"dark\") the theme is derived in both modes. Other keys include `contrastTarget` (4.5 for AA, 7 for AAA), `accent`, `background` (the page's color, `{ \"light\": hex, \"dark\": hex }`), `chroma`, `neutral`, `radius`, `density`, and `separation`.",
                 "type": "object",
             },
         },
@@ -117,12 +118,19 @@ const TIER: (&str, &str) = (
     "`styled` or `headless`. Defaults to the styled tier where it is installed.",
 );
 
-/// Every tool, as `tools/list` returns them.
+/// Every tool, as `tools/list` returns them: the lookups, then the checks.
 pub fn catalog() -> Vec<Value> {
+    let mut all = lookups();
+    all.extend(checks());
+    all
+}
+
+/// The tools that read the installed packages, each a `helix api` verb.
+fn lookups() -> Vec<Value> {
     vec![
         json!({
             "annotations": annotations("Find a Helix family"),
-            "description": "Finds the Helix families that answer a name, an alias, a tag, a native element such as `button` or `h1`, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes.",
+            "description": "Finds the Helix families that answer a name, an alias, a tag, a native element such as `button` or `h1`, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes, and `platforms`, its status on the web and, where Helix draws it there, on React Native.",
             "inputSchema": {
                 "properties": {
                     "limit": { "description": "How many families to list. Defaults to 10.", "type": "integer" },
@@ -137,11 +145,19 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Read a Helix family"),
-            "description": "Returns one Helix family's API from the installed packages: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. A tag another installed package adds to the family, such as helix-sandbox-editor from @fusion.dev/helix-sandbox, is listed with its own import line. Write only what it lists. Lists the family's examples by slug for helix_example. `versions` names each package read, and `missing` says where the family's root is when its package is not installed.",
+            "description": "Returns one Helix family's API from the installed packages: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. A tag another installed package adds to the family, such as helix-sandbox-editor from @fusion.dev/helix-sandbox, is listed with its own import line. Write only what it lists. Lists the family's examples by slug for helix_example. The family's `platforms` gives its status on the web and on React Native. On React Native a tag is a component imported from the same entry, and the tag's `platforms` names it: `component`, the web properties it takes under the same names, the prop each slot and event becomes, and the properties it leaves out. Write only those on a phone. `versions` names each package read, and `missing` says where the family's root is when its package is not installed.",
             "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags, such as `select` or `helix-option`."), TIER], &["family"]),
             "name": "helix_family",
             "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string"), ("versions", "object")]),
             "title": "Read a Helix family",
+        }),
+        json!({
+            "annotations": annotations("Read a Helix family's anatomy"),
+            "description": "Returns what each styled element of a Helix family is made of, from the installed packages: the attributes the web element takes with what each holds, its custom states and events, and the tree in its shadow root, each part by its `part` name and each slot by its name. Where Helix draws the element on React Native, the same for its component: the props it takes, and the tree it draws, each region as the prop that fills it. Use it to see which part a `::part()` selector reaches and which slot content goes into.",
+            "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags."), TIER], &["family"]),
+            "name": "helix_anatomy",
+            "outputSchema": output(&[("anatomy", "array"), ("family", "string"), ("package", "string"), ("version", "string")]),
+            "title": "Read a Helix family's anatomy",
         }),
         json!({
             "annotations": annotations("Read a Helix example"),
@@ -173,6 +189,12 @@ pub fn catalog() -> Vec<Value> {
             "outputSchema": output(&[("categories", "array"), ("package", "string"), ("tokens", "array"), ("version", "string")]),
             "title": "Find Helix tokens",
         }),
+    ]
+}
+
+/// The tools that judge code, a page, or a theme.
+fn checks() -> Vec<Value> {
+    vec![
         json!({
             "annotations": annotations("Check Helix code"),
             "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a tag whose entry nothing imports, a native element a Helix family replaces, an interactive element inside a button or a link, and `\"false\"` on an attribute that is on wherever it is present. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
@@ -272,6 +294,13 @@ pub fn call(name: &str, arguments: &Value, from: &Path) -> Result<Answer, String
                 .map_err(|failure| said(&failure))
         }
         "helix_family" => api::family(
+            from,
+            argument(arguments, "family")?,
+            arguments["tier"].as_str(),
+        )
+        .map(Answer::of)
+        .map_err(|failure| said(&failure)),
+        "helix_anatomy" => api::anatomy(
             from,
             argument(arguments, "family")?,
             arguments["tier"].as_str(),
@@ -463,6 +492,6 @@ fn theme(name: &str, arguments: &Value) -> Result<Answer, String> {
 fn read(arguments: &Value) -> Result<ThemeIntent, String> {
     let body = arguments.get("intent").unwrap_or(arguments);
     serde_json::from_value(body.clone()).map_err(|failure| {
-        format!("that is not a theme intent: {failure}. It is the JSON `helix.theme.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
+        format!("that is not a theme intent: {failure}. It is the JSON the `theme` of `helix.json` holds, such as `{{\"brand\": \"#0b3d91\"}}`.")
     })
 }

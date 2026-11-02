@@ -1,0 +1,228 @@
+import field from '../../../fragments/field.js'
+import fieldInline from '../../../fragments/field-inline.js'
+import printExact from '../../../fragments/print-exact.js'
+import {
+  difference,
+  first,
+  list,
+  native,
+  product,
+  quotient,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Switch's styled tier.
+ *
+ * **The width follows the height**, so `--switch-block-size` widens the
+ * switch too and keeps its proportion, and the density steps carry the ratio
+ * without three widths written down.
+ *
+ * **The thumb travels**, and the fill says the switch is on: a switch has no
+ * mark, so the fill is the whole difference between the two states. The fill
+ * is `primary-surface`, the ground the thumb's `foreground-on-primary` ink is
+ * solved against.
+ *
+ * **The input is the track on the web**: stretched over it, invisible, and
+ * still what takes the press and the focus. A phone presses the row, and the
+ * focus ring goes on the track either way.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'switch',
+    hooks: ({ own }) => ({
+      blockSize: token('size-switch'),
+      iconColor: null,
+      inlineSize: product(own.switchHeight, 1.75),
+      onColor: token('color-primary-surface'),
+      thumbColor: null,
+    }),
+    own: {
+      fieldControlInlineSize: null,
+      fieldDisabledOpacity: null,
+      switchHeight: null,
+      switchInset: null,
+      switchWidth: null,
+    },
+    stylesheet: 'switch/root/switch-root.generated.css',
+  },
+  ({ hook, include, on, own, rule }) => [
+    include(field),
+    include(fieldInline),
+    /* The gap around the thumb, named once because three things derive from
+       it: the thumb's size, where it rests, and how far it travels. */
+    on('host', [
+      rule({
+        own: {
+          switchHeight: hook.blockSize,
+          switchWidth: hook.inlineSize,
+          switchInset: quotient(token('space-2xs'), 2),
+          /* What `field-inline` indents the hint by, so it starts under the
+             words, declared beside the size it derives from. */
+          fieldControlInlineSize: own.switchWidth,
+        },
+      }),
+      rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
+      rule(
+        { formDisabled: true },
+        { opacity: token('opacity-disabled'), own: { fieldDisabledOpacity: 1 } },
+      ),
+    ]),
+    on('field', [
+      rule({
+        alignItems: 'center',
+        web: { cursor: 'pointer' },
+        display: 'inline-flex',
+        gap: token('space-xs'),
+        position: 'relative',
+      }),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches
+         the target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
+      /* `:disabled` matches a disabled fieldset around the switch as well. */
+      web([rule({ formDisabled: true }, { cursor: 'default' })]),
+    ]),
+    /* The groove. One cell, so the input lies over the whole of it. */
+    on('track', [
+      rule({
+        backgroundColor: token('color-surface-sunken'),
+        blockSize: own.switchHeight,
+        /* The edge in the mark ink, as a Checkbox's: an off Switch is a white thumb
+           on a near-white groove, and it is still a control you can press. */
+        border: [token('border-thin'), 'solid', token('color-foreground-subtle')],
+        borderRadius: token('radii-full'),
+        display: 'grid',
+        flex: '0 0 auto',
+        inlineSize: own.switchWidth,
+        position: 'relative',
+        transition: list(
+          ['background-color', token('duration-fast'), token('easing-standard')],
+          ['border-color', token('duration-fast'), token('easing-standard')],
+        ),
+      }),
+      rule(
+        { checked: true },
+        {
+          backgroundColor: hook.onColor,
+          borderColor: hook.onColor,
+        },
+      ),
+      rule(
+        { holds: { control: 'focusVisible' } },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      /* The edge firms up under the pointer, as a Checkbox's and a Radio's do. */
+      rule(
+        { formDisabled: false, within: { field: { hover: true } } },
+        { borderColor: token('color-foreground') },
+      ),
+      rule({ invalid: true }, { borderColor: token('color-danger') }),
+      /* A press firms the edge, and a press on the on state lifts the fill. */
+      rule(
+        { formDisabled: false, within: { field: { active: true } } },
+        { backgroundColor: token('color-press') },
+      ),
+      /* A checked track is a fill, which forced colors paint Canvas. */
+      rule(
+        { checked: true, forcedColors: true },
+        { backgroundColor: 'Highlight', borderColor: 'Highlight', forcedColorAdjust: 'none' },
+      ),
+    ]),
+    /* A hairline, which is symmetric where a shadow is not. Over the groove,
+       which is `overlay`: lighter than the groove in light, a step up in
+       dark. The inset is less the border, since an absolute box is placed
+       against its containing block's padding box. */
+    on('thumb', [
+      rule({
+        alignItems: 'center',
+        color: hook.iconColor(
+          scheme(token('color-foreground-muted'), token('color-surface-sunken')),
+        ),
+        display: 'flex',
+        justifyContent: 'center',
+        /* In dark, a light thumb instead. There `overlay` is a single step above
+           `sunken`, and an off switch read as an empty groove. A mid-light ink is
+           what the platforms' own switches show in dark, and the icon inside it
+           turns to the groove's color so it still reads. */
+        backgroundColor: hook.thumbColor(
+          scheme(token('color-surface-overlay'), token('color-foreground-muted')),
+        ),
+        blockSize: difference(own.switchHeight, product(own.switchInset, 2)),
+        border: [token('border-thin'), 'solid', token('color-border')],
+        borderRadius: token('radii-full'),
+        inlineSize: difference(own.switchHeight, product(own.switchInset, 2)),
+        insetBlockStart: '50%',
+        insetInlineStart: difference(own.switchInset, token('border-thin')),
+        pointerEvents: 'none',
+        position: 'absolute',
+        translate: '0 -50%',
+        transition: ['translate', token('duration-fast'), token('easing-emphasized')],
+      }),
+      /* No hairline once it is on: the thumb on the fill is distinct already. */
+      rule(
+        { checked: true },
+        {
+          borderColor: 'transparent',
+          color: first(hook.iconColor, hook.onColor),
+        },
+      ),
+      /* On the fill, so it takes the ink meant to sit on it. The travel is the
+         track less the thumb and the gap at both ends. */
+      rule(
+        { checked: true },
+        {
+          backgroundColor: hook.thumbColor(token('color-foreground-on-primary')),
+          translate: [difference(own.switchWidth, own.switchHeight), '-50%'],
+        },
+      ),
+      /* `translate` is physical, so on a right-to-left page the thumb travels the
+         other way. Measured October 31, 2026: 16 pixels outside its track. */
+      rule(
+        { checked: true, dir: 'rtl' },
+        { translate: [difference(own.switchHeight, own.switchWidth), '-50%'] },
+      ),
+      /* A thumb off in light is white on a near-white groove, so it takes the mark
+         ink at its edge: thumb against track was 1.12:1. */
+      rule({ checked: false }, { borderColor: token('color-foreground-subtle') }),
+      rule(
+        { checked: true, forcedColors: true },
+        { backgroundColor: 'HighlightText', forcedColorAdjust: 'none' },
+      ),
+    ]),
+    /* An icon takes most of the thumb, and the thumb's own color. */
+    on({ region: ['on', 'off'], slotted: '*' }, [
+      rule({
+        '--icon-size': product(difference(own.switchHeight, product(own.switchInset, 2)), 0.7),
+      }),
+    ]),
+    /* The input is the track on the web: stretched over it, invisible, and
+       still what takes the press and the focus. */
+    on('control', [
+      rule({
+        web: { appearance: 'none', cursor: 'inherit', gridArea: '1 / 1' },
+        blockSize: '100%',
+        inlineSize: '100%',
+        margin: token('space-none'),
+        opacity: 0,
+      }),
+    ]),
+    /* Nothing in it, so no box and no gap beside it. */
+    on('label', [
+      rule({ part: { 'data-empty': true } }, { display: 'none' }),
+      /* The web's element marks the region as a slot fills, which a phone reads
+         from what it draws. */
+      native([rule({ filled: { default: false }, label: false }, { display: 'none' })]),
+    ]),
+    /* A switch carries no mark, so the fill must print. */
+    include(printExact),
+  ],
+)

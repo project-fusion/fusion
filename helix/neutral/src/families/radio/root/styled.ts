@@ -1,0 +1,261 @@
+import visuallyHidden from '../../../fragments/visually-hidden.js'
+import { oneOf } from '../../../render.js'
+import { difference, list, product, quotient, token, web } from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Radio's styled tier.
+ *
+ * **A circle with a dot in it.** The dot scales up from nothing when the
+ * radio is chosen, as a checkbox's tick does, and takes no color: a chosen
+ * radio is an answer. An icon passed into `indicator` takes the dot's place.
+ *
+ * **A card is the same radio in a bounded surface**, and a chosen card is
+ * where the brand color belongs, as a ring drawn outside its edge so a
+ * column of cards does not move. **A chip gives up its words**: they name it
+ * unseen, and a chosen chip goes solid and comes forward.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'radio',
+    hooks: ({ own }) => ({
+      backgroundColor: 'transparent',
+      borderColor: null,
+      cardBackgroundColor: token('color-surface'),
+      cardBorderColor: token('color-border'),
+      cardPadding: token('space-md'),
+      chipSize: token('size-control'),
+      indicatorSize: product(own.radioSize, 0.75),
+      markColor: token('color-foreground'),
+      size: token('size-checkbox'),
+    }),
+    own: { radioChipLift: null, radioSize: null },
+    props: {
+      chip: false,
+      hideControl: false,
+      separation: oneOf(['filled', 'outlined', 'plain']),
+    },
+    stylesheet: 'radio/root/radio-root.generated.css',
+  },
+  ({ hook, on, own, rule }) => [
+    on('host', [
+      rule({ own: { radioSize: hook.size } }),
+      rule({ display: 'block' }),
+      rule({ has: 'disabled' }, { opacity: token('opacity-disabled') }),
+      /* A card is the same radio in a bounded surface. */
+      rule({ separation: ['filled', 'outlined'] }, { display: 'block' }),
+      /* A chosen dot must print, or the answer prints empty. */
+      rule({ print: true }, { boxShadow: 'none', web: { printColorAdjust: 'exact' } }),
+    ]),
+    /* The row is the button, so the whole of it is the target. */
+    on('item', [
+      rule({
+        web: { all: 'unset', cursor: 'pointer' },
+        alignItems: 'center',
+        boxSizing: 'border-box',
+        display: 'inline-flex',
+        gap: token('space-xs'),
+        position: 'relative',
+      }),
+      web([rule({ has: 'disabled' }, { cursor: 'default' })]),
+      rule(
+        { separation: ['filled', 'outlined'] },
+        {
+          alignItems: 'start',
+          backgroundColor: hook.cardBackgroundColor,
+          border: [token('border-thin'), 'solid', hook.cardBorderColor],
+          borderRadius: token('radii-sm'),
+          display: 'flex',
+          gap: token('space-sm'),
+          inlineSize: '100%',
+          padding: hook.cardPadding,
+          transition: list(
+            ['background-color', token('duration-fast'), token('easing-standard')],
+            ['border-color', token('duration-fast'), token('easing-standard')],
+          ),
+        },
+      ),
+      /* The ground carries it and the edge goes, transparent so the card keeps its size. */
+      rule({ separation: 'filled' }, { borderColor: 'transparent' }),
+      /* An edge and no fill, as `outlined` is wherever it is offered. */
+      rule(
+        { separation: 'outlined' },
+        { backgroundColor: hook.cardBackgroundColor('transparent') },
+      ),
+      /* Chosen: the brand color, as a ring laid outside the edge. */
+      rule(
+        { separation: ['filled', 'outlined'], selected: true },
+        {
+          backgroundColor: token('color-surface-raised'),
+          borderColor: token('color-primary'),
+          boxShadow: ['0', '0', '0', token('border-thick'), token('color-primary')],
+        },
+      ),
+      /* Under a pointer, the edge is muted, chosen or not: the ring says it is chosen. */
+      rule(
+        { hover: true, lacks: 'disabled', separation: ['filled', 'outlined'] },
+        { borderColor: token('color-foreground-muted') },
+      ),
+      /* On the whole card, because the card is the target. */
+      rule(
+        { focusVisible: true, separation: ['filled', 'outlined'] },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      /* How far a chosen chip comes forward, and a hovered one half of it. */
+      rule(
+        { chip: true },
+        {
+          alignItems: 'center',
+          backgroundColor: token('color-surface-sunken'),
+          blockSize: hook.chipSize,
+          borderRadius: token('radii-full'),
+          color: token('color-foreground-muted'),
+          web: { cursor: 'pointer' },
+          display: 'inline-flex',
+          inlineSize: hook.chipSize,
+          justifyContent: 'center',
+          padding: 0,
+          transition: list(
+            ['background-color', token('duration-fast'), token('easing-standard')],
+            ['box-shadow', token('duration-fast'), token('easing-standard')],
+            ['translate', token('duration-fast'), token('easing-standard')],
+          ),
+          own: { radioChipLift: '2px' },
+        },
+      ),
+      /* Weight and height carry the choice: solid, and forward. */
+      rule(
+        { selected: true, chip: true },
+        {
+          backgroundColor: token('color-surface-inverse'),
+          boxShadow: token('shadow-md'),
+          color: token('color-foreground-inverse'),
+          translate: ['0', product(own.radioChipLift, '-1')],
+        },
+      ),
+      rule(
+        { hover: true, lacks: 'disabled', chip: true },
+        { translate: ['0', quotient(own.radioChipLift, '-2')] },
+      ),
+      rule(
+        { focusVisible: true, chip: true },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      rule({ reducedMotion: true, chip: true }, { transition: 'none', translate: 'none' }),
+      /* Rows sit against each other, so a box reaching past a row would take the
+         press from the row beside it. On a touch screen the row itself reaches the
+         target. */
+      rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
+    ]),
+    /* One cell, so the dot is centered in the circle. No fill of its own, so an
+       unchosen circle is an empty ring on whatever it sits on: the page's own
+       color read as a solid dark disc on a card in dark mode. The edge in the
+       mark ink, not the rule ink, which drew no ring around it there. */
+    on('box', [
+      rule({
+        backgroundColor: hook.backgroundColor,
+        blockSize: own.radioSize,
+        border: [token('border-thin'), 'solid', hook.borderColor(token('color-foreground-subtle'))],
+        borderRadius: token('radii-full'),
+        display: 'grid',
+        flex: '0 0 auto',
+        inlineSize: own.radioSize,
+        placeItems: 'center',
+        transition: ['border-color', token('duration-fast'), token('easing-standard')],
+      }),
+      rule({ selected: true }, { borderColor: hook.borderColor(token('color-foreground')) }),
+      /* The edge firms up and takes no color, through the hook, so a group
+         saying "these are wrong" is not undone by a pointer, chosen or not. */
+      rule(
+        { lacks: 'disabled', within: { item: { hover: true } } },
+        { borderColor: hook.borderColor(token('color-foreground')) },
+      ),
+      /* Offset, because the ring surrounds a circle whose own edge is not moving. */
+      rule(
+        { within: { item: { focusVisible: true } } },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      rule(
+        { separation: ['filled', 'outlined'], within: { item: { focusVisible: true } } },
+        { outline: 'none' },
+      ),
+      /* The circle centers on the label's first line, by a margin, since a
+         band would draw an oval. */
+      rule(
+        { separation: ['filled', 'outlined'] },
+        {
+          fontSize: token('text-md'),
+          lineHeight: token('leading-normal'),
+          marginBlockStart: quotient(difference('1lh', own.radioSize), 2),
+        },
+      ),
+      /* The card is the control, so the circle can go. */
+      rule({ hideControl: true, separation: ['filled', 'outlined'] }, { display: 'none' }),
+      /* A chip is a card that gave up its words. */
+      rule({ chip: true }, { display: 'none' }),
+      rule(
+        { lacks: 'disabled', within: { item: { active: true } } },
+        { backgroundColor: token('color-press') },
+      ),
+    ]),
+    /* A dot under half the circle, so the pair reads as a mark in a circle. */
+    on({ after: 'box' }, [
+      rule({
+        backgroundColor: hook.markColor,
+        blockSize: product(own.radioSize, 0.4),
+        borderRadius: token('radii-full'),
+        content: '""',
+        inlineSize: product(own.radioSize, 0.4),
+        scale: 0,
+        transition: ['scale', token('duration-fast'), token('easing-emphasized')],
+      }),
+      rule({ selected: true }, { scale: 1 }),
+      /* A slotted indicator is the mark, so the dot goes. */
+      rule({ hasIndicator: true }, { content: 'none' }),
+      /* Forced colors paint every background Canvas, so a mark drawn as one
+         disappears and a chosen control looks like the others. */
+      rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
+    ]),
+    on({ region: 'indicator', slotted: '*' }, [
+      rule({
+        blockSize: hook.indicatorSize,
+        color: hook.markColor,
+        inlineSize: hook.indicatorSize,
+        scale: 0,
+        transition: ['scale', token('duration-fast'), token('easing-emphasized')],
+      }),
+      rule({ selected: true }, { scale: 1 }),
+    ]),
+    /* A step up from body weight: a radio's label is one of the answers. */
+    on('label', [
+      rule({
+        color: token('color-foreground'),
+        fontFamily: token('font-sans'),
+        fontSize: token('text-control'),
+        fontWeight: token('weight-medium'),
+        lineHeight: token('leading-tight'),
+        /* A long unbroken word breaks inside the column it was given. */
+        minInlineSize: 0,
+        web: { overflowWrap: 'anywhere' },
+      }),
+      /* A card's first line is a sentence somebody reads. */
+      rule(
+        { separation: ['filled', 'outlined'] },
+        { fontSize: token('text-md'), lineHeight: token('leading-normal') },
+      ),
+      /* The words name the choice without taking room in it. */
+      rule({ chip: true }, [visuallyHidden]),
+    ]),
+  ],
+)

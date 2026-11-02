@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMeterSegment } from '@fusion.dev/helix-headless/meter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './meter-segment.css.js'
+import { styles } from './meter-segment.generated.css.js'
 
 /**
  * @summary One share of a meter's whole, drawn as a slice of its bar.

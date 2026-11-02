@@ -1,0 +1,38 @@
+# Button: a press on the pending example, recorded. The button is busy for
+# two seconds after each press, and a busy button reads as disabled.
+appId: dev.fusion.helix.app
+name: Button
+tags:
+  - interactions
+---
+# The gallery starts, and the link opens once its first screen draws, as
+# `open.yaml` says.
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://button/pending
+      SHOWS: Save changes
+# The first touch on a screen that has just opened is lost on the iOS
+# simulator, a drag's as well: three times in three on October 11, 2026. A tap
+# on the empty space below the example takes it.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: button
+# The spinner keeps the screen moving, so the press waits for no stillness.
+- tapOn:
+    text: Save changes
+    waitToSettleTimeoutMs: 200
+# **The busy state is looked for and not required.** Reading a device's view
+# hierarchy took longer in CI than the two seconds the button stays busy, on
+# iOS (run 38193448320) and Android (run 38274438099). The video shows it.
+- assertVisible:
+    enabled: false
+    optional: true
+    text: Save changes
+- extendedWaitUntil:
+    visible:
+      enabled: true
+      text: Save changes
+    timeout: 5000
+- stopRecording

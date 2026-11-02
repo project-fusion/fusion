@@ -133,15 +133,27 @@ console.log(css[':root'])
 A value that is not a color and still changes with the mode, such as the edge
 of a floating surface, is set by rules after the block, one for each mode.
 
-The CLI writes the same block. `helix theme init` writes a `helix.theme.json`,
-with your brand color if you pass `--brand`. `helix theme build` derives it in
-both modes, unless the file names a `scheme`, and refuses to write a theme with
-a pair that misses its target:
+The CLI writes the same block. `helix theme init` writes the `theme` of
+`helix.json`, with your brand color if you pass `--brand`. `helix theme build`
+derives it in both modes, unless the theme names a `scheme`, and refuses to
+write a theme with a pair that misses its target:
 
 ```sh
 helix theme init --brand '#0b3d91'
 helix theme build --out theme.css
 ```
+
+For React Native, `--format native` writes the same colors as a TypeScript
+module. It exports `theme`, each mode's colors by token name, which
+`HelixRoot` in `@fusion.dev/helix-native` takes as `tokens`:
+
+```sh
+helix theme build --format native --out src/theme.ts
+```
+
+`--check` writes nothing, and exits 1 when the file at `--out` is missing or
+differs from what the theme builds. Run it in a build that commits its theme
+files.
 
 ## Color one section
 

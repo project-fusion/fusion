@@ -27,8 +27,10 @@ const define = () =>
     import('@fusion.dev/helix/listbox'),
     import('@fusion.dev/helix/map/route'),
     import('@fusion.dev/helix/notifications'),
+    import('@fusion.dev/helix/object-inspector'),
     import('@fusion.dev/helix/option'),
     import('@fusion.dev/helix/splitter'),
+    import('@fusion.dev/helix/virtual-list'),
   ])
 
 const late = new URLSearchParams(location.search).get('order') === 'late'

@@ -1,9 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessPinInput } from '@fusion.dev/helix-headless/pin-input'
 import type { CSSResultGroup } from 'lit'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './pin-input-root.css.js'
+import { styles } from './pin-input-root.generated.css.js'
 
 /**
  * @summary A field for a short code, with one box for each character.
@@ -46,7 +44,7 @@ import { styles } from './pin-input-root.css.js'
  */
 @customElement('helix-pin-input')
 export class HelixPinInput extends HelixHeadlessPinInput {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

@@ -23,6 +23,10 @@
       "!helix/theme/wasm",
       "!fusion/scripts/eval/questions.json",
       "!**/*.css.ts",
+      "!helix/core/src/capabilities/**/*.generated.ts",
+      "!helix/core/src/machines/**/*.generated.ts",
+      "!helix/native/src/ir.generated.ts",
+      "!helix/native/src/theme/*.generated.ts",
       "!**/jsx.d.ts",
       "!**/vue.d.ts",
       "!**/svelte.d.ts",
@@ -82,10 +86,204 @@
       "includes": ["**/package.json"]
     },
     {
+      "assist": {
+        "actions": {
+          "source": {
+            "useSortedKeys": "off"
+          }
+        }
+      },
+      "includes": [
+        "helix/cli/tests/fixtures/*/src/families/**/headless.tsx",
+        "helix/cli/tests/fixtures/*/src/families/**/styled.ts",
+        "helix/neutral/src/families/**/headless.tsx",
+        "helix/neutral/src/families/**/styled.ts",
+        "helix/neutral/src/fragments/**"
+      ]
+    },
+    {
+      "includes": [
+        "helix/core/src/capabilities/**",
+        "helix/core/src/machines/**",
+        "helix/core/src/utils/rove/**",
+        "helix/native/**",
+        "helix/neutral/**",
+        "!helix/native/src/style/apply.ts",
+        "!helix/native/src/style/calc.ts",
+        "!helix/native/src/style/conditions.ts",
+        "!helix/native/src/style/finish.ts",
+        "!helix/native/src/style/reads.ts",
+        "!helix/native/src/style/regions.ts",
+        "!helix/native/src/style/resolve.ts",
+        "!helix/native/src/style/style.ts",
+        "!helix/native/src/style/tree.ts"
+      ],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": {
+              "level": "error",
+              "options": { "maxAllowedComplexity": 12 }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["helix/core/src/machines/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "cancelAnimationFrame": "A machine is pure: an adapter performs what a machine requests.",
+                  "clearTimeout": "A machine is pure: an adapter performs what a machine requests.",
+                  "Date": "A machine is pure: time enters as an event that carries its timestamp.",
+                  "document": "A machine reaches no platform: it returns requests, and an adapter performs them.",
+                  "fetch": "A machine reaches no platform: it returns requests, and an adapter performs them.",
+                  "globalThis": "A machine reaches no platform: it returns requests, and an adapter performs them.",
+                  "navigator": "A machine reaches no platform: it returns requests, and an adapter performs them.",
+                  "performance": "A machine is pure: time enters as an event that carries its timestamp.",
+                  "requestAnimationFrame": "A machine is pure: an adapter performs what a machine requests.",
+                  "setInterval": "A machine is pure: time enters as an event from the timers capability.",
+                  "setTimeout": "A machine is pure: time enters as an event from the timers capability.",
+                  "window": "A machine reaches no platform: it returns requests, and an adapter performs them."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "helix/core/src/capabilities/**",
+        "!helix/core/src/capabilities/*/web.ts",
+        "!helix/core/src/capabilities/**/*.dom.spec.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "document": "Only a capability's web implementation reaches the browser: its contract, server, and fake run anywhere.",
+                  "navigator": "Only a capability's web implementation reaches the browser: its contract, server, and fake run anywhere.",
+                  "requestAnimationFrame": "Only a capability's web implementation reaches the browser: its contract, server, and fake run anywhere.",
+                  "window": "Only a capability's web implementation reaches the browser: its contract, server, and fake run anywhere."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/.examples/*.tsx"],
       "javascript": {
         "formatter": {
           "attributePosition": "multiline"
+        }
+      }
+    },
+    {
+      "includes": ["helix/cli/tests/fixtures/*/src/families/**/*.tsx", "helix/neutral/**/*.tsx"],
+      "javascript": {
+        "formatter": {
+          "attributePosition": "multiline"
+        }
+      }
+    },
+    {
+      "includes": ["helix/app/**", "helix/native/**", "helix/proof/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noReactNativeRawText": {
+              "level": "error",
+              "options": {
+                "skip": [
+                  "Bar",
+                  "Block",
+                  "Button",
+                  "Checkbox",
+                  "Count",
+                  "Dialog",
+                  "Dismissible",
+                  "Handing",
+                  "HelixAccordionItem",
+                  "HelixAnnouncement",
+                  "HelixBreadcrumb",
+                  "HelixButton",
+                  "HelixCallout",
+                  "HelixCard",
+                  "HelixCheckbox",
+                  "HelixCode",
+                  "HelixDescriptionListItem",
+                  "HelixDivider",
+                  "HelixDrilldown",
+                  "HelixDrilldownItem",
+                  "HelixEmpty",
+                  "HelixKbd",
+                  "HelixListItem",
+                  "HelixMegamenuItem",
+                  "HelixMenuItem",
+                  "HelixOption",
+                  "HelixOptionGroup",
+                  "HelixMotionToggle",
+                  "HelixNavigationItem",
+                  "HelixProgress",
+                  "HelixQuote",
+                  "HelixRadio",
+                  "HelixScrollArea",
+                  "HelixSpeedDialItem",
+                  "HelixStat",
+                  "HelixStep",
+                  "HelixTab",
+                  "HelixTableCell",
+                  "HelixTableColumn",
+                  "HelixTabPanel",
+                  "HelixTag",
+                  "HelixText",
+                  "HelixToastItem",
+                  "HelixToggle",
+                  "HelixTrend",
+                  "Item",
+                  "Light",
+                  "Line",
+                  "Message",
+                  "Note",
+                  "Paged",
+                  "Panel",
+                  "Row",
+                  "Sample",
+                  "ScaledText",
+                  "Strip",
+                  "Switch",
+                  "Tab",
+                  "ToggleButton",
+                  "Words",
+                  "helix-button",
+                  "helix-callout",
+                  "helix-radio",
+                  "helix-text",
+                  "helix-trend"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["helix/styled/**"],
+      "linter": {
+        "domains": {
+          "react": "none",
+          "reactNative": "none"
         }
       }
     }

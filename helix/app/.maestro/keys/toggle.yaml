@@ -1,0 +1,38 @@
+# Toggle Group from a hardware keyboard, on Android, on the preview example,
+# where List starts chosen. Right moves focus to the next toggle and chooses
+# it, Left comes back, and Left on the first toggle wraps to the last. The
+# example opens alone, at `/preview`, as `list.yaml` here says.
+appId: dev.fusion.helix.app
+name: Toggle Group from a keyboard
+---
+- stopApp
+- openLink: helix://toggle/preview/preview
+- extendedWaitUntil:
+    visible: Grid
+    timeout: 30000
+- repeat:
+    times: 8
+    while:
+      notVisible:
+        focused: true
+        text: List
+    commands:
+      - pressKey: Remote Dpad Down
+- pressKey: Remote Dpad Right
+- assertVisible:
+    checked: true
+    focused: true
+    text: Grid
+- assertVisible:
+    checked: false
+    text: List
+- pressKey: Remote Dpad Left
+- assertVisible:
+    checked: true
+    focused: true
+    text: List
+- pressKey: Remote Dpad Left
+- assertVisible:
+    checked: true
+    focused: true
+    text: Board

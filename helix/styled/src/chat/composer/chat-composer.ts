@@ -4,7 +4,7 @@ import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } f
 import { property } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
-import { styles } from './chat-composer.css.js'
+import { styles } from './chat-composer.generated.css.js'
 import '../../tooltip/index.js'
 import '../../voice-level/index.js'
 

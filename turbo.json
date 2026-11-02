@@ -47,6 +47,31 @@
   // `single-thread.json` decide what the build produces.
   "globalPassThroughEnv": ["GH_TOKEN", "GITHUB_OUTPUT", "HELIX_BIN"],
   "tasks": {
+    // The bundles and assets alone, which name no address, so one cached
+    // entry serves every deploy. The site writes the manifests for its own
+    // address beside a copy: see `@fusion.dev/site#helix-app`.
+    "@fusion.dev/helix-app#bundle": {
+      "dependsOn": ["^build", "^analyze"],
+      "outputs": ["dist/**"]
+    },
+    // The gallery bundles what its workspace packages export, their `dist` and
+    // the styled tier's `api.json` and `examples.json`, so it waits on both.
+    // The base address is an argument, which turbo hashes. `SOURCE_DATE_EPOCH`
+    // dates the manifests where it is set, and the commit's time does where it
+    // is not: a hit replays the date of the commit whose files were the same.
+    "@fusion.dev/helix-app#export": {
+      "dependsOn": ["^build", "^analyze"],
+      "env": ["SOURCE_DATE_EPOCH"],
+      "outputs": ["dist/**"]
+    },
+    // **The gallery's specs draw the native runtime's components from its
+    // source**, which `components` writes into `helix/native/src/families`. The
+    // native specs write the same files, so these run after them.
+    "@fusion.dev/helix-app#test": {
+      "dependsOn": ["^build", "analyze", "@fusion.dev/helix-native#test"],
+      "inputs": ["src/**", "tests/**", "$TURBO_ROOT$/helix/native/src/**"],
+      "outputs": []
+    },
     // **The specs read packages this one does not depend on, so their files are
     // inputs here.** `dependenciesOf` walks the `dependencies` of
     // `helix/sandbox` and of every helix package it reaches, and the spec
@@ -178,6 +203,115 @@
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
+    // **The build writes the types and token modules it compiles**, which are
+    // never committed, so their sources are its inputs: the neutral sources,
+    // the token layer, and the commands that write them. Not the components
+    // `helix system components` writes, which only the specs read, so it waits
+    // for nothing the styled package builds on top of this one.
+    "@fusion.dev/helix-native#build": {
+      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.spec.ts",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/styles/src/builders.ts",
+        "$TURBO_ROOT$/helix/styles/src/tokens.ts",
+        "$TURBO_ROOT$/helix/theme/rust/tokens/**",
+        "$TURBO_ROOT$/Cargo.lock"
+      ],
+      // The generated sources are outputs as well as `dist`, so a cache hit
+      // puts back what the scripts' specs and the typecheck read.
+      "outputs": ["dist/**", "src/ir.generated.ts", "src/theme/*.generated.ts"]
+    },
+    // **The native specs draw the components `helix system components` writes
+    // for them into `src/families`**, from the neutral sources and the styled
+    // manifest, as the styled build writes the ones it ships. So both wait for
+    // that manifest and read those sources, and the modules they write are no
+    // input, or a second run would hash a tree the first one changed.
+    //
+    // **The conformance record is an output**, so a cache hit puts back what
+    // React Native did for the comparison with the web to read.
+    "@fusion.dev/helix-native#test": {
+      "dependsOn": ["^build", "@fusion.dev/helix#analyze"],
+      "inputs": [
+        "src/**",
+        "!src/families/*/index.native.ts",
+        "tests/**",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/styles/src/builders.ts",
+        "$TURBO_ROOT$/helix/styles/src/tokens.ts",
+        "$TURBO_ROOT$/helix/theme/rust/tokens/**",
+        "$TURBO_ROOT$/Cargo.lock"
+      ],
+      "outputs": ["$TURBO_ROOT$/.local/conformance/react-native.json"]
+    },
+    "@fusion.dev/helix-native#typecheck": {
+      "dependsOn": ["^build", "@fusion.dev/helix#analyze"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/styles/src/builders.ts",
+        "$TURBO_ROOT$/helix/styles/src/tokens.ts",
+        "$TURBO_ROOT$/helix/theme/rust/tokens/**",
+        "$TURBO_ROOT$/Cargo.lock"
+      ],
+      "outputs": []
+    },
+    // **The authoring helpers, which are all of `dist`.** `helix system
+    // build` writes Helix's compiled forms into `build`, beside it. The
+    // helpers import no workspace package, so nothing builds first.
+    "@fusion.dev/helix-neutral#build": {
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts"],
+      "outputs": ["dist/**"]
+    },
+    // The style survey's specs sit beside the survey, under `scripts`.
+    "@fusion.dev/helix-neutral#test": {
+      "dependsOn": ["^build", "analyze"],
+      "inputs": ["scripts/**", "src/**"],
+      "outputs": []
+    },
+    // **Acme's sources are typed through the helpers' published entry points**,
+    // which resolve to this package's `dist/authoring`, so the typecheck waits
+    // for its own `build` and reads the fixture.
+    "@fusion.dev/helix-neutral#typecheck": {
+      "dependsOn": ["^build", "^analyze", "analyze", "build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/helix/cli/tests/fixtures/acme/**",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json"
+      ],
+      "outputs": []
+    },
+    // The proof app's website: the web export of its route tree, under the
+    // base URL `/helix/app/proof` its Expo config names, which the site
+    // serves. It bundles what its workspace packages export, so it waits on
+    // their builds.
+    "@fusion.dev/helix-proof#bundle": {
+      "dependsOn": ["^build", "^analyze"],
+      "outputs": ["dist/**"]
+    },
+    // **The proof app's specs draw the native runtime's components from its
+    // source**, as the gallery's do, so they run after the native specs that
+    // write the same files. Its routes are inputs.
+    "@fusion.dev/helix-proof#test": {
+      "dependsOn": ["^build", "analyze", "@fusion.dev/helix-native#test"],
+      "inputs": ["app/**", "src/**", "tests/**", "$TURBO_ROOT$/helix/native/src/**"],
+      "outputs": []
+    },
     // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
     // registry, and `elements-css` writes `src/elements.css` from the tags in
     // `@fusion.dev/helix`, so both stylesheets are build outputs and have to be
@@ -189,16 +323,119 @@
     // reads element source text and needs nothing compiled, which is what lets
     // the two be ordered at all.
     "@fusion.dev/helix-styles#build": {
-      "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles", "elements-css"],
+      "dependsOn": [
+        "^build",
+        "^analyze",
+        "analyze",
+        "icons",
+        "styles",
+        "elements-css",
+        "design-tokens"
+      ],
       "outputs": ["dist/**", "src/tokens.css", "src/elements.css"]
     },
+    // **The Design Tokens Format Module file is written by the Rust registry**,
+    // so the registry's sources are inputs beside the token layer's. It holds
+    // each token's CSS to what the builders returned, which `token-layer`
+    // records in `dist/tokens.json`, so that runs first.
+    "@fusion.dev/helix-styles#design-tokens": {
+      "dependsOn": ["token-layer"],
+      "inputs": [
+        "src/_modes.css",
+        "src/base.css",
+        "src/builders.ts",
+        "src/primitives.css",
+        "src/tokens.ts",
+        "$TURBO_ROOT$/Cargo.lock",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/cli/src/family/tokens/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/theme/Cargo.toml",
+        "$TURBO_ROOT$/helix/theme/rust/tokens/**"
+      ],
+      "outputs": ["dist/helix.tokens.json", "dist/helix.resolver.json"]
+    },
+    // **The styled tier's own `analyze`, because its `api.json` says what each
+    // element is called on React Native.** It asks `helix system platforms`
+    // over the neutral sources, so they are inputs beside the generic task's.
+    "@fusion.dev/helix#analyze": {
+      "dependsOn": ["^build", "styles"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/helix/docs/content/using-helix-with-an-agent.mdx",
+        "$TURBO_ROOT$/Cargo.lock",
+        "$TURBO_ROOT$/Cargo.toml",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/helix/cli/src/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/visual.fingerprint.json"
+      ],
+      "outputs": [
+        "api.json",
+        "custom-elements.json",
+        "examples.json",
+        "lint.json",
+        "skills/**",
+        "types/jsx.d.ts",
+        "types/svelte.d.ts",
+        "types/vue.d.ts",
+        "types/words.d.ts"
+      ]
+    },
+    // **The native components are written here, before `tsc` compiles them.**
+    // `helix system components` reads the neutral sources, this package's
+    // manifest, which `analyze` writes, and core's event classes, which core's
+    // build stands for, and writes one module per family into `native`.
     "@fusion.dev/helix#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.spec.ts",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/Cargo.lock"
+      ],
       "outputs": [
         "dist/**",
+        "native/**",
         "src/element-events.generated.ts",
         "src/sandbox/compile-worker.generated.ts"
       ]
+    },
+    // **The styled tier's own, because it writes stylesheets as well as their
+    // mirrors.** `helix system stylesheets` writes every `*.generated.css` from
+    // the platform-neutral sources in `helix/neutral` before `build-styles`
+    // compiles them, so those sources and the compiler are inputs. The
+    // stylesheets it writes are outputs only, for the reason the two layers
+    // above give.
+    "@fusion.dev/helix#styles": {
+      "inputs": [
+        "src/**/*.css",
+        "!src/**/*.generated.css",
+        "$TURBO_ROOT$/fusion/scripts/build-styles.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/join-lines.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/tighten.mjs",
+        "$TURBO_ROOT$/helix/neutral/src/**",
+        "!$TURBO_ROOT$/helix/neutral/src/**/*.spec.ts",
+        "$TURBO_ROOT$/helix/cli/src/family/**",
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/cli/Cargo.toml",
+        "$TURBO_ROOT$/Cargo.lock"
+      ],
+      "outputs": ["src/**/*.css.ts", "src/**/*.generated.css"]
+    },
+    // **The specs read the stylesheets the package ships, the generated ones
+    // included**, as the quiet-text spec reads the Tabs sheets, so `styles`
+    // writes them before the specs run.
+    "@fusion.dev/helix#test": {
+      "dependsOn": ["^build", "analyze", "styles"],
+      "inputs": ["src/**", "tests/**"],
+      "outputs": []
     },
     // The same wait as the headless tier's, above, for the same examples.
     "@fusion.dev/helix#typecheck": {
@@ -216,14 +453,21 @@
       "outputs": ["src/pages.generated.ts", "src/sources.generated.ts"]
     },
     // `bump.spec.mjs` reads the release scripts and `fusion.json` at the root,
-    // which belong to no package, so they are named here.
+    // which belong to no package, so they are named here. `paint.spec.mjs`
+    // holds the native token modules to `paint.mjs`, so the token layer it
+    // resolves is named here too, and `lib`, where both it and `paint.mjs`
+    // live. The modules are written by the native runtime's build, never
+    // committed, so that build runs first.
     "@fusion.dev/scripts#test": {
-      "dependsOn": ["^build", "analyze"],
+      "dependsOn": ["^build", "analyze", "@fusion.dev/helix-native#build"],
       "inputs": [
+        "lib/**",
         "src/**",
         "tests/**",
         "$TURBO_ROOT$/.github/scripts/*.sh",
-        "$TURBO_ROOT$/fusion.json"
+        "$TURBO_ROOT$/fusion.json",
+        "$TURBO_ROOT$/helix/styles/src/primitives.css",
+        "$TURBO_ROOT$/helix/styles/src/tokens.ts"
       ],
       "outputs": []
     },
@@ -255,6 +499,7 @@
         "faces",
         "themed-page",
         "catalog",
+        "native-reference",
         "frame",
         "specs",
         "maplibre-copy",
@@ -274,6 +519,7 @@
         "faces",
         "themed-page",
         "catalog",
+        "native-reference",
         "frame",
         "specs",
         "maplibre-copy",
@@ -282,9 +528,57 @@
       ],
       "persistent": true
     },
-    // `tsc` imports the catalog, the font list and the themed page's markup,
-    // all generated, so the same five run first. Not `wasm-copy`: nothing
-    // typed reads the binary.
+    // **The gallery Expo Go opens, copied into `public/helix/app` with
+    // manifests for this deploy's own address, and the proof app's website
+    // into `public/helix/app/proof`.** Uncached, because the address
+    // differs on every preview and the manifests take a second to write; the
+    // bundling it waits on is the cached part. Beside `build`, which does not
+    // wait for it: `vercel.json` runs both, and Vercel reads `public` after.
+    "@fusion.dev/site#helix-app": {
+      "cache": false,
+      "dependsOn": ["@fusion.dev/helix-app#bundle", "@fusion.dev/helix-proof#bundle"],
+      "passThroughEnv": [
+        "HELIX_APP_BASE",
+        "SOURCE_DATE_EPOCH",
+        "VERCEL_ENV",
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "VERCEL_URL"
+      ]
+    },
+    // **The React Native reference, from the modules `helix system components`
+    // writes.** `@fusion.dev/helix`'s `build` writes them into its `native`
+    // folder and its `analyze` writes `api.json`, which says which families
+    // are drawn natively, so both wait. Keyed to the site for the reason
+    // `docs-check` gives, the check with it.
+    "@fusion.dev/site#native-reference": {
+      "dependsOn": ["^build", "^analyze"],
+      "inputs": [
+        "scripts/build-native-reference.mjs",
+        "utils/native-module/native-module.ts",
+        "utils/native-reference/native-reference.ts",
+        "$TURBO_ROOT$/fusion/scripts/lib/emit.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
+        "$TURBO_ROOT$/helix/styled/api.json",
+        "$TURBO_ROOT$/helix/styled/native/**",
+        "$TURBO_ROOT$/helix/styled/package.json"
+      ],
+      "outputs": ["content/native/native.generated.json"]
+    },
+    "@fusion.dev/site#native-reference-check": {
+      "cache": false,
+      "dependsOn": ["^build", "^analyze"]
+    },
+    // **The site's specs are pure and DOM, and need only the DOM harness
+    // built.** The shared `test` waits for `^build`, which for the site is the
+    // whole workspace, and reads `src`, which the site has none of.
+    "@fusion.dev/site#test": {
+      "dependsOn": ["@fusion.dev/helix-testing#build"],
+      "inputs": ["hooks/**", "utils/**"],
+      "outputs": []
+    },
+    // `tsc` imports the catalog, the native reference, the font list and the
+    // themed page's markup, all generated, so the same tasks run first. Not
+    // `wasm-copy`: nothing typed reads the binary.
     "@fusion.dev/site#typecheck": {
       "dependsOn": [
         "^build",
@@ -293,6 +587,7 @@
         "faces",
         "themed-page",
         "catalog",
+        "native-reference",
         "frame",
         "specs"
       ],
@@ -419,6 +714,7 @@
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/styled/api.json",
         "$TURBO_ROOT$/helix/*/package.json",
         "$TURBO_ROOT$/helix/headless/src/*/.examples/**",
         "$TURBO_ROOT$/helix/sandbox/src/*/.examples/**",
@@ -719,6 +1015,7 @@
         "$TURBO_ROOT$/helix/plot/src/**/*.ts",
         "$TURBO_ROOT$/helix/terminal/src/**/*.ts",
         "$TURBO_ROOT$/helix/testing/src/browser.ts",
+        "$TURBO_ROOT$/helix/testing/src/conformance/**",
         "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
         "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"
       ],
@@ -801,8 +1098,9 @@
     // invisible while these artifacts were tracked and is not any more. Every
     // `outputs` below names everything its script writes.
 
-    // `src/tokens.ts` is the whole input: the layer is spelled there and this
-    // writes both the stylesheet block and the registry the docs read.
+    // `src/tokens.ts` and its builders are the whole input: the layer is
+    // spelled there and this writes both the stylesheet block and the registry
+    // the docs read.
     // **Uncached, because one of its outputs is partly written by hand.**
     //
     // Cacheable since `src/tokens.css` became wholly generated: the hand-written
@@ -814,6 +1112,7 @@
     "token-layer": {
       "inputs": [
         "src/_modes.css",
+        "src/builders.ts",
         "src/tokens.ts",
         "$TURBO_ROOT$/helix/styles/scripts/build-token-layer.mjs"
       ],

@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessListItem } from '@fusion.dev/helix-headless/list'
 import { type CSSResultGroup, html, type TemplateResult } from 'lit'
-import { styles } from './list-item.css.js'
+import { styles } from './list-item.generated.css.js'
 
 /**
  * @summary One row of a list.
@@ -15,6 +15,7 @@ import { styles } from './list-item.css.js'
  * @aliases Row, Entry
  * @documentation https://fusion.dev/helix/components/list
  *
+ * @csspart body - The box that holds the label and, under it, the description.
  * @csspart rail - The cell that holds the number in a railed list.
  *
  * @cssproperty --list-item-current-background-color - The fill behind a row that is `current`.
@@ -53,6 +54,15 @@ export class HelixListItem extends HelixHeadlessListItem {
    */
   protected override renderRail(): TemplateResult {
     return html`<span part="rail"></span>`
+  }
+
+  /**
+   * The label and the description in a box of their own, which this tier can
+   * afford because it has a sheet. The row is one line of tracks, and the body
+   * is the track the description lines up under the label in.
+   */
+  protected override renderBody(): TemplateResult {
+    return html`<span part="body">${super.renderBody()}</span>`
   }
 }
 

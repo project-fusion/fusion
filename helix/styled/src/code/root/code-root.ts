@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCode } from '@fusion.dev/helix-headless/code'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './code-root.css.js'
+import { styles } from './code-root.generated.css.js'
 
 /**
  * @summary A fragment of code inside a line of prose.

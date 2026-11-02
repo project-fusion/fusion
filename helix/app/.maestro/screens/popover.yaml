@@ -1,0 +1,73 @@
+# Popover, each example drawn alone: the panel that is open as the page
+# loads, and the rest opened from their trigger, one tap each, after the
+# touch the iOS simulator loses on a new screen. One screenshot of each,
+# named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Popover"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://popover/default-open/preview
+      - extendedWaitUntil:
+          visible: .*You can now share folders.*
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: popover-default-open-${MODE}-${SIZE}
+- openLink: helix://popover/preview/preview
+- extendedWaitUntil:
+    visible: Project details
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Project details
+- extendedWaitUntil:
+    visible: .*12 members and 48 files.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: popover-preview-${MODE}-${SIZE}
+- openLink: helix://popover/commanded/preview
+- extendedWaitUntil:
+    visible: Filters
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Filters
+- extendedWaitUntil:
+    visible: Merged
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: popover-commanded-${MODE}-${SIZE}
+- openLink: helix://popover/plain/preview
+- extendedWaitUntil:
+    visible: Details
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Details
+- extendedWaitUntil:
+    visible: .*ready to share with your team.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: popover-plain-${MODE}-${SIZE}
+- openLink: helix://popover/offset/preview
+- extendedWaitUntil:
+    visible: Details
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Details
+- extendedWaitUntil:
+    visible: .*Last edited by Alex Kim.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: popover-offset-${MODE}-${SIZE}

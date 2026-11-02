@@ -1,6 +1,12 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  mount,
+  registerDom,
+  slotted,
+  type Updatable,
+  unweighted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,10 +19,12 @@ beforeAll(async () => {
    tier's and are tested there. */
 const sheet = (tag: 'helix-stat' | 'helix-stat-group'): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`, in either sheet. */
@@ -79,7 +87,7 @@ describe('stat', () => {
     expect(group.hasAttribute('divided')).toBe(true)
     expect(rule('helix-stat-group', ':host')).toContain('flex-wrap: wrap')
     expect(rule('helix-stat-group', ':host([divided])')).toContain('overflow-x: clip')
-    const divided = rule('helix-stat-group', ':host([divided]) ::slotted(*)')
+    const divided = rule('helix-stat-group', ':host([divided]) slot::slotted(*)')
     expect(divided).toContain('border-inline-start: var(--helix-border-thin) solid')
     expect(divided).toContain('margin-inline-start: calc(var(--_stat-group-gap) * -1')
     expect(divided).toContain('padding-inline-start: var(--_stat-group-gap)')

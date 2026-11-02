@@ -1,36 +1,23 @@
+import { useState } from 'react'
+
+type Edge = 'bottom' | 'end' | 'start' | 'top'
+
 export function Example() {
+  const [open, setOpen] = useState<Edge>()
+
   return (
     <>
       <helix-flex gap="sm">
-        <helix-button
-          command="--show"
-          commandfor="start-drawer"
-        >
-          Start
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="end-drawer"
-        >
-          End
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="top-drawer"
-        >
-          Top
-        </helix-button>
-        <helix-button
-          command="--show"
-          commandfor="bottom-drawer"
-        >
-          Bottom
-        </helix-button>
+        <helix-button onClick={() => setOpen('start')}>Start</helix-button>
+        <helix-button onClick={() => setOpen('end')}>End</helix-button>
+        <helix-button onClick={() => setOpen('top')}>Top</helix-button>
+        <helix-button onClick={() => setOpen('bottom')}>Bottom</helix-button>
       </helix-flex>
 
       <helix-drawer
-        id="start-drawer"
         label="Menu"
+        onClose={() => setOpen(undefined)}
+        open={open === 'start'}
         placement="start"
       >
         <span slot="header">Menu</span>
@@ -38,8 +25,9 @@ export function Example() {
       </helix-drawer>
 
       <helix-drawer
-        id="end-drawer"
         label="Details"
+        onClose={() => setOpen(undefined)}
+        open={open === 'end'}
         placement="end"
       >
         <span slot="header">Details</span>
@@ -47,8 +35,9 @@ export function Example() {
       </helix-drawer>
 
       <helix-drawer
-        id="top-drawer"
         label="Search"
+        onClose={() => setOpen(undefined)}
+        open={open === 'top'}
         placement="top"
       >
         <span slot="header">Search</span>
@@ -56,8 +45,9 @@ export function Example() {
       </helix-drawer>
 
       <helix-drawer
-        id="bottom-drawer"
         label="Share"
+        onClose={() => setOpen(undefined)}
+        open={open === 'bottom'}
         placement="bottom"
       >
         <span slot="header">Share</span>

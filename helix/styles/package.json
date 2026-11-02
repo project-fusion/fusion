@@ -18,6 +18,8 @@
     "./base.css": "./dist/base.css",
     "./elements.css": "./dist/elements.css",
     "./helix.css": "./dist/helix.css",
+    "./helix.resolver.json": "./dist/helix.resolver.json",
+    "./helix.tokens.json": "./dist/helix.tokens.json",
     "./package.json": "./package.json",
     "./primitives.css": "./dist/primitives.css",
     "./tokens.css": "./dist/tokens.css",
@@ -29,8 +31,10 @@
   "sideEffects": true,
   "scripts": {
     "build": "bun run token-layer && bun run elements-css && bun scripts/build-styles-dist.mjs",
+    "design-tokens": "helix system design-tokens",
     "elements-css": "build-elements-css",
     "styles-dist": "bun scripts/build-styles-dist.mjs",
+    "test": "bun test src",
     "token-layer": "bun scripts/build-token-layer.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

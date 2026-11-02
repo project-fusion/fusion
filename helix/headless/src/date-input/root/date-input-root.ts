@@ -200,9 +200,12 @@ const dates = (value: string): string[] =>
  * @csspart trigger - The control that opens the calendar.
  * @csspart trigger-icon - The icon on the button that opens the calendar.
  *
+ * @cssstate aligned-start - While the calendar lines up with the start of the field.
  * @cssstate blank - The field holds no date.
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - The calendar is open.
+ * @cssstate placed-bottom - While the calendar sits below the field.
+ * @cssstate placed-top - While the calendar sits above the field, where there was no room below.
  */
 @customElement('helix-headless-date-input')
 export class HelixHeadlessDateInput extends MixinSegmentedField(

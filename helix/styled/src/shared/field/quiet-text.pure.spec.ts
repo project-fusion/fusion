@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { unweighted } from '@fusion.dev/helix-testing/sheets'
 
 /**
  * Quiet text that is read is painted in `foreground-muted`.
@@ -27,15 +28,15 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['shared/tags/tags.css', '[part="rest"]', 'color'],
   ['canvas/node/canvas-node.css', '::slotted([slot="description"])', 'color'],
   ['canvas/root/canvas-root.css', '[part="label"]', 'color'],
-  ['chat/root/chat-root.css', '[part="history"]', 'color'],
-  ['code-block/root/code-block-root.css', '[part="gutter"]', 'color'],
-  ['color-input/root/color-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
-  ['color-picker/root/color-picker-root.css', '[part="hint"]', 'color'],
+  ['chat/root/chat-root.generated.css', '[part="history"]', 'color'],
+  ['code-block/root/code-block-root.generated.css', '[part="gutter"]', 'color'],
+  ['color-input/root/color-input-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
+  ['color-picker/root/color-picker-root.generated.css', '[part="hint"]', 'color'],
   ['combobox/root/combobox-root.css', '[part="control"]::placeholder', 'color'],
   ['date-input/root/date-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['date-input/root/date-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['date-picker/root/date-picker-root.css', '[part="weekday"]', 'color'],
-  ['drilldown/item/drilldown-item.css', 'slot[name="description"]', 'color'],
+  ['drilldown/item/drilldown-item.generated.css', 'slot[name="description"]', 'color'],
   ['filter-input/chip/filter-chip.css', '[part="dismiss"]', 'color'],
   ['filter-input/chip/filter-chip.css', '[part="operator"]', 'color'],
   ['filter-input/root/filter-input-root.css', '[part="clear"]', 'color'],
@@ -44,43 +45,47 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['graph/root/graph-root.css', '[part~="legend-item-hidden"]', 'color'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder', 'color'],
   ['graph/root/graph-root.css', '[part="settling"]', 'color'],
-  ['image/root/image-root.css', '[part="fallback"]', 'color'],
-  ['input/root/input-root.css', '[part="field"]', 'color'],
-  ['input/root/input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
+  ['image/root/image-root.generated.css', '[part="fallback"]', 'color'],
+  ['input/root/input-root.generated.css', '[part="field"]', 'color'],
+  ['input/root/input-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['lightbox/item/lightbox-item.css', '[part="item"] ::slotted([slot="description"])', 'color'],
-  ['log/group/log-group.css', '[part="status"]', 'color'],
-  ['log/line/log-line.css', '[part~="line-debug"]', 'color'],
-  ['log/root/log-root.css', ':host', '--log-ansi-bright-black'],
+  ['log/group/log-group.generated.css', '[part="status"]', 'color'],
+  ['log/line/log-line.generated.css', '[part~="line"][part~="line-debug"]', 'color'],
+  ['log/root/log-root.generated.css', ':host', '--log-ansi-bright-black'],
   ['map/root/map-root.css', '::slotted([slot="attribution"])', 'color'],
-  ['menu/item/menu-item.css', '[part="end"]', 'color'],
-  ['menu/item/menu-item.css', 'slot[name="description"]', 'color'],
-  ['menu/section/menu-section.css', '[part="heading"]', 'color'],
-  ['notifications/group/notification-group.css', '[part="count"]', 'color'],
-  ['notifications/notification/notification.css', '[part="dismiss"]', 'color'],
-  ['log/line/log-line.css', '[part="count"]', 'color'],
+  ['menu/item/menu-item.generated.css', '[part="end"]', 'color'],
+  ['menu/item/menu-item.generated.css', 'slot[name="description"]', 'color'],
+  ['menu/section/menu-section.generated.css', '[part="heading"]', 'color'],
+  ['notifications/group/notification-group.generated.css', '[part="count"]', 'color'],
+  ['notifications/notification/notification.generated.css', '[part="dismiss"]', 'color'],
+  ['log/line/log-line.generated.css', '[part="count"]', 'color'],
   [
-    'notifications/notification/notification.css',
+    'notifications/notification/notification.generated.css',
     '[part="trailing"] > :not([part="controls"])',
     'color',
   ],
-  ['notifications/notification/notification.css', 'slot[name="description"]::slotted(*)', 'color'],
-  ['number-input/root/number-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
-  ['option/group/option-group.css', '[part="label"]', 'color'],
+  [
+    'notifications/notification/notification.generated.css',
+    'slot[name="description"]::slotted(*)',
+    'color',
+  ],
+  ['number-input/root/number-input-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
+  ['option/group/option-group.generated.css', '[part="label"]', 'color'],
   ['pagination/root/pagination-root.css', '[part="gap"]', 'color'],
   ['pagination/summary/pagination-summary.css', ':host', 'color'],
-  ['pin-input/root/pin-input-root.css', '[part="placeholder"]', 'color'],
+  ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]', 'color'],
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
-  ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
-  ['steps/root/steps-root.css', ':host([marker="numeric"])', '--_steps-marker-color'],
-  ['steps/step/step.css', '[part="description"]', 'color'],
-  ['tabs/root/tabs-root.css', '[part="scroll-start"]', 'color'],
-  ['tabs/tab/tab.css', '[part="tab"]', 'color'],
-  ['textarea/root/textarea-root.css', 'slot[name="start"]::slotted(*)', 'color'],
+  ['slider/root/slider-root.generated.css', '[part="marker-label"]', 'color'],
+  ['steps/root/steps-root.generated.css', ':host([marker="numeric"])', '--_steps-marker-color'],
+  ['steps/step/step.generated.css', '[part="description"]', 'color'],
+  ['tabs/root/tabs-root.generated.css', '[part="scroll-start"]', 'color'],
+  ['tabs/tab/tab.generated.css', '[part="tab"]', 'color'],
+  ['textarea/root/textarea-root.generated.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['time-input/root/time-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['time-input/root/time-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['time-picker/root/time-picker-root.css', '[part="hint"]', 'color'],
-  ['tree/root/tree-root.css', ':host([nesting="heading"])', '--_tree-heading-ink'],
+  ['tree/root/tree-root.generated.css', ':host([nesting="heading"])', '--_tree-heading-ink'],
   [
     'video-playlist/item/video-playlist-item.css',
     '[part="label"] ::slotted([slot="meta"])',
@@ -100,7 +105,12 @@ const literal = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\
  * ink in a rule of its own, so the list would answer for the wrong rule.
  */
 const declared = (sheet: string, selector: string, property: string): string | undefined => {
-  const css = readFileSync(join(SRC, sheet), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  const text = readFileSync(join(SRC, sheet), 'utf8')
+  /* A generated sheet's conditions weigh nothing, and the selector reads as written. */
+  const css = (sheet.endsWith('.generated.css') ? unweighted(text) : text).replace(
+    /\/\*[\s\S]*?\*\//g,
+    '',
+  )
   for (const after of ['\\s*\\{', ',\\n']) {
     const opening = new RegExp(`(?:^|\\n)${literal(selector)}${after}`, 'g')
     for (const found of css.matchAll(opening)) {
@@ -128,7 +138,7 @@ const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field-segments.css', '[part~="segment-placeholder"]'],
   ['combobox/root/combobox-root.css', '[part="control"]::placeholder'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
-  ['pin-input/root/pin-input-root.css', '[part="placeholder"]'],
+  ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],
 ]
 
 describe('quiet text', () => {
@@ -149,8 +159,8 @@ describe('quiet text', () => {
   /* A step ahead sat one ink below a finished one, and the range holds one
      quiet ink, so the step between them is a weight. */
   test('a numeric step ahead is set lighter than a finished one', () => {
-    const root = readFileSync(join(SRC, 'steps/root/steps-root.css'), 'utf8')
-    const step = readFileSync(join(SRC, 'steps/step/step.css'), 'utf8')
+    const root = unweighted(readFileSync(join(SRC, 'steps/root/steps-root.generated.css'), 'utf8'))
+    const step = unweighted(readFileSync(join(SRC, 'steps/step/step.generated.css'), 'utf8'))
     expect(root).toMatch(
       /:host\(\[marker="numeric"\]\) \{[^}]*--_steps-marker-weight: var\(--helix-weight-regular\);/,
     )

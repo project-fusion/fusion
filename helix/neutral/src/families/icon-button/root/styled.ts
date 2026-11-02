@@ -1,0 +1,384 @@
+import iconButtonFloating from '../../../fragments/icon-button-floating.js'
+import iconButtonTones from '../../../fragments/icon-button-tones.js'
+import { oneOf } from '../../../render.js'
+import {
+  difference,
+  first,
+  fn,
+  hookOf,
+  inherit,
+  list,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Icon Button's styled tier.
+ *
+ * **Button's two axes, resting elsewhere.** A text button rests outlined,
+ * because a button with words in it is a thing you are meant to see. An icon
+ * button rests as a ghost, because a toolbar of framed squares is a toolbar of
+ * boxes. So the resting ink is muted, and it lifts to the full foreground
+ * under a pointer.
+ *
+ * **Every rule that colors the button reads through two pressed values**,
+ * `icon-button-pressed-fill` and `icon-button-pressed-ink`, which are set only
+ * while the button is down and only from the `-active` hooks. With neither
+ * hook set, a press looks as the state under it does.
+ *
+ * **The private colors each tone sets are `icon-button-tones`**, and the
+ * ground and lift of a button over a busy surface are
+ * `icon-button-floating`, which Copy Button takes in with the rest of Icon
+ * Button's rules.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'icon-button',
+    hooks: ({ own }) => ({
+      backgroundColor: null,
+      backgroundColorActive: null,
+      backgroundColorHover: null,
+      borderColor: null,
+      borderWidth: token('border-thin'),
+      foregroundColor: null,
+      foregroundColorActive: null,
+      radius: token('radii-sm'),
+      size: token('size-control'),
+      spinnerColor: 'currentColor',
+      spinnerDuration: own.iconButtonTurn,
+      spinnerSize: '1.15em',
+    }),
+    own: {
+      iconButtonCrawl: null,
+      iconButtonEdge: null,
+      iconButtonFill: null,
+      iconButtonFillHover: null,
+      iconButtonInk: null,
+      iconButtonInkHover: null,
+      iconButtonOnTone: null,
+      iconButtonPressWay: null,
+      iconButtonSolidPress: null,
+      iconButtonPressedFill: null,
+      iconButtonPressedInk: null,
+      iconButtonSize: null,
+      iconButtonTone: null,
+      iconButtonTurn: null,
+      iconButtonWash: null,
+    },
+    props: {
+      emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
+      material: oneOf(['frosted', 'glass', 'transparent']),
+      raised: false,
+      shape: oneOf(['circle']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    },
+    stylesheet: 'icon-button/root/icon-button-root.generated.css',
+  },
+  ({ hook, include, keyframes, on, own, rule }) => [
+    on('host', [rule({ display: 'inline-flex', own: { iconButtonSize: hook.size } })]),
+    include(iconButtonTones),
+    on('host', [
+      rule({
+        own: {
+          /* Near black has nothing darker, so a neutral press goes toward the page. */
+          iconButtonPressWay: 1,
+          iconButtonWash: token('color-hover'),
+        },
+      }),
+      rule(
+        { has: 'tone', tone: { not: 'neutral' } },
+        {
+          own: {
+            iconButtonPressWay: '-1',
+            iconButtonWash: mix(own.iconButtonTone, 8, 'transparent'),
+          },
+        },
+      ),
+    ]),
+    /* Square by construction: one length for both sides, so the control stays
+       the same box whatever glyph it holds. The edge is written in longhands,
+       so `--icon-button-border-width` takes one to four widths, for a control
+       one side of whose edge is another's. */
+    on('button', [
+      rule({
+        alignItems: 'center',
+        backgroundColor: first(own.iconButtonPressedFill, hook.backgroundColor, 'transparent'),
+        blockSize: own.iconButtonSize,
+        borderColor: hook.borderColor('transparent'),
+        borderStyle: 'solid',
+        borderWidth: hook.borderWidth,
+        /* A corner apiece, read from Button's corner hooks, so a Button Group
+           flattens the corners it joins on an icon button as on a button. */
+        borderEndEndRadius: first(
+          hookOf('button', 'radius-end-end'),
+          hookOf('button', 'radius-end'),
+          hook.radius,
+        ),
+        borderEndStartRadius: first(
+          hookOf('button', 'radius-end-start'),
+          hookOf('button', 'radius-start'),
+          hook.radius,
+        ),
+        borderStartEndRadius: first(
+          hookOf('button', 'radius-start-end'),
+          hookOf('button', 'radius-end'),
+          hook.radius,
+        ),
+        borderStartStartRadius: first(
+          hookOf('button', 'radius-start-start'),
+          hookOf('button', 'radius-start'),
+          hook.radius,
+        ),
+        color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonInk),
+        web: { cursor: 'pointer' },
+        display: 'inline-flex',
+        /* A browser gives a button its own font, which the first content that
+           is not an icon would show. */
+        font: inherit(),
+        inlineSize: own.iconButtonSize,
+        justifyContent: 'center',
+        padding: token('space-none'),
+        position: 'relative',
+        transition: list(
+          ['background-color', token('duration-fast'), token('easing-standard')],
+          ['color', token('duration-fast'), token('easing-standard')],
+        ),
+      }),
+      /* A wash of the tone under the pointer, which is a step away from whatever
+         the button sits on in either mode. A rung of the surface ladder vanished
+         inside a menu, a dialog, or a popover in dark mode. */
+      rule(
+        { formDisabled: false, hover: true },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            own.iconButtonWash,
+          ),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonInkHover),
+        },
+      ),
+      /* Pressed: the two values every color rule reads through, from the
+         `-active` hooks alone. */
+      rule(
+        { active: true, formDisabled: false },
+        {
+          own: {
+            iconButtonPressedFill: hook.backgroundColorActive(),
+            iconButtonPressedInk: hook.foregroundColorActive(),
+          },
+        },
+      ),
+      rule({ shape: 'circle' }, { borderRadius: token('radii-full') }),
+      rule(
+        { focusVisible: true },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      /* The three departures from the resting ghost. */
+      rule(
+        { emphasis: 'solid' },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            own.iconButtonFill,
+          ),
+          borderColor: hook.borderColor('transparent'),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonOnTone),
+        },
+      ),
+      rule(
+        { formDisabled: false, emphasis: 'solid', hover: true },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            own.iconButtonFillHover,
+          ),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonOnTone),
+        },
+      ),
+      /* Framed, for a control beside a field, with no fill, as Button has, so a
+         row of an icon button and a text button reads as one kind of control. */
+      rule(
+        { emphasis: 'outlined' },
+        {
+          backgroundColor: first(own.iconButtonPressedFill, hook.backgroundColor, 'transparent'),
+          borderColor: first(hook.borderColor, own.iconButtonEdge),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
+        },
+      ),
+      rule(
+        { formDisabled: false, emphasis: 'outlined', hover: true },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 12, 'transparent'),
+          ),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
+        },
+      ),
+      rule(
+        { emphasis: 'subtle' },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 14, 'transparent'),
+          ),
+          borderColor: hook.borderColor('transparent'),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
+        },
+      ),
+      rule(
+        { formDisabled: false, emphasis: 'subtle', hover: true },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 22, 'transparent'),
+          ),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
+        },
+      ),
+      /* `:disabled` on the host, which a form's disabled fieldset sets too. */
+      rule(
+        { formDisabled: true },
+        { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+      ),
+      /* **Pending: the icon stays where it is, unseen, and a ring turns over
+         it**, as on Button. The ring is the `spinner` part, drawn only while
+         pending. */
+      rule({ pending: true }, { web: { cursor: 'progress' } }),
+    ]),
+    /* **Pressed by a Button Group, the solid fill**, as a Button takes it. The
+       web group writes these hooks onto a pressed button's control. A phone's
+       icon button reads the group's own hooks, with the same fallbacks. */
+    on('host', [
+      native([
+        rule(
+          { pressed: true },
+          {
+            '--icon-button-background-color': hookOf(
+              'button-group',
+              'pressed-background-color',
+              token('color-foreground'),
+            ),
+            '--icon-button-border-color': first(
+              hookOf('button-group', 'pressed-border-color'),
+              hookOf('button-group', 'pressed-background-color'),
+              token('color-foreground'),
+            ),
+            '--icon-button-foreground-color': hookOf(
+              'button-group',
+              'pressed-color',
+              token('color-background'),
+            ),
+          },
+        ),
+      ]),
+    ]),
+    on({ region: '*' }, [rule({ pending: true }, { visibility: 'hidden' })]),
+    on('spinner', [
+      rule({
+        animation: ['helix-icon-button-turn', hook.spinnerDuration, 'linear', 'infinite'],
+        blockSize: hook.spinnerSize,
+        border: [token('border-thick'), 'solid', mix(hook.spinnerColor, 30, 'transparent')],
+        borderBlockStartColor: hook.spinnerColor,
+        borderRadius: token('radii-full'),
+        boxSizing: 'border-box',
+        inlineSize: hook.spinnerSize,
+        inset: 0,
+        margin: 'auto',
+        position: 'absolute',
+      }),
+      /* Slowed to a fixed rate, as Loader does. The base layer sets every
+         duration token to 0.01ms under the preference, so a rate scaled from one
+         turned the ring about eight thousand times a second. */
+      rule({ reducedMotion: true }, { animationDuration: own.iconButtonCrawl }),
+    ]),
+    keyframes('helix-icon-button-turn', { to: { rotate: '1turn' } }),
+    include(iconButtonFloating),
+    on('button', [
+      rule(
+        { active: true, formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 16, 'transparent'),
+          ),
+        },
+      ),
+      /* A step past the hover fill, which way the tone's press goes. */
+      rule(
+        { active: true, emphasis: 'solid', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            own.iconButtonSolidPress,
+          ),
+          own: {
+            iconButtonSolidPress: fn('oklch', [
+              'from',
+              own.iconButtonFillHover,
+              sum('l', product('0.05', own.iconButtonPressWay('-1'))),
+              'c',
+              'h',
+            ]),
+          },
+        },
+      ),
+      rule(
+        { active: true, emphasis: 'outlined', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 20, 'transparent'),
+          ),
+        },
+      ),
+      rule(
+        { active: true, emphasis: 'subtle', formDisabled: false },
+        {
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            mix(own.iconButtonTone, 30, 'transparent'),
+          ),
+        },
+      ),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing
+       drawn moves. Where the control is already that size the box sits inside it. */
+    on({ after: 'button' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    /* A control is not printed. */
+    on('host', [rule({ print: true }, { display: 'none' })]),
+  ],
+)

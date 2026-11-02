@@ -13,15 +13,9 @@
  */
 
 import { valueAt } from '@fusion.dev/helix-core'
+import { keyOf, textOf, textsOf } from '@fusion.dev/helix-core/virtual-list'
 
-/**
- * The text a value takes in a row.
- *
- * Nothing for a missing value, so a hole whose field is absent is empty and
- * does not read "undefined".
- */
-export const textOf = (value: unknown): string =>
-  value === undefined || value === null || typeof value === 'object' ? '' : String(value)
+export { keyOf, textOf, textsOf }
 
 /** The prefix a data attribute takes to name an attribute it fills. */
 const ATTRIBUTE = 'data-field-'
@@ -58,26 +52,3 @@ export const fillHoles = (root: Element, item: unknown): void => {
     }
   }
 }
-
-/**
- * The key of item `at` in a selecting list's `value`: its `keyField` where it
- * is an object and one is named, a string or a number item itself, and its
- * place in the set otherwise.
- */
-export const keyOf = (item: unknown, at: number, keyField: string): string => {
-  if (keyField !== '' && item !== null && typeof item === 'object') {
-    return textOf(valueAt(item, keyField))
-  }
-  return typeof item === 'string' || typeof item === 'number' ? String(item) : String(at)
-}
-
-/**
- * The text typing matches for each item: its `field`, or a string or number
- * item itself, and nothing where an object has no `field` to read.
- */
-export const textsOf = (data: readonly unknown[], field: string): string[] =>
-  data.map((item) =>
-    field === '' || item === null || typeof item !== 'object'
-      ? textOf(item)
-      : textOf(valueAt(item, field)),
-  )

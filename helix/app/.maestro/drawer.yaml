@@ -1,0 +1,133 @@
+# Drawer: the sheet opens from its button and a swipe down on its title
+# takes it out; the list example's sheet, resting half open, opens further
+# under a drag up on its list, scrolls its list once whole, and hands its
+# drag back to the sheet only once the list stands at its top and has stood
+# still. Recorded.
+appId: dev.fusion.helix.app
+name: Drawer
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://drawer/sheet/preview
+      SHOWS: Open filters
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: drawer
+- tapOn: Open filters
+- extendedWaitUntil:
+    visible: .*Show projects by owner.*
+    timeout: 5000
+# The sheet rests half open, as the web's does, with its title low on the
+# screen. Maestro drags from a title to 90% of the screen, which is too short
+# to pass the snap point at a quarter, so this drag names its points, on the
+# sheet's header.
+- swipe:
+    start: 50%, 86%
+    end: 50%, 99%
+    duration: 300
+- extendedWaitUntil:
+    notVisible: .*Show projects by owner.*
+    timeout: 5000
+- openLink: helix://drawer/list/preview
+- extendedWaitUntil:
+    visible: Open recent files
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Open recent files
+- extendedWaitUntil:
+    visible: .*Quarterly report.*
+    timeout: 5000
+# The sheet is still rising when its words first show, and this wait can end
+# inside the rise: in run 41361727088 the first row was read at 94% of the Android
+# screen, against 77% at rest.
+- waitForAnimationToEnd:
+    timeout: 3000
+# Half open, a drag up on the list opens the sheet to the whole, which shows the
+# sixth file. The second drag starts from the row at rest.
+- swipe:
+    from: .*Quarterly report.*
+    direction: UP
+    duration: 600
+- extendedWaitUntil:
+    visible: .*Customer interviews.*
+    timeout: 5000
+    optional: true
+- runFlow:
+    when:
+      notVisible: .*Customer interviews.*
+    commands:
+      - swipe:
+          from: .*Quarterly report.*
+          direction: UP
+          duration: 600
+      - extendedWaitUntil:
+          visible: .*Customer interviews.*
+          timeout: 5000
+          optional: true
+# In run 41361727088 the drag at rest moved no pixel on Android, sheet or list, and
+# that run cannot say why. Where both drags stand still, these take pictures of what
+# does move, and the flow still fails: a short drag on the list as Scroll Area drags,
+# which passes there, and then a drag on the header, where no scroller stands.
+- runFlow:
+    when:
+      notVisible: .*Customer interviews.*
+    commands:
+      - takeScreenshot: drawer-list-drag-stood
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 69%
+          duration: 400
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - takeScreenshot: drawer-list-short-drag
+      - swipe:
+          start: 50%, 71%
+          end: 50%, 30%
+          duration: 600
+      - waitForAnimationToEnd:
+          timeout: 3000
+      - takeScreenshot: drawer-header-drag
+      - assertVisible: A drag on the list opened the sheet
+- waitForAnimationToEnd:
+    timeout: 3000
+# Whole, a drag up scrolls the list to its last file.
+- scrollUntilVisible:
+    element: .*Onboarding checklist.*
+    direction: DOWN
+    timeout: 15000
+- assertVisible: .*Recent files.*
+- takeScreenshot: drawer-list-scrolled
+# Back at its top, and still for half a second, a drag down takes the sheet.
+- scrollUntilVisible:
+    element: .*Quarterly report.*
+    direction: UP
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
+# Named points and a quick drag. A fling goes on to the next snap point, as
+# core's `settleSwipe` has it on the web as well, so the whole sheet rests half
+# open with its list still shown.
+- swipe:
+    start: 50%, 78%
+    end: 50%, 99%
+    duration: 200
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: .*Quarterly report.*
+# A second fling from the header at half open takes it out.
+- swipe:
+    start: 50%, 70%
+    end: 50%, 99%
+    duration: 200
+- extendedWaitUntil:
+    notVisible: .*Quarterly report.*
+    timeout: 5000
+- stopRecording

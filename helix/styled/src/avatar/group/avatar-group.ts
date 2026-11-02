@@ -1,14 +1,14 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAvatarGroup } from '@fusion.dev/helix-headless/avatar'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './avatar-group.css.js'
+import { styles } from './avatar-group.generated.css.js'
 
 /**
  * @summary Overlapping avatars, with a count for the ones not shown.
  *
  * @description
- * Avatars overlap by one step of space, so they read as a stack and each face
- * stays visible. Each avatar has a ring in the page background color, which
+ * Each avatar overlaps the one before it by a quarter of its own size, so they
+ * read as a stack and the initials of a small avatar stay readable. Each avatar has a ring in the page background color, which
  * marks its edge against the avatar behind it.
  *
  * Each avatar is drawn over the one before it, in document order, with no

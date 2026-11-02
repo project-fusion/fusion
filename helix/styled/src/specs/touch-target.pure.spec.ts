@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -13,6 +13,12 @@ import { join } from 'node:path'
  * cannot switch.
  */
 const SRC = join(import.meta.dir, '..')
+
+/* A family written once in `helix/neutral` draws a generated sheet beside its element. */
+const read = (sheet: string): string => {
+  const path = join(SRC, sheet)
+  return readFileSync(existsSync(path) ? path : path.replace(/\.css$/, '.generated.css'), 'utf8')
+}
 
 const TARGETS: [sheet: string, selector: string][] = [
   ['button/root/button-root.css', '[part="button"]::after'],
@@ -65,7 +71,7 @@ const ROWS = [
   'object-inspector/root/object-inspector-root.css',
   'outline/root/outline-root.css',
   'radio/root/radio-root.css',
-  'shared/row/row.css',
+  'option/root/option-root.css',
   'switch/root/switch-root.css',
   'tree/item/tree-item.css',
 ]
@@ -73,8 +79,8 @@ const ROWS = [
 describe('a control reaches the target', () => {
   for (const [sheet, selector] of TARGETS) {
     test(`${sheet} ${selector}`, () => {
-      const css = readFileSync(join(SRC, sheet), 'utf8')
-      const start = css.indexOf(`${selector} {`)
+      const css = read(sheet)
+      const start = Math.max(css.indexOf(`${selector} {`), css.indexOf(`${selector},`))
       expect(start).toBeGreaterThan(-1)
       expect(css.slice(start, css.indexOf('}', start))).toContain('var(--helix-size-target)')
     })
@@ -82,7 +88,7 @@ describe('a control reaches the target', () => {
 
   for (const sheet of ROWS) {
     test(`${sheet} grows to the target under a coarse pointer`, () => {
-      const css = readFileSync(join(SRC, sheet), 'utf8')
+      const css = read(sheet)
       expect(css).toMatch(
         /@media \(pointer: coarse\)[^@]*min-block-size: var\(--helix-size-target\)/,
       )

@@ -1,12 +1,15 @@
-import './preview.css'
+import { useState } from 'react'
 
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <div className="page">
       <helix-speed-dial
         data-dock="bottom-end"
         data-dock-within
         label="Actions"
+        onToggle={(event: Event & { newState?: string }) => setOpen(event.newState === 'open')}
       >
         <helix-icon-button
           emphasis="solid"
@@ -14,9 +17,13 @@ export function Example() {
           raised
           shape="circle"
           slot="trigger"
+          style={{ '--icon-button-size': 'var(--helix-size-control-lg)' }}
           tone="primary"
         >
-          <helix-icon name="plus"></helix-icon>
+          <helix-icon
+            name="plus"
+            style={open ? { '--icon-rotate': '45deg' } : {}}
+          ></helix-icon>
         </helix-icon-button>
 
         <helix-speed-dial-item value="share">

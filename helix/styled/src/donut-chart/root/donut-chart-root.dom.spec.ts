@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, type Updatable, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -14,10 +14,12 @@ beforeAll(async () => {
 const sheet = (): string => {
   const declared = (customElements.get('helix-donut-chart') as unknown as { styles: unknown })
     .styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`. */

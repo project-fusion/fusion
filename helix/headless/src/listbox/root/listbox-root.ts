@@ -19,6 +19,7 @@ import {
   HelixFilterEvent,
   HelixFormElement,
   HelixLoadMoreEvent,
+  highlightStep,
   hostAria,
   inlineStep,
   internalsOf,
@@ -984,18 +985,9 @@ export class HelixHeadlessListbox extends MixinVoice(
         at,
         event.key === 'ArrowDown' ? 1 : -1,
       )
-    } else if (event.key === 'ArrowDown') {
-      next = at < 0 ? 0 : (at + 1) % shown.length
-    } else if (event.key === 'ArrowUp') {
-      next = at < 0 ? last : (at - 1 + shown.length) % shown.length
-    } else if (event.key === 'Home') {
-      next = 0
-    } else if (event.key === 'End') {
-      next = last
-    } else if (event.key === 'PageDown') {
-      next = at < 0 ? 0 : Math.min(at + this.pageSize(), last)
     } else {
-      next = at < 0 ? last : Math.max(at - this.pageSize(), 0)
+      const paged = event.key === 'PageDown' || event.key === 'PageUp'
+      next = highlightStep(event.key, at, shown.length, paged ? this.pageSize() : 0)
     }
 
     const target = shown[next]

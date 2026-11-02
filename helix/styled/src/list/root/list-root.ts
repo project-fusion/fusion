@@ -3,7 +3,7 @@ import { HelixHeadlessList } from '@fusion.dev/helix-headless/list'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './list-root.css.js'
+import { styles } from './list-root.generated.css.js'
 
 /**
  * @summary A set of rows, announced as a list.
@@ -15,7 +15,7 @@ import { styles } from './list-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Rows, Stack, Menu
+ * @aliases Grid list, Rows, Stack
  * @documentation https://fusion.dev/helix/components/list
  *
  * @cssproperty --list-drag-preview-background-color - The fill behind the copy of a row a pointer drags.

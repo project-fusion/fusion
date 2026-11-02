@@ -80,6 +80,17 @@
   display: none;
 }
 
+/* One platform at a time, the same way. Only a family Helix draws natively
+   marks anything `web`, so every other family keeps its web reference under
+   native, below a line that says so. */
+:root:not([data-platform="native"]) .docsShell [data-platform="native"] {
+  display: none;
+}
+
+:root[data-platform="native"] .docsShell [data-platform="web"] {
+  display: none;
+}
+
 /* Sticky where they already are, so nothing moves when the page does. The rails
    rest at `header + the shell's own top padding`, and an offset of `header +
    space-md` measured 105 resting against 72 stuck, so the first scroll yanked

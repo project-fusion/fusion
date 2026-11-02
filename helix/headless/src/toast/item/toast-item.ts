@@ -1,4 +1,5 @@
 import {
+  animationsSettled,
   CountdownController,
   customElement,
   drawDismiss,
@@ -87,6 +88,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @cssproperty --toast-swipe-y - How far a swipe has moved the message down, in pixels, under a `swipe-direction` of `top` or `bottom`.
  *
  * @cssstate closed - The message has been dismissed and is hidden, or leaving.
+ * @cssstate entering - While a message shown again by `open` runs its entrance.
+ * @cssstate exiting - While a dismissed message runs its exit, before it has gone.
  * @cssstate paused - The dismiss timer is paused, while a pointer or focus is on the message or in the stack, or while the page is hidden.
  * @cssstate waiting - The region holds the message back, past its `max-visible`, until a message before it goes.
  */
@@ -396,8 +399,35 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     internalsOf(this).ariaModal = 'false'
   }
 
+  /** Counts each way out and back in, so a journey cut short by the next one ends nothing. */
+  private turn = 0
+
+  /**
+   * The way out after a dismissal, or back in after `open` is set again:
+   * `:state(exiting)` or `:state(entering)` holds until every animation on
+   * the message has finished, as Callout's does.
+   */
+  private journey(): void {
+    this.turn += 1
+    const turn = this.turn
+    const open = this.open
+    this.toggleState('entering', open)
+    this.toggleState('exiting', !open)
+    void animationsSettled(this).then(() => {
+      if (turn === this.turn) {
+        this.toggleState('entering', false)
+        this.toggleState('exiting', false)
+      }
+    })
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* A turn, and not the page writing what it already was. */
+    const was = changed.get('open') as boolean | undefined
+    if (changed.has('open') && was !== undefined && was !== this.open) {
+      this.journey()
+    }
     this.name()
     if (changed.has('waiting')) {
       this.wait(this.waiting)

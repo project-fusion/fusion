@@ -95,6 +95,39 @@ const grouped = (text: string, separator: string, decimal: string): boolean => {
 const literal = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 
 /**
+ * A number's parts as `formatToParts` gives them, or read off `format` where
+ * the engine has no `formatToParts`, as iOS's Hermes has none for numbers.
+ * Read off: the mark between the digits of `1` and `5` in one and a half is
+ * the decimal, the mark between `2` and `3` in twelve thousand the group,
+ * and the words left once the number is taken out are literals, which is all
+ * `parseNumber` reads of them.
+ */
+export const partsOf = (format: Intl.NumberFormat, value: number): Intl.NumberFormatPart[] => {
+  if (typeof format.formatToParts === 'function') {
+    return format.formatToParts(value)
+  }
+  const digits = (text: string): string => latinDigits(text)
+  const decimal = /1(\D+)5/u.exec(digits(format.format(1.5)))?.[1]
+  const group = /2(\D+)3/u.exec(digits(format.format(12345)))?.[1]
+  const parts: Intl.NumberFormatPart[] = []
+  if (group !== undefined) {
+    parts.push({ type: 'group', value: group })
+  }
+  if (decimal !== undefined) {
+    parts.push({ type: 'decimal', value: decimal })
+  }
+  let rest = digits(format.format(value)).replace(/[\d\-\u2212]/gu, ' ')
+  for (const mark of [group, decimal]) {
+    rest = mark === undefined ? rest : rest.split(mark).join(' ')
+  }
+  const words = rest.split(/\s+/u).filter((word) => word !== '')
+  for (const word of words) {
+    parts.push({ type: 'literal', value: word })
+  }
+  return parts
+}
+
+/**
  * Reads a number written in a locale with the same options it is shown with,
  * or `null` where the text is no number.
  *
@@ -112,10 +145,10 @@ export const parseNumber = (
   options?: Intl.NumberFormatOptions,
 ): number | null => {
   const format = formatter(locale, options)
-  const parts = format.formatToParts(-12345.6)
+  const parts = partsOf(format, -12345.6)
   /* And a sample of one, whose words are the singular where the locale has
      one: `1 kilogram` beside `-12,345.6 kilograms`. */
-  const one = format.formatToParts(1)
+  const one = partsOf(format, 1)
   const of = (type: string, from = parts): string[] =>
     from.filter((part) => part.type === type).map((part) => part.value)
   /* **The separators are the locale's, read from its plain format where the
@@ -123,7 +156,7 @@ export const parseNumber = (
      no groups, so the sample lacked the part. Measured before this: a
      zero-fraction percent in `de-DE` fell back to a point for the decimal,
      the same mark as its group, and refused both `0.25` and `12,5 %`. */
-  const plain = formatter(locale, undefined).formatToParts(-12345.6)
+  const plain = partsOf(formatter(locale, undefined), -12345.6)
   const group = of('group')[0] ?? of('group', plain)[0] ?? ','
   const decimal = of('decimal')[0] ?? of('decimal', plain)[0] ?? '.'
   const named = (from: Intl.NumberFormatPart[]): string[] => [

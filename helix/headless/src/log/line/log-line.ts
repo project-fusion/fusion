@@ -6,26 +6,22 @@ import {
   wordsConverter,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import {
+  elapsedClock,
+  type LogLevel,
+  type LogRun,
+  levelSaid,
+  markMatches,
+  timeOf,
+} from '@fusion.dev/helix-core/log'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { LogRun } from '../ansi.js'
-import { type LogLevel, levelSaid, timeOf } from '../buffer.js'
-import { markMatches } from '../rows.js'
 
 /** A color named for the stylesheet, such as `red`, where anything else is CSS. */
 const NAME = /^[a-z-]+$/
 
 /** How a line's time reads: the clock, or how far into the run it was written. */
 export type LogTimes = 'absolute' | 'relative'
-
-/** `seconds` as `m:ss`, or `h:mm:ss` from an hour, which is how far into a run reads. */
-const elapsed = (seconds: number): string => {
-  const whole = Math.max(0, Math.floor(seconds))
-  const hours = Math.floor(whole / 3600)
-  const minutes = Math.floor((whole % 3600) / 60)
-  const rest = String(whole % 60).padStart(2, '0')
-  return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${rest}` : `${minutes}:${rest}`
-}
 
 /**
  * @summary One line of a log, with its number, its time, and its text.
@@ -241,7 +237,7 @@ export class HelixHeadlessLogLine extends HelixElement {
     }
     const reads =
       this.logTimes === 'relative'
-        ? elapsed((time - (this.logStart ?? time)) / 1000)
+        ? elapsedClock((time - (this.logStart ?? time)) / 1000)
         : new Intl.DateTimeFormat(wordsLocale(this), {
             hour: '2-digit',
             hourCycle: 'h23',

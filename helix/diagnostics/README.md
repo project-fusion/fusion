@@ -427,6 +427,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `served-rows-differ` | A data table's first drawn page differs from the rows the page served, so the rows change once it draws. Development builds only (the `development` export condition) |
 | `solid-handler-syntax` | A React prop uses Solid's `on:` syntax. Development builds only (the `development` export condition) |
 | `stale-worker` | A page's copy of the sandbox's compiler worker file is from another release, so its messages may not match |
+| `static-description` | A list at `kind="description"` has no row a reader presses, selects, or reorders, so it is a static list of terms that Description List draws. Development builds only (the `development` export condition) |
 | `stencil-regions-unused` | A graph stencil's regions could not be used |
 | `stencil-without-inside` | A graph stencil has no inside to place the notes in |
 | `too-many-rows` | A data table is drawing more rows at once than it stays responsive to |

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTag } from '@fusion.dev/helix-headless/tag/root'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './tag-root.css.js'
+import { styles } from './tag-root.generated.css.js'
 
 /**
  * @summary A short label that adds metadata to content.

@@ -1,0 +1,82 @@
+# Tour, its examples drawn alone, closed and then open, after the touch the
+# iOS simulator loses on a new screen. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`. The examples that open on their own are
+# pictured open.
+appId: dev.fusion.helix.app
+name: "Screens: Tour"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://tour/preview/preview
+      - extendedWaitUntil:
+          visible: Take the tour
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: Find your documents
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-preview-open-${MODE}-${SIZE}
+- openLink: helix://tour/with-actions/preview
+- extendedWaitUntil:
+    visible: Take the tour
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-with-actions-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: Write a message
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-with-actions-open-${MODE}-${SIZE}
+- openLink: helix://tour/events/preview
+- extendedWaitUntil:
+    visible: Create a project to get started.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-events-${MODE}-${SIZE}
+- openLink: helix://tour/relabeled/preview
+- extendedWaitUntil:
+    visible: Everything you have saved is here, newest first.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-relabeled-${MODE}-${SIZE}
+- openLink: helix://tour/first-and-last/preview
+- extendedWaitUntil:
+    visible: Create a project to get started.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-first-and-last-${MODE}-${SIZE}
+- openLink: helix://tour/inside-a-menu-and-drawer/preview
+- extendedWaitUntil:
+    visible: Take the tour
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-inside-a-menu-and-drawer-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: File actions
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tour-inside-a-menu-and-drawer-open-${MODE}-${SIZE}

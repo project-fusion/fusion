@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTabs } from '@fusion.dev/helix-headless/tabs'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './tabs-root.css.js'
+import { styles } from './tabs-root.generated.css.js'
 
 /**
  * @summary A row of tabs and the panel each one shows.
@@ -90,6 +90,20 @@ export class HelixTabs extends HelixHeadlessTabs {
    */
   @property({ reflect: true })
   emphasis?: 'subtle'
+
+  /**
+   * How much of the row the tabs take.
+   *
+   * - `auto` is the default and is never written: the strip is as wide as its
+   *   tabs.
+   * - `full` fills the row, and the tabs share it evenly. A segmented control
+   *   across a phone is the case it is for, where each tab is a target before
+   *   it is a label.
+   *
+   * The same word, and the same values, as `width` on Button.
+   */
+  @property({ reflect: true })
+  width?: 'auto' | 'full'
 }
 
 declare global {

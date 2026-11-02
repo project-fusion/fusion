@@ -49,6 +49,37 @@ describe('Motion Toggle', () => {
     expect(changes).toHaveLength(2)
   })
 
+  /* Checkbox, Switch, and Toggle ask with the same event, so one handler
+     reads every control that turns on and off. */
+  test('asks with `helix-before-check` before each press, with `checked` true where it pauses', async () => {
+    const element = await toggle()
+    const heard: string[] = []
+    element.addEventListener('helix-before-check', (event) => {
+      const request = event as CustomEvent<{ checked: boolean }>
+      heard.push(`before ${request.detail.checked} ${request.cancelable}`)
+    })
+    element.addEventListener('change', () => heard.push('change'))
+    const button = part(element, 'button') as HTMLButtonElement
+    button.click()
+    button.click()
+    expect(heard).toEqual(['before true true', 'change', 'before false true', 'change'])
+  })
+
+  test('a refused press leaves the motion as it was and sends no change', async () => {
+    const element = await toggle()
+    let changes = 0
+    element.addEventListener('helix-before-check', (event) => event.preventDefault())
+    element.addEventListener('change', () => {
+      changes += 1
+    })
+    const button = part(element, 'button') as HTMLButtonElement
+    button.click()
+    await element.updateComplete
+    expect(document.documentElement.hasAttribute('data-helix-motion')).toBe(false)
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+    expect(changes).toBe(0)
+  })
+
   test('two on a page agree, and follow the page set by other means', async () => {
     const host = (await mount(
       '<div><helix-headless-motion-toggle></helix-headless-motion-toggle><helix-headless-motion-toggle></helix-headless-motion-toggle></div>',

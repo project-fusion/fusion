@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -238,10 +238,12 @@ describe('a shut branch', () => {
    what can be held here is that a rule exists rather than that it applied. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-tree-item') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /* A file tree in a `data-density="sm"` region kept 35px rows beside 26px

@@ -1,10 +1,12 @@
 import {
   customElement,
   drawIcon,
+  HelixBeforeCheckEvent,
   HelixElement,
   motionPaused,
   onMotionChange,
   pauseMotion,
+  toggled,
   words,
 } from '@fusion.dev/helix-core'
 import { pause, play } from '@fusion.dev/helix-icons'
@@ -37,6 +39,11 @@ import { property, state } from 'lit/decorators.js'
  * `aria-pressed`. It keeps one name, `label`, whichever way it stands, as a
  * toggle button does, and its icon shows what a press does next.
  *
+ * A press sends `helix-before-check`, with `detail.checked` `true` where the
+ * press pauses the motion, which you can cancel. Then it pauses the motion or
+ * lets it run, and sends `change`. Checkbox, Switch, and Toggle send the same
+ * `helix-before-check`.
+ *
  * Put it where a reader looks first, such as the page's header. Where the
  * reader asked for reduced motion, nothing moves by itself to begin with.
  *
@@ -50,6 +57,7 @@ import { property, state } from 'lit/decorators.js'
  * @slot icon - Replaces the icon, which is pause while motion runs and play while it is paused.
  *
  * @event {Event} change - Fired after a press pauses the page's motion or lets it run.
+ * @event {HelixBeforeCheckEvent} helix-before-check - Fired before a press pauses the page's motion or lets it run, with `detail.checked` `true` where it pauses. Cancelable: call `preventDefault()` to leave the motion as it is.
  *
  * @csspart button - The toggle button, with `aria-pressed` while the page's motion is paused.
  * @csspart icon - The icon inside the button.
@@ -104,9 +112,23 @@ export class HelixHeadlessMotionToggle extends HelixElement {
     this.toggleState('paused', this.paused)
   }
 
-  /** Pauses the page's motion, or lets it run again. */
+  /** Pauses the page's motion, or lets it run again, once `helix-before-check` stands. */
   private readonly toggle = (): void => {
-    pauseMotion(!motionPaused())
+    const next = toggled({
+      checked: motionPaused(),
+      disabled: false,
+      mixed: false,
+      readOnly: false,
+    })
+    if (next === null) {
+      return
+    }
+    const request = new HelixBeforeCheckEvent({ checked: next.checked })
+    this.dispatchEvent(request)
+    if (request.defaultPrevented) {
+      return
+    }
+    pauseMotion(next.checked)
     this.paused = motionPaused()
     this.dispatchEvent(new Event('change', { bubbles: true }))
   }

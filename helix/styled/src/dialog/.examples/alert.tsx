@@ -1,10 +1,14 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(true)
+
   return (
     <helix-dialog
       alert
-      default-open
       dismissible
-      id="delete-project"
+      onClose={() => setOpen(false)}
+      open={open}
     >
       <helix-text
         as="h2"
@@ -20,16 +24,10 @@ export function Example() {
         layout="spaced"
         slot="footer"
       >
+        <helix-button onClick={() => setOpen(false)}>Keep project</helix-button>
         <helix-button
-          command="--close"
-          commandfor="delete-project"
-        >
-          Keep project
-        </helix-button>
-        <helix-button
-          command="--close"
-          commandfor="delete-project"
           emphasis="solid"
+          onClick={() => setOpen(false)}
           tone="danger"
         >
           Delete project

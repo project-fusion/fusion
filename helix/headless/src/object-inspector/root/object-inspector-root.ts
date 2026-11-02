@@ -30,13 +30,6 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import { repeat } from 'lit/directives/repeat.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { html as staticHtml } from 'lit/static-html.js'
-import '../../copy-button/index.js'
 import {
   cursorFor,
   entries,
@@ -46,7 +39,14 @@ import {
   seed,
   siblingBranches,
   withAncestors,
-} from '../rows.js'
+} from '@fusion.dev/helix-core/object-inspector'
+import { caretDown, caretRight } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html as staticHtml } from 'lit/static-html.js'
+import '../../copy-button/index.js'
 
 /** What a `renderValue` function is told about the entry it draws. */
 export interface ObjectInspectorEntry {
@@ -181,6 +181,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
+ * @csspart copy-tooltip - The tooltip around the copy button, forwarded from it.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, pointing at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Set alongside `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Set alongside `copy-tooltip-arrow`.
@@ -1119,7 +1120,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   protected renderCopyButton(row: Row | undefined): TemplateResult {
     return staticHtml`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text, mark: copy-mark, tooltip-surface: copy-tooltip-surface,
+      exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text, mark: copy-mark, tooltip: copy-tooltip, tooltip-surface: copy-tooltip-surface,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-surface-bottom: copy-tooltip-surface-bottom,

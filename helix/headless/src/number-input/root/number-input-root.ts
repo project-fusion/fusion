@@ -1,6 +1,7 @@
 import {
   AriaForwardController,
   appleTouch,
+  capturePointer,
   customElement,
   formatNumber,
   formatWords,
@@ -11,28 +12,35 @@ import {
   MixinControllerValue,
   MixinField,
   numberConverter,
-  parseNumber,
   restoreValue,
   submitImplicitly,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { timers } from '@fusion.dev/helix-core/capabilities/timers'
+import { installWebTimers } from '@fusion.dev/helix-core/capabilities/timers/web'
+import type { Stop } from '@fusion.dev/helix-core/capabilities/types'
+import {
+  type NumberField,
+  numberFieldClamp,
+  numberFieldEnds,
+  numberFieldFlaw,
+  numberFieldKeyed,
+  numberFieldKeypad,
+  numberFieldNudge,
+  numberFieldParse,
+  numberFieldShown,
+  numberFieldSteps,
+  numberFieldStride,
+  numberFieldWritten,
+  REPEAT_DELAY,
+  REPEAT_EVERY,
+  SCRUB_PITCH,
+} from '@fusion.dev/helix-core/number-field'
 import { minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
-import { decimals, formatGrain, strideOf } from '../grain.js'
-
-/**
- * How far a pointer travels for one step of the value, in pixels.
- *
- * Four, measured against the alternatives rather than picked: at one the value
- * runs away from the pointer and a field with `step="1"` crosses a hundred in
- * the width of a word, and at ten a reader has to cross the viewport to reach
- * a useful number. Four is roughly a character's width at the sizes this is set
- * in, so a step reads as "about one glyph of travel".
- */
-const SCRUB_PITCH = 4
 
 /**
  * And the same step over four times the travel, which is what fine means here.
@@ -43,9 +51,6 @@ const SCRUB_PITCH = 4
  * grid the control is on.
  */
 const SCRUB_FINE = 16
-
-/** The format a field with no `format-options` writes its number in: the locale's plain decimal. */
-const PLAIN_FORMAT: Intl.NumberFormatOptions = {}
 
 /** `step` as written: `any`, or a number, as a native number field reads it. */
 const stepConverter = {
@@ -67,13 +72,6 @@ const phoneOf = (platform: { userAgent?: string } | undefined): 'android' | 'iph
 
 /** A number as `Number()` writes one back: a sign, digits and one decimal point. */
 const PLAIN = /^-?(\d+(\.\d*)?|\.\d+)$/
-
-/**
- * How long a stepper button is held before it steps again, and how often it
- * steps after that, in milliseconds: React Aria's NumberField's 400 and 60.
- */
-const REPEAT_DELAY = 400
-const REPEAT_EVERY = 60
 
 /**
  * @summary A field for a number, typed or changed with step buttons.
@@ -387,11 +385,19 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * `format-options` once it is not.
    */
   private get shown(): string {
-    const parsed = this.numeric
-    if (this.editing || this.formatOptions === undefined || parsed === null) {
-      return this.value
+    return numberFieldShown(this.value, this.editing, this.field)
+  }
+
+  /** What core's number-field arithmetic reads: the bounds, the step, the format, and the locale. */
+  private get field(): NumberField {
+    return {
+      format: this.formatOptions,
+      largeStep: this.largeStep,
+      locale: this.locale,
+      max: this.max,
+      min: this.min,
+      step: this.step,
     }
-    return formatNumber(parsed, this.locale, this.formatOptions)
   }
 
   /** Steps on the wheel, where asked, while the field has focus. */
@@ -428,16 +434,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * this: `decimal` with `min="-10"`, so a phone could not type the minus.
    */
   private get keypad(): 'decimal' | 'numeric' | 'text' {
-    const negative = this.min === undefined || this.min < 0
-    const grid = this.grid
-    const fraction = grid === 0 || !Number.isInteger(grid)
-    if (this.phone === 'iphone') {
-      return negative ? 'text' : fraction ? 'decimal' : 'numeric'
-    }
-    if (this.phone === 'android') {
-      return negative ? 'numeric' : fraction ? 'decimal' : 'numeric'
-    }
-    return 'numeric'
+    return numberFieldKeypad(this.phone, this.field)
   }
 
   private get control(): HTMLInputElement | null {
@@ -446,49 +443,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   /** The value as a number, or `null` where the field holds nothing usable. */
   private get numeric(): number | null {
-    const text = this.value.trim()
-    if (text === '') {
-      return null
-    }
     /* Read in the locale with the options it is shown with, so a typed
        `$1,200` is 1200 and `1,5` in a locale with a decimal comma is one and a
        half. A point is a decimal point in every locale, unless the locale's
        decimal comma is there too. */
-    return parseNumber(text, this.locale, this.formatOptions)
-  }
-
-  /** The grain last read off the format, with the locale and options it was read for. */
-  private grainOf?: [string, Intl.NumberFormatOptions, number]
-
-  /** The step as a number, or zero where it is unset or `any`. */
-  private get stepSize(): number {
-    return typeof this.step === 'number' ? Math.abs(this.step) || 0 : 0
-  }
-
-  /** How far one press moves: `step`, or the stride the format implies. */
-  private get stride(): number {
-    return this.stepSize || strideOf(this.formatOptions)
-  }
-
-  /**
-   * The grid a typed number is rounded to: `step` where it is set, nothing
-   * where it is `any`, and otherwise the smallest amount the format shows.
-   * Measured before this: with no step and no format, `2,75` typed in German
-   * became 3 on blur.
-   */
-  private get grid(): number {
-    const step = this.stepSize
-    if (step || this.step === 'any') {
-      return step
-    }
-    const options = this.formatOptions ?? PLAIN_FORMAT
-    const [locale, read, grain] = this.grainOf ?? []
-    if (locale === this.locale && read === options && grain !== undefined) {
-      return grain
-    }
-    const fresh = formatGrain(this.locale, options)
-    this.grainOf = [this.locale, options, fresh]
-    return fresh
+    return numberFieldParse(this.value, this.field)
   }
 
   /**
@@ -497,60 +456,24 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * always written.
    */
   private written(number: number): string {
-    return formatNumber(number, wordsLocale(this), {
-      maximumFractionDigits: 20,
-      useGrouping: false,
-    })
+    return numberFieldWritten(number, wordsLocale(this))
   }
 
-  /** Whether `value` is on the step grid, counted from `min`. */
-  private onStep(value: number): boolean {
-    const step = this.grid
-    if (!step) {
-      return true
-    }
-    const anchor = this.min ?? 0
-    const steps = (value - anchor) / step
-    // To the precision the grid is written in, so 0.1 + 0.2 is on a 0.1 grid.
-    return Math.abs(steps - Math.round(steps)) < 1e-9
-  }
-
-  /**
-   * A value pulled into range and onto the step grid.
-   *
-   * The grid is anchored at `min` where there is one, so `min="1" step="2"`
-   * gives 1, 3, 5 rather than 0, 2, 4. Rounded to the step's own precision,
-   * because stepping 0.1 in binary floating point otherwise produces
-   * `0.30000000000000004` and puts it in the field.
-   */
+  /** A value pulled into range and onto the step grid, as core's `numberFieldClamp` holds it. */
   private clamp(value: number): number {
-    const step = this.grid
-    const anchor = this.min ?? 0
-    const stepped = step ? anchor + Math.round((value - anchor) / step) * step : value
-    const floored = this.min === undefined ? stepped : Math.max(this.min, stepped)
-    const capped = this.max === undefined ? floored : Math.min(this.max, floored)
-    /* Decimal places from the step and the anchor together: a step of 0.5 from
-       an anchor of 0.25 lands on 0.75, which needs two rather than the one the
-       step alone would give. */
-    const places = Math.max(decimals(step), decimals(anchor))
-    return step ? Number(capped.toFixed(places)) : capped
+    return numberFieldClamp(value, this.field)
   }
 
   /**
-   * Moves by whole steps, from where the reader is.
-   *
-   * From `min` when the field is empty, so the first press of an arrow lands
-   * somewhere meaningful rather than on zero: an empty field with `min="1"`
-   * stepping to 0 would be out of range before the reader had typed anything.
+   * Moves by whole steps, from where the reader is, as core's
+   * `numberFieldNudge` takes them: from `min` when the field is empty, so
+   * the first press of an arrow lands somewhere meaningful.
    */
   private nudge(steps: number): void {
     if (this.isDisabled || this.readOnly) {
       return
     }
-    const step = this.stride
-    const from = this.numeric ?? this.min ?? 0
-    const next = this.clamp(this.numeric === null ? from : from + steps * step)
-    this.land(String(next))
+    this.land(numberFieldNudge(this.value, steps, this.field))
   }
 
   /**
@@ -598,14 +521,11 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   /** How many steps a `stepUp` argument asks for: a count, or `largeStep` for `true`. */
   private stepsOf(count: number | boolean): number {
-    if (typeof count === 'boolean') {
-      return count ? (this.largeStep ?? 10) : 1
-    }
-    return Number.isFinite(count) ? Math.trunc(count) : 1
+    return numberFieldSteps(count, this.field)
   }
 
-  /** The timer of a held stepper button. */
-  private repeat: ReturnType<typeof setTimeout> | undefined
+  /** Stops the timer of a held stepper button, which runs on the timers capability. */
+  private repeat: Stop | undefined
 
   /** Whether a pointer press stepped already, so the click that ends it does not step again. */
   private pressStepped = false
@@ -631,9 +551,14 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (event.pointerType === 'mouse' && this.control && !this.control.matches(':focus')) {
       this.control.focus({ preventScroll: true })
     }
-    clearTimeout(this.repeat)
+    this.repeat?.()
     this.pressStepped = true
-    button.setPointerCapture?.(event.pointerId)
+    /* Through `capturePointer`, so a pointer the platform refuses to capture,
+       a script's, still steps. Measured before this: a synthetic touch threw
+       `NotFoundError` and stepped nothing. */
+    capturePointer(button, event.pointerId)
+    /* On the timers capability, so a conformance scenario's fake clock moves a hold. */
+    installWebTimers()
     const step = (): void => {
       const before = this.value
       if (up) {
@@ -642,12 +567,12 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         this.stepDown()
       }
       // A step that moved nothing is a bound, and holding on past it does nothing.
-      this.repeat = this.value === before ? undefined : setTimeout(step, REPEAT_EVERY)
+      this.repeat = this.value === before ? undefined : timers().timeout(REPEAT_EVERY, step)
     }
     step()
     if (this.repeat !== undefined) {
-      clearTimeout(this.repeat)
-      this.repeat = setTimeout(step, REPEAT_DELAY)
+      this.repeat()
+      this.repeat = timers().timeout(REPEAT_DELAY, step)
     }
   }
 
@@ -661,7 +586,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * so the press is forgotten after it.
    */
   private readonly stopRepeat = (): void => {
-    clearTimeout(this.repeat)
+    this.repeat?.()
     this.repeat = undefined
     if (this.pressStepped) {
       setTimeout(() => {
@@ -763,7 +688,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     if (!grip.hasPointerCapture(event.pointerId)) {
       return
     }
-    const step = this.stride
+    const step = numberFieldStride(this.field)
     const unit = event.shiftKey ? (this.largeStep ?? 10) * step : step
     const pitch = event.altKey ? SCRUB_FINE : SCRUB_PITCH
     const steps = Math.round((event.clientX - this.scrubFrom) / pitch)
@@ -889,33 +814,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * what a reader pressing them meant.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (event.key === 'ArrowUp') {
-      this.stepUp()
-    } else if (event.key === 'ArrowDown') {
-      this.stepDown()
-    } else if (event.key === 'PageUp') {
-      this.stepUp(true)
-    } else if (event.key === 'PageDown') {
-      this.stepDown(true)
-      /* Guarded the way `nudge` is. A read-only field still receives keydown,
-         so an unguarded Home on one with a `min` silently rewrites the value
-         that the arrows beside it correctly refuse to touch. */
-    } else if (
-      event.key === 'Home' &&
-      this.min !== undefined &&
-      !this.isDisabled &&
-      !this.readOnly
-    ) {
-      this.land(String(this.min))
-    } else if (
-      event.key === 'End' &&
-      this.max !== undefined &&
-      !this.isDisabled &&
-      !this.readOnly
-    ) {
-      this.land(String(this.max))
-    } else {
+    const next = numberFieldKeyed(event.key, this.value, this.field)
+    const ends = event.key === 'Home' || event.key === 'End'
+    /* Guarded the way `nudge` is. A read-only field still receives keydown,
+       so an unguarded Home on one with a `min` silently rewrites the value
+       that the arrows beside it correctly refuse to touch. A read-only
+       field keeps Home and End for its caret. */
+    if (next === undefined || (ends && (this.isDisabled || this.readOnly))) {
       return
+    }
+    if (!this.isDisabled && !this.readOnly) {
+      this.land(next)
     }
     // Or the arrows scroll the page and Home jumps to the top of it.
     event.preventDefault()
@@ -965,38 +874,52 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         this.valueMissingMessage || 'Please fill in this field.',
         control,
       )
-    } else if (this.value.trim() !== '' && parsed === null) {
-      internalsOf(this).setValidity({ badInput: true }, this.badInputMessage, control)
-    } else if (parsed !== null && this.min !== undefined && parsed < this.min) {
-      internalsOf(this).setValidity(
-        { rangeUnderflow: true },
-        formatWords(this, 'rangeUnderflowMessage', { min: this.written(this.min) }),
-        control,
-      )
-    } else if (parsed !== null && this.max !== undefined && parsed > this.max) {
-      internalsOf(this).setValidity(
-        { rangeOverflow: true },
-        formatWords(this, 'rangeOverflowMessage', { max: this.written(this.max) }),
-        control,
-      )
-    } else if (parsed !== null && !this.onStep(parsed)) {
-      const step = this.grid
-      const anchor = this.min ?? 0
-      const below = this.clamp(anchor + Math.floor((parsed - anchor) / step) * step)
-      const above = this.clamp(anchor + Math.ceil((parsed - anchor) / step) * step)
-      internalsOf(this).setValidity(
-        { stepMismatch: true },
-        formatWords(this, 'stepMismatchMessage', {
-          above: this.written(above),
-          below: this.written(below),
-        }),
-        control,
-      )
     } else {
-      internalsOf(this).setValidity({}, '', control)
+      this.report(control)
     }
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
+  }
+
+  /**
+   * Reports what core's `numberFieldFlaw` finds wrong with the text, under
+   * the platform's flag name and with the sentence the matching property
+   * holds, or that nothing is.
+   */
+  private report(control: HTMLInputElement): void {
+    const flaw = numberFieldFlaw(this.value, this.field)
+    switch (flaw?.flag) {
+      case undefined:
+        internalsOf(this).setValidity({}, '', control)
+        return
+      case 'badInput':
+        internalsOf(this).setValidity({ badInput: true }, this.badInputMessage, control)
+        return
+      case 'rangeUnderflow':
+        internalsOf(this).setValidity(
+          { rangeUnderflow: true },
+          formatWords(this, 'rangeUnderflowMessage', { min: this.written(flaw.min) }),
+          control,
+        )
+        return
+      case 'rangeOverflow':
+        internalsOf(this).setValidity(
+          { rangeOverflow: true },
+          formatWords(this, 'rangeOverflowMessage', { max: this.written(flaw.max) }),
+          control,
+        )
+        return
+      case 'stepMismatch':
+        internalsOf(this).setValidity(
+          { stepMismatch: true },
+          formatWords(this, 'stepMismatchMessage', {
+            above: this.written(flaw.above),
+            below: this.written(flaw.below),
+          }),
+          control,
+        )
+        return
+    }
   }
 
   /**
@@ -1043,9 +966,9 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.releaseCaret?.()
     this.releaseCaret = undefined
     this.sync()
-    const parsed = this.numeric
-    this.toggleState('at-min', parsed !== null && this.min !== undefined && parsed <= this.min)
-    this.toggleState('at-max', parsed !== null && this.max !== undefined && parsed >= this.max)
+    const { atMax, atMin } = numberFieldEnds(this.value, this.field)
+    this.toggleState('at-min', atMin)
+    this.toggleState('at-max', atMax)
   }
 
   /**
@@ -1099,8 +1022,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   protected override render(): TemplateResult {
     const parsed = this.numeric
-    const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
-    const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
+    const { atMax, atMin } = numberFieldEnds(this.value, this.field)
     return html`${this.renderLabel()}
       <div part="field" role="group" aria-labelledby=${this.labeled ? this.labelId : nothing}>
         <button

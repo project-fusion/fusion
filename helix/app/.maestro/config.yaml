@@ -1,0 +1,13 @@
+# What `maestro test helix/app/.maestro` runs: the flow of each family the
+# gallery draws natively with a behavior, which presses, drags, and selects it
+# and records a video, and the flows of the gallery's own checks, after the
+# one that accepts iOS's prompt for links. `scripts/devices.sh` runs the rest
+# by file or folder: the keyboard flows in `keys` on Android, the screenshots
+# in `screens`, and the frame rate, with the appearance and text size each
+# pass sets on the device first.
+includeTags:
+  - interactions
+executionOrder:
+  continueOnFailure: true
+  flowsOrder:
+    - "Allow the gallery's links"

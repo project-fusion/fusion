@@ -10,7 +10,7 @@ import {
   slotFilled,
   slotNamed,
 } from '@fusion.dev/helix-core'
-import { caretRight } from '@fusion.dev/helix-icons'
+import { caretRight, dotsThree } from '@fusion.dev/helix-icons'
 import {
   type CSSResultGroup,
   css,
@@ -21,6 +21,11 @@ import {
 } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html as staticHtml } from 'lit/static-html.js'
+/* Relative, so this registers the base key and the styled file's identical
+   imports register the styled ones. `tier` picks which the template asks for. */
+import '../../icon-button/index.js'
+import '../../menu/index.js'
 
 /**
  * @summary One step in a breadcrumb trail.
@@ -65,8 +70,34 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixBeforeSelectEvent} helix-before-select - A plain press on the crumb's link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
  * @event {HelixSelectEvent} helix-select - Fired after a plain press on the crumb's link stood, with its `href` as the value, before the browser follows it.
  *
- * @csspart expand - The button after the first crumb of a folded slotted trail, which shows the folded crumbs.
- * @csspart fold-separator - The chevron before that button.
+ * @csspart expand - The button after the first crumb of a folded slotted trail, which opens the menu of the folded crumbs.
+ * @csspart expand-button - The fold button's inner button.
+ * @csspart expand-live - The fold button's live region.
+ * @csspart expand-mark - The three dots the fold's button draws.
+ * @csspart expand-spinner - The fold button's pending ring.
+ * @csspart expand-text - The fold button's words.
+ * @csspart fold - The menu of the crumbs a folded slotted trail folded after this one.
+ * @csspart fold-back - In the fold's menu, the way back over a page of it.
+ * @csspart fold-back-mark - In the fold's menu, the caret on that way back.
+ * @csspart fold-empty - In the fold's menu, the words it shows with no rows.
+ * @csspart fold-header - In the fold's menu, the bar over a page of it.
+ * @csspart fold-item - Each row of that menu, a link to a folded crumb.
+ * @csspart fold-item-end - The trailing column of a row of the fold's menu.
+ * @csspart fold-item-item - A row of the fold's menu, a link to its crumb.
+ * @csspart fold-item-mark - The trailing mark of a row of the fold's menu.
+ * @csspart fold-item-shortcut - The key a row of the fold's menu draws for its shortcut.
+ * @csspart fold-item-shortcut-kbd - The key inside it.
+ * @csspart fold-item-shortcut-key - One key of that shortcut's chord.
+ * @csspart fold-item-shortcut-separator - The `+` between two keys of that shortcut.
+ * @csspart fold-item-start - The leading column of a row of the fold's menu.
+ * @csspart fold-item-surface - The panel a row of the fold's menu opens beside it.
+ * @csspart fold-live - In the fold's menu, its live region.
+ * @csspart fold-loading - In the fold's menu, the words it shows while its rows load.
+ * @csspart fold-search-field - In the fold's menu, its filter field.
+ * @csspart fold-separator - The box before the fold's button, which holds its mark.
+ * @csspart fold-separator-mark - The chevron before the fold's button, or the slash under the trail's `separator="slash"`.
+ * @csspart fold-surface - In the fold's menu, its floating panel.
+ * @csspart fold-title - In the fold's menu, the name of the page of it showing.
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
  * @csspart separator-mark - The chevron between crumbs, or the slash under the trail's `separator="slash"`, shown when no separator is slotted.
@@ -109,12 +140,19 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   fold = 0
 
   /**
+   * @internal Set by the trail: the crumbs it folded after this one, each its
+   * link and its words, which the fold's menu lists.
+   */
+  @property({ attribute: false })
+  foldCrumbs: readonly { readonly href: string; readonly label: string }[] = []
+
+  /**
    * @internal Set by the trail: whether this crumb is folded away.
    */
   @property({ attribute: false })
   folded = false
 
-  /** @internal Set by the trail: the name of the button that shows the folded crumbs. */
+  /** @internal Set by the trail: the name of the button that opens the folded crumbs' menu. */
   @property({ attribute: false })
   foldLabel = ''
 
@@ -152,9 +190,6 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    */
   @property({ attribute: false })
   mark: 'chevron' | 'slash' = 'chevron'
-
-  /** @internal Set by the trail: what a press on the fold's button does. */
-  onFold: (() => void) | undefined = undefined
 
   /**
    * The link's `rel` value, which describes how the linked page relates to this
@@ -199,17 +234,41 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   }
 
   /**
-   * The button that shows the crumbs a slotted trail folded after this one,
-   * with a chevron before it, drawn after the crumb's own label.
+   * The menu of the crumbs a slotted trail folded after this one, with a
+   * chevron before it, drawn after the crumb's own label: a ghost icon button
+   * named by `foldLabel` opens it, and each row is a link to its crumb.
    */
   protected renderFold(): TemplateResult | typeof nothing {
     if (this.fold === 0) {
       return nothing
     }
-    return html`<span part="fold-separator" aria-hidden="true">${this.renderMark()}</span
-      ><button part="expand" type="button" aria-label=${this.foldLabel} @click=${() => this.onFold?.()}>
-        …
-      </button>`
+    const menu = this.tag('menu')
+    const row = this.tag('menu-item')
+    const button = this.tag('icon-button')
+    return html`<span part="fold-separator" aria-hidden="true">${this.renderMark('fold')}</span
+      >${staticHtml`<${menu}
+        part="fold"
+        exportparts="back: fold-back, back-mark: fold-back-mark, empty: fold-empty, header: fold-header, live: fold-live, loading: fold-loading, search-field: fold-search-field, surface: fold-surface, title: fold-title"
+        label=${this.foldLabel}
+        ><${button}
+          part="expand"
+          exportparts="button: expand-button, live: expand-live, spinner: expand-spinner, text: expand-text"
+          slot="trigger"
+          emphasis="ghost"
+          label=${this.foldLabel}
+          ><svg part="expand-mark" aria-hidden="true" data-glyph fill="currentColor" viewBox=${dotsThree.viewBox}>
+            ${unsafeSVG(dotsThree.content)}
+          </svg></${button}
+        >${this.foldCrumbs.map(
+          (crumb) =>
+            staticHtml`<${row}
+              part="fold-item"
+              exportparts="end: fold-item-end, item: fold-item-item, mark: fold-item-mark, shortcut: fold-item-shortcut, shortcut-kbd: fold-item-shortcut-kbd, shortcut-key: fold-item-shortcut-key, shortcut-separator: fold-item-shortcut-separator, start: fold-item-start, surface: fold-item-surface"
+              href=${crumb.href}
+              value=${crumb.href}
+              >${crumb.label}</${row}
+            >`,
+        )}</${menu}>`}`
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -245,28 +304,31 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * without reimplementing the crumb, its link and its current-page branch.
    */
   protected renderSeparator(): TemplateResult {
-    return html`<slot name="separator">${this.renderMark(true)}</slot>`
+    return html`<slot name="separator">${this.renderMark('separator')}</slot>`
   }
 
   /**
    * The trail's mark: a chevron, mirrored on a right-to-left page because it
    * points the way the trail runs, or a slash, which is a character and is
-   * written the same way in either direction.
+   * written the same way in either direction. `at` says which it marks: the
+   * crumb's separator, or the fold after the crumb's label.
    */
-  private renderMark(named = false): TemplateResult {
+  private renderMark(at: 'fold' | 'separator'): TemplateResult {
     /* The part written out rather than bound, so the parts check sees it
        rendered. */
     if (this.mark === 'slash') {
-      return named
+      return at === 'separator'
         ? html`<span part="separator-mark" data-mark="slash">/</span>`
-        : html`<span data-mark="slash">/</span>`
+        : html`<span part="fold-separator-mark" data-mark="slash">/</span>`
     }
     const chevron = unsafeSVG(caretRight.content)
-    return named
+    return at === 'separator'
       ? html`<svg part="separator-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
           ${chevron}
         </svg>`
-      : html`<svg data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>${chevron}</svg>`
+      : html`<svg part="fold-separator-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
+          ${chevron}
+        </svg>`
   }
 
   protected override render(): TemplateResult {

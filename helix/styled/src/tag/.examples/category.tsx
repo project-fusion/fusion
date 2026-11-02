@@ -2,18 +2,18 @@ export function Example() {
   return (
     <helix-flex gap="xs">
       <helix-tag>
-        <span slot="start">Priority</span>
+        <helix-text slot="start">Priority</helix-text>
         High
       </helix-tag>
       <helix-tag tone="info">
-        <span slot="start">Plan</span>
+        <helix-text slot="start">Plan</helix-text>
         Pro
       </helix-tag>
       <helix-tag
         dismissible
         tone="success"
       >
-        <span slot="start">Owner</span>
+        <helix-text slot="start">Owner</helix-text>
         Alex
       </helix-tag>
     </helix-flex>

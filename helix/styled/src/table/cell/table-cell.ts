@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTableCell } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './table-cell.css.js'
+import { styles } from './table-cell.generated.css.js'
 
 /**
  * @summary One cell of a table.

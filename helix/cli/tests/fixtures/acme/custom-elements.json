@@ -1,0 +1,98 @@
+{
+  "modules": [
+    {
+      "declarations": [
+        {
+          "attributes": [{ "name": "label" }, { "name": "tone" }, { "name": "value" }],
+          "cssParts": [{ "name": "indicator" }],
+          "cssProperties": [{ "description": "How far the indicator's corners are rounded.", "name": "--badge-radius" }],
+          "members": [
+            { "description": "What a screen reader says the count is.", "name": "label" },
+            { "description": "The fill of the indicator.", "name": "tone" },
+            { "description": "The count.", "name": "value" }
+          ],
+          "name": "AcmeBadge",
+          "slots": [{ "description": "What the badge marks.", "name": "" }],
+          "summary": "A count beside what it marks.",
+          "tagName": "acme-badge"
+        },
+        {
+          "attributes": [{ "name": "disabled" }, { "name": "emphasis" }, { "name": "label" }],
+          "cssParts": [{ "name": "button" }, { "name": "text" }],
+          "cssProperties": [
+            { "description": "The space at each end of the words.", "name": "--button-padding-inline" },
+            { "description": "How far the corners are rounded.", "name": "--button-radius" }
+          ],
+          "events": [
+            { "description": "Sent when the button is pressed.", "name": "acme-press", "type": { "text": "AcmePressEvent" } }
+          ],
+          "members": [
+            { "description": "Whether the button can be pressed.", "name": "disabled" },
+            { "description": "How strongly the button is drawn.", "name": "emphasis" },
+            { "description": "The button's name, where its words do not say it.", "name": "label" }
+          ],
+          "name": "AcmeButton",
+          "slots": [{ "description": "The button's words.", "name": "" }],
+          "summary": "A press, named by its words.",
+          "tagName": "acme-button"
+        },
+        {
+          "attributes": [{ "name": "active" }, { "name": "default-active" }, { "name": "label" }],
+          "cssParts": [{ "name": "tabs" }],
+          "cssProperties": [{ "description": "The space between the tabs.", "name": "--tabs-gap" }],
+          "events": [
+            { "description": "Sent once a tab is chosen.", "name": "acme-activate", "type": { "text": "AcmeActivateEvent" } },
+            {
+              "description": "Sent before a tab is chosen, which a handler may refuse.",
+              "name": "acme-before-activate",
+              "type": { "text": "AcmeBeforeEvent" }
+            },
+            {
+              "description": "Sent before a tab is pressed, which a handler may refuse.",
+              "name": "acme-before-select",
+              "type": { "text": "AcmeBeforeEvent" }
+            }
+          ],
+          "members": [
+            { "description": "The `value` of the chosen tab.", "name": "active" },
+            { "description": "The tab chosen at first.", "name": "defaultActive" },
+            { "description": "The name of the row of tabs.", "name": "label" }
+          ],
+          "name": "AcmeTabs",
+          "slots": [{ "description": "The tabs.", "name": "" }],
+          "summary": "A row of tabs, one of them chosen.",
+          "tagName": "acme-tabs"
+        },
+        {
+          "attributes": [{ "name": "count" }, { "name": "disabled" }, { "name": "selected" }, { "name": "value" }],
+          "cssParts": [{ "name": "count" }, { "name": "label" }, { "name": "tab" }],
+          "cssProperties": [
+            { "description": "The color of the words at rest.", "name": "--tabs-tab-color" },
+            { "description": "The color of the words while the tab is chosen.", "name": "--tabs-tab-selected-color" }
+          ],
+          "cssStates": [{ "name": "selected" }],
+          "events": [
+            {
+              "description": "Sent before the tab is chosen, which a handler may refuse.",
+              "name": "acme-before-select",
+              "type": { "text": "AcmeBeforeEvent" }
+            }
+          ],
+          "members": [
+            { "description": "The count the tab's badge shows.", "name": "count" },
+            { "description": "Whether the tab can be chosen.", "name": "disabled" },
+            { "description": "Whether the tab is chosen.", "name": "selected" },
+            { "description": "What names the tab in its set.", "name": "value" }
+          ],
+          "name": "AcmeTab",
+          "slots": [{ "description": "The tab's words.", "name": "" }],
+          "summary": "One tab of a tab set.",
+          "tagName": "acme-tab"
+        }
+      ],
+      "kind": "javascript-module",
+      "path": "src/index.ts"
+    }
+  ],
+  "schemaVersion": "2.1.0"
+}
