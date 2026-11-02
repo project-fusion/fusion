@@ -66,10 +66,23 @@ name: "Screens: Megamenu"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-# Solutions runs off the bar at iOS's largest text size, and the bar scrolls.
+# Solutions runs off the bar at iOS's largest text size, and the bar scrolls. On
+# iOS a swipe from Products aims at the word's middle, past the bar's clip, and
+# moves nothing (run 41391811482: the word at x 269 to 473, the bar ending at 364),
+# so the drag is by points on the bar, as a drag on the simulator moved it.
 - runFlow:
     when:
       notVisible: Solutions
+      platform: iOS
+    commands:
+      - swipe:
+          start: 80%, 21%
+          end: 20%, 21%
+          duration: 800
+- runFlow:
+    when:
+      notVisible: Solutions
+      platform: Android
     commands:
       - swipe:
           from: Products
