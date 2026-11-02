@@ -4,6 +4,7 @@ import {
   fn,
   list,
   mix,
+  native,
   product,
   quotient,
   safeArea,
@@ -68,6 +69,15 @@ export default styles(
     /* The title's first line, where the close control is centered. */
     const titleLine = product(token('text-xl'), token('leading-tight'))
     const dismissSize = token('size-control-sm')
+    /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
+       show and the two were one fill, so inside the dialog the token sits a step above it. In
+       light the shadow separates them. */
+    const step = rule({
+      '--helix-color-surface-overlay': scheme(
+        own.dialogGround,
+        mix(token('color-foreground'), 8, own.dialogGround),
+      ),
+    })
     return [
       /* The host draws nothing, and holds the scrim's tint for the backdrop to read. */
       on('host', [
@@ -80,16 +90,10 @@ export default styles(
         }),
         rule({ print: true }, { display: 'none' }),
       ]),
+      on('surface', [step]),
       on('surface', [
         rule({
           own: { dialogWidth: hook.inlineSize },
-          /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
-             show and the two were one fill, so inside the dialog the token sits a step above it. In
-             light the shadow separates them. */
-          '--helix-color-surface-overlay': scheme(
-            own.dialogGround,
-            mix(token('color-foreground'), 8, own.dialogGround),
-          ),
           backgroundColor: own.dialogGround,
           border: [hook.borderWidth, 'solid', hook.borderColor],
           borderRadius: hook.radius,

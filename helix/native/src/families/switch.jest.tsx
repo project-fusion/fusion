@@ -5,6 +5,9 @@
  * while a required switch is off. `test:native` writes the component beside
  * this file, as the styled package's build writes the one it ships.
  */
+
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
 import { fakeFocus } from '@fusion.dev/helix-core/capabilities/focus/fake'
 import { setKeys } from '@fusion.dev/helix-core/capabilities/keys'
@@ -14,6 +17,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef, type ReactNode } from 'react'
 import { Dimensions, StyleSheet, View } from 'react-native'
 import type { FieldHandle } from '../machines/validation'
+import type { Family } from '../style/form'
 import { HelixTheme, useTokens } from '../theme/helix-theme'
 import { HelixSwitch, type HelixSwitchProps } from './switch/index.native'
 
@@ -56,6 +60,7 @@ const themed = (children: ReactNode) => (
     <Token name="color-primary-surface" />
     <Token name="color-surface-sunken" />
     <Token name="color-danger" />
+    <Token name="color-primary-surface-active" />
   </HelixTheme>
 )
 
@@ -196,6 +201,22 @@ describe('the generated Switch', () => {
     await fireEvent.press(theSwitch())
     expect(screen.queryByTestId('sun', { includeHiddenElements: true })).toBeTruthy()
     expect(screen.queryByTestId('moon', { includeHiddenElements: true })).toBeNull()
+  })
+
+  /* The rule a phone reads. A press in this spec's renderer gives the row no pressed state. */
+  test('under a press, an on track takes the fill step, past the wash', () => {
+    const form = JSON.parse(
+      readFileSync(join(__dirname, '../../../neutral/build/ir/switch/root.json'), 'utf8'),
+    ) as Family
+    const rules = (form.rules ?? []).flatMap((rule) =>
+      rule.kind === 'rule' && rule.target === 'track' ? [rule] : [],
+    )
+    const pressed = rules.filter((rule) => JSON.stringify(rule.when).includes('"active"'))
+    const on = pressed.find((rule) => JSON.stringify(rule.when).includes('"checked"'))
+    const off = pressed.find((rule) => !JSON.stringify(rule.when).includes('"checked"'))
+    expect(on?.webOnly).toBe(false)
+    expect(JSON.stringify(on?.set)).toContain('color-primary-surface-active')
+    expect(on?.order).toBeGreaterThan(off?.order ?? Number.POSITIVE_INFINITY)
   })
 
   test('keeps its track and thumb at 1.353 times their size at the largest text size, and grows its words', async () => {
