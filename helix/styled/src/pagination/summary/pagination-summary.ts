@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessPaginationSummary } from '@fusion.dev/helix-headless/pagination'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './pagination-summary.css.js'
+import { styles } from './pagination-summary.generated.css.js'
 
 /**
  * @summary Text that shows which items are on the current page, out of the total.

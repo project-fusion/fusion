@@ -8,7 +8,7 @@ import {
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
-import { styles } from './pagination-size.css.js'
+import { styles } from './pagination-size.generated.css.js'
 
 describe('pagination size server output', () => {
   test('the select and its options ship, rather than appearing on hydration', () => {
