@@ -635,6 +635,84 @@ pub const TABLE: &[(&str, Names)] = &[
 /// What a table computes for its parts, each read as `tableRoot.x`.
 pub const TABLE_COMPUTED: &[&str] = &["empty", "every", "heads", "nests", "rows", "waiting"];
 
+/// What a table drawn from an array reads and sends, by the name the machine binds.
+pub const DATA_TABLE: &[(&str, Names)] = &[
+    ("ascendingLabel", Names::Prop),
+    ("childField", Names::Prop),
+    ("columns", Names::Prop),
+    ("data", Names::Prop),
+    ("defaultExpanded", Names::Prop),
+    ("defaultFilter", Names::Prop),
+    ("defaultOrder", Names::Prop),
+    ("defaultPage", Names::Prop),
+    ("defaultPageSize", Names::Prop),
+    ("defaultSelected", Names::Prop),
+    ("defaultSort", Names::Prop),
+    ("expanded", Names::Prop),
+    ("filter", Names::Prop),
+    ("gapLabel", Names::Prop),
+    ("hideColumnLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("loadMore", Names::Prop),
+    ("loadMoreLabel", Names::Prop),
+    ("locale", Names::Prop),
+    ("mode", Names::Prop),
+    ("moveLeftLabel", Names::Prop),
+    ("moveRightLabel", Names::Prop),
+    ("nextLabel", Names::Prop),
+    ("order", Names::Prop),
+    ("page", Names::Prop),
+    ("pageLabel", Names::Prop),
+    ("pageSize", Names::Prop),
+    ("paginated", Names::Prop),
+    ("paginationLabel", Names::Prop),
+    ("previousLabel", Names::Prop),
+    ("reorderable", Names::Prop),
+    ("reorderableRows", Names::Prop),
+    ("resultLabel", Names::Prop),
+    ("resultsLabel", Names::Prop),
+    ("rowKey", Names::Prop),
+    ("rowLink", Names::Prop),
+    ("selectable", Names::Prop),
+    ("selected", Names::Prop),
+    ("selectionBehavior", Names::Prop),
+    ("showColumnsLabel", Names::Prop),
+    ("sort", Names::Prop),
+    ("sortAscendingLabel", Names::Prop),
+    ("sortDescendingLabel", Names::Prop),
+    ("total", Names::Prop),
+    ("windowed", Names::Prop),
+    ("onBeforeColumnToggle", Names::Event),
+    ("onBeforeExpand", Names::Event),
+    ("onBeforeFilter", Names::Event),
+    ("onBeforeFollow", Names::Event),
+    ("onBeforeNavigate", Names::Event),
+    ("onBeforeReorder", Names::Event),
+    ("onBeforeSelect", Names::Event),
+    ("onBeforeSort", Names::Event),
+    ("onColumnToggle", Names::Event),
+    ("onExpand", Names::Event),
+    ("onFilter", Names::Event),
+    ("onFollow", Names::Event),
+    ("onLoadMore", Names::Event),
+    ("onNavigate", Names::Event),
+    ("onReorder", Names::Event),
+    ("onSelect", Names::Event),
+    ("onSort", Names::Event),
+];
+
+/// What a table drawn from an array computes for its parts, each read as `dataTableRoot.x`.
+pub const DATA_TABLE_COMPUTED: &[&str] = &[
+    "empty",
+    "every",
+    "heads",
+    "more",
+    "nests",
+    "pagination",
+    "rows",
+    "waiting",
+];
+
 /// What a row of a table reads, by the name the machine binds.
 pub const TABLE_ROW: &[(&str, Names)] = &[
     ("disabled", Names::Prop),
@@ -734,6 +812,11 @@ pub fn inspector(lit: &Lit) -> Result<TreeChoice, String> {
 /// `tableRoot({ ... })`, each field a name.
 pub fn table(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "tableRoot", TABLE, TABLE_COMPUTED)
+}
+
+/// `dataTableRoot({ ... })`, each field a name.
+pub fn data_table(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "dataTableRoot", DATA_TABLE, DATA_TABLE_COMPUTED)
 }
 
 /// `tableRow({ ... })`, each field a name.
@@ -872,6 +955,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "notificationRow" => notification_row(value),
         "notificationGroup" => notification_group(value),
         "carousel" => carousel(value),
+        "dataTableRoot" => data_table(value),
         "paginationRoot" => pagination_root(value),
         "paginationSize" => pagination_size(value),
         "listbox" => listbox(value),
