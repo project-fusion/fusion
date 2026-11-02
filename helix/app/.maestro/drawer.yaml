@@ -30,7 +30,7 @@ tags:
 - swipe:
     start: 50%, 86%
     end: 50%, 99%
-    duration: 300
+    duration: 1500
 - extendedWaitUntil:
     notVisible: .*Show projects by owner.*
     timeout: 5000
@@ -159,12 +159,21 @@ tags:
     timeout: 3000
 # A drag rests the sheet at the nearest point: this one ends nearer the half than the
 # whole, with the list still shown.
-- swipe:
-    start: 50%, 78%
-    end: 50%, 90%
-    duration: 600
-- waitForAnimationToEnd:
-    timeout: 3000
+# The simulator can stall: in run 41489332691 this drag took 41 seconds, the sheet stood
+# whole after it, and the commands around it waited 80 seconds. The drag goes again while
+# the sheet has not come down. At the half the fourth file's frame is off the screen, so
+# the repeat ends there, and a drag never lands on a sheet that already rests.
+- repeat:
+    times: 3
+    while:
+      visible: .*Brand guidelines.*
+    commands:
+      - swipe:
+          start: 50%, 78%
+          end: 50%, 90%
+          duration: 600
+      - waitForAnimationToEnd:
+          timeout: 3000
 - assertVisible: .*Quarterly report.*
 - assertNotVisible: .*Brand guidelines.*
 # A drag from the header, which stands near 85% at half open, ends past the middle of
