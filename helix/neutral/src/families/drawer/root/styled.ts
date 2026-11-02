@@ -4,10 +4,12 @@ import {
   first,
   fn,
   list,
+  mix,
   native,
   product,
   quotient,
   safeArea,
+  scheme,
   sum,
   token,
   web,
@@ -56,6 +58,7 @@ export default styles(
     }),
     own: {
       drawerAway: null,
+      drawerGround: null,
       drawerLead: null,
       drawerScrim: null,
       drawerSize: null,
@@ -79,7 +82,12 @@ export default styles(
       /* The host draws nothing, and holds the panel's size and the scrim's tint. */
       on('host', [
         rule({ own: { drawerSize: hook.size }, display: 'contents' }),
-        rule({ own: { drawerScrim: token('color-overlay') } }),
+        rule({
+          own: {
+            drawerGround: hook.backgroundColor(token('color-surface-overlay')),
+            drawerScrim: token('color-overlay'),
+          },
+        }),
         rule({ print: true }, { display: 'none' }),
       ]),
       /* The scrim fades in as the panel slides, and out as it leaves. */
@@ -107,7 +115,14 @@ export default styles(
           inset: web('auto'),
           inlineSize: 'auto',
           blockSize: 'auto',
-          backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
+          /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
+             show and the two were one fill, so inside the drawer the token sits a step above it. In
+             light the shadow separates them. */
+          '--helix-color-surface-overlay': scheme(
+            own.drawerGround,
+            mix(token('color-foreground'), 8, own.drawerGround),
+          ),
+          backgroundColor: own.drawerGround,
           padding,
           paddingBlockStart: own.drawerLead(paddingTop),
           paddingBlockEnd: own.drawerTrail(padding),

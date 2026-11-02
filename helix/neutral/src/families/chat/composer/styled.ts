@@ -412,7 +412,16 @@ export default styles(
       native([rule({ flexDirection: 'row' })]),
       rule({ part: { hidden: true } }, { display: 'none' }),
     ]),
-    on({ placeholder: 'field' }, [native([rule({ color: token('color-foreground-muted') })])]),
+    /* This sheet does not take the field fragment, so the rule it gives every field is
+       written here too. Without it the placeholder took the browser's #757575, measured
+       4.41:1 in light and 4.25:1 in dark, where the muted ink is 5.76:1 and 7.57:1. */
+    on({ placeholder: 'field' }, [
+      rule({ color: token('color-foreground-muted') }),
+      web([rule({ fontWeight: token('weight-regular') })]),
+    ]),
+    on({ placeholder: 'example' }, [
+      web([rule({ color: token('color-foreground-muted'), fontWeight: token('weight-regular') })]),
+    ]),
     on('tools', [
       rule({
         alignItems: 'center',

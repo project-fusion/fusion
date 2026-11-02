@@ -39,6 +39,8 @@ export default styles(
         display: 'flex',
         flexDirection: 'column',
         gap: hook.gap,
+        /* A long unbroken word breaks inside the block. */
+        web: { overflowWrap: 'anywhere' },
         padding: hook.padding,
         textAlign: 'center',
       }),

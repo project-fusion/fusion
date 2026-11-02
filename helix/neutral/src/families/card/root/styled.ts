@@ -65,7 +65,9 @@ export default styles(
         gap: hook.gap,
         gridTemplateColumns: 'minmax(0, 1fr)',
         lineHeight: hook.lineHeight,
+        /* It clips a long unbroken word too, so the word breaks. */
         overflow: 'hidden',
+        web: { overflowWrap: 'anywhere' },
         padding: own.cardInset,
         transition: list(
           ['border-color', token('duration-fast'), token('easing-standard')],
