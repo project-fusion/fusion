@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessPagination } from '@fusion.dev/helix-headless/pagination'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './pagination-root.css.js'
+import { styles } from './pagination-root.generated.css.js'
 
 /**
  * @summary Controls for moving between the pages of a long set of results.

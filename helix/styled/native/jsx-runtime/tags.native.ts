@@ -54,6 +54,11 @@ import { HelixNumberInput } from '../number-input/index.native'
 import { HelixObjectInspector } from '../object-inspector/index.native'
 import { HelixOption, HelixOptionGroup, HelixOptionSeparator } from '../option/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
+import {
+  HelixPagination,
+  HelixPaginationSize,
+  HelixPaginationSummary,
+} from '../pagination/index.native'
 import { HelixPinInput } from '../pin-input/index.native'
 import { HelixPopover } from '../popover/index.native'
 import { HelixProgress } from '../progress/index.native'
@@ -260,6 +265,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-option-separator': HelixOptionSeparator,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
+  'helix-pagination': HelixPagination,
+  'helix-pagination-size': HelixPaginationSize,
+  'helix-pagination-summary': HelixPaginationSummary,
   'helix-pin-input': HelixPinInput,
   'helix-popover': HelixPopover,
   'helix-progress': HelixProgress,
