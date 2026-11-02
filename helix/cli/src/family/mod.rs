@@ -41,8 +41,9 @@ mod capability;
 mod compile;
 mod components;
 mod css;
-mod ir;
 #[cfg(feature = "internal")]
+mod host_states;
+mod ir;
 mod machine;
 mod output;
 mod parts;
@@ -281,6 +282,40 @@ fn runtime_package(
 }
 
 #[cfg(feature = "internal")]
+/// Each source file directly under `folder` that keys a host state in camelCase,
+/// with what it wrote.
+fn host_state_faults(folder: &Path) -> Result<Vec<String>, Failure> {
+    let entries = fs::read_dir(folder).map_err(|error| {
+        Failure::input(
+            "cannot read a folder of machines",
+            format!("{}: {error}", folder.display()),
+        )
+    })?;
+    let mut paths: Vec<_> = entries
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            let name = path.to_string_lossy();
+            (name.ends_with(".ts") || name.ends_with(".tsx")) && !name.contains(".jest.")
+        })
+        .collect();
+    paths.sort();
+    let mut broken = Vec::new();
+    for path in paths {
+        let text = fs::read_to_string(&path).map_err(|error| {
+            Failure::input(
+                "cannot read a machine",
+                format!("{}: {error}", path.display()),
+            )
+        })?;
+        let faults = host_states::faults(&text);
+        if !faults.is_empty() {
+            broken.push(format!("{}:\n{}", path.display(), faults.join("\n")));
+        }
+    }
+    Ok(broken)
+}
+
 /// Compiles each machine under the package's `src/machines` to the module
 /// beside it, or with `--check` says which written ones are behind.
 ///
@@ -326,7 +361,7 @@ pub fn machines(
     }
     folders.sort();
     let mut outputs = Vec::new();
-    let mut broken = Vec::new();
+    let mut broken = host_state_faults(&package.join("src").join("machines"))?;
     for folder in folders {
         let source = folder.join("machine.ts");
         let text = fs::read_to_string(&source).map_err(|error| {
