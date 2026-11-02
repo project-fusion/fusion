@@ -79,7 +79,14 @@ tags:
 - takeScreenshot: toast-events-heard
 # The row is one label on iOS, its name and its button. Matching from the start
 # of the words keeps the message "Archived Quarterly report.pdf" from answering.
-- openLink: helix://toast/undo/preview
+#
+# The check `standing-undo` is the undo example with a message that stands a
+# minute. In run 41361727088 the example's 8 seconds ran out inside the steps: on
+# Android the tap on Archive returned 9.6 seconds after the press, and on iOS "Undo"
+# was aimed at the screen's title, which the example's screen is also named, and
+# pressed 9.5 seconds after Archive, with the message gone. This screen's title is
+# Toast, so "Undo" names the message's button alone.
+- openLink: helix://checks/standing-undo
 - extendedWaitUntil:
     visible: Quarterly report.pdf.*
     timeout: 15000
