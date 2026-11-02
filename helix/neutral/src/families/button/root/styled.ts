@@ -85,6 +85,7 @@ export default styles(
         minInlineSize: hook.inlineSize,
         maxInlineSize: '100%',
       }),
+      native([rule({ flexDirection: 'column' })]),
       rule({
         own: {
           buttonEdge: token('color-border'),
@@ -280,6 +281,11 @@ export default styles(
         ),
         whiteSpace: 'nowrap',
       }),
+      /* A phone resolves a share against the room its parent has, where the web's
+         button resolves it against the host's own fit, and a row grows an item to
+         that room too, so a button in a row that scrolls stood as wide as the frame.
+         The host stacks, and the button stretches to whatever width the host has. */
+      native([rule({ inlineSize: 'auto', minInlineSize: 0 })]),
       /* A corner apiece, so a group can flatten the ones it needs to. `start`
          and `end` name the two inline sides, which is all a row of buttons
          needs: the first keeps its leading corners and the last its trailing

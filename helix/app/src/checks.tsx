@@ -6,6 +6,7 @@ import { HelixIcon } from '@fusion.dev/helix/icon'
 import { HelixMotionToggle } from '@fusion.dev/helix/motion-toggle'
 import { HelixProgress } from '@fusion.dev/helix/progress'
 import { HelixSkeleton } from '@fusion.dev/helix/skeleton'
+import { HelixToolbar } from '@fusion.dev/helix/toolbar'
 import { HelixTrend } from '@fusion.dev/helix/trend'
 import { dateTimeSupport, numberSupport, ScrollArea, useTokens } from '@fusion.dev/helix-native'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -169,6 +170,17 @@ export const CHECKS: Readonly<
   'select-all': { draw: () => <SelectAll />, title: 'Checkbox Group' },
   'standing-copy': { draw: () => <StandingCopy />, title: 'Copy Button' },
   'standing-undo': { draw: () => <StandingUndo />, title: 'Toast' },
+  'toolbar-scrolls': {
+    draw: () => (
+      <HelixToolbar label="Actions" scrollable>
+        <HelixButton>Save the draft</HelixButton>
+        <HelixButton>Share</HelixButton>
+        <HelixButton>Move to another folder</HelixButton>
+        <HelixButton>Archive</HelixButton>
+      </HelixToolbar>
+    ),
+    title: 'Toolbar',
+  },
 }
 
 /** One check, by its name. */
