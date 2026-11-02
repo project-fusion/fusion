@@ -110,13 +110,14 @@
   - paragraph: Contrast is measured on every release
   - text: One pair that failed
   - paragraph: Body text in this gray
-  - text: 3.03:1 against a target of 4.5:1 Fails 10 generator checks
+  - text: 3.03:1 against a target of 4.5:1 Fails 11 generator checks
   - code: content
   - code: register
   - code: docs
   - code: element-events
   - code: eval
   - code: metrics
+  - code: native-reference
   - code: routes
   - code: samples
   - code: themed-page
