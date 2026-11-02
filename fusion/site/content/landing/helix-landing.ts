@@ -71,7 +71,7 @@ export const HERO = {
    * answer to both, and Lit is the honest footnote: it is what they are built
    * with, and it is 5KB the consumer is also taking.
    */
-  works: 'Works in React, Vue, Svelte, or no framework.',
+  works: 'Works in React, Angular, Vue, Svelte, or no framework.',
 } as const
 
 /**
