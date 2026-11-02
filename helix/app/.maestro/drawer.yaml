@@ -65,12 +65,23 @@ tags:
 - assertVisible: .*Brand guidelines.*
 # Whole, a drag up scrolls the list, and it stays the list's after the finger
 # leaves the list. This drag runs from the first row to 10% of the screen, past the
-# list's top almost at once. It flings, so it can pass the sixth file: the first
-# file gone is what it proves.
+# list's top almost at once. Maestro's iOS reads a row the list has clipped while its
+# frame still meets the sheet: in run 41381302660 this drag moved the list 80 points,
+# the picture shows the first file gone, and the hierarchy kept it at y 547 with the
+# sheet's top at 554. So the list goes on until the first file's frame leaves the sheet.
 - swipe:
     from: .*Quarterly report.*
     direction: UP
     duration: 600
+- repeat:
+    times: 4
+    while:
+      visible: .*Quarterly report.*
+    commands:
+      - swipe:
+          start: 50%, 88%
+          end: 50%, 76%
+          duration: 300
 - extendedWaitUntil:
     notVisible: .*Quarterly report.*
     timeout: 5000
@@ -97,6 +108,17 @@ tags:
       - swipe:
           start: 50%, 76%
           end: 50%, 88%
+          duration: 300
+# On iOS the first file reads as shown up to about 112 points short of the list's top,
+# as above, and a step above is 105. One longer drag ends at the top. Android reads the
+# clip, so this drag would take its sheet.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 76%
+          end: 50%, 90%
           duration: 300
 - waitForAnimationToEnd:
     timeout: 3000

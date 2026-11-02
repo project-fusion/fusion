@@ -332,6 +332,20 @@ esac
 # the dialogs for apps that stop responding or crash with this setting.
 if [[ $platform == android ]]; then
   adb -s "$device" shell settings put global hide_error_dialogs 1
+  # The setting did not hold in run 41381302660: the dialog stood over the gallery
+  # about a minute into two passes, and all 57 flows of each failed. Force-stopping the
+  # launcher takes its dialog away. A dialog of the gallery's own stays, so a flow
+  # still fails on it.
+  while :; do
+    if adb -s "$device" shell dumpsys window windows 2> /dev/null |
+      grep -q 'Application Not Responding: com.google.android.apps.nexuslauncher'; then
+      say "Stopping the launcher, which is not responding"
+      adb -s "$device" shell am force-stop com.google.android.apps.nexuslauncher
+    fi
+    sleep 5
+  done &
+  launcher_watch=$!
+  trap 'kill "$launcher_watch" 2> /dev/null' EXIT
 fi
 
 if [[ $part == all || $part == flows ]]; then

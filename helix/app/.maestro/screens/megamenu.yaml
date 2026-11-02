@@ -2,6 +2,9 @@
 # the iOS simulator loses on a new screen. One screenshot of each, named by
 # the example, `MODE`, and `SIZE`. An open panel is pictured from its top, and
 # at the largest text size a flow scrolls it to the group further down.
+# A press on Products lands near the word's start: at iOS's largest text size the
+# word runs past the bar's clip, its middle stands outside the bar, and a press there
+# reaches nothing (run 41381302660: the word at x 269 to 473, the bar ending at 364).
 appId: dev.fusion.helix.app
 name: "Screens: Megamenu"
 ---
@@ -18,7 +21,9 @@ name: "Screens: Megamenu"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-- tapOn: Products
+- tapOn:
+    text: Products
+    point: 10%, 50%
 - extendedWaitUntil:
     visible: .*Plan and track work across teams.*
     timeout: 5000
@@ -38,7 +43,9 @@ name: "Screens: Megamenu"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-- tapOn: Products
+- tapOn:
+    text: Products
+    point: 10%, 50%
 - extendedWaitUntil:
     visible: .*Plan and track work across teams.*
     timeout: 5000
@@ -84,7 +91,9 @@ name: "Screens: Megamenu"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-- tapOn: Products
+- tapOn:
+    text: Products
+    point: 10%, 50%
 - extendedWaitUntil:
     visible: .*helix-before-open.*
     timeout: 5000
@@ -104,7 +113,9 @@ name: "Screens: Megamenu"
 - tapOn:
     point: 50%, 90%
     retryTapIfNoChange: false
-- tapOn: Products
+- tapOn:
+    text: Products
+    point: 10%, 50%
 - extendedWaitUntil:
     visible: .*Plan and track work across teams.*
     timeout: 5000
