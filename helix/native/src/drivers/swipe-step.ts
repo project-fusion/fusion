@@ -41,7 +41,7 @@ export const stepped = (travel: number, delta: number, held: Held | undefined): 
 }
 
 /** How far a pan stands from where it began, along both axes. */
-export interface Travelled {
+export interface Traveled {
   readonly x: number
   readonly y: number
 }
@@ -55,8 +55,8 @@ export interface Travelled {
 export const released = (
   edge: SwipeEdge,
   travel: number,
-  seen: Travelled,
-  lifted: Travelled,
+  seen: Traveled,
+  lifted: Traveled,
   held: Held | undefined,
 ): number => {
   'worklet'
