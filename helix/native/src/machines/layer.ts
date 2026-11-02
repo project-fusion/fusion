@@ -332,7 +332,7 @@ export const useLayer = (
         layer: layered,
         states: { ...states, ...refusal.states, ...settled },
         view: {
-          ...partView({ decorative, modal, notice, tooltip }),
+          ...partView({ decorative, edge: swiped.edge, modal, notice, tooltip }),
           collapsable: false,
           onAccessibilityEscape: () => dismiss('request'),
           ref,

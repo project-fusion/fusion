@@ -19,10 +19,11 @@ import { type FakeKeys, fakeKeys } from '@fusion.dev/helix-core/capabilities/key
 import { setTimers, timers } from '@fusion.dev/helix-core/capabilities/timers'
 import { type FakeTimers, fakeTimers } from '@fusion.dev/helix-core/capabilities/timers/fake'
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
-import { act, fireEvent, render } from '@testing-library/react-native'
+import { act, fireEvent, render, renderHook } from '@testing-library/react-native'
 import type { ReactNode } from 'react'
-import { Text } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useHeldEnd } from '../render/scroll-parts'
 import { LayerHostView } from '../root/layers'
 import { dark } from '../theme/dark.generated'
 import { light } from '../theme/light.generated'
@@ -154,6 +155,73 @@ describe('the generated Toast', () => {
     await act(() => new Promise<void>((done) => setTimeout(done, 300)))
     expect(order).toEqual(['message Project saved.', 'stack Project saved.'])
     expect(hidden(textOf('Project saved.') as never)).toBe(true)
+  })
+
+  describe('a stack taller than the window', () => {
+    /** The stack's scroll view, as the test renderer holds it. */
+    const scroller = () => viewsWhere((props) => props.contentContainerStyle !== undefined)[0]
+    const layout = async (frame: number, content: number) => {
+      await act(async () => {
+        const told = scroller()?.props as unknown as {
+          onContentSizeChange: (width: number, height: number) => void
+          onLayout: (event: object) => void
+        }
+        told.onLayout({ nativeEvent: { layout: { height: frame, width: 390, x: 0, y: 0 } } })
+        told.onContentSizeChange(390, content)
+      })
+    }
+    const messages = (
+      <HelixToast>
+        <HelixToastItem>Export started.</HelixToastItem>
+        <HelixToastItem>Two devices signed in.</HelixToastItem>
+      </HelixToast>
+    )
+
+    test('passes a touch through while its messages fit, and takes it once they do not', async () => {
+      await draw(messages)
+      await layout(800, 200)
+      expect(scroller()?.props.pointerEvents).toBe('box-none')
+      expect(scroller()?.props.scrollEnabled).toBe(false)
+      await layout(800, 1400)
+      expect(scroller()?.props.pointerEvents).toBeUndefined()
+      expect(scroller()?.props.scrollEnabled).toBe(true)
+    })
+
+    test('holds its inset on what scrolls, clear of the status bar and the home indicator', async () => {
+      await draw(messages)
+      const content = StyleSheet.flatten(scroller()?.props.contentContainerStyle)
+      expect(content.pointerEvents).toBe('box-none')
+      expect(content.paddingTop).toBeGreaterThan(59)
+      expect(content.paddingBottom).toBeGreaterThan(34)
+      expect(textOf('Export started.')).toBeDefined()
+    })
+
+    /** A scroll view's calls, as `useHeldEnd` makes them. */
+    const held = () => {
+      const calls: unknown[] = []
+      const view = {
+        scrollTo: (to: unknown) => calls.push(['to', to]),
+        scrollToEnd: (to: unknown) => calls.push(['end', to]),
+      }
+      const at = { current: { content: 0, frame: 800, offset: 600 } }
+      return { at, calls, view: { current: view } as never }
+    }
+
+    test('stands at its end along the bottom as a message arrives, and inside what is left as one goes', async () => {
+      const { at, calls, view } = held()
+      const hook = await renderHook(() => useHeldEnd(true, view, at))
+      hook.result.current(1400)
+      expect(calls).toEqual([['end', { animated: false }]])
+      hook.result.current(1000)
+      expect(calls[1]).toEqual(['to', { animated: false, y: 200 }])
+    })
+
+    test('stands where it is along the top, where the newest message comes first', async () => {
+      const { at, calls, view } = held()
+      const hook = await renderHook(() => useHeldEnd(false, view, at))
+      hook.result.current(1400)
+      expect(calls).toEqual([])
+    })
   })
 
   test('keeps a message the stack refuses to let go', async () => {
