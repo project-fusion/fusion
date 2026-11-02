@@ -686,6 +686,26 @@ export function ThemeBuilder({
       .join('&')}&display=swap`
   }, [bodyFace, displayFace, monoFace])
 
+  /* **Says when the frame has drawn, for the site's visual check.** The frame is a
+     document of its own, so `whenSettled` on this page resolves before it paints,
+     and a capture taken in that gap pictures a blank preview. Its first size report
+     comes once it has drawn, and two frames later the picture is on screen. */
+  useEffect(() => {
+    const el = preview.current
+    if (!el) {
+      return
+    }
+    const drawn = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          el.dataset.previewDrawn = ''
+        })
+      })
+    }
+    el.addEventListener('helix-resize', drawn, { once: true })
+    return () => el.removeEventListener('helix-resize', drawn)
+  }, [])
+
   useEffect(() => {
     if (!preview.current) {
       return
