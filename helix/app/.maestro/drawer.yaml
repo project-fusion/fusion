@@ -111,7 +111,11 @@ tags:
           duration: 300
 # On iOS the first file reads as shown up to about 112 points short of the list's top,
 # as above, and a step above is 105. One longer drag ends at the top. Android reads the
-# clip, so this drag would take its sheet.
+# first file as shown with any part of its 105 pixel row in the list: in run 41457272036
+# the list stood short of its top, the drag below only scrolled it there, and the sheet
+# stayed whole. A drag of 156 pixels ends at the top from anywhere that row shows. Where
+# the list is at its top already, the sheet takes it and goes back, 210 pixels being the
+# middle between the whole and the half of an 840 pixel sheet.
 - runFlow:
     when:
       platform: iOS
@@ -119,6 +123,14 @@ tags:
       - swipe:
           start: 50%, 76%
           end: 50%, 90%
+          duration: 300
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 50%, 76%
+          end: 50%, 82.5%
           duration: 300
 - waitForAnimationToEnd:
     timeout: 3000
