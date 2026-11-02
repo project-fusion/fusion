@@ -30,6 +30,7 @@ import { NOTIFICATIONS } from './scenarios/notifications.js'
 import { NUMBER_INPUT } from './scenarios/number-input.js'
 import { OBJECT_INSPECTOR } from './scenarios/object-inspector.js'
 import { OUTLINE } from './scenarios/outline.js'
+import { PAGINATION } from './scenarios/pagination.js'
 import { PIN_INPUT } from './scenarios/pin-input.js'
 import { POPOVER } from './scenarios/popover.js'
 import { QR_CODE } from './scenarios/qr-code.js'
@@ -94,6 +95,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'number-input': NUMBER_INPUT,
   'object-inspector': OBJECT_INSPECTOR,
   outline: OUTLINE,
+  pagination: PAGINATION,
   'pin-input': PIN_INPUT,
   popover: POPOVER,
   'qr-code': QR_CODE,

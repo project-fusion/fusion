@@ -133,6 +133,22 @@ const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   }
 }
 
+/** What a row of pages says of its controls, the page it is on, and which steps are spent. */
+const paginationOf = (mounted: Mounted): NonNullable<Left['pagination']> => {
+  const shadow = mounted.root.shadowRoot
+  const all = [...(shadow?.querySelectorAll('button, a') ?? [])]
+  const named = (one: Element): string => one.getAttribute('aria-label') ?? ''
+  return {
+    controls: all.map(named),
+    current: (() => {
+      const at = all.find((one) => one.getAttribute('aria-current') === 'page')
+      return at === undefined ? null : named(at)
+    })(),
+    spent: all.filter((one) => (one as HTMLButtonElement).disabled === true).map(named),
+    status: shadow?.querySelector('[part="status"]')?.textContent?.trim() ?? null,
+  }
+}
+
 /** What a carousel says of its panes and its dots, and which dot has focus. */
 const carouselOf = (mounted: Mounted): NonNullable<Left['carousel']> => {
   const shadow = mounted.root.shadowRoot
@@ -453,6 +469,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
+  ...(family === 'pagination' ? { pagination: paginationOf(mounted) } : {}),
   ...(family === 'code-block' ? { codeBlock: codeBlockOf(mounted) } : {}),
   ...(family === 'chat'
     ? {

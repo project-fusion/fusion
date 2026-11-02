@@ -383,6 +383,13 @@ export interface Left {
     readonly pressed: boolean
     readonly tabs: readonly { readonly selected: boolean; readonly words: string }[]
   }
+  /** What a row of pages says of its controls, the page it is on, and which steps are spent. */
+  readonly pagination?: {
+    readonly controls: readonly string[]
+    readonly current: string | null
+    readonly spent: readonly string[]
+    readonly status: string | null
+  }
   /**
    * What a carousel says of its panes and its dots, which dot is current and which
    * has focus, whether each arrow has nowhere to go, and what its rotation control
