@@ -246,7 +246,7 @@
 .diagramGaugeValue {
   stroke: var(--helix-color-accent);
   stroke-opacity: 0.9;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-accent) 45%, transparent));
+  filter: drop-shadow(0 0 3px color-mix(in oklab, var(--helix-color-accent) 25%, transparent));
 }
 
 .diagramGaugeTick {
