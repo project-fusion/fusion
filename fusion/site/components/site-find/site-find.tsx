@@ -147,25 +147,22 @@ export function SiteFind({
     <>
       {/* **A button as well as a shortcut, because a shortcut nobody is told
           about is a feature for whoever wrote it.** The key is the fast path
-          and the button is how a reader finds out there is one: it carries the
-          keys it answers to, which is the only place on the page that says so.
+          and the button is how a reader finds out there is one: its tooltip
+          names the keys it answers to, which is the only place on the page that
+          says so. An icon button, like the controls beside it in every header.
 
           The workbench passes `trigger={false}`: its header is a tool's, every
           row of chrome is taken from the thing being examined, and the hotkey
           still works because the palette listens on the document. */}
       {trigger && (
-        <helix-button
-          class={styles.siteFind}
-          emphasis="outlined"
-          onClick={() => setOpen(true)}
-          slot={slot}
-        >
-          <helix-icon name="magnifying-glass" slot="start"></helix-icon>
-          Search
-          <span className={styles.keysOnly} slot="end">
-            <helix-kbd keys="mod+k"></helix-kbd>
+        <helix-tooltip placement="bottom" slot={slot}>
+          <helix-icon-button label="Search" onClick={() => setOpen(true)}>
+            <helix-icon name="magnifying-glass"></helix-icon>
+          </helix-icon-button>
+          <span slot="content">
+            Search <helix-kbd keys="mod+k"></helix-kbd>
           </span>
-        </helix-button>
+        </helix-tooltip>
       )}
 
       {/* **The palette listens for its own hotkey from the document**, so it

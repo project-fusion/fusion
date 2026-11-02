@@ -1089,7 +1089,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
           {/*
            * *The one thing on the page that says which key it answers to.**
            *               A shortcut nobody is told about is a feature for whoever wrote it,
-           *               which is the argument `SiteFind` makes for showing its own chord on
+           *               which is the argument `SiteFind` makes for naming its own chord on
            *               its own trigger.
            */}
           <helix-kbd
@@ -1224,8 +1224,8 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               hotkey working anyway because the palette listens on the document.
               `SiteFind` answers that in its own comment, written for the site
               and just as true here: a shortcut nobody is told about is a feature
-              for whoever wrote it, and the button is the only thing on the page
-              that says which keys it answers to. Hidden, the palette is
+              for whoever wrote it, and the button's tooltip is the only thing on
+              the page that says which keys it answers to. Hidden, the palette is
               something you have to already know about. */}
           <SiteFind findable={findable} />
 
