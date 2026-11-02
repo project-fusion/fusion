@@ -172,11 +172,26 @@ tags:
 # swipe` waits for the app to finish each move, and a slow frame leaves more than the
 # 40 ms between its last move and its release after which Android's `VelocityTracker`
 # reads no speed. In run 41374589645 a drag of this length over 200 ms stopped at about
-# a quarter shown and came back.
-- swipe:
-    start: 50%, 85%
-    end: 50%, 99%
-    duration: 600
+# a quarter shown and came back. In run 41480320795 one over 600 ms stood about 160
+# pixels down in the last frames seen, of the 336 it asks, and came back. `input swipe`
+# sends no move at its end, so a slow frame costs the last of the drag. Over 2 seconds
+# the same frame costs less of it.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 99%
+          duration: 600
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 99%
+          duration: 2000
 - extendedWaitUntil:
     notVisible: .*Quarterly report.*
     timeout: 5000
