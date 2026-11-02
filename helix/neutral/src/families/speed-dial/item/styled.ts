@@ -54,7 +54,8 @@ export default styles(
       ]),
       on('icon', [
         rule({
-          '--icon-size': token('size-icon'),
+          /* The small icon, for a well 32 tall: the default 20 outweighed the label. */
+          '--icon-size': token('size-icon-sm'),
           alignItems: 'center',
           aspectRatio: 1,
           backgroundColor: hook.itemBackgroundColor,

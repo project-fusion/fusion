@@ -77,6 +77,8 @@ export default styles(
         fontWeight: token('weight-medium'),
         gridColumn: '1 / -1',
         letterSpacing: token('tracking-wide'),
+        /* A long unbroken word breaks inside the column it was given. */
+        web: { overflowWrap: 'anywhere' },
       }),
       rule({ direction: 'column-reverse' }, { order: 1 }),
       rule([{ direction: 'row' }, { direction: 'row-reverse' }], { gridColumn: 'auto' }),
@@ -87,9 +89,11 @@ export default styles(
         fontFamily: token('font-display'),
         fontSize: hook.valueSize,
         /* Figures take one width each. A value breaks only where a word is wider than
-           the whole column, so "99.9%" stays together. */
+           the whole column, so "99.9%" stays together. `anywhere`, since `break-word`
+           leaves the word's full width as the `auto` column's minimum, and the column
+           then runs past the host. */
         fontVariantNumeric: 'tabular-nums',
-        web: { overflowWrap: 'break-word' },
+        web: { overflowWrap: 'anywhere' },
         fontWeight: token('weight-semibold'),
         letterSpacing: token('tracking-tight'),
         lineHeight: token('leading-tight'),
@@ -102,7 +106,9 @@ export default styles(
         fontWeight: token('weight-medium'),
       }),
     ]),
-    on({ region: 'trend', slotted: '*' }, [rule({ gridColumn: '1 / -1' })]),
+    on({ region: 'trend', slotted: '*' }, [
+      rule({ gridColumn: '1 / -1', web: { overflowWrap: 'anywhere' } }),
+    ]),
     on({ region: 'label' }, [rule({ direction: 'row-reverse' }, { order: 1 })]),
     include(printEconomy),
   ],

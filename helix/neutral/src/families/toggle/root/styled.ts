@@ -117,7 +117,14 @@ export default styles(
       ]),
     ]),
     /* An icon before the label, or a count after it, set off by a step. */
-    on({ region: 'start', slotted: '*' }, [rule({ marginInlineEnd: token('space-xs') })]),
+    on({ region: 'start', slotted: '*' }, [
+      rule({
+        /* The small icon: a segment is 30 tall in its track, and the default 20 outweighed
+           the label beside it. */
+        '--icon-size': token('size-icon-sm'),
+        marginInlineEnd: token('space-xs'),
+      }),
+    ]),
     on({ region: 'end', slotted: '*' }, [rule({ marginInlineStart: token('space-xs') })]),
   ],
 )

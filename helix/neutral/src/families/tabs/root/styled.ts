@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { difference, fn, list, measured, mix, product, sum, token } from '../../../style.js'
+import { difference, fn, list, measured, mix, product, scheme, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import tabs from './headless.js'
 
@@ -151,8 +151,9 @@ export default styles(
           padding: token('space-2xs'),
           inlineSize: 'fit-content',
           own: {
-            /* A groove, so the pill in it is over the page as well as on it. */
-            tabSelectedSurface: token('color-surface-overlay'),
+            /* The selected tab paints nothing of its own: the pill behind it is the mark,
+               and a fill here covered the pill and stopped its slide. */
+            tabSelectedSurface: 'transparent',
             /* The control is the height of a control, and the tabs are what is left
                inside it. The same fix Toggle Group carries, and the same reason for
                `100%` over arithmetic: it resolves against the track's content box, so
@@ -303,7 +304,11 @@ export default styles(
         {
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
-            indicatorColor: hook.indicatorColor(token('color-surface-overlay')),
+            /* The press wash in dark, as Toggle Group's indicator: `overlay` on the groove
+               measured 1.06:1, and the wash is 1.84:1, a step past the hover wash at 1.38:1. */
+            indicatorColor: hook.indicatorColor(
+              scheme(token('color-surface-overlay'), token('color-press')),
+            ),
             indicatorRadius: difference(token('radii-sm'), token('border-thin')),
             indicatorShadow: token('shadow-sm'),
             indicatorOffset: '0px',

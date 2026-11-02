@@ -1,4 +1,14 @@
-import { callback, cancelable, headless, oneOf, Pressable, Slot, View } from '../../../render.js'
+import {
+  callback,
+  cancelable,
+  headless,
+  oneOf,
+  Path,
+  Pressable,
+  Slot,
+  Svg,
+  View,
+} from '../../../render.js'
 
 /**
  * One column of a table, in its headless tier: its heading, its width, and the
@@ -11,6 +21,13 @@ import { callback, cancelable, headless, oneOf, Pressable, Slot, View } from '..
  * **`sortable` with a `field` draws the heading as a press** that sorts the
  * table by the column, and the column says which way it is ordered: `aria-sort`
  * on the web and the words of a phone's value.
+ *
+ * **A sortable heading draws two chevrons after its words.** The chevron for the
+ * current direction takes the heading's ink, so you can see which columns sort
+ * and which way the table is sorted.
+ *
+ * **`menu` adds a small button after the chevrons, in a web `DataTable`.** A
+ * phone's `Table` ignores it, until `DataTable` is drawn on a phone.
  *
  * **`resizable` draws a separator on the heading's end edge.** A drag moves it,
  * as do the arrow keys on the web and a screen reader's adjustments on a phone,
@@ -29,6 +46,8 @@ export default headless('table-column', {
     cell: callback('(row: Readonly<Record<string, unknown>>) => unknown'),
     compare: callback('(row: Readonly<Record<string, unknown>>) => unknown'),
     field: '',
+    menu: false,
+    menuLabel: '{named, select, no {Column menu} other {{name} column menu}}',
     moveLabel: '{named, select, no {Move column} other {Move {name}}}',
     resizable: false,
     resizeLabel: '{named, select, no {Resize column} other {Resize {name}}}',
@@ -42,7 +61,7 @@ export default headless('table-column', {
     beforeResize: cancelable(['value']),
     resized: ['value'],
   },
-  states: ['settled', 'sortedAscending', 'sortedDescending'],
+  states: ['hasMenu', 'settled', 'sortedAscending', 'sortedDescending'],
   tableColumn: {
     field: 'field',
     movable: 'movable',
@@ -71,9 +90,35 @@ export default headless('table-column', {
       {tableColumn.sorts && (
         <Pressable part="sort">
           <Slot />
+          <Svg
+            ariaHidden
+            part="sort-mark"
+            viewBox="0 0 18 18"
+          >
+            <Path
+              d="M5.5 7.2 9 3.7l3.5 3.5"
+              part="sort-up"
+            />
+            <Path
+              d="M5.5 10.8 9 14.3l3.5-3.5"
+              part="sort-down"
+            />
+          </Svg>
         </Pressable>
       )}
       {tableColumn.still && <Slot />}
+      {props.menu && (
+        <Pressable
+          part="menu-button"
+          platform="web"
+        >
+          <View
+            ariaHidden
+            icon="dots-three"
+            part="menu-mark"
+          />
+        </Pressable>
+      )}
       {props.resizable && (
         <View
           part="resizer"

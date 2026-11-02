@@ -3,9 +3,11 @@ import {
   difference,
   fn,
   list,
+  mix,
   product,
   quotient,
   safeArea,
+  scheme,
   sum,
   token,
   web,
@@ -51,7 +53,7 @@ export default styles(
       scrim: own.dialogScrim,
       shadow: token('shadow-floating'),
     }),
-    own: { dialogScrim: null, dialogWidth: null },
+    own: { dialogGround: null, dialogScrim: null, dialogWidth: null },
     props: {
       material: oneOf(['frosted', 'glass']),
       size: oneOf(['sm', 'md', 'lg', 'full']),
@@ -70,13 +72,25 @@ export default styles(
       /* The host draws nothing, and holds the scrim's tint for the backdrop to read. */
       on('host', [
         rule({ display: 'contents' }),
-        rule({ own: { dialogScrim: token('color-overlay') } }),
+        rule({
+          own: {
+            dialogGround: hook.backgroundColor(token('color-surface-overlay')),
+            dialogScrim: token('color-overlay'),
+          },
+        }),
         rule({ print: true }, { display: 'none' }),
       ]),
       on('surface', [
         rule({
           own: { dialogWidth: hook.inlineSize },
-          backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
+          /* A panel opened from inside takes `surface-overlay` too. In dark a shadow does not
+             show and the two were one fill, so inside the dialog the token sits a step above it. In
+             light the shadow separates them. */
+          '--helix-color-surface-overlay': scheme(
+            own.dialogGround,
+            mix(token('color-foreground'), 8, own.dialogGround),
+          ),
+          backgroundColor: own.dialogGround,
           border: [hook.borderWidth, 'solid', hook.borderColor],
           borderRadius: hook.radius,
           boxShadow: hook.shadow,

@@ -5,6 +5,7 @@ import {
   difference,
   first,
   list,
+  measured,
   native,
   product,
   quotient,
@@ -126,10 +127,16 @@ export default styles(
         { borderColor: token('color-foreground') },
       ),
       rule({ invalid: true }, { borderColor: token('color-danger') }),
-      /* A press firms the edge, and a press on the on state lifts the fill. */
+      /* A press firms the edge and washes an off groove. */
       rule(
         { formDisabled: false, within: { field: { active: true } } },
         { backgroundColor: token('color-press') },
+      ),
+      /* On, the press takes the fill's own step, as a solid Button does. The wash above
+         replaced the fill: the thumb fell from 17.76:1 to 1.45:1 under the press. */
+      rule(
+        { checked: true, formDisabled: false, within: { field: { active: true } } },
+        { backgroundColor: measured('switch-on-color', token('color-primary-surface-active')) },
       ),
       /* A checked track is a fill, which forced colors paint Canvas. */
       rule(
