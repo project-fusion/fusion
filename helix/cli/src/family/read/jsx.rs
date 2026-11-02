@@ -94,6 +94,7 @@ const GIVEN: &[&str] = &[
     "chatComposer",
     "codeBlock",
     "tableRoot",
+    "dataTableRoot",
     "tableRow",
     "treeRoot",
     "window",

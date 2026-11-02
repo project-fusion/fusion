@@ -60,6 +60,7 @@ import type {
   ChatMessageChoice,
   ChatRootChoice,
   CodeBlockChoice,
+  DataTableChoice,
   InspectorChoice,
   ListboxChoice,
   LogGroupChoice,
@@ -295,6 +296,7 @@ export interface Headless {
   readonly inspector?: InspectorChoice
   /** What it reads, sends, and computes where it is a table. */
   readonly tableRoot?: TableChoice
+  readonly dataTableRoot?: DataTableChoice
   /** What it reads and computes where it is a row of a table. */
   readonly tableRow?: TableRowChoice
   /** What it reads, sends, and computes where it is a column of a table. */

@@ -195,6 +195,80 @@ export interface TableChoice {
   readonly windowed?: string
 }
 
+/** What a table drawn from an array reads and computes, each read as `dataTableRoot.x`. */
+export interface DataTableChoice {
+  readonly ascendingLabel?: string
+  readonly childField?: string
+  readonly columns?: string
+  readonly data?: string
+  readonly defaultExpanded?: string
+  readonly defaultFilter?: string
+  readonly defaultOrder?: string
+  readonly defaultPage?: string
+  readonly defaultPageSize?: string
+  readonly defaultSelected?: string
+  readonly defaultSort?: string
+  readonly empty?: string
+  readonly every?: string
+  readonly expanded?: string
+  readonly filter?: string
+  readonly gapLabel?: string
+  readonly heads?: string
+  readonly hideColumnLabel?: string
+  readonly label?: string
+  readonly loadMore?: string
+  readonly loadMoreLabel?: string
+  readonly locale?: string
+  readonly mode?: string
+  readonly more?: string
+  readonly moveLeftLabel?: string
+  readonly moveRightLabel?: string
+  readonly nests?: string
+  readonly nextLabel?: string
+  readonly onBeforeColumnToggle?: string
+  readonly onBeforeExpand?: string
+  readonly onBeforeFilter?: string
+  readonly onBeforeFollow?: string
+  readonly onBeforeNavigate?: string
+  readonly onBeforeReorder?: string
+  readonly onBeforeSelect?: string
+  readonly onBeforeSort?: string
+  readonly onColumnToggle?: string
+  readonly onExpand?: string
+  readonly onFilter?: string
+  readonly onFollow?: string
+  readonly onLoadMore?: string
+  readonly onNavigate?: string
+  readonly onReorder?: string
+  readonly onSelect?: string
+  readonly onSort?: string
+  readonly order?: string
+  readonly page?: string
+  readonly pageLabel?: string
+  readonly pageSize?: string
+  readonly paginated?: string
+  readonly pagination?: string
+  readonly paginationLabel?: string
+  readonly previousLabel?: string
+  readonly reorderable?: string
+  readonly reorderableRows?: string
+  readonly resultLabel?: string
+  readonly resultsLabel?: string
+  readonly rowKey?: string
+  readonly rowLink?: string
+  readonly rows?: string
+  readonly selectable?: string
+  readonly selected?: string
+  readonly selectionBehavior?: string
+  readonly showColumnsLabel?: string
+  readonly sort?: string
+  readonly sortAscendingLabel?: string
+  readonly sortDescendingLabel?: string
+  readonly total?: string
+  readonly waiting?: string
+  readonly windowed?: string
+}
+
 /** What a row of a table reads and computes. Each computed value is the name a render binds. */
 export interface TableRowChoice {
   readonly branch?: string
