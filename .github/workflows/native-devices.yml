@@ -14,7 +14,7 @@
 # passes of screenshots, each with a timeout of its own. In run 41367807734, on
 # November 1, 2026, with 57 families, a pass of screenshots took 16 minutes on
 # Android and 12 to 16 on iOS, about 17 seconds a family. Four of them on one
-# device ran out its 60 minutes on both platforms, and a job cancelled inside a
+# device ran out its 60 minutes on both platforms, and a job canceled inside a
 # pass kept nothing. The flows took 25 minutes on Android and 39 on iOS.
 #
 # **That split still fits with every family in.** Helix has 122 families with
