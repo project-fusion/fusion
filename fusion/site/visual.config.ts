@@ -114,7 +114,7 @@ export default defineConfig({
         { name: 'home', path: '/' },
         { name: 'button', path: '/helix/components/button' },
         { name: 'sandbox', path: '/helix/sandbox' },
-        { name: 'theme', path: '/helix/theme' },
+        { name: 'theme', path: '/helix/theme', selector: '[data-preview-drawn]' },
         { name: 'maps', path: '/helix/maps' },
         { name: 'components-loading', path: '/stand-ins/components' },
         { name: 'insights-loading', path: '/stand-ins/insights' },
