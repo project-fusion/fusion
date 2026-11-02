@@ -10,8 +10,8 @@ import root from './headless.js'
  * `--image-fit`. The placeholder and the fallback each cover the box exactly,
  * because they stand in for it.
  *
- * **A failed picture is a box with its fallback**, 16 by 9 where nothing
- * sizes it.
+ * **A failed picture has no size of its own**, so with no `--image-aspect` it
+ * is a thin strip across the line that holds its fallback.
  *
  * **The picture arrives rather than appears**: unseen while it loads, and
  * faded in once it has. A failed picture stays unseen, and keeps its `alt`
@@ -51,7 +51,15 @@ export default styles(
       /* A phone's picture has no size of its own to give the box, and a phone
          reads no page stylesheet to size it, so its box spans the line at
          16 / 9 until `--image-aspect` says otherwise. */
-      native([rule({ aspectRatio: hook.aspect('16 / 9'), inlineSize: '100%' })]),
+      native([
+        rule({ aspectRatio: hook.aspect('16 / 9'), inlineSize: '100%' }),
+        /* A failed picture gives up that 16 / 9 for the strip the web draws, as
+           tall as the fallback's glyph. */
+        rule(
+          { error: true },
+          { aspectRatio: hook.aspect('auto'), minBlockSize: token('size-icon') },
+        ),
+      ]),
       rule({ shape: 'rounded' }, { borderRadius: hook.radius }),
       rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
@@ -71,13 +79,6 @@ export default styles(
          phone resolves its full height against the room the page has. */
         rule({ error: true }, { inset: 0, position: 'absolute' }),
       ]),
-    ]),
-    /* **A picture that fails has no size to give the box**, so the box is 16
-       by 9 until `--image-aspect` says otherwise, and holds the fallback, on
-       both platforms. */
-    /* Written out: a condition reads no attribute the web element writes on its own host. */
-    on({ part: 'host', selector: ':host([data-status="error"])' }, [
-      web([rule({ aspectRatio: hook.aspect('16 / 9') })]),
     ]),
     /* Written out: a condition reads no attribute the web element writes on its own host. */
     on({ part: 'image', selector: ':host([data-status="loaded"]) [part="image"]' }, [

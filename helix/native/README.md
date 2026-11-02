@@ -1141,10 +1141,11 @@ The `load` event's `target` gives the picture's `naturalWidth` and
 `naturalHeight`, as the web element does, and a picture that fails gives 0
 by 0. A `data:` address that holds SVG draws through
 `react-native-svg`, since `Image` decodes no SVG, and takes the part's
-`object-fit`. An image with no `--image-aspect` is 16 by 9 on a phone, which has no
-picture's size to read before it loads. A picture that fails is a box 16 by 9
-that holds the fallback, on a phone and on the web, until `--image-aspect`
-says otherwise.
+`object-fit`. An image with no `--image-aspect` is 16 by 9 on a phone while it
+loads and once it has, since a phone has no picture's size to read before it
+loads. A picture that fails with no `--image-aspect` is a thin strip that holds
+the fallback, on a phone and on the web. With `--image-aspect` it keeps that
+ratio.
 
 ## Lists
 

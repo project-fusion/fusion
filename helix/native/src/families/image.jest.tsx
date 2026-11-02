@@ -89,17 +89,29 @@ describe('the generated Image', () => {
     expect(screen.getByText('Photo unavailable')).toBeTruthy()
   })
 
-  test('once failed, is a 16 by 9 box that holds its fallback, as on the web', async () => {
+  test('once failed, is a strip as tall as its glyph that holds its fallback, as on the web', async () => {
     await render(drawn(fakeImage('fails')))
     await act(async () => undefined)
     const host = all()[0] ?? { props: {} }
-    expect(styleOf(host).aspectRatio).toBe(16 / 9)
-    expect(styleOf(host).minHeight).toBeUndefined()
+    expect(styleOf(host).aspectRatio).toBeUndefined()
+    expect(styleOf(host).minHeight).toBe(20)
+    expect(styleOf(host).alignSelf).toBe('stretch')
     /* The failed picture lies over the box, so its full height sizes nothing. */
     expect(styleOf(picture() ?? { props: {} }).position).toBe('absolute')
+  })
+
+  test('is 16 by 9 while it loads and once it has', async () => {
+    await render(drawn(fakeImage('hangs')))
+    expect(styleOf(all()[0] ?? { props: {} }).aspectRatio).toBe(16 / 9)
     await render(drawn(fakeImage('loads')))
     await act(async () => undefined)
     expect(styleOf(all()[0] ?? { props: {} }).aspectRatio).toBe(16 / 9)
+  })
+
+  test('once failed, takes the ratio its aspect hook names', async () => {
+    await render(drawn(fakeImage('fails'), { hooks: { aspect: '4 / 3' } }))
+    await act(async () => undefined)
+    expect(styleOf(all()[0] ?? { props: {} }).aspectRatio).toBe(4 / 3)
   })
 
   test('holds the placeholder back for its delay, and again for a new picture', async () => {
