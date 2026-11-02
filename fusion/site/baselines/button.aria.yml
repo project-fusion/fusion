@@ -197,45 +197,58 @@
     - link "Open in the sandbox":
       - /url: /helix/sandbox?e=button.preview
     - textbox "Example source"
-    - heading "Guidelines Link to Guidelines" [level=2]:
-      - text: Guidelines
-      - link "Link to Guidelines":
-        - /url: "#guidelines"
-    - heading "When to use" [level=3]
-    - list:
+    - heading "Anatomy Link to Anatomy" [level=2]:
+      - text: Anatomy
+      - link "Link to Anatomy":
+        - /url: "#anatomy"
+    - paragraph:
+      - text: "What each element draws in its shadow root: each part by the name"
+      - code: ::part()
+      - text: reaches, and each slot by the name content goes into.
+    - heading "Root Link to Root anatomy" [level=3]:
+      - text: Root
+      - link "Link to Root anatomy":
+        - /url: "#helix-button-anatomy"
+    - list "helix-button on the web":
       - listitem:
-        - paragraph: An action on the page or a form's submit, such as Save, Delete, or Open settings.
-        - text: Button This page
-      - listitem:
-        - 'link "Icon Button: an action shown as an icon alone, such as Settings in a toolbar."':
-          - /url: /helix/components/icon-button
-          - text: An action shown as an icon alone, such as Settings in a toolbar. Icon Button
-      - listitem:
-        - 'link "Copy Button: a value you copy to the clipboard, such as an install command."':
-          - /url: /helix/components/copy-button
-          - text: A value you copy to the clipboard, such as an install command. Copy Button
-    - heading "Using Button" [level=3]
-    - list:
-      - listitem:
-        - text: Draw a link that looks like a button on your own anchor, with the base layer's recipe. Button never renders an anchor, because a router renders its own to intercept a click.
-        - code: <a data-button="solid" data-button-tone="primary" href="https://example.test" rel="noreferrer" target="_blank" > Visit website </a>
-        - button "Copy code"
-      - listitem:
-        - text: Set
-        - code: pending
-        - text: while the action a press started is still running. The button keeps focus and refuses presses, and a screen reader on it hears
-        - code: pending-label
-        - text: .
-        - code: "<helix-button emphasis=\"solid\" id=\"save\" pending-label=\"Saving\" tone=\"primary\" >Save changes</helix-button> <script type=\"module\"> const save = document.getElementById('save') // The time the pretend request takes. const WAIT = 2000 save.addEventListener('click', () => { save.pending = true setTimeout(() => { save.pending = false }, WAIT) }) </script>"
-        - button "Copy code"
-    - heading "Anatomy" [level=3]
-    - list:
-      - listitem:
-        - code: ::part(button)
-        - text: The inner control.
-      - listitem:
-        - code: ::part(text)
-        - text: The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
+        - code: <helix-button>
+        - code: :state(pending)
+        - code: :state(pressed)
+        - code: :state(settled)
+        - list:
+          - listitem:
+            - code: "#shadow-root"
+            - list:
+              - listitem:
+                - code: pressable part="button"
+                - code: "busy={pending}"
+                - code: chooses
+                - code: "disabled={disabled}"
+                - code: "expanded={expanded}"
+                - code: "focusable-when-disabled={focusable-when-disabled}"
+                - code: "label={label}"
+                - code: "popup={popup}"
+                - code: "pressed={pressed}"
+                - code: role="button"
+                - code: sends="press"
+                - list:
+                  - listitem:
+                    - code: slot name="start"
+                  - listitem:
+                    - code: slot
+                    - code: part="text"
+                  - listitem:
+                    - code: slot name="end"
+                  - listitem:
+                    - code: while pending
+                    - list:
+                      - listitem:
+                        - code: box part="spinner"
+                        - code: decorative
+              - listitem:
+                - code: live part="live"
+                - code: "says={pending-label}"
+                - code: "while={pending}"
     - heading "API reference Link to API reference" [level=2]:
       - text: API reference
       - link "Link to API reference":
@@ -387,8 +400,8 @@
           - link "Preview":
             - /url: "#preview"
         - listitem:
-          - link "Guidelines":
-            - /url: "#guidelines"
+          - link "Anatomy":
+            - /url: "#anatomy"
         - listitem:
           - link "API reference":
             - /url: "#api"
