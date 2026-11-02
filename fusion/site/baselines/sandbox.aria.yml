@@ -1,7 +1,7 @@
 - button "Menu"
 - link "Fusion":
   - /url: /
-- button "Search Ctrl+K"
+- button "Search"
 - button "Preferences"
 - text: Files
 - radio "index.html" [checked]
