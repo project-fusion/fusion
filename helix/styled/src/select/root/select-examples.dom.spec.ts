@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import events from '../.examples/events.html' with { type: 'text' }
+import focused from '../.examples/focused.html' with { type: 'text' }
 import long_list from '../.examples/long-list.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -19,6 +20,16 @@ const run = hasLayout() ? test : (): void => {}
 const choose = (option: Element | null | undefined): void => {
   ;(option?.shadowRoot?.querySelector('[part~="item"]') as HTMLElement | null)?.click()
 }
+
+describe('the focused example', () => {
+  run('takes focus, on its trigger', async () => {
+    await example(focused)
+    await idle()
+    const host = document.getElementById('choice') as HTMLElement
+    expect(document.activeElement).toBe(host)
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'trigger'))
+  })
+})
 
 describe('the events example', () => {
   run('choosing a plan proposes it, commits it, and the list closes', async () => {
