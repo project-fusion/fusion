@@ -38,6 +38,7 @@ export type Family =
   | 'chat'
   | 'notifications'
   | 'object-inspector'
+  | 'pagination'
   | 'table'
   | 'outline'
   | 'pin-input'

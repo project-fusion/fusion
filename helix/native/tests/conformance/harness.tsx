@@ -39,6 +39,7 @@ import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { logPress, logProps, logRows, logs } from './log'
 import { feedFocus, feedPress, feeds } from './notifications'
+import { paginates, paginationPress } from './pagination'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
 import { laySections } from './sections'
 import { focusStop, isTable, moveRow, tablePress } from './table'
@@ -303,16 +304,24 @@ const pressPlain = async (
   return undefined
 }
 
+/** Taps a press that is drawn and not disabled. */
+const tapEnabled = async (pressed: ReturnType<typeof paginationPress>): Promise<void> => {
+  if (pressed !== undefined && pressed.props.accessibilityState?.disabled !== true) {
+    await tap(pressed)
+  }
+}
+
 /** A press, on a part of a feed where the setup draws one. */
 const press = async (
   setup: Setup,
   intent: Extract<Intent, { kind: 'press' }>,
 ): Promise<string | undefined> => {
+  if (paginates(setup)) {
+    await tapEnabled(paginationPress(setup, intent.part))
+    return undefined
+  }
   if (carousels(setup)) {
-    const pressed = carouselPress(setup, intent.part, intent.row)
-    if (pressed !== undefined && pressed.props.accessibilityState?.disabled !== true) {
-      await tap(pressed)
-    }
+    await tapEnabled(carouselPress(setup, intent.part, intent.row))
     return undefined
   }
   if (chats(setup)) {

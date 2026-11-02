@@ -11,6 +11,7 @@ import { layerIn, PAGE } from './layers'
 import { listboxLeft, selectLeft } from './listbox'
 import { logLeft } from './log'
 import { feedLeft, feeds } from './notifications'
+import { paginationLeft } from './pagination'
 import { rangeLeft } from './range'
 import { tableLeft } from './table'
 import { textLeft } from './text'
@@ -245,6 +246,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...inspectorLeft(run),
     ...logLeft(run, String(HOST_STATES.get(run.scenario.setup.tag)?.selectedLines ?? '')),
     ...carouselLeft(run),
+    ...paginationLeft(run),
     ...chatLeft(run),
     ...feedLeft(run),
     ...tableLeft(run),
