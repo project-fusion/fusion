@@ -66,25 +66,30 @@ tags:
 # Whole, a drag up scrolls the list, and it stays the list's after the finger
 # leaves the list. This drag runs from the first row to 10% of the screen, past the
 # list's top almost at once. Maestro's iOS reads a row the list has clipped while its
-# frame still meets the sheet: in run 41381302660 this drag moved the list 80 points,
-# the picture shows the first file gone, and the hierarchy kept it at y 547 with the
-# sheet's top at 554. So the list goes on until the first file's frame leaves the sheet.
+# frame stands on the screen: in run 41457272036 the list stood at its end, the picture
+# shows the first file gone, and the hierarchy kept it at y 335 with the sheet's top at
+# 554. So only Android can read the first file's absence, and on iOS the last file
+# coming onto the screen below proves the scroll.
 - swipe:
     from: .*Quarterly report.*
     direction: UP
     duration: 600
-- repeat:
-    times: 4
-    while:
-      visible: .*Quarterly report.*
+- runFlow:
+    when:
+      platform: Android
     commands:
-      - swipe:
-          start: 50%, 88%
-          end: 50%, 76%
-          duration: 300
-- extendedWaitUntil:
-    notVisible: .*Quarterly report.*
-    timeout: 5000
+      - repeat:
+          times: 4
+          while:
+            visible: .*Quarterly report.*
+          commands:
+            - swipe:
+                start: 50%, 88%
+                end: 50%, 76%
+                duration: 300
+      - extendedWaitUntil:
+          notVisible: .*Quarterly report.*
+          timeout: 5000
 # Maestro's `scrollUntilVisible` drags from the middle of the screen, which is the
 # scrim above this sheet, so these drags name points on the list.
 - repeat:
@@ -99,18 +104,36 @@ tags:
 - assertVisible: .*Onboarding checklist.*
 - assertVisible: .*Recent files.*
 - takeScreenshot: drawer-list-scrolled
-# Back at its top, and still for half a second, a drag down takes the sheet.
-- repeat:
-    times: 12
-    while:
-      notVisible: .*Quarterly report.*
+# Back at its top, and still for half a second, a drag down takes the sheet. The first
+# file's frame is on the screen wherever this list stands on iOS, so iOS reads a lower
+# file: Team offsite's frame leaves the bottom of the screen 33 points short of the top.
+- runFlow:
+    when:
+      platform: Android
     commands:
-      - swipe:
-          start: 50%, 76%
-          end: 50%, 88%
-          duration: 300
-# On iOS the first file reads as shown up to about 112 points short of the list's top,
-# as above, and a step above is 105. One longer drag ends at the top. Android reads the
+      - repeat:
+          times: 12
+          while:
+            notVisible: .*Quarterly report.*
+          commands:
+            - swipe:
+                start: 50%, 76%
+                end: 50%, 88%
+                duration: 300
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - repeat:
+          times: 12
+          while:
+            visible: .*Team offsite.*
+          commands:
+            - swipe:
+                start: 50%, 76%
+                end: 50%, 88%
+                duration: 300
+# On iOS a step above is 105 points, and one longer drag ends at the top. Android reads the
 # first file as shown with any part of its 105 pixel row in the list: in run 41457272036
 # the list stood short of its top, the drag below only scrolled it there, and the sheet
 # stayed whole. A drag of 156 pixels ends at the top from anywhere that row shows. Where
