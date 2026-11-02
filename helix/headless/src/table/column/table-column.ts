@@ -632,7 +632,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
         : nothing
     }${
       this.canSort
-        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot><svg aria-hidden="true" fill="none" part="sort-mark" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 18 18">
+        ? html`<button part="sort" type="button" tabindex=${control} aria-description=${this.sortWords || nothing}><slot></slot><svg aria-hidden="true" fill="none" part="sort-mark" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewBox="0 0 18 18">
             <path d="M5.5 7.2 9 3.7l3.5 3.5" part="sort-up" />
             <path d="M5.5 10.8 9 14.3l3.5-3.5" part="sort-down" />
           </svg></button>`

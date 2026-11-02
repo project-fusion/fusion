@@ -98,7 +98,6 @@
   border-radius: var(--helix-radii-sm);
   flex: none;
   inline-size: 1.07em;
-  stroke-width: 1.9;
 }
 
 /* The whole heading is the button, so the highlight answers a pointer anywhere
