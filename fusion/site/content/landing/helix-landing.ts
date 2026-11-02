@@ -19,7 +19,7 @@ import type { CopyItem } from '@/content/copy/copy'
 
 /** One capability, stated the way the feature blocks state them. */
 export interface Capability {
-  /** Two facts a reader can check, not two adjectives. */
+  /** A fact a reader can check, for the card and the band under it. */
   bullets: readonly string[]
   claim: string
   /** The short name in the eyebrow above the claim. */
@@ -35,26 +35,10 @@ export const HERO = {
    * thing. Two fields keep one sentence in one place and let the page decide
    * which half is painted.
    */
-  accent: 'and the engineers behind it',
-  /**
-   * **The longer form, for a search result and a link preview.**
-   *
-   * Separate from `lede` because the hero is one line, and cutting the two
-   * together leaves a forty-nine character meta description: a result page and a
-   * link card want the sentences a hero is better without. So the proofs live
-   * here, where length is a virtue.
-   *
-   * **All three are literal and checkable, which is why they are worth stating
-   * flatly.** Open source is MIT across the published packages. Machine-readable
-   * is an MCP server and an `llms.txt`, so an agent can derive a theme, audit
-   * its contrast and read the docs. Verified on every build is the contrast
-   * gate, the token checks and an agent corpus that fails when a question stops
-   * being answerable from a current artifact. That is the intelligence the
-   * heading names, said plainly enough that the phrase is a description rather
-   * than a joke.
-   */
+  accent: 'software with AI agents',
+  /** The longer form, for a search result and a link preview. */
   description:
-    'Ship faster because the system does the checking. An open source design system, machine-readable and verified on every build, and the engineers behind it.',
+    'Helix gives your agents one design system, Cortex gives them memory, and our engineers build with you.',
   install: 'bun add @fusion.dev/helix',
   /**
    * **One sentence, because the hero already says enough.** `Ship faster` is the
@@ -73,17 +57,10 @@ export const HERO = {
    */
   lede: 'Ship faster because the system does the checking.',
   /**
-   * **Generic before it is clever.** A sentence about us that takes twenty words
-   * to reach what the product is loses a reader arriving cold: they want the
-   * category first and the argument second.
-   *
-   * Reads as one sentence with `accent`: "An intelligent design system, and the
-   * engineers behind it." The category is plain and the half worth painting is
-   * the people, which is the whole reason the heading is in two colors: the
-   * system is the thing being sold and the engineers are the reason to trust
-   * it.
+   * What Fusion is for, in words a stranger can read. Reads as one sentence with
+   * `accent`.
    */
-  title: 'An intelligent design system,',
+  title: 'The foundation for building',
   /**
    * What the package actually is, for a reader deciding whether it can be used
    * at all.
@@ -94,7 +71,7 @@ export const HERO = {
    * answer to both, and Lit is the honest footnote: it is what they are built
    * with, and it is 5KB the consumer is also taking.
    */
-  works: 'Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.',
+  works: 'Works in React, Vue, Svelte, or no framework.',
 } as const
 
 /**
@@ -108,36 +85,27 @@ export const PROBLEM = {
    * The last sentence names Helix, because the four cards under it start from
    * that subject.
    */
-  lede: 'Each agent chooses its own colors, spacing, and components. Your product drifts with every change, and nothing reports it. Helix gives every agent the same components and checks what each one writes.',
+  lede: 'Helix gives every agent the same components and checks what each one writes.',
   title: 'AI writes a screen in seconds, and every agent writes a different one',
 } as const
 
 /**
- * The four jobs Helix does for you, each with two facts you can check. The
+ * The four jobs Helix does for you, each with a fact you can check. The
  * fourth, agents, is the one you can verify by fetching a URL.
  */
 export const MECHANISMS: readonly Capability[] = [
   {
-    bullets: [
-      'Enter one brand color and get a full palette',
-      'Helix rejects a palette it cannot make readable',
-    ],
+    bullets: ['Enter one brand color and get a full palette'],
     claim: 'Set your brand with one color',
     name: 'Theming',
   },
   {
-    bullets: [
-      'Custom elements that run in any framework, or in none',
-      'Types for React, Vue, and Svelte from one manifest',
-    ],
+    bullets: ['Custom elements that run in any framework, or in none'],
     claim: 'Use one system in every framework',
     name: 'Components',
   },
   {
-    bullets: [
-      'Contrast is measured on every release',
-      'The helix scan command checks your code against the Helix version you installed',
-    ],
+    bullets: ['Contrast is measured on every release'],
     claim: 'Catch what an agent gets wrong',
     name: 'Checks',
   },
@@ -147,10 +115,7 @@ export const MECHANISMS: readonly Capability[] = [
        it is reading the same source the documentation was built from rather than
        a description of it. The CLI serves the same derivation over MCP and is
        deliberately not cited here: it does not publish yet. */
-    bullets: [
-      'Every tag, property, and event in one manifest at a URL',
-      'Every page as Markdown, and every component family as JSON',
-    ],
+    bullets: ['Every tag, property, and event in one manifest at a URL'],
     claim: 'Give AI agents the reference you read',
     name: 'Agents',
   },
@@ -182,11 +147,11 @@ export const DELIVERY = {
  */
 export const ENGAGEMENT: readonly CopyItem[] = [
   {
-    body: 'The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.',
+    body: 'The work lands in your repository under your license.',
     name: 'You keep all of it',
   },
   {
-    body: 'Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.',
+    body: 'Every product shows whether it ships, is underway, or is planned.',
     name: 'We tell you what is not done',
   },
 ]

@@ -43,11 +43,6 @@
 }
 
 /* The jobs nobody else in the table covers, as tags in the brand's tone. */
-.alone {
-  display: grid;
-  gap: var(--helix-space-xs);
-}
-
 /**
  * **One figure, set apart by a rule above it and nothing else.** The size is a
  * footnote to the table, so it gets a figure and a sentence. A card around it

@@ -204,8 +204,7 @@ export function Showcase(): React.ReactElement {
             Use the behavior with your own design
           </helix-text>
           <helix-text>
-            Every component comes in two tiers. The headless tier holds its structure, state, and
-            form behavior, and you write all of its styling.
+            The headless tier holds structure, state, and form behavior. You write the styling.
           </helix-text>
           {/* **A link, because it goes somewhere.** It was a `helix-button`
               reading "Read about theming" that did nothing when pressed, which

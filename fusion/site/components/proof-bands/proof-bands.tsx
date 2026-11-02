@@ -61,9 +61,6 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
                 Fails
               </helix-tag>
             </helix-flex>
-            <helix-text as="p" class={styles.finding} emphasis="muted" scale="caption">
-              {caught.sentence}
-            </helix-text>
           </helix-flex>
           <helix-flex class={band.bandSection} direction="column" gap="sm">
             <helix-text class={styles.kicker} emphasis="muted" scale="label">
@@ -103,9 +100,6 @@ export async function ProofBands({ engine }: { engine: ThemeEngine }) {
             <helix-list-item>
               <helix-text class={styles.kicker} emphasis="muted" scale="label">
                 Answer
-              </helix-text>
-              <helix-text as="p" emphasis="muted" scale="caption">
-                {AGENT_EXCHANGE.answer}
               </helix-text>
               <Snippet code={AGENT_EXCHANGE.excerpt} label="Manifest excerpt" language="js" wrap />
             </helix-list-item>

@@ -225,8 +225,7 @@ export default async function Home() {
           {/* **No card and no art, because the band is the card.**
                   `InsightCard` here would be a card inside a card: two edges, and
                   a `backdrop-filter` sampling a surface that is already frosted.
-                  The three things a reader chooses from, what it is about, what it
-                  is called and what it argues, remove the nesting rather than
+                  What it is about and what it is called remove the nesting rather than
                   exempting it, and the cell is the link so the whole of it is the
                   target. The full card, with its art and its glass, is what
                   `/insights` shows. */}
@@ -243,9 +242,6 @@ export default async function Home() {
                 </helix-flex>
                 <helix-text as="h3" scale="title">
                   {insight.title}
-                </helix-text>
-                <helix-text emphasis="muted" scale="caption">
-                  {insight.summary}
                 </helix-text>
               </Link>
             ))}
