@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /*
  * The generated Switch, drawn from its real intermediate form: a row a screen
  * reader hears as a switch, a track that fills and a thumb that travels as it
