@@ -175,6 +175,58 @@
     - link "Open in the sandbox":
       - /url: /helix/sandbox?e=button.preview
     - textbox "Example source"
+    - heading "Link to Anatomy Anatomy" [level=2]:
+      - link "Link to Anatomy":
+        - /url: "#anatomy"
+      - text: Anatomy
+    - paragraph:
+      - text: "What each element draws in its shadow root: each part by the name"
+      - code: ::part()
+      - text: reaches, and each slot by the name content goes into.
+    - heading "Link to Root anatomy Root" [level=3]:
+      - link "Link to Root anatomy":
+        - /url: "#helix-button-anatomy"
+      - text: Root
+    - list "helix-button on the web":
+      - listitem:
+        - code: <helix-button>
+        - code: :state(pending)
+        - code: :state(pressed)
+        - code: :state(settled)
+        - list:
+          - listitem:
+            - code: "#shadow-root"
+            - list:
+              - listitem:
+                - code: pressable part="button"
+                - code: "busy={pending}"
+                - code: chooses
+                - code: "disabled={disabled}"
+                - code: "expanded={expanded}"
+                - code: "focusable-when-disabled={focusable-when-disabled}"
+                - code: "label={label}"
+                - code: "popup={popup}"
+                - code: "pressed={pressed}"
+                - code: role="button"
+                - code: sends="press"
+                - list:
+                  - listitem:
+                    - code: slot name="start"
+                  - listitem:
+                    - code: slot
+                    - code: part="text"
+                  - listitem:
+                    - code: slot name="end"
+                  - listitem:
+                    - code: while pending
+                    - list:
+                      - listitem:
+                        - code: box part="spinner"
+                        - code: decorative
+              - listitem:
+                - code: live part="live"
+                - code: "says={pending-label}"
+                - code: "while={pending}"
     - heading "Link to API Reference API Reference" [level=2]:
       - link "Link to API Reference":
         - /url: "#api"
@@ -326,6 +378,9 @@
         - listitem:
           - link "Preview":
             - /url: "#preview"
+        - listitem:
+          - link "Anatomy":
+            - /url: "#anatomy"
         - listitem:
           - link "API Reference":
             - /url: "#api"
