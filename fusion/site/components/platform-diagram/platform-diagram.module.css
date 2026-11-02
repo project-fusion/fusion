@@ -98,11 +98,8 @@
     drop-shadow(0 0 7px color-mix(in oklab, var(--helix-color-accent) 28%, transparent));
 }
 
-/* The mark, glowing the way the ring does. */
 .platformMark {
   display: grid;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--helix-color-accent) 55%, transparent))
-    drop-shadow(0 0 18px color-mix(in oklab, var(--helix-color-accent) 35%, transparent));
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -66,8 +66,8 @@ export const PlatformDiagram = () => (
 
       <defs>
         <radialGradient id="platform-bloom">
-          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.22" />
-          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.05" />
+          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.1" />
+          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.02" />
           <stop offset="1" stopColor="var(--helix-color-accent)" stopOpacity="0" />
         </radialGradient>
       </defs>
@@ -210,8 +210,8 @@ export const PlatformDiagramStacked = () => (
 
       <defs>
         <radialGradient id="platform-bloom-stacked">
-          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.22" />
-          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.05" />
+          <stop offset="0" stopColor="var(--helix-color-accent)" stopOpacity="0.1" />
+          <stop offset="0.6" stopColor="var(--helix-color-accent)" stopOpacity="0.02" />
           <stop offset="1" stopColor="var(--helix-color-accent)" stopOpacity="0" />
         </radialGradient>
       </defs>
