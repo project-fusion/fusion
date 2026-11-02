@@ -153,6 +153,10 @@
       "default": "./dist/utils/object-inspector/object-inspector.js"
     },
     "./package.json": "./package.json",
+    "./pagination": {
+      "types": "./dist/utils/pagination/pagination.d.ts",
+      "default": "./dist/utils/pagination/pagination.js"
+    },
     "./pin-code": {
       "types": "./dist/utils/pin-code/pin-code.d.ts",
       "default": "./dist/utils/pin-code/pin-code.js"
