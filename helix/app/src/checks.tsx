@@ -119,6 +119,39 @@ function Dates() {
   )
 }
 
+/** What one locale's calendar writes for one date, and the calendar it says it used. */
+const inCalendar = (locale: string): string => {
+  const format = new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' })
+  return `${locale}: ${format.resolvedOptions().calendar}, ${format.format(new Date(2026, 10, 2))}`
+}
+
+/** The first day of the week a locale says, through whichever spelling the engine gives. */
+const firstDay = (tag: string): string => {
+  const locale = new Intl.Locale(tag) as Intl.Locale & {
+    readonly getWeekInfo?: () => { readonly firstDay: number }
+    readonly weekInfo?: { readonly firstDay: number }
+  }
+  const info = locale.getWeekInfo?.() ?? locale.weekInfo
+  return `${tag}: first day ${info?.firstDay ?? 'missing'}`
+}
+
+/**
+ * Whether the engine honors a calendar named in a locale, and says which day
+ * a week starts on, each as one line, for the date pickers' headings and rows.
+ */
+function Calendars() {
+  return (
+    <>
+      {['en-US', 'en-u-ca-hebrew', 'th-TH-u-ca-buddhist', 'ar-SA-u-ca-islamic'].map((locale) => (
+        <Note key={locale}>{inCalendar(locale)}</Note>
+      ))}
+      {['en-US', 'fr-FR', 'ar-EG'].map((tag) => (
+        <Note key={tag}>{firstDay(tag)}</Note>
+      ))}
+    </>
+  )
+}
+
 /** Each kind of motion wave 1 draws, under the app's Motion Toggle. */
 function Motion() {
   return (
@@ -159,6 +192,7 @@ function Direction({ rtl }: { readonly rtl: boolean }) {
 export const CHECKS: Readonly<
   Record<string, { readonly draw: () => ReactNode; readonly title: string }>
 > = {
+  calendars: { draw: () => <Calendars />, title: 'Calendars' },
   dates: { draw: () => <Dates />, title: 'Dates' },
   device: { draw: () => <Device />, title: 'Device' },
   gestures: { draw: () => <Gestures />, title: 'Gestures' },
