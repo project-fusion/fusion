@@ -163,10 +163,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
     snapshotOf(HERO_VIEWS.wide),
     snapshotOf(HERO_VIEWS.narrow),
   ])
+  const credit = wide.credit.length > 0 ? wide.credit : narrow.credit
   return (
     <>
       <MapsHero
-        credit={wide.credit.length > 0 ? wide.credit : narrow.credit}
+        credit={credit}
         painted={painted}
         sent={sent}
         snapshots={wide.picture && narrow.picture ? { narrow, wide } : undefined}
@@ -216,7 +217,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <Snippet code={POINTS_MARKUP} label="The markup" language="html" />
             </helix-flex>
             <div className={band.bandSection}>
-              <MapsPoints />
+              <MapsPoints credit={credit} />
             </div>
           </div>
         </Band>
