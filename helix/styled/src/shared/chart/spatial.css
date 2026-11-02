@@ -78,6 +78,8 @@
 }
 
 [part="fallback"] {
+  /* The smallest its words stand on the page, however far the drawing scales. */
+  font-size: var(--helix-text-xs);
   inset: var(--helix-space-md);
   position: absolute;
 }

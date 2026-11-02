@@ -38,6 +38,7 @@ import {
   SPATIAL_VIEW,
   TICK_SIZE,
   turned,
+  wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
 import {
   type BarField,
@@ -844,7 +845,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     const layout: BarLayout = this.layout ?? 'grid'
     const lined = layout === 'grid' ? undefined : layout
     const bare = this.noBox || lined !== undefined
-    const view = boxView(read.axes, this.camera, [], bare)
+    const view = wordsFitted(this.room, (words) => boxView(read.axes, this.camera, [], bare, words))
     /* A row whose bars have a size is drawn at the scale that makes them
        that wide, its value axis as tall as the plot has room for. */
     const room = this.room
@@ -878,12 +879,12 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     /* Words are written at the box's own font size, in CSS pixels, whatever
        the drawing's scale: measured on a frame, which the words then widen
        a little, and measured again on that. */
-    const pixelOf = (frame: Frame): number | undefined =>
-      sized
-        ? sized.unit
-        : room
-          ? 1 / Math.min(room.width / frame.width, room.height / frame.height)
-          : undefined
+    const pixelOf = (frame: Frame): number | undefined => {
+      const fitted = room && 1 / Math.min(room.width / frame.width, room.height / frame.height)
+      /* A sized row holds its scale until its words reach past the plot, and then
+         it shrinks to fit as any does, so the words are measured at that scale. */
+      return sized ? Math.max(sized.unit, fitted ?? 0) : fitted
+    }
     const sizeOf = (frame: Frame): number => {
       const pixel = pixelOf(frame)
       return room && pixel !== undefined ? room.font * pixel : TICK_SIZE
@@ -914,8 +915,11 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
       })
       return { frame: around(base, extents), names, values }
     }
-    const first = wordsAt(sizeOf(base))
-    const size = sizeOf(first.frame)
+    /* Three passes, each on the frame the last one widened: a name stood at 10.4
+       pixels at 390 wide when the frame was read once. */
+    let size = sizeOf(wordsAt(sizeOf(base)).frame)
+    size = sizeOf(wordsAt(size).frame)
+    size = sizeOf(wordsAt(size).frame)
     const { frame: fits, names, values } = wordsAt(size)
     /* A sized row is centered in a frame the plot's own size at its scale,
        unless its words reach past it, when it shrinks to fit as any does. */

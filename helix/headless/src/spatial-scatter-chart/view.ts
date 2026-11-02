@@ -23,6 +23,7 @@ import {
   projectionOf,
   shortNumber,
 } from '@fusion.dev/helix-core'
+import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { type SVGTemplateResult, svg } from 'lit'
 import type { PlotAxis } from './field.js'
 
@@ -63,6 +64,8 @@ export interface BoxView {
   /** The box's edges and its grid, as one path. */
   grid: string
   labels: ViewLabel[]
+  /** How large the words are, as a share of `TICK_SIZE` and `NAME_SIZE`. */
+  words: number
   /** A place in the box, on the page. */
   on(point: BoxPoint): PagePoint
   /** How near the camera a place in the box stands: the larger, the nearer. */
@@ -98,6 +101,7 @@ export const boxView = (
   camera: Camera,
   extra: readonly PagePoint[] = [],
   bare = false,
+  words = 1,
 ): BoxView => {
   const projection = projectionOf(camera)
   const [ex, ey, ez] = axes.extent ?? [1, 1, 1]
@@ -137,10 +141,15 @@ export const boxView = (
   /* Along the edges that face the reader, which a turn changes. */
   const text = (axis: PlotAxis): BoxAxisText => ({
     name: axis.name,
-    ticks: axis.ticks.map((tick, index) => ({
-      at: inBox(axis, tick),
-      text: axis.labels?.[index] ?? tickText(tick),
-    })),
+    ticks: axis.ticks.map((tick, index) => {
+      const label = axis.labels?.[index]
+      return {
+        at: inBox(axis, tick),
+        /* A label with a number in it, such as a date, reads from the labels beside it. */
+        category: label !== undefined && !/\d/.test(label),
+        text: label ?? tickText(tick),
+      }
+    }),
   })
   /* A bare box writes nothing along its edges. */
   const labels: ViewLabel[] = bare
@@ -148,7 +157,7 @@ export const boxView = (
     : boxLabels(
         (point) => ({ ...on(point), depth: depth(point) }),
         { x: text(axes.x), y: text(axes.y), z: text(axes.z) },
-        { gap: LABEL_GAP, name: NAME_SIZE, tick: TICK_SIZE, wide: WIDE },
+        { gap: LABEL_GAP * words, name: NAME_SIZE * words, tick: TICK_SIZE * words, wide: WIDE },
       )
   /* The bounds hold every line, every label at about its width, and every
      reading, so nothing is cut at the edge of the drawing. */
@@ -161,7 +170,7 @@ export const boxView = (
     }
   }
   for (const one of labels) {
-    const size = one.name ? NAME_SIZE : TICK_SIZE
+    const size = (one.name ? NAME_SIZE : TICK_SIZE) * words
     const half = (one.text.length * size * WIDE) / 2
     corners.push({ x: one.x - half, y: one.y - size }, { x: one.x + half, y: one.y + size })
   }
@@ -176,6 +185,82 @@ export const boxView = (
     labels,
     on,
     projection,
+    words,
+  }
+}
+
+/** The drawing's box on the page, and the font size its words are measured against. */
+export interface PlotRoom {
+  font: number
+  height: number
+  width: number
+}
+
+/** How many times the words are measured, each pass on the frame the last one widened. */
+const WORD_PASSES = 4
+
+/** The most the words grow, which holds them to a size where the box still shows. */
+const MOST_WORDS = 3
+
+/**
+ * The view whose ticks stand at the box's font size or larger on the page.
+ *
+ * The drawing scales through its `viewBox`, so a tick written in the box's units
+ * shrinks with the box: measured October 2026 at 390 wide, 7.4 pixels on Scatter
+ * and Surface, under the 12 of the box's own font. The words widen the frame they
+ * are measured on, so the measure runs again on what they widened. Where nothing
+ * has measured the box, as on a server, the words stay at their written size.
+ */
+export const wordsFitted = (
+  room: PlotRoom | undefined,
+  draw: (words: number) => BoxView,
+): BoxView => {
+  let view = draw(1)
+  if (!room) {
+    return view
+  }
+  for (let pass = 0; pass < WORD_PASSES; pass += 1) {
+    const pixel = 1 / Math.min(room.width / view.bounds.width, room.height / view.bounds.height)
+    view = draw(Math.min(MOST_WORDS, Math.max(1, (room.font * pixel) / TICK_SIZE)))
+  }
+  return view
+}
+
+/** Keeps a chart told the size and font size of the box its own drawing fills. */
+export class PlotRoomWatch implements ReactiveController {
+  room: PlotRoom | undefined
+
+  private box: Element | undefined
+
+  private sizes: ResizeObserver | undefined
+
+  constructor(private readonly host: ReactiveControllerHost & HTMLElement) {
+    host.addController(this)
+  }
+
+  hostUpdated(): void {
+    const box = this.host.shadowRoot?.querySelector('[part="fallback"]')
+    if (!box || box === this.box || typeof ResizeObserver !== 'function') {
+      return
+    }
+    this.box = box
+    this.sizes?.disconnect()
+    this.sizes = new ResizeObserver(([entry]) => {
+      const { height, width } = entry?.contentRect ?? { height: 0, width: 0 }
+      const font = Number.parseFloat(getComputedStyle(box).fontSize) || 16
+      const was = this.room
+      if (was?.width !== width || was.height !== height || was.font !== font) {
+        this.room = height > 0 && width > 0 ? { font, height, width } : undefined
+        this.host.requestUpdate()
+      }
+    })
+    this.sizes.observe(box)
+  }
+
+  hostDisconnected(): void {
+    this.sizes?.disconnect()
+    this.sizes = undefined
+    this.box = undefined
   }
 }
 
@@ -217,8 +302,8 @@ export const turned = (camera: Camera, across: number, up: number): Camera => ({
 export const drawBox = (view: BoxView): SVGTemplateResult =>
   svg`<path d=${view.grid} part="grid"></path>${view.labels.map((label) =>
     label.name
-      ? svg`<text dominant-baseline="central" font-size=${NAME_SIZE} part="axis-name" text-anchor="middle" x=${shortNumber(label.x)} y=${shortNumber(label.y)}>${label.text}</text>`
-      : svg`<text dominant-baseline="central" font-size=${TICK_SIZE} part="tick" text-anchor="middle" x=${shortNumber(label.x)} y=${shortNumber(label.y)}>${label.text}</text>`,
+      ? svg`<text dominant-baseline="central" font-size=${NAME_SIZE * view.words} part="axis-name" text-anchor="middle" x=${shortNumber(label.x)} y=${shortNumber(label.y)}>${label.text}</text>`
+      : svg`<text dominant-baseline="central" font-size=${TICK_SIZE * view.words} part="tick" text-anchor="middle" x=${shortNumber(label.x)} y=${shortNumber(label.y)}>${label.text}</text>`,
   )}`
 
 /** A reading drawn on the page, which the pointer finds. */

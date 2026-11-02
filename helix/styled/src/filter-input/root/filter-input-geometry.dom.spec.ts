@@ -85,3 +85,50 @@ describe('what sits at either end of the field', () => {
     expect(box(trigger).height).toBe(box(chip).height)
   })
 })
+
+/* Measured from the seam with a lead, and from the inside of the border without
+   one. The row's gap alone left the text 4 from the seam against that 12. */
+describe('what follows the lead', () => {
+  const lead = '<helix-button emphasis="ghost" slot="start">Filter</helix-button>'
+  const chip = (name: string): string =>
+    `<helix-filter-chip label="${name}" name="${name}" slot="tags">A value</helix-filter-chip>`
+  const fromField = (filter: HTMLElement, element: Element | null): number => {
+    const field = part(filter, 'field') as HTMLElement
+    return box(element).left - box(field).left - field.clientLeft
+  }
+  const fromSeam = (filter: HTMLElement, element: Element | null): number =>
+    box(element).left - box(part(filter, 'lead')).right
+
+  /* Each is read before the next mounts, which takes the last one off the page. */
+  const bareStart = async (): Promise<number> => {
+    const bare = await mount('<helix-filter-input label="Filter rows"></helix-filter-input>')
+    return fromField(bare, part(bare, 'control'))
+  }
+
+  geometry('text starts as far from the seam as it does from a bare field', async () => {
+    const led = await mount(`<helix-filter-input label="Filter rows">${lead}</helix-filter-input>`)
+    const start = fromSeam(led, part(led, 'control'))
+    expect(start).toBe(await bareStart())
+  })
+
+  geometry('a chip takes the same start', async () => {
+    const led = await mount(
+      `<helix-filter-input label="Filter rows">${lead}${chip('one')}</helix-filter-input>`,
+    )
+    const start = fromSeam(led, led.querySelector('helix-filter-chip'))
+    expect(start).toBe(await bareStart())
+  })
+
+  geometry('a later line starts at the padding of the field', async () => {
+    const led = await mount(
+      `<div style="inline-size: 240px"><helix-filter-input label="Filter rows">${lead}${chip('one')}${chip('two')}${chip('three')}</helix-filter-input></div>`,
+    )
+    const filter = led.querySelector('helix-filter-input') as HTMLElement
+    const chips = [...filter.querySelectorAll('helix-filter-chip')]
+    const [first] = chips
+    const later = chips.find((one) => box(one).top > box(first ?? null).top)
+    expect(later).toBeDefined()
+    const start = fromField(filter, later ?? null)
+    expect(start).toBe(await bareStart())
+  })
+})

@@ -56,8 +56,10 @@
   --_toggle-height: calc(var(--helix-size-control) - var(--helix-space-2xs) * 2);
   /* No track, so nothing to be concentric with. */
   --_toggle-radius: var(--toggle-group-item-radius, var(--helix-radii-sm));
-  /* And no groove either, which decides the thumb's color. */
-  --_indicator-surface: var(--helix-color-surface-raised);
+  /* And no groove either, which decides the thumb's color. In dark every surface
+     above the page is the same 0.21, so a fill would vanish on a card or in a
+     dialog. A wash holds a step from any ground. */
+  --_indicator-surface: light-dark(var(--helix-color-surface-raised), var(--helix-color-press));
   display: inline-flex;
   /* It grows inside the row, which is always what holds it. */
   flex: 1 1 auto;
@@ -104,8 +106,11 @@
     (var(--helix-space-2xs) + var(--helix-border-thin)) *
     2
   );
-  /* A groove, so the thumb is over it rather than on it. */
-  --_indicator-surface: var(--helix-color-surface-overlay);
+  /* A groove, so the thumb is over it rather than on it. In dark the shadow that
+     lifts the thumb in light does not show, and `overlay` on `sunken` measured
+     1.06:1, fainter than the 1.38:1 of the hover wash on an unselected segment.
+     The press wash is 1.84:1, a step past hover, on any track color. */
+  --_indicator-surface: light-dark(var(--helix-color-surface-overlay), var(--helix-color-press));
   background-color: var(--toggle-group-background-color, var(--helix-color-surface-sunken));
   box-shadow: var(--helix-shadow-surface);
   border: var(--helix-border-surface) solid

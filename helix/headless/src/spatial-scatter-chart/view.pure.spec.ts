@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, spyOn, test } from 'bun:test'
 import type { Camera } from '@fusion.dev/helix-core'
-import { DragTurn, type Frame } from './view.js'
+import { boxView, DragTurn, type Frame, TICK_SIZE, wordsFitted } from './view.js'
 
 const press = (x: number, y = 0): PointerEvent =>
   ({
@@ -78,5 +78,26 @@ describe('the frame a drag draws in', () => {
     expect(drag.frame(fits, { x: 8, y: 4 })).toEqual(fits)
     expect(drag.up(press(2))).toBe(false)
     expect(redraws()).toBe(0)
+  })
+})
+
+describe('the words of a box in a narrow plot', () => {
+  const axis = { name: 'Reading', range: [0, 100], ticks: [0, 50, 100] } as never
+  const camera: Camera = { tilt: 30, turn: 45 } as Camera
+  const draw = (words: number) => boxView({ x: axis, y: axis, z: axis }, camera, [], false, words)
+
+  test('stand at the font size of the box', () => {
+    const room = { font: 12, height: 225, width: 310 }
+    const view = wordsFitted(room, draw)
+    const pixel = 1 / Math.min(room.width / view.bounds.width, room.height / view.bounds.height)
+    expect((TICK_SIZE * view.words) / pixel).toBeGreaterThanOrEqual(11.5)
+  })
+
+  test('stay at their written size where nothing has measured the box', () => {
+    expect(wordsFitted(undefined, draw).words).toBe(1)
+  })
+
+  test('hold their written size in a plot with room', () => {
+    expect(wordsFitted({ font: 1, height: 2000, width: 2000 }, draw).words).toBe(1)
   })
 })

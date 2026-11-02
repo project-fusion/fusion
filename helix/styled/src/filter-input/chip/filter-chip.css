@@ -5,9 +5,17 @@
    "is not" changes what the chip means and has to be read. */
 :host {
   align-items: center;
-  background-color: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
+  --_chip-fill: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
+  background-color: var(--_chip-fill);
+  /* The edge is a step from the chip's own fill. `color-border` is a step from the
+     page, and on the sunken fill in light it measured 1.03:1. This mix measures
+     1.27:1 in light, near the 1.23:1 `color-border` has on the page, and is the
+     1.16:1 `color-border` already drew in dark. */
   border: var(--helix-border-thin) solid
-    var(--filter-input-chip-border-color, var(--helix-color-border));
+    var(
+      --filter-input-chip-border-color,
+      color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_chip-fill))
+    );
   border-radius: var(--filter-input-chip-radius, var(--helix-radii-sm));
   color: var(--helix-color-foreground);
   display: inline-flex;
@@ -19,6 +27,9 @@
   gap: var(--helix-space-none);
   line-height: var(--helix-leading-normal);
   max-inline-size: 100%;
+  /* The values never wrap, so without this their whole width is the chip's minimum,
+     and a grid track or flex row holding the chip grows past its own box. */
+  min-inline-size: 0;
   /* **`Tag`'s height, not a control's.** Both are slotted into the same row and
      a consumer mixes them freely, so a chip at `control-sm` stood 32 against
      tags of 28 and the row stepped wherever the two met. What the row is made
@@ -52,10 +63,15 @@
 }
 
 /* The name of what is filtered, which a reader already knows: they picked it.
-   So it is the quietest of the three and never the widest. */
+   So it is the quietest of the three and never the widest. A long name stops at
+   twenty characters and ends in an ellipsis, as the values do. */
 [part="field"] {
   color: var(--helix-color-foreground-muted);
+  max-inline-size: 20ch;
+  min-inline-size: 0;
+  overflow: hidden;
   padding-inline-end: var(--helix-space-2xs);
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -75,6 +91,8 @@
    rather than color: a bar of chips is chrome and a row of colored words in it
    reads as several meanings rather than one list. */
 [part="values"] {
+  /* The values give way first, so the field's name stays readable. */
+  flex-shrink: 1000;
   font-weight: var(--helix-weight-medium);
   min-inline-size: 0;
   overflow: hidden;
