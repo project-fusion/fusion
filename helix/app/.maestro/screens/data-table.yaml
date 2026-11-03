@@ -1,0 +1,35 @@
+# Data Table, its examples drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`, and the rows again once a press has moved them.
+appId: dev.fusion.helix.app
+name: "Screens: Data Table"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://data-table/preview/preview
+      - extendedWaitUntil:
+          visible: archive.tar.gz
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: data-table-preview-${MODE}-${SIZE}
+- tapOn:
+    text: Next page
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: profile.bin
+    timeout: 20000
+- takeScreenshot: data-table-preview-page-two-${MODE}-${SIZE}
+- openLink: helix://data-table/selecting-and-arranging/selecting-and-arranging
+- extendedWaitUntil:
+    visible: Select every row
+    timeout: 30000
+- takeScreenshot: data-table-selecting-${MODE}-${SIZE}
+- openLink: helix://data-table/column-menu/column-menu
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: data-table-column-menu-${MODE}-${SIZE}
+- openLink: helix://data-table/nested-rows/nested-rows
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: data-table-nested-rows-${MODE}-${SIZE}

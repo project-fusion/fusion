@@ -164,6 +164,8 @@ export interface Standing {
   contents: number[]
   measured: Map<string, string>
   nodes: Map<string, unknown>
+  /** The row a stop no reader has moved stands on. */
+  resting: string | undefined
   scheduled: boolean
   stop: { column: number; row: string | 'head' } | undefined
   wantsFocus: boolean
@@ -175,6 +177,7 @@ export const noStanding = (): Standing => ({
   contents: [],
   measured: new Map(),
   nodes: new Map(),
+  resting: undefined,
   scheduled: false,
   stop: undefined,
   wantsFocus: false,

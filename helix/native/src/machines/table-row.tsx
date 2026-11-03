@@ -17,11 +17,12 @@ import {
   useRef,
   useState,
 } from 'react'
-import { type HostInstance, type LayoutChangeEvent, Pressable } from 'react-native'
+import { type HostInstance, type LayoutChangeEvent, Pressable, View } from 'react-native'
 import { holdScrollViewsAbove } from '../capabilities/scroll'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import { DataTableMenuContext, drawMenu } from './data-table-menu'
 import { boundTo, given, tell } from './props'
 import {
   ColumnContext,
@@ -51,6 +52,9 @@ const atEdge = (element: ReactNode, edge: string): ReactNode =>
     : cloneElement(element as ReactElement<{ hooks?: unknown }>, {
         hooks: { cellAlign: edge, cellJustify: JUSTIFY[edge] ?? 'flex-start' },
       })
+
+/** A heading and the button of its menu, in a line. */
+const BESIDE = { alignItems: 'center', flexDirection: 'row' } as const
 
 /** What one cell's box takes. */
 const cellBox = (
@@ -315,6 +319,8 @@ const STEP = 16
 export const useTableColumn = (family: Family, props: Props, use: MachineUse): Behavior => {
   const offer = useContext(TableContext)
   const place = useContext(ColumnContext)
+  const menus = useContext(DataTableMenuContext)
+  const hasMenu = menus !== undefined && given(family, props, 'menu') === true
   const field = String(given(family, props, boundTo(use, 'field', 'prop')) ?? '')
   const sortable = given(family, props, boundTo(use, 'sortable', 'prop')) === true
   const sorts = sortable && field !== ''
@@ -354,10 +360,29 @@ export const useTableColumn = (family: Family, props: Props, use: MachineUse): B
           accessibilityRole: 'header',
           ...(sorts ? {} : { accessibilityLabel: words, accessible: true }),
         },
+        ...(menus === undefined || !hasMenu
+          ? {}
+          : {
+              wrap: (view: ReactNode) => (
+                <View style={BESIDE}>
+                  {view}
+                  {drawMenu(menus, {
+                    field,
+                    label: formatMessage(
+                      String(given(family, props, 'menu-label') ?? ''),
+                      name as never,
+                      '',
+                    ),
+                    moves: menus.moves,
+                    sorts,
+                  })}
+                </View>
+              ),
+            }),
       },
       host: {
         states: {
-          'has-menu': false,
+          'has-menu': hasMenu,
           movable: false,
           'sorted-ascending': sorted === 'ascending',
           'sorted-descending': sorted === 'descending',

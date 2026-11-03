@@ -111,11 +111,12 @@ export const useChoice = (
   selected: string,
   setSelected: (next: string) => void,
   standing: Standing,
+  every?: readonly string[],
 ) => {
   const read = reader(family, props, use)
   const single = read('selectionMode') === 'single'
   const replaces = read('selectable') === true && read('selectionBehavior') === 'replace'
-  const order = rows.map((row) => row.key)
+  const order = every ?? rows.map((row) => row.key)
   const chosen = new Set(commaList(selected))
   const isOut = (key: string): boolean => rows.find((row) => row.key === key)?.disabled === true
   const request = (next: ReadonlySet<string>): boolean => {

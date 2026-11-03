@@ -183,6 +183,14 @@
       "default": "./dist/copy-button/index.js"
     },
     "./custom-elements.json": "./custom-elements.json",
+    "./data-table": {
+      "react-native": {
+        "types": "./dist/data-table/index.native.d.ts",
+        "default": "./dist/data-table/index.native.js"
+      },
+      "types": "./dist/data-table/index.d.ts",
+      "default": "./dist/data-table/index.js"
+    },
     "./description-list": {
       "react-native": {
         "types": "./dist/description-list/index.native.d.ts",

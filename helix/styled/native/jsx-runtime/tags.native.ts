@@ -21,6 +21,7 @@ import { HelixCodeBlock } from '../code-block/index.native'
 import { HelixColorInput } from '../color-input/index.native'
 import { HelixColorPicker } from '../color-picker/index.native'
 import { HelixCopyButton } from '../copy-button/index.native'
+import { HelixDataTable } from '../data-table/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
 import { HelixDialog } from '../dialog/index.native'
 import { HelixDivider } from '../divider/index.native'
@@ -220,6 +221,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-color-input': HelixColorInput,
   'helix-color-picker': HelixColorPicker,
   'helix-copy-button': HelixCopyButton,
+  'helix-data-table': HelixDataTable,
   'helix-description-list': HelixDescriptionList,
   'helix-description-list-item': HelixDescriptionListItem,
   'helix-dialog': HelixDialog,

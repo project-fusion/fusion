@@ -17,6 +17,7 @@ import {
   inRowOrder,
   nestedRows,
   parse,
+  type RowShape,
   rowShapes,
   sortedRows,
   treeArrow,
@@ -277,6 +278,23 @@ const useEndInSight = (on: boolean, nearEnd: () => void) => {
   }, [])
 }
 
+/**
+ * What a table drawn from an array has already decided. Its rows come in the
+ * order they draw, a page of them, so the table sorts and nests nothing itself.
+ */
+export interface TableOver {
+  /** Every key in row order, past the page drawn, which a selection and a range read. */
+  readonly everyKey: readonly string[]
+  /** What it holds open, and how a reader changes it. */
+  readonly expanded: readonly [string, (next: string) => void]
+  /** A press on a link or a row's own press that it takes first. */
+  readonly grid: boolean
+  /** Each row's depth, and whether it holds rows, read from the data. */
+  readonly shapes: ReadonlyMap<string, RowShape>
+  /** The sort, held around the table so that it can arrange the rows. */
+  readonly sorting: { readonly sort: string; readonly toggleSort: (field: string) => void }
+}
+
 /** What a repeat marked `windowed` draws the rows with. */
 const drawingOf = (
   windowed: boolean,
@@ -348,17 +366,31 @@ const useAcross = (): {
 }
 
 /** What a table works out of what it holds and what a reader chose. */
-const useStanding = (family: Family, props: Props, use: MachineUse) => {
+const useStanding = (family: Family, props: Props, use: MachineUse, over?: TableOver) => {
   const read = reader(family, props, use)
   const standing = useRef<Standing>(noStanding()).current
   const { columns, rows } = useMemo(() => modelOf(props.children), [props.children])
-  const sorting = useSorting(family, props, use)
+  const ownSorting = useSorting(family, props, use)
+  const sorting = over?.sorting ?? ownSorting
   const [selected, setSelected] = useHeld(read('selected'), read('defaultSelected'))
-  const [expanded, setExpanded] = useHeld(read('expanded'), read('defaultExpanded'))
+  const ownExpanded = useHeld(read('expanded'), read('defaultExpanded'))
+  const [expanded, setExpanded] = over?.expanded ?? ownExpanded
   const open = new Set(commaList(expanded))
-  const nests = rows.some((row) => row.parent !== '')
+  /* At rest a table drawn from an array holds its stop on its first row, as on the
+     web, whichever row that is now. A move by the keys ends the rest. */
+  const first = rows[0]?.key
+  if (
+    over !== undefined &&
+    first !== undefined &&
+    (standing.stop === undefined || standing.stop.row === standing.resting)
+  ) {
+    standing.stop = { column: 0, row: first }
+    standing.resting = first
+  }
+  const nests = over === undefined ? rows.some((row) => row.parent !== '') : over.shapes.size > 0
   const selectable = read('selectable') === true
-  const shapes = useMemo(() => rowShapes(rows), [rows])
+  const ownShapes = useMemo(() => rowShapes(rows), [rows])
+  const shapes = over?.shapes ?? ownShapes
   const lead = [
     ...(read('reorderable') === true ? ['grip'] : []),
     ...(selectable ? ['select'] : []),
@@ -370,7 +402,7 @@ const useStanding = (family: Family, props: Props, use: MachineUse) => {
     ...tracksFor(columns, rows, String(read('columns') ?? ''), resized),
   ]
   const tracks = useTracksOf(written, standing)
-  const everyKey = rows.map((row) => row.key)
+  const everyKey = over?.everyKey ?? rows.map((row) => row.key)
   const discloseRow = (key: string): void => {
     const next = new Set(open)
     if (!next.delete(key)) {
@@ -380,10 +412,10 @@ const useStanding = (family: Family, props: Props, use: MachineUse) => {
     ask(family, props, use, ['onBeforeExpand', 'onExpand'], value, () => setExpanded(value))
   }
   return {
-    choice: useChoice(family, props, use, rows, selected, setSelected, standing),
+    choice: useChoice(family, props, use, rows, selected, setSelected, standing, over?.everyKey),
     columns,
     discloseRow,
-    drawn: arranged(rows, columns, sorting.sort, open),
+    drawn: over === undefined ? arranged(rows, columns, sorting.sort, open) : rows,
     lead,
     moves: useMoves(family, props, use, rows, parse(sorting.sort) !== undefined),
     nests,
@@ -537,15 +569,20 @@ const offerOf = (
 }
 
 /** Hosts a table. */
-export const useTable = (family: Family, props: Props, use: MachineUse): Behavior => {
+export const useTable = (
+  family: Family,
+  props: Props,
+  use: MachineUse,
+  over?: TableOver,
+): Behavior => {
   const read = reader(family, props, use)
   const [, tick] = useState(0)
   const redraw = useCallback(() => tick((at) => at + 1), [])
-  const state = useStanding(family, props, use)
+  const state = useStanding(family, props, use, over)
   const { choice, columns, drawn, lead, nests, rows, selected, selectable, sorting, tracks } = state
   const { standing } = state
   const windowed = read('windowed') === true
-  const grid = read('grid') === true
+  const grid = over?.grid ?? read('grid') === true
   useSaid(family, props, sorting.sort, selected, choice.chosen.size, columns)
   const keysOn = useGrid(grid, drawn, columns, lead, standing, redraw, gridActions(state))
   const across = useAcross()
@@ -558,7 +595,11 @@ export const useTable = (family: Family, props: Props, use: MachineUse): Behavio
   const pin = usePin(offer)
   const entries = useEntries(columns, drawn, sorting.sort, placeOf(state), lead)
   const nearEnd = useLoadMore(family, props, use, rows.length, standing)
-  const endRef = useEndInSight(read('loadMore') === true && !windowed, nearEnd)
+  /* A table drawn from an array holds a button for more, unless it is windowed. */
+  const endRef = useEndInSight(
+    over === undefined && read('loadMore') === true && !windowed,
+    nearEnd,
+  )
   const every = everyState(choice.chosen, choice.enabled)
   const errorText = String(given(family, props, 'errorText') ?? '')
   const loading = given(family, props, 'loading') === true
