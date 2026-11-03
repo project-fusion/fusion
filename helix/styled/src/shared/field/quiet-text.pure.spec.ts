@@ -32,7 +32,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['code-block/root/code-block-root.generated.css', '[part="gutter"]', 'color'],
   ['color-input/root/color-input-root.generated.css', 'slot[name="start"]', 'color'],
   ['color-picker/root/color-picker-root.generated.css', '[part="hint"]', 'color'],
-  ['combobox/root/combobox-root.css', '[part="control"]::placeholder', 'color'],
+  ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder', 'color'],
   ['date-input/root/date-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['date-input/root/date-input-root.css', 'slot[name="start"]', 'color'],
   ['date-picker/root/date-picker-root.css', '[part="weekday"]', 'color'],
@@ -136,7 +136,7 @@ const inkOf = (sheet: string, selector: string, property: string): string | unde
 const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field.css', '::placeholder'],
   ['shared/field/field-segments.css', '[part~="segment-placeholder"]'],
-  ['combobox/root/combobox-root.css', '[part="control"]::placeholder'],
+  ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
   ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],
 ]

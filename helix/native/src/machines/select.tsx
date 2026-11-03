@@ -22,6 +22,10 @@ import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { Around } from './binder'
+import type { ListOpening, ListOwner } from './list-owner'
+
+export type { ListOpening, ListOwner }
+
 import { holdMember, useOrder } from './listbox'
 import { useMembers, useWritten, wordsIn } from './listbox-hooks'
 import { type Entry, entriesOf, type Held } from './listbox-model'
@@ -30,27 +34,8 @@ import { boundTo, given, type HelixEvent, senderOf, tell, told } from './props'
 import type { Turned } from './toggle'
 import { reachable } from './virtual-focus'
 
-/** Where the highlight goes as the list opens, by the key that opened it. */
-export interface ListOpening {
-  /** The option a typed letter landed on, which takes the place of `where`. */
-  readonly value?: string | undefined
-  readonly where: 'first' | 'last' | 'selected'
-}
-
-/** What a list drawn inside a Select reads of the Select. */
-export interface ListOwner {
-  /** Closes the list, as the chosen option pressed again does. */
-  readonly again: () => void
-  /** Hears the view of the option the list opened on. */
-  readonly landed: (row: unknown) => void
-  /** Where the highlight goes as the list opens. */
-  readonly opening: ListOpening
-  /** Closes the list and lets focus move on, as Tab does. */
-  readonly tab: () => void
-}
-
 /** What the hidden copy of the options joins. Nothing there is pressed, and nothing shows. */
-const heldOwner = (held: Held, schedule: () => void): OptionOwner => ({
+export const heldOwner = (held: Held, schedule: () => void): OptionOwner => ({
   choose: () => undefined,
   disabled: false,
   drag: undefined,
@@ -208,7 +193,7 @@ const namesOf = (
 })
 
 /** Asks, then stands, then says so; a refusal leaves the list as it stands. */
-const requesterOf =
+export const requesterOf =
   (
     family: Family,
     props: Props,
@@ -237,7 +222,7 @@ const requesterOf =
   }
 
 /** Closes a toggle that stands open. */
-const closeIf = (toggled: Turned | undefined): void => {
+export const closeIf = (toggled: Turned | undefined): void => {
   if (toggled?.checked === true) {
     toggled.turn()
   }
