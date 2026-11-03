@@ -322,6 +322,7 @@ const OPENS: ReadonlySet<string> = new Set(['accordion', 'tree'])
 /** The families that open a layer, whose record says whether it stands open. */
 const LAYERS: ReadonlySet<string> = new Set([
   'combobox',
+  'command',
   'select',
   'color-input',
   'dialog',
@@ -474,6 +475,8 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
         ...(inState(mounted.root, 'open') ? { options: optionRows(mounted) } : {}),
       }
     : {}),
+  /* A palette's focus is in its list's field, or on a phone on the command pressed. */
+  ...(family === 'command' ? { focused: null } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),

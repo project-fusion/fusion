@@ -24,6 +24,15 @@ const itemElements = (parent: Element): Updatable[] =>
       GROUP_TAGS.has(child.localName) ? itemElements(child) : [child, ...pageRows(child)],
     )
 
+/**
+ * The events an element hears from an element it draws and passes on as its own,
+ * by family: a palette's list filters, and the page hears `before-filter` and
+ * `filter` on the palette, as a composed event leaves the list's shadow root.
+ */
+const RELAYED: Readonly<Record<string, readonly string[]>> = {
+  command: ['helix-before-filter', 'helix-filter'],
+}
+
 /** An event an element sent, and the value of the item that sent it, or `null` for the element. */
 export interface Heard {
   readonly event: Event
@@ -34,9 +43,10 @@ export interface Heard {
  * Holds a built setup: its items and panels by value, and each event each
  * of its elements sends, in order. **An event stopped on its way down to
  * the element is one the page cannot hear on it**, as a drilldown stops the
- * `before-select` of a row that opens a page, so it is left out.
+ * `before-select` of a row that opens a page, so it is left out. **The events a
+ * family relays from an element it draws are its own**, as `RELAYED` says.
  */
-export const mountSetup = (root: Updatable): { heard: Heard[]; mounted: Mounted } => {
+export const mountSetup = (root: Updatable, family = ''): { heard: Heard[]; mounted: Mounted } => {
   const children = [...root.children] as Updatable[]
   /* An item with no value is known by its `href`, as a destination is. */
   const valued = (one: Element) => one.getAttribute('value') ?? one.getAttribute('href') ?? ''
@@ -69,6 +79,17 @@ export const mountSetup = (root: Updatable): { heard: Heard[]; mounted: Mounted 
       }
       return result
     }
+  }
+  for (const type of RELAYED[family] ?? []) {
+    root.addEventListener(
+      type,
+      (event) => {
+        if (event.composedPath()[0] !== root) {
+          heard.push({ event, from: null })
+        }
+      },
+      { capture: true },
+    )
   }
   return { heard, mounted }
 }
