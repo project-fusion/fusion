@@ -67,7 +67,8 @@ interface ScrollingProps {
    * a `pager` is handed the part's `Pager` once it is drawn, a
    * `contentRef` is handed the view its content is laid out in, a
    * `scrollerRef` the scroll view the scroll capability takes as the part,
-   * `indicators` shows the platform's scroll indicators, `holdsEnd` keeps the
+   * `indicators` shows the platform's scroll indicators,
+   * `keyboardShouldPersistTaps` and `onScroll` go to the scroll view, `holdsEnd` keeps the
    * end of the content showing as it grows, `onSnapOffsets` hears
    * the offsets a part that snaps can rest at, and `snapOffsets` takes the place
    * of those, as a carousel stops only at its stops.
@@ -148,10 +149,12 @@ export const ScrollingPart = ({
     contentRef,
     holdsEnd,
     indicators,
+    keyboardShouldPersistTaps,
     maintainVisibleContentPosition,
     onSnapOffsets,
     pager,
     scrollerRef,
+    onScroll: heard,
     snapOffsets,
     style: over,
     ...props
@@ -187,6 +190,8 @@ export const ScrollingPart = ({
   const handOff = useHandOff(twoWays ? undefined : horizontal ? 'x' : 'y', own)
   const through = passingThrough(props.pointerEvents, more, locked, handOff.waits)
   const shared = {
+    keyboardShouldPersistTaps:
+      keyboardShouldPersistTaps as ScrollViewProps['keyboardShouldPersistTaps'],
     scrollEnabled: through.scrollEnabled,
     scrollEventThrottle: 16,
     showsHorizontalScrollIndicator: indicators === true,
@@ -234,6 +239,7 @@ export const ScrollingPart = ({
             onMomentumScrollEnd: told.onMomentumScrollEnd,
             onScroll: (event: Scrolled) => {
               told.onScroll(event)
+              ;(heard as ((event: Scrolled) => void) | undefined)?.(event)
               const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent
               track({ offset: horizontal ? contentOffset.x : contentOffset.y })
               handOff.scrolled({
