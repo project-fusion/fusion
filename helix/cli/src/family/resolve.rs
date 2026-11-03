@@ -74,6 +74,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.listbox,
         &api.select,
         &api.combobox,
+        &api.command_root,
         &api.option,
         &api.option_group,
         &api.chat_root,
@@ -192,6 +193,7 @@ impl<'a> Names<'a> {
             layers: layers(&family.tree)
                 .into_iter()
                 .map(|layer| layer.name.clone())
+                .chain(layered::drawn_layers(&family.tree))
                 .collect(),
             parts,
             props: family.api.props.iter().collect(),
@@ -242,6 +244,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
         ("listbox", &family.api.listbox, api::LISTBOX),
         ("select", &family.api.select, api::SELECT),
         ("combobox", &family.api.combobox, api::COMBOBOX),
+        ("commandRoot", &family.api.command_root, api::COMMAND),
         ("option", &family.api.option, api::OPTION),
         ("optionGroup", &family.api.option_group, api::OPTION_GROUP),
         ("chatRoot", &family.api.chat_root, api::CHAT_ROOT),

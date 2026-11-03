@@ -22,6 +22,9 @@
 //!   at the top of the window stands clear of the status bar: a phone
 //!   measures where the host stands in the window and reads the share of
 //!   each inset that reaches into it.
+//! - **A wrap that draws a dialog draws a layer**, the dialog's `surface`, which
+//!   a rule reaches as the wrap's `-surface`, and which opens on the element's
+//!   toggle, as its machine hands the dialog whether it stands open.
 
 #[cfg(test)]
 #[path = "resolve_layers_tests.rs"]
@@ -33,6 +36,28 @@ use super::{rules, Names};
 use crate::family::api::{self, parts, Attribute, Binding, Node, PropType, Toggle};
 use crate::family::ir::{Condition, Family, Rule, Value};
 use crate::family::vocabulary::layer::{layers, PRESENTATIONS};
+
+/// The elements a wrap may draw that are a layer, each with the part that is
+/// placed in the window.
+const DRAWN_LAYERS: &[(&str, &str)] = &[("dialog", "surface")];
+
+/// The names a tree exposes the layers of the elements it draws under, as a
+/// palette's `dialog-surface`.
+pub(super) fn drawn_layers(nodes: &[Node]) -> Vec<String> {
+    let mut found = Vec::new();
+    for node in nodes {
+        if let Some(Attribute::Text(drawn)) = node.attributes.get("draws") {
+            found.extend(
+                DRAWN_LAYERS
+                    .iter()
+                    .filter(|(element, _)| drawn.ends_with(element))
+                    .map(|(_, part)| format!("{}-{part}", node.name)),
+            );
+        }
+        found.extend(drawn_layers(&node.children));
+    }
+    found
+}
 
 /// The sides of its anchor a layer may land on, each a state it is in there.
 pub const PLACED: &[&str] = &["placed-bottom", "placed-left", "placed-right", "placed-top"];
@@ -202,6 +227,7 @@ fn presented(family: &Family, layer: &Node, names: &Names, at: &str, found: &mut
 pub(super) fn opened_by(family: &Family, toggle: &Toggle) -> bool {
     /* A tour opens on the page's request and closes on its own controls. */
     family.api.tour.is_some()
+        || !drawn_layers(&family.tree).is_empty()
         || layers(&family.tree).iter().any(|layer| {
         matches!(
             layer.attributes.get("open"),

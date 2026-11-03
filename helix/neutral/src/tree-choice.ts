@@ -410,6 +410,20 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a palette of commands reads, sends, and computes. */
+export interface CommandChoice {
+  readonly fallbackLabel?: string
+  readonly footed?: string
+  readonly inline?: string
+  readonly label?: string
+  readonly listName?: string
+  readonly modal?: string
+  readonly onBeforeSelect?: string
+  readonly onSelect?: string
+  readonly page?: string
+  readonly status?: string
+}
+
 /** What a text field that filters a list of options reads, sends, and computes. */
 export interface ComboboxChoice {
   readonly allowsCustomValue?: string
