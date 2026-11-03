@@ -38,6 +38,7 @@ import { inspectorRows, inspects, rowNode } from './inspector'
 import { dismissIn, PAGE } from './layers'
 import { expanded, leftBy } from './left'
 import { logPress, logProps, logRows, logs } from './log'
+import { namedPress } from './named'
 import { feedFocus, feedPress, feeds } from './notifications'
 import { paginates, paginationPress } from './pagination'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
@@ -330,6 +331,10 @@ const press = async (
   setup: Setup,
   intent: Extract<Intent, { kind: 'press' }>,
 ): Promise<string | undefined> => {
+  if (intent.label !== undefined) {
+    await tapEnabled(namedPress(intent.label))
+    return undefined
+  }
   if (paginates(setup)) {
     await tapEnabled(paginationPress(setup, intent.part))
     return undefined

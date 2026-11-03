@@ -395,6 +395,11 @@ const perform = async (
       scroll(mounted.root, intent.x, intent.y)
       return
     case 'press': {
+      if (intent.label !== undefined) {
+        const named = mounted.root.shadowRoot?.querySelector(`[aria-label="${intent.label}"]`)
+        tap(named ?? mounted.root, intent.held)
+        return
+      }
       if (intent.link !== undefined) {
         tap(mounted.root.querySelector(`a[href="#${intent.link}"]`) ?? mounted.root, intent.held)
         break
