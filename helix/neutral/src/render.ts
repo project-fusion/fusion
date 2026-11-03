@@ -317,6 +317,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tags'
     | 'tagsShown'
   >
+  /** What a palette of commands computes for its parts. */
+  readonly commandRoot: Computes<'footed' | 'listName' | 'modal' | 'status'>
   /** What an option computes for its parts. */
   readonly option: Computes<
     | 'checkShown'

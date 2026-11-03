@@ -422,6 +422,19 @@ pub const COMBOBOX_COMPUTED: &[&str] = &[
     "tagsShown",
 ];
 
+/// What a palette of commands reads and sends, by the name the machine binds.
+pub const COMMAND: &[(&str, Names)] = &[
+    ("fallbackLabel", Names::Prop),
+    ("inline", Names::Prop),
+    ("label", Names::Prop),
+    ("page", Names::Prop),
+    ("onBeforeSelect", Names::Event),
+    ("onSelect", Names::Event),
+];
+
+/// What a palette computes for its parts, each read as `commandRoot.x`.
+pub const COMMAND_COMPUTED: &[&str] = &["footed", "listName", "modal", "status"];
+
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[
     ("description", Names::Prop),
@@ -906,6 +919,11 @@ pub fn combobox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "combobox", COMBOBOX, COMBOBOX_COMPUTED)
 }
 
+/// `commandRoot({ ... })`, each field a name.
+pub fn command_root(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "commandRoot", COMMAND, COMMAND_COMPUTED)
+}
+
 /// `option({ ... })`, each field a name.
 pub fn option(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "option", OPTION, OPTION_COMPUTED)
@@ -1013,6 +1031,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "listbox" => listbox(value),
         "select" => select(value),
         "combobox" => combobox(value),
+        "commandRoot" => command_root(value),
         "option" => option(value),
         "optionGroup" => option_group(value),
         "chatRoot" => chat_root(value),

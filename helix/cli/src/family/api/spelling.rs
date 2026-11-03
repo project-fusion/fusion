@@ -582,6 +582,19 @@ const COMBOBOX: &[Field] = &[
     ("value", "value", Name),
 ];
 
+const COMMAND: &[Field] = &[
+    ("fallbackLabel", "fallbackLabel", Name),
+    ("footed", "footed", Name),
+    ("inline", "inline", Name),
+    ("label", "label", Name),
+    ("listName", "listName", Name),
+    ("modal", "modal", Name),
+    ("onBeforeSelect", "onBeforeSelect", Name),
+    ("onSelect", "onSelect", Name),
+    ("page", "page", Name),
+    ("status", "status", Name),
+];
+
 const SELECT: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1240,6 +1253,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),
     ("combobox", "combobox", COMBOBOX),
+    ("commandRoot", "commandRoot", COMMAND),
     ("option", "option", OPTION),
     ("optionGroup", "optionGroup", OPTION_GROUP),
     ("chatRoot", "chatRoot", CHAT_ROOT),

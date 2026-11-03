@@ -61,6 +61,7 @@ import type {
   ChatRootChoice,
   CodeBlockChoice,
   ComboboxChoice,
+  CommandChoice,
   DataTableChoice,
   InspectorChoice,
   ListboxChoice,
@@ -324,6 +325,8 @@ export interface Headless {
   readonly select?: SelectChoice
   /** What the element reads, sends, and computes where it is a text field that filters a list of options. */
   readonly combobox?: ComboboxChoice
+  /** What the element reads, sends, and computes where it is a palette of commands. */
+  readonly commandRoot?: CommandChoice
   /** What the element reads, sends, and computes where it is an option. */
   readonly option?: OptionChoice
   /** What the element reads where it is a group of options, or a rule between runs. */

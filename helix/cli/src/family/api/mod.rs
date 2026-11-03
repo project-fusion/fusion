@@ -73,10 +73,10 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, DATA_TABLE,
-    INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
-    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE,
-    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND,
+    DATA_TABLE, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE,
+    SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -187,6 +187,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a text field that filters a list.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub combobox: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a palette of commands.
+    #[serde(rename = "commandRoot", skip_serializing_if = "Option::is_none")]
+    pub command_root: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is an option.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub option: Option<TreeChoice>,
@@ -365,6 +368,7 @@ impl Api {
             && self.listbox.is_none()
             && self.select.is_none()
             && self.combobox.is_none()
+            && self.command_root.is_none()
             && self.option.is_none()
             && self.option_group.is_none()
             && self.chat_root.is_none()
@@ -450,6 +454,7 @@ const FIELDS: &[&str] = &[
     "listbox",
     "select",
     "combobox",
+    "commandRoot",
     "option",
     "optionGroup",
     "chatRoot",
@@ -510,6 +515,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
         select: field("select").map(tree_choice::select).transpose()?,
         combobox: field("combobox").map(tree_choice::combobox).transpose()?,
+        command_root: field("commandRoot")
+            .map(tree_choice::command_root)
+            .transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
         option_group: field("optionGroup")
             .map(tree_choice::option_group)
