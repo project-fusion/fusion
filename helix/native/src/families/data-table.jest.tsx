@@ -122,6 +122,17 @@ describe('a table drawn from an array', () => {
     expect(shown(NAMES)).toEqual(['export'])
   })
 
+  test('a page size written as the web writes its attribute pages the rows', async () => {
+    const written = { pageSize: '2' } as unknown as { pageSize: number }
+    await draw(
+      <HelixDataTable label="Files" rowKey="id" rows={files} {...written}>
+        {columns}
+      </HelixDataTable>,
+    )
+    expect(shown(NAMES)).toEqual(NAMES.slice(0, 2))
+    expect(screen.getByLabelText('Next page')).toBeTruthy()
+  })
+
   test('a refused page stays', async () => {
     await draw(
       <HelixDataTable

@@ -68,12 +68,17 @@ const asTable = (use: MachineUse): MachineUse => ({
   },
 })
 
+/** A number as text, written as a number or as the web's attribute writes one, `page-size="4"`. */
+const numberWords = (written: unknown): string | undefined =>
+  (typeof written === 'number' || typeof written === 'string') &&
+  written !== '' &&
+  !Number.isNaN(Number(written))
+    ? String(written)
+    : undefined
+
 /** A page's size and the page, each held as a number between a page's writes. */
 const useHeldNumber = (written: unknown, seed: unknown) => {
-  const [held, setHeld] = useHeld(
-    typeof written === 'number' ? String(written) : undefined,
-    String(typeof seed === 'number' ? seed : 0),
-  )
+  const [held, setHeld] = useHeld(numberWords(written), numberWords(seed) ?? '0')
   return [Number(held), (next: number) => setHeld(String(next))] as const
 }
 
