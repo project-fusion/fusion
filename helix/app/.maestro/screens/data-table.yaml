@@ -23,12 +23,12 @@ name: "Screens: Data Table"
     visible: '.*profile\.bin'
     timeout: 20000
 - takeScreenshot: data-table-preview-page-two-${MODE}-${SIZE}
-- openLink: helix://data-table/selecting-and-arranging/selecting-and-arranging
+- openLink: helix://data-table/selecting-and-arranging/preview
 - extendedWaitUntil:
     visible: 'Select every row.*'
     timeout: 30000
 - takeScreenshot: data-table-selecting-${MODE}-${SIZE}
-- openLink: helix://data-table/column-menu/column-menu
+- openLink: helix://data-table/column-menu/preview
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: data-table-column-menu-${MODE}-${SIZE}
@@ -52,7 +52,7 @@ name: "Screens: Data Table"
     visible: '.*asset-018\.webp'
     timeout: 20000
 - takeScreenshot: data-table-column-menu-descending-${MODE}-${SIZE}
-- openLink: helix://data-table/nested-rows/nested-rows
+- openLink: helix://data-table/nested-rows/preview
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: data-table-nested-rows-${MODE}-${SIZE}
