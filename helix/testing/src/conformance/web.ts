@@ -44,7 +44,9 @@ const build = (setup: Setup): Updatable => {
       made.setAttribute(name, value === true ? '' : String(value))
     }
   }
-  if (setup.items !== undefined) {
+  if (setup.items !== undefined && setup.tag === 'helix-data-table') {
+    ;(made as Updatable & { rows?: unknown }).rows = setup.items
+  } else if (setup.items !== undefined) {
     const holds = made as Updatable & { items?: unknown; renderItem?: unknown; textField?: string }
     holds.items = setup.items
     const field = String(setup.props?.['text-field'] ?? '')

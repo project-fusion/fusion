@@ -214,7 +214,11 @@ const drawChild = (run: Run, child: Setup | string): ReactElement | string => {
 
 /** What a setup hands a family whose content is data. */
 const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
-  ...(setup.items === undefined ? {} : { items: setup.items }),
+  ...(setup.items === undefined
+    ? {}
+    : setup.tag === 'helix-data-table'
+      ? { rows: setup.items }
+      : { items: setup.items }),
   ...logProps(setup),
   ...chatProps(setup),
   ...(setup.value === undefined ? {} : { value: setup.value }),

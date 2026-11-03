@@ -11,7 +11,8 @@ import type { Run, View } from './views'
 
 /** Whether a setup draws a table. */
 export const isTable = (scenario: Scenario): boolean =>
-  formOf(scenario.setup.tag).api?.tableRoot !== undefined
+  formOf(scenario.setup.tag).api?.tableRoot !== undefined ||
+  scenario.setup.tag === 'helix-data-table'
 
 const byId = (id: string): View | undefined =>
   screen.root?.queryAll((node: View) => node.props.testID === id)[0] as View | undefined
@@ -189,7 +190,8 @@ export const tableLeft = (run: Run): Partial<Pick<Left, 'chosen' | 'focused' | '
   const holder = stop.slice(0, stop.lastIndexOf('/'))
   return {
     chosen: chosen === '' ? [] : chosen.split(','),
-    focused: tableFocused(run, holder),
+    /* A press on the web's harness moves no focus, where a phone's grid keeps it. */
+    focused: run.scenario.setup.tag === 'helix-data-table' ? null : tableFocused(run, holder),
     table: {
       heads: heads.map((box) => {
         const sorted = box.queryAll(

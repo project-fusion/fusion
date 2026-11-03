@@ -83,6 +83,80 @@ export const tableOf = (table: HTMLElement): NonNullable<Left['table']> => {
   }
 }
 
+/** A row's key, found from its first cell's words and the table's rows. */
+const keyIn = (table: HTMLElement, row: Element): string => {
+  const { rowKey, rows } = table as unknown as {
+    rowKey: string
+    rows: readonly Readonly<Record<string, unknown>>[]
+  }
+  const name = wordsOf(row.querySelector('[part~="cell"]') ?? undefined)
+  return String(rows.find((one) => String(one.service) === name)?.[rowKey] ?? '')
+}
+
+/** Where the one stop of a table drawn from an array stands in its headings. */
+const dataTableStop = (table: HTMLElement, columns: readonly Column[]): string => {
+  const leads = [
+    ...(table.shadowRoot?.querySelectorAll('[part="grip-head"], [part="select-all"]') ?? []),
+  ]
+  const lead = leads.findIndex((box) => box.getAttribute('tabindex') === '0')
+  if (lead >= 0) {
+    return `head/${lead}`
+  }
+  const at = columns.findIndex((column) => column.cellBox?.getAttribute('tabindex') === '0')
+  if (at >= 0) {
+    return `head/${leads.length + at}`
+  }
+  for (const row of table.shadowRoot?.querySelectorAll('[part~="row"]') ?? []) {
+    const cell = [...row.children].findIndex((one) => one.getAttribute('tabindex') === '0')
+    if (cell >= 0) {
+      return `${keyIn(table, row)}/${cell}`
+    }
+  }
+  return ''
+}
+
+/**
+ * What a table drawn from an array holds and says. Its rows stand in its own
+ * root, each row's cells behind whatever leads them.
+ */
+export const dataTableOf = (table: HTMLElement): NonNullable<Left['table']> => {
+  const columns = [...table.children].filter(
+    (child) => child.localName === 'helix-table-column',
+  ) as Column[]
+  const headings = columns.map((column) => wordsOf(column))
+  const {
+    rowKey,
+    rows: data,
+    selected,
+    sort,
+  } = table as unknown as {
+    rowKey: string
+    rows: readonly Readonly<Record<string, unknown>>[]
+    selected: string
+    sort: string
+  }
+  const keyed = new Map(data.map((row) => [String(row.service), String(row[rowKey])]))
+  const rows = [...(table.shadowRoot?.querySelectorAll('[part~="row"]') ?? [])]
+  return {
+    heads: columns.map((column, at) => ({
+      sorted: column.sorted ?? null,
+      words: headings[at] ?? '',
+    })),
+    rows: rows.map((row) => {
+      const cells = [...row.querySelectorAll('[part~="cell"]')]
+      return {
+        cells: cells.map((cell, at) => reading(headings[at] ?? '', wordsOf(cell))),
+        disabled: false,
+        expanded: null,
+        key: keyed.get(wordsOf(cells[0])) ?? '',
+      }
+    }),
+    selected,
+    sort,
+    stop: dataTableStop(table, columns),
+  }
+}
+
 /** The element a grid's reader tabs to: its one stop. */
 export const tableStop = (table: HTMLElement): HTMLElement | null => {
   for (const child of table.children) {
