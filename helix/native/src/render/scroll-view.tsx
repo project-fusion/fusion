@@ -89,7 +89,8 @@ const both =
  * what a scroll view takes, a `ref` among them, which the scroll
  * capability's `observe` and `to` take as the node. **Inside a layer that
  * swipes along its axis, it hands its drag to the layer at its start**, as a
- * scrolling part does.
+ * scrolling part does. **A press in it reaches what it lands on with a keyboard
+ * up**, unless `keyboardShouldPersistTaps` says otherwise.
  */
 export const ScrollArea = ({
   ref,
@@ -117,6 +118,7 @@ export const ScrollArea = ({
   const drawn = (
     <ScrollView
       {...props}
+      keyboardShouldPersistTaps={props.keyboardShouldPersistTaps ?? 'handled'}
       onContentSizeChange={both(told.onContentSizeChange, props.onContentSizeChange)}
       onLayout={both(told.onLayout, props.onLayout)}
       onMomentumScrollBegin={both(told.onMomentumScrollBegin, props.onMomentumScrollBegin)}

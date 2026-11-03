@@ -36,6 +36,17 @@ import { WrapWidth } from './text'
 export type { Pager } from './scroll-parts'
 export { ScrollArea, useScrollLocked } from './scroll-view'
 
+/**
+ * What a press inside a part that scrolls does with a keyboard up: it reaches
+ * what it lands on, as a press does on the web, unless the binding says
+ * otherwise. React Native's default spends a first press on putting the
+ * keyboard away, in every scroll view around the press, so a dialog's surface
+ * or a field's panel that scrolls swallowed it although the list inside kept
+ * handled presses.
+ */
+const tapsKept = (given: unknown): ScrollViewProps['keyboardShouldPersistTaps'] =>
+  (given ?? 'handled') as ScrollViewProps['keyboardShouldPersistTaps']
+
 /** What `ScrollingPart` takes. */
 interface ScrollingProps {
   /** The axis the part scrolls along, or both. */
@@ -190,8 +201,7 @@ export const ScrollingPart = ({
   const handOff = useHandOff(twoWays ? undefined : horizontal ? 'x' : 'y', own)
   const through = passingThrough(props.pointerEvents, more, locked, handOff.waits)
   const shared = {
-    keyboardShouldPersistTaps:
-      keyboardShouldPersistTaps as ScrollViewProps['keyboardShouldPersistTaps'],
+    keyboardShouldPersistTaps: tapsKept(keyboardShouldPersistTaps),
     scrollEnabled: through.scrollEnabled,
     scrollEventThrottle: 16,
     showsHorizontalScrollIndicator: indicators === true,

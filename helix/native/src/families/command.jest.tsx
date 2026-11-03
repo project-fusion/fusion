@@ -73,14 +73,22 @@ describe('Command', () => {
     await type('sav')
     expect(screen.getByText('Save all')).toBeTruthy()
     expect(screen.queryByText('New file')).toBeNull()
-    /* With the filter's keyboard up, the list's scroller hands a press on a command to
-       the command, where a first press on Android only put the keyboard away. */
+    /* With the filter's keyboard up, every scroll view around a command hands a press
+       on it to the command: the dialog's surface as well as the list. One that does
+       not spends the first press on putting the keyboard away, on iOS and Android. */
     const kept: unknown[] = []
-    type Up = { readonly parent: Up | null; readonly props: Record<string, unknown> } | null
+    type Up = {
+      readonly parent: Up | null
+      readonly props: Record<string, unknown>
+      readonly type: unknown
+    } | null
     for (let at = screen.getByText('Save all') as unknown as Up; at !== null; at = at.parent) {
-      kept.push(at.props.keyboardShouldPersistTaps)
+      if (at.type === 'RCTScrollView') {
+        kept.push(at.props.keyboardShouldPersistTaps)
+      }
     }
-    expect(kept).toContain('handled')
+    expect(kept.length).toBeGreaterThan(1)
+    expect(kept.every((one) => one === 'handled')).toBe(true)
   })
 
   test('a choice asks before-select, says select, and closes', async () => {

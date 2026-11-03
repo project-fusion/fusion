@@ -155,6 +155,21 @@ describe('Filter Input on a phone', () => {
       fireEvent(field(), 'selectionChange', { nativeEvent: { selection: { end: 2, start: 2 } } }),
     )
     expect(screen.queryByText('status')).toBeNull()
+    /* The panel scrolls, and with the field's keyboard up it hands a press on an
+       option to the option, where a first press only put the keyboard away. */
+    type Up = {
+      readonly parent: Up | null
+      readonly props: Record<string, unknown>
+      readonly type: unknown
+    } | null
+    const kept: unknown[] = []
+    for (let at = screen.getByText('owner') as unknown as Up; at !== null; at = at.parent) {
+      if (at.type === 'RCTScrollView') {
+        kept.push(at.props.keyboardShouldPersistTaps)
+      }
+    }
+    expect(kept.length).toBeGreaterThan(0)
+    expect(kept.every((one) => one === 'handled')).toBe(true)
     await on(() => fireEvent.press(screen.getByText('owner')))
     expect(chosen).toEqual(['owner'])
   })
