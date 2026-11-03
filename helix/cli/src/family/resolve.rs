@@ -73,6 +73,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.pagination_size,
         &api.listbox,
         &api.select,
+        &api.combobox,
         &api.option,
         &api.option_group,
         &api.chat_root,
@@ -240,6 +241,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
         ),
         ("listbox", &family.api.listbox, api::LISTBOX),
         ("select", &family.api.select, api::SELECT),
+        ("combobox", &family.api.combobox, api::COMBOBOX),
         ("option", &family.api.option, api::OPTION),
         ("optionGroup", &family.api.option_group, api::OPTION_GROUP),
         ("chatRoot", &family.api.chat_root, api::CHAT_ROOT),
@@ -342,9 +344,10 @@ pub fn unresolved(family: &Family) -> Vec<String> {
             && family.api.color.is_none()
             && family.api.listbox.is_none()
             && family.api.select.is_none()
+            && family.api.combobox.is_none()
         {
             found.push(
-                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files`, `color`, `listbox` or `select` holds its answer"
+                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files`, `color`, `listbox`, `select` or `combobox` holds its answer"
                     .to_owned(),
             );
         }
@@ -531,7 +534,8 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
         channels. */
         let holds = family.api.color.is_some()
             || family.api.listbox.is_some()
-            || family.api.select.is_some();
+            || family.api.select.is_some()
+            || family.api.combobox.is_some();
         for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
@@ -579,7 +583,8 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
         /* A color holds what its axes move, as a color picker's square. */
         let holds = family.api.color.is_some()
             || family.api.listbox.is_some()
-            || family.api.select.is_some();
+            || family.api.select.is_some()
+            || family.api.combobox.is_some();
         for name in controls.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"

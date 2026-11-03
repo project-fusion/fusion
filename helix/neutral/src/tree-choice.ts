@@ -410,6 +410,49 @@ export interface TailChoice {
   readonly threshold?: string
 }
 
+/** What a text field that filters a list of options reads, sends, and computes. */
+export interface ComboboxChoice {
+  readonly allowsCustomValue?: string
+  readonly collapseLabel?: string
+  readonly creatable?: string
+  readonly createActive?: string
+  readonly createLabel?: string
+  readonly createShown?: string
+  readonly createWords?: string
+  readonly defaultValue?: string
+  readonly disabled?: string
+  readonly expandable?: string
+  readonly expandLabel?: string
+  readonly fieldPlaceholder?: string
+  readonly filterDelay?: string
+  readonly listLabel?: string
+  readonly listName?: string
+  readonly maxTags?: string
+  readonly multiple?: string
+  readonly onBeforeChange?: string
+  readonly onBeforeFilter?: string
+  readonly onChange?: string
+  readonly onCreate?: string
+  readonly onFilter?: string
+  readonly onInput?: string
+  readonly openOn?: string
+  readonly placeholder?: string
+  readonly readonly?: string
+  readonly removeLabel?: string
+  readonly restLabel?: string
+  readonly restPress?: string
+  readonly restShown?: string
+  readonly restText?: string
+  readonly restWords?: string
+  readonly resultsLabel?: string
+  readonly selectedLabel?: string
+  readonly status?: string
+  readonly suggest?: string
+  readonly tags?: string
+  readonly tagsShown?: string
+  readonly value?: string
+}
+
 /** What a field that opens a list of options reads, sends, and computes. */
 export interface SelectChoice {
   readonly defaultValue?: string

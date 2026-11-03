@@ -302,6 +302,21 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What a field that opens a list of options computes for its parts. */
   readonly select: Computes<'listName' | 'said' | 'status' | 'unchosen' | 'words'>
+  /** What a text field that filters a list of options computes for its parts. */
+  readonly combobox: Computes<
+    | 'createActive'
+    | 'createShown'
+    | 'createWords'
+    | 'fieldPlaceholder'
+    | 'listName'
+    | 'restLabel'
+    | 'restPress'
+    | 'restShown'
+    | 'restWords'
+    | 'status'
+    | 'tags'
+    | 'tagsShown'
+  >
   /** What an option computes for its parts. */
   readonly option: Computes<
     | 'checkShown'
