@@ -97,9 +97,12 @@ const control = () => boxPart().children[0] as Drawn
 /** The mark over it. */
 const mark = () => boxPart().children[1] as Drawn
 
+/** The mark's own view, inside the layer that centers it over the box. */
+const markInside = () => mark().children[0] as Drawn
+
 /** The mark's scale, as its transform says. */
 const scale = (): unknown =>
-  (styleOf(mark()).transform as readonly Record<string, unknown>[] | undefined)?.find(
+  (styleOf(markInside()).transform as readonly Record<string, unknown>[] | undefined)?.find(
     (step) => 'scaleX' in step,
   )?.scaleX
 
@@ -165,6 +168,18 @@ describe('the generated Checkbox', () => {
     await fireEvent.press(theBox())
     expect(state()).toBe(false)
     expect(scale()).toBe(0)
+  })
+
+  test('centers the mark over the box without a percentage, which Yoga reads against the row', async () => {
+    await render(<Checkbox defaultChecked>Terms</Checkbox>)
+    const style = styleOf(mark())
+    expect([style.top, style.bottom, style.left, style.right]).toEqual([0, 0, 0, 0])
+    expect([style.alignItems, style.justifyContent]).toEqual(['center', 'center'])
+  })
+
+  test('keeps the gap beside words written between its tags', async () => {
+    await render(<Checkbox>Terms</Checkbox>)
+    expect(styleOf(theBox()).gap).toBeGreaterThan(0)
   })
 
   test('strokes the tick at the weight the web masks it with, in the mark color', async () => {
@@ -239,7 +254,7 @@ describe('the generated Checkbox', () => {
     const words = styleOf(screen.getByText('Terms')).fontSize as number
     await act(() => atTextSize(3.571))
     expect(styleOf(control()).width).toBeCloseTo(size * 1.353, 1)
-    expect(styleOf(mark()).width).toBeCloseTo(size * 1.353, 1)
+    expect(styleOf(markInside()).width).toBeCloseTo(size * 1.353, 1)
     expect(styleOf(screen.getByText('Terms')).fontSize).toBeCloseTo(words * 3.571, 1)
   })
 })

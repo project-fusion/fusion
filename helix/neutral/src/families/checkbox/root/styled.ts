@@ -210,15 +210,11 @@ export default styles(
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
       }),
-      /* A phone's grid has no shared cell, so the mark lies over the box. */
-      native([
-        rule({
-          insetBlockStart: '50%',
-          insetInlineStart: '50%',
-          position: 'absolute',
-          translate: '-50% -50%',
-        }),
-      ]),
+      /* A phone's grid has no shared cell, so the mark lies over the box.
+         Centered by `inset` and `margin`: under the row's least height, Yoga
+         resolved a `top` of 50% against the row and stood the mark below the
+         box, measured on iOS on November 2, 2026. */
+      native([rule({ inset: 0, margin: 'auto', position: 'absolute' })]),
       rule(marked, { scale: 1 }),
       /* The dash wins where both are set, and `mark-dash` outlasts the mixed
          state, so emptying a mixed set does not flash a tick. */
