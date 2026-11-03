@@ -68,7 +68,7 @@ const RENAMED: Readonly<Record<string, string>> = {
 }
 
 /** The corners' own radii, which `border-radius` sets as it is written. */
-const CORNERS = [
+export const CORNERS = [
   'borderBottomEndRadius',
   'borderBottomStartRadius',
   'borderTopEndRadius',
