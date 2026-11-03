@@ -39,6 +39,7 @@ export type Family =
   | 'notifications'
   | 'object-inspector'
   | 'pagination'
+  | 'data-table'
   | 'table'
   | 'outline'
   | 'pin-input'
