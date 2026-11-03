@@ -5,6 +5,7 @@
  */
 import { parse } from '@fusion.dev/helix-core/table'
 import { createContext, type ReactNode } from 'react'
+import { View } from 'react-native'
 import { madeFor } from '../render/made'
 
 /** What a table offers the menus of its columns. */
@@ -35,6 +36,9 @@ export interface MenuColumn {
   readonly moves: boolean
   readonly sorts: boolean
 }
+
+/** A menu's box on the heading's line. */
+const CENTERED = { alignSelf: 'center' } as const
 
 /** Does what a row of the menu says. */
 const choose = (menus: DataTableMenus, field: string, value: string): void => {
@@ -101,28 +105,32 @@ export const drawMenu = (menus: DataTableMenus, column: MenuColumn): ReactNode =
       ...(menus.restorable.length > 0 ? [row('restore', menus.says('showColumnsLabel'))] : []),
     ],
   ].filter((group) => group.length > 0)
+  /* A Menu draws no box of its own, and its trigger stands at the start of its line,
+     so a box of this one's holds it on the line of the heading's words. */
   return (
-    <menu.Component
-      label={column.label}
-      onBeforeCheck={(event: { preventDefault: () => void }) => event.preventDefault()}
-      onSelect={(event: { readonly detail: { readonly value: string } }) =>
-        choose(menus, field, event.detail.value)
-      }
-      trigger={
-        <button.Component label={column.label}>
-          {icon === undefined ? null : <icon.Component name="dots-three" />}
-        </button.Component>
-      }
-    >
-      {groups.flatMap((group) => {
-        const first = group[0] as { readonly key: string }
-        return [
-          ...(first === (groups[0]?.[0] as unknown) || divider === undefined
-            ? []
-            : [<divider.Component key={`line-${first.key}`} />]),
-          ...group,
-        ]
-      })}
-    </menu.Component>
+    <View style={CENTERED}>
+      <menu.Component
+        label={column.label}
+        onBeforeCheck={(event: { preventDefault: () => void }) => event.preventDefault()}
+        onSelect={(event: { readonly detail: { readonly value: string } }) =>
+          choose(menus, field, event.detail.value)
+        }
+        trigger={
+          <button.Component label={column.label}>
+            {icon === undefined ? null : <icon.Component name="dots-three" />}
+          </button.Component>
+        }
+      >
+        {groups.flatMap((group) => {
+          const first = group[0] as { readonly key: string }
+          return [
+            ...(first === (groups[0]?.[0] as unknown) || divider === undefined
+              ? []
+              : [<divider.Component key={`line-${first.key}`} />]),
+            ...group,
+          ]
+        })}
+      </menu.Component>
+    </View>
   )
 }
