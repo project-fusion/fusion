@@ -182,6 +182,14 @@
       "types": "./dist/combobox/index.d.ts",
       "default": "./dist/combobox/index.js"
     },
+    "./command": {
+      "react-native": {
+        "types": "./dist/command/index.native.d.ts",
+        "default": "./dist/command/index.native.js"
+      },
+      "types": "./dist/command/index.d.ts",
+      "default": "./dist/command/index.js"
+    },
     "./copy-button": {
       "react-native": {
         "types": "./dist/copy-button/index.native.d.ts",

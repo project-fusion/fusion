@@ -5,8 +5,7 @@ import { property } from 'lit/decorators.js'
 import '../../dialog/index.js'
 import '../../listbox/index.js'
 import '../../option/index.js'
-import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './command-root.css.js'
+import { styles } from './command-root.generated.css.js'
 
 /**
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
@@ -45,7 +44,7 @@ export class HelixCommand extends HelixHeadlessCommand {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
-  static override styles: CSSResultGroup = [liveStyles, styles]
+  static override styles: CSSResultGroup = styles
 
   protected override updated(changed: PropertyValues): void {
     super.updated?.(changed)
