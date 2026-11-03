@@ -1,5 +1,8 @@
 # Data Table, its examples drawn alone, one screenshot of each, named by the
 # example, `MODE`, and `SIZE`, and the rows again once a press has moved them.
+# A cell is named by its column and its words, `Name: archive.tar.gz`, which iOS
+# reads in place of the words, and a checkbox's name carries its state on
+# Android, `Select every row, mixed`, so each wait matches the words inside.
 appId: dev.fusion.helix.app
 name: "Screens: Data Table"
 ---
@@ -8,7 +11,7 @@ name: "Screens: Data Table"
     commands:
       - openLink: helix://data-table/preview/preview
       - extendedWaitUntil:
-          visible: archive.tar.gz
+          visible: '.*archive\.tar\.gz'
           timeout: 30000
 - waitForAnimationToEnd:
     timeout: 5000
@@ -17,12 +20,12 @@ name: "Screens: Data Table"
     text: Next page
     retryTapIfNoChange: false
 - extendedWaitUntil:
-    visible: profile.bin
+    visible: '.*profile\.bin'
     timeout: 20000
 - takeScreenshot: data-table-preview-page-two-${MODE}-${SIZE}
 - openLink: helix://data-table/selecting-and-arranging/selecting-and-arranging
 - extendedWaitUntil:
-    visible: Select every row
+    visible: 'Select every row.*'
     timeout: 30000
 - takeScreenshot: data-table-selecting-${MODE}-${SIZE}
 - openLink: helix://data-table/column-menu/column-menu
@@ -46,7 +49,7 @@ name: "Screens: Data Table"
     text: Sort descending
     retryTapIfNoChange: false
 - extendedWaitUntil:
-    visible: asset-018.webp
+    visible: '.*asset-018\.webp'
     timeout: 20000
 - takeScreenshot: data-table-column-menu-descending-${MODE}-${SIZE}
 - openLink: helix://data-table/nested-rows/nested-rows
