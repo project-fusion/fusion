@@ -1,17 +1,9 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterInput } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
-import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
-import { styles } from './filter-input-root.css.js'
+import { styles } from './filter-input-root.generated.css.js'
 import '../../voice-level/index.js'
 
 /**
@@ -63,19 +55,7 @@ export class HelixFilterInput extends HelixHeadlessFilterInput {
   /* So the chips `chips` writes are this tier's `helix-filter-chip`. */
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    glyphStyles,
-    fieldStyles,
-    fieldFrameStyles,
-    fieldStackedStyles,
-    tagRowStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    collectionStateStyles,
-    styles,
-    dictationStyles,
-  ]
+  static override styles: CSSResultGroup = [glyphStyles, styles, dictationStyles]
 }
 
 declare global {
