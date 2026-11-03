@@ -1,5 +1,6 @@
 import { formatMessage } from '../../words/message.js'
 import { lookupWord } from '../../words/registry.js'
+import { labelWith } from '../fill-template/fill-template.js'
 
 /** The English a tag's remove button is named by, with `{label}` for the tag's words. */
 export const REMOVE_LABEL = 'Remove {label}'
@@ -60,4 +61,44 @@ export const removeName = (props: RemoveProps): string => {
     return formatMessage(label, { label: words }, locale).trim()
   }
   return words === '' || label.includes(words) ? label : `${label} ${words}`
+}
+
+/** The English a filter chip's remove button is named by, before the chip's words. */
+export const FILTER_REMOVE_LABEL = 'Remove filter'
+
+/** The props a filter chip's remove button's name is worked out from, by the web's names. */
+export interface FilterRemoveProps {
+  readonly default?: unknown
+  readonly 'dismiss-label'?: unknown
+  readonly field?: unknown
+  readonly label?: unknown
+  readonly locale?: unknown
+  readonly 'operator-label'?: unknown
+}
+
+/**
+ * A filter chip's remove button's name, as the web chip names it:
+ * `dismiss-label` with the chip's words, its field, its comparison, and its
+ * values, such as "Remove filter Status is not open", where it writes `{label}`,
+ * and the words after it where it does not.
+ *
+ * **The field's words are what is passed into `field`**, and otherwise `label`.
+ * A label given as its English reads the words registered for
+ * `helix-filter-chip` in `locale`, as a phone cannot tell it from one left unset.
+ */
+export const filterRemoveName = (props: FilterRemoveProps): string => {
+  const locale = typeof props.locale === 'string' && props.locale !== '' ? props.locale : 'en'
+  const own = props['dismiss-label']
+  const registered = lookupWord(locale, 'helix-filter-chip', 'dismissLabel')?.[0]
+  const label =
+    typeof own === 'string' && own !== FILTER_REMOVE_LABEL
+      ? own
+      : typeof registered === 'string'
+        ? registered
+        : FILTER_REMOVE_LABEL
+  const field = contentWords(props.field) || contentWords(props.label)
+  const words = [field, contentWords(props['operator-label']), contentWords(props.default)]
+    .filter(Boolean)
+    .join(' ')
+  return labelWith(label, 'label', words)
 }

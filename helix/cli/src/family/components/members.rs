@@ -378,8 +378,16 @@ pub fn typed_members(
             .into_iter()
             .chain(hooks::id(family)),
     );
-    /* A form control's ref is its handle, as a field's is on the web. */
-    if family.api.validation.is_some() {
+    /* A field for filters offers its text and its caret on its handle, as the web
+    element's members do. */
+    if family.api.filter_input.is_some() {
+        members.push(Member {
+            doc: vec!["The field's handle. `validate()` shows what is wrong with the answer, and `value`, `selectionStart`, `selectionEnd`, `setSelectionRange()` and `updateComplete` are the web element's members.".to_owned()],
+            name: "ref".to_owned(),
+            ty: "Ref<FilterInputHandle>".to_owned(),
+        });
+    } else if family.api.validation.is_some() {
+        /* A form control's ref is its handle, as a field's is on the web. */
         /* A control that holds files offers them on its handle too, as the
         web element's methods do. */
         let (ty, doc) = if family.api.files.is_some() {

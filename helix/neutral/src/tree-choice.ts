@@ -424,6 +424,53 @@ export interface CommandChoice {
   readonly status?: string
 }
 
+/** What a text field for filters reads, sends, and computes. */
+export interface FilterInputChoice {
+  readonly busy?: string
+  readonly chips?: string
+  readonly clearable?: string
+  readonly clearLabel?: string
+  readonly clearShown?: string
+  readonly collapseLabel?: string
+  readonly defaultValue?: string
+  readonly disabled?: string
+  readonly expandable?: string
+  readonly expandLabel?: string
+  readonly filterDelay?: string
+  readonly filterSuggestions?: string
+  readonly listName?: string
+  readonly loading?: string
+  readonly loadingText?: string
+  readonly maxTags?: string
+  readonly noResultsText?: string
+  readonly onBeforeChange?: string
+  readonly onBeforeFacet?: string
+  readonly onChange?: string
+  readonly onDismiss?: string
+  readonly onFacet?: string
+  readonly onInput?: string
+  readonly placeholder?: string
+  readonly restLabel?: string
+  readonly restPress?: string
+  readonly restShown?: string
+  readonly restText?: string
+  readonly restWords?: string
+  readonly source?: string
+  readonly status?: string
+  readonly suggestionLabel?: string
+  readonly suggestionsLabel?: string
+  readonly unmatched?: string
+  readonly value?: string
+}
+
+/** What a menu that builds a filter reads and sends. */
+export interface FilterMenuChoice {
+  readonly fallbackLabel?: string
+  readonly label?: string
+  readonly onBeforeFacet?: string
+  readonly onFacet?: string
+}
+
 /** What a text field that filters a list of options reads, sends, and computes. */
 export interface ComboboxChoice {
   readonly allowsCustomValue?: string
