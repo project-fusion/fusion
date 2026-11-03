@@ -22,6 +22,7 @@ import { useCombobox } from './combobox'
 import { useCommand } from './command'
 import { type Copied, useCopy } from './copy'
 import { useDataTable } from './data-table'
+import { useDatePicker } from './date-picker'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
@@ -453,6 +454,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             usePaginationSize(family, props, use),
+      ),
+    /* A month calendar. */
+    ...uses
+      .filter((use) => use.machine === 'date-picker')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useDatePicker(family, props, use),
       ),
     /* A carousel. */
     ...uses
