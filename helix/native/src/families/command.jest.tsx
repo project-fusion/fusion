@@ -73,6 +73,14 @@ describe('Command', () => {
     await type('sav')
     expect(screen.getByText('Save all')).toBeTruthy()
     expect(screen.queryByText('New file')).toBeNull()
+    /* With the filter's keyboard up, the list's scroller hands a press on a command to
+       the command, where a first press on Android only put the keyboard away. */
+    const kept: unknown[] = []
+    type Up = { readonly parent: Up | null; readonly props: Record<string, unknown> } | null
+    for (let at = screen.getByText('Save all') as unknown as Up; at !== null; at = at.parent) {
+      kept.push(at.props.keyboardShouldPersistTaps)
+    }
+    expect(kept).toContain('handled')
   })
 
   test('a choice asks before-select, says select, and closes', async () => {

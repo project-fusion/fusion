@@ -435,13 +435,11 @@ const drawingOf = (
 })
 
 /** What the list part does as it scrolls. */
-const itemsBinding = (
-  scrolling: ReturnType<typeof useScrolling>,
-  keepsKeyboard: boolean,
-): PartBinding => ({
+const itemsBinding = (scrolling: ReturnType<typeof useScrolling>): PartBinding => ({
   view: {
-    /* A press on an option chooses it, with a field's keyboard still up. */
-    ...(keepsKeyboard ? { keyboardShouldPersistTaps: 'handled' } : {}),
+    /* A press on an option chooses it with a keyboard up, a field's around the list or
+       the list's own filter's, where a first press would only put the keyboard away. */
+    keyboardShouldPersistTaps: 'handled',
     onScroll: ({ nativeEvent }: Scrolled) =>
       scrolling.moved(
         nativeEvent.contentOffset.y,
@@ -721,7 +719,7 @@ export const useListbox = (
             [state('windowed')]: windowed,
           },
         },
-        items: itemsBinding(scrolling, owned?.keepsFocus === true),
+        items: itemsBinding(scrolling),
         rows: windowed ? { windowed: drawingOf(scrolling, rows) } : {},
         'search-field': fieldBinding(filter, fieldKey, listening),
       },
