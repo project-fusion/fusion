@@ -73,7 +73,7 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, DATA_TABLE,
+    TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, DATA_TABLE,
     INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
     NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE,
     TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
@@ -184,6 +184,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it opens a list of options.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub select: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a text field that filters a list.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub combobox: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is an option.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub option: Option<TreeChoice>,
@@ -361,6 +364,7 @@ impl Api {
             && self.pagination_size.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
+            && self.combobox.is_none()
             && self.option.is_none()
             && self.option_group.is_none()
             && self.chat_root.is_none()
@@ -445,6 +449,7 @@ const FIELDS: &[&str] = &[
     "paginationSize",
     "listbox",
     "select",
+    "combobox",
     "option",
     "optionGroup",
     "chatRoot",
@@ -504,6 +509,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
         select: field("select").map(tree_choice::select).transpose()?,
+        combobox: field("combobox").map(tree_choice::combobox).transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
         option_group: field("optionGroup")
             .map(tree_choice::option_group)

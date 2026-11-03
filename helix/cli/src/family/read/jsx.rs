@@ -87,6 +87,7 @@ const GIVEN: &[&str] = &[
     "paginationSize",
     "listbox",
     "select",
+    "combobox",
     "option",
     "optionGroup",
     "chatRoot",
