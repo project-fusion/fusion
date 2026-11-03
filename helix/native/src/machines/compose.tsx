@@ -19,6 +19,7 @@ import { useCodeBlock } from './code-block'
 import { useColor } from './color'
 import { useColorField } from './color-field'
 import { useCombobox } from './combobox'
+import { useCommand } from './command'
 import { type Copied, useCopy } from './copy'
 import { useDataTable } from './data-table'
 import { standsOpen, useReportOpen } from './disclosed'
@@ -390,6 +391,13 @@ export const behaviorFor = (family: Family): UseBehavior => {
             around.chosen.current = value
             return behavior
           },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'command')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useCommand(family, props, use, around.toggled),
       ),
     ...uses
       .filter((use) => use.machine === 'option')
