@@ -18,6 +18,7 @@ import { useChatMessage } from './chat-message'
 import { useCodeBlock } from './code-block'
 import { useColor } from './color'
 import { useColorField } from './color-field'
+import { useCombobox } from './combobox'
 import { type Copied, useCopy } from './copy'
 import { useDataTable } from './data-table'
 import { standsOpen, useReportOpen } from './disclosed'
@@ -369,6 +370,22 @@ export const behaviorFor = (family: Family): UseBehavior => {
               around.toggled,
               around.touch,
               around.layering,
+            )
+            around.chosen.current = value
+            return behavior
+          },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'combobox')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, value } = useCombobox(
+              family,
+              props,
+              use,
+              around.toggled,
+              around.touch,
             )
             around.chosen.current = value
             return behavior

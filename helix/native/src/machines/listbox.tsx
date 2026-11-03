@@ -16,10 +16,12 @@ import {
   dataOptions,
   filterKeeps,
 } from '@fusion.dev/helix-core/listbox'
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import type { ListHands } from './combobox-keys'
+import type { ListOwner } from './list-owner'
 import {
   moveOption,
   useFilter,
@@ -45,7 +47,6 @@ import {
 import { heardKey, type ListRun } from './listbox-run'
 import { type OptionMember, type OptionOwner, OptionOwnerContext } from './option'
 import { boundTo, given, senderOf, tell, told } from './props'
-import type { ListOwner } from './select'
 import { useFollow, useVirtualFocus, type VirtualFocus } from './virtual-focus'
 import type { DrawnRow, WindowDrawing, WindowScroller } from './window'
 
@@ -165,7 +166,7 @@ const useOpening = (
       return
     }
     done.current = true
-    keysHere.current = true
+    keysHere.current = owned.keepsFocus !== true
     byKeys.current = true
     const { value, where } = owned.opening
     if (value === undefined) {
@@ -178,7 +179,7 @@ const useOpening = (
   const { active } = focus
   const landed = useRef(false)
   useEffect(() => {
-    if (owned === undefined || landed.current || active === '') {
+    if (owned === undefined || owned.keepsFocus === true || landed.current || active === '') {
       return undefined
     }
     landed.current = true
@@ -244,6 +245,10 @@ const useScrolling = (
   const offset = useRef(0)
   const list = useRef<WindowScroller | null>(null)
   const scroller = useRef<Scroller>(null)
+  /* The scroll view inside the part's frame, which scrolls an option into view. */
+  const held = useCallback((node: unknown) => {
+    scroller.current = node as Scroller
+  }, [])
   const askedAt = useRef(-1)
   const scrollTo = (to: number): void => {
     offset.current = Math.max(0, to)
@@ -258,7 +263,7 @@ const useScrolling = (
       told(family, props, onMore, {})
     }
   }
-  return { frame, list, moved, offset, scroller, scrollTo }
+  return { frame, held, list, moved, offset, scroller, scrollTo }
 }
 
 /** Takes an option's latest in, and the place it drew in. */
@@ -430,8 +435,13 @@ const drawingOf = (
 })
 
 /** What the list part does as it scrolls. */
-const itemsBinding = (scrolling: ReturnType<typeof useScrolling>): PartBinding => ({
+const itemsBinding = (
+  scrolling: ReturnType<typeof useScrolling>,
+  keepsKeyboard: boolean,
+): PartBinding => ({
   view: {
+    /* A press on an option chooses it, with a field's keyboard still up. */
+    ...(keepsKeyboard ? { keyboardShouldPersistTaps: 'handled' } : {}),
     onScroll: ({ nativeEvent }: Scrolled) =>
       scrolling.moved(
         nativeEvent.contentOffset.y,
@@ -440,9 +450,9 @@ const itemsBinding = (scrolling: ReturnType<typeof useScrolling>): PartBinding =
       ),
     ref: (node: unknown) => {
       scrolling.frame.current = node
-      scrolling.scroller.current = node as Scroller
     },
     scrollEventThrottle: 16,
+    scrollerRef: scrolling.held,
   },
 })
 
@@ -552,6 +562,24 @@ const useInView = (
   }, [byKeys, list, shownAt, windowed])
 }
 
+/** Tells a field around where the highlight stands, and hands it the list's keys. */
+const useHanded = (owned: ListOwner | undefined, focus: VirtualFocus, given: ListHands): void => {
+  const heard = owned?.active
+  const hands = owned?.hands
+  useEffect(() => heard?.(focus.active), [focus.active, heard])
+  useEffect(
+    () => () => {
+      if (hands !== undefined) {
+        hands.current = undefined
+      }
+    },
+    [hands],
+  )
+  if (hands !== undefined) {
+    hands.current = given
+  }
+}
+
 /**
  * Hosts a list: its options and its groups, the value, the filter, the highlight,
  * and what its keys do.
@@ -567,7 +595,8 @@ export const useListbox = (
   useOrder(held, schedule)
   const focus = useVirtualFocus()
   const filter = useFilter(family, props, use, focus)
-  const typed = filter.filter.trim()
+  const owned = props.listOwner as ListOwner | undefined
+  const typed = (owned?.filter ?? filter.filter).trim()
   const filtering = typed !== ''
   const { entries, records } = useEntries(family, props, use, held, typed)
   const windowed = records !== undefined
@@ -596,7 +625,6 @@ export const useListbox = (
   const { drag, dragging, moveBy, moveTo } = useMoves(family, props, use, entries, held, scrolling)
   const current = focus.active || (chosen[0] ?? '')
   const byKeys = useRef(false)
-  const owned = props.listOwner as ListOwner | undefined
   useOpening(owned, focus, held, entries, chosen, keysHere, byKeys)
   const run: ListRun = {
     arrive: (one, forwarded) => {
@@ -623,6 +651,14 @@ export const useListbox = (
   }
   useInView(current, entries, held, scrolling, windowed, byKeys)
   const rows = useRows(entries)
+  useHanded(owned, focus, {
+    highlight: (where) => focus.highlight(where, entries, chosen),
+    key: (press) => {
+      keysHere.current = false
+      byKeys.current = true
+      return heardKey(run, press, true)
+    },
+  })
   const owner = ownerOf({
     active: focus.active,
     choose: (member) => {
@@ -685,7 +721,7 @@ export const useListbox = (
             [state('windowed')]: windowed,
           },
         },
-        items: itemsBinding(scrolling),
+        items: itemsBinding(scrolling, owned?.keepsFocus === true),
         rows: windowed ? { windowed: drawingOf(scrolling, rows) } : {},
         'search-field': fieldBinding(filter, fieldKey, listening),
       },
