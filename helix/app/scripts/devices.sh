@@ -184,9 +184,11 @@ failed_flows() {
 # another flow of the run names a drop, and this one has a command still running
 # and none that failed. In run 41391811482 Tour and Steps failed in under 200 ms,
 # their logs ending on `Opening link`, as the 25 flows around them named the drop.
+# The run's own output counts: in run 41552701183 a drop at the end of the run
+# named only there cut Menu off on a screenshot, the last flow of its pass.
 cut_short() {
   local tests="$out/debug/$1/.maestro/tests"
-  grep -qsE "$drop_words" "$tests"/*/*/logs/maestro.log &&
+  grep -qsE "$drop_words" "$tests"/*/*/logs/maestro.log "$out/debug/$1.log" &&
     grep -qsE '"status" *: *"RUNNING"' "$tests"/*/"$2"/commands.json &&
     ! grep -qsE '"status" *: *"FAILED"' "$tests"/*/"$2"/commands.json
 }
