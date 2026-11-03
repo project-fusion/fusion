@@ -62,6 +62,7 @@ export type Family =
   | 'tooltip'
   | 'tour'
   | 'listbox'
+  | 'combobox'
   | 'select'
   | 'tree'
 

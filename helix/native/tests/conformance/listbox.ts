@@ -46,3 +46,39 @@ export const selectLeft = (run: Run): Partial<Pick<Left, 'chosen' | 'focused'>> 
     focused: states?.open === true || run.focus.focused() === null ? null : setup.tag,
   }
 }
+
+/** What a Combobox holds, and the options its filter leaves while the list stands open. */
+export const comboboxLeft = (run: Run): Partial<Pick<Left, 'chosen' | 'focused' | 'options'>> => {
+  const { family, setup } = run.scenario
+  if (family !== 'combobox') {
+    return {}
+  }
+  const states = HOST_STATES.get(setup.tag)
+  const chosen = String(states?.chosen ?? '')
+    .split('\n')
+    .filter(Boolean)
+  if (states?.open !== true) {
+    return { chosen, focused: null }
+  }
+  return {
+    chosen,
+    focused: null,
+    /* The last press that says an option's words is the list's, after any tag. */
+    options: itemsIn(run).flatMap((item) => {
+      if (screen.queryAllByText(item.words).length === 0) {
+        return []
+      }
+      const press = pressOf(item.words, true)
+      const state = press.props.accessibilityState ?? {}
+      return state.selected === undefined
+        ? []
+        : [
+            {
+              disabled: state.disabled === true,
+              selected: state.selected === true,
+              value: item.value,
+            },
+          ]
+    }),
+  }
+}
