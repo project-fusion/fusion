@@ -319,6 +319,18 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   >
   /** What a palette of commands computes for its parts. */
   readonly commandRoot: Computes<'footed' | 'listName' | 'modal' | 'status'>
+  /** What a text field for filters computes for its parts. */
+  readonly filterInput: Computes<
+    | 'busy'
+    | 'clearShown'
+    | 'listName'
+    | 'restLabel'
+    | 'restPress'
+    | 'restShown'
+    | 'restWords'
+    | 'status'
+    | 'unmatched'
+  >
   /** What an option computes for its parts. */
   readonly option: Computes<
     | 'checkShown'

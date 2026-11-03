@@ -89,6 +89,8 @@ const GIVEN: &[&str] = &[
     "select",
     "combobox",
     "commandRoot",
+    "filterInput",
+    "filterMenu",
     "option",
     "optionGroup",
     "chatRoot",

@@ -21,7 +21,7 @@ import { formatNumber } from '../number-format/number-format.js'
 import { numberOf, numberOptions, textOf } from '../number-format/props.js'
 import { cleanCode, type PinCase, type PinType, separatorsAfter } from '../pin-code/pin-code.js'
 import { onApple } from '../platform/platform.js'
-import { removeName } from '../remove-name/remove-name.js'
+import { filterRemoveName, removeName } from '../remove-name/remove-name.js'
 import { sliderBoundsOf, sliderMarks, sliderSaid } from '../slider/slider.js'
 import { trendReading } from '../trend-figure/trend-props.js'
 
@@ -283,6 +283,13 @@ export const stepSays: Derivation = (props) => {
  * Apple".
  */
 export const tagRemoveName: Derivation = (props) => removeName(props)
+
+/**
+ * `filter-chip-remove-name`: what a screen reader hears a filter chip's remove
+ * button as, `dismiss-label` with the chip's field, comparison, and values, such
+ * as "Remove filter Status is not open".
+ */
+export const filterChipRemoveName: Derivation = (props) => filterRemoveName(props)
 
 /** A Pin Input's box count, `length`, at least one. */
 const boxesOf = (props: DerivationProps): number => {

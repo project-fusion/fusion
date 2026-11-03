@@ -63,6 +63,8 @@ import type {
   ComboboxChoice,
   CommandChoice,
   DataTableChoice,
+  FilterInputChoice,
+  FilterMenuChoice,
   InspectorChoice,
   ListboxChoice,
   LogGroupChoice,
@@ -327,6 +329,10 @@ export interface Headless {
   readonly combobox?: ComboboxChoice
   /** What the element reads, sends, and computes where it is a palette of commands. */
   readonly commandRoot?: CommandChoice
+  /** What the element reads, sends, and computes where it is a text field for filters. */
+  readonly filterInput?: FilterInputChoice
+  /** What the element reads and sends where it is a menu that builds a filter. */
+  readonly filterMenu?: FilterMenuChoice
   /** What the element reads, sends, and computes where it is an option. */
   readonly option?: OptionChoice
   /** What the element reads where it is a group of options, or a rule between runs. */

@@ -74,9 +74,9 @@ pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
     TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND,
-    DATA_TABLE, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
-    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE,
-    SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    DATA_TABLE, FILTER_INPUT, FILTER_MENU, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
+    NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION,
+    PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -190,6 +190,12 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a palette of commands.
     #[serde(rename = "commandRoot", skip_serializing_if = "Option::is_none")]
     pub command_root: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a text field for filters.
+    #[serde(rename = "filterInput", skip_serializing_if = "Option::is_none")]
+    pub filter_input: Option<TreeChoice>,
+    /// What the element reads and sends where it is a menu that builds a filter.
+    #[serde(rename = "filterMenu", skip_serializing_if = "Option::is_none")]
+    pub filter_menu: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is an option.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub option: Option<TreeChoice>,
@@ -369,6 +375,8 @@ impl Api {
             && self.select.is_none()
             && self.combobox.is_none()
             && self.command_root.is_none()
+            && self.filter_input.is_none()
+            && self.filter_menu.is_none()
             && self.option.is_none()
             && self.option_group.is_none()
             && self.chat_root.is_none()
@@ -455,6 +463,8 @@ const FIELDS: &[&str] = &[
     "select",
     "combobox",
     "commandRoot",
+    "filterInput",
+    "filterMenu",
     "option",
     "optionGroup",
     "chatRoot",
@@ -517,6 +527,12 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         combobox: field("combobox").map(tree_choice::combobox).transpose()?,
         command_root: field("commandRoot")
             .map(tree_choice::command_root)
+            .transpose()?,
+        filter_input: field("filterInput")
+            .map(tree_choice::filter_input)
+            .transpose()?,
+        filter_menu: field("filterMenu")
+            .map(tree_choice::filter_menu)
             .transpose()?,
         option: field("option").map(tree_choice::option).transpose()?,
         option_group: field("optionGroup")

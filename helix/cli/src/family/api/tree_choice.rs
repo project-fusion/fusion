@@ -435,6 +435,57 @@ pub const COMMAND: &[(&str, Names)] = &[
 /// What a palette computes for its parts, each read as `commandRoot.x`.
 pub const COMMAND_COMPUTED: &[&str] = &["footed", "listName", "modal", "status"];
 
+/// What a text field for filters reads and sends, by the name the machine binds.
+pub const FILTER_INPUT: &[(&str, Names)] = &[
+    ("chips", Names::Prop),
+    ("clearable", Names::Prop),
+    ("clearLabel", Names::Prop),
+    ("collapseLabel", Names::Prop),
+    ("defaultValue", Names::Prop),
+    ("disabled", Names::Prop),
+    ("expandable", Names::Prop),
+    ("expandLabel", Names::Prop),
+    ("filterDelay", Names::Prop),
+    ("filterSuggestions", Names::Prop),
+    ("loading", Names::Prop),
+    ("loadingText", Names::Prop),
+    ("maxTags", Names::Prop),
+    ("noResultsText", Names::Prop),
+    ("placeholder", Names::Prop),
+    ("restText", Names::Prop),
+    ("source", Names::Prop),
+    ("suggestionLabel", Names::Prop),
+    ("suggestionsLabel", Names::Prop),
+    ("value", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onBeforeFacet", Names::Event),
+    ("onChange", Names::Event),
+    ("onDismiss", Names::Event),
+    ("onFacet", Names::Event),
+    ("onInput", Names::Event),
+];
+
+/// What a text field for filters computes for its parts, each read as `filterInput.x`.
+pub const FILTER_INPUT_COMPUTED: &[&str] = &[
+    "busy",
+    "clearShown",
+    "listName",
+    "restLabel",
+    "restPress",
+    "restShown",
+    "restWords",
+    "status",
+    "unmatched",
+];
+
+/// What a menu that builds a filter reads and sends, by the name the machine binds.
+pub const FILTER_MENU: &[(&str, Names)] = &[
+    ("fallbackLabel", Names::Prop),
+    ("label", Names::Prop),
+    ("onBeforeFacet", Names::Event),
+    ("onFacet", Names::Event),
+];
+
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[
     ("description", Names::Prop),
@@ -924,6 +975,16 @@ pub fn command_root(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "commandRoot", COMMAND, COMMAND_COMPUTED)
 }
 
+/// `filterInput({ ... })`, each field a name.
+pub fn filter_input(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "filterInput", FILTER_INPUT, FILTER_INPUT_COMPUTED)
+}
+
+/// `filterMenu({ ... })`, each field a name.
+pub fn filter_menu(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "filterMenu", FILTER_MENU, &[])
+}
+
 /// `option({ ... })`, each field a name.
 pub fn option(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "option", OPTION, OPTION_COMPUTED)
@@ -1032,6 +1093,8 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "select" => select(value),
         "combobox" => combobox(value),
         "commandRoot" => command_root(value),
+        "filterInput" => filter_input(value),
+        "filterMenu" => filter_menu(value),
         "option" => option(value),
         "optionGroup" => option_group(value),
         "chatRoot" => chat_root(value),

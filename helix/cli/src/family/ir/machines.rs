@@ -87,9 +87,10 @@ use ts_rs::TS;
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
-    CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE,
-    LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP,
-    PAGINATION, PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, FILTER_INPUT, FILTER_MENU, INSPECTOR,
+    LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
+    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -639,6 +640,8 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.select, SELECT, "select"),
         (&api.combobox, COMBOBOX, "combobox"),
         (&api.command_root, COMMAND, "command"),
+        (&api.filter_input, FILTER_INPUT, "filter-input"),
+        (&api.filter_menu, FILTER_MENU, "filter-menu"),
         (&api.option, OPTION, "option"),
         (&api.option_group, OPTION_GROUP, "option-group"),
         (&api.chat_root, CHAT_ROOT, "chat"),

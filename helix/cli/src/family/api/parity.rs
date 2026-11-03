@@ -7,10 +7,16 @@ use serde_json::Value as Json;
 use crate::family::api::{Api, Attribute, Node, NodeKind};
 use crate::family::project::Names;
 
-/// The regions a tree draws, by name.
+/// The regions a tree draws, by name. **A region marked for a phone alone is no
+/// slot of the web element's**, as the fields a filter field holds outside its
+/// menu are a phone's to read, where the web reads its light DOM.
 fn regions(tree: &[Node], into: &mut BTreeSet<String>) {
     for node in tree {
-        if node.kind == NodeKind::Region {
+        let native = matches!(
+            node.attributes.get("platform"),
+            Some(Attribute::Text(platform)) if platform == "native"
+        );
+        if node.kind == NodeKind::Region && !native {
             into.insert(node.name.clone());
         }
         regions(&node.children, into);
