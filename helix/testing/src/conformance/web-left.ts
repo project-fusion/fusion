@@ -323,6 +323,7 @@ const OPENS: ReadonlySet<string> = new Set(['accordion', 'tree'])
 const LAYERS: ReadonlySet<string> = new Set([
   'combobox',
   'command',
+  'filter-input',
   'select',
   'color-input',
   'dialog',

@@ -19,7 +19,8 @@ const pageRows = (item: Element): Updatable[] =>
  */
 const itemElements = (parent: Element): Updatable[] =>
   ([...parent.children] as Updatable[])
-    .filter((child) => !child.slot)
+    /* A field's suggestions are slotted, and are its items as a list's options are. */
+    .filter((child) => !child.slot || child.slot === 'suggestions')
     .flatMap((child) =>
       GROUP_TAGS.has(child.localName) ? itemElements(child) : [child, ...pageRows(child)],
     )
