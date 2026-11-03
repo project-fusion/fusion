@@ -75,6 +75,7 @@ import type {
   NotificationsRootChoice,
   OptionChoice,
   OptionGroupChoice,
+  DatePickerChoice,
   PaginationRootChoice,
   PaginationSizeChoice,
   SelectChoice,
@@ -341,6 +342,8 @@ export interface Headless {
   readonly paginationRoot?: PaginationRootChoice
   /** What the element reads, sends, and computes where it chooses a page size. */
   readonly paginationSize?: PaginationSizeChoice
+  /** What the element reads, sends, and computes where it is a month calendar. */
+  readonly datePicker?: DatePickerChoice
   /** What the element reads, sends, and computes where it is a carousel. */
   readonly carousel?: CarouselChoice
   /** What the element reads, sends, and computes where it is a conversation. */
