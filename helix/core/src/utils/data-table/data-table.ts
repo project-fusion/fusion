@@ -16,5 +16,6 @@ export {
   sort,
   window_,
 } from '../row-order/row-order.js'
+export { csvOf } from './csv.js'
 export { toggledOpen } from './keys.js'
 export { childrenOf, type Grown, grow, type Placement } from './tree.js'
