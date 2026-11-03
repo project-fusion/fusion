@@ -372,6 +372,38 @@ export {
   yearOut,
   yearPageOf,
 } from './utils/calendar/calendar.js'
+export {
+  type DateAnswer,
+  type DateProblem,
+  dateProblem,
+  selectionKind,
+} from './utils/calendar/calendar-answer.js'
+export {
+  type AnchorFrom,
+  calendarAnchor,
+  calendarAtEnd,
+  calendarAtStart,
+  chooseDate,
+  clampDate,
+  type DateMode,
+  type DateRules,
+  type DayCell,
+  type DrawnRange,
+  dateBarred,
+  dateChosen,
+  dateRange,
+  dayKeyMove,
+  drawnRange,
+  firstOfMonth,
+  type MonthGrid,
+  monthCells,
+  monthWeeks,
+  nearestOpenMonth,
+  rangePending,
+  weekOffset,
+  writtenMonth,
+} from './utils/calendar/calendar-grid.js'
+export { type CalendarFormats, calendarFormats } from './utils/calendar/calendar-words.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export {
   type AxisLengths,

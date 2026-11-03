@@ -1,12 +1,22 @@
 import {
-  addDays,
-  addMonths,
   valueAsDate as asDate,
-  barredBy,
+  type CalendarFormats,
   type CalendarView,
+  calendarAnchor,
+  calendarAtEnd,
+  calendarAtStart,
+  calendarFormats,
   calendarLocale,
+  chooseDate,
+  clampDate,
   customElement,
   type DateCalendar,
+  type DrawnRange,
+  dateBarred,
+  dateProblem,
+  dateRange,
+  dayKeyMove,
+  drawnRange,
   formatWords,
   dateAsValue as fromDate,
   HelixBeforeNavigateEvent,
@@ -23,20 +33,25 @@ import {
   MixinPickerFeedback,
   type MonthCalendar,
   type MonthSystem,
+  monthCells,
   monthOut,
   monthSystem,
+  nearestOpenMonth,
   numberConverter,
   type PickerFailure,
   periodCells,
   periodKey,
+  rangePending,
   reportValues,
   requestChange,
   SPOKEN_RULE,
+  selectionKind,
   todayIn,
   weekendOf,
   weekStartOf,
   words,
   wordsLocale,
+  writtenMonth,
   YEARS_SHOWN,
   yearOut,
   yearPageOf,
@@ -65,33 +80,6 @@ const KEYS = new Set([
   'PageUp',
   ' ',
 ])
-
-/**
- * The first of a month at midnight UTC, with the year as written: year 1 is
- * year 1, where `Date.UTC` reads it as 1901.
- */
-const firstOf = (year: number, month: number): Date =>
-  addMonths(asDate('2000-01-01') as Date, (year - 2000) * 12 + month)
-
-/**
- * The format of the names over the day columns: the short name, or the narrow
- * one in a language whose short names are longer than four characters.
- *
- * A column is a day wide, and the short name is the one a reader expects
- * where it fits. In Arabic, Persian, Hebrew, Thai, Polish, and Vietnamese it
- * does not: "أربعاء" and "niedz." ran past their 40 pixel columns into the
- * next. The narrow names fit any column, and each header still says the long
- * name to a reader.
- */
-const columnHeads = (
-  utc: (options: Intl.DateTimeFormatOptions) => Intl.DateTimeFormat,
-): Intl.DateTimeFormat => {
-  const short = utc({ weekday: 'short' })
-  const long = Array.from({ length: 7 }, (_, day) => short.format(Date.UTC(2026, 0, 4 + day))).some(
-    (name) => [...name].length > 4,
-  )
-  return long ? utc({ weekday: 'narrow' }) : short
-}
 
 /**
  * @summary A month calendar for choosing one or more dates.
@@ -518,12 +506,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /** The range's ends, when there are two and the mode asks for them. */
   private get range(): [string, string] | null {
-    const dates = this.selected
-    if (this.mode !== 'range' || dates.length < 2) {
-      return null
-    }
-    const [first, second] = [dates[0] as string, dates[1] as string]
-    return first <= second ? [first, second] : [second, first]
+    return dateRange(this.mode, this.selected)
   }
 
   /**
@@ -535,30 +518,15 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /** Whether a range holds its first end and waits for the second. */
   private get pending(): boolean {
-    return this.mode === 'range' && this.selected.length === 1
+    return rangePending(this.mode, this.selected)
   }
 
   /**
    * The range the grid draws: the chosen one, or, while one end waits for
    * the other, the run to the day under the pointer or the focus.
    */
-  private get drawnRange(): { ends: [string, string]; preview: boolean } | null {
-    const range = this.range
-    if (range) {
-      return { ends: range, preview: false }
-    }
-    const end = this.previewed || this.focused
-    const start = this.selected[0]
-    if (
-      !this.pending ||
-      start === undefined ||
-      end === '' ||
-      end === start ||
-      asDate(end) === null
-    ) {
-      return null
-    }
-    return { ends: start <= end ? [start, end] : [end, start], preview: true }
+  private get drawnRange(): DrawnRange | null {
+    return drawnRange(this.mode, this.selected, this.previewed || this.focused)
   }
 
   /** Draws a waiting range to the day the pointer is on. */
@@ -572,22 +540,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     this.previewed = ''
   }
 
-  private isSelected(iso: string): boolean {
-    const range = this.range
-    if (range) {
-      return iso >= range[0] && iso <= range[1]
-    }
-    return this.selected.includes(iso)
-  }
-
   /** The month being shown, resolved from `month`, then `value`, then today. */
   private get shown(): Date {
-    const explicit = /^(\d{4})-(\d{2})(?:-(\d{2}))?$/.exec(this.monthState ?? this.defaultMonth)
-    if (explicit) {
-      const first = firstOf(Number(explicit[1]), Number(explicit[2]) - 1)
-      return this.system.start(explicit[3] ? addDays(first, Number(explicit[3]) - 1) : first)
-    }
-    return this.derivedMonth
+    return writtenMonth(this.monthState ?? this.defaultMonth, this.system) ?? this.derivedMonth
   }
 
   /**
@@ -636,32 +591,14 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * first day, so the grid still has a way in.
    */
   private get anchor(): Date {
-    const shown = this.shown
-    const today = asDate(todayIn(this.timeZone))
-    for (const candidate of [
-      asDate(this.focused),
-      asDate(this.selected[0] ?? ''),
-      today && !this.barred(today) ? today : null,
-    ]) {
-      if (candidate && this.system.same(candidate, shown)) {
-        return candidate
-      }
-    }
-    for (let day = shown; this.system.same(day, shown); day = addDays(day, 1)) {
-      if (!this.barred(day)) {
-        return day
-      }
-    }
-    return shown
-  }
-
-  /** Six weeks of dates, so a grid does not change height between months. */
-  private weeksOf(month: Date): Date[][] {
-    const offset = (month.getUTCDay() - this.weekStart + 7) % 7
-    const start = addDays(month, -offset)
-    return Array.from({ length: 6 }, (_, week) =>
-      Array.from({ length: 7 }, (_, day) => addDays(start, week * 7 + day)),
-    )
+    return calendarAnchor({
+      focused: this.focused,
+      rules: this,
+      selected: this.selected,
+      shown: this.shown,
+      system: this.system,
+      today: todayIn(this.timeZone),
+    })
   }
 
   /**
@@ -673,43 +610,19 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * one that moves.
    */
   private barred(date: Date): boolean {
-    const iso = fromDate(date)
-    if (this.min !== '' && iso < this.min) {
-      return true
-    }
-    if (this.max !== '' && iso > this.max) {
-      return true
-    }
-    return barredBy(date, this) !== null
-  }
-
-  /** Pulls a date inside `min` and `max`, so the keys stop at the bounds. */
-  private clamp(date: Date): Date {
-    const iso = fromDate(date)
-    const min = asDate(this.min)
-    const max = asDate(this.max)
-    if (min && iso < this.min) {
-      return min
-    }
-    if (max && iso > this.max) {
-      return max
-    }
-    return date
+    return dateBarred(date, this)
   }
 
   /** Whether the month before the first one shown is wholly before `min`. */
   private get atStart(): boolean {
     /* The last day before the first month shown is before `min`, which is
        the month before wholly before it in any calendar. */
-    return asDate(this.min) !== null && fromDate(addDays(this.shown, -1)) < this.min
+    return calendarAtStart(this.shown, this.min)
   }
 
   /** Whether the month after the last one shown is wholly after `max`. */
   private get atEnd(): boolean {
-    return (
-      asDate(this.max) !== null &&
-      fromDate(this.system.start(this.system.add(this.shown, this.monthCount))) > this.max
-    )
+    return calendarAtEnd(this.shown, this.monthCount, this.max, this.system)
   }
 
   /**
@@ -760,7 +673,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   private moveTo(wanted: Date): void {
-    const date = this.clamp(wanted)
+    const date = clampDate(wanted, this.min, this.max)
     this.focused = fromDate(date)
     this.previewed = ''
     this.show(date)
@@ -789,16 +702,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       return
     }
     const iso = fromDate(date)
-    const held = this.selected
-
-    let next: string[]
-    if (this.mode === 'range') {
-      next = held.length === 1 ? [...held, iso].sort() : [iso]
-    } else if (this.mode === 'multiple') {
-      next = held.includes(iso) ? held.filter((entry) => entry !== iso) : [...held, iso].sort()
-    } else {
-      next = [iso]
-    }
+    const next = chooseDate(this.mode, this.selected, iso)
 
     /* Focus moves whatever happens, because the reader pressed there and the
        roving tab stop is about where they are rather than about what is
@@ -839,21 +743,13 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
     if (event.key === 'Enter' || event.key === ' ') {
       this.select(from)
-    } else if (along !== 0) {
-      this.moveTo(addDays(from, along))
-    } else if (event.key === 'ArrowUp') {
-      this.moveTo(addDays(from, -7))
-    } else if (event.key === 'ArrowDown') {
-      this.moveTo(addDays(from, 7))
-    } else if (event.key === 'Home') {
-      this.moveTo(addDays(from, -((from.getUTCDay() - this.weekStart + 7) % 7)))
-    } else if (event.key === 'End') {
-      this.moveTo(addDays(from, 6 - ((from.getUTCDay() - this.weekStart + 7) % 7)))
     } else {
       /* Shift pages by a year, to the month of the same name: twelve months
          in the Gregorian calendar, and in a Hebrew leap year thirteen. */
-      const step = event.key === 'PageUp' ? -1 : 1
-      this.moveTo(event.shiftKey ? this.system.addYears(from, step) : this.system.add(from, step))
+      const to = dayKeyMove(event.key, from, along, event.shiftKey, this.weekStart, this.system)
+      if (to) {
+        this.moveTo(to)
+      }
     }
 
     event.preventDefault()
@@ -944,13 +840,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
          moving from August 2026 to 2030 is looking for August. Where `min` or
          `max` leaves that month out, the nearest month the year has. */
       const month = this.system.parts(this.shown).month - 1
-      const open = Array.from({ length: this.system.months(at) }, (_, index) => index).filter(
-        (index) => !this.monthOut(this.system.from(at, index + 1, 1)),
-      )
-      this.periodFocus = open.includes(month)
-        ? month
-        : ([...open].sort((left, right) => Math.abs(left - month) - Math.abs(right - month))[0] ??
-          month)
+      this.periodFocus = nearestOpenMonth(at, month, this.min, this.max, this.system)
       this.zoom('month')
       return
     }
@@ -1156,13 +1046,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     }
     const { long } = this.formats
     const range = this.range
-    const kind = range
-      ? 'range'
-      : this.pending
-        ? 'start'
-        : this.mode === 'multiple'
-          ? 'dates'
-          : 'date'
+    const kind = selectionKind(this.mode, this.selected)
     return formatWords(this, 'selectionLabel', {
       count: dates.length,
       end: range ? long.format(asDate(range[1]) as Date) : '',
@@ -1245,37 +1129,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   /**
-   * What is wrong with a date the calendar can read, as a validity flag and a
-   * message, or nothing.
-   *
-   * Measured before this: a value before `min`, after `max`, or on a barred
-   * day reported valid and was submitted, where a native date input reports
-   * the bound it is past.
-   */
-  private fault(iso: string): [keyof ValidityStateFlags, string] | undefined {
-    if (this.min !== '' && iso < this.min) {
-      return [
-        'rangeUnderflow',
-        formatWords(this, 'rangeUnderflowMessage', { min: this.spoken(this.min) }),
-      ]
-    }
-    if (this.max !== '' && iso > this.max) {
-      return [
-        'rangeOverflow',
-        formatWords(this, 'rangeOverflowMessage', { max: this.spoken(this.max) }),
-      ]
-    }
-    const date = asDate(iso)
-    const why = date ? barredBy(date, this) : null
-    if (why === null) {
-      return undefined
-    }
-    return why === 'listed'
-      ? ['badInput', this.unavailableMessage]
-      : ['stepMismatch', this.stepMismatchMessage]
-  }
-
-  /**
    * Reports "required and empty", or clears it.
    *
    * Written out rather than taken from `MixinField`, which is where the seven
@@ -1299,43 +1152,31 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * `reportRequired` hands it to the form, and `failure` to the mark.
    */
   private get problem(): [ValidityStateFlags, string] | undefined {
-    if (this.required && this.value === '') {
-      return [{ valueMissing: true }, this.valueMissingMessage]
-    }
     /* **A value the calendar cannot read is bad input.** The grid draws only
        what it can parse, so `value="not-a-date"` would otherwise select
-       nothing, report `:valid` and hand the string to the form.
-
-       `asDate` rather than the shape alone, which is the half `DateInput`'s own
-       regex still misses: `2026-02-30` matches `YYYY-MM-DD` and is not a day,
-       and `valueAsDate` reads the parts back after constructing to say so. */
-    const held = this.selected
-    if (held.length > 0 && held.some((one) => asDate(one) === null)) {
-      return [
-        { badInput: true },
-        formatWords(this, 'badInputMessage', {
-          example: this.spoken(EXAMPLE),
-          mode: this.mode ?? 'single',
-        }),
-      ]
+       nothing, report `:valid` and hand the string to the form. A range the
+       calendar picks is in order, so only a value set from outside can end
+       before it starts: Date Input reports the same pair the same way. */
+    const problem = dateProblem({
+      mode: this.mode,
+      required: this.required,
+      rules: this,
+      selected: this.selected,
+    })
+    if (!problem) {
+      return undefined
     }
-    for (const one of held) {
-      const fault = this.fault(one)
-      if (fault) {
-        return [{ [fault[0]]: true }, fault[1]]
-      }
+    const [flag, message, values] = problem
+    if (Object.keys(values).length === 0) {
+      return [{ [flag]: true }, this[message]]
     }
-    /* A range the calendar picks is in order, the two days sorted as they are
-       chosen, so only a value set from outside can end before it starts: Date
-       Input reports the same pair the same way. */
-    const [start, end] = held
-    if (this.mode === 'range' && start !== undefined && end !== undefined && end < start) {
-      return [
-        { rangeUnderflow: true },
-        formatWords(this, 'rangeOrderMessage', { start: this.spoken(start) }),
-      ]
+    /* Each date a message names is written as the calendar names one, and a
+       date that will not parse is named by an example. */
+    const spoken: Record<string, string> = { example: this.spoken(EXAMPLE) }
+    for (const [key, one] of Object.entries(values)) {
+      spoken[key] = key === 'mode' ? one : this.spoken(one)
     }
-    return undefined
+    return [{ [flag]: true }, formatWords(this, message, spoken)]
   }
 
   /** A missing date waits for the reader; a refused one is marked at once. */
@@ -1433,61 +1274,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   /**
-   * The three date formatters, built once per locale rather than per render.
-   *
-   * `Intl.DateTimeFormat` costs about a quarter of a millisecond to construct
-   * and these depend on nothing but `locale` and `calendar`, so building them
-   * inside the per-month render is three constructions for every month on
-   * show, on every update: a two-month calendar rebuilds six each time an
-   * arrow key moves the anchor.
-   *
-   * Keyed on the locale with its calendar, so a change to either is picked
-   * up, which a plain lazy field would not do.
+   * The date formatters for the locale and its calendar, which core builds once
+   * per locale, so a change to either is picked up.
    */
-  private cachedFormats:
-    | {
-        full: Intl.DateTimeFormat
-        heading: Intl.DateTimeFormat
-        locale: string
-        long: Intl.DateTimeFormat
-        monthName: Intl.DateTimeFormat
-        monthYear: Intl.DateTimeFormat
-        weekday: Intl.DateTimeFormat
-        weekdayName: Intl.DateTimeFormat
-        year: Intl.DateTimeFormat
-      }
-    | undefined
-
-  private get formats(): {
-    full: Intl.DateTimeFormat
-    heading: Intl.DateTimeFormat
-    long: Intl.DateTimeFormat
-    monthName: Intl.DateTimeFormat
-    monthYear: Intl.DateTimeFormat
-    weekday: Intl.DateTimeFormat
-    weekdayName: Intl.DateTimeFormat
-    year: Intl.DateTimeFormat
-  } {
-    const language = calendarLocale(this.language, this.calendar)
-    if (this.cachedFormats?.locale === language) {
-      return this.cachedFormats
-    }
-    /* In UTC, as every date here is. */
-    const utc = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat =>
-      new Intl.DateTimeFormat(language || undefined, { ...options, timeZone: 'UTC' })
-    const built = {
-      full: utc({ dateStyle: 'full' }),
-      heading: utc({ month: 'long', year: 'numeric' }),
-      locale: language,
-      long: utc({ dateStyle: 'long' }),
-      monthName: utc({ month: 'short' }),
-      monthYear: utc({ month: 'short', year: 'numeric' }),
-      weekday: columnHeads(utc),
-      weekdayName: utc({ weekday: 'long' }),
-      year: utc({ year: 'numeric' }),
-    }
-    this.cachedFormats = built
-    return built
+  private get formats(): CalendarFormats {
+    return calendarFormats(calendarLocale(this.language, this.calendar))
   }
 
   /**
@@ -1523,16 +1314,21 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     const { full, heading: named, weekday, weekdayName } = this.formats
     /* The month's name, which is the heading and the grid's name both. */
     const heading = named.format(month)
-    const weeks = this.weeksOf(month)
-    const anchor = fromDate(this.anchor)
     /* Today, marked with `aria-current="date"` in the accessibility tree and as
-       `day-today` on the day, so a consumer can add a mark from CSS. Computed
-       once per month rather than per cell. */
-    const today = todayIn(this.timeZone)
-    const drawn = this.drawnRange
-    const range = drawn?.ends ?? null
-    const preview = drawn?.preview === true
-    const weekend = this.weekend
+       `day-today` on the day, so a consumer can add a mark from CSS. Core works
+       out every cell's marks once per month. */
+    const weeks = monthCells({
+      anchor: fromDate(this.anchor),
+      drawn: this.drawnRange,
+      mode: this.mode,
+      month,
+      rules: this,
+      selected: this.selected,
+      system: this.system,
+      today: todayIn(this.timeZone),
+      weekend: this.weekend,
+      weekStart: this.weekStart,
+    })
 
     // One set of controls across the whole run: back on the first month,
     // forward on the last. A pair per month would offer six ways to make the
@@ -1592,7 +1388,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       >
         <div part="week" role="row">
           ${weeks[0]?.map(
-            (date) =>
+            ({ date }) =>
               html`<span part="weekday" role="columnheader" aria-label=${weekdayName.format(date)}
                 >${weekday.format(date)}</span
               >`,
@@ -1600,10 +1396,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         </div>
         ${weeks.map(
           (week) => html`<div part="week" role="row">
-            ${week.map((date) => {
-              const iso = fromDate(date)
-              const disabled = this.barred(date)
-              const selected = this.isSelected(iso)
+            ${week.map((cell) => {
+              const { date, end, iso, middle, outside, start } = cell
               /* A day from a neighboring month is filler, so the grid is a
                  rectangle, and nothing else. It takes no click and shows no
                  selection: at `months="2"` the same date is a trailing cell in
@@ -1611,10 +1405,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                  answer on the page twice and runs the range band through two
                  rows. The band stops at the last day the grid owns and picks up
                  in the next, which is where those dates actually are. */
-              const outside = !this.system.same(date, month)
-              const start = !outside && range !== null && iso === range[0]
-              const end = !outside && range !== null && iso === range[1]
-              const middle = !outside && range !== null && iso > range[0] && iso < range[1]
               // The cell is the column track and the day is the shape centered
               // in it. A range paints the track, so it runs continuously
               // between days and stops at the ends of a row on its own.
@@ -1631,22 +1421,22 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
               return html`<span
                 part="cell${start ? ' cell-range-start' : ''}${middle ? ' cell-range-middle' : ''}${end ? ' cell-range-end' : ''}"
                 role="gridcell"
-                aria-disabled=${disabled || outside ? 'true' : nothing}
+                aria-disabled=${cell.barred || outside ? 'true' : nothing}
                 aria-label=${full.format(date)}
-                aria-current=${iso === today ? 'date' : nothing}
-                aria-selected=${!outside && selected ? 'true' : nothing}
+                aria-current=${cell.today ? 'date' : nothing}
+                aria-selected=${cell.selected ? 'true' : nothing}
                 data-outside=${outside ? '' : nothing}
                 data-range-end=${end ? '' : nothing}
                 data-range-middle=${middle ? '' : nothing}
-                data-range-preview=${preview && (start || middle || end) ? '' : nothing}
+                data-range-preview=${cell.preview ? '' : nothing}
                 data-range-start=${start ? '' : nothing}
-                data-today=${iso === today ? '' : nothing}
-                data-weekend=${weekend.includes(date.getUTCDay()) ? '' : nothing}
-                tabindex=${!outside && iso === anchor && !this.isDisabled ? '0' : '-1'}
+                data-today=${cell.today ? '' : nothing}
+                data-weekend=${cell.weekend ? '' : nothing}
+                tabindex=${cell.stop && !this.isDisabled ? '0' : '-1'}
                 @click=${outside ? nothing : () => this.select(date)}
                 @pointerenter=${outside ? nothing : () => this.preview(iso)}
                 ><span
-                  part="day${!outside && selected && !middle ? ' day-selected' : ''}${iso === today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${disabled ? ' day-disabled' : ''}${weekend.includes(date.getUTCDay()) ? ' day-weekend' : ''}"
+                  part="day${cell.solid ? ' day-selected' : ''}${cell.today ? ' day-today' : ''}${outside ? ' day-outside' : ''}${cell.barred ? ' day-disabled' : ''}${cell.weekend ? ' day-weekend' : ''}"
                   >${this.renderDay(date, outside)}</span
                 ></span
               >`
