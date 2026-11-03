@@ -292,6 +292,7 @@ const ownerOf = ({
   entries,
   filtering,
   held,
+  keepsFocus,
   key,
   moving,
   moveTo,
@@ -306,6 +307,7 @@ const ownerOf = ({
   readonly entries: readonly Entry[]
   readonly filtering: boolean
   readonly held: Held
+  readonly keepsFocus: boolean
   readonly key: (press: KeyPress) => boolean
   readonly moveTo: (key: object, by: number) => void
   readonly moving: boolean
@@ -330,6 +332,7 @@ const ownerOf = ({
       held.groups = held.groups.filter((one) => one !== group)
     }
   },
+  keepsFocus,
   key: (_from, press) => key(press),
   leave: (one) => {
     held.members.delete(one)
@@ -673,6 +676,7 @@ export const useListbox = (
     entries,
     filtering,
     held,
+    keepsFocus: owned?.keepsFocus === true,
     key: (press) => {
       if (press.key === 'Tab') {
         owned?.tab()

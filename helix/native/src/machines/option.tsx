@@ -67,6 +67,11 @@ export interface OptionOwner {
   readonly lift: ((key: object) => void) | undefined
   /** Whether a filter narrows the list, which a rule between runs goes for. */
   readonly filtering: boolean
+  /**
+   * Whether focus stays in a field the owner types into, as a Combobox's or a Filter
+   * Input's, so a press on an option leaves it there and the keyboard up.
+   */
+  readonly keepsFocus?: boolean
   /** Whether a group holds nothing showing, and whether it is not the first. */
   readonly group: (key: object) => { readonly hidden: boolean; readonly later: boolean }
   /** Tells the owner where an option's latest stands, and answers how to let it go. */
@@ -219,9 +224,11 @@ const pressOf = (
     void openLink().open(href)
     return
   }
-  /* Focus first: a choice may close the list, which gives focus back to its trigger. */
+  /* Focus first: a choice may close the list, which gives focus back to its trigger.
+     Where focus stays in the owner's field, moving it to the option would blur the
+     field and put the keyboard away, and a list that stays open would close. */
   const view = node()
-  if (view) {
+  if (view && owner?.keepsFocus !== true) {
     focus().focus(view, false)
   }
   owner?.choose(member)

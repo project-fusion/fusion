@@ -5,6 +5,8 @@
  * into a facet and `chips` draws it, suggestions open with focus and a press says
  * `before-select`, and a menu's tick is a facet the field hears.
  */
+import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
+import { fakeFocus } from '@fusion.dev/helix-core/capabilities/focus/fake'
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createRef, type ReactNode } from 'react'
@@ -170,8 +172,13 @@ describe('Filter Input on a phone', () => {
     }
     expect(kept.length).toBeGreaterThan(0)
     expect(kept.every((one) => one === 'handled')).toBe(true)
+    /* Focus stays in the field, where a move to the option would blur it, put the
+       keyboard away, and close the list a key's values come next in. */
+    const moves = fakeFocus()
+    setFocus(moves)
     await on(() => fireEvent.press(screen.getByText('owner')))
     expect(chosen).toEqual(['owner'])
+    expect(moves.moved).toEqual([])
   })
 
   test("a menu's tick is a facet the field hears", async () => {
