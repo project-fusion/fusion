@@ -326,8 +326,12 @@ export const drawVector = (
   }
   const viewBox = viewBoxOf(written, own)
   const { Svg: Canvas } = svg()
+  /* A height in rems is only a least past the largest standard text size, and a
+     vector at 100% of no height stands as tall as the window. */
+  const height =
+    own?.height === undefined && typeof own?.minHeight === 'number' ? own.minHeight : '100%'
   return (
-    <Canvas height="100%" key={`${node.name}-vector`} viewBox={viewBox} width="100%">
+    <Canvas height={height} key={`${node.name}-vector`} viewBox={viewBox} width="100%">
       {drawn(styling, node.children ?? []).map((child, at) =>
         drawShape(styling, child, extra, boxOf(viewBox), `${child.name}-${at}`),
       )}
