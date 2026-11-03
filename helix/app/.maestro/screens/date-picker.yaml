@@ -1,0 +1,50 @@
+# Date Picker, its examples drawn alone: a month, the next month after a press,
+# a day chosen, a range, and the months a heading steps back to. One screenshot of
+# each, named by the example, `MODE`, and `SIZE`. A day is named by its whole date
+# and a control by its words, so each wait matches the words inside.
+appId: dev.fusion.helix.app
+name: "Screens: Date Picker"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://date-picker/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Next month.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-picker-preview-${MODE}-${SIZE}
+- tapOn:
+    text: '.*Next month.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*September 2026.*'
+    timeout: 10000
+- tapOn:
+    text: '.*Tuesday, September 8, 2026.*'
+    retryTapIfNoChange: false
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-picker-preview-chosen-${MODE}-${SIZE}
+- openLink: helix://date-picker/range/preview
+- extendedWaitUntil:
+    visible: '.*August 2026.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-picker-range-${MODE}-${SIZE}
+- openLink: helix://date-picker/restricted/preview
+- extendedWaitUntil:
+    visible: '.*Next month.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-picker-restricted-${MODE}-${SIZE}
+- openLink: helix://date-picker/controlled-month/preview
+- extendedWaitUntil:
+    visible: '.*Next month.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-picker-controlled-month-${MODE}-${SIZE}
