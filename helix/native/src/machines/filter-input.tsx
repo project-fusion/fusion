@@ -9,23 +9,21 @@
  * match. Escape on a hardware keyboard closes it, or empties the text where it is
  * closed. A choice keeps it open, so a key's values come next.
  */
-import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import { completeTerm, currentTerm, type FacetDetail } from '@fusion.dev/helix-core/filter-text'
 import { type RefObject, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { MachineUse } from '../ir.generated'
-import type { Behavior, PartBinding, Props } from '../render/behavior'
+import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { ListHands } from './combobox-keys'
 import { says } from './combobox-model'
+import { type Caret, type Control, controlOf, textRequester } from './filter-input-control'
 import {
   announced,
   chipsAfter,
   type Facets,
   facetTold,
-  fieldKey,
   goneWith,
   type KeyNow,
-  RETURN,
   readFilters,
 } from './filter-input-facets'
 import { declaredFields } from './filter-input-fields'
@@ -44,15 +42,6 @@ import type { ListOwner } from './list-owner'
 import { useWritten, wordsIn } from './listbox-hooks'
 import { boundTo, given, type HelixEvent, tell, told } from './props'
 import type { Turned } from './toggle'
-
-/** A focusable field, as React Native's `TextInput` is. */
-type Control = { readonly focus?: () => void } | null
-
-/** A caret's selection in the text. */
-interface Caret {
-  readonly end: number
-  readonly start: number
-}
 
 /** The menus joined to the field, and what the field offers them, kept for every draw. */
 const useAround = (latest: {
@@ -82,47 +71,6 @@ const useWish = (toggled: Turned | undefined, wanted: boolean): void => {
     }
   }, [wanted])
 }
-
-/** What the text field's view reads of the element at one draw. */
-interface ControlNow {
-  readonly back: () => void
-  readonly control: { current: Control }
-  readonly disabled: boolean
-  readonly edit: (text: string) => void
-  readonly focus: (focused: boolean) => void
-  readonly key: { readonly current: KeyNow }
-  readonly listening: { current: (() => void) | undefined }
-  readonly placed: Caret | undefined
-  readonly select: (caret: Caret) => void
-  readonly value: string
-}
-
-/** The text field's view: its text, its caret, and its keys. */
-const controlOf = (now: ControlNow): PartBinding => ({
-  view: {
-    editable: !now.disabled,
-    onBlur: () => now.focus(false),
-    onChangeText: now.edit,
-    onFocus: () => now.focus(true),
-    onKeyPress: (event: { readonly nativeEvent: { readonly key: string } }) => {
-      if (event.nativeEvent.key === 'Backspace' && now.value === '') {
-        now.back()
-      }
-    },
-    onSelectionChange: (event: { readonly nativeEvent: { readonly selection: Caret } }) =>
-      now.select(event.nativeEvent.selection),
-    onSubmitEditing: () => fieldKey(RETURN, now.key.current),
-    ref: (node: unknown) => {
-      now.control.current = node as Control
-      now.listening.current?.()
-      now.listening.current =
-        node === null ? undefined : keys().listen(node, (press) => fieldKey(press, now.key.current))
-    },
-    submitBehavior: 'submit',
-    value: now.value,
-    ...(now.placed === undefined ? {} : { selection: now.placed }),
-  },
-})
 
 /** What the panel offers at one draw: the options, how many, and what it says. */
 const offered = (
@@ -185,33 +133,6 @@ const hostStates = (
     [state('unmatched')]: now.unmatched,
   }
 }
-
-/** What an edit of the text reads of the field. */
-interface Editing {
-  readonly family: Family
-  readonly props: Props
-  readonly setValue: (next: string) => void
-  readonly touch: () => void
-  readonly use: MachineUse
-  readonly value: string
-}
-
-/** Asks `before-change` for new text, takes it, and says `input`, as each keystroke does on the web. */
-const textRequester =
-  ({ family, props, setValue, touch, use, value }: Editing) =>
-  (next: string): boolean => {
-    const before = boundTo(use, 'onBeforeChange', 'event')
-    if (before !== undefined && !tell(family, props, before, { value: next }, { value })) {
-      return false
-    }
-    setValue(next)
-    touch()
-    const input = boundTo(use, 'onInput', 'event')
-    if (input !== undefined) {
-      told(family, props, input, {}, { value: next })
-    }
-    return true
-  }
 
 /** Hosts a text field for filters. */
 export const useFilterInput = (
