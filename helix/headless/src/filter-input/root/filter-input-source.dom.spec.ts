@@ -1,7 +1,11 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import type {
+  FilterSource,
+  FilterSourceRequest,
+  FilterSuggestion,
+} from '@fusion.dev/helix-core/filter-text'
 import { hasState, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
-import type { FilterSource, FilterSourceRequest, FilterSuggestion } from '../suggest.js'
 
 beforeAll(async () => {
   registerDom()

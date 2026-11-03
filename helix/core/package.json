@@ -116,6 +116,10 @@
       "types": "./dist/utils/file-input/file-input.d.ts",
       "default": "./dist/utils/file-input/file-input.js"
     },
+    "./filter-text": {
+      "types": "./dist/utils/filter-text/filter-text.d.ts",
+      "default": "./dist/utils/filter-text/filter-text.js"
+    },
     "./follow-tail": {
       "types": "./dist/utils/follow-tail/follow-tail.d.ts",
       "default": "./dist/utils/follow-tail/follow-tail.js"
