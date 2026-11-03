@@ -42,8 +42,11 @@ const viewsWhere = (test: (props: Readonly<Record<string, unknown>>) => boolean)
 export const layerIn = (run: Run): { readonly layer?: boolean } => {
   const { tag } = run.scenario.setup
   const form = formOf(tag)
+  /* A palette opens the dialog it draws, whose layer is the dialog's. */
   const layered =
-    form.api?.notices === undefined && (form.machines ?? []).some((use) => use.machine === 'layer')
+    (form.api?.notices === undefined &&
+      (form.machines ?? []).some((use) => use.machine === 'layer')) ||
+    form.api?.commandRoot !== undefined
   return layered ? { layer: HOST_STATES.get(tag)?.open === true } : {}
 }
 

@@ -227,7 +227,11 @@ export const leftBy = (run: Run, opened: number): Left => {
       .map((item) => item.value),
     ...currentIn(run),
     /* The web keeps focus on a list of options, and a phone's option holds it for the keys. */
-    focused: formOf(setup.tag).api?.listbox === undefined ? focusedIn(run) : null,
+    focused:
+      formOf(setup.tag).api?.listbox === undefined &&
+      formOf(setup.tag).api?.commandRoot === undefined
+        ? focusedIn(run)
+        : null,
     opened: run.opened.opened.slice(opened),
     ...readsIn(run),
     ...rowsIn(run),

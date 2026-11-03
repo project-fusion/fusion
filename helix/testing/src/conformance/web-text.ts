@@ -30,7 +30,9 @@ export const controlOf = (mounted: Mounted): Control | undefined => {
     shadow?.querySelector('[part~="search-field"]') ??
     shadow?.querySelector('[part~="value"]') ??
     shadow?.querySelector('[part~="field-input"]') ??
-    shadow?.querySelector('textarea[part~="field"]')
+    shadow?.querySelector('textarea[part~="field"]') ??
+    /* A palette's filter is its list's, in the list's own shadow root. */
+    shadow?.querySelector('[part~="listbox"]')?.shadowRoot?.querySelector('[part~="search-field"]')
   return isControl(found) ? found : undefined
 }
 
