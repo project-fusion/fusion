@@ -117,6 +117,9 @@ const senderOf = (run: Run, name: string, event: HelixEvent): string | null => {
   return (event.target as { readonly value?: string }).value ?? relays.get(event) ?? last ?? null
 }
 
+/** The events a palette of commands announces from itself, beside its options' own. */
+const PALETTE: readonly string[] = ['before-select', 'select']
+
 /**
  * The handler for one event of one element: it refuses what the page
  * refuses, and records the event where the page hears it. The element that
@@ -132,7 +135,12 @@ const hearing = (run: Run, name: string, value: string | null) => {
      event of the same name on its own, as a toggle group's `change` and a
      toggle's do. */
   const collection = formOf(root.tag).api?.collection
-  const announces = [collection?.before, ...[collection?.after ?? []].flat()].includes(name)
+  /* A palette says the command chosen as its own `before-select` and `select`, after
+     the option's own, as the web palette dispatches them from itself. */
+  const palette = formOf(root.tag).api?.commandRoot === undefined ? [] : PALETTE
+  const announces = [collection?.before, ...[collection?.after ?? []].flat(), ...palette].includes(
+    name,
+  )
   const typed =
     formOf(root.tag).api?.entry !== undefined ||
     ranges(root.tag) ||
@@ -145,7 +153,9 @@ const hearing = (run: Run, name: string, value: string | null) => {
       (child) => typeof child !== 'string' && eventsOf(child.tag).includes(name),
     )
   return (event: HelixEvent) => {
-    if (run.refused.has(name) && (value === null || !rootSends)) {
+    /* The page refuses a palette's option's own `before-select` too, as the web page's
+       listener on the palette hears the option's event on its way out. */
+    if (run.refused.has(name) && (value === null || !rootSends || palette.includes(name))) {
       event.preventDefault()
     }
     /* `input` is left out, as the web half leaves it out: it records the
