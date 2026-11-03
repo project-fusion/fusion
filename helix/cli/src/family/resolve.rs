@@ -75,6 +75,8 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.select,
         &api.combobox,
         &api.command_root,
+        &api.filter_input,
+        &api.filter_menu,
         &api.option,
         &api.option_group,
         &api.chat_root,
@@ -245,6 +247,8 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
         ("select", &family.api.select, api::SELECT),
         ("combobox", &family.api.combobox, api::COMBOBOX),
         ("commandRoot", &family.api.command_root, api::COMMAND),
+        ("filterInput", &family.api.filter_input, api::FILTER_INPUT),
+        ("filterMenu", &family.api.filter_menu, api::FILTER_MENU),
         ("option", &family.api.option, api::OPTION),
         ("optionGroup", &family.api.option_group, api::OPTION_GROUP),
         ("chatRoot", &family.api.chat_root, api::CHAT_ROOT),
@@ -545,7 +549,8 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
         let holds = family.api.color.is_some()
             || family.api.listbox.is_some()
             || family.api.select.is_some()
-            || family.api.combobox.is_some();
+            || family.api.combobox.is_some()
+            || family.api.filter_input.is_some();
         for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
@@ -594,7 +599,8 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
         let holds = family.api.color.is_some()
             || family.api.listbox.is_some()
             || family.api.select.is_some()
-            || family.api.combobox.is_some();
+            || family.api.combobox.is_some()
+            || family.api.filter_input.is_some();
         for name in controls.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"

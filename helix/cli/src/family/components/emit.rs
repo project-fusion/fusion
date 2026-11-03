@@ -219,8 +219,9 @@ fn component(part: &Part) -> String {
 /// import fails the native typecheck.
 ///
 /// The handles a generated `ref` can name, in the order an import lists them.
-const HANDLES: [&str; 5] = [
+const HANDLES: [&str; 6] = [
     "FieldHandle",
+    "FilterInputHandle",
     "FilesHandle",
     "WindowHandle",
     "DataTableHandle",

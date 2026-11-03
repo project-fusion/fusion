@@ -63,6 +63,7 @@ pub const DERIVATIONS: &[(&str, &str)] = &[
     ("drilldown-page-role", "drilldownPageRole"),
     ("drilldown-status", "drilldownStatus"),
     ("drilldown-top-name", "drilldownTopName"),
+    ("filter-chip-remove-name", "filterChipRemoveName"),
     ("format-date-expires", "formatDateExpires"),
     ("format-date-future", "formatDateFuture"),
     ("format-date-past", "formatDatePast"),
