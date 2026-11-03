@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDatePicker } from '@fusion.dev/helix-headless/date-picker'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './date-picker-root.css.js'
+import { styles } from './date-picker-root.generated.css.js'
 
 /**
  * @summary A month calendar for choosing one or more dates.

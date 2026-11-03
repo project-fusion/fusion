@@ -24,6 +24,7 @@ import { HelixCombobox } from '../combobox/index.native'
 import { HelixCommand } from '../command/index.native'
 import { HelixCopyButton } from '../copy-button/index.native'
 import { HelixDataTable } from '../data-table/index.native'
+import { HelixDatePicker } from '../date-picker/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
 import { HelixDialog } from '../dialog/index.native'
 import { HelixDivider } from '../divider/index.native'
@@ -233,6 +234,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-command': HelixCommand,
   'helix-copy-button': HelixCopyButton,
   'helix-data-table': HelixDataTable,
+  'helix-date-picker': HelixDatePicker,
   'helix-description-list': HelixDescriptionList,
   'helix-description-list-item': HelixDescriptionListItem,
   'helix-dialog': HelixDialog,
