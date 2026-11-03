@@ -218,6 +218,15 @@ fn component(part: &Part) -> String {
 /// The imports a module needs: only the types its parts name, since an unused
 /// import fails the native typecheck.
 ///
+/// The handles a generated `ref` can name, in the order an import lists them.
+const HANDLES: [&str; 5] = [
+    "FieldHandle",
+    "FilesHandle",
+    "WindowHandle",
+    "DataTableHandle",
+    "LogHandle",
+];
+
 /// **The runtime by its package name**, whose entry checks the peers before
 /// anything else in it runs.
 fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) -> String {
@@ -230,23 +239,22 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) 
         .iter()
         .flat_map(|part| &part.events)
         .any(|sends| sends.bare && !sends.fields.is_empty());
-    let handles = parts
+    /* Each handle a part's `ref` names, which the runtime exports. */
+    let handle_types: Vec<String> = HANDLES
         .iter()
-        .flat_map(|part| &part.members)
-        .any(|member| member.ty.contains("FieldHandle"));
-    let file_handles = parts
-        .iter()
-        .flat_map(|part| &part.members)
-        .any(|member| member.ty.contains("FilesHandle"));
-    let window_handles = parts
-        .iter()
-        .flat_map(|part| &part.members)
-        .any(|member| member.ty.contains("WindowHandle"));
+        .filter(|name| {
+            parts
+                .iter()
+                .flat_map(|part| &part.members)
+                .any(|member| member.ty == format!("Ref<{name}>"))
+        })
+        .map(|name| format!("type {name}"))
+        .collect();
     let mut react = vec!["ComponentType"];
     if regions {
         react.push("ReactNode");
     }
-    if handles || file_handles || window_handles {
+    if !handle_types.is_empty() {
         react.push("Ref");
     }
     let mut out = format!("import type {{ {} }} from 'react'\n", react.join(", "));
@@ -256,15 +264,7 @@ fn imports(parts: &[Part], folders: &BTreeMap<String, String>, origin: &Origin) 
         names.extend(["behaviorFor", "element"]);
     }
     names.push("type Family");
-    if handles {
-        names.push("type FieldHandle");
-    }
-    if file_handles {
-        names.push("type FilesHandle");
-    }
-    if window_handles {
-        names.push("type WindowHandle");
-    }
+    names.extend(handle_types.iter().map(String::as_str));
     if events {
         names.push(&event_type);
     }
