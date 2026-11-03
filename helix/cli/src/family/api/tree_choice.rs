@@ -375,6 +375,53 @@ pub const SELECT: &[(&str, Names)] = &[
 /// What a field that opens a list computes for its parts, each read as `select.x`.
 pub const SELECT_COMPUTED: &[&str] = &["listName", "said", "status", "unchosen", "words"];
 
+/// What a text field that filters a list of options reads and sends, by the name the machine binds.
+pub const COMBOBOX: &[(&str, Names)] = &[
+    ("allowsCustomValue", Names::Prop),
+    ("collapseLabel", Names::Prop),
+    ("creatable", Names::Prop),
+    ("createLabel", Names::Prop),
+    ("defaultValue", Names::Prop),
+    ("disabled", Names::Prop),
+    ("expandable", Names::Prop),
+    ("expandLabel", Names::Prop),
+    ("filterDelay", Names::Prop),
+    ("listLabel", Names::Prop),
+    ("maxTags", Names::Prop),
+    ("multiple", Names::Prop),
+    ("openOn", Names::Prop),
+    ("placeholder", Names::Prop),
+    ("readonly", Names::Prop),
+    ("removeLabel", Names::Prop),
+    ("restText", Names::Prop),
+    ("resultsLabel", Names::Prop),
+    ("selectedLabel", Names::Prop),
+    ("suggest", Names::Prop),
+    ("value", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onBeforeFilter", Names::Event),
+    ("onChange", Names::Event),
+    ("onCreate", Names::Event),
+    ("onFilter", Names::Event),
+    ("onInput", Names::Event),
+];
+
+/// What such a field computes for its parts, each read as `combobox.x`.
+pub const COMBOBOX_COMPUTED: &[&str] = &[
+    "createActive",
+    "createShown",
+    "createWords",
+    "fieldPlaceholder",
+    "listName",
+    "restLabel",
+    "restPress",
+    "restShown",
+    "restWords",
+    "status",
+    "tags",
+    "tagsShown",
+];
+
 /// What an option reads and sends, by the name the machine binds.
 pub const OPTION: &[(&str, Names)] = &[
     ("description", Names::Prop),
@@ -854,6 +901,11 @@ pub fn select(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "select", SELECT, SELECT_COMPUTED)
 }
 
+/// `combobox({ ... })`, each field a name.
+pub fn combobox(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "combobox", COMBOBOX, COMBOBOX_COMPUTED)
+}
+
 /// `option({ ... })`, each field a name.
 pub fn option(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "option", OPTION, OPTION_COMPUTED)
@@ -960,6 +1012,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "paginationSize" => pagination_size(value),
         "listbox" => listbox(value),
         "select" => select(value),
+        "combobox" => combobox(value),
         "option" => option(value),
         "optionGroup" => option_group(value),
         "chatRoot" => chat_root(value),
