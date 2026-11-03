@@ -386,3 +386,17 @@ fn a_stack_of_messages_opens_its_notice_on_what_it_holds_with_no_toggle_or_open_
         .iter()
         .any(|why| why.contains("declares no state `open`")));
 }
+
+#[test]
+fn a_dialog_a_wrap_draws_is_a_layer_its_toggle_opens_and_its_rules_may_read_the_window() {
+    let palette = family(
+        "export default headless('command', {
+          props: [prop('open', 'boolean')],
+          states: ['open'],
+          toggle: { prop: 'open' },
+          tree: [box('dialog', { draws: 'dialog', exports: { surface: true } })],
+        })",
+        "{ on: 'dialog-surface', set: [['margin-block-start', '20vh']] }",
+    );
+    assert_eq!(unresolved(&palette), Vec::<String>::new());
+}
