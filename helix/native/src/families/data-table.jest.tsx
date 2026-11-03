@@ -136,9 +136,8 @@ describe('a table drawn from an array', () => {
 
   test("its ref takes the web element's methods", async () => {
     const ref = createRef<DataTableHandle>()
-    const props = { ref } as Record<string, unknown>
     await draw(
-      <HelixDataTable label="Files" rowKey="id" rows={files} {...props}>
+      <HelixDataTable label="Files" ref={ref} rowKey="id" rows={files}>
         {columns}
       </HelixDataTable>,
     )

@@ -407,6 +407,22 @@ pub fn typed_members(
             ty: "Ref<WindowHandle>".to_owned(),
         });
     }
+    /* A Data Table offers what the web element's methods do. */
+    if family.api.data_table.is_some() {
+        members.push(Member {
+            doc: vec!["The table's handle. `search()`, `toggleSort()`, `hideColumn()`, `showColumn()` and `csv()` are the web element's methods.".to_owned()],
+            name: "ref".to_owned(),
+            ty: "Ref<DataTableHandle>".to_owned(),
+        });
+    }
+    /* A Log offers what the web element's methods do. */
+    if family.api.log_root.is_some() {
+        members.push(Member {
+            doc: vec!["The log's handle. `write()`, `writeLine()`, `clear()`, `resume()`, `scrollToLine()`, `lines`, `done` and `text` are the web element's members.".to_owned()],
+            name: "ref".to_owned(),
+            ty: "Ref<LogHandle>".to_owned(),
+        });
+    }
     let mut typed = Typed::default();
     let mut faults = Vec::new();
     for one in family
