@@ -241,10 +241,16 @@ export const useValidation = (
   }, [context, feedback, send])
   /* The ref holds what the element's other machines offer beside `validate`,
      as a file input's `removeAt`. */
-  useImperativeHandle(props.ref as Ref<FieldHandle> | undefined, () => ({ ...handle, validate }), [
-    handle,
-    validate,
-  ])
+  /* Copied by their descriptors, so a member read or written through a getter, as a
+     filter field's `value`, stays one. */
+  useImperativeHandle(
+    props.ref as Ref<FieldHandle> | undefined,
+    () =>
+      Object.assign(Object.defineProperties({}, Object.getOwnPropertyDescriptors(handle)), {
+        validate,
+      }),
+    [handle, validate],
+  )
   /* The sentence under the control, which the tree reads by the name the
      form gives it, while a failure shows. */
   const message = boundTo(use, 'message', 'state')

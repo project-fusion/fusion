@@ -1,0 +1,67 @@
+# Filter Input, its examples drawn alone: the field with its chips, a chip removed by
+# its remove press, the suggestions under the field narrowed by typing and chosen with
+# the keyboard still up, and the filter menu opened. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`. Each wait matches the words inside the name each
+# platform gives an element.
+appId: dev.fusion.helix.app
+name: "Screens: Filter Input"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://filter-input/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Staging.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: filter-input-preview-${MODE}-${SIZE}
+# A chip's remove press reaches the field, whose handler takes the chip out.
+- tapOn:
+    text: '.*Remove the env filter.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    notVisible: '.*Staging.*'
+    timeout: 10000
+- takeScreenshot: filter-input-preview-removed-${MODE}-${SIZE}
+- openLink: helix://filter-input/suggesting/preview
+- extendedWaitUntil:
+    visible: '.*owner:ada status:open.*'
+    timeout: 15000
+- tapOn:
+    text: '.*owner:ada status:open.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*area.*'
+    timeout: 10000
+- inputText: st
+- extendedWaitUntil:
+    notVisible: '.*area.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: filter-input-suggesting-${MODE}-${SIZE}
+# A press on a suggestion with the keyboard up completes the key, and its values come next.
+- tapOn:
+    text: '^status$'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*closed.*'
+    timeout: 10000
+- takeScreenshot: filter-input-suggesting-chosen-${MODE}-${SIZE}
+- openLink: helix://filter-input/picking/preview
+- extendedWaitUntil:
+    visible: '.*Search, or pick a filter.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: filter-input-picking-${MODE}-${SIZE}
+- tapOn:
+    text: '^Filter$'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*Disposition.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: filter-input-picking-menu-${MODE}-${SIZE}

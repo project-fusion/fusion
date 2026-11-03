@@ -48,7 +48,7 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['toggle/root/toggle-root.css', '[part="item"]::after'],
   ['app-header/root/app-header-root.css', '[part="toggle"]::after'],
   ['carousel/root/carousel-root.css', '[part~="indicator"]::after'],
-  ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
+  ['filter-input/chip/filter-chip.generated.css', '[part="dismiss"]::after'],
   ['rating/root/rating-root.css', '[part="option"]::after'],
   ['date-picker/root/date-picker-root.css', '[part="previous"]::after'],
   ['date-picker/root/date-picker-root.css', '[part="next"]::after'],
@@ -59,7 +59,7 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['chat/composer/chat-composer.css', '[part="send"]::after'],
   ['chat/message/chat-message.css', '[part="retry"]::after'],
   ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
-  ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
+  ['filter-input/chip/filter-chip.generated.css', '[part="dismiss"]::after'],
   ['lightbox/root/lightbox-root.css', '[part="zoom-out"]::after'],
   ['color-picker/root/color-picker-root.css', '[part="swatch"]::after'],
 ]

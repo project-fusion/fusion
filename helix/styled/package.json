@@ -272,6 +272,22 @@
       "types": "./dist/file-input/index.d.ts",
       "default": "./dist/file-input/index.js"
     },
+    "./filter-input": {
+      "react-native": {
+        "types": "./dist/filter-input/index.native.d.ts",
+        "default": "./dist/filter-input/index.native.js"
+      },
+      "types": "./dist/filter-input/index.d.ts",
+      "default": "./dist/filter-input/index.js"
+    },
+    "./filter-input/menu": {
+      "react-native": {
+        "types": "./dist/filter-input/index.native.d.ts",
+        "default": "./dist/filter-input/index.native.js"
+      },
+      "types": "./dist/filter-input/menu/index.d.ts",
+      "default": "./dist/filter-input/menu/index.js"
+    },
     "./flex": {
       "react-native": {
         "types": "./dist/flex/index.native.d.ts",
