@@ -51,7 +51,9 @@
 # <out> gets `screenshots`, `videos`, `frame-rate`, a JUnit report of each
 # pass in `reports`, what Maestro keeps of each pass that fails in `debug`,
 # and `summary.md`. A flow an emulator's drop failed runs again, under
-# `<pass>-again-<n>`, as `rerun_dropped` says. A pass that fails leaves the next
+# `<pass>-again-<n>`, as `rerun_dropped` says. A pass whose every flow failed
+# before running a command runs again once, as `none_ran` says, its first run
+# kept under `<pass>-first`. A pass that fails leaves the next
 # ones to run, and the script fails at the end. Each pass that ends is written up as it ends, so a
 # job stopped by its timeout keeps the passes before.
 set -uo pipefail
@@ -254,6 +256,20 @@ emulator_back() {
   emulator_ready
 }
 
+# Whether every flow of the run named by the argument failed and none of them
+# ran a command: the device was not there, and nothing was tested. In run
+# 41575426749 all 60 flows of screens-light-default failed in about 1 ms each,
+# 27 s after the pass began, on an emulator that had been offline twice while it
+# booted. No flow's log named a drop and none was cut short mid-command, so
+# `rerun_dropped` ran nothing again. A flow that ran a command and failed is a
+# real failure, and keeps the pass from running again.
+none_ran() {
+  local report="$out/reports/$1.xml"
+  grep -qs '<testcase' "$report" &&
+    ! grep -qs 'status="SUCCESS"' "$report" &&
+    ! grep -qsE '"status" *: *"COMPLETED"' "$out/debug/$1/.maestro/tests"/*/*/commands.json
+}
+
 # Writes `summary.md` from the passes that have ended.
 summarize() {
   {
@@ -304,6 +320,18 @@ pass() {
       driver=--reinstall-driver
       rm -rf "$out/debug/$name"
       run_maestro "$name" "$@" || result=failed
+    elif none_ran "$name" && { [[ $platform == ios ]] || emulator_ready; }; then
+      say "No flow of $name ran a command; running $name again"
+      driver=--reinstall-driver
+      interrupted+=("$name-first")
+      mv "$out/debug/$name" "$out/debug/$name-first"
+      if ! run_maestro "$name" "$@"; then
+        if [[ $platform == android && -n $(failed_flows "$name") ]]; then
+          rerun_dropped "$name" "$@" || result=failed
+        else
+          result=failed
+        fi
+      fi
     elif [[ $platform == android && -n $(failed_flows "$name") ]]; then
       rerun_dropped "$name" "$@" || result=failed
     elif emulator_back "$name"; then
