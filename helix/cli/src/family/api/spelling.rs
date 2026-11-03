@@ -827,6 +827,29 @@ const PAGINATION_ROOT: &[Field] = &[
     ("total", "total", Name),
 ];
 
+const DATE_PICKER: &[Field] = &[
+    ("atEnd", "atEnd", Name),
+    ("atStart", "atStart", Name),
+    ("columns", "columns", Name),
+    ("defaultProp", "defaultProp", Name),
+    ("heading", "heading", Name),
+    ("headingLabel", "headingLabel", Name),
+    ("months", "months", Name),
+    ("nextWords", "nextWords", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onBeforeNavigate", "onBeforeNavigate", Name),
+    ("onChange", "onChange", Name),
+    ("onInput", "onInput", Name),
+    ("onNavigate", "onNavigate", Name),
+    ("periodRows", "periodRows", Name),
+    ("periods", "periods", Name),
+    ("previousWords", "previousWords", Name),
+    ("prop", "prop", Name),
+    ("selection", "selection", Name),
+    ("steps", "steps", Name),
+    ("unset", "unset", Name),
+];
+
 const PAGINATION_SIZE: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1295,6 +1318,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("dataTableRoot", "dataTableRoot", DATA_TABLE),
     ("paginationRoot", "paginationRoot", PAGINATION_ROOT),
     ("paginationSize", "paginationSize", PAGINATION_SIZE),
+    ("datePicker", "datePicker", DATE_PICKER),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),
     ("combobox", "combobox", COMBOBOX),
