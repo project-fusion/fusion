@@ -233,23 +233,29 @@ const usePlaced = ({
       update()
     }
   }, [active, update, window.width, window.height])
-  /* The anchor, measured each frame while the layer is open. */
+  /* The anchor, and the layer's own size, measured each frame while the layer is
+     open: a layer that drew wider at first and then narrowed, as a combobox's list
+     does as its first letter narrows it, kept the shift its first width needed. */
   useEffect(() => {
     if (!active) {
       room.current = undefined
       return undefined
     }
-    let last = ''
+    const last = { anchor: '', layer: '' }
     let frame = 0
-    const look = () => {
-      const anchor = refs.reference.current as Measured | null
-      anchor?.measureInWindow?.((left, top, width, height) => {
-        const now = `${left},${top},${width},${height}`
-        if (now !== last) {
-          last = now
+    const heard =
+      (which: 'anchor' | 'layer') =>
+      (...box: readonly number[]) => {
+        const now = (which === 'anchor' ? box : box.slice(2)).join(',')
+        if (now !== last[which]) {
+          last[which] = now
           update()
         }
-      })
+      }
+    const look = () => {
+      const anchor = refs.reference.current as Measured | null
+      anchor?.measureInWindow?.(heard('anchor'))
+      ;(refs.floating?.current as Measured | null | undefined)?.measureInWindow?.(heard('layer'))
       frame = requestAnimationFrame(look)
     }
     frame = requestAnimationFrame(look)
