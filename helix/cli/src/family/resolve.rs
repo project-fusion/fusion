@@ -258,6 +258,30 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
     }
 }
 
+/// Where the element's `validation` names resolve to nothing, and where nothing
+/// holds the answer it validates.
+fn validated(family: &Family, names: &Names, found: &mut Vec<String>) {
+    let Some(validation) = &family.api.validation else {
+        return;
+    };
+    references("validation", validation.references(), names, found);
+    if family.api.toggle.is_none()
+        && family.api.collection.is_none()
+        && family.api.entry.is_none()
+        && family.api.range.is_none()
+        && family.api.files.is_none()
+        && family.api.color.is_none()
+        && family.api.listbox.is_none()
+        && family.api.select.is_none()
+        && family.api.combobox.is_none()
+    {
+        found.push(
+            "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files`, `color`, `listbox`, `select` or `combobox` holds its answer"
+                .to_owned(),
+        );
+    }
+}
+
 /// Where one element's names resolve to nothing, one sentence each.
 pub fn unresolved(family: &Family) -> Vec<String> {
     let names = Names::of(family);
@@ -334,24 +358,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     layered::layered(family, &names, &mut found);
     gestures::gestures(family, &names, &mut found);
     stack::stacked(family, &names, &mut found);
-    if let Some(validation) = &family.api.validation {
-        references("validation", validation.references(), &names, &mut found);
-        if family.api.toggle.is_none()
-            && family.api.collection.is_none()
-            && family.api.entry.is_none()
-            && family.api.range.is_none()
-            && family.api.files.is_none()
-            && family.api.color.is_none()
-            && family.api.listbox.is_none()
-            && family.api.select.is_none()
-            && family.api.combobox.is_none()
-        {
-            found.push(
-                "the element declares a `validation`, and no `toggle`, `collection`, `text`, `range`, `files`, `color`, `listbox`, `select` or `combobox` holds its answer"
-                    .to_owned(),
-            );
-        }
-    }
+    validated(family, &names, &mut found);
     items::item(family, &names, &mut found);
     /* An element with no headless source has no tree to hold its rules to. */
     if !family.tree.is_empty() {
