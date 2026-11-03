@@ -11,6 +11,7 @@ import { CHECKBOX_GROUP } from './scenarios/checkbox-group.js'
 import { CODE_BLOCK } from './scenarios/code-block.js'
 import { COLOR_INPUT } from './scenarios/color-input.js'
 import { COLOR_PICKER } from './scenarios/color-picker.js'
+import { COMBOBOX } from './scenarios/combobox.js'
 import { COPY_BUTTON } from './scenarios/copy-button.js'
 import { DATA_TABLE } from './scenarios/data-table.js'
 import { DIALOG } from './scenarios/dialog.js'
@@ -76,6 +77,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'code-block': CODE_BLOCK,
   'color-input': COLOR_INPUT,
   'color-picker': COLOR_PICKER,
+  combobox: COMBOBOX,
   'copy-button': COPY_BUTTON,
   'data-table': DATA_TABLE,
   dialog: DIALOG,

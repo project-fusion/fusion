@@ -321,6 +321,7 @@ const OPENS: ReadonlySet<string> = new Set(['accordion', 'tree'])
 
 /** The families that open a layer, whose record says whether it stands open. */
 const LAYERS: ReadonlySet<string> = new Set([
+  'combobox',
   'select',
   'color-input',
   'dialog',
@@ -466,6 +467,13 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'listbox' ? { focused: null, options: optionRows(mounted) } : {}),
   /* While its list stands open, focus is on the list on the web, and on an option on a phone. */
   ...(family === 'select' && inState(mounted.root, 'open') ? { focused: null } : {}),
+  /* The options a filter leaves, while the list stands open; focus stays in the field. */
+  ...(family === 'combobox'
+    ? {
+        focused: null,
+        ...(inState(mounted.root, 'open') ? { options: optionRows(mounted) } : {}),
+      }
+    : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
