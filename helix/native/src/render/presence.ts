@@ -141,7 +141,7 @@ const machineStates = (family: Family): ReadonlySet<string> => {
 /**
  * The `has-` states the web element sets while a region holds something,
  * each by the state's name: `has-label` while the `label` region does, or
- * while the prop of that name holds words. **A family's `label` may be its
+ * while the prop of that name holds words or is on. **A family's `label` may be its
  * default region**, as a checkbox's words are written between its tags. **A
  * state the family computes in
  * its `derived` is left to it**, as a card's `has-footer` is, and so is one
@@ -163,7 +163,8 @@ export const hasStates = (
     states[state] =
       filled.includes(region) ||
       (region === 'label' && filled.includes('default')) ||
-      (typeof words === 'string' && words !== '')
+      (typeof words === 'string' && words !== '') ||
+      words === true
   }
   return states
 }

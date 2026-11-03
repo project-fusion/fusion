@@ -74,7 +74,23 @@ export default styles(
       ]),
     ]
     return [
-      on('host', [web([rule({ display: 'contents' })]), native([rule({ flexGrow: 1 })])]),
+      on('host', [
+        web([rule({ display: 'contents' })]),
+        native([
+          rule({ flexGrow: 1 }),
+          /* The menu stands beside the column on a phone, so the rule runs under both. */
+          rule(
+            { hasMenu: true },
+            {
+              borderBlockEnd: [
+                token('border-thin'),
+                'solid',
+                measured('_table-heading-rule-color', hook.ruleColor),
+              ],
+            },
+          ),
+        ]),
+      ]),
       on('column', [
         rule({
           alignItems: 'center',
@@ -106,7 +122,10 @@ export default styles(
             zIndex: own.tableHeadingLayer('auto'),
           },
         }),
-        native([rule({ flexDirection: 'row', flexGrow: 1 })]),
+        native([
+          rule({ flexDirection: 'row', flexGrow: 1 }),
+          rule({ hasMenu: true }, { borderBlockEndWidth: token('space-none'), flexGrow: 0 }),
+        ]),
         rule({ textAlign: 'center' }, { justifyContent: 'center' }),
         rule({ textAlign: 'end' }, { justifyContent: 'flex-end' }),
         web([
@@ -141,7 +160,7 @@ export default styles(
         /* The sort button shrinks to its words so the menu button sits beside the
            chevrons. A press on the rest of the heading still sorts: the table listens on
            the whole column. */
-        web([rule({ hasMenu: true }, { flex: '0 1 auto' })]),
+        rule({ hasMenu: true }, { flex: '0 1 auto' }),
         web(ring),
       ]),
       /* Two chevrons, quiet until one of them is the current direction. The box is
