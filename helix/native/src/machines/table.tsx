@@ -87,6 +87,8 @@ export interface TableOffer {
   readonly resize: (column: string, value: string) => void
   /** How far the rows overflow the frame. */
   readonly over: number
+  /** Whether the first column pins: one as wide as the frame would hide every other. */
+  readonly pins: boolean
   /** A row's press, where it does anything. */
   readonly rowPress: ((row: RowModel) => void) | undefined
   readonly scroll: SharedValue<number>
@@ -330,13 +332,16 @@ export const pinShift = (scroll: number, lead: number, over: number, rtl: boolea
 }
 
 /** A style that holds a box still once the table scrolls past the columns before it. */
-export const usePin = (offer: Pick<TableOffer, 'leadWidth' | 'over' | 'scroll'> | undefined) => {
+export const usePin = (
+  offer: Pick<TableOffer, 'leadWidth' | 'over' | 'pins' | 'scroll'> | undefined,
+) => {
   const scroll = offer?.scroll
   const lead = offer?.leadWidth ?? 0
   const over = offer?.over ?? 0
+  const pins = offer?.pins !== false
   const rtl = direction() === 'rtl'
   return useAnimatedStyle(() => ({
-    transform: [{ translateX: pinShift(scroll?.value ?? 0, lead, over, rtl) }],
+    transform: [{ translateX: pins ? pinShift(scroll?.value ?? 0, lead, over, rtl) : 0 }],
   }))
 }
 
@@ -566,6 +571,7 @@ const offerOf = (
     lead,
     leadWidth: lead.reduce((sum, _, at) => sum + (widths?.[at] ?? 0), 0),
     over: Math.max(0, (total ?? 0) - (tracks.frame ?? 0)),
+    pins: (widths?.[lead.length] ?? 0) < (tracks.frame ?? Number.POSITIVE_INFINITY),
     resize: (column, value) => state.setResized((was) => ({ ...was, [column]: value })),
     rowPress: presses ? rowPressOf(state) : undefined,
     said: (name, values) => worded(family, props, name, values),

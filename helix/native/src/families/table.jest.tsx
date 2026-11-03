@@ -22,6 +22,10 @@ describe('a table on a phone', () => {
       trackWidths(['minmax(max-content, 1fr)', 'minmax(max-content, 1fr)'], [300, 200], 390, BASIS),
     ).toEqual([300, 200])
     expect(trackWidths(['minmax(14ch, 2fr)', '100px'], [], 110, BASIS)).toEqual([98, 100])
+    /* Between its two lengths, by what the others leave. */
+    expect(trackWidths(['minmax(100px, 200px)', '100px'], [], 250, BASIS)).toEqual([150, 100])
+    expect(trackWidths(['minmax(100px, 200px)', '100px'], [], 500, BASIS)).toEqual([200, 100])
+    expect(trackWidths(['minmax(100px, 200px)', '100px'], [], 150, BASIS)).toEqual([100, 100])
   })
 
   test('a cell says its heading with its words', async () => {
@@ -36,6 +40,29 @@ describe('a table on a phone', () => {
       </HelixRoot>,
     )
     expect(screen.getByLabelText('Region: us-east-1')).toBeTruthy()
+  })
+
+  test('a cell keeps the inset that separates it from the next, and the last ends on the rule', async () => {
+    await render(
+      <HelixRoot>
+        <HelixTable label="Services">
+          <HelixTableColumn>Region</HelixTableColumn>
+          <HelixTableColumn>Status</HelixTableColumn>
+          <HelixTableRow>
+            <HelixTableCell>us-east-1</HelixTableCell>
+            <HelixTableCell>Healthy</HelixTableCell>
+          </HelixTableRow>
+        </HelixTable>
+      </HelixRoot>,
+    )
+    const inset = (label: string): unknown => {
+      const box = screen.getByLabelText(label)
+      const host = box.children[0] as { readonly props: { readonly style?: unknown } }
+      const style = StyleSheet.flatten(host.props.style as never) as Record<string, unknown>
+      return style.paddingEnd ?? style.paddingRight
+    }
+    expect(inset('Region: us-east-1')).toBeGreaterThan(0)
+    expect(inset('Status: Healthy')).toBe(0)
   })
 
   test('a pinned column stands still past the columns before it, on either edge', () => {
@@ -103,8 +130,10 @@ describe('a table on a phone', () => {
       <HelixRoot>
         <HelixTable label="Services">
           <HelixTableColumn textAlign="end">Region</HelixTableColumn>
+          <HelixTableColumn>Status</HelixTableColumn>
           <HelixTableRow value="a">
             <HelixTableCell>us-east-1</HelixTableCell>
+            <HelixTableCell>Healthy</HelixTableCell>
           </HelixTableRow>
         </HelixTable>
       </HelixRoot>,

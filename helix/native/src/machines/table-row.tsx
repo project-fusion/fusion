@@ -32,6 +32,7 @@ import {
   type TableOffer,
   usePin,
 } from './table'
+import { CellAt } from './table-cell-at'
 import { type CellModel, cellsOf, type RowModel } from './table-model'
 
 /** The words a phone says of a cell: its column's heading, then its own. */
@@ -256,10 +257,15 @@ export const useTableRow = (family: Family, props: Props, use: MachineUse): Beha
     view === null ? undefined : keys().listen(view, (press) => heard.current(press as KeyPress)),
   )
   const entries = cells.map((cell, index) => {
+    const id = String(index)
     return {
       at: index,
-      draw: () => atEdge(cell.element, offer?.columns[index]?.textAlign ?? ''),
-      key: String(index),
+      draw: () => (
+        <CellAt at={index} count={cells.length} key={id}>
+          {atEdge(cell.element, offer?.columns[index]?.textAlign ?? '')}
+        </CellAt>
+      ),
+      key: id,
       pinned: index === 0 && offer !== undefined,
     }
   })

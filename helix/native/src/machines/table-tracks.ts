@@ -15,6 +15,8 @@ interface Sized {
   readonly least: number | undefined
   /** Whether what is still left once the shares are out stretches it. */
   readonly stretches: boolean
+  /** The length what is left may grow it to, where `minmax()` writes one above its least. */
+  readonly most: number | undefined
   /** Its share of the room, where it takes one. */
   readonly share: number | undefined
 }
@@ -57,12 +59,16 @@ const sizedOf = (track: string, basis: Basis, frame: number): Sized => {
   const [low, high] = endsOf(track)
   const share = shareOf(high)
   if (shareOf(low) !== undefined) {
-    return { least: 0, share, stretches: false }
+    return { least: 0, most: undefined, share, stretches: false }
   }
   const least = CONTENT.test(low) ? undefined : (pointsOf(low, basis, frame) ?? 0)
   const fixed = CONTENT.test(high) || share !== undefined ? undefined : pointsOf(high, basis, frame)
+  /* A track written with no least is its length. Written `minmax(9rem, 14rem)`, it
+     starts at its least and grows into what the others leave, as CSS sizes it. */
+  const named = /^minmax\(/i.test(track.trim()) && least !== undefined
   return {
-    least: fixed === undefined ? least : Math.max(least ?? 0, fixed),
+    least: fixed === undefined || named ? least : Math.max(least ?? 0, fixed),
+    most: named ? fixed : undefined,
     share,
     stretches: /^auto$/i.test(high),
   }
@@ -97,6 +103,25 @@ const frameShare = (
   }
 }
 
+/** Grows each track that has a `most` into `room`, evenly, none past its own. */
+const growInto = (widths: number[], tracks: readonly Sized[], room: number): number => {
+  let left = room
+  for (;;) {
+    const growing = tracks.flatMap((track, at) =>
+      track.most !== undefined && track.most > (widths[at] ?? 0) ? [at] : [],
+    )
+    if (left <= 0 || growing.length === 0) {
+      return left
+    }
+    const part = left / growing.length
+    for (const at of growing) {
+      const taken = Math.min(part, (tracks[at]?.most ?? 0) - (widths[at] ?? 0))
+      widths[at] = (widths[at] ?? 0) + taken
+      left -= taken
+    }
+  }
+}
+
 /** Each track's width at `frame`, with `contents` the widest cell each has drawn. */
 export const trackWidths = (
   written: readonly string[],
@@ -110,7 +135,7 @@ export const trackWidths = (
   const widths = tracks.map((track, at) =>
     track.share === undefined || frozen.has(at) ? (bases[at] ?? 0) : size * track.share,
   )
-  const left = frame - widths.reduce((total, one) => total + one, 0)
+  const left = growInto(widths, tracks, frame - widths.reduce((total, one) => total + one, 0))
   const stretching = tracks.flatMap((track, at) => (track.stretches ? [at] : []))
   if (left > 0 && stretching.length > 0 && !tracks.some((track) => track.share !== undefined)) {
     for (const at of stretching) {
