@@ -25,6 +25,8 @@ import { useDataTable } from './data-table'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
+import { useFilterInput } from './filter-input'
+import { useFilterMenu } from './filter-menu'
 import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
 import { useJoin } from './join'
@@ -391,6 +393,30 @@ export const behaviorFor = (family: Family): UseBehavior => {
             around.chosen.current = value
             return behavior
           },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'filter-input')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, handle, value } = useFilterInput(
+              family,
+              props,
+              use,
+              around.toggled,
+              around.touch,
+            )
+            around.chosen.current = value
+            around.handle.current = handle
+            return behavior
+          },
+      ),
+    ...uses
+      .filter((use) => use.machine === 'filter-menu')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useFilterMenu(family, props, use),
       ),
     ...uses
       .filter((use) => use.machine === 'command')

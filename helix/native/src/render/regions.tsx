@@ -295,6 +295,12 @@ export const drawRegion = (
   )
 }
 
+/** What a region holds: what a machine draws in it in place of what was passed, or what was. */
+const passedInto = (scope: Scope, name: string): unknown => {
+  const replaced = scope.behavior.regions?.[name]
+  return replaced === undefined ? regionContent(scope.props, name) : replaced
+}
+
 /** What a region draws: what is passed into it, or what it falls back to. */
 const drawContent = (
   scope: Scope,
@@ -310,7 +316,7 @@ const drawContent = (
   const regions = { ...around, ...scope.host.contents[node.name]?.style }
   /* A copy that holds a slide of its own draws it in its slot, as a carousel's pane. */
   const own = scope.item?.fields.slide
-  const content = own === undefined ? regionContent(scope.props, node.name) : own
+  const content = own === undefined ? passedInto(scope, node.name) : own
   /* **A flag is not content.** A list's `loading` is a prop and a region
      both, so `loading` on its own draws the words the region falls back to,
      as React draws nothing for `true`. */

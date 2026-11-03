@@ -79,6 +79,12 @@ export interface Behavior {
    * join it through.
    */
   readonly provide?: (drawn: ReactNode) => ReactNode
+  /**
+   * What a region draws in place of what was passed into it, by the region's
+   * name, as a field for filters draws its first `max-tags` tokens and hands each
+   * token what it hears through it. A region not named draws what was passed.
+   */
+  readonly regions?: Readonly<Record<string, unknown>>
 }
 
 /**
@@ -246,9 +252,18 @@ export const merged = (...behaviors: readonly Behavior[]): Behavior => {
   }
   const wraps = behaviors.flatMap((behavior) => (behavior.provide ? [behavior.provide] : []))
   const marks = behaviors.flatMap((behavior) => behavior.marks)
+  const given = behaviors.flatMap((behavior) =>
+    behavior.regions === undefined ? [] : [behavior.regions],
+  )
+  const regions = given.length === 0 ? {} : { regions: Object.assign({}, ...given) }
   return wraps.length === 0
-    ? { marks, parts }
-    : { marks, parts, provide: (drawn) => wraps.reduceRight((inner, wrap) => wrap(inner), drawn) }
+    ? { marks, parts, ...regions }
+    : {
+        marks,
+        parts,
+        provide: (drawn) => wraps.reduceRight((inner, wrap) => wrap(inner), drawn),
+        ...regions,
+      }
 }
 
 /**
