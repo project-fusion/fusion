@@ -347,6 +347,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly paginationRoot: Computes<'atEnd' | 'atStart' | 'empty' | 'slots' | 'status'>
   /** What a page-size control computes for its parts. */
   readonly paginationSize: Computes<'empty' | 'options' | 'shown'>
+  /** What a month calendar computes for its parts. */
+  readonly datePicker: Computes<'atEnd' | 'atStart' | 'columns' | 'heading' | 'headingLabel' | 'months' | 'nextWords' | 'periodRows' | 'periods' | 'previousWords' | 'selection' | 'steps' | 'unset'>
   /** What a carousel computes for its parts. */
   readonly carousel: Computes<
     | 'arrows'

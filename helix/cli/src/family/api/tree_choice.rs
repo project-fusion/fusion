@@ -543,6 +543,35 @@ pub const PAGINATION: &[(&str, Names)] = &[
 /// What a pagination computes for its parts, each read as `paginationRoot.x`.
 pub const PAGINATION_COMPUTED: &[&str] = &["atEnd", "atStart", "empty", "slots", "status"];
 
+/// What a month calendar reads and sends, by the name the machine binds. Its other
+/// props it reads by their own names.
+pub const DATE_PICKER: &[(&str, Names)] = &[
+    ("defaultProp", Names::Prop),
+    ("prop", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onBeforeNavigate", Names::Event),
+    ("onChange", Names::Event),
+    ("onInput", Names::Event),
+    ("onNavigate", Names::Event),
+];
+
+/// What a month calendar computes for its parts, each read as `datePicker.x`.
+pub const DATE_PICKER_COMPUTED: &[&str] = &[
+    "atEnd",
+    "atStart",
+    "columns",
+    "heading",
+    "headingLabel",
+    "months",
+    "nextWords",
+    "periodRows",
+    "periods",
+    "previousWords",
+    "selection",
+    "steps",
+    "unset",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1000,6 +1029,11 @@ pub fn pagination_root(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "paginationRoot", PAGINATION, PAGINATION_COMPUTED)
 }
 
+/// `datePicker({ ... })`, each field a name.
+pub fn date_picker(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "datePicker", DATE_PICKER, DATE_PICKER_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1089,6 +1123,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "dataTableRoot" => data_table(value),
         "paginationRoot" => pagination_root(value),
         "paginationSize" => pagination_size(value),
+        "datePicker" => date_picker(value),
         "listbox" => listbox(value),
         "select" => select(value),
         "combobox" => combobox(value),

@@ -74,9 +74,9 @@ pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
     TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND,
-    DATA_TABLE, FILTER_INPUT, FILTER_MENU, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
-    NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION,
-    PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    DATA_TABLE, DATE_PICKER, FILTER_INPUT, FILTER_MENU, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE,
+    LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP,
+    PAGINATION, PAGINATION_SIZE, SELECT, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -211,6 +211,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it chooses a page size.
     #[serde(rename = "paginationSize", skip_serializing_if = "Option::is_none")]
     pub pagination_size: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a month calendar.
+    #[serde(rename = "datePicker", skip_serializing_if = "Option::is_none")]
+    pub date_picker: Option<TreeChoice>,
     #[serde(rename = "chatRoot", skip_serializing_if = "Option::is_none")]
     pub chat_root: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a turn in a conversation.
@@ -371,6 +374,7 @@ impl Api {
             && self.carousel.is_none()
             && self.pagination_root.is_none()
             && self.pagination_size.is_none()
+            && self.date_picker.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
             && self.combobox.is_none()
@@ -459,6 +463,7 @@ const FIELDS: &[&str] = &[
     "carousel",
     "paginationRoot",
     "paginationSize",
+    "datePicker",
     "listbox",
     "select",
     "combobox",
@@ -521,6 +526,9 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         pagination_size: field("paginationSize")
             .map(tree_choice::pagination_size)
+            .transpose()?,
+        date_picker: field("datePicker")
+            .map(tree_choice::date_picker)
             .transpose()?,
         listbox: field("listbox").map(tree_choice::listbox).transpose()?,
         select: field("select").map(tree_choice::select).transpose()?,

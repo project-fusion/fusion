@@ -870,3 +870,27 @@ export interface PaginationSizeChoice {
   readonly sizes?: string
   readonly value?: string
 }
+
+/** A month calendar's names, each read as `datePicker.x`. */
+export interface DatePickerChoice {
+  readonly atEnd?: string
+  readonly atStart?: string
+  readonly columns?: string
+  readonly defaultProp?: string
+  readonly heading?: string
+  readonly headingLabel?: string
+  readonly months?: string
+  readonly nextWords?: string
+  readonly onBeforeChange?: string
+  readonly onBeforeNavigate?: string
+  readonly onChange?: string
+  readonly onInput?: string
+  readonly onNavigate?: string
+  readonly periodRows?: string
+  readonly periods?: string
+  readonly previousWords?: string
+  readonly prop?: string
+  readonly selection?: string
+  readonly steps?: string
+  readonly unset?: string
+}
