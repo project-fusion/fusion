@@ -365,6 +365,27 @@ const useAcross = (): {
   return { scroll, wrap }
 }
 
+/**
+ * At rest a table drawn from an array holds its stop on its first row, as on the
+ * web, whichever row that is now. A move by the keys ends the rest.
+ */
+const restOnFirstRow = (standing: Standing, first: string | undefined): void => {
+  if (first === undefined) {
+    return
+  }
+  if (standing.stop === undefined || standing.stop.row === standing.resting) {
+    standing.stop = { column: 0, row: first }
+    standing.resting = first
+  }
+}
+
+/** The tracks that stand before a table's columns, in the order they are drawn. */
+const leadTracks = (reorderable: boolean, selectable: boolean, nests: boolean): string[] => [
+  ...(reorderable ? ['grip'] : []),
+  ...(selectable ? ['select'] : []),
+  ...(nests ? ['expand'] : []),
+]
+
 /** What a table works out of what it holds and what a reader chose. */
 const useStanding = (family: Family, props: Props, use: MachineUse, over?: TableOver) => {
   const read = reader(family, props, use)
@@ -376,26 +397,14 @@ const useStanding = (family: Family, props: Props, use: MachineUse, over?: Table
   const ownExpanded = useHeld(read('expanded'), read('defaultExpanded'))
   const [expanded, setExpanded] = over?.expanded ?? ownExpanded
   const open = new Set(commaList(expanded))
-  /* At rest a table drawn from an array holds its stop on its first row, as on the
-     web, whichever row that is now. A move by the keys ends the rest. */
-  const first = rows[0]?.key
-  if (
-    over !== undefined &&
-    first !== undefined &&
-    (standing.stop === undefined || standing.stop.row === standing.resting)
-  ) {
-    standing.stop = { column: 0, row: first }
-    standing.resting = first
+  if (over !== undefined) {
+    restOnFirstRow(standing, rows[0]?.key)
   }
   const nests = over === undefined ? rows.some((row) => row.parent !== '') : over.shapes.size > 0
   const selectable = read('selectable') === true
   const ownShapes = useMemo(() => rowShapes(rows), [rows])
   const shapes = over?.shapes ?? ownShapes
-  const lead = [
-    ...(read('reorderable') === true ? ['grip'] : []),
-    ...(selectable ? ['select'] : []),
-    ...(nests ? ['expand'] : []),
-  ]
+  const lead = leadTracks(read('reorderable') === true, selectable, nests)
   const [resized, setResized] = useState<Readonly<Record<string, string>>>({})
   const written = [
     ...lead.map(() => 'max-content'),
