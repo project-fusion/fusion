@@ -63,6 +63,7 @@ export type Family =
   | 'tour'
   | 'listbox'
   | 'combobox'
+  | 'command'
   | 'select'
   | 'tree'
 

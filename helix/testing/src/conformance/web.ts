@@ -519,7 +519,7 @@ const nameOf = (type: string, family: string): string | undefined => {
  */
 export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> => {
   const root = build(scenario.setup)
-  const { heard, mounted } = mountSetup(root)
+  const { heard, mounted } = mountSetup(root, scenario.family)
   const opened: string[] = []
   const follow = (event: Event) => {
     const link = event.composedPath().find((node) => node instanceof HTMLAnchorElement)
