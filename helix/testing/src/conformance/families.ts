@@ -64,6 +64,7 @@ export type Family =
   | 'listbox'
   | 'combobox'
   | 'command'
+  | 'filter-input'
   | 'select'
   | 'tree'
 
