@@ -1411,8 +1411,18 @@ elements the page passed in: each entry's `draw` is the function a `<Wrap render
 calls, the one place `renders` reads a copy's `field()` and no prop.
 
 `--_table-heading-*` are read with `measured()` by their whole names, since Data
-Table's hand-written sheet sets them on the column. Its source takes them over in
-wave 6.
+Table's source sets them on the column.
+
+## Data Table
+
+`dataTableRoot` says what a phone's machine reads that Table does not. Core's
+`@fusion.dev/helix-core/data-table` decides which rows show. The machine hands
+each row to Table's machine as a `TableRow` of `TableCell`s, with the props and
+events Table reads bound to Data Table's own attributes. Rows and cells draw in
+Table's rules, so a phone has one row to keep.
+
+A hook that only a fragment reads is refused as unused: the check does not read
+the fragment. `data-table-rows` holds the rules whose hooks the table reads too.
 
 ## Log and following a box's newest content
 

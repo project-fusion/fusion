@@ -19,6 +19,7 @@ import { useCodeBlock } from './code-block'
 import { useColor } from './color'
 import { useColorField } from './color-field'
 import { type Copied, useCopy } from './copy'
+import { useDataTable } from './data-table'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
@@ -260,6 +261,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useTreeItem(family, props, use, around.toggled),
+      ),
+    /* A table drawn from an array. */
+    ...uses
+      .filter((use) => use.machine === 'data-table')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useDataTable(family, props, use),
       ),
     /* A table, and a row and a column of one. */
     ...uses

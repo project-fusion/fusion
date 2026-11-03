@@ -6,7 +6,7 @@ import { styles as collectionErrorStyles } from '../../shared/collection/error.c
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as recipeStyles } from '../recipes.css.js'
-import { styles } from './data-table-root.css.js'
+import { styles } from './data-table-root.generated.css.js'
 import '../../checkbox/index.js'
 import '../../divider/index.js'
 import '../../menu/index.js'
