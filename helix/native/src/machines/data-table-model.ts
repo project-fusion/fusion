@@ -107,6 +107,8 @@ export interface Asked {
 /** The rows a page draws, how many there are, and each key past the page. */
 export interface Seen {
   /** Every key in reading order. */
+  /** Every row the search left, past the page, in order. */
+  readonly all: readonly DataRow[]
   readonly every: readonly string[]
   /** How many rows the search left. */
   readonly matched: number
@@ -134,6 +136,7 @@ const treeSeen = (rows: readonly DataRow[], axes: Axis[], asked: Asked): Seen =>
     return { key, row }
   })
   return {
+    all: tree.rows,
     every: tree.every.map((row) => keyOf(row, -1, asked.rowKey)),
     matched: asked.server ? Math.max(asked.total, tree.rows.length) : tree.rows.length,
     page,
@@ -150,6 +153,7 @@ export const seenOf = (rows: readonly DataRow[], axes: Axis[], asked: Asked): Se
   }
   if (asked.server) {
     return {
+      all: rows,
       every: keyed(rows, asked.rowKey).map((one) => one.key),
       matched: Math.max(asked.total, rows.length),
       page: keyed(rows, asked.rowKey),
@@ -165,6 +169,7 @@ export const seenOf = (rows: readonly DataRow[], axes: Axis[], asked: Asked): Se
   const all = arranged(rows, axes, { query: asked.filter, spec: asked.sort })
   const places = new Map(rows.map((row, at) => [row, at]))
   return {
+    all: all.rows,
     every: all.rows.map((row) => keyOf(row, places.get(row) ?? 0, asked.rowKey)),
     matched: view.matched,
     page: view.rows.map((row) => ({
