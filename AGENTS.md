@@ -173,6 +173,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing workbench cli templates create-app visual
 cortex/    core trace engram docs
+valence/   the content system, declared: its design and decisions, no code yet
 fusion/    cli docs plugins rules scripts site: what belongs to the company
            rather than to a product. `docs/insights` is the published writing;
            `rules` is the crate every command line takes, which is what a rule
