@@ -106,9 +106,9 @@ export interface Asked {
 
 /** The rows a page draws, how many there are, and each key past the page. */
 export interface Seen {
-  /** Every key in reading order. */
   /** Every row the search left, past the page, in order. */
   readonly all: readonly DataRow[]
+  /** Every key in reading order. */
   readonly every: readonly string[]
   /** How many rows the search left. */
   readonly matched: number
