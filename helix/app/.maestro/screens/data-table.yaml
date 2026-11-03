@@ -29,6 +29,26 @@ name: "Screens: Data Table"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: data-table-column-menu-${MODE}-${SIZE}
+# The first touch on a screen that has just opened is lost on the iOS simulator,
+# as `button.yaml` says, and a press while a sheet still rises lands on its scrim.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn:
+    text: File column menu
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: Sort descending
+    timeout: 20000
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    text: Sort descending
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: asset-018.webp
+    timeout: 20000
+- takeScreenshot: data-table-column-menu-descending-${MODE}-${SIZE}
 - openLink: helix://data-table/nested-rows/nested-rows
 - waitForAnimationToEnd:
     timeout: 5000
