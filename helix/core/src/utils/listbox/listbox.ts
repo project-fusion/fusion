@@ -11,6 +11,7 @@
 export { selectsAll } from '../chord/chord.js'
 export { chosenValues } from '../chosen-values/chosen-values.js'
 export { columnStep } from '../column-step/column-step.js'
+export { completionFor, creationFor } from '../combobox-text/combobox-text.js'
 export { countLabel } from '../count-label/count-label.js'
 export { type DataOption, type DataOptionItem, dataOptions } from '../data-options/data-options.js'
 export { filterKeeps } from '../filter-marks/filter-marks.js'

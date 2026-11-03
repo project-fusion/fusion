@@ -32,6 +32,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { completionFor, creationFor } from '@fusion.dev/helix-core/listbox'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -778,14 +779,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * copy of what they are looking at.
    */
   private get creation(): string {
-    const typed = this.typed.trim()
-    if (!this.creatable || typed === '') {
-      return ''
-    }
-    const exists = (this.listbox?.options ?? []).some(
-      (option) => option.text.trim().toLowerCase() === typed.toLowerCase(),
-    )
-    return exists ? '' : typed
+    return creationFor(this.typed, this.creatable, this.listbox?.options ?? [])
   }
 
   /**
@@ -1020,15 +1014,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * the whole point of showing it.
    */
   private completionFor(typed: string): string {
-    if (typed === '') {
-      return ''
-    }
-    const needle = typed.toLowerCase()
-    const match = (this.listbox?.options ?? []).find(
-      (option) =>
-        !option.hidden && !option.disabled && option.text.toLowerCase().startsWith(needle),
-    )
-    return match && match.text.length > typed.length ? match.text : ''
+    return completionFor(typed, this.listbox?.options ?? [])
   }
 
   /**
