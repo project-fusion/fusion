@@ -29,7 +29,7 @@ import { collection } from '../machines/collection'
 import { type HelixEvent, handlerOf, tell } from '../machines/props'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
-import { type Around, AroundContext, useInheritedText } from './around'
+import { type Around, AroundContext, type GivenStyle, useInheritedText } from './around'
 import { type Made, madeFor } from './made'
 import { bound, camel, resolve, type Scope, split } from './styles'
 import { drawText } from './words-node'
@@ -41,11 +41,23 @@ const aroundOf = (
   made: Made,
   box: ReturnType<typeof resolve>,
 ): Around => {
-  const parts: Record<string, Style> = {}
+  const parts: Record<string, GivenStyle> = {}
   for (const part of exportsOf(node)) {
-    const { style } = resolve(scope, `${node.name}-${part}`)
-    if (Object.keys(style).length > 0) {
-      parts[part] = style
+    const name = `${node.name}-${part}`
+    if (Object.keys(resolve(scope, name).style).length > 0) {
+      /* Resolved again where the part stands, so a layer's window reaches it. */
+      parts[part] = (where) =>
+        resolve(
+          {
+            ...scope,
+            base: {
+              ...scope.base,
+              ...(where.viewport === undefined ? {} : { viewport: where.viewport }),
+              measured: { ...scope.base.measured, ...where.measured },
+            },
+          },
+          name,
+        ).style
     }
   }
   return {

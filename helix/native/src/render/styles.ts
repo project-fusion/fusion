@@ -6,12 +6,14 @@ import type { Line, Resolved, Slotted, Style } from '../style/resolved'
 import { style } from '../style/style'
 import { stepsOf, withoutTransform } from '../style/transforms'
 import type { Theme } from '../theme/theme'
+import type { GivenStyle } from './around'
 import { type Behavior, boundBy, type Props, viewFor } from './behavior'
 import { carried } from './carried'
 import { colorModeOf } from './color-mode'
 import { computedAttribute, derivedFor, holdsContent, laidOr } from './computed'
 import { type Entry, ofCopy } from './entry'
 import { UNFOLDED } from './fold'
+import { withGiven } from './given'
 import type { Scrolling } from './scrolled'
 import { totalHolds } from './total'
 
@@ -30,7 +32,7 @@ export interface Values {
   /** Its words' locale where its `locale` names none: the nearest `lang`, or the reader's. */
   readonly locale?: string
   /** The style the element around gives each part, where a box of it draws this one. */
-  readonly parts?: Readonly<Record<string, Style>> | undefined
+  readonly parts?: Readonly<Record<string, GivenStyle>> | undefined
   /** The element's props, by React's names. */
   readonly props: Props
 }
@@ -262,8 +264,7 @@ export const resolve = (
     part: { ...own, ...state, ...states },
   })
   /* The element around styles a part of this one where its box draws it. */
-  const given = styling.parts?.[name]
-  return given === undefined ? resolved : { ...resolved, style: { ...resolved.style, ...given } }
+  return withGiven(styling, name, resolved)
 }
 
 /**

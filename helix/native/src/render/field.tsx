@@ -5,10 +5,11 @@
  */
 
 import type { ReactNode } from 'react'
-import { StyleSheet, TextInput, type TextInputProps } from 'react-native'
+import { StyleSheet, type TextInputProps } from 'react-native'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
 import { wrapped } from './behavior'
+import { FieldStop } from './field-stop'
 import { fieldSemantics } from './semantics'
 import { bound, fromText, inherit, laid, resolve, type Scope, split } from './styles'
 
@@ -164,5 +165,5 @@ export const drawField = (scope: Scope, node: Node, text: Style): ReactNode => {
     },
     scope.item,
   )
-  return wrapped(scope.behavior, node.name, <TextInput key={node.name} {...view} />, node.name)
+  return wrapped(scope.behavior, node.name, <FieldStop key={node.name} {...view} />, node.name)
 }

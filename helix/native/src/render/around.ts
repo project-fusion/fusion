@@ -5,8 +5,16 @@
  * that provide it.
  */
 import { createContext, useContext } from 'react'
+import type { Context } from '../style/context'
 import type { Layout, Placed, Resolution, Slotted, Style } from '../style/resolved'
 import type { Tracks } from './tracks'
+
+/** The style the element around gives a part, under what the part's own place measures. */
+export type GivenStyle = (
+  where: {
+    readonly [Key in 'measured' | 'viewport']?: Context[Key] | undefined
+  },
+) => Style
 
 /** What region content inherits from the part around it. */
 export interface Around {
@@ -33,8 +41,12 @@ export interface Around {
    * part's own name, where a box of the element around draws this one and
    * its rules style a part it exports, as `[part="select-all"]::part(box)`
    * does on the web. Absent for content passed into a region.
+   *
+   * **Each is resolved where the part stands**, under the window and the lengths
+   * of the layer it is: a palette's `dialog-surface` stands a fifth of the window
+   * down, which no length the element around measures can say.
    */
-  readonly parts?: Readonly<Record<string, Style>>
+  readonly parts?: Readonly<Record<string, GivenStyle>>
   /**
    * Where the child stands among the elements passed in with it, which its
    * own `:host(:first-child)` rules read.
