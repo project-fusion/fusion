@@ -176,6 +176,8 @@ export type Intent =
       readonly held?: Held
       readonly item?: string
       readonly kind: 'press'
+      /** The press inside the element's own root named by these words, as a calendar's day. */
+      readonly label?: string
       readonly link?: string
       readonly part?: string
       /** The row at this place in the element's `items`, on a family whose items arrive as data. */
