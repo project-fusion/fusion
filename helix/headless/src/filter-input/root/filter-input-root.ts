@@ -28,13 +28,6 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
-import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
-import { HelixHeadlessFilterField } from '../field/filter-field.js'
-import { type FilterGrammarField, readFilterText } from '../grammar.js'
 import {
   completeTerm,
   currentField,
@@ -43,7 +36,14 @@ import {
   type FilterSuggestion,
   suggests,
   tokenEntry,
-} from '../suggest.js'
+} from '@fusion.dev/helix-core/filter-text'
+import { x } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
+import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
+import { HelixHeadlessFilterField } from '../field/filter-field.js'
+import { type FilterGrammarField, readFilterText } from '../grammar.js'
 import {
   type BoundTable,
   facetOf,
