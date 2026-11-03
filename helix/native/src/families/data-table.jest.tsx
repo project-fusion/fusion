@@ -5,8 +5,9 @@
  */
 import { describe, expect, jest, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
-import type { ReactNode } from 'react'
+import { createRef, type ReactNode } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import type { DataTableHandle } from '../machines/data-table-handle'
 import { light } from '../theme/light.generated'
 import { ThemeProvider } from '../theme/theme'
 import { HelixDataTable } from './data-table/index.native'
@@ -131,6 +132,39 @@ describe('a table drawn from an array', () => {
     )
     expect(shown(NAMES)).toEqual(NAMES.slice(0, 2))
     expect(screen.getByLabelText('Next page')).toBeTruthy()
+  })
+
+  test("its ref takes the web element's methods", async () => {
+    const ref = createRef<DataTableHandle>()
+    const props = { ref } as Record<string, unknown>
+    await draw(
+      <HelixDataTable label="Files" rowKey="id" rows={files} {...props}>
+        {columns}
+      </HelixDataTable>,
+    )
+    await act(async () => {
+      expect(ref.current?.search('arch')).toBe(true)
+    })
+    expect(shown(NAMES)).toEqual(['archive'])
+    expect(ref.current?.csv()).toBe('Name,Size\r\narchive,900')
+    await act(async () => {
+      expect(ref.current?.search('')).toBe(true)
+      expect(ref.current?.toggleSort('name')).toBe(true)
+    })
+    expect(screen.getAllByText(/^(archive|export)$/)[0]?.props.children).toBe('archive')
+    await act(async () => {
+      expect(ref.current?.toggleSort('name')).toBe(true)
+    })
+    expect(screen.getAllByText(/^(archive|export)$/)[0]?.props.children).toBe('export')
+    await act(async () => {
+      expect(ref.current?.hideColumn('size')).toBe(true)
+    })
+    expect(screen.queryByText('Size')).toBeNull()
+    expect(ref.current?.hideColumn('name')).toBe(false)
+    await act(async () => {
+      expect(ref.current?.showColumn('size')).toBe(true)
+    })
+    expect(screen.queryByText('Size')).not.toBeNull()
   })
 
   test('a refused page stays', async () => {

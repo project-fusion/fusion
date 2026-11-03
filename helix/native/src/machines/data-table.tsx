@@ -7,12 +7,14 @@
  * reader hears of a cell, selecting, and moving rows are Table's, and one set of
  * rules. The hooks a page sets here reach those rows through their own names.
  */
-import { cycle, format, parse } from '@fusion.dev/helix-core/table'
+import { cycle, format, inRowOrder, parse } from '@fusion.dev/helix-core/table'
+import { formatMessage } from '@fusion.dev/helix-core/words'
 import { useMemo, useState } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { madeFor } from '../render/made'
 import type { Family } from '../style/form'
+import { useDataTableHandle } from './data-table-handle'
 import { DataTableMenuContext, type DataTableMenus } from './data-table-menu'
 import {
   axesOf,
@@ -22,6 +24,7 @@ import {
   inOrder,
   seenOf,
 } from './data-table-model'
+import { TreeMark } from './data-table-tree-mark'
 import { boundTo, given, tell } from './props'
 import { useTable } from './table'
 import { ask, reader, useHeld } from './table-choice'
@@ -124,10 +127,15 @@ const useArranged = (family: Family, props: Props, use: MachineUse) => {
       tell(family, props, after, detail)
     }
   }
-  const toggle = (field: string, hide: boolean): void => {
+  const toggle = (field: string, hide: boolean): boolean => {
+    const column = all.find((one) => one.field === field)
+    const out = column !== undefined && isOut(column)
+    if (column === undefined || field === '' || out === hide || (hide && shown.length <= 1)) {
+      return false
+    }
     const detail = { field, hidden: hide }
     if (!tell(family, props, 'before-column-toggle', detail)) {
-      return
+      return false
     }
     setHidden((was) => {
       const next = new Set(was)
@@ -139,13 +147,25 @@ const useArranged = (family: Family, props: Props, use: MachineUse) => {
       return next
     })
     tell(family, props, 'column-toggle', detail)
+    return true
   }
   return { all, arrangedColumns, hidden, moveColumn, shown, toggle }
 }
 
 /** The search, the page, and its size. */
 const usePaged = (family: Family, props: Props) => {
-  const [filter] = useHeld(given(family, props, 'filter'), given(family, props, 'default-filter'))
+  const [filter, setFilter] = useHeld(
+    given(family, props, 'filter'),
+    given(family, props, 'default-filter'),
+  )
+  const search = (query: string): boolean => {
+    if (!tell(family, props, 'before-filter', { value: query })) {
+      return false
+    }
+    setFilter(query)
+    tell(family, props, 'filter', { value: query })
+    return true
+  }
   const [size] = useHeldNumber(
     given(family, props, 'page-size'),
     given(family, props, 'default-page-size'),
@@ -164,7 +184,7 @@ const usePaged = (family: Family, props: Props) => {
     tell(family, props, 'navigate', details)
     return true
   }
-  return { filter, navigate, page: Math.max(1, page), size: Math.max(0, Math.floor(size)) }
+  return { filter, navigate, page: Math.max(1, page), search, size: Math.max(0, Math.floor(size)) }
 }
 
 /** Hosts a table drawn from an array. */
@@ -202,6 +222,15 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
     total,
   })
   const header = headerOf(columns.shown)
+  const says = (name: string): string => wordOf(family, props, name)
+  const disclose = (key: string): void => {
+    const next = new Set(open)
+    if (!next.delete(key)) {
+      next.add(key)
+    }
+    const value = inRowOrder(next, seen.every).join(',')
+    ask(family, props, tableUse, ['onBeforeExpand', 'onExpand'], value, () => expanded[1](value))
+  }
   const row = madeFor('helix-table-row')
   const cell = madeFor('helix-table-cell')
   const hooks = (props as { readonly hooks?: Readonly<Record<string, unknown>> }).hooks
@@ -216,12 +245,36 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
           <row.Component hooks={rowHooks} key={key} value={key}>
             {columns.shown.map((column) => (
               <cell.Component header={column === header} hooks={rowHooks} key={column.field}>
+                {column === header && childField !== '' ? (
+                  <TreeMark
+                    branch={seen.shapes.get(key)?.branch === true}
+                    label={formatMessage(
+                      says('expandRowLabel'),
+                      { row: String(column.read(entry)) },
+                      '',
+                    )}
+                    level={seen.shapes.get(key)?.level ?? 1}
+                    onPress={() => disclose(key)}
+                    open={open.has(key)}
+                  />
+                ) : null}
                 {cellContent(column.read(entry))}
               </cell.Component>
             ))}
           </row.Component>
         ))),
   ]
+  useDataTableHandle({
+    columns: columns.shown,
+    hide: columns.toggle,
+    ref: props.ref,
+    rows: seen.all,
+    search: paged.search,
+    toggleSort: (field) => {
+      const value = format(cycle(parse(sorting.sort), field))
+      return ask(family, props, tableUse, ['onBeforeSort', 'onSort'], value, () => setSort(value))
+    },
+  })
   const table = useTable(family, { ...props, children }, tableUse, {
     everyKey: seen.every,
     expanded,
@@ -236,7 +289,6 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
     given(family, props, 'loading') !== true &&
     String(given(family, props, 'errorText') ?? '') === '' &&
     seen.page.length > 0
-  const says = (name: string): string => wordOf(family, props, name)
   const menus: DataTableMenus = {
     columns: columns.shown.map((column) => column.field),
     hide: (field) => columns.toggle(field, true),

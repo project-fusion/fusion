@@ -16,6 +16,8 @@ export interface GridHost {
   readonly arrive: (row: number, toggle: boolean) => void
   /** Right or Left on a disclosure cell: done, a row to move to, or neither. */
   readonly disclose: (row: number, forward: boolean) => boolean | number
+  /** Whether a column holds the disclosure Right and Left turn. */
+  readonly discloses: (column: number) => boolean
   /** How many columns lead the cells. */
   readonly lead: readonly string[]
   /** The last row's place. */
@@ -111,7 +113,7 @@ const disclosed = (
     press.shift ||
     press.control ||
     press.meta ||
-    host.lead[place.column] !== 'expand'
+    !host.discloses(place.column)
   ) {
     return false
   }

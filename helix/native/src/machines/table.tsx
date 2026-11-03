@@ -409,7 +409,8 @@ const useStanding = (family: Family, props: Props, use: MachineUse, over?: Table
   const selectable = read('selectable') === true
   const ownShapes = useMemo(() => rowShapes(rows), [rows])
   const shapes = over?.shapes ?? ownShapes
-  const lead = leadTracks(read('reorderable') === true, selectable, nests)
+  /* A table drawn from an array holds its disclosure in the row header's cell. */
+  const lead = leadTracks(read('reorderable') === true, selectable, nests && over === undefined)
   const [resized, setResized] = useState<Readonly<Record<string, string>>>({})
   const written = [
     ...lead.map(() => 'max-content'),
@@ -428,6 +429,7 @@ const useStanding = (family: Family, props: Props, use: MachineUse, over?: Table
   return {
     choice: useChoice(family, props, use, rows, selected, setSelected, standing, over?.everyKey),
     columns,
+    discloseInHeader: over !== undefined && nests,
     discloseRow,
     drawn: over === undefined ? arranged(rows, columns, sorting.sort, open) : rows,
     lead,
@@ -489,6 +491,8 @@ const gridActions = (state: TableState) => {
       }
     },
     disclose: disclosing(state),
+    discloses: (column: number) =>
+      state.lead[column] === 'expand' || (state.discloseInHeader && column === state.lead.length),
     selectAll: () => {
       if (!selectable || choice.single) {
         return false

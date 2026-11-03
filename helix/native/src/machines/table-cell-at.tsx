@@ -2,7 +2,11 @@ import { type ReactNode, useMemo } from 'react'
 import { type Around, AroundContext, useAround } from '../render/around'
 
 /** What a cell stands in where no element is around the table. */
-const NOTHING: Around = { children: {}, values: {}, within: { flex: true, row: false, tracks: [] } }
+export const NOTHING: Around = {
+  children: {},
+  values: {},
+  within: { flex: true, row: false, tracks: [] },
+}
 
 /**
  * A cell at its place among the row's cells. **Each cell stands in a box of its

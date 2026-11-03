@@ -29,6 +29,7 @@ export type {
 } from './contract'
 export { useCountdown, useDelay, useWallClock } from './machines/clocks'
 export { behaviorFor } from './machines/compose'
+export type { DataTableHandle } from './machines/data-table-handle'
 export type { FileStatus, FilesHandle } from './machines/files'
 export { claimLongPress, type HoldRank } from './machines/long-press'
 export type { HelixEvent, PlatformEvent } from './machines/props'
