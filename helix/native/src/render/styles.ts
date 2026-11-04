@@ -305,6 +305,10 @@ export const PAINT = new Set([
   'fill',
   'fillOpacity',
   'r',
+  'rx',
+  'ry',
+  'stopColor',
+  'stopOpacity',
   'stroke',
   'strokeDasharray',
   'strokeDashoffset',
@@ -312,6 +316,7 @@ export const PAINT = new Set([
   'strokeLinejoin',
   'strokeOpacity',
   'strokeWidth',
+  'vectorEffect',
 ])
 
 /** A part's style as what its view takes and what its text takes. A shape's paint, `paintOf` reads. */

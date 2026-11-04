@@ -48,9 +48,18 @@ const WEB = new Set(['class', 'className', 'id', 'style'])
 
 /**
  * `data-` attributes a native component reads, as a grid reads a cell's
- * span, any element its density, and a rule whether a color mode is named.
+ * span, any element its density, and a rule whether a color mode is named. A
+ * table that is hidden visually stays a source a chart reads, and a cell's
+ * `data-value` is the number a chart draws for it, as on the web.
  */
-const READ = new Set(['data-active', 'data-color-mode', 'data-density', 'data-grid-span'])
+const READ = new Set([
+  'data-active',
+  'data-color-mode',
+  'data-density',
+  'data-grid-span',
+  'data-hidden-visually',
+  'data-value',
+])
 
 /** The recipes an `a` draws by, which only it reads. */
 const LINK = new Set(['aria-current', 'data-button', 'data-button-tone', 'data-card', 'data-link'])
@@ -261,6 +270,7 @@ const DRAWN_AS_THE_WEB = new Set([
   'a',
   'b',
   'blockquote',
+  'caption',
   'circle',
   'ellipse',
   'em',

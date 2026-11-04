@@ -3,7 +3,13 @@
    the element around gives them the recipe of Helix's base layer, and a chat
    message gives them the values its turns take there. Outside `data-prose`
    they stay plain, as the base layer resets them on the web. */
-import { type Tokens, useInheritedText, useTokens } from '@fusion.dev/helix-native'
+import type { Row as ChartRow, RowCell } from '@fusion.dev/helix-core/chart'
+import {
+  publishChartSource,
+  type Tokens,
+  useInheritedText,
+  useTokens,
+} from '@fusion.dev/helix-native'
 import * as React from 'react'
 import { ScrollView, Text, View } from 'react-native'
 import { type Props, proseInk, Span } from './words.native'
@@ -433,10 +439,100 @@ const sharesOf = (children: React.ReactNode): number[] => {
   return shares
 }
 
-export const Table = ({ children }: Props) => {
+/** A cell as a chart reads it: its words, and the number its `data-value` or its words hold. */
+const cellOf = (name: string, cell: React.ReactNode): RowCell => {
+  const text = wordsIn(cell).trim()
+  const given = React.isValidElement<Props>(cell) ? cell.props['data-value'] : undefined
+  const raw = (typeof given === 'string' || typeof given === 'number' ? String(given) : text).trim()
+  const value = Number(raw)
+  return { name, text, ...(raw !== '' && Number.isFinite(value) ? { value } : {}) }
+}
+
+/** The instant a row's heading holds in a `<time dateTime>`, where it holds one. */
+const whenIn = (node: React.ReactNode): string | undefined => {
+  for (const child of React.Children.toArray(node)) {
+    if (React.isValidElement<Props>(child)) {
+      const when =
+        typeof child.props.dateTime === 'string'
+          ? child.props.dateTime
+          : whenIn(child.props.children)
+      if (when !== undefined) {
+        return when
+      }
+    }
+  }
+  return undefined
+}
+
+/** The words of the table's caption, which names a single series. */
+const captionIn = (node: React.ReactNode): string =>
+  React.Children.toArray(node)
+    .filter(
+      (child): child is React.ReactElement<Props> =>
+        React.isValidElement<Props>(child) && child.type === Caption,
+    )
+    .map((child) => wordsIn(child.props.children).trim())
+    .join(' ')
+
+/**
+ * A table's rows as a chart reads them, as the web's `readRows` reads a
+ * table: the names of the head row's cells after the first, then each row of
+ * the body headed by its first cell.
+ */
+export const rowsOfTable = (children: React.ReactNode): ChartRow[] => {
+  const all = rowsIn(children)
+  const headed = (row: React.ReactElement<Props>) =>
+    React.Children.toArray(row.props.children).every(
+      (cell) => React.isValidElement(cell) && cell.type === HeadCell,
+    )
+  const head = all.find((row) => headed(row))
+  const names =
+    head === undefined
+      ? []
+      : React.Children.toArray(head.props.children)
+          .slice(1)
+          .map((cell) => wordsIn(cell).trim())
+  return all
+    .filter((row) => row !== head)
+    .map((row) => {
+      const [first, ...rest] = React.Children.toArray(row.props.children)
+      const when = whenIn(first)
+      return {
+        cells: rest.map((cell, at) => cellOf(names[at] ?? '', cell)),
+        label: wordsIn(first).trim(),
+        ...(when === undefined ? {} : { when }),
+      }
+    })
+}
+
+/** A table's caption, which a chart reads as its single series' name. */
+export const Caption = ({ children }: Props) => React.createElement(Paragraph, null, children)
+
+/** Hidden from sight and still read, as the web's `data-hidden-visually` hides a table a chart reads. */
+const UNSEEN = {
+  height: 1,
+  opacity: 0,
+  overflow: 'hidden',
+  position: 'absolute',
+  width: 1,
+} as const
+
+export const Table = ({ children, ...props }: Props) => {
   const tokens = useTokens()
   const { kind } = React.useContext(ScopeContext)
   const shares = React.useMemo(() => sharesOf(children), [children])
+  const id = typeof props.id === 'string' ? props.id : ''
+  /* A table with an id is a source a chart's `for` reads, as on the web. */
+  React.useEffect(
+    () =>
+      id === ''
+        ? undefined
+        : publishChartSource(id, { caption: captionIn(children), rows: rowsOfTable(children) }),
+    [children, id],
+  )
+  if (props['data-hidden-visually'] !== undefined) {
+    return React.createElement(View, { style: UNSEEN }, React.Children.toArray(children))
+  }
   const box =
     kind === 'turn'
       ? {
