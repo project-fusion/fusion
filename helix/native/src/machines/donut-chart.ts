@@ -28,11 +28,9 @@ import {
   donutRing,
   donutShares,
   formatNumbers,
-  isChartData,
   percentIn,
   type Row,
   readingPosition,
-  rowsFromData,
   rowsWithShare,
   seriesIndex,
   seriesOfRows,
@@ -44,7 +42,8 @@ import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { showsSeries, useChartSource, useHiddenSeries } from '../render/chart-sources'
 import type { Family } from '../style/form'
-import { type Theme, useTheme } from '../theme/theme'
+import { useTheme } from '../theme/theme'
+import { boundAll, type Color, paletteOf, sourceOf } from './chart-common'
 import { type CursorHeard, useChartCursor } from './chart-cursor'
 import { kebab, wordsIn } from './date-picker-read'
 import { langOf } from './picker-field-kind'
@@ -54,24 +53,6 @@ type Read = (name: string) => unknown
 
 /** How far past the band a finger still finds a slice, in the drawing's units. */
 const SLACK = 6
-
-/** The palette color of the slice at a place, as the tree sets it in `--chart-series`. */
-type Color = (place: number) => string
-
-/**
- * The palette color of the slice at a place: the theme's series color, the
- * first sixteen trading places with their other tone in dark, as the web's
- * `--chart-series-*` hooks do. **A phone reads the color here**, since a
- * custom property a tree sets reads no `var()` of its own.
- */
-const paletteOf =
-  (theme: Theme): Color =>
-  (place) => {
-    const slot = seriesIndex(place)
-    const dark = theme.mode === 'dark'
-    const toned = !dark || slot > 16 ? slot : slot <= 8 ? slot + 8 : slot - 8
-    return String(theme.tokens[`color-series-${toned}`] ?? 'transparent')
-  }
 
 /** The ring's readings: the table's rows, the first column of amounts, and its place in a row. */
 interface Drawn {
@@ -186,15 +167,6 @@ const sender =
 const aspectOf = (ring: DonutRing, drawn: boolean): string =>
   !ring.half ? '1' : drawn ? String(100 / (40 + ring.thickness / 2)) : '2'
 
-/** The rows the ring reads: the table its `for` names first, as the web's chart reads one, and then `data`. */
-const sourceOf = (
-  table: ReturnType<typeof useChartSource>,
-  data: unknown,
-  lang: string,
-): ReturnType<typeof useChartSource> =>
-  table ??
-  (isChartData(data) ? { caption: data.caption ?? '', rows: rowsFromData(data, lang) } : undefined)
-
 /** What the ring reads and writes for a slice: its row with its share, and its words. */
 const readerOf = (read: Read, drawn: Drawn, lang: string) => {
   const format = percentIn(lang)
@@ -268,13 +240,6 @@ const bubbleOf = (drawn: Drawn, share: DonutShare | undefined, ring: DonutRing) 
     tipped: true,
   }
 }
-
-/** Each name of a record as the form binds it. */
-const boundAll = <T>(
-  flag: (name: string) => string,
-  record: Readonly<Record<string, T>>,
-): Record<string, T> =>
-  Object.fromEntries(Object.entries(record).map(([name, value]) => [flag(name), value]))
 
 /** Hosts a donut chart: its ring from its readings, and its reading. */
 export const useDonutChart = (family: Family, props: Props, use: MachineUse): Behavior => {
