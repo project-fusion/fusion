@@ -232,9 +232,17 @@ export class HelixHeadlessTabPanel extends HelixElement {
   protected override render(): TemplateResult {
     /* **No tab stop while not selected.** `hidden="until-found"` hides the
        content through `content-visibility` and leaves the panel's own box in
-       the tree, so a `tabindex` here would make an inactive panel focusable. */
+       the tree, so a `tabindex` here would make an inactive panel focusable.
+
+       **`aria-hidden` says what `content-visibility` already does.** Chromium
+       leaves skipped content out of the accessibility tree, and a tool that
+       reads the page itself need not know that: Playwright's accessibility
+       snapshot listed an inactive panel's text, on the examples whose text
+       sits directly in the panel, as text a reader could reach. Find in page
+       does not read `aria-hidden`, so it still searches the panel. */
     return html`<div
       part="panel"
+      aria-hidden=${this.selected ? nothing : 'true'}
       hidden=${this.selected ? nothing : this.findable ? 'until-found' : ''}
       tabindex=${!this.selected || this.holdsStop ? nothing : '0'}
       @beforematch=${this.handleBeforeMatch}

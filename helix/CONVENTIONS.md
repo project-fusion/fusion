@@ -224,6 +224,13 @@ through a text fragment, which reveals the way find in page does: the match
 selected its tab, a refused `helix-before-activate` left the panel hidden, and
 the inactive panel's box took no space and no clicks.
 
+**Say it with `aria-hidden` as well.** Chromium leaves skipped content out of
+the accessibility tree, and Playwright's accessibility snapshot does not read
+`content-visibility`: on the Tabs examples, whose text sits directly in the
+panel, it listed the inactive panel's text, while Chromium's own tree had no
+node for it. An inactive panel carries `aria-hidden="true"`, so every reader
+of the page agrees with the browser. Find in page does not read it.
+
 Carousel needs none of this. Its slides are scrolled out of view and not hidden,
 so the browser scrolls the track to a match, and the carousel moved to that
 slide on its own in the same test.
