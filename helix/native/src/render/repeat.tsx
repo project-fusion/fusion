@@ -27,7 +27,7 @@ type Fields = Readonly<Record<string, unknown>>
  * `each` names computes, or the list the prop it binds holds. Absent for a
  * repeat that counts.
  */
-const entriesOf = (scope: Scope, node: Node): readonly Fields[] | undefined => {
+export const entriesOf = (scope: Scope, node: Node): readonly Fields[] | undefined => {
   const each = node.attributes?.each
   if (each === undefined) {
     return undefined

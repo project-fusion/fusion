@@ -1169,6 +1169,29 @@ fill, stroke, and dashes take the component's colors and move as its state
 does. Without the package, the first shape drawn throws an error that names
 it and the command that installs it.
 
+**A chart's marks are computed by core and drawn by its vector.** A repeat
+inside a vector draws a shape for each entry of the list its machine computes,
+as a sparkline's columns, and a gradient's stops take their color and opacity
+from the style table. A strip written with `preserveAspectRatio="none"`
+fills its box, and `vector-effect: non-scaling-stroke` keeps its stroke its
+weight. Dense data is folded into a few paths before it reaches the vector, so
+100,000 points draw as a few dozen shapes.
+
+**The vector is a layer of its own.** `react-native-svg` draws a whole canvas
+again when any shape in it changes, so the canvas is drawn again only when what
+it draws changes, and the marks a chart lays over it, its cursor and its
+readout, move without it. Shapes jump to new data, and do not ease there.
+
+**A chart reads a table by its id.** A `<table>` with an `id` in shared code
+publishes its rows, and a chart whose `for` names that id reads them, as the
+web's chart reads a table in the page. `publishChartSource` publishes rows a
+page computes, and `useChartSource` reads them.
+
+**A chart's plot is one adjustable control.** A press-and-drag scrubs it with a
+haptic tick at each reading, a tap shows a reading and presses it, a screen
+reader's increment and decrement move the reading, and a hardware keyboard's
+arrows, Home, End, Page Up, Page Down, Enter, and Escape work as on the web.
+
 `glyphs` makes the `Glyph` `HelixRoot` draws a component's icons with, from
 icons that are SVG markup and a view box, such as `@fusion.dev/helix-icons`.
 Each icon keeps its own strokes and fills, and what it does not paint is drawn

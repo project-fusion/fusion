@@ -214,6 +214,8 @@ export const DRAWN: Readonly<Record<string, Mapping>> = {
     out.rotate = turned
     return undefined
   },
+  rx: paintLength('rx'),
+  ry: paintLength('ry'),
   scale: (out, value) => {
     if (value === 'none') {
       return undefined
@@ -226,6 +228,8 @@ export const DRAWN: Readonly<Record<string, Mapping>> = {
     out.scaleY = y
     return undefined
   },
+  'stop-color': kept('stopColor'),
+  'stop-opacity': kept('stopOpacity'),
   stroke: kept('stroke'),
   'stroke-dasharray': (out, value, space) => {
     if (value === 'none') {
@@ -280,6 +284,9 @@ export const DRAWN: Readonly<Record<string, Mapping>> = {
     out.translateY = down as number | string
     return undefined
   },
+  /* `non-scaling-stroke` keeps a stroke its width in points however a vector
+     written with `preserveAspectRatio="none"` is stretched, as on the web. */
+  'vector-effect': kept('vectorEffect'),
 }
 
 /** The properties whose value may be a list, which every other property's list is not. */
