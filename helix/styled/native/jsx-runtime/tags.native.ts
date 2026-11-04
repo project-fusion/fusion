@@ -93,6 +93,7 @@ import { HelixTab, HelixTabPanel, HelixTabs } from '../tabs/index.native'
 import { HelixTag, HelixTagGroup } from '../tag/index.native'
 import { HelixText } from '../text/index.native'
 import { HelixTextarea } from '../textarea/index.native'
+import { HelixTimeInput } from '../time-input/index.native'
 import { HelixTimePicker } from '../time-picker/index.native'
 import { HelixTimeline, HelixTimelineGroup, HelixTimelineItem } from '../timeline/index.native'
 import { HelixToast, HelixToastItem } from '../toast/index.native'
@@ -324,6 +325,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tag-group': TagGroup,
   'helix-text': HelixText,
   'helix-textarea': HelixTextarea,
+  'helix-time-input': HelixTimeInput,
   'helix-time-picker': HelixTimePicker,
   'helix-timeline': HelixTimeline,
   'helix-timeline-group': HelixTimelineGroup,

@@ -6,14 +6,18 @@
  */
 
 import { locale } from '@fusion.dev/helix-core/capabilities/locale'
+import { clockLocale, writeClock } from '@fusion.dev/helix-core/clock'
 import {
   committedDates,
+  committedTimes,
   type DateStyle,
   dateFault,
   dateKind,
   dateSegmentLocale,
   dateSegmentSystem,
   EXAMPLE_DATE,
+  exampleTime,
+  type HourCycle,
   type MonthSystem,
   type PickerKind,
   type PickerMode,
@@ -21,9 +25,13 @@ import {
   type SegmentOptions,
   type SegmentSlot,
   segmentLayout,
+  type TimeStyle,
+  timeFieldFault,
+  timeKind,
   writtenDate,
 } from '@fusion.dev/helix-core/picker-text'
 import { formatMessage } from '@fusion.dev/helix-core/words'
+import type { Family } from '../style/form'
 import { numberIn, wordsIn } from './date-picker-read'
 
 /** What is wrong with a field's values: nothing, a message alone, or a flag and its message. */
@@ -31,6 +39,11 @@ export type FieldFault = string | readonly [string, string]
 
 /** What a picker field holds and how it reads it. */
 export interface FieldKind {
+  /**
+   * Whether a pick of one value in the panel closes it: a date's does, and a
+   * time's does in a list, while on the wheels each turn is a third of a time.
+   */
+  readonly closesOnPick: boolean
   /** What its committed text names, written, before each is read back. */
   readonly committed: (value: string) => string[]
   /** What is wrong with the values, the empty string where nothing is. */
@@ -89,6 +102,7 @@ export const dateFieldKind = (read: Read): FieldKind => {
     step: numberIn(read('step')) ?? 1,
   }
   return {
+    closesOnPick: true,
     committed: (value) => committedDates(mode, value),
     fault: (value) =>
       dateFault(mode, value, rules, {
@@ -113,3 +127,51 @@ export const dateFieldKind = (read: Read): FieldKind => {
     text: dateKind(style, lang, calendar),
   }
 }
+
+/** A time field, as Time Input's props say. */
+export const timeFieldKind = (read: Read): FieldKind => {
+  const lang = langOf(read)
+  const hourCycle = (wordsIn(read('hour-cycle')) || undefined) as HourCycle | undefined
+  const seconds = read('seconds') === true
+  const style = (wordsIn(read('time-style')) || 'local') as TimeStyle
+  const mode = modeOf(read)
+  const text = timeKind(style, lang, hourCycle, seconds)
+  const say = sayIn(read, lang)
+  const clock = clockLocale(lang, hourCycle)
+  const max = wordsIn(read('max'))
+  const min = wordsIn(read('min'))
+  const rules = { disableTimes: wordsIn(read('disable-times')), max, min }
+  return {
+    closesOnPick: wordsIn(read('picker')) !== 'wheels',
+    committed: committedTimes,
+    fault: (value) =>
+      timeFieldFault(mode, value, rules, seconds, {
+        bad: () =>
+          wordsIn(read('bad-input-message')) ||
+          say('unreadable-message', {
+            example: text.written(exampleTime(seconds)),
+            mode,
+            shape: seconds ? 'HH:mm:ss' : 'HH:mm',
+          }),
+        length: say('range-length-message'),
+        over: () => say('range-overflow-message', { max: writeClock(max, clock, seconds) }),
+        unavailable: say('unavailable-message'),
+        under: () => say('range-underflow-message', { min: writeClock(min, clock, seconds) }),
+      }),
+    iso: style === 'iso',
+    lang,
+    layout: segmentLayout('time', lang, { hourCycle, seconds }),
+    locale: lang,
+    mode,
+    segmented: 'time',
+    sorts: true,
+    text,
+  }
+}
+
+/**
+ * The kind of field a family is, by the words its tag ends with: a field of
+ * times where it names one, and of dates otherwise.
+ */
+export const fieldKindFor = (family: Family): ((read: Read) => FieldKind) =>
+  family.tag.endsWith('time-input') ? timeFieldKind : dateFieldKind
