@@ -4,8 +4,19 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde_json::Value as Json;
 
+use super::tree::Flag;
 use crate::family::api::{Api, Attribute, Node, NodeKind};
 use crate::family::project::Names;
+
+/// The flag of an export a phone alone has, `exports={{ 'row-item': 'native' }}`:
+/// a part of the rows a drawn element draws from data, which the web draws as
+/// elements of its own.
+pub const NATIVE_EXPORT: &str = "native";
+
+/// Whether an export is a phone's alone.
+pub fn native_export(flag: &Flag) -> bool {
+    matches!(flag, Flag::Words(words) if words == NATIVE_EXPORT)
+}
 
 /// The regions a tree draws, by name. **A region marked for a phone alone is no
 /// slot of the web element's**, as the fields a filter field holds outside its
@@ -70,6 +81,24 @@ pub fn exported(tree: &[Node]) -> BTreeMap<String, (String, String)> {
     found
 }
 
+/// The parts of the elements a tree's boxes draw that a phone alone exports,
+/// `exports={{ 'row-item': 'native' }}`, by the name the box exposes each under.
+pub fn native_exported(tree: &[Node]) -> BTreeSet<String> {
+    let mut found = BTreeSet::new();
+    for node in tree {
+        if let Some(Attribute::Parts(exports)) = node.attributes.get("exports") {
+            found.extend(
+                exports
+                    .iter()
+                    .filter(|(_, flag)| native_export(flag))
+                    .map(|(part, _)| format!("{}-{part}", node.name)),
+            );
+        }
+        found.extend(native_exported(&node.children));
+    }
+    found
+}
+
 /// The tree the web element draws: every node but those only a phone draws,
 /// as a checkbox's tick, which the web draws as a mask on its mark. **A wrap
 /// only a phone draws leaves its children where it stands**, as a wrap
@@ -86,7 +115,7 @@ fn drawn_on_the_web(tree: &[Node]) -> Vec<Node> {
                 (true, NodeKind::Wrap) => drawn_on_the_web(&node.children),
                 (true, _) => Vec::new(),
                 (false, _) => vec![Node {
-                    attributes: node.attributes.clone(),
+                    attributes: web_attributes(node),
                     children: drawn_on_the_web(&node.children),
                     kind: node.kind,
                     name: node.name.clone(),
@@ -94,6 +123,15 @@ fn drawn_on_the_web(tree: &[Node]) -> Vec<Node> {
             }
         })
         .collect()
+}
+
+/// A node's attributes on the web, without the exports a phone alone has.
+fn web_attributes(node: &Node) -> BTreeMap<String, Attribute> {
+    let mut attributes = node.attributes.clone();
+    if let Some(Attribute::Parts(exports)) = attributes.get_mut("exports") {
+        exports.retain(|_, flag| !native_export(flag));
+    }
+    attributes
 }
 
 /// Where a family's API and tree differ from what the manifest says its

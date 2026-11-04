@@ -1,6 +1,7 @@
 //! The part tree, read from the node helpers, with each attribute held to
 //! the vocabulary.
 
+use super::parity::NATIVE_EXPORT;
 use std::collections::BTreeMap;
 use std::fmt;
 
@@ -218,9 +219,14 @@ pub fn node(lit: &Lit) -> Result<Node, String> {
                 .map(|(key, value)| {
                     let value = attribute(value)
                         .map_err(|why| format!("`{kind}('{name}')`: `{key}` {why}"))?;
-                    let worded = matches!(&value, Attribute::Parts(parts) if parts.values().any(|flag| matches!(flag, Flag::Words(_))));
-                    if worded && key != "gives" {
-                        return Err(format!("`{kind}('{name}')`: `{key}` takes each part's flag as a boolean, `bind()`, `not()` or `field()`, and words only in `gives`"));
+                    /* An export a phone alone has is `'native'`, as a time
+                    list's reach into the rows its list draws from data. */
+                    let worded = matches!(&value, Attribute::Parts(parts) if parts.values().any(|flag| match flag {
+                        Flag::Words(words) => key != "gives" && !(key == "exports" && words == NATIVE_EXPORT),
+                        _ => false,
+                    }));
+                    if worded {
+                        return Err(format!("`{kind}('{name}')`: `{key}` takes each part's flag as a boolean, `bind()`, `not()` or `field()`, words only in `gives`, and `'native'` in `exports`"));
                     }
                     vocabulary::attribute(kind, name, key, &value)?;
                     Ok((key.clone(), value))
