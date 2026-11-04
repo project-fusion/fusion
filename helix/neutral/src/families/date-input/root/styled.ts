@@ -6,7 +6,16 @@ import floatingEntrance from '../../../fragments/floating-entrance.js'
 import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
-import { difference, list, native, quotient, token, web } from '../../../style.js'
+import {
+  difference,
+  list,
+  measured,
+  native,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -187,6 +196,15 @@ export default styles(
         padding: token('space-sm'),
         position: web('absolute'),
       }),
+      /* A phone's reader may set text so large the calendar outgrows the window: the
+         panel keeps inside it and scrolls, its heading in view. */
+      native([
+        rule({
+          maxBlockSize: measured('floating-available-block-size', 'none'),
+          maxInlineSize: difference('100vw', product(token('space-md'), 2)),
+          overflowY: 'auto',
+        }),
+      ]),
     ]),
     on({ region: 'panel-header', slotted: '*' }, [
       rule({ display: web('block'), marginBlockEnd: token('space-sm') }),
