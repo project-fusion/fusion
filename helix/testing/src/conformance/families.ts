@@ -67,6 +67,7 @@ export type Family =
   | 'date-picker'
   | 'time-picker'
   | 'date-input'
+  | 'time-input'
   | 'filter-input'
   | 'select'
   | 'tree'
