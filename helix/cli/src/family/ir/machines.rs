@@ -87,10 +87,11 @@ use ts_rs::TS;
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
-    CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, FILTER_INPUT, FILTER_MENU,
-    INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
-    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SELECT,
-    SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM,
+    CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT,
+    FILTER_MENU, INSPECTOR, LEGEND, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE,
+    PICKER_FIELD, SELECT, SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE,
+    TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -639,6 +640,8 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.date_picker, DATE_PICKER, "date-picker"),
         (&api.time_picker, TIME_PICKER, "time-picker"),
         (&api.sparkline, SPARKLINE, "sparkline"),
+        (&api.donut_chart, DONUT_CHART, "donut-chart"),
+        (&api.legend, LEGEND, "legend"),
         (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),
         (&api.select, SELECT, "select"),

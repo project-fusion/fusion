@@ -64,9 +64,11 @@ import type {
   CommandChoice,
   DataTableChoice,
   DatePickerChoice,
+  DonutChartChoice,
   FilterInputChoice,
   FilterMenuChoice,
   InspectorChoice,
+  LegendChoice,
   ListboxChoice,
   LogGroupChoice,
   LogLineChoice,
@@ -351,6 +353,10 @@ export interface Headless {
   readonly timePicker?: TimePickerChoice
   /** What the element reads, sends, and computes where it is a sparkline. */
   readonly sparkline?: SparklineChoice
+  /** What the element reads, sends, and computes where it is a ring of shares. */
+  readonly donutChart?: DonutChartChoice
+  /** What the element reads, sends, and computes where it is a chart's key. */
+  readonly legend?: LegendChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */
