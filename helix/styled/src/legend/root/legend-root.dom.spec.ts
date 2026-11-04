@@ -109,7 +109,7 @@ describe('legend', () => {
     expect(sheet()).toContain(
       '--chart-series-1: light-dark(var(--helix-color-series-1), var(--helix-color-series-9))',
     )
-    expect(sheet()).toContain('var(--chart-series)')
+    expect(sheet()).toContain('var(--chart-series, var(--helix-color-primary))')
   })
 
   test('beside a chart the entries stack, and on the end side they read from the swatch inward', () => {
