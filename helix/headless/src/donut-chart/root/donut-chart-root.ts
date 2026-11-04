@@ -1,6 +1,14 @@
 import {
   CHART_PLOT,
   customElement,
+  DONUT_GAP,
+  type DonutRing,
+  type DonutShare,
+  donutBearing,
+  donutEdge,
+  donutRing,
+  donutSeam,
+  donutShares,
   drawTooltip,
   HelixElement,
   HelixReadingChangeEvent,
@@ -8,100 +16,19 @@ import {
   MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
-  PLOT_HEIGHT,
-  PLOT_WIDTH,
+  percentIn,
   type Row,
+  rowsWithShare,
   seriesIndex,
+  sliceLabelAt,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { sliceLabelAt } from '../slice-label.js'
-
-/* Built once per locale and kept, `Intl.NumberFormat` being expensive to
-   construct and cheap to call. */
-const PERCENTS = new Map<string, Intl.NumberFormat>()
-
-/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
-const percentIn = (locale: string): Intl.NumberFormat => {
-  let found = PERCENTS.get(locale)
-  if (!found) {
-    found = new Intl.NumberFormat(locale || undefined, {
-      maximumFractionDigits: 0,
-      style: 'percent',
-    })
-    PERCENTS.set(locale, found)
-  }
-  return found
-}
-
-/* Square, because the shape has to stay round: the plot box is already one and
-   this is the center of it. */
-const CENTER = PLOT_WIDTH / 2
-
-/** The outer edge of the ring, whatever its thickness. */
-const EDGE = 40
-
-/**
- * The dash gap, long enough that the pattern cannot repeat.
- *
- * A dash array tiles. Set to `circumference - length` the pattern fills the
- * circle exactly once and is right at rest, and wrong the moment it animates:
- * both numbers interpolate, and while the gap is shorter than the path still to
- * cover, a second and third copy of the slice sweep round the ring and vanish
- * inside one transition. A constant far larger than any circumference has no
- * second tile to draw at any point in the interpolation. It is the number
- * `@starting-style` already uses for the same reason.
- */
-const GAP = 9999
-
-/**
- * The seam between two slices, along the ring, in the view box's units.
- *
- * Slices that touched read as one band where two colors were near, as two
- * light series in the ink theme are. A dash a seam short leaves the track
- * showing between slices, which is the ring's own ground on any surface, and
- * a constant length on a circle is a constant angle, so the seam's sides are
- * radial as the slices' ends are. 0.8 is 1.8 pixels at the resting 224.
- */
-const SEAM = 0.8
-
-/**
- * How much of the radius the ring takes, by name.
- *
- * **The outer edge is fixed and the radius follows the thickness**, which is
- * what makes `none` a pie. The stroke sits astride its own radius, so a ring
- * drawn at a fixed `r` grows outward as well as inward: against a 100 box, a
- * fixed `r=40` has an unstated ceiling at a thickness of 20, and anything past
- * it crosses the view box and is cut with nothing to say so.
- *
- * Derived instead, `r = EDGE - thickness / 2`, the outer edge lands on `EDGE`
- * for every value and the inner edge is `EDGE - thickness`. A pie is where the
- * inner edge reaches the center, which solves to `thickness = EDGE`: the ring
- * is then drawn at `r = EDGE / 2` and its stroke spans the whole radius.
- *
- * `EDGE * 2` was the first answer and is the trap in this arithmetic. It gives
- * `r = 0`, and a circle of radius zero draws nothing at all, so a pie came out
- * as an empty box. The stroke reaches `thickness / 2` either side of `r`, not
- * `thickness`.
- */
-const THICKNESS: Record<string, number> = {
-  large: 8,
-  medium: 16,
-  none: EDGE,
-  small: 26,
-}
 
 /** One slice: its share of the whole, where it starts, and the row it was read from. */
-export interface DonutShare {
-  /** The slice's share of the whole, from 0 to 1. */
-  fraction: number
-  /** The table row the slice was read from, counting from zero. */
-  row: number
-  /** Where the slice starts, as a share of the whole. */
-  start: number
-}
+export type { DonutShare }
 
 /**
  * @summary A chart that shows parts of a whole as a ring, read from a table.
@@ -311,30 +238,19 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
   @property({ reflect: true })
   sweep?: 'half'
 
-  /** The fraction of the circle the shares are spread over. */
-  private get span(): number {
-    return this.sweep === 'half' ? 0.5 : 1
-  }
-
-  /**
-   * Where the first slice starts, as an angle from three o'clock.
-   *
-   * Twelve for a whole ring and nine for a half, the turns the stylesheet gives
-   * the circles. Anything drawn or placed by arithmetic has to start from the
-   * same place, or it describes a slice the ring is not showing there.
-   */
-  private get origin(): number {
-    return this.sweep === 'half' ? Math.PI : -Math.PI / 2
+  /** The ring `hole` and `sweep` ask for, as core draws it. */
+  private get ring(): DonutRing {
+    return donutRing(this.hole, this.sweep)
   }
 
   /** How thick the ring is drawn, in the drawing's own units. */
   private get thickness(): number {
-    return THICKNESS[this.hole ?? 'medium'] ?? THICKNESS.medium ?? 0
+    return this.ring.thickness
   }
 
   /** The ring's radius, which follows its thickness so the outer edge holds. */
   private get radius(): number {
-    return EDGE - this.thickness / 2
+    return this.ring.radius
   }
 
   /**
@@ -346,26 +262,10 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
    * the table's rows named the row before the one under the pointer.
    */
   private get shares(): DonutShare[] {
-    const series = this.series
-    const points = series[0]?.points ?? []
+    const points = this.series[0]?.points ?? []
     /* A slice a legend hid is none of the whole, so the others close over
        it. A ring's legend names its rows, the slices being the rows. */
-    const values = points.map((point) =>
-      Number.isFinite(point.value) && point.value > 0 && this.showsSeries(point.label)
-        ? point.value
-        : 0,
-    )
-    const total = values.reduce((sum, one) => sum + one, 0)
-    if (total === 0) {
-      return []
-    }
-    let start = 0
-    return values.map((value, index) => {
-      const fraction = value / total
-      const at = start
-      start += fraction
-      return { fraction, row: points[index]?.at ?? index, start: at }
-    })
+    return donutShares(points, (index) => this.showsSeries(points[index]?.label ?? ''))
   }
 
   /**
@@ -449,7 +349,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
       <svg
         aria-hidden="true"
         data-mirror=${this.sweep === 'half' ? '' : nothing}
-        viewBox=${this.frame}
+        viewBox=${this.ring.frame}
         xmlns="http://www.w3.org/2000/svg"
       >
         ${this.renderTrack()}
@@ -461,12 +361,12 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
   /** The whole ring the slices are drawn on. */
   private renderTrack(): TemplateResult {
     return svg`<circle
-      cx=${CENTER}
-      cy=${CENTER}
+      cx=${this.ring.center}
+      cy=${this.ring.center}
       fill="none"
       part="track"
       r=${this.radius}
-      stroke-dasharray="${2 * Math.PI * this.radius * this.span} ${GAP}"
+      stroke-dasharray="${2 * Math.PI * this.radius * this.ring.span} ${DONUT_GAP}"
       stroke-width=${this.thickness}
     />`
   }
@@ -501,7 +401,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
       <svg
         aria-hidden="true"
         data-mirror=${this.sweep === 'half' ? '' : nothing}
-        viewBox=${this.frame}
+        viewBox=${this.ring.frame}
         xmlns="http://www.w3.org/2000/svg"
       >
         ${this.renderTrack()}
@@ -520,16 +420,8 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
    * whose bearing is a clock's, and from the inline start on a half one.
    */
   protected renderSliceLabels(shares: DonutShare[]): TemplateResult {
-    const half = this.sweep === 'half'
-    const ring = {
-      center: CENTER,
-      origin: this.origin,
-      radius: this.radius,
-      span: this.span,
-      tall: half ? EDGE + this.thickness / 2 : PLOT_HEIGHT,
-      top: half ? CENTER - EDGE : 0,
-      width: PLOT_WIDTH,
-    }
+    const ring = this.ring
+    const half = ring.half
     const format = percentIn(wordsLocale(this))
     return html`${shares.map((share, index) => {
       const place = sliceLabelAt(share, ring)
@@ -550,43 +442,27 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
   }
 
   /**
-   * The view box, cropped to what is actually drawn.
-   *
-   * A full turn uses the square. A half arc uses the band from the top of the
-   * ring down to the center line, plus the half stroke its flat ends hang
-   * below that, and cropping to it is the difference between a semi-donut and a
-   * semi-donut with an empty quarter of the box under it. The outer edge is
-   * `EDGE` from the center whatever the thickness, which is what makes this two
-   * numbers rather than a measurement.
-   */
-  private get frame(): string {
-    if (this.sweep !== 'half') {
-      return `0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}`
-    }
-    return `0 ${CENTER - EDGE} ${PLOT_WIDTH} ${EDGE + this.thickness / 2}`
-  }
-
-  /**
    * The seam each slice leaves at either end, as a length along the ring:
-   * half a `SEAM`, and none where one slice is the whole.
+   * half a `DONUT_SEAM`, and none where one slice is the whole.
    */
   private get seam(): number {
-    return this.shares.filter((share) => share.fraction > 0).length > 1 ? SEAM / 2 : 0
+    return donutSeam(this.shares)
   }
 
   /** One slice, as a dash the length of its share, less the seam at each end. */
   protected renderSegment(share: DonutShare, index: number): TemplateResult {
+    const span = this.ring.span
     const circumference = 2 * Math.PI * this.radius
     const seam = this.seam
-    const length = Math.max(0, share.fraction * circumference * this.span - seam * 2)
+    const length = Math.max(0, share.fraction * circumference * span - seam * 2)
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
        a positive offset would run the slices anticlockwise from twelve. The
        rotation that puts zero at the top is the stylesheet's, since it is a
        fact about how the picture is presented rather than about the numbers. */
     const active = this.pointer.at === index
     return svg`<circle
-      cx=${CENTER}
-      cy=${CENTER}
+      cx=${this.ring.center}
+      cy=${this.ring.center}
       data-active=${active ? '' : nothing}
       data-series=${seriesIndex(index)}
       fill="none"
@@ -603,8 +479,8 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
       }}
       part="segment${active ? ' segment-active' : ''}"
       r=${this.radius}
-      stroke-dasharray="${length} ${GAP}"
-      stroke-dashoffset=${-(share.start * circumference * this.span + seam)}
+      stroke-dasharray="${length} ${DONUT_GAP}"
+      stroke-dashoffset=${-(share.start * circumference * span + seam)}
     />
     ${this.renderEdge(share, index)}`
   }
@@ -640,35 +516,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
    * box, which is the ring's center for a circle and is not for a sector.
    */
   protected renderEdge(share: DonutShare, index: number): TemplateResult {
-    const turn = 2 * Math.PI * this.span
-    /* The seam the dash leaves, as the angle it is on the dash's circle, so
-       the edge and the slice it outlines end together. */
-    const seam = Math.min(this.seam / this.radius, share.fraction * turn * 0.5)
-    const from = share.start * turn + this.origin + seam
-    const to = (share.start + share.fraction) * turn + this.origin - seam
-    const outer = EDGE
-    const inner = EDGE - this.thickness
-    const at = (radius: number, angle: number): string =>
-      `${(CENTER + Math.cos(angle) * radius).toFixed(3)} ${(CENTER + Math.sin(angle) * radius).toFixed(3)}`
-    const wide = to - from > Math.PI ? 1 : 0
-    /* A slice that is the whole ring starts and ends at one point, and an arc
-       between a point and itself draws nothing. Split at the halfway angle so
-       each half is a real arc. */
-    const full = to - from >= 2 * Math.PI - 1e-6
-    const mid = from + (to - from) / 2
-    const outward = full
-      ? `A ${outer} ${outer} 0 0 1 ${at(outer, mid)} A ${outer} ${outer} 0 0 1 ${at(outer, to)}`
-      : `A ${outer} ${outer} 0 ${wide} 1 ${at(outer, to)}`
-    /* A pie has no inner arc: the radius solves to zero and the two ends meet at
-       the middle, so the step back is a line to the center and not an arc of no
-       size. */
-    const homeward =
-      inner <= 0
-        ? `L ${CENTER} ${CENTER}`
-        : full
-          ? `L ${at(inner, to)} A ${inner} ${inner} 0 0 0 ${at(inner, mid)} A ${inner} ${inner} 0 0 0 ${at(inner, from)}`
-          : `L ${at(inner, to)} A ${inner} ${inner} 0 ${wide} 0 ${at(inner, from)}`
-    const shape = `M ${at(outer, from)} ${outward} ${homeward} Z`
+    const shape = donutEdge(share, this.ring, 0, this.seam)
     /* **Clipped to itself, because a stroke straddles the line it is drawn on.**
        Half of it falls outside the wedge: past the fill on both arcs, and across
        the seam into the neighbor on both radial sides, where that neighbor is
@@ -711,19 +559,12 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
    * said by key gives it too, as the summary does.
    */
   private withShare(share: DonutShare): Row[] {
-    const rows = this.sourceRows
-    const column = this.plottedColumns[0]
-    const row = rows[share.row]
-    const cell = column === undefined ? undefined : row?.cells[column]
-    if (!row || !cell || column === undefined) {
-      return rows
-    }
-    const cells = [...row.cells]
-    cells[column] = {
-      ...cell,
-      text: `${cell.text} (${percentIn(wordsLocale(this)).format(share.fraction)})`,
-    }
-    return rows.map((one, index) => (index === share.row ? { ...row, cells } : one))
+    return rowsWithShare(
+      this.sourceRows,
+      this.plottedColumns[0],
+      share,
+      percentIn(wordsLocale(this)),
+    )
   }
 
   /**
@@ -747,49 +588,17 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
         this.pointer,
       )
     }
-    /* **Outside the ring, on the slice's own bearing**, rather than centered in
-       the hole: centered covers the data on a pie, and in neither shape does it
-       say *which* slice it means. Out here one rule serves both.
-
-       The mid-angle, from `origin` because the ring is turned to start at
-       twelve o'clock, or nine for a half, and this arithmetic starts at three.
-       The point is the outer edge. A half ring's box is cropped to the band it
-       draws, so the height is measured from the top of that band. */
-    const angle = (share.start + share.fraction / 2) * 2 * Math.PI * this.span + this.origin
-    const edge = EDGE
-    const x = CENTER + Math.cos(angle) * edge
-    const top = this.sweep === 'half' ? CENTER - EDGE : 0
-    const tall = this.sweep === 'half' ? EDGE + this.thickness / 2 : PLOT_HEIGHT
-    const y = ((CENTER + Math.sin(angle) * edge - top) / tall) * 100
-    /* **A whole ring stays as drawn on a right-to-left page, and a half ring
-       turns.** Clockwise from twelve is a clock's convention, and a clock does
-       not run backwards in Arabic or Hebrew, so the ring's bearing is measured
-       from the left in either direction. A half ring is read across, the first
-       slice where a line of text starts, so it is marked `data-mirror` like any
-       axis and its bearing is measured from the inline start, with the side the
-       bubble prefers turned to match. */
-    const turned = this.sweep === 'half' && this.pointer.mirrored
-    const across = Math.cos(angle) > 0 !== turned
+    /* Outside the ring, on the slice's own bearing: see `donutBearing`. */
+    const bearing = donutBearing(share, this.ring, this.pointer.mirrored)
     return drawTooltip(
       this.withShare(share),
       share.row,
       this.tag('tooltip'),
       {
-        fixed: this.sweep !== 'half',
-        /* The preferred side from the bearing's dominant axis, and
-           `FloatingController` moves it if that side does not fit. A fixed side
-           cannot express a bearing, so the arrow misses the ring; a preference
-           plus flipping can. */
-        placement:
-          Math.abs(Math.cos(angle)) > Math.abs(Math.sin(angle))
-            ? across
-              ? 'right'
-              : 'left'
-            : Math.sin(angle) > 0
-              ? 'bottom'
-              : 'top',
-        x: `${x}%`,
-        y: `${y}%`,
+        fixed: bearing.fixed,
+        placement: bearing.placement,
+        x: `${bearing.x}%`,
+        y: `${bearing.y}%`,
       },
       /* **A ring's series are its rows and not its columns**, which is the one
          place the mixin's answer is wrong by more than an offset. The bubble is
