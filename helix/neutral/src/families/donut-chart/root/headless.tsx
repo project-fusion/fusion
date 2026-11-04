@@ -114,7 +114,6 @@ export default headless('donut-chart', {
           <Svg
             ariaHidden
             part="ring"
-            platform="native"
             viewBox={donutChart.frame}
           >
             {/* A phone's custom properties do not inherit from a tree's style,
