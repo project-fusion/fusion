@@ -102,14 +102,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             "sections" => push("sections.list", &sections::sections(value)?.list),
             "files" => push("files.list", &files::files(value)?.list),
             "window" => push("window.list", &window::window(value)?.list),
-            "treeRoot" | "treeItem" | "inspector" | "tableRoot" | "tableRow" | "tableColumn"
-            | "logRoot" | "logLine" | "logGroup" | "tail" | "notificationsRoot"
-            | "notificationRow" | "notificationGroup" | "codeBlock" | "carousel"
-            | "dataTableRoot" | "paginationRoot" | "paginationSize" | "datePicker"
-            | "pickerField" | "timePicker" | "sparkline" | "donutChart" | "legend"
-            | "lineChart" | "areaChart" | "listbox" | "select" | "combobox" | "commandRoot"
-            | "filterInput" | "filterMenu" | "option" | "optionGroup" | "chatRoot"
-            | "chatMessage" | "chatComposer" => {
+            choice if TREE_CHOICES.contains(&choice) => {
                 let choice = super::tree_choice::by_key(&key, value)?;
                 for (field, name) in choice.computed {
                     push(&format!("{key}.{field}"), &name);
@@ -148,18 +141,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
                     push(path, name);
                 }
             }
-            "entry" => {
-                let entry = super::entry::entry(value)?;
-                if let Some(shows) = entry.shows {
-                    push("text.clearShown", &shows);
-                }
-                if let Some(unveils) = entry.unveils {
-                    push("text.revealShown", &unveils);
-                }
-                if let Some(bared) = entry.bared {
-                    push("text.revealed", &bared);
-                }
-            }
+            "entry" => entry_reads(value, &mut push)?,
             "validation" => {
                 if let Some(message) = validation::validation(value)?.message {
                     push("validation.message", &message);
@@ -180,6 +162,63 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
         }
     }
     Ok(read)
+}
+
+/// The features whose computed values a tree choice names, each read as
+/// `key.field`.
+const TREE_CHOICES: &[&str] = &[
+    "treeRoot",
+    "treeItem",
+    "inspector",
+    "tableRoot",
+    "tableRow",
+    "tableColumn",
+    "logRoot",
+    "logLine",
+    "logGroup",
+    "tail",
+    "notificationsRoot",
+    "notificationRow",
+    "notificationGroup",
+    "codeBlock",
+    "carousel",
+    "dataTableRoot",
+    "paginationRoot",
+    "paginationSize",
+    "datePicker",
+    "pickerField",
+    "timePicker",
+    "sparkline",
+    "donutChart",
+    "legend",
+    "lineChart",
+    "areaChart",
+    "listbox",
+    "select",
+    "combobox",
+    "commandRoot",
+    "filterInput",
+    "filterMenu",
+    "option",
+    "optionGroup",
+    "chatRoot",
+    "chatMessage",
+    "chatComposer",
+];
+
+/// What a field of text computes, as `(path, name)` through `push`.
+fn entry_reads(value: &Lit, push: &mut impl FnMut(&str, &str)) -> Result<(), String> {
+    let entry = super::entry::entry(value)?;
+    if let Some(shows) = entry.shows {
+        push("text.clearShown", &shows);
+    }
+    if let Some(unveils) = entry.unveils {
+        push("text.revealShown", &unveils);
+    }
+    if let Some(bared) = entry.bared {
+        push("text.revealed", &bared);
+    }
+    Ok(())
 }
 
 /// What a tour stop computes, as `(path, name)` through `push`.
