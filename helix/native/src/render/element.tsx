@@ -277,6 +277,13 @@ const shownIn = (styling: Styling, presence: Presence): Styling =>
         }),
       }
 
+/** The lengths a machine measures, laid over those the element around gives, as every rule reads them. */
+const measuredBy = (
+  context: { readonly measured?: Readonly<Record<string, number | string>> },
+  behavior: Behavior,
+) =>
+  behavior.measured === undefined ? {} : { measured: { ...context.measured, ...behavior.measured } }
+
 /**
  * A component that draws `family`.
  *
@@ -343,6 +350,7 @@ export const element = (
     const context = contextOf(values, outer, slotted, reducedMotion, theme)
     const base = {
       ...context,
+      ...measuredBy(context, behavior),
       ...heldBy(family, props, context.conditions, entering, presence),
       ...wordsIn(locale, outer),
       ...width.context,

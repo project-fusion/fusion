@@ -75,6 +75,12 @@ export interface Cursor {
   readonly keyed: boolean
   /** What the plot's view takes: the scrub, the adjustable control, and the keys. */
   readonly plot: PartBinding
+  /**
+   * Puts the reading away, as a touch outside the chart does on the web: a
+   * chart whose bubble a touch elsewhere closed calls it, so the reading and
+   * its bubble go together.
+   */
+  readonly away: () => void
 }
 
 /** The actions a screen reader moves the reading by, as iOS's swipe up and down and TalkBack's volume keys take them. */
@@ -283,5 +289,6 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     }),
     [onAccessibilityAction, ref, ringed, setup.enabled, tracking, words],
   )
-  return { at: shown.at, keyed: shown.keyed, plot }
+  const away = useCallback(() => move(-1, 'touch'), [move])
+  return { at: shown.at, away, keyed: shown.keyed, plot }
 }
