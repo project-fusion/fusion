@@ -339,8 +339,9 @@ export const drawVector = (
   extra: Parameters<typeof resolve>[2],
   own?: Style,
 ): ReactNode => {
-  const written = node.attributes?.viewBox
-  if (typeof written !== 'string') {
+  /* A view box may be a value the element computes, as a half ring crops its box to its thickness. */
+  const written = bound(styling, node.attributes?.viewBox, node.name)
+  if (typeof written !== 'string' || written === '') {
     return null
   }
   const viewBox = viewBoxOf(written, own)

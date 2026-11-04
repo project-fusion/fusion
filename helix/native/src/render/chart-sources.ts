@@ -62,3 +62,60 @@ export const useChartSource = (id: string): ChartSource | undefined =>
     () => (id === '' ? undefined : sources.get(id)),
     () => undefined,
   )
+
+/**
+ * The series a legend hid on each table, by its id and by lowercased name,
+ * where the web holds them on the table element: **a legend writes them and
+ * every chart reading the same table reads them**, so a chart draws without a
+ * hidden series, and a series keeps its color while it is hidden. For a ring
+ * the names are its rows, the slices being the rows.
+ */
+const hidden = new Map<string, ReadonlySet<string>>()
+
+/** No series hidden. */
+const NONE: ReadonlySet<string> = new Set()
+
+/** A name as a heading is matched, without regard to case or the space around it. */
+const keyOf = (name: string): string => name.trim().toLowerCase()
+
+/**
+ * Hides `names` on the table with this id, in place of those hidden before.
+ * Given `among`, only those names are shown or hidden, and a series hidden
+ * outside them stays hidden, as two legends on one table, one of its rows and
+ * one of its columns, each keep their own. Nothing is told where the set is
+ * already this one, so two writers that agree stop asking each other to draw.
+ */
+export const hideChartSeries = (
+  id: string,
+  names: Iterable<string>,
+  among?: Iterable<string>,
+): void => {
+  if (id === '') {
+    return
+  }
+  const now = hidden.get(id) ?? NONE
+  const mine = among === undefined ? undefined : new Set([...among].map(keyOf))
+  const kept = mine === undefined ? [] : [...now].filter((one) => !mine.has(one))
+  const next = new Set([...kept, ...[...names].map(keyOf)].filter(Boolean))
+  if (next.size === now.size && [...next].every((one) => now.has(one))) {
+    return
+  }
+  if (next.size === 0) {
+    hidden.delete(id)
+  } else {
+    hidden.set(id, next)
+  }
+  tell()
+}
+
+/** The series hidden on the table with this id, by lowercased name. */
+export const useHiddenSeries = (id: string): ReadonlySet<string> =>
+  useSyncExternalStore(
+    subscribe,
+    () => (id === '' ? NONE : (hidden.get(id) ?? NONE)),
+    () => NONE,
+  )
+
+/** Whether a series of this name is drawn, which it is unless a legend hid it. */
+export const showsSeries = (set: ReadonlySet<string>, name: string): boolean =>
+  !set.has(keyOf(name))
