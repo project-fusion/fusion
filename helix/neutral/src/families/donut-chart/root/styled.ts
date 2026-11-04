@@ -50,7 +50,7 @@ export default styles(
       sliceLabelFontSize: token('text-xs'),
       trackColor: token('color-surface-sunken'),
     },
-    own: { donutChartRing: null },
+    own: { donutChartEdge: null, donutChartRing: null },
     props: {
       emphasis: oneOf(['outlined', 'solid', 'subtle']),
       material: oneOf(['frosted', 'glass']),
@@ -149,7 +149,7 @@ export default styles(
             product('100%', difference(own.donutChartRing, product(2, settled))),
             100,
           ),
-          own: { donutChartRing: '80' },
+          own: { donutChartEdge: '40', donutChartRing: '80' },
           pointerEvents: 'none',
           position: 'absolute',
           textAlign: 'center',
@@ -199,8 +199,8 @@ export default styles(
           {
             web: { insetBlockEnd: 0, insetBlockStart: 'auto', translate: ['-50%', 0] },
             blockSize: quotient(
-              product('100%', difference(40, settled)),
-              sum(40, quotient(settled, 2)),
+              product('100%', difference(own.donutChartEdge, settled)),
+              sum(own.donutChartEdge, quotient(settled, 2)),
             ),
           },
         ),

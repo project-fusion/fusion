@@ -98,6 +98,7 @@ export type { DonutShare }
  * @csspart loading - The words in place of the ring while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
+ * @csspart ring - The drawing of the ring, its track and its slices, which a phone draws as the same shapes.
  * @csspart segment - One slice.
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
@@ -401,6 +402,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
       <svg
         aria-hidden="true"
         data-mirror=${this.sweep === 'half' ? '' : nothing}
+        part="ring"
         viewBox=${this.ring.frame}
         xmlns="http://www.w3.org/2000/svg"
       >
