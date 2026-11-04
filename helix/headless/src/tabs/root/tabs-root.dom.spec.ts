@@ -781,7 +781,10 @@ describe('find in page', () => {
     const second = part(panels(host)[1] as HTMLElement, 'panel') as HTMLElement
     expect(second.getAttribute('hidden')).toBe('until-found')
     expect(second.hasAttribute('tabindex')).toBe(false)
-    expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('hidden')).toBe(false)
+    expect(second.getAttribute('aria-hidden')).toBe('true')
+    const first = part(panels(host)[0] as HTMLElement, 'panel')
+    expect(first?.hasAttribute('hidden')).toBe(false)
+    expect(first?.hasAttribute('aria-hidden')).toBe(false)
   })
 
   test('a match in an inactive panel selects its tab', async () => {
