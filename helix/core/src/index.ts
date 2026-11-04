@@ -493,6 +493,12 @@ export {
   segmentName,
 } from './utils/date-segments/date-segments.js'
 export {
+  segmentRowsOf,
+  segmentRowsPartial,
+  segmentRowsValue,
+  withRow,
+} from './utils/date-segments/segment-rows.js'
+export {
   type DrawDismissOptions,
   drawDismiss,
   drawDismissGlyph,
@@ -622,6 +628,30 @@ export {
   pauseMotion,
   reducedMotion,
 } from './utils/page-motion/page-motion.js'
+export {
+  committedDates,
+  type DateFaultWords,
+  type DateStyle,
+  dateFault,
+  dateKind,
+  dateSegmentLocale,
+  dateSegmentSystem,
+  EXAMPLE_DATE,
+  writtenDate,
+} from './utils/picker-text/date-text.js'
+export {
+  committedValue,
+  draftKey,
+  heldValues,
+  type PickerKind,
+  type PickerMode,
+  pickedValues,
+  pickerAnswers,
+  pickerDisplay,
+  shownValues,
+  typedValue,
+  withoutValue,
+} from './utils/picker-text/picker-text.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'

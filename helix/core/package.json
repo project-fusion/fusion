@@ -169,6 +169,10 @@
       "types": "./dist/utils/pagination/pagination.d.ts",
       "default": "./dist/utils/pagination/pagination.js"
     },
+    "./picker-text": {
+      "types": "./dist/utils/picker-text/fields.d.ts",
+      "default": "./dist/utils/picker-text/fields.js"
+    },
     "./pin-code": {
       "types": "./dist/utils/pin-code/pin-code.d.ts",
       "default": "./dist/utils/pin-code/pin-code.js"
