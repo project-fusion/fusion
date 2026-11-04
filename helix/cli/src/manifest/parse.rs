@@ -16,6 +16,7 @@
 //! followed.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::LazyLock;
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
@@ -24,6 +25,7 @@ use oxc_ast::ast::{
 };
 use oxc_parser::Parser;
 use oxc_span::{GetSpan, SourceType, Span};
+use regex::Regex;
 
 use crate::manifest::jsdoc::{self, Documented};
 
@@ -187,6 +189,14 @@ pub struct Member {
     /// Whether `@words` makes it a word property, one a page can register
     /// words for by locale.
     pub words: bool,
+    /// The slot whose fallback this property is, where it is one: the name of
+    /// a named slot, or empty for the default slot.
+    ///
+    /// **A content property says so**, so a tool that edits a page can tell
+    /// the text a person reads from configuration. `content` on a tooltip and
+    /// `next-label` on a carousel are both string attributes, and only the
+    /// first is something the author wrote. See [`fallbacks`].
+    pub slot: Option<String>,
 }
 
 /// Every doc block in a source, by the offset of what it is written above.
@@ -599,6 +609,109 @@ fn renders(source: &str, at: Span) -> Vec<String> {
     found.into_iter().collect()
 }
 
+/// Every slot in a class body whose fallback is one property and nothing else,
+/// as the slot's name (empty for the default slot) and the property's.
+///
+/// **This is the content-property rule read back out of the template.**
+/// `<slot name="content">${this.content}</slot>` is how a component publishes
+/// text a consumer may replace by slotting, so the pairing is already written
+/// down and needs no tag of its own. A fallback counts when it is one
+/// `${this.name}`, or one whose name is the left side of `||` or `??`, as
+/// `${this.label || hidden}` is: the property is what the slot shows whenever
+/// it is set. One that formats the value, joins two, or draws markup is the
+/// component's own rendering, and calling its property content would send an
+/// editor to the wrong field.
+///
+/// **A computed slot name is skipped**, since which slot it is would be a
+/// runtime question. Read from the text with the comments blanked, for the
+/// reason [`dispatched`] is.
+fn fallbacks(source: &str, at: Span) -> Vec<(String, String)> {
+    static NAME: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r#"\sname=["']([a-z][a-z0-9-]*)["']"#).expect("a literal pattern compiles")
+    });
+    static COMPUTED: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"\sname=\$\{").expect("a literal pattern compiles"));
+    static BARE: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"^\$\{\s*this\.(\w+)\s*(?:(?:\|\||\?\?)[^{}]*)?\}$")
+            .expect("a literal pattern compiles")
+    });
+    let body = &source[at.start as usize..at.end as usize];
+    let bytes = body.as_bytes();
+    let mut found = Vec::new();
+    let mut from = 0;
+    while let Some(offset) = body[from..].find("<slot") {
+        let start = from + offset;
+        from = start + "<slot".len();
+        if !bytes
+            .get(from)
+            .is_some_and(|one| one.is_ascii_whitespace() || *one == b'>')
+        {
+            continue;
+        }
+        /* A `>` inside `${}` does not close the tag: a listener's arrow is
+        the usual one. */
+        let mut depth = 0usize;
+        let mut index = from;
+        let mut end = None;
+        while index < bytes.len() {
+            match bytes[index] {
+                b'$' if bytes.get(index + 1) == Some(&b'{') => {
+                    depth += 1;
+                    index += 1;
+                }
+                b'{' if depth > 0 => depth += 1,
+                b'}' if depth > 0 => depth -= 1,
+                b'>' if depth == 0 => {
+                    end = Some(index);
+                    break;
+                }
+                _ => {}
+            }
+            index += 1;
+        }
+        let Some(end) = end else {
+            break;
+        };
+        let tag = &body[start..end];
+        if tag.ends_with('/') || COMPUTED.is_match(tag) {
+            continue;
+        }
+        /* Lit's formatting often puts the closing `>` on the next line, as
+        `</slot\n>`, so the end tag is found by its name alone. */
+        let Some(close) = body[end + 1..].find("</slot") else {
+            continue;
+        };
+        let inside = body[end + 1..end + 1 + close].trim();
+        if let Some(property) = BARE.captures(inside).and_then(|one| one.get(1)) {
+            let slot = NAME
+                .captures(tag)
+                .and_then(|one| one.get(1))
+                .map_or_else(String::new, |one| one.as_str().to_owned());
+            found.push((slot, property.as_str().to_owned()));
+        }
+    }
+    found
+}
+
+/// The members, each attribute-backed property marked with the slot whose
+/// fallback it is.
+///
+/// **An attribute-backed property and nothing else.** A getter interpolated
+/// into a fallback is derived text, such as the initials an avatar draws from
+/// a name: there is nothing there to edit, and the property it derives from is
+/// not the one on the page.
+fn with_slots(mut members: Vec<Member>, source: &str, at: Span) -> Vec<Member> {
+    for (slot, property) in fallbacks(source, at) {
+        if let Some(member) = members
+            .iter_mut()
+            .find(|one| one.name == property && one.kind == "field" && one.attribute.is_some())
+        {
+            member.slot.get_or_insert(slot);
+        }
+    }
+    members
+}
+
 fn dispatched(source: &str, at: Span) -> Vec<(String, Option<String>)> {
     const CALL: &str = "this.dispatchEvent(";
     let body = &source[at.start as usize..at.end as usize];
@@ -787,6 +900,7 @@ fn field_of(
         },
         reflects,
         returns: None,
+        slot: None,
         words,
         /* **An optional property says `| undefined` out loud.** `name?: string`
         can hold one, and the manifest describes what a reader may find there
@@ -851,6 +965,7 @@ fn method_of(
         reflects,
         boolean,
         words: accessor && has_words(&method.decorators),
+        slot: None,
         default: None,
         documented,
         is_static: method.r#static,
@@ -1161,7 +1276,9 @@ fn variables_of(
                 dispatched: makes
                     .map_or_else(Vec::new, |class| dispatched(plain, class.body.span())),
                 renders: makes.map_or_else(Vec::new, |class| renders(plain, class.body.span())),
-                members: makes.map_or_else(Vec::new, |class| members_of(class, source, docs)),
+                members: makes.map_or_else(Vec::new, |class| {
+                    with_slots(members_of(class, source, docs), plain, class.body.span())
+                }),
                 kind: match (arrow, makes) {
                     (_, Some(_)) => "mixin",
                     (Some(_), None) => "function",
@@ -1299,7 +1416,7 @@ fn named(
                 borrows: borrowed(class, &id.name),
                 dispatched: dispatched(plain, class.body.span()),
                 renders: renders(plain, class.body.span()),
-                members: members_of(class, source, docs),
+                members: with_slots(members_of(class, source, docs), plain, class.body.span()),
                 name: id.name.to_string(),
                 heritage: class.heritage.as_ref().map_or_else(Vec::new, |one| {
                     let mut names = Vec::new();
@@ -1672,5 +1789,79 @@ fn published(declaration: &Declaration<'_>) -> Vec<Exported> {
         /* An interface and a type alias are not exports, which the tiers say
         without exception: a hundred and seven declared and none published. */
         _ => Vec::new(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::declarations;
+
+    /// The slot each member of the one class in `body` was marked with.
+    fn marked(body: &str) -> Vec<(String, Option<String>)> {
+        let source = format!(
+            "import {{ html, LitElement }} from 'lit'\nimport {{ property, state }} from 'lit/decorators.js'\n\
+             export class Sample extends LitElement {{\n{body}\n}}\n"
+        );
+        declarations(&source, "src/sample.ts")
+            .into_iter()
+            .flat_map(|one| one.members)
+            .filter(|one| one.kind == "field")
+            .map(|one| (one.name, one.slot))
+            .collect()
+    }
+
+    fn slot_of(found: &[(String, Option<String>)], name: &str) -> Option<String> {
+        found
+            .iter()
+            .find(|one| one.0 == name)
+            .and_then(|one| one.1.clone())
+    }
+
+    /* Tooltip writes its end tag as `</slot` with the `>` on the next line,
+    and a first version looking for `</slot>` marked nothing. */
+    #[test]
+    fn a_property_alone_in_a_named_slot_is_that_slots_content() {
+        let found = marked(
+            "  @property() content = ''\n  render() {\n    return html`<slot name=\"content\" @slotchange=${() => this.read()}\n      >${this.content}</slot\n    >`\n  }",
+        );
+        assert_eq!(slot_of(&found, "content"), Some("content".to_owned()));
+    }
+
+    #[test]
+    fn the_default_slot_is_written_empty() {
+        let found = marked(
+            "  @property() label = ''\n  render() {\n    return html`<slot>${this.label}</slot>`\n  }",
+        );
+        assert_eq!(slot_of(&found, "label"), Some(String::new()));
+    }
+
+    #[test]
+    fn a_property_on_the_left_of_a_default_is_content() {
+        let found = marked(
+            "  @property() label = ''\n  @property() hint = ''\n  render() {\n    return html`<slot name=\"label\">${this.label || hidden}</slot><slot name=\"hint\">${this.hint ?? ''}</slot>`\n  }",
+        );
+        assert_eq!(slot_of(&found, "label"), Some("label".to_owned()));
+        assert_eq!(slot_of(&found, "hint"), Some("hint".to_owned()));
+    }
+
+    /* An avatar draws initials derived from a name: the derived text is not a
+    field anybody edits, and neither is state the component keeps. */
+    #[test]
+    fn a_getter_or_state_is_not_content() {
+        let found = marked(
+            "  @state() private note = ''\n  get initials(): string { return '' }\n  render() {\n    return html`<slot name=\"note\">${this.note}</slot><slot>${this.initials}</slot>`\n  }",
+        );
+        assert_eq!(slot_of(&found, "note"), None);
+        assert_eq!(slot_of(&found, "initials"), None);
+    }
+
+    #[test]
+    fn markup_two_values_a_computed_name_or_a_comment_are_not_content() {
+        let found = marked(
+            "  @property() a = ''\n  @property() b = ''\n  @property() c = ''\n  @property() d = ''\n  render() {\n    /* <slot name=\"d\">${this.d}</slot> */\n    return html`<slot name=\"a\"><b>${this.a}</b></slot><slot name=\"b\">${this.a}${this.b}</slot><slot name=${this.c}>${this.c}</slot>`\n  }",
+        );
+        for name in ["a", "b", "c", "d"] {
+            assert_eq!(slot_of(&found, name), None, "{name}");
+        }
     }
 }

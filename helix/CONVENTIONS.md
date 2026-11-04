@@ -560,6 +560,23 @@ given anything and choose. Slot fallback is the platform answering that
 question itself, at assignment time, with no code, no attribute on the host,
 and no disagreement between what the server rendered and what the client shows.
 
+**The manifest records the pairing as `helix.slot` on the member.** A tool that
+edits a page, such as a content system's form or a click-to-edit overlay, has to
+tell the text an author wrote from configuration, and the types cannot:
+`content` on Tooltip and `next-label` on Carousel are both string attributes.
+`helix manifest build` reads it from the template, so a component declares
+nothing extra. A member is marked when it is backed by an attribute and a slot's
+whole fallback is that property, alone or on the left of `||` or `??`, as in
+`${this.label || hidden}`. The value is the slot's name, and empty for the
+default slot. A getter is never marked, because derived text such as Avatar's
+initials is not a field anybody edits.
+
+**The slot is named on the mark because it is often not the property's name.**
+Measured on November 4, 2026: 46 members are marked where they are declared,
+across core and headless, and 108 reach 58 styled tags through inheritance.
+`label` falls back into `heading` on Menu Section, `triggerLabel` into `trigger`
+on File Input, and `emptyText` into `empty` on Combobox.
+
 Two things follow for the component:
 
 - **Ask the slot, not the property, whether there is anything to show.** Any

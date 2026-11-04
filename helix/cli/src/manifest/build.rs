@@ -1119,6 +1119,12 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     if member.words {
         helix.insert("words".to_owned(), json!(true));
     }
+    /* **The slot a content property falls back into**, so an editor can tell
+    the text a person reads from configuration: empty names the default
+    slot, as the manifest's own slot list writes it. */
+    if let Some(slot) = &member.slot {
+        helix.insert("slot".to_owned(), json!(slot));
+    }
     /* **How the attribute turns the property on**, which its type cannot say:
     `present` is on wherever the attribute is, `disabled="false"` included,
     and `unless-false` is off for `"false"`. Diagnostics reads it to report a
