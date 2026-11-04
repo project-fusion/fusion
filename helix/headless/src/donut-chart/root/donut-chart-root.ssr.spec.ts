@@ -12,11 +12,11 @@ describe('donut chart server output', () => {
      rather than a rectangle: the empty track is what makes the plot square,
      and the middle is where the consumer's own total is slotted, which is
      ordinary markup and should be readable before hydration. */
-  test('serves its track and its middle, and no slices', () => {
+  test('serves its ring with its track, and its middle, and no slices', () => {
     const markup = ssr(
       html`<helix-headless-donut-chart for="traffic"></helix-headless-donut-chart>`,
     )
-    expect(servedParts(markup)).toEqual(['center', 'plot', 'track'])
+    expect(servedParts(markup)).toEqual(['center', 'plot', 'ring', 'track'])
   })
 
   test('the plot is named, so its box is the boundary a bubble is kept inside', () => {

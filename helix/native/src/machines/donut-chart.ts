@@ -243,7 +243,7 @@ const statesOf = (
     drawn: any,
     empty: !any && !loading,
     frame: ring.frame,
-    labelled: any && read('slice-labels') === true,
+    labeled: any && read('slice-labels') === true,
     live: keyed && share !== undefined ? said(at) : '',
     loading,
     named: name,
