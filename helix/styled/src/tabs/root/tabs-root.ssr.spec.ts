@@ -38,10 +38,18 @@ describe('tabs server output', () => {
     expect(partTag(ssr(html`<helix-tab>One</helix-tab>`), 'tab')).toContain('tabindex="0"')
   })
 
+  /* **Hidden until found, and no tab stop until it is selected.** Find in page
+     searches a panel that is not showing, which keeps the panel's own box in
+     the tree, so the stop it shipped while it was `display: none` would have
+     made every inactive panel focusable before the page hydrated. */
   test('the panel ships its content, so a crawler reads it whichever tab is open', () => {
     const panel = ssr(html`<helix-tab-panel value="two"></helix-tab-panel>`)
-    expect(partTag(panel, 'panel')).toContain('tabindex="0"')
+    expect(partTag(panel, 'panel')).toContain('hidden="until-found"')
+    expect(partTag(panel, 'panel')).not.toContain('tabindex')
     expect(rendered(panel, 'helix-tab-panel')).toMatch(/<slot\s*><\/slot>/)
+    const shown = ssr(html`<helix-tab-panel selected value="one"></helix-tab-panel>`)
+    expect(partTag(shown, 'panel')).toContain('tabindex="0"')
+    expect(partTag(shown, 'panel')).not.toContain('hidden')
   })
 
   test('the hosts carry only what the consumer wrote', () => {

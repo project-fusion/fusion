@@ -770,3 +770,66 @@ describe('tabs with no panels', () => {
     expect(control.ariaControlsElements ?? []).toEqual([])
   })
 })
+
+describe('find in page', () => {
+  /* A panel whose tab is not selected was plain `hidden`, so find in page
+     never searched it. Accordion sections were searched and tab panels were
+     not, on the same page. */
+  test('an inactive panel is hidden until found, and no tab stop', async () => {
+    const host = (await mount(markup)) as Updatable
+    await turn(host)
+    const second = part(panels(host)[1] as HTMLElement, 'panel') as HTMLElement
+    expect(second.getAttribute('hidden')).toBe('until-found')
+    expect(second.hasAttribute('tabindex')).toBe(false)
+    expect(part(panels(host)[0] as HTMLElement, 'panel')?.hasAttribute('hidden')).toBe(false)
+  })
+
+  test('a match in an inactive panel selects its tab', async () => {
+    const host = (await mount(markup)) as Updatable & { active: string }
+    await turn(host)
+    const second = part(panels(host)[1] as HTMLElement, 'panel') as HTMLElement
+    second.dispatchEvent(new Event('beforematch'))
+    await turn(host)
+    await (panels(host)[1] as Updatable).updateComplete
+    expect(host.active).toBe('two')
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
+    expect(second.hasAttribute('hidden')).toBe(false)
+  })
+
+  /* In the browser's order: the event, its listeners and their microtasks, and
+     only then the removal of `hidden`, as on the accordion item. */
+  test('a refused change puts the panel back to hidden until found', async () => {
+    const host = (await mount(markup)) as Updatable & { active: string }
+    await turn(host)
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
+    const second = part(panels(host)[1] as HTMLElement, 'panel') as HTMLElement
+    second.dispatchEvent(new Event('beforematch'))
+    await Promise.resolve()
+    second.removeAttribute('hidden')
+    await new Promise((resolve) => setTimeout(resolve))
+    await host.updateComplete
+    expect(host.active).toBe('one')
+    expect(second.getAttribute('hidden')).toBe('until-found')
+  })
+
+  test('the tabs turn it off for every panel, and a panel turns it back on', async () => {
+    const host = (await mount(`
+      <helix-headless-tabs default-active="one" hidden-until-found="false">
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab value="two">Two</helix-headless-tab>
+        <helix-headless-tab value="three">Three</helix-headless-tab>
+        <helix-headless-tab-panel slot="panels" value="one">First</helix-headless-tab-panel>
+        <helix-headless-tab-panel slot="panels" value="two">Second</helix-headless-tab-panel>
+        <helix-headless-tab-panel slot="panels" value="three" hidden-until-found>Third</helix-headless-tab-panel>
+      </helix-headless-tabs>`)) as Updatable
+    await turn(host)
+    await new Promise((resolve) => setTimeout(resolve))
+    for (const panel of panels(host)) {
+      await panel.updateComplete
+    }
+    expect(part(panels(host)[1] as HTMLElement, 'panel')?.getAttribute('hidden')).toBe('')
+    expect(part(panels(host)[2] as HTMLElement, 'panel')?.getAttribute('hidden')).toBe(
+      'until-found',
+    )
+  })
+})
