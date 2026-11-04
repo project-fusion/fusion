@@ -1197,7 +1197,10 @@ haptic tick at each reading, a tap shows a reading and presses it, a screen
 reader's increment and decrement move the reading, and a hardware keyboard's
 arrows, Home, End, Page Up, Page Down, Enter, and Escape work as on the web.
 A ring finds the slice under a finger by its angle, and the keys pass over a
-reading a legend hid.
+reading a legend hid. On a chart of several series, Down and Up walk the
+series of the reading, as on the web, and a screen reader's increment and
+decrement still move from reading to reading. An axis chart's band and guide
+are views under its canvas, so moving the reading leaves its lines as drawn.
 
 `glyphs` makes the `Glyph` `HelixRoot` draws a component's icons with, from
 icons that are SVG markup and a view box, such as `@fusion.dev/helix-icons`.
