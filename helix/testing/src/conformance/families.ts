@@ -70,6 +70,7 @@ export type Family =
   | 'time-input'
   | 'donut-chart'
   | 'legend'
+  | 'line-chart'
   | 'sparkline'
   | 'filter-input'
   | 'select'
