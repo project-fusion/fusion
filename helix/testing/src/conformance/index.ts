@@ -44,6 +44,7 @@ import { RATING } from './scenarios/rating.js'
 import { SCROLL_AREA } from './scenarios/scroll-area.js'
 import { SELECT } from './scenarios/select.js'
 import { SLIDER } from './scenarios/slider.js'
+import { SPARKLINE } from './scenarios/sparkline.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
 import { SPLITTER } from './scenarios/splitter.js'
 import { TABLE } from './scenarios/table.js'
@@ -117,6 +118,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'scroll-area': SCROLL_AREA,
   select: SELECT,
   slider: SLIDER,
+  sparkline: SPARKLINE,
   'speed-dial': SPEED_DIAL,
   splitter: SPLITTER,
   switch: SWITCH,
