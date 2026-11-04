@@ -1,0 +1,55 @@
+# Donut Chart, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Donut Chart"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://donut-chart/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: donut-chart-preview-${MODE}-${SIZE}
+- openLink: helix://donut-chart/arc/preview
+- extendedWaitUntil:
+    visible: 'Arc'
+    timeout: 15000
+- takeScreenshot: donut-chart-arc-${MODE}-${SIZE}
+- openLink: helix://donut-chart/emphasis/preview
+- extendedWaitUntil:
+    visible: 'Emphasis'
+    timeout: 15000
+- takeScreenshot: donut-chart-emphasis-${MODE}-${SIZE}
+- openLink: helix://donut-chart/large-hole/preview
+- extendedWaitUntil:
+    visible: 'Large Hole'
+    timeout: 15000
+- takeScreenshot: donut-chart-large-hole-${MODE}-${SIZE}
+- openLink: helix://donut-chart/material/preview
+- extendedWaitUntil:
+    visible: 'Material'
+    timeout: 15000
+- takeScreenshot: donut-chart-material-${MODE}-${SIZE}
+- openLink: helix://donut-chart/pie/preview
+- extendedWaitUntil:
+    visible: 'Pie'
+    timeout: 15000
+- takeScreenshot: donut-chart-pie-${MODE}-${SIZE}
+- openLink: helix://donut-chart/slice-labels/preview
+- extendedWaitUntil:
+    visible: 'Slice Labels'
+    timeout: 15000
+- takeScreenshot: donut-chart-slice-labels-${MODE}-${SIZE}
+- openLink: helix://donut-chart/with-a-legend/preview
+- extendedWaitUntil:
+    visible: 'With A Legend'
+    timeout: 15000
+- takeScreenshot: donut-chart-with-a-legend-${MODE}-${SIZE}
+- openLink: helix://donut-chart/with-a-total/preview
+- extendedWaitUntil:
+    visible: 'With A Total'
+    timeout: 15000
+- takeScreenshot: donut-chart-with-a-total-${MODE}-${SIZE}

@@ -22,6 +22,7 @@ import { useCombobox } from './combobox'
 import { useCommand } from './command'
 import { type Copied, useCopy } from './copy'
 import { useDataTable } from './data-table'
+import { useDonutChart } from './donut-chart'
 import { useDatePicker } from './date-picker'
 import { standsOpen, useReportOpen } from './disclosed'
 import { type Entered, useEntry } from './entry'
@@ -467,6 +468,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useDatePicker(family, props, use),
+      ),
+    /* A ring of shares: its ring from its readings, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'donut-chart')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useDonutChart(family, props, use),
       ),
     /* A sparkline: its drawing from its readings, and its reading. */
     ...uses
