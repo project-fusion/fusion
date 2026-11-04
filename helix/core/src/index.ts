@@ -414,8 +414,16 @@ export {
 } from './utils/category-labels/category-labels.js'
 export { centerInView } from './utils/center-in-view/center-in-view.js'
 export {
+  type AreaAsked,
+  type AreaBand,
+  type AreaStack,
   type AxisScales,
+  areaBand,
+  areaDomain,
   areaPath,
+  areaStack,
+  areaTallied,
+  areaTipY,
   axisScales,
   baselineAt,
   type Column,
@@ -433,6 +441,7 @@ export {
   type LineEnd,
   type LineMarks,
   latestReadings,
+  latestShares,
   latestWords,
   levelRules,
   lineDomain,
