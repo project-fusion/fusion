@@ -207,6 +207,14 @@
       "types": "./dist/data-table/index.d.ts",
       "default": "./dist/data-table/index.js"
     },
+    "./date-input": {
+      "react-native": {
+        "types": "./dist/date-input/index.native.d.ts",
+        "default": "./dist/date-input/index.native.js"
+      },
+      "types": "./dist/date-input/index.d.ts",
+      "default": "./dist/date-input/index.js"
+    },
     "./date-picker": {
       "react-native": {
         "types": "./dist/date-picker/index.native.d.ts",

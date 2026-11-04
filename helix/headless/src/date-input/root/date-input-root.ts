@@ -836,6 +836,9 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     })
   }
 
+  /**
+   * The message shown when `disable-dates` or `disable-days` bars a date.
+   */
   @words
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a date that is available.'

@@ -39,6 +39,8 @@ export interface Around {
    */
   readonly layering: {
     dismiss?: (by: 'outside' | 'request' | 'swipe') => boolean
+    /** Takes focus to the layer's first or last control as it next opens. */
+    enter?: (where: 'first' | 'last') => void
     holds?: () => boolean
     /** Stands the layer over its anchor, as a Select's `position="item-aligned"`. */
     over?: OverAsked

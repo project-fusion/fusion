@@ -22,7 +22,7 @@ const SRC = join(import.meta.dir, '..', '..')
 /** Each sheet, and the selector of the rule that sets the editable text's size. */
 const FIELDS: [sheet: string, selector: string][] = [
   ['shared/field/field-frame.css', '[part="control"] {'],
-  ['shared/field/field-segments.css', '[part="segments"] {'],
+  ['time-input/root/time-input-segments.css', '[part="segments"] {'],
   ['select/root/select-root.generated.css', ':host [part="trigger"] {'],
   ['listbox/root/listbox-root.generated.css', ':host [part="search-field"] {'],
   ['command/root/command-root.generated.css', ':host [part="listbox"]::part(search-field) {'],
