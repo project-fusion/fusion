@@ -123,6 +123,23 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("cx", BOX, Shape::Length),
     ("cy", BOX, Shape::Length),
     ("d", BOX, Shape::Path),
+    /* A shape's place and size in its vector's units, as a rect's `x` and
+    `width`, and the ends of the line a gradient runs along. */
+    ("height", BOX, Shape::Length),
+    /* The name a vector's gradient is painted by, a shape's `fill: url(#id)`. */
+    ("id", BOX, Shape::Name),
+    /* Where a gradient's stop stands along it, 0 to 1. */
+    ("offset", BOX, Shape::Length),
+    /* `none`: the vector is stretched to fill its box on both axes, as a
+    sparkline's strip fills a slot of any width. */
+    ("preserveAspectRatio", BOX, Shape::OneOf(&["none"])),
+    ("width", BOX, Shape::Length),
+    ("x", BOX, Shape::Length),
+    ("x1", BOX, Shape::Length),
+    ("x2", BOX, Shape::Length),
+    ("y", BOX, Shape::Length),
+    ("y1", BOX, Shape::Length),
+    ("y2", BOX, Shape::Length),
     /* `aria-hidden`: out of what a screen reader reaches, with what it holds.
     A layer that is decorative is a look alone, as a tour's spotlight. */
     (
@@ -326,7 +343,11 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     ("steps", PRESS, Shape::OneOf(&["down", "up"])),
     /* The shape a box inside a vector draws, at the geometry its own
     attributes give. */
-    ("shape", BOX, Shape::OneOf(&["circle", "path"])),
+    (
+        "shape",
+        BOX,
+        Shape::OneOf(&["circle", "gradient", "path", "rect", "stop"]),
+    ),
     /* Where a picture loads from, a URL or the prop that holds one. */
     ("src", IMAGE, Shape::Words),
     /* The press that turns the element's toggle the other way. */
@@ -403,10 +424,17 @@ pub fn attribute(kind: NodeKind, node: &str, name: &str, value: &Attribute) -> R
             )),
         };
     }
-    let Some((_, kinds, shape)) = ATTRIBUTES
-        .iter()
-        .chain(layer::ATTRIBUTES)
-        .find(|(known, ..)| *known == name)
+    /* A name two kinds of node take in different shapes, as a stop's
+    `offset` and a layer's, is the row of the kind that takes it. */
+    let named = || {
+        ATTRIBUTES
+            .iter()
+            .chain(layer::ATTRIBUTES)
+            .filter(|(known, ..)| *known == name)
+    };
+    let Some((_, kinds, shape)) = named()
+        .find(|(_, kinds, _)| kinds.contains(&kind))
+        .or_else(|| named().next())
     else {
         return Err(format!("`{kind}('{node}')`: `{name}` is not an attribute"));
     };

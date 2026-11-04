@@ -187,10 +187,21 @@ pub const ELEMENTS: &[Element] = &[
 ];
 
 /// The shapes a box inside a vector may draw, and the geometry each takes.
-pub const SHAPES: &[(&str, &[&str])] = &[("circle", &["cx", "cy", "r"]), ("path", &["d"])];
+///
+/// A `gradient` is a paint and draws nothing itself: it holds the `stop`s it
+/// runs through, and a shape's `fill` names it by its `id`, `url(#id)`.
+pub const SHAPES: &[(&str, &[&str])] = &[
+    ("circle", &["cx", "cy", "r"]),
+    ("gradient", &["x1", "x2", "y1", "y2"]),
+    ("path", &["d"]),
+    ("rect", &["height", "width", "x", "y"]),
+    ("stop", &["offset"]),
+];
 
 /// Every geometry attribute some shape takes.
-pub const GEOMETRY: &[&str] = &["cx", "cy", "d", "r"];
+pub const GEOMETRY: &[&str] = &[
+    "cx", "cy", "d", "height", "offset", "r", "width", "x", "x1", "x2", "y", "y1", "y2",
+];
 
 /// Whether `name` names a role.
 pub fn is_role(name: &str) -> bool {
