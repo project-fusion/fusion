@@ -1,16 +1,18 @@
 import {
   customElement,
   HelixElement,
+  isHidden,
+  namesIn,
   requestValue,
   type Series,
   SourceController,
   seriesIndex,
   seriesKey,
   ToolbarController,
+  toggledNames,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
 
 /**
  * @summary A list of the series in a chart, each name beside the color it is drawn in.

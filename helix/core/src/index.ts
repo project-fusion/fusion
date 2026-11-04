@@ -425,6 +425,9 @@ export {
   donutRing,
   donutSeam,
   donutShares,
+  isHidden,
+  type NameList,
+  namesIn,
   type Overview,
   overviewWords,
   type Placed,
@@ -445,6 +448,7 @@ export {
   slotsOf,
   sparklineMarks,
   sparklinePlot,
+  toggledNames,
 } from './utils/chart-plot/chart-plot.js'
 export {
   ariaChord,
