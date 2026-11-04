@@ -27,8 +27,10 @@ const row = measured('_time-row', token('size-control'))
  * washed. **The wheels are columns of the same list**, five rows tall, each row's
  * mark centered as a calendar day is, the answer the calendar's solid mark.
  *
- * Rules on the rows the list draws are the web's own `::part()` selectors; a phone
- * draws its rows from data, in Listbox's own look.
+ * Rules on the rows the list draws are the web's own `::part()` selectors on the
+ * options it slots in. A phone draws its rows from data, and reaches them through
+ * the parts the list exports of each row, `list-row-item` and `column-row-label`,
+ * under the row's own `data-selected`, `data-active` and `data-between`.
  */
 export default styles(
   root,
@@ -125,6 +127,68 @@ export default styles(
       ]),
       /* A phone draws the list's own rows, its frame off as on the web. */
       on(['list-items', 'column-items'], [native([rule(frameless)])]),
+      /* A range's ends filled and the times between washed, on the rows a phone
+         draws from data. */
+      on('list-row-item', [
+        native([
+          rule(
+            { mode: 'range', part: { 'data-selected': true } },
+            {
+              backgroundColor: token('color-surface-inverse'),
+              color: token('color-foreground-inverse'),
+            },
+          ),
+          rule({ part: { 'data-between': true } }, { backgroundColor: hook.rangeColor }),
+          rule(
+            { invalid: true, part: { 'data-selected': true } },
+            { outline: ring, outlineOffset: token('size-focus-offset') },
+          ),
+        ]),
+      ]),
+      /* A wheel's row: its mark centered, the answer the calendar's solid mark. */
+      on('column-row-item', [
+        native([
+          rule({
+            backgroundColor: 'transparent',
+            justifyContent: 'center',
+            minBlockSize: row,
+            minInlineSize: row,
+            paddingBlock: token('space-none'),
+            paddingInline: token('space-sm'),
+          }),
+        ]),
+      ]),
+      /* Room above the first row and below the last, so each can rest in the middle. */
+      on('column-items', [
+        native([rule({ paddingBlock: quotient(difference(hook.wheelBlockSize, row), 2) })]),
+      ]),
+      on('column-row-text', [native([rule({ alignItems: 'center' })])]),
+      on('column-row-label', [
+        native([
+          rule({
+            alignItems: 'center',
+            blockSize: row,
+            borderRadius: hook.markRadius,
+            justifyContent: 'center',
+            minInlineSize: row,
+            paddingInline: token('space-2xs'),
+            textAlign: 'center',
+          }),
+          rule({ part: { 'data-active': true } }, { backgroundColor: hook.hoverBackgroundColor }),
+          rule(
+            { part: { 'data-selected': true } },
+            {
+              backgroundColor: hook.selectedBackgroundColor,
+              color: hook.selectedForegroundColor,
+            },
+          ),
+          rule(
+            { invalid: true, part: { 'data-selected': true } },
+            { outline: ring, outlineOffset: token('size-focus-offset') },
+          ),
+        ]),
+      ]),
+      on('column-row-check', [native([rule({ display: 'none' })])]),
       on('columns', [rule({ display: 'flex', gap: hook.columnsGap })]),
       on('columns', [native([rule({ flexDirection: 'row' })])]),
       on('column', [

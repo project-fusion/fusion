@@ -25,7 +25,10 @@ import {
  * element reads too. A choice asks `before-change` first.
  *
  * **The list is Listbox, drawn from data and windowed**, so a day in short steps
- * draws only the rows on screen. **`picker="wheels"`** draws one list a wheel, the
+ * draws only the rows on screen. A phone's rows are the list's own, and the list
+ * exports their parts again, `row-item` and `row-label`, so the rules that style
+ * the web's options reach them; a time between a range's ends says so in its
+ * record. **`picker="wheels"`** draws one list a wheel, the
  * hour, the minute, the second, and the half of the day, for one time.
  *
  * **The web's**: a form's `name`, and `time-content`, which returns a Lit template.
@@ -128,6 +131,10 @@ export default headless('time-picker', {
                 label: true,
                 live: true,
                 loading: true,
+                'row-check': 'native',
+                'row-item': 'native',
+                'row-label': 'native',
+                'row-text': 'native',
                 search: true,
                 'search-field': true,
                 voice: true,
@@ -160,6 +167,10 @@ export default headless('time-picker', {
             label: true,
             live: true,
             loading: true,
+            'row-check': 'native',
+            'row-item': 'native',
+            'row-label': 'native',
+            'row-text': 'native',
             search: true,
             'search-field': true,
             voice: true,

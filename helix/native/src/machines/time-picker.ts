@@ -186,40 +186,56 @@ const markedOf = (
   return found !== undefined && (found[0] !== 'valueMissing' || touched)
 }
 
-/** A list's handle, which scrolls to a row. */
-interface Scroller {
-  readonly scrollToIndex?: (index: number, options?: { readonly align?: 'center' }) => void
+/** What the ref of a list the picker draws holds, as the web's Listbox has `reveal()`. */
+interface Revealing {
+  readonly reveal?: () => void
 }
 
 /**
- * Brings the time held to the middle of the list, or of each wheel, once drawn:
- * a list comes to rest with its chosen time in the middle, as the web's does.
+ * Brings the time held to the middle of the list, or of each wheel, as the web's
+ * `reveal()` does: **the wheels on every change**, as a turn of the hour changes
+ * the minutes the next wheel offers, and **the list once**, as it is first drawn,
+ * since centering it on every choice would move the row from under the finger
+ * that chose it. A list holding several, a range or a set, rests where it is.
  */
-const useRevealed = (indexOf: (key: string) => number) => {
-  const scrollers = useRef(new Map<string, Scroller>()).current
-  const shown = useRef(false)
+const useRevealed = (value: string, wheels: boolean, several: boolean) => {
+  const lists = useRef(new Map<string, Revealing>()).current
+  const refs = useRef(new Map<string, (handle: Revealing | null) => void>()).current
+  /* What was last brought to rest: the wheels' time, or the list, once. */
+  const shown = useRef<string | undefined>(undefined)
+  const frame = useRef<number | undefined>(undefined)
+  const resting = wheels ? `wheels ${value}` : 'list'
   useEffect(() => {
-    if (shown.current || scrollers.size === 0) {
+    if (several || shown.current === resting || lists.size === 0) {
       return
     }
-    shown.current = true
-    /* A frame on, once the list has measured itself. */
-    const frame = requestAnimationFrame(() => {
-      for (const [key, scroller] of scrollers) {
-        const index = indexOf(key)
-        if (index >= 0) {
-          scroller.scrollToIndex?.(index, { align: 'center' })
+    shown.current = resting
+    /* A frame on, once each list has measured itself. Nothing cancels it: a draw
+       before that frame that held nothing new canceled it, and so did React's
+       second mount in development, and a list gone by then has left `lists`. */
+    if (frame.current === undefined) {
+      frame.current = requestAnimationFrame(() => {
+        frame.current = undefined
+        for (const list of lists.values()) {
+          list.reveal?.()
+        }
+      })
+    }
+  }, [lists, resting, several])
+  /* One ref for each list across draws, so React keeps it attached. */
+  return (key: string) => {
+    let ref = refs.get(key)
+    if (ref === undefined) {
+      ref = (handle) => {
+        if (handle === null) {
+          lists.delete(key)
+        } else {
+          lists.set(key, handle)
         }
       }
-    })
-    return () => cancelAnimationFrame(frame)
-  })
-  return (key: string) => (handle: Scroller | null) => {
-    if (handle === null) {
-      scrollers.delete(key)
-    } else {
-      scrollers.set(key, handle)
+      refs.set(key, ref)
     }
+    return ref
   }
 }
 
@@ -259,14 +275,7 @@ export const useTimePicker = (family: Family, props: Props, use: MachineUse): Be
   }
   const options = optionsOf(now, value)
   const columns = wheels ? columnsOf(now, value, read) : []
-  const scroller = useRevealed((key) => {
-    if (key === 'list') {
-      const held = commaList(value)
-      return options.findIndex((one) => held.includes(one.value))
-    }
-    const wheel = columns.find((one) => one.key === key)
-    return wheel?.options.findIndex((one) => one.value === wheel.value) ?? -1
-  })
+  const scroller = useRevealed(value, wheels, now.mode !== undefined)
   const turn = (part: WheelPart, to: string) => request(wheelTurn(part, to, { ...now, value }))
   const selectNow = () => {
     const clock = new Date()
