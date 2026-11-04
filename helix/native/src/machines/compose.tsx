@@ -62,6 +62,7 @@ import { stackRow } from './stack-row'
 import { useTable } from './table'
 import { useTableColumn, useTableRow } from './table-row'
 import { useTail } from './tail'
+import { useTimePicker } from './time-picker'
 import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
 import { useTree } from './tree'
@@ -464,6 +465,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useDatePicker(family, props, use),
+      ),
+    /* A list of times, or a set of wheels. */
+    ...uses
+      .filter((use) => use.machine === 'time-picker')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTimePicker(family, props, use),
       ),
     /* A field of dates or times, which the verdict reads as its answer and its faults. */
     ...uses
