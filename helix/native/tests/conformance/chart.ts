@@ -74,7 +74,12 @@ export const tapPlot = async (
 /** Whether the element is a chart a reader reads a reading at a time. */
 export const isChart = (tag: string): boolean => {
   const api = formOf(tag).api
-  return api?.sparkline !== undefined || api?.donutChart !== undefined
+  return (
+    api?.sparkline !== undefined ||
+    api?.donutChart !== undefined ||
+    api?.lineChart !== undefined ||
+    api?.areaChart !== undefined
+  )
 }
 
 /**
