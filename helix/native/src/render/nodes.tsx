@@ -376,7 +376,7 @@ const drawContent = (
         <ScaledText style={inherits}>{resolved.before}</ScaledText>
       )}
       {drawGlyph(scope, node, inherits, box, inside === 'host' ? scope.host.style : undefined)}
-      {typeof node.attributes?.viewBox === 'string'
+      {node.attributes?.viewBox !== undefined
         ? drawVector(held, node, fromText(inherits), box)
         : inScheme(resolved.scheme, inner(held, node, inherits, resolved.regions, node))}
       {drawGenerated(resolved.generated?.after, inherits, `${node.name}-after`)}

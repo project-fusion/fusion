@@ -29,7 +29,7 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 import type { AccessibilityActionEvent } from 'react-native'
 import { GestureDetector } from 'react-native-gesture-handler'
 import { useFocusVisible } from '../capabilities/focus-visible'
-import { useTrack } from '../drivers/track'
+import { type TrackPoint, useTrack } from '../drivers/track'
 import type { PartBinding } from '../render/behavior'
 import { direction } from '../render/styles'
 
@@ -54,6 +54,17 @@ export interface CursorSetup {
   readonly said: (at: number) => string
   /** Told each move of the reading, and each press of it. */
   readonly tell: (heard: 'change' | 'press', reading: CursorHeard) => void
+  /**
+   * The reading under a point of the plot, as shares of its box, or `-1` for
+   * none, for a plot whose readings are not laid out along it, as a ring's
+   * slices are found by a touch's angle. Absent, the reading is the slot
+   * along the plot the finger is in.
+   */
+  readonly pick?: (point: TrackPoint) => number
+  /** Whether the reading at a place is drawn: the keys pass over one that is not, as a slice a legend hid. */
+  readonly shows?: (at: number) => boolean
+  /** The axis the keys walk, `none` for a ring, whose arrows all move on or back. Absent is `inline`. */
+  readonly axis?: 'inline' | 'none'
 }
 
 /** What a chart's cursor gives its chart. */
@@ -75,13 +86,32 @@ const ACTIONS = [
 /** How far Page Up and Page Down move: a tenth of the readings, at least one. */
 const pageOf = (count: number): number => Math.max(1, Math.round(count / 10))
 
-/** The reading a key moves to from `at`, or `undefined` for a key that moves nothing. */
-const keyedTo = (key: string, at: number, count: number): number | undefined =>
-  stepReading(
+/** The places of the readings drawn, which the keys walk. */
+const shownOf = (setup: CursorSetup): number[] =>
+  Array.from({ length: setup.count }, (_, at) => at).filter((at) => setup.shows?.(at) !== false)
+
+/**
+ * The reading a key moves to from `at`, or `undefined` for a key that moves
+ * nothing: stepped by place among the readings drawn, so a hidden one is never
+ * landed on, as the web's chart steps.
+ */
+const keyedTo = (key: string, at: number, setup: CursorSetup): number | undefined => {
+  const shown = shownOf(setup)
+  const count = shown.length
+  const next = stepReading(
     key,
-    { at, series: -1 },
-    { axis: 'inline', count, grid: 1, page: pageOf(count), rtl: direction() === 'rtl', series: 1 },
-  )?.at
+    { at: shown.indexOf(at), series: -1 },
+    {
+      axis: setup.axis ?? 'inline',
+      count,
+      grid: 1,
+      page: pageOf(count),
+      rtl: direction() === 'rtl',
+      series: 1,
+    },
+  )
+  return next === undefined ? undefined : (shown[next.at] ?? -1)
+}
 
 /** Holds the reading a finger, a key, or a screen reader rests on. */
 export const useChartCursor = (setup: CursorSetup): Cursor => {
@@ -131,17 +161,27 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
       now.setup.tell('press', { at: now.shown.at, by })
     }
   }, [])
-  const under = (fraction: number): number => readingAt(fraction, latest.current.setup.count)
+  /* A point off every reading, a ring's hole, moves nothing. */
+  const under = (fraction: number, point: TrackPoint): number => {
+    const { pick, count } = latest.current.setup
+    return pick === undefined ? readingAt(fraction, count) : pick(point)
+  }
   const tracking = useTrack({
-    drag: (fraction) => {
+    drag: (fraction, point) => {
       dragged.current = true
       flush()
-      move(under(fraction), 'touch')
+      const at = under(fraction, point)
+      if (at >= 0) {
+        move(at, 'touch')
+      }
     },
     enabled: setup.touches,
-    press: (fraction) => {
+    press: (fraction, point) => {
       dragged.current = false
-      move(under(fraction), 'touch', true)
+      const at = under(fraction, point)
+      if (at >= 0) {
+        move(at, 'touch', true)
+      }
     },
     release: () => {
       if (!dragged.current) {
@@ -171,7 +211,7 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
         press('keyboard')
         return was.at >= 0
       }
-      const to = keyedTo(key.key, was.at, now.count)
+      const to = keyedTo(key.key, was.at, now)
       if (to === undefined) {
         return false
       }
@@ -197,8 +237,9 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
   /* Focus a key brought shows the first reading, and focus leaving puts away a reading the keys chose. */
   useEffect(() => {
     const { setup: now, shown: was } = latest.current
-    if (ringed && was.at < 0 && now.count > 0) {
-      move(0, 'keyboard')
+    const first = shownOf(now)[0]
+    if (ringed && was.at < 0 && first !== undefined) {
+      move(first, 'keyboard')
     } else if (!ringed && was.keyed && was.at >= 0) {
       move(-1, 'keyboard')
     }
@@ -212,7 +253,7 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
         return
       }
       /* Down and Up move on and back along one series whatever the page's direction. */
-      const to = keyedTo(name === 'increment' ? 'ArrowDown' : 'ArrowUp', was.at, now.count)
+      const to = keyedTo(name === 'increment' ? 'ArrowDown' : 'ArrowUp', was.at, now)
       if (to !== undefined) {
         move(to, 'keyboard')
       }

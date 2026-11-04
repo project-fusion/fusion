@@ -58,6 +58,12 @@ const alongOf = (vertical: boolean) => {
     : { activeOffsetX: slop, failOffsetY: slop }
 }
 
+/** A point of a track, as shares of its width from the left and of its height from the top. */
+export interface TrackPoint {
+  readonly x: number
+  readonly y: number
+}
+
 /** What a drag along a track reads of the track it moves along. */
 export interface TrackSetup {
   /** Whether a touch moves the value now. */
@@ -66,10 +72,14 @@ export interface TrackSetup {
   readonly rtl: boolean
   /** Whether the track stands on end, its start at the foot. */
   readonly vertical: boolean
-  /** Told where a press, or the start of a drag, stands. */
-  readonly press: (fraction: number) => void
-  /** Told where a drag stands as it moves. */
-  readonly drag: (fraction: number) => void
+  /**
+   * Told where a press, or the start of a drag, stands, and the point under
+   * the finger as shares of the track's width and height, for a track read
+   * by more than its axis, as a ring is read by the angle of a touch.
+   */
+  readonly press: (fraction: number, point: TrackPoint) => void
+  /** Told where a drag stands as it moves, and the point under the finger. */
+  readonly drag: (fraction: number, point: TrackPoint) => void
   /** Told that the press or the drag is done. */
   readonly release: () => void
 }
@@ -92,6 +102,11 @@ export const useTrack = (setup: TrackSetup): Tracking => {
     const { height, width } = event.nativeEvent.layout
     size.current = { height, width }
   }, [])
+  /** A point in the track, as shares of its box. */
+  const pointOf = useCallback((at: { readonly x: number; readonly y: number }): TrackPoint => {
+    const { height, width } = size.current
+    return { x: width > 0 ? at.x / width : 0, y: height > 0 ? at.y / height : 0 }
+  }, [])
   /** Where a point in the track stands, as a fraction of it. */
   const fraction = useCallback((at: { readonly x: number; readonly y: number }): number => {
     const { rtl, vertical } = latest.current
@@ -107,10 +122,9 @@ export const useTrack = (setup: TrackSetup): Tracking => {
            track takes the value there first. */
         onActivate: (event: PanGestureActiveEvent) => {
           held.current = true
-          latest.current.press(
-            fraction({ x: event.x - event.translationX, y: event.y - event.translationY }),
-          )
-          latest.current.drag(fraction(event))
+          const start = { x: event.x - event.translationX, y: event.y - event.translationY }
+          latest.current.press(fraction(start), pointOf(start))
+          latest.current.drag(fraction(event), pointOf(event))
         },
         onFinalize: () => {
           if (held.current) {
@@ -120,12 +134,12 @@ export const useTrack = (setup: TrackSetup): Tracking => {
         },
         onUpdate: (event: PanGestureActiveEvent) => {
           if (held.current) {
-            latest.current.drag(fraction(event))
+            latest.current.drag(fraction(event), pointOf(event))
           }
         },
         runOnJS: true,
       }),
-      [setup.enabled, setup.vertical, fraction],
+      [setup.enabled, setup.vertical, fraction, pointOf],
     ),
   )
   const tap = useTapGesture(
@@ -133,12 +147,12 @@ export const useTrack = (setup: TrackSetup): Tracking => {
       () => ({
         enabled: setup.enabled,
         onActivate: (event: TapGestureActiveEvent) => {
-          latest.current.press(fraction(event))
+          latest.current.press(fraction(event), pointOf(event))
           latest.current.release()
         },
         runOnJS: true,
       }),
-      [setup.enabled, fraction],
+      [setup.enabled, fraction, pointOf],
     ),
   )
   const gesture = useExclusiveGestures(pan, tap)
