@@ -68,6 +68,7 @@ export type Family =
   | 'time-picker'
   | 'date-input'
   | 'time-input'
+  | 'donut-chart'
   | 'sparkline'
   | 'filter-input'
   | 'select'

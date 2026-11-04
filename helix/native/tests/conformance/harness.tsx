@@ -234,6 +234,7 @@ const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
   ...logProps(setup),
   ...chatProps(setup),
   ...(setup.value === undefined ? {} : { value: setup.value }),
+  ...(setup.data === undefined ? {} : { data: setup.data }),
 })
 
 /**
@@ -514,7 +515,7 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
     case 'point':
       return pointIn(intent)
     case 'tap':
-      return tapPlot(intent)
+      return tapPlot(intent, run.scenario.setup.tag)
     case 'box':
       return pressBox(run, intent.at)
     case 'scrub':

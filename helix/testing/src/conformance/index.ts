@@ -18,6 +18,7 @@ import { DATA_TABLE } from './scenarios/data-table.js'
 import { DATE_INPUT } from './scenarios/date-input.js'
 import { DATE_PICKER } from './scenarios/date-picker.js'
 import { DIALOG } from './scenarios/dialog.js'
+import { DONUT_CHART } from './scenarios/donut-chart.js'
 import { DRAWER } from './scenarios/drawer.js'
 import { DRILLDOWN } from './scenarios/drilldown.js'
 import { FILE_INPUT } from './scenarios/file-input.js'
@@ -91,6 +92,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'date-input': DATE_INPUT,
   'date-picker': DATE_PICKER,
   dialog: DIALOG,
+  'donut-chart': DONUT_CHART,
   drawer: DRAWER,
   drilldown: DRILLDOWN,
   'file-input': FILE_INPUT,

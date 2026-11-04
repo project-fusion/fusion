@@ -32,10 +32,16 @@ const gesturesOf = (plot: View): readonly unknown[] => {
   return []
 }
 
-/** A finger's tap on the chart's plot at `x` and `y`, fractions of it from its top left corner. */
+/**
+ * A finger's tap on the chart's plot at `x` and `y`, fractions of it from its
+ * top left corner. The plot is as tall as its `aspect` says, a ring's square,
+ * and a strip a quarter of its width where it says none.
+ */
 export const tapPlot = async (
   intent: Extract<Intent, { kind: 'tap' }>,
+  tag: string,
 ): Promise<string | undefined> => {
+  const aspect = Number(HOST_STATES.get(tag)?.aspect ?? 4) || 4
   /* A chart that is decoration has no control a screen reader reaches, and a finger still reads its plot. */
   const plot =
     plotIn() ??
@@ -47,10 +53,10 @@ export const tapPlot = async (
   }
   await act(async () => {
     fireEvent(plot, 'layout', {
-      nativeEvent: { layout: { height: LENGTH / 4, width: LENGTH, x: 0, y: 0 } },
+      nativeEvent: { layout: { height: LENGTH / aspect, width: LENGTH, x: 0, y: 0 } },
     })
   })
-  const at = { x: intent.x * LENGTH, y: (intent.y * LENGTH) / 4 }
+  const at = { x: intent.x * LENGTH, y: (intent.y * LENGTH) / aspect }
   const [, tap] = gesturesOf(plot)
   if (tap === undefined) {
     return 'The plot holds no tap.'
@@ -66,7 +72,10 @@ export const tapPlot = async (
 }
 
 /** Whether the element is a chart a reader reads a reading at a time. */
-export const isChart = (tag: string): boolean => formOf(tag).api?.sparkline !== undefined
+export const isChart = (tag: string): boolean => {
+  const api = formOf(tag).api
+  return api?.sparkline !== undefined || api?.donutChart !== undefined
+}
 
 /**
  * Focus on the chart's plot as a reader tabs to it: the node it hears keys on,

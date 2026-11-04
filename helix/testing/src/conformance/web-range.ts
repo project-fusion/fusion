@@ -102,11 +102,17 @@ export const pointAt = async (
     pointerId: 2,
     pointerType: 'touch',
   }
-  target.dispatchEvent(new PointerEvent('pointerdown', { ...at, buttons: 1 }))
+  /* A tap lands on what is drawn under the finger inside the part, as a ring's
+     slice, and on the part where nothing inside it is. */
+  const root = target.getRootNode() as Document | ShadowRoot
+  const under = clicks
+    ? (root.elementsFromPoint(at.clientX, at.clientY).find((one) => target.contains(one)) ?? target)
+    : target
+  under.dispatchEvent(new PointerEvent('pointerdown', { ...at, buttons: 1 }))
   await frame()
-  target.dispatchEvent(new PointerEvent('pointerup', at))
+  under.dispatchEvent(new PointerEvent('pointerup', at))
   if (clicks) {
-    target.dispatchEvent(new PointerEvent('click', { ...at, detail: 1 }))
+    under.dispatchEvent(new PointerEvent('click', { ...at, detail: 1 }))
     await frame()
   }
   return undefined
