@@ -33,6 +33,7 @@ import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
+import { useLegend } from './legend'
 import { useListbox } from './listbox'
 import { useLog } from './log'
 import { useLogGroup } from './log-group'
@@ -468,6 +469,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useDatePicker(family, props, use),
+      ),
+    /* A chart's key: its entries from the table, and the series its toggles hide. */
+    ...uses
+      .filter((use) => use.machine === 'legend')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useLegend(family, props, use),
       ),
     /* A ring of shares: its ring from its readings, and its reading. */
     ...uses
