@@ -479,6 +479,21 @@ export {
   wheelParts,
   wholeHour,
 } from './utils/clock/clock.js'
+export {
+  halfBarred,
+  hourBarred,
+  type TimeMode,
+  type TimeProblemWords,
+  timeBetween,
+  timeChoice,
+  timeProblem,
+  type WheelPart,
+  wheelHours,
+  wheelMinutes,
+  wheelSeconds,
+  wheelsAt,
+  wheelTurn,
+} from './utils/clock/time-picker.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { closestName } from './utils/closest-name/closest-name.js'
 export {
