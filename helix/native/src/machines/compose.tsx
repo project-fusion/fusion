@@ -360,8 +360,9 @@ export const behaviorFor = (family: Family): UseBehavior => {
       .map(
         (use): Binder =>
           (props, around) => {
-            const { behavior, value } = useListbox(family, props, use, around.touch)
+            const { behavior, handle, value } = useListbox(family, props, use, around.touch)
             around.chosen.current = value
+            around.handle.current = handle as unknown as Readonly<Record<string, unknown>>
             return behavior
           },
       ),

@@ -12,8 +12,8 @@ import { carried } from './carried'
 import { colorModeOf } from './color-mode'
 import { computedAttribute, derivedFor, holdsContent, laidOr } from './computed'
 import { type Entry, ofCopy } from './entry'
-import { UNFOLDED } from './fold'
 import { withGiven } from './given'
+import { given } from './given-prop'
 import type { Scrolling } from './scrolled'
 import { totalHolds } from './total'
 
@@ -82,24 +82,7 @@ export type Draw = (
   inside: Node | 'host',
 ) => ReactNode
 
-/** `pending-label` as React spells a prop, `pendingLabel`. */
-export const camel = (name: string): string =>
-  name.replace(/-(\w)/g, (_, letter: string) => letter.toUpperCase())
-
-/**
- * A prop as the element was given it, or its default where it was not. The
- * default region is `children`, which a node reads as `default` where it asks
- * whether the region holds something.
- */
-export const given = (values: Pick<Values, 'family' | 'props'>, name: string): unknown => {
-  const set =
-    name === 'default'
-      ? ((values.props as Record<symbol, unknown>)[UNFOLDED] ?? values.props.children)
-      : values.props[camel(name)]
-  return set === undefined
-    ? values.family.api?.props.find((prop) => prop.name === name)?.default
-    : set
-}
+export { camel, given } from './given-prop'
 
 /**
  * A value a part reads by name: a list or a state its binding gives it, then
@@ -220,6 +203,12 @@ const flags = (values: Values, node: Node): Record<string, boolean | string> => 
   return part
 }
 
+/** A box's flags where it stands, which the rules on the parts it exports read. */
+export const boxFlags = (styling: Styling, node: Node): Record<string, boolean | string> => ({
+  ...flags(styling, node),
+  ...styling.behavior.parts[node.name]?.states,
+})
+
 /** The parts a node is as well while each flag holds, as a row is `row-current` while it is current. */
 const also = (values: Values, node: Node): string[] => {
   const parts = node.attributes?.also
@@ -244,7 +233,7 @@ export const resolve = (
   styling: Styling,
   node: Node | string,
   extra: Partial<Context> = {},
-  state: Readonly<Record<string, boolean>> = {},
+  state: Readonly<Record<string, boolean | string>> = {},
 ): Resolved => {
   const name = typeof node === 'string' ? node : node.name
   const states = styling.behavior.parts[name]?.states ?? {}
@@ -263,8 +252,10 @@ export const resolve = (
     conditions: { ...styling.base.conditions, ...states },
     part: { ...own, ...state, ...states },
   })
-  /* The element around styles a part of this one where its box draws it. */
-  return withGiven(styling, name, resolved)
+  /* The element around styles a part of this one where its box draws it. A part
+     named alone with flags is one a box exports, and the flags are the box's. */
+  const box = typeof node === 'string' && Object.keys(state).length > 0 ? state : undefined
+  return withGiven(styling, name, resolved, box)
 }
 
 /**

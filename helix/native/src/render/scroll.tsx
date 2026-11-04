@@ -19,6 +19,7 @@ import type { Line, Motion, Snap, Style, Transition } from '../style/resolved'
 import { Box } from './box'
 import { holding, useHandOff } from './hand-off'
 import { growing, movesOf, parted, passingThrough, spreads, wrapWidth } from './scroll-layout'
+import { ScrollPadding, useHeldPadding } from './scroll-padding'
 import {
   useContent,
   useFill,
@@ -156,6 +157,8 @@ export const ScrollingPart = ({
   const scroller = useRef<ScrollViewInstance>(null)
   const { at, more, track } = useMore()
   const [frame, inner] = parted(box)
+  /* A windowed list inside takes the padding along it into its own content. */
+  const [laidInner, padding] = useHeldPadding(inner, axis)
   const {
     contentRef,
     holdsEnd,
@@ -213,7 +216,7 @@ export const ScrollingPart = ({
       {...snapping.scroller}
       contentContainerStyle={{
         ...(twoWays ? { flexDirection: 'column' } : {}),
-        ...inner,
+        ...laidInner,
         flexGrow: 1,
         ...through.content,
         ...(spread.width === undefined ? {} : { width: spread.width }),
@@ -264,7 +267,7 @@ export const ScrollingPart = ({
       {...through.scroller}
     >
       <WrapWidth.Provider value={twoWays ? wrapWidth(wide, inner) : undefined}>
-        {content(scrolling)}
+        <ScrollPadding.Provider value={padding}>{content(scrolling)}</ScrollPadding.Provider>
       </WrapWidth.Provider>
     </ScrollView>
   )
