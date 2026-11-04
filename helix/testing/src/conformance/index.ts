@@ -27,6 +27,7 @@ import { FORMAT_DATE } from './scenarios/format-date.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
 import { LEGEND } from './scenarios/legend.js'
+import { LINE_CHART } from './scenarios/line-chart.js'
 import { LIST } from './scenarios/list.js'
 import { LISTBOX } from './scenarios/listbox.js'
 import { LOADER } from './scenarios/loader.js'
@@ -102,6 +103,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   image: IMAGE,
   input: INPUT,
   legend: LEGEND,
+  'line-chart': LINE_CHART,
   list: LIST,
   listbox: LISTBOX,
   loader: LOADER,
