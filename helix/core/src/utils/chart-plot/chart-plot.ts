@@ -19,6 +19,7 @@ export type { Row, RowCell, Series, SeriesPoint } from '../read-series/read-seri
 export { extremesOf, seriesKey, unbroken } from '../read-series/read-series.js'
 export { ticks } from '../scale/ticks.js'
 export { writtenList, writtenNumbers } from '../written-list/written-list.js'
+export * from './area-plot.js'
 export * from './chart-reading.js'
 export * from './donut-plot.js'
 export * from './hidden-series.js'

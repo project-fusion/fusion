@@ -1,4 +1,11 @@
 import {
+  type AreaStack,
+  areaBand,
+  areaDomain,
+  areaStack,
+  areaTallied,
+  areaTipY,
+  axisScales,
   CategoryAxisController,
   CHART_PLOT,
   type Curve,
@@ -10,75 +17,26 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
-  headroom,
-  heldInside,
-  levelsOf,
-  linear,
-  linePath,
+  latestShares,
+  levelRules,
   MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
-  type Point,
+  percentIn,
   type Row,
   reportRuntime,
-  ScaleMemory,
   seriesIndex,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { repeat } from 'lit/directives/repeat.js'
 import '../../tooltip/index.js'
 
-/**
- * The largest of some numbers, or zero for none or for none above it. A loop,
- * because spread into `Math.max` four layers of 100,000 readings are more
- * arguments than a call can take.
- */
-const highest = (values: readonly number[]): number => {
-  let top = 0
-  for (const value of values) {
-    top = Math.max(top, value)
-  }
-  return top
-}
-
-/* Built once per locale and kept, `Intl.NumberFormat` being expensive to
-   construct and cheap to call. */
-const PERCENTS = new Map<string, Intl.NumberFormat>()
-
-/** A share from 0 to 1 as a whole percentage, the way the locale writes one. */
-const percentIn = (locale: string): Intl.NumberFormat => {
-  let found = PERCENTS.get(locale)
-  if (!found) {
-    found = new Intl.NumberFormat(locale || undefined, {
-      maximumFractionDigits: 0,
-      style: 'percent',
-    })
-    PERCENTS.set(locale, found)
-  }
-  return found
-}
-
-/** The table as parts of a total: which columns, what each holds, and the running sums. */
-export interface AreaStack {
-  /** The table's columns that hold numbers, by their place among its cells. */
-  columns: number[]
-  /**
-   * Each column's top edge at each reading: its running sum, or its own
-   * reading under `overlap`.
-   */
-  layers: number[][]
-  /** Each column's heading. */
-  names: string[]
-  /** Every reading's total. */
-  totals: number[]
-  /** Each column's own reading, not yet summed. */
-  values: number[][]
-}
+/** The table as parts of a total, as core reads it: which columns, what each holds, and the running sums. */
+export type { AreaStack }
 
 /**
  * @summary A chart that shows how a total is made up over time, as bands stacked on one another.
@@ -184,18 +142,15 @@ export interface AreaStack {
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - One part's band.
- * @csspart area-hidden - The band of a part a legend hid, closed to nothing where it stood and hidden, so a stylesheet can fade it as it closes. Set alongside `area`.
  * @csspart axis - The numbers of the scale beside the plot, unless `value-axis` is `none`.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
- * @csspart gridline-leaving - A rule at a level the scale no longer has, kept hidden at its place on the new scale, so a stylesheet can fade it out as it moves. Set alongside `gridline`.
- * @csspart guide - A rule down the reading a pointer is resting on, moved to it with `translate`, so a stylesheet can glide it from one to the next.
+ * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The top edge of one part's band.
- * @csspart line-hidden - The top edge of a part a legend hid, hidden. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -206,7 +161,6 @@ export interface AreaStack {
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
- * @csspart tick-leaving - A number the scale no longer has, kept `hidden` at its place on the new scale, held inside the plot, so a stylesheet can fade it out as it moves. Set alongside `tick`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
@@ -350,12 +304,6 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
 
   private warnedAboutNegatives = false
 
-  /** The scale drawn before this one, whose levels the axis and the rules leave from. */
-  private readonly scaleBefore = new ScaleMemory()
-
-  /** The scale before the one this render draws, from `scaleBefore`. */
-  private domainBefore: readonly [number, number] | undefined
-
   /**
    * Measures the axis and says which reading names fit on it, which are the
    * names drawn and the readings `category` gridlines rule.
@@ -392,42 +340,14 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     /* A part a legend hid is none of the total, so its band closes and the
        top edge is the sum of the parts still drawn. It keeps its place, and so
        its color. */
-    const values = columns.map((column, depth) =>
-      rows.map((row) => {
-        if (!this.showsSeries(names[depth] ?? '')) {
-          return 0
-        }
-        const value = row.cells[column]?.value ?? 0
-        if (value < 0) {
-          this.warnNegative()
-        }
-        return Math.max(0, value)
-      }),
-    )
-    const totals = rows.map((_, index) =>
-      values.reduce((sum, column) => sum + (column[index] ?? 0), 0),
-    )
-    const drawn = this.share
-      ? values.map((column) =>
-          column.map((value, index) => {
-            const total = totals[index] ?? 0
-            return total > 0 ? value / total : 0
-          }),
-        )
-      : values
-    const layers: number[][] = []
-    let running = rows.map(() => 0)
-    for (const column of drawn) {
-      running = this.overlap ? column : running.map((sum, index) => sum + (column[index] ?? 0))
-      layers.push(running)
-    }
-    return {
+    return areaStack(
+      rows,
       columns,
-      layers,
       names,
-      totals,
-      values,
-    }
+      (name) => this.showsSeries(name),
+      { overlap: this.overlap, share: this.share },
+      () => this.warnNegative(),
+    )
   }
 
   /**
@@ -463,23 +383,15 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     if (rows.length === 0 || stack.columns.length === 0) {
       return this.renderEmpty()
     }
-    const top = this.overlap
-      ? Math.max(0, ...stack.layers.map(highest))
-      : this.share
-        ? 1
-        : highest(stack.totals)
-    /* Room above the highest total wherever the scale is drawn, for the
-       reason `LineChart` gives. A share fills the height by definition, and
-       its top is 100 percent, already a level. */
-    const extent: [number, number] = [0, top > 0 ? top : 1]
-    const domain = !this.share && (this.drawsAxis || this.rulesValue) ? headroom(extent) : extent
-    const y = linear(domain, [PLOT_HEIGHT, 0])
-    this.domainBefore = this.scaleBefore.before(domain)
+    const domain = areaDomain(stack, {
+      overlap: this.overlap,
+      room: this.drawsAxis || this.rulesValue,
+      share: this.share,
+    })
     /* In the middle of each reading's slot, for the reason `LineChart` gives:
        the names underneath are a row of equal columns, and a reading at the
        edge of the box sits half a slot away from its own name. */
-    const slot = PLOT_WIDTH / rows.length
-    const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
+    const { x, y } = axisScales(domain, rows.length)
     return html`${this.drawsAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
       ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}${this.renderSonify()}${this.renderTable()}`
   }
@@ -497,7 +409,6 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       (value) => (y(value) / PLOT_HEIGHT) * 100,
       this.share ? (value) => percent.format(value) : formatNumbers(locale),
       (widest) => `--area-chart-axis: ${widest}ch`,
-      this.domainBefore,
     )
   }
 
@@ -535,15 +446,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
         viewBox="0 0 ${PLOT_WIDTH} ${PLOT_HEIGHT}"
         xmlns="http://www.w3.org/2000/svg"
       >
-        ${order.map((depth) =>
-          this.renderLayer(
-            stack.layers[depth] ?? [],
-            depth,
-            x,
-            y,
-            !this.showsSeries(stack.names[depth] ?? ''),
-          ),
-        )}
+        ${order.map((depth) => this.renderLayer(stack.layers[depth] ?? [], depth, x, y))}
         ${this.renderGridlines(x, y, domain, count)}
         <line part="baseline" x1="0" x2=${PLOT_WIDTH} y1=${PLOT_HEIGHT} y2=${PLOT_HEIGHT} />
         ${this.renderGuide(x)}
@@ -552,43 +455,30 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     </div>`
   }
 
-  /**
-   * One band: everything under its top edge, and the edge itself.
-   *
-   * `hidden` is a part a legend hid, which the stack has already closed to
-   * nothing where it stood. Its band and edge stay, with `area-hidden` and
-   * `line-hidden` and `visibility="hidden"`, so a stylesheet can fade them as
-   * the band closes and the bands above settle onto it.
-   */
+  /** One band: everything under its top edge, and the edge itself. */
   protected renderLayer(
     layer: number[],
     depth: number,
     x: (value: number) => number,
     y: (value: number) => number,
-    hidden = false,
   ): TemplateResult | typeof nothing {
-    const points: Point[] = layer.map((value, index) => [x(index), y(value)])
-    const path = linePath(points, this.curve ?? 'straight')
-    if (path === '') {
+    const band = areaBand(layer, { x, y }, this.curve ?? 'straight')
+    if (band === undefined) {
       return nothing
     }
     const index = seriesIndex(depth)
-    const first = points[0] as Point
-    const last = points.at(-1) as Point
-    const wash = `${path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
+    const { line: path, wash } = band
     return svg`<path
         d=${wash}
         data-series=${index}
-        part="area${hidden ? ' area-hidden' : ''}"
+        part="area"
         style="--chart-series: var(--chart-series-${index})"
-        visibility=${hidden ? 'hidden' : nothing}
       /><path
         d=${path}
         data-series=${index}
         fill="none"
-        part="line${hidden ? ' line-hidden' : ''}"
+        part="line"
         style="--chart-series: var(--chart-series-${index})"
-        visibility=${hidden ? 'hidden' : nothing}
       />`
   }
 
@@ -613,24 +503,11 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       : []
     /* The floor is the baseline's, and a gridline drawn on top of it is the
        same rule twice. */
-    /* Keyed by level and moved by `translate`, so a rule a new scale keeps
-       moves to its new level, and one it drops stays hidden for its fade. */
     const across = this.rulesValue
-      ? repeat(
-          levelsOf(domain, this.domainBefore).filter(({ level }) => level > domain[0]),
-          (one) => one.level,
-          ({ leaving, level }) =>
-            svg`<line
-              part="gridline${leaving ? ' gridline-leaving' : ''}"
-              style=${`translate: 0 ${leaving ? heldInside(y(level)) : y(level)}px`}
-              visibility=${leaving ? 'hidden' : nothing}
-              x1="0"
-              x2=${PLOT_WIDTH}
-              y1="0"
-              y2="0"
-            />`,
+      ? levelRules(domain, y, domain[0]).map(
+          (level) => svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${level} y2=${level} />`,
         )
-      : nothing
+      : []
     return svg`${down}${across}`
   }
 
@@ -645,16 +522,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     if (at < 0) {
       return nothing
     }
-    /* At the plot's start and moved by `translate`, a property a stylesheet
-       can transition in every engine, which the `x1` attribute is not. */
-    return svg`<line
-      part="guide"
-      style=${`translate: ${x(at)}px 0`}
-      x1="0"
-      x2="0"
-      y1="0"
-      y2=${PLOT_HEIGHT}
-    />`
+    return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
   }
 
   /**
@@ -687,13 +555,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     const last = rows.length - 1
     const total = stack.totals[last] ?? 0
     const locale = wordsLocale(this)
-    const shares = stack.names.flatMap((name, depth) =>
-      this.showsSeries(name)
-        ? [
-            `${name} ${percentIn(locale).format(total > 0 ? (stack.values[depth]?.[last] ?? 0) / total : 0)}`,
-          ]
-        : [],
-    )
+    const shares = latestShares(stack, (name) => this.showsSeries(name), percentIn(locale))
     const named = this.named ? `${this.named}, ` : ''
     /* One string and one text node: a space standing alone between two
        bindings is a text node of its own, which Chromium's description drops,
@@ -715,24 +577,14 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
    */
   private tallied(rows: Row[], stack: AreaStack): Row[] {
     const locale = wordsLocale(this)
-    const format = formatNumbers(locale)
-    return rows.map((row, index) => {
-      const total = stack.totals[index] ?? 0
-      return {
-        ...row,
-        cells: [
-          ...row.cells.map((cell, column) =>
-            this.share && cell.value !== undefined && stack.columns.includes(column) && total > 0
-              ? {
-                  ...cell,
-                  text: `${cell.text} (${percentIn(locale).format(Math.max(0, cell.value) / total)})`,
-                }
-              : cell,
-          ),
-          { name: this.totalLabel, text: format(total) },
-        ],
-      }
-    })
+    return areaTallied(
+      rows,
+      stack,
+      this.share,
+      this.totalLabel,
+      formatNumbers(locale),
+      percentIn(locale),
+    )
   }
 
   /** What a pointer resting on a reading shows, above the top of the stack. */
@@ -753,7 +605,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       {
         placement: 'top',
         x: `${at * slot + slot / 2}%`,
-        y: `${y(Math.max(0, ...stack.layers.map((layer) => layer[at] ?? 0)))}%`,
+        y: areaTipY(stack, at, y),
       },
       (cell) => this.seriesOf(cell),
       this.pointer,
