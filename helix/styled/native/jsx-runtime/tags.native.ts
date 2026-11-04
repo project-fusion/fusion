@@ -4,6 +4,7 @@ import * as React from 'react'
 import { HelixAccordion, HelixAccordionItem } from '../accordion/index.native'
 import { HelixAnnouncement } from '../announcement/index.native'
 import { HelixAppHeader } from '../app-header/index.native'
+import { HelixAreaChart } from '../area-chart/index.native'
 import { HelixAvatar, HelixAvatarGroup } from '../avatar/index.native'
 import { HelixBadge } from '../badge/index.native'
 import { HelixBlockquote } from '../blockquote/index.native'
@@ -219,6 +220,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-accordion-item': HelixAccordionItem,
   'helix-announcement': HelixAnnouncement,
   'helix-app-header': HelixAppHeader,
+  'helix-area-chart': HelixAreaChart,
   'helix-avatar': HelixAvatar,
   'helix-avatar-group': HelixAvatarGroup,
   'helix-badge': HelixBadge,

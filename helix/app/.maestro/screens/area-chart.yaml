@@ -1,0 +1,50 @@
+# Area Chart, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Area Chart"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://area-chart/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: area-chart-preview-${MODE}-${SIZE}
+- openLink: helix://area-chart/curves/preview
+- extendedWaitUntil:
+    visible: 'Curves'
+    timeout: 15000
+- takeScreenshot: area-chart-curves-${MODE}-${SIZE}
+- openLink: helix://area-chart/overlap/preview
+- extendedWaitUntil:
+    visible: 'Overlap'
+    timeout: 15000
+- takeScreenshot: area-chart-overlap-${MODE}-${SIZE}
+- openLink: helix://area-chart/share/preview
+- extendedWaitUntil:
+    visible: 'Share'
+    timeout: 15000
+- takeScreenshot: area-chart-share-${MODE}-${SIZE}
+- openLink: helix://area-chart/with-a-legend/preview
+- extendedWaitUntil:
+    visible: 'With A Legend'
+    timeout: 15000
+- takeScreenshot: area-chart-with-a-legend-${MODE}-${SIZE}
+- openLink: helix://area-chart/with-a-tooltip/preview
+- extendedWaitUntil:
+    visible: 'With A Tooltip'
+    timeout: 15000
+- takeScreenshot: area-chart-with-a-tooltip-${MODE}-${SIZE}
+- openLink: helix://area-chart/with-a-value-axis/preview
+- extendedWaitUntil:
+    visible: 'With A Value Axis'
+    timeout: 15000
+- takeScreenshot: area-chart-with-a-value-axis-${MODE}-${SIZE}
+- openLink: helix://area-chart/with-gridlines/preview
+- extendedWaitUntil:
+    visible: 'With Gridlines'
+    timeout: 15000
+- takeScreenshot: area-chart-with-gridlines-${MODE}-${SIZE}
