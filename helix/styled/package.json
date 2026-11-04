@@ -255,14 +255,6 @@
       "types": "./dist/donut-chart/index.d.ts",
       "default": "./dist/donut-chart/index.js"
     },
-    "./legend": {
-      "react-native": {
-        "types": "./dist/legend/index.native.d.ts",
-        "default": "./dist/legend/index.native.js"
-      },
-      "types": "./dist/legend/index.d.ts",
-      "default": "./dist/legend/index.js"
-    },
     "./drawer": {
       "react-native": {
         "types": "./dist/drawer/index.native.d.ts",
@@ -400,6 +392,14 @@
       },
       "types": "./dist/kbd/index.d.ts",
       "default": "./dist/kbd/index.js"
+    },
+    "./legend": {
+      "react-native": {
+        "types": "./dist/legend/index.native.d.ts",
+        "default": "./dist/legend/index.native.js"
+      },
+      "types": "./dist/legend/index.d.ts",
+      "default": "./dist/legend/index.js"
     },
     "./lint.json": "./lint.json",
     "./list": {

@@ -40,7 +40,7 @@ export default styles(
       swatchSize: token('space-sm'),
       swatchStroke: token('border-thick'),
     },
-    own: { legendArea: null, legendShade: null, legendThrough: null },
+    own: { legendArea: null, legendThrough: null },
     props: {
       emphasis: oneOf(['outlined', 'solid', 'subtle']),
       glass: '',
@@ -52,7 +52,7 @@ export default styles(
     stylesheet: 'legend/root/legend-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => {
-    const series = measured('chart-series')
+    const series = measured('chart-series', token('color-primary'))
     const through = own.legendThrough(1)
     /* The series' color at the share material lets through, toward nothing. */
     const edge = [
@@ -96,7 +96,6 @@ export default styles(
           content: '""',
           flex: [0, 0, 'auto'],
           inlineSize: hook.swatchSize,
-          own: { legendShade: mix(series, 60, token('color-background')) },
         }),
         rule({
           backgroundColor: fn(
@@ -129,7 +128,7 @@ export default styles(
           backgroundColor: fn(
             'color-mix',
             ['in', 'oklab'],
-            [own.legendShade, product(through, '100%')],
+            [mix(series, 60, token('color-background')), product(through, '100%')],
             'transparent',
           ),
           border: edge,
