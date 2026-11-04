@@ -414,6 +414,25 @@ export {
 } from './utils/category-labels/category-labels.js'
 export { centerInView } from './utils/center-in-view/center-in-view.js'
 export {
+  areaPath,
+  type Column,
+  type Overview,
+  overviewWords,
+  type Placed,
+  type Run,
+  readingAt,
+  readingPosition,
+  readingWords,
+  type SparklineInput,
+  type SparklineKind,
+  type SparklinePlot,
+  STRIP_HEIGHT,
+  seriesOfRows,
+  slotsOf,
+  sparklineMarks,
+  sparklinePlot,
+} from './utils/chart-plot/chart-plot.js'
+export {
   ariaChord,
   type ChordPress,
   chordParts,
