@@ -479,6 +479,8 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
     : {}),
   /* A palette's focus is in its list's field, or on a phone on the command pressed. */
   ...(family === 'command' ? { focused: null } : {}),
+  /* A list of times keeps focus on its list on the web, and on the time pressed on a phone. */
+  ...(family === 'time-picker' ? { focused: null } : {}),
   ...(family === 'object-inspector' ? { inspector: inspectorRows(mounted) } : {}),
   ...(family === 'log' ? { log: logRows(mounted) } : {}),
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),

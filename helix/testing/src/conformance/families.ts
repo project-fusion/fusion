@@ -65,6 +65,7 @@ export type Family =
   | 'combobox'
   | 'command'
   | 'date-picker'
+  | 'time-picker'
   | 'date-input'
   | 'filter-input'
   | 'select'

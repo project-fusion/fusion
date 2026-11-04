@@ -36,15 +36,22 @@ import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
  * page where it is.
  */
 
+/** The innermost element of a tree whose words are these, as an option says its time. */
+const worded = (tree: Element | ShadowRoot, label: string): Element | undefined =>
+  [...tree.querySelectorAll('[role="option"], [value]')].find(
+    (one) => one.textContent?.trim() === label,
+  )
+
 /**
  * The element named by these words in the root's own tree or in a tree an element
- * there draws, as a field's calendar draws its days in a root of its own.
+ * there draws, as a field's calendar draws its days in a root of its own, or the
+ * option whose words they are, as a list of times names each by its time.
  */
 const labeled = (root: Element, label: string): Element | undefined => {
   const trees: (Element | ShadowRoot)[] = [root.shadowRoot ?? root]
   for (const tree of trees) {
-    const found = tree.querySelector(`[aria-label="${label}"]`)
-    if (found !== null) {
+    const found = tree.querySelector(`[aria-label="${label}"]`) ?? worded(tree, label)
+    if (found) {
       return found
     }
     for (const one of tree.querySelectorAll('*')) {
