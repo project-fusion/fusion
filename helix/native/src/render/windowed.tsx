@@ -27,9 +27,10 @@ import {
   type ViewProps,
 } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import type { DrawnRow, WindowDrawing } from '../machines/window'
+import type { DrawnRow, WindowDrawing, WindowScroller } from '../machines/window'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
+import { ScrollPadding, useTakenPadding } from './scroll-padding'
 import { ScrollArea, type Scrolled } from './scroll-view'
 import type { Draw, Scope } from './styles'
 
@@ -180,15 +181,74 @@ const lengthOf = (horizontal: boolean, shrinks: boolean) => {
   return shrinks ? { flexGrow: 0, flexShrink: 1 } : { flex: 1 }
 }
 
+/**
+ * The list as the machine moves it, which remembers where in the frame it was
+ * last asked to stand a row: a row not yet drawn is reached in two steps, and
+ * the second keeps the place, so a wheel's answer rests in the middle there too.
+ */
+const scrollerOf = (
+  list: FlatList<DrawnRow>,
+  asked: { readonly current: Asked },
+): WindowScroller & { readonly getNativeScrollRef: () => unknown } => ({
+  getNativeScrollRef: () => list.getNativeScrollRef(),
+  scrollTo: (to) => (list as unknown as WindowScroller).scrollTo?.(to),
+  scrollToEnd: (to) => list.scrollToEnd(to),
+  scrollToIndex: (to) => {
+    asked.current.tries = 0
+    asked.current.viewPosition = to.viewPosition
+    list.scrollToIndex(to)
+  },
+  scrollToOffset: (to) => list.scrollToOffset(to),
+})
+
+/** Where in the frame the list was last asked to stand a row, and how often it has tried since. */
+interface Asked {
+  tries: number
+  viewPosition: number | undefined
+}
+
+/** How many times a row not yet drawn is asked for again before the list gives up on it. */
+const PATIENCE = 30
+
+/**
+ * Reaches a row the list has not drawn: it scrolls near where the rows it has
+ * measured put it, and asks again a frame on, at the place in the frame it was
+ * asked for. **A list not yet laid out has measured no row**, as a list a page
+ * opens on its ninth hour has not, so it only asks again, a few dozen times at
+ * most, as a list in a closed panel never lays out.
+ */
+const reachLater = (
+  list: { readonly current: FlatList<DrawnRow> | null },
+  asked: Asked,
+  info: { readonly averageItemLength: number; readonly index: number },
+): void => {
+  asked.tries += 1
+  if (asked.tries > PATIENCE) {
+    return
+  }
+  if (info.averageItemLength > 0) {
+    list.current?.scrollToOffset({ animated: false, offset: info.averageItemLength * info.index })
+  }
+  const { viewPosition } = asked
+  requestAnimationFrame(() =>
+    list.current?.scrollToIndex({
+      animated: false,
+      index: info.index,
+      ...(viewPosition === undefined ? {} : { viewPosition }),
+    }),
+  )
+}
+
 /** A list of rows, lines of columns, or a line across, in `FlatList`. */
 const Listed = ({ drawing, footer, row }: Drawing) => {
   const { across, gap, held, horizontal, laid, listRef, moved, rows, shrinks, sideways } = drawing
   const [width, setWidth] = useState(0)
   const list = useRef<FlatList<DrawnRow> | null>(null)
+  const asked = useRef<Asked>({ tries: 0, viewPosition: undefined })
   const own = useCallback(
     (next: FlatList<DrawnRow> | null) => {
       list.current = next
-      listRef(next)
+      listRef(next === null ? null : scrollerOf(next, asked))
     },
     [listRef],
   )
@@ -210,64 +270,66 @@ const Listed = ({ drawing, footer, row }: Drawing) => {
      frame inside a page that scrolls, as the web's box does: it reads no
      scroll view around it. */
   const lengthwise = lengthOf(horizontal, shrinks === true)
+  const padding = useTakenPadding(horizontal)
   const listed = (
     <ScrollView.Context.Provider value={null}>
-      <Cells.Provider value={cells}>
-        <FlatList
-          CellRendererComponent={Cell}
-          columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
-          contentContainerStyle={gap > 0 && across > 1 ? { rowGap: gap } : undefined}
-          data={rows}
-          horizontal={horizontal}
-          ItemSeparatorComponent={
-            gap > 0 && across === 1
-              ? () => <View style={horizontal ? { width: gap } : { height: gap }} />
-              : undefined
-          }
-          key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
-          keyExtractor={keyed}
-          {...followingOf(drawing)}
-          ListFooterComponent={<View style={{ paddingBottom: pad }}>{footer}</View>}
-          nestedScrollEnabled
-          numColumns={across}
-          onContentSizeChange={(contentWidth, contentHeight) => {
-            standing.current.content = horizontal ? contentWidth : contentHeight
-            tell()
-            settle(standing.current.content, standing.current.frame)
-          }}
-          onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
-            if (sideways !== true) {
-              setWidth(layout.width)
+      <ScrollPadding.Provider value={undefined}>
+        <Cells.Provider value={cells}>
+          <FlatList
+            CellRendererComponent={Cell}
+            columnWrapperStyle={across > 1 && gap > 0 ? { columnGap: gap } : undefined}
+            contentContainerStyle={{
+              ...padding,
+              ...(gap > 0 && across > 1 ? { rowGap: gap } : {}),
+            }}
+            data={rows}
+            horizontal={horizontal}
+            ItemSeparatorComponent={
+              gap > 0 && across === 1
+                ? () => <View style={horizontal ? { width: gap } : { height: gap }} />
+                : undefined
             }
-            standing.current.frame = horizontal ? layout.width : layout.height
-            laid(layout.width, layout.height)
-            tell()
-            settle(standing.current.content, standing.current.frame)
-          }}
-          onScroll={({ nativeEvent }: Scrolled) => {
-            standing.current = {
-              content: horizontal ? nativeEvent.contentSize.width : nativeEvent.contentSize.height,
-              frame: horizontal
-                ? nativeEvent.layoutMeasurement.width
-                : nativeEvent.layoutMeasurement.height,
-              offset: horizontal ? nativeEvent.contentOffset.x : nativeEvent.contentOffset.y,
-            }
-            tell()
-          }}
-          onScrollToIndexFailed={(info) => {
-            const line = Math.max(1, info.averageItemLength)
-            list.current?.scrollToOffset({ animated: false, offset: line * info.index })
-            requestAnimationFrame(() =>
-              list.current?.scrollToIndex({ animated: false, index: info.index }),
-            )
-          }}
-          ref={own}
-          renderItem={drawCell}
-          renderScrollComponent={scrollIn}
-          scrollEventThrottle={16}
-          style={lengthwise}
-        />
-      </Cells.Provider>
+            key={`columns-${across}-${horizontal ? 'across' : 'down'}`}
+            keyExtractor={keyed}
+            {...followingOf(drawing)}
+            ListFooterComponent={<View style={{ paddingBottom: pad }}>{footer}</View>}
+            nestedScrollEnabled
+            numColumns={across}
+            onContentSizeChange={(contentWidth, contentHeight) => {
+              standing.current.content = horizontal ? contentWidth : contentHeight
+              tell()
+              settle(standing.current.content, standing.current.frame)
+            }}
+            onLayout={({ nativeEvent: { layout } }: LayoutChangeEvent) => {
+              if (sideways !== true) {
+                setWidth(layout.width)
+              }
+              standing.current.frame = horizontal ? layout.width : layout.height
+              laid(layout.width, layout.height)
+              tell()
+              settle(standing.current.content, standing.current.frame)
+            }}
+            onScroll={({ nativeEvent }: Scrolled) => {
+              standing.current = {
+                content: horizontal
+                  ? nativeEvent.contentSize.width
+                  : nativeEvent.contentSize.height,
+                frame: horizontal
+                  ? nativeEvent.layoutMeasurement.width
+                  : nativeEvent.layoutMeasurement.height,
+                offset: horizontal ? nativeEvent.contentOffset.x : nativeEvent.contentOffset.y,
+              }
+              tell()
+            }}
+            onScrollToIndexFailed={(info) => reachLater(list, asked.current, info)}
+            ref={own}
+            renderItem={drawCell}
+            renderScrollComponent={scrollIn}
+            scrollEventThrottle={16}
+            style={lengthwise}
+          />
+        </Cells.Provider>
+      </ScrollPadding.Provider>
     </ScrollView.Context.Provider>
   )
   /* A row that runs past the frame scrolls across around the list, which scrolls

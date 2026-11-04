@@ -9,11 +9,17 @@ import type { Context } from '../style/context'
 import type { Layout, Placed, Resolution, Slotted, Style } from '../style/resolved'
 import type { Tracks } from './tracks'
 
-/** The style the element around gives a part, under what the part's own place measures. */
+/**
+ * The style the element around gives a part, under what the part's own place
+ * measures. **`box` is the flags of the box that exports it on**, where the part is
+ * one a drawn element exports again, as a list's `row-item` is the `item` of each
+ * row it draws from data: a rule on a time list's `list-row-item` reads the row's
+ * `data-selected`, as the web reads the option's own state.
+ */
 export type GivenStyle = (
   where: {
     readonly [Key in 'measured' | 'viewport']?: Context[Key] | undefined
-  },
+  } & { readonly box?: Readonly<Record<string, boolean | string>> },
 ) => Style
 
 /** What region content inherits from the part around it. */

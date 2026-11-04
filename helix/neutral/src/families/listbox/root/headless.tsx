@@ -243,7 +243,10 @@ export default headless('listbox', {
           >
             <View
               data-active={entry.active}
+              data-between={entry.between}
+              data-selected={entry.selected}
               draws="option"
+              exports={{ check: true, item: true, label: true, text: true }}
               gives={{
                 dataActive: entry.active,
                 disabled: entry.disabled,

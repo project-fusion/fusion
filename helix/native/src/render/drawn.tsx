@@ -31,7 +31,7 @@ import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
 import { type Around, AroundContext, type GivenStyle, useInheritedText } from './around'
 import { type Made, madeFor } from './made'
-import { bound, camel, resolve, type Scope, split } from './styles'
+import { bound, boxFlags, camel, resolve, type Scope, split } from './styles'
 import { drawText } from './words-node'
 
 /** What a box or a wrap gives the element it draws. */
@@ -42,10 +42,15 @@ const aroundOf = (
   box: ReturnType<typeof resolve>,
 ): Around => {
   const parts: Record<string, GivenStyle> = {}
+  /* **A rule on an exported part reads the box's flags**, as the web's
+     `[part~="row"][data-selected]::part(item)` reads the box, and a box in a copy
+     of a repeat reads its copy's: each row a list draws from data. */
+  const flagged = boxFlags(scope, node)
   for (const part of exportsOf(node)) {
     const name = `${node.name}-${part}`
-    if (Object.keys(resolve(scope, name).style).length > 0) {
-      /* Resolved again where the part stands, so a layer's window reaches it. */
+    if (styles(scope, name)) {
+      /* Resolved again where the part stands, so a layer's window reaches it. A
+         box further in that exports it again hands its own flags on with it. */
       parts[part] = (where) =>
         resolve(
           {
@@ -57,6 +62,8 @@ const aroundOf = (
             },
           },
           name,
+          {},
+          { ...flagged, ...where.box },
         ).style
     }
   }
@@ -71,6 +78,15 @@ const aroundOf = (
     within: box.layout,
   }
 }
+
+/**
+ * Whether a rule of the element styles the part `name`, or the element around
+ * gives it a style: a rule under a flag a row alone carries counts, where the
+ * box at hand does not carry it.
+ */
+const styles = (scope: Scope, name: string): boolean =>
+  scope.parts?.[name] !== undefined ||
+  (scope.family.rules ?? []).some((rule) => rule.kind === 'rule' && rule.target === name)
 
 /**
  * Whether an element's host is `display: inline`, a piece of text that takes the
