@@ -921,7 +921,7 @@ const DONUT_CHART: &[Field] = &[
     ("drawn", "drawn", Name),
     ("empty", "empty", Name),
     ("frame", "frame", Name),
-    ("labelled", "labelled", Name),
+    ("labeled", "labeled", Name),
     ("labels", "labels", Name),
     ("live", "live", Name),
     ("loading", "loading", Name),

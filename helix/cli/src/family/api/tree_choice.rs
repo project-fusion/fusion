@@ -669,7 +669,7 @@ pub const DONUT_CHART_COMPUTED: &[&str] = &[
     "drawn",
     "empty",
     "frame",
-    "labelled",
+    "labeled",
     "labels",
     "live",
     "loading",

@@ -81,7 +81,7 @@ export default headless('donut-chart', {
     drawn: 'drawn',
     empty: 'empty',
     frame: 'frame',
-    labelled: 'labelled',
+    labeled: 'labeled',
     labels: 'labels',
     live: 'live',
     loading: 'loading',
@@ -154,7 +154,7 @@ export default headless('donut-chart', {
             <Slot />
           </View>
         )}
-        {donutChart.labelled && (
+        {donutChart.labeled && (
           <Repeat
             each={donutChart.labels}
             key="key"
