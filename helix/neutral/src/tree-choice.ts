@@ -942,6 +942,39 @@ export interface DonutChartChoice {
   readonly track?: string
 }
 
+/** An axis chart's names, each read as `lineChart.x` or `areaChart.x`. */
+export interface AxisChartChoice {
+  readonly axisWidth?: string
+  readonly axised?: string
+  readonly bandWidth?: string
+  readonly bandX?: string
+  readonly based?: string
+  readonly baseline?: string
+  readonly cells?: string
+  readonly drawn?: string
+  readonly empty?: string
+  readonly ends?: string
+  readonly gridlines?: string
+  readonly guideX?: string
+  readonly labels?: string
+  readonly layers?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly marks?: string
+  readonly named?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly placement?: string
+  readonly reading?: string
+  readonly role?: string
+  readonly summary?: string
+  readonly ticks?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+}
+
 /** A chart key's names, each read as `legend.x`. */
 export interface LegendChoice {
   readonly entries?: string

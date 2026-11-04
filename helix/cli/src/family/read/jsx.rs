@@ -93,6 +93,8 @@ const GIVEN: &[&str] = &[
     "sparkline",
     "donutChart",
     "legend",
+    "lineChart",
+    "areaChart",
     "pickerField",
     "listbox",
     "select",

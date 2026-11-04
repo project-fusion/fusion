@@ -694,6 +694,51 @@ pub const LEGEND: &[(&str, Names)] =
 /// entry, and the list's name and role.
 pub const LEGEND_COMPUTED: &[&str] = &["entries", "named", "role"];
 
+/// What a chart of lines or of stacked bands sends, by the name the machine
+/// binds. Its props it reads by their own names.
+pub const LINE_CHART: &[(&str, Names)] = &[
+    ("onReadingChange", Names::Event),
+    ("onReadingPress", Names::Event),
+];
+
+/// What a chart of stacked bands sends: what a chart of lines does.
+pub const AREA_CHART: &[(&str, Names)] = LINE_CHART;
+
+/// What an axis chart computes for its parts, each read as `lineChart.x` or
+/// `areaChart.x`: the axis of numbers, each series or band core draws, the
+/// rules, the marks, the names along the readings, the band and the guide on
+/// the reading a finger or a key rests on with its bubble, and the words in
+/// place of the drawing while there is nothing to draw.
+pub const AXIS_CHART_COMPUTED: &[&str] = &[
+    "axisWidth",
+    "axised",
+    "bandWidth",
+    "bandX",
+    "based",
+    "baseline",
+    "cells",
+    "drawn",
+    "empty",
+    "ends",
+    "gridlines",
+    "guideX",
+    "labels",
+    "layers",
+    "live",
+    "loading",
+    "markX",
+    "markY",
+    "marks",
+    "named",
+    "placement",
+    "reading",
+    "role",
+    "summary",
+    "ticks",
+    "tipLabel",
+    "tipped",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1181,6 +1226,16 @@ pub fn legend(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "legend", LEGEND, LEGEND_COMPUTED)
 }
 
+/// `lineChart({ ... })`, each field a name.
+pub fn line_chart(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "lineChart", LINE_CHART, AXIS_CHART_COMPUTED)
+}
+
+/// `areaChart({ ... })`, each field a name.
+pub fn area_chart(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "areaChart", AREA_CHART, AXIS_CHART_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1275,6 +1330,8 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "sparkline" => sparkline(value),
         "donutChart" => donut_chart(value),
         "legend" => legend(value),
+        "lineChart" => line_chart(value),
+        "areaChart" => area_chart(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),
