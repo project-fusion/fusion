@@ -22,21 +22,11 @@ import { formatWords, words } from '../../words/words.js'
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
 
-/**
- * How many colors the series palette has, and so where it starts over.
- *
- * Here rather than in each chart, because a number two files have to agree on
- * is a number that will stop agreeing: when the palette went from eight to
- * twenty-four, one of five copies was missed and drew every ninth series in the
- * first color while the legend beside it named the ninth.
- */
-export const PALETTE = 24
-
-/** The palette slot for the nth series, counting from one and wrapping. */
-export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
+/* The palette's size and a series' slot in it, in core's chart arithmetic, which a phone reads too. */
+import { seriesIndex } from '../../utils/chart-plot/plot-box.js'
 
 /* The drawing's own coordinates, in core's chart arithmetic, which a phone reads too. */
-export { PLOT_HEIGHT, PLOT_WIDTH } from '../../utils/chart-plot/plot-box.js'
+export { PALETTE, PLOT_HEIGHT, PLOT_WIDTH, seriesIndex } from '../../utils/chart-plot/plot-box.js'
 
 /**
  * A list of series names, as the attributes that take one are written.

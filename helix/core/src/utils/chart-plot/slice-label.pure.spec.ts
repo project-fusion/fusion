@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { sliceLabelAt } from './slice-label.js'
+import { sliceLabelAt } from './donut-plot.js'
 
 /* A ring of 100 by 100 with its band's middle 40 out, starting at twelve. */
 const RING = {
