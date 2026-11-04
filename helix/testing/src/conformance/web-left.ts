@@ -381,6 +381,16 @@ const TEXTS: ReadonlySet<string> = new Set([
  */
 const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider'])
 
+/** The charts a reader reads a reading at a time, whose record says what the reading says. */
+const CHARTS: ReadonlySet<string> = new Set(['sparkline'])
+
+/** What a chart's reading says: its readout's words, and its live region's. */
+const readingOf = (mounted: Mounted): { readonly readout: string; readonly said: string } => {
+  const words = (part: string) =>
+    (mounted.root.shadowRoot?.querySelector(`[part="${part}"]`)?.textContent ?? '').trim()
+  return { readout: words('readout'), said: words('live') }
+}
+
 /** What the element's field holds, and whether the element is marked wrong. */
 const textOf = (mounted: Mounted): { readonly invalid: boolean; readonly value: string } => {
   const control = mounted.root.shadowRoot?.querySelector(
@@ -438,6 +448,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(READS.has(family)
     ? { reads: mounted.root.shadowRoot?.querySelector('[part="time"]')?.textContent ?? '' }
     : {}),
+  ...(CHARTS.has(family) ? { reading: readingOf(mounted) } : {}),
   ...(STACKS.has(family)
     ? {
         rows: [...mounted.items]

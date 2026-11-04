@@ -75,7 +75,8 @@ export const frame = (): Promise<void> =>
 
 /**
  * A finger's press on the element's `part` at `x` and `y`, fractions of it from
- * its top left corner: the pointer down, a frame, and the pointer up there.
+ * its top left corner: the pointer down, a frame, and the pointer up there,
+ * and with `clicks` the click a tap ends in, as a chart's plot hears one.
  * **A disabled element's part hears both and moves nothing**, as a finger's do.
  */
 export const pointAt = async (
@@ -83,6 +84,7 @@ export const pointAt = async (
   part: string,
   x: number,
   y: number,
+  clicks = false,
 ): Promise<string | undefined> => {
   const target = mounted.root.shadowRoot?.querySelector(`[part~="${part}"]`)
   if (target === null || target === undefined) {
@@ -103,6 +105,10 @@ export const pointAt = async (
   target.dispatchEvent(new PointerEvent('pointerdown', { ...at, buttons: 1 }))
   await frame()
   target.dispatchEvent(new PointerEvent('pointerup', at))
+  if (clicks) {
+    target.dispatchEvent(new PointerEvent('click', { ...at, detail: 1 }))
+    await frame()
+  }
   return undefined
 }
 

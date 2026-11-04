@@ -1,6 +1,7 @@
 import { type Left, panelsOf, type Setup } from '@fusion.dev/helix-testing/conformance'
 import { screen } from '@testing-library/react-native'
 import { carouselLeft } from './carousel'
+import { chartLeft } from './chart'
 import { chatLeft } from './chat'
 import { codeBlockLeft } from './code-block'
 import { colorLeft } from './color'
@@ -258,5 +259,6 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...tableLeft(run),
     ...codeBlockLeft(run),
     ...colorLeft(run),
+    ...chartLeft(setup),
   }
 }
