@@ -22,6 +22,7 @@ import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { ListHands } from './combobox-keys'
 import type { ListOwner } from './list-owner'
+import { type ListHandle, useHandle } from './listbox-handle'
 import {
   moveOption,
   useFilter,
@@ -52,7 +53,13 @@ import type { DrawnRow, WindowDrawing, WindowScroller } from './window'
 
 /** One row of `items` a windowed repeat draws. */
 interface ListRow extends DrawnRow {
+  /** Whether the highlight is on it. */
+  readonly active: boolean
+  /** Whether its record marks it between the two ends of a range its owner holds. */
+  readonly between: boolean
   readonly disabled: boolean
+  /** Whether it is chosen. */
+  readonly selected: boolean
   readonly value: string
   readonly words: string
 }
@@ -212,25 +219,35 @@ const useOpening = (
 }
 
 /** The rows of `items`, the same objects while they say the same. */
-const useRows = (entries: readonly Entry[]): readonly ListRow[] => {
+const useRows = (
+  entries: readonly Entry[],
+  chosen: readonly string[],
+  active: string,
+): readonly ListRow[] => {
   const said = entries
-    .map((one) => `${one.value}\n${one.hidden}\n${one.disabled}\n${one.text}`)
+    .map((one) => `${one.value}\n${one.hidden}\n${one.disabled}\n${one.between}\n${one.text}`)
     .join('\n\n')
-  const latest = useRef(entries)
-  latest.current = entries
+  const marked = `${chosen.join('\n')}\n\n${active}`
+  const latest = useRef({ active, chosen, entries })
+  latest.current = { active, chosen, entries }
   return useMemo(() => {
     void said
-    return latest.current
+    void marked
+    const now = latest.current
+    return now.entries
       .filter((one) => !one.hidden)
       .map((one, at) => ({
+        active: one.value === now.active,
         at,
+        between: one.between === true,
         disabled: one.disabled,
         header: false,
         key: `option-${one.value}`,
+        selected: now.chosen.includes(one.value),
         value: one.value,
         words: one.text,
       }))
-  }, [said])
+  }, [said, marked])
 }
 
 /** What the list's own scrolling does, whether it is a scroll view or a window of `items`. */
@@ -590,7 +607,7 @@ export const useListbox = (
   props: Props,
   use: MachineUse,
   touch: () => void,
-): { readonly behavior: Behavior; readonly value: string } => {
+): { readonly behavior: Behavior; readonly handle: ListHandle; readonly value: string } => {
   const read = readOf(family, props, use)
   const { held, schedule } = useMembers()
   useOrder(held, schedule)
@@ -651,7 +668,8 @@ export const useListbox = (
     request,
   }
   useInView(current, entries, held, scrolling, windowed, byKeys)
-  const rows = useRows(entries)
+  const rows = useRows(entries, chosen, focus.active)
+  const handle = useHandle(entries, chosen, focus.active, held, scrolling, windowed)
   useHanded(owned, focus, {
     highlight: (where) => focus.highlight(where, entries, chosen),
     key: (press) => {
@@ -731,6 +749,7 @@ export const useListbox = (
         <OptionOwnerContext.Provider value={owner}>{inside}</OptionOwnerContext.Provider>
       ),
     },
+    handle,
     value,
   }
 }

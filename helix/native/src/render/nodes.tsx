@@ -21,6 +21,7 @@ import { drawRepeat, outOfCopy } from './repeat'
 import { drawRun } from './run'
 import { ScrollingPart } from './scroll'
 import { controlEdge, isControl } from './scroll-layout'
+import { windowedPadding } from './scroll-padding'
 import { toSection } from './sections'
 import { boxSemantics, pressSemantics, silent } from './semantics'
 import {
@@ -433,7 +434,9 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
   })
   /* A copy's place is its own, and what it holds stands where it is drawn. */
   const held = outOfCopy(scope)
-  const [box, words] = split(resolved.style)
+  const [own, words] = split(resolved.style)
+  /* A windowed list it holds scrolls its padding with the rows. */
+  const [box, passing] = windowedPadding(node, own)
   const inherits = inherit(text, words)
   const view = reportingSnap(
     scope,
@@ -467,7 +470,7 @@ const drawBox = (scope: Scope, node: Node, text: Style, inside: Node | 'host'): 
       {...(driven ? {} : { transitions: resolved.transitions })}
       view={view}
     >
-      {drawContent(scope, held, node, resolved, inherits, box, inside)}
+      {passing(drawContent(scope, held, node, resolved, inherits, box, inside))}
       {saidStatus(view)}
     </PartBox>,
     node.name,

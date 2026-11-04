@@ -41,8 +41,14 @@ const laidOver = (own: Style, given: Style): Style => {
 }
 
 /** A part's resolved style with what the element around gives it laid over it. */
-export const withGiven = (styling: Styling, name: string, resolved: Resolved): Resolved => {
+export const withGiven = (
+  styling: Styling,
+  name: string,
+  resolved: Resolved,
+  box?: Readonly<Record<string, boolean | string>>,
+): Resolved => {
   const given = styling.parts?.[name]?.({
+    ...(box === undefined ? {} : { box }),
     measured: styling.base.measured,
     viewport: styling.base.viewport,
   })

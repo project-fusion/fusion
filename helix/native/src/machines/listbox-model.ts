@@ -13,6 +13,8 @@ const PAGE = 10
 
 /** One option as the list reads it, whether a page wrote it or `items` holds it. */
 export interface Entry extends Reached {
+  /** Whether its record marks it between the two ends of a range its owner holds. */
+  readonly between?: boolean
   readonly group: object | undefined
   readonly href: string
   readonly key: object | undefined
@@ -41,6 +43,7 @@ export const entriesOf = (
 ): Entry[] => {
   if (records !== undefined) {
     return records.map((one) => ({
+      between: one.between,
       disabled: one.disabled,
       group: undefined,
       hidden: !shows(one.text),
