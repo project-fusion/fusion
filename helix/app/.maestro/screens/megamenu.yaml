@@ -5,6 +5,9 @@
 # A press on Products lands near the word's start: at iOS's largest text size the
 # word runs past the bar's clip, its middle stands outside the bar, and a press there
 # reaches nothing (run 41381302660: the word at x 269 to 473, the bar ending at 364).
+# Each example after the first is waited for by its title in the header first: a
+# wait on words the example before also draws passes while the link is still opening,
+# and pictures or presses the screen on its way out.
 appId: dev.fusion.helix.app
 name: "Screens: Megamenu"
 ---
@@ -32,6 +35,9 @@ name: "Screens: Megamenu"
 - takeScreenshot: megamenu-preview-open-${MODE}-${SIZE}
 - openLink: helix://megamenu/open-on-click/preview
 - extendedWaitUntil:
+    visible: 'Open On Click'
+    timeout: 15000
+- extendedWaitUntil:
     notVisible: .*Plan and track work across teams.*
     timeout: 15000
 - extendedWaitUntil:
@@ -57,6 +63,9 @@ name: "Screens: Megamenu"
     timeout: 60000
     visibilityPercentage: 25
 - openLink: helix://megamenu/several/preview
+- extendedWaitUntil:
+    visible: 'Several'
+    timeout: 15000
 - extendedWaitUntil:
     visible: Products
     timeout: 15000
@@ -101,6 +110,9 @@ name: "Screens: Megamenu"
 - takeScreenshot: megamenu-several-open-${MODE}-${SIZE}
 - openLink: helix://megamenu/events/preview
 - extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- extendedWaitUntil:
     visible: .*No events yet.*
     timeout: 15000
 - waitForAnimationToEnd:
@@ -119,6 +131,9 @@ name: "Screens: Megamenu"
     timeout: 5000
 - takeScreenshot: megamenu-events-open-${MODE}-${SIZE}
 - openLink: helix://megamenu/band/preview
+- extendedWaitUntil:
+    visible: 'Band'
+    timeout: 15000
 - extendedWaitUntil:
     notVisible: .*helix-before-open.*
     timeout: 15000
