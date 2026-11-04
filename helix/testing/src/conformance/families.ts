@@ -71,6 +71,7 @@ export type Family =
   | 'donut-chart'
   | 'legend'
   | 'line-chart'
+  | 'area-chart'
   | 'sparkline'
   | 'filter-input'
   | 'select'

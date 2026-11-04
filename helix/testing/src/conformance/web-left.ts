@@ -382,7 +382,12 @@ const TEXTS: ReadonlySet<string> = new Set([
 const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider'])
 
 /** The charts a reader reads a reading at a time, whose record says what the reading says. */
-const CHARTS: ReadonlySet<string> = new Set(['donut-chart', 'line-chart', 'sparkline'])
+const CHARTS: ReadonlySet<string> = new Set([
+  'area-chart',
+  'donut-chart',
+  'line-chart',
+  'sparkline',
+])
 
 /** What a chart's reading says: its readout's words, and its live region's. */
 const readingOf = (mounted: Mounted): { readonly readout: string; readonly said: string } => {
