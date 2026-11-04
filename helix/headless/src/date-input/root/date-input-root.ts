@@ -1,17 +1,24 @@
 import {
   AriaForwardController,
   valueAsDate as asDate,
-  barredBy,
-  calendarLocale,
+  committedDates,
+  committedValue,
   customElement,
   type DateCalendar,
+  dateFault,
+  dateKind,
+  dateSegmentLocale,
+  dateSegmentSystem,
+  draftKey,
   drawIcon,
+  EXAMPLE_DATE,
   formatWords,
   dateAsValue as fromDate,
   type HelixBeforeChangeEvent,
   HelixClearEvent,
   HelixFormElement,
   handedLocale,
+  heldValues,
   isDateValue,
   MixinControllerOpen,
   MixinControllerValue,
@@ -20,14 +27,20 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
-  MONTH_CALENDARS,
   type MonthCalendar,
   type MonthSystem,
-  monthSystem,
   numberConverter,
-  readWrittenDate,
+  type PickerKind,
+  type PickerMode,
+  pickedValues,
+  pickerAnswers,
+  pickerDisplay,
+  shownValues,
+  typedValue,
+  withoutValue,
   words,
   wordsLocale,
+  writtenDate,
 } from '@fusion.dev/helix-core'
 import { calendarBlank, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -36,31 +49,6 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import '../../date-picker/index.js'
 import '../../tag/root/index.js'
-
-/**
- * The date the bad-input message names, its day past twelve so no order of day
- * and month misreads it.
- */
-const EXAMPLE = '2026-08-24'
-
-/**
- * The dates in a value, which may hold more than one.
- *
- * A range is two and a multiple is any number, comma separated, which is what
- * the calendar announces and what a form field can carry as one string. Empty
- * entries are dropped so a trailing comma while typing is not a date.
- */
-const dates = (value: string): string[] =>
-  /* The en dash and the spaced hyphen both mean "to", because a range is shown
-     that way and what is shown is what gets typed back. An ISO date holds
-     hyphens of its own, so only a spaced one separates: `2026-08-04-2026-08-11`
-     is not a thing anybody writes, and treating a bare hyphen as a separator
-     would take `2026-08-04` apart into three numbers. */
-  value
-    .replace(/\s+[–-]\s+/g, ',')
-    .split(',')
-    .map((one) => one.trim())
-    .filter(Boolean)
 
 /**
  * @summary A date, typed or picked from a calendar.
@@ -631,8 +619,17 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * complete.
    */
   private get picked(): string {
-    const held = dates(this.value)
-    return held.length > 0 && held.every(isDateValue) ? held.join(',') : ''
+    return pickedValues(this.value, this.kind)
+  }
+
+  /** How this field tells, writes, and reads back one date, which core's picker text reads. */
+  private get kind(): PickerKind {
+    return dateKind(this.dateStyle, this.language, this.calendar)
+  }
+
+  /** One, a range, or several, as core's picker text names them. */
+  private get held(): PickerMode {
+    return this.mode ?? 'single'
   }
 
   /**
@@ -660,30 +657,17 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * out and named in it.
    */
   protected override get segmentLocale(): string {
-    const tag = calendarLocale(this.language, this.calendar)
-    return tag.includes('-ca-iso8601') || this.segmentSystem ? tag : calendarLocale(tag, 'gregory')
+    return dateSegmentLocale(this.language, this.calendar)
   }
 
   /** The calendar the segments count in, where it has months of its own. */
   protected override get segmentSystem(): MonthSystem | undefined {
-    return MONTH_CALENDARS.includes(this.calendar ?? '') ? monthSystem(this.calendar) : undefined
+    return dateSegmentSystem(this.calendar)
   }
 
   /** One date, written the way `dateStyle` asks for. */
   private written(date: string): string {
-    if (this.dateStyle === 'iso' || !isDateValue(date)) {
-      return date
-    }
-    /* UTC, because the dates are UTC throughout: a date parsed in a zone behind
-       Greenwich renders as the day before, which is the classic off-by-one that
-       makes a calendar disagree with the field beside it. */
-    const at = new Date(`${date}T00:00:00Z`)
-    return Number.isNaN(at.getTime())
-      ? date
-      : new Intl.DateTimeFormat(calendarLocale(this.language, this.calendar) || undefined, {
-          dateStyle: this.dateStyle,
-          timeZone: 'UTC',
-        }).format(at)
+    return writtenDate(date, this.dateStyle, this.language, this.calendar)
   }
 
   /*
@@ -699,29 +683,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * and the input is a draft.
    */
   protected override get display(): string {
-    if (this.mode === 'multiple') {
-      return this.draft
-    }
-    const held = dates(this.value)
-    /* Being edited, the field is the value. The rendering is what it shows when
-       nobody is in it, so there is never a moment where what is on screen is
-       something this element could not read back. */
-    if (this.editing || this.dateStyle === 'iso') {
-      return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
-    }
-    const written = held.map((one) => this.written(one))
-    return this.mode === 'range' ? written.join(' – ') : written.join(', ')
+    return pickerDisplay(
+      {
+        draft: this.draft,
+        editing: this.editing,
+        iso: this.dateStyle === 'iso',
+        mode: this.held,
+        value: this.value,
+      },
+      this.kind,
+    )
   }
 
-  /**
-   * What is being typed but not yet held, for `multiple` only.
-   *
-   * The other modes type into the value directly, because one date and a range
-   * are both a whole answer at the moment they are complete. A multiple is not:
-   * it is a set being added to, so the field needs somewhere to hold a date
-   * before it joins the set and somewhere to leave a half-typed one that is not
-   * a date yet.
-   */
   @state()
   private draft = ''
 
@@ -742,9 +715,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
        shape to support. Half-typed text stays verbatim, for the reason the class
        gives about a document being edited: normalizing `2026-08-0` would take
        the caret away mid-date. */
-    const held = dates(typed)
-    const whole = held.length > 0 && held.every(isDateValue)
-    this.requestValue(whole ? held.join(',') : typed)
+    this.requestValue(typedValue(typed, this.kind))
     this.restore()
   }
 
@@ -754,30 +725,11 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * read back, so `8/4/2026` in `en-US` is August 4, 2026. Empty where it is
    * no date.
    */
-  private read(text: string): string {
-    return isDateValue(text) ? text : readWrittenDate(text, this.segmentLocale, this.segmentSystem)
-  }
-
-  /**
-   * The text the reader leaves, read in the field's locale: a date written as
-   * the locale writes one becomes the value, as ISO, when the field commits.
-   * Not on each key, where `8/4/202` is a date in the year 202 and taking it
-   * would move the caret mid-year.
-   */
   private readonly handleTextCommit = (event: Event): void => {
     if (this.mode !== 'multiple') {
-      /* A range written with a dash keeps the commas inside each end, as in
-         `Aug 4, 2026 – Aug 11, 2026`, and one date is the whole text, as in
-         `Aug 4, 2026`, the way en-US writes the date the field shows. */
-      const held =
-        this.mode !== 'range'
-          ? [this.value.trim()].filter(Boolean)
-          : /\s[–-]\s/.test(this.value)
-            ? this.value.split(/\s+[–-]\s+/).map((one) => one.trim())
-            : dates(this.value)
-      const read = held.map((one) => this.read(one))
-      if (held.length > 0 && !held.every(isDateValue) && read.every(Boolean)) {
-        this.requestValue(read.join(','))
+      const read = committedValue(committedDates(this.held, this.value), this.kind)
+      if (read !== undefined) {
+        this.requestValue(read)
       }
     }
     this.handleCommit(event)
@@ -788,43 +740,43 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     if (this.mode !== 'multiple') {
       return
     }
-    const held = dates(this.value)
-    const draft = this.read(this.draft.trim())
-    if (event.key === 'Enter' && draft !== '') {
+    /* Enter adds the date typed; Backspace in an empty field takes the last one
+       back, the convention every tag field has, so a mistake costs one key
+       rather than a hunt for a small control. */
+    const answer = draftKey(
+      event.key,
+      { draft: this.draft, sorts: false, value: this.value },
+      this.kind,
+    )
+    if (answer === undefined) {
+      return
+    }
+    if (answer.cleared) {
       event.preventDefault()
-      if (!held.includes(draft)) {
-        this.requestPicked([...held, draft].join(','))
-      }
       this.draft = ''
-    } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
-      /* The convention every tag field has: an empty field and a backspace takes
-         the last one back, so a mistake costs one key rather than a hunt for a
-         small control. */
-      this.requestPicked(held.slice(0, -1).join(','))
+    }
+    if (answer.value !== undefined) {
+      this.requestPicked(answer.value)
     }
   }
 
-  /** The dates that get a tag, which is all of them until the cap says not. */
+  /**
+   * The dates that get a tag, which is all of them until the cap says not:
+   * `shownLimit` rather than `maxTags`, since the mixin returns zero while
+   * expanded, so the cap lifts.
+   */
   private get shownDates(): string[] {
-    const held = dates(this.value)
-    /* `shownLimit` rather than `maxTags`, which is the whole of what
-       expanding does: the mixin returns zero while expanded, so the cap
-       lifts and every date gets a tag. */
-    return this.shownLimit > 0 ? held.slice(0, this.shownLimit) : held
+    return shownValues(this.value, this.shownLimit).shown
   }
 
   /** How many are held beyond the ones shown. */
   private get restCount(): number {
-    return Math.max(0, dates(this.value).length - this.shownDates.length)
+    return shownValues(this.value, this.shownLimit).rest
   }
 
   /** Takes one date back out of the set. */
   private readonly removeDate = (date: string): void => {
-    this.requestPicked(
-      dates(this.value)
-        .filter((one) => one !== date)
-        .join(','),
-    )
+    this.requestPicked(withoutValue(this.value, date))
   }
 
   private readonly handleCalendarChange = (event: Event): void => {
@@ -857,87 +809,33 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * a native date field sends a date it cannot read, in every mode.
    */
   protected override get answers(): readonly string[] | undefined {
-    if (this.mode !== undefined) {
-      const held = dates(this.value)
-      return held.every(isDateValue) ? held : ['']
-    }
-    const text = this.value.trim()
-    return text === '' || isDateValue(text) ? undefined : ['']
-  }
-
-  /** What is wrong with the dates, which the text input cannot say. */
-  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
-    /* Bounds are checked here rather than left to the input, which is `text`
-       and has no idea what a date is: `min` and `max` on a text input do
-       nothing, and `type="date"` is what was given up to own the calendar.
-       String comparison is enough because ISO dates sort lexically, which is
-       the whole reason the value is that shape. */
-    /* Every date in the value, not the value itself: a range is two of them and
-       a multiple is any number, so a string comparison against `min` would be
-       comparing a bound to a list. */
-    const held = dates(this.value)
-    if (held.length > 0 && !held.every(isDateValue)) {
-      return (
-        this.badInputMessage ||
-        formatWords(this, 'unreadableMessage', {
-          example: this.written(EXAMPLE),
-          mode: this.mode ?? 'single',
-        })
-      )
-    }
-    /* The bound as the field writes a date, the way Time Input writes its
-       own: a reader who sees "4 Aug 2026" in the field is told about the same
-       day in the same words. */
-    /* Each with the flag a native date input sets for it, as Date Picker
-       reports them: `rangeUnderflow`, `rangeOverflow` and `stepMismatch`. A
-       date the calendar bars by name is `badInput`, React Aria's choice for an
-       unavailable date, there being no native flag for one. */
-    if (this.min !== '' && held.some((one) => one < this.min)) {
-      return [
-        'rangeUnderflow',
-        formatWords(this, 'rangeUnderflowMessage', { min: this.written(this.min) }),
-      ]
-    }
-    if (this.max !== '' && held.some((one) => one > this.max)) {
-      return [
-        'rangeOverflow',
-        formatWords(this, 'rangeOverflowMessage', { max: this.written(this.max) }),
-      ]
-    }
-    /* What the calendar bars, a typed or seeded date is barred from too.
-       Measured before this: a weekend typed into a field that disables
-       weekends reported valid and was submitted. */
-    const why = held.map((one) => {
-      const date = asDate(one)
-      return date ? barredBy(date, this) : null
-    })
-    if (why.includes('listed')) {
-      return this.unavailableMessage
-    }
-    if (why.includes('step')) {
-      return ['stepMismatch', this.stepMismatchMessage]
-    }
-    if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage
-    }
-    /* An end before its start, as Date Picker reports one. Measured before
-       this: a segmented range stepped to 2026-06-03 to 2026-05-09 reported
-       valid and was submitted, where React Aria's DateRangePicker reports it
-       invalid. `rangeUnderflow`, since the end is under the bound its start
-       sets. */
-    const [start, end] = held
-    if (this.mode === 'range' && start !== undefined && end !== undefined && end < start) {
-      return [
-        'rangeUnderflow',
-        formatWords(this, 'rangeOrderMessage', { start: this.written(start) }),
-      ]
-    }
-    return ''
+    return pickerAnswers(this.held, this.value, this.kind)
   }
 
   /**
-   * The message shown when `disable-dates` or `disable-days` bars a date.
+   * What is wrong with the dates, which the text input cannot say: core's
+   * `dateFault` over every date in the value, each bound written as the field
+   * writes a date, so a reader who sees "4 Aug 2026" is told about the same day
+   * in the same words. What the calendar bars, a typed or seeded date is barred
+   * from too.
    */
+  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
+    return dateFault(this.held, this.value, this, {
+      bad: () =>
+        this.badInputMessage ||
+        formatWords(this, 'unreadableMessage', {
+          example: this.written(EXAMPLE_DATE),
+          mode: this.held,
+        }),
+      length: this.rangeLengthMessage,
+      order: (start) => formatWords(this, 'rangeOrderMessage', { start: this.written(start) }),
+      over: (max) => formatWords(this, 'rangeOverflowMessage', { max: this.written(max) }),
+      step: this.stepMismatchMessage,
+      unavailable: this.unavailableMessage,
+      under: (min) => formatWords(this, 'rangeUnderflowMessage', { min: this.written(min) }),
+    })
+  }
+
   @words
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a date that is available.'
@@ -1166,7 +1064,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
       .value=${this.display}
       name=${this.name || nothing}
       placeholder=${
-        this.mode === 'multiple' && dates(this.value).length > 0
+        this.mode === 'multiple' && heldValues(this.value).length > 0
           ? nothing
           : this.placeholder || nothing
       }
