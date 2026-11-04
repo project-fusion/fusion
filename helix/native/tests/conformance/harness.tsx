@@ -28,6 +28,7 @@ import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
 import { carouselDot, carouselPress, carousels } from './carousel'
+import { focusPlot, isChart, tapPlot } from './chart'
 import { chatPress, chatProps, chats } from './chat'
 import { codeBlockPresses, codeBlocks } from './code-block'
 import { colors, opensPicker, pointIn, pressSwatch, turnPicker } from './color'
@@ -374,6 +375,11 @@ const focusOn = async (run: Run, intent: Extract<Intent, { kind: 'focus' }>): Pr
     run.focus.place(feedFocus(run, intent.row))
     return
   }
+  /* A chart's plot, as a reader tabs to it. */
+  if (intent.page !== true && intent.item === undefined && isChart(run.scenario.setup.tag)) {
+    await focusPlot(run.listening, (node) => run.focus.place(node))
+    return
+  }
   await focusPlain(run, intent)
 }
 
@@ -507,6 +513,8 @@ const perform = async (run: Run, intent: Intent): Promise<string | undefined> =>
       return pickIn(run, intent)
     case 'point':
       return pointIn(intent)
+    case 'tap':
+      return tapPlot(intent)
     case 'box':
       return pressBox(run, intent.at)
     case 'scrub':

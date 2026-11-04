@@ -155,6 +155,10 @@ export interface Held {
  * - `scrub`: a drag on the element's label, `by` that many points along the
  *   line, which lets go there. The web sends the pointer's down, move, and up on
  *   the label, and a phone a pan on it.
+ * - `tap`: a finger taps the element's `part` at `x` and `y`, each a
+ *   fraction of it from its top left corner, as a reader taps a chart's plot
+ *   to read it. The web sends a touch's `pointerdown`, a frame later its
+ *   `pointerup`, and the click; a phone lays the part out and sends its tap.
  * - `hold`: a finger holds the element's `part` down while `ms`
  *   milliseconds pass on the fake clock, then lets go, as a reader holds a
  *   number input's stepper. The web sends a touch's `pointerdown`, moves the
@@ -210,6 +214,7 @@ export type Intent =
   | { readonly kind: 'hold'; readonly ms: number; readonly part: string }
   | { readonly files: readonly PickedFile[]; readonly kind: 'pick' }
   | { readonly kind: 'point'; readonly part: string; readonly x: number; readonly y: number }
+  | { readonly kind: 'tap'; readonly part: string; readonly x: number; readonly y: number }
 
 /** A file a `pick` intent chooses: its name, its size in bytes, and its media type. */
 export interface PickedFile {
@@ -320,6 +325,14 @@ export interface Left {
    * draws.
    */
   readonly reads?: string
+  /**
+   * What a chart's reading says, for a family a reader reads a reading at a
+   * time, as a sparkline: the words its readout draws beside the reading, and
+   * the words a screen reader is told as a key moves it. The web reads its
+   * `readout` and `live` parts, and React Native the words its machine gives
+   * the readout and the live region.
+   */
+  readonly reading?: { readonly readout: string; readonly said: string }
   /**
    * The values of the rows whose press is drawn, for a family that shows one
    * page of rows at a time, as a drilldown.
@@ -631,6 +644,8 @@ export const say = (intent: Intent): string => {
       return `press box ${intent.at}`
     case 'point':
       return `press ${intent.part} at ${intent.x}, ${intent.y}`
+    case 'tap':
+      return `tap ${intent.part} at ${intent.x}, ${intent.y}`
     case 'pick':
       return intent.files.length === 0
         ? 'close the file chooser'

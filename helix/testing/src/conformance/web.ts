@@ -588,8 +588,14 @@ export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> =>
           steps.push({ cannot, intent: say(intent) })
           continue
         }
-      } else if (intent.kind === 'point') {
-        const cannot = await pointAt(mounted, intent.part, intent.x, intent.y)
+      } else if (intent.kind === 'point' || intent.kind === 'tap') {
+        const cannot = await pointAt(
+          mounted,
+          intent.part,
+          intent.x,
+          intent.y,
+          intent.kind === 'tap',
+        )
         if (cannot !== undefined) {
           steps.push({ cannot, intent: say(intent) })
           continue
