@@ -26,6 +26,7 @@ import { FILTER_INPUT } from './scenarios/filter-input.js'
 import { FORMAT_DATE } from './scenarios/format-date.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
+import { LEGEND } from './scenarios/legend.js'
 import { LIST } from './scenarios/list.js'
 import { LISTBOX } from './scenarios/listbox.js'
 import { LOADER } from './scenarios/loader.js'
@@ -100,6 +101,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'format-date': FORMAT_DATE,
   image: IMAGE,
   input: INPUT,
+  legend: LEGEND,
   list: LIST,
   listbox: LISTBOX,
   loader: LOADER,

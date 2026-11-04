@@ -38,6 +38,13 @@ export interface Setup {
    */
   readonly data?: object
   /**
+   * A table the element reads by its id, as a legend reads the table its
+   * chart reads: `data` in the shape a chart's `data` takes. The web writes it
+   * as a `<table>` with that id inside the element, and a phone publishes its
+   * rows under the id.
+   */
+  readonly table?: { readonly data: object; readonly id: string }
+  /**
    * The data it draws, for a family whose items arrive as data, as a virtual
    * list. The web sets it as a property with a function that draws each
    * item's words, and a phone passes it as a prop.
