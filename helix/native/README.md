@@ -1187,10 +1187,17 @@ publishes its rows, and a chart whose `for` names that id reads them, as the
 web's chart reads a table in the page. `publishChartSource` publishes rows a
 page computes, and `useChartSource` reads them.
 
+**A legend hides a series on the table, and every chart reading it draws
+without it.** `hideChartSeries` holds the hidden names by the table's id, where
+the web holds them on the table, and `useHiddenSeries` reads them, so a ring
+closes over a slice a legend hid and a series keeps its color while hidden.
+
 **A chart's plot is one adjustable control.** A press-and-drag scrubs it with a
 haptic tick at each reading, a tap shows a reading and presses it, a screen
 reader's increment and decrement move the reading, and a hardware keyboard's
 arrows, Home, End, Page Up, Page Down, Enter, and Escape work as on the web.
+A ring finds the slice under a finger by its angle, and the keys pass over a
+reading a legend hid.
 
 `glyphs` makes the `Glyph` `HelixRoot` draws a component's icons with, from
 icons that are SVG markup and a view box, such as `@fusion.dev/helix-icons`.
