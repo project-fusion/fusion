@@ -693,6 +693,14 @@
       "types": "./dist/textarea/index.d.ts",
       "default": "./dist/textarea/index.js"
     },
+    "./time-picker": {
+      "react-native": {
+        "types": "./dist/time-picker/index.native.d.ts",
+        "default": "./dist/time-picker/index.native.js"
+      },
+      "types": "./dist/time-picker/index.d.ts",
+      "default": "./dist/time-picker/index.js"
+    },
     "./timeline": {
       "react-native": {
         "types": "./dist/timeline/index.native.d.ts",

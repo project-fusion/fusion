@@ -88,7 +88,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['textarea/root/textarea-root.generated.css', 'slot[name="start"]', 'color'],
   ['time-input/root/time-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['time-input/root/time-input-root.css', 'slot[name="start"]', 'color'],
-  ['time-picker/root/time-picker-root.css', '[part="hint"]', 'color'],
+  ['time-picker/root/time-picker-root.generated.css', '[part="hint"]', 'color'],
   ['tree/root/tree-root.generated.css', ':host([nesting="heading"])', '--_tree-heading-ink'],
   [
     'video-playlist/item/video-playlist-item.css',
