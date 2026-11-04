@@ -1,4 +1,4 @@
-import { segmentName } from '@fusion.dev/helix-core'
+import { segmentName } from '../date-segments/date-segments.js'
 
 /** A part of the time a Time Picker wheel sets. */
 export type WheelField = 'dayPeriod' | 'hour' | 'minute' | 'second'

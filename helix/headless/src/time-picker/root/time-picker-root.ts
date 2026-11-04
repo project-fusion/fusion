@@ -32,6 +32,7 @@ import {
   type WheelPart,
   wheelHours,
   wheelMinutes,
+  wheelName,
   type wheelParts,
   wheelSeconds,
   wheelsAt,
@@ -43,7 +44,6 @@ import {
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
-import { wheelName } from '../wheel-name.js'
 /* Relative, so this registers the headless elements and the styled file's
    identical imports register the styled ones. `tier` picks which the template
    asks for. */

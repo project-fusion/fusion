@@ -453,6 +453,7 @@ export {
   wheelsAt,
   wheelTurn,
 } from './utils/clock/time-picker.js'
+export { type WheelField, wheelName } from './utils/clock/wheel-name.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { closestName } from './utils/closest-name/closest-name.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
