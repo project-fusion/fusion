@@ -597,6 +597,21 @@ pub const PICKER_FIELD_COMPUTED: &[&str] = &[
     "tagsShown",
 ];
 
+/// What a list of times reads and sends, by the name the machine binds. Its other
+/// props it reads by their own names.
+pub const TIME_PICKER: &[(&str, Names)] = &[
+    ("defaultProp", Names::Prop),
+    ("prop", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onInput", Names::Event),
+];
+
+/// What a list of times computes for its parts, each read as `timePicker.x`.
+pub const TIME_PICKER_COMPUTED: &[&str] = &[
+    "columns", "listName", "multiple", "options", "unset", "wheels",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1064,6 +1079,11 @@ pub fn picker_field(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "pickerField", PICKER_FIELD, PICKER_FIELD_COMPUTED)
 }
 
+/// `timePicker({ ... })`, each field a name.
+pub fn time_picker(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "timePicker", TIME_PICKER, TIME_PICKER_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1154,6 +1174,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "paginationRoot" => pagination_root(value),
         "paginationSize" => pagination_size(value),
         "datePicker" => date_picker(value),
+        "timePicker" => time_picker(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),
