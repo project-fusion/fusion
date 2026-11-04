@@ -923,7 +923,7 @@ export interface DonutChartChoice {
   readonly drawn?: string
   readonly empty?: string
   readonly frame?: string
-  readonly labelled?: string
+  readonly labeled?: string
   readonly labels?: string
   readonly live?: string
   readonly loading?: string

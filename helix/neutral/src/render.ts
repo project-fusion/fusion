@@ -384,7 +384,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'drawn'
     | 'empty'
     | 'frame'
-    | 'labelled'
+    | 'labeled'
     | 'labels'
     | 'live'
     | 'loading'
