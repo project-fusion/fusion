@@ -8,7 +8,9 @@ import {
   type HelixBeforeChangeEvent,
   HelixFormElement,
   type HourCycle,
+  halfBarred,
   hostWords,
+  hourBarred,
   inlineStep,
   internalsOf,
   isTwelveHour,
@@ -23,10 +25,17 @@ import {
   slotFilled,
   slottedWords,
   timeBarred,
-  timeFault,
+  timeBetween,
+  timeChoice,
+  timeProblem,
   valueAsSeconds,
-  wheelParts,
-  wholeHour,
+  type WheelPart,
+  wheelHours,
+  wheelMinutes,
+  type wheelParts,
+  wheelSeconds,
+  wheelsAt,
+  wheelTurn,
   words,
   wordsLocale,
   writeClock,
@@ -434,35 +443,18 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   }
 
   /**
-   * The offered time nearest to one the wheels built, which keeps them inside
-   * `min`, `max` and `step`.
-   *
-   * A wheel sets one part of a time and keeps the others, so moving the hour
-   * from 16:45 to 17 built 17:45 against a `max` of 17:00, and moving the half
-   * of the day built 05:45 against a `min` of 09:00. Measured before this,
-   * both reported valid and were submitted. The nearest earlier time wins a
-   * tie, so a step past `max` lands on `max`'s own row.
-   */
-  private nearest(at: number): number {
-    return nearestTime(this.times, at)
-  }
-
-  /**
    * Whether every offered time in an hour is barred.
    *
    * `shown` is the meridiem the wheel is on, so `1` means 01:00 under AM and
    * 13:00 under PM. Absent is a 24 hour clock, where the number is the hour.
    */
   private wholeHourBarred(shown: number, half?: 'AM' | 'PM'): boolean {
-    const whole = wholeHour(shown, half)
-    const within = this.times.filter((at) => Math.floor(at / 3600) === whole)
-    return within.length > 0 && within.every((at) => this.barredAt(at))
+    return hourBarred(this.times, shown, this.disableTimes, half)
   }
 
   /** Whether every offered time in a half of the clock is barred. */
   private halfBarred(half: 'AM' | 'PM'): boolean {
-    const within = this.times.filter((at) => (half === 'PM') === at >= 43_200)
-    return within.length > 0 && within.every((at) => this.barredAt(at))
+    return halfBarred(this.times, half, this.disableTimes)
   }
 
   /** The times held, which is a list whether or not a mode is set. */
@@ -510,38 +502,13 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * returns whether the value changed.
    */
   private choose(announced: string): boolean {
-    /* The listbox already skips a disabled option, so this is the second lock
-       rather than the first: it covers a value arriving from a consumer's own
-       dispatch, and it is what makes the refusal a fact about the component
-       rather than about the listbox it happens to render. */
-    if (announced.split(',').some((one) => this.barred(one.trim()))) {
-      return false
-    }
-    if (this.mode !== 'range') {
-      return this.requestValue(announced)
-    }
-    const next = announced
-      .split(',')
-      .map((one) => one.trim())
-      .filter(Boolean)
-    if (next.length <= 2) {
-      return this.requestValue(next.sort().join(','))
-    }
-    const before = new Set(this.held)
-    const added = next.find((one) => !before.has(one))
-    return this.requestValue(added ?? '')
+    /* The listbox already skips a disabled option, so this is the second lock:
+       core's `timeChoice` refuses a barred time from a consumer's own dispatch
+       too, and keeps a range's two ends in order. */
+    const next = timeChoice(announced, this.held, this.mode, (one) => this.barred(one))
+    return next !== undefined && this.requestValue(next)
   }
 
-  /**
-   * Chooses the current time, as a press on the `show-now` button does, and
-   * returns whether the value changed.
-   *
-   * The time is read off the reader's clock and moved to the nearest time on
-   * offer that is not barred, so it falls on the `step` and inside `min` and
-   * `max`. It is requested as a pick is, so `helix-before-change` can cancel
-   * it. With a `mode` the time joins the times held, and a range that holds
-   * two starts over from it, as a third pick does.
-   */
   selectNow(): boolean {
     if (this.isDisabled) {
       return false
@@ -632,109 +599,49 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * pointer.
    */
   private between(at: string): boolean {
-    if (this.mode !== 'range') {
-      return false
-    }
-    const [from, to = this.previewed] = this.held
-    if (from === undefined || to === '' || this.held.length > 2) {
-      return false
-    }
-    const [low = from, high = to] = [from, to].sort()
-    return at > low && at < high
+    return timeBetween(at, this.held, this.previewed, this.mode)
   }
 
   /** The readings the wheels show, from the value or from `min`. */
   private get parts(): ReturnType<typeof wheelParts> {
-    const at = valueAsSeconds(this.value) ?? valueAsSeconds(this.min) ?? 0
-    return wheelParts(at, isTwelveHour(this.clock))
+    return wheelsAt(this.value, this.min, isTwelveHour(this.clock))
   }
 
-  /** Puts a changed column back together into a whole time. */
-  private readonly moveColumn = (
-    part: 'hour' | 'meridiem' | 'minute' | 'second',
-    to: string,
-  ): void => {
+  /**
+   * Puts a changed column back together into a whole time, through core's
+   * `wheelTurn`. The wheels build a value from their columns and never reach
+   * `handleChange`, so the refusal of a barred time is core's too: a reader on
+   * 09:00 who moves the hour to 10 lands on 10:00, which can be barred while
+   * nothing in the hour column was.
+   */
+  private readonly moveColumn = (part: WheelPart, to: string): void => {
     if (this.isDisabled) {
       return
     }
-    const { hour, meridiem, minute, second } = this.parts
-    let [h, m, sec] = [hour, minute, second]
-    if (part === 'minute') {
-      m = Number(to)
-    } else if (part === 'second') {
-      sec = Number(to)
-    } else if (part === 'hour') {
-      /* On a twelve hour clock the column says 1 to 12 and the meridiem says
-         which half, so the two have to be recombined rather than read straight:
-         12 AM is midnight and 12 PM is noon, which is the one pair that does not
-         follow the pattern. */
-      h = wholeHour(Number(to), isTwelveHour(this.clock) ? meridiem : undefined)
-    } else {
-      h = (hour % 12) + (to === 'PM' ? 12 : 0)
+    const next = wheelTurn(part, to, {
+      disableTimes: this.disableTimes,
+      min: this.min,
+      seconds: this.seconds,
+      times: this.times,
+      twelve: isTwelveHour(this.clock),
+      value: this.value,
+    })
+    if (next !== undefined) {
+      this.requestValue(next)
     }
-    /* The wheels build a value from their columns and never reach
-       `handleChange`, so the refusal has to be repeated here. Disabling the
-       options is not enough on its own: a reader on 09:00 who moves the hour to
-       10 lands on 10:00, and 10:00 can be barred while nothing in the hour
-       column was. */
-    const nearest = this.nearest(h * 3600 + m * 60 + sec)
-    if (this.barredAt(nearest)) {
-      return
-    }
-    this.requestValue(this.valueFor(nearest))
-  }
-
-  /** Every whole hour that has at least one offered time in it. */
-  private get hours(): number[] {
-    const found = new Set(this.times.map((at) => Math.floor(at / 3600)))
-    return [...found]
   }
 
   /** Every minute offered within the hour currently shown. */
   private get minutes(): number[] {
-    const hour = this.parts.hour
-    const found = new Set(
-      this.times
-        .filter((at) => Math.floor(at / 3600) === hour)
-        .map((at) => Math.floor(at / 60) % 60),
-    )
-    return [...found]
+    return wheelMinutes(this.times, this.parts.hour)
   }
 
   /** Every second offered within the minute currently shown. */
   private get secondsShown(): number[] {
     const { hour, minute } = this.parts
-    return this.times
-      .filter((at) => Math.floor(at / 60) === hour * 60 + minute)
-      .map((at) => at % 60)
+    return wheelSeconds(this.times, hour, minute)
   }
 
-  /**
-   * Scrolls each wheel to its selected value, and the list to its selected
-   * time.
-   *
-   * A dial that opens at midnight when it holds ten in the evening is a dial
-   * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
-   * snap point when something scrolls, and nothing has. Measured before this,
-   * with the value at 22:00, the hour wheel sat 288 pixels above its answer. The
-   * list had the same fault: holding 09:30 it opened on 12:00 AM with the answer
-   * 38 rows down and out of sight, flat on a page and in every Time Input panel.
-   * A list holding several, a range or a set, is left where it is, having no
-   * one row to come to rest on.
-   *
-   * The wheels on every update, because the columns re-render as the value
-   * moves and the minute column's contents change with the hour. The list on
-   * the first only, where it is flat on a page: centering it on every choice
-   * would move the row out from under the pointer that chose it.
-   *
-   * **And it is public, because an update is not the only moment that matters.**
-   * Inside a panel this element renders while the panel is still
-   * `display: none`, so every box measures zero and there is nothing to center
-   * against: measured, the hour wheel stayed 288 pixels off its answer because
-   * the only call happened before anything had a size. Whatever shows the panel
-   * calls this again afterwards. The guard below makes the early call harmless
-   * rather than wrong, which is why it can be left in.
-   */
   reveal(): void {
     if (this.mode !== undefined) {
       return
@@ -871,41 +778,6 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * whether set by a script or built on the wheels, reported valid and was
    * submitted, where a native time input reports the bound it is past.
    */
-  private fault(at: string): [keyof ValidityStateFlags, string] | undefined {
-    switch (
-      timeFault(at, {
-        disableTimes: this.disableTimes,
-        max: this.max,
-        min: this.min,
-        offered: this.times,
-      })
-    ) {
-      case 'rangeUnderflow':
-        return [
-          'rangeUnderflow',
-          formatWords(this, 'rangeUnderflowMessage', {
-            min: writeClock(this.min, this.clock, this.seconds),
-          }),
-        ]
-      case 'rangeOverflow':
-        return [
-          'rangeOverflow',
-          formatWords(this, 'rangeOverflowMessage', {
-            max: writeClock(this.max, this.clock, this.seconds),
-          }),
-        ]
-      case 'unavailable':
-        return ['badInput', this.unavailableMessage]
-      case 'stepMismatch':
-        return ['stepMismatch', this.stepMismatchMessage]
-      default:
-        return undefined
-    }
-  }
-
-  /**
-   * The validation message for a required time picker with no time chosen.
-   */
   @words
   @property({ attribute: 'value-missing-message' })
   valueMissingMessage = 'Choose a time.'
@@ -934,32 +806,39 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * `reportRequired` hands it to the form, and `failure` to the mark.
    */
   private get problem(): [ValidityStateFlags, string] | undefined {
-    if (this.required && this.value === '') {
-      return [{ valueMissing: true }, this.valueMissingMessage]
-    }
-    /* A value the wheels cannot read is bad input, the same as on the calendar:
-       `value="not-a-time"` marks no row, and would otherwise report `:valid` and
-       be handed to the form. `valueAsSeconds` rejects the hours and minutes
-       that are shaped right and out of range as well as the ones that are not
-       shaped right at all. */
-    const held = this.held
-    if (held.length > 0 && held.some((one) => valueAsSeconds(one) === null)) {
-      return [
-        { badInput: true },
-        formatWords(this, 'badInputMessage', {
-          example: writeClock(this.seconds ? '14:30:15' : '14:30', this.clock, this.seconds),
-          mode: this.mode ?? 'single',
-          shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
-        }),
-      ]
-    }
-    for (const one of held) {
-      const fault = this.fault(one)
-      if (fault) {
-        return [{ [fault[0]]: true }, fault[1]]
-      }
-    }
-    return undefined
+    /* Core's `timeProblem`, as a native time input says it. A value the wheels
+       cannot read is bad input, the same as on the calendar: `value="not-a-time"`
+       marks no row, and would otherwise report `:valid`. */
+    const found = timeProblem(
+      {
+        disableTimes: this.disableTimes,
+        max: this.max,
+        min: this.min,
+        required: this.required,
+        times: this.times,
+        value: this.value,
+      },
+      {
+        bad: () =>
+          formatWords(this, 'badInputMessage', {
+            example: writeClock(this.seconds ? '14:30:15' : '14:30', this.clock, this.seconds),
+            mode: this.mode ?? 'single',
+            shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
+          }),
+        missing: this.valueMissingMessage,
+        over: () =>
+          formatWords(this, 'rangeOverflowMessage', {
+            max: writeClock(this.max, this.clock, this.seconds),
+          }),
+        step: this.stepMismatchMessage,
+        unavailable: this.unavailableMessage,
+        under: () =>
+          formatWords(this, 'rangeUnderflowMessage', {
+            min: writeClock(this.min, this.clock, this.seconds),
+          }),
+      },
+    )
+    return found === undefined ? undefined : [{ [found[0]]: true }, found[1]]
   }
 
   /** A missing time waits for the reader; a refused one is marked at once. */
@@ -1270,11 +1149,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     /* The hour column reads 1 to 12 on a twelve hour clock, so the whole hours
        on offer are mapped into that half and de-duplicated: 13:00 and 01:00 are
        both "1", and offering it twice is offering a choice that is not one. */
-    const hours = twelve
-      ? [...new Set(this.hours.map((one) => (one % 12 === 0 ? 12 : one % 12)))].sort(
-          (a, b) => a - b,
-        )
-      : this.hours
+    const hours = wheelHours(this.times, twelve)
     /* A group named as the list would be, so the wheels are heard as the parts
        of one named time. */
     return html`<div
