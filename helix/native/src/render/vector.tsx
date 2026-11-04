@@ -27,17 +27,16 @@
  * moves without it.
  */
 
-import { type ComponentType, createElement, memo, type ReactNode } from 'react'
+import { type ComponentType, createElement, type ReactNode } from 'react'
 import Reanimated from 'react-native-reanimated'
 import type * as Svg from 'react-native-svg'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
-import { useTokens } from '../theme/helix-theme'
-import type { GlyphProps } from '../theme/theme'
 import { animationStyle, transitionStyle } from './animation'
-import { paintedMarkup } from './icon-paint'
 import { entriesOf } from './repeat'
 import { bound, PAINT, paintOf, resolve, type Scope, type Styling } from './styles'
+import { Canvas } from './vector-canvas'
+import { dashed, listedDashes, listedFrames } from './vector-dashes'
 
 /** The package, loaded at the first vector: `null` where the app does not install it. */
 let loaded: typeof Svg | null | undefined
@@ -174,66 +173,6 @@ const outline = (kind: Kind, at: Readonly<Record<string, number>>): number | und
     default:
       return undefined
   }
-}
-
-/**
- * Paint with its dashes in the shape's own units, where they are written in
- * `pathLength`'s. **`react-native-svg` draws no `pathLength`**, so a ring
- * whose dashes say 70 of 100 is measured by its circumference here.
- */
-const dashed = (paint: Style, by: number): Style => {
-  if (by === 1) {
-    return paint
-  }
-  const out: Record<string, number | string> = { ...paint }
-  if (typeof paint.strokeDasharray === 'string') {
-    out.strokeDasharray = paint.strokeDasharray
-      .split(/[\s,]+/)
-      .map((dash) => Math.round(Number(dash) * by * 1000) / 1000)
-      .join(' ')
-  }
-  if (typeof paint.strokeDashoffset === 'number') {
-    out.strokeDashoffset = Math.round(paint.strokeDashoffset * by * 1000) / 1000
-  }
-  return out
-}
-
-/**
- * A style with its dashes as a list of numbers, `[70, 100]` for `70 100`.
- * **Reanimated takes a shape's dashes only as a list**, and threw on the
- * words `react-native-svg` takes, so a ring whose dashes move or ease did
- * not draw at all: Progress's ring example on a simulator and an emulator,
- * run 38957410938.
- */
-const listedDashes = <T extends Readonly<Record<string, unknown>>>(style: T): T => {
-  const dashes = style.strokeDasharray
-  return typeof dashes === 'string' && dashes !== 'none'
-    ? {
-        ...style,
-        strokeDasharray: dashes
-          .split(/[\s,]+/)
-          .filter(Boolean)
-          .map(Number),
-      }
-    : style
-}
-
-/** Each frame of an animation style with its dashes as a list, as `listedDashes` writes them. */
-const listedFrames = (
-  css: Readonly<Record<string, unknown>>,
-): Readonly<Record<string, unknown>> => {
-  const frames = css.animationName
-  return typeof frames === 'object' && frames !== null
-    ? {
-        ...css,
-        animationName: Object.fromEntries(
-          Object.entries(frames).map(([at, frame]) => [
-            at,
-            listedDashes(frame as Readonly<Record<string, unknown>>),
-          ]),
-        ),
-      }
-    : css
 }
 
 /**
@@ -424,89 +363,4 @@ export const drawVector = (
   )
 }
 
-/** What a vector's canvas draws: its box and its shapes, drawn again only when either changes. */
-interface CanvasProps {
-  readonly aspect: string | undefined
-  readonly height: number | string
-  readonly shapes: readonly ReactNode[]
-  readonly viewBox: string
-}
-
-/**
- * The words of what a canvas draws, which say whether it changed: each shape's
- * kind, key, and props, its stops among them.
- */
-const signature = (shapes: readonly ReactNode[]): string =>
-  JSON.stringify(shapes, (name, value) => (name.startsWith('_') ? undefined : value))
-
-/**
- * A vector's canvas, which React draws again only when its box or a shape it
- * draws changes, so a mark laid over it can move with no new canvas.
- */
-const Canvas = memo(
-  ({ aspect, height, shapes, viewBox }: CanvasProps) => {
-    const { Defs, Svg: Drawing } = svg()
-    const paints = shapes.filter((one) => isGradient(one))
-    const rest = shapes.filter((one) => !isGradient(one))
-    return (
-      <Drawing height={height} preserveAspectRatio={aspect} viewBox={viewBox} width="100%">
-        {paints.length === 0 ? null : <Defs>{paints}</Defs>}
-        {rest}
-      </Drawing>
-    )
-  },
-  (before, after) =>
-    before.aspect === after.aspect &&
-    before.height === after.height &&
-    before.viewBox === after.viewBox &&
-    signature(before.shapes) === signature(after.shapes),
-)
-
-/** Whether a drawn shape is a gradient, a paint that goes in the canvas's `Defs`. */
-const isGradient = (shape: ReactNode): boolean =>
-  typeof shape === 'object' &&
-  shape !== null &&
-  'type' in shape &&
-  shape.type === (svg().LinearGradient as unknown)
-
-/** An icon as data: the inner markup of an SVG, and the box it is drawn in. */
-export interface Icon {
-  readonly content: string
-  readonly viewBox: string
-}
-
-/**
- * A `Glyph` for `HelixRoot` that draws icons by their names, such as
- * `@fusion.dev/helix-icons`'s, in the color and at the size a component
- * asks for. Each icon's own strokes and fills are kept, with a `var()` they
- * name read from the theme, and what it does not paint is drawn in the color. `named` finds an icon by the name a component
- * gives, such as `caret-end`. A name it finds nothing for draws nothing.
- *
- * ```tsx
- * import * as icons from '@fusion.dev/helix-icons'
- *
- * const Glyph = glyphs((name) => icons[camelCase(name)])
- *
- * <HelixRoot Glyph={Glyph}>
- * ```
- */
-export const glyphs = (named: (name: string) => Icon | undefined): ComponentType<GlyphProps> => {
-  const drawing = ({ color, name, size }: GlyphProps) => {
-    const tokens = useTokens()
-    const icon = named(name)
-    if (icon === undefined) {
-      return null
-    }
-    const { SvgXml } = svg()
-    const content = paintedMarkup(icon.content, tokens, color)
-    return (
-      <SvgXml
-        color={color}
-        height={size}
-        width={size}
-        xml={`<svg viewBox="${icon.viewBox}" fill="currentColor">${content}</svg>`}
-      />
-    )
-  }
-  return Object.assign(drawing, { displayName: 'Glyph' })
-}
+export { glyphs, type Icon } from './glyphs'
