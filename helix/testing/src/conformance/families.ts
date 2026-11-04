@@ -69,6 +69,7 @@ export type Family =
   | 'date-input'
   | 'time-input'
   | 'donut-chart'
+  | 'legend'
   | 'sparkline'
   | 'filter-input'
   | 'select'

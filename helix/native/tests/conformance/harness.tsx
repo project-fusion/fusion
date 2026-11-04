@@ -8,6 +8,7 @@ import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import { fakeOpenLink } from '@fusion.dev/helix-core/capabilities/open-link/fake'
 import { setTimers, timers } from '@fusion.dev/helix-core/capabilities/timers'
 import { fakeTimers } from '@fusion.dev/helix-core/capabilities/timers/fake'
+import { isChartData, rowsFromData } from '@fusion.dev/helix-core/chart'
 import {
   type Intent,
   knownBy,
@@ -27,6 +28,7 @@ import { Text } from 'react-native'
 import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
+import { publishChartSource } from '../../src/render/chart-sources'
 import { carouselDot, carouselPress, carousels } from './carousel'
 import { focusPlot, isChart, tapPlot } from './chart'
 import { chatPress, chatProps, chats } from './chat'
@@ -237,6 +239,16 @@ const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
   ...(setup.data === undefined ? {} : { data: setup.data }),
 })
 
+/** Publishes the rows of a table the element reads by its id, as a phone's `<table>` does. */
+const publishTable = (setup: Setup): void => {
+  if (setup.table !== undefined && isChartData(setup.table.data)) {
+    publishChartSource(setup.table.id, {
+      caption: setup.table.data.caption ?? '',
+      rows: rowsFromData(setup.table.data),
+    })
+  }
+}
+
 /**
  * The element a setup draws: its default region as children, and each named
  * region as a prop. A plain element is its words.
@@ -262,6 +274,7 @@ const draw = (run: Run, setup: Setup, value: string | null): ReactElement => {
     }
   }
   const { Component } = drawn
+  publishTable(setup)
   return (
     <Component key={String(knownBy(setup) ?? setup.props?.anchor ?? setup.tag)} {...props}>
       {children}

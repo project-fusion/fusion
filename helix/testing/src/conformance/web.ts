@@ -38,7 +38,7 @@ import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
 
 /** The innermost element of a tree whose words are these, as an option says its time. */
 const worded = (tree: Element | ShadowRoot, label: string): Element | undefined =>
-  [...tree.querySelectorAll('[role="option"], [value]')].find(
+  [...tree.querySelectorAll('[role="option"], [value], button')].find(
     (one) => one.textContent?.trim() === label,
   )
 
@@ -62,6 +62,46 @@ const labeled = (root: Element, label: string): Element | undefined => {
   }
   return undefined
 }
+/** A chart's readings as data: a caption, the column headings, and a row for each reading. */
+interface TableData {
+  readonly caption?: string
+  readonly columns: readonly string[]
+  readonly rows: readonly (readonly [string, ...(number | string)[]])[]
+}
+
+/** A table a chart reads by its id, written from data, hidden from view. */
+const tableOf = (id: string, data: TableData): HTMLTableElement => {
+  const table = document.createElement('table')
+  table.id = id
+  table.hidden = true
+  if (data.caption !== undefined) {
+    table.createCaption().textContent = data.caption
+  }
+  const head = table.createTHead().insertRow()
+  for (const column of data.columns) {
+    const cell = document.createElement('th')
+    cell.scope = 'col'
+    cell.textContent = column
+    head.append(cell)
+  }
+  const body = table.createTBody()
+  for (const [label, ...cells] of data.rows) {
+    const row = body.insertRow()
+    const name = document.createElement('th')
+    name.scope = 'row'
+    name.textContent = label
+    row.append(name)
+    for (const value of cells) {
+      const cell = row.insertCell()
+      cell.textContent = String(value)
+      if (typeof value === 'number') {
+        cell.dataset.value = String(value)
+      }
+    }
+  }
+  return table
+}
+
 /** The element a setup draws, with its props as attributes and what it holds. */
 const build = (setup: Setup): Updatable => {
   const made = document.createElement(setup.tag) as Updatable
@@ -86,6 +126,9 @@ const build = (setup: Setup): Updatable => {
   }
   if (setup.data !== undefined) {
     ;(made as Updatable & { data?: unknown }).data = setup.data
+  }
+  if (setup.table !== undefined) {
+    made.append(tableOf(setup.table.id, setup.table.data as TableData))
   }
   if (setup.turns !== undefined) {
     ;(made as Updatable & { turns?: unknown }).turns = setup.turns
