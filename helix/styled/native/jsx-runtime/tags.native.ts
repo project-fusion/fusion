@@ -29,6 +29,7 @@ import { HelixDatePicker } from '../date-picker/index.native'
 import { HelixDescriptionList, HelixDescriptionListItem } from '../description-list/index.native'
 import { HelixDialog } from '../dialog/index.native'
 import { HelixDivider } from '../divider/index.native'
+import { HelixDonutChart } from '../donut-chart/index.native'
 import { HelixDrawer } from '../drawer/index.native'
 import { HelixDrilldown, HelixDrilldownItem } from '../drilldown/index.native'
 import { HelixEmpty } from '../empty/index.native'
@@ -246,6 +247,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-description-list-item': HelixDescriptionListItem,
   'helix-dialog': HelixDialog,
   'helix-divider': HelixDivider,
+  'helix-donut-chart': HelixDonutChart,
   'helix-drawer': HelixDrawer,
   'helix-drilldown': HelixDrilldown,
   'helix-drilldown-item': HelixDrilldownItem,

@@ -247,6 +247,14 @@
       "types": "./dist/divider/index.d.ts",
       "default": "./dist/divider/index.js"
     },
+    "./donut-chart": {
+      "react-native": {
+        "types": "./dist/donut-chart/index.native.d.ts",
+        "default": "./dist/donut-chart/index.native.js"
+      },
+      "types": "./dist/donut-chart/index.d.ts",
+      "default": "./dist/donut-chart/index.js"
+    },
     "./drawer": {
       "react-native": {
         "types": "./dist/drawer/index.native.d.ts",
