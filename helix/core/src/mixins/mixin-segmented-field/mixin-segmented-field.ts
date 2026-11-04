@@ -4,7 +4,6 @@ import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import type { MonthSystem } from '../../utils/calendar/calendar.js'
 import {
-  isPartial,
   isTwelveHourLayout,
   type SegmentedKind,
   type SegmentKind,
@@ -15,12 +14,16 @@ import {
   segmentLayout,
   segmentName,
   segmentRange,
-  segmentsOf,
-  segmentsValue,
   segmentText,
   segmentValueText,
   shownValue,
 } from '../../utils/date-segments/date-segments.js'
+import {
+  segmentRowsOf,
+  segmentRowsPartial,
+  segmentRowsValue,
+  withRow,
+} from '../../utils/date-segments/segment-rows.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { latinDigits } from '../../utils/number-format/number-format.js'
 import { appleTouch } from '../../utils/platform/platform.js'
@@ -265,18 +268,12 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
 
     /** The value the rows add up to: each row's, joined by commas, or empty while any row is not whole. */
     private joined(rows: readonly Segments[]): string {
-      const values = rows.map((one) =>
-        segmentsValue(this.segmentedKind, one, this.layout, this.segmentSystem),
-      )
-      return values.some((one) => one === '') ? '' : values.join(',')
+      return segmentRowsValue(this.segmentedKind, rows, this.layout, this.segmentSystem)
     }
 
     /** The rows a value names, one per row, empty where it names none. */
     private rowsOf(value: string): Segments[] {
-      const values = this.segmentGroups > 1 ? value.split(',') : [value]
-      return Array.from({ length: this.segmentGroups }, (_, row) =>
-        segmentsOf(this.segmentedKind, (values[row] ?? '').trim(), this.segmentSystem),
-      )
+      return segmentRowsOf(this.segmentedKind, value, this.segmentGroups, this.segmentSystem)
     }
 
     /** A date or a time. Each family says which. */
@@ -328,7 +325,7 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
      * a refused text field puts its text back.
      */
     private take(row: number, next: Segments): void {
-      this.parts = this.parts.map((one, index) => (index === row ? next : one))
+      this.parts = withRow(this.parts, row, next)
       const value = this.joined(this.parts)
       if (value === this.value) {
         this.sync()
@@ -597,12 +594,13 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
       const anchor = this.anchor ?? undefined
       /* A row half set, or one row whole and the other empty, which is half a
          range. */
-      const partial =
-        this.parts.some((one) =>
-          isPartial(this.segmentedKind, one, this.layout, this.segmentSystem),
-        ) ||
-        (this.value === '' &&
-          this.parts.some((one) => Object.values(one).some((part) => part !== undefined)))
+      const partial = segmentRowsPartial(
+        this.segmentedKind,
+        this.parts,
+        this.value,
+        this.layout,
+        this.segmentSystem,
+      )
       const fault = verdictFlags(this.validate())
       if (partial) {
         internalsOf(this).setValidity(
