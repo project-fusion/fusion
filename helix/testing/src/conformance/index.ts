@@ -50,6 +50,7 @@ import { TABLE } from './scenarios/table.js'
 import { TABS } from './scenarios/tabs.js'
 import { TAG_GROUP } from './scenarios/tag-group.js'
 import { TEXTAREA } from './scenarios/textarea.js'
+import { TIME_INPUT } from './scenarios/time-input.js'
 import { TIME_PICKER } from './scenarios/time-picker.js'
 import { TIMELINE } from './scenarios/timeline.js'
 import { TOAST } from './scenarios/toast.js'
@@ -123,6 +124,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   tabs: TABS,
   'tag-group': TAG_GROUP,
   textarea: TEXTAREA,
+  'time-input': TIME_INPUT,
   'time-picker': TIME_PICKER,
   timeline: TIMELINE,
   toast: TOAST,
