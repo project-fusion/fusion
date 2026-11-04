@@ -46,6 +46,14 @@
       "types": "./dist/app-header/index.d.ts",
       "default": "./dist/app-header/index.js"
     },
+    "./area-chart": {
+      "react-native": {
+        "types": "./dist/area-chart/index.native.d.ts",
+        "default": "./dist/area-chart/index.native.js"
+      },
+      "types": "./dist/area-chart/index.d.ts",
+      "default": "./dist/area-chart/index.js"
+    },
     "./avatar": {
       "react-native": {
         "types": "./dist/avatar/index.native.d.ts",

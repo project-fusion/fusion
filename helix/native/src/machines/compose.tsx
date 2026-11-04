@@ -9,6 +9,7 @@ import {
 } from '../render/behavior'
 import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
+import { useAreaChart } from './area-chart'
 import { aroundToolbar } from './axis'
 import type { Around, Binder } from './binder'
 import { useCarousel } from './carousel'
@@ -478,6 +479,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useLegend(family, props, use),
+      ),
+    /* A chart of stacked bands: its bands from its readings, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'area-chart')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useAreaChart(family, props, use),
       ),
     /* A chart of lines: its lines from its readings, and its reading. */
     ...uses
