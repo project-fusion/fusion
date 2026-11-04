@@ -108,7 +108,11 @@ fn has(node: &Node, name: &str) -> bool {
 /// A shape takes the geometry of its kind, and holds nothing.
 fn shape(node: &Node, at: &str) -> Result<(), String> {
     let Some(kind) = text(node, "shape") else {
-        if let Some(name) = GEOMETRY.iter().find(|name| has(node, name)) {
+        /* A layer's `offset` is its distance from its anchor, and no geometry. */
+        if let Some(name) = GEOMETRY
+            .iter()
+            .find(|name| node.kind == NodeKind::Box && has(node, name))
+        {
             return Err(format!(
                 "{at}: `{name}` is a shape's, and it has no `shape`"
             ));
@@ -136,7 +140,20 @@ fn shape(node: &Node, at: &str) -> Result<(), String> {
     if kind == "path" && !has(node, "d") {
         return Err(format!("{at}: a path takes its outline as `d`"));
     }
-    if !node.children.is_empty() {
+    /* A gradient holds the stops it runs through, and nothing else; every
+    other shape holds nothing. */
+    if kind == "gradient" {
+        if let Some(child) = node
+            .children
+            .iter()
+            .find(|child| text(child, "shape") != Some("stop"))
+        {
+            return Err(format!(
+                "{at}: a gradient holds its stops alone, and `{}('{}')` is none",
+                child.kind, child.name
+            ));
+        }
+    } else if !node.children.is_empty() {
         return Err(format!("{at}: a shape holds nothing"));
     }
     if has(node, "viewBox") {
@@ -291,8 +308,13 @@ fn walk(nodes: &[Node], vector: bool, copy: Within) -> Result<(), String> {
             _ => copy,
         };
         let shape = has(node, "shape");
-        if vector && node.kind != NodeKind::When && !shape {
-            return Err(format!("{at} is inside a vector, which holds shapes alone"));
+        /* A vector holds shapes, a `when` that draws some, and a repeat that
+        draws a shape for each entry of a list, as a bar plot draws a column
+        for each reading. */
+        if vector && !matches!(node.kind, NodeKind::When | NodeKind::Repeat) && !shape {
+            return Err(format!(
+                "{at} is inside a vector, which holds shapes, a `when`, and repeats of them alone"
+            ));
         }
         if !vector && shape {
             return Err(format!(

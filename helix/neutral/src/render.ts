@@ -376,6 +376,35 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tags'
     | 'tagsShown'
   >
+  /** What a sparkline computes for its parts: its marks, where each stands, and the reading shown. */
+  readonly sparkline: Computes<
+    | 'area'
+    | 'bandHeight'
+    | 'bandY'
+    | 'banded'
+    | 'bars'
+    | 'cursorX'
+    | 'cursorY'
+    | 'ended'
+    | 'high'
+    | 'highX'
+    | 'highY'
+    | 'line'
+    | 'lined'
+    | 'live'
+    | 'lone'
+    | 'low'
+    | 'lowX'
+    | 'lowY'
+    | 'named'
+    | 'overview'
+    | 'readout'
+    | 'reading'
+    | 'role'
+    | 'terminusX'
+    | 'terminusY'
+    | 'washed'
+  >
   /** What a list of times computes for its parts. */
   readonly timePicker: Computes<
     'columns' | 'listName' | 'multiple' | 'options' | 'unset' | 'wheels'
@@ -986,6 +1015,8 @@ export const Wrap = (_: WrapAttributes): Drawn => node()
 export interface SvgAttributes extends Named {
   readonly children?: Child
   readonly part: string
+  /** `none` stretches the drawing to fill its box on both axes, as a sparkline's strip fills a slot of any width. */
+  readonly preserveAspectRatio?: 'none'
   readonly viewBox: string
 }
 
@@ -1003,6 +1034,34 @@ interface Shape extends Common {
 
 /** A path inside a vector. */
 export const Path = (_: Shape & { readonly d: string | Read }): Drawn => node()
+
+/** A rectangle inside a vector, at its place and size in the vector's units, as a bar plot's column. */
+export const Rect = (
+  _: Shape & {
+    readonly height?: Given
+    readonly width?: Given
+    readonly x?: Given
+    readonly y?: Given
+  },
+): Drawn => node()
+
+/**
+ * A paint inside a vector that runs through its stops along the line from
+ * `x1`, `y1` to `x2`, `y2`, each a fraction of the shape it paints: a
+ * shape's `fill` names it by its `id`, `url(#id)`. It draws nothing itself.
+ */
+export const LinearGradient = (_: {
+  readonly children?: Child
+  readonly id: string
+  readonly part: string
+  readonly x1?: Given
+  readonly x2?: Given
+  readonly y1?: Given
+  readonly y2?: Given
+}): Drawn => node()
+
+/** A stop of a gradient, at `offset` along it, its color and opacity its style table's. */
+export const Stop = (_: { readonly offset: Given; readonly part: string }): Drawn => node()
 
 /** A circle inside a vector, its geometry its style table's where it gives none. */
 export const Circle = (

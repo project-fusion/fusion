@@ -194,7 +194,7 @@ impl Render<'_> {
             )),
             ("View", "shape") => Err(self.at(
                 attribute.span,
-                "a shape inside a vector is `<Path>` or `<Circle>`",
+                "a shape inside a vector is `<Path>`, `<Circle>`, `<Rect>`, or a `<LinearGradient>` of `<Stop>`s",
             )),
             (_, "sends" | "while" | "says") => Err(self.at(
                 attribute.span,

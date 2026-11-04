@@ -94,12 +94,41 @@ fn a_vector_holds_shapes_and_a_shape_is_inside_one() {
     let stray = tree(&[vector(vec![with(NodeKind::Box, "label", &[], Vec::new())])]);
     assert_eq!(
         stray.unwrap_err(),
-        "`box('label')` is inside a vector, which holds shapes alone"
+        "`box('label')` is inside a vector, which holds shapes, a `when`, and repeats of them alone"
     );
+    let bars = Node {
+        attributes: BTreeMap::new(),
+        children: vec![circle("bar")],
+        kind: NodeKind::Repeat,
+        name: "bars".to_owned(),
+    };
+    assert!(tree(&[vector(vec![bars])]).is_ok());
     let outside = tree(&[with(NodeKind::Box, "track", &[], vec![circle("groove")])]);
     assert!(outside
         .unwrap_err()
         .contains("not inside a box with a `viewBox`"));
+}
+
+#[test]
+fn a_gradient_holds_its_stops_alone() {
+    let stop = with(
+        NodeKind::Box,
+        "wash-start",
+        &[("shape", text("stop")), ("offset", Attribute::Number(0.0))],
+        Vec::new(),
+    );
+    let gradient = |children| {
+        with(
+            NodeKind::Box,
+            "wash",
+            &[("shape", text("gradient")), ("id", text("wash"))],
+            children,
+        )
+    };
+    assert!(node(&gradient(vec![stop])).is_ok());
+    assert!(node(&gradient(vec![circle("dot")]))
+        .unwrap_err()
+        .contains("holds its stops alone"));
 }
 
 #[test]

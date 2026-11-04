@@ -915,6 +915,38 @@ export interface PickerFieldChoice {
   readonly tagsShown?: string
 }
 
+/** A sparkline's names, each read as `sparkline.x`. */
+export interface SparklineChoice {
+  readonly area?: string
+  readonly bandHeight?: string
+  readonly bandY?: string
+  readonly banded?: string
+  readonly bars?: string
+  readonly cursorX?: string
+  readonly cursorY?: string
+  readonly ended?: string
+  readonly high?: string
+  readonly highX?: string
+  readonly highY?: string
+  readonly line?: string
+  readonly lined?: string
+  readonly live?: string
+  readonly lone?: string
+  readonly low?: string
+  readonly lowX?: string
+  readonly lowY?: string
+  readonly named?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly overview?: string
+  readonly reading?: string
+  readonly readout?: string
+  readonly role?: string
+  readonly terminusX?: string
+  readonly terminusY?: string
+  readonly washed?: string
+}
+
 /** A list of times's names, each read as `timePicker.x`. */
 export interface TimePickerChoice {
   readonly columns?: string

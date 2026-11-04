@@ -612,6 +612,45 @@ pub const TIME_PICKER_COMPUTED: &[&str] = &[
     "columns", "listName", "multiple", "options", "unset", "wheels",
 ];
 
+/// What a sparkline sends, by the name the machine binds. Its props it reads by
+/// their own names.
+pub const SPARKLINE: &[(&str, Names)] = &[
+    ("onReadingChange", Names::Event),
+    ("onReadingPress", Names::Event),
+];
+
+/// What a sparkline computes for its parts, each read as `sparkline.x`: the marks
+/// core draws from its readings, where each stands, and the reading a finger or
+/// a key rests on.
+pub const SPARKLINE_COMPUTED: &[&str] = &[
+    "area",
+    "bandHeight",
+    "bandY",
+    "banded",
+    "bars",
+    "cursorX",
+    "cursorY",
+    "ended",
+    "high",
+    "highX",
+    "highY",
+    "line",
+    "lined",
+    "live",
+    "lone",
+    "low",
+    "lowX",
+    "lowY",
+    "named",
+    "overview",
+    "readout",
+    "reading",
+    "role",
+    "terminusX",
+    "terminusY",
+    "washed",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1084,6 +1123,11 @@ pub fn time_picker(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "timePicker", TIME_PICKER, TIME_PICKER_COMPUTED)
 }
 
+/// `sparkline({ ... })`, each field a name.
+pub fn sparkline(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "sparkline", SPARKLINE, SPARKLINE_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1175,6 +1219,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "paginationSize" => pagination_size(value),
         "datePicker" => date_picker(value),
         "timePicker" => time_picker(value),
+        "sparkline" => sparkline(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

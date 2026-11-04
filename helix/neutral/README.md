@@ -6,7 +6,7 @@ Blockquote, Breadcrumbs, Button, Button Group, Callout, Card, Checkbox, Checkbox
 Group, Code, Code Block, Color Input, Color Picker, Copy Button, Description List, Dialog, Divider, Drawer, Drilldown,
 Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd, List, Loader,
 Megamenu, Menu, Meter, Motion Toggle, Navigation, Number Input, Outline, Pin Input, Popover, Progress, QR Code,
-Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Speed Dial, Splitter, Stat, Steps,
+Quote, Radio, Rating, Scroll Area, Skeleton, Skip Link, Slider, Sparkline, Speed Dial, Splitter, Stat, Steps,
 Switch, Tabs, Tag, Text, Textarea, Timeline, Toast, Toggle, Toolbar, Tooltip, Tour, and
 Trend, and Virtual List.
 
@@ -75,7 +75,11 @@ export default headless('tab', {
 - An event is its detail's fields, `cancelable([...])`, or `bare([...])`.
 - The nodes are `View`, `Text`, `Image`, `Pressable`, `Slot`, `Layer`,
   `Announce`, `Repeat`, `Wrap`, `Svg`, and the shapes inside a vector,
-  `Path` and `Circle`.
+  `Path`, `Circle`, `Rect`, and a `LinearGradient` of `Stop`s, a paint a
+  shape's `fill: url(#id)` names by its `id`. A vector holds a `Repeat` over
+  a list, which draws a shape for each entry with its geometry read from the
+  entry, as a bar plot's columns, and `preserveAspectRatio="none"` stretches
+  it to fill its box, as a sparkline's strip.
 - `memberOf: set('tabs')` names the set the element joins, and pressing the
   element selects it where a `<Pressable selects>` in the render says so.
 - A `<Wrap>` always wraps what it holds, and `<Wrap when={props.x}>` wraps it

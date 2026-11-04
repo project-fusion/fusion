@@ -38,8 +38,14 @@ fn regions(tree: &[Node], into: &mut BTreeSet<String>) {
 /// regions, and the part a region carries.
 pub fn parts(tree: &[Node], into: &mut BTreeSet<String>) {
     for node in tree {
+        /* A vector's gradient is a paint its shapes name by id, and the web
+        writes it with no part; its stops are parts. */
+        let paint = matches!(
+            node.attributes.get("shape"),
+            Some(Attribute::Text(shape)) if shape == "gradient"
+        );
         match node.kind {
-            kind if kind.is_part() => {
+            kind if kind.is_part() && !paint => {
                 into.insert(node.name.clone());
                 /* A token the part carries beside its own name while a prop
                 holds, as `row-current`. */
