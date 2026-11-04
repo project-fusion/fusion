@@ -850,6 +850,25 @@ const DATE_PICKER: &[Field] = &[
     ("unset", "unset", Name),
 ];
 
+const PICKER_FIELD: &[Field] = &[
+    ("clearShown", "clearShown", Name),
+    ("defaultProp", "defaultProp", Name),
+    ("fieldPlaceholder", "fieldPlaceholder", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onChange", "onChange", Name),
+    ("onClear", "onClear", Name),
+    ("onInput", "onInput", Name),
+    ("prop", "prop", Name),
+    ("restLabel", "restLabel", Name),
+    ("restPress", "restPress", Name),
+    ("restShown", "restShown", Name),
+    ("restWords", "restWords", Name),
+    ("segmented", "segmented", Name),
+    ("segments", "segments", Name),
+    ("tags", "tags", Name),
+    ("tagsShown", "tagsShown", Name),
+];
+
 const PAGINATION_SIZE: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1319,6 +1338,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("paginationRoot", "paginationRoot", PAGINATION_ROOT),
     ("paginationSize", "paginationSize", PAGINATION_SIZE),
     ("datePicker", "datePicker", DATE_PICKER),
+    ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),
     ("combobox", "combobox", COMBOBOX),
