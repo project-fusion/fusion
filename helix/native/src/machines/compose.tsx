@@ -46,7 +46,7 @@ import { useOption, useOptionGroup } from './option'
 import { usePage } from './page'
 import { usePagination, usePaginationSize } from './pagination'
 import { usePickerField } from './picker-field'
-import { dateFieldKind } from './picker-field-kind'
+import { fieldKindFor } from './picker-field-kind'
 import { pressing } from './pressing'
 import { boundTo } from './props'
 import { useRange } from './range'
@@ -486,7 +486,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
               props,
               use,
               around,
-              dateFieldKind,
+              fieldKindFor(family),
             )
             around.chosen.current = value
             around.spun.current = spun
