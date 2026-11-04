@@ -80,6 +80,7 @@ import type {
   PaginationSizeChoice,
   PickerFieldChoice,
   SelectChoice,
+  SparklineChoice,
   TableChoice,
   TableColumnChoice,
   TableRowChoice,
@@ -348,6 +349,8 @@ export interface Headless {
   readonly datePicker?: DatePickerChoice
   /** What the element reads, sends, and computes where it is a list of times. */
   readonly timePicker?: TimePickerChoice
+  /** What the element reads, sends, and computes where it is a sparkline. */
+  readonly sparkline?: SparklineChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */
