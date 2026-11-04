@@ -2,8 +2,12 @@ import {
   AriaForwardController,
   valueAsTime as asTime,
   clockLocale,
+  committedTimes,
+  committedValue,
   customElement,
+  draftKey,
   drawIcon,
+  exampleTime,
   formatWords,
   timeAsValue as fromTime,
   type HelixBeforeChangeEvent,
@@ -11,8 +15,8 @@ import {
   HelixFormElement,
   type HourCycle,
   handedLocale,
+  heldValues,
   hostWords,
-  isClockValue,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -21,9 +25,17 @@ import {
   MixinSegmentedField,
   MixinTokens,
   numberConverter,
-  readWrittenTime,
+  type PickerKind,
+  type PickerMode,
+  pickedValues,
+  pickerAnswers,
+  pickerDisplay,
+  shownValues,
   slottedWords,
-  timeFault,
+  timeFieldFault,
+  timeKind,
+  typedValue,
+  withoutValue,
   words,
   wordsLocale,
   writeClock,
@@ -426,17 +438,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   @property({ attribute: 'unavailable-message' })
   unavailableMessage = 'Choose a time that is available.'
 
-  /** Every time in the value, which may hold more than one. */
-  private get held(): string[] {
-    /* The en dash and the spaced hyphen both mean "to", because a range is shown
-       that way and what is shown is what gets typed back. A time carries a colon
-       rather than a hyphen, so unlike a date there is no ambiguity to guard
-       against, and the guard is kept anyway for the sake of one reading. */
-    return this.value
-      .replace(/\s+[–-]\s+/g, ',')
-      .split(',')
-      .map((one) => one.trim())
-      .filter(Boolean)
+  /** How this field tells, writes, and reads back one time, which core's picker text reads. */
+  private get kind(): PickerKind {
+    return timeKind(this.timeStyle, this.language, this.hourCycle, this.seconds)
+  }
+
+  /** One, a range, or several, as core's picker text names them. */
+  private get held(): PickerMode {
+    return this.mode ?? 'single'
   }
 
   /**
@@ -464,29 +473,23 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
     return { hourCycle: this.hourCycle, seconds: this.seconds }
   }
 
-  /** Whether a typed time is one this field holds, to the second where it holds seconds. */
-  private isTime(at: string): boolean {
-    return isClockValue(at, this.seconds)
-  }
-
   /** One time, written the way `time-style` asks for. */
   private written(at: string): string {
-    return this.timeStyle === 'iso' || !this.isTime(at)
-      ? at
-      : writeClock(at, clockLocale(this.language, this.hourCycle), this.seconds)
+    return this.kind.written(at)
   }
 
   /** What the field shows: the value while it is being edited, a reading when not. */
   protected override get display(): string {
-    if (this.mode === 'multiple') {
-      return this.draft
-    }
-    const held = this.held
-    if (this.editing || this.timeStyle === 'iso') {
-      return this.mode === 'range' && held.length === 2 ? held.join(' – ') : this.value
-    }
-    const written = held.map((one) => this.written(one))
-    return this.mode === 'range' ? written.join(' – ') : written.join(', ')
+    return pickerDisplay(
+      {
+        draft: this.draft,
+        editing: this.editing,
+        iso: this.timeStyle === 'iso',
+        mode: this.held,
+        value: this.value,
+      },
+      this.kind,
+    )
   }
 
   /**
@@ -499,66 +502,61 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   @state()
   private draft = ''
 
-  /** The times that get a tag, which is all of them until the cap says not. */
+  /**
+   * The times that get a tag, which is all of them until the cap says not:
+   * `shownLimit` rather than `maxTags`, since the mixin returns zero while
+   * expanded, so the cap lifts.
+   */
   private get shownTimes(): string[] {
-    const held = this.held
-    /* `shownLimit` rather than `maxTags`, which is the whole of what
-       expanding does: the mixin returns zero while expanded, so the cap
-       lifts and every time gets a tag. */
-    return this.shownLimit > 0 ? held.slice(0, this.shownLimit) : held
+    return shownValues(this.value, this.shownLimit).shown
   }
 
   /** How many are held beyond the ones shown. */
   private get restCount(): number {
-    return Math.max(0, this.held.length - this.shownTimes.length)
+    return shownValues(this.value, this.shownLimit).rest
   }
 
   /**
-   * A time as the reader wrote it, as the value writes one: `HH:mm` as it
-   * is, and `2:30 PM`, `2.30pm`, `14h30`, or `1430` read back, with the half
-   * of the day in the locale's words. Empty where it is no time.
-   */
-  private read(text: string): string {
-    return this.isTime(text) ? text : readWrittenTime(text, this.language, this.seconds)
-  }
-
-  /**
-   * The text the reader leaves, read: a time written as a reader writes one
-   * becomes the value as the field commits. Not on each key, where `2:3` is
-   * a time a moment before it is `2:30`.
+   * The text the reader leaves, read: a time written as a reader writes one,
+   * `2:30 PM`, `2.30pm`, `14h30`, or `1430`, becomes the value as the field
+   * commits, with the half of the day in the locale's words. Not on each key,
+   * where `2:3` is a time a moment before it is `2:30`.
    */
   private readonly handleTextCommit = (event: Event): void => {
     if (this.mode !== 'multiple') {
-      const held = this.held
-      const read = held.map((one) => this.read(one))
-      if (held.length > 0 && !held.every((one) => this.isTime(one)) && read.every(Boolean)) {
-        this.requestValue(read.join(','))
+      const read = committedValue(committedTimes(this.value), this.kind)
+      if (read !== undefined) {
+        this.requestValue(read)
       }
     }
     this.handleCommit(event)
   }
 
-  /** Adds what was typed to the set, or takes the last one back out. */
+  /** Adds what was typed to the set, kept in order, or takes the last one back out. */
   private readonly handleDraftKey = (event: KeyboardEvent): void => {
     if (this.mode !== 'multiple') {
       return
     }
-    const held = this.held
-    const draft = this.read(this.draft.trim())
-    if (event.key === 'Enter' && draft !== '') {
+    const answer = draftKey(
+      event.key,
+      { draft: this.draft, sorts: true, value: this.value },
+      this.kind,
+    )
+    if (answer === undefined) {
+      return
+    }
+    if (answer.cleared) {
       event.preventDefault()
-      if (!held.includes(draft)) {
-        this.requestPicked([...held, draft].sort().join(','))
-      }
       this.draft = ''
-    } else if (event.key === 'Backspace' && this.draft === '' && held.length > 0) {
-      this.requestPicked(held.slice(0, -1).join(','))
+    }
+    if (answer.value !== undefined) {
+      this.requestPicked(answer.value)
     }
   }
 
   /** Takes one time back out of the set. */
   private readonly removeTime = (at: string): void => {
-    this.requestPicked(this.held.filter((one) => one !== at).join(','))
+    this.requestPicked(withoutValue(this.value, at))
   }
 
   /**
@@ -569,8 +567,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * reason Date Input withholds a half-typed date from its calendar.
    */
   private get picked(): string {
-    const held = this.held
-    return held.length > 0 && held.every((one) => this.isTime(one)) ? held.join(',') : ''
+    return pickedValues(this.value, this.kind)
   }
 
   private readonly handleInput = (event: Event): void => {
@@ -587,13 +584,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
        until then, which is the same rule Date Input follows: a form should
        submit `09:00,17:00` however the dash was written, and half-typed text
        must survive so the caret does not move mid-entry. */
-    const held = typed
-      .replace(/\s+[–-]\s+/g, ',')
-      .split(',')
-      .map((one) => one.trim())
-      .filter(Boolean)
-    const whole = held.length > 0 && held.every((one) => this.isTime(one))
-    this.requestValue(whole ? held.join(',') : typed)
+    this.requestValue(typedValue(typed, this.kind))
     this.restore()
   }
 
@@ -644,64 +635,41 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * range written `09:00/10:30` was invalid and submitted the text.
    */
   protected override get answers(): readonly string[] | undefined {
-    if (this.mode !== undefined) {
-      const held = this.held
-      return held.every((one) => this.isTime(one)) ? held : ['']
-    }
-    const text = this.value.trim()
-    return text === '' || this.isTime(text) ? undefined : ['']
+    return pickerAnswers(this.held, this.value, this.kind)
   }
-  /** What is wrong with the times, which the text input cannot say. */
-  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
-    /* Checked here rather than left to the input, which is `text` and has no
-       idea what a time is.
 
-       **Every time in the value, not the value itself**, which is what Date
-       Input's own note says and what this was missing. A range holds two and a
-       multiple holds any number, joined by commas, so `isClockValue` on the whole
-       string answered false for every range that had been filled in: two times
-       chosen from the picker reported "Enter a time as HH:mm" and the field went
-       invalid on being used correctly. */
-    const held = this.held
-    if (held.length > 0 && !held.every((one) => this.isTime(one))) {
-      return (
-        this.badInputMessage ||
-        formatWords(this, 'unreadableMessage', {
-          example: this.written(this.seconds ? '14:30:15' : '14:30'),
-          mode: this.mode ?? 'single',
-          shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
-        })
-      )
-    }
-    /* Each fault across every time, in the order the messages take, so a
-       range with one end early and the other late says it is early. */
-    const rules = { disableTimes: this.disableTimes, max: this.max, min: this.min }
-    const faults = held.map((one) => timeFault(one, rules))
-    /* With the flag a native time input sets, as Time Picker reports them; a
-       time barred by name is `badInput`, there being no native flag for one. */
-    if (faults.includes('rangeUnderflow')) {
-      return [
-        'rangeUnderflow',
-        formatWords(this, 'rangeUnderflowMessage', {
-          min: writeClock(this.min, clockLocale(this.language, this.hourCycle), this.seconds),
-        }),
-      ]
-    }
-    if (faults.includes('rangeOverflow')) {
-      return [
-        'rangeOverflow',
-        formatWords(this, 'rangeOverflowMessage', {
-          max: writeClock(this.max, clockLocale(this.language, this.hourCycle), this.seconds),
-        }),
-      ]
-    }
-    if (faults.includes('unavailable')) {
-      return this.unavailableMessage
-    }
-    if (this.mode === 'range' && held.length > 2) {
-      return this.rangeLengthMessage
-    }
-    return ''
+  /**
+   * What is wrong with the times, which the text input cannot say: core's
+   * `timeFieldFault` over every time in the value, each bound written on the
+   * field's clock.
+   */
+  protected override validate(): string | readonly [keyof ValidityStateFlags, string] {
+    const clock = clockLocale(this.language, this.hourCycle)
+    return timeFieldFault(
+      this.held,
+      this.value,
+      { disableTimes: this.disableTimes, max: this.max, min: this.min },
+      this.seconds,
+      {
+        bad: () =>
+          this.badInputMessage ||
+          formatWords(this, 'unreadableMessage', {
+            example: this.written(exampleTime(this.seconds)),
+            mode: this.held,
+            shape: this.seconds ? 'HH:mm:ss' : 'HH:mm',
+          }),
+        length: this.rangeLengthMessage,
+        over: () =>
+          formatWords(this, 'rangeOverflowMessage', {
+            max: writeClock(this.max, clock, this.seconds),
+          }),
+        unavailable: this.unavailableMessage,
+        under: () =>
+          formatWords(this, 'rangeUnderflowMessage', {
+            min: writeClock(this.min, clock, this.seconds),
+          }),
+      },
+    )
   }
 
   /**
@@ -860,7 +828,9 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       .value=${this.display}
       name=${this.name || nothing}
       placeholder=${
-        this.mode === 'multiple' && this.held.length > 0 ? nothing : this.placeholder || nothing
+        this.mode === 'multiple' && heldValues(this.value).length > 0
+          ? nothing
+          : this.placeholder || nothing
       }
       role="combobox"
       aria-controls="surface"
