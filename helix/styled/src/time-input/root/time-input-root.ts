@@ -5,14 +5,7 @@ import type { CSSResultGroup } from 'lit'
    it to remind anyone. */
 import '../../tag/root/index.js'
 import '../../time-picker/index.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles as floatingEntranceStyles } from './time-input-entrance.css.js'
-import { styles as floatingPanelStyles } from './time-input-panel.css.js'
-import { styles } from './time-input-root.css.js'
-import { styles as fieldSegmentsStyles } from './time-input-segments.css.js'
-import { styles as tagRowStyles } from './time-input-tags.css.js'
+import { styles } from './time-input-root.generated.css.js'
 
 /**
  * @summary A field for a time, typed or picked from a list.
@@ -53,16 +46,7 @@ import { styles as tagRowStyles } from './time-input-tags.css.js'
 export class HelixTimeInput extends HelixHeadlessTimeInput {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    fieldStyles,
-    fieldFrameStyles,
-    fieldStackedStyles,
-    fieldSegmentsStyles,
-    tagRowStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

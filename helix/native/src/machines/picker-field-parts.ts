@@ -199,7 +199,7 @@ export const fieldParts = (now: FieldNow) => {
             heard.preventDefault()
             return
           }
-          if (kind.mode === 'single') {
+          if (kind.mode === 'single' && kind.closesOnPick) {
             moves.close()
             focusText()
           }

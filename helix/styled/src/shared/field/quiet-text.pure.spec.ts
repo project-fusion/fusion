@@ -23,9 +23,9 @@ const SRC = join(import.meta.dir, '..', '..')
 const QUIET: [sheet: string, selector: string, property: string][] = [
   ['shared/field/field.css', '::placeholder', 'color'],
   ['shared/field/field.css', '[part="hint"]', 'color'],
-  ['time-input/root/time-input-segments.css', '[part~="segment-placeholder"]', 'color'],
+  ['time-input/root/time-input-root.generated.css', '[part~="segment-placeholder"]', 'color'],
   ['shared/collection/state.css', '[part="empty"]', 'color'],
-  ['time-input/root/time-input-tags.css', '[part="rest"]', 'color'],
+  ['time-input/root/time-input-root.generated.css', '[part="rest"]', 'color'],
   ['canvas/node/canvas-node.css', '::slotted([slot="description"])', 'color'],
   ['canvas/root/canvas-root.css', '[part="label"]', 'color'],
   ['chat/root/chat-root.generated.css', '[part="history"]', 'color'],
@@ -86,8 +86,12 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['tabs/root/tabs-root.generated.css', '[part="scroll-start"]', 'color'],
   ['tabs/tab/tab.generated.css', '[part="tab"]', 'color'],
   ['textarea/root/textarea-root.generated.css', 'slot[name="start"]', 'color'],
-  ['time-input/root/time-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
-  ['time-input/root/time-input-root.css', 'slot[name="start"]', 'color'],
+  [
+    'time-input/root/time-input-root.generated.css',
+    '[part="segments"]',
+    '--_segment-placeholder-color',
+  ],
+  ['time-input/root/time-input-root.generated.css', 'slot[name="start"]', 'color'],
   ['time-picker/root/time-picker-root.generated.css', '[part="hint"]', 'color'],
   ['tree/root/tree-root.generated.css', ':host([nesting="heading"])', '--_tree-heading-ink'],
   [
@@ -139,7 +143,7 @@ const inkOf = (sheet: string, selector: string, property: string): string | unde
 /** Every placeholder rule, which sets the weight a placeholder is drawn at. */
 const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field.css', '::placeholder'],
-  ['time-input/root/time-input-segments.css', '[part~="segment-placeholder"]'],
+  ['time-input/root/time-input-root.generated.css', '[part~="segment-placeholder"]'],
   ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
   ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],
