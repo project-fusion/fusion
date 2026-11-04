@@ -5,6 +5,7 @@ import {
   HelixLoadEvent,
   hostAria,
   internalsOf,
+  onUnlessFalse,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -16,6 +17,15 @@ import { property, state } from 'lit/decorators.js'
  * An inactive panel is hidden and stays mounted. Anything typed into it is
  * still there when the person comes back, and the content of every panel is in
  * the server-rendered markup for crawlers, whichever tab is open.
+ *
+ * The browser's find in page searches an inactive panel, and a match selects
+ * its tab, with `helix-before-activate` first, as a match in a closed
+ * accordion section opens it. An inactive panel is `hidden="until-found"`,
+ * which hides it with no stylesheet loaded and keeps it out of the tab order
+ * and the accessibility tree. Set `hidden-until-found="false"` on the panel,
+ * or on the tabs for every panel, and an inactive panel is `hidden` instead,
+ * and find in page skips it. A `lazy` panel that has not been shown holds only
+ * its template, so there is nothing in it to find.
  *
  * The host is the `tabpanel` while its tab is selected, through
  * `ElementInternals`, so the tab's `aria-controls` can reach it from the tab's
@@ -46,6 +56,24 @@ import { property, state } from 'lit/decorators.js'
  */
 @customElement('helix-headless-tab-panel')
 export class HelixHeadlessTabPanel extends HelixElement {
+  /**
+   * @internal The tabs' `hidden-until-found`, written by the tabs, for the
+   * reason `label` is a property.
+   */
+  @property({ attribute: false })
+  groupHiddenUntilFound = true
+
+  /**
+   * Whether find in page searches the panel while its tab is not selected, and
+   * selects the tab on a match.
+   *
+   * Unset takes the tabs' `hidden-until-found`, which is on. Write
+   * `hidden-until-found="false"` to keep find in page out of this panel: an
+   * inactive panel is then `hidden`.
+   */
+  @property({ attribute: 'hidden-until-found', converter: onUnlessFalse })
+  hiddenUntilFound?: boolean
+
   /**
    * @internal The name of the panel, which is the text of the tab that opens it.
    *
@@ -88,6 +116,13 @@ export class HelixHeadlessTabPanel extends HelixElement {
     this.toggleState('loaded', true)
     this.dispatchEvent(new HelixLoadEvent())
   }
+
+  /**
+   * @internal Asks the tabs to select this panel's tab, and says whether they
+   * did. Written by the tabs, which own the choice: a panel cannot select
+   * itself without leaving its tab and `active` behind.
+   */
+  requestShow: (() => boolean) | undefined
 
   /**
    * Whether this panel is the visible one.
@@ -133,6 +168,34 @@ export class HelixHeadlessTabPanel extends HelixElement {
     this.watcher?.disconnect()
   }
 
+  /** Whether find in page searches this panel while it is not selected. */
+  private get findable(): boolean {
+    return this.hiddenUntilFound ?? this.groupHiddenUntilFound
+  }
+
+  /**
+   * Selects this panel's tab when find in page matches inside it, before the
+   * match is shown.
+   *
+   * A refusal puts `hidden` back, so the tab and the panel still agree. The
+   * browser removes the attribute after this event's listeners have returned,
+   * and after the microtasks they queued, so a mutation observer is what hears
+   * the removal, as on the accordion item.
+   */
+  private readonly handleBeforeMatch = (event: Event): void => {
+    if (this.selected || this.requestShow?.() === true) {
+      return
+    }
+    const panel = event.currentTarget as HTMLElement
+    const observer = new MutationObserver(() => {
+      observer.disconnect()
+      if (!this.selected && !panel.hasAttribute('hidden')) {
+        panel.setAttribute('hidden', this.findable ? 'until-found' : '')
+      }
+    })
+    observer.observe(panel, { attributeFilter: ['hidden'] })
+  }
+
   /* After the render that shows the content, since a hidden panel's content
      has no box and so no stop. */
   protected override updated(changed: PropertyValues): void {
@@ -167,10 +230,14 @@ export class HelixHeadlessTabPanel extends HelixElement {
   }
 
   protected override render(): TemplateResult {
+    /* **No tab stop while not selected.** `hidden="until-found"` hides the
+       content through `content-visibility` and leaves the panel's own box in
+       the tree, so a `tabindex` here would make an inactive panel focusable. */
     return html`<div
       part="panel"
-      ?hidden=${!this.selected}
-      tabindex=${this.holdsStop ? nothing : '0'}
+      hidden=${this.selected ? nothing : this.findable ? 'until-found' : ''}
+      tabindex=${!this.selected || this.holdsStop ? nothing : '0'}
+      @beforematch=${this.handleBeforeMatch}
     >
       <slot @slotchange=${this.readStops}></slot>
     </div>`

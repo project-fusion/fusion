@@ -9,6 +9,10 @@
 }
 
 [part="panel"] {
+  /* Every panel in the one cell. An inactive panel that find in page can
+     search keeps a box of its own, and placed by the grid it took a row below
+     the panel showing, whose padding added space nobody could see. */
+  grid-area: 1 / 1;
   min-block-size: 0;
   min-inline-size: 0;
   outline: none;
@@ -19,6 +23,17 @@
   padding-inline-start: var(--_tabs-panel-padding-inline-start, var(--helix-space-none));
 }
 
-[part="panel"][hidden] {
+/* **Never `display: none` on a panel find in page can search.** Content under
+   `display: none` is not searched, so this would undo `hidden="until-found"`,
+   which hides through `content-visibility` and keeps the panel's own box.
+   That box has to take no room in the cell it shares: stretched, it was as
+   tall as the panel showing and lay over it, where it took the clicks meant
+   for the content underneath. */
+[part="panel"][hidden="until-found"] {
+  align-self: start;
+  padding: 0;
+}
+
+[part="panel"][hidden]:not([hidden="until-found"]) {
   display: none;
 }

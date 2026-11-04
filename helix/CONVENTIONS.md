@@ -214,6 +214,20 @@ consumer styles would animate open to nothing. It also needs a `beforematch`
 handler to set the open state, or find-in-page reveals content while the trigger
 still reports collapsed.
 
+**And a sheet that writes `display: none` on `[hidden]` undoes it**, because
+content under `display: none` is never searched. The region also keeps a box of
+its own, which a `tabindex` makes focusable. Tab panels carry all three: the
+styled sheet excludes `[hidden="until-found"]` from its `display: none`, gives
+that box no height in the cell the panels share, and the panel drops its
+`tabindex` while it is not selected. Measured in Chromium on November 4, 2026,
+through a text fragment, which reveals the way find in page does: the match
+selected its tab, a refused `helix-before-activate` left the panel hidden, and
+the inactive panel's box took no space and no clicks.
+
+Carousel needs none of this. Its slides are scrolled out of view and not hidden,
+so the browser scrolls the track to a match, and the carousel moved to that
+slide on its own in the same test.
+
 ### The headless tier publishes facts, and CSS is a fine channel for them
 
 **Setting a custom property is not styling, so the tier rule does not bar it.**

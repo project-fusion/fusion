@@ -11,6 +11,7 @@ import {
   KeyboardNavigationController,
   MIRROR_RULE,
   MixinControllerActive,
+  onUnlessFalse,
   scrollWithin,
   whenHydrated,
 } from '@fusion.dev/helix-core'
@@ -150,6 +151,16 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     label: true,
     target: () => this.partNamed('tabs'),
   })
+
+  /**
+   * Whether find in page searches the panels whose tabs are not selected, and
+   * selects the tab on a match. On by default.
+   *
+   * Write `hidden-until-found="false"` to turn it off for every panel; a
+   * panel's own `hidden-until-found` wins for that panel.
+   */
+  @property({ attribute: 'hidden-until-found', converter: onUnlessFalse })
+  hiddenUntilFound = true
 
   /**
    * The tab list's name, read by screen readers.
@@ -379,7 +390,9 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     for (const panel of this.panels) {
       const selected = panel.value === value
       const label = names.get(panel.value) ?? ''
+      panel.requestShow = () => this.requestActive(panel.value)
       whenHydrated(panel, () => {
+        panel.groupHiddenUntilFound = this.hiddenUntilFound
         panel.selected = selected
         panel.label = label
       })
@@ -521,7 +534,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('active')) {
+    if (changed.has('active') || (this.hasUpdated && changed.has('hiddenUntilFound'))) {
       this.sync()
       if (changed.get('active') !== undefined) {
         void this.updateComplete.then(() => this.reveal())
