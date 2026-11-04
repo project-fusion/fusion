@@ -55,6 +55,7 @@ import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
+  AxisChartChoice,
   CarouselChoice,
   ChatComposerChoice,
   ChatMessageChoice,
@@ -357,6 +358,10 @@ export interface Headless {
   readonly donutChart?: DonutChartChoice
   /** What the element reads, sends, and computes where it is a chart's key. */
   readonly legend?: LegendChoice
+  /** What the element reads, sends, and computes where it is a chart of lines. */
+  readonly lineChart?: AxisChartChoice
+  /** What the element reads, sends, and computes where it is a chart of stacked bands. */
+  readonly areaChart?: AxisChartChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */

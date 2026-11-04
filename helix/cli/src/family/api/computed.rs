@@ -35,6 +35,8 @@ pub const FEATURES: &[&str] = &[
     "sparkline",
     "donutChart",
     "legend",
+    "lineChart",
+    "areaChart",
     "pickerField",
     "listbox",
     "select",
@@ -104,9 +106,10 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             | "logRoot" | "logLine" | "logGroup" | "tail" | "notificationsRoot"
             | "notificationRow" | "notificationGroup" | "codeBlock" | "carousel"
             | "dataTableRoot" | "paginationRoot" | "paginationSize" | "datePicker"
-            | "pickerField" | "timePicker" | "sparkline" | "donutChart" | "legend" | "listbox"
-            | "select" | "combobox" | "commandRoot" | "filterInput" | "filterMenu" | "option"
-            | "optionGroup" | "chatRoot" | "chatMessage" | "chatComposer" => {
+            | "pickerField" | "timePicker" | "sparkline" | "donutChart" | "legend"
+            | "lineChart" | "areaChart" | "listbox" | "select" | "combobox" | "commandRoot"
+            | "filterInput" | "filterMenu" | "option" | "optionGroup" | "chatRoot"
+            | "chatMessage" | "chatComposer" => {
                 let choice = super::tree_choice::by_key(&key, value)?;
                 for (field, name) in choice.computed {
                     push(&format!("{key}.{field}"), &name);
