@@ -1017,7 +1017,8 @@ export interface SvgAttributes extends Named {
   readonly part: string
   /** `none` stretches the drawing to fill its box on both axes, as a sparkline's strip fills a slot of any width. */
   readonly preserveAspectRatio?: 'none'
-  readonly viewBox: string
+  /** Four numbers, or a value the element computes, as a half ring crops its box to its thickness. */
+  readonly viewBox: string | Read
 }
 
 /** A vector. */

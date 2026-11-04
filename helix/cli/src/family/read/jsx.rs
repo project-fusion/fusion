@@ -91,6 +91,8 @@ const GIVEN: &[&str] = &[
     "datePicker",
     "timePicker",
     "sparkline",
+    "donutChart",
+    "legend",
     "pickerField",
     "listbox",
     "select",

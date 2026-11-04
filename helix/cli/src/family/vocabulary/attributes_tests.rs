@@ -317,6 +317,8 @@ fn takes_a_custom_property_on_a_box_and_a_press() {
 fn takes_a_vector_with_no_view_box_a_bound_role_and_a_busy_box() {
     assert!(attribute(NodeKind::Box, "track", "viewBox", &text("none")).is_ok());
     assert!(attribute(NodeKind::Box, "track", "viewBox", &text("auto")).is_err());
+    /* A half ring crops its box to its thickness, a value the element computes. */
+    assert!(attribute(NodeKind::Box, "ring", "viewBox", &bind("frame")).is_ok());
     assert!(attribute(NodeKind::Box, "host", "role", &bind("spoken-role")).is_ok());
     assert!(attribute(NodeKind::Box, "host", "busy", &bind("loading")).is_ok());
     assert!(attribute(NodeKind::Region, "label", "names", &Attribute::Flag(true)).is_ok());

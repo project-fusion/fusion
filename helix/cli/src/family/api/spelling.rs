@@ -914,6 +914,40 @@ const SPARKLINE: &[Field] = &[
     ("washed", "washed", Name),
 ];
 
+const DONUT_CHART: &[Field] = &[
+    ("aspect", "aspect", Name),
+    ("cells", "cells", Name),
+    ("centered", "centered", Name),
+    ("drawn", "drawn", Name),
+    ("empty", "empty", Name),
+    ("frame", "frame", Name),
+    ("labelled", "labelled", Name),
+    ("labels", "labels", Name),
+    ("live", "live", Name),
+    ("loading", "loading", Name),
+    ("markX", "markX", Name),
+    ("markY", "markY", Name),
+    ("named", "named", Name),
+    ("onReadingChange", "onReadingChange", Name),
+    ("onReadingPress", "onReadingPress", Name),
+    ("placement", "placement", Name),
+    ("role", "role", Name),
+    ("slices", "slices", Name),
+    ("stroke", "stroke", Name),
+    ("summary", "summary", Name),
+    ("tipLabel", "tipLabel", Name),
+    ("tipped", "tipped", Name),
+    ("track", "track", Name),
+];
+
+const LEGEND: &[Field] = &[
+    ("entries", "entries", Name),
+    ("named", "named", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onChange", "onChange", Name),
+    ("role", "role", Name),
+];
+
 const PAGINATION_SIZE: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1385,6 +1419,8 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("datePicker", "datePicker", DATE_PICKER),
     ("timePicker", "timePicker", TIME_PICKER),
     ("sparkline", "sparkline", SPARKLINE),
+    ("donutChart", "donutChart", DONUT_CHART),
+    ("legend", "legend", LEGEND),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),
