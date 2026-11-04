@@ -1,5 +1,6 @@
 import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import type { KeyPress, Stop } from '@fusion.dev/helix-core/capabilities/types'
+import type { Flag } from '@fusion.dev/helix-core/machines/validation/machine'
 import {
   type NumberField,
   type NumberFlaw,
@@ -124,6 +125,11 @@ const useScrub = (
 export interface Spun {
   /** What core's `numberFieldFlaw` finds wrong with the text, or `undefined`. */
   readonly flaw: NumberFlaw | undefined
+  /**
+   * What the field says is wrong with what it holds, in its own sentence, as a
+   * date field says a date is barred: a flag the web sets and its message.
+   */
+  readonly said?: { readonly flag: Flag; readonly message: string } | undefined
   /** The locale its sentences write their numbers in. */
   readonly locale: string
 }

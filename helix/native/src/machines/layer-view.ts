@@ -2,7 +2,9 @@
  * What a layer's own view takes, and what the layer answers and tells back
  * to a machine bound before it, as a tour stop's.
  */
+
 import type { Around } from './binder'
+import type { Landing } from './layer-anchor'
 
 /** A view that takes no touch and that no screen reader reaches. */
 const HIDDEN = {
@@ -38,13 +40,21 @@ export const answeredFirst = (
   return asked?.dismiss?.(by)
 }
 
-/** Tells the machine that answers for the layer whether focus is inside it, and its view. */
+/**
+ * Tells the machine that answers for the layer whether focus is inside it, its
+ * view, and how to take focus in as it next opens, as a field's trigger opens
+ * its panel with focus inside where a press on its text leaves the caret.
+ */
 export const tellBack = (
   asked: Around['layering'] | undefined,
   holds: () => boolean,
   view: unknown,
+  landing: { current: Landing | undefined },
 ): void => {
   if (asked !== undefined) {
+    asked.enter = (where) => {
+      landing.current = where
+    }
     asked.holds = holds
     asked.view = () => view
   }

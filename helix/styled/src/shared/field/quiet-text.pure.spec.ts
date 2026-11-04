@@ -23,9 +23,9 @@ const SRC = join(import.meta.dir, '..', '..')
 const QUIET: [sheet: string, selector: string, property: string][] = [
   ['shared/field/field.css', '::placeholder', 'color'],
   ['shared/field/field.css', '[part="hint"]', 'color'],
-  ['shared/field/field-segments.css', '[part~="segment-placeholder"]', 'color'],
+  ['time-input/root/time-input-segments.css', '[part~="segment-placeholder"]', 'color'],
   ['shared/collection/state.css', '[part="empty"]', 'color'],
-  ['shared/tags/tags.css', '[part="rest"]', 'color'],
+  ['time-input/root/time-input-tags.css', '[part="rest"]', 'color'],
   ['canvas/node/canvas-node.css', '::slotted([slot="description"])', 'color'],
   ['canvas/root/canvas-root.css', '[part="label"]', 'color'],
   ['chat/root/chat-root.generated.css', '[part="history"]', 'color'],
@@ -33,8 +33,12 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['color-input/root/color-input-root.generated.css', 'slot[name="start"]', 'color'],
   ['color-picker/root/color-picker-root.generated.css', '[part="hint"]', 'color'],
   ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder', 'color'],
-  ['date-input/root/date-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
-  ['date-input/root/date-input-root.css', 'slot[name="start"]', 'color'],
+  [
+    'date-input/root/date-input-root.generated.css',
+    '[part="segments"]',
+    '--_segment-placeholder-color',
+  ],
+  ['date-input/root/date-input-root.generated.css', 'slot[name="start"]', 'color'],
   ['date-picker/root/date-picker-root.generated.css', '[part="weekday"]', 'color'],
   ['drilldown/item/drilldown-item.generated.css', 'slot[name="description"]', 'color'],
   ['filter-input/chip/filter-chip.generated.css', '[part="dismiss"]', 'color'],
@@ -135,7 +139,7 @@ const inkOf = (sheet: string, selector: string, property: string): string | unde
 /** Every placeholder rule, which sets the weight a placeholder is drawn at. */
 const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field.css', '::placeholder'],
-  ['shared/field/field-segments.css', '[part~="segment-placeholder"]'],
+  ['time-input/root/time-input-segments.css', '[part~="segment-placeholder"]'],
   ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
   ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],

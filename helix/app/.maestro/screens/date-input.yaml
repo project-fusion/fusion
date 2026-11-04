@@ -1,0 +1,64 @@
+# Date Input, its examples drawn alone: the field, its segments, the calendar its
+# trigger opens on the date it holds, the field after a pick, several dates as tags,
+# a range, and a date the bounds refuse. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`. A control is named by its words, so each wait
+# matches the words inside.
+appId: dev.fusion.helix.app
+name: "Screens: Date Input"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://date-input/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Choose a date.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-preview-${MODE}-${SIZE}
+- openLink: helix://date-input/segmented/preview
+- extendedWaitUntil:
+    visible: '.*Choose a date.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-segmented-${MODE}-${SIZE}
+- tapOn:
+    text: '.*Choose a date.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*August 2026.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-segmented-open-${MODE}-${SIZE}
+- tapOn:
+    text: '.*Tuesday, August 11, 2026.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    notVisible: '.*Next month.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-segmented-picked-${MODE}-${SIZE}
+- openLink: helix://date-input/multiple/preview
+- extendedWaitUntil:
+    visible: '.*August 4, 2026.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-multiple-${MODE}-${SIZE}
+- openLink: helix://date-input/range/preview
+- extendedWaitUntil:
+    visible: '.*Choose a date.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-range-${MODE}-${SIZE}
+- openLink: helix://date-input/invalid/preview
+- extendedWaitUntil:
+    visible: '.*Choose a date.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: date-input-invalid-${MODE}-${SIZE}

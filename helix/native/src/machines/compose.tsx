@@ -45,6 +45,8 @@ import { useNotifications } from './notifications'
 import { useOption, useOptionGroup } from './option'
 import { usePage } from './page'
 import { usePagination, usePaginationSize } from './pagination'
+import { usePickerField } from './picker-field'
+import { dateFieldKind } from './picker-field-kind'
 import { pressing } from './pressing'
 import { boundTo } from './props'
 import { useRange } from './range'
@@ -462,6 +464,24 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useDatePicker(family, props, use),
+      ),
+    /* A field of dates or times, which the verdict reads as its answer and its faults. */
+    ...uses
+      .filter((use) => use.machine === 'picker-field')
+      .map(
+        (use): Binder =>
+          (props, around) => {
+            const { behavior, spun, value } = usePickerField(
+              family,
+              props,
+              use,
+              around,
+              dateFieldKind,
+            )
+            around.chosen.current = value
+            around.spun.current = spun
+            return behavior
+          },
       ),
     /* A carousel. */
     ...uses
