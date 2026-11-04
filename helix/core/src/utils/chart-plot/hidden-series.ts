@@ -1,10 +1,12 @@
-import { commaList, seriesKey } from '@fusion.dev/helix-core'
+import { seriesKey } from '../read-series/read-series.js'
+import { commaList } from '../written-list/written-list.js'
 
 /*
  * The names in a Legend's `hidden-series`, and what a toggle leaves there.
  *
- * Pure and beside the family's `index.ts`, because what a press does to the
- * list is a fact about lists and not about the legend's template.
+ * Pure and in core, because what a press does to the list is a fact about
+ * lists and not about the legend's template, and a phone's legend presses
+ * the same way.
  *
  * **Commas only**, through `commaList`, because a column's heading may hold a
  * space: split on whitespace, `Direct sales` would hide a series called
