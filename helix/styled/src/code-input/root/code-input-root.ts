@@ -4,8 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from './code-input-frame.css.js'
-import { styles as fieldStackedStyles } from './code-input-stacked.css.js'
 import { styles } from './code-input-root.css.js'
+import { styles as fieldStackedStyles } from './code-input-stacked.css.js'
 import '../../voice-level/index.js'
 
 /**
