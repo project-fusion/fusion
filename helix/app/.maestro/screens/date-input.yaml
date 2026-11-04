@@ -2,7 +2,10 @@
 # trigger opens on the date it holds, the field after a pick, several dates as tags,
 # a range, and a date the bounds refuse. One screenshot of each, named by the
 # example, `MODE`, and `SIZE`. A control is named by its words, so each wait
-# matches the words inside.
+# matches the words inside. Each example is waited for by words only it draws, its
+# hint or its feedback: every example has a trigger named "Choose a date", so a wait
+# on that passed on the example before while the link was still opening, and the
+# press reached the trigger of a screen on its way out.
 appId: dev.fusion.helix.app
 name: "Screens: Date Input"
 ---
@@ -11,14 +14,14 @@ name: "Screens: Date Input"
     commands:
       - openLink: helix://date-input/preview/preview
       - extendedWaitUntil:
-          visible: '.*Choose a date.*'
+          visible: '.*Any weekday works.*'
           timeout: 30000
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: date-input-preview-${MODE}-${SIZE}
 - openLink: helix://date-input/segmented/preview
 - extendedWaitUntil:
-    visible: '.*Choose a date.*'
+    visible: '.*Type the digits.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
@@ -43,21 +46,21 @@ name: "Screens: Date Input"
 - takeScreenshot: date-input-segmented-picked-${MODE}-${SIZE}
 - openLink: helix://date-input/multiple/preview
 - extendedWaitUntil:
-    visible: '.*August 4, 2026.*'
+    visible: '.*Choose one or more dates.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: date-input-multiple-${MODE}-${SIZE}
 - openLink: helix://date-input/range/preview
 - extendedWaitUntil:
-    visible: '.*Choose a date.*'
+    visible: '.*Choose a start and end date.*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: date-input-range-${MODE}-${SIZE}
 - openLink: helix://date-input/invalid/preview
 - extendedWaitUntil:
-    visible: '.*Choose a date.*'
+    visible: '.*(Your plan starts on this date|on or after August 1, 2026).*'
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
