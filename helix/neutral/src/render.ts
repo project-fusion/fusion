@@ -376,6 +376,32 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tags'
     | 'tagsShown'
   >
+  /** What a ring of shares computes for its parts: its ring, its slices and their labels, and the bubble on the slice shown. */
+  readonly donutChart: Computes<
+    | 'aspect'
+    | 'cells'
+    | 'centered'
+    | 'drawn'
+    | 'empty'
+    | 'frame'
+    | 'labelled'
+    | 'labels'
+    | 'live'
+    | 'loading'
+    | 'markX'
+    | 'markY'
+    | 'named'
+    | 'placement'
+    | 'role'
+    | 'slices'
+    | 'stroke'
+    | 'summary'
+    | 'tipLabel'
+    | 'tipped'
+    | 'track'
+  >
+  /** What a chart's key computes for its parts: its entries, and its list's name and role. */
+  readonly legend: Computes<'entries' | 'named' | 'role'>
   /** What a sparkline computes for its parts: its marks, where each stands, and the reading shown. */
   readonly sparkline: Computes<
     | 'area'
@@ -1034,7 +1060,7 @@ interface Shape extends Common {
 }
 
 /** A path inside a vector. */
-export const Path = (_: Shape & { readonly d: string | Read }): Drawn => node()
+export const Path = (_: Shape & { readonly d: string | Read | undefined }): Drawn => node()
 
 /** A rectangle inside a vector, at its place and size in the vector's units, as a bar plot's column. */
 export const Rect = (

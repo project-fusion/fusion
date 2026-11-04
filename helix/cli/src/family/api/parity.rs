@@ -107,9 +107,7 @@ pub fn native_exported(tree: &[Node]) -> BTreeSet<String> {
 
 /// The tree the web element draws: every node but those only a phone draws,
 /// as a checkbox's tick, which the web draws as a mask on its mark. **A wrap
-/// only a phone draws leaves its children where it stands**, and so does a
-/// vector only a phone draws, whose shapes the web draws in an `<svg>` with no
-/// part, as a ring's track and slices. A wrap
+/// only a phone draws leaves its children where it stands**, as a wrap
 /// whose `while` does not hold draws its children alone, so a stat's figure
 /// and unit share a line on a phone and stand in the host on the web.
 fn drawn_on_the_web(tree: &[Node]) -> Vec<Node> {
@@ -119,10 +117,8 @@ fn drawn_on_the_web(tree: &[Node]) -> Vec<Node> {
                 node.attributes.get("platform"),
                 Some(Attribute::Text(platform)) if platform == "native"
             );
-            let vector = node.attributes.contains_key("viewBox");
             match (native, node.kind) {
                 (true, NodeKind::Wrap) => drawn_on_the_web(&node.children),
-                (true, _) if vector => drawn_on_the_web(&node.children),
                 (true, _) => Vec::new(),
                 (false, _) => vec![Node {
                     attributes: web_attributes(node),
