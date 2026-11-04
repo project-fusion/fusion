@@ -36,6 +36,25 @@ import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
  * page where it is.
  */
 
+/**
+ * The element named by these words in the root's own tree or in a tree an element
+ * there draws, as a field's calendar draws its days in a root of its own.
+ */
+const labeled = (root: Element, label: string): Element | undefined => {
+  const trees: (Element | ShadowRoot)[] = [root.shadowRoot ?? root]
+  for (const tree of trees) {
+    const found = tree.querySelector(`[aria-label="${label}"]`)
+    if (found !== null) {
+      return found
+    }
+    for (const one of tree.querySelectorAll('*')) {
+      if (one.shadowRoot !== null) {
+        trees.push(one.shadowRoot)
+      }
+    }
+  }
+  return undefined
+}
 /** The element a setup draws, with its props as attributes and what it holds. */
 const build = (setup: Setup): Updatable => {
   const made = document.createElement(setup.tag) as Updatable
@@ -396,8 +415,7 @@ const perform = async (
       return
     case 'press': {
       if (intent.label !== undefined) {
-        const named = mounted.root.shadowRoot?.querySelector(`[aria-label="${intent.label}"]`)
-        tap(named ?? mounted.root, intent.held)
+        tap(labeled(mounted.root, intent.label) ?? mounted.root, intent.held)
         return
       }
       if (intent.link !== undefined) {
