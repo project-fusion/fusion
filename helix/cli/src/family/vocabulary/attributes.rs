@@ -484,7 +484,7 @@ fn fits(shape: Shape, value: &Attribute) -> bool {
         /* A shape's geometry may bind a prop or a value the element
         computes, as a code's modules are a path it derives. */
         | (
-            Shape::Length | Shape::Path,
+            Shape::Length | Shape::Path | Shape::ViewBox,
             Attribute::Bound(Binding::Bind(_)) | Attribute::Derived { .. },
         )
         | (Shape::List, Attribute::Derived { .. })

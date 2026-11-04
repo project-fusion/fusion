@@ -651,6 +651,49 @@ pub const SPARKLINE_COMPUTED: &[&str] = &[
     "washed",
 ];
 
+/// What a ring of shares sends, by the name the machine binds. Its props it
+/// reads by their own names.
+pub const DONUT_CHART: &[(&str, Names)] = &[
+    ("onReadingChange", Names::Event),
+    ("onReadingPress", Names::Event),
+];
+
+/// What a ring of shares computes for its parts, each read as `donutChart.x`:
+/// the ring core draws from its readings, each slice and its label, the
+/// bubble on the slice a finger or a key rests on, and the words in place of
+/// the ring while there is nothing to draw.
+pub const DONUT_CHART_COMPUTED: &[&str] = &[
+    "aspect",
+    "cells",
+    "centered",
+    "drawn",
+    "empty",
+    "frame",
+    "labelled",
+    "labels",
+    "live",
+    "loading",
+    "markX",
+    "markY",
+    "named",
+    "placement",
+    "role",
+    "slices",
+    "stroke",
+    "summary",
+    "tipLabel",
+    "tipped",
+    "track",
+];
+
+/// What a chart's key reads and sends, by the name the machine binds.
+pub const LEGEND: &[(&str, Names)] =
+    &[("onBeforeChange", Names::Event), ("onChange", Names::Event)];
+
+/// What a chart's key computes for its parts, each read as `legend.x`: each
+/// entry, and the list's name and role.
+pub const LEGEND_COMPUTED: &[&str] = &["entries", "named", "role"];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1128,6 +1171,16 @@ pub fn sparkline(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "sparkline", SPARKLINE, SPARKLINE_COMPUTED)
 }
 
+/// `donutChart({ ... })`, each field a name.
+pub fn donut_chart(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "donutChart", DONUT_CHART, DONUT_CHART_COMPUTED)
+}
+
+/// `legend({ ... })`, each field a name.
+pub fn legend(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "legend", LEGEND, LEGEND_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1220,6 +1273,8 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "datePicker" => date_picker(value),
         "timePicker" => time_picker(value),
         "sparkline" => sparkline(value),
+        "donutChart" => donut_chart(value),
+        "legend" => legend(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

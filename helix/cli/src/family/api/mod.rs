@@ -74,10 +74,10 @@ pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
     TreeChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND,
-    DATA_TABLE, DATE_PICKER, FILTER_INPUT, FILTER_MENU, INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE,
-    LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP,
-    PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SELECT, SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW,
-    TAIL, TIME_PICKER, TREE, TREE_ITEM,
+    DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU, INSPECTOR, LEGEND, LISTBOX,
+    LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
+    OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SELECT, SPARKLINE, TABLE,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -221,6 +221,12 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a sparkline.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sparkline: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a ring of shares.
+    #[serde(rename = "donutChart", skip_serializing_if = "Option::is_none")]
+    pub donut_chart: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a chart's key.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legend: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a field of dates or times.
     #[serde(rename = "pickerField", skip_serializing_if = "Option::is_none")]
     pub picker_field: Option<TreeChoice>,
@@ -387,6 +393,8 @@ impl Api {
             && self.date_picker.is_none()
             && self.time_picker.is_none()
             && self.sparkline.is_none()
+            && self.donut_chart.is_none()
+            && self.legend.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
@@ -479,6 +487,8 @@ const FIELDS: &[&str] = &[
     "datePicker",
     "timePicker",
     "sparkline",
+    "donutChart",
+    "legend",
     "pickerField",
     "listbox",
     "select",
@@ -550,6 +560,10 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::time_picker)
             .transpose()?,
         sparkline: field("sparkline").map(tree_choice::sparkline).transpose()?,
+        donut_chart: field("donutChart")
+            .map(tree_choice::donut_chart)
+            .transpose()?,
+        legend: field("legend").map(tree_choice::legend).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)
             .transpose()?,

@@ -915,6 +915,42 @@ export interface PickerFieldChoice {
   readonly tagsShown?: string
 }
 
+/** A ring of shares' names, each read as `donutChart.x`. */
+export interface DonutChartChoice {
+  readonly aspect?: string
+  readonly cells?: string
+  readonly centered?: string
+  readonly drawn?: string
+  readonly empty?: string
+  readonly frame?: string
+  readonly labelled?: string
+  readonly labels?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly named?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly placement?: string
+  readonly role?: string
+  readonly slices?: string
+  readonly stroke?: string
+  readonly summary?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+  readonly track?: string
+}
+
+/** A chart key's names, each read as `legend.x`. */
+export interface LegendChoice {
+  readonly entries?: string
+  readonly named?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly role?: string
+}
+
 /** A sparkline's names, each read as `sparkline.x`. */
 export interface SparklineChoice {
   readonly area?: string
