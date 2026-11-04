@@ -6,11 +6,18 @@
  */
 
 export * from '../../controllers/chart-pointer-controller/reading-step.js'
+export {
+  type AxisLengths,
+  type PlacedLabel,
+  placeLabels,
+} from '../category-labels/category-labels.js'
 export * from '../draw-tooltip/spoken-reading.js'
 export { formatNumbers } from '../format-numbers/format-numbers.js'
+export type { Curve } from '../line-path/line-path.js'
 export { type ChartData, isChartData, rowsFromData } from '../read-data/read-data.js'
 export type { Row, RowCell, Series, SeriesPoint } from '../read-series/read-series.js'
 export { extremesOf, seriesKey, unbroken } from '../read-series/read-series.js'
+export { ticks } from '../scale/ticks.js'
 export { writtenList, writtenNumbers } from '../written-list/written-list.js'
 export * from './chart-reading.js'
 export * from './donut-plot.js'

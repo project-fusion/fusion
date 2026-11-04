@@ -36,10 +36,15 @@ import { direction } from '../render/styles'
 /** What moved the reading, as the web's reading detail names it. */
 export type MovedBy = 'keyboard' | 'touch'
 
-/** What a reading's move or press is told: its place, `-1` for none, and what moved it. */
+/**
+ * What a reading's move or press is told: its place, `-1` for none, what
+ * moved it, and the series the keys rest on within it, `-1` for the whole
+ * reading.
+ */
 export interface CursorHeard {
   readonly at: number
   readonly by: MovedBy
+  readonly series: number
 }
 
 /** What a chart's cursor reads of its chart at one draw. */
@@ -65,12 +70,19 @@ export interface CursorSetup {
   readonly shows?: (at: number) => boolean
   /** The axis the keys walk, `none` for a ring, whose arrows all move on or back. Absent is `inline`. */
   readonly axis?: 'inline' | 'none'
+  /**
+   * How many series a reading holds, which the cross pair of arrows walks,
+   * as Down and Up walk a line chart's series on the web. Absent is one.
+   */
+  readonly series?: number
 }
 
 /** What a chart's cursor gives its chart. */
 export interface Cursor {
   /** The reading shown, or `-1` for none. */
   readonly at: number
+  /** The series the keys rest on within the reading, by its place among those drawn, or `-1` for the whole reading. */
+  readonly series: number
   /** Whether a key, or a screen reader's step, moved it last, which is when its words are said. */
   readonly keyed: boolean
   /** What the plot's view takes: the scrub, the adjustable control, and the keys. */
@@ -96,35 +108,48 @@ const pageOf = (count: number): number => Math.max(1, Math.round(count / 10))
 const shownOf = (setup: CursorSetup): number[] =>
   Array.from({ length: setup.count }, (_, at) => at).filter((at) => setup.shows?.(at) !== false)
 
+/** Where the keys rest: a reading, and the series within it. */
+interface Place {
+  readonly at: number
+  readonly series: number
+}
+
 /**
- * The reading a key moves to from `at`, or `undefined` for a key that moves
- * nothing: stepped by place among the readings drawn, so a hidden one is never
- * landed on, as the web's chart steps.
+ * The reading and the series a key moves to from `from`, or `undefined` for
+ * a key that moves nothing: stepped by place among the readings drawn, so a
+ * hidden one is never landed on, as the web's chart steps. `series` is how
+ * many series the cross pair of arrows walks.
  */
-const keyedTo = (key: string, at: number, setup: CursorSetup): number | undefined => {
+const keyedTo = (
+  key: string,
+  from: Place,
+  setup: CursorSetup,
+  series = setup.series ?? 1,
+): Place | undefined => {
   const shown = shownOf(setup)
   const count = shown.length
   const next = stepReading(
     key,
-    { at: shown.indexOf(at), series: -1 },
+    { at: shown.indexOf(from.at), series: from.series },
     {
       axis: setup.axis ?? 'inline',
       count,
       grid: 1,
       page: pageOf(count),
       rtl: direction() === 'rtl',
-      series: 1,
+      series,
     },
   )
-  return next === undefined ? undefined : (shown[next.at] ?? -1)
+  return next === undefined ? undefined : { at: shown[next.at] ?? -1, series: next.series }
 }
 
 /** Holds the reading a finger, a key, or a screen reader rests on. */
 export const useChartCursor = (setup: CursorSetup): Cursor => {
-  const [shown, setShown] = useState<{ readonly at: number; readonly keyed: boolean }>({
-    at: -1,
-    keyed: false,
-  })
+  const [shown, setShown] = useState<{
+    readonly at: number
+    readonly keyed: boolean
+    readonly series: number
+  }>({ at: -1, keyed: false, series: -1 })
   const latest = useRef({ setup, shown })
   latest.current = { setup, shown }
   /** Whether the finger down now has dragged, which keeps a lift from pressing the reading. */
@@ -143,28 +168,31 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     }
   }, [])
 
-  /** Shows the reading at `at`, telling it once, with a tick under a finger, or holding it for `flush`. */
-  const move = useCallback((at: number, by: MovedBy, hold = false) => {
+  /**
+   * Shows the reading at `at`, and the series `series` within it, telling it
+   * once, with a tick under a finger, or holding it for `flush`.
+   */
+  const move = useCallback((at: number, by: MovedBy, hold = false, series = -1) => {
     const now = latest.current
     const keyed = by === 'keyboard'
-    if (at === now.shown.at && keyed === now.shown.keyed) {
+    if (at === now.shown.at && keyed === now.shown.keyed && series === now.shown.series) {
       return
     }
-    latest.current = { ...now, shown: { at, keyed } }
-    setShown({ at, keyed })
+    latest.current = { ...now, shown: { at, keyed, series } }
+    setShown({ at, keyed, series })
     if (by === 'touch' && at >= 0 && at !== now.shown.at) {
       haptics().play('pass')
     }
     if (hold) {
-      pending.current = { at, by }
+      pending.current = { at, by, series }
     } else {
-      now.setup.tell('change', { at, by })
+      now.setup.tell('change', { at, by, series })
     }
   }, [])
   const press = useCallback((by: MovedBy) => {
     const now = latest.current
     if (now.shown.at >= 0) {
-      now.setup.tell('press', { at: now.shown.at, by })
+      now.setup.tell('press', { at: now.shown.at, by, series: now.shown.series })
     }
   }, [])
   /* A point off every reading, a ring's hole, moves nothing. */
@@ -217,11 +245,11 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
         press('keyboard')
         return was.at >= 0
       }
-      const to = keyedTo(key.key, was.at, now)
+      const to = keyedTo(key.key, was, now)
       if (to === undefined) {
         return false
       }
-      move(to, 'keyboard')
+      move(to.at, 'keyboard', false, to.series)
       return true
     },
     [move, press],
@@ -258,10 +286,11 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
       if (name !== 'increment' && name !== 'decrement') {
         return
       }
-      /* Down and Up move on and back along one series whatever the page's direction. */
-      const to = keyedTo(name === 'increment' ? 'ArrowDown' : 'ArrowUp', was.at, now)
+      /* Down and Up move on and back along the readings whatever the page's
+         direction, the whole reading said, however many series it holds. */
+      const to = keyedTo(name === 'increment' ? 'ArrowDown' : 'ArrowUp', was, now, 1)
       if (to !== undefined) {
-        move(to, 'keyboard')
+        move(to.at, 'keyboard', false, -1)
       }
     },
     [move],
@@ -290,5 +319,5 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     [onAccessibilityAction, ref, ringed, setup.enabled, tracking, words],
   )
   const away = useCallback(() => move(-1, 'touch'), [move])
-  return { at: shown.at, away, keyed: shown.keyed, plot }
+  return { at: shown.at, away, keyed: shown.keyed, plot, series: shown.series }
 }

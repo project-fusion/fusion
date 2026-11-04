@@ -35,6 +35,7 @@ import { hideChartSeries, useChartSource, useHiddenSeries } from '../render/char
 import type { Entry } from '../render/entry'
 import type { Family } from '../style/form'
 import { type Theme, useTheme } from '../theme/theme'
+import { paletteOf } from './chart-common'
 import { kebab, wordsIn } from './date-picker-read'
 import { boundTo, given, tell } from './props'
 
@@ -47,17 +48,6 @@ const namesOf = (rows: readonly Row[], caption: string, entries: string): readon
     return series[0]?.points.map((point) => point.label) ?? []
   }
   return (entries === 'measures' ? series.slice(1) : series).map((one) => one.name)
-}
-
-/**
- * The palette color of the entry at a place: the theme's series color, the
- * first sixteen trading places with their other tone in dark, as the web's
- * `--chart-series-*` hooks do.
- */
-const colorOf = (theme: Theme, place: number): string => {
-  const slot = seriesIndex(place)
-  const toned = theme.mode !== 'dark' || slot > 16 ? slot : slot <= 8 ? slot + 8 : slot - 8
-  return String(theme.tokens[`color-series-${toned}`] ?? 'transparent')
 }
 
 /** The places of the entries a list of names matches, as the styled tier matches them. */
@@ -81,7 +71,7 @@ const entriesOf = (read: Read, names: readonly string[], hidden: string, theme: 
   return names.map((name, place) => {
     const off = isHidden(hidden, name)
     return {
-      color: colorOf(theme, place),
+      color: paletteOf(theme)(place),
       emphasis: outlined.has(place) ? 'outlined' : subtle.has(place) ? 'subtle' : '',
       hidden: off,
       key: String(place),
