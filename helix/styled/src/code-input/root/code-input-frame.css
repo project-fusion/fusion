@@ -1,9 +1,8 @@
-/* The frame a text-like field wears, in one sheet, and never copied into a
-   family's own: the stack, the hover edge, the focus ring, the invalid state and
-   the stripped control. Compose with `field.css` and the family's own sheet,
-   never instead of either. Nine families take it: Input, Textarea, Number
-   Input, File Input, Combobox, Date Input, Time Input, Color Input and Filter
-   Input. */
+/* The frame a text-like field wears: the stack, the hover edge, the focus ring,
+   the invalid state and the stripped control. Code Input is the last family to
+   read it as a sheet; every family written in helix/neutral takes the
+   `field-frame` fragment instead. Compose with `field.css` and the family's own
+   sheet, never instead of either. */
 
 /* A column, so the label, the field and whatever is under it stack without any
    of them needing a margin. **Flex rather than grid, and the inline axis is
