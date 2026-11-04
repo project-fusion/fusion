@@ -12,6 +12,10 @@
 //!   the host's props, states and media, and not a state of the part, an
 //!   interaction on it, its place, a part around it or inside it, a region,
 //!   slotted children, or generated content.
+//! - **A part a phone alone exports reads the flags of the box that exports
+//!   it**, as a list's `row-item` is the `item` of each row it draws from
+//!   data, which the web draws as options of the element around: its rules
+//!   are a phone's, and may read the row's `data-selected`.
 
 #[cfg(test)]
 #[path = "resolve_items_tests.rs"]
@@ -19,7 +23,7 @@ mod tests;
 
 use super::{expect_prop, Names};
 use crate::family::api::spelling::{camel, ITEM};
-use crate::family::api::{exported, Item, Names as Refers, Primitive, PropType};
+use crate::family::api::{exported, native_exported, Item, Names as Refers, Primitive, PropType};
 use crate::family::ir::{scope, Condition, Family, Rule, Scope};
 
 /// Where an item's names resolve to nothing, one sentence each.
@@ -94,6 +98,7 @@ fn mixed(family: &Family, item: &Item, names: &Names, found: &mut Vec<String>) {
 /// Why each rule on a part of a drawn element reads what it cannot.
 pub(super) fn drawn(family: &Family, rules: &[&Rule], found: &mut Vec<String>) {
     let parts = exported(&family.tree);
+    let native = native_exported(&family.tree);
     for rule in rules {
         let Some((what, part)) = parts.get(&rule.target) else {
             continue;
@@ -102,13 +107,24 @@ pub(super) fn drawn(family: &Family, rules: &[&Rule], found: &mut Vec<String>) {
             "a rule on `{}`, the `{part}` of the element `{what}` draws,",
             rule.target
         );
+        let phone = native.contains(&rule.target);
+        if phone && !rule.native_only {
+            found.push(format!(
+                "{at} is a part a phone alone exports, so its rules are written under `native()`"
+            ));
+            continue;
+        }
         let reads = if rule.region.is_some() || rule.slotted.is_some() {
             Some("styles what is passed in")
         } else if rule.inner.is_some() {
             Some("writes generated content or a selector")
         } else if rule.exact {
             Some("is `exact`")
-        } else if rule.when.iter().any(on_the_part) {
+        } else if rule
+            .when
+            .iter()
+            .any(|condition| on_the_part(condition) && !(phone && box_flag(condition)))
+        {
             Some("reads a state of the part, an interaction, its place, or a part around or inside it")
         } else {
             None
@@ -118,6 +134,16 @@ pub(super) fn drawn(family: &Family, rules: &[&Rule], found: &mut Vec<String>) {
                 "{at} {reads}, where the web reaches it through `::part()`, which reads the element around alone"
             ));
         }
+    }
+}
+
+/// Whether a condition reads a flag of the box, which a part a phone alone
+/// exports reads of the box that exports it.
+fn box_flag(condition: &Condition) -> bool {
+    match condition {
+        Condition::Not { condition } => box_flag(condition),
+        Condition::Part { .. } => true,
+        _ => false,
     }
 }
 

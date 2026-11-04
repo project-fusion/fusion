@@ -112,3 +112,59 @@ fn an_item_of_a_set_that_mixes_reads_switches_and_asks_through_a_cancelable_even
         ]
     );
 }
+
+/// A time list that draws a list, which exports the item of each row it draws
+/// from data, on a phone alone.
+const TIMES: &str = "export default headless('time-list', {
+  props: [prop('disabled', 'boolean')],
+  tree: [box('list', { draws: 'listbox', exports: { items: true, 'row-item': 'native' } })],
+})";
+
+fn times(rules: &str) -> Family {
+    Family::new(
+        styled(
+            &default_export(&format!(
+                "export default family('time-list', {{ stylesheet: 'time-list/t.css', rules: [{rules}] }})"
+            ))
+            .unwrap(),
+        )
+        .unwrap(),
+        Some(headless(&default_export(TIMES).unwrap()).unwrap()),
+        "time-list",
+        "root",
+    )
+}
+
+#[test]
+fn a_part_a_phone_alone_exports_reads_the_flags_of_the_row_that_exports_it() {
+    let list = times(
+        "{ on: 'list-row-item', platform: 'native', when: { part: { 'data-selected': true } }, set: [['color', token('color-danger')]] }",
+    );
+    assert_eq!(unresolved(&list), Vec::<String>::new());
+    assert!(!emit(&list).contains("row-item"));
+}
+
+#[test]
+fn a_rule_on_a_part_a_phone_alone_exports_is_written_for_the_phone() {
+    let found = unresolved(&times(
+        "{ on: 'list-row-item', set: [['color', token('color-danger')]] }",
+    ));
+    assert!(
+        found.iter().any(|one| one.contains(
+            "is a part a phone alone exports, so its rules are written under `native()`"
+        )),
+        "{found:?}"
+    );
+}
+
+#[test]
+fn an_export_takes_words_only_as_a_phone_alone() {
+    let refused = headless(
+        &default_export(
+            "export default headless('time-list', { tree: [box('list', { draws: 'listbox', exports: { 'row-item': 'web' } })] })",
+        )
+        .unwrap(),
+    )
+    .unwrap_err();
+    assert!(refused.contains("`'native'` in `exports`"), "{refused}");
+}
