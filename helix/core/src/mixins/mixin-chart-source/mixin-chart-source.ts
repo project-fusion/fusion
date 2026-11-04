@@ -35,26 +35,8 @@ export const PALETTE = 24
 /** The palette slot for the nth series, counting from one and wrapping. */
 export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
 
-/**
- * The drawing's own coordinates, which a `viewBox` maps onto whatever box CSS
- * gives it.
- *
- * Here for the reason `PALETTE` is here, one paragraph up: six families drew
- * into the same square and declared it six times under three names, and one of
- * them wrote the same number as a literal on one axis and as its own constant
- * on the other, in one attribute. A round hundred so a `d` attribute is
- * readable in the inspector.
- *
- * **Two names for one number, because the axes are two facts.** `x2=${PLOT_WIDTH}`
- * and `y2=${PLOT_HEIGHT}` say which edge they reach; one name used twice says
- * nothing, and the day a chart is not square the call sites are already right.
- * `Sparkline` is that day already: it is a strip rather than a plot, so it takes
- * this width and states its own height beside it.
- */
-export const PLOT_WIDTH = 100
-
-/** The drawing's own coordinates. See `PLOT_WIDTH`. */
-export const PLOT_HEIGHT = 100
+/* The drawing's own coordinates, in core's chart arithmetic, which a phone reads too. */
+export { PLOT_HEIGHT, PLOT_WIDTH } from '../../utils/chart-plot/plot-box.js'
 
 /**
  * A list of series names, as the attributes that take one are written.
