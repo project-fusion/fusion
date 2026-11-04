@@ -75,6 +75,13 @@ export interface Behavior {
   /** The custom states the element is in, which `:state()` reads on the web and its styles read here. */
   readonly marks: readonly string[]
   /**
+   * Lengths the machine measures, by name after `--`, which every rule of the
+   * element reads with `measured()`, a part an element it draws exports among
+   * them: a chart's bubble stands at the reading, where the web's inline style
+   * sets the same property on the mark.
+   */
+  readonly measured?: Readonly<Record<string, number | string>>
+  /**
    * Wraps what the element draws, as a set gives its items the context they
    * join it through.
    */
@@ -256,13 +263,18 @@ export const merged = (...behaviors: readonly Behavior[]): Behavior => {
     behavior.regions === undefined ? [] : [behavior.regions],
   )
   const regions = given.length === 0 ? {} : { regions: Object.assign({}, ...given) }
+  const lengths = behaviors.flatMap((behavior) =>
+    behavior.measured === undefined ? [] : [behavior.measured],
+  )
+  const measured = lengths.length === 0 ? {} : { measured: Object.assign({}, ...lengths) }
   return wraps.length === 0
-    ? { marks, parts, ...regions }
+    ? { marks, parts, ...regions, ...measured }
     : {
         marks,
         parts,
         provide: (drawn) => wraps.reduceRight((inner, wrap) => wrap(inner), drawn),
         ...regions,
+        ...measured,
       }
 }
 
