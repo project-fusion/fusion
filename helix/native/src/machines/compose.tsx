@@ -34,6 +34,7 @@ import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
 import { useLegend } from './legend'
+import { useLineChart } from './line-chart'
 import { useListbox } from './listbox'
 import { useLog } from './log'
 import { useLogGroup } from './log-group'
@@ -477,6 +478,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useLegend(family, props, use),
+      ),
+    /* A chart of lines: its lines from its readings, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'line-chart')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useLineChart(family, props, use),
       ),
     /* A ring of shares: its ring from its readings, and its reading. */
     ...uses

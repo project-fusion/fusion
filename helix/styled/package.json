@@ -401,6 +401,14 @@
       "types": "./dist/legend/index.d.ts",
       "default": "./dist/legend/index.js"
     },
+    "./line-chart": {
+      "react-native": {
+        "types": "./dist/line-chart/index.native.d.ts",
+        "default": "./dist/line-chart/index.native.js"
+      },
+      "types": "./dist/line-chart/index.d.ts",
+      "default": "./dist/line-chart/index.js"
+    },
     "./lint.json": "./lint.json",
     "./list": {
       "react-native": {

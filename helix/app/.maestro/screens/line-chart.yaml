@@ -1,0 +1,85 @@
+# Line Chart, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Line Chart"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://line-chart/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: line-chart-preview-${MODE}-${SIZE}
+- openLink: helix://line-chart/area/preview
+- extendedWaitUntil:
+    visible: 'Area'
+    timeout: 15000
+- takeScreenshot: line-chart-area-${MODE}-${SIZE}
+- openLink: helix://line-chart/curves/preview
+- extendedWaitUntil:
+    visible: 'Curves'
+    timeout: 15000
+- takeScreenshot: line-chart-curves-${MODE}-${SIZE}
+- openLink: helix://line-chart/emphasis/preview
+- extendedWaitUntil:
+    visible: 'Emphasis'
+    timeout: 15000
+- takeScreenshot: line-chart-emphasis-${MODE}-${SIZE}
+- openLink: helix://line-chart/from-zero/preview
+- extendedWaitUntil:
+    visible: 'From Zero'
+    timeout: 15000
+- takeScreenshot: line-chart-from-zero-${MODE}-${SIZE}
+- openLink: helix://line-chart/listen/preview
+- extendedWaitUntil:
+    visible: 'Listen'
+    timeout: 15000
+- takeScreenshot: line-chart-listen-${MODE}-${SIZE}
+- openLink: helix://line-chart/markers/preview
+- extendedWaitUntil:
+    visible: 'Markers'
+    timeout: 15000
+- takeScreenshot: line-chart-markers-${MODE}-${SIZE}
+- openLink: helix://line-chart/material/preview
+- extendedWaitUntil:
+    visible: 'Material'
+    timeout: 15000
+- takeScreenshot: line-chart-material-${MODE}-${SIZE}
+- openLink: helix://line-chart/several-series/preview
+- extendedWaitUntil:
+    visible: 'Several Series'
+    timeout: 15000
+- takeScreenshot: line-chart-several-series-${MODE}-${SIZE}
+- openLink: helix://line-chart/streaming/preview
+- extendedWaitUntil:
+    visible: 'Streaming'
+    timeout: 15000
+- takeScreenshot: line-chart-streaming-${MODE}-${SIZE}
+- openLink: helix://line-chart/taking-new-data/preview
+- extendedWaitUntil:
+    visible: 'Taking New Data'
+    timeout: 15000
+- takeScreenshot: line-chart-taking-new-data-${MODE}-${SIZE}
+- openLink: helix://line-chart/terminus/preview
+- extendedWaitUntil:
+    visible: 'Terminus'
+    timeout: 15000
+- takeScreenshot: line-chart-terminus-${MODE}-${SIZE}
+- openLink: helix://line-chart/with-a-tooltip/preview
+- extendedWaitUntil:
+    visible: 'With A Tooltip'
+    timeout: 15000
+- takeScreenshot: line-chart-with-a-tooltip-${MODE}-${SIZE}
+- openLink: helix://line-chart/with-a-value-axis/preview
+- extendedWaitUntil:
+    visible: 'With A Value Axis'
+    timeout: 15000
+- takeScreenshot: line-chart-with-a-value-axis-${MODE}-${SIZE}
+- openLink: helix://line-chart/with-gridlines/preview
+- extendedWaitUntil:
+    visible: 'With Gridlines'
+    timeout: 15000
+- takeScreenshot: line-chart-with-gridlines-${MODE}-${SIZE}
