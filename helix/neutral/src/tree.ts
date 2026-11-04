@@ -84,6 +84,7 @@ import type {
   TableColumnChoice,
   TableRowChoice,
   TailChoice,
+  TimePickerChoice,
   TreeChoice,
   TreeItemChoice,
 } from './tree-choice.js'
@@ -345,6 +346,8 @@ export interface Headless {
   readonly paginationSize?: PaginationSizeChoice
   /** What the element reads, sends, and computes where it is a month calendar. */
   readonly datePicker?: DatePickerChoice
+  /** What the element reads, sends, and computes where it is a list of times. */
+  readonly timePicker?: TimePickerChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */

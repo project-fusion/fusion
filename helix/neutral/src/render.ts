@@ -376,6 +376,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tags'
     | 'tagsShown'
   >
+  /** What a list of times computes for its parts. */
+  readonly timePicker: Computes<
+    'columns' | 'listName' | 'multiple' | 'options' | 'unset' | 'wheels'
+  >
   /** What a carousel computes for its parts. */
   readonly carousel: Computes<
     | 'arrows'
