@@ -1,6 +1,6 @@
 /*
- *  The end-of-series mark, shared by `Sparkline` and `LineChart` because the two
- *    are the same mark on the same kind of thing.
+ *  The end-of-series mark of `LineChart`, which `Sparkline` draws from the
+ *    neutral `terminus` fragment as the same mark on the same kind of thing.
  *
  *  **Four shapes, and both families' docblocks name all four.** The same
  *    omission was found here twice: `Sparkline.terminus` shipped `square`
