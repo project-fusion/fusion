@@ -326,6 +326,7 @@ const LAYERS: ReadonlySet<string> = new Set([
   'filter-input',
   'select',
   'color-input',
+  'date-input',
   'dialog',
   'drawer',
   'megamenu',

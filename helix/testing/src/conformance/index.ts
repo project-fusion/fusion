@@ -15,6 +15,7 @@ import { COMBOBOX } from './scenarios/combobox.js'
 import { COMMAND } from './scenarios/command.js'
 import { COPY_BUTTON } from './scenarios/copy-button.js'
 import { DATA_TABLE } from './scenarios/data-table.js'
+import { DATE_INPUT } from './scenarios/date-input.js'
 import { DATE_PICKER } from './scenarios/date-picker.js'
 import { DIALOG } from './scenarios/dialog.js'
 import { DRAWER } from './scenarios/drawer.js'
@@ -84,6 +85,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   command: COMMAND,
   'copy-button': COPY_BUTTON,
   'data-table': DATA_TABLE,
+  'date-input': DATE_INPUT,
   'date-picker': DATE_PICKER,
   dialog: DIALOG,
   drawer: DRAWER,
