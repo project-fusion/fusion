@@ -49,6 +49,7 @@ import { HelixIconButton } from '../icon-button/index.native'
 import { HelixImage } from '../image/index.native'
 import { HelixInput } from '../input/index.native'
 import { HelixKbd } from '../kbd/index.native'
+import { HelixLegend } from '../legend/index.native'
 import { HelixList, HelixListItem } from '../list/index.native'
 import { HelixListbox } from '../listbox/index.native'
 import { HelixLoader } from '../loader/index.native'
@@ -266,6 +267,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-image': HelixImage,
   'helix-input': HelixInput,
   'helix-kbd': HelixKbd,
+  'helix-legend': HelixLegend,
   'helix-list': List,
   'helix-list-item': HelixListItem,
   'helix-listbox': HelixListbox,
