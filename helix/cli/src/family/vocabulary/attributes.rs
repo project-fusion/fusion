@@ -67,6 +67,7 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
         "also",
         &[
             NodeKind::Box,
+            NodeKind::Field,
             NodeKind::Layer,
             NodeKind::Pressable,
             NodeKind::Wrap,
@@ -370,11 +371,12 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
 pub fn attribute(kind: NodeKind, node: &str, name: &str, value: &Attribute) -> Result<(), String> {
     /* A `data-` attribute is a flag the web writes on a box's part, which a
     rule's `part` condition reads, as `[data-dot]`, and a phone reads as the
-    part's state. */
+    part's state. A field takes one too, as a date's segment is hidden in a
+    copy that draws a literal. */
     if name.len() > "data-".len() && name.starts_with("data-") {
         return match (kind, fits(Shape::Flag, value)) {
-            (NodeKind::Box | NodeKind::Pressable, true) => Ok(()),
-            (NodeKind::Box | NodeKind::Pressable, false) => Err(format!(
+            (NodeKind::Box | NodeKind::Field | NodeKind::Pressable, true) => Ok(()),
+            (NodeKind::Box | NodeKind::Field | NodeKind::Pressable, false) => Err(format!(
                 "`{kind}('{node}')`: `{name}` takes {}",
                 describe(Shape::Flag)
             )),

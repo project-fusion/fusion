@@ -78,6 +78,7 @@ import type {
   OptionGroupChoice,
   PaginationRootChoice,
   PaginationSizeChoice,
+  PickerFieldChoice,
   SelectChoice,
   TableChoice,
   TableColumnChoice,
@@ -344,6 +345,8 @@ export interface Headless {
   readonly paginationSize?: PaginationSizeChoice
   /** What the element reads, sends, and computes where it is a month calendar. */
   readonly datePicker?: DatePickerChoice
+  /** What the element reads, sends, and computes where it is a field of dates or times. */
+  readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */
   readonly carousel?: CarouselChoice
   /** What the element reads, sends, and computes where it is a conversation. */

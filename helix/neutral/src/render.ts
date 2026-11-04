@@ -363,6 +363,19 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'steps'
     | 'unset'
   >
+  /** What a field of dates or times computes for its parts. */
+  readonly pickerField: Computes<
+    | 'clearShown'
+    | 'fieldPlaceholder'
+    | 'restLabel'
+    | 'restPress'
+    | 'restShown'
+    | 'restWords'
+    | 'segmented'
+    | 'segments'
+    | 'tags'
+    | 'tagsShown'
+  >
   /** What a carousel computes for its parts. */
   readonly carousel: Computes<
     | 'arrows'
@@ -812,6 +825,8 @@ export const Pressable = (_: PressableAttributes): Drawn => node()
  * keyboard and its Enter key, and `autoComplete` the platform's autofill.
  */
 export interface TextInputAttributes extends Common {
+  /** The parts the field is as well while each flag holds, as a segment is `segment-placeholder` while empty. */
+  readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   readonly autoCapitalize?: Given
   readonly autoComplete?: Given
   readonly autoCorrect?: Given

@@ -89,8 +89,8 @@ use crate::family::api::{
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE,
     CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, FILTER_INPUT, FILTER_MENU,
     INSPECTOR, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
-    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, SELECT, TABLE,
-    TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
+    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SELECT,
+    TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TREE, TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -637,6 +637,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.pagination_root, PAGINATION, "pagination"),
         (&api.pagination_size, PAGINATION_SIZE, "pagination-size"),
         (&api.date_picker, DATE_PICKER, "date-picker"),
+        (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),
         (&api.select, SELECT, "select"),
         (&api.combobox, COMBOBOX, "combobox"),
