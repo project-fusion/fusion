@@ -894,3 +894,23 @@ export interface DatePickerChoice {
   readonly steps?: string
   readonly unset?: string
 }
+
+/** A field of dates or times's names, each read as `pickerField.x`. */
+export interface PickerFieldChoice {
+  readonly clearShown?: string
+  readonly defaultProp?: string
+  readonly fieldPlaceholder?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onClear?: string
+  readonly onInput?: string
+  readonly prop?: string
+  readonly restLabel?: string
+  readonly restPress?: string
+  readonly restShown?: string
+  readonly restWords?: string
+  readonly segmented?: string
+  readonly segments?: string
+  readonly tags?: string
+  readonly tagsShown?: string
+}

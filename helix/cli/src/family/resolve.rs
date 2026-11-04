@@ -72,6 +72,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.pagination_root,
         &api.pagination_size,
         &api.date_picker,
+        &api.picker_field,
         &api.listbox,
         &api.select,
         &api.combobox,
@@ -245,6 +246,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
             api::PAGINATION_SIZE,
         ),
         ("datePicker", &family.api.date_picker, api::DATE_PICKER),
+        ("pickerField", &family.api.picker_field, api::PICKER_FIELD),
         ("listbox", &family.api.listbox, api::LISTBOX),
         ("select", &family.api.select, api::SELECT),
         ("combobox", &family.api.combobox, api::COMBOBOX),
@@ -552,7 +554,8 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
             || family.api.listbox.is_some()
             || family.api.select.is_some()
             || family.api.combobox.is_some()
-            || family.api.filter_input.is_some();
+            || family.api.filter_input.is_some()
+            || family.api.picker_field.is_some();
         for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`field('{name}')` is typed into, and the element declares no `text` to hold what is typed"
@@ -602,7 +605,8 @@ fn ranged(family: &Family, names: &Names, found: &mut Vec<String>) {
             || family.api.listbox.is_some()
             || family.api.select.is_some()
             || family.api.combobox.is_some()
-            || family.api.filter_input.is_some();
+            || family.api.filter_input.is_some()
+            || family.api.picker_field.is_some();
         for name in controls.into_iter().filter(|_| !holds) {
             found.push(format!(
                 "`box('{name}')` is moved by a reader, and the element declares no `range` to hold its value"

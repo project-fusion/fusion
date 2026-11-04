@@ -572,6 +572,31 @@ pub const DATE_PICKER_COMPUTED: &[&str] = &[
     "unset",
 ];
 
+/// What a field of dates or times reads and sends, by the name the machine binds. Its other
+/// props it reads by their own names.
+pub const PICKER_FIELD: &[(&str, Names)] = &[
+    ("defaultProp", Names::Prop),
+    ("prop", Names::Prop),
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onClear", Names::Event),
+    ("onInput", Names::Event),
+];
+
+/// What a field of dates or times computes for its parts, each read as `pickerField.x`.
+pub const PICKER_FIELD_COMPUTED: &[&str] = &[
+    "clearShown",
+    "fieldPlaceholder",
+    "restLabel",
+    "restPress",
+    "restShown",
+    "restWords",
+    "segmented",
+    "segments",
+    "tags",
+    "tagsShown",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1034,6 +1059,11 @@ pub fn date_picker(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "datePicker", DATE_PICKER, DATE_PICKER_COMPUTED)
 }
 
+/// `pickerField({ ... })`, each field a name.
+pub fn picker_field(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "pickerField", PICKER_FIELD, PICKER_FIELD_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1124,6 +1154,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "paginationRoot" => pagination_root(value),
         "paginationSize" => pagination_size(value),
         "datePicker" => date_picker(value),
+        "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),
         "combobox" => combobox(value),

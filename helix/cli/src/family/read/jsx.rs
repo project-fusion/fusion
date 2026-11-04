@@ -86,6 +86,7 @@ const GIVEN: &[&str] = &[
     "paginationRoot",
     "paginationSize",
     "datePicker",
+    "pickerField",
     "listbox",
     "select",
     "combobox",
