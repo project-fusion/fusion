@@ -2,11 +2,12 @@
  * Where each column of a category stands when a Bar Chart stacks them, as
  * arithmetic with no element in it.
  *
- * Pure and beside the family's `index.ts`, because how a stack adds up is a
- * fact about numbers, and a spec can hold it without a page.
+ * Pure and in core, because how a stack adds up is a fact about numbers that
+ * the web's element and a phone's both draw from, and a spec can hold it
+ * without a page.
  */
 
-import { byRow, type Series } from '@fusion.dev/helix-core'
+import { byRow, type Series } from '../read-series/read-series.js'
 
 /** Where a column starts and ends along the measure, in the data's own units. */
 export type Span = readonly [from: number, to: number]

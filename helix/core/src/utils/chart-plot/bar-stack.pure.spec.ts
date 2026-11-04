@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { stackEnds, stackedReadings, stackFarEnds, stackSpans } from './stack.js'
+import { stackEnds, stackedReadings, stackFarEnds, stackSpans } from './bar-stack.js'
 
 describe('a stack of columns', () => {
   test('stands each positive reading on the ones before it', () => {
