@@ -215,7 +215,12 @@ export default headless('combobox', {
                 <Text part="tag-words">{entry.words}</Text>
               </Wrap>
             </Repeat>
-            {combobox.restShown && <Text part="rest">{combobox.restWords}</Text>}
+            {/* A box around the words, since a phone styles words by the part around them. */}
+            {combobox.restShown && (
+              <View part="rest">
+                <Text part="rest-words">{combobox.restWords}</Text>
+              </View>
+            )}
             {combobox.restPress && (
               <Pressable
                 label={combobox.restLabel}
