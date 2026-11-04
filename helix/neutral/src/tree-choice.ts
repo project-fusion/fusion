@@ -914,3 +914,18 @@ export interface PickerFieldChoice {
   readonly tags?: string
   readonly tagsShown?: string
 }
+
+/** A list of times's names, each read as `timePicker.x`. */
+export interface TimePickerChoice {
+  readonly columns?: string
+  readonly defaultProp?: string
+  readonly listName?: string
+  readonly multiple?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onInput?: string
+  readonly options?: string
+  readonly prop?: string
+  readonly unset?: string
+  readonly wheels?: string
+}
