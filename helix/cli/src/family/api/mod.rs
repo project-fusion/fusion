@@ -62,7 +62,7 @@ pub use item::Item;
 pub use members::{props, Event, Literal, Platform, Primitive, PropType, Tier};
 pub use notices::{Notice, Notices};
 pub use page::Page;
-pub use parity::{exported, parity, parts};
+pub use parity::{exported, native_exported, parity, parts};
 pub use range::ValueRange;
 pub use scroll::Scroll;
 pub use sections::{Section, Sections};
