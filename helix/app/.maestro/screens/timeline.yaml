@@ -3,6 +3,9 @@
 # sides, and entries across the page. One screenshot of each, named by the
 # example, `MODE`, and `SIZE`. At the largest text the second day is below
 # the screen, so the flow scrolls to it.
+# Each example after the first is waited for by its title in the header first: a
+# wait on words the example before also draws passes while the link is still opening,
+# and pictures or presses the screen on its way out.
 appId: dev.fusion.helix.app
 name: "Screens: Timeline"
 ---
@@ -15,6 +18,9 @@ name: "Screens: Timeline"
     timeout: 30000
 - takeScreenshot: timeline-preview-${MODE}-${SIZE}
 - openLink: helix://timeline/grouped/preview
+- extendedWaitUntil:
+    visible: 'Grouped'
+    timeout: 15000
 - scrollUntilVisible:
     centerElement: true
     element: '.*Yesterday.*'
@@ -23,15 +29,24 @@ name: "Screens: Timeline"
 - takeScreenshot: timeline-grouped-${MODE}-${SIZE}
 - openLink: helix://timeline/opposite/preview
 - extendedWaitUntil:
+    visible: 'Opposite'
+    timeout: 15000
+- extendedWaitUntil:
     visible: '.*Deployed to production.*'
     timeout: 15000
 - takeScreenshot: timeline-opposite-${MODE}-${SIZE}
 - openLink: helix://timeline/alternate/preview
 - extendedWaitUntil:
+    visible: 'Alternate'
+    timeout: 15000
+- extendedWaitUntil:
     visible: '.*Deployed to production.*'
     timeout: 15000
 - takeScreenshot: timeline-alternate-${MODE}-${SIZE}
 - openLink: helix://timeline/horizontal/preview
+- extendedWaitUntil:
+    visible: 'Horizontal'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*Deployed to production.*'
     timeout: 15000

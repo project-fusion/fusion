@@ -1,5 +1,8 @@
 # Pagination, its examples drawn alone, one screenshot of each, named by the
 # example, `MODE`, and `SIZE`, and the row again once a gap has moved it.
+# Each example after the first is waited for by its title in the header first: a
+# wait on words the example before also draws passes while the link is still opening,
+# and pictures or presses the screen on its way out.
 appId: dev.fusion.helix.app
 name: "Screens: Pagination"
 ---
@@ -23,12 +26,18 @@ name: "Screens: Pagination"
 - takeScreenshot: pagination-preview-moved-${MODE}-${SIZE}
 - openLink: helix://pagination/compact/preview
 - extendedWaitUntil:
+    visible: 'Compact'
+    timeout: 15000
+- extendedWaitUntil:
     visible: Next page
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: pagination-compact-${MODE}-${SIZE}
 - openLink: helix://pagination/footer/preview
+- extendedWaitUntil:
+    visible: 'Footer'
+    timeout: 15000
 - extendedWaitUntil:
     visible: .*of 248.*
     timeout: 15000
