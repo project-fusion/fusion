@@ -84,6 +84,9 @@ const build = (setup: Setup): Updatable => {
     log.groups = setup.logGroups ?? []
     log.lines = setup.logLines
   }
+  if (setup.data !== undefined) {
+    ;(made as Updatable & { data?: unknown }).data = setup.data
+  }
   if (setup.turns !== undefined) {
     ;(made as Updatable & { turns?: unknown }).turns = setup.turns
   }

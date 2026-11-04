@@ -32,6 +32,12 @@ export interface Setup {
   /** The elements and the words inside it, in order. */
   readonly children?: readonly (Setup | string)[]
   /**
+   * The readings a chart draws, as its `data` takes them: a caption, the
+   * column headings, and a row for each reading. The web sets it as a
+   * property, and a phone passes it as a prop.
+   */
+  readonly data?: object
+  /**
    * The data it draws, for a family whose items arrive as data, as a virtual
    * list. The web sets it as a property with a function that draws each
    * item's words, and a phone passes it as a prop.
