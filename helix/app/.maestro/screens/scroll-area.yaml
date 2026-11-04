@@ -2,6 +2,9 @@
 # on one axis, a changelog, and the notes under `scrollbars`, which a phone
 # draws with its own indicators. One screenshot of each, named by the
 # example, `MODE`, and `SIZE`.
+# Each example after the first is waited for by its title in the header first: a
+# wait on words the example before also draws passes while the link is still opening,
+# and pictures or presses the screen on its way out.
 appId: dev.fusion.helix.app
 name: "Screens: Scroll Area"
 ---
@@ -15,20 +18,32 @@ name: "Screens: Scroll Area"
 - takeScreenshot: scroll-area-preview-${MODE}-${SIZE}
 - openLink: helix://scroll-area/horizontal/preview
 - extendedWaitUntil:
+    visible: 'Horizontal'
+    timeout: 15000
+- extendedWaitUntil:
     visible: '.*Overview.*'
     timeout: 15000
 - takeScreenshot: scroll-area-horizontal-${MODE}-${SIZE}
 - openLink: helix://scroll-area/one-axis/preview
+- extendedWaitUntil:
+    visible: 'One Axis'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*Installing dependencies.*'
     timeout: 15000
 - takeScreenshot: scroll-area-one-axis-${MODE}-${SIZE}
 - openLink: helix://scroll-area/one-edge/preview
 - extendedWaitUntil:
+    visible: 'One Edge'
+    timeout: 15000
+- extendedWaitUntil:
     visible: '.*export reports.*'
     timeout: 15000
 - takeScreenshot: scroll-area-one-edge-${MODE}-${SIZE}
 - openLink: helix://scroll-area/scrollbars/preview
+- extendedWaitUntil:
+    visible: 'Scrollbars'
+    timeout: 15000
 - extendedWaitUntil:
     visible: '.*export reports.*'
     timeout: 15000
