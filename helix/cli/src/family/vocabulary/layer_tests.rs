@@ -138,7 +138,6 @@ fn only_a_layer_takes_the_attributes_that_open_and_place_it() {
         "closedby: 'any'",
         "modal: true",
         "notice: true",
-        "offset: 4",
         "open: bind('open')",
         "placement: 'top'",
         "presentation: 'auto'",
@@ -146,6 +145,13 @@ fn only_a_layer_takes_the_attributes_that_open_and_place_it() {
         let boxed = read(&format!("box('panel', {{ {attribute} }})")).unwrap_err();
         assert!(boxed.contains("a box does not take"), "{boxed}");
     }
+    /* A box takes `offset` as a gradient stop's place, so a box with no shape is
+    refused for that. */
+    let offset = read("box('panel', { offset: 4 })").unwrap_err();
+    assert!(
+        offset.contains("`offset` is a shape's, and it has no `shape`"),
+        "{offset}"
+    );
     let busy = read("layer('surface', { busy: true, open: bind('open') }, [region('default')])")
         .unwrap_err();
     assert!(busy.contains("a layer does not take `busy`"), "{busy}");
