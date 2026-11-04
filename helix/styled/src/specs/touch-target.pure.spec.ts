@@ -26,7 +26,7 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['tabs/tab/tab.css', '[part="tab"]::after'],
   ['tabs/tab/tab.css', '[part="dismiss"]::after'],
   ['tag/root/tag-root.css', '[part="dismiss"]::after'],
-  ['date-input/root/date-input-root.css', '[part="trigger"]::after'],
+  ['date-input/root/date-input-root.generated.css', '[part="trigger"]'],
   ['time-input/root/time-input-root.css', '[part="trigger"]::after'],
   ['color-input/root/color-input-root.css', '[part="trigger"]::after'],
   ['input/root/input-root.css', '[part="clear"]::after'],
@@ -59,7 +59,6 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['chat/composer/chat-composer.css', '[part="send"]::after'],
   ['chat/message/chat-message.css', '[part="retry"]::after'],
   ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
-  ['filter-input/chip/filter-chip.generated.css', '[part="dismiss"]::after'],
   ['lightbox/root/lightbox-root.css', '[part="zoom-out"]::after'],
   ['color-picker/root/color-picker-root.css', '[part="swatch"]::after'],
 ]

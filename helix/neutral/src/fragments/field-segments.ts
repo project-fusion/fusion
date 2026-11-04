@@ -1,4 +1,4 @@
-import { fn, quotient, token, web } from '../style.js'
+import { fn, native, quotient, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -12,6 +12,9 @@ import { fragment } from '../table.js'
  * **The segment with focus is marked by its fill**, and the ring stays the field's.
  * The fill is `primary-surface`, the ground `foreground-on-primary` is solved
  * against. A family writes a disabled row's rule, since a fragment declares no state.
+ *
+ * **On a phone each segment is a field** in the row, beside a literal in each copy,
+ * and the copy draws whichever it holds.
  */
 export default fragment(
   'field-segments',
@@ -55,12 +58,34 @@ export default fragment(
         }),
       ]),
     ]),
+    /* A phone's empty segment shows its dashes as the field's placeholder, in the same ink. */
     on('segment-placeholder', [
-      rule({
-        color: own.segmentPlaceholderColor(token('color-foreground-muted')),
-        fontWeight: token('weight-regular'),
-      }),
+      web([
+        rule({
+          color: own.segmentPlaceholderColor(token('color-foreground-muted')),
+          fontWeight: token('weight-regular'),
+        }),
+      ]),
     ]),
+    on({ placeholder: 'segment' }, [
+      native([rule({ color: own.segmentPlaceholderColor(token('color-foreground-muted')) })]),
+    ]),
+    /* A phone's segment is a field of its own in the row: a copy that holds a
+       literal hides it, and the one with focus takes the fill a flag marks. */
+    on('segment', [
+      native([
+        rule({ padding: 0 }),
+        rule({ part: { 'data-hidden': true } }, { display: 'none' }),
+        rule(
+          { part: { 'data-focused': true } },
+          {
+            backgroundColor: own.segmentFocusBackgroundColor(token('color-primary-surface')),
+            color: own.segmentFocusColor(token('color-foreground-on-primary')),
+          },
+        ),
+      ]),
+    ]),
+    on('literal', [native([rule({ part: { 'data-hidden': true } }, { display: 'none' })])]),
     on('literal', [
       rule({ color: own.segmentLiteralColor(token('color-foreground-muted')), whiteSpace: 'pre' }),
     ]),

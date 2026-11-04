@@ -90,7 +90,13 @@ const useConstraint = (
     textOf(given(family, props, boundTo(use, name, 'prop'))) ||
     (NUMBER_SENTENCES[name as keyof typeof NUMBER_SENTENCES] ?? '')
   const flaw = number?.flaw
-  const verdict = flaw === undefined ? undefined : numberVerdict(flaw, sentence, number?.locale)
+  const own = number?.said
+  const verdict =
+    own !== undefined
+      ? { flags: [own.flag], message: own.message }
+      : flaw === undefined
+        ? undefined
+        : numberVerdict(flaw, sentence, number?.locale)
   /* Kept by what it says, so the verdict is taken again only as that changes. */
   const flag = verdict?.flags[0]
   const said = verdict?.message ?? ''

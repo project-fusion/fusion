@@ -319,7 +319,7 @@ export const useLayer = (
     toggled,
     tooltip,
   })
-  tellBack(asked, stops.holds, view)
+  tellBack(asked, stops.holds, view, landing)
   const states = { ...statesOf(open, sheet, placed), ...swiped.states }
   const pointer = boundTo(use, 'arrow', 'part')
   const settled = placedOf(placedAgainst, open, sheet, placed)
