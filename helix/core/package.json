@@ -99,6 +99,10 @@
       "types": "./dist/utils/chat/turns.d.ts",
       "default": "./dist/utils/chat/turns.js"
     },
+    "./clock": {
+      "types": "./dist/utils/clock/times.d.ts",
+      "default": "./dist/utils/clock/times.js"
+    },
     "./code-block": {
       "types": "./dist/utils/code-block/code-block.d.ts",
       "default": "./dist/utils/code-block/code-block.js"
