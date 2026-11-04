@@ -611,6 +611,14 @@
       "types": "./dist/slider/index.d.ts",
       "default": "./dist/slider/index.js"
     },
+    "./sparkline": {
+      "react-native": {
+        "types": "./dist/sparkline/index.native.d.ts",
+        "default": "./dist/sparkline/index.native.js"
+      },
+      "types": "./dist/sparkline/index.d.ts",
+      "default": "./dist/sparkline/index.js"
+    },
     "./specs": null,
     "./speed-dial": {
       "react-native": {

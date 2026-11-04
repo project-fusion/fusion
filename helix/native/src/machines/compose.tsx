@@ -56,6 +56,7 @@ import { useScale } from './scale'
 import { scrollersOf } from './scrolling'
 import { useSelect } from './select'
 import { setting } from './setting'
+import { useSparkline } from './sparkline'
 import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
 import { stackRow } from './stack-row'
@@ -466,6 +467,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useDatePicker(family, props, use),
+      ),
+    /* A sparkline: its drawing from its readings, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'sparkline')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useSparkline(family, props, use),
       ),
     /* A list of times, or a set of wheels. */
     ...uses

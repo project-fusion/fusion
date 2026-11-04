@@ -83,6 +83,7 @@ import { HelixSelect } from '../select/index.native'
 import { HelixSkeleton } from '../skeleton/index.native'
 import { HelixSkipLink } from '../skip-link/index.native'
 import { HelixSlider } from '../slider/index.native'
+import { HelixSparkline } from '../sparkline/index.native'
 import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../speed-dial/index.native'
 import { HelixSplitter } from '../splitter/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
@@ -106,6 +107,7 @@ import { HelixTrend } from '../trend/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import {
   BulletList,
+  Caption,
   DataCell,
   Emphasis,
   HEADINGS,
@@ -209,6 +211,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   fieldset: Fieldset,
   form: Box,
   ...HEADINGS,
+  caption: Caption,
   'helix-accordion': HelixAccordion,
   'helix-accordion-item': HelixAccordionItem,
   'helix-announcement': HelixAnnouncement,
@@ -305,6 +308,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-skeleton': HelixSkeleton,
   'helix-skip-link': HelixSkipLink,
   'helix-slider': HelixSlider,
+  'helix-sparkline': HelixSparkline,
   'helix-speed-dial': HelixSpeedDial,
   'helix-speed-dial-group': HelixSpeedDialGroup,
   'helix-speed-dial-item': HelixSpeedDialItem,

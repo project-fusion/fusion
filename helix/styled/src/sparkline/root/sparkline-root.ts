@@ -4,9 +4,8 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
-import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './sparkline-root.css.js'
+import { styles } from './sparkline-root.generated.css.js'
 
 /**
  * @summary A small chart with no axes that shows the shape of a series beside its number.
@@ -85,13 +84,7 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
-  static override styles: CSSResultGroup = [
-    motionStyles,
-    liveStyles,
-    terminusStyles,
-    styles,
-    statusMarkStyles,
-  ]
+  static override styles: CSSResultGroup = [motionStyles, liveStyles, styles, statusMarkStyles]
 
   /**
    * The shape of the mark on the last reading.
