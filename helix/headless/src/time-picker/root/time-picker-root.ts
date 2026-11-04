@@ -509,6 +509,16 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return next !== undefined && this.requestValue(next)
   }
 
+  /**
+   * Chooses the current time, as a press on the `show-now` button does, and
+   * returns whether the value changed.
+   *
+   * The time is read off the reader's clock and moved to the nearest time on
+   * offer that is not barred, so it falls on the `step` and inside `min` and
+   * `max`. It is requested as a pick is, so `helix-before-change` can cancel
+   * it. With a `mode` the time joins the times held, and a range that holds
+   * two starts over from it, as a third pick does.
+   */
   selectNow(): boolean {
     if (this.isDisabled) {
       return false
@@ -642,6 +652,32 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
     return wheelSeconds(this.times, hour, minute)
   }
 
+  /**
+   * Scrolls each wheel to its selected value, and the list to its selected
+   * time.
+   *
+   * A dial that opens at midnight when it holds ten in the evening is a dial
+   * showing the wrong thing, and CSS cannot fix it: `scroll-snap-type` chooses a
+   * snap point when something scrolls, and nothing has. Measured before this,
+   * with the value at 22:00, the hour wheel sat 288 pixels above its answer. The
+   * list had the same fault: holding 09:30 it opened on 12:00 AM with the answer
+   * 38 rows down and out of sight, flat on a page and in every Time Input panel.
+   * A list holding several, a range or a set, is left where it is, having no
+   * one row to come to rest on.
+   *
+   * The wheels on every update, because the columns re-render as the value
+   * moves and the minute column's contents change with the hour. The list on
+   * the first only, where it is flat on a page: centering it on every choice
+   * would move the row out from under the pointer that chose it.
+   *
+   * **And it is public, because an update is not the only moment that matters.**
+   * Inside a panel this element renders while the panel is still
+   * `display: none`, so every box measures zero and there is nothing to center
+   * against: measured, the hour wheel stayed 288 pixels off its answer because
+   * the only call happened before anything had a size. Whatever shows the panel
+   * calls this again afterwards. The guard below makes the early call harmless
+   * rather than wrong, which is why it can be left in.
+   */
   reveal(): void {
     if (this.mode !== undefined) {
       return
