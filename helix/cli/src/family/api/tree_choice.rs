@@ -798,6 +798,37 @@ pub const SCATTER_CHART_COMPUTED: &[&str] = &[
     "yTicks",
 ];
 
+/// What a strip of cells sends: a reading moved or pressed, a selection asked and
+/// changed, and how many cells it draws. Its props it reads by their own names.
+pub const HEATMAP: &[(&str, Names)] = &[
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onReadingChange", Names::Event),
+    ("onReadingPress", Names::Event),
+    ("onResize", Names::Event),
+];
+
+/// What a strip of cells computes for its parts, each read as `heatmap.x`.
+pub const HEATMAP_COMPUTED: &[&str] = &[
+    "actives",
+    "cells",
+    "drawn",
+    "empty",
+    "footed",
+    "live",
+    "loading",
+    "markX",
+    "markY",
+    "named",
+    "overview",
+    "placement",
+    "role",
+    "selection",
+    "tipCells",
+    "tipLabel",
+    "tipped",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1305,6 +1336,11 @@ pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
 }
 
+/// `heatmap({ ... })`, each field a name.
+pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1403,6 +1439,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "areaChart" => area_chart(value),
         "barChart" => bar_chart(value),
         "scatterChart" => scatter_chart(value),
+        "heatmap" => heatmap(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),
