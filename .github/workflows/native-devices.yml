@@ -63,7 +63,7 @@ jobs:
   # Whether the night has anything to run. A pull request and a run by hand
   # always do.
   changed:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     # `contents` as well, because a job's block replaces the workflow's.
     permissions:
@@ -133,7 +133,7 @@ jobs:
   packages:
     needs: changed
     if: needs.changed.outputs.run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     # The remote cache `verify` fills, for the reason `verify.yml` gives.
     env:
@@ -331,7 +331,7 @@ jobs:
   android-build:
     needs: [changed, packages]
     if: needs.changed.outputs.run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       EXPO_NO_TELEMETRY: 1
@@ -400,7 +400,7 @@ jobs:
   android:
     needs: [changed, android-build]
     if: needs.changed.outputs.run == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
       fail-fast: false
