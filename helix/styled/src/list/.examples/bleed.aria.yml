@@ -1,0 +1,8 @@
+- paragraph: Settings
+- separator
+- link "Profile":
+  - /url: "#profile"
+- link "Billing":
+  - /url: "#billing"
+- link "Notifications":
+  - /url: "#notifications"

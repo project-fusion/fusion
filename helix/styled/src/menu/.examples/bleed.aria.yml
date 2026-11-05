@@ -1,0 +1,7 @@
+- button "File" [expanded]
+- menu "File":
+  - menuitem "New file"
+  - menuitem "Open…"
+  - separator
+  - menuitem "Rename"
+- status

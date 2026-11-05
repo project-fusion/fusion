@@ -1,0 +1,32 @@
+- paragraph: Services
+- separator
+- rowgroup:
+  - row "Select every row Name Region Instances":
+    - columnheader "Select every row":
+      - checkbox "Select every row" [checked=mixed]
+      - text: Select every row
+    - columnheader "Name"
+    - columnheader "Region"
+    - columnheader "Instances"
+  - row "api":
+    - gridcell "Select api":
+      - checkbox "Select api"
+      - text: Select api
+    - rowheader "api"
+    - gridcell "eu-central-1"
+    - gridcell "12"
+  - row "web" [selected]:
+    - gridcell "Select web":
+      - checkbox "Select web" [checked]
+      - text: Select web
+    - rowheader "web"
+    - gridcell "us-east-1"
+    - gridcell "3"
+  - row "worker":
+    - gridcell "Select worker":
+      - checkbox "Select worker"
+      - text: Select worker
+    - rowheader "worker"
+    - gridcell "us-west-2"
+    - gridcell "5"
+- status
