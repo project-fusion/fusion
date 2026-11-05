@@ -511,7 +511,6 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'yName'
     | 'yTicks'
   >
-  /** What a strip of cells computes for its parts. */
   /** What a viewer of one item at a time computes for its parts. */
   readonly lightbox: Computes<
     | 'arrows'
@@ -524,6 +523,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'zoomOutOff'
     | 'zooms'
   >
+  /** What a strip of cells computes for its parts. */
   readonly heatmap: Computes<
     | 'actives'
     | 'cells'

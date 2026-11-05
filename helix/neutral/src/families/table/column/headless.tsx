@@ -55,6 +55,8 @@ export default headless('table-column', {
     rowHeader: false,
     sortable: false,
     textAlign: oneOf(['center', 'end', 'start']),
+    /* Where the column's cells sit from top to bottom; the web writes it on each cell. */
+    verticalAlign: oneOf(['center', 'end', 'start']),
     width: '',
     widthLabel: '{width, plural, one {# pixel} other {# pixels}}',
   },
