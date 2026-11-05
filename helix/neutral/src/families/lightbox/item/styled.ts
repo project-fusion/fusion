@@ -53,7 +53,9 @@ export default styles(
     on({ part: 'item', selector: '[part="item"] ::slotted(*)' }, [
       web([rule({ maxBlockSize: '100%', maxInlineSize: '100%', objectFit: 'contain' })]),
     ]),
-    on({ region: 'default', slotted: '*' }, [native([rule({ maxBlockSize: '100%', maxInlineSize: '100%' })])]),
+    on({ region: 'default', slotted: '*' }, [
+      native([rule({ maxBlockSize: '100%', maxInlineSize: '100%' })]),
+    ]),
     on({ region: 'description', slotted: '*' }, [
       rule({
         color: hook.descriptionColor,

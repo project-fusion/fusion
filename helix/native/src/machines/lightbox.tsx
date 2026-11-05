@@ -180,15 +180,47 @@ const useMoves = (family: Family, props: Props, use: MachineUse, items: readonly
 }
 
 /** Says the place each time it changes and as the viewer opens, as the web's live region does. */
-const useSaying = (words: string, at: number, open: boolean) => {
-  const said = useRef(words)
-  said.current = words
+const useSaying = (words: string, open: boolean) => {
   const speaks = open && words !== ''
   useEffect(() => {
     if (speaks) {
-      announce().say(said.current, 'polite')
+      announce().say(words, 'polite')
     }
-  }, [at, speaks])
+  }, [speaks, words])
+}
+
+/** A number a prop holds, or `fallback` where it holds none. */
+const numberIn = (value: unknown, fallback: number): number => Number(value ?? fallback) || fallback
+
+/** The place of the item shown in the words of `status-label`, or nothing in an empty set. */
+const placeIn = (template: string, items: readonly Item[], at: number, lang: string): string => {
+  const shown = items[at]
+  return shown === undefined
+    ? ''
+    : formatMessage(template, { count: items.length, index: at + 1, label: shown.label }, lang)
+}
+
+/** What the viewer's parts read: which controls it draws, which stand at an end, and its words. */
+const statesOf = (
+  read: (name: string) => unknown,
+  count: number,
+  at: number,
+  loop: boolean,
+  scale: number,
+) => {
+  const stepping = count > 1
+  const controls = read('controls') === true
+  const max = numberIn(read('maxZoom'), 1)
+  return {
+    arrows: controls && stepping,
+    atEnd: !loop && (count === 0 || at >= count - 1),
+    atStart: !loop && (count === 0 || at <= 0),
+    counted: read('counter') === true && stepping,
+    named: wordsIn(read('label')) || wordsIn(read('fallbackLabel')),
+    zoomInOff: scale >= max,
+    zoomOutOff: scale <= 1,
+    zooms: controls && max > 1,
+  }
 }
 
 /** The hardware keys, heard anywhere in the app while the viewer is open, on the view the viewer gives. */
@@ -277,17 +309,10 @@ export const useLightbox = (
   const items = useMemo(() => itemsOf(props.children), [props.children])
   const count = items.length
   const { at, keyed, loop, shown, step } = useMoves(family, props, use, items)
-  const maxZoom = Number(read('maxZoom') ?? 1) || 1
-  const place =
-    shown === undefined
-      ? ''
-      : formatMessage(
-          wordsIn(read('statusLabel')),
-          { count, index: at + 1, label: shown.label },
-          lang,
-        )
-  useSaying(place, at, open)
-  const idle = useIdle(Number(read('idleDelay') ?? 0) || 0, open)
+  const maxZoom = numberIn(read('maxZoom'), 1)
+  const place = placeIn(wordsIn(read('statusLabel')), items, at, lang)
+  useSaying(place, open)
+  const idle = useIdle(numberIn(read('idleDelay'), 0), open)
   const zoom = useLightboxZoom({
     lang,
     max: maxZoom,
@@ -322,10 +347,7 @@ export const useLightbox = (
     () => slidesOf(items, at, slideLabel, roleLabel, lang),
     [at, items, lang, roleLabel, slideLabel],
   )
-  const stepping = count > 1
-  const atEnd = !loop && (count === 0 || at >= count - 1)
-  const atStart = !loop && (count === 0 || at <= 0)
-  const controls = read('controls') === true
+  const states = statesOf(read, count, at, loop, zoom.scale)
   return {
     marks: [
       ...(idle.resting ? ['idle'] : []),
@@ -334,28 +356,21 @@ export const useLightbox = (
     ],
     parts: {
       host: {
-        states: {
-          [flag('arrows')]: controls && stepping,
-          [flag('atEnd')]: atEnd,
-          [flag('atStart')]: atStart,
-          [flag('counted')]: read('counter') === true && stepping,
-          [flag('named')]: wordsIn(read('label')) || wordsIn(read('fallbackLabel')),
-          [flag('place')]: place,
-          [flag('zoomInOff')]: zoom.scale >= maxZoom,
-          [flag('zoomOutOff')]: zoom.scale <= 1,
-          [flag('zooms')]: controls && maxZoom > 1,
-        },
+        states: Object.fromEntries([
+          ...Object.entries(states).map(([name, value]) => [flag(name), value]),
+          [flag('place'), place],
+        ]),
       },
-      next: pressed(atEnd, () => step(1)),
-      previous: pressed(atStart, () => step(-1)),
+      next: pressed(states.atEnd, () => step(1)),
+      previous: pressed(states.atStart, () => step(-1)),
       viewport: {
         view: { onLayout: zoom.measure, onTouchStart: stir, ref: setView },
         wrap: (view: ReactNode) => (
           <GestureDetector gesture={zoom.driver.gesture}>{view}</GestureDetector>
         ),
       },
-      'zoom-in': pressed(zoom.scale >= maxZoom, zoom.zoomIn),
-      'zoom-out': pressed(zoom.scale <= 1, zoom.zoomOut),
+      'zoom-in': pressed(states.zoomInOff, zoom.zoomIn),
+      'zoom-out': pressed(states.zoomOutOff, zoom.zoomOut),
     },
     regions: { default: zoomed(drawn, zoom.driver.style) },
   }
