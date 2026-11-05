@@ -39,13 +39,20 @@
   text-align: center;
 }
 
+/* The color goes on the slot, where whatever is assigned inherits it. Written
+   on `::slotted`, it would beat a slotted component's own `:host` color, as it
+   turned an avatar's initials muted in a list row. */
+slot[name="start"],
+slot[name="end"] {
+  color: var(--helix-color-foreground-muted);
+}
+
 /*
  *  A unit or an icon at either end: quieter than the number, and never shrinking
  * when the field is narrow. `Input` answers both the same way.
  */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
-  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
 }
 
