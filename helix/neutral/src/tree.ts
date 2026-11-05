@@ -83,6 +83,7 @@ import type {
   PaginationRootChoice,
   PaginationSizeChoice,
   PickerFieldChoice,
+  ScatterChartChoice,
   SelectChoice,
   SparklineChoice,
   TableChoice,
@@ -365,6 +366,7 @@ export interface Headless {
   readonly areaChart?: AxisChartChoice
   /** What the element reads, sends, and computes where it is a chart of columns. */
   readonly barChart?: BarChartChoice
+  readonly scatterChart?: ScatterChartChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */

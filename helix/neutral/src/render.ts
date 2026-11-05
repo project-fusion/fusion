@@ -487,6 +487,30 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tipLabel'
     | 'tipped'
   >
+  /** What a chart of points computes for its parts. */
+  readonly scatterChart: Computes<
+    | 'active'
+    | 'cells'
+    | 'drawn'
+    | 'empty'
+    | 'gridlines'
+    | 'layers'
+    | 'live'
+    | 'loading'
+    | 'markX'
+    | 'markY'
+    | 'named'
+    | 'placement'
+    | 'role'
+    | 'summary'
+    | 'tipLabel'
+    | 'tipped'
+    | 'trends'
+    | 'xName'
+    | 'xTicks'
+    | 'yName'
+    | 'yTicks'
+  >
   /** What a chart's key computes for its parts: its entries, and its list's name and role. */
   readonly legend: Computes<'entries' | 'named' | 'role'>
   /** What a sparkline computes for its parts: its marks, where each stands, and the reading shown. */
