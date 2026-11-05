@@ -37,7 +37,9 @@ describe('Video without expo-video', () => {
     )
     expect(alert.length).toBeGreaterThan(0)
     expect(drawn.queryByText('This video cannot be played here')).not.toBeNull()
-    expect(drawn.container.queryAll((node) => node.props.accessibilityLabel === 'Play')).toHaveLength(0)
+    expect(
+      drawn.container.queryAll((node) => node.props.accessibilityLabel === 'Play'),
+    ).toHaveLength(0)
     const stills = drawn.container.queryAll(
       (node) =>
         typeof node.props.source === 'object' &&
