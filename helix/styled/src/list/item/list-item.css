@@ -62,8 +62,17 @@
    just the same: measured on an ordered list, the text sat 28px in where the
    row's own inset is 16, the extra twelve being a gap next to a column holding
    nothing. */
-slot[name="start"]::slotted(*) {
+/* **The muted color goes on the slot, where the slotted element inherits it.**
+   A `::slotted` declaration belongs to this shadow tree, which is the outer
+   context to the slotted element's own, so it beats that element's `:host` rule:
+   written on `::slotted(*)`, it turned an avatar's initials muted. Inherited, it
+   reaches an icon and a bare span, and loses to any component that sets its own
+   color. */
+slot[name="start"] {
   color: var(--helix-color-foreground-muted);
+}
+
+slot[name="start"]::slotted(*) {
   grid-column: 2;
   margin-inline-end: var(--helix-space-sm);
   grid-row: 1 / span 2;
