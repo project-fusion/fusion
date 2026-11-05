@@ -398,11 +398,13 @@ export class HelixHeadlessOption extends HelixElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    for (const name of ['media', 'indicator'] as const) {
-      const slot = this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
-      if (slot) {
-        this.toggleState(`has-${name}`, slotFilled(slot))
-      }
+    const media = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="media"]')
+    if (media) {
+      this.toggleState('has-media', slotFilled(media))
+    }
+    const indicator = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="indicator"]')
+    if (indicator) {
+      this.toggleState('has-indicator', slotFilled(indicator))
     }
   }
 
