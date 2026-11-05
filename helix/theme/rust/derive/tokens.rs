@@ -8,7 +8,9 @@
 
 use crate::derive::accent::{seeded, settle};
 use crate::derive::emphasis::{chosen, emphasis, ink, Emphasis};
-use crate::derive::fills::{filled_grounds, hover_of, on_fill, on_ink, status_fills, Fill};
+use crate::derive::fills::{
+    filled_grounds, hover_of, in_scheme, on_fill, on_ink, status_fills, Fill,
+};
 use crate::derive::inks::{neutral_inks, NeutralInks};
 use crate::derive::marks::{brand_mark, focus_ring, inverse};
 use crate::derive::quiet::quiet;
@@ -102,7 +104,10 @@ impl Phases {
         named: Option<(Oklch, Oklch)>,
         neutral: Cast,
     ) -> Self {
-        let primary = named.map_or_else(|| ink(neutral, ctx), |(_, brand)| chosen(brand, ctx));
+        let primary = named.map_or_else(
+            || ink(neutral, ctx),
+            |(_, brand)| in_scheme(chosen(brand, ctx), brand, ctx.scheme),
+        );
         /* **Ink counts as an ordinary brand's loudness, as far as the statuses
         go.** `harmony` pulls a status toward the palette's own loudness, and ink
         has none to pull toward: taken as a brand at chroma 0, the default
@@ -123,11 +128,15 @@ impl Phases {
                     Seed::Relation(relation) => relation.allowance.unwrap_or(45.0),
                 };
                 let settled = settle(seed, pinned, bound, primary.raw, &statuses, ctx);
-                let accent = if pinned {
-                    chosen(settled, ctx)
-                } else {
-                    emphasis(settled, ctx)
-                };
+                let accent = in_scheme(
+                    if pinned {
+                        chosen(settled, ctx)
+                    } else {
+                        emphasis(settled, ctx)
+                    },
+                    settled,
+                    ctx.scheme,
+                );
                 let origin = if pinned {
                     Origin::Pinned
                 } else {
@@ -144,14 +153,14 @@ impl Phases {
         let primary_ink = named.is_none();
         let accent_ink = primary_ink && resolved.accent.is_none();
         let grounds = filled_grounds(
-            (!primary_ink).then_some(primary.filled),
-            (!accent_ink).then_some(accent.filled),
+            (!primary_ink).then_some(&primary),
+            (!accent_ink).then_some(&accent),
             &fills,
         );
         let colored = on_fill(&grounds, resolved.contrast_target);
         let on_primary = if primary_ink {
             on_ink(
-                primary.filled,
+                &primary,
                 ctx.surfaces.raw_background,
                 resolved.contrast_target,
             )
@@ -295,11 +304,10 @@ fn assemble(
     filled anything, the inverse pair a toast uses and the ring a keyboard
     depends on: a ground or an ink the stylesheet has and the engine does not is
     a themed page keeping the stock color exactly where it matters most. */
-    tokens.push(plain(
-        "color-primary-surface-hover",
-        hover_of(primary.filled),
-    ));
-    tokens.push(plain("color-accent-surface-hover", hover_of(accent.filled)));
+    tokens.push(plain("color-primary-surface-hover", primary.filled_hover));
+    tokens.push(plain("color-primary-surface-active", primary.filled_active));
+    tokens.push(plain("color-accent-surface-hover", accent.filled_hover));
+    tokens.push(plain("color-accent-surface-active", accent.filled_active));
     for (name, fill) in fills {
         tokens.push(plain(&format!("color-{name}-surface"), fill.rest));
         tokens.push(plain(

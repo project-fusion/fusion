@@ -34,7 +34,13 @@ fn edge(mechanism: Mechanism) -> &'static str {
 /* Stated rather than referenced, because the emitted file has to stand on its
 own: a consumer who takes the block and not the stylesheet still gets a lift. */
 const SHADOW_IN_FLOW: &str = "0 4px 12px color-mix(in oklab, oklch(0.13 0 0) 10%, transparent)";
-const SHADOW_FLOATING: &str = "0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, transparent)";
+/* **A contact layer under the lift**, as the stylesheet's `shadow-floating` is
+`shadow-sm` under `shadow-lg`. The lift alone is a faint ink spread over 32px,
+so a menu over a white dialog was white on white with nothing at its edge but
+the hairline. The contact layer is first, so it paints over the lift. Its 8%
+is the stylesheet's dark `shadow-sm` ink, as the 14% beside it is the dark
+`shadow-lg` ink and the 10% above is the dark `shadow-md` ink. */
+const SHADOW_FLOATING: &str = "0 1px 2px color-mix(in oklab, oklch(0.13 0 0) 8%, transparent), 0 12px 32px color-mix(in oklab, oklch(0.13 0 0) 14%, transparent)";
 
 const SPRING: &str = "spring";
 

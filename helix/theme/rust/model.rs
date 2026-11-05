@@ -83,14 +83,21 @@ pub const TINTS: [&str; 2] = ["color-primary-subtle", "color-accent-subtle"];
 /// different color with the same text on it, so an ink solved against the
 /// resting fill alone leaves the hovered half unmeasured. Six families times two
 /// states is twelve grounds.
-pub const FILLS: [&str; 12] = [
+///
+/// **The primary and the accent add their press**, which the engine emits for
+/// those two: in dark a brand fill steps lighter under the pointer and lighter
+/// again under the press, toward its label, so the press is the state the label
+/// clears by the least. The status fills keep their press in the stylesheet.
+pub const FILLS: [&str; 14] = [
     "color-accent-surface",
+    "color-accent-surface-active",
     "color-accent-surface-hover",
     "color-danger-surface",
     "color-danger-surface-hover",
     "color-info-surface",
     "color-info-surface-hover",
     "color-primary-surface",
+    "color-primary-surface-active",
     "color-primary-surface-hover",
     "color-success-surface",
     "color-success-surface-hover",
@@ -165,8 +172,41 @@ pub const HOVER: Wash = Wash {
     name: "color-hover",
 };
 
+/// What something chosen is lit with when it keeps its own ground, which
+/// `tokens.ts` declares as 13% of the foreground in light and 16% in dark: a
+/// range of days, a pressed toggle in a find bar, a selected row.
+///
+/// **Quiet text stays on it**, as it does on a lit row, so the quiet ink is
+/// solved against it over each surface of the ladder. Measured in Chromium on
+/// November 4, 2026, with the ink solved against the hover wash alone: a
+/// selected List row's description at 4.34:1 in light.
+pub const SELECTED: Wash = Wash {
+    dark: 16,
+    ink: "color-foreground",
+    light: 13,
+    name: "color-selected",
+};
+
+/// What a control is lit with under a press, which `tokens.ts` declares as 16%
+/// of the foreground in light and 19% in dark. It is also what a chosen row is
+/// lit with under the pointer.
+///
+/// **The strongest wash a row takes**, so it is the one that decides the quiet
+/// ink: a pressed row of a raised panel measured 3.82:1 in light and 3.65 in
+/// dark on November 4, 2026, with the ink solved against the hover wash alone.
+pub const PRESS: Wash = Wash {
+    dark: 19,
+    ink: "color-foreground",
+    light: 16,
+    name: "color-press",
+};
+
 /// Every wash the model names, which is what a ground's name is read against.
-pub const WASHES: [Wash; 2] = [WELL, HOVER];
+pub const WASHES: [Wash; 4] = [WELL, HOVER, SELECTED, PRESS];
+
+/// The three washes a row is lit with, from the faintest: under the pointer,
+/// chosen, and pressed.
+pub const ROW_WASHES: [Wash; 3] = [HOVER, SELECTED, PRESS];
 
 /// The name of a wash over one ground, `color-well over color-surface`, which
 /// is the ground a pair over it reports.
@@ -242,8 +282,9 @@ pub static GROUNDS: LazyLock<Vec<Ground>> = LazyLock::new(|| {
     October 10, 2026, with the quiet ink solved against the ladder and the
     well alone: an option's description at 4.31:1 on its lit row on a sunken
     panel in the default theme, and at 3.65:1 on a raised one in the default
-    dark theme. */
-    grounds.extend(hovers().iter().map(|name| bounded(name)));
+    dark theme. The selected and the press washes are the same case at a
+    greater strength, so each is a ground over each surface as well. */
+    grounds.extend(lit_rows().iter().map(|name| bounded(name)));
     /* **A field on a tinted row**, such as a selected row of a list that holds
     one. The tint is a ground of its own, so the well over it is too. Measured
     the same day: a placeholder at 4.41:1 on the well over `primary-subtle` in
@@ -264,11 +305,12 @@ fn wells() -> Vec<String> {
         .collect()
 }
 
-/// The hover wash over each surface of the page ladder, in the ladder's order.
-fn hovers() -> Vec<String> {
-    PAGE_SURFACES
+/// Each row wash over each surface of the page ladder: the hover wash over
+/// every rung in the ladder's order, then the selected wash, then the press.
+fn lit_rows() -> Vec<String> {
+    ROW_WASHES
         .iter()
-        .map(|ground| over(HOVER, ground))
+        .flat_map(|wash| PAGE_SURFACES.iter().map(|ground| over(*wash, ground)))
         .collect()
 }
 
@@ -291,7 +333,7 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
                 owned(&TINTS),
                 owned(&["color-overlay"]),
                 wells(),
-                hovers(),
+                lit_rows(),
                 tinted_wells(),
             ]
             .concat(),
@@ -307,7 +349,7 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
                 pages.clone(),
                 wells(),
                 owned(&TINTS),
-                hovers(),
+                lit_rows(),
                 tinted_wells(),
             ]
             .concat(),
@@ -318,12 +360,20 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
         so one label measured against all twelve could never pass. */
         Ink {
             contrast: Contrast::Text,
-            grounds: owned(&["color-primary-surface", "color-primary-surface-hover"]),
+            grounds: owned(&[
+                "color-primary-surface",
+                "color-primary-surface-hover",
+                "color-primary-surface-active",
+            ]),
             name: "color-foreground-on-primary".to_owned(),
         },
         Ink {
             contrast: Contrast::Text,
-            grounds: owned(&["color-accent-surface", "color-accent-surface-hover"]),
+            grounds: owned(&[
+                "color-accent-surface",
+                "color-accent-surface-hover",
+                "color-accent-surface-active",
+            ]),
             name: "color-foreground-on-accent".to_owned(),
         },
         Ink {

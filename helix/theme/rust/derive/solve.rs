@@ -37,6 +37,18 @@ use crate::oklch::{
 /// If handed no grounds. No caller has one: the model supplies them.
 #[must_use]
 pub fn solve_against(grounds: &[Oklch], sample: Cast, target: f64) -> Oklch {
+    solve_on_side(grounds, sample, target, None)
+}
+
+/// [`solve_against`] with each candidate searched on one side of its ground,
+/// darker when `darker` is `Some(true)` and lighter when it is `Some(false)`,
+/// or on whichever side reads when it is `None`.
+///
+/// # Panics
+///
+/// If handed no grounds, as [`solve_against`] does.
+#[must_use]
+pub fn solve_on_side(grounds: &[Oklch], sample: Cast, target: f64, darker: Option<bool>) -> Oklch {
     assert!(
         !grounds.is_empty(),
         "an ink is solved against at least one ground"
@@ -62,7 +74,7 @@ pub fn solve_against(grounds: &[Oklch], sample: Cast, target: f64) -> Oklch {
                 sample.hue,
                 *ground,
                 target,
-                None,
+                darker,
                 CONTRAST_STEPS,
             )
         })

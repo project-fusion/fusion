@@ -131,14 +131,24 @@ pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
 }
 
 /// Three sRGB bytes to OKLCH: [`hex_to_oklch`] once the string is read.
+fn from_bytes(bytes: [u8; 3]) -> Oklch {
+    let [r, g, b] = bytes.map(|value| srgb_to_linear(f64::from(value) / 255.0));
+    linear_rgb_to_oklch(LinearRgb { b, g, r })
+}
+
+/// Linear-light sRGB to OKLCH, the inverse of [`oklch_to_linear_rgb`].
+///
+/// Unclamped, so a color scaled in linear light past what sRGB holds comes back
+/// as the out-of-gamut color it is, for [`fit_to_gamut`] to bring in.
 /* `l`, `m`, `s`, `a` and `b` are Oklab's own names for its axes and its LMS
 response, and the coefficients below are only checkable against Ottosson's
 published matrices by keeping them. Naming them `long`, `medium` and `short`
 would make a line-by-line comparison with the TypeScript, which is the thing
 this file is a port of, harder for every future reader. */
 #[allow(clippy::many_single_char_names)]
-fn from_bytes(bytes: [u8; 3]) -> Oklch {
-    let [r, g, b] = bytes.map(|value| srgb_to_linear(f64::from(value) / 255.0));
+#[must_use]
+pub fn linear_rgb_to_oklch(rgb: LinearRgb) -> Oklch {
+    let LinearRgb { b, g, r } = rgb;
 
     /* The cube roots of the LMS response, which is where Oklab starts.
     Coefficients are Ottosson's, and are the inverse of the matrix

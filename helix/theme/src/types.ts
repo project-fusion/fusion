@@ -88,6 +88,8 @@ export interface PairingRequest {
    * surface it sits on: 5% of the theme's `color-foreground` laid over that
    * surface, as the stylesheet paints it. `color-hover over color-surface`
    * names a lit row over it: 8% of `color-foreground` in light and 12% in dark.
+   * `color-selected` names a chosen row, at 13% and 16%, and `color-press` a
+   * pressed one, at 16% and 19%.
    */
   background: string
   foreground: string
@@ -409,7 +411,8 @@ export interface Pairing {
   /**
    * The ground, as the request names it. `color-well over color-surface` is a
    * field's well over that surface, and `color-hover over color-surface` is a
-   * lit row over it.
+   * lit row over it. `color-selected` and `color-press` are a chosen row and a
+   * pressed one.
    */
   background: string
   foreground: string
