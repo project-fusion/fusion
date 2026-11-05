@@ -235,7 +235,55 @@ describe('a menu, by default', () => {
 
 describe('a data table with `bleed`', () => {
   geometry(
-    'keeps its words and headings on its edge, and paints each row’s edge cells past it',
+    'keeps its words and headings on its edge, and runs each row and its rule past it',
+    async () => {
+      const region = await mount(
+        `<div style="padding: 2rem"><helix-data-table bleed default-selected="api" label="Services" row-key="name" selectable>
+        <helix-table-column field="name">Name</helix-table-column>
+        <helix-table-column field="count">Count</helix-table-column>
+      </helix-data-table></div>`,
+      )
+      const host = region.querySelector('helix-data-table') as HTMLElement & {
+        rows: readonly Record<string, unknown>[]
+      }
+      host.rows = [
+        { count: 3, name: 'api' },
+        { count: 5, name: 'web' },
+        /* So the plain row above is not the last, which draws no rule. */
+        { count: 1, name: 'worker' },
+      ]
+      await settleAll(region)
+      const amount = bleedIn(region)
+      const edge = box(host).left
+      const table = box(partOf(host, 'table'))
+      expect(table.left).toBeCloseTo(edge - amount, 0)
+      expect(table.right).toBeCloseTo(box(host).right + amount, 0)
+      const rows = [...(host.shadowRoot?.querySelectorAll('[part~="row"]') ?? [])]
+      const [chosen, plain] = rows
+      const first = chosen?.firstElementChild as HTMLElement
+      const last = chosen?.lastElementChild as HTMLElement
+      /* The row's fill and its rule run to the table's edges. */
+      expect(box(first).left).toBeCloseTo(table.left, 0)
+      expect(box(last).right).toBeCloseTo(table.right, 0)
+      /* The checkbox keeps its own step inside the bleed, so it stands where it did. */
+      const name = chosen?.querySelector('[part~="cell"]') as HTMLElement
+      expect(wordsAt(name)).toBeGreaterThan(edge)
+      /* The last column's words end on the host's edge, as they did. */
+      const count = last.getBoundingClientRect()
+      expect(count.right - Number.parseFloat(getComputedStyle(last).paddingInlineEnd)).toBeCloseTo(
+        box(host).right,
+        0,
+      )
+      /* A chosen row is its fill between the lines; a plain row keeps its rule. */
+      expect(getComputedStyle(first).borderBlockEndColor).toBe('rgba(0, 0, 0, 0)')
+      expect(getComputedStyle(plain?.firstElementChild as Element).borderBlockEndColor).not.toBe(
+        'rgba(0, 0, 0, 0)',
+      )
+    },
+  )
+
+  geometry(
+    'puts the first column’s words and heading on its edge where nothing leads them',
     async () => {
       const region = await mount(
         `<div style="padding: 2rem"><helix-data-table bleed label="Services">
@@ -248,14 +296,11 @@ describe('a data table with `bleed`', () => {
       }
       host.rows = [{ count: 3, name: 'api' }]
       await settleAll(region)
-      const amount = bleedIn(region)
-      const table = box(partOf(host, 'table'))
-      expect(table.left).toBeCloseTo(box(host).left - amount, 0)
-      const first = host.shadowRoot?.querySelector('[part~="row"] > :first-child') as HTMLElement
-      expect(box(first).left).toBeCloseTo(box(host).left, 0)
-      const edge = getComputedStyle(first, '::before')
-      expect(Number.parseFloat(edge.inlineSize)).toBeCloseTo(amount, 0)
-      expect(edge.backgroundColor).toBe(getComputedStyle(first).backgroundColor)
+      const edge = box(host).left
+      const cell = host.shadowRoot?.querySelector('[part~="row"] > :first-child') as HTMLElement
+      expect(wordsAt(cell)).toBeCloseTo(edge, 0)
+      const heading = host.querySelector('helix-table-column') as HTMLElement
+      expect(wordsAt(heading)).toBeCloseTo(edge, 0)
     },
   )
 })

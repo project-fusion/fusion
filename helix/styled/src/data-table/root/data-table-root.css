@@ -246,52 +246,62 @@
   background-color: var(--data-table-row-background-color);
 }
 
-/* **`bleed`: the words stay on the table's edge, and each row's fill reaches
-   past it.** A row has no box to take a margin, so the table takes the room
-   instead, as padding inside the box that scrolls and clips, pulled back out by
-   the same margin, and the first and last cell of each row paint their own fill
-   into it. The headings and the rules stay on the words' column. The table's
-   parent has to leave the room, as a list's does. */
+/* **`bleed`: the words stay on the table's edge, and each row reaches past
+   it.** The table is wider than its host by the bleed on each side, and the
+   first and last box of every row, the headings' included, take the same
+   amount on top of their own inset, so the words stand where they did while
+   each row's fill and the rule under it run on to the same edge. A fill drawn
+   past rules that stopped short read as a block pasted over the lines.
+   The table's parent has to leave the room, as a list's does. */
 :host([bleed]) {
   --_data-table-bleed: var(--data-table-bleed, var(--helix-space-row-bleed));
 }
 
 :host([bleed]) [part="table"] {
-  box-sizing: content-box;
+  inline-size: calc(100% + var(--_data-table-bleed) * 2);
   margin-inline: calc(var(--_data-table-bleed) * -1);
-  padding-inline: var(--_data-table-bleed);
 }
 
-:host([bleed]) [part~="row"] > :first-child,
-:host([bleed]) [part~="row"] > :last-child {
-  position: relative;
+/* Before the tree grid's indent below, which adds the lead to its own sum and
+   wins at the same weight by coming later. */
+:host([bleed]) :where([part~="row"], [part="head"]) > :first-child {
+  --_data-table-lead: var(--_data-table-bleed);
+  padding-inline-start: var(--_data-table-bleed);
 }
 
-/* `inherit` from the cell, which is what makes the edge the row's fill in every
-   state a rule below gives it: hover, selected, dragging. */
-:host([bleed]) [part~="row"] > :first-child::before,
-:host([bleed]) [part~="row"] > :last-child::after {
-  background-color: inherit;
-  content: "";
-  inline-size: var(--_data-table-bleed);
-  inset-block: 0;
-  pointer-events: none;
-  position: absolute;
+:host([bleed]) :where([part~="row"], [part="head"]) > :last-child {
+  padding-inline-end: var(--_data-table-bleed);
 }
 
-/* Rounded on the outside only, as a list's row is: the edges are the only
-   outer corners a row's fill has, and the cells between them stay square so
-   the columns and the rules under them meet as they did. */
-:host([bleed]) [part~="row"] > :first-child::before {
-  border-end-start-radius: var(--helix-radii-sm);
-  border-start-start-radius: var(--helix-radii-sm);
-  inset-inline-start: calc(var(--_data-table-bleed) * -1);
+/* A checkbox or a grip leading the row keeps its own step inside the bleed. */
+:host([bleed])
+  :where([part~="row"], [part="head"])
+  > :is([part~="select"], [part="select-all"], [part="row-grip"], [part="grip-head"]):first-child {
+  padding-inline-start: calc(var(--helix-space-sm) + var(--_data-table-bleed));
 }
 
-:host([bleed]) [part~="row"] > :last-child::after {
-  border-end-end-radius: var(--helix-radii-sm);
-  border-start-end-radius: var(--helix-radii-sm);
-  inset-inline-end: calc(var(--_data-table-bleed) * -1);
+/* The headings are drawn by each column, so the first and the last are handed
+   the bleed through the relay above. The first only where nothing leads it. */
+:host([bleed]:not([selectable]):not([reorderable-rows]))
+  ::slotted(helix-table-column:first-of-type) {
+  --_table-heading-padding-inline: var(--_data-table-bleed) var(--helix-space-md);
+}
+
+:host([bleed]) ::slotted(helix-table-column:last-of-type) {
+  --_table-heading-padding-inline: var(--helix-space-none) var(--_data-table-bleed);
+}
+
+:host([bleed]:not([selectable]):not([reorderable-rows]))
+  ::slotted(helix-table-column:only-of-type) {
+  --_table-heading-padding-inline: var(--_data-table-bleed);
+}
+
+/* **A chosen or hovered row is its fill between the lines**, so the rule under
+   it does not draw across the fill, and chosen rows next to each other read as
+   one wash rather than strips cut by lines. */
+:host([bleed]) [part~="row"][aria-selected="true"] > *,
+:host([bleed][row-link]) [part~="row"]:hover > * {
+  border-block-end-color: transparent;
 }
 
 /* `row-link` makes the row a target, so the row says so under a pointer. */
@@ -461,6 +471,7 @@
     var(--data-table-toggle-gap, var(--helix-space-2xs))
   );
   padding-inline-start: calc(
+    var(--_data-table-lead, var(--helix-space-none)) +
     (var(--data-table-level, 1) - 1) *
     var(--data-table-indent, var(--_data-table-gutter))
   );
@@ -468,6 +479,7 @@
 
 :host([child-field]) [part~="cell-header"]:not(:has([part~="toggle"])) {
   padding-inline-start: calc(
+    var(--_data-table-lead, var(--helix-space-none)) +
     (var(--data-table-level, 1) - 1) *
     var(--data-table-indent, var(--_data-table-gutter)) +
     var(--_data-table-gutter)
