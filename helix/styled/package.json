@@ -425,6 +425,14 @@
       "types": "./dist/legend/index.d.ts",
       "default": "./dist/legend/index.js"
     },
+    "./lightbox": {
+      "react-native": {
+        "types": "./dist/lightbox/index.native.d.ts",
+        "default": "./dist/lightbox/index.native.js"
+      },
+      "types": "./dist/lightbox/index.d.ts",
+      "default": "./dist/lightbox/index.js"
+    },
     "./line-chart": {
       "react-native": {
         "types": "./dist/line-chart/index.native.d.ts",
