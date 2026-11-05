@@ -249,9 +249,10 @@ export default styles(
         }),
       ]),
       /* What sits at either end keeps its size, so the text gives way. */
-      on({ region: ['start', 'end'], slotted: '*' }, [
-        rule({ color: token('color-foreground-muted'), flex: '0 0 auto' }),
-      ]),
+      /* The color goes on the slot, where what is passed in inherits it: written on
+         `::slotted`, it beat a slotted component's own `:host` color. */
+      on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
+      on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: '0 0 auto' })]),
       on('host', [rule({ print: true }, { printColorAdjust: web('exact') })]),
     ]
   },

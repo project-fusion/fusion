@@ -99,9 +99,10 @@ export default styles(
     include(floatingPanel),
     include(floatingEntrance),
     on('control', [rule({ mode: { not: 'multiple' } }, { textOverflow: web('ellipsis') })]),
-    on({ region: ['start', 'end'], slotted: '*' }, [
-      rule({ color: token('color-foreground-muted'), flex: 'none' }),
-    ]),
+    /* The color goes on the slot, where what is passed in inherits it: written on
+       `::slotted`, it beat a slotted component's own `:host` color. */
+    on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
+    on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: 'none' })]),
     /* A mark in the field, with no box of its own: the press reaches the target. */
     on('trigger', [
       rule({

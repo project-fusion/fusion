@@ -125,9 +125,10 @@ export default styles(
         rule({ part: { hidden: true } }, { display: 'none' }),
       ]),
       on({ region: 'end' }, [rule(actions)]),
-      on({ region: ['start', 'end'], slotted: '*' }, [
-        rule({ color: token('color-foreground-muted'), flex: '0 0 auto' }),
-      ]),
+      /* The color goes on the slot, where what is passed in inherits it: written on
+         `::slotted`, it beat a slotted component's own `:host` color. */
+      on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
+      on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: '0 0 auto' })]),
       /* The tokens stand in the field's own row, as the web's `display: contents` row does,
          so the text takes the room left on the last line. */
       on('tags', [native([rule({ display: 'contents' })])]),
