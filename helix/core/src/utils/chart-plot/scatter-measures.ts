@@ -1,11 +1,11 @@
-import { seriesKey } from '@fusion.dev/helix-core'
+import { seriesKey } from '../read-series/read-series.js'
 
 /*
  * What each of a Scatter Chart's numeric columns measures, and how large a
  * point is drawn, as arithmetic with no element in it.
  *
- * Pure and beside the family's `index.ts`, so a spec holds the split of the
- * columns and the bubble sizes without a page.
+ * Pure and in core, which a phone's chart reads as the web's does, so a spec
+ * holds the split of the columns and the bubble sizes without a page.
  */
 
 /** The numeric columns by what they measure. */

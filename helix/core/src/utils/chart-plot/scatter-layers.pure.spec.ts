@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { layersOf } from './layers.js'
+import { layersOf } from './scatter-layers.js'
 
 const at = (x: number, y: number, width = 10): { width: number; x: number; y: number } => ({
   width,
