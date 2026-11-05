@@ -79,6 +79,10 @@ const KEYS = new Set([
  * and Control+Shift+Home or End checks every item from the focused one to the
  * first or the last, then moves there, as the tree pattern's range keys do.
  *
+ * Tab moves from the focused item into its `actions`, and out of the tree
+ * after them. A key pressed there is the control's, so the arrows, Enter,
+ * Space and typed letters move and choose nothing in the tree.
+ *
  * A tree with no name of its own is announced as "Tree", which says nothing
  * about what it holds, so a development build warns once with the kind
  * `missing-name` where neither `label` nor an `aria-label` names it.
@@ -804,6 +808,11 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
      * no-op: it returns the element it was called on. */
     const current = closestInstance(event.target as Element | null, HelixHeadlessTreeItem)
     if (!current || !this.items.includes(current)) {
+      return
+    }
+    /* A key pressed in a row's actions is the control's: Space on a menu
+       button opens the menu, and the arrows move inside it. */
+    if (current.fromActions(event)) {
       return
     }
     if (this.multiple && this.handleMultiple(current, event)) {

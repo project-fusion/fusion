@@ -49,6 +49,17 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * sends `helix-load`, the row says it is busy, and the children you add appear
  * in it. Remove `lazy` once they are in.
  *
+ * **The `actions` slot holds the row's own controls**, such as a button that
+ * opens a menu of what you can do with the item. A press, a key or a
+ * right-click there stays with the control: it does not choose, open, follow
+ * or move the row. The actions show while the pointer is over the row, while
+ * the row has focus, and while focus is inside them. Tab moves from the focused
+ * row into its actions and Shift+Tab back. Every other row's actions are
+ * `inert`, so Tab leaves the tree after the focused row's. A row with actions
+ * is named by its label alone, so the controls are not read as part of its
+ * name. On a touch screen the first tap on a row chooses and focuses it, which
+ * shows its actions.
+ *
  * **In a `reorderable` tree, the row has a grip** at its far end, which a
  * pointer drags to move the item among its siblings. The tree says which item
  * is moving and where the drop indicator is, with the `dragging`,
@@ -60,6 +71,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @documentation https://fusion.dev/helix/components/tree
  *
  * @slot - The item's label. A nested item does not go here: give it `slot="children"`. In a development build, an item nested here is reported.
+ * @slot actions - Controls for the row, after `end`, such as a button that opens a menu. Shown while the row is hovered or focused.
  * @slot chevron - Replaces the expand and collapse mark of a branch, such as with your own icon.
  * @slot children - Nested items, which make this a branch.
  * @slot end - Content after the label, at the far side of the row, such as a count or a state.
@@ -71,6 +83,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @event {HelixLoadEvent} helix-load - Fired when a `lazy` item opens, so you can load its children.
  * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
+ * @csspart actions - The `actions` slot, which draws no box of its own. `inert` while the actions are not shown, which takes what it holds off the tab order and out of reach of the pointer.
  * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
  * @csspart checkbox-checked - The check mark's box while the item is checked.
  * @csspart checkbox-mixed - The check mark's box while some of a branch's items are checked.
@@ -84,6 +97,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  *
  * @cssproperty --tree-level - How deep this row sits, counting from one as `aria-level` does, for the indent.
  *
+ * @cssstate actions-shown - While the row's actions are shown: the row is hovered or focused, or focus is inside the actions.
  * @cssstate checked - While it is checked, in a tree with `selection-mode="multiple"`.
  * @cssstate dragging - The item is being moved, in a `reorderable` tree.
  * @cssstate drop-after - The item being moved goes after this one when it is dropped.
@@ -249,6 +263,88 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
    */
   @state()
   private branch = false
+
+  /** Whether the pointer is over the row. */
+  @state()
+  private hovered = false
+
+  /** Whether focus is on the row, or inside its actions. */
+  @state()
+  private focusedHere = false
+
+  /** Whether the row's actions are shown and can be reached. */
+  private get actionsShown(): boolean {
+    return this.hovered || this.focusedHere
+  }
+
+  /**
+   * @internal Whether an event began inside the row's actions, which keep
+   * their presses and keys: the tree asks before it moves or chooses.
+   */
+  fromActions(event: Event): boolean {
+    /* The slot, or the child assigned to it: a path through a slot names the
+       slot in a browser, and happy-dom leaves it out. */
+    const actions = this.partNamed('actions')
+    return event
+      .composedPath()
+      .some(
+        (node) =>
+          node === actions ||
+          (node instanceof Element && node.parentElement === this && node.slot === 'actions'),
+      )
+  }
+
+  /**
+   * Focus on this row or inside its actions shows them. Focus anywhere else,
+   * such as on a nested row, does not. A move from the row into its actions is
+   * a `focusout` and then a `focusin` in the same task, so the update between
+   * them never draws.
+   */
+  private readonly handleFocusIn = (event: FocusEvent): void => {
+    const first = event.composedPath()[0]
+    this.focusedHere =
+      this.fromActions(event) || first === this.partNamed('item') || first === this.partNamed('row')
+  }
+
+  /**
+   * **Read where focus is going, never cleared and set again.** The update a
+   * `focusout` asks for runs before the browser moves focus on, so clearing
+   * here made the actions `inert` under a Tab already headed into them, and
+   * focus fell to the page. Measured in Chromium: Tab from a row landed on
+   * `<body>`.
+   */
+  private readonly handleFocusOut = (event: FocusEvent): void => {
+    this.focusedHere = this.intoActions(event.relatedTarget)
+  }
+
+  /** Whether a node is inside what is slotted into `actions`, read up the page's own tree to this item. */
+  private intoActions(node: EventTarget | null): boolean {
+    let at = node instanceof Node ? node : null
+    while (at && at.parentNode !== this) {
+      at = at.parentNode
+    }
+    return at instanceof Element && at.slot === 'actions'
+  }
+
+  private readonly handleRowEnter = (): void => {
+    this.hovered = true
+  }
+
+  private readonly handleRowLeave = (): void => {
+    this.hovered = false
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.addEventListener('focusin', this.handleFocusIn)
+    this.addEventListener('focusout', this.handleFocusOut)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('focusin', this.handleFocusIn)
+    this.removeEventListener('focusout', this.handleFocusOut)
+  }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
@@ -426,6 +522,15 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   }
 
   private readonly handleRowClick = (event: MouseEvent): void => {
+    /* A press in the actions is the control's. Inside a link row, a press that
+       landed on no control of its own would follow the link, so that one is
+       stopped here; a press on a button is the button's, and left alone. */
+    if (this.fromActions(event)) {
+      if (this.href !== '' && !this.landedOnControl(event)) {
+        event.preventDefault()
+      }
+      return
+    }
     /* A press on the grip is the tree's, which picks the item up: it neither
        chooses the row nor follows its link. */
     if (fromGrip(event)) {
@@ -462,6 +567,24 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     if (!onLink) {
       this.follow()
     }
+  }
+
+  /** Whether a press inside the actions landed on a control, which then acts on it instead of the row's link. */
+  private landedOnControl(event: Event): boolean {
+    const row = this.partNamed('row')
+    for (const node of event.composedPath()) {
+      if (node === row) {
+        return false
+      }
+      if (
+        node instanceof HTMLElement &&
+        (node.matches('a[href], button, input, label, select, summary, textarea') ||
+          node.getAttribute('role') === 'button')
+      ) {
+        return true
+      }
+    }
+    return false
   }
 
   /**
@@ -502,8 +625,14 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   private renderRow(): TemplateResult {
     return html`${this.isBranch ? this.renderToggle() : nothing}${this.renderCheckbox()}
       <slot name="start"></slot>
-      <span part="label"><slot></slot></span>
-      <slot name="end"></slot>${
+      <span part="label" id="label"><slot></slot></span>
+      <slot name="end"></slot>
+      <slot
+        name="actions"
+        part="actions"
+        ?inert=${!this.actionsShown}
+        @slotchange=${() => this.requestUpdate()}
+      ></slot>${
         this.grip && !this.disabled
           ? html`<span part="grip" aria-hidden="true"
               ><svg part="grip-mark" fill="currentColor" viewBox=${dotsSixVertical.viewBox}>
@@ -538,6 +667,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     this.toggleState('dragging', this.move === 'dragging')
     this.toggleState('drop-after', this.move === 'drop-after')
     this.toggleState('drop-before', this.move === 'drop-before')
+    this.toggleState('actions-shown', this.actionsShown)
     if (this.childrenKnown) {
       this.branch = this.knownChildren.some((child) => child.slot === 'children')
     }
@@ -605,6 +735,11 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
        the same words, a server and the render that has to be its, so a browser
        draws what it drew before. */
     const tabIndex = this.focusable || !this.childrenKnown ? '0' : '-1'
+    /* **A row with actions is named by its label.** A `treeitem` takes its name
+       from what it holds, so a menu button in the row was read into it: "Report
+       More actions". Only then, so a row without actions keeps reading its
+       marks as it always has. */
+    const named = this.knownChildren.some((child) => child.slot === 'actions') ? 'label' : nothing
 
     return html`<div
         part="item"
@@ -617,6 +752,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
         aria-level=${linked ? nothing : depth}
         aria-posinset=${linked ? nothing : position}
         aria-setsize=${linked ? nothing : size}
+        aria-labelledby=${linked ? nothing : named}
         tabindex=${linked ? nothing : tabIndex}
       >
         ${
@@ -635,14 +771,19 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
                 aria-level=${depth}
                 aria-posinset=${position}
                 aria-setsize=${size}
+                aria-labelledby=${named}
                 tabindex=${tabIndex}
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
+                @pointerenter=${this.handleRowEnter}
+                @pointerleave=${this.handleRowLeave}
               >${this.renderRow()}</a>`
             : html`<div
                 part="row"
                 style="--tree-level: ${level}"
                 @click=${this.handleRowClick}
+                @pointerenter=${this.handleRowEnter}
+                @pointerleave=${this.handleRowLeave}
               >${this.renderRow()}</div>`
         }
         <!-- Inside the treeitem, not beside it. As a sibling, the row's
