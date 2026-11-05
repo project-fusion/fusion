@@ -10,6 +10,7 @@ import { setHaptics } from '@fusion.dev/helix-core/capabilities/haptics'
 import { setKeys } from '@fusion.dev/helix-core/capabilities/keys'
 import { setLocale } from '@fusion.dev/helix-core/capabilities/locale'
 import { setMeasure } from '@fusion.dev/helix-core/capabilities/measure'
+import { setMedia } from '@fusion.dev/helix-core/capabilities/media'
 import { setMotion } from '@fusion.dev/helix-core/capabilities/motion'
 import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import { setScroll } from '@fusion.dev/helix-core/capabilities/scroll'
@@ -29,6 +30,7 @@ import { installIntl } from './intl'
 import { nativeKeys } from './keys'
 import { nativeLocale } from './locale'
 import { nativeMeasure } from './measure'
+import { nativeMedia } from './media'
 import { nativeOpenLink } from './open-link'
 import { nativeScroll } from './scroll'
 import { nativeShare } from './share'
@@ -57,6 +59,7 @@ export const installNativeCapabilities = (): void => {
   setKeys(nativeKeys)
   setLocale(nativeLocale)
   setMeasure(nativeMeasure)
+  setMedia(nativeMedia)
   setMotion(nativeMotion)
   setOpenLink(nativeOpenLink)
   setScroll(nativeScroll)

@@ -8,8 +8,9 @@ use std::fmt::Write as _;
 use ts_rs::{Config, TypeVisitor, TS};
 
 use super::types::{
-    Conditions, DragSetup, Dragged, FilePick, FileSave, Flag, Frame, Haptic, KeyPress, Picked,
-    Point, Rect, Saved, Scrolled, Shareable, Shared, Transition, Urgency,
+    CaptionTrack, Conditions, DragSetup, Dragged, FilePick, FileSave, Flag, Frame, Haptic,
+    KeyPress, NowPlaying, Picked, Playback, Point, Rect, Saved, Scrolled, Shareable, Shared,
+    Transition, Urgency,
 };
 use super::{Capability, Param, Ty};
 use crate::{COMPILER, PRODUCT};
@@ -71,6 +72,7 @@ pub fn types_module() -> String {
         found: BTreeMap::new(),
         seen: HashSet::new(),
     };
+    declarations.visit::<CaptionTrack>();
     declarations.visit::<Conditions>();
     declarations.visit::<DragSetup>();
     declarations.visit::<Dragged>();
@@ -80,7 +82,9 @@ pub fn types_module() -> String {
     declarations.visit::<Frame>();
     declarations.visit::<Haptic>();
     declarations.visit::<KeyPress>();
+    declarations.visit::<NowPlaying>();
     declarations.visit::<Picked>();
+    declarations.visit::<Playback>();
     declarations.visit::<Point>();
     declarations.visit::<Rect>();
     declarations.visit::<Saved>();

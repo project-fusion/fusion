@@ -26,6 +26,7 @@ pub const CAPABILITIES: &[Capability] = &[
     KEYS,
     LOCALE,
     MEASURE,
+    MEDIA,
     MOTION,
     OPEN_LINK,
     SCROLL,
@@ -269,6 +270,93 @@ const MEASURE: Capability = Capability {
                 },
             ],
             returns: Ty::Stop,
+        },
+    ],
+};
+
+const PLAYBACK: Ty = Ty::Named("Playback");
+
+const SHOWN: Param = Param {
+    name: "on",
+    ty: Ty::Boolean,
+};
+
+const MEDIA: Capability = Capability {
+    name: "media",
+    interface: "Media",
+    doc: "Plays a video or a sound in a part that shows it: through the page's own media element on the web, and through expo-video on iOS and Android, an optional peer loaded the first time a player is made. A phone without the package, and the server, play nothing.",
+    members: &[
+        Member {
+            name: "play",
+            doc: "Starts `node` playing, and gives whether it plays. A platform that refuses to play before the reader has pressed gives `false`.",
+            params: &[NODE],
+            returns: Ty::Promise(&Ty::Boolean),
+        },
+        Member {
+            name: "pause",
+            doc: "Pauses `node` where it stands.",
+            params: &[NODE],
+            returns: Ty::Void,
+        },
+        Member {
+            name: "seek",
+            doc: "Moves `node` to `seconds` from its start, held between its start and its end.",
+            params: &[NODE, Param { name: "seconds", ty: Ty::Number }],
+            returns: Ty::Void,
+        },
+        Member {
+            name: "mute",
+            doc: "Mutes `node`, or gives its sound back.",
+            params: &[NODE, Param { name: "muted", ty: Ty::Boolean }],
+            returns: Ty::Void,
+        },
+        Member {
+            name: "read",
+            doc: "Where `node` stands now.",
+            params: &[NODE],
+            returns: PLAYBACK,
+        },
+        Member {
+            name: "observe",
+            doc: "Calls `changed` with where `node` stands each time it plays, pauses, moves, loads, ends, or fails, until stopped.",
+            params: &[
+                NODE,
+                Param {
+                    name: "changed",
+                    ty: Ty::Callback(&[Param { name: "playback", ty: PLAYBACK }], &Ty::Void),
+                },
+            ],
+            returns: Ty::Stop,
+        },
+        Member {
+            name: "fullscreen",
+            doc: "Shows `node` over the whole screen, or puts it back, and gives whether it stands as asked. On a phone it is the platform's own player.",
+            params: &[NODE, SHOWN],
+            returns: Ty::Promise(&Ty::Boolean),
+        },
+        Member {
+            name: "pictureInPicture",
+            doc: "Floats `node` in a small window over other apps and pages, or brings it back, and gives whether it stands as asked. A platform without picture in picture gives `false`.",
+            params: &[NODE, SHOWN],
+            returns: Ty::Promise(&Ty::Boolean),
+        },
+        Member {
+            name: "captions",
+            doc: "The caption tracks `node`'s media carries, in its order.",
+            params: &[NODE],
+            returns: Ty::List(&Ty::Named("CaptionTrack")),
+        },
+        Member {
+            name: "showCaptions",
+            doc: "Shows the caption track `id` names over `node`, or none where it is `null`. The platform draws the cues.",
+            params: &[NODE, Param { name: "id", ty: Ty::Maybe(&Ty::Text) }],
+            returns: Ty::Void,
+        },
+        Member {
+            name: "nowPlaying",
+            doc: "Says what `node` plays to the system's now-playing controls, on a phone's lock screen and in its control center, and in the browser's media controls through its Media Session where it has one, or takes it off them where it is `null`.",
+            params: &[NODE, Param { name: "shown", ty: Ty::Maybe(&Ty::Named("NowPlaying")) }],
+            returns: Ty::Void,
         },
     ],
 };
