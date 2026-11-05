@@ -1,5 +1,8 @@
 <div align="center">
-  <img src=".github/fusion-logo.svg" width="88" alt="Fusion" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/fusion-logo-dark.svg" />
+    <img src=".github/fusion-logo-light.svg" width="88" alt="Fusion" />
+  </picture>
   <h1>Fusion Development Group</h1>
   <p>
     An intelligent design system, intelligent tooling, and intelligent
