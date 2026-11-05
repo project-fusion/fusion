@@ -389,6 +389,9 @@ export class HelixHeadlessListbox extends MixinVoice(
    * `::part(items)` as it likes, since the keys read where each option is
    * drawn. A list of `items` stays a stack. Left out, the list is a stack,
    * and the host carries no attribute for it.
+   *
+   * An option with an image in its `media` slot is drawn as a tile, the image
+   * above the label, for a picker of photos or products.
    */
   @property({ reflect: true })
   layout?: 'grid' | 'stack'

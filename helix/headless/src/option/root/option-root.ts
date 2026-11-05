@@ -36,10 +36,16 @@ export { isOption, optionsAmong } from '../among.js'
  * nothing, as an entry in a command palette that goes to a page does.
  *
  * The option's name is its label alone, as React Aria's `slot="label"` makes
- * it: what is in `start` and `end`, an avatar's initials or a shortcut, is
- * drawn and not read as part of the name. The description is read as the
+ * it: what is in `start`, `end` and `media`, an avatar's initials, a shortcut
+ * or a photo, is drawn and not read as part of the name. The description is read as the
  * option's description. A name you give with `aria-label` or
  * `aria-labelledby` wins over both.
+ *
+ * **An image goes in `media`, above the label**, for an option drawn as a
+ * tile, such as a photo or a product in a listbox with `layout="grid"`. The
+ * row is still the option: choosing, the arrow keys and the highlight work as
+ * they do on a row with no image, and the label stays its name, so give the
+ * image an empty `alt`.
  *
  * @since 0.1.0
  * @status stable
@@ -51,6 +57,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @slot description - A second line under the label, for content richer than the `description` text.
  * @slot end - Content after the label, such as a shortcut or a count.
  * @slot indicator - An icon shown while the option is chosen, in place of the check the styled option draws.
+ * @slot media - An image above the label, for an option drawn as a tile.
  * @slot start - Content before the label, such as an icon or an avatar.
  *
  * @event {HelixBeforeSelectEvent} helix-before-select - The option was chosen. Cancelable: canceling it leaves the selection as it was, and keeps the browser from following an option's `href`.
@@ -65,6 +72,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @cssstate active - While the keyboard is on the option, which is the option `aria-activedescendant` names.
  * @cssstate disabled - While the option cannot be chosen.
  * @cssstate has-indicator - An icon is slotted into `indicator`.
+ * @cssstate has-media - Something is slotted into `media`.
  * @cssstate hovered - While a mouse or a pen is over the option. A touch sets no hover, as React Aria's `data-hovered` does not.
  * @cssstate pressing - While a pointer presses the option, from the press to the release.
  * @cssstate selected - While the option is chosen.
@@ -460,6 +468,11 @@ export class HelixHeadlessOption extends HelixElement {
       @pointerleave=${this.handlePointerLeave}
       @pointerup=${this.handlePointerUp}
     >
+      <slot
+        name="media"
+        @slotchange=${(event: Event) =>
+          this.toggleState('has-media', slotFilled(event.target as HTMLSlotElement))}
+      ></slot>
       <slot name="start"></slot>
       <span part="text">
         <span part="label"><slot>${this.label}</slot></span>

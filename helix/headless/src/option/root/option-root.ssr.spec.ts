@@ -70,3 +70,15 @@ describe('an option with a supporting line', () => {
     expect(hasPart(markup, 'description')).toBe(false)
   })
 })
+
+describe('an option with an image', () => {
+  test('serves the media slot first in the row, so a slotted image lands above the label', () => {
+    const markup = rendered(
+      ssr(
+        html`<helix-headless-option value="sun"><img slot="media" alt="" src="sun.jpg" />Sun</helix-headless-option>`,
+      ),
+      'helix-headless-option',
+    )
+    expect(markup).toMatch(/<div\s+part="item"[^>]*>\s*(<!--[^>]*-->\s*)*<slot\s+name="media"/)
+  })
+})
