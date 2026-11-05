@@ -1,7 +1,7 @@
 # @fusion.dev/helix-icons
 
-The Helix icon set: 126 marks, 121 resolved from
-[Phosphor](https://phosphoricons.com) at build time and 5 of our own.
+The Helix icon set: marks resolved from [Phosphor](https://phosphoricons.com)
+at build time, and a few of our own.
 
 ```sh
 npm install @fusion.dev/helix-icons

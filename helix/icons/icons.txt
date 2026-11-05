@@ -94,6 +94,7 @@ image
 info
 info-fill
 key
+keyboard
 laptop
 layout
 leaf
@@ -141,6 +142,7 @@ sign-out
 skip-back
 skip-forward
 sliders-horizontal
+sparkle
 speaker-high
 speaker-low
 speaker-slash
