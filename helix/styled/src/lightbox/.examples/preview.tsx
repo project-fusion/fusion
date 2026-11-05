@@ -1,21 +1,22 @@
+import type { HelixLightbox } from '@fusion.dev/helix'
+import { useRef, useState } from 'react'
 import './preview.css'
 
 export function Example() {
+  /* The lightbox starts open, so the preview shows it. */
+  const [open, setOpen] = useState(true)
+  const viewer = useRef<HelixLightbox>(null)
+
   return (
     <>
-      <helix-button
-        command="--show"
-        commandfor="gallery"
-      >
-        Open gallery
-      </helix-button>
+      <helix-button onClick={() => setOpen(true)}>Open gallery</helix-button>
 
-      {/* The lightbox starts open, so the preview shows it. */}
       <helix-lightbox
-        id="gallery"
         label="Beach photos"
         loop
-        open
+        onClose={() => setOpen(false)}
+        open={open}
+        ref={viewer}
       >
         <helix-button-group
           label="Lightbox actions"
@@ -23,23 +24,20 @@ export function Example() {
           slot="header"
         >
           <helix-icon-button
-            command="--previous"
-            commandfor="gallery"
             label="Previous picture"
+            onClick={() => viewer.current?.previous()}
           >
             <helix-icon name="caret-left"></helix-icon>
           </helix-icon-button>
           <helix-icon-button
-            command="--next"
-            commandfor="gallery"
             label="Next picture"
+            onClick={() => viewer.current?.next()}
           >
             <helix-icon name="caret-right"></helix-icon>
           </helix-icon-button>
           <helix-icon-button
-            command="--close"
-            commandfor="gallery"
             label="Close"
+            onClick={() => viewer.current?.close()}
           >
             <helix-icon name="x"></helix-icon>
           </helix-icon-button>
