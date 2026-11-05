@@ -79,7 +79,8 @@ export const isChart = (tag: string): boolean => {
     api?.donutChart !== undefined ||
     api?.lineChart !== undefined ||
     api?.areaChart !== undefined ||
-    api?.barChart !== undefined
+    api?.barChart !== undefined ||
+    api?.scatterChart !== undefined
   )
 }
 
