@@ -5,6 +5,7 @@ import { formatColor, parseColor } from '@fusion.dev/helix-core'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
+import type { AskFact } from '@/components/site-find/ask'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
@@ -218,6 +219,7 @@ const BAND_COLOR = '#0b2a33'
 const BRAND_COLOR = '#3b82f6'
 
 export function ThemeBuilder({
+  ask = [],
   contexts,
   findable,
   initialContext,
@@ -227,6 +229,8 @@ export function ThemeBuilder({
   layouts,
   markup,
 }: {
+  /** Facts for Ask, built on the server beside `findable`. */
+  ask?: AskFact[]
   /** Whose page the preview is, and what a reader picks one by. */
   contexts: readonly { label: string; value: string }[]
   findable: Findable[]
@@ -830,7 +834,7 @@ export function ThemeBuilder({
           </a>
         </helix-flex>
         <helix-flex align-items="center" gap="2xs" slot="end">
-          <SiteFind findable={findable} />
+          <SiteFind ask={ask} findable={findable} />
           <helix-tooltip content="Preferences" placement="bottom">
             <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
               <helix-icon name="gear"></helix-icon>

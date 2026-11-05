@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { HashTarget } from '@/components/hash-target/hash-target'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
+import { askCorpus } from '@/components/site-find/ask-corpus'
 import { SiteFooter } from '@/components/site-footer/site-footer'
 import { SiteNav } from '@/components/site-nav/site-nav'
 import { type RouteKind, routes } from '@/content/routes/routes'
@@ -46,6 +47,7 @@ export function SiteChrome({
        *           than against prose about it.
        */}
       <SiteNav
+        ask={askCorpus()}
         findable={[
           { group: 'Components', items: findable('component') },
           { group: 'Documentation', items: findable('doc') },

@@ -1,4 +1,5 @@
 import { HelixElements } from '@/components/helix-elements/helix-elements'
+import { askCorpus } from '@/components/site-find/ask-corpus'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { listFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
@@ -31,7 +32,8 @@ export default function SandboxPage() {
      A component row carries the sandbox as its second destination, which is
      what `alternate` on `Option` is for. From inside the sandbox that is the
      one row where the two destinations genuinely differ: Enter goes to the
-     reference and the modifier stays here with a different component loaded. */
+     reference and the modifier stays here with a different component loaded.
+     The address is `e=<family>`, which is what the sandbox reads. */
   return (
     <>
       {/* On the page rather than in `sandbox/layout.tsx`, which is an ancestor
@@ -39,12 +41,13 @@ export default function SandboxPage() {
           must not have it. */}
       <HelixElements />
       <SandboxWorkbench
+        ask={askCorpus()}
         families={families}
         findable={[
           {
             group: 'Components',
             items: families.map((family) => ({
-              alternate: `/helix/sandbox?family=${family.slug}`,
+              alternate: `/helix/sandbox?e=${family.slug}`,
               alternateLabel: 'Open in the sandbox',
               href: `/helix/components/${family.slug}`,
               label: family.label,

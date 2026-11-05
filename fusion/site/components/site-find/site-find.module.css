@@ -72,6 +72,28 @@
   letter-spacing: var(--helix-tracking-wide);
 }
 
+/* The tag on a component row. Mono, because it is a name you type. */
+.askMark {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+}
+
+/* The way back to search, in the same weight as the key hints. */
+.askBack {
+  background: none;
+  border: 0;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--helix-text-sm);
+  padding: 0;
+}
+
+.askBack:hover {
+  color: var(--helix-color-foreground);
+}
+
 /* The row the keyboard is on, in the brand's own subtle ground rather than the
    neutral wash a select uses. */
 .siteCommand {

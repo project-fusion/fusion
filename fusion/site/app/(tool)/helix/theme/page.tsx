@@ -1,3 +1,4 @@
+import { askCorpus } from '@/components/site-find/ask-corpus'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import {
   deriveOr,
@@ -114,12 +115,13 @@ export default async function ThemePage({ searchParams }: { searchParams: Promis
 
   return (
     <ThemeBuilder
+      ask={askCorpus()}
       contexts={THEMED_CONTEXTS}
       findable={[
         {
           group: 'Components',
           items: families.map((family) => ({
-            alternate: `/helix/sandbox?family=${family.slug}`,
+            alternate: `/helix/sandbox?e=${family.slug}`,
             alternateLabel: 'Open in the sandbox',
             href: `/helix/components/${family.slug}`,
             label: family.label,
