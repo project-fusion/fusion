@@ -81,7 +81,14 @@
      than an avatar at `md`. */
   block-size: var(--avatar-size, var(--helix-size-avatar));
   border-radius: var(--helix-radii-full);
-  box-shadow: 0 0 0 var(--_avatar-group-gap) var(--_avatar-group-ring);
+  /* **An edge as well as a fill.** The fill alone is the sunken surface, so on
+     a sunken panel the count was a number with no circle round it, and the
+     stack read as three avatars and a caption. Inset, so the count stays the
+     avatars' size, and after the ring, which is outside it. */
+  box-shadow:
+    0 0 0 var(--_avatar-group-gap) var(--_avatar-group-ring),
+    inset 0 0 0 var(--helix-border-thin)
+    var(--avatar-group-overflow-border-color, var(--helix-color-border));
   color: var(--avatar-group-overflow-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   flex: 0 0 auto;
