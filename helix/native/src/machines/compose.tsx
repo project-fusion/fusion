@@ -506,7 +506,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       .map(
         (use): Binder =>
           (props, around) =>
-            useLightbox(family, props, use, around.toggled),
+            useLightbox(family, props, use, around),
       ),
     /* A strip of cells: its cells from its readings, its reading, and its selection. */
     ...uses

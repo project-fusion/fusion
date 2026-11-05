@@ -20,7 +20,6 @@
  */
 
 import { announce } from '@fusion.dev/helix-core/capabilities/announce'
-import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import { locale } from '@fusion.dev/helix-core/capabilities/locale'
 import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
 import { swipeStep } from '@fusion.dev/helix-core/swipe'
@@ -31,10 +30,8 @@ import {
   isValidElement,
   type ReactElement,
   type ReactNode,
-  type Ref,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -45,11 +42,12 @@ import Reanimated from 'react-native-reanimated'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
+import type { Around } from './binder'
 import { kebab } from './date-picker-read'
+import { useHandle, useKeys, useOwnFocus } from './lightbox-hooks'
 import { useIdle } from './lightbox-idle'
 import { useLightboxZoom } from './lightbox-zoom'
 import { boundTo, given, tell } from './props'
-import type { Turned } from './toggle'
 
 /** The tag a lightbox item's component carries. */
 const ITEM = 'helix-lightbox-item'
@@ -223,48 +221,6 @@ const statesOf = (
   }
 }
 
-/** The hardware keys, heard anywhere in the app while the viewer is open, on the view the viewer gives. */
-const useKeys = (open: boolean, heard: (press: KeyPress) => boolean) => {
-  const [view, setView] = useState<unknown>(null)
-  useEffect(() => {
-    if (!open || view === null) {
-      return undefined
-    }
-    return keys().listenAnywhere(view as never, heard)
-  }, [heard, open, view])
-  return setView
-}
-
-/** The web element's methods, on the element's ref. */
-const useHandle = (
-  ref: unknown,
-  toggled: Turned | undefined,
-  step: (by: number) => void,
-  zoomTo: (scale: number) => void,
-) => {
-  const turn = useRef(toggled)
-  turn.current = toggled
-  useImperativeHandle(
-    ref as Ref<unknown> | undefined,
-    () => ({
-      close: () => {
-        if (turn.current?.checked === true) {
-          turn.current.turn()
-        }
-      },
-      next: () => step(1),
-      previous: () => step(-1),
-      show: () => {
-        if (turn.current?.checked === false) {
-          turn.current.turn()
-        }
-      },
-      zoomTo,
-    }),
-    [step, zoomTo],
-  )
-}
-
 /** Each item, told whether it shows, its name, and its role's words. */
 const slidesOf = (
   items: readonly Item[],
@@ -300,8 +256,10 @@ export const useLightbox = (
   family: Family,
   props: Props,
   use: MachineUse,
-  toggled: Turned | undefined,
+  around: Around,
 ): Behavior => {
+  const { toggled } = around
+  useOwnFocus(toggled?.checked === true, () => around.layering.view?.())
   const read = (name: string): unknown => given(family, props, kebab(name))
   const flag = (name: string): string => boundTo(use, name, 'state') ?? kebab(name)
   const lang = locale().read()
