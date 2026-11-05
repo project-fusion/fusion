@@ -97,12 +97,11 @@ describe('a row taller than its text', () => {
   geometry('centers a link on its capitals, and a tag on its box', async () => {
     const [grip, , notes, state] = firstRow(await table())
     const row = rowOf(grip as HTMLElement)
+    const tag = state?.querySelector('helix-tag') as Element
     expect(
       Math.abs(offset(capitals(notes?.querySelector('a') as Element), row)),
     ).toBeLessThanOrEqual(1)
-    expect(
-      Math.abs(offset((state?.querySelector('helix-tag') as Element).getBoundingClientRect(), row)),
-    ).toBeLessThanOrEqual(1)
+    expect(Math.abs(offset(tag.getBoundingClientRect(), row))).toBeLessThanOrEqual(1)
   })
 
   geometry('keeps the row as tall as it was', async () => {
