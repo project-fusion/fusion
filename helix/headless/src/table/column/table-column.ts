@@ -192,6 +192,27 @@ export class HelixHeadlessTableColumn extends HelixElement {
   menuLabel = '{named, select, no {Column menu} other {{name} column menu}}'
 
   /**
+   * The narrowest a `DataTable` can be with this column showing, as a length
+   * in `px`, `rem` or `em`, such as `40rem`. While the table is narrower, it
+   * leaves the column out: its heading, its track and its cells.
+   *
+   * Give the columns a reader can do without the widest minimums, so they go
+   * first as the table narrows. The columns that stay keep their widths and
+   * their edges, and every row keeps its cells under their headings, as with
+   * `hidden`. A column left out is not in the grid at all, so `aria-colcount`
+   * counts the columns that show and a screen reader moves among those alone.
+   * Widen the table and the column comes back in its place.
+   *
+   * The table measures its own box, so a server draws every column and the
+   * page leaves out what does not fit once it runs. A percentage or a
+   * viewport unit is no width of the table, and leaves the column in. One
+   * column always shows. Left unset, the column shows at any width. A `Table`
+   * ignores it, since its cells are markup you wrote.
+   */
+  @property({ attribute: 'min-table-width' })
+  minTableWidth = ''
+
+  /**
    * The accessible name of the grip that moves the column. `{name}` is the
    * heading text, and `{named}` is `no` for a column without one, so the
    * sentence for it can name the column another way.
@@ -592,7 +613,12 @@ export class HelixHeadlessTableColumn extends HelixElement {
        the column rather than of a table by name: both tables are Lit elements
        that read it when they render, and a column held by anything else has
        nobody to tell. */
-    if (changed.has('menu') || changed.has('textAlign') || changed.has('width')) {
+    if (
+      changed.has('menu') ||
+      changed.has('minTableWidth') ||
+      changed.has('textAlign') ||
+      changed.has('width')
+    ) {
       this.tellHolder()
     }
   }

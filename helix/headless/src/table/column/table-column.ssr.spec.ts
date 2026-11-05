@@ -46,4 +46,18 @@ describe('table column server output', () => {
     )
     expect(written.filter((one) => !one.startsWith('data-'))).toEqual([])
   })
+
+  /* A server cannot measure the table, so the column it serves is the column
+     at any width, and the page drops it once it runs. */
+  test('a column with a minimum table width is served whole, and writes nothing for it', () => {
+    const markup = ssr(
+      html`<helix-headless-table-column field="owner" min-table-width="40rem">Owner</helix-headless-table-column>`,
+    )
+    expect(servedParts(markup)).toContain('column')
+    expect(
+      hostAttributes(markup, 'helix-headless-table-column').filter(
+        (one) => !one.startsWith('data-'),
+      ),
+    ).toEqual(['field', 'min-table-width'])
+  })
 })
