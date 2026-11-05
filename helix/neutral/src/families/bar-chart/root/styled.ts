@@ -141,9 +141,8 @@ export default styles(
         ),
         /* A stack is one column, so only its far ends are rounded. */
         rule({ also: { 'bar-end': false }, stacked: true }, { own: { barChartCorners: 0 } }),
-        /* The paths of a dense chart are thinner than a pixel, with no corner to round. */
-        native([rule({ stroke: 'none' })]),
       ]),
+      on('bar-edge', [native([rule({ own: { barChartSeries: measured('chart-series') } })])]),
       /* Written out: a dense chart's columns are a `path` and not a `rect`, which no part says. */
       on({ part: 'bar', selector: ':host path[part~="bar"]' }, [
         web([rule({ own: { barChartCorners: 0 } })]),
@@ -320,7 +319,6 @@ export default styles(
       on('bar-edge', [
         native([
           rule({
-            own: { barChartSeries: measured('chart-series') },
             fill: 'none',
             stroke: own.barChartSeries,
             strokeOpacity: own.barChartThrough(1),

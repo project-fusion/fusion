@@ -18,18 +18,11 @@ import {
 } from '../../../render.js'
 
 /**
- * Bar Chart's headless tier: a table's categories as columns, or as bars down
- * the side under `orientation="horizontal"`, which core draws on a phone as on
- * the web: `barFrame` measures each column from zero, `barBox` stands a
- * category's columns abreast or stacked, `barPaths` draws a dense chart as a
- * path for each series, tone, and side of zero, and a series `lines` names is
- * a line. `outlined`, `subtle`, and `glass` are written onto the columns of
- * the series they name, as `data-emphasis` and `data-material`.
- *
- * **The columns and the reading are two layers**: a phone fades its canvas of
- * every column while a reading is shown and draws the category shown again
- * over it. **Web only:** the hidden table, the summary, the Listen button, a
- * reading under a mouse, a mirrored drawing, and the columns easing in.
+ * Bar Chart's headless tier: a table's categories as columns, or bars down the
+ * side, drawn by core on a phone as on the web, with `data-emphasis` and
+ * `data-material` on the columns of the series `outlined`, `subtle`, and
+ * `glass` name. **Web only:** the hidden table, the summary, the Listen
+ * button, a reading under a mouse, and the columns easing in.
  */
 export default headless('bar-chart', {
   props: {
@@ -237,7 +230,15 @@ export default headless('bar-chart', {
           also={{ 'group-active': true }}
           part="group"
           platform="web"
-        />
+        >
+          <View
+            also={{ 'bar-end': true, 'bar-end-negative': true, 'bar-negative': true }}
+            part="bar"
+          />
+          <View part="line" />
+          <View part="bar-wash-start" />
+          <View part="bar-wash-end" />
+        </View>
         {barChart.drawn && (
           <Svg
             part="lines-svg"
