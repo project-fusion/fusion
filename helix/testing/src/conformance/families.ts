@@ -74,6 +74,7 @@ export type Family =
   | 'area-chart'
   | 'bar-chart'
   | 'scatter-chart'
+  | 'heatmap'
   | 'sparkline'
   | 'filter-input'
   | 'select'
