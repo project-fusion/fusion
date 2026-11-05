@@ -1,6 +1,7 @@
 /*
- * Which columns a data table leaves out at the width it is drawn at, in a
- * module that registers nothing, for the reason `edge.ts` gives.
+ * Which columns a data table leaves out at the width it is drawn at, as
+ * arithmetic with no element in it, which the web element and a phone's
+ * machine both read.
  */
 
 /** The font sizes a length in `em` and `rem` is read against, in pixels. */

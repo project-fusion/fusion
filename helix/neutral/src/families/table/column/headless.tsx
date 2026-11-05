@@ -48,6 +48,7 @@ export default headless('table-column', {
     field: '',
     menu: false,
     menuLabel: '{named, select, no {Column menu} other {{name} column menu}}',
+    minTableWidth: '',
     moveLabel: '{named, select, no {Move column} other {Move {name}}}',
     resizable: false,
     resizeLabel: '{named, select, no {Resize column} other {Resize {name}}}',
