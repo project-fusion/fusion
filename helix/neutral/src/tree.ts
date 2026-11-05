@@ -70,6 +70,7 @@ import type {
   FilterInputChoice,
   FilterMenuChoice,
   HeatmapChoice,
+  LightboxChoice,
   InspectorChoice,
   LegendChoice,
   ListboxChoice,
@@ -370,6 +371,8 @@ export interface Headless {
   readonly scatterChart?: ScatterChartChoice
   /** What the element reads, sends, and computes where it is a strip of cells. */
   readonly heatmap?: HeatmapChoice
+  /** What the element reads, sends, and computes where it is a viewer of one item at a time. */
+  readonly lightbox?: LightboxChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */
