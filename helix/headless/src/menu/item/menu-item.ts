@@ -91,7 +91,7 @@ import '../../kbd/index.js'
  * @slot description - A line under the label that describes the row. It describes the row to a screen reader and is not part of its name.
  * @slot end - Words after the label, such as a count or a detail, beside any `shortcut`. They describe the row and are not part of its name.
  * @slot start - Content before the label, such as an icon.
- * @slot submenu - The rows of a submenu that this row opens.
+ * @slot submenu - The rows of a submenu that this row opens, each a menu item placed directly in the slot.
  *
  * @event {HelixBeforeCheckEvent} helix-before-check - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The row was chosen. Cancelable: cancel it to keep the menu open.

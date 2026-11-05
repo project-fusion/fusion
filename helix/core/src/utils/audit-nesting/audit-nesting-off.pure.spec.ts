@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { fileURLToPath } from 'node:url'
-import { auditNesting } from './audit-nesting-off.js'
+import { auditNesting, auditWrapped } from './audit-nesting-off.js'
 
 /**
  * Which module `#audit-nesting` is in each build.
@@ -34,5 +34,18 @@ describe('the unslotted-item audit by build', () => {
   test('the production audit does nothing', () => {
     const host = { children: [], localName: 'helix-tree-item' }
     expect(auditNesting(host as unknown as HTMLElement, 'children')).toBeUndefined()
+  })
+
+  test('the production wrapped-row audit never asks for the rows', () => {
+    const host = { children: [], localName: 'helix-menu' }
+    let asked = false
+    const reached = (): Element[] => {
+      asked = true
+      return []
+    }
+    expect(
+      auditWrapped(host as unknown as HTMLElement, 'helix-menu-item', reached, () => '', ''),
+    ).toBeUndefined()
+    expect(asked).toBe(false)
   })
 })

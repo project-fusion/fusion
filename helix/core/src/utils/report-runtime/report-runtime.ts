@@ -130,6 +130,11 @@ export type RuntimeKind =
   | 'untold-toggle'
   /** A slotted trigger is a plain element, which cannot be told it opens something. */
   | 'untold-trigger'
+  /**
+   * A row sits inside an element between it and the container that reads it, such as a menu
+   * item in a `<div>`, so the keys skip it and its submenu opens empty. Development builds only.
+   */
+  | 'wrapped-row'
   /** A tooltip wraps a trigger that does not name it, and opened before a reader reached the trigger. */
   | 'wrapped-trigger'
 

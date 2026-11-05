@@ -443,6 +443,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `unslotted-item` | A tree item holds another without `slot="children"`, so the inner item is read as the label. Development builds only (the `development` export condition) |
 | `untold-toggle` | A native button in a button group with `selection-mode`, which cannot carry `aria-pressed` |
 | `untold-trigger` | A slotted trigger is a plain element, which cannot carry `aria-expanded` |
+| `wrapped-row` | A menu item sits inside an element of the page's own, such as a `<div>`, between it and its menu, section or submenu, so the arrow keys skip it and its submenu opens on an empty page. Development builds only (the `development` export condition) |
 | `wrapped-trigger` | A tooltip wraps a trigger that does not name it, and opened before a reader reached the trigger |
 
 ## Performance
