@@ -292,6 +292,11 @@
     // `tsc` imports the catalog, the font list and the themed page's markup,
     // all generated, so the same five run first. Not `wasm-copy`: nothing
     // typed reads the binary.
+    "@fusion.dev/site#test": {
+      "dependsOn": [],
+      "inputs": ["components/site-find/**"],
+      "outputs": []
+    },
     "@fusion.dev/site#typecheck": {
       "dependsOn": [
         "^build",

@@ -23,6 +23,7 @@
     "specs": "bun scripts/build-specs.mjs",
     "speech-copy": "bun scripts/copy-speech.mjs",
     "start": "next start",
+    "test": "bun test components/site-find",
     "themed-page": "bun scripts/build-themed-page.mjs",
     "themed-page-check": "bun scripts/build-themed-page.mjs --check",
     "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",

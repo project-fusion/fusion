@@ -2,7 +2,8 @@
 
 import type { HelixCommand } from '@fusion.dev/helix'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ASK_PAGE, type AskFact, askHits, askOnPath } from './ask'
 import styles from './site-find.module.css'
 
 /**
@@ -90,6 +91,30 @@ const ranked =
   }
 
 /**
+ * The listbox hides a row whose text does not contain the whole query.
+ *
+ * Ask ranks by tokens, so a question such as "how do I install" would hide
+ * the install row. While Ask is showing, every row it ranked stays visible.
+ */
+const keepEveryRow = (): boolean => true
+
+/** What the empty Ask page says when the question matches nothing published. */
+const ASK_EMPTY = 'Nothing in the Helix manifest or the docs matches that.'
+
+/**
+ * Empties the field.
+ *
+ * The command clears the field when it changes page itself. Ask changes the
+ * page from here, and the resting search is the curated list, so the field
+ * is cleared the same way.
+ */
+const clearFilter = (host: HelixCommand): void => {
+  host.shadowRoot
+    ?.querySelector<Element & { requestFilter?: (next: string) => boolean }>('helix-listbox')
+    ?.requestFilter?.('')
+}
+
+/**
  * The search trigger and the palette behind it, for any header that wants one.
  *
  * **Extraction rather than unification.** Two headers exist, the site's
@@ -101,10 +126,16 @@ const ranked =
  * reader in the sandbox cannot reach anything without going back to the site.
  */
 export function SiteFind({
+  ask = [],
   findable = [],
   slot,
   trigger = true,
 }: {
+  /**
+   * Facts Ask may rank. Built on the server. Empty on a page that has no
+   * corpus, which leaves the palette as search.
+   */
+  ask?: AskFact[]
   findable?: Findable[]
   /**
    * Which slot the trigger goes in, or `undefined` for whatever it is inside.
@@ -113,10 +144,13 @@ export function SiteFind({
   trigger?: boolean
 }) {
   const router = useRouter()
-  const pathname = usePathname()
+  const pathname = usePathname() ?? ''
   const palette = useRef<HelixCommand>(null)
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
+  const [asking, setAsking] = useState(false)
+  const askHere = askOnPath(pathname) && ask.length > 0
+  const hits = useMemo(() => (asking ? askHits(ask, needle) : []), [ask, asking, needle])
 
   /* **Bound here rather than as a prop.**
    *
@@ -142,6 +176,74 @@ export function SiteFind({
     element.addEventListener('helix-filter', heard)
     return () => element.removeEventListener('helix-filter', heard)
   }, [])
+
+  /* Backspace in an empty field is the command's own way back to search.
+     The listener is on the window, which hears the key after the command has
+     changed the page, and the state follows that. */
+  useEffect(() => {
+    const heard = (event: KeyboardEvent): void => {
+      if (event.key !== 'Backspace') {
+        return
+      }
+      const host = palette.current
+      if (host === null || (event.target !== host && !host.contains(event.target as Node))) {
+        return
+      }
+      setAsking(host.page === ASK_PAGE)
+    }
+    window.addEventListener('keydown', heard)
+    return () => window.removeEventListener('keydown', heard)
+  }, [])
+
+  /* The page follows the mode once its rows are in the tree. The listbox would
+     otherwise hide a ranked row whose text does not contain the whole question. */
+  useEffect(() => {
+    const host = palette.current
+    if (!host) {
+      return
+    }
+    if (asking) {
+      host.filterMatch = keepEveryRow
+      host.page = ASK_PAGE
+      return
+    }
+    host.filterMatch = undefined
+    if (host.page === ASK_PAGE) {
+      host.page = ''
+      clearFilter(host)
+    }
+  }, [asking])
+
+  useEffect(() => {
+    if (askHere) {
+      return
+    }
+    setAsking(false)
+  }, [askHere])
+
+  const enterAsk = useCallback(() => {
+    setAsking(true)
+  }, [])
+
+  const leaveAsk = useCallback(() => {
+    setNeedle('')
+    setAsking(false)
+  }, [])
+
+  const refuseAsk = useCallback(
+    (event: Event) => {
+      const value = (event as CustomEvent<{ value?: string }>).detail?.value
+      if (value !== ASK_PAGE) {
+        return
+      }
+      /* Refused, so the command's own page opener does not run. That opener
+         clears the field, and the question the reader just typed is the
+         question Ask should rank. */
+      event.preventDefault()
+      enterAsk()
+    },
+    [enterAsk],
+  )
 
   return (
     <>
@@ -169,31 +271,58 @@ export function SiteFind({
           answers from wherever the reader is, including from inside another
           field. `open` is bound here because the button opens it too, so the
           palette and the React state have to agree about which it is: both
-          events are bound so neither can drift from the other. */}
+          events are bound so neither can drift from the other.
+
+          It opens only from the hotkey or the button. Nothing on the page
+          opens it on load. */}
       <helix-command
         class={styles.siteCommand}
+        empty-text={asking ? ASK_EMPTY : 'No commands'}
         hotkey="mod+k"
-        label="Search"
+        label={asking ? 'Ask' : 'Search'}
         onhelix-before-close={() => {
           setOpen(false)
           setNeedle('')
+          setAsking(false)
         }}
         onhelix-before-open={() => setOpen(true)}
+        onhelix-before-select={refuseAsk}
         onhelix-select={(event: { detail: { alternate?: boolean; value: string } }) => {
+          if (event.detail.value === ASK_PAGE) {
+            enterAsk()
+            return
+          }
           setOpen(false)
           /* **The page a reader is on is already open**, so choosing it only
              closes the palette: a push to the same address scrolled nothing
              and added nothing, and a reload would throw away whatever the
              page was holding, a theme half built or a sandbox edited. */
-          if (event.detail.value === pathname) {
+          if (event.detail.value === pathname || !event.detail.value.startsWith('/')) {
             return
           }
           router.push(event.detail.value)
         }}
         open={open}
-        placeholder="Search the site"
+        placeholder={asking ? 'Ask about a component, a tag, or contrast' : 'Search the site'}
         ref={palette}
       >
+        {/* **Ask is a page of this palette**, offered where the path is Helix
+            docs, the component reference, the sandbox, or the theme builder.
+            The row stays visible while a search is typed, because its filter
+            text includes what was typed: choosing it ranks that question. */}
+        {askHere && (
+          <helix-option-group label="Ask">
+            <helix-option
+              description="From the manifest and the docs"
+              opens={ASK_PAGE}
+              text-value={needle === '' ? 'Ask' : `Ask ${needle}`}
+              value={ASK_PAGE}
+            >
+              Ask
+            </helix-option>
+          </helix-option-group>
+        )}
+
         {/* **The catalog arrives when it is asked for.** Every component and
             every article is the whole of what a palette can reach and none of
             what it should open with: a reader summoning it sees a hundred rows
@@ -219,11 +348,34 @@ export function SiteFind({
           ),
         )}
 
+        {asking && hits.length > 0 && (
+          <helix-option-group label="Manifest and docs" slot={`page:${ASK_PAGE}`}>
+            {hits.map((fact) => (
+              <helix-option
+                alternate={fact.sandbox}
+                alternate-label={fact.sandbox === undefined ? undefined : 'Open in the sandbox'}
+                description={fact.detail}
+                key={fact.id}
+                value={fact.href}
+              >
+                {fact.label}
+                {fact.mark === undefined ? null : (
+                  <span className={styles.askMark} slot="end">
+                    {fact.mark}
+                  </span>
+                )}
+              </helix-option>
+            ))}
+          </helix-option-group>
+        )}
+
         {/*
          * *Four hints, and each one is a group rather than a clause.** A key
          *             and the word for what it does are one object, and the space between
          *             objects is what says so; run together in a sentence, a reader has to
          *             parse punctuation to find where one key's job ends.
+         *
+         * Ask adds Backspace, which the command already uses to leave a page.
          */}
         <div className={styles.siteCommandHints} slot="footer">
           <span>
@@ -239,11 +391,22 @@ export function SiteFind({
             <helix-kbd keys="mod+enter"></helix-kbd>
             Sandbox
           </span>
+          {asking ? (
+            <span>
+              <helix-kbd>⌫</helix-kbd>
+              Search
+            </span>
+          ) : null}
           <span>
             <helix-kbd>Esc</helix-kbd>
             Close
           </span>
         </div>
+        {asking ? (
+          <button className={styles.askBack} onClick={leaveAsk} slot="footer" type="button">
+            Search the site
+          </button>
+        ) : null}
         <helix-text class={styles.siteCommandMark} scale="caption" slot="footer">
           Fusion
         </helix-text>

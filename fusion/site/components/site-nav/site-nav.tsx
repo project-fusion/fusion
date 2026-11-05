@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
+import type { AskFact } from '@/components/site-find/ask'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { Picture } from '@/components/site-nav/tiles'
 import { Wordmark } from '@/components/wordmark/wordmark'
@@ -204,9 +205,15 @@ export function SiteMenu({
  * Site navigation: the sections, centered in the masthead.
  */
 export function SiteNav({
+  ask = [],
   findable = [],
   path,
 }: {
+  /**
+   * Facts for Ask, built on the server beside `findable`. The palette shows
+   * them on Helix docs, the reference, the sandbox, and the theme builder.
+   */
+  ask?: AskFact[]
   findable?: Findable[]
   /**
    * The page the masthead marks current, where it is not the address. Only the
@@ -508,7 +515,7 @@ export function SiteNav({
             keyboard to press the shortcut with and the drawer is the way
             through. */}
         <div className={styles.wideOnly} slot="end">
-          <SiteFind findable={findable} />
+          <SiteFind ask={ask} findable={findable} />
         </div>
 
         {/* **Between the search and the preferences, and an anchor.** The two

@@ -22,6 +22,7 @@ import type { HelixSandboxEditor } from '@fusion.dev/helix-sandbox/editor'
 import { jsxToHtml } from '@fusion.dev/helix-workbench'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
+import type { AskFact } from '@/components/site-find/ask'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
@@ -44,6 +45,8 @@ import styles from './workbench.module.css'
  */
 
 interface Props {
+  /** Facts for Ask, built on the server beside `findable`. */
+  ask?: AskFact[]
   families: FamilyListing[]
   /** Where the palette can go, built on a server by the page above. */
   findable?: Findable[]
@@ -122,7 +125,7 @@ const resolve = (
   return { example, family, withExamples }
 }
 
-export function SandboxWorkbench({ families, findable = [] }: Props) {
+export function SandboxWorkbench({ ask = [], families, findable = [] }: Props) {
   useSandboxEditor()
 
   const preview = useRef<HelixSandboxPreview>(null)
@@ -1227,7 +1230,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               for whoever wrote it, and the button's tooltip is the only thing on
               the page that says which keys it answers to. Hidden, the palette is
               something you have to already know about. */}
-          <SiteFind findable={findable} />
+          <SiteFind ask={ask} findable={findable} />
 
           <helix-tooltip content="Preferences" placement="bottom">
             <helix-icon-button label="Preferences" onClick={() => setPrefsOpen(true)}>
