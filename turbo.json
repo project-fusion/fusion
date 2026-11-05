@@ -178,6 +178,13 @@
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
+    // The specs read the generated set, which a fresh checkout does not have
+    // until `icons` writes it from `icons.txt`.
+    "@fusion.dev/helix-icons#test": {
+      "dependsOn": ["^build", "analyze", "icons"],
+      "inputs": ["src/**", "tests/**"],
+      "outputs": []
+    },
     // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
     // registry, and `elements-css` writes `src/elements.css` from the tags in
     // `@fusion.dev/helix`, so both stylesheets are build outputs and have to be
