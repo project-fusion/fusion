@@ -118,7 +118,10 @@ export default fragment(
               difference(measured('data-table-level'), '1'),
               first(hook.indent, own.dataTableGutter),
             ),
-            dataTableGutter: sum(hook.toggleSize, hook.toggleGap),
+            dataTableGutter: sum(
+              hook.toggleSize(token('size-icon-tight')),
+              hook.toggleGap(token('space-2xs')),
+            ),
           },
           paddingInlineStart: sum(own.dataTableLead(token('space-none')), own.dataTableDepth),
         }),
