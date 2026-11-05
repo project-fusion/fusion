@@ -61,8 +61,22 @@ const PREVIEW_SHARE_NARROW = 76
  * keeps about the height it had. With the audit at `AUDIT_OPEN_NARROW` the
  * share is 64: measured at 390 by 844 in Chromium, the stylesheet keeps 174px
  * and the preview 309.
+ *
+ * **The least the preview gets**: the share is worked out from the panes'
+ * height so that the stylesheet keeps `SOURCE_KEPT_NARROW` and the preview
+ * takes the rest. At 64 on a shorter phone the preview measured 224px of a
+ * 711px window and 194 of 664, and the headline was cut through its first
+ * line. 64 stays the floor, for a stage too short to keep the stylesheet's
+ * height and still give the preview more.
  */
 const PREVIEW_SHARE_NARROW_AUDIT = 64
+
+/**
+ * The stylesheet's height on a phone with the audit open: five of its lines.
+ * It is the artifact, and with the audit open a reader is judging the preview
+ * against the findings under it.
+ */
+const SOURCE_KEPT_NARROW = 112
 
 /**
  * A wide screen's audit opens to this height. **Tall enough for the
@@ -82,8 +96,13 @@ const AUDIT_SHUT = 52
  * under the tabs had 102px, and the Unverifiable tab's table needs 196 at that
  * width: under the preview and the stylesheet a reader scrolled a 102px window
  * to read two rows. At 256 the findings have 198px, which holds that tab whole.
+ *
+ * **At most 30% of the window.** A fixed 256 was 36% of a 711px Safari window,
+ * which left the preview 224px. The findings scroll inside their tab on a
+ * window too short for both.
  */
 const AUDIT_OPEN_NARROW = 256
+const AUDIT_OPEN_NARROW_SHARE = 0.3
 
 /**
  * The faces on offer, fetched rather than vendored.
@@ -362,9 +381,25 @@ export function ThemeBuilder({
       return
     }
     let frame = requestAnimationFrame(() => {
-      frame = requestAnimationFrame(() =>
-        setSplit(auditSize > AUDIT_SHUT ? PREVIEW_SHARE_NARROW_AUDIT : PREVIEW_SHARE_NARROW),
-      )
+      frame = requestAnimationFrame(() => {
+        if (auditSize <= AUDIT_SHUT) {
+          setSplit(PREVIEW_SHARE_NARROW)
+          return
+        }
+        /* The preview and the stylesheet are the two panes the share divides. */
+        const source = preview.current?.parentElement?.querySelector('helix-sandbox-editor')
+        const panes =
+          (preview.current?.getBoundingClientRect().height ?? 0) +
+          (source?.getBoundingClientRect().height ?? 0)
+        const kept = panes > 0 ? (100 * (panes - SOURCE_KEPT_NARROW)) / panes : 0
+        const share = Math.max(PREVIEW_SHARE_NARROW_AUDIT, kept)
+        /* **A share equal to the one in state still has to be written.** The
+           hold has moved the panes off it, and React skips a state that did
+           not change: at 390 by 844 the share came out at 76, the shut share,
+           and the stylesheet stayed at 0px. Not rounded, and nudged when it
+           matches. */
+        setSplit((current) => (current === share ? share + 0.01 : share))
+      })
     })
     return () => cancelAnimationFrame(frame)
   }, [auditSize, narrow])
@@ -487,7 +522,9 @@ export function ThemeBuilder({
    */
   const [audit, setAudit] = useState('contrast')
   /* A count opens its tab, and on a phone the audit may be shut. */
-  const auditOpen = narrow ? AUDIT_OPEN_NARROW : AUDIT_OPEN
+  const auditOpen = narrow
+    ? Math.min(AUDIT_OPEN_NARROW, Math.round(window.innerHeight * AUDIT_OPEN_NARROW_SHARE))
+    : AUDIT_OPEN
   const showAudit = (value: string) => {
     setAudit(value)
     setAuditSize((size) => Math.max(size, auditOpen))

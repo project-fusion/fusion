@@ -66,10 +66,8 @@ describe('callout', () => {
   })
 
   test('a slotted icon is sized like the default one, so swapping it moves nothing', () => {
-    expect(rule('[part="icon"] svg')).toContain('block-size: var(--helix-size-icon-tight)')
-    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
-      '--icon-size: var(--helix-size-icon-tight)',
-    )
+    expect(rule('[part="icon"] svg')).toContain('block-size: var(--_callout-icon)')
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain('--icon-size: var(--_callout-icon)')
   })
 
   test('a heading is its own line, not the opening words of the content', () => {

@@ -207,6 +207,12 @@
 [part="y-name"] {
   grid-area: y-name;
   justify-self: start;
+  /* **The gap is measured to the top level, not to the plot.** The level is
+     centered on its rule, a line of `text-xs` at a line height of 1, so half of
+     it stands above the plot and took 6 of the 8 pixels under the name: the
+     two sat 2 pixels apart (November 4, 2026). The half line goes under the
+     name, so the gap is whole. */
+  margin-block-end: calc(var(--helix-text-xs) * 0.5);
 }
 
 /* Said and not shown: the points are the picture of it. */

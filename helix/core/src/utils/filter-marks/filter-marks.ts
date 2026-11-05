@@ -45,6 +45,16 @@ export const rangeOf = (root: Element, needle: string): Range[] => {
   return [range]
 }
 
+/** One letter of a cased script, or one digit. */
+const tooShortToMark = (needle: string): boolean => {
+  const characters = [...needle]
+  if (characters.length !== 1) {
+    return false
+  }
+  const [character] = characters as [string]
+  return /\p{Nd}/u.test(character) || character.toLowerCase() !== character.toUpperCase()
+}
+
 /**
  * Marks where `needle` matches in each of `elements`, for `owner`, without
  * touching the elements. An empty needle takes the owner's marks away, which
@@ -66,13 +76,20 @@ export const rangeOf = (root: Element, needle: string): Range[] => {
  * Nothing at all where the API is missing, as on a server, in a test
  * environment or in an older browser: the text nodes are not walked for an
  * answer nothing can paint.
+ *
+ * **Nothing for a single letter or digit of a cased script.** One letter
+ * matches somewhere in nearly every option, so each row carried one
+ * underlined letter at a different place, which read as stray underscores in
+ * Combobox and Listbox and marked nothing a reader was looking for. The
+ * marks start at the second character. A single character of a script with
+ * no case, such as a Chinese one, is often a whole word, and is marked.
  */
 export const markMatches = (owner: Element, elements: Iterable<Element>, needle: string): void => {
   const registry = globalThis.CSS?.highlights
   if (registry === undefined) {
     return
   }
-  if (needle === '') {
+  if (needle === '' || tooShortToMark(needle)) {
     matched.delete(owner)
   } else {
     matched.set(

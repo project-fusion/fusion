@@ -23,5 +23,16 @@ export const formatNumbers = (locale: string): ((value: number) => string) => {
     held.set(locale, format)
   }
   const found = format
-  return (value) => found.format(value)
+  /* **A negative number takes the minus sign, U+2212, where the locale writes
+     a hyphen**, which is the typesetter's rule for figures: the hyphen is
+     shorter and sits lower, so "-8,000" on a chart's axis read as a dash
+     beside a number (November 4, 2026). A locale that writes its own minus
+     keeps it. */
+  return (value) =>
+    value < 0 || Object.is(value, -0)
+      ? found
+          .formatToParts(value)
+          .map((part) => (part.type === 'minusSign' && part.value === '-' ? '\u2212' : part.value))
+          .join('')
+      : found.format(value)
 }

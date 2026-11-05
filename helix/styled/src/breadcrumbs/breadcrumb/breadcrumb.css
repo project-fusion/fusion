@@ -134,6 +134,13 @@
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
+/* **A press steps past the hover**, as every control's does. The crumb's
+   press was its hover, so a link held down looked exactly like one under the
+   pointer. */
+::slotted(a:active) {
+  background-color: var(--helix-color-press);
+}
+
 ::slotted(a:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -202,6 +209,10 @@
 a[part="link"]:hover {
   background-color: var(--breadcrumbs-hover-background-color, var(--helix-color-hover));
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
+}
+
+a[part="link"]:active {
+  background-color: var(--helix-color-press);
 }
 
 /* The library's ring, which `::slotted(a:focus-visible)` draws for a slotted
@@ -374,6 +385,10 @@ a[part="link"]:focus-visible {
 [part="expand"]:hover {
   background-color: var(--breadcrumbs-hover-background-color, var(--helix-color-hover));
   color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
+}
+
+[part="expand"]:active {
+  background-color: var(--helix-color-press);
 }
 
 [part="expand"]:focus-visible {

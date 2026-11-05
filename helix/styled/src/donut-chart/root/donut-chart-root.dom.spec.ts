@@ -159,11 +159,15 @@ describe('donut chart sweep', () => {
     expect(sheet()).toContain(':host([sweep="half"]) [part="track"],')
   })
 
-  test('the middle sits at the bottom, where the center of the circle now is', () => {
-    /* Cropping put the circle's center on the box's bottom edge, so a middle at
-       fifty per cent of the plot floats inside the arc and over its top. */
+  test('the middle sits at the bottom, on the line the ends of the arc stand on', () => {
+    /* Cropping put the circle's center half a stroke over the box's bottom
+       edge, so a middle at fifty per cent of the plot floats inside the arc and
+       over its top, and one ended at the edge drops its figure under the ends. */
     const half = rule(':host([sweep="half"]) [part="center"]')
-    expect(half).toContain('inset-block-end: 0')
+    expect(half).toMatch(
+      /inset-block-end: calc\(\s*100% \*\s*\(var\(--donut-chart-stroke, 16\) \/ 2\)/,
+    )
     expect(half).toContain('inset-block-start: auto')
+    expect(half).toContain('place-items: end center')
   })
 })

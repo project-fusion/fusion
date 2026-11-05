@@ -67,7 +67,9 @@
    it a long caption pushes the row wider than the panel instead of being cut. */
 [part="text"] {
   display: flex;
-  flex: 1 1 auto;
+  /* A list laid out in cells sets `--_option-packed` to `0`, so the words and
+     the tick stay together in the cell; see Listbox's grid. */
+  flex: var(--_option-packed, 1) 1 auto;
   flex-direction: column;
   min-inline-size: 0;
 }
@@ -145,7 +147,7 @@ slot[name="indicator"]::slotted(*) {
   display: block;
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
-  margin-inline-start: auto;
+  margin-inline-start: var(--_option-tick-start, auto);
 }
 
 /* The chosen option, which is not the same fact as where the keyboard is. */
@@ -155,7 +157,7 @@ slot[name="indicator"]::slotted(*) {
   block-size: var(--helix-size-icon-tight);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
-  margin-inline-start: auto;
+  margin-inline-start: var(--_option-tick-start, auto);
   mask-image: var(--_option-check);
   mask-position: center;
   mask-repeat: no-repeat;

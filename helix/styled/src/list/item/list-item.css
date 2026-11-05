@@ -64,7 +64,8 @@
   grid-column: 1;
   grid-row: 1;
   letter-spacing: var(--helix-tracking-wide);
-  line-height: calc(var(--helix-text-sm) * var(--helix-leading-normal));
+  /* The label's line, rounded as the label's is, so the ordinal stays on it. */
+  line-height: round(up, calc(var(--helix-text-sm) * var(--helix-leading-normal)), 1px);
   inline-size: var(--list-rail-inline-size, var(--helix-space-3xl));
 }
 
@@ -122,6 +123,11 @@ slot:not([name]) {
   font-weight: var(--list-item-term-weight, var(--helix-weight-regular));
   grid-column: 3;
   grid-row: 1;
+  /* **A whole pixel of line**, so a row that adds a description is a whole
+     number of pixels tall. The 13 pixel label set a 19.5 line, and over an 18
+     pixel description the rows came to 49.5, 53.5, and 61.5, which put each
+     `divided` rule on a half pixel. */
+  line-height: round(up, calc(1em * var(--helix-leading-normal)), 1px);
   /* A grid item's own minimum is its content's, so the track above is not
      enough alone. */
   min-inline-size: 0;

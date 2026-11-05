@@ -95,7 +95,7 @@ export function Example() {
               data-tone="danger"
               data-value="-8000"
             >
-              -$8k
+              −$8k
             </td>
           </tr>
           <tr>
@@ -108,7 +108,7 @@ export function Example() {
               data-tone="danger"
               data-value="-14000"
             >
-              -$14k
+              −$14k
             </td>
           </tr>
         </tbody>

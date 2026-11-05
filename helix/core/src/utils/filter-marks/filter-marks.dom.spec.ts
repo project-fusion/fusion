@@ -88,6 +88,18 @@ describe('marking matches', () => {
     expect(registry.has(marks.FILTER_MARK)).toBe(false)
   })
 
+  test('marks nothing for one letter or digit, and marks one character of a script with no case', () => {
+    install()
+    const owner = row('x')
+    marks.markMatches(owner, [row('Rust'), row('Ruby')], 'r')
+    expect(marked()).toEqual([])
+    marks.markMatches(owner, [row('Version 2')], '2')
+    expect(marked()).toEqual([])
+    marks.markMatches(owner, [row('日本')], '日')
+    expect(marked()).toEqual(['日'])
+    marks.markMatches(owner, [], '')
+  })
+
   test('does nothing where the platform cannot paint a highlight', () => {
     expect(() => marks.markMatches(row('x'), [row('Rust')], 'ru')).not.toThrow()
     expect(registry.size).toBe(0)

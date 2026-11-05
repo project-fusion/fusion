@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import './in-a-drawer.css'
 
 /* The notifications are data, so the badge can count the unread ones. */
 const ARRIVED = [

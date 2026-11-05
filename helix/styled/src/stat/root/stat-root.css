@@ -16,6 +16,14 @@
   grid-template-columns: auto 1fr;
 }
 
+/* **No gap after a figure with no unit beside it**, so a stat that hugs its
+   figure is as wide as the figure. The gap stood after the last digit with
+   nothing past it, and in a donut's hole it set "10,000" 2 pixels left of the
+   ring's center (measured November 4, 2026: a 78.8 figure in an 82.8 stat). */
+:host(:not(:state(has-unit))) {
+  column-gap: var(--helix-space-none);
+}
+
 /* The three sizes below are relative to whatever the figure is set in, never
    absolute off the type ramp, because a figure is one of the few things that
    legitimately has to scale with its surroundings. A `Stat` in a donut's hole is
@@ -45,9 +53,10 @@ slot[name="label"]::slotted(*) {
    part is the figure `value` writes, which takes all of it. */
 [part="value"] {
   /* Figures take one width each. A value breaks only where it is wider than the
-     whole column even two steps smaller. A slotted figure offers no break of its
-     own, so it keeps `anywhere`: `break-word` leaves the word's full width as
-     the `auto` column's minimum, and the column then runs past the host. */
+     whole column even two steps smaller. Slotted words that are not a number
+     offer no break of their own, so they keep `anywhere`: `break-word` leaves
+     the word's full width as the `auto` column's minimum, and the column then
+     runs past the host. A number is kept whole below. */
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
   color: var(--stat-value-color, var(--helix-color-foreground));
@@ -58,13 +67,16 @@ slot[name="label"]::slotted(*) {
   line-height: var(--helix-leading-tight);
 }
 
-/* **A figure the stat writes breaks after a group separator and nowhere
-   else.** It offers a break after each separator, which keeps every run short
-   enough to be the column's minimum, and `break-word` takes a break inside a
-   run only where one run alone is wider than the column. Under `anywhere` the
-   browser broke "1,284,567" as "1,284,5" over "67". */
-[part="value"]:not(slot) {
-  overflow-wrap: break-word;
+/* **A figure breaks after a group separator and nowhere else**, as the owner
+   decided on November 3, 2026. The stat writes a break after each separator,
+   which keeps every run short enough to be the column's minimum. Under
+   `anywhere` the browser broke "1,284,567" as "1,284,5" over "67", and under
+   `break-word` a figure with no separator, such as "1284392118" in a 6rem
+   column, still broke between two digits. A slotted number the stat cannot
+   write, one with no separator, is kept whole by the same rule. */
+[part="value"]:not(slot),
+:host(:state(number)) [part="value"] {
+  overflow-wrap: normal;
 }
 /* A step down the scale where the figure does not fit at full size, and a
    second where one is not enough, measured by the headless tier against the
@@ -91,6 +103,11 @@ slot[name="label"]::slotted(*) {
 
 /* Quieter and smaller than the number it qualifies. */
 slot[name="unit"]::slotted(*) {
+  /* **Beside the figure, whatever the text alignment.** The unit's column takes
+     the rest of the width, so in a centered stat, such as Donut Chart's arc,
+     the unit was centered in that column: "GB" sat 13 pixels after "850"
+     where the gap is 4. */
+  justify-self: start;
   color: var(--stat-unit-color, var(--helix-color-foreground-muted));
   font-size: var(--stat-unit-size, calc(var(--helix-text-md) / var(--helix-text-md) * 1em));
   font-weight: var(--helix-weight-medium);

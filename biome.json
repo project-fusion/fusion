@@ -82,7 +82,11 @@
       "includes": ["**/package.json"]
     },
     {
-      "includes": ["**/dialog/.examples/*.html", "fusion/scripts/eval/tasks/dialog/index.html"],
+      "includes": [
+        "**/dialog/.examples/*.html",
+        "**/chat/.examples/command-palette.html",
+        "fusion/scripts/eval/tasks/dialog/index.html"
+      ],
       "linter": {
         "rules": {
           "a11y": {

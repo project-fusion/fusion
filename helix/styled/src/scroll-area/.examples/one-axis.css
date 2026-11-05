@@ -12,6 +12,8 @@ helix-scroll-area {
 helix-scroll-area helix-text {
   --text-font-size: var(--helix-text-xs);
   display: block;
-  margin: 0 0 var(--helix-space-xs);
-  padding-inline-end: var(--helix-space-md);
+  margin-block: 0 var(--helix-space-xs);
+  margin-inline: 0 var(--helix-space-md);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

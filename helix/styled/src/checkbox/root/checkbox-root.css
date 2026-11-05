@@ -35,6 +35,14 @@
 [part="box"] {
   display: grid;
   flex: 0 0 auto;
+  /* **As tall as the label's first line, where that is taller than the box**,
+     so the box is centered on the line. At `sm` the 16 pixel box sat at the
+     top of a 19.5 pixel line, 1.75 pixels above its middle. The label's font
+     and leading, so `1lh` is the label's line. The label is padded instead
+     where the box is the taller, below. */
+  font-size: var(--helix-text-control);
+  line-height: var(--helix-leading-normal);
+  min-block-size: 1lh;
   /* One cell, both children in it, so the mark is centered over the input with
      no offsets to keep in step with the box's size. */
   place-items: center;

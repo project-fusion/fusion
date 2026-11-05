@@ -67,3 +67,23 @@
 .prose helix-table {
   --helix-text-control: calc((var(--helix-text-md) + var(--helix-text-lg)) / 2);
 }
+
+/* **One code size on the page, a step under the reading type.** Inline code
+   took 16.71 beside 18px text, a table's code 14.86, and a Code Block 13: three
+   sizes for one face in one column. All three take one size here: the table's
+   16 scaled by 13 over 14, the ratio of code to text on the ramp, which is
+   14.86. At 1440, 49 of 307 blocks scroll sideways against 16 before. At 13,
+   29 scroll, and inline code sat at 0.72 of the sentence around it, small
+   enough to read as a footnote. */
+.prose {
+  --code-block-font-size: calc(
+    var(--helix-text-sm) /
+    var(--helix-text-md) *
+    (var(--helix-text-md) + var(--helix-text-lg)) /
+    2
+  );
+}
+
+.prose :is(helix-text[as="p"], ul, ol, helix-table) {
+  --code-size: var(--code-block-font-size);
+}

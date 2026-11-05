@@ -162,7 +162,7 @@
    they were scoped to that sheet: `getAnimations()` returned nothing and the
    animation never ran. */
 
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   /* **Held on its first frame until the Helix elements are in and drawn.**
      The column is a `helix-flex`, hidden until it is defined. Running from
      the first paint, the rise played unseen, started again from nothing when
@@ -176,7 +176,11 @@
      **Twice the slow step, 640ms at the shipped scale.** At three times it,
      the calls to action stayed blurred until 1.32s and the last line arrived
      at 1.44s, long after a reader had looked for the buttons. Now they clear at
-     1.0s and the column settles at 1.12s. */
+     1.0s and the column settles at 1.12s.
+
+     **Only where scripts run.** The mark comes from a script, so with
+     JavaScript off the column held its first frame for good: the heading at
+     0.01 behind a 12px blur. The query below leaves it at rest. */
   .heroShell > * {
     animation: site-hero-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-decelerate)
       backwards;

@@ -157,6 +157,13 @@
   );
 }
 
+/* **A press takes the chosen color**, a step past the preview the hover
+   draws: held down, a mark looked exactly as it did under the pointer. The
+   marks being pressed are the score the release gives. */
+:host(:not(:disabled, [readonly])) [part="marks"]:active [part="fill"] {
+  color: var(--rating-color, var(--helix-color-warning-mark));
+}
+
 /*
  *  Each step takes a mark's worth of the row, in order.
  *

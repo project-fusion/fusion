@@ -164,7 +164,11 @@ helix-data-table:not(:defined):is(${LEAD}) {
 
 helix-data-table:not(:defined)${BOTH} {
   --_data-table-lead: calc(1em + 2 * var(--data-table-padding-inline, var(--helix-space-sm)))
-    calc(var(--checkbox-size, var(--helix-size-checkbox)) + 2 * var(--data-table-padding-inline, var(--helix-space-sm)));
+    calc(
+      var(--checkbox-size, var(--helix-size-checkbox)) +
+      var(--data-table-padding-inline, var(--helix-space-none)) +
+      var(--data-table-padding-inline, var(--helix-space-md))
+    );
 }
 
 ${SERVED}:is(${LEAD})::before,
@@ -187,9 +191,14 @@ helix-data-table:where(${LEAD}) > helix-table-row:not([hidden])::before {
   padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
 }
 
+/* The checkbox cell's own box: no block padding, flush at the start and a
+   step at the end, as the table draws it once it upgrades. */
 helix-data-table[selectable] > helix-table-row:not([hidden])::before {
   block-size: var(--checkbox-size, var(--helix-size-checkbox));
   inline-size: var(--checkbox-size, var(--helix-size-checkbox));
+  padding-block: var(--helix-space-none);
+  padding-inline-end: var(--data-table-padding-inline, var(--helix-space-md));
+  padding-inline-start: var(--data-table-padding-inline, var(--helix-space-none));
 }
 
 ${SERVED}${BOTH}::before,

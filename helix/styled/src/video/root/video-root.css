@@ -392,6 +392,23 @@ slot[name$="-icon"]::slotted(*) {
   pointer-events: auto;
 }
 
+/* **On a touch screen the level takes a press the target's width**, as the
+   scrubber takes one the bar's height. Standing up, the input was its 4 pixel
+   rail across, and a finger on the level beside the rail reached the frame
+   under it. A transparent border either side makes the press 44 across; the
+   background stops at the border, so the rail is drawn as before. After the
+   resting rule, which sets the rail's width. */
+@media (pointer: coarse) {
+  [part="volume"] {
+    --_video-volume-reach: calc((var(--helix-size-target) - var(--_video-rail-size)) / 2);
+
+    background-clip: padding-box;
+    block-size: var(--helix-size-target);
+    border-block: var(--_video-volume-reach) solid transparent;
+    box-sizing: border-box;
+  }
+}
+
 /*
  *  The gap between the speaker and the level, made hoverable.
  */
@@ -665,16 +682,37 @@ slot[name$="-icon"]::slotted(*) {
  */
 [part="header"] {
   align-items: center;
+  /* **On a shade of its own, as the bar is.** The title is the bar's light ink
+     over the picture, and with nothing under it a bright frame took it to
+     about 2.9:1. The shade is the overlay the bar stands on, held across the
+     header's own height and fading below it, across the top of the stage, so
+     no edge of it shows. The header has no height while nothing is slotted,
+     and then the shade has none either. */
+  background-image: linear-gradient(
+    to bottom,
+    var(--helix-color-overlay),
+    var(--helix-color-overlay) calc(100% - var(--helix-space-lg)),
+    transparent
+  );
   /* The bar's ink, for the title here sits over the same picture. */
   color: var(--video-controls-color, var(--helix-color-foreground));
   display: flex;
   gap: var(--helix-space-sm);
-  inset-block-start: var(--helix-space-sm);
-  inset-inline-start: var(--helix-space-sm);
-  max-inline-size: calc(100% - 2 * var(--helix-space-sm));
+  inset-block-start: 0;
+  inset-inline: 0;
   opacity: inherit;
+  padding-inline: var(--helix-space-sm);
+  /* The picture under the shade still takes a press. */
+  pointer-events: none;
   position: absolute;
   z-index: var(--helix-layer-raised);
+}
+
+/* The space above and below the slotted line, on the line, so an empty header
+   keeps no height. Below it the shade's fade. */
+slot[name="header"]::slotted(*) {
+  margin-block: var(--helix-space-sm) var(--helix-space-lg);
+  pointer-events: auto;
 }
 
 [part="header"]:not(:has(*)) {

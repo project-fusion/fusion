@@ -43,6 +43,7 @@ export function Example() {
             Two, both from August. The total is $1,240.
           </helix-chat-message>
           <helix-chat-composer
+            autofocus
             placeholder="Ask anything"
             slot="composer"
           >

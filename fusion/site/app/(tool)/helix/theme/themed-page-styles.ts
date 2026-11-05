@@ -651,6 +651,13 @@ export const THEMED_PAGE_STYLES = css`
       text-align: start;
     }
 
+    /* The wordmark goes to the start with the labels. Set to the end it stood
+       alone at the pane's right edge over a navigation that starts at the
+       left. */
+    .themedWordmark {
+      justify-content: start;
+    }
+
     /* One column, because three columns of prose at this width is three columns
        of one word. */
     .themedMinimalFeatures {

@@ -12,9 +12,9 @@
    controller placed the panel and leaves x alone.
 
    0.96 rather than 0. A list of commands shrinking to a point squashes its own
-   rows; only Tooltip is small enough for the full collapse to read as arriving
-   rather than as a trick. And `2xs` is enough to read as motion and short enough
-   that a fast reader who opens and picks in one gesture is not waiting on it. */
+   rows, and Tooltip takes 0.96 as well. And `2xs` is enough to read as motion
+   and short enough that a fast reader who opens and picks in one gesture is
+   not waiting on it. */
 [part="surface"] {
   --_travel: calc(var(--helix-space-2xs) * -1);
 
@@ -68,13 +68,18 @@
 }
 
 /* The panel still has to arrive, so what goes is the movement, not the
-   appearance: no travel and no scale, and it is simply there. */
+   appearance: no travel and no scale. **A short fade stays**, the one change
+   the preference leaves, so the panel does not blink into being: with every
+   transition off it went from nothing to whole in one frame. */
 @media (prefers-reduced-motion: reduce) {
   [part="surface"],
   [part="surface"][data-placed] {
     scale: 1;
     transform: none;
-    transition: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
   }
 }
 

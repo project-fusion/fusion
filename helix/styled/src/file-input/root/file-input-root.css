@@ -60,7 +60,9 @@
   font-family: var(--helix-font-sans);
   gap: var(--helix-space-2xs);
   text-align: center;
-  font-size: var(--helix-text-md);
+  /* The size a field's value takes at this density, 13 at `sm` and 14 above:
+     a fixed `text-md` set it at 14 beside 13 pixel fields in an `sm` form. */
+  font-size: var(--helix-text-field);
   font-weight: var(--helix-weight-medium);
   /* Not `pointer`: the input above it already carries that, and a label with its
      own cursor would flicker as the pointer crossed between them. */

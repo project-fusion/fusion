@@ -127,32 +127,45 @@
   box-shadow: none;
 }
 
-/* **The tight icon step, 12, 16 and 20, the glyph a field and an Accordion
-   draw beside the same text**, and centered on the first line. The full step,
-   16, 20 and 24, was taller than the 19.5 and 21 pixel lines at `md` and
-   `lg`, and hung from its top: measured, the mark's center 2 pixels under the
-   first line's at `lg`. */
+/* **The tight icon step, 16 and 20 at `md` and `lg`, the glyph a field and an
+   Accordion draw beside the same text**, and centered on the first line. The
+   full step, 16, 20 and 24, was taller than the 19.5 and 21 pixel lines at
+   `md` and `lg`, and hung from its top: measured, the mark's center 2 pixels
+   under the first line's at `lg`.
+
+   **Never under 16, as an Icon Button's glyph is not.** The tight step is 12
+   at `sm`, and the tone's mark inked about 10 pixels beside the text it
+   introduces; 16 still fits the 18 pixel line there. The offset is rounded to
+   a whole pixel: a 20 pixel mark on the 21 pixel line at `lg` stood half a
+   pixel down, at y 757.5. */
+:host {
+  --_callout-icon: max(var(--helix-size-icon-tight), var(--helix-size-icon-sm));
+}
+
 [part="icon"] {
   color: var(--_callout-color);
   display: inline-flex;
   flex: 0 0 auto;
-  margin-block-start: calc((var(--_callout-line) - var(--helix-size-icon-tight)) / 2);
+  margin-block-start: max(
+    0px,
+    round(down, calc((var(--_callout-line) - var(--_callout-icon)) / 2), 1px)
+  );
 }
 
 /* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
    at width 16, and a value tuned for a 24 box would make it hairline. */
 [part="icon"] svg {
-  block-size: var(--helix-size-icon-tight);
-  inline-size: var(--helix-size-icon-tight);
+  block-size: var(--_callout-icon);
+  inline-size: var(--_callout-icon);
 }
 
 /* A slotted replacement icon is sized the same way as the default, so swapping
    it does not change the callout's rhythm. */
 slot[name="icon"]::slotted(*) {
-  --icon-size: var(--helix-size-icon-tight);
+  --icon-size: var(--_callout-icon);
 
-  block-size: var(--helix-size-icon-tight);
-  inline-size: var(--helix-size-icon-tight);
+  block-size: var(--_callout-icon);
+  inline-size: var(--_callout-icon);
 }
 
 /* `break-word`, which breaks only a word that does not fit and leaves the

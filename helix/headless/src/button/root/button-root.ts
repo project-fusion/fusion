@@ -741,7 +741,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}
     >
-      <slot name="start"></slot><slot part="text"></slot><slot name="end"></slot>${this.renderSpinner()}
+      <slot name="start"></slot><slot part="text" dir="auto"></slot><slot name="end"></slot>${this.renderSpinner()}
     </button>${this.renderLive()}`
   }
 

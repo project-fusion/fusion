@@ -83,6 +83,13 @@ slot:not([name]) {
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* **Aligned to the page's start.** The part takes its own direction from
+     its first letter, `dir="auto"` in the template, so a Latin answer in a
+     right-to-left page keeps its start and ends in the ellipsis: the page's
+     direction cut its first letters away. `unicode-bidi: plaintext` did the
+     same in Chromium and put the ellipsis over the first letter in WebKit,
+     which places it by the box's direction. */
+  text-align: match-parent;
 }
 
 /* **The letters at the middle, in any font.** A line box is centered, and
@@ -196,9 +203,18 @@ slot:not([name])::slotted(helix-icon) {
   padding: var(--helix-space-2xs);
 }
 
-/* Not on a disabled tag, whose cross takes no press and so shows none. */
+/* Not on a disabled tag, whose cross takes no press and so shows none.
+
+   **The library's two steps, hover and then press, mixed from the label's
+   ink**, so they read on any tone and on a solid tag. The hover was the tone
+   at 20% and the press the neutral wash at 16%, two washes of two inks, and
+   on a neutral tag the press was lighter than the hover. 8% and 16% in light,
+   12% and 19% in dark, as `color-hover` and `color-press` step. */
 :host(:not([disabled])) [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, var(--_tag-color) 20%, transparent);
+  background-color: light-dark(
+    color-mix(in oklab, currentcolor 8%, transparent),
+    color-mix(in oklab, currentcolor 12%, transparent)
+  );
 }
 
 /* **Inside the cross's own box**, where the ring has room: the box is the
@@ -300,7 +316,10 @@ slot[name="start"]::slotted(*) {
 }
 
 :host(:not([disabled])) [part="dismiss"]:active {
-  background-color: var(--helix-color-press);
+  background-color: light-dark(
+    color-mix(in oklab, currentcolor 16%, transparent),
+    color-mix(in oklab, currentcolor 19%, transparent)
+  );
 }
 
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn

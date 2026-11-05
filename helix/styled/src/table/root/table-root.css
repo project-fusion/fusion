@@ -1,6 +1,11 @@
 /* The table scrolls its own box rather than squeezing its columns. */
 :host {
   --_table-fade: to right;
+  /* **The fade reaches past a cell's end inset**, `space-md`, so it falls on
+     the words of the column it cuts and not on the blank room after them: at
+     `space-xl` alone, at 390, half of it lay over padding and the edge barely
+     read as one (November 4, 2026). */
+  --_table-fade-size: calc(var(--helix-space-xl) + var(--helix-space-md));
   display: block;
   /* A table wider than its box says so by fading the edge with more behind it,
      as Data Table does. A timeline over a box with nothing to scroll is
@@ -31,19 +36,19 @@
 
 @keyframes table-edges {
   0% {
-    --_table-fade-end: var(--helix-space-xl);
+    --_table-fade-end: var(--_table-fade-size);
     --_table-fade-start: 0rem;
   }
 
   5%,
   95% {
-    --_table-fade-end: var(--helix-space-xl);
-    --_table-fade-start: var(--helix-space-xl);
+    --_table-fade-end: var(--_table-fade-size);
+    --_table-fade-start: var(--_table-fade-size);
   }
 
   100% {
     --_table-fade-end: 0rem;
-    --_table-fade-start: var(--helix-space-xl);
+    --_table-fade-start: var(--_table-fade-size);
   }
 }
 
@@ -230,4 +235,13 @@ slot[name="error"]::slotted(*) {
   :host {
     print-color-adjust: economy;
   }
+}
+
+/* **The box sits in the middle of the row on a touch screen.** There the
+   checkbox's row grows to the 44 pixel target and keeps the box at its top,
+   where a label's first line would be. A table's checkbox has no visible label,
+   so the box rose 12 pixels above the row's center (measured November 4, 2026,
+   in Data Table at 390). */
+[part~="checkbox"]::part(field) {
+  align-items: center;
 }

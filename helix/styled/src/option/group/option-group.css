@@ -27,7 +27,8 @@
      start on one line down the panel. A group label indented differently from
      its own group reads as belonging to something else.
 
-     `xs`, which is what the rows use. Two stylesheets naming one inset is what
-     lets them drift apart unnoticed. */
-  padding-inline: var(--option-padding, var(--helix-space-xs));
+     `space-field`, which is what the rows read. The heading read `xs` after
+     the rows moved to the field's inset, and started 4 pixels before the
+     words it names, 32 against 36 at `md`. */
+  padding-inline: var(--option-padding, var(--helix-space-field));
 }

@@ -14,7 +14,7 @@ describe('tag server output', () => {
       'helix-headless-tag',
     )
     expect(markup).toContain('<slot name="start" part="start"></slot>')
-    expect(markup).toContain('<slot part="label"></slot>')
+    expect(markup).toContain('<slot part="label" dir="auto"></slot>')
   })
 
   test('a plain tag ships no control', () => {

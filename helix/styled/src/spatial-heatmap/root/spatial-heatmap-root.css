@@ -16,27 +16,20 @@
   --heatmap-tone-success: var(--helix-color-success);
   /* The mark warning, as Heatmap's cells take it. */
   --heatmap-tone-warning: var(--helix-color-warning-mark);
-  --heatmap-tone-1: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 35%,
-    var(--helix-color-surface-sunken)
+  /* **In dark the far end is held at a lightness of 0.87 or less**, the
+     neutral 200, as light holds it at the neutral 700 or more. The ink
+     theme's dark 200 is white, and the top step of a continuous field drew a
+     pure white glare beside steps of 212 and 170 (November 4, 2026). A brand's
+     dark 200 stands under the cap and is drawn as before. */
+  --_heatmap-far: light-dark(
+    var(--helix-color-primary-strong),
+    oklch(from var(--helix-color-primary-strong) min(l, 0.87) c h)
   );
-  --heatmap-tone-2: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 51%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-3: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 68%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-4: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 84%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-5: var(--helix-color-primary-strong);
+  --heatmap-tone-1: color-mix(in oklab, var(--_heatmap-far) 35%, var(--helix-color-surface-sunken));
+  --heatmap-tone-2: color-mix(in oklab, var(--_heatmap-far) 51%, var(--helix-color-surface-sunken));
+  --heatmap-tone-3: color-mix(in oklab, var(--_heatmap-far) 68%, var(--helix-color-surface-sunken));
+  --heatmap-tone-4: color-mix(in oklab, var(--_heatmap-far) 84%, var(--helix-color-surface-sunken));
+  --heatmap-tone-5: var(--_heatmap-far);
 
   /* A grid of one track, so the footer is as wide as the strip. */
   display: grid;

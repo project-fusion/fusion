@@ -343,13 +343,30 @@ describe('a data table that serves its first page, before it upgrades', () => {
     expect(layout(files)).toEqual(upgraded)
   })
 
+  /* Within a pixel: WebKit lays out in sixty-fourths, so a track that comes to
+     458.46 drew 458 in one tree and 459 in the other with the 36 pixel
+     checkbox column (November 4, 2026). A box that moved would move more. */
+  const within = (before: Box[], after: Box[]): void => {
+    expect(before.length).toBe(after.length)
+    for (const [at, row] of before.entries()) {
+      for (const [index, value] of row.entries()) {
+        const other = after[at]?.[index]
+        if (typeof value === 'number' && typeof other === 'number') {
+          expect(Math.abs(value - other)).toBeLessThanOrEqual(1)
+        } else {
+          expect(value).toBe(other as string)
+        }
+      }
+    }
+  }
+
   run('widths in `columns`, the checkbox column and a footer stand still too', async () => {
     await example(sized)
     await idle()
     const roster = document.getElementById('roster') as HTMLElement & { rows: unknown[] }
     const upgraded = layout(roster)
     const before = layout(await unupgraded(sized, roster.getBoundingClientRect().width))
-    expect(before).toEqual(upgraded)
+    within(before, upgraded)
     roster.rows = people
     await idle()
     expect(layout(roster)).toEqual(upgraded)

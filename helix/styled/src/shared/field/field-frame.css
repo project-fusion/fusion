@@ -112,15 +112,38 @@
    width was the browser's own twenty characters, and each engine measures a
    character its own way: on November 4, 2026, an unsized Input was 202 pixels
    in Chromium and 216 in WebKit, and a Textarea 212 and 186. Size containment
-   sets the control's width from content aside, and the width given is
-   Chromium's twenty characters of Fusion Sans, 176 at the 14 pixel field
-   text, so a Chromium page keeps its width and WebKit comes to it. A Textarea
-   takes the same width as an Input, where it was 10 pixels wider in Chromium.
-   A field in a column, or given a width, fills it as before. A file control
-   is a hidden input behind a drop zone, so it is left out. */
+   sets the control's width from content aside. The width is Chromium's twenty
+   characters of Fusion Sans, 176 at the 14 pixel field text, so a Chromium
+   page keeps its width and WebKit comes to it. A Textarea takes the same width
+   as an Input, where it was 10 pixels wider in Chromium. A field in a column,
+   or given a width, fills it as before. A file control is a hidden input
+   behind a drop zone, so it is left out. */
 [part="control"]:not([type="file"]) {
   contain: inline-size;
   contain-intrinsic-inline-size: round(12.57em, 1px);
+}
+
+/* **And the field still gives way in a row.** WebKit counts a contained
+   control's width as its minimum as well, where Chromium lets a control with
+   a percentage width go to nothing: measured on November 4, 2026, an Input
+   and a Button in a 280 pixel row were 177 and 95 in Chromium and 202 and 95
+   in WebKit, and two Date Inputs were 222 each, 452 in all. So a control the
+   field holds directly takes no width of its own, and an empty box after it
+   carries the twenty characters. A grid track of `minmax(0, …)` is that width
+   at most and nothing at least, in both engines, and it gives way before the
+   control does. The margin takes back the field's gap, which the box would
+   otherwise add. A field with a row of tokens undoes both in `tags.css`. */
+[part="field"] > [part="control"]:not([type="file"]) {
+  contain-intrinsic-inline-size: 0px;
+}
+
+[part="field"]:has(> [part="control"]:not([type="file"]))::after {
+  content: "";
+  display: grid;
+  flex: 0 1000000 auto;
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
+  grid-template-columns: minmax(0, round(12.57em, 1px));
+  margin-inline-start: calc(var(--_field-gap, var(--helix-space-2xs)) * -1);
 }
 
 /* **An icon at either end is the size of the marks the field draws itself**,

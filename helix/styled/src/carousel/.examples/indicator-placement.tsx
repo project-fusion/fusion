@@ -1,3 +1,5 @@
+import './indicator-placement.css'
+
 export function Example() {
   return (
     <helix-flex
@@ -35,9 +37,9 @@ export function Example() {
         indicator-placement="overlay"
         label="News"
       >
-        <helix-callout tone="info">New features are available.</helix-callout>
-        <helix-callout tone="success">Your changes were saved.</helix-callout>
-        <helix-callout tone="warning">Your storage is almost full.</helix-callout>
+        <div className="slide"></div>
+        <div className="slide"></div>
+        <div className="slide"></div>
       </helix-carousel>
     </helix-flex>
   )

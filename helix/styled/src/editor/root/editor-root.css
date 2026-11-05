@@ -110,6 +110,22 @@
   gap: var(--helix-space-2xs);
 }
 
+/* **On a touch screen the tools stand a target apart**, as Toolbar's own
+   controls do. The toolbar opens its gap between the groups and not inside
+   them, so the buttons of one group kept the `2xs` gap: measured at 390 on a
+   phone, 36 pixels to press across a 32 button where the target is 44. Rows
+   that wrap open the same way, so a press below a button does not land on the
+   row under it. */
+@media (pointer: coarse) {
+  [part="tools"] {
+    gap: max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-control));
+  }
+
+  [part="controls"]::part(toolbar) {
+    row-gap: max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-control));
+  }
+}
+
 [part="divider"] {
   align-self: center;
   block-size: calc(var(--helix-size-control) * 0.6);

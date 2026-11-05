@@ -31,6 +31,10 @@
 }
 
 [part="surface"] {
+  /* The panel is the ground an elevated Card inside stands on, so the Card's
+     lift inside another card, the white of the overlay rung in light, stops
+     here: on this white panel it drew white on white. */
+  --_card-nest: initial;
   /* A panel opened from inside, such as a Select's list, takes `surface-overlay`
      too. In dark a shadow does not show and the two were one fill, so inside the
      dialog the token sits a step above it. In light the shadow separates them. */
@@ -38,11 +42,12 @@
     var(--_dialog-ground),
     color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_dialog-ground))
   );
-  /* A panel in the content, such as a Card, reads `surface-raised`, which in dark
-     is the dialog's own fill. A smaller step, so a list opened from that panel
-     still stands above it. **The rungs inside step by 3%, 9%, and 12% of the
-     ink**, as Popover's do, so an elevated card reads above a filled one: at 5%
-     an elevated card measured #272727 against a filled #2c2c2c. */
+  /* A panel in the content reads `surface-raised`, which in dark is the
+     dialog's own fill. A smaller step, so a list opened from that panel still
+     stands above it. **The rungs inside step by 3%, 9%, and 12% of the ink**,
+     as Popover's do, so an elevated card, which takes the overlay rung, reads
+     #343434 above a filled one at #2b2b2b, 1.13:1. At the raised rung it read
+     #2f2f2f, 1.05. */
   --helix-color-surface-raised: light-dark(
     var(--_dialog-raised),
     color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_dialog-ground))
@@ -285,10 +290,29 @@
   }
 }
 
+/* **Under reduced motion the panel and the scrim fade, and nothing rises.**
+   Both went from nothing to whole in one frame, since the base layer takes
+   `normal` to 0.01ms there; `duration-fade` is left alone, so the two fade
+   over 120ms with the panel in place, the phone sheet included. */
 @media (prefers-reduced-motion: reduce) {
   [part="surface"],
+  [part="surface"][open],
   [part="surface"]::backdrop {
-    transition: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
+  }
+
+  [part="surface"],
+  [part="surface"][open] {
+    translate: 0 0;
+  }
+
+  @starting-style {
+    [part="surface"][open] {
+      translate: 0 0;
+    }
   }
 
   /* The refusal is motion and nothing but, so with motion off it does not slow
@@ -391,15 +415,40 @@
    with a filter or a transform: on a frosted page, somewhere else entirely.
    There it closes at once instead, and still fades in. */
 /* `glass` is the one glass coverage over the theme's blur, `material-panel`,
-   as every glass panel draws it, and `frosted` the same pair turned up. */
+   as every glass panel draws it, and `frosted` the same pair turned up.
+   **The filter lifts the page back from under the scrim in light**, by
+   `material-scrim-lift`, so the panel reads the page and keeps the one glass
+   coverage over it: 240 on average over a white page, from 218. It was a rule
+   in the base layer keyed on the mode with a style query, which a browser
+   without them skipped and which could not reach the Command palette's own
+   dialog. */
 :host([material="glass"]) [part="surface"] {
-  backdrop-filter: var(--dialog-backdrop, var(--helix-material-backdrop));
+  backdrop-filter: var(
+    --dialog-backdrop,
+    var(--helix-material-backdrop) brightness(var(--helix-material-scrim-lift))
+  );
   background-color: var(--dialog-background-color, var(--helix-material-panel));
 }
 
 :host([material="frosted"]) [part="surface"] {
   backdrop-filter: var(--dialog-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--dialog-background-color, var(--helix-material-translucent-strong));
+}
+
+/* **Glass opened inside the panel steps off it in dark**, as a solid panel
+   opened inside does. A glass Menu in a glass Dialog took the page's glass, the
+   #121212 sheet at 72%, and over this panel it sampled #151514 against
+   #181817: one sheet. A solid Menu there takes the overlay rung this panel
+   restates, #343434, so the glass inside takes that rung at the one glass
+   coverage. In light the overlay rung is white here as on the page, so the
+   glass is unchanged. On the children, since the panel's own glass reads the
+   page's. */
+[part="surface"] > * {
+  --helix-material-panel: color-mix(
+    in oklab,
+    var(--helix-color-surface-overlay) min(100%, var(--helix-material-glass-opacity) * 100%),
+    transparent
+  );
 }
 
 @supports not (overlay: auto) {

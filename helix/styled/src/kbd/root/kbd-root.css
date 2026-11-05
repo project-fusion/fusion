@@ -103,6 +103,15 @@
   text-align: center;
 }
 
+/* **A symbol key in the sans face.** The mono face has no ⌘, ⇧, ⌥ or ⌃, and
+   the fallback that drew them, Menlo on a Mac, set them 6.4 to 6.7 pixels
+   tall beside an 8.3 pixel P in a 12 pixel key, and ⌘ high in its cap. The
+   system face draws them at the height of a capital, as a menu's shortcuts
+   are drawn. */
+:host([caps]) [part="key"][data-symbol] {
+  font-family: var(--kbd-font-family, var(--helix-font-sans));
+}
+
 /* The `+` between two caps, where the platform writes one. */
 [part="separator"] {
   color: var(--kbd-separator-color, var(--helix-color-foreground-muted));

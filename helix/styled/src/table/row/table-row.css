@@ -167,6 +167,26 @@
   opacity: var(--table-grip-disabled-opacity, var(--helix-opacity-disabled));
 }
 
+/* **On a touch screen the grip reaches the 44 pixel target across, and the
+   row's height up and down.** Its cell widens to the target and the button's
+   press fills the cell: as drawn, the press was 16 by 24 (measured November 4,
+   2026, at 390). Placed against the cell, not the button, so a 40 pixel row's
+   press stops at its rule: a 44 pixel press centered on the button reached 2
+   pixels into each row beside it, and the row below took a tap on this one's
+   last 2. */
+@media (pointer: coarse) {
+  [part~="grip"] {
+    padding-inline: calc((var(--helix-size-target) - var(--helix-size-icon-tight)) / 2);
+    position: relative;
+  }
+
+  [part="grip-button"]::after {
+    content: "";
+    inset: 0;
+    position: absolute;
+  }
+}
+
 [part="grip-mark"] {
   block-size: var(--helix-size-icon-tight);
   inline-size: var(--helix-size-icon-tight);
@@ -196,4 +216,13 @@
 :host(:state(drop-after)) ::slotted(*) {
   box-shadow: inset 0 calc(var(--table-drop-indicator-size, var(--helix-border-thick)) * -1) 0 0
     var(--table-drop-indicator-color, var(--helix-color-primary));
+}
+
+/* **The box sits in the middle of the row on a touch screen.** There the
+   checkbox's row grows to the 44 pixel target and keeps the box at its top,
+   where a label's first line would be. A table's checkbox has no visible label,
+   so the box rose 12 pixels above the row's center (measured November 4, 2026,
+   in Data Table at 390). */
+[part~="checkbox"]::part(field) {
+  align-items: center;
 }

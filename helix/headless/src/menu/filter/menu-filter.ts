@@ -44,7 +44,9 @@ export const drawFilter = (
   html`<input
     part="search-field"
     type="text"
+    autocapitalize="off"
     autocomplete="off"
+    autocorrect="off"
     spellcheck="false"
     .value=${host.filter}
     placeholder=${host.filterLabel}

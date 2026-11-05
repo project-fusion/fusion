@@ -12,6 +12,15 @@
 :root {
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
+  /* **How much a glass modal brightens the page it samples**, set with the
+     mode, since a filter takes no `light-dark()`. A modal's `::backdrop`
+     paints behind its panel, so the panel's filter samples the page with the
+     scrim already over it: in light the white page came through as #9d9d9d and
+     the glass as a gray slab. The light scrim is 40% of the ink, so 1 / 0.6
+     hands the filter the page as it stands under the scrim. Dark keeps the
+     dimmed page, which is what its glass is drawn over. Public, so a Dialog
+     and a Drawer read it in their own sheets. */
+  --helix-material-scrim-lift: calc(1 / 0.6);
 
   /* **The shadow ink is per mode, because the two modes are not the same
      problem.** One value served both, and it could not: a shadow is a dark ink
@@ -205,6 +214,7 @@
   :root {
     --_helix-mode: dark;
     --_helix-mode-inverted: light;
+    --helix-material-scrim-lift: 1;
   }
 }
 
@@ -212,12 +222,14 @@
 [data-color-mode="light"] {
   --_helix-mode: light;
   --_helix-mode-inverted: dark;
+  --helix-material-scrim-lift: calc(1 / 0.6);
   color-scheme: light;
 }
 
 [data-color-mode="dark"] {
   --_helix-mode: dark;
   --_helix-mode-inverted: light;
+  --helix-material-scrim-lift: 1;
   color-scheme: dark;
 }
 

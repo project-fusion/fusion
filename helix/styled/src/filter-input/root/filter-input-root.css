@@ -3,6 +3,18 @@
    to a filter input. */
 :host {
   --_filter-input-size: var(--filter-input-size, var(--helix-size-control));
+  /* **A chip's corner, concentric with the field**, for the reason Combobox
+     gives its tags: `radii-inset`'s derivation, the field's corner less the
+     border and the `2xs` the chip sits in from it, and never squarer than 2
+     pixels or half the field's corner. Written out so a field corner set
+     through `--filter-input-radius` moves the chips with it. Handed to the
+     chips, which take it under their own hook. */
+  --_filter-input-chip-corner: max(
+    min(var(--filter-input-radius, var(--helix-radii-sm)) * 0.5, 2px),
+    var(--filter-input-radius, var(--helix-radii-sm)) -
+    var(--helix-border-thin) -
+    var(--helix-space-2xs)
+  );
 }
 
 /* The box is the field, not the input.

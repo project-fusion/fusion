@@ -34,7 +34,8 @@ describe('the pending ring under reduced motion', () => {
 })
 
 /* A status crosses components: `warning` on a tag and on the filter button that
-   selects it are one color, or the color is decoration. */
+   selects it are one color, or the color is decoration. A solid warning fill is
+   the warning mark, as a solid warning Tag's is. */
 describe('a button takes the status tones', () => {
   test('each with the fill, ink, and edge of its own token', () => {
     const declared = (customElements.get('helix-button') as unknown as { styles: unknown }).styles
@@ -44,7 +45,11 @@ describe('a button takes the status tones', () => {
       .join('\n')
     for (const tone of ['info', 'success', 'warning']) {
       expect(sheet).toContain(`:host([tone="${tone}"])`)
-      expect(sheet).toContain(`--helix-color-${tone}-surface`)
+      expect(sheet).toContain(
+        tone === 'warning'
+          ? '--_button-fill: var(--helix-color-warning-mark)'
+          : `--helix-color-${tone}-surface`,
+      )
     }
   })
 })

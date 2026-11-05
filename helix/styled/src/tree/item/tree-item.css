@@ -11,8 +11,9 @@
     --tree-row-size,
     calc(var(--helix-size-control) - var(--tree-gap, var(--helix-space-2xs)))
   );
-  /* The padding above and below a row's line, from that height. */
-  --_tree-pad: calc((var(--_tree-row) - 1lh) / 2);
+  /* The padding above and below a row's line, from that height, in whole
+     pixels: the 19.5 pixel line in a 36 pixel row left 8.25 at `md`. */
+  --_tree-pad: max(0px, round(down, calc((var(--_tree-row) - 1lh) / 2), 1px));
   /* The row's inline inset, which is the tree's `bleed` where it asks for one,
      so a top-level row's words start on the tree's edge, and every level steps
      in from there by the indent as it did. */

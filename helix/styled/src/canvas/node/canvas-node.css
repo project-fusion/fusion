@@ -30,6 +30,13 @@
      1.26 on the group and the board in light and 1.30 to 1.35 in dark, about the
      1.23 of the page's own edges. A toned card keeps its tone as the edge, below. */
   --_canvas-card-wash: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
+  /* A filled card's tint from the hook alone, which is nothing when the page
+     sets no color, so the rule below falls back to the wash. */
+  --_canvas-card-hook-fill: color-mix(
+    in oklab,
+    var(--canvas-node-color) 16%,
+    var(--helix-color-surface)
+  );
   --_canvas-card-edge: var(--canvas-node-color, var(--_canvas-card-wash));
   /* **The handles are the card's edge, so they take its color**: its tone at
      rest, and the accent when the edge turns accent, selected or about to
@@ -125,6 +132,16 @@
 :host([separation="filled"]:not([group])) {
   background-color: color-mix(in oklab, var(--_canvas-card-color) 16%, var(--helix-color-surface));
   border-color: transparent;
+}
+
+/* **A filled card with no color takes the filled wash**, as a filled `Card` on
+   a well does. Its color is then the border, and 16% of that into `surface`
+   came out #f7f7f7 on the #ebebeb board in light, 1.07:1, where a filled Card
+   on a well measures 1.12. A color the page sets through the hook still tints
+   it: the private below resolves to nothing without one. */
+:host([separation="filled"]:not([group]):not([tone])),
+:host([separation="filled"]:not([group])[tone="neutral"]) {
+  background-color: var(--_canvas-card-hook-fill, var(--helix-color-surface-filled));
 }
 
 :host([separation="elevated"]:not([group])) {
@@ -480,6 +497,11 @@
 :host([shape="diamond"][separation="filled"]) [part="outline"] polygon {
   fill: color-mix(in oklab, var(--_canvas-card-color) 16%, var(--helix-color-surface));
   stroke: transparent;
+}
+
+:host([shape="diamond"][separation="filled"]:not([tone])) [part="outline"] polygon,
+:host([shape="diamond"][separation="filled"][tone="neutral"]) [part="outline"] polygon {
+  fill: var(--_canvas-card-hook-fill, var(--helix-color-surface-filled));
 }
 
 :host([shape="diamond"][separation="plain"]) [part="outline"] polygon {

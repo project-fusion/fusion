@@ -85,6 +85,8 @@
      the resting one, changed nothing and was told nothing. `Card` reads its own
      the same way in the rule this pair was copied from. */
   background-color: var(--_drawer-ground);
+  /* The Card's lift inside a card stops at the panel. See Dialog's note. */
+  --_card-nest: initial;
   /* A panel opened from inside takes `surface-overlay` too, and in dark a shadow
      does not show, so inside the drawer the token sits a step above it. See
      Dialog's note. */
@@ -175,6 +177,25 @@
 :host([material="glass"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
   background-color: var(--drawer-background-color, var(--helix-material-panel));
+}
+
+/* A modal drawer's glass lifts the page back from under its scrim in light, as
+   a glass Dialog's does. See its note. `:modal`, since only a modal panel has
+   the scrim, and `modal` does not reflect. */
+:host([material="glass"]) [part="panel"]:modal {
+  backdrop-filter: var(
+    --drawer-backdrop,
+    var(--helix-material-backdrop) brightness(var(--helix-material-scrim-lift))
+  );
+}
+
+/* Glass opened inside the drawer steps off it in dark. See Dialog's note. */
+[part="panel"] > * {
+  --helix-material-panel: color-mix(
+    in oklab,
+    var(--helix-color-surface-overlay) min(100%, var(--helix-material-glass-opacity) * 100%),
+    transparent
+  );
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
@@ -416,6 +437,41 @@
 @media (prefers-reduced-motion: reduce) {
   [part="dismiss"] {
     transition: none;
+  }
+}
+
+/* **Under reduced motion the panel fades in place and does not slide**, and
+   the scrim fades with it, as Dialog's do. Both went from nothing to whole in
+   one frame, since the base layer takes `normal` to 0.01ms there;
+   `duration-fade` is left alone. The panel stays where a swipe puts it, so a
+   finger still moves it, with no transition on the transform. After the
+   swiping rule, at its weight, so the fade holds through a swipe too. */
+@media (prefers-reduced-motion: reduce) {
+  [part="panel"],
+  :host(:state(open)) [part="panel"][open] {
+    transform: translate(var(--drawer-swipe-x, 0), var(--drawer-swipe-y, 0));
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
+  }
+
+  [part="panel"]::backdrop {
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
+  }
+
+  [part="panel"]:not([open]) {
+    opacity: 0;
+  }
+
+  @starting-style {
+    :host(:state(open)) [part="panel"][open] {
+      opacity: 0;
+      transform: none;
+    }
   }
 }
 
