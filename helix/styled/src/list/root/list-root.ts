@@ -18,6 +18,7 @@ import { styles } from './list-root.css.js'
  * @aliases Rows, Stack, Menu
  * @documentation https://fusion.dev/helix/components/list
  *
+ * @cssproperty --list-bleed - How far a row's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
  * @cssproperty --list-drag-preview-background-color - The fill behind the copy of a row a pointer drags.
  * @cssproperty --list-drag-preview-border-color - The color of the edge around the copy of a row a pointer drags.
  * @cssproperty --list-drag-preview-border-width - The width of the edge around the copy of a row a pointer drags. None by default, where the shadow lifts it.
@@ -37,6 +38,18 @@ import { styles } from './list-root.css.js'
  */
 @customElement('helix-list')
 export class HelixList extends HelixHeadlessList {
+  /**
+   * Sets the words of its rows on the list's own edge, with each fill reaching past it.
+   *
+   * The words line up with a divider or a heading beside the list, and a hover, a
+   * selection or the current row is drawn `--list-bleed` wider on each side,
+   * by a negative margin and the same padding, so nothing moves. The parent has
+   * to leave that room: inside `overflow: hidden` with no inline padding, the
+   * fill and the focus ring are cut at the list's edge.
+   */
+  @property({ reflect: true, type: Boolean })
+  bleed = false
+
   /**
    * Draws a line between rows.
    */

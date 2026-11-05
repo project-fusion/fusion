@@ -148,6 +148,7 @@
   --helix-text-field: var(--helix-text-sm);
   --helix-text-field-label: var(--helix-text-xs);
   --helix-space-field: var(--helix-space-xs);
+  --helix-space-row-bleed: var(--helix-space-2xs);
   --helix-size-tag: var(--helix-size-tag-sm);
 
   align-items: center;

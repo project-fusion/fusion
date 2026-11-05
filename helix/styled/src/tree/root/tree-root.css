@@ -15,6 +15,12 @@
 }
 
 /* The placement, handed down as numbers the item can use. */
+:host([bleed]) {
+  /* Read by every row, at every depth: the rows' words start on the tree's own
+     edge and their fills reach this far past it. See `list-root.css`. */
+  --_tree-bleed: var(--tree-bleed, var(--helix-space-row-bleed));
+}
+
 :host([chevron-placement="end"]) {
   /* Past the `end` slot, which already sits at `order: 1` with an auto margin of
      its own. Sharing that order put the two side by side and, more to the point,

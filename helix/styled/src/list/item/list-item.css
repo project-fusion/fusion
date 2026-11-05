@@ -18,7 +18,14 @@
   grid-template-columns: auto auto 1fr auto auto;
   /* The height of a control at this density, and two lines grow from it. */
   min-block-size: var(--helix-size-control);
-  padding: var(--list-item-padding, calc(var(--helix-space-control) * 0.5) var(--helix-space-md));
+  padding: var(
+    --list-item-padding,
+    calc(var(--helix-space-control) * 0.5) var(--_list-bleed, var(--helix-space-md))
+  );
+  /* Out by the list's `bleed`, with the inset above the same amount, so the
+     words stay on the list's edge and the fill reaches past it. None by
+     default, where the inset is the row's own. */
+  margin-inline: calc(var(--_list-bleed, var(--helix-space-none)) * -1);
 }
 
 /* The rail: the ordinal, at the start edge of the block rather than beside the

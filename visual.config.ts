@@ -204,6 +204,17 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    /* A row's fill reaching past its words is drawn against what it lines up
+       with, a heading and a divider, so it is pictured apart too. */
+    {
+      files,
+      glob: '{name}/.examples/bleed.html',
+      kind: 'html',
+      name: 'bleed',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
   ],
   /* `verify`'s browser jobs and `measure-browser.mjs` name a file here, and
      `measure:browser --from` merges a run's worth of them. */

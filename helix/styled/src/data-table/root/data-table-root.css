@@ -246,6 +246,47 @@
   background-color: var(--data-table-row-background-color);
 }
 
+/* **`bleed`: the words stay on the table's edge, and each row's fill reaches
+   past it.** A row has no box to take a margin, so the table takes the room
+   instead, as padding inside the box that scrolls and clips, pulled back out by
+   the same margin, and the first and last cell of each row paint their own fill
+   into it. The headings and the rules stay on the words' column. The table's
+   parent has to leave the room, as a list's does. */
+:host([bleed]) {
+  --_data-table-bleed: var(--data-table-bleed, var(--helix-space-row-bleed));
+}
+
+:host([bleed]) [part="table"] {
+  box-sizing: content-box;
+  margin-inline: calc(var(--_data-table-bleed) * -1);
+  padding-inline: var(--_data-table-bleed);
+}
+
+:host([bleed]) [part~="row"] > :first-child,
+:host([bleed]) [part~="row"] > :last-child {
+  position: relative;
+}
+
+/* `inherit` from the cell, which is what makes the edge the row's fill in every
+   state a rule below gives it: hover, selected, dragging. */
+:host([bleed]) [part~="row"] > :first-child::before,
+:host([bleed]) [part~="row"] > :last-child::after {
+  background-color: inherit;
+  content: "";
+  inline-size: var(--_data-table-bleed);
+  inset-block: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+:host([bleed]) [part~="row"] > :first-child::before {
+  inset-inline-start: calc(var(--_data-table-bleed) * -1);
+}
+
+:host([bleed]) [part~="row"] > :last-child::after {
+  inset-inline-end: calc(var(--_data-table-bleed) * -1);
+}
+
 /* `row-link` makes the row a target, so the row says so under a pointer. */
 :host([row-link]) [part~="row"] > [part~="cell"] {
   cursor: pointer;

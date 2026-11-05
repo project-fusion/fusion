@@ -895,6 +895,14 @@ export const TOKENS: Token[] = [
   ['text-field', 'var(--helix-text-md)'],
   ['text-field-label', 'var(--helix-text-sm)'],
   ['space-field', 'var(--helix-space-sm)'],
+  /* *How far a row's fill reaches past its words**, in a list, tree, menu,
+     listbox or table that asks for `bleed`. The words sit on the column the
+     content around them is set on, a divider or a heading, and the hover, the
+     selection or the current row is drawn this much wider on each side, by a
+     negative margin and the same padding, so nothing moves. A step under the
+     control's inset at every density: 2, 4 and 8 pixels at `sm`, `md` and
+     `lg`, so the fill reads as the row's and not as a box around it. */
+  ['space-row-bleed', 'var(--helix-space-xs)'],
   /* *The smallest type a field you type into may take.** iOS Safari zooms the
      page into a focused input, textarea or select whose text is under 16px, so
      on a touch screen this is 16px and everywhere else it is 0, which leaves

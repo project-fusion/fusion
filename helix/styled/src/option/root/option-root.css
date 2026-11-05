@@ -25,7 +25,13 @@
   /* The field's own inset: a row and the closed control it came from hold their
      words on the same column, or the chosen answer shifts sideways when the panel
      opens. */
-  padding-inline: var(--option-padding, var(--helix-space-field));
+  padding-inline: var(--_option-bleed, var(--option-padding, var(--helix-space-field)));
+  /* Under the listbox's `bleed` the inset is the bleed and the margin is the rest
+     of the field's step, so the words do not move. None by default. */
+  margin-inline: calc(
+    var(--option-padding, var(--helix-space-field)) -
+    var(--_option-bleed, var(--option-padding, var(--helix-space-field)))
+  );
 }
 
 /* *The column that carries the words, and the caption when there is one.** It

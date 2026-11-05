@@ -8,7 +8,7 @@
   text-decoration: none;
   /* No corner: a row that reaches both edges of the surface has no outside
      corner to round, and rounding it draws a notch against the surface's own. */
-  border-radius: var(--helix-radii-none);
+  border-radius: var(--_menu-item-radius, var(--helix-radii-none));
   color: var(--helix-color-foreground);
   cursor: pointer;
   display: grid;
@@ -28,8 +28,11 @@
     minmax(0, 1fr)
     auto
     var(--menu-item-end, 0px);
-  /* The inset is padding on the row and nothing else. */
-  padding-inline: var(--helix-space-sm);
+  /* The inset is padding on the row and nothing else. Under the menu's `bleed`
+     it is the bleed, and the margin takes up the rest of the step, so the words
+     stay on the headings' column whichever it is. */
+  margin-inline: calc(var(--helix-space-sm) - var(--_menu-bleed, var(--helix-space-sm)));
+  padding-inline: var(--_menu-bleed, var(--helix-space-sm));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
