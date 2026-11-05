@@ -98,6 +98,13 @@
   grid-template-columns: auto 1fr auto;
 }
 
+/* The color goes on the slot, where whatever is assigned inherits it. Written
+   on `::slotted`, it would beat a slotted component's own `:host` color, as it
+   turned an avatar's initials muted in a list row. */
+slot[name="start"] {
+  color: var(--helix-color-foreground);
+}
+
 /* The leading and trailing regions are bare slots, so an omitted one generates
    no flex item and takes none of the bar's gap.
 
@@ -108,7 +115,6 @@
    rendered nowhere at all. */
 slot[name="start"]::slotted(*) {
   align-items: center;
-  color: var(--helix-color-foreground);
   display: flex;
   flex: 0 0 auto;
   font-weight: var(--helix-weight-semibold);

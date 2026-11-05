@@ -106,11 +106,18 @@
   scale: 1 -1;
 }
 
+/* The color goes on the slot, where whatever is assigned inherits it. Written
+   on `::slotted`, it would beat a slotted component's own `:host` color, as it
+   turned an avatar's initials muted in a list row. */
+slot[name="start"],
+slot[name="end"] {
+  color: var(--helix-color-foreground-muted);
+}
+
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
   --icon-size: var(--helix-size-icon);
 
-  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
 }
 
