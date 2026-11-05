@@ -265,6 +265,7 @@
     "helix/headless/src/number-input/root/number-input-root.ts",
     "helix/headless/src/object-inspector/root/object-inspector-root.dom.spec.ts",
     "helix/headless/src/object-inspector/root/object-inspector-root.ts",
+    "helix/headless/src/option/root/option-root.dom.spec.ts",
     "helix/headless/src/option/root/option-root.ts",
     "helix/headless/src/outline/root/outline-root.ts",
     "helix/headless/src/pagination/root/pagination-root.dom.spec.ts",
