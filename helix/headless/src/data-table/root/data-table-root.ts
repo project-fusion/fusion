@@ -903,8 +903,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    *
    * Wants `row-key`: a selection is a set of identities, and without one the rows
    * are known by their place in the result, which a sort changes.
+   *
+   * Reflected, because the styled tier lays the headings out by whether a
+   * checkbox column leads them: set as a property, as React sets it, the
+   * table's first heading took the inset a leading column already gives.
    */
-  @property({ type: Boolean })
+  @property({ reflect: true, type: Boolean })
   selectable = false
 
   /** The name of the checkbox in the heading that selects every row. */
