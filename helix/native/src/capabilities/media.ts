@@ -137,6 +137,9 @@ export const nativeMedia: Media<MediaNode> = {
     player.play()
     return Promise.resolve(true)
   },
+  rate: ({ player }, rate) => {
+    player.playbackRate = rate
+  },
   read: ({ player }) => readOf(player),
   seek: ({ player }, seconds) => {
     const end = Number.isFinite(player.duration) && player.duration > 0 ? player.duration : seconds

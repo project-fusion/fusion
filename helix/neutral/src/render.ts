@@ -511,6 +511,35 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'yName'
     | 'yTicks'
   >
+  /** What a player of one video computes for its parts. */
+  readonly video: Computes<
+    | 'bar'
+    | 'captioned'
+    | 'captionMenu'
+    | 'captionRows'
+    | 'captionToggle'
+    | 'clock'
+    | 'extras'
+    | 'failed'
+    | 'failWords'
+    | 'full'
+    | 'level'
+    | 'named'
+    | 'overflowed'
+    | 'overflowRows'
+    | 'playing'
+    | 'playWords'
+    | 'postered'
+    | 'progress'
+    | 'quiet'
+    | 'seekAt'
+    | 'seekMax'
+    | 'seekWords'
+    | 'silent'
+    | 'start'
+    | 'waiting'
+    | 'waitWords'
+  >
   /** What a viewer of one item at a time computes for its parts. */
   readonly lightbox: Computes<
     | 'arrows'

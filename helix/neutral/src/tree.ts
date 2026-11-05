@@ -95,6 +95,7 @@ import type {
   TimePickerChoice,
   TreeChoice,
   TreeItemChoice,
+  VideoChoice,
 } from './tree-choice.js'
 import type { Validation } from './validation.js'
 import type { Window } from './window.js'
@@ -371,6 +372,8 @@ export interface Headless {
   readonly scatterChart?: ScatterChartChoice
   /** What the element reads, sends, and computes where it is a strip of cells. */
   readonly heatmap?: HeatmapChoice
+  /** What the element reads, sends, and computes where it is a player of one video. */
+  readonly video?: VideoChoice
   /** What the element reads, sends, and computes where it is a viewer of one item at a time. */
   readonly lightbox?: LightboxChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */

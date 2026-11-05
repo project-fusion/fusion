@@ -11,6 +11,7 @@ export type MediaCall<N> =
   | { readonly call: 'pause'; readonly node: N }
   | { readonly call: 'picture-in-picture'; readonly node: N; readonly on: boolean }
   | { readonly call: 'play'; readonly node: N }
+  | { readonly call: 'rate'; readonly node: N; readonly rate: number }
   | { readonly call: 'seek'; readonly node: N; readonly seconds: number }
 
 /** A media capability that keeps each node's playback and every request, for a spec to read. */
@@ -86,6 +87,9 @@ export const fakeMedia = <N>(): FakeMedia<N> => {
       return fake.plays
     },
     plays: true,
+    rate: (node, rate) => {
+      calls.push({ call: 'rate', node, rate })
+    },
     read,
     seek: (node, seconds) => {
       calls.push({ call: 'seek', node, seconds })

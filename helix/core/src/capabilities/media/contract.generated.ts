@@ -29,6 +29,9 @@ export interface Media<N> {
   /** Mutes `node`, or gives its sound back. */
   readonly mute: (node: N, muted: boolean) => void
 
+  /** Plays `node` at `rate` times its recorded speed. */
+  readonly rate: (node: N, rate: number) => void
+
   /** Where `node` stands now. */
   readonly read: (node: N) => Playback
 

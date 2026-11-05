@@ -845,6 +845,14 @@
       "types": "./dist/trend/index.d.ts",
       "default": "./dist/trend/index.js"
     },
+    "./video": {
+      "react-native": {
+        "types": "./dist/video/index.native.d.ts",
+        "default": "./dist/video/index.native.js"
+      },
+      "types": "./dist/video/index.d.ts",
+      "default": "./dist/video/index.js"
+    },
     "./virtual-list": {
       "react-native": {
         "types": "./dist/virtual-list/index.native.d.ts",

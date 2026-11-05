@@ -110,6 +110,9 @@ export const webMedia: Media<HTMLMediaElement> = {
       return false
     }
   },
+  rate: (node, rate) => {
+    node.playbackRate = rate
+  },
   read: (node): Playback => ({
     duration: Number.isFinite(node.duration) ? node.duration : 0,
     ended: node.ended,

@@ -78,6 +78,7 @@ import { useTree } from './tree'
 import { useTreeItem } from './tree-item'
 import { settingTurns, turning, turnsAlone } from './turns'
 import { type Judged, useValidation } from './validation'
+import { useVideo } from './video'
 import { useWindow } from './window'
 
 export { scrollingOf } from './scrolling'
@@ -507,6 +508,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLightbox(family, props, use, around),
+      ),
+    /* A player of one video: its picture, its bar, its keys, and its menus. */
+    ...uses
+      .filter((use) => use.machine === 'video')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useVideo(family, props, use),
       ),
     /* A strip of cells: its cells from its readings, its reading, and its selection. */
     ...uses

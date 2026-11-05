@@ -22,6 +22,7 @@ export const serverMedia: Media<unknown> = {
   pause: () => undefined,
   pictureInPicture: async () => false,
   play: async () => false,
+  rate: () => undefined,
   read: () => STILL_PLAYBACK,
   seek: () => undefined,
   showCaptions: () => undefined,

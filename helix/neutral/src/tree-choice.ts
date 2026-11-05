@@ -1032,6 +1032,38 @@ export interface ScatterChartChoice {
   readonly yTicks?: string
 }
 
+/** The names of a player of one video, each read as `video.x`. */
+export interface VideoChoice {
+  readonly bar?: string
+  readonly captioned?: string
+  readonly captionMenu?: string
+  readonly captionRows?: string
+  readonly captionToggle?: string
+  readonly clock?: string
+  readonly extras?: string
+  readonly failed?: string
+  readonly failWords?: string
+  readonly full?: string
+  readonly level?: string
+  readonly named?: string
+  readonly onNext?: string
+  readonly onPrevious?: string
+  readonly overflowed?: string
+  readonly overflowRows?: string
+  readonly playing?: string
+  readonly playWords?: string
+  readonly postered?: string
+  readonly progress?: string
+  readonly quiet?: string
+  readonly seekAt?: string
+  readonly seekMax?: string
+  readonly seekWords?: string
+  readonly silent?: string
+  readonly start?: string
+  readonly waiting?: string
+  readonly waitWords?: string
+}
+
 /** The names of a viewer of one item at a time, each read as `lightbox.x`. */
 export interface LightboxChoice {
   readonly arrows?: string
