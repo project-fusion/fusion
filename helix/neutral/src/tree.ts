@@ -69,6 +69,7 @@ import type {
   DonutChartChoice,
   FilterInputChoice,
   FilterMenuChoice,
+  HeatmapChoice,
   InspectorChoice,
   LegendChoice,
   ListboxChoice,
@@ -367,6 +368,8 @@ export interface Headless {
   /** What the element reads, sends, and computes where it is a chart of columns. */
   readonly barChart?: BarChartChoice
   readonly scatterChart?: ScatterChartChoice
+  /** What the element reads, sends, and computes where it is a strip of cells. */
+  readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */
