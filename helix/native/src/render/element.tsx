@@ -27,6 +27,7 @@ import { useFieldset } from './fieldset'
 import { folded } from './fold'
 import { useFollowed } from './follows'
 import { hostSemantics } from './host'
+import { inHostScheme } from './host-scheme'
 import { hostStyle } from './host-style'
 import { useHostTarget } from './host-target'
 import { keepMade } from './made'
@@ -410,7 +411,10 @@ export const element = (
     return dense(theme, stop, behavior.provide === undefined ? placed : behavior.provide(placed))
   }
   /* The tag the element around finds this one's `::slotted()` style by. */
-  const made = Object.assign(drawing, { displayName: family.tag, tag: family.tag })
+  const made = Object.assign(inHostScheme(family, drawing), {
+    displayName: family.tag,
+    tag: family.tag,
+  })
   keepMade(family, made)
   return made
 }
