@@ -1035,6 +1035,20 @@ const SCATTER_CHART: &[Field] = &[
     ("yTicks", "yTicks", Name),
 ];
 
+const LIGHTBOX: &[Field] = &[
+    ("arrows", "arrows", Name),
+    ("atEnd", "atEnd", Name),
+    ("atStart", "atStart", Name),
+    ("counted", "counted", Name),
+    ("named", "named", Name),
+    ("onActivate", "onActivate", Name),
+    ("onBeforeActivate", "onBeforeActivate", Name),
+    ("place", "place", Name),
+    ("zoomInOff", "zoomInOff", Name),
+    ("zoomOutOff", "zoomOutOff", Name),
+    ("zooms", "zooms", Name),
+];
+
 const HEATMAP: &[Field] = &[
     ("actives", "actives", Name),
     ("cells", "cells", Name),
@@ -1538,6 +1552,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("barChart", "barChart", BAR_CHART),
     ("scatterChart", "scatterChart", SCATTER_CHART),
     ("heatmap", "heatmap", HEATMAP),
+    ("lightbox", "lightbox", LIGHTBOX),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),

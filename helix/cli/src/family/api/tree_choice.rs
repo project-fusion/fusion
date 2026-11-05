@@ -808,6 +808,26 @@ pub const HEATMAP: &[(&str, Names)] = &[
     ("onResize", Names::Event),
 ];
 
+/// What a viewer of one item at a time sends: a move asked and made. Its props it
+/// reads by their own names.
+pub const LIGHTBOX: &[(&str, Names)] = &[
+    ("onActivate", Names::Event),
+    ("onBeforeActivate", Names::Event),
+];
+
+/// What a viewer computes for its parts, each read as `lightbox.x`.
+pub const LIGHTBOX_COMPUTED: &[&str] = &[
+    "arrows",
+    "atEnd",
+    "atStart",
+    "counted",
+    "named",
+    "place",
+    "zoomInOff",
+    "zoomOutOff",
+    "zooms",
+];
+
 /// What a strip of cells computes for its parts, each read as `heatmap.x`.
 pub const HEATMAP_COMPUTED: &[&str] = &[
     "actives",
@@ -1336,6 +1356,11 @@ pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
 }
 
+/// `lightbox({ ... })`, each field a name.
+pub fn lightbox(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "lightbox", LIGHTBOX, LIGHTBOX_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1440,6 +1465,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "barChart" => bar_chart(value),
         "scatterChart" => scatter_chart(value),
         "heatmap" => heatmap(value),
+        "lightbox" => lightbox(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

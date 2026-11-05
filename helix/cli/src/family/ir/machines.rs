@@ -88,10 +88,11 @@ use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, AREA_CHART, BAR_CHART, CAROUSEL,
     CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER,
-    DONUT_CHART, FILTER_INPUT, FILTER_MENU, HEATMAP, INSPECTOR, LEGEND, LINE_CHART, LISTBOX,
-    LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW,
-    OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT,
-    SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM,
+    DONUT_CHART, FILTER_INPUT, FILTER_MENU, HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART,
+    LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
+    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD,
+    SCATTER_CHART, SELECT, SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE,
+    TREE_ITEM,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -647,6 +648,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.bar_chart, BAR_CHART, "bar-chart"),
         (&api.scatter_chart, SCATTER_CHART, "scatter-chart"),
         (&api.heatmap, HEATMAP, "heatmap"),
+        (&api.lightbox, LIGHTBOX, "lightbox"),
         (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),
         (&api.select, SELECT, "select"),
