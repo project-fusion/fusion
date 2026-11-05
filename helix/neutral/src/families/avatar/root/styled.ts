@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { fn, native, product, token } from '../../../style.js'
+import { fn, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
