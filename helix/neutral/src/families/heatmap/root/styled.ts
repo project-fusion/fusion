@@ -81,6 +81,10 @@ export default styles(
     const through = own.heatmapThrough(1)
     const ring = [token('border-thin'), 'solid', token('color-foreground')]
     const inside = product(token('border-thin'), '-1')
+    const edged = [
+      { emphasis: 'outlined', also: { 'cell-selected': false } },
+      { emphasis: 'subtle', also: { 'cell-selected': false } },
+    ]
     return [
       /* A grid of one column, as wide as the strip, so the footer is too. */
       on('host', [
@@ -152,32 +156,16 @@ export default styles(
         ]),
         /* The edge in the cell's tone under `outlined` and `subtle`, but on a selected cell. */
         web([
-          rule(
-            { emphasis: 'outlined', also: { 'cell-selected': false } },
-            {
-              boxShadow: [
-                'inset',
-                0,
-                0,
-                0,
-                token('border-thin'),
-                fn('color-mix', 'in oklab', [paint, product(through, '100%')], 'transparent'),
-              ],
-            },
-          ),
-          rule(
-            { emphasis: 'subtle', also: { 'cell-selected': false } },
-            {
-              boxShadow: [
-                'inset',
-                0,
-                0,
-                0,
-                token('border-thin'),
-                fn('color-mix', 'in oklab', [paint, product(through, '100%')], 'transparent'),
-              ],
-            },
-          ),
+          rule(edged, {
+            boxShadow: [
+              'inset',
+              0,
+              0,
+              0,
+              token('border-thin'),
+              fn('color-mix', 'in oklab', [paint, product(through, '100%')], 'transparent'),
+            ],
+          }),
           rule(
             { emphasis: 'outlined' },
             { own: { heatmapFill: mix(paint, 60, token('color-background')) } },
@@ -193,32 +181,16 @@ export default styles(
           ),
         ]),
         native([
-          rule(
-            { emphasis: 'outlined', also: { 'cell-selected': false } },
-            {
-              boxShadow: [
-                'inset',
-                0,
-                0,
-                0,
-                token('border-thin'),
-                measured('heatmap-ring', token('color-border')),
-              ],
-            },
-          ),
-          rule(
-            { emphasis: 'subtle', also: { 'cell-selected': false } },
-            {
-              boxShadow: [
-                'inset',
-                0,
-                0,
-                0,
-                token('border-thin'),
-                measured('heatmap-ring', token('color-border')),
-              ],
-            },
-          ),
+          rule(edged, {
+            boxShadow: [
+              'inset',
+              0,
+              0,
+              0,
+              token('border-thin'),
+              measured('heatmap-ring', token('color-border')),
+            ],
+          }),
         ]),
       ]),
       /* The bubble hangs off a point with no size, which takes no pointer. */
