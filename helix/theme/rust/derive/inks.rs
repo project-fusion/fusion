@@ -9,7 +9,7 @@ use crate::derive::solve::solve_against;
 use crate::derive::surfaces::Surfaces;
 use crate::derive::Cast;
 use crate::intent::Scheme;
-use crate::model::{HOVER, WELL};
+use crate::model::{ROW_WASHES, WELL};
 use crate::oklch::{
     fit_to_gamut, laid_over, lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS,
     GAMUT_STEPS,
@@ -61,8 +61,8 @@ pub struct NeutralInks {
 /// **A field's well is laid in the foreground**, so the foreground is chosen
 /// first and the wells are made from it: a field's quiet text is solved against
 /// the color the stylesheet will paint behind it, and a theme whose foreground
-/// changes moves its wells with it. A lit row's wash is laid in it the same
-/// way, at the strength the scheme paints.
+/// changes moves its wells with it. A row's hover, selected, and press washes
+/// are laid in it the same way, at the strength the scheme paints.
 ///
 /// **The tints are grounds of their own**, a selected row's `primary-subtle`
 /// and `accent-subtle`, and a field on one fills its well over the tint. They
@@ -100,7 +100,7 @@ pub fn neutral_inks(
 /// some of it is chosen.
 struct Grounds {
     /// The grounds the ladder is solved against, fitted.
-    ladder: [Oklch; 4],
+    ladder: [Oklch; 5],
     scheme: Scheme,
     /// `primary-subtle` and `accent-subtle`, fitted.
     tints: [Oklch; 2],
@@ -108,16 +108,16 @@ struct Grounds {
 
 impl Grounds {
     /// Every ground a neutral ink lands on once `foreground` washes them: the
-    /// ladder, the well over each rung, the lit row over each rung, the tints,
-    /// and the well over each tint.
+    /// ladder, the well over each rung, each row wash over each rung, the
+    /// tints, and the well over each tint.
     ///
     /// **In the order the model added them**, the ladder and its wells first:
     /// a tie keeps the earlier candidate, so the order is part of the answer.
     ///
-    /// Over the grounds the ladder is solved against, which leave `overlay`
-    /// out: it is pure white in light, where a wash on it is the lightest of
-    /// all, and the same color as `raised` in dark, so a wash on it is the wash
-    /// on `raised`.
+    /// **The row washes are the hover, the selected, and the press**, in that
+    /// order. The press is the strongest of the three and is what decides the
+    /// quiet ink: in dark on the overlay, the lightest rung, and in light on
+    /// the sunken surface, the darkest.
     fn under(&self, foreground: Oklch) -> Vec<Oklch> {
         let washed = |percent: u8, grounds: &[Oklch]| -> Vec<Oklch> {
             grounds
@@ -126,14 +126,14 @@ impl Grounds {
                 .collect()
         };
         let well = WELL.percent(self.scheme);
-        [
-            self.ladder.to_vec(),
-            washed(well, &self.ladder),
-            washed(HOVER.percent(self.scheme), &self.ladder),
-            self.tints.to_vec(),
-            washed(well, &self.tints),
-        ]
-        .concat()
+        let mut grounds = self.ladder.to_vec();
+        grounds.extend(washed(well, &self.ladder));
+        for wash in ROW_WASHES {
+            grounds.extend(washed(wash.percent(self.scheme), &self.ladder));
+        }
+        grounds.extend(self.tints);
+        grounds.extend(washed(well, &self.tints));
+        grounds
     }
 }
 

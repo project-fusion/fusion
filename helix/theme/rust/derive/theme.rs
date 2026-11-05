@@ -73,7 +73,7 @@ mod tests {
         Background, Brand, BrandPair, Color, Font, From, Material, Motion, Neutral, Relation,
         Scheme, Seed, Status, StatusSeed, ThemeIntent, STATUS_BAND, STATUS_HUE,
     };
-    use crate::model::{HOVER, PAGE_SURFACES, TINTS, WELL};
+    use crate::model::{over, PAGE_SURFACES, ROW_WASHES, TINTS, WELL};
     use crate::oklch::{laid_over, shipped_contrast_ratio, Oklch};
 
     fn hex(value: &str) -> Color {
@@ -175,14 +175,23 @@ mod tests {
         }
     }
 
-    /// Both neutral inks clear the target on a lit row over every surface, on
-    /// each tint, and in a field on each tint, on the nine themes measured in
-    /// Chromium on October 10, 2026. Solved against the ladder and the well
-    /// alone, the quiet ink measured 3.65:1 on a lit row over a raised surface
-    /// in the default dark theme, 4.32:1 on `primary-subtle` on a #4a4a4a page,
-    /// and 3.81:1 on the well over a tint on a #0b2a33 one.
+    /// Both neutral inks clear the target on every row wash over every
+    /// surface, on each tint, and in a field on each tint, on the nine themes
+    /// measured in Chromium on October 10, 2026. Solved against the ladder and
+    /// the well alone, the quiet ink measured 3.65:1 on a lit row over a raised
+    /// surface in the default dark theme, 4.32:1 on `primary-subtle` on a
+    /// #4a4a4a page, and 3.81:1 on the well over a tint on a #0b2a33 one.
+    ///
+    /// **A #4a4a4a dark page cannot carry the press over its overlay**, and the
+    /// theme says so. The overlay stands a rung above the raised surface at
+    /// #595959, and 19% of white over it is #797979, where white measures
+    /// 4.35:1 and the quiet ink, solved for the best worst case, 4.28. No gray
+    /// reaches 4.5 there, so the two pairs are reported as violations and the
+    /// rest of the page is held to the target.
     #[test]
     fn a_quiet_line_reads_on_a_lit_row_and_on_a_tinted_one() {
+        let pressed_overlay =
+            |ink: &str| format!("{ink} on color-press over color-surface-overlay");
         for (brand, scheme, page) in [
             ("#3b82f6", Scheme::Light, None),
             ("#3b82f6", Scheme::Dark, None),
@@ -197,17 +206,19 @@ mod tests {
             let label = page.unwrap_or("no page");
             let theme = derive_theme(&branded(brand, scheme, page)).expect("the page derives");
             let foreground = token(&theme, "color-foreground").value;
-            let mut grounds: Vec<(String, Oklch)> = PAGE_SURFACES
+            let mut grounds: Vec<(String, Oklch)> = ROW_WASHES
                 .iter()
-                .map(|ground| {
-                    (
-                        format!("a lit row over {ground}"),
-                        laid_over(
-                            foreground,
-                            HOVER.percent(scheme),
-                            token(&theme, ground).value,
-                        ),
-                    )
+                .flat_map(|wash| {
+                    PAGE_SURFACES.iter().map(|ground| {
+                        (
+                            over(*wash, ground),
+                            laid_over(
+                                foreground,
+                                wash.percent(scheme),
+                                token(&theme, ground).value,
+                            ),
+                        )
+                    })
                 })
                 .collect();
             for tint in TINTS {
@@ -218,8 +229,12 @@ mod tests {
                     laid_over(foreground, WELL.percent(scheme), under),
                 ));
             }
+            let unreachable = page == Some("#4a4a4a");
             for ink in ["color-foreground", "color-foreground-muted"] {
                 for (name, ground) in &grounds {
+                    if unreachable && pressed_overlay(ink) == format!("{ink} on {name}") {
+                        continue;
+                    }
                     let ratio = shipped_contrast_ratio(token(&theme, ink).value, *ground);
                     assert!(
                         ratio >= 4.5,
@@ -227,27 +242,44 @@ mod tests {
                     );
                 }
             }
-            assert!(
-                theme.violations.is_empty(),
-                "{label} in {scheme:?}: {:?}",
-                theme.violations
-            );
+            let reported: Vec<&str> = theme
+                .violations
+                .iter()
+                .map(|violation| violation.split(':').next().unwrap_or_default())
+                .collect();
+            let expected: Vec<String> = if unreachable {
+                ["color-foreground", "color-foreground-muted"]
+                    .map(pressed_overlay)
+                    .to_vec()
+            } else {
+                Vec::new()
+            };
+            assert_eq!(reported, expected, "{label} in {scheme:?}");
         }
     }
 
     /// A lit row is measured at the strength its scheme paints, which is what
-    /// `tokens.ts` declares for `color-hover`: 8% of the foreground in light
-    /// and 12% in dark.
+    /// `tokens.ts` declares for each row wash: `color-hover` at 8% of the
+    /// foreground in light and 12% in dark, `color-selected` at 13% and 16%,
+    /// and `color-press` at 16% and 19%.
     #[test]
     fn a_lit_row_is_measured_at_the_strength_its_scheme_paints() {
-        for (scheme, percent) in [(Scheme::Light, 8), (Scheme::Dark, 12)] {
+        for (scheme, wash, percent) in [
+            (Scheme::Light, "color-hover", 8),
+            (Scheme::Dark, "color-hover", 12),
+            (Scheme::Light, "color-selected", 13),
+            (Scheme::Dark, "color-selected", 16),
+            (Scheme::Light, "color-press", 16),
+            (Scheme::Dark, "color-press", 19),
+        ] {
             let theme = derive_theme(&branded("#3b82f6", scheme, None)).expect("the theme derives");
+            let background = format!("{wash} over color-surface-sunken");
             let pairing = theme
                 .pairings
                 .iter()
                 .find(|pairing| {
                     pairing.foreground == "color-foreground-muted"
-                        && pairing.background == "color-hover over color-surface-sunken"
+                        && pairing.background == background
                 })
                 .expect("the quiet ink is measured on a lit row over a sunken surface");
             let lit = laid_over(
@@ -261,7 +293,7 @@ mod tests {
                     token(&theme, "color-foreground-muted").value,
                     lit
                 )),
-                "{scheme:?}"
+                "{wash} in {scheme:?}"
             );
         }
     }

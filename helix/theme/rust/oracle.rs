@@ -46,6 +46,7 @@ use serde_json::Value;
 use crate::css::{to_css, to_css_modes};
 use crate::derive::accent::{seeded, settle};
 use crate::derive::emphasis::{chosen, emphasis, ink};
+use crate::derive::fills::in_scheme;
 use crate::derive::inks::neutral_inks;
 use crate::derive::marks::walk_outward;
 use crate::derive::report::Outcome;
@@ -61,7 +62,7 @@ use crate::intent::{
     From, Material, Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed,
     ThemeIntent, Weight, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
-use crate::model::{over, washed, GROUNDS, HOVER, INKS, PAGE_SURFACES, TINTS, WASHES, WELL};
+use crate::model::{over, washed, GROUNDS, INKS, PAGE_SURFACES, ROW_WASHES, TINTS, WASHES, WELL};
 use crate::oklch::{
     contrast_ratio, fit_to_gamut, hex_to_oklch, is_out_of_gamut, lightness_for_contrast,
     oklch_to_hex, relative_luminance, shipped_contrast_ratio, shipped_luminance, Oklch,
@@ -1170,6 +1171,12 @@ fn the_neutral_inks_land_where_the_typescript_lands() {
 /// out `#4c5057` from `#2358e8`, a heading on the page read as muted, and the
 /// oracle recorded it faithfully. Measured on the default blue, on the brand
 /// that found it, and at AAA, where the target is highest, in both schemes.
+///
+/// **0.2 of lightness apart, from 0.25.** The quiet ink is solved against the
+/// press wash, 19% of white in dark, over the overlay, and comes out at 0.78
+/// on a black page, 0.22 under white: the lightness the stylesheet ships its
+/// dark `foreground-muted` at. A foreground solved to a gray, as in #422, is
+/// caught by the first assertion, which holds it at the end of the neutral.
 #[test]
 fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
     let mut intents = vec![
@@ -1213,15 +1220,16 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
             inks.foreground.lightness
         );
         assert!(
-            gap > 0.25,
+            gap > 0.2,
             "{label}: foreground only {gap} of lightness from the muted ink"
         );
     }
 }
 
-/// The two neutral inks clear their target on a field's well and on a lit row
-/// over every surface of the ladder, on each tint, and on the well over each
-/// tint, in every theme the oracle records.
+/// The two neutral inks clear their target on a field's well and on each row
+/// wash, the hover, the selected, and the press, over every surface of the
+/// ladder, on each tint, and on the well over each tint, in every theme the
+/// oracle records.
 ///
 /// **Read off the pairings, so it holds the model and the solver together.** A
 /// ground left out of the model is a theme with no such pair, which fails here
@@ -1230,7 +1238,10 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
 fn the_neutral_inks_clear_every_wash_and_tint_they_are_written_on() {
     let grounds: Vec<String> = PAGE_SURFACES
         .iter()
-        .flat_map(|ground| [over(WELL, ground), over(HOVER, ground)])
+        .flat_map(|ground| {
+            std::iter::once(over(WELL, ground))
+                .chain(ROW_WASHES.iter().map(|wash| over(*wash, ground)))
+        })
         .chain(
             TINTS
                 .iter()
@@ -1291,8 +1302,8 @@ fn a_shadow_floats_with_a_hairline_only_in_the_dark() {
             "{scheme:?}: expected a {width} edge in\n{css}"
         );
         assert!(
-            css.contains("--helix-shadow-floating: 0 12px 32px"),
-            "{scheme:?}: the shadow stays"
+            css.contains("--helix-shadow-floating: 0 1px 2px color-mix(in oklab, oklch(0.13 0 0) 8%, transparent), 0 12px 32px"),
+            "{scheme:?}: the shadow stays, a contact layer under the lift"
         );
     }
 }
@@ -1480,7 +1491,10 @@ fn deriving_for(
         scheme: resolved.scheme,
         surfaces: built,
     };
-    let primary = brand.map_or_else(|| ink(neutral, &ctx), |brand| chosen(brand, &ctx));
+    let primary = brand.map_or_else(
+        || ink(neutral, &ctx),
+        |brand| in_scheme(chosen(brand, &ctx), brand, resolved.scheme),
+    );
     let loudness = brand.map_or(REFERENCE_CHROMA, |brand| brand.chroma);
     (resolved, ctx, primary, loudness)
 }
@@ -1512,6 +1526,8 @@ fn the_primary_role_lands_where_the_typescript_lands() {
             ("color-primary-active", primary.active),
             ("color-primary-subtle", primary.subtle),
             ("color-primary-surface", primary.filled),
+            ("color-primary-surface-hover", primary.filled_hover),
+            ("color-primary-surface-active", primary.filled_active),
         ] {
             let mine = token(name, raw, Origin::Derived, None);
             assert_token(&mine, token_of(theme, name), &format!("{label}/{name}"));
@@ -1631,11 +1647,15 @@ fn the_accent_lands_where_the_typescript_lands() {
                 } else {
                     Origin::Related
                 };
-                let steps = if pinned {
-                    chosen(settled, &ctx)
-                } else {
-                    emphasis(settled, &ctx)
-                };
+                let steps = in_scheme(
+                    if pinned {
+                        chosen(settled, &ctx)
+                    } else {
+                        emphasis(settled, &ctx)
+                    },
+                    settled,
+                    resolved.scheme,
+                );
                 (steps, origin)
             }
         };
@@ -1658,6 +1678,18 @@ fn the_accent_lands_where_the_typescript_lands() {
         ] {
             assert_token(
                 &token(name, raw, origin, None),
+                token_of(theme, name),
+                &format!("{label}/{name}"),
+            );
+        }
+        /* The fill's two steps are emitted as derived whatever the accent's
+        origin, being steps this engine took. */
+        for (name, raw) in [
+            ("color-accent-surface-hover", steps.filled_hover),
+            ("color-accent-surface-active", steps.filled_active),
+        ] {
+            assert_token(
+                &token(name, raw, Origin::Derived, None),
                 token_of(theme, name),
                 &format!("{label}/{name}"),
             );

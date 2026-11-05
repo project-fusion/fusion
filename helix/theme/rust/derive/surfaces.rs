@@ -49,7 +49,7 @@ pub struct Surfaces {
 }
 
 impl Surfaces {
-    /// The four grounds an ink with no ground of its own is solved against.
+    /// The five grounds an ink with no ground of its own is solved against.
     ///
     /// **Text lands on more than one surface, and the hardest is not always the
     /// page background**: in a dark theme `surface` is *lighter* than
@@ -57,18 +57,21 @@ impl Surfaces {
     /// surface ships a palette that passes on the page and fails inside every
     /// card.
     ///
-    /// `overlay` is not among them, being pure white in light mode and equal to
-    /// `raised` in dark, so it adds a ground that is either trivial or already
-    /// covered. That is the TypeScript's list, kept as it is rather than
-    /// improved: a port that widens a solver's inputs derives a different
-    /// palette.
+    /// **`overlay` is among them, last.** It was left out while it was pure
+    /// white in light and equal to `raised` in dark, where it added nothing.
+    /// In dark it now stands a rung above `raised`, the lightest ground a dark
+    /// page has, so a light ink solved without it falls short in every menu and
+    /// popover. Last, because a tie keeps the earlier candidate: in light it
+    /// is white, the lightest ground there, and the candidate it adds does not
+    /// beat the page's.
     #[must_use]
-    pub fn solved_against(self) -> [Oklch; 4] {
+    pub fn solved_against(self) -> [Oklch; 5] {
         [
             fit_to_gamut(self.raw_background, GAMUT_STEPS),
             fit_to_gamut(self.raw_surface, GAMUT_STEPS),
             fit_to_gamut(self.raw_raised, GAMUT_STEPS),
             fit_to_gamut(self.raw_sunken, GAMUT_STEPS),
+            fit_to_gamut(self.raw_overlay, GAMUT_STEPS),
         ]
     }
 
@@ -148,9 +151,12 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
         raw_background,
         /* `overlay` is pure white in light and takes no cast, matching
         `neutral-0`: a menu on a white page is white, which is what every desktop
-        menu does. */
+        menu does. **In dark it is one rung above `raised`**, `neutral-775` at
+        0.235, so a popover opened from a raised panel steps off it: at 0.21 the
+        two were both #181818, 1.00:1, and at 0.235 the overlay is #1e1e1e,
+        1.06:1 off the raised rung. */
         raw_overlay: if dark {
-            step(0.21)
+            step(0.235)
         } else {
             Oklch {
                 chroma: 0.0,

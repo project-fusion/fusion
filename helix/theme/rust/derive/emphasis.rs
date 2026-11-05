@@ -5,6 +5,7 @@
 //! learn, and there is no reason for one. A theme that names no brand takes
 //! [`ink`] for both.
 
+use crate::derive::fills::hover_of;
 use crate::derive::solve::solve_against;
 use crate::derive::{Cast, Deriving};
 use crate::intent::Scheme;
@@ -20,6 +21,11 @@ pub struct Emphasis {
     pub active: Oklch,
     /// The role as a *ground*, dark enough to carry light text.
     pub filled: Oklch,
+    /// The fill under a press, one step past `filled_hover` in the direction
+    /// it went.
+    pub filled_active: Oklch,
+    /// The fill under a pointer.
+    pub filled_hover: Oklch,
     /// Hovered: one step away from the page.
     pub hover: Oklch,
     /// The role as an *ink*, solved to be legible on every ground it lands on.
@@ -146,6 +152,8 @@ fn role(base: Oklch, ctx: &Deriving, keep: bool) -> Emphasis {
     Emphasis {
         active: step(0.1),
         filled,
+        filled_active: hover_of(hover_of(filled)),
+        filled_hover: hover_of(filled),
         hover: step(0.05),
         raw,
         subtle,
@@ -196,6 +204,8 @@ pub fn ink(neutral: Cast, ctx: &Deriving) -> Emphasis {
     Emphasis {
         active: step(0.1),
         filled: raw,
+        filled_active: hover_of(hover_of(raw)),
+        filled_hover: hover_of(raw),
         hover: step(0.05),
         raw,
         subtle,
