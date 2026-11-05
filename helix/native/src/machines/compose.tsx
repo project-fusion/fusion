@@ -37,6 +37,7 @@ import { useInspector } from './inspector'
 import { useJoin } from './join'
 import { layering } from './layer'
 import { useLegend } from './legend'
+import { useLightbox } from './lightbox'
 import { useLineChart } from './line-chart'
 import { useListbox } from './listbox'
 import { useLog } from './log'
@@ -498,6 +499,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useScatterChart(family, props, use),
+      ),
+    /* A viewer of one item at a time: its items, its zoom, and its chrome. */
+    ...uses
+      .filter((use) => use.machine === 'lightbox')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useLightbox(family, props, use, around.toggled),
       ),
     /* A strip of cells: its cells from its readings, its reading, and its selection. */
     ...uses

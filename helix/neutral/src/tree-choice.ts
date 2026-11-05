@@ -1032,6 +1032,21 @@ export interface ScatterChartChoice {
   readonly yTicks?: string
 }
 
+/** The names of a viewer of one item at a time, each read as `lightbox.x`. */
+export interface LightboxChoice {
+  readonly arrows?: string
+  readonly atEnd?: string
+  readonly atStart?: string
+  readonly counted?: string
+  readonly named?: string
+  readonly onActivate?: string
+  readonly onBeforeActivate?: string
+  readonly place?: string
+  readonly zoomInOff?: string
+  readonly zoomOutOff?: string
+  readonly zooms?: string
+}
+
 /** The names of a strip of cells, each read as `heatmap.x`. */
 export interface HeatmapChoice {
   readonly actives?: string
