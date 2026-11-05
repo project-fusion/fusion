@@ -52,7 +52,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['image/root/image-root.generated.css', '[part="fallback"]', 'color'],
   ['input/root/input-root.generated.css', '[part="field"]', 'color'],
   ['input/root/input-root.generated.css', 'slot[name="start"]', 'color'],
-  ['lightbox/item/lightbox-item.css', '[part="item"] ::slotted([slot="description"])', 'color'],
+  ['lightbox/item/lightbox-item.generated.css', 'slot[name="description"]::slotted(*)', 'color'],
   ['log/group/log-group.generated.css', '[part="status"]', 'color'],
   ['log/line/log-line.generated.css', '[part~="line"][part~="line-debug"]', 'color'],
   ['log/root/log-root.generated.css', ':host', '--log-ansi-bright-black'],
