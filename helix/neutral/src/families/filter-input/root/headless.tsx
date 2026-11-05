@@ -51,6 +51,7 @@ import {
 export default headless('filter-input', {
   props: {
     ariaLabel: string(),
+    autocomplete: 'off',
     chips: false,
     clearable: false,
     clearLabel: 'Clear',
@@ -209,6 +210,7 @@ export default headless('filter-input', {
         </View>
         <TextInput
           autoCapitalize="none"
+          autoComplete={props.autocomplete}
           autoCorrect={false}
           describedby="hint"
           disabled={props.disabled}

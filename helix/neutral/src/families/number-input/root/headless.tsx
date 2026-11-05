@@ -51,7 +51,7 @@ import {
 export default headless('number-input', {
   props: {
     ariaLabel: string(),
-    autocomplete: '',
+    autocomplete: 'off',
     badInputMessage: 'Please enter a number.',
     decrementLabel: 'Decrease',
     defaultValue: '',
