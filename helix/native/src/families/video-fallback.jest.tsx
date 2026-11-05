@@ -32,13 +32,13 @@ describe('Video without expo-video', () => {
       </HelixTheme>,
     )
     await act(() => new Promise<void>((done) => setTimeout(done, 40)))
-    const alert = drawn.queryAll(
+    const alert = drawn.container.queryAll(
       (node) => node.props.accessibilityRole === 'alert' || node.props.role === 'alert',
     )
     expect(alert.length).toBeGreaterThan(0)
     expect(drawn.queryByText('This video cannot be played here')).not.toBeNull()
-    expect(drawn.queryAll((node) => node.props.accessibilityLabel === 'Play')).toHaveLength(0)
-    const stills = drawn.queryAll(
+    expect(drawn.container.queryAll((node) => node.props.accessibilityLabel === 'Play')).toHaveLength(0)
+    const stills = drawn.container.queryAll(
       (node) =>
         typeof node.props.source === 'object' &&
         node.props.source !== null &&
