@@ -73,7 +73,7 @@ jobs:
   # skipping it is the job's own ten seconds and the certainty that nothing
   # below it is skipped by accident.
   proven:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     # **`contents` as well, because a job's block replaces the workflow's
     # rather than adding to it.** With `actions: read` alone the checkout below
@@ -113,7 +113,7 @@ jobs:
   seed:
     needs: proven
     if: needs.proven.outputs.proven == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
     steps:
@@ -164,7 +164,7 @@ jobs:
   seed-webkit:
     needs: proven
     if: needs.proven.outputs.proven == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
     steps:
@@ -225,7 +225,7 @@ jobs:
   seed-cargo:
     needs: proven
     if: needs.proven.outputs.proven == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     continue-on-error: true
     strategy:
@@ -333,7 +333,7 @@ jobs:
   plan:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       browser: ${{ steps.scope.outputs.browser }}
@@ -451,7 +451,7 @@ jobs:
   # fourteen tasks here because `analyze` hashed the files the first had
   # generated; `analyze` no longer reads them, which `VERIFYING.md` explains.
   #
-  # **The runner is a repository variable, `WARM_RUNNER`, and `ubuntu-latest`
+  # **The runner is a repository variable, `WARM_RUNNER`, and `ubuntu-24.04`
   # without one.** On a change that rebuilds the components, `warm` is about
   # four minutes on two cores. Most of it is `analyze` formatting the framework
   # typings, which runs on one core, and `metrics` compressing the bundles it
@@ -462,7 +462,7 @@ jobs:
   warm:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ${{ vars.WARM_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.WARM_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -512,7 +512,7 @@ jobs:
   warm-browser:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -527,7 +527,7 @@ jobs:
   # than the browser jobs beside them and were billed a minute apiece.
   checks:
     needs: [plan, warm]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       # **Never fail fast.** A shard that fails while five are canceled is the
@@ -567,7 +567,7 @@ jobs:
   # own beside `warm` for 139 seconds, measured 15 Sep 2026.
   floors:
     needs: warm
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Check out
@@ -626,7 +626,7 @@ jobs:
   # restores.
   packaging:
     needs: warm
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Check out
@@ -647,7 +647,7 @@ jobs:
   typings:
     needs: [plan, warm]
     if: ${{ !cancelled() && needs.plan.outputs.typings == 'true' && needs.warm.result == 'success' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -664,7 +664,7 @@ jobs:
   lint:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       # The whole history, which the withheld step below needs to list a pull
@@ -696,7 +696,7 @@ jobs:
   # the site's types import the catalog, the frame and the spec bundles.
   types:
     needs: warm
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -720,7 +720,7 @@ jobs:
   # `warm`. Together the two runs cover `turbo run test` once.
   tests:
     needs: warm-browser
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -749,7 +749,7 @@ jobs:
   rust:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # **A warm run and a margin, and not a cold compile.** Warm on run
     # 38703800539 this was 216 seconds: 46 restoring the cache, 88 compiling
     # the workspace's own crates and 51 running the tests. Cold on run
@@ -938,7 +938,7 @@ jobs:
   clippy:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # A warm run and a margin, for the reason `rust` gives: warm this was 78
     # to 107 seconds on runs 38187696534 and 38697333389.
     timeout-minutes: 8
@@ -1031,7 +1031,7 @@ jobs:
   cli:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # A warm run and a margin, for the reason `rust` gives. Warm this was 246
     # to 359 seconds on runs 38187696534 and 38185180071, a minute of it the
     # compile and up to two the workspace build that waits on `warm`. Cold on
@@ -1172,7 +1172,7 @@ jobs:
     # A failed or skipped `plan` still skips this through `needs`, and `plan`'s
     # own failure is what the gate catches, so the safe case is unchanged.
     if: needs.plan.outputs.browser != 'false'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # A shard is sized to about a minute of work, so this is five times that
     # and room for a slow runner. Too low and the job is `cancelled`, which  # dialect:quoted, GitHub spells this conclusion value so
     # reports as neither pass nor fail and reads in the summary as a job that
@@ -1339,7 +1339,7 @@ jobs:
   visual-triage:
     needs: [browser]
     if: ${{ always() && needs.browser.result == 'failure' }}  # dialect:quoted, GitHub's own function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     continue-on-error: true
     permissions:
@@ -1425,7 +1425,7 @@ jobs:
   visual-preview:
     needs: [browser, site, visual-triage]
     if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && needs.browser.result != 'cancelled' && needs.site.result != 'cancelled' }}  # dialect:quoted, GitHub's own job result spelled its way
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
     permissions:
@@ -1499,7 +1499,7 @@ jobs:
   site:
     needs: [proven, warm]
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' && needs.warm.result == 'success' }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out
@@ -1583,7 +1583,7 @@ jobs:
   telemetry:
     needs: [proven, browser]
     if: always() && github.event_name == 'push'  # dialect:quoted, GitHub's own function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     continue-on-error: true
     permissions:
@@ -1643,7 +1643,7 @@ jobs:
     if: always()
     needs:
       [proven, plan, warm, warm-browser, checks, cli, floors, packaging, typings, lint, types, tests, rust, clippy, browser, site]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: A job did not pass
