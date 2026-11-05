@@ -3,6 +3,7 @@ import {
   fn,
   hookOf,
   inherited,
+  list,
   native,
   product,
   sum,
@@ -36,6 +37,7 @@ export default styles(
     prefix: 'avatar-group',
     hooks: {
       overflowBackgroundColor: token('color-surface-sunken'),
+      overflowBorderColor: token('color-border'),
       overflowColor: token('color-foreground-muted'),
       overflowFontSize: token('text-xs'),
       overlap: token('space-sm'),
@@ -116,7 +118,12 @@ export default styles(
           backgroundColor: hook.overflowBackgroundColor,
           blockSize: inherited('avatar-size', token('size-avatar')),
           borderRadius: token('radii-full'),
-          boxShadow: [0, 0, 0, gap, own.avatarGroupRing],
+          /* An edge as well as a fill, so the count keeps its circle on a
+             surface the color of its fill: inset, after the ring outside it. */
+          boxShadow: list(
+            [0, 0, 0, gap, own.avatarGroupRing],
+            ['inset', 0, 0, 0, token('border-thin'), hook.overflowBorderColor],
+          ),
           color: hook.overflowColor,
           display: 'inline-flex',
           flex: '0 0 auto',
