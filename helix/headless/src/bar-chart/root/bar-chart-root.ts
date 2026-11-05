@@ -230,6 +230,24 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
   }
 
   /**
+   * The names of the series drawn in glass.
+   *
+   * Matched the way `outlined` is, against the column headings the table gives.
+   *
+   * **Per series for the reason `outlined` is.** A chart-wide material puts
+   * every column in the same substance, which is right when the whole chart is
+   * joining the page's language and wrong the moment one series is a different
+   * kind of fact from the others.
+   *
+   * **This tier writes it onto each column**, as `data-material="glass"`, a
+   * rect or a path of them, and the stylesheet paints it: a mark the tier that
+   * draws the columns writes as it draws them reaches a phone's drawing too,
+   * where a mark written after the drawing reaches nothing.
+   */
+  @property()
+  glass?: string
+
+  /**
    * Which gridlines are drawn across the plot, if any.
    *
    * Absent rules the levels, as `value` does, which are the levels the `axis`
@@ -252,24 +270,6 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    */
   @property()
   gridlines?: 'both' | 'category' | 'none' | 'value'
-
-  /**
-   * The names of the series drawn in glass.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `outlined` is.** A chart-wide material puts
-   * every column in the same substance, which is right when the whole chart is
-   * joining the page's language and wrong the moment one series is a different
-   * kind of fact from the others.
-   *
-   * **This tier writes it onto each column**, as `data-material="glass"`, a
-   * rect or a path of them, and the stylesheet paints it: a mark the tier that
-   * draws the columns writes as it draws them reaches a phone's drawing too,
-   * where a mark written after the drawing reaches nothing.
-   */
-  @property()
-  glass?: string
 
   /**
    * The name the summary gives each series' highest reading, `{highestLabel}`
