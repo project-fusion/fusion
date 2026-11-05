@@ -7,13 +7,15 @@
  * reader hears of a cell, selecting, and moving rows are Table's, and one set of
  * rules. The hooks a page sets here reach those rows through their own names.
  */
-import { cycle, format, inRowOrder, parse } from '@fusion.dev/helix-core/table'
+import { cycle, droppedAt, format, inRowOrder, parse } from '@fusion.dev/helix-core/table'
 import { formatMessage } from '@fusion.dev/helix-core/words'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import type { LayoutChangeEvent } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { madeFor } from '../render/made'
 import type { Family } from '../style/form'
+import { useTheme } from '../theme/theme'
 import { useDataTableHandle } from './data-table-handle'
 import { DataTableMenuContext, type DataTableMenus } from './data-table-menu'
 import {
@@ -89,8 +91,37 @@ const useHeldNumber = (written: unknown, seed: unknown) => {
 const headerOf = (columns: readonly DataColumn[]): DataColumn | undefined =>
   columns.find((column) => column.rowHeader) ?? columns.find((column) => column.field !== '')
 
-/** What the columns a reader arranged leave: their order, and the ones hidden. */
-const useArranged = (family: Family, props: Props, use: MachineUse) => {
+/**
+ * The columns a table this wide leaves out, by each one's `min-table-width`,
+ * as the web's `droppedAt` reads them: one always stays. A table not laid out
+ * yet leaves none out, as a server's table serves every column.
+ */
+const droppedOf = (
+  columns: readonly DataColumn[],
+  width: number,
+  rem: number,
+): ReadonlySet<DataColumn> =>
+  width <= 0 || !columns.some((column) => column.minimum !== '')
+    ? new Set()
+    : droppedAt(
+        width,
+        columns.map((column) => ({ column, minimum: column.minimum })),
+        { em: rem, rem },
+      )
+
+/** The table's width in points, measured as it is laid out. */
+const useTableWidth = () => {
+  const [width, setWidth] = useState(0)
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const next = Math.round(event.nativeEvent.layout.width)
+    setWidth((was) => (was === next ? was : next))
+  }, [])
+  return { onLayout, width }
+}
+
+/** What the columns a reader arranged leave: their order, and the ones hidden or dropped. */
+const useArranged = (family: Family, props: Props, use: MachineUse, width: number) => {
+  const { rem } = useTheme()
   const [order, setOrder] = useHeld(
     given(family, props, 'order'),
     given(family, props, 'default-order'),
@@ -98,7 +129,13 @@ const useArranged = (family: Family, props: Props, use: MachineUse) => {
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set())
   const all = useMemo(() => columnsOf(props.children), [props.children])
   const arrangedColumns = inOrder(all, order)
-  const isOut = (column: DataColumn): boolean => column.hidden || hidden.has(column.field)
+  const hiddenOut = (column: DataColumn): boolean => column.hidden || hidden.has(column.field)
+  const dropped = droppedOf(
+    arrangedColumns.filter((column) => !hiddenOut(column)),
+    width,
+    rem,
+  )
+  const isOut = (column: DataColumn): boolean => hiddenOut(column) || dropped.has(column)
   const shown = arrangedColumns.filter((column) => !isOut(column))
   const moveColumn = (field: string, by: number): void => {
     const fields = shown.map((column) => column.field)
@@ -129,7 +166,7 @@ const useArranged = (family: Family, props: Props, use: MachineUse) => {
   }
   const toggle = (field: string, hide: boolean): boolean => {
     const column = all.find((one) => one.field === field)
-    const out = column !== undefined && isOut(column)
+    const out = column !== undefined && hiddenOut(column)
     if (column === undefined || field === '' || out === hide || (hide && shown.length <= 1)) {
       return false
     }
@@ -149,7 +186,7 @@ const useArranged = (family: Family, props: Props, use: MachineUse) => {
     tell(family, props, 'column-toggle', detail)
     return true
   }
-  return { all, arrangedColumns, hidden, moveColumn, shown, toggle }
+  return { all, arrangedColumns, hidden, isOut, moveColumn, shown, toggle }
 }
 
 /** The search, the page, and its size. */
@@ -206,7 +243,8 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
     },
   }
   const expanded = useHeld(read('expanded'), read('defaultExpanded'))
-  const columns = useArranged(family, props, tableUse)
+  const measured = useTableWidth()
+  const columns = useArranged(family, props, tableUse, measured.width)
   const paged = usePaged(family, props)
   const open = new Set(expanded[0].split(',').filter((one) => one !== ''))
   const axes = useMemo(() => axesOf(columns.all), [columns.all])
@@ -236,9 +274,7 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
   const hooks = (props as { readonly hooks?: Readonly<Record<string, unknown>> }).hooks
   const rowHooks = hooks === undefined ? undefined : rowHooksOf(hooks)
   const children = [
-    ...columns.arrangedColumns.map((column) =>
-      column.hidden || columns.hidden.has(column.field) ? null : column.element,
-    ),
+    ...columns.arrangedColumns.map((column) => (columns.isOut(column) ? null : column.element)),
     ...(row === undefined || cell === undefined
       ? []
       : seen.page.map(({ key, row: entry }) => (
@@ -321,6 +357,16 @@ export const useDataTable = (family: Family, props: Props, use: MachineUse): Beh
           ...table.parts.host?.states,
           more: moreDrawn,
           pagination: paginated,
+        },
+        view: {
+          ...table.parts.host?.view,
+          /* The host's width, which the tracks are fitted to and the columns dropped by. */
+          onLayout: (event: LayoutChangeEvent) => {
+            ;(table.parts.host?.view?.onLayout as ((one: LayoutChangeEvent) => void) | undefined)?.(
+              event,
+            )
+            measured.onLayout(event)
+          },
         },
       },
       'more-button': {

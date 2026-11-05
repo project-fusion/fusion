@@ -55,7 +55,41 @@ const press = (name: string) =>
     fireEvent.press(screen.getByLabelText(name))
   })
 
+/** Every laid-out view of the table at `width` points, as a phone lays the table out. */
+const layOut = (width: number) =>
+  act(async () => {
+    for (const node of screen.root?.queryAll((one) => typeof one.props.onLayout === 'function') ??
+      []) {
+      fireEvent(node, 'layout', { nativeEvent: { layout: { height: 300, width, x: 0, y: 0 } } })
+    }
+  })
+
 describe('a table drawn from an array', () => {
+  test('a column leaves a table narrower than its `min-table-width`, and comes back as it widens', async () => {
+    await draw(
+      <HelixDataTable label="Files" rowKey="id" rows={files}>
+        <HelixTableColumn field="name" key="name">
+          Name
+        </HelixTableColumn>
+        <HelixTableColumn
+          cell={(row: Readonly<Record<string, unknown>>) => `${row.size as number} B`}
+          field="size"
+          key="size"
+          minTableWidth="40rem"
+        >
+          Size
+        </HelixTableColumn>
+      </HelixDataTable>,
+    )
+    expect(screen.queryByText('900 B')).not.toBeNull()
+    await layOut(400)
+    expect(screen.queryByText('900 B')).toBeNull()
+    expect(screen.queryByText('Size')).toBeNull()
+    expect(shown(NAMES)).toEqual(NAMES)
+    await layOut(800)
+    expect(screen.queryByText('900 B')).not.toBeNull()
+  })
+
   test('a cell draws what its column reads of the row, and the field where it reads nothing', async () => {
     await draw(
       <HelixDataTable label="Files" rowKey="id" rows={files}>
