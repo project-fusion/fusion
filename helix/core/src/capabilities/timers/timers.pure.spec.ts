@@ -1,7 +1,14 @@
-import { afterEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { fakeTimers } from './fake.js'
 import { setTimers, timers } from './index.js'
 import { serverTimers } from './server.js'
+
+/* Every spec file shares one process, and a controller another file started
+   under a document installs the web timers, so this file starts from the
+   server's, as a fresh process does. */
+beforeAll(() => {
+  setTimers(serverTimers)
+})
 
 afterEach(() => {
   setTimers(serverTimers)
