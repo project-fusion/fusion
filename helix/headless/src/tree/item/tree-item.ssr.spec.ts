@@ -94,3 +94,20 @@ describe('tree item server output', () => {
     expect(partTag(linked, 'item')).not.toContain('aria-selected')
   })
 })
+
+describe('a row with actions on the server', () => {
+  /* Nothing is hovered or focused before the page runs, so the actions are
+     served out of reach, and the host carries nothing for them. */
+  test('serves the actions slot in the row, inert', () => {
+    const markup = ssr(
+      html`<helix-headless-tree-item value="a">Atlas<button slot="actions">More</button></helix-headless-tree-item>`,
+    )
+    const slot = partTag(markup, 'actions')
+    expect(slot).toContain('<slot')
+    expect(slot).toContain('name="actions"')
+    expect(slot).toContain('inert')
+    expect(
+      hostAttributes(markup, 'helix-headless-tree-item').filter((one) => !one.startsWith('data-')),
+    ).toEqual(['value'])
+  })
+})

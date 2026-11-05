@@ -1,0 +1,40 @@
+export function Example() {
+  return (
+    <helix-tree label="Projects">
+      <helix-tree-item value="atlas">
+        Atlas
+        <helix-menu
+          label="Atlas actions"
+          slot="actions"
+        >
+          <helix-icon-button
+            emphasis="ghost"
+            label="Actions for Atlas"
+            slot="trigger"
+          >
+            <helix-icon name="dots-three"></helix-icon>
+          </helix-icon-button>
+          <helix-menu-item value="pin">Pin to top</helix-menu-item>
+          <helix-menu-item value="rename">Rename</helix-menu-item>
+        </helix-menu>
+      </helix-tree-item>
+      <helix-tree-item value="beacon">
+        Beacon
+        <helix-menu
+          label="Beacon actions"
+          slot="actions"
+        >
+          <helix-icon-button
+            emphasis="ghost"
+            label="Actions for Beacon"
+            slot="trigger"
+          >
+            <helix-icon name="dots-three"></helix-icon>
+          </helix-icon-button>
+          <helix-menu-item value="pin">Pin to top</helix-menu-item>
+          <helix-menu-item value="rename">Rename</helix-menu-item>
+        </helix-menu>
+      </helix-tree-item>
+    </helix-tree>
+  )
+}

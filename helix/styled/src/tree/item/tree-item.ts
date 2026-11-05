@@ -13,6 +13,9 @@ import { styles } from './tree-item.css.js'
  *
  * The twisty rotates when a branch opens. The row itself stays flat.
  *
+ * The row's actions are hidden until the row is hovered or focused, and hold
+ * their room while hidden, so the label does not move under the pointer.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases TreeNode, Branch, Leaf
@@ -36,6 +39,8 @@ import { styles } from './tree-item.css.js'
  * @csspart row - The clickable label row.
  * @csspart toggle - The expand and collapse control.
  *
+ * @cssproperty --tree-actions-color - Color of the row's actions, inherited by what is slotted into `actions`.
+ * @cssproperty --tree-actions-size - Edge length of an icon button in the row's actions. Half again the chevron's size.
  * @cssproperty --tree-checkbox-background-color - Fill of the check mark's box.
  * @cssproperty --tree-checkbox-border-color - Border of the check mark's box.
  * @cssproperty --tree-checkbox-mark-color - Color of the check, and of the bar of a partly checked

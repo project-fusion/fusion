@@ -242,6 +242,30 @@ slot[name="end"] {
   order: 1;
 }
 
+/* The row's actions, after `end` and before the grip. **Hidden and not
+   removed**, so the room they take is held and the label and `end` stay where
+   they are as the pointer crosses the rows. `visibility` takes them off the
+   tab order with the headless tier's `inert`, and both lift together. */
+slot[name="actions"] {
+  /* An icon button sized to sit inside the row's padding, from the chevron the
+     row already measures by, so it follows density as the chevron does. */
+  --icon-button-size: var(--tree-actions-size, calc(var(--_tree-chevron) * 1.5));
+
+  color: var(--tree-actions-color, var(--helix-color-foreground-muted));
+  visibility: hidden;
+}
+
+:host(:state(actions-shown)) slot[name="actions"] {
+  visibility: visible;
+}
+
+/* The color is the slot's, inherited, so a control that sets its own keeps it. */
+slot[name="actions"]::slotted(*) {
+  align-self: center;
+  flex: 0 0 auto;
+  order: 2;
+}
+
 /* A mark beside the name reads as being about the name, so it takes the muted
    color the row has rather than full strength. */
 slot[name="start"]::slotted(*) {
