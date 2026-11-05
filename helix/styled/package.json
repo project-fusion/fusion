@@ -70,6 +70,14 @@
       "types": "./dist/badge/index.d.ts",
       "default": "./dist/badge/index.js"
     },
+    "./bar-chart": {
+      "react-native": {
+        "types": "./dist/bar-chart/index.native.d.ts",
+        "default": "./dist/bar-chart/index.native.js"
+      },
+      "types": "./dist/bar-chart/index.d.ts",
+      "default": "./dist/bar-chart/index.js"
+    },
     "./blockquote": {
       "react-native": {
         "types": "./dist/blockquote/index.native.d.ts",
