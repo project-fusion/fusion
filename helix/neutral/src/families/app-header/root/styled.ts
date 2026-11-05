@@ -191,10 +191,12 @@ export default styles(
         ['start', 'end'],
         [native([rule({ flexShrink: 0 }), rule({ folded: true }, { minBlockSize: header })])],
       ),
+      /* The color goes on the slot, where what is passed in inherits it: written on
+         `::slotted`, it beat a slotted component's own `:host` color. */
+      on({ region: 'start' }, [rule({ color: token('color-foreground') })]),
       on({ region: 'start', slotted: '*' }, [
         rule({
           alignItems: 'center',
-          color: token('color-foreground'),
           display: 'flex',
           flex: '0 0 auto',
           fontWeight: token('weight-semibold'),

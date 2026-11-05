@@ -83,9 +83,10 @@ export default styles(
       }),
     ]),
     /* A unit or an icon at either end: quieter than the number, and never shrinking. */
-    on({ region: ['start', 'end'], slotted: '*' }, [
-      rule({ color: token('color-foreground-muted'), flex: '0 0 auto' }),
-    ]),
+    /* The color goes on the slot, where what is passed in inherits it: written on
+       `::slotted`, it beat a slotted component's own `:host` color. */
+    on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
+    on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: '0 0 auto' })]),
     on({ region: 'start', slotted: '*' }, [rule({ paddingInlineStart: token('space-xs') })]),
     on({ region: 'end', slotted: '*' }, [rule({ paddingInlineEnd: token('space-xs') })]),
     /* Square, at the field's own height, each ruled off from the number. */
