@@ -55,6 +55,7 @@ export default headless('tree-item', {
     toggle: bare(['newState', 'oldState']),
   },
   states: [
+    'actionsShown',
     'checked',
     'dragging',
     'dropAfter',
@@ -156,6 +157,11 @@ export default headless('tree-item', {
           </Slot>
         )}
         <Slot name="end" />
+        {/* The row's own controls, which a phone shows always, having no hover to show them on. */}
+        <Slot
+          name="actions"
+          part="actions"
+        />
         {treeItem.chevronEnd && (
           <Slot name="chevron">
             <View

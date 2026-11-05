@@ -42,6 +42,8 @@ export default styles(
   {
     prefix: 'tree',
     hooks: {
+      actionsColor: token('color-foreground-muted'),
+      actionsSize: null,
       checkboxBackgroundColor: token('color-background'),
       checkboxBorderColor: null,
       checkboxMarkColor: token('color-foreground'),
@@ -304,6 +306,24 @@ export default styles(
           marginInlineStart: 'auto',
           web: { order: 1 },
         }),
+      ]),
+      /* The row's actions, after `end` and before the grip. Hidden and not
+         removed on the web, so the room they take is held as the pointer
+         crosses the rows; a phone, with no hover, shows them always. An icon
+         button is sized from the chevron, and the color is the slot's,
+         inherited, so a control that sets its own keeps it. */
+      on({ region: 'actions' }, [
+        rule({
+          '--icon-button-size': first(hook.actionsSize, product(own.treeChevron, 1.5)),
+          color: hook.actionsColor,
+        }),
+        web([
+          rule({ visibility: 'hidden' }),
+          rule({ actionsShown: true }, { visibility: 'visible' }),
+        ]),
+      ]),
+      on({ region: 'actions', slotted: '*' }, [
+        rule({ alignSelf: 'center', flex: '0 0 auto', web: { order: 2 } }),
       ]),
       /* A mark beside the name reads as being about the name. */
       on({ region: 'start', slotted: '*' }, [
