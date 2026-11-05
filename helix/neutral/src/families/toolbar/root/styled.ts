@@ -58,6 +58,7 @@ export default styles(
           '--helix-text-field': token('text-md'),
           '--helix-text-field-label': token('text-sm'),
           '--helix-space-field': token('space-sm'),
+          '--helix-space-row-bleed': token('space-xs'),
           '--helix-size-tag': token('size-tag-md'),
         },
         lg: {
@@ -76,6 +77,7 @@ export default styles(
           '--helix-text-field': token('text-md'),
           '--helix-text-field-label': token('text-sm'),
           '--helix-space-field': token('space-md'),
+          '--helix-space-row-bleed': token('space-sm'),
           '--helix-size-tag': token('size-tag-lg'),
         },
       }),

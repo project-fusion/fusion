@@ -20,6 +20,7 @@ export default styles(
   {
     prefix: 'tree',
     hooks: {
+      bleed: token('space-row-bleed'),
       dragPreviewBackgroundColor: token('color-surface-raised'),
       dragPreviewBorderColor: token('color-border'),
       dragPreviewBorderWidth: token('border-floating'),
@@ -28,6 +29,7 @@ export default styles(
       dragPreviewShadow: token('shadow-floating'),
     },
     own: {
+      treeBleed: null,
       treeHeadingInk: null,
       treeHeadingText: null,
       treeHeadingTracking: null,
@@ -35,11 +37,15 @@ export default styles(
       treeNestedText: null,
       treeReserve: null,
     },
+    props: { bleed: false },
     stylesheet: 'tree/root/tree-root.generated.css',
   },
   ({ hook, on, rule }) => [
     on('host', [
       rule({ display: 'block' }),
+      /* Read by every row, at every depth: the rows' words start on the tree's
+         own edge and their fills reach this far past it, as a list's do. */
+      rule({ bleed: true }, { own: { treeBleed: hook.bleed } }),
       web([
         rule({ '--tree-chevron-order': '0' }),
         /* The placement, handed down as numbers the item can use. Past the `end`

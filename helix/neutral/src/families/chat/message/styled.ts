@@ -112,6 +112,7 @@ export default styles(
         '--helix-text-field': token('text-sm'),
         '--helix-text-field-label': token('text-xs'),
         '--helix-space-field': token('space-xs'),
+        '--helix-space-row-bleed': token('space-2xs'),
         '--helix-size-icon': token('size-icon-sm'),
         '--helix-size-icon-loose': product(token('size-icon'), '1.2'),
         '--helix-size-icon-tight': product(token('size-icon'), '0.8'),

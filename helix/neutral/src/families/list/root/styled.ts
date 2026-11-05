@@ -18,6 +18,7 @@ export default styles(
   {
     prefix: 'list',
     hooks: {
+      bleed: token('space-row-bleed'),
       dragPreviewBackgroundColor: token('color-surface-raised'),
       dragPreviewBorderColor: token('color-border'),
       dragPreviewBorderWidth: token('border-floating'),
@@ -31,7 +32,8 @@ export default styles(
       loadingPadding: token('space-sm'),
       markerGutter: token('space-md'),
     },
-    props: { divided: false, marker: oneOf(['rail']) },
+    own: { listBleed: null },
+    props: { bleed: false, divided: false, marker: oneOf(['rail']) },
     stylesheet: 'list/root/list-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [
@@ -49,6 +51,14 @@ export default styles(
       }),
       /* The rail: the same numbering, at the start edge of the block, where a
          native marker cannot be moved. */
+      /* **The rows' words on the list's own edge, and their fills past it.**
+         Each row takes this as a negative margin and as its inset, so a
+         hover, a selection, or the current row is drawn this much wider. The
+         list's parent has to leave the room. */
+      rule(
+        { bleed: true, kind: { not: ['ordered', 'unordered'] } },
+        { own: { listBleed: hook.bleed } },
+      ),
       rule(
         { marker: 'rail' },
         {
@@ -91,6 +101,14 @@ export default styles(
       ),
       /* The two things a row cannot work out for itself: that there is a rail at
          all, and what number this row is. */
+      /* **The rows' words on the list's own edge, and their fills past it.**
+         Each row takes this as a negative margin and as its inset, so a
+         hover, a selection, or the current row is drawn this much wider. The
+         list's parent has to leave the room. */
+      rule(
+        { bleed: true, kind: { not: ['ordered', 'unordered'] } },
+        { own: { listBleed: hook.bleed } },
+      ),
       rule(
         { marker: 'rail' },
         {

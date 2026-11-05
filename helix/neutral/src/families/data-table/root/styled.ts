@@ -1,3 +1,4 @@
+import dataTableBleed from '../../../fragments/data-table-bleed.js'
 import dataTableRows from '../../../fragments/data-table-rows.js'
 import {
   difference,
@@ -51,7 +52,6 @@ export default styles(
       footerItemGap: token('space-md'),
       headingBackgroundColor: token('color-background'),
       headingColor: null,
-      indent: null,
       moreBorderColor: token('color-border'),
       moreHoverBackgroundColor: token('color-surface-raised'),
       morePaddingBlock: token('space-2xs'),
@@ -69,9 +69,7 @@ export default styles(
     own: {
       collectionInsetBlock: null,
       collectionInsetInline: null,
-      dataTableDepth: null,
       dataTableFade: null,
-      dataTableGutter: null,
       tableHeadingBackgroundColor: null,
       tableHeadingColor: null,
       tableHeadingLayer: null,
@@ -81,6 +79,7 @@ export default styles(
       tableHeadingRuleColor: null,
       tableHeadingText: null,
     },
+    props: { bleed: false },
     stylesheet: 'data-table/root/data-table-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => {
@@ -92,7 +91,6 @@ export default styles(
       paddingInline: token('space-sm'),
       textAlign: 'center',
     } as const
-    const gutter = own.dataTableGutter
     const leadBox = {
       alignItems: 'center',
       borderBlockEnd: [token('border-thin'), 'solid', hook.ruleColor],
@@ -173,6 +171,7 @@ export default styles(
       on({ part: 'row', selector: '[part~="row"] > *' }, [
         web([rule({ backgroundColor: hook.rowBackgroundColor })]),
       ]),
+      include(dataTableBleed),
       on({ part: 'row', selector: ':host([row-link]) [part~="row"] > [part~="cell"]' }, [
         web([rule({ cursor: 'pointer' })]),
       ]),
@@ -322,28 +321,6 @@ export default styles(
         ],
       ),
       on('error', [rule({ ...said, color: hook.errorColor, web: { gridColumn: '1 / -1' } })]),
-      /* Written out: a row header holds two names, and steps in by its depth. */
-      on({ part: 'cell', selector: ':host([child-field]) [part~="cell-header"]' }, [
-        web([
-          rule({
-            own: {
-              dataTableDepth: product(
-                difference(measured('data-table-level'), '1'),
-                first(hook.indent, gutter),
-              ),
-              dataTableGutter: sum(hook.toggleSize, hook.toggleGap),
-            },
-            paddingInlineStart: own.dataTableDepth,
-          }),
-        ]),
-      ]),
-      on(
-        {
-          part: 'cell',
-          selector: ':host([child-field]) [part~="cell-header"]:not(:has([part~="toggle"]))',
-        },
-        [web([rule({ paddingInlineStart: sum(own.dataTableDepth, gutter) })])],
-      ),
       on({ part: 'toggle', selector: '[part~="toggle"]' }, [
         web([
           rule({

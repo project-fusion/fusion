@@ -23,6 +23,7 @@ export default fragment('density-sm', { parts: [] }, ({ on, rule }) => [
       '--helix-size-tag': token('size-tag-sm'),
       '--helix-space-control': token('space-sm'),
       '--helix-space-field': token('space-xs'),
+      '--helix-space-row-bleed': token('space-2xs'),
       '--helix-text-control': token('text-control-sm'),
       '--helix-text-field': token('text-sm'),
       '--helix-text-field-label': token('text-xs'),
