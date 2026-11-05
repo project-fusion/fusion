@@ -72,6 +72,7 @@ export type Family =
   | 'legend'
   | 'line-chart'
   | 'area-chart'
+  | 'bar-chart'
   | 'sparkline'
   | 'filter-input'
   | 'select'
