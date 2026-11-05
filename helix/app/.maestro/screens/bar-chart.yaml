@@ -1,0 +1,70 @@
+# Bar Chart, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Bar Chart"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://bar-chart/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: bar-chart-preview-${MODE}-${SIZE}
+- openLink: helix://bar-chart/glass-and-gradient/preview
+- extendedWaitUntil:
+    visible: 'Glass And Gradient'
+    timeout: 15000
+- takeScreenshot: bar-chart-glass-and-gradient-${MODE}-${SIZE}
+- openLink: helix://bar-chart/grouped/preview
+- extendedWaitUntil:
+    visible: 'Grouped'
+    timeout: 15000
+- takeScreenshot: bar-chart-grouped-${MODE}-${SIZE}
+- openLink: helix://bar-chart/horizontal/preview
+- extendedWaitUntil:
+    visible: 'Horizontal'
+    timeout: 15000
+- takeScreenshot: bar-chart-horizontal-${MODE}-${SIZE}
+- openLink: helix://bar-chart/outlined/preview
+- extendedWaitUntil:
+    visible: 'Outlined'
+    timeout: 15000
+- takeScreenshot: bar-chart-outlined-${MODE}-${SIZE}
+- openLink: helix://bar-chart/outlined-series/preview
+- extendedWaitUntil:
+    visible: 'Outlined Series'
+    timeout: 15000
+- takeScreenshot: bar-chart-outlined-series-${MODE}-${SIZE}
+- openLink: helix://bar-chart/stacked/preview
+- extendedWaitUntil:
+    visible: 'Stacked'
+    timeout: 15000
+- takeScreenshot: bar-chart-stacked-${MODE}-${SIZE}
+- openLink: helix://bar-chart/with-a-line/preview
+- extendedWaitUntil:
+    visible: 'With A Line'
+    timeout: 15000
+- takeScreenshot: bar-chart-with-a-line-${MODE}-${SIZE}
+- openLink: helix://bar-chart/with-a-second-axis/preview
+- extendedWaitUntil:
+    visible: 'With A Second Axis'
+    timeout: 15000
+- takeScreenshot: bar-chart-with-a-second-axis-${MODE}-${SIZE}
+- openLink: helix://bar-chart/with-a-tooltip/preview
+- extendedWaitUntil:
+    visible: 'With A Tooltip'
+    timeout: 15000
+- takeScreenshot: bar-chart-with-a-tooltip-${MODE}-${SIZE}
+- openLink: helix://bar-chart/with-a-value-axis/preview
+- extendedWaitUntil:
+    visible: 'With A Value Axis'
+    timeout: 15000
+- takeScreenshot: bar-chart-with-a-value-axis-${MODE}-${SIZE}
+- openLink: helix://bar-chart/with-gridlines/preview
+- extendedWaitUntil:
+    visible: 'With Gridlines'
+    timeout: 15000
+- takeScreenshot: bar-chart-with-gridlines-${MODE}-${SIZE}
