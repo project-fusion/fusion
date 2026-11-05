@@ -92,7 +92,7 @@ export default styles(
             {
               maskImage: fn(
                 'radial-gradient',
-                ['50%', '50%', 'at', own.avatarGroupNext(), '50%'],
+                ['50%', '50%', 'at', own.avatarGroupNext, '50%'],
                 ['transparent', difference(sum('100%', gap), '0.5px')],
                 ['#000', sum('100%', gap)],
               ),
