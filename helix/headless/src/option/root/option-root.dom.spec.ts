@@ -269,9 +269,12 @@ describe('an option’s own content', () => {
     const media = host.shadowRoot?.querySelector('slot[name="media"]') as HTMLSlotElement
     expect(media.assignedElements().map((one) => one.localName)).toEqual(['img'])
     expect(part(host, 'item')?.firstElementChild).toBe(media)
-    expect(hasState(host, 'has-media')).toBe(false)
-    media.dispatchEvent(new Event('slotchange'))
+    /* Read once the row is drawn, as a hydrated option needs, and again on
+       each `slotchange`. */
     expect(hasState(host, 'has-media')).toBe(true)
+    host.querySelector('img')?.remove()
+    media.dispatchEvent(new Event('slotchange'))
+    expect(hasState(host, 'has-media')).toBe(false)
     expect(host.text).toBe('Sun')
     await host.updateComplete
     expect(internalsOf(host).ariaLabelledByElements).toEqual([part(host, 'label') as Element])
