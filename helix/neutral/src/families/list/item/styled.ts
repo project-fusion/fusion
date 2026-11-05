@@ -132,10 +132,11 @@ export default styles(
     on('start', [rule({ color: token('color-foreground-muted'), web: { display: 'contents' } })]),
     /* The gap after it is the content's, so a row with nothing there has
        none. A gap on the row would be drawn beside an empty track just the
-       same. */
+       same. **The muted color stays on the slot**, where what is passed in
+       inherits it: written on `::slotted(*)`, it beat a slotted component's own
+       `:host` color and turned an avatar's initials muted. */
     on({ part: 'start', slotted: '*' }, [
       rule({
-        color: token('color-foreground-muted'),
         gridColumn: 2,
         gridRow: '1 / span 2',
         marginInlineEnd: token('space-sm'),
