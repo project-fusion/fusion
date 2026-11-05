@@ -483,6 +483,7 @@ export {
   barLayout,
   barLinePath,
   barNames,
+  barOutline,
   barPaths,
   barRect,
   barTip,
