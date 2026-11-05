@@ -34,6 +34,8 @@
      first of the row separators rather than as the line the table starts at. */
   min-block-size: var(--helix-size-control-loose);
   min-inline-size: 0;
+  /* A long unbroken word breaks inside its column, and stays off the next one. */
+  overflow-wrap: anywhere;
   padding-block: var(
     --_table-heading-padding-block,
     var(--table-padding-block, var(--helix-space-none))
@@ -132,6 +134,10 @@
    group and neither competes with the words. */
 [part="menu-button"] {
   all: unset;
+  /* A small square around the mark, the grip's box, so the hover fill reads as
+     a button. Bare, the fill was only the mark, 13 to 15 pixels. Decided by
+     the owner on November 3, 2026. */
+  padding: var(--helix-space-2xs);
   align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
@@ -154,9 +160,11 @@
   order: -1;
 }
 
+/* The grip's mark size, so the two buttons in a heading are one square, on
+   whole pixels where `1.07em` landed between them. */
 [part="menu-mark"] {
-  block-size: 1.07em;
-  inline-size: 1.07em;
+  block-size: var(--helix-text-control);
+  inline-size: var(--helix-text-control);
 }
 
 [part="menu-button"]:hover,
@@ -192,9 +200,9 @@
    own ink it would read as part of the heading's words. */
 [part="grip"] {
   all: unset;
-  /* Room above and below the mark, so the mark stays under three quarters of the
-     button's height. Along the row it stays the mark's width. */
-  padding-block: var(--helix-space-2xs);
+  /* Room on every side of the mark, so the mark stays under three quarters of
+     the button's height and the grip is the menu button's square. */
+  padding: var(--helix-space-2xs);
   align-items: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;

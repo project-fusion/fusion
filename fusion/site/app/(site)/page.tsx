@@ -81,7 +81,7 @@ export default async function Home() {
             <SectionTitle>Every pair Helix solves, checked for contrast</SectionTitle>
             <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
           </helix-flex>
-          <DerivationDiagrams className={band.bandSection} />
+          <DerivationDiagrams className={band.bandSection} engine={await serverTheme()} />
         </Band>
 
         {/* **The band does not paint its own ground.** An opaque fill here cut

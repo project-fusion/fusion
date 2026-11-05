@@ -167,6 +167,9 @@ export class HelixHeadlessPagination extends HelixElement {
    * place. This is the shape a narrow screen wants, and the only shape possible
    * where the total is large enough that no window over it is useful.
    *
+   * Set, it always shows. Unset, the control still folds into it wherever its
+   * own width cannot hold the full row on one line, and unfolds when it can.
+   *
    * Not reflected, for the reason `ends` is not: it decides what renders, so
    * nothing has to select on it.
    */
@@ -371,6 +374,27 @@ export class HelixHeadlessPagination extends HelixElement {
    */
   @state()
   private announcement = ''
+
+  /**
+   * Whether the full row does not fit the control's own width, so it shows the
+   * compact form until the width can hold the row again. Its own width and not
+   * the screen's, so a pagination in a narrow column of a wide page folds too.
+   * Decided by the owner on November 3, 2026: a default Pagination wrapped into
+   * three rows, back arrow, numbers, forward arrow, at 280 and 390.
+   */
+  @state()
+  private narrow = false
+
+  /** How wide the full row measured when it last drew, to know when it fits again. */
+  private fullWidth = 0
+
+  /** Watches the control's own width. */
+  private widths: ResizeObserver | undefined
+
+  /** Whether the compact form shows, asked for or forced by a narrow width. */
+  private get folded(): boolean {
+    return this.compact || this.narrow
+  }
 
   /** The page last announced, so the first render announces nothing. */
   private announced: number | undefined = undefined
@@ -582,6 +606,63 @@ export class HelixHeadlessPagination extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.restoreFocus()
+    /* Measured here and acted on from the observer, which reports once after
+       the first layout and on every change after, so the fold never changes
+       state in the middle of an update. */
+    if (!this.folded) {
+      this.fullWidth = this.measureRow()
+    }
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (typeof ResizeObserver === 'undefined' || this.widths) {
+      return
+    }
+    this.widths = new ResizeObserver(([entry]) => {
+      const width = entry?.borderBoxSize?.[0]?.inlineSize ?? entry?.contentRect.width ?? 0
+      /* Zero is a control not laid out yet, which is no narrow one. */
+      if (width > 0) {
+        this.fit(width)
+      }
+    })
+    this.widths.observe(this)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.widths?.disconnect()
+    this.widths = undefined
+  }
+
+  /**
+   * The width the full row takes on one line: each control's own width, the
+   * whole run of pages however much of it scrolls, and the gaps between them.
+   */
+  private measureRow(): number {
+    const parts = [...(this.shadowRoot?.children ?? [])].filter(
+      (node): node is HTMLElement => node instanceof HTMLElement && node.hasAttribute('part'),
+    )
+    const shown = parts.filter(
+      (node) => node.getAttribute('part') !== 'live' && node.offsetWidth > 0,
+    )
+    const gap = Number.parseFloat(getComputedStyle(this).columnGap) || 0
+    return shown.reduce(
+      (sum, node) =>
+        sum + (node.getAttribute('part') === 'list' ? node.scrollWidth : node.offsetWidth),
+      Math.max(0, shown.length - 1) * gap,
+    )
+  }
+
+  /** Folds into the compact form where the full row does not fit, and back where it does. */
+  private fit(width: number): void {
+    if (this.compact || width <= 0 || this.fullWidth <= 0) {
+      return
+    }
+    const narrow = this.fullWidth > width + 0.5
+    if (narrow !== this.narrow) {
+      this.narrow = narrow
+    }
   }
 
   /**
@@ -810,7 +891,7 @@ export class HelixHeadlessPagination extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    if (this.compact) {
+    if (this.folded) {
       return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
         <span part="status"
           >${formatWords(this, 'statusLabel', { page: this.current, pages: this.count })}</span

@@ -58,6 +58,14 @@
   color: var(--helix-color-accent);
 }
 
+/* The press reaches `--helix-size-target` in a transparent box, so the 16px mark
+   stays where it is drawn. */
+.anchor::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* No margin to hide in on a narrow screen, so it sits after the words instead
    of off the edge of the page.
  *
@@ -72,7 +80,8 @@
     margin-inline-start: var(--helix-space-sm);
     opacity: 1;
     padding-inline-end: 0;
-    position: static;
+    /* Relative, which holds the press area above and leaves the mark in flow. */
+    position: relative;
     translate: none;
   }
 

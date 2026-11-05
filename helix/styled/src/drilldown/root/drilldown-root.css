@@ -127,7 +127,8 @@ slot[name="back-icon"]::slotted(*) {
 /* Rows that are already there stay, and dim, while a new set arrives. Removing
    them would collapse the box and throw the page around under the reader for
    as long as the request takes; dimming says the same thing and holds still. */
-:host([loading]) [part="page"] {
+:host([loading]) [part="page"] > :not([part~="loading"], [part~="empty"]),
+:host([loading]) ::slotted(:not([slot])) {
   opacity: var(--helix-opacity-busy);
 }
 

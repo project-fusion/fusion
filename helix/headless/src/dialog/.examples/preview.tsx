@@ -20,16 +20,17 @@ export function Example() {
         <p>This removes the project and everything in it. It cannot be undone.</p>
         <div slot="footer">
           <helix-headless-button
+            autofocus
             command="--close"
             commandfor="base-confirm"
           >
-            Delete project
+            Cancel
           </helix-headless-button>
           <helix-headless-button
             command="--close"
             commandfor="base-confirm"
           >
-            Cancel
+            Delete project
           </helix-headless-button>
         </div>
       </helix-headless-dialog>

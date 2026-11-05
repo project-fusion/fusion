@@ -41,8 +41,9 @@ export class HelixBreadcrumbs extends HelixHeadlessBreadcrumbs {
    * - `plain` is the default. The halves are text at rest, like every other
    *   crumb. While one half is under the pointer, both halves take a light fill
    *   and that half takes the full hover fill.
-   * - `outlined` draws a hairline between the halves, at rest and under the
-   *   pointer, the way an outlined surface keeps its edge at rest.
+   * - `outlined` draws a hairline between the halves while the crumb is in
+   *   use: while either half is under the pointer or has focus, and while the
+   *   crumb's menu is open. At rest the halves read as one crumb.
    *
    * The other crumbs look the same under either value.
    */

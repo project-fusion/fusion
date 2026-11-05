@@ -1,7 +1,13 @@
 /* A settings panel is a column, not a sheet the width of the window. The
    drill-down does not pick a width for the same reason a menu does not: it is
    put in a sidebar, a popover and a phone-width screen, and only one of those
-   is knowable from here. */
+   is knowable from here.
+
+   **And the page frames it, as Drilldown leaves to whatever holds it**, with
+   the edge and corner a Card takes. Bare, the panel was a fill with no edge. */
 .panel {
+  border: var(--helix-border-surface) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-surface);
   max-inline-size: 18rem;
 }

@@ -57,6 +57,15 @@
   );
 }
 
+/* A press lays the press wash over whichever fill the button has, as Button's
+   press is a step past its hover. Without it a press drew the hover's 10%: on
+   a phone, where no hover comes first, a tap showed nothing. Over the rest fill
+   it is 16% in light and 20% in dark, and over the paused fill it is a step
+   past that fill's 16%. */
+[part="button"]:active {
+  background-image: linear-gradient(var(--helix-color-press), var(--helix-color-press));
+}
+
 /* A pause control means nothing on paper, where nothing moves. */
 @media print {
   :host {
@@ -73,4 +82,16 @@
     background-color: Highlight;
     color: HighlightText;
   }
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. */
+[part="button"] {
+  position: relative;
+}
+
+[part="button"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }

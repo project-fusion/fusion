@@ -36,7 +36,10 @@ export function Example() {
       </table>
 
       <helix-donut-chart for="legended"></helix-donut-chart>
-      <helix-legend for="legended"></helix-legend>
+      <helix-legend
+        entries="categories"
+        for="legended"
+      ></helix-legend>
     </helix-flex>
   )
 }

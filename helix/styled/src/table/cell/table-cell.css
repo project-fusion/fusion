@@ -68,6 +68,19 @@
   min-inline-size: 0;
 }
 
+/* **A link written in a cell reads as one**, in the ink and underline prose
+   gives a link, where it drew the browser's own blue under every brand.
+   `::slotted` reaches only a link placed straight in the cell, so a component
+   in it styles its own, and a page's rule for its links still wins over this
+   one. Not a link that names its own look with `data-link`. */
+slot:not([name])::slotted(a:not([data-link])) {
+  color: var(--helix-color-primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
 /*
  *  A *row* header, which is content and not a label: "helix-web" names the row
  *    and is one of the things being read. Weight carries it, and it keeps the

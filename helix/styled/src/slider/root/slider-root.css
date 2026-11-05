@@ -412,6 +412,24 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* **Read-only, and the thumb says so by sitting flat.** A read-only field
+   keeps its edge and loses its fill, flush with its ground. A slider draws no
+   edge and its fill is its value, so the thing that says "pick this up" is
+   what goes: the thumb's `shadow-md` lift, and the halo a press would add,
+   since the press is refused. The ring of the ground's color stays, and still
+   parts the thumb from the track and the fill, which keep their ink. Focus
+   keeps its outline. The thumb looked exactly like one that takes a drag.
+   Before the invalid rules, whose red ring still wins. */
+:host([readonly]) [part="control"]::-webkit-slider-thumb {
+  box-shadow: 0 0 0 var(--helix-border-thick)
+    var(--slider-thumb-ring-color, var(--helix-color-background));
+}
+
+:host([readonly]) [part="control"]::-moz-range-thumb {
+  box-shadow: 0 0 0 var(--helix-border-thick)
+    var(--slider-thumb-ring-color, var(--helix-color-background));
+}
+
 /*
  *  Wrong, and the handle says so.
  */

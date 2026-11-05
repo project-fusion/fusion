@@ -4,6 +4,7 @@ export function Example() {
       align-items="center"
       gap="md"
       justify-content="between"
+      wrap
     >
       <helix-pagination-summary
         page={4}

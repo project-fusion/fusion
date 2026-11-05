@@ -1,19 +1,36 @@
 :host {
   /* Each color is its hook, or the theme's token. The canvas reads the same
      ones below, and the peak, which only the ribbon draws. */
+  --_strands-fade: var(--strands-fade, 15%);
   --_strands-glow: var(--strands-glow, var(--helix-color-primary));
   --_strands-ground: var(--strands-ground, var(--helix-color-background));
   --_strands-tint: var(--strands-tint, var(--helix-color-primary));
+
+  /* **The top and bottom edges fade**, so a band of light has no ruled line where
+     the box ends. `--strands-fade: 0%` keeps a hard edge. */
+  --_strands-mask: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--_strands-fade),
+    black calc(100% - var(--_strands-fade)),
+    transparent
+  );
 
   position: relative;
   display: block;
   inline-size: 100%;
   block-size: 100%;
 
-  /* The fallback, needing no detection: a canvas that never draws is
-     transparent, so the host lays a soft band of the same colors underneath
-     it, at a fifth of the glow, which is about what the ribbon averages to
-     once it is spread over the box. */
+  /* Decorative, so it never takes a click meant for what is over it. */
+  pointer-events: none;
+}
+
+/* The fallback, needing no detection: a canvas that never draws is transparent,
+   so a layer lays a soft band of the same colors underneath it, at a fifth of the
+   glow, which is about what the ribbon averages to once it is spread over the
+   box. A layer and not the host's background, because the top and bottom fade
+   has to take it and must not take what is slotted. */
+:host::before {
   background-image: linear-gradient(
     115deg,
     var(--_strands-ground) 20%,
@@ -21,19 +38,28 @@
     color-mix(in oklab, var(--_strands-tint) 12%, var(--_strands-ground)) 58%,
     var(--_strands-ground) 82%
   );
+  content: "";
+  inset: 0;
+  mask-image: var(--_strands-mask);
+  position: absolute;
+}
 
-  /* Decorative, so it never takes a click meant for what is over it. */
-  pointer-events: none;
+/* Hidden while the ribbon draws. Both layers take the same fade, so where the
+   canvas was half faded the gradient under it showed through by up to a
+   quarter, and the top and bottom of the box drew a gray band: the ground
+   went from 255 to 245 in light and from 0 to 11 in dark. */
+:host(:state(drawing))::before {
+  visibility: hidden;
 }
 
 /* Clear, the canvas is see-through, so the band would show under the ribbon
    all the time: it shows only while the element falls back, and then with no
    ground either, so what is behind shows through it as it does the ribbon. */
-:host([clear]) {
+:host([clear])::before {
   background-image: none;
 }
 
-:host([clear]:state(fallback)) {
+:host([clear]:state(fallback))::before {
   background-image: linear-gradient(
     115deg,
     transparent 20%,
@@ -53,12 +79,16 @@
   inset: 0;
   position: fixed;
   z-index: var(--helix-layer-beneath);
+  /* The viewport is its box, so it has no edge to soften. */
+  --_strands-fade: 0%;
 }
 
 [part="canvas"] {
   display: block;
   inline-size: 100%;
   block-size: 100%;
+  mask-image: var(--_strands-mask);
+  position: relative;
 
   /* **The colors, carried on color properties a canvas never paints**, as on
      Aura: a custom property is handed back as the text that was written and a

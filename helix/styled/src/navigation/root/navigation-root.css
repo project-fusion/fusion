@@ -18,6 +18,45 @@
   position: relative;
 }
 
+/* **The bar says when it scrolls.** A wider strip fades the edge with more behind it, as Table does: cut
+   flat, a link at 280 read "Pr" and at 390 two of three were out of view with
+   nothing to say so. A timeline over a strip with nothing to scroll is
+   inactive, so a strip that fits is never masked. */
+[part="nav"] {
+  --_navigation-fade: to right;
+  animation: navigation-edges linear both;
+  animation-timeline: scroll(self inline);
+  mask-image: linear-gradient(
+    var(--_navigation-fade),
+    transparent,
+    #000 var(--_navigation-fade-start, 0rem),
+    #000 calc(100% - var(--_navigation-fade-end, 0rem)),
+    transparent
+  );
+}
+
+:host(:dir(rtl)) [part="nav"] {
+  --_navigation-fade: to left;
+}
+
+@keyframes navigation-edges {
+  0% {
+    --_navigation-fade-end: var(--helix-space-xl);
+    --_navigation-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_navigation-fade-end: var(--helix-space-xl);
+    --_navigation-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_navigation-fade-end: 0rem;
+    --_navigation-fade-start: var(--helix-space-xl);
+  }
+}
+
 /* **A list of destinations lays out as bare links do.** The list is the row,
    or the column, and its items take the bar's height. `list-style` inherits,
    so the items lose their bullets with it. */
@@ -159,5 +198,37 @@
 @media print {
   :host {
     display: none;
+  }
+}
+
+/* The bar scrolls, so a box past a link would be clipped. On a touch screen the
+   bar itself reaches the target. */
+@media (pointer: coarse) {
+  :host(:not([orientation="vertical"])) [part="nav"] {
+    block-size: var(--navigation-block-size, var(--helix-size-target));
+  }
+}
+
+/* Forced colors paint every fill the page's Canvas, and the indicator behind the
+   current link is a fill, so the current page looked like every other link. An
+   edge in the system's Highlight draws it instead; the underline marker is
+   already a bar and takes the same color. */
+@media (forced-colors: active) {
+  [part="indicator"] {
+    border: var(--helix-border-thick) solid Highlight;
+  }
+
+  :host([marker="underlined"]) [part="indicator"] {
+    background-color: Highlight;
+    border: none;
+    forced-color-adjust: none;
+  }
+}
+
+/* The edge fade is driven by the scroll, and a reader who asked for less motion
+   gets the strip without it, as Table's. */
+@media (prefers-reduced-motion: reduce) {
+  [part="nav"] {
+    animation: none;
   }
 }

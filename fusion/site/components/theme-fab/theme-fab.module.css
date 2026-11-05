@@ -28,8 +28,9 @@
   display: flex;
   inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
   inset-inline: 0;
-  justify-content: center;
-  padding-inline: var(--helix-space-md);
+  /* In the corner, clear of the actions a page centers at its close. */
+  justify-content: flex-end;
+  padding-inline: var(--helix-space-lg);
   pointer-events: none;
   position: fixed;
   z-index: var(--helix-layer-sticky);
@@ -195,6 +196,7 @@
 
   .fab:not([data-open]) {
     margin-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
+    margin-inline-end: var(--helix-space-lg);
   }
 
   /**
@@ -204,12 +206,16 @@
    * `block-size: auto` lets the six rows decide, and the cap is only there so a
    * future seventh cannot push it over the fold.
    */
+  /* Solid, as the navigation drawer is: a sheet this tall over the hero blurred
+     the strands into a gray band behind its labels. */
   .fab[data-open] {
+    backdrop-filter: none;
+    background: var(--helix-color-surface-overlay);
     block-size: auto;
     border-end-end-radius: 0;
     border-end-start-radius: 0;
-    border-start-end-radius: var(--helix-radii-lg);
-    border-start-start-radius: var(--helix-radii-lg);
+    border-start-end-radius: var(--helix-radii-sm);
+    border-start-start-radius: var(--helix-radii-sm);
     inline-size: 100%;
     max-block-size: 80dvh;
     overflow-y: auto;

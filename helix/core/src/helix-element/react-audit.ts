@@ -123,7 +123,8 @@ const told = new Set<string>()
  * React's own, so the day React renames that key every `onhelix-*` handler on
  * a server-rendered page is dead again, and every object property a server
  * dropped stays unset, with nothing in the console. The bridge calls this for
- * an element whose window closed in a document carrying React's root mark,
+ * an element React has reached whose window closed in a document carrying
+ * React's root mark,
  * where no element has found a props bag, with the window it looked for and
  * the mark, whose suffix is that React's own.
  *

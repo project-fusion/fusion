@@ -9,6 +9,8 @@
 .hero {
   --aura-glow: var(--helix-color-accent);
   --aura-haze: var(--helix-color-accent-subtle);
+  /* The peak in the accent as well, so the heading over it stays readable. */
+  --aura-peak: var(--helix-color-accent);
 }
 
 /* The content box covers the field, so placing the content is placing it in

@@ -963,7 +963,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     } else if (this.required && this.value.trim() === '') {
       internalsOf(this).setValidity(
         { valueMissing: true },
-        this.valueMissingMessage || 'Please fill in this field.',
+        this.valueMissingMessage || 'Please fill out this field.',
         control,
       )
     } else if (this.value.trim() !== '' && parsed === null) {

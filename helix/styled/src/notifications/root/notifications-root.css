@@ -118,6 +118,15 @@
   color: var(--helix-color-foreground);
 }
 
+/* A press, the wash a tab or a menu item takes under one, 16% in light and 20%
+   in dark, in the box's own small corner. The hover is ink alone, so a press
+   drew the same frame as a hover, and a tap on a phone, where no hover comes
+   first, changed only the ink. */
+[part="mark-all"]:active {
+  background-color: var(--helix-color-press);
+  color: var(--helix-color-foreground);
+}
+
 /* The way to the next page, a quiet full-width row under the last item. */
 [part="more"] {
   background: none;

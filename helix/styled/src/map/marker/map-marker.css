@@ -365,7 +365,7 @@
    transparent leaves the name on the map with its halo of nothing. */
 :host([material="glass"]) [part="label"] {
   backdrop-filter: var(--helix-material-backdrop);
-  background: var(--helix-material-translucent);
+  background: var(--helix-material-panel);
 }
 
 :host([material="frosted"]) [part="label"] {

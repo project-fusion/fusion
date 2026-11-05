@@ -1,5 +1,5 @@
 - text: Brand color
 - textbox "Brand color":
-  - /placeholder: "#000000"
+  - /placeholder: "#ff0000"
 - button "Choose a color"
 - paragraph: Use hex, rgb(), or hsl().

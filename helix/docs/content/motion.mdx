@@ -56,10 +56,10 @@ inside any component.**
 
 The `*` selector does not cross a shadow boundary. The rule applies to your
 prose, your layout, and the base layer's own recipes. It does not apply to the
-ninety-odd components that draw inside a shadow root. Each component that
-animates handles `prefers-reduced-motion` in its own stylesheet. Fifty-nine
-components animate, and all fifty-nine have this rule. A component that
-animates without one fails the build.
+ninety-odd components that draw inside a shadow root. A custom property does
+cross that boundary, so under the setting Helix takes its duration tokens down to
+almost nothing, and every transition written with them stops. A component with an
+animation of its own handles `prefers-reduced-motion` in its stylesheet.
 
 The same applies to your own components. If you write a component with a shadow
 root, the global rule does not cover it. This comes from how `*` works in CSS,

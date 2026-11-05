@@ -52,7 +52,7 @@ helix-headless-object-inspector::part(tree) {
   padding-block: 0.5rem;
 }
 
-helix-headless-object-inspector[label]::part(tree) {
+helix-headless-object-inspector:state(labeled)::part(tree) {
   border-start-end-radius: 0;
   border-start-start-radius: 0;
 }
@@ -101,6 +101,24 @@ helix-headless-object-inspector::part(copy) {
   inset-block-start: 0.25rem;
   inset-inline-end: 0.25rem;
   position: absolute;
+}
+
+/* With a label, the copy button ends the header bar, which trades its inset
+   for the button's. The state rather than `[label]`, which React sets as a
+   property and never writes as an attribute. */
+helix-headless-object-inspector:state(labeled):not([no-copy])::part(header) {
+  padding-block: 0.25rem;
+  padding-inline-end: 0.25rem;
+}
+
+helix-headless-object-inspector:state(labeled)::part(copy) {
+  margin-inline-start: auto;
+  position: static;
+}
+
+helix-headless-object-inspector:state(labeled)::part(copy-button) {
+  block-size: 2rem;
+  inline-size: 2rem;
 }
 
 helix-headless-object-inspector::part(copy-button) {

@@ -4,7 +4,9 @@
    different material from the band. */
 .navGlass {
   backdrop-filter: var(--site-glass-backdrop);
-  background-color: var(--site-glass);
+  /* Denser than the site's glass, so the links hold their contrast over whatever
+     scrolls under them: over the blue card they measured 1.31:1 at 30%. */
+  background-color: color-mix(in oklab, var(--helix-color-surface) 85%, transparent);
   block-size: var(--helix-size-header);
   inset-block-start: 0;
   inset-inline: 0;
@@ -39,6 +41,8 @@
   border-block-start: 0;
   border-start-end-radius: 0;
   border-start-start-radius: 0;
+  /* A line under it, because its shadow draws nothing against a pale page. */
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
   /* Offset past its own blur, so nothing reaches back over the bar. */
   box-shadow: 0 14px 28px -10px color-mix(in oklab, var(--helix-color-background) 70%, transparent);
 }
@@ -104,6 +108,14 @@
 .navExtra:focus-visible {
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
+}
+
+/* The target's height on a touch screen. The rows are stacked 4px apart, so a
+   box past a row would take the press from the row beside it. */
+@media (pointer: coarse) {
+  .navExtra {
+    block-size: max(var(--helix-size-control), var(--helix-size-target));
+  }
 }
 
 /* ------------------------------------------------------------ the band ---- */

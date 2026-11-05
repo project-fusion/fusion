@@ -13,7 +13,7 @@ describe('a checked Switch under a press', () => {
   test('takes the fill step', () => {
     const sheet = readFileSync(join(import.meta.dir, 'switch-root.css'), 'utf8')
     const rule =
-      /:host\(:state\(checked\):not\(:disabled\)\) \[part="field"\]:active \[part="track"\] \{([^}]*)\}/.exec(
+      /:host\(:state\(checked\):not\(:disabled, \[readonly\]\)\) \[part="field"\]:active \[part="track"\] \{([^}]*)\}/.exec(
         sheet,
       )
     expect(rule?.[1]).toContain('--helix-color-primary-surface-active')

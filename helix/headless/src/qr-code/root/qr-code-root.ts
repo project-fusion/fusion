@@ -182,6 +182,7 @@ const pathFor = (
  * @csspart logo - The box that holds the center logo.
  * @csspart modules - Every module except the three corner squares.
  *
+ * @cssstate empty - The value is empty, so no code is drawn.
  * @cssstate overflow - The value is too long for a code at the correction level, so the fallback shows.
  */
 @customElement('helix-headless-qr-code')
@@ -333,6 +334,9 @@ export class HelixHeadlessQrCode extends HelixElement {
     const key = `${this.level}:${this.value}`
     const overflow = this.value !== '' && this.encoded() === undefined
     this.toggleState('overflow', overflow)
+    /* Said so a tier above can drop the paper a code is printed on: with no
+       value there is no code, and nothing to scan needs a quiet zone. */
+    this.toggleState('empty', this.value === '')
     if (overflow) {
       if (this.overflowed !== key) {
         this.overflowed = key

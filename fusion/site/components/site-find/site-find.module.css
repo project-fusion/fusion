@@ -21,7 +21,7 @@
      coverage the reader's own paragraph went on being legible under the list. */
   background-color: var(--site-glass-dense);
   border: var(--helix-border-thin) solid var(--helix-material-border);
-  border-radius: var(--helix-radii-lg);
+  border-radius: var(--helix-radii-sm);
   /* The largest the scale has. */
   box-shadow: var(--helix-shadow-lg);
 }
@@ -90,4 +90,21 @@
   .siteCommandHints {
     display: none;
   }
+}
+
+/* The field the search button focuses as it is pressed, so a phone raises its
+   keyboard. Out of sight and out of the way of the pointer, and fixed, so
+   focusing it scrolls nothing. **16px**, because iOS zooms the page into a
+   field set smaller than that as it takes focus. */
+.siteFindKeyboard {
+  block-size: 1px;
+  border: 0;
+  font-size: var(--helix-text-field-min);
+  inline-size: 1px;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+  position: fixed;
 }

@@ -10,6 +10,8 @@ helix-headless-scroll-area {
   block-size: 12rem;
   display: block;
   inline-size: 20rem;
+  /* No wider than the column: at 20rem it ran past a 280 column. */
+  max-inline-size: 100%;
   position: relative;
 }
 

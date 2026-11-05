@@ -27,7 +27,8 @@
    structure. */
 :host([material="glass"]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  background-color: var(--app-header-background-color, var(--helix-material-translucent));
+  /* The coverage every glass takes, which Card's note explains. */
+  background-color: var(--app-header-background-color, var(--helix-material-panel));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
@@ -45,7 +46,7 @@
 /* Scrolled, it takes the glass rather than the opaque fill. */
 :host([material="transparent"]:state(scrolled)) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  background-color: var(--app-header-background-color, var(--helix-material-translucent));
+  background-color: var(--app-header-background-color, var(--helix-material-panel));
 }
 
 :host([sticky]) {
@@ -135,6 +136,45 @@ slot[name="start"]::slotted(*) {
   /* Long navigation scrolls inside the bar instead of widening the page. */
   min-inline-size: 0;
   overflow-x: auto;
+}
+
+/* **The navigation says when it scrolls.** A wider strip fades the edge with more behind it, as Table does: cut
+   flat, a link at 280 read "Pr" and at 390 two of three were out of view with
+   nothing to say so. A timeline over a strip with nothing to scroll is
+   inactive, so a strip that fits is never masked. */
+[part="content"] {
+  --_app-header-fade: to right;
+  animation: app-header-edges linear both;
+  animation-timeline: scroll(self inline);
+  mask-image: linear-gradient(
+    var(--_app-header-fade),
+    transparent,
+    #000 var(--_app-header-fade-start, 0rem),
+    #000 calc(100% - var(--_app-header-fade-end, 0rem)),
+    transparent
+  );
+}
+
+:host(:dir(rtl)) [part="content"] {
+  --_app-header-fade: to left;
+}
+
+@keyframes app-header-edges {
+  0% {
+    --_app-header-fade-end: var(--helix-space-xl);
+    --_app-header-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_app-header-fade-end: var(--helix-space-xl);
+    --_app-header-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_app-header-fade-end: 0rem;
+    --_app-header-fade-start: var(--helix-space-xl);
+  }
 }
 
 :host([content-align="start"]) [part="content"] {
@@ -244,5 +284,13 @@ slot[name="start"]::slotted(*) {
 @media print {
   :host {
     display: none;
+  }
+}
+
+/* The edge fade is driven by the scroll, and a reader who asked for less motion
+   gets the strip without it, as Table's. */
+@media (prefers-reduced-motion: reduce) {
+  [part="content"] {
+    animation: none;
   }
 }

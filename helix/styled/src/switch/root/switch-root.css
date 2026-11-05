@@ -22,10 +22,18 @@
 }
 
 [part="field"] {
-  align-items: center;
+  /* The track stays beside the first line of a label that wraps, as a
+     Checkbox's box does. Centered, it sat 23.4 pixels below the first line of a
+     wrapped label at `md`. */
+  align-items: start;
   cursor: pointer;
   display: inline-flex;
   gap: var(--helix-space-xs);
+}
+
+/* The label's first line centered on the track, which is taller than a line. */
+[part="label"] {
+  padding-block-start: max(0px, calc((var(--_switch-height) - 1lh) / 2));
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`.
@@ -37,7 +45,7 @@
  * no mirroring, no JavaScript, and nothing written onto the consumer's markup.
  */
 :host(:disabled) [part="field"] {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 :host(:disabled) {
@@ -182,8 +190,26 @@
 }
 
 /* The edge firms up under the pointer, as a Checkbox's and a Radio's do. */
-:host(:not(:disabled)) [part="field"]:hover [part="track"] {
+:host(:not(:disabled, [readonly])) [part="field"]:hover [part="track"] {
   border-color: var(--helix-color-foreground);
+}
+
+/* **Read-only, and the track says so with its edge**, as a read-only
+   Checkbox's box does. A read-only field keeps its edge and loses its fill; a
+   switch's fill is its value, so the fill stays and the edge steps down to the
+   one a field is drawn with, `color-border`: 1.23:1 on the page, from the mark
+   ink's 3.95:1 off and the fill's own color on. The thumb and the fill keep
+   their ink. No pointer cursor, and no firming or wash under a pointer or a
+   press, which the switch refuses. It looked exactly like a switch that
+   takes a press. Before the invalid rule, whose red edge still wins. */
+:host([readonly]) [part="field"] {
+  cursor: default;
+}
+
+/* Off only: on, the edge is the fill's own, and the field edge drew a pale rim
+   around it. */
+:host([readonly]:not(:state(checked))) [part="track"] {
+  border-color: var(--helix-color-border);
 }
 
 :host(:state(invalid)) [part="track"] {
@@ -222,13 +248,13 @@
 }
 
 /* A press firms the edge and washes an off groove. */
-:host(:not(:disabled)) [part="field"]:active [part="track"] {
+:host(:not(:disabled, [readonly])) [part="field"]:active [part="track"] {
   background-color: var(--helix-color-press);
 }
 
 /* On, the press takes the fill's own step, as a solid Button does. The wash above
    replaced the fill: the thumb fell from 17.76:1 to 1.45:1 under the press. */
-:host(:state(checked):not(:disabled)) [part="field"]:active [part="track"] {
+:host(:state(checked):not(:disabled, [readonly])) [part="field"]:active [part="track"] {
   background-color: var(--switch-on-color, var(--helix-color-primary-surface-active));
 }
 

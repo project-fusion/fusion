@@ -27,12 +27,65 @@
   display: block;
 }
 
-/* The listbox brings its own frame and this element does not want it. */
+/* The listbox brings its own frame and this element does not want it on the
+   box that scrolls, where the fade below would take the frame's top and bottom
+   edges with the rows. */
 [part="list"]::part(items) {
   background-color: transparent;
   border: none;
   border-radius: var(--helix-radii-none);
   padding-block: var(--helix-space-none);
+}
+
+/* **The edge a list takes, on the box around the scroller.** With the frame
+   off, a standing list had no edge at all, and its seven rows ended in the
+   page. Through a hook, because Time Input holds this list in a panel that is
+   already the frame, and sets the edge to nothing there. */
+[part="list"] {
+  background-color: var(--time-picker-list-background-color, var(--helix-color-surface));
+  border: var(--time-picker-list-border-width, var(--helix-border-thin)) solid
+    var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  overflow: hidden;
+}
+
+/* **The end with more past it fades**, as Table and Navigation fade theirs,
+   where a row was cut off flat at the edge with nothing to say the list goes
+   on. A timeline over a list with nothing to scroll is inactive, so a list that
+   fits is never masked. */
+[part="list"]::part(items) {
+  animation: time-picker-edges linear both;
+  animation-timeline: scroll(self block);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--_time-picker-fade-start, 0rem),
+    #000 calc(100% - var(--_time-picker-fade-end, 0rem)),
+    transparent
+  );
+}
+
+/* The mask clips what is drawn outside the box, so the ring goes inside it. */
+[part="list"]::part(items):focus-visible {
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+@keyframes time-picker-edges {
+  0% {
+    --_time-picker-fade-end: var(--helix-space-xl);
+    --_time-picker-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_time-picker-fade-end: var(--helix-space-xl);
+    --_time-picker-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_time-picker-fade-end: 0rem;
+    --_time-picker-fade-start: var(--helix-space-xl);
+  }
 }
 
 /* The two ends of a range are the answer, so they are filled rather than washed. */
@@ -265,5 +318,13 @@
 @media print {
   :host {
     print-color-adjust: exact;
+  }
+}
+
+/* The edge fade is driven by the scroll, and a reader who asked for less motion
+   gets the strip without it, as Table's. */
+@media (prefers-reduced-motion: reduce) {
+  [part="list"]::part(items) {
+    animation: none;
   }
 }

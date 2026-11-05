@@ -60,6 +60,12 @@
 }
 
 /* `overflow: visible`, so the ring on a prism at the edge is not cut. */
+/* The ground, where a page asks for one. */
+:host([separation="filled"]) [part~="strip"] {
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-md);
+}
+
 [part="drawing"] {
   block-size: auto;
   display: block;

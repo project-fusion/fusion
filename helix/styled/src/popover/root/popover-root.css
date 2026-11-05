@@ -1,4 +1,7 @@
 :host {
+  --_popover-ground: var(--popover-background-color, var(--helix-color-surface-overlay));
+  --_popover-surface: var(--helix-color-surface);
+  --_popover-md: var(--helix-radii-md);
   /* No box of its own: the trigger is the consumer's element and the panel is in
      the top layer, so anything here would be a third box between them. */
   display: contents;
@@ -8,8 +11,15 @@
    scroll container, and anything positioned outside a scroll container is
    clipped. */
 [part="surface"] {
+  /* A Card reads `surface`, and in dark that is darker than the panel, and
+     nothing inside is rounder than the panel. See Dialog's note. */
+  --helix-color-surface: light-dark(
+    var(--_popover-surface),
+    color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_popover-ground))
+  );
+  --helix-radii-md: min(var(--_popover-md), var(--helix-radii-sm));
   overflow: visible;
-  background-color: var(--popover-background-color, var(--helix-color-surface-overlay));
+  background-color: var(--_popover-ground);
   /* The edge, said in full rather than left out: the UA stylesheet gives
      `[popover]` `border: solid`, so dropping the declaration leaves a
      three-pixel medium border. */
@@ -55,6 +65,17 @@
   opacity: 0;
   transform: translateY(var(--_travel));
   scale: var(--_popover-from);
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate),
+    transform var(--helix-duration-fast) var(--helix-easing-accelerate),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
+}
+
+/* The small overshoot is an arrival's; leaving, a panel accelerates away as
+   Dialog's note gives. It overshot on the way out too, swelling as it went. */
+[part="surface"]:popover-open {
   transition:
     opacity var(--helix-duration-fast) var(--helix-easing-standard),
     scale var(--helix-duration-fast) var(--helix-easing-emphasized),

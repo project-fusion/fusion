@@ -27,7 +27,9 @@
   gap: var(--helix-space-xs);
   justify-content: space-between;
   padding-inline: var(--helix-space-field);
-  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`. */
@@ -168,6 +170,15 @@
   color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
+}
+
+/* What sits at either end of the trigger, in the quiet ink every field's ends
+   take, so an icon before the value reads as Input's and Combobox's do. It
+   drew in the full ink, beside fields whose start icons were muted. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
 }
 
 :host(:not(:disabled)) [part="trigger"]:active {

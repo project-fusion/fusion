@@ -214,21 +214,20 @@
 }
 
 /* A grip beside the line, for a splitter that has to be found rather than known.
-   **Nothing at rest, and the grip is the whole answer on approach.** Drawn at
-   rest, a page of nested splitters is a page of pills saying "boundary" at
-   something that already looks like a boundary, and the line under each one is
-   the mark that belongs there. **And it answers alone.** The line keeps its
-   color and its width in this shape, which is what the `:not([handle="grip"])`
-   on the interest rules above is doing. */
+   **Drawn at rest, quietly, in the ink a grip is drawn in**, `foreground-subtle`,
+   and the muted ink on approach. It was transparent at rest, so `grip` drew
+   nothing until the pointer was already on the line, which is the moment the
+   cursor says the same thing: the grip is for the first encounter, and the
+   property says so. A page of nested splitters that would be a page of pills
+   keeps `line`, the divider alone. **And it answers alone.** The line keeps
+   its color and its width in this shape, which is what the
+   `:not([handle="grip"])` on the interest rules above is doing. */
 :host([handle="grip"]) [part="separator"]::after {
-  background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
+  background-color: var(--splitter-grip-color, var(--helix-color-foreground-subtle));
   border-radius: var(--helix-radii-full);
   content: "";
-  opacity: 0;
   position: absolute;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* Along the run, centered, and offset to the leading side of the line. */
@@ -256,11 +255,11 @@
   inset-inline-start: calc(50% - var(--splitter-grip-length, 2rem) / 2);
 }
 
-/* Interest brings it in. */
+/* Interest firms it, a step from the subtle ink to the muted one. */
 :host([handle="grip"]) [part="separator"]:hover::after,
 :host([handle="grip"]) [part="separator"]:focus-visible::after,
 :host([handle="grip"]) [part="separator"][data-dragging]::after {
-  opacity: 1;
+  background-color: var(--splitter-grip-color, var(--helix-color-foreground-muted));
 }
 
 /* And a drag goes accent, for the reason the corner records: hover is a question

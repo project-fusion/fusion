@@ -1,6 +1,7 @@
 :host {
   /* Each stop is its hook, or the theme's token. The canvas reads the same
      three below, and the peak, which only the shader draws. */
+  --_aura-fade: var(--aura-fade, 15%);
   --_aura-glow: var(--aura-glow, var(--helix-color-primary));
   --_aura-ground: var(--aura-ground, var(--helix-color-background));
   --_aura-haze: var(--aura-haze, var(--helix-color-primary-subtle));
@@ -10,20 +11,46 @@
   inline-size: 100%;
   block-size: 100%;
 
-  /* The fallback, needing no detection: a canvas that never paints is
-     transparent, so the host ramps the same tokens underneath it.
+  /* **The top and bottom edges fade**, so a field has no ruled line where the box
+     ends. `--aura-fade: 0%` keeps a hard edge. */
+  --_aura-mask: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--_aura-fade),
+    black calc(100% - var(--_aura-fade)),
+    transparent
+  );
+}
 
-     The hot stop is mixed into the ground because the shader's is not a wash.
-     At full `primary` the landing page's average luma went 20.8 to 44.5 in dark
-     and 231 to 199 in light. 38% balances both: 15.6 against 20.8, and 225.8
-     against 231. `primary-subtle` is left alone at 17.5 and 245.8; mixing it
-     down too gives 2.1 and 251.4, worse in both. */
+/* The fallback, needing no detection: a canvas that never paints is transparent,
+   so a layer ramps the same tokens underneath it. A layer and not the host's
+   background, because the fade has to take it and must not take what is slotted
+   or the pause control.
+
+   The hot stop is mixed into the ground because the shader's is not a wash.
+   At full `primary` the landing page's average luma went 20.8 to 44.5 in dark
+   and 231 to 199 in light. 38% balances both: 15.6 against 20.8, and 225.8
+   against 231. `primary-subtle` is left alone at 17.5 and 245.8; mixing it
+   down too gives 2.1 and 251.4, worse in both. */
+:host::before {
   background-image: radial-gradient(
     120% 90% at 62% 12%,
     color-mix(in oklab, var(--_aura-glow) 38%, var(--_aura-ground)) 0%,
     var(--_aura-haze) 38%,
     var(--_aura-ground) 78%
   );
+  content: "";
+  inset: 0;
+  mask-image: var(--_aura-mask);
+  position: absolute;
+}
+
+/* Hidden while the shader draws. Both layers take the same fade, so where the
+   canvas was half faded the gradient under it showed through by up to a
+   quarter, and the top and bottom of the box drew a gray band: the ground
+   went from 255 to 245 in light and from 0 to 11 in dark. */
+:host(:state(drawing))::before {
+  visibility: hidden;
 }
 
 /* Decorative, so it must not swallow clicks. But an element that is not
@@ -42,6 +69,8 @@
   display: block;
   inline-size: 100%;
   block-size: 100%;
+  mask-image: var(--_aura-mask);
+  position: relative;
 
   /* **The ramp, carried on color properties a canvas never paints**, because
      a custom property is handed back as the text that was written and a color

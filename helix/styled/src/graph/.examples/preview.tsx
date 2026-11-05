@@ -1,5 +1,3 @@
-import './preview.css'
-
 const nodes = [
   { id: 'pricing', label: 'Pricing' },
   { id: 'plans', label: 'Plans and tiers' },
@@ -24,14 +22,17 @@ const links = [
 
 export function Example() {
   return (
-    <helix-graph
-      default-active="pricing"
-      label="Company notes"
-      links={links}
-      nodes={nodes}
-    >
-      {/* Put your graph here, drawn by Sigma.js, a canvas, or an image. */}
-      <div className="stand-in">Graph</div>
-    </helix-graph>
+    <>
+      {/* Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph(frame, cosmosDriver(new Graph(box, { enableSimulation: true }), box)) does, the box being the div inside the frame. Any drawing works there: Sigma.js, a canvas, or an image. */}
+      <helix-graph
+        data-preview-graph="cosmos"
+        default-active="pricing"
+        label="Company notes"
+        links={links}
+        nodes={nodes}
+      >
+        <div data-preview-graph-canvas></div>
+      </helix-graph>
+    </>
   )
 }

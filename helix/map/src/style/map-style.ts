@@ -526,8 +526,11 @@ export const mapLibreStyle = (colors: MapColors, options: MapStyleOptions = {}):
       {
         filter: [
           'all',
-          ['>=', ['get', 'admin_level'], 3],
-          ['<=', ['get', 'admin_level'], 4],
+          /* A boundary with no level reads as 0, so it is no state line. Compared
+             bare, a feature without `admin_level` failed the whole layer's
+             filter: "Expected value to be of type number, but found null". */
+          ['>=', ['coalesce', ['get', 'admin_level'], 0], 3],
+          ['<=', ['coalesce', ['get', 'admin_level'], 0], 4],
           ['!=', ['get', 'maritime'], 1],
         ],
         id: 'border-state',

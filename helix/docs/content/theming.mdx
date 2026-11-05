@@ -56,13 +56,27 @@ on the element where the property is *declared*, so the ramp has already
 resolved at the root. The stylesheet declares the ramp again on each
 `[data-helix-theme]` element, so the ramp there reads the seeds you set on it.
 
-Tuned does not guarantee contrast. CSS has no contrast function.
-`oklch(from …)` can step and rotate a color, but it cannot search for the
-lightness that meets a target. The contrast figures built into the ramp were
-measured on one blue seed, so they are exact for that seed and approximate for
-any other. The label on a solid button turns black on a seed lighter than L 0.68.
-The focus ring still follows the seed, so use the verified engine for a very
-light brand, where the ring measures 1.23:1 on white.
+Tuned holds primary text and fills to a floor for any seed. CSS has no contrast
+function, so it cannot search for the least change that meets a target, but it
+can hold a lightness. In light mode the primary color is held at L 0.5 or less,
+and in dark mode at 0.68 or more. Measured across every hue, that clears 4.5:1
+for text on each surface. A filled control in dark mode is held between 0.52 and
+0.55, which clears 3:1 against a card and carries a white label. A seed already
+inside these limits is drawn exactly. A seed outside them is darkened or
+lightened to the limit, so a very light brand draws a darker primary color than
+the one you set. In dark mode, a seed lighter than L 0.68 keeps its own fill and
+takes a black label. The accent seed is held to the same limits.
+
+The focus ring keeps the primary color's hue and chroma, and its lightness is
+held at 0.6 or less in light mode and 0.65 or more in dark mode. The ring stays
+visible on the page whichever seed you set. On a `#ffe600` seed, the ring
+measures 3.86:1 on white.
+
+A development build checks the page in light and dark mode, and again whenever
+the seed changes. It warns when primary text measures under 4.5:1 or a filled
+control under 3:1 against the page. A seed alone cannot cause this. An override
+of `--helix-color-primary`, `--helix-color-primary-surface`, or the page color
+can.
 
 **Verified** uses the theme engine. It searches for each color that meets its
 target, measures every pair, and returns the theme with any violations:
@@ -105,7 +119,8 @@ computes the values the engine does not, from the same seeds the engine used:
 
 This keeps both ways of theming in agreement on the same page.
 
-Use tuned to try a color. Use verified for the theme you ship.
+Use tuned to try a color. Use verified for the theme you ship, since it moves
+each color the least distance that meets its target on every ground.
 
 ## Derive both modes
 

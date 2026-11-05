@@ -389,7 +389,7 @@ void main() {
   e *= uGain;
   vec3 dark = 1.0 - (1.0 - uGround) * exp(-e);
   float lum = dot(e, vec3(0.3, 0.55, 0.15));
-  float ink = 1.0 - exp(-lum * 1.4);
+  float ink = 1.0 - exp(-lum * 2.4);
   vec3 light = mix(uGround, uInk, ink);
   vec3 c = mix(dark, light, uLight);
   float a = 1.0;

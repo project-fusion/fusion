@@ -82,19 +82,21 @@ describe('select server output', () => {
   })
 
   test('the words for an empty and a loading list reach the list that shows them', () => {
-    /* The list is a `Listbox`, a different element, so these three are not read
+    /* The list is a `Listbox`, a different element, so these four are not read
        here at all: they are forwarded as attributes and everything about when
        to show them belongs to the collection mixin on the other side. A binding
        that stopped forwarding leaves a select saying the library's own words
        with the property here still reading the consumer's. */
     const asking = html`<helix-headless-select
       label="Region"
-      empty-text="No region by that name"
+      empty-text="No regions"
+      no-results-text="No region by that name"
       loading-text="Asking"
       loading
     ></helix-headless-select>`
     const inner = partTag(ssr(asking), 'listbox')
-    expect(inner).toContain('empty-text="No region by that name"')
+    expect(inner).toContain('empty-text="No regions"')
+    expect(inner).toContain('no-results-text="No region by that name"')
     expect(inner).toContain('loading-text="Asking"')
     expect(inner).toMatch(/\sloading(?=[\s>])/)
   })

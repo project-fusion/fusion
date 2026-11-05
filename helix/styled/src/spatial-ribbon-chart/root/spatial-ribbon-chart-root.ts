@@ -28,16 +28,6 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-spatial-ribbon-chart')
 export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {
-  static override tier = 'helix-'
-
-  static override styles: CSSResultGroup = [
-    spatialStyles,
-    seriesStyles,
-    tooltipStyles,
-    styles,
-    sonifyStyles,
-  ]
-
   /**
    * How strongly the ribbons are drawn, as on every chart.
    *
@@ -54,6 +44,16 @@ export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
+  static override tier = 'helix-'
+
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    seriesStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
+
   /**
    * How much of each mark comes through, as on every chart: `glass` admits the
    * most of what is behind it, `frosted` less, and absent is opaque. The
@@ -61,6 +61,15 @@ export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
+
+  /**
+   * What the plot stands on. `plain`, the default, draws nothing behind it, as a
+   * flat chart does, so a Card or the page is its ground. `filled` draws the
+   * sunken ground. `no-box` is a separate choice: it removes the box, grid,
+   * numbers, and names.
+   */
+  @property({ reflect: true })
+  separation?: 'filled' | 'plain'
 }
 
 declare global {

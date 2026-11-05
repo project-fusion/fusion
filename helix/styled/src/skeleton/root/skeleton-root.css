@@ -26,11 +26,10 @@
 
 :host([shape="circle"]) {
   aspect-ratio: 1 / 1;
-  /* The control step, not the bare `2.5rem` it works out to: that is
-     `--helix-size-control-md` undensified, so a circle skeleton standing in for
-     an avatar keeps its size inside a `data-density` region while the thing it
-     stands in for shrinks. */
-  inline-size: var(--skeleton-size, var(--helix-size-control));
+  /* Avatar's own step, since a circle stands in for an avatar. It was the
+     control step, 40 against the 32 an Avatar draws; both follow the seed's
+     density, and neither changes inside a `data-density` region. */
+  inline-size: var(--skeleton-size, var(--helix-size-avatar));
 }
 
 /*
@@ -39,7 +38,12 @@
 [part~="skeleton"] {
   background-color: var(
     --skeleton-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+    /* 12% in light and 14% in dark: at 8% the shape measured 1.20:1 against a
+       white page and 1.15:1 against black, a placeholder few could see. */
+    light-dark(
+        color-mix(in oklab, var(--helix-color-foreground) 12%, transparent),
+        color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)
+      )
   );
   block-size: 100%;
   border-radius: var(--skeleton-radius, var(--helix-radii-sm));
@@ -51,10 +55,14 @@
   position: relative;
 }
 
+/* Half the leading above the first line and below the last, as a line box
+   holds its glyphs: three lines measured 56 against the 63 of a three-line
+   paragraph, and now take 4.5em, the paragraph's 63. */
 [part="lines"] {
   display: flex;
   flex-direction: column;
   gap: calc((var(--helix-leading-normal) - 1) * 1em);
+  padding-block: calc((var(--helix-leading-normal) - 1) * 0.5em);
 }
 
 [part~="line"] {
@@ -146,6 +154,11 @@
 :host(:state(wrapping)) [part="content"],
 :host(:not(:defined):not(:empty)) [part="content"] {
   display: block;
+}
+
+/* Around a block, the line, as the block takes alone. */
+:host(:state(wrapping-block)) {
+  inline-size: 100%;
 }
 
 :host(:state(wrapping)) [part="skeleton"],

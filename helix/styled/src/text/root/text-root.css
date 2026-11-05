@@ -82,13 +82,19 @@
 
 :host([scale="body-strong"]),
 :host(:not([scale])[as="h5"]),
-:host(:not([scale])[as="h6"]),
-:host(:not([scale])[as="strong"]) {
+:host(:not([scale])[as="h6"]) {
   font-family: var(--text-font-family, var(--helix-font-sans));
   font-size: var(--text-font-size, var(--helix-text-md));
   font-weight: var(--text-font-weight, var(--helix-weight-medium));
   letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
   line-height: var(--text-line-height, var(--helix-leading-normal));
+}
+
+/* Bold inside a run of text, and only bolder: the size, face, and leading are
+   the text's own. It took `body-strong` whole, so a bold lead-in in an 18px
+   paragraph was set at 14px, smaller than the words it introduced. */
+:host(:not([scale])[as="strong"]) {
+  font-weight: var(--text-font-weight, var(--helix-weight-semibold));
 }
 
 :host([scale="caption"]) {

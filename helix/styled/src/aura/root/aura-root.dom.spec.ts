@@ -424,7 +424,7 @@ describe('aura', () => {
          took: the canvas is simply never painted, and a canvas that never
          paints is transparent. */
       expect(host.shadowRoot?.querySelector('canvas')?.hasAttribute('hidden')).toBe(false)
-      expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
+      expect(getComputedStyle(host, '::before').backgroundImage).toContain('radial-gradient')
       expect(await framesBooked(4)).toBe(0)
       expect(hasState(host, 'fallback')).toBe(true)
     })
@@ -446,7 +446,7 @@ describe('aura', () => {
       expect(carried.outlineColor).toBe('rgb(4, 5, 6)')
       expect(carried.columnRuleColor).toBe('rgb(7, 8, 9)')
       expect(carried.caretColor).toBe('rgb(7, 8, 9)')
-      expect(getComputedStyle(host).backgroundImage).toContain('rgb(1, 2, 3)')
+      expect(getComputedStyle(host, '::before').backgroundImage).toContain('rgb(1, 2, 3)')
     })
 
     test('a press on the content reaches it, and the bare field passes it through', async () => {
@@ -580,7 +580,7 @@ describe('aura', () => {
       expect(reasons).toEqual(['lost'])
       /* The fallback is the host's own gradient, and what it needs is nothing
          in front of it: a lost canvas is not reliably transparent. */
-      expect(getComputedStyle(host).backgroundImage).toContain('radial-gradient')
+      expect(getComputedStyle(host, '::before').backgroundImage).toContain('radial-gradient')
       expect(canvas.checkVisibility()).toBe(false)
 
       /* Given back only because the element canceled the loss: `restoreContext`

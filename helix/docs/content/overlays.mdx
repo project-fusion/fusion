@@ -134,6 +134,44 @@ The pointer can move onto a tooltip's bubble and the bubble stays, so a reader
 can read it under a magnifier. Set `hoverable="false"` to hide it once the
 pointer reaches it.
 
+## Order a dialog's actions
+
+Put a dialog's actions in its `footer` slot. The action that dismisses the
+dialog, such as Cancel, Close, Keep, or Not now, comes first. The primary action
+comes last, at the trailing edge. `Dialog` aligns its footer to the end of the
+line. The same order applies to an alert dialog and to a `Drawer`.
+
+**Write the actions in the order they are drawn.** A screen reader reads them
+in source order, and `Tab` moves through them in source order, so the markup
+has to match the screen. Do not reorder them with `row-reverse` or `order`.
+When the actions stack at a narrow width, keep the same order, so the primary
+action is at the bottom, nearest your thumb.
+
+```html
+<helix-button-group
+  label="Dialog actions"
+  layout="spaced"
+  slot="footer"
+>
+  <helix-button
+    autofocus
+    command="--close"
+    commandfor="confirm"
+  >Cancel</helix-button>
+  <helix-button
+    command="--close"
+    commandfor="confirm"
+    emphasis="solid"
+    tone="danger"
+  >Delete project</helix-button>
+</helix-button-group>
+```
+
+**In a confirmation before a destructive action**, such as a deletion, focus
+starts on the action that destroys nothing. Put `autofocus` on that action, as
+the Cancel button above carries it. Without it, opening the dialog moves
+focus to the dialog itself, and the first `Tab` reaches the first control.
+
 ## Keep an overlay open
 
 An overlay sends `helix-before-close` before it closes. Cancel the event to keep

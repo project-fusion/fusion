@@ -47,6 +47,12 @@
       "helix-development": "./dist/helix-element/react-audit.js",
       "default": "./dist/helix-element/react-audit-off.js"
     },
+    "./audits/seed": {
+      "types": "./dist/utils/audit-seed/audit-seed.d.ts",
+      "development": "./dist/utils/audit-seed/audit-seed.js",
+      "helix-development": "./dist/utils/audit-seed/audit-seed.js",
+      "default": "./dist/utils/audit-seed/audit-seed-off.js"
+    },
     "./audits/served": {
       "types": "./dist/utils/audit-served/audit-served.d.ts",
       "development": "./dist/utils/audit-served/audit-served.js",
@@ -111,6 +117,11 @@
       "development": "./src/utils/audit-number/audit-number.ts",
       "helix-development": "./src/utils/audit-number/audit-number.ts",
       "default": "./src/utils/audit-number/audit-number-off.ts"
+    },
+    "#audit-seed": {
+      "development": "./src/utils/audit-seed/audit-seed.ts",
+      "helix-development": "./src/utils/audit-seed/audit-seed.ts",
+      "default": "./src/utils/audit-seed/audit-seed-off.ts"
     },
     "#audit-served": {
       "development": "./src/utils/audit-served/audit-served.ts",

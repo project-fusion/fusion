@@ -47,7 +47,7 @@
   - heading "Every pair Helix solves, checked for contrast" [level=2]
   - paragraph: You enter one brand color, and Helix computes every token from it.
   - figure:
-    - img "How a palette is derived from one color A brand color, a saturation, a density and a radius feed a derivation engine, which emits 179 semantic tokens in both schemes with 67 foreground and ground pairs measured.": What you choose brand saturation density radius AA Aa 4.9:1 measured contrast What comes out 179 semantic tokens both schemes 67 pairs measured
+    - img "How a palette is derived from one color A brand color, a saturation, a density and a radius feed a derivation engine, which emits 45 color tokens in both schemes with 123 foreground and ground pairs measured.": What you choose brand saturation density radius AA Aa 4.9:1 measured contrast What comes out 45 color tokens both schemes 123 pairs measured
   - paragraph: Components
   - heading "The panel runs in your browser" [level=2]
   - paragraph: Each control in it is a custom element from the Helix package.

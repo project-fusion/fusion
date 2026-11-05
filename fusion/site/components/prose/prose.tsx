@@ -157,7 +157,15 @@ export const PROSE_COMPONENTS = {
   img: ({ alt, src }: { alt?: string; src?: string }) => (
     <helix-image alt={alt ?? ''} src={src ?? ''}></helix-image>
   ),
-  li: ({ children }: { children?: ReactNode }) => <helix-list-item>{children}</helix-list-item>,
+  /* **The words in a span, so a page can size them.** The row sets its label at
+     `text-sm` inside its shadow root, so a size on the host stops there and a bare
+     text node has nothing a page rule can reach. A docs page and a document set
+     the span at the paragraph's size. */
+  li: ({ children }: { children?: ReactNode }) => (
+    <helix-list-item>
+      <span data-item-text>{children}</span>
+    </helix-list-item>
+  ),
   ol: ({ children }: { children?: ReactNode }) => (
     <helix-list kind="ordered">{children}</helix-list>
   ),

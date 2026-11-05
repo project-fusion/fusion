@@ -82,6 +82,16 @@
       "includes": ["**/package.json"]
     },
     {
+      "includes": ["**/dialog/.examples/*.html", "fusion/scripts/eval/tasks/dialog/index.html"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noAutofocus": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["**/.examples/*.tsx"],
       "javascript": {
         "formatter": {

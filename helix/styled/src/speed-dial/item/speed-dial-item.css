@@ -66,6 +66,24 @@
   box-shadow: var(--helix-shadow-lg);
 }
 
+/* **An action that destroys something says so in its ink**, on the mark and
+   on its name, with a wash of the danger under the pointer, as Menu Item's
+   danger row does. Delete drew in the same ink as Share. */
+:host([tone="danger"]) [part="icon"] {
+  color: var(--speed-dial-item-color, var(--helix-color-danger));
+}
+
+:host([tone="danger"]) [part="label"] {
+  color: var(--speed-dial-label-color, var(--helix-color-danger));
+}
+
+:host([tone="danger"]) [part="item"]:not(:disabled):hover [part="icon"] {
+  background-color: var(
+    --speed-dial-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-danger) 12%, var(--helix-color-surface-overlay))
+  );
+}
+
 /* One ring, and on the mark. The control is the whole row, so the user agent
    draws its ring around the name and the mark together, and the mark carries a
    ring of its own: two indicators saying one thing, and the outer one boxes a

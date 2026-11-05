@@ -1,5 +1,6 @@
 import { type CSSResultOrNative, LitElement, type PropertyValues, unsafeCSS } from 'lit'
 import type { StaticValue } from 'lit/static-html.js'
+import { auditSeed } from '#audit-seed'
 import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
 import { exposeStateIfAsked } from '../utils/state/state.js'
@@ -609,6 +610,7 @@ export class HelixElement extends LitElement {
     /* Counted where a page asked to count, and a null check where it did not:
        see `reportUsage`. */
     reportUsage(this)
+    auditSeed()
     /* Made in `willUpdate`, unless the render was hydrating a server's or a
        subclass skipped `super.willUpdate`. See `applyReactProperties`. */
     const applied = this.reactApplied ?? applyReactProperties(this)

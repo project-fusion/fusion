@@ -21,6 +21,7 @@ export function Example() {
         slot="footer"
       >
         <helix-button
+          autofocus
           command="--close"
           commandfor="delete-project"
         >

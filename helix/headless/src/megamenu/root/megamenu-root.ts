@@ -15,8 +15,10 @@ import {
   timeConverter,
   untilReactHydrated,
 } from '@fusion.dev/helix-core'
+import { caretDown } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HandOver, type Motion } from '../hand-over.js'
 
 /**
@@ -102,6 +104,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @csspart indicator - The `indicator` slot, rendered while the panel is open.
  * @csspart surface - The floating panel that opens.
  * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.
+ * @csspart trigger-indicator - The caret on the default trigger, turned while the panel is open.
  *
  * @cssproperty --megamenu-from-block-size - The height of the panel this one took over from, written on the surface while it is open.
  * @cssproperty --megamenu-from-inline-size - The width of the panel this one took over from, written on the surface while it is open.
@@ -808,6 +811,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
         aria-expanded=${this.open ? 'true' : 'false'}
       >
         ${this.label}
+        <svg part="trigger-indicator" fill="currentColor" width="1em" height="1em" viewBox=${caretDown.viewBox} aria-hidden="true">${unsafeSVG(caretDown.content)}</svg>
       </button>
     </slot>`
   }

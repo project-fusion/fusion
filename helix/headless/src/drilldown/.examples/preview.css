@@ -14,7 +14,11 @@
   --_radius-panel: 0.75rem;
 }
 
+/* Framed by the page, as the styled preview is: an edge and a surface's
+   corner around the panel. */
 .panel {
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
   max-inline-size: 18rem;
 }
 

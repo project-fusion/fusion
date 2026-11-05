@@ -1,10 +1,9 @@
 /*
- * *It wraps, because a list of links can and a row of them ran out of room.**
- *
- * Measured at 320: the control came to 24 past the page. It already windows the
- * run, `siblings` and `boundaries` deciding how many slots there are and a gap
- * standing over what is hidden, so there is no missing setting here; the
- * default simply asks for one slot more than a 272px row holds.
+ * *It wraps, as the last resort.** Where its own width cannot hold the full row,
+ * the control folds into its compact form, back arrow, "Page 4 of 12", forward
+ * arrow, which the headless tier decides by measuring. Wrapping is left for a
+ * row that does not fit even folded, such as one with `ends` in a very narrow
+ * column, so nothing runs past the page.
  */
 :host {
   align-items: center;
@@ -266,4 +265,25 @@
 [part="previous"]:active,
 [part="next"]:active {
   background-color: var(--helix-color-press);
+}
+
+/* Pages sit against each other, so a box past one would take the press from the
+   one beside it. On a touch screen each grows to the target instead, and the list
+   scrolls where a phone has no room. */
+@media (pointer: coarse) {
+  [part="first"],
+  [part="gap"],
+  [part="last"],
+  [part~="page"],
+  [part="previous"],
+  [part="next"] {
+    block-size: max(
+      var(--pagination-size, var(--helix-size-control-tight)),
+      var(--helix-size-target)
+    );
+    min-inline-size: max(
+      var(--pagination-size, var(--helix-size-control-tight)),
+      var(--helix-size-target)
+    );
+  }
 }

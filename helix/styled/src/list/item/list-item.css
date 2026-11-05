@@ -143,6 +143,32 @@ slot[name="end"]::slotted(*) {
   text-decoration: none;
 }
 
+/* A row that goes somewhere answers the pointer and the keyboard as every other
+   row family's does. It had neither: no wash under the pointer or the press, and
+   the browser's own blue ring around the link on focus. The ring goes on the
+   row, inside it, so the next row cannot cover it. */
+@media (hover: hover) {
+  [part~="row"]:has([part="link"]):hover {
+    background-color: var(--list-item-hover-background-color, var(--helix-color-hover));
+    border-radius: var(--helix-radii-sm);
+  }
+}
+
+[part~="row"]:has([part="link"]):active {
+  background-color: var(--helix-color-press);
+  border-radius: var(--helix-radii-sm);
+}
+
+[part="link"]:focus-visible {
+  outline: none;
+}
+
+[part~="row"]:has([part="link"]:focus-visible) {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
 /* The row a reader is on, which `current` marks. */
 [part~="row-current"] {
   background-color: var(--list-item-current-background-color, var(--helix-color-well));

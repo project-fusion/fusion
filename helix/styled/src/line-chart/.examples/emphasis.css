@@ -6,14 +6,17 @@
  * the same thing read as two unrelated things at that distance, and a red one
  * reads as a warning besides, which p95 latency is not on its own.
  *
- * The green is the palette's own, `--helix-color-series-3`, not a color picked
- * for the example: a chart borrowing an ink from outside the series ramp is the
- * one thing a series ramp exists to prevent, and it would drift the moment the
- * brand seed moves. Reassigning within the ramp keeps every contrast the ramp
- * was solved for.
+ * The green is the chart's own third series, `--chart-series-3`, not a color
+ * picked for the example: a chart borrowing an ink from outside the series ramp
+ * is the one thing a series ramp exists to prevent, and it would drift the
+ * moment the brand seed moves. Reassigning within the ramp keeps every contrast
+ * the ramp was solved for. **The chart's slot, not the global token**: a chart
+ * takes the bright eight in light and the balanced eight in dark, and the
+ * global `--helix-color-series-3` is the bright one in both, so in dark the
+ * area under this line painted a neon rgb(0, 254, 222).
  *
  * On the chart rather than a wrapper, because what is being shown is four
  * weights of one chart and a container class would suggest the grouping matters. */
 helix-line-chart {
-  --chart-series-2: var(--helix-color-series-3);
+  --chart-series-2: var(--chart-series-3);
 }

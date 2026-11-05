@@ -47,7 +47,12 @@
 /* Sized against the avatar rather than per size, so one rule covers every size
    including a custom `--avatar-size`. */
 [part="initials"] {
-  font-size: calc(var(--_avatar-size) * 0.4);
+  /* A proportion, floored at the smallest text the library sets, where the disc
+     holds two letters at that size. */
+  font-size: max(
+    calc(var(--_avatar-size) * 0.4),
+    min(var(--helix-text-xs), calc(var(--_avatar-size) * 0.5))
+  );
   font-weight: var(--avatar-font-weight, var(--helix-weight-medium));
   letter-spacing: var(--helix-tracking-wide);
   line-height: 1;

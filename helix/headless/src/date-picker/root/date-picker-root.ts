@@ -745,7 +745,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     this.previewed = ''
     this.show(date)
     this.updateComplete.then(() => {
-      this.renderRoot.querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')?.focus()
+      /* Date Input calls this as its panel opens, before the panel is placed. */
+      this.renderRoot
+        .querySelector<HTMLElement>('[part~="cell"][tabindex="0"]')
+        ?.focus({ preventScroll: true })
     })
   }
 

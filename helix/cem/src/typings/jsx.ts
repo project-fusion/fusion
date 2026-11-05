@@ -320,6 +320,8 @@ type FrameworkStyle<F extends Framework> = F extends "react"
 type BaseProps<T extends HTMLElement, F extends Framework = "other"> = {
   /** Skips the hydration check for an element whose DOM is written by something other than React, which a custom element writing its own state attributes is. React takes it, and no other framework does. */
   suppressHydrationWarning?: (F extends "react" ? boolean : never) | undefined;
+  /** Focuses the element when the modal dialog or popover holding it opens, such as the action that destroys nothing in a confirmation. */
+  autofocus?: boolean | undefined;
   /** Content added between the opening and closing tags of the element */
   children?: any;
   /** Used for declaratively styling one or more elements using CSS (Cascading Stylesheets) */

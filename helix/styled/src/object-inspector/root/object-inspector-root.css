@@ -1,6 +1,7 @@
 /* Code Block's frame, because a value is code a reader happens to be able to
    fold: the same ground, edge and corner, the name in a bar over it, and the
-   copy button in the corner of the code. */
+   copy button at the end of that bar, or in the corner of the code where
+   there is no bar. */
 :host {
   display: flex;
   flex-direction: column;
@@ -36,6 +37,9 @@
 }
 
 [part="tree"] {
+  /* Left to right whatever the page does, as Code Block's note gives. */
+  direction: ltr;
+  unicode-bidi: isolate;
   background-color: var(--object-inspector-background-color, var(--helix-color-background));
   border: var(--helix-border-thin) solid
     var(--object-inspector-border-color, var(--helix-color-border));
@@ -133,6 +137,7 @@
 
 /* The row the keys are on holds focus, so the ring is the row's own. */
 [part~="row"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -157,13 +162,17 @@
    string, a number and a null read as three different things at a glance. The
    text itself says the same thing for a reader who cannot see the color: a
    string keeps its quotes and a null is spelled. */
+/* **The tag ink, the one a name in markup takes**, as GitHub draws a JSON key.
+   The name ink is a blue beside the string's blue, #0550ae against #0a3069
+   before the lift to one lightness, so a key and its string value read as one
+   color. */
 [part="key"] {
-  color: var(--helix-color-syntax-name);
+  color: var(--helix-color-syntax-tag);
 }
 
 /* A key on a matched row takes the foreground ink. In the default theme the
-   name ink measures 4.27:1 on the match ground, under the 4.5:1 that text
-   needs. */
+   name ink measured 4.27:1 on the match ground, under the 4.5:1 that text
+   needs, and the syntax inks are not solved against that ground. */
 [part~="row-match"] [part="key"] {
   color: var(--helix-color-foreground);
 }
@@ -196,6 +205,22 @@
   inset-block-start: var(--helix-space-2xs);
   inset-inline-end: var(--helix-space-2xs);
   position: absolute;
+}
+
+/* **In the header, at the end of the bar and at Code Block's size there.**
+   Beside the tree under a header, the button floated in the body below the
+   bar that names what it copies. The bar trades its inset for the button's,
+   as Code Block's does. */
+[part="header"]:has(> [part="copy"]) {
+  padding-block: var(--helix-space-2xs);
+  padding-inline-end: var(--helix-space-2xs);
+}
+
+[part="header"] > [part="copy"] {
+  --copy-button-icon-size: var(--helix-size-icon-sm);
+  --icon-button-size: var(--helix-size-control-sm);
+  margin-inline-start: auto;
+  position: static;
 }
 
 /* Rows sit against each other, so a box reaching past a row would take the press

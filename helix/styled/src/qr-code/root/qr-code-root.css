@@ -12,6 +12,15 @@
   position: relative;
 }
 
+/* **No paper under no code.** The light ground is the quiet zone a scanner
+   needs around the modules, and with no value there are no modules: in dark
+   mode an empty code was a 192px white slab on a black page. Empty, the
+   square keeps its size and takes the ground it sits on. A value too long for
+   a code keeps the paper, since its fallback is set in the code's ink. */
+:host(:state(empty)) {
+  background-color: var(--qr-code-background-color, transparent);
+}
+
 [part="code"] {
   block-size: 100%;
   display: block;

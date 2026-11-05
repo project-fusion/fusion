@@ -116,8 +116,10 @@ slot[name="end"]::slotted(*) {
 [part="increment"] svg,
 slot[name="decrement-icon"]::slotted(*),
 slot[name="increment-icon"]::slotted(*) {
-  block-size: var(--number-input-stepper-icon-size, var(--helix-size-icon));
-  inline-size: var(--number-input-stepper-icon-size, var(--helix-size-icon));
+  /* The step every field's indicator takes, so the marks match a Select's
+     caret beside them: 20 against 16 at `md` before. */
+  block-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
+  inline-size: var(--number-input-stepper-icon-size, var(--helix-size-icon-tight));
 }
 
 /*

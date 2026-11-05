@@ -52,6 +52,9 @@
 
 /* The unfilled marks, which are also the ones that give the row its size. */
 [part="track"] {
+  /* `subtle` in full, because the empty marks are how a reader counts the
+     scale, and a graphic needs 3:1. At half strength they measured about 1.6:1
+     on a dark page. */
   color: var(--rating-empty-color, var(--helix-color-foreground-subtle));
 }
 
@@ -113,6 +116,10 @@
   inset-block: 0;
   position: absolute;
 }
+
+/* **No wash under the pointer.** The fill already previews the score the
+   pointer is on, from the first mark to that one, so a box lit behind the
+   hovered mark said the same thing twice and drew a square around a star. */
 
 /*
  *  Each step takes a mark's worth of the row, in order.

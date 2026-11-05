@@ -13,7 +13,9 @@
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
-  /* `lg`: a container corner rather than the `sm` the controls inside it take. */
+  /* `md`: a container corner rather than the `sm` the controls inside it take.
+     Inside a Dialog, Drawer, or Popover `md` is the panel's own corner, so a
+     card is never rounder than what holds it. */
   border-radius: var(--card-radius, var(--helix-radii-md));
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. */
@@ -52,7 +54,18 @@
    page's own black had a `shadow-md` of `oklab(0.15 0 0 / 0.1)` painted onto
    `lab(0 0 0)`, a shadow darker than its ground*, and no border to fall back on. */
 :host([separation="elevated"]) {
-  --card-shadow: var(--helix-shadow-md);
+  /* A contact ring under the lift in light, so the card has an edge where the
+     soft shadow fades into white: alone, the shadow's darkest pixel was 245 and
+     the edge measured 1.09:1. In dark the hairline below does this. */
+  --card-shadow:
+    0 0 0 var(--helix-border-thin)
+    light-dark(color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), transparent),
+    var(--helix-shadow-md);
+  /* A shadow draws nothing on a black page, so in dark the raised step says it. */
+  background-color: var(
+    --card-background-color,
+    light-dark(var(--helix-color-surface), var(--helix-color-surface-raised))
+  );
   border-color: light-dark(transparent, var(--helix-color-border));
 }
 
@@ -68,7 +81,22 @@
    `ThemeIntent.separation` carries and no component could ask for. */
 :host([separation="filled"]) {
   --card-shadow: none;
+  background-color: var(
+    --card-background-color,
+    var(--_card-nested-fill, var(--helix-color-surface))
+  );
   border-color: transparent;
+}
+
+/* A filled card inside a card has only its fill to show where it ends, and the
+   same fill would leave nothing. The step reaches what is slotted by inheriting
+   from the slot, so a card on the page never sees it. */
+slot {
+  --_card-nested-fill: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 5%,
+    var(--helix-color-surface)
+  );
 }
 
 /* No frame at all, so no lift either: a theme that separates surfaces with a
@@ -143,6 +171,23 @@ slot[name="footer-actions"]::slotted(*) {
   margin-inline-start: auto;
 }
 
+/* **A ghost button's words on the content edge, and its wash in the inset.**
+   A ghost button has no edge to see, so what lines up is its label, and the
+   label sat the button's own inline padding inside the edge every other line
+   of the card starts on: 16 pixels at the default density. Pulled out by that
+   padding on the side it stands against, as other systems align a text
+   button. The button's border stays inside, so the wash on hover stops short
+   of the card's edge. */
+slot[name="footer"]::slotted(helix-button[emphasis="ghost"]),
+slot[name="header-actions"]::slotted(helix-button[emphasis="ghost"]),
+slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
+  margin-inline-end: calc(var(--button-padding-inline, var(--helix-space-control)) * -1);
+}
+
+[part="footer-row"] slot[name="footer"]::slotted(helix-button[emphasis="ghost"]) {
+  margin-inline: calc(var(--button-padding-inline, var(--helix-space-control)) * -1) 0;
+}
+
 /*
  * **Served, the actions stand at the end of their line already.** Before the
  * element is defined there is no row around them, since a server cannot see
@@ -209,7 +254,10 @@ slot[name="footer-actions"]::slotted(*) {
   /* Full ink: muted ink over a busy page falls under 4.5:1 through glass. */
   color: var(--card-color, var(--helix-color-foreground));
   backdrop-filter: var(--card-backdrop, var(--helix-material-backdrop));
-  background-color: var(--card-background-color, var(--helix-material-translucent));
+  /* The coverage a Popover's glass takes. At 30% white a muted line in the card
+     measured 1.24:1 over a photo, and glass meant two coverages depending on
+     which family drew it. Decided by the owner on November 3, 2026. */
+  background-color: var(--card-background-color, var(--helix-material-panel));
 }
 
 /* The same pair turned up. */

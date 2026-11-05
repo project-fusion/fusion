@@ -32,8 +32,12 @@
 
 /* One rule between neighbors rather than one per item, so the seam is a single
    pixel. **Not while each item carries its own frame**, where a seam would be a
-   third line between two borders that a gap has already separated. */
-:host(:not([separation="outlined"])) ::slotted(* + *) {
+   third line between two borders that a gap has already separated.
+
+   `:not(:first-child)` and not `* + *`: `::slotted()` takes one compound
+   selector, so the combinator made the whole rule invalid, the parser dropped
+   it, and no seam was ever drawn. */
+:host(:not([separation="outlined"])) ::slotted(:not(:first-child)) {
   border-block-start: var(--helix-border-thin) solid
     var(--accordion-border-color, var(--helix-color-border));
 }

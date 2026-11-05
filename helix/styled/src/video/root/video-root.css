@@ -9,7 +9,7 @@
      own 0.8s, so two spinners on one page agree, and no rung of the duration
      scale is that long. Privates rather than hooks, because none of the three
      is a thing a consumer is invited to move. */
-  --_video-rail-size: 4px;
+  --_video-rail-size: var(--helix-space-2xs);
   --_video-spin: 0.8s;
   --_video-thumb-size: 12px;
 
@@ -92,6 +92,20 @@
   padding: var(--helix-space-xs) var(--helix-space-sm);
   position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  /* The bar's own width, which its insets set and its content never does, so
+     the controls can ask it how much room they have. The stage cannot be
+     asked, for the reason the start mark gives below. */
+  container-type: inline-size;
+}
+
+/* **The time goes first when the bar is narrow.** At 280 the clock, `0:00 /
+   0:00` at about 60 pixels, stood beside every control in a bar 256 wide, and
+   the scrubber, the one control that has to be long, was squeezed to a stub.
+   The position is still said: the scrubber's value text is the time. */
+@container (inline-size < 20rem) {
+  [part="time"] {
+    display: none;
+  }
 }
 
 /* A bar with a ground of its own, for a video embedded in a document rather
@@ -217,6 +231,10 @@ slot[name$="-icon"]::slotted(*) {
 [part="volume"] {
   appearance: none;
   border-radius: var(--helix-radii-full);
+  /* The bar's ink, which the rail and the thumb paint from. WebKit's own sheet
+     gives a range a gray of its own, so the thumb drew #909090 there against
+     white in Chromium. */
+  color: inherit;
   cursor: pointer;
   margin: var(--helix-space-none);
 }

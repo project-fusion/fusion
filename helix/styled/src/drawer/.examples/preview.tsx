@@ -11,6 +11,7 @@ export function Example() {
       </helix-button>
 
       <helix-drawer
+        dismissible
         id="panel"
         label="Project details"
         placement="end"

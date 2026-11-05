@@ -142,6 +142,19 @@ slot[name="icon"]::slotted(*) {
   margin-block-start: var(--helix-space-xs);
 }
 
+/* **An outlined button takes an edge that reads on the toast.** The toast is
+   the inverse of the page, so on a light page it is the dark overlay surface,
+   where `color-border` is 1.10:1 and a Retry button's edge all but went.
+   5% of the foreground into it is 1.23:1 there, the edge a field has on the
+   page. A light toast keeps the border as it is, already 1.23:1 on white. A
+   button with a tone keeps its tone's edge, and the other emphases draw none. */
+[part="actions"] slot::slotted(helix-button:not([tone])) {
+  --button-border-color: light-dark(
+    var(--helix-color-border),
+    color-mix(in oklab, var(--helix-color-border) 95%, var(--helix-color-foreground))
+  );
+}
+
 /* Color on the mark rather than a fill behind the words. */
 :host([tone="info"]) {
   --_toast-severity: var(--helix-color-primary);
@@ -201,6 +214,14 @@ slot[name="icon"]::slotted(*) {
    foreground rather than taken from `surface-sunken`. */
 [part="dismiss"]:hover {
   background-color: var(--helix-color-hover);
+  color: var(--helix-color-foreground);
+}
+
+/* A press, the wash a tab or a menu item takes under one: 16% in light and 20% in
+   dark, against the hover's 8% and 12%. It drew the hover's wash before, so a
+   tap on a phone, where no hover comes first, showed nothing distinct. */
+[part="dismiss"]:active {
+  background-color: var(--helix-color-press);
   color: var(--helix-color-foreground);
 }
 
@@ -277,6 +298,26 @@ slot[name="icon"]::slotted(*) {
     /* `backwards`, so the `from` state holds through any delay a consumer sets
        on `::part(item)`. */
     animation: helix-toast-in var(--helix-duration-normal) var(--helix-easing-decelerate) backwards;
+  }
+
+  /* **And it makes room as it arrives**, the same row collapse its leaving
+     runs, in reverse. Only the new message moved: the ones already showing
+     jumped 53 pixels in one frame to make room for it. */
+  :host(:not([data-closed])) [part="item"] {
+    transition: padding-block var(--helix-duration-normal) var(--helix-easing-decelerate);
+  }
+
+  /* After the rules it starts, which share their specificity, or source order
+     hands the arriving frame to them. */
+  @starting-style {
+    :host {
+      grid-template-rows: minmax(0, 0fr);
+      margin-block-start: 0;
+    }
+
+    :host(:not([data-closed])) [part="item"] {
+      padding-block: 0;
+    }
   }
 }
 

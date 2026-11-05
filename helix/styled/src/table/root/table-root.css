@@ -167,8 +167,13 @@
   grid-column: 1 / -1;
 }
 
-/* Rows that are already there stay, and dim, while a new set arrives. */
-:host([loading]) [part="table"] {
+/* Rows that are already there stay, and dim, while a new set arrives.
+   **The rows, not the box they are in.** The line that says "Loading" is in
+   the same box, and an opacity on the box cannot be undone inside it: the
+   message that explains the wait measured 2.2:1. A slot draws no box, so the
+   rows it holds are dimmed through `::slotted`. */
+:host([loading]) [part="table"] > :not([part~="loading"], [part~="empty"], [part~="error"]),
+:host([loading]) ::slotted(:not([slot])) {
   opacity: var(--helix-opacity-busy);
 }
 
@@ -185,8 +190,12 @@
   opacity: var(--table-drag-preview-opacity, 0.9);
 }
 
-/* The message spans the columns, as Data Table's does. */
-[part="empty"] {
+/* Each message spans the columns, as Data Table's do. Only the empty one did:
+   the loading and error lines sat in the first column, 370 of 836 pixels,
+   centered on a point a third of the way across. */
+[part="empty"],
+[part="loading"],
+[part="error"] {
   grid-column: 1 / -1;
 }
 

@@ -66,13 +66,14 @@ export function SiteMenu({
 
   return (
     <helix-drawer
+      dismissible
       label="Site navigation"
-      material="glass"
       onhelix-before-close={() => onOpenChange(false)}
       onhelix-before-open={() => onOpenChange(true)}
       open={open}
       placement={placement}
     >
+      <span slot="header">Menu</span>
       <div className={styles.navMenu}>
         {/*
          *  A tree, because the depth is real. A flat list of four destinations
@@ -507,7 +508,7 @@ export function SiteNav({
             workbench renders too. Hidden on a narrow screen, where there is no
             keyboard to press the shortcut with and the drawer is the way
             through. */}
-        <div className={styles.wideOnly} slot="end">
+        <div slot="end">
           <SiteFind findable={findable} />
         </div>
 

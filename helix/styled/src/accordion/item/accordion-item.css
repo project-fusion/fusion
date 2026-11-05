@@ -21,7 +21,8 @@
   min-block-size: var(--helix-size-control);
   padding: var(
     --accordion-item-padding,
-    calc(var(--helix-space-control) * 0.5) var(--helix-space-md)
+    min(calc(var(--helix-space-control) * 0.5), calc((var(--helix-size-control) - 1lh) / 2))
+      var(--helix-space-md)
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -29,20 +30,20 @@
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
    substitution. */
 [part="chevron"] {
-  block-size: 1em;
-  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-subtle));
+  block-size: var(--helix-size-icon-tight);
+  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
-  inline-size: 1em;
+  inline-size: var(--helix-size-icon-tight);
   transform: scaleY(1);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* An icon slotted in its place is sized, colored and turned the same way. */
 ::slotted([slot="chevron"]) {
-  block-size: 1em;
-  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-subtle));
+  block-size: var(--helix-size-icon-tight);
+  color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
-  inline-size: 1em;
+  inline-size: var(--helix-size-icon-tight);
   transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -57,9 +58,13 @@
   transform: scaleY(-1);
 }
 
-/* No fill on hover, unless a page asks for one. */
+/* **The row's hover wash**, 8% in light and 12% in dark, as a menu row, a tree
+   row and a tab take, and a step under the 16% and 20% the press below draws.
+   With no fill the hover moved only the chevron's ink, 0.04% of the row's
+   pixels, so a pointer over a heading showed nothing a reader could see. The
+   hook still sets one of a page's own, `transparent` included. */
 [part="trigger"]:hover:not(:disabled) {
-  background-color: var(--accordion-item-hover-background-color, transparent);
+  background-color: var(--accordion-item-hover-background-color, var(--helix-color-hover));
 }
 
 [part="trigger"]:hover:not(:disabled) [part="chevron"],
@@ -75,6 +80,7 @@
 /* Inset, because the trigger runs to the item's edge and an outset ring would be
    clipped by the accordion's `overflow: hidden`. */
 [part="trigger"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -119,10 +125,9 @@
 
    A margin on top of the padding rather than a second padding, so a consumer's
    `--accordion-item-padding` still moves the heading and the body together. The
-   gutter is the chevron and the gap beside it, in the heading's own size: the
-   chevron is `1em` of the trigger, whose type is `text-md`. */
+   gutter is the chevron and the gap beside it. */
 :host([chevron-placement="start"]) [part="content-inner"] > slot {
-  margin-inline-start: calc(var(--helix-text-md) + var(--helix-space-xs));
+  margin-inline-start: calc(var(--helix-size-icon-tight) + var(--helix-space-xs));
 }
 
 [part="trigger"]:active:not(:disabled) {

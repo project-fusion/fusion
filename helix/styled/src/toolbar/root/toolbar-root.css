@@ -10,13 +10,13 @@
    step resolves where it is declared. */
 :host([size="md"]) {
   --helix-size-checkbox: var(--helix-size-checkbox-md);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
+  --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-md);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
   --helix-size-control: var(--helix-size-control-md);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-switch: var(--helix-size-switch-md);
   --helix-text-control: var(--helix-text-control-md);
@@ -30,13 +30,13 @@
 
 :host([size="lg"]) {
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
+  --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-lg);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
   --helix-size-control: var(--helix-size-control-lg);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-switch: var(--helix-size-switch-lg);
   --helix-text-control: var(--helix-text-control-lg);
@@ -92,8 +92,12 @@
   margin-inline: 0;
 }
 
-/* A control wider than the toolbar cuts its label, so the row stays inside it. */
+/* A control wider than the toolbar cuts its label, so the row stays inside it.
+   And it fills a host given more room than its controls take, so a growing
+   field in it has that room to grow into: in a 1000 pixel host the row held to
+   489 and wrapped its last button onto a second line. */
 [part="toolbar"] {
+  flex: 1 1 auto;
   max-inline-size: 100%;
   min-inline-size: 0;
 }

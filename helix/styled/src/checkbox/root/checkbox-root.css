@@ -12,7 +12,8 @@
 /* The row is the label, so the whole of it is the target the browser forwards to
    the box. */
 [part="field"] {
-  align-items: center;
+  /* The box stays beside the first line of a label that wraps. */
+  align-items: start;
   cursor: pointer;
   display: inline-flex;
   gap: var(--helix-space-xs);
@@ -20,7 +21,7 @@
 
 /* `:host(:disabled)`, not `:host([disabled])`. */
 :host(:disabled) [part="field"] {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 :host(:disabled) {
@@ -64,15 +65,15 @@
 
 /* Monotone, for the reason under the checked rule: a box that turns brand-blue
    under a pointer says "recommended" about whichever one it happens to be over. */
-:host(:not(:disabled)) [part="field"]:hover [part="control"] {
+:host(:not(:disabled, [readonly])) [part="field"]:hover [part="control"] {
   border-color: var(--checkbox-border-color, var(--helix-color-foreground));
 }
 
-:host(:not(:disabled)) [part="field"]:hover [part="control"] {
+:host(:not(:disabled, [readonly])) [part="field"]:hover [part="control"] {
   background-color: var(--helix-color-hover);
 }
 
-:host(:not(:disabled)) [part="field"]:active [part="control"] {
+:host(:not(:disabled, [readonly])) [part="field"]:active [part="control"] {
   background-color: var(--helix-color-press);
 }
 
@@ -84,6 +85,25 @@
     --checkbox-border-color,
     var(--checkbox-checked-color, var(--helix-color-foreground))
   );
+}
+
+/* **Read-only, and the box says so with its edge.** A read-only field keeps
+   its edge and loses its fill, flush with its ground. A box has no fill to
+   lose, so its edge steps down to the one a field is drawn with,
+   `color-border`: 1.23:1 on the page, from the mark ink's 3.95:1, or the
+   foreground's when ticked. The tick and the dash keep their ink, being the
+   value. No pointer cursor, and no wash under a pointer or a press, which the
+   box refuses. It looked exactly like a box that takes a press. After the
+   checked rule, which it outranks by order, and before the invalid rule,
+   whose red edge still wins. */
+:host([readonly]) [part="field"] {
+  cursor: default;
+}
+
+:host([readonly]:not(:state(checked), :state(indeterminate))) [part="control"] {
+  /* Empty only: a ticked box's edge is its fill's own, and the field edge drew
+     a pale rim around it. */
+  border-color: var(--checkbox-border-color, var(--helix-color-border));
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours. */
@@ -207,7 +227,8 @@ slot[name="dash"]::slotted(*) {
    sheet read the other way round: a card inside a disabled fieldset carries no
    attribute, so the attribute form let it light up under a pointer that could
    not press it. */
-:host(:not(:disabled):is([separation="filled"], [separation="outlined"])) [part="field"]:hover {
+:host(:not(:disabled, [readonly]):is([separation="filled"], [separation="outlined"]))
+  [part="field"]:hover {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -300,4 +321,9 @@ slot[name="dash"]::slotted(*) {
   :host(:state(indeterminate)) [part="control"] {
     border-color: Highlight;
   }
+}
+
+/* The label's first line centered on the box, which is taller than a line. */
+:host(:not([separation])) [part="label"] {
+  padding-block-start: max(0px, calc((var(--helix-size-checkbox) - 1lh) / 2));
 }

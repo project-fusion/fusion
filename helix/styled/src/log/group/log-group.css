@@ -37,6 +37,15 @@
   color: var(--helix-color-foreground);
 }
 
+/* A press, the wash a tree row or a menu item takes under one: 16% in light
+   and 20% in dark, against the hover's 8% and 12%. It drew the hover's wash
+   before, so a tap on a phone, where no hover comes first, showed nothing
+   distinct. */
+[part="summary"]:active {
+  background-color: var(--helix-color-press);
+  color: var(--helix-color-foreground);
+}
+
 [part="summary"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);

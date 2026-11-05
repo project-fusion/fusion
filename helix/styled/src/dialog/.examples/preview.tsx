@@ -29,18 +29,19 @@ export function Example() {
           slot="footer"
         >
           <helix-button
+            autofocus
+            command="--close"
+            commandfor="confirm"
+          >
+            Cancel
+          </helix-button>
+          <helix-button
             command="--close"
             commandfor="confirm"
             emphasis="solid"
             tone="danger"
           >
             Delete project
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="confirm"
-          >
-            Cancel
           </helix-button>
         </helix-button-group>
       </helix-dialog>

@@ -11,7 +11,7 @@
  * `:root`, and every token follows it.
  *
  * **Color appears in two places, and both are named.** Each tile's icon takes
- * `--helix-color-primary` on `--helix-color-primary-subtle`, and a chosen row
+ * `--helix-color-brand-mark` on `--helix-color-primary-subtle`, and a chosen row
  * takes `--helix-color-primary-subtle` through the parts the table publishes.
  * Everywhere else the page is the foreground on the background, and the
  * components carry their own color.
@@ -140,7 +140,26 @@ helix-app-header {
    and faded out behind the words so they keep their contrast: it is at full
    strength only behind the card, which is below the words in one column and
    beside them in two. */
+/*
+ * **On a light page the light is drawn bright on a tint.** By default an aura
+ * ramps from the page up to `primary`, which in dark is light on black. In light
+ * that ramp runs from white to a dark color, and with no brand it drew a gray
+ * smoke behind the card: at 390 the muted stat labels sat on #cccccc at 3.7:1.
+ * Turned around, it runs from `primary-subtle` up to the page's own white, so
+ * the strands read as light and a brand still tints them. The stat labels
+ * measure 5.7:1 or more against the darkest pixel behind them, at 390 and 1440,
+ * with no brand and with a violet or a yellow one. The second half of each pair
+ * is the aura's own default, so dark is unchanged.
+ */
 .first-light {
+  --aura-ground: light-dark(var(--helix-color-primary-subtle), var(--helix-color-background));
+  --aura-glow: light-dark(var(--helix-color-background), var(--helix-color-primary));
+  --aura-haze: light-dark(
+    color-mix(in oklab, var(--helix-color-primary-subtle), var(--helix-color-background)),
+    var(--helix-color-primary-subtle)
+  );
+  --aura-peak: light-dark(var(--helix-color-background), var(--helix-color-foreground));
+
   block-size: auto;
   inset: 0;
   mask-image: linear-gradient(to bottom, transparent 40%, black 80%);
@@ -224,12 +243,14 @@ helix-app-header {
   block-size: 100%;
 }
 
-/* Each tile's icon, on a tint of the brand. */
+/* Each tile's icon, on a tint of the brand. The icon is a graphic, so it takes
+   `brand-mark`, the brand as a graphic: a graphic needs 3:1 where text needs
+   4.5:1, so a theme can set it nearer the color you chose than `primary`. */
 .feature-mark {
   --icon-size: 1.25rem;
   background-color: var(--helix-color-primary-subtle);
   border-radius: var(--helix-radii-md);
-  color: var(--helix-color-primary);
+  color: var(--helix-color-brand-mark);
   display: inline-flex;
   inline-size: fit-content;
   padding: var(--helix-space-xs);
@@ -310,6 +331,30 @@ helix-app-header {
   display: flex;
   flex-wrap: wrap;
   gap: var(--helix-space-md);
+  /* Wide enough on a touch screen for the press areas below to meet without
+     overlapping, where the links wrap onto a second row. */
+  row-gap: max(var(--helix-space-md), calc(var(--helix-size-target) - 1lh));
+}
+
+/*
+ * **A link reaches the touch target in a transparent box**, as Helix's own row
+ * of destinations does, so nothing drawn moves. On a 390 phone the wordmark and
+ * the footer links were 21 pixels tall and "React" 37 wide, against a 44-pixel
+ * target. The box grows only on the axis the link is short on, into the bar's
+ * padding and the gap between links, and `--helix-size-target` is 44 only on a
+ * coarse pointer.
+ */
+.wordmark,
+.footer-links a {
+  position: relative;
+}
+
+.wordmark::after,
+.footer-links a::after {
+  content: "";
+  inset-block: min(0px, calc((100% - var(--helix-size-target)) / 2));
+  inset-inline: min(0px, calc((100% - var(--helix-size-target)) / 2));
+  position: absolute;
 }
 
 /*

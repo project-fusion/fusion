@@ -1,16 +1,12 @@
 <!-- @summary A graph of linked notes, with the selected note's links and backlinks listed first. -->
-<link
-  href="styles.css"
-  rel="stylesheet"
-/>
-
+<!-- Preview frame: data-preview-graph="cosmos" has the frame connect cosmos.gl; on your page, connectGraph(frame, cosmosDriver(new Graph(box, { enableSimulation: true }), box)) does, the box being the div inside the frame. Any drawing works there: Sigma.js, a canvas, or an image. -->
 <helix-graph
+  data-preview-graph="cosmos"
   default-active="pricing"
   id="notes"
   label="Company notes"
 >
-  <!-- Put your graph here, drawn by Sigma.js, a canvas, or an image. -->
-  <div class="stand-in">Graph</div>
+  <div data-preview-graph-canvas></div>
 </helix-graph>
 
 <script>

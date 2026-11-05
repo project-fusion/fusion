@@ -1,24 +1,27 @@
 export function Example() {
   return (
     <>
-      <table id="context-files">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Size</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr tabIndex={0}>
-            <td>Quarterly report.pdf</td>
-            <td>2.4 MB</td>
-          </tr>
-          <tr tabIndex={0}>
-            <td>Roadmap.key</td>
-            <td>8.1 MB</td>
-          </tr>
-        </tbody>
-      </table>
+      {/* `data-prose` sets the table as the docs set one: a rule under each row and the heading row muted. */}
+      <div data-prose="">
+        <table id="context-files">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tabIndex={0}>
+              <td>Quarterly report.pdf</td>
+              <td>2.4 MB</td>
+            </tr>
+            <tr tabIndex={0}>
+              <td>Roadmap.key</td>
+              <td>8.1 MB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* `targets` says which things the menu is about; `contextTarget` is the one asked over. */}
       <helix-menu

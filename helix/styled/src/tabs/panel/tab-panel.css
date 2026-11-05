@@ -37,3 +37,13 @@
 [part="panel"][hidden]:not([hidden="until-found"]) {
   display: none;
 }
+
+/* A panel with nothing in it to stop on takes focus itself, so a Tab from the
+   tab list lands somewhere; the `outline: none` above left that stop with no
+   mark, and focus vanished on the second Tab. The ring goes inside the panel,
+   where a clipping parent cannot cut it. */
+[part="panel"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}

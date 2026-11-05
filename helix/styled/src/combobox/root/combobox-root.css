@@ -193,9 +193,48 @@ slot[name="end"]::slotted(*) {
    second fill inside one would draw the shape twice. */
 [part="listbox"] {
   --listbox-background-color: transparent;
+  /* The list draws its border on the box that scrolls, through this hook, and
+     the `border` below is on the host, which draws none. Off, as the note above
+     asks, and so the fade below has no border on that box to take out with
+     the rows. */
+  --listbox-border: none;
 
   border: none;
   display: block;
+}
+
+/* **The end with more past it fades**, as Table and Navigation fade theirs:
+   the last row was cut off flat at the panel's edge with nothing to say the
+   list goes on. A timeline over a list with nothing to scroll is inactive, so a
+   list that fits is never masked. */
+[part="listbox"]::part(items) {
+  animation: combobox-edges linear both;
+  animation-timeline: scroll(self block);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--_combobox-fade-start, 0rem),
+    #000 calc(100% - var(--_combobox-fade-end, 0rem)),
+    transparent
+  );
+}
+
+@keyframes combobox-edges {
+  0% {
+    --_combobox-fade-end: var(--helix-space-xl);
+    --_combobox-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_combobox-fade-end: var(--helix-space-xl);
+    --_combobox-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_combobox-fade-end: 0rem;
+    --_combobox-fade-start: var(--helix-space-xl);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -217,5 +256,13 @@ slot[name="end"]::slotted(*) {
 @media print {
   :host {
     print-color-adjust: exact;
+  }
+}
+
+/* The edge fade is driven by the scroll, and a reader who asked for less motion
+   gets the strip without it, as Table's. */
+@media (prefers-reduced-motion: reduce) {
+  [part="listbox"]::part(items) {
+    animation: none;
   }
 }

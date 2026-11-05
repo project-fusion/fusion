@@ -47,8 +47,12 @@ describe('toolbar', () => {
     expect(host).toContain('--helix-size-tag: var(--helix-size-tag-sm)')
     // And the loose and tight steps are derived from the new base, not left at
     // the page's.
-    expect(host).toContain('--helix-size-control-loose: calc(var(--helix-size-control) * 1.2)')
-    expect(host).toContain('--helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8)')
+    expect(host).toContain(
+      '--helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px)',
+    )
+    expect(host).toContain(
+      '--helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px)',
+    )
   })
 
   test('no chrome of its own unless a hook asks for it', () => {

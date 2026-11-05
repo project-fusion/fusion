@@ -63,7 +63,8 @@
 //! controls, how loud this one is, and separation is asked of containers, where
 //! the surface ends. Nothing but the guard here stops a family declaring both,
 //! and the day one does, `outlined` becomes two answers to one question with
-//! nothing to say which wins.
+//! nothing to say which wins. A family may hold both axes only where its
+//! `separation` leaves `outlined` out, as the spatial charts do.
 //!
 //! **Disagreement inside a group is reported and not failed on.** Whether a
 //! component *should* have an axis needs a reading of what it is for, and a rule
@@ -186,6 +187,12 @@ fn values_in(text: &str, aliases: &BTreeMap<String, String>) -> Vec<String> {
         .map(str::to_owned)
         .collect()
 }
+
+/// Noted beside a family's axes when its `separation` offers `outlined`, which is
+/// what cannot sit beside `emphasis`. A chart's `emphasis` is how its faces are
+/// drawn and its `separation` is what it stands on, and it offers `filled` and
+/// `plain` only, so the one word stays one answer.
+const SEPARATION_OUTLINED: &str = "separation/outlined";
 
 /// What every family declares, gathered before anything is judged.
 ///
@@ -361,6 +368,20 @@ fn attribute_of(
                         .or_default()
                         .insert(name.to_owned());
                     checked += 1;
+                    let said = attribute
+                        .get("type")
+                        .and_then(|one| one.get("text"))
+                        .and_then(Value::as_str)
+                        .map(|text| values_in(text, aliases))
+                        .unwrap_or_default();
+                    if name == "separation"
+                        && (said.is_empty() || said.iter().any(|one| one == "outlined"))
+                    {
+                        declares
+                            .entry(family.to_owned())
+                            .or_default()
+                            .insert(SEPARATION_OUTLINED.to_owned());
+                    }
 
                     /* One axis, two value kinds, named rather than assumed: a
                     table column answers `width` with a grid track rather than
@@ -507,7 +528,7 @@ pub fn run(context: &Context) -> Report {
 
     /* **`outlined` is in two vocabularies and no family may be asked both.** */
     for (family, axes) in &declares {
-        if axes.contains("emphasis") && axes.contains("separation") {
+        if axes.contains("emphasis") && axes.contains(SEPARATION_OUTLINED) {
             findings.push(Finding {
                 detail: "One of the two has to lose it here, or the family has to pick the axis \
                          it is really on: emphasis is how loud a control is, separation is where \
@@ -527,7 +548,12 @@ pub fn run(context: &Context) -> Report {
     for (group, families) in &groups {
         let mut counted: BTreeMap<&String, usize> = BTreeMap::new();
         for family in families {
-            for axis in declares.get(family).into_iter().flatten() {
+            for axis in declares
+                .get(family)
+                .into_iter()
+                .flatten()
+                .filter(|axis| *axis != SEPARATION_OUTLINED)
+            {
                 *counted.entry(axis).or_default() += 1;
             }
         }

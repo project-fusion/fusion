@@ -161,6 +161,12 @@
   opacity: 1;
 }
 
+/* Not on a press with the mouse, where the browser drew its own blue ring:
+   only `:focus-visible` was styled, and nothing turned the default off. */
+[part="svg"]:focus {
+  outline: none;
+}
+
 /* *Read by key.** A named sparkline's drawing takes focus, and the ring goes
    round the whole drawing, as it goes round every chart's plot. */
 [part="svg"]:focus-visible {
@@ -219,6 +225,27 @@
 
 :host(:dir(rtl)) [part="readout"] {
   translate: 50% calc(-100% - var(--sparkline-mark-size, 5px));
+}
+
+/* **The words the charts show with nothing to draw, at a sparkline's size.** An
+   empty sparkline drew a blank 98 by 35 box. The charts set their words at
+   `text-sm` in the middle of the plot; `text-xs` is the step a 2.5em box holds,
+   the size the readout already takes, and one line, so a narrow cell ends the
+   words in an ellipsis and never grows a second line. */
+[part="empty"],
+[part="loading"] {
+  align-content: center;
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  inset: 0;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Said and not shown: the dot and the readout are the picture of it. Out of

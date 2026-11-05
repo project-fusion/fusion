@@ -37,6 +37,13 @@ const page = (): string => {
 /** The mark `createRoot` and `hydrateRoot` leave on the node they render into. */
 const CONTAINER = '__reactContainer$m3q1'
 
+/**
+ * An element React has hydrated under a props key the bridge does not know,
+ * which is what a renamed key looks like: its fiber is there, its props are not.
+ */
+const reached = (): HTMLElement =>
+  Object.assign(document.createElement(tag), { __reactFiber$k9x2: {} })
+
 /** Makes a node the one React rendered into. */
 const container = (node: Node): void => {
   Object.assign(node, { [CONTAINER]: {} })
@@ -86,7 +93,7 @@ describe('a page where React has a root and no element found its props', () => {
     page()
     container(document.body)
     const lines = await printed(async () => {
-      document.body.append(document.createElement(tag), document.createElement(tag))
+      document.body.append(reached(), reached())
       await pastTheWindow()
     })
     expect(missing()).toHaveLength(1)
@@ -111,10 +118,20 @@ describe('a page where React has a root and no element found its props', () => {
     page()
     container(document.body)
     await printed(async () => {
-      document.body.append(document.createElement(tag))
+      document.body.append(reached())
       await pastTheWindow()
     })
     expect(missing()).toHaveLength(1)
+  })
+
+  /* A development build hydrates a large page slower than the window, and
+     Next.js's error overlay marks the page before the app's React does. */
+  test('says nothing of an element React has not reached yet', async () => {
+    page()
+    container(document.body)
+    document.body.append(document.createElement(tag))
+    await pastTheWindow()
+    expect(missing()).toHaveLength(0)
   })
 })
 

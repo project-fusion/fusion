@@ -179,9 +179,19 @@
   justify-content: center;
 }
 
+/* At an end a stepper keeps focus and says so with `aria-disabled`, so it has to
+   look it. */
+[part="previous"][aria-disabled="true"],
+[part="next"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: var(--helix-opacity-disabled);
+}
+
+/* Not on a stepper at its end, which offers nothing to press: the wash there
+   lifted a half-faded arrow to full ink under the pointer. */
 [part="rotation"]:hover,
-[part="previous"]:hover,
-[part="next"]:hover {
+[part="previous"]:hover:not([aria-disabled="true"]),
+[part="next"]:hover:not([aria-disabled="true"]) {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }
@@ -703,6 +713,27 @@
   inset-block: calc((var(--helix-size-target) - 100%) / -2);
   inset-inline: 0;
   position: absolute;
+}
+
+/* Along the run the dots sit two pixels apart, so the box cannot grow there
+   without taking the press from the dot beside it: a dot was 8 wide to a finger,
+   at a 12 pitch, and on a touch screen the arrows are hidden, so the dots are the
+   only control. Where a finger presses, the run opens to the target's pitch and
+   each dot's box takes half the space on either side of it. */
+@media (pointer: coarse) {
+  [part="indicators"] {
+    --_carousel-dot-reach: calc(var(--helix-size-target) - var(--helix-space-xs));
+    gap: var(--_carousel-dot-reach);
+  }
+
+  [part~="indicator"]::after {
+    inset-inline: calc(var(--_carousel-dot-reach) / -2);
+  }
+
+  :host([orientation="vertical"]:not([indicator-placement])) [part~="indicator"]::after {
+    inset-block: calc(var(--_carousel-dot-reach) / -2);
+    inset-inline: calc((var(--helix-size-target) - 100%) / -2);
+  }
 }
 
 [part~="indicator"]:active {

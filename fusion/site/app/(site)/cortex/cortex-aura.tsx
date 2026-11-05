@@ -25,7 +25,7 @@ export function CortexAura({
     <helix-aura
       class={className}
       data-layer
-      gain={0.8}
+      gain={0.45}
       pattern={pattern}
       paused={motion === 'off' || undefined}
       scale={4.5}

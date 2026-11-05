@@ -122,8 +122,10 @@
   text-wrap: balance;
 }
 
+/* The body's step, at every width. A clamp from `text-md` set the standfirst at
+   14px on a phone, under the 18px paragraphs beneath it. */
 .documentLede {
-  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  font-size: var(--helix-text-lg);
   /* No cap of its own.** A `34rem` cap holds about 55 characters at the current
      size and a different number at any other, and it makes the standfirst the
      narrowest thing on the page: measured, it stopped 118px short of the
@@ -194,4 +196,11 @@
 .documentHeadCentred .documentLede,
 .documentHeadCentred .documentKicker {
   inline-size: 100%;
+}
+
+/* Reading type: a long article is read, not scanned, so its body is larger than
+   an interface's, about 75 characters to the line. */
+.documentBody :is(helix-text[as="p"], helix-list-item, [data-item-text]) {
+  font-size: var(--helix-text-lg);
+  line-height: var(--helix-leading-normal);
 }

@@ -58,8 +58,10 @@ import { closeOnDialogSubmit, commandValue } from '../form-method.js'
  *
  * Set `alert` for a dialog that interrupts to ask for an answer, such as a
  * confirmation before a deletion. It is an `alertdialog`, which a screen reader
- * announces with its description as it opens. Set `dismissible` to draw a
- * close control, labeled by `dismiss-label`.
+ * announces with its description as it opens. Put the action that dismisses
+ * first in the footer, with `autofocus`, so focus starts on the action that
+ * destroys nothing. Set
+ * `dismissible` to draw a close control, labeled by `dismiss-label`.
  *
  * **Keyboard.** Opening moves focus to the first control in the dialog.
  *
@@ -79,7 +81,7 @@ import { closeOnDialogSubmit, commandValue } from '../form-method.js'
  *
  * @slot - The dialog's content.
  * @slot dismiss-icon - Replaces the glyph inside the close control.
- * @slot footer - The dialog's actions.
+ * @slot footer - The dialog's actions, written in the order they are drawn: the one that dismisses first, and the primary one last, at the trailing edge.
  * @slot header - The title, and anything beside it.
  * @slot icon - An icon above the title, for a warning dialog.
  *

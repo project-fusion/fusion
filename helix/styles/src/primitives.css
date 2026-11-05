@@ -247,9 +247,17 @@
   --_helix-series-hue-8: 225;
 
   /* ------------------------------------------------------- brand ------- */
-  --_helix-brand-500: var(--_helix-seed-brand);
-  --_helix-brand-600: oklch(from var(--_helix-seed-brand) calc(l - 0.05) c h);
-  --_helix-brand-700: oklch(from var(--_helix-seed-brand) calc(l - 0.1) c h);
+  /* **Solved, so any brand reads.** The light rungs are held at or under L 0.5
+     and the dark ones at or over L 0.68: walked across every hue at chroma 0.1
+     to 0.25, those clear 4.5:1 for text on `surface-sunken` in light (the worst
+     was 0.51) and on a panel nested in a dark dialog (the worst was 0.677). A
+     seed already inside them is drawn exactly, so most brands are untouched;
+     a mid green measured 3.43:1 and a navy 3.30:1 in dark before. The verified
+     engine still finds the least move for each ground; this is the floor CSS
+     can say without searching. Decided by the owner on November 3, 2026. */
+  --_helix-brand-500: oklch(from var(--_helix-seed-brand) min(l, 0.5) c h);
+  --_helix-brand-600: oklch(from var(--_helix-brand-500) calc(l - 0.05) c h);
+  --_helix-brand-700: oklch(from var(--_helix-brand-500) calc(l - 0.1) c h);
   --_helix-brand-800: oklch(from var(--_helix-brand-700) calc(l - 0.05) c h);
   /* **`0.13`, and it was once the difference between passing and not.** This rung
      is `--helix-color-primary` in dark, and against the 0.29 that
@@ -261,7 +269,7 @@
      0.13` measuring 5.733:1. It stays because a shipped color is not re-picked
      for having got easier, and because the hundredth is what the light side's
      `- 0.05` and `- 0.10` are measured against below. */
-  --_helix-brand-400: oklch(from var(--_helix-seed-brand) calc(l + 0.13) c h);
+  --_helix-brand-400: oklch(from var(--_helix-seed-brand) max(calc(l + 0.13), 0.68) c h);
   /* The dark side of the ramp.** 600 and 700 step down from the seed for a light
      page, where pressing a control should sink it into the ground. A dark page
      needs the mirror of that: without these, `color-primary-hover` and
@@ -271,8 +279,26 @@
      mirror the `- 0.05` and `- 0.10` the light side takes, measured from 400
      rather than from the seed, so the two directions move by the same amount
      from the rung each scheme actually starts on. */
-  --_helix-brand-300: oklch(from var(--_helix-seed-brand) calc(l + 0.18) c h);
-  --_helix-brand-200: oklch(from var(--_helix-seed-brand) calc(l + 0.23) c h);
+  --_helix-brand-300: oklch(from var(--_helix-brand-400) calc(l + 0.05) c h);
+  --_helix-brand-200: oklch(from var(--_helix-brand-400) calc(l + 0.1) c h);
+  /* **The fill in dark, which has two ways to pass.** A dark seed's fill is held
+     between L 0.52 and 0.55, where it clears 3:1 against a card (the worst hue
+     needed 0.515) and still carries a white label (white needs 0.55 or under).
+     A seed light enough to carry a black label keeps its own lightness less
+     0.05, which is the fill it always had. The switch is the label's own, at a
+     seed of L 0.68. Its hover and press step down from it, as a light fill's do. */
+  --_helix-brand-fill-dark: oklch(
+    from var(--_helix-seed-brand)
+      calc(
+        clamp(0, (l - 0.68) * 1000, 1) *
+        (l - 0.05) +
+        (1 - clamp(0, (l - 0.68) * 1000, 1)) *
+        clamp(0.52, l - 0.05, 0.55)
+      )
+      c h
+  );
+  --_helix-brand-fill-dark-hover: oklch(from var(--_helix-brand-fill-dark) calc(l - 0.05) c h);
+  --_helix-brand-fill-dark-active: oklch(from var(--_helix-brand-fill-dark) calc(l - 0.1) c h);
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
   /* The brand's quiet ink: each mode's rung at half its chroma. Unset with no
@@ -285,10 +311,14 @@
      it exists only where a brand does.** A brand fill is dark in both modes.
      With no brand this is unset like the ramp above, and the label falls back
      to the page's own color, which is what reads on an ink fill. */
-  /* White on a brand, or black on one too light to carry white: the surface sits
-     0.05 under the seed, and white falls under 4.5:1 near 0.63. Measured with
-     `oklch(0.92 0.21 115)`: 1.44:1 before, October 31, 2026. */
-  --_helix-brand-on: oklch(from var(--_helix-seed-brand) clamp(0, (0.68 - l) * 1000, 1) 0 0);
+  /* White on a brand, or black on one too light to carry white. In light the
+     fill is held at or under L 0.45 above, so the label is always white. In
+     dark the fill sits 0.05 under a light seed, and white falls under 4.5:1 near
+     0.63. Measured with `oklch(0.92 0.21 115)`: 1.44:1 before, October 31, 2026. */
+  --_helix-brand-on: light-dark(
+    oklch(from var(--_helix-seed-brand) 1 0 0),
+    oklch(from var(--_helix-seed-brand) clamp(0, (0.68 - l) * 1000, 1) 0 0)
+  );
   --_helix-brand-wash: color-mix(
     in oklab,
     light-dark(var(--_helix-brand-500), var(--_helix-brand-400)) 20%,
@@ -344,16 +374,31 @@
  * primary in light and a hundredth of lightness away from it in dark: below
  * anything an eye resolves, and a difference all the same, in the one place the
  * whole point is that there is no difference. */
-  --_helix-accent-500: var(--_helix-seed-accent);
-  --_helix-accent-600: oklch(from var(--_helix-seed-accent) calc(l - 0.05) c h);
-  --_helix-accent-700: oklch(from var(--_helix-seed-accent) calc(l - 0.1) c h);
-  --_helix-accent-400: oklch(from var(--_helix-seed-accent) calc(l + 0.13) c h);
-  --_helix-accent-300: oklch(from var(--_helix-seed-accent) calc(l + 0.18) c h);
-  --_helix-accent-200: oklch(from var(--_helix-seed-accent) calc(l + 0.23) c h);
+  /* Solved to the brand's floor, for the brand's reasons and on its numbers. */
+  --_helix-accent-500: oklch(from var(--_helix-seed-accent) min(l, 0.5) c h);
+  --_helix-accent-600: oklch(from var(--_helix-accent-500) calc(l - 0.05) c h);
+  --_helix-accent-700: oklch(from var(--_helix-accent-500) calc(l - 0.1) c h);
+  --_helix-accent-400: oklch(from var(--_helix-seed-accent) max(calc(l + 0.13), 0.68) c h);
+  --_helix-accent-300: oklch(from var(--_helix-accent-400) calc(l + 0.05) c h);
+  --_helix-accent-200: oklch(from var(--_helix-accent-400) calc(l + 0.1) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
   --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
+  --_helix-accent-fill-dark: oklch(
+    from var(--_helix-seed-accent)
+      calc(
+        clamp(0, (l - 0.68) * 1000, 1) *
+        (l - 0.05) +
+        (1 - clamp(0, (l - 0.68) * 1000, 1)) *
+        clamp(0.52, l - 0.05, 0.55)
+      )
+      c h
+  );
+  --_helix-accent-fill-dark-hover: oklch(from var(--_helix-accent-fill-dark) calc(l - 0.05) c h);
   /* The label on an accent fill, and its quiet ink, for the brand's reasons. */
-  --_helix-accent-on: oklch(from var(--_helix-seed-accent) clamp(0, (0.68 - l) * 1000, 1) 0 0);
+  --_helix-accent-on: light-dark(
+    oklch(from var(--_helix-seed-accent) 1 0 0),
+    oklch(from var(--_helix-seed-accent) clamp(0, (0.68 - l) * 1000, 1) 0 0)
+  );
   --_helix-accent-quiet-500: oklch(from var(--_helix-accent-500) l calc(c * 0.5) h);
   --_helix-accent-quiet-400: oklch(from var(--_helix-accent-400) l calc(c * 0.5) h);
 
@@ -418,20 +463,22 @@
      half is lifted to an even lightness.** GitHub's runs from 0.31 to 0.55 in
      OKLCH, and the bottom of that reads as uncolored text rather than as color:
      a string at #0a3069 is near enough black, and a tag at #116329 is not far
-     behind. */
-  --_helix-syntax-comment-light: oklch(from #6e7781 0.58 c h);
+     behind. Each sits at the lightest step that still clears 4.5:1 on
+     `surface-sunken`, the darkest ground code is drawn on: at 0.58 a comment
+     measured 3.6:1 there and 3.84:1 in a Code Input. */
+  --_helix-syntax-comment-light: oklch(from #6e7781 0.52 c h);
   --_helix-syntax-comment-dark: #8b949e;
-  --_helix-syntax-keyword-light: oklch(from #cf222e 0.58 c h);
+  --_helix-syntax-keyword-light: oklch(from #cf222e 0.54 c h);
   --_helix-syntax-keyword-dark: #ff7b72;
   --_helix-syntax-string-light: oklch(from #0a3069 0.5 c h);
   --_helix-syntax-string-dark: #a5d6ff;
-  --_helix-syntax-tag-light: oklch(from #116329 0.54 c h);
+  --_helix-syntax-tag-light: oklch(from #116329 0.5 c h);
   --_helix-syntax-tag-dark: #7ee787;
-  --_helix-syntax-name-light: oklch(from #0550ae 0.55 c h);
+  --_helix-syntax-name-light: oklch(from #0550ae 0.52 c h);
   --_helix-syntax-name-dark: #79c0ff;
-  --_helix-syntax-callable-light: oklch(from #8250df 0.58 c h);
+  --_helix-syntax-callable-light: oklch(from #8250df 0.54 c h);
   --_helix-syntax-callable-dark: #d2a8ff;
-  --_helix-syntax-constant-light: oklch(from #953800 0.56 c h);
+  --_helix-syntax-constant-light: oklch(from #953800 0.53 c h);
   --_helix-syntax-constant-dark: #ffa657;
   --_helix-syntax-invalid-light: oklch(from #82071e 0.5 c h);
   --_helix-syntax-invalid-dark: #ffa198;

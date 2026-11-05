@@ -679,6 +679,28 @@ describe('an invalid date field marks the calendar too', () => {
  * elsewhere, for the same reason.
  */
 if (hasLayout()) {
+  describe('opening on a scrolled page', () => {
+    test('leaves the page where it was', async () => {
+      const spacer = document.createElement('div')
+      spacer.style.blockSize = '3000px'
+      document.body.prepend(spacer)
+      const host = (await mount(
+        '<helix-headless-date-input label="Starts"></helix-headless-date-input>',
+      )) as InputDate
+      const after = document.createElement('div')
+      after.style.blockSize = '3000px'
+      document.body.append(after)
+      window.scrollTo(0, 2800)
+      const before = window.scrollY
+      ;(part(host, 'trigger') as HTMLElement).click()
+      await new Promise((settled) => requestAnimationFrame(() => setTimeout(settled, 100)))
+      expect(window.scrollY).toBe(before)
+      spacer.remove()
+      after.remove()
+      window.scrollTo(0, 0)
+    })
+  })
+
   describe('months, where the window is narrow', () => {
     const narrow = (width: number): void => {
       const real = window.visualViewport

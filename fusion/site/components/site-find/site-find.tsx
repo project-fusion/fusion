@@ -1,6 +1,6 @@
 'use client'
 
-import type { HelixCommand } from '@fusion.dev/helix'
+import type { HelixCommand, HelixIconButton } from '@fusion.dev/helix'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import styles from './site-find.module.css'
@@ -115,6 +115,11 @@ export function SiteFind({
   const router = useRouter()
   const pathname = usePathname()
   const palette = useRef<HelixCommand>(null)
+  const button = useRef<HelixIconButton>(null)
+  const keyboard = useRef<HTMLInputElement>(null)
+  /* Set only while the button hands focus to `keyboard`, which is how its
+     focus handler tells that from the palette handing focus back. */
+  const summoning = useRef(false)
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
 
@@ -156,13 +161,49 @@ export function SiteFind({
           still works because the palette listens on the document. */}
       {trigger && (
         <helix-tooltip placement="bottom" slot={slot}>
-          <helix-icon-button label="Search" onClick={() => setOpen(true)}>
+          <helix-icon-button
+            label="Search"
+            onClick={() => {
+              summoning.current = true
+              keyboard.current?.focus({ preventScroll: true })
+              summoning.current = false
+              setOpen(true)
+            }}
+            ref={button}
+          >
             <helix-icon name="magnifying-glass"></helix-icon>
           </helix-icon-button>
           <span slot="content">
             Search <helix-kbd keys="mod+k"></helix-kbd>
           </span>
         </helix-tooltip>
+      )}
+
+      {/* **A field that takes focus inside the tap, so a phone raises its
+          keyboard.** iOS opens the on-screen keyboard only for a field focused
+          in the handler of the tap itself, and the palette's field is drawn
+          and focused a few microtasks later, once the dialog has opened:
+          measured in WebKit, the palette's own call came first and missed, and
+          the dialog's landed 13ms after it. The keyboard opens for this
+          field and stays up as focus moves on to the palette's.
+
+          **The palette hands focus back here as it closes**, because the
+          dialog returns focus to whatever had it when it opened. This field
+          passes it on to the button, where it was before. */}
+      {trigger && (
+        <input
+          aria-hidden="true"
+          autoComplete="off"
+          className={styles.siteFindKeyboard}
+          onFocus={() => {
+            if (!summoning.current) {
+              button.current?.focus()
+            }
+          }}
+          ref={keyboard}
+          slot={slot}
+          tabIndex={-1}
+        />
       )}
 
       {/* **The palette listens for its own hotkey from the document**, so it

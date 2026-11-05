@@ -37,6 +37,7 @@ import { property } from 'lit/decorators.js'
  * @csspart skeleton - The placeholder shape.
  *
  * @cssstate wrapping - The skeleton holds content, an element or words, and takes that content's size. Line breaks and spaces alone are not content.
+ * @cssstate wrapping-block - The content the skeleton holds is a block, which fills its line, so the skeleton fills the line with it.
  */
 @customElement('helix-headless-skeleton')
 export class HelixHeadlessSkeleton extends HelixElement {
@@ -90,6 +91,14 @@ export class HelixHeadlessSkeleton extends HelixElement {
     super.willUpdate(changed)
     const wraps = this.wraps
     this.toggleState('wrapping', wraps)
+    /* A block fills its line, so a skeleton around one fills it too: shrunk to
+       fit, a wrapped Input measured 202 pixels against the 260 it takes alone. */
+    const first = this.firstElementChild
+    const display = wraps && first && this.isConnected ? getComputedStyle(first).display : ''
+    this.toggleState(
+      'wrapping-block',
+      /^(block|flex|grid|table|list-item|flow-root)$/.test(display),
+    )
     internalsOf(this).ariaBusy = this.loading ? 'true' : null
     /* Loaded content is the page's own and is read as it is. The busy
        indicator and its name belong to a placeholder or to content that is

@@ -26,6 +26,7 @@ import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { PREVIEW_RELAY } from '@/preview/preview-relay'
+import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
 import type { Family, FamilyListing } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
@@ -206,7 +207,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   // for the site has said how they want to look at things, and a preview that
   // ignored it would be the one part of the page that did.
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light' | null>(null)
-  const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>('dark')
+  const siteTheme = useSiteScheme()
   const [copied, setCopied] = useState(false)
   const [filter, setFilter] = useState('')
   const filterRef = useRef<HelixInput>(null)
@@ -332,7 +333,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     setShowPanel(url.panes.includes('panel'))
     setShowStatus(url.panes.includes('status'))
     setShowRail(url.panes.includes('rail'))
-    setSiteTheme(document.documentElement.dataset.colorMode === 'light' ? 'light' : 'dark')
 
     const stored = readArrangement()
     // Only when the address did not say. A link that names a language is a
@@ -373,18 +373,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       JSON.stringify({ panelSize: element.panelSize, split: element.split, syntax }),
     )
   }
-
-  // Watched, not read once: the preferences drawer is on this page now, so the
-  // site's mode can change while the sandbox is open and a preview following it
-  // has to notice.
-  useEffect(() => {
-    const root = document.documentElement
-    const sync = () => setSiteTheme(root.dataset.colorMode === 'light' ? 'light' : 'dark')
-    sync()
-    const watch = new MutationObserver(sync)
-    watch.observe(root, { attributeFilter: ['data-color-mode'], attributes: true })
-    return () => watch.disconnect()
-  }, [])
 
   // Side by side is unusable on a phone: at 375px a 45/55 split leaves two
   // slivers. Orientation is a property rather than a stylesheet override,
@@ -1479,7 +1467,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               </div>
             </div>
 
+            {/* `color-mode` reaches the frame's own document, which inherits
+                nothing from this host; `data-color-mode` styles the host. */}
             <helix-sandbox-preview
+              color-mode={previewTheme ?? siteTheme}
               data-color-mode={previewTheme ?? siteTheme}
               direction={direction === 'rtl' ? 'rtl' : undefined}
               layout={layout === 'padded' ? undefined : layout}
@@ -1556,6 +1547,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               typed here is gone.
             </helix-text>
             <helix-flex gap="sm" slot="footer">
+              <helix-button onClick={() => setPendingSyntax(null)}>Keep editing</helix-button>
               <helix-button
                 emphasis="solid"
                 onClick={() => {
@@ -1569,7 +1561,6 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               >
                 Change anyway
               </helix-button>
-              <helix-button onClick={() => setPendingSyntax(null)}>Keep editing</helix-button>
             </helix-flex>
           </helix-dialog>
         </div>

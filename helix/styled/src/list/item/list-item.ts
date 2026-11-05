@@ -23,6 +23,7 @@ import { styles } from './list-item.css.js'
  * @cssproperty --list-item-drop-indicator-color - The color of the line where a moved row would land.
  * @cssproperty --list-item-drop-indicator-size - The thickness of the line where a moved row would land.
  * @cssproperty --list-item-grip-color - The color of the grip, in a `reorderable` list.
+ * @cssproperty --list-item-hover-background-color - The fill behind a row that links somewhere, under the pointer.
  * @cssproperty --list-item-padding - The padding inside the row.
  * @cssproperty --list-item-rail-content - What the rail cell shows. The list sets it.
  * @cssproperty --list-item-rail-display - Whether the row has a rail. The list sets it.

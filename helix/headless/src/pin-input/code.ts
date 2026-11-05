@@ -97,7 +97,7 @@ export const codeVerdict = (
   messages: CodeMessages,
 ): PickerVerdict => {
   if (required && code === '') {
-    return ['valueMissing', messages.missing || 'Please fill in this field.']
+    return ['valueMissing', messages.missing || 'Please fill out this field.']
   }
   if (code !== '' && code.length < count) {
     return ['tooShort', messages.short(count)]

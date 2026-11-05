@@ -119,6 +119,7 @@ palette
 paperclip
 path
 pause
+pause-fill
 phone
 picture-in-picture
 play
