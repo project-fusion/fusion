@@ -127,6 +127,13 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    /* **`slotchange` alone misses a hydrated radio**, as it misses a hydrated
+       option: a server's slots are filled before Lit binds the listener, and
+       the event has already gone. */
+    const indicator = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="indicator"]')
+    if (indicator) {
+      this.toggleState('has-indicator', slotFilled(indicator))
+    }
   }
 
   /**

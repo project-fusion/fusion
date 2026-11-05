@@ -280,6 +280,20 @@ describe('an option’s own content', () => {
     expect(host.text).toBe('Sun')
   })
 
+  test('says it holds an indicator from its first render, which a hydrated option needs', async () => {
+    /* A server's slots are filled before the listener is bound, so the
+       `slotchange` that sets this has already gone by the time it could be
+       heard. The row reads the slot once it is drawn, as it reads `media`. */
+    const host = (await mount(
+      '<helix-headless-option value="a"><i slot="indicator"></i>Alpha</helix-headless-option>',
+    )) as Option
+    expect(hasState(host, 'has-indicator')).toBe(true)
+    const bare = (await mount(
+      '<helix-headless-option value="b">Beta</helix-headless-option>',
+    )) as Option
+    expect(hasState(bare, 'has-indicator')).toBe(false)
+  })
+
   test('draws the `description` text inside its part, as the caption slot’s fallback', async () => {
     const host = (await mount(
       '<helix-headless-option value="h" description="the design system">Helix</helix-headless-option>',
