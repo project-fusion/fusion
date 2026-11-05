@@ -154,12 +154,15 @@ export default styles(
       },
       [web([rule({ cursor: 'default', opacity: token('opacity-disabled') })])],
     ),
-    on(['previous', 'next'], [
-      web([rule({ insetBlockStart: '50%', translate: [0, '-50%'] })]),
-      /* Yoga reads a top of half against the row, so a phone centers the
+    on(
+      ['previous', 'next'],
+      [
+        web([rule({ insetBlockStart: '50%', translate: [0, '-50%'] })]),
+        /* Yoga reads a top of half against the row, so a phone centers the
          control between both edges. */
-      native([rule({ insetBlockEnd: 0, insetBlockStart: 0, marginBlock: 'auto' })]),
-    ]),
+        native([rule({ insetBlockEnd: 0, insetBlockStart: 0, marginBlock: 'auto' })]),
+      ],
+    ),
     on('previous', [rule({ insetInlineStart: hook.padding })]),
     on('next', [rule({ insetInlineEnd: hook.padding })]),
     on('dismiss', [rule({ insetBlockStart: hook.padding, insetInlineEnd: hook.padding })]),
