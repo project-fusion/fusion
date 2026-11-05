@@ -1,0 +1,23 @@
+- rowgroup:
+  - row "Move rows Release Notes State":
+    - columnheader "Move rows"
+    - columnheader "Release"
+    - columnheader "Notes"
+    - columnheader "State"
+  - row "Version 2.4":
+    - gridcell "Move Version 2.4":
+      - button "Move Version 2.4"
+    - rowheader "Version 2.4"
+    - gridcell "Read the notes":
+      - link "Read the notes":
+        - /url: "#v2-4"
+    - gridcell "Shipped"
+  - row "Version 2.5":
+    - gridcell "Move Version 2.5":
+      - button "Move Version 2.5"
+    - rowheader "Version 2.5"
+    - gridcell "Read the notes":
+      - link "Read the notes":
+        - /url: "#v2-5"
+    - gridcell "In review"
+- status
