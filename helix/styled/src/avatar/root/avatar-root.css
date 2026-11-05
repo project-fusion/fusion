@@ -54,6 +54,18 @@
   user-select: none;
 }
 
+/* **The initials at the middle, on their capitals**, as a button's label is.
+   The line box is centered and the letters sit in it where the face's ascent
+   and descent put them, which keeps room for descenders capitals do not have:
+   at a 26px avatar in the system face, 8px above the capitals and 10.5px
+   below. Trimmed to the capitals and the baseline, the box is the letters, and
+   the avatar centers it. Only where the trim is supported. */
+@supports (text-box: trim-both cap alphabetic) {
+  [part="initials"] {
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 /* Print: a picture or initials, both of which print.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
