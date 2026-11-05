@@ -770,6 +770,34 @@ pub const BAR_CHART_COMPUTED: &[&str] = &[
     "tipped",
 ];
 
+/// What a chart of points sends: what a chart of lines does.
+pub const SCATTER_CHART: &[(&str, Names)] = LINE_CHART;
+
+/// What a chart of points computes for its parts, each read as `scatterChart.x`.
+pub const SCATTER_CHART_COMPUTED: &[&str] = &[
+    "active",
+    "cells",
+    "drawn",
+    "empty",
+    "gridlines",
+    "layers",
+    "live",
+    "loading",
+    "markX",
+    "markY",
+    "named",
+    "placement",
+    "role",
+    "summary",
+    "tipLabel",
+    "tipped",
+    "trends",
+    "xName",
+    "xTicks",
+    "yName",
+    "yTicks",
+];
+
 /// What a page-size control reads and sends, by the name the machine binds.
 pub const PAGINATION_SIZE: &[(&str, Names)] = &[
     ("defaultValue", Names::Prop),
@@ -1272,6 +1300,11 @@ pub fn bar_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "barChart", BAR_CHART, BAR_CHART_COMPUTED)
 }
 
+/// `scatterChart({ ... })`, each field a name.
+pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
+}
+
 /// `paginationSize({ ... })`, each field a name.
 pub fn pagination_size(lit: &Lit) -> Result<TreeChoice, String> {
     read(
@@ -1369,6 +1402,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "lineChart" => line_chart(value),
         "areaChart" => area_chart(value),
         "barChart" => bar_chart(value),
+        "scatterChart" => scatter_chart(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

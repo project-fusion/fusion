@@ -1009,6 +1009,32 @@ const BAR_CHART: &[Field] = &[
     ("tipped", "tipped", Name),
 ];
 
+const SCATTER_CHART: &[Field] = &[
+    ("active", "active", Name),
+    ("cells", "cells", Name),
+    ("drawn", "drawn", Name),
+    ("empty", "empty", Name),
+    ("gridlines", "gridlines", Name),
+    ("layers", "layers", Name),
+    ("live", "live", Name),
+    ("loading", "loading", Name),
+    ("markX", "markX", Name),
+    ("markY", "markY", Name),
+    ("named", "named", Name),
+    ("onReadingChange", "onReadingChange", Name),
+    ("onReadingPress", "onReadingPress", Name),
+    ("placement", "placement", Name),
+    ("role", "role", Name),
+    ("summary", "summary", Name),
+    ("tipLabel", "tipLabel", Name),
+    ("tipped", "tipped", Name),
+    ("trends", "trends", Name),
+    ("xName", "xName", Name),
+    ("xTicks", "xTicks", Name),
+    ("yName", "yName", Name),
+    ("yTicks", "yTicks", Name),
+];
+
 const PAGINATION_SIZE: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1485,6 +1511,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("lineChart", "lineChart", AXIS_CHART),
     ("areaChart", "areaChart", AXIS_CHART),
     ("barChart", "barChart", BAR_CHART),
+    ("scatterChart", "scatterChart", SCATTER_CHART),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),
