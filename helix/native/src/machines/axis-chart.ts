@@ -27,7 +27,7 @@ import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { Theme } from '../theme/theme'
 import { boundAll, type Color } from './chart-common'
-import { type Cursor, type CursorHeard, useChartCursor } from './chart-cursor'
+import { type Cursor, type CursorHeard, type CursorSetup, useChartCursor } from './chart-cursor'
 import { wordsIn } from './date-picker-read'
 import { boundTo, tell } from './props'
 
@@ -140,6 +140,22 @@ export const useWidth = () => {
   return { onLayout, width }
 }
 
+/** The plot's box in points and where it stands in its parent, measured as it is laid out. */
+export const useBox = () => {
+  const [box, setBox] = useState({ height: 0, top: 0, width: 0 })
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const height = Math.round(event.nativeEvent.layout.height)
+    const top = Math.round(event.nativeEvent.layout.y)
+    const width = Math.round(event.nativeEvent.layout.width)
+    setBox((was) =>
+      was.height === height && was.top === top && was.width === width
+        ? was
+        : { height, top, width },
+    )
+  }, [])
+  return { box, onLayout }
+}
+
 /**
  * The bubble's cells for the reading at `at`: each cell of its row, a
  * plotted one in its series color, and the one the keys rest on current.
@@ -186,7 +202,15 @@ export interface ReadingSetup {
   /** How the chart's numbers are written. */
   readonly write: (value: number) => string
   /** The axis the readings run along: `block` down the plot, as a bar chart's categories turned sideways. Absent is `inline`. */
-  readonly axis?: 'block' | 'inline'
+  readonly axis?: 'block' | 'inline' | 'none'
+  /** The columns Down and Up walk, as a scatter's series up. Absent is every column a series is drawn from. */
+  readonly among?: readonly number[]
+  /** The readings in the order the keys walk them, and where a reading stands among them. Absent is the table's order. */
+  readonly order?: readonly number[]
+  /** The reading under a point of the plot, for readings not laid out along it. */
+  readonly pick?: CursorSetup['pick']
+  /** Whether the plot is drawn left to right on every page. */
+  readonly ltr?: boolean
 }
 
 /** The reading of an axis chart: the cursor, the words it says, and the series the keys walk. */
@@ -233,10 +257,16 @@ export const useAxisReading = (
   setup: ReadingSetup,
 ): AxisReading => {
   const shows = showsCell(setup)
-  const among = setup.columns.filter(shows)
+  const among = (setup.among ?? setup.columns).filter(shows)
   const said = (at: number, series = -1): string => {
     const row = setup.rows[at]
-    const position = readingPosition(wordsIn(read('position-label')), at, setup.count, setup.write)
+    const place = setup.order === undefined ? at : setup.order.indexOf(at)
+    const position = readingPosition(
+      wordsIn(read('position-label')),
+      place,
+      setup.count,
+      setup.write,
+    )
     return row === undefined ? '' : spokenReading(row, among[series], shows, position)
   }
   const any = setup.count > 0
@@ -244,6 +274,9 @@ export const useAxisReading = (
     axis: setup.axis ?? 'inline',
     count: setup.count,
     enabled: any,
+    ...(setup.ltr === undefined ? {} : { ltr: setup.ltr }),
+    ...(setup.order === undefined ? {} : { order: setup.order }),
+    ...(setup.pick === undefined ? {} : { pick: setup.pick }),
     said: (at) => said(at),
     series: among.length,
     tell: sender(family, props, use, setup, among),
@@ -309,4 +342,21 @@ export const statusOf = (read: Read, any: boolean, name: string) => {
     named: name,
     role: !any && name !== '' ? 'group' : '',
   }
+}
+
+/** The behavior with the plot measured as it is laid out, beside what its cursor measures. */
+export const withPlotLayout = (
+  behavior: Behavior,
+  onLayout: (event: LayoutChangeEvent) => void,
+) => {
+  const plot = behavior.parts.plot
+  const measure = plot?.view?.onLayout as ((event: LayoutChangeEvent) => void) | undefined
+  const view = {
+    ...plot?.view,
+    onLayout: (event: LayoutChangeEvent) => {
+      measure?.(event)
+      onLayout(event)
+    },
+  }
+  return { ...behavior, parts: { ...behavior.parts, plot: { ...plot, view } } }
 }

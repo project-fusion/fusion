@@ -14,8 +14,6 @@ import {
   seriesKey,
   ticks,
 } from '@fusion.dev/helix-core/chart'
-import { useCallback, useState } from 'react'
-import type { LayoutChangeEvent } from 'react-native'
 import { gridlinesAsked, labelsOf, percent } from './axis-chart'
 import type { Color } from './chart-common'
 
@@ -28,17 +26,6 @@ export interface Plotted {
   readonly lang: string
   /** The size of the names' type in points. */
   readonly size: number
-}
-
-/** The plot's box in points, measured as it is laid out. */
-export const useBox = () => {
-  const [box, setBox] = useState({ height: 0, width: 0 })
-  const onLayout = useCallback((event: LayoutChangeEvent) => {
-    const height = Math.round(event.nativeEvent.layout.height)
-    const width = Math.round(event.nativeEvent.layout.width)
-    setBox((was) => (was.height === height && was.width === width ? was : { height, width }))
-  }, [])
-  return { box, onLayout }
 }
 
 /** A name's length in the face the names are set in, near enough: a digit or a lowercase letter is about half its size. */
