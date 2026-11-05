@@ -90,6 +90,16 @@ export default styles(
           { display: 'none' },
         ),
       ]),
+      /* **The initials at the middle, on their capitals**, as a button's label
+         is: trimmed to the capitals and the baseline, the box is the letters,
+         and the avatar centers it, with no room kept for descenders capitals
+         do not have. Only where the trim is supported. */
+      web([
+        rule(
+          { supports: '(text-box: trim-both cap alphabetic)' },
+          { textBox: 'trim-both cap alphabetic' },
+        ),
+      ]),
     ]),
   ],
 )
