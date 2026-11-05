@@ -3,6 +3,7 @@ import collectionState from '../../../fragments/collection-state.js'
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
+import { oneOf } from '../../../render.js'
 import { first, fn, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import listbox from './headless.js'
@@ -32,6 +33,7 @@ export default styles(
     prefix: 'listbox',
     hooks: {
       backgroundColor: token('color-surface'),
+      bleed: token('space-row-bleed'),
       border: [token('border-thin'), 'solid', token('color-border')],
       columnMinInlineSize: '8rem',
       draggingOpacity: null,
@@ -44,7 +46,9 @@ export default styles(
       collectionInsetBlock: null,
       collectionInsetInline: null,
       fieldDisabledOpacity: null,
+      optionBleed: null,
     },
+    props: { bleed: oneOf(['none']) },
     stylesheet: 'listbox/root/listbox-root.generated.css',
   },
   ({ hook, include, on, rule }) => {
@@ -64,6 +68,9 @@ export default styles(
           { formDisabled: true },
           { opacity: token('opacity-disabled'), own: { fieldDisabledOpacity: 1 } },
         ),
+        /* As in a menu: the words stay on the field's column, and the fill
+           reaches the bleed past them. Read by every option. */
+        rule({ bleed: { not: 'none' } }, { own: { optionBleed: hook.bleed } }),
       ]),
       on('items', [
         rule({
