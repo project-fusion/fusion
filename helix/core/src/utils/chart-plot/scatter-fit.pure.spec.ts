@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { correlation, leastSquares } from './fit.js'
+import { correlation, leastSquares } from './scatter-fit.js'
 
 describe('the correlation', () => {
   test('is one for points on a rising line, and minus one on a falling one', () => {

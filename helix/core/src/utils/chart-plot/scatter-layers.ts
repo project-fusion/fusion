@@ -2,8 +2,9 @@
  * Which of a Scatter Chart's points are drawn together, as arithmetic with no
  * element in it.
  *
- * Pure and beside the family's `index.ts`, because which points overlap is a
- * fact about where they are, and a spec can hold it without a page.
+ * Pure and in core, which a phone's chart reads as the web's does, because
+ * which points overlap is a fact about where they are, and a spec can hold it
+ * without a page.
  */
 
 /** A point where it is drawn, in pixels, and how wide its ring is. */

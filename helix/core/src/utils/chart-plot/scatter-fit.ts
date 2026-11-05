@@ -2,8 +2,8 @@
  * How a Scatter Chart's measures move together, as arithmetic with no element
  * in it: the correlation its summary gives and the line its `trend` draws.
  *
- * Pure and beside the family's `index.ts`, because a fit is a fact about
- * pairs of numbers, and a spec can hold it without a page.
+ * Pure and in core, which a phone's chart reads as the web's does, because a
+ * fit is a fact about pairs of numbers, and a spec can hold it without a page.
  */
 
 /** The mean of some numbers. */
