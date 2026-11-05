@@ -296,6 +296,8 @@ export default headless('heatmap', {
       >
         {heatmap.selection}
       </Announce>
+      {/* What is passed in, as the table a phone reads by its id, hidden from sight and still read. */}
+      <Slot platform="native" />
       <Pressable
         part="sonify"
         platform="web"
