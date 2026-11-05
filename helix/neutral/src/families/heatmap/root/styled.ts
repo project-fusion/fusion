@@ -22,7 +22,7 @@ import root from './headless.js'
  * size of a cell so the weeks stand together, and the host a grid of one
  * column as wide as the strip, so the footer annotates the picture and not
  * the box. A phone stands each cell where core places it, in a strip as large
- * as the cells it draws, with the footer as wide.
+ * as the cells it draws, with the footer at least as wide.
  *
  * **Emphasis and material, as every chart reads them.** `outlined` is a
  * cell's edge in its tone over a fill faded toward the page, and `subtle` a
@@ -331,12 +331,18 @@ export default styles(
           rule({
             display: 'flex',
             flexDirection: 'row',
-            inlineSize: measured('heatmap-strip-width'),
+            maxInlineSize: '100%',
+            minInlineSize: measured('heatmap-strip-width'),
           }),
         ]),
       ]),
-      on('summary', [rule({ textAlign: 'center' }), native([rule({ flexGrow: 1 })])]),
+      /* The middle takes the room and wraps inside the window, as the web's track stops at the box. */
+      on('summary', [
+        rule({ textAlign: 'center' }),
+        native([rule({ flexGrow: 1, flexShrink: 1 })]),
+      ]),
       on('end', [rule({ textAlign: 'end' })]),
+      on(['start', 'end'], [native([rule({ flexShrink: 0 })])]),
       /* Under the strip, in place of the cells. */
       on(
         ['empty', 'loading'],
