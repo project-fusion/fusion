@@ -44,13 +44,15 @@ import { styles } from './tree-root.css.js'
 @customElement('helix-tree')
 export class HelixTree extends HelixHeadlessTree {
   /**
-   * Sets the words of its rows, at every depth, on the tree's own edge, with each fill reaching past it.
+   * Sets the words of its rows on the tree's own edge, with each fill reaching past it.
    *
    * The words line up with a divider or a heading beside the tree, and a hover, a
    * selection or the current row is drawn `--tree-bleed` wider on each side,
-   * by a negative margin and the same padding, so nothing moves. The parent has
-   * to leave that room: inside `overflow: hidden` with no inline padding, the
-   * fill and the focus ring are cut at the tree's edge.
+   * by a negative margin and the same padding, so nothing moves.
+   *
+   * **Asked for rather than the default**, because the tree is often set flush in
+   * a pane that scrolls or clips, a sidebar or a transcript, and there the fill
+   * and the focus ring are cut at the pane's edge. The parent leaves the room.
    */
   @property({ reflect: true, type: Boolean })
   bleed = false

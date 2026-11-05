@@ -4,7 +4,7 @@
   display: contents;
 }
 
-:host([bleed]) {
+:host(:not([bleed="none"])) {
   /* **In a panel, the words stay where the section headings are**, a step in
      from its edge, and the fill reaches the bleed past them, so a highlighted
      row is a rounded fill inset from the panel rather than a band across it.

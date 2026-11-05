@@ -127,6 +127,17 @@ describe('a list with `bleed`', () => {
     expect(md).toBeLessThan(lg)
   })
 
+  /* The marker hangs in the list's gutter, where the bleed would pull the
+     words: measured on a numbered list in a chat transcript, "1Pause". */
+  geometry('leaves an ordered or unordered list’s rows where their markers need them', async () => {
+    const region = await mount(
+      '<div style="padding: 2rem"><helix-list bleed kind="ordered" label="Steps"><helix-list-item>One</helix-list-item></helix-list></div>',
+    )
+    await settleAll(region)
+    const row = box(partOf(region.querySelector('helix-list-item'), 'row'))
+    expect(row.left).toBeGreaterThanOrEqual(box(region.querySelector('helix-list')).left)
+  })
+
   geometry('a page can set the amount on the list', async () => {
     const region = await mount(
       '<div style="padding: 2rem"><helix-list bleed label="Steps" style="--list-bleed: 10px"><helix-list-item current="page">One</helix-list-item></helix-list></div>',
@@ -168,16 +179,16 @@ describe('a tree with `bleed`', () => {
   )
 })
 
-describe('a listbox with `bleed`', () => {
+describe('a listbox, by default', () => {
   geometry(
     'keeps the words on the field’s column, and insets a rounded fill around them',
     async () => {
       const markup = (attributes: string): string =>
         `<helix-listbox label="Fruit" ${attributes}><helix-option value="a">Apple</helix-option><helix-option value="b">Banana</helix-option></helix-listbox>`
-      const plain = await mount(markup(''))
+      const plain = await mount(markup('bleed="none"'))
       await settleAll(plain)
       const before = wordsAt(plain.querySelector('helix-option') as Node) - box(plain).left
-      const bled = await mount(markup('bleed'))
+      const bled = await mount(markup(''))
       await settleAll(bled)
       const option = bled.querySelector('helix-option')
       const words = wordsAt(option as Node)
@@ -189,7 +200,7 @@ describe('a listbox with `bleed`', () => {
   )
 })
 
-describe('a menu with `bleed`', () => {
+describe('a menu, by default', () => {
   /* Read as computed insets, which a closed panel resolves as an open one does:
      the margin and the padding sum to the step the section headings are set
      on, so the words do not move, and the fill is rounded and inset. */
@@ -206,11 +217,11 @@ describe('a menu with `bleed`', () => {
         radius: item.borderStartStartRadius,
       }
     }
-    const plain = await mount(markup(''))
+    const plain = await mount(markup('bleed="none"'))
     await settleAll(plain)
     /* Each mount replaces the last, so the first is read before the second. */
     const before = inset(plain)
-    const bled = await mount(markup('bleed'))
+    const bled = await mount(markup(''))
     await settleAll(bled)
     const after = inset(bled)
     expect(before.margin).toBe(0)

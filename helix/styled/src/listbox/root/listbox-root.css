@@ -9,7 +9,7 @@
  *  The frame is the list rather than the host, so a filter that empties it
  *    leaves a box with a message in it instead of a border collapsing to nothing.
  */
-:host([bleed]) {
+:host(:not([bleed="none"])) {
   /* As in a menu: the words stay on the field's column, and the fill reaches
      the bleed past them. Read by every option. */
   --_option-bleed: var(--listbox-bleed, var(--helix-space-row-bleed));

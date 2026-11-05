@@ -27,7 +27,7 @@ import { styles } from './menu-root.css.js'
  * @cssproperty --menu-backdrop - Filter applied behind a `frosted` or `glass` panel.
  *   Follows the theme's material policy.
  * @cssproperty --menu-background-color - Fill of the surface.
- * @cssproperty --menu-bleed - How far a item's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
+ * @cssproperty --menu-bleed - How far a item's fill reaches past its words unless `bleed` is `none`. Defaults to `--helix-space-row-bleed`, which follows the density.
  * @cssproperty --menu-border-color - Color of the panel's edge.
  * @cssproperty --menu-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --menu-max-block-size - The tallest the menu grows before it scrolls.
@@ -37,14 +37,15 @@ import { styles } from './menu-root.css.js'
 @customElement('helix-menu')
 export class HelixMenu extends HelixHeadlessMenu {
   /**
-   * Draws each highlighted item as a fill inset from the panel's edge.
+   * Whether a highlighted row is drawn as a fill inset from the panel's edge.
    *
-   * The words stay on the column the section headings are set on, and the fill
-   * reaches `--menu-bleed` past them on each side, rounded, rather than running
-   * across the panel edge to edge.
+   * By default the words stay on the column the section headings are set on,
+   * and the fill reaches `--menu-bleed` past them on each side, rounded, rather than
+   * running across the panel edge to edge. `none` draws the band edge to edge,
+   * as before.
    */
-  @property({ reflect: true, type: Boolean })
-  bleed = false
+  @property({ reflect: true })
+  bleed?: 'none'
 
   /**
    * The panel's surface: `frosted` or `glass`.
