@@ -1,14 +1,28 @@
-import { fn, inherited, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  hookOf,
+  inherited,
+  native,
+  product,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import group from './headless.js'
 
 /**
  * Avatar Group's styled tier.
  *
- * **Each avatar overlaps the one before it** and is drawn over it, ringed in
- * the page's background so the edge between two reads. The overlap is
- * `space-sm`, whatever the avatars' size, unless the hook sets another.
- * Nothing is positioned, so painting follows the order they stand in.
+ * **Each avatar overlaps the one before it** and is drawn over it. On the
+ * web a circle the next avatar's size and a gap wider is cut out of each
+ * avatar where the next sits over it, so the gap shows the surface the group
+ * is on; `--avatar-group-ring-color` fills it with a color instead. A phone
+ * draws no mask, so it rings each avatar in that color, or in the page's
+ * background. The overlap is `space-sm`, whatever the avatars' size, unless
+ * the hook sets another. Nothing is positioned, so painting follows the order
+ * they stand in.
  *
  * **Past `max`, the web hides the avatars from its sheet** as soon as they
  * arrive, before the element's next update: one selector per count up to
@@ -25,26 +39,62 @@ export default styles(
       overflowColor: token('color-foreground-muted'),
       overflowFontSize: token('text-xs'),
       overlap: token('space-sm'),
-      ringColor: token('color-background'),
+      ringColor: 'transparent',
     },
-    own: { avatarGroupRing: null },
+    own: { avatarGroupGap: null, avatarGroupNext: null, avatarGroupRing: null, avatarGroupStep: null },
     stylesheet: 'avatar/group/avatar-group.generated.css',
   },
   ({ hook, on, own, rule }) => {
+    const step = own.avatarGroupStep(hook.overlap)
+    const gap = own.avatarGroupGap(token('border-thick'))
     return [
       on('host', [
         rule({
           alignItems: 'center',
           display: 'flex',
-          own: { avatarGroupRing: hook.ringColor },
+          own: {
+            avatarGroupGap: token('border-thick'),
+            avatarGroupNext: difference('150%', own.avatarGroupStep(hook.overlap)),
+            avatarGroupRing: hook.ringColor,
+            avatarGroupStep: hook.overlap,
+          },
         }),
+        /* Where the next avatar's center sits, from this one's start edge. */
+        web([
+          rule(
+            { dir: 'rtl' },
+            { own: { avatarGroupNext: sum('-50%', own.avatarGroupStep(hook.overlap)) } },
+          ),
+        ]),
+        /* A phone draws no mask, so its ring takes the page's background where no color is given. */
+        native([
+          rule({
+            own: {
+              avatarGroupRing: hookOf('avatar-group', 'ring-color', token('color-background')),
+            },
+          }),
+        ]),
       ]),
       on({ region: 'default', slotted: '*' }, [
         rule({
-          boxShadow: [0, 0, 0, token('border-thick'), own.avatarGroupRing],
+          boxShadow: [0, 0, 0, gap, own.avatarGroupRing],
           flex: '0 0 auto',
         }),
-        rule({ child: 'later' }, { marginInlineStart: product(hook.overlap, '-1') }),
+        /* The cutout, taken out of every avatar but the last where the next sits over it. */
+        web([
+          rule(
+            { child: 'earlier' },
+            {
+              maskImage: fn(
+                'radial-gradient',
+                ['50%', '50%', 'at', own.avatarGroupNext(), '50%'],
+                ['transparent', difference(sum('100%', gap), '0.5px')],
+                ['#000', sum('100%', gap)],
+              ),
+            },
+          ),
+        ]),
+        rule({ child: 'later' }, { marginInlineStart: product(step, '-1') }),
       ]),
       /* Written out: one rule for each value of a prop, each on the children past it. */
       on(
@@ -59,18 +109,18 @@ export default styles(
         rule({
           alignItems: 'center',
           backgroundColor: hook.overflowBackgroundColor,
-          blockSize: inherited('avatar-size', token('size-control-md')),
+          blockSize: inherited('avatar-size', token('size-avatar')),
           borderRadius: token('radii-full'),
-          boxShadow: [0, 0, 0, token('border-thick'), own.avatarGroupRing],
+          boxShadow: [0, 0, 0, gap, own.avatarGroupRing],
           color: hook.overflowColor,
           display: 'inline-flex',
           flex: '0 0 auto',
           fontFamily: token('font-sans'),
           fontSize: hook.overflowFontSize,
           fontWeight: token('weight-medium'),
-          inlineSize: inherited('avatar-size', token('size-control-md')),
+          inlineSize: inherited('avatar-size', token('size-avatar')),
           justifyContent: 'center',
-          marginInlineStart: product(hook.overlap, '-1'),
+          marginInlineStart: product(step, '-1'),
         }),
         /* A phone's circle is space, which stops growing at the largest
            standard text size, so the count stops there too and fits it, as
