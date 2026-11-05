@@ -75,6 +75,27 @@ describe('an avatar group on a surface', () => {
     )
   })
 
+  /* The count's fill is the sunken surface, the panel's own color here, so
+     what keeps it a circle is its edge. */
+  geometry('the count keeps an edge on a panel the color of its fill', async () => {
+    const group = await panel()
+    const count = getComputedStyle(part(group, 'overflow') as HTMLElement)
+    const surface = getComputedStyle(document.querySelector('.panel') as HTMLElement)
+    expect(count.backgroundColor).toBe(surface.backgroundColor)
+    const probe = document.createElement('i')
+    probe.style.color = 'var(--helix-color-border)'
+    document.body.append(probe)
+    const edge = getComputedStyle(probe).color
+    probe.remove()
+    expect(edge).not.toBe(surface.backgroundColor)
+    expect(count.boxShadow).toContain('inset')
+    expect(count.boxShadow).toContain(edge)
+    group.style.setProperty('--avatar-group-overflow-border-color', 'rgb(7, 8, 9)')
+    expect(getComputedStyle(part(group, 'overflow') as HTMLElement).boxShadow).toContain(
+      'rgb(7, 8, 9)',
+    )
+  })
+
   geometry('the cutout is on the other side of each avatar right to left', async () => {
     const group = await panel()
     const ltr = getComputedStyle(avatars(group)[0] as HTMLElement).maskImage
