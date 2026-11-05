@@ -303,6 +303,14 @@ export class HelixHeadlessFilterInput extends MixinVoice(
   protected override readonly announcesInput = true
 
   /**
+   * What the browser may autofill in the field, as an HTML `autocomplete`
+   * token. `off` by default, since a filter offers its own suggestions and the
+   * browser's form history would open a second list over them.
+   */
+  @property()
+  autocomplete = 'off'
+
+  /**
    * Whether the field keeps a `FilterChip` for each filter in its `tags` slot,
    * from the `helix-facet` events it hears.
    *
@@ -1545,6 +1553,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
         .value=${this.value}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}
+        autocomplete=${this.autocomplete || nothing}
         aria-describedby=${this.describedBy ?? nothing}
         aria-invalid=${this.invalidity ?? nothing}
         role=${this.suggesting ? 'combobox' : nothing}

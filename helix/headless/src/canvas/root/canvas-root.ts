@@ -3551,6 +3551,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       data-target=${editing.target}
       style=${`--_canvas-editor-x: ${at.x}px; --_canvas-editor-y: ${at.y}px`}
       type="text"
+      autocomplete="off"
       .value=${editing.was}
       @blur=${this.handleEditorBlur}
       @keydown=${this.handleEditorKeydown}
