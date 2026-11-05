@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as spatialStyles } from '../../shared/chart/spatial.css.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-surface-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -48,7 +49,13 @@ export class HelixSpatialSurfaceChart extends HelixHeadlessSpatialSurfaceChart {
 
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [spatialStyles, tooltipStyles, styles, sonifyStyles]
+  static override styles: CSSResultGroup = [
+    spatialStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+    statusMarkStyles,
+  ]
 
   /**
    * How much of each mark comes through, as on every chart: `glass` admits the

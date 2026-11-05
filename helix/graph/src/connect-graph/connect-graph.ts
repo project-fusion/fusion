@@ -570,6 +570,14 @@ export const connectGraph = (
         if (owed) {
           owed = false
           ready()
+          /* **A selection that came with the notes is framed again where the
+             layout put it.** It was framed at the seeded places, before the
+             layout moved every note, so the selected note ended in a corner
+             of the view, beside the stop button, with its neighbors out of
+             it. Only after a whole drawing's layout: notes added later settle
+             beside a view the reader has chosen. */
+          framed = undefined
+          frameSelection()
         }
       })
       /* **The frame offers a stop once the layout has run a while**, which

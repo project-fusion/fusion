@@ -85,9 +85,9 @@ export class HelixLegend extends HelixHeadlessLegend {
    * same way.** On a surface the points are how much of the page shows through;
    * on a series they are how much ink the mark has, and the order is the same:
    * `glass` admits most, `frosted` admits less, absent is opaque. The two
-   * factors, 0.62 and 0.88, carry the relationship the surface tokens carry
-   * between `material-translucent` and `material-translucent-strong`, so a
-   * chart and a card mean the same thing by the word.
+   * factors, 0.72 and 0.88, are the tokens a glass and a frosted surface read,
+   * `material-glass-opacity` and `material-frosted-opacity`, so a chart and a
+   * card mean the same thing by the word.
    *
    * **`transparent` is where this one stops.** A mark with no ink is not a
    * material choice, it is an absent series, and a chart says that by not

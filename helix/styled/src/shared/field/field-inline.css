@@ -11,6 +11,25 @@
   padding-inline-start: calc(var(--_field-control-inline-size, 0px) + var(--helix-space-xs));
 }
 
+/* **On a touch screen the hint keeps its place under the words.** The row
+   grows to the target there, and its words stay level with the top of the
+   mark, so the whole band it adds stood between them and the hint: on Switch
+   the hint's text sat 32 under the label's against 13 under a mouse. The hint
+   rises by that band, which lies over it as the row's own press. */
+@media (pointer: coarse) {
+  [part="hint"],
+  [part="feedback"] {
+    margin-block-start: calc(
+      var(--helix-space-2xs) -
+      max(
+        0px,
+        var(--helix-size-target) -
+        var(--_field-control-block-size, var(--helix-size-target))
+      )
+    );
+  }
+}
+
 /* The words beside a mark read at the density they are in, as a button's do. */
 [part="label"] {
   font-size: var(--helix-text-control);

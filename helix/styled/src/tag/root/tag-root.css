@@ -1,6 +1,6 @@
 /* The host is the box. Heights are defined rather than falling out of padding,
-   so a tag beside a control lines up predictably: 24px at md, 20px at sm,
-   against a 40px control and a 32px dense one. */
+   so a tag beside a control lines up predictably: 28px at md, 24px at sm, and
+   32px at lg, against controls of 40, 32, and 48. */
 :host {
   max-inline-size: 100%;
   --_tag-height: var(--helix-size-tag);
@@ -22,7 +22,14 @@
      percent, a tone fill separates from the page by 30 to 33 sRGB levels in
      light and by **4 to 10 in dark**, where the same mix in sRGB gives 26 to 37
      in both. */
-  --_tag-fill: color-mix(in srgb, var(--_tag-color) 14%, var(--helix-color-background));
+  /* Translucent rather than mixed into the page color, so a tag on a card
+     tints the card and not a patch of page. In dark 22%: the same 14% over
+     black measured 1.055:1 for danger, a ground nobody saw. Two whole colors,
+     since `light-dark()` is not valid in a percentage. */
+  --_tag-fill: light-dark(
+    color-mix(in srgb, var(--_tag-color) 14%, transparent),
+    color-mix(in srgb, var(--_tag-color) 22%, transparent)
+  );
   --_tag-edge: transparent;
   --_tag-label: color-mix(in oklab, var(--_tag-color) 55%, var(--helix-color-foreground));
   align-items: center;
@@ -35,12 +42,20 @@
   font-size: var(--_tag-text);
   font-weight: var(--tag-font-weight, var(--helix-weight-medium));
   gap: var(--tag-gap, var(--helix-space-2xs));
-  /* An icon in a tag is sized to the tag's words, as a Button's icon is to its
-     label: the icon step put a 20 pixel mark beside 12 pixel text at `md` and
-     24 at `lg`. `round` keeps it on a whole pixel. */
-  --icon-size: round(calc(var(--_tag-text) * 1.15), 1px);
+  /* An icon in a tag is half the tag, on an even pixel: 12, 14, and 16 in
+     tags of 24, 28, and 32. The icon step put a 20 pixel mark beside 12 pixel
+     text at `md`, and a size read from the text, which does not move with
+     density, kept 14 in every tag. Even, so it centers on a whole pixel. */
+  --icon-size: round(calc(var(--_tag-height) / 2), 2px);
   line-height: var(--helix-leading-tight);
   padding-inline: var(--_tag-inset);
+  /* **On the middle of the line in running text**, so a tag sits at one
+     height whatever comes first in it. On the baseline, an inline flex box
+     takes its first item's: an icon in `start` has none and gave its bottom
+     edge, so a tag with one sat 2.75 pixels higher than the tag beside it.
+     The label is centered on its capitals, so in 16 pixel text its baseline
+     lands within a tenth of a pixel of where it stood. */
+  vertical-align: middle;
   white-space: nowrap;
 }
 
@@ -176,19 +191,25 @@ slot:not([name])::slotted(helix-icon) {
   padding: var(--helix-space-2xs);
 }
 
-[part="dismiss"]:hover {
+/* Not on a disabled tag, whose cross takes no press and so shows none. */
+:host(:not([disabled])) [part="dismiss"]:hover {
   background-color: color-mix(in oklab, var(--_tag-color) 20%, transparent);
 }
 
+/* **Inside the cross's own box**, where the ring has room: the box is the
+   glyph and a `2xs` inset round it. Drawn outside it, the ring covered the
+   four pixel gap and touched the label. */
 [part="dismiss"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 [part="dismiss"] svg {
-  /* From the icon steps, so the mark follows density with the tag around it. */
-  /* Rounded, since three quarters of 13 and 19 land between pixels. */
-  --_tag-dismiss-size: round(calc(var(--helix-size-icon-tight) * 0.75), 1px);
+  /* From the icon steps, so the mark follows density with the tag around it.
+     **Rounded to an even size**, 10, 12 and 16, so the cross's center lands on a
+     whole pixel: three quarters of the tight steps, 12, 16 and 20, is 9 and 15
+     at the ends. */
+  --_tag-dismiss-size: round(calc(var(--helix-size-icon-tight) * 0.75), 2px);
   block-size: var(--_tag-dismiss-size);
   inline-size: var(--_tag-dismiss-size);
 }
@@ -271,7 +292,7 @@ slot[name="start"]::slotted(*) {
   --_tag-label: var(--_tag-on, var(--helix-color-foreground-inverse));
 }
 
-[part="dismiss"]:active {
+:host(:not([disabled])) [part="dismiss"]:active {
   background-color: var(--helix-color-press);
 }
 

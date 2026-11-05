@@ -22,7 +22,7 @@
 :host([separation="plain"]) [part="region"] {
   background-color: transparent;
   border: none;
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
 }
 
 [part="viewport"] {
@@ -224,7 +224,7 @@
   position: absolute;
   top: var(--_canvas-end-y);
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* A reach larger than the dot, for the reason a card's points have one. */
@@ -237,7 +237,7 @@
 /* A finger's reach on touch, as a card's points take once it has focus. */
 @media (pointer: coarse) {
   [part="edge-end"]::after {
-    inset: calc((2.75rem - 100%) / -2);
+    inset: calc((var(--helix-size-target) - 100%) / -2);
   }
 }
 
@@ -266,7 +266,7 @@
   text-align: center;
   top: var(--_canvas-editor-y);
   transform: translate(-50%, -50%);
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 [part="label-editor"][data-target="group"] {
@@ -294,7 +294,7 @@
   pointer-events: none;
   position: absolute;
   top: var(--_canvas-marquee-y);
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* The connection being drawn, dashed until it is asked for. */

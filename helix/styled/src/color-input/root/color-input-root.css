@@ -79,9 +79,15 @@
 /* **With no color yet, the caret a field's trigger draws**, centered on the
    checkerboard in the quiet ink, as Select's and Date Input's ends say they
    open something. The empty chip was a checkerboard alone, which reads as a
-   transparent color chosen and not as a control. */
+   transparent color chosen and not as a control.
+
+   **On the sunken ground, without the checkerboard.** The checkerboard says
+   a color is partly transparent, and with no color it says something that is
+   not so; under the caret its squares crossed the glyph. */
 [part="preview"][data-empty] {
   align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  background-image: none;
   display: flex;
   justify-content: center;
 }
@@ -115,7 +121,7 @@
  * square stretched to a 600 pixel field is a square no longer.
  */
 [part="surface"] {
-  --_floating-border-color: var(--color-input-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--color-input-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--color-input-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--color-input-shadow, var(--helix-shadow-floating));
 

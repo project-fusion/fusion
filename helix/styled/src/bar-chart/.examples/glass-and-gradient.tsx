@@ -39,7 +39,6 @@ export function Example() {
           <figcaption>glass</figcaption>
           <helix-bar-chart
             for="barchartmaterial"
-            gridlines="value"
             material="glass"
           ></helix-bar-chart>
         </figure>
@@ -48,7 +47,6 @@ export function Example() {
           <figcaption>gradient</figcaption>
           <helix-bar-chart
             for="barchartmaterial"
-            gridlines="value"
             wash="gradient"
           ></helix-bar-chart>
         </figure>

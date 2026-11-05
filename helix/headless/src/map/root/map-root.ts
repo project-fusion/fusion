@@ -2,6 +2,7 @@ import {
   auditChildren,
   auditName,
   customElement,
+  drawIcon,
   focusItemOf,
   formatWords,
   HelixActivateEvent,
@@ -22,6 +23,8 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import {
+  arrowClockwise,
+  arrowCounterClockwise,
   buildings,
   cloudRain,
   dotsNine,
@@ -1300,7 +1303,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @click=${() => this.rotate(-ROTATE_STEP)}
               @helix-press=${stopPress}
             >
-              <slot name="rotate-left-icon">↺</slot>
+              <slot name="rotate-left-icon">${drawIcon(arrowCounterClockwise)}</slot>
             </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
@@ -1330,7 +1333,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @click=${() => this.rotate(ROTATE_STEP)}
               @helix-press=${stopPress}
             >
-              <slot name="rotate-right-icon">↻</slot>
+              <slot name="rotate-right-icon">${drawIcon(arrowClockwise)}</slot>
             </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
@@ -1437,7 +1440,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @click=${this.toggleFullscreen}
               @helix-press=${stopPress}
             >
-              <slot name="fullscreen-icon">⤢</slot>
+              <slot name="fullscreen-icon">${this.controlGlyph('fullscreen')}</slot>
             </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
@@ -1471,7 +1474,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @click=${() => this.zoom(1)}
                 @helix-press=${stopPress}
               >
-                <slot name="zoom-in-icon">+</slot>
+                <slot name="zoom-in-icon">${this.controlGlyph('zoom-in')}</slot>
               </${button}><${tip} for="zoom-in" content=${this.zoomInLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
               <${button}
                 part="zoom-out"
@@ -1483,7 +1486,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @click=${() => this.zoom(-1)}
                 @helix-press=${stopPress}
               >
-                <slot name="zoom-out-icon">−</slot>
+                <slot name="zoom-out-icon">${this.controlGlyph('zoom-out')}</slot>
               </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }

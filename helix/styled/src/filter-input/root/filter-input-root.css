@@ -27,8 +27,17 @@
   flex-wrap: wrap;
   gap: var(--helix-space-2xs);
   min-block-size: var(--_filter-input-size);
-  /* Room above and below a token, which a fixed-height field does not need. */
-  padding-block: var(--helix-space-2xs);
+  /* Room above and below a token, which a fixed-height field does not need.
+     No more than a token leaves inside the field's own height, so one row of
+     tokens keeps the field the control's height: in a Toolbar, dense, a 24
+     pixel chip with four above and below made the field 34 beside 32 pixel
+     controls. */
+  padding-block: clamp(
+    0px,
+    (var(--_filter-input-size) - var(--helix-size-tag) - var(--helix-border-thin) * 2) /
+    2,
+    var(--helix-space-2xs)
+  );
   padding-inline: var(--filter-input-padding-inline, var(--helix-space-field));
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -188,7 +197,7 @@ slot[name="end"]::slotted(*) {
    through `shared/floating`, with one difference that matters: the options are
    its own children rather than a listbox's, so this is the box that scrolls. */
 [part="surface"] {
-  --_floating-border-color: var(--filter-input-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--filter-input-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--filter-input-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--filter-input-shadow, var(--helix-shadow-floating));
 

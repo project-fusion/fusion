@@ -37,6 +37,14 @@
   background-color: var(--helix-color-primary-subtle);
 }
 
+/* Dimmed while the table loads a new set, across every cell since the row has
+   no box. The table says how much. */
+[part~="select"],
+[part~="expand"],
+::slotted(*) {
+  opacity: var(--_table-busy-opacity, 1);
+}
+
 /* Out of reach, and drawn so, across every cell since the row has no box. */
 :host([disabled]) [part~="select"],
 :host([disabled]) [part~="expand"],

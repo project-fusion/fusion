@@ -76,9 +76,11 @@
   flex-direction: column;
 }
 
-/* Behind the destinations and out of flow, so animating it reflows nothing. */
+/* Behind the destinations and out of flow, so animating it reflows nothing.
+   The selected wash, as a chosen row is: `surface-sunken` measured 1.05:1 on a
+   dark glass header, a pill nobody saw, where the wash measures 1.65. */
 [part="indicator"] {
-  background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));
+  background-color: var(--navigation-indicator-color, var(--helix-color-selected));
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--navigation-indicator-radius, var(--helix-radii-sm));
   box-shadow: var(--navigation-indicator-shadow, none);

@@ -85,8 +85,9 @@ describe('card actions and gap', () => {
     expect(sheet()).toContain('object-fit: var(--card-media-fit, cover)')
   })
 
-  test('the gap is a hook that falls back to the step it always was', () => {
-    expect(sheet()).toContain('gap: var(--card-gap, var(--helix-space-sm))')
+  test('the gap is a hook that falls back to the field step, which moves with density', () => {
+    expect(sheet()).toContain('--_card-gap: var(--card-gap, var(--helix-space-field))')
+    expect(sheet()).toContain('gap: var(--_card-gap)')
   })
 
   if (hasLayout()) {

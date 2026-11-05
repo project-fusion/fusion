@@ -48,14 +48,17 @@
  * square and the corners are taken off with a clip.
  */
 [part~="bar"] {
-  --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
+  /* Half the small corner, 2 pixels at the default seed, so a theme that
+     squares its controls squares its bars with them. */
+  --_bar-chart-radius: var(--bar-chart-bar-radius, calc(var(--helix-radii-sm) / 2));
+  --_bar-chart-corners: var(--_bar-chart-radius) var(--_bar-chart-radius) 0 0;
   --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
   clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
   fill: var(--_bar-chart-series);
 }
 
 :host([orientation="horizontal"]) [part~="bar"] {
-  --_bar-chart-corners: 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0;
+  --_bar-chart-corners: 0 var(--_bar-chart-radius) var(--_bar-chart-radius) 0;
   --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2);
 }
 
@@ -91,11 +94,11 @@ path[part~="bar"],
  * stack. A right-to-left page mirrors the whole drawing, and the clip with it.
  */
 [part~="bar-end-negative"] {
-  --_bar-chart-corners: 0 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px);
+  --_bar-chart-corners: 0 0 var(--_bar-chart-radius) var(--_bar-chart-radius);
 }
 
 :host([orientation="horizontal"]) [part~="bar-end-negative"] {
-  --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) 0 0 var(--bar-chart-bar-radius, 2px);
+  --_bar-chart-corners: var(--_bar-chart-radius) 0 0 var(--_bar-chart-radius);
 }
 
 /*
@@ -278,7 +281,7 @@ path[part~="bar"],
 }
 
 /*
- *  The grid, under `gridlines`, and the slot the pointer is in.
+ *  The grid, unless `gridlines` is `none`, and the slot the pointer is in.
  */
 [part="gridline"] {
   stroke: var(--bar-chart-gridline-color, var(--helix-color-border));
@@ -305,7 +308,7 @@ path[part~="bar"],
 }
 
 /*
- *  The numbers along a scale, drawn only when `secondary` split them in two.
+ *  The numbers along two scales, when `secondary` splits them in two.
  *
  * **A column of the host grid, not a layer over the plot.** Inside the plot the
  * numbers are drawn over the drawing, which a horizontal chart shows at once
@@ -382,29 +385,45 @@ path[part~="bar"],
   grid-row: 3;
 }
 
-/* One scale's numbers under `value-axis`, placed as the primary is with two:
-   down the inline start of columns, and under the bars when they run across.
-   With `secondary` the rules above already place both. */
-:host([value-axis]:not([secondary]):not([orientation="horizontal"])) {
+/* One scale's numbers unless `value-axis` is `none`, placed as the primary is
+   with two: down the inline start of columns, and under the bars when they run
+   across. With `secondary` the rules above already place both.
+
+   The space beside the numbers is the axis's own margin, and the grid has no
+   column gap. A chart with nothing to draw renders no axis, so its plot stands
+   alone in the second column, and a gap there would move the empty and loading
+   words off center by half of it. */
+:host(:not([value-axis="none"]):not([secondary]):not([orientation="horizontal"])) {
+  column-gap: 0;
   grid-template-columns: auto 1fr;
 }
 
-:host([value-axis]:not([secondary]):not([orientation="horizontal"]))
+/* Room over the plot for the top number, which is centered on the plot's top
+   edge now that the top of the scale is a numbered level, and hung half its
+   height out of the chart's box without this. */
+:host(:not([value-axis="none"]):not([orientation="horizontal"])),
+:host([secondary]:not([orientation="horizontal"])) {
+  padding-block-start: calc(var(--helix-text-xs) / 2);
+}
+
+:host(:not([value-axis="none"]):not([secondary]):not([orientation="horizontal"]))
   [part="axis"][data-axis="primary"] {
   grid-column: 1;
   grid-row: 1;
+  margin-inline-end: var(--bar-chart-gap, var(--helix-space-2xs));
 }
 
-:host([value-axis]:not([secondary]):not([orientation="horizontal"])) [part="plot"],
-:host([value-axis]:not([secondary]):not([orientation="horizontal"])) [part="labels"] {
+:host(:not([value-axis="none"]):not([secondary]):not([orientation="horizontal"])) [part="plot"],
+:host(:not([value-axis="none"]):not([secondary]):not([orientation="horizontal"])) [part="labels"] {
   grid-column: 2;
 }
 
-:host([value-axis][orientation="horizontal"]:not([secondary])) {
+:host([orientation="horizontal"]:not([value-axis="none"]):not([secondary])) {
   grid-template-rows: 1fr auto;
 }
 
-:host([value-axis][orientation="horizontal"]:not([secondary])) [part="axis"][data-axis="primary"] {
+:host([orientation="horizontal"]:not([value-axis="none"]):not([secondary]))
+  [part="axis"][data-axis="primary"] {
   grid-column: 2;
   grid-row: 2;
 }
@@ -436,6 +455,8 @@ path[part~="bar"],
 
 :host(:not([orientation="horizontal"])) [part="tick"] {
   inset-inline-end: 0;
+  /* One line of its own height, so half of it is the room over the plot. */
+  line-height: 1;
   translate: 0 -50%;
 }
 
@@ -447,6 +468,17 @@ path[part~="bar"],
    centered the other way: `translate` is physical. */
 :host([orientation="horizontal"]:dir(rtl)) [part="tick"] {
   translate: 50% 0;
+}
+
+/* The number at the far end ends at its level, so it stays inside the chart's
+   box: centered, the top of the scale hung half its width past the plot's end,
+   16 pixels out of the box for 2,000 on the horizontal example. */
+:host([orientation="horizontal"]) [part="tick"]:last-child {
+  translate: -100% 0;
+}
+
+:host([orientation="horizontal"]:dir(rtl)) [part="tick"]:last-child {
+  translate: 100% 0;
 }
 
 :host(:not([orientation="horizontal"])) [part="axis"][data-axis="secondary"] [part="tick"] {
@@ -538,12 +570,12 @@ path[part~="bar"],
  */
 [part~="bar"][data-material="glass"],
 :host([material="glass"]) [part~="bar"]:not([data-material]) {
-  --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
+  --_bar-chart-through: var(--helix-material-glass-opacity);
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
-   0.88 against glass's 0.62 is the same relationship the surface tokens carry,
-   `material-translucent` at 60% against `material-translucent-strong` at 88%,
-   so a chart and a card mean the same thing by the word. Absent is still fully
+   Glass and frosted take the same two tokens a glass and a frosted surface
+   read, 0.72 and 0.88 at full strength, so a chart and a card mean the same
+   thing by the word. Absent is still fully
    opaque, so the three points read glass, frosted, then no attribute at all.
 
    **Chart-wide only, and there is no per-bar arm.** The per-series material
@@ -554,7 +586,7 @@ path[part~="bar"],
    wants a second per-series property rather than a selector, and `glass` is the
    point of the axis a chart reaches for. */
 :host([material="frosted"]) [part~="bar"]:not([data-material]) {
-  --_bar-chart-through: calc(0.88 * var(--helix-material-opacity));
+  --_bar-chart-through: var(--helix-material-frosted-opacity);
 }
 
 /*

@@ -1,6 +1,8 @@
 :host {
   --_popover-ground: var(--popover-background-color, var(--helix-color-surface-overlay));
+  --_popover-raised: var(--helix-color-surface-raised);
   --_popover-surface: var(--helix-color-surface);
+  --_popover-border: var(--helix-color-border);
   --_popover-md: var(--helix-radii-md);
   /* No box of its own: the trigger is the consumer's element and the panel is in
      the top layer, so anything here would be a third box between them. */
@@ -12,10 +14,27 @@
    clipped. */
 [part="surface"] {
   /* A Card reads `surface`, and in dark that is darker than the panel, and
-     nothing inside is rounder than the panel. See Dialog's note. */
+     nothing inside is rounder than the panel. See Dialog's note. A list opened
+     from inside, such as a Select's, takes `surface-overlay`, which in dark was
+     the panel's own fill: #181818 on #181818. The rungs step up from the panel
+     as Dialog's do. */
+  --helix-color-surface-overlay: light-dark(
+    var(--_popover-ground),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_popover-ground))
+  );
+  --helix-color-surface-raised: light-dark(
+    var(--_popover-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_popover-ground))
+  );
   --helix-color-surface: light-dark(
     var(--_popover-surface),
     color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_popover-ground))
+  );
+  /* A line inside sits the step above the panel that it sits above the page.
+     See Dialog's note. */
+  --helix-color-border: light-dark(
+    var(--_popover-border),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_popover-ground))
   );
   --helix-radii-md: min(var(--_popover-md), var(--helix-radii-sm));
   overflow: visible;
@@ -24,10 +43,10 @@
      `[popover]` `border: solid`, so dropping the declaration leaves a
      three-pixel medium border. */
   border: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+    var(--popover-border-color, var(--helix-color-border-floating));
   /* The same edge, for the point to draw on its two outer sides. */
   --_popover-edge: var(--popover-border-width, var(--helix-border-floating)) solid
-    var(--popover-border-color, var(--helix-color-border));
+    var(--popover-border-color, var(--helix-color-border-floating));
   /* The house radius, so a menu and the dialog it opens from draw the same
      corner. */
   border-radius: var(--helix-radii-sm);
@@ -156,7 +175,9 @@
    trigger. The floating pass places it; the panel's own edge is drawn on the
    two sides turned outward, which are physical because a placement is. */
 [part~="arrow"] {
-  background-color: var(--popover-background-color, var(--helix-color-surface-overlay));
+  /* The panel's own fill, read off the host: inside the surface
+     `surface-overlay` is the step a nested list takes. */
+  background-color: var(--_popover-ground);
   block-size: var(--popover-arrow-size, 0.5rem);
   inline-size: var(--popover-arrow-size, 0.5rem);
   position: absolute;

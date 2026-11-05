@@ -41,28 +41,39 @@
  * steps came out within a few percent of each other, and a busy week was
  * indistinguishable from a quiet one. The active weight is the 700 in light and
  * the 200 in dark, so five steps have room to be five.
+ *
+ * **The far end is held at a lightness of 0.33 or more**, the neutral 700, a
+ * dark ink that still reads as a fill. Only the ink theme's light 700 falls
+ * under it: at 0.11 the top step drew black, and Spatial Heatmap's shaded
+ * sides of it drew black slabs. A brand's 700 and every dark 200 stand above
+ * the floor, so they are drawn as before.
+ *
+ * **The near end starts at 35%, not 20%**, the steps still even between it and
+ * the far end. Decided by the owner on November 3, 2026: at 20% the lowest
+ * readings measured 1.46:1 against the slab in light and 1.54:1 in dark, and
+ * Spatial Heatmap's low prisms all but vanished into the plate.
  */
   --heatmap-tone-1: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 20%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 35%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-2: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 40%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 51%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-3: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 60%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 68%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-4: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 80%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 84%,
     var(--helix-color-surface-sunken)
   );
-  --heatmap-tone-5: var(--helix-color-primary-active);
+  --heatmap-tone-5: oklch(from var(--helix-color-primary-active) max(l, 0.33) c h);
   /* **A grid of one column, so the footer is as wide as the strip and not as
      wide as the box.** The labels annotate the picture: "Jun" under the first
      week and "Aug" under the last is the whole of what they say, and a block
@@ -132,13 +143,13 @@
 }
 
 :host([material="glass"]) {
-  --_heatmap-through: calc(0.62 * var(--helix-material-opacity));
+  --_heatmap-through: var(--helix-material-glass-opacity);
 }
 
 /* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
-   0.62, the relationship the surface tokens carry. */
+   0.72, the two tokens a glass and a frosted surface read. */
 :host([material="frosted"]) {
-  --_heatmap-through: calc(0.88 * var(--helix-material-opacity));
+  --_heatmap-through: var(--helix-material-frosted-opacity);
 }
 
 /* The tooltip, on the terms the other charts already set. The mark is a point
@@ -296,6 +307,7 @@
    would need, selecting the strip by what it contains, is one `::part()` cannot
    express. Out of the grid, neither tier needs a rule at all. */
 [part="empty"],
+[part="error"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
   display: grid;
@@ -313,13 +325,16 @@
    cell, so they stand in the middle of the height the cells will take and the
    page does not move when the readings arrive. */
 :host(:state(empty)),
+:host(:state(error)),
 :host(:state(loading)) {
   grid-template-columns: minmax(0, 1fr);
 }
 
 :host(:state(empty)) [part~="strip"],
+:host(:state(error)) [part~="strip"],
 :host(:state(loading)) [part~="strip"],
 [part="empty"],
+[part="error"],
 [part="loading"] {
   grid-area: 1 / 1;
 }

@@ -269,7 +269,14 @@
      0.13` measuring 5.733:1. It stays because a shipped color is not re-picked
      for having got easier, and because the hundredth is what the light side's
      `- 0.05` and `- 0.10` are measured against below. */
-  --_helix-brand-400: oklch(from var(--_helix-seed-brand) max(calc(l + 0.13), 0.68) c h);
+  /* **Capped at the seed, or 0.87 where the seed is darker.** The lift exists
+     for a dark seed. Uncapped it took a seed already light enough past the top:
+     `#ffe600` at L 0.92 drew at L 1, an out-of-gamut `#ffff46` and 19.64:1,
+     where the seed itself clears 4.5:1 on black many times over. A seed at or
+     past 0.87 now draws as itself, and the shipped seed still lands on 0.68. */
+  --_helix-brand-400: oklch(
+    from var(--_helix-seed-brand) clamp(0.68, calc(l + 0.13), max(l, 0.87)) c h
+  );
   /* The dark side of the ramp.** 600 and 700 step down from the seed for a light
      page, where pressing a control should sink it into the ground. A dark page
      needs the mirror of that: without these, `color-primary-hover` and
@@ -279,6 +286,15 @@
      mirror the `- 0.05` and `- 0.10` the light side takes, measured from 400
      rather than from the seed, so the two directions move by the same amount
      from the rung each scheme actually starts on. */
+  /* **The brand as a mark, floored for a graphic's 3:1 and not for a word's
+     4.5.** Light is held at or under L 0.54 and dark at or over 0.6: walked across
+     every hue at chroma 0.1 to 0.25, the worst measured 3.11 on `surface-sunken`
+     in light at 0.54 and 3.12 on a panel nested in a dark dialog at 0.6. A seed
+     inside them is drawn as itself: the old Helix blue, `oklch(0.539 0.19 258)`,
+     keeps its own 0.539 in light, where `primary` is held to 0.5. Before November 3, 2026 this was
+     `primary` for every seed, and only the engine moved it. */
+  --_helix-brand-mark-500: oklch(from var(--_helix-seed-brand) min(l, 0.54) c h);
+  --_helix-brand-mark-400: oklch(from var(--_helix-seed-brand) max(l, 0.6) c h);
   --_helix-brand-300: oklch(from var(--_helix-brand-400) calc(l + 0.05) c h);
   --_helix-brand-200: oklch(from var(--_helix-brand-400) calc(l + 0.1) c h);
   /* **The fill in dark, which has two ways to pass.** A dark seed's fill is held
@@ -378,7 +394,9 @@
   --_helix-accent-500: oklch(from var(--_helix-seed-accent) min(l, 0.5) c h);
   --_helix-accent-600: oklch(from var(--_helix-accent-500) calc(l - 0.05) c h);
   --_helix-accent-700: oklch(from var(--_helix-accent-500) calc(l - 0.1) c h);
-  --_helix-accent-400: oklch(from var(--_helix-seed-accent) max(calc(l + 0.13), 0.68) c h);
+  --_helix-accent-400: oklch(
+    from var(--_helix-seed-accent) clamp(0.68, calc(l + 0.13), max(l, 0.87)) c h
+  );
   --_helix-accent-300: oklch(from var(--_helix-accent-400) calc(l + 0.05) c h);
   --_helix-accent-200: oklch(from var(--_helix-accent-400) calc(l + 0.1) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
@@ -425,18 +443,25 @@
      semantic token built on a 500 can be a fill or a mark and cannot be a word.
      *The steps differ per hue, and that is deliberate.** A 600 is defined by the
      contrast it has to reach rather than by a fixed lightness drop, because the
-     same drop buys different contrast at different hues: `-0.07` takes danger to
-     5.56, info to 5.09 and success to 4.87, and leaves warning at 3.21. Yellow
-     starts at 0.7 rather than 0.58 and has the least room, so it takes `-0.18`
-     to reach 5.02. */
-  --_helix-info-600: oklch(from var(--_helix-info-500) calc(l - 0.07) calc(c - 0.04) h);
-  --_helix-success-600: oklch(from var(--_helix-success-500) calc(l - 0.07) calc(c - 0.04) h);
+     same drop buys different contrast at different hues.
+
+     **The ground to reach is the darkest a word in a tone stands on**: a row's
+     hover over `surface-sunken`, #d9d9d9 in light, which the theme engine also
+     solves its inks against. Danger clears it at `-0.07`, 4.60:1. At `-0.07`
+     the other two measured 3.85 and 4.02 there, and a success word on a hovered
+     row of a card was 4.39 and on a filled card inside a card 4.25. So info takes
+     `-0.10`, 4.59 on the hovered sunken row, and success `-0.11`, 4.58. Yellow
+     starts at 0.7 rather than 0.58 and has the least room, so it takes `-0.21`,
+     4.52. Re-measured November 3, 2026; on white the four now read 6.52, 6.50,
+     6.49, and 6.40. */
+  --_helix-info-600: oklch(from var(--_helix-info-500) calc(l - 0.1) calc(c - 0.04) h);
+  --_helix-success-600: oklch(from var(--_helix-success-500) calc(l - 0.11) calc(c - 0.04) h);
   /* `c - 0.075`, not `c - 0.02`, because the smaller step is outside sRGB.** It
      asks for chroma 0.165 at lightness 0.52 on hue 75 and the browser paints
      0.110, so the file says one thing and the screen shows another with nothing
      anywhere reporting it. Measured by fitting to gamut and reading the chroma
      back: 0.110 is what was already being painted, so nothing on screen moves. */
-  --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.18) calc(c - 0.075) h);
+  --_helix-warning-600: oklch(from var(--_helix-warning-500) calc(l - 0.21) calc(c - 0.075) h);
 
   /* The 700s, one step past the 600s on the same curve each of them took. */
   --_helix-danger-700: oklch(from var(--_helix-danger-500) calc(l - 0.14) calc(c - 0.06) h);

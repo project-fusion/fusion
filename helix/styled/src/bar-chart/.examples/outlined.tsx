@@ -48,7 +48,6 @@ export function Example() {
         <helix-bar-chart
           emphasis="outlined"
           for="barchartemphasis"
-          gridlines="value"
         ></helix-bar-chart>
       </div>
     </>

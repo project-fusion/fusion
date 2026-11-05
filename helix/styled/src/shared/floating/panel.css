@@ -16,7 +16,7 @@
 [part="surface"] {
   background-color: var(--_floating-background-color, var(--helix-color-surface-overlay));
   border: var(--_floating-border-width, var(--helix-border-floating)) solid
-    var(--_floating-border-color, var(--helix-color-border));
+    var(--_floating-border-color, var(--helix-color-border-floating));
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--_floating-shadow, var(--helix-shadow-floating));
   inset: auto;

@@ -793,6 +793,19 @@ describe('the columns either side of a label', () => {
     expect(hasState(el, 'start')).toBe(true)
   })
 
+  test('a mark added to a row after the rows were read opens the column', async () => {
+    const el = await menu(`
+      <helix-headless-menu-item value="rename">Rename</helix-headless-menu-item>
+      <helix-headless-menu-item value="delete">Delete</helix-headless-menu-item>`)
+    expect(hasState(el, 'start')).toBe(false)
+    const mark = document.createElement('span')
+    mark.slot = 'start'
+    el.querySelector('[value="delete"]')?.prepend(mark)
+    await new Promise((resolve) => setTimeout(resolve))
+    await (el as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(hasState(el, 'start')).toBe(true)
+  })
+
   test('a section decides its own leading column, apart from the others', async () => {
     const el = await menu(`
       <helix-headless-menu-section label="Show">

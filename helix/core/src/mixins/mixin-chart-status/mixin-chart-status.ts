@@ -31,6 +31,11 @@ export declare class MixinChartStatusInterface {
    */
   emptyText: string
   /**
+   * The words shown in place of the drawing when the readings did not load,
+   * such as "The visits did not load". Empty, the default, shows nothing.
+   */
+  errorText: string
+  /**
    * Whether the readings are still on their way. The chart shows
    * `loading-text` in place of an empty drawing until it has readings.
    */
@@ -41,8 +46,9 @@ export declare class MixinChartStatusInterface {
    */
   loadingText: string
   /**
-   * What stands in the plot while there is nothing to draw: the `loading`
-   * line, the `empty` line, or nothing while the table cannot be read yet.
+   * What stands in the plot while there is nothing to draw: the `error` line,
+   * the `loading` line, the `empty` line, or nothing while the table cannot be
+   * read yet.
    */
   protected renderStatus(): TemplateResult | typeof nothing
   /**
@@ -55,6 +61,11 @@ export declare class MixinChartStatusInterface {
 /**
  * What a chart shows in place of its drawing when it has no readings: words
  * while they load, and words when the table it reads has none.
+ *
+ * **And words when they did not load.** `error-text` stands in the plot in
+ * place of the other two while it is set, in the danger ink with its mark, and
+ * the `error` slot takes markup, such as a button that tries again. `Table`,
+ * `List`, and `Listbox` take the same property and slot.
  *
  * **A blank box said neither.** A chart pointed at an empty table drew its
  * plot at full height with nothing in it, which reads as a chart that failed,
@@ -71,11 +82,12 @@ export declare class MixinChartStatusInterface {
  * **The plot keeps the chart's name while it has nothing to draw**, as a
  * group around the words, so the chart is still found by its name.
  *
- * **Three custom states follow:** `active` while a reading is shown, under the
+ * **Four custom states follow:** `active` while a reading is shown, under the
  * pointer or the keys, with its tooltip open; `empty` while the empty words
- * stand in the plot; and `loading` while the loading words do.
+ * stand in the plot; `loading` while the loading words do; and `error` while
+ * the error words do.
  *
- * Applied by the four charts that draw on axes and by Donut Chart. The slots,
+ * Applied by every chart family that reads a table. The slots,
  * parts and states are documented on each of them, a class-level tag on a
  * mixin reaching no manifest.
  */
@@ -99,6 +111,19 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
     emptyText = 'No readings'
 
     /**
+     * The words shown in place of the drawing when the readings did not load,
+     * such as "The visits did not load". Empty, the default, shows nothing.
+     *
+     * While it is set and the chart has no readings to draw, the `error` line
+     * stands in the plot in place of the empty and loading words, or your own
+     * content in the `error` slot, such as a button that tries again, and the
+     * chart takes the `error` state. Clear it once you try again. Announced as
+     * it appears, being news you act on.
+     */
+    @property({ attribute: 'error-text' })
+    errorText = ''
+
+    /**
      * Whether the readings are still on their way. The chart shows
      * `loading-text` in place of an empty drawing until it has readings.
      *
@@ -118,13 +143,20 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
     loadingText = 'Loading readings'
 
     /**
-     * What stands in the plot while there is nothing to draw: the `loading`
-     * line, the `empty` line, or nothing while the table cannot be read yet.
+     * What stands in the plot while there is nothing to draw: the `error`
+     * line, the `loading` line, the `empty` line, or nothing while the table
+     * cannot be read yet.
+     *
+     * The error comes first, on the server too, being a fact the page gave
+     * the chart and no claim about readings nobody has looked at.
      *
      * `dir="auto"`, so words in a right-to-left script read their own way in
      * a plot that holds itself left to right, as Scatter Chart's does.
      */
     protected renderStatus(): TemplateResult | typeof nothing {
+      if (this.errorText) {
+        return html`<p dir="auto" part="error" role="alert"><slot name="error">${this.errorText}</slot></p>`
+      }
       if (this.loading) {
         return html`<p dir="auto" part="loading"><slot name="loading">${this.loadingText}</slot></p>`
       }
@@ -147,13 +179,14 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
       >${this.renderStatus()}</div>`
     }
 
-    /** Records what the plot shows as the `active`, `empty` and `loading` states. */
+    /** Records what the plot shows as the `active`, `empty`, `loading` and `error` states. */
     protected override updated(changed: PropertyValues): void {
       super.updated(changed)
       const root = this.renderRoot
       this.toggleState('active', this.pointer.at >= 0)
       this.toggleState('empty', root.querySelector('[part="empty"]') !== null)
       this.toggleState('loading', root.querySelector('[part="loading"]') !== null)
+      this.toggleState('error', root.querySelector('[part="error"]') !== null)
     }
   }
 

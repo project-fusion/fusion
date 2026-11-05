@@ -65,9 +65,10 @@ describe('an empty list', () => {
     expect(hasState(list, 'empty')).toBe(true)
   })
 
-  test('says "No items" by default, and an empty string shows no row', async () => {
+  test('says "Nothing to show" by default, and an empty string shows no row', async () => {
     const list = await settled('<helix-headless-list label="Files"></helix-headless-list>')
     expect((part(list, 'empty') as HTMLElement).hidden).toBe(false)
+    expect(part(list, 'empty')?.textContent?.trim()).toBe('Nothing to show')
     expect(hasState(list, 'empty')).toBe(true)
     const quiet = await settled(
       '<helix-headless-list label="Files" empty-text=""></helix-headless-list>',
@@ -199,7 +200,7 @@ describe('a list that loads more', () => {
       await busy.updateComplete
       const row = part(list, 'loading') as HTMLElement
       expect(row.getAttribute('role')).toBe('listitem')
-      expect(row.textContent?.trim()).toBe('Loading more')
+      expect(row.textContent?.trim()).toBe('Loading')
       expect(hasState(list, 'loading')).toBe(true)
 
       list.append(document.createElement('helix-headless-list-item'))

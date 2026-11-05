@@ -2,8 +2,16 @@
   --_drawer-ground: var(--drawer-background-color, var(--helix-color-surface-overlay));
   --_drawer-raised: var(--helix-color-surface-raised);
   --_drawer-surface: var(--helix-color-surface);
+  --_drawer-border: var(--helix-color-border);
   --_drawer-md: var(--helix-radii-md);
   --_drawer-size: var(--drawer-size, 20rem);
+  /* **The inset follows the region's density**, as Dialog's does: a step and a
+     half of the control inset, 24 at `md` as before. It was the same at every
+     density. **Above the title it is that and a fixed `lg` more**, 42, 48 and
+     60. At twice the inset it reached 72 at `lg`, more air over the title than
+     the 48 control beside it is tall. */
+  --_drawer-inset: calc(var(--helix-space-control) * 1.5);
+  --_drawer-inset-top: calc(var(--_drawer-inset) + var(--helix-space-lg));
   /* No box at all. The `[hidden]` rule from `HelixElement.finalizeStyles` still
      wins over it, being (0,3,0). */
   display: contents;
@@ -97,16 +105,22 @@
     var(--_drawer-surface),
     color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_drawer-ground))
   );
+  /* A line inside sits the step above the panel that it sits above the page.
+     See Dialog's note. */
+  --helix-color-border: light-dark(
+    var(--_drawer-border),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_drawer-ground))
+  );
   --helix-radii-md: min(var(--_drawer-md), var(--drawer-radius, var(--helix-radii-sm)));
   /* A drawer's own inset, and nothing about anyone's header. A drawer is
      `position: fixed` with `inset-block: 0`, so it spans the strip a sticky
      header occupies and its first line of content sits behind one. */
-  padding: var(--drawer-padding, var(--helix-space-lg));
+  padding: var(--drawer-padding, var(--_drawer-inset));
   /* The block-start hook falls back to the general one rather than to the token,
      so `--drawer-padding` governs all four sides. */
   padding-block-start: var(
     --drawer-padding-block-start,
-    var(--drawer-padding, var(--helix-space-2xl))
+    var(--drawer-padding, var(--_drawer-inset-top))
   );
   display: flex;
   flex-direction: column;
@@ -123,8 +137,12 @@
 }
 
 /* In on a decelerating curve, coming to rest, and out on the accelerating one
-   above, as Dialog's note gives. */
-[part="panel"][open] {
+   above, as Dialog's note gives.
+
+   **Keyed on the open state, not on `[open]`.** The panel keeps `[open]`
+   until the slide out ends, so a rule keyed on it carried the exit too, and the
+   drawer left on the arrival's curve. */
+:host(:state(open)) [part="panel"][open] {
   transition:
     transform var(--helix-duration-normal) var(--helix-easing-decelerate),
     display var(--helix-duration-normal) allow-discrete,
@@ -144,13 +162,10 @@
    opaque ground is invisible and a translucent ground over an unfiltered page is
    a smear, so the component owns both.
 
-   **Light admits less, because a drawer samples its own scrim.**
-   `[part="panel"]::backdrop` paints behind the panel, so the `backdrop-filter`
-   above reads the page with the scrim already over it. Measured on a white page:
-   the scrim takes the ground to L 0.66, and 30 per cent white over that lands at
-   L 0.76, a mid gray panel where `surface-overlay` white was meant.
-   `translucent-strong` lands at 0.96. Dark has no such problem, a dim page under
-   a dim scrim being what the blur is for, so it keeps the lighter mix.
+   **The one glass coverage**, `material-panel`, as every glass panel draws
+   it, by the owner's decision of November 3, 2026. A drawer samples its own
+   scrim, so in light its glass reads darker than a menu's over the bare page:
+   a heavier mix here made glass and `frosted` the same coverage on a modal.
 
    **Not a mask.** That is the reflex for forcing a surface opaque and it is the
    one thing that cannot be used here: `mask-image` disables `backdrop-filter`
@@ -158,7 +173,7 @@
    it. The alpha is the only lever that leaves the filter running. */
 :host([material="glass"]) [part="panel"] {
   backdrop-filter: var(--drawer-backdrop, var(--helix-material-backdrop));
-  background-color: var(--drawer-background-color, var(--helix-material-modal));
+  background-color: var(--drawer-background-color, var(--helix-material-panel));
 }
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
@@ -197,7 +212,7 @@
   inset-block-end: 0;
   inset-inline: 0;
   padding-block-end: calc(
-    var(--drawer-padding, var(--helix-space-lg)) +
+    var(--drawer-padding, var(--_drawer-inset)) +
     env(safe-area-inset-bottom, 0px)
   );
   --_drawer-away: translateY(100%);
@@ -210,7 +225,7 @@
   inset-block-start: 0;
   inset-inline: 0;
   padding-block-start: calc(
-    var(--drawer-padding-block-start, var(--drawer-padding, var(--helix-space-2xl))) +
+    var(--drawer-padding-block-start, var(--drawer-padding, var(--_drawer-inset-top))) +
     env(safe-area-inset-top, 0px)
   );
   --_drawer-away: translateY(-100%);
@@ -229,7 +244,7 @@
 
 :host(:state(open)) [part="panel"] {
   border: var(--drawer-border-width, var(--helix-border-floating)) solid
-    var(--drawer-border-color, var(--helix-color-border));
+    var(--drawer-border-color, var(--helix-color-border-floating));
   box-shadow: var(--drawer-shadow, var(--helix-shadow-floating));
   /* Home, less however far a swipe or a snap point has moved it toward its
      edge. Both are unset at rest, which is `translate(0, 0)`. */
@@ -252,8 +267,9 @@
   touch-action: pan-x;
 }
 
-/* Under the finger while it moves, and back to the slide once it lets go. */
-[part="panel"][data-swiping] {
+/* Under the finger while it moves, and back to the slide once it lets go. As
+   specific as the open rule above, which it follows and has to beat. */
+:host(:state(open)) [part="panel"][data-swiping] {
   transition: none;
   user-select: none;
 }
@@ -312,8 +328,16 @@
   margin-block-start: var(--helix-space-md);
 }
 
+/* **The content's children stand a step apart**, the gap Dialog's body takes,
+   12, 16 and 24 with the density. A block of its own, the region stacked what
+   it was given edge to edge, a paragraph against the list under it. A child
+   keeps its own height and the region scrolls, so nothing in a long drawer is
+   squeezed to fit. */
 [part="content"] {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--helix-space-control);
   min-block-size: 0;
   /* *Room for a focus ring, taken back the moment it is given.** Asking for
      `overflow-y: auto` and nothing else makes this a horizontal clipper too: CSS
@@ -326,35 +350,48 @@
   padding-inline: var(--helix-size-focus-reach);
 }
 
+[part="content"] > slot::slotted(*) {
+  flex-shrink: 0;
+}
+
 /* The close control, drawn only on a `dismissible` drawer. In the corner and out
    of the flow, centered on the title's first line, so the title keeps its line
    and the content under it does not move. The panel is `position: fixed`, which
-   is what it is placed against. */
+   is what it is placed against.
+
+   **The box, its glyph and its inset follow the density** as Dialog's do: the
+   tight control and icon steps, and the glyph's edge on the content's edge. */
 [part="dismiss"] {
+  --_drawer-dismiss: var(--helix-size-control-tight);
+  --_drawer-dismiss-glyph: var(--helix-size-icon-tight);
   all: unset;
   /* `all: unset` takes the `border-box` every shadow root is given with it. */
   box-sizing: border-box;
   position: absolute;
   inset-block-start: calc(
-    var(--drawer-padding-block-start, var(--drawer-padding, var(--helix-space-2xl))) +
-    (var(--helix-text-lg) * var(--helix-leading-tight) - var(--helix-size-control-sm)) /
+    var(--drawer-padding-block-start, var(--drawer-padding, var(--_drawer-inset-top))) +
+    (var(--helix-text-lg) * var(--helix-leading-tight) - var(--_drawer-dismiss)) /
     2
   );
-  inset-inline-end: var(--helix-space-md);
-  block-size: var(--helix-size-control-sm);
+  inset-inline-end: calc(
+    var(--drawer-padding, var(--_drawer-inset)) -
+    (var(--_drawer-dismiss) - var(--_drawer-dismiss-glyph)) /
+    2
+  );
+  block-size: var(--_drawer-dismiss);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--helix-size-control-sm);
+  inline-size: var(--_drawer-dismiss);
   place-content: center;
   place-items: center;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [part="dismiss"] svg {
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--_drawer-dismiss-glyph);
+  inline-size: var(--_drawer-dismiss-glyph);
 }
 
 [part="dismiss"]:hover {
@@ -369,7 +406,7 @@
 
 /* Room for it at the end of the title, so a long title wraps before it. */
 :host([dismissible]) ::slotted([slot="header"]) {
-  padding-inline-end: calc(var(--helix-size-control-sm) + var(--helix-space-xs));
+  padding-inline-end: calc(var(--helix-size-control-tight) + var(--helix-space-xs));
 }
 
 @media (prefers-reduced-motion: reduce) {

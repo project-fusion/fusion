@@ -34,10 +34,12 @@
   padding: var(--tooltip-padding, var(--helix-space-2xs) var(--helix-space-xs));
   position: fixed;
   scale: 0;
-  /* And it leaves the same way it arrived. */
+  /* The way out, which this closed rule carries: it accelerates away, as every
+     floating panel does. It left on the entrance's overshoot, swelling as it
+     went. */
   transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate),
     display var(--helix-duration-fast) allow-discrete,
     overlay var(--helix-duration-fast) allow-discrete;
 }
@@ -45,6 +47,12 @@
 [part~="surface"][data-placed] {
   opacity: 1;
   scale: 1;
+  /* The way in, with the overshoot an arrival has. */
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
 }
 
 /* The point, drawn as a square turned forty-five degrees and half buried under
@@ -82,7 +90,8 @@
 
 :host([material="frosted"]) [part~="surface"],
 :host([material="glass"]) [part~="surface"] {
-  border: var(--helix-border-thin) solid var(--tooltip-border-color, var(--helix-color-border));
+  border: var(--helix-border-thin) solid
+    var(--tooltip-border-color, var(--helix-color-border-floating));
   color: var(--tooltip-color, var(--helix-color-foreground));
 }
 
@@ -126,6 +135,7 @@
 
   [part~="surface"][data-placed] {
     scale: 1;
+    transition: none;
   }
 }
 

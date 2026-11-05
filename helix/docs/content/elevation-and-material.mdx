@@ -48,9 +48,9 @@ for the cases the top layer does not cover:
 | Token | Value |
 | --- | --- |
 | `--helix-shadow-none` | `none` |
-| `--helix-shadow-sm` | `0 1px 2px var(--_helix-shadow-ink-sm)` |
-| `--helix-shadow-md` | `0 4px 12px var(--_helix-shadow-ink-md)` |
-| `--helix-shadow-lg` | `0 12px 32px var(--_helix-shadow-ink-lg)` |
+| `--helix-shadow-sm` | `0 1px 2px light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 5%, transparent), color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 8%, transparent))` |
+| `--helix-shadow-md` | `0 4px 12px light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 6%, transparent), color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 10%, transparent))` |
+| `--helix-shadow-lg` | `0 12px 32px light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 9%, transparent), color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent))` |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` |
 | `--helix-shadow-raised` | `var(--helix-shadow-floating)` |
@@ -63,7 +63,7 @@ separation](./surfaces-and-separation).
 
 ## Material
 
-Ten tokens describe translucency:
+These tokens describe translucency:
 
 [//]: # (tokens:material)
 
@@ -71,13 +71,14 @@ Ten tokens describe translucency:
 | --- | --- | --- |
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md)) saturate(1.5)` | The blur and saturation behind a translucent surface. |
 | `--helix-material-opacity` | `1` | How opaque a translucent surface is. |
+| `--helix-material-glass-opacity` | `calc(0.72 * var(--helix-material-opacity))` | How much of a mark a glass material covers. |
+| `--helix-material-frosted-opacity` | `calc(0.88 * var(--helix-material-opacity))` | How much of a mark a frosted material covers. |
 | `--helix-material-blur-sm` | `8px` | The lightest backdrop blur. |
 | `--helix-material-blur-md` | `16px` | The backdrop blur behind a modal. |
 | `--helix-material-blur-lg` | `32px` | The heaviest backdrop blur. |
-| `--helix-material-translucent` | `light-dark(color-mix(in oklab, oklch(1 0 0) 30%, transparent), color-mix(in oklab, oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 60%, transparent))` | The translucent background, for a surface that shows what is behind it. |
-| `--helix-material-translucent-strong` | `color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) 88%, transparent)` | The stronger translucent background, for a surface that shows less of what is behind it. |
-| `--helix-material-modal` | `light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))` | The glass of a Dialog or Drawer, which sits over its own scrim. |
-| `--helix-material-panel` | `light-dark(color-mix(in oklab, oklch(1 0 0) 72%, transparent), var(--helix-material-translucent))` | The glass of a panel over the page, such as a Menu, Popover, or Tooltip. |
+| `--helix-material-translucent` | `light-dark(color-mix(in oklab, oklch(1 0 0) min(100%, 30% * var(--helix-material-opacity)), transparent), color-mix(in oklab, oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) min(100%, 60% * var(--helix-material-opacity)), transparent))` | The translucent background, for a surface that shows what is behind it. |
+| `--helix-material-translucent-strong` | `color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) min(100%, 88% * var(--helix-material-opacity)), transparent)` | The stronger translucent background, for a surface that shows less of what is behind it. |
+| `--helix-material-panel` | `light-dark(color-mix(in oklab, oklch(1 0 0) min(100%, 72% * var(--helix-material-opacity)), transparent), var(--helix-material-translucent))` | The glass of every panel, from a Menu, Popover, or Tooltip to a Dialog or Drawer over its scrim. |
 | `--helix-material-border` | `light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))` | The border a translucent surface needs to keep a visible edge. |
 
 [//]: # (/tokens)

@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './line-chart-root.css.js'
@@ -47,7 +48,7 @@ import '../../tooltip/index.js'
  * @cssproperty --line-chart-block-size - Height of the drawing.
  * @cssproperty --line-chart-dash - The dash pattern of a series `dashed` names, as `stroke-dasharray` takes it.
  * @cssproperty --line-chart-gap - Space between the drawing and its labels.
- * @cssproperty --line-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --line-chart-gridline-color - Color of the rules drawn across the plot.
  * @cssproperty --line-chart-marker-ring-color - Color of the ring round the mark on a reading, which matches the page. Change it when the chart sits on another surface.
  * @cssproperty --line-chart-marker-size - Size of the mark on a reading, under `markers`.
  * @cssproperty --line-chart-width - Thickness of a line. Overrides `--chart-stroke`.
@@ -111,8 +112,8 @@ export class HelixLineChart extends HelixHeadlessLineChart {
    * same way.** On a surface the points are how much of the page shows through;
    * on a series they are how much ink the mark has, and the order is the same:
    * `glass` admits most, `frosted` admits less, absent is opaque. The two
-   * factors, 0.62 and 0.88, carry the relationship the surface tokens carry
-   * between `material-translucent` and `material-translucent-strong`, so a
+   * strengths, 0.72 and 0.88, are `--helix-material-glass-opacity` and
+   * `--helix-material-frosted-opacity`, which every glass surface reads, so a
    * chart and a card mean the same thing by the word.
    *
    * **`transparent` is where this one stops.** A mark with no ink is not a
@@ -129,6 +130,7 @@ export class HelixLineChart extends HelixHeadlessLineChart {
     terminusStyles,
     styles,
     sonifyStyles,
+    statusMarkStyles,
   ]
 }
 

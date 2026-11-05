@@ -92,6 +92,18 @@ const SAMPLE = 24
  */
 const pixels = (size: number): number => 0.5 * (1.6 + 1.35 * Math.max(size, 0))
 
+/**
+ * The least size the smallest note is given, for a graph of `count` notes.
+ * **Three on a graph of up to 250**, which an eight-note graph draws at about
+ * 8 pixels across. Halving Sigma's size drew its leaves at about 4, specks the
+ * eye loses against the ground, and a floor of six drew them at 18, larger
+ * than the names beside them. Past 250 the floor falls with the square root
+ * of the count, 1.5 at 1,000, so a graph of thousands, whose leaves are 2.15,
+ * is drawn as before. Every note is scaled by the one factor that lifts the
+ * smallest to the floor, so a hub stays larger than a leaf.
+ */
+const floorOf = (count: number): number => Math.min(3, 3 * Math.sqrt(250 / Math.max(count, 1)))
+
 /** How hard each group's notes are drawn toward its place, which keeps the groups apart. */
 const CLUSTER = 0.1
 
@@ -440,6 +452,10 @@ export const cosmosDriver = (
     index = new Map(ids.map((id, at) => [id, at]))
     drawnNow = new Map(nodes.map((node) => [node.id, node]))
     sizes = nodes.map((node) => pixels(node.size))
+    /* A reduce, not a spread, which overflows the stack on a large graph. */
+    const least = sizes.reduce((low, size) => Math.min(low, size), Infinity)
+    const lift = Math.max(1, floorOf(nodes.length) / least)
+    sizes = sizes.map((size) => size * lift)
     /* A note under the pointer before is not one now, whatever is at its index. */
     hovered = undefined
     links = next.filter((link) => index.has(link.source) && index.has(link.target))

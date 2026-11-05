@@ -27,6 +27,54 @@
   overflow-x: auto;
 }
 
+/* **The strip says when it scrolls.** The edge with more behind it fades, as
+   Navigation's and Table's do: cut flat, a tab at the edge read as the last
+   one, with nothing to say there were more. A timeline over a strip with
+   nothing to scroll is inactive, so a strip that fits is never masked. Not
+   under `scroll-controls`, whose buttons stand at the ends and say it. */
+:host(:not([orientation="vertical"], [scroll-controls])) [part="tabs"] {
+  --_tabs-fade: to right;
+  animation: tabs-edges linear both;
+  animation-timeline: scroll(self inline);
+  mask-image: linear-gradient(
+    var(--_tabs-fade),
+    transparent,
+    #000 var(--_tabs-fade-start, 0rem),
+    #000 calc(100% - var(--_tabs-fade-end, 0rem)),
+    transparent
+  );
+}
+
+:host(:dir(rtl)) [part="tabs"] {
+  --_tabs-fade: to left;
+}
+
+@keyframes tabs-edges {
+  0% {
+    --_tabs-fade-end: var(--helix-space-xl);
+    --_tabs-fade-start: 0rem;
+  }
+
+  5%,
+  95% {
+    --_tabs-fade-end: var(--helix-space-xl);
+    --_tabs-fade-start: var(--helix-space-xl);
+  }
+
+  100% {
+    --_tabs-fade-end: 0rem;
+    --_tabs-fade-start: var(--helix-space-xl);
+  }
+}
+
+/* The edge fade is driven by the scroll, and a reader who asked for less motion
+   gets the strip without it, as Navigation's. */
+@media (prefers-reduced-motion: reduce) {
+  :host(:not([orientation="vertical"], [scroll-controls])) [part="tabs"] {
+    animation: none;
+  }
+}
+
 /* A scroll container clips what passes its edge, and that took the press box
    from a tab. On a touch screen the strip gets room for the box and hands the
    same room back, so nothing around it moves. */

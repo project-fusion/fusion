@@ -31,9 +31,9 @@ const frames = async (host: Chart): Promise<void> => {
   }
 }
 
-const chart = async (): Promise<Chart> => {
+const chart = async (attributes = ''): Promise<Chart> => {
   await mount(
-    `<div style="inline-size: 30rem">${TABLE}<helix-area-chart for="visits"></helix-area-chart></div>`,
+    `<div style="inline-size: 30rem">${TABLE}<helix-area-chart for="visits" ${attributes}></helix-area-chart></div>`,
   )
   const host = document.querySelector('helix-area-chart') as Chart
   await frames(host)
@@ -78,13 +78,30 @@ describe('the bands', () => {
     expect(fill - edge).toBeGreaterThan(60)
   })
 
-  geometry('fill the plot to the total at its highest reading', async () => {
-    const host = await chart()
+  geometry('fill the plot to the total at its highest reading, with no scale drawn', async () => {
+    const host = await chart('gridlines="none" value-axis="none"')
     const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
     const top = all(host, 'area')[0]?.getBoundingClientRect()
     expect(Math.abs((top?.top ?? 0) - plot.top)).toBeLessThan(2)
     expect(Math.abs((top?.bottom ?? 0) - plot.bottom)).toBeLessThan(2)
   })
+
+  geometry(
+    'stand the highest total clear of the top edge, under the scale drawn by default',
+    async () => {
+      const host = await chart()
+      const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+      const top = all(host, 'area')[0]?.getBoundingClientRect()
+      expect((top?.top ?? 0) - plot.top).toBeGreaterThan(4)
+      expect(Math.abs((top?.bottom ?? 0) - plot.bottom)).toBeLessThan(2)
+      /* The top number stays inside the chart's box. */
+      const ticks = all(host, 'tick') as unknown as HTMLElement[]
+      const box = host.getBoundingClientRect()
+      expect(
+        Math.min(...ticks.map((one) => one.getBoundingClientRect().top)),
+      ).toBeGreaterThanOrEqual(box.top - 0.5)
+    },
+  )
 })
 
 describe('a pointer', () => {

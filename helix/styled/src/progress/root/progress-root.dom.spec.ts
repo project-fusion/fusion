@@ -105,11 +105,12 @@ describe('words on the bar', () => {
   })
 })
 
-/* Under reduced motion the base layer sets every duration token to 0.01ms, so a
-   crawl scaled from the cycle turned the ring about seventeen hundred times a
-   second. */
+/* Under reduced motion the base layer sets every duration token on the scale to
+   0.01ms, so a crawl scaled from the cycle turned the ring about seventeen
+   hundred times a second. `duration-crawl` is off the scale and keeps its rate,
+   and every other ring crawls at it. */
 describe('the indeterminate ring under reduced motion', () => {
-  test('turns once in twelve cycles, on no duration token', () => {
+  test('turns at the crawl every ring shares, on no rung of the scale', () => {
     const turn =
       sheet()
         .split('@media (prefers-reduced-motion: reduce)')
@@ -118,6 +119,8 @@ describe('the indeterminate ring under reduced motion', () => {
         .find((declarations) => declarations.includes('animation-duration')) ?? ''
     expect(turn).toContain('animation-duration: var(--_progress-crawl)')
     expect(turn).not.toContain('--_progress-cycle')
-    expect(rule(':host([indeterminate])')).toContain('--_progress-crawl: 19.2s')
+    expect(rule(':host([indeterminate])')).toContain(
+      '--_progress-crawl: var(--helix-duration-crawl)',
+    )
   })
 })

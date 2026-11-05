@@ -16,6 +16,8 @@ title: Motion
 | `--helix-duration-fast` | `120ms` |
 | `--helix-duration-normal` | `200ms` |
 | `--helix-duration-slow` | `320ms` |
+| `--helix-duration-turn` | `0.8s` |
+| `--helix-duration-crawl` | `4s` |
 
 [//]: # (/tokens)
 
@@ -31,13 +33,19 @@ title: Motion
 
 [//]: # (/tokens)
 
-Helix has four durations and five curves. Use each curve for one kind of
-movement:
+Helix has six durations and five curves. `instant`, `fast`, `normal`, and
+`slow` time a change that answers a hand. `turn` is one revolution of a
+spinner, and `crawl` is the same revolution while motion is reduced, so a busy
+ring still turns slowly.
+
+Use each curve for one kind of movement:
 
 - `standard` for most movement
 - `decelerate` for something arriving
 - `accelerate` for something leaving
-- `emphasized` for a movement you want the user to follow
+- `emphasized` for a surface entering the screen, such as a Dialog or a
+  Popover, and for a marker that travels to a new place, such as the indicator
+  under the selected tab
 - `spring` for the few places where overshoot looks responsive and does not
   look like a bug
 

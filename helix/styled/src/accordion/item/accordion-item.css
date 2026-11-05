@@ -28,14 +28,17 @@
 }
 
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
-   substitution. */
+   substitution. **At the panel's pace**, `normal`, so the chevron finishes
+   turning as the panel finishes opening. At `fast` it was done 80
+   milliseconds before the panel it was about. **Turned, as Tree's and
+   Megamenu's are**: flipped through `scaleY` it passed through a flat line,
+   0 pixels tall, on its way over. */
 [part="chevron"] {
   block-size: var(--helix-size-icon-tight);
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
-  transform: scaleY(1);
-  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 /* An icon slotted in its place is sized, colored and turned the same way. */
@@ -44,7 +47,7 @@
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
-  transition: transform var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
 /* Pushed to the far end only where it belongs there. */
@@ -55,7 +58,7 @@
 
 :host(:state(open)) [part="chevron"],
 :host(:state(open)) ::slotted([slot="chevron"]) {
-  transform: scaleY(-1);
+  rotate: 180deg;
 }
 
 /* **The row's hover wash**, 8% in light and 12% in dark, as a menu row, a tree
@@ -108,11 +111,17 @@
 /* The padding is here and not on the box above, and it is not conditional. And
    it cannot sit on `[part="content-inner"]`, which is the grid item: its padding
    is outside the clip and survives a zero track, so a closed region measured
-   12px instead of 0, a shut accordion with a band of space under it. */
+   12px instead of 0, a shut accordion with a band of space under it.
+
+   **A word longer than the line breaks.** The region clips, for the animation,
+   so a word that ran past the edge was cut off: a 512 pixel address in a 280
+   pixel column lost 232 pixels. `break-word` breaks only a word that does not
+   fit, and leaves the min-content width alone. */
 [part="content-inner"] > slot {
   color: var(--accordion-item-content-color, var(--helix-color-foreground-muted));
   display: block;
   line-height: var(--helix-leading-normal);
+  overflow-wrap: break-word;
   padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
   padding-block-start: 0;
 }

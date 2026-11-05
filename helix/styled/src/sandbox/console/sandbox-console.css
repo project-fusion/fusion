@@ -24,8 +24,8 @@
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-switch: var(--helix-size-switch-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
   --helix-text-control: var(--helix-text-control-sm);

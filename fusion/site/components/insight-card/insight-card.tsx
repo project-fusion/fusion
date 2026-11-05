@@ -22,21 +22,29 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
           `helix component`'s `overruled` exists to catch. The recipe is for elements that are
           not components. */}
       <helix-card material="glass" separation="elevated">
-        {/* Both facts as tags, and toned the way the post's own page tones them:
-            the subject carries the brand and the kind of writing stays neutral
-            beside it. */}
-        <helix-flex align-items="center" data-density="sm" gap="sm" slot="header" wrap>
-          <helix-tag tone="accent">{insight.topic}</helix-tag>
-          <helix-tag>{insight.kind}</helix-tag>
-        </helix-flex>
+        {/* **The tags and the words as one region**, so the card's
+            `space-between` has two regions to part: this one at the top and
+            the date at the foot. With the tags in the header slot it had
+            three, and the title sat wherever the leftover space put it: in a
+            row of four, a one-line title sat 66px down its card and a
+            two-line title 53px, 13px apart. */}
+        <helix-flex class={styles.insightBody} direction="column">
+          {/* Both facts as tags, and toned the way the post's own page tones
+              them: the subject carries the brand and the kind of writing stays
+              neutral beside it. */}
+          <helix-flex align-items="center" data-density="sm" gap="sm" wrap>
+            <helix-tag tone="accent">{insight.topic}</helix-tag>
+            <helix-tag>{insight.kind}</helix-tag>
+          </helix-flex>
 
-        <helix-flex direction="column" gap="xs">
-          <helix-text as="h3" scale="title">
-            {insight.title}
-          </helix-text>
-          <helix-text class={styles.insightSummary} emphasis="muted" scale="caption">
-            {insight.summary}
-          </helix-text>
+          <helix-flex direction="column" gap="xs">
+            <helix-text as="h3" scale="title">
+              {insight.title}
+            </helix-text>
+            <helix-text class={styles.insightSummary} emphasis="muted" scale="caption">
+              {insight.summary}
+            </helix-text>
+          </helix-flex>
         </helix-flex>
 
         {/* A machine-readable date beside the readable one. The card is the only

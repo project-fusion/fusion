@@ -12,7 +12,7 @@ import { styles } from './virtual-list-root.css.js'
  * holding focus. Rows are your markup in the light DOM, so your stylesheet
  * styles them the same as any other content, and a rule of yours on a row wins
  * over the ring. While `loading` is set, a muted, centered row after the last
- * item says "Loading more". In a list with `selection-mode`, a chosen row takes
+ * item says "Loading". In a list with `selection-mode`, a chosen row takes
  * the fill a chosen List row takes.
  *
  * @category layout

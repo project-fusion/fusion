@@ -45,7 +45,7 @@ import { styles } from './tree-item.css.js'
  * @cssproperty --tree-checkbox-border-color - Border of the check mark's box.
  * @cssproperty --tree-checkbox-mark-color - Color of the check, and of the bar of a partly checked
  *   branch.
- * @cssproperty --tree-checkbox-size - Size of the check mark's box. Follows the chevron's size.
+ * @cssproperty --tree-checkbox-size - Size of the check mark's box. Follows the checkbox size, as Checkbox does.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
  * @cssproperty --tree-dragging-opacity - The opacity of an item being moved, in a `reorderable` tree.
  * @cssproperty --tree-drop-indicator-color - The color of the line where a moved item would land.

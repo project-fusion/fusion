@@ -120,7 +120,7 @@ describe('callout separation and hooks', () => {
        `data-density` region follows it as the controls beside it do. */
     expect(host).toContain('--_callout-inset: var(--callout-padding, var(--helix-space-control))')
     expect(host).toContain('font-size: var(--callout-font-size, var(--helix-text-control))')
-    expect(host).toContain('gap: var(--callout-gap, var(--helix-space-sm))')
+    expect(host).toContain('gap: var(--callout-gap, var(--helix-space-field))')
     expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
   })
 })

@@ -89,7 +89,9 @@ const OPENING_PATIENCE = 500
  * is the foreground on a dark page and `primary-active` on a light one, because
  * mixing a saturated hue toward near-black removes its chroma. The component
  * reads which way the page runs from the background's luminance, because the
- * mode is a private token.
+ * mode is a private token. On a light page the shader holds the glow at a
+ * lightness of 0.45 or more and the peak at 0.33 or more, so an ink theme's
+ * strands draw as a dark gray and not as black.
  *
  * The geometry is three vertices derived from `gl_VertexID`. There is no
  * dependency, scene graph, attribute, buffer, or upload.
@@ -149,11 +151,11 @@ const OPENING_PATIENCE = 500
  * @csspart pause-mark - The glyph on the pause control: pause while the field moves, play while it is paused.
  *
  * @cssproperty --aura-fade - How far the top and bottom edges fade, as a share of the height. `0%` keeps a hard edge. Defaults to `15%`.
- * @cssproperty --aura-glow - The bright stop of the ramp. Defaults to `--helix-color-primary`.
+ * @cssproperty --aura-glow - The bright stop of the ramp. Defaults to `--helix-color-primary`, which the shader holds at a lightness of 0.45 or more on a light page.
  * @cssproperty --aura-ground - The page the field fades into. Defaults to `--helix-color-background`.
  * @cssproperty --aura-haze - The faint stop between the ground and the glow. Defaults to `--helix-color-primary-subtle`.
  * @cssproperty --aura-pause-background-color - The pause control's ground. Defaults to `--helix-color-surface-overlay`.
- * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active` on a light page and `--helix-color-foreground` on a dark one.
+ * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active`, held at a lightness of 0.33 or more, on a light page and `--helix-color-foreground` on a dark one.
  *
  * @cssstate drawing - The shader draws on the GPU, so the gradient under it is hidden.
  * @cssstate fallback - The aura shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the shader draws again.

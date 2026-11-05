@@ -1,6 +1,7 @@
 import {
   customElement,
   formatNumber,
+  formatNumberParts,
   HelixElement,
   hostAria,
   internalsOf,
@@ -65,6 +66,7 @@ import { property } from 'lit/decorators.js'
  * @cssstate has-trend - Something is slotted into `trend`.
  * @cssstate has-unit - Something is slotted into `unit`.
  * @cssstate stepped - The figure is set a step smaller, because at full size it does not fit the stat's width on one line.
+ * @cssstate stepped-twice - The figure is set two steps smaller, because one step smaller it still does not fit. `stepped` holds as well.
  */
 @customElement('helix-headless-stat')
 export class HelixHeadlessStat extends HelixElement {
@@ -151,12 +153,6 @@ export class HelixHeadlessStat extends HelixElement {
     this.finishHydration()
   }
 
-  /** How wide the figure and its unit are on one line at full size, last measured. */
-  private natural = 0
-
-  /** Whether the figure is set a step smaller, which `stepped` says to the sheet. */
-  private stepped = false
-
   /** Watches the stat's own width, to step the figure down where it does not fit. */
   private widths: ResizeObserver | undefined
 
@@ -167,42 +163,82 @@ export class HelixHeadlessStat extends HelixElement {
     }
     this.widths = new ResizeObserver(() => this.fit())
     this.widths.observe(this)
+    /* **Measured again once a face arrives.** The figure is set in the display
+       face, and measured in the fallback before it loads it fitted: "$8,402"
+       stayed at full size in a 6rem column and wrapped once the face drew it
+       wider, with no resize to measure it again. */
+    this.ownerDocument.fonts?.addEventListener('loadingdone', this.refit)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.widths?.disconnect()
     this.widths = undefined
+    this.ownerDocument.fonts?.removeEventListener('loadingdone', this.refit)
   }
 
+  private readonly refit = (): void => this.fit()
+
   /**
-   * Sets the figure a step smaller where it does not fit on one line.
+   * Sets the figure a step or two smaller where it does not fit on one line.
    *
    * **A figure is read whole, so it is never broken between digits first.** At
    * full size "1,284" measured 104.5 pixels against a 6rem column and wrapped as
    * "1,28" over "4". Decided by the owner on November 3, 2026: step a long value
-   * down one type size, and break it only where even that does not fit.
+   * down the type scale, a second step where one is not enough, and break it only
+   * where even that does not fit, and then only after a group separator. One step
+   * left "$8,402" as "$8," over "402" at 6rem.
    *
-   * Measured on one line at full size, with no wrapping, and compared with the
-   * stat's own width rather than the screen's. Measured again whenever the
-   * figure changes; on a resize the last full-size width is compared, so the
-   * figure steps back up once the room is there.
+   * Each size is measured on one line, with no wrapping, against the stat's own
+   * width rather than the screen's, smallest step last. Measured afresh on every
+   * resize, so the figure steps back up once the room is there.
    */
   private fit(): void {
     const part = this.renderRoot?.querySelector<HTMLElement>('[part="value"]')
-    const room = this.clientWidth
-    if (!part || room <= 0) {
+    if (!part) {
       return
     }
-    if (!this.stepped || this.natural === 0) {
-      const wrap = part.style.whiteSpace
-      part.style.whiteSpace = 'nowrap'
-      this.natural =
-        this.widthOf(part) + this.widthOf(this.renderRoot.querySelector('[part="unit"]'))
-      part.style.whiteSpace = wrap
+    /* The figure's own column where it writes the figure, read before it is
+       set on one line: the stat's whole width is the column and what stands
+       beside it, and "$8,402" at 128 pixels fitted a 130 pixel stat and wrapped
+       in its 126 pixel column. A slotted figure has no box, so the stat's
+       content box stands for it. */
+    const box = getComputedStyle(this)
+    const room =
+      part instanceof HTMLSlotElement
+        ? this.clientWidth -
+          (Number.parseFloat(box.paddingInlineStart) || 0) -
+          (Number.parseFloat(box.paddingInlineEnd) || 0)
+        : part.getBoundingClientRect().width
+    if (room <= 0) {
+      return
     }
-    this.stepped = this.natural > room + 0.5
-    this.toggleState('stepped', this.stepped)
+    const unit = this.renderRoot.querySelector('[part="unit"]')
+    const wrap = part.style.whiteSpace
+    part.style.whiteSpace = 'nowrap'
+    /* The breaks after the group separators are out while it is measured:
+       Chromium breaks at a `<wbr>` under `nowrap`, and "$8,402" measured as its
+       longer line, 71 pixels, and fitted a 96 pixel column it overflowed. */
+    const breaks = [...part.querySelectorAll<HTMLElement>('wbr')]
+    for (const one of breaks) {
+      one.style.display = 'none'
+    }
+    /* The unit counts only beside a slotted figure: a figure the stat writes
+       has a column of its own, and the unit already stands outside it. */
+    const beside = part instanceof HTMLSlotElement ? this.widthOf(unit) : 0
+    const fits = (): boolean => this.widthOf(part) + beside <= room + 0.5
+    this.toggleState('stepped', false)
+    this.toggleState('stepped-twice', false)
+    if (!fits()) {
+      this.toggleState('stepped', true)
+      if (!fits()) {
+        this.toggleState('stepped-twice', true)
+      }
+    }
+    part.style.whiteSpace = wrap
+    for (const one of breaks) {
+      one.style.removeProperty('display')
+    }
   }
 
   /** The width of what a part shows, slotted or its own, on the lines it takes. */
@@ -210,7 +246,11 @@ export class HelixHeadlessStat extends HelixElement {
     if (!part) {
       return 0
     }
-    const nodes = part instanceof HTMLSlotElement ? part.assignedNodes({ flatten: true }) : [part]
+    /* What the part holds, and not its box: the figure the part writes is a
+       grid item, as wide as the column whatever it holds, so its box always
+       fitted and the figure never stepped down. */
+    const nodes =
+      part instanceof HTMLSlotElement ? part.assignedNodes({ flatten: true }) : [...part.childNodes]
     const shown = nodes.filter(
       (node) => node.nodeType !== Node.TEXT_NODE || node.textContent?.trim(),
     )
@@ -228,10 +268,6 @@ export class HelixHeadlessStat extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.readPieces()
-    /* A new figure is measured afresh at full size. */
-    this.natural = 0
-    this.stepped = false
-    this.toggleState('stepped', false)
     this.fit()
     const given = this.direction as string | undefined
     if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
@@ -264,11 +300,30 @@ export class HelixHeadlessStat extends HelixElement {
       value === undefined || !Number.isFinite(value)
         ? ''
         : formatNumber(value, wordsLocale(this), this.formatOptions)
+    /* A break is offered after each group separator, so a figure too wide for
+       its column even two steps smaller breaks as "$1,284," over "567.89" and
+       not between two digits. */
+    const pieces: (string | TemplateResult)[] = []
+    if (figure !== '') {
+      let run = ''
+      for (const piece of formatNumberParts(
+        value as number,
+        wordsLocale(this),
+        this.formatOptions,
+      )) {
+        run += piece.value
+        if (piece.type === 'group') {
+          pieces.push(html`${run}<wbr />`)
+          run = ''
+        }
+      }
+      pieces.push(run)
+    }
     /* **The figure replaces the slot**, where a slot's fallback would not: the
        line breaks between the stat's children are assigned to the unnamed
        slot, so a fallback under it would never show. */
     return html`<slot name="label" part="label" @slotchange=${() => this.requestUpdate()}></slot>
-      ${figure === '' ? html`<slot part="value"></slot>` : html`<span part="value">${figure}</span>`}
+      ${figure === '' ? html`<slot part="value"></slot>` : html`<span part="value">${pieces}</span>`}
       <slot name="unit" part="unit" @slotchange=${this.readPieces}></slot>
       <slot name="trend" part="trend" @slotchange=${this.readPieces}></slot>`
   }

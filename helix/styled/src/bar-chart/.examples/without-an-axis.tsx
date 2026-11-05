@@ -6,7 +6,7 @@ export function Example() {
     >
       <table
         data-hidden-visually
-        id="signups-axis"
+        id="signups-bare"
       >
         <caption>Sign-ups a month</caption>
         <thead>
@@ -44,8 +44,9 @@ export function Example() {
       </table>
 
       <helix-bar-chart
-        for="signups-axis"
-        value-axis
+        for="signups-bare"
+        gridlines="none"
+        value-axis="none"
       ></helix-bar-chart>
     </helix-flex>
   )

@@ -1,11 +1,13 @@
 import {
   AriaForwardController,
   auditName,
+  autofocusTarget,
   CommandController,
   customElement,
   drawDismiss,
   drawDismissGlyph,
   FocusScopeController,
+  focusAs,
   focusableElements,
   HelixElement,
   headingsIn,
@@ -14,7 +16,9 @@ import {
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
+  openingFocus,
   reflectElements,
+  refocusWithin,
   unlockScroll,
   words,
 } from '@fusion.dev/helix-core'
@@ -457,6 +461,8 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
 
   /** Opens once anything slotted has had its first render. See `updated`. */
   private async openWhenSlotted(dialog: HTMLDialogElement): Promise<void> {
+    /* Before anything moves it, while the opener still holds focus. */
+    const focusing = openingFocus()
     await Promise.all(
       [...this.children]
         .map((one) => (one as Partial<{ updateComplete: Promise<unknown> }>).updateComplete)
@@ -465,6 +471,13 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     /* Re-checked, because both facts can have moved while that resolved. */
     if (this.open && !dialog.open && this.isConnected) {
       dialog.showModal()
+      /* **`autofocus` on a slotted component is honored here**, where the
+         browser's own focusing steps skip it. See `autofocusTarget`. */
+      const marked = await autofocusTarget(this)
+      if (marked && this.open && dialog.open) {
+        focusAs(marked, focusing)
+        return
+      }
       /* **WebKit leaves focus on the dialog** where the first control is
          inside a component's shadow root, as a text area's field is: its
          focusing steps do not count a host that delegates focus, where
@@ -476,7 +489,12 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
         this.matches(':focus-within') &&
         !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === dialog)
       if (!chose) {
-        focusableElements(this)[0]?.focus()
+        const first = focusableElements(this)[0]
+        if (first) {
+          focusAs(first, focusing)
+        }
+      } else {
+        refocusWithin(this, focusing)
       }
     }
   }

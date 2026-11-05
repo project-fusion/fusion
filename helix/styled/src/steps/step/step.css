@@ -41,7 +41,7 @@
   background-color: var(--steps-connector-color, var(--helix-color-border));
   content: "";
   position: absolute;
-  z-index: 0;
+  z-index: var(--helix-layer-base);
 }
 
 :host::before {
@@ -91,7 +91,7 @@
   justify-content: center;
   position: relative;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* The slot is a flex item like the glyph inside it, so it needs the same
@@ -156,7 +156,7 @@ slot[name="marker"]::slotted(*) {
   flex-direction: column;
   min-inline-size: 0;
   position: relative;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /*
@@ -181,8 +181,8 @@ slot[name="marker"]::slotted(*) {
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-space-control: var(--_step-inset);
   --helix-text-control: var(--helix-text-control-md);
   --button-foreground-color: var(--helix-color-foreground-muted);

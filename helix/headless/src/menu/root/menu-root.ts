@@ -726,6 +726,18 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * anywhere but the body is left there.
    */
   private readonly followRemoved = (records: MutationRecord[]): void => {
+    /* **A leading mark added after the rows were read decides the columns
+       again.** A menu opened from markup opens while the parser is still adding
+       its rows, and a row arrives before the icon inside it: on a page of
+       "Rename" and then "Delete" with a trash icon, no column was reserved and
+       the icon sat over the label. */
+    if (
+      records.some((one) =>
+        [...one.addedNodes, ...one.removedNodes].some((node) => (node as Element).slot === 'start'),
+      )
+    ) {
+      this.requestUpdate()
+    }
     if (!this.open) {
       return
     }

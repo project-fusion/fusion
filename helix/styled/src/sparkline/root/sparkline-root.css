@@ -211,7 +211,7 @@
   position: absolute;
   translate: -50% calc(-100% - var(--sparkline-mark-size, 5px));
   white-space: nowrap;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* On a right-to-left page the inline start is the right, so a mark hangs left
@@ -233,6 +233,7 @@
    the size the readout already takes, and one line, so a narrow cell ends the
    words in an ellipsis and never grows a second line. */
 [part="empty"],
+[part="error"],
 [part="loading"] {
   align-content: center;
   color: var(--helix-color-foreground-muted);

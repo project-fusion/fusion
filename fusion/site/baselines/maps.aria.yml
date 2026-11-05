@@ -40,11 +40,11 @@
       - listitem: Walk from the route to Barton Springs Pool
       - listitem: 3D buildings
     - toolbar "Map controls":
-      - button "Fill the screen": ⤢
+      - button "Fill the screen"
       - button "Map layers"
       - button "Show in 3D" [pressed]: 3D
-      - button "Zoom in": +
-      - button "Zoom out": −
+      - button "Zoom in"
+      - button "Zoom out"
       - button "Face north"
     - link "OpenFreeMap":
       - /url: https://openfreemap.org
@@ -102,9 +102,9 @@
     - list "Map layers":
       - listitem: Food and drink, 3,252 places from OpenStreetMap
     - toolbar "Map controls":
-      - button "Fill the screen": ⤢
-      - button "Zoom in": +
-      - button "Zoom out": −
+      - button "Fill the screen"
+      - button "Zoom in"
+      - button "Zoom out"
       - button "Face north"
     - link "OpenFreeMap":
       - /url: https://openfreemap.org
@@ -143,11 +143,11 @@
       - listitem: Terrain
       - listitem: Contour lines
     - toolbar "Map controls":
-      - button "Fill the screen": ⤢
+      - button "Fill the screen"
       - button "Map layers"
       - button "Show in 3D": 3D
-      - button "Zoom in": +
-      - button "Zoom out": −
+      - button "Zoom in"
+      - button "Zoom out"
       - button "Face north"
     - status
   - text: Press 3D to lay the valley flat. Open the layers menu for satellite imagery.
@@ -183,9 +183,9 @@
     - list "Map layers":
       - listitem: Weather radar, The last 50 minutes, in 10-minute steps
     - toolbar "Map controls":
-      - button "Fill the screen": ⤢
-      - button "Zoom in": +
-      - button "Zoom out": −
+      - button "Fill the screen"
+      - button "Zoom in"
+      - button "Zoom out"
       - button "Face north"
     - status
   - button "Show the next frame"

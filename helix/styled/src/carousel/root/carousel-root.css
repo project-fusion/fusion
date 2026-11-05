@@ -196,6 +196,15 @@
   color: var(--helix-color-foreground);
 }
 
+/* A step past the hover under a press, which drew the hover's fill and so
+   showed nothing a reader could see. */
+[part="rotation"]:active,
+[part="previous"]:active:not([aria-disabled="true"]),
+[part="next"]:active:not([aria-disabled="true"]) {
+  background-color: var(--helix-color-press);
+  color: var(--helix-color-foreground);
+}
+
 [part="rotation"]:focus-visible,
 [part="previous"]:focus-visible,
 [part="next"]:focus-visible {

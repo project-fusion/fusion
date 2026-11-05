@@ -10,3 +10,30 @@
   padding-inline: var(--_collection-inset-inline, var(--helix-space-sm));
   text-align: center;
 }
+
+/* **The danger mark before the line**, in its ink, so a list that did not
+   load reads apart from one that is empty by more than its color. The
+   `danger` tone's own mark, `x-circle-fill`, which Callout, Toast, and Code
+   Editor's problems draw, at the size of the text. Drawn by a pseudo-element,
+   so it is no word a screen reader hears. */
+[part="error"]::before {
+  background-color: currentColor;
+  block-size: 1.125em;
+  content: "";
+  display: inline-block;
+  inline-size: 1.125em;
+  margin-inline-end: var(--helix-space-xs);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m37.66 130.34a8 8 0 0 1-11.32 11.32L128 139.31l-26.34 26.35a8 8 0 0 1-11.32-11.32L116.69 128l-26.35-26.34a8 8 0 0 1 11.32-11.32L128 116.69l26.34-26.35a8 8 0 0 1 11.32 11.32L139.31 128Z'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  vertical-align: -0.1875em;
+}
+
+/* Forced colors paint every background the canvas, which took the mark, a
+   fill under a mask, with it. */
+@media (forced-colors: active) {
+  [part="error"]::before {
+    background-color: CanvasText;
+    forced-color-adjust: none;
+  }
+}

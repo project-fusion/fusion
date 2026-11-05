@@ -135,6 +135,17 @@ const ZOOM_MIN = 0.1
 const ZOOM_MAX = 8
 
 /**
+ * The least the automatic fit zooms out to: a card's 13 pixel text draws at
+ * about 10 pixels and a 12 pixel name at 9. Fitted whole, a five-card board in
+ * a 280 pixel column landed at 0.36 and drew its text at 4.7 pixels, and the
+ * minimap example's board at 0.11 and 1.4. **0.75, a step up from 0.6**, which
+ * drew the preview's names at 7.2 pixels at 390 wide, measured November 3,
+ * 2026, and read as a picture of a board more than as one. The reader can
+ * still zoom out to `ZOOM_MIN`.
+ */
+const FIT_MIN = 0.75
+
+/**
  * The zoom the ruling is drawn at, which steps by doubling as the board zooms
  * out so the lines stay far enough apart to be lines.
  *
@@ -3843,15 +3854,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * Fits the whole board into its box, centered, and never zoomed in past its
-   * own size.
+   * Fits the whole board into its box, centered, never zoomed in past its own
+   * size, and never zoomed out past the size its text still reads at.
    *
    * **Automatic while nobody has touched the board, and public for when they
    * have.** The document carries every rectangle, so the extent is arithmetic
    * rather than a guess, and a board that opened cropped would be one a reader
    * has to go looking for. Never magnified past its own size: a four-card board
    * blown up to fill a screen is a worse first view than a small one in the
-   * middle.
+   * middle. **Never shrunk past `FIT_MIN`**, where the cards' text would no
+   * longer read: a board larger than that opens at its top left corner, and the
+   * reader pans or zooms out for the rest.
    */
   fit(): void {
     this.fitInto(false)
@@ -3876,13 +3889,20 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
       return
     }
     const whole = { height: board.height + MARGIN * 2, width: board.width + MARGIN * 2 }
-    const zoom = Math.min(1, free.width / whole.width, free.height / whole.height)
+    const zoom = Math.max(
+      Math.min(1, free.width / whole.width, free.height / whole.height),
+      FIT_MIN,
+    )
     if (!Number.isFinite(zoom) || zoom <= 0) {
       return
     }
+    /* Centered along each side it fits, and from its start along a side it
+       does not, so the first cards are the ones in view. */
+    const along = (room: number, length: number, from: number): number =>
+      length * zoom > room ? from : from + (room - length * zoom) / 2
     const next = {
-      x: free.x + (free.width - whole.width * zoom) / 2,
-      y: free.y + (free.height - whole.height * zoom) / 2,
+      x: along(free.width, whole.width, free.x),
+      y: along(free.height, whole.height, free.y),
       zoom,
     }
     /* **Only where it moved**, or this never stops. A fit runs after every

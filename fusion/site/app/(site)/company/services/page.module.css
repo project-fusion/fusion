@@ -146,6 +146,13 @@
   font-size: var(--helix-text-lg);
 }
 
+/* The offers' standfirst at the same reading size. At the body's 14 it sat
+   between the hero's 18 and the closing panels' 18, the one paragraph on the
+   page set smaller than the prose around it. */
+.sectionLede {
+  font-size: var(--helix-text-lg);
+}
+
 /* Edge to edge on a narrow screen, and no corner where there is no gap. The
    landing bands do this and the reasoning is theirs: `--site-inset` clamps to
    1.5rem, so a 390px phone spends 48px, an eighth of its width, holding a card

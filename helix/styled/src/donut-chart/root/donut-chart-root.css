@@ -220,10 +220,19 @@
   );
 }
 
+/* **Half the proportions, with the type ramp's floor under them.** The opening
+   is as wide as the full ring's hole and half as tall, so the proportions are
+   halved, and halved alone they went below anything a reader can read:
+   measured in Chromium on November 3, 2026, the `arc` example drew its figure
+   at 12.9px, its unit at 6.99px and its label at 5.99px in a 108 by 54 opening.
+   The floors are the ramp's own steps, the label at `text-xs` as a Stat label
+   is everywhere, the unit and plain content at `text-sm`, and the figure at
+   `text-lg`, so the figure stays the largest thing in the opening. */
 :host([sweep="half"]) [part="center"] slot {
-  --stat-value-size: 12cqi;
+  --stat-label-size: var(--helix-text-xs);
+  --stat-value-size: max(var(--helix-text-lg), 12cqi);
 
-  font-size: 6.5cqi;
+  font-size: max(var(--helix-text-sm), 6.5cqi);
 }
 
 /* Placed from the inline start, which is the right on a right-to-left page, so
@@ -283,14 +292,14 @@
    donut has none; what reads through here is the page, which is the case that
    matters when the chart is on a surface that is itself translucent. */
 :host([material="glass"]) [part~="segment"] {
-  stroke-opacity: calc(0.62 * var(--helix-material-opacity));
+  stroke-opacity: var(--helix-material-glass-opacity);
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
-   0.88 against glass's 0.62 is the same relationship the surface tokens carry,
-   `material-translucent` at 60% against `material-translucent-strong` at 88%, so
-   a chart and a card mean the same thing by the word. */
+   Glass and frosted take the same two tokens a glass and a frosted surface
+   read, 0.72 and 0.88 at full strength, so a chart and a card mean the same
+   thing by the word. */
 :host([material="frosted"]) [part~="segment"] {
-  stroke-opacity: calc(0.88 * var(--helix-material-opacity));
+  stroke-opacity: var(--helix-material-frosted-opacity);
 }
 
 /* The summary is for screen readers, and the drawing is what a sighted reader

@@ -34,6 +34,13 @@ host through `ElementInternals`, pointing into their own shadow root. WebKit
 reads those references back as empty, so their specs for it fail there. We have
 not yet checked whether VoiceOver still reads the name.
 
+A field you give no width takes the width of the browser's own control inside
+it, and the two engines size that control differently. Measured on November 3,
+2026, an Input is 202 pixels wide in Chromium and 216 in WebKit, and Date Input,
+Combobox, and Number Input are each 14 pixels wider in WebKit too. A Textarea is
+212 in Chromium and 186 in WebKit. A field that fills a grid column, or has a
+width you set, is the same width in both.
+
 ## Browser features Helix uses
 
 | Feature | Where |
@@ -82,6 +89,45 @@ The headless examples use neither.
 because components still work without it. A component that cannot record a
 state keeps the look of its resting rule, so a checkbox is drawn unchecked.
 Helix tests for `:state()` support in the one place that records states.
+
+## Bundlers that rewrite `light-dark()`
+
+**Set your bundler's CSS targets to browsers that have `light-dark()`.** Some
+bundlers minify CSS for older browsers by default, and rewrite each
+`light-dark()` into a fallback that resolves on the root element. The page
+still switches between modes. A Toast, which takes the mode opposite the page,
+and an element with its own `data-color-mode` both draw in the page's mode. A
+development server does not minify CSS, so only a production build shows this.
+
+We measured on November 3, 2026:
+
+- Vite 8 targets Safari 16.4 by default and minifies with Lightning CSS, which
+  rewrites every `light-dark()` call in `helix.css`. A Toast on a white page
+  drew white.
+- Next.js 16 targets Safari 16.4 by default, and Turbopack processes CSS with
+  Lightning CSS.
+- Bun 1.4 rewrites `light-dark()` when it bundles CSS, and has no setting for
+  the browsers it targets. Serve the Helix stylesheets as files, as
+  [Without a bundler](./without-a-bundler) shows.
+- Angular builds CSS with esbuild, which leaves `light-dark()` as written.
+
+The Helix templates set these targets. In Vite, set `build.cssTarget`:
+
+```ts
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  build: { cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5', 'ios17.5'] },
+})
+```
+
+In Next.js, add `browserslist` to `package.json`:
+
+```json
+{
+  "browserslist": ["chrome >= 123", "edge >= 123", "firefox >= 120", "safari >= 17.5", "ios_saf >= 17.5"]
+}
+```
 
 ## Browsers without `CSS.highlights`
 

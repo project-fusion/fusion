@@ -1,4 +1,4 @@
-<!-- @summary The scale's numbers beside the plot, at the levels the grid rules, so a reading can be measured off the drawing. -->
+<!-- @summary Columns with no numbers or rules, using `value-axis` and `gridlines` set to `none`, for categories compared at a glance. -->
 
 <helix-flex
   direction="column"
@@ -6,13 +6,13 @@
 >
   <table
     data-hidden-visually
-    id="sessions-axis"
+    id="signups-bare"
   >
-    <caption>Sessions a month</caption>
+    <caption>Sign-ups a month</caption>
     <thead>
       <tr>
         <th scope="col">Month</th>
-        <th scope="col">Sessions</th>
+        <th scope="col">Sign-ups</th>
       </tr>
     </thead>
     <tbody>
@@ -43,9 +43,9 @@
     </tbody>
   </table>
 
-  <helix-line-chart
-    for="sessions-axis"
-    gridlines
-    value-axis
-  ></helix-line-chart>
+  <helix-bar-chart
+    for="signups-bare"
+    gridlines="none"
+    value-axis="none"
+  ></helix-bar-chart>
 </helix-flex>

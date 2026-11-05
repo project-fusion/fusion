@@ -4,11 +4,13 @@
 }
 
 /* Every metric that places a character, on the field and on the colored
-   copy `tokenize` draws under it, so the two match. */
+   copy `tokenize` draws under it, so the two match. The text is the full
+   ink, as Code Input's is: code being edited in the muted ink read as
+   disabled. */
 [part="highlight"],
 [part="source"] {
   border: none;
-  color: var(--helix-color-foreground-muted);
+  color: var(--helix-color-foreground);
   font-family: var(--helix-font-mono);
   font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
   inline-size: 100%;

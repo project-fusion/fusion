@@ -4,12 +4,19 @@
 
 /* ============================================================ sandbox ==== */
 
-/* The tool owns the viewport. */
+/* The tool owns the viewport.
+ *
+ * **Clipped rather than hidden.** A phone's divider is the 44px target centered
+ * on the controls' edge, so with the controls across the whole width it
+ * reaches 22px past the screen: the shell measured 412 wide at 390. `hidden`
+ * still scrolls when focus moves, and tabbing into the form panned the whole
+ * tool 22px left, taking the labels' gutter with it. `clip` cuts the same
+ * overflow and cannot be scrolled. */
 .sandboxShell {
   block-size: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .workbenchHeader {
@@ -18,6 +25,22 @@
 
   border-block-end-color: var(--helix-color-border);
   flex: 0 0 auto;
+}
+
+/* **On a touch screen the header's buttons sit far enough apart that each
+   press reaches 44.** They are 32px with 8px between, so each one's transparent
+   box stopped where its neighbor's began and measured 40 wide. Each takes 2px a
+   side, which with the flex's `2xs` gap opens 12 between them, where the boxes
+   meet without overlapping. A margin and not the flex's gap, which is the
+   component's own declaration. */
+@media (pointer: coarse) {
+  .workbenchHeader helix-icon-button {
+    margin-inline: calc(
+      (var(--helix-size-target) - var(--helix-size-control-sm)) /
+      2 -
+      var(--helix-space-2xs)
+    );
+  }
 }
 
 /* Editor and preview take what is left; the examples keep a fixed rail on the

@@ -1,5 +1,6 @@
 import { type HighlightLanguage, highlight } from '@fusion.dev/helix-sandbox/highlight'
 import { type AnchorHTMLAttributes, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { Code } from '@/components/code-text/code-text'
 import { SectionHeading } from '@/components/section-heading/section-heading'
 
 /*
@@ -89,7 +90,8 @@ const CodeFence = ({ children }: { children?: ReactNode }) => {
  * of one. One flows with a sentence and must never scroll; the other is a
  * figure with its own box, its own overflow and something to copy.
  */
-const InlineCode = ({ children }: { children?: ReactNode }) => <helix-code>{children}</helix-code>
+const InlineCode = ({ children }: { children?: ReactNode }) =>
+  typeof children === 'string' ? <Code>{children}</Code> : <helix-code>{children}</helix-code>
 
 /** Every string under a node, which is what a heading's slug is made from. */
 const textOf = (node: ReactNode): string => {

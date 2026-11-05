@@ -131,4 +131,77 @@ describe('the box labels', () => {
     expect(place(true)).toEqual(['North', 'South'])
     expect(place(false)).toEqual(['North'])
   })
+
+  test('names a step apart down a slanted edge are moved clear and every one is kept', () => {
+    /* Four series 11.5 pixels apart at 12, as a ribbon chart's were at 342 wide:
+       0.0125 of a box a pixel, so a step of 0.144 for names 0.15 tall. */
+    const row = (at: number, text: string) => ({ at, category: true, text })
+    const z = {
+      name: '',
+      ticks: [
+        row(-1, 'Frankfurt (ms)'),
+        row(-1 / 3, 'Virginia (ms)'),
+        row(1 / 3, 'Singapore (ms)'),
+        row(1, 'São Paulo (ms)'),
+      ],
+    }
+    const seen = ([, , depth]: readonly number[]) => ({
+      depth: 0,
+      x: (depth ?? 0) * 0.3,
+      y: -(depth ?? 0) * 0.216,
+    })
+    const labels = boxLabels(
+      seen,
+      { x: { name: '', ticks: [] }, y: { name: '', ticks: [] }, z },
+      { ...SIZES, tick: 0.15 },
+    )
+    expect(labels.map((label) => label.text).sort()).toEqual([
+      'Frankfurt (ms)',
+      'Singapore (ms)',
+      'São Paulo (ms)',
+      'Virginia (ms)',
+    ])
+    /* Each name's descenders, 0.44 of its height under a `g` or a `p` and
+       0.38 under a parenthesis, clear the next one's capitals, 0.48, by an
+       eighth of a line. */
+    const down = (text: string): number => (/[gjpqy]/.test(text) ? 0.44 : 0.38)
+    const sorted = [...labels].sort((one, other) => one.y - other.y)
+    for (const [index, below] of sorted.slice(1).entries()) {
+      const above = sorted[index] as BoxLabel
+      expect(below.y - above.y).toBeGreaterThanOrEqual(
+        0.15 * (down(above.text) + 0.48 + 0.125) - 1e-4,
+      )
+    }
+  })
+
+  test('a wide name off a slanted edge stands clear of the edge at its nearest corner', () => {
+    const row = (at: number, text: string) => ({ at, category: true, text })
+    const z = { name: '', ticks: [row(0, 'Singapore (ms)')] }
+    /* An edge rising to the right at about 25 degrees, with the box above it. */
+    const seen = ([across, up, depth]: readonly number[]) => ({
+      depth: 0,
+      x: (depth ?? 0) * 0.9 + (across ?? 0) * 0.1,
+      y: -(depth ?? 0) * 0.42 - (up ?? 0) * 0.5 - (across ?? 0) * 0.1,
+    })
+    const [label] = boxLabels(
+      seen,
+      { x: { name: '', ticks: [] }, y: { name: '', ticks: [] }, z },
+      SIZES,
+    )
+    const at = seen([1, -1, 0])
+    const along = { x: 0.9, y: -0.42 }
+    const length = Math.hypot(along.x, along.y)
+    const out = { x: 0.42 / length, y: 0.9 / length }
+    const half = { height: SIZES.tick / 2, width: (14 * SIZES.tick * SIZES.wide) / 2 }
+    const near = Math.min(
+      ...[-1, 1].flatMap((sx) =>
+        [-1, 1].map(
+          (sy) =>
+            ((label?.x ?? 0) + sx * half.width - at.x) * out.x +
+            ((label?.y ?? 0) + sy * half.height - at.y) * out.y,
+        ),
+      ),
+    )
+    expect(near).toBeGreaterThanOrEqual(SIZES.gap - 1e-9)
+  })
 })

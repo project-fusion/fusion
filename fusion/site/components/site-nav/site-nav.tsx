@@ -13,6 +13,9 @@ import { stageAppearance } from '@/content/verticals/verticals'
 import { MAILTO } from '@/utils/site/site'
 import styles from './site-nav.module.css'
 
+/** The id of the box under the bar that each page's strands go quiet behind. */
+export const MASTHEAD_QUIET = 'masthead-quiet'
+
 /**
  * The other two sections of the site, beside the Products panel.
  */
@@ -306,6 +309,16 @@ export function SiteNav({
 
   return (
     <>
+      {/* **Where the strands go quiet, at the top of the page under the bar.**
+          Over a hero the bar is clear, and a bright ridge of the light crossed
+          its end: "Menu" measured 2.86:1 at its tenth percentile at 390 in
+          dark. Each page's strands name this box in `quiet`, which dims the
+          light behind it to a glow that eases back below the bar. A box of its
+          own rather than the bar, because the bar is sticky and the strands
+          measure where a quiet element sits on the page: this one stays at the
+          top. */}
+      <div aria-hidden="true" className={styles.navQuiet} id={MASTHEAD_QUIET} />
+
       {/* The one glass, under both the bar and the panel.
 
           Always rendered and lit by an attribute rather than mounted on demand:

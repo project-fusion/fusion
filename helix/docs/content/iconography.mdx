@@ -27,10 +27,10 @@ The Icon entry registers every glyph in the set by name, so `name` draws any
 glyph. `@fusion.dev/helix/icon/all` is the same entry and registers the same
 set.
 
-## Size and color come from the surrounding text
+## Size comes from the region and color from the text
 
-An icon has no `size` and no `color` property. It is `1em` square and
-`currentColor`, so it takes the size and color of the text it sits in:
+An icon has no `size` and no `color` property. It draws in `currentColor`, so it
+takes the color of the text it sits in:
 
 ```html
 <span data-tone="danger">
@@ -38,8 +38,13 @@ An icon has no `size` and no `color` property. It is `1em` square and
 </span>
 ```
 
-Inside a control, `--helix-size-icon` sets the size, and it follows the region's
-density. So an icon in a small button is smaller without any extra setting.
+An icon is `--helix-size-icon` square, and that size follows the region's
+density: 16px at `sm`, 20px at `md`, and 24px at `lg`. It does not follow the
+size of the text around it. Inside a Button, an icon is 1.15 times the label's
+size, rounded down to an even pixel: 12px beside the 12px label of a small
+button, 14px beside a 13px label, and 16px beside a 14px label. A small button's
+icon is a step smaller without any extra setting. Set `--icon-size` on an icon
+to give it a size of its own.
 
 ## Decorative and named icons
 
@@ -50,16 +55,16 @@ density. So an icon in a small button is smaller without any extra setting.
   Delete
 </helix-button>
 
-<!-- Named: there is no text, so the icon has to carry the name. -->
-<helix-icon-button
-  label="Delete"
-  name="trash"
-></helix-icon-button>
+<!-- Named: there is no text, so the button has to carry the name. -->
+<helix-icon-button label="Delete">
+  <helix-icon name="trash"></helix-icon>
+</helix-icon-button>
 ```
 
 An icon with no `label` is hidden from assistive technology. Leave out `label`
 when text beside the icon says what it is. Add a `label` when there is no text.
-`Icon.Button` takes a `label` because it never has text beside it.
+Icon Button takes a `label` because it never has text beside it, and the icon
+inside it takes none.
 
 ## Mirror an icon on right-to-left pages
 
@@ -150,7 +155,7 @@ import { peak } from './icons'
 
 The command reads a directory of SVG files and writes the module that
 `helix-icon` draws from. It works the same way for your own drawings, another
-library's, or the 1,404 Phosphor glyphs this set does not include:
+library's, or the 1,351 Phosphor glyphs this set does not include:
 
 ```sh
 npx helix-icons build \

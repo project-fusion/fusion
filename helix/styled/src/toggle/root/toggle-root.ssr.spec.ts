@@ -7,7 +7,7 @@ describe('toggle server output', () => {
   test('the item ships as a real radio, named by its own words', () => {
     const markup = ssr(html`<helix-toggle value="light">Light</helix-toggle>`)
     expect(partTag(markup, 'item')).toContain('role="radio"')
-    expect(rendered(markup, 'helix-toggle')).toContain('<slot></slot>')
+    expect(rendered(markup, 'helix-toggle')).toContain('<span part="label"><slot></slot></span>')
   })
 
   /**

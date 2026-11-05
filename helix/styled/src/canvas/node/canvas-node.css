@@ -50,7 +50,7 @@
      what the card holds instead. */
   overflow: visible;
   position: absolute;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* **A group is a box behind its cards, not a card.** The cards inside it are
@@ -61,7 +61,7 @@
   border-style: dashed;
   /* Its name is drawn above the box, and a card's clipping cut it off. */
   overflow: visible;
-  z-index: 0;
+  z-index: var(--helix-layer-base);
 }
 
 :host([tone="accent"]) {
@@ -314,7 +314,7 @@
 @media (pointer: coarse) {
   :host(:focus-within) [part~="handle"]::after,
   :host(:focus-within) [part~="grip"]::after {
-    inset: calc((2.75rem - 100%) / -2);
+    inset: calc((var(--helix-size-target) - 100%) / -2);
   }
 }
 
@@ -392,7 +392,7 @@
    the ends, and a circle is the box's own ellipse. Each meets the middle of
    every side, which is where connections arrive. */
 :host([shape="square"]:not([group])) {
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
 }
 
 :host([shape="pill"]:not([group])) {

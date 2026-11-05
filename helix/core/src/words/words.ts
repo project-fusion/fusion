@@ -139,8 +139,8 @@ const watcher = (host: Host): ReactiveController => {
  * static words = 'helix-combobox'
  *
  * @words
- * @property({ attribute: 'empty-text' })
- * emptyText = 'No matches'
+ * @property({ attribute: 'no-results-text' })
+ * noResultsText = 'No matches'
  * ```
  *
  * **Reading the property gives the word in the element's locale**: a value

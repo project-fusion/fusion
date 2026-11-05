@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ticks } from './ticks.js'
+import { headroom, ticks } from './ticks.js'
 
 describe('ticks', () => {
   test('lands on numbers a reader would have picked', () => {
@@ -40,5 +40,37 @@ describe('ticks', () => {
 
   test('negatives cross zero without a gap', () => {
     expect(ticks([-40, 40])).toContain(0)
+  })
+
+  test('a top on a level keeps its rule, which summed steps lost', () => {
+    expect(ticks([0, 1.2])).toEqual([0, 0.2, 0.4, 0.6, 0.8, 1, 1.2])
+  })
+})
+
+describe('headroom', () => {
+  test('raises the top to a level clear of the highest reading', () => {
+    /* 1,410 was drawn on the top edge with 1,400 the highest rule under it. */
+    expect(headroom([1180, 1410])).toEqual([1180, 1450])
+    expect(ticks(headroom([1180, 1410])).at(-1)).toBe(1450)
+  })
+
+  test('a peak exactly on a level takes the next one', () => {
+    expect(headroom([0, 1000])).toEqual([0, 1200])
+  })
+
+  test('works the step out again when raising the top widens it', () => {
+    /* 0 to 147 rules every 20 and 0 to 160 every 50, so 160 would be off the
+       scale. 150 is on it. */
+    expect(headroom([0, 140])).toEqual([0, 150])
+    expect(ticks(headroom([0, 140])).at(-1)).toBe(150)
+  })
+
+  test('tenths stay tenths', () => {
+    expect(headroom([0, 0.93])).toEqual([0, 1])
+  })
+
+  test('a top at zero and a flat domain are left alone', () => {
+    expect(headroom([-40, 0])).toEqual([-40, 0])
+    expect(headroom([7, 7])).toEqual([7, 7])
   })
 })

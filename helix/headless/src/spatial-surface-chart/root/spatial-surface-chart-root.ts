@@ -124,6 +124,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.
+ * @slot error - Content shown while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixPlotChangeEvent} helix-plot-change - The readings or the place the keys rest on changed, which the renderer is told. It stays on the chart.
@@ -135,6 +136,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart contour - The pieces of one contour line that cross one square of the surface, drawn under `contours` at their height, colored along the ramp by it.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the surface.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
+ * @csspart error - The words while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart face - One square of the surface between four readings, or a triangle where one is missing, shaded by its height and by which way it faces.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
@@ -171,6 +173,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @cssstate active - While a place is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the surface, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the readings.
+ * @cssstate error - While the `error` part stands in place of the readings.
  * @cssstate loading - While the `loading` part stands in place of the readings.
  */
 @customElement('helix-headless-spatial-surface-chart')

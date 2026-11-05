@@ -79,7 +79,7 @@ describe('a timeline', () => {
     await host.updateComplete
     const loading = part(host, 'loading') as HTMLElement
     expect(loading.getAttribute('role')).toBe('listitem')
-    expect(loading.textContent?.trim()).toBe('Loading more')
+    expect(loading.textContent?.trim()).toBe('Loading')
     const internals = internalsOf(host)
     expect(internals.ariaBusy).toBe('true')
     expect(hasState(host, 'loading')).toBe(true)

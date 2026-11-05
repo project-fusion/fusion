@@ -1,8 +1,10 @@
 :host {
   /* Relative to the surrounding text, because a key inside a heading has to be
      key-sized in that heading. 0.85 rather than 0.75: three quarters of 13px is
-     a 9.75px glyph, and an arrow that small in the mono face is a smudge. */
-  --_kbd-size: var(--kbd-font-size, 0.85em);
+     a 9.75px glyph, and an arrow that small in the mono face is a smudge.
+     **Rounded to a whole pixel**, 12 in 14 pixel text, where it was 11.9, a
+     size no other code on the page is set at. */
+  --_kbd-size: var(--kbd-font-size, round(0.85em, 1px));
   /* Whole pixels, so the face is drawn at the height it is laid out at and
      the label centered in it stays centered at 1x. Unrounded, a 17.85px face
      drew 17px tall in Chromium and 18px in WebKit, and K sat 0.84px low in the

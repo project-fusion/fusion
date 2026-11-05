@@ -1,4 +1,4 @@
-<!-- @summary The numbers of the scale the columns are measured on, beside the plot, with one scale. -->
+<!-- @summary Sessions drawn as a shape with no numbers or rules, using `value-axis` and `gridlines` set to `none`, for a chart in a card beside the figure it explains. -->
 
 <helix-flex
   direction="column"
@@ -6,13 +6,13 @@
 >
   <table
     data-hidden-visually
-    id="signups-axis"
+    id="sessions-bare"
   >
-    <caption>Sign-ups a month</caption>
+    <caption>Sessions a month</caption>
     <thead>
       <tr>
         <th scope="col">Month</th>
-        <th scope="col">Sign-ups</th>
+        <th scope="col">Sessions</th>
       </tr>
     </thead>
     <tbody>
@@ -43,8 +43,9 @@
     </tbody>
   </table>
 
-  <helix-bar-chart
-    for="signups-axis"
-    value-axis
-  ></helix-bar-chart>
+  <helix-line-chart
+    for="sessions-bare"
+    gridlines="none"
+    value-axis="none"
+  ></helix-line-chart>
 </helix-flex>

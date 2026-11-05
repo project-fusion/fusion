@@ -53,7 +53,7 @@
   background-color: var(--toast-background-color, var(--helix-color-surface-overlay));
   border-radius: var(--toast-radius, var(--helix-radii-sm));
   border: var(--toast-border-width, var(--helix-border-floating)) solid
-    var(--toast-border-color, var(--helix-color-border));
+    var(--toast-border-color, var(--helix-color-border-floating));
   box-shadow: var(--toast-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
   color: var(--toast-color, var(--helix-color-foreground));

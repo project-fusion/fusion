@@ -178,3 +178,34 @@ helix-tree-item:hover .docsJump,
 helix-tree-item:focus-within .docsJump {
   opacity: 1;
 }
+
+/* **On a touch screen every press in the bar and the panel reaches 44.** The
+   actions are 32px at a 36px pitch, so each press stopped where its neighbor's
+   began, 36 wide; the gap opens until the presses meet. The examples' divider is
+   44px wide on a touch screen and centered on the stage's edge, so it reached
+   22px into the bar and took the end of the last button's press; the bar's end
+   inset clears it. The panel's tabs sit at its top edge, under the reach of the
+   divider above them (`--helix-space-2xs`), which took the top of every tab's
+   press and left 37; the inset moves them clear. */
+@media (pointer: coarse) {
+  .sandboxActions {
+    --toolbar-gap: calc(var(--helix-size-target) - var(--helix-size-control-sm));
+  }
+
+  .sandboxToolbar {
+    padding-inline-end: calc(
+      var(--helix-size-target) /
+      2 +
+      (var(--helix-size-target) - var(--helix-size-control-sm)) /
+      2
+    );
+  }
+
+  .panelTabs {
+    padding-block-start: calc(
+      var(--helix-space-2xs) +
+      (var(--helix-size-target) - var(--helix-size-control)) /
+      2
+    );
+  }
+}

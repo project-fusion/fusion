@@ -16,10 +16,10 @@
      controls lie over the map or the board the way a popover lies over a page,
      so each is a raised Icon Button, which takes the theme's floating edge and
      lift and the overlay for a ground. Said here once, as hooks every button in
-     the cluster reads: the small control size, the full ink rather than an icon
-     button's quiet one, the page's own ground where it sets
-     `--viewport-control-background-color`, and pointed at, that ground with a
-     little of the ink in it, as a quiet button shows it. */
+     the cluster reads: a control a step smaller than the region's, the full
+     ink rather than an icon button's quiet one, the page's own ground where it
+     sets `--viewport-control-background-color`, and pointed at, that ground
+     with a little of the ink in it, as a quiet button shows it. */
 
   --icon-button-background-color: var(--viewport-control-background-color);
   --icon-button-background-color-hover: color-mix(
@@ -28,10 +28,14 @@
     var(--viewport-control-background-color, var(--helix-color-surface-overlay))
   );
   --icon-button-foreground-color: var(--helix-color-foreground);
-  --icon-button-size: var(--helix-size-control-sm);
-  /* The pan and zoom marks are characters, so this sets them to an icon's size: at
-     body size a plus measured 6.5 pixels in a 32 pixel box. */
-  font-size: var(--helix-size-icon);
+  /* **A step below the region's control, so the cluster follows density**:
+     32 at the default, 26 under `data-density="sm"` and 38 under `lg`. It was
+     the fixed small step, 32 in every region. */
+  --icon-button-size: var(--helix-size-control-tight);
+  /* **The glyph is half its button, on an even pixel**, so it centers on a
+     whole pixel at every step: 16 in 32, 14 in 26, and 20 in 38. The icon
+     scale's own tight step is 13 and 19, which sat half a pixel off center. */
+  --_viewport-glyph-size: round(calc(var(--icon-button-size) / 2), 2px);
 
   display: grid;
   gap: var(--helix-space-2xs);
@@ -50,6 +54,16 @@
   inset-block-start: var(--helix-space-sm);
   inset-inline-end: var(--helix-space-sm);
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* **On a touch screen each control grows to the target.** The buttons sit a
+   `2xs` gap apart, and zoom in and out touch, so a press box past one took
+   the press from the one beside it: measured on Map at 390, each reached 36
+   to 39 of the 44. The glyph stays half its button, as above. */
+@media (pointer: coarse) {
+  [part="controls"] {
+    --icon-button-size: max(var(--helix-size-control-tight), var(--helix-size-target));
+  }
 }
 
 /* **The cluster is laid out for the controls that are there.** With the zoom
@@ -87,7 +101,7 @@
 :host(:state(fullscreen)) [part="region"] {
   block-size: 100dvh;
   border: none;
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
 }
 
 /* Said as well as defaulted, so a consumer can put the controls back in the
@@ -148,13 +162,15 @@
   font-size: var(--helix-text-sm);
 }
 
-/* **An icon a page slots in is sized like the glyph it replaces**, so an icon
-   set swapped in leaves every button its size. */
+/* **Each control's glyph is drawn from the icon set**, at the size above. An
+   icon a page slots in is sized the same, so an icon set swapped in leaves
+   every button its size. */
+[part="controls"] [data-glyph],
 [part="controls"] ::slotted(*) {
-  --icon-size: var(--helix-size-icon-sm);
+  --icon-size: var(--_viewport-glyph-size);
 
-  block-size: var(--helix-size-icon-sm);
-  inline-size: var(--helix-size-icon-sm);
+  block-size: var(--_viewport-glyph-size);
+  inline-size: var(--_viewport-glyph-size);
 }
 
 /* **What the surface let pass to the page, said over it for a moment**, and

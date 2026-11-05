@@ -63,23 +63,90 @@ export interface BoxLabelSizes {
   wide: number
 }
 
-/** A label's box on the page: its middle and its half width and height. */
+/** A label's box on the page: its middle, its half width and height, and how far its ink reaches above and below its middle. */
 interface Area {
   half: { height: number; width: number }
+  ink: { down: number; up: number }
   x: number
   y: number
 }
 
 /**
- * Whether two labels would cover each other. **By their ink**, which stands
- * about four fifths of a line tall: measured by the whole line, the names of
- * a bar chart's categories, a line and a quarter apart down a slanted edge,
- * read as touching and every other one was left out.
+ * How far a label's ink reaches above and below its middle, as shares of its
+ * height, from the letters in it. **The ink is not centered on the line.**
+ * Measured on Fusion Sans with the middle as the baseline, November 3, 2026: a
+ * capital, a figure, or a tall letter reaches 0.44 to 0.48 up, and a word of
+ * small letters 0.27; a word with no descender reaches 0.29 down, a
+ * parenthesis 0.38, and `g`, `j`, `p`, `q`, or `y` 0.44. So "Virginia (ms)" is
+ * 0.92 of a line tall and "North" 0.73. One share for every label, the four
+ * fifths of a line this was, put the first too short: four names 11.5 pixels
+ * apart at 12 were judged clear with their descenders on the capitals below.
  */
-const INK = 0.8
+const inkOf = (text: string): { down: number; up: number } => ({
+  down: /[gjpqyçÇ]/.test(text) ? 0.44 : /[()[\]{},;|/]/.test(text) ? 0.38 : 0.29,
+  up: /^[acemnorsuvwxz\s.,:;-]*$/.test(text) ? 0.27 : 0.48,
+})
+
+/** Whether two labels would cover each other, by their ink and `pad` more. */
 const overlaps = (one: Area, other: Area, pad: number): boolean =>
   Math.abs(one.x - other.x) < one.half.width + other.half.width + pad &&
-  Math.abs(one.y - other.y) < (one.half.height + other.half.height) * INK + pad
+  one.y - one.ink.up < other.y + other.ink.down + pad &&
+  other.y - other.ink.up < one.y + one.ink.down + pad
+
+/** How far two labels' inks are from meeting down the page, or less than nothing where they meet. */
+const inkApart = (above: Area, below: Area): number =>
+  below.y - below.ink.up - (above.y + above.ink.down)
+
+/** The clear space kept between two categories' inks, as a share of a number's height: a pixel and a half at 12. */
+const CLEAR = 0.125
+
+/** The furthest a category's name moves off its place to stand clear, as a share of a number's height. */
+const NUDGE = 0.4
+
+/**
+ * Moves an axis' category names apart down the page where their inks would
+ * meet or come within `clear` of meeting, each by no more than `NUDGE` of a
+ * line, so every name is kept and stays beside its own place.
+ *
+ * **A name is moved and not left out.** The names of a slanted edge stand a
+ * step apart down the page, and in a narrow plot the step is about a line:
+ * measured on November 3, 2026 at 342 wide, a ribbon chart's four series 11.5
+ * apart at 12, with 0.6 of a pixel between one's descenders and the next one's
+ * capitals. A number reads from its neighbors and is thinned where it would
+ * cover another; a category has no neighbor to read it from, so each pair is
+ * pushed apart, half each, until they stand clear, and only a name still meeting
+ * another after that is left out.
+ */
+const spread = (names: Area[], clear: number): void => {
+  const placed = names.map((name) => ({ from: name.y, name }))
+  const order = [...placed].sort((one, other) => one.from - other.from).map((one) => one.name)
+  for (let round = 0; round < 32; round += 1) {
+    let moved = false
+    for (const [step, below] of order.entries()) {
+      const above = order[step - 1]
+      if (above === undefined) {
+        continue
+      }
+      const short = clear - inkApart(above, below)
+      if (
+        short <= clear * 1e-3 ||
+        Math.abs(above.x - below.x) >= above.half.width + below.half.width
+      ) {
+        continue
+      }
+      above.y -= short / 2
+      below.y += short / 2
+      moved = true
+    }
+    if (!moved) {
+      break
+    }
+  }
+  for (const { from, name } of placed) {
+    const most = name.half.height * 2 * NUDGE
+    name.y = Math.min(from + most, Math.max(from - most, name.y))
+  }
+}
 
 /**
  * The numbers and names of a box's three axes, placed on the page for a
@@ -132,17 +199,30 @@ export const boxLabels = (
     return { height, width: text.length * height * sizes.wide }
   }
   /* A label of this size off `at` in direction `out`, the side of it
-     nearest `at` a gap away. */
+     nearest `at` a gap away.
+   *
+     **The nearest side is the box's corner where `out` slants**, which is
+     how far the box reaches toward the edge: half its width times the
+     slant across, and half its height times the slant down. Moved by the
+     square of each slant, which is what this was, a wide name off a slanted
+     edge came back over it by a third of its width, and the names of a
+     ribbon chart ran into the ends of the ribbons standing on that edge. */
   const off = (
     at: PagePoint,
     out: PagePoint,
     box: { height: number; width: number },
     by: number,
-  ): Area => ({
-    half: { height: box.height / 2, width: box.width / 2 },
-    x: at.x + out.x * by + (out.x * box.width) / 2,
-    y: at.y + out.y * by + (out.y * box.height) / 2,
-  })
+    text: string,
+  ): Area => {
+    const reach = by + (Math.abs(out.x) * box.width) / 2 + (Math.abs(out.y) * box.height) / 2
+    const ink = inkOf(text)
+    return {
+      half: { height: box.height / 2, width: box.width / 2 },
+      ink: { down: ink.down * box.height, up: ink.up * box.height },
+      x: at.x + out.x * reach,
+      y: at.y + out.y * reach,
+    }
+  }
   const names: Array<Area & { text: string }> = []
   const ticks: Array<Area & { category: boolean; text: string; of: number }> = []
   for (const { along, key } of edges) {
@@ -160,16 +240,21 @@ export const boxLabels = (
       out = { x: -out.x, y: -out.y }
     }
     let deepest = 0
+    const first = ticks.length
     for (const tick of axis.ticks) {
       const box = size(tick.text, false)
       ticks.push({
-        ...off(seen(along(tick.at)), out, box, sizes.gap),
+        ...off(seen(along(tick.at)), out, box, sizes.gap, tick.text),
         category: tick.category === true,
         of: axis.ticks.length,
         text: tick.text,
       })
       deepest = Math.max(deepest, Math.abs(out.x) * box.width + Math.abs(out.y) * box.height)
     }
+    spread(
+      ticks.slice(first).filter((tick) => tick.category),
+      sizes.tick * CLEAR,
+    )
     if (axis.name === '') {
       continue
     }
@@ -180,8 +265,8 @@ export const boxLabels = (
     names.push({
       ...(key === 'y'
         ? /* Over the top of the upright, where a name reads level. */
-          off(to, { x: 0, y: -1 }, box, sizes.gap + (topped ? sizes.tick / 2 : 0))
-        : off(seen(along(0)), out, box, sizes.gap * 2 + deepest)),
+          off(to, { x: 0, y: -1 }, box, sizes.gap + (topped ? sizes.tick / 2 : 0), axis.name)
+        : off(seen(along(0)), out, box, sizes.gap * 2 + deepest, axis.name)),
       text: axis.name,
     })
   }

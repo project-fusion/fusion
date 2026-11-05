@@ -1,3 +1,13 @@
+/* The box the strands go quiet behind: the bar's height, at the top of the
+   page, drawing nothing and taking no press. */
+.navQuiet {
+  block-size: var(--helix-size-header);
+  inset-block-start: 0;
+  inset-inline: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
 /* The one glass. **`--site-glass`, which is what the landing bands are made
    of.** The bar had its own filter written out and its fill from
    `--helix-material-translucent`, so the masthead floating over a band was a

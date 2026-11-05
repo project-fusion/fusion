@@ -1279,7 +1279,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                desk hid the component on a phone. */
             split={showEditor ? paneShare : narrow ? 100 : 0}
           >
-            <helix-sandbox-toolbar slot="toolbar">
+            <helix-sandbox-toolbar class={styles.sandboxToolbar} slot="toolbar">
               {/* A toggle group, not a tab list. A tab in the toolbar would carry
                 `aria-controls` for a panel down in the source pane, and an
                 IDREF cannot leave the tab's shadow root to reach it: the
@@ -1301,7 +1301,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                 </helix-toggle-group>
               )}
 
-              <helix-toolbar label="Sandbox actions" slot="end">
+              <helix-toolbar class={styles.sandboxActions} label="Sandbox actions" slot="end">
                 <helix-tooltip
                   content={copied ? 'Link copied' : 'Copy a link to this example'}
                   placement="bottom"
@@ -1487,6 +1487,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
              */}
             {showPanel && (
               <helix-tabs
+                class={styles.panelTabs}
                 data-density="sm"
                 defaultActive="console"
                 label="Panel"

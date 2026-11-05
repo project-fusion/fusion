@@ -83,3 +83,39 @@
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
 }
+
+/* **On a touch screen every control in the bar reaches 44.** Each press grows
+   in a transparent box, so nothing drawn moves, and the bar makes room for the
+   boxes instead of letting them overlap: the gap opens to the 12px two 32px
+   controls need, and the inset clears the reach of the divider above the bar
+   (`--helix-space-2xs` into the pane) as well as the press's own 6px. The icon
+   controls stop shrinking, which had taken the layout cycle to 30px wide. */
+@media (pointer: coarse) {
+  .docsPreviewBar {
+    column-gap: calc(var(--helix-size-target) - var(--helix-size-control));
+    padding-block: calc(
+      var(--helix-space-2xs) +
+      (var(--helix-size-target) - var(--helix-size-control)) /
+      2
+    );
+  }
+
+  .docsPreviewTab,
+  .docsPreviewOpen {
+    flex: none;
+    position: relative;
+  }
+
+  .docsPreviewTab::after,
+  .docsPreviewOpen::after {
+    content: "";
+    inset: calc((var(--helix-size-target) - 100%) / -2);
+    position: absolute;
+  }
+
+  /* The tabs are wider than 44 and sit side by side, so theirs grows on the
+     block axis only. */
+  .docsPreviewTab::after {
+    inset-inline: 0;
+  }
+}

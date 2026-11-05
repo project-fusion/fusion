@@ -33,7 +33,7 @@
 
 :host([separation="plain"]) [part="field"] {
   border: none;
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
 }
 
 /* The header and the status line are one strip each, on one fill, and dense
@@ -42,8 +42,8 @@
 [part="header"],
 [part="status"] {
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
@@ -120,9 +120,17 @@
   flex: 0 0 auto;
 }
 
-/* The code: the editor's own face, and the room the rest leaves. */
+/* The code: the editor's own face, and the room the rest leaves.
+
+   **Code reads left to right whatever the page does**, as Code Block's does.
+   Under `dir="rtl"` the code inherited the page's direction, so each line
+   started at the right edge with its closing punctuation moved to the front.
+   Isolated, so a Hebrew comment inside the code still reads right to left
+   within its line. The header and the status line keep the page's direction. */
 [part="body"] {
   color: var(--helix-color-foreground);
+  direction: ltr;
+  unicode-bidi: isolate;
   display: flex;
   flex: 1 1 auto;
   font-family: var(--helix-font-mono);
@@ -207,6 +215,14 @@
 [part="diagnostic-icon"] {
   display: inline-flex;
   flex: 0 0 auto;
+}
+
+/* A problem is a sentence about code, and it takes the direction of its own
+   first letter. On a right-to-left page an English message took the page's,
+   and its final period and question mark moved to its start: ".Line 10:
+   Unexpected console statement". */
+[part~="diagnostic"] {
+  unicode-bidi: plaintext;
 }
 
 [part~="diagnostic-danger"] [part="diagnostic-icon"] {

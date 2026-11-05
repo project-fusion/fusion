@@ -28,6 +28,12 @@
   --card-backdrop: blur(40px) saturate(1.5);
 }
 
+/* The tags over the words at the gap the card puts between its regions, which
+   is where they sat when the tags were the header. */
+.insightBody {
+  row-gap: var(--helix-space-field);
+}
+
 /* The summary, held to two lines. **A card shows a preview and the page shows
    the description.** `summary` is the essay's own `description`, which is also
    its meta description and its line in `llms.txt`, so it is written to be a

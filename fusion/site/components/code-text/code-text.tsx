@@ -10,6 +10,45 @@ const CODE = /`([^`]+)`/
 const BOLD = '**'
 
 /**
+ * A run of hyphens that opens a word, with the character after it: the `--` of
+ * a custom property, the `-` of `-apple-system`, the `-webkit-` after `::`.
+ * Not one inside a word, where a line may break after it as it does in prose.
+ */
+const OPENING_HYPHENS = /(?<![\w-])(-+[^\s-]?)/g
+
+/**
+ * Inline code whose opening hyphens stay with the word they open.
+ *
+ * **A browser breaks a line after any hyphen**, and one that opens a word is
+ * no exception: measured at 390, the docs ended lines on `system-ui, -` with
+ * `apple-system` below it, and on `var(--` with the property's name below. A
+ * lone hyphen at a line's end reads as a dash, or as nothing. The run and the
+ * character after it are held on one line by a span that does not wrap, which
+ * leaves the text a reader copies as it was written: a word joiner would have
+ * been copied into the custom property's name with it.
+ */
+export function Code({ children }: { children: string }) {
+  const pieces = children.split(OPENING_HYPHENS)
+  /* Keyed by where each piece starts in the text, which is unique within it. */
+  let offset = 0
+  return (
+    <helix-code>
+      {pieces.map((piece, at) => {
+        const key = offset
+        offset += piece.length
+        return at % 2 === 1 ? (
+          <span key={key} style={{ whiteSpace: 'nowrap' }}>
+            {piece}
+          </span>
+        ) : (
+          <Fragment key={key}>{piece}</Fragment>
+        )
+      })}
+    </helix-code>
+  )
+}
+
+/**
  * Text from the manifest, with each span in backticks shown as inline code and
  * each span in double asterisks in bold.
  *
@@ -37,7 +76,7 @@ export function CodeText({ children }: { children: string }) {
   }
   for (const [at, piece] of pieces.entries()) {
     if (at % 2 === 1) {
-      add(offset, <helix-code>{piece.replace(/\s+/g, ' ')}</helix-code>)
+      add(offset, <Code>{piece.replace(/\s+/g, ' ')}</Code>)
       offset += piece.length + 2
       continue
     }

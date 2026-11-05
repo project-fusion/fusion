@@ -10,6 +10,7 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  headroom,
   linear,
   linePath,
   MIRROR_RULE,
@@ -110,8 +111,10 @@ export interface AreaStack {
  * compare the parts with each other; the scale then fits the largest part
  * rather than the total.
  *
- * `value-axis` draws the scale's numbers beside the plot, at the levels
- * `gridlines` rules: amounts in `locale`, or percentages under `share`.
+ * The scale's numbers stand beside the plot, at the levels the gridlines
+ * rule: amounts in `locale`, or percentages under `share`. The top of the
+ * scale is a level above the highest total. `value-axis="none"` and
+ * `gridlines="none"` take them away, for bands read as a composition.
  *
  * The drawing is hidden from screen readers. The text summary gives the latest
  * reading's total and each part's share of it, and the table beside the chart
@@ -140,6 +143,9 @@ export interface AreaStack {
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
+ * When the readings did not load, set `error-text`, such as "The visits did
+ * not load": it stands in the plot in place of both, and the `error` slot
+ * takes a button that tries again.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -160,16 +166,18 @@ export interface AreaStack {
  * @documentation https://fusion.dev/helix/components/area-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - One part's band.
- * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
+ * @csspart axis - The numbers of the scale beside the plot, unless `value-axis` is `none`.
  * @csspart baseline - The rule at zero, which is the floor of the drawing.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
@@ -207,6 +215,7 @@ export interface AreaStack {
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate error - While the `error` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-area-chart')
@@ -259,14 +268,15 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
   /**
    * Which rules are drawn across the plot, if any.
    *
-   * The same three values `LineChart` takes, with the same fallback: a bare
-   * `gridlines`, or anything unrecognized, rules the levels, and `category`
-   * rules each reading whose name is drawn. Drawn over the bands
+   * Absent rules the levels, as `value` does, and `none` draws no rules. The
+   * same values `LineChart` takes, with the same fallback: a bare `gridlines`,
+   * or anything unrecognized, rules the levels, and `category` rules each
+   * reading whose name is drawn. Drawn over the bands
    * rather than under them, because the bands are opaque and a rule under one is
    * a rule nobody sees.
    */
   @property()
-  gridlines?: 'both' | 'category' | 'value'
+  gridlines?: 'both' | 'category' | 'none' | 'value'
 
   /**
    * Draws every band from zero, in front of the next, so a band's height is
@@ -306,14 +316,22 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
   totalLabel = 'Total'
 
   /**
-   * Draws the scale's numbers beside the plot, the `axis` part, at the levels
-   * `gridlines` rules: amounts, or percentages under `share`.
+   * Whether the scale's numbers are drawn beside the plot, the `axis` part.
    *
-   * Absent draws none: bands read as a composition need no numbers beside
-   * them, and the tooltip and the table hold every reading.
+   * Absent draws them, at the levels `gridlines` rules: amounts, or
+   * percentages under `share`. `none` draws no axis, for bands read as a
+   * composition, where the tooltip and the table hold every reading.
+   *
+   * Reflected, because the stylesheet gives the axis a column of its own unless
+   * this is `none`, and undefaulted, so a host carries only what you wrote.
    */
-  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
-  valueAxis = false
+  @property({ attribute: 'value-axis', reflect: true })
+  valueAxis?: 'none'
+
+  /** Whether the axis is drawn, which is every value but `none`. */
+  protected get drawsAxis(): boolean {
+    return this.valueAxis !== 'none'
+  }
 
   private warnedAboutNegatives = false
 
@@ -323,9 +341,9 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
    */
   private readonly names = new CategoryAxisController(this)
 
-  /** Whether the levels are ruled, which is every value but `category`. */
+  /** Whether the levels are ruled, which is every value but `category` and `none`. */
   protected get rulesValue(): boolean {
-    return this.gridlines !== undefined && this.gridlines !== 'category'
+    return this.gridlines !== 'category' && this.gridlines !== 'none'
   }
 
   /** Whether each reading is ruled, which only two values ask for. */
@@ -429,19 +447,23 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       : this.share
         ? 1
         : highest(stack.totals)
-    const domain: [number, number] = [0, top > 0 ? top : 1]
+    /* Room above the highest total wherever the scale is drawn, for the
+       reason `LineChart` gives. A share fills the height by definition, and
+       its top is 100 percent, already a level. */
+    const extent: [number, number] = [0, top > 0 ? top : 1]
+    const domain = !this.share && (this.drawsAxis || this.rulesValue) ? headroom(extent) : extent
     const y = linear(domain, [PLOT_HEIGHT, 0])
     /* In the middle of each reading's slot, for the reason `LineChart` gives:
        the names underneath are a row of equal columns, and a reading at the
        edge of the box sits half a slot away from its own name. */
     const slot = PLOT_WIDTH / rows.length
     const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
-    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
+    return html`${this.drawsAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
       ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**
-   * The scale's numbers beside the plot, under `value-axis`: amounts written
+   * The scale's numbers beside the plot, unless `value-axis` is `none`: amounts written
    * in the chart's locale, or percentages under `share`. A seam, so a
    * subclass can write the numbers its own way, such as a currency.
    */
@@ -536,7 +558,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     domain: [number, number],
     count: number,
   ): TemplateResult | typeof nothing {
-    if (this.gridlines === undefined) {
+    if (!this.rulesValue && !this.rulesCategory) {
       return nothing
     }
     const down = this.rulesCategory

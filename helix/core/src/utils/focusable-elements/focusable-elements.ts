@@ -117,3 +117,66 @@ export const deepContains = (root: Node, node: Node | null): boolean => {
   }
   return false
 }
+
+/**
+ * The element inside `root` marked `autofocus`, once it can take focus, or
+ * `null` where nothing is marked.
+ *
+ * For a modal whose contents are components. A `<dialog>`'s focusing steps
+ * look for `autofocus`, and Chromium's skip a component host that delegates
+ * focus, so a dialog with a close control opened with focus on the close
+ * control rather than the action marked. It waits on two things first: the
+ * end of parsing, because a dialog opened from markup while the page is still
+ * loading opens before the parser has added its contents, and the marked
+ * element's first render, because a host has nothing to delegate to before it.
+ */
+export const autofocusTarget = async (root: HTMLElement): Promise<HTMLElement | null> => {
+  const document = root.ownerDocument
+  if (document.readyState === 'loading') {
+    await new Promise((resolve) =>
+      document.addEventListener('DOMContentLoaded', resolve, { once: true }),
+    )
+  }
+  const marked = root.querySelector<HTMLElement & Partial<{ updateComplete: Promise<unknown> }>>(
+    '[autofocus]',
+  )
+  await marked?.updateComplete
+  return marked
+}
+
+/**
+ * How a modal moves focus as it opens: with a ring where the reader came by
+ * keyboard, and without one where they came by pointer or by nothing at all.
+ *
+ * Read before the modal opens, while the control that opened it still holds
+ * focus, and passed to every focus the modal then moves. **WebKit counts a
+ * focus a script moves as one the keyboard made**: a Drawer opened by a tap
+ * drew a ring on its close control in WebKit and on iOS, where Chromium drew
+ * none, and its own dialog focusing does the same.
+ */
+export const openingFocus = (): FocusOptions =>
+  ({ focusVisible: deepActiveElement()?.matches(':focus-visible') ?? false }) as FocusOptions
+
+/**
+ * Focuses `element` with `options`, letting go first where it has focus
+ * already: WebKit takes a focus on the element that has it as nothing to do,
+ * and kept the ring its own dialog focusing step drew.
+ */
+export const focusAs = (element: HTMLElement, options: FocusOptions): void => {
+  if (deepActiveElement() === element) {
+    element.blur()
+  }
+  element.focus(options)
+}
+
+/**
+ * Focuses the element that has focus again, with `options`, so a ring the
+ * browser drew for its own focusing step follows how the reader came. Only
+ * where that element is inside `root`.
+ */
+export const refocusWithin = (root: HTMLElement, options: FocusOptions): void => {
+  const active = deepActiveElement()
+  if (active instanceof HTMLElement && deepContains(root, active)) {
+    focusAs(active, options)
+  }
+}

@@ -1,7 +1,10 @@
 export function Example() {
   return (
     <>
-      <helix-flex gap="sm">
+      <helix-flex
+        gap="sm"
+        wrap
+      >
         <helix-button
           command="--show"
           commandfor="start-drawer"

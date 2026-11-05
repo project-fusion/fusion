@@ -167,10 +167,12 @@
     gap: 0;
   }
 
+  /* At least the target's width too: "Helix" is 29px of text. */
   .siteFooterLink {
     align-items: center;
     display: flex;
     min-block-size: var(--helix-size-target);
+    min-inline-size: var(--helix-size-target);
   }
 
   .footerSocials {

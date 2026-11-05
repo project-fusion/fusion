@@ -135,7 +135,7 @@ slot[name="trigger"]::slotted(*) {
  * screen.
  */
 [part="surface"] {
-  --_floating-border-color: var(--date-input-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--date-input-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--date-input-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--date-input-shadow, var(--helix-shadow-floating));
 

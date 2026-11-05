@@ -30,6 +30,11 @@ type Chart = HTMLElement & {
   updateComplete: Promise<unknown>
 }
 
+/* A chart with no axis and no rules, whose largest total fills the box, for
+   the specs that measure the drawing's arithmetic. The default raises the top
+   to a numbered level above the largest total. */
+const BARE = 'gridlines="none" value-axis="none"'
+
 const chart = async (table: string, attributes = ''): Promise<Chart> => {
   await mount(
     `<div>${table}<helix-headless-area-chart ${attributes}></helix-headless-area-chart></div>`,
@@ -52,7 +57,7 @@ const edges = (host: HTMLElement): Array<Array<[number, number]>> =>
 
 describe('stacking', () => {
   test('each part sits on the ones below it, and the top edge is the total', async () => {
-    const host = await chart(SOURCES, 'for="sources"')
+    const host = await chart(SOURCES, `for="sources" ${BARE}`)
     const [search, direct, social] = edges(host)
     /* Measured from zero to the largest total, 50, in a drawing 100 tall. */
     expect(search?.map(([, y]) => y)).toEqual([80, 60, 50])
@@ -79,7 +84,7 @@ describe('stacking', () => {
   /* Web Awesome Pro's area chart draws its series overlapping; this one could
      only stack them, so no part could be compared with another by height. */
   test('`overlap` draws each band from zero, its height its own amount, the scale fit to the largest', async () => {
-    const host = await chart(SOURCES, 'for="sources" overlap')
+    const host = await chart(SOURCES, `for="sources" overlap ${BARE}`)
     const [search, direct, social] = edges(host)
     /* Measured from zero to the largest part, Search's 25. */
     expect(search?.map(([, y]) => y)).toEqual([60, 20, 0])
@@ -104,7 +109,7 @@ describe('stacking', () => {
         <tr><th scope="row">Mar</th><td data-value="10">10</td><td data-value="10">10</td></tr>
       </tbody>
     </table>`
-    const host = await chart(gap, 'for="gap"')
+    const host = await chart(gap, `for="gap" ${BARE}`)
     const [a, b] = edges(host)
     expect(a?.map(([, y]) => y)).toEqual([50, 100, 50])
     expect(b?.map(([, y]) => y)).toEqual([0, 0, 0])
@@ -131,7 +136,7 @@ describe('stacking', () => {
   })
 
   test('rules the levels over the bands, leaving the floor to the baseline', async () => {
-    const host = await chart(SOURCES, 'for="sources" gridlines')
+    const host = await chart(SOURCES, 'for="sources"')
     const ys = all(host, 'gridline').map((line) => Number(line.getAttribute('y1')))
     expect(ys.length).toBeGreaterThan(0)
     expect(ys).not.toContain(100)
@@ -287,22 +292,51 @@ describe('the reading, heard by the page', () => {
 })
 
 /* A reading could be measured only from the tooltip: the drawing had no numbers
-   beside it. */
-describe('value-axis', () => {
+   beside it. Drawn by default since November 3, 2026, the owner's decision. */
+describe('the value axis', () => {
   const ticks = (host: HTMLElement): string[] =>
     [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].map(
       (one) => one.textContent ?? '',
     )
 
-  test("draws the scale's numbers beside the plot, at the levels the grid rules", async () => {
-    const host = await chart(SOURCES, 'for="sources" value-axis')
+  test("draws the scale's numbers beside the plot by default, at the levels the grid rules", async () => {
+    const host = await chart(SOURCES, 'for="sources"')
     expect(part(host, 'axis')?.getAttribute('aria-hidden')).toBe('true')
-    expect(ticks(host)).toEqual(['0', '10', '20', '30', '40', '50'])
+    /* 50 is the largest total, and the top is raised to the next level, 60. */
+    expect(ticks(host)).toEqual(['0', '10', '20', '30', '40', '50', '60'])
   })
 
-  test('absent draws none', async () => {
+  test('the largest total stands clear of the top edge, and a share fills the height', async () => {
+    const stacked = await chart(SOURCES, 'for="sources"')
+    /* The top edge is the total: 50 of 60 is a sixth of the box below the top. */
+    expect(
+      Math.min(
+        ...(edges(stacked)
+          .at(-1)
+          ?.map(([, y]) => y) ?? []),
+      ),
+    ).toBeCloseTo(16.67, 1)
+    const share = await chart(SOURCES, 'for="sources" share')
+    expect(ticks(share).at(-1)).toBe('100%')
+    expect(
+      Math.min(
+        ...(edges(share)
+          .at(-1)
+          ?.map(([, y]) => y) ?? []),
+      ),
+    ).toBe(0)
+  })
+
+  test('`none` draws no axis, and `gridlines="none"` no rules', async () => {
+    const host = await chart(SOURCES, `for="sources" ${BARE}`)
+    expect(host.shadowRoot?.querySelector('[part="axis"]')).toBeNull()
+    expect(all(host, 'gridline')).toHaveLength(0)
+  })
+
+  test('the host carries no attribute nobody wrote', async () => {
     const host = await chart(SOURCES, 'for="sources"')
-    expect(part(host, 'axis')).toBeNull()
+    expect(host.hasAttribute('value-axis')).toBe(false)
+    expect(host.hasAttribute('gridlines')).toBe(false)
   })
 })
 

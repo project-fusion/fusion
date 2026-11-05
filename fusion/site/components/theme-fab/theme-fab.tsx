@@ -55,6 +55,30 @@ export const ThemeFab = () => {
     return () => watch.disconnect()
   }, [])
 
+  /* **Out of the way while a phone reader scrolls down, back as they scroll
+   * up.** Fixed over a 390px column, the closed pill measured 198 by 44 and
+   * sat on text at 37 of 56 scroll positions down the home page, the reading
+   * under it being the thing a reader scrolls down for. Scrolling back up is
+   * the gesture of looking for something, and that is when it returns, as it
+   * does at the top of the page. Wider screens keep it: the column there stops
+   * well short of the corner it sits in. */
+  const [stowed, setStowed] = useState(false)
+  useEffect(() => {
+    const phone = matchMedia('(max-width: 40rem)')
+    let last = window.scrollY
+    const moved = () => {
+      const now = window.scrollY
+      /* A few pixels either way is a hand resting on the glass, not a scroll. */
+      if (Math.abs(now - last) < 8) {
+        return
+      }
+      setStowed(phone.matches && now > last && now > 0)
+      last = now
+    }
+    window.addEventListener('scroll', moved, { passive: true })
+    return () => window.removeEventListener('scroll', moved)
+  }, [])
+
   /* Escape closes it, and a press anywhere outside does too. A floating control
      with no way out but its own small button is a trap on a touch screen. */
   useEffect(() => {
@@ -83,7 +107,7 @@ export const ThemeFab = () => {
     <div
       className={styles.fabRail}
       data-open={open || undefined}
-      data-retired={nearFooter ? '' : undefined}
+      data-retired={nearFooter || (stowed && !open) ? '' : undefined}
     >
       <div
         className={`${styles.fab} ${open ? styles.fabOpen : ''}`}
@@ -172,7 +196,7 @@ export const ThemeFab = () => {
              *                 and the tooltip says so, which is the pair that leaves no doubt
              *                 about which way the control reads.
              */}
-            <div className={styles.fabRow}>
+            <div className={`${styles.fabRow} ${styles.fabRowInline}`}>
               <span className={styles.fabRowLabel}>Color scheme</span>
               <helix-tooltip
                 content={c.scheme === 'dark' ? 'Switch to light' : 'Switch to dark'}
@@ -200,7 +224,7 @@ export const ThemeFab = () => {
              *                 four back. Next to the close it would read as a second way out
              *                 of the bar.
              */}
-            <div className={styles.fabRow}>
+            <div className={`${styles.fabRow} ${styles.fabRowInline}`}>
               <span className={styles.fabRowLabel}>Reset</span>
               <helix-tooltip content="Back to the shipped palette" placement="top">
                 <helix-icon-button
@@ -285,14 +309,20 @@ export const ThemeFab = () => {
              *                 content: an empty button the width of an icon, with no close in
              *                 it.
              */}
-            <helix-icon-button
-              class={styles.fabClose}
-              emphasis="ghost"
-              label="Close the theme controls"
-              onClick={() => setOpen(false)}
-            >
-              <helix-icon name="x"></helix-icon>
-            </helix-icon-button>
+            {/* **On a phone the sheet's title sits beside its close**, as the
+                Menu and Preferences drawers put theirs. Above the breakpoint
+                the wrapper is `display: contents` and the title is not drawn,
+                so the bar ends in the close alone, as before. */}
+            <div className={styles.fabHeader}>
+              <span className={styles.fabTitle}>Make it yours</span>
+              <helix-icon-button
+                emphasis="ghost"
+                label="Close the theme controls"
+                onClick={() => setOpen(false)}
+              >
+                <helix-icon name="x"></helix-icon>
+              </helix-icon-button>
+            </div>
           </helix-flex>
         </div>
       </div>

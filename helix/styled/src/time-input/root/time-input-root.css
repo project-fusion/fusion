@@ -148,7 +148,7 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="surface"] {
-  --_floating-border-color: var(--time-input-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--time-input-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--time-input-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--time-input-shadow, var(--helix-shadow-floating));
 

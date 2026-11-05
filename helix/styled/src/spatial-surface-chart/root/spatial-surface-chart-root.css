@@ -1,14 +1,21 @@
 /* The ramp a height is shaded along, low to high: one hue getting louder, as
    the heatmap's is, so a reader compares two places by weight. The 3D
-   renderer reads the same two hooks, with the same defaults. */
+   renderer reads the same two hooks, with the same defaults. **The high end
+   is held at a lightness of 0.33 or more**, as Heatmap's top step is: the ink
+   theme's light 700 is 0.11, and the upper surface, shaded darker still as it
+   turns from the light, drew pure black. */
 :host {
   --_spatial-surface-chart-high: var(
     --spatial-surface-chart-high,
-    var(--helix-color-primary-active)
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h)
   );
   --_spatial-surface-chart-low: var(
     --spatial-surface-chart-low,
-    color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken))
+    color-mix(
+      in oklab,
+      oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 15%,
+      var(--helix-color-surface-sunken)
+    )
   );
 
   display: block;
@@ -30,9 +37,9 @@
   position: relative;
 }
 
-/* The ground, where a page asks for one. */
+/* The ground, where a page asks for one: the one `filled` ground every family takes. */
 :host([separation="filled"]) [part="plot"] {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--helix-color-surface-filled);
 }
 
 /* **A face takes its height's color on the ramp, less light as it turns
@@ -40,7 +47,10 @@
    along the grid a little lighter than itself where it is dark, and a
    little darker where it is light**, as the spatial heatmap's edges are: on
    a ramp that ends near black, a darker rule vanished and the top of the
-   surface was one black shape. */
+   surface was one black shape. **The shade takes its share of the face's
+   own lightness**, so a light face loses about what it did and a dark one
+   less: taken whole, 0.3 off the top of the light ramp at 0.33 left 0.03,
+   and the upper surface drew pure black. */
 [part="face"] {
   --_spatial-surface-chart-color: color-mix(
     in oklab,
@@ -48,7 +58,8 @@
     var(--_spatial-surface-chart-low)
   );
   --_spatial-surface-chart-lit: oklch(
-    from var(--_spatial-surface-chart-color) calc(l - var(--spatial-surface-chart-shade, 0)) c h
+    from var(--_spatial-surface-chart-color) calc(l * (1 - var(--spatial-surface-chart-shade, 0))) c
+      h
   );
   --_spatial-surface-chart-rule: oklch(
     from var(--_spatial-surface-chart-lit) calc(l + clamp(-0.1, (0.6 - l) * 1000, 0.14)) c h
@@ -104,13 +115,13 @@
 }
 
 :host([material="glass"]) {
-  --_spatial-surface-chart-through: calc(0.62 * var(--helix-material-opacity));
+  --_spatial-surface-chart-through: var(--helix-material-glass-opacity);
 }
 
-/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
-   0.62, the relationship the surface tokens carry. */
+/* `frosted` admits less, which on a mark is more ink: 0.88
+   against glass's 0.72, the material tokens every glass surface reads. */
 :host([material="frosted"]) {
-  --_spatial-surface-chart-through: calc(0.88 * var(--helix-material-opacity));
+  --_spatial-surface-chart-through: var(--helix-material-frosted-opacity);
 }
 
 @media print {

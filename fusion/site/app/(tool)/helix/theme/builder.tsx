@@ -47,9 +47,34 @@ const PREVIEW_SHARE = 68
 /** On a phone the preview takes more of a stack that has no room for three panes. */
 const PREVIEW_SHARE_NARROW = 76
 
-/** A phone's audit opens to this height, and shuts to its row of tabs. */
+/**
+ * On a phone with the audit open, so the stylesheet keeps its height.
+ *
+ * **The panes splitter holds the preview's pixels when its own height
+ * changes**, so the 120px the audit opens by came out of the stylesheet alone:
+ * measured at 390 by 844, it went from 137px to 17px in WebKit and from 168px to
+ * 48px in Chromium. At 70 the preview gives back its share and the stylesheet
+ * keeps about the height it had. With the audit at `AUDIT_OPEN_NARROW` the
+ * share is 64: measured at 390 by 844 in Chromium, the stylesheet keeps 174px
+ * and the preview 309.
+ */
+const PREVIEW_SHARE_NARROW_AUDIT = 64
+
+/**
+ * A phone's audit opens to this height, and shuts to its row of tabs: the 32px
+ * row, the inset above it that keeps its press clear of the divider (in
+ * `builder.css`), and the press's own reach below it.
+ */
 const AUDIT_OPEN = 160
-const AUDIT_SHUT = 40
+const AUDIT_SHUT = 48
+
+/**
+ * **A phone's audit opens taller than a wide screen's.** At 160 the findings
+ * under the tabs had 102px, and the Unverifiable tab's table needs 196: under
+ * the preview and the stylesheet a reader scrolled a 102px window to read two
+ * rows. At 256 the findings have 198px, which holds that tab whole.
+ */
+const AUDIT_OPEN_NARROW = 256
 
 /**
  * The faces on offer, fetched rather than vendored.
@@ -301,10 +326,29 @@ export function ThemeBuilder({
     return () => query.removeEventListener('change', sync)
   }, [])
 
-  /* Nearly the whole width on a phone: a column of labeled fields at a quarter
-     of 375px reads as a column rather than as a form. A sliver is left so the
-     preview says it is still there. */
-  const controlsPosition = controlsShown ? (narrow ? 88 : 24) : 0
+  /* The whole width on a phone: a column of labeled fields at a quarter of
+     375px reads as a column rather than as a form. No sliver of preview is left
+     beside it. At 88 the sliver measured 46px of a 390px screen, too narrow to
+     show anything of the page, and the way back is a button in the form's own
+     header instead. */
+  const controlsPosition = controlsShown ? (narrow ? 100 : 24) : 0
+
+  /* **After the panes have settled, not with the panel.** The panes splitter
+     answers its own change of height by holding the preview's pixels, so a
+     share written in the same frame as the panel is overwritten by that hold.
+     Two frames later the panel has been laid out and the share applies to the
+     height the panes now have. */
+  useEffect(() => {
+    if (!narrow) {
+      return
+    }
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() =>
+        setSplit(auditSize > AUDIT_SHUT ? PREVIEW_SHARE_NARROW_AUDIT : PREVIEW_SHARE_NARROW),
+      )
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [auditSize, narrow])
 
   /* **Declared as a correction, and answered so it stays one.** The splitter
      moves itself; this hears where it went and agrees. A reader dragging the
@@ -424,9 +468,10 @@ export function ThemeBuilder({
    */
   const [audit, setAudit] = useState('contrast')
   /* A count opens its tab, and on a phone the audit may be shut. */
+  const auditOpen = narrow ? AUDIT_OPEN_NARROW : AUDIT_OPEN
   const showAudit = (value: string) => {
     setAudit(value)
-    setAuditSize((size) => Math.max(size, AUDIT_OPEN))
+    setAuditSize((size) => Math.max(size, auditOpen))
   }
 
   /* **What the preview pretends to be, and neither is part of the theme.**
@@ -874,11 +919,30 @@ export function ThemeBuilder({
                 <helix-text as="h1" scale="subheading">
                   Theme builder
                 </helix-text>
-                <helix-tooltip content="Back to the shipped values" placement="bottom">
-                  <helix-icon-button disabled={pristine || undefined} label="Reset" onClick={reset}>
-                    <helix-icon name="arrow-counter-clockwise"></helix-icon>
-                  </helix-icon-button>
-                </helix-tooltip>
+                <helix-flex align-items="center" gap="2xs">
+                  <helix-tooltip content="Back to the shipped values" placement="bottom">
+                    <helix-icon-button
+                      disabled={pristine || undefined}
+                      label="Reset"
+                      onClick={reset}
+                    >
+                      <helix-icon name="arrow-counter-clockwise"></helix-icon>
+                    </helix-icon-button>
+                  </helix-tooltip>
+                  {/* **The way back to the preview on a phone**, where the form
+                      covers the whole width and the toolbar's own toggle is
+                      under it. */}
+                  {narrow ? (
+                    <helix-tooltip content="Hide controls" placement="bottom">
+                      <helix-icon-button
+                        label="Hide controls"
+                        onClick={() => setControlsShown(false)}
+                      >
+                        <helix-icon name="sidebar-simple"></helix-icon>
+                      </helix-icon-button>
+                    </helix-tooltip>
+                  ) : null}
+                </helix-flex>
               </helix-flex>
               <helix-text scale="caption">
                 Start from ink, or describe a brand. Each foreground Helix solves is measured
@@ -1528,7 +1592,7 @@ export function ThemeBuilder({
               active={audit}
               data-density="sm"
               label="The audit"
-              onClick={() => setAuditSize((size) => Math.max(size, AUDIT_OPEN))}
+              onClick={() => setAuditSize((size) => Math.max(size, auditOpen))}
               onhelix-before-activate={(event) => setAudit(event.detail.value)}
               slot="panel"
             >

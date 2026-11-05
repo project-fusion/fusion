@@ -17,10 +17,10 @@ const sheet = (): string => {
     .join('\n')
 }
 
-/* Under reduced motion the base layer sets every duration token to 0.01ms, so a
+/* Under reduced motion the base layer sets the duration scale to 0.01ms, so a
    crawl scaled from one turned the ring about eight thousand times a second. */
 describe('the pending ring under reduced motion', () => {
-  test('turns once in four seconds, on no duration token', () => {
+  test('turns once in four seconds, on the crawl token, which the base layer leaves alone', () => {
     const turn =
       sheet()
         .split('@media (prefers-reduced-motion: reduce)')
@@ -29,7 +29,7 @@ describe('the pending ring under reduced motion', () => {
         ?.split('}')[0] ?? ''
     expect(turn).toContain('animation-duration: var(--_button-crawl)')
     expect(turn).not.toContain('--helix-duration')
-    expect(sheet()).toContain('--_button-crawl: 4s')
+    expect(sheet()).toContain('--_button-crawl: var(--helix-duration-crawl)')
   })
 })
 

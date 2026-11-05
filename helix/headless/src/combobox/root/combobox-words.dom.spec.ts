@@ -139,7 +139,7 @@ describe('a combobox on a page in another language', () => {
 
   test('updates once words are registered after it rendered', async () => {
     const host = await combobox('lang="pl"')
-    expect(listbox(host).getAttribute('empty-text')).toBe('No matches')
+    expect(listbox(host).getAttribute('empty-text')).toBe('No options')
     registerWords('pl', POLISH)
     await Promise.resolve()
     await settle(host)

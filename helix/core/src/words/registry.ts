@@ -41,7 +41,7 @@ export type Words = {
  * as Color Picker's `colorWords`, merges entry by entry.
  *
  * ```js
- * registerWords('de', { 'helix-combobox': { emptyText: 'Keine Treffer' } })
+ * registerWords('de', { 'helix-combobox': { noResultsText: 'Keine Treffer' } })
  * ```
  */
 export const registerWords = (locale: string, ...words: Words[]): void => {

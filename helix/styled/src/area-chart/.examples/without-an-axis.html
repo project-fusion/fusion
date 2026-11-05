@@ -1,4 +1,4 @@
-<!-- @summary Each part's share with the percentages beside the plot, so a band can be measured off the drawing. -->
+<!-- @summary Each part's share as bands with no numbers or rules, using `value-axis` and `gridlines` set to `none`, for a composition read at a glance. -->
 
 <helix-flex
   direction="column"
@@ -6,7 +6,7 @@
 >
   <table
     data-hidden-visually
-    id="sources-axis"
+    id="sources-bare"
   >
     <caption>Visits by source</caption>
     <thead>
@@ -41,8 +41,9 @@
   </table>
 
   <helix-area-chart
-    for="sources-axis"
+    for="sources-bare"
+    gridlines="none"
     share
-    value-axis
+    value-axis="none"
   ></helix-area-chart>
 </helix-flex>

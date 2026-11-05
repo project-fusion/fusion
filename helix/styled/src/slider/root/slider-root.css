@@ -367,6 +367,25 @@
   margin-block-start: calc((var(--_slider-track) - var(--_slider-thumb)) / 2);
 }
 
+/* Under the pointer, the halo at half its strength, so the thumb answers a
+   pointer before it is held, as every other control does. It had no hover at
+   all. The halo is a shadow and moves nothing. */
+[part="control"]:where(:hover:enabled)::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
+    var(--helix-shadow-md),
+    0 0 0 var(--helix-space-2xs)
+    color-mix(in oklab, var(--slider-fill-color, var(--helix-color-primary)) 12%, transparent);
+}
+
+[part="control"]:where(:hover:enabled)::-moz-range-thumb {
+  box-shadow:
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background)),
+    var(--helix-shadow-md),
+    0 0 0 var(--helix-space-2xs)
+    color-mix(in oklab, var(--slider-fill-color, var(--helix-color-primary)) 12%, transparent);
+}
+
 [part="control"]:focus-visible::-webkit-slider-thumb,
 [part="control"]:active::-webkit-slider-thumb {
   box-shadow:

@@ -26,7 +26,7 @@
 :host([fill]) [part="region"] {
   block-size: auto;
   border: none;
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
   container-type: size;
   inset: 0;
   position: absolute;
@@ -117,7 +117,9 @@
 
 :host([credit-placement]) ::slotted([slot="attribution"]) {
   backdrop-filter: var(--helix-material-backdrop);
-  background-color: var(--helix-material-translucent);
+  /* The one glass coverage. At the translucent 30% the credit's muted text read
+     over whatever the map drew under it. */
+  background-color: var(--helix-material-panel);
   border-block-start: none;
   border-radius: var(--helix-radii-sm);
   color: var(--map-attribution-color, var(--helix-color-foreground-muted));
@@ -186,8 +188,16 @@
   --button-radius-start-start: var(--helix-radii-none);
   --icon-button-border-width: 0 var(--helix-border-floating) var(--helix-border-floating);
   --icon-button-shadow: var(--helix-shadow-floating);
+  --_map-zoom-out-edge: var(--helix-border-floating);
 
   margin-block-start: calc(-1 * var(--helix-space-2xs));
+}
+
+/* With no edge on top, zoom out's box is a pixel shorter above its glyph than
+   below it, and the minus sat half a pixel high: 7.5 from the top of a 32
+   pixel button. A margin of the missing edge puts it back on the middle. */
+[part="controls"] [part="zoom-out"] [data-glyph] {
+  margin-block-start: var(--_map-zoom-out-edge);
 }
 
 /* **The compass's own icon is the needle's size**, where the shared sheet
@@ -239,12 +249,13 @@
 }
 
 /* The arrows are small and bare on the disc: not raised, and no ground, even
-   one the page set for the rest of the controls. */
+   one the page set for the rest of the controls. Three quarters of the
+   column's button on an even pixel, 24 at the default, and a glyph half
+   that, so each arrow centers on a whole pixel at every density. */
 [part="compass"] > :not([part="face-north"]) {
   --icon-button-background-color: transparent;
-  --icon-button-size: calc(var(--helix-size-control-sm) * 0.75);
-
-  font-size: var(--helix-text-xs);
+  --icon-button-size: round(calc(var(--helix-size-control-tight) * 0.75), 2px);
+  --_viewport-glyph-size: round(calc(var(--icon-button-size) / 2), 2px);
 }
 
 /* **A panel behind the arrows**, where a page asks for them, so they read
@@ -284,7 +295,7 @@
   font-size: inherit;
 
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
-  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);

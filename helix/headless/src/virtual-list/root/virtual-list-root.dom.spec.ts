@@ -809,7 +809,7 @@ describe('loading more', () => {
     const row = part(host, 'loading') as HTMLElement
     expect(row.getAttribute('role')).toBe('listitem')
     expect(row.hasAttribute('aria-posinset')).toBe(false)
-    expect(row.textContent?.trim()).toBe('Loading more')
+    expect(row.textContent?.trim()).toBe('Loading')
     expect(part(host, 'viewport')?.getAttribute('aria-busy')).toBe('true')
     // After the room the undrawn rows stand for, so it closes the list.
     expect(row.previousElementSibling?.getAttribute('part')).toBe('after')

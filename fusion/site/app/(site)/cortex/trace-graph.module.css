@@ -95,10 +95,28 @@
 /* **Tall on a phone**, where the trace runs down the screen one note to a
    line: tall enough for a line each at a size a name reads at. 62rem held 46
    lines; the example takes 35 since the groups' names moved to the legend and
-   took the open lines at each group's middle with them. */
+   took the open lines at each group's middle with them, and four more under
+   the last note for the legend (`LEGEND_LINES`). At 48rem those 41 lines came
+   to 18.5px each, under a 14px name, and adjacent names read as one block;
+   at 56rem each line measured 19.5px and two lit names on adjacent lines
+   still touched, halo to halo. 64rem gives each line about 22px, which
+   leaves a gap between them.
+
+   **The legend wraps here.** The frame keeps a narrow legend to one row that
+   scrolls, so a short drawing is not covered by rows of buttons; at 390 that
+   row showed two and a half of its six groups and cut "Memories" off at the
+   edge. This drawing is tall and the box leaves room under the last note, so
+   the six groups take two rows across the full width, clear of the controls,
+   which sit at the top. */
 @media (max-width: 40rem) {
   .traceFrame {
-    --graph-block-size: 48rem;
+    --graph-block-size: 64rem;
+  }
+
+  .traceFrame::part(legend) {
+    flex-wrap: wrap;
+    max-inline-size: calc(100% - var(--helix-space-sm) * 2);
+    overflow-x: visible;
   }
 }
 

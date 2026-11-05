@@ -130,9 +130,12 @@ Where the primary pointer is coarse, such as on a phone, these sizes change:
 - A field's text is at least 16px, so a field at `md` goes from 14px to 16px.
   iOS Safari zooms the page into a field whose text is smaller. See
   [Typography](./typography).
-- A row in a Menu, a Select, a Combobox, or a Tree is at least
-  `--helix-size-target` tall, 44px at every density. Rows sit against each
-  other, so the row itself grows to the target.
+- A row in a Menu, a Select, or a Combobox is at least `--helix-size-target`
+  tall, 44px at every density. Rows sit against each other, so the row itself
+  grows to the target.
+- A List row and a Tree row are 48px apart at every density, the pitch a List
+  has at `lg`. Tree rows keep the List's pitch.
+- A link in a Navigation bar is 44px tall.
 
 A control keeps the height of its density step.
 

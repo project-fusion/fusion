@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex gap="xs">
+    <helix-flex
+      gap="xs"
+      wrap
+    >
       <helix-tag>
         <span slot="start">Priority</span>
         High

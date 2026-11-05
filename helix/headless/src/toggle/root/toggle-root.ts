@@ -41,6 +41,7 @@ import { property } from 'lit/decorators.js'
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart item - The button: a radio in a group where one is chosen, and a button with `aria-pressed` on its own or in a group where several can be.
+ * @csspart label - The words, between the `start` and `end` slots.
  *
  * @cssstate pressed - The item is pressed, on its own or in a group where several can be.
  * @cssstate selected - The item is chosen.
@@ -201,7 +202,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
       ?disabled=${this.disabled}
       tabindex=${alone || (this.focusable ?? this.selected) || !this.childrenKnown ? '0' : '-1'}
       @click=${() => this.select()}
-    ><slot name="start"></slot><slot></slot><slot name="end"></slot></button>`
+    ><slot name="start"></slot><span part="label"><slot></slot></span><slot name="end"></slot></button>`
   }
 }
 

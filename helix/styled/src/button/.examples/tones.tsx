@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex gap="sm">
+    <helix-flex
+      gap="sm"
+      wrap
+    >
       <helix-button
         emphasis="solid"
         tone="primary"

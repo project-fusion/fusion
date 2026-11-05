@@ -149,12 +149,13 @@
   border-color: transparent;
 }
 
-/* A fill as well as an edge. `surface-raised` rather than `surface`, because the
-   feed itself usually sits on a surface already and a row has to be the rung
-   above whatever it is on rather than the same one. */
+/* The wash every `filled` surface takes, because the feed itself usually sits on
+   a surface already and a row has to be a step off whatever it is on rather than
+   a rung that may be the same one. `surface-raised` read 1.09:1 on the white
+   page; the wash reads 1.12 there and on every rung. */
 :host([separation="filled"]) [part="item"],
 :host(:state(feed-filled)) [part="item"] {
-  background-color: var(--notifications-item-fill, var(--helix-color-surface-raised));
+  background-color: var(--notifications-item-fill, var(--helix-color-surface-filled));
 }
 
 /* **An avatar on a plain row takes a wash in light mode.** Its own fill is
@@ -170,7 +171,7 @@
 }
 
 /* **An avatar on a filled row takes its disc from the row.** Its own fill is
-   `surface-raised`, which is the row's too, so the disc vanished and the
+   `surface-raised`, which was the row's too, so the disc vanished and the
    initials floated in both schemes. Mixed from the foreground, the way a hover
    well is, it sits one step off whatever the row is filled with. */
 :host([separation="filled"]),

@@ -12,7 +12,7 @@
      `Popover` says its own. The point drew `border-thin` whatever
      `--tour-border-width` said, so the two could come apart. */
   --_tour-edge: var(--tour-border-width, var(--helix-border-floating)) solid
-    var(--helix-color-border);
+    var(--helix-color-border-floating);
 
   background-color: var(--tour-surface-background-color, var(--helix-color-surface-overlay));
   border: var(--_tour-edge);

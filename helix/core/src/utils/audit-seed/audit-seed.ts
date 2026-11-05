@@ -28,6 +28,25 @@ export const contrastOf = (one: readonly number[], other: readonly number[]): nu
 }
 
 /**
+ * The warning for one scheme, naming only the measures that fall under their
+ * floor. It once named both floors whatever failed, and read "a filled control
+ * 7.24:1 ... under 4.5:1 and 3:1" for a fill that passed.
+ */
+export const contrastMessage = (scheme: 'dark' | 'light', text: number, fill: number): string =>
+  [
+    text < TEXT
+      ? `In ${scheme}, primary text measures ${text.toFixed(2)}:1 against the page, under the ${TEXT}:1 it needs.`
+      : '',
+    fill < FILL
+      ? `In ${scheme}, a filled control measures ${fill.toFixed(2)}:1 against the page, under the ${FILL}:1 it needs.`
+      : '',
+    'A seed alone cannot cause this, so look for an override of `--helix-color-primary`, ' +
+      '`--helix-color-primary-surface`, or the page color.',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+/**
  * Reports a page whose primary text or filled controls fall under their
  * contrast floor, in either color scheme.
  *
@@ -112,11 +131,7 @@ export const auditSeed = (): void => {
     }
     reportRuntime({
       kind: 'primary-contrast',
-      message:
-        `In ${scheme}, primary text measures ${text.toFixed(2)}:1 and a filled control ` +
-        `${fill.toFixed(2)}:1 against this page, under ${TEXT}:1 and ${FILL}:1. The brand ` +
-        'ramp is solved for any seed, so look for an override of `--helix-color-primary`, ' +
-        '`--helix-color-primary-surface`, or the page color.',
+      message: contrastMessage(scheme, text, fill),
       tag: 'html',
     })
   }

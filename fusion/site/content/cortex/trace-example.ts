@@ -97,6 +97,16 @@ const SOURCE_NAMES = 3
 /** How much further the outputs start, for the contexts' long names before them. */
 const CONTEXT_NAMES = 3
 
+/**
+ * **How many rows a column sits higher than the others.** A group's name is
+ * drawn at the middle of its notes, and a link that skips a column passes it
+ * near its middle too: level with the rest, the sources sent the links from
+ * "What will my plan cost?" through "Facts, in Engram", which read struck
+ * through at 1440. Two rows up, their links run above that name, and no lit
+ * link crosses a group's name for any of the four answers.
+ */
+const RAISED: Partial<Record<keyof typeof KINDS, number>> = { source: 2 }
+
 /** How the trace is laid out: in columns, across a wide screen, or in rows, down a narrow one. */
 export type TraceLayout = 'columns' | 'rows'
 
@@ -117,6 +127,7 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
   let line = 0
   COLUMNS.forEach((column, across) => {
     if (layout === 'columns') {
+      const kind = ORDER[across]
       const half = Math.ceil(column.length / 2)
       /* **Two open rows where the count is odd, one where it is even.** The
          group's name is drawn at the middle of its notes, and with an odd
@@ -131,7 +142,7 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
            retrievals and contexts share: on a row, the link from a
            retrieval to its context ran straight through a tool call it has
            nothing to do with. */
-        const off = ORDER[across] === 'tool_call' ? DOWN / 2 : 0
+        const off = (kind === 'tool_call' ? DOWN / 2 : 0) + ((kind && RAISED[kind]) ?? 0) * DOWN
         /* The sources' names are the longest, so the columns after them
            start a little further over; and the contexts' names are the next
            longest, so the outputs start further over again, or a context's
@@ -191,21 +202,31 @@ export const TRACE_REMOVED: ReadonlySet<string> = new Set(EXAMPLE.removed)
 const NAMES = 0.8 * ACROSS
 
 /**
+ * How far under the last note the box reaches in rows, in lines, for the
+ * legend. The frame's legend sits at the drawing's foot, and on a phone its six
+ * groups wrap to two rows, about four lines of the drawing.
+ */
+const LEGEND_LINES = 4
+
+/**
  * **The box the drawing is fitted to, with room for the answers' names.**
  * Sigma fits the notes to the frame, and a name is drawn to the right of its
  * note, so in columns the last column's names ran past the frame's edge. In
  * rows the notes take a narrow strip in the middle, which leaves names room
- * either side, and the notes' own box is the right one, which `null` asks for.
+ * either side, and the box reaches past the last note for the legend under it:
+ * fitted to the notes alone, the answer at the foot sat behind the legend once
+ * the legend wrapped.
  */
-export const boxFor = (
-  layout: TraceLayout,
-): { x: [number, number]; y: [number, number] } | null => {
-  if (layout === 'rows') {
-    return null
-  }
+export const boxFor = (layout: TraceLayout): { x: [number, number]; y: [number, number] } => {
   const places = [...placesFor(layout).values()]
   const xs = places.map((place) => place.x)
   const ys = places.map((place) => place.y)
+  if (layout === 'rows') {
+    return {
+      x: [Math.min(...xs), Math.max(...xs)],
+      y: [Math.min(...ys) - LEGEND_LINES, Math.max(...ys)],
+    }
+  }
   return {
     x: [Math.min(...xs), Math.max(...xs) + NAMES],
     y: [Math.min(...ys), Math.max(...ys)],

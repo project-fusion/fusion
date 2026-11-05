@@ -145,14 +145,25 @@ helix-app-header {
  * ramps from the page up to `primary`, which in dark is light on black. In light
  * that ramp runs from white to a dark color, and with no brand it drew a gray
  * smoke behind the card: at 390 the muted stat labels sat on #cccccc at 3.7:1.
- * Turned around, it runs from `primary-subtle` up to the page's own white, so
- * the strands read as light and a brand still tints them. The stat labels
- * measure 5.7:1 or more against the darkest pixel behind them, at 390 and 1440,
- * with no brand and with a violet or a yellow one. The second half of each pair
- * is the aura's own default, so dark is unchanged.
+ * Turned around, it runs from a tint up to the page's own white, so the strands
+ * read as light and a brand still colors them. The tint is `primary-subtle`
+ * with 12% of `primary` in it: `primary-subtle` alone ran from #e8e8e8 to
+ * white, 1.23:1, a haze that hardly showed. Now it runs from #d1d1d1, 1.53:1.
+ * The stat labels sit on the glass card, whose ink rises over what shows
+ * through, and measure 7.9:1 or more against the darkest pixel behind them, at
+ * 390 and 1440, with no brand and with a violet or a yellow one. The second half
+ * of each pair is the aura's own default, so dark is unchanged.
+ *
+ * **Side by side, the light starts at 45% of the panel's width.** From 35%, the
+ * dark plume reached the end of the lede's lines, and the lede measured 3.84:1
+ * against the brightest pixel behind it at 1440. From 45% it measures 8.9:1, and
+ * the light reaches full strength at 75%, behind the card.
  */
 .first-light {
-  --aura-ground: light-dark(var(--helix-color-primary-subtle), var(--helix-color-background));
+  --aura-ground: light-dark(
+    color-mix(in oklab, var(--helix-color-primary) 12%, var(--helix-color-primary-subtle)),
+    var(--helix-color-background)
+  );
   --aura-glow: light-dark(var(--helix-color-background), var(--helix-color-primary));
   --aura-haze: light-dark(
     color-mix(in oklab, var(--helix-color-primary-subtle), var(--helix-color-background)),
@@ -170,7 +181,7 @@ helix-app-header {
 
 @media (width >= 60rem) {
   .first-light {
-    mask-image: linear-gradient(to right, transparent 35%, black 70%);
+    mask-image: linear-gradient(to right, transparent 45%, black 75%);
   }
 }
 

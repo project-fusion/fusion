@@ -90,6 +90,16 @@ helix-sandbox-editor {
   min-block-size: 0;
 }
 
+/* **A declaration that wraps hangs its value under its name.** The pane is
+   350px at 1440, and 10 of the 43 declarations wrap there; each one's second
+   line started at column 0, two characters left of the name above it, and read
+   as a new line of the sheet. `hanging` leaves each line's first row alone and
+   indents every row after it, and the editor's lines inherit it. Four
+   characters clears the two the declarations are indented by. */
+helix-sandbox-editor::part(editor) {
+  text-indent: 4ch hanging;
+}
+
 /* The findings, inside whichever tab is showing. The tabs own the panel's
    height; each pane scrolls on its own so switching tabs does not move the
    scroll position of the one you left. */
@@ -198,4 +208,49 @@ helix-sandbox-editor {
 
 .themeFaceSample[data-face-ready] + .themeFaceWaiting {
   display: none;
+}
+
+/* **On a touch screen each count is a press the target's height.** The tags
+   are 24px tall in a 48px toolbar, so a transparent box reaches 44 without
+   leaving the bar and nothing drawn moves. They sit side by side and are wider
+   than 44 already, so the box grows on the block axis only. */
+@media (pointer: coarse) {
+  .themeJump {
+    position: relative;
+  }
+
+  .themeJump::after {
+    content: "";
+    inset-block: calc((var(--helix-size-target) - 100%) / -2);
+    inset-inline: 0;
+    position: absolute;
+  }
+
+  /* The controls' divider is 44px wide on a touch screen, centered on the
+     stage's edge, so with the controls shut its half reaches 22px into the
+     toolbar and took the left of the first button's press. The inset clears
+     the divider and the button's own reach past its edge. */
+  .themeStage helix-sandbox-toolbar {
+    padding-inline-start: calc(
+      var(--helix-size-target) /
+      2 +
+      (var(--helix-size-target) - var(--helix-size-control-sm)) /
+      2
+    );
+  }
+}
+
+/* **On a phone the audit's tabs sit below the reach of the divider above
+   them.** The divider's grab reaches `--helix-space-2xs` into the panel and a
+   tab's press reaches 6px above the tab, so at the panel's top edge the
+   divider took the top of every tab's press. `AUDIT_SHUT` in `builder.tsx`
+   counts this inset. */
+@media (max-width: 60rem) {
+  .themeStage helix-tabs[slot="panel"] {
+    padding-block-start: calc(
+      var(--helix-space-2xs) +
+      (var(--helix-size-target) - var(--helix-size-control)) /
+      2
+    );
+  }
 }

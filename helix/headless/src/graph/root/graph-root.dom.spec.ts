@@ -97,7 +97,8 @@ describe('graph frame', () => {
     }
     const zoomIn = part(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
     expect(zoomIn.assignedElements()).toEqual([plus as Element])
-    expect(part(host, 'zoom-out')?.textContent?.trim()).toBe('−')
+    /* The glyph a slot falls back to is drawn from the icon set. */
+    expect(part(host, 'zoom-out')?.querySelector('slot > svg[data-glyph]')).not.toBeNull()
   })
 
   test('is a named region with a named list of every note', async () => {

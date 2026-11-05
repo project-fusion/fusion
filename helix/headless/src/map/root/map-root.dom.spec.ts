@@ -323,7 +323,8 @@ describe('map controls a consumer keeps or drops', () => {
     }
     const zoomIn = control(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
     expect(zoomIn.assignedElements()).toEqual([host.querySelector('#plus') as Element])
-    expect(control(host, 'zoom-out')?.textContent?.trim()).toBe('−')
+    /* The glyph a slot falls back to is drawn from the icon set. */
+    expect(control(host, 'zoom-out')?.querySelector('slot > svg[data-glyph]')).not.toBeNull()
     expect(control(host, 'face-north')?.querySelector('[part="needle"]')).not.toBeNull()
   })
 
@@ -426,8 +427,13 @@ describe('map controls on a right-to-left page', () => {
     const host = await map('controls="pan" dir="rtl"')
     const start = control(host, 'pan-start')
     expect((await inner(start))?.getAttribute('aria-label')).toBe('Pan right')
-    expect(start?.textContent?.trim()).toBe('→')
     const ltr = await map('controls="pan"')
+    /* It points right: the arrow on the left-to-right map's end control. */
+    const arrow = (button: Element | null | undefined): string | undefined =>
+      button?.querySelector('slot > svg[data-glyph]')?.innerHTML
+    expect(arrow(start)).toBeDefined()
+    expect(arrow(start)).toBe(arrow(control(ltr, 'pan-end')))
+    expect(arrow(start)).not.toBe(arrow(control(ltr, 'pan-start')))
     expect((await inner(control(ltr, 'pan-start')))?.getAttribute('aria-label')).toBe('Pan left')
   })
 

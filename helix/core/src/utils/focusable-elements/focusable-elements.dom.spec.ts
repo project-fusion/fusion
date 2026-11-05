@@ -2,12 +2,13 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 
+let autofocusTarget: (root: HTMLElement) => Promise<HTMLElement | null>
 let deepContains: (root: Node, node: Node | null) => boolean
 let focusableElements: (root: HTMLElement) => HTMLElement[]
 
 beforeAll(async () => {
   registerDom()
-  ;({ deepContains, focusableElements } = await import('./focusable-elements.js'))
+  ;({ autofocusTarget, deepContains, focusableElements } = await import('./focusable-elements.js'))
 })
 
 /** A host with a shadow root holding one button, the shape every control has. */
@@ -207,5 +208,29 @@ describe('a press on a control of the item its own', () => {
     })
     row.querySelector('span')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     expect(answers).toEqual([true, false])
+  })
+})
+
+describe('autofocusTarget', () => {
+  test('is the element marked `autofocus`, however deep, once it has rendered', async () => {
+    const root = document.createElement('div')
+    const group = document.createElement('div')
+    let rendered = false
+    const marked = Object.assign(document.createElement('div'), {
+      updateComplete: Promise.resolve().then(() => {
+        rendered = true
+      }),
+    })
+    marked.setAttribute('autofocus', '')
+    group.append(document.createElement('button'), marked)
+    root.append(group)
+    expect(await autofocusTarget(root)).toBe(marked)
+    expect(rendered).toBe(true)
+  })
+
+  test("is null where nothing is marked, so the browser's own choice stands", async () => {
+    const root = document.createElement('div')
+    root.append(document.createElement('button'))
+    expect(await autofocusTarget(root)).toBeNull()
   })
 })

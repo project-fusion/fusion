@@ -132,22 +132,30 @@
    decides which ground a neutral filled band gets, and the rung is the answer:
    `neutral` says the band carries no meaning, not that it sits in a well. */
 
-/* A ground of its own, a step up off the page rather than a tint of anything. */
+/* A ground of its own, a step off the page rather than a tint of anything: the
+   wash every `filled` surface takes, 1.12:1 on the white page where `surface`
+   was 1.04. A tone's tint is still mixed against `surface`, since a mix with a
+   wash would come out translucent. */
 :host([separation="filled"]) {
   --_announcement-ground: var(--helix-color-surface);
 
-  background-color: var(--announcement-background-color, var(--helix-color-surface));
+  background-color: var(--announcement-background-color, var(--helix-color-surface-filled));
 }
 
 /* A line under the band, beneath only: a band across the top of the page is
    bounded by the page's own edges on three sides already. Its color is the
-   tone's where the band has one, set by the tone rules above. */
+   tone's where the band has one, set by the tone rules above. **An edge and no
+   fill**, as `outlined` is wherever it is offered, so the tone's tint goes
+   with the ground: the tone rule above drew its gradient under an outlined
+   band too, which painted the fill this value exists to leave out. The
+   gradient is unset in the rule keyed on the tone, which outranks it. */
 :host([separation="outlined"]) {
   background-color: var(--announcement-background-color, transparent);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
 :host([separation="outlined"][tone]:not([tone="neutral"])) {
+  background-image: none;
   border-block-end-color: color-mix(
     in oklab,
     var(--_announcement-tint) 40%,

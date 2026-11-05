@@ -16,11 +16,15 @@
 }
 
 /* Beside: the labels take the width of the longest one and the values the rest,
-   which is what makes the column of labels scannable. */
+   which is what makes the column of labels scannable.
+
+   **Up to two fifths of the list, where a long label wraps.** At the width of
+   the longest label, one label of seven words took 326 of a 400 pixel list and
+   left its value 50. */
 :host([direction="row"]) [part="list"] {
   --_description-list-gap: var(--description-list-gap, var(--helix-space-sm));
   column-gap: var(--description-list-column-gap, var(--helix-space-lg));
-  grid-template-columns: var(--description-list-label-width, max-content) minmax(0, 1fr);
+  grid-template-columns: var(--description-list-label-width, fit-content(40%)) minmax(0, 1fr);
   row-gap: var(--_description-list-gap);
 }
 

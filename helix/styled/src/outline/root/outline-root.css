@@ -211,7 +211,7 @@
     --outline-surface-background-color,
     var(--helix-material-translucent-strong)
   );
-  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   box-sizing: border-box;

@@ -11,6 +11,7 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  headroom,
   linear,
   linePath,
   MIRROR_RULE,
@@ -96,6 +97,11 @@ interface BarFrame {
  * because a bar's length is its value. To show the differences between values,
  * use a line chart.
  *
+ * The scale's numbers stand beside the columns, at the levels the gridlines
+ * rule, and the top of the scale is a level above the highest reading.
+ * `value-axis="none"` and `gridlines="none"` take them away, for columns
+ * compared with each other at a glance.
+ *
  * The labels are HTML beside the drawing. An `<svg>` that fills its box scales
  * the text inside it: the same `font-size` renders at 10px in a narrow chart
  * and 43px in a wide one, and SVG has no setting that keeps text at one size
@@ -144,6 +150,9 @@ interface BarFrame {
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
+ * When the readings did not load, set `error-text`, such as "The visits did
+ * not load": it stands in the plot in place of both, and the `error` slot
+ * takes a button that tries again.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -165,12 +174,13 @@ interface BarFrame {
  * @documentation https://fusion.dev/helix/components/bar-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
- * @csspart axis - The numbers of one scale: the primary under `value-axis`, and both when `secondary` splits the chart into two scales.
+ * @csspart axis - The numbers of one scale: the primary unless `value-axis` is `none`, and both when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
  * @csspart bar - One column. Under `stacked`, one segment of a category's column. Past one column a pixel, a path of the columns of one series that share a `data-tone` and a side of zero, each a rectangle in it.
  * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`, and never on a path of columns.
@@ -180,7 +190,8 @@ interface BarFrame {
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart gridline - One gridline across the plot, drawn when `gridlines` is set.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart gridline - One gridline across the plot, unless `gridlines` is `none`.
  * @csspart group - One category's columns, together. Past one column a pixel, every category's columns, together.
  * @csspart group-active - The group the tooltip describes. Set together with `group`. Past one column a pixel, that category's columns drawn again over the rest, each at least two pixels thick.
  * @csspart label - One category's name, placed along the row by `--chart-label-start` and `--chart-label-size`, or down the column under `orientation="horizontal"`, with its text centered. Only the names that fit are drawn, the first and the last always.
@@ -230,6 +241,7 @@ interface BarFrame {
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate error - While the `error` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-bar-chart')
@@ -261,14 +273,15 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
   /**
    * Which gridlines are drawn across the plot, if any.
    *
-   * Absent draws none. `value` rules the axis the columns are *measured* on,
+   * Absent rules the levels, as `value` does, which are the levels the `axis`
+   * part numbers, and `none` draws no rules. `value` rules the axis the columns are *measured* on,
    * `category` rules the axis they are *arranged* on with one through each
    * group whose name is drawn, and `both` draws both. Which of those is horizontal turns with
    * `orientation`, because a rule belongs to an axis and not to a screen edge.
    *
-   * **A bare `gridlines` means `value`**, and so does anything unrecognized: an
-   * unrecognized value that draws nothing is indistinguishable from the
-   * attribute being absent, which is the one thing a reader cannot debug.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognized,
+   * so a typo draws the rules the chart rests with. Only `none` takes them
+   * away.
    *
    * `category` is the quieter half of this on a bar chart: columns already
    * divide the categories by being separate columns, and a rule through each
@@ -279,7 +292,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    * and reach no reader through the table.
    */
   @property()
-  gridlines?: 'both' | 'category' | 'value'
+  gridlines?: 'both' | 'category' | 'none' | 'value'
 
   /**
    * The name the summary gives each series' highest reading, `{highestLabel}`
@@ -391,15 +404,24 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
   summaryLabel = '{highestLabel}: {readings}.'
 
   /**
-   * Draws the numbers of the scale the bars are measured on, the `axis` part,
-   * at the levels `gridlines` rules: down the side of columns, and along the
-   * bottom of bars under `orientation="horizontal"`.
+   * Whether the numbers of the scale the bars are measured on are drawn, the
+   * `axis` part.
    *
-   * Absent draws none with one scale, since bars compared with each other need
-   * no numbers. With `secondary` both scales are drawn whatever this says.
+   * Absent draws them, at the levels `gridlines` rules: down the side of
+   * columns, and along the bottom of bars under `orientation="horizontal"`.
+   * `none` draws no axis with one scale, for bars compared with each other at
+   * a glance. With `secondary` both scales are drawn whatever this says.
+   *
+   * Reflected, because the stylesheet gives the axis a track of its own unless
+   * this is `none`, and undefaulted, so a host carries only what you wrote.
    */
-  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
-  valueAxis = false
+  @property({ attribute: 'value-axis', reflect: true })
+  valueAxis?: 'none'
+
+  /** Whether the primary axis is drawn, which is every value but `none`. */
+  protected get drawsAxis(): boolean {
+    return this.valueAxis !== 'none'
+  }
 
   /**
    * Measures the axis the categories run along and says which of their names
@@ -421,9 +443,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     return new Set(seriesNames(this.lines))
   }
 
-  /** Whether the levels are ruled, which is every value but `category`. */
+  /** Whether the levels are ruled, which is every value but `category` and `none`. */
   protected get rulesValue(): boolean {
-    return this.gridlines !== undefined && this.gridlines !== 'category'
+    return this.gridlines !== 'category' && this.gridlines !== 'none'
   }
 
   /** Whether each category is ruled, which only two values ask for. */
@@ -488,7 +510,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         : undefined
 
     return html`${
-      z === undefined && !this.valueAxis
+      z === undefined && !this.drawsAxis
         ? nothing
         : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
@@ -514,7 +536,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       this.orientation,
       this.lines,
       this.secondary,
-      this.valueAxis,
+      this.drawsAxis,
+      this.rulesValue,
       wordsLocale(this),
       series.map((one) => (this.showsSeries(one.name) ? 1 : 0)).join(''),
     ].join(' ')
@@ -559,14 +582,20 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
      * Reusing the inverted scale for both puts the longest bar at x=0 and every
        shorter one hard against the right edge, growing away from the baseline
        instead of out of it. */
-    const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
+    /* Room above the highest reading wherever a scale is drawn, for the
+       reason `LineChart` gives, and on the second scale too, so its top is a
+       numbered level as well. Columns with no axis and no rules keep the whole
+       height. */
+    const measured = this.drawsAxis || this.rulesValue || scaled.size > 0
+    const room = (span: [number, number]): [number, number] => (measured ? headroom(span) : span)
+    const domain = room([Math.min(0, low), Math.max(0, high)])
     const range: [number, number] =
       this.orientation === 'horizontal' ? [0, PLOT_HEIGHT] : [PLOT_HEIGHT, 0]
     const y = linear(domain, range)
     const floor = y(0)
 
     const [second, top] = extent(scaled.size > 0 ? on(own) : [0])
-    const other: [number, number] = [Math.min(0, second), Math.max(0, top)]
+    const other = room([Math.min(0, second), Math.max(0, top)])
     const z = scaled.size > 0 ? linear(other, range) : undefined
 
     /* Widest number on either scale, in characters, so the axis column is the
@@ -580,7 +609,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     const format = formatNumbers(wordsLocale(this))
     const levels = [...ticks(domain), ...(z === undefined ? [] : ticks(other))]
     const widest =
-      z === undefined && !this.valueAxis
+      z === undefined && !this.drawsAxis
         ? 0
         : Math.max(1, ...levels.map((level) => format(level).length))
 
@@ -1188,15 +1217,14 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
   }
 
   /**
-   * The numbers along one scale, drawn only where there are two of them.
+   * The numbers along one scale.
    *
-   * **A chart with one scale renders no axis, on purpose.** Columns measured
-   * against each other need no numbers to be compared, and a row of them beside
-   * a small chart is furniture that makes the drawing smaller for no reading a
-   * reader was going to do. With two scales that argument inverts: a reader
-   * cannot tell there are two, cannot tell which series is on which, and cannot
-   * recover either from the picture. So this appears with `secondary`, and
-   * with one scale only where `value-axis` asks for its numbers.
+   * **Drawn by default, decided by the owner on November 3, 2026.** A column
+   * is read against the level beside it, and the tooltip answers one column at
+   * a time. `value-axis="none"` takes the primary away for columns compared
+   * with each other at a glance. With two scales both are drawn whatever it
+   * says: a reader cannot tell there are two, cannot tell which series is on
+   * which, and cannot recover either from the picture.
    *
    * **Beside the plot and not inside it.** Inside, the numbers are drawn over
    * the drawing, and a horizontal chart shows it immediately: its value axis
@@ -1207,7 +1235,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    * to the right.
    *
    * A column of the host grid instead, which the stylesheet grows only when
-   * `secondary` or `value-axis` is set. That is what the two reflect for.
+   * `secondary` is set or `value-axis` is not `none`. That is what the two
+   * reflect for.
    *
    * The primary hugs the edge the drawing starts at and the secondary the edge
    * it ends at: down the two sides for columns, along the bottom and top for
@@ -1259,7 +1288,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     sideways: boolean,
     count: number,
   ): TemplateResult | typeof nothing {
-    if (this.gridlines === undefined) {
+    if (!this.rulesValue && !this.rulesCategory) {
       return nothing
     }
     /* Through the middle of each group, which is where the column stands, and

@@ -165,6 +165,9 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
+ * When the readings did not load, set `error-text`, such as "The visits did
+ * not load": it stands in the plot in place of both, and the `error` slot
+ * takes a button that tries again.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -185,12 +188,14 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
  * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
@@ -237,6 +242,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate error - While the `error` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-scatter-chart')

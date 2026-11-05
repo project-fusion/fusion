@@ -6,7 +6,7 @@ export function Example() {
     >
       <table
         data-hidden-visually
-        id="sources-axis"
+        id="sources-bare"
       >
         <caption>Visits by source</caption>
         <thead>
@@ -41,9 +41,10 @@ export function Example() {
       </table>
 
       <helix-area-chart
-        for="sources-axis"
+        for="sources-bare"
+        gridlines="none"
         share
-        value-axis
+        value-axis="none"
       ></helix-area-chart>
     </helix-flex>
   )

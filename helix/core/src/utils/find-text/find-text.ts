@@ -211,6 +211,11 @@ const textsOf = (root: Element, skip: string): { joined: string; nodes: [Text, n
     return { joined, nodes }
   }
   const never = skip === '' ? NEVER : `${NEVER}, ${skip}`
+  /* **Laid out first, because WebKit's `checkVisibility()` does not lay out.**
+     A search at the end of parsing, before the first layout, measured every
+     element hidden in WebKit and found no matches with the text on the page,
+     where Chromium's lays out and found six. Reading a box is what makes it. */
+  root.getClientRects()
   const shown = new Map<Element, boolean>()
   const inline = new Map<Element, boolean>()
   const walker = root.ownerDocument.createTreeWalker(
