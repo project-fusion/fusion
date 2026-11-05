@@ -197,3 +197,26 @@ fn the_device_capabilities_give_what_became_of_each_request() {
     assert!(types.contains("type: string"), "{types}");
     assert!(types.contains("file?: DeviceFile"), "{types}");
 }
+
+#[test]
+fn media_plays_a_part_and_says_where_it_stands() {
+    let media = CAPABILITIES.iter().find(|one| one.name == "media").unwrap();
+    let written = contract(media);
+    assert!(written.contains("export interface Media<N> {"), "{written}");
+    assert!(
+        written.contains(
+            "  readonly observe: (node: N, changed: (playback: Playback) => void) => Stop\n"
+        ),
+        "{written}"
+    );
+    assert!(
+        written.contains("  readonly showCaptions: (node: N, id: string | null) => void\n"),
+        "{written}"
+    );
+    let types = types_module();
+    assert!(
+        types.contains("export type Playback = { duration: number,"),
+        "{types}"
+    );
+    assert!(types.contains("artist?: string"), "{types}");
+}

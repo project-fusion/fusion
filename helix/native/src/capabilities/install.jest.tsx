@@ -10,6 +10,7 @@ import { haptics, setHaptics } from '@fusion.dev/helix-core/capabilities/haptics
 import { keys, setKeys } from '@fusion.dev/helix-core/capabilities/keys'
 import { locale, setLocale } from '@fusion.dev/helix-core/capabilities/locale'
 import { measure, setMeasure } from '@fusion.dev/helix-core/capabilities/measure'
+import { media, setMedia } from '@fusion.dev/helix-core/capabilities/media'
 import { motion, setMotion } from '@fusion.dev/helix-core/capabilities/motion'
 import { openLink, setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import { scroll, setScroll } from '@fusion.dev/helix-core/capabilities/scroll'
@@ -31,6 +32,7 @@ import { installNativeCapabilities } from './install'
 import { nativeKeys } from './keys'
 import { nativeLocale } from './locale'
 import { nativeMeasure } from './measure'
+import { nativeMedia } from './media'
 import { nativeOpenLink } from './open-link'
 import { nativeScroll } from './scroll'
 import { nativeShare } from './share'
@@ -50,6 +52,7 @@ const before = {
   keys: keys(),
   locale: locale(),
   measure: measure(),
+  media: media(),
   motion: motion(),
   openLink: openLink(),
   scroll: scroll(),
@@ -70,6 +73,7 @@ afterEach(() => {
   setKeys(before.keys)
   setLocale(before.locale)
   setMeasure(before.measure)
+  setMedia(before.media)
   setMotion(before.motion)
   setOpenLink(before.openLink)
   setScroll(before.scroll)
@@ -94,6 +98,7 @@ describe('installNativeCapabilities', () => {
     expect(keys()).toBe(nativeKeys)
     expect(locale()).toBe(nativeLocale)
     expect(measure()).toBe(nativeMeasure)
+    expect(media()).toBe(nativeMedia)
     expect(motion()).toBe(nativeMotion)
     expect(openLink()).toBe(nativeOpenLink)
     expect(scroll()).toBe(nativeScroll)

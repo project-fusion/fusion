@@ -288,6 +288,40 @@ pub struct Picked {
     outcome: Outcome,
 }
 
+/// Where a player stands: how far it has played and how long its media runs,
+/// in seconds, 0 until the media says, and whether it is paused, has played
+/// to its end, waits for data, is muted, or could not load its media.
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Serialize, TS)]
+pub struct Playback {
+    duration: f64,
+    ended: bool,
+    failed: bool,
+    muted: bool,
+    paused: bool,
+    time: f64,
+    waiting: bool,
+}
+
+/// A caption track a player's media carries: the name a player shows it by,
+/// its language as a BCP 47 tag, and the identifier `showCaptions` takes.
+#[derive(Serialize, TS)]
+pub struct CaptionTrack {
+    id: String,
+    label: String,
+    language: String,
+}
+
+/// What the system's now-playing controls show of what plays: its title, who
+/// made it, and the address of a picture of it.
+#[derive(Serialize, TS)]
+#[ts(optional_fields)]
+pub struct NowPlaying {
+    artist: Option<String>,
+    artwork: Option<String>,
+    title: String,
+}
+
 /// What the share sheet is handed: words, an address, a file, or several of
 /// them, and a title for the sheet where the platform shows one.
 #[derive(Serialize, TS)]
