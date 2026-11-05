@@ -251,7 +251,7 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
     },
     touches: any,
   })
-  useResize(family, props, use, drawn.length)
+  useResize(family, props, use, host.width > 0 ? drawn.length : undefined)
   const at = cursor.at
   const shown = shownOf(at, cells, { dropped, lengths, rows, tableRows })
   const name = wordsIn(read('aria-label')) || wordsIn(read('label')) || caption
@@ -292,8 +292,12 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
   }
 }
 
-/** Tells `resize` with how many cells are drawn, each time that changes after the first drawing. */
-const useResize = (family: Family, props: Props, use: MachineUse, size: number) => {
+/**
+ * Tells `resize` with how many cells are drawn, each time that changes once
+ * the strip has been measured, as the web's strip tells it from the width it
+ * first measured. `size` is undefined before then.
+ */
+const useResize = (family: Family, props: Props, use: MachineUse, size: number | undefined) => {
   const told = useRef<number | undefined>(undefined)
   const latest = useRef({ family, props, use })
   latest.current = { family, props, use }
@@ -301,7 +305,7 @@ const useResize = (family: Family, props: Props, use: MachineUse, size: number) 
     const was = told.current
     told.current = size
     const event = boundTo(latest.current.use, 'onResize', 'event')
-    if (was !== undefined && was !== size && event !== undefined) {
+    if (was !== undefined && size !== undefined && was !== size && event !== undefined) {
       tell(latest.current.family, latest.current.props, event, { size })
     }
   }, [size])
