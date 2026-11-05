@@ -59,8 +59,12 @@ const readTones = (text: string): string[] => {
     let at = (start.index ?? 0) + start[0].length
     const from = at
     while (at < text.length && depth > 0) {
-      if (text[at] === '(') depth += 1
-      if (text[at] === ')') depth -= 1
+      if (text[at] === '(') {
+        depth += 1
+      }
+      if (text[at] === ')') {
+        depth -= 1
+      }
       at += 1
     }
     found.set(start[1] ?? '', text.slice(from, at - 1).trim())
