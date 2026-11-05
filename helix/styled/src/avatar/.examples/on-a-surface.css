@@ -1,0 +1,8 @@
+.panel {
+  align-items: center;
+  background-color: var(--helix-color-surface-sunken);
+  border-radius: var(--helix-radii-md);
+  display: flex;
+  gap: var(--helix-space-md);
+  padding: var(--helix-space-md);
+}
