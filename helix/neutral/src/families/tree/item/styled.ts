@@ -69,10 +69,12 @@ export default styles(
       rowSize: token('size-control-tight'),
     },
     own: {
+      treeBleed: null,
       treeChevron: null,
       treeHeadingInk: null,
       treeHeadingText: null,
       treeHeadingTracking: null,
+      treeInset: null,
       treeLabelFlex: null,
       treeNestedText: null,
       treePad: null,
@@ -85,7 +87,7 @@ export default styles(
   },
   ({ hook, keyframes, on, own, rule }) => {
     const step = first(hook.indent, sum(own.treeChevron, token('space-2xs')))
-    const inset = sum(token('space-xs'), product(difference(measured('tree-level', 1), 1), step))
+    const inset = sum(own.treeInset, product(difference(measured('tree-level', 1), 1), step))
     const size = first(hook.checkboxSize, own.treeChevron)
     /* An icon passed in the chevron's place is sized, colored and turned the same way. */
     const turned = [
@@ -116,6 +118,10 @@ export default styles(
           display: 'block',
           own: {
             treeChevron: hook.chevronSize,
+            /* The row's inline inset, which is the tree's `bleed` where it asks
+               for one, so a top-level row's words start on the tree's edge, and
+               every level steps in from there by the indent as it did. */
+            treeInset: own.treeBleed(token('space-xs')),
             /* From the target size, so `md` is exactly `space-xs`, and a
                `data-density="sm"` region's rows keep up with its controls. */
             treePad: quotient(difference(token('size-control-tight'), '1rem'), 2),
@@ -148,8 +154,10 @@ export default styles(
              adds up. */
           marginBlockEnd: hook.gap,
           minBlockSize: hook.rowSize,
+          /* Out by the bleed on both sides, which the inset above gives back. */
+          marginInline: product(own.treeBleed(token('space-none')), '-1'),
           paddingBlock: own.treePad,
-          paddingInline: token('space-xs'),
+          paddingInline: own.treeInset,
           paddingInlineStart: inset,
           position: 'relative',
           web: {
@@ -359,6 +367,15 @@ export default styles(
       on('group-inner', [native([rule({ minBlockSize: 0, overflow: 'hidden' })])]),
       on({ part: 'group', inner: '> slot' }, [
         web([rule({ display: 'block', minBlockSize: 0, overflow: 'hidden' })]),
+        /* **The room a nested row bleeds into, inside the clip**: wider by the
+           bleed on each side and pulled back by the same, so the clip moves
+           out and the rows do not, at every depth. */
+        web([
+          rule({
+            marginInline: product(own.treeBleed(token('space-none')), '-1'),
+            paddingInline: own.treeBleed(token('space-none')),
+          }),
+        ]),
       ]),
       on({ region: 'chevron', slotted: '*' }, [
         rule({

@@ -1,4 +1,4 @@
-import { inherited, product, token, web } from '../../../style.js'
+import { first, inherited, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -18,22 +18,23 @@ export default styles(
   item,
   {
     prefix: 'list-item',
-    hooks: {
+    hooks: ({ own }) => ({
       currentBackgroundColor: token('color-well'),
       disabledOpacity: token('opacity-disabled'),
       draggingOpacity: 0.5,
       dropIndicatorColor: token('color-primary'),
       dropIndicatorSize: token('border-thick'),
       gripColor: token('color-foreground-muted'),
-      padding: [product(token('space-control'), '0.5'), token('space-md')],
+      padding: [product(token('space-control'), '0.5'), first(own.listBleed, token('space-md'))],
       railContent: '""',
       railDisplay: 'none',
       selectedBackgroundColor: token('color-primary-subtle'),
       termWeight: token('weight-regular'),
-    },
+    }),
+    own: { listBleed: null },
     stylesheet: 'list/item/list-item.generated.css',
   },
-  ({ hook, on, rule }) => [
+  ({ hook, on, own, rule }) => [
     on('host', [
       rule({ display: 'block' }),
       /* Out of reach, and drawn so: the platform's own disabled step. */
@@ -52,6 +53,10 @@ export default styles(
         /* A long unbroken word breaks inside the column it was given. */
         minInlineSize: 0,
         padding: hook.padding,
+        /* Out by the list's `bleed`, with the inset above the same amount, so
+           the words stay on the list's edge and the fill reaches past it. None
+           by default, where the inset is the row's own. */
+        marginInline: product(own.listBleed(token('space-none')), '-1'),
         web: { overflowWrap: 'anywhere' },
       }),
       /* The row a reader is on, by the part it is as well, `row-current`, which
