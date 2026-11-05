@@ -45,6 +45,7 @@ import { styles } from './color-picker-root.css.js'
  * @cssproperty --color-picker-fields-gap - The space between the channel number fields, in `channel-fields`.
  * @cssproperty --color-picker-grid-radius - The corner radius of the square.
  * @cssproperty --color-picker-grid-ratio - The aspect ratio of the square.
+ * @cssproperty --color-picker-max-inline-size - The widest the picker grows, 28rem when unset.
  * @cssproperty --color-picker-padding - The inset of the rows under the square and of the picker's bottom edge.
  * @cssproperty --color-picker-sample-size - The width and height of the chip that copies the value.
  * @cssproperty --color-picker-swatch-size - The width and height of one preset.

@@ -2,5 +2,5 @@
 - dialog "Delete project":
   - heading "Delete project" [level=2]
   - text: This removes the project and everything in it. It cannot be undone.
-  - button "Delete project"
   - button "Cancel"
+  - button "Delete project"

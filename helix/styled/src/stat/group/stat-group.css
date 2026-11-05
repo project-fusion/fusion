@@ -40,11 +40,26 @@
    doubles. */
 :host([divided]) {
   column-gap: calc(var(--_stat-group-gap) * 2);
-  overflow-x: clip;
+  overflow: clip;
+  /* The clip is for the rules, and a focus ring on a figure in the first row
+     or column reaches past the box by this much. */
+  overflow-clip-margin: var(--helix-size-focus-reach);
 }
 
 :host([divided]) ::slotted(*) {
   border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
   margin-inline-start: calc(var(--_stat-group-gap) * -1 - var(--helix-border-thin));
   padding-inline-start: var(--_stat-group-gap);
+}
+
+/* **And a rule over every figure, by the same trick across the rows.** At 280
+   the group wrapped one figure, then two, with the rules standing only between
+   figures in a row, so nothing divided the rows. Each figure's rule is pulled
+   up half the row gap and its width, so the first row's lands above the box
+   and the clip takes it, and every later row has one halfway down the gap
+   over it, which stays the gap it was. */
+:host([divided]) ::slotted(*) {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block-start: calc(var(--_stat-group-gap) * -0.5 - var(--helix-border-thin));
+  padding-block-start: calc(var(--_stat-group-gap) * 0.5);
 }

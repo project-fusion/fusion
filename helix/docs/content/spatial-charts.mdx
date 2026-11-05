@@ -182,8 +182,7 @@ three.js draws both as well.
 
 `no-box` draws `Spatial Bar Chart`, `Spatial Ribbon Chart`, `Spatial Scatter
 Chart`, `Spatial Surface Chart`, or `Spatial Treemap` with no box, grid,
-numbers, or names, and nothing behind it, so the readings stand on the page as
-a picture does:
+numbers, or names, so the readings stand on the page as a picture does:
 
 ```html
 <helix-spatial-surface-chart
@@ -193,6 +192,11 @@ a picture does:
   no-box
 ></helix-spatial-surface-chart>
 ```
+
+## Give a chart a ground
+
+A spatial chart draws nothing behind its plot, as a flat chart does. Set
+`separation="filled"` on any of the six to draw a sunken ground.
 
 The table, the summary, the tooltip, and the keys still carry every value, and
 three.js draws no box either. `Spatial Heatmap` has no box, and its `start` and

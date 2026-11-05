@@ -187,8 +187,9 @@ const looking: Looking[] = []
  * **What makes a silent break loud.** A document carrying React's root mark
  * where no element ever finds a props bag is the one way this file fails
  * without a symptom of its own: React renamed the key, every handler on a
- * server-rendered page is dead again, and nothing says so. An element whose
- * window closes on such a page is handed to `auditReactMissing`, which in a
+ * server-rendered page is dead again, and nothing says so. An element React
+ * has reached whose window closes on such a page is handed to
+ * `auditReactMissing`, which in a
  * development build says so once. See `react-audit.ts`.
  *
  * Kept by mark rather than by document, because the mark's suffix is React's
@@ -196,6 +197,20 @@ const looking: Looking[] = []
  * stand for a new page by writing a new mark.
  */
 const found = new Set<string>()
+
+/**
+ * Whether React has reached a node, by any key of its own on it.
+ *
+ * **What tells a renamed key from a slow page.** React writes a node's fiber
+ * and its props together as it hydrates it, both under `__react`. A node with
+ * the one and not the other is a renamed props key. A node with neither has
+ * not been hydrated yet: a development build of Next.js hydrated a page of
+ * 1,367 elements 170 ms after marking it, and its error overlay, a React of
+ * its own, marks the page earlier still, so a window counted from the mark
+ * closed on elements React was still coming to.
+ */
+const reachedByReact = (node: EventTarget): boolean =>
+  Object.keys(node).some((key) => key.startsWith('__react'))
 
 /** The ticks run so far, so an element can count its own. */
 let ticks = 0
@@ -242,7 +257,7 @@ const tick = (): void => {
     }
     const taken = mark !== undefined && take(one.host, false, mark)
     const over = ticks - one.after >= LOOK_FOR / LOOK_EVERY && now - one.since >= LOOK_FOR
-    if (!taken && over && mark !== undefined && !found.has(mark)) {
+    if (!taken && over && mark !== undefined && !found.has(mark) && reachedByReact(one.host)) {
       auditReactMissing(one.host, LOOK_FOR, mark)
     }
     if (!(taken || over)) {

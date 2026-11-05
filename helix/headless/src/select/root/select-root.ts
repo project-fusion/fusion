@@ -215,12 +215,15 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   @property()
   autocomplete = ''
 
+  /* "No matches" was the default, a filter's message, so a select with
+     nothing to choose said it had found nothing. */
   /**
-   * The text shown when no options match the filter.
+   * The text shown when the list has no options. A filter that hides every
+   * option shows `no-results-text`.
    */
   @words
   @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
+  emptyText = 'No options'
 
   /**
    * Whether the list can be narrowed by typing.
@@ -297,6 +300,13 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    */
   @property({ reflect: true, type: Boolean })
   multiple = false
+
+  /**
+   * The text shown when typing hides every option, under `filterable`.
+   */
+  @words
+  @property({ attribute: 'no-results-text' })
+  noResultsText = 'No matches'
 
   /**
    * Shown on the trigger while nothing is chosen.
@@ -884,6 +894,11 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* The attribute means nothing to a host that cannot take focus itself, so the
+       trigger takes it, as `focus()` does. */
+    if (this.hasAttribute('autofocus')) {
+      this.focus()
+    }
     this.finishHydration()
   }
 
@@ -946,6 +961,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
        words. A comment here and not in the template, which would ship it. */
     return html`<${this.tag('listbox')}
       empty-text=${this.emptyText}
+      no-results-text=${this.noResultsText}
       loading-text=${this.loadingText}
       ?loading=${this.loading}
       part="listbox"

@@ -60,7 +60,8 @@
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. */
-:host([loading]) [part="tree"] {
+:host([loading]) [part="tree"] > :not([part~="loading"], [part~="empty"]),
+:host([loading]) ::slotted(:not([slot])) {
   opacity: var(--helix-opacity-busy);
 }
 

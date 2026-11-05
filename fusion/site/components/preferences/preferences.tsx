@@ -142,22 +142,21 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
 
   return (
     <helix-drawer
+      dismissible
       label="Preferences"
-      material="glass"
       onhelix-before-close={() => onOpenChange(false)}
       onhelix-before-open={() => onOpenChange(true)}
       open={open}
       placement="end"
     >
+      {/* The title in the header beside the close control, as the Menu drawer
+          has it. */}
+      <span slot="header">Preferences</span>
       {/* No `align="start"`. It shrink wraps every child to its own content, so
           each toggle group comes out as wide as its three words. Stretch is the
           default and is what a column of fields wants: they share an edge, and a
           group that fills its column has segments wide enough to read. */}
       <helix-flex direction="column" gap="lg">
-        <helix-text as="h2" scale="subheading">
-          Preferences
-        </helix-text>
-
         {/* The label and the line under it are the control's own, not `Text`
             elements placed around it: `MixinField` exists so the spacing is not
             a guess at what every other field does, and so the group is named

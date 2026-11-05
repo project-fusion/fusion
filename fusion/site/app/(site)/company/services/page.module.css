@@ -77,7 +77,12 @@
   grid-template-columns: 1fr;
 }
 
+/* The same gap between the four bands when the offers stack as when they stand
+   in columns. Stacked, the offer was a block, and each label sat on the value
+   above it. */
 .offer {
+  display: grid;
+  gap: var(--helix-space-lg);
   padding: var(--helix-space-xl);
 }
 
@@ -98,8 +103,6 @@
   }
 
   .offer {
-    display: grid;
-    gap: var(--helix-space-lg);
     grid-row: span 4;
     grid-template-rows: subgrid;
   }
@@ -136,10 +139,11 @@
   }
 }
 
-/* The subheading under the display line. */
+/* The subheading under the display line, at the article lede's step at every
+   width. A clamp from `text-md` set it at 14px on a phone. */
 .servicesHeroLede {
   color: var(--helix-color-foreground-muted);
-  font-size: clamp(var(--helix-text-md), 1.6vw, var(--helix-text-lg));
+  font-size: var(--helix-text-lg);
 }
 
 /* Edge to edge on a narrow screen, and no corner where there is no gap. The

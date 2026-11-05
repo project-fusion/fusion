@@ -35,6 +35,10 @@
   font-size: var(--_tag-text);
   font-weight: var(--tag-font-weight, var(--helix-weight-medium));
   gap: var(--tag-gap, var(--helix-space-2xs));
+  /* An icon in a tag is sized to the tag's words, as a Button's icon is to its
+     label: the icon step put a 20 pixel mark beside 12 pixel text at `md` and
+     24 at `lg`. `round` keeps it on a whole pixel. */
+  --icon-size: round(calc(var(--_tag-text) * 1.15), 1px);
   line-height: var(--helix-leading-tight);
   padding-inline: var(--_tag-inset);
   white-space: nowrap;
@@ -88,18 +92,27 @@ slot:not([name]) {
    anyone sees. What is left is 0.41px, not zero, and that is the honest ceiling
    for CSS here. `middle` is the baseline plus half an x-height, so the line box
    stays 0.81px taller than the icon and the icon rides at the bottom of it.
-   0.41px is below a device pixel at every density we draw at; 1.7px was not. */
+   0.41px is below a device pixel at every density we draw at; 1.7px was not.
+
+   In the label's own slot an icon is a word in the line, so the flex gap the
+   tag's other slots take does not reach it, and it sat against the text. */
 slot:not([name])::slotted(helix-icon) {
+  margin-inline-end: var(--tag-gap, var(--helix-space-2xs));
   vertical-align: middle;
 }
 
-/* Filled with the tone, label on top of it. At full strength `primary` measures
-   4.21:1 against an inverse label, under the 4.5 that 12px text needs; every
-   other tone clears it. */
+/* Filled with the tone, label on top of it. **A tone's fill is its `-surface`
+   token and the label the ink solved against it**, the pair a solid Button and
+   a Badge take, so the three agree: Tag mixed its own, and in dark the info Tag
+   was a light blue under a black label beside a dark blue Button under a white
+   one. The neutral tag has no surface token and keeps its mix. */
 :host([emphasis="solid"]) {
-  --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
+  --_tag-fill: var(
+    --_tag-solid,
+    color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground))
+  );
   --_tag-edge: var(--_tag-fill);
-  --_tag-label: var(--helix-color-foreground-inverse);
+  --_tag-label: var(--_tag-on, var(--helix-color-foreground-inverse));
 }
 
 /* The tone at its edge only. */
@@ -110,27 +123,39 @@ slot:not([name])::slotted(helix-icon) {
 
 :host([tone="primary"]) {
   --_tag-color: var(--helix-color-primary);
+  --_tag-solid: var(--helix-color-primary-surface);
+  --_tag-on: var(--helix-color-foreground-on-primary);
 }
 
 /* Present so `Tag` and `Announcement` name one set of tones between them. */
 :host([tone="accent"]) {
   --_tag-color: var(--helix-color-accent);
+  --_tag-solid: var(--helix-color-accent-surface);
+  --_tag-on: var(--helix-color-foreground-on-accent);
 }
 
 :host([tone="info"]) {
   --_tag-color: var(--helix-color-info);
+  --_tag-solid: var(--helix-color-info-surface);
+  --_tag-on: var(--helix-color-foreground-on-status);
 }
 
 :host([tone="success"]) {
   --_tag-color: var(--helix-color-success);
+  --_tag-solid: var(--helix-color-success-surface);
+  --_tag-on: var(--helix-color-foreground-on-status);
 }
 
 :host([tone="warning"]) {
   --_tag-color: var(--helix-color-warning);
+  --_tag-solid: var(--helix-color-warning-surface);
+  --_tag-on: var(--helix-color-foreground-on-status);
 }
 
 :host([tone="danger"]) {
   --_tag-color: var(--helix-color-danger);
+  --_tag-solid: var(--helix-color-danger-surface);
+  --_tag-on: var(--helix-color-foreground-on-status);
 }
 
 /* Inside the tag's inline padding, and not pulled past it. */
@@ -162,7 +187,8 @@ slot:not([name])::slotted(helix-icon) {
 
 [part="dismiss"] svg {
   /* From the icon steps, so the mark follows density with the tag around it. */
-  --_tag-dismiss-size: calc(var(--helix-size-icon-tight) * 0.75);
+  /* Rounded, since three quarters of 13 and 19 land between pixels. */
+  --_tag-dismiss-size: round(calc(var(--helix-size-icon-tight) * 0.75), 1px);
   block-size: var(--_tag-dismiss-size);
   inline-size: var(--_tag-dismiss-size);
 }
@@ -237,9 +263,12 @@ slot[name="start"]::slotted(*) {
 
 /* Selected in a group that selects: the tone filled, as `solid` draws it. */
 :host(:state(selected)) {
-  --_tag-fill: color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground));
+  --_tag-fill: var(
+    --_tag-solid,
+    color-mix(in oklab, var(--_tag-color) 82%, var(--helix-color-foreground))
+  );
   --_tag-edge: var(--_tag-fill);
-  --_tag-label: var(--helix-color-foreground-inverse);
+  --_tag-label: var(--_tag-on, var(--helix-color-foreground-inverse));
 }
 
 [part="dismiss"]:active {

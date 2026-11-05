@@ -204,6 +204,15 @@ slot[name="dismiss-icon"]::slotted(*) {
 
 /* The heading, when there is one. A bare slot, so an omitted one generates no
    box and the content sits where it would have anyway. */
+/* A link written in the callout reads as one, as a link in a Table cell does. */
+slot:not([name])::slotted(a:not([data-link])) {
+  color: var(--helix-color-primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+}
+
 slot[name="heading"]::slotted(*) {
   color: var(--helix-color-foreground);
   /* Its own line. A slotted `<span>` is inline by default, so the heading and the

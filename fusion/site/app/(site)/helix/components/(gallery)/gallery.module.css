@@ -103,7 +103,18 @@
   }
 }
 
-@media (width < 36rem) {
+/* **Two across on a phone, on a smaller gap.** One across made the page 46,148
+   pixels tall at 390 against 8,839 at 1440. At the `2xl` gap two cards came out
+   155 wide; at `md` they are 171 at 390 and 163 at 375, which holds every
+   drawing and a two-line name. Below 23rem a card would drop under 160, so the
+   narrowest phones keep one across, at the grid's own gap. */
+@media (23rem <= width < 36rem) {
+  .familyGrid {
+    gap: var(--helix-space-md);
+  }
+}
+
+@media (width < 23rem) {
   .familyGrid {
     grid-template-columns: minmax(0, 1fr);
   }

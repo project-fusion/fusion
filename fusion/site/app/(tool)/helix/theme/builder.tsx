@@ -44,6 +44,13 @@ import styles from '../tool-shell.module.css'
  */
 const PREVIEW_SHARE = 68
 
+/** On a phone the preview takes more of a stack that has no room for three panes. */
+const PREVIEW_SHARE_NARROW = 76
+
+/** A phone's audit opens to this height, and shuts to its row of tabs. */
+const AUDIT_OPEN = 160
+const AUDIT_SHUT = 40
+
 /**
  * The faces on offer, fetched rather than vendored.
  */
@@ -275,6 +282,8 @@ export function ThemeBuilder({
    * are.
    */
   const [controlsShown, setControlsShown] = useState(true)
+  const [split, setSplit] = useState(PREVIEW_SHARE)
+  const [auditSize, setAuditSize] = useState(AUDIT_OPEN)
   const [narrow, setNarrow] = useState(false)
 
   useEffect(() => {
@@ -284,6 +293,8 @@ export function ThemeBuilder({
       /* Shut on arrival at a narrow width: the preview is what a reader came
          for, and a form over almost all of it is not a first impression. */
       setControlsShown(!query.matches)
+      setSplit(query.matches ? PREVIEW_SHARE_NARROW : PREVIEW_SHARE)
+      setAuditSize(query.matches ? AUDIT_SHUT : AUDIT_OPEN)
     }
     sync()
     query.addEventListener('change', sync)
@@ -383,7 +394,6 @@ export function ThemeBuilder({
   const [radius, setRadius] = useState(initialSettings.radius)
   const [allowance, setAllowance] = useState(initialSettings.allowance)
   const [harmony, setHarmony] = useState(initialSettings.harmony)
-  const [split, setSplit] = useState(PREVIEW_SHARE)
   const [bodyFace, setBodyFace] = useState(initialSettings.bodyFace)
   /* The stylesheet for the brand's own faces, and what its field holds. */
   const [fontCss, setFontCss] = useState(initialSettings.fontCss)
@@ -413,6 +423,11 @@ export function ThemeBuilder({
    * from the words.
    */
   const [audit, setAudit] = useState('contrast')
+  /* A count opens its tab, and on a phone the audit may be shut. */
+  const showAudit = (value: string) => {
+    setAudit(value)
+    setAuditSize((size) => Math.max(size, AUDIT_OPEN))
+  }
 
   /* **What the preview pretends to be, and neither is part of the theme.**
      They change no token, appear in no artifact and are measured by nothing:
@@ -920,7 +935,11 @@ export function ThemeBuilder({
                 and turning it off and on again brings that color back. */}
             <helix-switch
               checked={brand !== ''}
-              hint="Off, the palette is ink: near-black in light mode and near-white in dark."
+              hint={
+                brand
+                  ? 'On, the palette is derived from the color below.'
+                  : 'Off, the palette is ink: near-black in light mode and near-white in dark.'
+              }
               label="Brand color"
               onChange={(event) => setBrand(event.currentTarget.checked ? brandColor : '')}
             ></helix-switch>
@@ -1367,16 +1386,21 @@ export function ThemeBuilder({
             corner-label="Preview, artifact and audit"
             default-split={PREVIEW_SHARE}
             lead="preview"
+            onhelix-before-split={(event) => {
+              setSplit((event.target as HTMLElement & { split: number }).split)
+            }}
             /* **Stacked on a phone.** Side by side at 375 the
                sheet pane came out about 130px and every custom property wrapped
                one word to a line, which is the same measurement 244 made of the
                sandbox's source pane. Only the axis changes: `lead` above already says
                preview, at every width, because that is what this tool is for. */
-            onhelix-before-split={(event) => {
-              setSplit((event.target as HTMLElement & { split: number }).split)
+            onhelix-panel-resize={(event) => {
+              setAuditSize((event.target as HTMLElement & { panelSize: number }).panelSize)
             }}
             orientation={narrow ? 'vertical' : 'horizontal'}
+            panel-collapsed-size={narrow ? AUDIT_SHUT : 0}
             panel-label="The audit"
+            panel-size={auditSize}
             separator-label="Preview and artifact"
             split={split}
           >
@@ -1418,13 +1442,13 @@ export function ThemeBuilder({
                  *                     contrast" not being English and "Contrast failures" not being
                  *                     a tab label that fits.
                  */}
-                <button className="themeJump" onClick={() => setAudit('contrast')} type="button">
+                <button className="themeJump" onClick={() => showAudit('contrast')} type="button">
                   <helix-tag emphasis="subtle" tone="success">
                     {counts.pass ?? 0} pass
                   </helix-tag>
                 </button>
                 {failures.length > 0 ? (
-                  <button className="themeJump" onClick={() => setAudit('contrast')} type="button">
+                  <button className="themeJump" onClick={() => showAudit('contrast')} type="button">
                     <helix-tag emphasis="subtle" tone="danger">
                       {failures.length} fail
                     </helix-tag>
@@ -1433,7 +1457,7 @@ export function ThemeBuilder({
                 {unmeasured.length > 0 ? (
                   <button
                     className="themeJump"
-                    onClick={() => setAudit('unmeasured')}
+                    onClick={() => showAudit('unmeasured')}
                     type="button"
                   >
                     <helix-tag emphasis="subtle" tone="neutral">
@@ -1444,7 +1468,7 @@ export function ThemeBuilder({
                 {theme.collisions.length > 0 ? (
                   <button
                     className="themeJump"
-                    onClick={() => setAudit('collisions')}
+                    onClick={() => showAudit('collisions')}
                     type="button"
                   >
                     <helix-tag emphasis="subtle" tone="warning">
@@ -1504,6 +1528,7 @@ export function ThemeBuilder({
               active={audit}
               data-density="sm"
               label="The audit"
+              onClick={() => setAuditSize((size) => Math.max(size, AUDIT_OPEN))}
               onhelix-before-activate={(event) => setAudit(event.detail.value)}
               slot="panel"
             >

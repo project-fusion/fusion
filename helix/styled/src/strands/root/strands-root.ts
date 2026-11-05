@@ -124,11 +124,13 @@ const PACE = 0.25
  * @csspart canvas - The surface the ribbon draws into.
  * @csspart content - The box over the ribbon that holds the content. It covers the element.
  *
+ * @cssproperty --strands-fade - How far the top and bottom edges fade, as a share of the height. `0%` keeps a hard edge. Defaults to `15%`.
  * @cssproperty --strands-glow - The color of most strands. Defaults to `--helix-color-primary`.
  * @cssproperty --strands-ground - The page the light is added to. Defaults to `--helix-color-background`.
  * @cssproperty --strands-peak - The hottest strands, and on a light page the ink the light darkens toward. Defaults to `--helix-color-primary-hover` on a dark page and `--helix-color-primary-active` on a light one.
  * @cssproperty --strands-tint - The color of a few strands, for depth. Defaults to `--helix-color-accent`, which is the primary itself unless the theme relates an accent to the brand, as `accent: { from: 'brand', rotate: 40 }` does.
  *
+ * @cssstate drawing - The ribbon draws on the GPU, so the gradient under it is hidden.
  * @cssstate fallback - The element shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the ribbon draws again.
  */
 @customElement('helix-strands')
@@ -468,6 +470,7 @@ export class HelixStrands extends HelixElement {
     this.canvas?.toggleAttribute('hidden', false)
     this.fallback = undefined
     this.toggleState('fallback', false)
+    this.toggleState('drawing', true)
     return true
   }
 
@@ -490,6 +493,7 @@ export class HelixStrands extends HelixElement {
     }
     this.renderer = null
     this.canvas?.toggleAttribute('hidden', true)
+    this.toggleState('drawing', false)
     this.fallBack('lost')
   }
 
@@ -516,6 +520,7 @@ export class HelixStrands extends HelixElement {
     }
     this.fallback = reason
     this.toggleState('fallback', true)
+    this.toggleState('drawing', false)
     this.dispatchEvent(new HelixStrandsFallbackEvent({ reason }))
   }
 

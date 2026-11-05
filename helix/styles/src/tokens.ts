@@ -138,12 +138,14 @@ export const TOKENS: Token[] = [
     'color-hover',
     'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
   ],
-  /* The bubble of your own message: a brand's wash, or at no brand a lighter one,
-     since 28% of near black is `#bfbfbf`, and 16% matched the other speaker's bubble
-     at `#dbdbdb` against `#dadada`. */
+  /* The bubble of your own message: a brand's wash, or at no brand twice the
+     other speaker's. The other bubble is 8% of the foreground, and the ink at
+     14% came out a gray beside it, so only the side a turn kept to said who
+     sent it. 16% of the foreground, which flips with the mode, holds the step
+     in both. November 3, 2026. */
   [
     'color-primary-wash',
-    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-primary) 14%, transparent))',
+    'var(--_helix-brand-wash, color-mix(in oklab, var(--helix-color-foreground) 16%, transparent))',
     'A wash of the primary color, such as the bubble of your own Chat message.',
   ],
   /* What a control is lit with under a press, a step past `color-hover`. A press
@@ -294,23 +296,23 @@ export const TOKENS: Token[] = [
      from there like a brand fill's does. */
   [
     'color-accent-surface',
-    'light-dark(var(--_helix-accent-600, var(--_helix-ink-500)), var(--_helix-accent-600, var(--_helix-ink-400)))',
+    'light-dark(var(--_helix-accent-600, var(--_helix-ink-500)), var(--_helix-accent-fill-dark, var(--_helix-ink-400)))',
   ],
   [
     'color-accent-surface-hover',
-    'light-dark(var(--_helix-accent-700, var(--_helix-ink-600)), var(--_helix-accent-700, var(--_helix-ink-450)))',
+    'light-dark(var(--_helix-accent-700, var(--_helix-ink-600)), var(--_helix-accent-fill-dark-hover, var(--_helix-ink-450)))',
   ],
   [
     'color-primary-surface',
-    'light-dark(var(--_helix-brand-600, var(--_helix-ink-500)), var(--_helix-brand-600, var(--_helix-ink-400)))',
+    'light-dark(var(--_helix-brand-600, var(--_helix-ink-500)), var(--_helix-brand-fill-dark, var(--_helix-ink-400)))',
   ],
   [
     'color-primary-surface-hover',
-    'light-dark(var(--_helix-brand-700, var(--_helix-ink-surface-hover)), var(--_helix-brand-700, var(--_helix-ink-surface-hover-dark)))',
+    'light-dark(var(--_helix-brand-700, var(--_helix-ink-surface-hover)), var(--_helix-brand-fill-dark-hover, var(--_helix-ink-surface-hover-dark)))',
   ],
   [
     'color-primary-surface-active',
-    'light-dark(var(--_helix-brand-800, var(--_helix-ink-surface-active)), var(--_helix-brand-800, var(--_helix-ink-surface-active-dark)))',
+    'light-dark(var(--_helix-brand-800, var(--_helix-ink-surface-active)), var(--_helix-brand-fill-dark-active, var(--_helix-ink-surface-active-dark)))',
   ],
   /* The edge of a field under the pointer. A brand's own color, and with no brand
      a gray at 3:1 on the page, where the primary is near black and the edge went
@@ -336,7 +338,12 @@ export const TOKENS: Token[] = [
      for two components to disagree about which one to reach for." Two names
      holding the same *value* is that place. One name pointing at the other is
      not, and cannot become one. */
-  ['color-focus-ring', 'var(--helix-color-primary)'],
+  /* The primary color, held in the lightness that keeps a ring visible on the page,
+     since a CSS seed can be as bright as a consumer likes. */
+  [
+    'color-focus-ring',
+    'light-dark(oklch(from var(--helix-color-primary) min(l, 0.6) c h), oklch(from var(--helix-color-primary) max(l, 0.65) c h))',
+  ],
   /* The brand as a mark, which is the one place it appears as itself.
      Everywhere else it is solved for a word: `primary` has to clear 4.5:1 as
      text and `primary-surface` further still to carry white on a fill. A mark
@@ -419,6 +426,11 @@ export const TOKENS: Token[] = [
      weakest pair under deuteranopia is 1 and 8 of the balanced eight in light,
      and they are closer than is comfortable.
 
+     **The two that could hold the most are held to 0.23**, series 4, the
+     magenta, at 0.295 and series 7 at 0.277, so neither reads as louder than the
+     rest of the bright eight. Lightness is unchanged, so contrast is too.
+     November 3, 2026.
+
      **Re-measured October 31, 2026, with no brand at origin 270 and series 2 at
      chroma 0.18.** Series 2 sits 18 degrees from danger and series 5 15 from
      warning, against 6 and 3. The light bright eight clear 3.28 on the page and
@@ -439,7 +451,7 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-series-4',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.565 calc(0.295 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.252 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.565 calc(0.23 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ), oklch( from var(--_helix-series-origin) 0.62 calc(0.23 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-4)) ) )',
   ],
   [
     'color-series-5',
@@ -451,7 +463,7 @@ export const TOKENS: Token[] = [
   ],
   [
     'color-series-7',
-    'light-dark( oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.66 calc(0.277 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
+    'light-dark( oklch( from var(--_helix-series-origin) 0.66 calc(0.23 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ), oklch( from var(--_helix-series-origin) 0.66 calc(0.23 * var(--_helix-seed-chroma-scale)) calc(h + var(--_helix-series-hue-7)) ) )',
   ],
   [
     'color-series-8',
@@ -630,7 +642,9 @@ export const TOKENS: Token[] = [
      and 3.38 on the raised and overlay rungs.
 
      The hover step is the thumb while the pointer is over its scroller, the
-     subtle foreground at 5.25 and 7.01 on the page. The track is clear, so the
+     muted foreground at 6.01 and 8.13 on the page. It was the subtle
+     foreground, which the ramp has since moved to the resting thumb's own gray,
+     so a hover changed nothing. The track is clear, so the
      scroller's own ground shows behind the thumb. Each family reads its own
      hook first, so one scroller can differ without moving these. */
   [
@@ -640,7 +654,7 @@ export const TOKENS: Token[] = [
   ],
   [
     'scrollbar-thumb-hover-color',
-    'var(--helix-color-foreground-subtle)',
+    'var(--helix-color-foreground-muted)',
     'The thumb while the pointer is over its scroller.',
   ],
   ['scrollbar-track-color', 'transparent', 'The track behind the thumb.'],
@@ -936,11 +950,11 @@ export const TOKENS: Token[] = [
   /* Rounded, so a row does not land between pixels: 25.6 and 38.4 at `sm` and
      `lg` before October 31, 2026. */
   ['size-control-tight', 'round(calc(var(--helix-size-control) * 0.8), 1px)'],
-  ['size-control-loose', 'calc(var(--helix-size-control) * 1.2)'],
-  ['size-icon-tight', 'calc(var(--helix-size-icon) * 0.8)'],
-  ['size-icon-loose', 'calc(var(--helix-size-icon) * 1.2)'],
-  ['size-checkbox-tight', 'calc(var(--helix-size-checkbox) * 0.8)'],
-  ['size-checkbox-loose', 'calc(var(--helix-size-checkbox) * 1.2)'],
+  ['size-control-loose', 'round(calc(var(--helix-size-control) * 1.2), 1px)'],
+  ['size-icon-tight', 'round(calc(var(--helix-size-icon) * 0.8), 1px)'],
+  ['size-icon-loose', 'round(calc(var(--helix-size-icon) * 1.2), 1px)'],
+  ['size-checkbox-tight', 'round(calc(var(--helix-size-checkbox) * 0.8), 1px)'],
+  ['size-checkbox-loose', 'round(calc(var(--helix-size-checkbox) * 1.2), 1px)'],
   /* How wide a button is when it is asked to take a standard width rather than
      its label's. */
   ['size-button', 'calc(12.5rem * var(--_helix-seed-density))'],

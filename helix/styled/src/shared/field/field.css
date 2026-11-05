@@ -54,6 +54,8 @@
   line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);
   margin-block-start: var(--helix-space-2xs);
+  /* A long unbroken word breaks inside the column it was given, as the label's. */
+  overflow-wrap: anywhere;
 }
 
 [part="hint"] {
@@ -70,8 +72,8 @@
 }
 
 /* `:host(:disabled)`, not `:host([disabled])`. */
-:host(:disabled) [part="label"],
-:host(:disabled) [part="hint"] {
+/* Not the hint: it often says why the field is disabled, so it stays readable. */
+:host(:disabled) [part="label"] {
   /* A family that fades its whole host sets this to 1, so a label fades once. */
   opacity: var(--_field-disabled-opacity, var(--helix-opacity-disabled));
 }

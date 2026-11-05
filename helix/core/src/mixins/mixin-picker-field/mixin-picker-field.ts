@@ -364,7 +364,9 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       if (event.key === 'ArrowDown' && fromText && !this.isDisabled) {
         event.preventDefault()
         if (this.open) {
-          this.partNamed('picker')?.focus()
+          /* The panel opens beside its trigger and is not placed yet, so focus
+             moving there would scroll the page to where it last was. */
+          this.partNamed('picker')?.focus({ preventScroll: true })
         } else {
           this.fromTrigger = true
           if (!this.requestOpen(true)) {
@@ -596,7 +598,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       /* After the panel is shown, which the controller does on this update. */
       if (changed.has('open')) {
         if (this.open && this.fromTrigger) {
-          this.partNamed('picker')?.focus()
+          this.partNamed('picker')?.focus({ preventScroll: true })
         }
         this.fromTrigger = false
         if (!this.open) {

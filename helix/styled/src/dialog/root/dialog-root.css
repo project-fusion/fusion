@@ -1,6 +1,9 @@
 /* The host draws nothing. */
 :host {
   --_dialog-ground: var(--dialog-background-color, var(--helix-color-surface-overlay));
+  --_dialog-raised: var(--helix-color-surface-raised);
+  --_dialog-surface: var(--helix-color-surface);
+  --_dialog-md: var(--helix-radii-md);
   display: contents;
 }
 
@@ -12,6 +15,24 @@
     var(--_dialog-ground),
     color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_dialog-ground))
   );
+  /* A panel in the content, such as a Card, reads `surface-raised`, which in dark
+     is the dialog's own fill. A smaller step, so a list opened from that panel
+     still stands above it. */
+  --helix-color-surface-raised: light-dark(
+    var(--_dialog-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_dialog-ground))
+  );
+  /* A Card in the content reads `surface`, which in dark is darker than the
+     dialog's fill: the default card measured #0c0c0c on #181818 and read as a
+     hole. Inside, the token sits a step above the dialog instead. */
+  --helix-color-surface: light-dark(
+    var(--_dialog-surface),
+    color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_dialog-ground))
+  );
+  /* Nothing inside is rounder than the panel. A Card takes `md`, 8px, and drew
+     it inside this 4px corner; inside, `md` is at most the panel's own. Decided
+     by the owner on November 3, 2026: a card follows its container. */
+  --helix-radii-md: min(var(--_dialog-md), var(--dialog-radius, var(--helix-radii-sm)));
   background-color: var(--_dialog-ground);
   border: var(--dialog-border-width, var(--helix-border-floating)) solid
     var(--dialog-border-color, var(--helix-color-border));
@@ -100,7 +121,8 @@
   margin: var(--helix-space-none);
 }
 
-/* Actions from the leading edge, where the reading starts. */
+/* Actions at the trailing edge, the primary one last, in the order they are
+   written. */
 ::slotted([slot="footer"]) {
   display: flex;
   gap: var(--helix-space-xs);
@@ -112,11 +134,16 @@
    *pace* of it cannot be read: measured, `snappy` settles at 159ms and `gentle`
    at 262ms, a difference of a hundred milliseconds that nobody can see across
    twelve pixels. */
+/* **Two curves, one per direction.** The transition a change runs is the one
+   on the state it arrives at, so the closed rule carries the way out and the
+   open rule the way in: it decelerates in, coming to rest, and accelerates out,
+   as Toast leaves. It closed on the arrival's curve, so it eased gently into
+   nowhere while a Toast beside it left at speed. */
 [part="surface"] {
   opacity: 0;
   transition:
-    opacity var(--helix-duration-normal) var(--helix-easing-standard),
-    translate var(--helix-duration-normal) var(--helix-easing-decelerate),
+    opacity var(--helix-duration-normal) var(--helix-easing-accelerate),
+    translate var(--helix-duration-normal) var(--helix-easing-accelerate),
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
   translate: 0 var(--dialog-rise, var(--helix-space-lg));
@@ -124,6 +151,11 @@
 
 [part="surface"][open] {
   opacity: 1;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    translate var(--helix-duration-normal) var(--helix-easing-decelerate),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
   translate: 0 0;
 }
 

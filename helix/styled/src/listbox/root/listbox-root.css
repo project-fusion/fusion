@@ -193,7 +193,8 @@ slot[name="filter-icon"]::slotted(*) {
 /* Options already showing stay and dim while a new set arrives. Removing them
    would collapse the panel and move everything under the reader for as long as
    the request takes. */
-:host([loading]) [part="items"] {
+:host([loading]) [part="items"] > :not([part~="loading"], [part~="empty"], [part~="error"]),
+:host([loading]) ::slotted(:not([slot])) {
   opacity: var(--helix-opacity-busy);
 }
 

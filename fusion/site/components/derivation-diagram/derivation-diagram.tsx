@@ -1,5 +1,12 @@
+import type { ThemeEngine } from '@fusion.dev/helix-theme'
 import { StillWhenUnseen } from '@/components/still-when-unseen/still-when-unseen'
 import styles from './derivation-diagram.module.css'
+
+/** What the engine reports for one scheme, so the drawing cannot go stale. */
+interface DerivationFacts {
+  pairs: number
+  tokens: number
+}
 
 /**
  * The derivation, drawn as a routing diagram.
@@ -17,7 +24,7 @@ import styles from './derivation-diagram.module.css'
  * are content: it leaves "brand" and "density" visibly weaker than "179" and
  * "67" across the same figure, which says the inputs matter less. They do not.
  */
-export const DerivationDiagram = () => (
+export const DerivationDiagram = ({ pairs, tokens }: DerivationFacts) => (
   <StillWhenUnseen className={styles.diagram}>
     <svg
       aria-labelledby="derivation-title derivation-desc"
@@ -27,8 +34,8 @@ export const DerivationDiagram = () => (
     >
       <title id="derivation-title">How a palette is derived from one color</title>
       <desc id="derivation-desc">
-        A brand color, a saturation, a density and a radius feed a derivation engine, which emits
-        179 semantic tokens in both schemes with 67 foreground and ground pairs measured.
+        A brand color, a saturation, a density and a radius feed a derivation engine, which emits{' '}
+        {tokens} color tokens in both schemes with {pairs} foreground and ground pairs measured.
       </desc>
 
       <defs>
@@ -474,10 +481,10 @@ export const DerivationDiagram = () => (
         What comes out
       </text>
       <text className={styles.diagramFigure} fontSize="34" x="954" y="164">
-        179
+        {tokens}
       </text>
       <text className={styles.diagramMeta} fontSize="15" x="954" y="185">
-        semantic tokens
+        color tokens
       </text>
 
       <rect fill="var(--helix-color-foreground)" height="26" rx="8" width="26" x="954" y="227" />
@@ -495,7 +502,7 @@ export const DerivationDiagram = () => (
       </text>
 
       <text className={styles.diagramFigure} fontSize="34" x="954" y="324">
-        67
+        {pairs}
       </text>
       <text className={styles.diagramMeta} fontSize="15" x="954" y="345">
         pairs measured
@@ -515,7 +522,7 @@ export const DerivationDiagram = () => (
  * honest and still means dragging a box twice the width of the screen to read
  * the page's central explanation.
  */
-export const DerivationDiagramStacked = () => (
+export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => (
   <div className={styles.diagramStacked}>
     {/* The figure carries its own `title` and `desc`, in the wide figure's words.
         Below 52rem the wide figure is `display: none`, and above it this one is,
@@ -528,8 +535,8 @@ export const DerivationDiagramStacked = () => (
     >
       <title id="derivation-stacked-title">How a palette is derived from one color</title>
       <desc id="derivation-stacked-desc">
-        A brand color, a saturation, a density and a radius feed a derivation engine, which emits
-        179 semantic tokens in both schemes with 67 foreground and ground pairs measured.
+        A brand color, a saturation, a density and a radius feed a derivation engine, which emits{' '}
+        {tokens} color tokens in both schemes with {pairs} foreground and ground pairs measured.
       </desc>
 
       <defs>
@@ -605,13 +612,13 @@ export const DerivationDiagramStacked = () => (
       <circle cx="170" cy="168" fill="var(--helix-color-accent)" r="3.5" />
 
       {/* Three across, each number over its two words. Split onto two lines
-          rather than shrunk: 113 units a column will not hold `semantic tokens`
+          rather than shrunk: 113 units a column will not hold `color tokens`
           on one line at a size anybody reads. */}
       <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="57" y="288">
-        179
+        {tokens}
       </text>
       <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="308">
-        semantic
+        color
       </text>
       <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="322">
         tokens
@@ -635,7 +642,7 @@ export const DerivationDiagramStacked = () => (
       </text>
 
       <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="283" y="288">
-        67
+        {pairs}
       </text>
       <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="308">
         pairs
@@ -655,9 +662,22 @@ export const DerivationDiagramStacked = () => (
  * Both figures in one box, which decides between them by its own width: the
  * wide one where it has its 52rem, the stacked one where it does not.
  */
-export const DerivationDiagrams = ({ className }: { className?: string }) => (
-  <div className={`${styles.diagrams} ${className ?? ''}`}>
-    <DerivationDiagram />
-    <DerivationDiagramStacked />
-  </div>
-)
+export const DerivationDiagrams = ({
+  className,
+  engine,
+}: {
+  className?: string
+  engine: ThemeEngine
+}) => {
+  const theme = engine.derive({ scheme: 'light' })
+  const facts = {
+    pairs: theme.pairings.filter((pair) => pair.ratio !== undefined).length,
+    tokens: theme.tokens.length,
+  }
+  return (
+    <div className={`${styles.diagrams} ${className ?? ''}`}>
+      <DerivationDiagram {...facts} />
+      <DerivationDiagramStacked {...facts} />
+    </div>
+  )
+}

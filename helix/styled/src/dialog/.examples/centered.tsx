@@ -35,16 +35,17 @@ export function Example() {
           slot="footer"
         >
           <helix-button
-            emphasis="solid"
-            tone="danger"
-          >
-            Discard changes
-          </helix-button>
-          <helix-button
+            autofocus
             command="--close"
             commandfor="discard"
           >
             Keep editing
+          </helix-button>
+          <helix-button
+            emphasis="solid"
+            tone="danger"
+          >
+            Discard changes
           </helix-button>
         </helix-button-group>
       </helix-dialog>

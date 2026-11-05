@@ -11,6 +11,15 @@
   cursor: pointer;
   inline-size: 2rem;
   padding: 0;
+  position: relative;
+}
+
+/* The press reaches `--helix-size-target` in a transparent box, as the icon
+   buttons beside it do, so the swatch stays 2rem on a phone. */
+.brandSwatch::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 .brandSwatch:focus-visible {

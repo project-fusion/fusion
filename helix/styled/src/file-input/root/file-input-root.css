@@ -17,7 +17,7 @@
   display: flex;
   gap: var(--helix-space-xs);
   justify-content: center;
-  padding: var(--file-input-padding, var(--helix-space-md));
+  padding: var(--file-input-padding, var(--helix-space-field));
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);

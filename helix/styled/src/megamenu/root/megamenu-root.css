@@ -261,6 +261,18 @@
   }
 }
 
+/* The caret says the word opens something, as a Select's does. */
+[part="trigger-indicator"] {
+  block-size: var(--helix-size-icon-tight);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-tight);
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="trigger"][aria-expanded="true"] [part="trigger-indicator"] {
+  rotate: 180deg;
+}
+
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. */
 [part="trigger"] {

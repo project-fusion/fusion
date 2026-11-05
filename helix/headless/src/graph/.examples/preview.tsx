@@ -31,7 +31,7 @@ export function Example() {
       nodes={nodes}
     >
       {/* Put your graph here, drawn by Sigma.js, a canvas, or an image. */}
-      <div className="stand-in">Graph</div>
+      <div className="stand-in"></div>
     </helix-headless-graph>
   )
 }

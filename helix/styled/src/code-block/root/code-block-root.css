@@ -3,6 +3,8 @@
    host empty: stretched into a 118px row beside a card, the snippet draws 82px
    of itself and 36px of nothing. */
 :host {
+  /* Code shows the characters written: a ligature hides a `!=` changing to `!==`. */
+  font-variant-ligatures: none;
   /* The code's type, which the gutter's numbers share so they stay level. */
   --_code-block-size: var(--code-block-font-size, var(--helix-text-sm));
   --_code-block-leading: var(--code-block-line-height, var(--helix-leading-normal));
@@ -240,6 +242,12 @@
 }
 
 [part="code"] {
+  /* Code reads left to right whatever the page around it does. Under
+     `dir="rtl"` it inherited the page's direction, so a line opened at its
+     end, the start of each line hidden past the box. Log, Code Input, and
+     Object Inspector hold the same. */
+  direction: ltr;
+  unicode-bidi: isolate;
   color: var(--code-block-color, var(--helix-color-foreground));
   font-family: var(--_code-block-face);
   font-size: var(--_code-block-size);

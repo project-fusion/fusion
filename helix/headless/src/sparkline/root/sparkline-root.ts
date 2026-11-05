@@ -70,6 +70,11 @@ const STRIP_HEIGHT = 32
  * such as a normal range. A blank cell in a `for` table is a gap in the line,
  * and a reading alone between two blanks is a `lone` mark.
  *
+ * **Nothing to draw.** With no readings it shows `empty-text`, "No readings",
+ * in place of the line, and `loading` shows `loading-text` there until
+ * readings arrive, as on every chart. The `empty` and `loading` slots take
+ * markup in place of either.
+ *
  * Place it beside a `Stat`, because a change beside a figure is a second fact,
  * as `Stat`'s own spec says. `Trend` is composed the same way.
  *
@@ -95,15 +100,20 @@ const STRIP_HEIGHT = 32
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://fusion.dev/helix/components/sparkline
  *
+ * @slot empty - Content shown in place of the line when there are no readings. Falls back to `empty-text`.
+ * @slot loading - Content shown in place of the line while `loading` is set and there are no readings yet. Falls back to `loading-text`.
+ *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the reading, or `-1` for none, with its row's `label` from a table and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The region between the line and the bottom of its range.
  * @csspart bar - One column, drawn when `plot="bar"`.
  * @csspart cursor - The mark on the reading a pointer or a key rests on, rendered only while there is one. Placed with `inset-inline-start` and `inset-block-start`.
+ * @csspart empty - The words in place of the line when there are no readings: the `empty` slot, falling back to `empty-text`. Not drawn while a table named by `for` cannot be read yet, on the server and during hydration.
  * @csspart high - The mark on the highest reading, under `marks="high"`. Placed as `cursor` is.
  * @csspart line - The line's path.
  * @csspart live - A polite region that says the reading a key moved to, rendered only with a `label`. Hide it visually.
+ * @csspart loading - The words in place of the line while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart lone - The mark on a reading no line reaches, with a blank or an end on each side. Placed as `cursor` is.
  * @csspart low - The mark on the lowest reading, under `marks="low"`. Placed as `cursor` is.
  * @csspart overview - What the readings come to, in `overview-label`, which describes the drawing. Rendered `hidden` with a name, since it is read through the description and not shown.
@@ -116,6 +126,9 @@ const STRIP_HEIGHT = 32
  *
  * @cssproperty --chart-terminus-x - Where the last point sits horizontally, as a percentage.
  * @cssproperty --chart-terminus-y - Where the last point sits vertically, as a percentage.
+ *
+ * @cssstate empty - While the `empty` part stands in place of the line.
+ * @cssstate loading - While the `loading` part stands in place of the line.
  */
 @customElement('helix-headless-sparkline')
 export class HelixHeadlessSparkline extends HelixElement {
@@ -159,6 +172,14 @@ export class HelixHeadlessSparkline extends HelixElement {
   curve?: Curve
 
   /**
+   * The words shown in place of the line when there are no readings, and the
+   * fallback of the `empty` slot.
+   */
+  @words
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No readings'
+
+  /**
    * The id of a table to read the readings from, when a table holds the data.
    *
    * The first column of numbers is the series drawn. This wins over `values`,
@@ -181,6 +202,25 @@ export class HelixHeadlessSparkline extends HelixElement {
    */
   @property()
   label = ''
+
+  /**
+   * Whether the readings are still on their way. The sparkline shows
+   * `loading-text` in place of an empty drawing until it has readings.
+   *
+   * Reflected, so a stylesheet can treat the sparkline while it waits. One
+   * that already has readings keeps drawing them, so a refresh does not blank
+   * it.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /**
+   * The words shown in place of the line while `loading` is set and there are
+   * no readings yet, and the fallback of the `loading` slot.
+   */
+  @words
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading readings'
 
   /**
    * The locale the words, the readout's numbers and positions are in, such
@@ -339,6 +379,14 @@ export class HelixHeadlessSparkline extends HelixElement {
     if (changed.has('for')) {
       this.source.watch()
     }
+  }
+
+  /** Records what stands in place of the line as the `empty` and `loading` states. */
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    const root = this.renderRoot
+    this.toggleState('empty', root.querySelector('[part="empty"]') !== null)
+    this.toggleState('loading', root.querySelector('[part="loading"]') !== null)
   }
 
   /**
@@ -578,6 +626,10 @@ export class HelixHeadlessSparkline extends HelixElement {
         )}
       </svg>
       ${
+        /* The words the other charts show with nothing to draw. An empty
+           sparkline drew a blank box, which reads as one that failed. */
+        points.length === 0 ? this.renderStatus() : nothing
+      }${
         /* The mark on the last value, as an element beside the drawing rather
            than a `<circle>` inside it. `preserveAspectRatio="none"` is what lets
            the line fill any box, and it distorts everything in that coordinate
@@ -597,6 +649,20 @@ export class HelixHeadlessSparkline extends HelixElement {
           ? nothing
           : html`<span hidden id="sparkline-overview" part="overview">${overview}</span>`
       }`
+  }
+
+  /**
+   * The words in place of the line while there is nothing to draw, as every
+   * chart's `MixinChartStatus` writes them: the `loading` line, the `empty`
+   * line, or nothing while a table named by `for` cannot be read yet.
+   */
+  protected renderStatus(): TemplateResult | typeof nothing {
+    if (this.loading) {
+      return html`<p dir="auto" part="loading"><slot name="loading">${this.loadingText}</slot></p>`
+    }
+    return this.source.known
+      ? html`<p dir="auto" part="empty"><slot name="empty">${this.emptyText}</slot></p>`
+      : nothing
   }
 
   /**

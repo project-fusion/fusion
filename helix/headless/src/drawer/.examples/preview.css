@@ -88,6 +88,39 @@ helix-headless-drawer::part(header) {
   flex: none;
 }
 
+/* The close control `dismissible` draws, in the panel's top corner. */
+helix-headless-drawer::part(dismiss) {
+  all: unset;
+  align-items: center;
+  block-size: 1.5rem;
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 1.5rem;
+  inset-block-start: 1.25rem;
+  inset-inline-end: 1.25rem;
+  justify-content: center;
+  position: absolute;
+}
+
+helix-headless-drawer::part(dismiss):hover {
+  background-color: var(--_gray-subtle);
+  color: var(--_gray-strong);
+}
+
+helix-headless-drawer::part(dismiss):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-drawer::part(dismiss-mark) {
+  block-size: 1rem;
+  flex: none;
+  inline-size: 1rem;
+}
+
 helix-headless-drawer > [slot="header"] {
   display: block;
   font-size: 1.125rem;

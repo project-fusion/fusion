@@ -1,7 +1,7 @@
 :host {
   /* An icon in a crumb is drawn to the crumb's text, in the link, in the trigger
      and in a control alike. At the default 20 a house stood over 13px words. */
-  --icon-size: 1.15em;
+  --icon-size: round(1.15em, 1px);
 
   /* A control in a crumb is a crumb-sized target, not an icon-sized one.
      `::slotted(a)` below is a line box with `2xs` above and below, which comes
@@ -35,6 +35,9 @@
 
   align-items: center;
   display: inline-flex;
+  /* No wider than the trail, so a long unbroken word wraps inside it. */
+  max-inline-size: 100%;
+  min-inline-size: 0;
   gap: var(--breadcrumbs-gap, var(--helix-space-xs));
 }
 
@@ -122,6 +125,11 @@
   color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   gap: var(--helix-space-xs);
+  /* A long unbroken word breaks inside the trail, as a slotted anchor's does
+     below. The current page's crumb held its word whole and ran 162 pixels past
+     a 280 column. */
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   text-decoration: none;
 }
@@ -254,15 +262,18 @@ a[part="link"]:focus-visible {
   background-color: var(--_breadcrumbs-split-fill, transparent);
 }
 
-/* **`outlined`: a hairline between the halves, at rest as well**, because an
-   outlined surface keeps its edge at rest. It is the border every outlined
-   surface draws, at its hairline width, and it stands 60% of the pair's
-   height, which is the rule `ToggleGroup` draws inside a control. It stands
-   just past the seam, on the trigger's side: a focused label's ring is inside
-   the label and the rule stays clear of it, and a focused trigger is raised,
-   so its ring covers the rule. Drawn from the label's box, which is
-   positioned, so it paints above the trigger's fill. Under `plain` its color
-   is transparent. */
+/* **`outlined`: a hairline between the halves while the crumb is in use**:
+   while either half is under the pointer, while either half has focus, and
+   while the crumb's menu is open, which holds focus inside the trigger's
+   half. At rest a split crumb reads as one crumb, as a plain one does: the
+   line showed on every crumb in a trail nobody was touching. Decided by the
+   owner on November 3, 2026. It is the border every outlined surface draws,
+   at its hairline width, and it stands 60% of the pair's height, which is the
+   rule `ToggleGroup` draws inside a control. It stands just past the seam, on
+   the trigger's side: a focused label's ring is inside the label and the rule
+   stays clear of it, and a focused trigger is raised, so its ring covers the
+   rule. Drawn from the label's box, which is positioned, so it paints above
+   the trigger's fill. Under `plain` its color is transparent. */
 :host(:state(end)) [part="link"] {
   position: relative;
 }
@@ -273,8 +284,20 @@ a[part="link"]:focus-visible {
   inline-size: var(--helix-border-thin);
   inset-block: 20%;
   inset-inline-end: calc(var(--helix-border-thin) * -1);
+  opacity: 0;
   pointer-events: none;
   position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The slot's `:focus-within` is the trigger's focus and the open menu both,
+   since the trigger and its panel are what the slot holds. A slotted label's
+   focus reaches the label's box the same way. */
+:host(:state(end):hover) [part="link"]::after,
+:host(:state(end)) [part="link"]:focus-visible::after,
+:host(:state(end)) [part="link"]:focus-within::after,
+:host(:state(end)) [part="link"]:has(~ slot[name="end"]:focus-within)::after {
+  opacity: 1;
 }
 
 /* A hidden crumb takes no room, and nor does one a long trail folded away. */
@@ -322,4 +345,16 @@ a[part="link"]:focus-visible {
 ::slotted(a) {
   min-inline-size: 0;
   overflow-wrap: anywhere;
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves. Where the link is already that size the box sits inside it. */
+::slotted(a) {
+  position: relative;
+}
+
+::slotted(a)::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }

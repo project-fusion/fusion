@@ -9,6 +9,7 @@ import type {
 import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
 import { PREVIEW_RELAY } from '@/preview/preview-relay'
+import { useSiteScheme } from '@/utils/site-scheme/site-scheme'
 import sheet from './preview.module.css'
 
 /**
@@ -117,6 +118,11 @@ export function ComponentPreview({
      sandbox and the editor being worth deferring on its own weight. */
   useSandboxEditor()
 
+  /* The site's mode, sent to the frame. The frame is a document of its own and
+     otherwise follows the system, so a reader who chose dark on a light system
+     saw a white example on a black page. */
+  const scheme = useSiteScheme()
+
   const preview = useRef<HelixSandboxPreview>(null)
   const sandbox = useRef<HelixSandbox>(null)
 
@@ -207,6 +213,7 @@ export function ComponentPreview({
           never wired, so nothing set the measured height and every page sat at
           the floor looking exactly like the fixed pane it replaced. */}
       <helix-sandbox-preview
+        color-mode={scheme}
         label="Example preview"
         layout={layout}
         onhelix-resize={measured}

@@ -9,6 +9,7 @@ export { auditIconControl, auditName } from '#audit-name'
 export { auditNesting, auditWrapped } from '#audit-nesting'
 /* The served-rows check, which a production build resolves to a function that
    does nothing. See `utils/audit-served`. */
+export { auditSeed } from '#audit-seed'
 export { auditServed } from '#audit-served'
 export {
   AriaForwardController,

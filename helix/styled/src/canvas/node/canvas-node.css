@@ -127,7 +127,7 @@
    smear, so the card owns both. What shows through is the ruling. */
 :host([material="glass"]:not([group])) {
   backdrop-filter: var(--helix-material-backdrop);
-  background-color: var(--helix-material-translucent);
+  background-color: var(--helix-material-panel);
 }
 
 :host([material="frosted"]:not([group])) {
@@ -442,7 +442,7 @@
 }
 
 :host([shape="diamond"][material="glass"]) [part="outline"] polygon {
-  fill: var(--helix-material-translucent);
+  fill: var(--helix-material-panel);
 }
 
 :host([shape="diamond"][material="frosted"]) [part="outline"] polygon {

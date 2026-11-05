@@ -33,7 +33,10 @@ export function Example() {
             slot="icon"
           ></helix-icon>
         </helix-speed-dial-item>
-        <helix-speed-dial-item value="delete">
+        <helix-speed-dial-item
+          tone="danger"
+          value="delete"
+        >
           Delete
           <helix-icon
             name="trash"

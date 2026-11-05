@@ -47,6 +47,7 @@ body {
    tempt `size` to be set independently of it, which is how a page ends up with
    an <h4> that looks like a title. */
 :where([data-prose] h1) {
+  font-family: var(--helix-font-display);
   font-size: var(--helix-text-3xl);
 }
 
@@ -58,16 +59,20 @@ body {
   font-size: var(--helix-text-xl);
 }
 
+/* From here down a heading is the size of the text it heads, so it tracks as
+   the text does. These match `Text` heading for heading: a page that sets its
+   `<h6>` in markup and one that writes `<helix-text as="h6">` get one heading,
+   where the two had drifted to 13px at 600 against 14px at 500. */
 :where([data-prose] h4) {
   font-size: var(--helix-text-lg);
+  letter-spacing: var(--helix-tracking-normal);
 }
 
-:where([data-prose] h5) {
+:where([data-prose] h5, [data-prose] h6) {
   font-size: var(--helix-text-md);
-}
-
-:where([data-prose] h6) {
-  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-normal);
+  line-height: var(--helix-leading-normal);
 }
 
 :where(p, figure, blockquote, dl, dd) {
@@ -627,12 +632,19 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
    inside a dialog: sunken is `oklch(0.15)` in dark mode against a panel at
    `oklch(0.29)`, so the hover was a 1.39 step *darker* than the surface it was
    on, which on a raised panel reads as a hole rather than as a press. On the
-   page, where the same token was chosen, the step is 1.11 and correct. 8%
-   wherever the resting state is transparent. */
+   page, where the same token was chosen, the step is 1.11 and correct. 8% in
+   light and 12% in dark wherever the resting state is transparent, as the
+   element's own sheet says. */
 [data-button="ghost"]:not(:disabled):hover {
   background-color: var(
     --button-background-color-hover,
-    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
+    var(
+      --button-background-color,
+      light-dark(
+        color-mix(in oklab, var(--_button-tone) 8%, transparent),
+        color-mix(in oklab, var(--_button-tone) 12%, transparent)
+      )
+    )
   );
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-ink));
@@ -692,11 +704,11 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
      whatever region it is in: measured, an option row stayed 32px in all three
      while the trigger above it moved 32, 40, 48. */
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
+  --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
 }
 
 /* The amount, for a region that sets `--helix-density` instead of a stop. */
@@ -803,6 +815,14 @@ helix-toggle::part(item) {
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     color var(--helix-duration-fast) var(--helix-easing-standard);
   white-space: nowrap;
+}
+
+/* A clipped item would clip the transparent box that takes the press, so on a
+   touch screen it does not clip. */
+@media (pointer: coarse) {
+  helix-toggle::part(item) {
+    overflow: visible;
+  }
 }
 
 /* **Guarded, because a disabled control that lights up under the pointer is one
@@ -1550,7 +1570,9 @@ helix-toast:not([data-color-mode]) {
 :where(helix-chat-message) :where(helix-table) {
   background-color: var(--helix-color-surface-sunken);
   border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-lg);
+  /* `sm`, so a box in a turn is never rounder than the 8px bubble holding it. At
+     `lg` it drew 12 inside 8. */
+  border-radius: var(--helix-radii-sm);
 }
 
 /* The box's own inset at its edges, so the first column's words are not

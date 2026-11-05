@@ -358,10 +358,15 @@
 /* A scrolling region takes focus when it scrolls, and says so when it has it.
    The viewport is the tab stop, and the ring is drawn on the layer over it:
    the fade mask on the viewport would take the ring out at every edge that
-   fades. */
+   fades.
+
+   **Outside the box, at the offset every control's ring takes.** It sat
+   inside, 2px in over a viewport with no padding of its own, so the ring lay
+   on the first line and the first letters of every line. Out, it leaves 2px of
+   page between it and the content, and the content does not move. */
 [part="viewport"]:focus-visible ~ [part="edges"] {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+  outline-offset: var(--helix-size-focus-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -48,7 +48,12 @@ use crate::component::{walk_outside, Context, Finding, Report};
 /// `style` is here so the attribute check passes over it quietly and the
 /// dedicated rule is the one that speaks: reported from here it would read "has
 /// no attribute style", which is both wrong and unhelpful.
-const GLOBAL: [&str; 11] = [
+///
+/// `autofocus` is here because a confirmation puts it on the action that
+/// destroys nothing, and a modal dialog honors it on a slotted button in every
+/// engine Helix is tested in.
+const GLOBAL: [&str; 12] = [
+    "autofocus",
     "class",
     "dir",
     "exportparts",

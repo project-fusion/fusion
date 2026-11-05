@@ -15,7 +15,7 @@ Helix has two layers of tokens. You use the second layer, the semantic tokens.
 | Semantic | `--helix-color-primary` | Any code, including yours |
 
 Each semantic token is named for its purpose. The name does not describe its
-value. Every token belongs to exactly one of sixteen categories:
+value. Every token belongs to exactly one of seventeen categories:
 
 - `color`
 - `scrollbar`
@@ -29,6 +29,7 @@ value. Every token belongs to exactly one of sixteen categories:
 - `border`
 - `shadow`
 - `material`
+- `opacity`
 - `duration`
 - `easing`
 - `size`
@@ -47,20 +48,26 @@ nothing is lighter than white, so a raised surface is *darker* than the page.
 - **`background`**: the page.
 - **`surface`**: a plane on the page, such as a card or a panel you own.
 - **`surface-raised`**: something lifted that still *lies on* the page, such as
-  a selected tab's pill, a hovered row, or an option under the pointer. The page
-  surrounds it on all sides, so its fill sets it apart. On a white page, that
-  fill is one step darker.
+  a selected tab's pill, Pagination's current page, or a Code Block's header.
+  The page surrounds it on all sides, so its fill sets it apart. On a white
+  page, that fill is one step darker.
 - **`surface-overlay`**: something *over* the page, such as a menu, a popover, a
   dialog, or the thumb of a switch or a segmented control. Its shadow and the
   content it covers set it apart, so on a white page it is white.
-- **`surface-sunken`**: a well that holds a value, such as an input's fill, a
-  track, or a groove.
+- **`surface-sunken`**: a recessed fill, such as a progress track, a keyboard
+  key, or the groove of a segmented control.
+
+Two fills are a step from whatever ground they sit on, so they read the same on
+the page, a card, or a raised surface. `--helix-color-well` fills a field, such
+as an input. `--helix-color-hover` lights a row under the pointer, such as an
+option or a menu item.
 
 **Use `raised` and `overlay` for different jobs.** They are the same color in
 dark mode, so one token can seem to do both jobs. In light mode they need
-opposite fills. A hovered row must be darker than a white page, and a thumb must
-be lighter than the groove it sits in. If a surface looks almost right in dark
-mode and wrong in light mode, it usually uses the wrong one of these two tokens.
+opposite fills. A selected tab's pill must be darker than a white page, and a
+thumb must be lighter than the groove it sits in. If a surface looks almost
+right in dark mode and wrong in light mode, it usually uses the wrong one of
+these two tokens.
 
 ## Per-component hooks
 
@@ -96,7 +103,7 @@ loses its styles.
 Each token declares its light and dark values in one declaration:
 
 ```css
---helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-900));
+--helix-color-surface: light-dark(var(--_helix-neutral-50), var(--_helix-neutral-925));
 ```
 
 The `color-scheme` property alone decides which value applies. You set the

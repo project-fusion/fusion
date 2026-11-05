@@ -283,6 +283,17 @@
 /* **The hardware buttons, raised**, standing apart from the page as the
    device does. A row centered over it, or a column beside it. */
 [part="controls"] {
+  /* **A press past the hover.** A raised button's hover is 10% of the
+     foreground in the overlay it rests on, and it outranks Icon Button's own
+     press, so a press drew the hover and a tap on a phone showed nothing
+     distinct. The press hook is read in every state, at 16% in light and 20%
+     in dark, the strengths of `color-press`, in the same overlay. It inherits
+     to a page's own buttons in the slot, which join the row. */
+  --icon-button-background-color-active: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 16%, var(--helix-color-surface-overlay)),
+    color-mix(in oklab, var(--helix-color-foreground) 20%, var(--helix-color-surface-overlay))
+  );
+
   align-items: center;
   display: flex;
   flex: none;

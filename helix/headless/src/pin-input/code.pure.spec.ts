@@ -59,7 +59,7 @@ describe('codeVerdict', () => {
   test('a required field with nothing in it is missing', () => {
     expect(codeVerdict('', 6, true, messages)).toEqual([
       'valueMissing',
-      'Please fill in this field.',
+      'Please fill out this field.',
     ])
     expect(codeVerdict('', 6, false, messages)).toBe('')
   })

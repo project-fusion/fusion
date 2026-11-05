@@ -20,7 +20,11 @@
   --_icon-button-ink-hover: var(--helix-color-foreground);
   /* Near black has nothing darker, so a neutral press goes toward the page. */
   --_icon-button-press-way: 1;
-  --_icon-button-wash: var(--helix-color-hover);
+  /* 8% in light and 12% in dark, as a row's hover and Button's ghost. */
+  --_icon-button-wash: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
+  );
   /*
  *  The solid fill, separate from the tone, and it has to be separate.
  *
@@ -212,7 +216,10 @@
    neither hook set a press looks as it always did. */
 :host([tone]:not([tone="neutral"])) {
   --_icon-button-press-way: -1;
-  --_icon-button-wash: color-mix(in oklab, var(--_icon-button-tone) 8%, transparent);
+  --_icon-button-wash: light-dark(
+    color-mix(in oklab, var(--_icon-button-tone) 8%, transparent),
+    color-mix(in oklab, var(--_icon-button-tone) 12%, transparent)
+  );
 }
 
 :host(:not(:disabled)) [part="button"]:active {
@@ -355,13 +362,13 @@
 [part="spinner"] {
   animation: helix-icon-button-turn var(--icon-button-spinner-duration, var(--_icon-button-turn))
     linear infinite;
-  block-size: var(--icon-button-spinner-size, 1.15em);
+  block-size: var(--icon-button-spinner-size, round(1.15em, 1px));
   border: var(--helix-border-thick) solid
     color-mix(in oklab, var(--icon-button-spinner-color, currentColor) 30%, transparent);
   border-block-start-color: var(--icon-button-spinner-color, currentColor);
   border-radius: var(--helix-radii-full);
   box-sizing: border-box;
-  inline-size: var(--icon-button-spinner-size, 1.15em);
+  inline-size: var(--icon-button-spinner-size, round(1.15em, 1px));
   inset: 0;
   margin: auto;
   position: absolute;
@@ -414,7 +421,7 @@
   backdrop-filter: var(--icon-button-backdrop, var(--helix-material-backdrop));
   background-color: var(
     --_icon-button-pressed-fill,
-    var(--icon-button-background-color, var(--helix-material-translucent))
+    var(--icon-button-background-color, var(--helix-material-panel))
   );
 }
 
@@ -497,7 +504,7 @@
     --_icon-button-pressed-fill,
     var(
       --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 20%, transparent)
+      color-mix(in oklab, var(--_icon-button-tone) 16%, transparent)
     )
   );
 }

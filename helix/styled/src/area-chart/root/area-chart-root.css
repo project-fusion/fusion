@@ -26,10 +26,21 @@
    The strength comes from mixing toward the page instead, which keeps a band
    light without letting anything through it. */
 [part="area"] {
-  fill: color-mix(
-    in oklab,
-    var(--chart-series) var(--area-chart-fill-strength, 55%),
-    var(--helix-color-background)
+  /* 75% in dark, two whole colors since `light-dark()` cannot sit in a
+     percentage. Mixed 55% toward black, the orange band came out rgb(112, 66,
+     46) against the same series at rgb(251, 156, 112) in a donut, a muddy
+     brown that read as a different series. */
+  fill: light-dark(
+    color-mix(
+      in oklab,
+      var(--chart-series) var(--area-chart-fill-strength, 55%),
+      var(--helix-color-background)
+    ),
+    color-mix(
+      in oklab,
+      var(--chart-series) var(--area-chart-fill-strength, 75%),
+      var(--helix-color-background)
+    )
   );
   stroke: none;
 }

@@ -79,6 +79,7 @@
 }
 
 [part="item"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -279,4 +280,20 @@ slot[name="submenu"]::slotted(helix-divider) {
 
 [part="item"]:active {
   background-color: var(--_menu-item-press, var(--helix-color-press));
+}
+
+/* A command that destroys something says so in its ink and its wash. */
+:host([tone="danger"]) [part~="item"] {
+  color: var(--helix-color-danger);
+}
+
+/* The row the keys reached in a filtered menu takes the same wash, as a
+   normal row's keyboard highlight is its hover. A danger row under the keys
+   drew the neutral hover wash while the pointer drew 12% of the danger. */
+:host([tone="danger"]:not([disabled]):state(highlighted)) [part~="item"],
+:host([tone="danger"]:not([disabled])) [part~="item"]:hover {
+  background-color: var(
+    --menu-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+  );
 }

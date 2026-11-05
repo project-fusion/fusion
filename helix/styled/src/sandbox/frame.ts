@@ -345,7 +345,7 @@ const SCRIPT_END = ['<', 'script>'].join('/')
 export const defaultFrame = (imports?: Readonly<Record<string, string>>): string => {
   if (builtIn === undefined) {
     const script = `(${serveWith})({drawn:${drawn},isRender:${isRender},layoutRules:${JSON.stringify(LAYOUT_RULES)},loggedText:${loggedText},runScripts:${runScripts},withoutStylesheets:${withoutStylesheets}})`
-    builtIn = `<!doctype html><html><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><style>:root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0}</style></head><body><div id="preview-root"></div><script>${script.replaceAll('</', '<\\/')}${SCRIPT_END}</body></html>`
+    builtIn = `<!doctype html><html><head><meta charset="utf-8"><meta content="width=device-width" name="viewport"><style>:root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0;padding:1rem}</style></head><body><div id="preview-root"></div><script>${script.replaceAll('</', '<\\/')}${SCRIPT_END}</body></html>`
   }
   if (!imports || Object.keys(imports).length === 0) {
     return builtIn

@@ -27,6 +27,21 @@
   overflow-x: auto;
 }
 
+/* A scroll container clips what passes its edge, and that took the press box
+   from a tab. On a touch screen the strip gets room for the box and hands the
+   same room back, so nothing around it moves. */
+@media (pointer: coarse) {
+  :host(:not([orientation="vertical"], [marker="segmented"])) [part="tabs"] {
+    background-position: left 0 bottom var(--helix-space-xs);
+    margin-block: calc(var(--helix-space-xs) * -1);
+    padding-block: var(--helix-space-xs);
+  }
+
+  :host([marker="segmented"]) [part="tabs"] {
+    block-size: max(var(--helix-size-control), var(--helix-size-target));
+  }
+}
+
 /* The scroll buttons under `scroll-controls` hold to the ends of the strip as
    it scrolls, over the tabs that pass under them. Hidden, they draw no box. */
 [part="scroll-start"],

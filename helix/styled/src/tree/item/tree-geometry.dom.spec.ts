@@ -250,9 +250,12 @@ const sheet = (): string => {
 describe('tree item density', () => {
   test("the row's padding and text follow the region's density", () => {
     const css = sheet()
-    expect(css).toContain('--_tree-pad: calc((var(--helix-size-control-tight) - 1rem) / 2)')
+    expect(css).toContain(
+      'calc(var(--helix-size-control) - var(--tree-gap, var(--helix-space-2xs)))',
+    )
+    expect(css).toContain('--_tree-pad: calc((var(--_tree-row) - 1lh) / 2)')
     expect(css).toContain('padding-block: var(--_tree-pad)')
-    expect(css).toContain('calc(1lh + var(--_tree-pad) * 2)')
+    expect(css).toContain('block-size: var(--_tree-row)')
     expect(css).toContain('font-size: var(--_tree-text, var(--helix-text-control))')
   })
 

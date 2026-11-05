@@ -8,7 +8,24 @@
   border-radius: var(--textarea-radius, var(--helix-radii-sm));
   display: flex;
   gap: var(--helix-space-2xs);
-  padding: var(--textarea-padding, var(--helix-space-field));
+  /* One row stands as tall as an Input beside it, at every density.
+
+     The line is the control's, written out, and not `1lh`: here `1lh` is the
+     frame's own line, read at the frame's 14px text, while the row is set in
+     the control's text, 13px at `sm`. The row measured 30.5 beside fields of 32. */
+  --_textarea-line: calc(
+    max(var(--helix-text-field-min), var(--helix-text-field)) *
+    var(--helix-leading-normal)
+  );
+
+  padding: var(
+    --textarea-padding,
+    min(
+        var(--helix-space-field),
+        calc((var(--helix-size-control) - var(--_textarea-line)) / 2 - var(--helix-border-thin))
+      )
+      var(--helix-space-field)
+  );
   position: relative;
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),

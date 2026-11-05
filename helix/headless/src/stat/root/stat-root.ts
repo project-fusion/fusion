@@ -64,6 +64,7 @@ import { property } from 'lit/decorators.js'
  * @cssstate has-label - Something is slotted into `label`.
  * @cssstate has-trend - Something is slotted into `trend`.
  * @cssstate has-unit - Something is slotted into `unit`.
+ * @cssstate stepped - The figure is set a step smaller, because at full size it does not fit the stat's width on one line.
  */
 @customElement('helix-headless-stat')
 export class HelixHeadlessStat extends HelixElement {
@@ -150,11 +151,88 @@ export class HelixHeadlessStat extends HelixElement {
     this.finishHydration()
   }
 
+  /** How wide the figure and its unit are on one line at full size, last measured. */
+  private natural = 0
+
+  /** Whether the figure is set a step smaller, which `stepped` says to the sheet. */
+  private stepped = false
+
+  /** Watches the stat's own width, to step the figure down where it does not fit. */
+  private widths: ResizeObserver | undefined
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (typeof ResizeObserver === 'undefined' || this.widths) {
+      return
+    }
+    this.widths = new ResizeObserver(() => this.fit())
+    this.widths.observe(this)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.widths?.disconnect()
+    this.widths = undefined
+  }
+
+  /**
+   * Sets the figure a step smaller where it does not fit on one line.
+   *
+   * **A figure is read whole, so it is never broken between digits first.** At
+   * full size "1,284" measured 104.5 pixels against a 6rem column and wrapped as
+   * "1,28" over "4". Decided by the owner on November 3, 2026: step a long value
+   * down one type size, and break it only where even that does not fit.
+   *
+   * Measured on one line at full size, with no wrapping, and compared with the
+   * stat's own width rather than the screen's. Measured again whenever the
+   * figure changes; on a resize the last full-size width is compared, so the
+   * figure steps back up once the room is there.
+   */
+  private fit(): void {
+    const part = this.renderRoot?.querySelector<HTMLElement>('[part="value"]')
+    const room = this.clientWidth
+    if (!part || room <= 0) {
+      return
+    }
+    if (!this.stepped || this.natural === 0) {
+      const wrap = part.style.whiteSpace
+      part.style.whiteSpace = 'nowrap'
+      this.natural =
+        this.widthOf(part) + this.widthOf(this.renderRoot.querySelector('[part="unit"]'))
+      part.style.whiteSpace = wrap
+    }
+    this.stepped = this.natural > room + 0.5
+    this.toggleState('stepped', this.stepped)
+  }
+
+  /** The width of what a part shows, slotted or its own, on the lines it takes. */
+  private widthOf(part: Element | null): number {
+    if (!part) {
+      return 0
+    }
+    const nodes = part instanceof HTMLSlotElement ? part.assignedNodes({ flatten: true }) : [part]
+    const shown = nodes.filter(
+      (node) => node.nodeType !== Node.TEXT_NODE || node.textContent?.trim(),
+    )
+    if (shown.length === 0) {
+      return 0
+    }
+    const range = document.createRange()
+    range.setStartBefore(shown[0] as Node)
+    range.setEndAfter(shown.at(-1) as Node)
+    return range.getBoundingClientRect().width
+  }
+
   /* Said once for the mix-up the description warns about. A server runs no
      `updated`, so nothing is said there. */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.readPieces()
+    /* A new figure is measured afresh at full size. */
+    this.natural = 0
+    this.stepped = false
+    this.toggleState('stepped', false)
+    this.fit()
     const given = this.direction as string | undefined
     if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
       reportRuntime({

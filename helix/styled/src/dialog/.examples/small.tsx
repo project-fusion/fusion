@@ -30,16 +30,16 @@ export function Example() {
           <helix-button
             command="--close"
             commandfor="small-dialog"
-            emphasis="solid"
-            tone="primary"
           >
-            Archive project
+            Cancel
           </helix-button>
           <helix-button
             command="--close"
             commandfor="small-dialog"
+            emphasis="solid"
+            tone="primary"
           >
-            Cancel
+            Archive project
           </helix-button>
         </helix-button-group>
       </helix-dialog>

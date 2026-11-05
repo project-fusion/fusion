@@ -19,3 +19,10 @@
 .prose helix-text[as="h3"] {
   margin-block-start: var(--helix-space-xl);
 }
+
+/* Reading type, as on the site's document pages: 14 on this column ran past 110
+   characters a line. */
+.prose :is(helix-text[as="p"], helix-list-item, [data-item-text]) {
+  font-size: var(--helix-text-lg);
+  line-height: var(--helix-leading-normal);
+}

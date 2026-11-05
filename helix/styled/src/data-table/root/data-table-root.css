@@ -443,9 +443,10 @@
 }
 
 /* What the table says when its rows did not load: the same line as the empty
-   and loading ones, in the foreground color, since it is news a reader acts on. */
+   and loading ones, in the danger color, since it is news a reader acts on and
+   is the color Table, Listbox, and Combobox give the same line. */
 [part="error"] {
-  color: var(--data-table-error-color, var(--helix-color-foreground));
+  color: var(--data-table-error-color, var(--helix-color-danger));
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   grid-column: 1 / -1;
@@ -596,7 +597,8 @@
    them collapses the box and throws the page around under the reader for as long
    as the request takes, which is the whole of what a server-mode table does on
    every sort. */
-:host([loading]) [part="table"] {
+:host([loading]) [part="table"] > :not([part~="loading"], [part~="empty"], [part~="error"]),
+:host([loading]) ::slotted(:not([slot])) {
   opacity: var(--helix-opacity-busy);
 }
 

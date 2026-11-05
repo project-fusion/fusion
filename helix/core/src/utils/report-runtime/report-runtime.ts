@@ -33,6 +33,8 @@ export type RuntimeKind =
   | 'fullscreen-refused'
   /** A rating's `min` is no score between 0 and its `max`. */
   | 'min-out-of-range'
+  /** Primary text under 4.5:1 or a filled control under 3:1 against the page, in light or dark. Development builds only. */
+  | 'primary-contrast'
   /** A chart's `data` is not `{ columns, rows }`, so it draws its empty state. Development builds only. */
   | 'malformed-data'
   /** A Stat was given one of Trend's directions, `up`, `down` or `neutral`, which lay nothing out. */

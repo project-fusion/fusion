@@ -950,8 +950,7 @@ control:
 
 - **Emphasis.** `emphasis` carries it, which is what the axis is named for. A
   filled button says "this one matters" far louder than eight more pixels.
-- **Fit.** A fact about the region: a toolbar is tight, a hero is spacious, a
-  table row is tighter still.
+- **Fit.** A fact about the region: a toolbar is tight, and a hero is spacious.
 - **Optical role.** Real, and only for things that are not controls. An avatar
   at 24 in a list and 96 on a profile is a different graphic, not a taller
   control.
@@ -2483,9 +2482,10 @@ viewport. Everything else in here is `@media print` or
 **A press reaches `--helix-size-target`**: 24 under a mouse and 44 on a touch
 screen, in a transparent `::after` around the control, so nothing drawn moves.
 Rows that sit against each other grow to the target on a touch screen instead,
-since a box past a row would take the press from the row beside it. Decided by
-the owner on October 31, 2026, and held by `touch-target.pure.spec.ts`. A new
-standalone control adds the same box.
+since a box past a row would take the press from the row beside it. Proposed in
+the style review from WCAG 2.5.5 and Apple's 44, accepted by the owner on October
+31, 2026, and kept on November 2, 2026, and held by `touch-target.pure.spec.ts`.
+A new standalone control adds the same box.
 
 **What narrow looks like now, measured rather than asserted.** Every styled
 family was rendered at 390 and at 320 on August 25, 2026. At 390 the library is
@@ -2495,6 +2495,11 @@ per-corner Button hooks a stacked group needs to say what it means, and
 Pagination needed no new API at all, because `siblings` and `boundaries` already
 existed and the default simply asked for one slot more than a 272 pixel row
 holds.
+
+**280 is the narrowest supported column, decided by the owner on November 2, 2026.**
+Every example of every family fits at 280 with no sideways scroll, measured that
+day. Below it nothing is promised, so a report from a narrower column is not a
+defect.
 
 **The faults that sweep found were the site's, not the library's**, which is the
 result worth keeping. Category one was unbuilt on that date, three families

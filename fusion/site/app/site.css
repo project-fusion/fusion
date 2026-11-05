@@ -254,11 +254,13 @@ helix-app-header {
 @media (width < 48rem) {
   /* Width only. */
   .pageHeroActions helix-button-group {
+    align-self: stretch;
     inline-size: 100%;
   }
 
+  /* Each half takes half the row, from no width of its own. */
   .pageHeroActions helix-button-group > * {
-    --button-inline-size: 100%;
+    --button-inline-size: 0;
 
     flex: 1 1 0;
   }
@@ -280,12 +282,6 @@ helix-slider {
   --slider-thumb-radius: var(--helix-radii-sm);
   --slider-thumb-size: var(--helix-space-lg);
   --slider-track-size: var(--helix-space-md);
-}
-
-helix-drawer {
-  /* The header, plus the drawer's own inset, and this is the *whole* top padding
-     rather than something added to one. */
-  --drawer-padding-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
 }
 
 /* **A drawer samples its own scrim, so in light mode 30 percent glass is gray.**
@@ -462,7 +458,17 @@ helix-drawer[material="glass"] {
   display: inline-flex;
   inline-size: var(--helix-size-control-sm);
   justify-content: center;
+  position: relative;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The press reaches `--helix-size-target` in a transparent box, as a Helix
+   button's does, so nothing drawn moves. On a fine pointer the box sits inside
+   the link. */
+[data-icon-link]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 [data-icon-link]:hover,

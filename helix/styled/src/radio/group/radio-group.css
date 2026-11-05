@@ -23,6 +23,21 @@
   flex-wrap: wrap;
 }
 
+/* **Read-only, and the circles say so with their edge**, as a read-only
+   Checkbox's box does. The group holds `readonly` and a radio cannot see it, so
+   the group hands it down through the hooks: the circle's edge steps down to
+   the one a field is drawn with, `color-border`, 1.23:1 on the page from the
+   mark ink's 3.95:1, or the foreground's when chosen, and the dot keeps its
+   ink, being the value. The hook holds through a hover, so the edge does not
+   firm under a pointer. No pointer cursor, and no wash under a press, which
+   the group refuses. It looked exactly like a set that takes a press. Before
+   the invalid rule, whose red edge still wins. */
+:host([readonly]) [part="items"] {
+  --radio-border-color: var(--helix-color-border);
+  --_radio-cursor: default;
+  --_radio-press: transparent;
+}
+
 /*
  *  Wrong, and the set says so, on the controls rather than around them.
  */

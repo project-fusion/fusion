@@ -11,6 +11,10 @@ interface Focusable {
  */
 export const useFocusOnLoad = (field: RefObject<Focusable | null>, tag = 'helix-input'): void => {
   useEffect(() => {
+    /* A touch screen answers focus with its keyboard, which covers the page. */
+    if (matchMedia('(pointer: coarse)').matches) {
+      return
+    }
     let live = true
     void customElements.whenDefined(tag).then(async () => {
       await field.current?.updateComplete

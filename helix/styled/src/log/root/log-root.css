@@ -138,11 +138,11 @@
    output. */
 ::slotted([slot="toolbar"]) {
   --helix-size-control: var(--helix-size-control-sm);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
-  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
-  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
+  --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-switch: var(--helix-size-switch-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
   --helix-text-control: var(--helix-text-control-sm);
@@ -152,8 +152,8 @@
   --helix-space-field: var(--helix-space-xs);
   --helix-space-row-bleed: var(--helix-space-2xs);
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
-  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
 
   border-block-end: var(--helix-border-thin) solid
     var(--log-border-color, var(--helix-color-border));
@@ -185,6 +185,12 @@
 /* The scrollport takes the treatment `ScrollArea` settled on: `thin`, and the
    shared scrollbar colors after this family's own hooks. */
 [part="log"] {
+  /* Left to right whatever the page does, as Code Block's note gives. */
+  direction: ltr;
+  unicode-bidi: isolate;
+  /* The characters written, as Code Block, Code Input, and Code Editor show
+     them: the mono face's ligatures drew `!=` and `=>` as single marks here. */
+  font-variant-ligatures: none;
   grid-row: 3;
   overflow: auto;
   overscroll-behavior: contain;
@@ -214,6 +220,7 @@
 }
 
 [part="log"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }

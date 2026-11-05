@@ -37,7 +37,7 @@ import { styles } from './accordion-item.css.js'
  * @cssproperty --accordion-item-disabled-opacity - How faint a disabled trigger is drawn.
  * @cssproperty --accordion-item-font-size - The size of the trigger's text.
  * @cssproperty --accordion-item-font-weight - The weight of the trigger's text.
- * @cssproperty --accordion-item-hover-background-color - The trigger's fill while the pointer is on it. Unset, there is none.
+ * @cssproperty --accordion-item-hover-background-color - The trigger's fill while the pointer is on it. Defaults to `--helix-color-hover`.
  * @cssproperty --accordion-item-padding - The padding of the trigger and the content.
  */
 @customElement('helix-accordion-item')

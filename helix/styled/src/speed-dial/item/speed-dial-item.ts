@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpeedDialItem } from '@fusion.dev/helix-headless/speed-dial'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './speed-dial-item.css.js'
 
 /**
@@ -29,6 +30,10 @@ import { styles } from './speed-dial-item.css.js'
  */
 @customElement('helix-speed-dial-item')
 export class HelixSpeedDialItem extends HelixHeadlessSpeedDialItem {
+  /** What the action means. `danger` marks an action that destroys something. */
+  @property({ reflect: true })
+  tone?: 'danger'
+
   static override styles: CSSResultGroup = styles
 }
 

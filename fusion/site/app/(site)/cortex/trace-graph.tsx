@@ -41,6 +41,12 @@ const FIRST = 'o-price'
 const nameOf = (id: string): string => TRACE_NODES.find((node) => node.id === id)?.label ?? id
 
 /**
+ * Whether the groups are named in the drawing: in columns, and not in rows,
+ * where the legend names them. The trace example's layout says why.
+ */
+const namedIn = (layout: TraceLayout): boolean => layout === 'columns'
+
+/**
  * **The trace drawn before Sigma loads**, in each layout, at the size the
  * frame is drawn: 34rem tall beside the text, and a 390-pixel phone's width
  * in rows. Lit for the first answer, as the drawing opens. CSS shows the one
@@ -51,7 +57,8 @@ const SNAPSHOTS = (['columns', 'rows'] as const).map((layout) => ({
   markup: graphSnapshot(traceIn(layout), TRACE_LINKS, {
     active: FIRST,
     bounds: boxFor(layout),
-    height: layout === 'rows' ? 990 : 542,
+    groupLabels: namedIn(layout),
+    height: layout === 'rows' ? 768 : 542,
     labels: 'all',
     reach: 'upstream',
     width: layout === 'rows' ? 340 : 1280,
@@ -90,8 +97,8 @@ export function TraceGraph() {
      something. Pressing a note in the drawing chooses it too. */
   const [active, setActive] = useState(FIRST)
   /* Read when the graph is first given its notes, in case any changed before it loaded. */
-  const now = useRef({ active, deleted, layout })
-  now.current = { active, deleted, layout }
+  const now = useRef({ active, deleted })
+  now.current = { active, deleted }
   const [failed, setFailed] = useState(false)
 
   useEffect(() => {
@@ -118,16 +125,20 @@ export function TraceGraph() {
       if (!live) {
         return
       }
-      const trace = traceOf(now.current.deleted, now.current.layout)
+      const trace = traceOf(now.current.deleted, layout)
       host.nodes = trace.nodes
       host.links = trace.links
       const sigma = new Sigma(new Graph(), drawing, sigmaOptions())
-      sigma.setCustomBBox(boxFor(now.current.layout))
+      sigma.setCustomBBox(boxFor(layout))
       renderer.current = sigma
       const connection = connectGraph(
         host,
         /* Every note is placed in its column, so no layout runs. */
-        sigmaDriver(sigma, { labels: 'all', material: 'mark' }),
+        sigmaDriver(sigma, {
+          groupLabels: namedIn(layout),
+          labels: 'all',
+          material: 'mark',
+        }),
         /* A note's whole derivation lights, not only its neighbors. */
         { center: false, reach: 'upstream' },
       )
@@ -163,7 +174,9 @@ export function TraceGraph() {
       near.disconnect()
       stop()
     }
-  }, [])
+    /* **Made again when the layout changes**, since the driver is told at
+       making whether to name the groups. */
+  }, [layout])
 
   /* **The memory deleted as Trace deletes it**, the frame handed the trace
      without it, which draws only what changed. Nothing to hand before the
@@ -215,6 +228,7 @@ export function TraceGraph() {
           class={styles.traceFrame}
           gestures="cooperative"
           label="An example trace of four answers"
+          legend={!namedIn(layout)}
           no-panel
           ref={frame}
         >

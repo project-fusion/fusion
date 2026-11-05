@@ -135,6 +135,18 @@
   display: block;
 }
 
+/* Anything else slotted as the preview is laid out as `Sandbox.Preview` lays
+   out its document: the same ground and the inset its frame gives. A plain
+   element had none, so its button sat hard in the pane's corner. */
+::slotted([slot="preview"]:not(helix-sandbox-preview)) {
+  background-color: var(--helix-color-background);
+  block-size: 100%;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  display: block;
+  padding: var(--helix-space-md);
+}
+
 /* Print: an editor, and the whole of it is chrome. */
 @media print {
   :host {

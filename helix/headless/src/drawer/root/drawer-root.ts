@@ -119,7 +119,7 @@ import { startsSwipe } from '../swipe-start.js'
  *
  * @slot - The drawer's content.
  * @slot dismiss-icon - Replaces the glyph inside the close control.
- * @slot footer - Content pinned below the scrolling area, such as the drawer's actions.
+ * @slot footer - Content pinned below the scrolling area, such as the drawer's actions. Write the action that dismisses first and the primary one last.
  * @slot header - Content pinned above the scrolling area.
  *
  * @event {Event} close - Sent from the host after the drawer closes, because the native `close` event does not leave the shadow root.

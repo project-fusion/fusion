@@ -8,8 +8,14 @@
  *    be a second answer to a question the library has already answered.
  */
 [part="surface"] {
+  /* The edge, once, for the panel and for the point's two outer sides, as
+     `Popover` says its own. The point drew `border-thin` whatever
+     `--tour-border-width` said, so the two could come apart. */
+  --_tour-edge: var(--tour-border-width, var(--helix-border-floating)) solid
+    var(--helix-color-border);
+
   background-color: var(--tour-surface-background-color, var(--helix-color-surface-overlay));
-  border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
+  border: var(--_tour-edge);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--tour-shadow, var(--helix-shadow-floating));
   box-sizing: border-box;
@@ -125,23 +131,23 @@
    point, and `border-inline-start` on a right-to-left page edged the top-right
    one, which is its right. */
 [part="surface"][data-placement^="bottom"] [part~="arrow"] {
-  border-left: var(--helix-border-thin) solid var(--helix-color-border);
-  border-top: var(--helix-border-thin) solid var(--helix-color-border);
+  border-left: var(--_tour-edge);
+  border-top: var(--_tour-edge);
 }
 
 [part="surface"][data-placement^="top"] [part~="arrow"] {
-  border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
-  border-right: var(--helix-border-thin) solid var(--helix-color-border);
+  border-bottom: var(--_tour-edge);
+  border-right: var(--_tour-edge);
 }
 
 [part="surface"][data-placement^="right"] [part~="arrow"] {
-  border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
-  border-left: var(--helix-border-thin) solid var(--helix-color-border);
+  border-bottom: var(--_tour-edge);
+  border-left: var(--_tour-edge);
 }
 
 [part="surface"][data-placement^="left"] [part~="arrow"] {
-  border-right: var(--helix-border-thin) solid var(--helix-color-border);
-  border-top: var(--helix-border-thin) solid var(--helix-color-border);
+  border-right: var(--_tour-edge);
+  border-top: var(--_tour-edge);
 }
 
 /* A dialog and a floating stop point at nothing. After the arrow's own rules,

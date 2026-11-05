@@ -52,7 +52,9 @@
   align-self: center;
   background-color: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
   border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-muted);
+  /* Full ink, since the pill is what is quieter and a tinted row takes the
+     contrast of muted ink under 4.5:1 at this size. */
+  color: var(--helix-color-foreground);
   flex: none;
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;

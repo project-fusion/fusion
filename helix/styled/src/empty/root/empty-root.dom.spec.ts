@@ -40,8 +40,11 @@ describe('empty', () => {
     expect(rule(':host')).toContain('padding: var(--empty-padding, var(--helix-space-2xl))')
   })
 
-  test('the icon takes the large step, so it moves with density', () => {
-    expect(rule('slot[name="icon"]::slotted(*)')).toContain('var(--helix-size-icon-lg)')
+  test('the icon takes a third over the large step, so it moves with density', () => {
+    // At the step itself it stood under the heading as an icon in a line of text.
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
+      'round(calc(var(--helix-size-icon-lg) * 4 / 3), 1px)',
+    )
   })
 
   test('the heading is the one thing at full strength', () => {
@@ -75,7 +78,9 @@ describe('empty hooks', () => {
   test('the block, the icon, the heading, the message and the actions each take one', () => {
     expect(rule(':host')).toContain('gap: var(--empty-gap, var(--helix-space-sm))')
     const icon = rule('slot[name="icon"]::slotted(*)')
-    expect(icon).toContain('--icon-size: var(--empty-icon-size, var(--helix-size-icon-lg))')
+    expect(icon).toContain(
+      '--icon-size: var(--empty-icon-size, round(calc(var(--helix-size-icon-lg) * 4 / 3), 1px))',
+    )
     expect(icon).toContain('color: var(--empty-icon-color, var(--helix-color-foreground-subtle))')
     const heading = rule('slot[name="heading"]::slotted(*)')
     expect(heading).toContain('color: var(--empty-heading-color, var(--helix-color-foreground))')

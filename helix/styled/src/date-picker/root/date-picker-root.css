@@ -475,3 +475,59 @@
   display: block;
   margin-block-start: var(--helix-space-sm);
 }
+
+/* Forced colors paint every fill the page's Canvas, and the chosen day is a fill,
+   so day 14 looked like every other day. The chosen day takes the system's
+   Highlight pair, and the days either side of the month the system's GrayText,
+   which is what their muted ink was saying. */
+@media (forced-colors: active) {
+  [part~="cell"][aria-selected]:not([data-range-middle]) [part~="day"] {
+    background-color: Highlight;
+    color: HighlightText;
+    forced-color-adjust: none;
+  }
+
+  [part~="cell"][aria-selected][data-range-middle] {
+    outline: var(--helix-border-thin) solid Highlight;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+
+  [part~="cell"][data-outside] [part~="day"] {
+    color: GrayText;
+  }
+}
+
+/* Days sit against each other, so on a touch screen the cell itself grows to the
+   target. The row always does. The width grows only as far as the calendar's
+   own box allows: seven days at the target take 308, a 280 column holds seven
+   at 40, and the columns settle anywhere between the two. The box decides, not
+   the screen, so a calendar in a narrow sidebar of a wide page stays inside it.
+   At the end of the sheet, since it overrides base rules of the same weight. */
+@media (pointer: coarse) {
+  :host {
+    --_calendar-row: var(--date-picker-row-size, var(--helix-size-target));
+    --_calendar-reach: var(--date-picker-track-size, var(--helix-size-target));
+  }
+
+  [part="months"] {
+    grid-template-columns: repeat(
+        var(--date-picker-columns, var(--date-picker-column-count, 1)),
+        minmax(min-content, max-content)
+      );
+  }
+
+  [part="week"] {
+    grid-template-columns: repeat(7, minmax(var(--_calendar-track), var(--_calendar-reach)));
+  }
+
+  [part~="cell"],
+  [part="weekday"] {
+    inline-size: auto;
+  }
+
+  [part="periods"] {
+    inline-size: calc(var(--_calendar-reach) * 7);
+    max-inline-size: 100%;
+    min-inline-size: calc(var(--_calendar-track) * 7);
+  }
+}

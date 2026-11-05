@@ -8,6 +8,8 @@
      once here and every ramp below reads it. */
   --_color-picker-along: to right;
   display: block;
+  /* A control and no more, so the square does not fill a wide column. */
+  max-inline-size: var(--color-picker-max-inline-size, 28rem);
   padding-block-end: var(--color-picker-padding, var(--helix-space-none));
 }
 
@@ -270,10 +272,13 @@
   block-size: 100%;
   content: "";
   inset: 0;
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+  /* **Checkbox's tick, which the note above says it is**, the same path and
+     stroke at the checkbox's size. It was a path of its own at stroke 3 over
+     60% of the sample, a 2.7px line beside Checkbox's 2.08px. */
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
   mask-position: center;
   mask-repeat: no-repeat;
-  mask-size: 60%;
+  mask-size: var(--helix-size-checkbox);
   position: absolute;
 }
 
@@ -484,7 +489,7 @@
    is not. */
 [part="actions"] {
   display: flex;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 
 [part="actions"] helix-button {
@@ -639,4 +644,17 @@
     box-shadow: none;
     print-color-adjust: exact;
   }
+}
+
+/* The format button is as wide as its word, and the value takes the rest. */
+[part="actions"] helix-button[part="format"] {
+  --button-inline-size: auto;
+
+  flex: 0 0 auto;
+}
+
+/* An edge on the square, so its dark corner stays apart from a black page. */
+[part="grid"] {
+  box-shadow: inset 0 0 0 var(--helix-border-thin)
+    color-mix(in oklab, var(--helix-color-foreground) 14%, transparent);
 }

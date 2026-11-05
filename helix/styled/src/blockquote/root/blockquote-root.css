@@ -8,9 +8,13 @@
   margin: var(--helix-space-none);
 }
 
-/* Block, not flex. */
+/* Block, not flex. **`flow-root`, so the box holds the mark floated in it.** A
+   passage shorter than the mark let the float hang below the quote, and the
+   attribution under it wrapped beside the mark: in the pull quote the German
+   line, one line long, put its attribution at x 52, indented to the words,
+   where the English, two lines long, put its own at x 24, under the mark. */
 [part="blockquote"] {
-  display: block;
+  display: flow-root;
   margin: var(--helix-space-none);
 }
 

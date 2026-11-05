@@ -10,15 +10,22 @@
 [part="item"] {
   all: unset;
   position: relative;
-  align-items: center;
+  /* The circle stays beside the first line of a label that wraps, as a
+     Checkbox's box does. Centered, it sat 15.9 pixels below the first line of a
+     three-line label at `md`. */
+  align-items: start;
   box-sizing: border-box;
-  cursor: pointer;
-  display: inline-flex;
+  /* A read-only group sets `--_radio-cursor` to `default`; see `radio-group.css`. */
+  cursor: var(--_radio-cursor, pointer);
+  /* A block, so the host takes no line box around it and a group's rows match a
+     checkbox group's. */
+  display: flex;
   gap: var(--helix-space-xs);
+  inline-size: fit-content;
 }
 
 :host([disabled]) [part="item"] {
-  cursor: default;
+  cursor: not-allowed;
 }
 
 :host([disabled]) {
@@ -129,6 +136,11 @@ slot[name="indicator"]::slotted(*) {
   /* A long unbroken word breaks inside the column it was given. */
   min-inline-size: 0;
   overflow-wrap: anywhere;
+}
+
+/* The label's first line centered on the circle, which is taller than a line. */
+:host(:not([separation="filled"], [separation="outlined"], [chip])) [part="label"] {
+  padding-block-start: max(0px, calc((var(--_radio-size) - 1lh) / 2));
 }
 
 /*
@@ -256,7 +268,7 @@ slot[name="indicator"]::slotted(*) {
   block-size: var(--radio-chip-size, var(--helix-size-control));
   border-radius: var(--helix-radii-full);
   color: var(--helix-color-foreground-muted);
-  cursor: pointer;
+  cursor: var(--_radio-cursor, pointer);
   display: inline-flex;
   inline-size: var(--radio-chip-size, var(--helix-size-control));
   justify-content: center;
@@ -323,7 +335,9 @@ slot[name="indicator"]::slotted(*) {
 }
 
 :host(:not([disabled])) [part="item"]:active [part="box"] {
-  background-color: var(--helix-color-press);
+  /* A read-only group sets `--_radio-press` to `transparent`, the press being
+     refused. */
+  background-color: var(--_radio-press, var(--helix-color-press));
 }
 
 /* An edge and no fill, as `outlined` is wherever it is offered. */

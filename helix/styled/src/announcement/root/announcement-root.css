@@ -244,6 +244,14 @@
   color: var(--helix-color-foreground);
 }
 
+/* A press, the wash a tab or a menu item takes under one: 16% in light and 20% in
+   dark, against the hover's 8% and 12%. It drew the hover's wash before, so a
+   tap on a phone, where no hover comes first, showed nothing distinct. */
+[part="dismiss"]:active {
+  background-color: var(--helix-color-press);
+  color: var(--helix-color-foreground);
+}
+
 [part="dismiss"] svg {
   block-size: var(--helix-size-icon);
   inline-size: var(--helix-size-icon);

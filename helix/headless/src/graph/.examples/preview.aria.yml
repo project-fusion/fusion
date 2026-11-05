@@ -1,5 +1,4 @@
 - group "Company notes":
-  - text: Graph
   - toolbar "Graph controls":
     - button "Zoom in": +
     - button "Zoom out": −

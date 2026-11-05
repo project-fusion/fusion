@@ -65,7 +65,7 @@ helix-headless-dialog p {
 helix-headless-dialog [slot="footer"] {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 
 helix-headless-button::part(button) {
@@ -89,7 +89,7 @@ helix-headless-button::part(button) {
 }
 
 helix-headless-button:not(helix-headless-dialog *)::part(button),
-helix-headless-dialog [slot="footer"] > helix-headless-button:first-child::part(button) {
+helix-headless-dialog [slot="footer"] > helix-headless-button:last-child::part(button) {
   background-color: var(--_gray-strong);
   border-color: transparent;
   color: var(--_gray-surface);

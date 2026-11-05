@@ -31,6 +31,19 @@ Size does three jobs:
   a list and at 96 on a profile are two different pictures. That is why
   `Avatar`, `Loader`, and `Orb` keep a `size`.
 
+## The steps
+
+| Density | Control height | Tight row | Control text |
+| --- | --- | --- | --- |
+| `sm` | 32px | 26px | 12px |
+| `md` | 40px | 32px | 13px |
+| `lg` | 48px | 38px | 14px |
+
+A tight row is `--helix-size-control-tight`, the height of a row in a Menu, a
+Select, or a Combobox. A Table and a List row take the control height. The
+control text in the table is for a mouse or a trackpad. On a touch screen it is
+a step larger, as [On a touch screen](#on-a-touch-screen) describes.
+
 ## Can two controls differ in height?
 
 Ask whether two controls placed together can ever differ in height:
@@ -73,14 +86,55 @@ Density works through these custom properties:
 
 - `--helix-size-control`
 - `--helix-size-checkbox`
+- `--helix-size-icon`
 - `--helix-size-switch`
 - `--helix-size-tag`
+
+It also sets the control text, the field text, and their insets.
 
 Because of this, density adds no API to any component, and it passes through
 every shadow boundary.
 
 The `-sm`, `-md`, and `-lg` tokens are the scale, and they never change. The
 unsuffixed tokens hold the current step, and `data-density` changes them.
+
+## A step either side
+
+`-tight` and `-loose` are a step either side of the current one: 0.8 and 1.2
+times the unsuffixed token. They move with the region's density. Three sizes
+have the pair:
+
+- `--helix-size-control-tight` and `--helix-size-control-loose`
+- `--helix-size-icon-tight` and `--helix-size-icon-loose`
+- `--helix-size-checkbox-tight` and `--helix-size-checkbox-loose`
+
+Use a `-tight` or `-loose` step for something that is meant to differ from its
+neighbors, such as a row in a floating panel or a caret inside a trigger. Use
+`-sm`, `-md`, or `-lg` for a size that does not follow density.
+
+Two sizes are fixed and do not follow density:
+
+- `--helix-size-button` is 200px, a standard width for a button. Set it as a
+  button's `--button-inline-size`.
+- `--helix-size-badge` is 16px, the size of a Badge's mark. A badge is pinned
+  to something else, such as an avatar, so it does not take a control's size.
+
+## On a touch screen
+
+Where the primary pointer is coarse, such as on a phone, these sizes change:
+
+- `--helix-size-target` is 44px. Under a mouse it is 24px. A control's press
+  reaches that size through a transparent box around it, so nothing drawn moves.
+- Control text is a step larger, up to 14px: 13px at `sm`, and 14px at `md` and
+  `lg`. A Button at `md` goes from 13px to 14px.
+- A field's text is at least 16px, so a field at `md` goes from 14px to 16px.
+  iOS Safari zooms the page into a field whose text is smaller. See
+  [Typography](./typography).
+- A row in a Menu, a Select, a Combobox, or a Tree is at least
+  `--helix-size-target` tall, 44px at every density. Rows sit against each
+  other, so the row itself grows to the target.
+
+A control keeps the height of its density step.
 
 ## Exceptions
 
@@ -92,3 +146,11 @@ one step above `--helix-size-checkbox` at every density, because a switch is a
 track with a thumb inside it and a checkbox is a box with a mark in it. The
 component sets this once, and it applies to every instance. You do not set a
 height on each instance.
+
+## Narrowest supported width
+
+Helix supports a column down to 280px. Every family's examples fit at that width
+with no sideways scroll. Below it, a control may overflow or a figure may wrap.
+
+A `Stat` keeps its size in any column, because its figure is the reading. Give
+each `Stat` a column of about 6rem or wider, so its digits stay on one line.

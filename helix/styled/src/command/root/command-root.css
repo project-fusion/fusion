@@ -37,8 +37,13 @@ helix-listbox::part(items) {
 
   /* *More air than a listbox gives itself, because of what is under it.**
      `Listbox` pads its scrollport by `space-2xs`, which is enough to hold the
-     first and last rows off the frame of a box that ends in nothing. */
-  padding-block: var(--helix-space-xs);
+     first and last rows off the frame of a box that ends in nothing.
+
+     **Above the rows only.** Under them the footer brings its own inset and
+     rule, so `xs` there and the footer's `xs` stood the last row two steps off
+     the rule, a loose band between the list and the keys. The listbox's own
+     `2xs` is enough on that side, footer or not. */
+  padding-block: var(--helix-space-xs) var(--helix-space-2xs);
 }
 
 /* The field reads as the top of the panel rather than as a control inside it:

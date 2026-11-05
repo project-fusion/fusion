@@ -1,7 +1,6 @@
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
-  background-color: var(--helix-color-surface-sunken);
   /* **Three quarters as tall as it is wide, and 22em at most**, so a narrow
      plot is not a tall gray field with a small drawing in its middle: a box
      seen at a slant is wider than it is tall. The hook sets one height. */
@@ -17,10 +16,9 @@
   position: relative;
 }
 
-/* With no box, the readings stand on the page itself, as a picture on a
-   landing page does, with nothing drawn behind them. */
-:host([no-box]) [part="plot"] {
-  background-color: transparent;
+/* The ground, where a page asks for one. */
+:host([separation="filled"]) [part="plot"] {
+  background-color: var(--helix-color-surface-sunken);
 }
 
 /* Each face of a block in its group's color, darkened by how far it turns

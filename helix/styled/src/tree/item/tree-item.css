@@ -4,13 +4,15 @@
      current step it reads as the loudest thing in a row whose text is 14px, and
      a tree is a list of names with a hint of structure beside them. */
   --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-tight));
-  /* The row's padding above and below its line, from the region's density.
-     *Derived from the target size, so `md` is exactly `space-xs`.** The tight
-     target there is 2rem, so a rem off it and halved is .5rem, which is what the
-     padding was before; `sm` gives about 5px and `lg` about 11. Spacing tokens
-     do not move with density, so a padding of `space-xs` kept every row 35px
-     tall in a `data-density="sm"` region whose controls were 26. */
-  --_tree-pad: calc((var(--helix-size-control-tight) - 1rem) / 2);
+  /* **The row and the gap under it come to one control height**, so a tree stands
+     at the pitch a List and a Table do, 32, 40, and 48, in whole pixels, whatever
+     a row's own text size is. */
+  --_tree-row: var(
+    --tree-row-size,
+    calc(var(--helix-size-control) - var(--tree-gap, var(--helix-space-2xs)))
+  );
+  /* The padding above and below a row's line, from that height. */
+  --_tree-pad: calc((var(--_tree-row) - 1lh) / 2);
   /* The row's inline inset, which is the tree's `bleed` where it asks for one,
      so a top-level row's words start on the tree's edge, and every level steps
      in from there by the indent as it did. */
@@ -30,9 +32,8 @@
      child.** Under `stretch` a child taller than the line sets the row, so the
      sandbox rail's 24px docs link in `end` made its family rows 40 against 34
      for every example row under them, which is the opposite of what
-     `min-block-size` below is for. Measured in the rail: rows 34 throughout, the
-     docs link still 24 square, and the padding it grows into is inside the row
-     rather than beyond it. */
+     `min-block-size` below is for. The docs link stays 24 square, and the padding
+     it grows into is inside the row rather than beyond it. */
   align-items: center;
   /* Through a private, so a checked row takes a fill only where a page asks
      for one, and the hover below still wins over it. */
@@ -52,13 +53,10 @@
      added up, a parent's under its last child's, so the gaps in one tree came
      out 0, 4 and 8px. */
   margin-block-end: var(--tree-gap, var(--helix-space-2xs));
-  /* One line plus the padding, floored at the target size: a row you can hit,
-     rather than one sized to the height of its own text. */
-  block-size: max(
-    var(--tree-row-size, var(--helix-size-control-tight)),
-    calc(1lh + var(--_tree-pad) * 2)
-  );
-  min-block-size: var(--tree-row-size, var(--helix-size-control-tight));
+  /* A set height, so a branch and a leaf at different text sizes stay one column
+     of rows. */
+  block-size: var(--_tree-row);
+  min-block-size: var(--_tree-row);
   /* Out by the bleed on both sides, which the inset above gives back. */
   margin-inline: calc(var(--_tree-bleed, var(--helix-space-none)) * -1);
   padding-block: var(--_tree-pad);
@@ -149,9 +147,11 @@ slot[name="children"]::slotted(*) {
   color: var(--tree-row-hover-color, var(--helix-color-foreground));
 }
 
-/* A surface, not the accent. */
+/* A wash, not the accent, and a step past the hover's. At `primary-subtle` the
+   chosen row measured 1.03:1 against a hovered one in light, so under the
+   pointer the current row could not be told from any other. */
 :host(:state(selected)) [part="row"] {
-  background-color: var(--tree-row-selected-background-color, var(--helix-color-primary-subtle));
+  background-color: var(--tree-row-selected-background-color, var(--helix-color-selected));
   color: var(--tree-row-selected-color, var(--helix-color-foreground));
 }
 
@@ -205,6 +205,9 @@ a[part="row"] {
    wide had a 57px anchor in it, so three quarters of every navigation row looked
    clickable and was not. */
 [part="label"] {
+  /* The words at the row's center, in a box as tall as the row, so a row grown
+     to the touch target does not leave them high. */
+  align-content: center;
   /* Full height, not just the height of the words. */
   align-self: stretch;
   flex: 1;
@@ -483,4 +486,14 @@ slot[name="chevron"]::slotted(*) {
 
 [part="row"] {
   position: relative;
+}
+
+/* Forced colors paint every fill the page's Canvas, and a selected row is a
+   fill, so it looked like every other row. An edge in the system's Highlight
+   marks it instead, with the text left in the system's own color. */
+@media (forced-colors: active) {
+  :host(:state(selected)) [part="row"] {
+    outline: var(--helix-border-thick) solid Highlight;
+    outline-offset: calc(var(--helix-border-thick) * -1);
+  }
 }

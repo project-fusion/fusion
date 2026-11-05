@@ -1,4 +1,6 @@
 :host {
+  /* Code shows the characters written: a ligature hides a `!=` changing to `!==`. */
+  font-variant-ligatures: none;
   display: inline;
 }
 

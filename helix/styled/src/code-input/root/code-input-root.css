@@ -17,6 +17,9 @@
 /* The box that scrolls fills the field, and shrinks under a narrow host, so a
    long line scrolls inside the frame and never widens the form. */
 [part="scroller"] {
+  /* Left to right whatever the page does, as Code Block's note gives. */
+  direction: ltr;
+  unicode-bidi: isolate;
   flex: 1 1 auto;
   min-inline-size: 0;
   scrollbar-width: thin;

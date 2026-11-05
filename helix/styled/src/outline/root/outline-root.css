@@ -285,3 +285,14 @@
     position: static;
   }
 }
+
+/* Forced colors paint every fill the page's Canvas, and the marker beside the
+   current link is a fill, so the current entry was not marked. The marker and
+   the current tick take the system's Highlight. */
+@media (forced-colors: active) {
+  [part="indicator"],
+  :host([marker="rail"]) [part="tick"][data-current] {
+    background-color: Highlight;
+    forced-color-adjust: none;
+  }
+}

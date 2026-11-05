@@ -50,13 +50,13 @@ describe('skeleton', () => {
     )
   })
 
-  test('a line of text is one line tall, and a circle is round at the control step', () => {
-    // The control step rather than a bare rem, so a circle standing in for an
-    // avatar shrinks with the density region the avatar would.
+  test('a line of text is one line tall, and a circle is round at the avatar step', () => {
+    // Avatar's step, so a circle standing in for an avatar is the avatar's
+    // size: the control step drew it 40 against an Avatar's 32.
     expect(rule(':host([shape="text"])')).toContain('block-size: 1em')
     expect(rule(':host([shape="circle"])')).toContain('aspect-ratio: 1 / 1')
     expect(rule(':host([shape="circle"])')).toContain(
-      'inline-size: var(--skeleton-size, var(--helix-size-control))',
+      'inline-size: var(--skeleton-size, var(--helix-size-avatar))',
     )
     for (const selector of [
       ':host([shape="text"]) [part~="skeleton"]',
@@ -127,7 +127,7 @@ describe('skeleton around content', () => {
   })
 
   test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {
-    expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*color-mix/)
+    expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*light-dark\(\s*color-mix/)
     expect(sheet()).toMatch(/var\(\s*--skeleton-sheen-color,\s*color-mix/)
     expect(sheet()).toMatch(/var\(\s*--skeleton-radius,\s*var\(--helix-radii-sm\)\)/)
     expect(sheet()).toMatch(
@@ -173,6 +173,11 @@ describe('a paragraph of lines', () => {
       'block-size: auto',
     )
     expect(rule('[part="lines"]')).toContain('gap: calc((var(--helix-leading-normal) - 1) * 1em)')
+    // Half the leading at each end, so three lines are a three-line
+    // paragraph's 4.5em, where they were 4em.
+    expect(rule('[part="lines"]')).toContain(
+      'padding-block: calc((var(--helix-leading-normal) - 1) * 0.5em)',
+    )
     expect(rule('[part~="line"]')).toContain('block-size: 1em')
     expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
       'inline-size: var(--skeleton-last-line-size, 60%)',

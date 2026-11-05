@@ -156,3 +156,24 @@
 .siteFooterLink:focus-visible {
   color: var(--helix-color-foreground);
 }
+
+/* **On a touch screen each link is a row the target's height.** The links sit
+   20px tall at a 24px pitch, so a transparent box reaching 44 would take the
+   press from the link beside it. The rows grow instead and the gap closes, which
+   is what Helix's vertical navigation does. The icons sit side by side, so their
+   gap opens until the press areas meet without overlapping. */
+@media (pointer: coarse) {
+  .footerGroup {
+    gap: 0;
+  }
+
+  .siteFooterLink {
+    align-items: center;
+    display: flex;
+    min-block-size: var(--helix-size-target);
+  }
+
+  .footerSocials {
+    gap: calc(var(--helix-size-target) - var(--helix-size-control-sm));
+  }
+}

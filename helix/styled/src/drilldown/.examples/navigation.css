@@ -1,3 +1,8 @@
+/* Framed by the page, as Drilldown leaves to whatever holds it, with the
+   edge and corner a Card takes. */
 .panel {
+  border: var(--helix-border-surface) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: var(--helix-shadow-surface);
   max-inline-size: 18rem;
 }

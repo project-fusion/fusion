@@ -148,12 +148,14 @@ const OPENING_PATIENCE = 500
  * @csspart pause - The control that pauses the field and starts it again, drawn under `pause-control`.
  * @csspart pause-mark - The glyph on the pause control: pause while the field moves, play while it is paused.
  *
+ * @cssproperty --aura-fade - How far the top and bottom edges fade, as a share of the height. `0%` keeps a hard edge. Defaults to `15%`.
  * @cssproperty --aura-glow - The bright stop of the ramp. Defaults to `--helix-color-primary`.
  * @cssproperty --aura-ground - The page the field fades into. Defaults to `--helix-color-background`.
  * @cssproperty --aura-haze - The faint stop between the ground and the glow. Defaults to `--helix-color-primary-subtle`.
  * @cssproperty --aura-pause-background-color - The pause control's ground. Defaults to `--helix-color-surface-overlay`.
  * @cssproperty --aura-peak - The hottest stop, at the center of a shape. Defaults to `--helix-color-primary-active` on a light page and `--helix-color-foreground` on a dark one.
  *
+ * @cssstate drawing - The shader draws on the GPU, so the gradient under it is hidden.
  * @cssstate fallback - The aura shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the shader draws again.
  */
 @customElement('helix-aura')
@@ -714,6 +716,7 @@ export class HelixAura extends HelixElement {
     this.canvas?.toggleAttribute('hidden', false)
     this.fallback = undefined
     this.toggleState('fallback', false)
+    this.toggleState('drawing', true)
     gl.useProgram(this.program)
     for (const name of [
       'uBloom',
@@ -860,6 +863,7 @@ export class HelixAura extends HelixElement {
     }
     this.program = null
     this.canvas?.toggleAttribute('hidden', true)
+    this.toggleState('drawing', false)
     this.fallBack('lost')
   }
 
@@ -877,6 +881,7 @@ export class HelixAura extends HelixElement {
     }
     this.fallback = reason
     this.toggleState('fallback', true)
+    this.toggleState('drawing', false)
     this.dispatchEvent(new HelixAuraFallbackEvent({ reason }))
   }
 

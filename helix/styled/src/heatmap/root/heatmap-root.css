@@ -298,10 +298,30 @@
 [part="empty"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
+  display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   margin: var(--helix-space-none);
+  place-content: center;
   text-align: center;
+}
+
+/* **Across the box and in the middle of the strip, as the charts on axes draw
+   their words.** The track was the words' max-content, so "Loading" was a box
+   of 102 by 20 at the top left of a 280 column, under a strip of nothing. With
+   nothing to draw the track takes the box, and the words share the strip's
+   cell, so they stand in the middle of the height the cells will take and the
+   page does not move when the readings arrive. */
+:host(:state(empty)),
+:host(:state(loading)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:host(:state(empty)) [part~="strip"],
+:host(:state(loading)) [part~="strip"],
+[part="empty"],
+[part="loading"] {
+  grid-area: 1 / 1;
 }
 
 /* Print: a tone is a fill, and a strip of ninety of them is the one thing on the

@@ -101,9 +101,9 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * Space, each with the row of the table in `index`.
  *
  * **Nothing to draw.** A table with no readings shows `empty-text`, "No
- * readings", under the strip, and `loading` shows `loading-text` there until
- * readings arrive. The `empty` and `loading` slots take markup in place of
- * either, as on every chart.
+ * readings", in place of the cells, and `loading` shows `loading-text` there
+ * until readings arrive. The `empty` and `loading` slots take markup in place
+ * of either, as on every chart.
  *
  * **Keyboard.** The strip is one tab stop once it has cells.
  *
@@ -125,9 +125,9 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
  * @documentation https://fusion.dev/helix/components/heatmap
  *
- * @slot empty - Content shown under the strip when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot empty - Content shown in place of the cells when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
- * @slot loading - Content shown under the strip while `loading` is set and there are no readings yet. Falls back to `loading-text`.
+ * @slot loading - Content shown in place of the cells while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  * @slot start - Below the strip, at the leading edge: usually the oldest date.
  * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
@@ -140,11 +140,11 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart cell - One reading.
  * @csspart cell-active - The cell the pointer or the keys rest on. Set alongside `cell`.
  * @csspart cell-selected - A cell that is selected, under `selection-mode`. Set alongside `cell`.
- * @csspart empty - The words under the strip when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
+ * @csspart empty - The words in place of the cells when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
- * @csspart loading - The words under the strip while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
+ * @csspart loading - The words in place of the cells while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart overview - The busiest reading and the total of the readings drawn, written as a sentence for screen readers, which describes the strip. Rendered once there are cells. Hide it visually.
  * @csspart plot - The same element as `strip`, under the name every chart gives the drawing that takes focus.

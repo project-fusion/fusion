@@ -5,7 +5,7 @@
      is drawn only where a page asks for a color. */
   --_avatar-group-ring: var(--avatar-group-ring-color, transparent);
   --_avatar-group-gap: var(--helix-border-thick);
-  --_avatar-group-step: var(--avatar-group-overlap, var(--helix-space-sm));
+  --_avatar-group-step: var(--avatar-group-overlap, var(--helix-space-2xs));
   /* Where the next avatar's center sits, from this one's start edge: one and a
      half of its own width along, less the overlap. A share of the avatar's own
      box, since each avatar sets its size inside its own shadow root and the

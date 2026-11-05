@@ -175,7 +175,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
  * @csspart before - The space the rows above the drawn rows would take, when `windowed` is set.
  * @csspart boolean - A `true` or `false`.
- * @csspart copy - The copy button, which copies the active row.
+ * @csspart copy - The copy button, which copies the active row: at the end of the header where there is one, and beside the tree where there is not.
  * @csspart copy-button - The button inside the copy control.
  * @csspart copy-live - The live region inside the copy button, which says its `pending-label` when the copy becomes pending under focus.
  * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
@@ -193,8 +193,8 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart copy-tooltip-surface-top - The tooltip while it is above the copy button. Set alongside `copy-tooltip-surface`.
  * @csspart count - The number of entries a branch holds.
  * @csspart empty - The row shown in the tree while it has no entries to show: no value, or a filter that matched none. It holds the `empty` slot.
- * @csspart frame - The tree and the copy button beside it.
- * @csspart header - The bar that holds the label, when there is one.
+ * @csspart frame - The tree, and the copy button beside it where there is no header.
+ * @csspart header - The bar that holds the label and the copy button, when there is a label.
  * @csspart key - A property name or an array index.
  * @csspart label - The label.
  * @csspart live - How many entries a filter matched, in a region that screen readers announce when it changes. Drawn from the first filter on. Visually hidden in the styled tier.
@@ -214,6 +214,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  *
  * @cssstate empty - While the tree has no entries to show: no value, or a filter that matched none.
  * @cssstate filtered - While `filter` holds text.
+ * @cssstate labeled - While `label` names the tree, so the header shows and the copy button stands at its end.
  * @cssstate matched - While `filter` holds text and matched at least one entry.
  */
 @customElement('helix-headless-object-inspector')
@@ -435,7 +436,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   /**
    * The tree's accessible name when `label` is empty and the host names it
-   * with neither `aria-label` nor `aria-labelledby`.
+   * with neither `aria-label` nor `aria-labeledby`.
    */
   @words
   @property({ attribute: 'tree-label' })
@@ -503,7 +504,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   /** The branches of the last value seen, by path, so a new value can tell old ones from new. */
   private branches = new Set<string>()
 
-  /** Carries a host `aria-label` and `aria-labelledby` to the tree, which is what takes focus. */
+  /** Carries a host `aria-label` and `aria-labeledby` to the tree, which is what takes focus. */
   protected readonly aria = new AriaForwardController(this, {
     label: true,
     target: () => this.partNamed('tree'),
@@ -627,6 +628,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
     }
     this.toggleState('empty', this.blank)
     this.toggleState('filtered', this.found !== undefined)
+    this.toggleState('labeled', this.label !== '')
     this.toggleState('matched', (this.found?.size ?? 0) > 0)
   }
 
@@ -1159,8 +1161,14 @@ export class HelixHeadlessObjectInspector extends HelixElement {
        that scrolled away from it left no row with `tabindex="0"`, so Tab back
        in landed nowhere a key could move from. The tree hands focus on. */
     const stopless = rows.length > 0 && !shown.some(([, at]) => at === this.cursor)
+    /* **In the header where there is one**, as Code Block's is. Beside the
+       tree, under a header, the button stood in the body below the bar that
+       names what it copies. */
+    const copy = this.noCopy ? nothing : this.renderCopyButton(rows[this.cursor])
     return html`${
-      this.label ? html`<div part="header"><span part="label">${this.label}</span></div>` : nothing
+      this.label
+        ? html`<div part="header"><span part="label">${this.label}</span>${copy}</div>`
+        : nothing
     }${
       this.filterable
         ? html`<input
@@ -1209,7 +1217,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
           }
           ${this.windowed ? html`<div part="after" role="presentation" style="block-size: ${after}px"></div>` : nothing}
         </div>
-        ${this.noCopy ? nothing : this.renderCopyButton(rows[this.cursor])}
+        ${this.label ? nothing : copy}
       </div>
       ${drawStatus(this.status)}`
   }

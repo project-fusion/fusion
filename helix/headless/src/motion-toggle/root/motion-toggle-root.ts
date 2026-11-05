@@ -7,7 +7,7 @@ import {
   pauseMotion,
   words,
 } from '@fusion.dev/helix-core'
-import { pause, play } from '@fusion.dev/helix-icons'
+import { pauseFill, play } from '@fusion.dev/helix-icons'
 import { html, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -127,7 +127,7 @@ export class HelixHeadlessMotionToggle extends HelixElement {
    * its own here.
    */
   protected renderIcon(): TemplateResult {
-    return html`<slot name="icon">${drawIcon(this.paused ? play : pause)}</slot>`
+    return html`<slot name="icon">${drawIcon(this.paused ? play : pauseFill)}</slot>`
   }
 }
 

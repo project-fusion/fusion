@@ -48,9 +48,10 @@ slot[name="end"]::slotted(*) {
 /* The trigger is a mark inside the field rather than a button beside it: a
    second frame inside the first is two controls where a reader sees one. */
 [part="trigger"] {
-  /* The small icon, as Date Input's: 20 filled a 20 tall button. The box is the
-     target, and the negative margin keeps it from widening the field. */
-  --icon-size: var(--helix-size-icon-sm);
+  /* The step every field's indicator takes, as Date Input's and a Select's
+     caret: 20 filled a 20 tall button. The box is the target, and the negative
+     margin keeps it from widening the field. */
+  --icon-size: var(--helix-size-icon-tight);
   all: unset;
 
   align-items: center;
@@ -63,7 +64,7 @@ slot[name="end"]::slotted(*) {
   flex: none;
   inline-size: var(--helix-size-target);
   justify-content: center;
-  margin: calc((var(--helix-size-icon-sm) - var(--helix-size-target)) / 2);
+  margin: calc((var(--helix-size-icon-tight) - var(--helix-size-target)) / 2);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -139,6 +140,13 @@ slot[name="end"]::slotted(*) {
  * `shared/floating`'s: this sheet hands it the family's own hooks and says what
  * is particular to a time input.
  */
+/* The list sits in this panel, which is already its frame, so the list draws
+   no edge or ground of its own: a second edge would sit on the panel's. */
+[part="picker"] {
+  --time-picker-list-background-color: transparent;
+  --time-picker-list-border-width: 0;
+}
+
 [part="surface"] {
   --_floating-border-color: var(--time-input-border-color, var(--helix-color-border));
   --_floating-border-width: var(--time-input-border-width, var(--helix-border-floating));

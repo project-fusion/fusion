@@ -109,8 +109,8 @@ export type TraceLayout = 'columns' | 'rows'
  *   little to the right of the one before, so the trace still reads from
  *   what came in to the answer, and a line between kinds parts them.
  *
- * Either way room is left open at each kind's middle, where its group's
- * name is drawn.
+ * In columns, room is left open at each kind's middle, where its group's
+ * name is drawn. Rows leave none, because the legend names the groups there.
  */
 const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> => {
   const at = new Map<string, { x: number; y: number }>()
@@ -144,19 +144,17 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
       })
       return
     }
-    /* **The group's name is drawn at the middle of its notes**, so the open
-       space is where that middle falls. With an even count it is one line,
-       halfway between the two halves. With an odd count the upper half is
-       one longer, which pulls the middle up off the line between them, so
-       the space is three lines, and the middle lands clear of every name. */
-    const upper = Math.ceil(column.length / 2)
-    const open = column.length % 2 === 0 ? 1 : 3
+    /* **No group names in the drawing.** A name is drawn at the middle of its
+       group's notes, and in one strip down a phone every link that skips a
+       kind runs through that middle: at 390 the links struck through
+       "Memories", "Tool calls", "Sources", and "Facts, in Engram". A search
+       over where each half of each kind sits still left four links through
+       a name at best, so the frame's legend names the groups. */
     column.forEach((id, down) => {
-      const row = down < upper ? down : down + open
-      at.set(id, { x: across * 0.6, y: -(line + row) })
+      at.set(id, { x: across * 0.6, y: -(line + down) })
     })
-    /* Past this kind's notes and its open middle, and one more line between kinds. */
-    line += column.length + open + 1
+    /* Past this kind's notes, and one more line between kinds. */
+    line += column.length + 1
   })
   return at
 }
