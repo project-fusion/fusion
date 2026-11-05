@@ -331,3 +331,19 @@ slot[name="submenu"]::slotted(helix-divider) {
 :host([tone="danger"]:not([disabled])) [part~="item"]:active {
   background-color: color-mix(in oklab, var(--helix-color-danger) 20%, transparent);
 }
+
+/* **A disabled row under forced colors is GrayText, drawn whole**, as a
+   disabled Button is. Forced colors paints every ink CanvasText, and the half
+   opacity on top washed that into the Canvas behind it, where every other
+   disabled control in the library reads GrayText. */
+@media (forced-colors: active) {
+  [part="item"][aria-disabled="true"],
+  [part="item"][aria-disabled="true"] [part],
+  :host([disabled]) ::slotted(*) {
+    color: GrayText;
+  }
+
+  [part="item"][aria-disabled="true"] {
+    opacity: 1;
+  }
+}

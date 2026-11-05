@@ -162,7 +162,7 @@ describe('a reorderable list', () => {
 
   test('puts the grip in a track of its own after end, which takes no room without one', () => {
     expect(rule('helix-list-item', '[part~="row"]')).toContain(
-      'grid-template-columns: auto auto 1fr auto auto',
+      'grid-template-columns: auto auto minmax(0, 1fr) auto auto',
     )
     const grip = rule('helix-list-item', '[part="grip"]')
     expect(grip).toContain('grid-column: 5')

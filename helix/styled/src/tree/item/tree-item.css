@@ -179,10 +179,12 @@ a[part="row"] {
    not a substitution. A fixed width, not `1em`. The gutter a chevron sits in is
    what a row without one has to reserve, and `1em` makes that reservation follow
    the row's own type size: a parent at 14px reserved 14 and its child at 12px
-   reserved 12, so the two could not line up whatever the indent was. */
+   reserved 12, so the two could not line up whatever the indent was.
+   **The muted ink every other disclosure glyph takes**, Accordion's chevron and
+   a Select's: in the subtle ink it measured oklch 0.6 against their 0.46. */
 [part="toggle"] {
   block-size: var(--_tree-chevron);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   inline-size: var(--_tree-chevron);
   transform: rotate(-90deg);
@@ -340,7 +342,7 @@ slot[name="start"]::slotted(*) {
 slot[name="chevron"]::slotted(*) {
   align-self: center;
   block-size: var(--_tree-chevron);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   inline-size: var(--_tree-chevron);
   margin-inline-start: var(--tree-chevron-gap, var(--helix-space-none));

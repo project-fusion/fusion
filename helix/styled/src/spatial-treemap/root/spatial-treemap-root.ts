@@ -25,7 +25,7 @@ import '../../tooltip/index.js'
  * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-treemap
  *
- * @cssproperty --spatial-treemap-block-size - How tall the plot is. By default, three quarters of its width and 22em at most.
+ * @cssproperty --spatial-treemap-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  */
 @customElement('helix-spatial-treemap')
 export class HelixSpatialTreemap extends HelixHeadlessSpatialTreemap {

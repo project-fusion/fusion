@@ -153,10 +153,17 @@ export const TOKENS: Token[] = [
      1.12 on the page and on `surface-sunken` in light, and in dark the card rung,
      #0d0d0d, on the black page. **5%, the well's strength**, so a quiet word on a
      filled surface stands where the engine already solves it, on the well: 4.51
-     on a filled card over `surface-sunken`, where 6% measured 4.43. */
+     on a filled card over `surface-sunken`, where 6% measured 4.43.
+     **8.5% in dark**, where 5% painted #0d0d0d on the black page, 1.08:1 and
+     weaker than a default card with its edge. 8.5% paints #161616, 1.16:1,
+     under the elevated card's #181818, so elevated still reads above it.
+     Decided by the owner on November 4, 2026. A panel, an elevated card, and a
+     sunken region restate it at 6%, since a translucent wash steps further off
+     a lighter ground. Two whole colors, since `light-dark()` is not valid in a
+     percentage. */
   [
     'color-surface-filled',
-    'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 5%, transparent), color-mix(in oklab, var(--helix-color-foreground) 8.5%, transparent) )',
     'What a filled surface is filled with, such as a filled card. A wash of the foreground, so it steps off whatever it is on.',
   ],
   /* **What a row is lit with under the pointer or the keyboard**: an option, a
@@ -209,10 +216,14 @@ export const TOKENS: Token[] = [
      `light-dark()` resolves to a `<color>` and is not valid in a percentage
      slot, so `color-mix(in oklab, neutral-950 light-dark(40%, 64%),
      transparent)` is an invalid declaration: the token resolves to nothing and
-     every scrim in the library goes transparent, silently. */
+     every scrim in the library goes transparent, silently. **True black in
+     dark**, the page's own color: `neutral-950` at 64% lifted the black page to
+     rgb(7, 7, 7), so a Tour's lit target, the page as it stands, read darker
+     than the dimmed page around it. Black at 64% leaves the page black and
+     dims everything on it, November 4, 2026. */
   [
     'color-overlay',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-950) 64%, transparent) )',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-950) 40%, transparent), color-mix(in oklab, var(--_helix-neutral-1000) 64%, transparent) )',
   ],
   /* Text and icons, by prominence. */
   /* The ends of the ramp, matching the page. */
@@ -958,8 +969,15 @@ export const TOKENS: Token[] = [
     'The shadow of a surface that floats over content.',
   ],
   /* A control lifted over content: a raised Icon Button, a Carousel arrow, a Speed
-     Dial. The same lift as a panel, and a control keeps its own corner. */
-  ['shadow-raised', 'var(--helix-shadow-floating)', 'The shadow of a control lifted over content.'],
+     Dial. A control keeps its own corner. **A rung under a panel's lift**, the
+     contact shadow and `shadow-md`: it was `shadow-floating` itself, so light
+     had one shadow for every lift and a Carousel arrow stood as high as the
+     Menu opened over it. */
+  [
+    'shadow-raised',
+    'var(--helix-shadow-sm), var(--helix-shadow-md)',
+    'The shadow of a control lifted over content.',
+  ],
   /* ======================================================== material ==== */
   /* Translucency and blur: how much of what is behind a thing shows through
      it. */

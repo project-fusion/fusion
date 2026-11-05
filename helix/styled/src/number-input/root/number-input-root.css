@@ -51,6 +51,17 @@ slot[name="end"] {
   color: var(--helix-color-foreground-muted);
 }
 
+/* **A unit stands beside its number.** Centered, "12" stood about 100 pixels
+   from the "kg" pinned at the field's end, so the number sits at the end the
+   unit is at. With something at both ends it stays centered between them. */
+:host(:state(has-end):not(:state(has-start))) [part="control"] {
+  text-align: end;
+}
+
+:host(:state(has-start):not(:state(has-end))) [part="control"] {
+  text-align: start;
+}
+
 /*
  *  A unit or an icon at either end: quieter than the number, and never shrinking
  * when the field is narrow. `Input` answers both the same way.
@@ -87,10 +98,22 @@ slot[name="end"]::slotted(*) {
   /* Less the rule it draws, so what is left beside the rule is as wide as the
      field is tall inside its edge, and the mark centers on a whole pixel both
      ways. At the full control width the box inside the rule was 31, 39 and 47
-     wide around marks of 12, 16 and 20, and every mark sat half a pixel off. */
+     wide around marks of 12, 16 and 20, and every mark sat half a pixel off.
+
+     **Narrower in a narrow field**, to three tenths of it on a whole pixel and
+     no less than its mark and 4 either side. At their full width two
+     steppers took 94 of a 96 pixel field at `lg`, and the increment ended 7
+     pixels past its edge. A maximum, so a field sized by what it holds keeps
+     the width it had. */
   inline-size: var(
     --number-input-stepper-size,
     calc(var(--helix-size-control) - var(--helix-border-thin))
+  );
+  max-inline-size: max(
+    var(--number-input-stepper-icon-size, var(--helix-size-icon-tight)) +
+    var(--helix-space-2xs) *
+    2,
+    round(30%, 1px)
   );
   justify-content: center;
   transition:

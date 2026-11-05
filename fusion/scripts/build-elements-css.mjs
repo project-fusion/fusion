@@ -183,7 +183,7 @@ helix-data-table:where(${LEAD}) > helix-table-row:not([hidden])::before {
   block-size: 1em;
   box-sizing: content-box;
   inline-size: 1em;
-  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-block: var(--data-table-padding-block, calc(var(--helix-space-control) * 0.5));
   padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
 }
 
@@ -312,6 +312,12 @@ helix-table:not(:defined) > helix-table-row > helix-table-cell:last-child {
   padding-inline-end: var(--helix-space-none);
 }
 
+/* The last row draws no rule, as the table's own rows do once it upgrades. */
+helix-table:not(:defined) > helix-table-row:last-of-type > helix-table-cell,
+helix-table:not(:defined) > helix-table-row:last-of-type::before {
+  border-block-end-color: transparent;
+}
+
 helix-table:not(:defined) > helix-table-row > helix-table-cell[header] {
   font-weight: var(--helix-weight-medium);
 }
@@ -390,16 +396,17 @@ helix-data-table > helix-table-row > helix-table-cell {
   border-block-end: var(--helix-border-thin) solid
     var(--data-table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
+  align-content: center;
   color: var(--data-table-color, var(--helix-color-foreground));
   display: block;
   font-family: var(--helix-font-sans);
   font-size: var(--data-table-text, var(--helix-text-control));
   font-variant-numeric: tabular-nums;
   font-weight: inherit;
-  min-block-size: auto;
+  min-block-size: var(--helix-size-control);
   min-inline-size: auto;
   overflow-wrap: normal;
-  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-block: var(--data-table-padding-block, calc(var(--helix-space-control) * 0.5));
   padding-inline: var(--data-table-padding-inline, var(--helix-space-none) var(--helix-space-md));
 }
 

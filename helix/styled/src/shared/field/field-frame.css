@@ -108,6 +108,21 @@
   min-inline-size: 0;
 }
 
+/* **The resting width is said here, so both engines draw the same one.** That
+   width was the browser's own twenty characters, and each engine measures a
+   character its own way: on November 4, 2026, an unsized Input was 202 pixels
+   in Chromium and 216 in WebKit, and a Textarea 212 and 186. Size containment
+   sets the control's width from content aside, and the width given is
+   Chromium's twenty characters of Fusion Sans, 176 at the 14 pixel field
+   text, so a Chromium page keeps its width and WebKit comes to it. A Textarea
+   takes the same width as an Input, where it was 10 pixels wider in Chromium.
+   A field in a column, or given a width, fills it as before. A file control
+   is a hidden input behind a drop zone, so it is left out. */
+[part="control"]:not([type="file"]) {
+  contain: inline-size;
+  contain-intrinsic-inline-size: round(12.57em, 1px);
+}
+
 /* **An icon at either end is the size of the marks the field draws itself**,
    the clear and reveal buttons' tight step, 16 at the default. A slotted icon
    took the region's icon size, so a search field drew a 20 magnifier beside a

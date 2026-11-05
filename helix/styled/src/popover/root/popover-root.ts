@@ -45,9 +45,9 @@ export class HelixPopover extends HelixHeadlessPopover {
    * over a glass window is not the one opaque slab on it. `frosted` is the same
    * pair turned up, a ground that admits less and a heavier blur.
    *
-   * The strength is the theme's: `--helix-material-translucent`,
-   * `--helix-material-translucent-strong` and `--helix-material-backdrop` are
-   * what the policy moves. `Drawer` and `Tooltip` carry the same attribute.
+   * The strength is the theme's: `--helix-material-panel` for `glass`,
+   * `--helix-material-translucent-strong` for `frosted`, and
+   * `--helix-material-backdrop` are what the policy moves. `Drawer` and `Tooltip` carry the same attribute.
    *
    * **No `transparent`, deliberately.** A panel floating over arbitrary page
    * content is only readable because it has a ground.

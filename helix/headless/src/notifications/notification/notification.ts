@@ -92,6 +92,7 @@ import '../../format-date/index.js'
  * @cssstate actions - While the actions slot holds something, so the words above make room for it.
  * @cssstate controls - The item can be dismissed, so the time gives way to the dismiss control under a pointer.
  * @cssstate read - While it has been read.
+ * @cssstate time - While `at` is set, so the row shows a time.
  */
 @customElement('helix-headless-notification')
 export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
@@ -226,6 +227,9 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     /* The mirror the stylesheet selects on, kept off the host's attributes for
        the reason on `read` itself. */
     this.toggleState('read', this.read)
+    /* Whether there is a time to show, so a row with no time and no dismiss
+       takes no trailing column at all. */
+    this.toggleState('time', this.at !== '')
   }
 
   protected override updated(changed: PropertyValues): void {

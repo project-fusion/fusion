@@ -880,6 +880,19 @@ describe('a number at a bound', () => {
   })
 })
 
+describe('a number with a unit', () => {
+  /* The styled tier sets the number beside its unit, which it can only do
+     where it knows which end holds one. */
+  test('says which end holds something, as a state', async () => {
+    const host = (await mount(
+      '<helix-headless-number-input label="Weight"><span slot="end">kg</span></helix-headless-number-input>',
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    await new Promise((done) => setTimeout(done, 0))
+    expect(hasState(host, 'has-end')).toBe(true)
+    expect(hasState(host, 'has-start')).toBe(false)
+  })
+})
+
 /* React Aria names its steppers with the field's label after the verb, so a
    reader moving through the page hears which field a stepper changes. */
 describe('the steppers', () => {

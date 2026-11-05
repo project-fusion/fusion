@@ -23,11 +23,21 @@ const sheet = (tag: 'helix-table' | 'helix-table-row'): string => {
 const rule = (tag: 'helix-table' | 'helix-table-row', selector: string): string =>
   sheet(tag).split(`${selector} {`)[1]?.split('}')[0] ?? ''
 
+describe('the end of a table', () => {
+  /* As Data Table ends its rows, so a table in a Card does not draw a second
+     line a pixel above the Card's edge. */
+  test('draws no rule under its last row', () => {
+    expect(rule('helix-table-row', ':host(:last-of-type)')).toContain(
+      '--table-rule-color: transparent',
+    )
+  })
+})
+
 describe('a reorderable table', () => {
   test('draws the grip cell and its heading as the checkbox column is drawn', () => {
     const cell = rule('helix-table-row', '[part~="grip"]')
     expect(cell).toContain(
-      'border-block-end: var(--helix-border-thin) solid var(--helix-color-border)',
+      'border-block-end: var(--helix-border-thin) solid var(--table-rule-color, var(--helix-color-border))',
     )
     expect(cell).toContain('min-block-size: var(--helix-size-control)')
     expect(rule('helix-table', '[part="grip-head"]')).toContain(

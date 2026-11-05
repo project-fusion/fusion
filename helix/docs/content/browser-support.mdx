@@ -34,13 +34,6 @@ host through `ElementInternals`, pointing into their own shadow root. WebKit
 reads those references back as empty, so their specs for it fail there. We have
 not yet checked whether VoiceOver still reads the name.
 
-A field you give no width takes the width of the browser's own control inside
-it, and the two engines size that control differently. Measured on November 3,
-2026, an Input is 202 pixels wide in Chromium and 216 in WebKit, and Date Input,
-Combobox, and Number Input are each 14 pixels wider in WebKit too. A Textarea is
-212 in Chromium and 186 in WebKit. A field that fills a grid column, or has a
-width you set, is the same width in both.
-
 ## Browser features Helix uses
 
 | Feature | Where |

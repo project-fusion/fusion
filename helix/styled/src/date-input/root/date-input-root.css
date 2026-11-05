@@ -103,8 +103,17 @@ slot[name="trigger"]::slotted(*) {
   inline-size: var(--helix-size-icon-tight);
 }
 
-[part="trigger"]:hover {
+:host(:not([readonly])) [part="trigger"]:hover {
   color: var(--helix-color-foreground);
+}
+
+/* **Read-only, and the trigger says the panel does not open**, at the disabled
+   opacity, as Combobox's caret and Number Input's spent steppers are. The
+   field already drops its well; the glyph kept the full ink, offering a panel
+   a press does not open, and darkened under the pointer. */
+:host([readonly]) [part="trigger"] {
+  cursor: default;
+  opacity: var(--helix-opacity-disabled);
 }
 
 [part="trigger"]:focus-visible {

@@ -229,7 +229,8 @@ path[part~="bar"],
   --bar-chart-tone-muted: var(--helix-color-foreground-subtle);
   --bar-chart-tone-primary: var(--helix-color-primary);
   --bar-chart-tone-success: var(--helix-color-success);
-  --bar-chart-tone-warning: var(--helix-color-warning);
+  /* The mark warning, amber in light, since a bar is a shape. */
+  --bar-chart-tone-warning: var(--helix-color-warning-mark);
 }
 /*
  *  The groups the tooltip is not about, faded.

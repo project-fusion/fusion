@@ -88,6 +88,20 @@
   }
 }
 
+/* **On a touch screen the names give way until each mark is a target wide.**
+   At 390 the table is 342 and 36% of it left five marks 43.8 wide. The label
+   column takes what five 44px columns leave, up to its 36%, and no less than
+   6rem, below which the names break on every word. In container units, since a
+   table column whose width mixes a percentage with a length is laid out as
+   `auto`: written with `100%`, every column came out 57 wide. */
+@media (width < 40rem) and (pointer: coarse) {
+  .frame {
+    --label: clamp(6rem, 100cqi - var(--systems) * var(--helix-size-target), 36cqi);
+
+    container-type: inline-size;
+  }
+}
+
 /**
  * **Helix's column, one shape behind every row.** A wash of the brand color
  * that fades down the column, a hairline edge, and a glow outside it. It sits

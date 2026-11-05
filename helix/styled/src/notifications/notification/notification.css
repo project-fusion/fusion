@@ -346,6 +346,15 @@ slot[name="detail"]::slotted(*) {
   margin-inline-start: var(--helix-space-sm);
 }
 
+/* **Nothing to show, and no column for it.** A row with no `at` and no
+   dismiss drew an empty trailing box: beside the body it took a `sm` margin,
+   and in a narrow column, where it drops under the body, a line and a `2xs`
+   step of nothing. Measured at 300 pixels, a one-line row 61 pixels tall with
+   34 of them under its words. */
+:host(:not(:state(time), :state(controls))) [part="trailing"] {
+  display: none;
+}
+
 /* **The swap is a crossfade with a step in it, not a light being switched.** At
    `duration-fast` on opacity alone the time did not fade so much as vanish and
    the controls did not arrive so much as appear, which on a feed is a row that

@@ -157,6 +157,13 @@ helix-app-header {
  * dark plume reached the end of the lede's lines, and the lede measured 3.84:1
  * against the brightest pixel behind it at 1440. From 45% it measures 8.9:1, and
  * the light reaches full strength at 75%, behind the card.
+ *
+ * **In one column, the light is measured up from the bottom edge**, so it
+ * starts under the actions however the words above them wrap. From 40% of the
+ * panel's height, the bright plume passed behind "Open the form" at 390: in dark
+ * its label fell to 5.33:1 against the brightest pixel behind it, and its edge
+ * to 1.02:1, gone. The light now fades in from 14rem above the bottom, under the
+ * actions, and is at full strength from 7rem, behind the card.
  */
 .first-light {
   --aura-ground: var(--helix-color-background);
@@ -172,7 +179,7 @@ helix-app-header {
 
   block-size: auto;
   inset: 0;
-  mask-image: linear-gradient(to bottom, transparent 40%, black 80%);
+  mask-image: linear-gradient(to top, black 7rem, transparent 14rem);
   pointer-events: none;
   position: absolute;
   z-index: var(--helix-layer-beneath);
@@ -193,8 +200,9 @@ helix-app-header {
 }
 
 /* The first screen's heading takes more room around it than a route's, and
-   its lede a step more size. Both wrap to even lines: at 390 the heading broke
-   as "Helix design" over a lone "system". */
+   its lede a step more size. Both wrap to even lines where they wrap. Balance
+   cannot split three words evenly, so on a phone the heading takes a smaller
+   size, below. */
 .first-screen .hero {
   gap: var(--helix-space-md);
 }
@@ -392,6 +400,21 @@ helix-app-header {
 @media (width < 40rem) {
   .first-screen {
     padding: var(--helix-space-2xl) var(--helix-space-lg);
+  }
+
+  /* **The heading a step down, so it is one line at 390.** At the display
+     size, 42px, "Helix design system" is 370 pixels wide in a 316 pixel
+     column, and balance broke it as "Helix design" over a lone "system". At
+     `2xl`, 32px, it is 282 pixels wide. Narrower than that, it balances again. */
+  .first-screen .hero > [as="h1"] {
+    --text-font-size: var(--helix-text-2xl);
+  }
+
+  /* One step less between blocks, as the gutter gives: 64 pixels between the
+     first screen and the section under it was more than a phone screen's
+     blocks need, so the page reads 48. */
+  .stack {
+    gap: var(--helix-space-2xl);
   }
 
   .page {

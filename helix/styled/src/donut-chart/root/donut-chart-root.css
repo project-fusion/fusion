@@ -1,6 +1,10 @@
 /* The ring and its middle share one grid cell, so whatever is slotted sits in
    the hole without either knowing the other's size. */
 :host {
+  /* The empty ring is this chart's ground, so the rules the charts on axes
+     draw under their empty and loading lines stay out. */
+  --_chart-status-baseline: none;
+  --_chart-status-ground: none;
   display: grid;
   position: relative;
   /* Bigger than the other charts' 12em, because the hole has to hold something.

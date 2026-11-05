@@ -193,16 +193,16 @@ numbers, or names, so the readings stand on the page as a picture does:
 ></helix-spatial-surface-chart>
 ```
 
+The table, the summary, the tooltip, and the keys still carry every value, and
+three.js draws no box under `no-box` either. `Spatial Heatmap` has no box, and its `start` and
+`end` slots are the only names it draws, so leave them empty for the same
+picture.
+
 ## Give a chart a ground
 
 A spatial chart draws nothing behind its plot, as a flat chart does. Set
 `separation="filled"` on any of the six to draw a ground of
 `--helix-color-surface-filled`, the fill every `filled` surface takes.
-
-The table, the summary, the tooltip, and the keys still carry every value, and
-three.js draws no box either. `Spatial Heatmap` has no box, and its `start` and
-`end` slots are the only names it draws, so leave them empty for the same
-picture.
 
 ## When a 3D bar or ribbon chart fits
 
@@ -295,6 +295,9 @@ Each chart takes its colors from your theme, and these hooks change them:
   the page. On `Spatial Surface Chart` it is a wireframe.
 - `emphasis="subtle"` draws a faint wash under the same edge, which shows what
   stands behind a prism, a point, or a fold of the surface.
+- `emphasis="muted"` on `Spatial Bar Chart` draws every bar in the neutral
+  ink, so a bar whose cell names a tone is the one in color, and it glows in
+  that tone.
 - `material="glass"` lets the most of what is behind each mark through, and
   `material="frosted"` less.
 

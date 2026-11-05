@@ -26,7 +26,9 @@
   --heatmap-tone-muted: var(--helix-color-surface-sunken);
   --heatmap-tone-primary: var(--helix-color-primary);
   --heatmap-tone-success: var(--helix-color-success);
-  --heatmap-tone-warning: var(--helix-color-warning);
+  /* The mark warning, amber in light, since a cell is a shape: the ink one
+     solved for text read brown, #845500, beside Meter's and Rating's #b86d00. */
+  --heatmap-tone-warning: var(--helix-color-warning-mark);
 
   /*
  * **The numbered ones are a ramp, and a ramp is one hue getting louder.** A

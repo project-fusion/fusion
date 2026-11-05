@@ -26,7 +26,7 @@ import '../../tooltip/index.js'
  * @documentation https://fusion.dev/helix/components/spatial-bar-chart
  *
  * @cssproperty --spatial-bar-chart-bar-size - How wide each bar of a `row` or a `diagonal` stands on the page, whatever the number of bars: the row is as long as its bars make it, centered in the plot, and the tallest bar stands as high as the plot has room for, and no taller than the row is long and a quarter again, so one bar stands as a block. `fits` says how many bars the plot holds. Unset, the row fills the plot's width.
- * @cssproperty --spatial-bar-chart-block-size - How tall the plot is. By default, three quarters of its width and 22em at most.
+ * @cssproperty --spatial-bar-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  */
 @customElement('helix-spatial-bar-chart')
 export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {

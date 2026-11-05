@@ -52,9 +52,9 @@ nothing is lighter than white, so a raised surface is *darker* than the page.
   surrounds it on all sides, so its fill sets it apart. On a white page, that
   fill is one step darker.
 - **`surface-overlay`**: something *over* the page, such as a menu, a popover, a
-  dialog, a selected tab's pill, or the thumb of a switch or a segmented
-  control. Its edge, its shadow, and the content it covers set it apart, so on a
-  white page it is white.
+  dialog, or the thumb of a switch or a segmented control. Its edge, its
+  shadow, and the content it covers set it apart, so on a white page it is
+  white. In dark mode it is one rung above `surface-raised`.
 - **`surface-sunken`**: a recessed fill, such as a progress track, a keyboard
   key, or the groove of a segmented control.
 
@@ -63,13 +63,13 @@ the page, a card, or a raised surface. `--helix-color-well` fills a field, such
 as an input. `--helix-color-hover` lights a row under the pointer, such as an
 option or a menu item.
 
-**Use `raised` and `overlay` for different jobs.** They are the same color in
-dark mode, so one token can seem to do both jobs. In light mode they need
-opposite fills. A Code Block's header must be darker than a white page, and a
-thumb must be lighter than the groove it sits in. A selected tab's pill is white
-on a white page, set apart by its edge and `shadow-sm`. If a surface looks almost
-right in dark mode and wrong in light mode, it usually uses the wrong one of
-these two tokens.
+**Use `raised` and `overlay` for different jobs.** In dark mode they are one
+rung apart, #181818 and #1e1e1e, so either token can seem to do both jobs. In
+light mode they need opposite fills. A Code Block's header must be darker than
+a white page, and a thumb must be lighter than the groove it sits in. A menu is
+white on a white page, set apart by its edge and its shadow. If a surface looks
+almost right in dark mode and wrong in light mode, it usually uses the wrong one
+of these two tokens.
 
 ## Per-component hooks
 

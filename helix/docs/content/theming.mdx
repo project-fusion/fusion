@@ -93,8 +93,10 @@ measures 5.89:1 on white.
 A development build warns when primary text measures under 4.5:1 or a filled
 control under 3:1 against the page, in light or dark mode. A seed alone cannot
 cause this. An override of `--helix-color-primary`,
-`--helix-color-primary-surface`, or the page color can. Each warning prints
-once.
+`--helix-color-primary-surface`, or the page color can. It also warns when the
+primary color sits within 0.08 in OKLab of a status color, so a warning or a
+success reads as the brand. A yellow, green, or red seed can cause this. Each
+warning prints once.
 
 The build checks the page when the first element renders, and again when one of
 these changes:

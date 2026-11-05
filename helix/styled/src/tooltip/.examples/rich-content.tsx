@@ -14,8 +14,7 @@ export function Example() {
       >
         <span slot="content">
           Save
-          <helix-kbd>Cmd</helix-kbd>
-          <helix-kbd>S</helix-kbd>
+          <helix-kbd keys="mod+s" />
         </span>
       </helix-tooltip>
     </>

@@ -159,36 +159,40 @@ export const PROSE_COMPONENTS = {
   img: ({ alt, src }: { alt?: string; src?: string }) => (
     <helix-image alt={alt ?? ''} src={src ?? ''}></helix-image>
   ),
+  /* **A docs page's lists are lines of its text.** As List rows they stood 43
+     apart at 18px, a row's padding round a 27 line, and their host ran the
+     column's 743 beside paragraphs held to 612. The page sets them as it sets
+     a paragraph, in `docs/[slug]/page.module.css`. */
+  li: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
+  ol: ({ children }: { children?: ReactNode }) => <ol>{children}</ol>,
+  p: ({ children }: { children?: ReactNode }) => <helix-text as="p">{children}</helix-text>,
+  pre: CodeFence,
+  strong: ({ children }: { children?: ReactNode }) => (
+    <helix-text as="strong">{children}</helix-text>
+  ),
+  ul: ({ children }: { children?: ReactNode }) => <ul>{children}</ul>,
+}
+
+/**
+ * The same map, with lists as List rows and ordered lists set in a rail.
+ */
+export const DOCUMENT_COMPONENTS = {
+  ...PROSE_COMPONENTS,
   /* **The words in a span, so a page can size them.** The row sets its label at
      `text-sm` inside its shadow root, so a size on the host stops there and a bare
-     text node has nothing a page rule can reach. A docs page and a document set
-     the span at the paragraph's size. */
+     text node has nothing a page rule can reach. A document sets the span at the
+     paragraph's size. */
   li: ({ children }: { children?: ReactNode }) => (
     <helix-list-item>
       <span data-item-text>{children}</span>
     </helix-list-item>
   ),
   ol: ({ children }: { children?: ReactNode }) => (
-    <helix-list kind="ordered">{children}</helix-list>
-  ),
-  p: ({ children }: { children?: ReactNode }) => <helix-text as="p">{children}</helix-text>,
-  pre: CodeFence,
-  strong: ({ children }: { children?: ReactNode }) => (
-    <helix-text as="strong">{children}</helix-text>
-  ),
-  ul: ({ children }: { children?: ReactNode }) => (
-    <helix-list kind="unordered">{children}</helix-list>
-  ),
-}
-
-/**
- * The same map, with ordered lists set in a rail.
- */
-export const DOCUMENT_COMPONENTS = {
-  ...PROSE_COMPONENTS,
-  ol: ({ children }: { children?: ReactNode }) => (
     <helix-list kind="ordered" marker="rail">
       {children}
     </helix-list>
+  ),
+  ul: ({ children }: { children?: ReactNode }) => (
+    <helix-list kind="unordered">{children}</helix-list>
   ),
 }

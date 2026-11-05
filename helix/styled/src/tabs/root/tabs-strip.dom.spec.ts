@@ -45,7 +45,9 @@ describe('a strip of tabs', () => {
   test('subtle draws the mark as a tint, with no edge or shadow', () => {
     const css = sheet('helix-tabs')
     expect(css).toContain(':host([emphasis="subtle"]:not([marker])) [part="indicator"]')
-    expect(css).toContain('--_indicator-border: 0')
+    expect(css).toContain(
+      '--_indicator-color: var(--tabs-indicator-color, var(--helix-color-selected))',
+    )
     expect(css).toContain('--_indicator-shadow: none')
     expect(css).toContain(':host([dismiss-marks="hover"]) {--_tabs-dismiss-rest: 0}')
   })

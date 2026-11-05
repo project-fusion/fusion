@@ -13,6 +13,7 @@ import {
   numberConverter,
   parseNumber,
   restoreValue,
+  slotFilled,
   submitImplicitly,
   words,
   wordsLocale,
@@ -165,6 +166,8 @@ const REPEAT_EVERY = 60
  *
  * @cssstate at-max - The number is at `max`, so it cannot step up, as React Aria's NumberField says with `canIncrement`.
  * @cssstate at-min - The number is at `min`, so it cannot step down.
+ * @cssstate has-end - Something is slotted into `end`, such as a unit.
+ * @cssstate has-start - Something is slotted into `start`, such as a currency sign.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate scrubbing - The label is being dragged to change the value, under `scrub`, as Zag's scrubber says while it is held.
  */
@@ -1041,6 +1044,12 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* On the first render too, where an engine sends no `slotchange` for
+       what was slotted before the shadow root was drawn. */
+    if (!this.endsRead) {
+      this.endsRead = true
+      this.readEnds()
+    }
     this.releaseCaret?.()
     this.releaseCaret = undefined
     this.sync()
@@ -1098,6 +1107,17 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     >`
   }
 
+  /** Whether the ends have been read once since the first render. */
+  private endsRead = false
+
+  /** Says which ends hold something, one call apiece so each pairs with its `@cssstate`. */
+  private readonly readEnds = (): void => {
+    const filled = (name: string): boolean =>
+      slotFilled(this.renderRoot?.querySelector<HTMLSlotElement>(`slot[name="${name}"]`))
+    this.toggleState('has-start', filled('start'))
+    this.toggleState('has-end', filled('end'))
+  }
+
   protected override render(): TemplateResult {
     const parsed = this.numeric
     const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
@@ -1121,7 +1141,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         >
           ${this.renderDecrementIcon()}
         </button>
-        <slot name="start"></slot>
+        <slot name="start" @slotchange=${this.readEnds}></slot>
         ${
           /* `role="spinbutton"` with the range on it, which is what tells a
              screen reader this is a number in a range rather than a line of
@@ -1170,7 +1190,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
           @keypress=${this.handleKeypress}
           @wheel=${this.handleWheel}
         />
-        <slot name="end"></slot>
+        <slot name="end" @slotchange=${this.readEnds}></slot>
         <button
           part="increment"
           id="increment"

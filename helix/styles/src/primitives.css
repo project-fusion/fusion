@@ -192,8 +192,8 @@
 
      `neutral-900` is dark `surface` *and* light `surface-inverse` *and* the dark
      translucent material, so a light tooltip went to #121212 with the dark page
-     it was named after. `neutral-950` is the modal scrim in both modes, and
-     stayed.
+     it was named after. `neutral-950` is the modal scrim in light, and
+     stayed; the dark scrim is black.
 
      **What is left is one thing rather than a ramp.** `surface-overlay` in light
      is `neutral-0`, the page color exactly, so its separation is zero by all

@@ -53,13 +53,14 @@ export class HelixTooltip extends HelixHeadlessTooltip {
    *
    * **It flips the ink and adds an edge, which no other family carrying this axis
    * has to do.** A card is already the page's surface, so glass swaps one ground
-   * for another; this one starts inverse, and `--helix-material-translucent` is
-   * the page's ground, so taking it without the foreground would put light ink on
+   * for another; this one starts inverse, and `--helix-material-panel` is the
+   * page's ground, so taking it without the foreground would put light ink on
    * a light bubble. The border arrives with the material rather than being there
    * all along, because a glass bubble has to be told from what is behind it while
    * an inverse one is told from the page by being its opposite.
    *
-   * The strength is the theme's: `--helix-material-translucent` and
+   * The strength is the theme's: `--helix-material-panel` for `glass`,
+   * `--helix-material-translucent-strong` for `frosted`, and
    * `--helix-material-backdrop` are what the policy moves.
    *
    * **`emphasis` is not here and that is not an omission.** It says how much ink

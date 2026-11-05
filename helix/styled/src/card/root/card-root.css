@@ -91,23 +91,32 @@
    `surface-overlay`, the same rung: measured 1.00:1, one fill. A line inside
    measured 1.10 against the card and a default card inside it read as a hole.
    The rungs keep their values on the page, decided by the owner on October 31,
-   2026; inside, each sits the step above this card that Dialog's sit above its
-   panel: an overlay 1.19:1 off the card and a line 1.33. On the slots, since the
-   card's own fill reads `surface-raised`, and slotted content inherits from its
-   slot. Light keeps its own rungs, where a shadow sets an overlay apart, and
-   restates the line as the rule below does for an unset card. */
+   2026; inside, each sits a step of the ink above this card, as a Popover's
+   sit above its panel: 3% for a card, 9% for an elevated card, 12% for an
+   overlay, and a filled card's wash at 6%. That measures a filled card 1.17:1
+   off this one, an elevated card 1.22, an overlay 1.33, and a line 1.33. At
+   5% of the ink an elevated card inside read #212121, under the page's filled
+   wash at #2c2c2c. On the
+   slots, since the card's own fill reads `surface-raised`, and slotted content
+   inherits from its slot. Light keeps its own rungs, where a shadow sets an
+   overlay apart, and restates the line as the rule below does for an unset
+   card. */
 :host([separation="elevated"]) slot {
   --helix-color-surface-overlay: light-dark(
     var(--_card-overlay),
-    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_card-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_card-ground))
   );
   --helix-color-surface-raised: light-dark(
     var(--_card-raised),
-    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_card-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_card-ground))
   );
   --helix-color-surface: light-dark(
     var(--_card-surface),
     color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_card-ground))
+  );
+  --helix-color-surface-filled: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
   );
   --helix-color-border: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 7%, var(--_card-ground)),
@@ -316,8 +325,11 @@ slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
    component owns both and a consumer says what it wants rather than assembling
    it. */
 :host([material="glass"]) {
-  /* Full ink: muted ink over a busy page falls under 4.5:1 through glass. */
-  color: var(--card-color, var(--helix-color-foreground));
+  /* **The body keeps the muted ink an opaque card takes**, so `material`
+     changes the ground and not the hierarchy. Glass raises its own quiet ink to
+     4.5:1 over black and over white seen through it, in `_modes.css`. The body
+     was full ink, so a muted line in a glass card read quieter than the body
+     and in an opaque one it read the same. */
   backdrop-filter: var(--card-backdrop, var(--helix-material-backdrop));
   /* The coverage a Popover's glass takes. At 30% white a muted line in the card
      measured 1.24:1 over a photo, and glass meant two coverages depending on
@@ -326,11 +338,9 @@ slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
 }
 
 /* A heavier ground under a heavier blur, 88% under 32px, with no saturation.
-   Full ink, as glass takes and as a frosted Dialog, Drawer, and Popover keep:
-   the body was the muted ink, so the one frosted surface with quiet body text
-   was the card. */
+   The body keeps the muted ink, as under glass: frosted raises it 10% of the
+   way to the foreground, to 4.83:1 or more over black and white. */
 :host([material="frosted"]) {
-  color: var(--card-color, var(--helix-color-foreground));
   backdrop-filter: var(--card-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--card-background-color, var(--helix-material-translucent-strong));
 }

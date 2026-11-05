@@ -2,6 +2,17 @@ import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
+/** A stat, by what it offers a group: the step it needs and a way to set one. */
+interface Stepping {
+  showStep(step: number): void
+  stepNeeded: number
+}
+
+/** The child as a stat that steps its figure, or nothing. */
+function steps(child: Element): Stepping | undefined {
+  return 'stepNeeded' in child && 'showStep' in child ? (child as unknown as Stepping) : undefined
+}
+
 /**
  * @summary A row of related measurements.
  *
@@ -65,8 +76,39 @@ export class HelixHeadlessStatGroup extends HelixElement {
     hostAria(internalsOf(this), { label: this.label, role: named ? 'group' : '' })
   }
 
+  /**
+   * The step a stat's figure takes: its own outside columns, and in columns the
+   * largest any stat in the group needs, so a row of figures shares one size.
+   * The others are set at that step as it changes.
+   *
+   * **Only in columns**, where a stat is as wide as its column whatever its
+   * figure. Stats that flow take the width of their figures, so a stat set a
+   * step down shrank and then needed the step it was given, and the group never
+   * stepped back up.
+   */
+  stepFor(stat: Element): number {
+    const own = steps(stat)?.stepNeeded ?? 0
+    if (!this.hasAttribute('columns')) {
+      return own
+    }
+    const stats = [...this.children].filter((child) => child !== stat && steps(child))
+    const shared = Math.max(own, ...stats.map((one) => steps(one)?.stepNeeded ?? 0))
+    for (const one of stats) {
+      steps(one)?.showStep(shared)
+    }
+    return shared
+  }
+
+  /** Sets every stat at the step the group shares, once one comes or goes. */
+  private readonly share = (): void => {
+    const first = [...this.children].find((child) => steps(child) !== undefined)
+    if (first) {
+      steps(first)?.showStep(this.stepFor(first))
+    }
+  }
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot @slotchange=${this.share}></slot>`
   }
 }
 

@@ -43,6 +43,12 @@
   min-block-size: 100svh;
 }
 
+/* A module reached by its name in the address lands under the sticky bar,
+   as a docs heading does. */
+.module {
+  scroll-margin-block-start: calc(var(--helix-size-header) + var(--helix-space-lg));
+}
+
 /* The three modules, each with its picture over its name. */
 .modulePicture {
   inline-size: 100%;

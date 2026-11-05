@@ -42,12 +42,12 @@ ring still turns slowly.
 Use each curve for one kind of movement:
 
 - `standard` for most movement
-- `decelerate` for something arriving
+- `decelerate` for something arriving, such as a Dialog, a Drawer, or a Toast
 - `accelerate` for something leaving
 - `cycle` for a loop that repeats, such as a pulse or a loading sweep
-- `emphasized` for a surface entering the screen, such as a Dialog or a
-  Popover, and for a marker that travels to a new place, such as the indicator
-  under the selected tab
+- `emphasized` for a floating panel opening from its trigger, such as a
+  Popover or a Menu, and for a marker that travels to a new place, such as the
+  indicator under the selected tab
 - `spring` for the few places where overshoot looks responsive and does not
   look like a bug
 
@@ -65,10 +65,11 @@ inside any component.**
 ```
 
 The `*` selector does not cross a shadow boundary. The rule applies to your
-prose, your layout, and the base layer's own recipes. It does not apply to the
-ninety-odd components that draw inside a shadow root. A custom property does
-cross that boundary, so under the setting Helix takes its duration tokens down to
-almost nothing, and every transition written with them stops. A component with an
+prose, your layout, and the base layer's own recipes. It does not apply to any
+component that draws inside a shadow root, which is almost every Helix
+component. A custom property does cross that boundary, so under the setting
+Helix takes its duration tokens down to almost nothing, and every transition
+written with them stops. A component with an
 animation of its own handles `prefers-reduced-motion` in its stylesheet.
 
 The same applies to your own components. If you write a component with a shadow

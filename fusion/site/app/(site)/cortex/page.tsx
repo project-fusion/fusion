@@ -94,7 +94,7 @@ export default function Page() {
                 justify-content="center"
                 wrap
               >
-                <a data-button="solid" data-button-tone="primary" href="#trace">
+                <a data-button="solid" data-button-tone="primary" href="#trace-example">
                   See an example trace
                 </a>
                 <Link data-button="subtle" href="/company/thesis">
@@ -115,8 +115,16 @@ export default function Page() {
           </helix-flex>
 
           <div className={`${band.bandRow} ${styles.stagger}`}>
+            {/* Each cell is the module's place on the site, which the site
+                menu's Engram, Trace, and Recall rows link to by its name. */}
             {CORTEX_MODULES.map((module) => (
-              <helix-flex class={band.bandCell} direction="column" gap="md" key={module.title}>
+              <helix-flex
+                class={`${band.bandCell} ${styles.module}`}
+                direction="column"
+                gap="md"
+                id={module.title.toLowerCase()}
+                key={module.title}
+              >
                 <div className={styles.modulePicture}>
                   <Picture camera="isometric" name={module.picture} />
                 </div>
@@ -138,7 +146,7 @@ export default function Page() {
         {/* **What Trace records, drawn with Helix**: an example of the graph
             Trace keeps, in its own terms, and its deletion run on it. Said to
             be an example, since Trace is still being built. */}
-        <Band cardId="trace-card" id="trace">
+        <Band cardId="trace-card" id="trace-example">
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Trace</Eyebrow>
             <SectionTitle>Every answer, traced to its inputs</SectionTitle>

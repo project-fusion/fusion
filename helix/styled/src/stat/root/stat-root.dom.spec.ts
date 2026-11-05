@@ -30,13 +30,14 @@ const figure = `<helix-stat>
 </helix-stat>`
 
 describe('stat', () => {
-  test('the pair is a grid: the label across the top, the unit on the number’s baseline', async () => {
+  test('the pair is a grid: the label across the top, the unit on the number’s last baseline', async () => {
     // Measured at 14px: without both saying so, the unit's bottom sat 32.5px
-    // above the number's.
+    // above the number's. On the last line's baseline, so a unit follows a
+    // figure that wraps to the line it ends on.
     const stat = await mount(figure)
     expect(slotted(stat, 'unit')).toHaveLength(1)
     expect(rule('helix-stat', ':host')).toContain('display: grid')
-    expect(rule('helix-stat', ':host')).toContain('align-items: baseline')
+    expect(rule('helix-stat', ':host')).toContain('align-items: last baseline')
     expect(rule('helix-stat', 'slot[name="label"]::slotted(*)')).toContain('grid-column: 1 / -1')
   })
 

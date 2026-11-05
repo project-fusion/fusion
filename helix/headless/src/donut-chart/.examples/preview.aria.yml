@@ -18,5 +18,11 @@
       - rowheader "Social"
       - cell "900"
 - application "Sessions by source":
+  - text: Sessions 10,000
   - status
 - paragraph: "Sessions by source: Direct 42%, Search 31%, Referral 18%, Social 9%."
+- list "Sessions by source":
+  - listitem: Direct
+  - listitem: Search
+  - listitem: Referral
+  - listitem: Social

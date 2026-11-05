@@ -47,8 +47,12 @@ export function MapsTerrain() {
         return
       }
       const language = document.documentElement.lang || 'en'
+      /* **A flat map at every zoom.** MapLibre 6.16 draws raised terrain's
+         fog only on a flat projection, and with the globe on it printed
+         "calculateFogMatrix is not supported on globe projection" on every
+         load of this page. A valley at zoom 11 has no use for a globe. */
       const style = (from: typeof colors) =>
-        mapLibreStyle(from, { font: mapFontFrom(host), language }) as never
+        mapLibreStyle(from, { font: mapFontFrom(host), globe: false, language }) as never
       const map = new maplibregl.Map({
         ...VALLEY,
         attributionControl: false,

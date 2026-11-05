@@ -70,6 +70,27 @@ describe('select', () => {
     expect(trigger(host).getAttribute('aria-expanded')).toBe('true')
   })
 
+  /* `readonly` was not a Select property at all: the attribute did nothing,
+     the list opened and the keys on the trigger changed the answer. */
+  test('a read-only select keeps its answer, submits it, and does not open', async () => {
+    const host = (await select('readonly value="one"')) as Updatable & {
+      open: boolean
+      readOnly: boolean
+      value: string
+    }
+    expect(host.readOnly).toBe(true)
+    trigger(host).click()
+    await settle(host)
+    expect(host.open).toBe(false)
+    for (const key of ['ArrowRight', 'b', 'ArrowDown']) {
+      trigger(host).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key }))
+      await settle(host)
+    }
+    expect(host.open).toBe(false)
+    expect(host.value).toBe('one')
+    expect(formValue(host)).toBe('one')
+  })
+
   test('the answer is the select own, and is what the form submits', async () => {
     // The listbox is the thing being operated, not a second place the answer
     // lives.

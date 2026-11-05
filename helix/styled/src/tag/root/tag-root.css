@@ -161,10 +161,15 @@ slot:not([name])::slotted(helix-icon) {
   --_tag-on: var(--helix-color-foreground-on-status);
 }
 
+/* **A solid warning tag is amber under a black label.** The status fill is
+   the 600, #845500 in light, which carries white at 6.40:1 and reads brown,
+   and no amber dark enough for a white label reads amber. The warning mark is
+   #b86d00 in light, which takes black at 5.23:1, and the 400 in dark, which
+   takes it at 11.4. Black is the page's ink in light and the page in dark. */
 :host([tone="warning"]) {
   --_tag-color: var(--helix-color-warning);
-  --_tag-solid: var(--helix-color-warning-surface);
-  --_tag-on: var(--helix-color-foreground-on-status);
+  --_tag-solid: var(--helix-color-warning-mark);
+  --_tag-on: light-dark(var(--helix-color-foreground), var(--helix-color-background));
 }
 
 :host([tone="danger"]) {
@@ -205,12 +210,13 @@ slot:not([name])::slotted(helix-icon) {
 }
 
 [part="dismiss"] svg {
-  /* **A step under the tag's own icon**, 10, 12 and 14 on tags of 24, 28 and
+  /* **A step under the tag's own icon**, 12, 12 and 14 on tags of 24, 28 and
      32, so the cross follows the tag as its icon does and keeps an even size,
      its center on a whole pixel. Three quarters of the tight icon step rounded
      to 10, 12 and 16, a jump of four at `lg` where the icon beside it moved
-     two. */
-  --_tag-dismiss-size: calc(round(calc(var(--_tag-height) / 2), 2px) - 2px);
+     two. **Never under the tag's own text**, 12: the step under the icon was
+     10 on a small tag, the one control glyph in the library under 12. */
+  --_tag-dismiss-size: max(var(--_tag-text), calc(round(calc(var(--_tag-height) / 2), 2px) - 2px));
   block-size: var(--_tag-dismiss-size);
   inline-size: var(--_tag-dismiss-size);
 }

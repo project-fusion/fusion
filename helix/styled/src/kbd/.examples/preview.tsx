@@ -1,7 +1,7 @@
 export function Example() {
   return (
     <helix-text scale="body">
-      Press <helix-kbd>Cmd</helix-kbd> <helix-kbd>K</helix-kbd> to search.
+      Press <helix-kbd keys="mod+k" /> to search and <helix-kbd>Esc</helix-kbd> to close.
     </helix-text>
   )
 }

@@ -5,8 +5,12 @@
   align-content: start;
   /* The unit on the number's baseline, which takes both of them saying so.
      Measured at 14px: the unit's bottom sat 32.5px above the number's, and 5.5px
-     after this, which is the descender. */
-  align-items: baseline;
+     after this, which is the descender.
+
+     **The last line's baseline**, so the unit follows a figure that wraps to
+     the line it ends on. On the first line's it sat beside the start of the
+     figure, about 57 pixels from its last digit. */
+  align-items: last baseline;
   display: grid;
   gap: var(--stat-gap, var(--helix-space-2xs));
   grid-template-columns: auto 1fr;

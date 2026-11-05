@@ -1,6 +1,6 @@
 :host {
-  /* The default look, and where every marker starts from: a raised pill on the
-     selected tab and nothing at all behind the row. */
+  /* The default look, and where every marker starts from: the selected wash on
+     the selected tab and nothing at all behind the row. */
   --_tabs-rule: none;
   --_tab-radius: var(--helix-radii-sm);
   --_tab-selected-shadow: var(--helix-shadow-sm);
@@ -207,12 +207,6 @@ slot[name="scroll-end-icon"]::slotted(*) {
 [part="indicator"] {
   background-color: var(--_indicator-color, transparent);
   block-size: var(--_indicator-block, var(--helix-border-thick));
-  /* *An edge as well as a fill**, because on a light page a fill alone could not
-     tell the mark from a hover. `surface-raised` is 0.97 and the hover wash is
-     five per cent of the foreground over the strip, which composites to 0.966:
-     measured 0.004 apart in OKLCH lightness, so the only thing separating the
-     tab you are on from the tab under your pointer was a `shadow-sm`. */
-  border: var(--_indicator-border, 0) solid var(--_indicator-border-color, transparent);
   border-radius: var(--tabs-indicator-radius, var(--_indicator-radius, var(--helix-radii-none)));
   box-shadow: var(--tabs-indicator-shadow, var(--_indicator-shadow, none));
   inline-size: var(--indicator-inline-size, 0);
@@ -272,7 +266,16 @@ slot[name="scroll-end-icon"]::slotted(*) {
     --tabs-indicator-color,
     light-dark(var(--helix-color-surface-overlay), var(--helix-color-press))
   );
-  --_indicator-radius: calc(var(--helix-radii-sm) - var(--helix-border-thin));
+  /* **Toggle Group's thumb corner, by Toggle Group's derivation**: the track's
+     corner less its edge and padding, never squarer than 2 pixels or half the
+     track's corner. Less the edge alone, the thumb was 3 pixels in the same 4
+     pixel track at the same 5 pixel inset where Toggle Group's is 2. */
+  --_indicator-radius: max(
+    min(var(--helix-radii-sm) * 0.5, 2px),
+    var(--helix-radii-sm) -
+    var(--helix-border-thin) -
+    var(--helix-space-2xs)
+  );
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;
 }
@@ -281,32 +284,27 @@ slot[name="scroll-end-icon"]::slotted(*) {
   --_tab-selected-surface: transparent;
 }
 
-/* The default is a pill too, so it travels for the same reason. */
+/* **The default mark is the selected wash, as Navigation's and App Header's
+   current item is**, and it travels for the same reason. A raised pill with no
+   track was a white tab on a white strip behind a 1.2:1 edge, and the 8% wash
+   under the pointer read stronger than the selection; in dark the pill was
+   #1e1e1e beside a hovered #141414, 1.1:1. Decided by the owner on November 4,
+   2026. */
 :host(:not([marker])) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
-  /* *`overlay` with an edge, not `raised`.** This pill lies on the page with
-     nothing framing it, and `raised` put it a three per cent step off a white
-     strip: the same place the hover wash lands, so the selected tab and a
-     hovered one read as the same thing. */
-  --_indicator-border: var(--helix-border-thin);
-  --_indicator-border-color: var(--helix-color-border);
-  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-overlay));
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-selected));
   --_indicator-radius: var(--helix-radii-sm);
-  --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;
 }
 
 :host(:not([marker])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
-  /* **A hovered tab stays darker than the pill in dark.** The 12% hover wash
-     over black is #1f1f1f and the pill is `overlay`, #181818, so the tab under
-     the pointer read as the chosen one. 8%, the strength a dark menu row takes,
-     is #141414, under the pill. */
-  --_tab-hover-surface: light-dark(
-    var(--helix-color-hover),
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
-  );
+  /* **The pointer takes Navigation's 5% wash, under the selected wash in both
+     modes.** Over white the hover is #f2f2f2 and the selection #dedede, 1.20:1
+     apart; over black #0d0d0d and #292929, 1.34:1. At the row hover, 8% in light
+     and 12% in dark, the two stood 1.13 apart in both. */
+  --_tab-hover-surface: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
 }
 
 /* Vertical: the tabs in a column at the inline start, the panels beside them. */
@@ -375,16 +373,14 @@ slot[name="scroll-end-icon"]::slotted(*) {
   }
 }
 
-/* `subtle`: the mark as a tint, with no edge and no shadow. The same wash the
-   tab under the pointer takes, a step stronger, so the current tab still reads
-   as current beside one being hovered. */
+/* `subtle`: the mark as a tint, with no edge and no shadow. **The selected
+   wash, a step past the wash under the pointer**, so the current tab still
+   reads as current beside one being hovered. The 8% tint it was stood level
+   with the light hover and under the dark one, 12%, in the segmented track.
+   The unset marker is this wash already, so `subtle` leaves it as it is. */
 :host([emphasis="subtle"]:not([marker])) [part="indicator"],
 :host([emphasis="subtle"][marker="segmented"]) [part="indicator"] {
-  --_indicator-border: 0;
-  --_indicator-color: var(
-    --tabs-indicator-color,
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
-  );
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-selected));
   --_indicator-shadow: none;
 }
 

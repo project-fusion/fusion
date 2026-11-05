@@ -52,9 +52,12 @@ describe('the preview example', () => {
     const words = probe()
     document.querySelector('p')?.prepend(words)
     for (const key of document.querySelectorAll<HTMLElement>('helix-headless-kbd')) {
+      /* Into the face itself, beside the label. A key written as `keys` draws
+         its own label and has no slot, so a probe appended to the host had no
+         box there. */
       const label = probe()
-      key.append(label)
       const face = part(key, 'kbd') as HTMLElement
+      face.append(label)
       const box = face.getBoundingClientRect()
       const inside = box.top + 1 + (box.height - 3) / 2
       expect(Math.abs(inside - middle(words))).toBeLessThan(0.1)

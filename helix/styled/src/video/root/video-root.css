@@ -265,12 +265,13 @@ slot[name$="-icon"]::slotted(*) {
  *    not an exception to it.
  *
  * `surface-raised` is the tempting token for a bar with a ground of its own and
- * it is invisible here. Measured against the bar it sits in: `surface` is
- * `oklch(0.21)` and `surface-raised` is `oklch(0.29)`, a step sized for a card
- * standing off a page and lost across four pixels, so the empty half of the
- * track is not there and the blue reads as a line stopping at the thumb rather
- * than as a level filling a channel. The ink at 28% lands near `oklch(0.43)`
- * over that same bar, which is a rail a reader can see the whole of.
+ * it is invisible here. Measured against the bar it sits in, in dark: `surface`
+ * is #0c0c0c, `oklch(0.154)`, and `surface-raised` is #181818, `oklch(0.21)`, a
+ * step sized for a card standing off a page and lost across four pixels, so the
+ * empty half of the track is not there and the blue reads as a line stopping at
+ * the thumb rather than as a level filling a channel. The ink at 28% lands near
+ * `oklch(0.39)` over that same bar, which is a rail a reader can see the whole
+ * of.
  */
 [part="scrubber"] {
   background-color: color-mix(in oklab, currentColor 28%, transparent);

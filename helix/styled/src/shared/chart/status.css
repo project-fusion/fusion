@@ -21,6 +21,28 @@
   text-align: center;
 }
 
+/* **A quiet ground under the empty and loading lines**, so the plot reads as a
+   chart with nothing in it yet: three rules a third apart and a baseline, in
+   the gridlines' color, so no rule runs through the words in the middle. The words alone stood in about 200 pixels of blank
+   plot, with no axis or ground to say a chart was there. Donut Chart draws
+   its empty ring instead and sets the ground to none. */
+[part="empty"],
+[part="loading"] {
+  background-image: var(
+    --_chart-status-ground,
+    linear-gradient(
+      var(--helix-color-border) var(--helix-border-thin),
+      transparent var(--helix-border-thin)
+    )
+  );
+  background-repeat: repeat-y;
+  background-size: 100% calc(100% / 3);
+  border-block-end: var(
+    --_chart-status-baseline,
+    var(--helix-border-thin) solid var(--helix-color-border)
+  );
+}
+
 /* **The error line wraps**, so a button in the `error` slot goes under the
    words in a narrow plot. As a grid of one row it stood beside them, and a
    224 pixel donut pushed the mark out past its ring. */

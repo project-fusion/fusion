@@ -35,10 +35,21 @@
   border-block-end: var(--helix-border-thin) solid
     var(--notifications-rule, var(--helix-color-border));
   display: flex;
+  /* **The action goes under the title once the title's longest word and the
+     action no longer fit on one line.** Until then the title wraps beside it,
+     as below. A title of one long word in a narrow column held its line and
+     the header scrolled: measured at a 280 pixel window, 13 pixels sideways. */
+  flex-wrap: wrap;
   gap: var(--helix-space-sm);
   justify-content: space-between;
   padding-block: var(--helix-space-sm);
   padding-inline: var(--notifications-padding-inline, var(--helix-space-lg));
+}
+
+/* Measured at its longest word for the wrap above, and given the rest of the
+   line after it, so a long title still takes a second line beside the action. */
+::slotted([slot="header"]) {
+  flex: 1 1 min-content;
 }
 
 /*

@@ -3,4 +3,4 @@
   - textbox "Search commands"
   - listbox "Commands": New file Open folder Save all
   - status
-  - text: Cmd K to open, Esc to close
+  - text: Ctrl+K to open, Esc to close

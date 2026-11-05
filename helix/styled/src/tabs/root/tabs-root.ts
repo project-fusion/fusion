@@ -15,14 +15,14 @@ import { styles } from './tabs-root.css.js'
  *
  * The mark depends on `marker`:
  *
- * - Unset, it is a raised pill on the selected tab, with nothing behind the
- *   row.
+ * - Unset, it is the selected wash on the selected tab, with nothing behind
+ *   the row, as `Navigation` marks its current destination.
  * - `underlined` makes it a bar along the bottom of the strip, on a rule.
  * - `segmented` makes it the size of the tab's box, inside a sunken track.
  *
  * `emphasis="subtle"` makes the mark quieter, for tabs inside other chrome
- * such as a pane's header: a tint with no edge or shadow, the same wash a
- * subtle button takes.
+ * such as a pane's header: the `segmented` thumb becomes the selected wash,
+ * with no edge or shadow, and the `underlined` bar takes the foreground's ink.
  *
  * **Tabs with no panels are a strip.** Where what each tab stands for lives
  * outside the set, such as a pane's pages or shells, leave the panels out: the
@@ -53,9 +53,9 @@ import { styles } from './tabs-root.css.js'
  * @csspart tabs - The tab list.
  *
  * @cssproperty --tabs-gap - The space between tabs.
- * @cssproperty --tabs-indicator-color - The fill of the mark on the current tab: the bar under `underlined`, and the pill otherwise.
+ * @cssproperty --tabs-indicator-color - The fill of the mark on the current tab: the bar under `underlined`, the thumb under `segmented`, and the wash otherwise.
  * @cssproperty --tabs-indicator-radius - The corners of the mark.
- * @cssproperty --tabs-indicator-shadow - The shadow under the mark, which the pill and `segmented` draw.
+ * @cssproperty --tabs-indicator-shadow - The shadow under the mark, which `segmented` draws.
  * @cssproperty --tabs-indicator-thickness - The height of the bar under `underlined`.
  * @cssproperty --tabs-rule-color - The color of the rule under the row in `underlined`.
  * @cssproperty --tabs-scroll-background-color - The fill behind the scroll buttons, over the tabs that pass under them.
@@ -80,10 +80,11 @@ export class HelixTabs extends HelixHeadlessTabs {
    * How loud the mark on the current tab is.
    *
    * Unset is the mark `marker` draws at rest. `subtle` is a tint with no
-   * edge or shadow: the raised pill becomes a wash, the `segmented` track's
-   * pill does the same inside it, and the `underlined` bar takes the
-   * foreground's ink in place of the primary color. For tabs inside other
-   * chrome, where a raised mark reads as a control laid on top of it.
+   * edge or shadow: the `segmented` track's raised thumb becomes the selected
+   * wash, and the `underlined` bar takes the foreground's ink in place of the
+   * primary color. The unset marker is the selected wash already and stays
+   * as it is. For tabs inside other chrome, where a raised mark reads as a
+   * control laid on top of it.
    *
    * Independent of `marker`, since each of its marks has a quiet form: the two
    * answer different questions, which is the test the axis registry applies.

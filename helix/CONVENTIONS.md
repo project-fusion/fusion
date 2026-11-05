@@ -2499,9 +2499,11 @@ existed and the default simply asked for one slot more than a 272 pixel row
 holds.
 
 **280 is the narrowest supported column, decided by the owner on November 2, 2026.**
-Every example of every family fits at 280 with no sideways scroll, measured that
-day. Below it nothing is promised, so a report from a narrower column is not a
-defect.
+The 280 is pixels of content: a 320 phone less its two 20 pixel gutters, as the
+owner stated on November 4, 2026. A 280 pixel viewport is narrower than the
+floor, because the page's own gutters come out of it. Every example of every
+family fits in a 280 column with no sideways scroll, measured that day. Below
+it nothing is promised, so a report from a narrower column is not a defect.
 
 **The faults that sweep found were the site's, not the library's**, which is the
 result worth keeping. Category one was unbuilt on that date, three families
