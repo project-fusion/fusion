@@ -77,11 +77,13 @@ export default styles(
       },
       [web([rule({ paddingInlineEnd: sum(token('size-icon-loose'), token('space-2xs')) })])],
     ),
+    /* The color goes on the slot, where what is passed in inherits it: written on
+       `::slotted`, it beat a slotted component's own `:host` color. */
+    on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
     /* What sits at either end keeps its size at the first line. */
     on({ region: ['start', 'end'], slotted: '*' }, [
       rule({
         alignSelf: 'flex-start',
-        color: token('color-foreground-muted'),
         flex: '0 0 auto',
       }),
     ]),
