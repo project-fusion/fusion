@@ -1108,7 +1108,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
         @keydown=${this.handleTriggerKeydown}
       >
         <slot name="start"></slot>
-        <span part="value" id="value" ?data-placeholder=${this.chosen.length === 0}>${this.renderValue()}</span>
+        <span part="value" id="value" dir="auto" ?data-placeholder=${this.chosen.length === 0}>${this.renderValue()}</span>
         <slot name="end"></slot>
         ${this.renderIndicator()}
       </button>

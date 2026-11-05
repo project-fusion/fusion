@@ -2,31 +2,53 @@
   display: block;
 }
 
+/* **A grid of one row, packed in the middle, with each item at the row's
+   top**, so the chevron stays on the summary's first line as Checkbox's box
+   does. Centered in a flex row it sat on the middle of the block: on a three
+   line summary, 21.5 pixels under the first line. The one row is as tall as
+   the summary, so a one-line heading still sits in the middle of the control
+   height. The summary's column takes the room and the chevron's is its own
+   width, in the order the template writes them. */
 [part="trigger"] {
   all: unset;
   position: relative;
   /* `all: unset` takes `box-sizing` with it, back to `content-box`, and the
      `border-box` every shadow root is given comes from a rule this one outranks. */
   box-sizing: border-box;
-  align-items: center;
+  align-content: center;
+  align-items: start;
   color: var(--accordion-item-color, var(--helix-color-foreground));
   cursor: pointer;
-  display: flex;
+  display: grid;
   font-size: var(--accordion-item-font-size, var(--helix-text-md));
   font-weight: var(--accordion-item-font-weight, var(--helix-weight-medium));
+  grid-auto-flow: column;
+  grid-template-columns: minmax(0, 1fr) auto;
   inline-size: 100%;
-  /* No `space-between`. */
-  gap: var(--helix-space-xs);
+  column-gap: var(--helix-space-xs);
   /* The current step, not the fixed `md` one. */
   min-block-size: var(--helix-size-control);
   /* The inline inset steps with density, as a List row's: 4 past a field's at
-     every stop, 12, 16 and 20. */
+     every stop, 12, 16 and 20. The block inset is a whole pixel: the 21 pixel
+     line in a 32 pixel row left 5.5 at `sm`. */
   padding: var(
     --accordion-item-padding,
-    min(calc(var(--helix-space-control) * 0.5), calc((var(--helix-size-control) - 1lh) / 2))
+    round(
+        down,
+        min(calc(var(--helix-space-control) * 0.5), calc((var(--helix-size-control) - 1lh) / 2)),
+        1px
+      )
       calc(var(--helix-space-field) + var(--helix-space-2xs))
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([chevron-placement="start"]) [part="trigger"] {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+:host([chevron-placement="none"]) [part="trigger"] {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Rotation rather than a swapped glyph: opening is a short movement, not a
@@ -40,6 +62,9 @@
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
+  /* Centered on the first line, from the top of the row it shares with the
+     summary. */
+  margin-block-start: round(down, calc((1lh - var(--helix-size-icon-tight)) / 2), 1px);
   transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
@@ -49,6 +74,7 @@
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
+  margin-block-start: round(down, calc((1lh - var(--helix-size-icon-tight)) / 2), 1px);
   transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 

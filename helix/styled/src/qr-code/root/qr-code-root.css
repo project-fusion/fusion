@@ -8,6 +8,11 @@
   border-radius: var(--qr-code-radius, var(--helix-radii-sm));
   color: var(--qr-code-color, var(--helix-color-surface-media));
   display: block;
+  /* **Never squeezed along one side by a row it sits in.** As a flex item it
+     shrank like any other, and the square became 98 by 192 at 390 and 77 by
+     192 in a 280 column (November 4, 2026), a shape no scanner reads. The
+     words beside it wrap instead. */
+  flex-shrink: 0;
   inline-size: var(--_qr-size);
   position: relative;
 }

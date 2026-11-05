@@ -18,7 +18,16 @@
   --_announcement-tint: var(--announcement-tone-color, var(--_announcement-color));
 
   align-items: center;
-  background-color: var(--announcement-background-color, var(--helix-color-surface-sunken));
+  /* **The well in light, and in dark the quiet gray a step past the filled
+     wash**, so a resting band and a filled one keep one order in both modes.
+     The sunken rung measured 1.19:1 off the white page and 1.12 off the black
+     one, where the filled wash measures 1.12 and 1.16: the resting band was the
+     louder of the two in light and the quieter in dark. `neutral-subtle`
+     measures 1.22 on the black page. */
+  background-color: var(
+    --announcement-background-color,
+    light-dark(var(--helix-color-surface-sunken), var(--helix-color-neutral-subtle))
+  );
   /* **No line, until `separation="outlined"` asks for one.** The band's own
      fill already parts it from the page, and a hairline under every band was
      a second statement of the same edge. */

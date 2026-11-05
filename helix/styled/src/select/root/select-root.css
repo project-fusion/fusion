@@ -45,9 +45,17 @@
   outline-offset: 0;
 }
 
+/* **And a list that could not load says so while the panel is shut.**
+   `error-text` was drawn in the panel only, so a closed Select whose options
+   failed looked exactly like one that worked until a reader opened it. The
+   words stay in the panel, which is where the way to try again is; the closed
+   control takes the danger edge a wrong answer takes. */
 :host(:state(invalid)) [part="trigger"],
 :host(:state(invalid)) [part="trigger"]:hover,
-:host(:state(invalid)) [part="trigger"]:focus-visible {
+:host(:state(invalid)) [part="trigger"]:focus-visible,
+:host(:state(error)) [part="trigger"],
+:host(:state(error)) [part="trigger"]:hover,
+:host(:state(error)) [part="trigger"]:focus-visible {
   border-color: var(--helix-color-danger);
   outline-color: var(--helix-color-danger);
 }
@@ -107,6 +115,13 @@
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* **Aligned to the page's start.** The part takes its own direction from
+     its first letter, `dir="auto"` in the template, so a Latin answer in a
+     right-to-left page keeps its start and ends in the ellipsis: the page's
+     direction cut its first letters away. `unicode-bidi: plaintext` did the
+     same in Chromium and put the ellipsis over the first letter in WebKit,
+     which places it by the box's direction. */
+  text-align: match-parent;
   white-space: nowrap;
 }
 

@@ -102,17 +102,19 @@
      seed the subtraction comes to less than nothing, and a square thumb in a 4
      pixel track read as a different shape from the track. The floor is 2
      there, a square theme still draws a square thumb, and at a seed of 16 the
-     subtraction gives 3, past the floor. Two pixels, which the radii scale
-     cannot say: its first rung after none is the track's own. */
-  --_toggle-radius-floor: 2px;
+     subtraction gives 3, past the floor. **That corner is `radii-inset`**, the
+     one Tabs and Navigation take for their thumbs, and a track the page rounds
+     through `--toggle-group-radius` derives its own the same way, in the
+     private below, which is nothing while the hook is unset. */
+  --_toggle-radius-hooked: max(
+    min(var(--toggle-group-radius) * 0.5, 2px),
+    var(--toggle-group-radius) -
+    var(--helix-border-thin) -
+    var(--helix-space-2xs)
+  );
   --_toggle-radius: var(
     --toggle-group-item-radius,
-    max(
-      min(var(--toggle-group-radius, var(--helix-radii-sm)) * 0.5, var(--_toggle-radius-floor)),
-      var(--toggle-group-radius, var(--helix-radii-sm)) -
-      var(--helix-border-thin) -
-      var(--helix-space-2xs)
-    )
+    var(--_toggle-radius-hooked, var(--helix-radii-inset))
   );
   /* The border joins the padding in what the row has to give back. */
   --_toggle-height: calc(

@@ -40,6 +40,8 @@
  */
 [part="table"] {
   --_data-table-fade: to right;
+  /* Past a cell's end inset, as Table's is, so the fade falls on words. */
+  --_data-table-fade-size: calc(var(--helix-space-xl) + var(--helix-space-md));
   mask-image: linear-gradient(
     var(--_data-table-fade),
     transparent,
@@ -65,19 +67,19 @@
 
 @keyframes data-table-edges {
   0% {
-    --_data-table-fade-end: var(--helix-space-xl);
+    --_data-table-fade-end: var(--_data-table-fade-size);
     --_data-table-fade-start: 0rem;
   }
 
   5%,
   95% {
-    --_data-table-fade-end: var(--helix-space-xl);
-    --_data-table-fade-start: var(--helix-space-xl);
+    --_data-table-fade-end: var(--_data-table-fade-size);
+    --_data-table-fade-start: var(--_data-table-fade-size);
   }
 
   100% {
     --_data-table-fade-end: 0rem;
-    --_data-table-fade-start: var(--helix-space-xl);
+    --_data-table-fade-start: var(--_data-table-fade-size);
   }
 }
 
@@ -250,6 +252,20 @@
 
 /* The grip heading holds nothing, and takes a grip's width anyway, so the
    column is as wide before the rows draw their grips as after. */
+/* **The checkbox cells take no block padding and sit flush at the start, as
+   Table's do.** A checkbox is shorter than the row at every density, so the
+   padding only ever added to it: 24 and two 12s and the rule made a selectable
+   row 49 at `lg` against 48, and on a touch screen the 44 pixel target made
+   every row 61 (measured November 4, 2026). Centered in its column, the box
+   started 12 pixels in where Table's starts at the edge with the words. */
+[part~="select"],
+[part="select-all"] {
+  justify-content: flex-start;
+  padding-block: var(--helix-space-none);
+  padding-inline-end: var(--data-table-padding-inline, var(--helix-space-md));
+  padding-inline-start: var(--data-table-padding-inline, var(--helix-space-none));
+}
+
 [part="grip-head"]::before {
   content: "";
   inline-size: 1em;
@@ -680,4 +696,13 @@ slot[name="error"]::slotted(*) {
   [part="footer"] {
     display: none;
   }
+}
+
+/* **The box sits in the middle of the row on a touch screen.** There the
+   checkbox's row grows to the 44 pixel target and keeps the box at its top,
+   where a label's first line would be. A table's checkbox has no visible label,
+   so the box rose 12.5 pixels above the row's center (measured November 4,
+   2026, at 390 in the templates' overview). */
+[part~="checkbox"]::part(field) {
+  align-items: center;
 }

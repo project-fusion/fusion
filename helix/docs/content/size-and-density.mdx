@@ -150,6 +150,10 @@ Where the primary pointer is coarse, such as on a phone, these sizes change:
   grows to the target.
 - A List row and a Tree row are 48px apart at every density, the pitch a List
   has at `lg`. Tree rows keep the List's pitch.
+- An Accordion's summary row is at least 44px tall, so it is 44px at `sm` and
+  `md` and keeps its 48px at `lg`.
+- A Table row does not grow to the target. It keeps its density's height, and
+  only its text takes the larger touch size.
 - A link in a Navigation bar is 44px tall.
 
 A control keeps the height of its density step.

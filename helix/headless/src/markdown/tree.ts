@@ -128,11 +128,16 @@ const aligned = (align: MarkdownAlign): Record<string, string> =>
 
 /**
  * Each column's share of a table's width, from its heading's length, between
- * 4 and 24 characters. Set once, from the rows that arrive first, so the
+ * 10 and 24 characters. Set once, from the rows that arrive first, so the
  * columns never move as the rest arrives.
+ *
+ * **Ten at the least, because a short heading says nothing about its cells.**
+ * From a floor of four, "Step" over "Backfill" and "Constraint" took 16% of a
+ * 336 pixel table at 390, a 50 pixel column, and both words broke inside
+ * themselves. At ten the column is 86 and both fit.
  */
 export const columnShares = (head: string[]): number[] => {
-  const weights = head.map((cell) => Math.min(24, Math.max(4, cell.length)))
+  const weights = head.map((cell) => Math.min(24, Math.max(10, cell.length)))
   const total = weights.reduce((sum, weight) => sum + weight, 0)
   return weights.map((weight) => Math.round((weight / total) * 10000) / 100)
 }

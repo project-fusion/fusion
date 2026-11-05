@@ -249,7 +249,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
         @click=${this.handleLinkClick}
         @keydown=${this.handleKeydown}
       >
-        <slot part="label"></slot>${this.renderDismiss()}
+        <slot part="label" dir="auto"></slot>${this.renderDismiss()}
       </a>`
     }
     return html`<button
@@ -263,7 +263,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
       @click=${() => this.select()}
       @keydown=${this.handleKeydown}
     >
-      <slot part="label"></slot>${this.renderDismiss()}
+      <slot part="label" dir="auto"></slot>${this.renderDismiss()}
     </button>`
   }
 }

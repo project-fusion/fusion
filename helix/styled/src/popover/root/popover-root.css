@@ -17,8 +17,10 @@
      nothing inside is rounder than the panel. See Dialog's note. A list opened
      from inside, such as a Select's, takes `surface-overlay`, which in dark was
      the panel's own fill: #181818 on #181818. The rungs step up from the panel
-     by 3%, 9%, and 12% of the ink, so an elevated card, #2f2f2f, reads above
-     a filled one, #2c2c2c, where at 5% of the ink it read #272727. */
+     by 3%, 9%, and 12% of the ink, so an elevated card, which takes the overlay
+     rung, #343434, reads above a filled one, #2b2b2b. See Dialog's note, which
+     also says why the Card's lift inside a card stops here. */
+  --_card-nest: initial;
   --helix-color-surface-overlay: light-dark(
     var(--_popover-ground),
     color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_popover-ground))
@@ -135,13 +137,19 @@
   transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
-/* It arrives instantly rather than not at all. */
+/* **Under reduced motion it fades and does not move.** It went from nothing
+   to whole in one frame, since the base layer takes `fast` to 0.01ms there;
+   `duration-fade` is left alone, so the panel fades over 120ms in place. */
 @media (prefers-reduced-motion: reduce) {
   [part="surface"],
+  [part="surface"]:popover-open,
   [part="surface"][data-placed] {
     scale: 1;
     transform: none;
-    transition: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
   }
 }
 
@@ -217,6 +225,16 @@
 :host([material="glass"]) [part~="arrow"] {
   backdrop-filter: var(--popover-backdrop, var(--helix-material-backdrop));
   background-color: var(--popover-background-color, var(--helix-material-panel));
+}
+
+/* Glass opened inside the popover steps off it in dark. See Dialog's note. On
+   the content alone, since the point is the panel's own glass. */
+[part="content"] {
+  --helix-material-panel: color-mix(
+    in oklab,
+    var(--helix-color-surface-overlay) min(100%, var(--helix-material-glass-opacity) * 100%),
+    transparent
+  );
 }
 
 :host([material="frosted"]) [part="surface"],

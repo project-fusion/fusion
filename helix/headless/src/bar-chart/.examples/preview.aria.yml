@@ -57,15 +57,15 @@
     - row "Q1 +$12k":
       - rowheader "Q1"
       - cell "+$12k"
-    - row "Q2 -$8k":
+    - row "Q2 −$8k":
       - rowheader "Q2"
-      - cell "-$8k"
+      - cell "−$8k"
     - row "Q3 +$5k":
       - rowheader "Q3"
       - cell "+$5k"
-    - row "Q4 -$14k":
+    - row "Q4 −$14k":
       - rowheader "Q4"
-      - cell "-$14k"
+      - cell "−$14k"
 - application "Net cash by quarter":
   - status
 - paragraph: "Net cash by quarter. Highest: Net Q1 +$12k."

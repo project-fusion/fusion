@@ -2,6 +2,9 @@
    control are `shared/field/field-frame`'s. What is here is what is particular
    to a combobox. */
 :host {
+  /* The field's gap, which the frame's sizing box takes back. */
+  --_field-gap: var(--helix-space-xs);
+
   position: relative;
 }
 
@@ -65,8 +68,27 @@
 }
 
 [part="tag"] {
+  /* **Concentric with the field, `radii-inset`**: the field's `sm` corner
+     less the border and the `2xs` between the two curves, as Toggle Group's
+     thumb takes it. The field's own corner at a 5 pixel inset drew 8 inside 8
+     at a seed of `1rem`, rounder than the curve around it; it is 3 there now,
+     and 2 at the default seed. */
+  --tag-radius: var(--helix-radii-inset);
   flex: 0 0 auto;
   max-inline-size: 100%;
+}
+
+/* **A list that could not load says so while the panel is shut**, as Select
+   draws it: the danger edge a wrong answer takes, with the words and the way
+   to try again in the panel. `error-text` was drawn in the panel only. Named
+   as the frame's invalid rule is, so a pointer or the focus ring does not put
+   the gray edge back. */
+:host(:state(error)) [part="field"],
+:host(:state(error)) [part="field"]:hover,
+:host(:state(error):focus-within) [part="field"],
+:host(:state(error):focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
 }
 
 /* The text field keeps a usable width once tags share the line with it, and

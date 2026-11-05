@@ -24,6 +24,10 @@
   --_steps-body-align: center;
   --_steps-row-gap: var(--helix-space-xs);
   --_steps-content: none;
+  /* How far the focus ring reaches back from the name to take in the mark:
+     over it in a row, beside it in a column. */
+  --_steps-ring-reach-block: calc(var(--_steps-mark-box) + var(--_steps-row-gap));
+  --_steps-ring-reach-inline: var(--helix-space-none);
 
   --_steps-lead-inline-start: calc(var(--steps-gap, var(--helix-space-md)) / -2);
   --_steps-lead-inline-size: calc(
@@ -112,6 +116,9 @@
   --_steps-body-align: start;
   --_steps-row-gap: var(--helix-space-2xs);
   --_steps-content: grid;
+  /* The step's own column gap is `2xs`, between the mark and the name. */
+  --_steps-ring-reach-block: var(--helix-space-none);
+  --_steps-ring-reach-inline: calc(var(--_steps-mark-box) + var(--helix-space-2xs));
 
   --_steps-lead-inline-start: calc(var(--_steps-mark-box) / 2);
   --_steps-lead-inline-size: var(--helix-border-thin);

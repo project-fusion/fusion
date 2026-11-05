@@ -210,14 +210,21 @@ const WORD_PASSES = 4
 /** The most the words grow, which holds them to a size where the box still shows. */
 const MOST_WORDS = 3
 
+/** The least the words shrink to, in a box drawn so large a tick would be a speck. */
+const FEWEST_WORDS = 0.25
+
 /**
- * The view whose ticks stand at the box's font size or larger on the page.
+ * The view whose ticks stand at the box's font size on the page.
  *
  * The drawing scales through its `viewBox`, so a tick written in the box's units
  * shrinks with the box: measured October 2026 at 390 wide, 7.4 pixels on Scatter
- * and Surface, under the 12 of the box's own font. The words widen the frame they
- * are measured on, so the measure runs again on what they widened. Where nothing
- * has measured the box, as on a server, the words stay at their written size.
+ * and Surface, under the 12 of the box's own font. **And it grows with the box**,
+ * so the words are held to the font size from above as well as from below:
+ * measured November 4, 2026 at 640 wide, Treemap's ticks drew at 15.4 and its
+ * axis name at 17.8, against 12 and 13.8 on Surface beside it. The words widen
+ * the frame they are measured on, so the measure runs again on what they
+ * widened. Where nothing has measured the box, as on a server, the words stay
+ * at their written size.
  */
 export const wordsFitted = (
   room: PlotRoom | undefined,
@@ -229,7 +236,7 @@ export const wordsFitted = (
   }
   for (let pass = 0; pass < WORD_PASSES; pass += 1) {
     const pixel = 1 / Math.min(room.width / view.bounds.width, room.height / view.bounds.height)
-    view = draw(Math.min(MOST_WORDS, Math.max(1, (room.font * pixel) / TICK_SIZE)))
+    view = draw(Math.min(MOST_WORDS, Math.max(FEWEST_WORDS, (room.font * pixel) / TICK_SIZE)))
   }
   return view
 }

@@ -55,27 +55,20 @@
  * readings measured 1.46:1 against the slab in light and 1.54:1 in dark, and
  * Spatial Heatmap's low prisms all but vanished into the plate.
  */
-  --heatmap-tone-1: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 35%,
-    var(--helix-color-surface-sunken)
+  /* **In dark the far end is held at a lightness of 0.87 or less**, the
+     neutral 200, as light holds it at the neutral 700 or more. The ink
+     theme's dark 200 is white, and the top step of a continuous field drew a
+     pure white glare beside steps of 212 and 170 (November 4, 2026). A brand's
+     dark 200 stands under the cap and is drawn as before. */
+  --_heatmap-far: light-dark(
+    var(--helix-color-primary-strong),
+    oklch(from var(--helix-color-primary-strong) min(l, 0.87) c h)
   );
-  --heatmap-tone-2: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 51%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-3: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 68%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-4: color-mix(
-    in oklab,
-    var(--helix-color-primary-strong) 84%,
-    var(--helix-color-surface-sunken)
-  );
-  --heatmap-tone-5: var(--helix-color-primary-strong);
+  --heatmap-tone-1: color-mix(in oklab, var(--_heatmap-far) 35%, var(--helix-color-surface-sunken));
+  --heatmap-tone-2: color-mix(in oklab, var(--_heatmap-far) 51%, var(--helix-color-surface-sunken));
+  --heatmap-tone-3: color-mix(in oklab, var(--_heatmap-far) 68%, var(--helix-color-surface-sunken));
+  --heatmap-tone-4: color-mix(in oklab, var(--_heatmap-far) 84%, var(--helix-color-surface-sunken));
+  --heatmap-tone-5: var(--_heatmap-far);
   /* **A grid of one column, so the footer is as wide as the strip and not as
      wide as the box.** The labels annotate the picture: "Jun" under the first
      week and "Aug" under the last is the whole of what they say, and a block
@@ -112,7 +105,13 @@
    dot: ninety of them read as beads on a string. Halved they read as cells, and
    the value still comes off the seed. */
 [part~="cell"] {
-  --_heatmap-paint: var(--heatmap-tone, var(--helix-color-surface-sunken));
+  /* **In dark a cell with no reading takes the overlay rung**, so it reads as a
+     cell on the black page: the sunken rung, #121212, measured 1.12:1 there
+     and the empty days all but vanished (November 4, 2026). */
+  --_heatmap-paint: var(
+    --heatmap-tone,
+    light-dark(var(--helix-color-surface-sunken), var(--helix-color-surface-overlay))
+  );
 
   background-color: color-mix(
     in oklab,

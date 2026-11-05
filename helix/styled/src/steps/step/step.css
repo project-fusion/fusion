@@ -219,6 +219,27 @@ slot[name="marker"]::slotted(*) {
   max-inline-size: 100%;
 }
 
+/* **The ring goes round the mark and the name together**, since the step is
+   what the name goes to and the mark is half of how a reader finds it. The
+   button's own ring went round the name alone and left the mark outside it.
+   Drawn on the button's free `::before`, reaching back over the mark by the
+   distance the list hands down: up in a row, where the mark sits over the
+   name, and back along the line in a column, where it sits beside it. */
+[part="label"]::part(button):focus-visible {
+  outline: none;
+}
+
+[part="label"]::part(button):focus-visible::before {
+  border-radius: var(--helix-radii-sm);
+  content: "";
+  inset-block: calc(var(--_steps-ring-reach-block, var(--helix-space-none)) * -1) 0;
+  inset-inline: calc(var(--_steps-ring-reach-inline, var(--helix-space-none)) * -1) 0;
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+  pointer-events: none;
+  position: absolute;
+}
+
 /* The stage the reader is in reads at full strength, and so does one they have
    been through; the ones ahead recede. */
 :host([complete]) [part="label"],

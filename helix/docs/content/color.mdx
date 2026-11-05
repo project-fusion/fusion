@@ -36,8 +36,10 @@ separation](./surfaces-and-separation).
 
 A field is filled with `well`: 5% of `foreground` laid over whatever the field
 sits on, so its color depends on the surface under the field. `surface-filled`
-is the same 5% wash, for a surface with `separation="filled"`, such as a filled
-Card or the ground of a spatial chart. A row under the
+is a wash of `foreground` too, for a surface with `separation="filled"`, such as
+a filled Card or the ground of a spatial chart: 5% in light and 8.5% in dark.
+Inside a Dialog, a Drawer, a Popover, an elevated Card, or a sunken region, the
+dark wash is 6%, so a filled Card there stays under an elevated one. A row under the
 pointer or the keyboard, such as an option, is lit with `hover` the same way:
 8% of `foreground` in light and 12% in dark.
 
@@ -71,7 +73,7 @@ Three more grounds sit outside the ladder:
 - `surface-media` and `foreground-media` are black and white in both modes. They
   are the well behind a video and the controls drawn over it.
 - `overlay` is the scrim behind a modal Dialog, a Drawer, or a Lightbox: a
-  near-black at 40% in light mode and 64% in dark.
+  near-black at 40% in light mode, and black at 64% in dark.
 
 ### Inks
 
@@ -81,8 +83,10 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
   placeholder, a hint, or a caption. The engine solves it to the contrast
   target.
 - `foreground-subtle` recedes further. It is for marks that are not text, such
-  as a separator, a chevron, or a grip. A disabled control fades whole, through
-  `--helix-opacity-disabled`.
+  as a separator, a chevron, or a grip. It is a fixed step of the gray ramp,
+  and the engine does not solve it, so its contrast is not guaranteed. Use
+  `foreground-muted` for text that is read. A disabled control fades whole,
+  through `--helix-opacity-disabled`.
 - Three opacities fade ink by a fixed amount:
   - `--helix-opacity-disabled` is 0.5, for a disabled control.
   - `--helix-opacity-busy` is 0.5, for rows that stay on screen while a new set
@@ -90,8 +94,6 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
   - `--helix-opacity-quiet` is 0.72, for quiet text on a ground the text does
     not know, where `foreground-muted` would be the page's gray. A chart
     tooltip's names on the inverse bubble and a message still sending take it.
-  It is a fixed step of the gray ramp, and the engine does not solve it, so its
-  contrast is not guaranteed. Use `foreground-muted` for text that is read.
 - Text on a filled color takes the ink named for that fill:
   - `foreground-on-primary` on `primary-surface`
   - `foreground-on-accent` on `accent-surface`
@@ -176,7 +178,8 @@ roles. Helix has fewer because code in documentation only needs to be read.
 tokens:
 
 - `--helix-scrollbar-thumb-color` is the thumb at rest. It is a mid gray that
-  measures at least 3:1 against the page and every surface, in both modes.
+  measures at least 3:1 against the page and every surface, in both modes. It
+  also clears 3:1 on the rungs inside a Dialog, a Drawer, or a Popover.
 - `--helix-scrollbar-thumb-hover-color` is the thumb while the pointer is over
   its scroller. It is `foreground-muted`, a step closer to the text than the
   thumb at rest: darker in light mode and lighter in dark mode.

@@ -934,6 +934,31 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.activeValue = option.value
   }
 
+  /**
+   * Puts the highlight where the reader arrives, as Tab brings them in.
+   *
+   * **The chosen option, or the first one a reader can reach**, which is
+   * where APG's listbox puts focus as it arrives and the option
+   * `aria-activedescendant` already named. The list took the ring and every
+   * option stayed transparent until an arrow key, so a reader could not see
+   * where the arrows would start. Only from the keyboard, since a press
+   * places the highlight on the option pressed, and only where nothing holds
+   * it yet: a highlight the reader left stays where they left it.
+   */
+  private readonly handleItemsFocus = (event: FocusEvent): void => {
+    const items = event.currentTarget as HTMLElement
+    if (this.activeValue !== '' || this.filterable || !items.matches(':focus-visible')) {
+      return
+    }
+    const shown = this.shown.filter((option) => !option.disabled)
+    const values = new Set(this.values)
+    const at = shown.find((option) => values.has(option.value)) ?? shown[0]
+    if (at) {
+      this.parked = false
+      this.activeValue = at.value
+    }
+  }
+
   /** Gives the highlight back to where the keyboard left it. */
   private readonly handlePointerLeave = (): void => {
     const before = this.beforePointer
@@ -1823,7 +1848,9 @@ export class HelixHeadlessListbox extends MixinVoice(
               <input
                 part="search-field"
                 type="text"
+                autocapitalize="off"
                 autocomplete="off"
+                autocorrect="off"
                 spellcheck="false"
                 .value=${this.filter}
                 placeholder=${this.filterLabel}
@@ -1848,6 +1875,7 @@ export class HelixHeadlessListbox extends MixinVoice(
         aria-multiselectable=${this.multiple ? 'true' : nothing}
         aria-required=${this.required ? 'true' : nothing}
         tabindex=${this.filterable ? nothing : this.isDisabled ? -1 : 0}
+        @focus=${this.handleItemsFocus}
         @scroll=${this.handleScroll}
       >
         ${

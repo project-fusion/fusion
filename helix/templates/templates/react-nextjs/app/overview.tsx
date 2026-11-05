@@ -37,7 +37,7 @@ export function Overview() {
 
       <section className="section">
         <helix-data-table
-          columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) minmax(4.25rem, 1fr) max-content"
+          columns="minmax(5.5rem, 1.6fr) minmax(4.75rem, 1fr) minmax(4.25rem, 1fr) max-content"
           default-sort="name:asc"
           label="Roster"
           page-size={6}

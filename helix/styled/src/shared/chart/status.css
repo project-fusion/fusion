@@ -25,8 +25,13 @@
    chart with nothing in it yet: three rules a third apart and a baseline, in
    the gridlines' color, so no rule runs through the words in the middle. The words alone stood in about 200 pixels of blank
    plot, with no axis or ground to say a chart was there. Donut Chart draws
-   its empty ring instead and sets the ground to none. */
+   its empty ring instead and sets the ground to none.
+
+   **The error line stands on the same ground.** It drew the words alone, so a
+   chart lost its rules when its readings failed and kept them while they were
+   loading or empty (November 4, 2026). */
 [part="empty"],
+[part="error"],
 [part="loading"] {
   background-image: var(
     --_chart-status-ground,

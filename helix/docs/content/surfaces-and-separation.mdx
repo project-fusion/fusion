@@ -80,11 +80,16 @@ a white page it is white.
 
 **In dark mode, a surface over a raised one steps up from it.** A shadow does
 not show on a black page, so `overlay` stands one rung above `raised`: #1e1e1e
-over #181818, 1.06:1. Inside a Dialog, a Drawer, or an elevated Card, the rungs are washes of
-`foreground` over the panel: `overlay` 8%, `raised` 5%, `surface` 3%, and
-`border` 12%. A Menu opened from an elevated Card stands a step above the card,
-and a Dialog opened over another Dialog stands 8% above it. Light mode keeps its
-rungs, where a shadow sets an overlay apart.
+over #181818, 1.07:1. An elevated Card fills the `overlay` rung in dark, so it
+reads above a filled card: #1e1e1e against #161616 on the page. Inside a Dialog,
+a Drawer, a Popover, or an elevated Card, the rungs are washes of `foreground`
+over the panel: `overlay` 12%, `raised` 9%, `surface` 3%, and `border` 12%.
+Inside a default Card, `overlay` is 12% and the filled wash 6%. An elevated
+Card inside any of these reads above a filled one. A Menu opened from an
+elevated Card stands a step above the card, and a Dialog opened over another
+Dialog stands 8% above it. Light mode keeps its rungs, where a shadow sets an
+overlay apart. An elevated Card inside another card fills the `overlay` rung in
+light too, white on the card's #fafafa.
 
 **A sunken region restates the border for what it holds.** On
 `surface-sunken`, the page's border measures 1.03:1 in light, so an outlined

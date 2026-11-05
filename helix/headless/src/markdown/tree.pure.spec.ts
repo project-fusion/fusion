@@ -32,7 +32,7 @@ describe('markdownToHtml', () => {
 
   test('draws a table with columns sized from its header and aligned by attribute', () => {
     expect(markdownToHtml('| Name | Description |\n| - | -: |\n| a | b |')).toBe(
-      '<div data-table=""><table data-columns="2"><colgroup><col width="26.67%"><col width="73.33%"></colgroup>' +
+      '<div data-table=""><table data-columns="2"><colgroup><col width="47.62%"><col width="52.38%"></colgroup>' +
         '<thead><tr><th>Name</th><th data-align="end">Description</th></tr></thead>' +
         '<tbody><tr><td>a</td><td data-align="end">b</td></tr></tbody></table></div>',
     )
@@ -64,8 +64,8 @@ describe('safeUrl', () => {
 })
 
 describe('columnShares', () => {
-  test('shares the width by heading length, between 4 and 24 characters', () => {
+  test('shares the width by heading length, between 10 and 24 characters', () => {
     expect(columnShares(['a', 'abcd'])).toEqual([50, 50])
-    expect(columnShares(['x'.repeat(40), 'abcd'])).toEqual([85.71, 14.29])
+    expect(columnShares(['x'.repeat(40), 'abcd'])).toEqual([70.59, 29.41])
   })
 })

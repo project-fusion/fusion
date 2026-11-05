@@ -571,11 +571,19 @@ path[part~="bar"],
    **70% of the series in dark, so the fill clears 3:1 on the page.** At 60%
    the eight dark series measured 2.30 to 3.36 on black and read as deep navy
    and brown slabs. At 70% they measure 3.10 to 4.57, and the edge still reads
-   2.2 to 2.5 against the fill (November 4, 2026). */
+   2.2 to 2.5 against the fill (November 4, 2026).
+
+   **The chroma stops at 0.14**, the most the series reach, so a tone as
+   colorful as the danger red stays inside the screen's colors at that
+   lightness. Uncapped, the dark negative bars of the outlined example asked
+   for more red than sRGB holds and were clipped to a saturated #b80003, louder
+   than the blue columns beside them, while light draws both quiet. Capped, the
+   red keeps its lightness, clears 3:1 on black, and sits at the series'
+   strength (November 4, 2026). */
 [part~="bar"] {
   --_bar-chart-shade: light-dark(
     color-mix(in oklab, var(--_bar-chart-series) 60%, var(--helix-color-background)),
-    color-mix(in oklch, var(--_bar-chart-series) 70%, oklch(from var(--_bar-chart-series) 0 c h))
+    oklch(from var(--_bar-chart-series) calc(l * 0.7) min(c, 0.14) h)
   );
 }
 

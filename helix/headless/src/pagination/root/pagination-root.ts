@@ -919,8 +919,11 @@ export class HelixHeadlessPagination extends HelixElement {
 
   protected override render(): TemplateResult {
     if (this.folded) {
+      /* **The status in the direction of its own words**, `dir="auto"`.
+         "20 of 40" in a right-to-left page with English words read
+         "of 40 20", the page's direction putting the first number last. */
       return html`${this.ends ? this.renderFirst() : nothing}${this.renderPrevious()}
-        <span part="status"
+        <span part="status" dir="auto"
           >${formatWords(this, 'statusLabel', { page: this.current, pages: this.count })}</span
         >
         ${this.renderNext()}${this.ends ? this.renderLast() : nothing}${this.renderLive()}`

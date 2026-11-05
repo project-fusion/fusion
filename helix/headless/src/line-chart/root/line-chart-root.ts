@@ -676,7 +676,14 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         }
         ${this.renderBand(this.readings)}
         ${this.renderGuide(x)}
-        ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
+        ${
+          /* **Every wash under every line**, the first series' wash on top.
+             Drawn a series at a time, a wash covered the lines drawn before
+             it, and under `emphasis="solid"` the second series' opaque wash
+             hid the first series' line and wash entirely (November 4, 2026). */
+          series.map((one, depth) => this.renderSeries(one, depth, x, y, 'area')).reverse()
+        }
+        ${series.map((one, depth) => this.renderSeries(one, depth, x, y, 'line'))}
         ${this.renderMarkers(series, x, y)}
       </svg>
       ${this.renderTermini(ends)}
@@ -889,7 +896,8 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   }
 
   /**
-   * One series, its wash first so the line is drawn over its own fill.
+   * One series' wash or its line. The chart draws every wash and then every
+   * line, so a line is drawn over its own fill and over every other series'.
    *
    * Each reading sits at its own row, and the line breaks where a row has no
    * reading: a line drawn across a blank claims a value nobody measured.
@@ -899,6 +907,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     depth: number,
     x: (value: number) => number,
     y: (value: number) => number,
+    piece: 'area' | 'line',
   ): TemplateResult {
     /* A series a legend hid keeps its palette slot and draws nothing. */
     if (!this.showsSeries(one.name)) {
@@ -922,16 +931,17 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         return `${run.path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
       })
       .join('')
-    return svg`${
-      this.area
+    if (piece === 'area') {
+      return this.area
         ? svg`<path
             d=${wash}
             data-series=${index}
             part="area"
             style="--chart-series: var(--chart-series-${index})"
           />`
-        : nothing
-    }<path
+        : html`${nothing}`
+    }
+    return svg`<path
       d=${path}
       data-series=${index}
       fill="none"

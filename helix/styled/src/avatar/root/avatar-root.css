@@ -15,7 +15,10 @@
   display: inline-flex;
   flex: 0 0 auto;
   inline-size: var(--_avatar-size);
-  justify-content: center;
+  /* **`safe`, so words too wide for the disc keep their start.** Text a page
+     slots straight in is centered as the initials are, and centered past both
+     edges it lost its first and last letters: "Default" read "efau". */
+  justify-content: safe center;
   overflow: hidden;
 }
 
@@ -46,8 +49,11 @@
 }
 
 /* Sized against the avatar rather than per size, so one rule covers every size
-   including a custom `--avatar-size`. */
-[part="initials"] {
+   including a custom `--avatar-size`. **On the slot as well**, so words a page
+   slots straight in are set as the initials are; at the page's own 16 pixels
+   they ran past the disc. */
+[part="initials"],
+slot {
   /* A proportion, floored at the smallest text the library sets, where the disc
      holds two letters at that size. */
   font-size: max(

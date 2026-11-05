@@ -36,6 +36,11 @@ describe('a formatter for a locale', () => {
     expect(formatNumbers('')(42)).toBe(new Intl.NumberFormat(undefined).format(42))
   })
 
+  test('writes a negative number with the minus sign rather than a hyphen', () => {
+    expect(formatNumbers('en-US')(-8000)).toBe('\u22128,000')
+    expect(formatNumbers('en-US')(8000)).toBe('8,000')
+  })
+
   test('two locales do not share one formatter', () => {
     expect(formatNumbers('en-US')(1234)).not.toBe(formatNumbers('de-DE')(1234))
   })

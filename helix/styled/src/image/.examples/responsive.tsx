@@ -12,6 +12,7 @@ export function Example() {
         alt="Sunlight breaking through the surface of the sea, seen from below"
         fetchpriority="high"
         loading="eager"
+        shape="rounded"
         sizes="(min-width: 40rem) 32rem, 100vw"
         src="/media/scale/seawater-800.jpg"
         srcset="/media/scale/seawater-400.jpg 400w, /media/scale/seawater-800.jpg 800w, /media/scale/seawater.jpg 1536w"

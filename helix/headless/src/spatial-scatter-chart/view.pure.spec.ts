@@ -97,7 +97,13 @@ describe('the words of a box in a narrow plot', () => {
     expect(wordsFitted(undefined, draw).words).toBe(1)
   })
 
-  test('hold their written size in a plot with room', () => {
-    expect(wordsFitted({ font: 1, height: 2000, width: 2000 }, draw).words).toBe(1)
+  /* Held from above too: Treemap's ticks drew at 15.4 at 640 wide, beside 12
+     on the other spatial charts. */
+  test('do not grow past the font size of the box in a plot with room', () => {
+    const room = { font: 12, height: 900, width: 1200 }
+    const view = wordsFitted(room, draw)
+    const pixel = 1 / Math.min(room.width / view.bounds.width, room.height / view.bounds.height)
+    expect((TICK_SIZE * view.words) / pixel).toBeLessThanOrEqual(12.5)
+    expect((TICK_SIZE * view.words) / pixel).toBeGreaterThanOrEqual(11.5)
   })
 })

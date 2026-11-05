@@ -53,8 +53,15 @@
   border-start-start-radius: 0;
   /* A line under it, because its shadow draws nothing against a pale page. */
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  /* Offset past its own blur, so nothing reaches back over the bar. */
-  box-shadow: 0 14px 28px -10px color-mix(in oklab, var(--helix-color-background) 70%, transparent);
+  /* **A fade of the page color under the edge, opaque where the panel cuts.**
+     The page eases back in over the 32px the surface's clip leaves below it.
+     At 70% and a 28px blur the wash only half covered what the panel cut: the
+     descender of the home headline's "g" showed under the edge as a gray
+     half-disc, its ink at 93 of 255 in light against 22 bare. A plain shadow
+     left the same letter whole and black. The fade holds 86% or more over a
+     descender's 8px and is spent before the clip at 32px. Its blur starts
+     1px below the panel's top, so nothing reaches back over the bar. */
+  box-shadow: 0 16px 15px var(--helix-color-background);
 }
 
 /* The navigation drawer is a menu, not prose. **`data-link` is the prose recipe

@@ -156,7 +156,7 @@ export const TOKENS: Token[] = [
      on a filled card over `surface-sunken`, where 6% measured 4.43.
      **8.5% in dark**, where 5% painted #0d0d0d on the black page, 1.08:1 and
      weaker than a default card with its edge. 8.5% paints #161616, 1.16:1,
-     under the elevated card's #181818, so elevated still reads above it.
+     under the elevated card's #1e1e1e, the overlay rung, 1.08 above it.
      Decided by the owner on November 4, 2026. A panel, an elevated card, and a
      sunken region restate it at 6%, since a translucent wash steps further off
      a lighter ground. Two whole colors, since `light-dark()` is not valid in a
@@ -726,28 +726,46 @@ export const TOKENS: Token[] = [
      **Under the pointer a fill moves away from the page**, darker on white and
      lighter on black, as the brand's fill does. Darkening in dark took the fill
      into the black page: the danger fill's hover measured 2.39:1 against it and
-     its press 1.95, under the 3:1 a control's edge needs. `+ 0.04` and `+ 0.08`
-     from the 600 keep white on all four at 4.53:1 or more, and the fill at 3.80
-     or more against the page. */
-  ['color-danger-surface', 'var(--_helix-danger-600)'],
+     its press 1.95, under the 3:1 a control's edge needs. The press, `+ 0.08`
+     from the 600, keeps white on all four at 4.53:1 or more, and the fill at
+     3.80 or more against the page.
+
+     **At rest in dark, a step up from the 600**, so a solid fill clears 3:1 on
+     a panel as well as on the page: the 600 measured 2.56:1 on the #1e1e1e
+     overlay rung, a danger Button in a Popover. `+ 0.04` measures 3.01 there
+     and 5.53 under white, and the hover and the press move up by 0.02 each from
+     it, so white still reads 4.65:1 on the press. */
+  [
+    'color-danger-surface',
+    'light-dark(var(--_helix-danger-600), oklch(from var(--_helix-danger-600) calc(l + 0.04) c h))',
+  ],
   [
     'color-danger-surface-hover',
-    'light-dark(var(--_helix-danger-700), oklch(from var(--_helix-danger-600) calc(l + 0.04) c h))',
+    'light-dark(var(--_helix-danger-700), oklch(from var(--_helix-danger-600) calc(l + 0.06) c h))',
   ],
-  ['color-info-surface', 'var(--_helix-info-600)'],
+  [
+    'color-info-surface',
+    'light-dark(var(--_helix-info-600), oklch(from var(--_helix-info-600) calc(l + 0.04) c h))',
+  ],
   [
     'color-info-surface-hover',
-    'light-dark(var(--_helix-info-700), oklch(from var(--_helix-info-600) calc(l + 0.04) c h))',
+    'light-dark(var(--_helix-info-700), oklch(from var(--_helix-info-600) calc(l + 0.06) c h))',
   ],
-  ['color-success-surface', 'var(--_helix-success-600)'],
+  [
+    'color-success-surface',
+    'light-dark(var(--_helix-success-600), oklch(from var(--_helix-success-600) calc(l + 0.04) c h))',
+  ],
   [
     'color-success-surface-hover',
-    'light-dark(var(--_helix-success-700), oklch(from var(--_helix-success-600) calc(l + 0.04) c h))',
+    'light-dark(var(--_helix-success-700), oklch(from var(--_helix-success-600) calc(l + 0.06) c h))',
   ],
-  ['color-warning-surface', 'var(--_helix-warning-600)'],
+  [
+    'color-warning-surface',
+    'light-dark(var(--_helix-warning-600), oklch(from var(--_helix-warning-600) calc(l + 0.04) c h))',
+  ],
   [
     'color-warning-surface-hover',
-    'light-dark(var(--_helix-warning-700), oklch(from var(--_helix-warning-600) calc(l + 0.04) c h))',
+    'light-dark(var(--_helix-warning-700), oklch(from var(--_helix-warning-600) calc(l + 0.06) c h))',
   ],
   /* **A press is one step past the hover, in the direction the hover went, and
      it is said here once.** Button, Icon Button, and the `data-button` recipe
@@ -807,9 +825,11 @@ export const TOKENS: Token[] = [
      scroller sits on, measured in Chromium. In light, `neutral-500` measures
      3.95 on the page, 3.78 on `surface`, and 3.62 on `surface-raised`. In dark,
      `neutral-600` clears the page and `surface` and measures 2.96 on
-     `surface-raised` and `surface-overlay`, the ground of a menu or a popover,
-     so the dark thumb is `neutral-550`: 4.00 on the page, 3.57 on `surface`,
-     and 3.38 on the raised and overlay rungs.
+     `surface-raised` and `surface-overlay`, the ground of a menu or a popover.
+     **Inside a Dialog, a Drawer, or a Popover the overlay rung steps up to
+     #343434**, a list opened inside one, where `neutral-550` measured 2.37, so
+     the dark thumb is `neutral-500`: 5.32 on the page, 4.21 on the overlay rung,
+     and 3.15 on that panel's own.
 
      The hover step is the thumb while the pointer is over its scroller, the
      muted foreground at 6.01 and 8.13 on the page. It was the subtle
@@ -819,7 +839,7 @@ export const TOKENS: Token[] = [
      hook first, so one scroller can differ without moving these. */
   [
     'scrollbar-thumb-color',
-    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
+    'var(--_helix-neutral-500)',
     'The thumb of a scrollbar Helix colors, at rest.',
   ],
   [
@@ -840,6 +860,17 @@ export const TOKENS: Token[] = [
   ['space-3xl', 'var(--_helix-scale-16)'],
   /* ======================================================== radii ======= */
   ['radii-none', '0'],
+  /* **The corner of a part inset in a track**, such as a toggle group's thumb:
+     the track's `sm` corner less its edge and padding, so the two curves are
+     concentric, and never squarer than 2 pixels or half the track's corner. At
+     the default seed the subtraction comes to less than nothing and the floor
+     holds it at 2; at a seed of 16 it gives 3. Toggle Group, Tabs, and Navigation each derived
+     it, and Heatmap's cells took half the `sm` corner. */
+  [
+    'radii-inset',
+    'max(min(calc(var(--_helix-seed-radii) * 0.25), 2px), calc(var(--_helix-seed-radii) * 0.5 - var(--helix-border-thin) - var(--helix-space-2xs)))',
+    'The corner of a part inset in a track, such as the thumb of a toggle group. Concentric with the `sm` corner around it.',
+  ],
   ['radii-sm', 'calc(var(--_helix-seed-radii) * 0.5)'],
   ['radii-md', 'var(--_helix-seed-radii)'],
   ['radii-lg', 'calc(var(--_helix-seed-radii) * 1.5)'],
@@ -898,10 +929,15 @@ export const TOKENS: Token[] = [
 
      `tight` keeps its readers and its value: 27 rules take it, and `Radio` and
      `Checkbox` compute box geometry from `text-sm * leading-tight`, so it is a
-     control metric now as much as a type one. */
+     control metric now as much as a type one.
+
+     **Rounded up to a whole pixel**, so a heading's line box ends on a pixel
+     and what stacks under it does too: the sum came to 49.58, 39.68, 31.76,
+     25.82, and 20.87 across the heading sizes, and a rule or a card edge under
+     a heading landed on a fraction. Each moves by under half a pixel. */
   [
     'leading-heading',
-    'calc(0.99em + 0.5rem)',
+    'round(up, calc(0.99em + 0.5rem), 1px)',
     'Headings, which need less line height than a paragraph. It is a length plus an em, so it tightens as the type grows.',
   ],
   ['tracking-tight', '-0.01em', 'Large type, which needs tighter letter spacing than a paragraph.'],
@@ -1080,6 +1116,16 @@ export const TOKENS: Token[] = [
      to 0.01ms under the preference and a ring handed that runs flat out. */
   ['duration-turn', '0.8s'],
   ['duration-crawl', '4s'],
+  /* **The fade a panel keeps under reduced motion.** The base layer takes
+     `fast`, `normal` and `slow` to 0.01ms under the preference, so a Tooltip,
+     a Toast or a panel that answered it went from nothing to whole in one
+     frame. This one is left alone there, as `turn` and `crawl` are: a panel
+     stops moving and still fades. */
+  [
+    'duration-fade',
+    'var(--_helix-ms-120)',
+    'The fade a panel keeps when motion is reduced, with no movement.',
+  ],
   /* `standard` for most state changes, `emphasized` for things entering the
      screen and for a marker that travels (the indicator of Tabs and Navigation,
      the thumb of a Switch, a Checkbox's mark), `decelerate` for things arriving
@@ -1192,7 +1238,8 @@ export const TOKENS: Token[] = [
   ['size-tag-sm', 'calc(1.5rem * var(--_helix-seed-density))'],
   /* How thick a bar reporting a proportion is drawn. */
   ['size-progress', 'calc(0.5rem * var(--_helix-seed-density))'],
-  /* And a meter is half again as thick, which is a difference on purpose. */
+  /* A meter is twice as thick as a progress bar, 16 against 8, which is a
+     difference on purpose. */
   ['size-meter', 'calc(1rem * var(--_helix-seed-density))'],
   /* Sixteen, twenty, twenty-four: an even four pixels a step. */
   ['size-checkbox', 'var(--helix-size-checkbox-md)'],

@@ -466,6 +466,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
   --_button-fill-press: var(--helix-color-danger-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-danger);
   --_button-tone-hover: color-mix(
     in oklab,
@@ -479,6 +480,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-fill-hover: var(--helix-color-info-surface-hover);
   --_button-fill-press: var(--helix-color-info-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-info);
   --_button-tone-hover: color-mix(
     in oklab,
@@ -492,6 +494,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-fill-hover: var(--helix-color-success-surface-hover);
   --_button-fill-press: var(--helix-color-success-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-success);
   --_button-tone-hover: color-mix(
     in oklab,
@@ -499,12 +502,20 @@ helix-text[tone="warning"][emphasis="muted"] {
     var(--helix-color-foreground)
   );
 }
+/* Amber under a black label, as the element's is. See its note. */
 [data-button][data-button-tone="warning"] {
   --_button-edge: var(--helix-color-warning);
-  --_button-fill: var(--helix-color-warning-surface);
-  --_button-fill-hover: var(--helix-color-warning-surface-hover);
-  --_button-fill-press: var(--helix-color-warning-surface-active);
-  --_button-on-tone: var(--helix-color-foreground-on-status);
+  --_button-fill: var(--helix-color-warning-mark);
+  --_button-fill-hover: light-dark(
+    oklch(from var(--helix-color-warning-mark) calc(l + 0.03) c h),
+    oklch(from var(--helix-color-warning-mark) calc(l - 0.03) c h)
+  );
+  --_button-fill-press: light-dark(
+    oklch(from var(--helix-color-warning-mark) calc(l + 0.06) c h),
+    oklch(from var(--helix-color-warning-mark) calc(l - 0.06) c h)
+  );
+  --_button-on-tone: light-dark(var(--helix-color-foreground), var(--helix-color-background));
+  --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-warning);
   --_button-tone-hover: color-mix(
     in oklab,
@@ -568,7 +579,10 @@ helix-text[tone="warning"][emphasis="muted"] {
 [data-button="subtle"] {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 14%, transparent)
+    light-dark(
+      color-mix(in oklab, var(--_button-tone) 14%, transparent),
+      color-mix(in oklab, var(--_button-tone) var(--_button-subtle-dark, 14%), transparent)
+    )
   );
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-ink));
@@ -577,7 +591,17 @@ helix-text[tone="warning"][emphasis="muted"] {
 [data-button="subtle"]:not(:disabled):hover {
   background-color: var(
     --button-background-color-hover,
-    var(--button-background-color, color-mix(in oklab, var(--_button-tone) 22%, transparent))
+    var(
+      --button-background-color,
+      light-dark(
+        color-mix(in oklab, var(--_button-tone) 22%, transparent),
+        color-mix(
+          in oklab,
+          var(--_button-tone) calc(var(--_button-subtle-dark, 14%) + 8%),
+          transparent
+        )
+      )
+    )
   );
   border-color: transparent;
 }
@@ -680,7 +704,14 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
 [data-button="subtle"]:not(:disabled):active {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 30%, transparent)
+    light-dark(
+      color-mix(in oklab, var(--_button-tone) 30%, transparent),
+      color-mix(
+        in oklab,
+        var(--_button-tone) calc(var(--_button-subtle-dark, 14%) + 16%),
+        transparent
+      )
+    )
   );
 }
 
@@ -940,6 +971,20 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 
+/* **On a touch screen, a dense region's tight glyph is never under
+   `size-icon-sm`**, since its field text is never under 16 there. At `sm` the
+   tight step is 12, so a Select's value grew to 16 beside a 12 chevron, and a
+   field's own icon stood at 12 beside the 16 its text and an Icon Button draw.
+   A fine pointer keeps the 12, which matches the 13 text it sits beside. */
+@media (pointer: coarse) {
+  [data-density="sm"] {
+    --helix-size-icon-tight: max(
+      round(calc(var(--helix-size-icon) * 0.8), 2px),
+      var(--helix-size-icon-sm)
+    );
+  }
+}
+
 helix-toggle::part(item) {
   align-items: center;
   background: none;
@@ -1075,6 +1120,26 @@ helix-toggle[disabled]::part(item) {
   justify-content: start;
 }
 
+/* **A name too long for the column ends in an ellipsis**, as a row's does
+   elsewhere. A flex link has no text of its own to cut, so the column's mask
+   cut a 411 pixel name hard at the edge of a 260 pixel link. A block line box
+   centered in the row can carry `text-overflow`, and an icon before the name
+   sits inline at the gap a flex row put beside it, centered on the capitals. */
+:where(helix-navigation[orientation="vertical"]) :where([data-navigation-item], a) {
+  align-content: center;
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:where(helix-navigation[orientation="vertical"])
+  :where([data-navigation-item], a)
+  > :where(helix-icon) {
+  margin-inline-end: var(--helix-space-xs);
+  vertical-align: round(calc(0.5cap - var(--icon-size, var(--helix-size-icon)) / 2), 1px);
+}
+
 /* **Inside a segmented track, the destinations take the track's height.** The
    floor above is the bar's, and the track is a control's height less its
    frame and padding, which is under the floor: held to it, a destination
@@ -1102,12 +1167,6 @@ helix-toggle[disabled]::part(item) {
 
 :where(helix-navigation[marker="segmented"]) :where([data-navigation-item], a) {
   min-block-size: 0;
-}
-
-/* A link in a list item fills the item down a column, as a bare link fills its
-   place in the column. */
-:where(helix-navigation[orientation="vertical"]) :where(li) > :where([data-navigation-item], a) {
-  display: flex;
 }
 
 :where([data-navigation-item], helix-navigation a):hover {
@@ -1449,43 +1508,21 @@ helix-toggle[disabled]::part(item) {
   border-color: transparent;
 }
 
-/* **A glass modal in light reads the page, not its own scrim.** A modal's
-   `::backdrop` paints behind its panel, so the panel's filter sampled the page
-   with the scrim already over it: the white page came through as #9d9d9d and
-   the glass as a gray slab, #e4e4e4 on average, where a glass menu over the
-   same page is near white. The scrim is 40% of the ink in light, so a
-   brightness of 1 / 0.6 hands the filter the page as it stands under the
-   scrim, and the panel keeps the one glass coverage over it: 240 on average,
-   from 218. Dark keeps the dimmed page, which is what its glass is drawn over.
-   Keyed on the mode the page decided, since a filter takes no `light-dark()`.
-   A browser without style queries keeps the gray. */
-@container style(--_helix-mode: light) {
-  helix-dialog[material="glass"]::part(surface) {
-    backdrop-filter: var(
-      --dialog-backdrop,
-      var(--helix-material-backdrop) brightness(calc(1 / 0.6))
-    );
-  }
-
-  helix-drawer[material="glass"]:not([modal="false"])::part(panel) {
-    backdrop-filter: var(
-      --drawer-backdrop,
-      var(--helix-material-backdrop) brightness(calc(1 / 0.6))
-    );
-  }
-}
-
 /* *What sets a surface apart from what is behind it**, which is the question
    `separation` asks and the four mechanisms `ThemeIntent.separation` names. */
+/* The same fills `Card` draws: elevated takes the overlay rung in dark, where
+   a shadow draws nothing on the black page, and filled the wash that steps off
+   any ground. Both read `surface`, so a filled region and an elevated one in
+   dark were one fill, #0c0c0c, told apart by a shadow nobody could see. */
 [data-separation="elevated"] {
-  background-color: var(--helix-color-surface);
+  background-color: light-dark(var(--helix-color-surface), var(--helix-color-surface-overlay));
   border-color: transparent;
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-md);
 }
 
 [data-separation="filled"] {
-  background-color: var(--helix-color-surface);
+  background-color: var(--helix-color-surface-filled);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground);
 }
@@ -1525,12 +1562,13 @@ helix-toggle[disabled]::part(item) {
 /* **In dark, a surface inside the well steps up to `surface-raised`**, so a
    Card is not a hole in it: the card rung, #0c0c0c, measured 1.04:1 darker
    than the #121212 well. Decided by the owner on November 4, 2026. The rungs
-   above it step with it, so an elevated Card, which reads `surface-raised`,
+   above it step with it, so an elevated Card, which reads `surface-overlay`,
    stands above a default one and above a filled one, whose wash comes out
-   #202020 on the well: #181818, #202020, and #272727, in that order. A menu
-   opened inside stands off all three. Light keeps its own rungs, where a card
-   already sits lighter than the well. On the children, since a token restated
-   on the well itself would read its own new value. The page's rungs are unchanged. */
+   #202020 on the well: #181818, #202020, and #2d2d2d, in that order, the
+   elevated card 1.18:1 above the filled one. Light keeps its own rungs, where
+   a card already sits lighter than the well. On the children, since a token
+   restated on the well itself would read its own new value. The page's rungs
+   are unchanged. */
 :where([data-surface="sunken"] > *) {
   --helix-color-surface: light-dark(var(--_helix-sunken-surface), var(--_helix-sunken-raised));
   --helix-color-surface-raised: light-dark(
@@ -1558,7 +1596,8 @@ helix-toggle[disabled]::part(item) {
    an elevated card beside it. At 6%, over the panel, measured on November 4,
    2026: surface #232323 at 1.06, filled #2c2c2c at 1.19, raised #2f2f2f at
    1.25, and overlay #343434 at 1.34. On the host, so it reaches what the panel
-   holds, which none of the three restates. Light keeps the page's 5%. */
+   holds, which none of the three restates. An elevated card takes the overlay
+   rung, so it reads 1.13:1 above a filled one. Light keeps the page's 5%. */
 :where(helix-dialog, helix-drawer, helix-popover) {
   --helix-color-surface-filled: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
@@ -1766,8 +1805,11 @@ helix-toast:not([data-color-mode]) {
    Each column takes the share its `col` gives it, fixed from the header row,
    so a long cell arriving wraps inside its column and widens nothing. Fixed
    layout needs a table box, so the scrolling is the box around it:
-   `data-table`, spaced as a table is. Each column keeps 7rem at least, three
-   columns fitting a 375 screen, and a wider table scrolls inside its box. */
+   `data-table`, spaced as a table is. The table is at least 7rem wide for
+   each column it has, up to eight, so three columns fit a 375 screen and a
+   wider table scrolls inside its box. Inside it each column takes its share,
+   weighed from its heading at 10 to 24 characters, so the narrowest column is
+   never under ten twenty-fourths of the widest. */
 :where([data-prose] [data-table]) {
   margin-block: var(--helix-space-none) var(--helix-space-sm);
   max-inline-size: 100%;
@@ -1872,6 +1914,31 @@ helix-toast:not([data-color-mode]) {
   background-color: transparent;
   font-size: inherit;
   padding: var(--helix-space-none);
+}
+
+/* **One code size in a document set for reading**, the `Code` ratio of the
+   table's step, between `md` and `lg`: 14.86. Code in a paragraph took the
+   ratio of the paragraph's 18 and drew 16.71, code in a table 14.86, and a
+   `Code Block` its own 13, three sizes of one mono face on one page. A `Code`,
+   a raw `pre`, and a `Code Block` read the size through their hooks, so a
+   block that sets its own size keeps it, and code in a heading keeps the
+   heading's ratio. */
+:where([data-prose="reading"]) {
+  --code-block-font-size: calc(
+    var(--helix-text-sm) /
+    var(--helix-text-md) *
+    (var(--helix-text-md) + var(--helix-text-lg)) /
+    2
+  );
+}
+
+:where([data-prose="reading"]) :where(p, li, blockquote, table, helix-table) {
+  --code-size: var(--code-block-font-size);
+}
+
+:where([data-prose="reading"]) :where(p, li, blockquote, table) :where(code, samp),
+:where([data-prose="reading"]) :where(pre) {
+  font-size: var(--code-block-font-size);
 }
 
 /* **In a conversation, a table and a block of code are held in a box of their

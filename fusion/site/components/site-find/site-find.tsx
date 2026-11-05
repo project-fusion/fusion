@@ -225,8 +225,11 @@ export function SiteFind({
           field. `open` is bound here because the button opens it too, so the
           palette and the React state have to agree about which it is: both
           events are bound so neither can drift from the other. */}
+      {/* The rows are pages, so the empty list says pages. The component's
+          own "No commands" is for a palette of actions. */}
       <helix-command
         class={styles.siteCommand}
+        empty-text="No pages match your search"
         hotkey="mod+k"
         label="Search"
         onhelix-before-close={() => {

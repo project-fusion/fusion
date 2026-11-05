@@ -266,16 +266,11 @@ slot[name="scroll-end-icon"]::slotted(*) {
     --tabs-indicator-color,
     light-dark(var(--helix-color-surface-overlay), var(--helix-color-press))
   );
-  /* **Toggle Group's thumb corner, by Toggle Group's derivation**: the track's
-     corner less its edge and padding, never squarer than 2 pixels or half the
-     track's corner. Less the edge alone, the thumb was 3 pixels in the same 4
-     pixel track at the same 5 pixel inset where Toggle Group's is 2. */
-  --_indicator-radius: max(
-    min(var(--helix-radii-sm) * 0.5, 2px),
-    var(--helix-radii-sm) -
-    var(--helix-border-thin) -
-    var(--helix-space-2xs)
-  );
+  /* **Toggle Group's thumb corner, `radii-inset`**: the track's corner less
+     its edge and padding, never squarer than 2 pixels or half the track's
+     corner. Less the edge alone, the thumb was 3 pixels in the same 4 pixel
+     track at the same 5 pixel inset where Toggle Group's is 2. */
+  --_indicator-radius: var(--helix-radii-inset);
   --_indicator-shadow: var(--helix-shadow-sm);
   --_indicator-offset: 0px;
 }

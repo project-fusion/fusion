@@ -16,6 +16,13 @@
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* **Aligned to the page's start.** The part takes its own direction from
+     its first letter, `dir="auto"` in the template, so a Latin answer in a
+     right-to-left page keeps its start and ends in the ellipsis: the page's
+     direction cut its first letters away. `unicode-bidi: plaintext` did the
+     same in Chromium and put the ellipsis over the first letter in WebKit,
+     which places it by the box's direction. */
+  text-align: match-parent;
 }
 
 /* *The label is centered on its capitals.** Trimmed to its cap height and

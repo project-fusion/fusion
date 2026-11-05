@@ -21,6 +21,14 @@
   margin-block-start: calc(var(--helix-space-xs) - var(--helix-space-lg));
 }
 
+/* **The heading's buttons are the toolbar's size.** Hide controls is the same
+   function as the toolbar's Show controls, and at the default control size it
+   drew 40 beside the toolbar's 32 and the header's 32. The press still
+   reaches 44 on a touch screen. */
+.themeControlsHead helix-icon-button {
+  --icon-button-size: var(--helix-size-control-sm);
+}
+
 /* **On a phone the heading and its Hide controls stay at the top of the
    form.** It reaches into the pane's top and side padding and gives the same
    back as its own, so at rest nothing moves, and stuck it covers what scrolls

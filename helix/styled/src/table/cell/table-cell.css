@@ -61,6 +61,23 @@
   min-inline-size: 0;
 }
 
+/* **A cell of controls holds the row's height.** The block padding is room for
+   words, and stacked on a control it made the row follow its contents:
+   measured November 4, 2026 at `md`, a text row was 40, a Tag row 45, a Switch
+   row 41, an Avatar row 49 and a Button row 57. With no padding a control up to
+   a pixel under the row's height centers in it and the row stays 32, 40 or 48;
+   a control of the row's full height is a pixel more, for the rule. The words a
+   cell of elements holds, such as a link or a `code`, keep the room as their
+   own margin, so a line of them that wraps still clears the rule. */
+:host(:not(:state(text))) {
+  padding-block: var(--helix-space-none);
+}
+
+:host(:not(:state(text)))
+  ::slotted(:is(a, abbr, b, cite, code, em, i, kbd, p, small, span, strong, time)) {
+  margin-block: var(--table-padding-block, calc(var(--helix-space-control) * 0.5));
+}
+
 /* The cell can shrink and its content could not: `min-inline-size: 0` above
    frees the grid item, and a flex item inside keeps an automatic minimum of its
    own until it is told otherwise. Both are needed and neither is enough. */

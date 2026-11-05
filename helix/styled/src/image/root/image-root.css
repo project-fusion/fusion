@@ -27,6 +27,16 @@
   opacity: 0;
 }
 
+/* **A failed picture with no box of its own keeps a surface around its mark.**
+   With no size and no `--image-aspect`, the host was only as tall as the
+   broken image's line, 20 pixels, a pill across the column with the mark
+   filling it. On the picture and not the host, so a box that is given a height
+   or a ratio keeps exactly that: the host clips, and its height is not the
+   picture's to grow. */
+:host([data-status="error"]) [part="image"] {
+  min-block-size: calc(var(--helix-size-icon) + var(--helix-space-lg) * 2);
+}
+
 /* Both stand-ins cover the box exactly, because they are standing in for it. */
 [part="placeholder"],
 [part="fallback"] {

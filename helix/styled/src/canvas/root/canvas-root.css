@@ -19,7 +19,8 @@
      `data-surface="sunken"` region: a card took `surface`, #0c0c0c, and on the
      #121212 board it measured 1.04:1 darker, a hole in the board. Decided by
      the owner on November 4, 2026. The rungs above step with it, so an elevated
-     card, #272727, stands off a default one, #181818. Light keeps its own, where a card
+     card, which takes the overlay rung, #2d2d2d, stands off a default one,
+     #181818, and a filled one, #202020. Light keeps its own, where a card
      already sits lighter than the board. */
   --helix-color-surface: light-dark(var(--_canvas-surface), var(--_canvas-raised));
   --helix-color-surface-raised: light-dark(

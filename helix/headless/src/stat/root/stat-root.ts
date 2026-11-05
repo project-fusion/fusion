@@ -17,6 +17,9 @@ import { property, state } from 'lit/decorators.js'
 /** The characters a figure groups its digits with, besides the locale's own. */
 const SEPARATORS = new Set([',', '.', "'", '\u2019', ' ', '\u00a0', '\u2009', '\u202f'])
 
+/** Text that reads as a figure: digits, the separators, signs, currency and percent. */
+const FIGURE = /^[\p{N}\p{Sc}\p{Zs}.,'\u2019+\-\u2212%\u2030]+$/u
+
 /** What a Stat asks of the group around it: the step its figure takes. */
 interface StepSharing {
   stepFor(stat: HelixHeadlessStat): number
@@ -79,6 +82,7 @@ interface StepSharing {
  * @cssstate has-label - Something is slotted into `label`.
  * @cssstate has-trend - Something is slotted into `trend`.
  * @cssstate has-unit - Something is slotted into `unit`.
+ * @cssstate number - The slotted figure is text that reads as a number, such as `1284392118` or `$8,402`, so it breaks only after a group separator and never between two digits.
  * @cssstate stepped - The figure is set a step smaller, because at full size it does not fit the stat's width on one line.
  * @cssstate stepped-twice - The figure is set two steps smaller, because one step smaller it still does not fit. `stepped` holds as well.
  */
@@ -383,6 +387,12 @@ export class HelixHeadlessStat extends HelixElement {
       }
     }
     runs.push(run)
+    /* **A number with no separator is kept whole**, as the owner decided on
+       November 3, 2026: stepped down twice and then broken only after a group
+       separator, so "1284392118" in a 6rem column does not break as
+       "12843921" over "18". Words that are not a number keep breaking where
+       they must. */
+    this.toggleState('number', /\d/.test(text) && FIGURE.test(text))
     const next = runs.length > 1 ? runs : []
     const same =
       next.length === this.slottedRuns.length &&

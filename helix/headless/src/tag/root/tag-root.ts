@@ -267,7 +267,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   /** The label, inside a link under `href`, behind a seam a tier can move. */
   protected renderLabel(): TemplateResult {
     if (this.href === '') {
-      return html`<slot part="label"></slot>`
+      return html`<slot part="label" dir="auto"></slot>`
     }
     /* A disabled link loses its address, which is what takes it out of the
        tab order and stops a press going anywhere; in a group the row holds the
@@ -277,7 +277,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
       href=${this.disabled ? nothing : this.href}
       part="link"
       tabindex=${this.grouped ? '-1' : nothing}
-      ><slot part="label"></slot
+      ><slot part="label" dir="auto"></slot
     ></a>`
   }
 

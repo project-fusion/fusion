@@ -228,6 +228,25 @@ slot[name="trigger"]::slotted(*) {
   min-inline-size: var(--helix-size-icon-loose);
 }
 
+/* **The calendar comes out of the wrap**, as Combobox's caret does once it
+   holds tags. As the last item in the row it wrapped alone: at 390 with two
+   tags and a count it sat on a second line under them, 33 pixels from the
+   start, a field that read as broken. It opens the panel for the whole field,
+   so it stays at the field's end, centered on its height, in room the padding
+   keeps for it. */
+:host([mode="multiple"]) [part="field"] {
+  padding-inline-end: calc(var(--helix-space-field) + var(--helix-size-icon-tight));
+  position: relative;
+}
+
+:host([mode="multiple"]) [part="trigger"] {
+  inset-block-start: 50%;
+  inset-inline-end: var(--helix-space-field);
+  margin-block: var(--helix-space-none);
+  position: absolute;
+  translate: 0 -50%;
+}
+
 /* The count and the row it sits in are the shared tag sheet's, composed in
    beside this one: `MixinTokens` renders both and `shared/tags` paints them,
    so the count reads the same here as it does in Combobox and Filter Input

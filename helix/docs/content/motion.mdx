@@ -18,6 +18,7 @@ title: Motion
 | `--helix-duration-slow` | `320ms` |
 | `--helix-duration-turn` | `0.8s` |
 | `--helix-duration-crawl` | `4s` |
+| `--helix-duration-fade` | `120ms` |
 
 [//]: # (/tokens)
 
@@ -34,10 +35,11 @@ title: Motion
 
 [//]: # (/tokens)
 
-Helix has six durations and six curves. `instant`, `fast`, `normal`, and
-`slow` time a change that answers a hand. `turn` is one revolution of a
-spinner, and `crawl` is the same revolution while motion is reduced, so a busy
-ring still turns slowly.
+Helix has seven durations and six curves. `instant`, `fast`, `normal`, and
+`slow` time a change that answers a hand. `fade` is the fade a panel keeps
+while motion is reduced. `turn` is one revolution of a spinner, and `crawl` is
+the same revolution while motion is reduced, so a busy ring still turns
+slowly.
 
 Use each curve for one kind of movement:
 
@@ -90,9 +92,11 @@ ship without noticing.
 
 Some transitions show a relationship, such as a panel that slides out of the
 control that opened it. Others are decorative, such as a floating effect. With
-reduced motion, Helix removes decorative movement. It sets every transition
-duration token to 0.01ms, so a panel appears in its final place at once. The
-transition still runs that long, so `transitionend` still fires.
+reduced motion, Helix removes decorative movement. It sets `fast`, `normal`,
+and `slow` to 0.01ms, so a panel appears in its final place at once. The
+transition still runs that long, so `transitionend` still fires. A Tooltip, a
+Toast, and a panel that opens from a field or a Menu still fade in and out over
+`fade`, 120ms, with no movement.
 
 Anything that moves continuously without input stops completely:
 

@@ -219,13 +219,13 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
         node instanceof Element ? node.slot === '' : (node.textContent ?? '').trim() !== '',
       )
 
-    return html`<span part="field"><slot name="field">${this.label}</slot></span>
+    return html`<span part="field"><slot name="field" dir="auto">${this.label}</slot></span>
       ${
         operator
           ? html`<span part="operator"><slot name="operator">${this.operatorLabel}</slot></span>`
           : nothing
       }
-      <span part="values" ?hidden=${!values}><slot></slot></span>
+      <span part="values" ?hidden=${!values}><slot dir="auto"></slot></span>
       ${
         this.dismissible
           ? html`<button

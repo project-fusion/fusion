@@ -16,7 +16,11 @@
       --filter-input-chip-border-color,
       color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_chip-fill))
     );
-  border-radius: var(--filter-input-chip-radius, var(--helix-radii-sm));
+  /* Concentric with the field around it, which hands its corner down. */
+  border-radius: var(
+    --filter-input-chip-radius,
+    var(--_filter-input-chip-corner, var(--helix-radii-sm))
+  );
   color: var(--helix-color-foreground);
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -74,6 +78,22 @@
   padding-inline-end: var(--helix-space-2xs);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* **The words are cut inside their slot, in their own direction.** Each
+   slot takes its direction from its first letter, `dir="auto"` in the
+   template, so a Latin name or value in a right-to-left page keeps its start
+   and ends in the ellipsis: the page's direction cut its first letters away.
+   On the slot and not the part around it, because a part holding a slot
+   takes the page's direction whatever the words are. Aligned to the page's
+   start all the same. */
+[part="field"] > slot,
+[part="values"] > slot {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-align: match-parent;
+  text-overflow: ellipsis;
 }
 
 /* **Drawn only where there is one to draw**, which the template decides, so
@@ -143,11 +163,16 @@
   inline-size: var(--icon-size, var(--_chip-dismiss-size));
 }
 
-/* The well is mixed from the ink the control is already drawn in, so the hover
-   deepens what is there rather than turning it a second color. */
+/* **The library's two washes, hover and then press**, as Tag's cross takes
+   them. The hover was a 12% mix of the ink and there was no press, so a
+   pressed cross looked exactly like a hovered one. */
 [part="dismiss"]:hover {
-  background-color: color-mix(in oklab, currentcolor 12%, transparent);
+  background-color: var(--helix-color-hover);
   color: var(--helix-color-foreground);
+}
+
+[part="dismiss"]:active {
+  background-color: var(--helix-color-press);
 }
 
 /* **Inside the cross's own box**, as `Tag` draws it: the box is the 12 pixel

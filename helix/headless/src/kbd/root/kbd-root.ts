@@ -378,16 +378,26 @@ export class HelixHeadlessKbd extends HelixElement {
    * so a sheet can draw a cap per key. Written with no space between, so a
    * chord reads as the one label it was. Where the chord is said in words,
    * the parts are hidden from a screen reader, which reads the words.
+   *
+   * A key drawn as one arrow or technical symbol, such as ⌘, ⇧ or ↵, carries
+   * `data-symbol`, so a sheet can draw it in a face that has the glyph at the
+   * height of a letter.
    */
   protected renderChord(): TemplateResult {
     const { keys, separator, spoken } = this.label
     const hidden = spoken === '' ? nothing : 'true'
     return html`${keys.map(
       (key, index) =>
-        html`${index > 0 && separator !== '' ? html`<span part="separator" aria-hidden=${hidden}>${separator}</span>` : nothing}<span part="key" aria-hidden=${hidden}>${key}</span>`,
+        html`${index > 0 && separator !== '' ? html`<span part="separator" aria-hidden=${hidden}>${separator}</span>` : nothing}<span part="key" aria-hidden=${hidden} ?data-symbol=${drawnAsSymbol(key)}>${key}</span>`,
     )}`
   }
 }
+
+/**
+ * Whether a key is one arrow or technical symbol: the modifier glyphs, Enter,
+ * Delete, Escape, Tab and the arrows of an Apple keyboard.
+ */
+const drawnAsSymbol = (key: string): boolean => /^[\u2190-\u21ff\u2300-\u23ff]$/u.test(key)
 
 declare global {
   interface HTMLElementTagNameMap {

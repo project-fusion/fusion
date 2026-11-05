@@ -18,7 +18,10 @@
   align-items: center;
   color: var(--legend-color, var(--helix-color-foreground-muted));
   display: flex;
-  font-size: var(--legend-font-size, var(--helix-text-sm));
+  /* **The size of the chart's own words**, `text-xs`, as its axis ticks and
+     labels are, so a key under a chart reads as part of it. At `text-sm` the
+     names were 13 beside 12 pixel ticks (November 4, 2026). */
+  font-size: var(--legend-font-size, var(--helix-text-xs));
   gap: var(--legend-entry-gap, var(--helix-space-2xs));
   line-height: var(--helix-leading-tight);
 }

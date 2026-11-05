@@ -4,23 +4,35 @@
   block-size: 20rem;
 }
 
-/* The glow and the haze from the accent rather than the primary color. The
-   ground and the peak keep the theme's. */
+/* The glow, the haze, and the peak from the accent, in the same light and dark
+   pairs Aura uses for the primary color. The ground keeps the theme's.
+
+   **In light the field is a pale sheen of the accent.** With the accent at full
+   strength in both modes, the ink theme drew near-black curtains on white, and
+   at 390 the heading's first line sat on their darkest stroke. Dark keeps the
+   accent at full strength, which reads as light on black. */
 .hero {
-  --aura-glow: var(--helix-color-accent);
-  --aura-haze: var(--helix-color-accent-subtle);
-  /* The peak in the accent as well, so the heading over it stays readable. */
-  --aura-peak: var(--helix-color-accent);
+  --aura-glow: light-dark(var(--helix-color-accent-subtle), var(--helix-color-accent));
+  --aura-haze: light-dark(
+    color-mix(in oklab, var(--helix-color-accent-subtle) 50%, var(--helix-color-background)),
+    var(--helix-color-accent-subtle)
+  );
+  --aura-peak: light-dark(
+    color-mix(in oklab, var(--helix-color-accent) 34%, var(--helix-color-accent-subtle)),
+    var(--helix-color-accent)
+  );
 }
 
 /* The content box covers the field, so placing the content is placing it in
    the aura. At the foot of the box, with `terminus` moving the aurora's axis
    toward the trailing corner, the heading sits under the curtains. Centered,
-   with the axis at its default, it sat on their heaviest strokes. */
+   with the axis at its default, it sat on their heaviest strokes. A heading
+   that wraps, as it does at 390, centers its lines over the button. */
 .hero::part(content) {
   align-content: end;
   display: grid;
   gap: var(--helix-space-md);
   justify-items: center;
   padding-block-end: var(--helix-space-xl);
+  text-align: center;
 }

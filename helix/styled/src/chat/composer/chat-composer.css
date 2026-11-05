@@ -63,11 +63,17 @@
   /* **The light reaches half way across the box at most**, so on a box one
      line tall the light on one edge leaves the edge across from it dark.
      At a fixed 2.5rem it lit a short streak on the top edge while it ran
-     along the bottom. */
+     along the bottom. Its bright center is the glow mixed toward the lightest
+     ink the theme has, the page in light and the foreground in dark, which a
+     literal white only matched while the theme kept white in both. */
   background: radial-gradient(
     min(5rem, var(--_chat-composer-reach-x)) min(2.5rem, var(--_chat-composer-reach-y)) at
       var(--_chat-composer-light-x, 0px) var(--_chat-composer-light-y, 0px),
-    color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 60%, white),
+    color-mix(
+      in oklab,
+      var(--chat-composer-glow-color, var(--helix-color-primary)) 60%,
+      light-dark(var(--helix-color-background), var(--helix-color-foreground))
+    ),
     var(--chat-composer-glow-color, var(--helix-color-primary)) 35%,
     transparent 100%
   );

@@ -152,6 +152,17 @@ slot[name="indicator"]::slotted(*) {
   padding-block-start: max(0px, calc((var(--_radio-size) - 1lh) / 2));
 }
 
+/* **And the circle centered on the line, where the line is the taller**, as
+   Checkbox's box is. At `sm` the 16 pixel circle sat at the top of a 19.5
+   pixel line, 1.75 pixels above its middle. A margin, the box being the
+   circle itself; the label's font and leading, so `1lh` is the label's
+   line. */
+:host(:not([separation="filled"], [separation="outlined"], [chip])) [part="box"] {
+  font-size: var(--helix-text-control);
+  line-height: var(--helix-leading-normal);
+  margin-block-start: max(0px, calc((1lh - var(--_radio-size)) / 2));
+}
+
 /*
  *  A card is the same radio in a bounded surface, for a set of options that need
  * room: a description, an icon, a price.

@@ -245,13 +245,24 @@
   content: none;
 }
 /* Wrong, and the mark says so. */
-:host([invalid]) [part~="option"]:state(selected)::part(item),
 :host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label),
-:host(:state(invalid)) [part~="option"]:state(selected)::part(item),
 :host(:state(invalid)) [part="column"] [part~="option"]:state(selected)::part(label) {
   outline: var(--helix-size-focus-ring) solid
     var(--time-picker-invalid-color, var(--helix-color-danger));
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **Inside the row in the list.** A list row runs from edge to edge of a box
+   that scrolls, so a ring outside it was clipped at both ends and read as a red
+   rule above the row and another below it. A wheel row's ring stays on its
+   mark, which has room around it, and the row itself draws none: on the full
+   row of a column it was the same two clipped rules across the wheels. */
+:host([invalid]) [part="list"] [part~="option"]:state(selected)::part(item),
+:host(:state(invalid)) [part="list"] [part~="option"]:state(selected)::part(item) {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid
+    var(--time-picker-invalid-color, var(--helix-color-danger));
+  outline-offset: calc(var(--helix-size-focus-ring) * -1);
 }
 
 /* And with nothing chosen, the surface, for the reason Date Picker records at

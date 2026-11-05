@@ -84,42 +84,17 @@
   inline-size: var(--helix-size-icon);
 }
 
-/* **With no color yet, the caret a field's trigger draws**, centered on the
-   checkerboard in the quiet ink, as Select's and Date Input's ends say they
-   open something. The empty chip was a checkerboard alone, which reads as a
-   transparent color chosen and not as a control.
-
-   **The caret alone, without a chip.** The checkerboard says a color is
-   partly transparent, and with no color it says something that is not so;
-   under the caret its squares crossed the glyph. A gray chip read as a gray
-   chosen. */
+/* **With no color yet, an empty chip with a dashed edge**, the place a color
+   goes, at the chip's own size and corner. A caret alone read as a Select
+   with nothing in it, the field showing no sign that it holds a color; the
+   checkerboard says a color is partly transparent, which with no color is
+   not so, and a gray chip read as a gray chosen. The dashed edge is the mark
+   ink, the 3:1 a graphic needs. */
 [part="preview"][data-empty] {
-  align-items: center;
   background-color: transparent;
   background-image: none;
-  border-color: transparent;
-  display: flex;
-  justify-content: center;
-}
-
-[part="preview"][data-empty]::before {
-  background-color: var(--helix-color-foreground-muted);
-  block-size: var(--helix-size-icon-tight);
-  content: "";
-  inline-size: var(--helix-size-icon-tight);
-  /* Select's `caret-down`, the same glyph at the same tight icon size. */
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='m213.66 101.66-80 80a8 8 0 0 1-11.32 0l-80-80a8 8 0 0 1 11.32-11.32L128 164.69l74.34-74.35a8 8 0 0 1 11.32 11.32'/%3E%3C/svg%3E");
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
-}
-
-/* Forced colors paint every background the canvas, which took the caret, a
-   fill under a mask, with it. */
-@media (forced-colors: active) {
-  [part="preview"][data-empty]::before {
-    background-color: CanvasText;
-    forced-color-adjust: none;
-  }
+  border-color: var(--helix-color-foreground-subtle);
+  border-style: dashed;
 }
 
 /*
@@ -212,6 +187,12 @@
 slot[name="start"],
 slot[name="end"] {
   color: var(--helix-color-foreground-muted);
+}
+
+/* The swatch with no color is the same empty chip, at the swatch's size. */
+:host([trigger="swatch"]) [part="preview"][data-empty] {
+  border-color: var(--helix-color-foreground-subtle);
+  border-style: dashed;
 }
 
 /* Whatever is at either end keeps its size, so the text is what gives way when

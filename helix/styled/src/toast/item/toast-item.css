@@ -343,6 +343,12 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
+@keyframes helix-toast-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes helix-toast-in {
   from {
     opacity: 0;
@@ -406,10 +412,11 @@ slot[name="icon"]::slotted(*) {
 }
 
 /* The arrival goes: a message that slides in is the kind of movement the
-   preference is about, and it still appears. */
+   preference is about, and it still appears. **It fades in**, with no slide
+   and no growing row, so it does not blink into being. */
 @media (prefers-reduced-motion: reduce) {
   [part="item"] {
-    animation: none;
+    animation: helix-toast-fade var(--helix-duration-fade) var(--helix-easing-standard) backwards;
   }
 
   [part="dismiss"] {
@@ -424,10 +431,30 @@ slot[name="icon"]::slotted(*) {
    `prefers-reduced-motion: reduce`, this element kept its full eight seconds
    while a light-DOM element beside it came back at 1e-05s. */
 @media (prefers-reduced-motion: reduce) {
-  :host,
-  :host([data-closed]),
-  :host([data-closed]) [part="item"] {
+  :host {
     transition: none;
+  }
+
+  /* **Leaving, it fades and then gives up its room at once.** The message
+     fades inside the host, and the host holds its row, margin, padding and
+     opacity for the fade and then lets them go in one step, so nothing
+     slides. The fade is the shadow part's: a page's own reduced motion rule
+     takes every light-DOM transition to 0.01ms, the host's included, and
+     keeps only the delays. */
+  :host([data-closed]) {
+    transition:
+      opacity 0s var(--helix-duration-fade),
+      grid-template-rows 0s var(--helix-duration-fade),
+      margin-block-start 0s var(--helix-duration-fade),
+      visibility 0s var(--helix-duration-fade);
+    translate: none;
+  }
+
+  :host([data-closed]) [part="item"] {
+    opacity: 0;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-accelerate),
+      padding-block 0s var(--helix-duration-fade);
   }
 
   [part="timer"] {

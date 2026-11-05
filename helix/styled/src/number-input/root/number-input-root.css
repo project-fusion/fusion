@@ -11,6 +11,9 @@
    frame wins, so a number lights, rings and reddens exactly as the text field
    beside it does. */
 [part="field"] {
+  /* No gap, so the frame's sizing box takes nothing back. */
+  --_field-gap: 0px;
+
   align-items: center;
   background-color: var(--number-input-background-color, var(--helix-color-well));
   block-size: var(--number-input-size, var(--helix-size-control));

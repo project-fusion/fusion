@@ -54,6 +54,11 @@
 /* In rows and columns, each column at least the hook's width, as many as fit.
    The keys read where each option is drawn, so the columns are this rule's. */
 :host([layout="grid"]) [part="items"] {
+  /* **The tick beside the words it marks.** At the end of a cell it sat 101
+     pixels after "Medium" and 24 before "Large" in the next cell, so it read
+     as the next option's. The words stop growing and the tick follows them. */
+  --_option-packed: 0;
+  --_option-tick-start: var(--helix-space-none);
   display: grid;
   grid-template-columns: repeat(
       auto-fill,

@@ -190,12 +190,24 @@ interface Piece {
 /**
  * The shapes a wrapped field is drawn as: one for each box its shadow root
  * lays out, where it has a label or a hint, which is what makes it a field.
- * A label or a hint is a line one `em` tall in the middle of its line box, as
- * wide as its words; the box keeps its own size and corner. Empty for anything
- * else, which keeps the one block. Undefined where the element is not a field.
+ * A label, a hint, or a box of words alone is a line for each line its words
+ * take, one `em` tall in the middle of its line box and as wide as its words;
+ * any other box keeps its own size and corner. Undefined where the element is
+ * not a field.
+ *
+ * **A row that holds a box beside its label is read for both**, as a
+ * Checkbox's or a Radio's `<label>` is. Read as one, the Checkbox drew its
+ * label's two lines and no box (measured November 4, 2026). **A slot is read
+ * for what it shows**, since it draws no box of its own: a Stat's label and
+ * figure arrive through slots, and the Stat drew one 112 by 50 block for its
+ * figure and nothing for its label.
  */
 const piecesOf = (field: Element, host: Element): Piece[] | undefined => {
-  const boxes = [...(field.shadowRoot?.children ?? [])]
+  const boxes = [...(field.shadowRoot?.children ?? [])].flatMap((box) =>
+    box.matches('[part~="field"]') && box.querySelector(':scope > [part~="label"]')
+      ? [...box.children]
+      : [box],
+  )
   if (!boxes.some((box) => box.matches('[part~="label"], [part~="hint"]'))) {
     return undefined
   }
@@ -204,38 +216,119 @@ const piecesOf = (field: Element, host: Element): Piece[] | undefined => {
   const pieces: Piece[] = []
   for (const box of boxes) {
     const at = box.getBoundingClientRect()
-    if (at.width === 0 || at.height === 0) {
+    const slot = box instanceof HTMLSlotElement
+    /* A label drawn only to name the box is clipped to a pixel, and is no
+       line a reader sees. A slot draws no box, so it is read for its words. */
+    if (!slot && (at.width <= 1 || at.height <= 1)) {
       continue
     }
     const parts = box.getAttribute('part')?.split(/\s+/) ?? []
-    const line = parts.includes('label') || parts.includes('hint')
-    let start = rtl ? frame.right - at.right : at.left - frame.left
-    let top = at.top - frame.top
-    let width = at.width
-    let height = at.height
-    let corner = cornerOf(box)
+    const words = wordsOf(box)
+    const line =
+      words.length > 0 && (parts.includes('label') || parts.includes('hint') || wordy(box))
     if (line) {
-      const words = document.createRange()
-      words.selectNodeContents(box)
-      const ink = words.getBoundingClientRect()
-      const size = Number.parseFloat(getComputedStyle(box).fontSize) || at.height
-      width = Math.min(at.width, ink.width > 0 ? ink.width : at.width)
-      start = rtl ? frame.right - Math.min(at.right, ink.right || at.right) : start
-      top += Math.max(0, (at.height - size) / 2)
-      height = Math.min(size, at.height)
-      corner = ''
+      const size = fontOf(box)
+      for (const one of linesIn(words)) {
+        pieces.push(lineAt(one, size, frame, rtl))
+      }
+      continue
+    }
+    if (slot) {
+      continue
     }
     pieces.push({
-      corner,
-      height: Math.round(height),
-      line,
-      start: Math.round(start),
-      top: Math.round(top),
-      width: Math.round(width),
+      corner: cornerOf(box),
+      height: Math.round(at.height),
+      line: false,
+      start: Math.round(rtl ? frame.right - at.right : at.left - frame.left),
+      top: Math.round(at.top - frame.top),
+      width: Math.round(at.width),
     })
   }
   return pieces
 }
+
+/** Whether a box holds words alone: a slot, or text with nothing in it but breaks and slots. */
+const wordy = (box: Element): boolean =>
+  box instanceof HTMLSlotElement ||
+  [...box.children].every((child) => child.localName === 'wbr' || child.localName === 'slot')
+
+/**
+ * The words a box shows, as ranges: what a slot in it is assigned, or falls
+ * back to, or the box's own text. Empty where it shows no words. An element
+ * among them is read for what it holds and not for its box, which a grid can
+ * stretch: a Stat's label measured the stat's whole width.
+ */
+const wordsOf = (box: Element): Range[] => {
+  const slot = box instanceof HTMLSlotElement ? box : box.querySelector('slot')
+  const nodes = slot ? slot.assignedNodes({ flatten: true }) : [box]
+  return nodes
+    .filter((node) => node.textContent?.trim())
+    .map((node) => {
+      const range = document.createRange()
+      if (node.nodeType === Node.TEXT_NODE) {
+        range.selectNode(node)
+      } else {
+        range.selectNodeContents(node)
+      }
+      return range
+    })
+}
+
+/**
+ * The size a box's words are set in: those of what a slot in it shows, which
+ * may set their own, as a Stat's label does at 12 in a stat at 16.
+ */
+const fontOf = (box: Element): number => {
+  const slot = box instanceof HTMLSlotElement ? box : box.querySelector('slot')
+  const first = slot?.assignedNodes({ flatten: true }).find((node) => node.textContent?.trim())
+  const holder =
+    first instanceof Element
+      ? first
+      : ((first as Text | undefined)?.assignedSlot ?? first?.parentElement ?? box)
+  return Number.parseFloat(getComputedStyle(holder).fontSize) || 16
+}
+
+interface LineBox {
+  bottom: number
+  left: number
+  right: number
+  top: number
+}
+
+/** The lines a run of words takes, each the span of the boxes on it. */
+const linesIn = (words: Range[]): LineBox[] => {
+  const lines: LineBox[] = []
+  for (const box of words.flatMap((one) => [...one.getClientRects()])) {
+    if (box.width === 0) {
+      continue
+    }
+    const line = lines.find(
+      (one) => box.top < one.bottom - box.height / 2 && box.bottom > one.top + box.height / 2,
+    )
+    if (line) {
+      line.left = Math.min(line.left, box.left)
+      line.right = Math.max(line.right, box.right)
+      line.top = Math.min(line.top, box.top)
+      line.bottom = Math.max(line.bottom, box.bottom)
+    } else {
+      lines.push({ bottom: box.bottom, left: box.left, right: box.right, top: box.top })
+    }
+  }
+  return lines
+}
+
+/** A line of words as a shape, one `em` tall in the middle of the line. */
+const lineAt = (line: LineBox, size: number, frame: DOMRect, rtl: boolean): Piece => ({
+  corner: '',
+  height: Math.round(Math.min(size, line.bottom - line.top)),
+  line: true,
+  start: Math.round(rtl ? frame.right - line.right : line.left - frame.left),
+  top: Math.round(
+    (line.top + line.bottom) / 2 - Math.min(size, line.bottom - line.top) / 2 - frame.top,
+  ),
+  width: Math.round(line.right - line.left),
+})
 
 /**
  * **Around words that wrap, a line for each line they take.** One block over a
@@ -251,35 +344,14 @@ const linesOf = (element: Element, host: Element): Piece[] => {
   }
   const words = document.createRange()
   words.selectNodeContents(element)
-  const lines: { bottom: number; left: number; right: number; top: number }[] = []
-  for (const box of words.getClientRects()) {
-    if (box.width === 0) {
-      continue
-    }
-    const line = lines.find(
-      (one) => box.top < one.bottom - box.height / 2 && box.bottom > one.top + box.height / 2,
-    )
-    if (line) {
-      line.left = Math.min(line.left, box.left)
-      line.right = Math.max(line.right, box.right)
-    } else {
-      lines.push({ bottom: box.bottom, left: box.left, right: box.right, top: box.top })
-    }
-  }
+  const lines = linesIn([words])
   if (lines.length < 2) {
     return []
   }
   const frame = host.getBoundingClientRect()
   const rtl = getComputedStyle(host).direction === 'rtl'
   const size = Number.parseFloat(getComputedStyle(element).fontSize) || 16
-  return lines.map((line) => ({
-    corner: '',
-    height: Math.round(size),
-    line: true,
-    start: Math.round(rtl ? frame.right - line.right : line.left - frame.left),
-    top: Math.round((line.top + line.bottom) / 2 - size / 2 - frame.top),
-    width: Math.round(line.right - line.left),
-  }))
+  return lines.map((line) => lineAt(line, size, frame, rtl))
 }
 
 /** Whether a computed `border-radius` draws any corner at all. */
@@ -297,7 +369,9 @@ const cornerOf = (element: Element): string => {
     return own
   }
   const box = element.getBoundingClientRect()
-  for (const inner of element.shadowRoot?.children ?? []) {
+  /* Or that of a child drawn at its size, as a Checkbox's input is inside the
+     box that holds it. */
+  for (const inner of [...(element.shadowRoot?.children ?? []), ...element.children]) {
     const at = inner.getBoundingClientRect()
     const radius = getComputedStyle(inner).borderRadius
     if (

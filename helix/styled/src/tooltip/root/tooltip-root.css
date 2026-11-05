@@ -33,7 +33,9 @@
   opacity: 0;
   padding: var(--tooltip-padding, var(--helix-space-2xs) var(--helix-space-xs));
   position: fixed;
-  scale: 0;
+  /* **From 0.96, as every floating panel enters.** From 0 it grew out of a
+     point to 1.021 and back in 120ms, the one panel in the library that did. */
+  scale: 0.96;
   /* The way out, which this closed rule carries: it accelerates away, as every
      floating panel does. It left on the entrance's overshoot, swelling as it
      went. */
@@ -150,18 +152,24 @@
   display: none;
 }
 
-/* The whole effect is the movement, so with motion reduced it is not replaced
-   with a slower one: the tooltip simply appears, which is what it did before. */
+/* **With motion reduced the scale goes and a short fade stays**, as every
+   panel answers the preference: the tooltip does not move, and it does not
+   blink into being either. */
 @media (prefers-reduced-motion: reduce) {
-  /* The scale and the transition go; the opacity gate stays. */
   [part~="surface"] {
     scale: 1;
-    transition: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
   }
 
   [part~="surface"][data-placed] {
     scale: 1;
-    transition: none;
+    transition:
+      opacity var(--helix-duration-fade) var(--helix-easing-standard),
+      display var(--helix-duration-fade) allow-discrete,
+      overlay var(--helix-duration-fade) allow-discrete;
   }
 }
 
