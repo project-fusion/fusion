@@ -1032,6 +1032,32 @@ export interface ScatterChartChoice {
   readonly yTicks?: string
 }
 
+/** The names of a strip of cells, each read as `heatmap.x`. */
+export interface HeatmapChoice {
+  readonly actives?: string
+  readonly cells?: string
+  readonly drawn?: string
+  readonly empty?: string
+  readonly footed?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly named?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly onResize?: string
+  readonly overview?: string
+  readonly placement?: string
+  readonly role?: string
+  readonly selection?: string
+  readonly tipCells?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+}
+
 /** A chart key's names, each read as `legend.x`. */
 export interface LegendChoice {
   readonly entries?: string

@@ -511,6 +511,26 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'yName'
     | 'yTicks'
   >
+  /** What a strip of cells computes for its parts. */
+  readonly heatmap: Computes<
+    | 'actives'
+    | 'cells'
+    | 'drawn'
+    | 'empty'
+    | 'footed'
+    | 'live'
+    | 'loading'
+    | 'markX'
+    | 'markY'
+    | 'named'
+    | 'overview'
+    | 'placement'
+    | 'role'
+    | 'selection'
+    | 'tipCells'
+    | 'tipLabel'
+    | 'tipped'
+  >
   /** What a chart's key computes for its parts: its entries, and its list's name and role. */
   readonly legend: Computes<'entries' | 'named' | 'role'>
   /** What a sparkline computes for its parts: its marks, where each stands, and the reading shown. */
