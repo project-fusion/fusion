@@ -8,8 +8,13 @@ import { styles } from './avatar-group.css.js'
  *
  * @description
  * Avatars overlap by one step of space, so they read as a stack and each face
- * stays visible. Each avatar has a ring in the page background color, which
- * marks its edge against the avatar behind it.
+ * stays visible. A gap is cut out of each avatar where the next one sits over
+ * it, so the edge between them shows the surface the group is on: the page, a
+ * header, a card, or a photograph. To fill the gap with a color, set
+ * `--avatar-group-ring-color`.
+ *
+ * The cutout is a circle the size of the avatar beside it, so the avatars in
+ * one group share a size.
  *
  * Each avatar is drawn over the one before it, in document order, with no
  * `z-index`. The group does not use `row-reverse` to put the first avatar on
@@ -25,7 +30,7 @@ import { styles } from './avatar-group.css.js'
  * @cssproperty --avatar-group-overflow-color - The color of the count of avatars past `max`.
  * @cssproperty --avatar-group-overflow-font-size - The type size of the count of avatars past `max`.
  * @cssproperty --avatar-group-overlap - How far each avatar sits over the one before it.
- * @cssproperty --avatar-group-ring-color - Color of the ring that separates one avatar from the next.
+ * @cssproperty --avatar-group-ring-color - A color for the gap between one avatar and the next, which is otherwise cut out and shows the surface behind the group.
  */
 @customElement('helix-avatar-group')
 export class HelixAvatarGroup extends HelixHeadlessAvatarGroup {

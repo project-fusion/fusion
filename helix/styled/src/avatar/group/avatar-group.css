@@ -1,20 +1,51 @@
 :host {
-  --_avatar-group-ring: var(--avatar-group-ring-color, var(--helix-color-background));
+  /* The gap between one avatar and the next is cut out, so it shows whatever
+     the group sits on. A color painted there instead had to guess the surface:
+     the page color drew a halo on a header, a card or a sunken panel. The ring
+     is drawn only where a page asks for a color. */
+  --_avatar-group-ring: var(--avatar-group-ring-color, transparent);
+  --_avatar-group-gap: var(--helix-border-thick);
+  --_avatar-group-step: var(--avatar-group-overlap, var(--helix-space-sm));
+  /* Where the next avatar's center sits, from this one's start edge: one and a
+     half of its own width along, less the overlap. A share of the avatar's own
+     box, since each avatar sets its size inside its own shadow root and the
+     group cannot read it. Avatars in a group share one size. */
+  --_avatar-group-next: calc(150% - var(--_avatar-group-step));
+
   align-items: center;
   display: flex;
+}
+
+:host(:dir(rtl)) {
+  --_avatar-group-next: calc(-50% + var(--_avatar-group-step));
 }
 
 /* Each avatar overlaps the one before it and is drawn over it, which falls out
    of document order and needs no `z-index`: nothing here is positioned, so
    painting follows the tree. */
 ::slotted(*) {
-  box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
+  box-shadow: 0 0 0 var(--_avatar-group-gap) var(--_avatar-group-ring);
   flex: 0 0 auto;
+}
+
+/* The cutout: a circle the next avatar's size and the gap wider, taken out of
+   this one where the next sits over it. Every avatar but the last child has a
+   next one. Past `max`, the last child is hidden and the avatar shown last has
+   the count beside it, which is the same size. */
+/* **The gap is in the stops, and the size is a bare `50%`.** Chromium 153
+   refuses a `calc()` in a radial gradient's size, which drops the whole
+   `mask-image`, and takes one in a stop. */
+::slotted(:not(:last-child)) {
+  mask-image: radial-gradient(
+    50% 50% at var(--_avatar-group-next) 50%,
+    transparent calc(100% + var(--_avatar-group-gap) - 0.5px),
+    #000 calc(100% + var(--_avatar-group-gap))
+  );
 }
 
 /* The overlap, as a negative margin on everything after the first. */
 ::slotted(*:not(:first-child)) {
-  margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
+  margin-inline-start: calc(-1 * var(--_avatar-group-step));
 }
 
 /* Past `max`. Measured in Chrome 148: append two avatars past `max` to a settled
@@ -40,20 +71,23 @@
    is where the avatars it stands for would have continued. */
 [part="overflow"] {
   align-items: center;
-  margin-inline-start: calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)));
+  margin-inline-start: calc(-1 * var(--_avatar-group-step));
   background-color: var(
     --avatar-group-overflow-background-color,
     var(--helix-color-surface-sunken)
   );
-  block-size: var(--avatar-size, var(--helix-size-control-md));
+  /* The avatars' own size, so the count is one more of them and fits the
+     cutout the avatar before it makes. It was a control's size, a step larger
+     than an avatar at `md`. */
+  block-size: var(--avatar-size, var(--helix-size-avatar));
   border-radius: var(--helix-radii-full);
-  box-shadow: 0 0 0 var(--helix-border-thick) var(--_avatar-group-ring);
+  box-shadow: 0 0 0 var(--_avatar-group-gap) var(--_avatar-group-ring);
   color: var(--avatar-group-overflow-color, var(--helix-color-foreground-muted));
   display: inline-flex;
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--avatar-group-overflow-font-size, var(--helix-text-xs));
   font-weight: var(--helix-weight-medium);
-  inline-size: var(--avatar-size, var(--helix-size-control-md));
+  inline-size: var(--avatar-size, var(--helix-size-avatar));
   justify-content: center;
 }
