@@ -106,9 +106,8 @@
   /* **A row is a control's height at each density, 32, 40 and 48, as Table's
      is.** Padding alone made it 43, 44.5 and 46: a fixed 12 above and below a
      line that grew by a pixel a step, so the rows ignored density and landed on
-     half pixels at `md`. The words sit at the row's center, the rule included
-     in the height. */
-  align-content: center;
+     half pixels at `md`. The rule is included in the height, and the rule
+     below sets the words at the row's center. */
   border-block-end: var(--helix-border-thin) solid
     var(--data-table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
@@ -156,12 +155,16 @@
    centers the line box. */
 @supports (text-box: trim-both cap alphabetic) {
   [part~="cell"] {
-    /* `border-box`, so the line, the padding either side and the rule. */
-    min-block-size: calc(
-      1lh +
-      var(--data-table-padding-block, var(--helix-space-sm)) *
-      2 +
-      var(--helix-border-thin)
+    /* `border-box`, so the line, the padding either side and the rule, and
+       never under the control height the rule above holds a row to. */
+    min-block-size: max(
+      var(--helix-size-control),
+      calc(
+        1lh +
+        var(--data-table-padding-block, calc(var(--helix-space-control) * 0.5)) *
+        2 +
+        var(--helix-border-thin)
+      )
     );
     text-box: trim-both cap alphabetic;
   }
