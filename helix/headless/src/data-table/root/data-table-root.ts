@@ -404,6 +404,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart toolbar - The region above the grid.
  *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
+ * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  *
@@ -2729,10 +2730,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     id?: string,
   ): TemplateResult {
     const edge = edgeOf(column.textAlign)
+    /* The same three words, through the same guard, since both go into CSS. */
+    const block = edgeOf(column.verticalAlign)
     /* The depth goes on the row header, which indents, and holds the toggle. */
     const placed = header && this.childField ? this.tree().placed.get(row) : undefined
     const style = [
       edge ? `--data-table-cell-align: ${edge}` : '',
+      block ? `--data-table-cell-block-align: ${block}` : '',
       placed ? `--data-table-level: ${placed.level}` : '',
     ]
       .filter(Boolean)
