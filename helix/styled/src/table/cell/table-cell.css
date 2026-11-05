@@ -68,13 +68,35 @@
    a pixel under the row's height centers in it and the row stays 32, 40 or 48;
    a control of the row's full height is a pixel more, for the rule. The words a
    cell of elements holds, such as a link or a `code`, keep the room as their
-   own margin, so a line of them that wraps still clears the rule. */
+   own margin, so a line of them that wraps still clears the rule. Helix's own
+   words count as words: without `helix-text` and `helix-code` here, the API
+   reference's rows lost their room and each name sat on the rule above it. */
 :host(:not(:state(text))) {
   padding-block: var(--helix-space-none);
 }
 
 :host(:not(:state(text)))
-  ::slotted(:is(a, abbr, b, cite, code, em, i, kbd, p, small, span, strong, time)) {
+  ::slotted(
+    :is(
+      a,
+      abbr,
+      b,
+      cite,
+      code,
+      em,
+      i,
+      kbd,
+      p,
+      small,
+      span,
+      strong,
+      time,
+      helix-code,
+      helix-format-date,
+      helix-kbd,
+      helix-text
+    )
+  ) {
   margin-block: var(--table-padding-block, calc(var(--helix-space-control) * 0.5));
 }
 
