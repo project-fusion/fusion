@@ -1,16 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import type { Series } from '../read-series/read-series.js'
+import { barDense, barOutline, barPaths, barTip } from './bar-marks.js'
 import {
   barBox,
   barColumns,
   barColumnsAt,
-  barDense,
   barFrame,
   barLayout,
   barNames,
-  barPaths,
   barRect,
-  barTip,
   barToned,
 } from './bar-plot.js'
 
@@ -119,6 +117,19 @@ describe('a bar chart drawn by core', () => {
       x: '20%',
       y: '25%',
     })
+  })
+
+  test('draws a phone column with its far end rounded and its edge open at its base', () => {
+    const box = { across: 10, along: 20, size: 60, thickness: 20 }
+    const up = barOutline(box, { end: 'positive', stacked: false }, false, { x: 2, y: 4 })
+    expect(up.d).toBe('M10,80L10,24A2,4 0 0 1 12,20L28,20A2,4 0 0 1 30,24L30,80Z')
+    expect(up.edge).toBe('M10,80L10,24A2,4 0 0 1 12,20L28,20A2,4 0 0 1 30,24L30,80')
+    const down = barOutline(box, { end: 'negative', stacked: false }, false, { x: 2, y: 4 })
+    expect(down.d).toBe('M10,20L10,76A2,4 0 0 0 12,80L28,80A2,4 0 0 0 30,76L30,20Z')
+    const between = barOutline(box, { end: undefined, stacked: true }, false, { x: 2, y: 4 })
+    expect(between.d).toBe('M10,80L10,20L10,20L30,20L30,20L30,80Z')
+    const across = barOutline(box, { end: 'positive', stacked: false }, true, { x: 4, y: 2 })
+    expect(across.d.startsWith('M20,10L76,10A4,2 0 0 1 80,12')).toBe(true)
   })
 
   test('takes a tone only where a custom property can carry its name', () => {
