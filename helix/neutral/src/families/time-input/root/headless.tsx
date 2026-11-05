@@ -40,7 +40,7 @@ import {
 export default headless('time-input', {
   props: {
     ariaLabel: string(),
-    autocomplete: web(''),
+    autocomplete: web('off'),
     badInputMessage: string(),
     clearable: false,
     clearLabel: 'Clear',

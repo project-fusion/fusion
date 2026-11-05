@@ -42,7 +42,7 @@ import {
 export default headless('date-input', {
   props: {
     ariaLabel: string(),
-    autocomplete: web(''),
+    autocomplete: web('off'),
     badInputMessage: string(),
     calendar: string(),
     calendarLabel: 'Date Picker',
