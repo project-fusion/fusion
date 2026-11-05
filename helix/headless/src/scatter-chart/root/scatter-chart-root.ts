@@ -167,7 +167,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * their place, such as a link to add the first reading.
  * When the readings did not load, set `error-text`, such as "The visits did
  * not load": it stands in the plot in place of both, and the `error` slot
- * takes a button that tries again.
+ * takes a button that tries again, shown after the words.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -188,14 +188,14 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @documentation https://fusion.dev/helix/components/scatter-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
- * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
+ * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
  * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.

@@ -194,6 +194,12 @@
   padding-inline: var(--helix-space-md);
 }
 
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the words a step away from them, as it does in Table. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
+}
+
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. */
 [part="mark-all"] {

@@ -78,9 +78,9 @@ step darker to be seen. A lit row is different: it takes `hover`, a wash measure
 against whatever it sits on. `overlay` works the other way. Its edge and its shadow separate it, so on
 a white page it is white.
 
-**In dark mode, a surface over a raised one steps up from it.** `raised` and
-`overlay` are one color in dark mode, and a shadow does not show on a black
-page. Inside a Dialog, a Drawer, or an elevated Card, the rungs are washes of
+**In dark mode, a surface over a raised one steps up from it.** A shadow does
+not show on a black page, so `overlay` stands one rung above `raised`: #1e1e1e
+over #181818, 1.06:1. Inside a Dialog, a Drawer, or an elevated Card, the rungs are washes of
 `foreground` over the panel: `overlay` 8%, `raised` 5%, `surface` 3%, and
 `border` 12%. A Menu opened from an elevated Card stands a step above the card,
 and a Dialog opened over another Dialog stands 8% above it. Light mode keeps its

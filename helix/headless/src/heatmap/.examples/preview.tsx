@@ -382,7 +382,13 @@ export function Example() {
         </tbody>
       </table>
 
-      <span slot="start">28 Jul</span>
+      <helix-headless-format-date
+        date="2026-07-28"
+        day="numeric"
+        month="short"
+        slot="start"
+        time-zone="UTC"
+      ></helix-headless-format-date>
       <span slot="summary">99.6% uptime</span>
       <span slot="end">Today</span>
     </helix-headless-heatmap>

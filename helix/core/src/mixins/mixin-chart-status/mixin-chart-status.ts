@@ -64,8 +64,10 @@ export declare class MixinChartStatusInterface {
  *
  * **And words when they did not load.** `error-text` stands in the plot in
  * place of the other two while it is set, in the danger ink with its mark, and
- * the `error` slot takes markup, such as a button that tries again. `Table`,
- * `List`, and `Listbox` take the same property and slot.
+ * the `error` slot takes markup after the words, such as a button that tries
+ * again. The words stay: with the slot in their place, a page following the
+ * documented example showed a button and no reason for it. `Table`, `List`,
+ * and `Listbox` take the same property and slot.
  *
  * **A blank box said neither.** A chart pointed at an empty table drew its
  * plot at full height with nothing in it, which reads as a chart that failed,
@@ -115,9 +117,9 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
      * such as "The visits did not load". Empty, the default, shows nothing.
      *
      * While it is set and the chart has no readings to draw, the `error` line
-     * stands in the plot in place of the empty and loading words, or your own
-     * content in the `error` slot, such as a button that tries again, and the
-     * chart takes the `error` state. Clear it once you try again. Announced as
+     * stands in the plot in place of the empty and loading words, followed by
+     * your own content in the `error` slot, such as a button that tries again,
+     * and the chart takes the `error` state. Clear it once you try again. Announced as
      * it appears, being news you act on.
      */
     @property({ attribute: 'error-text' })
@@ -155,7 +157,7 @@ export const MixinChartStatus = <T extends Constructor<ChartHost>>(
      */
     protected renderStatus(): TemplateResult | typeof nothing {
       if (this.errorText) {
-        return html`<p dir="auto" part="error" role="alert"><slot name="error">${this.errorText}</slot></p>`
+        return html`<p dir="auto" part="error" role="alert">${this.errorText}<slot name="error"></slot></p>`
       }
       if (this.loading) {
         return html`<p dir="auto" part="loading"><slot name="loading">${this.loadingText}</slot></p>`

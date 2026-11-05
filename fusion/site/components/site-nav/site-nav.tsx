@@ -84,17 +84,18 @@ export function SiteMenu({
          *             the component reference, the sandbox, the theme builder, reachable
          *             only by landing on `/helix` first and looking for it.
          *
-         *             `heading`, because a product row is not a destination. It carries
-         *             no `href`, its own page sitting under it as Overview, so it is the
-         *             name of the list and the list is what the drawer is for. Under
-         *             `subordinate`, which it had, the ranking landed on the wrong rows:
-         *             Docs and Sandbox came out smaller than Services and Insights while
-         *             all four are pages a reader can open, so the drawer sized its
-         *             destinations by which of them happened to sit under a product.
-         *             Here every destination is one size and the two product names are
-         *             the labels over them.
+         *             **Every row at one size, the product rows included.** Under
+         *             `subordinate` Docs and Sandbox came out smaller than Services and
+         *             Insights while all four are pages a reader can open. Under
+         *             `heading` the product names became 12px muted labels, which reads
+         *             as a label over its list while the branch is open, and as two
+         *             smaller, grayer rows beside Services and Insights while it is
+         *             closed, which is how the drawer opens on most pages. At the
+         *             default `peer`, Helix and Cortex are rows like the rest, and
+         *             the chevron says each one holds more. A product row still
+         *             carries no `href`: its own page sits under it as Overview.
          */}
-        <helix-tree active={pathname} label="Site navigation" nesting="heading">
+        <helix-tree active={pathname} label="Site navigation">
           {PRODUCTS.map((product) => (
             <helix-tree-item
               /* Open where the reader already is. A tree that opens nothing

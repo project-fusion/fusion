@@ -45,6 +45,9 @@
     var(--object-inspector-border-color, var(--helix-color-border));
   border-radius: var(--object-inspector-radius, var(--helix-radii-md));
   font-family: var(--helix-font-mono);
+  /* Code shows the characters written, as Code's does: Fira Code's ligatures
+     drew `</` and `=>` as single marks. */
+  font-variant-ligatures: none;
   line-height: var(--helix-leading-normal);
   padding-block: var(--helix-space-xs);
 }

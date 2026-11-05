@@ -18,15 +18,11 @@
 - button "Color scheme Site": Site
 - paragraph: Which half of the palette you see. Site follows the site's own mode; both halves are emitted either way.
 - text: Light page
-- textbox "Light page":
-  - /placeholder: "#ff0000"
-  - text: "#ffffff"
+- textbox "Light page": "#ffffff"
 - button "Choose a color"
 - paragraph: The page's color in light.
 - text: Dark page
-- textbox "Dark page":
-  - /placeholder: "#ff0000"
-  - text: "#000000"
+- textbox "Dark page": "#000000"
 - button "Choose a color"
 - paragraph: The page's color in dark.
 - switch "Color one band"

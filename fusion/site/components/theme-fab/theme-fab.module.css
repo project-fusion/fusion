@@ -24,7 +24,11 @@
   }
 }
 
+/* The page's border, captured where it is still the page's, so the sheet can
+   restate it below without reading itself. */
 .fabRail {
+  --_site-fab-border: var(--helix-color-border);
+
   display: flex;
   inset-block-end: calc(var(--helix-space-lg) + env(safe-area-inset-bottom, 0px));
   inset-inline: 0;
@@ -225,7 +229,18 @@
    */
   /* Solid, as the navigation drawer is: a sheet this tall over the hero blurred
      the strands into a gray band behind its labels. */
+  /* **And it restates the border for that ground, as a Helix Dialog does.** In
+     dark the sheet is `surface-overlay`, a rung above the page, and the page's
+     border sat on it at 1.03:1, so the sliders' unfilled track did not show.
+     The dark line is the Dialog's own mix, 12% of the foreground into the
+     ground. Light keeps the page's line, because there the sheet is the
+     page's white. */
   .fab[data-open] {
+    --helix-color-border: light-dark(
+      var(--_site-fab-border),
+      color-mix(in oklab, var(--helix-color-foreground) 12%, var(--helix-color-surface-overlay))
+    );
+
     backdrop-filter: none;
     background: var(--helix-color-surface-overlay);
     block-size: auto;

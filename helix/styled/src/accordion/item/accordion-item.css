@@ -19,10 +19,12 @@
   gap: var(--helix-space-xs);
   /* The current step, not the fixed `md` one. */
   min-block-size: var(--helix-size-control);
+  /* The inline inset steps with density, as a List row's: 4 past a field's at
+     every stop, 12, 16 and 20. */
   padding: var(
     --accordion-item-padding,
     min(calc(var(--helix-space-control) * 0.5), calc((var(--helix-size-control) - 1lh) / 2))
-      var(--helix-space-md)
+      calc(var(--helix-space-field) + var(--helix-space-2xs))
   );
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -122,7 +124,10 @@
   display: block;
   line-height: var(--helix-leading-normal);
   overflow-wrap: break-word;
-  padding: var(--accordion-item-padding, var(--helix-space-sm) var(--helix-space-md));
+  padding: var(
+    --accordion-item-padding,
+    var(--helix-space-sm) calc(var(--helix-space-field) + var(--helix-space-2xs))
+  );
   padding-block-start: 0;
 }
 

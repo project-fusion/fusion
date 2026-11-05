@@ -31,6 +31,16 @@
   background-color: var(--app-header-background-color, var(--helix-material-panel));
 }
 
+/* **Glass and frosted draw the material's edge under the bar**, as every glass
+   or frosted surface does. The opaque bar has none, and the material kept that
+   transparent line, so over a scrolled photo the bar's foot had no edge at all.
+   A transparent bar takes it once it has scrolled and taken the glass. */
+:host([material="glass"]),
+:host([material="frosted"]),
+:host([material="transparent"]:state(scrolled)) {
+  border-block-end-color: var(--app-header-border-color, var(--helix-material-border));
+}
+
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
    the heavier blur is what stops a ground that opaque reading as a smear. */
 :host([material="frosted"]) {
@@ -160,8 +170,6 @@ slot[name="start"]::slotted(*) {
    inactive, so a strip that fits is never masked. */
 [part="content"] {
   --_app-header-fade: to right;
-  animation: app-header-edges linear both;
-  animation-timeline: scroll(self inline);
   mask-image: linear-gradient(
     var(--_app-header-fade),
     transparent,
@@ -173,6 +181,16 @@ slot[name="start"]::slotted(*) {
 
 :host(:dir(rtl)) [part="content"] {
   --_app-header-fade: to left;
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a strip with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  [part="content"] {
+    animation: app-header-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
 }
 
 @keyframes app-header-edges {

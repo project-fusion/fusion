@@ -52,6 +52,22 @@
   padding-inline-start: var(--_stat-group-gap);
 }
 
+/* **In fixed columns the grid already spaces the figures**, so the rule
+   stands in the middle of one gap and the gap does not double. With the
+   flowing group's doubled gap and inset, three columns in a 342 group kept 2
+   pixels each for a figure, and "98.2" broke after its point. Each figure is
+   pulled back half the gap, which a grid item stretches across, so its
+   figure starts where its track does, and the rule of the first column lands
+   outside the box, where the clip takes it. */
+:host([columns][divided]) {
+  column-gap: var(--_stat-group-gap);
+}
+
+:host([columns][divided]) ::slotted(*) {
+  margin-inline-start: calc(var(--_stat-group-gap) * -0.5 - var(--helix-border-thin));
+  padding-inline-start: calc(var(--_stat-group-gap) * 0.5);
+}
+
 /* **And a rule over every figure, by the same trick across the rows.** At 280
    the group wrapped one figure, then two, with the rules standing only between
    figures in a row, so nothing divided the rows. Each figure's rule is pulled

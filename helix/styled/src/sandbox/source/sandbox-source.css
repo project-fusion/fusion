@@ -13,6 +13,9 @@
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-mono);
   font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+  /* Code shows the characters written, as Code's does: Fira Code's ligatures
+     drew `</` and `=>` as single marks. */
+  font-variant-ligatures: none;
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
   min-block-size: var(--sandbox-source-min-block-size, 12rem);
@@ -162,6 +165,7 @@
   box-shadow: var(--sandbox-source-completions-shadow, var(--helix-shadow-floating));
   font-family: var(--helix-font-mono);
   font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+  font-variant-ligatures: none;
   max-block-size: 12rem;
   min-inline-size: 8rem;
   overflow-y: auto;

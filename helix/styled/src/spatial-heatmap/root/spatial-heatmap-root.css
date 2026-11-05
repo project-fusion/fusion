@@ -286,14 +286,36 @@
   display: none;
 }
 
+/* **Across the box and in the middle of a plot's height**, as the other
+   spatial charts draw their words. With nothing to draw the strip has no
+   size, so the words were a 20 pixel line at the top of the box and the page
+   jumped when the prisms arrived. The track takes the box, the words share
+   the strip's cell, and they stand in 12em, a Line Chart plot's height. */
 [part="empty"],
 [part="error"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
+  display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  grid-area: 1 / 1;
+  grid-auto-flow: column;
   margin: var(--helix-space-none);
+  min-block-size: 12em;
+  place-content: center;
   text-align: center;
+}
+
+:host(:state(empty)),
+:host(:state(error)),
+:host(:state(loading)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:host(:state(empty)) [part~="strip"],
+:host(:state(error)) [part~="strip"],
+:host(:state(loading)) [part~="strip"] {
+  grid-area: 1 / 1;
 }
 
 /* Print: an edge on every face, so the prisms stay countable whatever the

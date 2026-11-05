@@ -57,6 +57,17 @@ const EDGE = 40
 const GAP = 9999
 
 /**
+ * The seam between two slices, along the ring, in the view box's units.
+ *
+ * Slices that touched read as one band where two colors were near, as two
+ * light series in the ink theme are. A dash a seam short leaves the track
+ * showing between slices, which is the ring's own ground on any surface, and
+ * a constant length on a circle is a constant angle, so the seam's sides are
+ * radial as the slices' ends are. 0.8 is 1.8 pixels at the resting 224.
+ */
+const SEAM = 0.8
+
+/**
  * How much of the radius the ring takes, by name.
  *
  * **The outer edge is fixed and the radius follows the thickness**, which is
@@ -127,7 +138,7 @@ export interface DonutShare {
  * their place.
  * When the readings did not load, set `error-text`, such as "The visits did
  * not load": it stands in the plot in place of both, and the `error` slot
- * takes a button that tries again.
+ * takes a button that tries again, shown after the words.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -147,7 +158,7 @@ export interface DonutShare {
  *
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
  * @slot empty - Content shown in place of the ring when the table has no readings. Falls back to `empty-text`.
- * @slot error - Content shown in place of the ring while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
+ * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown in place of the ring while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The slice shown moved, or was put away: `index` is the slice's row, or `-1` for none, with its `label` and the `pointerType` that moved it.
@@ -155,7 +166,7 @@ export interface DonutShare {
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart empty - The words in place of the ring when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart error - The words in place of the ring while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart error - The words in place of the ring while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart live - The readout: a polite live region that says the slice the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the ring while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -555,10 +566,19 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
     return `0 ${CENTER - EDGE} ${PLOT_WIDTH} ${EDGE + this.thickness / 2}`
   }
 
-  /** One slice, as a dash the length of its share. */
+  /**
+   * The seam each slice leaves at either end, as a length along the ring:
+   * half a `SEAM`, and none where one slice is the whole.
+   */
+  private get seam(): number {
+    return this.shares.filter((share) => share.fraction > 0).length > 1 ? SEAM / 2 : 0
+  }
+
+  /** One slice, as a dash the length of its share, less the seam at each end. */
   protected renderSegment(share: DonutShare, index: number): TemplateResult {
     const circumference = 2 * Math.PI * this.radius
-    const length = share.fraction * circumference * this.span
+    const seam = this.seam
+    const length = Math.max(0, share.fraction * circumference * this.span - seam * 2)
     /* Negative, because `stroke-dashoffset` counts backwards along the path:
        a positive offset would run the slices anticlockwise from twelve. The
        rotation that puts zero at the top is the stylesheet's, since it is a
@@ -584,7 +604,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
       part="segment${active ? ' segment-active' : ''}"
       r=${this.radius}
       stroke-dasharray="${length} ${GAP}"
-      stroke-dashoffset=${-share.start * circumference * this.span}
+      stroke-dashoffset=${-(share.start * circumference * this.span + seam)}
     />
     ${this.renderEdge(share, index)}`
   }
@@ -621,8 +641,11 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
    */
   protected renderEdge(share: DonutShare, index: number): TemplateResult {
     const turn = 2 * Math.PI * this.span
-    const from = share.start * turn + this.origin
-    const to = (share.start + share.fraction) * turn + this.origin
+    /* The seam the dash leaves, as the angle it is on the dash's circle, so
+       the edge and the slice it outlines end together. */
+    const seam = Math.min(this.seam / this.radius, share.fraction * turn * 0.5)
+    const from = share.start * turn + this.origin + seam
+    const to = (share.start + share.fraction) * turn + this.origin - seam
     const outer = EDGE
     const inner = EDGE - this.thickness
     const at = (radius: number, angle: number): string =>

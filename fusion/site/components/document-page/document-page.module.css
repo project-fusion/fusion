@@ -130,8 +130,13 @@
      size and a different number at any other, and it makes the standfirst the
      narrowest thing on the page: measured, it stopped 118px short of the
      paragraph beneath it, so the head had a ragged right edge of its own before
-     the shell had one. */
-  text-wrap: balance;
+     the shell had one.
+
+     **`pretty`, as the site's other ledes are.** `balance` evens every line, so
+     a four-line standfirst at 390 broke at 242 to 279 in a 342 column and drew
+     a narrower box than the column it sits in. `pretty` fills each line and
+     only keeps the last one from ending on a single word. */
+  text-wrap: pretty;
 }
 
 /* A numbered document reads its numbers in a rail.** A claim with prose under it

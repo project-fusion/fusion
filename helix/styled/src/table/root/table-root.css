@@ -1,8 +1,6 @@
 /* The table scrolls its own box rather than squeezing its columns. */
 :host {
   --_table-fade: to right;
-  animation: table-edges linear both;
-  animation-timeline: scroll(self inline);
   display: block;
   /* A table wider than its box says so by fading the edge with more behind it,
      as Data Table does. A timeline over a box with nothing to scroll is
@@ -19,6 +17,16 @@
 
 :host(:dir(rtl)) {
   --_table-fade: to left;
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a table with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  :host {
+    animation: table-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
 }
 
 @keyframes table-edges {

@@ -165,6 +165,17 @@
   }
 }
 
+/* **Forced colors draw the edge the inverse ground stood for.** The surface's
+   fill turns to Canvas over a Canvas page and the shadow is dropped, so the
+   tooltip was its words alone, with no box: measured in Chromium on November 4,
+   2026, a border of 0 over the page's own color. The opaque ground keeps no
+   edge everywhere else. */
+@media (forced-colors: active) {
+  [part~="surface"] {
+    border: var(--helix-border-thin) solid CanvasText;
+  }
+}
+
 /* Not printed, being an overlay. */
 /* Where `overlay` cannot be transitioned, as in WebKit, a closing surface
    leaves the top layer at once while `display` holds it for the fade, and a

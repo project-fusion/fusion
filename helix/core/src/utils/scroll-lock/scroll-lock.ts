@@ -12,11 +12,13 @@ interface ScrollLock {
 
 /**
  * A box that stays above every modal surface: Toast's stack. `raise` puts it
- * back on top of the top layer, and `covers` says whether a point lands on it.
+ * back on top of the top layer, `covers` says whether a point lands on it, and
+ * `release` tells it a modal surface has let go of the page.
  */
 export interface Raised {
   covers(x: number, y: number): boolean
   raise(): void
+  release?(): void
 }
 
 const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
@@ -65,7 +67,13 @@ export const lockScroll = (holder: Element): void => {
 /** Lets go of the page, and gives it back once nothing else holds it. */
 export const unlockScroll = (holder: Element): void => {
   const lock = record()
-  if (!lock?.holders.delete(holder) || lock.holders.size > 0) {
+  if (!lock?.holders.delete(holder)) {
+    return
+  }
+  for (const one of lock.raised) {
+    one.release?.()
+  }
+  if (lock.holders.size > 0) {
     return
   }
   const root = document.documentElement

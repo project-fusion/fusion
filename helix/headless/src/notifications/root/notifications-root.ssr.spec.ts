@@ -88,14 +88,16 @@ describe('notifications server output', () => {
   /* A failure is a fact the page knows before any script runs, so the server
      says it, in the part and in the live region, with the slot for richer
      content around the words. */
-  test('a load error is served, around a slot for richer content', () => {
+  test('a load error is served, with a slot after it for richer content', () => {
     const failed = rendered(
       ssr(
         html`<helix-headless-notifications label="Activity" error-text="Could not load"></helix-headless-notifications>`,
       ),
       'helix-headless-notifications',
     )
-    expect(failed).toMatch(/<p part="error"><slot name="error">(<!--[^>]*-->)*Could not load/)
+    expect(failed).toMatch(
+      /<p part="error">(<!--[^>]*-->)*Could not load(<!--[^>]*-->)*<slot name="error"><\/slot>/,
+    )
     expect(failed).toMatch(/<span part="live" role="status">(<!--[^>]*-->)*Could not load/)
   })
 })

@@ -77,3 +77,11 @@
     forced-color-adjust: none;
   }
 }
+
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the words a step away from them, as it does in Table. The words stay: with
+   the slot in their place, a page following the documented example showed a
+   button and no reason for it. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
+}

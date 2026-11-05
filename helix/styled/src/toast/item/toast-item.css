@@ -426,6 +426,17 @@ slot[name="icon"]::slotted(*) {
   }
 }
 
+/* **Forced colors draw the edge the inverse ground stood for.** The message's
+   fill turns to Canvas over a Canvas page and the shadow is dropped, so a
+   message was its words with no box around them: measured in Chromium on
+   November 4, 2026, a border of 0 over the page's own color. The ground keeps
+   no edge everywhere else. */
+@media (forced-colors: active) {
+  [part="item"] {
+    border: var(--helix-border-thin) solid CanvasText;
+  }
+}
+
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
    moves. Where the control is already that size the box sits inside it. */
 [part="dismiss"]::after {

@@ -38,11 +38,8 @@
   --_icon-button-turn: var(--helix-duration-turn);
   --_icon-button-ink: var(--helix-color-foreground-muted);
   --_icon-button-ink-hover: var(--helix-color-foreground);
-  /* 8% in light and 12% in dark, as a row's hover and Button's ghost. */
-  --_icon-button-wash: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
-  );
+  /* The hover wash a row and Button's ghost take, read from its token. */
+  --_icon-button-wash: var(--helix-color-hover);
   /*
  *  The solid fill, separate from the tone, and it has to be separate.
  *
@@ -440,7 +437,17 @@
    place under the button, and frosted turns the pair up for a surface too busy
    for glass to read. The filter and the translucent ground go together, for
    the reason `Card` gives: either alone does nothing a reader can see. A solid
-   button keeps its fill, which is what it means. */
+   button keeps its fill, which is what it means. **A ghost under a material
+   draws the material's edge**, as every glass or frosted surface does: its
+   border was transparent, so over a photo the glass square had no edge at all.
+   An outlined button keeps its own. */
+:host([material="glass"]:not([emphasis])) [part="button"],
+:host([material="glass"][emphasis="ghost"]) [part="button"],
+:host([material="frosted"]:not([emphasis])) [part="button"],
+:host([material="frosted"][emphasis="ghost"]) [part="button"] {
+  border-color: var(--icon-button-border-color, var(--helix-material-border));
+}
+
 :host([material="glass"]:not([emphasis="solid"])) [part="button"] {
   backdrop-filter: var(--icon-button-backdrop, var(--helix-material-backdrop));
   background-color: var(

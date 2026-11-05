@@ -21,6 +21,7 @@
   color: var(--helix-color-danger);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-sm);
+  font-variant-ligatures: none;
   inset: 0;
   line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);

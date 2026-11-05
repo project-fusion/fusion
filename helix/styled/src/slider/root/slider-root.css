@@ -444,10 +444,7 @@
    read-only slider measured 0.00% of pixels from an editable one. Before the
    invalid rules, whose red ring still wins. */
 :host([readonly]) {
-  --_slider-read-only-edge: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
-  );
+  --_slider-read-only-edge: var(--helix-color-border-readonly);
 }
 
 :host([readonly]) [part="control"]::-webkit-slider-thumb {
@@ -802,18 +799,36 @@
 
 /* Forced colors drop a background image, which is the whole track, and paint the
    thumb Canvas: measured October 31, 2026, the slider drew nothing at all. The
-   platform's own range control is what survives. */
+   platform's own range control is what survives. **The fill is the value, so it
+   is drawn in `Highlight` over the `Canvas` track**, as Progress draws its own:
+   a flat Canvas track left the thumb as the only mark of where the value was.
+   The image is opted out of the adjustment, which is what keeps it painted. */
 @media (forced-colors: active) {
+  [part="control"] {
+    --slider-fill-color: Highlight;
+    --_slider-track-color: Canvas;
+  }
+
   [part="control"]::-webkit-slider-runnable-track {
-    background: Canvas;
+    background: var(--_slider-track-image);
     border: var(--helix-border-thin) solid CanvasText;
     forced-color-adjust: none;
   }
 
   [part="control"]::-moz-range-track {
-    background: Canvas;
+    background: var(--_slider-track-image);
     border: var(--helix-border-thin) solid CanvasText;
     forced-color-adjust: none;
+  }
+
+  :host([range]) [part="control"]:not([data-thumb="start"])::-webkit-slider-runnable-track {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  :host([range]) [part="control"]:not([data-thumb="start"])::-moz-range-track {
+    background: transparent;
+    border-color: transparent;
   }
 
   [part="control"]::-webkit-slider-thumb {

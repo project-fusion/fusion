@@ -101,7 +101,7 @@ const STRIP_HEIGHT = 32
  * @documentation https://fusion.dev/helix/components/sparkline
  *
  * @slot empty - Content shown in place of the line when there are no readings. Falls back to `empty-text`.
- * @slot error - Content shown in place of the line while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
+ * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown in place of the line while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the reading, or `-1` for none, with its row's `label` from a table and the `pointerType` that moved it.
@@ -111,7 +111,7 @@ const STRIP_HEIGHT = 32
  * @csspart bar - One column, drawn when `plot="bar"`.
  * @csspart cursor - The mark on the reading a pointer or a key rests on, rendered only while there is one. Placed with `inset-inline-start` and `inset-block-start`.
  * @csspart empty - The words in place of the line when there are no readings: the `empty` slot, falling back to `empty-text`. Not drawn while a table named by `for` cannot be read yet, on the server and during hydration.
- * @csspart error - The words in place of the line while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart error - The words in place of the line while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart high - The mark on the highest reading, under `marks="high"`. Placed as `cursor` is.
  * @csspart line - The line's path.
  * @csspart live - A polite region that says the reading a key moved to, rendered only with a `label`. Hide it visually.
@@ -187,8 +187,8 @@ export class HelixHeadlessSparkline extends HelixElement {
    * as "The visits did not load". Empty, the default, shows nothing.
    *
    * While it is set and there are no readings, the `error` line stands in place
-   * of the line, or your own content in the `error` slot, and the sparkline
-   * takes the `error` state. Clear it once you try again.
+   * of the line, followed by your own content in the `error` slot, and the
+   * sparkline takes the `error` state. Clear it once you try again.
    */
   @property({ attribute: 'error-text' })
   errorText = ''
@@ -674,7 +674,7 @@ export class HelixHeadlessSparkline extends HelixElement {
    */
   protected renderStatus(): TemplateResult | typeof nothing {
     if (this.errorText) {
-      return html`<p dir="auto" part="error" role="alert"><slot name="error">${this.errorText}</slot></p>`
+      return html`<p dir="auto" part="error" role="alert">${this.errorText}<slot name="error"></slot></p>`
     }
     if (this.loading) {
       return html`<p dir="auto" part="loading"><slot name="loading">${this.loadingText}</slot></p>`

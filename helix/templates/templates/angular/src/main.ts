@@ -12,7 +12,9 @@ import { bootstrapApplication } from '@angular/platform-browser'
    targets reach back to browsers without it, so a production build would
    rewrite each `light-dark()` into a fallback that resolves on the root
    element, and a Toast would draw in the page's mode. The Vite templates set
-   the same browsers as `cssTarget`. */
+   the same browsers as `cssTarget`. Safari 18 and Firefox 128 are the first
+   with relative colors, `oklch(from ...)`, which the brand ramp is built
+   from. */
 import '@fusion.dev/helix'
 
 import { App } from './app/app'

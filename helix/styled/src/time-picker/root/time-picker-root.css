@@ -1,5 +1,9 @@
 :host {
   display: block;
+  /* Figures of one width, so the colons of a column of times line up. With the
+     face's own figures "11:30" drew 32.2 pixels wide against 36.5 for "10:30",
+     and the colons wandered down the list. */
+  font-variant-numeric: tabular-nums;
 }
 
 /* A slotted label, set as every field's label is in `shared/field`, a step
@@ -54,8 +58,6 @@
    on. A timeline over a list with nothing to scroll is inactive, so a list that
    fits is never masked. */
 [part="list"]::part(items) {
-  animation: time-picker-edges linear both;
-  animation-timeline: scroll(self block);
   mask-image: linear-gradient(
     to bottom,
     transparent,
@@ -63,6 +65,16 @@
     #000 calc(100% - var(--_time-picker-fade-end, 0rem)),
     transparent
   );
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a list with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  [part="list"]::part(items) {
+    animation: time-picker-edges linear both;
+    animation-timeline: scroll(self block);
+  }
 }
 
 /* The mask clips what is drawn outside the box, so the ring goes inside it. */

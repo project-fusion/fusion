@@ -356,7 +356,7 @@
   - slider "Corner radius": "50"
   - button "Switch to dark"
   - button "Reset to the shipped palette" [disabled]
-  - text: every measured pair clears
+  - text: Every pair passes contrast
   - button "Close the theme controls"
 - contentinfo:
   - img "Fusion"

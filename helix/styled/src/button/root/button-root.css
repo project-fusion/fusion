@@ -272,9 +272,9 @@
 /* A press, one step past each hover. After the hovers and at their specificity,
    since a press happens under the pointer.
 
-   **16% in light and 20% in dark, the strengths of `color-press`**, so a pressed
-   button and a pressed row take one press. At 16% in dark the press stood 1.13:1
-   from the 12% hover, against 1.31 for a row; at 20% it stands 1.30. */
+   **16% in light and 20% in dark.** At 16% in dark the press stood 1.13:1 from
+   the 12% hover, against 1.31 for a row; at 20% it stands 1.30. `color-press`,
+   which a row takes, is 19% in dark since November 4, 2026. */
 :host(:not(:disabled)) [part="button"]:active {
   background-color: var(
     --button-background-color,

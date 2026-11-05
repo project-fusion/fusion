@@ -22,9 +22,12 @@
   align-content: center;
   /* The height of a control at this density, and two lines grow from it. */
   min-block-size: var(--helix-size-control);
+  /* **The inline inset steps with density**, 4 past a field's at every stop:
+     12, 16 and 20. A fixed 16 stood beside fields at 8 in an `sm` region. */
   padding: var(
     --list-item-padding,
-    calc(var(--helix-space-control) * 0.5) var(--_list-bleed, var(--helix-space-md))
+    calc(var(--helix-space-control) * 0.5)
+      var(--_list-bleed, calc(var(--helix-space-field) + var(--helix-space-2xs)))
   );
   /* Out by the list's `bleed`, with the inset above the same amount, so the
      words stay on the list's edge and the fill reaches past it. None by

@@ -5,9 +5,16 @@
      range can paint the whole track and stay continuous. */
   --_calendar-track: var(--date-picker-track-size, 2.5rem);
   --_calendar-row: var(--date-picker-row-size, 2.25rem);
+  /* The names' row, which is the pointer's row on a touch screen as well:
+     nothing in it is pressed, so it keeps the week's pitch as a mouse sees it
+     while the weeks grow to the target. */
+  --_calendar-names: var(--date-picker-row-size, 2.25rem);
   --_calendar-day: var(--date-picker-day-size, calc(var(--helix-size-control) * 0.75));
   --_calendar-month: calc(var(--_calendar-track) * 7);
   display: inline-block;
+  /* Figures of one width, so a column of days and a row of years line up digit
+     over digit, as every table of numbers here does. */
+  font-variant-numeric: tabular-nums;
 }
 
 /*
@@ -217,10 +224,13 @@
 /* **One row of the grid, the pitch the weeks keep.** The name sat in the top
    twenty of a forty pixel box, so 48 pixels lay between the names and the first
    week's numbers against 36 between one week and the next, and the names read
-   as a heading apart from the grid rather than as its top row. */
+   as a heading apart from the grid rather than as its top row. On a touch
+   screen the weeks grow to the target and the names stay at this pitch, since
+   nothing in their row is pressed: at the target the names stood 61 pixels
+   under the title. */
 [part="weekday"] {
   align-items: center;
-  block-size: var(--_calendar-row);
+  block-size: var(--_calendar-names);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
   font-size: var(--helix-text-xs);

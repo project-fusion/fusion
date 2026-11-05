@@ -69,7 +69,7 @@ slot[name="label"]::slotted(*) {
 /* The whole range, always fully drawn: a track that only appears where the fill
    has not reached leaves the reading without anything to be a reading of. */
 [part="track"] {
-  background-color: var(--meter-track-color, var(--helix-color-surface-sunken));
+  background-color: var(--meter-track-color, var(--helix-color-track));
   block-size: var(--meter-size, var(--helix-size-meter));
   /*
  *  The house radius, not the pill `Progress` wears, and the ticks are why.
@@ -245,7 +245,7 @@ slot[name="label"]::slotted(*) {
    seventy-five for an arc, written by the tier below. */
 :host([shape="arc"]) [part="groove"],
 :host([shape="ring"]) [part="groove"] {
-  stroke: var(--meter-track-color, var(--helix-color-surface-sunken));
+  stroke: var(--meter-track-color, var(--helix-color-track));
   stroke-dasharray: var(--meter-sweep) 100;
 }
 
@@ -342,19 +342,16 @@ slot[name="label"]::slotted(*) {
  * **In light, 72%, for the same 3:1.** At 30% the tones measured 1.54 to 1.56
  * against the `#ebebeb` track; at 72% they measure 3.14 for warning, the lowest,
  * to 3.20, and the primary ink 7.32, against 5.37 to 14.89 at full strength.
+ *
+ * **The track is a wash since November 4, 2026, and the fill is mixed into
+ * it**, so the fill steps off a card with the track: the danger band measures
+ * 3.61 on a light card and 3.03 on a dark raised one, where the opaque track
+ * had been a hole in the raised card.
  */
 :host([emphasis="subtle"]) [part~="indicator"] {
   --_meter-subtle: light-dark(
-    color-mix(
-      in oklab,
-      var(--_meter-hue) 72%,
-      var(--meter-track-color, var(--helix-color-surface-sunken))
-    ),
-    color-mix(
-      in oklab,
-      var(--_meter-hue) 65%,
-      var(--meter-track-color, var(--helix-color-surface-sunken))
-    )
+    color-mix(in oklab, var(--_meter-hue) 72%, var(--meter-track-color, var(--helix-color-track))),
+    color-mix(in oklab, var(--_meter-hue) 65%, var(--meter-track-color, var(--helix-color-track)))
   );
   background-color: var(--_meter-subtle);
 }

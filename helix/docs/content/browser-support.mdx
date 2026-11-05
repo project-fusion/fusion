@@ -50,10 +50,12 @@ width you set, is the same width in both.
 | Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
 | `light-dark()` | Every color token, and each component color that differs between the modes |
 | `oklch()` | Every color in the system |
+| Relative colors, `oklch(from ...)` | The brand and accent ramps, the strong and subtle tones, and a few chart marks |
 | `:has()` | Relational styling, mostly of slotted content |
 | `@starting-style` | Entry transitions on overlays |
 | `:state()` | Every boolean state the library publishes: `open`, `checked`, `selected`, `invalid`, `read`, `has-label`, `settled`, `empty`, `controls` |
 | `CSS.highlights` | Filter-match highlighting, in `Command` and `Combobox` |
+| Scroll-driven animations | The edge fade on a strip or table with more to scroll |
 
 Positioning uses `@floating-ui/dom`. We chose this on purpose, and it is the one
 place Helix takes a dependency for something the browser could do. CSS anchor
@@ -62,20 +64,24 @@ features.
 
 ## Which features set the minimum browser
 
-**Check for `light-dark()` and the Popover API.** They are the newest features
-Helix requires, and everything else in the table has been available longer.
-Helix depends on both. Every token uses `light-dark()` to set both color modes
-in one declaration. Every overlay uses the Popover API to draw in the top layer.
+**Check for `light-dark()`, relative colors, and the Popover API.** They are
+the newest features Helix requires. Every token uses `light-dark()` to set both
+color modes in one declaration. The brand and accent ramps are computed from
+your seed colors with `oklch(from ...)`. Every overlay uses the Popover API to
+draw in the top layer.
 
-Neither one has a useful fallback:
+None of them has a useful fallback:
 
 - A browser without `light-dark()` shows no color at all.
+- A browser without relative colors draws no primary or accent color.
 - A browser without the Popover API renders overlays in the page flow.
+
+The first versions with all three are Chromium 123, Safari 18, and Firefox 128.
 
 For that reason, this page has no support table with a fallback column. Helix
 has no partial mode.
 
-Chromium 132 has both features. We measured on September 15, 2026 that it
+Chromium 132 has all three. We measured on September 15, 2026 that it
 does not support two things your stylesheet can do through `::part()`:
 
 - It ignores a range input's `::-webkit-slider-thumb` and
@@ -85,7 +91,7 @@ does not support two things your stylesheet can do through `::part()`:
 
 The headless examples use neither.
 
-`:state()` is the third newest feature. It does not set the minimum browser,
+`:state()` is the next newest feature. It does not set the minimum browser,
 because components still work without it. A component that cannot record a
 state keeps the look of its resting rule, so a checkbox is drawn unchecked.
 Helix tests for `:state()` support in the one place that records states.
@@ -117,7 +123,7 @@ The Helix templates set these targets. In Vite, set `build.cssTarget`:
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  build: { cssTarget: ['chrome123', 'edge123', 'firefox120', 'safari17.5', 'ios17.5'] },
+  build: { cssTarget: ['chrome123', 'edge123', 'firefox128', 'safari18', 'ios18'] },
 })
 ```
 
@@ -125,19 +131,24 @@ In Next.js, add `browserslist` to `package.json`:
 
 ```json
 {
-  "browserslist": ["chrome >= 123", "edge >= 123", "firefox >= 120", "safari >= 17.5", "ios_saf >= 17.5"]
+  "browserslist": ["chrome >= 123", "edge >= 123", "firefox >= 128", "safari >= 18", "ios_saf >= 18"]
 }
 ```
 
 ## Browsers without `CSS.highlights`
 
 `Command` and `Combobox` use the CSS Custom Highlight API to highlight the
-matched text in their filtered results. It is the least widely available
-feature Helix uses, and it is the only one that degrades gracefully. Without it,
-the results still filter, sort, and select correctly, and the match is not
-highlighted.
+matched text in their filtered results. Without it, the results still filter,
+sort, and select correctly, and the match is not highlighted.
 
 Nothing else in Helix uses it.
+
+## Browsers without scroll-driven animations
+
+Tabs, Navigation, Table, Data Table, and Log fade the edge that has more to
+scroll past it. A scroll timeline drives the fade, and Safari added scroll
+timelines in version 26. Firefox does not have them yet. In those browsers the
+strip or table still scrolls, and its edges are cut flat with no fade.
 
 ## Older browsers
 

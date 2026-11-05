@@ -1,11 +1,26 @@
 /* What the spatial charts draw alike. Compose with `series.css` and the family's
    own sheet, which comes after and so changes what it needs to. */
 
+/* **One cell holds the plot and the words that stand in it**, so "No
+   readings" sits in the middle of the box it stands for. Flowed after the plot
+   it sat at y 225 of a 245 host, under an empty box. The row takes a height
+   set on the host, which the plot then keeps to, so a 200 host is 200 and
+   nothing it draws reaches the next element. With no height set, the row is
+   the plot's own. */
 :host {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
 }
 
-::slotted(*) {
+[part="plot"] {
+  grid-area: 1 / 1;
+}
+
+/* The renderer's box, the page's own element in the default slot, fills the
+   plot. Only that slot: a button in the `error` slot was laid over the whole
+   page. */
+::slotted(:not([slot])) {
   inset: 0;
   position: absolute;
 }
@@ -43,9 +58,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* **Each axis name stands on a plate of the ground**, a stroke in the ground's
+   color painted under its letters, so a name that crosses the box's back-wall
+   lines reads whole. Without it "Requests a minute" ran across three of them.
+   The ground is the page's, or the `filled` ground where a page asks for
+   one. */
 [part="axis-name"] {
   fill: var(--helix-color-foreground);
   font-weight: var(--helix-weight-semibold);
+  paint-order: stroke;
+  stroke: var(--_spatial-plate, var(--helix-color-background));
+  stroke-linejoin: round;
+  stroke-width: 0.25em;
+}
+
+:host([separation="filled"]) {
+  --_spatial-plate: var(--helix-color-surface-filled);
 }
 
 [part="ring"] {
@@ -74,7 +102,10 @@
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
+  grid-area: 1 / 1;
   margin: var(--helix-space-none);
+  padding: var(--helix-space-md);
+  place-self: center;
   text-align: center;
 }
 

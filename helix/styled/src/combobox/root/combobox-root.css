@@ -75,6 +75,13 @@
   flex: 1 1 var(--combobox-control-size, 4ch);
 }
 
+/* A placeholder or an answer longer than the box ends in an ellipsis, as
+   Select's value does. Clipped, "Search people" read "Search peopl" in a column
+   of a two column form at 390. */
+[part="control"] {
+  text-overflow: ellipsis;
+}
+
 [part="control"]::placeholder {
   color: var(--helix-color-foreground-muted);
   font-weight: var(--helix-weight-regular);
@@ -254,8 +261,6 @@ slot[name="end"]::slotted(*) {
      the last. The list's own, half that, opened Combobox's "Loading" in a panel
      46 tall against Select's 54. */
   padding-block: var(--helix-space-xs);
-  animation: combobox-edges linear both;
-  animation-timeline: scroll(self block);
   mask-image: linear-gradient(
     to bottom,
     transparent,
@@ -263,6 +268,16 @@ slot[name="end"]::slotted(*) {
     #000 calc(100% - var(--_combobox-fade-end, 0rem)),
     transparent
   );
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a list with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  [part="listbox"]::part(items) {
+    animation: combobox-edges linear both;
+    animation-timeline: scroll(self block);
+  }
 }
 
 @keyframes combobox-edges {
@@ -311,4 +326,11 @@ slot[name="end"]::slotted(*) {
   [part="listbox"]::part(items) {
     animation: none;
   }
+}
+
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the list's error words a step away from them, as it does in Table. Set here,
+   where the page's content is slotted: the list sees only this slot. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
 }

@@ -305,24 +305,61 @@
   --_helix-brand-mark-400: oklch(from var(--_helix-seed-brand) max(l, 0.6) c h);
   --_helix-brand-300: oklch(from var(--_helix-brand-400) calc(l + 0.05) c h);
   --_helix-brand-200: oklch(from var(--_helix-brand-400) calc(l + 0.1) c h);
-  /* **The fill in dark, which has two ways to pass.** A dark seed's fill is held
-     between L 0.52 and 0.55, where it clears 3:1 against a card (the worst hue
-     needed 0.515) and still carries a white label (white needs 0.55 or under).
-     A seed light enough to carry a black label keeps its own lightness less
-     0.05, which is the fill it always had. The switch is the label's own, at a
-     seed of L 0.68. Its hover and press step down from it, as a light fill's do. */
-  --_helix-brand-fill-dark: oklch(
-    from var(--_helix-seed-brand)
-      calc(
-        clamp(0, (l - 0.68) * 1000, 1) *
-        (l - 0.05) +
-        (1 - clamp(0, (l - 0.68) * 1000, 1)) *
-        clamp(0.52, l - 0.05, 0.55)
-      )
-      c h
+  /* The arithmetic the dark fills share, written once. Each is read inside an
+     XYZ color, where `y` is that color's luminance: the scale that lands a dark
+     seed's fill between 0.115 and 0.135 and leaves a light one's alone, and the
+     hover and press steps, up for a white label and down for a black one. */
+  --_helix-fill-luminance: calc(
+    (
+      clamp(0, (y - 0.185) * 1000, 1) *
+      y +
+      (1 - clamp(0, (y - 0.185) * 1000, 1)) *
+      clamp(0.115, y, 0.135)
+    ) /
+    max(y, 0.001)
   );
-  --_helix-brand-fill-dark-hover: oklch(from var(--_helix-brand-fill-dark) calc(l - 0.05) c h);
-  --_helix-brand-fill-dark-active: oklch(from var(--_helix-brand-fill-dark) calc(l - 0.1) c h);
+  --_helix-fill-hover: calc(1.15 - 0.27 * clamp(0, (y - 0.185) * 1000, 1));
+  --_helix-fill-press: calc(1.3 - 0.5 * clamp(0, (y - 0.185) * 1000, 1));
+  /* **The fill in dark, which has two ways to pass.** A seed light enough to
+     carry a black label keeps its own lightness less 0.05, which is the fill it
+     always had. The switch is the label's own, at a seed of L 0.68.
+
+     **A dark seed's fill is held by its luminance, which is what both
+     contrasts are measured in.** It was held between L 0.52 and 0.55, and the
+     same lightness is a different luminance in each hue: at 0.55 a green
+     carried white at 4.45:1 (#22a35a), and a violet's hover at 0.47 stood
+     2.68:1 off the black page (#7c3aed). The fill is the seed scaled in XYZ,
+     which keeps its chromaticity, to a luminance between 0.115 and 0.135: 3:1
+     or more against a card, and white at 5.6:1 or more. A light seed's fill,
+     at 0.185 or more, is left where it is. */
+  --_helix-brand-fill-dark: color(
+    from
+      oklch(
+        from var(--_helix-seed-brand)
+          calc(
+            clamp(0, (l - 0.68) * 1000, 1) *
+            (l - 0.05) +
+            (1 - clamp(0, (l - 0.68) * 1000, 1)) *
+            clamp(0.48, l - 0.05, 0.54)
+          )
+          c h
+      )
+      xyz-d65 calc(x * var(--_helix-fill-luminance)) calc(y * var(--_helix-fill-luminance))
+      calc(z * var(--_helix-fill-luminance))
+  );
+  /* **Under the pointer the fill moves away from the page**, lighter on black,
+     as the status fills do: stepping down took a violet's hover to 2.68:1
+     against the page and a navy's to 3.01. 15% and 30% more luminance keep
+     white at 4.57:1 or more on the press. A fill that carries a black label
+     steps down instead, toward its label's opposite, as it did. */
+  --_helix-brand-fill-dark-hover: color(
+    from var(--_helix-brand-fill-dark) xyz-d65 calc(x * var(--_helix-fill-hover))
+      calc(y * var(--_helix-fill-hover)) calc(z * var(--_helix-fill-hover))
+  );
+  --_helix-brand-fill-dark-active: color(
+    from var(--_helix-brand-fill-dark) xyz-d65 calc(x * var(--_helix-fill-press))
+      calc(y * var(--_helix-fill-press)) calc(z * var(--_helix-fill-press))
+  );
   --_helix-brand-50: oklch(from var(--_helix-seed-brand) 0.95 calc(c * 0.25) h);
   --_helix-brand-900: oklch(from var(--_helix-seed-brand) 0.28 calc(c * 0.5) h);
   /* The brand's quiet ink: each mode's rung at half its chroma. Unset with no
@@ -409,17 +446,25 @@
   --_helix-accent-200: oklch(from var(--_helix-accent-400) calc(l + 0.1) c h);
   --_helix-accent-50: oklch(from var(--_helix-seed-accent) 0.95 calc(c * 0.25) h);
   --_helix-accent-900: oklch(from var(--_helix-seed-accent) 0.28 calc(c * 0.5) h);
-  --_helix-accent-fill-dark: oklch(
-    from var(--_helix-seed-accent)
-      calc(
-        clamp(0, (l - 0.68) * 1000, 1) *
-        (l - 0.05) +
-        (1 - clamp(0, (l - 0.68) * 1000, 1)) *
-        clamp(0.52, l - 0.05, 0.55)
+  --_helix-accent-fill-dark: color(
+    from
+      oklch(
+        from var(--_helix-seed-accent)
+          calc(
+            clamp(0, (l - 0.68) * 1000, 1) *
+            (l - 0.05) +
+            (1 - clamp(0, (l - 0.68) * 1000, 1)) *
+            clamp(0.48, l - 0.05, 0.54)
+          )
+          c h
       )
-      c h
+      xyz-d65 calc(x * var(--_helix-fill-luminance)) calc(y * var(--_helix-fill-luminance))
+      calc(z * var(--_helix-fill-luminance))
   );
-  --_helix-accent-fill-dark-hover: oklch(from var(--_helix-accent-fill-dark) calc(l - 0.05) c h);
+  --_helix-accent-fill-dark-hover: color(
+    from var(--_helix-accent-fill-dark) xyz-d65 calc(x * var(--_helix-fill-hover))
+      calc(y * var(--_helix-fill-hover)) calc(z * var(--_helix-fill-hover))
+  );
   /* The label on an accent fill, and its quiet ink, for the brand's reasons. */
   --_helix-accent-on: light-dark(
     oklch(from var(--_helix-seed-accent) 1 0 0),

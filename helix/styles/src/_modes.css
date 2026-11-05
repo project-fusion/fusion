@@ -196,6 +196,18 @@
   --helix-color-warning: var(--_helix-frosted-warning);
 }
 
+/* **The operating system's answer, where nothing has overridden it**, and so
+   ahead of the rules that override it. `:root` and `[data-color-mode]` are of
+   equal weight, so the later rule wins on the root. After them, a page set to
+   light on an operating system in dark kept the dark answer: the toast took the
+   light scheme and drew #f5f5f5 on a white page, at 1.09:1. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --_helix-mode: dark;
+    --_helix-mode-inverted: light;
+  }
+}
+
 /* The color mode, and the only thing that decides it. */
 [data-color-mode="light"] {
   --_helix-mode: light;
@@ -207,14 +219,6 @@
   --_helix-mode: dark;
   --_helix-mode-inverted: light;
   color-scheme: dark;
-}
-
-/* The operating system's answer, where nothing has overridden it. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --_helix-mode: dark;
-    --_helix-mode-inverted: light;
-  }
 }
 
 /* **The pointer decides how small a field's text may be.** iOS Safari zooms

@@ -25,8 +25,6 @@ import { html } from 'lit/static-html.js'
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../color-picker/index.js'
 
-/** The color the picker opens on with nothing to start from, as the field's placeholder says. */
-const FIRST_COLOR = '#ff0000'
 /**
  * @summary A field for a color, typed in any syntax or picked from a panel.
  *
@@ -222,9 +220,9 @@ export class HelixHeadlessColorInput extends MixinPickerField(
   noFormat = false
 
   /**
-   * The text the field shows before a color is entered. Unset, it is the color
-   * the picker opens on when there is none, `#ff0000`, so the field and the
-   * panel say one color.
+   * The text the field shows before a color is entered. Unset, the field shows
+   * none, so an empty field reads as empty. A color here, such as `#ff0000`,
+   * read as a color already chosen.
    */
   @property()
   placeholder?: string
@@ -561,7 +559,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
           type="text"
           .value=${this.value}
           name=${this.name || nothing}
-          placeholder=${this.placeholder ?? FIRST_COLOR}
+          placeholder=${this.placeholder || nothing}
           autocomplete=${this.autocomplete || nothing}
           spellcheck="false"
           aria-describedby=${this.describedBy ?? nothing}

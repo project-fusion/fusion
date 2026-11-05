@@ -103,8 +103,14 @@
 
 /* Clear of the tagline by more than the brand's own row gap: the marks are a
    different kind of thing from the two lines above them, and at the row gap they
-   read as a third line of the lockup. */
+   read as a third line of the lockup.
+
+   **The first glyph starts on the text column, and its box starts before it.**
+   Each link is a `control-sm` square with the glyph centered in it, so the
+   first glyph measured 8px right of the name and tagline above it, at 1440 and
+   at 390. The row moves back by the space between the box and the glyph. */
 .footerSocials {
+  margin-inline-start: calc((var(--helix-size-control-sm) - var(--helix-size-icon-tight)) / -2);
   padding-block-start: var(--helix-space-xs);
 }
 

@@ -27,18 +27,20 @@
 }
 
 /*
- *  The trigger fills the trailing end of the field rather than sitting in it as
- * an icon.
+ *  The trigger fills the trailing end of the field, a square as tall as the
+ * control, and the color sits in it as a chip.
  */
 [part="trigger"] {
   all: unset;
   position: relative;
-  align-items: stretch;
+  align-items: center;
   align-self: stretch;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   flex: none;
+  inline-size: var(--helix-size-control);
+  justify-content: center;
 }
 
 /* Inset by the offset, which is what the other eleven sheets inset by. This
@@ -56,8 +58,12 @@
 }
 
 /* A checkerboard behind it, so a color carrying alpha reads as partly
-   transparent rather than as a slightly different color. Bordered only on the
-   leading edge: the other three are the field's own. */
+   transparent rather than as a slightly different color.
+
+   **A chip at the region's icon size, edged and rounded on every side**, 20 at
+   `md`, as the mark a Select or a Date Input draws at its end. The block that
+   filled the field's end, 40 by 38 and flush to its edge, read as a second
+   control beside the field. */
 [part="preview"] {
   background-image:
     linear-gradient(var(--color-input-swatch, transparent), var(--color-input-swatch, transparent)),
@@ -69,11 +75,13 @@
     );
   background-size:
     100% 100%,
-    var(--helix-space-sm) var(--helix-space-sm);
-  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+    var(--helix-space-xs) var(--helix-space-xs);
+  block-size: var(--helix-size-icon);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
   display: block;
-  inline-size: var(--helix-size-control);
+  inline-size: var(--helix-size-icon);
 }
 
 /* **With no color yet, the caret a field's trigger draws**, centered on the
@@ -81,13 +89,15 @@
    open something. The empty chip was a checkerboard alone, which reads as a
    transparent color chosen and not as a control.
 
-   **On the sunken ground, without the checkerboard.** The checkerboard says
-   a color is partly transparent, and with no color it says something that is
-   not so; under the caret its squares crossed the glyph. */
+   **The caret alone, without a chip.** The checkerboard says a color is
+   partly transparent, and with no color it says something that is not so;
+   under the caret its squares crossed the glyph. A gray chip read as a gray
+   chosen. */
 [part="preview"][data-empty] {
   align-items: center;
-  background-color: var(--helix-color-surface-sunken);
+  background-color: transparent;
   background-image: none;
+  border-color: transparent;
   display: flex;
   justify-content: center;
 }

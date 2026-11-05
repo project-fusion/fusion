@@ -119,6 +119,17 @@ export interface FloatingOptions {
   floating: () => HTMLElement | null | undefined
 
   /**
+   * Whether the element may slide over its anchor to stay whole in the window,
+   * where neither side has room for all of it. Off by default.
+   *
+   * For a picker of a fixed size hanging off a field, such as a calendar: a
+   * list can scroll and stay usable in whatever room it gets, and a month
+   * held to the room above a field on a short phone lost its last week. On,
+   * it is held to the window instead, and covers the field it came from.
+   */
+  cover?: boolean
+
+  /**
    * How close to the window's edges the floating element may come, in
    * pixels, when it slides or is capped to fit, and, where it is given, when
    * it flips. Defaults to 8 for the first two and none for flipping. React
@@ -434,9 +445,16 @@ export class FloatingController implements ReactiveController {
              deciding markup, which no rule could do with a property. */
           apply: ({ availableHeight, availableWidth, elements, rects }) => {
             room = availableWidth
+            /* The window's height and not the side's, where the element may
+               cover its anchor and is taller than the side it landed on. The
+               slide after this pass moves it on screen. */
+            const whole =
+              this.options.cover && elements.floating.scrollHeight > availableHeight
+                ? window.innerHeight - margin * 2
+                : availableHeight
             elements.floating.style.setProperty(
               '--floating-available-block-size',
-              `${Math.round(availableHeight)}px`,
+              `${Math.round(whole)}px`,
             )
             /* The anchor's width, which a panel that has to match the control
                it hangs off cannot get any other way. `min-inline-size: 100%`
@@ -453,6 +471,12 @@ export class FloatingController implements ReactiveController {
           padding: margin,
         }),
       )
+    }
+    if (this.options.cover) {
+      /* Along the side's own axis, which `shift` above leaves alone, so an
+         element taller than either side slides over its anchor until all of
+         it is in the window. One that fits its side does not move. */
+      middleware.push(shift({ crossAxis: true, mainAxis: false, padding: margin }))
     }
     if (pointer) {
       middleware.push(arrow({ element: pointer, padding: this.padding ?? corner(floating) }))

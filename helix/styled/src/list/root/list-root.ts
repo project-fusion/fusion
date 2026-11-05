@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessList } from '@fusion.dev/helix-headless/list'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './list-root.css.js'
@@ -28,6 +29,7 @@ import { styles } from './list-root.css.js'
  * @cssproperty --list-drag-preview-shadow - The shadow that raises the copy of a row a pointer drags over the page.
  * @cssproperty --list-empty-color - The color of the text in the row shown while the list has no rows.
  * @cssproperty --list-empty-padding - The space around the text in the row shown while the list has no rows.
+ * @cssproperty --list-error-color - The color of the text in the row drawn while `error-text` is set.
  * @cssproperty --list-gap - The space between rows.
  * @cssproperty --list-loading-color - The color of the text in the row drawn while `loading` is set.
  * @cssproperty --list-loading-padding - The space around the text in the row drawn while `loading` is set.
@@ -81,7 +83,12 @@ export class HelixList extends HelixHeadlessList {
   @property({ reflect: true })
   marker?: 'rail'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [
+    liveStyles,
+    collectionStateStyles,
+    collectionErrorStyles,
+    styles,
+  ]
 }
 
 declare global {

@@ -325,8 +325,12 @@ slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
   background-color: var(--card-background-color, var(--helix-material-panel));
 }
 
-/* A heavier ground under a heavier blur, 88% under 32px, with no saturation. */
+/* A heavier ground under a heavier blur, 88% under 32px, with no saturation.
+   Full ink, as glass takes and as a frosted Dialog, Drawer, and Popover keep:
+   the body was the muted ink, so the one frosted surface with quiet body text
+   was the card. */
 :host([material="frosted"]) {
+  color: var(--card-color, var(--helix-color-foreground));
   backdrop-filter: var(--card-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--card-background-color, var(--helix-material-translucent-strong));
 }

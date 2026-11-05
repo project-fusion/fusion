@@ -623,6 +623,15 @@ export class HelixHeadlessPagination extends HelixElement {
       const width = entry?.borderBoxSize?.[0]?.inlineSize ?? entry?.contentRect.width ?? 0
       /* Zero is a control not laid out yet, which is no narrow one. */
       if (width > 0) {
+        /* **Measured here as well, where the row had no box when it drew.** A
+           control slotted into an element that had not drawn its own shadow
+           root yet, such as a `Flex` upgrading after it, rendered with no
+           layout, so the row measured 0 and the fold never came: at 390 on a
+           touch screen it wrapped to three rows, 342 by 140, where a plain
+           flex parent folded it to 150 by 44. */
+        if (!this.folded && this.fullWidth <= 0) {
+          this.fullWidth = this.measureRow()
+        }
         this.fit(width)
       }
     })

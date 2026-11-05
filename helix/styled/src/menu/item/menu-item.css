@@ -53,16 +53,23 @@
     minmax(0, 1fr)
     auto
     var(--menu-item-end, 0px);
-  /* The inset is padding on the row and nothing else. Under the menu's `bleed`
-     it is the bleed, and the margin takes up the rest of the step, so the words
-     stay on the headings' column whichever it is. */
-  margin-inline: calc(var(--helix-space-sm) - var(--_menu-bleed, var(--helix-space-sm)));
-  padding-inline: var(--_menu-bleed, var(--helix-space-sm));
+  /* The inset is padding on the row and nothing else. **The field's inset, as an
+     Option's is**, 8, 12 and 16 across the stops: a fixed 12 stood beside an
+     Option of the same height at 8 and 16. Under the menu's `bleed` it is the
+     bleed, and the margin takes up the rest of the step, so the words stay on
+     the headings' column whichever it is. */
+  margin-inline: calc(var(--helix-space-field) - var(--_menu-bleed, var(--helix-space-field)));
+  padding-inline: var(--_menu-bleed, var(--helix-space-field));
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Relative to the menu's own surface. */
-[part="item"]:hover {
+/* Relative to the menu's own surface. **One highlight in a menu, the row with
+   focus.** The pointer moves focus to the row it rests on, so the wash marks
+   that row under the pointer and the row the keys reach. A bare `:hover` lit a
+   second row: the pointer resting on Copy while the keys had moved to Paste,
+   and a disabled row, which focus skips, under the pointer. */
+[part="item"]:hover:focus,
+[part="item"]:focus-visible {
   background-color: var(
     --menu-item-hover-background-color,
     var(--_menu-item-wash, var(--helix-color-hover))
@@ -284,7 +291,7 @@ slot[name="submenu"]::slotted(helix-divider) {
   transform-origin: 0 0;
 }
 
-[part="item"]:active {
+[part="item"]:not([aria-disabled="true"]):active {
   background-color: var(--_menu-item-press, var(--helix-color-press));
 }
 
@@ -294,14 +301,15 @@ slot[name="submenu"]::slotted(helix-divider) {
 
    **Deepened toward the foreground in dark, at rest as under the pointer**, as
    Button deepens a tone's label on a wash of that tone. A menu in a Dialog or a
-   Drawer stands two rungs up, and the bare tone on its 12% wash there measured
-   3.84:1; 85% of the tone measures 4.60. One ink in both states, so the label
-   does not change color as the pointer arrives. */
+   Drawer stands two rungs up, on #2d2d2d, and the bare tone on its 12% wash
+   there measured 3.84:1. 85% of the tone measured 4.57 under the pointer and
+   4.09 on the 20% press; 75% measures 5.14 and 4.60, and 5.94 at rest. One ink
+   in every state, so the label does not change color as the pointer arrives. */
 :host([tone="danger"]) [part~="item"],
 :host([tone="danger"]) [part="start"] {
   color: light-dark(
     var(--helix-color-danger),
-    color-mix(in oklab, var(--helix-color-danger) 85%, var(--helix-color-foreground))
+    color-mix(in oklab, var(--helix-color-danger) 75%, var(--helix-color-foreground))
   );
 }
 
@@ -309,7 +317,8 @@ slot[name="submenu"]::slotted(helix-divider) {
    normal row's keyboard highlight is its hover. A danger row under the keys
    drew the neutral hover wash while the pointer drew 12% of the danger. */
 :host([tone="danger"]:not([disabled]):state(highlighted)) [part~="item"],
-:host([tone="danger"]:not([disabled])) [part~="item"]:hover {
+:host([tone="danger"]:not([disabled])) [part~="item"]:hover:focus,
+:host([tone="danger"]:not([disabled])) [part~="item"]:focus-visible {
   background-color: var(
     --menu-item-hover-background-color,
     color-mix(in oklab, var(--helix-color-danger) 12%, transparent)

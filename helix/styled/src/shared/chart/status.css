@@ -21,6 +21,18 @@
   text-align: center;
 }
 
+/* **The error line wraps**, so a button in the `error` slot goes under the
+   words in a narrow plot. As a grid of one row it stood beside them, and a
+   224 pixel donut pushed the mark out past its ring. */
+[part="error"] {
+  align-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: var(--helix-space-xs);
+}
+
 /* The readings as a table, drawn where they came from `data`, and the words
    and buttons that turn its pages: read by a screen reader and hidden from
    view, the chart being the picture of it. */

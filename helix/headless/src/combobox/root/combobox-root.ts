@@ -136,7 +136,7 @@ const isInsertion = (event: Event): boolean =>
  * @slot - The options.
  * @slot empty - What the list shows when it has no options, for content richer than `empty-text`.
  * @slot end - After the text, for a unit or a clear button.
- * @slot error - What the list shows while `error-text` is set, for content richer than its text.
+ * @slot error - Content the list shows after `error-text` while it is set, such as a button that tries again.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
@@ -1595,7 +1595,9 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       <slot @slotchange=${() => this.requestUpdate()}></slot>
       <slot name="empty" slot="empty">${this.emptyText}</slot>
       <slot name="loading" slot="loading">${this.loadingText}</slot>
-      <slot name="error" slot="error">${this.loadError || this.errorText}</slot>
+      <!-- No fallback: the list shows the error words itself and this slot
+           after them, so words here would say them twice. -->
+      <slot name="error" slot="error"></slot>
       <slot
         name="no-results"
         slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}

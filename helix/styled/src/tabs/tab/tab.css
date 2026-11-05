@@ -186,12 +186,48 @@ slot[name="dismiss-icon"]::slotted(*) {
   }
 }
 
+/* **The close mark's press sits over the tab's.** Both are boxes inside the
+   tab, and the tab's comes later in the tree, so it painted over the mark and
+   took the press: measured on touch, a tap at the center of the mark on "Docs"
+   and "A" landed on the tab, which was chosen, and nothing closed. Raised in a
+   stacking context of the tab's own, so the mark stays under anything that sits
+   over the strip.
+
+   **The mark's press runs toward the end and leaves the label to the tab.**
+   Centered on the mark, a box the target wide reaches 14 pixels back over the
+   label, more than the whole of a one-letter label at 10. It starts at the gap
+   before the mark and is the target wide from there, and a tab after it,
+   painted later, keeps its own box. */
+[part="tab"] {
+  isolation: isolate;
+}
+
 [part="dismiss"] {
   position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
 [part="dismiss"]::after {
   content: "";
-  inset: calc((var(--helix-size-target) - 100%) / -2);
+  inline-size: max(100%, var(--helix-size-target));
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline-start: calc(var(--helix-space-2xs) * -1);
   position: absolute;
+}
+
+/* **One marker under forced colors, the selected tab's.** The edge every tab
+   keeps at the bottom is transparent, and forced colors draws a transparent
+   edge in the text color, so each unselected tab carried an underline that
+   read as the marker, and under `subtle` and `segmented`, whose indicator is a
+   fill that forced colors paints out, the selected tab carried nothing else.
+   The edge is Canvas on every other tab and Highlight on the selected one, and
+   keeps its width, so nothing moves. */
+@media (forced-colors: active) {
+  [part="tab"] {
+    border-block-end-color: Canvas;
+  }
+
+  :host(:state(selected)) [part="tab"] {
+    border-block-end-color: Highlight;
+  }
 }

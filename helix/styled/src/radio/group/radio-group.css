@@ -34,10 +34,7 @@
    pointer or a press, which the group refuses. It looked exactly like a set that takes a press. Before
    the invalid rule, whose red edge still wins. */
 :host([readonly]) [part="items"] {
-  --radio-border-color: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
-  );
+  --radio-border-color: var(--helix-color-border-readonly);
   --_radio-cursor: default;
   --_radio-hover: transparent;
   --_radio-press: transparent;

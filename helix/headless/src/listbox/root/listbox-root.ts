@@ -168,7 +168,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * @slot - The options, and any groups of them.
  * @slot empty - What the list shows when it has no options to show, for content richer than `empty-text`.
- * @slot error - What the list shows while `error-text` is set, for content richer than its text.
+ * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot filter-icon - The icon in the filter field. Defaults to a magnifying glass.
  * @slot hint - The hint, for content richer than plain text.
@@ -188,7 +188,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart empty - The text shown when the list has no options to show, or the filter hides every one. `:state(no-results)` is set for the second.
- * @csspart error - The text shown while `error-text` is set.
+ * @csspart error - The text shown while `error-text` is set, followed by the `error` slot.
  * @csspart feedback - The message that says what is wrong with the value.
  * @csspart filter-icon - The icon beside the filter field.
  * @csspart filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -1745,11 +1745,13 @@ export class HelixHeadlessListbox extends MixinVoice(
    *
    * **The text is the slot's fallback**, which is this library's rule for a
    * content property, so `empty-text` still shows where nothing is slotted and
-   * the live region still says it.
+   * the live region still says it. **The error line keeps its words** and puts
+   * the `error` slot after them, as Table does, so a button that tries again
+   * never stands alone with no reason for it.
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
     if (this.failed) {
-      return html`<p part="error"><slot name="error">${this.loadError || this.errorText}</slot></p>`
+      return html`<p part="error">${this.loadError || this.errorText}<slot name="error"></slot></p>`
     }
     if (!this.loading && hasContent) {
       return nothing

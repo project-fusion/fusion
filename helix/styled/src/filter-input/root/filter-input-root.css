@@ -66,6 +66,9 @@
    than shrinking it to nothing when they fill one. */
 [part="control"] {
   flex: 1 1 var(--filter-input-control-size, 6ch);
+  /* A placeholder cut by the chips ends in an ellipsis. Clipped, "Add a filter"
+     read "Add a filte" beside four chips in a 320 column. */
+  text-overflow: ellipsis;
 }
 
 /* The seam between what a consumer put at the head of the field and the field.
