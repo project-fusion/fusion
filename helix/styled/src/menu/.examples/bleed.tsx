@@ -12,7 +12,6 @@ export function Example() {
 
   return (
     <helix-menu
-      bleed
       label="File"
       ref={menu}
     >

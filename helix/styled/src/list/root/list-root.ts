@@ -43,9 +43,14 @@ export class HelixList extends HelixHeadlessList {
    *
    * The words line up with a divider or a heading beside the list, and a hover, a
    * selection or the current row is drawn `--list-bleed` wider on each side,
-   * by a negative margin and the same padding, so nothing moves. The parent has
-   * to leave that room: inside `overflow: hidden` with no inline padding, the
-   * fill and the focus ring are cut at the list's edge.
+   * by a negative margin and the same padding, so nothing moves.
+   *
+   * **Asked for rather than the default**, because the list is often set flush in
+   * a pane that scrolls or clips, a sidebar or a transcript, and there the fill
+   * and the focus ring are cut at the pane's edge. The parent leaves the room.
+   *
+   * Off for an ordered or unordered list, whose marker hangs in the room the
+   * bleed would take.
    */
   @property({ reflect: true, type: Boolean })
   bleed = false

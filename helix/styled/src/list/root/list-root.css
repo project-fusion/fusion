@@ -10,7 +10,7 @@
    and a hover, a selection or the current row is drawn this much wider. The
    list's parent has to leave the room: under `overflow: hidden` with no inline
    padding, the fill and the focus ring are cut at the list's edge. */
-:host([bleed]) {
+:host([bleed]:not([kind="ordered"]):not([kind="unordered"])) {
   --_list-bleed: var(--list-bleed, var(--helix-space-row-bleed));
 }
 

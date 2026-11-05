@@ -279,11 +279,18 @@
   position: absolute;
 }
 
+/* Rounded on the outside only, as a list's row is: the edges are the only
+   outer corners a row's fill has, and the cells between them stay square so
+   the columns and the rules under them meet as they did. */
 :host([bleed]) [part~="row"] > :first-child::before {
+  border-end-start-radius: var(--helix-radii-sm);
+  border-start-start-radius: var(--helix-radii-sm);
   inset-inline-start: calc(var(--_data-table-bleed) * -1);
 }
 
 :host([bleed]) [part~="row"] > :last-child::after {
+  border-end-end-radius: var(--helix-radii-sm);
+  border-start-end-radius: var(--helix-radii-sm);
   inset-inline-end: calc(var(--_data-table-bleed) * -1);
 }
 

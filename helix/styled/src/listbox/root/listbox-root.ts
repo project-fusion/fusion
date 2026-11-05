@@ -29,7 +29,7 @@ import '../../voice-level/index.js'
  * @documentation https://fusion.dev/helix/components/listbox
  *
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
- * @cssproperty --listbox-bleed - How far a option's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
+ * @cssproperty --listbox-bleed - How far a option's fill reaches past its words unless `bleed` is `none`. Defaults to `--helix-space-row-bleed`, which follows the density.
  * @cssproperty --listbox-border - The panel's border, as a shorthand. Set it to `none` when the list is already inside a panel.
  * @cssproperty --listbox-column-min-inline-size - How narrow a column may be with `layout="grid"`. As many columns as fit are drawn. Defaults to `8rem`.
  * @cssproperty --listbox-drag-preview-background-color - The fill behind the copy of an option a pointer drags.
@@ -47,14 +47,15 @@ import '../../voice-level/index.js'
 @customElement('helix-listbox')
 export class HelixListbox extends HelixHeadlessListbox {
   /**
-   * Draws each highlighted option as a fill inset from the panel's edge.
+   * Whether a highlighted row is drawn as a fill inset from the panel's edge.
    *
-   * The words stay on the column the section headings are set on, and the fill
-   * reaches `--listbox-bleed` past them on each side, rounded, rather than running
-   * across the panel edge to edge.
+   * By default the words stay on the column the section headings are set on,
+   * and the fill reaches `--listbox-bleed` past them on each side, rounded, rather than
+   * running across the panel edge to edge. `none` draws the band edge to edge,
+   * as before.
    */
-  @property({ reflect: true, type: Boolean })
-  bleed = false
+  @property({ reflect: true })
+  bleed?: 'none'
 
   /* The options drawn for `items` are this tier's. */
   static override tier = 'helix-'

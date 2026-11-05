@@ -1,7 +1,6 @@
 export function Example() {
   return (
     <helix-listbox
-      bleed
       default-value="two"
       label="Notifications"
     >
