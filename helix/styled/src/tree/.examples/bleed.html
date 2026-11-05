@@ -1,0 +1,31 @@
+<!-- @summary A tree under a heading and a divider, its words on their column and the current row's fill reaching past it, at every depth. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="panel">
+  <p class="heading">Files</p>
+  <helix-divider></helix-divider>
+  <helix-tree
+    bleed
+    default-active="two"
+    label="Files"
+  >
+    <helix-tree-item
+      default-open
+      value="one"
+    >
+      Documents
+      <helix-tree-item
+        slot="children"
+        value="two"
+      >Budget.xlsx</helix-tree-item>
+      <helix-tree-item
+        slot="children"
+        value="three"
+      >Notes.txt</helix-tree-item>
+    </helix-tree-item>
+    <helix-tree-item value="four">Invoice-1042.pdf</helix-tree-item>
+  </helix-tree>
+</div>
