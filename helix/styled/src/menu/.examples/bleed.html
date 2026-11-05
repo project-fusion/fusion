@@ -1,0 +1,19 @@
+<!-- @summary An open menu whose items keep their words on the section headings' column, with a rounded fill inset around the row. -->
+<!-- @min 300 -->
+<helix-menu
+  bleed
+  id="bleed-menu"
+  label="File"
+>
+  <helix-button slot="trigger">File</helix-button>
+  <helix-menu-item value="new">New file</helix-menu-item>
+  <helix-menu-item value="open">Open…</helix-menu-item>
+  <helix-divider></helix-divider>
+  <helix-menu-item value="rename">Rename</helix-menu-item>
+</helix-menu>
+
+<script>
+  /* Opened, which reaches its first row: the ring a keyboard draws shows where
+     the row's fill would be. */
+  document.getElementById('bleed-menu').show()
+</script>

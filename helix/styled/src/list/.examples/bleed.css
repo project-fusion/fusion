@@ -1,4 +1,4 @@
-/* The room the fills reach into: a list with `bleed` draws its rows' fills past
+/* The room the fills reach into: a family with `bleed` draws its rows’ fills past
    its own edge, so whatever holds it leaves that much inline padding. */
 .panel {
   display: flex;
