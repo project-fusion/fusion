@@ -92,7 +92,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * their place, such as a link to add the first reading.
  * When the readings did not load, set `error-text`, such as "The visits did
  * not load": it stands in the plot in place of both, and the `error` slot
- * takes a button that tries again.
+ * takes a button that tries again, shown after the words.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -113,7 +113,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
- * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
+ * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
@@ -124,7 +124,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart band - The band around the reading under the pointer.
  * @csspart baseline - The rule at zero, where zero is inside the range.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.

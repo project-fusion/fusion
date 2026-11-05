@@ -5,7 +5,8 @@ import type { NextConfig } from 'next'
    default reaches back to Safari 16.4, and its CSS pipeline then rewrites each
    `light-dark()` into a fallback that resolves on the root element. A Toast then
    draws in the page's mode, white on a white page, and so does a
-   `data-color-mode` panel. */
+   `data-color-mode` panel. Safari 18 and Firefox 128 are the first with
+   relative colors, `oklch(from ...)`, which the brand ramp is built from. */
 const config: NextConfig = {}
 
 export default config

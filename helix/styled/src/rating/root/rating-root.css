@@ -232,8 +232,11 @@
 /* **Read-only: the value keeps its ink and the frame is drawn as a read-only
    field's**, the one treatment every control takes. The filled marks are the
    score and keep their color. The empty marks are the frame the score is
-   counted against, and take the edge a field is drawn with, `color-border`,
-   as an empty read-only Checkbox's box does. Only the cursor changed before,
+   counted against, and take the edge a read-only Checkbox's box takes,
+   `color-border-readonly`. They carry the value as the box does, and at the
+   field edge they measured 1.23:1 in light and 1.30 in dark, so a reader
+   could not count the scale; the read-only edge is 3:1, as the owner decided
+   for every read-only value mark on November 4, 2026. Only the cursor changed before,
    and a read-only rating measured 0.04% of pixels from an editable one. A
    readout is not a control: nothing to press, so nothing that looks
    pressable. */
@@ -242,7 +245,7 @@
 }
 
 :host([readonly]) [part="track"] {
-  color: var(--rating-empty-color, var(--helix-color-border));
+  color: var(--rating-empty-color, var(--helix-color-border-readonly));
 }
 
 /* A shape the consumer handed us, drawn as itself.

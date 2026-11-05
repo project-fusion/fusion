@@ -92,7 +92,12 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">Q2</th>
-            <td data-value="-8000">-$8k</td>
+            <td
+              data-tone="danger"
+              data-value="-8000"
+            >
+              -$8k
+            </td>
           </tr>
           <tr>
             <th scope="row">Q3</th>
@@ -100,7 +105,12 @@ export function Example() {
           </tr>
           <tr>
             <th scope="row">Q4</th>
-            <td data-value="-14000">-$14k</td>
+            <td
+              data-tone="danger"
+              data-value="-14000"
+            >
+              -$14k
+            </td>
           </tr>
         </tbody>
       </table>

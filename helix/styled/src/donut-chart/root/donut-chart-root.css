@@ -11,6 +11,9 @@
      16 Sep 2026, a 224px chart holds a 108px hole, `10,000` measures 45 in it,
      and at 12em it would be 81. */
   inline-size: var(--donut-chart-size, 16em);
+  /* Never wider than its column: at 16em a bare donut was 224 in a 200
+     column and ran past it. The ring is square, so it shrinks whole. */
+  max-inline-size: 100%;
   place-items: center;
 }
 

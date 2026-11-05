@@ -138,6 +138,7 @@ import {
  *
  * @slot - The rows.
  * @slot empty - Content for the row shown while the list has no rows and none are loading. Falls back to `empty-text`.
+ * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot loading - Content for the row after the last while `loading` is set. Falls back to `loading-text`.
  *
  * @event {Event} change - Fired once a press has changed which rows are selected.
@@ -149,6 +150,7 @@ import {
  *
  * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
  * @csspart empty - The row shown while the list has no rows and none are loading, where `empty-text` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
+ * @csspart error - The row after the last while `error-text` is set, in place of the empty and loading rows: the words, then the `error` slot. A grid row with one cell in a list that selects.
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
  * @csspart loading - The row after the last while `loading` is set. A grid row with one cell in a list that selects.
  *
@@ -156,6 +158,7 @@ import {
  * @cssproperty --list-step - What each row adds to the number before it: `1`, or `-1` where `reversed`.
  *
  * @cssstate empty - While the list has no rows.
+ * @cssstate error - While `error-text` is set.
  * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-list')
@@ -205,6 +208,19 @@ export class HelixHeadlessList extends HelixElement {
   @words
   @property({ attribute: 'empty-text' })
   emptyText = 'Nothing to show'
+
+  /**
+   * The words shown after the rows when they did not load, such as "The files
+   * did not load". Set it when a fetch fails, and clear it once you try again.
+   * Empty, the default, shows nothing.
+   *
+   * While it is set, a row after the last shows it, followed by your own
+   * content in the `error` slot, such as a button that tries again, in place of
+   * the empty and loading rows, and screen readers hear it. Table, Listbox, and
+   * every chart take the same property and slot.
+   */
+  @property({ attribute: 'error-text' })
+  errorText = ''
 
   /**
    * The kind of list, which follows from the content.
@@ -873,6 +889,12 @@ export class HelixHeadlessList extends HelixElement {
     super.willUpdate(changed)
     hostAria(internalsOf(this), { label: this.label, role: this.interactive ? 'grid' : 'list' })
     internalsOf(this).ariaBusy = this.loading ? 'true' : null
+    /* The error is news you act on, so the live region says it as it
+       appears, as Table's does. */
+    if (changed.has('errorText') && this.errorText !== '') {
+      this.status.say(this.errorText)
+    }
+    this.toggleState('error', this.errorText !== '')
     internalsOf(this).ariaMultiSelectable = this.selectionMode === 'multiple' ? 'true' : null
     /* `role="list"` at every kind, including `description`. A description list
        has its own native role, but this renders divs rather than `<dl>`, and
@@ -901,7 +923,7 @@ export class HelixHeadlessList extends HelixElement {
   protected override render(): TemplateResult {
     /* A row arriving or leaving changes who holds the stop and how many rows
        a reversed list counts down from. */
-    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${this.drawLoading()}${this.drawEmpty()}${this.loadMore ? html`<span data-end aria-hidden="true"></span>` : nothing}${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
+    return html`<slot style=${this.numbers} @slotchange=${this.handleSlotChange}></slot>${this.errorText === '' ? html`${this.drawLoading()}${this.drawEmpty()}` : this.drawError()}${this.loadMore ? html`<span data-end aria-hidden="true"></span>` : nothing}${drawStatus(this.status)}${this.reorder.drawDragPreview()}`
   }
 
   /**
@@ -921,6 +943,19 @@ export class HelixHeadlessList extends HelixElement {
     return this.interactive
       ? html`<div part="empty" role="row" ?hidden=${!shown}><div role="gridcell">${content}</div></div>`
       : html`<div part="empty" role="listitem" ?hidden=${!shown}>${content}</div>`
+  }
+
+  /**
+   * The row after the last while `error-text` is set: the words and then the
+   * `error` slot, so a button that tries again never stands alone with no
+   * reason for it. A list item, or a grid row with one cell in a list that
+   * selects, carrying no value, so a key never lands on it.
+   */
+  private drawError(): TemplateResult {
+    const content = html`${this.errorText}<slot name="error"></slot>`
+    return this.interactive
+      ? html`<div part="error" role="row"><div role="gridcell">${content}</div></div>`
+      : html`<div part="error" role="listitem">${content}</div>`
   }
 
   /**

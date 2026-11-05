@@ -126,6 +126,10 @@ export function SiteFind({
   const returning = useRef<FocusOptions>({})
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
+  /* Whether the field holds anything, spaces included, which is what decides
+     what Escape does: it clears a field that holds text and closes an empty
+     one. */
+  const [typed, setTyped] = useState(false)
 
   /* **Bound here rather than as a prop.**
    *
@@ -146,7 +150,9 @@ export function SiteFind({
       return
     }
     const heard = (event: Event): void => {
-      setNeedle(((event as CustomEvent<{ value: string }>).detail.value ?? '').trim())
+      const value = (event as CustomEvent<{ value: string }>).detail.value ?? ''
+      setNeedle(value.trim())
+      setTyped(value !== '')
     }
     element.addEventListener('helix-filter', heard)
     return () => element.removeEventListener('helix-filter', heard)
@@ -226,6 +232,7 @@ export function SiteFind({
         onhelix-before-close={() => {
           setOpen(false)
           setNeedle('')
+          setTyped(false)
         }}
         onhelix-before-open={() => setOpen(true)}
         onhelix-select={(event: { detail: { alternate?: boolean; value: string } }) => {
@@ -288,9 +295,12 @@ export function SiteFind({
             <helix-kbd keys="mod+enter"></helix-kbd>
             Sandbox
           </span>
+          {/* **The word for what Escape does now.** The palette clears a
+              field that holds text before it closes, so with a query typed the
+              hint said Close and the first press cleared the query. */}
           <span>
             <helix-kbd>Esc</helix-kbd>
-            Close
+            {typed ? 'Clear' : 'Close'}
           </span>
         </div>
         <helix-text class={styles.siteCommandMark} scale="caption" slot="footer">

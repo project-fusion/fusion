@@ -124,6 +124,19 @@ const stopping =
   () =>
     disposable.dispose()
 
+/**
+ * Faint text, SGR 2, in the quiet ink, which the theme solves to 4.5:1 against
+ * the page.
+ *
+ * xterm.js draws faint text at half the opacity of the ink and holds it to
+ * half the contrast floor, so in light mode it measured 3.98 under a 4.5 floor,
+ * and no ink at half opacity on white reaches 4.5. Only text in the default
+ * ink: a faint color keeps xterm.js's own half. The selector outranks the
+ * rule xterm.js writes, by one class, an attribute, and an element.
+ */
+const FAINT =
+  '.xterm .xterm-rows span.xterm-dim:not([class*="xterm-fg-"]) { color: var(--helix-color-foreground-muted); }'
+
 /** The escape codes that show and hide the cursor, DECTCEM. */
 const SHOW_CURSOR = '\u001b[?25h'
 const HIDE_CURSOR = '\u001b[?25l'
@@ -147,6 +160,23 @@ export const xtermDriver = (terminal: XtermTerminal, addons: XtermAddons = {}): 
     smoothScrollDuration: terminal.options.smoothScrollDuration ?? 0,
   }
   let cursorShown = true
+  /* The faint text rule, in the terminal's own element, while a contrast
+     floor is asked for. */
+  let faint: HTMLStyleElement | undefined
+  const holdFaint = (held: boolean): void => {
+    if (!held) {
+      faint?.remove()
+      faint = undefined
+      return
+    }
+    const element = terminal.element
+    if (!element || faint?.isConnected) {
+      return
+    }
+    faint = element.ownerDocument.createElement('style')
+    faint.textContent = FAINT
+    element.append(faint)
+  }
   const { fit, search, webLinks } = addons
   if (fit) {
     terminal.loadAddon(fit as never)
@@ -196,6 +226,7 @@ export const xtermDriver = (terminal: XtermTerminal, addons: XtermAddons = {}): 
     options: (options: TerminalOptions) => {
       terminal.options.disableStdin = !options.input
       terminal.options.minimumContrastRatio = options.contrast
+      holdFaint(options.contrast > 1)
       terminal.options.screenReaderMode = options.screenReader
       terminal.options.cursorBlink = options.motion && made.cursorBlink
       terminal.options.smoothScrollDuration = options.motion ? made.smoothScrollDuration : 0
@@ -220,6 +251,7 @@ export const xtermDriver = (terminal: XtermTerminal, addons: XtermAddons = {}): 
       terminal.options.minimumContrastRatio = made.minimumContrastRatio
       terminal.options.screenReaderMode = made.screenReaderMode
       terminal.options.smoothScrollDuration = made.smoothScrollDuration
+      holdFaint(false)
       if (!cursorShown) {
         cursorShown = true
         terminal.write(SHOW_CURSOR)

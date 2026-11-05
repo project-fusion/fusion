@@ -214,10 +214,7 @@
 
 :host([readonly]) [part="track"] {
   background-color: transparent;
-  border-color: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
-  );
+  border-color: var(--helix-color-border-readonly);
 }
 
 :host([readonly]:state(checked)) [part="thumb"] {

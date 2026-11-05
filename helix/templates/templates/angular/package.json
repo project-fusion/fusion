@@ -12,9 +12,9 @@
   "browserslist": [
     "chrome >= 123",
     "edge >= 123",
-    "firefox >= 120",
-    "safari >= 17.5",
-    "ios_saf >= 17.5"
+    "firefox >= 128",
+    "safari >= 18",
+    "ios_saf >= 18"
   ],
   "dependencies": {
     "@angular/common": "^22.2.1",

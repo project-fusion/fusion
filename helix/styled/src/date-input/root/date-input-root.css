@@ -161,7 +161,9 @@ slot[name="trigger"]::slotted(*) {
   inline-size: max-content;
   /* No taller than the room on the side it opened to, scrolling inside it, as
      a Select's list is. On a phone where neither side had the calendar's
-     height, it opened above and ran 31 pixels past the top of the screen. */
+     height, it opened above and ran 31 pixels past the top of the screen.
+     Where neither side holds the whole month, the panel covers the field and
+     the room is the window's, so the month is not cut. */
   max-block-size: var(--floating-available-block-size, none);
   overflow-y: auto;
   padding: var(--helix-space-sm);

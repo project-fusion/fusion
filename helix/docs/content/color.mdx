@@ -55,10 +55,11 @@ An Icon Button takes the same washes.
 Three more washes are laid over a ground the same way:
 
 - `press` lights a control under a press, a step past `hover`: 16% of
-  `foreground` in light and 20% in dark.
+  `foreground` in light and 19% in dark. A Button's own press is 20% in dark,
+  as the table above gives.
 - `selected` marks a chosen thing that stays chosen and has no fill of its own,
-  such as a range of days or a pressed toggle in a find bar. It is 14% of
-  `foreground` in light and 18% in dark.
+  such as a range of days or a pressed toggle in a find bar. It is 13% of
+  `foreground` in light and 16% in dark.
 - `primary-wash` is the bubble of your own message in Chat. It is 20% of
   `primary` with a brand color, and 16% of `foreground` with none.
 
@@ -127,8 +128,8 @@ Intent colors show what something means.
   the busiest cell of a heatmap. It is `primary-active` held at a lightness of
   0.33 or more, so the top of the ramp never reads as black.
 - `neutral-subtle` is a quiet gray for a mark that stands on the page, such as
-  an Avatar with no picture or a neutral Badge. It is 10% of `foreground` over
-  the page and opaque, so one avatar can overlap the next.
+  an Avatar with no picture or a neutral Badge. It is 11% of `foreground` over
+  the page, mixed in sRGB, and opaque, so one avatar can overlap the next.
 - `neutral-surface-hover` and `neutral-surface-active` are a neutral fill under
   the pointer and under a press. The neutral fill is `foreground`, which has
   nothing past it, so both move toward the page, and the press moves further.

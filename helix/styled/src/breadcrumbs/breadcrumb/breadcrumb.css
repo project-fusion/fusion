@@ -95,6 +95,12 @@
 ::slotted(a) {
   background-color: transparent;
   border-radius: var(--breadcrumbs-radius, var(--helix-radii-sm));
+  /* **The crumb's own ink and no underline**, as a crumb this component draws
+     takes. A bare anchor kept the browser's link blue, rgb(0, 0, 238), and its
+     underline beside crumbs in the muted ink. A page rule, such as
+     `data-link`, still wins, being in the outer tree. */
+  color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
+  text-decoration: none;
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
@@ -112,6 +118,7 @@
      seen at all and barely was, while the same token against white gave a clear
      step. */
   background-color: var(--breadcrumbs-hover-background-color, var(--helix-color-hover));
+  color: var(--breadcrumbs-current-color, var(--helix-color-foreground));
 }
 
 ::slotted(a:focus-visible) {

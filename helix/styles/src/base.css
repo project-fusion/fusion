@@ -431,9 +431,11 @@ helix-text[tone="warning"][emphasis="muted"] {
   position: absolute;
 }
 
-/* An icon beside the words, at the size the element draws it. */
+/* An icon beside the words, at the size the element draws it: rounded down, 12,
+   14 and 16 beside labels of 12, 13 and 14. To the nearest it was 14 at `sm`
+   beside `helix-button`'s 12. */
 [data-button] helix-icon {
-  --icon-size: round(1.15em, 2px);
+  --icon-size: round(down, 1.15em, 2px);
 }
 
 /* The tones, paired with the component's as everything here is. */
@@ -520,7 +522,7 @@ helix-text[tone="warning"][emphasis="muted"] {
 }
 
 /* A press, one step past each hover, as `helix-button` draws it: 16% in light
-   and 20% in dark, the strengths of `color-press`. */
+   and 20% in dark. `color-press` is 16% and 19%. */
 [data-button]:not(:disabled):active {
   background-color: var(
     --button-background-color,
@@ -772,19 +774,117 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
 }
 
-/* The amount, for a region that sets `--helix-density` instead of a stop. */
+/* The amount, for a region that sets `--helix-density` instead of a stop.
+   **0.8 draws `sm` and 1.2 draws `lg`**, and each value between is a straight
+   line from `md` to the stop it moves toward, past which it keeps that slope.
+   A multiplier on `md` did not reproduce the stops: at 0.8 a button's text was
+   10.4 against `sm`'s 12 and a field's 11.2 against 13, and at 1.2 a field's
+   text was 16.8 against `lg`'s 14, since the stops do not scale evenly.
+   Rounded as the stops are drawn, whole pixels and an even icon. */
 [data-density] {
-  --helix-text-control: calc(var(--helix-text-control-md) * var(--helix-density, 1));
-  --helix-space-control: calc(var(--helix-space-md) * var(--helix-density, 1));
-  --helix-text-field: calc(var(--helix-text-md) * var(--helix-density, 1));
-  --helix-text-field-label: calc(var(--helix-text-sm) * var(--helix-density, 1));
-  --helix-space-field: calc(var(--helix-space-sm) * var(--helix-density, 1));
-  --helix-space-row-bleed: calc(var(--helix-space-xs) * var(--helix-density, 1));
-  --helix-size-checkbox: calc(var(--helix-size-checkbox-md) * var(--helix-density, 1));
-  --helix-size-icon: calc(var(--helix-size-icon-md) * var(--helix-density, 1));
-  --helix-size-control: calc(var(--helix-size-control-md) * var(--helix-density, 1));
-  --helix-size-switch: calc(var(--helix-size-switch-md) * var(--helix-density, 1));
-  --helix-size-tag: calc(var(--helix-size-tag-md) * var(--helix-density, 1));
+  --_helix-density-down: min(calc((var(--helix-density, 1) - 1) * 5), 0);
+  --_helix-density-up: max(calc((var(--helix-density, 1) - 1) * 5), 0);
+  --helix-text-control: round(
+    calc(
+      var(--helix-text-control-md) +
+      var(--_helix-density-down) *
+      (var(--helix-text-control-md) - var(--helix-text-control-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-text-control-lg) - var(--helix-text-control-md))
+    ),
+    1px
+  );
+  --helix-space-control: round(
+    calc(
+      var(--helix-space-md) +
+      var(--_helix-density-down) *
+      (var(--helix-space-md) - var(--helix-space-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-space-lg) - var(--helix-space-md))
+    ),
+    1px
+  );
+  --helix-text-field: round(
+    calc(
+      var(--helix-text-md) +
+      var(--_helix-density-down) *
+      (var(--helix-text-md) - var(--helix-text-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-text-md) - var(--helix-text-md))
+    ),
+    1px
+  );
+  --helix-text-field-label: round(
+    calc(
+      var(--helix-text-sm) +
+      var(--_helix-density-down) *
+      (var(--helix-text-sm) - var(--helix-text-xs)) +
+      var(--_helix-density-up) *
+      (var(--helix-text-sm) - var(--helix-text-sm))
+    ),
+    1px
+  );
+  --helix-space-field: round(
+    calc(
+      var(--helix-space-sm) +
+      var(--_helix-density-down) *
+      (var(--helix-space-sm) - var(--helix-space-xs)) +
+      var(--_helix-density-up) *
+      (var(--helix-space-md) - var(--helix-space-sm))
+    ),
+    1px
+  );
+  --helix-space-row-bleed: round(calc(var(--helix-space-xs) * var(--helix-density, 1)), 1px);
+  --helix-size-checkbox: round(
+    calc(
+      var(--helix-size-checkbox-md) +
+      var(--_helix-density-down) *
+      (var(--helix-size-checkbox-md) - var(--helix-size-checkbox-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-size-checkbox-lg) - var(--helix-size-checkbox-md))
+    ),
+    1px
+  );
+  --helix-size-icon: round(
+    calc(
+      var(--helix-size-icon-md) +
+      var(--_helix-density-down) *
+      (var(--helix-size-icon-md) - var(--helix-size-icon-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-size-icon-lg) - var(--helix-size-icon-md))
+    ),
+    2px
+  );
+  --helix-size-control: round(
+    calc(
+      var(--helix-size-control-md) +
+      var(--_helix-density-down) *
+      (var(--helix-size-control-md) - var(--helix-size-control-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-size-control-lg) - var(--helix-size-control-md))
+    ),
+    1px
+  );
+  --helix-size-switch: round(
+    calc(
+      var(--helix-size-switch-md) +
+      var(--_helix-density-down) *
+      (var(--helix-size-switch-md) - var(--helix-size-switch-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-size-switch-lg) - var(--helix-size-switch-md))
+    ),
+    1px
+  );
+  --helix-size-tag: round(
+    calc(
+      var(--helix-size-tag-md) +
+      var(--_helix-density-down) *
+      (var(--helix-size-tag-md) - var(--helix-size-tag-sm)) +
+      var(--_helix-density-up) *
+      (var(--helix-size-tag-lg) - var(--helix-size-tag-md))
+    ),
+    1px
+  );
 }
 
 [data-density="sm"] {
@@ -1349,6 +1449,32 @@ helix-toggle[disabled]::part(item) {
   border-color: transparent;
 }
 
+/* **A glass modal in light reads the page, not its own scrim.** A modal's
+   `::backdrop` paints behind its panel, so the panel's filter sampled the page
+   with the scrim already over it: the white page came through as #9d9d9d and
+   the glass as a gray slab, #e4e4e4 on average, where a glass menu over the
+   same page is near white. The scrim is 40% of the ink in light, so a
+   brightness of 1 / 0.6 hands the filter the page as it stands under the
+   scrim, and the panel keeps the one glass coverage over it: 240 on average,
+   from 218. Dark keeps the dimmed page, which is what its glass is drawn over.
+   Keyed on the mode the page decided, since a filter takes no `light-dark()`.
+   A browser without style queries keeps the gray. */
+@container style(--_helix-mode: light) {
+  helix-dialog[material="glass"]::part(surface) {
+    backdrop-filter: var(
+      --dialog-backdrop,
+      var(--helix-material-backdrop) brightness(calc(1 / 0.6))
+    );
+  }
+
+  helix-drawer[material="glass"]:not([modal="false"])::part(panel) {
+    backdrop-filter: var(
+      --drawer-backdrop,
+      var(--helix-material-backdrop) brightness(calc(1 / 0.6))
+    );
+  }
+}
+
 /* *What sets a surface apart from what is behind it**, which is the question
    `separation` asks and the four mechanisms `ThemeIntent.separation` names. */
 [data-separation="elevated"] {
@@ -1389,6 +1515,31 @@ helix-toggle[disabled]::part(item) {
   --helix-color-border: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 7%, var(--helix-color-surface-sunken)),
     color-mix(in oklab, var(--helix-color-foreground) 12%, var(--helix-color-surface-sunken))
+  );
+  /* The rungs as they stand outside, read here for the children below. */
+  --_helix-sunken-surface: var(--helix-color-surface);
+  --_helix-sunken-raised: var(--helix-color-surface-raised);
+  --_helix-sunken-overlay: var(--helix-color-surface-overlay);
+}
+
+/* **In dark, a surface inside the well steps up to `surface-raised`**, so a
+   Card is not a hole in it: the card rung, #0c0c0c, measured 1.04:1 darker
+   than the #121212 well. Decided by the owner on November 4, 2026. The rungs
+   above it step with it, so an elevated Card, which reads `surface-raised`,
+   stands above a default one and above a filled one, whose wash comes out
+   #1e1e1e on the well: #181818, #1e1e1e, and #272727, in that order. A menu
+   opened inside stands off all three. Light keeps its own rungs, where a card
+   already sits lighter than the well. On the children, since a token restated on the well itself would read
+   its own new value. The page's rungs are unchanged. */
+:where([data-surface="sunken"] > *) {
+  --helix-color-surface: light-dark(var(--_helix-sunken-surface), var(--_helix-sunken-raised));
+  --helix-color-surface-raised: light-dark(
+    var(--_helix-sunken-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_helix-sunken-overlay))
+  );
+  --helix-color-surface-overlay: light-dark(
+    var(--_helix-sunken-overlay),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_helix-sunken-overlay))
   );
 }
 
@@ -1630,9 +1781,11 @@ helix-toast:not([data-color-mode]) {
 /* **Code is set at `Code`'s ratio**, `sm` over `md`, so a raw `code` in a
    paragraph matches a `Code` beside it: it drew at the paragraph's 14 against
    the component's 13. A `pre` takes it too, as `Code Block` draws at 13, and the
-   `code` inside a `pre` inherits it below. */
+   `code` inside a `pre` inherits it below. **No ligatures**, as `Code` draws:
+   Fira Code drew `</` and `=>` as single marks. */
 :where([data-prose] code, [data-prose] samp, [data-prose] pre) {
   font-size: calc(var(--helix-text-sm) / var(--helix-text-md) * 1em);
+  font-variant-ligatures: none;
 }
 
 /* **A fragment moves to the next line whole**, as `Code` does: a raw `code`

@@ -107,6 +107,12 @@
   padding: var(--helix-space-xs);
 }
 
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the words a step away from them, as it does in Table. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
+}
+
 /*
  *  The mark beside the field, and a slot so it can be something else.
  *

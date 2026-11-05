@@ -1,5 +1,6 @@
 import {
   animationsFinished,
+  animationsSettled,
   ariaChord,
   chordParts,
   customElement,
@@ -82,9 +83,11 @@ import { joinSaid, messageWords } from '../words.js'
  * opened while it showed. Position the `region` part, which is the box in the
  * top layer. While a modal is open, the browser makes everything outside it
  * inert, the stack included, so a message stays visible and its actions cannot
- * be pressed, and a press on a message does not close the modal under it. Where the browser has
- * `ariaNotify`, a message that arrives then is announced through it. For a
- * message with an action, render a second region inside the dialog.
+ * be pressed, and a press on a message reaches nothing under it. The stack
+ * moves off the modal's surface, above, below or beside it by its own inset,
+ * and is hidden while the window has no room outside the surface. Where the
+ * browser has `ariaNotify`, a message that arrives then is announced through
+ * it. For a message with an action, render a second region inside the dialog.
  *
  * When a message with focus inside it is dismissed, focus moves to the next
  * message, then the one before it, then back to where it was before it entered
@@ -702,6 +705,159 @@ export class HelixHeadlessToast extends HelixElement {
     if (!open || blocked) {
       region.showPopover()
     }
+    this.clear()
+  }
+
+  /**
+   * Moves the stack off a modal surface it would cover, or hides it where the
+   * window has no room outside the surface.
+   *
+   * **The stack is inert under a modal**, so a press on a message passes
+   * through it to what the modal holds. Measured at 390 by 844, two messages
+   * stood over a bottom sheet's Delete at 288,779, and a tap on the message
+   * fired Delete. The move that fits and is shortest wins: up or down past the
+   * surface's edge, or sideways past it, keeping the stack's own inset from
+   * the window's edge as its gap from the surface.
+   */
+  private clear(): void {
+    const region = this.region
+    if (!region) {
+      return
+    }
+    const style = region.style
+    const surfaces = this.showing.length > 0 && popoverOpen(region) ? this.modalSurfaces() : []
+    if (surfaces.length === 0) {
+      style.removeProperty('translate')
+      style.removeProperty('visibility')
+      return
+    }
+    /* Where the stack rests, read through any move still transitioning. */
+    const [movedX = 0, movedY = 0] = getComputedStyle(region)
+      .translate.split(' ')
+      .map((one) => Number.parseFloat(one) || 0)
+    const frame = region.getBoundingClientRect()
+    const messages = this.showing.map((one) => one.getBoundingClientRect())
+    const rest = {
+      bottom: frame.bottom - movedY,
+      left: Math.min(...messages.map((one) => one.left)) - movedX,
+      right: Math.max(...messages.map((one) => one.right)) - movedX,
+      top: frame.top - movedY,
+    }
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const inlineGap = frame.left - movedX
+    const blockGap = this.placement?.startsWith('top') ? rest.top : height - rest.bottom
+    const meets = (box: Box, other: Box): boolean =>
+      box.left < other.right &&
+      box.right > other.left &&
+      box.top < other.bottom &&
+      box.bottom > other.top
+    const moved = (x: number, y: number): Box => ({
+      bottom: rest.bottom + y,
+      left: rest.left + x,
+      right: rest.right + x,
+      top: rest.top + y,
+    })
+    if (!surfaces.some((one) => meets(rest, one))) {
+      style.removeProperty('translate')
+      style.removeProperty('visibility')
+      return
+    }
+    const moves = surfaces.flatMap((one): [number, number][] => [
+      [0, one.top - blockGap - rest.bottom],
+      [0, one.bottom + blockGap - rest.top],
+      [one.left - inlineGap - rest.right, 0],
+      [one.right + inlineGap - rest.left, 0],
+    ])
+    const fits = moves
+      .filter(([x, y]) => {
+        const box = moved(x, y)
+        return (
+          box.top >= blockGap &&
+          box.bottom <= height - blockGap &&
+          box.left >= inlineGap &&
+          box.right <= width - inlineGap &&
+          !surfaces.some((one) => meets(box, one))
+        )
+      })
+      .sort((one, other) => Math.abs(one[0] + one[1]) - Math.abs(other[0] + other[1]))
+    const [move] = fits
+    if (move) {
+      /* Whole pixels, so the messages stay on the pixel grid they rest on. */
+      style.setProperty('translate', `${Math.round(move[0])}px ${Math.round(move[1])}px`)
+      style.removeProperty('visibility')
+    } else {
+      style.removeProperty('translate')
+      style.setProperty('visibility', 'hidden')
+    }
+  }
+
+  /**
+   * The boxes of the open modal surfaces this stack is not inside: the
+   * `<dialog>` of each `Dialog`, `Drawer` and `Lightbox` holding the page, and
+   * an open modal `<dialog>` in the document.
+   */
+  private modalSurfaces(): Box[] {
+    const surfaces: Element[] = []
+    for (const holder of scrollHolders()) {
+      const surface =
+        holder instanceof HTMLDialogElement ? holder : holder.shadowRoot?.querySelector('dialog')
+      if (surface && !deepContains(holder, this)) {
+        surfaces.push(surface)
+      }
+    }
+    try {
+      const native = document.querySelector('dialog:modal')
+      if (native && !deepContains(native, this)) {
+        surfaces.push(native)
+      }
+    } catch {
+      // A document that cannot parse `:modal` has no modal dialog to find.
+    }
+    return surfaces
+      .map((one) => one.getBoundingClientRect())
+      .filter((one) => one.width > 0 && one.height > 0)
+  }
+
+  /**
+   * Keeps a press on a message from reaching what a modal holds under it.
+   *
+   * A message under a modal is inert, so the browser hands the press to the
+   * element beneath. Taken in the capture phase on the window, before anything
+   * on the page sees it. Read only while a modal makes the stack inert.
+   */
+  private readonly handleCoveredPress = (event: Event): void => {
+    const point = 'changedTouches' in event ? (event as TouchEvent).changedTouches[0] : event
+    if (!point || !('clientX' in point)) {
+      return
+    }
+    const target = event.composedPath()[0]
+    if (target instanceof Node && deepContains(this, target)) {
+      return
+    }
+    if (!this.raised.covers(point.clientX, point.clientY) || !this.blocked()) {
+      return
+    }
+    event.stopImmediatePropagation()
+    if (event.cancelable) {
+      event.preventDefault()
+    }
+  }
+
+  /** Measures the stack again against a window that has changed size. */
+  private readonly handleResize = (): void => {
+    this.clear()
+  }
+
+  /**
+   * Measures the stack against the modal surfaces once they have come to
+   * rest. A bottom sheet rises into place, and measured while it moved, the
+   * sheet's top was lower than where it stops.
+   */
+  private clearWhenStill(): void {
+    this.clear()
+    const surfaces = scrollHolders().map((holder) => holder.shadowRoot?.querySelector('dialog'))
+    void Promise.all(surfaces.map((one) => animationsSettled(one))).then(() => this.clear())
   }
 
   /**
@@ -829,6 +985,14 @@ export class HelixHeadlessToast extends HelixElement {
     document.addEventListener('keydown', this.handleHotkey)
     document.addEventListener('keydown', this.handleUndo)
     window.addEventListener('pagehide', this.handlePageHide)
+    window.addEventListener('resize', this.handleResize)
+    for (const press of PRESSES) {
+      /* Passive for `touchstart`, which would otherwise hold every scroll. */
+      window.addEventListener(press, this.handleCoveredPress, {
+        capture: true,
+        passive: press === 'touchstart',
+      })
+    }
     this.lower = keepAbove(this.raised)
     this.unregister = registerShortcut({
       keys: () => this.hotkey,
@@ -865,10 +1029,12 @@ export class HelixHeadlessToast extends HelixElement {
    * The stack as a box kept above every modal surface. A modal opened while a
    * message showed covered the stack with its backdrop until the next message
    * arrived, measured in Dialog and in Drawer, so the modal raises it again
-   * once it has opened, and steps over a press that lands on a message.
+   * once it has opened, and steps over a press that lands on a message. The
+   * stack moves off the surface once it has opened and back once it lets go.
    */
   private readonly raised: Raised = {
     covers: (x, y) =>
+      this.region?.style.visibility !== 'hidden' &&
       this.showing.some((one) => {
         const box = one.getBoundingClientRect()
         return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom
@@ -879,6 +1045,10 @@ export class HelixHeadlessToast extends HelixElement {
         region.hidePopover()
         region.showPopover()
       }
+      this.clearWhenStill()
+    },
+    release: () => {
+      this.clear()
     },
   }
 
@@ -886,6 +1056,10 @@ export class HelixHeadlessToast extends HelixElement {
     super.disconnectedCallback()
     this.unregister?.()
     this.lower?.()
+    window.removeEventListener('resize', this.handleResize)
+    for (const press of PRESSES) {
+      window.removeEventListener(press, this.handleCoveredPress, { capture: true })
+    }
     this.keepAll()
     document.removeEventListener('keydown', this.handleUndo)
     window.removeEventListener('pagehide', this.handlePageHide)
@@ -925,6 +1099,28 @@ export class HelixHeadlessToast extends HelixElement {
     return html`<div part="region" popover="manual" tabindex="-1"><slot></slot><span part="live" role="status">${this.said}</span><span part="live" role="alert">${this.urgent}</span></div>`
   }
 }
+
+/** A box on the window, in the shape `getBoundingClientRect` gives. */
+interface Box {
+  bottom: number
+  left: number
+  right: number
+  top: number
+}
+
+/** The presses a message under a modal keeps from what lies beneath it. */
+const PRESSES = [
+  'auxclick',
+  'click',
+  'contextmenu',
+  'dblclick',
+  'mousedown',
+  'mouseup',
+  'pointerdown',
+  'pointerup',
+  'touchend',
+  'touchstart',
+] as const
 
 /** Whether a message is a `danger` one, which is said assertively. */
 const isDanger = (item: HTMLElement): boolean =>

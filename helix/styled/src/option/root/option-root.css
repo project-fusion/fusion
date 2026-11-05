@@ -124,6 +124,16 @@ slot[name="media"]::slotted(*) {
   object-fit: cover;
 }
 
+/* **A leading icon at the tick's size**, the tight step, which is what a Menu
+   Item's leading icon draws in a row of the same height. Left to the region's
+   icon size it drew 16, 20 and 24 across density, a step over the tick at the
+   other end of its own row and over the 12, 16 and 20 of a menu beside it. A
+   page that sets `--icon-size` on its own icon still wins. */
+slot[name="start"]::slotted(*) {
+  --icon-size: var(--helix-size-icon-tight);
+  flex: 0 0 auto;
+}
+
 /* An icon slotted into `indicator` is shown only on the chosen option, where
    the tick would be, and the tick goes. */
 slot[name="indicator"]::slotted(*) {

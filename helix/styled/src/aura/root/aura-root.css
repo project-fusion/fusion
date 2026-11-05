@@ -28,12 +28,25 @@
   block-size: 100%;
 
   /* **The top and bottom edges fade**, so a field has no ruled line where the box
-     ends. `--aura-fade: 0%` keeps a hard edge. */
+     ends. `--aura-fade: 0%` keeps a hard edge. **Eased at both ends of the
+     fade, on smoothstep's stops**: a straight ramp ran into the flat middle at
+     a corner, and in dark the eye drew that corner as a line across both
+     shafts, 84 pixels down a 560 pixel field. */
   --_aura-mask: linear-gradient(
     to bottom,
     transparent,
+    rgb(0 0 0 / 0.04) calc(var(--_aura-fade) * 0.125),
+    rgb(0 0 0 / 0.16) calc(var(--_aura-fade) * 0.25),
+    rgb(0 0 0 / 0.5) calc(var(--_aura-fade) * 0.5),
+    rgb(0 0 0 / 0.84) calc(var(--_aura-fade) * 0.75),
+    rgb(0 0 0 / 0.96) calc(var(--_aura-fade) * 0.875),
     black var(--_aura-fade),
     black calc(100% - var(--_aura-fade)),
+    rgb(0 0 0 / 0.96) calc(100% - var(--_aura-fade) * 0.875),
+    rgb(0 0 0 / 0.84) calc(100% - var(--_aura-fade) * 0.75),
+    rgb(0 0 0 / 0.5) calc(100% - var(--_aura-fade) * 0.5),
+    rgb(0 0 0 / 0.16) calc(100% - var(--_aura-fade) * 0.25),
+    rgb(0 0 0 / 0.04) calc(100% - var(--_aura-fade) * 0.125),
     transparent
   );
 }

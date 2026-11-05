@@ -228,6 +228,13 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
         this.partNamed('surface'),
         this.partNamed('trigger'),
       ],
+      /* **Over the field rather than cut**, where neither side holds the
+         picker. A calendar is a fixed shape, and held to the room on one side
+         it scrolled inside itself: on a 390 by 664 phone, Date Input's month
+         was held to 306 of its 386 above the field, with its last week out of
+         sight. Covering the field keeps the month whole, as a phone's own date
+         picker does. */
+      cover: true,
       /* Wider than the four every other panel here takes. Those sit against a
          control the same width as themselves and read as an extension of it; this
          one is a picker of its own size hanging off a field, so the gap is what

@@ -129,6 +129,12 @@
 
 :host([separation="elevated"]:not([group])) {
   --canvas-node-shadow: var(--helix-shadow-md);
+  /* A shadow draws nothing on a dark board, so in dark the raised step says it,
+     as an elevated Card's does: the card drew exactly as an unset one. */
+  background-color: var(
+    --canvas-node-background-color,
+    light-dark(var(--helix-color-surface), var(--helix-color-surface-raised))
+  );
 }
 
 :host([separation="plain"]:not([group])) {

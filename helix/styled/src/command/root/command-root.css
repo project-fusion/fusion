@@ -136,3 +136,10 @@ helix-listbox::part(search-field) {
     display: none;
   }
 }
+
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the list's error words a step away from them, as it does in Table. Set here,
+   where the page's content is slotted: the list sees only this slot. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
+}

@@ -363,6 +363,11 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
    * still overlaps moves down a row. Controls side by side in a toolbar are
    * narrower than a key and a name together, and badges drawn over each other
    * read as neither.
+   *
+   * **Both badges of a pair that would overlap drop it**, measured at full
+   * width before any is placed. Placed one at a time, the first of three
+   * toolbar buttons kept its name, the second dropped it, and the third, clear
+   * of the second's shorter badge, kept it: "⌘B Bold", "⌘I", "⌘K Link".
    */
   private arrange(): void {
     const placed: Array<{ bottom: number; left: number; right: number; top: number }> = []
@@ -370,6 +375,29 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
     const width = window.innerWidth
     const height = window.innerHeight
     const drawn = [...(this.renderRoot.querySelectorAll<HTMLElement>('[part~="badge"]') ?? [])]
+    /* Each badge at full width under its control, to find every one that
+       would overlap another before any is placed. */
+    const full = drawn.map((element, index) => {
+      element.toggleAttribute('data-compact', false)
+      const { height: tall, width: wide } = element.getBoundingClientRect()
+      const left = (this.badges[index]?.left ?? 0) - wide / 2
+      const top = (this.badges[index]?.top ?? 0) + margin
+      return { bottom: top + tall, left, right: left + wide, top }
+    })
+    const crowded = new Set(
+      full.flatMap((one, index) =>
+        full.some(
+          (other, at) =>
+            at !== index &&
+            one.left < other.right &&
+            one.right > other.left &&
+            one.top < other.bottom &&
+            one.bottom > other.top,
+        )
+          ? [index]
+          : [],
+      ),
+    )
     drawn.forEach((element, index) => {
       const badge = this.badges[index]
       if (!badge) {
@@ -394,7 +422,7 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
             one.bottom > other.top,
         )
       const under = badge.top + margin
-      let place = box(false, under)
+      let place = box(crowded.has(index), under)
       if (hits(place).length > 0) {
         place = box(true, under)
       }

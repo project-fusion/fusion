@@ -1,5 +1,9 @@
 /* The host draws nothing: the region inside it is the board's frame. */
 :host {
+  /* The rungs as they stand outside, read here for the region below. */
+  --_canvas-surface: var(--helix-color-surface);
+  --_canvas-raised: var(--helix-color-surface-raised);
+  --_canvas-overlay: var(--helix-color-surface-overlay);
   display: contents;
 }
 
@@ -11,6 +15,21 @@
   /* `md`, the container corner every framed region takes: Code Editor, Editor,
      Log, Video, Image, and the spatial charts. */
   border-radius: var(--canvas-radius, var(--helix-radii-md));
+  /* **In dark, the cards on the board step up a rung**, as a surface does in a
+     `data-surface="sunken"` region: a card took `surface`, #0c0c0c, and on the
+     #121212 board it measured 1.04:1 darker, a hole in the board. Decided by
+     the owner on November 4, 2026. The rungs above step with it, so an elevated
+     card, #272727, stands off a default one, #181818. Light keeps its own, where a card
+     already sits lighter than the board. */
+  --helix-color-surface: light-dark(var(--_canvas-surface), var(--_canvas-raised));
+  --helix-color-surface-raised: light-dark(
+    var(--_canvas-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_canvas-overlay))
+  );
+  --helix-color-surface-overlay: light-dark(
+    var(--_canvas-overlay),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_canvas-overlay))
+  );
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto 1fr auto;

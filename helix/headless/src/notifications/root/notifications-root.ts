@@ -88,7 +88,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own. The live region still says `empty-text`.
- * @slot error - Replaces the words of `error-text` in the `error` part, such as a line with a retry button. The live region still says `error-text`.
+ * @slot error - Content shown after `error-text` in the `error` part, such as a button that tries again.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader. The live region still says `loading-text`.
@@ -569,14 +569,16 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   }
 
   /**
-   * The error, the empty or the loading line, each around a slot of the same
-   * name whose fallback is the words, so a page can put its own in. The error
-   * shows under the rows there are, since a page that failed is news even to
-   * a feed that holds some.
+   * The error, the empty or the loading line. The empty and loading lines are
+   * each around a slot of the same name whose fallback is the words, so a page
+   * can put its own in. The error line keeps its words and puts the `error`
+   * slot after them, as Table does, so a button that tries again never stands
+   * alone with no reason for it. The error shows under the rows there are,
+   * since a page that failed is news even to a feed that holds some.
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
     if (this.failed) {
-      return html`<p part="error"><slot name="error">${this.loadError || this.errorText}</slot></p>`
+      return html`<p part="error">${this.loadError || this.errorText}<slot name="error"></slot></p>`
     }
     if (!this.loading && hasContent) {
       return nothing

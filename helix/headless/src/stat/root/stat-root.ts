@@ -144,6 +144,16 @@ export class HelixHeadlessStat extends HelixElement {
      children to name it with. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    /* **The figure is read before the render that draws it**, on the first
+       update and when the locale moves, so its runs are in this render. Read
+       in `firstUpdated` and `updated` it asked for a second update after the
+       first had completed, which Lit's development build reports, on every
+       stat on the site's home page. Not while hydrating, whose render is the
+       server's: the update after it reads the figure. */
+    if (this.childrenKnown && (!this.figureRead || changed.has('locale'))) {
+      this.figureRead = true
+      this.readFigure()
+    }
     const labels = this.knownChildren.filter((child) => child.slot === 'label')
     hostAria(internalsOf(this), {
       label:
@@ -156,11 +166,11 @@ export class HelixHeadlessStat extends HelixElement {
   }
 
   /* A hydrated label slot was filled before its listener was bound and sends
-     no change, so the name is read once more after hydrating. */
+     no change, so the name is read once more after hydrating. The update that
+     asks for reads the figure too. */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
-    this.readFigure()
   }
 
   /** Watches the stat's own width, to step the figure down where it does not fit. */
@@ -173,6 +183,9 @@ export class HelixHeadlessStat extends HelixElement {
    */
   @state()
   private slottedRuns: string[] = []
+
+  /** Whether the figure has been read since the children were known. */
+  private figureRead = false
 
   /** Watches the slotted text, which a framework edits in place with no `slotchange`. */
   private edits: MutationObserver | undefined
@@ -292,9 +305,6 @@ export class HelixHeadlessStat extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.readPieces()
-    if (changed.has('locale')) {
-      this.readFigure()
-    }
     this.fit()
     const given = this.direction as string | undefined
     if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
@@ -321,8 +331,12 @@ export class HelixHeadlessStat extends HelixElement {
    * breaks after its points in German and "1,284.5" never after its point.
    */
   private readonly readFigure = (): void => {
+    /* Before the first render there is no slot yet, and what it will hold is
+       the children that name no other slot. */
     const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
-    const nodes = slot?.assignedNodes({ flatten: true }) ?? []
+    const nodes =
+      slot?.assignedNodes({ flatten: true }) ??
+      [...this.childNodes].filter((node) => !(node instanceof Element && node.hasAttribute('slot')))
     const text = nodes.every((node) => node.nodeType === Node.TEXT_NODE)
       ? nodes
           .map((node) => node.textContent ?? '')

@@ -1847,11 +1847,13 @@ declares it. So every English default a component ships is a word property, and
   keeps its name.
 - **A collection message is an attribute and a slot.** The attribute is a word
   property: the words the part shows by default and the words the live region
-  says. A slot of the state's name, `empty`, `loading` or `error`, takes
-  richer content, such as a link or a picture, and replaces only what is
-  shown, so the live region still says the attribute's words: a slot holds
-  markup, and markup is no sentence. A family with the slot declares the
-  attribute too. Canvas's `empty` and `loading` slots and Device Screen's
+  says. A slot of the state's name, `empty` or `loading`, takes richer
+  content, such as a link or a picture, and replaces only what is shown, so
+  the live region still says the attribute's words: a slot holds markup, and
+  markup is no sentence. **The `error` slot comes after the words** and never
+  replaces them, in every family: its content is a button that tries again,
+  and a button with no reason beside it says nothing about what failed. A
+  family with the slot declares the attribute too. Canvas's `empty` and `loading` slots and Device Screen's
   `empty` slot have no attribute yet.
 - **A mixin's words resolve under its host's key.** The mixin writes
   `static words = ''` and `@words` on its own words; a host with no key reads

@@ -13,6 +13,9 @@ beforeAll(async () => {
    code does asserts only that the code agrees with itself. */
 const CIRCUMFERENCE = 2 * Math.PI * 32
 
+/* The seam each slice leaves between it and the next, along the ring. */
+const SEAM = 0.8
+
 const TRAFFIC = `<table id="traffic">
   <caption>Sessions by source</caption>
   <thead><tr><th scope="col">Source</th><th scope="col">Share</th></tr></thead>
@@ -56,18 +59,18 @@ describe('donut chart', () => {
     expect(segments(await chart(TRAFFIC, 'for="traffic"'))).toHaveLength(3)
   })
 
-  test('each slice takes its share of the circumference', async () => {
+  test('each slice takes its share of the circumference, less a seam', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
     const [a, b, c] = segments(host)
-    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5, 2)
-    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3, 2)
-    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2, 2)
+    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5 - SEAM, 2)
+    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3 - SEAM, 2)
+    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2 - SEAM, 2)
   })
 
-  test('the slices close the ring exactly, with nothing lost to rounding', async () => {
+  test('the slices and their seams close the ring exactly, with nothing lost to rounding', async () => {
     const host = await chart(TRAFFIC, 'for="traffic"')
     const total = segments(host).reduce((sum, one) => sum + drawn(one), 0)
-    expect(total).toBeCloseTo(CIRCUMFERENCE, 6)
+    expect(total + SEAM * 3).toBeCloseTo(CIRCUMFERENCE, 6)
   })
 
   test('each slice begins where the last one ended', async () => {
@@ -75,9 +78,9 @@ describe('donut chart', () => {
     const offsets = segments(host).map((one) =>
       Math.abs(Number(one.getAttribute('stroke-dashoffset'))),
     )
-    expect(offsets[0]).toBe(0)
-    expect(offsets[1]).toBeCloseTo(CIRCUMFERENCE * 0.5, 2)
-    expect(offsets[2]).toBeCloseTo(CIRCUMFERENCE * 0.8, 2)
+    expect(offsets[0]).toBeCloseTo(SEAM / 2, 6)
+    expect(offsets[1]).toBeCloseTo(CIRCUMFERENCE * 0.5 + SEAM / 2, 2)
+    expect(offsets[2]).toBeCloseTo(CIRCUMFERENCE * 0.8 + SEAM / 2, 2)
   })
 
   test('drops a negative row rather than drawing it backwards', async () => {
@@ -87,9 +90,9 @@ describe('donut chart', () => {
        hundred, not of ninety. */
     const host = await chart(NEGATIVE, 'for="negative"')
     const drawnLengths = segments(host).map(drawn)
-    expect(drawnLengths[0]).toBeCloseTo(CIRCUMFERENCE * 0.75, 2)
+    expect(drawnLengths[0]).toBeCloseTo(CIRCUMFERENCE * 0.75 - SEAM, 2)
     expect(drawnLengths[1]).toBe(0)
-    expect(drawnLengths[2]).toBeCloseTo(CIRCUMFERENCE * 0.25, 2)
+    expect(drawnLengths[2]).toBeCloseTo(CIRCUMFERENCE * 0.25 - SEAM, 2)
   })
 
   test('takes the palette in order, so a legend beside it agrees', async () => {
@@ -265,7 +268,7 @@ describe('donut chart hole', () => {
   test('the dash follows the radius, so the slices still close the ring', async () => {
     const host = await chart(TRAFFIC, 'for="traffic" hole="large"')
     const total = segments(host).reduce((sum, one) => sum + drawn(one), 0)
-    expect(total).toBeCloseTo(2 * Math.PI * radius(host), 6)
+    expect(total + SEAM * 3).toBeCloseTo(2 * Math.PI * radius(host), 6)
   })
 })
 
@@ -279,9 +282,9 @@ describe('donut chart sweep', () => {
   test('spreads the same shares over half the circle', async () => {
     const host = await chart(TRAFFIC, 'for="traffic" sweep="half"')
     const [a, b, c] = segments(host)
-    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5 * 0.5, 2)
-    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3 * 0.5, 2)
-    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2 * 0.5, 2)
+    expect(drawn(a)).toBeCloseTo(CIRCUMFERENCE * 0.5 * 0.5 - SEAM, 2)
+    expect(drawn(b)).toBeCloseTo(CIRCUMFERENCE * 0.3 * 0.5 - SEAM, 2)
+    expect(drawn(c)).toBeCloseTo(CIRCUMFERENCE * 0.2 * 0.5 - SEAM, 2)
   })
 
   test('the track is half a ring too, so the shares sit on something', async () => {

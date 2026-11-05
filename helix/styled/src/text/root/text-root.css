@@ -119,6 +119,7 @@
 :host(:not([scale])[as="code"]) {
   font-family: var(--text-font-family, var(--helix-font-mono));
   font-size: var(--text-font-size, var(--helix-text-sm));
+  font-variant-ligatures: none;
   font-weight: var(--text-font-weight, var(--helix-weight-regular));
   letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
   line-height: var(--text-line-height, var(--helix-leading-normal));

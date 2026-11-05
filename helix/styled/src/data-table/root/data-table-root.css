@@ -40,8 +40,6 @@
  */
 [part="table"] {
   --_data-table-fade: to right;
-  animation: data-table-edges linear both;
-  animation-timeline: scroll(self inline);
   mask-image: linear-gradient(
     var(--_data-table-fade),
     transparent,
@@ -53,6 +51,16 @@
 
 :host(:dir(rtl)) [part="table"] {
   --_data-table-fade: to left;
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a strip with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  [part="table"] {
+    animation: data-table-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
 }
 
 @keyframes data-table-edges {

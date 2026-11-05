@@ -67,7 +67,7 @@ slot[name="label"]::slotted(*) {
    track that only appears where the fill has not reached leaves the bar without
    a total, and a proportion needs both halves to be read as one. */
 [part="track"] {
-  background-color: var(--progress-track-color, var(--helix-color-surface-sunken));
+  background-color: var(--progress-track-color, var(--helix-color-track));
   /* A floor and not a height, so words in the default slot can grow it. */
   min-block-size: var(--progress-size, var(--helix-size-progress));
   border-radius: var(--progress-radius, var(--helix-radii-full));
@@ -274,7 +274,7 @@ slot[name="label"]::slotted(*) {
 }
 
 :host([shape="ring"]) [part="groove"] {
-  stroke: var(--progress-track-color, var(--helix-color-surface-sunken));
+  stroke: var(--progress-track-color, var(--helix-color-track));
 }
 
 /* `pathLength="100"` on the element is what makes this the percentage itself:
@@ -429,7 +429,7 @@ slot[name="label"]::slotted(*) {
   background-color: color-mix(
     in oklab,
     var(--progress-color, var(--helix-color-primary-surface)) 30%,
-    var(--progress-track-color, var(--helix-color-surface-sunken))
+    var(--progress-track-color, var(--helix-color-track))
   );
 }
 
@@ -437,6 +437,6 @@ slot[name="label"]::slotted(*) {
   stroke: color-mix(
     in oklab,
     var(--progress-color, var(--helix-color-primary-surface)) 30%,
-    var(--progress-track-color, var(--helix-color-surface-sunken))
+    var(--progress-track-color, var(--helix-color-track))
   );
 }

@@ -83,7 +83,11 @@
     transparent
   );
 
-  display: block;
+  /* A column, so the frame keeps a height set on the host: its own 24rem is
+     where it starts, and it shrinks or grows to the host's box. In a 160 host
+     the frame stayed 384 and ran over what followed. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* **Covering the container, for a terminal that fills a pane.** A pane's
@@ -98,6 +102,8 @@
 [part="region"] {
   background-color: var(--terminal-background-color);
   block-size: var(--terminal-block-size, 24rem);
+  flex: 1 1 auto;
+  min-block-size: 0;
   box-shadow: var(--helix-shadow-surface);
   border: var(--helix-border-surface) solid var(--terminal-border-color, var(--helix-color-border));
   border-radius: var(--terminal-radius, var(--helix-radii-md));

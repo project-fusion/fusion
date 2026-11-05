@@ -44,6 +44,9 @@ export interface PopoverOptions {
   /** How far to slide the surface along its side, in pixels. See `FloatingController`. */
   crossOffset?: number | (() => number)
 
+  /** Whether the surface may cover its anchor to stay whole in the window. See `FloatingController`. */
+  cover?: boolean
+
   /** How close to the window's edges the surface may come, in pixels. See `FloatingController`. */
   padding?: number | (() => number | undefined)
 
@@ -253,6 +256,7 @@ export class PopoverController implements ReactiveController {
       floating: options.surface,
       ...(options.offset === undefined ? {} : { offset: options.offset }),
       ...(options.crossOffset === undefined ? {} : { crossOffset: options.crossOffset }),
+      ...(options.cover === undefined ? {} : { cover: options.cover }),
       ...(options.flip === undefined ? {} : { flip: options.flip }),
       ...(options.padding === undefined ? {} : { padding: options.padding }),
       ...(options.onPlace === undefined ? {} : { onPlace: options.onPlace }),

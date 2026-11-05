@@ -75,14 +75,15 @@ export const ticks = (domain: readonly [number, number], count = 5): number[] =>
  * the box's edge rather than a number. Measured on Line Chart's sessions
  * example before this: 1,410 at the top edge, 0px above it, and the highest
  * numbered level, 1,400, under the peak. The top is raised to the first level
- * at least a twentieth of the span above the highest reading, so the peak
+ * at least a thirtieth of the span above the highest reading, so the peak
  * stands clear of the edge and the top edge is a numbered level. A peak exactly
- * on a level takes the next one.
+ * on a level takes the next one. The room is a thirtieth of the span, which
+ * clears the peak without taking the next level over a peak just under one.
  *
  * **The floor is the same edge turned over.** Left where the data put it, the
  * same example's lowest reading, 1,180, lay on the bottom edge under the lowest
  * rule, 1,200, and a diverging bar of -14,000 ran past the last numbered level,
- * -10,000. The floor is lowered to the first level at least a twentieth of the
+ * -10,000. The floor is lowered to the first level at least a thirtieth of the
  * span below the lowest reading. **A floor of zero stays**, since zero is the
  * baseline the drawing stands on, and a floor above zero is lowered no further
  * than zero.
@@ -99,7 +100,10 @@ export const headroom = (domain: readonly [number, number], count = 5): [number,
   if (!Number.isFinite(low) || !Number.isFinite(high) || low >= high || count < 1) {
     return [low, high]
   }
-  const room = (high - low) / 20
+  /* A thirtieth of the span. A twentieth took -14,000 past -15,000 and ruled
+     the scale to -20,000, a third of the plot below the lowest bar, where a
+     thirtieth stops at -15,000. */
+  const room = (high - low) / 30
   const [above, below] = [high === 0 ? 0 : high + room, low === 0 ? 0 : low - room]
   let [floor, top] = [low, high]
   let held = 0

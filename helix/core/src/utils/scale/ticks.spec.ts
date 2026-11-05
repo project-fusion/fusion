@@ -61,6 +61,9 @@ describe('headroom', () => {
     const [floor] = headroom([-14_000, 12_000])
     expect(floor).toBeLessThan(-14_000)
     expect(ticks(headroom([-14_000, 12_000]))[0]).toBe(floor)
+    /* And no further than the next level: a twentieth of the span took it to
+       -20,000, a third of the plot under the lowest bar. */
+    expect(headroom([-14_000, 12_000])).toEqual([-15_000, 15_000])
   })
 
   test('a floor of zero stays, and a floor above zero is lowered no further than zero', () => {

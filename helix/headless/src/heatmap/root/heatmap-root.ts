@@ -20,6 +20,7 @@ import {
   StatusController,
   spokenReading,
   words,
+  wordsLocale,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
@@ -28,6 +29,31 @@ import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { inSequence, rectangleOf } from '../rectangle.js'
 import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
+
+/**
+ * A `<time datetime>` value as its day and short month in `locale`, such as
+ * "Aug 6" in English, or undefined where it names no date. A date with no time
+ * is read in UTC, the day it names everywhere.
+ */
+const dayOf = (when: string | undefined, locale: string): string | undefined => {
+  if (!when) {
+    return undefined
+  }
+  const date = new Date(when)
+  if (Number.isNaN(date.getTime())) {
+    return undefined
+  }
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(when)
+  try {
+    return new Intl.DateTimeFormat(locale || undefined, {
+      day: 'numeric',
+      month: 'short',
+      ...(dateOnly ? { timeZone: 'UTC' } : {}),
+    }).format(date)
+  } catch {
+    return undefined
+  }
+}
 
 /**
  * @summary A strip of cells, each colored by its reading, for uptime, contributions, or activity.
@@ -127,9 +153,9 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  *
  * @slot empty - Content shown in place of the cells when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
- * @slot error - Content shown in place of the cells while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
+ * @slot error - Content shown after `error-text` while it is set and there are no readings, such as a button that tries again.
  * @slot loading - Content shown in place of the cells while `loading` is set and there are no readings yet. Falls back to `loading-text`.
- * @slot start - Below the strip, at the leading edge: usually the oldest date. While a narrow strip drops its oldest readings, the first drawn row's name stands in its place.
+ * @slot start - Below the strip, at the leading edge: usually the oldest date. While a narrow strip drops its oldest readings, the first drawn row stands in its place: its date, as day and short month in the chart's locale, where its heading holds a `<time>`, and its heading's words otherwise.
  * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
  * @event {Event} change - Fired once a press or a key has changed which cells are selected.
@@ -143,7 +169,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart cell-selected - A cell that is selected, under `selection-mode`. Set alongside `cell`.
  * @csspart empty - The words in place of the cells when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
- * @csspart error - The words in place of the cells while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart error - The words in place of the cells while `error-text` is set and there are no readings, followed by the `error` slot. Announced as it appears.
  * @csspart footer - The three-slot row under the strip.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the cells while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
@@ -847,11 +873,19 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
        preview dropped nine days and still read "28 Jul" under a strip that
        began on 6 Aug. While days are dropped, the slotted words stay in the
        document, hidden, and the first drawn row's name stands in their place.
-       Only where something is slotted, so a footer you left empty stays empty. */
+       Only where something is slotted, so a footer you left empty stays empty,
+       and read again as the slot fills: a start parsed after the strip had
+       drawn left the slotted words under a strip that began later.
+
+       **A row whose heading holds a `<time>` is named by its date**, day and
+       short month in the chart's locale, as Format Date writes them with
+       those two parts. The heading's own words were the table's, "6 Aug 2026"
+       under a slot that read "28 Jul", and English on a page in Arabic. */
     const dropped = this.dropped
+    const first = this.sourceRows[dropped]
     const drawnStart =
       dropped > 0 && this.querySelector(':scope > [slot="start"]') !== null
-        ? (this.sourceRows[dropped]?.label ?? '')
+        ? (dayOf(first?.when, wordsLocale(this)) ?? first?.label ?? '')
         : ''
     return html`<div
         aria-activedescendant=${grid && at >= 0 ? `cell-${at}` : nothing}
@@ -874,7 +908,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       </div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer">
-        <span part="start"><slot ?hidden=${drawnStart !== ''} name="start"></slot>${drawnStart}</span>
+        <span part="start"><slot ?hidden=${drawnStart !== ''} name="start" @slotchange=${() => this.requestUpdate()}></slot>${drawnStart}</span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
       </div>${readable ? this.renderOverview(cells) : nothing}${

@@ -193,9 +193,14 @@ helix-app-header {
 }
 
 /* The first screen's heading takes more room around it than a route's, and
-   its lede a step more size, wrapped to even lines. */
+   its lede a step more size. Both wrap to even lines: at 390 the heading broke
+   as "Helix design" over a lone "system". */
 .first-screen .hero {
   gap: var(--helix-space-md);
+}
+
+.first-screen .hero > [as="h1"] {
+  text-wrap: balance;
 }
 
 .first-screen .lede {
@@ -377,9 +382,12 @@ helix-app-header {
 
 /*
  * **Narrow, the gutter gives first.** 24 pixels either side of a 390 window
- * spend 48 of 390 on margin, and the table needs 355 of what is left. At `md` it
- * has 358 and fits; at `lg` it was 13 pixels short, and the last column sat
- * outside the box until you scrolled the table sideways.
+ * spend 48 of 390 on margin, and the table needs 355 of what is left. At `lg`
+ * it was 13 pixels short, and the last column sat outside the box until you
+ * scrolled the table sideways. At `md` it had 358, and on a touch screen, where
+ * the table's text steps up from 13 to 14, four of the twelve names took two
+ * lines and their rows grew from 46 to 67. At `sm` it has 366, and the header,
+ * the page, and the footer keep one edge.
  */
 @media (width < 40rem) {
   .first-screen {
@@ -388,15 +396,15 @@ helix-app-header {
 
   .page {
     padding-block: var(--helix-space-xl) var(--helix-space-2xl);
-    padding-inline: var(--helix-space-md);
+    padding-inline: var(--helix-space-sm);
   }
 
   .footer-row {
-    padding-inline: var(--helix-space-md);
+    padding-inline: var(--helix-space-sm);
   }
 
   helix-app-header {
-    --app-header-padding: var(--helix-space-md);
+    --app-header-padding: var(--helix-space-sm);
   }
 }
 

@@ -131,6 +131,18 @@ export const TOKENS: Token[] = [
      holds: 1.119, 1.112, 1.114 across page, card and raised, against the
      absolute token's 1.027 to 1.119. */
   ['color-well', 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)'],
+  /* **The unfilled length of a bar, a step from its ground for the reason the
+     well is one.** Progress and Meter drew their tracks in `surface-sunken`,
+     which measured 1.04:1 on a dark card, 1.06 on a dark raised panel, and 1.09
+     on a raised panel in light, a track that read as a hole or as nothing. 8%
+     in light and 7% in dark paint the sunken rung itself on the page, #ebebeb
+     and #121212, and then step the same distance off every ground. Two whole
+     colors, for the reason `color-overlay` gives below. */
+  [
+    'color-track',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 7%, transparent) )',
+    'The unfilled length of a bar, such as a Progress or Meter track. A wash of the foreground, so it steps off whatever it is on.',
+  ],
   /* **What a `filled` surface is filled with, stated as a step from its ground
      for the reason the well is one.** Card, Checkbox and Radio cards,
      Announcement, and Notification each drew `filled` their own way, and
@@ -294,6 +306,17 @@ export const TOKENS: Token[] = [
   [
     'color-border-floating',
     'light-dark( var(--helix-color-border), color-mix(in oklab, var(--_helix-neutral-0) 10%, transparent) )',
+  ],
+  /* **The edge of a read-only mark that carries a value**: a read-only
+     Checkbox's box, a Radio's circle, a Switch's track, a Slider's thumb, and a
+     Rating's empty stars. A wash of the foreground, 3.1 to 3.4:1 on every
+     ground, where the field edge elsewhere stays at 1.23, by the owner's
+     decision of November 4, 2026. Checkbox, Radio, Slider, and Switch each
+     wrote the same two strengths for themselves. */
+  [
+    'color-border-readonly',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 44%, transparent), color-mix(in oklab, var(--helix-color-foreground) 36%, transparent) )',
+    'The edge of a read-only mark that carries a value, such as the box of a read-only Checkbox.',
   ],
   /* Interaction. Each brand step falls back to the ink step it stands in for,
      which is the whole palette when no brand is named. */
@@ -620,10 +643,13 @@ export const TOKENS: Token[] = [
      for text at 6.40:1 and reads brown as a shape, so a mark takes this, at least 3:1
      on the light page, on its own tint, on `surface-sunken` at 3.37, and under a
      row's hover at 3.23. Those two were 2.99 and 2.86 before the ink went down a
-     step on November 3, 2026. */
+     step on November 3, 2026. **At 1.5 times the ink's chroma in light, from
+     1.25**, the most this lightness holds in gamut: at 1.25 a filled star read
+     brown, #af7200, and at 1.5 it reads amber, #b86d00, at the same 4.02:1
+     on the page and 3.37 on `surface-sunken`, November 4, 2026. */
   [
     'color-warning-mark',
-    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.25) h), var(--helix-color-warning))',
+    'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.5) h), var(--helix-color-warning))',
     'Warning as a mark that is not text, such as a star or a Meter fill.',
   ],
   /* The one severity whose two arms are two steps apart rather than one: `600`

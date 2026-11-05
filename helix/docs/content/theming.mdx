@@ -75,9 +75,13 @@ for text on each surface.
   0.87 or lighter is drawn exactly: on a `#ffe600` seed, primary text is
   `#ffe600` and measures 16.57:1 on the black page. A darker seed is drawn
   lighter than the one you set.
-- **A filled control in dark mode.** A seed at L 0.68 or darker fills between
-  0.52 and 0.55, which clears 3:1 against a card and carries a white label. A
-  lighter seed fills 0.05 darker than itself and takes a black label.
+- **A filled control in dark mode.** A seed at L 0.68 or darker fills at a
+  luminance between 0.115 and 0.135, with its hue and chroma kept. Lightness
+  alone is a different luminance in each hue, so a green filled at the same
+  lightness as a blue carried a white label at 4.43:1. At that luminance the
+  fill clears 3:1 against a card, and a white label clears 4.5:1 on it at rest,
+  under the pointer, and pressed, which step lighter. A lighter seed fills 0.05 darker than itself
+  and takes a black label.
 
 The accent seed is held to the same limits.
 

@@ -673,6 +673,31 @@ describe('each opening of the palette', () => {
       'New file',
     ])
   })
+
+  /* After Escape cleared a query, the command the query had highlighted stayed
+     highlighted, so the full list showed two ways: with no highlight on
+     opening, and with one after the first Escape. */
+  test('an emptied filter puts the list back as it opened, with nothing highlighted', async () => {
+    const host = await palette()
+    press('k', { metaKey: true })
+    await settle(host)
+    listbox(host).requestFilter('o')
+    await settle(host)
+    const typed = highlighted(host)
+    const clearing = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      composed: true,
+      key: 'Escape',
+    })
+    field(host).dispatchEvent(clearing)
+    await settle(host)
+    await settle(host)
+    expect([typed, highlighted(host), host.open]).toEqual(['Open recent', null, true])
+    down(host)
+    await settle(host)
+    expect(highlighted(host)).toBe('New file')
+  })
 })
 
 /* An app that sorts its results puts the best one first a tick after the

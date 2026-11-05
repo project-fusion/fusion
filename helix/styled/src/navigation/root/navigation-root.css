@@ -24,8 +24,6 @@
    inactive, so a strip that fits is never masked. */
 [part="nav"] {
   --_navigation-fade: to right;
-  animation: navigation-edges linear both;
-  animation-timeline: scroll(self inline);
   mask-image: linear-gradient(
     var(--_navigation-fade),
     transparent,
@@ -37,6 +35,16 @@
 
 :host(:dir(rtl)) [part="nav"] {
   --_navigation-fade: to left;
+}
+
+/* Only where scroll timelines exist. Elsewhere the animation runs on time,
+   finishes at once and holds its last keyframe, which masked the first 32px
+   of a strip with nothing to scroll; without it the mask is opaque. */
+@supports (animation-timeline: scroll()) {
+  [part="nav"] {
+    animation: navigation-edges linear both;
+    animation-timeline: scroll(self inline);
+  }
 }
 
 @keyframes navigation-edges {

@@ -28,7 +28,7 @@ import { styles } from './notifications-root.css.js'
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own.
- * @slot error - Replaces the words of `error-text` in the `error` part, such as a line with a retry button.
+ * @slot error - Content shown after `error-text` in the `error` part, such as a button that tries again.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader.

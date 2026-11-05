@@ -50,6 +50,15 @@
   pointer-events: auto;
 }
 
+/* **The stack moves off a modal's surface as the surface arrives**, at the pace
+   a bottom sheet rises, so the two travel together. The region writes the move
+   as its own `translate`. */
+@media (prefers-reduced-motion: no-preference) {
+  [part="region"] {
+    transition: translate var(--helix-duration-normal) var(--helix-easing-decelerate);
+  }
+}
+
 /* Where the stack sits, and which way it grows. */
 /* Which way the nearest edge is, told to the messages rather than worked out by
    them. */

@@ -37,7 +37,7 @@ export function Overview() {
 
       <section className="section">
         <helix-data-table
-          columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) minmax(4.5rem, 1fr) max-content"
+          columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) minmax(4.25rem, 1fr) max-content"
           default-sort="name:asc"
           label="Roster"
           page-size={6}
@@ -52,12 +52,13 @@ export function Overview() {
               cell, so the last column is pushed outside the box and you have to
               scroll the table sideways to read a value. Each track here has a
               floor and a share: the floor is what the words need, and the share
-              is how the spare width is divided. Measured September 16, 2026: at
-              390 the four columns and the checkboxes come to 358 in a box of
-              358, so nothing is cut and nothing wraps. The floors alone come to
-              344, so at a 376 pixel window they exactly fit, and below it the
-              table scrolls its own box and fades whichever edge has more behind
-              it. The last is `max-content`, since a column of numerals has one
+              is how the spare width is divided. Measured November 4, 2026, at
+              390 in a box of 366: nothing is cut, and no name on the first page
+              wraps with a mouse or on a touch screen, where the text steps up
+              from 13 to 14. On touch "Kwame Asante", the longest name, takes two
+              lines. The floors alone come to 342 with a mouse, so at a 366
+              pixel window they exactly fit, and below it the table scrolls its
+              own box and fades whichever edge has more behind it. The last is `max-content`, since a column of numerals has one
               right width. On the table, so a page rendered on a server is laid
               out at these widths before the script runs. */}
           <helix-table-column field="name" sortable>

@@ -93,7 +93,10 @@ const CONTROL = 'helix-control:'
  * **Keyboard.** Focus goes to the filter field as the palette opens, with no
  * command highlighted, as in React Aria's Autocomplete, so Enter runs nothing
  * until you type or press Down. Typing highlights the first command left, and
- * the highlight moves through the commands while you type.
+ * the highlight moves through the commands while you type. Emptying the filter
+ * puts the list back as it opened, with no command highlighted and the list at
+ * its top. Escape clears the filter before it closes the palette, so a hint
+ * for Escape in the `footer` slot says Clear while the filter holds text.
  *
  * | Key | What it does |
  * |---|---|
@@ -135,7 +138,7 @@ const CONTROL = 'helix-control:'
  *
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
- * @slot error - What the palette shows while `error-text` is set, for content richer than its text.
+ * @slot error - Content the palette shows after `error-text` while it is set, such as a button that tries again.
  * @slot filter-icon - Replaces the magnifying glass in the filter field.
  * @slot footer - Content under the list, such as the keys that work in the palette.
  * @slot header - Content above the filter field, such as a title or the scope being searched. A heading here does not rename the palette, which `label` names.
@@ -671,6 +674,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.addEventListener('helix-before-select', this.swallowOptionSelect)
     /* Capture, so both reach this before the listbox and the row do. */
     this.addEventListener('keydown', this.handleAlternate, { capture: true })
+    this.addEventListener('keydown', this.noteEscape, { capture: true })
     this.addEventListener('keydown', this.handleBack)
     this.addEventListener('click', this.handleAlternate, { capture: true })
     document.addEventListener('keydown', this.handleHotkey)
@@ -697,6 +701,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.unregister?.()
     this.removeEventListener('helix-before-select', this.swallowOptionSelect)
     this.removeEventListener('keydown', this.handleAlternate, { capture: true })
+    this.removeEventListener('keydown', this.noteEscape, { capture: true })
     this.removeEventListener('keydown', this.handleBack)
     this.removeEventListener('click', this.handleAlternate, { capture: true })
     document.removeEventListener('keydown', this.handleHotkey)
@@ -760,10 +765,58 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     if (this.typed.trim() === '' && typed.trim() !== '') {
       this.readControls()
     }
+    const emptied = this.typed !== '' && typed === ''
+    const cleared = this.escaping
+    this.escaping = false
     this.typed = typed
+    this.filterTurn += 1
+    const turn = this.filterTurn
     void Promise.resolve()
       .then(() => this.listbox?.updateComplete)
-      .then(() => this.markStatus())
+      .then(() => {
+        this.markStatus()
+        /* Only when Escape emptied it, and only for the latest filter event.
+           The palette empties the filter itself as it shuts and as it opens a
+           page, and starting over on those, in a browser where the list's
+           update lands after the next keystroke, cleared the highlight a
+           reader's typing had just put on the first match. */
+        if (emptied && cleared && turn === this.filterTurn) {
+          this.startOver()
+        }
+      })
+  }
+
+  /** Counts filter events, so a start over waits on the latest one only. */
+  private filterTurn = 0
+
+  /** Whether the next emptied filter is an Escape a reader pressed at a query. */
+  private escaping = false
+
+  /** Notes an Escape pressed while something is typed, before the list clears it. */
+  private readonly noteEscape = (event: KeyboardEvent): void => {
+    this.escaping = event.key === 'Escape' && this.typed !== ''
+  }
+
+  /**
+   * Puts the full list back as an opening shows it: no command highlighted,
+   * and the list at its top.
+   *
+   * **An emptied filter is the list a reader opened**, so it looks the same.
+   * After Escape cleared a query, the first command left by the query stayed
+   * highlighted and the list stayed scrolled about 22 pixels down, cutting the
+   * first group's heading, where the same list on opening had no highlight and
+   * its heading in full.
+   */
+  private startOver(): void {
+    const list = this.listbox
+    if (!list || this.typed !== '' || list.filter !== '') {
+      return
+    }
+    list.highlight('none')
+    const items = list.shadowRoot?.querySelector<HTMLElement>('[part="items"]')
+    if (items) {
+      items.scrollTop = 0
+    }
   }
 
   /** Whether a child fills the named slot, so it is handed on to the dialog or the list. */
@@ -918,7 +971,9 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
              own empty line says empty-text. -->
         <slot name="empty" slot=${this.fills('no-results') ? 'empty' : 'no-results'}>${this.emptyText}</slot>
         <slot name="loading" slot="loading">${this.loadingText}</slot>
-        <slot name="error" slot="error">${this.loadError || this.errorText}</slot>
+        <!-- No fallback: the list shows the error words itself and this slot
+             after them, so words here would say them twice. -->
+        <slot name="error" slot="error"></slot>
         <!-- Handed on only while something fills it: an assigned slot hides the
              list's own fallback, which is no-results-text or empty-text. -->
         <slot

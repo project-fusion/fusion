@@ -280,12 +280,29 @@ const editorScript = await editorBuilt.outputs[0].text()
 await writeFile(join(out, 'editor.js'), editorScript)
 
 /* **Helix's highlighter, in one file the frame loads only when a render
- * carries a Code Input**: the sandbox's grammars, registered for the page. */
+ * carries a Code Input**: the sandbox's grammars, registered for the page.
+ *
+ * **The registry alone, and none of Code Block's elements.** The sandbox's
+ * entry reaches `registerHighlighter` through the family's entry, which defines
+ * Code Block and the four elements it draws with, so this file defined a second
+ * class for each tag `frame.js` had already defined, and the frame printed five
+ * warnings that the page held two copies of Helix. The registry is kept on
+ * `globalThis`, so the copy of its module bundled here registers into the one
+ * the frame's elements read. */
+const highlighterOnly = {
+  name: 'highlighter-only',
+  setup(build) {
+    build.onResolve({ filter: /^@fusion\.dev\/helix-headless\/code-block$/ }, () => ({
+      path: join(root, 'helix/headless/src/code-block/highlighter.ts'),
+    }))
+  },
+}
 const highlightBuilt = await Bun.build({
   define: PRODUCTION,
   entrypoints: [highlightEntry],
   format: 'iife',
   minify: true,
+  plugins: [highlighterOnly],
   target: 'browser',
 })
 if (!highlightBuilt.success) {

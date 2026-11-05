@@ -289,13 +289,17 @@ export const ThemeFab = () => {
                     page is wearing the palette the stylesheet ships. Saying
                     "deriving" there would be a spinner for work that is not
                     happening and never will until somebody moves something. */}
+                    {/* **Each reading is a whole statement.** "every measured
+                    pair clears" left out what the pairs clear, and only the
+                    tooltip said, which a phone never shows. The pass and the
+                    failure name contrast in the same words. */}
                     {c.derived
                       ? c.derived.violations.length > 0
-                        ? `${c.derived.violations.length} pair${c.derived.violations.length === 1 ? '' : 's'} fail`
+                        ? `${c.derived.violations.length} pair${c.derived.violations.length === 1 ? '' : 's'} fail contrast`
                         : c.derived.collisions.length > 0
-                          ? 'roles too close'
-                          : 'every measured pair clears'
-                      : 'as shipped'}
+                          ? 'Roles too close to tell apart'
+                          : 'Every pair passes contrast'
+                      : 'As shipped'}
                   </span>
                 </helix-tooltip>
               </div>
