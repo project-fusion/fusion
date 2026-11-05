@@ -29,7 +29,6 @@ export default styles(
     prefix: 'data-table',
     hooks: {
       cellAlign: null,
-      cellBlockAlign: 'center',
       draggingOpacity: 0.5,
       dropIndicatorColor: token('color-primary'),
       dropIndicatorSize: token('border-thick'),
@@ -170,32 +169,6 @@ export default styles(
       include(dataTableRows),
       on({ part: 'cell', selector: '[part~="cell"]' }, [
         web([rule({ textAlign: hook.cellAlign })]),
-      ]),
-      /* **Centered from top to bottom**, so a line of text beside a taller
-         grip, tag or button sits on the row's middle rather than riding at its
-         top. `align-content` rather than a flex box, which would make every
-         text node an anonymous item and lose `text-align` above. A cell that
-         wraps to the row's full height has no room to move, so long text still
-         starts at the top. */
-      on({ part: 'cell', selector: '[part~="cell"]' }, [
-        web([rule({ alignContent: hook.cellBlockAlign })]),
-      ]),
-      /* **On the capitals, not on the line box.** A line centered as a box sits
-         a pixel or two high to the eye. Trimmed to cap height, and held to a
-         line's height as its least, the cell is as tall as it was and the
-         capitals are what is centered, `border-box` so the line, the padding
-         either side and the rule. Behind `@supports`, as `Avatar` does its
-         initials: a browser without it centers the line box. */
-      on({ part: 'cell', selector: '[part~="cell"]' }, [
-        web([
-          rule(
-            { supports: '(text-box: trim-both cap alphabetic)' },
-            {
-              minBlockSize: sum('1lh', product(hook.paddingBlock, 2), token('border-thin')),
-              textBox: 'trim-both cap alphabetic',
-            },
-          ),
-        ]),
       ]),
       on({ part: 'row', selector: '[part~="row"] > *' }, [
         web([rule({ backgroundColor: hook.rowBackgroundColor })]),
