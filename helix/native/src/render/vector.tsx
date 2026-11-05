@@ -237,6 +237,7 @@ const drawShape = (
         }
   const css = { ...animationStyle(motion, paint), ...transitionStyle(resolved.transitions, PAINT) }
   const d = bound(styling, node.attributes?.d, node.name)
+  const id = bound(styling, node.attributes?.id, node.name)
   const moves = Object.keys(css).length > 0
   const painted = paintedBy(paint, resolved.style.opacity)
   return createElement(
@@ -244,7 +245,7 @@ const drawShape = (
     {
       ...geometry,
       ...(typeof d === 'string' ? { d } : {}),
-      ...(typeof node.attributes?.id === 'string' ? { id: node.attributes.id } : {}),
+      ...(typeof id === 'string' && id !== '' ? { id } : {}),
       key,
       style: moves ? { ...listedDashes(painted), ...listedFrames(css) } : { ...painted, ...css },
     },

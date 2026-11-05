@@ -185,6 +185,8 @@ export interface ReadingSetup {
   readonly shows: (name: string) => boolean
   /** How the chart's numbers are written. */
   readonly write: (value: number) => string
+  /** The axis the readings run along: `block` down the plot, as a bar chart's categories turned sideways. Absent is `inline`. */
+  readonly axis?: 'block' | 'inline'
 }
 
 /** The reading of an axis chart: the cursor, the words it says, and the series the keys walk. */
@@ -239,6 +241,7 @@ export const useAxisReading = (
   }
   const any = setup.count > 0
   const cursor = useChartCursor({
+    axis: setup.axis ?? 'inline',
     count: setup.count,
     enabled: any,
     said: (at) => said(at),
