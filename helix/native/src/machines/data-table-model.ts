@@ -23,6 +23,8 @@ export interface DataColumn {
   readonly element: ReactElement
   readonly field: string
   readonly hidden: boolean
+  /** The narrowest the table may be with the column showing, as `min-table-width` writes it, or empty. */
+  readonly minimum: string
   /** What a cell draws of a row. */
   readonly read: (row: DataRow) => unknown
   /** What the column sorts and searches a row by. */
@@ -45,6 +47,7 @@ const asColumn = (element: ReactElement): DataColumn => {
     element,
     field,
     hidden: isHidden(props.hidden),
+    minimum: typeof props.minTableWidth === 'string' ? props.minTableWidth : '',
     order: (row) => {
       const compared = compare?.(row)
       return compared === undefined ? valueAt(row, field) : compared

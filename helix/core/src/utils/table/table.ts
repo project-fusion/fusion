@@ -15,5 +15,6 @@ export {
   inRowOrder,
   toggleEvery,
 } from '../written-list/written-list.js'
+export { droppedAt, type FontSizes, pixelsOf } from './fit.js'
 export { type NestingRow, nestedRows, type RowShape, rowShapes, sortedRows } from './rows.js'
 export { fittedTracks, SAMPLE, tracksOf } from './tracks.js'
