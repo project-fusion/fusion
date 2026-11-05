@@ -27,6 +27,7 @@ import { styles } from './tree-root.css.js'
  * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.
  * @csspart tree - The tree container.
  *
+ * @cssproperty --tree-bleed - How far a row's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
  * @cssproperty --tree-chevron-gap - The space before the chevron. Set from `chevron-placement`.
  * @cssproperty --tree-chevron-order - The chevron's order in the row. Set from `chevron-placement` and read by each item.
  * @cssproperty --tree-chevron-size - Size of the chevron, and the gutter a leaf reserves.
@@ -42,6 +43,18 @@ import { styles } from './tree-root.css.js'
  */
 @customElement('helix-tree')
 export class HelixTree extends HelixHeadlessTree {
+  /**
+   * Sets the words of its rows, at every depth, on the tree's own edge, with each fill reaching past it.
+   *
+   * The words line up with a divider or a heading beside the tree, and a hover, a
+   * selection or the current row is drawn `--tree-bleed` wider on each side,
+   * by a negative margin and the same padding, so nothing moves. The parent has
+   * to leave that room: inside `overflow: hidden` with no inline padding, the
+   * fill and the focus ring are cut at the tree's edge.
+   */
+  @property({ reflect: true, type: Boolean })
+  bleed = false
+
   /**
    * Which end of the row the branch chevron sits at.
    *

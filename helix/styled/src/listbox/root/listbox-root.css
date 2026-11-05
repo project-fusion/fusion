@@ -9,6 +9,12 @@
  *  The frame is the list rather than the host, so a filter that empties it
  *    leaves a box with a message in it instead of a border collapsing to nothing.
  */
+:host([bleed]) {
+  /* As in a menu: the words stay on the field's column, and the fill reaches
+     the bleed past them. Read by every option. */
+  --_option-bleed: var(--listbox-bleed, var(--helix-space-row-bleed));
+}
+
 [part="items"] {
   /* Square rows, for the reason the select's panel gives: they run the full
      width of this box, and a radius on a band that reaches both edges rounds

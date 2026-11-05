@@ -706,6 +706,7 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-text-field: calc(var(--helix-text-md) * var(--helix-density, 1));
   --helix-text-field-label: calc(var(--helix-text-sm) * var(--helix-density, 1));
   --helix-space-field: calc(var(--helix-space-sm) * var(--helix-density, 1));
+  --helix-space-row-bleed: calc(var(--helix-space-xs) * var(--helix-density, 1));
   --helix-size-checkbox: calc(var(--helix-size-checkbox-md) * var(--helix-density, 1));
   --helix-size-icon: calc(var(--helix-size-icon-md) * var(--helix-density, 1));
   --helix-size-control: calc(var(--helix-size-control-md) * var(--helix-density, 1));
@@ -719,6 +720,7 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-text-field: var(--helix-text-sm);
   --helix-text-field-label: var(--helix-text-xs);
   --helix-space-field: var(--helix-space-xs);
+  --helix-space-row-bleed: var(--helix-space-2xs);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-control: var(--helix-size-control-sm);
@@ -743,6 +745,7 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-sm);
+  --helix-space-row-bleed: var(--helix-space-xs);
   --helix-size-checkbox: var(--helix-size-checkbox-md);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-size-control: var(--helix-size-control-md);
@@ -756,6 +759,7 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-md);
+  --helix-space-row-bleed: var(--helix-space-sm);
   --helix-size-checkbox: var(--helix-size-checkbox-lg);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-size-control: var(--helix-size-control-lg);

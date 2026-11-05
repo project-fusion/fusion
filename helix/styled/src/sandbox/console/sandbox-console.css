@@ -33,6 +33,7 @@
   --helix-text-field: var(--helix-text-sm);
   --helix-text-field-label: var(--helix-text-xs);
   --helix-space-field: var(--helix-space-xs);
+  --helix-space-row-bleed: var(--helix-space-2xs);
 
   align-items: center;
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);

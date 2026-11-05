@@ -15,6 +15,7 @@
   --helix-size-tag: var(--helix-size-tag-sm);
   --helix-space-control: var(--helix-space-sm);
   --helix-space-field: var(--helix-space-xs);
+  --helix-space-row-bleed: var(--helix-space-2xs);
   --helix-text-control: var(--helix-text-control-sm);
   --helix-text-field: var(--helix-text-sm);
   --helix-text-field-label: var(--helix-text-xs);

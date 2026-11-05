@@ -24,6 +24,7 @@
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-sm);
+  --helix-space-row-bleed: var(--helix-space-xs);
   --helix-size-tag: var(--helix-size-tag-md);
 }
 
@@ -43,6 +44,7 @@
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-md);
+  --helix-space-row-bleed: var(--helix-space-sm);
   --helix-size-tag: var(--helix-size-tag-lg);
 }
 

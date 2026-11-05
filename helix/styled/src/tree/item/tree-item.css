@@ -11,6 +11,10 @@
      do not move with density, so a padding of `space-xs` kept every row 35px
      tall in a `data-density="sm"` region whose controls were 26. */
   --_tree-pad: calc((var(--helix-size-control-tight) - 1rem) / 2);
+  /* The row's inline inset, which is the tree's `bleed` where it asks for one,
+     so a top-level row's words start on the tree's edge, and every level steps
+     in from there by the indent as it did. */
+  --_tree-inset: var(--_tree-bleed, var(--helix-space-xs));
   display: block;
 }
 
@@ -55,11 +59,13 @@
     calc(1lh + var(--_tree-pad) * 2)
   );
   min-block-size: var(--tree-row-size, var(--helix-size-control-tight));
+  /* Out by the bleed on both sides, which the inset above gives back. */
+  margin-inline: calc(var(--_tree-bleed, var(--helix-space-none)) * -1);
   padding-block: var(--_tree-pad);
-  padding-inline: var(--helix-space-xs);
+  padding-inline: var(--_tree-inset);
   /* One step per level, and the step is the gutter a chevron sits in. */
   padding-inline-start: calc(
-    var(--helix-space-xs) +
+    var(--_tree-inset) +
     (var(--tree-level, 1) - 1) *
     var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
   );
@@ -80,7 +86,7 @@
    shallower than its sibling. */
 [part="row"]:not(:has([part="toggle"])) {
   padding-inline-start: calc(
-    var(--helix-space-xs) +
+    var(--_tree-inset) +
     (var(--tree-level, 1) - 1) *
     var(--tree-indent, calc(var(--_tree-chevron) + var(--helix-space-2xs))) +
     var(--_tree-reserve, calc(var(--_tree-chevron) + var(--helix-space-2xs)))
@@ -294,6 +300,16 @@ slot[name="start"]::slotted(*) {
   display: block;
   min-block-size: 0;
   overflow: hidden;
+}
+
+/* **The room a nested row bleeds into, inside the clip.** The slot clips so a
+   branch can fold, and a nested row reaching past it was cut flat at its edge,
+   fill and focus ring alike. Wider by the bleed on each side and pulled back
+   by the same, so the clip moves out and the rows do not. Nested slots do the
+   same inside it, so every depth has the room. */
+[part="group"] > slot {
+  margin-inline: calc(var(--_tree-bleed, var(--helix-space-none)) * -1);
+  padding-inline: var(--_tree-bleed, var(--helix-space-none));
 }
 
 /* No `display: none`, which the browser's find does not search. */

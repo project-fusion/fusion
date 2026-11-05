@@ -20,6 +20,7 @@
   --helix-text-field: var(--helix-text-sm);
   --helix-text-field-label: var(--helix-text-xs);
   --helix-space-field: var(--helix-space-xs);
+  --helix-space-row-bleed: var(--helix-space-2xs);
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-space-control: var(--helix-space-sm);
   --helix-text-control: var(--helix-text-control-sm);
@@ -39,6 +40,7 @@
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-sm);
+  --helix-space-row-bleed: var(--helix-space-xs);
   --helix-size-icon: var(--helix-size-icon-md);
   --helix-space-control: var(--helix-space-md);
   --helix-text-control: var(--helix-text-control-md);
@@ -58,6 +60,7 @@
   --helix-text-field: var(--helix-text-md);
   --helix-text-field-label: var(--helix-text-sm);
   --helix-space-field: var(--helix-space-md);
+  --helix-space-row-bleed: var(--helix-space-sm);
   --helix-size-icon: var(--helix-size-icon-lg);
   --helix-space-control: var(--helix-space-lg);
   --helix-text-control: var(--helix-text-control-lg);

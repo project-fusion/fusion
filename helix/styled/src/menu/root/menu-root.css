@@ -4,6 +4,15 @@
   display: contents;
 }
 
+:host([bleed]) {
+  /* **In a panel, the words stay where the section headings are**, a step in
+     from its edge, and the fill reaches the bleed past them, so a highlighted
+     row is a rounded fill inset from the panel rather than a band across it.
+     Read by every item, a submenu's included. */
+  --_menu-bleed: var(--menu-bleed, var(--helix-space-row-bleed));
+  --_menu-item-radius: var(--helix-radii-sm);
+}
+
 [part="surface"] {
   /* Rows take the step below the control that opened them, from `row.css`, and
      icons stay small beside them. */

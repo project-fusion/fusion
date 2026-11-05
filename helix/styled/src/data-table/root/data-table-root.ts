@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
@@ -53,6 +54,7 @@ import '../../pagination/index.js'
  * @csspart live - A copy of the empty and loading messages, which screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart table - The grid.
  *
+ * @cssproperty --data-table-bleed - How far a row's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
  * @cssproperty --data-table-block-size - The height of the scrolling box while `windowed`.
  * Ignored otherwise, where the grid is as tall as its rows. It is a fixed height, so a
  * short result keeps the full box with space below it.
@@ -97,6 +99,18 @@ import '../../pagination/index.js'
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {
+  /**
+   * Sets the words of its rows on the table's own edge, with each fill reaching past it.
+   *
+   * The words line up with a divider or a heading beside the table, and a hover, a
+   * selection or the current row is drawn `--data-table-bleed` wider on each side,
+   * by a negative margin and the same padding, so nothing moves. The parent has
+   * to leave that room: inside `overflow: hidden` with no inline padding, the
+   * fill and the focus ring are cut at the table's edge.
+   */
+  @property({ reflect: true, type: Boolean })
+  bleed = false
+
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [
