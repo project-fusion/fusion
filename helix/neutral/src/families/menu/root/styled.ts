@@ -44,6 +44,7 @@ export default styles(
     hooks: {
       backdrop: null,
       backgroundColor: null,
+      bleed: token('space-row-bleed'),
       borderColor: null,
       borderWidth: null,
       maxBlockSize: null,
@@ -52,13 +53,15 @@ export default styles(
       shadow: null,
     },
     own: {
+      menuBleed: null,
       menuFrom: null,
+      menuItemRadius: null,
       menuMaterialBackdrop: null,
       menuMaterialFill: null,
       menuSectionHeading: null,
       menuTravel: null,
     },
-    props: { material: oneOf(['frosted', 'glass']) },
+    props: { bleed: oneOf(['none']), material: oneOf(['frosted', 'glass']) },
     stylesheet: 'menu/root/menu-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
@@ -68,7 +71,18 @@ export default styles(
     const hover = token('color-hover')
     return [
       /* No box of its own: the trigger is passed in and the panel is in the top layer. */
-      on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
+      on('host', [
+        rule({ display: 'contents' }),
+        rule({ print: true }, { display: 'none' }),
+        /* **In a panel, the words stay where the section headings are**, a step
+           in from its edge, and the fill reaches the bleed past them, so a
+           highlighted row is a rounded fill inset from the panel rather than a
+           band across it. Read by every item, a submenu's included. */
+        rule(
+          { bleed: { not: 'none' } },
+          { own: { menuBleed: hook.bleed, menuItemRadius: token('radii-sm') } },
+        ),
+      ]),
       /* The trigger's box on a phone, as wide as the trigger, which the panel is placed against. */
       on('trigger', [rule({ platform: 'native' }, { inlineSize: 'fit-content' })]),
       on('surface', [
