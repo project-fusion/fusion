@@ -126,8 +126,9 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* A shape's place and size in its vector's units, as a rect's `x` and
     `width`, and the ends of the line a gradient runs along. */
     ("height", BOX, Shape::Length),
-    /* The name a vector's gradient is painted by, a shape's `fill: url(#id)`. */
-    ("id", BOX, Shape::Name),
+    /* The name a vector's gradient is painted by, a shape's `fill: url(#id)`,
+    or a copy's field, as a bar chart's wash for each series. */
+    ("id", BOX, Shape::Words),
     /* Where a gradient's stop stands along it, 0 to 1. */
     ("offset", BOX, Shape::Length),
     /* `none`: the vector is stretched to fill its box on both axes, as a

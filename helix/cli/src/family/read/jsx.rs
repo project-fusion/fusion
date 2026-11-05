@@ -95,6 +95,7 @@ const GIVEN: &[&str] = &[
     "legend",
     "lineChart",
     "areaChart",
+    "barChart",
     "pickerField",
     "listbox",
     "select",
