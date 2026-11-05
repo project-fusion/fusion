@@ -57,26 +57,30 @@
 }
 
 /* **Glass raises its own quiet ink.** A glass panel covers 72% of what is behind
-   it in light and 60% in dark, so its ground is whatever the page shows through,
-   and the muted and toned inks are solved for the opaque grounds. Measured over a
-   photo and over a busy page, November 3, 2026: muted text in a glass Card at
-   3.40:1 in light, in a glass Popover at 4.00 and 4.11, in a dark glass Menu over
-   white at 1.89, and danger text in a dark glass Card at 3.21. Card alone set its
-   own ink, and only its body ink.
+   it, so its ground is whatever the page shows through, and the muted and toned
+   inks are solved for the opaque grounds. Measured over a photo and over a busy
+   page, November 3, 2026: muted text in a glass Card at 3.40:1 in light, in a
+   glass Popover at 4.00 and 4.11, in a dark glass Menu over white at 1.89, and
+   danger text in a dark glass Card at 3.21. Card alone set its own ink, and only
+   its body ink.
 
    **In light the quiet ink moves 40% of the way to the foreground**, which holds
    4.5:1 over black seen through the glass, the darkest ground it can get. **In
-   dark it is the foreground**, because dark glass over a white page lands at about
-   #747474 and only white clears 4.5:1 on that.
+   dark it moves 50%**, to #cfcfcf, 4.84:1 over a white page, the brightest
+   ground dark glass can get, so muted text stays a step below the foreground.
+
+   **Dark glass covers 72%, as light does.** At 60% it landed at about #717171
+   over a white page, where white itself measured 4.90:1 and capped every ink:
+   the muted ink had to be the foreground, so the quiet tier was gone, and the
+   tones measured 3.55 to 4.12 at 70% of the way to white. At 72% the ground over
+   white is #545454 and white measures 7.53. Decided by the owner on November 3,
+   2026.
 
    **A tone keeps its hue and moves 35% of the way to the foreground in light and
-   70% in dark.** White itself measures 4.88:1 on dark glass over a white page, so
-   that ground caps every ink, and at 35% the tones measured 2.37 to 3.32 there:
-   danger 2.37, info 2.69, success 2.75, and warning 3.32. At 70% they measure
-   3.54 to 4.12, still a visible red, blue, green, and amber, and 7.75 or more
-   over a mid gray. Light glass holds 6.50 or more over black at 35%. **In dark
-   the primary ink moves 70% as well**, from 3.73 to 4.52 over white; in light it
-   stays, at 8.95 over black.
+   60% in dark.** Over a white page, dark glass measures danger 4.89, info 5.28,
+   success 5.37, and warning 5.97, and 8.48 or more over a mid gray. Light glass
+   holds 6.50 or more over black at 35%. **In dark the primary ink moves 60% as
+   well**, 6.79 over white; in light it stays, at 8.95 over black.
 
    **Frosted moves every quiet ink 10% of the way.** It covers 88%, and with no
    correction it measured 4.55:1 or under at its worst grounds: in light over black,
@@ -91,27 +95,27 @@
 :root {
   --_helix-glass-muted: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 40%, var(--helix-color-foreground-muted)),
-    var(--helix-color-foreground)
+    color-mix(in oklab, var(--helix-color-foreground) 50%, var(--helix-color-foreground-muted))
   );
   --_helix-glass-primary: light-dark(
     var(--helix-color-primary),
-    color-mix(in oklab, var(--helix-color-foreground) 70%, var(--helix-color-primary))
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-primary))
   );
   --_helix-glass-danger: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 35%, var(--helix-color-danger)),
-    color-mix(in oklab, var(--helix-color-foreground) 70%, var(--helix-color-danger))
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-danger))
   );
   --_helix-glass-info: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 35%, var(--helix-color-info)),
-    color-mix(in oklab, var(--helix-color-foreground) 70%, var(--helix-color-info))
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-info))
   );
   --_helix-glass-success: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 35%, var(--helix-color-success)),
-    color-mix(in oklab, var(--helix-color-foreground) 70%, var(--helix-color-success))
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-success))
   );
   --_helix-glass-warning: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 35%, var(--helix-color-warning)),
-    color-mix(in oklab, var(--helix-color-foreground) 70%, var(--helix-color-warning))
+    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-warning))
   );
   --_helix-frosted-muted: color-mix(
     in oklab,
@@ -154,6 +158,13 @@
   helix-tooltip
 )[material="glass"],
 [data-material="glass"] {
+  /* **One edge for glass, `material-border`**, a wash that takes the color of
+     whatever shows through. The panels drew the opaque line they draw on the
+     page, `border-floating` or `border`, and the `[data-material]` recipe drew
+     this, so one material had two edges: in light #e8e8e8 against 14% of the
+     ink, which over a photo is a pale line against a shade of the photo. */
+  --helix-color-border: var(--helix-material-border);
+  --helix-color-border-floating: var(--helix-material-border);
   --helix-color-foreground-muted: var(--_helix-glass-muted);
   --helix-color-primary: var(--_helix-glass-primary);
   --helix-color-danger: var(--_helix-glass-danger);
@@ -176,6 +187,8 @@
   helix-tooltip
 )[material="frosted"],
 [data-material="frosted"] {
+  --helix-color-border: var(--helix-material-border);
+  --helix-color-border-floating: var(--helix-material-border);
   --helix-color-foreground-muted: var(--_helix-frosted-muted);
   --helix-color-danger: var(--_helix-frosted-danger);
   --helix-color-info: var(--_helix-frosted-info);

@@ -58,7 +58,7 @@
   flex: none;
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
-  line-height: 1.4;
+  line-height: var(--helix-leading-snug);
   padding-inline: var(--helix-space-xs);
 }
 
@@ -201,7 +201,7 @@ button[part="number"]:focus-visible {
 }
 
 [part~="run-dim"] {
-  opacity: 0.7;
+  opacity: var(--helix-opacity-quiet);
 }
 
 [part~="run-italic"] {

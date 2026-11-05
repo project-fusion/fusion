@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { displayName, startCase, tierOf } from './naming.js'
+import { displayName, sentenceCase, startCase, tierOf } from './naming.js'
 
 describe('naming', () => {
   test('a slug becomes words', () => {
@@ -18,6 +18,14 @@ describe('naming', () => {
     // Guessing from length would turn every two-letter word into shouting.
     expect(startCase('is-open')).toBe('Is Open')
     expect(startCase('go-to-page')).toBe('Go To Page')
+  })
+
+  test('an example name is a sentence', () => {
+    expect(sentenceCase('chevron-at-the-start')).toBe('Chevron at the start')
+    expect(sentenceCase('preview')).toBe('Preview')
+    // Initialisms and names keep their capitals anywhere in it.
+    expect(sentenceCase('oklch-swatches')).toBe('OKLCH swatches')
+    expect(sentenceCase('on-android')).toBe('On Android')
   })
 
   test('a tag drops its prefix, and its tier', () => {

@@ -258,6 +258,7 @@ export class StrandsRenderer {
     this.vec3(this.composite, 'uGround', palette.ground)
     this.vec3(this.composite, 'uInk', palette.peak)
     this.float(this.composite, 'uLight', palette.light ? 1 : 0)
+    this.float(this.composite, 'uShade', Math.max(...palette.glow))
     this.float(this.composite, 'uClear', frame.clear ? 1 : 0)
     this.float(this.composite, 'uGain', (GAIN * frame.gain) / this.scale)
     this.float(this.composite, 'uBloom', BLOOM * frame.bloom)

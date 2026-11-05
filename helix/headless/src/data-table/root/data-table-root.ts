@@ -218,9 +218,10 @@ const isControl = (element: HTMLElement): boolean =>
  * next rows to `rows`, and set `loading` while they are on their way.
  *
  * When a fetch fails, set `error-text`, such as "The files did not load", and
- * put a button that tries again in the `error` slot. The line shows after the
- * rows in place of the empty and loading lines, the live region says it, and
- * the table takes the `error` state. Clear it once you try again.
+ * put a button that tries again in the `error` slot. The line shows the words
+ * and then the button, after the rows in place of the empty and loading lines,
+ * the live region says it, and the table takes the `error` state. Clear it
+ * once you try again.
  *
  * The controls inside the cells leave the tab order, so Tab moves past the
  * whole grid. A windowed table keeps the row holding focus drawn while the
@@ -302,7 +303,7 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
- * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
+ * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
@@ -561,9 +562,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * files did not load". Set it when a fetch fails, and clear it once you try
    * again. Empty, the default, shows nothing.
    *
-   * While it is set, a line after the rows shows it, or your own content in the
-   * `error` slot, in place of the empty and loading lines, and the live region
-   * says it.
+   * While it is set, a line after the rows shows it, followed by your own
+   * content in the `error` slot, in place of the empty and loading lines, and
+   * the live region says it.
    */
   @property({ attribute: 'error-text' })
   errorText = ''
@@ -3048,7 +3049,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * empty and loading lines are, since a grid holds rows and nothing else.
    */
   private renderError(): TemplateResult {
-    return html`<p part="error" role="row"><span role="gridcell"><slot name="error">${this.errorText}</slot></span></p>`
+    return html`<p part="error" role="row"><span role="gridcell">${this.errorText}<slot name="error"></slot></span></p>`
   }
 
   protected override render(): TemplateResult {
@@ -3205,6 +3206,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
     this.addEventListener('helix-before-resize', this.handleResize)
+    /* **A child parsed after the table upgraded is sent to its slot too.** The
+       slots are assigned by hand on each update, and markup the parser was
+       still reading arrived with none to follow: a button in the `error` slot
+       after the columns stayed unassigned and drew nothing. */
+    if (typeof MutationObserver !== 'undefined') {
+      this.arrivals ??= new MutationObserver(() => this.assign())
+      this.arrivals.observe(this, { childList: true })
+    }
     this.watchSize()
   }
 
@@ -3230,6 +3239,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.sizeObserver.observe(table)
   }
 
+  /** Watches the table's own children, which the manual slots need to be told about. */
+  private arrivals: MutationObserver | undefined
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('click', this.handleHeadClick)
@@ -3243,6 +3255,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
     this.removeEventListener('helix-before-resize', this.handleResize)
+    this.arrivals?.disconnect()
     this.sizeObserver?.disconnect()
   }
 

@@ -22,6 +22,15 @@
      writes, because no stylesheet can enumerate a hex. */
   --_canvas-card-tone: var(--helix-color-border);
   --_canvas-card-color: var(--canvas-node-color, var(--_canvas-card-tone));
+  /* **An untoned card's edge is a wash of the ink, which steps off any ground
+     the board puts under it.** The board is `surface-sunken` and a group lays
+     the well over it, and `color-border` is lighter than both in light: an
+     outlined card measured #e8e8e8 on #ebebeb, 1.03:1, and on a group's #dfdfdf,
+     1.09; in dark #212121 on #1e1e1e, 1.03. 10% of the ink measures 1.25 and
+     1.26 on the group and the board in light and 1.30 to 1.35 in dark, about the
+     1.23 of the page's own edges. A toned card keeps its tone as the edge, below. */
+  --_canvas-card-wash: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
+  --_canvas-card-edge: var(--canvas-node-color, var(--_canvas-card-wash));
   /* **The handles are the card's edge, so they take its color**: its tone at
      rest, and the accent when the edge turns accent, selected or about to
      take a connection. Accent always, they read as a selection the card did
@@ -31,8 +40,9 @@
   background-color: var(--canvas-node-background-color, var(--helix-color-surface));
   block-size: var(--_canvas-card-block-size);
   box-shadow: var(--canvas-node-shadow, none);
-  border: var(--helix-border-thin) solid var(--_canvas-card-color);
-  border-radius: var(--canvas-node-radius, var(--helix-radii-sm));
+  border: var(--helix-border-thin) solid var(--_canvas-card-edge);
+  /* `md`, the corner a Card takes. */
+  border-radius: var(--canvas-node-radius, var(--helix-radii-md));
   box-sizing: border-box;
   color: var(--helix-color-foreground);
   display: block;
@@ -83,6 +93,10 @@
   --_canvas-card-tone: var(--helix-color-warning);
 }
 
+:host([tone]:not([tone="neutral"])) {
+  --_canvas-card-edge: var(--_canvas-card-color);
+}
+
 /* A card with no tone has a border too faint for something a reader grabs,
    so its handles take the muted ink instead. */
 :host(:not([tone])),
@@ -124,13 +138,17 @@
 
 /* **Glass is a pair**, the note `Card` carries: a filter behind an opaque
    ground is invisible and a translucent ground over an unfiltered board is a
-   smear, so the card owns both. What shows through is the ruling. */
+   smear, so the card owns both. What shows through is the ruling. An untoned
+   card's edge is the material's own, `material-border`, 14% of the ink in light
+   and 12% in dark against the 10% an opaque card draws. */
 :host([material="glass"]:not([group])) {
+  --_canvas-card-wash: var(--helix-material-border);
   backdrop-filter: var(--helix-material-backdrop);
   background-color: var(--helix-material-panel);
 }
 
 :host([material="frosted"]:not([group])) {
+  --_canvas-card-wash: var(--helix-material-border);
   backdrop-filter: blur(var(--helix-material-blur-lg));
   background-color: var(--helix-material-translucent-strong);
 }
@@ -437,7 +455,7 @@
 
 [part="outline"] polygon {
   fill: var(--canvas-node-background-color, var(--helix-color-surface));
-  stroke: var(--_canvas-card-color);
+  stroke: var(--_canvas-card-edge);
   stroke-width: var(--helix-border-thin);
 }
 

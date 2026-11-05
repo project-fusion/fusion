@@ -87,64 +87,104 @@ const inkOf = (text: string): { down: number; up: number } => ({
   up: /^[acemnorsuvwxz\s.,:;-]*$/.test(text) ? 0.27 : 0.48,
 })
 
-/** Whether two labels would cover each other, by their ink and `pad` more. */
+/**
+ * Whether two labels would cover each other: across, by their widths and
+ * `pad` more, and down the page, by their ink. **No pad down the page**,
+ * where the space under a line of type already keeps two inks apart: with a
+ * pad, a spatial bar chart's first number, 0, was left out at 390 wide, two
+ * pixels across and two down from the first region's name.
+ */
 const overlaps = (one: Area, other: Area, pad: number): boolean =>
   Math.abs(one.x - other.x) < one.half.width + other.half.width + pad &&
-  one.y - one.ink.up < other.y + other.ink.down + pad &&
-  other.y - other.ink.up < one.y + one.ink.down + pad
-
-/** How far two labels' inks are from meeting down the page, or less than nothing where they meet. */
-const inkApart = (above: Area, below: Area): number =>
-  below.y - below.ink.up - (above.y + above.ink.down)
-
-/** The clear space kept between two categories' inks, as a share of a number's height: a pixel and a half at 12. */
-const CLEAR = 0.125
-
-/** The furthest a category's name moves off its place to stand clear, as a share of a number's height. */
-const NUDGE = 0.4
+  one.y - one.ink.up < other.y + other.ink.down &&
+  other.y - other.ink.up < one.y + one.ink.down
 
 /**
- * Moves an axis' category names apart down the page where their inks would
- * meet or come within `clear` of meeting, each by no more than `NUDGE` of a
- * line, so every name is kept and stays beside its own place.
+ * How tall a label's line is, as a share of its size: the face's ascent and
+ * descent, which is the box a browser gives the text. Measured on Fusion Sans,
+ * November 3, 2026: 130 pixels at 100.
+ */
+const LINE = 1.3
+
+/**
+ * Whether two numbers would crowd each other: across, by their widths and
+ * `pad` more, and down the page, by their lines.
+ *
+ * **A number keeps a line from the next**, so the numbers left of an axis
+ * stand a line apart: measured on November 3, 2026, a spatial bar chart at
+ * 390 wide wrote eight numbers 14.4 pixels apart in boxes 16 tall, clear by
+ * their ink and still one column of type. Against a name, a number keeps
+ * clear of its ink, as `overlaps` measures it.
+ */
+const crowds = (one: Area, other: Area, pad: number): boolean =>
+  Math.abs(one.x - other.x) < one.half.width + other.half.width + pad &&
+  Math.abs(one.y - other.y) < (one.half.height + other.half.height) * LINE
+
+/**
+ * The furthest a category's name moves off its place toward the box, and away
+ * from it, as shares of its size.
+ *
+ * **A name moves away from the box further than toward it**, where nothing
+ * else is written. Measured on November 3, 2026: a spatial bar chart at 390
+ * wide stands five regions 11 pixels apart at 12, so the five need about 18
+ * pixels more to stand a line, 15.6, apart. Moved half each way, the first
+ * region's name rose onto the up axis' 0, which was left out or met it; held
+ * to 5 pixels toward the box, the rest is taken away from it, and the last
+ * name is still the last down its edge.
+ */
+const NUDGE = { away: 1.6, toward: 0.4 }
+
+/**
+ * Moves an axis' category names apart down the page so each stands a line
+ * from the next, where their boxes would meet, so every name is kept and
+ * stays beside its own place. `down` is 1 where the names stand below their
+ * edge, so down the page is away from the box, -1 where they stand above
+ * it, and 0 beside an upright, where each way is toward another label.
  *
  * **A name is moved and not left out.** The names of a slanted edge stand a
- * step apart down the page, and in a narrow plot the step is about a line:
- * measured on November 3, 2026 at 342 wide, a ribbon chart's four series 11.5
- * apart at 12, with 0.6 of a pixel between one's descenders and the next one's
- * capitals. A number reads from its neighbors and is thinned where it would
- * cover another; a category has no neighbor to read it from, so each pair is
- * pushed apart, half each, until they stand clear, and only a name still meeting
- * another after that is left out.
+ * step apart down the page, and in a narrow plot the step is under a line:
+ * measured on November 3, 2026, a ribbon chart's four series 11.5 apart at
+ * 12 at 342 wide, and 14 apart at 640, where their boxes are 16 tall. Clear
+ * by their ink alone, they still read as one block of type. A number reads
+ * from its neighbors and is thinned where it would cover another; a category
+ * has no neighbor to read it from, so each pair is pushed apart, half each,
+ * and each name held within `NUDGE` of its place, until they stand a line
+ * apart. Only a name whose ink still meets another after that is left out.
  */
-const spread = (names: Area[], clear: number): void => {
+const spread = (names: Area[], down: -1 | 0 | 1): void => {
   const placed = names.map((name) => ({ from: name.y, name }))
-  const order = [...placed].sort((one, other) => one.from - other.from).map((one) => one.name)
-  for (let round = 0; round < 32; round += 1) {
+  const order = [...placed].sort((one, other) => one.from - other.from)
+  const held = (one: { from: number; name: Area }): void => {
+    const size = one.name.half.height * 2
+    const lower = one.from + size * (down === 1 ? NUDGE.away : NUDGE.toward)
+    const upper = one.from - size * (down === -1 ? NUDGE.away : NUDGE.toward)
+    one.name.y = Math.min(lower, Math.max(upper, one.name.y))
+  }
+  for (let round = 0; round < 64; round += 1) {
     let moved = false
     for (const [step, below] of order.entries()) {
       const above = order[step - 1]
       if (above === undefined) {
         continue
       }
-      const short = clear - inkApart(above, below)
+      const line = Math.max(above.name.half.height, below.name.half.height) * 2 * LINE
+      const short = line - (below.name.y - above.name.y)
       if (
-        short <= clear * 1e-3 ||
-        Math.abs(above.x - below.x) >= above.half.width + below.half.width
+        short <= line * 1e-3 ||
+        Math.abs(above.name.x - below.name.x) >= above.name.half.width + below.name.half.width
       ) {
         continue
       }
-      above.y -= short / 2
-      below.y += short / 2
-      moved = true
+      const [was, wasBelow] = [above.name.y, below.name.y]
+      above.name.y -= short / 2
+      below.name.y += short / 2
+      held(above)
+      held(below)
+      moved ||= above.name.y !== was || below.name.y !== wasBelow
     }
     if (!moved) {
       break
     }
-  }
-  for (const { from, name } of placed) {
-    const most = name.half.height * 2 * NUDGE
-    name.y = Math.min(from + most, Math.max(from - most, name.y))
   }
 }
 
@@ -253,7 +293,7 @@ export const boxLabels = (
     }
     spread(
       ticks.slice(first).filter((tick) => tick.category),
-      sizes.tick * CLEAR,
+      out.y > 0.1 ? 1 : out.y < -0.1 ? -1 : 0,
     )
     if (axis.name === '') {
       continue
@@ -270,7 +310,7 @@ export const boxLabels = (
       text: axis.name,
     })
   }
-  const kept: Area[] = [...names]
+  const kept: Array<Area & { number?: boolean }> = [...names]
   const labels: BoxLabel[] = names.map((one) => ({
     name: true,
     text: one.text,
@@ -281,10 +321,17 @@ export const boxLabels = (
      four series' names keeps them where they meet the last of fourteen
      dates. Stable, so each axis keeps its own order. */
   for (const tick of [...ticks].sort((one, other) => one.of - other.of)) {
-    if (kept.some((other) => overlaps(tick, other, tick.category ? 0 : sizes.gap / 2))) {
+    const number = !tick.category
+    if (
+      kept.some((other) =>
+        number && other.number === true
+          ? crowds(tick, other, sizes.gap / 2)
+          : overlaps(tick, other, number ? sizes.gap / 2 : 0),
+      )
+    ) {
       continue
     }
-    kept.push(tick)
+    kept.push({ ...tick, number })
     labels.push({ name: false, text: tick.text, x: tick.x, y: tick.y })
   }
   return labels

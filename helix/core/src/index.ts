@@ -686,7 +686,15 @@ export {
   scrollRoom,
   scrollWithin,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
-export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
+export {
+  coversPress,
+  keepAbove,
+  lockScroll,
+  type Raised,
+  raiseAbove,
+  scrollHolders,
+  unlockScroll,
+} from './utils/scroll-lock/scroll-lock.js'
 export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'

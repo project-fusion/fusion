@@ -77,7 +77,7 @@ slot:not([name])::slotted(a:not([data-link])) {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--helix-border-thin);
   text-underline-offset: 0.25em;
 }
 

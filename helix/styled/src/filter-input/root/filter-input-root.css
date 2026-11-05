@@ -44,6 +44,16 @@
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
+/* **Rows of chips stand a press apart on a touch screen.** A chip is 28 tall
+   and its dismiss press is 44, so with 4 pixels between rows the chip below
+   took the press 9 pixels under the cross, and the press measured 19 tall. The
+   row gap is the difference, 16, and one row of chips is unchanged. */
+@media (pointer: coarse) {
+  [part="field"] {
+    row-gap: max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-tag));
+  }
+}
+
 /* The consumer's own elements, so this is all they are told: keep your size,
    and do not run past the field. Anything else about them is theirs. */
 ::slotted([slot="tags"]) {

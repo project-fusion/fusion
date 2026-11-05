@@ -12,7 +12,7 @@ const page = (from: number) =>
 const SHEET = `
   .fileRow {
     align-items: center;
-    block-size: 32px;
+    block-size: max(32px, var(--helix-size-target));
     display: flex;
     justify-content: space-between;
     padding-inline: var(--helix-space-sm);

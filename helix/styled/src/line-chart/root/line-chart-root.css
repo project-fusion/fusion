@@ -350,12 +350,22 @@
  *    A line chart's mark sits on the page, so it would be the worse half of that
  *    trade. Weight moves instead, and the color stays the series'.
  */
+/* **In dark, 70% of the series, so the line clears 3:1 on the page.** At 45%
+   the eight dark series measured 1.57 to 1.91 on black. At 70% they measure
+   3.19 to 4.43, against 7.36 to 10.98 at full strength (November 4, 2026).
+   Light keeps 45%. */
 :host([emphasis="subtle"]) [part~="line"] {
-  stroke: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
+  stroke: light-dark(
+    color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background)),
+    color-mix(in oklab, var(--chart-series) 70%, var(--helix-color-background))
+  );
 }
 
 :host([emphasis="subtle"]) [part="area"] {
-  fill: color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background));
+  fill: light-dark(
+    color-mix(in oklab, var(--chart-series) 45%, var(--helix-color-background)),
+    color-mix(in oklab, var(--chart-series) 70%, var(--helix-color-background))
+  );
 }
 
 /* The two ends of the axis, both written against the wash's own hook so they

@@ -7,7 +7,8 @@ import { DOCS } from './docs.ts'
 /** One message in the toast region, and what it says. */
 interface Message {
   readonly id: number
-  readonly text: string
+  /** The answers, one `name=value` pair each, so a line breaks only between pairs. */
+  readonly pairs: readonly string[]
 }
 
 const handle = ref('')
@@ -21,8 +22,7 @@ const join = (event: Event) => {
   event.preventDefault()
   const answers = [...new FormData(event.currentTarget as HTMLFormElement).entries()]
     .map(([field, value]) => `${field}=${value}`)
-    .join('  ')
-  messages.value = [...messages.value, { id: Date.now(), text: answers }]
+  messages.value = [...messages.value, { id: Date.now(), pairs: answers }]
 }
 
 /**
@@ -141,7 +141,9 @@ const dismiss = (id: number) => {
       >
         <helix-flex direction="column" gap="2xs">
           <helix-text scale="body-strong">Read by the form</helix-text>
-          <helix-text scale="code">{{ message.text }}</helix-text>
+          <helix-flex column-gap="md" wrap>
+            <helix-text v-for="pair in message.pairs" :key="pair" scale="code">{{ pair }}</helix-text>
+          </helix-flex>
         </helix-flex>
       </helix-toast-item>
     </helix-toast>

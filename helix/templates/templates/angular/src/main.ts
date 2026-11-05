@@ -5,7 +5,14 @@ import { bootstrapApplication } from '@angular/platform-browser'
    makes every Helix tag in the app real. Import the whole library while you are
    finding your feet. `@fusion.dev/helix/button` and its siblings are subpath
    exports, for when you want to pay for only what you use. The stylesheets are
-   in `angular.json`, since Angular takes global styles there. */
+   in `angular.json`, since Angular takes global styles there.
+
+   **The browsers that have `light-dark()`**, which every Helix color token is
+   written with, are the `browserslist` in `package.json`. Angular's default
+   targets reach back to browsers without it, so a production build would
+   rewrite each `light-dark()` into a fallback that resolves on the root
+   element, and a Toast would draw in the page's mode. The Vite templates set
+   the same browsers as `cssTarget`. */
 import '@fusion.dev/helix'
 
 import { App } from './app/app'

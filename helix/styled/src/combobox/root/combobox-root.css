@@ -114,6 +114,48 @@ slot[name="end"] {
   color: var(--helix-color-foreground-muted);
 }
 
+/* **Read-only, and the caret says the panel does not open**, at the disabled
+   opacity, as Number Input's spent steppers are. The field already drops its
+   well; the caret was still drawn at full ink, offering a list a press does
+   not open. */
+:host([readonly]) [part="indicator"],
+:host([readonly]) ::slotted([slot="indicator"]) {
+  opacity: var(--helix-opacity-disabled);
+}
+
+/* **Loading, and the closed control says so**: the caret turns into the ring
+   every spinner here draws, a step smaller than the caret's box so it sits in
+   the caret's place without moving the value. A closed trigger with `loading`
+   set measured 0 pixels from one at rest, so nothing said the list was on its
+   way until it was opened. A caret of the page's own is left as it is. */
+:host([loading]) [part="indicator"] {
+  --_combobox-ring: round(calc(var(--helix-size-icon-tight) * 0.75), 2px);
+
+  animation: helix-combobox-turn var(--helix-duration-turn) linear infinite;
+  block-size: var(--_combobox-ring);
+  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 30%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  fill: transparent;
+  inline-size: var(--_combobox-ring);
+  margin: calc((var(--helix-size-icon-tight) - var(--_combobox-ring)) / 2);
+}
+
+@keyframes helix-combobox-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Slowed rather than stopped, as Button's ring is: a ring that holds still
+   reads as broken. */
+@media (prefers-reduced-motion: reduce) {
+  :host([loading]) [part="indicator"] {
+    animation-duration: var(--helix-duration-crawl);
+  }
+}
+
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
   --icon-size: var(--helix-size-icon);

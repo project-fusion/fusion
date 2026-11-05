@@ -63,3 +63,30 @@
   margin-block-start: calc(var(--_stat-group-gap) * -0.5 - var(--helix-border-thin));
   padding-block-start: calc(var(--_stat-group-gap) * 0.5);
 }
+
+/* **The rule over a row runs the group's whole width.** Each figure's rule was
+   only as wide as the figure, so a wrapped row drew stubs: at 390 the third
+   figure's rule was 85 of the group's 342, and at 280 each rule stopped 48
+   short of the next. A border image draws the same line and reaches past the
+   figure's end edge, where the next figure's line and the group's clip meet
+   it. The start edge keeps its own rule, the border image drawing the start
+   side from the same color at the same place. */
+:host([divided]) ::slotted(*) {
+  border-image:
+    linear-gradient(var(--helix-color-border), var(--helix-color-border)) 1 /
+    var(--helix-border-thin) 0 0 var(--helix-border-thin) / 0 100vw 0 0;
+}
+
+:host([divided]:dir(rtl)) ::slotted(*) {
+  border-image:
+    linear-gradient(var(--helix-color-border), var(--helix-color-border)) 1 /
+    var(--helix-border-thin) var(--helix-border-thin) 0 0 / 0 0 0 100vw;
+}
+
+/* Forced colors replace the border's color and not a border image's, so the
+   rules go back to plain borders in the system's color. */
+@media (forced-colors: active) {
+  :host([divided]) ::slotted(*) {
+    border-image: none;
+  }
+}

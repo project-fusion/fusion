@@ -1,6 +1,7 @@
 import {
   auditName,
   CommandController,
+  coversPress,
   customElement,
   DelayController,
   deepActiveElement,
@@ -23,6 +24,7 @@ import {
   MixinControllerOpen,
   numberConverter,
   OpenPhaseController,
+  raiseAbove,
   resolveActiveItem,
   SwipeController,
   swipeStep,
@@ -777,7 +779,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * is. Not a press that dragged, which was a swipe or a pan.
    */
   private readonly handleBackdrop = (event: MouseEvent): void => {
-    if (this.dragged(event) || !this.onEmptyArea(event)) {
+    if (this.dragged(event) || !this.onEmptyArea(event) || coversPress(event)) {
       return
     }
     this.requestOpen(false)
@@ -876,6 +878,8 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
         () => this.label !== '',
       )
       dialog.showModal()
+      /* A toast showing before it stays on top. See `keepAbove`. */
+      raiseAbove()
       /* Said as well as marked, because `autofocus` on a dialog was honored
          when the markup opened it and not when a framework set `open` after
          it rendered: the first control took focus instead, ringed. */

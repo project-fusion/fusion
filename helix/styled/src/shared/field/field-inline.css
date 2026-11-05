@@ -30,7 +30,13 @@
   }
 }
 
-/* The words beside a mark read at the density they are in, as a button's do. */
+/* The words beside a mark read at the density they are in, as a button's do.
+
+   **At the body's leading, because a label beside a mark is read as a
+   sentence.** The field label's tight leading set a wrapped 13 pixel label on
+   15.6 pixel lines beside 21 pixel body text. At 1.5 the line is 19.5, under
+   the 20 pixel box at `md`, so a one-line row keeps its height there. */
 [part="label"] {
   font-size: var(--helix-text-control);
+  line-height: var(--helix-leading-normal);
 }

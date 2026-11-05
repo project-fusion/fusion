@@ -14,10 +14,13 @@
 }
 
 /* The content box covers the field, so placing the content is placing it in
-   the aura. */
+   the aura. At the foot of the box, with `terminus` moving the aurora's axis
+   toward the trailing corner, the heading sits under the curtains. Centered,
+   with the axis at its default, it sat on their heaviest strokes. */
 .hero::part(content) {
-  align-content: center;
+  align-content: end;
   display: grid;
   gap: var(--helix-space-md);
   justify-items: center;
+  padding-block-end: var(--helix-space-xl);
 }

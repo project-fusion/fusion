@@ -4,13 +4,20 @@
 :host {
   color-scheme: dark;
   /* The two bars, their thumbs and the spinner's turn, named once. A rail
-     `4px` thick with a `12px` thumb on it is a fact about a slider drawn over a
-     picture, and no rung of the size scale is that thin; the turn is the token
-     every spinner reads, so two on one page agree. Privates rather than hooks,
-     because none of the three is a thing a consumer is invited to move. */
+     `4px` thick with a `12px` thumb on it, three rails across, is a fact about
+     a slider drawn over a picture, and no rung of the size scale is that thin;
+     the turn is the token every spinner reads, so two on one page agree.
+     Privates rather than hooks, because none of the three is a thing a
+     consumer is invited to move. */
   --_video-rail-size: var(--helix-space-2xs);
   --_video-spin: var(--helix-duration-turn);
-  --_video-thumb-size: 12px;
+  --_video-thumb-size: calc(var(--_video-rail-size) * 3);
+  /* The bar's padding above and below its controls, and the gap between them.
+     On a touch screen both make room for each control's 44 pixel press: a 24
+     pixel control with 8 above and below had its press cut by the stage's edge
+     at 39, and the speaker beside the full screen control pressed at 19 wide. */
+  --_video-bar-pad: var(--helix-space-xs);
+  --_video-bar-gap: var(--helix-space-xs);
 
   display: block;
   position: relative;
@@ -84,11 +91,11 @@
      dark ink on a dark gradient. */
   color: var(--video-controls-color, var(--helix-color-foreground));
   display: flex;
-  gap: var(--helix-space-xs);
+  gap: var(--_video-bar-gap);
   inset-block-end: 0;
   inset-inline: 0;
   opacity: 1;
-  padding: var(--helix-space-xs) var(--helix-space-sm);
+  padding: var(--_video-bar-pad) var(--helix-space-sm);
   position: absolute;
   transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
   /* The bar's own width, which its insets set and its content never does, so
@@ -100,8 +107,12 @@
 /* **The time goes first when the bar is narrow.** At 280 the clock, `0:00 /
    0:00` at about 60 pixels, stood beside every control in a bar 256 wide, and
    the scrubber, the one control that has to be long, was squeezed to a stub.
-   The position is still said: the scrubber's value text is the time. */
-@container (inline-size < 20rem) {
+   The position is still said: the scrubber's value text is the time.
+
+   At `20rem` a phone lost the clock too: a 390 pixel page gives the bar 318.
+   At `18rem` the clock stays there, and the scrubber keeps at least 74 pixels
+   on a touch screen, where the gaps are widest. */
+@container (inline-size < 18rem) {
   [part="time"] {
     display: none;
   }
@@ -118,9 +129,20 @@
 
 /*
  *  The shading reaches higher than the bar does.
+ *
+ * **At full strength behind the bar, then fading above it.** A fade that
+ * started at the bottom edge had lost a third of its strength at the rail: over
+ * a white frame the empty rail measured 1.18:1 against the frame above it and
+ * the controls stood on a ground of rgb 162. Held through the bar's height, the
+ * ground under the controls is the overlay's own.
  */
 [part="stage"]::before {
-  background-image: linear-gradient(to top, var(--helix-color-overlay), transparent);
+  background-image: linear-gradient(
+    to top,
+    var(--helix-color-overlay),
+    var(--helix-color-overlay) calc(var(--helix-size-icon-loose) + var(--_video-bar-pad) * 2),
+    transparent
+  );
   block-size: calc(var(--helix-size-icon-loose) + var(--helix-space-2xl));
   content: "";
   inset-block-end: 0;
@@ -266,6 +288,36 @@ slot[name$="-icon"]::slotted(*) {
 
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+
+/* **On a touch screen the scrubber takes a press the bar's height.** A 4 pixel
+   rail with a 12 pixel thumb pressed at 11. A transparent border above and
+   below makes the input the target's height, the background stops at the
+   border, so the rail is drawn as before, and the negative margin keeps the
+   bar's height its controls'. */
+@media (pointer: coarse) {
+  :host {
+    --_video-bar-gap: max(
+      var(--helix-space-xs),
+      var(--helix-size-target) -
+      var(--helix-size-icon-loose)
+    );
+    --_video-bar-pad: max(
+      var(--helix-space-xs),
+      (var(--helix-size-target) - var(--helix-size-icon-loose)) /
+      2
+    );
+  }
+
+  [part="scrubber"] {
+    --_video-scrub-reach: calc((var(--helix-size-target) - var(--_video-rail-size)) / 2);
+
+    background-clip: padding-box;
+    block-size: var(--helix-size-target);
+    border-block: var(--_video-scrub-reach) solid transparent;
+    box-sizing: border-box;
+    margin-block: calc(var(--_video-scrub-reach) * -1);
+  }
 }
 
 /* The level is drawn in the reader's own ink rather than the accent. Two bright
@@ -427,7 +479,9 @@ slot[name$="-icon"]::slotted(*) {
  * vanishes the other is there.
  */
 [part="start"] {
-  --icon-size: 40%;
+  /* Rounded to whole even pixels: 40% of a 72 disc drew a 28.8 glyph, its
+     edges on no pixel. */
+  --icon-size: round(40%, 2px);
   all: unset;
 
   align-items: center;

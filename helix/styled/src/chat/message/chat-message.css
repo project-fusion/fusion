@@ -411,7 +411,7 @@ slot[name="indicator"]::slotted(helix-orb) {
 }
 
 :host([state="sending"]) [part="content"] {
-  opacity: 0.6;
+  opacity: var(--helix-opacity-quiet);
 }
 
 /* *The red says what happened; the control says what to do about it.** Left to

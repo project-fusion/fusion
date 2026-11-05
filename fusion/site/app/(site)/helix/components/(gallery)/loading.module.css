@@ -72,9 +72,15 @@
 }
 
 /* The search field is `heroSearch` for its width, and a control for its
-   height. */
+   height, 44 on a touch screen as the field is. */
 .heroSearch {
   block-size: var(--helix-size-control);
+}
+
+@media (pointer: coarse) {
+  .heroSearch {
+    block-size: max(var(--helix-size-control), var(--helix-size-target));
+  }
 }
 
 /* The button pair: two halves at `--helix-size-button`, welded by the border

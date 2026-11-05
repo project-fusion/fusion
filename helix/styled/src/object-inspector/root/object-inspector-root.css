@@ -174,12 +174,14 @@
    string, a number and a null read as three different things at a glance. The
    text itself says the same thing for a reader who cannot see the color: a
    string keeps its quotes and a null is spelled. */
-/* **The tag ink, the one a name in markup takes**, as GitHub draws a JSON key.
-   The name ink is a blue beside the string's blue, #0550ae against #0a3069
-   before the lift to one lightness, so a key and its string value read as one
-   color. */
+/* **The roles a Code Block gives the same words**, so an object reads in the
+   colors its source does: a key and a number in the name ink, a string in the
+   string ink, `true` in the constant ink, and `null` in the keyword ink. The
+   key took the tag ink, green, because the name and string inks were one blue
+   in light; the string ink now sits darker than the name ink, as GitHub draws
+   it. */
 [part="key"] {
-  color: var(--helix-color-syntax-tag);
+  color: var(--helix-color-syntax-name);
 }
 
 /* A key on a matched row takes the foreground ink. In the default theme the
@@ -194,10 +196,13 @@
 }
 
 [part="number"] {
+  color: var(--helix-color-syntax-name);
+}
+
+[part="boolean"] {
   color: var(--helix-color-syntax-constant);
 }
 
-[part="boolean"],
 [part="null"] {
   color: var(--helix-color-syntax-keyword);
 }
@@ -228,11 +233,15 @@
   padding-inline-end: var(--helix-space-2xs);
 }
 
+/* **Above the tree**, so its press reaches past the bar. The bar is 40 tall
+   round a 32 pixel button, and the tree drawn after it took the bottom 2
+   pixels of the 44 pixel press on a touch screen: it measured 39. */
 [part="header"] > [part="copy"] {
   --copy-button-icon-size: var(--helix-size-icon-sm);
   --icon-button-size: var(--helix-size-control-sm);
   margin-inline-start: auto;
-  position: static;
+  position: relative;
+  z-index: var(--helix-layer-raised);
 }
 
 /* Rows sit against each other, so a box reaching past a row would take the press

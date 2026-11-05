@@ -56,7 +56,11 @@
      around the box in a card in dark mode, so it read as a filled square. */
   border: var(--helix-border-thin) solid
     var(--checkbox-border-color, var(--helix-color-foreground-subtle));
-  border-radius: var(--helix-radii-sm);
+  /* **Never past a quarter of the box**, so a box stays a box whatever the
+     theme's corners: at `--helix-seed-radii: 1rem` the 16 pixel box took an 8
+     pixel corner and was a circle, a Radio. A quarter is the 4 the shipped
+     corner already draws on the 16 pixel box. */
+  border-radius: min(var(--helix-radii-sm), calc(var(--_checkbox-size) / 4));
   cursor: inherit;
   inline-size: var(--_checkbox-size);
   margin: var(--helix-space-none);
@@ -91,9 +95,13 @@
 
 /* **Read-only, and the box says so with its edge.** A read-only field keeps
    its edge and loses its fill, flush with its ground. A box has no fill to
-   lose, so its edge steps down to the one a field is drawn with,
-   `color-border`: 1.23:1 on the page, from the mark ink's 3.95:1, or the
-   foreground's when ticked. The tick and the dash keep their ink, being the
+   lose, so its edge steps down, from the mark ink's 3.95:1 or the
+   foreground's when ticked, to a wash of the foreground at 3.1 to 3.4:1 on
+   every ground. **At 3:1 and not at the field edge's 1.23**, by the owner's
+   decision of November 4, 2026: the box carries the value, and at 1.23 an
+   unticked read-only box was all but gone. **Ticked or not**, as every read-only control draws
+   its frame: keyed to the empty box only, a ticked read-only box was identical
+   to an editable one. The tick and the dash keep their ink, being the
    value. No pointer cursor, and no wash under a pointer or a press, which the
    box refuses. It looked exactly like a box that takes a press. After the
    checked rule, which it outranks by order, and before the invalid rule,
@@ -102,10 +110,14 @@
   cursor: default;
 }
 
-:host([readonly]:not(:state(checked), :state(indeterminate))) [part="control"] {
-  /* Empty only: a ticked box's edge is its fill's own, and the field edge drew
-     a pale rim around it. */
-  border-color: var(--checkbox-border-color, var(--helix-color-border));
+:host([readonly]) [part="control"] {
+  border-color: var(
+    --checkbox-border-color,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
+      color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
+    )
+  );
 }
 
 /* The tick and the dash, as masks rather than glyphs, so their weight is ours. */
@@ -203,23 +215,67 @@ slot[name="dash"]::slotted(*) {
   --_field-control-block-size: var(--helix-size-target);
 
   display: block;
+  /* What the card's surface is drawn against, below. `isolation` keeps the
+     surface under the words and over whatever is behind the host. */
+  isolation: isolate;
+  position: relative;
 }
 
-/* Through hooks, the way `Card` does it. */
+/* **The surface is drawn over the whole host, so the hint is inside the card.**
+   The row is the `<label>` and the hint is its sibling, so a surface drawn on
+   the row stopped above the hint: measured, the hint hung under the card at 52
+   pixels from the edge while the words in the card started at 73. The row's
+   `::before` reaches the host's edges instead, and as part of the label it
+   keeps the whole card a press on the box. Through hooks, the way `Card` does
+   it. */
 :host(:is([separation="filled"], [separation="outlined"])) [part="field"] {
   align-items: start;
+  /* Transparent, so the words sit where the surface's edge puts them. */
+  border: var(--helix-border-thin) solid transparent;
+  display: flex;
+  gap: var(--helix-space-sm);
+  inline-size: 100%;
+  padding: var(--checkbox-card-padding, var(--helix-space-md));
+  position: static;
+}
+
+:host(:is([separation="filled"], [separation="outlined"])) [part="field"]::before {
   background-color: var(--checkbox-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid
     var(--checkbox-card-border-color, var(--helix-color-border));
   /* A card's corner, as Card draws it: 8 at the default, where it drew 4. */
   border-radius: var(--helix-radii-md);
-  display: flex;
-  gap: var(--helix-space-sm);
-  inline-size: 100%;
-  padding: var(--checkbox-card-padding, var(--helix-space-md));
+  box-sizing: border-box;
+  content: "";
+  inset: 0;
+  position: absolute;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
     border-color var(--helix-duration-fast) var(--helix-easing-standard);
+  z-index: var(--helix-layer-beneath);
+}
+
+/* The hint and the message under the words, inside the card's padding. The
+   row gives up its own padding below, and the hint takes it. A press on the
+   hint goes through to the card, which is the target. */
+:host(:is([separation="filled"], [separation="outlined"]))
+  [part="field"]:has(~ [part="hint"], ~ [part="feedback"]) {
+  padding-block-end: var(--helix-space-none);
+}
+
+:host(:is([separation="filled"], [separation="outlined"])) :is([part="hint"], [part="feedback"]) {
+  padding-block-end: calc(
+    var(--checkbox-card-padding, var(--helix-space-md)) +
+    var(--helix-border-thin)
+  );
+  padding-inline: calc(
+      var(--checkbox-card-padding, var(--helix-space-md)) +
+      var(--helix-border-thin) +
+      var(--_checkbox-size) +
+      var(--helix-space-sm)
+    )
+    calc(var(--checkbox-card-padding, var(--helix-space-md)) + var(--helix-border-thin));
+  pointer-events: none;
 }
 
 /* The ground carries it and the edge goes, which is what `Card` and `Radio` do
@@ -229,7 +285,7 @@ slot[name="dash"]::slotted(*) {
    **The fill is `surface-filled`, the wash every `filled` surface takes.** It
    drew `surface`, 1.04:1 on the white page, which is nearly the page; the wash
    is 1.12 there and on every ground. */
-:host([separation="filled"]) [part="field"] {
+:host([separation="filled"]) [part="field"]::before {
   background-color: var(--checkbox-card-background-color, var(--helix-color-surface-filled));
   border-color: transparent;
 }
@@ -239,7 +295,7 @@ slot[name="dash"]::slotted(*) {
    attribute, so the attribute form let it light up under a pointer that could
    not press it. */
 :host(:not(:disabled, [readonly]):is([separation="filled"], [separation="outlined"]))
-  [part="field"]:hover {
+  [part="field"]:hover::before {
   border-color: var(--helix-color-foreground-muted);
 }
 
@@ -249,15 +305,21 @@ slot[name="dash"]::slotted(*) {
    card's box moves when it is chosen and a column of them does not jump as the
    answer changes. Under `filled` the edge comes back with it, which is what
    makes the ticked one the only card in the column with a line around it. */
-:host(:is([separation="filled"], [separation="outlined"]):state(checked)) [part="field"] {
-  background-color: var(--helix-color-surface-raised);
+:host(:is([separation="filled"], [separation="outlined"]):state(checked)) [part="field"]::before {
   border-color: var(--helix-color-primary);
   box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
 }
 
+/* **The fill steps up under `filled` only.** `outlined` is an edge and no fill,
+   ticked or not: a ticked outlined card drew `surface-raised`, #f7f7f7 in
+   light and #181818 in dark, the same card as a ticked `filled` one. */
+:host([separation="filled"]:state(checked)) [part="field"]::before {
+  background-color: var(--helix-color-surface-raised);
+}
+
 /* The ring goes on the card, because the card is the target. */
 :host(:is([separation="filled"], [separation="outlined"]))
-  [part="field"]:has([part="control"]:focus-visible) {
+  [part="field"]:has([part="control"]:focus-visible)::before {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
@@ -305,8 +367,17 @@ slot[name="dash"]::slotted(*) {
 }
 
 /* An edge and no fill, as `outlined` is wherever it is offered. */
-:host([separation="outlined"]) [part="field"] {
+:host([separation="outlined"]) [part="field"]::before {
   background-color: var(--checkbox-card-background-color, transparent);
+}
+
+/* **A read-only card is drawn as a read-only field is**: the wash clears to the
+   ground, the edge is the field edge whether ticked or not, and the ticked ring
+   goes. The tick inside keeps its ink, being the value. */
+:host([readonly]:is([separation="filled"], [separation="outlined"])) [part="field"]::before {
+  background-color: var(--checkbox-card-background-color, transparent);
+  border-color: var(--checkbox-card-border-color, var(--helix-color-border));
+  box-shadow: none;
 }
 
 /* Print: a control prints the value it holds, and the state has to survive: a

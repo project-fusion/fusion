@@ -5,7 +5,8 @@ import { DOCS } from './docs.ts'
 /** One message in the toast region, and what it says. */
 interface Message {
   readonly id: number
-  readonly text: string
+  /** The answers, one `name=value` pair each, so a line breaks only between pairs. */
+  readonly pairs: readonly string[]
 }
 
 /**
@@ -30,8 +31,7 @@ export function SignupForm() {
     event.preventDefault()
     const answers = [...new FormData(event.currentTarget).entries()]
       .map(([field, value]) => `${field}=${value}`)
-      .join('  ')
-    setMessages((sent) => [...sent, { id: Date.now(), text: answers }])
+    setMessages((sent) => [...sent, { id: Date.now(), pairs: answers }])
   }
 
   return (
@@ -140,7 +140,9 @@ export function SignupForm() {
             >
               <helix-flex direction="column" gap="2xs">
                 <helix-text scale="body-strong">Read by the form</helix-text>
-                <helix-text scale="code">{message.text}</helix-text>
+                <helix-flex column-gap="md" wrap>
+                  <For each={message.pairs}>{(pair) => <helix-text scale="code">{pair}</helix-text>}</For>
+                </helix-flex>
               </helix-flex>
             </helix-toast-item>
           )}

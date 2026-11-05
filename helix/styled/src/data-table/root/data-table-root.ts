@@ -43,7 +43,7 @@ import '../../pagination/index.js'
  *
  * @slot - The columns, as `TableColumn` elements, and the first page served as `TableRow` elements, which show until `rows` holds a row.
  * @slot empty - Content shown when there are no rows to show and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
- * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
+ * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
@@ -86,7 +86,7 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
  * @cssproperty --data-table-row-background-color - The fill across a row. A row generates no box, so a `::part(row)` rule sets this for its cells, as `::part(row):hover` does for a hover.
- * @cssproperty --data-table-row-hover-background-color - The fill across a row while the pointer is over it, with `row-link`.
+ * @cssproperty --data-table-row-hover-background-color - The fill across a row while the pointer is over it.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
  * color only, because it fills the color in a border shorthand, and a full border value
  * makes the rule invalid. It is drawn on the cells, because the row is `display: contents`.

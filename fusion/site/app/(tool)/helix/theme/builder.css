@@ -15,6 +15,56 @@
   padding: var(--helix-space-lg);
 }
 
+/* The caption keeps its `xs` under the heading, now that the heading is a row
+   of the form's `lg` column rather than of a group with it. */
+.themeControlsLede {
+  margin-block-start: calc(var(--helix-space-xs) - var(--helix-space-lg));
+}
+
+/* **On a phone the heading and its Hide controls stay at the top of the
+   form.** It reaches into the pane's top and side padding and gives the same
+   back as its own, so at rest nothing moves, and stuck it covers what scrolls
+   under it in the page's color. A sticky box holds inside the pane's
+   padding, so its offset reaches back out by the same `lg`. */
+@media (max-width: 60rem) {
+  .themeControlsHead {
+    background-color: var(--helix-color-background);
+    inset-block-start: calc(-1 * var(--helix-space-lg));
+    margin: calc(-1 * var(--helix-space-lg)) calc(-1 * var(--helix-space-lg)) 0;
+    padding: var(--helix-space-lg) var(--helix-space-lg) var(--helix-space-xs);
+    position: sticky;
+    z-index: 1;
+  }
+
+  /* **A rule under it once the form scrolls.** Stuck with nothing under its
+     edge, the heading cut the next label through its letters, which read as
+     a clipping fault. The rule is a shadow so it takes no room, and it comes
+     in over the form's first `xs` of scroll, so at rest the caption sits
+     under the heading as before. */
+  @supports (animation-timeline: scroll()) {
+    .themeControlsHead {
+      animation: theme-controls-stuck linear both;
+      animation-range: 0 var(--helix-space-xs);
+      animation-timeline: scroll(nearest block);
+    }
+  }
+
+  @keyframes theme-controls-stuck {
+    from {
+      box-shadow: 0 var(--helix-border-thin) 0 transparent;
+    }
+
+    to {
+      box-shadow: 0 var(--helix-border-thin) 0 var(--helix-color-border);
+    }
+  }
+
+  /* The heading's own end padding is the `xs` above the caption here. */
+  .themeControlsLede {
+    margin-block-start: calc(-1 * var(--helix-space-lg));
+  }
+}
+
 /* What the brand became.
  *
  * **A caption under the field, not a callout.** A callout carries a severity
@@ -241,16 +291,12 @@ helix-sandbox-editor::part(editor) {
 }
 
 /* **On a phone the audit's tabs sit below the reach of the divider above
-   them.** The divider's grab reaches `--helix-space-2xs` into the panel and a
-   tab's press reaches 6px above the tab, so at the panel's top edge the
-   divider took the top of every tab's press. `AUDIT_SHUT` in `builder.tsx`
-   counts this inset. */
+   them.** The divider's grab reaches `--helix-space-2xs` into the panel, so the
+   strip starts that far down. A tab sits 8px down a 48px strip and its press
+   reaches 6px above it, which clears the grab with the strip's own room.
+   `AUDIT_SHUT` in `builder.tsx` counts this inset. */
 @media (max-width: 60rem) {
   .themeStage helix-tabs[slot="panel"] {
-    padding-block-start: calc(
-      var(--helix-space-2xs) +
-      (var(--helix-size-target) - var(--helix-size-control)) /
-      2
-    );
+    padding-block-start: var(--helix-space-2xs);
   }
 }

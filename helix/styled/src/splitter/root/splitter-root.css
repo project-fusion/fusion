@@ -38,6 +38,42 @@
   overflow: auto;
 }
 
+/* **A pane shut to a strip keeps its content's width and shows its edge.**
+   Narrowed with the pane, the content reflowed into the strip: at
+   `collapsed-size="8"` in a 280 pixel column a Card's text broke one or two
+   letters to a line down the whole pane. Side by side, the content stays as
+   wide as its longest line and the pane cuts it, as a panel slid most of the
+   way out of view. */
+:host([data-collapsed="start"]) [part="start"],
+:host([data-collapsed="end"]) [part="end"] {
+  overflow: hidden;
+}
+
+:host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"]))
+  ::slotted([slot="start"]),
+:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"]))
+  ::slotted([slot="end"]) {
+  min-inline-size: max-content;
+}
+
+/* **The cut edge fades**, so the strip reads as a pane running on past it. Cut
+   hard, a collapsed Terminal pane read "Term" at 640 and "T" at 280, a word
+   broken off. The content is cut at the pane's end on either side, beside the
+   divider for the start pane and at the splitter's edge for the end one. */
+:host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"]))
+  [part="start"],
+:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"])) [part="end"] {
+  --_splitter-fade: min(var(--helix-space-lg), 50%);
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--_splitter-fade)), transparent);
+}
+
+:host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"]):dir(rtl))
+  [part="start"],
+:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"]):dir(rtl))
+  [part="end"] {
+  mask-image: linear-gradient(to left, #000 calc(100% - var(--_splitter-fade)), transparent);
+}
+
 /* The divider. **The box is only the target and the line is drawn inside it**,
    never the box doing its own drawing, which fails three ways at once: a line on
    the box's leading edge puts every one of the eight pixels on one side of it

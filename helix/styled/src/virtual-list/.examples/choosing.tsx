@@ -14,7 +14,7 @@ const people = Array.from({ length: 500 }, (_, index) => ({
 const SHEET = `
   .personRow {
     align-items: center;
-    block-size: 32px;
+    block-size: max(32px, var(--helix-size-target));
     cursor: default;
     display: flex;
     justify-content: space-between;

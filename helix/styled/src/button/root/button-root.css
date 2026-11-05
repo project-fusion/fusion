@@ -407,20 +407,36 @@ slot:not([name]) {
 /* **Forced colors keep the emphasis.** Every fill turns Canvas and every edge
    the text color, so solid, outlined, subtle, and ghost were one box. A solid
    button takes the system's button colors reversed, a ghost button loses its
-   edge, and the two between keep the box. A system color is honored there, so
-   nothing here opts out of forcing. The `[data-button]` recipe says the same. */
+   edge, and the two between keep the box. The `[data-button]` recipe says the
+   same.
+
+   **A solid button opts out of forcing, with system colors only.** Forced, the
+   browser paints a Canvas backplate behind the label, and a ButtonFace label
+   landed on its own color: 1.0:1, every solid label gone. Unforced, the two
+   system colors are drawn as written. */
 @media (forced-colors: active) {
   :host([emphasis="solid"]) [part="button"],
   :host(:not(:disabled)[emphasis="solid"]) [part="button"]:hover,
   :host(:not(:disabled)[emphasis="solid"]) [part="button"]:active {
+    forced-color-adjust: none;
     background-color: ButtonText;
     border-color: ButtonText;
     color: ButtonFace;
   }
 
+  /* **GrayText is the disabled state, so it is drawn whole**, as the
+     `data-button` recipe draws it. The half opacity on top washed it into the
+     Canvas behind it, a mauve on a solid button. */
+  :host(:disabled) [part="button"] {
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+
   :host([emphasis="solid"]:disabled) [part="button"] {
     background-color: GrayText;
     border-color: GrayText;
+    color: ButtonFace;
   }
 
   :host([emphasis="ghost"]) [part="button"],

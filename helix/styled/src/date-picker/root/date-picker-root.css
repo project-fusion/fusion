@@ -214,20 +214,19 @@
   grid-template-columns: repeat(7, var(--_calendar-track));
 }
 
-/* Twenty of name over twenty of space, in a track's width.
-   `box-sizing` is border-box here as everywhere, so the forty is the whole box
-   and the padding takes half of it: the name occupies the top twenty and the
-   bottom twenty separates the heading row from the first week. */
+/* **One row of the grid, the pitch the weeks keep.** The name sat in the top
+   twenty of a forty pixel box, so 48 pixels lay between the names and the first
+   week's numbers against 36 between one week and the next, and the names read
+   as a heading apart from the grid rather than as its top row. */
 [part="weekday"] {
   align-items: center;
-  block-size: var(--_calendar-track);
+  block-size: var(--_calendar-row);
   color: var(--helix-color-foreground-muted);
   display: inline-flex;
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   inline-size: var(--_calendar-track);
   justify-content: center;
-  padding-block-end: calc(var(--_calendar-track) / 2);
 }
 
 /*
@@ -375,8 +374,11 @@
 
 /* Read off the day's own part rather than the cell's `aria-disabled`, which a
    filler day from a neighboring month carries too: it takes no press, and it
-   keeps the quieter look above rather than this one. */
-:host(:not(:disabled)) [part~="day-disabled"] {
+   keeps the quieter look above rather than this one. **Not on a filler day**,
+   which carries `day-disabled` as well: this rule came later at the same
+   weight, so a filler day and a barred day of the month were one color, 191 on
+   white and 64 on black. */
+:host(:not(:disabled)) [part~="cell"]:not([data-outside]) [part~="day-disabled"] {
   color: var(--helix-color-foreground-subtle);
   opacity: var(--helix-opacity-disabled);
 }

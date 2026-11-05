@@ -16,6 +16,7 @@ import {
   shortNumber,
   spokenReading,
   words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -436,7 +437,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    */
   private renderFallback(field: PlotField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words),
+      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
     const places = field.points.map((point, index) => {
       const box: BoxPoint = [

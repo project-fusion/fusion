@@ -36,6 +36,7 @@ export function Example() {
           resizable
           sortable
           text-align="end"
+          width="6rem"
         >
           Size
         </helix-table-column>

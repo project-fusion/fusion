@@ -44,14 +44,17 @@ export function SectionHeading({
 }) {
   return (
     <helix-text as={as} class={styles.heading} id={id || undefined}>
+      {children}
       {/* A heading whose text slugs to nothing has no address, so it gets no
-          mark rather than a link to `#`. */}
+          mark rather than a link to `#`. **After the words**, so on a narrow
+          screen it follows the last word of a heading that wraps: placed
+          first and reordered by a flex row, it stood at the right edge, 217
+          pixels from the end of "Deriving a theme" at 390. */}
       {target && (
         <a aria-label={`Link to ${label ?? target}`} className={styles.anchor} href={`#${target}`}>
           <helix-icon name="link"></helix-icon>
         </a>
       )}
-      {children}
     </helix-text>
   )
 }

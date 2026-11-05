@@ -29,7 +29,14 @@
   /* 75% in dark, two whole colors since `light-dark()` cannot sit in a
      percentage. Mixed 55% toward black, the orange band came out rgb(112, 66,
      46) against the same series at rgb(251, 156, 112) in a donut, a muddy
-     brown that read as a different series. */
+     brown that read as a different series.
+   *
+     **In dark, darker and as colorful.** Mixed toward the black page, a band
+     loses its chroma with its lightness, and at 75% the four series measured
+     a chroma of 0.096 to 0.102 against 0.128 to 0.136 for the lines over
+     them: four dull bands. Now 0.101 to 0.136, the teal held by the screen. Mixed toward the series' own color at no lightness, a
+     band takes the same lightness, the page being black, and keeps its
+     chroma (November 3, 2026). */
   fill: light-dark(
     color-mix(
       in oklab,
@@ -37,9 +44,9 @@
       var(--helix-color-background)
     ),
     color-mix(
-      in oklab,
+      in oklch,
       var(--chart-series) var(--area-chart-fill-strength, 75%),
-      var(--helix-color-background)
+      oklch(from var(--chart-series) 0 c h)
     )
   );
   stroke: none;

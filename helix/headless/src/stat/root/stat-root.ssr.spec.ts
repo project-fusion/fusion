@@ -15,7 +15,9 @@ describe('stat server output', () => {
     )
     /* The label's slot carries a listener, which the server leaves out. */
     expect(markup).toMatch(/<slot name="label" part="label"\s*><\/slot>/)
-    expect(markup).toContain('<slot part="value"></slot>')
+    /* And the figure's slot carries the bindings that hide it once the stat
+       writes slotted text itself, which leave nothing on a server. */
+    expect(markup).toMatch(/<slot part="value"\s*><\/slot>/)
     expect(markup).toMatch(/<slot name="unit" part="unit"\s*><\/slot>/)
     expect(markup).toMatch(/<slot name="trend" part="trend"\s*><\/slot>/)
   })

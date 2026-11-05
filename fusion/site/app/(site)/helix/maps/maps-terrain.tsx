@@ -6,6 +6,7 @@ import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/hel
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
 import { ELEVATION, IMAGERY, MAP_FAILED } from '@/content/maps/maps'
+import { useCoarsePointer } from '@/hooks/use-coarse-pointer/use-coarse-pointer'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
@@ -25,6 +26,8 @@ export function MapsTerrain() {
   const container = useRef<HTMLDivElement>(null)
   /* Said in the map's footer, where a failed load would leave an empty box. */
   const [failed, setFailed] = useState(false)
+  /* One finger scrolls the page on a touch screen, as on the map above. */
+  const touch = useCoarsePointer()
 
   useEffect(() => {
     const host = frame.current
@@ -86,6 +89,7 @@ export function MapsTerrain() {
       <helix-map
         class={styles.mapsDemoFrame}
         controls="zoom compass tilt layers fullscreen"
+        gestures={touch ? 'cooperative' : undefined}
         label="Yosemite Valley in 3D"
         ref={frame}
       >

@@ -152,11 +152,15 @@
    square sits flush with the top of the box, and its focus ring, 2px wide and
    2px out, fell wholly outside it: a reader on the keyboard saw no focus at
    all. The picker's handle at the right of its square drew a horizontal
-   scrollbar the same way. */
+   scrollbar the same way.
+
+   **The control space step, which follows density**: 12, 16, and 24 across
+   `sm`, `md`, and `lg`, the inset Card takes. At a fixed `space-md` a Popover
+   kept 16 in every region while a Dialog beside it moved 18, 24, and 36. */
 [part="content"] {
   max-block-size: var(--popover-max-block-size, var(--floating-available-block-size, none));
   overflow: auto;
-  padding: var(--popover-padding, var(--helix-space-md));
+  padding: var(--popover-padding, var(--helix-space-control));
 }
 
 /* Nothing but the surface. */

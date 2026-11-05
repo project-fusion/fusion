@@ -84,7 +84,14 @@ slot[name="end"]::slotted(*) {
   cursor: pointer;
   display: flex;
   flex: none;
-  inline-size: var(--number-input-stepper-size, var(--helix-size-control));
+  /* Less the rule it draws, so what is left beside the rule is as wide as the
+     field is tall inside its edge, and the mark centers on a whole pixel both
+     ways. At the full control width the box inside the rule was 31, 39 and 47
+     wide around marks of 12, 16 and 20, and every mark sat half a pixel off. */
+  inline-size: var(
+    --number-input-stepper-size,
+    calc(var(--helix-size-control) - var(--helix-border-thin))
+  );
   justify-content: center;
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),

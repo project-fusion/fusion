@@ -2,9 +2,25 @@
   /* Each stop is its hook, or the theme's token. The canvas reads the same
      three below, and the peak, which only the shader draws. */
   --_aura-fade: var(--aura-fade, 15%);
-  --_aura-glow: var(--aura-glow, var(--helix-color-primary));
+  /* **On a light page the field is a sheen, not an ink.** The glow is the
+     brand's subtle wash, the haze half of that into the page, and the peak a
+     third of the brand in the wash. Drawn as primary, the braid came out a
+     black smear with no brand and a saturated band with one, a field that read
+     as dirt on white. The six templates drew their light aura this way first.
+     Dark keeps the brand at full strength, which reads as light on black.
+     Decided by the owner on November 4, 2026. */
+  --_aura-glow: var(
+    --aura-glow,
+    light-dark(var(--helix-color-primary-subtle), var(--helix-color-primary))
+  );
   --_aura-ground: var(--aura-ground, var(--helix-color-background));
-  --_aura-haze: var(--aura-haze, var(--helix-color-primary-subtle));
+  --_aura-haze: var(
+    --aura-haze,
+    light-dark(
+      color-mix(in oklab, var(--helix-color-primary-subtle) 50%, var(--helix-color-background)),
+      var(--helix-color-primary-subtle)
+    )
+  );
 
   position: relative;
   display: block;
@@ -79,19 +95,16 @@
      The peak is carried twice, the light page's and the dark page's, and the
      script picks one by the ground.
 
-     **On a light page the shader's glow is held at a lightness of 0.45 or
-     more, and the peak at 0.33 or more**, so the strands stay an ink that
-     reads as a color. Only the ink theme falls under either floor: its
-     `primary` is 0.21 and its light `primary-active` 0.11, and the braid drew
-     as a black smear. The peak stays the darker of the two, so the hot stop
-     is still the center of a shape. A brand's 500 and 700 stand above the
-     floors, and every dark page's stops do, so they are drawn as before. A
-     page that sets `--aura-glow` or `--aura-peak` is drawn as it says. */
+     **On a light page the glow is the brand's wash and the peak a third of
+     the brand in it**, the sheen above, so the hot stop is still the center
+     of a shape and never a black one: the ink theme's `primary` is 0.21, and
+     drawn at full strength the braid was a black smear. A page that sets
+     `--aura-glow` or `--aura-peak` is drawn as it says. */
   caret-color: var(--aura-peak, var(--helix-color-foreground));
-  color: var(--aura-glow, oklch(from var(--helix-color-primary) max(l, 0.45) c h));
+  color: var(--_aura-glow);
   column-rule-color: var(
     --aura-peak,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h)
+    color-mix(in oklab, var(--helix-color-primary) 34%, var(--helix-color-primary-subtle))
   );
   outline-color: var(--_aura-ground);
   text-decoration-color: var(--_aura-haze);

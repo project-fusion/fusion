@@ -124,7 +124,7 @@ const PACE = 0.25
  * @csspart canvas - The surface the ribbon draws into.
  * @csspart content - The box over the ribbon that holds the content. It covers the element.
  *
- * @cssproperty --strands-fade - How far the top and bottom edges fade, as a share of the height. `0%` keeps a hard edge. Defaults to `15%`.
+ * @cssproperty --strands-fade - How far the top and bottom edges fade, as a share of the height. The sides fade a third as far, as a share of the width. `0%` keeps every edge hard. Defaults to `15%`.
  * @cssproperty --strands-glow - The color of most strands. Defaults to `--helix-color-primary`.
  * @cssproperty --strands-ground - The page the light is added to. Defaults to `--helix-color-background`.
  * @cssproperty --strands-peak - The hottest strands, and on a light page the ink the light darkens toward. Defaults to `--helix-color-primary-hover` on a dark page and `--helix-color-primary-active` on a light one.

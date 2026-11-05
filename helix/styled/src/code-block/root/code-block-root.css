@@ -75,6 +75,24 @@
   padding-inline-end: var(--helix-space-2xs);
 }
 
+/* On a touch screen the inset holds the button's whole press inside the bar.
+   At `2xs` the 44 press reached a pixel past the block's top edge, where the
+   page took it, and pressed at 43. */
+@media (pointer: coarse) {
+  [part="header"]:has(> [part="copy"]) {
+    padding-block: max(
+      var(--helix-space-2xs),
+      (var(--helix-size-target) - var(--helix-size-control-sm)) /
+      2
+    );
+    padding-inline-end: max(
+      var(--helix-space-2xs),
+      (var(--helix-size-target) - var(--helix-size-control-sm)) /
+      2
+    );
+  }
+}
+
 /* *The name is a name, not code**, so it is not in the mono face: the block
    below is the only thing here that is code. A long path wraps rather than
    pushing the copy button off the end of the bar. */
@@ -165,9 +183,12 @@
 
 /* Scrolls, never wraps. */
 [part="block"] {
-  /* The page's own ground, not a sunken panel. */
+  /* **The ground it sits on, not a sunken panel.** The page's own color was
+     right only on the page: in a dark elevated Card or a Dialog it drew #000 on
+     #181818, a hole at 1.18:1, and in a light Card a white patch on #fafafa.
+     Clear, the code is on the page, the card, or the panel that holds it. */
   backdrop-filter: var(--code-block-backdrop, none);
-  background-color: var(--code-block-background-color, var(--helix-color-background));
+  background-color: var(--code-block-background-color, transparent);
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
   border-radius: var(--code-block-radius, var(--helix-radii-md));
   margin: var(--helix-space-none);
@@ -404,7 +425,7 @@
 [part="old"],
 [part="new"] {
   backdrop-filter: var(--code-block-backdrop, none);
-  background-color: var(--code-block-background-color, var(--helix-color-background));
+  background-color: var(--code-block-background-color, transparent);
   border: var(--helix-border-thin) solid var(--code-block-border-color, var(--helix-color-border));
   border-radius: var(--code-block-radius, var(--helix-radii-md));
   margin: var(--helix-space-none);
@@ -521,7 +542,7 @@
   background-color: color-mix(
     in srgb,
     var(--code-block-added-color, var(--helix-color-success)) 14%,
-    var(--code-block-background-color, var(--helix-color-background))
+    var(--code-block-background-color, transparent)
   );
 }
 
@@ -529,17 +550,20 @@
   background-color: color-mix(
     in srgb,
     var(--code-block-removed-color, var(--helix-color-danger)) 14%,
-    var(--code-block-background-color, var(--helix-color-background))
+    var(--code-block-background-color, transparent)
   );
 }
 
 /* The words that changed within a line: the line's own tone, deeper, so the
-   eye goes to them first and the line still reads as one wash. */
+   eye goes to them first and the line still reads as one wash. **21% laid over
+   the line's 14% is the tone at 32%**, what this drew as an opaque mix when the
+   ground was the page's own color, and it stays 32% on any ground the block
+   sits on, a color set with `--code-block-background-color` included. */
 [part="added"] [part="changed"] {
   background-color: color-mix(
     in srgb,
-    var(--code-block-added-color, var(--helix-color-success)) 32%,
-    var(--code-block-background-color, var(--helix-color-background))
+    var(--code-block-added-color, var(--helix-color-success)) 21%,
+    transparent
   );
   border-radius: var(--helix-radii-sm);
 }
@@ -547,8 +571,8 @@
 [part="removed"] [part="changed"] {
   background-color: color-mix(
     in srgb,
-    var(--code-block-removed-color, var(--helix-color-danger)) 32%,
-    var(--code-block-background-color, var(--helix-color-background))
+    var(--code-block-removed-color, var(--helix-color-danger)) 21%,
+    transparent
   );
   border-radius: var(--helix-radii-sm);
 }

@@ -55,25 +55,25 @@
  */
   --heatmap-tone-1: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 35%,
+    var(--helix-color-primary-strong) 35%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-2: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 51%,
+    var(--helix-color-primary-strong) 51%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-3: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 68%,
+    var(--helix-color-primary-strong) 68%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-4: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 84%,
+    var(--helix-color-primary-strong) 84%,
     var(--helix-color-surface-sunken)
   );
-  --heatmap-tone-5: oklch(from var(--helix-color-primary-active) max(l, 0.33) c h);
+  --heatmap-tone-5: var(--helix-color-primary-strong);
   /* **A grid of one column, so the footer is as wide as the strip and not as
      wide as the box.** The labels annotate the picture: "Jun" under the first
      week and "Aug" under the last is the whole of what they say, and a block
@@ -186,7 +186,7 @@
 [part="tooltip-label"] {
   display: block;
   font-weight: var(--helix-weight-medium);
-  opacity: 0.72;
+  opacity: var(--helix-opacity-quiet);
 }
 
 /* Name and value on one line, the value pushed to the end so a column of them
@@ -199,7 +199,7 @@
 }
 
 [part="tooltip-name"] {
-  opacity: 0.72;
+  opacity: var(--helix-opacity-quiet);
 }
 
 [part="tooltip-value"] {

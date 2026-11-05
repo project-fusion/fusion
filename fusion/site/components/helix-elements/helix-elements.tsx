@@ -66,9 +66,16 @@ export function HelixElements(): null {
        25, 2026. With the bar's own families asked for first, 168 to 235 ms and
        815 ms, and the rest of the library arrives when it did. The bar at rest
        is these; its drawer, tree, and palette open later and come with the
-       rest. */
+       rest.
+
+       **Flex and Text are the bar's too**, being the wordmark's row and its
+       name. Left to the library, the bar showed about 200ms with the mark and
+       no name, 66 wide where the lockup is 99, and the sections stood 122
+       pixels left of center until the name arrived and moved them. */
     const elements = Promise.allSettled([
       import('@fusion.dev/helix/app-header'),
+      import('@fusion.dev/helix/flex'),
+      import('@fusion.dev/helix/text'),
       import('@fusion.dev/helix/navigation'),
       import('@fusion.dev/helix/megamenu'),
       import('@fusion.dev/helix/button'),

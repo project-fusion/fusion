@@ -160,8 +160,21 @@
   inset-inline-end: var(--lightbox-padding, var(--helix-space-md));
 }
 
+/* **The press reaches `--helix-size-target`, in a transparent box**, so
+   nothing drawn moves: on a touch screen the 32 pixel arrows pressed at 32. */
+[part="previous"]::after,
+[part="next"]::after,
+[part="dismiss"]::after,
+[part="zoom-in"]::after,
+[part="zoom-out"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* Zoom out and zoom in, in the bottom corner at the end of the line, under the
-   close control: out first, so the pair reads as a scale does. */
+   close control: out first, so the pair reads as a scale does. On a touch
+   screen they stand a press apart, so neither takes the other's. */
 [part="zoom-in"],
 [part="zoom-out"] {
   inset-block-end: var(--lightbox-padding, var(--helix-space-md));
@@ -175,7 +188,11 @@
   inset-inline-end: calc(
     var(--lightbox-padding, var(--helix-space-md)) +
     var(--lightbox-control-size, var(--helix-size-control)) +
-    var(--helix-space-xs)
+    max(
+      var(--helix-space-xs),
+      var(--helix-size-target) -
+      var(--lightbox-control-size, var(--helix-size-control))
+    )
   );
 }
 

@@ -89,6 +89,15 @@
     --table-padding-block: var(--helix-space-xs) var(--helix-space-none);
   }
 
+  /* With the headings out of sight the first row is the top of the table,
+     which scrolls and so clips, and the link sits `space-xs` below it: its
+     press reached 11.5px above and measured 41 tall. The first row's box
+     starts at the table's edge and keeps 44 by reaching further down. */
+  .apiTable helix-table-row:first-of-type > helix-table-cell > a[data-link]::after {
+    inset-block: calc(-1 * var(--helix-space-xs))
+      calc(100% + var(--helix-space-xs) - var(--helix-size-target));
+  }
+
   .apiTable helix-table-cell:not(:first-child) {
     --table-padding-block: var(--helix-space-2xs) var(--helix-space-xs);
   }
@@ -153,6 +162,38 @@
 .apiHint:hover,
 .apiHint:focus-visible {
   color: var(--helix-color-foreground);
+}
+
+/* **On a touch screen each mark is a 44px press.** The marks are drawn at
+   `1em`, and measured at 390 the reference link was 22 by 14 and the column's
+   hint 14 by 14. A transparent box centered on each reaches the target and
+   nothing drawn moves. The rows are taller than 44 and a cell holds one mark,
+   so no two boxes meet. */
+@media (pointer: coarse) {
+  .apiReference,
+  .apiHint {
+    position: relative;
+  }
+
+  .apiReference::after,
+  .apiHint::after {
+    content: "";
+    inset: calc((var(--helix-size-target) - 100%) / -2);
+    position: absolute;
+  }
+
+  /* The link sits at the end of its cell, which clips past it, so its box
+     grows toward the start alone: 33 wide, centered, at 390. */
+  .apiReference::after {
+    inset-inline: calc(100% - var(--helix-size-target)) 0;
+  }
+
+  /* An example's name is as wide as its word, and "Inline" measured 35. The
+     link's own press is already 44 tall, so it takes the target's width at
+     least and the cell has room for it. */
+  .apiTable helix-table-cell > a[data-link] {
+    min-inline-size: var(--helix-size-target);
+  }
 }
 
 .apiName {

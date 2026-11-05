@@ -130,14 +130,27 @@
    pointer is on, from the first mark to that one, so a box lit behind the
    hovered mark said the same thing twice and drew a square around a star. */
 
-/* **A previewed score is paler than a chosen one**, 60% of the mark color over
-   the page, so the marks under the pointer read as a proposal until pressed.
-   Drawn in the chosen color, a preview of 5 looked exactly like a score of 5. */
+/* **A previewed score is drawn apart from a chosen one**, so the marks under
+   the pointer read as a proposal until pressed. Drawn in the chosen color, a
+   preview of 5 looked exactly like a score of 5. */
 :host(:state(previewing)) [part="fill"] {
-  color: color-mix(
-    in oklab,
-    var(--rating-color, var(--helix-color-warning-mark)) 60%,
-    var(--helix-color-background)
+  /* **A step off the chosen color that keeps 3:1 against the page**, which a
+     graphic needs: darker in light, dimmer in dark. 60% toward the page in
+     both modes measured 2.17:1 in light, a disabled rating's look, and 85%,
+     the least that clears 3:1 there, sat 1.28:1 from the chosen marks. Toward
+     the ink by a quarter it is 7.56:1 on white and 1.88:1 from the chosen
+     amber; in dark the step toward the page holds at 3.25:1 and 3.50:1. */
+  color: light-dark(
+    color-mix(
+      in oklab,
+      var(--rating-color, var(--helix-color-warning-mark)) 75%,
+      var(--helix-color-foreground)
+    ),
+    color-mix(
+      in oklab,
+      var(--rating-color, var(--helix-color-warning-mark)) 60%,
+      var(--helix-color-background)
+    )
   );
 }
 
@@ -216,9 +229,20 @@
   opacity: var(--helix-opacity-disabled);
 }
 
-/* A readout is not a control: nothing to press, so nothing that looks pressable. */
+/* **Read-only: the value keeps its ink and the frame is drawn as a read-only
+   field's**, the one treatment every control takes. The filled marks are the
+   score and keep their color. The empty marks are the frame the score is
+   counted against, and take the edge a field is drawn with, `color-border`,
+   as an empty read-only Checkbox's box does. Only the cursor changed before,
+   and a read-only rating measured 0.04% of pixels from an editable one. A
+   readout is not a control: nothing to press, so nothing that looks
+   pressable. */
 :host([readonly]) [part="marks"] {
   cursor: default;
+}
+
+:host([readonly]) [part="track"] {
+  color: var(--rating-empty-color, var(--helix-color-border));
 }
 
 /* A shape the consumer handed us, drawn as itself.

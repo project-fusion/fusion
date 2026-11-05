@@ -82,7 +82,38 @@ interface Props {
  */
 const PREVIEW_MIN = 180
 const PREVIEW_MAX = 720
-const EDITOR = 256
+
+/**
+ * How much room the source pane gets: its bar and the example's lines, up to
+ * 256, past which the editor scrolls.
+ *
+ * **Fitted to the source, as the preview is fitted to its drawing.** Held at
+ * 256 for every example, a source of five lines left about 110 pixels empty
+ * under its last line. The bar is 53 at its tallest, on a touch screen; a line
+ * is 19.5, the editor's 13px at a leading of 1.5; and 20 is the editor's own
+ * padding with a line's room under the last one. The longer of the two files
+ * decides, so switching tabs does not resize the pane, and the floor keeps room
+ * to type a few lines into an example that has one.
+ */
+const EDITOR_MAX = 256
+const EDITOR_MIN = 128
+const EDITOR_BAR = 53
+const EDITOR_LINE = 19.5
+const EDITOR_PADDING = 20
+
+const lineCount = (text: string): number =>
+  text.trim() === '' ? 0 : text.trim().split('\n').length
+
+const editorSize = (html: string, css: string): number =>
+  Math.round(
+    Math.min(
+      EDITOR_MAX,
+      Math.max(
+        EDITOR_MIN,
+        EDITOR_BAR + Math.max(lineCount(html), lineCount(css)) * EDITOR_LINE + EDITOR_PADDING,
+      ),
+    ),
+  )
 
 /** What the preview pane should be, given what the frame says it drew. */
 const previewSize = (drawn: number | undefined, min = PREVIEW_MIN): number =>
@@ -188,6 +219,7 @@ export function ComponentPreview({
     frame.styles = styles
   }, [source, styles])
 
+  const editor = editorSize(html, css)
   return (
     <helix-sandbox
       class={sheet.docsPreview}
@@ -195,8 +227,8 @@ export function ComponentPreview({
       onhelix-before-edit={sourceEdited}
       orientation="vertical"
       ref={sandbox}
-      split={Math.round((previewSize(drawn, min) / (previewSize(drawn, min) + EDITOR)) * 100)}
-      style={{ blockSize: `${previewSize(drawn, min) + EDITOR}px` }}
+      split={Math.round((previewSize(drawn, min) / (previewSize(drawn, min) + editor)) * 100)}
+      style={{ blockSize: `${previewSize(drawn, min) + editor}px` }}
     >
       {/*
        *  Laid out by the frame, not by this page. The preview renders into a

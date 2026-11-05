@@ -29,13 +29,19 @@ const OPENING_HYPHENS = /(?<![\w-])(-+[^\s-]?)/g
  */
 export function Code({ children }: { children: string }) {
   const pieces = children.split(OPENING_HYPHENS)
-  /* Keyed by where each piece starts in the text, which is unique within it. */
+  /* Keyed by where each piece starts in the text, which is unique within it
+     once the empty pieces are dropped: a name that opens with its hyphens,
+     as `--color-ink` does, splits into an empty piece at 0 and the hyphens at
+     0, and the two keys of 0 were 26 React errors on the color page. */
   let offset = 0
   return (
     <helix-code>
       {pieces.map((piece, at) => {
         const key = offset
         offset += piece.length
+        if (piece === '') {
+          return null
+        }
         return at % 2 === 1 ? (
           <span key={key} style={{ whiteSpace: 'nowrap' }}>
             {piece}

@@ -4,8 +4,22 @@ import { html as htmlLanguage } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
 import { json } from '@codemirror/lang-json'
 import { indentUnit, StreamLanguage, syntaxHighlighting } from '@codemirror/language'
-import { Annotation, Compartment, EditorState, type Extension } from '@codemirror/state'
-import { EditorView, keymap, lineNumbers } from '@codemirror/view'
+import {
+  Annotation,
+  Compartment,
+  EditorState,
+  type Extension,
+  RangeSetBuilder,
+} from '@codemirror/state'
+import {
+  Decoration,
+  type DecorationSet,
+  EditorView,
+  keymap,
+  lineNumbers,
+  ViewPlugin,
+  type ViewUpdate,
+} from '@codemirror/view'
 import {
   type CaretDetail,
   HelixBeforeEditEvent,
@@ -46,6 +60,53 @@ export type EditorLanguage =
   | 'sh'
   | 'ts'
   | 'tsx'
+
+/**
+ * Each line's indent, as a style the sheet reads to hang the line's wrapped
+ * rows under its text.
+ *
+ * **Wrapped rows start past the line's own indent, two columns further in.**
+ * The editor wraps, and a wrapped row started at the gutter, level with the
+ * next line's first character, so a long attribute read as a line of its own.
+ * The width is the line's leading space plus two, in `ch` of the editor's
+ * monospace face, and the sheet pads every row by it and pulls the first row
+ * back. Only the lines on screen are decorated, rebuilt as they change.
+ */
+const hangingIndent = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet
+
+    constructor(view: EditorView) {
+      this.decorations = this.hang(view)
+    }
+
+    update(update: ViewUpdate): void {
+      if (update.docChanged || update.viewportChanged) {
+        this.decorations = this.hang(update.view)
+      }
+    }
+
+    hang(view: EditorView): DecorationSet {
+      const builder = new RangeSetBuilder<Decoration>()
+      const tab = view.state.tabSize
+      for (const { from, to } of view.visibleRanges) {
+        for (let at = from; at <= to; ) {
+          const line = view.state.doc.lineAt(at)
+          const lead = /^[ \t]*/.exec(line.text)?.[0] ?? ''
+          const columns = [...lead].reduce((sum, char) => sum + (char === '\t' ? tab : 1), 0)
+          builder.add(
+            line.from,
+            line.from,
+            Decoration.line({ attributes: { style: `--_sandbox-editor-hang: ${columns + 2}ch` } }),
+          )
+          at = line.to + 1
+        }
+      }
+      return builder.finish()
+    }
+  },
+  { decorations: (plugin) => plugin.decorations },
+)
 
 /** sh, through the same mode the highlighter runs, so a pane and a block agree. */
 const shellLanguage = StreamLanguage.define({ ...shellMode, tokenTable: shellTokens })
@@ -271,6 +332,7 @@ export class HelixSandboxEditor extends HelixElement {
           this.language$.of(this.grammar()),
           this.readOnly$.of(EditorState.readOnly.of(this.readOnly)),
           EditorView.lineWrapping,
+          hangingIndent,
           /**
            * The edit, announced before it lands, which is what `before` means.
            *

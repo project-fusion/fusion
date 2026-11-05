@@ -24,12 +24,21 @@
    outranks.
 
    A drawn box, so the character is centered by the grid where a text field
-   centered it itself, and the pointer is the text one a field shows. */
+   centered it itself, and the pointer is the text one a field shows.
+
+   **At least the target on a touch screen.** The boxes sit 8 pixels apart, so
+   a press box past one would take the press from the next: the box itself
+   grows, from 40 to 44. */
 [part~="cell"] {
+  --_pin-input-cell-size: var(
+    --pin-input-cell-size,
+    max(var(--helix-size-control), var(--helix-size-target))
+  );
+
   all: unset;
   align-items: center;
   background-color: var(--pin-input-cell-background-color, var(--helix-color-well));
-  block-size: var(--pin-input-cell-size, var(--helix-size-control));
+  block-size: var(--_pin-input-cell-size);
   border: var(--helix-border-thin) solid
     var(--pin-input-cell-border-color, var(--helix-color-border));
   border-radius: var(--pin-input-cell-radius, var(--helix-radii-sm));
@@ -45,7 +54,7 @@
   font-weight: var(--helix-weight-medium);
   /* The box gives up width in a narrow column, so the row stays inside it. */
   flex: 0 1 auto;
-  inline-size: var(--pin-input-cell-size, var(--helix-size-control));
+  inline-size: var(--_pin-input-cell-size);
   min-inline-size: 0;
   justify-content: center;
   text-align: center;

@@ -9,6 +9,13 @@
     "ng": "ng",
     "start": "ng serve"
   },
+  "browserslist": [
+    "chrome >= 123",
+    "edge >= 123",
+    "firefox >= 120",
+    "safari >= 17.5",
+    "ios_saf >= 17.5"
+  ],
   "dependencies": {
     "@angular/common": "^22.2.1",
     "@angular/compiler": "^22.2.1",

@@ -7,6 +7,7 @@ export function Example() {
         className="hero"
         interactive
         pattern="aurora"
+        terminus={0.9}
       >
         <helix-text as="h2">Ship the release on Friday</helix-text>
         <helix-button

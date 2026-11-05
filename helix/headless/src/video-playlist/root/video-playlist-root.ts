@@ -133,6 +133,7 @@ type Player = HTMLElement & {
  * @csspart player - The region that holds the player.
  *
  * @cssstate ended - The last entry finished and the playlist stopped there, until an entry plays again.
+ * @cssstate no-thumbnails - No entry has a thumbnail, from a `poster` or a slotted `media`, so the entries draw no thumbnail column.
  */
 @customElement('helix-headless-video-playlist')
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
@@ -771,6 +772,16 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       item.current = item === current
     }
     this.known = { current: current?.value, values: items.map((one) => one.value) }
+    /* Whether no entry draws a thumbnail, so a set with none draws no empty
+       column for them: the column is fixed so one thumbnail in a set still
+       lines the names up, and with none it was 5rem of nothing on every row.
+       Said of the set with none, so a page served before this runs keeps the
+       column a set with thumbnails needs. */
+    this.toggleState(
+      'no-thumbnails',
+      items.length > 0 &&
+        !items.some((one) => one.poster !== '' || one.querySelector(':scope > [slot="media"]')),
+    )
     this.placeStop(items)
     const player = this.player
     if (!player || !current) {

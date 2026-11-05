@@ -96,12 +96,19 @@
 :host(:not([separation])) [part="track"] {
   /* Concentric, which is the outer radius less everything between the two
      curves: the border and the padding. **The padding was left out**, so a 3
-     corner sat inside a 4 at a 5 inset, rounder than the curve around it. At the
-     default seed the answer is square, and at a seed of 16 it is 3. */
+     corner sat inside a 4 at a 5 inset, rounder than the curve around it.
+
+     **Never squarer than 2 pixels, or half the track's corner.** At the default
+     seed the subtraction comes to less than nothing, and a square thumb in a 4
+     pixel track read as a different shape from the track. The floor is 2
+     there, a square theme still draws a square thumb, and at a seed of 16 the
+     subtraction gives 3, past the floor. Two pixels, which the radii scale
+     cannot say: its first rung after none is the track's own. */
+  --_toggle-radius-floor: 2px;
   --_toggle-radius: var(
     --toggle-group-item-radius,
     max(
-      var(--helix-radii-none),
+      min(var(--toggle-group-radius, var(--helix-radii-sm)) * 0.5, var(--_toggle-radius-floor)),
       var(--toggle-group-radius, var(--helix-radii-sm)) -
       var(--helix-border-thin) -
       var(--helix-space-2xs)

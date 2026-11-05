@@ -18,6 +18,7 @@ export function Example() {
       >
         <helix-button-group
           label="Lightbox actions"
+          layout="spaced"
           slot="header"
         >
           <helix-icon-button

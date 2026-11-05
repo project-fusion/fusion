@@ -174,14 +174,17 @@ slot[name="end"]::slotted(*) {
    answers the same way: it is pressed to select or act, and had no wash at
    all. */
 @media (hover: hover) {
-  [part~="row"]:has([part="link"][href]):hover,
-  :host(:not([disabled])) [part~="row"][role="gridcell"]:hover {
+  [part~="row"]:not([part~="row-current"]):has([part="link"][href]):hover,
+  :host(:not([disabled], :state(selected))) [part~="row"][role="gridcell"]:hover {
     background-color: var(--list-item-hover-background-color, var(--helix-color-hover));
     border-radius: var(--helix-radii-sm);
   }
 }
 
-[part~="row"]:has([part="link"][href]):active,
+/* The link's press at the hover's weight, after it: at `[part~="row"]` alone
+   the hover outranked it and a pressed link showed the hover wash, 0.08 under
+   the pointer and under the press alike. */
+[part~="row"]:not([part~="row-current"]):has([part="link"][href]):active,
 :host(:not([disabled])) [part~="row"][role="gridcell"]:active {
   background-color: var(--helix-color-press);
   border-radius: var(--helix-radii-sm);
@@ -208,9 +211,16 @@ slot[name="end"]::slotted(*) {
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
-/* The row a reader is on, which `current` marks. */
+/* The row a reader is on, which `current` marks, and the rows chosen in a list
+   that selects, below: **one wash for anything chosen, `color-selected`, a step
+   past the hover's**, as Tree's selected row is. `current` took the 5% well,
+   1.06:1 under the 8% hover in light, and a selected row took
+   `primary-subtle`, rgb 238 with no brand against the hover's 235, 1.03:1
+   apart: the row under the pointer read as the chosen one. At 13% (16% in
+   dark) a chosen row stands 1.13:1 past a hovered one, and the hover above
+   leaves it alone. */
 [part~="row-current"] {
-  background-color: var(--list-item-current-background-color, var(--helix-color-well));
+  background-color: var(--list-item-current-background-color, var(--helix-color-selected));
   border-radius: var(--helix-radii-sm);
 }
 
@@ -223,13 +233,27 @@ slot[name="end"]::slotted(*) {
 }
 
 :host(:state(selected)) [part~="row"] {
-  background-color: var(--list-item-selected-background-color, var(--helix-color-primary-subtle));
+  background-color: var(--list-item-selected-background-color, var(--helix-color-selected));
   border-radius: var(--helix-radii-sm);
 }
 
 /* A press on a selected row still shows, after the selected fill it would
-   otherwise lose to. */
+   otherwise lose to. **And so does the pointer**: a chosen row, and the current
+   row of a list of links, take the press wash under it, three points past the
+   selected one. They answered with nothing, 0.14 under the pointer as at rest,
+   November 4, 2026. */
 :host(:state(selected):not([disabled])) [part~="row"][role="gridcell"]:active {
+  background-color: var(--helix-color-press);
+}
+
+@media (hover: hover) {
+  :host(:state(selected):not([disabled])) [part~="row"][role="gridcell"]:hover,
+  [part~="row-current"]:has([part="link"][href]):hover {
+    background-color: var(--helix-color-press);
+  }
+}
+
+[part~="row-current"]:has([part="link"][href]):active {
   background-color: var(--helix-color-press);
 }
 

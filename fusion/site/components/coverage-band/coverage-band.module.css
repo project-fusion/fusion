@@ -207,6 +207,16 @@
   vertical-align: middle;
 }
 
+/* **A row as tall as a target on a touch screen.** Each mark's button fills
+   its cell, and the cell is the row's text and two `space-xs`: measured at
+   390, 44 by 37. The row grows to `size-target` there and the mark stays
+   centered in it. */
+@media (pointer: coarse) {
+  .row {
+    block-size: var(--helix-size-target);
+  }
+}
+
 .row td:last-child {
   border-end-end-radius: var(--helix-radii-sm);
   border-start-end-radius: var(--helix-radii-sm);

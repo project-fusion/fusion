@@ -87,22 +87,22 @@ describe('nameStart', () => {
   const box = (start: number) => ({ bottom: 14, left: start - 2, right: start + 42, top: 0 })
 
   test('puts a name after its note where there is room', () => {
-    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400)).toBe(108)
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400)).toBe(112)
   })
 
   test('puts a name before its note where after it would run under the controls', () => {
     const controls = { bottom: 40, left: 120, right: 160, top: 0 }
-    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [controls], 400)).toBe(52)
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [controls], 400)).toBe(48)
   })
 
   test('puts a name before its note where after it would run off the drawing', () => {
-    expect(overlay.nameStart({ radius: 4, x: 380 }, 40, box, [], 400)).toBe(332)
+    expect(overlay.nameStart({ radius: 4, x: 380 }, 40, box, [], 400)).toBe(328)
   })
 
   test('puts a name after its note in reading order, which is its left on a right-to-left page', () => {
-    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400, true)).toBe(52)
+    expect(overlay.nameStart({ radius: 4, x: 100 }, 40, box, [], 400, true)).toBe(48)
     /* And to its right where the left would run off the drawing. */
-    expect(overlay.nameStart({ radius: 4, x: 30 }, 40, box, [], 400, true)).toBe(38)
+    expect(overlay.nameStart({ radius: 4, x: 30 }, 40, box, [], 400, true)).toBe(42)
   })
 })
 

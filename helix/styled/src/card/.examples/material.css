@@ -4,9 +4,10 @@
    custom property a consumer sets on its own.
 
    All three materials, beside the same card opaque, because the comparison is
-   the point: `glass` is `blur(16px) saturate(1.5)` at 30% ground, `frosted` is
-   `blur(32px)` at 88%, and a page whose header is glass and whose cards are not
-   reads as two designs sharing a window.
+   the point: `glass` is `blur(16px) saturate(1.5)` over a 72% ground in
+   both modes, `frosted` is `blur(32px)` with no saturation over 88%, and a
+   page whose header is glass and whose cards are not reads as two designs
+   sharing a window.
 
    **The ground has to have detail at a scale the blur cannot erase, and that is
    arithmetic rather than taste.** A blur of radius r destroys detail finer than

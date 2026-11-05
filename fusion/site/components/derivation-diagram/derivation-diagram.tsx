@@ -546,15 +546,18 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
         </linearGradient>
       </defs>
 
-      <text className={styles.diagramLabel} fontSize="11" x="8" y="14">
+      {/* **Every word at 12 units.** The figure is drawn 340 wide and a phone
+          shows it about 342 wide, so a unit is about a pixel: at 10.5 and 11
+          the words stood under the 12px the page's own captions keep to. */}
+      <text className={styles.diagramLabel} fontSize="12" x="8" y="14">
         What you choose
       </text>
 
       {/* Four across, each icon over its word. The columns are 85 apart, which
-          is what `saturation` needs at 11 and the widest of the four. */}
+          is what `saturation` needs at 12 and the widest of the four. */}
       <g>
         <rect fill="var(--helix-color-accent)" height="24" rx="7" width="24" x="30" y="34" />
-        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="42" y="76">
+        <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="42" y="76">
           brand
         </text>
       </g>
@@ -568,7 +571,7 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
           x="115"
           y="40"
         />
-        <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="127" y="76">
+        <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="127" y="76">
           saturation
         </text>
       </g>
@@ -578,7 +581,7 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
         <line x1="200" x2="224" y1="46" y2="46" />
         <line x1="200" x2="224" y1="52" y2="52" />
       </g>
-      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="212" y="76">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="212" y="76">
         density
       </text>
 
@@ -588,7 +591,7 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
         stroke="var(--helix-color-foreground-muted)"
         strokeWidth="1.6"
       />
-      <text className={styles.diagramMeta} fontSize="11" textAnchor="middle" x="297" y="76">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="297" y="76">
         radius
       </text>
 
@@ -617,10 +620,10 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
       <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="57" y="288">
         {tokens}
       </text>
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="308">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="57" y="308">
         color
       </text>
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="57" y="322">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="57" y="324">
         tokens
       </text>
 
@@ -634,24 +637,24 @@ export const DerivationDiagramStacked = ({ pairs, tokens }: DerivationFacts) => 
         x="173"
         y="264"
       />
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="308">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="170" y="308">
         both
       </text>
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="170" y="322">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="170" y="324">
         schemes
       </text>
 
       <text className={styles.diagramFigure} fontSize="26" textAnchor="middle" x="283" y="288">
         {pairs}
       </text>
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="308">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="283" y="308">
         pairs
       </text>
-      <text className={styles.diagramMeta} fontSize="10.5" textAnchor="middle" x="283" y="322">
+      <text className={styles.diagramMeta} fontSize="12" textAnchor="middle" x="283" y="324">
         measured
       </text>
 
-      <text className={styles.diagramLabel} fontSize="11" textAnchor="end" x="332" y="360">
+      <text className={styles.diagramLabel} fontSize="12" textAnchor="end" x="332" y="360">
         What comes out
       </text>
     </svg>

@@ -218,9 +218,11 @@ describe('line chart', () => {
     const host = await chart(CHANNELS, 'for="channels"')
     const [first, second] = lines(host)
     const low = (one: Element | undefined): number => Math.max(...anchors(d(one)).map(([, y]) => y))
-    // The smaller series sits nearer the floor; on its own scale it would touch it.
+    /* The smaller series sits nearer the floor, the lowest reading of all at
+       84 of 100, clear of the floor as `headroom` lowers it; on its own scale
+       the first series' lowest would stand there too. */
     expect(low(second)).toBeGreaterThan(low(first))
-    expect(low(second)).toBe(100)
+    expect(low(second)).toBeCloseTo(84, 0)
   })
 
   test('the curve changes the path and nothing else about the reading', async () => {
@@ -572,16 +574,17 @@ describe('the value axis', () => {
   test("draws the scale's numbers beside the plot by default, at the levels the grid rules", async () => {
     const host = await chart(SESSIONS, 'for="sessions"')
     expect(part(host, 'axis')?.getAttribute('aria-hidden')).toBe('true')
-    /* 1,020 is the highest, and the top is raised to the next level, 1,030. */
-    expect(ticks(host)).toEqual(['980', '990', '1,000', '1,010', '1,020', '1,030'])
-    expect(rules(host)).toBe(6)
+    /* 1,020 is the highest, and the top is raised to the next level, 1,030;
+       980 is the lowest, and the floor is lowered to the next, 970. */
+    expect(ticks(host)).toEqual(['970', '980', '990', '1,000', '1,010', '1,020', '1,030'])
+    expect(rules(host)).toBe(7)
   })
 
   test('the highest reading stands clear of the top edge', async () => {
     const host = await chart(SESSIONS, 'for="sessions"')
     const ys = anchors(d(lines(host)[0])).map(([, y]) => y)
-    /* 1,020 of 980 to 1,030 is a fifth of the box below the top. */
-    expect(Math.min(...ys)).toBeCloseTo(20, 1)
+    /* 1,020 of 970 to 1,030 is a sixth of the box below the top. */
+    expect(Math.min(...ys)).toBeCloseTo(16.67, 1)
   })
 
   test('`none` draws no axis, and `gridlines="none"` no rules, so the line fills the box', async () => {

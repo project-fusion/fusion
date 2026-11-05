@@ -78,9 +78,20 @@
   --_screen: min((100cqi - var(--_beside, 0px)) / var(--_across), 100cqb / var(--_down));
   --_unit: calc(var(--_screen) * var(--_scale));
 
+  /* **A step lighter in dark**, where the body is a dark thing on a black page:
+     at 86% it measured 1.1:1 against the page and its rim 1.4, so a device
+     with nothing on its screen was a black shape on black. 80% and a 60% rim
+     put the body a rung off the page and the rim at 2.3:1. */
   background-color: var(
     --device-screen-bezel-color,
-    color-mix(in oklab, var(--helix-color-surface-media) 86%, var(--helix-color-foreground-media))
+    light-dark(
+      color-mix(
+        in oklab,
+        var(--helix-color-surface-media) 86%,
+        var(--helix-color-foreground-media)
+      ),
+      color-mix(in oklab, var(--helix-color-surface-media) 80%, var(--helix-color-foreground-media))
+    )
   );
   block-size: calc(var(--_screen) * var(--_down));
   border-radius: calc(
@@ -94,7 +105,14 @@
      against a dark page. An outline, so it takes none of the room the screen
      is measured in. */
   outline: var(--helix-border-thin) solid
-    color-mix(in oklab, var(--helix-color-surface-media) 72%, var(--helix-color-foreground-media));
+    light-dark(
+      color-mix(
+        in oklab,
+        var(--helix-color-surface-media) 72%,
+        var(--helix-color-foreground-media)
+      ),
+      color-mix(in oklab, var(--helix-color-surface-media) 60%, var(--helix-color-foreground-media))
+    );
   outline-offset: calc(var(--helix-border-thin) * -1);
   padding: calc(var(--_unit) * var(--_block)) calc(var(--_unit) * var(--_inline));
   position: relative;
@@ -301,7 +319,10 @@
   gap: var(--helix-space-2xs);
   grid-area: controls;
   justify-content: center;
-  padding: var(--helix-space-xs);
+  /* Above and below only, for the raised buttons' shadow. A centered row needs
+     no inset at its ends, and one there wrapped a tablet's four buttons three
+     and one in a 181 pixel column the four fit in. */
+  padding: var(--helix-space-xs) var(--helix-space-none);
 }
 
 /* **A column stays one column**, which is the width the device leaves it, and

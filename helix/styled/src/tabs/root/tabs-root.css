@@ -5,6 +5,7 @@
   --_tab-radius: var(--helix-radii-sm);
   --_tab-selected-shadow: var(--helix-shadow-sm);
   --_tab-selected-surface: var(--helix-color-surface-raised);
+  --_tab-hover-surface: var(--helix-color-hover);
 
   display: grid;
   /* The tab strip takes what it needs, the panels take the rest. `minmax(0,
@@ -104,7 +105,8 @@
   justify-content: center;
   padding-inline: var(--helix-space-2xs);
   position: sticky;
-  z-index: 1;
+  /* Over the tabs it scrolls past, which stack at `layer-raised`. */
+  z-index: var(--helix-layer-sticky);
 }
 
 [part="scroll-start"] {
@@ -289,6 +291,14 @@ slot[name="scroll-end-icon"]::slotted(*) {
 :host(:not([marker])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
+  /* **A hovered tab stays darker than the pill in dark.** The 12% hover wash
+     over black is #1f1f1f and the pill is `overlay`, #181818, so the tab under
+     the pointer read as the chosen one. 8%, the strength a dark menu row takes,
+     is #141414, under the pill. */
+  --_tab-hover-surface: light-dark(
+    var(--helix-color-hover),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
 }
 
 /* Vertical: the tabs in a column at the inline start, the panels beside them. */

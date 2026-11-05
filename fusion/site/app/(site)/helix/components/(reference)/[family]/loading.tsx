@@ -73,8 +73,8 @@ export default function Loading() {
           <div className={loading.railHead}>
             <div className={loading.railHeadText} data-skeleton="text" />
           </div>
-          {/* Usage, Preview, API Reference and Examples, which every family
-              has, and the element under API Reference that most have one of. */}
+          {/* Usage, Preview, API reference and Examples, which every family
+              has, and the element under API reference that most have one of. */}
           <div className={loading.rail}>
             {[0, 1, 2, 3, 4].map((entry) => (
               <div className={loading.railRow} key={entry}>

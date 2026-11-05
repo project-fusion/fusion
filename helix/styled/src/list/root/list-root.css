@@ -155,11 +155,13 @@
 
 /* The row after the last while more are fetched, quiet in the same way, with
    the turning ring every collection draws before "Loading" (from the shared
-   collection sheet). */
+   collection sheet). The empty row's inset, so a list that loads and then
+   comes back empty keeps its height: at `sm` the loading row was 44 and the
+   empty row 52, an 8 pixel jump, where Table draws both at 52. */
 [part="loading"] {
   color: var(--list-loading-color, var(--helix-color-foreground-muted));
   font-size: var(--helix-text-sm);
-  padding: var(--list-loading-padding, var(--helix-space-sm));
+  padding: var(--list-loading-padding, var(--helix-space-md));
   text-align: center;
 }
 

@@ -332,22 +332,36 @@ slot[name="label"]::slotted(*) {
  * are the other axis and this must not borrow from them. Written against
  * `--_meter-hue`, so one pair of rules quietens all four colors in all three
  * shapes.
+ *
+ * **In dark, 65% of the hue, so the fill clears 3:1 against its track.** At
+ * 30% the four hues measured 1.52 to 2.05 against the `#121212` track, a fill
+ * that read as part of it. At 65% they measure 3.09 for danger, the lowest, to
+ * 5.94 for the primary ink, against 6.00 to 14.33 at full strength (November 4,
+ * 2026).
+ *
+ * **In light, 72%, for the same 3:1.** At 30% the tones measured 1.54 to 1.56
+ * against the `#ebebeb` track; at 72% they measure 3.14 for warning, the lowest,
+ * to 3.20, and the primary ink 7.32, against 5.37 to 14.89 at full strength.
  */
 :host([emphasis="subtle"]) [part~="indicator"] {
-  background-color: color-mix(
-    in oklab,
-    var(--_meter-hue) 30%,
-    var(--meter-track-color, var(--helix-color-surface-sunken))
+  --_meter-subtle: light-dark(
+    color-mix(
+      in oklab,
+      var(--_meter-hue) 72%,
+      var(--meter-track-color, var(--helix-color-surface-sunken))
+    ),
+    color-mix(
+      in oklab,
+      var(--_meter-hue) 65%,
+      var(--meter-track-color, var(--helix-color-surface-sunken))
+    )
   );
+  background-color: var(--_meter-subtle);
 }
 
 :host([emphasis="subtle"][shape="arc"]) [part~="indicator"],
 :host([emphasis="subtle"][shape="ring"]) [part~="indicator"] {
-  stroke: color-mix(
-    in oklab,
-    var(--_meter-hue) 30%,
-    var(--meter-track-color, var(--helix-color-surface-sunken))
-  );
+  stroke: var(--_meter-subtle);
 }
 
 /* Forced colors paint every background the page's Canvas color, so the track

@@ -361,8 +361,15 @@ void main() {
  *
  * On a dark page the light is screened onto the ground, so it saturates to
  * the peak rather than clipping. On a light page added light is invisible, so
- * the same energy darkens the ground toward the peak as ink. A step of noise
- * under a code value hides the banding a slow gradient shows on eight bits.
+ * the same energy darkens the ground as ink. A step of noise under a code value
+ * hides the banding a slow gradient shows on eight bits.
+ *
+ * **On a light page the ink keeps the strands' hue.** It is the light's own
+ * color, brought to the glow's level by `uShade`, and it reaches the peak only
+ * in the hottest strands, by the square of the ink. The ink once ran straight
+ * from the ground to the peak, which drew a success glow and an info tint as
+ * the same gray as the ink theme: no pixel carried chroma above 12 of 255,
+ * where dark mode drew them green and blue.
  *
  * **Clear, the light is drawn without the ground**, premultiplied, so the
  * canvas composites over whatever is behind it. On a dark page it is the light
@@ -379,6 +386,7 @@ uniform sampler2D uFar;
 uniform vec3 uGround;
 uniform vec3 uInk;
 uniform float uLight;
+uniform float uShade;
 uniform float uClear;
 uniform float uGain;
 uniform float uBloom;
@@ -390,13 +398,15 @@ void main() {
   vec3 dark = 1.0 - (1.0 - uGround) * exp(-e);
   float lum = dot(e, vec3(0.3, 0.55, 0.15));
   float ink = 1.0 - exp(-lum * 2.4);
-  vec3 light = mix(uGround, uInk, ink);
+  vec3 hue = e / max(max(max(e.r, e.g), e.b), 1e-4);
+  vec3 pen = mix(hue * uShade, uInk, ink * ink);
+  vec3 light = mix(uGround, pen, ink);
   vec3 c = mix(dark, light, uLight);
   float a = 1.0;
   if (uClear > 0.5) {
     vec3 shine = 1.0 - exp(-e);
     a = mix(max(max(shine.r, shine.g), shine.b), ink, uLight);
-    c = mix(shine, uInk * ink, uLight);
+    c = mix(shine, pen * ink, uLight);
   }
   c = clamp(c + (hash(gl_FragCoord.xy) - 0.5) / 255.0 * a, 0.0, a);
   outColor = vec4(c, a);

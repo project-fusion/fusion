@@ -90,11 +90,15 @@ describe('meter', () => {
   test('subtle is a wash of whichever color the band chose', () => {
     // Written against the one variable, so a single rule quiets all four
     // colors, and the bands keep saying what they mean.
+    // 72% in light and 65% in dark, so the fill clears 3:1 on its track in both.
     expect(rule(':host([emphasis="subtle"]) [part~="indicator"]')).toContain(
-      'var(--_meter-hue) 30%',
+      'var(--_meter-hue) 72%',
+    )
+    expect(rule(':host([emphasis="subtle"]) [part~="indicator"]')).toContain(
+      'var(--_meter-hue) 65%',
     )
     expect(rule(':host([emphasis="subtle"][shape="ring"]) [part~="indicator"]')).toContain(
-      'var(--_meter-hue) 30%',
+      'var(--_meter-subtle)',
     )
   })
 

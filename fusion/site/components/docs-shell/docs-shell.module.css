@@ -35,14 +35,36 @@
   }
 }
 
+/* **Below 64rem the tree folds under a button at the top of the column**, and
+   the button opens it in place. Hidden outright, as it was, a docs page on a
+   phone had no link to its siblings. The column's row gap comes down to
+   `space-lg` so the button sits over the page it opens on rather than 48px
+   above it. */
 @media (width < 64rem) {
   .docsShell {
     grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--helix-space-lg);
   }
 
-  .docsNav {
+  .docsNavTree:not([data-shown]) {
     display: none;
   }
+
+  .docsNavTree {
+    margin-block-start: var(--helix-space-sm);
+  }
+}
+
+/* Past the button recipe's own `display`, which a full-width button sets
+   from two attributes and which outweighed the class alone at 1440. */
+@media (width >= 64rem) {
+  .docsNav .docsNavToggle[data-button] {
+    display: none;
+  }
+}
+
+.docsNavToggle {
+  justify-content: space-between;
 }
 
 /* Anything the rail can send a reader to clears the masthead. **A descendant
@@ -71,6 +93,23 @@
   min-inline-size: 0;
 }
 
+/* **A page with no outline takes the outline's column too.** The guides index
+   has no rail, and measured at 1440 it left 348 pixels empty at the right, the
+   column the rail stands in on every page it links to. Spanning it, the rows
+   run three across. Its standfirst keeps its own measure.
+
+   **Starting where a page's column starts.** A page's 80ch is centered in the
+   middle track, 12 pixels in at 1440, so the start margin is half of what the
+   track has beyond the measure: the area less the rail and its gap, less 80ch. */
+@media (width >= 90rem) {
+  .docsMainWide {
+    grid-column: 2 / -1;
+    inline-size: auto;
+    margin-inline: max(0px, calc((100% - var(--docs-rail) - var(--helix-space-2xl) - 80ch) / 2)) 0;
+    max-inline-size: none;
+  }
+}
+
 /* One tier at a time, chosen in preferences and applied here. */
 :root:not([data-api-tier="headless"]) .docsShell [data-tier="headless"] {
   display: none;
@@ -91,6 +130,17 @@
   max-block-size: calc(100vh - var(--docs-top) - var(--helix-space-lg));
   overflow-y: auto;
   position: sticky;
+}
+
+/* In the column's flow below 64rem, where the tree opens in place: after the
+   rule above, since it says the same things. Left sticky, the button stood at
+   the top of the window over the page as it scrolled. */
+@media (width < 64rem) {
+  .docsNav {
+    max-block-size: none;
+    overflow-y: visible;
+    position: static;
+  }
 }
 
 /* **The scrollbar `helix-scroll-area` draws**, thin with a thumb in the

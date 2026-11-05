@@ -12,11 +12,13 @@ import {
   HelixElement,
   hostAria,
   internalsOf,
+  keepAbove,
   keyClaimed,
   keyNames,
   matchesChord,
   numberConverter,
   onApple,
+  type Raised,
   registerShortcut,
   scrollHolders,
   words,
@@ -76,10 +78,11 @@ import { joinSaid, messageWords } from '../words.js'
  *
  * **The stack is in the top layer.** The `region` part is a `popover="manual"`
  * shown while a message is showing, and shown again above a modal dialog that
- * opened after it. Position the `region` part, which is the box in the top
- * layer. While a modal `Dialog`, `Drawer` or `Lightbox` is open, the browser
- * makes everything outside it inert, the stack included, so a message stays
- * visible and its actions cannot be pressed. Where the browser has
+ * opened after it, and above a modal `Dialog`, `Drawer` or `Lightbox` that
+ * opened while it showed. Position the `region` part, which is the box in the
+ * top layer. While a modal is open, the browser makes everything outside it
+ * inert, the stack included, so a message stays visible and its actions cannot
+ * be pressed, and a press on a message does not close the modal under it. Where the browser has
  * `ariaNotify`, a message that arrives then is announced through it. For a
  * message with an action, render a second region inside the dialog.
  *
@@ -826,6 +829,7 @@ export class HelixHeadlessToast extends HelixElement {
     document.addEventListener('keydown', this.handleHotkey)
     document.addEventListener('keydown', this.handleUndo)
     window.addEventListener('pagehide', this.handlePageHide)
+    this.lower = keepAbove(this.raised)
     this.unregister = registerShortcut({
       keys: () => this.hotkey,
       label: () => this.hotkeyLabel,
@@ -854,9 +858,34 @@ export class HelixHeadlessToast extends HelixElement {
   /** Takes the hotkey off the page's list of shortcuts. */
   private unregister: (() => void) | undefined
 
+  /** Stops keeping the stack above the modal surfaces opened after it. */
+  private lower: (() => void) | undefined
+
+  /**
+   * The stack as a box kept above every modal surface. A modal opened while a
+   * message showed covered the stack with its backdrop until the next message
+   * arrived, measured in Dialog and in Drawer, so the modal raises it again
+   * once it has opened, and steps over a press that lands on a message.
+   */
+  private readonly raised: Raised = {
+    covers: (x, y) =>
+      this.showing.some((one) => {
+        const box = one.getBoundingClientRect()
+        return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom
+      }),
+    raise: () => {
+      const region = this.region
+      if (region && popoverOpen(region) && this.showing.length > 0) {
+        region.hidePopover()
+        region.showPopover()
+      }
+    },
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unregister?.()
+    this.lower?.()
     this.keepAll()
     document.removeEventListener('keydown', this.handleUndo)
     window.removeEventListener('pagehide', this.handlePageHide)

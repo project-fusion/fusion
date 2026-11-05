@@ -5,8 +5,13 @@
   align-items: center;
   column-gap: var(--helix-space-lg);
   display: grid;
-  grid-template-columns: auto auto auto;
+  /* The two lines give up width in a narrow column, down from 9em each, so
+     the grid stays inside it: at 9em it ran 37 pixels past a 280 pixel column. */
+  grid-template-columns: auto repeat(2, minmax(0, 9em));
   justify-content: start;
+  /* Room at the end for the dot on each line's last reading, which is centered
+     on the end of the line: it hung 2.5 pixels past a 280 page. */
+  padding-inline-end: var(--helix-space-2xs);
   row-gap: var(--helix-space-xs);
 }
 
@@ -27,7 +32,7 @@
 
 helix-sparkline {
   --sparkline-block-size: 1.8em;
-  --sparkline-inline-size: 9em;
+  --sparkline-inline-size: 100%;
 }
 
 .series-1 {

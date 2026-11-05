@@ -59,8 +59,14 @@ A size on each control describes the **region**, one element at a time, and
 that is how a row ends up with one control at the wrong height. When you set the
 density once on the region, you cannot write a row of mismatched heights.
 
-`Dialog` keeps a `size` by the same test. Two dialogs never sit together. One is
-on screen at a time, in the top layer, so the dialog is itself the region.
+Three regions take a `size` by the same test:
+
+- `Toolbar` sets the density of every control in it. Unset, its controls are
+  `sm`, since a toolbar is dense.
+- `Button Group` sets the density of every button in it. Unset, its buttons
+  take the density of the region around the group.
+- `Dialog` sets its own width. Two dialogs never sit together. One is on screen
+  at a time, in the top layer, so the dialog is itself the region.
 
 This also helps when you or a model generate code. There is no size to get wrong
 on each element, and you make one choice for each region.
@@ -71,10 +77,10 @@ Put `data-density` on any container, with a value of `sm`, `md`, or `lg`. `md`
 is the default, so you never write it.
 
 ```html
-<helix-toolbar>
+<helix-toolbar label="Build">
   <!-- Nothing here needs a size. The toolbar is already dense. -->
   <helix-button>Run</helix-button>
-  <helix-select label="Target"><!-- … --></helix-select>
+  <helix-select aria-label="Target"><!-- … --></helix-select>
 </helix-toolbar>
 ```
 
@@ -101,18 +107,27 @@ unsuffixed tokens hold the current step, and `data-density` changes them.
 ## A step either side
 
 `-tight` and `-loose` are a step either side of the current one: 0.8 and 1.2
-times the unsuffixed token. They move with the region's density. Three sizes
-have the pair:
+times the unsuffixed token, rounded to a whole pixel. An icon rounds to an even
+pixel, so its steps land between 0.75 and 0.83 times the icon and between 1.17
+and 1.25 times it. They move with the region's density. Three sizes have the
+pair:
 
 - `--helix-size-control-tight` and `--helix-size-control-loose`
 - `--helix-size-icon-tight` and `--helix-size-icon-loose`
 - `--helix-size-checkbox-tight` and `--helix-size-checkbox-loose`
 
+| Density | Control | Tight | Loose | Icon | Tight | Loose |
+| --- | --- | --- | --- | --- | --- | --- |
+| `sm` | 32px | 26px | 38px | 16px | 12px | 20px |
+| `md` | 40px | 32px | 48px | 20px | 16px | 24px |
+| `lg` | 48px | 38px | 58px | 24px | 20px | 28px |
+
 Use a `-tight` or `-loose` step for something that is meant to differ from its
 neighbors, such as a row in a floating panel or a caret inside a trigger. Use
 `-sm`, `-md`, or `-lg` for a size that does not follow density.
 
-Two sizes are fixed and do not follow density:
+Two sizes do not follow a region's density. Like every size, they still scale
+with `--helix-seed-density`:
 
 - `--helix-size-button` is 200px, a standard width for a button. Set it as a
   button's `--button-inline-size`.
@@ -155,5 +170,7 @@ height on each instance.
 Helix supports a column down to 280px. Every family's examples fit at that width
 with no sideways scroll. Below it, a control may overflow or a figure may wrap.
 
-A `Stat` keeps its size in any column, because its figure is the reading. Give
-each `Stat` a column of about 6rem or wider, so its digits stay on one line.
+A `Stat` figure that does not fit its column steps down the type scale twice,
+from `3xl` to `2xl` to `xl`. If it still does not fit, it breaks after a group
+separator, such as the comma in "1,284,567". Give each `Stat` a column of about
+6rem or wider, so its digits stay on one line.

@@ -144,10 +144,12 @@
 }
 
 /* Rows sit against each other, so a box reaching past a row would take the press
-   from the row beside it. On a touch screen the row itself reaches the target. */
+   from the row beside it. On a touch screen the row itself reaches the target,
+   and keeps its density's height where that is taller: the target alone took
+   an `lg` row from 48 down to 45 on a phone. */
 @media (pointer: coarse) {
   [part="trigger"] {
-    min-block-size: var(--helix-size-target);
+    min-block-size: max(var(--helix-size-control), var(--helix-size-target));
   }
 }
 

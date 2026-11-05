@@ -16,10 +16,9 @@ import { styles } from './toast-item.css.js'
  * @status stable
  * @documentation https://fusion.dev/helix/components/toast
  *
- * @cssproperty --toast-background-color - The panel's color. Follows `--helix-color-surface-overlay`.
- * @cssproperty --toast-border-color - Color of the panel's edge.
- * @cssproperty --toast-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
+ * @cssproperty --toast-background-color - The panel's color. The inverse ground Tooltip draws, #f5f5f5 over a dark page and #121212 over a light one.
+ * @cssproperty --toast-border-color - Color of the panel's edge, once `--toast-border-width` gives it one.
+ * @cssproperty --toast-border-width - Width of the panel's edge. `0`, the opposite mode setting the panel apart from the page.
  * @cssproperty --toast-color - Color of the message's text.
  * @cssproperty --toast-description-color - Color of the line in the `description` slot, under the heading.
  * @cssproperty --toast-dismiss-color - Color of the dismiss control's mark at rest.

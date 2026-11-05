@@ -462,7 +462,11 @@ helix-drawer[material="glass"] {
   white-space: nowrap;
 }
 
+/* The glyph is an Icon Button's, the field glyph of the region and never under
+   `size-icon-sm`, so a link between two of them draws the same mark. */
 [data-icon-link] {
+  --icon-size: max(var(--helix-size-icon-tight), var(--helix-size-icon-sm));
+
   align-items: center;
   block-size: var(--helix-size-control-sm);
   border-radius: var(--helix-radii-sm);
@@ -623,6 +627,13 @@ helix-sandbox [slot="panel"]::part(tabs) {
   background-color: var(--helix-color-background);
   block-size: var(--helix-size-control-lg);
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  /* **No margin either, on a touch screen too.** Tabs gives its strip `xs` of
+     padding there and takes it back with a negative margin, so a tab's press
+     box has room inside the scroll container. With the padding stated away
+     here the margin stayed, the panels rose 8px over the strip's end, and
+     they took the bottom of every tab's press: 42 of 44 at 390 in the
+     sandbox and the theme builder. A 48px strip holds the 44px box as it is. */
+  margin-block: var(--helix-space-none);
   padding-block: var(--helix-space-none);
   padding-inline: var(--helix-space-md);
 }

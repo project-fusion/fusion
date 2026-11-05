@@ -25,17 +25,6 @@
   inline-size: 100%;
 }
 
-/* With nothing to draw, the plot keeps the ring's box, so the empty and
-   loading words stand where the ring will be and the page does not move when
-   the readings arrive. */
-[part="plot"]:not(:has(svg)) {
-  aspect-ratio: 1;
-}
-
-:host([sweep="half"]) [part="plot"]:not(:has(svg)) {
-  aspect-ratio: 2;
-}
-
 /* Square, and it stays square. */
 [part="plot"] svg {
   aspect-ratio: 1;
@@ -255,12 +244,24 @@
 
 /* *Emphasis takes three values.** A slice is a stroke on a ring and the edge is*
    the mark, with nothing within it to fade, which reads at first as `outlined`
-   requiring slices to be filled paths instead of arcs. */
+   requiring slices to be filled paths instead of arcs.
+
+   **In dark, 60% of the series, so a slice clears 3:1 on the page.** At 30%
+   the eight dark series measured about 1.5 on black. At 60% they measure 3.26
+   to 4.31, against 7.36 to 10.98 at full strength (November 4, 2026). Light
+   keeps 30%. */
 :host([emphasis="subtle"]) [part~="segment"] {
-  stroke: color-mix(
-    in oklab,
-    var(--chart-series) 30%,
-    var(--donut-chart-track-color, var(--helix-color-surface-sunken))
+  stroke: light-dark(
+    color-mix(
+      in oklab,
+      var(--chart-series) 30%,
+      var(--donut-chart-track-color, var(--helix-color-surface-sunken))
+    ),
+    color-mix(
+      in oklab,
+      var(--chart-series) 60%,
+      var(--donut-chart-track-color, var(--helix-color-surface-sunken))
+    )
   );
 }
 
@@ -323,7 +324,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--donut-chart-slice-label-font-size, var(--helix-text-xs));
   font-variant-numeric: tabular-nums;
-  line-height: 1.4;
+  line-height: var(--helix-leading-snug);
   padding: 0 var(--helix-space-2xs);
   pointer-events: none;
   position: absolute;

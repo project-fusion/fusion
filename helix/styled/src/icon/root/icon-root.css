@@ -63,12 +63,12 @@
 
 :host([animation="pulse"]) {
   animation: helix-icon-pulse var(--icon-animation-duration, calc(var(--helix-duration-turn) * 2))
-    ease-in-out infinite;
+    var(--helix-easing-cycle) infinite;
 }
 
 :host([animation="beat"]) {
   animation: helix-icon-beat var(--icon-animation-duration, calc(var(--helix-duration-turn) * 1.25))
-    ease-in-out infinite;
+    var(--helix-easing-cycle) infinite;
 }
 
 @keyframes helix-icon-spin {

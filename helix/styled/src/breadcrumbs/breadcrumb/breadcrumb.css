@@ -47,11 +47,18 @@
    a baseline to be set against: the box is as tall as the link's text line and
    centered with it, so the two baselines are one. */
 [part="separator"] {
-  /* An even size, 12, 14 and 14 beside words of 12, 13 and 14, so the
-     chevron's center lands on a whole pixel. At `1em` it was 13 at `md`. */
-  --_breadcrumb-separator: round(1em, 2px);
+  /* An even size, so the chevron's center lands on a whole pixel, and a step
+     at each density as the words beside it take one: 12, 14 and 16 beside
+     words of 12, 13 and 14. At `1em` it was 13 at `md`, and rounded to an
+     even em it was 14 at both `md` and `lg`. Seven tenths of the region's
+     icon step, which is what moves with the density. */
+  --_breadcrumb-separator: round(calc(var(--helix-size-icon) * 0.7), 2px);
   color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
   display: block;
+  /* The crumb's line rounded up to an even height, so the box centers on a whole
+     pixel in the row: the 13 pixel type at `md` set a 19.5 line, and the chevron
+     in it stood a quarter pixel off the grid. */
+  line-height: round(up, 1lh, 2px);
   user-select: none;
 }
 
@@ -64,7 +71,10 @@
   /* The lift takes half the box, so the center stays on the capitals. */
   block-size: var(--_breadcrumb-separator);
   inline-size: var(--_breadcrumb-separator);
-  vertical-align: calc(0.5cap - var(--_breadcrumb-separator) / 2);
+  /* Rounded to the pixel, so the chevron does not sit at a fraction above the
+     baseline: the cap height is a fraction of the type size, and the lift was
+     0.73, 0.63 and 0.52 of a pixel off the grid at the three densities. */
+  vertical-align: round(calc(0.5cap - var(--_breadcrumb-separator) / 2), 1px);
 }
 
 /* The slash takes the chevron's box, as wide and centered in it, so a trail
@@ -316,15 +326,19 @@ a[part="link"]:focus-visible {
    separator draws one, and a button drawn as a crumb's link is, as the fold of
    a trail drawn from `items` is. */
 [part="fold-separator"] {
+  /* The separator's own size and lift, so the two chevrons in one trail are one
+     mark. At `1em` the fold's was 13 at `md` beside the separator's 14. */
+  --_breadcrumb-separator: round(calc(var(--helix-size-icon) * 0.7), 2px);
   color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
   display: block;
+  line-height: round(up, 1lh, 2px);
   user-select: none;
 }
 
 [part="fold-separator"] svg {
-  block-size: 1em;
-  inline-size: 1em;
-  vertical-align: calc(0.5cap - 0.5em);
+  block-size: var(--_breadcrumb-separator);
+  inline-size: var(--_breadcrumb-separator);
+  vertical-align: round(calc(0.5cap - var(--_breadcrumb-separator) / 2), 1px);
 }
 
 [part="expand"] {

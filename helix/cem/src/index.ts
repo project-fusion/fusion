@@ -415,7 +415,7 @@ export {
   type Render,
   rendersOf,
 } from './catalog.js'
-export { displayName, familyOf, place, startCase, tierOf } from './naming.js'
+export { displayName, familyOf, place, sentenceCase, startCase, tierOf } from './naming.js'
 export type {
   Documented,
   HelixAttribute,

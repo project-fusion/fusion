@@ -74,7 +74,7 @@ export interface PlotColors {
   quiet: string
   /**
    * The ramp a height is shaded along, from `--spatial-surface-chart-low` to
-   * `--spatial-surface-chart-high`: a quiet tint of `primary-active` up to it whole.
+   * `--spatial-surface-chart-high`: 35% of `primary-strong` up to it whole.
    */
   ramp: { high: string; low: string }
 }
@@ -244,10 +244,12 @@ export const plotColorsFrom = (
         read(`var(--chart-series-${(at % SERIES) + 1}, var(--helix-color-primary))`) ?? ink,
       )
     }
-    const high = read('var(--spatial-surface-chart-high, var(--helix-color-primary-active))') ?? ink
+    /* The ramp the styled chart's own drawing takes, from 35% to the
+       primary held at a lightness of 0.33 or more. */
+    const high = read('var(--spatial-surface-chart-high, var(--helix-color-primary-strong))') ?? ink
     const low =
       read(
-        'var(--spatial-surface-chart-low, color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken)))',
+        'var(--spatial-surface-chart-low, color-mix(in oklab, var(--helix-color-primary-strong) 35%, var(--helix-color-surface-sunken)))',
       ) ?? ground
     const named: Record<string, string> = {}
     for (const [name, value] of Object.entries(extra)) {

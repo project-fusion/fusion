@@ -1,34 +1,36 @@
-<!-- @summary The list next to the player. -->
+<!-- @summary The list next to the player where there is room, and under it in a narrow column. -->
 <link
   href="styles.css"
   rel="stylesheet"
 >
 
-<helix-video-playlist
-  class="wide"
-  default-active="sintel"
-  label="Episodes"
->
-  <helix-video
-    extra-controls="previous next"
-    label="Episode player"
-    slot="player"
-  ></helix-video>
+<div class="room">
+  <helix-video-playlist
+    class="wide"
+    default-active="sintel"
+    label="Episodes"
+  >
+    <helix-video
+      extra-controls="previous next"
+      label="Episode player"
+      slot="player"
+    ></helix-video>
 
-  <helix-video-playlist-item
-    poster="/media/sintel-short.jpg"
-    src="https://mdn.github.io/shared-assets/videos/sintel-short.mp4"
-    value="sintel"
-  >
-    Sintel
-    <span slot="meta">2:00</span>
-  </helix-video-playlist-item>
-  <helix-video-playlist-item
-    poster="/media/tears-of-steel.jpg"
-    src="https://mdn.github.io/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4"
-    value="tears"
-  >
-    Tears of Steel
-    <span slot="meta">1:10</span>
-  </helix-video-playlist-item>
-</helix-video-playlist>
+    <helix-video-playlist-item
+      poster="/media/sintel-short.jpg"
+      src="https://mdn.github.io/shared-assets/videos/sintel-short.mp4"
+      value="sintel"
+    >
+      Sintel
+      <span slot="meta">2:00</span>
+    </helix-video-playlist-item>
+    <helix-video-playlist-item
+      poster="/media/tears-of-steel.jpg"
+      src="https://mdn.github.io/shared-assets/videos/tears-of-steel-battle-clip-medium.mp4"
+      value="tears"
+    >
+      Tears of Steel
+      <span slot="meta">1:10</span>
+    </helix-video-playlist-item>
+  </helix-video-playlist>
+</div>

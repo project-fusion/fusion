@@ -15,6 +15,7 @@ import {
   MixinChartStatus,
   spokenReading,
   words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   html,
@@ -482,7 +483,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    */
   private renderFallback(field: SurfaceField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words),
+      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
     const depths = field.depths.length
     const boxed = field.cells.map((cell): BoxPoint | undefined =>

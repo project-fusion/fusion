@@ -12,7 +12,7 @@
   border: none;
   color: var(--helix-color-foreground);
   font-family: var(--helix-font-mono);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
   inline-size: 100%;
   line-height: var(--helix-leading-normal);
   min-block-size: var(--sandbox-source-min-block-size, 12rem);
@@ -161,13 +161,13 @@
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--sandbox-source-completions-shadow, var(--helix-shadow-floating));
   font-family: var(--helix-font-mono);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
   max-block-size: 12rem;
   min-inline-size: 8rem;
   overflow-y: auto;
   padding: var(--helix-space-2xs);
   position: absolute;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 [part~="completion"] {

@@ -202,13 +202,15 @@
 
 /* The grid is one tab stop and the arrow keys move it between the cells, so
    the cell itself shows where focus is. Inset, so a cell at the edge of the
-   scrolling box is not clipped. */
+   scrolling box is not clipped. **At the corner every focus ring here takes**,
+   `radii-sm`: square, it was the one ring in the library drawn without one. */
 [part~="cell"]:focus-visible,
 [part="more-cell"]:focus-visible,
 [part~="select"]:focus-visible,
 [part="select-all"]:focus-visible,
 [part="row-grip"]:focus-visible,
 [part="grip-head"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
@@ -298,15 +300,23 @@
 }
 
 /* `row-link` makes the row a target, so the row says so under a pointer. */
+
+/* `row-link` makes the row a target, so the pointer says so over it. */
 :host([row-link]) [part~="row"] > [part~="cell"] {
   cursor: pointer;
 }
 
-:host([row-link]) [part~="row"]:not([aria-selected="true"]):hover > * {
-  background-color: var(
-    --data-table-row-hover-background-color,
-    color-mix(in srgb, var(--helix-color-foreground) 4%, var(--helix-color-background))
-  );
+/* **Every row lights under the pointer**, which keeps a reader's place across
+   a wide row, as a data grid's rows do. Only a row with `row-link` did, so a
+   grid that selects and edits drew nothing under the pointer at all. At 4%,
+   under the selected wash, so a chosen row still reads as chosen. */
+@media (hover: hover) {
+  [part~="row"]:not([aria-selected="true"]):hover > * {
+    background-color: var(
+      --data-table-row-hover-background-color,
+      color-mix(in srgb, var(--helix-color-foreground) 4%, var(--helix-color-background))
+    );
+  }
 }
 
 /* **A chosen row is washed across every cell**, the checkbox's included, since
@@ -454,6 +464,14 @@
   padding-block: var(--helix-space-md);
   padding-inline: var(--helix-space-sm);
   text-align: center;
+}
+
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the words a step away from them. The words stay: with the slot in their
+   place, a page following the documented example showed a button and no
+   reason for it. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
 }
 
 /* A tree grid's row headers step in by their depth, and a row with nothing

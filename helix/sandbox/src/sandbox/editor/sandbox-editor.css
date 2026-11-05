@@ -36,6 +36,14 @@
   caret-color: var(--helix-color-primary);
 }
 
+/* A wrapped row hangs under its line's text, by the indent the editor writes
+   on each line. CodeMirror pads a line by 6 at its start, a step and a half of
+   `2xs`, which the first row keeps. */
+[part="editor"] .cm-line {
+  padding-inline-start: calc(var(--helix-space-2xs) * 1.5 + var(--_sandbox-editor-hang, 0ch));
+  text-indent: calc(-1 * var(--_sandbox-editor-hang, 0ch));
+}
+
 [part="editor"] .cm-cursor {
   border-left-color: var(--helix-color-primary);
 }

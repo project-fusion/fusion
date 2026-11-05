@@ -16,7 +16,28 @@
  * and explicit rather than guessed at from length: `ui`, `id` and `api` are
  * initialisms and `is`, `on` and `to` are not.
  */
-const INITIALISMS = new Set(['api', 'css', 'html', 'id', 'qr', 'ui', 'url'])
+const INITIALISMS = new Set([
+  '3d',
+  'ansi',
+  'api',
+  'css',
+  'html',
+  'id',
+  'iso',
+  'oklch',
+  'qr',
+  'ui',
+  'url',
+])
+
+/**
+ * Words a slug spells in lower case that are names, so they keep their capital
+ * in a sentence. The same reasoning as the initialisms: the slug has lost it.
+ */
+const NAMES = new Map([
+  ['android', 'Android'],
+  ['vercel', 'Vercel'],
+])
 
 /** `app-header` becomes `App Header`, and `qr-code` becomes `QR Code`. */
 export const startCase = (slug: string): string =>
@@ -26,6 +47,27 @@ export const startCase = (slug: string): string =>
     .map((word) =>
       INITIALISMS.has(word) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1),
     )
+    .join(' ')
+
+/**
+ * `chevron-at-the-start` becomes `Chevron at the start`, for a name that reads
+ * as a heading rather than as a product: an example's. Initialisms and names
+ * keep their capitals, so `oklch-swatches` becomes `OKLCH swatches`.
+ */
+export const sentenceCase = (slug: string): string =>
+  slug
+    .split('-')
+    .filter(Boolean)
+    .map((word, at) => {
+      if (INITIALISMS.has(word)) {
+        return word.toUpperCase()
+      }
+      const name = NAMES.get(word)
+      if (name) {
+        return name
+      }
+      return at === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word
+    })
     .join(' ')
 
 /** `helix-app-header` becomes `App Header`, `helix-headless-card` becomes `Card`. */

@@ -185,10 +185,30 @@ describe('a direction meant for Trend', () => {
    arrives through is the part. */
 describe('the value part', () => {
   test('is the slot the value arrives through, drawing no box of its own', async () => {
-    const stat = await mount('<helix-headless-stat>4,210</helix-headless-stat>')
+    const stat = await mount('<helix-headless-stat>98.2</helix-headless-stat>')
     const value = stat.shadowRoot?.querySelector('[part="value"]')
     expect(value?.tagName).toBe('SLOT')
-    expect((value as HTMLSlotElement).assignedNodes()[0]?.textContent).toBe('4,210')
+    expect((value as HTMLSlotElement).assignedNodes()[0]?.textContent).toBe('98.2')
+  })
+
+  /* A slotted figure broke between digits: "12,345,678" as "12,345,67" over
+     "8". Written by the stat, it breaks after a separator, as `value` does. */
+  test('is the figure the stat writes from slotted text, breaking after each group separator', async () => {
+    const stat = (await mount(
+      '<helix-headless-stat>12,345,678.9</helix-headless-stat>',
+    )) as Updatable
+    await stat.updateComplete
+    const value = stat.shadowRoot?.querySelector('[part="value"]') as HTMLElement
+    expect(value.tagName).toBe('SPAN')
+    expect(value.textContent).toBe('12,345,678.9')
+    expect(value.querySelectorAll('wbr').length).toBe(2)
+    const slot = stat.shadowRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+    expect(slot?.hidden).toBe(true)
+  })
+
+  test('stays the slot where the figure holds an element', async () => {
+    const stat = await mount('<helix-headless-stat><b>12,345</b></helix-headless-stat>')
+    expect(stat.shadowRoot?.querySelector('[part="value"]')?.tagName).toBe('SLOT')
   })
 })
 

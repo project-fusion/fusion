@@ -431,22 +431,37 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* **Read-only, and the thumb says so by sitting flat.** A read-only field
-   keeps its edge and loses its fill, flush with its ground. A slider draws no
-   edge and its fill is its value, so the thing that says "pick this up" is
-   what goes: the thumb's `shadow-md` lift, and the halo a press would add,
-   since the press is refused. The ring of the ground's color stays, and still
-   parts the thumb from the track and the fill, which keep their ink. Focus
-   keeps its outline. The thumb looked exactly like one that takes a drag.
-   Before the invalid rules, whose red ring still wins. */
+/* **Read-only: the value keeps its ink and the frame is drawn as a read-only
+   field's**, the one treatment every control takes. The fill is the value and
+   keeps its ink. The thumb is the handle, the frame a press takes hold of, so
+   it drops its fill to the ground and keeps only an edge, as a read-only field
+   drops its well: a ring that marks the value's end. **A wash of the
+   foreground at 3.1 to 3.4:1, not the field edge's 1.23**, by the owner's
+   decision of November 4, 2026: at 1.23 the dark thumb was a black disc on a
+   black page. Its lift goes, and the halo a press would add, since the
+   press is refused; the ring of the ground's color stays and still parts it
+   from the track. Focus keeps its outline. Only the lift went before, and a
+   read-only slider measured 0.00% of pixels from an editable one. Before the
+   invalid rules, whose red ring still wins. */
+:host([readonly]) {
+  --_slider-read-only-edge: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
+  );
+}
+
 :host([readonly]) [part="control"]::-webkit-slider-thumb {
-  box-shadow: 0 0 0 var(--helix-border-thick)
-    var(--slider-thumb-ring-color, var(--helix-color-background));
+  background-color: var(--slider-thumb-ring-color, var(--helix-color-background));
+  box-shadow:
+    inset 0 0 0 var(--helix-border-thick) var(--_slider-read-only-edge),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background));
 }
 
 :host([readonly]) [part="control"]::-moz-range-thumb {
-  box-shadow: 0 0 0 var(--helix-border-thick)
-    var(--slider-thumb-ring-color, var(--helix-color-background));
+  background-color: var(--slider-thumb-ring-color, var(--helix-color-background));
+  box-shadow:
+    inset 0 0 0 var(--helix-border-thick) var(--_slider-read-only-edge),
+    0 0 0 var(--helix-border-thick) var(--slider-thumb-ring-color, var(--helix-color-background));
 }
 
 /*

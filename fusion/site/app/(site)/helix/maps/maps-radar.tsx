@@ -6,6 +6,7 @@ import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/hel
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
 import { useEffect, useRef, useState } from 'react'
 import { MAP_FAILED, RADAR } from '@/content/maps/maps'
+import { useCoarsePointer } from '@/hooks/use-coarse-pointer/use-coarse-pointer'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
@@ -30,6 +31,8 @@ export function MapsRadar() {
   const container = useRef<HTMLDivElement>(null)
   /* Said in the map's footer, where a failed load would leave an empty box. */
   const [failed, setFailed] = useState(false)
+  /* One finger scrolls the page on a touch screen, as on the map above. */
+  const touch = useCoarsePointer()
   const [playing, setPlaying] = useState(false)
   /* **With less motion asked for, a step at a time.** The layer never plays
      for such a reader, and the button that said Pause over a still map was
@@ -111,6 +114,7 @@ export function MapsRadar() {
     <div className={styles.mapsDemo}>
       <helix-map
         class={styles.mapsDemoFrame}
+        gestures={touch ? 'cooperative' : undefined}
         label="Weather radar over the United States"
         ref={frame}
       >

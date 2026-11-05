@@ -156,6 +156,7 @@
 /* The words stay over the values they name, so the button goes before the
    chevrons, and the grip stays first. */
 :host([text-align="end"]) [part="grip"] {
+  margin-inline: var(--helix-space-none) var(--helix-space-2xs);
   order: -2;
 }
 
@@ -214,8 +215,25 @@
   cursor: grab;
   display: inline-flex;
   flex: none;
-  margin-inline-end: var(--helix-space-2xs);
+  /* **After the words**, so the words start on the edge the cells under them
+     start on. First, the grip and its gap put "File" 25 pixels past
+     "asset-001.webp" in every column that moves. An end-aligned heading keeps
+     it first, before its words, for the same reason. */
+  margin-inline: var(--helix-space-2xs) var(--helix-space-none);
+  order: 1;
   touch-action: none;
+}
+
+/* The sort button shrinks to its words where a grip follows them, so the grip
+   sits beside the chevrons. Grown, it pushed the grip to the heading's end,
+   against the next heading's grip. */
+[part="grip"] ~ [part="sort"] {
+  flex: 0 1 auto;
+}
+
+:host([text-align="center"]) [part="grip"] {
+  margin-inline: var(--helix-space-none) var(--helix-space-2xs);
+  order: -2;
 }
 
 [part="grip"]:active {

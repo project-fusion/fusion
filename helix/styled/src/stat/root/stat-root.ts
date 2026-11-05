@@ -17,7 +17,7 @@ import { styles } from './stat-root.css.js'
  * @aliases Metric, KPI, Figure
  * @documentation https://fusion.dev/helix/components/stat
  *
- * @csspart value - The slot the value is written in. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
+ * @csspart value - The slot the value is written in, or the figure the stat writes from `value` or from slotted text. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
  *
  * @cssproperty --stat-gap - Space between the label and the value, and between the value and the unit in a row.
  * @cssproperty --stat-label-color - Color of the label.

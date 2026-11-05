@@ -141,18 +141,17 @@ helix-app-header {
    strength only behind the card, which is below the words in one column and
    beside them in two. */
 /*
- * **On a light page the light is drawn bright on a tint.** By default an aura
- * ramps from the page up to `primary`, which in dark is light on black. In light
- * that ramp runs from white to a dark color, and with no brand it drew a gray
- * smoke behind the card: at 390 the muted stat labels sat on #cccccc at 3.7:1.
- * Turned around, it runs from a tint up to the page's own white, so the strands
- * read as light and a brand still colors them. The tint is `primary-subtle`
- * with 12% of `primary` in it: `primary-subtle` alone ran from #e8e8e8 to
- * white, 1.23:1, a haze that hardly showed. Now it runs from #d1d1d1, 1.53:1.
- * The stat labels sit on the glass card, whose ink rises over what shows
- * through, and measure 7.9:1 or more against the darkest pixel behind them, at
- * 390 and 1440, with no brand and with a violet or a yellow one. The second half
- * of each pair is the aura's own default, so dark is unchanged.
+ * **On a light page the light is a pale sheen on the page itself.** By default
+ * an aura ramps from the page up to `primary`, which in dark is light on black.
+ * In light that ramp runs from white to a dark color, and with no brand it drew
+ * a gray smoke behind the card: at 390 the muted stat labels sat on #cccccc at
+ * 3.7:1. Turned around, from a tint up to white, it laid a #d1d1d1 slab over
+ * the end of the hero that read as a smudge. Now the ground is the page, the
+ * strands are `primary-subtle`, and their cores take a third of `primary`, so
+ * only the strokes show: at 1440 the darkest is #bebebe, 1.86:1, on a thin
+ * line, and the strip beside the card stays white where the slab covered 93%
+ * of it. A brand colors the strokes. The second half of each pair is the
+ * aura's own default, so dark is unchanged.
  *
  * **Side by side, the light starts at 45% of the panel's width.** From 35%, the
  * dark plume reached the end of the lede's lines, and the lede measured 3.84:1
@@ -160,16 +159,16 @@ helix-app-header {
  * the light reaches full strength at 75%, behind the card.
  */
 .first-light {
-  --aura-ground: light-dark(
-    color-mix(in oklab, var(--helix-color-primary) 12%, var(--helix-color-primary-subtle)),
-    var(--helix-color-background)
-  );
-  --aura-glow: light-dark(var(--helix-color-background), var(--helix-color-primary));
+  --aura-ground: var(--helix-color-background);
+  --aura-glow: light-dark(var(--helix-color-primary-subtle), var(--helix-color-primary));
   --aura-haze: light-dark(
-    color-mix(in oklab, var(--helix-color-primary-subtle), var(--helix-color-background)),
+    color-mix(in oklab, var(--helix-color-primary-subtle) 50%, var(--helix-color-background)),
     var(--helix-color-primary-subtle)
   );
-  --aura-peak: light-dark(var(--helix-color-background), var(--helix-color-foreground));
+  --aura-peak: light-dark(
+    color-mix(in oklab, var(--helix-color-primary) 34%, var(--helix-color-primary-subtle)),
+    var(--helix-color-foreground)
+  );
 
   block-size: auto;
   inset: 0;
@@ -312,9 +311,17 @@ helix-app-header {
 
 /* The callout takes the column, which `start` above would otherwise size to its
    own words: a notice narrower than the paragraph under it reads as a stray. The
-   link beside it is meant to be its own width. */
+   link beside it is meant to be its own width.
+
+   **The notes' text size, and a step more room under it.** A callout draws at
+   the control size, 13px, which beside the notes' 14px read as a smaller voice
+   for the one fact that matters. And at the column's 12px gap the heading sat as
+   close to the callout as to its own paragraph, so it belonged to neither; 24px
+   above it and 12 below tie it to what it heads. */
 .notes > helix-callout {
+  --callout-font-size: var(--helix-text-md);
   inline-size: 100%;
+  margin-block-end: var(--helix-space-sm);
 }
 
 /*

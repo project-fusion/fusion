@@ -9,6 +9,30 @@ helix-dialog::part(surface) {
   padding: var(--helix-space-none);
 }
 
+/* **At the top on a phone.** The on-screen keyboard rises with the field, and
+   a fifth of the way down, measured on iOS at 390 by 844, the panel ran from
+   169 to 622: Safari panned the field out of view to make room and the last
+   rows sat under the keyboard's accessory bar. Pinned under the top edge, the
+   field stays where it is and the list is short enough to end above the
+   keyboard, which leaves about 460 of the 844.
+
+   The breakpoint is the one that makes `Dialog` a sheet. A sheet is anchored
+   to the bottom edge, which is where the keyboard is, so the palette keeps its
+   card and takes back what the sheet changed: all four corners, and no rise
+   from below, since a panel at the top would rise through its own field. It
+   fades in and out. */
+@media (width < 30rem) {
+  helix-dialog::part(surface) {
+    border-radius: var(--command-radius, var(--helix-radii-sm));
+    margin-block-start: calc(var(--helix-space-sm) + env(safe-area-inset-top, 0px));
+    translate: none;
+  }
+
+  helix-listbox::part(items) {
+    max-block-size: min(var(--command-list-size, 22rem), 40svh);
+  }
+}
+
 /* One text column down the whole panel. */
 :host {
   --option-padding: var(--helix-space-sm);

@@ -29,11 +29,12 @@ title: Motion
 | `--helix-easing-emphasized` | `cubic-bezier(0.3, 0, 0, 1.2)` |
 | `--helix-easing-decelerate` | `cubic-bezier(0, 0, 0, 1)` |
 | `--helix-easing-accelerate` | `cubic-bezier(0.3, 0, 1, 1)` |
+| `--helix-easing-cycle` | `cubic-bezier(0.42, 0, 0.58, 1)` |
 | `--helix-easing-spring` | `linear(0, 0.006, 0.025, 0.101, 0.539, 0.826, 0.976, 1.037, 1.043, 1.026, 1.006, 0.997, 1)` |
 
 [//]: # (/tokens)
 
-Helix has six durations and five curves. `instant`, `fast`, `normal`, and
+Helix has six durations and six curves. `instant`, `fast`, `normal`, and
 `slow` time a change that answers a hand. `turn` is one revolution of a
 spinner, and `crawl` is the same revolution while motion is reduced, so a busy
 ring still turns slowly.
@@ -43,6 +44,7 @@ Use each curve for one kind of movement:
 - `standard` for most movement
 - `decelerate` for something arriving
 - `accelerate` for something leaving
+- `cycle` for a loop that repeats, such as a pulse or a loading sweep
 - `emphasized` for a surface entering the screen, such as a Dialog or a
   Popover, and for a marker that travels to a new place, such as the indicator
   under the selected tab
@@ -87,8 +89,9 @@ ship without noticing.
 
 Some transitions show a relationship, such as a panel that slides out of the
 control that opened it. Others are decorative, such as a floating effect. With
-reduced motion, Helix removes decorative movement. It shortens transitions that
-show a relationship until they are close to instant, without an abrupt jump.
+reduced motion, Helix removes decorative movement. It sets every transition
+duration token to 0.01ms, so a panel appears in its final place at once. The
+transition still runs that long, so `transitionend` still fires.
 
 Anything that moves continuously without input stops completely:
 

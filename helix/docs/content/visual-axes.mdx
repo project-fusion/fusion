@@ -232,7 +232,7 @@ smeared, and a filter behind an opaque ground cannot be seen. With no
 | Value | What it draws |
 |---|---|
 | `glass` | A translucent ground and the backdrop filter that makes it read |
-| `frosted` | The same pair turned up, a heavier ground under a heavier blur. Every family draws `glass` at one coverage, a Dialog and a Drawer included, so `frosted` is heavier on all of them |
+| `frosted` | A heavier ground under a heavier blur with no added saturation: 88% of the ground under a 32px blur, against glass's 72% in light under 16px. Every family draws `glass` at one coverage, a Dialog and a Drawer included, so `frosted` is heavier on all of them |
 | `transparent` | Neither, so the page shows through structure and spacing |
 
 Use `frosted` for a surface that has to stay readable over a busy page. A theme

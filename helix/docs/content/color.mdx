@@ -35,13 +35,22 @@ choice people most often get wrong. See [Surfaces and
 separation](./surfaces-and-separation).
 
 A field is filled with `well`: 5% of `foreground` laid over whatever the field
-sits on, so its color depends on the surface under the field. A row under the
+sits on, so its color depends on the surface under the field. `surface-filled`
+is the same 5% wash, for a surface with `separation="filled"`, such as a filled
+Card or the ground of a spatial chart. A row under the
 pointer or the keyboard, such as an option, is lit with `hover` the same way:
 8% of `foreground` in light and 12% in dark.
 
-A Button washes with its own tone and leaves `hover` alone: 8% on a ghost Button
-under the pointer in light and 12% in dark, 12% on an outlined one, and 16% under
-a press. An Icon Button takes the same washes.
+A Button washes with its own tone and leaves `hover` alone. Each emphasis takes
+its own steps:
+
+| Emphasis | At rest | Under the pointer | Under a press |
+| --- | --- | --- | --- |
+| `ghost` | None | 8% in light, 12% in dark | 16% in light, 20% in dark |
+| `outlined` | None | 12% | 16% in light, 20% in dark |
+| `subtle` | 14% | 22% | 30% |
+
+An Icon Button takes the same washes.
 
 Three more washes are laid over a ground the same way:
 
@@ -73,6 +82,13 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
 - `foreground-subtle` recedes further. It is for marks that are not text, such
   as a separator, a chevron, or a grip. A disabled control fades whole, through
   `--helix-opacity-disabled`.
+- Three opacities fade ink by a fixed amount:
+  - `--helix-opacity-disabled` is 0.5, for a disabled control.
+  - `--helix-opacity-busy` is 0.5, for rows that stay on screen while a new set
+    loads.
+  - `--helix-opacity-quiet` is 0.72, for quiet text on a ground the text does
+    not know, where `foreground-muted` would be the page's gray. A chart
+    tooltip's names on the inverse bubble and a message still sending take it.
   It is a fixed step of the gray ramp, and the engine does not solve it, so its
   contrast is not guaranteed. Use `foreground-muted` for text that is read.
 - Text on a filled color takes the ink named for that fill:
@@ -84,6 +100,9 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
 
 - `border` is the hairline edge of a card, a field, a divider, or a segmented
   control's groove.
+- `border-floating` is the edge of a surface that floats over content, such as a
+  menu or a popover. It is `border` in light mode and 10% of white in dark mode,
+  so the edge still shows where a shadow cannot.
 - `border-hover` is the edge of a field under the pointer. It is the brand color
   when one is set, and a gray at about 3:1 on the white page when none is.
 - `focus-ring` is the color of the focus ring. It is `primary`, held at a
@@ -104,6 +123,12 @@ Intent colors show what something means.
   `-surface` variant, the filled ground that carries `foreground-on-status`,
   such as a danger button or a badge in a status tone, with the same
   `-surface-hover` and `-surface-active` variants.
+- `primary-strong` is the far end of a ramp drawn in the brand color, such as
+  the busiest cell of a heatmap. It is `primary-active` held at a lightness of
+  0.33 or more, so the top of the ramp never reads as black.
+- `neutral-subtle` is a quiet gray for a mark that stands on the page, such as
+  an Avatar with no picture or a neutral Badge. It is 10% of `foreground` over
+  the page and opaque, so one avatar can overlap the next.
 - `neutral-surface-hover` and `neutral-surface-active` are a neutral fill under
   the pointer and under a press. The neutral fill is `foreground`, which has
   nothing past it, so both move toward the page, and the press moves further.
@@ -126,6 +151,11 @@ Intent colors show what something means.
 are `success` and `danger` unless you set them. Mainland China, Taiwan, and
 Japan draw a rise in red, so a page for one of those markets swaps the two. See
 [Rise and fall colors](./localization#rise-and-fall-colors).
+
+### Maps
+
+`contour` colors the contour lines of a map, a brown taken 45% of the way toward
+`foreground`, so the lines read on a light map and on a dark one.
 
 ### Series
 

@@ -15,6 +15,7 @@ import {
   MixinChartStatus,
   spokenReading,
   words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   html,
@@ -442,7 +443,7 @@ export class HelixHeadlessSpatialRibbonChart extends MixinChartStatus(
    */
   private renderFallback(field: RibbonField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words),
+      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
     const ribbons = ribbonsDrawn(field, view.projection).sort(
       (one, other) => one.depth - other.depth,

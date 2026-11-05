@@ -12,7 +12,7 @@ const rows = Array.from({ length: 2000 }, (_, index) => ({
 
 /* The same stylesheet as the HTML example's `<style>` block. It is set with
    `dangerouslySetInnerHTML` because JSX reads the braces in CSS as expressions. */
-const SHEET = `\n  .virtualRow {\n    align-content: center;\n    align-items: baseline;\n    block-size: 32px;\n    display: grid;\n    gap: var(--helix-space-sm);\n    grid-template-columns: 4.5rem minmax(0, 1fr);\n    padding-inline: var(--helix-space-sm);\n  }\n`
+const SHEET = `\n  .virtualRow {\n    align-content: center;\n    align-items: baseline;\n    block-size: max(32px, var(--helix-size-target));\n    display: grid;\n    gap: var(--helix-space-sm);\n    grid-template-columns: 4.5rem minmax(0, 1fr);\n    padding-inline: var(--helix-space-sm);\n  }\n`
 
 /* The same markup as the HTML example's `<template>`, indentation included, so
    both examples clone the same nodes. */

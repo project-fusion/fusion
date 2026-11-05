@@ -2,9 +2,11 @@ import {
   type BoxAxisText,
   type BoxPlace,
   boxLabels,
+  formatNumbers,
   type Holder,
   pageBudget,
   type SeenPlace,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   BufferGeometry,
@@ -71,8 +73,13 @@ export const edgeOf = (face: Color): Color => {
 /** Eases in and out. */
 const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)
 
-/** A number on an axis, written short enough for a tick. */
-export const tickText = (value: number): string => String(Number(value.toPrecision(6)))
+/**
+ * A number on an axis, written short enough for a tick and grouped in
+ * `locale` as the flat charts write theirs, such as `3,000`: the runtime's own
+ * locale where it is empty. Negative zero is written as zero.
+ */
+export const tickText = (value: number, locale = ''): string =>
+  formatNumbers(locale)(Number(value.toPrecision(6)) || 0)
 
 /** Where a number stands in the box, from -1 at its axis' low end to 1 at its high end. */
 export const inBox = (axis: Axis, value: number): number => {
@@ -308,11 +315,13 @@ export const createStage = (
       const on = place.project(camera)
       return { depth, x: ((on.x + 1) / 2) * width, y: ((1 - on.y) / 2) * height }
     }
+    /* In the locale of the chart the stage is drawn in. */
+    const locale = wordsLocale(container)
     const text = (axis: Axis): BoxAxisText => ({
       name: axis.name,
       ticks: axis.ticks.map((tick, index) => ({
         at: inBox(axis, tick) / HALF,
-        text: axis.labels?.[index] ?? tickText(tick),
+        text: axis.labels?.[index] ?? tickText(tick, locale),
       })),
     })
     for (const one of boxLabels(

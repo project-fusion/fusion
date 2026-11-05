@@ -84,7 +84,7 @@ describe('looksOf', () => {
       raised: true,
       selected: false,
     })
-    expect(drawn.node('d').color).toBe(mixRgb('rgb(0, 255, 0)', colors.ground, 0.75))
+    expect(drawn.node('d').color).toBe(mixRgb('rgb(0, 255, 0)', colors.ground, 0.6))
     expect(drawn.node('d').label).toBe('never')
   })
 

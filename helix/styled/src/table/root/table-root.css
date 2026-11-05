@@ -129,6 +129,14 @@
   color: var(--table-error-color, var(--helix-color-danger));
 }
 
+/* What the `error` slot holds, such as a button that tries again, sits after
+   the words a step away from them. The words stay: with the slot in their
+   place, a page following the documented example showed a button and no
+   reason for it. */
+slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-sm);
+}
+
 /* **A windowed table scrolls its own box**, at a definite height, as Data
    Table's does: the window is a reading of that box, and a height that
    followed the rows drawn would move under every reading. The rows start at

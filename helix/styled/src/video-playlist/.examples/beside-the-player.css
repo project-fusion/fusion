@@ -1,5 +1,13 @@
 /* The two regions side by side, which is what the hook is for: how a playlist
-   is arranged is a fact about the room it is in, not about the playlist. */
-.wide {
-  --video-playlist-layout: minmax(0, 2fr) minmax(0, 1fr);
+   is arranged is a fact about the room it is in, not about the playlist. The
+   room is asked, so below 30rem the list goes under the player: side by side in
+   a 280 pixel column, the player was 176 wide and its scrubber a stub. */
+.room {
+  container-type: inline-size;
+}
+
+@container (inline-size >= 30rem) {
+  .wide {
+    --video-playlist-layout: minmax(0, 2fr) minmax(0, 1fr);
+  }
 }

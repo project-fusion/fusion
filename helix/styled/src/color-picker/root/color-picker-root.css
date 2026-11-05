@@ -335,6 +335,11 @@
     hsl(300 100% 50%),
     hsl(360 100% 50%)
   );
+  /* **The thumb is the hue it stands on, in the white ring the square's mark
+     wears**, so the mark says the hue it chose. An ink disc hid the very color
+     under it, beside a ring on the square that shows it. */
+  --slider-thumb-color: hsl(var(--color-picker-hue, 0) 100% 50%);
+  --slider-thumb-ring-color: var(--helix-color-foreground-media);
 }
 
 /* The checkerboard again, under a ramp from clear to the color itself, because
@@ -541,7 +546,14 @@
   border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--helix-space-2xs);
+  /* **A press apart on a touch screen.** Each swatch's press is 44 and the
+     swatch is 24, so the gap is the difference, 20, and no swatch takes a
+     neighbor's press. Under a mouse the press is 24 and the gap stays 4. */
+  gap: max(
+    var(--helix-space-2xs),
+    var(--helix-size-target) -
+    var(--color-picker-swatch-size, var(--helix-size-icon-loose))
+  );
   margin-block-start: var(--helix-space-sm);
   padding-block-start: var(--helix-space-sm);
   /* The inset every other row takes, applied here because this row sits outside
@@ -559,6 +571,15 @@
   cursor: pointer;
   inline-size: var(--color-picker-swatch-size, var(--helix-size-icon-loose));
   padding: var(--helix-space-none);
+  position: relative;
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves: on a touch screen a swatch pressed at 24. */
+[part="swatch"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* The message, under everything it is about, in the danger ink and the size a

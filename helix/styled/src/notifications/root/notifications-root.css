@@ -66,6 +66,20 @@
 :host([separation="filled"]) [part="list"],
 :host([separation="outlined"]) [part="list"] {
   padding-block-start: var(--notifications-item-gap, var(--helix-space-xs));
+  /* **The boxes stand the gap between them in from the feed's sides**, so a box
+     is a card on the feed and not a band across it: they ran flush to the
+     feed's edges while the header's words stood 24 in. The header and the
+     footer move in by the same step, so a title still starts where the media
+     column starts. */
+  padding-inline: var(--notifications-item-gap, var(--helix-space-xs));
+}
+
+:host([separation="filled"]) :is([part="header"], [part="footer"]),
+:host([separation="outlined"]) :is([part="header"], [part="footer"]) {
+  padding-inline: calc(
+    var(--notifications-padding-inline, var(--helix-space-lg)) +
+    var(--notifications-item-gap, var(--helix-space-xs))
+  );
 }
 
 [part="footer"] {
