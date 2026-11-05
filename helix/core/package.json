@@ -185,6 +185,10 @@
       "types": "./dist/utils/pin-code/pin-code.d.ts",
       "default": "./dist/utils/pin-code/pin-code.js"
     },
+    "./queue": {
+      "types": "./dist/utils/queue/queue.d.ts",
+      "default": "./dist/utils/queue/queue.js"
+    },
     "./rating": {
       "types": "./dist/utils/rating/rating.d.ts",
       "default": "./dist/utils/rating/rating.js"
@@ -232,6 +236,10 @@
     "./words": {
       "types": "./dist/words/index.d.ts",
       "default": "./dist/words/index.js"
+    },
+    "./zoom": {
+      "types": "./dist/utils/zoom/zoom.d.ts",
+      "default": "./dist/utils/zoom/zoom.js"
     }
   },
   "files": [
