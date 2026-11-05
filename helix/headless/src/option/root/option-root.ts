@@ -387,6 +387,24 @@ export class HelixHeadlessOption extends HelixElement {
   }
 
   /**
+   * Reads whether `media` holds anything once the row is drawn, whether this
+   * element drew it or hydrated a server's.
+   *
+   * **`slotchange` alone misses a hydrated option.** A server's shadow root is
+   * parsed with the page, so its slots are filled before Lit binds the
+   * listener and the event has already gone. Measured on the hydration check in CI:
+   * a tile served that way drew its image beside the label, 569 pixels off
+   * the same tile drawn by a client.
+   */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    const media = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="media"]')
+    if (media) {
+      this.toggleState('has-media', slotFilled(media))
+    }
+  }
+
+  /**
    * The name is the label part and the description the description part, by
    * reference, because the host's own content runs `start` and `end` into its
    * name: an option with initials and a shortcut was called `P Priya Shah ⌘P`.
