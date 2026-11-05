@@ -35,7 +35,7 @@ jobs:
       && !github.event.pull_request.head.repo.fork
       && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'),
                   github.event.pull_request.author_association)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -89,7 +89,7 @@ jobs:
   publish:
     needs: [plan, cortex-binaries, helix-binaries]
     if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.helix-binaries.result == 'success') && (needs.plan.outputs.cortex == '' || needs.cortex-binaries.result == 'success') }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: experimental
     env:

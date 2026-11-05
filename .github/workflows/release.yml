@@ -30,7 +30,7 @@ jobs:
   # version job, no binaries and no leg below, and spends no number:
   # [RELEASING.md](../RELEASING.md#a-held-domain).
   intent:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       domains: ${{ steps.resolve.outputs.domains }}
@@ -65,7 +65,7 @@ jobs:
     if: >-
       contains(needs.intent.outputs.domains, '"helix"')
       && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -103,7 +103,7 @@ jobs:
     if: >-
       contains(needs.intent.outputs.domains, '"cortex"')
       && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -143,7 +143,7 @@ jobs:
   release:
     needs: [intent, cortex-binaries, helix-binaries]
     if: ${{ !cancelled() && needs.intent.result == 'success' && needs.intent.outputs.domains != '[]' && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING) }}  # dialect:quoted, GitHub's function
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
       # One domain must not take another down with it, and two domains must
