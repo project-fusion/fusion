@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { bubbleWeights, measuresOf } from './measures.js'
+import { bubbleWeights, measuresOf } from './scatter-measures.js'
 
 const NAMES = ['Rate', 'p50', 'Users']
 const name = (column: number): string => NAMES[column] ?? ''
