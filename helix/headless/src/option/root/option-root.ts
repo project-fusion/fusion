@@ -387,8 +387,8 @@ export class HelixHeadlessOption extends HelixElement {
   }
 
   /**
-   * Reads whether `media` holds anything once the row is drawn, whether this
-   * element drew it or hydrated a server's.
+   * Reads whether `media` and `indicator` hold anything once the row is drawn,
+   * whether this element drew it or hydrated a server's.
    *
    * **`slotchange` alone misses a hydrated option.** A server's shadow root is
    * parsed with the page, so its slots are filled before Lit binds the
@@ -398,9 +398,11 @@ export class HelixHeadlessOption extends HelixElement {
    */
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    const media = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="media"]')
-    if (media) {
-      this.toggleState('has-media', slotFilled(media))
+    for (const name of ['media', 'indicator'] as const) {
+      const slot = this.renderRoot.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
+      if (slot) {
+        this.toggleState(`has-${name}`, slotFilled(slot))
+      }
     }
   }
 
