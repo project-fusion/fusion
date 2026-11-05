@@ -266,7 +266,11 @@ export class PlotRoomWatch implements ReactiveController {
       const was = this.room
       if (was?.width !== width || was.height !== height || was.font !== font) {
         this.room = height > 0 && width > 0 ? { font, height, width } : undefined
-        this.host.requestUpdate()
+        /* **On the next frame, not in this one.** The words the new room sizes
+           can move the box this observer watches, and a change made inside the
+           callback raised a resize loop in about half of the runs once the words
+           could shrink as well as grow. */
+        requestAnimationFrame(() => this.host.requestUpdate())
       }
     })
     this.sizes.observe(box)
