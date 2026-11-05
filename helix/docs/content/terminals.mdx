@@ -278,7 +278,13 @@ ran. The frame draws no cursor and sends no input. Set `columns` and `rows` to
 draw the output at the size the command ran at:
 
 ```html
-<helix-terminal controls="find copy" label="bun run build" readonly columns="80" rows="12">
+<helix-terminal
+  columns="80"
+  controls="find copy"
+  label="bun run build"
+  readonly
+  rows="12"
+>
   <div id="transcript"></div>
 </helix-terminal>
 ```
@@ -294,8 +300,15 @@ buttons beside it:
 
 ```html
 <div class="pane">
-  <helix-terminal fill label="zsh" separation="plain">
-    <helix-icon-button label="New terminal" slot="actions">
+  <helix-terminal
+    fill
+    label="zsh"
+    separation="plain"
+  >
+    <helix-icon-button
+      label="New terminal"
+      slot="actions"
+    >
       <helix-icon name="plus"></helix-icon>
     </helix-icon-button>
     <div id="terminal"></div>

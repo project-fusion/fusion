@@ -97,17 +97,27 @@ is a file the scripts import by a relative path:
 
 ```html
 <helix-sandbox>
-  <helix-sandbox-source label="main.js" name="js" slot="source">
+  <helix-sandbox-source
+    label="main.js"
+    name="js"
+    slot="source"
+  >
     import confetti from 'canvas-confetti'
     import { cheer } from './cheer.js'
 
     confetti()
     cheer()
   </helix-sandbox-source>
-  <helix-sandbox-source name="cheer.js" slot="source">
+  <helix-sandbox-source
+    name="cheer.js"
+    slot="source"
+  >
     export const cheer = () => console.log('Done')
   </helix-sandbox-source>
-  <helix-sandbox-source name="package.json" slot="source">
+  <helix-sandbox-source
+    name="package.json"
+    slot="source"
+  >
     { "dependencies": { "canvas-confetti": "^1.9" } }
   </helix-sandbox-source>
   <helix-sandbox-preview slot="preview"></helix-sandbox-preview>

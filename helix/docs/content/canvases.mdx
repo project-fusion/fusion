@@ -19,9 +19,25 @@ document's own units, and a connection names its two cards by `name`:
 
 ```html
 <helix-canvas label="Launch plan">
-  <helix-canvas-node name="draft" x="0" y="0" width="160" height="64">Draft the email</helix-canvas-node>
-  <helix-canvas-node name="ship" tone="success" x="256" y="0" width="160" height="64">Publish the release</helix-canvas-node>
-  <helix-canvas-edge from="draft" to="ship"></helix-canvas-edge>
+  <helix-canvas-node
+    height="64"
+    name="draft"
+    width="160"
+    x="0"
+    y="0"
+  >Draft the email</helix-canvas-node>
+  <helix-canvas-node
+    height="64"
+    name="ship"
+    tone="success"
+    width="160"
+    x="256"
+    y="0"
+  >Publish the release</helix-canvas-node>
+  <helix-canvas-edge
+    from="draft"
+    to="ship"
+  ></helix-canvas-edge>
 </helix-canvas>
 ```
 
