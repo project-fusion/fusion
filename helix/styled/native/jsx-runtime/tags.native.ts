@@ -83,6 +83,7 @@ import { HelixQrCode } from '../qr-code/index.native'
 import { HelixQuote } from '../quote/index.native'
 import { HelixRadio, HelixRadioGroup } from '../radio/index.native'
 import { HelixRating } from '../rating/index.native'
+import { HelixScatterChart } from '../scatter-chart/index.native'
 import { HelixScrollArea } from '../scroll-area/index.native'
 import { HelixSelect } from '../select/index.native'
 import { HelixSkeleton } from '../skeleton/index.native'
@@ -313,6 +314,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-radio': HelixRadio,
   'helix-radio-group': HelixRadioGroup,
   'helix-rating': HelixRating,
+  'helix-scatter-chart': HelixScatterChart,
   'helix-scroll-area': HelixScrollArea,
   'helix-select': HelixSelect,
   'helix-skeleton': HelixSkeleton,

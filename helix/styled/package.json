@@ -608,6 +608,14 @@
       "default": "./dist/rehype/rehype.js"
     },
     "./sandbox/compile-worker.js": "./dist/sandbox/compile-worker.js",
+    "./scatter-chart": {
+      "react-native": {
+        "types": "./dist/scatter-chart/index.native.d.ts",
+        "default": "./dist/scatter-chart/index.native.js"
+      },
+      "types": "./dist/scatter-chart/index.d.ts",
+      "default": "./dist/scatter-chart/index.js"
+    },
     "./scroll-area": {
       "react-native": {
         "types": "./dist/scroll-area/index.native.d.ts",
