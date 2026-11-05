@@ -78,7 +78,8 @@ export const isChart = (tag: string): boolean => {
     api?.sparkline !== undefined ||
     api?.donutChart !== undefined ||
     api?.lineChart !== undefined ||
-    api?.areaChart !== undefined
+    api?.areaChart !== undefined ||
+    api?.barChart !== undefined
   )
 }
 

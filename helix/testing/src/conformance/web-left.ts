@@ -384,6 +384,7 @@ const VALUES: ReadonlySet<string> = new Set(['color-picker', 'rating', 'slider']
 /** The charts a reader reads a reading at a time, whose record says what the reading says. */
 const CHARTS: ReadonlySet<string> = new Set([
   'area-chart',
+  'bar-chart',
   'donut-chart',
   'line-chart',
   'sparkline',
