@@ -8,6 +8,10 @@
   display: contents;
 }
 
+/* **A long word breaks rather than leaving the column.** The panel shrinks to
+   its column and the text in it did not: a 57 letter identifier ran 68 pixels
+   past a 280 pixel column. `break-word` breaks only a word that would overflow,
+   and leaves the panel's own min-content alone. */
 [part="panel"] {
   /* Every panel in the one cell. An inactive panel that find in page can
      search keeps a box of its own, and placed by the grid it took a row below
@@ -16,6 +20,7 @@
   min-block-size: 0;
   min-inline-size: 0;
   outline: none;
+  overflow-wrap: break-word;
   padding-block-start: var(
     --tabs-panel-padding-block-start,
     var(--_tabs-panel-padding-block-start, var(--helix-space-md))

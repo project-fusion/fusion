@@ -212,6 +212,10 @@ slot[name="label"]::slotted(*) {
   font-size: var(--progress-content-size, var(--helix-text-xs));
   font-variant-numeric: tabular-nums;
   line-height: var(--helix-leading-tight);
+  /* Half a step above and below the line, so the bar the words grow is 18 and
+     their 12 pixel line has room inside it. With none it was 14, the glyphs
+     touching both edges of the fill. */
+  padding-block: calc(var(--helix-space-2xs) / 2);
   padding-inline: var(--helix-space-xs);
   /* Positioned, so it paints over the fill: a `scale` makes the fill a layer
      of its own, painted after anything in the flow. */
@@ -322,7 +326,8 @@ slot[name="label"]::slotted(*) {
 }
 
 :host([shape="ring"][indeterminate]) [part="indicator"] {
-  animation: helix-progress-ring-sweep calc(var(--_progress-cycle) * 0.7) ease-in-out infinite;
+  animation: helix-progress-ring-sweep calc(var(--_progress-cycle) * 0.7) var(--helix-easing-cycle)
+    infinite;
   transition: none;
 }
 

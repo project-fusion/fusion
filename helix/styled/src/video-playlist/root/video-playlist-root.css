@@ -1,3 +1,9 @@
+/* **No entry has a thumbnail, so no entry keeps a column for one.** Read by
+   each entry, which cannot see the others. */
+:host(:state(no-thumbnails)) {
+  --_video-playlist-media-display: none;
+}
+
 /*
  *  Two regions, and which way they sit is the consumer's.
  */

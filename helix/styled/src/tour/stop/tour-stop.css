@@ -25,7 +25,10 @@
   gap: var(--helix-space-md);
   inline-size: max-content;
   margin: var(--helix-space-none);
-  max-inline-size: var(--tour-bubble-size, 22rem);
+  /* **Never wider than the window less an inset**, as Popover caps itself. At
+     `max-content` up to 22rem a stop measured 335 wide and ran 15 pixels past
+     a 328 pixel window and 23 past a 320 one. */
+  max-inline-size: min(var(--tour-bubble-size, 22rem), 100vw - var(--helix-space-lg));
   /* The arrow hangs half outside this box, and the user agent's own
      `[popover] { overflow: auto }` was cutting that half off. Measured: the
      arrow computed correctly at `inset-block-start: -5px`, its center sat

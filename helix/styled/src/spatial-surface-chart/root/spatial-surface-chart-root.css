@@ -3,19 +3,16 @@
    renderer reads the same two hooks, with the same defaults. **The high end
    is held at a lightness of 0.33 or more**, as Heatmap's top step is: the ink
    theme's light 700 is 0.11, and the upper surface, shaded darker still as it
-   turns from the light, drew pure black. */
+   turns from the light, drew pure black. **The low end starts at 35%**, where
+   Heatmap's first step does: at 15% the lowest faces were the plate's gray. */
 :host {
   --_spatial-surface-chart-high: var(
     --spatial-surface-chart-high,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h)
+    var(--helix-color-primary-strong)
   );
   --_spatial-surface-chart-low: var(
     --spatial-surface-chart-low,
-    color-mix(
-      in oklab,
-      oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 15%,
-      var(--helix-color-surface-sunken)
-    )
+    color-mix(in oklab, var(--helix-color-primary-strong) 35%, var(--helix-color-surface-sunken))
   );
 
   display: block;
@@ -47,7 +44,8 @@
    along the grid a little lighter than itself where it is dark, and a
    little darker where it is light**, as the spatial heatmap's edges are: on
    a ramp that ends near black, a darker rule vanished and the top of the
-   surface was one black shape. **The shade takes its share of the face's
+   surface was one black shape. The rule is the step every spatial chart's
+   edge takes, 0.08 darker or 0.1 lighter. **The shade takes its share of the face's
    own lightness**, so a light face loses about what it did and a dark one
    less: taken whole, 0.3 off the top of the light ramp at 0.33 left 0.03,
    and the upper surface drew pure black. */
@@ -62,7 +60,7 @@
       h
   );
   --_spatial-surface-chart-rule: oklch(
-    from var(--_spatial-surface-chart-lit) calc(l + clamp(-0.1, (0.6 - l) * 1000, 0.14)) c h
+    from var(--_spatial-surface-chart-lit) calc(l + clamp(-0.08, (0.6 - l) * 1000, 0.1)) c h
   );
   fill: var(--_spatial-surface-chart-fill, var(--_spatial-surface-chart-lit));
   fill-opacity: calc(

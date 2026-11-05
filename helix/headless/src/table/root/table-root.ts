@@ -228,8 +228,9 @@ const ESTIMATE = 40
  *
  * When the rows did not load, set `error-text`, such as "The orders did not
  * load", and put a button that tries again in the `error` slot. The line shows
- * after the rows in place of the empty and loading lines, the live region says
- * it, and the table takes the `error` state. Clear it once you try again.
+ * the words and then the button, after the rows in place of the empty and
+ * loading lines, the live region says it, and the table takes the `error`
+ * state. Clear it once you try again.
  *
  * The CSS custom properties listed for this component are written by it and
  * read by the stylesheet that draws it. Do not set them. Each holds a number
@@ -245,7 +246,7 @@ const ESTIMATE = 40
  * @slot - The table's rows.
  * @slot columns - The columns, as `TableColumn` elements. The table moves each column here itself, so markup that runs in a browser leaves it out; a server-rendered page writes `slot="columns"` on each column so the headings sit in place before the table upgrades.
  * @slot empty - Content shown when there are no rows and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
- * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
+ * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot heading - Words that name the table, shown above it, such as a heading.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
@@ -395,9 +396,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * fetch fails, and clear it once you try again. Empty, the default, shows
    * nothing.
    *
-   * While it is set, a line after the rows shows it, or your own content in the
-   * `error` slot, in place of the empty and loading lines, and the live region
-   * says it.
+   * While it is set, a line after the rows shows it, followed by your own
+   * content in the `error` slot, in place of the empty and loading lines, and
+   * the live region says it.
    */
   @property({ attribute: 'error-text' })
   errorText = ''
@@ -1945,7 +1946,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
       ${
         this.errorText === ''
           ? this.renderStatus(this.hasRows, grid ? 'gridcell' : 'cell')
-          : html`<p part="error" role="row"><span role=${grid ? 'gridcell' : 'cell'}><slot name="error">${this.errorText}</slot></span></p>`
+          : html`<p part="error" role="row"><span role=${grid ? 'gridcell' : 'cell'}>${this.errorText}<slot name="error"></slot></span></p>`
       }
     </div>${end}${this.loadMore ? html`<span data-end aria-hidden="true"></span>` : nothing}${
       this.errorText === ''

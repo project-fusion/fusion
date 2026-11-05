@@ -1,4 +1,4 @@
-import { readColor } from '@fusion.dev/helix-core'
+import { type ColorBytesAlpha, readColorAlpha } from '@fusion.dev/helix-core'
 
 /**
  * The colors a graph is drawn in, each `rgb()`, read from the page's tokens
@@ -61,6 +61,12 @@ const TOKENS = {
  * **Not yet rather than never.** A stylesheet being swapped takes the tokens
  * away for a moment, which is `null` here, and the connector asks again on the
  * next change.
+ *
+ * **A see-through token is laid over the ground**, the color it is seen as in
+ * the drawing. A theme may write its border as white at 12%, as the Fusion
+ * site does, and an opaque reading refused it: the colors never arrived, and
+ * the Cortex trace drew every note in the renderer's own gray, its chosen
+ * answer unlit and its groups unnamed.
  */
 export const graphColorsFrom = (element: Element): GraphColors | null => {
   if (typeof document === 'undefined') {
@@ -71,13 +77,23 @@ export const graphColorsFrom = (element: Element): GraphColors | null => {
   probe.setAttribute('aria-hidden', 'true')
   element.append(probe)
   try {
-    const read = (token: string): string | null => {
+    const bytesOf = (token: string): ColorBytesAlpha | null => {
       if (getComputedStyle(probe).getPropertyValue(token).trim() === '') {
         return null
       }
       probe.style.color = `var(${token})`
-      const bytes = readColor(getComputedStyle(probe).color)
-      return bytes ? `rgb(${bytes[0]}, ${bytes[1]}, ${bytes[2]})` : null
+      return readColorAlpha(getComputedStyle(probe).color) ?? null
+    }
+    const ground = bytesOf(TOKENS.ground)
+    const read = (token: string): string | null => {
+      const bytes = bytesOf(token)
+      if (!bytes || !ground) {
+        return null
+      }
+      const [red, green, blue, alpha] = bytes
+      const over = (one: number, under: number): number =>
+        Math.round(one * alpha + under * (1 - alpha))
+      return `rgb(${over(red, ground[0])}, ${over(green, ground[1])}, ${over(blue, ground[2])})`
     }
     const named = Object.fromEntries(
       Object.entries(TOKENS).map(([name, token]) => [name, read(token)]),
@@ -199,8 +215,13 @@ export interface GraphLooks {
   node(id: string): NodeLook
 }
 
-/** How far a note outside the selected one's neighborhood is faded toward the ground. */
-const FADED = 0.75
+/**
+ * How far a note outside the selected one's neighborhood is faded toward the
+ * ground. At 0.75 a muted note on the light ground worked out to about 1.4:1
+ * and read as a smudge. At 0.6 it is about 1.8:1, a note set back and still
+ * well under the neighborhood's full color.
+ */
+const FADED = 0.6
 
 /**
  * How the graph is drawn for one selection.

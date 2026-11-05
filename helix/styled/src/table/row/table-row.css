@@ -96,8 +96,10 @@
 /* The caret points along the line while the rows under it are hidden, and
    down while they show. */
 [part="expand-mark"] {
-  block-size: 1em;
-  inline-size: 1em;
+  /* The step a field's indicator and a Tree row's caret take, 12, 16 and 20
+     across density. At `1em` it was the cell's 14 at every density. */
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
   transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -154,8 +156,8 @@
 }
 
 [part="grip-mark"] {
-  block-size: 1em;
-  inline-size: 1em;
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* The row being moved, faded where it was, and the line where it would land:

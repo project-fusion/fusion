@@ -35,17 +35,20 @@ Helix sets the choice with two pairs of policy tokens:
 | `--helix-border-surface` | `var(--helix-border-thin)` | The border of a surface in the page flow. Set it to zero to separate surfaces with shadows. |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | The shadow of a surface in the page flow. Set it to none to separate surfaces with borders. |
 | `--helix-border-floating` | `var(--helix-border-thin)` | The border of a surface that floats over content. Set it to zero to separate floating surfaces by their shadow alone. |
-| `--helix-shadow-floating` | `var(--helix-shadow-lg)` | The shadow of a surface that floats over content. |
+| `--helix-shadow-floating` | `var(--helix-shadow-sm), var(--helix-shadow-lg)` | The shadow of a surface that floats over content. |
 
 [//]: # (/tokens)
 
 A floating surface draws a hairline edge and a shadow by default. A shadow is
 ink darker than the ground it falls on, so over a dark page it does not show,
-and the edge keeps a menu or a popover apart from what it opened over.
+and the edge keeps a menu or a popover apart from what it opened over. The edge
+is `--helix-color-border-floating`: `border` in light mode, and 10% of white in
+dark mode.
 
 A Tooltip draws neither. Its fill is `surface-inverse`, the mode's opposite,
 which sets it apart from any ground it opens over. A glass or frosted Tooltip
-lets the page show through, so it takes the hairline edge.
+lets the page show through, so it takes the hairline edge every glass surface
+draws, `--helix-material-border`.
 
 To make every component shadow-first, set the border pair to zero and give the
 shadow pair a value. Reverse them to go border-first. Every Helix surface reads
@@ -74,6 +77,27 @@ on every side. Only its fill separates it, and on a white page a fill has to be 
 step darker to be seen. A lit row is different: it takes `hover`, a wash measured
 against whatever it sits on. `overlay` works the other way. Its edge and its shadow separate it, so on
 a white page it is white.
+
+**In dark mode, a surface over a raised one steps up from it.** `raised` and
+`overlay` are one color in dark mode, and a shadow does not show on a black
+page. Inside a Dialog, a Drawer, or an elevated Card, the rungs are washes of
+`foreground` over the panel: `overlay` 8%, `raised` 5%, `surface` 3%, and
+`border` 12%. A Menu opened from an elevated Card stands a step above the card,
+and a Dialog opened over another Dialog stands 8% above it. Light mode keeps its
+rungs, where a shadow sets an overlay apart.
+
+**A sunken region restates the border for what it holds.** On
+`surface-sunken`, the page's border measures 1.03:1 in light, so an outlined
+Card, a Table rule, a Divider, or a field placed there has no visible edge. Mark
+the region with `data-surface="sunken"`. It draws the sunken ground and mixes the
+border from `foreground` into it, so an edge stands as far off the well as it
+does off the page: 1.23:1 in light and 1.29:1 in dark.
+
+```html
+<section data-surface="sunken">
+  <helix-card separation="outlined">…</helix-card>
+</section>
+```
 
 ## Using the page color inside a component
 

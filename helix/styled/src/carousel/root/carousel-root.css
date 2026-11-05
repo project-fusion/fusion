@@ -652,6 +652,21 @@
   order: 1;
 }
 
+/* **At the top or the foot, the arrows stand in from the picture's edge** by the
+   bleed and the same gap they keep from its sides. The bar has no block padding,
+   so `start` put them on the track's top edge, 16 above the slide, straddling
+   the picture's edge. A margin on the arrows, so a bar of centered arrows is
+   the height it was. */
+:host([controls-placement="overlay"][controls-align="start"])
+  :is([part="previous"], [part="next"], [part="rotation"]) {
+  margin-block-start: calc(var(--_carousel-bleed) + var(--helix-space-md));
+}
+
+:host([controls-placement="overlay"][controls-align="end"])
+  :is([part="previous"], [part="next"], [part="rotation"]) {
+  margin-block-end: calc(var(--_carousel-bleed) + var(--helix-space-md));
+}
+
 /* ================================================ vertical, by default ==
  * **A vertical carousel's chrome runs down its side, and nothing had to be
  * said for that to be true of a horizontal one.**

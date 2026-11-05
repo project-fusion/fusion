@@ -14,7 +14,10 @@
   border-radius: var(--helix-radii-md);
   display: grid;
   gap: var(--helix-space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  /* Capped at the panel, so a column narrower than one chart holds one chart
+     inside its padding: at 16rem a 280 page ran a pixel past its edge, the
+     chart 26 past the panel's inset. */
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
   padding: var(--helix-space-lg);
 }
 

@@ -273,6 +273,36 @@ describe('the page behind an open dialog', () => {
   })
 })
 
+describe('a dialog opened over another', () => {
+  const pair = async (inner: boolean): Promise<[Dialog, Dialog]> => {
+    const second = '<helix-headless-dialog id="b" label="Discard">Lost</helix-headless-dialog>'
+    const first = (await mount(
+      `<helix-headless-dialog id="a" label="Edit">Body${inner ? second : ''}</helix-headless-dialog>${inner ? '' : second}`,
+    )) as Dialog
+    return [first, document.getElementById('b') as Dialog]
+  }
+
+  for (const inner of [false, true]) {
+    test(`is stacked only when it is not written inside the first (${inner ? 'inside' : 'beside'})`, async () => {
+      const [first, second] = await pair(inner)
+      try {
+        first.show()
+        await first.updateComplete
+        second.show()
+        await second.updateComplete
+        expect([hasState(first, 'stacked'), hasState(second, 'stacked')]).toEqual([false, !inner])
+        second.close()
+        await second.updateComplete
+        expect(hasState(second, 'stacked')).toBe(false)
+      } finally {
+        second.close()
+        first.close()
+        await first.updateComplete
+      }
+    })
+  }
+})
+
 describe('dialog invokers', () => {
   const wired = async (): Promise<{ dialog: Dialog; trigger: HTMLElement }> => {
     const trigger = (await mount(

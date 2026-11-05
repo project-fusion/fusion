@@ -13,7 +13,7 @@
      built on, so a theme that slows its spinners slows this with them. */
   --_chat-typing-cycle: calc(var(--helix-duration-turn) * 1.5);
 
-  animation: helix-chat-typing var(--_chat-typing-cycle) infinite ease-in-out;
+  animation: helix-chat-typing var(--_chat-typing-cycle) infinite var(--helix-easing-cycle);
   background-image:
     radial-gradient(circle closest-side, currentColor 90%, transparent),
     radial-gradient(circle closest-side, currentColor 90%, transparent),
@@ -30,7 +30,7 @@
   block-size: 1lh;
   display: block;
   inline-size: 1.75em;
-  opacity: 0.7;
+  opacity: var(--helix-opacity-quiet);
 }
 
 @keyframes helix-chat-typing {

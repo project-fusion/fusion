@@ -4,7 +4,7 @@ section: Theming
 title: Deriving a theme
 ---
 
-# Theming
+# Deriving a theme
 
 Helix computes your color tokens from a few inputs, such as your brand color.
 
@@ -26,8 +26,9 @@ Before ink, the default was a blue. To draw that blue, set it as your seed:
 
 The primary color is held to a floor, described under
 [Two ways to theme](#two-ways-to-theme), so in light mode this seed draws at
-L 0.5, a little darker than the 0.539 the old default drew. In dark mode it
-draws at L 0.68.
+L 0.5, a little darker than the 0.539 the old default drew. In dark mode it is
+set at L 0.68. That color is outside sRGB, so a screen draws it as `#4495ff`, at
+L 0.672.
 
 When a design system ships two hundred fixed color values, you theme it by
 changing them one at a time. A change to one value can break the contrast of a
@@ -85,11 +86,22 @@ held at 0.6 or less in light mode and 0.65 or more in dark mode. The ring stays
 visible on the page whichever seed you set. On a `#ffe600` seed, the ring
 measures 5.89:1 on white.
 
-A development build checks the page in light and dark mode, and again whenever
-the seed changes. It warns when primary text measures under 4.5:1 or a filled
-control under 3:1 against the page. A seed alone cannot cause this. An override
-of `--helix-color-primary`, `--helix-color-primary-surface`, or the page color
-can.
+A development build warns when primary text measures under 4.5:1 or a filled
+control under 3:1 against the page, in light or dark mode. A seed alone cannot
+cause this. An override of `--helix-color-primary`,
+`--helix-color-primary-surface`, or the page color can. Each warning prints
+once.
+
+The build checks the page when the first element renders, and again when one of
+these changes:
+
+- the seed
+- a `style`, `class`, or `data-theme` attribute on the root or the body
+- a stylesheet in the head, once it has loaded
+- the system setting for light or dark mode
+
+A page that sets its colors for one mode at a time on the root is checked in the
+mode it shows. The other mode is checked once the page switches to it.
 
 **Verified** uses the theme engine. It searches for each color that meets its
 target, measures every pair, and returns the theme with any violations:

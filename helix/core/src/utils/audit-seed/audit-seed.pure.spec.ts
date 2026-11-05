@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { contrastMessage, contrastOf } from './audit-seed.js'
+import { contrastMessage, contrastOf, schemeOf } from './audit-seed.js'
 
 describe('contrastOf', () => {
   test('black on white is 21', () => {
@@ -29,5 +29,17 @@ describe('contrastMessage', () => {
     const message = contrastMessage('dark', 1.11, 2.1)
     expect(message).toContain('In dark, primary text measures 1.11:1')
     expect(message).toContain('In dark, a filled control measures 2.10:1')
+  })
+})
+
+describe('schemeOf', () => {
+  test('names a white page light and a black page dark', () => {
+    expect(schemeOf([255, 255, 255])).toBe('light')
+    expect(schemeOf([0, 0, 0])).toBe('dark')
+  })
+
+  test('names the dark card grounds dark', () => {
+    expect(schemeOf([12, 12, 12])).toBe('dark')
+    expect(schemeOf([24, 24, 24])).toBe('dark')
   })
 })

@@ -68,7 +68,8 @@ export const ticks = (domain: readonly [number, number], count = 5): number[] =>
 
 /**
  * A domain whose top is raised to a level `ticks` rules, with room above the
- * highest reading.
+ * highest reading, and whose floor is lowered to one, with room below the
+ * lowest, unless the floor is zero.
  *
  * **A peak drawn on the plot's top edge reads as cut off**, and its top rule is
  * the box's edge rather than a number. Measured on Line Chart's sessions
@@ -78,29 +79,41 @@ export const ticks = (domain: readonly [number, number], count = 5): number[] =>
  * stands clear of the edge and the top edge is a numbered level. A peak exactly
  * on a level takes the next one.
  *
- * The step is worked out again from the raised domain until it holds, since
- * raising the top can widen the step: 0 to 140 rules every 20, and 0 to 160
- * every 50, which would leave 160 off the scale. The result is 0 to 150.
+ * **The floor is the same edge turned over.** Left where the data put it, the
+ * same example's lowest reading, 1,180, lay on the bottom edge under the lowest
+ * rule, 1,200, and a diverging bar of -14,000 ran past the last numbered level,
+ * -10,000. The floor is lowered to the first level at least a twentieth of the
+ * span below the lowest reading. **A floor of zero stays**, since zero is the
+ * baseline the drawing stands on, and a floor above zero is lowered no further
+ * than zero.
  *
- * The floor is left where it is. A domain whose top is zero, or that is flat,
- * comes back as it went in: zero is the baseline the drawing ends at, and a
- * flat domain has no levels.
+ * The step is worked out again from the widened domain until it holds, since
+ * widening it can widen the step: 0 to 140 rules every 20, and 0 to 160 every
+ * 50, which would leave 160 off the scale. The result is 0 to 150.
+ *
+ * A top at zero stays, for the reason the floor does, and a flat domain comes
+ * back as it went in: it has no levels.
  */
 export const headroom = (domain: readonly [number, number], count = 5): [number, number] => {
   const [low, high] = domain
-  if (!Number.isFinite(low) || !Number.isFinite(high) || low >= high || high === 0 || count < 1) {
+  if (!Number.isFinite(low) || !Number.isFinite(high) || low >= high || count < 1) {
     return [low, high]
   }
-  const target = high + (high - low) / 20
-  let top = target
+  const room = (high - low) / 20
+  const [above, below] = [high === 0 ? 0 : high + room, low === 0 ? 0 : low - room]
+  let [floor, top] = [low, high]
   let held = 0
   for (let round = 0; round < 8; round += 1) {
-    const step = stepOf(low, top, count)
+    const step = stepOf(floor, top, count)
     if (step === held) {
       break
     }
     held = step
-    top = toStep(Math.ceil(target / step) * step, step)
+    top = high === 0 ? 0 : toStep(Math.ceil(above / step) * step, step)
+    floor = low === 0 ? 0 : toStep(Math.floor(below / step) * step, step)
+    if (low > 0 && floor < 0) {
+      floor = 0
+    }
   }
-  return [low, top]
+  return [floor, top]
 }

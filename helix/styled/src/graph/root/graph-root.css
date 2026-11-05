@@ -10,7 +10,8 @@
   background-color: var(--graph-background-color, var(--helix-color-surface-sunken));
   block-size: var(--graph-block-size, 32rem);
   border: var(--helix-border-thin) solid var(--graph-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  /* `md`, the container corner every framed region takes. */
+  border-radius: var(--helix-radii-md);
   box-sizing: border-box;
   container-type: inline-size;
   display: grid;
@@ -184,6 +185,21 @@
 [part~="legend-item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **The press reaches `--helix-size-target` above and below**, in a
+   transparent box, so nothing drawn moves: on a touch screen an item 32 tall
+   took a 32 pixel press. Across the row it stays the item's width, the items
+   sitting 4 apart. */
+[part~="legend-item"] {
+  position: relative;
+}
+
+[part~="legend-item"]::after {
+  content: "";
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: var(--helix-space-none);
+  position: absolute;
 }
 
 /* **A group's color by its place in the legend**, which is the order of the

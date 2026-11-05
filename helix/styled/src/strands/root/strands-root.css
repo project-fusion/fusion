@@ -7,14 +7,24 @@
   --_strands-tint: var(--strands-tint, var(--helix-color-primary));
 
   /* **The top and bottom edges fade**, so a band of light has no ruled line where
-     the box ends. `--strands-fade: 0%` keeps a hard edge. */
-  --_strands-mask: linear-gradient(
-    to bottom,
-    transparent,
-    black var(--_strands-fade),
-    black calc(100% - var(--_strands-fade)),
-    transparent
-  );
+     the box ends. `--strands-fade: 0%` keeps a hard edge. **The sides fade a
+     third as far**, because the ribbon runs out through them: its bloom ended in
+     one pixel, from 35 of 255 inside the box to the page's 0 beside it. */
+  --_strands-mask:
+    linear-gradient(
+      to bottom,
+      transparent,
+      black var(--_strands-fade),
+      black calc(100% - var(--_strands-fade)),
+      transparent
+    ),
+    linear-gradient(
+      to right,
+      transparent,
+      black calc(var(--_strands-fade) / 3),
+      black calc(100% - var(--_strands-fade) / 3),
+      transparent
+    );
 
   position: relative;
   display: block;
@@ -40,6 +50,7 @@
   );
   content: "";
   inset: 0;
+  mask-composite: intersect;
   mask-image: var(--_strands-mask);
   position: absolute;
 }
@@ -87,6 +98,7 @@
   display: block;
   inline-size: 100%;
   block-size: 100%;
+  mask-composite: intersect;
   mask-image: var(--_strands-mask);
   position: relative;
 

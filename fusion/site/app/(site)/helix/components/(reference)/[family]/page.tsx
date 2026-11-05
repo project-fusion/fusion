@@ -38,7 +38,7 @@ export function generateStaticParams() {
 const SECTIONS = [
   { id: 'usage', label: 'Usage' },
   { id: 'preview', label: 'Preview' },
-  { id: 'api', label: 'API Reference' },
+  { id: 'api', label: 'API reference' },
 ] as const
 
 /**
@@ -596,7 +596,7 @@ export default async function FamilyDocs({
                     reference point at the source it documents instead of at
                     whatever `main` holds when it is read. */}
                 <a data-button="" href={source} rel="noreferrer" target="_blank">
-                  View Source
+                  View source
                 </a>
                 <DocumentActions family={family.slug} headline={headline?.slug} />
               </helix-flex>
@@ -690,8 +690,8 @@ export default async function FamilyDocs({
               the component does not offer it, which is the component being right
               about how far apart two things in one flow should ever be. */}
           <helix-flex direction="column" gap="2xl" id="api">
-            <SectionHeading as="h2" label="API Reference" target="api">
-              API Reference
+            <SectionHeading as="h2" label="API reference" target="api">
+              API reference
             </SectionHeading>
             {family.elements.map((element) => (
               <ElementApi element={element} familyStatus={family.status} key={element.tagName} />

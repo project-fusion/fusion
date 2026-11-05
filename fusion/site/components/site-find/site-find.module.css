@@ -10,6 +10,15 @@
   --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
 }
 
+/* **No box until it is defined.** The palette is shut at rest, but before its
+   definition it is a plain element holding every option, hidden and still laid
+   out: measured at 1440, it stood 552 wide in the header's end slot for about
+   200ms of a cold load, and the sections sat 122 pixels left of center until
+   it collapsed. */
+.siteCommand:not(:defined) {
+  display: none;
+}
+
 .siteCommand::part(dialog-surface) {
   /* *Glass, which is what a palette is: the page is still there.** A palette
      does not replace the page the way a dialog does. **The panel's own alpha is

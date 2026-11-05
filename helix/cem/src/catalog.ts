@@ -11,7 +11,7 @@
  * files hold the markup. Nothing about a component is written down here, which
  * is what keeps a site from drifting away from the library it documents.
  */
-import { displayName, familyOf, startCase, tierOf } from './naming.js'
+import { displayName, familyOf, sentenceCase, startCase, tierOf } from './naming.js'
 import type { HelixDeclaration, HelixManifest, HelixMember } from './types.js'
 
 /**
@@ -494,15 +494,18 @@ const examplesOf = (
           html: withoutAnnotations(source.html),
           /* Written once the whole catalog is read, by `catalog`. */
           imports: [],
-          /* **The label is the file's name, with no special case.** `startCase`
-           gives "Preview" for the canonical example on its own.
+          /* **The label is the file's name, with no special case.**
+           `sentenceCase` gives "Preview" for the canonical example on its own.
+           Sentence case, as every heading is: an example's name is a heading
+           on its family's page and a row in the sandbox, and in title case
+           "Chevron At The Start" read as a product name.
 
            **A headless example takes the name of the one it mirrors**, so the two
            tiers show the same list rather than a list that changes its labels
            when a reader changes a preference. Only one of a pair is ever on
            screen, the tier deciding which, so a differing name would be the only
            thing suggesting they are different examples. */
-          label: startCase(mirrored),
+          label: sentenceCase(mirrored),
           ...(layout ? { layout } : {}),
           ...(min ? { min } : {}),
           renders: rendersOf(source.slug, source.pictures ?? []),

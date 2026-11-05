@@ -4,10 +4,11 @@
   align-items: center;
   /* Gray, not a brand tint: an avatar with no picture is a placeholder for a
      person, and a `primary-subtle` fill makes every one of them look like it
-     means something. `surface-raised` rather than `sunken`, because sunken is
-     `neutral-950` in dark mode and an avatar on a `neutral-1000` page all but
-     disappears; raised separates from the page in both directions. */
-  background-color: var(--avatar-background-color, var(--helix-color-surface-raised));
+     means something. **`neutral-subtle`, the gray a mark stands on the page
+     in**, which a neutral Badge takes too. `surface-raised` was a panel's rung:
+     1.09:1 on the white page and 1.04 on a card, a disc with no edge. The token
+     measures 1.26 on the page in light and 1.20 in dark. */
+  background-color: var(--avatar-background-color, var(--helix-color-neutral-subtle));
   block-size: var(--_avatar-size);
   border-radius: var(--helix-radii-full);
   color: var(--avatar-color, var(--helix-color-foreground));

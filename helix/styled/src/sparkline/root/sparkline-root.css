@@ -136,9 +136,17 @@
 /* *Emphasis, and one value, for a drawing whose whole point is its size.** A
    sparkline sits inside a line of text or a table cell, and the case that arises
    there is a row that is context beside a row that is being read, which is
-   `subtle` exactly. */
+   `subtle` exactly.
+
+   **In dark, 70% of the ink, so the line still clears 3:1 on the page.** At
+   40% the eight dark series measured 1.41 to 1.64 on black, a line that read
+   as a shadow of one. At 70% they measure 3.19 to 4.43, against 7.36 to 10.98
+   at full strength (November 4, 2026). Light keeps 40%. */
 :host([emphasis="subtle"]) {
-  color: color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background));
+  color: light-dark(
+    color-mix(in oklab, var(--_sparkline-ink) 40%, var(--helix-color-background)),
+    color-mix(in oklab, var(--_sparkline-ink) 70%, var(--helix-color-background))
+  );
 }
 
 /* *The other two ends, and each plot answers them in its own shape.** A
@@ -205,7 +213,7 @@
   font-family: var(--helix-font-sans);
   font-size: var(--sparkline-readout-font-size, var(--helix-text-xs));
   font-variant-numeric: tabular-nums;
-  line-height: 1.4;
+  line-height: var(--helix-leading-snug);
   padding: 0 var(--helix-space-2xs);
   pointer-events: none;
   position: absolute;

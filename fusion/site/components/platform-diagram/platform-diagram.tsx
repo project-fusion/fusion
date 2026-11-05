@@ -216,12 +216,15 @@ export const PlatformDiagramStacked = () => (
         </radialGradient>
       </defs>
 
-      <text className={styles.platformLabel} fontSize="11" x="8" y="14">
+      {/* **Every word at 12 units.** The figure is drawn 340 wide and a phone
+          shows it about 342 wide, so a unit is about a pixel: at 10.5 and 11
+          the words stood under the 12px the page's own captions keep to. */}
+      <text className={styles.platformLabel} fontSize="12" x="8" y="14">
         What you bring
       </text>
 
       <rect fill="var(--helix-color-accent)" height="24" rx="7" width="24" x="45" y="34" />
-      <text className={styles.platformMeta} fontSize="11" textAnchor="middle" x="57" y="76">
+      <text className={styles.platformMeta} fontSize="12" textAnchor="middle" x="57" y="76">
         your brand
       </text>
 
@@ -235,7 +238,7 @@ export const PlatformDiagramStacked = () => (
       >
         <path d="M11 9L4 16L11 23M21 9L28 16L21 23M18 7L14 25" />
       </g>
-      <text className={styles.platformMeta} fontSize="11" textAnchor="middle" x="170" y="76">
+      <text className={styles.platformMeta} fontSize="12" textAnchor="middle" x="170" y="76">
         your code
       </text>
 
@@ -251,7 +254,7 @@ export const PlatformDiagramStacked = () => (
         <circle cx="24" cy="10" r="3" />
         <path d="M8 9V23M24 13C24 20,8 18,8 23" />
       </g>
-      <text className={styles.platformMeta} fontSize="11" textAnchor="middle" x="283" y="76">
+      <text className={styles.platformMeta} fontSize="12" textAnchor="middle" x="283" y="76">
         your decisions
       </text>
 
@@ -290,11 +293,11 @@ export const PlatformDiagramStacked = () => (
             {output.lines.map((line, row) => (
               <text
                 className={styles.platformMeta}
-                fontSize="11"
+                fontSize="12"
                 key={line}
                 textAnchor="middle"
                 x={x}
-                y={row === 0 ? 308 : 322}
+                y={row === 0 ? 308 : 324}
               >
                 {line}
               </text>
@@ -303,7 +306,7 @@ export const PlatformDiagramStacked = () => (
         )
       })}
 
-      <text className={styles.platformLabel} fontSize="11" textAnchor="end" x="332" y="370">
+      <text className={styles.platformLabel} fontSize="12" textAnchor="end" x="332" y="370">
         What comes out
       </text>
     </svg>

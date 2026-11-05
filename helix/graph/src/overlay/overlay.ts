@@ -502,8 +502,12 @@ export const nameStart = (
   room: number,
   rightToLeft = false,
 ): number => {
-  const right = at.x + at.radius + 4
-  const left = at.x - at.radius - 4 - width
+  /* Eight clear of the note's radius. At four, the gap measured about two
+     pixels between a dot's edge and its name's first glyph in the Graph
+     preview, and the name read as touching the dot; at eight it measures
+     about five. */
+  const right = at.x + at.radius + 8
+  const left = at.x - at.radius - 8 - width
   const [after, before] = rightToLeft ? [left, right] : [right, left]
   const fits = (start: number): boolean => {
     const placed = box(start)

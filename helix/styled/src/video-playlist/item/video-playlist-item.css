@@ -111,6 +111,8 @@
  */
 [part="media"] {
   aspect-ratio: var(--video-playlist-media-aspect-ratio, 16 / 9);
+  /* None where the playlist says no entry has a thumbnail. */
+  display: var(--_video-playlist-media-display, block);
   border-radius: var(--video-playlist-media-radius, var(--helix-radii-sm));
   flex: 0 0 auto;
   inline-size: var(--video-playlist-media-size, 5rem);

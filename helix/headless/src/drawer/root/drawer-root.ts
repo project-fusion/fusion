@@ -3,6 +3,7 @@ import {
   auditName,
   autofocusTarget,
   CommandController,
+  coversPress,
   customElement,
   drawDismiss,
   drawDismissGlyph,
@@ -19,6 +20,7 @@ import {
   onUnlessFalse,
   openingFocus,
   parseSnapPoints,
+  raiseAbove,
   reflectElements,
   refocusWithin,
   SwipeController,
@@ -557,6 +559,10 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     if (!panel || event.target !== panel || !this.modal) {
       return
     }
+    /* A press on a toast kept above the backdrop is not one on the backdrop. */
+    if (coversPress(event)) {
+      return
+    }
     const box = panel.getBoundingClientRect()
     if (
       event.clientX >= box.left &&
@@ -681,6 +687,8 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       const focusing = openingFocus()
       if (this.modal) {
         panel.showModal()
+        /* A toast showing before it stays on top. See `keepAbove`. */
+        raiseAbove()
       } else {
         panel.show()
       }

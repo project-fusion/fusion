@@ -17,6 +17,7 @@ import {
   type BoxAxisText,
   boxLabels,
   type Camera,
+  formatNumbers,
   type PagePoint,
   type Projection,
   pathData,
@@ -79,8 +80,13 @@ export const inBox = (axis: PlotAxis, value: number): number => {
   return high === low ? 0 : ((value - low) / (high - low)) * 2 - 1
 }
 
-/** A number on an axis, written short enough for a tick. */
-export const tickText = (value: number): string => String(Number(value.toPrecision(6)))
+/**
+ * A number on an axis, written short enough for a tick and grouped in
+ * `locale` as the flat charts write theirs, such as `3,000`: the runtime's own
+ * locale where it is empty. Negative zero is written as zero.
+ */
+export const tickText = (value: number, locale = ''): string =>
+  formatNumbers(locale)(Number(value.toPrecision(6)) || 0)
 
 /** How wide a label is on the page, as a share of its size, which is near enough to fit the box around it. */
 const WIDE = 0.58
@@ -94,7 +100,8 @@ const LABEL_GAP = 0.06
 
 /**
  * The box for `axes`, seen from `camera`, and the readings' own places on
- * the page, which `extra` adds to the bounds.
+ * the page, which `extra` adds to the bounds. Its numbers are written in
+ * `locale`.
  */
 export const boxView = (
   axes: { extent?: BoxExtent | undefined; x: PlotAxis; y: PlotAxis; z: PlotAxis },
@@ -102,6 +109,7 @@ export const boxView = (
   extra: readonly PagePoint[] = [],
   bare = false,
   words = 1,
+  locale = '',
 ): BoxView => {
   const projection = projectionOf(camera)
   const [ex, ey, ez] = axes.extent ?? [1, 1, 1]
@@ -147,7 +155,7 @@ export const boxView = (
         at: inBox(axis, tick),
         /* A label with a number in it, such as a date, reads from the labels beside it. */
         category: label !== undefined && !/\d/.test(label),
-        text: label ?? tickText(tick),
+        text: label ?? tickText(tick, locale),
       }
     }),
   })

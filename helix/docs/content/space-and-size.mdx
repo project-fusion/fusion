@@ -36,9 +36,17 @@ arithmetic, such as `space-4` being twice `space-2`. That stops being true as
 soon as the scale is tuned, and it leads to a `space-4.5` the first time
 something does not fit.
 
-`--helix-space-control` and `--helix-space-field` are two more of a different kind. It is the inset a
-control uses, and it follows the region's density. It is not a step on the
-scale. See [Size and density](./size-and-density).
+`--helix-space-field` and `--helix-space-control` are of a different kind. Each
+is the inset a control uses, and each follows the region's density, so the table
+above shows its `md` value. They are not steps on the scale. A field's text
+starts closer to its edge than a button's label does:
+
+| Token | `sm` | `md` | `lg` |
+| --- | --- | --- | --- |
+| `--helix-space-field` | 8px | 12px | 16px |
+| `--helix-space-control` | 12px | 16px | 24px |
+
+See [Size and density](./size-and-density).
 
 Use the space tokens for gap, padding, and margin:
 

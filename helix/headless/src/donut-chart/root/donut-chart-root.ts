@@ -420,6 +420,47 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
   }
 
   /**
+   * The plot with no readings to draw, the ring's track under the words.
+   *
+   * **The track stays**, so an empty donut is still a donut. The words alone
+   * stood in a blank square, which reads as a chart that did not draw, and the
+   * frame served before the readings arrive already drew the track: it went
+   * the moment the table turned out to be empty.
+   */
+  protected override renderEmpty(): TemplateResult {
+    const named = this.named
+    return html`<div
+      aria-label=${named || nothing}
+      id=${CHART_PLOT}
+      part="plot"
+      role=${named ? 'group' : nothing}
+    >
+      <svg
+        aria-hidden="true"
+        data-mirror=${this.sweep === 'half' ? '' : nothing}
+        viewBox=${this.frame}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        ${this.renderTrack()}
+      </svg>
+      ${this.renderStatus()}
+    </div>`
+  }
+
+  /** The whole ring the slices are drawn on. */
+  private renderTrack(): TemplateResult {
+    return svg`<circle
+      cx=${CENTER}
+      cy=${CENTER}
+      fill="none"
+      part="track"
+      r=${this.radius}
+      stroke-dasharray="${2 * Math.PI * this.radius * this.span} ${GAP}"
+      stroke-width=${this.thickness}
+    />`
+  }
+
+  /**
    * The ring itself, behind a seam the styled tier can move.
    *
    * The drawing is `aria-hidden`, because the table it was read from is the
@@ -452,15 +493,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
         viewBox=${this.frame}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle
-          cx=${CENTER}
-          cy=${CENTER}
-          fill="none"
-          part="track"
-          r=${this.radius}
-          stroke-dasharray="${2 * Math.PI * this.radius * this.span} ${GAP}"
-          stroke-width=${this.thickness}
-        />
+        ${this.renderTrack()}
         ${shares.map((share, index) => this.renderSegment(share, index))}
       </svg>
       ${this.hole === 'none' ? nothing : html`<div id="helix-chart-center" part="center"><slot></slot></div>`}

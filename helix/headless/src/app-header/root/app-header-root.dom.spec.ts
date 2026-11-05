@@ -232,6 +232,30 @@ describe('a header that folds', () => {
     expect(header.shadowRoot?.activeElement).toBe(toggle)
   })
 
+  /* A folded region is a column, and its destinations go down it. A navigation
+     that names its own orientation keeps it. */
+  test('stands a navigation on end while folded and gives the orientation back when wide', async () => {
+    const header = (await mount(`
+      <helix-headless-app-header fold-below="600">
+        <helix-headless-navigation label="Main"><a href="/">Home</a></helix-headless-navigation>
+        <helix-headless-navigation label="Kept" orientation="vertical"><a href="/a">A</a></helix-headless-navigation>
+      </helix-headless-app-header>
+    `)) as Folding
+    const [turned, kept] = header.querySelectorAll('helix-headless-navigation')
+    header.fold(400)
+    await header.updateComplete
+    expect([turned?.getAttribute('orientation'), kept?.getAttribute('orientation')]).toEqual([
+      'vertical',
+      'vertical',
+    ])
+    header.fold(900)
+    await header.updateComplete
+    expect([turned?.hasAttribute('orientation'), kept?.getAttribute('orientation')]).toEqual([
+      false,
+      'vertical',
+    ])
+  })
+
   test('draws no toggle and hides nothing where the bar is wide, or nothing asked it to fold', async () => {
     const header = await folding()
     header.fold(900)

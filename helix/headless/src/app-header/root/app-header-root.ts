@@ -213,6 +213,35 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /** The navigation the fold stood on end, to give back when the bar widens. */
+  private readonly turned = new Set<Element>()
+
+  /**
+   * A folded region opens as a column, and a `Navigation` in it lists its
+   * destinations down that column: one that names no `orientation` takes
+   * `vertical` while the bar is folded and loses it when the bar widens.
+   * Measured at 390, the open region held its destinations in a row.
+   */
+  private turnNavigation(folded: boolean): void {
+    if (!folded) {
+      for (const navigation of this.turned) {
+        navigation.removeAttribute('orientation')
+      }
+      this.turned.clear()
+      return
+    }
+    for (const child of this.children) {
+      if (
+        child.slot === '' &&
+        child.localName.endsWith('-navigation') &&
+        !child.hasAttribute('orientation')
+      ) {
+        child.setAttribute('orientation', 'vertical')
+        this.turned.add(child)
+      }
+    }
+  }
+
   /** Opens or closes the folded middle region. */
   private readonly handleToggle = (): void => {
     this.toggleOpen()
@@ -471,6 +500,9 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
     }
     if (changed.has('hideOnScroll') && !this.hideOnScroll) {
       this.hide(false)
+    }
+    if (changed.has('folded')) {
+      this.turnNavigation(this.folded)
     }
     this.watchPresses()
   }

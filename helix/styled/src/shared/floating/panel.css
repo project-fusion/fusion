@@ -13,7 +13,27 @@
    gives `[popover]` `border: solid`, an inset that centers it in the window and
    a margin that offsets it from wherever the positioning put it, so dropping any
    of the three leaves the UA's answer standing. */
+/* The page's line as it stands outside, read here for the surface below. */
+:host {
+  --_floating-line: var(--helix-color-border);
+}
+
 [part="surface"] {
+  /* **A line inside sits the step above the panel that it sits above the page**,
+     as Popover's, Dialog's, and Drawer's do. In dark the panel is
+     `surface-overlay`, one rung above `surface-raised` since November 4, 2026,
+     and the page's line sits 0.011 above it, #212121 on #1e1e1e: 1.03:1 for a
+     Menu's header rule or a Divider in a Menu, where it was 1.10 on #181818. 12%
+     of the ink over the panel measures 1.34. Light keeps the page's line, 1.23:1
+     on the white panel as on the white page. */
+  --helix-color-border: light-dark(
+    var(--_floating-line),
+    color-mix(
+      in oklab,
+      var(--helix-color-foreground) 12%,
+      var(--_floating-background-color, var(--helix-color-surface-overlay))
+    )
+  );
   background-color: var(--_floating-background-color, var(--helix-color-surface-overlay));
   border: var(--_floating-border-width, var(--helix-border-floating)) solid
     var(--_floating-border-color, var(--helix-color-border-floating));

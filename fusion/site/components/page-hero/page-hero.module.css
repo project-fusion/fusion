@@ -77,6 +77,16 @@
   text-align: start;
 }
 
+/* **On a touch screen the hero's search field is 44 tall.** A field keeps the
+   height it is drawn at on a coarse pointer, which here is 40, and the hero's
+   field is the one control the page leads with. Decided by the owner on
+   November 3, 2026. Through the component's own size hook. */
+@media (pointer: coarse) {
+  .heroSearch {
+    --input-size: max(var(--helix-size-control), var(--helix-size-target));
+  }
+}
+
 /* The shortcut chip on the hero's search field, which is glass. **`Kbd` ships an
    opaque key and the hero has nothing opaque on it.** Its ground is
    `surface-sunken` and its edge is a full-strength `border`, which is right on a

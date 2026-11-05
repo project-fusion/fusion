@@ -94,6 +94,15 @@
   color: var(--helix-color-foreground);
 }
 
+/* A row is its name and one line of summary, 41px at 390, so a touch screen
+   takes it to `size-target` with the two lines centered in it. */
+@media (pointer: coarse) {
+  .read {
+    align-content: center;
+    min-block-size: var(--helix-size-target);
+  }
+}
+
 /* The closing call to action, as a card rather than a band, in the brand's
    own fill. The same recipe as the landing page's close. */
 .closingCard {

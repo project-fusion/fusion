@@ -15,7 +15,7 @@
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
   --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
-  --helix-size-control: round(calc(var(--helix-size-control-sm) * 0.8), 1px);
+  --helix-size-control: var(--helix-size-control-xs);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
@@ -156,6 +156,41 @@
 
   [part="replace"] {
     margin-inline-start: auto;
+  }
+}
+
+/* **A narrow bar gives the toolbar a row of its own, its buttons spread across
+   it**, under the field and the count. Left to wrap, the toolbar stood at the
+   end of a row with nothing at its start: measured at 390, six buttons in the
+   last 176 of a 321 row. */
+@container (inline-size < 30rem) {
+  [part="controls"] {
+    flex-basis: 100%;
+  }
+
+  [part="controls"]::part(toolbar) {
+    justify-content: space-between;
+  }
+}
+
+/* **On a touch screen the field reaches the target**, since a field has no box
+   to reach past its edge as a button does, and the bar's end inset holds the
+   reach of the last button inside the bar. A pane that clips its content cut
+   the Close button's press to 40 across at the end of the bar, and the field
+   pressed at 26. */
+@media (pointer: coarse) {
+  [part="bar"] {
+    padding-inline: max(
+        var(--helix-space-sm),
+        (var(--helix-size-target) - var(--helix-size-control)) /
+        2
+      )
+      max(var(--helix-space-2xs), (var(--helix-size-target) - var(--helix-size-control)) / 2);
+  }
+
+  [part="field"],
+  [part="replace-field"] {
+    block-size: max(var(--helix-size-control), var(--helix-size-target));
   }
 }
 

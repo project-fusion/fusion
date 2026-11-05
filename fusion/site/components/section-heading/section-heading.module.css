@@ -72,9 +72,15 @@
  * After rather than before: inline and leading, the mark reads as the first
  * character of the title. Trailing, it is plainly an affordance the heading
  * carries. Shown at rest here too, there being no hover on a touch screen to
- * reveal it with. */
+ * reveal it with.
+ *
+ * **Inline, in the line of the last word.** The mark is the last child, so in
+ * the heading's own flow it follows the words wherever they end. A flex row
+ * made the words one item as wide as the line once they wrapped, and the mark
+ * stood at the far edge of the column. */
 @media (width < 48rem) {
   .anchor {
+    display: inline-flex;
     inset-block-start: auto;
     inset-inline-end: auto;
     margin-inline-start: var(--helix-space-sm);
@@ -83,26 +89,13 @@
     /* Relative, which holds the press area above and leaves the mark in flow. */
     position: relative;
     translate: none;
+    vertical-align: middle;
   }
 
-  /* **On the part, not on the host.** `helix-text` renders
-     `<h2 part="text"><slot></slot></h2>`, so the mark and the words are inside
-     that element rather than being children of the host: a flex container on the
-     host has exactly one item, the `h2`, and reordering or centering it does
-     nothing to the two things a reader sees. Measured at 700 before this, the
-     anchor came out 151px wide and top-aligned in a 68px heading with every
-     computed value saying `center`, and the glyph drew on its own line above the
-     words. */
-  .heading::part(text) {
-    align-items: center;
-    display: flex;
-    flex-direction: row-reverse;
-    gap: var(--helix-space-2xs);
-    /* `start`, not `end`. Box alignment resolves against the writing mode rather
-       than against the flex direction, so `end` is the right edge whatever
-       `row-reverse` did to the order, and every heading on a narrow screen hung
-       off the right of a page whose paragraphs start on the left. `flex-end`
-       would say the same thing the other way round. */
-    justify-content: start;
+  /* Balanced, so the mark never takes a line of its own: "Forms and
+     validation" filled the 358 of a 390 screen exactly and left the mark
+     alone under it. */
+  .heading {
+    text-wrap: balance;
   }
 }

@@ -8,7 +8,7 @@ import { absolute } from '@/utils/site/site'
  * The ellipsis beside a component's title, wired.
  *
  * **Everything in here is about the document rather than about the component**,
- * which is why it is an overflow menu and why View Source keeps its own button
+ * which is why it is an overflow menu and why View source keeps its own button
  * beside it: one of these is a thing a reader wants, and five are a thing a
  * reader occasionally wants.
  *

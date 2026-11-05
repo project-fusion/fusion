@@ -132,13 +132,18 @@ describe('separation on the feed', () => {
     expect(bare.hasAttribute('separation')).toBe(false)
   })
 
-  test('takes the rule under the header away and puts the gap between boxes before the first', () => {
+  test('takes the rule under the header away and puts the gap between boxes before the first and at the sides', () => {
     const text = feedSheet()
     expect(text).toContain(
       ':host([separation="filled"]) [part="header"], :host([separation="outlined"]) [part="header"] {border-block-end: none}',
     )
     expect(text).toContain(
-      ':host([separation="filled"]) [part="list"], :host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs))}',
+      ':host([separation="filled"]) [part="list"], :host([separation="outlined"]) [part="list"] {padding-block-start: var(--notifications-item-gap, var(--helix-space-xs));padding-inline: var(--notifications-item-gap, var(--helix-space-xs))}',
+    )
+    /* The header and the footer move in by the same gap, so a title still
+       starts where the media column inside a box starts. */
+    expect(text).toContain(
+      'padding-inline: calc(var(--notifications-padding-inline, var(--helix-space-lg)) + var(--notifications-item-gap, var(--helix-space-xs)))',
     )
   })
 })

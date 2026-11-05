@@ -209,6 +209,9 @@ const INTERACTIVE =
 /** One stop in the walk: a card, or a connection leaving one. */
 type Stop = { kind: 'node'; key: string } | { kind: 'edge'; key: string; edge: CanvasEdge }
 
+/** A part of the box a fit may use, in pixels from its top left. */
+type Free = { x: number; y: number; width: number; height: number }
+
 /**
  * A color the page wrote in an element's own `style`, which is where a color
  * with no meaning goes: a tone is a statement and an attribute, a hex is a
@@ -3721,18 +3724,35 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * a consumer who restyles the cluster, moves it with a part rule, or hides it
    * with `controls="none"` gets a fit that follows what is actually there.
    */
-  private get free(): { x: number; y: number; width: number; height: number } {
+  private get free(): Free {
+    const { band, column, whole } = this.frees
+    if (band && (!column || band.height / whole.height >= column.width / whole.width)) {
+      return band
+    }
+    return column ?? whole
+  }
+
+  /**
+   * The box less a band across the controls' edge, and less a column down
+   * their side, each where it leaves at least half the box, and the whole box.
+   */
+  private get frees(): {
+    band: Free | undefined
+    column: Free | undefined
+    whole: Free
+  } {
     const { height, width } = this.box
     const whole = { height, width, x: 0, y: 0 }
     const viewport = this.renderRoot?.querySelector('[part="viewport"]')
     const controls = this.controlsElement
+    const none = { band: undefined, column: undefined, whole }
     if (!viewport || !controls) {
-      return whole
+      return none
     }
     const box = viewport.getBoundingClientRect()
     const cluster = controls.getBoundingClientRect()
     if (cluster.width === 0 || cluster.height === 0) {
-      return whole
+      return none
     }
     const atTop = cluster.top - box.top <= box.bottom - cluster.bottom
     const atLeft = cluster.left - box.left <= box.right - cluster.right
@@ -3744,13 +3764,17 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     const column = atLeft
       ? cluster.right - box.left + (cluster.left - box.left)
       : box.right - cluster.left + (box.right - cluster.right)
-    if (band / height <= column / width && band <= height / 2) {
-      return { height: height - band, width, x: 0, y: atTop ? band : 0 }
+    return {
+      band:
+        band <= height / 2
+          ? { height: height - band, width, x: 0, y: atTop ? band : 0 }
+          : undefined,
+      column:
+        column <= width / 2
+          ? { height, width: width - column, x: atLeft ? column : 0, y: 0 }
+          : undefined,
+      whole,
     }
-    if (column <= width / 2) {
-      return { height, width: width - column, x: atLeft ? column : 0, y: 0 }
-    }
-    return whole
   }
 
   /**
@@ -3884,11 +3908,22 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    */
   private fitInto(direct: boolean): void {
     const board = extent(this.nodes)
-    const free = this.free
+    const whole = { height: board.height + MARGIN * 2, width: board.width + MARGIN * 2 }
+    /* **A board cut across stands under a band, and one cut down beside a
+       column**, since the cut side runs on under the controls whichever is
+       kept clear. Measured November 3, 2026 at 390 wide: kept clear of a
+       column, the minimap example's board, too wide at its least zoom, drew
+       its first connection under the zoom buttons. */
+    const { band, column } = this.frees
+    const free =
+      band && column && whole.width * FIT_MIN > column.width
+        ? band
+        : band && column && whole.height * FIT_MIN > band.height
+          ? column
+          : this.free
     if (board.width === 0 || free.width === 0 || free.height === 0) {
       return
     }
-    const whole = { height: board.height + MARGIN * 2, width: board.width + MARGIN * 2 }
     const zoom = Math.max(
       Math.min(1, free.width / whole.width, free.height / whole.height),
       FIT_MIN,

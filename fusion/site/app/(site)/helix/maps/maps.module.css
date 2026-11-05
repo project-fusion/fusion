@@ -116,6 +116,16 @@
   align-self: stretch;
 }
 
+/* **Stacked on a phone, each button takes the line**, as the other heroes'
+   do: measured at 390, the home page's pair stood 342 wide and this one 200,
+   two widths for the same pair of doors. Only where the pair cannot sit side
+   by side, so a wider column keeps its two `size-button` halves. */
+@media (width < 30rem) {
+  .mapsActions [data-button] {
+    flex-grow: 1;
+  }
+}
+
 /* **The subtle button opaque, as it reads over the page's ground.** Its fill is
    14% of the ink over transparent, so set on the map it let the streets and a
    highway shield show through its label. Mixed into the page's ground instead,

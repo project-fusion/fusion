@@ -159,13 +159,24 @@ slot[name="indicator"]::slotted(*) {
   content: none;
 }
 
-:host(:state(active)) [part~="item"],
-:host(:not([disabled])) [part~="item"]:hover {
+:host(:state(active)) [part~="item"] {
   /* A wash of the foreground rather than a step on the surface ladder, and
      the one the theme engine solves the description's quiet ink against. */
   background-color: var(
     --option-active-background-color,
     var(--_option-wash, var(--helix-color-hover))
+  );
+}
+
+/* **One highlight in a list.** A listbox moves its highlight to the option
+   under the pointer, so there the hover draws nothing of its own and the
+   active wash is the only one: an open Select lit the chosen row and the
+   hovered row alike, two highlights in one wash. Elsewhere, where nothing moves
+   the highlight, the hover still lights the row. */
+:host(:not([disabled]):not(:state(active))) [part~="item"]:hover {
+  background-color: var(
+    --option-hover-background-color,
+    var(--option-active-background-color, var(--helix-color-hover))
   );
 }
 

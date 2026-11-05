@@ -107,6 +107,14 @@ const CONTEXT_NAMES = 3
  */
 const RAISED: Partial<Record<keyof typeof KINDS, number>> = { source: 2 }
 
+/**
+ * **How far each kind steps right in rows**, in the graph's units. At 0.6 the
+ * six kinds spanned about 55 pixels of a 342 frame at 390, and every link ran
+ * down one dark band over the notes between its ends. At 1 the links part
+ * enough to follow, and the strip still leaves the names their room.
+ */
+const ROW_STEP = 1
+
 /** How the trace is laid out: in columns, across a wide screen, or in rows, down a narrow one. */
 export type TraceLayout = 'columns' | 'rows'
 
@@ -162,7 +170,7 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
        over where each half of each kind sits still left four links through
        a name at best, so the frame's legend names the groups. */
     column.forEach((id, down) => {
-      at.set(id, { x: across * 0.6, y: -(line + down) })
+      at.set(id, { x: across * ROW_STEP, y: -(line + down) })
     })
     /* Past this kind's notes, and one more line between kinds. */
     line += column.length + 1
@@ -209,11 +217,21 @@ const NAMES = 0.8 * ACROSS
 const LEGEND_LINES = 4
 
 /**
+ * How far past the last kind the box reaches in rows, and how far before the
+ * first, in the graph's units. **The strip at the start, its names after it.**
+ * Fitted to the notes alone, the strip stood in the middle of the frame and
+ * the names of the last kinds ran into its far edge, or turned and ran back
+ * over the strip. Seven units is about the longest name at 390.
+ */
+const ROW_NAMES = 7
+const ROW_INSET = 1
+
+/**
  * **The box the drawing is fitted to, with room for the answers' names.**
  * Sigma fits the notes to the frame, and a name is drawn to the right of its
  * note, so in columns the last column's names ran past the frame's edge. In
- * rows the notes take a narrow strip in the middle, which leaves names room
- * either side, and the box reaches past the last note for the legend under it:
+ * rows the notes take a narrow strip at the start, the names the room after
+ * it, and the box reaches past the last note for the legend under it:
  * fitted to the notes alone, the answer at the foot sat behind the legend once
  * the legend wrapped.
  */
@@ -223,7 +241,7 @@ export const boxFor = (layout: TraceLayout): { x: [number, number]; y: [number, 
   const ys = places.map((place) => place.y)
   if (layout === 'rows') {
     return {
-      x: [Math.min(...xs), Math.max(...xs)],
+      x: [Math.min(...xs) - ROW_INSET, Math.max(...xs) + ROW_NAMES],
       y: [Math.min(...ys) - LEGEND_LINES, Math.max(...ys)],
     }
   }

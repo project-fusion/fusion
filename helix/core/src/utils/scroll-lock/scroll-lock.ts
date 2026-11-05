@@ -7,6 +7,16 @@ interface ScrollLock {
   gutter: string
   holders: Set<Element>
   overflow: string
+  raised: Set<Raised>
+}
+
+/**
+ * A box that stays above every modal surface: Toast's stack. `raise` puts it
+ * back on top of the top layer, and `covers` says whether a point lands on it.
+ */
+export interface Raised {
+  covers(x: number, y: number): boolean
+  raise(): void
 }
 
 const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
@@ -14,6 +24,15 @@ const SCROLL_LOCK = Symbol.for('fusion.helix.scroll-lock')
 /** The record, made the first time anything holds the page. */
 const record = (): ScrollLock | undefined =>
   (globalThis as unknown as Record<symbol, ScrollLock | undefined>)[SCROLL_LOCK]
+
+/** The record, made here if nothing has held the page yet. */
+const made = (): ScrollLock => {
+  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
+  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '', raised: new Set() }
+  /* A record from an older copy of Helix has no `raised`. */
+  globals[SCROLL_LOCK].raised ??= new Set()
+  return globals[SCROLL_LOCK]
+}
 
 /**
  * Stops the page behind a modal surface from scrolling.
@@ -27,10 +46,8 @@ const record = (): ScrollLock | undefined =>
  * Dialog, Drawer and Lightbox hold it, and Toast reads who does.
  */
 export const lockScroll = (holder: Element): void => {
-  const globals = globalThis as unknown as Record<symbol, ScrollLock | undefined>
   const root = document.documentElement
-  globals[SCROLL_LOCK] ??= { gutter: '', holders: new Set(), overflow: '' }
-  const lock = globals[SCROLL_LOCK]
+  const lock = made()
   if (lock.holders.has(holder)) {
     return
   }
@@ -58,3 +75,36 @@ export const unlockScroll = (holder: Element): void => {
 
 /** The surfaces holding the page still, in the order they took it. */
 export const scrollHolders = (): Element[] => [...(record()?.holders ?? [])]
+
+/**
+ * Keeps a box above every modal surface opened after it, until the returned
+ * function lets go.
+ *
+ * The top layer is ordered by when each element entered it, so a modal opened
+ * while a toast showed covered the toast with its backdrop: measured, the
+ * whole stack sat under the scrim until another message arrived.
+ */
+export const keepAbove = (one: Raised): (() => void) => {
+  made().raised.add(one)
+  return () => {
+    record()?.raised.delete(one)
+  }
+}
+
+/** Puts every kept box back on top. A modal surface calls it once it has opened. */
+export const raiseAbove = (): void => {
+  for (const one of record()?.raised ?? []) {
+    one.raise()
+  }
+}
+
+/**
+ * Whether a press lands on a kept box, which a modal surface reads before it
+ * takes the press for one on its backdrop.
+ *
+ * **The box is inert under the modal**, as everything outside it is, so the
+ * press passes through it to the backdrop, and a reader pressing a toast's
+ * Dismiss closed the Dialog under it instead.
+ */
+export const coversPress = (event: MouseEvent): boolean =>
+  [...(record()?.raised ?? [])].some((one) => one.covers(event.clientX, event.clientY))

@@ -171,9 +171,14 @@
      in: 200ms held on a cold load, and 133ms on a warm one. Paused,
      `backwards` keeps the `from` frame on screen, the delays included, and
      the rise starts after that frame. `data-helix-elements` is set by
-     `HelixElements`. */
+     `HelixElements`.
+
+     **Twice the slow step, 640ms at the shipped scale.** At three times it,
+     the calls to action stayed blurred until 1.32s and the last line arrived
+     at 1.44s, long after a reader had looked for the buttons. Now they clear at
+     1.0s and the column settles at 1.12s. */
   .heroShell > * {
-    animation: site-hero-arrive calc(var(--helix-duration-slow) * 3) var(--helix-easing-decelerate)
+    animation: site-hero-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-decelerate)
       backwards;
     animation-play-state: paused;
   }

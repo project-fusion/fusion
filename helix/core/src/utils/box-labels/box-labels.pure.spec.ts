@@ -132,7 +132,7 @@ describe('the box labels', () => {
     expect(place(false)).toEqual(['North'])
   })
 
-  test('names a step apart down a slanted edge are moved clear and every one is kept', () => {
+  test('names a step apart down a slanted edge are moved a line apart and every one is kept', () => {
     /* Four series 11.5 pixels apart at 12, as a ribbon chart's were at 342 wide:
        0.0125 of a box a pixel, so a step of 0.144 for names 0.15 tall. */
     const row = (at: number, text: string) => ({ at, category: true, text })
@@ -161,17 +161,33 @@ describe('the box labels', () => {
       'São Paulo (ms)',
       'Virginia (ms)',
     ])
-    /* Each name's descenders, 0.44 of its height under a `g` or a `p` and
-       0.38 under a parenthesis, clear the next one's capitals, 0.48, by an
-       eighth of a line. */
-    const down = (text: string): number => (/[gjpqy]/.test(text) ? 0.44 : 0.38)
+    /* Each name stands a line from the next, the face's 1.3 of its size,
+       which is the box a browser gives it. */
     const sorted = [...labels].sort((one, other) => one.y - other.y)
     for (const [index, below] of sorted.slice(1).entries()) {
       const above = sorted[index] as BoxLabel
-      expect(below.y - above.y).toBeGreaterThanOrEqual(
-        0.15 * (down(above.text) + 0.48 + 0.125) - 1e-4,
-      )
+      expect(below.y - above.y).toBeGreaterThanOrEqual(0.15 * 1.3 * 0.998)
     }
+  })
+
+  test('numbers stand a line apart, and those between are left out', () => {
+    /* Eight numbers 14.4 pixels apart at 12.3, as a spatial bar chart's
+       upright was at 390 wide: 1.17 of their size, 0.152 for numbers 0.13
+       tall, which a line is 0.169. */
+    const y = {
+      name: '',
+      ticks: Array.from({ length: 8 }, (_, index) => ({
+        at: (index / 7) * 2 - 1,
+        text: String(index * 100),
+      })),
+    }
+    const seen = ([, up]: readonly number[]) => ({ depth: 0, x: 0, y: -(up ?? 0) * 3.5 * 0.152 })
+    const labels = boxLabels(
+      seen,
+      { x: { name: '', ticks: [] }, y, z: { name: '', ticks: [] } },
+      SIZES,
+    )
+    expect(labels.map((label) => label.text)).toEqual(['0', '200', '400', '600'])
   })
 
   test('a wide name off a slanted edge stands clear of the edge at its nearest corner', () => {

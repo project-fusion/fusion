@@ -68,6 +68,13 @@
   border-color: var(--radio-border-color, var(--helix-color-foreground));
 }
 
+/* **And the circle takes the hover wash**, as Checkbox's box does: a chosen
+   circle is already at the firm edge, so a pointer over it changed nothing.
+   A read-only group sets `--_radio-hover` to `transparent`. */
+:host(:not([disabled])) [part="item"]:hover [part="box"] {
+  background-color: var(--_radio-hover, var(--helix-color-hover));
+}
+
 /* The edge firms up and takes no color, which is the checkbox's rule: color
    is reserved for state, and being chosen is an answer rather than a state. */
 :host(:state(selected)) [part="box"] {
@@ -132,7 +139,9 @@ slot[name="indicator"]::slotted(*) {
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-control);
   font-weight: var(--helix-weight-medium);
-  line-height: var(--helix-leading-tight);
+  /* The body's leading, as Checkbox's and Switch's labels take it: at the
+     tight step a wrapped 13 pixel label sat on 15.6 pixel lines. */
+  line-height: var(--helix-leading-normal);
   /* A long unbroken word breaks inside the column it was given. */
   min-inline-size: 0;
   overflow-wrap: anywhere;
@@ -158,8 +167,12 @@ slot[name="indicator"]::slotted(*) {
    references doing what tokens are for. */
 :host(:is([separation="filled"], [separation="outlined"])) [part="item"] {
   align-items: start;
-  background-color: var(--radio-card-background-color, var(--helix-color-surface));
-  border: var(--helix-border-thin) solid var(--radio-card-border-color, var(--helix-color-border));
+  background-color: var(
+    --radio-card-background-color,
+    var(--_radio-card-ground, var(--helix-color-surface))
+  );
+  border: var(--helix-border-thin) solid
+    var(--radio-card-border-color, var(--_radio-card-edge, var(--helix-color-border)));
   /* A card's corner, as Card draws it: 8 at the default, where it drew 4. */
   border-radius: var(--helix-radii-md);
   display: flex;
@@ -181,12 +194,15 @@ slot[name="indicator"]::slotted(*) {
    drew `surface`, 1.04:1 on the white page, which is nearly the page; the wash
    is 1.12 there and on every ground. */
 :host([separation="filled"]) [part="item"] {
-  background-color: var(--radio-card-background-color, var(--helix-color-surface-filled));
-  border-color: transparent;
+  background-color: var(
+    --radio-card-background-color,
+    var(--_radio-card-ground, var(--helix-color-surface-filled))
+  );
+  border-color: var(--_radio-card-edge, transparent);
 }
 
 :host(:not([disabled]):is([separation="filled"], [separation="outlined"])) [part="item"]:hover {
-  border-color: var(--helix-color-foreground-muted);
+  border-color: var(--_radio-card-edge, var(--helix-color-foreground-muted));
 }
 
 /* The card is where the brand color belongs, because here the whole surface is
@@ -204,9 +220,15 @@ slot[name="indicator"]::slotted(*) {
  * point of the pair: an unanswered column is grounds alone and the answer is
  * the one with a line around it. */
 :host(:is([separation="filled"], [separation="outlined"]):state(selected)) [part="item"] {
-  background-color: var(--helix-color-surface-raised);
-  border-color: var(--helix-color-primary);
-  box-shadow: 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
+  border-color: var(--_radio-card-edge, var(--helix-color-primary));
+  box-shadow: 0 0 0 var(--helix-border-thick) var(--_radio-card-ring, var(--helix-color-primary));
+}
+
+/* **The fill steps up under `filled` only.** `outlined` is an edge and no fill,
+   chosen or not: a chosen outlined card drew `surface-raised`, #f7f7f7 in light
+   and #181818 in dark, the same card as a chosen `filled` one. */
+:host([separation="filled"]:state(selected)) [part="item"] {
+  background-color: var(--_radio-card-ground, var(--helix-color-surface-raised));
 }
 
 /* On the whole card, because in this appearance the card is the target. The
@@ -266,8 +288,9 @@ slot[name="indicator"]::slotted(*) {
 
 :host([chip]) [part="item"] {
   /* How far a chosen chip comes forward, and a hovered one half of it. Two
-     pixels, which the space scale cannot say: its first rung is four. */
-  --_radio-chip-lift: 2px;
+     pixels, half the space scale's first rung, so it scales with the seed's
+     density as the chip does. */
+  --_radio-chip-lift: calc(var(--helix-space-2xs) / 2);
 
   align-items: center;
   background-color: var(--helix-color-surface-sunken);

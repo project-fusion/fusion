@@ -1,6 +1,26 @@
 :host {
+  /* The region's tight icon step, and never under `size-icon-sm`, read here and
+     handed to the glyph below. */
+  --_icon-button-glyph: max(var(--helix-size-icon-tight), var(--helix-size-icon-sm));
   --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
   display: inline-flex;
+}
+
+/* **The glyph a field draws**, a step under the region's icon: 16 at `md` and
+   20 at `lg`, as a Select's caret and an Input's clear mark are. At the
+   region's own step the plus drew 20 in a 40 button beside a field's 16 and a
+   Button's 14 in one row.
+
+   **Never under 16, so a small bar keeps a legible mark.** A Toolbar or an App
+   Header sits at `sm`, where the field step is 12, and a 12 glyph in a 32
+   button read thin beside the bar's 14 pixel words. Decided by the owner on
+   November 4, 2026. The step the glyph falls back to, on the glyph, so an
+   `--icon-size` set on the button or around it, as a crumb sets one, still
+   sizes it. */
+::slotted(*) {
+  --helix-size-icon: var(--_icon-button-glyph);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
 }
 
 /*
@@ -481,12 +501,18 @@
   );
 }
 
+/* A press, one step past each hover. **16% in light and 20% in dark, the
+   strengths of `color-press`**, as Button's press is: at 16% in dark an icon
+   button pressed to rgb 41 where a Button pressed to 51. */
 :host(:not(:disabled)) [part="button"]:active {
   background-color: var(
     --_icon-button-pressed-fill,
     var(
       --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 16%, transparent)
+      light-dark(
+        color-mix(in oklab, var(--_icon-button-tone) 16%, transparent),
+        color-mix(in oklab, var(--_icon-button-tone) 20%, transparent)
+      )
     )
   );
 }
@@ -503,7 +529,10 @@
     --_icon-button-pressed-fill,
     var(
       --icon-button-background-color,
-      color-mix(in oklab, var(--_icon-button-tone) 16%, transparent)
+      light-dark(
+        color-mix(in oklab, var(--_icon-button-tone) 16%, transparent),
+        color-mix(in oklab, var(--_icon-button-tone) 20%, transparent)
+      )
     )
   );
 }

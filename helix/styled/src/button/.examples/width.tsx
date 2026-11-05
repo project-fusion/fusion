@@ -19,6 +19,7 @@ export function Example() {
       <helix-flex
         className="standard"
         gap="sm"
+        wrap
       >
         <helix-button
           emphasis="solid"
@@ -32,6 +33,7 @@ export function Example() {
       <helix-flex
         className="standard"
         gap="sm"
+        wrap
       >
         <helix-button
           emphasis="solid"

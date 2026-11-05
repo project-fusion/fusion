@@ -68,7 +68,7 @@
   grid-column: 2;
   /* Quieter than the number beside it, from the bubble's own ink rather than
      from the page's. */
-  opacity: 0.72;
+  opacity: var(--helix-opacity-quiet);
 }
 
 [part="tooltip-value"] {
@@ -118,6 +118,11 @@
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;
+  /* Pinned to the start corner, where it can never stand past an edge. Left at
+     its static place after the plot, the pixel stood just past a chart's end
+     and widened a 280 page to 282. */
+  inset-block-start: 0;
+  inset-inline-start: 0;
   margin: var(--helix-space-none);
   overflow: hidden;
   position: absolute;

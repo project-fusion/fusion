@@ -20,7 +20,7 @@
   box-sizing: border-box;
   color: var(--helix-color-danger);
   font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+  font-size: var(--helix-text-sm);
   inset: 0;
   line-height: var(--helix-leading-normal);
   margin: var(--helix-space-none);

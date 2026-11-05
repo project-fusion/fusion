@@ -15,6 +15,7 @@ import {
   MixinChartStatus,
   spokenReading,
   words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   html,
@@ -438,7 +439,7 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
    */
   private renderFallback(field: TreemapField, at: number): TemplateResult {
     const view = wordsFitted(this.plotRoom.room, (words) =>
-      boxView(field.axes, this.camera, [], this.noBox, words),
+      boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
     const blocks = blocksDrawn(field, view.projection)
     const active = blocks[at]

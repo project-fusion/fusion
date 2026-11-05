@@ -290,10 +290,19 @@ slot[name="submenu"]::slotted(helix-divider) {
 
 /* A command that destroys something says so in its ink and its wash, its
    leading icon included: the column's quiet ink left a gray trash can beside a
-   red label. */
+   red label.
+
+   **Deepened toward the foreground in dark, at rest as under the pointer**, as
+   Button deepens a tone's label on a wash of that tone. A menu in a Dialog or a
+   Drawer stands two rungs up, and the bare tone on its 12% wash there measured
+   3.84:1; 85% of the tone measures 4.60. One ink in both states, so the label
+   does not change color as the pointer arrives. */
 :host([tone="danger"]) [part~="item"],
 :host([tone="danger"]) [part="start"] {
-  color: var(--helix-color-danger);
+  color: light-dark(
+    var(--helix-color-danger),
+    color-mix(in oklab, var(--helix-color-danger) 85%, var(--helix-color-foreground))
+  );
 }
 
 /* The row the keys reached in a filtered menu takes the same wash, as a

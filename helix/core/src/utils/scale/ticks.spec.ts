@@ -50,8 +50,22 @@ describe('ticks', () => {
 describe('headroom', () => {
   test('raises the top to a level clear of the highest reading', () => {
     /* 1,410 was drawn on the top edge with 1,400 the highest rule under it. */
-    expect(headroom([1180, 1410])).toEqual([1180, 1450])
+    expect(headroom([1180, 1410])).toEqual([1150, 1450])
     expect(ticks(headroom([1180, 1410])).at(-1)).toBe(1450)
+  })
+
+  test('lowers the floor to a level clear of the lowest reading', () => {
+    /* 1,180 was drawn on the bottom edge with 1,200 the lowest rule over it,
+       and a diverging bar of -14,000 ran past the last rule, -10,000. */
+    expect(ticks(headroom([1180, 1410]))[0]).toBe(1150)
+    const [floor] = headroom([-14_000, 12_000])
+    expect(floor).toBeLessThan(-14_000)
+    expect(ticks(headroom([-14_000, 12_000]))[0]).toBe(floor)
+  })
+
+  test('a floor of zero stays, and a floor above zero is lowered no further than zero', () => {
+    expect(headroom([0, 1000])[0]).toBe(0)
+    expect(headroom([3, 100])[0]).toBe(0)
   })
 
   test('a peak exactly on a level takes the next one', () => {
@@ -69,8 +83,8 @@ describe('headroom', () => {
     expect(headroom([0, 0.93])).toEqual([0, 1])
   })
 
-  test('a top at zero and a flat domain are left alone', () => {
-    expect(headroom([-40, 0])).toEqual([-40, 0])
+  test('a top at zero stays, and a flat domain is left alone', () => {
+    expect(headroom([-40, 0])).toEqual([-50, 0])
     expect(headroom([7, 7])).toEqual([7, 7])
   })
 })

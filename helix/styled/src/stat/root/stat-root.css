@@ -41,10 +41,9 @@ slot[name="label"]::slotted(*) {
    part is the figure `value` writes, which takes all of it. */
 [part="value"] {
   /* Figures take one width each. A value breaks only where it is wider than the
-     whole column even two steps smaller, and then after a group separator,
-     where the figure offers a break, so "99.9%" stays together. `anywhere`,
-     since `break-word` leaves the word's full width as the `auto` column's
-     minimum, and the column then runs past the host. */
+     whole column even two steps smaller. A slotted figure offers no break of its
+     own, so it keeps `anywhere`: `break-word` leaves the word's full width as
+     the `auto` column's minimum, and the column then runs past the host. */
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
   color: var(--stat-value-color, var(--helix-color-foreground));
@@ -53,6 +52,15 @@ slot[name="label"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
+}
+
+/* **A figure the stat writes breaks after a group separator and nowhere
+   else.** It offers a break after each separator, which keeps every run short
+   enough to be the column's minimum, and `break-word` takes a break inside a
+   run only where one run alone is wider than the column. Under `anywhere` the
+   browser broke "1,284,567" as "1,284,5" over "67". */
+[part="value"]:not(slot) {
+  overflow-wrap: break-word;
 }
 /* A step down the scale where the figure does not fit at full size, and a
    second where one is not enough, measured by the headless tier against the

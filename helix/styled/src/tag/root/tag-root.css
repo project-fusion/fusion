@@ -205,11 +205,12 @@ slot:not([name])::slotted(helix-icon) {
 }
 
 [part="dismiss"] svg {
-  /* From the icon steps, so the mark follows density with the tag around it.
-     **Rounded to an even size**, 10, 12 and 16, so the cross's center lands on a
-     whole pixel: three quarters of the tight steps, 12, 16 and 20, is 9 and 15
-     at the ends. */
-  --_tag-dismiss-size: round(calc(var(--helix-size-icon-tight) * 0.75), 2px);
+  /* **A step under the tag's own icon**, 10, 12 and 14 on tags of 24, 28 and
+     32, so the cross follows the tag as its icon does and keeps an even size,
+     its center on a whole pixel. Three quarters of the tight icon step rounded
+     to 10, 12 and 16, a jump of four at `lg` where the icon beside it moved
+     two. */
+  --_tag-dismiss-size: calc(round(calc(var(--_tag-height) / 2), 2px) - 2px);
   block-size: var(--_tag-dismiss-size);
   inline-size: var(--_tag-dismiss-size);
 }
@@ -223,7 +224,7 @@ slot:not([name])::slotted(helix-icon) {
 slot[name="start"]::slotted(*) {
   font-weight: var(--helix-weight-semibold);
   margin-inline-end: var(--_tag-inset);
-  opacity: 0.75;
+  opacity: var(--helix-opacity-quiet);
 }
 
 /*

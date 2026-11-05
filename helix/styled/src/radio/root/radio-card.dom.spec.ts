@@ -87,11 +87,12 @@ if (hasLayout()) {
       expect(Number.parseFloat(edge(find('plain'), 'field').borderTopWidth)).toBe(0)
     })
 
-    test('a chosen card is lifted rather than colored', async () => {
+    test('a chosen outlined card is marked by its edge, with no fill', async () => {
       /* This component's own rule about the dot, restated for the surface:
          color is reserved for state, and being chosen is an answer rather than
          a state. If someone reaches for an accent border here later, this is
-         the decision they are changing. */
+         the decision they are changing. And `outlined` is an edge and no fill,
+         chosen or not: a chosen card that filled drew the same as `filled`. */
       const find = await board(
         `<helix-radio id="chosen" separation="outlined" selected value="one">Solo</helix-radio>
          <helix-radio id="rest" separation="outlined" value="two">Team</helix-radio>`,
@@ -99,7 +100,7 @@ if (hasLayout()) {
       const chosen = edge(find('chosen'), 'item')
       const rest = edge(find('rest'), 'item')
 
-      expect(chosen.backgroundColor).not.toBe(rest.backgroundColor)
+      expect(chosen.backgroundColor).toBe(rest.backgroundColor)
       expect(chosen.borderTopColor).not.toBe(rest.borderTopColor)
     })
 

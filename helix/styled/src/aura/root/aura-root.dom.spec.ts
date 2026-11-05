@@ -274,7 +274,9 @@ describe('aura', () => {
     const { styles } = await import('./aura-root.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
     expect(sheet).toContain('color-mix(in oklab, var(--_aura-glow) 38%')
-    expect(sheet).toContain('--_aura-glow: var(--aura-glow, var(--helix-color-primary))')
+    expect(sheet).toContain(
+      '--_aura-glow: var(--aura-glow, light-dark(var(--helix-color-primary-subtle), var(--helix-color-primary)))',
+    )
     expect(sheet).not.toMatch(/var\(--_aura-glow\)\s+0%/)
   })
 

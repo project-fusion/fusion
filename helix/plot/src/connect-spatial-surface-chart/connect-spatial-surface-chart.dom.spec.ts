@@ -59,7 +59,7 @@ const recording = () => {
 
 const chart = async (ramp = '') => {
   const host = (await mount(
-    `<div style="--helix-color-border: rgb(1, 2, 3); --helix-color-surface-sunken: rgb(4, 5, 6); --helix-color-foreground: rgb(7, 8, 9); --helix-color-foreground-muted: rgb(10, 11, 12); --helix-color-primary-active: rgb(0, 0, 200); ${ramp}">
+    `<div style="--helix-color-border: rgb(1, 2, 3); --helix-color-surface-sunken: rgb(4, 5, 6); --helix-color-foreground: rgb(7, 8, 9); --helix-color-foreground-muted: rgb(10, 11, 12); --helix-color-primary-strong: rgb(0, 0, 200); ${ramp}">
       <table id="load" data-hidden-visually>
         <caption>Load</caption>
         <thead><tr><th>Slot</th><th>Hour</th><th>Day</th><th>Load</th></tr></thead>

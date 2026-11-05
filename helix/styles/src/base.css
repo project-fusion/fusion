@@ -141,7 +141,7 @@ helix-card > [slot="media"] {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--helix-border-thin);
   /* One offset, in both states. */
   text-underline-offset: 0.25em;
   transition:
@@ -695,19 +695,32 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
 /* **Forced colors keep the emphasis**, as `helix-button` does. Every fill turns
    Canvas and every edge the text color, so solid, outlined, subtle, and ghost
    were one box. A solid button takes the system's button colors reversed, a
-   ghost button loses its edge, and the two between keep the box. */
+   ghost button loses its edge, and the two between keep the box. A solid one
+   opts out of forcing with system colors only, or its label lands on a Canvas
+   backplate of its own color, as `helix-button` records. */
 @media (forced-colors: active) {
   [data-button="solid"],
   [data-button="solid"]:not(:disabled):hover,
   [data-button="solid"]:not(:disabled):active {
+    forced-color-adjust: none;
     background-color: ButtonText;
     border-color: ButtonText;
     color: ButtonFace;
   }
 
-  [data-button="solid"]:disabled {
+  /* **GrayText is the disabled state, so it is drawn whole.** The half
+     opacity on top washed it into the Canvas behind it. */
+  [data-button][aria-disabled="true"] {
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+
+  [data-button="solid"]:disabled,
+  [data-button="solid"][aria-disabled="true"] {
     background-color: GrayText;
     border-color: GrayText;
+    color: ButtonFace;
   }
 
   [data-button="ghost"],
@@ -1361,6 +1374,22 @@ helix-toggle[disabled]::part(item) {
   background-color: transparent;
   border-color: transparent;
   box-shadow: none;
+}
+
+/* **A recessed region, and the edges inside it.** `surface-sunken` behind
+   outlined content took the edge away: the border measured 1.028:1 against it in
+   light, where it is 1.225 on the page, so an outlined Card, a Table rule, a
+   Divider, or a field placed in a sunken well drew no edge. The region restates
+   the border for what it holds, as a Dialog does, mixed from the ink into the
+   well so it stands as far off this ground as the page's border stands off the
+   page: 1.23:1 in light and 1.29 in dark. Decided by the owner on November 3,
+   2026. The field edge on the page is unchanged. */
+[data-surface="sunken"] {
+  background-color: var(--helix-color-surface-sunken);
+  --helix-color-border: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 7%, var(--helix-color-surface-sunken)),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--helix-color-surface-sunken))
+  );
 }
 
 /* The clickable-card recipe. */

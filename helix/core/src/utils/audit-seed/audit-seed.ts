@@ -1,7 +1,19 @@
 import { reportRuntime } from '../report-runtime/report-runtime.js'
 
-/** The seed last looked at, so a page is measured once per seed it sets. */
+/**
+ * The seed last looked at, so an element that upgrades measures only a new
+ * seed. An empty string is the default ink theme, which has no seed.
+ */
 let audited: string | undefined
+
+/** Whether the root, the body, or the head changed since the last measure. */
+let changed = false
+
+/** What the last measure read, so a change that moves no color reports nothing. */
+let measured: string | undefined
+
+/** Every warning printed, so a page that switches back and forth prints each once. */
+const reported = new Set<string>()
 
 /** Whether the root is watched for a seed that arrives or changes later. */
 let watching = false
@@ -26,6 +38,24 @@ export const contrastOf = (one: readonly number[], other: readonly number[]): nu
   const [low, high] = [luminance(one), luminance(other)].sort((a, b) => a - b) as [number, number]
   return (high + 0.05) / (low + 0.05)
 }
+
+/**
+ * The scheme a page color belongs to: light when black text on it measures
+ * more than white text does.
+ */
+export const schemeOf = (page: readonly number[]): 'dark' | 'light' =>
+  contrastOf(page, [0, 0, 0]) > contrastOf(page, [255, 255, 255]) ? 'light' : 'dark'
+
+/** One scheme's colors as bytes: the page, primary text, and a primary fill. */
+type Probe = {
+  fill: number[]
+  page: number[]
+  scheme: 'dark' | 'light'
+  text: number[]
+}
+
+/** The canvas that turns a computed color into bytes, made on the first measure. */
+let context: CanvasRenderingContext2D | null | undefined
 
 /**
  * The warning for one scheme, naming only the measures that fall under their
@@ -58,8 +88,17 @@ export const contrastMessage = (scheme: 'dark' | 'light', text: number, fill: nu
  *
  * **Both schemes, from probes that each name one**, since `light-dark()`
  * resolves against the element's own `color-scheme` and a page in light would
- * otherwise never be checked in dark. **Again whenever the seed changes**: a
- * theme set by script after the first element upgraded was never looked at.
+ * otherwise never be checked in dark. **A page that sets its colors per scheme
+ * at the root**, as the Fusion site does with `lab(100 0 0)` in light and
+ * `lab(0 0 0)` in dark, hands both probes the same colors. Those colors are the
+ * scheme the page shows, named by the page color, and the other scheme is
+ * measured when the page switches to it. The probes once named both, so a
+ * `#fff59d` primary on the light page read "In dark ... 1.12:1".
+ *
+ * **Again whenever the seed changes or the root, the body, or the head does**: a
+ * theme set by script after the first element upgraded was never looked at, and
+ * an override of `--helix-color-primary` set after the seed printed nothing,
+ * since the audit stopped at a seed it had seen.
  *
  * **Read off a probe**, because a custom property is handed back as the text
  * that was written, and off a canvas, which turns any color syntax into bytes. A
@@ -77,7 +116,8 @@ export const auditSeed = (): void => {
   if (!watching && typeof MutationObserver !== 'undefined') {
     watching = true
     let queued = false
-    const observer = new MutationObserver(() => {
+    const queue = (): void => {
+      changed = true
       if (queued) {
         return
       }
@@ -86,7 +126,22 @@ export const auditSeed = (): void => {
         queued = false
         auditSeed()
       })
+    }
+    /* A sheet added to the head is seen before it loads, so its colors are
+       measured again once it has. */
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (node instanceof HTMLLinkElement) {
+            node.addEventListener('load', queue, { once: true })
+          }
+        }
+      }
+      queue()
     })
+    /* A page that follows the system's scheme switches with no attribute
+       changing. */
+    globalThis.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', queue)
     /* Where a seed is set: an attribute on the root or the body, or a sheet
        added to or edited in the head. Not the whole tree, whose style
        attributes an animation can rewrite every frame. */
@@ -99,22 +154,27 @@ export const auditSeed = (): void => {
       observer.observe(document.head, { characterData: true, childList: true, subtree: true })
     }
   }
+  /* An empty seed is measured too. The default ink theme sets none, and an
+     override of `--helix-color-primary` to `#eeeeee` on it measured 1.16:1 and
+     printed nothing while the audit returned on an empty seed. */
   const seed = getComputedStyle(root).getPropertyValue('--helix-seed-brand').trim()
-  if (seed === '' || seed === audited) {
+  if (seed === audited && !changed) {
     return
   }
   audited = seed
-  const context = document.createElement('canvas').getContext?.('2d', { willReadFrequently: true })
+  changed = false
+  context ??= document.createElement('canvas').getContext?.('2d', { willReadFrequently: true })
   if (!context) {
     return
   }
+  const pen = context
   const bytes = (value: string): number[] => {
-    context.fillStyle = '#000'
-    context.fillStyle = value
-    context.fillRect(0, 0, 1, 1)
-    return [...context.getImageData(0, 0, 1, 1).data].slice(0, 3)
+    pen.fillStyle = '#000'
+    pen.fillStyle = value
+    pen.fillRect(0, 0, 1, 1)
+    return [...pen.getImageData(0, 0, 1, 1).data].slice(0, 3)
   }
-  for (const scheme of ['light', 'dark'] as const) {
+  const [light, dark] = (['light', 'dark'] as const).map((scheme) => {
     const probe = document.createElement('span')
     probe.style.cssText =
       `color-scheme:${scheme};color:var(--helix-color-primary);` +
@@ -123,16 +183,29 @@ export const auditSeed = (): void => {
     root.append(probe)
     const { backgroundColor, borderTopColor, color } = getComputedStyle(probe)
     probe.remove()
-    const page = bytes(backgroundColor)
-    const text = contrastOf(bytes(color), page)
-    const fill = contrastOf(bytes(borderTopColor), page)
-    if (text >= TEXT && fill >= FILL) {
+    return { fill: bytes(borderTopColor), page: bytes(backgroundColor), scheme, text: bytes(color) }
+  }) as [Probe, Probe]
+  const key = JSON.stringify([light, dark])
+  if (key === measured) {
+    return
+  }
+  measured = key
+  const probes =
+    JSON.stringify([light.fill, light.page, light.text]) ===
+    JSON.stringify([dark.fill, dark.page, dark.text])
+      ? [{ ...light, scheme: schemeOf(light.page) }]
+      : [light, dark]
+  for (const { fill, page, scheme, text } of probes) {
+    const textContrast = contrastOf(text, page)
+    const fillContrast = contrastOf(fill, page)
+    if (textContrast >= TEXT && fillContrast >= FILL) {
       continue
     }
-    reportRuntime({
-      kind: 'primary-contrast',
-      message: contrastMessage(scheme, text, fill),
-      tag: 'html',
-    })
+    const message = contrastMessage(scheme, textContrast, fillContrast)
+    if (reported.has(message)) {
+      continue
+    }
+    reported.add(message)
+    reportRuntime({ kind: 'primary-contrast', message, tag: 'html' })
   }
 }

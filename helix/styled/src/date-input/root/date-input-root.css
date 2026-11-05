@@ -20,7 +20,16 @@
   flex-wrap: wrap;
   gap: var(--helix-space-2xs);
   min-block-size: var(--helix-size-control);
-  padding-block: var(--helix-space-2xs);
+  /* No more than a tag leaves inside the field's own height, as Filter Input
+     sets it, so one line keeps the field the control's height. At `sm` on a
+     touch screen the 16 pixel text sets a 24 pixel line, and with 4 above and
+     below the field stood 34 beside 32 pixel controls. */
+  padding-block: clamp(
+    0px,
+    (var(--helix-size-control) - var(--helix-size-tag) - var(--helix-border-thin) * 2) /
+    2,
+    var(--helix-space-2xs)
+  );
   padding-inline: var(--helix-space-field);
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -58,18 +67,28 @@ slot[name="end"]::slotted(*) {
 [part="trigger"] {
   all: unset;
   position: relative;
-  /* The press reaches the target: the box is the target, and the glyph stays the
-     icon's size inside it. */
-  block-size: var(--helix-size-target);
+  /* **The box is a step past the glyph, and the press reaches the target past
+     it**, as Input's clear button does, so the focus ring stays inside the
+     field. With the target as the box, a touch screen drew a 44 square in a 40
+     field: it stood 2 above and below the field and 1 past its end, the ring
+     drew outside the field, and a field as wide as a 390 page widened it to
+     391. The negative margin keeps the box from widening the field. */
+  block-size: var(--helix-size-icon-loose);
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: grid;
   flex: none;
-  inline-size: var(--helix-size-target);
-  margin: calc((var(--helix-size-icon-tight) - var(--helix-size-target)) / 2);
+  inline-size: var(--helix-size-icon-loose);
+  margin: calc((var(--helix-size-icon-tight) - var(--helix-size-icon-loose)) / 2);
   place-items: center;
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="trigger"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 /* The set's own calendar, at the step every field's indicator takes, so it

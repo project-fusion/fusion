@@ -53,7 +53,13 @@
   --_bar-chart-radius: var(--bar-chart-bar-radius, calc(var(--helix-radii-sm) / 2));
   --_bar-chart-corners: var(--_bar-chart-radius) var(--_bar-chart-radius) 0 0;
   --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
-  clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
+  /* **Measured from the fill**, `fill-box`, which is what the insets below
+     are written against. Left to the default, Chromium measured from a stroke
+     box it widened by the stroke, so an outlined bar drew its line across the
+     base and square corners, where WebKit drew the open base and the rounding
+     (November 3, 2026). Clipped outside the fill, the rounding is lost: the
+     drawing is stretched across, so a pixel of inset is five or more. */
+  clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners)) fill-box;
   fill: var(--_bar-chart-series);
 }
 
@@ -554,11 +560,21 @@ path[part~="bar"],
   vector-effect: non-scaling-stroke;
 }
 
+/* **In dark, darker and as colorful**, for the reason Area Chart's bands
+   give: mixed toward black, the three series of the outlined example
+   measured a chroma of 0.077 to 0.081 under edges of 0.13 and read as brown,
+   navy, and bottle green. Mixed toward the series' own color at no
+   lightness, the fill keeps its lightness, at a chroma of 0.085 to 0.136
+   (November 3, 2026).
+
+   **70% of the series in dark, so the fill clears 3:1 on the page.** At 60%
+   the eight dark series measured 2.30 to 3.36 on black and read as deep navy
+   and brown slabs. At 70% they measure 3.10 to 4.57, and the edge still reads
+   2.2 to 2.5 against the fill (November 4, 2026). */
 [part~="bar"] {
-  --_bar-chart-shade: color-mix(
-    in oklab,
-    var(--_bar-chart-series) 60%,
-    var(--helix-color-background)
+  --_bar-chart-shade: light-dark(
+    color-mix(in oklab, var(--_bar-chart-series) 60%, var(--helix-color-background)),
+    color-mix(in oklch, var(--_bar-chart-series) 70%, oklch(from var(--_bar-chart-series) 0 c h))
   );
 }
 

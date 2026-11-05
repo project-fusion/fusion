@@ -1,6 +1,10 @@
 'use client'
 
-import type { HelixBeforeResizeEvent, HelixSandboxPreview } from '@fusion.dev/helix'
+import type {
+  HelixBeforeResizeEvent,
+  HelixIconButton,
+  HelixSandboxPreview,
+} from '@fusion.dev/helix'
 import { formatColor, parseColor } from '@fusion.dev/helix-core'
 import { type DerivedTheme, initTheme, type ThemeEngine } from '@fusion.dev/helix-theme'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -61,18 +65,23 @@ const PREVIEW_SHARE_NARROW = 76
 const PREVIEW_SHARE_NARROW_AUDIT = 64
 
 /**
- * A phone's audit opens to this height, and shuts to its row of tabs: the 32px
- * row, the inset above it that keeps its press clear of the divider (in
- * `builder.css`), and the press's own reach below it.
+ * A wide screen's audit opens to this height. **Tall enough for the
+ * Unverifiable tab whole**: at 160 its findings had 96px of the 137 they need
+ * at 1440, so the second pair was cut off under the first. At 208 they have
+ * 144.
+ *
+ * A phone's audit shuts to its row of tabs: the 48px strip and the 4px inset
+ * above it that keeps its press clear of the divider (in `builder.css`). The
+ * strip holds each tab's 44px press whole.
  */
-const AUDIT_OPEN = 160
-const AUDIT_SHUT = 48
+const AUDIT_OPEN = 208
+const AUDIT_SHUT = 52
 
 /**
  * **A phone's audit opens taller than a wide screen's.** At 160 the findings
- * under the tabs had 102px, and the Unverifiable tab's table needs 196: under
- * the preview and the stylesheet a reader scrolled a 102px window to read two
- * rows. At 256 the findings have 198px, which holds that tab whole.
+ * under the tabs had 102px, and the Unverifiable tab's table needs 196 at that
+ * width: under the preview and the stylesheet a reader scrolled a 102px window
+ * to read two rows. At 256 the findings have 198px, which holds that tab whole.
  */
 const AUDIT_OPEN_NARROW = 256
 
@@ -332,6 +341,16 @@ export function ThemeBuilder({
      show anything of the page, and the way back is a button in the form's own
      header instead. */
   const controlsPosition = controlsShown ? (narrow ? 100 : 24) : 0
+
+  /* **The toggle's attribute follows its name.** React sets `label` as a
+     property once the element is defined, and the property does not reflect,
+     so the attribute kept the server's "Hide controls" over a button named
+     "Show controls" at every narrow width. Written back here, the markup says
+     what a screen reader hears. */
+  const controlsToggle = useRef<HelixIconButton>(null)
+  useEffect(() => {
+    controlsToggle.current?.setAttribute('label', controlsShown ? 'Hide controls' : 'Show controls')
+  }, [controlsShown])
 
   /* **After the panes have settled, not with the panel.** The panes splitter
      answers its own change of height by holding the preview's pixels, so a
@@ -914,41 +933,46 @@ export function ThemeBuilder({
       >
         <section className="themeControls" ref={controls} slot="start">
           <helix-flex direction="column" gap="lg">
-            <helix-flex direction="column" gap="xs">
-              <helix-flex align-items="center" gap="sm" justify-content="between">
-                <helix-text as="h1" scale="subheading">
-                  Theme builder
-                </helix-text>
-                <helix-flex align-items="center" gap="2xs">
-                  <helix-tooltip content="Back to the shipped values" placement="bottom">
+            {/* **The heading holds to the top of the form on a phone**, where
+                the form is the whole width and its Hide controls is the way
+                back to the preview: measured at 390, a reader 600px down the
+                form had scrolled it 519px out of sight. A child of the form's
+                column and not of a group with the caption, so it can stick for
+                the whole of it. */}
+            <helix-flex
+              align-items="center"
+              className="themeControlsHead"
+              gap="sm"
+              justify-content="between"
+            >
+              <helix-text as="h1" scale="subheading">
+                Theme builder
+              </helix-text>
+              <helix-flex align-items="center" gap="2xs">
+                <helix-tooltip content="Back to the shipped values" placement="bottom">
+                  <helix-icon-button disabled={pristine || undefined} label="Reset" onClick={reset}>
+                    <helix-icon name="arrow-counter-clockwise"></helix-icon>
+                  </helix-icon-button>
+                </helix-tooltip>
+                {/* **The way back to the preview on a phone**, where the form
+                    covers the whole width and the toolbar's own toggle is
+                    under it. */}
+                {narrow ? (
+                  <helix-tooltip content="Hide controls" placement="bottom">
                     <helix-icon-button
-                      disabled={pristine || undefined}
-                      label="Reset"
-                      onClick={reset}
+                      label="Hide controls"
+                      onClick={() => setControlsShown(false)}
                     >
-                      <helix-icon name="arrow-counter-clockwise"></helix-icon>
+                      <helix-icon name="sidebar-simple"></helix-icon>
                     </helix-icon-button>
                   </helix-tooltip>
-                  {/* **The way back to the preview on a phone**, where the form
-                      covers the whole width and the toolbar's own toggle is
-                      under it. */}
-                  {narrow ? (
-                    <helix-tooltip content="Hide controls" placement="bottom">
-                      <helix-icon-button
-                        label="Hide controls"
-                        onClick={() => setControlsShown(false)}
-                      >
-                        <helix-icon name="sidebar-simple"></helix-icon>
-                      </helix-icon-button>
-                    </helix-tooltip>
-                  ) : null}
-                </helix-flex>
+                ) : null}
               </helix-flex>
-              <helix-text scale="caption">
-                Start from ink, or describe a brand. Each foreground Helix solves is measured
-                against the ground it lands on.
-              </helix-text>
             </helix-flex>
+            <helix-text className="themeControlsLede" scale="caption">
+              Start from ink, or describe a brand. Each foreground Helix solves is measured against
+              the ground it lands on.
+            </helix-text>
 
             {/*
              * *A preview control, in the form, because every input is.** The
@@ -1202,7 +1226,7 @@ export function ThemeBuilder({
 
             <helix-slider
               {...BOUNDS.radius}
-              hint="As a percentage of the shipped radii. Zero is square."
+              hint="The base corner in hundredths of a rem. The shipped corner is 50, and zero is square."
               label="Corner radius"
               name="radius"
               onInput={(event) => setRadius(Number(event.currentTarget.value))}
@@ -1484,6 +1508,7 @@ export function ThemeBuilder({
                 <helix-icon-button
                   label={controlsShown ? 'Hide controls' : 'Show controls'}
                   onClick={() => setControlsShown((open) => !open)}
+                  ref={controlsToggle}
                 >
                   <helix-icon name="sidebar-simple"></helix-icon>
                 </helix-icon-button>

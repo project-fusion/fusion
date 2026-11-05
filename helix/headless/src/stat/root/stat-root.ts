@@ -11,8 +11,11 @@ import {
   slottedWords,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+
+/** The characters a figure groups its digits with, besides the locale's own. */
+const SEPARATORS = new Set([',', '.', "'", '\u2019', ' ', '\u00a0', '\u2009', '\u202f'])
 
 /**
  * @summary One measurement, with a label that names what it measures.
@@ -39,6 +42,12 @@ import { property } from 'lit/decorators.js'
  * a server writes it as the browser does. A number in `value` takes the place
  * of a slotted figure.
  *
+ * **A figure too wide for its column breaks after a group separator**, slotted
+ * or written from `value`, so "$1,284,567" breaks as "$1,284," over "567" and
+ * never between two digits. A slotted figure that is text alone is written by
+ * the stat with those breaks, and the slot is hidden while it is. A figure
+ * holding an element is shown as it is.
+ *
  * **Each slot is a part of the same name**, and `value` for the figure, so a
  * page reaches the label, the unit and the trend from outside. A slot draws no
  * box, so a part passes inherited properties to what is slotted. **The stat
@@ -60,7 +69,7 @@ import { property } from 'lit/decorators.js'
  * @csspart label - The slot the label arrives through, drawing no box, as `value` does.
  * @csspart trend - The slot the trend arrives through, drawing no box, as `value` does.
  * @csspart unit - The slot the unit arrives through, drawing no box, as `value` does.
- * @csspart value - The slot the value is written in, or the figure `value` writes. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
+ * @csspart value - The slot the value is written in, or the figure the stat writes from `value` or from slotted text. A slot draws no box, so it takes the inherited properties, such as color and font, and passes them to the value.
  *
  * @cssstate has-label - Something is slotted into `label`.
  * @cssstate has-trend - Something is slotted into `trend`.
@@ -151,10 +160,22 @@ export class HelixHeadlessStat extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    this.readFigure()
   }
 
   /** Watches the stat's own width, to step the figure down where it does not fit. */
   private widths: ResizeObserver | undefined
+
+  /**
+   * A slotted figure that is text alone, cut into the runs it may break
+   * after. Empty where the slot holds an element, or text with no group
+   * separator, which the slot then shows as it is.
+   */
+  @state()
+  private slottedRuns: string[] = []
+
+  /** Watches the slotted text, which a framework edits in place with no `slotchange`. */
+  private edits: MutationObserver | undefined
 
   override connectedCallback(): void {
     super.connectedCallback()
@@ -163,6 +184,10 @@ export class HelixHeadlessStat extends HelixElement {
     }
     this.widths = new ResizeObserver(() => this.fit())
     this.widths.observe(this)
+    if (typeof MutationObserver !== 'undefined') {
+      this.edits = new MutationObserver(this.readFigure)
+      this.edits.observe(this, { characterData: true, subtree: true })
+    }
     /* **Measured again once a face arrives.** The figure is set in the display
        face, and measured in the fallback before it loads it fitted: "$8,402"
        stayed at full size in a 6rem column and wrapped once the face drew it
@@ -174,6 +199,8 @@ export class HelixHeadlessStat extends HelixElement {
     super.disconnectedCallback()
     this.widths?.disconnect()
     this.widths = undefined
+    this.edits?.disconnect()
+    this.edits = undefined
     this.ownerDocument.fonts?.removeEventListener('loadingdone', this.refit)
   }
 
@@ -198,22 +225,22 @@ export class HelixHeadlessStat extends HelixElement {
     if (!part) {
       return
     }
-    /* The figure's own column where it writes the figure, read before it is
-       set on one line: the stat's whole width is the column and what stands
-       beside it, and "$8,402" at 128 pixels fitted a 130 pixel stat and wrapped
-       in its 126 pixel column. A slotted figure has no box, so the stat's
-       content box stands for it. */
+    /* **The stat's content box, less the unit's column and the gap before it.**
+       The figure's own column is `auto`, sized by what it holds, so reading it
+       was circular; and the gap is there whether a unit is or not: "1,284" in
+       an 80 pixel stat measured 79.6 of room against the 76 its column had, and
+       wrapped as "1,28" over "4". */
     const box = getComputedStyle(this)
+    const unit = this.renderRoot.querySelector('[part="unit"]')
     const room =
-      part instanceof HTMLSlotElement
-        ? this.clientWidth -
-          (Number.parseFloat(box.paddingInlineStart) || 0) -
-          (Number.parseFloat(box.paddingInlineEnd) || 0)
-        : part.getBoundingClientRect().width
+      this.clientWidth -
+      (Number.parseFloat(box.paddingInlineStart) || 0) -
+      (Number.parseFloat(box.paddingInlineEnd) || 0) -
+      (Number.parseFloat(box.columnGap) || 0) -
+      this.widthOf(unit)
     if (room <= 0) {
       return
     }
-    const unit = this.renderRoot.querySelector('[part="unit"]')
     const wrap = part.style.whiteSpace
     part.style.whiteSpace = 'nowrap'
     /* The breaks after the group separators are out while it is measured:
@@ -223,10 +250,7 @@ export class HelixHeadlessStat extends HelixElement {
     for (const one of breaks) {
       one.style.display = 'none'
     }
-    /* The unit counts only beside a slotted figure: a figure the stat writes
-       has a column of its own, and the unit already stands outside it. */
-    const beside = part instanceof HTMLSlotElement ? this.widthOf(unit) : 0
-    const fits = (): boolean => this.widthOf(part) + beside <= room + 0.5
+    const fits = (): boolean => this.widthOf(part) <= room + 0.5
     this.toggleState('stepped', false)
     this.toggleState('stepped-twice', false)
     if (!fits()) {
@@ -268,6 +292,9 @@ export class HelixHeadlessStat extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.readPieces()
+    if (changed.has('locale')) {
+      this.readFigure()
+    }
     this.fit()
     const given = this.direction as string | undefined
     if (changed.has('direction') && (given === 'up' || given === 'down' || given === 'neutral')) {
@@ -279,6 +306,50 @@ export class HelixHeadlessStat extends HelixElement {
           "`helix-trend` in the stat's `trend` slot.",
         tag: this.localName,
       })
+    }
+  }
+
+  /**
+   * Reads a slotted figure that is text alone into the runs it may break
+   * after: each ends at a group separator between two digits.
+   *
+   * **A slotted figure broke between digits.** A slot offers no break of its
+   * own, so it took `overflow-wrap: anywhere`, and "12,345,678" in a 120 pixel
+   * stat broke as "12,345,67" over "8". The separators are the locale's own
+   * group character and the ones figures are written with, a comma, a point, an
+   * apostrophe, or a space, less the locale's decimal sign, so "1.284.567,89"
+   * breaks after its points in German and "1,284.5" never after its point.
+   */
+  private readonly readFigure = (): void => {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')
+    const nodes = slot?.assignedNodes({ flatten: true }) ?? []
+    const text = nodes.every((node) => node.nodeType === Node.TEXT_NODE)
+      ? nodes
+          .map((node) => node.textContent ?? '')
+          .join('')
+          .trim()
+      : ''
+    const parts = formatNumberParts(1234.5, wordsLocale(this))
+    const group = parts.find((part) => part.type === 'group')?.value ?? ','
+    const decimal = parts.find((part) => part.type === 'decimal')?.value ?? '.'
+    const characters = [...text]
+    const runs: string[] = []
+    let run = ''
+    for (const [at, character] of characters.entries()) {
+      run += character
+      const between = /\d/.test(characters[at - 1] ?? '') && /\d/.test(characters[at + 1] ?? '')
+      if (between && character !== decimal && (character === group || SEPARATORS.has(character))) {
+        runs.push(run)
+        run = ''
+      }
+    }
+    runs.push(run)
+    const next = runs.length > 1 ? runs : []
+    const same =
+      next.length === this.slottedRuns.length &&
+      next.every((piece, at) => piece === this.slottedRuns[at])
+    if (!same) {
+      this.slottedRuns = next
     }
   }
 
@@ -304,6 +375,10 @@ export class HelixHeadlessStat extends HelixElement {
        its column even two steps smaller breaks as "$1,284," over "567.89" and
        not between two digits. */
     const pieces: (string | TemplateResult)[] = []
+    const slotted = figure === '' ? this.slottedRuns : []
+    for (const [at, run] of slotted.entries()) {
+      pieces.push(at < slotted.length - 1 ? html`${run}<wbr />` : run)
+    }
     if (figure !== '') {
       let run = ''
       for (const piece of formatNumberParts(
@@ -321,9 +396,12 @@ export class HelixHeadlessStat extends HelixElement {
     }
     /* **The figure replaces the slot**, where a slot's fallback would not: the
        line breaks between the stat's children are assigned to the unnamed
-       slot, so a fallback under it would never show. */
+       slot, so a fallback under it would never show. A slotted figure the
+       stat writes itself keeps its slot, hidden, which is what tells it the
+       text changed. */
+    const written = figure !== '' || slotted.length > 0
     return html`<slot name="label" part="label" @slotchange=${() => this.requestUpdate()}></slot>
-      ${figure === '' ? html`<slot part="value"></slot>` : html`<span part="value">${pieces}</span>`}
+      ${figure === '' ? html`${written ? html`<span part="value">${pieces}</span>` : nothing}<slot part=${written ? nothing : 'value'} ?hidden=${written} @slotchange=${this.readFigure}></slot>` : html`<span part="value">${pieces}</span>`}
       <slot name="unit" part="unit" @slotchange=${this.readPieces}></slot>
       <slot name="trend" part="trend" @slotchange=${this.readPieces}></slot>`
   }

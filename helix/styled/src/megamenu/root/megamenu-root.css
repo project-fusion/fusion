@@ -34,7 +34,10 @@
   font-size: var(--megamenu-trigger-font-size, var(--helix-text-sm));
   font-weight: var(--megamenu-trigger-font-weight, var(--helix-weight-medium));
   gap: var(--helix-space-2xs);
-  min-block-size: var(--helix-size-control-tight);
+  /* The bar's step, fixed, as the links beside it in `base.css` take: at the
+     density's tight step the trigger was 26, 32 and 38 beside 32 pixel links,
+     and at `lg` it stood out of Navigation's 32 pixel bar. */
+  min-block-size: var(--helix-size-control-sm);
   padding-inline: var(--megamenu-trigger-padding-inline, var(--helix-space-xs));
   transition:
     background-color var(--helix-duration-fast) var(--helix-easing-standard),
@@ -45,9 +48,12 @@
   color: var(--megamenu-trigger-hover-color, var(--helix-color-foreground));
 }
 
+/* Inside the trigger, because the trigger fills a bar that scrolls: drawn
+   outside, two pixels of ring were cut off at the top and the bottom by
+   Navigation's `overflow-x`. */
 [part="trigger"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* Open reads like the current destination. */
@@ -97,8 +103,14 @@
      nothing: without this a two-column panel came out 34 pixels wide. */
   inline-size: max-content;
   margin: var(--helix-space-none);
-  /* `100%`, not `100vw`: the difference is the scrollbar's gutter. */
-  max-inline-size: min(var(--megamenu-size, 52rem), calc(100% - var(--helix-space-xl) * 2));
+  /* `100%`, not `100vw`: the difference is the scrollbar's gutter. Inside the
+     margin the card keeps from the edge, `--megamenu-edge`, so a card as wide
+     as the room starts where its row of destinations does: at 640 it ran 8
+     pixels from the edge with the navigation starting at 24. */
+  max-inline-size: min(
+    var(--megamenu-size, 52rem),
+    calc(100% - var(--megamenu-edge, var(--helix-space-xl)) * 2)
+  );
   padding: var(--megamenu-padding, var(--helix-space-md));
   /* `display` and `overlay` ride along with `allow-discrete`, or the panel
      vanishes on the frame it is told to close and there is no exit at all. */
@@ -261,11 +273,17 @@
   }
 }
 
-/* The caret says the word opens something, as a Select's does. */
+/* The caret says the word opens something, as a Select's does. **Sized from
+   the word beside it**, which holds at `text-sm` whatever the density, so the
+   caret holds too: the tight icon step grew it from 12 to 20 across the three
+   densities beside the same 13 pixel word. 1.2em rounded to an even size is
+   the 16 it drew at `md`, centered on a whole pixel. */
 [part="trigger-indicator"] {
-  block-size: var(--helix-size-icon-tight);
+  --_megamenu-caret: round(1.2em, 2px);
+
+  block-size: var(--_megamenu-caret);
   flex: 0 0 auto;
-  inline-size: var(--helix-size-icon-tight);
+  inline-size: var(--_megamenu-caret);
   transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

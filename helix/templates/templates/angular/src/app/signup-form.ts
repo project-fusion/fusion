@@ -5,7 +5,8 @@ import { DOCS } from './docs'
 /** One message in the toast region, and what it says. */
 interface Message {
   readonly id: number
-  readonly text: string
+  /** The answers, one `name=value` pair each, so a line breaks only between pairs. */
+  readonly pairs: readonly string[]
 }
 
 /**
@@ -41,8 +42,7 @@ export class SignupForm {
     event.preventDefault()
     const answers = [...new FormData(event.currentTarget as HTMLFormElement).entries()]
       .map(([field, value]) => `${field}=${value}`)
-      .join('  ')
-    this.messages.update((sent) => [...sent, { id: Date.now(), text: answers }])
+    this.messages.update((sent) => [...sent, { id: Date.now(), pairs: answers }])
   }
 
   /**

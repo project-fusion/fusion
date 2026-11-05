@@ -18,6 +18,7 @@ import {
   shortNumber,
   spokenReading,
   words,
+  wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
   html,
@@ -848,7 +849,9 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     const layout: BarLayout = this.layout ?? 'grid'
     const lined = layout === 'grid' ? undefined : layout
     const bare = this.noBox || lined !== undefined
-    const view = wordsFitted(this.room, (words) => boxView(read.axes, this.camera, [], bare, words))
+    const view = wordsFitted(this.room, (words) =>
+      boxView(read.axes, this.camera, [], bare, words, wordsLocale(this)),
+    )
     /* A row whose bars have a size is drawn at the scale that makes them
        that wide, its value axis as tall as the plot has room for. */
     const room = this.room

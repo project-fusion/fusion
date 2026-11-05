@@ -15,6 +15,13 @@
      `emphasis` can draw it as an outline or a tint. */
   --_badge-fill: var(--helix-color-primary-surface);
   display: inline-flex;
+  /* **A long word in what the badge marks breaks inside the column.** The host
+     is as wide as its content, so a 57 letter word ran 68 pixels past a 280
+     pixel column. `anywhere`, because the host sizes to its content's
+     min-content, which `break-word` leaves at the whole word. The count itself
+     does not wrap. */
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
   position: relative;
   vertical-align: middle;
 }
@@ -126,9 +133,8 @@ slot[name="icon"]::slotted(*) {
    on the base rule, the accent's, and the one the four statuses share, each set
    as `--_badge-on`.
 
-   `neutral` is the exception and says so by setting its own ink: it is a rung on
-   the surface ladder rather than a status fill, so the ink is the page's
-   foreground. */
+   `neutral` is the exception and says so by setting its own ink: it is a quiet
+   gray rather than a status fill, so the ink is the page's foreground. */
 
 /* The brand, said as well as defaulted. `Announcement` gives the reason for
    spelling out a value that is also the resting one: a generated page should be
@@ -175,9 +181,19 @@ slot[name="icon"]::slotted(*) {
   --_badge-fill: var(--helix-color-danger-surface);
 }
 
+/* **`neutral-subtle`, a gray that stands on the page.** It was
+   `surface-raised`, a rung for a panel and not a mark: 1.09:1 on the white page
+   and 1.18 on the black one, where the badge read as its count alone. The
+   token measures 1.26 and 1.20. Its tint is half of it, for the reason `subtle`
+   below gives: the tint of a fill this quiet measured 1.02:1, nothing at all. */
 :host([tone="neutral"]) {
-  --_badge-fill: var(--helix-color-surface-raised);
+  --_badge-fill: var(--helix-color-neutral-subtle);
   --_badge-on: var(--helix-color-foreground);
+  --_badge-tint: color-mix(
+    in srgb,
+    var(--helix-color-foreground) 5%,
+    var(--helix-color-background)
+  );
 }
 
 /*
@@ -227,6 +243,12 @@ slot[name="icon"]::slotted(*) {
  * **`emphasis`, `Tag`'s axis.** Absent and `solid` are the fill. `outlined`
  * draws the fill as a ring on the page's ground, and `subtle` as a tint, each
  * with the page's ink, which reads on the page's ground in every tone.
+ *
+ * **The tint mixes in sRGB, as `Tag`'s does and for its reason.** Mixed in
+ * oklab, 22% of a status fill over the black page compressed to a lightness of
+ * 0.10 to 0.11 for every tone, 1.02:1 against the page, so info, success,
+ * warning, and danger looked alike. The same 22% in sRGB keeps each tone's hue
+ * and lifts it off the page; in light the two spaces land within a few levels.
  */
 :host([emphasis="outlined"]) [part="indicator"] {
   background-color: var(--badge-background-color, var(--helix-color-background));
@@ -239,7 +261,7 @@ slot[name="icon"]::slotted(*) {
 :host([emphasis="subtle"]) [part="indicator"] {
   background-color: var(
     --badge-background-color,
-    color-mix(in oklab, var(--_badge-fill) 22%, var(--helix-color-background))
+    var(--_badge-tint, color-mix(in srgb, var(--_badge-fill) 22%, var(--helix-color-background)))
   );
   color: var(--badge-color, var(--helix-color-foreground));
 }

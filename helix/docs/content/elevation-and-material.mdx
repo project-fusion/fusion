@@ -52,7 +52,7 @@ for the cases the top layer does not cover:
 | `--helix-shadow-md` | `0 4px 12px light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 6%, transparent), color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 10%, transparent))` |
 | `--helix-shadow-lg` | `0 12px 32px light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 9%, transparent), color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent))` |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` |
-| `--helix-shadow-floating` | `var(--helix-shadow-lg)` |
+| `--helix-shadow-floating` | `var(--helix-shadow-sm), var(--helix-shadow-lg)` |
 | `--helix-shadow-raised` | `var(--helix-shadow-floating)` |
 
 [//]: # (/tokens)
@@ -76,7 +76,7 @@ These tokens describe translucency:
 | `--helix-material-blur-sm` | `8px` | The lightest backdrop blur. |
 | `--helix-material-blur-md` | `16px` | The backdrop blur behind a modal. |
 | `--helix-material-blur-lg` | `32px` | The heaviest backdrop blur. |
-| `--helix-material-translucent` | `light-dark(color-mix(in oklab, oklch(1 0 0) min(100%, 30% * var(--helix-material-opacity)), transparent), color-mix(in oklab, oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) min(100%, 60% * var(--helix-material-opacity)), transparent))` | The translucent background, for a surface that shows what is behind it. |
+| `--helix-material-translucent` | `light-dark(color-mix(in oklab, oklch(1 0 0) min(100%, 30% * var(--helix-material-opacity)), transparent), color-mix(in oklab, oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) min(100%, 72% * var(--helix-material-opacity)), transparent))` | The translucent background, for a surface that shows what is behind it. |
 | `--helix-material-translucent-strong` | `color-mix(in oklab, light-dark(oklch(1 0 0), oklch(0.182 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258))) min(100%, 88% * var(--helix-material-opacity)), transparent)` | The stronger translucent background, for a surface that shows less of what is behind it. |
 | `--helix-material-panel` | `light-dark(color-mix(in oklab, oklch(1 0 0) min(100%, 72% * var(--helix-material-opacity)), transparent), var(--helix-material-translucent))` | The glass of every panel, from a Menu, Popover, or Tooltip to a Dialog or Drawer over its scrim. |
 | `--helix-material-border` | `light-dark(color-mix(in oklab, oklch(0.15 var(--helix-seed-neutral-chroma, 0) var(--helix-seed-neutral-hue, 258)) 14%, transparent), color-mix(in oklab, oklch(1 0 0) 12%, transparent))` | The border a translucent surface needs to keep a visible edge. |
@@ -89,12 +89,27 @@ The `material` axis draws its three values, `frosted`, `glass`, and
 properties that can apply at once belong on two axes. See [Visual
 axes](./visual-axes).
 
+| Value | Ground | Backdrop filter |
+| --- | --- | --- |
+| `glass` | `material-panel`: 72% white in light mode, and 72% of the dark ground in dark mode | `material-backdrop`: a 16px blur and 1.5 times the saturation |
+| `frosted` | `material-translucent-strong`: 88% of the ground in both modes | A 32px blur, `material-blur-lg`, with no change to saturation |
+| `transparent` | None | None |
+
+Every family that takes `material` draws `glass` at the same coverage, a Dialog
+and a Drawer included. `--helix-material-opacity` scales every coverage
+together.
+
 **Use blur with care, because it is expensive.** A `backdrop-filter` makes the
 compositor read what is behind the element again on every frame the element
 moves. A frosted header that is always on screen pays that cost all the time.
-When you want depth without the frosted texture, use `translucent` without the
-blur.
+To show depth without that cost, use `separation="elevated"` on a Card, or
+`data-separation="elevated"` on an element of your own. Each lifts the surface
+with a shadow and needs no backdrop filter.
 
 A translucent surface takes its color from what is behind it, so on a busy
-background it has no visible edge. `material-border` gives it one, so it keeps
-its shape.
+background it has no visible edge. **Every glass or frosted surface draws
+`material-border` as its edge**: 14% of near-black in light mode and 12% of
+white in dark mode, a wash that takes the color of what shows through. Inside a
+glass or frosted surface, `border` and `border-floating` are `material-border`
+too, so the panel's edge and the lines inside it match. The quiet inks are
+raised inside it as well, so muted text stays readable over a busy page.

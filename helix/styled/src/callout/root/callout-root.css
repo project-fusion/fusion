@@ -103,10 +103,13 @@
 }
 
 /* The bar and the mark and nothing behind them, for an aside in running
-   prose. The bar stays, being what says the tone where the hue is not seen. */
+   prose. The bar stays, being what says the tone where the hue is not seen.
+   **Square, as a quotation's rule is**, since nothing else of the box is drawn:
+   the 8px corner clipped the 2px bar at both ends into a crescent. */
 :host([separation="plain"]) {
   --_callout-bar: var(--callout-bar-thickness, var(--helix-border-thick));
   background-color: var(--callout-background-color, transparent);
+  border-radius: var(--callout-radius, var(--helix-radii-none));
   box-shadow: none;
 }
 
@@ -217,7 +220,7 @@ slot:not([name])::slotted(a:not([data-link])) {
   color: var(--helix-color-primary);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--helix-border-thin);
   text-underline-offset: 0.25em;
 }
 

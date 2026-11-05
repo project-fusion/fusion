@@ -12,6 +12,16 @@
   margin-block-start: var(--helix-space-xs);
 }
 
+/* **Between the two top rungs on a phone**, 37 where the page's 42 took two
+   lines for a title of three words: measured at 390, "Deriving a theme"
+   wrapped to 99 tall, and 9 of 45 titles wrap at 37 against 13 at 42. Still a
+   step above the 32 of a section heading. */
+@media (width < 48rem) {
+  .prose helix-text[as="h1"] {
+    --text-font-size: calc((var(--helix-text-2xl) + var(--helix-text-3xl)) / 2);
+  }
+}
+
 .prose helix-text[as="h2"] {
   margin-block-start: var(--helix-space-2xl);
 }
@@ -32,4 +42,12 @@
   font-size: var(--helix-text-lg);
   line-height: var(--helix-leading-normal);
   max-inline-size: 34em;
+}
+
+/* **Tables a step under the reading type**, 16 between the ramp's 14 and 18.
+   A cell takes the control size, 13, which put a table's words five pixels
+   under the 18 of the sentence that introduced it. Set through the token the
+   cells read, so the table keeps its own rhythm and the column it already has. */
+.prose helix-table {
+  --helix-text-control: calc((var(--helix-text-md) + var(--helix-text-lg)) / 2);
 }

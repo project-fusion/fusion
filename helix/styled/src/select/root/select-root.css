@@ -174,6 +174,39 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
+/* **Loading, and the closed control says so**: the caret turns into the ring
+   every spinner here draws, a step smaller than the caret's box so it sits in
+   the caret's place without moving the value. A closed trigger with `loading`
+   set measured 0 pixels from one at rest, so nothing said the list was on its
+   way until it was opened. A caret of the page's own is left as it is. */
+:host([loading]) [part="indicator"] {
+  --_select-ring: round(calc(var(--helix-size-icon-tight) * 0.75), 2px);
+
+  animation: helix-select-turn var(--helix-duration-turn) linear infinite;
+  block-size: var(--_select-ring);
+  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 30%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  fill: transparent;
+  inline-size: var(--_select-ring);
+  margin: calc((var(--helix-size-icon-tight) - var(--_select-ring)) / 2);
+}
+
+@keyframes helix-select-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* Slowed rather than stopped, as Button's ring is: a ring that holds still
+   reads as broken. */
+@media (prefers-reduced-motion: reduce) {
+  :host([loading]) [part="indicator"] {
+    animation-duration: var(--helix-duration-crawl);
+  }
+}
+
 /* What sits at either end of the trigger, in the quiet ink every field's ends
    take, so an icon before the value reads as Input's and Combobox's do. It
    drew in the full ink, beside fields whose start icons were muted. */

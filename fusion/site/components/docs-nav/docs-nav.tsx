@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { type MouseEvent as ReactMouseEvent, useCallback, useRef } from 'react'
+import { type MouseEvent as ReactMouseEvent, useCallback, useId, useRef, useState } from 'react'
 import { docsShell } from '@/components/docs-shell/docs-shell'
 import type { NavEntry, NavSection } from '@/content/helix-nav/helix-nav'
 
@@ -78,6 +78,15 @@ export function DocsNav({
   const address = usePathname()
   const pathname = path ?? address
   const warmed = useRef(new Set<string>())
+  /* **The page the tree was opened on, below 64rem.** The shell folds the rail
+     away there, and a reader on a phone had no way from one docs page to the
+     next but the site Menu, which lists three of them. The tree comes back
+     under a button at the top of the column, shut until asked for. Kept as the
+     page it was opened on and not as a flag, so following a row to another
+     page shuts it again with no effect to run. */
+  const [shownOn, setShownOn] = useState<string | null>(null)
+  const shown = shownOn === pathname
+  const tree = useId()
 
   const held = sections.findIndex((section) =>
     section.entries.some((entry) => holds(entry, pathname)),
@@ -133,9 +142,26 @@ export function DocsNav({
           one the branch changes at every depth and the pages stay at the size
           every other page is, which is the shape a reader of documentation
           already knows. */}
+      <button
+        aria-controls={tree}
+        aria-expanded={shown}
+        className={docsShell.docsNavToggle}
+        data-button="outlined"
+        data-button-width="full"
+        data-density="lg"
+        onClick={() => setShownOn(shown ? null : pathname)}
+        type="button"
+      >
+        Helix documentation
+        {/* Turned by Icon's own `rotate`, which a rule here would overrule. */}
+        <helix-icon name="caret-down" rotate={shown ? 180 : undefined}></helix-icon>
+      </button>
       <helix-tree
         active={pathname}
         chevron-placement="end"
+        class={docsShell.docsNavTree}
+        data-shown={shown ? '' : undefined}
+        id={tree}
         label="Helix documentation"
         nesting="heading"
       >

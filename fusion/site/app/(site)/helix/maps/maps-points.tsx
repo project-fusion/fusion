@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { MapCredit } from '@/components/map-credit/map-credit'
 import { MAP_FAILED } from '@/content/maps/maps'
 import { AUSTIN_PLACES, POINTS_VIEW } from '@/content/maps/points'
+import { useCoarsePointer } from '@/hooks/use-coarse-pointer/use-coarse-pointer'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import styles from './maps.module.css'
 
@@ -46,6 +47,8 @@ export function MapsPoints({ credit }: { credit: readonly CreditPart[] }) {
   const container = useRef<HTMLDivElement>(null)
   /* Said in the map's footer, where a failed load would leave an empty box. */
   const [failed, setFailed] = useState(false)
+  /* One finger scrolls the page on a touch screen, as on the map above. */
+  const touch = useCoarsePointer()
   const [pressed, setPressed] = useState('')
   /* The map drawn on the server at `POINTS_VIEW` and the tiles' credit,
      shown until MapLibre has drawn, and whether asking for it is over,
@@ -154,6 +157,7 @@ export function MapsPoints({ credit }: { credit: readonly CreditPart[] }) {
     <div className={styles.mapsPoints}>
       <helix-map
         class={styles.mapsPointsFrame}
+        gestures={touch ? 'cooperative' : undefined}
         label={`Food and drink in Austin, ${COUNTED} places`}
         ref={frame}
       >

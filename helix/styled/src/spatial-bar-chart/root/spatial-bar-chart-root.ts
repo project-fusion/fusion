@@ -75,8 +75,8 @@ export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {
   /**
    * What the plot stands on. `plain`, the default, draws nothing behind it, as a
    * flat chart does, so a Card or the page is its ground. `filled` draws the
-   * sunken ground. `no-box` is a separate choice: it removes the box, grid,
-   * numbers, and names.
+   * `surface-filled` ground every family takes. `no-box` is a separate choice:
+   * it removes the box, grid, numbers, and names.
    */
   @property({ reflect: true })
   separation?: 'filled' | 'plain'

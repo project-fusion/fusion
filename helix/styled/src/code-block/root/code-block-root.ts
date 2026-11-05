@@ -44,7 +44,7 @@ import '../../copy-button/index.js'
  *
  * @cssproperty --code-block-added-color - The color a diff's added lines are tinted in and their `+` is drawn in. The success color by default.
  * @cssproperty --code-block-backdrop - A backdrop filter for the block and its header, for a translucent background.
- * @cssproperty --code-block-background-color - The background behind the code. Set it for a block that sits on a surface other than the page background.
+ * @cssproperty --code-block-background-color - The background behind the code. Clear by default, so the code sits on the page, card, or panel that holds it.
  * @cssproperty --code-block-border-color - The line around the block and its header.
  * @cssproperty --code-block-color - The color of the code. A highlighter's own colors win on the tokens it colors.
  * @cssproperty --code-block-expand-color - The color of the button under a capped block that shows every line.

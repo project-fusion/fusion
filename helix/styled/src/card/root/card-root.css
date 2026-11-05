@@ -14,6 +14,10 @@
   /* The ink a `helix-text` heading anywhere in the card takes, where the body
      around it is muted. */
   --_heading-ink: var(--card-heading-color, var(--helix-color-foreground));
+  /* The card's own fill, and the page's line as it stands outside, read here
+     for the slot below. */
+  --_card-fill: var(--card-background-color, var(--helix-color-surface));
+  --_card-line: var(--helix-color-border);
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
@@ -72,6 +76,72 @@
     light-dark(var(--helix-color-surface), var(--helix-color-surface-raised))
   );
   border-color: light-dark(transparent, var(--helix-color-border));
+  /* The rungs as they stood outside, read here for the slots below. */
+  --_card-ground: var(
+    --card-background-color,
+    light-dark(var(--helix-color-surface), var(--helix-color-surface-raised))
+  );
+  --_card-overlay: var(--helix-color-surface-overlay);
+  --_card-raised: var(--helix-color-surface-raised);
+  --_card-surface: var(--helix-color-surface);
+}
+
+/* **In dark, what stands on an elevated card steps up from it, as it does in a
+   Dialog.** The card is `surface-raised`, #181818, and a Menu opened from it is
+   `surface-overlay`, the same rung: measured 1.00:1, one fill. A line inside
+   measured 1.10 against the card and a default card inside it read as a hole.
+   The rungs keep their values on the page, decided by the owner on October 31,
+   2026; inside, each sits the step above this card that Dialog's sit above its
+   panel: an overlay 1.19:1 off the card and a line 1.33. On the slots, since the
+   card's own fill reads `surface-raised`, and slotted content inherits from its
+   slot. Light keeps its own rungs, where a shadow sets an overlay apart, and
+   restates the line as the rule below does for an unset card. */
+:host([separation="elevated"]) slot {
+  --helix-color-surface-overlay: light-dark(
+    var(--_card-overlay),
+    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_card-ground))
+  );
+  --helix-color-surface-raised: light-dark(
+    var(--_card-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_card-ground))
+  );
+  --helix-color-surface: light-dark(
+    var(--_card-surface),
+    color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_card-ground))
+  );
+  --helix-color-border: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 7%, var(--_card-ground)),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_card-ground))
+  );
+}
+
+/* **A line inside a card with a fill sits as far off the card as the page's
+   line sits off the page**, as `data-surface="sunken"` restates it for a well.
+   Against the card the page's line measured 1.17:1 in light and 1.21 in dark,
+   so a field or a Button on a card, and a card inside a card, drew a fainter
+   edge than they draw on the page, 1.23 and 1.30. 7% of the ink over the card
+   in light and 14% in dark measure 1.23 and 1.31. A filled card's wash is
+   translucent, and a line mixed into it stacks on the wash and on a field's own
+   well: 1.45:1 in light. Its line is mixed over the wash as it stands on the
+   page, 1.27 in light; in dark that mix comes out fainter than the page's line,
+   so the page's line stays. An outlined or plain card, or one in a material,
+   shows what is behind it and keeps the page's line. */
+:host(:not([separation]):not([material])) slot {
+  --helix-color-border: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 7%, var(--_card-fill)),
+    color-mix(in oklab, var(--helix-color-foreground) 14%, var(--_card-fill))
+  );
+}
+
+:host([separation="filled"]:not([material])) slot {
+  --helix-color-border: light-dark(
+    color-mix(
+      in oklab,
+      var(--helix-color-foreground) 7%,
+      color-mix(in oklab, var(--helix-color-foreground) 5%, var(--helix-color-background))
+    ),
+    var(--_card-line)
+  );
 }
 
 /* An edge and no fill, so the page shows through: one mechanism, as the others
@@ -255,7 +325,7 @@ slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
   background-color: var(--card-background-color, var(--helix-material-panel));
 }
 
-/* The same pair turned up. */
+/* A heavier ground under a heavier blur, 88% under 32px, with no saturation. */
 :host([material="frosted"]) {
   backdrop-filter: var(--card-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--card-background-color, var(--helix-material-translucent-strong));

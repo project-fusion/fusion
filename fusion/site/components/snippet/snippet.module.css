@@ -14,3 +14,13 @@
 .snippetWord {
   white-space: nowrap;
 }
+
+/* **A step smaller on a phone**, 12 against 13, so the longest name in a
+   list keeps its comma. Measured at 390, the manifest excerpt's column held 25
+   characters past its hang, `"focusable-when-disabled",` is 26, and the comma
+   broke onto a line of its own. At 12 the name and its comma share a line. */
+@media (width < 30rem) {
+  .snippetWrapped {
+    --code-block-font-size: var(--helix-text-xs);
+  }
+}

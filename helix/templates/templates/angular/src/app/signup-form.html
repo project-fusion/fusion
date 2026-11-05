@@ -83,7 +83,11 @@
     >
       <helix-flex direction="column" gap="2xs">
         <helix-text scale="body-strong">Read by the form</helix-text>
-        <helix-text scale="code">{{ message.text }}</helix-text>
+        <helix-flex column-gap="md" wrap>
+          @for (pair of message.pairs; track pair) {
+            <helix-text scale="code">{{ pair }}</helix-text>
+          }
+        </helix-flex>
       </helix-flex>
     </helix-toast-item>
   }

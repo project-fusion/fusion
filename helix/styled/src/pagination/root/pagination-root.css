@@ -9,7 +9,9 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--pagination-font-size, var(--helix-text-sm));
+  /* The control step, 12, 13 and 14 across density, as the buttons it labels
+     step 26, 32 and 38. At `text-sm` a page number was 13 at every density. */
+  font-size: var(--pagination-font-size, var(--helix-text-control));
   gap: var(--pagination-gap, var(--helix-space-2xs));
 }
 
@@ -79,10 +81,8 @@
 [part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
-  /* The well, as a navigation link's hover is, and not the row wash. The page
-     you are on is a raised chip, `surface-raised`, and in dark the 12% wash
-     came out brighter than it, so the page under the pointer outranked the
-     page you were on. */
+  /* The well, as a navigation link's hover is, a step under the selected wash
+     the page you are on takes. */
   background-color: var(--pagination-hover-background-color, var(--helix-color-well));
   color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
@@ -98,18 +98,18 @@
 }
 
 /*
- *  Where you are: a raised chip, not a brand fill.
+ *  Where you are: the wash every chosen thing takes, not a brand fill.
  *
- * **The border is what actually distinguishes it, and that is a measurement.**
- * The two grays in play are `oklch(0.97 0 258)` for raised against
- * `oklch(0.96 0 258)` for the sunken fill a hovered page takes: one per cent of
- * lightness apart, so under `surface-raised` and `shadow-sm` alone the page you
- * are on and the page under the pointer are the same chip. A shadow at this size
- * cannot carry a distinction that fine.
+ * **`color-selected`, a step past the hover's well**, as a List's current row
+ * and a Tree's selected one are. The page you were on was `surface-raised`
+ * with an edge, rgb 245 in light against the hovered page's well at 242,
+ * 1.03:1 apart: under the pointer every page read as the one you were on. At
+ * 14% (18% in dark) the current page stands past the hover's 5% in both
+ * modes.
  */
 [part~="page"][aria-current="page"],
 [part~="page"][aria-current="page"]:hover {
-  background-color: var(--pagination-current-background-color, var(--helix-color-surface-raised));
+  background-color: var(--pagination-current-background-color, var(--helix-color-selected));
   border-color: var(--pagination-current-border-color, var(--helix-color-border));
   color: var(--pagination-current-foreground-color, var(--helix-color-foreground));
   font-weight: var(--pagination-current-font-weight, var(--helix-weight-semibold));

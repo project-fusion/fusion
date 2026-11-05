@@ -122,8 +122,8 @@
    both slotted into `tags` and a consumer mixes them, so an X drawn to a
    different rule in each is two marks that should be one.
  *
-   Three quarters of `icon-sm`, which the chip's own icon size does not move, is
-   the 12 a tag draws.
+   A step under half the tag's height, 10, 12 and 14 as a tag draws. Three
+   quarters of `icon-sm` was 12 at every size, beside a large tag's 16.
 
    It was `--helix-size-icon-tight`, and that token cannot do this job here. It
    is declared once at the root as `icon * 0.8`, and a custom property is
@@ -134,8 +134,9 @@
    as an X far too big for the chip. `Breadcrumb` records the same trap with
    `1lh`, which is the same mistake in the other unit. */
 [part="dismiss-mark"] {
-  block-size: var(--icon-size, calc(var(--helix-size-icon-sm) * 0.75));
-  inline-size: var(--icon-size, calc(var(--helix-size-icon-sm) * 0.75));
+  --_chip-dismiss-size: calc(round(calc(var(--helix-size-tag) / 2), 2px) - 2px);
+  block-size: var(--icon-size, var(--_chip-dismiss-size));
+  inline-size: var(--icon-size, var(--_chip-dismiss-size));
 }
 
 /* The well is mixed from the ink the control is already drawn in, so the hover
@@ -145,9 +146,12 @@
   color: var(--helix-color-foreground);
 }
 
+/* **Inside the cross's own box**, as `Tag` draws it: the box is the 12 pixel
+   glyph with 2 pixels round it, and the ring takes those 2. Drawn outside it,
+   the ring crossed the 4 pixel gap and touched the values. */
 [part="dismiss"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
 }
 
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn

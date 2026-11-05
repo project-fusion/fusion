@@ -24,7 +24,7 @@ export default function DocsIndex() {
        the header, the two stack: the index's title sits at 249 where every page
        it links to starts at 134, and 108px below its own sidebar. An index that
        does not line up with its siblings reads as a different kind of page. */
-    <main className={docsShell.docsMain}>
+    <main className={`${docsShell.docsMain} ${docsShell.docsMainWide}`}>
       <helix-flex class={styles.head} direction="column" gap="sm">
         <helix-flex align-items="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>

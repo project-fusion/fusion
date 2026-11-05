@@ -29,7 +29,7 @@
   inset-inline: 0;
   pointer-events: none;
   position: absolute;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 :host(:state(drop-before))::before {

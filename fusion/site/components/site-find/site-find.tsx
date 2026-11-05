@@ -1,6 +1,7 @@
 'use client'
 
 import type { HelixCommand, HelixIconButton } from '@fusion.dev/helix'
+import { focusAs, openingFocus } from '@fusion.dev/helix-core'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import styles from './site-find.module.css'
@@ -120,6 +121,9 @@ export function SiteFind({
   /* Set only while the button hands focus to `keyboard`, which is how its
      focus handler tells that from the palette handing focus back. */
   const summoning = useRef(false)
+  /* How focus goes back to the button, read as the button is pressed: with a
+     ring after a key, without one after a tap. */
+  const returning = useRef<FocusOptions>({})
   const [open, setOpen] = useState(false)
   const [needle, setNeedle] = useState('')
 
@@ -164,6 +168,7 @@ export function SiteFind({
           <helix-icon-button
             label="Search"
             onClick={() => {
+              returning.current = openingFocus()
               summoning.current = true
               keyboard.current?.focus({ preventScroll: true })
               summoning.current = false
@@ -189,15 +194,18 @@ export function SiteFind({
 
           **The palette hands focus back here as it closes**, because the
           dialog returns focus to whatever had it when it opened. This field
-          passes it on to the button, where it was before. */}
+          passes it on to the button, where it was before. **Without a ring
+          after a tap.** WebKit counts a focus a script moves out of a text
+          field as one the keyboard made, so on a phone the button drew its
+          ring and opened its "Search ⌘K" hint after every dismissal. */}
       {trigger && (
         <input
           aria-hidden="true"
           autoComplete="off"
           className={styles.siteFindKeyboard}
           onFocus={() => {
-            if (!summoning.current) {
-              button.current?.focus()
+            if (!summoning.current && button.current) {
+              focusAs(button.current, returning.current)
             }
           }}
           ref={keyboard}

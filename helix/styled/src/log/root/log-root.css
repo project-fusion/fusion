@@ -61,7 +61,10 @@
   color: var(--log-color, var(--helix-color-foreground));
   display: grid;
   font-family: var(--log-font-family, var(--helix-font-mono));
-  font-size: var(--log-font-size, var(--helix-text-xs));
+  /* **Code is 13px in every family that shows it**: Code, Code Block, Code
+     Input, Code Editor, and Terminal. A log at 12 sat a step under a terminal
+     beside it, with nothing recorded to say why. */
+  font-size: var(--log-font-size, var(--helix-text-sm));
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto minmax(0, 1fr) auto;
   line-height: var(--log-line-height, var(--helix-leading-normal));

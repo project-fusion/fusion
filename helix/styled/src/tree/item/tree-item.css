@@ -429,7 +429,7 @@ slot[name="chevron"]::slotted(*) {
   inset-inline: 0;
   pointer-events: none;
   position: absolute;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 :host(:state(drop-before)) [part="item"]::before {
@@ -472,6 +472,20 @@ slot[name="chevron"]::slotted(*) {
 
 [part="row"]:active {
   background-color: var(--helix-color-press);
+}
+
+/* **A chosen row answers the pointer and the press too**, with the press wash,
+   three points past the selected one. The selected rule above outranks both
+   rules before it, so the chosen row stayed at 0.14 under either, November 4,
+   2026. */
+:host(:state(selected):not([disabled])) [part="row"]:active {
+  background-color: var(--helix-color-press);
+}
+
+@media (hover: hover) {
+  :host(:state(selected):not([disabled])) [part="row"]:hover {
+    background-color: var(--helix-color-press);
+  }
 }
 
 :host([disabled]) [part="row"]:active {

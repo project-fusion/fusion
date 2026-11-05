@@ -516,6 +516,19 @@ export class HelixHeadlessListbox extends MixinVoice(
    */
   private shifted = false
 
+  /**
+   * Where the highlight was before the pointer took it, so leaving the list
+   * gives it back. Unset while the keyboard has it.
+   */
+  private beforePointer: { parked: boolean; steered: boolean; value: string } | undefined
+
+  /**
+   * Whether the pointer moved the highlight on this update, which then is not
+   * scrolled to: the row is already under the pointer, and scrolling the list
+   * would slide another row under it.
+   */
+  private pointed = false
+
   /** The letters typed at the list, which move the highlight to a match. */
   private readonly typeahead = new Typeahead()
 
@@ -596,6 +609,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    * ArrowUp, and Combobox moves the highlight off the list onto its create row.
    */
   highlight(where: 'first' | 'last' | 'none' | 'selected'): void {
+    this.beforePointer = undefined
     const shown = this.shown.filter((option) => !option.disabled)
     this.typeahead.reset()
     this.parked = where === 'none'
@@ -681,6 +695,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    * `<select>` does.
    */
   typeaheadTo(key: string): string | undefined {
+    this.beforePointer = undefined
     const shown = this.shown.filter((option) => !option.disabled)
     const current = this.currentValue
     const from = shown.findIndex((option) => option.value === current)
@@ -893,7 +908,48 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.shifted = event.shiftKey
   }
 
+  /**
+   * Moves the highlight to the option under a mouse or a pen, as Radix's Select
+   * and the menus of macOS do, so a list draws one highlighted row. The hover
+   * and the highlight were drawn in one wash, and an open Select lit the chosen
+   * row and the row under the pointer alike. Only a move counts, so a list that
+   * scrolls under a resting pointer keeps the highlight the keyboard gave it.
+   * Nothing is chosen on the way past.
+   */
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      return
+    }
+    const options = this.elements
+    const option = event
+      .composedPath()
+      .find((node): node is HelixHeadlessOption => options.includes(node as HelixHeadlessOption))
+    if (!option || option.disabled || option.hidden || option.value === this.activeValue) {
+      return
+    }
+    this.beforePointer ??= { parked: this.parked, steered: this.steered, value: this.activeValue }
+    this.parked = false
+    this.steered = true
+    this.pointed = true
+    this.activeValue = option.value
+  }
+
+  /** Gives the highlight back to where the keyboard left it. */
+  private readonly handlePointerLeave = (): void => {
+    const before = this.beforePointer
+    if (!before) {
+      return
+    }
+    this.beforePointer = undefined
+    this.parked = before.parked
+    this.steered = before.steered
+    this.pointed = true
+    this.activeValue = before.value
+  }
+
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    /* The keyboard takes the highlight from wherever the pointer left it. */
+    this.beforePointer = undefined
     const shown = this.shown.filter((option) => !option.disabled)
     if (shown.length === 0) {
       return
@@ -1041,6 +1097,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    * panel, one keystroke into the interaction.
    */
   private arrive(value: string): void {
+    this.beforePointer = undefined
     this.parked = false
     this.steered = true
     this.activeValue = value
@@ -1134,6 +1191,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    * from 14:07 went to midnight.
    */
   highlightValue(value: string): void {
+    this.beforePointer = undefined
     if (!this.shown.some((option) => !option.disabled && option.value === value)) {
       return
     }
@@ -1284,6 +1342,10 @@ export class HelixHeadlessListbox extends MixinVoice(
 
   /** Scrolls the active option into view, which needs the rendered list to scroll. */
   private followActive(changed: PropertyValues): void {
+    if (this.pointed) {
+      this.pointed = false
+      return
+    }
     /* A list of `items` scrolls to the highlight when it or the filter moved,
        and once the window holds it, the drawn option is scrolled to as a child
        is. See `OptionWindowController.follow`. */
@@ -1320,6 +1382,8 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.addEventListener('helix-before-select', this.handleSelection as EventListener)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick, true)
+    this.addEventListener('pointermove', this.handlePointerMove)
+    this.addEventListener('pointerleave', this.handlePointerLeave)
     auditChildren(this, 'option', 'option', 'the list offers no choices')
     /* Watched again where a filtered list is moved, since leaving stopped
        its observer. */
@@ -1333,6 +1397,8 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.removeEventListener('helix-before-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick, true)
+    this.removeEventListener('pointermove', this.handlePointerMove)
+    this.removeEventListener('pointerleave', this.handlePointerLeave)
     this.sources?.disconnect()
     /* Its marks go with it. The registry is the document's and outlives this
        element, so a list removed while filtered would leave ranges over text
@@ -1373,6 +1439,7 @@ export class HelixHeadlessListbox extends MixinVoice(
     /* A keystroke hands the highlight back to the filter's first match. */
     if (changed.has('filter')) {
       this.steered = false
+      this.beforePointer = undefined
     }
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element

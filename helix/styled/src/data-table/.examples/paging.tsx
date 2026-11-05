@@ -25,6 +25,7 @@ export function Example() {
         field="size"
         sortable
         text-align="end"
+        width="6rem"
       >
         Size
       </helix-table-column>

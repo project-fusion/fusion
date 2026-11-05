@@ -196,22 +196,33 @@
   border-color: var(--helix-color-foreground);
 }
 
-/* **Read-only, and the track says so with its edge**, as a read-only
-   Checkbox's box does. A read-only field keeps its edge and loses its fill; a
-   switch's fill is its value, so the fill stays and the edge steps down to the
-   one a field is drawn with, `color-border`: 1.23:1 on the page, from the mark
-   ink's 3.95:1 off and the fill's own color on. The thumb and the fill keep
-   their ink. No pointer cursor, and no firming or wash under a pointer or a
-   press, which the switch refuses. It looked exactly like a switch that
-   takes a press. Before the invalid rule, whose red edge still wins. */
+/* **Read-only: the value keeps its ink and the frame is drawn as a read-only
+   field's**, the one treatment every control takes. A read-only field keeps the
+   faint field edge and drops its well, so the track drops its fill, on and
+   off, and keeps an edge. **A wash of the foreground at 3.1 to 3.4:1 rather
+   than the field edge's 1.23**, by the owner's decision of November 4, 2026:
+   the track is what says where the thumb can go, and at 1.23 an off read-only
+   switch was a thumb with nothing around it. The thumb is the value, where it sits, and keeps its ink; on, it was
+   drawn in the color of the fill under it, so with the fill gone it takes that
+   fill's color itself. A read-only switch that was on measured identical to
+   an editable one, 0 pixels apart. No pointer cursor, and no firming or wash
+   under a pointer or a press, which the switch refuses. Before the invalid
+   rule, whose red edge still wins. */
 :host([readonly]) [part="field"] {
   cursor: default;
 }
 
-/* Off only: on, the edge is the fill's own, and the field edge drew a pale rim
-   around it. */
-:host([readonly]:not(:state(checked))) [part="track"] {
-  border-color: var(--helix-color-border);
+:host([readonly]) [part="track"] {
+  background-color: transparent;
+  border-color: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 44%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 36%, transparent)
+  );
+}
+
+:host([readonly]:state(checked)) [part="thumb"] {
+  background-color: var(--switch-on-color, var(--helix-color-primary-surface));
+  color: var(--switch-icon-color, var(--helix-color-foreground-on-primary));
 }
 
 :host(:state(invalid)) [part="track"] {
@@ -268,7 +279,8 @@
     forced-color-adjust: none;
   }
 
-  :host(:state(checked)) [part="thumb"] {
+  :host(:state(checked)) [part="thumb"],
+  :host([readonly]:state(checked)) [part="thumb"] {
     background-color: HighlightText;
     forced-color-adjust: none;
   }

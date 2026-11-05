@@ -36,7 +36,7 @@
         - /url: /helix/components/accordion
       - group:
         - treeitem "Preview" [level=2] [selected]
-        - treeitem "Chevron At The Start" [level=2]
+        - treeitem "Chevron at the start" [level=2]
         - treeitem "Events" [level=2]
         - treeitem "Outlined" [level=2]
         - treeitem "Plain" [level=2]

@@ -18,7 +18,8 @@
   /** One message in the toast region, and what it says. */
   interface Message {
     readonly id: number
-    readonly text: string
+    /** The answers, one `name=value` pair each, so a line breaks only between pairs. */
+    readonly pairs: readonly string[]
   }
 
   let handle = $state('')
@@ -32,8 +33,7 @@
     event.preventDefault()
     const answers = [...new FormData(event.currentTarget as HTMLFormElement).entries()]
       .map(([field, value]) => `${field}=${value}`)
-      .join('  ')
-    messages = [...messages, { id: Date.now(), text: answers }]
+    messages = [...messages, { id: Date.now(), pairs: answers }]
   }
 
   /**
@@ -139,7 +139,11 @@
       >
         <helix-flex direction="column" gap="2xs">
           <helix-text scale="body-strong">Read by the form</helix-text>
-          <helix-text scale="code">{message.text}</helix-text>
+          <helix-flex column-gap="md" wrap>
+            {#each message.pairs as pair (pair)}
+              <helix-text scale="code">{pair}</helix-text>
+            {/each}
+          </helix-flex>
         </helix-flex>
       </helix-toast-item>
     {/each}

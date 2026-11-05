@@ -74,6 +74,7 @@ export const BrandPicker = () => {
     /* The swatch says whether the picker is open, which the popover cannot say
        for a plain button: it reads it off the popover when `toggle` says it moved. */
     <helix-popover
+      label="Brand color"
       ontoggle={(event) => setOpen((event.currentTarget as HelixPopover).open)}
       placement="bottom-start"
     >

@@ -106,6 +106,7 @@ import { HandOver, type Motion } from '../hand-over.js'
  * @csspart trigger - The default trigger button, shown when the `trigger` slot is empty.
  * @csspart trigger-indicator - The caret on the default trigger, turned while the panel is open.
  *
+ * @cssproperty --megamenu-edge - How far the card keeps from the window's edge, which is as far as the row it sits in starts from it, between 8 and 32 pixels. Written on the card while it is placed, and read there.
  * @cssproperty --megamenu-from-block-size - The height of the panel this one took over from, written on the surface while it is open.
  * @cssproperty --megamenu-from-inline-size - The width of the panel this one took over from, written on the surface while it is open.
  * @cssproperty --megamenu-surface-block-size - The panel's own height, written on the surface while it is open.
@@ -269,6 +270,7 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
     boundary: () => [...HelixHeadlessMegamenu.bar.connected],
     onDismiss: () => this.close(),
     open: () => this.open,
+    padding: () => this.edge(),
     place: () => !this.banded,
     placement: () => this.placement,
     surface: () => this.partNamed('surface'),
@@ -451,6 +453,45 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
       node = node.parentElement
     }
     return this.trigger.getBoundingClientRect().bottom
+  }
+
+  /**
+   * How far the card keeps from the window's edge: as far as the row it sits
+   * in starts from it, between 8 and 32 pixels.
+   *
+   * At 640 the card slid to 8 pixels from the edge while the navigation it
+   * hangs from started at 24, so neither edge of the card lined up with
+   * anything on the page. Written on the card as `--megamenu-edge` as well, so
+   * a stylesheet can hold the card's width inside the same margin on both
+   * sides, and a card as wide as the room then starts where the row does.
+   * On the card and not the host: a style written on the host is an attribute
+   * a server never sent, and hydration would find it.
+   *
+   * The row is the first flex or grid box above the trigger in the flat tree,
+   * which is what lays destinations out side by side, by fact and not by tag
+   * name, as `bar` finds the bar.
+   */
+  private edge(): number {
+    let node: Element | null = this
+    let row: Element | null = null
+    for (let step = 0; node && step < 4 && !row; step += 1) {
+      const up: Element | null =
+        node.assignedSlot?.parentElement ??
+        node.parentElement ??
+        ((node.parentNode as ShadowRoot | null)?.host || null)
+      if (up && /flex|grid/.test(getComputedStyle(up).display)) {
+        row = up
+      }
+      node = up
+    }
+    const box = (row ?? this).getBoundingClientRect()
+    const start =
+      getComputedStyle(this).direction === 'rtl'
+        ? document.documentElement.clientWidth - box.right
+        : box.left
+    const edge = Math.min(32, Math.max(8, Math.round(start)))
+    this.partNamed('surface')?.style.setProperty('--megamenu-edge', `${edge}px`)
+    return edge
   }
 
   private timer: ReturnType<typeof setTimeout> | undefined

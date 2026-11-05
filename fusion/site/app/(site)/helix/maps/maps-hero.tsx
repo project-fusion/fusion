@@ -18,6 +18,7 @@ import { MapCredit } from '@/components/map-credit/map-credit'
 import { ThemeTry } from '@/components/theme-try/theme-try'
 import { MAP_FAILED, MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
+import { useCoarsePointer } from '@/hooks/use-coarse-pointer/use-coarse-pointer'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import type { SentTheme } from '@/utils/scope-theme/scope-theme'
@@ -139,14 +140,7 @@ export function MapsHero({
      it: measured at 390, a swipe over it panned the map and the page stayed at
      0. Two fingers move the map, and the frame says so when one finger passes
      to the page. A mouse keeps the map's own resting gestures. */
-  const [touch, setTouch] = useState(false)
-  useEffect(() => {
-    const query = matchMedia('(pointer: coarse)')
-    const sync = () => setTouch(query.matches)
-    sync()
-    query.addEventListener('change', sync)
-    return () => query.removeEventListener('change', sync)
-  }, [])
+  const touch = useCoarsePointer()
 
   /* The map, loaded after the page, and restyled when its colors move. */
   useEffect(() => {

@@ -88,6 +88,32 @@
   background-color: var(--tooltip-background-color, var(--helix-material-translucent-strong));
 }
 
+/* **Through glass the arrow is only its outer half.** The buried half lay under
+   a bubble that no longer hides it, so the overlap took the glass twice and
+   showed as a solid diamond inside the bubble. Each clip is the triangle facing
+   the trigger, in the square's own corners before its quarter turn: the turn
+   brings the bottom-right corner down, the top-left up, the top-right to the
+   right, and the bottom-left to the left. */
+:host([material="frosted"]) [part~="arrow-top"],
+:host([material="glass"]) [part~="arrow-top"] {
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+:host([material="frosted"]) [part~="arrow-bottom"],
+:host([material="glass"]) [part~="arrow-bottom"] {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+:host([material="frosted"]) [part~="arrow-left"],
+:host([material="glass"]) [part~="arrow-left"] {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+:host([material="frosted"]) [part~="arrow-right"],
+:host([material="glass"]) [part~="arrow-right"] {
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
 :host([material="frosted"]) [part~="surface"],
 :host([material="glass"]) [part~="surface"] {
   border: var(--helix-border-thin) solid

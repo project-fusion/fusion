@@ -3,6 +3,7 @@ import {
   auditName,
   autofocusTarget,
   CommandController,
+  coversPress,
   customElement,
   drawDismiss,
   drawDismissGlyph,
@@ -17,8 +18,10 @@ import {
   MixinControllerOpen,
   OpenPhaseController,
   openingFocus,
+  raiseAbove,
   reflectElements,
   refocusWithin,
+  scrollHolders,
   unlockScroll,
   words,
 } from '@fusion.dev/helix-core'
@@ -26,6 +29,17 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../description.js'
 import { closeOnDialogSubmit, commandValue } from '../form-method.js'
+
+/** Whether `outer` contains `inner`, across shadow roots. */
+const holds = (outer: Element, inner: Element): boolean => {
+  for (let node: Node | null = inner; node; ) {
+    if (node === outer) {
+      return true
+    }
+    node = node instanceof ShadowRoot ? node.host : (node.parentNode ?? null)
+  }
+  return false
+}
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -104,6 +118,7 @@ import { closeOnDialogSubmit, commandValue } from '../form-method.js'
  * @cssstate entering - From the moment the dialog opens until its entrance has finished.
  * @cssstate exiting - From the moment the dialog closes until its exit has finished.
  * @cssstate open - While the dialog is open.
+ * @cssstate stacked - While the dialog is open over another modal surface that does not hold it, such as a second Dialog or a Drawer.
  */
 @customElement('helix-headless-dialog')
 export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
@@ -418,6 +433,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     } else {
       unlockScroll(this)
     }
+    this.toggleState('stacked', this.open && this.overAnother())
     /* After render, because the element has to exist to be opened, and only on
        a difference: `showModal()` on an open dialog throws, and `close()` on a
        shut one fires a second `close` event. */
@@ -459,6 +475,18 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * Whether a modal surface opened before this one is still holding the page
+   * and is not an ancestor of this one. A dialog written inside another already
+   * takes the panel's raised rungs; one opened beside it does not, and in dark
+   * the two were one fill under the scrim, measured 1.07:1.
+   */
+  private overAnother(): boolean {
+    const holders = scrollHolders()
+    const at = holders.indexOf(this)
+    return holders.slice(0, at < 0 ? holders.length : at).some((one) => !holds(one, this))
+  }
+
   /** Opens once anything slotted has had its first render. See `updated`. */
   private async openWhenSlotted(dialog: HTMLDialogElement): Promise<void> {
     /* Before anything moves it, while the opener still holds focus. */
@@ -471,6 +499,8 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     /* Re-checked, because both facts can have moved while that resolved. */
     if (this.open && !dialog.open && this.isConnected) {
       dialog.showModal()
+      /* A toast showing before it stays on top. See `keepAbove`. */
+      raiseAbove()
       /* **`autofocus` on a slotted component is honored here**, where the
          browser's own focusing steps skip it. See `autofocusTarget`. */
       const marked = await autofocusTarget(this)
@@ -512,6 +542,10 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   private readonly handleBackdrop = (event: MouseEvent): void => {
     const panel = this.dialog
     if (!panel || event.target !== panel) {
+      return
+    }
+    /* A press on a toast kept above the backdrop is not one on the backdrop. */
+    if (coversPress(event)) {
       return
     }
     const box = panel.getBoundingClientRect()

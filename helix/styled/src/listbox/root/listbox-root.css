@@ -20,6 +20,9 @@
      width of this box, and a radius on a band that reaches both edges rounds
      against nothing. */
   --option-radius: var(--helix-radii-none);
+  /* The highlight follows the pointer here, so a hovered row is the active row
+     and draws the active wash. See the option's note. */
+  --option-hover-background-color: transparent;
 
   /*
  *  `surface`, not `surface-sunken`, and the rows are what decides it. A row

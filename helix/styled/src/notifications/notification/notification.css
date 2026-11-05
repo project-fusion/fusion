@@ -287,7 +287,7 @@ slot[name="detail"]::slotted(*) {
 [part="body"] slot:not([name])::slotted(a:hover) {
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, currentcolor 35%, transparent);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--helix-border-thin);
   text-underline-offset: 0.25em;
 }
 

@@ -57,7 +57,7 @@
  * of the 0.18 it held: shallow enough that a still frame looks unchanged and
  * only the movement is new. */
 [part="track"] {
-  animation: helix-loader-breathe var(--_loader-breathe) ease-in-out infinite;
+  animation: helix-loader-breathe var(--_loader-breathe) var(--helix-easing-cycle) infinite;
   opacity: 0.18;
   stroke: var(--loader-track-color, currentColor);
   stroke-width: var(--loader-track-width, var(--_loader-stroke));
@@ -70,7 +70,7 @@
  *    an empty box, which costs nothing.
  */
 [part="mark"] {
-  animation: helix-loader-breathe-mark var(--_loader-breathe) ease-in-out infinite;
+  animation: helix-loader-breathe-mark var(--_loader-breathe) var(--helix-easing-cycle) infinite;
 }
 
 @keyframes helix-loader-breathe {

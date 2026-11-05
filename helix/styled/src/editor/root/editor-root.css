@@ -167,7 +167,7 @@
 /* The address bar: a row under the tools, its field as wide as an address
    needs and no wider, and its buttons after it. */
 [part="link-bar"] {
-  --helix-size-control: round(calc(var(--helix-size-control-sm) * 0.8), 1px);
+  --helix-size-control: var(--helix-size-control-xs);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-checkbox: var(--helix-size-checkbox-sm);

@@ -17,25 +17,25 @@
   --heatmap-tone-warning: var(--helix-color-warning);
   --heatmap-tone-1: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 35%,
+    var(--helix-color-primary-strong) 35%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-2: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 51%,
+    var(--helix-color-primary-strong) 51%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-3: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 68%,
+    var(--helix-color-primary-strong) 68%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-4: color-mix(
     in oklab,
-    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 84%,
+    var(--helix-color-primary-strong) 84%,
     var(--helix-color-surface-sunken)
   );
-  --heatmap-tone-5: oklch(from var(--helix-color-primary-active) max(l, 0.33) c h);
+  --heatmap-tone-5: var(--helix-color-primary-strong);
 
   /* A grid of one track, so the footer is as wide as the strip. */
   display: grid;

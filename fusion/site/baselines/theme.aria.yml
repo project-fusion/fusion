@@ -46,7 +46,7 @@
 - paragraph: Control heights and the spacing scale, as a percentage of the shipped one.
 - text: Corner radius
 - slider "Corner radius": "50"
-- paragraph: As a percentage of the shipped radii. Zero is square.
+- paragraph: The base corner in hundredths of a rem. The shipped corner is 50, and zero is square.
 - text: Font stylesheet
 - textbox "Font stylesheet":
   - /placeholder: https://

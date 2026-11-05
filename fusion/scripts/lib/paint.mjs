@@ -366,7 +366,8 @@ export const evaluate = (value, scheme) => {
 
   if (text.startsWith('color-mix(')) {
     const [space, first, second] = parts(body(text, text.indexOf('(')))
-    if (space.trim() !== 'in oklab') {
+    const inSrgb = space.trim() === 'in srgb'
+    if (space.trim() !== 'in oklab' && !inSrgb) {
       throw new Error(`\`${space.trim()}\` is not a space this resolves in`)
     }
     const read = (side) => {
@@ -385,6 +386,21 @@ export const evaluate = (value, scheme) => {
        `color-mix(…, transparent)` reads as "the first color, faded" rather than
        as "the first color, darkened toward black". */
     const alpha = one.color.alpha * weight + other.color.alpha * (1 - weight)
+    /* **sRGB mixes the gamma-encoded channels**, which is why a token mixes
+       there: near black oklab compresses, and 10% of the ink in sRGB is the
+       step a neutral fill wants. Premultiplied as below, then read back. */
+    if (inSrgb) {
+      const encoded = (color) => mapToGamut(color).map(encode)
+      const [first, second] = [encoded(one.color), encoded(other.color)]
+      const channel = (index) =>
+        alpha === 0
+          ? 0
+          : (first[index] * one.color.alpha * weight +
+              second[index] * other.color.alpha * (1 - weight)) /
+            alpha
+      const lab = linearToLab([0, 1, 2].map((index) => decode(channel(index))))
+      return { ...lab, alpha }
+    }
     const blend = (key) =>
       alpha === 0
         ? 0

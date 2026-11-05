@@ -63,6 +63,8 @@ if (hasLayout()) {
   /**
    * Which corners of a column are round, from the clip that takes them off:
    * the four corners from the top left, clockwise, `r` round and `-` square.
+   * The clip names its reference box after the shape, `fill-box`, which both
+   * readers here step over.
    *
    * **The far end only.** A negative column hung below zero with its round
    * corners on the baseline, because the rule rounded the top whatever the
@@ -77,7 +79,7 @@ if (hasLayout()) {
       </tbody>
     </table>`
     const corners = (one: Element): string => {
-      const round = /round (.+)\)$/.exec(getComputedStyle(one).clipPath)?.[1] ?? '0px'
+      const round = /round (.+)\)(?: [a-z-]+)?$/.exec(getComputedStyle(one).clipPath)?.[1] ?? '0px'
       const radii = round.split(' / ')[0]?.trim().split(/\s+/) ?? []
       const [a = '0px', b = a, c = a, d = b] = radii
       return [a, b, c, d].map((radius) => (Number.parseFloat(radius) > 0 ? 'r' : '-')).join('')
@@ -119,7 +121,9 @@ if (hasLayout()) {
   describe('bar chart edges', () => {
     const SIDES = ['top', 'right', 'bottom', 'left']
     const open = (one: Element): string => {
-      const inset = /inset\(([^)]*?)(?: round .*)?\)$/.exec(getComputedStyle(one).clipPath)?.[1]
+      const inset = /inset\(([^)]*?)(?: round .*)?\)(?: [a-z-]+)?$/.exec(
+        getComputedStyle(one).clipPath,
+      )?.[1]
       const [a = '0px', b = a, c = a, d = b] = inset?.trim().split(/\s+/) ?? []
       const taken = [a, b, c, d].flatMap((side, at) =>
         Number.parseFloat(side) > 0 ? [SIDES[at]] : [],

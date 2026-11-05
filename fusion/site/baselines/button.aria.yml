@@ -150,22 +150,22 @@
     - status
   - article:
     - heading "Button" [level=1]
-    - link "View Source":
+    - link "View source":
       - /url: https://github.com/project-fusion/fusion/tree/main/helix/styled/src/button
     - button "More"
     - status
     - paragraph: Triggers an action, submits a form, or navigates.
     - text: Stable Since 0.1.0 Actions
-    - heading "Link to Usage Usage" [level=2]:
+    - heading "Usage Link to Usage" [level=2]:
+      - text: Usage
       - link "Link to Usage":
         - /url: "#usage"
-      - text: Usage
     - code: import '@fusion.dev/helix/button'
     - button "Copy code"
-    - heading "Link to Preview Preview" [level=2]:
+    - heading "Preview Link to Preview" [level=2]:
+      - text: Preview
       - link "Link to Preview":
         - /url: "#preview"
-      - text: Preview
     - iframe
     - separator "Resize preview pane"
     - button "index.html" [pressed]
@@ -175,14 +175,14 @@
     - link "Open in the sandbox":
       - /url: /helix/sandbox?e=button.preview
     - textbox "Example source"
-    - heading "Link to API Reference API Reference" [level=2]:
-      - link "Link to API Reference":
+    - heading "API reference Link to API reference" [level=2]:
+      - text: API reference
+      - link "Link to API reference":
         - /url: "#api"
-      - text: API Reference
-    - heading "Link to Root Root" [level=3]:
+    - heading "Root Link to Root" [level=3]:
+      - text: Root
       - link "Link to Root":
         - /url: "#helix-button"
-      - text: Root
     - text: helix-button
     - paragraph: Triggers an action, submits a form, or navigates.
     - table "Properties":
@@ -263,10 +263,10 @@
       - code: pending
       - text: is set. A ring turns over its hidden words. pressed A Button Group in a selection mode has this button pressed. settled Set one frame after the first render. Transitions wait for it, so an element does not animate its own arrival.
     - status
-    - heading "Link to Examples Examples" [level=2]:
+    - heading "Examples Link to Examples" [level=2]:
+      - text: Examples
       - link "Link to Examples":
         - /url: "#examples"
-      - text: Examples
     - table "Examples":
       - row "Name Description"
       - link "Accent":
@@ -274,7 +274,7 @@
       - text: The
       - code: accent
       - text: tone, a second emphasis derived from your brand color.
-      - link "As Link":
+      - link "As link":
         - /url: /helix/sandbox?e=button.as-link
       - text: A button that navigates, rendered as an anchor.
       - link "Disabled":
@@ -283,10 +283,10 @@
       - link "Emphasis":
         - /url: /helix/sandbox?e=button.emphasis
       - text: Each emphasis in the neutral, primary, and danger tones.
-      - link "Focusable When Disabled":
+      - link "Focusable when disabled":
         - /url: /helix/sandbox?e=button.focusable-when-disabled
       - text: Disabled buttons that stay in the tab order, with a tooltip that says why each one is disabled.
-      - link "Form Overrides":
+      - link "Form overrides":
         - /url: /helix/sandbox?e=button.form-overrides
       - text: Three submit buttons on one form, each setting where and how its own submission goes.
       - link "Hugging":
@@ -308,7 +308,7 @@
       - text: ", and at full width with"
       - code: width
       - text: .
-      - link "With Slots":
+      - link "With slots":
         - /url: /helix/sandbox?e=button.with-slots
       - text: Icons at either end of the label, placed in the
       - code: start
@@ -327,7 +327,7 @@
           - link "Preview":
             - /url: "#preview"
         - listitem:
-          - link "API Reference":
+          - link "API reference":
             - /url: "#api"
           - list:
             - listitem:

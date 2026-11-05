@@ -14,7 +14,16 @@
   background-color: var(--time-input-background-color, var(--helix-color-well));
   flex-wrap: wrap;
   min-block-size: var(--helix-size-control);
-  padding-block: var(--helix-space-2xs);
+  /* No more than a tag leaves inside the field's own height, as Filter Input
+     sets it, so one line keeps the field the control's height. At `sm` on a
+     touch screen the 16 pixel text sets a 24 pixel line, and with 4 above and
+     below the field stood 34 beside 32 pixel controls. */
+  padding-block: clamp(
+    0px,
+    (var(--helix-size-control) - var(--helix-size-tag) - var(--helix-border-thin) * 2) /
+    2,
+    var(--helix-space-2xs)
+  );
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
   display: flex;
@@ -49,22 +58,24 @@ slot[name="end"]::slotted(*) {
    second frame inside the first is two controls where a reader sees one. */
 [part="trigger"] {
   /* The step every field's indicator takes, as Date Input's and a Select's
-     caret: 20 filled a 20 tall button. The box is the target, and the negative
-     margin keeps it from widening the field. */
+     caret: 20 filled a 20 tall button. The box is a step past the glyph and the
+     press reaches the target past it, as Date Input's does, so the ring stays
+     inside the field: a 44 box on a touch screen overhung the 40 field. The
+     negative margin keeps the box from widening the field. */
   --icon-size: var(--helix-size-icon-tight);
   all: unset;
 
   align-items: center;
-  block-size: var(--helix-size-target);
+  block-size: var(--helix-size-icon-loose);
   /* Restored in the same rule, `all` having taken it back to `content-box`. */
   box-sizing: border-box;
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: flex;
   flex: none;
-  inline-size: var(--helix-size-target);
+  inline-size: var(--helix-size-icon-loose);
   justify-content: center;
-  margin: calc((var(--helix-size-icon-tight) - var(--helix-size-target)) / 2);
+  margin: calc((var(--helix-size-icon-tight) - var(--helix-size-icon-loose)) / 2);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 

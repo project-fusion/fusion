@@ -100,6 +100,16 @@
   min-inline-size: 0;
 }
 
+/* **On a touch screen the actions stand a press apart.** Each control's press
+   is 44 and the controls are 32, so at an 8 pixel gap the second took 4 pixels
+   of the first one's press: Search pressed at 35 wide. The gap is the
+   difference, 12. */
+@media (pointer: coarse) {
+  [part="end"] {
+    gap: max(var(--helix-space-xs), var(--helix-size-target) - var(--helix-size-control));
+  }
+}
+
 /* Navigation beside the brand instead of centered in the banner. */
 :host([content-align="start"]) [part="row"] {
   grid-template-columns: auto 1fr auto;

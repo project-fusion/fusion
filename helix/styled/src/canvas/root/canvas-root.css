@@ -8,7 +8,9 @@
   block-size: var(--canvas-block-size, 30rem);
   box-shadow: var(--helix-shadow-surface);
   border: var(--helix-border-surface) solid var(--canvas-border-color, var(--helix-color-border));
-  border-radius: var(--canvas-radius, var(--helix-radii-sm));
+  /* `md`, the container corner every framed region takes: Code Editor, Editor,
+     Log, Video, Image, and the spatial charts. */
+  border-radius: var(--canvas-radius, var(--helix-radii-md));
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto 1fr auto;

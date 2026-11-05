@@ -90,7 +90,10 @@
  * behave alike.
  */
 [part="tab"]:hover:not(:disabled, [aria-disabled="true"]) {
-  background-color: var(--tabs-tab-hover-background-color, var(--helix-color-hover));
+  background-color: var(
+    --tabs-tab-hover-background-color,
+    var(--_tab-hover-surface, var(--helix-color-hover))
+  );
   color: var(--tabs-tab-hover-color, var(--helix-color-foreground));
 }
 
@@ -143,15 +146,17 @@
   }
 }
 
+/* The close mark steps with density, as every row mark does. At `1em` it was
+   14 at every density, a step under a Table row's mark at `lg`. */
 [part="dismiss"] svg {
-  block-size: 1em;
-  inline-size: 1em;
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 slot[name="dismiss-icon"]::slotted(*) {
-  --icon-size: 1em;
-  block-size: 1em;
-  inline-size: 1em;
+  --icon-size: var(--helix-size-icon-tight);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 [part="dismiss"]:hover {

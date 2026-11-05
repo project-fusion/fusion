@@ -92,7 +92,7 @@
  */
 [part="sheen"] {
   animation: helix-skeleton-sweep var(--skeleton-duration, calc(var(--helix-duration-slow) * 4))
-    ease-in-out infinite;
+    var(--helix-easing-cycle) infinite;
   background-image: linear-gradient(
     90deg,
     transparent 0%,
@@ -130,7 +130,7 @@
 
 :host([effect="pulse"]) [part~="skeleton"] {
   animation: helix-skeleton-pulse var(--skeleton-duration, calc(var(--helix-duration-slow) * 4))
-    ease-in-out infinite;
+    var(--helix-easing-cycle) infinite;
 }
 
 @keyframes helix-skeleton-pulse {
