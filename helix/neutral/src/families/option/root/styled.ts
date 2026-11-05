@@ -1,6 +1,6 @@
 import printExact from '../../../fragments/print-exact.js'
 import row from '../../../fragments/row.js'
-import { native, token, web } from '../../../style.js'
+import { difference, inherited, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import option from './headless.js'
 
@@ -54,7 +54,11 @@ export default styles(
         display: 'flex',
         gap: token('space-xs'),
         paddingBlock: hook.blockPadding,
-        paddingInline: hook.padding,
+        paddingInline: inherited('_option-bleed', hook.padding),
+        /* Under the listbox's `bleed` the inset is the bleed and the margin is
+           the rest of the field's step, so the words do not move. None by
+           default. */
+        marginInline: difference(hook.padding, inherited('_option-bleed', hook.padding)),
         web: { cursor: 'pointer' },
       }),
       native([

@@ -1,5 +1,6 @@
 import rowFragment from '../../../fragments/row.js'
 import {
+  difference,
   first,
   fn,
   hookOf,
@@ -45,7 +46,14 @@ export default styles(
       itemHoverBackgroundColor: token('color-hover'),
       itemStart: '0px',
     },
-    own: { menuFrom: null, menuMaterialBackdrop: null, menuMaterialFill: null, menuTravel: null },
+    own: {
+      menuBleed: null,
+      menuFrom: null,
+      menuItemRadius: null,
+      menuMaterialBackdrop: null,
+      menuMaterialFill: null,
+      menuTravel: null,
+    },
     stylesheet: 'menu/item/menu-item.generated.css',
   },
   ({ hook, include, on, own, rule }) => {
@@ -67,12 +75,16 @@ export default styles(
         rule({
           alignItems: 'center',
           textDecoration: 'none',
-          borderRadius: token('radii-none'),
+          borderRadius: own.menuItemRadius(token('radii-none')),
           color: token('color-foreground'),
           web: { cursor: 'pointer' },
           display: 'grid',
           gridTemplateColumns: [hook.itemStart, fn('minmax', 0, '1fr'), 'auto', hook.itemEnd],
-          paddingInline: token('space-sm'),
+          /* The inset is padding on the row and nothing else. Under the menu's
+             `bleed` it is the bleed, and the margin takes up the rest of the
+             step, so the words stay on the headings' column whichever it is. */
+          marginInline: difference(token('space-sm'), own.menuBleed(token('space-sm'))),
+          paddingInline: own.menuBleed(token('space-sm')),
           transition: ['background-color', fast, token('easing-standard')],
         }),
         rule({ hover: true }, { backgroundColor: lit }),
