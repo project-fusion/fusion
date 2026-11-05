@@ -201,6 +201,18 @@ describe('Lightbox', () => {
     expect(opacity()).not.toBe(0)
   })
 
+  test('its ref steps and closes it, as the web element’s methods do', async () => {
+    const told: Told = []
+    const ref: { current: { close(): void; next(): void } | null } = { current: null }
+    const closed: string[] = []
+    await draw(viewer(told, { onClose: () => closed.push('close'), ref }))
+    await act(async () => ref.current?.next())
+    expect(told.at(-1)).toEqual(['activate', { previous: 'seawater', value: 'sun' }])
+    await act(async () => ref.current?.close())
+    await frames()
+    expect(closed).toEqual(['close'])
+  })
+
   test('draws its chrome in the dark scheme on a light page', async () => {
     await draw(viewer([]))
     const words = drawn?.getByText('1 of 2', { includeHiddenElements: true })

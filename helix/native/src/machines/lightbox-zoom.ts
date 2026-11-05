@@ -100,6 +100,7 @@ export const useLightboxZoom = (setup: LightboxZoomSetup): LightboxZooming => {
     enabled: setup.open,
     max: setup.open ? setup.max : 1,
     swiped: (dx, _dy, vx) => latest.current.swiped(dx, vx, width.current.width),
+    tapped: () => latest.current.touched(),
     touched: () => latest.current.touched(),
   })
   /* Every item starts at its own size, and a closed viewer keeps no zoom. */
