@@ -229,15 +229,17 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
 
   /**
    * What the browser may autofill here, as one of the platform's own tokens,
-   * such as `bday`.
+   * such as `bday`. `off` by default: the text a date is typed into is a text
+   * field to the browser, and its form history offered unrelated words a
+   * reader had typed elsewhere.
    *
-   * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all: hardcoding `off` here means a birthday or a
-   * postal code can never be filled in for a reader. With `segmented`, a
-   * hidden native date input carries it, since no browser fills the segments.
+   * **A default, never a fixed value.** Set a token such as `bday` and the
+   * browser fills it, so a birthday can still be filled in for a reader. With
+   * `segmented`, a hidden native date input carries the token, since no
+   * browser fills the segments. Set it empty to leave the attribute off.
    */
   @property()
-  autocomplete = ''
+  autocomplete = 'off'
 
   /**
    * The calendar the written date, the segments, and the calendar's days are

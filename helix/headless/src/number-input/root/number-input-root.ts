@@ -189,15 +189,16 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   protected override readonly announcesInput = true
 
   /**
-   * What the browser may autofill, as an HTML `autocomplete` token.
+   * What the browser may autofill, as an HTML `autocomplete` token, such as
+   * `postal-code`. `off` by default, since a number field's form history is
+   * every number ever typed into a field of the same name.
    *
-   * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all. Hardcoding `off` here is what stops a reader
-   * having a birthday or a postal code filled in for them, with no way for a
-   * consumer to ask for it.
+   * **A default, never a fixed value.** Set a token and the browser fills it,
+   * so a postal code or a card's expiry month can still be filled in for a
+   * reader. Set it empty to leave the attribute off.
    */
   @property()
-  autocomplete = ''
+  autocomplete = 'off'
 
   /**
    * The message the browser shows when the field holds something that is not a

@@ -223,12 +223,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
 
   /**
    * What the browser may autofill here, as one of the platform's own tokens.
+   * `off` by default, since a time field's form history is unrelated text a
+   * reader typed elsewhere.
    *
-   * Empty leaves the attribute off, which is the browser's default and is what
-   * lets autofill work at all.
+   * A default, never a fixed value: set a token and the browser fills it, or
+   * set it empty to leave the attribute off.
    */
   @property()
-  autocomplete = ''
+  autocomplete = 'off'
 
   /**
    * Whether the field shows a button that empties it, as Input's `clearable`

@@ -216,3 +216,33 @@ returns to. In a form, that is usually what you mean by a starting value:
 ```
 
 See [State and control](./state-and-control).
+
+## Choose what the browser offers in a field
+
+Every control you type into takes `autocomplete` and passes it to the text box
+it draws. Set a token from the HTML standard, and the browser offers the
+matching value from what it knows about the reader:
+
+```html
+<helix-input
+  autocomplete="email"
+  label="Email"
+  name="email"
+></helix-input>
+<helix-pin-input
+  autocomplete="one-time-code"
+  label="Code"
+></helix-pin-input>
+```
+
+Each control starts from the value that suits it:
+
+- Number Input, Date Input, Time Input, Filter Input, Combobox, and Color Input
+  start at `off`. A browser's form history for these is text typed into other
+  fields, and a filter or a combobox offers its own list.
+- Pin Input starts at `one-time-code`, so a phone offers the code it was sent.
+- Input and Textarea leave the attribute off, so the browser offers what it
+  usually does.
+
+To leave the attribute off on any control, set `autocomplete` to an empty
+string.
