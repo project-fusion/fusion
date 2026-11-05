@@ -81,6 +81,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { ColumnMenuDrawer, HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import { edgeOf } from '../../table/edge.js'
+import { droppedAt } from '../../table/fit.js'
 import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
 import '../../divider/index.js'
@@ -249,6 +250,14 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * In the grid, Alt+Down on a heading opens its menu, and F2 and Tab reach the
  * button.
+ *
+ * **`min-table-width` on a column drops it from a narrow table.** While the
+ * table is narrower than that length, it leaves out the column's heading,
+ * track and cells, and brings them back when it widens. The other columns
+ * keep their widths and edges, `aria-colcount` counts the columns that show,
+ * and the column keeps its place in `order` and in the sort. One column
+ * always shows. `csv()` still writes every column that is not `hidden`, since
+ * a file has no width.
  *
  * **`reorderable-rows` lets people move rows.** A column of grips leads each
  * row, named by `move-row-label`. Drag a grip to move its row, and the table
@@ -1514,7 +1523,66 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * sort, which are by field, so showing it again puts it back where it was.
    */
   private get shownColumns(): HelixHeadlessTableColumn[] {
-    return this.orderedColumns.filter((column) => column.shown)
+    return this.orderedColumns.filter((column) => column.shown && !this.dropped.has(column))
+  }
+
+  /** The table's inline size as last measured, or undefined where nothing has measured it, as on a server. */
+  private measuredInlineSize: number | undefined = undefined
+
+  /** The font sizes `em` and `rem` read against, taken with the size. */
+  private fontSizes = { em: 16, rem: 16 }
+
+  /** The columns left out at the measured size, for their `min-table-width`. */
+  private dropped: ReadonlySet<HelixHeadlessTableColumn> = new Set()
+
+  /** Measures the `table` part as it changes size, in a browser. */
+  private sizeObserver: ResizeObserver | undefined = undefined
+
+  /**
+   * Works out which columns are left out at the measured size, and says
+   * whether that changed.
+   *
+   * **Asked on every resize, and the table draws again only when the answer
+   * changes**, so dragging a window across a hundred pixels costs a render at
+   * each minimum it crosses and none between them. Read off the columns in the
+   * order on screen, which keeps the first one there where every column would
+   * go. A hidden column takes no part, having no room to give back.
+   */
+  private fit(): boolean {
+    const size = this.measuredInlineSize
+    const columns = this.orderedColumns.filter((column) => column.shown)
+    const next =
+      size === undefined || !columns.some((column) => column.minTableWidth !== '')
+        ? new Set<HelixHeadlessTableColumn>()
+        : droppedAt(
+            size,
+            columns.map((column) => ({ column, minimum: column.minTableWidth })),
+            this.fontSizes,
+          )
+    const same =
+      next.size === this.dropped.size && [...next].every((column) => this.dropped.has(column))
+    if (!same) {
+      this.dropped = next
+    }
+    return !same
+  }
+
+  private readonly handleSize = (entries: ResizeObserverEntry[]): void => {
+    const entry = entries[entries.length - 1]
+    if (!entry) {
+      return
+    }
+    this.measuredInlineSize = entry.contentBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
+    this.fontSizes = {
+      em: Number.parseFloat(getComputedStyle(this).fontSize) || 16,
+      rem: Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16,
+    }
+    /* **On the next frame, outside the observer's delivery.** Drawn inside it,
+       the rows a column takes with it change the part's height while the
+       browser is still delivering sizes, which it reports as a resize loop. */
+    if (this.fit()) {
+      requestAnimationFrame(() => this.requestUpdate())
+    }
   }
 
   /** The fields in the order on screen. */
@@ -2103,8 +2171,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * **Values, not cells.** A cell may be a template, a badge or a link, so each
    * column gives its field's value, which is what a spreadsheet wants anyway.
    * A column with no field has no value and is left out, and so is a hidden
-   * one, which is not on screen. In `server` mode this is the page it holds,
-   * which is all it can know.
+   * one, which is not on screen. A column dropped for its `min-table-width`
+   * is kept, so the file is the same at any window width. In `server` mode
+   * this is the page it holds, which is all it can know.
    *
    * **A text value that a spreadsheet would run is quoted as text.** A cell
    * opening with `=`, `+`, `-` or `@` is a formula to a spreadsheet, and a
@@ -2113,7 +2182,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * left alone, so a negative one stays a number.
    */
   csv(): string {
-    const columns = this.shownColumns.filter((column) => column.field !== '')
+    const columns = this.orderedColumns.filter((column) => column.shown && column.field !== '')
     const rows = this.mode === 'server' && !this.childField ? this.rows : this.flat().rows
     const quote = (value: unknown): string => {
       if (value === undefined || value === null) {
@@ -2217,7 +2286,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        what it is given alone. This runs on every update, and a windowed table
        updates as it scrolls: in WebKit an assignment that changed nothing
        stopped the reader's keyboard scroll through the table. */
-    const columns = this.orderedColumns
+    /* A column left out for its `min-table-width` is assigned nowhere, so its
+       heading draws nothing and is in no tree a screen reader reads. */
+    const columns = this.orderedColumns.filter((column) => !this.dropped.has(column))
     assignSlot(head, ...columns)
     /* The rows the page served, while they are shown, into the slot that stands
        in for the drawn rows. Left unassigned after, so they draw nothing. */
@@ -2306,6 +2377,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    this.fit()
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
     this.announced = this.news()
     hostAria(internalsOf(this), {
@@ -3038,9 +3110,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               : nothing
           }${
             this.assignsByName && !this.hydrating
-              ? this.orderedColumns.map(
-                  (_, index) =>
-                    html`<slot name=${`column-${index + 1}`} @slotchange=${this.handleSlotChange}></slot>`,
+              ? this.orderedColumns.map((column, index) =>
+                  this.dropped.has(column)
+                    ? nothing
+                    : html`<slot name=${`column-${index + 1}`} @slotchange=${this.handleSlotChange}></slot>`,
                 )
               : html`<slot name="columns" @slotchange=${this.handleSlotChange}></slot>`
           }${
@@ -3124,6 +3197,29 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
     this.addEventListener('helix-before-resize', this.handleResize)
+    this.watchSize()
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.watchSize()
+  }
+
+  /**
+   * Measures the `table` part as it changes size, once it is drawn.
+   *
+   * **The part and not the host.** The host has no `display` on the headless
+   * tier, so it is inline, and an inline box reports no size: every column
+   * with a minimum dropped at once. The part is a block, as wide as the room
+   * the table has, whatever the rows hold, since it scrolls them.
+   */
+  private watchSize(): void {
+    const table = this.partNamed('table')
+    if (!table || typeof ResizeObserver === 'undefined') {
+      return
+    }
+    this.sizeObserver ??= new ResizeObserver(this.handleSize)
+    this.sizeObserver.observe(table)
   }
 
   override disconnectedCallback(): void {
@@ -3139,6 +3235,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
     this.removeEventListener('helix-before-resize', this.handleResize)
+    this.sizeObserver?.disconnect()
   }
 
   /**
