@@ -99,8 +99,9 @@ describe('the generated Avatar', () => {
       const size = styleOf(count ?? { props: {} }).fontSize
       shares.push(Number(size) / Number(styleOf(circle ?? { props: {} }).width))
     }
-    expect(shares[0]).toBeCloseTo(0.3)
-    expect(shares[1]).toBeCloseTo(0.3)
+    /* The count's `text-xs` on an avatar's own circle, `size-avatar`: 12 of 32. */
+    expect(shares[0]).toBeCloseTo(0.375)
+    expect(shares[1]).toBeCloseTo(0.375)
   })
 
   test('has no role without a name', async () => {
