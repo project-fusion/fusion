@@ -445,7 +445,13 @@ const cellOf = (name: string, cell: React.ReactNode): RowCell => {
   const given = React.isValidElement<Props>(cell) ? cell.props['data-value'] : undefined
   const raw = (typeof given === 'string' || typeof given === 'number' ? String(given) : text).trim()
   const value = Number(raw)
-  return { name, text, ...(raw !== '' && Number.isFinite(value) ? { value } : {}) }
+  const tone = React.isValidElement<Props>(cell) ? cell.props['data-tone'] : undefined
+  return {
+    name,
+    text,
+    ...(raw !== '' && Number.isFinite(value) ? { value } : {}),
+    ...(typeof tone === 'string' && tone !== '' ? { tone } : {}),
+  }
 }
 
 /** The instant a row's heading holds in a `<time dateTime>`, where it holds one. */

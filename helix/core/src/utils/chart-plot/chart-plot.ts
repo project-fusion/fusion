@@ -18,7 +18,12 @@ export { type ChartData, isChartData, rowsFromData } from '../read-data/read-dat
 export type { Row, RowCell, Series, SeriesPoint } from '../read-series/read-series.js'
 export { extremesOf, seriesKey, unbroken } from '../read-series/read-series.js'
 export { ticks } from '../scale/ticks.js'
-export { writtenList, writtenNumbers } from '../written-list/written-list.js'
+export {
+  commaList,
+  pressedValue,
+  writtenList,
+  writtenNumbers,
+} from '../written-list/written-list.js'
 export * from './area-plot.js'
 export * from './bar-marks.js'
 export * from './bar-plot.js'
