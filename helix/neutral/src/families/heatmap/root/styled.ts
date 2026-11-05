@@ -84,7 +84,7 @@ export default styles(
     const edged = [
       { emphasis: 'outlined', also: { 'cell-selected': false } },
       { emphasis: 'subtle', also: { 'cell-selected': false } },
-    ]
+    ] as const
     return [
       /* A grid of one column, as wide as the strip, so the footer is too. */
       on('host', [
