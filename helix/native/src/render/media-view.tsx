@@ -61,7 +61,9 @@ const Playing = ({
   style,
   video,
 }: MediaViewProps & { readonly video: typeof ExpoVideo }) => {
-  const player = video.useVideoPlayer(sourceOf(source, nowPlaying))
+  /* The same source object for the same media, or a player is made again on every render. */
+  const asked = useMemo(() => sourceOf(source, nowPlaying), [source, nowPlaying])
+  const player = video.useVideoPlayer(asked)
   const node = useMemo<MediaNode>(
     () => ({ player, shown: nowPlaying ?? null, view: null }),
     [player, nowPlaying],
