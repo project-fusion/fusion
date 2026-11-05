@@ -8,6 +8,12 @@
 export type Axis = "x" | "y";
 
 /**
+ * A caption track a player's media carries: the name a player shows it by,
+ * its language as a BCP 47 tag, and the identifier `showCaptions` takes.
+ */
+export type CaptionTrack = { id: string, label: string, language: string, };
+
+/**
  * Whether the reader's system is set to light or dark.
  */
 export type ColorScheme = "dark" | "light";
@@ -161,6 +167,12 @@ key: string, meta: boolean,
 repeat: boolean, shift: boolean, };
 
 /**
+ * What the system's now-playing controls show of what plays: its title, who
+ * made it, and the address of a picture of it.
+ */
+export type NowPlaying = { artist?: string, artwork?: string, title: string, };
+
+/**
  * What became of a request for files: they were chosen, the reader closed
  * the chooser, the reader or the system refused the permission it needs,
  * or the device cannot do it.
@@ -177,6 +189,13 @@ export type Picked = { files: Array<DeviceFile>, outcome: Outcome, };
  * Where the components run.
  */
 export type Platform = "android" | "ios" | "server" | "web";
+
+/**
+ * Where a player stands: how far it has played and how long its media runs,
+ * in seconds, 0 until the media says, and whether it is paused, has played
+ * to its end, waits for data, is muted, or could not load its media.
+ */
+export type Playback = { duration: number, ended: boolean, failed: boolean, muted: boolean, paused: boolean, time: number, waiting: boolean, };
 
 /**
  * A point, or a distance along both axes.
