@@ -352,6 +352,14 @@
       "types": "./dist/grid/index.d.ts",
       "default": "./dist/grid/index.js"
     },
+    "./heatmap": {
+      "react-native": {
+        "types": "./dist/heatmap/index.native.d.ts",
+        "default": "./dist/heatmap/index.native.js"
+      },
+      "types": "./dist/heatmap/index.d.ts",
+      "default": "./dist/heatmap/index.js"
+    },
     "./icon": {
       "react-native": {
         "types": "./dist/icon/index.native.d.ts",
