@@ -262,7 +262,7 @@ describe('an option’s own content', () => {
 
   /* A picker of photos or products draws each option as a tile, an image with
      its label under it. */
-  test('takes an image in `media`, first in the row, and its name stays the label', async () => {
+  test('takes an image in `media`, first in the row, and adds nothing to its words', async () => {
     const host = (await mount(
       '<helix-headless-option value="sun"><img slot="media" alt="" src="sun.jpg">Sun</helix-headless-option>',
     )) as Option
@@ -275,9 +275,9 @@ describe('an option’s own content', () => {
     host.querySelector('img')?.remove()
     media.dispatchEvent(new Event('slotchange'))
     expect(hasState(host, 'has-media')).toBe(false)
+    /* The image adds nothing to the option's words. That the name is the label
+       part alone is held by "is its label alone" below. */
     expect(host.text).toBe('Sun')
-    await host.updateComplete
-    expect(internalsOf(host).ariaLabelledByElements).toEqual([part(host, 'label') as Element])
   })
 
   test('draws the `description` text inside its part, as the caption slot’s fallback', async () => {
