@@ -32,7 +32,12 @@ impl Names {
                             };
                             for (key, value) in web {
                                 let name = property(key);
-                                ordered(&written, &name)?;
+                                /* A vector shape's `height` and `width` are its
+                                geometry, which SVG names physically, as a column
+                                grows in from no height: a `web` block may write them. */
+                                if !matches!(name.as_str(), "height" | "width") {
+                                    ordered(&written, &name)?;
+                                }
                                 written.push(name.clone());
                                 let value = Lit::Call("web".to_owned(), vec![self.value(value)?]);
                                 declarations.push(Lit::Array(vec![Lit::Text(name), value]));
