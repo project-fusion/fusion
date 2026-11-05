@@ -1005,6 +1005,33 @@ export interface BarChartChoice {
   readonly tipped?: string
 }
 
+/** The names of a chart of points, each read as `scatterChart.x`. */
+export interface ScatterChartChoice {
+  readonly active?: string
+  readonly cells?: string
+  readonly drawn?: string
+  readonly empty?: string
+  readonly gridlines?: string
+  readonly layers?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly named?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly placement?: string
+  readonly role?: string
+  readonly summary?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+  readonly trends?: string
+  readonly xName?: string
+  readonly xTicks?: string
+  readonly yName?: string
+  readonly yTicks?: string
+}
+
 /** A chart key's names, each read as `legend.x`. */
 export interface LegendChoice {
   readonly entries?: string
