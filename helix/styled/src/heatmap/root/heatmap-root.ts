@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as motionStyles } from '../../shared/chart/motion.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
-import { styles } from './heatmap-root.css.js'
+import { styles } from './heatmap-root.generated.css.js'
 import '../../tooltip/index.js'
 
 /**
