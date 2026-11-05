@@ -169,12 +169,12 @@ export default styles(
         web([rule({ gridColumn: 1, gridRow: 2 })]),
         native([
           rule({
-            blockSize: measured('scatter-chart-plot-height'),
             fontSize: token('text-xs'),
             inlineSize: measured('scatter-chart-axis-size'),
-            left: 0,
+            insetBlock: 0,
+            insetInlineEnd: '100%',
+            marginInlineEnd: hook.gap,
             position: 'absolute',
-            top: measured('scatter-chart-plot-top'),
           }),
         ]),
       ]),

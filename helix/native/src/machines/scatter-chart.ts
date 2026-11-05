@@ -183,11 +183,36 @@ const plotOf = (
   return { gridlines, trends, widest, xTicks, yTicks }
 }
 
-/** The levels across a chart this narrow shows: every other one, counted from the far end, as the web hides the rest. */
-const shownTicks = <T>(ticks: readonly T[], width: number, rem: number): readonly T[] =>
-  width > 0 && width < NARROW * rem
-    ? ticks.filter((_, place) => (ticks.length - place) % 2 === 1)
-    : ticks
+/** Where the levels across stand, and what they say, as the plot and the type measure them. */
+interface Across {
+  /** The plane's width in points, which the web's container query reads. */
+  readonly plane: number
+  /** The plot's width in points, which the levels are spread along. */
+  readonly plot: number
+  readonly rem: number
+  /** The size of the levels' type in points. */
+  readonly size: number
+}
+
+/**
+ * The levels across a chart shows: every other one, counted from the far
+ * end, once the chart is narrow, as the web hides the rest, and fewer again
+ * where a larger type would run one level into the next, as it does at a
+ * phone's largest text sizes.
+ */
+const shownTicks = <T extends { readonly text: string }>(
+  ticks: readonly T[],
+  across: Across,
+): readonly T[] => {
+  const narrow = across.plane > 0 && across.plane < NARROW * across.rem
+  const widest = Math.max(0, ...ticks.map((one) => one.text.length)) * 0.6 * across.size
+  const apart = ticks.length > 1 ? across.plot / (ticks.length - 1) : across.plot
+  let every = narrow ? 2 : 1
+  while (across.plot > 0 && every < ticks.length && apart * every < widest + across.size) {
+    every += 1
+  }
+  return ticks.filter((_, place) => (ticks.length - 1 - place) % every === 0)
+}
 
 /** The points drawn in the row at `at`, in the order of their series. */
 const pointsIn = (drawn: Drawn, at: number): ScatterPoint[] =>
@@ -319,7 +344,12 @@ export const useScatterChart = (family: Family, props: Props, use: MachineUse): 
     gridlines: any ? plot.gridlines : [],
     layers: any ? layers : [],
     trends: any ? plot.trends : [],
-    xTicks: shownTicks(plot.xTicks, plane.width, theme.rem),
+    xTicks: shownTicks(plot.xTicks, {
+      plane: plane.width,
+      plot: box.width,
+      rem: theme.rem,
+      size: nameSize(theme),
+    }),
     yTicks: plot.yTicks,
   }
   const size = nameSize(theme)
@@ -331,8 +361,6 @@ export const useScatterChart = (family: Family, props: Props, use: MachineUse): 
       'chart-mark-y': states.markY,
       /* The levels' width: a figure is about six tenths of its type, and one more for a sign. */
       'scatter-chart-axis-size': (plot.widest + 1) * 0.6 * size,
-      'scatter-chart-plot-height': box.height,
-      'scatter-chart-plot-top': box.top,
     },
     name,
     onLayout: () => undefined,

@@ -107,7 +107,7 @@ export default headless('scatter-chart', {
   render: ({ entry, scatterChart, props }) => (
     <>
       <View part="plane">
-        {/* What is measured up, over the plot, and the numbers up beside it. */}
+        {/* What is measured up, over the plot. */}
         {scatterChart.drawn && (
           <View
             ariaHidden
@@ -116,30 +116,33 @@ export default headless('scatter-chart', {
             <Text part="y-name-words">{scatterChart.yName}</Text>
           </View>
         )}
-        {scatterChart.drawn && (
-          <View
-            ariaHidden
-            part="y-axis"
-          >
-            <Repeat
-              each={scatterChart.yTicks}
-              key="key"
-              part="y-ticks"
-            >
-              <View
-                part="y-tick"
-                style={{ '--chart-tick': entry.at }}
-              >
-                <Text part="y-tick-text">{entry.text}</Text>
-              </View>
-            </Repeat>
-          </View>
-        )}
         <View
           label={scatterChart.named}
           part="plot"
           role={scatterChart.role}
         >
+          {/* The numbers up, beside the plot: inside it on a phone, which stands
+              them in the room at its start, as tall as it is. */}
+          {scatterChart.drawn && (
+            <View
+              ariaHidden
+              part="y-axis"
+            >
+              <Repeat
+                each={scatterChart.yTicks}
+                key="key"
+                part="y-ticks"
+              >
+                <View
+                  part="y-tick"
+                  style={{ '--chart-tick': entry.at }}
+                >
+                  <Text part="y-tick-text">{entry.text}</Text>
+                </View>
+              </Repeat>
+            </View>
+          )}
+
           {/* The rules and the lines of best fit, behind the points. */}
           {scatterChart.drawn && (
             <Svg
