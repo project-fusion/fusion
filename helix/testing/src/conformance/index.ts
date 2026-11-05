@@ -30,6 +30,7 @@ import { HEATMAP } from './scenarios/heatmap.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
 import { LEGEND } from './scenarios/legend.js'
+import { LIGHTBOX } from './scenarios/lightbox.js'
 import { LINE_CHART } from './scenarios/line-chart.js'
 import { LIST } from './scenarios/list.js'
 import { LISTBOX } from './scenarios/listbox.js'
@@ -110,6 +111,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   image: IMAGE,
   input: INPUT,
   legend: LEGEND,
+  lightbox: LIGHTBOX,
   'line-chart': LINE_CHART,
   list: LIST,
   listbox: LISTBOX,

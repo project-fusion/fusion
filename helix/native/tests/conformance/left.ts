@@ -39,9 +39,12 @@ const focusedIn = (run: Run): string | null => {
   if (at === PAGE) {
     return 'page'
   }
+  /* **A view that holds every item's words is the element's own**, as a
+     lightbox's layer takes focus itself, and not any one item's panel. */
+  const holding = itemsIn(run).filter((item) => holds(at, item.words))
   return (
     itemsIn(run).find((item) => inPress(item.words) && nodeOf(run, item.words) === at)?.value ??
-    itemsIn(run).find((item) => holds(at, item.words))?.value ??
+    (holding.length === 1 ? holding[0]?.value : undefined) ??
     run.scenario.setup.tag
   )
 }

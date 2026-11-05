@@ -138,11 +138,13 @@ export const partPressOf = (words: string, part?: string): View | undefined => {
   if (around !== undefined) {
     return pick(around.queryAll(answers))
   }
-  for (
-    let at: View | null = screen.getAllByText(words, { includeHiddenElements: true })[0] ?? null;
-    at !== null;
-    at = at.parent
-  ) {
+  /* An element that draws no words of its own, as a lightbox over the page,
+     is found by the part's press among every press drawn. */
+  const texts = words === '' ? [] : screen.queryAllByText(words, { includeHiddenElements: true })
+  if (texts.length === 0 && part !== undefined) {
+    return screen.container.queryAll(answers).find((one) => drawnFor(one, part))
+  }
+  for (let at: View | null = texts[0] ?? null; at !== null; at = at.parent) {
     const found = at.queryAll(answers)
     if (found.length > 0) {
       return pick(found)
