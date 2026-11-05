@@ -808,6 +808,40 @@ pub const HEATMAP: &[(&str, Names)] = &[
     ("onResize", Names::Event),
 ];
 
+/// What a player of one video sends: a request for the next or the previous. Its
+/// props it reads by their own names.
+pub const VIDEO: &[(&str, Names)] = &[("onNext", Names::Event), ("onPrevious", Names::Event)];
+
+/// What it computes for its parts, each read as `video.x`.
+pub const VIDEO_COMPUTED: &[&str] = &[
+    "bar",
+    "captioned",
+    "captionMenu",
+    "captionRows",
+    "captionToggle",
+    "clock",
+    "extras",
+    "failed",
+    "failWords",
+    "full",
+    "level",
+    "named",
+    "overflowed",
+    "overflowRows",
+    "playing",
+    "playWords",
+    "postered",
+    "progress",
+    "quiet",
+    "seekAt",
+    "seekMax",
+    "seekWords",
+    "silent",
+    "start",
+    "waiting",
+    "waitWords",
+];
+
 /// What a viewer of one item at a time sends: a move asked and made. Its props it
 /// reads by their own names.
 pub const LIGHTBOX: &[(&str, Names)] = &[
@@ -1356,6 +1390,11 @@ pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
 }
 
+/// `video({ ... })`, each field a name.
+pub fn video(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "video", VIDEO, VIDEO_COMPUTED)
+}
+
 /// `lightbox({ ... })`, each field a name.
 pub fn lightbox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "lightbox", LIGHTBOX, LIGHTBOX_COMPUTED)
@@ -1466,6 +1505,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "scatterChart" => scatter_chart(value),
         "heatmap" => heatmap(value),
         "lightbox" => lightbox(value),
+        "video" => video(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

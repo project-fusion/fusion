@@ -78,7 +78,7 @@ pub use tree_choice::{
     HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
     NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION,
     PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, TABLE, TABLE_COLUMN,
-    TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM,
+    TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -246,6 +246,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a viewer of one item at a time.
     #[serde(rename = "lightbox", skip_serializing_if = "Option::is_none")]
     pub lightbox: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a player of one video.
+    #[serde(rename = "video", skip_serializing_if = "Option::is_none")]
+    pub video: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a field of dates or times.
     #[serde(rename = "pickerField", skip_serializing_if = "Option::is_none")]
     pub picker_field: Option<TreeChoice>,
@@ -420,6 +423,7 @@ impl Api {
             && self.scatter_chart.is_none()
             && self.heatmap.is_none()
             && self.lightbox.is_none()
+            && self.video.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
@@ -520,6 +524,7 @@ const FIELDS: &[&str] = &[
     "scatterChart",
     "heatmap",
     "lightbox",
+    "video",
     "pickerField",
     "listbox",
     "select",
@@ -607,6 +612,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         heatmap: field("heatmap").map(tree_choice::heatmap).transpose()?,
         lightbox: field("lightbox").map(tree_choice::lightbox).transpose()?,
+        video: field("video").map(tree_choice::video).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)
             .transpose()?,
