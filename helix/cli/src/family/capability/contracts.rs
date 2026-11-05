@@ -311,6 +311,12 @@ const MEDIA: Capability = Capability {
             returns: Ty::Void,
         },
         Member {
+            name: "rate",
+            doc: "Plays `node` at `rate` times its recorded speed.",
+            params: &[NODE, Param { name: "rate", ty: Ty::Number }],
+            returns: Ty::Void,
+        },
+        Member {
             name: "read",
             doc: "Where `node` stands now.",
             params: &[NODE],
