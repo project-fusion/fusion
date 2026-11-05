@@ -68,8 +68,13 @@ export interface CursorSetup {
   readonly pick?: (point: TrackPoint) => number
   /** Whether the reading at a place is drawn: the keys pass over one that is not, as a slice a legend hid. */
   readonly shows?: (at: number) => boolean
-  /** The axis the keys walk, `none` for a ring, whose arrows all move on or back. Absent is `inline`. */
-  readonly axis?: 'inline' | 'none'
+  /**
+   * The axis the readings run along, which the keys walk and a finger scrubs:
+   * `block` down the plot, as a bar chart's categories run under
+   * `orientation="horizontal"`, and `none` for a ring, whose arrows all move
+   * on or back. Absent is `inline`.
+   */
+  readonly axis?: 'block' | 'inline' | 'none'
   /**
    * How many series a reading holds, which the cross pair of arrows walks,
    * as Down and Up walk a line chart's series on the web. Absent is one.
@@ -197,8 +202,10 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
   }, [])
   /* A point off every reading, a ring's hole, moves nothing. */
   const under = (fraction: number, point: TrackPoint): number => {
-    const { pick, count } = latest.current.setup
-    return pick === undefined ? readingAt(fraction, count) : pick(point)
+    const { axis, pick, count } = latest.current.setup
+    /* Down a plot the readings run from its top, as a bar chart's categories turned sideways. */
+    const along = axis === 'block' ? point.y : fraction
+    return pick === undefined ? readingAt(along, count) : pick(point)
   }
   const tracking = useTrack({
     drag: (fraction, point) => {
@@ -224,7 +231,7 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
       flush()
     },
     rtl: direction() === 'rtl',
-    vertical: false,
+    vertical: setup.axis === 'block',
   })
 
   /* The keys of a hardware keyboard, heard while the plot has focus. */
