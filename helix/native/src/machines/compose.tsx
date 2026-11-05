@@ -31,6 +31,7 @@ import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
 import { useFilterInput } from './filter-input'
 import { useFilterMenu } from './filter-menu'
+import { useHeatmap } from './heatmap'
 import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
 import { useJoin } from './join'
@@ -497,6 +498,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useScatterChart(family, props, use),
+      ),
+    /* A strip of cells: its cells from its readings, its reading, and its selection. */
+    ...uses
+      .filter((use) => use.machine === 'heatmap')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useHeatmap(family, props, use),
       ),
     /* A chart of stacked bands: its bands from its readings, and its reading. */
     ...uses

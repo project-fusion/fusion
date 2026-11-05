@@ -90,6 +90,20 @@ export interface CursorSetup {
    * plane is, so the right arrow moves on there too.
    */
   readonly ltr?: boolean
+  /**
+   * How many readings stand in a column, for a grid of them, as a heatmap's
+   * week: the across pair of arrows moves a column, and Page Up and Page Down
+   * four. Absent is one.
+   */
+  readonly grid?: number
+  /** Where Page Up or Page Down goes from a reading, where the chart measures a page itself, as a month of days. */
+  readonly pageFrom?: (at: number, forward: boolean) => number | undefined
+  /**
+   * Told each key that moves the reading, or would at an end, with where it
+   * goes and where it was, before the move is told, as a strip that selects
+   * with Shift hears it.
+   */
+  readonly keyed?: (key: KeyPress, at: number, from: number) => void
 }
 
 /** What a chart's cursor gives its chart. */
@@ -116,8 +130,9 @@ const ACTIONS = [
   { label: 'decrement', name: 'decrement' },
 ] as const
 
-/** How far Page Up and Page Down move: a tenth of the readings, at least one. */
-const pageOf = (count: number): number => Math.max(1, Math.round(count / 10))
+/** How far Page Up and Page Down move: four columns of a grid, or a tenth of the readings, at least one. */
+const pageOf = (count: number, grid: number): number =>
+  grid > 1 ? grid * 4 : Math.max(1, Math.round(count / 10))
 
 /** The places of the readings drawn, which the keys walk. */
 const shownOf = (setup: CursorSetup): number[] =>
@@ -145,14 +160,23 @@ const keyedTo = (
 ): Place | undefined => {
   const shown = shownOf(setup)
   const count = shown.length
+  /* A page the chart measures itself, such as a month of days, from a reading shown. */
+  const paged =
+    (key === 'PageDown' || key === 'PageUp') && from.at >= 0
+      ? setup.pageFrom?.(from.at, key === 'PageDown')
+      : undefined
+  if (paged !== undefined && shown.includes(paged)) {
+    return { at: paged, series: from.series }
+  }
+  const grid = Math.max(1, setup.grid ?? 1)
   const next = stepReading(
     key,
     { at: shown.indexOf(from.at), series: from.series },
     {
       axis: setup.axis ?? 'inline',
       count,
-      grid: 1,
-      page: pageOf(count),
+      grid,
+      page: pageOf(count, grid),
       rtl: setup.ltr !== true && direction() === 'rtl',
       series,
     },
@@ -268,6 +292,9 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
       if (to === undefined) {
         return false
       }
+      /* What the key did to a selection is told first, as the web's strip
+         tells it while the key is heard and its reading once drawn. */
+      now.keyed?.(key, to.at, was.at)
       move(to.at, 'keyboard', false, to.series)
       return true
     },

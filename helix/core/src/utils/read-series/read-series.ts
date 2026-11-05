@@ -256,6 +256,11 @@ export interface RowCell {
    * The number behind it, where there is one.
    */
   value?: number
+  /**
+   * The tone the cell asked for through `data-tone`, where a phone's table
+   * read one, as a heatmap's cell takes it.
+   */
+  tone?: string
 }
 
 /** One row of a table, headed and with every cell in it. */
