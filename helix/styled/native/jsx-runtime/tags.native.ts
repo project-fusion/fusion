@@ -46,6 +46,7 @@ import {
 import { HelixFlex } from '../flex/index.native'
 import { HelixFormatDate } from '../format-date/index.native'
 import { HelixGrid } from '../grid/index.native'
+import { HelixHeatmap } from '../heatmap/index.native'
 import { HelixIcon } from '../icon/index.native'
 import { HelixIconButton } from '../icon-button/index.native'
 import { HelixImage } from '../image/index.native'
@@ -268,6 +269,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-flex': HelixFlex,
   'helix-format-date': HelixFormatDate,
   'helix-grid': HelixGrid,
+  'helix-heatmap': HelixHeatmap,
   'helix-icon': HelixIcon,
   'helix-icon-button': HelixIconButton,
   'helix-image': HelixImage,
