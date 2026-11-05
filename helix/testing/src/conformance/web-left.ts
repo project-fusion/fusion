@@ -387,6 +387,7 @@ const CHARTS: ReadonlySet<string> = new Set([
   'bar-chart',
   'donut-chart',
   'line-chart',
+  'scatter-chart',
   'sparkline',
 ])
 

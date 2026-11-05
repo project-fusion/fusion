@@ -73,6 +73,7 @@ export type Family =
   | 'line-chart'
   | 'area-chart'
   | 'bar-chart'
+  | 'scatter-chart'
   | 'sparkline'
   | 'filter-input'
   | 'select'
