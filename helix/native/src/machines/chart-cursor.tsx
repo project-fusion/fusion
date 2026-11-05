@@ -80,6 +80,16 @@ export interface CursorSetup {
    * as Down and Up walk a line chart's series on the web. Absent is one.
    */
   readonly series?: number
+  /**
+   * The readings in the order the keys walk them, as a scatter's rows are
+   * walked left to right across the plot. Absent is the table's order.
+   */
+  readonly order?: readonly number[]
+  /**
+   * Whether the plot is drawn left to right on every page, as a scatter's
+   * plane is, so the right arrow moves on there too.
+   */
+  readonly ltr?: boolean
 }
 
 /** What a chart's cursor gives its chart. */
@@ -111,7 +121,9 @@ const pageOf = (count: number): number => Math.max(1, Math.round(count / 10))
 
 /** The places of the readings drawn, which the keys walk. */
 const shownOf = (setup: CursorSetup): number[] =>
-  Array.from({ length: setup.count }, (_, at) => at).filter((at) => setup.shows?.(at) !== false)
+  (setup.order ?? Array.from({ length: setup.count }, (_, at) => at)).filter(
+    (at) => setup.shows?.(at) !== false,
+  )
 
 /** Where the keys rest: a reading, and the series within it. */
 interface Place {
@@ -141,7 +153,7 @@ const keyedTo = (
       count,
       grid: 1,
       page: pageOf(count),
-      rtl: direction() === 'rtl',
+      rtl: setup.ltr !== true && direction() === 'rtl',
       series,
     },
   )

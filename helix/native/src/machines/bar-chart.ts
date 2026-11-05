@@ -27,7 +27,6 @@ import {
   seriesOfRows,
 } from '@fusion.dev/helix-core/chart'
 import { useMemo } from 'react'
-import type { LayoutChangeEvent } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { showsSeries, useChartSource, useHiddenSeries } from '../render/chart-sources'
@@ -42,6 +41,8 @@ import {
   plottedOf,
   statusOf,
   useAxisReading,
+  useBox,
+  withPlotLayout,
 } from './axis-chart'
 import {
   columnsOf,
@@ -55,7 +56,7 @@ import {
   treatmentsOf,
   washesOf,
 } from './bar-chart-columns'
-import { axesOf, gridlinesOf, labelsAlong, type Plotted, useBox } from './bar-chart-parts'
+import { axesOf, gridlinesOf, labelsAlong, type Plotted } from './bar-chart-parts'
 import { type Color, paletteOf, sourceOf } from './chart-common'
 import { kebab, wordsIn } from './date-picker-read'
 import { langOf } from './picker-field-kind'
@@ -232,20 +233,6 @@ const usePlot = (read: Read, drawn: Drawn, box: Plotted['box'], lang: string) =>
     theme,
     valueAxis,
   ])
-}
-
-/** The behavior with the plot measured as it is laid out, beside what its cursor measures. */
-const withPlotLayout = (behavior: Behavior, onLayout: (event: LayoutChangeEvent) => void) => {
-  const plot = behavior.parts.plot
-  const measure = plot?.view?.onLayout as ((event: LayoutChangeEvent) => void) | undefined
-  const view = {
-    ...plot?.view,
-    onLayout: (event: LayoutChangeEvent) => {
-      measure?.(event)
-      onLayout(event)
-    },
-  }
-  return { ...behavior, parts: { ...behavior.parts, plot: { ...plot, view } } }
 }
 
 /** Hosts a bar chart: its columns from its readings, and its reading. */

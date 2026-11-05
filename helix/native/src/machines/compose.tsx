@@ -58,6 +58,7 @@ import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
 import { useSplit } from './resize'
 import { useScale } from './scale'
+import { useScatterChart } from './scatter-chart'
 import { scrollersOf } from './scrolling'
 import { useSelect } from './select'
 import { setting } from './setting'
@@ -488,6 +489,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useBarChart(family, props, use),
+      ),
+    /* A chart of points: its points from its readings, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'scatter-chart')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useScatterChart(family, props, use),
       ),
     /* A chart of stacked bands: its bands from its readings, and its reading. */
     ...uses
