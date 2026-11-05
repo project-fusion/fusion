@@ -117,6 +117,38 @@
   text-align: var(--data-table-cell-align);
 }
 
+/* **Centered from top to bottom**, so a line of text beside a taller grip, tag
+   or button sits on the row's middle rather than riding at its top: measured,
+   a name four pixels above the middle of a row its grip set. `align-content`
+   rather than a flex box, which would make every text node an anonymous item
+   and lose `text-align` above. A cell that wraps to the row's full height has
+   no room to move, so long text still starts at the top. */
+[part~="cell"] {
+  align-content: var(--data-table-cell-block-align, center);
+}
+
+/* **On the capitals, not on the line box.** A line box carries the descender's
+   room below the baseline and the accent's above it, so a line centered as a
+   box sits a pixel or two high to the eye. Trimmed to cap height, and held to a
+   line's height as its least, the cell is exactly as tall as it was, the
+   centering above has the line's room to work in, and the capitals are what
+   is centered. Padding given back instead came out a pixel short of a line in
+   rounding, and a served table's first rows stood a pixel off the drawn ones.
+   Behind `@supports`, as `Avatar` does its initials: a browser without it
+   centers the line box. */
+@supports (text-box: trim-both cap alphabetic) {
+  [part~="cell"] {
+    /* `border-box`, so the line, the padding either side and the rule. */
+    min-block-size: calc(
+      1lh +
+      var(--data-table-padding-block, var(--helix-space-sm)) *
+      2 +
+      var(--helix-border-thin)
+    );
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 /*
  *  No rule under the last row, so a table inside a bordered box does not show two
  *    lines a pixel apart.

@@ -193,6 +193,17 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    /* A row whose grip, link and tag are taller than its text, which is where
+       a cell's content riding high or low is seen. */
+    {
+      files,
+      glob: '{name}/.examples/aligned-cells.html',
+      kind: 'html',
+      name: 'aligned-cells',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
   ],
   /* `verify`'s browser jobs and `measure-browser.mjs` name a file here, and
      `measure:browser --from` merges a run's worth of them. */

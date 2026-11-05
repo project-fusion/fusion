@@ -1,0 +1,36 @@
+<!-- @summary A row whose grip, link and tag are taller than its text, with every cell's content centered on the row. -->
+<helix-data-table
+  id="aligned"
+  label="Releases"
+  reorderable-rows
+  row-key="id"
+>
+  <helix-table-column field="name">Release</helix-table-column>
+  <helix-table-column
+    field="notes"
+    id="aligned-notes"
+  >Notes</helix-table-column>
+  <helix-table-column
+    field="state"
+    id="aligned-state"
+  >State</helix-table-column>
+</helix-data-table>
+
+<script type="module">
+  const table = document.getElementById('aligned')
+  document.getElementById('aligned-notes').cell = (row) => {
+    const link = document.createElement('a')
+    link.href = `#${row.id}`
+    link.textContent = 'Read the notes'
+    return link
+  }
+  document.getElementById('aligned-state').cell = (row) => {
+    const tag = document.createElement('helix-tag')
+    tag.textContent = row.state
+    return tag
+  }
+  table.rows = [
+    { id: 'v2-4', name: 'Version 2.4', state: 'Shipped' },
+    { id: 'v2-5', name: 'Version 2.5', state: 'In review' },
+  ]
+</script>

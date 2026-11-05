@@ -305,6 +305,19 @@ export class HelixHeadlessTableColumn extends HelixElement {
   textAlign?: 'center' | 'end' | 'start'
 
   /**
+   * Where the content of this column's cells sits from top to bottom, when a
+   * row is taller than it: `start`, `center` or `end`.
+   *
+   * **Unset follows the table**, which centers, so a line of text beside a
+   * taller grip, tag or button sits on the row's middle rather than riding at
+   * its top. `start` keeps a column of long, wrapping text against the top
+   * edge, where a reader begins it. Reflected and written to each cell as
+   * `text-align` is, for the same reasons.
+   */
+  @property({ attribute: 'vertical-align', reflect: true })
+  verticalAlign?: 'center' | 'end' | 'start'
+
+  /**
    * The track this column takes, as CSS.
    *
    * A single track value, so anything valid in `grid-template-columns` works:
@@ -617,6 +630,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
       changed.has('menu') ||
       changed.has('minTableWidth') ||
       changed.has('textAlign') ||
+      changed.has('verticalAlign') ||
       changed.has('width')
     ) {
       this.tellHolder()
