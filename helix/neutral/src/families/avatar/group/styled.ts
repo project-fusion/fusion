@@ -41,7 +41,12 @@ export default styles(
       overlap: token('space-sm'),
       ringColor: 'transparent',
     },
-    own: { avatarGroupGap: null, avatarGroupNext: null, avatarGroupRing: null, avatarGroupStep: null },
+    own: {
+      avatarGroupGap: null,
+      avatarGroupNext: null,
+      avatarGroupRing: null,
+      avatarGroupStep: null,
+    },
     stylesheet: 'avatar/group/avatar-group.generated.css',
   },
   ({ hook, on, own, rule }) => {
