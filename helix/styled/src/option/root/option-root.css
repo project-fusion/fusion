@@ -64,6 +64,34 @@ slot[name="description"]::slotted(*) {
   white-space: nowrap;
 }
 
+/* An option with an image is a tile: the image takes a line of its own across
+   the row, and the label, the marks either side of it and the check sit on the
+   line under it. **The row wraps only while `media` is filled.** A row that
+   wraps puts a long label on a line of its own, where it should be cut, so a
+   row with no image keeps one line. The label's column starts from nothing
+   here for the same reason, and grows into the line the image leaves it. */
+:host(:state(has-media)) [part~="item"] {
+  flex-wrap: wrap;
+  row-gap: var(--helix-space-xs);
+}
+
+:host(:state(has-media)) [part="text"] {
+  flex-basis: 0;
+}
+
+/* `min-inline-size: 0`, because a flex item's floor is its content and an
+   image's content is its own width: a photo wider than the tile would push the
+   tile out of its column. */
+slot[name="media"]::slotted(*) {
+  aspect-ratio: var(--option-media-aspect-ratio, 4 / 3);
+  border-radius: var(--option-media-radius, var(--helix-radii-sm));
+  display: block;
+  flex: 1 0 100%;
+  inline-size: 100%;
+  min-inline-size: 0;
+  object-fit: cover;
+}
+
 /* An icon slotted into `indicator` is shown only on the chosen option, where
    the tick would be, and the tick goes. */
 slot[name="indicator"]::slotted(*) {

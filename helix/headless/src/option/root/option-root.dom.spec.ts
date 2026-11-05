@@ -260,6 +260,23 @@ describe('an option’s own content', () => {
     expect(host.text).toBe('Helix')
   })
 
+  /* A picker of photos or products draws each option as a tile, an image with
+     its label under it. */
+  test('takes an image in `media`, first in the row, and its name stays the label', async () => {
+    const host = (await mount(
+      '<helix-headless-option value="sun"><img slot="media" alt="" src="sun.jpg">Sun</helix-headless-option>',
+    )) as Option
+    const media = host.shadowRoot?.querySelector('slot[name="media"]') as HTMLSlotElement
+    expect(media.assignedElements().map((one) => one.localName)).toEqual(['img'])
+    expect(part(host, 'item')?.firstElementChild).toBe(media)
+    expect(hasState(host, 'has-media')).toBe(false)
+    media.dispatchEvent(new Event('slotchange'))
+    expect(hasState(host, 'has-media')).toBe(true)
+    expect(host.text).toBe('Sun')
+    await host.updateComplete
+    expect(internalsOf(host).ariaLabelledByElements).toEqual([part(host, 'label') as Element])
+  })
+
   test('draws the `description` text inside its part, as the caption slot’s fallback', async () => {
     const host = (await mount(
       '<helix-headless-option value="h" description="the design system">Helix</helix-headless-option>',
