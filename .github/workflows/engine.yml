@@ -33,7 +33,7 @@ jobs:
             out: helix/native/ios/theme/engine
           # A shared library for each ABI, linked by the runner's NDK.
           - platform: android
-            runner: ubuntu-latest
+            runner: ubuntu-24.04
             targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
             out: helix/native/android/src/engine
     runs-on: ${{ matrix.runner }}
