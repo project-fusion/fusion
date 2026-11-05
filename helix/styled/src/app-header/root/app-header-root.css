@@ -66,7 +66,13 @@
    width: measured at 390, the end track was 41.3 wide, the brand's width, around
    two 32 pixel buttons and their gap, and the actions overflowed backwards
    across the navigation by 6.7. With the floor at `max-content` it is the
-   navigation that yields, and it already scrolls. */
+   navigation that yields, and it already scrolls.
+
+   **The row is as wide as the banner unless you set a measure.** It was
+   centered in a 72rem column of its own, a width nothing else in the library
+   or on your page shared, so over full-width content the brand and the actions
+   sat inward of the page's own edges. Set `--app-header-max-inline-size` to
+   your page's measure to center both on one column. */
 [part="row"] {
   align-items: center;
   block-size: var(--app-header-block-size, var(--helix-size-header));
@@ -74,7 +80,7 @@
   gap: var(--helix-space-lg);
   grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr);
   margin-inline: auto;
-  max-inline-size: var(--app-header-max-inline-size, 72rem);
+  max-inline-size: var(--app-header-max-inline-size, none);
   padding-inline: var(--app-header-padding, var(--helix-space-lg));
 }
 

@@ -9,6 +9,13 @@
     "diagnostics": "helix diagnostics",
     "start": "next start"
   },
+  "browserslist": [
+    "chrome >= 123",
+    "edge >= 123",
+    "firefox >= 120",
+    "safari >= 17.5",
+    "ios_saf >= 17.5"
+  ],
   "dependencies": {
     "@fusion.dev/helix": "^__HELIX_VERSION__",
     "@fusion.dev/helix-styles": "^__HELIX_VERSION__",

@@ -146,6 +146,11 @@
   display: grid;
   margin-inline: auto;
   max-inline-size: var(--color-picker-wheel-size, 100%);
+  /* The mark's layer is a square the size of the wheel, turned by the hue, and
+     a turned square reaches past the box it turns in: at 280 the page scrolled
+     sideways by 34 pixels. Clipped to the circle, which the band and the mark
+     sit inside. */
+  overflow: clip;
   place-items: center;
   position: relative;
   touch-action: none;
@@ -249,6 +254,15 @@
   padding: var(--helix-space-none);
   position: relative;
   transition: scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves, as every other control's does. The sample had none: 36 by 36 to press
+   on a phone. `::before`, since the copied mark is drawn in `::after`. */
+[part="sample"]::before {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
 }
 
 [part="sample"]:disabled {

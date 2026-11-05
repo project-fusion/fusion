@@ -172,6 +172,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.
+ * @slot error - Content shown while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixPlotChangeEvent} helix-plot-change - The bars or the bar the keys rest on changed, which the renderer is told. It stays on the chart.
@@ -184,6 +185,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @csspart bar-active - The bar the pointer or the keys rest on. Set alongside `bar`.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and names, and the bars.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
+ * @csspart error - The words while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart face - One face of a bar the view shows, shaded by which way it faces.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart floor - One place on the floor of a `row`, under a bar or where one would stand, drawn as its outline.
@@ -218,7 +220,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @csspart tooltip-value - A column's value inside the tooltip.
  * @csspart value - The value of a bar whose cell names a tone, written above it in the chart's own drawing.
  *
- * @cssproperty --spatial-bar-chart-shade -How far a bar's face turns from the light, from 0 for its top. The component writes it on each face, and the stylesheet that shades the face reads it.
+ * @cssproperty --spatial-bar-chart-shade - How far a bar's face turns from the light, from 0 for its top. The component writes it on each face, and the stylesheet that shades the face reads it.
  * @cssproperty --spatial-bar-chart-tone-accent - The color of a bar whose cell says `data-tone="accent"`.
  * @cssproperty --spatial-bar-chart-tone-danger - The color of a bar whose cell says `data-tone="danger"`.
  * @cssproperty --spatial-bar-chart-tone-info - The color of a bar whose cell says `data-tone="info"`.
@@ -230,6 +232,7 @@ const around = (frame: Frame, points: readonly { x: number; y: number }[]): Fram
  * @cssstate active - While a bar is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the bars, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the readings.
+ * @cssstate error - While the `error` part stands in place of the readings.
  * @cssstate loading - While the `loading` part stands in place of the readings.
  */
 @customElement('helix-headless-spatial-bar-chart')

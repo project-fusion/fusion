@@ -68,7 +68,9 @@
 }
 
 /* The count, drawn as one more member of the stack and last along the row, which
-   is where the avatars it stands for would have continued. */
+   is where the avatars it stands for would have continued. **At an avatar's
+   size**, 32 at the default, where the control height made it 40 beside 32
+   pixel avatars. */
 [part="overflow"] {
   align-items: center;
   margin-inline-start: calc(-1 * var(--_avatar-group-step));

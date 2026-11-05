@@ -40,6 +40,6 @@ describe('a virtual list on a page in another language', () => {
 
   test('says it in English where nothing is registered', async () => {
     const host = await list('lang="fr"')
-    expect(part(host, 'loading')?.textContent?.trim()).toBe('Loading more')
+    expect(part(host, 'loading')?.textContent?.trim()).toBe('Loading')
   })
 })

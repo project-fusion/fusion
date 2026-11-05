@@ -92,7 +92,7 @@
   inset-inline-end: var(--helix-space-sm);
   overflow: hidden;
   position: absolute;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 :host([no-panel]) [part="panel"][hidden] {

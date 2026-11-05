@@ -134,6 +134,19 @@ export function MapsHero({
   useEffect(() => {
     setStill(matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
+  /* **On a touch screen one finger scrolls the page.** The map is 483px of a
+     844px phone, and resting at `always` it took every swipe that started on
+     it: measured at 390, a swipe over it panned the map and the page stayed at
+     0. Two fingers move the map, and the frame says so when one finger passes
+     to the page. A mouse keeps the map's own resting gestures. */
+  const [touch, setTouch] = useState(false)
+  useEffect(() => {
+    const query = matchMedia('(pointer: coarse)')
+    const sync = () => setTouch(query.matches)
+    sync()
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
 
   /* The map, loaded after the page, and restyled when its colors move. */
   useEffect(() => {
@@ -421,6 +434,7 @@ export function MapsHero({
         class={styles.mapsHeroFrame}
         cluster
         controls="zoom compass tilt layers fullscreen"
+        gestures={touch ? 'cooperative' : undefined}
         label="Map of Austin"
         ref={frame}
       >

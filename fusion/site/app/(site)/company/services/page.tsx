@@ -123,7 +123,7 @@ export default async function Page() {
             <helix-text as="h2" data-section-title>
               Three offers, in the order they usually happen
             </helix-text>
-            <helix-text as="p" data-measure emphasis="muted">
+            <helix-text as="p" class={styles.sectionLede} data-measure emphasis="muted">
               {page?.lede}
             </helix-text>
           </helix-flex>

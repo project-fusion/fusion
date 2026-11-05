@@ -562,10 +562,35 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
       : ''
   }
 
-  /** Searches with the finder, and says where the search stands. */
+  /** Whether a search is waiting for the document to finish parsing. */
+  private waitingForParse = false
+
+  /**
+   * Searches with the finder, and says where the search stands.
+   *
+   * **A target the parser has not reached yet is searched once it has.** A
+   * Find defined by a script in the head upgrades before the element `for`
+   * names exists, and searched nothing for good: no matches, with the text on
+   * the page. While the document is still loading, a search with no target
+   * runs again when parsing ends, as `autofocusTarget` waits for the same.
+   */
   private search(direction: FindDirection): void {
     const finder = this.finder
     if (!finder) {
+      const document = this.ownerDocument
+      if (document?.readyState === 'loading' && !this.waitingForParse) {
+        this.waitingForParse = true
+        document.addEventListener(
+          'DOMContentLoaded',
+          () => {
+            this.waitingForParse = false
+            if (this.open) {
+              this.search('first')
+            }
+          },
+          { once: true },
+        )
+      }
       return
     }
     if (this.marking !== finder) {

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { CardEdgeWatch } from '@/components/card-edge-watch/card-edge-watch'
 import { HashTarget } from '@/components/hash-target/hash-target'
 import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { SiteFooter } from '@/components/site-footer/site-footer'
@@ -33,6 +34,7 @@ export function SiteChrome({
           two copies of the library. */}
       <HelixElements />
       <HashTarget />
+      <CardEdgeWatch />
       {/*
        * *Built here, on the server, and handed down.** The registry reads the
        *           manifest off disk and holds the whole of the writing: it belongs to a

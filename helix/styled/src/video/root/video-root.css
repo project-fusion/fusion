@@ -5,12 +5,11 @@
   color-scheme: dark;
   /* The two bars, their thumbs and the spinner's turn, named once. A rail
      `4px` thick with a `12px` thumb on it is a fact about a slider drawn over a
-     picture, and no rung of the size scale is that thin; the turn is `Loader`'s
-     own 0.8s, so two spinners on one page agree, and no rung of the duration
-     scale is that long. Privates rather than hooks, because none of the three
-     is a thing a consumer is invited to move. */
+     picture, and no rung of the size scale is that thin; the turn is the token
+     every spinner reads, so two on one page agree. Privates rather than hooks,
+     because none of the three is a thing a consumer is invited to move. */
   --_video-rail-size: var(--helix-space-2xs);
-  --_video-spin: 0.8s;
+  --_video-spin: var(--helix-duration-turn);
   --_video-thumb-size: 12px;
 
   display: block;

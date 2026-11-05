@@ -66,8 +66,8 @@ describe('the words a listbox says', () => {
   test('are the words registered for the nearest `lang`, under its key', async () => {
     registerWords('de', {
       'helix-listbox': {
-        emptyText: 'Keine Treffer',
         filterLabel: 'Filtern',
+        noResultsText: 'Keine Treffer',
         resultsLabel: '{count, plural, one {# Treffer} other {# Treffer}}',
         valueMissingMessage: 'Bitte eine wählen.',
       },

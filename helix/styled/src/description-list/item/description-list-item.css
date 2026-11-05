@@ -11,11 +11,16 @@
 
 /* *`muted`, not `subtle`, because a label is content*, the reason `Stat` gives
    for its own label: `subtle` falls under the contrast a small label needs. */
+/* A label wraps at its spaces inside its column, and breaks inside a word only
+   where one word is wider than the column. Without it a 51 letter label ran 46
+   past a 280 pixel list, and stacked it widened the list to 326. */
 [part="label"] {
   color: var(--description-list-label-color, var(--helix-color-foreground-muted));
   font-size: var(--description-list-label-font-size, var(--helix-text-sm));
   font-weight: var(--description-list-label-weight, var(--helix-weight-medium));
   margin: 0;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
 }
 
 /* The value takes the text around it, and breaks anywhere rather than

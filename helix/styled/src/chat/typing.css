@@ -8,8 +8,10 @@
    part a sheet can size, color, or replace. */
 [part="indicator"] {
   /* Off the duration scale on purpose: its longest rung is a control answering
-     a hand, and this is three dots taking turns at the pace somebody types. */
-  --_chat-typing-cycle: 1.2s;
+     a hand, and this is three dots taking turns at the pace somebody types.
+     **A turn and a half, 1.2s**, from the rate every loop in the library is
+     built on, so a theme that slows its spinners slows this with them. */
+  --_chat-typing-cycle: calc(var(--helix-duration-turn) * 1.5);
 
   animation: helix-chat-typing var(--_chat-typing-cycle) infinite ease-in-out;
   background-image:

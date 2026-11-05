@@ -211,8 +211,8 @@ const LINE = 'helix-line-'
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
  * fire again. While you fetch, set `loading`: the list is busy, and a row after
- * the last item says "Loading more" (`loading-text`, or your own content in
- * the `loading` slot). `scrollToIndex` takes a reader to an item.
+ * the last item says "Loading", the word every collection uses (`loading-text`,
+ * or your own content in the `loading` slot). `scrollToIndex` takes a reader to an item.
  *
  * **Moving items** is a separate import, `@fusion.dev/helix/virtual-list/reorder`,
  * as React Aria's drag and drop is. With it imported, `reorderable` lets a
@@ -408,7 +408,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
   @words
   @property({ attribute: 'loading-text' })
-  loadingText = 'Loading more'
+  loadingText = 'Loading'
 
   /**
    * Places each row by its own measured height. Without it, rows are placed

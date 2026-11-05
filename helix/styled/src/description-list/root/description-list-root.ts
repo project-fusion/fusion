@@ -35,7 +35,7 @@ import { styles } from './description-list-root.css.js'
  * @cssproperty --description-list-divider-color - The color of the rule between pairs, with `divided`.
  * @cssproperty --description-list-divider-width - The thickness of the rule between pairs, with `divided`.
  * @cssproperty --description-list-gap - Space between one pair and the next. The default is smaller with `direction="row"` than when stacked. Setting this property replaces both defaults.
- * @cssproperty --description-list-label-width - The width of the column of labels, with `direction="row"`. Defaults to the width of the longest label; set a length such as `10rem` to line up several lists.
+ * @cssproperty --description-list-label-width - The width of the column of labels, with `direction="row"`. Defaults to the width of the longest label, up to two fifths of the list; set a length such as `10rem` to line up several lists.
  */
 @customElement('helix-description-list')
 export class HelixDescriptionList extends HelixHeadlessDescriptionList {

@@ -13,8 +13,8 @@
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-md);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-control: var(--helix-size-control-md);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
@@ -33,8 +33,8 @@
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-lg);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-control: var(--helix-size-control-lg);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
@@ -83,6 +83,12 @@
   margin-inline: var(--toolbar-separator-gap, 0);
 }
 
+/* A divider a wrap left at the start or the end of a line, which the script
+   marks, parts nothing there. */
+::slotted(helix-divider[data-line-edge]) {
+  display: none;
+}
+
 /* Across a column the divider is horizontal, and a horizontal line is as long
    as its box, which a column of controls centered on its axis shrank to
    nothing. */
@@ -105,6 +111,21 @@
 ::slotted(*) {
   max-inline-size: 100%;
   min-inline-size: 0;
+}
+
+/* **On a touch screen the controls stand a target apart.** Each control's press
+   already reaches `--helix-size-target` in a transparent box, but at a `2xs`
+   gap the boxes overlapped and each neighbor took half the overlap: measured on
+   a phone, 36 pixels to press across a 32 button, and 30 across Find's 26. The
+   gap opens to what the boxes need, so each one reaches 44, and nothing drawn
+   changes size. */
+@media (pointer: coarse) {
+  [part="toolbar"] {
+    gap: var(
+      --toolbar-gap,
+      max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-control))
+    );
+  }
 }
 
 /* Print: not at all. A row of controls is ink spent on actions a page cannot

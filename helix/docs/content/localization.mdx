@@ -167,7 +167,7 @@ import { registerWords } from '@fusion.dev/helix/words'
 
 registerWords('pl', {
   'helix-combobox': {
-    emptyText: 'Brak wyników',
+    noResultsText: 'Brak wyników',
     resultsLabel:
       '{count, plural, one {# wynik} few {# wyniki} many {# wyników} other {# wyniku}}',
   },
@@ -204,7 +204,7 @@ in every family, such as `{ 'helix-table': { fallbackLabel: 'Tabelle' } }`.
 ### Which words an element uses
 
 1. **A value you set on the element**, as an attribute or a property. The
-   English counts as a value, so `empty-text="No matches"` keeps the English
+   English counts as a value, so `no-results-text="No matches"` keeps the English
    on every page.
 2. The words registered for the element's locale.
 3. The English.

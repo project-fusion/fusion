@@ -8,6 +8,7 @@
  *    the page does not move when the readings arrive.
  */
 [part="empty"],
+[part="error"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
   display: grid;

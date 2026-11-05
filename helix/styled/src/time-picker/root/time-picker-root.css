@@ -88,16 +88,15 @@
   }
 }
 
-/* The two ends of a range are the answer, so they are filled rather than washed. */
+/* The two ends of a range are the answer, so they are filled rather than washed,
+   with the calendar's chosen day's fill: the primary ground and the label solved
+   on it, as a Switch that is on draws. Decided by the owner on November 3, 2026,
+   for Date Picker and Time Picker together; with no brand it is the ink mirror.
+   Never `foreground-muted` carrying `foreground-on-accent`: that pairing
+   measured 2.96:1 in dark, `foreground-muted` being an ink that turns pale. */
 :host([mode="range"]) [part~="option"]:state(selected)::part(item) {
-  /* *The inverse pair, and never `foreground-muted` carrying
-     `foreground-on-accent`.** That pairing measures 6.01 in light and 2.96:1 in
-     dark, under AA: `foreground-muted` flips to a *light* gray there, and the
-     ink on it is pale. `surface-inverse` is the token for a slab that is the
-     opposite of the page whichever page it is, and `foreground-inverse` is the
-     ink solved against it: 7.20:1 in both schemes. */
-  background-color: var(--helix-color-surface-inverse);
-  color: var(--helix-color-foreground-inverse);
+  background-color: var(--helix-color-primary-surface);
+  color: var(--helix-color-foreground-on-primary);
 }
 
 /* The times inside a range, which are part of the answer without having been
@@ -214,24 +213,19 @@
   background-color: var(--time-picker-hover-background-color, var(--helix-color-surface-sunken));
 }
 
-/* And the answer is the calendar's solid mark, which this now actually is.
+/* And the answer is the calendar's solid mark: the primary ground and the
+ * label solved on it, as the calendar's chosen day draws.
  *
- * **`foreground-muted` is an ink and this is a ground**, which is the note the
- * calendar carries over its own mark and the reason it does not use one here:
- * an ink follows the page and inverts with it, so a ground written as one goes
- * pale exactly when the page goes dark. Measured on a selected wheel row,
- * `foreground-on-accent` white on it read 2.58:1 in dark, which is the number
- * the calendar's note records for the same mistake it had already made and
- * fixed. This copied the mark from before that fix.
- *
- * `surface-inverse` is the ground that stays dark while the page goes light,
- * and `foreground-inverse` is the ink solved against it. */
+ * **`foreground-muted` is an ink and this is a ground**, which is why it is not
+ * used here: an ink follows the page and inverts with it, so a ground written
+ * as one goes pale exactly when the page goes dark. Measured on a selected wheel
+ * row, `foreground-on-accent` white on it read 2.58:1 in dark. */
 [part="column"] [part~="option"]:state(selected)::part(label) {
   background-color: var(
     --time-picker-selected-background-color,
-    var(--helix-color-surface-inverse)
+    var(--helix-color-primary-surface)
   );
-  color: var(--time-picker-selected-foreground-color, var(--helix-color-foreground-inverse));
+  color: var(--time-picker-selected-foreground-color, var(--helix-color-foreground-on-primary));
 }
 
 /* No tick. */

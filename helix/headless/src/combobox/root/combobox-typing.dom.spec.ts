@@ -144,7 +144,7 @@ describe('combobox typing, as a screen reader hears it', () => {
     const combobox = await mount(
       OPTIONS.replace(
         '</helix-headless-combobox>',
-        '<span slot="empty">No language. <a href="#add">Suggest one</a></span></helix-headless-combobox>',
+        '<span slot="no-results">No language. <a href="#add">Suggest one</a></span></helix-headless-combobox>',
       ),
     )
     await type(combobox, 'zz')
@@ -155,20 +155,18 @@ describe('combobox typing, as a screen reader hears it', () => {
     expect(handed.assignedElements({ flatten: true })[0]?.textContent).toContain('Suggest one')
   })
 
-  test('without it, the empty text still shows', async () => {
+  test('without it, the no-results text shows', async () => {
     const combobox = await mount(
-      OPTIONS.replace('label="Language"', 'label="Language" empty-text="Nothing"'),
+      OPTIONS.replace('label="Language"', 'label="Language" no-results-text="Nothing"'),
     )
     await type(combobox, 'zz')
     const list = listbox(combobox) as unknown as HTMLElement & { updateComplete: Promise<unknown> }
     await list.updateComplete
-    const empty = list.shadowRoot?.querySelector('[part="empty"] slot') as HTMLSlotElement
-    /* The combobox's own slot is what the list's is given, and with nothing
-       slotted into it, it shows its fallback, which is the text. happy-dom
-       does not flatten through a fallback, so the handed slot is read. */
-    const handed = empty.assignedElements()[0] as HTMLSlotElement
-    expect(handed.assignedNodes()).toHaveLength(0)
-    expect(handed.textContent?.trim()).toBe('Nothing')
+    /* Nothing fills the no-results slot, so none is handed on, and the list's
+       own line shows the text it was given. */
+    const line = list.shadowRoot?.querySelector('[part="empty"]') as HTMLElement
+    expect(line.querySelector('slot')?.getAttribute('name')).toBe('no-results')
+    expect(line.textContent?.trim()).toBe('Nothing')
   })
 })
 

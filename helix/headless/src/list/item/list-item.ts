@@ -104,7 +104,8 @@ export class HelixHeadlessListItem extends HelixElement {
    * Takes the row out of reach in a list with `selection-mode`: the arrow keys
    * pass over it and it cannot be selected or acted on. In a list with
    * `disabled-behavior="selection"`, it cannot be selected and is reached and
-   * acted on as any row is.
+   * acted on as any row is. Anywhere else, a disabled row with `href` does
+   * not follow its link.
    */
   @property({ reflect: true, type: Boolean })
   disabled = false
@@ -356,7 +357,14 @@ export class HelixHeadlessListItem extends HelixElement {
        **`end` is outside the anchor.** It is where a row's own action goes, a
        delete button or a menu, and inside the link it was interactive content
        inside interactive content: the link's name took the button's words and a
-       click on the button followed the link. */
+       click on the button followed the link.
+
+       **A disabled row's link has no `href`**, as `Tree.Item`'s does, so a
+       press, Enter and a middle click all go nowhere and the link leaves the
+       tab order. `role="link"` keeps it a link to a reader, who hears it is
+       unavailable from `aria-disabled`. With the `href` kept, a disabled row
+       still went where it pointed. */
+    const off = this.disabled && !this.selectionOnly
     return this.href === ''
       ? html`<div
           part="row${this.current === undefined ? '' : ' row-current'}"
@@ -377,7 +385,9 @@ export class HelixHeadlessListItem extends HelixElement {
           @blur=${this.handleCellFocus}
         ><a
           part="link"
-          href=${this.href}
+          href=${off ? nothing : this.href}
+          role=${off ? 'link' : nothing}
+          aria-disabled=${off ? 'true' : nothing}
           target=${this.target || nothing}
           rel=${this.rel || nothing}
           aria-current=${this.current ?? nothing}

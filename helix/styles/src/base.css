@@ -122,6 +122,12 @@ helix-card > [slot="media"] {
   font-family: var(--helix-font-mono);
 }
 
+/* **No rule for every bare anchor.** `:where(a:any-link) { color: inherit }`
+   took the browser's blue off a bare link, and it also beat every component's
+   `::slotted(a)` color, since a page's rule wins over a shadow root's for a
+   slotted element whatever its weight: Outline's links lost their hook. A bare
+   link outside `[data-prose]` and `data-link` keeps the browser's color. */
+
 /* Anchors are styled here rather than wrapped in a `Link` component. */
 /* Prose, and anything that says it is a link. **A helper needs its base case,
    not only its variants.** `data-link="subtle"` and `"quiet"` are departures
@@ -270,9 +276,11 @@ helix-card > [slot="media"] {
   line-height: var(--helix-leading-normal);
 }
 
+/* At `Code`'s size, `sm`: the ramp drew 12 beside `Code`, `Code Block`, and
+   prose code at 13, four sizes of code on one page. */
 [data-text="code"] {
   font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+  font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-regular);
   letter-spacing: var(--helix-tracking-normal);
   line-height: var(--helix-leading-normal);
@@ -374,14 +382,8 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-ink: color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground));
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
-  --_button-tone-hover: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 72%, var(--helix-color-background)),
-    color-mix(in oklab, var(--helix-color-foreground) 90%, var(--helix-color-background))
-  );
-  --_button-fill-press: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-background)),
-    color-mix(in oklab, var(--helix-color-foreground) 80%, var(--helix-color-background))
-  );
+  --_button-tone-hover: var(--helix-color-neutral-surface-hover);
+  --_button-fill-press: var(--helix-color-neutral-surface-active);
 
   align-items: center;
   /* A wash of the foreground, inside a hairline. **The line is what separates
@@ -414,9 +416,24 @@ helix-text[tone="warning"][emphasis="muted"] {
   white-space: nowrap;
 }
 
+/* **The press reaches `--helix-size-target`, in a transparent box**, as
+   `helix-button`'s does, so nothing drawn moves: on a touch screen a 32 pixel
+   link drawn as a button pressed at 32 of the 44. Where the button is already
+   that size the box sits inside it. `:where`, so a page that places one of
+   these itself keeps its own `position`. */
+:where([data-button]) {
+  position: relative;
+}
+
+[data-button]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 /* An icon beside the words, at the size the element draws it. */
 [data-button] helix-icon {
-  --icon-size: 1.15em;
+  --icon-size: round(1.15em, 2px);
 }
 
 /* The tones, paired with the component's as everything here is. */
@@ -436,7 +453,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-edge: var(--helix-color-accent);
   --_button-fill: var(--helix-color-accent-surface);
   --_button-fill-hover: var(--helix-color-accent-surface-hover);
-  --_button-fill-press: oklch(from var(--helix-color-accent-surface-hover) calc(l - 0.05) c h);
+  --_button-fill-press: var(--helix-color-accent-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-accent);
   --_button-tone: var(--helix-color-accent);
   --_button-tone-hover: var(--helix-color-accent-hover);
@@ -445,7 +462,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-edge: var(--helix-color-danger);
   --_button-fill: var(--helix-color-danger-surface);
   --_button-fill-hover: var(--helix-color-danger-surface-hover);
-  --_button-fill-press: oklch(from var(--helix-color-danger-surface-hover) calc(l - 0.05) c h);
+  --_button-fill-press: var(--helix-color-danger-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-danger);
   --_button-tone-hover: color-mix(
@@ -458,7 +475,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-edge: var(--helix-color-info);
   --_button-fill: var(--helix-color-info-surface);
   --_button-fill-hover: var(--helix-color-info-surface-hover);
-  --_button-fill-press: oklch(from var(--helix-color-info-surface-hover) calc(l - 0.05) c h);
+  --_button-fill-press: var(--helix-color-info-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-info);
   --_button-tone-hover: color-mix(
@@ -471,7 +488,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-edge: var(--helix-color-success);
   --_button-fill: var(--helix-color-success-surface);
   --_button-fill-hover: var(--helix-color-success-surface-hover);
-  --_button-fill-press: oklch(from var(--helix-color-success-surface-hover) calc(l - 0.05) c h);
+  --_button-fill-press: var(--helix-color-success-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-success);
   --_button-tone-hover: color-mix(
@@ -484,7 +501,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   --_button-edge: var(--helix-color-warning);
   --_button-fill: var(--helix-color-warning-surface);
   --_button-fill-hover: var(--helix-color-warning-surface-hover);
-  --_button-fill-press: oklch(from var(--helix-color-warning-surface-hover) calc(l - 0.05) c h);
+  --_button-fill-press: var(--helix-color-warning-surface-active);
   --_button-on-tone: var(--helix-color-foreground-on-status);
   --_button-tone: var(--helix-color-warning);
   --_button-tone-hover: color-mix(
@@ -502,11 +519,15 @@ helix-text[tone="warning"][emphasis="muted"] {
   );
 }
 
-/* A press, one step past each hover, as `helix-button` draws it. */
+/* A press, one step past each hover, as `helix-button` draws it: 16% in light
+   and 20% in dark, the strengths of `color-press`. */
 [data-button]:not(:disabled):active {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 16%, transparent)
+    light-dark(
+      color-mix(in oklab, var(--_button-tone) 16%, transparent),
+      color-mix(in oklab, var(--_button-tone) 20%, transparent)
+    )
   );
 }
 
@@ -664,8 +685,35 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
 [data-button="ghost"]:not(:disabled):active {
   background-color: var(
     --button-background-color,
-    color-mix(in oklab, var(--_button-tone) 16%, transparent)
+    light-dark(
+      color-mix(in oklab, var(--_button-tone) 16%, transparent),
+      color-mix(in oklab, var(--_button-tone) 20%, transparent)
+    )
   );
+}
+
+/* **Forced colors keep the emphasis**, as `helix-button` does. Every fill turns
+   Canvas and every edge the text color, so solid, outlined, subtle, and ghost
+   were one box. A solid button takes the system's button colors reversed, a
+   ghost button loses its edge, and the two between keep the box. */
+@media (forced-colors: active) {
+  [data-button="solid"],
+  [data-button="solid"]:not(:disabled):hover,
+  [data-button="solid"]:not(:disabled):active {
+    background-color: ButtonText;
+    border-color: ButtonText;
+    color: ButtonFace;
+  }
+
+  [data-button="solid"]:disabled {
+    background-color: GrayText;
+    border-color: GrayText;
+  }
+
+  [data-button="ghost"],
+  [data-button="ghost"]:not(:disabled):hover {
+    border-color: Canvas;
+  }
 }
 
 /* *Do not restate type and inset per density stop here.** `[data-button]` above
@@ -705,8 +753,8 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
      while the trigger above it moved 32, 40, 48. */
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
 }
@@ -949,16 +997,18 @@ helix-toggle[disabled]::part(item) {
   display: flex;
 }
 
-:where([data-navigation-item], helix-navigation a):active {
-  background-color: var(--helix-color-press);
-}
-
 :where([data-navigation-item], helix-navigation a):hover {
   background-color: var(
     --navigation-item-hover-background-color,
     color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
   );
   color: var(--navigation-item-hover-color, var(--helix-color-foreground));
+}
+
+/* After the hover, at the same weight, so a press reads as a step past it: it
+   sat before and the hover won, and a pressed link showed the hover wash. */
+:where([data-navigation-item], helix-navigation a):active {
+  background-color: var(--helix-color-press);
 }
 
 /* **An outline written as nested lists**, `<ul><li><a>`, styled as the flat
@@ -1261,11 +1311,13 @@ helix-toggle[disabled]::part(item) {
    takes them here: a landing page building its own bands is what needs them,
    every other recipe in this file being control shaped. **The values are the
    axis's own, verbatim**, so one word means one thing on a component and on a
-   `<section>`. **This is the only implementation of `frosted`**, and the only
-   reader of `--helix-material-translucent-strong`. */
+   `<section>`. **Glass is the coverage every glass family takes**, the panel's:
+   at the 30% this read before November 3, 2026, muted text on a section over a
+   photo measured 1.08:1. The tokens layer raises the quiet inks inside it, as it
+   does for every glass surface. */
 [data-material="glass"] {
   backdrop-filter: var(--helix-material-backdrop);
-  background-color: var(--helix-material-translucent);
+  background-color: var(--helix-material-panel);
   border: var(--helix-border-thin) solid var(--helix-material-border);
 }
 
@@ -1328,17 +1380,20 @@ helix-toggle[disabled]::part(item) {
   transition: outline-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Hover goes to the brand, not to a darker gray. `border-strong` is a hairline
-   moving from 0.91 to 0.71: a twenty point jump that says nothing except
-   "slightly more", and gray darkening reads as the card getting heavier rather
-   than as the card being pointed at. `outline-offset: 0` puts it flush against
-   the border, so the two read as one 2px ring rather than as a ring with a gap
-   in it. **Focus still wins, and it has to.** `:where(:focus-visible)` further
-   down this file sets the same property at the same zero specificity, and later
-   wins, so a focused card keeps the focus ring's own 2px offset. */
+/* Hover takes `border-hover`, the edge a field takes under the pointer: the
+   brand where one is set, and a gray at 3:1 where none is. It was `primary`, near black with no brand, drawn as the
+   card's border and an outline flush against it: a 2px ink ring, which is what
+   focus draws. **One line on hover**, the card's own border where the recipe
+   holds a Card and the outline where it holds anything else. **Focus still
+   wins, and it has to.** `:where(:focus-visible)` further down this file sets
+   the same property at the same zero specificity, and later wins, so a focused
+   card keeps the focus ring's own 2px offset. */
 :where([data-card]):hover {
-  --card-border-color: var(--helix-color-primary);
-  outline-color: var(--helix-color-primary);
+  --card-border-color: var(--helix-color-border-hover);
+}
+
+:where([data-card]:not(:has(> helix-card))):hover {
+  outline-color: var(--helix-color-border-hover);
 }
 
 :where([data-card])[aria-current] {
@@ -1380,6 +1435,15 @@ helix-toast:not([data-color-mode]) {
 :where([data-prose] table, [data-prose] helix-table),
 :where([data-prose] blockquote, [data-prose] helix-callout) {
   margin-block: var(--helix-space-none) var(--helix-space-sm);
+}
+
+/* **A comfortable measure.** Paragraphs, lists and quotes stop at 50ch, which
+   measured 63 characters a line of running text in Fusion Sans, whose average
+   character is 0.46em against the 0.66em of a `0`. With none, a paragraph in a
+   wide column ran to 188 characters a line. A table, a code block or a picture
+   keeps the column's whole width. */
+:where([data-prose] p, [data-prose] ul, [data-prose] ol, [data-prose] blockquote) {
+  max-inline-size: 50ch;
 }
 
 /* And nothing hanging off either end, so the surface's own padding is the only
@@ -1532,6 +1596,23 @@ helix-toast:not([data-color-mode]) {
   margin-block: var(--helix-space-none);
   margin-inline: calc(var(--helix-space-md) * -1) var(--helix-space-2xs);
   vertical-align: middle;
+}
+
+/* **Code is set at `Code`'s ratio**, `sm` over `md`, so a raw `code` in a
+   paragraph matches a `Code` beside it: it drew at the paragraph's 14 against
+   the component's 13. A `pre` takes it too, as `Code Block` draws at 13, and the
+   `code` inside a `pre` inherits it below. */
+:where([data-prose] code, [data-prose] samp, [data-prose] pre) {
+  font-size: calc(var(--helix-text-sm) / var(--helix-text-md) * 1em);
+}
+
+/* **A fragment moves to the next line whole**, as `Code` does: a raw `code`
+   broke inside its token, and `--helix-text-control` ended a line on its
+   leading `--`. Never wider than its line, so a token longer than the column
+   still breaks inside it rather than running past. */
+:where([data-prose]) :where(:not(pre) > code) {
+  display: inline-block;
+  max-inline-size: 100%;
 }
 
 /* A ground for a block of code, which the font alone does not give it. Inline
@@ -1798,7 +1879,8 @@ helix-toast:not([data-color-mode]) {
    **`0.01ms` rather than `0` or `none`**, because a transition that still runs
    still fires `transitionend`. **Animations are deliberately left out**: they
    are not all written with these tokens, and seven sheets animate `infinite`:
-   a spinner handed a 0.01ms cycle does not stop, it runs flat out. */
+   a spinner handed a 0.01ms cycle does not stop, it runs flat out. `turn` and
+   `crawl` are left out for the same reason. */
 @media (prefers-reduced-motion: reduce) {
   :root,
   [data-helix-theme] {
@@ -1824,11 +1906,16 @@ helix-toast:not([data-color-mode]) {
    validating the inner selector regardless and the gate then risking a browser
    that supports the feature and not the query. A consumer on Turbopack will
    see the same warning, and `turbopack.ignoreIssue` is the answer there too. */
+/* **An underline in the primary color, and no wash.** A wash behind a single
+   matched letter drew a gray block that read as a caret in Combobox and
+   Listbox. */
 ::highlight(helix-filter-match) {
-  background-color: light-dark(
-    color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
-    color-mix(in oklab, var(--helix-color-primary) 32%, transparent)
-  );
+  background-color: transparent;
+  color: var(--helix-color-foreground);
+  text-decoration-color: var(--helix-color-primary);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--helix-border-thick);
+  text-underline-offset: 0.2em;
 }
 
 /* What Find marks: every match in a pale wash of the warning hue, and the

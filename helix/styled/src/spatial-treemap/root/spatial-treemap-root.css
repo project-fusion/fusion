@@ -16,9 +16,9 @@
   position: relative;
 }
 
-/* The ground, where a page asks for one. */
+/* The ground, where a page asks for one: the one `filled` ground every family takes. */
 :host([separation="filled"]) [part="plot"] {
-  background-color: var(--helix-color-surface-sunken);
+  background-color: var(--helix-color-surface-filled);
 }
 
 /* Each face of a block in its group's color, darkened by how far it turns
@@ -66,13 +66,13 @@
 }
 
 :host([material="glass"]) {
-  --_spatial-treemap-through: calc(0.62 * var(--helix-material-opacity));
+  --_spatial-treemap-through: var(--helix-material-glass-opacity);
 }
 
-/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
-   0.62, the relationship the surface tokens carry. */
+/* `frosted` admits less, which on a mark is more ink: 0.88
+   against glass's 0.72, the material tokens every glass surface reads. */
 :host([material="frosted"]) {
-  --_spatial-treemap-through: calc(0.88 * var(--helix-material-opacity));
+  --_spatial-treemap-through: var(--helix-material-frosted-opacity);
 }
 
 /* The outline again over every block, faint and dashed: where the block shows,

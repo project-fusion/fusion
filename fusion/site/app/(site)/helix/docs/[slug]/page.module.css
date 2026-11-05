@@ -21,8 +21,15 @@
 }
 
 /* Reading type, as on the site's document pages: 14 on this column ran past 110
-   characters a line. */
+   characters a line.
+
+   **And a reading measure at that size.** The column is 80ch of the 14px it is
+   set in, 743px at 1440, and 18px text across all of it ran 82 to 90
+   characters a line. In `em` rather than `ch`: the face's zero is wide, so 62ch
+   came to 740px and moved nothing. 34em is 612px, about 70 characters of this
+   face. Tables and code keep the column. */
 .prose :is(helix-text[as="p"], helix-list-item, [data-item-text]) {
   font-size: var(--helix-text-lg);
   line-height: var(--helix-leading-normal);
+  max-inline-size: 34em;
 }

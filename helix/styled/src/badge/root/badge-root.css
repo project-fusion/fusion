@@ -254,13 +254,19 @@ slot[name="icon"]::slotted(*) {
  * `transform`, which neither the placement's `translate` nor the arrival's
  * `scale` uses, so the three compose. Still for a reader who asked for less
  * motion.
+ *
+ * **Paced in turns, the rate every loop in the library is built on**: a pulse
+ * is two, 1.6s, as Icon's `pulse` is, and a bounce is one and a quarter, 1s, as
+ * Icon's `beat` is. They were 1.5s and 1s here and 1.92s and 0.96s there.
  */
 :host([attention="pulse"]) [part="indicator"]:not([data-blank]) {
-  animation: badge-pulse var(--badge-attention-duration, 1.5s) var(--helix-easing-standard) infinite;
+  animation: badge-pulse var(--badge-attention-duration, calc(var(--helix-duration-turn) * 2))
+    var(--helix-easing-standard) infinite;
 }
 
 :host([attention="bounce"]) [part="indicator"]:not([data-blank]) {
-  animation: badge-bounce var(--badge-attention-duration, 1s) var(--helix-easing-standard) infinite;
+  animation: badge-bounce var(--badge-attention-duration, calc(var(--helix-duration-turn) * 1.25))
+    var(--helix-easing-standard) infinite;
 }
 
 @keyframes badge-pulse {

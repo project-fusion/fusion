@@ -1,7 +1,9 @@
 :host {
   /* An icon in a crumb is drawn to the crumb's text, in the link, in the trigger
-     and in a control alike. At the default 20 a house stood over 13px words. */
-  --icon-size: round(1.15em, 1px);
+     and in a control alike. At the default 20 a house stood over 13px words.
+     Button's step, 12, 14 and 16 over words of 12, 13 and 14: an even size puts
+     the glyph's center on a whole pixel, where `round(1.15em, 1px)` gave 15. */
+  --icon-size: round(down, 1.15em, 2px);
 
   /* A control in a crumb is a crumb-sized target, not an icon-sized one.
      `::slotted(a)` below is a line box with `2xs` above and below, which comes
@@ -45,6 +47,9 @@
    a baseline to be set against: the box is as tall as the link's text line and
    centered with it, so the two baselines are one. */
 [part="separator"] {
+  /* An even size, 12, 14 and 14 beside words of 12, 13 and 14, so the
+     chevron's center lands on a whole pixel. At `1em` it was 13 at `md`. */
+  --_breadcrumb-separator: round(1em, 2px);
   color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
   display: block;
   user-select: none;
@@ -56,16 +61,17 @@
    baseline. Half the gap between the em and the cap height, taken off the
    baseline, is the same answer in any face, which a nudge in pixels is not. */
 [part="separator"] svg {
-  block-size: 1em;
-  inline-size: 1em;
-  vertical-align: calc(0.5cap - 0.5em);
+  /* The lift takes half the box, so the center stays on the capitals. */
+  block-size: var(--_breadcrumb-separator);
+  inline-size: var(--_breadcrumb-separator);
+  vertical-align: calc(0.5cap - var(--_breadcrumb-separator) / 2);
 }
 
-/* The slash takes the chevron's box, an em wide and centered in it, so a trail
+/* The slash takes the chevron's box, as wide and centered in it, so a trail
    keeps its spacing whichever mark it draws. */
 [data-mark="slash"] {
   display: inline-block;
-  inline-size: 1em;
+  inline-size: var(--_breadcrumb-separator);
   text-align: center;
 }
 
@@ -354,6 +360,20 @@ a[part="link"]:focus-visible {
 }
 
 ::slotted(a)::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
+/* **And the same box for the link the crumb draws from `href`**, which no rule
+   above reached: measured on a phone, 29 and 30 pixels to press against the
+   slotted link's 44. `::before`, since a split crumb draws its rule in this
+   link's `::after`. */
+a[part="link"] {
+  position: relative;
+}
+
+a[part="link"]::before {
   content: "";
   inset: calc((var(--helix-size-target) - 100%) / -2);
   position: absolute;

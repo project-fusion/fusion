@@ -34,6 +34,17 @@ export const formatNumber = (
   options?: Intl.NumberFormatOptions | null,
 ): string => formatter(locale, options).format(value)
 
+/**
+ * A number written in a locale with `Intl.NumberFormat` options, in its pieces:
+ * the digits, the group and decimal separators, the sign, the currency. Joined,
+ * they are what `formatNumber` writes.
+ */
+export const formatNumberParts = (
+  value: number,
+  locale = '',
+  options?: Intl.NumberFormatOptions | null,
+): Intl.NumberFormatPart[] => formatter(locale, options).formatToParts(value)
+
 /** A share written as a whole percentage, which a reading says by default. */
 const WHOLE_PERCENT: Intl.NumberFormatOptions = { maximumFractionDigits: 0, style: 'percent' }
 

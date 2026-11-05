@@ -74,6 +74,26 @@ const firstOf = (year: number, month: number): Date =>
   addMonths(asDate('2000-01-01') as Date, (year - 2000) * 12 + month)
 
 /**
+ * The format of the names over the day columns: the short name, or the narrow
+ * one in a language whose short names are longer than four characters.
+ *
+ * A column is a day wide, and the short name is the one a reader expects
+ * where it fits. In Arabic, Persian, Hebrew, Thai, Polish, and Vietnamese it
+ * does not: "أربعاء" and "niedz." ran past their 40 pixel columns into the
+ * next. The narrow names fit any column, and each header still says the long
+ * name to a reader.
+ */
+const columnHeads = (
+  utc: (options: Intl.DateTimeFormatOptions) => Intl.DateTimeFormat,
+): Intl.DateTimeFormat => {
+  const short = utc({ weekday: 'short' })
+  const long = Array.from({ length: 7 }, (_, day) => short.format(Date.UTC(2026, 0, 4 + day))).some(
+    (name) => [...name].length > 4,
+  )
+  return long ? utc({ weekday: 'narrow' }) : short
+}
+
+/**
  * @summary A month calendar for choosing one or more dates.
  *
  * @description
@@ -170,7 +190,7 @@ const firstOf = (year: number, month: number): Date =>
  * @csspart previous-mark - The glyph on the previous month control, where none is slotted.
  * @csspart selection - The chosen date or range in words, which screen readers hear when it changes. Drawn for screen readers only.
  * @csspart week - One row of days.
- * @csspart weekday - A column header naming a day of the week. It shows the short name and says the full one.
+ * @csspart weekday - A column header naming a day of the week. It shows the short name, or the narrow one where short names are long, and says the full one.
  *
  * @cssproperty --date-picker-column-count - How many month columns are drawn, capped at two. `--date-picker-columns` overrides it.
  *
@@ -1462,7 +1482,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
       long: utc({ dateStyle: 'long' }),
       monthName: utc({ month: 'short' }),
       monthYear: utc({ month: 'short', year: 'numeric' }),
-      weekday: utc({ weekday: 'short' }),
+      weekday: columnHeads(utc),
       weekdayName: utc({ weekday: 'long' }),
       year: utc({ year: 'numeric' }),
     }

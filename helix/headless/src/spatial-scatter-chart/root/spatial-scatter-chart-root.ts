@@ -105,6 +105,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no points. Falls back to `empty-text`.
+ * @slot error - Content shown while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown while `loading` is set and there are no points yet. Falls back to `loading-text`.
  *
  * @event {HelixPlotChangeEvent} helix-plot-change - The points or the point the keys rest on changed, which the renderer is told. It stays on the chart.
@@ -116,6 +117,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the points.
  * @csspart drop-line - The line from a point straight down to the floor of the box, drawn under `drop-lines`, in its group's color.
  * @csspart empty - The words when the table has no points: the `empty` slot, falling back to `empty-text`.
+ * @csspart error - The words while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
  * @csspart live - The readout: a polite live region that says the point the keys moved to. Hide it visually.
@@ -150,6 +152,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @cssstate active - While a point is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the points, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the points.
+ * @cssstate error - While the `error` part stands in place of the points.
  * @cssstate loading - While the `loading` part stands in place of the points.
  */
 @customElement('helix-headless-spatial-scatter-chart')

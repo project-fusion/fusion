@@ -170,11 +170,20 @@
 /* Rows that are already there stay, and dim, while a new set arrives.
    **The rows, not the box they are in.** The line that says "Loading" is in
    the same box, and an opacity on the box cannot be undone inside it: the
-   message that explains the wait measured 2.2:1. A slot draws no box, so the
-   rows it holds are dimmed through `::slotted`. */
-:host([loading]) [part="table"] > :not([part~="loading"], [part~="empty"], [part~="error"]),
-:host([loading]) ::slotted(:not([slot])) {
-  opacity: var(--helix-opacity-busy);
+   message that explains the wait measured 2.2:1.
+
+   **Handed to the cells, because a row draws no box.** A row is `display:
+   contents`, so an opacity on it dimmed nothing: measured November 3, 2026,
+   every cell of a loading table at full strength. The row dims its own cells
+   by this, and the column headings, which say what the rows are, stay. Set to
+   1 on a table that is not loading, so a table inside a cell does not take
+   its parent's. */
+:host {
+  --_table-busy-opacity: 1;
+}
+
+:host([loading]) {
+  --_table-busy-opacity: var(--helix-opacity-busy);
 }
 
 /* The copy of a row a pointer drags, drawn in the top layer and raised over

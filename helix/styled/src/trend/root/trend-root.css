@@ -26,17 +26,19 @@
   color: var(--trend-color, var(--_trend-color));
 }
 
+/* **An even size, the em rounded to two pixels**: 14 beside the 13 of the
+   figure, so the arrow's center lands on a whole pixel. At `1em` it was 13. */
 [part="icon"] {
-  --icon-size: var(--trend-icon-size, 1em);
+  --icon-size: var(--trend-icon-size, round(1em, 2px));
 }
 
 /* A glyph of the page's own takes the arrow's size, so swapping it moves
    nothing, and its color from the host like the arrow. */
 slot[name$="icon"]::slotted(*) {
-  --icon-size: var(--trend-icon-size, 1em);
+  --icon-size: var(--trend-icon-size, round(1em, 2px));
 
-  block-size: var(--trend-icon-size, 1em);
-  inline-size: var(--trend-icon-size, 1em);
+  block-size: var(--trend-icon-size, round(1em, 2px));
+  inline-size: var(--trend-icon-size, round(1em, 2px));
 }
 
 /* The judgment, which is the movement crossed with what counts as better.

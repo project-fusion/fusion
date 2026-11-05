@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <helix-flex gap="lg">
+    <helix-flex
+      gap="lg"
+      wrap
+    >
       <helix-button
         aria-describedby="placements-top-tip"
         id="placements-top"

@@ -28,8 +28,10 @@
 
 /* `:host(:disabled)`, not `:host([disabled])`: the pseudo-class matches the
    element's own attribute and an ancestor `<fieldset disabled>` alike, where the
-   attribute selector only ever sees the first. */
-:host(:not(:disabled)) [part="field"]:hover {
+   attribute selector only ever sees the first. **Not read-only either**, whose
+   edge darkened from 1.23:1 to the hover's under a pointer and so offered an
+   edit the field refuses. */
+:host(:not(:disabled, [readonly])) [part="field"]:hover {
   border-color: var(--helix-color-border-hover);
 }
 
@@ -95,7 +97,25 @@
   font-family: var(--helix-font-sans);
   font-size: max(var(--helix-text-field-min), var(--helix-text-field));
   font-weight: var(--helix-weight-medium);
+  /* **A percentage width, so the field shrinks to its column.** An input's
+     min-content is its default twenty characters whatever its minimum says, and
+     that floored the host: measured at 390, Input 202, Textarea 212, Date
+     Input 222, Combobox 226 and Number Input 266 against Select's 98.6, so a
+     300 pixel grid of two columns ran to 500. A form control with a percentage
+     width contributes nothing to min-content and its own width to max-content,
+     so a host sized by its content keeps the input's width. */
+  inline-size: 100%;
   min-inline-size: 0;
+}
+
+/* **An icon at either end is the size of the marks the field draws itself**,
+   the clear and reveal buttons' tight step, 16 at the default. A slotted icon
+   took the region's icon size, so a search field drew a 20 magnifier beside a
+   16 clear mark in the same 40 pixel box. A page that sets `--icon-size` on
+   its own icon still wins. */
+::slotted([slot="start"]),
+::slotted([slot="end"]) {
+  --icon-size: var(--helix-size-icon-tight);
 }
 
 /* A danger edge is painted the system color, so a wrong field thickens its edge. */

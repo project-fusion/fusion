@@ -113,18 +113,18 @@ import {
  * no `start` counts down from the number of rows, which a server cannot know,
  * so served markup counts from one until the list runs.
  *
- * **An empty list.** Set `empty-text`, or put your own content in the `empty`
- * slot, for a row shown while the list has no rows and none are loading, such
- * as "No files yet" and a link to add one. Without either, an empty list shows
- * nothing. The list takes the `empty` state while it has no rows, whatever it
- * shows.
+ * **An empty list.** A list with no rows and none loading shows a row that
+ * says "Nothing to show", the words every collection uses. Set `empty-text`,
+ * or put your own content in the `empty` slot, to say more, such as "No files
+ * yet" and a link to add one. An empty `empty-text` shows no row. The list
+ * takes the `empty` state while it has no rows, whatever it shows.
  *
  * **Loading more.** `load-more` sends `helix-load-more` once the end of the
  * list comes within a screen of view, in the box that scrolls it or the page,
  * once for each number of rows: add rows and it can send it again. While you
  * fetch, set `loading`: the list is busy, and a row after the last says
- * "Loading more" (`loading-text`, or your own content in the `loading`
- * slot). The list asks for nothing while `loading` is set.
+ * "Loading" (`loading-text`, or your own content in the `loading` slot). The
+ * list asks for nothing while `loading` is set.
  *
  * An interactive list with no name is reported once in a development build,
  * since a screen reader announces it as a grid and nothing more. Name it with
@@ -204,7 +204,7 @@ export class HelixHeadlessList extends HelixElement {
    */
   @words
   @property({ attribute: 'empty-text' })
-  emptyText = 'No items'
+  emptyText = 'Nothing to show'
 
   /**
    * The kind of list, which follows from the content.
@@ -252,10 +252,14 @@ export class HelixHeadlessList extends HelixElement {
   @property({ attribute: 'loading-label' })
   loadingLabel?: string
 
-  /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
+  /**
+   * The text of the row drawn while `loading` is set, where the `loading` slot
+   * is empty. "Loading", the word every collection uses, since the same row
+   * stands alone in a list that has no rows yet.
+   */
   @words
   @property({ attribute: 'loading-text' })
-  loadingText = 'Loading more'
+  loadingText = 'Loading'
 
   /**
    * Sends `helix-load-more` once the end of the list comes within a screen of

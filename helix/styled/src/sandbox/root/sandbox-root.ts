@@ -38,6 +38,12 @@ const DEFAULT_SPLIT = 50
    leaves about five lines, which is what a console is read in. */
 const DEFAULT_PANEL = 160
 
+/**
+ * The width below which unset `orientation` stacks the panes: two of the
+ * 280 pixel columns that are the narrowest supported.
+ */
+const STACK_BELOW = 560
+
 /** The most of the sandbox the panel may take, leaving the panes above it. */
 const PANEL_MAX = 0.8
 
@@ -278,6 +284,9 @@ export class HelixSandbox extends HelixElement {
 
   /**
    * Whether the panes sit side by side or stacked.
+   *
+   * Unset, they sit side by side, and stack where the sandbox is narrower than
+   * 560 pixels, two of the narrowest supported columns.
    *
    * Not reflected, for `lead`'s reason above: no rule selects on it. The axis
    * reaches the stylesheet as the inner splitter's own `orientation`, which is
@@ -535,6 +544,9 @@ export class HelixSandbox extends HelixElement {
    */
   private bodyHeight = 0
 
+  /** The body's width, last measured, which decides whether unset `orientation` stacks. */
+  private bodyWidth = 0
+
   /**
    * Asks for a render when the body changes size.
    *
@@ -783,9 +795,18 @@ export class HelixSandbox extends HelixElement {
    *
    * Unset is horizontal, and stays unset: the default is the absent attribute,
    * so a reflected default cannot appear on the host after hydration.
+   *
+   * **Unset stacks where the body is narrower than two columns.** Side by side
+   * on a 390 pixel page, each pane was 179 wide, under the 280 a column needs.
+   * Measured on the body, which the observer watches, so the panes go
+   * back side by side once the room is there. A server measures nothing and
+   * serves them side by side.
    */
   private get axis(): 'horizontal' | 'vertical' {
-    return this.orientation ?? 'horizontal'
+    if (this.orientation) {
+      return this.orientation
+    }
+    return this.bodyWidth > 0 && this.bodyWidth < STACK_BELOW ? 'vertical' : 'horizontal'
   }
 
   /**
@@ -1059,7 +1080,9 @@ export class HelixSandbox extends HelixElement {
     if (!body) {
       return
     }
-    this.bodyHeight = body.getBoundingClientRect().height
+    const box = body.getBoundingClientRect()
+    this.bodyHeight = box.height
+    this.bodyWidth = box.width
     this.watch?.observe(body)
     if (render) {
       this.requestUpdate()
@@ -1092,7 +1115,9 @@ export class HelixSandbox extends HelixElement {
     }
     const body = this.renderRoot.querySelector<HTMLElement>('[part="body"]')
     if (body) {
-      this.bodyHeight = body.getBoundingClientRect().height
+      const box = body.getBoundingClientRect()
+      this.bodyHeight = box.height
+      this.bodyWidth = box.width
     }
   }
 

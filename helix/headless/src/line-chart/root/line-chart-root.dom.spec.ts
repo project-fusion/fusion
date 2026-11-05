@@ -54,6 +54,11 @@ const SWING = `<table id="swing">
   </tbody>
 </table>`
 
+/* A chart with no axis and no rules, whose readings fill the box from the
+   lowest to the highest, for the specs that measure the drawing's arithmetic.
+   The default raises the top to a numbered level above the highest reading. */
+const BARE = 'gridlines="none" value-axis="none"'
+
 const chart = async (table: string, attributes = ''): Promise<HTMLElement> => {
   await mount(
     `<div>${table}<helix-headless-line-chart ${attributes}></helix-headless-line-chart></div>`,
@@ -188,7 +193,7 @@ describe('line chart', () => {
     /* The rule that is the opposite of the bar chart's, and on purpose. Forcing
        zero into 980..1020 puts every reading within four percent of the top of
        the box, which is a rule rather than a line. */
-    const host = await chart(SESSIONS, 'for="sessions"')
+    const host = await chart(SESSIONS, `for="sessions" ${BARE}`)
     const path = d(lines(host)[0])
     const ys = anchors(path).map(([, y]) => y)
     expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(90)
@@ -463,7 +468,7 @@ describe('markers', () => {
   })
 
   test('`markers` draws one on every reading, in its series color, at its place', async () => {
-    const host = await chart(CHANNELS, 'for="channels" markers')
+    const host = await chart(CHANNELS, `for="channels" markers ${BARE}`)
     const all = marks(host)
     expect(all).toHaveLength(2)
     expect(all[0]?.getAttribute('style')).toContain('--chart-series: var(--chart-series-1)')
@@ -497,7 +502,7 @@ describe('markers', () => {
         <tr><th>Mar</th><td></td></tr><tr><th>Apr</th><td>8</td></tr><tr><th>May</th><td></td></tr>
       </tbody>
     </table>`
-    const host = await chart(table, 'for="lone"')
+    const host = await chart(table, `for="lone" ${BARE}`)
     expect(marks(host).map((one) => one.getAttribute('part'))).toEqual(['marker marker-lone'])
     expect(dots(marks(host)[0])).toEqual(['70,0'])
   })
@@ -555,22 +560,42 @@ describe('the reading, heard by the page', () => {
 })
 
 /* A reading could be measured only from the tooltip: the drawing had no numbers
-   beside it. */
-describe('value-axis', () => {
+   beside it. Drawn by default since November 3, 2026, the owner's decision. */
+describe('the value axis', () => {
   const ticks = (host: HTMLElement): string[] =>
     [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].map(
       (one) => one.textContent ?? '',
     )
+  const rules = (host: HTMLElement): number =>
+    host.shadowRoot?.querySelectorAll('[part="gridline"]').length ?? 0
 
-  test("draws the scale's numbers beside the plot, at the levels the grid rules", async () => {
-    const host = await chart(SESSIONS, 'for="sessions" value-axis')
+  test("draws the scale's numbers beside the plot by default, at the levels the grid rules", async () => {
+    const host = await chart(SESSIONS, 'for="sessions"')
     expect(part(host, 'axis')?.getAttribute('aria-hidden')).toBe('true')
-    expect(ticks(host)).toEqual(['980', '990', '1,000', '1,010', '1,020'])
+    /* 1,020 is the highest, and the top is raised to the next level, 1,030. */
+    expect(ticks(host)).toEqual(['980', '990', '1,000', '1,010', '1,020', '1,030'])
+    expect(rules(host)).toBe(6)
   })
 
-  test('absent draws none', async () => {
+  test('the highest reading stands clear of the top edge', async () => {
     const host = await chart(SESSIONS, 'for="sessions"')
-    expect(part(host, 'axis')).toBeNull()
+    const ys = anchors(d(lines(host)[0])).map(([, y]) => y)
+    /* 1,020 of 980 to 1,030 is a fifth of the box below the top. */
+    expect(Math.min(...ys)).toBeCloseTo(20, 1)
+  })
+
+  test('`none` draws no axis, and `gridlines="none"` no rules, so the line fills the box', async () => {
+    const host = await chart(SESSIONS, `for="sessions" ${BARE}`)
+    expect(host.shadowRoot?.querySelector('[part="axis"]')).toBeNull()
+    expect(rules(host)).toBe(0)
+    const ys = anchors(d(lines(host)[0])).map(([, y]) => y)
+    expect(Math.min(...ys)).toBe(0)
+  })
+
+  test('the host carries no attribute nobody wrote', async () => {
+    const host = await chart(SESSIONS, 'for="sessions"')
+    expect(host.hasAttribute('value-axis')).toBe(false)
+    expect(host.hasAttribute('gridlines')).toBe(false)
   })
 })
 
@@ -611,6 +636,28 @@ describe('with nothing to draw', () => {
     const refreshing = await host(FULL, 'for="some" loading')
     expect(part(refreshing, 'loading')).toBeNull()
     expect(part(refreshing, 'svg') ?? part(refreshing, 'plot')?.querySelector('svg')).not.toBeNull()
+  })
+
+  /* A chart had empty and loading words and none for readings that did not
+     load, which Table, Listbox, and Select each have. */
+  test('says its readings did not load while error-text is set, over the loading words', async () => {
+    const failed = await host(EMPTY, 'for="none" loading error-text="The sessions did not load"')
+    const error = part(failed, 'error')
+    expect(error?.textContent?.trim()).toBe('The sessions did not load')
+    expect(error?.getAttribute('role')).toBe('alert')
+    expect(part(failed, 'loading')).toBeNull()
+    expect(part(failed, 'empty')).toBeNull()
+    const retry = await host(
+      EMPTY,
+      'for="none" error-text="The sessions did not load"',
+      '<button slot="error">Try again</button>',
+    )
+    const slot = part(retry, 'error')?.querySelector('slot[name="error"]') as HTMLSlotElement
+    expect(slot.assignedElements().map((one) => one.textContent)).toEqual(['Try again'])
+    ;(retry as HTMLElement & { errorText: string }).errorText = ''
+    await (retry as HTMLElement & { updateComplete: Promise<boolean> }).updateComplete
+    expect(part(retry, 'error')).toBeNull()
+    expect(part(retry, 'empty')?.textContent?.trim()).toBe('No readings')
   })
 })
 

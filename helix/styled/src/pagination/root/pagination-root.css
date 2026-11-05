@@ -79,7 +79,11 @@
 [part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
-  background-color: var(--pagination-hover-background-color, var(--helix-color-hover));
+  /* The well, as a navigation link's hover is, and not the row wash. The page
+     you are on is a raised chip, `surface-raised`, and in dark the 12% wash
+     came out brighter than it, so the page under the pointer outranked the
+     page you were on. */
+  background-color: var(--pagination-hover-background-color, var(--helix-color-well));
   color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
 

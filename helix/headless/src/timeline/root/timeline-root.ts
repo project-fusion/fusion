@@ -29,8 +29,8 @@ import { property } from 'lit/decorators.js'
  * and the layout only moves where they are drawn.
  *
  * **A feed that loads more entries sets `loading` while it fetches.** The
- * timeline is busy, and an entry after the last says "Loading more"
- * (`loading-text`, or your own content in the `loading` slot). Put a button
+ * timeline is busy, and an entry after the last says "Loading", the word every
+ * collection uses (`loading-text`, or your own content in the `loading` slot). Put a button
  * that asks for more after the timeline, and move focus to the first new
  * entry when they arrive.
  *
@@ -79,7 +79,7 @@ export class HelixHeadlessTimeline extends HelixElement {
   /** The text of the entry drawn while `loading` is set, where the `loading` slot is empty. */
   @words
   @property({ attribute: 'loading-text' })
-  loadingText = 'Loading more'
+  loadingText = 'Loading'
 
   protected override render(): TemplateResult {
     return html`<slot></slot>${

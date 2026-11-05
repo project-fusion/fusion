@@ -7,6 +7,10 @@
 
 /* The box is the field, not the input. */
 [part="field"] {
+  /* **The control is the height of its line, centered here** as Select centers
+     its value. Stretched to the box, Chromium set the text a pixel below
+     Select's, Combobox's and Button's at `md` and `lg`. A press anywhere in
+     the box still lands in the control, through `delegatesFocus`. */
   align-items: center;
   background-color: var(--input-background-color, var(--helix-color-well));
   block-size: var(--_input-size);
@@ -19,11 +23,6 @@
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* The one thing the control adds to the shared reset: the field's full height. */
-[part="control"] {
-  block-size: 100%;
 }
 
 /* The clear affordance a search field draws itself, which is a different shape

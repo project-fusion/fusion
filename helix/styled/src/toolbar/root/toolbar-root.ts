@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToolbar } from '@fusion.dev/helix-headless/toolbar'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
 import { styles } from './toolbar-root.css.js'
@@ -52,6 +52,80 @@ export class HelixToolbar extends HelixHeadlessToolbar {
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg'
+
+  /* **A Divider that a wrap leaves at the start or the end of a line is
+     hidden**, since it parts nothing there: in a 330 pixel column a wrapped
+     row put two dividers at the start of their lines. A layout check, run
+     on the frame after the row changes size or its controls change. Each check
+     shows every divider first and measures that layout, so the answer does
+     not depend on the last one's. Marked with `data-line-edge`, which the
+     sheet hides. */
+  private lines: ResizeObserver | undefined
+  private lineFrame = 0
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    if (this.hasUpdated) {
+      this.watchLines()
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.lines?.disconnect()
+    cancelAnimationFrame(this.lineFrame)
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.renderRoot
+      .querySelector('slot')
+      ?.addEventListener('slotchange', () => this.checkLinesSoon())
+    this.watchLines()
+  }
+
+  private watchLines(): void {
+    const row = this.renderRoot.querySelector('[part="toolbar"]')
+    if (!row || typeof ResizeObserver !== 'function') {
+      return
+    }
+    this.lines ??= new ResizeObserver(() => this.checkLinesSoon())
+    this.lines.observe(row)
+  }
+
+  private checkLinesSoon(): void {
+    cancelAnimationFrame(this.lineFrame)
+    this.lineFrame = requestAnimationFrame(() => this.checkLines())
+  }
+
+  private checkLines(): void {
+    const dividers = [...this.children].filter((child) => child.localName === 'helix-divider')
+    if (dividers.length === 0) {
+      return
+    }
+    for (const divider of dividers) {
+      divider.removeAttribute('data-line-edge')
+    }
+    const row = this.renderRoot.querySelector('[part="toolbar"]')
+    const laid = row ? getComputedStyle(row) : undefined
+    if (laid?.flexDirection !== 'row' || laid.flexWrap !== 'wrap') {
+      return
+    }
+    /* Two controls share a line where their boxes overlap down the page. */
+    const shown = [...this.children].filter((child) => child.getClientRects().length > 0)
+    const boxes = shown.map((child) => child.getBoundingClientRect())
+    const level = (one: DOMRect | undefined, other: DOMRect): boolean =>
+      one === undefined || Math.min(one.bottom, other.bottom) - Math.max(one.top, other.top) > 0
+    shown.forEach((child, at) => {
+      const box = boxes[at] as DOMRect
+      if (
+        child.localName === 'helix-divider' &&
+        (!level(boxes[at - 1], box) || !level(boxes[at + 1], box))
+      ) {
+        child.setAttribute('data-line-edge', '')
+      }
+    })
+  }
 }
 
 declare global {

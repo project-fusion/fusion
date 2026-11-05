@@ -112,6 +112,7 @@ const SERIES = 24
  *
  * @slot - The renderer's box, which the 3D drawing is made in.
  * @slot empty - Content shown when the table has no readings. Falls back to `empty-text`.
+ * @slot error - Content shown while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixPlotChangeEvent} helix-plot-change - The readings or the reading the keys rest on changed, which the renderer is told. It stays on the chart.
@@ -122,6 +123,7 @@ const SERIES = 24
  * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and names, and the ribbons.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
+ * @csspart error - The words while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart face - One face of a ribbon the view shows: a piece of its top, an end, or its side, shaded by how far it turns from the light.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid, in the chart's own drawing.
@@ -158,6 +160,7 @@ const SERIES = 24
  * @cssstate active - While a reading is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the ribbons, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the readings.
+ * @cssstate error - While the `error` part stands in place of the readings.
  * @cssstate loading - While the `loading` part stands in place of the readings.
  */
 @customElement('helix-headless-spatial-ribbon-chart')

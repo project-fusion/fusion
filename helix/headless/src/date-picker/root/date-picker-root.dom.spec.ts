@@ -1158,6 +1158,14 @@ describe('the columns, the weekend, today, and content around the calendar', () 
     expect(headers[0]?.getAttribute('aria-label')).toBe('Sunday')
   })
 
+  test('shows the narrow name where short names are too long for a column', async () => {
+    const cal = await calendar('locale="pl-PL" default-month="2026-08"')
+    const names = [...(cal.shadowRoot?.querySelectorAll('[part="weekday"]') ?? [])].map(
+      (header) => header.textContent?.trim() ?? '',
+    )
+    expect(names.every((name) => [...name].length <= 2)).toBe(true)
+  })
+
   test("marks the weekend days of the calendar's language", async () => {
     const cal = await calendar('locale="en-US" default-month="2026-08"')
     const cells = days(cal).filter((cell) => !cell.hasAttribute('data-outside'))

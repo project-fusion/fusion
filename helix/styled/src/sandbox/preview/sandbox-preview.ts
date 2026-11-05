@@ -274,9 +274,10 @@ export class HelixSandboxPreview extends HelixElement {
    * **The frame is a document and a document has its own color mode.** Setting
    * `data-color-mode` on this element styles this element, and the contents of
    * an iframe inherit nothing from it: measured, a frame under a host carrying
-   * the attribute had it unset on its own root. Left alone the frame follows
-   * `prefers-color-scheme`, which is right for a preview that should look like
-   * the reader's own machine, and wrong for one whose tool has a scheme control.
+   * the attribute had it unset on its own root. Left alone the frame takes the
+   * mode of the nearest `data-color-mode` around this element, so a page in dark
+   * mode shows a dark preview, and follows it when it changes. With neither, the
+   * frame follows `prefers-color-scheme`, as the page does.
    *
    * It matters more than a background: `light-dark()` is compiled to a shim
    * keyed on this attribute, and of the 56 tokens that differ by scheme the
@@ -427,6 +428,31 @@ export class HelixSandboxPreview extends HelixElement {
   /** What the example threw and did not catch, while the preview is `failed`. */
   @state()
   private failure: string | undefined
+
+  /**
+   * The mode of the nearest `data-color-mode` around this element, crossing
+   * shadow roots, which the frame takes where `colorMode` is unset. Measured
+   * before it was read: an example of this element on a docs page in dark mode
+   * drew a white preview on a machine set to light.
+   */
+  @state()
+  private surroundingMode: 'dark' | 'light' | undefined
+
+  /** Watches every `data-color-mode` on the page, since any ancestor can carry one. */
+  private modeWatch: MutationObserver | undefined
+
+  private readSurroundingMode(): void {
+    let node: Node | null = this.parentNode
+    while (node) {
+      const mode = node instanceof HTMLElement ? node.dataset.colorMode : undefined
+      if (mode === 'dark' || mode === 'light') {
+        this.surroundingMode = mode
+        return
+      }
+      node = node instanceof ShadowRoot ? node.host : node.parentNode
+    }
+    this.surroundingMode = undefined
+  }
 
   /** Each module file compiled to JavaScript, by its path and source. */
   private compiled = new Map<string, string>()
@@ -724,8 +750,9 @@ export class HelixSandboxPreview extends HelixElement {
 
   /** What the frame is sent: the source, its stylesheet and its settings. */
   private get message(): PreviewRender {
+    const colorMode = this.colorMode ?? this.surroundingMode
     return {
-      ...(this.colorMode ? { colorMode: this.colorMode } : {}),
+      ...(colorMode ? { colorMode } : {}),
       direction: this.direction ?? 'ltr',
       layout: this.layout ?? 'padded',
       source: this.sending,
@@ -814,11 +841,18 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
   override connectedCallback(): void {
     super.connectedCallback()
     window.addEventListener('message', this.handleMessage)
+    this.readSurroundingMode()
+    this.modeWatch ??= new MutationObserver(() => this.readSurroundingMode())
+    this.modeWatch.observe(this.ownerDocument.documentElement, {
+      attributeFilter: ['data-color-mode'],
+      subtree: true,
+    })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     window.removeEventListener('message', this.handleMessage)
+    this.modeWatch?.disconnect()
     this.speech?.stop()
     this.speech = undefined
   }
@@ -974,7 +1008,12 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     }
     /* Only a setting the frame is sent. A failure shown, or the controls
        drawn, is this element's own, and sending on it ran the example again. */
-    if (changed.has('colorMode') || changed.has('direction') || changed.has('layout')) {
+    if (
+      changed.has('colorMode') ||
+      changed.has('surroundingMode') ||
+      changed.has('direction') ||
+      changed.has('layout')
+    ) {
       this.send()
     }
   }

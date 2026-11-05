@@ -4,6 +4,8 @@
   /* What `field-inline.css` indents the hint by, so it starts under the words
      rather than under the box. */
   --_field-control-inline-size: var(--_checkbox-size);
+  /* And how tall the mark is, which the row grows past on a touch screen. */
+  --_field-control-block-size: var(--_checkbox-size);
   display: inline-flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
@@ -195,8 +197,11 @@ slot[name="dash"]::slotted(*) {
   display: none;
 }
 
-/* A card is the same checkbox in a bounded surface. */
+/* A card is the same checkbox in a bounded surface. Its padding takes it past
+   the target, so it adds no band for the hint to rise by. */
 :host(:is([separation="filled"], [separation="outlined"])) {
+  --_field-control-block-size: var(--helix-size-target);
+
   display: block;
 }
 
@@ -206,7 +211,8 @@ slot[name="dash"]::slotted(*) {
   background-color: var(--checkbox-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid
     var(--checkbox-card-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  /* A card's corner, as Card draws it: 8 at the default, where it drew 4. */
+  border-radius: var(--helix-radii-md);
   display: flex;
   gap: var(--helix-space-sm);
   inline-size: 100%;
@@ -218,8 +224,13 @@ slot[name="dash"]::slotted(*) {
 
 /* The ground carries it and the edge goes, which is what `Card` and `Radio` do
    for the same value. Transparent rather than absent, so the box is the same
-   size in both and a set mixing them does not step. */
+   size in both and a set mixing them does not step.
+
+   **The fill is `surface-filled`, the wash every `filled` surface takes.** It
+   drew `surface`, 1.04:1 on the white page, which is nearly the page; the wash
+   is 1.12 there and on every ground. */
 :host([separation="filled"]) [part="field"] {
+  background-color: var(--checkbox-card-background-color, var(--helix-color-surface-filled));
   border-color: transparent;
 }
 
@@ -323,7 +334,10 @@ slot[name="dash"]::slotted(*) {
   }
 }
 
-/* The label's first line centered on the box, which is taller than a line. */
-:host(:not([separation])) [part="label"] {
+/* The label's first line centered on the box, which is taller than a line.
+   Every row that is not a card, `plain` with no separation, as `Radio` keys
+   it: keyed on no attribute, a `separation="plain"` label sat 2.5 pixels
+   high. */
+:host(:not([separation="filled"], [separation="outlined"])) [part="label"] {
   padding-block-start: max(0px, calc((var(--helix-size-checkbox) - 1lh) / 2));
 }

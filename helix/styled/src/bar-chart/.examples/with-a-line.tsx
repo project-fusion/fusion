@@ -44,7 +44,6 @@ export function Example() {
 
       <helix-bar-chart
         for="barchartline"
-        gridlines="value"
         lines="Target"
       ></helix-bar-chart>
     </>

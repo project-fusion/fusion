@@ -114,10 +114,11 @@
   line-height: var(--text-line-height, var(--helix-leading-normal));
 }
 
+/* At `Code`'s size, as the `code` ramp is. */
 :host([scale="code"]),
 :host(:not([scale])[as="code"]) {
   font-family: var(--text-font-family, var(--helix-font-mono));
-  font-size: var(--text-font-size, var(--helix-text-xs));
+  font-size: var(--text-font-size, var(--helix-text-sm));
   font-weight: var(--text-font-weight, var(--helix-weight-regular));
   letter-spacing: var(--text-letter-spacing, var(--helix-tracking-normal));
   line-height: var(--text-line-height, var(--helix-leading-normal));

@@ -50,19 +50,24 @@
 }
 
 /* On the host, which turns, fades or swells as a whole, so the glyph's own
-   turn and flip hold inside it. */
+   turn and flip hold inside it.
+
+   **Paced in turns, as every spinner is.** A spin is one `duration-turn`, so an
+   icon turning beside a Loader keeps its pace: it was three of the `slow` rung,
+   960ms against the Loader's 800. A pulse is two turns and a beat one and a
+   quarter, as Badge's `attention` is. */
 :host([animation="spin"]) {
-  animation: helix-icon-spin var(--icon-animation-duration, calc(var(--helix-duration-slow) * 3))
-    linear infinite;
+  animation: helix-icon-spin var(--icon-animation-duration, var(--helix-duration-turn)) linear
+    infinite;
 }
 
 :host([animation="pulse"]) {
-  animation: helix-icon-pulse var(--icon-animation-duration, calc(var(--helix-duration-slow) * 6))
+  animation: helix-icon-pulse var(--icon-animation-duration, calc(var(--helix-duration-turn) * 2))
     ease-in-out infinite;
 }
 
 :host([animation="beat"]) {
-  animation: helix-icon-beat var(--icon-animation-duration, calc(var(--helix-duration-slow) * 3))
+  animation: helix-icon-beat var(--icon-animation-duration, calc(var(--helix-duration-turn) * 1.25))
     ease-in-out infinite;
 }
 

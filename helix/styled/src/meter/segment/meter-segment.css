@@ -12,7 +12,7 @@
 [part="fill"] {
   background-color: var(
     --meter-segment-color,
-    var(--_meter-segment-hue, var(--helix-color-series-1))
+    var(--_meter-segment-hue, light-dark(var(--helix-color-series-1), var(--helix-color-series-9)))
   );
   block-size: 100%;
   box-sizing: border-box;
@@ -23,39 +23,44 @@
 
 /* The next color in the series for each segment, in the order written, so two
    segments are told apart without being given a color. A tone is what a segment
-   means and takes the place of its turn. */
+   means and takes the place of its turn.
+
+   **In dark a segment starts from the balanced eight, as a chart does**, by the
+   same swap `shared/chart/series.css` makes. The bright eight are drawn for the
+   light page: the third segment painted #00fede in dark, 16.2:1 on the page
+   beside 5.5 and 5.9 for the two before it. */
 :host(:nth-of-type(1)) {
-  --_meter-segment-hue: var(--helix-color-series-1);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-1), var(--helix-color-series-9));
 }
 :host(:nth-of-type(2)) {
-  --_meter-segment-hue: var(--helix-color-series-2);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-2), var(--helix-color-series-10));
 }
 :host(:nth-of-type(3)) {
-  --_meter-segment-hue: var(--helix-color-series-3);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-3), var(--helix-color-series-11));
 }
 :host(:nth-of-type(4)) {
-  --_meter-segment-hue: var(--helix-color-series-4);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-4), var(--helix-color-series-12));
 }
 :host(:nth-of-type(5)) {
-  --_meter-segment-hue: var(--helix-color-series-5);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-5), var(--helix-color-series-13));
 }
 :host(:nth-of-type(6)) {
-  --_meter-segment-hue: var(--helix-color-series-6);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-6), var(--helix-color-series-14));
 }
 :host(:nth-of-type(7)) {
-  --_meter-segment-hue: var(--helix-color-series-7);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-7), var(--helix-color-series-15));
 }
 :host(:nth-of-type(8)) {
-  --_meter-segment-hue: var(--helix-color-series-8);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-8), var(--helix-color-series-16));
 }
 :host(:nth-of-type(9)) {
-  --_meter-segment-hue: var(--helix-color-series-9);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-9), var(--helix-color-series-1));
 }
 :host(:nth-of-type(10)) {
-  --_meter-segment-hue: var(--helix-color-series-10);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-10), var(--helix-color-series-2));
 }
 :host(:nth-of-type(11)) {
-  --_meter-segment-hue: var(--helix-color-series-11);
+  --_meter-segment-hue: light-dark(var(--helix-color-series-11), var(--helix-color-series-3));
 }
 
 :host([tone="accent"]) {

@@ -50,10 +50,16 @@ describe('skeleton', () => {
     )
   })
 
-  test('a line of text is one line tall, and a circle is round at the avatar step', () => {
+  test('a line of text is one line box tall, and a circle is round at the avatar step', () => {
+    // The shape is one em in the middle of the line box, so the words arrive
+    // where it was: one em alone drew 14 against a 21 pixel line.
+    expect(rule(':host')).toContain('--_skeleton-leading: calc(1lh - 1em)')
+    expect(rule(':host([shape="text"])')).toContain(
+      'padding-block: calc(var(--_skeleton-leading) / 2)',
+    )
     // Avatar's step, so a circle standing in for an avatar is the avatar's
     // size: the control step drew it 40 against an Avatar's 32.
-    expect(rule(':host([shape="text"])')).toContain('block-size: 1em')
+    expect(rule(':host([shape="text"])')).toContain('block-size: 1lh')
     expect(rule(':host([shape="circle"])')).toContain('aspect-ratio: 1 / 1')
     expect(rule(':host([shape="circle"])')).toContain(
       'inline-size: var(--skeleton-size, var(--helix-size-avatar))',
@@ -129,7 +135,9 @@ describe('skeleton around content', () => {
   test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {
     expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*light-dark\(\s*color-mix/)
     expect(sheet()).toMatch(/var\(\s*--skeleton-sheen-color,\s*color-mix/)
-    expect(sheet()).toMatch(/var\(\s*--skeleton-radius,\s*var\(--helix-radii-sm\)\)/)
+    expect(sheet()).toMatch(
+      /var\(\s*--skeleton-radius,\s*var\(--_skeleton-corner,\s*var\(--helix-radii-sm\)\)\)/,
+    )
     expect(sheet()).toMatch(
       /var\(\s*--skeleton-duration,\s*calc\(var\(--helix-duration-slow\) \* 4\)\)/,
     )
@@ -172,12 +180,10 @@ describe('a paragraph of lines', () => {
     expect(rule(':host([shape="text"][lines]:not([lines="1"]):not([lines="0"]))')).toContain(
       'block-size: auto',
     )
-    expect(rule('[part="lines"]')).toContain('gap: calc((var(--helix-leading-normal) - 1) * 1em)')
+    expect(rule('[part="lines"]')).toContain('gap: var(--_skeleton-leading)')
     // Half the leading at each end, so three lines are a three-line
-    // paragraph's 4.5em, where they were 4em.
-    expect(rule('[part="lines"]')).toContain(
-      'padding-block: calc((var(--helix-leading-normal) - 1) * 0.5em)',
-    )
+    // paragraph's three line boxes, where they were 4em.
+    expect(rule('[part="lines"]')).toContain('padding-block: calc(var(--_skeleton-leading) / 2)')
     expect(rule('[part~="line"]')).toContain('block-size: 1em')
     expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
       'inline-size: var(--skeleton-last-line-size, 60%)',

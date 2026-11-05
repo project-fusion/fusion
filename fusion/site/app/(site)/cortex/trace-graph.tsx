@@ -48,8 +48,8 @@ const namedIn = (layout: TraceLayout): boolean => layout === 'columns'
 
 /**
  * **The trace drawn before Sigma loads**, in each layout, at the size the
- * frame is drawn: 34rem tall beside the text, and a 390-pixel phone's width
- * in rows. Lit for the first answer, as the drawing opens. CSS shows the one
+ * frame is drawn: 34rem tall beside the text, and 64rem down a 390-pixel
+ * phone in rows. Lit for the first answer, as the drawing opens. CSS shows the one
  * for the screen, and the connection fades both once Sigma has drawn.
  */
 const SNAPSHOTS = (['columns', 'rows'] as const).map((layout) => ({
@@ -58,7 +58,7 @@ const SNAPSHOTS = (['columns', 'rows'] as const).map((layout) => ({
     active: FIRST,
     bounds: boxFor(layout),
     groupLabels: namedIn(layout),
-    height: layout === 'rows' ? 768 : 542,
+    height: layout === 'rows' ? 1024 : 542,
     labels: 'all',
     reach: 'upstream',
     width: layout === 'rows' ? 340 : 1280,

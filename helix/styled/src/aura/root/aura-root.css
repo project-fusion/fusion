@@ -77,10 +77,22 @@
      property is resolved by the engine first. The script reads these, so each
      stop takes its hook from anywhere above the aura, as the gradient does.
      The peak is carried twice, the light page's and the dark page's, and the
-     script picks one by the ground. */
+     script picks one by the ground.
+
+     **On a light page the shader's glow is held at a lightness of 0.45 or
+     more, and the peak at 0.33 or more**, so the strands stay an ink that
+     reads as a color. Only the ink theme falls under either floor: its
+     `primary` is 0.21 and its light `primary-active` 0.11, and the braid drew
+     as a black smear. The peak stays the darker of the two, so the hot stop
+     is still the center of a shape. A brand's 500 and 700 stand above the
+     floors, and every dark page's stops do, so they are drawn as before. A
+     page that sets `--aura-glow` or `--aura-peak` is drawn as it says. */
   caret-color: var(--aura-peak, var(--helix-color-foreground));
-  color: var(--_aura-glow);
-  column-rule-color: var(--aura-peak, var(--helix-color-primary-active));
+  color: var(--aura-glow, oklch(from var(--helix-color-primary) max(l, 0.45) c h));
+  column-rule-color: var(
+    --aura-peak,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h)
+  );
   outline-color: var(--_aura-ground);
   text-decoration-color: var(--_aura-haze);
 
@@ -124,7 +136,7 @@
   align-items: center;
   background-color: var(--aura-pause-background-color, var(--helix-color-surface-overlay));
   block-size: var(--helix-size-control-sm);
-  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);

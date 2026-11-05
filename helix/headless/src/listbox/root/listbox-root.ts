@@ -125,7 +125,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * As a filter narrows the list, a screen reader hears how many options are
  * left, such as "3 results", from `result-label` and `results-label`. A filter
- * that leaves none says `empty-text`.
+ * that leaves none says `no-results-text`.
  *
  * **Moving options** is a separate import, `@fusion.dev/helix/listbox/reorder`,
  * so a list that never moves options carries none of its code. With it
@@ -255,16 +255,15 @@ export class HelixHeadlessListbox extends MixinVoice(
   defaultFilter = ''
 
   /**
-   * The text shown when the filter hides every option.
+   * The text shown when the list has no options. A filter that hides every
+   * option shows `no-results-text`.
    *
-   * From `MixinCollection`, which every collection in the library now shares,
-   * and re-declared here only to keep this list's own wording: "No matches" is
-   * about a filter, and the mixin's "Nothing to show" is about a list that was
-   * never given anything.
+   * From `MixinCollection`, and re-declared here to name what the list holds,
+   * as Select does.
    */
   @words
   @property({ attribute: 'empty-text' })
-  override emptyText = 'No matches'
+  override emptyText = 'No options'
 
   /** What the list is narrowed to, whoever set it. */
   private filterState: string | undefined = undefined
@@ -426,12 +425,11 @@ export class HelixHeadlessListbox extends MixinVoice(
 
   /**
    * The text shown when a filter hides every option of a list that has some.
-   *
-   * Absent, the list says `empty-text` in both cases. Set it to tell "nothing
-   * matches what you typed" from "there is nothing here".
+   * `empty-text` is what a list with no options says.
    */
+  @words
   @property({ attribute: 'no-results-text' })
-  noResultsText?: string
+  noResultsText = 'No matches'
 
   /**
    * Lets a reader move options, once `@fusion.dev/helix/listbox/reorder` (or
@@ -621,8 +619,8 @@ export class HelixHeadlessListbox extends MixinVoice(
    * was said here, so a query that left forty options and one that left one
    * sounded the same. Said when the filter changes and the count with it, so
    * a keystroke that leaves the same options says nothing new. An empty filter
-   * says nothing, being the list as it was given; no matches is `empty-text`,
-   * which the region says in place of this. A load that ends says the count
+   * says nothing, being the list as it was given; no matches is
+   * `no-results-text`, which the region says in place of this. A load that ends says the count
    * too, whatever the filter.
    */
   private tell(changed: PropertyValues): void {
@@ -1692,16 +1690,12 @@ export class HelixHeadlessListbox extends MixinVoice(
     if (this.loading) {
       return html`<p part="loading"><slot name="loading">${this.loadingText}</slot></p>`
     }
-    /* The line a list that sets neither `no-results-text` nor the slot has
-       always drawn, and the same line holding the `no-results` slot where it
-       does, with the text as the slot's fallback. The part stays `empty`, so
-       every rule written for that line holds; `:state(no-results)` tells the
-       two apart. */
-    const given =
-      this.noResultsText !== undefined ||
-      this.querySelector?.(':scope > [slot="no-results"]') != null
-    return this.noResults && given
-      ? html`<p part="empty"><slot name="no-results">${this.noResultsText ?? this.emptyText}</slot></p>`
+    /* One line for both: the part stays `empty`, so every rule written for
+       that line holds, and `:state(no-results)` tells the two apart. "No
+       matches" is about a filter and says nothing true of a list with no
+       options, which says `empty-text`. */
+    return this.noResults
+      ? html`<p part="empty"><slot name="no-results">${this.noResultsText}</slot></p>`
       : html`<p part="empty"><slot name="empty">${this.emptyText}</slot></p>`
   }
 

@@ -44,7 +44,7 @@
  */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
-  transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /*
@@ -103,7 +103,7 @@
 
 :host(:state(open)) [part="indicator"],
 :host(:state(open)) ::slotted([slot="indicator"]) {
-  scale: 1 -1;
+  rotate: 180deg;
 }
 
 /* The color goes on the slot, where whatever is assigned inherits it. Written
@@ -137,7 +137,7 @@ slot[name="end"]::slotted(*) {
  * ellipsis where they meet the cap.
  */
 [part="surface"] {
-  --_floating-border-color: var(--combobox-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--combobox-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--combobox-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--combobox-shadow, var(--helix-shadow-floating));
 
@@ -208,6 +208,10 @@ slot[name="end"]::slotted(*) {
    list goes on. A timeline over a list with nothing to scroll is inactive, so a
    list that fits is never masked. */
 [part="listbox"]::part(items) {
+  /* The inset Select's and Menu's panels hold above the first row and below
+     the last. The list's own, half that, opened Combobox's "Loading" in a panel
+     46 tall against Select's 54. */
+  padding-block: var(--helix-space-xs);
   animation: combobox-edges linear both;
   animation-timeline: scroll(self block);
   mask-image: linear-gradient(

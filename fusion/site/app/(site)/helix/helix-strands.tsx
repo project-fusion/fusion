@@ -1,4 +1,5 @@
 'use client'
+import { MASTHEAD_QUIET } from '@/components/site-nav/site-nav'
 import { useMotion } from '@/hooks/use-motion/use-motion'
 
 /**
@@ -16,7 +17,7 @@ export function HelixStrands({ className }: { className: string }) {
     <helix-strands
       class={className}
       dust={1.3}
-      quiet="helix-hero-words"
+      quiet={`helix-hero-words ${MASTHEAD_QUIET}`}
       speed={motion === 'off' ? 0 : 1.2}
       travel
     >

@@ -94,12 +94,16 @@
 }
 
 /* Two chevrons, quiet until one of them is the current direction. The box is
-   wider than the chevrons so the hover has room to draw behind them. */
+   wider than the chevrons so the hover has room to draw behind them. **An even
+   size, 12, 14 and 16 beside headings of 12, 13 and 14**, Button's icon step,
+   so the chevrons' center lands on a whole pixel. At `1.07em` it was 12.83,
+   13.91 and 14.97. */
 [part="sort-mark"] {
-  block-size: 1.07em;
+  --_table-sort-mark: round(down, 1.15em, 2px);
+  block-size: var(--_table-sort-mark);
   border-radius: var(--helix-radii-sm);
   flex: none;
-  inline-size: 1.07em;
+  inline-size: var(--_table-sort-mark);
 }
 
 /* The whole heading is the button, so the highlight answers a pointer anywhere

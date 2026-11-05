@@ -25,7 +25,9 @@ describe('code', () => {
   test('sets the fragment inline with the prose, under its own tag', async () => {
     const code = await mount('<helix-code>data-density</helix-code>')
     expect(part(code, 'code')?.tagName).toBe('CODE')
-    expect(rule(':host')).toContain('display: inline')
+    // Whole on a line, as a word is: inline, it broke after a hyphen.
+    expect(rule(':host')).toContain('display: inline-block')
+    expect(rule(':host')).toContain('max-inline-size: 100%')
   })
 
   test('a step down the scale in the mono face, as a ratio rather than a rung', () => {

@@ -37,6 +37,7 @@ const SOURCES = join(ROOT, 'helix/docs/src/sources.generated.ts')
 const REGISTRY = join(ROOT, 'helix/styles/dist/tokens.json')
 const HEADLESS = join(ROOT, 'helix/headless/custom-elements.json')
 const PRIMITIVES = join(ROOT, 'helix/styles/src/primitives.css')
+const MODES = join(ROOT, 'helix/styles/src/_modes.css')
 
 /**
  * The token tables the Foundations pages carry, filled from the registry.
@@ -204,11 +205,23 @@ const registry = JSON.parse(readFileSync(REGISTRY, 'utf8'))
 /** Every token name, for the check that a page does not invent one. */
 const tokenNames = new Set(registry.tokens.map((token) => token.name))
 
-const primitives = new Map(
-  [...readFileSync(PRIMITIVES, 'utf8').matchAll(/^\s*(--_helix-[a-z0-9-]+):\s*([^;]+);/gm)].map(
+/* **The private values a token is built from, wherever they are declared.**
+   Most are primitives. The shadow inks are per mode and live in `_modes.css`,
+   and the shadow table showed `var(--_helix-shadow-ink-md)` unresolved, a
+   private name you are told never to touch and no value at all. Only a name
+   `_modes.css` declares once: one it declares again for a mode or a pointer
+   has no single value to show, and stays a name. */
+const declarations = (file) =>
+  [...readFileSync(file, 'utf8').matchAll(/^\s*(--_helix-[a-z0-9-]+):\s*([^;]+);/gm)].map(
     ([, name, value]) => [name, value.replace(/\s+/g, ' ').trim()],
-  ),
-)
+  )
+const primitives = new Map(declarations(PRIMITIVES))
+const modes = declarations(MODES)
+for (const [name, value] of modes) {
+  if (!primitives.has(name) && modes.filter(([other]) => other === name).length === 1) {
+    primitives.set(name, value)
+  }
+}
 
 /**
  * One category or named group, as the markdown table a page carries.

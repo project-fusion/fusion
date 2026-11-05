@@ -93,7 +93,7 @@
  * consumer swaps a heart or a circle through without this stylesheet knowing
  * what it drew. */
 [part="mark"] {
-  --_rating-star: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>');
+  --_rating-star: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z" stroke="black" stroke-width="2" stroke-linejoin="round"/></svg>');
 
   background-color: currentcolor;
   block-size: var(--_rating-mark-size);
@@ -103,6 +103,15 @@
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: contain;
+}
+
+/* **An empty star is drawn as an outline**, so filled and empty differ in
+   shape as well as in color. In light the two inks measured 1.11:1 apart, the
+   amber and the gray told apart by hue alone. The filled star above takes the
+   same stroke, so it covers the outline under it exactly. A mark of your own, from
+   `--rating-mark`, is drawn as it is given in both rows. */
+[part="track"] [part="mark"] {
+  --_rating-star: url('data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round"/></svg>');
 }
 
 /* The places a reader presses, laid over the marks rather than beside them, so
@@ -120,6 +129,17 @@
 /* **No wash under the pointer.** The fill already previews the score the
    pointer is on, from the first mark to that one, so a box lit behind the
    hovered mark said the same thing twice and drew a square around a star. */
+
+/* **A previewed score is paler than a chosen one**, 60% of the mark color over
+   the page, so the marks under the pointer read as a proposal until pressed.
+   Drawn in the chosen color, a preview of 5 looked exactly like a score of 5. */
+:host(:state(previewing)) [part="fill"] {
+  color: color-mix(
+    in oklab,
+    var(--rating-color, var(--helix-color-warning-mark)) 60%,
+    var(--helix-color-background)
+  );
+}
 
 /*
  *  Each step takes a mark's worth of the row, in order.
@@ -176,6 +196,12 @@
   mask-image: none;
 }
 
+/* An empty dot is a ring, for the reason an empty star is an outline. */
+:host([shape="dots"]) [part="track"] [part="mark"] {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 var(--helix-border-thick) currentcolor;
+}
+
 [part="option"]:focus-visible {
   border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
@@ -203,6 +229,18 @@
 [data-slotted] [part="mark"] {
   background-color: transparent;
   mask-image: none;
+}
+
+/* On a touch screen the marks open to the target's pitch, as Carousel's dots
+   do, since a box cannot grow along the row without taking the press from the
+   mark beside it. Each mark took 24 pixels of a finger's 44. */
+@media (pointer: coarse) {
+  :host {
+    --_rating-mark-gap: var(
+      --rating-gap,
+      max(var(--helix-space-2xs), calc(var(--helix-size-target) - var(--_rating-mark-size)))
+    );
+  }
 }
 
 /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn

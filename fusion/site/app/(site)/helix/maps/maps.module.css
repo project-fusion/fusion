@@ -116,6 +116,33 @@
   align-self: stretch;
 }
 
+/* **The subtle button opaque, as it reads over the page's ground.** Its fill is
+   14% of the ink over transparent, so set on the map it let the streets and a
+   highway shield show through its label. Mixed into the page's ground instead,
+   it is the same color it is on the page and hides what is under it. */
+.mapsActions [data-button="subtle"] {
+  --button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 14%,
+    var(--helix-color-background)
+  );
+  --button-background-color-hover: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 22%,
+    var(--helix-color-background)
+  );
+}
+
+/* The press reads the same hook as the rest, so it is said again at its own
+   step. */
+.mapsActions [data-button="subtle"]:active {
+  --button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 30%,
+    var(--helix-color-background)
+  );
+}
+
 .mapsTitle {
   /* A column's hero rather than the landing page's full-width line, which
      set this claim five words to a line. */

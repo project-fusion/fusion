@@ -24,9 +24,16 @@
      it at 15 while its own title was 14, which is a title smaller than the text
      under it. */
   font-size: var(--callout-font-size, var(--helix-text-control));
+  /* 10% in light and 18% in dark. The same 10% over black measured 1.09:1 to
+     1.12:1 against the page, a tint that was not seen, where light measured 1.13
+     to 1.18. Two whole colors, since `light-dark()` is not valid in a
+     percentage. */
   background-color: var(
     --callout-background-color,
-    color-mix(in oklab, var(--_callout-color) 10%, transparent)
+    light-dark(
+      color-mix(in oklab, var(--_callout-color) 10%, transparent),
+      color-mix(in oklab, var(--_callout-color) 18%, transparent)
+    )
   );
   /* A hairline of the tone, as a Tag draws, so a callout sits with its nearest
      relative. `--callout-bar-thickness` still draws the clipped bar. */
@@ -34,13 +41,14 @@
     color-mix(in oklab, var(--_callout-color) 28%, var(--helix-color-background));
   overflow: hidden;
   position: relative;
-  /* The house radius, and everything a callout sits beside is `sm`. At `md` the
-     corner is softer than the controls inside it and the container stops
-     receding, which is the one thing a container should do. */
-  border-radius: var(--callout-radius, var(--helix-radii-sm));
+  /* `md`, the container corner Card takes, against the `sm` of the controls
+     inside it. A callout at `sm` beside a card at `md` read as two kinds of
+     box. Inside a Dialog, Drawer, or Popover `md` is the panel's own corner. */
+  border-radius: var(--callout-radius, var(--helix-radii-md));
   color: var(--helix-color-foreground);
   display: flex;
-  gap: var(--callout-gap, var(--helix-space-sm));
+  /* A step under the inset, moving with it as Card's does: 8, 12, and 16. */
+  gap: var(--callout-gap, var(--helix-space-field));
   /* The bar's width added to the inset, so the text sits where it did when the
      bar was a border and the border box was doing this arithmetic. */
   padding: var(--_callout-inset);

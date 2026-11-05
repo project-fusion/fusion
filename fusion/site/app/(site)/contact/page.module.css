@@ -15,3 +15,9 @@
   flex: 1 1 auto;
   min-inline-size: 0;
 }
+
+/* The lede at the reading size the site's other ledes take. At the body's 14
+   it read as a caption under an h1 set at the section title's size. */
+.lede {
+  font-size: var(--helix-text-lg);
+}

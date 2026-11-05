@@ -5,6 +5,10 @@
      `lg` one: the region said how tight it was and the card was the one
      component that did not listen. */
   --_card-inset: var(--card-padding, var(--helix-space-control));
+  /* The space between regions, a step under the inset and moving with it: 8,
+     12, and 16 across `sm`, `md`, and `lg`. It was `space-sm` in every region,
+     so a dense card kept 12 between regions inside a 12 pixel inset. */
+  --_card-gap: var(--card-gap, var(--helix-space-field));
   /* How wide the media column is when the card lays out sideways. */
   --_card-media: var(--card-media-size, 12rem);
   /* The ink a `helix-text` heading anywhere in the card takes, where the body
@@ -13,9 +17,10 @@
   background-color: var(--card-background-color, var(--helix-color-surface));
   border: var(--card-border-width, var(--helix-border-surface)) solid
     var(--card-border-color, var(--helix-color-border));
-  /* `md`: a container corner rather than the `sm` the controls inside it take.
-     Inside a Dialog, Drawer, or Popover `md` is the panel's own corner, so a
-     card is never rounder than what holds it. */
+  /* `md`: a container corner rather than the `sm` the controls inside it take,
+     the corner Callout, Code Block, and Image take too. Inside a Dialog,
+     Drawer, or Popover `md` is the panel's own corner, so a card is never
+     rounder than what holds it. */
   border-radius: var(--card-radius, var(--helix-radii-md));
   /* A hook rather than a value, so something outside can lift the card without
      reaching into the shadow root. */
@@ -33,7 +38,7 @@
      `space-between`, which is what the site's insight cards ask for. */
   align-content: var(--card-align, start);
   display: grid;
-  gap: var(--card-gap, var(--helix-space-sm));
+  gap: var(--_card-gap);
   grid-template-columns: minmax(0, 1fr);
   line-height: var(--card-line-height, var(--helix-leading-normal));
   /* Clips the media to the corner radius, so a full-bleed image needs no corner
@@ -78,25 +83,15 @@
 }
 
 /* Told apart by its own color and nothing else, which is the fourth mechanism
-   `ThemeIntent.separation` carries and no component could ask for. */
+   `ThemeIntent.separation` carries and no component could ask for. **The fill is
+   `surface-filled`, a wash that steps off whatever the card is on**: 1.12:1 on
+   the white page and on `surface-sunken`, where the 3% color it replaced read
+   1.05, and the card rung on the black page. A filled card inside a filled card
+   steps again by itself, which a color could only do with a second color. */
 :host([separation="filled"]) {
   --card-shadow: none;
-  background-color: var(
-    --card-background-color,
-    var(--_card-nested-fill, var(--helix-color-surface))
-  );
+  background-color: var(--card-background-color, var(--helix-color-surface-filled));
   border-color: transparent;
-}
-
-/* A filled card inside a card has only its fill to show where it ends, and the
-   same fill would leave nothing. The step reaches what is slotted by inheriting
-   from the slot, so a card on the page never sees it. */
-slot {
-  --_card-nested-fill: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 5%,
-    var(--helix-color-surface)
-  );
 }
 
 /* No frame at all, so no lift either: a theme that separates surfaces with a
@@ -150,7 +145,7 @@ slot[name="footer"]::slotted(*) {
   /* A narrow card puts the actions under what they belong to rather than
      past its edge. */
   flex-wrap: wrap;
-  gap: var(--card-gap, var(--helix-space-sm));
+  gap: var(--_card-gap);
   min-inline-size: 0;
 }
 
@@ -215,7 +210,7 @@ slot[name="footer-actions"]::slotted(helix-button[emphasis="ghost"]) {
 :host(:not(:defined)) slot[name="footer-actions"]::slotted(*) {
   align-self: center;
   grid-column: 2;
-  margin-inline-start: var(--card-gap, var(--helix-space-sm));
+  margin-inline-start: var(--_card-gap);
 }
 
 /* Sideways is the same stack with the media taken out of flow beside it. And

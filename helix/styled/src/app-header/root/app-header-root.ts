@@ -36,7 +36,7 @@ import { styles } from './app-header-root.css.js'
  * @cssproperty --app-header-background-color - Fill behind the banner.
  * @cssproperty --app-header-block-size - Height of the banner.
  * @cssproperty --app-header-border-color - The line under the bar. None by default.
- * @cssproperty --app-header-max-inline-size - Width the content is centered in.
+ * @cssproperty --app-header-max-inline-size - Width the content is centered in. None by default, so the row runs as wide as the banner; set it to your page's measure.
  * @cssproperty --app-header-padding - Inline padding of the banner.
  */
 @customElement('helix-app-header')

@@ -1,3 +1,15 @@
+/** The round step `ticks` rules at, from the domain's span and the count asked for. */
+const stepOf = (low: number, high: number, count: number): number => {
+  const rough = (high - low) / count
+  const magnitude = 10 ** Math.floor(Math.log10(rough))
+  const eased = rough / magnitude
+  return magnitude * (eased >= 7.5 ? 10 : eased >= 3 ? 5 : eased >= 1.5 ? 2 : 1)
+}
+
+/** A value rounded to a step's own precision, which is as fine as any tick can be. */
+const toStep = (value: number, step: number): number =>
+  Number(value.toFixed(Math.max(0, -Math.floor(Math.log10(step)))))
+
 /**
  * The round numbers a reader would infer inside a domain.
  *
@@ -33,22 +45,62 @@ export const ticks = (domain: readonly [number, number], count = 5): number[] =>
     return []
   }
 
-  const rough = (high - low) / count
-  const magnitude = 10 ** Math.floor(Math.log10(rough))
-  const eased = rough / magnitude
-  const step = magnitude * (eased >= 7.5 ? 10 : eased >= 3 ? 5 : eased >= 1.5 ? 2 : 1)
+  const step = stepOf(low, high, count)
 
   const found: number[] = []
   /* From the first multiple of the step at or above the floor, so the run is
      anchored to the number line rather than to wherever the data happens to
      start. Two charts of the same shape over different ranges then draw rules
-     at the same levels, which is what makes them comparable at a glance. */
-  for (let at = Math.ceil(low / step) * step; at <= high; at += step) {
+     at the same levels, which is what makes them comparable at a glance.
+   *
+     Counted in whole steps and compared with a millionth of a step to spare,
+     because a sum of steps drifts: six steps of 0.2 come to 1.2000000000000002,
+     and a top that `headroom` put exactly on a level lost its rule to that. */
+  const first = Math.ceil(low / step - 1e-9)
+  for (let index = first; index * step <= high + step * 1e-6; index += 1) {
     /* Floating point makes 0.30000000000000004 out of three tenths, and a
        gridline is a number a reader sees. Rounded to the step's own precision,
        which is as fine as any tick can legitimately be. */
-    const places = Math.max(0, -Math.floor(Math.log10(step)))
-    found.push(Number(at.toFixed(places)))
+    found.push(toStep(index * step, step))
   }
   return found
+}
+
+/**
+ * A domain whose top is raised to a level `ticks` rules, with room above the
+ * highest reading.
+ *
+ * **A peak drawn on the plot's top edge reads as cut off**, and its top rule is
+ * the box's edge rather than a number. Measured on Line Chart's sessions
+ * example before this: 1,410 at the top edge, 0px above it, and the highest
+ * numbered level, 1,400, under the peak. The top is raised to the first level
+ * at least a twentieth of the span above the highest reading, so the peak
+ * stands clear of the edge and the top edge is a numbered level. A peak exactly
+ * on a level takes the next one.
+ *
+ * The step is worked out again from the raised domain until it holds, since
+ * raising the top can widen the step: 0 to 140 rules every 20, and 0 to 160
+ * every 50, which would leave 160 off the scale. The result is 0 to 150.
+ *
+ * The floor is left where it is. A domain whose top is zero, or that is flat,
+ * comes back as it went in: zero is the baseline the drawing ends at, and a
+ * flat domain has no levels.
+ */
+export const headroom = (domain: readonly [number, number], count = 5): [number, number] => {
+  const [low, high] = domain
+  if (!Number.isFinite(low) || !Number.isFinite(high) || low >= high || high === 0 || count < 1) {
+    return [low, high]
+  }
+  const target = high + (high - low) / 20
+  let top = target
+  let held = 0
+  for (let round = 0; round < 8; round += 1) {
+    const step = stepOf(low, top, count)
+    if (step === held) {
+      break
+    }
+    held = step
+    top = toStep(Math.ceil(target / step) * step, step)
+  }
+  return [low, top]
 }

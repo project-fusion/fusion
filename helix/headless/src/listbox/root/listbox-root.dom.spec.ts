@@ -158,8 +158,8 @@ describe('a list with nothing in it', () => {
     expect(part(host, 'empty')?.textContent?.trim()).toBe('Nobody by that name')
   })
 
-  test('and a filter that matches nothing empties it the same way', async () => {
-    const host = (await list('filterable empty-text="Nobody by that name"')) as Updatable & {
+  test('and a filter that matches nothing says `no-results-text` on the same line', async () => {
+    const host = (await list('filterable no-results-text="Nobody by that name"')) as Updatable & {
       requestFilter: (next: string) => boolean
     }
     host.requestFilter('zzz')
@@ -756,10 +756,10 @@ describe('the no-results and error lines', () => {
       '<helix-headless-listbox label="L" no-results-text="Nothing matches"></helix-headless-listbox>'
     const bare = document.body.firstElementChild as Updatable
     await settle(bare)
-    expect(part(bare, 'empty')?.textContent?.trim()).toBe('No matches')
+    expect(part(bare, 'empty')?.textContent?.trim()).toBe('No options')
   })
 
-  test('without `no-results-text` a hidden list draws its empty line as it always has', async () => {
+  test('a filter that hides every option says "No matches" by default, over your empty slot', async () => {
     document.body.innerHTML = `<helix-headless-listbox label="L" filterable>
       <helix-headless-option value="a">Alpha</helix-headless-option>
       <b slot="empty">Nobody</b>
@@ -771,8 +771,8 @@ describe('the no-results and error lines', () => {
     host.requestFilter('zzz')
     await settle(host)
     const line = part(host, 'empty') as HTMLElement
-    const shown = line.querySelector('slot[name="empty"]') as HTMLSlotElement
-    expect(shown.assignedElements()[0]?.textContent).toBe('Nobody')
+    expect(line.querySelector('slot')?.getAttribute('name')).toBe('no-results')
+    expect(line.textContent?.trim()).toBe('No matches')
     expect(live(host)).toBe('No matches')
     expect(hasState(host, 'no-results')).toBe(true)
   })

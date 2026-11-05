@@ -16,6 +16,10 @@
      until a list turns it on, and an `auto` track with no items takes no space.
      The grip's track is the same: a list that does not reorder draws no grip. */
   grid-template-columns: auto auto 1fr auto auto;
+  /* The two rows packed in the middle rather than stretched over the free
+     space. Stretched, an empty description row took half of it under the
+     label, and a one-line label sat 1.38 pixels above the row's center. */
+  align-content: center;
   /* The height of a control at this density, and two lines grow from it. */
   min-block-size: var(--helix-size-control);
   padding: var(
@@ -26,6 +30,8 @@
      words stay on the list's edge and the fill reaches past it. None by
      default, where the inset is the row's own. */
   margin-inline: calc(var(--_list-bleed, var(--helix-space-none)) * -1);
+  /* The link's press box below is placed against the row. */
+  position: relative;
 }
 
 /* The rail: the ordinal, at the start edge of the block rather than beside the
@@ -80,6 +86,10 @@ slot[name="start"] {
 }
 
 slot[name="start"]::slotted(*) {
+  /* The step Tree, Menu, and Option draw a leading icon at, 16 at `md`. An
+     icon here was 20 beside their 16. */
+  --icon-size: var(--helix-size-icon-tight);
+
   grid-column: 2;
   margin-inline-end: var(--helix-space-sm);
   grid-row: 1 / span 2;
@@ -124,6 +134,8 @@ slot[name="description"]::slotted(*) {
 slot[name="end"]::slotted(*) {
   grid-column: 4;
   grid-row: 1 / span 2;
+  /* Over the link's press box, so a control here takes its own press. */
+  position: relative;
 }
 
 /* The link, when the item has somewhere to go, and it must not look like one:
@@ -143,20 +155,47 @@ slot[name="end"]::slotted(*) {
   text-decoration: none;
 }
 
+/* **The whole row is the link's to press**, but for `end` and the grip. The
+   link is only as tall as its words, so a press in the row's own padding or its
+   start inset reached nothing: on a phone the link took 42% of a 40 pixel row. */
+[part="link"]::before {
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
 /* A row that goes somewhere answers the pointer and the keyboard as every other
    row family's does. It had neither: no wash under the pointer or the press, and
    the browser's own blue ring around the link on focus. The ring goes on the
-   row, inside it, so the next row cannot cover it. */
+   row, inside it, so the next row cannot cover it.
+
+   `[href]`, because a disabled row's link has none and takes no press, so it
+   lights under neither. A row of a grid, in a list with `selection-mode`,
+   answers the same way: it is pressed to select or act, and had no wash at
+   all. */
 @media (hover: hover) {
-  [part~="row"]:has([part="link"]):hover {
+  [part~="row"]:has([part="link"][href]):hover,
+  :host(:not([disabled])) [part~="row"][role="gridcell"]:hover {
     background-color: var(--list-item-hover-background-color, var(--helix-color-hover));
     border-radius: var(--helix-radii-sm);
   }
 }
 
-[part~="row"]:has([part="link"]):active {
+[part~="row"]:has([part="link"][href]):active,
+:host(:not([disabled])) [part~="row"][role="gridcell"]:active {
   background-color: var(--helix-color-press);
   border-radius: var(--helix-radii-sm);
+}
+
+[part~="row"][role="gridcell"] {
+  cursor: pointer;
+}
+
+/* Out of reach, and the pointer says so where the row would otherwise take a
+   press. */
+:host([disabled]) [part="link"],
+:host([disabled]) [part~="row"][role="gridcell"] {
+  cursor: not-allowed;
 }
 
 [part="link"]:focus-visible {
@@ -188,6 +227,12 @@ slot[name="end"]::slotted(*) {
   border-radius: var(--helix-radii-sm);
 }
 
+/* A press on a selected row still shows, after the selected fill it would
+   otherwise lose to. */
+:host(:state(selected):not([disabled])) [part~="row"][role="gridcell"]:active {
+  background-color: var(--helix-color-press);
+}
+
 /* The grip, in a `reorderable` list: after `end`, quiet until held, as a data
    table's column grip is. `touch-action: none` so a drag on a phone moves the
    row and does not scroll the page. */
@@ -206,6 +251,8 @@ slot[name="end"]::slotted(*) {
   grid-row: 1 / span 2;
   margin-inline-start: var(--helix-space-sm);
   touch-action: none;
+  /* Over the link's press box, as `end` is. */
+  position: relative;
 }
 
 [part="grip"]:active {
@@ -247,4 +294,14 @@ slot[name="end"]::slotted(*) {
 [part~="row"] {
   min-inline-size: 0;
   overflow-wrap: anywhere;
+}
+
+/* Rows sit against each other, so a box past one would take the press from the
+   row beside it. On a touch screen the row grows instead: to the target, and
+   the hair `Tree` keeps between its rows, so the two pitches agree at 48 as
+   they agree at 40 under a mouse. The row was 40 against Tree's 48. */
+@media (pointer: coarse) {
+  [part~="row"] {
+    min-block-size: calc(var(--helix-size-target) + var(--helix-space-2xs));
+  }
 }

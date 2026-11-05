@@ -21,7 +21,7 @@ export default function Page() {
           <helix-text as="h1" data-measure data-section-title>
             {CONTACT.title}
           </helix-text>
-          <helix-text as="p" data-measure emphasis="muted">
+          <helix-text as="p" class={styles.lede} data-measure emphasis="muted">
             One address, read by the people who would do the work. What follows is what to put in
             the first message and what happens after you send it, so neither is a thing you have to
             guess at.
@@ -63,9 +63,18 @@ export default function Page() {
               wider floor makes the same auto-fit grid land on two, so four
               items fill two rows evenly and it still collapses to one column
               when there is no room for two. */}
+          {/* Glass, as the site's other cards: without a material these had no
+              fill and no edge, and in light a card was its words on the page
+              with a moving ring around nothing. */}
           <helix-grid gap="xl" min="26rem">
             {INCLUDE.map((item) => (
-              <helix-flex data-substrate direction="column" gap="sm" key={item.name}>
+              <helix-flex
+                data-material="glass"
+                data-substrate
+                direction="column"
+                gap="sm"
+                key={item.name}
+              >
                 <helix-text as="h3" data-substrate-name>
                   {item.name}
                 </helix-text>

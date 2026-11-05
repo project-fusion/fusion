@@ -18,10 +18,10 @@
   border-radius: var(--number-input-radius, var(--helix-radii-sm));
   box-sizing: border-box;
   display: flex;
-  /*
- *  The field clips its own corners, which is what rounds the steppers.
- */
-  overflow: hidden;
+  /* **Nothing clips here.** The field clipped its own corners to round the
+     steppers, and that clipped their press boxes with them: on a touch screen
+     each took 40 by 38 of a finger's 44. The steppers round their own outer
+     corners below instead. */
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
@@ -35,7 +35,11 @@
    jump about under a repeated press. */
 [part="control"] {
   font-variant-numeric: tabular-nums;
-  padding-inline: var(--number-input-padding-inline, var(--helix-space-field));
+  /* `2xs`, a step under a field's inset. The value is centered between two
+     ruled steppers, so the inset only keeps it off the rules: at the field's
+     own 16 under `lg`, a 140 pixel field left 10 pixels for the number and
+     cut "12" in half. */
+  padding-inline: var(--number-input-padding-inline, var(--helix-space-2xs));
   text-align: center;
 }
 
@@ -90,11 +94,28 @@ slot[name="end"]::slotted(*) {
 [part="decrement"] {
   border-inline-end: var(--helix-border-thin) solid
     var(--number-input-stepper-border-color, var(--helix-color-border));
+  /* The field's corner, less its edge, on the two corners the field has. */
+  border-end-start-radius: calc(
+    var(--number-input-radius, var(--helix-radii-sm)) -
+    var(--helix-border-thin)
+  );
+  border-start-start-radius: calc(
+    var(--number-input-radius, var(--helix-radii-sm)) -
+    var(--helix-border-thin)
+  );
 }
 
 [part="increment"] {
   border-inline-start: var(--helix-border-thin) solid
     var(--number-input-stepper-border-color, var(--helix-color-border));
+  border-end-end-radius: calc(
+    var(--number-input-radius, var(--helix-radii-sm)) -
+    var(--helix-border-thin)
+  );
+  border-start-end-radius: calc(
+    var(--number-input-radius, var(--helix-radii-sm)) -
+    var(--helix-border-thin)
+  );
 }
 
 [part="decrement"]:hover:not(:disabled),

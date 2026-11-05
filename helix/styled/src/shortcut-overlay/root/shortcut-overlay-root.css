@@ -7,7 +7,7 @@
     var(--helix-color-surface-inverse)
   );
   border: var(--shortcut-overlay-badge-border-width, var(--helix-border-floating)) solid
-    var(--helix-color-border);
+    var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--shortcut-overlay-badge-shadow, var(--helix-shadow-floating));
   color: var(--shortcut-overlay-badge-color, var(--helix-color-foreground-inverse));

@@ -47,10 +47,10 @@
 .fab {
   backdrop-filter: var(--site-glass-backdrop);
   background: var(--site-glass);
-  /* **No stroke.** The shadow already separates the pill from whatever it is
-     over, and a line around a translucent object reads as the edge of a sheet
-     rather than the shape of a control. */
-  border: 0;
+  /* **The floating hairline as well as the shadow**, as every Helix surface
+     over the page draws since October 16, 2026. In dark the shadow is ink on a
+     near-black page and drew nothing, so the pill had no edge at all. */
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   /**
@@ -185,6 +185,23 @@
   display: none;
 }
 
+.fabHeader {
+  display: contents;
+}
+
+.fabTitle {
+  display: none;
+}
+
+/* **On a touch screen the closed pill is the target's height inside its
+   edge.** At one control tall the edge came out of the face, which measured 38,
+   and 40 before the edge. */
+@media (pointer: coarse) {
+  .fab:not([data-open]) {
+    block-size: calc(var(--helix-size-target) + var(--helix-border-floating) * 2);
+  }
+}
+
 @media (max-width: 40rem) {
   /* The rail stops centering a pill and starts holding a sheet against the
      bottom edge. The closed pill keeps its own gap, so only the open state is
@@ -287,13 +304,31 @@
     display: none;
   }
 
+  /* **A row with one button holds its label beside the button.** Over it, a
+     32px icon on a line of its own read as a stray mark under a caption. The
+     row is the target's height so the button's press fits inside it. */
+  .fabRowInline {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-block-size: var(--helix-size-target);
+  }
+
   /*
- *  First and hard against the trailing edge, so the sheet opens with its exit
- *      where a sheet's exit is, rather than below six controls.
+ *  First, with the title at the start and the close hard against the trailing
+ *      edge, so the sheet opens saying what it is and with its exit where a
+ *      sheet's exit is, rather than below six controls.
  */
-  .fabClose {
-    align-self: flex-end;
+  .fabHeader {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
     order: -1;
+  }
+
+  .fabTitle {
+    display: block;
+    font-size: var(--helix-text-md);
+    font-weight: var(--helix-weight-semibold);
   }
 }
 

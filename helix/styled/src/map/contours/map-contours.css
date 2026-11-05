@@ -1,10 +1,7 @@
 /* Nothing drawn here. The renderer draws the lines, and the connector reads
-   their color from this element: a brown, the color contours are printed in,
-   taken halfway toward the ink so it reads on a light or a dark map. */
+   their color from this element: `color-contour`, the brown contours are
+   printed in. */
 :host {
-  color: var(
-    --map-contours-color,
-    color-mix(in oklab, oklch(0.55 0.08 60) 55%, var(--helix-color-foreground))
-  );
+  color: var(--map-contours-color, var(--helix-color-contour));
   display: none;
 }

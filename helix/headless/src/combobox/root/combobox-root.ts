@@ -134,7 +134,7 @@ const isInsertion = (event: Event): boolean =>
  * @documentation https://fusion.dev/helix/components/combobox
  *
  * @slot - The options.
- * @slot empty - What the list shows when typing hides every option, for content richer than `empty-text`.
+ * @slot empty - What the list shows when it has no options, for content richer than `empty-text`.
  * @slot end - After the text, for a unit or a clear button.
  * @slot error - What the list shows while `error-text` is set, for content richer than its text.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
@@ -165,7 +165,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart indicator - The caret.
  * @csspart label - The label above the field.
  * @csspart listbox - The list inside the panel.
- * @csspart listbox-empty - Shown when a filter has hidden everything.
+ * @csspart listbox-empty - Shown when the list has no options, or typing has hidden every one.
  * @csspart listbox-error - Shown while `error-text` is set.
  * @csspart listbox-feedback - The inner list's error message.
  * @csspart listbox-filter-icon - The icon beside the list's filter field.
@@ -214,7 +214,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-combobox': { emptyText: 'Keine Treffer' } })`.
+   * `registerWords('de', { 'helix-combobox': { noResultsText: 'Keine Treffer' } })`.
    */
   static words = 'helix-combobox'
 
@@ -290,11 +290,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   createLabel = 'Add "{value}"'
 
   /**
-   * Text shown when the filter hides every option.
+   * The text shown when the list has no options. Typing that hides every
+   * option shows `no-results-text`.
    */
   @words
   @property({ attribute: 'empty-text' })
-  emptyText = 'No matches'
+  emptyText = 'No options'
 
   /**
    * What the list says when its options could not be loaded, such as after a
@@ -394,10 +395,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   /**
    * The text shown when typing hides every one of the options, where there are
-   * some. Absent, `empty-text` shows. See Listbox's `no-results-text`.
+   * some. See Listbox's `no-results-text`.
    */
+  @words
   @property({ attribute: 'no-results-text' })
-  noResultsText?: string
+  noResultsText = 'No matches'
 
   /**
    * What opens the list: `input`, typing or pressing Down; `focus`, also
@@ -1576,7 +1578,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       empty-text=${this.emptyText}
       error-text=${this.loadError || this.errorText}
       loading-text=${this.loadingText}
-      no-results-text=${this.noResultsText ?? nothing}
+      no-results-text=${this.noResultsText}
       lang=${handedLocale(this) || nothing}
       result-label=${this.resultLabel ?? ''}
       results-label=${this.resultsLabel}

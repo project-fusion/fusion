@@ -887,8 +887,18 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       case 'ArrowRight':
       case 'ArrowLeft':
         /* In is where a shut row's caret points, along the line, so it is the
-           left arrow on a right-to-left page and the right one comes back. */
-        switch (treeArrow(row, inlineStep(this, event.key) === 1 ? 1 : -1)) {
+           left arrow where the tree runs right to left and the right one comes
+           back. The tree's own direction and not the page's: a sheet that sets
+           the tree left to right, as the styled one does for code, keeps the
+           caret pointing right on a right-to-left page. */
+        switch (
+          treeArrow(
+            row,
+            inlineStep(this.renderRoot.querySelector('[part="tree"]') ?? this, event.key) === 1
+              ? 1
+              : -1,
+          )
+        ) {
           case 'open':
           case 'close':
             this.toggle(row, !row.open)

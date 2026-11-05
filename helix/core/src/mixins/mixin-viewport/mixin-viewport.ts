@@ -1,3 +1,13 @@
+import {
+  arrowDown,
+  arrowLeft,
+  arrowRight,
+  arrowUp,
+  cornersIn,
+  cornersOut,
+  minus,
+  plus,
+} from '@fusion.dev/helix-icons'
 import { html, type LitElement, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
@@ -6,6 +16,7 @@ import { IdleController } from '../../controllers/idle-controller/idle-controlle
 import { ToolbarController } from '../../controllers/toolbar-controller/toolbar-controller.js'
 import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 import { numberConverter, timeConverter } from '../../utils/number-converter/number-converter.js'
@@ -17,6 +28,9 @@ type Constructor<T> = new (...args: any[]) => T
 
 /** Which way a press or a key asked the surface to go. */
 export type ViewportWay = 'up' | 'down' | 'start' | 'end'
+
+/** A control whose glyph is not an arrow: the two zoom buttons and fullscreen. */
+export type ViewportGlyphControl = 'zoom-in' | 'zoom-out' | 'fullscreen'
 
 /** Where the controls sit, in the corner words the rest of the library uses. */
 export type ViewportControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
@@ -198,7 +212,9 @@ export declare class ViewportElement {
   protected sideOf(way: ViewportWay): string
 
   /** The arrow drawn on one pan control, for a family that draws its own. */
-  protected panGlyph(way: ViewportWay): string
+  protected panGlyph(way: ViewportWay): TemplateResult
+  /** The glyph drawn on the zoom or fullscreen control, for a family that draws its own. */
+  protected controlGlyph(control: ViewportGlyphControl): TemplateResult
 }
 
 /**
@@ -766,7 +782,6 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
             : this.panRightLabel
     }
 
-    /** The arrow drawn on a pan control, pointing the way it goes on screen. */
     protected get controlTag(): StaticValue {
       return this.tag('icon-button')
     }
@@ -775,8 +790,29 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       return { raised: false }
     }
 
-    protected panGlyph(way: ViewportWay): string {
-      return { down: '↓', left: '←', right: '→', up: '↑' }[this.sideOf(way)] ?? ''
+    /** The glyph drawn on a zoom or fullscreen control, from the icon set. */
+    protected controlGlyph(control: ViewportGlyphControl): TemplateResult {
+      if (control === 'zoom-in') {
+        return drawIcon(plus)
+      }
+      if (control === 'zoom-out') {
+        return drawIcon(minus)
+      }
+      return drawIcon(this.filled ? cornersIn : cornersOut)
+    }
+
+    /** The arrow drawn on a pan control, pointing the way it goes on screen. */
+    protected panGlyph(way: ViewportWay): TemplateResult {
+      const side = this.sideOf(way)
+      return drawIcon(
+        side === 'up'
+          ? arrowUp
+          : side === 'down'
+            ? arrowDown
+            : side === 'left'
+              ? arrowLeft
+              : arrowRight,
+      )
     }
 
     /**
@@ -889,8 +925,11 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
      * **Each glyph is the fallback of a slot named for its button**, the names
      * `Map` gave its own (`pan-up-icon`, `zoom-in-icon`, `fullscreen-icon`), so
      * a page with an icon set of its own swaps a glyph without drawing the
-     * controls again. The fallbacks are words with no element in them, and
-     * `panGlyph` is where a tier above draws other arrows.
+     * controls again. The fallbacks are drawn from the icon set: they were
+     * characters (a plus, a minus sign, and a diagonal arrow), which took the
+     * face's own weight and sat off center in a 32 pixel box, and a reader
+     * saw them beside the icons every other control draws. `panGlyph` is
+     * where a tier above draws other arrows.
      */
     protected renderControls(): TemplateResult | typeof nothing {
       const pan = this.drawsControls('pan')
@@ -902,6 +941,9 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       }
       const [up, start, end, down] = (['up', 'start', 'end', 'down'] as const).map((way) =>
         this.panGlyph(way),
+      )
+      const [zoomIn, zoomOut, full] = (['zoom-in', 'zoom-out', 'fullscreen'] as const).map(
+        (control) => this.controlGlyph(control),
       )
       const button = this.controlTag
       const tip = this.tag('tooltip')
@@ -972,7 +1014,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @click=${() => this.zoom(1)}
                   @helix-press=${stopPress}
                 >
-                  <slot name="zoom-in-icon">+</slot>
+                  <slot name="zoom-in-icon">${zoomIn}</slot>
                 </${button}><${tip} for="zoom-in" content=${this.zoomInLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
                 <${button}
                   part="zoom-out"
@@ -984,7 +1026,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @click=${() => this.zoom(-1)}
                   @helix-press=${stopPress}
                 >
-                  <slot name="zoom-out-icon">−</slot>
+                  <slot name="zoom-out-icon">${zoomOut}</slot>
                 </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
             : nothing
         }
@@ -1002,7 +1044,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                 @click=${this.toggleFullscreen}
                 @helix-press=${stopPress}
               >
-                <slot name="fullscreen-icon">⤢</slot>
+                <slot name="fullscreen-icon">${full}</slot>
               </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
             : nothing
         }

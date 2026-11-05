@@ -62,8 +62,8 @@
 [data-density] {
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
 }

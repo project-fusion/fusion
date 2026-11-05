@@ -33,7 +33,7 @@ export function Example() {
       <helix-table-column
         field="name"
         sortable
-        width="minmax(9rem, 14rem)"
+        width="minmax(6rem, 14rem)"
       >
         Name
       </helix-table-column>
@@ -49,7 +49,7 @@ export function Example() {
         field="size"
         sortable
         text-align="end"
-        width="6rem"
+        width="5rem"
       >
         Size
       </helix-table-column>

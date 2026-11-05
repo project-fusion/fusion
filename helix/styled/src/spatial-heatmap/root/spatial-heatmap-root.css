@@ -17,25 +17,25 @@
   --heatmap-tone-warning: var(--helix-color-warning);
   --heatmap-tone-1: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 20%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 35%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-2: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 40%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 51%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-3: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 60%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 68%,
     var(--helix-color-surface-sunken)
   );
   --heatmap-tone-4: color-mix(
     in oklab,
-    var(--helix-color-primary-active) 80%,
+    oklch(from var(--helix-color-primary-active) max(l, 0.33) c h) 84%,
     var(--helix-color-surface-sunken)
   );
-  --heatmap-tone-5: var(--helix-color-primary-active);
+  --heatmap-tone-5: oklch(from var(--helix-color-primary-active) max(l, 0.33) c h);
 
   /* A grid of one track, so the footer is as wide as the strip. */
   display: grid;
@@ -59,12 +59,20 @@
   position: absolute;
 }
 
-/* `overflow: visible`, so the ring on a prism at the edge is not cut. */
-/* The ground, where a page asks for one. */
-:host([separation="filled"]) [part~="strip"] {
-  background-color: var(--helix-color-surface-sunken);
+/* **The ground, where a page asks for one, holds the strip and its labels**
+   with an inset round them. It was the strip's own box, so the front prisms
+   touched its edge and the first and last labels stood half outside it. As
+   wide as what it holds, as the strip is. */
+:host([separation="filled"]) {
+  background-color: var(--helix-color-surface-filled);
   border-radius: var(--helix-radii-md);
+  box-sizing: border-box;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  padding: var(--helix-space-md);
 }
+
+/* `overflow: visible`, so the ring on a prism at the edge is not cut. */
 
 [part="drawing"] {
   block-size: auto;
@@ -200,13 +208,13 @@
 
 /* *Glass, so the relief is in the same language as the page around it.** */
 :host([material="glass"]) {
-  --_spatial-heatmap-through: calc(0.62 * var(--helix-material-opacity));
+  --_spatial-heatmap-through: var(--helix-material-glass-opacity);
 }
 
 /* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
-   0.62, the relationship the surface tokens carry. */
+   0.72, the material tokens every glass surface reads. */
 :host([material="frosted"]) {
-  --_spatial-heatmap-through: calc(0.88 * var(--helix-material-opacity));
+  --_spatial-heatmap-through: var(--helix-material-frosted-opacity);
 }
 
 /* The strip takes focus once it has cells to read, so it draws the ring. */
@@ -279,6 +287,7 @@
 }
 
 [part="empty"],
+[part="error"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);

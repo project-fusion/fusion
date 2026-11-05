@@ -315,6 +315,7 @@ export {
   type ViewportGestureLabels,
   type ViewportGestureMode,
   type ViewportGestures,
+  type ViewportGlyphControl,
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { MixinVoice, type VoiceElement } from './mixins/mixin-voice/mixin-voice.js'
@@ -489,11 +490,15 @@ export {
 } from './utils/find-text/find-text.js'
 export { focusTarget } from './utils/focus-target/focus-target.js'
 export {
+  autofocusTarget,
   deepActiveElement,
   deepContains,
+  focusAs,
   focusableElements,
+  openingFocus,
   PRESSABLE,
   pressedOwnControl,
+  refocusWithin,
 } from './utils/focusable-elements/focusable-elements.js'
 export {
   afterLinkFollowed,
@@ -544,6 +549,7 @@ export { nearest } from './utils/nearest/nearest.js'
 export { numberConverter, timeConverter } from './utils/number-converter/number-converter.js'
 export {
   formatNumber,
+  formatNumberParts,
   formatPercent,
   parseNumber,
   readingText,
@@ -670,7 +676,7 @@ export {
   window_,
 } from './utils/row-order/row-order.js'
 export { extent, linear, type Scale } from './utils/scale/scale.js'
-export { ticks } from './utils/scale/ticks.js'
+export { headroom, ticks } from './utils/scale/ticks.js'
 export {
   type ScrollerOptions,
   type ScrollItemOptions,

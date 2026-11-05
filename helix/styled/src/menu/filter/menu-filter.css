@@ -27,7 +27,7 @@ input {
   min-block-size: var(--helix-size-control-tight);
   padding-inline: var(--helix-space-sm);
   position: sticky;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 /* No ring: the field is where focus stays, and the caret says so. Listbox's

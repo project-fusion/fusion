@@ -24,8 +24,10 @@
 :host([separation="outlined"]) ::slotted(*) {
   border: var(--helix-border-surface) solid var(--accordion-border-color, var(--helix-color-border));
   box-shadow: var(--helix-shadow-surface);
-  /* The house radius. */
-  border-radius: var(--accordion-radius, var(--helix-radii-sm));
+  /* **A card's corner**, `md`, which Card, Callout and Notification draw: each
+     outlined item is a framed surface beside them. It drew `sm`, 4 against
+     their 8. */
+  border-radius: var(--accordion-radius, var(--helix-radii-md));
   /* Clips the trigger's own hover fill to the item's corners. */
   overflow: hidden;
 }

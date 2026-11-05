@@ -127,6 +127,22 @@ export const TOKENS: Token[] = [
      holds: 1.119, 1.112, 1.114 across page, card and raised, against the
      absolute token's 1.027 to 1.119. */
   ['color-well', 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)'],
+  /* **What a `filled` surface is filled with, stated as a step from its ground
+     for the reason the well is one.** Card, Checkbox and Radio cards,
+     Announcement, and Notification each drew `filled` their own way, and
+     against the white page they read 1.04, 1.09, and 1.14:1. Card's step was the
+     reference, but it was a color: on `surface-sunken` a filled card measured
+     1.05 in light and 1.04 in dark, and a filled card inside a card needed a
+     second color of its own. A wash steps the same distance off every ground:
+     1.12 on the page and on `surface-sunken` in light, and in dark the card rung,
+     #0d0d0d, on the black page. **5%, the well's strength**, so a quiet word on a
+     filled surface stands where the engine already solves it, on the well: 4.51
+     on a filled card over `surface-sunken`, where 6% measured 4.43. */
+  [
+    'color-surface-filled',
+    'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
+    'What a filled surface is filled with, such as a filled card. A wash of the foreground, so it steps off whatever it is on.',
+  ],
   /* **What a row is lit with under the pointer or the keyboard**: an option, a
      suggestion, a note in a graph's list. A step from its ground for the
      reason the well is one, and 12% in dark because the same alpha over a dark
@@ -156,10 +172,13 @@ export const TOKENS: Token[] = [
     'A wash under a control being pressed, a step past the hover wash.',
   ],
   /* A chosen thing that stays chosen and is not a fill of its own: a range of
-     days, a pressed toggle in a find bar. */
+     days, a pressed toggle in a find bar. 18% in dark, so it stays a step past
+     the 12% hover there as 14% does past 8% in light: at one 14% the two
+     measured 1.06:1 apart on the dark page, against 1.16 in light. Two whole
+     colors, since `light-dark()` is not valid in a percentage. */
   [
     'color-selected',
-    'color-mix(in oklab, var(--helix-color-foreground) 14%, transparent)',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 14%, transparent), color-mix(in oklab, var(--helix-color-foreground) 18%, transparent) )',
     'A wash under something chosen that keeps its ground, such as a range of days.',
   ],
   /* Two whole colors, not one color with a `light-dark()` strength.
@@ -188,10 +207,13 @@ export const TOKENS: Token[] = [
      that ink, so its contrast on a theme's grounds is not guaranteed. The half
      steps 550 and 450 are where it cleared 4.5:1 on the shipped grounds:
      `neutral-500` measured 3.53, 3.62, 3.78 and 3.95 in light and 3.59 in
-     dark. */
+     dark. **Dark is `neutral-500` as well**, 0.11 under the muted ink's 0.71 so
+     the two still stand apart: at `neutral-550` a submenu's chevron on a
+     hovered row of a dark menu measured 2.37:1, under the 3:1 a mark needs, and
+     3.15 at this step, November 3, 2026. */
   [
     'color-foreground-subtle',
-    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-550))',
+    'light-dark(var(--_helix-neutral-500), var(--_helix-neutral-500))',
     'A mark that is not text, such as a separator, a chevron, or a grip. Its contrast is not guaranteed.',
   ],
   /* **The label on a fill, one per role.** A brand fill and a status fill are
@@ -244,6 +266,17 @@ export const TOKENS: Token[] = [
   [
     'color-border',
     'light-dark(color-mix(in oklab, var(--_helix-neutral-300) 60%, var(--_helix-neutral-200)), color-mix(in oklab, var(--_helix-neutral-700) 30%, var(--_helix-neutral-800)))',
+  ],
+  /* **The edge of a surface over the page.** In light it is the line above. In
+     dark a floating panel is filled with `surface-overlay`, `neutral-800`, and
+     that line sits 0.036 above it: measured 1.10:1 on a Menu, and 1.08:1 on a
+     Menu inside a Dialog, whose overlay is stepped up past the line. A wash of
+     white is lighter than whatever panel it is drawn on, so the edge holds on
+     every rung a panel takes: 10% measured 1.33:1 on the overlay, near the
+     light edge's 1.24 on white, where 12% measured 1.43. */
+  [
+    'color-border-floating',
+    'light-dark( var(--helix-color-border), color-mix(in oklab, var(--_helix-neutral-0) 10%, transparent) )',
   ],
   /* Interaction. Each brand step falls back to the ink step it stands in for,
      which is the whole palette when no brand is named. */
@@ -303,6 +336,10 @@ export const TOKENS: Token[] = [
     'light-dark(var(--_helix-accent-700, var(--_helix-ink-600)), var(--_helix-accent-fill-dark-hover, var(--_helix-ink-450)))',
   ],
   [
+    'color-accent-surface-active',
+    'oklch(from var(--helix-color-accent-surface-hover) calc(l - 0.05) c h)',
+  ],
+  [
     'color-primary-surface',
     'light-dark(var(--_helix-brand-600, var(--_helix-ink-500)), var(--_helix-brand-fill-dark, var(--_helix-ink-400)))',
   ],
@@ -348,15 +385,14 @@ export const TOKENS: Token[] = [
      Everywhere else it is solved for a word: `primary` has to clear 4.5:1 as
      text and `primary-surface` further still to carry white on a fill. A mark
      is a graphic, and WCAG 1.4.11 asks 3:1 of a graphic, so it may sit far
-     closer to the color a consumer actually chose. *It coincides with
-     `primary` for the seed that ships and diverges under derivation**, which
-     is the whole reason it is a token rather than a reuse:
-     `@fusion.dev/helix-theme` solves this one against 3 and `primary` against
-     the theme's own target, so a brand that has to travel a long way to be
-     readable as text travels much less here. */
+     closer to the color a consumer actually chose. **A CSS seed takes the
+     mark's own floor in `primitives.css`**, and `@fusion.dev/helix-theme`
+     solves this one against 3 and `primary` against the theme's own target, so
+     a brand that has to travel a long way to be readable as text travels much
+     less here. With no brand it is the ink, as `primary` is. */
   [
     'color-brand-mark',
-    'light-dark(var(--_helix-brand-500, var(--_helix-ink-500)), var(--_helix-brand-400, var(--_helix-ink-400)))',
+    'light-dark(var(--_helix-brand-mark-500, var(--_helix-ink-500)), var(--_helix-brand-mark-400, var(--_helix-ink-400)))',
   ],
   /* Syntax. */
   [
@@ -554,8 +590,10 @@ export const TOKENS: Token[] = [
   ['color-success', 'light-dark(var(--_helix-success-600), var(--_helix-success-400))'],
   ['color-warning', 'light-dark(var(--_helix-warning-600), var(--_helix-warning-400))'],
   /* Warning as a mark: a star, a Meter's fill, a Callout's icon. The ink is solved
-     for text at 5.62:1 and reads brown as a shape, so a mark takes this, at least 3:1
-     on the light page and on its own tint. */
+     for text at 6.40:1 and reads brown as a shape, so a mark takes this, at least 3:1
+     on the light page, on its own tint, on `surface-sunken` at 3.37, and under a
+     row's hover at 3.23. Those two were 2.99 and 2.86 before the ink went down a
+     step on November 3, 2026. */
   [
     'color-warning-mark',
     'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.25) h), var(--helix-color-warning))',
@@ -582,6 +620,9 @@ export const TOKENS: Token[] = [
      can show Shanghai prices. The page sets these for the market it shows. */
   ['color-rise', 'var(--helix-color-success)'],
   ['color-fall', 'var(--helix-color-danger)'],
+  /* **The brown contours are printed in**, taken 45% of the way toward the ink
+     so a line reads on a light map and on a dark one. */
+  ['color-contour', 'color-mix(in oklab, oklch(0.55 0.08 60) 55%, var(--helix-color-foreground))'],
   /* **Each tone's quiet ink, one step and not two.** A tone's own ink is
      already at the contrast floor, so it cannot go quieter the way
      `foreground-muted` does, by giving up contrast; it gives up color instead:
@@ -625,6 +666,28 @@ export const TOKENS: Token[] = [
   ['color-success-surface-hover', 'var(--_helix-success-700)'],
   ['color-warning-surface', 'var(--_helix-warning-600)'],
   ['color-warning-surface-hover', 'var(--_helix-warning-700)'],
+  /* **A press is one step past the hover, in the direction the hover went, and
+     it is said here once.** Button, Icon Button, and the `data-button` recipe
+     each derived it, four ways between them, and two went opposite ways: with
+     no brand, Button's primary pressed from 0.30 to 0.37 in lightness and Icon
+     Button's to 0.25, and Icon Button's neutral fill in dark went from white to
+     #dedede under the pointer and back to #eee under the press. */
+  ['color-danger-surface-active', 'oklch(from var(--_helix-danger-700) calc(l - 0.05) c h)'],
+  ['color-info-surface-active', 'oklch(from var(--_helix-info-700) calc(l - 0.05) c h)'],
+  ['color-success-surface-active', 'oklch(from var(--_helix-success-700) calc(l - 0.05) c h)'],
+  ['color-warning-surface-active', 'oklch(from var(--_helix-warning-700) calc(l - 0.05) c h)'],
+  /* The neutral fill is the foreground itself, which has nothing past it, so its
+     hover and its press both move toward the page, the press further. Two whole
+     colors, since `light-dark()` is not valid in a percentage. Each step moves at
+     least 1.3:1 from the one before. */
+  [
+    'color-neutral-surface-hover',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 72%, var(--helix-color-background)), color-mix(in oklab, var(--helix-color-foreground) 90%, var(--helix-color-background)) )',
+  ],
+  [
+    'color-neutral-surface-active',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 60%, var(--helix-color-background)), color-mix(in oklab, var(--helix-color-foreground) 80%, var(--helix-color-background)) )',
+  ],
   /* ======================================================== scrollbar === */
   /* A scrollbar the library colors has to clear 3:1 against what it sits on.
      The browser's own thumb is exempt from WCAG 1.4.11 as a user-agent
@@ -808,8 +871,22 @@ export const TOKENS: Token[] = [
      are the same decision at three scales. Multiplied rather than replaced, so
      a component keeps the strength it was drawn at and the theme moves all of
      them together: 1 is what ships, below 1 is more see-through, above 1 more
-     solid. */
+     solid. The glass and frosted fills below take it as well, capped at 100%;
+     before November 3, 2026 it reached chart marks and no surface. */
   ['material-opacity', '1', 'How opaque a translucent surface is.'],
+  /* **What `glass` and `frosted` cover, as a scalar, for a family that fades a
+     mark.** A chart's glass group was drawn at 0.62 and every glass surface at
+     0.72, so glass meant two coverages. A chart reads these to draw the one. */
+  [
+    'material-glass-opacity',
+    'calc(0.72 * var(--helix-material-opacity))',
+    'How much of a mark a glass material covers.',
+  ],
+  [
+    'material-frosted-opacity',
+    'calc(0.88 * var(--helix-material-opacity))',
+    'How much of a mark a frosted material covers.',
+  ],
   /* How far a control that does not take a press fades. Every family keeps its own
      hook and reads this behind it. */
   ['opacity-disabled', '0.5', 'How far a disabled control fades.'],
@@ -839,30 +916,20 @@ export const TOKENS: Token[] = [
   ['material-blur-lg', '32px', 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 30%, transparent), color-mix(in oklab, var(--_helix-neutral-900) 60%, transparent) )',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) min(100%, 30% * var(--helix-material-opacity)), transparent), color-mix(in oklab, var(--_helix-neutral-900) min(100%, 60% * var(--helix-material-opacity)), transparent) )',
 
     'The translucent background, for a surface that shows what is behind it.',
   ],
   [
     'material-translucent-strong',
-    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) 88%, transparent )',
+    'color-mix( in oklab, light-dark(var(--_helix-neutral-0), var(--_helix-neutral-900)) min(100%, 88% * var(--helix-material-opacity)), transparent )',
 
     'The stronger translucent background, for a surface that shows less of what is behind it.',
   ],
-  /* **Glass over a page, and glass over its own scrim.** A modal samples the scrim
-     behind it, so it needs more coverage to stay a surface: at 30% it landed at L
-     0.76 in light. A menu or a popover has no scrim, so it can show more of the
-     page. Dark takes 60% in both, where white ink holds 4.5:1 over a white page; at
-     30% and 48% it measured 2.4:1 and 3.41:1, October 31, 2026. */
-  [
-    'material-modal',
-    'light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))',
-    'The glass of a Dialog or Drawer, which sits over its own scrim.',
-  ],
   [
     'material-panel',
-    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) 72%, transparent), var(--helix-material-translucent) )',
-    'The glass of a panel over the page, such as a Menu, Popover, or Tooltip.',
+    'light-dark( color-mix(in oklab, var(--_helix-neutral-0) min(100%, 72% * var(--helix-material-opacity)), transparent), var(--helix-material-translucent) )',
+    'The glass of every panel, from a Menu, Popover, or Tooltip to a Dialog or Drawer over its scrim.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the
      same bug: `light-dark()` in `color-mix()`'s percentage slot, sitting two
@@ -878,9 +945,19 @@ export const TOKENS: Token[] = [
   ['duration-fast', 'var(--_helix-ms-120)'],
   ['duration-normal', 'var(--_helix-ms-200)'],
   ['duration-slow', 'var(--_helix-ms-320)'],
+  /* **A spinner's turn, and the same turn under reduced motion.** Off the scale
+     above, whose longest rung answers a hand: 0.8s is the rate a ring reads as
+     busy at. Button, Icon Button, Loader, and Video each wrote 0.8s and 4s for
+     themselves so two rings on a page would agree. The crawl is one turn in
+     four seconds, a fixed rate, because the base layer takes every rung above
+     to 0.01ms under the preference and a ring handed that runs flat out. */
+  ['duration-turn', '0.8s'],
+  ['duration-crawl', '4s'],
   /* `standard` for most state changes, `emphasized` for things entering the
-     screen, `decelerate` for things arriving and settling, `spring` for the
-     one or two places a gesture should feel physical. */
+     screen and for a marker that travels (the indicator of Tabs and Navigation,
+     the thumb of a Switch, a Checkbox's mark), `decelerate` for things arriving
+     and settling, `spring` for the one or two places a gesture should feel
+     physical. */
   ['easing-standard', 'var(--_helix-curve-standard)'],
   ['easing-emphasized', 'var(--_helix-curve-emphasized)'],
   ['easing-decelerate', 'cubic-bezier(0, 0, 0, 1)'],
@@ -948,11 +1025,13 @@ export const TOKENS: Token[] = [
      failure: measured with it absent, a select's caret drew at 950px and a
      menu item at 18. */
   /* Rounded, so a row does not land between pixels: 25.6 and 38.4 at `sm` and
-     `lg` before October 31, 2026. */
+     `lg` before October 31, 2026. An icon rounds to an even size, so a glyph
+     drawn on a 256 grid keeps its center on a whole pixel: 12 and 20 beside the
+     16 it steps from, where 1px rounding gave 13 and 19. */
   ['size-control-tight', 'round(calc(var(--helix-size-control) * 0.8), 1px)'],
   ['size-control-loose', 'round(calc(var(--helix-size-control) * 1.2), 1px)'],
-  ['size-icon-tight', 'round(calc(var(--helix-size-icon) * 0.8), 1px)'],
-  ['size-icon-loose', 'round(calc(var(--helix-size-icon) * 1.2), 1px)'],
+  ['size-icon-tight', 'round(calc(var(--helix-size-icon) * 0.8), 2px)'],
+  ['size-icon-loose', 'round(calc(var(--helix-size-icon) * 1.2), 2px)'],
   ['size-checkbox-tight', 'round(calc(var(--helix-size-checkbox) * 0.8), 1px)'],
   ['size-checkbox-loose', 'round(calc(var(--helix-size-checkbox) * 1.2), 1px)'],
   /* How wide a button is when it is asked to take a standard width rather than

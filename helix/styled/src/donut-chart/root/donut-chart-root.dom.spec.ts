@@ -97,10 +97,10 @@ describe('donut chart', () => {
       'var(--chart-series) 30%',
     )
     expect(rule(':host([material="glass"]) [part~="segment"]')).toContain(
-      'stroke-opacity: calc(0.62 * var(--helix-material-opacity))',
+      'stroke-opacity: var(--helix-material-glass-opacity)',
     )
     expect(rule(':host([material="frosted"]) [part~="segment"]')).toContain(
-      'stroke-opacity: calc(0.88 * var(--helix-material-opacity))',
+      'stroke-opacity: var(--helix-material-frosted-opacity)',
     )
   })
 

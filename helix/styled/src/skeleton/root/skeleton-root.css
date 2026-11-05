@@ -1,4 +1,8 @@
 :host {
+  /* The leading of the line the skeleton sits in: its line height less its
+     type, half above the glyphs and half below. */
+  --_skeleton-leading: calc(1lh - 1em);
+
   display: block;
   inline-size: 100%;
 }
@@ -9,19 +13,26 @@
   block-size: var(--skeleton-block-size, var(--helix-size-control));
 }
 
-/* A line of text is one line tall whatever it is standing in for. */
+/* **A line of text is one line box tall**, the line height of where it sits,
+   with the shape one `em` tall in the middle of it, as a line box holds its
+   glyphs. The host was one `em`: 14 against a 21 pixel line of body text, so
+   the page moved by the leading when the words arrived. Inside a heading it
+   takes the heading's line. */
 :host([shape="text"]) {
-  block-size: 1em;
+  block-size: 1lh;
+  box-sizing: border-box;
+  padding-block: calc(var(--_skeleton-leading) / 2);
 }
 
 /*
- * **A paragraph is its lines.** Each line is one `em` tall, the lines a body
- * line height apart, so the column is as tall as the text it stands for, and the
+ * **A paragraph is its lines.** Each line is one `em` tall, the lines one line
+ * height apart, so the column is as tall as the text it stands for, and the
  * last line stops short, as a paragraph's does. One line, or a count the
  * script reads as none, is the single line above.
  */
 :host([shape="text"][lines]:not([lines="1"]):not([lines="0"])) {
   block-size: auto;
+  padding-block: 0;
 }
 
 :host([shape="circle"]) {
@@ -46,7 +57,8 @@
       )
   );
   block-size: 100%;
-  border-radius: var(--skeleton-radius, var(--helix-radii-sm));
+  /* Around content, the content's own corner, which the script reads. */
+  border-radius: var(--skeleton-radius, var(--_skeleton-corner, var(--helix-radii-sm)));
   display: block;
   inline-size: 100%;
   /* The containing block for the sweep, and the clip that keeps it inside the
@@ -57,12 +69,13 @@
 
 /* Half the leading above the first line and below the last, as a line box
    holds its glyphs: three lines measured 56 against the 63 of a three-line
-   paragraph, and now take 4.5em, the paragraph's 63. */
+   paragraph, and now take three line boxes, the paragraph's 63. The leading is
+   the line height where the paragraph sits, as for one line. */
 [part="lines"] {
   display: flex;
   flex-direction: column;
-  gap: calc((var(--helix-leading-normal) - 1) * 1em);
-  padding-block: calc((var(--helix-leading-normal) - 1) * 0.5em);
+  gap: var(--_skeleton-leading);
+  padding-block: calc(var(--_skeleton-leading) / 2);
 }
 
 [part~="line"] {
@@ -148,6 +161,7 @@
   block-size: auto;
   inline-size: fit-content;
   max-inline-size: 100%;
+  padding-block: 0;
   position: relative;
 }
 
@@ -180,6 +194,22 @@
 :host([loading]:state(wrapping)) [part="content"],
 :host([loading]:not(:defined):not(:empty)) [part="content"] {
   visibility: hidden;
+}
+
+/* Around a field, the shapes of its pieces, each placed where the script
+   measured it, in a layer over the field's box. A label or a hint is a line,
+   rounded as a line of text is. */
+[part="pieces"] {
+  inset: 0;
+  position: absolute;
+}
+
+[part~="piece"] {
+  position: absolute;
+}
+
+[part~="piece"][data-line] {
+  border-radius: var(--helix-radii-full);
 }
 
 @keyframes helix-skeleton-sweep {

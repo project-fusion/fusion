@@ -158,7 +158,11 @@ describe('the names under the plot', () => {
     expect(names(host).map((one) => one.text)).toEqual(months)
     const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
     const [first] = names(host)
-    /* Centered under its reading, at the middle of the first twelfth. */
-    expect(((first?.left ?? 0) + (first?.right ?? 0)) / 2 - plot.left).toBeCloseTo(600 / 24, 0)
+    /* Centered under its reading, at the middle of the plot's first twelfth,
+       the plot being the chart less the value axis beside it. */
+    expect(((first?.left ?? 0) + (first?.right ?? 0)) / 2 - plot.left).toBeCloseTo(
+      plot.width / 24,
+      0,
+    )
   })
 })

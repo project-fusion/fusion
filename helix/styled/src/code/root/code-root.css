@@ -1,7 +1,12 @@
 :host {
   /* Code shows the characters written: a ligature hides a `!=` changing to `!==`. */
   font-variant-ligatures: none;
-  display: inline;
+  /* **A fragment moves to the next line whole**, as a word does. Inline, it
+     broke wherever the line ran out, and a hyphen is a place to break: a column
+     ended on a lone `--` with `force` on the next line, or `-` and `v`. A
+     fragment wider than the line still breaks inside itself. */
+  display: inline-block;
+  max-inline-size: 100%;
 }
 
 /* A step down the scale: a monospace face reads larger than the prose it sits in. */
@@ -12,8 +17,7 @@
   background-color: var(--code-background-color, var(--helix-color-well));
   border-radius: var(--code-radius, var(--helix-radii-sm));
   /* A fragment longer than the line, a path or an identifier, breaks inside
-     itself where it would run out of the text, and each piece keeps the wash
-     and the padding. */
+     itself, and each piece keeps the wash and the padding. */
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
   /* Never a syntax color: a colored word in running text reads as a link.

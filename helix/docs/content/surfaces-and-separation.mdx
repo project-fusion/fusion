@@ -10,8 +10,8 @@ title: Surfaces and separation
 edge, a lift, and space.** A design language leads with one of them. Helix leads
 with an edge for surfaces on the page and a lift for surfaces above it. A card
 has a hairline border and no shadow. A menu has a shadow and a hairline border,
-because a shadow cannot show on a near-black page. The surface ladder below sets the ground color
-for each place a surface can sit.
+because a shadow cannot show on a black page. The surface ladder below sets the
+ground color for each place a surface can sit.
 
 ## The four ways to separate a surface
 
@@ -42,6 +42,10 @@ Helix sets the choice with two pairs of policy tokens:
 A floating surface draws a hairline edge and a shadow by default. A shadow is
 ink darker than the ground it falls on, so over a dark page it does not show,
 and the edge keeps a menu or a popover apart from what it opened over.
+
+A Tooltip draws neither. Its fill is `surface-inverse`, the mode's opposite,
+which sets it apart from any ground it opens over. A glass or frosted Tooltip
+lets the page show through, so it takes the hairline edge.
 
 To make every component shadow-first, set the border pair to zero and give the
 shadow pair a value. Reverse them to go border-first. Every Helix surface reads

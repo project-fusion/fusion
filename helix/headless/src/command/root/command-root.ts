@@ -894,7 +894,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         filter-label=${this.placeholder}
         error-text=${this.loadError || this.errorText}
         loading-text=${this.loadingText}
-        no-results-text=${this.noResultsText ?? nothing}
+        no-results-text=${this.noResultsText ?? this.emptyText}
         result-label=${this.resultLabel ?? ''}
         results-label=${this.resultsLabel}
         ?loading=${this.loading}
@@ -911,8 +911,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         ${this.page === '' ? html`<slot></slot>` : html`<slot name=${`page:${this.page}`}></slot>`}
         ${this.renderControls()}
         <!-- Handed on with the text as the fallback, for the reason Combobox
-             gives: the list's own fallback never shows behind a passed slot. -->
-        <slot name="empty" slot="empty">${this.emptyText}</slot>
+             gives: the list's own fallback never shows behind a passed slot.
+             The palette's empty line is what typing that matches nothing
+             shows, so it goes to the list's no-results line unless the
+             no-results slot is filled. With no commands at all, the list's
+             own empty line says empty-text. -->
+        <slot name="empty" slot=${this.fills('no-results') ? 'empty' : 'no-results'}>${this.emptyText}</slot>
         <slot name="loading" slot="loading">${this.loadingText}</slot>
         <slot name="error" slot="error">${this.loadError || this.errorText}</slot>
         <!-- Handed on only while something fills it: an assigned slot hides the

@@ -48,7 +48,7 @@
    hidden by opacity rather than taken out: it is the button's name. */
 [part="label"] {
   background: var(--helix-color-surface-overlay);
-  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border: var(--helix-border-floating) solid var(--helix-color-border-floating);
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);

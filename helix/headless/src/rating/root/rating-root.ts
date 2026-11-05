@@ -88,6 +88,7 @@ import { HelixPreviewEvent } from '../events/index.js'
  * @cssproperty --rating-steps - The number of steps in the whole row: `max` divided by `step`.
  *
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate previewing - The marks show the score under the pointer, before it is chosen.
  */
 @customElement('helix-headless-rating')
 export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -579,6 +580,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     /* Once per change of what is previewed, not per pointer move: Lit records
        `previewing` only when it differs. */
     if (changed.has('previewing')) {
+      this.toggleState('previewing', this.previewing !== undefined)
       this.dispatchEvent(
         new HelixPreviewEvent({
           value: this.previewing === undefined ? '' : String(this.previewing),

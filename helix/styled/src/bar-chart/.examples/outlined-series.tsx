@@ -47,7 +47,6 @@ export function Example() {
       <div className="panel">
         <helix-bar-chart
           for="barchartperseries"
-          gridlines="value"
           outlined="Target"
         ></helix-bar-chart>
       </div>

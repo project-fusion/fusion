@@ -38,7 +38,7 @@ describe('trend', () => {
     const trend = await mount('<helix-trend movement="up" good="up">12%</helix-trend>')
     expect(part(trend, 'icon')?.hasAttribute('data-glyph')).toBe(true)
     expect(rule('[data-glyph]')).toContain('block-size: var(--icon-size, var(--helix-size-icon))')
-    expect(rule('[part="icon"]')).toContain('--icon-size: var(--trend-icon-size, 1em)')
+    expect(rule('[part="icon"]')).toContain('--icon-size: var(--trend-icon-size, round(1em, 2px))')
   })
 
   test('gray until told what good means', () => {
@@ -152,7 +152,7 @@ describe('trend hooks', () => {
       'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
     )
     expect(rule('slot[name$="icon"]::slotted(*)')).toContain(
-      'block-size: var(--trend-icon-size, 1em)',
+      'block-size: var(--trend-icon-size, round(1em, 2px))',
     )
   })
 })

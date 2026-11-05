@@ -78,6 +78,17 @@ describe('servePreview', () => {
     document.documentElement.dir = ''
   })
 
+  test('takes the color mode it is sent, and drops it when a render sends none', () => {
+    serve()
+    const root = document.documentElement
+    render({ colorMode: 'dark', source: '<p>Hi</p>' })
+    expect(root.dataset.colorMode).toBe('dark')
+    expect(root.style.colorScheme).toBe('dark')
+    render({ source: '<p>Hi</p>' })
+    expect(root.dataset.colorMode).toBeUndefined()
+    expect(root.style.colorScheme).toBe('')
+  })
+
   test('says it drew each render, so the preview shows the frame', () => {
     serve()
     render({ source: '<p>Hi</p>' })

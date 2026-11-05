@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './area-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -42,7 +43,7 @@ import '../../tooltip/index.js'
  * @cssproperty --area-chart-block-size - Height of the drawing.
  * @cssproperty --area-chart-fill-strength - How much of its series' color a band takes, as a percentage mixed toward the page.
  * @cssproperty --area-chart-gap - Space between the drawing and its labels.
- * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot under `gridlines`.
+ * @cssproperty --area-chart-gridline-color - Color of the rules drawn across the plot.
  * @cssproperty --area-chart-overlap-opacity - How much of each band shows under `overlap`, where the bands in front let the ones behind show through.
  * @cssproperty --area-chart-width - Thickness of a band's top edge. Overrides `--chart-stroke`.
  * @cssproperty --chart-stroke - Thickness of a band's top edge. Area Chart, Line Chart, and Bar Chart's `lines` all read this one property. `--area-chart-width` overrides it here.
@@ -61,6 +62,7 @@ export class HelixAreaChart extends HelixHeadlessAreaChart {
     tooltipStyles,
     styles,
     sonifyStyles,
+    statusMarkStyles,
   ]
 }
 

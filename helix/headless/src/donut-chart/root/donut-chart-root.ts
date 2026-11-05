@@ -125,6 +125,9 @@ export interface DonutShare {
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place.
+ * When the readings did not load, set `error-text`, such as "The visits did
+ * not load": it stands in the plot in place of both, and the `error` slot
+ * takes a button that tries again.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -144,6 +147,7 @@ export interface DonutShare {
  *
  * @slot - Content in the middle of the ring, usually a total. It is read by screen readers, while the ring itself is hidden from them.
  * @slot empty - Content shown in place of the ring when the table has no readings. Falls back to `empty-text`.
+ * @slot error - Content shown in place of the ring while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the ring while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The slice shown moved, or was put away: `index` is the slice's row, or `-1` for none, with its `label` and the `pointerType` that moved it.
@@ -151,6 +155,7 @@ export interface DonutShare {
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart empty - The words in place of the ring when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
+ * @csspart error - The words in place of the ring while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart live - The readout: a polite live region that says the slice the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the ring while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -185,6 +190,7 @@ export interface DonutShare {
  *
  * @cssstate active - While a slice is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in place of the ring.
+ * @cssstate error - While the `error` part stands in place of the ring.
  * @cssstate loading - While the `loading` part stands in place of the ring.
  */
 @customElement('helix-headless-donut-chart')

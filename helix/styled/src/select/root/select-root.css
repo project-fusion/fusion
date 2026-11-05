@@ -106,7 +106,7 @@
    house shape and the entrance are `shared/floating`'s, handed the family's own
    hooks. */
 [part="surface"] {
-  --_floating-border-color: var(--select-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--select-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--select-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--select-shadow, var(--helix-shadow-floating));
   /* Square rows, because they run the full width of the panel. */
@@ -133,15 +133,17 @@
   padding-inline: var(--helix-space-none);
 }
 
-/* The indicator turns over as the panel opens. */
+/* The indicator turns over as the panel opens. **Turned rather than flipped**,
+   as Tree's and Megamenu's carets are: through `scale: 1 -1` it was a flat line
+   halfway. */
 [part="indicator"],
 ::slotted([slot="indicator"]) {
-  transition: scale var(--helix-duration-fast) var(--helix-easing-standard);
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 :host(:state(open)) [part="indicator"],
 :host(:state(open)) ::slotted([slot="indicator"]) {
-  scale: 1 -1;
+  rotate: 180deg;
 }
 
 /* The list inside a panel brings no frame of its own: the panel is the frame,

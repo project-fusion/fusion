@@ -1,8 +1,8 @@
 - group "Company notes":
   - toolbar "Graph controls":
-    - button "Zoom in": +
-    - button "Zoom out": −
-    - button "Fill the screen": ⤢
+    - button "Zoom in"
+    - button "Zoom out"
+    - button "Fill the screen"
   - combobox "Find a note" [expanded]
   - listbox "Notes":
     - option "Pricing" [selected]

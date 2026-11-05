@@ -290,12 +290,16 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
      into a shim. Setting only the first leaves 37 of the 56 two-armed tokens on
      their light arm, the 24 series colors among them.
 
-     Absent leaves both alone, so a frame nobody has told follows the reader's
-     own `prefers-color-scheme`, which is what a preview of a component should
-     do. A tool with a scheme control of its own says which. */
+     Absent clears both, so a frame nobody has told follows the reader's own
+     `prefers-color-scheme`, which is what a preview of a component should do,
+     and a mode the page took away is not kept from the last render. A tool
+     with a scheme control of its own says which. */
   if (colorMode) {
     document.documentElement.dataset.colorMode = colorMode
     document.documentElement.style.colorScheme = colorMode
+  } else {
+    delete document.documentElement.dataset.colorMode
+    document.documentElement.style.removeProperty('color-scheme')
   }
   /* The stylesheet link is for the reader, and it is dropped before the markup
      is rendered.

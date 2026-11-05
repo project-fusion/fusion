@@ -150,12 +150,24 @@
   );
 }
 
+/* An even size, 14 beside 13 pixel rows, so the caret's center lands on a whole
+   pixel. At `1em` it was 13. */
 [part="toggle"] {
-  block-size: 1em;
+  --_object-inspector-toggle: round(1em, 2px);
+  block-size: var(--_object-inspector-toggle);
   color: var(--helix-color-foreground-muted);
-  inline-size: 1em;
+  inline-size: var(--_object-inspector-toggle);
   margin-inline-end: var(--helix-space-2xs);
   vertical-align: -0.125em;
+}
+
+/* **The tree runs left to right on any page, so a shut caret points right on
+   any page.** The mirror every family's drawings take follows the page, and on
+   a right-to-left page it turned the caret to point left, away from the row it
+   opens, at the left edge of a left-to-right tree. The keys follow the tree as
+   well: the right arrow opens. */
+:host(:dir(rtl)) [part="toggle"][data-mirror] {
+  scale: none;
 }
 
 /* Each type in its own ink, from the syntax set the code blocks use, so a

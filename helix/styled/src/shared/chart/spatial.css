@@ -69,6 +69,7 @@
 }
 
 [part="empty"],
+[part="error"],
 [part="loading"] {
   color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);

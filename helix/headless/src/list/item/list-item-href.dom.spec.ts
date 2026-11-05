@@ -35,6 +35,16 @@ describe('list item href', () => {
     ).toEqual(['start', '', 'description'])
   })
 
+  test('goes nowhere while disabled, and says so', async () => {
+    const el = await mount(
+      '<helix-headless-list-item href="/a" disabled>Row</helix-headless-list-item>',
+    )
+    const link = el.shadowRoot?.querySelector('[part="link"]') as HTMLAnchorElement
+    expect(link.hasAttribute('href')).toBe(false)
+    expect(link.getAttribute('role')).toBe('link')
+    expect(link.getAttribute('aria-disabled')).toBe('true')
+  })
+
   test('writes target and rel only when asked', async () => {
     const bare = await mount('<helix-headless-list-item href="/a">Row</helix-headless-list-item>')
     const row = bare.shadowRoot?.querySelector('[part="link"]') as HTMLAnchorElement

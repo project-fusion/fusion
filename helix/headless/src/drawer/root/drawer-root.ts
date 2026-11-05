@@ -1,12 +1,14 @@
 import {
   AriaForwardController,
   auditName,
+  autofocusTarget,
   CommandController,
   customElement,
   drawDismiss,
   drawDismissGlyph,
   edgeOffset,
   FocusScopeController,
+  focusAs,
   HelixElement,
   headingsIn,
   isRtl,
@@ -15,8 +17,10 @@ import {
   nearest,
   OpenPhaseController,
   onUnlessFalse,
+  openingFocus,
   parseSnapPoints,
   reflectElements,
+  refocusWithin,
   SwipeController,
   type SwipeEdge,
   settleSwipe,
@@ -85,7 +89,10 @@ import { startsSwipe } from '../swipe-start.js'
  * is: the elements in the default slot before the first one that is or holds
  * a control. An `aria-describedby` on the host replaces it.
  *
- * **Keyboard.** Opening moves focus to the first control in the panel.
+ * **Keyboard.** Opening a modal drawer moves focus to the control marked
+ * `autofocus`, or else to the control that closes it: a slotted one whose
+ * `command` closes this drawer, such as a Close or Cancel button, and else
+ * the close control `dismissible` draws.
  *
  * | Key | What it does |
  * |---|---|
@@ -670,16 +677,51 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
               ?.assignedElements({ flatten: true }) ?? [],
           ).length > 0,
       )
+      /* Before anything moves it, while the opener still holds focus. */
+      const focusing = openingFocus()
       if (this.modal) {
         panel.showModal()
       } else {
         panel.show()
       }
+      /* `autofocus` on a slotted component, where the browser's own focusing
+         steps skip it (see `autofocusTarget`), and else the control that closes
+         the drawer, by the owner's decision of November 3, 2026: each engine
+         chose its own first control, Chromium a slotted Close and WebKit the
+         drawn one, and a drawer is a place a reader looks into and leaves. */
+      void autofocusTarget(this).then((marked) => {
+        if (!this.open) {
+          return
+        }
+        const first = marked ?? (this.modal ? this.closer : null)
+        if (first) {
+          focusAs(first, focusing)
+        } else {
+          refocusWithin(this, focusing)
+        }
+      })
       /* At the smallest snap point, once the panel has a size to measure. */
       this.restAt(parseSnapPoints(this.snapPoints)[0] ?? 1)
     } else if (!this.open && panel.open) {
       panel.close()
     }
+  }
+
+  /**
+   * The control that closes this drawer: a slotted one whose `command` closes
+   * it, such as Close or Cancel, and else the close control `dismissible` draws.
+   */
+  private get closer(): HTMLElement | null {
+    const closes = [
+      ...this.querySelectorAll<HTMLElement>(
+        '[command="--close"], [command="close"], [command="request-close"]',
+      ),
+    ].find((one) => {
+      const target = one.getAttribute('commandfor')
+      return target === null || target === this.id
+    })
+    /* The close control `drawDismiss` draws, the panel's one button of its own. */
+    return closes ?? this.renderRoot.querySelector<HTMLElement>('dialog > button')
   }
 
   protected override render(): TemplateResult {

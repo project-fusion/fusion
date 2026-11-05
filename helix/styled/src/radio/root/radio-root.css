@@ -160,7 +160,8 @@ slot[name="indicator"]::slotted(*) {
   align-items: start;
   background-color: var(--radio-card-background-color, var(--helix-color-surface));
   border: var(--helix-border-thin) solid var(--radio-card-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
+  /* A card's corner, as Card draws it: 8 at the default, where it drew 4. */
+  border-radius: var(--helix-radii-md);
   display: flex;
   gap: var(--helix-space-sm);
   inline-size: 100%;
@@ -174,8 +175,13 @@ slot[name="indicator"]::slotted(*) {
    for the same value: the surface is told apart by its own color, so a column
    of choices is a set of grounds rather than a grid of hairlines. The border is
    kept and made transparent rather than removed, so the box is the same size in
-   both and a set mixing them does not step. */
+   both and a set mixing them does not step.
+
+   **The fill is `surface-filled`, the wash every `filled` surface takes.** It
+   drew `surface`, 1.04:1 on the white page, which is nearly the page; the wash
+   is 1.12 there and on every ground. */
 :host([separation="filled"]) [part="item"] {
+  background-color: var(--radio-card-background-color, var(--helix-color-surface-filled));
   border-color: transparent;
 }
 

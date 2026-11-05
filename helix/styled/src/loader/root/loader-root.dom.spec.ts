@@ -23,11 +23,11 @@ const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.sp
 /* wa-spinner's `--speed` and `--track-width`, resting on the values the loader
    drew before they were hooks. */
 describe('loader hooks', () => {
-  test('the pace of a turn is a hook that rests on 0.8s', () => {
+  test('the pace of a turn is a hook that rests on the turn token', () => {
     expect(rule('[part="svg"]')).toContain(
       'animation: helix-loader-turn var(--loader-duration, var(--_loader-turn)) linear infinite',
     )
-    expect(rule(':host')).toContain('--_loader-turn: 0.8s')
+    expect(rule(':host')).toContain('--_loader-turn: var(--helix-duration-turn)')
   })
 
   test('the arc and the ring take one width, which rests on two units', () => {
@@ -41,7 +41,7 @@ describe('loader hooks', () => {
   })
 })
 
-/* Under reduced motion the base layer sets every duration token to 0.01ms, so a
+/* Under reduced motion the base layer sets the duration scale to 0.01ms, so a
    crawl scaled from one turned the arc about eight thousand times a second. */
 describe('loader under reduced motion', () => {
   const reduced = (): string[] =>
@@ -50,10 +50,10 @@ describe('loader under reduced motion', () => {
       .slice(1)
       .map((block) => block.split(/\n}\n|}\s*}/)[0] ?? '')
 
-  test('the turn slows to one turn in four seconds, on no duration token', () => {
+  test('the turn slows to one turn in four seconds, on the crawl token, which the base layer leaves alone', () => {
     const turn = reduced().find((block) => /\[part="svg"\]\s*\{/.test(block)) ?? ''
     expect(turn).toContain('animation-duration: var(--_loader-crawl)')
     expect(turn).not.toContain('--helix-duration')
-    expect(rule(':host')).toContain('--_loader-crawl: 4s')
+    expect(rule(':host')).toContain('--_loader-crawl: var(--helix-duration-crawl)')
   })
 })

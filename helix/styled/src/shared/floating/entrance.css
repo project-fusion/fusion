@@ -21,10 +21,15 @@
   opacity: 0;
   scale: 0.96;
   transform: translateY(var(--_travel));
+  /* **The way out.** A change runs the transition of the state it arrives at,
+     so this rule, the closed one, carries the exit, and the placed one below
+     the entrance. Leaving, a panel accelerates away, as Popover's and Dialog's
+     do. Menu and Select left on the entrance's overshoot, swelling as they
+     went. */
   transition:
-    opacity var(--helix-duration-fast) var(--helix-easing-standard),
-    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
-    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-accelerate),
+    transform var(--helix-duration-fast) var(--helix-easing-accelerate),
     display var(--helix-duration-fast) allow-discrete,
     overlay var(--helix-duration-fast) allow-discrete;
 }
@@ -53,6 +58,13 @@
   opacity: 1;
   scale: 1;
   transform: none;
+  /* The way in, with the small overshoot an arrival has. */
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-standard),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized),
+    transform var(--helix-duration-fast) var(--helix-easing-emphasized),
+    display var(--helix-duration-fast) allow-discrete,
+    overlay var(--helix-duration-fast) allow-discrete;
 }
 
 /* The panel still has to arrive, so what goes is the movement, not the

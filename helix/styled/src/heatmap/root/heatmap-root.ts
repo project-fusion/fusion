@@ -3,6 +3,7 @@ import { HelixHeadlessHeatmap } from '@fusion.dev/helix-headless/heatmap'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles } from './heatmap-root.css.js'
 import '../../tooltip/index.js'
 
@@ -78,7 +79,7 @@ import '../../tooltip/index.js'
 export class HelixHeatmap extends HelixHeadlessHeatmap {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [styles, sonifyStyles]
+  static override styles: CSSResultGroup = [styles, sonifyStyles, statusMarkStyles]
 
   /**
    * How strongly the cells are drawn, as on every chart.

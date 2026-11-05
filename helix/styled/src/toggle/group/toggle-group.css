@@ -95,10 +95,17 @@
 /* A framed track, and it is what makes the whole control read. */
 :host(:not([separation])) [part="track"] {
   /* Concentric, which is the outer radius less everything between the two
-     curves: the border and the padding. */
+     curves: the border and the padding. **The padding was left out**, so a 3
+     corner sat inside a 4 at a 5 inset, rounder than the curve around it. At the
+     default seed the answer is square, and at a seed of 16 it is 3. */
   --_toggle-radius: var(
     --toggle-group-item-radius,
-    calc(var(--toggle-group-radius, var(--helix-radii-sm)) - var(--helix-border-thin))
+    max(
+      var(--helix-radii-none),
+      var(--toggle-group-radius, var(--helix-radii-sm)) -
+      var(--helix-border-thin) -
+      var(--helix-space-2xs)
+    )
   );
   /* The border joins the padding in what the row has to give back. */
   --_toggle-height: calc(

@@ -6,26 +6,34 @@
   --_calendar-track: var(--date-picker-track-size, 2.5rem);
   --_calendar-row: var(--date-picker-row-size, 2.25rem);
   --_calendar-day: var(--date-picker-day-size, calc(var(--helix-size-control) * 0.75));
+  --_calendar-month: calc(var(--_calendar-track) * 7);
   display: inline-block;
 }
 
 /*
- * Two months to a row, and the rest underneath.
+ * Two months to a row, the rest underneath, and one to a row where two do not
+ * fit.
  *
- * Not a flex row: without `wrap` it can do nothing but overflow, and `months="3"`
- * measured 872px wide in an 820px container, a 560px one and a 320px one alike.
- * Wrapping cures the overflow and leaves the layout at the mercy of whatever box
- * it is in, so a calendar changes shape as the page does.
+ * A row that wraps, held to the width of the columns. Unwrapped, `months="3"`
+ * measured 872px wide in an 820px container, a 560px one and a 320px one alike;
+ * wrapping with no limit put three in a row wherever three fitted. A grid of two
+ * columns had no fold: a range across two months ran 272 pixels out of a 280
+ * column. Held to two months and their gap, the row wraps the third under the
+ * first two, and wraps the second under the first only where the box cannot
+ * hold both.
  */
 [part="months"] {
+  --_calendar-columns: var(--date-picker-columns, var(--date-picker-column-count, 1));
   align-items: start;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--helix-space-md);
-  grid-template-columns: repeat(
-      var(--date-picker-columns, var(--date-picker-column-count, 1)),
-      max-content
-    );
-  justify-content: start;
+  max-inline-size: calc(
+    var(--_calendar-columns) *
+    var(--_calendar-month) +
+    (var(--_calendar-columns) - 1) *
+    var(--helix-space-md)
+  );
 }
 
 /*
@@ -146,18 +154,19 @@
   box-shadow: inset 0 0 0 var(--helix-border-thin) var(--helix-color-border);
 }
 
+/* The chosen month or year takes the chosen day's fill. */
 [part~="period-selected"] {
   background-color: var(
     --date-picker-selected-background-color,
-    var(--helix-color-surface-inverse)
+    var(--helix-color-primary-surface)
   );
-  color: var(--helix-color-foreground-inverse);
+  color: var(--helix-color-foreground-on-primary);
 }
 
 [part~="period-selected"]:hover:not([aria-disabled]) {
   background-color: var(
     --date-picker-selected-background-color,
-    var(--helix-color-surface-inverse)
+    var(--helix-color-primary-surface)
   );
 }
 
@@ -274,8 +283,26 @@
 
 /* `:not([data-outside])` as well, since a filler day takes no click and a cell
    that lights under the pointer is a cell offering one. */
-[part~="cell"]:hover:not([aria-disabled], [data-outside]) [part~="day"] {
+/* Not on a calendar that is off or read-only either, which takes no press: the
+   days of a disabled calendar lit under the pointer, under a pointing hand. */
+:host(:not(:disabled, [readonly]))
+  [part~="cell"]:hover:not([aria-disabled], [data-outside])
+  [part~="day"] {
   background-color: var(--helix-color-surface-sunken);
+}
+
+/* And a step past the hover under a press, which had none: a press drew the
+   hover's fill, so a reader on a phone, with no hover first, saw nothing. Not
+   on a chosen day, whose solid mark it would wash out. */
+:host(:not(:disabled, [readonly]))
+  [part~="cell"]:active:not([aria-disabled], [data-outside], [aria-selected])
+  [part~="day"] {
+  background-color: var(--helix-color-press);
+}
+
+:host(:disabled) [part~="cell"],
+:host([readonly]) [part~="cell"] {
+  cursor: inherit;
 }
 
 /* The band, on the cell, and only where there is a run to band.
@@ -329,19 +356,17 @@
 }
 
 /* The ends of a range, and a single date, are the solid mark; the days between
-   carry only the band. Grays rather than the accent, the same call Time's range
-   takes.
-
-   **`foreground-muted` is an ink, and this is a ground.** It measures 6.01
-   against white in light and 2.58:1 in dark, an ink following the page and
-   inverting with it. A ground that must stay dark while the page goes light is
-   `surface-inverse`, which is what it says. */
+   carry only the band. **The primary fill, as a Switch that is on takes it**:
+   a chosen date is a value set, and under a brand seed an ink day beside a
+   brand Switch read as two systems. Decided by the owner on November 3, 2026.
+   With no brand the primary fill is the ink mirror, so the default is drawn
+   as before. The Slider thumb stays ink, a handle rather than a value. */
 [part~="cell"][aria-selected]:not([data-range-middle]) [part~="day"] {
   background-color: var(
     --date-picker-selected-background-color,
-    var(--helix-color-surface-inverse)
+    var(--helix-color-primary-surface)
   );
-  color: var(--helix-color-foreground-inverse);
+  color: var(--helix-color-foreground-on-primary);
 }
 
 [part~="cell"][aria-disabled] {
@@ -495,6 +520,19 @@
   [part~="cell"][data-outside] [part~="day"] {
     color: GrayText;
   }
+
+  /* Today's ring is a shadow, and forced colors draw no shadows, so today
+     looked like any other day. An outline in the text color, inside the day,
+     says it instead, and gives way to the focus ring. */
+  [part~="cell"][data-today] [part~="day"] {
+    outline: var(--helix-border-thin) solid CanvasText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+
+  [part~="cell"][data-today]:focus-visible [part~="day"] {
+    outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+    outline-offset: var(--helix-size-focus-offset);
+  }
 }
 
 /* Days sit against each other, so on a touch screen the cell itself grows to the
@@ -506,14 +544,8 @@
 @media (pointer: coarse) {
   :host {
     --_calendar-row: var(--date-picker-row-size, var(--helix-size-target));
+    --_calendar-month: calc(var(--_calendar-reach) * 7);
     --_calendar-reach: var(--date-picker-track-size, var(--helix-size-target));
-  }
-
-  [part="months"] {
-    grid-template-columns: repeat(
-        var(--date-picker-columns, var(--date-picker-column-count, 1)),
-        minmax(min-content, max-content)
-      );
   }
 
   [part="week"] {

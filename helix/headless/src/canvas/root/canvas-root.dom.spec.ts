@@ -349,8 +349,9 @@ describe('canvas', () => {
     }
     const zoomIn = part(host, 'zoom-in')?.querySelector('slot') as HTMLSlotElement
     expect(zoomIn.assignedElements()).toEqual([host.querySelector('#plus') as Element])
-    expect(part(host, 'zoom-out')?.textContent?.trim()).toBe('−')
-    expect(part(host, 'pan-up')?.textContent?.trim()).toBe('↑')
+    /* The glyphs a slot falls back to are drawn from the icon set. */
+    expect(part(host, 'zoom-out')?.querySelector('slot > svg[data-glyph]')).not.toBeNull()
+    expect(part(host, 'pan-up')?.querySelector('slot > svg[data-glyph]')).not.toBeNull()
   })
 
   test('choosing a card brings the board to it', async () => {

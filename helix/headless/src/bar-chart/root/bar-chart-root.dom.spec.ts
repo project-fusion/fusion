@@ -17,6 +17,11 @@ const REVENUE = `<table id="revenue">
   </tbody>
 </table>`
 
+/* A chart with no axis and no rules, whose tallest reading fills the box, for
+   the specs that measure the drawing's arithmetic. The default raises the top
+   to a numbered level above the tallest reading. */
+const BARE = 'gridlines="none" value-axis="none"'
+
 const chart = async (table: string, attributes: string): Promise<HTMLElement> => {
   await mount(
     `<div>${table}<helix-headless-bar-chart ${attributes}></helix-headless-bar-chart></div>`,
@@ -62,7 +67,7 @@ describe('bar chart', () => {
   test('data-value is the number and the cell text is for the reader', async () => {
     // The case where the value is written twice, on purpose: `$100k` is what a
     // reader should see and is not a number.
-    const host = await chart(REVENUE, 'for="revenue"')
+    const host = await chart(REVENUE, `for="revenue" ${BARE}`)
     const heights = bars(host).map((one) => Number(one.getAttribute('height')))
     // 100, 50 and 200 against a top of 200 in a box of 100.
     expect(heights).toEqual([50, 25, 100])
@@ -84,7 +89,7 @@ describe('bar chart', () => {
         <tr><th scope="row">A</th><td>-4</td></tr>
         <tr><th scope="row">B</th><td>4</td></tr>
       </tbody></table>`,
-      'for="delta"',
+      `for="delta" ${BARE}`,
     )
     const tops = bars(host).map((one) => Number(one.getAttribute('y')))
     // Zero is included at both ends, so the baseline lands halfway.
@@ -98,7 +103,7 @@ describe('bar chart', () => {
         <thead><tr><th>Week</th><th>Big</th><th>Small</th></tr></thead>
         <tbody><tr><th scope="row">W1</th><td>100</td><td>10</td></tr></tbody>
       </table>`,
-      'for="two"',
+      `for="two" ${BARE}`,
     )
     const heights = bars(host).map((one) => Number(one.getAttribute('height')))
     expect(heights[0]).toBe(100)
@@ -221,7 +226,8 @@ describe('naming a series', () => {
       ).length ?? 0
     expect(await axes('Conversion')).toBe(2)
     expect(await axes('Partner, Conversion')).toBe(2)
-    expect(await axes('')).toBe(0)
+    /* With no second scale, the primary alone, which is drawn by default. */
+    expect(await axes('')).toBe(1)
   })
 
   test('a name no column carries still leaves a chart rather than a blank', async () => {
@@ -248,7 +254,7 @@ describe('a blank cell', () => {
   })
 
   test('draws no column, and every other reading stays under its own label', async () => {
-    const host = await chart(GAP, 'for="gap"')
+    const host = await chart(GAP, `for="gap" ${BARE}`)
     const groups = [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])]
     const heights = groups.map((group) =>
       [...group.querySelectorAll('[part~="bar"]')].map((bar) => [
@@ -372,7 +378,7 @@ describe('stacked', () => {
   const near = (actual: number, expected: number): boolean => Math.abs(actual - expected) < 0.01
 
   test('stands each series on the ones before it, one column a category, scaled to the totals', async () => {
-    const host = await chart(MIX, 'for="mix" stacked')
+    const host = await chart(MIX, `for="mix" stacked ${BARE}`)
     const [q1New = [], q1Renewed = [], q2New = [], q2Renewed = []] = bars(host).map(box)
     /* One column a category: the same x and the same width for both series. */
     expect([q1New[0], q1New[2]]).toEqual([q1Renewed[0], q1Renewed[2]])
@@ -383,7 +389,7 @@ describe('stacked', () => {
   })
 
   test('absent stands them side by side, as before', async () => {
-    const host = await chart(MIX, 'for="mix"')
+    const host = await chart(MIX, `for="mix" ${BARE}`)
     const [q1New = [], q1Renewed = []] = bars(host).map(box)
     expect(q1New[0]).not.toBe(q1Renewed[0])
     expect(near(q1Renewed[3] ?? 0, 100 / 6)).toBe(true)
@@ -550,22 +556,41 @@ describe('the reading, heard by the page', () => {
 })
 
 /* A reading could be measured only from the tooltip: the drawing had no numbers
-   beside it. */
-describe('value-axis', () => {
+   beside it. Drawn by default since November 3, 2026, the owner's decision. */
+describe('the value axis', () => {
   const ticks = (host: HTMLElement): string[] =>
     [...(host.shadowRoot?.querySelectorAll('[part="tick"]') ?? [])].map(
       (one) => one.textContent ?? '',
     )
+  const rules = (host: HTMLElement): number =>
+    host.shadowRoot?.querySelectorAll('[part="gridline"]').length ?? 0
 
-  test("draws the scale's numbers beside the plot, at the levels the grid rules", async () => {
-    const host = await chart(REVENUE, 'for="revenue" value-axis')
+  test("draws the scale's numbers beside the plot by default, at the levels the grid rules", async () => {
+    const host = await chart(REVENUE, 'for="revenue"')
     expect(part(host, 'axis')?.getAttribute('aria-hidden')).toBe('true')
-    expect(ticks(host)).toEqual(['0', '50', '100', '150', '200'])
+    /* 200 is the tallest, and the top is raised to the next level, 250. */
+    expect(ticks(host)).toEqual(['0', '50', '100', '150', '200', '250'])
+    expect(rules(host)).toBe(6)
   })
 
-  test('absent draws none', async () => {
+  test('the tallest column stands clear of the top edge', async () => {
     const host = await chart(REVENUE, 'for="revenue"')
-    expect(part(host, 'axis')).toBeNull()
+    const heights = bars(host).map((one) => Number(one.getAttribute('height')))
+    expect(heights).toEqual([40, 20, 80])
+  })
+
+  test('`none` draws no axis, and `gridlines="none"` no rules, so the tallest fills the box', async () => {
+    const host = await chart(REVENUE, `for="revenue" ${BARE}`)
+    expect(host.shadowRoot?.querySelector('[part="axis"]')).toBeNull()
+    expect(rules(host)).toBe(0)
+    expect(bars(host).map((one) => Number(one.getAttribute('height')))).toEqual([50, 25, 100])
+    expect(host.getAttribute('value-axis')).toBe('none')
+  })
+
+  test('the host carries no attribute nobody wrote', async () => {
+    const host = await chart(REVENUE, 'for="revenue"')
+    expect(host.hasAttribute('value-axis')).toBe(false)
+    expect(host.hasAttribute('gridlines')).toBe(false)
   })
 })
 

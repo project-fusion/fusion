@@ -59,7 +59,7 @@ export function Example() {
 
       <helix-area-chart
         for="areachartgrid"
-        gridlines="value"
+        gridlines="both"
       ></helix-area-chart>
     </helix-flex>
   )

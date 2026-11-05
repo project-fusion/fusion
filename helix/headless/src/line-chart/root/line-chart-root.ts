@@ -12,6 +12,7 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  headroom,
   linear,
   linePath,
   MIRROR_RULE,
@@ -60,8 +61,10 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * `<svg>` that fills its box scales with the box, so the same `font-size` can
  * render at 10px in a narrow chart and 43px in a wide one.
  *
- * `value-axis` draws the scale's numbers beside the plot, at the levels
- * `gridlines` rules, written in `locale`.
+ * The scale's numbers stand beside the plot, written in `locale`, at the
+ * levels the gridlines rule, and the top of the scale is a level above the
+ * highest reading. `value-axis="none"` and `gridlines="none"` take them away,
+ * for a chart read for its shape.
  *
  * The table is the accessible representation, and the drawing is hidden from
  * screen readers, who get the numbers. The `summary` part names the chart, from
@@ -87,6 +90,9 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * `empty-text`, "No readings", in the plot, and `loading` shows `loading-text`
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
+ * When the readings did not load, set `error-text`, such as "The visits did
+ * not load": it stands in the plot in place of both, and the `error` slot
+ * takes a button that tries again.
  *
  * **Keyboard.** The plot is one tab stop.
  *
@@ -107,17 +113,19 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @documentation https://fusion.dev/helix/components/line-chart
  *
  * @slot empty - Content shown in place of the drawing when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
+ * @slot error - Content shown in place of the drawing while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the drawing while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  *
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The wash under one line, where `area` is set.
- * @csspart axis - The numbers of the scale beside the plot, under `value-axis`.
+ * @csspart axis - The numbers of the scale beside the plot, unless `value-axis` is `none`.
  * @csspart band - The band around the reading under the pointer.
  * @csspart baseline - The rule at zero, where zero is inside the range.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
- * @csspart gridline - One rule across the plot, under `gridlines`.
+ * @csspart error - The words in place of the drawing while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
+ * @csspart gridline - One rule across the plot, unless `gridlines` is `none`.
  * @csspart guide - A rule down the reading a pointer is resting on.
  * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
@@ -162,6 +170,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate error - While the `error` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-line-chart')
@@ -244,9 +253,10 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   /**
    * Which rules are drawn across the plot, if any.
    *
-   * Absent draws none, which is the honest default rather than a timid one: a
-   * chart in a card and a chart beside a figure are read as a shape, and a grid
-   * over one is furniture around a drawing nobody is measuring.
+   * Absent rules the levels, as `value` does, which are the levels the `axis`
+   * part numbers: a reading is measured against the rule beside it. `none`
+   * draws no rules, for a chart in a card or beside a figure that is read as a
+   * shape.
    *
    * `value` rules the axis the readings are *measured* on, at the levels
    * `ticks` picks, which are round numbers anchored to the number line rather
@@ -255,21 +265,19 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * through each reading whose name is drawn, which is what lets a point be
    * traced down to its label across a wide chart. `both` draws both.
    *
-   * **A bare `gridlines` means `value`**, and so does anything unrecognized.
-   * The attribute a consumer reaches for first should be the grid they meant,
-   * and a typo should fall back to the useful half rather than to nothing at
-   * all: an unrecognized value that draws no rules is indistinguishable from
-   * the attribute being absent, which is the one thing a reader cannot debug.
+   * **A bare `gridlines` means `value`**, and so does anything unrecognized,
+   * so a typo draws the rules the chart rests with. Only `none` takes them
+   * away, which is a word nobody types by accident.
    *
    * Furniture rather than data, so the rules are inside the `aria-hidden` plot
    * and reach no reader through the table.
    */
   @property()
-  gridlines?: 'both' | 'category' | 'value'
+  gridlines?: 'both' | 'category' | 'none' | 'value'
 
-  /** Whether the levels are ruled, which is every value but `category`. */
+  /** Whether the levels are ruled, which is every value but `category` and `none`. */
   protected get rulesValue(): boolean {
-    return this.gridlines !== undefined && this.gridlines !== 'category'
+    return this.gridlines !== 'category' && this.gridlines !== 'none'
   }
 
   /** Whether each reading is ruled, which only two values ask for. */
@@ -325,15 +333,23 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   terminus?: 'none' | 'ring' | 'square' | 'triangle'
 
   /**
-   * Draws the scale's numbers beside the plot, the `axis` part, at the levels
-   * `gridlines` rules, so a reading can be measured off the drawing as well
-   * as read from the tooltip.
+   * Whether the scale's numbers are drawn beside the plot, the `axis` part.
    *
-   * Absent draws none: a line read for its shape needs no numbers beside it,
-   * and the tooltip and the table hold every reading.
+   * Absent draws them, at the levels `gridlines` rules, so a reading can be
+   * measured off the drawing as well as read from the tooltip. `none` draws no
+   * axis, for a line read for its shape, where the tooltip and the table hold
+   * every reading.
+   *
+   * Reflected, because the stylesheet gives the axis a column of its own unless
+   * this is `none`, and undefaulted, so a host carries only what you wrote.
    */
-  @property({ attribute: 'value-axis', reflect: true, type: Boolean })
-  valueAxis = false
+  @property({ attribute: 'value-axis', reflect: true })
+  valueAxis?: 'none'
+
+  /** Whether the axis is drawn, which is every value but `none`. */
+  protected get drawsAxis(): boolean {
+    return this.valueAxis !== 'none'
+  }
 
   /** The domain last worked out, held while the series, the hidden ones and `zero` are the same. */
   private ranged: { domain: [number, number]; key: string; series: Series[] } | undefined
@@ -342,7 +358,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   private range(series: Series[]): [number, number] {
     /* Over the series drawn, so hiding one from a legend fits the scale to
        the rest, which is what hiding a series in a chart is for. */
-    const key = `${this.zero} ${series.map((one) => (this.showsSeries(one.name) ? 1 : 0)).join('')}`
+    const key = `${this.zero} ${this.drawsAxis || this.rulesValue} ${series.map((one) => (this.showsSeries(one.name) ? 1 : 0)).join('')}`
     if (this.ranged?.series === series && this.ranged.key === key) {
       return this.ranged.domain
     }
@@ -360,9 +376,13 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       }
     }
     const [floor, top] = low <= high ? [low, high] : [0, 0]
-    const domain: [number, number] = this.zero
+    const extent: [number, number] = this.zero
       ? [Math.min(0, floor), Math.max(0, top)]
       : [floor, top]
+    /* Room above the peak wherever the scale is drawn, so the top edge is a
+       numbered level and the highest reading stands clear of it. A chart with
+       no axis and no rules is read as a shape, and keeps the whole height. */
+    const domain = this.drawsAxis || this.rulesValue ? headroom(extent) : extent
     this.ranged = { domain, key, series }
     return domain
   }
@@ -549,11 +569,11 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     const domain = this.range(series)
     const { x, y } = this.scalesOf(domain, readings.length)
 
-    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
+    return html`${this.drawsAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**
-   * The scale's numbers beside the plot, under `value-axis`, written in the
+   * The scale's numbers beside the plot, unless `value-axis` is `none`, written in the
    * chart's locale. A seam, so a subclass can write the numbers its own way,
    * such as a currency.
    */
@@ -677,7 +697,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     domain: [number, number],
     count: number,
   ): TemplateResult | typeof nothing {
-    if (this.gridlines === undefined) {
+    if (!this.rulesValue && !this.rulesCategory) {
       return nothing
     }
     /* Through each reading rather than between them. A rule on the boundary

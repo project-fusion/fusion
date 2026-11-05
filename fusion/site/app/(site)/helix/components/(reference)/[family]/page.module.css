@@ -10,6 +10,20 @@
   overflow-x: auto;
 }
 
+/* **An example named in a row presses at the target's height.** The link is
+   one 21px line in a row about 60px tall, and a row holds one, so the press
+   grows on the block axis in a transparent box without reaching the next. */
+.apiTable helix-table-cell > a[data-link] {
+  position: relative;
+}
+
+.apiTable helix-table-cell > a[data-link]::after {
+  content: "";
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: 0;
+  position: absolute;
+}
+
 /**
  * **Under 46rem each description takes a line of its own, under its row.** The
  * description takes half the table, and the widest name and type, on

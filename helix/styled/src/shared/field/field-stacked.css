@@ -6,6 +6,10 @@
 
 [part="label"] {
   display: block;
+  /* **The tight leading, rounded to a whole pixel**, so the field under the
+     label starts on one. Unrounded the line was 15.6 at `md` and 14.4 at `sm`,
+     so every edge, value and mark in the box below sat between pixels. */
+  line-height: round(calc(var(--helix-leading-tight) * 1em), 1px);
   /*
  *  On top of the stack's own gap, so the label sits a step further from the
  *      control than the hint under it does. The two distances are not the same

@@ -156,6 +156,21 @@ reading a chart is usually read for:
 
 `Heatmap` and `Spatial Heatmap` are each an image with that name. `Sparkline` takes a `label` of its own.
 
+## The scale beside the plot
+
+`Line Chart`, `Area Chart`, and `Bar Chart` draw the numbers of their scale
+beside the plot, with a rule across the plot at each number. The top of the
+scale is a round number above the highest reading, so the peak stands clear of
+the top edge.
+
+- `gridlines="both"` also rules each reading whose name is drawn, and
+  `gridlines="category"` rules those readings alone.
+- `value-axis="none"` and `gridlines="none"` take the numbers and the rules
+  away, for a chart read for its shape, such as one in a card beside the figure
+  it explains.
+
+`Sparkline` draws no scale, and `Scatter Chart` draws both of its axes.
+
 ## Tables that change
 
 A chart follows its table. It redraws when you edit a cell, add a row, or

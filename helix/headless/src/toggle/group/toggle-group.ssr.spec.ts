@@ -26,7 +26,9 @@ describe('toggle group server output', () => {
     expect(hasPart(empty, 'track')).toBe(true)
     const item = ssr(html`<helix-headless-toggle value="light"></helix-headless-toggle>`)
     expect(partTag(item, 'item')).toContain('role="radio"')
-    expect(rendered(item, 'helix-headless-toggle')).toContain('<slot></slot>')
+    expect(rendered(item, 'helix-headless-toggle')).toContain(
+      '<span part="label"><slot></slot></span>',
+    )
   })
 
   test('the group names itself in markup, not on the first client render', () => {

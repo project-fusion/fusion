@@ -62,10 +62,16 @@
   --site-glass-backdrop: blur(40px) saturate(1.5);
 
   /* *The same glass, at the coverage a light page needs.** Thirty percent is one
-     number doing two jobs, and it is only right for one of them. */
+     number doing two jobs, and it is only right for one of them.
+
+     **Dense in dark as well, at Helix's own dark glass coverage.** At 30
+     percent the search palette over the home page's hero let the 96px blue
+     headline through as a blue field behind its rows and its key hints, and the
+     quiet text on it fell to 5.0:1 against the brightest of it. Sixty is what
+     every Helix glass panel covers in dark since November 3, 2026. */
   --site-glass-dense: light-dark(
     color-mix(in oklab, var(--helix-color-surface) 78%, transparent),
-    var(--site-glass)
+    color-mix(in oklab, var(--helix-color-surface) 60%, transparent)
   );
 
   /* The page runs edge to edge and the inset is what holds it off the sides. */
@@ -404,6 +410,8 @@ helix-drawer[material="glass"] {
   [data-closing]::before,
   [data-card-edge]::before {
     animation: site-card-edge 8s linear infinite;
+    /* Held still until the card is on screen. `CardEdgeWatch` marks it. */
+    animation-play-state: paused;
     background: conic-gradient(
       from var(--card-edge-angle),
       transparent 0%,
@@ -429,6 +437,10 @@ helix-drawer[material="glass"] {
       linear-gradient(black 0 0);
     mask-composite: exclude;
     -webkit-mask-composite: xor;
+  }
+
+  :is([data-substrate], [data-closing], [data-card-edge])[data-edge-in-view]::before {
+    animation-play-state: running;
   }
 }
 
@@ -476,6 +488,41 @@ helix-drawer[material="glass"] {
   color: var(--helix-color-foreground);
 }
 
+/* **A link drawn as a button presses like one.** Helix's `data-button` recipe
+   draws the box at the control's height and stops there, so on a touch screen
+   View Source measured 32 tall and the 40px buttons 40. The press reaches
+   `--helix-size-target` on the block axis, in a transparent box, as the icon
+   links above do; the buttons are wider than the target already and often sit
+   in a row, so the box grows on that axis only. `:where`, so a page that places
+   one of these itself keeps its own `position`. */
+:where([data-button]) {
+  position: relative;
+}
+
+[data-button]::after {
+  content: "";
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: 0;
+  position: absolute;
+}
+
+/* **A link standing on its own in a row presses the same way.** The onward
+   links under a section, the agent surfaces and the article's filing tag are
+   text, 21 to 28px tall, and the wordmark in the header is 33, all laid out
+   by `helix-flex` or the header rather than set in a sentence. A link inside
+   running text keeps the line's height, which is the exception the target
+   size makes for it. */
+:where(:is(helix-flex, helix-app-header) > a[data-link]) {
+  position: relative;
+}
+
+:is(helix-flex, helix-app-header) > a[data-link]::after {
+  content: "";
+  inset-block: calc((var(--helix-size-target) - 100%) / -2);
+  inset-inline: 0;
+  position: absolute;
+}
+
 [data-substrate] {
   border-radius: var(--helix-radii-md);
   padding: var(--helix-space-lg);
@@ -495,14 +542,13 @@ helix-drawer[material="glass"] {
   line-height: var(--helix-leading-tight);
 }
 
-/* A vertical is a row rather than a card. */
+/* A vertical is a row rather than a card. **Its rules stop at the text's
+   edges.** The row was pulled out past them by its own inset, room for a hover
+   fill it no longer has, so its rules ran 16px past the column into the page's
+   gutter: at 390, from 8 to 382 under text set from 24 to 366. */
 [data-row] {
   border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-sm);
-  margin-inline: calc(var(--helix-space-md) * -1);
   padding-block: var(--helix-space-lg);
-  padding-inline: var(--helix-space-md);
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 [data-row]:first-of-type {
@@ -801,4 +847,38 @@ helix-app-header {
 .artBrandStroke {
   fill: none;
   stroke: var(--helix-color-accent-muted);
+}
+
+/* **On a phone a table marked `data-stacked` puts its last column under each
+   row.** `stackTable` in `utils/mdx/mdx.ts` marks a table whose last column says
+   the most, a sentence beside a name, and writes the other columns' tracks into
+   `--table-stacked`. The last heading goes out of sight and stays a column
+   heading, so a screen reader still reads each sentence as that column's, and
+   the rule under the cells above it goes, so a row and its sentence read as
+   one. The same arrangement as the API tables on the component pages. */
+@media (width < 30rem) {
+  helix-table[data-stacked] {
+    --table-columns: var(--table-stacked);
+  }
+
+  helix-table[data-stacked] helix-table-column:last-of-type::part(column) {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  /* `contain` so the sentence, spanning every track, adds nothing to their
+     sizes: without it its width was shared out between the tracks, and the
+     Grounds table split 179 and 179 and broke a token name it had room for. */
+  helix-table[data-stacked] helix-table-cell:last-child {
+    contain: inline-size;
+    grid-column: 1 / -1;
+  }
+
+  helix-table[data-stacked] helix-table-cell:not(:last-child) {
+    --table-rule-color: transparent;
+  }
 }

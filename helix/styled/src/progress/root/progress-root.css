@@ -109,12 +109,13 @@ slot[name="label"]::slotted(*) {
    tenths wide, and the two compose without either needing to know the track's
    pixel width. */
 /* Slow enough to read as work rather than as a stripe going past. The crawl is
-   the ring's turn under reduced motion, twelve cycles long, and a fixed rate:
-   the base layer sets every duration token to 0.01ms under the preference, so
-   a crawl scaled from the cycle turned the ring about seventeen hundred times a
-   second. */
+   the ring's turn under reduced motion, and a fixed rate: the base layer sets
+   every duration token to 0.01ms under the preference, so a crawl scaled from
+   the cycle turned the ring about seventeen hundred times a second. **It is
+   `duration-crawl`, the rate every other ring crawls at**, where it was a 19.2s
+   literal of its own. */
 :host([indeterminate]) {
-  --_progress-crawl: 19.2s;
+  --_progress-crawl: var(--helix-duration-crawl);
   --_progress-cycle: calc(var(--helix-duration-slow) * 5);
 }
 

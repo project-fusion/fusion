@@ -361,6 +361,19 @@ describe('connectGraph', () => {
     expect(recorder.asked.centered).toEqual(['c'])
   })
 
+  test('a selection that came with the notes is framed again where the layout puts it', async () => {
+    const host = await frame()
+    host.active = 'c'
+    await host.updateComplete
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    const before = recorder.asked.centered.length
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 40, y: 0 }, c: { x: 80, y: 30 } })
+    await settled(host)
+    expect(recorder.asked.centered.slice(before)).toEqual(['c'])
+  })
+
   test('a press on no note lets the selection go', async () => {
     const host = await frame()
     const recorder = recording()
@@ -541,8 +554,9 @@ describe('connectGraph', () => {
     const sizes = Object.fromEntries(
       (asked.drawn.at(-1)?.nodes ?? []).map((node) => [node.id, node.size]),
     )
-    /* `a` and `b` share one link; `c` has none. */
-    expect(sizes).toEqual({ a: 2, b: 2, c: 1 })
+    /* `a` and `b` share one link; `c` has none, and is drawn as large as a
+       note with one, so a note alone reads as a note. */
+    expect(sizes).toEqual({ a: 2, b: 2, c: 2 })
   })
 
   test('brings a note a walk along the links reached into view, and not a note the list arrows reach', async () => {

@@ -137,6 +137,12 @@
   /* The track is `minmax(0, 1fr)` so it may shrink, and a block box in it has to
      be allowed to shrink with it rather than hold it open at its text's width. */
   min-inline-size: 0;
+  /* **An unbroken label breaks at the panel's edge.** The panel is as wide as
+     the screen allows, and an identifier wider than that ran past it and was
+     cut through a letter: measured at 340 pixels, 60 characters with no space
+     in them. `anywhere` and not `break-word`, because only `anywhere` lowers
+     the width the panel sizes itself from. Words with spaces wrap as before. */
+  overflow-wrap: anywhere;
 }
 
 /* A line under the label, in the label's column. Only where there is one, so
@@ -251,7 +257,7 @@ slot[name="submenu"]::slotted(helix-divider) {
     var(--_menu-material-fill, var(--helix-color-surface-overlay))
   );
   backdrop-filter: var(--_menu-material-backdrop, none);
-  --_floating-border-color: var(--menu-border-color, var(--helix-color-border));
+  --_floating-border-color: var(--menu-border-color, var(--helix-color-border-floating));
   --_floating-border-width: var(--menu-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--menu-shadow, var(--helix-shadow-floating));
 
@@ -282,8 +288,11 @@ slot[name="submenu"]::slotted(helix-divider) {
   background-color: var(--_menu-item-press, var(--helix-color-press));
 }
 
-/* A command that destroys something says so in its ink and its wash. */
-:host([tone="danger"]) [part~="item"] {
+/* A command that destroys something says so in its ink and its wash, its
+   leading icon included: the column's quiet ink left a gray trash can beside a
+   red label. */
+:host([tone="danger"]) [part~="item"],
+:host([tone="danger"]) [part="start"] {
   color: var(--helix-color-danger);
 }
 
@@ -296,4 +305,11 @@ slot[name="submenu"]::slotted(helix-divider) {
     --menu-item-hover-background-color,
     color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
   );
+}
+
+/* **And a press a step past it, 20%**, as a normal row's press is a step past
+   its hover. Under the danger wash the press drew the same 12% as the hover,
+   so a pressed delete looked exactly like one under the pointer. */
+:host([tone="danger"]:not([disabled])) [part~="item"]:active {
+  background-color: color-mix(in oklab, var(--helix-color-danger) 20%, transparent);
 }

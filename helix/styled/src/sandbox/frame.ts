@@ -202,9 +202,14 @@ const serveWith = (tools: FrameTools, options: ServePreviewOptions = {}): (() =>
     const { colorMode, direction = 'ltr', layout = 'padded', source = '', styles = '' } = event.data
     document.documentElement.dir = direction
     root.dataset.layout = layout
+    /* None sent is the reader's own machine again, so a mode the page took
+       away is taken away here too, and not kept from the last render. */
     if (colorMode) {
       document.documentElement.dataset.colorMode = colorMode
       document.documentElement.style.colorScheme = colorMode
+    } else {
+      delete document.documentElement.dataset.colorMode
+      document.documentElement.style.removeProperty('color-scheme')
     }
     const fresh = source !== rendered
     if (fresh) {

@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSparkline } from '@fusion.dev/helix-headless/sparkline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as terminusStyles } from '../../shared/chart/terminus.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './sparkline-root.css.js'
@@ -75,7 +76,7 @@ export class HelixSparkline extends HelixHeadlessSparkline {
   @property({ reflect: true })
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
-  static override styles: CSSResultGroup = [liveStyles, terminusStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, terminusStyles, styles, statusMarkStyles]
 
   /**
    * The shape of the mark on the last reading.

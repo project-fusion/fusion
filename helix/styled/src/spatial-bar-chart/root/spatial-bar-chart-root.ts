@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as spatialStyles } from '../../shared/chart/spatial.css.js'
+import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-bar-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -60,6 +61,7 @@ export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {
     tooltipStyles,
     styles,
     sonifyStyles,
+    statusMarkStyles,
   ]
 
   /**

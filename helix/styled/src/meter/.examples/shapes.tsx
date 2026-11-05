@@ -3,6 +3,7 @@ export function Example() {
     <helix-flex
       align-items="center"
       gap="lg"
+      wrap
     >
       <helix-meter
         high={80}

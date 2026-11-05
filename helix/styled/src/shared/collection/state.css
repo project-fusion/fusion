@@ -23,3 +23,34 @@
   padding-inline: var(--_collection-inset-inline, var(--helix-space-sm));
   text-align: center;
 }
+
+/* **A turning ring before "Loading"**, so the wait reads at a glance as work
+   happening and not as a sentence, where the line alone was the only sign.
+   Loader's ring at the size of the text: a quiet track and one arc of the
+   ink, turning at the turn every spinner reads, and at the crawl with motion
+   reduced. Drawn by a pseudo-element, so it is no word a screen reader hears. */
+[part="loading"]::before {
+  animation: helix-collection-turn var(--helix-duration-turn) linear infinite;
+  block-size: 1em;
+  border: var(--helix-border-thick) solid color-mix(in oklab, currentColor 18%, transparent);
+  border-block-start-color: currentColor;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  content: "";
+  display: inline-block;
+  inline-size: 1em;
+  margin-inline-end: var(--helix-space-xs);
+  vertical-align: -0.125em;
+}
+
+@keyframes helix-collection-turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="loading"]::before {
+    animation-duration: var(--helix-duration-crawl);
+  }
+}

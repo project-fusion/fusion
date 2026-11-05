@@ -33,6 +33,17 @@
   margin-inline-start: var(--helix-space-xs);
 }
 
+/* **A label longer than its segment ends in an ellipsis.** The words sat in the
+   button's own line, which a flex box cannot cut short, so a 299 pixel segment
+   clipped a 328 pixel label 29 pixels at each end with nothing to say so. The
+   label is its own box that can shrink, and the button keeps its centering. */
+[part="label"] {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 [part="item"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

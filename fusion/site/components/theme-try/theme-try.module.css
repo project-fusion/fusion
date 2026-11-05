@@ -88,3 +88,23 @@ fieldset.tryControl {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-space-2xs);
 }
+
+/* **On a touch screen each swatch's press reaches 44 in a transparent box**,
+   so the 24px dot stays the size it is drawn. At an 8px gap the boxes would
+   overlap, so the gap opens until they meet: 20px, on both axes for a row that
+   wraps. */
+@media (pointer: coarse) {
+  .trySwatches {
+    gap: calc(var(--helix-size-target) - 1.5rem);
+  }
+
+  .trySwatch {
+    position: relative;
+  }
+
+  .trySwatch::after {
+    content: "";
+    inset: calc((var(--helix-size-target) - 100%) / -2);
+    position: absolute;
+  }
+}

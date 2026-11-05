@@ -165,6 +165,7 @@ import { over } from '../align.js'
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
  *
+ * @cssstate error - While `error-text` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the list is open.
  * @cssstate placed-bottom - While the open list sits below the trigger.
@@ -224,6 +225,16 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No options'
+
+  /**
+   * What the list says when its options could not be loaded, such as after a
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it. Passed to the list, which shows it in
+   * the danger color under any options there are and tells screen readers, as
+   * Combobox's does.
+   */
+  @property({ attribute: 'error-text' })
+  errorText: string | null = ''
 
   /**
    * Whether the list can be narrowed by typing.
@@ -906,6 +917,9 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     super.updated(changed)
     this.sync()
     this.linkHost()
+    /* The list's `error` on the host too, as Combobox says it, so a page
+       styles the whole control from it. */
+    this.toggleState('error', Boolean(this.errorText))
     /* The panel follows `open` through the controller, which reads it after
        every update. What is left here is what only this element knows. */
     if (this.open) {
@@ -964,6 +978,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       no-results-text=${this.noResultsText}
       loading-text=${this.loadingText}
       ?loading=${this.loading}
+      error-text=${this.errorText || nothing}
       part="listbox"
       exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
         filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,

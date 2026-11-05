@@ -127,8 +127,9 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  *
  * @slot empty - Content shown in place of the cells when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
+ * @slot error - Content shown in place of the cells while `error-text` is set and there are no readings, such as a button that tries again. Falls back to `error-text`.
  * @slot loading - Content shown in place of the cells while `loading` is set and there are no readings yet. Falls back to `loading-text`.
- * @slot start - Below the strip, at the leading edge: usually the oldest date.
+ * @slot start - Below the strip, at the leading edge: usually the oldest date. While a narrow strip drops its oldest readings, the first drawn row's name stands in its place.
  * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
  * @event {Event} change - Fired once a press or a key has changed which cells are selected.
@@ -142,6 +143,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart cell-selected - A cell that is selected, under `selection-mode`. Set alongside `cell`.
  * @csspart empty - The words in place of the cells when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
+ * @csspart error - The words in place of the cells while `error-text` is set and there are no readings: the `error` slot, falling back to `error-text`. Announced as it appears.
  * @csspart footer - The three-slot row under the strip.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the cells while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
@@ -190,6 +192,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  *
  * @cssstate active - While a cell is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in place of the cells.
+ * @cssstate error - While the `error` part stands in place of the cells.
  * @cssstate loading - While the `loading` part stands in place of the cells.
  */
 @customElement('helix-headless-heatmap')
@@ -838,6 +841,18 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
               ></span>`
     })
     const at = this.pointer.at
+    /* **The start names the first day drawn once the strip drops days.** The
+       `start` slot names the oldest reading of the table, and a narrow strip
+       draws the newest it has room for: measured November 3, 2026 at 390, the
+       preview dropped nine days and still read "28 Jul" under a strip that
+       began on 6 Aug. While days are dropped, the slotted words stay in the
+       document, hidden, and the first drawn row's name stands in their place.
+       Only where something is slotted, so a footer you left empty stays empty. */
+    const dropped = this.dropped
+    const drawnStart =
+      dropped > 0 && this.querySelector(':scope > [slot="start"]') !== null
+        ? (this.sourceRows[dropped]?.label ?? '')
+        : ''
     return html`<div
         aria-activedescendant=${grid && at >= 0 ? `cell-${at}` : nothing}
         aria-describedby=${readable ? 'helix-chart-summary' : nothing}
@@ -859,7 +874,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       </div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer">
-        <span part="start"><slot name="start"></slot></span>
+        <span part="start"><slot ?hidden=${drawnStart !== ''} name="start"></slot>${drawnStart}</span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
       </div>${readable ? this.renderOverview(cells) : nothing}${

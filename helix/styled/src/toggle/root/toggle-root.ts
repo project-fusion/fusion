@@ -19,6 +19,7 @@ import { styles } from './toggle-root.css.js'
  * @slot - The item's label.
  *
  * @csspart item - The radio button.
+ * @csspart label - The words, between the `start` and `end` slots, cut short with an ellipsis where the segment is narrower.
  *
  * @cssproperty --toggle-item-color - Text color of an item that is not chosen. Read by the base
  *   layer, which styles the `item` part.

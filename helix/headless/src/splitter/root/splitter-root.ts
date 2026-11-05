@@ -1531,10 +1531,16 @@ export class HelixHeadlessSplitter extends HelixElement {
        On the panes rather than on the host, which the `dragging` state above
        records as a rule: a `data-` attribute here is one this element owns, and
        one on the host is one a React consumer's server markup never had. */
+    /* **A pane shut to nothing is out of reach as well as out of sight.** With
+       no width it still held its controls in the tab order: tabbing through a
+       phone form reached a toggle in the hidden pane beside it. A pane shut to
+       a sliver keeps them, since the sliver is what it shows. */
+    const shut = this.flush ? this.shutAt(position) : undefined
     return html`<div
         part="start"
         id="start"
         ?data-dragging=${this.dragging}
+        ?inert=${shut === 'start'}
         style="--splitter-position: ${position}%"
       >
         <slot name="start"></slot>
@@ -1567,7 +1573,7 @@ export class HelixHeadlessSplitter extends HelixElement {
       >
         <slot name="handle"></slot>
       </div>
-      <div part="end" ?data-dragging=${this.dragging}>
+      <div part="end" ?data-dragging=${this.dragging} ?inert=${shut === 'end'}>
         <slot name="end"></slot>
       </div>
       ${this.crossings.map(

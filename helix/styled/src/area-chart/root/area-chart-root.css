@@ -124,32 +124,45 @@
    whose top edge is on the line reads as belonging to the band under it. */
 [part="tick"] {
   inset-inline-end: 0;
+  /* One line of its own height, so half of it is the room over the plot. */
+  line-height: 1;
   position: absolute;
   translate: 0 -50%;
   white-space: nowrap;
 }
 
 /*
- *  The scale's numbers, under `value-axis`, in a column of their own beside the
- *  plot.
+ *  The scale's numbers, unless `value-axis` is `none`, in a column of their
+ *  own beside the plot.
  *
  * **A column of the host grid, not a layer over the plot**, for the reason
  * `BarChart` gives: the plot is the pointer's catchment and the tooltip's
  * containing block, both measured from its box, so padding it to make room
  * would move every reading. At the inline start, where the drawing starts on
  * either page direction.
+ *
+ * The space beside the numbers is the axis's own margin, and the grid has no
+ * column gap. A chart with nothing to draw renders no axis, so its plot stands
+ * alone in the second column, and a gap there would move the empty and loading
+ * words off center by half of it.
  */
-:host([value-axis]) {
+:host(:not([value-axis="none"])) {
+  column-gap: 0;
   grid-template-columns: auto 1fr;
+  /* Room over the plot for the top number, which is centered on the plot's
+     top edge now that the top of the scale is a numbered level, and hung
+     half its height out of the chart's box without this. */
+  padding-block-start: calc(var(--helix-text-xs) / 2);
 }
 
-:host([value-axis]) [part="axis"] {
+:host(:not([value-axis="none"])) [part="axis"] {
   grid-column: 1;
   grid-row: 1;
+  margin-inline-end: var(--area-chart-gap, var(--helix-space-2xs));
 }
 
-:host([value-axis]) [part="plot"],
-:host([value-axis]) [part="labels"] {
+:host(:not([value-axis="none"])) [part="plot"],
+:host(:not([value-axis="none"])) [part="labels"] {
   grid-column: 2;
 }
 

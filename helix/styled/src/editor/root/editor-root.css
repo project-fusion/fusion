@@ -34,7 +34,7 @@
 
 :host([separation="plain"]) [part="region"] {
   border: none;
-  border-radius: 0;
+  border-radius: var(--helix-radii-none);
 }
 
 /* Typing in the document rings the frame, as a field is ringed while it has
@@ -52,8 +52,8 @@
    scrolls under it. */
 [part="header"] {
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-control: var(--helix-size-control-sm);
   --helix-size-control-loose: round(calc(var(--helix-size-control) * 1.2), 1px);
   --helix-size-control-tight: round(calc(var(--helix-size-control) * 0.8), 1px);
@@ -81,7 +81,7 @@
   inset-block-start: var(--editor-header-offset, 0);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
   position: sticky;
-  z-index: 1;
+  z-index: var(--helix-layer-raised);
 }
 
 [part="header"][hidden] {
@@ -174,8 +174,8 @@
   --helix-size-checkbox-loose: round(calc(var(--helix-size-checkbox) * 1.2), 1px);
   --helix-size-checkbox-tight: round(calc(var(--helix-size-checkbox) * 0.8), 1px);
   --helix-size-icon: var(--helix-size-icon-sm);
-  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 1px);
-  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 1px);
+  --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);
+  --helix-size-icon-tight: round(calc(var(--helix-size-icon) * 0.8), 2px);
   --helix-size-switch: var(--helix-size-switch-sm);
   --helix-size-tag: var(--helix-size-tag-sm);
   --helix-text-control: var(--helix-text-control-sm);
