@@ -33,6 +33,8 @@ export default styles(
       draggingOpacity: 0.5,
       dropColor: token('color-primary'),
       dropSize: token('border-thick'),
+      mediaAspectRatio: '4 / 3',
+      mediaRadius: token('radii-sm'),
       padding: token('space-field'),
       radius: token('radii-sm'),
     },
@@ -100,6 +102,26 @@ export default styles(
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
+      }),
+    ]),
+    /* An option with an image is a tile: the image takes a line of its own
+       across the row, and the label, the marks either side of it and the check
+       sit on the line under it. The row wraps only while `media` is filled, so
+       a row with no image keeps one line, and the label's column starts from
+       nothing and grows into the line the image leaves it. */
+    on('item', [rule({ filled: 'media' }, { flexWrap: 'wrap', rowGap: token('space-xs') })]),
+    on('text', [rule({ filled: 'media' }, { flexBasis: 0 })]),
+    /* `min-inline-size: 0`, because an image's floor is its own width, which
+       would push the tile out of its column. */
+    on({ region: 'media', slotted: '*' }, [
+      rule({
+        aspectRatio: hook.mediaAspectRatio,
+        borderRadius: hook.mediaRadius,
+        display: 'block',
+        flex: '1 0 100%',
+        inlineSize: '100%',
+        minInlineSize: 0,
+        objectFit: 'cover',
       }),
     ]),
     /* What is passed into `indicator` is drawn only on the chosen option,
