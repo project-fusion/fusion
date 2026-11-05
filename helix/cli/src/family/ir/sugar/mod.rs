@@ -403,7 +403,11 @@ impl Names {
                     hook_key(key)
                 ));
             }
-            let name = crate::family::read::kebab(key);
+            let name = if field == "hooks" {
+                stepped(&crate::family::read::kebab(key))
+            } else {
+                crate::family::read::kebab(key)
+            };
             if !matches!(default, Lit::Null) {
                 let kind = if field == "hooks" { "hook" } else { "own" };
                 self.defaults
@@ -449,6 +453,21 @@ fn texts(lit: &Lit, field: &str) -> Result<Vec<String>, String> {
             _ => Err(format!("`{field}` is an array of names")),
         })
         .collect()
+}
+
+/// A hook's hyphenated name with each step of a scale set apart, as a ramp
+/// names its steps: `tone1` is `tone-1`.
+fn stepped(name: &str) -> String {
+    let mut written = String::with_capacity(name.len() + 2);
+    let mut lettered = false;
+    for character in name.chars() {
+        if character.is_ascii_digit() && lettered {
+            written.push('-');
+        }
+        lettered = character.is_ascii_alphabetic();
+        written.push(character);
+    }
+    written
 }
 
 /// A hyphenated name in camelCase: `background-color` is `backgroundColor`.
