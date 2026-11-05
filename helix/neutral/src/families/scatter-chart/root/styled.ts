@@ -47,7 +47,7 @@ export default styles(
   },
   ({ hook, include, on, own, rule }) => {
     const series = measured('chart-series')
-    const diameter = own.scatterChartDiameter()
+    const diameter = own.scatterChartDiameter(hook.pointSize)
     const beside = sum(measured('scatter-chart-axis-size'), hook.gap)
     return [
       include(chartStatus),

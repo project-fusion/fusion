@@ -337,6 +337,10 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     }),
     [onAccessibilityAction, ref, ringed, setup.enabled, tracking, words],
   )
-  const away = useCallback(() => move(-1, 'touch'), [move])
+  /* A reading the keys chose is put away by a key, a hardware Escape the bubble's layer heard, and told so, as the web tells it. */
+  const away = useCallback(
+    () => move(-1, latest.current.shown.keyed ? 'keyboard' : 'touch'),
+    [move],
+  )
   return { at: shown.at, away, keyed: shown.keyed, plot, series: shown.series }
 }
