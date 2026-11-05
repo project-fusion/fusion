@@ -41,3 +41,49 @@ export const auditNesting = (host: HTMLElement, slot: string): void => {
     tag: host.localName,
   })
 }
+
+/** The containers already reported for a wrapped row, so each is reported at most once in its life. */
+const wrapped = new WeakSet<HTMLElement>()
+
+/**
+ * Reports a row that sits inside an element of the page's own, between it and
+ * the container, where the container reads only its direct children.
+ *
+ * A menu's rows are its children, the rows of its sections and the rows in
+ * another row's `submenu` slot. A row inside a `<div>` or a framework's host
+ * element is none of those: the arrow keys skip it, and a drilled page hides
+ * every child that is not a row, so a wrapped row's submenu opens on an empty
+ * page. **Nothing unwraps it**, for the reason `auditNesting` gives.
+ *
+ * **In a development build only**, from `#audit-nesting`, as `auditNesting` is.
+ *
+ * `row` is the row's tag. `reached` returns the rows the container reads, and is
+ * called only here, so a production build never walks the tree for it.
+ * `consequence` says what being wrapped costs the row it is given, after "so",
+ * and `fix` is the sentence that says where the row belongs.
+ */
+export const auditWrapped = (
+  host: HTMLElement,
+  row: string,
+  reached: () => Iterable<Element>,
+  consequence: (stray: Element) => string,
+  fix: string,
+): void => {
+  if (wrapped.has(host)) {
+    return
+  }
+  const known = new Set(reached())
+  const stray = [...host.querySelectorAll(row)].find(
+    (each) => !known.has(each) && each.parentElement?.closest(host.localName) === host,
+  )
+  const wrapper = stray?.parentElement
+  if (!(stray && wrapper)) {
+    return
+  }
+  wrapped.add(host)
+  reportRuntime({
+    kind: 'wrapped-row',
+    message: `<${stray.localName}> sits inside a <${wrapper.localName}> in <${host.localName}>, so ${consequence(stray)}. ${fix}`,
+    tag: host.localName,
+  })
+}

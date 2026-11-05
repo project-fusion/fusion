@@ -1,4 +1,4 @@
-import type { auditNesting as audit } from './audit-nesting.js'
+import type { auditNesting as audit, auditWrapped as auditRows } from './audit-nesting.js'
 
 /**
  * The unslotted-item warning in a production build: nothing.
@@ -9,3 +9,6 @@ import type { auditNesting as audit } from './audit-nesting.js'
  * builds. See `audit-nesting.ts`.
  */
 export const auditNesting: typeof audit = () => {}
+
+/** The wrapped-row warning in a production build: nothing. See `audit-nesting.ts`. */
+export const auditWrapped: typeof auditRows = () => {}

@@ -4,9 +4,9 @@ export { auditChildren, auditEntry } from '#audit-children'
 /* The missing-name warning, which a production build resolves to a function
    that does nothing. See `utils/audit-name`. */
 export { auditIconControl, auditName } from '#audit-name'
-/* The unslotted-item warning, which a production build resolves to a function
-   that does nothing. See `utils/audit-nesting`. */
-export { auditNesting } from '#audit-nesting'
+/* The unslotted-item and wrapped-row warnings, which a production build resolves
+   to functions that do nothing. See `utils/audit-nesting`. */
+export { auditNesting, auditWrapped } from '#audit-nesting'
 /* The served-rows check, which a production build resolves to a function that
    does nothing. See `utils/audit-served`. */
 export { auditServed } from '#audit-served'

@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   anchorElement,
   auditEntry,
+  auditWrapped,
   customElement,
   DrilldownController,
   deepActiveElement,
@@ -107,6 +108,14 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * Group rows under a heading with `Menu.Section`, which is a `group` named by
  * its heading. Between runs of rows, a `<helix-divider>` is a separator a
  * screen reader announces.
+ *
+ * **A row goes directly in the menu, in a `Menu.Section`, or in another row's
+ * `submenu` slot.** The menu reads rows in those places only. A row inside an
+ * element of your own, such as a `<div>` or a component's host element, is
+ * skipped by the arrow keys, and a drilled page hides that element with the
+ * rest of the top page, so the row's submenu shows none of its rows. A
+ * development build warns about it as `wrapped-row`. In a framework, render a
+ * component's rows without a wrapper element, such as with a fragment.
  *
  * Keys: Enter, Space or Down Arrow on the trigger opens the menu on its first
  * row, and Up Arrow on its last. In the menu, Up and Down Arrow move between
@@ -335,6 +344,39 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
           (child): child is HelixHeadlessMenuItem => child.slot === 'submenu' && isItem(child),
         )
       : this.topRows
+  }
+
+  /** Every row the menu reads: the top page's, and each submenu's below them. */
+  private reachedRows(): HelixHeadlessMenuItem[] {
+    const rows: HelixHeadlessMenuItem[] = []
+    const walk = (holder: HelixHeadlessMenuItem | null): void => {
+      for (const row of this.rowsOf(holder)) {
+        rows.push(row)
+        walk(row)
+      }
+    }
+    walk(null)
+    return rows
+  }
+
+  /**
+   * Says, in development builds, when a row sits inside an element of the
+   * page's own. The menu reads only its children, its sections' rows and each
+   * row's `submenu` slot, and a drilled page hides every child that is not a
+   * row, wrapper and all.
+   */
+  private auditRows(): void {
+    const tier = (this.constructor as typeof HelixElement).tier
+    auditWrapped(
+      this,
+      `${tier}menu-item`,
+      () => this.reachedRows(),
+      (stray) =>
+        this.drilldown.hasPage(stray)
+          ? 'its submenu shows none of its rows and the arrow keys skip it'
+          : 'the arrow keys skip it',
+      `Place each <${tier}menu-item> directly in the menu, in a <${tier}menu-section>, or in the submenu slot of another row.`,
+    )
   }
 
   /** The row whose submenu holds a row, or null for a row of the top page. */
@@ -1384,6 +1426,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        compared with the rows as the reader found them. */
     if (changed.has('open') && this.open) {
       this.toldChecked = this.checkedValues.join('\u0000')
+      this.auditRows()
     }
     // Every update, so a trigger slotted after the first render is told too.
     // An area a context menu opens over is no button and is told nothing.
