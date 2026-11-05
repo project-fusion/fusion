@@ -1,17 +1,18 @@
 /**
  * Which tone a reading gets, and how many readings fit.
  *
- * Kept apart from the element because both answers are arithmetic and both are
+ * In core, so the web's element and a phone's tone and fit the same cells, and
+ * kept apart from either because both answers are arithmetic and both are
  * easy to get subtly wrong in ways a picture hides: a threshold comparison off
  * by one boundary colors a handful of cells wrong out of ninety, and a fit
  * calculation off by one drops a day silently. Neither is visible in a
  * screenshot of a strip.
  */
 
-import { extremesOf } from '@fusion.dev/helix-core'
+import { extremesOf } from '../read-series/read-series.js'
 
 /** A reading, reduced to what the bucketing needs. */
-export interface Reading {
+export interface HeatmapReading {
   tone?: string | undefined
   /** The number, or undefined for a row whose cell was blank. */
   value: number | undefined
@@ -33,8 +34,8 @@ export interface Reading {
  * one: an empty cell in a contribution graph is a day with nothing in it, and
  * painting it as the lowest bucket claims a reading that does not exist.
  */
-export const toneOf = (
-  reading: Reading,
+export const heatmapTone = (
+  reading: HeatmapReading,
   thresholds: readonly number[],
   tones: readonly string[],
 ): string | undefined => {
@@ -83,7 +84,7 @@ export const toneOf = (
  * The count is therefore always a whole number of columns, which is what keeps
  * the tail slice aligned.
  */
-export const fits = (
+export const heatmapFits = (
   total: number,
   width: number,
   minimum: number,
@@ -102,7 +103,7 @@ export const fits = (
 }
 
 /** What the drawn readings come to: where the busiest stands, and their total. */
-export interface Overview {
+export interface HeatmapOverview {
   /** The place of the busiest reading, the first where several tie, or -1 with none. */
   busiest: number
   /** The sum of every reading, blanks counting nothing. */
@@ -113,7 +114,7 @@ export interface Overview {
  * The busiest reading among `cells` and the total of them all, for the
  * strip's `overview`. A blank cell is passed over.
  */
-export const overviewOf = (cells: readonly Reading[]): Overview => {
+export const heatmapOverview = (cells: readonly HeatmapReading[]): HeatmapOverview => {
   const values = cells.map((cell) => cell.value)
   return {
     busiest: extremesOf(values).high ?? -1,
@@ -137,7 +138,7 @@ const dayOf = (when: string | undefined): number | undefined => {
  * nearest one past it in the direction of travel, and the last or the first
  * reading past the end. Undefined where the reading at `at` carries no date.
  */
-export const monthPage = (
+export const heatmapMonthPage = (
   whens: readonly (string | undefined)[],
   at: number,
   forward: boolean,
