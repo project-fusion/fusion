@@ -311,10 +311,27 @@
    that lights under the pointer is a cell offering one. */
 /* Not on a calendar that is off or read-only either, which takes no press: the
    days of a disabled calendar lit under the pointer, under a pointing hand. */
+/* **Not on a chosen day, which steps its own fill instead**, as a solid Button
+   does: this rule outranks the chosen fill, so under the pointer a chosen day
+   lost its primary fill to the pale well and kept its white label, about
+   1.1:1 on white. */
 :host(:not(:disabled, [readonly]))
-  [part~="cell"]:hover:not([aria-disabled], [data-outside])
+  [part~="cell"]:hover:not(
+    [aria-disabled],
+    [data-outside],
+    [aria-selected]:not([data-range-middle])
+  )
   [part~="day"] {
   background-color: var(--helix-color-surface-sunken);
+}
+
+:host(:not(:disabled, [readonly]))
+  [part~="cell"][aria-selected]:not([data-range-middle]):hover:not([aria-disabled], [data-outside])
+  [part~="day"] {
+  background-color: var(
+    --date-picker-selected-background-color,
+    var(--helix-color-primary-surface-hover)
+  );
 }
 
 /* And a step past the hover under a press, which had none: a press drew the
