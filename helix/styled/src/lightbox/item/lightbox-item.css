@@ -42,10 +42,12 @@
 /* **A picture that failed keeps a picture's room.** With no size of its own a
    failed Image is only as tall as its mark, so the stage that fills the screen
    showed a strip about 120 by 68 above the description. At 3:2, as wide as
-   most pictures are, and never past the viewport the rule above holds it to. */
+   most pictures are, 768 wide at the default density (48rem, from the size
+   scale so a density seed moves it), and never past the viewport the rule
+   above holds it to. */
 [part="item"] ::slotted(helix-image[data-status="error"]) {
   --image-aspect: 3 / 2;
-  inline-size: min(100%, 48rem);
+  inline-size: min(100%, calc(var(--helix-size-button) * 3.84));
 }
 
 [part="item"] ::slotted([slot="description"]) {
