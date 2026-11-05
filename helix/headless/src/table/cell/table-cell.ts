@@ -81,6 +81,15 @@ export class HelixHeadlessTableCell extends HelixElement {
     })
   }
 
+  /* **Read once on the first render as well.** A slot rendered on the server
+     already holds its children when the cell upgrades, so no `slotchange`
+     arrives: a cell of words served that way kept no `text` state, lost its
+     block padding, and its row stood 5 pixels off the one the client drew. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.handleSlotChange()
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     /* A cell that stops or starts being a header changes what the header cells
