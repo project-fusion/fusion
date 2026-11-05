@@ -7,7 +7,7 @@ import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
-import { styles } from './bar-chart-root.css.js'
+import { styles } from './bar-chart-root.generated.css.js'
 import '../../tooltip/index.js'
 
 /**

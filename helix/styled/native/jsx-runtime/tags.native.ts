@@ -7,6 +7,7 @@ import { HelixAppHeader } from '../app-header/index.native'
 import { HelixAreaChart } from '../area-chart/index.native'
 import { HelixAvatar, HelixAvatarGroup } from '../avatar/index.native'
 import { HelixBadge } from '../badge/index.native'
+import { HelixBarChart } from '../bar-chart/index.native'
 import { HelixBlockquote } from '../blockquote/index.native'
 import { HelixBreadcrumb, HelixBreadcrumbs } from '../breadcrumbs/index.native'
 import { HelixButton } from '../button/index.native'
@@ -224,6 +225,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-avatar': HelixAvatar,
   'helix-avatar-group': HelixAvatarGroup,
   'helix-badge': HelixBadge,
+  'helix-bar-chart': HelixBarChart,
   'helix-blockquote': HelixBlockquote,
   'helix-breadcrumb': HelixBreadcrumb,
   'helix-breadcrumbs': HelixBreadcrumbs,
