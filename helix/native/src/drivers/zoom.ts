@@ -31,7 +31,7 @@ import {
   type ZoomStart,
   zoomAt,
 } from '@fusion.dev/helix-core/zoom'
-import { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import {
   type ComposedGesture,
@@ -151,7 +151,10 @@ const useShared = (max: number): Shared => {
   const width = useSharedValue(0)
   const x = useSharedValue(0)
   const y = useSharedValue(0)
-  most.value = max
+  /* Written after the render, as Reanimated asks of a shared value. */
+  useEffect(() => {
+    most.value = max
+  }, [max, most])
   return useMemo(
     () => ({ from, height, max: most, pinching, scale, width, x, y }),
     [from, height, most, pinching, scale, width, x, y],

@@ -1,4 +1,4 @@
-import { list, native, sum, token, web } from '../../../style.js'
+import { difference, list, native, safeArea, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -91,7 +91,18 @@ export default styles(
         rule({ touchAction: ['pan-y', 'pinch-zoom'] }),
         rule({ zoomable: true }, { touchAction: 'none' }),
       ]),
-      native([rule({ display: 'flex', flexDirection: 'column' })]),
+      /* A phone's window runs under the status bar and the home indicator,
+         so the viewer stands between them, its controls with it, over the
+         scrim that covers the whole window. */
+      native([
+        rule({
+          blockSize: difference('100dvh', sum(safeArea('top'), safeArea('bottom'))),
+          display: 'flex',
+          flexDirection: 'column',
+          marginBlockStart: safeArea('top'),
+          maxBlockSize: difference('100dvh', sum(safeArea('top'), safeArea('bottom'))),
+        }),
+      ]),
       /* No ring on the viewer itself, which is the whole screen. */
       rule({ focusVisible: true }, { outline: 'none' }),
     ]),
