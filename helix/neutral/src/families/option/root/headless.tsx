@@ -53,7 +53,16 @@ export default headless('option', {
   events: {
     beforeSelect: cancelable(['href', 'value']),
   },
-  states: ['active', 'disabled', 'hasIndicator', 'hovered', 'pressing', 'selected', 'settled'],
+  states: [
+    'active',
+    'disabled',
+    'hasIndicator',
+    'hasMedia',
+    'hovered',
+    'pressing',
+    'selected',
+    'settled',
+  ],
   option: {
     checkShown: 'checkShown',
     described: 'described',
@@ -81,6 +90,7 @@ export default headless('option', {
       part="item"
       role="option"
     >
+      <Slot name="media" />
       <Slot name="start" />
       <View part="text">
         <View part="label">
