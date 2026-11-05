@@ -975,6 +975,36 @@ export interface AxisChartChoice {
   readonly tipped?: string
 }
 
+/** A bar chart's names, each read as `barChart.x`. */
+export interface BarChartChoice {
+  readonly axes?: string
+  readonly bandHeight?: string
+  readonly bandWidth?: string
+  readonly bandX?: string
+  readonly bandY?: string
+  readonly bars?: string
+  readonly baseline?: string
+  readonly cells?: string
+  readonly drawn?: string
+  readonly empty?: string
+  readonly gridlines?: string
+  readonly labels?: string
+  readonly lines?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly named?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly placement?: string
+  readonly reading?: string
+  readonly role?: string
+  readonly summary?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+}
+
 /** A chart key's names, each read as `legend.x`. */
 export interface LegendChoice {
   readonly entries?: string

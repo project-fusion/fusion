@@ -460,6 +460,33 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'tipLabel'
     | 'tipped'
   >
+  /** What a chart of columns computes for its parts. */
+  readonly barChart: Computes<
+    | 'axes'
+    | 'bandHeight'
+    | 'bandWidth'
+    | 'bandX'
+    | 'bandY'
+    | 'bars'
+    | 'baseline'
+    | 'cells'
+    | 'drawn'
+    | 'empty'
+    | 'gridlines'
+    | 'labels'
+    | 'lines'
+    | 'live'
+    | 'loading'
+    | 'markX'
+    | 'markY'
+    | 'named'
+    | 'placement'
+    | 'reading'
+    | 'role'
+    | 'summary'
+    | 'tipLabel'
+    | 'tipped'
+  >
   /** What a chart's key computes for its parts: its entries, and its list's name and role. */
   readonly legend: Computes<'entries' | 'named' | 'role'>
   /** What a sparkline computes for its parts: its marks, where each stands, and the reading shown. */
@@ -1139,7 +1166,7 @@ export const Rect = (
  */
 export const LinearGradient = (_: {
   readonly children?: Child
-  readonly id: string
+  readonly id: string | Read | undefined
   readonly part: string
   readonly x1?: Given
   readonly x2?: Given
@@ -1147,8 +1174,16 @@ export const LinearGradient = (_: {
   readonly y2?: Given
 }): Drawn => node()
 
-/** A stop of a gradient, at `offset` along it, its color and opacity its style table's. */
-export const Stop = (_: { readonly offset: Given; readonly part: string }): Drawn => node()
+/**
+ * A stop of a gradient, at `offset` along it, its color and opacity its style
+ * table's, which may read a custom property its `style` sets, as a bar
+ * chart's wash takes each series' color.
+ */
+export const Stop = (_: {
+  readonly offset: Given
+  readonly part: string
+  readonly style?: Style
+}): Drawn => node()
 
 /** A circle inside a vector, its geometry its style table's where it gives none. */
 export const Circle = (

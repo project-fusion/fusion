@@ -56,6 +56,7 @@ import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
   AxisChartChoice,
+  BarChartChoice,
   CarouselChoice,
   ChatComposerChoice,
   ChatMessageChoice,
@@ -362,6 +363,8 @@ export interface Headless {
   readonly lineChart?: AxisChartChoice
   /** What the element reads, sends, and computes where it is a chart of stacked bands. */
   readonly areaChart?: AxisChartChoice
+  /** What the element reads, sends, and computes where it is a chart of columns. */
+  readonly barChart?: BarChartChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
   readonly pickerField?: PickerFieldChoice
   /** What the element reads, sends, and computes where it is a carousel. */

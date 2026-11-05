@@ -980,6 +980,35 @@ const AXIS_CHART: &[Field] = &[
     ("tipped", "tipped", Name),
 ];
 
+const BAR_CHART: &[Field] = &[
+    ("axes", "axes", Name),
+    ("bandHeight", "bandHeight", Name),
+    ("bandWidth", "bandWidth", Name),
+    ("bandX", "bandX", Name),
+    ("bandY", "bandY", Name),
+    ("bars", "bars", Name),
+    ("baseline", "baseline", Name),
+    ("cells", "cells", Name),
+    ("drawn", "drawn", Name),
+    ("empty", "empty", Name),
+    ("gridlines", "gridlines", Name),
+    ("labels", "labels", Name),
+    ("lines", "lines", Name),
+    ("live", "live", Name),
+    ("loading", "loading", Name),
+    ("markX", "markX", Name),
+    ("markY", "markY", Name),
+    ("named", "named", Name),
+    ("onReadingChange", "onReadingChange", Name),
+    ("onReadingPress", "onReadingPress", Name),
+    ("placement", "placement", Name),
+    ("reading", "reading", Name),
+    ("role", "role", Name),
+    ("summary", "summary", Name),
+    ("tipLabel", "tipLabel", Name),
+    ("tipped", "tipped", Name),
+];
+
 const PAGINATION_SIZE: &[Field] = &[
     ("defaultValue", "defaultValue", Name),
     ("disabled", "disabled", Name),
@@ -1455,6 +1484,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("legend", "legend", LEGEND),
     ("lineChart", "lineChart", AXIS_CHART),
     ("areaChart", "areaChart", AXIS_CHART),
+    ("barChart", "barChart", BAR_CHART),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),

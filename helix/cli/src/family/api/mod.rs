@@ -73,11 +73,12 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, AREA_CHART, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX,
-    COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU, INSPECTOR, LEGEND,
-    LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
-    NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SELECT,
-    SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM,
+    TreeChoice, AREA_CHART, BAR_CHART, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT,
+    CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU,
+    INSPECTOR, LEGEND, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT,
+    NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE,
+    PICKER_FIELD, SELECT, SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE,
+    TREE_ITEM,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -233,6 +234,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a chart of stacked bands.
     #[serde(rename = "areaChart", skip_serializing_if = "Option::is_none")]
     pub area_chart: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a chart of columns.
+    #[serde(rename = "barChart", skip_serializing_if = "Option::is_none")]
+    pub bar_chart: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a field of dates or times.
     #[serde(rename = "pickerField", skip_serializing_if = "Option::is_none")]
     pub picker_field: Option<TreeChoice>,
@@ -403,6 +407,7 @@ impl Api {
             && self.legend.is_none()
             && self.line_chart.is_none()
             && self.area_chart.is_none()
+            && self.bar_chart.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
@@ -499,6 +504,7 @@ const FIELDS: &[&str] = &[
     "legend",
     "lineChart",
     "areaChart",
+    "barChart",
     "pickerField",
     "listbox",
     "select",
@@ -580,6 +586,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         area_chart: field("areaChart")
             .map(tree_choice::area_chart)
             .transpose()?,
+        bar_chart: field("barChart").map(tree_choice::bar_chart).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)
             .transpose()?,
