@@ -10,8 +10,8 @@ export function Example() {
       <helix-headless-option value="open">Open folder</helix-headless-option>
       <helix-headless-option value="save">Save all</helix-headless-option>
       <p slot="footer">
-        <helix-headless-kbd>Cmd</helix-headless-kbd> <helix-headless-kbd>K</helix-headless-kbd> to
-        open, <helix-headless-kbd>Esc</helix-headless-kbd> to close
+        <helix-headless-kbd keys="mod+k" /> to open, <helix-headless-kbd>Esc</helix-headless-kbd> to
+        close
       </p>
     </helix-headless-command>
   )

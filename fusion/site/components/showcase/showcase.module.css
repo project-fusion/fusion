@@ -258,4 +258,26 @@
   .showcaseView {
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* **On a phone the cell is as tall as the view showing.** A hidden view is
+     taken out of the flow and laid over the cell's top, where it keeps its
+     width and its height can still be measured. In one column the views
+     differ by up to 432px, all of which stood as empty glass under the short
+     ones. The panel turns only while its foot is out of sight, which
+     `showcase.tsx` checks, so the page under it never moves in view. */
+  .showcase {
+    position: relative;
+  }
+
+  .showcaseView[hidden] {
+    inset-block-start: 0;
+    inset-inline: 0;
+    position: absolute;
+  }
+
+  /* No fade at the foot, where nothing is cut off: the cell is the view's own
+     height, so the fade fell over the last card's own content. */
+  .showcaseStage {
+    mask-image: none;
+  }
 }

@@ -35,7 +35,16 @@ export function Example() {
         </tbody>
       </table>
 
-      <helix-donut-chart for="traffic"></helix-donut-chart>
+      <helix-donut-chart for="traffic">
+        <helix-stat>
+          10,000
+          <span slot="label">Sessions</span>
+        </helix-stat>
+      </helix-donut-chart>
+      <helix-legend
+        entries="categories"
+        for="traffic"
+      ></helix-legend>
     </helix-flex>
   )
 }

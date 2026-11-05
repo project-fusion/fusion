@@ -169,8 +169,12 @@ slot[name="icon"]::slotted(*) {
   --_badge-fill: var(--helix-color-success-surface);
 }
 
+/* Amber under a black label, as a solid warning Tag is, for Tag's reason: the
+   status fill reads brown, and the warning mark takes black at 5.23:1 in light
+   and 11.4 in dark. */
 :host([tone="warning"]) {
-  --_badge-fill: var(--helix-color-warning-surface);
+  --_badge-fill: var(--helix-color-warning-mark);
+  --_badge-on: light-dark(var(--helix-color-foreground), var(--helix-color-background));
 }
 
 /* The alarming one, which is the exception rather than the default. A badge is

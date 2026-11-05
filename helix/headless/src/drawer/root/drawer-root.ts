@@ -10,6 +10,7 @@ import {
   edgeOffset,
   FocusScopeController,
   focusAs,
+  focusableElements,
   HelixElement,
   headingsIn,
   isRtl,
@@ -704,6 +705,20 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
         const first = marked ?? (this.modal ? this.closer : null)
         if (first) {
           focusAs(first, focusing)
+          return
+        }
+        /* **WebKit leaves focus on the `<dialog>`** where the first control is
+           inside a component's shadow root, as Dialog says: its focusing steps
+           do not count a host that delegates focus, where Chromium's do.
+           Measured on a modal drawer with no `dismissible` and nothing marked,
+           Chromium focused the first control and WebKit the panel, so the
+           first control is focused here when the browser chose none. */
+        const chose =
+          this.matches(':focus-within') &&
+          !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === panel)
+        const fallback = this.modal && !chose ? focusableElements(this)[0] : undefined
+        if (fallback) {
+          focusAs(fallback, focusing)
         } else {
           refocusWithin(this, focusing)
         }

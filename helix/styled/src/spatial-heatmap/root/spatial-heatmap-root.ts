@@ -65,8 +65,8 @@ export class HelixSpatialHeatmap extends HelixHeadlessSpatialHeatmap {
   /**
    * What the plot stands on. `plain`, the default, draws nothing behind it, as a
    * flat chart does, so a Card or the page is its ground. `filled` draws the
-   * `surface-filled` ground every family takes. `no-box` is a separate choice:
-   * it removes the box, grid, numbers, and names.
+   * `surface-filled` ground every family takes. A heatmap draws no box, so the
+   * `start` and `end` slots are the only names it draws.
    */
   @property({ reflect: true })
   separation?: 'filled' | 'plain'

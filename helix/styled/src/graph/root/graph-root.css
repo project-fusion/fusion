@@ -327,7 +327,7 @@
 }
 
 [part~="legend-item"][data-tone="warning"] {
-  --_graph-swatch: var(--helix-color-warning);
+  --_graph-swatch: var(--helix-color-warning-mark);
 }
 
 [part="legend-swatch"] {

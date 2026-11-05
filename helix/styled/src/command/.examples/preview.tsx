@@ -8,8 +8,7 @@ export function Example() {
       <helix-option value="open">Open folder</helix-option>
       <helix-option value="save">Save all</helix-option>
       <helix-text slot="footer">
-        <helix-kbd>Cmd</helix-kbd> <helix-kbd>K</helix-kbd> to open, <helix-kbd>Esc</helix-kbd> to
-        close
+        <helix-kbd keys="mod+k" /> to open, <helix-kbd>Esc</helix-kbd> to close
       </helix-text>
     </helix-command>
   )

@@ -316,29 +316,38 @@ slot[name="icon"]::slotted(*) {
   }
 
   /* **And it makes room as it arrives**, the same row collapse its leaving
-     runs, in reverse. Only the new message moved: the ones already showing
-     jumped 53 pixels in one frame to make room for it. */
+     runs, in reverse, so the messages already showing slide over. **An
+     animation and not a `@starting-style` transition**, because no transition
+     runs in a component's first frame: `HelixElement` switches them off until
+     a frame after the first update, so the arriving row was already open when
+     transitions came on. Measured on November 4, 2026, in Chromium: the new
+     message 44 pixels tall from its first frame and the one above it 51.5
+     pixels higher in one frame, by `add()` and by appending. A waiting message
+     plays it as it shows, its `display` coming back from `none`. */
+  :host {
+    animation: helix-toast-room var(--helix-duration-normal) var(--helix-easing-decelerate)
+      backwards;
+  }
+
+  /* The way back for a message a consumer opens again, which is a change of
+     state after the first frame, so a transition carries it. */
   :host(:not([data-closed])) [part="item"] {
     transition: padding-block var(--helix-duration-normal) var(--helix-easing-decelerate);
   }
+}
 
-  /* After the rules it starts, which share their specificity, or source order
-     hands the arriving frame to them. */
-  @starting-style {
-    :host {
-      grid-template-rows: minmax(0, 0fr);
-      margin-block-start: 0;
-    }
-
-    :host(:not([data-closed])) [part="item"] {
-      padding-block: 0;
-    }
+@keyframes helix-toast-room {
+  from {
+    grid-template-rows: minmax(0, 0fr);
+    margin-block-start: 0;
   }
 }
 
 @keyframes helix-toast-in {
   from {
     opacity: 0;
+    /* The last thing holding the box open, closed with the row. */
+    padding-block: 0;
     /* From the border it is anchored to. */
     translate: 0 var(--_toast-enter, var(--helix-space-lg));
   }

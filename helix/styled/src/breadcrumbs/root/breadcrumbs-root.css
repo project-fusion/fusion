@@ -41,7 +41,8 @@
   box-sizing: border-box;
   color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
   cursor: pointer;
-  line-height: var(--helix-leading-normal);
+  /* A crumb's even line, so the button is as tall as the links beside it. */
+  line-height: round(up, calc(1em * var(--helix-leading-normal)), 2px);
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 

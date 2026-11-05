@@ -18,13 +18,21 @@
      measured 23.59 against links of 27.5, four pixels short and in the same row. */
   --icon-button-size: var(
     --breadcrumbs-control-size,
-    calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
+    calc(
+      round(up, calc(var(--helix-text-control) * var(--helix-leading-normal)), 2px) +
+      var(--helix-space-2xs) *
+      2
+    )
   );
 
   /* And the same for a labeled one, which the rule above cannot reach. */
   --button-size: var(
     --breadcrumbs-control-size,
-    calc(var(--helix-text-control) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
+    calc(
+      round(up, calc(var(--helix-text-control) * var(--helix-leading-normal)), 2px) +
+      var(--helix-space-2xs) *
+      2
+    )
   );
 
   /* And the inline rhythm, which the height alone does not buy. */
@@ -37,6 +45,11 @@
 
   align-items: center;
   display: inline-flex;
+  /* **The crumb's line rounded up to an even height**, the separator's own, so
+     a link is a whole number of pixels tall and the chevron centered beside it
+     lands on a whole pixel. The 13 pixel type at `md` set a 19.5 line and a
+     27.5 pixel link, and the separator sat at y .75 at `md` and .5 at `lg`. */
+  line-height: round(up, calc(1em * var(--helix-leading-normal)), 2px);
   /* No wider than the trail, so a long unbroken word wraps inside it. */
   max-inline-size: 100%;
   min-inline-size: 0;
@@ -53,7 +66,7 @@
      even em it was 14 at both `md` and `lg`. Seven tenths of the region's
      icon step, which is what moves with the density. */
   --_breadcrumb-separator: round(calc(var(--helix-size-icon) * 0.7), 2px);
-  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
+  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-muted));
   display: block;
   /* The crumb's line rounded up to an even height, so the box centers on a whole
      pixel in the row: the 13 pixel type at `md` set a 19.5 line, and the chevron
@@ -336,7 +349,7 @@ a[part="link"]:focus-visible {
   /* The separator's own size and lift, so the two chevrons in one trail are one
      mark. At `1em` the fold's was 13 at `md` beside the separator's 14. */
   --_breadcrumb-separator: round(calc(var(--helix-size-icon) * 0.7), 2px);
-  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-subtle));
+  color: var(--breadcrumbs-separator-color, var(--helix-color-foreground-muted));
   display: block;
   line-height: round(up, 1lh, 2px);
   user-select: none;
@@ -354,7 +367,7 @@ a[part="link"]:focus-visible {
   box-sizing: border-box;
   color: var(--breadcrumbs-link-color, var(--helix-color-foreground-muted));
   cursor: pointer;
-  line-height: var(--helix-leading-normal);
+  line-height: inherit;
   padding: var(--helix-space-2xs) var(--helix-space-xs);
 }
 

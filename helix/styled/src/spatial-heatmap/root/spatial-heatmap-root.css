@@ -14,7 +14,8 @@
   --heatmap-tone-muted: var(--helix-color-surface-sunken);
   --heatmap-tone-primary: var(--helix-color-primary);
   --heatmap-tone-success: var(--helix-color-success);
-  --heatmap-tone-warning: var(--helix-color-warning);
+  /* The mark warning, as Heatmap's cells take it. */
+  --heatmap-tone-warning: var(--helix-color-warning-mark);
   --heatmap-tone-1: color-mix(
     in oklab,
     var(--helix-color-primary-strong) 35%,

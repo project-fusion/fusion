@@ -111,7 +111,11 @@ slot[name="description"][data-empty] {
   background-color: var(--drilldown-item-hover-background-color, var(--helix-color-hover));
 }
 
+/* **The ring takes the `sm` corner, as Menu's, Tree's and Listbox's rows
+   do.** The row is square so its fill reaches both edges, and the ring drawn
+   on it was the one square ring among the row families. */
 [part="item"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   /* The offset token negated, not the ring-width token. They happen to be the
      same number and they are different ideas: this is the only place in the

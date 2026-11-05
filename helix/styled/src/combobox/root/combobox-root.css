@@ -163,9 +163,12 @@ slot[name="end"] {
   }
 }
 
+/* The tight step every field glyph takes, 12, 16 and 20, as the field frame
+   sets it for Input. At the region's icon size a start icon was 20 at `md`
+   beside the caret's 16. */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
-  --icon-size: var(--helix-size-icon);
+  --icon-size: var(--helix-size-icon-tight);
 
   flex: 0 0 auto;
 }

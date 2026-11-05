@@ -52,9 +52,15 @@
   transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
-/* Pushed to the far end only where it belongs there. */
+/* Pushed to the far end only where it belongs there. **And on the line a
+   field's chevron ends on**, the field inset and its edge from the trailing
+   side, 9, 13 and 17: the row's own inset, 4 past a field's, put it at 12, 16
+   and 20, so an Accordion over a Select had its chevron 3 pixels in from the
+   one under it. Through a margin, so `--accordion-item-padding` still moves
+   the heading and the chevron together. */
 :host(:not([chevron-placement="start"])) [part="chevron"],
 :host(:not([chevron-placement="start"])) ::slotted([slot="chevron"]) {
+  margin-inline-end: calc(var(--helix-border-thin) - var(--helix-space-2xs));
   margin-inline-start: auto;
 }
 

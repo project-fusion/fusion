@@ -121,6 +121,8 @@ export function Showcase(): React.ReactElement {
      left. */
   const [seen, setSeen] = useState(false)
   const stage = useRef<HTMLDivElement>(null)
+  /* The cell the views share, which on a phone is as tall as the view showing. */
+  const cell = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const node = stage.current
@@ -167,6 +169,26 @@ export function Showcase(): React.ReactElement {
     }
 
     const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+    /* **On a phone the cell is as tall as the view showing, so a turn moves
+       what is under the panel, and it turns only where nobody can see that.**
+       One column there holds every card of a view, and the views measured 956,
+       744, 1124, and 692 at 390: in a cell as tall as the tallest, a short
+       view left up to 432px of empty glass under it. So the page under the
+       panel moves only while the panel's foot is below the window, before and
+       after the turn, and otherwise the view waits for the next tick. The
+       wider layouts keep every view in one cell as tall as the tallest, since
+       there the views are within 184px of each other. */
+    const narrow = window.matchMedia('(width < 56rem)')
+    const unseen = (from: View, to: View): boolean => {
+      const node = cell.current
+      if (!(narrow.matches && node)) {
+        return true
+      }
+      const height = (name: View): number =>
+        node.querySelector(`[data-view="${name}"]`)?.getBoundingClientRect().height ?? 0
+      const foot = node.getBoundingClientRect().top + Math.min(height(from), height(to))
+      return foot >= window.innerHeight
+    }
     let timer: ReturnType<typeof setInterval> | undefined
 
     const start = (): void => {
@@ -176,7 +198,8 @@ export function Showcase(): React.ReactElement {
       timer = setInterval(() => {
         setView((was) => {
           const at = VIEWS.findIndex((one) => one.name === was)
-          return VIEWS[(at + 1) % VIEWS.length]?.name ?? was
+          const next = VIEWS[(at + 1) % VIEWS.length]?.name ?? was
+          return unseen(was, next) ? next : was
         })
       }, DWELL)
     }
@@ -233,8 +256,8 @@ export function Showcase(): React.ReactElement {
         ))}
       </helix-toggle-group>
 
-      <div className={styles.showcase}>
-        <div className={styles.showcaseView} hidden={view !== 'controls'}>
+      <div className={styles.showcase} ref={cell}>
+        <div className={styles.showcaseView} data-view="controls" hidden={view !== 'controls'}>
           {/* A form, laid out as one: fields first, then the two that are
                 settings. Controls stacked at even spacing are a pile rather
                 than a thing anybody would fill in. */}
@@ -343,7 +366,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className={styles.showcaseView} hidden={view !== 'data'}>
+        <div className={styles.showcaseView} data-view="data" hidden={view !== 'data'}>
           {/* **The sparkline spans the card, not one stat.** Aligned to the
                 first of a two stat group it is 98 wide under a 113 wide figure
                 inside a 174 wide group, lining up with nothing and reading as a
@@ -549,7 +572,7 @@ export function Showcase(): React.ReactElement {
             experimental, and a drag turns them. Above, because the stage fades
             out its last sixth and the note under the grid faded with it. A pointer inside the stage
             holds the panel on this view while a reader turns one. */}
-        <div className={styles.showcaseView} hidden={view !== 'depth'}>
+        <div className={styles.showcaseView} data-view="depth" hidden={view !== 'depth'}>
           <helix-flex
             align-items="center"
             class={styles.showcaseWide}
@@ -703,7 +726,7 @@ export function Showcase(): React.ReactElement {
           </helix-card>
         </div>
 
-        <div className={styles.showcaseView} hidden={view !== 'surfaces'}>
+        <div className={styles.showcaseView} data-view="surfaces" hidden={view !== 'surfaces'}>
           {/* Flat, like the code block. `Callout` already draws its own band:
               a tinted ground, a rule and an icon down the side. A card around
               it is a second surface a few pixels outside the first, and the two

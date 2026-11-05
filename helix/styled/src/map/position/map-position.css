@@ -295,7 +295,7 @@
   --_map-position-tone: var(--helix-color-success);
 }
 :host([tone="warning"]) {
-  --_map-position-tone: var(--helix-color-warning);
+  --_map-position-tone: var(--helix-color-warning-mark);
 }
 
 /* Forced colors: the dot, its pulse and its heading are backgrounds, which the

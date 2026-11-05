@@ -164,11 +164,20 @@
   padding: var(--helix-space-2xs);
 }
 
+/* **Toggle Group's thumb corner, by Toggle Group's derivation**, as segmented
+   Tabs take it: the track's corner less its edge and padding, never squarer
+   than 2 pixels or half the track's corner. Less the edge alone it was 3
+   pixels in the same 4 pixel track at the same 5 pixel inset. */
 :host([marker="segmented"]) [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-overlay));
   border-radius: var(
     --navigation-indicator-radius,
-    calc(var(--helix-radii-sm) - var(--helix-border-thin))
+    max(
+      min(var(--helix-radii-sm) * 0.5, 2px),
+      var(--helix-radii-sm) -
+      var(--helix-border-thin) -
+      var(--helix-space-2xs)
+    )
   );
   box-shadow: var(--navigation-indicator-shadow, var(--helix-shadow-sm));
 }

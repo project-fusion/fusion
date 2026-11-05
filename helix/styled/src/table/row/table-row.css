@@ -5,11 +5,21 @@
   display: contents;
 }
 
+/* **No rule under the last row**, as Data Table ends its rows, so a table
+   inside a bordered box such as a Card does not show two lines a pixel apart.
+   The row has no box, so it hands its cells the rule's color, and the cells
+   and the boxes below read it. `last-of-type`, so a slotted heading or status
+   after the rows does not keep the rule. */
+:host(:last-of-type) {
+  --table-rule-color: transparent;
+}
+
 /* The checkbox cell of a selectable table: a cell's box, the rule under it
    included, since the row has no box to draw one. */
 [part~="select"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid
+    var(--table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
   display: flex;
   min-block-size: var(--helix-size-control);
@@ -21,7 +31,8 @@
    belongs to. */
 [part~="expand"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid
+    var(--table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
   display: flex;
   min-block-size: var(--helix-size-control);
@@ -112,7 +123,8 @@
    scrolling box would otherwise cut. */
 [part~="grip"] {
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid
+    var(--table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
   display: flex;
   min-block-size: var(--helix-size-control);

@@ -59,15 +59,17 @@ describe('callout', () => {
     expect(rule(':host')).toContain('--_callout-bar: var(--callout-bar-thickness, 0px)')
     expect(rule(':host::before')).toContain('inline-size: var(--_callout-bar)')
     expect(rule(':host::before')).toContain('background-color: var(--_callout-color)')
-    expect(rule(':host')).toContain('overflow: hidden')
+    expect(rule(':host')).toContain('overflow: clip')
     expect(rule(':host')).toContain(
       'padding-inline-start: calc(var(--_callout-inset) + var(--_callout-bar))',
     )
   })
 
   test('a slotted icon is sized like the default one, so swapping it moves nothing', () => {
-    expect(rule('[part="icon"] svg')).toContain('block-size: var(--helix-size-icon)')
-    expect(rule('slot[name="icon"]::slotted(*)')).toContain('--icon-size: var(--helix-size-icon)')
+    expect(rule('[part="icon"] svg')).toContain('block-size: var(--helix-size-icon-tight)')
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
+      '--icon-size: var(--helix-size-icon-tight)',
+    )
   })
 
   test('a heading is its own line, not the opening words of the content', () => {

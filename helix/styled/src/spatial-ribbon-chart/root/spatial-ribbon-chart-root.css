@@ -1,17 +1,19 @@
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
-  /* **Three quarters as tall as it is wide, and 22em at most**, so a narrow
-     plot is not a tall gray field with a small drawing in its middle: a box
-     seen at a slant is wider than it is tall. The hook sets one height. */
-  aspect-ratio: 4 / 3;
+  /* **Square up to 26em tall, then as wide as its column at that height.**
+     At 4 by 3 under a 22em cap a 280 plot was 210 tall, and the drawing,
+     fitted to the height with its names beside it, shrank to 112 across; square
+     it is 159. At 640 the cap held the drawing to about 230 of a 592 column,
+     and at 26em it is about 350. The hook sets one height. */
+  aspect-ratio: 1;
   block-size: var(--spatial-ribbon-chart-block-size, auto);
   /* The width the page gives it, always: a ratio given a height cap carries
      the cap across, and a plot that reached it narrowed to a third less than
      its box. */
   inline-size: 100%;
   /* No taller than a height set on the host, which the row holds. */
-  max-block-size: min(var(--spatial-ribbon-chart-block-size, 22em), 100%);
+  max-block-size: min(var(--spatial-ribbon-chart-block-size, 26em), 100%);
   border-radius: var(--helix-radii-md);
   overflow: hidden;
   position: relative;

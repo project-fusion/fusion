@@ -16,12 +16,16 @@
 }
 
 /* One line of pages, scrolling in a column too narrow for it, since three lines
-   of numbers read as three lists. The block padding holds the focus ring. */
+   of numbers read as three lists. **The padding holds the focus ring on all
+   four sides**, and the margin hands the room back, so nothing around it
+   moves. With block padding alone, the ring on the first page was cut 4
+   pixels at its start by the scroll container, and on the last page at its
+   end. */
 [part="list"] {
   align-items: center;
   display: flex;
   gap: var(--pagination-gap, var(--helix-space-2xs));
-  max-inline-size: 100%;
+  max-inline-size: calc(100% + var(--helix-space-2xs) * 2);
   overflow-x: auto;
   padding-block: var(--helix-space-2xs);
   scrollbar-width: none;
@@ -29,8 +33,8 @@
      Safari drops list semantics when it sees this. */
   list-style: none;
   margin-block: calc(var(--helix-space-2xs) * -1);
-  margin-inline: var(--helix-space-none);
-  padding-inline: var(--helix-space-none);
+  margin-inline: calc(var(--helix-space-2xs) * -1);
+  padding-inline: var(--helix-space-2xs);
 }
 
 /* `inline-flex` and not `display: contents`, which is what this wants

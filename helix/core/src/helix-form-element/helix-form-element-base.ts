@@ -365,13 +365,20 @@ export class HelixFormElementBase extends HelixElement {
    * Only a click that starts at the host and that the browser sent: one from
    * inside has landed where it meant to, and `click()` from a script does not
    * focus a native control either.
+   *
+   * **A press from a pointer focuses without the ring**, as a press on a
+   * native checkbox's label does. The focus is a script's, and Chromium draws
+   * a script's focus as a keyboard's: a mouse press between a Switch's label
+   * and its hint drew the keyboard ring on the track, where Checkbox, which
+   * delegates focus, drew none. A click with no pointer behind it, `detail`
+   * 0, keeps the ring.
    */
   private readonly focusFromLabel = (event: MouseEvent): void => {
     if (!event.isTrusted || event.composedPath()[0] !== this || this.isDisabled) {
       return
     }
     if (!this.matches(':focus-within')) {
-      this.focus()
+      this.focus(event.detail > 0 ? ({ focusVisible: false } as FocusOptions) : undefined)
     }
   }
 

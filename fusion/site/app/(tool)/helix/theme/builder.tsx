@@ -962,6 +962,13 @@ export function ThemeBuilder({
                     <helix-icon-button
                       label="Hide controls"
                       onClick={() => setControlsShown(false)}
+                      /* Written as the attribute as well, as the toolbar's
+                         toggle is: this button mounts after hydration, and
+                         React set `label` only as the property, so the markup
+                         carried no name. */
+                      ref={(node) => {
+                        node?.setAttribute('label', 'Hide controls')
+                      }}
                     >
                       <helix-icon name="sidebar-simple"></helix-icon>
                     </helix-icon-button>

@@ -159,10 +159,10 @@ export interface Product {
  * tiles beside a column of text links. A product with none is a plain link to
  * its page until it has pages to tile: today that is Cortex.
  *
- * Engram, Trace and Recall are rows carrying their stage rather than a link,
- * because the division of Cortex is the argument even before the modules are
- * built. A row gains an `href` on the day it has somewhere to go, and keeps its
- * stage until it is finished.
+ * Engram, Trace and Recall are named because the division of Cortex is the
+ * argument. Each one's place is its cell on the Cortex page, which describes it
+ * and carries the same stage, so each row links there. A module named before it
+ * has anywhere to go takes no `href`, and keeps its stage until it is finished.
  */
 export const PRODUCTS: Product[] = [
   {
@@ -262,7 +262,8 @@ export const PRODUCTS: Product[] = [
     body: 'A memory and provenance layer for AI systems. Cortex records what a system knows, where each fact came from, and how far to trust it. The record stays when you replace the model.',
     /* The three modules that have earned an evocative name, per `AGENTS.md`:
        inside Cortex that is exactly Engram, Trace and Recall, and the rest stay
-       descriptive. The `cortex` command line ships all three. */
+       descriptive. The `cortex` command line ships all three, and each links
+       to its own cell on the Cortex page. */
     destinations: [
       {
         href: '/cortex',
@@ -270,16 +271,19 @@ export const PRODUCTS: Product[] = [
         title: 'Docs',
       },
       {
+        href: '/cortex#engram',
         stage: 'Active',
         summary: 'Memory: what a system keeps, and for how long.',
         title: 'Engram',
       },
       {
+        href: '/cortex#trace',
         stage: 'Active',
         summary: 'Provenance: where each fact came from.',
         title: 'Trace',
       },
       {
+        href: '/cortex#recall',
         stage: 'Active',
         summary: 'Context: what to give a model, and why.',
         title: 'Recall',

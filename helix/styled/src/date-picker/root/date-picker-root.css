@@ -2,13 +2,24 @@
   /* Two sizes, not one. The column track is what the grid is laid out on, and
      the day is the smaller shape centered in it. The difference is the space
      between days, and it belongs to the track rather than to a `gap`, so a
-     range can paint the whole track and stay continuous. */
-  --_calendar-track: var(--date-picker-track-size, 2.5rem);
-  --_calendar-row: var(--date-picker-row-size, 2.25rem);
+     range can paint the whole track and stay continuous.
+
+     **Both step with density, as the day does**: the track is a control's
+     height, 32, 40 and 48, and the row 4 under it, 28, 36 and 44. Fixed at 40
+     and 36 while the day stepped 24, 30 and 36, the days at `lg` touched from
+     one week to the next and the days at `sm` stood 16 apart. */
+  --_calendar-track: var(--date-picker-track-size, var(--helix-size-control));
+  --_calendar-row: var(
+    --date-picker-row-size,
+    calc(var(--helix-size-control) - var(--helix-space-2xs))
+  );
   /* The names' row, which is the pointer's row on a touch screen as well:
      nothing in it is pressed, so it keeps the week's pitch as a mouse sees it
      while the weeks grow to the target. */
-  --_calendar-names: var(--date-picker-row-size, 2.25rem);
+  --_calendar-names: var(
+    --date-picker-row-size,
+    calc(var(--helix-size-control) - var(--helix-space-2xs))
+  );
   --_calendar-day: var(--date-picker-day-size, calc(var(--helix-size-control) * 0.75));
   --_calendar-month: calc(var(--_calendar-track) * 7);
   display: inline-block;
@@ -57,7 +68,9 @@
   display: grid;
   gap: var(--helix-space-2xs);
   grid-template-columns: var(--_calendar-day) 1fr var(--_calendar-day);
-  margin-block-end: var(--helix-space-lg);
+  /* With density, 20, 24 and 32, so the title keeps its distance from the
+     names in step with the rows under them. */
+  margin-block-end: calc(var(--helix-space-control) + var(--helix-space-xs));
 }
 
 [part="heading"] {
@@ -134,6 +147,7 @@
   display: grid;
   gap: var(--helix-space-2xs);
   inline-size: calc(var(--_calendar-track) * 7);
+  max-inline-size: 100%;
 }
 
 [part="period-row"] {
@@ -216,9 +230,12 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
+/* A track gives way down to the day where the box is narrower than seven
+   tracks, so a calendar at `lg`, 336 wide, still fits a 280 column, its days
+   40 apart there as they were at every density. */
 [part="week"] {
   display: grid;
-  grid-template-columns: repeat(7, var(--_calendar-track));
+  grid-template-columns: repeat(7, minmax(var(--_calendar-day), var(--_calendar-track)));
 }
 
 /* **One row of the grid, the pitch the weeks keep.** The name sat in the top
@@ -235,7 +252,7 @@
   display: inline-flex;
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  inline-size: var(--_calendar-track);
+  inline-size: auto;
   justify-content: center;
 }
 
@@ -250,7 +267,7 @@
   block-size: var(--_calendar-row);
   cursor: pointer;
   display: inline-flex;
-  inline-size: var(--_calendar-track);
+  inline-size: auto;
   justify-content: center;
 }
 
@@ -557,21 +574,18 @@
   :host {
     --_calendar-row: var(--date-picker-row-size, var(--helix-size-target));
     --_calendar-month: calc(var(--_calendar-reach) * 7);
-    --_calendar-reach: var(--date-picker-track-size, var(--helix-size-target));
+    /* The larger of the target and the track, since the track at `lg` is 48. */
+    --_calendar-reach: var(
+      --date-picker-track-size,
+      max(var(--helix-size-target), var(--helix-size-control))
+    );
   }
 
   [part="week"] {
-    grid-template-columns: repeat(7, minmax(var(--_calendar-track), var(--_calendar-reach)));
-  }
-
-  [part~="cell"],
-  [part="weekday"] {
-    inline-size: auto;
+    grid-template-columns: repeat(7, minmax(var(--_calendar-day), var(--_calendar-reach)));
   }
 
   [part="periods"] {
     inline-size: calc(var(--_calendar-reach) * 7);
-    max-inline-size: 100%;
-    min-inline-size: calc(var(--_calendar-track) * 7);
   }
 }

@@ -421,6 +421,8 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `not-a-number` | A numeric attribute holds something that is not a number, such as `page-size="1O"`, or an attribute in milliseconds something that is not a time, such as `delay="soon"`, so the property keeps its default. Development builds only (the `development` export condition) |
 | `not-a-plot` | `connectSpatialScatterChart` or `connectSpatialSurfaceChart` was given an element that is not the chart it connects |
 | `picture-in-picture-refused` | The browser refused picture in picture |
+| `primary-contrast` | Primary text measures under 4.5:1 or a filled control under 3:1 against the page, in light or dark. Development builds only (the `development` export condition) |
+| `primary-status` | The primary color sits under 0.08 in OKLab from a status color, so a warning or a success reads as the brand. Development builds only (the `development` export condition) |
 | `react-props-missing` | React has a root on the page and no element found the props it holds, so `onhelix-*` handlers and object properties never arrive. Printed as an error. Development builds only (the `development` export condition) |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
 | `removed-callback` | A React prop is a callback that was removed and never ran from JSX. Development builds only (the `development` export condition) |

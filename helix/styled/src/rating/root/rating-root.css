@@ -134,12 +134,15 @@
    the pointer read as a proposal until pressed. Drawn in the chosen color, a
    preview of 5 looked exactly like a score of 5. */
 :host(:state(previewing)) [part="fill"] {
-  /* **A step off the chosen color that keeps 3:1 against the page**, which a
-     graphic needs: darker in light, dimmer in dark. 60% toward the page in
-     both modes measured 2.17:1 in light, a disabled rating's look, and 85%,
-     the least that clears 3:1 there, sat 1.28:1 from the chosen marks. Toward
-     the ink by a quarter it is 7.56:1 on white and 1.88:1 from the chosen
-     amber; in dark the step toward the page holds at 3.25:1 and 3.50:1. */
+  /* **A step off the chosen color toward the ink, in both modes**, which keeps
+     3:1 against the page and moves away from a disabled rating, which fades
+     toward the page. 60% toward the page in both modes measured 2.17:1 in
+     light, a disabled rating's look, and 85%, the least that clears 3:1 there,
+     sat 1.28:1 from the chosen marks. Toward the ink by a quarter it is 7.56:1
+     on white and 1.88:1 from the chosen amber. **Halfway toward the ink in
+     dark**: the step toward the page there measured #855600, 3.33:1, beside a
+     disabled #805800 at 3.31, 1.00:1 apart. Halfway is #ffd99c, 15.7:1 on
+     black, 1.38:1 from the chosen amber and 4.72:1 from the disabled marks. */
   color: light-dark(
     color-mix(
       in oklab,
@@ -148,8 +151,8 @@
     ),
     color-mix(
       in oklab,
-      var(--rating-color, var(--helix-color-warning-mark)) 60%,
-      var(--helix-color-background)
+      var(--rating-color, var(--helix-color-warning-mark)) 50%,
+      var(--helix-color-foreground)
     )
   );
 }

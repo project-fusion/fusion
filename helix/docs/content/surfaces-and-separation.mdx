@@ -99,6 +99,14 @@ does off the page: 1.23:1 in light and 1.29:1 in dark.
 </section>
 ```
 
+**In dark mode, a surface inside a sunken region steps up a rung.** The card
+rung, #0c0c0c, is darker than the #121212 well, so a Card there would read as a
+hole. Inside the region, `surface` takes the `raised` rung, #181818, and the
+rungs above it step with it: `raised` is #272727 and `overlay` is #2d2d2d. An
+elevated Card still stands above a default one, and a menu opened inside stands
+above both. Light mode keeps its rungs, where a card is already lighter than
+the well. Canvas's board is a sunken region too.
+
 ## Using the page color inside a component
 
 **`--helix-color-background` is the page color. Do not use it inside a
@@ -124,6 +132,14 @@ and components are not built on any of those.
 Put the color behind a hook that defaults to the page color. When the component
 sits on another surface, the hook can be set to match. Helix requires this of
 its own components, and the same applies to anything you build with it.
+
+**A tone faded toward the page needs no hook.** An outlined chart mark, a
+Callout's hairline, or a Badge's tint mixes its tone toward
+`--helix-color-background` to make a quieter color of the same tone. That color
+is a mark, and it never has to match the ground under it, so it reads as the
+tone on a card as it does on the page. A fill that has to disappear into its
+ground, such as a marker that hides a rail or a ring around a point, is the page
+color itself, and it takes a hook.
 
 ## Contrast
 

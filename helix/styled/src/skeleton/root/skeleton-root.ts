@@ -138,7 +138,7 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
 
   private measurePieces(): void {
     const field = this.watchedField
-    this.setPieces(field && this.loading ? piecesOf(field, this) : [])
+    this.setPieces(field && this.loading ? (piecesOf(field, this) ?? linesOf(field, this)) : [])
   }
 
   private setPieces(next: readonly Piece[]): void {
@@ -192,12 +192,12 @@ interface Piece {
  * lays out, where it has a label or a hint, which is what makes it a field.
  * A label or a hint is a line one `em` tall in the middle of its line box, as
  * wide as its words; the box keeps its own size and corner. Empty for anything
- * else, which keeps the one block.
+ * else, which keeps the one block. Undefined where the element is not a field.
  */
-const piecesOf = (field: Element, host: Element): Piece[] => {
+const piecesOf = (field: Element, host: Element): Piece[] | undefined => {
   const boxes = [...(field.shadowRoot?.children ?? [])]
   if (!boxes.some((box) => box.matches('[part~="label"], [part~="hint"]'))) {
-    return []
+    return undefined
   }
   const frame = host.getBoundingClientRect()
   const rtl = getComputedStyle(host).direction === 'rtl'
@@ -235,6 +235,51 @@ const piecesOf = (field: Element, host: Element): Piece[] => {
     })
   }
   return pieces
+}
+
+/**
+ * **Around words that wrap, a line for each line they take.** One block over a
+ * Text set on two lines drew a 538 by 42 slab, where `shape="text"` with
+ * `lines` draws a paragraph as its lines. Only an element that holds words and
+ * no elements, such as a Text or a paragraph, and only from two lines: one line
+ * keeps the one shape the size of its words. Each line is one `em` tall in the
+ * middle of its line box and as wide as its words, as a field's label is.
+ */
+const linesOf = (element: Element, host: Element): Piece[] => {
+  if (element.children.length > 0 || (element.textContent ?? '').trim() === '') {
+    return []
+  }
+  const words = document.createRange()
+  words.selectNodeContents(element)
+  const lines: { bottom: number; left: number; right: number; top: number }[] = []
+  for (const box of words.getClientRects()) {
+    if (box.width === 0) {
+      continue
+    }
+    const line = lines.find(
+      (one) => box.top < one.bottom - box.height / 2 && box.bottom > one.top + box.height / 2,
+    )
+    if (line) {
+      line.left = Math.min(line.left, box.left)
+      line.right = Math.max(line.right, box.right)
+    } else {
+      lines.push({ bottom: box.bottom, left: box.left, right: box.right, top: box.top })
+    }
+  }
+  if (lines.length < 2) {
+    return []
+  }
+  const frame = host.getBoundingClientRect()
+  const rtl = getComputedStyle(host).direction === 'rtl'
+  const size = Number.parseFloat(getComputedStyle(element).fontSize) || 16
+  return lines.map((line) => ({
+    corner: '',
+    height: Math.round(size),
+    line: true,
+    start: Math.round(rtl ? frame.right - line.right : line.left - frame.left),
+    top: Math.round((line.top + line.bottom) / 2 - size / 2 - frame.top),
+    width: Math.round(line.right - line.left),
+  }))
 }
 
 /** Whether a computed `border-radius` draws any corner at all. */

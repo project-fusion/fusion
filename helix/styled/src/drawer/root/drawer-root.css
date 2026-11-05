@@ -90,14 +90,15 @@
      Dialog's note. */
   --helix-color-surface-overlay: light-dark(
     var(--_drawer-ground),
-    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_drawer-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_drawer-ground))
   );
   /* A panel in the content, such as a Card, reads `surface-raised`, which in dark
      is the drawer's own fill. A smaller step, so a list opened from that panel
-     still stands above it. */
+     still stands above it. The rungs step by 3%, 9%, and 12% of the ink, as
+     Dialog's do. */
   --helix-color-surface-raised: light-dark(
     var(--_drawer-raised),
-    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_drawer-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_drawer-ground))
   );
   /* A Card reads `surface`, and in dark that is darker than the drawer, and
      nothing inside is rounder than the panel. See Dialog's note. */
@@ -296,7 +297,10 @@
    because the header region is a wrapper and always takes a place in the
    column: a gap would open the same space over a drawer with no title at all.
    `block` so the margin applies to a bare `<span>`, and a document rule still
-   wins over this one for a consumer whose header is a row of its own. */
+   wins over this one for a consumer whose header is a row of its own.
+   **The control inset, 12, 16 and 24 with the density**, the gap Dialog puts
+   under its title and the content's own gap. It was a fixed 16 at every
+   density. */
 ::slotted([slot="header"]) {
   color: var(--helix-color-foreground);
   display: block;
@@ -306,7 +310,7 @@
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
   margin: var(--helix-space-none);
-  margin-block-end: var(--helix-space-md);
+  margin-block-end: var(--helix-space-control);
 }
 
 /* The actions under the content, pinned like the header. No rule draws a box
@@ -316,7 +320,7 @@
 }
 
 /* A step clear of the content above, from the slotted element itself, for the
-   reason the title takes its step from its own margin. */
+   reason the title takes its step from its own margin, and the same step. */
 /* Actions at the trailing edge, the dismissive first and the primary last, in
    source order as on screen, as a Dialog's are. Wrapped, the primary is on the
    lower row, nearest the thumb. Decided by the owner on November 3, 2026. */
@@ -325,7 +329,7 @@
   flex-wrap: wrap;
   gap: var(--helix-space-xs);
   justify-content: flex-end;
-  margin-block-start: var(--helix-space-md);
+  margin-block-start: var(--helix-space-control);
 }
 
 /* **The content's children stand a step apart**, the gap Dialog's body takes,

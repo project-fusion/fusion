@@ -147,6 +147,24 @@ the space around headings in your own stylesheet:
 }
 ```
 
+**Set a document for reading with `data-prose="reading"`.** The default size
+is 14px, which suits a reply in a chat bubble or a note in a panel. A
+documentation page or an article reads better larger:
+
+```html
+<article data-prose="reading">
+  <h2>Install the connector</h2>
+  <p>Text at 18px on a 27px line, about 70 characters wide.</p>
+</article>
+```
+
+`reading` makes the following changes:
+
+- It sets the text at `--helix-text-lg`, on `--helix-leading-normal`.
+- It ends each block with `--helix-space-md`.
+- It stops paragraphs, lists, and quotes at 34em.
+- It sets a table at 16px, between `md` and `lg`.
+
 For one-off text outside prose, use `[data-text]` to set the ramp:
 
 ```html

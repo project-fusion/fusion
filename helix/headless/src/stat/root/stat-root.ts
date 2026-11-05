@@ -17,6 +17,11 @@ import { property, state } from 'lit/decorators.js'
 /** The characters a figure groups its digits with, besides the locale's own. */
 const SEPARATORS = new Set([',', '.', "'", '\u2019', ' ', '\u00a0', '\u2009', '\u202f'])
 
+/** What a Stat asks of the group around it: the step its figure takes. */
+interface StepSharing {
+  stepFor(stat: HelixHeadlessStat): number
+}
+
 /**
  * @summary One measurement, with a label that names what it measures.
  *
@@ -264,18 +269,38 @@ export class HelixHeadlessStat extends HelixElement {
       one.style.display = 'none'
     }
     const fits = (): boolean => this.widthOf(part) <= room + 0.5
-    this.toggleState('stepped', false)
-    this.toggleState('stepped-twice', false)
+    this.showStep(0)
+    let need = 0
     if (!fits()) {
-      this.toggleState('stepped', true)
+      need = 1
+      this.showStep(1)
       if (!fits()) {
-        this.toggleState('stepped-twice', true)
+        need = 2
       }
     }
     part.style.whiteSpace = wrap
     for (const one of breaks) {
       one.style.removeProperty('display')
     }
+    this.stepNeeded = need
+    /* **A group in columns sets every figure at one step**, the largest any of
+       them needs. Each stat stepped on its own width, and one row of three in
+       120 pixel columns read 42, 32 and 24. */
+    const group = this.parentElement as Partial<StepSharing> | null
+    this.showStep(group?.stepFor ? group.stepFor(this) : need)
+  }
+
+  /**
+   * The steps down this stat's own figure needs to fit its width, from 0 to 2,
+   * measured at full size whatever step it shows. A group in columns reads it
+   * to set every figure at the same step.
+   */
+  stepNeeded = 0
+
+  /** Sets the figure at a step, 0 for full size, without measuring it again. */
+  showStep(step: number): void {
+    this.toggleState('stepped', step >= 1)
+    this.toggleState('stepped-twice', step >= 2)
   }
 
   /** The width of what a part shows, slotted or its own, on the lines it takes. */

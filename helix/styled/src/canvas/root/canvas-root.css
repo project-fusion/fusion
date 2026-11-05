@@ -30,6 +30,12 @@
     var(--_canvas-overlay),
     color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_canvas-overlay))
   );
+  /* A filled card at a panel's step, #202020 on the board, under the elevated
+     one, as `data-surface="sunken"` restates it. */
+  --helix-color-surface-filled: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto 1fr auto;
@@ -361,7 +367,7 @@
   stroke: var(--helix-color-success);
 }
 [part="edge"][data-tone="warning"] {
-  stroke: var(--helix-color-warning);
+  stroke: var(--helix-color-warning-mark);
 }
 
 /* **Selected stays drawn after the pointer and the focus have gone**, in the

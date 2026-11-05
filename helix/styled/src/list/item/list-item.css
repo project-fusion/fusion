@@ -14,8 +14,12 @@
      rather than a width, so that a list which has not asked for a rail gets a
      track with nothing in it, which is `0`: the cell below is `display: none`
      until a list turns it on, and an `auto` track with no items takes no space.
-     The grip's track is the same: a list that does not reorder draws no grip. */
-  grid-template-columns: auto auto 1fr auto auto;
+     The grip's track is the same: a list that does not reorder draws no grip.
+     **`minmax(0, 1fr)` for the words**, because a bare `1fr` cannot go under
+     its content's min-content width: a code block in an item widened the row
+     past its list, and the terminals page scrolled sideways at 390, 434 pixels
+     wide. */
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
   /* The two rows packed in the middle rather than stretched over the free
      space. Stretched, an empty description row took half of it under the
      label, and a one-line label sat 1.38 pixels above the row's center. */
@@ -118,6 +122,9 @@ slot:not([name]) {
   font-weight: var(--list-item-term-weight, var(--helix-weight-regular));
   grid-column: 3;
   grid-row: 1;
+  /* A grid item's own minimum is its content's, so the track above is not
+     enough alone. */
+  min-inline-size: 0;
 }
 
 slot[name="description"] {
@@ -126,6 +133,7 @@ slot[name="description"] {
   font-size: var(--helix-text-xs);
   grid-column: 3;
   grid-row: 2;
+  min-inline-size: 0;
 }
 
 /* Margins only. */
@@ -317,10 +325,13 @@ slot[name="end"]::slotted(*) {
   opacity: var(--list-item-disabled-opacity, var(--helix-opacity-disabled));
 }
 
-/* A long unbroken word breaks inside the column it was given. */
+/* A long unbroken word breaks inside the column it was given. **`break-word`,
+   which breaks only a word that does not fit**, now that the text's track and
+   slot can go under their content: `anywhere` also took the row's min-content
+   down to one character, so a row in a flex line broke its words mid-word. */
 [part~="row"] {
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 /* Rows sit against each other, so a box past one would take the press from the

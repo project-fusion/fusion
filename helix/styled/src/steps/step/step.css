@@ -58,6 +58,35 @@
   inset-inline-start: var(--_steps-trail-inline-start, 0);
 }
 
+/* **The way already traveled is drawn in the mark ink**, so the line carries
+   the progress: the half leaving a complete step, and the half arriving at a
+   complete or current one. Every half was the 1.23:1 border, done and pending
+   alike. `foreground-subtle` is the ink of a pending step's mark, about 3:1
+   on the page, so the line reads as far as the reader has come and stays
+   quieter than the green check and the primary target. */
+:host([complete])::after,
+:host([complete])::before,
+:host([current])::before {
+  background-color: var(--steps-connector-color, var(--helix-color-foreground-subtle));
+}
+
+/* **Forced colors keep the line, and the progress in it.** The connector is a
+   background, which the mode paints `Canvas` on `Canvas`, so it vanished.
+   Divider draws its line the same way. */
+@media (forced-colors: active) {
+  :host::before,
+  :host::after {
+    background-color: GrayText;
+    forced-color-adjust: none;
+  }
+
+  :host([complete])::after,
+  :host([complete])::before,
+  :host([current])::before {
+    background-color: CanvasText;
+  }
+}
+
 /* Nothing arrives at the first and nothing leaves the last, which a structural
    pseudo-class says with no index and no parent counting its children. */
 :host(:first-child)::before,

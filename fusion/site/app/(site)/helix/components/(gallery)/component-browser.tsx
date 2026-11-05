@@ -175,6 +175,19 @@ export function ComponentBrowser({
     }
   }, [category, index, query, status])
 
+  /* **The way back names the filters that are set, by their own option.** It
+     said "clear the group filter" with no filter set, and the control it meant
+     is labeled Category and offers "All categories". */
+  const resets = [
+    category !== ALL ? 'All categories' : '',
+    status !== ALL ? 'All statuses' : '',
+  ].filter(Boolean)
+  const choose = resets.length > 0 ? `choose ${resets.join(' and ')}` : ''
+  const emptyHint =
+    query.trim() || !choose
+      ? `Try a shorter word${choose ? `, or ${choose}` : ''}.`
+      : `${choose.charAt(0).toUpperCase()}${choose.slice(1)}.`
+
   return (
     <>
       <PageHero backdrop={<HeroField />} className={styles.designHero}>
@@ -343,7 +356,7 @@ export function ComponentBrowser({
             <helix-text as="h2" slot="heading">
               Nothing matches
             </helix-text>
-            Try a shorter word, or clear the group filter.
+            {emptyHint}
           </helix-empty>
         ) : null}
         {children}

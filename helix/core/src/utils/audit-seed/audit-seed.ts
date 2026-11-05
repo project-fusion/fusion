@@ -24,6 +24,47 @@ const TEXT = 4.5
 /** What a filled control needs against the page, as a graphic does. */
 const FILL = 3
 
+/**
+ * How far apart in OKLab the primary and a status color must be to read as two
+ * colors. The theme engine's own `COLLISION_DISTANCE`, which it rotates a
+ * status clear of the brand by. A seed in CSS gets no such rotation: a yellow
+ * seed's light primary, #7c6100, measured 0.035 from the warning ink, #845500.
+ */
+const STATUS_DISTANCE = 0.08
+
+/** The status inks a primary must stay clear of. */
+const STATUSES = ['danger', 'info', 'success', 'warning'] as const
+
+/** The OKLab coordinates of three sRGB bytes. */
+export const oklabOf = (bytes: readonly number[]): [number, number, number] => {
+  const [red = 0, green = 0, blue = 0] = bytes.map((byte) => {
+    const channel = byte / 255
+    return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+  const long = Math.cbrt(0.4122214708 * red + 0.5363325363 * green + 0.0514459929 * blue)
+  const medium = Math.cbrt(0.2119034982 * red + 0.6806995451 * green + 0.1073969566 * blue)
+  const short = Math.cbrt(0.0883024619 * red + 0.2817188376 * green + 0.6299787005 * blue)
+  return [
+    0.2104542553 * long + 0.793617785 * medium - 0.0040720468 * short,
+    1.9779984951 * long - 2.428592205 * medium + 0.4505937099 * short,
+    0.0259040371 * long + 0.7827717662 * medium - 0.808675766 * short,
+  ]
+}
+
+/** The OKLab distance between two colors, as three bytes each. */
+export const distanceOf = (one: readonly number[], other: readonly number[]): number => {
+  const [l1, a1, b1] = oklabOf(one)
+  const [l2, a2, b2] = oklabOf(other)
+  return Math.hypot(l1 - l2, a1 - a2, b1 - b2)
+}
+
+/** The warning for a primary that reads as a status color in one scheme. */
+export const statusMessage = (scheme: 'dark' | 'light', status: string, distance: number): string =>
+  `In ${scheme}, the primary color is ${distance.toFixed(3)} from the ${status} color in OKLab, ` +
+  `under the ${STATUS_DISTANCE} that tells two colors apart, so a ${status} reads as the brand. ` +
+  'Choose a seed further from it, or build the theme with the theme engine, which turns the ' +
+  'status colors clear of the brand.'
+
 /** The WCAG relative luminance of three bytes. */
 const luminance = (bytes: readonly number[]): number => {
   const [red = 0, green = 0, blue = 0] = bytes.map((byte) => {
@@ -51,6 +92,7 @@ type Probe = {
   fill: number[]
   page: number[]
   scheme: 'dark' | 'light'
+  statuses: number[][]
   text: number[]
 }
 
@@ -85,6 +127,12 @@ export const contrastMessage = (scheme: 'dark' | 'light', text: number, fill: nu
  * dark ones at or over 0.68. What can is an override of the ramp's output, such
  * as `--helix-color-primary` set by hand or a page color the solve did not
  * assume, and that is what this catches.
+ *
+ * **And a primary that reads as a status color.** The status hues are fixed in
+ * CSS, so a yellow seed's primary lands on the warning ink and a green one's on
+ * success: a warning then reads as a brand mark. The theme engine turns a status
+ * clear of the brand by `STATUS_DISTANCE`, and this reports the same distance
+ * for a seed set in CSS.
  *
  * **Both schemes, from probes that each name one**, since `light-dark()`
  * resolves against the element's own `color-scheme` and a page in light would
@@ -182,8 +230,18 @@ export const auditSeed = (): void => {
       'border-color:var(--helix-color-primary-surface);display:none'
     root.append(probe)
     const { backgroundColor, borderTopColor, color } = getComputedStyle(probe)
+    const statuses = STATUSES.map((status) => {
+      probe.style.color = `var(--helix-color-${status})`
+      return bytes(getComputedStyle(probe).color)
+    })
     probe.remove()
-    return { fill: bytes(borderTopColor), page: bytes(backgroundColor), scheme, text: bytes(color) }
+    return {
+      fill: bytes(borderTopColor),
+      page: bytes(backgroundColor),
+      scheme,
+      statuses,
+      text: bytes(color),
+    }
   }) as [Probe, Probe]
   const key = JSON.stringify([light, dark])
   if (key === measured) {
@@ -195,6 +253,19 @@ export const auditSeed = (): void => {
     JSON.stringify([dark.fill, dark.page, dark.text])
       ? [{ ...light, scheme: schemeOf(light.page) }]
       : [light, dark]
+  for (const { scheme, statuses, text } of probes) {
+    STATUSES.forEach((status, index) => {
+      const distance = distanceOf(text, statuses[index] ?? text)
+      if (distance >= STATUS_DISTANCE) {
+        return
+      }
+      const message = statusMessage(scheme, status, distance)
+      if (!reported.has(message)) {
+        reported.add(message)
+        reportRuntime({ kind: 'primary-status', message, tag: 'html' })
+      }
+    })
+  }
   for (const { fill, page, scheme, text } of probes) {
     const textContrast = contrastOf(text, page)
     const fillContrast = contrastOf(fill, page)

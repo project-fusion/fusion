@@ -25,7 +25,7 @@ import '../../tooltip/index.js'
  * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-ribbon-chart
  *
- * @cssproperty --spatial-ribbon-chart-block-size - How tall the plot is. By default, three quarters of its width and 22em at most.
+ * @cssproperty --spatial-ribbon-chart-block-size - How tall the plot is. By default, as tall as it is wide and 26em at most.
  */
 @customElement('helix-spatial-ribbon-chart')
 export class HelixSpatialRibbonChart extends HelixHeadlessSpatialRibbonChart {

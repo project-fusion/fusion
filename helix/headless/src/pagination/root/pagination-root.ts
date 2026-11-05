@@ -658,8 +658,26 @@ export class HelixHeadlessPagination extends HelixElement {
     const gap = Number.parseFloat(getComputedStyle(this).columnGap) || 0
     return shown.reduce(
       (sum, node) =>
-        sum + (node.getAttribute('part') === 'list' ? node.scrollWidth : node.offsetWidth),
+        sum + (node.getAttribute('part') === 'list' ? this.listWidth(node) : node.offsetWidth),
       Math.max(0, shown.length - 1) * gap,
+    )
+  }
+
+  /**
+   * The room the whole run of pages takes in the row: its scroll width, which
+   * counts its padding, with its inline margins, which the row counts too.
+   * **The margins as well**, since a sheet may pad the run to hold the focus
+   * ring and hand the room back with negative margins: measured on November 4,
+   * 2026, the run's scroll width alone read 8 pixels wider than the row it
+   * sat in, so a two page control in a 1440 page folded to "1 of 2" and, as
+   * wide as its folded form, never unfolded.
+   */
+  private listWidth(list: HTMLElement): number {
+    const style = getComputedStyle(list)
+    return (
+      list.scrollWidth +
+      (Number.parseFloat(style.marginInlineStart) || 0) +
+      (Number.parseFloat(style.marginInlineEnd) || 0)
     )
   }
 

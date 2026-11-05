@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { contrastMessage, contrastOf, schemeOf } from './audit-seed.js'
+import {
+  contrastMessage,
+  contrastOf,
+  distanceOf,
+  oklabOf,
+  schemeOf,
+  statusMessage,
+} from './audit-seed.js'
 
 describe('contrastOf', () => {
   test('black on white is 21', () => {
@@ -41,5 +48,27 @@ describe('schemeOf', () => {
   test('names the dark card grounds dark', () => {
     expect(schemeOf([12, 12, 12])).toBe('dark')
     expect(schemeOf([24, 24, 24])).toBe('dark')
+  })
+})
+
+describe('distanceOf', () => {
+  test('a yellow seed primary sits within the collision distance of warning', () => {
+    expect(distanceOf([0x7c, 0x61, 0x00], [0x84, 0x55, 0x00])).toBeLessThan(0.08)
+  })
+
+  test('ink and a status are far apart', () => {
+    expect(distanceOf([0x18, 0x18, 0x18], [0x84, 0x55, 0x00])).toBeGreaterThan(0.08)
+  })
+
+  test('white is L 1 and black is L 0', () => {
+    expect(oklabOf([255, 255, 255])[0]).toBeCloseTo(1, 3)
+    expect(oklabOf([0, 0, 0])[0]).toBeCloseTo(0, 5)
+  })
+})
+
+describe('statusMessage', () => {
+  test('names the scheme, the status, and the distance', () => {
+    const message = statusMessage('light', 'warning', 0.035)
+    expect(message).toContain('In light, the primary color is 0.035 from the warning color')
   })
 })

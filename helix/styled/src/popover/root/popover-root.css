@@ -17,14 +17,15 @@
      nothing inside is rounder than the panel. See Dialog's note. A list opened
      from inside, such as a Select's, takes `surface-overlay`, which in dark was
      the panel's own fill: #181818 on #181818. The rungs step up from the panel
-     as Dialog's do. */
+     by 3%, 9%, and 12% of the ink, so an elevated card, #2f2f2f, reads above
+     a filled one, #2c2c2c, where at 5% of the ink it read #272727. */
   --helix-color-surface-overlay: light-dark(
     var(--_popover-ground),
-    color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_popover-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_popover-ground))
   );
   --helix-color-surface-raised: light-dark(
     var(--_popover-raised),
-    color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_popover-ground))
+    color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_popover-ground))
   );
   --helix-color-surface: light-dark(
     var(--_popover-surface),

@@ -1,4 +1,4 @@
-<!-- @summary Sessions by source as a ring, read from the table beside it. -->
+<!-- @summary Sessions by source as a ring, with the total in its middle and a legend under it. -->
 <!-- @layout hug -->
 
 <helix-flex
@@ -36,5 +36,14 @@
     </tbody>
   </table>
 
-  <helix-donut-chart for="traffic"></helix-donut-chart>
+  <helix-donut-chart for="traffic">
+    <helix-stat>
+      10,000
+      <span slot="label">Sessions</span>
+    </helix-stat>
+  </helix-donut-chart>
+  <helix-legend
+    entries="categories"
+    for="traffic"
+  ></helix-legend>
 </helix-flex>

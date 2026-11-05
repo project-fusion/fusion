@@ -177,6 +177,15 @@
   position: absolute;
 }
 
+/* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
+   moves: the control is 32 pixels, and on a touch screen it measured 32 by 32
+   against the 44 target. */
+[part="pause"]::after {
+  content: "";
+  inset: calc((var(--helix-size-target) - 100%) / -2);
+  position: absolute;
+}
+
 [part="pause-mark"] {
   block-size: var(--helix-size-icon-sm);
   inline-size: var(--helix-size-icon-sm);

@@ -341,6 +341,32 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   position: 'floating' | 'item-aligned' = 'floating'
 
   /**
+   * Whether the choice is locked. A read-only select still submits its value.
+   *
+   * The trigger can be read and focused, the list does not open, and the
+   * letters and the Left and Right keys on the closed trigger change nothing,
+   * as Combobox's `readonly` does.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /** Requests a new value. While `readOnly` is set, nothing changes. */
+  override requestValue(next: string): boolean {
+    if (this.readOnly) {
+      return false
+    }
+    return super.requestValue(next)
+  }
+
+  /** Requests the list open or closed. While `readOnly` is set, it does not open. */
+  override requestOpen(next: boolean): boolean {
+    if (next && this.readOnly) {
+      return false
+    }
+    return super.requestOpen(next)
+  }
+
+  /**
    * What the trigger shows for the chosen options: a function given them, in
    * the order they appear, that returns text, an element or a Lit template.
    *
@@ -1093,7 +1119,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       ${this.renderHint()}${this.renderFeedback()}${drawStatus(this.status)}
       ${drawAutofill({
         autocomplete: this.autocomplete,
-        disabled: this.isDisabled,
+        disabled: this.isDisabled || this.readOnly,
         multiple: this.multiple,
         onFill: (value) => this.requestValue(value),
         options: this.entries,

@@ -2,6 +2,11 @@ import '@fusion.dev/helix-styles/helix.css'
 import '@fusion.dev/helix-gallery/gallery.css'
 import './fonts.css'
 import './site.css'
+/* **The dead ends' sheet, loaded with the page.** Imported only by the error
+   and not-found files, it was preloaded on every page and used on none, and
+   Chrome warned "preloaded using link preload but not used" on 13 of 14 pages.
+   Loaded here it is one of the page's own stylesheets, about 80 lines. */
+import '@/components/trouble/trouble.module.css'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import type { ReactNode } from 'react'

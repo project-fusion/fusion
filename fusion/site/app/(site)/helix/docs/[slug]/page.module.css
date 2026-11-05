@@ -38,10 +38,26 @@
    characters a line. In `em` rather than `ch`: the face's zero is wide, so 62ch
    came to 740px and moved nothing. 34em is 612px, about 70 characters of this
    face. Tables and code keep the column. */
-.prose :is(helix-text[as="p"], helix-list-item, [data-item-text]) {
+.prose :is(helix-text[as="p"], ul, ol) {
   font-size: var(--helix-text-lg);
   line-height: var(--helix-leading-normal);
   max-inline-size: 34em;
+}
+
+/* **A list is lines of the text**, with the marker hung in the gutter and the
+   items a step apart, so a one-line item stands 31 below the last at 18px. */
+.prose :is(ul, ol) {
+  margin-block-end: 0;
+  padding-inline-start: var(--helix-space-lg);
+}
+
+.prose li + li,
+.prose li > :is(ul, ol) {
+  margin-block-start: var(--helix-space-2xs);
+}
+
+.prose li > :is(ul, ol) {
+  font-size: inherit;
 }
 
 /* **Tables a step under the reading type**, 16 between the ramp's 14 and 18.

@@ -47,13 +47,15 @@ const RULES: readonly SyntaxRule[] = [
       tags.moduleKeyword,
       tags.operatorKeyword,
       tags.self,
-      tags.null,
     ],
   },
   {
     class: 'helix-syntax-string',
+    // An attribute's value is a string, so `href="/docs"` in markup and
+    // `"/docs"` in script take one color. As a constant, a TSX file drew its
+    // quoted text in two colors.
     style: { color: 'var(--helix-color-syntax-string)' },
-    tag: [tags.string, tags.special(tags.string), tags.regexp, tags.escape],
+    tag: [tags.string, tags.special(tags.string), tags.regexp, tags.escape, tags.attributeValue],
   },
   {
     class: 'helix-syntax-tag',
@@ -64,19 +66,10 @@ const RULES: readonly SyntaxRule[] = [
   },
   {
     class: 'helix-syntax-name',
-    // What a name refers to. Attributes, variables, properties and numbers all
-    // read as "a value is being named or given", which is not structure.
+    // What a name refers to. Attributes, variables and properties all read as
+    // "a value is being named", which is not structure.
     style: { color: 'var(--helix-color-syntax-name)' },
-    tag: [
-      tags.attributeName,
-      tags.variableName,
-      tags.propertyName,
-      tags.number,
-      tags.integer,
-      tags.float,
-      tags.labelName,
-      tags.namespace,
-    ],
+    tag: [tags.attributeName, tags.variableName, tags.propertyName, tags.labelName, tags.namespace],
   },
   {
     class: 'helix-syntax-callable',
@@ -92,14 +85,20 @@ const RULES: readonly SyntaxRule[] = [
   },
   {
     class: 'helix-syntax-constant',
+    // A literal value: a number, `true` and `false`, and `null`. A JSON number
+    // took the key's color, and `null` the keyword's red, the danger hue,
+    // beside `true` in this color.
     style: { color: 'var(--helix-color-syntax-constant)' },
     tag: [
       tags.atom,
       tags.bool,
+      tags.null,
+      tags.number,
+      tags.integer,
+      tags.float,
       tags.constant(tags.name),
       tags.standard(tags.name),
       tags.unit,
-      tags.attributeValue,
       tags.color,
     ],
   },

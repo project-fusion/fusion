@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  settled,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -21,6 +28,14 @@ type Item = HTMLElement & {
   pause(): void
   resume(): void
   updateComplete: Promise<boolean>
+}
+
+/* **Once each message has arrived.** A message makes room as it arrives, its
+   row growing from nothing, so a box measured on its first frame is 0 tall
+   and two of them share a top edge. */
+const arrived = async (item: Element): Promise<void> => {
+  await settled(item)
+  await settled(part(item as HTMLElement, 'item'))
 }
 
 const region = async (items = ''): Promise<HTMLElement> =>
@@ -44,6 +59,7 @@ if (hasLayout()) {
       )) as HTMLElement
       await (host as unknown as { updateComplete: Promise<boolean> }).updateComplete
       const items = [...host.querySelectorAll('helix-toast-item')]
+      await Promise.all(items.map(arrived))
       const find = (text: string): number => {
         const found = items.find((item) => item.textContent?.trim() === text)
         if (!found) {
@@ -369,6 +385,7 @@ if (hasLayout()) {
       for (const id of ['short', 'long'] as const) {
         const found = host.querySelector(`#${id}`) as Item
         await found.updateComplete
+        await arrived(found)
         const center = (element: Element): number => {
           const box = element.getBoundingClientRect()
           return box.top + box.height / 2

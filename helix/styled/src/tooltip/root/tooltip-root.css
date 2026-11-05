@@ -72,8 +72,8 @@
 /* *Glass takes the ink with it, which is what makes this different from every
    other family that carries the axis.** A tooltip's resting state is
    `surface-inverse` with `foreground-inverse` on it, and
-   `--helix-material-translucent` is the *page's* ground, `neutral-0` in light
-   and `neutral-900` in dark. */
+   `--helix-material-panel` is the *page's* ground, `neutral-0` in light and
+   `neutral-900` in dark, at 72%. */
 :host([material="glass"]) [part~="surface"],
 :host([material="glass"]) [part~="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));

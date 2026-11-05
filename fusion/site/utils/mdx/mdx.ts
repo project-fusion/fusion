@@ -34,6 +34,12 @@ const childrenNamed = (node: HastNode, tagName: string): HastNode[] =>
  * other columns keep a track each in `--table-stacked`, which `site.css` reads
  * under its breakpoint. A table of figures has no such column and keeps
  * scrolling, its columns being the comparison.
+ *
+ * **A sentence is five words or more on average.** The column's heading goes
+ * out of sight when it stacks, which a sentence survives and a figure does not:
+ * measured on November 4, 2026, 8 of the 21 stacked tables had a last column
+ * of two to four words a cell, such as the color washes' "16% in light, 20% in
+ * dark", and on a phone nothing said which state each value was for.
  */
 const stackTable = (table: HastNode): void => {
   const columns = childrenNamed(table, 'helix-table-column').length
@@ -47,6 +53,13 @@ const stackTable = (table: HastNode): void => {
   })
   const last = lengths[columns - 1] ?? 0
   if (lengths.slice(0, -1).some((length) => length >= last)) {
+    return
+  }
+  const words = rows.reduce((sum, row) => {
+    const cell = childrenNamed(row, 'helix-table-cell')[columns - 1]
+    return sum + (cell ? textOf(cell).trim().split(/\s+/).filter(Boolean).length : 0)
+  }, 0)
+  if (words / rows.length < 5) {
     return
   }
   const style = typeof table.properties?.style === 'string' ? `${table.properties.style};` : ''

@@ -33,6 +33,21 @@ helix-dialog::part(surface) {
   }
 }
 
+/* **A glass palette in light reads the page, as a glass Dialog does.** The
+   correction in `base.css` names a Dialog in the document, and this one is in
+   the palette's own shadow root, where no document rule reaches: the panel
+   averaged #e4e4e4 over a white page, a gray slab beside a glass Dialog's
+   #ffffff. The scrim is 40% of the ink in light, and 1 / 0.6 hands the filter
+   the page as it stands under the scrim. */
+@container style(--_helix-mode: light) {
+  helix-dialog[material="glass"]::part(surface) {
+    backdrop-filter: var(
+      --dialog-backdrop,
+      var(--helix-material-backdrop) brightness(calc(1 / 0.6))
+    );
+  }
+}
+
 /* One text column down the whole panel. */
 :host {
   --option-padding: var(--helix-space-sm);

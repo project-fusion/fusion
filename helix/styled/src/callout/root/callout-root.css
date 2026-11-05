@@ -19,6 +19,14 @@
      loose as the controls beside it, as Card is, rather than through a `size`
      of its own. */
   --_callout-inset: var(--callout-padding, var(--helix-space-control));
+  /* **One line of the text, rounded up to a whole pixel**, so a one-line
+     callout is a whole number of pixels tall: the 13 pixel type at `md` set a
+     19.5 line, which the taller icon used to hide, and the box came out 51.5. */
+  --_callout-line: round(
+    up,
+    calc(var(--callout-font-size, var(--helix-text-control)) * var(--helix-leading-normal)),
+    1px
+  );
   /* Its own size rather than the page's. A callout is an aside inside prose, so
      it sets its type a step down from the body it interrupts: inheriting left
      it at 15 while its own title was 14, which is a title smaller than the text
@@ -39,7 +47,13 @@
      relative. `--callout-bar-thickness` still draws the clipped bar. */
   box-shadow: inset 0 0 0 var(--helix-border-thin)
     color-mix(in oklab, var(--_callout-color) 28%, var(--helix-color-background));
-  overflow: hidden;
+  /* **`clip`, which is not a scroll container.** A `hidden` host is one, and a
+     scroll container in a flex row has no minimum width of its own: beside a
+     sibling that kept its width, a callout saying "Notifications" was squeezed
+     to 41 pixels and broke the word a letter a line at 280. Clipped, it keeps
+     its longest word, 135 pixels, and the bar is clipped to the corners as
+     before. */
+  overflow: clip;
   position: relative;
   /* `md`, the container corner Card takes, against the `sm` of the controls
      inside it. A callout at `sm` beside a card at `md` read as two kinds of
@@ -113,32 +127,41 @@
   box-shadow: none;
 }
 
+/* **The tight icon step, 12, 16 and 20, the glyph a field and an Accordion
+   draw beside the same text**, and centered on the first line. The full step,
+   16, 20 and 24, was taller than the 19.5 and 21 pixel lines at `md` and
+   `lg`, and hung from its top: measured, the mark's center 2 pixels under the
+   first line's at `lg`. */
 [part="icon"] {
   color: var(--_callout-color);
   display: inline-flex;
   flex: 0 0 auto;
+  margin-block-start: calc((var(--_callout-line) - var(--helix-size-icon-tight)) / 2);
 }
 
 /* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box
    at width 16, and a value tuned for a 24 box would make it hairline. */
 [part="icon"] svg {
-  block-size: var(--helix-size-icon);
-  inline-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 /* A slotted replacement icon is sized the same way as the default, so swapping
    it does not change the callout's rhythm. */
 slot[name="icon"]::slotted(*) {
-  --icon-size: var(--helix-size-icon);
+  --icon-size: var(--helix-size-icon-tight);
 
-  block-size: var(--helix-size-icon);
-  inline-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
+/* `break-word`, which breaks only a word that does not fit and leaves the
+   min-content width alone, where `anywhere` took it down to one character and
+   a callout in a flex row broke its words mid-word. */
 [part="content"] {
-  line-height: var(--helix-leading-normal);
+  line-height: var(--_callout-line);
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 /* At the end of the first line, as quiet as the mark at the start: the glyph
@@ -176,8 +199,8 @@ slot[name="icon"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* Smaller than the callout's own mark, which leads the message: the dismiss is
-   a control at the end of it, drawn as Announcement, Notification and Toast draw
+/* The tight step, as the callout's own mark is: the dismiss is a control at
+   the end of the message, drawn as Announcement, Notification and Toast draw
    theirs. */
 [part="dismiss"] svg,
 slot[name="dismiss-icon"]::slotted(*) {

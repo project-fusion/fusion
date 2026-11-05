@@ -29,8 +29,10 @@ export function Landing() {
         {/* **The light behind the first screen**: a helix, drawn by the library
             in the theme's colors, so a new brand color relights it. It shows
             one still frame where motion is reduced, and a gradient where the
-            browser draws without a GPU. */}
-        <helix-aura className="first-light" speed={0.4} terminus={0.8} pattern="braid" />
+            browser draws without a GPU. `pause-control` draws a button in
+            its corner that stops the motion and starts it again, since the
+            light moves for longer than five seconds. */}
+        <helix-aura className="first-light" speed={0.4} terminus={0.8} pattern="braid" pause-control />
         <div className="hero">
           <helix-tag emphasis="subtle" tone="primary">
             Starter
