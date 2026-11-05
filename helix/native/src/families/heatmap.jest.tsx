@@ -212,6 +212,19 @@ describe('the cells', () => {
     expect(cells()).toHaveLength(7)
   })
 
+  test('tells resize as the cells it draws change, from the width it first measured', async () => {
+    const sizes: number[] = []
+    await render(
+      <Chart
+        onResize={(event: { detail: { size: number } }) => sizes.push(event.detail.size)}
+        rows={7}
+      />,
+    )
+    await hostWide(20)
+    await hostWide(40)
+    expect(sizes).toEqual([14])
+  })
+
   test('says it has no readings, in place of the cells, and draws a footer only for its slots', async () => {
     await render(<Chart blank />)
     expect(screen.getByText('No readings')).toBeTruthy()
