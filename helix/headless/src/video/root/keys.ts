@@ -1,16 +1,18 @@
 /**
  * What each key does to a player, and how far it moves.
  *
- * Separable because the table is a convention rather than a fact about this
- * element: Space and `k` play, the arrows scrub and change the volume, `m`
- * mutes, `f` fills the screen, `c` turns captions on and off, Home, End and
- * the digits go to the start, the end and each tenth, and `j` and `l` jump the
- * distance the bar's own buttons jump. What it needs is the media element and four actions, which is
- * the same handful the media session hands to a headset. Whether the keys are
+ * The table is core's `playerKey`, which a phone's player reads too: Space and
+ * `k` play, the arrows scrub and change the volume, `m` mutes, `f` fills the
+ * screen, `c` turns captions on and off, Home, End and the digits go to the
+ * start, the end and each tenth, and `j` and `l` jump the distance the bar's
+ * own buttons jump. What this module adds is the web's: which presses are a
+ * control's own, and the media element each answer moves. Whether the keys are
  * bound at all, and what a taken press does to the event, stay with the element.
  */
 
-import { SKIP_SECONDS } from '@fusion.dev/helix-core'
+import { PLAYER_KEYS, playerKey } from '@fusion.dev/helix-core/player'
+
+export { PLAYER_KEYS }
 
 /** What a press asks the player for, which is all a key can do. */
 export interface KeyActions {
@@ -27,9 +29,27 @@ const PRESSED_BY_SPACE = new Set(['a', 'button', 'select', 'summary', 'textarea'
 /** Roles whose element Space activates, whatever its tag. */
 const PRESSED_ROLES = /^(button|checkbox|link|menuitem\w*|option|radio|switch|tab)$/
 
-/** The keys `takeKey` answers, as `aria-keyshortcuts` names them. */
-export const PLAYER_KEYS =
-  'Space K ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight J L ArrowUp ArrowDown M F C Home End 0 1 2 3 4 5 6 7 8 9'
+/** Whether a press is the browser's, the page's, or a control's own, and not the player's. */
+const someoneElses = (event: KeyboardEvent): boolean => {
+  /* **A chord with Control, Command or Alt is the browser's or the page's.**
+     Alt with Left goes back a page and Command with a number picks a tab,
+     and the player took both as seeks and stopped them. */
+  if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
+    return true
+  }
+  /* The element the press began on, inside whatever shadow root holds it:
+     `target` is retargeted to the host of each root it leaves. */
+  const origin = (event.composedPath?.()[0] ?? event.target) as HTMLElement | null
+  if (origin?.tagName === 'INPUT' || origin?.isContentEditable) {
+    return true
+  }
+  return (
+    event.key === ' ' &&
+    origin !== null &&
+    (PRESSED_BY_SPACE.has(origin.localName) ||
+      PRESSED_ROLES.test(origin.getAttribute?.('role') ?? ''))
+  )
+}
 
 /**
  * Answers one press, and says whether it was one of these.
@@ -48,94 +68,45 @@ export const takeKey = (
   video: HTMLVideoElement,
   actions: KeyActions,
 ): boolean => {
-  /* **A chord with Control, Command or Alt is the browser's or the page's.**
-     Alt with Left goes back a page and Command with a number picks a tab,
-     and the player took both as seeks and stopped them. */
-  if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
+  if (someoneElses(event)) {
     return false
   }
-  /* The element the press began on, inside whatever shadow root holds it:
-     `target` is retargeted to the host of each root it leaves. */
-  const origin = (event.composedPath?.()[0] ?? event.target) as HTMLElement | null
-  if (origin?.tagName === 'INPUT' || origin?.isContentEditable) {
+  const asked = playerKey(event.key, event.shiftKey)
+  if (asked === undefined) {
     return false
   }
-  if (
-    event.key === ' ' &&
-    origin &&
-    (PRESSED_BY_SPACE.has(origin.localName) ||
-      PRESSED_ROLES.test(origin.getAttribute?.('role') ?? ''))
-  ) {
-    return false
-  }
-  /* Five seconds an arrow, the distance a native `<video controls>` moves by,
-     and ten with shift held, which is `SKIP_SECONDS` reached from the keyboard
-     rather than from a button: `j` and shift-left have to agree or the player
-     skips two distances under one name. */
-  const step = event.shiftKey ? SKIP_SECONDS : 5
-  switch (event.key) {
-    case ' ':
-    case 'k': {
+  switch (asked.kind) {
+    case 'toggle':
       actions.toggle()
       break
-    }
-    case 'ArrowRight': {
-      actions.seek(video.currentTime + step)
+    case 'seek-by':
+      actions.seek(video.currentTime + asked.seconds)
       break
-    }
-    case 'ArrowLeft': {
-      actions.seek(video.currentTime - step)
+    case 'skip-by':
+      actions.skipBy(asked.seconds)
       break
-    }
-    case 'ArrowUp': {
-      /* A tenth of the range a press, so the whole of it is ten presses
-         either way. Clamped here rather than left to the platform, which
-         throws on a volume outside zero to one instead of taking the nearest
-         legal one. */
-      video.volume = Math.min(video.volume + 0.1, 1)
+    /* Clamped here rather than left to the platform, which throws on a
+       volume outside zero to one instead of taking the nearest legal one. */
+    case 'volume-by':
+      video.volume = Math.min(Math.max(video.volume + asked.by, 0), 1)
       break
-    }
-    case 'ArrowDown': {
-      video.volume = Math.max(video.volume - 0.1, 0)
-      break
-    }
-    case 'j': {
-      actions.skipBy(-SKIP_SECONDS)
-      break
-    }
-    case 'l': {
-      actions.skipBy(SKIP_SECONDS)
-      break
-    }
-    case 'm': {
+    case 'mute':
       video.muted = !video.muted
       break
-    }
-    case 'f': {
+    case 'fullscreen':
       actions.fullscreen()
       break
-    }
-    case 'c': {
+    case 'captions':
       actions.captions()
       break
-    }
-    case 'Home': {
-      actions.seek(0)
-      break
-    }
-    case 'End': {
-      actions.seek(video.duration)
-      break
-    }
-    default: {
-      /* A digit goes to that tenth of the video: 0 to the start, 5 to the
-         middle, 9 to nine tenths in, the way the common players do. */
-      if (/^[0-9]$/.test(event.key) && Number.isFinite(video.duration)) {
-        actions.seek((video.duration * Number(event.key)) / 10)
-        break
+    case 'seek-to':
+      /* A digit goes to that tenth of a video whose length is known, and is
+         left alone where it is not. */
+      if (asked.needsLength && !Number.isFinite(video.duration)) {
+        return false
       }
-      return false
-    }
+      actions.seek(asked.share === 0 ? 0 : video.duration * asked.share)
+      break
   }
   return true
 }

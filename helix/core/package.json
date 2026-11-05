@@ -185,6 +185,10 @@
       "types": "./dist/utils/pin-code/pin-code.d.ts",
       "default": "./dist/utils/pin-code/pin-code.js"
     },
+    "./player": {
+      "types": "./dist/utils/player/player.d.ts",
+      "default": "./dist/utils/player/player.js"
+    },
     "./queue": {
       "types": "./dist/utils/queue/queue.d.ts",
       "default": "./dist/utils/queue/queue.js"
