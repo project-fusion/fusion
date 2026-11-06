@@ -54,7 +54,8 @@ export default headless('select', {
     defaultOpen: false,
     defaultValue: '',
     disabled: false,
-    emptyText: 'No matches',
+    emptyText: 'No options',
+    errorText: '',
     feedback: '',
     filterable: false,
     hint: '',
@@ -66,10 +67,12 @@ export default headless('select', {
     multiple: false,
     /* A form's, which a phone has none of. */
     name: web(''),
+    noResultsText: 'No matches',
     open: boolean(),
     placeholder: 'Choose',
     position: oneOf(['floating', 'item-aligned'], 'floating'),
     presentation: oneOf(['auto', 'popover', 'sheet'], 'auto'),
+    readonly: false,
     required: false,
     value: string(),
     valueContent: web(callback('(chosen: readonly HelixOption[]) => unknown')),
@@ -89,6 +92,7 @@ export default headless('select', {
   states: [
     'alignedEnd',
     'alignedStart',
+    'error',
     'invalid',
     'open',
     'placedBottom',
@@ -109,6 +113,7 @@ export default headless('select', {
     onInput: 'input',
     placeholder: 'placeholder',
     position: 'position',
+    readonly: 'readonly',
     said: 'said',
     status: 'status',
     unchosen: 'unchosen',
@@ -213,12 +218,14 @@ export default headless('select', {
           gives={{
             ariaLabel: select.listName,
             emptyText: props.emptyText,
+            errorText: props.errorText,
             filterable: props.filterable,
             items: props.items,
             loading: props.loading,
             loadingText: props.loadingText,
             manual: true,
             multiple: props.multiple,
+            noResultsText: props.noResultsText,
           }}
           part="listbox"
         >

@@ -6,6 +6,7 @@ import {
   Path,
   Rect,
   Repeat,
+  Slot,
   Stop,
   Svg,
   Text,
@@ -32,14 +33,23 @@ import {
  * reader adjusts the plot as one control whose value is the reading in words.
  * Unnamed, the drawing is decoration and is hidden from a screen reader.
  *
+ * **With nothing to draw it says so**, as every chart does: `error-text`
+ * first, in the danger ink and followed by what is passed into `error`, then
+ * `loading-text` while `loading` is set, then `empty-text`, or what is passed
+ * into `loading` and `empty`.
+ *
  * **Web only:** a reading shown under a mouse, and the mark of a `ring`
  * terminus cut out of the line, which a phone draws over the line.
  */
 export default headless('sparkline', {
   props: {
     curve: oneOf(['smooth', 'step', 'straight']),
+    emptyText: 'No readings',
+    errorText: '',
     for: '',
     label: '',
+    loading: false,
+    loadingText: 'Loading readings',
     locale: '',
     marks: '',
     overviewLabel: 'From {first} to {last}, highest {high}, lowest {low}',
@@ -52,7 +62,7 @@ export default headless('sparkline', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['settled'],
+  states: ['empty', 'error', 'loading', 'settled'],
   sparkline: {
     area: 'area',
     bandHeight: 'bandHeight',
@@ -61,13 +71,16 @@ export default headless('sparkline', {
     bars: 'bars',
     cursorX: 'cursorX',
     cursorY: 'cursorY',
+    empty: 'empty',
     ended: 'ended',
+    error: 'error',
     high: 'high',
     highX: 'highX',
     highY: 'highY',
     line: 'line',
     lined: 'lined',
     live: 'live',
+    loading: 'loading',
     lone: 'lone',
     low: 'low',
     lowX: 'lowX',
@@ -83,7 +96,7 @@ export default headless('sparkline', {
     terminusY: 'terminusY',
     washed: 'washed',
   },
-  render: ({ entry, sparkline }) => (
+  render: ({ entry, props, sparkline }) => (
     <>
       <Svg
         label={sparkline.named}
@@ -144,6 +157,29 @@ export default headless('sparkline', {
           />
         </Repeat>
       </Svg>
+      {sparkline.error && (
+        <View
+          part="error"
+          role="alert"
+        >
+          <Text part="error-words">{props.errorText}</Text>
+          <Slot name="error" />
+        </View>
+      )}
+      {sparkline.loading && (
+        <View part="loading">
+          <Slot name="loading">
+            <Text part="loading-words">{props.loadingText}</Text>
+          </Slot>
+        </View>
+      )}
+      {sparkline.empty && (
+        <View part="empty">
+          <Slot name="empty">
+            <Text part="empty-words">{props.emptyText}</Text>
+          </Slot>
+        </View>
+      )}
       {sparkline.ended && (
         <View
           ariaHidden

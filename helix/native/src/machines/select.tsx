@@ -256,6 +256,8 @@ export const useSelect = (
   const read = (name: string): unknown => given(family, props, boundTo(use, name, 'prop'))
   const multiple = read('multiple') === true
   const disabled = read('disabled') === true
+  /* Read-only: the choice can be read and focused, and neither a key nor a press changes it. */
+  const readonly = read('readonly') === true
   const written = read('value')
   const seed = wordsIn(read('defaultValue'))
   const [value, setValue] = useWritten(written, seed)
@@ -278,6 +280,11 @@ export const useSelect = (
   )
   const chosen = chosenValues(value, new Set(entries.map((one) => one.value)), multiple)
   const standing = toggled?.checked === true
+  useLayoutEffect(() => {
+    if (readonly && standing) {
+      closeIf(toggled)
+    }
+  }, [readonly, standing, toggled])
   const opening = useRef<ListOpening>({ where: 'selected' })
   const [status, setStatus] = useState('')
   const close = (): void => closeIf(toggled)
@@ -306,7 +313,7 @@ export const useSelect = (
         say(next)
       }
     },
-    disabled,
+    disabled: disabled || readonly,
     entries,
     multiple,
     open: (at) => {

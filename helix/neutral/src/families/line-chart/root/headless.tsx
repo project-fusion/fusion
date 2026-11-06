@@ -41,6 +41,8 @@ import {
  * **A chart with nothing to draw says so**: `empty-text` in the plot, or
  * `loading-text` while `loading` is set, or what is passed into `empty` and
  * `loading`.
+ * `error-text`, set when the readings did not load, stands in place of both,
+ * in the danger ink, followed by what is passed into `error`.
  *
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a reading shown under a mouse, the hole a
@@ -56,6 +58,7 @@ export default headless('line-chart', {
     /* The readings as data, where no table is named, as a phone's app hands them over. */
     data: property(object()),
     emptyText: 'No readings',
+    errorText: '',
     for: '',
     gridlines: oneOf(['both', 'category', 'value']),
     label: '',
@@ -80,7 +83,7 @@ export default headless('line-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'empty', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'loading', 'settled'],
   lineChart: {
     axisWidth: 'axisWidth',
     axised: 'axised',
@@ -91,6 +94,7 @@ export default headless('line-chart', {
     cells: 'cells',
     drawn: 'drawn',
     empty: 'empty',
+    error: 'error',
     ends: 'ends',
     gridlines: 'gridlines',
     guideX: 'guideX',
@@ -238,6 +242,15 @@ export default headless('line-chart', {
             }}
           />
         </Repeat>
+        {lineChart.error && (
+          <View
+            part="error"
+            role="alert"
+          >
+            <Text part="error-words">{props.errorText}</Text>
+            <Slot name="error" />
+          </View>
+        )}
         {lineChart.loading && (
           <View part="loading">
             <Slot name="loading">

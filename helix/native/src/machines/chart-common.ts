@@ -6,6 +6,7 @@
 import { isChartData, rowsFromData, seriesIndex } from '@fusion.dev/helix-core/chart'
 import type { useChartSource } from '../render/chart-sources'
 import type { Theme } from '../theme/theme'
+import { wordsIn } from './date-picker-read'
 
 /** The palette color of the series at a place, as the tree sets it in `--chart-series`. */
 export type Color = (place: number) => string
@@ -40,3 +41,10 @@ export const boundAll = <T>(
   record: Readonly<Record<string, T>>,
 ): Record<string, T> =>
   Object.fromEntries(Object.entries(record).map(([name, value]) => [flag(name), value]))
+
+/** Which words stand in place of the drawing: `error-text` first, then the loading words, then the empty ones. */
+export const shownStatus = (read: (name: string) => unknown, any: boolean) => {
+  const error = !any && wordsIn(read('error-text')) !== ''
+  const loading = !any && !error && read('loading') === true
+  return { empty: !any && !error && !loading, error, loading }
+}

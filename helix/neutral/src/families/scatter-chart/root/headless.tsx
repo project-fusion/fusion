@@ -41,6 +41,8 @@ import {
  * **A chart with nothing to draw says so**: `empty-text` in the plot, or
  * `loading-text` while `loading` is set, or what is passed into `empty` and
  * `loading`.
+ * `error-text`, set when the readings did not load, stands in place of both,
+ * in the danger ink, followed by what is passed into `error`.
  *
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a reading shown under a mouse, and the plane
@@ -52,6 +54,7 @@ export default headless('scatter-chart', {
     /* The readings as data, where no table is named, as a phone's app hands them over. */
     data: property(object()),
     emptyText: 'No readings',
+    errorText: '',
     for: '',
     gridlines: oneOf(['both', 'x', 'y']),
     label: '',
@@ -78,12 +81,13 @@ export default headless('scatter-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'empty', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'loading', 'settled'],
   scatterChart: {
     active: 'active',
     cells: 'cells',
     drawn: 'drawn',
     empty: 'empty',
+    error: 'error',
     gridlines: 'gridlines',
     layers: 'layers',
     live: 'live',
@@ -245,6 +249,15 @@ export default headless('scatter-chart', {
               }}
             />
           </Repeat>
+          {scatterChart.error && (
+            <View
+              part="error"
+              role="alert"
+            >
+              <Text part="error-words">{props.errorText}</Text>
+              <Slot name="error" />
+            </View>
+          )}
           {scatterChart.loading && (
             <View part="loading">
               <Slot name="loading">
