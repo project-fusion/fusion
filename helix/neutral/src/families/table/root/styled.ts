@@ -1,5 +1,15 @@
 import collectionError from '../../../fragments/collection-error.js'
-import { difference, first, fn, measured, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  first,
+  fn,
+  measured,
+  native,
+  product,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import table from './headless.js'
 
@@ -48,7 +58,9 @@ export default styles(
       titleText: token('text-md'),
     },
     own: {
+      tableBusyOpacity: null,
       tableFade: null,
+      tableFadeSize: null,
       collectionInsetBlock: null,
       collectionInsetInline: null,
       tableHeadingBackgroundColor: null,
@@ -99,16 +111,28 @@ export default styles(
           own: {
             collectionInsetBlock: token('space-md'),
             collectionInsetInline: token('space-sm'),
+            /* What a row's cells are drawn at while it loads, full until then. */
+            tableBusyOpacity: 1,
+            /* The fade at an edge with more behind it, wide enough to read as one. */
+            tableFadeSize: sum(token('space-xl'), token('space-md')),
           },
           web: { overflowX: 'auto' },
         }),
+        rule({ loading: true }, { own: { tableBusyOpacity: token('opacity-busy') } }),
         /* A table wider than its box says so by fading the edge with more behind
            it, as Data Table does. A timeline over a box with nothing to scroll is
            inactive, so a table that fits is never masked. */
         web([
+          /* The timeline only where a browser runs one, so a page that cannot scroll it
+             holds no animation that never moves. */
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['table-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self inline'),
+            },
+          ),
           rule({
-            animation: ['table-edges', 'linear', 'both'],
-            animationTimeline: fn('scroll', 'self inline'),
             maskImage: fn(
               'linear-gradient',
               own.tableFade,
@@ -148,7 +172,6 @@ export default styles(
           ),
         ]),
         native([rule({ windowed: true }, { blockSize: hook.blockSize })]),
-        rule({ loading: true }, { opacity: token('opacity-busy') }),
       ]),
       on('head', [
         web([rule({ display: 'contents' })]),
@@ -188,6 +211,7 @@ export default styles(
       ]),
       include(collectionError),
       on('error', [rule({ color: hook.errorColor })]),
+      on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
       on('loading', [native([rule(said)])]),
       /* The message spans the columns, as Data Table's does. */
       on('empty', [native([rule(said)]), web([rule({ gridColumn: '1 / -1' })])]),
@@ -218,12 +242,12 @@ export default styles(
         ]),
       ]),
       keyframes('table-edges', {
-        '0%': { '--_table-fade-end': token('space-xl'), '--_table-fade-start': '0rem' },
+        '0%': { '--_table-fade-end': own.tableFadeSize, '--_table-fade-start': '0rem' },
         '5%, 95%': {
-          '--_table-fade-end': token('space-xl'),
-          '--_table-fade-start': token('space-xl'),
+          '--_table-fade-end': own.tableFadeSize,
+          '--_table-fade-start': own.tableFadeSize,
         },
-        '100%': { '--_table-fade-end': '0rem', '--_table-fade-start': token('space-xl') },
+        '100%': { '--_table-fade-end': '0rem', '--_table-fade-start': own.tableFadeSize },
       }),
     ]
   },
