@@ -163,6 +163,35 @@ describe('an editable cell', () => {
   })
 })
 
+describe('what opens a cell with the pointer', () => {
+  test('a double click, by default, and a single click does not', async () => {
+    const element = await table()
+    cell(element, 0, 1).click()
+    await settle(element)
+    expect(editor(element)).toBeNull()
+    cell(element, 0, 1).dispatchEvent(new MouseEvent('dblclick', { bubbles: true, composed: true }))
+    await settle(element)
+    expect(editor(element)).not.toBeNull()
+  })
+
+  test('a single click under edit-on="click", and a double click is not a second open', async () => {
+    const element = await table('edit-on="click"')
+    cell(element, 0, 1).click()
+    await settle(element)
+    expect(editor(element)).not.toBeNull()
+  })
+
+  test('a click on the open field stays in it', async () => {
+    const element = await table('edit-on="click"')
+    cell(element, 0, 1).click()
+    await settle(element)
+    await type(element, 'Mae')
+    ;(editor(element) as HTMLElement).click()
+    await settle(element)
+    expect(editor(element)?.value).toBe('Mae')
+  })
+})
+
 test('a boolean toggles in place, with Space, and no field opens', async () => {
   const element = await table()
   cell(element, 0, 3).focus()

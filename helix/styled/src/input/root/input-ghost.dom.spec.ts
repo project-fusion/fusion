@@ -42,6 +42,13 @@ describe('a ghost field', () => {
     }
   })
 
+  test('takes the width of its place, with no steppers and the control text size', () => {
+    const css = cssOf('helix-number-input')
+    expect(css).toContain('contain-intrinsic-inline-size: 0')
+    expect(css).toContain('display: none')
+    expect(css).toContain('font-size: var(--helix-text-control)')
+  })
+
   test('underlines its words from its hook', () => {
     expect(cssOf('helix-input')).toContain('var(--input-ghost-underline, none) dotted')
   })

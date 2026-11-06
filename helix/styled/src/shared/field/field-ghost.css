@@ -31,3 +31,28 @@
 :host([emphasis="ghost"]:state(invalid)) [part="field"]:hover {
   box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-danger);
 }
+
+/* **Sized by the place it is in, never by itself.** A field has a resting width
+   of twenty characters, and a number field two buttons besides, which is right
+   on a form and wrong in a table cell: the column's track is as wide as its
+   widest content, so opening an editor widened the column. A ghost field takes
+   what it is given. */
+:host([emphasis="ghost"]) [part="control"]:not([type="file"]) {
+  contain-intrinsic-inline-size: 0;
+}
+
+/* **Dense, at the text around it.** The field's own type is a step over the
+   label's, which suits a form and makes a value in a row look larger than the
+   cells beside it. A ghost field reads at the control size and the weight of
+   its surroundings, and a touch screen keeps the size iOS will not zoom. */
+:host([emphasis="ghost"]) [part="control"] {
+  font-size: var(--helix-text-control);
+  font-weight: inherit;
+  padding-inline: var(--helix-space-xs);
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]) [part="control"] {
+    font-size: max(var(--helix-text-field-min), var(--helix-text-control));
+  }
+}

@@ -231,3 +231,10 @@ slot[name="increment-icon"]::slotted(*) {
     text-decoration-line: underline;
   }
 }
+
+/* The steppers stay out of an inline field. The arrow keys step it, as they do
+   a spreadsheet's number, and two buttons in a line of text are most of it. */
+:host([emphasis="ghost"]) [part="decrement"],
+:host([emphasis="ghost"]) [part="increment"] {
+  display: none;
+}
