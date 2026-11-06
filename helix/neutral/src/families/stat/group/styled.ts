@@ -1,5 +1,5 @@
 import { number } from '../../../render.js'
-import { difference, native, product, token } from '../../../style.js'
+import { difference, fn, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import group from './headless.js'
 
@@ -44,8 +44,23 @@ export default styles(
         '6': { gridTemplateColumns: hook.columns('repeat(6, minmax(0, 1fr))') },
       }),
       /* A rule before every figure, the one that starts a row clipped. */
-      rule({ divided: true }, { columnGap: product(own.statGroupGap, 2), overflowX: 'clip' }),
-      native([rule({ divided: true }, { overflow: 'hidden' })]),
+      web([
+        rule(
+          { divided: true },
+          {
+            columnGap: product(own.statGroupGap, 2),
+            /* Clipped both ways, the rule above a wrapped row's figures too, with room
+               for a focus ring. */
+            overflow: 'clip',
+            overflowClipMargin: token('size-focus-reach'),
+          },
+        ),
+        /* In columns, the gap is the gap, and the rule stands in the middle of it. */
+        rule({ divided: true, has: 'columns' }, { columnGap: own.statGroupGap }),
+      ]),
+      native([
+        rule({ divided: true }, { columnGap: product(own.statGroupGap, 2), overflow: 'hidden' }),
+      ]),
     ]),
     on({ region: '*', slotted: '*' }, [
       rule(
@@ -56,6 +71,61 @@ export default styles(
           paddingInlineStart: own.statGroupGap,
         },
       ),
+      web([
+        rule(
+          { divided: true, has: 'columns' },
+          {
+            marginInlineStart: difference(product(own.statGroupGap, '-0.5'), token('border-thin')),
+            paddingInlineStart: product(own.statGroupGap, 0.5),
+          },
+        ),
+        /* A rule above every figure too, half a gap up, which the box clips on the first
+           row, so a wrapped row is ruled off from the one above it. The border image
+           draws the line before the figure, and the rule above it on through the gap
+           to the next figure. */
+        rule(
+          { divided: true },
+          {
+            borderBlockStart: [token('border-thin'), 'solid', token('color-border')],
+            borderImage: [
+              fn('linear-gradient', token('color-border'), token('color-border')),
+              1,
+              '/',
+              token('border-thin'),
+              0,
+              0,
+              token('border-thin'),
+              '/',
+              0,
+              product(own.statGroupGap, 2),
+              0,
+              0,
+            ],
+            marginBlockStart: difference(product(own.statGroupGap, '-0.5'), token('border-thin')),
+            paddingBlockStart: product(own.statGroupGap, 0.5),
+          },
+        ),
+        rule(
+          { dir: 'rtl', divided: true },
+          {
+            borderImage: [
+              fn('linear-gradient', token('color-border'), token('color-border')),
+              1,
+              '/',
+              token('border-thin'),
+              token('border-thin'),
+              0,
+              0,
+              '/',
+              0,
+              0,
+              0,
+              product(own.statGroupGap, 2),
+            ],
+          },
+        ),
+        rule({ divided: true, forcedColors: true }, { borderImage: 'none' }),
+      ]),
     ]),
   ],
 )
