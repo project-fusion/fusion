@@ -25,7 +25,7 @@ export default styles(
       arrowSize: '0.5rem',
       backdrop: null,
       backgroundColor: null,
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       color: null,
       fontSize: token('text-xs'),
       gap: token('space-2xs'),
