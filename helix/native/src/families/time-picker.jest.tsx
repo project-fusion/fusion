@@ -189,9 +189,9 @@ describe('the generated Time Picker', () => {
     const end = styleOf(around('9:00 AM', 'button'))
     const between = styleOf(around('9:30 AM', 'button'))
     const outside = styleOf(around('10:30 AM', 'button'))
-    expect(end.backgroundColor).toBe(light['color-surface-inverse'])
+    expect(end.backgroundColor).toBe(light['color-primary-surface'])
     expect(styleOf(around('10:00 AM', 'button')).backgroundColor).toBe(
-      light['color-surface-inverse'],
+      light['color-primary-surface'],
     )
     expect(between.backgroundColor).toBeDefined()
     expect(between.backgroundColor).not.toBe(outside.backgroundColor)
@@ -211,8 +211,8 @@ describe('the generated Time Picker', () => {
       />,
     )
     const answer = styleOf(around('09'))
-    expect(answer.backgroundColor).toBe(light['color-surface-inverse'])
-    expect(styleOf(around('10')).backgroundColor).not.toBe(light['color-surface-inverse'])
+    expect(answer.backgroundColor).toBe(light['color-primary-surface'])
+    expect(styleOf(around('10')).backgroundColor).not.toBe(light['color-primary-surface'])
     expect(styleOf(around('09', 'button')).justifyContent).toBe('center')
     /* A chosen row draws Option's tick beside its words; a wheel's draws none. */
     const shown = (words: string) => shownViews(around(words, 'button'))
