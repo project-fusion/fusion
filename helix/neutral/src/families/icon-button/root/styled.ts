@@ -87,8 +87,7 @@ export default styles(
       rule({
         display: 'inline-flex',
         own: {
-          /* The glyph's step: the tight icon, and never under the small one, so a glyph
-             keeps its proportion to the box at every density. */
+          /* The glyph's step: the tight icon, never under the small one. */
           iconButtonGlyph: fn('max', token('size-icon-tight'), token('size-icon-sm')),
           iconButtonSize: hook.size,
         },
