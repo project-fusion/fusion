@@ -145,9 +145,19 @@ const heard = () => {
   return { events, props: { onReadingChange: take('change'), onReadingPress: take('press') } }
 }
 
+/* With no scale drawn and no rules, so the top total meets the top edge. Drawn by default,
+   either one gives the peak room above it, as the web's element does. */
+const Bare = (props: HelixAreaChartProps) => (
+  <Chart
+    gridlines="none"
+    valueAxis="none"
+    {...props}
+  />
+)
+
 describe('the bands', () => {
   test('stacks the parts from zero, the widest band first, each an edge and everything under it', async () => {
-    await render(<Chart />)
+    await render(<Bare />)
     /* Business on Team, to 100 at April; Team alone to 60. */
     expect(paths().slice(0, 4)).toEqual([
       'M12.5,60L37.5,40L62.5,20L87.5,0L87.5,100L12.5,100Z',
@@ -159,14 +169,14 @@ describe('the bands', () => {
   })
 
   test('draws each reading as a whole under share, and each part from zero under overlap', async () => {
-    const { rerender } = await render(<Chart share />)
+    const { rerender } = await render(<Bare share />)
     expect(paths()[1]).toBe('M12.5,0L37.5,0L62.5,0L87.5,0')
-    await rerender(<Chart overlap />)
+    await rerender(<Bare overlap />)
     expect(paths()[1]).toBe('M12.5,83.33L37.5,66.67L62.5,50L87.5,33.33')
   })
 
   test('closes a part a legend hid, and fits the scale to the rest', async () => {
-    await render(<Chart />)
+    await render(<Bare />)
     await act(async () => {
       hideChartSeries('plans', ['Team'])
     })
@@ -174,7 +184,7 @@ describe('the bands', () => {
   })
 
   test('writes the numbers of the scale beside the plot, shares under share', async () => {
-    await render(<Chart share valueAxis />)
+    await render(<Chart share />)
     for (const number of ['20%', '100%']) {
       expect(screen.getByText(number, { includeHiddenElements: true })).toBeTruthy()
     }
@@ -190,7 +200,8 @@ describe('the bands', () => {
 describe('the reading', () => {
   test('a tap finds the reading by its slot, presses it, and opens the bubble with the total', async () => {
     const { events, props } = heard()
-    await render(<Chart {...props} />)
+    /* No scale, whose numbers would say 60 too. */
+    await render(<Bare {...props} />)
     await tapAt(150)
     expect(events).toEqual(['press 1 touch Feb', 'change 1 touch Feb'])
     expect(screen.getByText('60', { includeHiddenElements: true })).toBeTruthy()

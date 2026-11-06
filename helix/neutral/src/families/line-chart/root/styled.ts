@@ -3,7 +3,19 @@ import chartTooltip from '../../../fragments/chart-tooltip.js'
 import printExact from '../../../fragments/print-exact.js'
 import terminus from '../../../fragments/terminus.js'
 import { oneOf } from '../../../render.js'
-import { inherited, list, measured, mix, native, product, sum, token, web } from '../../../style.js'
+import {
+  inherited,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -126,21 +138,41 @@ export default styles(
       on('tick', [
         rule({
           insetInlineEnd: 0,
+          lineHeight: 1,
           position: 'absolute',
           translate: [0, '-50%'],
           whiteSpace: 'nowrap',
         }),
         native([rule({ insetBlockStart: measured('chart-tick-y') })]),
       ]),
-      on('host', [web([rule({ valueAxis: true }, { gridTemplateColumns: 'auto 1fr' })])]),
-      on('axis', [web([rule({ valueAxis: true }, { gridColumn: 1, gridRow: 1 })])]),
-      on(['plot', 'labels'], [web([rule({ valueAxis: true }, { gridColumn: 2 })])]),
+      on('host', [
+        /* Half a number's height above the plot, so the top number stands inside the box. */
+        web([
+          rule(
+            { valueAxis: { not: 'none' } },
+            {
+              columnGap: 0,
+              gridTemplateColumns: 'auto 1fr',
+              paddingBlockStart: quotient(token('text-xs'), 2),
+            },
+          ),
+        ]),
+      ]),
+      on('axis', [
+        web([
+          rule(
+            { valueAxis: { not: 'none' } },
+            { gridColumn: 1, gridRow: 1, marginInlineEnd: hook.gap },
+          ),
+        ]),
+      ]),
+      on(['plot', 'labels'], [web([rule({ valueAxis: { not: 'none' } }, { gridColumn: 2 })])]),
       /* A phone stands the axis beside the plot in the room the host leaves at
          its start, as wide as the chart measures the widest number. */
       on('host', [
         native([
           rule(
-            { valueAxis: true },
+            { valueAxis: { not: 'none' } },
             { paddingInlineStart: sum(measured('line-chart-axis-size'), hook.gap) },
           ),
         ]),
@@ -148,7 +180,7 @@ export default styles(
       on('axis', [
         native([
           rule(
-            { valueAxis: true },
+            { valueAxis: { not: 'none' } },
             {
               /* As tall as the plot: the names' row under it is as tall as the axis' own type. */
               bottom: sum('1.4em', hook.gap),
@@ -276,10 +308,27 @@ export default styles(
       on('marker-ring', [web([rule({ forcedColors: true }, { stroke: 'Canvas' })])]),
       /* Weight moves with emphasis, and the color stays the series'. */
       on('line', [
-        rule({ emphasis: 'subtle' }, { stroke: mix(series, 45, token('color-background')) }),
+        /* In dark, 70% of the series, so a subtle line still clears 3:1 on the page. */
+        rule(
+          { emphasis: 'subtle' },
+          {
+            stroke: scheme(
+              mix(series, 45, token('color-background')),
+              mix(series, 70, token('color-background')),
+            ),
+          },
+        ),
       ]),
       on('area', [
-        rule({ emphasis: 'subtle' }, { fill: mix(series, 45, token('color-background')) }),
+        rule(
+          { emphasis: 'subtle' },
+          {
+            fill: scheme(
+              mix(series, 45, token('color-background')),
+              mix(series, 70, token('color-background')),
+            ),
+          },
+        ),
         rule(
           { emphasis: 'outlined' },
           { opacity: product(hook.areaOpacity('0.08'), token('material-opacity')) },
@@ -290,8 +339,8 @@ export default styles(
         ),
       ]),
       on('line', [
-        rule({ material: 'glass' }, { strokeOpacity: product(0.62, token('material-opacity')) }),
-        rule({ material: 'frosted' }, { strokeOpacity: product(0.88, token('material-opacity')) }),
+        rule({ material: 'glass' }, { strokeOpacity: token('material-glass-opacity') }),
+        rule({ material: 'frosted' }, { strokeOpacity: token('material-frosted-opacity') }),
       ]),
       /* The summary is said and not shown. */
       on('summary', [

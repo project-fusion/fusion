@@ -60,7 +60,7 @@ export default headless('line-chart', {
     emptyText: 'No readings',
     errorText: '',
     for: '',
-    gridlines: oneOf(['both', 'category', 'value']),
+    gridlines: oneOf(['both', 'category', 'none', 'value']),
     label: '',
     loading: false,
     loadingText: 'Loading readings',
@@ -76,7 +76,7 @@ export default headless('line-chart', {
     sonifyStopLabel: web('Stop'),
     summary: web(oneOf(['hidden', 'visible'])),
     terminus: oneOf(['none', 'ring', 'square', 'triangle']),
-    valueAxis: false,
+    valueAxis: oneOf(['none']),
     zero: false,
   },
   events: {

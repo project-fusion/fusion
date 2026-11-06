@@ -146,25 +146,36 @@ const heard = () => {
   return { events, props: { onReadingChange: take('change'), onReadingPress: take('press') } }
 }
 
+/* With no scale drawn and no rules, so the peak meets the top edge. Drawn by default,
+   either one gives the peak room above it, as the web's element does. */
+const Bare = (props: HelixLineChartProps) => (
+  <Chart
+    gridlines="none"
+    valueAxis="none"
+    {...props}
+  />
+)
+
 describe('the lines', () => {
   test('draws a line through each series over the range of the readings, each reading in the middle of its slot', async () => {
-    await render(<Chart curve="straight" />)
+    await render(<Bare curve="straight" />)
     /* Direct from 1000 to 1400 and Referral from 500 to 700, over 500 to 1400. */
     expect(paths()).toEqual(['M12.5,44.44L37.5,22.22L62.5,33.33L87.5,0', expect.any(String)])
     expect(paths()[1]?.startsWith('M12.5,100')).toBe(true)
   })
 
   test('washes each line under area, and marks a reading under markers', async () => {
-    await render(<Chart area curve="straight" markers />)
+    await render(<Bare area curve="straight" markers />)
     const drawn = paths()
     expect(drawn[0]).toBe('M12.5,44.44L37.5,22.22L62.5,33.33L87.5,0L87.5,100L12.5,100Z')
     expect(drawn).toContain('M12.5,44.44h0M37.5,22.22h0M62.5,33.33h0M87.5,0h0')
   })
 
   test('rules the levels and zero, and writes the numbers of the scale beside the plot', async () => {
-    await render(<Chart gridlines="value" valueAxis zero />)
+    await render(<Chart gridlines="value" zero />)
     expect(paths().filter((d) => d.startsWith('M0,'))).toContain('M0,100L100,100')
-    for (const number of ['200', '1,400']) {
+    /* Room above the peak of 1,400, to the next level. */
+    for (const number of ['500', '1,500']) {
       expect(screen.getByText(number, { includeHiddenElements: true })).toBeTruthy()
     }
   })
@@ -177,7 +188,7 @@ describe('the lines', () => {
   })
 
   test('leaves out a series a legend hid, and fits the scale to the rest', async () => {
-    await render(<Chart curve="straight" />)
+    await render(<Bare curve="straight" />)
     await act(async () => {
       hideChartSeries('channels', ['Direct'])
     })

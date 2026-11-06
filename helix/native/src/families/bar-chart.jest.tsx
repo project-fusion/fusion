@@ -154,9 +154,19 @@ const heard = () => {
 const canvases = () =>
   screen.root?.queryAll((node) => node.type === 'RNSVGSvgView').map((one) => one.props) ?? []
 
+/* With no scale drawn and no rules, so the tallest column meets the top edge. Drawn by
+   default, either one gives the peak room above it, as the web's element does. */
+const Bare = (props: HelixBarChartProps) => (
+  <Chart
+    gridlines="none"
+    valueAxis="none"
+    {...props}
+  />
+)
+
 describe('the columns', () => {
   test('stands each category abreast from zero, a column below zero hanging from the baseline', async () => {
-    await render(<Chart />)
+    await render(<Bare />)
     await layOut()
     /* Zero is 80% down a range of -20 to 80: Gateway 40 rises to 40%, its
        far corners rounded two points on a plot 400 by 200. */
@@ -170,7 +180,7 @@ describe('the columns', () => {
   })
 
   test('stacks a category into one column under stacked', async () => {
-    await render(<Chart stacked />)
+    await render(<Bare stacked />)
     await layOut()
     /* Q1's stack: Gateway's segment meets Billing's square, and Billing's far end is rounded. */
     expect(paths()).toContain('M3.5,83.33L3.5,50L3.5,50L21.5,50L21.5,50L21.5,83.33Z')
@@ -184,10 +194,11 @@ describe('the columns', () => {
     await layOut()
     /* Gateway's bars run across from zero; Billing is a line through the middle of each row, on its own scale. */
     expect(paths()).toContain('M0,0L0,100')
-    expect(paths()).toContain('M50,12.5L0,37.5L75,62.5L100,87.5')
-    /* Both scales are numbered once `secondary` splits them: the second reaches below zero. */
-    expect(screen.getByText('-20', { includeHiddenElements: true })).toBeTruthy()
-    expect(screen.getByText('80', { includeHiddenElements: true })).toBeTruthy()
+    /* Each scale takes room above its peak once `secondary` splits them: -40 to 80. */
+    expect(paths()).toContain('M50,12.5L16.67,37.5L66.67,62.5L83.33,87.5')
+    /* Both scales are numbered: the second reaches below zero, and both reach 80. */
+    expect(screen.getAllByText('−40', { includeHiddenElements: true })).toHaveLength(1)
+    expect(screen.getAllByText('80', { includeHiddenElements: true })).toHaveLength(2)
   })
 
   test('closes a series a legend hid, and fits the scale to the rest', async () => {

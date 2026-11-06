@@ -43,12 +43,12 @@ describe('a bar chart drawn by core', () => {
     expect(barFrame(both, 2, shows, { ...asked, stacked: true }, write).domain).toEqual([0, 9])
   })
 
-  test('gives a series named in `secondary` a scale of its own', () => {
+  test('gives a series named in `secondary` a scale of its own, both with room above', () => {
     const both = [series('Count', [40, 80]), series('Rate', [0.2, 0.4])]
     const frame = barFrame(both, 2, shows, { ...asked, scaled: barNames('rate') }, write)
-    expect(frame.domain).toEqual([0, 80])
-    expect(frame.other).toEqual([0, 0.4])
-    expect(frame.z?.(0.4)).toBe(0)
+    expect(frame.domain).toEqual([0, 100])
+    expect(frame.other).toEqual([0, 0.5])
+    expect(frame.z?.(0.5)).toBe(0)
     expect(frame.widest).toBeGreaterThan(0)
   })
 
