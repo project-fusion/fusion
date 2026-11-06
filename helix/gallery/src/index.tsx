@@ -24,6 +24,7 @@ import { codeEditorArt } from './art/code-editor'
 import { codeInputArt } from './art/code-input'
 import { colorInputArt } from './art/color-input'
 import { colorPickerArt } from './art/color-picker'
+import { columnManagerArt } from './art/column-manager'
 import { comboboxArt } from './art/combobox'
 import { commandArt } from './art/command'
 import { copyButtonArt } from './art/copy-button'
@@ -77,6 +78,7 @@ import { pinInputArt } from './art/pin-input'
 import { popoverArt } from './art/popover'
 import { progressArt } from './art/progress'
 import { qrCodeArt } from './art/qr-code'
+import { quickFiltersArt } from './art/quick-filters'
 import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
@@ -84,6 +86,7 @@ import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
+import { selectionBarArt } from './art/selection-bar'
 import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
@@ -102,6 +105,7 @@ import { stepsArt } from './art/steps'
 import { strandsArt } from './art/strands'
 import { switchArt } from './art/switch'
 import { tableArt } from './art/table'
+import { tableExportArt } from './art/table-export'
 import { tabsArt } from './art/tabs'
 import { tagArt } from './art/tag'
 import { terminalArt } from './art/terminal'
@@ -119,6 +123,7 @@ import { treeArt } from './art/tree'
 import { trendArt } from './art/trend'
 import { videoArt } from './art/video'
 import { videoPlaylistArt } from './art/video-playlist'
+import { viewPanelArt } from './art/view-panel'
 import { virtualListArt } from './art/virtual-list'
 import { voiceLevelArt } from './art/voice-level'
 
@@ -188,6 +193,7 @@ const art: Record<string, ReactNode> = {
   'code-input': codeInputArt,
   'color-input': colorInputArt,
   'color-picker': colorPickerArt,
+  'column-manager': columnManagerArt,
   combobox: comboboxArt,
   command: commandArt,
   'copy-button': copyButtonArt,
@@ -241,6 +247,7 @@ const art: Record<string, ReactNode> = {
   popover: popoverArt,
   progress: progressArt,
   'qr-code': qrCodeArt,
+  'quick-filters': quickFiltersArt,
   quote: quoteArt,
   radio: radioArt,
   rating: ratingArt,
@@ -248,6 +255,7 @@ const art: Record<string, ReactNode> = {
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
+  'selection-bar': selectionBarArt,
   'shortcut-overlay': shortcutOverlayArt,
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
@@ -266,6 +274,7 @@ const art: Record<string, ReactNode> = {
   strands: strandsArt,
   switch: switchArt,
   table: tableArt,
+  'table-export': tableExportArt,
   tabs: tabsArt,
   tag: tagArt,
   terminal: terminalArt,
@@ -283,6 +292,7 @@ const art: Record<string, ReactNode> = {
   trend: trendArt,
   video: videoArt,
   'video-playlist': videoPlaylistArt,
+  'view-panel': viewPanelArt,
   'virtual-list': virtualListArt,
   'voice-level': voiceLevelArt,
 }

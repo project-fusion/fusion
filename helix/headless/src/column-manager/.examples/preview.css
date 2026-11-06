@@ -64,18 +64,48 @@ helix-headless-column-manager::part(live) {
   position: absolute;
 }
 
-helix-headless-data-table::part(table) {
-  display: grid;
-  grid-template-columns: var(--data-table-template);
-}
-
-helix-headless-data-table::part(cell) {
-  border-block-end: 1px solid var(--_gray-edge);
-  padding: 0.5rem 0.75rem;
-}
-
 @media (max-width: 40rem) {
   .columns-pane {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* The grid, as the Data Table's own example draws it: the headings and rows
+   take no box, so their cells lay out in the table's tracks. */
+helix-headless-data-table {
+  display: block;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template, minmax(0, 1fr));
+  inline-size: 100%;
+}
+
+helix-headless-data-table::part(head),
+helix-headless-data-table::part(row),
+helix-headless-table-column:not([hidden]) {
+  display: contents;
+}
+
+helix-headless-table-column::part(column) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  min-block-size: 2.5rem;
+}
+
+helix-headless-data-table::part(cell),
+helix-headless-data-table::part(select) {
+  border-block-start: 1px solid var(--_gray-edge);
+  font-size: 0.8125rem;
+  padding-block: 0.5rem;
+  padding-inline: 0 1rem;
+  text-align: var(--data-table-cell-align);
+}
+
+helix-headless-column-manager::part(pin) {
+  grid-column: 4;
 }
