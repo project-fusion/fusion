@@ -61,6 +61,8 @@ export default styles(
         fontSize: hook.labelFontSize,
         fontWeight: hook.labelWeight,
         margin: 0,
+        /* A long label breaks inside its column on the web; a phone's terms share the widest. */
+        web: { minInlineSize: 0, overflowWrap: 'anywhere' },
       }),
     ]),
     /* The value takes the text around it, and breaks anywhere: an id, a hash

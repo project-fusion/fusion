@@ -227,7 +227,14 @@ export default styles(
       ]),
       /* Over the axis it names, across both columns. */
       on('y-name', [
-        web([rule({ gridColumn: '1 / 3', gridRow: 1, justifySelf: 'start' })]),
+        web([
+          rule({
+            gridColumn: '1 / 3',
+            gridRow: 1,
+            justifySelf: 'start',
+            marginBlockEnd: product(token('text-xs'), 0.5),
+          }),
+        ]),
         native([rule({ alignSelf: 'flex-start' })]),
       ]),
       /* The summary is said and not shown. */

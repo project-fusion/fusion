@@ -1,4 +1,4 @@
-import { native, product, token } from '../../../style.js'
+import { native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -146,7 +146,16 @@ export default styles(
         ],
       ),
       /* Rows that are already there dim, and hold still, while new ones load. */
-      on('page', [rule({ loading: true }, { opacity: token('opacity-busy') })]),
+      on('page', [native([rule({ loading: true }, { opacity: token('opacity-busy') })])]),
+      /* Written out: the rows dim while new ones load, and the loading and empty lines keep
+         full ink. */
+      on(
+        {
+          part: 'page',
+          selector: ':host([loading]) [part="page"] > :not([part~="loading"], [part~="empty"])',
+        },
+        [web([rule({ opacity: token('opacity-busy') })])],
+      ),
     ]
   },
 )

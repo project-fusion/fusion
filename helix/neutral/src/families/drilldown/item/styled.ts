@@ -167,6 +167,7 @@ export default styles(
         rule(
           { focusVisible: true },
           {
+            borderRadius: token('radii-sm'),
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
             outlineOffset: product(token('size-focus-offset'), '-1'),
           },

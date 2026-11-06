@@ -66,7 +66,6 @@ export default styles(
       rule({ readonly: true }, { backgroundColor: 'transparent' }),
       rule({ forcedColors: true, invalid: true }, { borderWidth: token('border-thick') }),
     ]),
-    on('control', [rule({ blockSize: '100%' })]),
     /* Written out: the clear mark a search field draws itself, a different
        shape in every browser, which the vocabulary has no name for. */
     on({ part: 'control', selector: '[part="control"]::-webkit-search-cancel-button' }, [

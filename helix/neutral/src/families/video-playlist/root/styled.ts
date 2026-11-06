@@ -1,4 +1,4 @@
-import { native, token } from '../../../style.js'
+import { native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -22,6 +22,8 @@ export default styles(
       layout: '1fr',
       size: '26rem',
     },
+    /* What each entry reads to draw its thumbnail column or none. */
+    own: { videoPlaylistMediaDisplay: null },
     stylesheet: 'video-playlist/root/video-playlist-root.generated.css',
   },
   ({ hook, on, rule }) => [
@@ -30,6 +32,7 @@ export default styles(
       /* A phone stacks the player over the list. */
       native([rule({ display: 'flex', flexDirection: 'column' })]),
       rule({ print: true }, { display: 'none' }),
+      web([rule({ noThumbnails: true }, { own: { videoPlaylistMediaDisplay: 'none' } })]),
     ]),
     on('items', [
       rule({
