@@ -1,0 +1,95 @@
+# Video, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Video"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://video/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: video-preview-${MODE}-${SIZE}
+- openLink: helix://video/captions/preview
+- extendedWaitUntil:
+    visible: 'Captions'
+    timeout: 15000
+- takeScreenshot: video-captions-${MODE}-${SIZE}
+- openLink: helix://video/events/preview
+- extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- takeScreenshot: video-events-${MODE}-${SIZE}
+- openLink: helix://video/extra-controls/preview
+- extendedWaitUntil:
+    visible: 'Extra Controls'
+    timeout: 15000
+- takeScreenshot: video-extra-controls-${MODE}-${SIZE}
+- openLink: helix://video/filled/preview
+- extendedWaitUntil:
+    visible: 'Filled'
+    timeout: 15000
+- takeScreenshot: video-filled-${MODE}-${SIZE}
+- openLink: helix://video/header/preview
+- extendedWaitUntil:
+    visible: 'Header'
+    timeout: 15000
+- takeScreenshot: video-header-${MODE}-${SIZE}
+- openLink: helix://video/icons/preview
+- extendedWaitUntil:
+    visible: 'Icons'
+    timeout: 15000
+- takeScreenshot: video-icons-${MODE}-${SIZE}
+- openLink: helix://video/muted-loop/preview
+- extendedWaitUntil:
+    visible: 'Muted Loop'
+    timeout: 15000
+- takeScreenshot: video-muted-loop-${MODE}-${SIZE}
+- openLink: helix://video/native/preview
+- extendedWaitUntil:
+    visible: 'Native'
+    timeout: 15000
+- takeScreenshot: video-native-${MODE}-${SIZE}
+- openLink: helix://video/overflow-controls/preview
+- extendedWaitUntil:
+    visible: 'Overflow Controls'
+    timeout: 15000
+- takeScreenshot: video-overflow-controls-${MODE}-${SIZE}
+- openLink: helix://video/plain/preview
+- extendedWaitUntil:
+    visible: 'Plain'
+    timeout: 15000
+- takeScreenshot: video-plain-${MODE}-${SIZE}
+- openLink: helix://video/playlist-controls/preview
+- extendedWaitUntil:
+    visible: 'Playlist Controls'
+    timeout: 15000
+- takeScreenshot: video-playlist-controls-${MODE}-${SIZE}
+- openLink: helix://video/scrim/preview
+- extendedWaitUntil:
+    visible: 'Scrim'
+    timeout: 15000
+- takeScreenshot: video-scrim-${MODE}-${SIZE}
+- openLink: helix://video/sources/preview
+- extendedWaitUntil:
+    visible: 'Sources'
+    timeout: 15000
+- takeScreenshot: video-sources-${MODE}-${SIZE}
+- openLink: helix://video/start-control/preview
+- extendedWaitUntil:
+    visible: 'Start Control'
+    timeout: 15000
+- takeScreenshot: video-start-control-${MODE}-${SIZE}
+- openLink: helix://video/subtitles-and-skip-buttons/preview
+- extendedWaitUntil:
+    visible: 'Subtitles And Skip Buttons'
+    timeout: 15000
+- takeScreenshot: video-subtitles-and-skip-buttons-${MODE}-${SIZE}
+- openLink: helix://video/unavailable/preview
+- extendedWaitUntil:
+    visible: 'Unavailable'
+    timeout: 15000
+- takeScreenshot: video-unavailable-${MODE}-${SIZE}

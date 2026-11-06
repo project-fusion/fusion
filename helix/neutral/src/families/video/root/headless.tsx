@@ -190,9 +190,11 @@ export default headless('video', {
       <View part="header">
         <Slot name="header" />
       </View>
+      {/* A phone draws `poster` as the still above: a region holds its prop's words there. */}
       <Slot
         name="poster"
         part="poster"
+        platform="web"
       />
       {video.waiting && (
         <View part="loading">
@@ -261,7 +263,12 @@ export default headless('video', {
             )}
           </Pressable>
           <View part="time">
-            <Text part="time-words">{video.clock}</Text>
+            <Text
+              lines={1}
+              part="time-words"
+            >
+              {video.clock}
+            </Text>
           </View>
           <View
             draws="slider"
