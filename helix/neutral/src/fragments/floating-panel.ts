@@ -1,4 +1,4 @@
-import { difference, safeArea, sum, token, web } from '../style.js'
+import { difference, mix, safeArea, scheme, sum, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -17,16 +17,30 @@ export default fragment(
   'floating-panel',
   {
     parts: ['surface'],
-    own: { floatingBorderColor: null, floatingBorderWidth: null, floatingShadow: null },
+    own: {
+      floatingBorderColor: null,
+      floatingBorderWidth: null,
+      floatingLine: null,
+      floatingShadow: null,
+    },
   },
   ({ on, own, rule }) => [
+    /* The page's line as it stands outside, read on the surface below. */
+    on('host', [rule({ own: { floatingLine: token('color-border') } })]),
     on('surface', [
       rule({
+        /* **A line inside sits the step above the panel that it sits above the page**,
+           as Popover's, Dialog's and Drawer's do: in dark 12% of the ink over the panel,
+           where the page's line measured 1.03:1 on it. Light keeps the page's line. */
+        '--helix-color-border': scheme(
+          own.floatingLine,
+          mix(token('color-foreground'), 12, token('color-surface-overlay')),
+        ),
         backgroundColor: token('color-surface-overlay'),
         border: [
           own.floatingBorderWidth(token('border-floating')),
           'solid',
-          own.floatingBorderColor(token('color-border')),
+          own.floatingBorderColor(token('color-border-floating')),
         ],
         borderRadius: token('radii-sm'),
         boxShadow: own.floatingShadow(token('shadow-floating')),
