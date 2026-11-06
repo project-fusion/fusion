@@ -75,3 +75,9 @@ helix-headless-data-table::part(select) {
   padding-inline: 0 1rem;
   text-align: var(--data-table-cell-align);
 }
+
+/* The checkboxes' names are for a screen reader. */
+helix-headless-data-table::part(checkbox-label) {
+  clip-path: inset(50%);
+  position: absolute;
+}
