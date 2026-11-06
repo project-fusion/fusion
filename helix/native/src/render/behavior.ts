@@ -219,24 +219,34 @@ const over = (before: PartBinding | undefined, binding: PartBinding): PartBindin
   ...(binding.windowed === undefined ? {} : { windowed: binding.windowed }),
 })
 
+/** The layer, the hint, and the drawing of two bindings, the later's where it has one. */
+const laidChoices = (
+  before: PartBinding | undefined,
+  binding: PartBinding,
+): Pick<PartBinding, 'drawing' | 'hint' | 'layer'> => {
+  const layer = binding.layer ?? before?.layer
+  const hint = binding.hint ?? before?.hint
+  const drawing = binding.drawing ?? before?.drawing
+  return {
+    ...(layer === undefined ? {} : { layer }),
+    ...(hint === undefined ? {} : { hint }),
+    ...(drawing === undefined ? {} : { drawing }),
+  }
+}
+
 /** What `over` joins of two bindings. */
 const laidOver = (before: PartBinding | undefined, binding: PartBinding): PartBinding => {
   const wrap = around(before?.wrap, binding.wrap)
   const copy = bothCopies(before?.copy, binding.copy)
   const earlier = before?.view?.ref
   const later = binding.view?.ref
-  const layer = binding.layer ?? before?.layer
-  const hint = binding.hint ?? before?.hint
-  const drawing = binding.drawing ?? before?.drawing
   const ref =
     typeof earlier === 'function' && typeof later === 'function'
       ? { ref: bothRefs(earlier as RefCallback, later as RefCallback) }
       : {}
   return {
     ...(before?.animated === true || binding.animated === true ? { animated: true } : {}),
-    ...(layer === undefined ? {} : { layer }),
-    ...(hint === undefined ? {} : { hint }),
-    ...(drawing === undefined ? {} : { drawing }),
+    ...laidChoices(before, binding),
     states: { ...before?.states, ...binding.states },
     ...(before?.lists === undefined && binding.lists === undefined
       ? {}

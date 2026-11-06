@@ -1015,8 +1015,8 @@ export {
   lockScroll,
   onModalOpen,
   openModal,
-  raiseAbove,
   type Raised,
+  raiseAbove,
   scrollHolders,
   unlockScroll,
 } from './utils/scroll-lock/scroll-lock.js'
