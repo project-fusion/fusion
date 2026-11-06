@@ -148,13 +148,7 @@ const heard = () => {
 
 /* With no scale drawn and no rules, so the peak meets the top edge. Drawn by default,
    either one gives the peak room above it, as the web's element does. */
-const Bare = (props: HelixLineChartProps) => (
-  <Chart
-    gridlines="none"
-    valueAxis="none"
-    {...props}
-  />
-)
+const Bare = (props: HelixLineChartProps) => <Chart gridlines="none" valueAxis="none" {...props} />
 
 describe('the lines', () => {
   test('draws a line through each series over the range of the readings, each reading in the middle of its slot', async () => {
