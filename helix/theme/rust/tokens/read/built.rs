@@ -9,7 +9,7 @@ use super::super::builder::print::DENSITY;
 use super::super::builder::Built;
 use super::super::expr::{
     Channel, Color, Easing, Expr, Families, Family, Filter, Filters, Layer, Math, Mix, Oklch, Op,
-    Quantity, Shadow, Shape, Shaped, Spring, Time, Unit, Var, Weight,
+    Quantity, Shadow, Shape, Shaped, Space, Spring, Time, Unit, Var, Weight,
 };
 use super::{component, is_hex, Reader};
 
@@ -140,6 +140,26 @@ impl Reader<'_> {
                 &Built::Name("transparent".to_owned()),
                 Weight::First(*percent),
             ),
+            ("alpha", [first, Built::Number(percent), by]) => {
+                let by = Box::new(self.built_quantity(by)?);
+                self.built_mix(
+                    first,
+                    &Built::Name("transparent".to_owned()),
+                    Weight::Scaled(*percent, by),
+                )
+            }
+            ("mix", [first, Built::Number(percent), second, Built::Text(space)])
+                if space == "srgb" =>
+            {
+                let mixed = self.built_mix(first, second, Weight::First(*percent))?;
+                Ok(match mixed {
+                    Color::Mix(mut mix) => {
+                        mix.space = Space::Srgb;
+                        Color::Mix(mix)
+                    }
+                    other => other,
+                })
+            }
             ("mix", [first, Built::Number(percent), second]) => {
                 self.built_mix(first, second, Weight::First(*percent))
             }
@@ -165,6 +185,7 @@ impl Reader<'_> {
         Ok(Color::Mix(Box::new(Mix {
             first: self.built_color(first)?,
             second: self.built_color(second)?,
+            space: Space::Oklab,
             weight,
         })))
     }
@@ -249,8 +270,26 @@ impl Reader<'_> {
                     Box::new(self.built_quantity(value)?),
                     Box::new(self.built_quantity(step)?),
                 )),
+                [value, step, Built::Text(strategy)] if strategy == "up" => Ok(Quantity::RoundUp(
+                    Box::new(self.built_quantity(value)?),
+                    Box::new(self.built_quantity(step)?),
+                )),
                 _ => Err(format!("`{built}` does not hold a value and a step")),
             },
+            Built::Call(name, arguments) if name == "min" || name == "max" => {
+                if arguments.len() < 2 {
+                    return Err(format!("`{built}` does not hold two values"));
+                }
+                let values = arguments
+                    .iter()
+                    .map(|one| self.built_quantity(one))
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(if name == "min" {
+                    Quantity::Min(values)
+                } else {
+                    Quantity::Max(values)
+                })
+            }
             other => Err(format!("`{other}` is not a number or a length")),
         }
     }
@@ -316,6 +355,17 @@ impl Reader<'_> {
             return var.map(Shadow::Var);
         }
         if let Some(layers) = arguments(built, "shadows") {
+            /* A list that names a reference is a list of shadows; a list of
+            layers alone stays one shadow of layers. */
+            if layers.iter().any(
+                |one| matches!(one, Built::Call(name, _) if name == "ref" || name == "primitive"),
+            ) {
+                return layers
+                    .iter()
+                    .map(|one| self.built_shadow(one))
+                    .collect::<Result<_, _>>()
+                    .map(Shadow::List);
+            }
             return layers
                 .iter()
                 .map(|one| self.built_layer(one))

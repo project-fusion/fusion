@@ -56,28 +56,61 @@ pub enum Color {
     Mix(Box<Mix>),
     /// `oklch(...)`, absolute or relative to an origin.
     Oklch(Box<Oklch>),
+    /// `color(from <origin> xyz-d65 <x> <y> <z>)`, the origin's CIE XYZ
+    /// components read as `x`, `y` and `z`: a fill scaled in luminance.
+    Xyz(Box<Xyz>),
     Transparent,
     Var(Var<Color>),
 }
 
-/// `color-mix(in oklab, <first> <weight>, <second>)`, the one space the token
-/// layer mixes in.
+/// `color-mix(in <space>, <first> <weight>, <second>)`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Mix {
     pub first: Color,
     pub second: Color,
+    pub space: Space,
     pub weight: Weight,
 }
 
+/// The space a mix is taken in: oklab, which the token layer mixes in, or
+/// sRGB, where a gray is meant to land on the gray between its two ends.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Space {
+    Oklab,
+    Srgb,
+}
+
 /// Which side of a mix states its percentage. Stating both is refused.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Weight {
     /// Neither, so each takes half.
     Even,
     /// The first color's percentage, from 0 to 100.
     First(f64),
+    /// The first color's percentage times a number, held at 100:
+    /// `min(100%, <percent>% * <by>)`, as a material's strength times
+    /// `material-opacity`.
+    Scaled(f64, Box<Quantity>),
     /// The second color's percentage, from 0 to 100.
     Second(f64),
+}
+
+/// `color(from <origin> xyz-d65 <x> <y> <z>)`.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Xyz {
+    pub origin: Color,
+    pub channels: Vec<Channel>,
+}
+
+/// A function of arithmetic that `calc()` and a component can hold.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Func {
+    /// `clamp(<min>, <value>, <max>)`.
+    Clamp,
+    /// `max(...)`.
+    Max,
+    /// `min(...)`.
+    Min,
 }
 
 /// `oklch(<l> <c> <h>)`, or `oklch(from <origin> <l> <c> <h>)`.
@@ -94,6 +127,8 @@ pub enum Channel {
     Calc(Math),
     /// `clamp(<min>, <value>, <max>)`, each as the inside of `calc()`.
     Clamp(Box<[Math; 3]>),
+    /// `min(...)` or `max(...)`, each as the inside of `calc()`.
+    Extreme(Func, Vec<Math>),
     /// The origin's own `l`, `c` or `h`, in a relative color.
     Component(Component),
     Number(f64),
@@ -107,6 +142,10 @@ pub enum Component {
     Chroma,
     Hue,
     Lightness,
+    /// The origin's CIE XYZ components, in `color(from ... xyz-d65 ...)`.
+    X,
+    Y,
+    Z,
 }
 
 /// A number or a length, outside `calc()` or as a whole `calc()`.
@@ -115,8 +154,14 @@ pub enum Quantity {
     Calc(Math),
     Length(f64, Unit),
     Number(f64),
+    /// The largest of two or more quantities, `max(...)`.
+    Max(Vec<Quantity>),
+    /// The smallest of two or more quantities, `min(...)`.
+    Min(Vec<Quantity>),
     /// `round(<value>, <step>)`, to the nearest multiple of the step.
     Round(Box<Quantity>, Box<Quantity>),
+    /// `round(up, <value>, <step>)`, to the multiple of the step at or above.
+    RoundUp(Box<Quantity>, Box<Quantity>),
     Var(Var<Quantity>),
 }
 
@@ -135,10 +180,14 @@ pub enum Unit {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Math {
     Binary(Box<Math>, Op, Box<Math>),
+    /// `clamp()`, `min()` or `max()` inside the arithmetic.
+    Call(Func, Vec<Math>),
     Component(Component),
     Length(f64, Unit),
     Number(f64),
     Var(Var<Quantity>),
+    /// A `calc()` inside the arithmetic, which groups as a parenthesis does.
+    Nested(Box<Math>),
 }
 
 /// The four operators of `calc()`.
@@ -193,6 +242,9 @@ pub struct Spring {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Shadow {
     Layers(Vec<Layer>),
+    /// Two or more shadows drawn together where one of them is a reference,
+    /// such as a contact shadow under a lift: `var(--a), var(--b)`.
+    List(Vec<Shadow>),
     None,
     Var(Var<Shadow>),
 }

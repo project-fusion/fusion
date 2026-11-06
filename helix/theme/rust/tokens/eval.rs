@@ -9,8 +9,8 @@
 //! a browser and in `paint.mjs`.
 
 use super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Kind, Math, Oklch,
-    Op, Quantity, Shadow, Shaped, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Kind, Math,
+    Oklch, Op, Quantity, Shadow, Shaped, Space, Time, Unit, Var, Weight,
 };
 use super::paint::{self, Lab, Polar};
 use super::registry::{Declared, Registry};
@@ -172,14 +172,43 @@ impl Evaluation<'_> {
             Color::Mix(mix) => {
                 let first = self.color(&mix.first, trail)?;
                 let second = self.color(&mix.second, trail)?;
-                let weight = match mix.weight {
+                let weight = match &mix.weight {
                     Weight::Even => 0.5,
                     Weight::First(percent) => percent / 100.0,
+                    Weight::Scaled(percent, by) => match self.quantity(by, trail)? {
+                        Amount::Number(by) => (percent * by / 100.0).min(1.0),
+                        Amount::Length(_) => {
+                            return Err(refused("a mix's strength is scaled by a length"));
+                        }
+                    },
                     Weight::Second(percent) => 1.0 - percent / 100.0,
                 };
-                Ok(paint::mix(&first, weight, &second))
+                Ok(match mix.space {
+                    Space::Oklab => paint::mix(&first, weight, &second),
+                    Space::Srgb => paint::mix_srgb(&first, weight, &second),
+                })
             }
             Color::Oklch(oklch) => self.oklch(oklch, trail),
+            Color::Xyz(xyz) => {
+                let origin = self.color(&xyz.origin, trail)?;
+                let [x, y, z] = paint::to_xyz(&origin);
+                /* The components ride in a polar's three slots, which `read`
+                hands back for `x`, `y` and `z`. */
+                let held = Polar {
+                    l: x,
+                    c: y,
+                    h: z,
+                    alpha: origin.alpha,
+                };
+                let mut values = Vec::new();
+                for channel in &xyz.channels {
+                    values.extend(self.channel(channel, Some(&held), trail)?);
+                }
+                let [x, y, z] = values[..] else {
+                    return Err(refused("a `color()` in xyz-d65 holds three components"));
+                };
+                Ok(paint::from_xyz([x, y, z], origin.alpha))
+            }
             Color::Transparent => Ok(paint::TRANSPARENT),
             Color::Var(var) => self.through(var, trail, &|one, trail| self.color(one, trail)),
         }
@@ -232,6 +261,26 @@ impl Evaluation<'_> {
                 let [low, value, high] = read;
                 Ok(vec![value.min(high).max(low)])
             }
+            Channel::Extreme(name, parts) => {
+                let mut read = Vec::new();
+                for part in parts {
+                    match self.math(part, origin, trail)? {
+                        Amount::Number(number) => read.push(number),
+                        Amount::Length(_) => {
+                            return Err(refused("a component of a color is a length"));
+                        }
+                    }
+                }
+                let pick: fn(f64, f64) -> f64 = if *name == Func::Min {
+                    f64::min
+                } else {
+                    f64::max
+                };
+                read.into_iter()
+                    .reduce(pick)
+                    .map(|one| vec![one])
+                    .ok_or_else(|| refused("`min()` or `max()` holds no value"))
+            }
             Channel::Component(name) => Ok(vec![read(*name, origin)?]),
             Channel::Number(number) => Ok(vec![*number]),
             Channel::Var(var) => self.through(var, trail, &|channels, trail| {
@@ -251,10 +300,51 @@ impl Evaluation<'_> {
                 *op,
                 self.math(right, origin, trail)?,
             ),
+            Math::Call(name, parts) => {
+                let mut read = Vec::new();
+                for part in parts {
+                    match self.math(part, origin, trail)? {
+                        Amount::Number(number) => read.push(number),
+                        Amount::Length(_) => {
+                            return Err(refused("a function in `calc()` is given a length"));
+                        }
+                    }
+                }
+                Ok(Amount::Number(match (name, read.as_slice()) {
+                    (Func::Clamp, [low, value, high]) => value.min(*high).max(*low),
+                    (Func::Min, [first, rest @ ..]) => {
+                        rest.iter().fold(*first, |one, &other| one.min(other))
+                    }
+                    (Func::Max, [first, rest @ ..]) => {
+                        rest.iter().fold(*first, |one, &other| one.max(other))
+                    }
+                    _ => return Err(refused("a function in `calc()` holds the wrong count")),
+                }))
+            }
+            Math::Nested(inner) => self.math(inner, origin, trail),
             Math::Component(name) => read(*name, origin).map(Amount::Number),
             Math::Length(value, unit) => Ok(Amount::Length(length(*value, *unit))),
             Math::Number(value) => Ok(Amount::Number(*value)),
-            Math::Var(var) => self.through(var, trail, &|one, trail| self.quantity(one, trail)),
+            Math::Var(var) => self.through(var, trail, &|one, trail| {
+                self.quantity_in(one, origin, trail)
+            }),
+        }
+    }
+
+    /// A quantity substituted into arithmetic, where the components it reads
+    /// are the origin's of the color it lands in.
+    fn quantity_in(
+        &self,
+        quantity: &Quantity,
+        origin: Option<&Polar>,
+        trail: &[String],
+    ) -> Result<Amount, Fault> {
+        match quantity {
+            Quantity::Calc(math) => self.math(math, origin, trail),
+            Quantity::Var(var) => self.through(var, trail, &|one, trail| {
+                self.quantity_in(one, origin, trail)
+            }),
+            other => self.quantity(other, trail),
         }
     }
 
@@ -263,10 +353,58 @@ impl Evaluation<'_> {
             Quantity::Calc(math) => self.math(math, None, trail),
             Quantity::Length(value, unit) => Ok(Amount::Length(length(*value, *unit))),
             Quantity::Number(value) => Ok(Amount::Number(*value)),
-            Quantity::Round(value, step) => {
-                rounded(self.quantity(value, trail)?, self.points(step, trail)?)
-            }
+            Quantity::Max(values) => self.extreme(values, trail, f64::max),
+            Quantity::Min(values) => self.extreme(values, trail, f64::min),
+            Quantity::Round(value, step) => rounded(
+                self.quantity(value, trail)?,
+                self.points(step, trail)?,
+                f64::round,
+            ),
+            /* **A phone takes a length with ems in it unrounded**, since the em
+            is resolved where the length lands: rounding up to a whole pixel
+            is the web's, for its raster, and the unrounded length is within
+            a pixel of it. */
+            Quantity::RoundUp(value, step) => match self.quantity(value, trail)? {
+                Amount::Length(length) if length.em != 0.0 => Ok(Amount::Length(length)),
+                amount => rounded(amount, self.points(step, trail)?, f64::ceil),
+            },
             Quantity::Var(var) => self.through(var, trail, &|one, trail| self.quantity(one, trail)),
+        }
+    }
+
+    /// The largest or the smallest of `values`, by `pick`.
+    ///
+    /// **Numbers with numbers, and lengths in points**, a rem being 16 of
+    /// them, since a phone resolves no `max()`: a length that holds ems is
+    /// refused, as it cannot be compared before it lands.
+    fn extreme(
+        &self,
+        values: &[Quantity],
+        trail: &[String],
+        pick: fn(f64, f64) -> f64,
+    ) -> Result<Amount, Fault> {
+        let mut numbers = None;
+        let mut points = None;
+        for one in values {
+            match self.quantity(one, trail)? {
+                Amount::Number(number) => {
+                    numbers = Some(numbers.map_or(number, |held| pick(held, number)));
+                }
+                Amount::Length(Length { em: 0.0, px, rem }) => {
+                    let value = px + rem * REM;
+                    points = Some(points.map_or(value, |held| pick(held, value)));
+                }
+                Amount::Length(_) => {
+                    return Err(refused(
+                        "`min()` or `max()` takes lengths with no ems in them",
+                    ));
+                }
+            }
+        }
+        match (numbers, points) {
+            (Some(number), None) => Ok(Amount::Number(number)),
+            (None, Some(value)) => Ok(Amount::Length(length(value, Unit::Px))),
+            _ => Err(refused("`min()` or `max()` mixes a number and a length")),
         }
     }
 
@@ -318,6 +456,13 @@ impl Evaluation<'_> {
                     })
                 })
                 .collect(),
+            Shadow::List(shadows) => {
+                let mut drops = Vec::new();
+                for one in shadows {
+                    drops.extend(self.shadow(one, trail)?);
+                }
+                Ok(drops)
+            }
             Shadow::None => Ok(Vec::new()),
             Shadow::Var(var) => self.through(var, trail, &|one, trail| self.shadow(one, trail)),
         }
@@ -370,14 +515,14 @@ fn length(value: f64, unit: Unit) -> Length {
 /// drawing at the reader's text size knows how many points a rem is, so this
 /// lands on a whole multiple at the default size and scales with the text from
 /// there.
-fn rounded(value: Amount, step: f64) -> Result<Amount, Fault> {
+fn rounded(value: Amount, step: f64, way: fn(f64) -> f64) -> Result<Amount, Fault> {
     let Amount::Length(Length { em: 0.0, px, rem }) = value else {
         return Err(refused("`round()` takes a length with no ems in it"));
     };
     if step <= 0.0 {
         return Err(refused("`round()` takes a step above zero"));
     }
-    let points = ((px + rem * REM) / step).round() * step;
+    let points = way((px + rem * REM) / step) * step;
     Ok(Amount::Length(if rem == 0.0 {
         length(points, Unit::Px)
     } else {
@@ -389,9 +534,10 @@ fn rounded(value: Amount, step: f64) -> Result<Amount, Fault> {
 fn read(name: Component, origin: Option<&Polar>) -> Result<f64, Fault> {
     let origin = origin.ok_or_else(|| refused("a component is read outside a relative color"))?;
     Ok(match name {
-        Component::Chroma => origin.c,
-        Component::Hue => origin.h,
-        Component::Lightness => origin.l,
+        /* An XYZ origin rides in the polar's slots, `x` in `l`. */
+        Component::Chroma | Component::Y => origin.c,
+        Component::Hue | Component::Z => origin.h,
+        Component::Lightness | Component::X => origin.l,
     })
 }
 

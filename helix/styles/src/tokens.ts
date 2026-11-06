@@ -47,6 +47,8 @@ import {
   lightDark,
   lightness,
   linear,
+  max,
+  min,
   minus,
   mix,
   ms,
@@ -63,6 +65,7 @@ import {
   s,
   saturate,
   shadow,
+  shadows,
   spring,
   type Time,
   times,
@@ -1368,7 +1371,7 @@ export const TOKENS: Token[] = [
      a gray ramp. Opaque, since an avatar overlaps the one beside it. */
   [
     'color-neutral-subtle',
-    mix(ref('color-foreground'), 11, ref('color-background')),
+    mix(ref('color-foreground'), 11, ref('color-background'), 'srgb'),
     'A quiet gray fill for a mark on the page, such as an avatar with no picture.',
   ],
   /* ======================================================== scrollbar === */
@@ -1426,7 +1429,10 @@ export const TOKENS: Token[] = [
      it, and Heatmap's cells took half the `sm` corner. */
   [
     'radii-inset',
-    times(primitive('seed-radii'), 0.25),
+    max(
+      min(times(primitive('seed-radii'), 0.25), px(2)),
+      minus(minus(times(primitive('seed-radii'), 0.5), ref('border-thin')), ref('space-2xs')),
+    ),
     'The corner of a part inset in a track, such as the thumb of a toggle group. Concentric with the `sm` corner around it.',
   ],
   ['radii-sm', times(primitive('seed-radii'), 0.5)],
@@ -1495,7 +1501,7 @@ export const TOKENS: Token[] = [
      a heading landed on a fraction. Each moves by under half a pixel. */
   [
     'leading-heading',
-    round(plus(em(0.99), rem(0.5)), px(1)),
+    round(plus(em(0.99), rem(0.5)), px(1), 'up'),
     'Headings, which need less line height than a paragraph. It is a length plus an em, so it tightens as the type grows.',
   ],
   ['tracking-tight', em(-0.01), 'Large type, which needs tighter letter spacing than a paragraph.'],
@@ -1559,7 +1565,7 @@ export const TOKENS: Token[] = [
      the edge, as the elevated Card's ring does. */
   [
     'shadow-floating',
-    ref('shadow-sm), var(--helix-shadow-lg'),
+    shadows(ref('shadow-sm'), ref('shadow-lg')),
     'The shadow of a surface that floats over content.',
   ],
   /* A control lifted over content: a raised Icon Button, a Carousel arrow, a Speed
@@ -1569,7 +1575,7 @@ export const TOKENS: Token[] = [
      Menu opened over it. */
   [
     'shadow-raised',
-    ref('shadow-sm), var(--helix-shadow-md'),
+    shadows(ref('shadow-sm'), ref('shadow-md')),
     'The shadow of a control lifted over content.',
   ],
   /* ======================================================== material ==== */
@@ -1637,19 +1643,25 @@ export const TOKENS: Token[] = [
   ['material-blur-lg', px(32), 'The heaviest backdrop blur.'],
   [
     'material-translucent',
-    lightDark(alpha(primitive('neutral-0'), 30), alpha(primitive('neutral-900'), 72)),
+    lightDark(
+      alpha(primitive('neutral-0'), 30, ref('material-opacity')),
+      alpha(primitive('neutral-900'), 72, ref('material-opacity')),
+    ),
 
     'The translucent background, for a surface that shows what is behind it.',
   ],
   [
     'material-translucent-strong',
-    alpha(lightDark(primitive('neutral-0'), primitive('neutral-900')), 88),
+    alpha(lightDark(primitive('neutral-0'), primitive('neutral-900')), 88, ref('material-opacity')),
 
     'The stronger translucent background, for a surface that shows less of what is behind it.',
   ],
   [
     'material-panel',
-    lightDark(alpha(primitive('neutral-0'), 72), ref('material-translucent')),
+    lightDark(
+      alpha(primitive('neutral-0'), 72, ref('material-opacity')),
+      ref('material-translucent'),
+    ),
     'The glass of every panel, from a Menu, Popover, or Tooltip to a Dialog or Drawer over its scrim.',
   ],
   /* Two whole colors, for both reasons the overlay above gives, and it is the

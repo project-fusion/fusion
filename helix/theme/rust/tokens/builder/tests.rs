@@ -262,3 +262,50 @@ fn a_nested_sum_keeps_its_parentheses() {
     assert_eq!(length, Native::Text("calc(2rem + 4px)".into()));
     assert_eq!(print(&registry.tokens()[0].expr), "calc((1rem + 2px) * 2)");
 }
+
+#[test]
+fn a_rounding_up_an_extreme_a_scaled_alpha_and_an_srgb_mix_print_and_evaluate() {
+    let registry = typed(&[
+        ("size-up", "round(px(25.2), px(1), 'up')"),
+        ("size-least", "min(px(3), times(rem(1), 0.25))"),
+        ("size-most", "max(min(px(3), px(1)), px(2))"),
+        ("opacity-scale", "0.5"),
+        (
+            "color-glass",
+            "alpha(hex('000000'), 40, ref('opacity-scale'))",
+        ),
+        (
+            "color-gray",
+            "mix(hex('000000'), 40, hex('ffffff'), 'srgb')",
+        ),
+        ("leading-up", "round(plus(em(0.99), rem(0.5)), px(1), 'up')"),
+    ])
+    .unwrap_or_else(|why| panic!("{}", why.join("\n")));
+    let tokens = registry.tokens();
+    let css: Vec<&str> = tokens.iter().map(|token| token.css.as_str()).collect();
+    assert_eq!(
+        css,
+        [
+            "round(up, 25.2px, 1px)",
+            "min(3px, calc(1rem * 0.25))",
+            "max(min(3px, 1px), 2px)",
+            "0.5",
+            "color-mix(in oklab, #000000 min(100%, 40% * var(--helix-opacity-scale)), transparent)",
+            "color-mix(in srgb, #000000 40%, #ffffff)",
+            "round(up, calc(0.99em + 0.5rem), 1px)",
+        ]
+    );
+    let value = |at: usize| {
+        native(
+            &registry
+                .evaluate(&tokens[at], Mode::Light)
+                .expect("the token evaluates"),
+        )
+    };
+    assert_eq!(value(0), Native::Number(26.0));
+    assert_eq!(value(1), Native::Number(3.0));
+    assert_eq!(value(2), Native::Number(2.0));
+    assert_eq!(value(4), Native::Text("#00000033".into()));
+    assert_eq!(value(5), Native::Text("#999999".into()));
+    assert_eq!(value(6), Native::Text("calc(0.99em + 0.5rem)".into()));
+}
