@@ -3,6 +3,11 @@
    32px at lg, against controls of 40, 32, and 48. */
 :host {
   max-inline-size: 100%;
+  /* **And less than that beside something else.** The label ends in an
+     ellipsis, but a flex item keeps its whole label as its smallest width, so
+     a long tag held 280 pixels in a 280 pixel row and pushed a button beside it
+     out. */
+  min-inline-size: 0;
   --_tag-height: var(--helix-size-tag);
 
   /* Every tone is one status color, tinted for the fill and used at full
