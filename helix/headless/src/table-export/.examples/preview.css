@@ -1,0 +1,51 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+}
+
+/* The panel beside the table it exports. */
+.export-pane {
+  align-items: start;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(18rem, auto) minmax(0, 1fr);
+}
+
+helix-headless-table-export {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+helix-headless-table-export::part(legend) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+helix-headless-table-export::part(choice) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+helix-headless-table-export::part(live) {
+  clip-path: inset(50%);
+  position: absolute;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template);
+}
+
+helix-headless-data-table::part(cell) {
+  border-block-end: 1px solid var(--_gray-edge);
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 40rem) {
+  .export-pane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
