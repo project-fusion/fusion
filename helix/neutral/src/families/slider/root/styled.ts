@@ -753,6 +753,12 @@ export default styles(
             position: 'absolute',
             zIndex: token('layer-overlay'),
           }),
+          /* Under a finger the control grows to the target size and holds the
+             track in its middle, so the thumbs stand in the middle of that. */
+          rule(
+            { coarsePointer: true },
+            { insetBlockStart: quotient(difference(token('size-target'), own.sliderTrack), 2) },
+          ),
         ]),
       ]),
       on(
