@@ -80,6 +80,10 @@
   inline-size: var(--helix-size-icon);
 }
 
+[part~="pin"] {
+  grid-column: 4;
+}
+
 [part~="pin-pinned"] {
   color: var(--column-manager-pinned-color, var(--helix-color-primary));
 }

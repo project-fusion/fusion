@@ -1,0 +1,4 @@
+/* Room between the presets and the table they set. */
+helix-quick-filters {
+  margin-block-end: var(--helix-space-md);
+}

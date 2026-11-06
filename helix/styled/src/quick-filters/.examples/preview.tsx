@@ -1,3 +1,5 @@
+import './preview.css'
+
 const rows = [
   { amount: 12400, customer: 'Acme Corporation', id: 'INV-2041', status: 'Overdue' },
   { amount: 8250, customer: 'Acme Logistics', id: 'INV-2047', status: 'Paid' },
