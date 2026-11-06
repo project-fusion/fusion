@@ -54,19 +54,23 @@ describe('the bleed example', () => {
     ])
   })
 
-  geometry('runs each row and its rule past the divider, with the words on it', async () => {
-    const host = await table()
-    const divider = (document.querySelector('helix-divider') as HTMLElement).getBoundingClientRect()
-    const chosen = rows(host)[1] as HTMLElement
-    const first = (chosen.firstElementChild as HTMLElement).getBoundingClientRect()
-    const last = (chosen.lastElementChild as HTMLElement).getBoundingClientRect()
-    expect(first.left).toBeLessThan(divider.left)
-    expect(last.right).toBeGreaterThan(divider.right)
-    expect(divider.left - first.left).toBeCloseTo(last.right - divider.right, 0)
-    /* The heading's words on the divider's column, past the checkbox it keeps. */
-    const heading = host
-      .querySelector('helix-table-column')
-      ?.shadowRoot?.querySelector('[part~="column"]') as HTMLElement
-    expect(heading.getBoundingClientRect().left).toBeGreaterThan(divider.left)
-  })
+  geometry(
+    'keeps the rules on the divider’s column, and reaches the chosen row past it',
+    async () => {
+      const host = await table()
+      const divider = (
+        document.querySelector('helix-divider') as HTMLElement
+      ).getBoundingClientRect()
+      const chosen = rows(host)[1] as HTMLElement
+      const first = chosen.firstElementChild as HTMLElement
+      const last = chosen.lastElementChild as HTMLElement
+      /* The cells and their rules on the divider's column. */
+      expect(first.getBoundingClientRect().left).toBeCloseTo(divider.left, 0)
+      expect(last.getBoundingClientRect().right).toBeCloseTo(divider.right, 0)
+      /* The fill past it by the same amount each side. */
+      const reach = Number.parseFloat(getComputedStyle(first, '::before').inlineSize)
+      expect(reach).toBeGreaterThan(0)
+      expect(Number.parseFloat(getComputedStyle(last, '::after').inlineSize)).toBeCloseTo(reach, 0)
+    },
+  )
 })
