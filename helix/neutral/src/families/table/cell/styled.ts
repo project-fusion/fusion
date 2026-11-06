@@ -1,4 +1,4 @@
-import { inherited, measured, native, product, token, web } from '../../../style.js'
+import { inherited, measured, mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import cell from './headless.js'
 
@@ -68,6 +68,9 @@ export default styles(
          next. */
       rule({ child: 'last' }, { paddingInlineEnd: token('space-none') }),
       rule({ header: true }, { fontWeight: token('weight-medium') }),
+      /* A cell of elements alone gives its padding to them, so a control stands at its
+         own height in the row. */
+      web([rule({ text: false }, { paddingBlock: token('space-none') })]),
       web([
         rule(
           { focusVisible: true },
@@ -98,5 +101,26 @@ export default styles(
     /* The cell can shrink and its content could not: a flex item inside keeps an
        automatic minimum of its own until it is told otherwise. */
     on({ region: 'default', slotted: '*' }, [web([rule({ minInlineSize: 0 })])]),
+    /* Text in an element takes the padding back, so it lines up with a text cell's. */
+    on(
+      {
+        region: 'default',
+        slotted:
+          ':is(a, abbr, b, cite, code, em, i, kbd, p, small, span, strong, time, helix-code, helix-format-date, helix-kbd, helix-text)',
+      },
+      [web([rule({ text: false }, { marginBlock: hook.paddingBlock })])],
+    ),
+    /* A link passed in reads as a link: the primary ink, underlined quietly. */
+    on({ region: 'default', slotted: 'a:not([data-link])' }, [
+      web([
+        rule({
+          color: token('color-primary'),
+          textDecoration: 'underline',
+          textDecorationColor: mix('currentColor', 35, 'transparent'),
+          textDecorationThickness: token('border-thin'),
+          textUnderlineOffset: '0.25em',
+        }),
+      ]),
+    ]),
   ],
 )
