@@ -34,7 +34,7 @@ export default headless('bar-chart', {
     errorText: '',
     for: '',
     glass: '',
-    gridlines: oneOf(['both', 'category', 'value']),
+    gridlines: oneOf(['both', 'category', 'none', 'value']),
     highestLabel: 'Highest',
     label: '',
     lines: '',
@@ -56,7 +56,7 @@ export default headless('bar-chart', {
     subtle: '',
     summary: web(oneOf(['hidden', 'visible'])),
     summaryLabel: '{highestLabel}: {readings}.',
-    valueAxis: false,
+    valueAxis: oneOf(['none']),
   },
   events: {
     readingChange: ['index', 'label', 'pointerType', 'series'],

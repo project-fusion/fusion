@@ -43,6 +43,7 @@ import { showsSeries, useChartSource, useHiddenSeries } from '../render/chart-so
 import type { Family } from '../style/form'
 import { useTheme } from '../theme/theme'
 import {
+  axisAsked,
   axisBehavior,
   axisOf,
   cellsOf,
@@ -54,6 +55,7 @@ import {
   nameSize,
   percent,
   plottedOf,
+  roomAsked,
   statusOf,
   useAxisReading,
   useWidth,
@@ -128,7 +130,10 @@ const layersOf = (
 
 /** Everything the canvas and the names draw, which a move of the reading leaves as it is. */
 const plotOf = (drawn: Drawn, plotted: Plotted, colorOf: Color) => {
-  const domain = areaDomain(drawn.stack, drawn.asked)
+  const domain = areaDomain(drawn.stack, {
+    ...drawn.asked,
+    room: roomAsked(plotted.axised, plotted.gridlines),
+  })
   const scales = axisScales(domain, Math.max(drawn.count, 1))
   const named = labelsOf(drawn.rows, plotted.width, plotted.size, drawn.count)
   const percents = percentIn(plotted.lang)
@@ -149,7 +154,7 @@ const plotOf = (drawn: Drawn, plotted: Plotted, colorOf: Color) => {
 /** The plot, worked out again only when what it draws changes. */
 const usePlot = (read: Read, drawn: Drawn, width: number, colorOf: Color, lang: string) => {
   const gridlines = gridlinesAsked(read('gridlines'))
-  const axised = read('value-axis') === true
+  const axised = axisAsked(read('value-axis'))
   const size = nameSize(useTheme())
   const curve = curveOf(read('curve'))
   return useMemo(
