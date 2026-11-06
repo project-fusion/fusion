@@ -39,6 +39,7 @@ export default headless('list', {
     /* The old name of `empty-text`, which the web reads for one release. */
     emptyLabel: web(string()),
     emptyText: 'No items',
+    errorText: '',
     kind: oneOf(['default', 'description', 'ordered', 'unordered']),
     label: '',
     loading: false,
@@ -66,7 +67,7 @@ export default headless('list', {
     loadMore: [],
     reorder: ['keys'],
   },
-  states: ['empty', 'loading', 'settled'],
+  states: ['empty', 'error', 'loading', 'settled'],
   collection: {
     /* **The keys only move focus down the rows, and stop at the ends**, as
        the web's list does. Left and Right are the row's own. */
@@ -96,7 +97,19 @@ export default headless('list', {
   render: ({ props, state }) => (
     <>
       <Slot />
-      {props.loading && (
+      {/* In place of the empty and loading rows while `error-text` is set: the
+          words, then the `error` slot, so a button that tries again never
+          stands alone. */}
+      {props.errorText && (
+        <View
+          part="error"
+          role="listitem"
+        >
+          <Text part="error-words">{props.errorText}</Text>
+          <Slot name="error" />
+        </View>
+      )}
+      {!props.errorText && props.loading && (
         <View
           part="loading"
           role="listitem"
@@ -106,7 +119,7 @@ export default headless('list', {
           </Slot>
         </View>
       )}
-      {state.empty && (
+      {!props.errorText && state.empty && (
         <View
           hidden={!props.emptyText}
           part="empty"
