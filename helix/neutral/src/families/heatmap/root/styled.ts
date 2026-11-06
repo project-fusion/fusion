@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { fn, measured, mix, native, product, token, web } from '../../../style.js'
+import { fn, measured, mix, native, product, scheme, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -41,7 +41,7 @@ export default styles(
   root,
   {
     prefix: 'heatmap',
-    hooks: {
+    hooks: ({ own }) => ({
       cellHeight: null,
       cellInlineSize: null,
       cellRadius: product(token('radii-sm'), 0.5),
@@ -49,21 +49,23 @@ export default styles(
       gap: token('space-2xs'),
       selectedColor: token('color-primary'),
       selectedWidth: token('border-thick'),
-      tone1: mix(token('color-primary-active'), 20, token('color-surface-sunken')),
-      tone2: mix(token('color-primary-active'), 40, token('color-surface-sunken')),
-      tone3: mix(token('color-primary-active'), 60, token('color-surface-sunken')),
-      tone4: mix(token('color-primary-active'), 80, token('color-surface-sunken')),
-      tone5: token('color-primary-active'),
+      /* The ramp toward the far end, in steps a reader tells apart in both modes. */
+      tone1: mix(own.heatmapFar, 35, token('color-surface-sunken')),
+      tone2: mix(own.heatmapFar, 51, token('color-surface-sunken')),
+      tone3: mix(own.heatmapFar, 68, token('color-surface-sunken')),
+      tone4: mix(own.heatmapFar, 84, token('color-surface-sunken')),
+      tone5: own.heatmapFar,
       toneAccent: token('color-accent'),
       toneDanger: token('color-danger'),
       toneInfo: token('color-info'),
       toneMuted: token('color-surface-sunken'),
       tonePrimary: token('color-primary'),
       toneSuccess: token('color-success'),
-      toneWarning: token('color-warning'),
-    },
+      toneWarning: token('color-warning-mark'),
+    }),
     own: {
       heatmapArea: null,
+      heatmapFar: null,
       heatmapFill: null,
       heatmapPaint: null,
       heatmapThrough: null,
@@ -88,10 +90,27 @@ export default styles(
     return [
       /* A grid of one column, as wide as the strip, so the footer is too. */
       on('host', [
+        /* The ramp's far end, the strong primary, which dark holds under a lightness
+           that still parts from the ink. */
+        web([
+          rule({
+            own: {
+              heatmapFar: scheme(
+                token('color-primary-strong'),
+                fn('oklch', ['from', token('color-primary-strong'), 'min(l, 0.87)', 'c', 'h']),
+              ),
+            },
+          }),
+        ]),
+        native([rule({ own: { heatmapFar: token('color-primary-strong') } })]),
         web([
           rule({
             display: 'grid',
             gridTemplateColumns: fn('minmax', 0, 'max-content'),
+          }),
+          /* With nothing to draw, the words stand in the strip's place. */
+          rule([{ empty: true }, { error: true }, { loading: true }], {
+            gridTemplateColumns: fn('minmax', 0, '1fr'),
           }),
         ]),
         native([rule({ alignItems: 'flex-start', display: 'flex', flexDirection: 'column' })]),
@@ -120,7 +139,13 @@ export default styles(
         rule({ borderRadius: hook.cellRadius }),
         web([
           rule({
-            own: { heatmapPaint: measured('heatmap-tone', token('color-surface-sunken')) },
+            /* An empty cell in dark is the overlay rung, which parts from the page. */
+            own: {
+              heatmapPaint: measured(
+                'heatmap-tone',
+                scheme(token('color-surface-sunken'), token('color-surface-overlay')),
+              ),
+            },
             backgroundColor: fn(
               'color-mix',
               'in oklab',
@@ -171,13 +196,10 @@ export default styles(
             { own: { heatmapFill: mix(paint, 60, token('color-background')) } },
           ),
           rule({ emphasis: 'subtle' }, { own: { heatmapArea: 0.2 } }),
-          rule(
-            { material: 'glass' },
-            { own: { heatmapThrough: product(0.62, token('material-opacity')) } },
-          ),
+          rule({ material: 'glass' }, { own: { heatmapThrough: token('material-glass-opacity') } }),
           rule(
             { material: 'frosted' },
-            { own: { heatmapThrough: product(0.88, token('material-opacity')) } },
+            { own: { heatmapThrough: token('material-frosted-opacity') } },
           ),
         ]),
         native([
@@ -354,8 +376,12 @@ export default styles(
             margin: token('space-none'),
             textAlign: 'center',
           }),
+          web([rule({ display: 'grid', gridArea: '1 / 1', placeContent: 'center' })]),
         ],
       ),
+      on('strip', [
+        web([rule([{ empty: true }, { error: true }, { loading: true }], { gridArea: '1 / 1' })]),
+      ]),
       /* The readings did not load: news to act on, in the danger ink. */
       on('error', [rule({ color: token('color-danger') })]),
       /* Printed, a hairline makes the cells countable whatever the fills come out like. */
