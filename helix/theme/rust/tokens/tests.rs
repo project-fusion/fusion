@@ -151,26 +151,26 @@ fn a_category_decides_a_kind_and_a_value_decides_the_rest() {
     assert_eq!(kind("shadow-floating"), Some(Kind::Shadow));
 }
 
-/// Hexes `paint.mjs` resolved for these tokens on November 1, 2026: the ends
-/// of the ramp, a mix of two rungs, a scrim, a relative color off a hex, the
-/// most out-of-gamut series, and two translucent materials.
+/// Hexes `paint.mjs` resolved for these tokens on November 1, 2026, and
+/// main's rescore of November 5 where it moved them: the ends of the ramp, a
+/// mix of two rungs, a scrim, a relative color off a hex, the most
+/// out-of-gamut series, and two translucent materials.
 #[test]
 fn colors_are_the_hex_paint_resolves() {
     let registry = layer();
     for (name, light, dark) in [
         ("color-background", "#ffffff", "#000000"),
         ("color-border", "#e8e8e8", "#212121"),
-        ("color-overlay", "#0b0b0b66", "#0b0b0ba3"),
+        ("color-overlay", "#0b0b0b66", "#000000a3"),
         ("color-primary", "#181818", "#e1e1e1"),
-        ("color-syntax-constant", "#b45528", "#ffa657"),
+        ("color-syntax-constant", "#aa4b1e", "#ffa657"),
         ("color-series-3", "#00a08a", "#00fede"),
-        ("color-warning-muted", "#7c6545", "#e8bc7f"),
-        ("material-translucent", "#ffffff4d", "#12121299"),
-        ("material-modal", "#ffffffe0", "#12121299"),
-        ("material-panel", "#ffffffb8", "#12121299"),
-        ("color-press", "#00000029", "#ffffff33"),
-        ("color-primary-wash", "#18181824", "#e1e1e124"),
-        ("color-warning-mark", "#b97b00", "#ffaf00"),
+        ("color-warning-muted", "#735c3c", "#e8bc7f"),
+        ("material-translucent", "#ffffff4d", "#121212b8"),
+        ("material-panel", "#ffffffb8", "#121212b8"),
+        ("color-press", "#00000029", "#ffffff30"),
+        ("color-primary-wash", "#00000029", "#ffffff29"),
+        ("color-warning-mark", "#b86d00", "#ffaf00"),
         ("color-border-hover", "#959595", "#6c6c6c"),
         ("color-foreground-on-primary", "#ffffff", "#000000"),
         ("scrollbar-track-color", "#00000000", "#00000000"),
@@ -218,10 +218,13 @@ fn lengths_keep_their_rems_and_the_rest_is_what_native_reads() {
     assert_eq!(light("easing-standard"), text("cubic-bezier(0.2, 0, 0, 1)"));
     assert_eq!(light("material-backdrop"), text("blur(16px) saturate(1.5)"));
     assert_eq!(light("shadow-surface"), text("none"));
-    assert_eq!(light("shadow-floating"), text("0px 12px 32px #0b0b0b17"));
+    assert_eq!(
+        light("shadow-floating"),
+        text("0px 1px 2px #0b0b0b0d, 0px 12px 32px #0b0b0b17")
+    );
     assert_eq!(
         value(&registry, "shadow-floating", Mode::Dark),
-        text("0px 12px 32px #0b0b0b24")
+        text("0px 1px 2px #0b0b0b14, 0px 12px 32px #0b0b0b24")
     );
     assert_eq!(
         light("font-display"),

@@ -23,6 +23,8 @@ import {
   lightDark,
   lightness,
   linear,
+  max,
+  min,
   minus,
   mix,
   ms,
@@ -37,6 +39,7 @@ import {
   round,
   saturate,
   shadow,
+  shadows,
   spring,
   times,
 } from './builders.js'
@@ -81,6 +84,26 @@ describe('the builders', () => {
       'ui-sans-serif, "Segoe UI"',
       'linear(0, 1.04, 1)',
       'var(--_helix-brand-on, var(--helix-color-ink))',
+    ])
+  })
+
+  test('write a rounding up, an extreme, a scaled alpha, an sRGB mix, and a list of shadows', () => {
+    expect(
+      [
+        round(px(25.2), px(1), 'up'),
+        min(px(3), times(rem(1), 0.25)),
+        max(min(px(3), px(1)), px(2)),
+        alpha(hex('000000'), 40, ref('opacity-scale')),
+        mix(hex('000000'), 40, hex('ffffff'), 'srgb'),
+        shadows(ref('shadow-sm'), ref('shadow-lg')),
+      ].map(String),
+    ).toEqual([
+      'round(up, 25.2px, 1px)',
+      'min(3px, calc(1rem * 0.25))',
+      'max(min(3px, 1px), 2px)',
+      'color-mix(in oklab, #000000 min(100%, 40% * var(--helix-opacity-scale)), transparent)',
+      'color-mix(in srgb, #000000 40%, #ffffff)',
+      'var(--helix-shadow-sm), var(--helix-shadow-lg)',
     ])
   })
 

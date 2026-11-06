@@ -134,6 +134,9 @@ fn component(name: &str) -> Option<Component> {
         "c" => Some(Component::Chroma),
         "h" => Some(Component::Hue),
         "l" => Some(Component::Lightness),
+        "x" => Some(Component::X),
+        "y" => Some(Component::Y),
+        "z" => Some(Component::Z),
         _ => None,
     }
 }

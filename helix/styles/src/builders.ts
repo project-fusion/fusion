@@ -253,9 +253,25 @@ export const clamp = (low: Operand, value: Operand, high: Operand): Value<'quant
   return built('quantity', `clamp(${inner(low)}, ${inner(value)}, ${inner(high)})`)
 }
 
-/** A length rounded to the nearest multiple of `step`. */
-export const round = (value: Length, step: Measure): Value<'quantity'> =>
-  built('quantity', `round(${text(value)}, ${text(step)})`)
+/**
+ * A length rounded to the nearest multiple of `step`, or with `'up'` to the
+ * multiple at or above it.
+ */
+export const round = (value: Length, step: Measure, strategy?: 'up'): Value<'quantity'> =>
+  built(
+    'quantity',
+    strategy === 'up'
+      ? `round(up, ${text(value)}, ${text(step)})`
+      : `round(${text(value)}, ${text(step)})`,
+  )
+
+/** The smallest of two or more lengths or numbers. */
+export const min = (...values: [Length, Length, ...Length[]]): Value<'quantity'> =>
+  built('quantity', `min(${values.map(text).join(', ')})`)
+
+/** The largest of two or more lengths or numbers. */
+export const max = (...values: [Length, Length, ...Length[]]): Value<'quantity'> =>
+  built('quantity', `max(${values.map(text).join(', ')})`)
 
 /** A color by its hex digits, without the `#`. */
 export const hex = (digits: string): Value<'color'> => built('color', `#${digits}`)
@@ -270,21 +286,36 @@ export const lightDark = (light: Color, dark: Color): Value<'color'> =>
 /**
  * Two colors mixed in OKLab: `mix(first, 60, second)` takes 60 percent of the
  * first, `mix(first, second, 30)` 30 percent of the second, and
- * `mix(first, second)` half of each.
+ * `mix(first, second)` half of each. `mix(first, 60, second, 'srgb')` mixes
+ * in sRGB, where a gray lands on the gray between its two ends.
  */
-export function mix(first: Color, percent: number, second: Color): Value<'color'>
+export function mix(first: Color, percent: number, second: Color, space?: 'srgb'): Value<'color'>
 export function mix(first: Color, second: Color, percent?: number): Value<'color'>
-export function mix(first: Color, middle: Color | number, last?: Color | number): Value<'color'> {
+export function mix(
+  first: Color,
+  middle: Color | number,
+  last?: Color | number,
+  space?: 'srgb',
+): Value<'color'> {
   const [one, other] =
     typeof middle === 'number'
       ? [`${first.css} ${middle}%`, (last as Color).css]
       : [first.css, last === undefined ? middle.css : `${middle.css} ${last}%`]
-  return built('color', `color-mix(in oklab, ${one}, ${other})`)
+  return built('color', `color-mix(in ${space ?? 'oklab'}, ${one}, ${other})`)
 }
 
-/** A color at `percent` of its strength, mixed toward transparent in OKLab. */
-export const alpha = (color: Color, percent: number): Value<'color'> =>
-  built('color', `color-mix(in oklab, ${color.css} ${percent}%, transparent)`)
+/**
+ * A color at `percent` of its strength, mixed toward transparent in OKLab.
+ * With `by`, at `percent` times `by`, held at 100, as a material's strength
+ * times `material-opacity`.
+ */
+export const alpha = (color: Color, percent: number, by?: Amount): Value<'color'> =>
+  built(
+    'color',
+    by === undefined
+      ? `color-mix(in oklab, ${color.css} ${percent}%, transparent)`
+      : `color-mix(in oklab, ${color.css} min(100%, ${percent}% * ${text(by)}), transparent)`,
+  )
 
 /** The origin's lightness, in a relative color. */
 export const lightness: Value<'component'> = built('component', 'l')
@@ -338,7 +369,7 @@ export const shadow = (
 }
 
 /** Several shadows, the first on top. */
-export const shadows = (...layers: Value<'shadow'>[]): Value<'shadow'> =>
+export const shadows = (...layers: Shadow[]): Value<'shadow'> =>
   built('shadow', layers.map((one) => one.css).join(', '))
 
 /** No shadow. */

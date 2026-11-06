@@ -17,8 +17,12 @@ impl Reader<'_> {
             Node::Dimension(value, unit) => length_unit(&unit)
                 .map(|unit| Quantity::Length(value, unit))
                 .ok_or_else(not),
+            /* **A component is read here too**, for arithmetic written once
+            and substituted into a relative color, as the dark fill's
+            luminance step is: evaluation refuses one that lands outside a
+            relative color, as it does a spread channel. */
             Node::Function(name, arguments) if name == "calc" => {
-                self.calc(&arguments, false).map(Quantity::Calc)
+                self.calc(&arguments, true).map(Quantity::Calc)
             }
             Node::Function(name, arguments) if name == "round" => match commas(&arguments)[..] {
                 [ref value, ref step] => Ok(Quantity::Round(
@@ -71,6 +75,16 @@ impl Reader<'_> {
             [Node::Ident(none)] if none == "none" => Ok(Shadow::None),
             [Node::Function(name, arguments)] if name == "var" => {
                 self.var(arguments, Self::shadow).map(Shadow::Var)
+            }
+            _ if commas(nodes).iter().any(
+                |one| matches!(one.as_slice(), [Node::Function(name, _)] if name == "var"),
+            ) =>
+            {
+                commas(nodes)
+                    .iter()
+                    .map(|one| self.shadow(one))
+                    .collect::<Result<_, _>>()
+                    .map(Shadow::List)
             }
             _ => commas(nodes)
                 .iter()

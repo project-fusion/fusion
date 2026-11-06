@@ -4,7 +4,7 @@
 
 use std::slice::from_ref;
 
-use super::super::expr::{Channel, Color, Math, Mix, Oklch, Op, Weight};
+use super::super::expr::{Channel, Color, Func, Math, Mix, Oklch, Op, Space, Weight, Xyz};
 use super::super::syntax::{self, commas, words, Node};
 use super::{component, is_hex, length_unit, single, Reader};
 
@@ -29,6 +29,7 @@ impl Reader<'_> {
                 "oklch" => self
                     .oklch(&arguments)
                     .map(|oklch| Color::Oklch(Box::new(oklch))),
+                "color" => self.xyz(&arguments).map(|xyz| Color::Xyz(Box::new(xyz))),
                 "var" => self.var(&arguments, Self::color).map(Color::Var),
                 _ => Err(not()),
             },
@@ -64,6 +65,7 @@ impl Reader<'_> {
         Ok(Mix {
             first,
             second,
+            space: Space::Oklab,
             weight,
         })
     }
@@ -115,6 +117,30 @@ impl Reader<'_> {
         Ok(Oklch { origin, channels })
     }
 
+    /// `color(from <origin> xyz-d65 <x> <y> <z>)`, the one form of `color()`
+    /// the layer writes.
+    fn xyz(&mut self, arguments: &[Node]) -> Result<Xyz, String> {
+        let list = words(arguments);
+        let [Node::Ident(from), origin, Node::Ident(space), rest @ ..] = list.as_slice() else {
+            return Err(format!(
+                "`color({})` is not relative to an origin, which is not typed",
+                syntax::source(arguments)
+            ));
+        };
+        if from != "from" || space != "xyz-d65" || rest.len() != 3 {
+            return Err(format!(
+                "`color({})` is not three components in xyz-d65 from an origin",
+                syntax::source(arguments)
+            ));
+        }
+        let origin = self.color(from_ref(origin))?;
+        let channels = rest
+            .iter()
+            .map(|node| self.channel(node, true))
+            .collect::<Result<Vec<_>, _>>()?;
+        Ok(Xyz { origin, channels })
+    }
+
     fn channel(&mut self, node: &Node, relative: bool) -> Result<Channel, String> {
         match node {
             Node::Number(value) => Ok(Channel::Number(*value)),
@@ -137,6 +163,16 @@ impl Reader<'_> {
                     self.calc(value, relative)?,
                     self.calc(high, relative)?,
                 ])))
+            }
+            Node::Function(name, arguments) if name == "min" || name == "max" => {
+                let parts = commas(arguments)
+                    .iter()
+                    .map(|one| self.calc(one, relative))
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Channel::Extreme(
+                    if name == "min" { Func::Min } else { Func::Max },
+                    parts,
+                ))
             }
             Node::Function(name, arguments) if name == "var" => {
                 self.var(arguments, Self::channels).map(Channel::Var)
@@ -219,6 +255,29 @@ impl Reader<'_> {
                 self.var(arguments, Self::quantity).map(Math::Var)
             }
             Node::Function(name, arguments) if name.is_empty() => self.calc(arguments, components),
+            Node::Function(name, arguments) if name == "calc" => self
+                .calc(arguments, components)
+                .map(|inner| Math::Nested(Box::new(inner))),
+            Node::Function(name, arguments)
+                if name == "clamp" || name == "min" || name == "max" =>
+            {
+                let parts = commas(arguments)
+                    .iter()
+                    .map(|one| self.calc(one, components))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let func = match name.as_str() {
+                    "clamp" if parts.len() == 3 => Func::Clamp,
+                    "min" => Func::Min,
+                    "max" => Func::Max,
+                    _ => {
+                        return Err(format!(
+                            "`{}` does not hold a minimum, a value and a maximum",
+                            syntax::source(from_ref(node))
+                        ))
+                    }
+                };
+                Ok(Math::Call(func, parts))
+            }
             other => Err(format!(
                 "`{}` is not a value `calc()` reads",
                 syntax::source(from_ref(other))

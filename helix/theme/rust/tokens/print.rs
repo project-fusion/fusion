@@ -7,8 +7,8 @@
 //! form is held to what `tokens.ts` writes.
 
 use super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Layer, Math, Oklch,
-    Op, Quantity, Shadow, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Layer, Math,
+    Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
 };
 use super::syntax::number_text;
 
@@ -62,22 +62,49 @@ fn color(value: &Color) -> String {
         Color::Hex(digits) => format!("#{digits}"),
         Color::LightDark(light, dark) => format!("light-dark({}, {})", color(light), color(dark)),
         Color::Mix(mix) => {
-            let (first, second) = match mix.weight {
+            let (first, second) = match &mix.weight {
                 Weight::Even => (color(&mix.first), color(&mix.second)),
                 Weight::First(percent) => (
-                    format!("{} {}%", color(&mix.first), number_text(percent)),
+                    format!("{} {}%", color(&mix.first), number_text(*percent)),
+                    color(&mix.second),
+                ),
+                Weight::Scaled(percent, by) => (
+                    format!(
+                        "{} min(100%, {}% * {})",
+                        color(&mix.first),
+                        number_text(*percent),
+                        quantity(by)
+                    ),
                     color(&mix.second),
                 ),
                 Weight::Second(percent) => (
                     color(&mix.first),
-                    format!("{} {}%", color(&mix.second), number_text(percent)),
+                    format!("{} {}%", color(&mix.second), number_text(*percent)),
                 ),
             };
-            format!("color-mix(in oklab, {first}, {second})")
+            let space = match mix.space {
+                Space::Oklab => "oklab",
+                Space::Srgb => "srgb",
+            };
+            format!("color-mix(in {space}, {first}, {second})")
         }
         Color::Oklch(oklch) => relative(oklch),
         Color::Transparent => "transparent".to_owned(),
         Color::Var(reference) => var(reference, color),
+        Color::Xyz(xyz) => format!(
+            "color(from {} xyz-d65 {})",
+            color(&xyz.origin),
+            list(&xyz.channels, channel, " ")
+        ),
+    }
+}
+
+/// A function's name as CSS writes it.
+fn func(name: Func) -> &'static str {
+    match name {
+        Func::Clamp => "clamp",
+        Func::Max => "max",
+        Func::Min => "min",
     }
 }
 
@@ -101,6 +128,9 @@ fn channel(value: &Channel) -> String {
                 arithmetic(high)
             )
         }
+        Channel::Extreme(name, parts) => {
+            format!("{}({})", func(*name), list(parts, arithmetic, ", "))
+        }
         Channel::Component(name) => component(*name).to_owned(),
         Channel::Number(number) => number_text(*number),
         Channel::Var(reference) => var(reference, |channels| list(channels, channel, " ")),
@@ -112,6 +142,9 @@ fn component(name: Component) -> &'static str {
         Component::Chroma => "c",
         Component::Hue => "h",
         Component::Lightness => "l",
+        Component::X => "x",
+        Component::Y => "y",
+        Component::Z => "z",
     }
 }
 
@@ -170,6 +203,8 @@ fn arithmetic(math: &Math) -> String {
                 operand(right, *op, true)
             )
         }
+        Math::Call(name, parts) => format!("{}({})", func(*name), list(parts, arithmetic, ", ")),
+        Math::Nested(inner) => format!("calc({})", arithmetic(inner)),
         Math::Component(name) => component(*name).to_owned(),
         Math::Length(value, length) => format!("{}{}", number_text(*value), unit(*length)),
         Math::Number(value) => number_text(*value),
@@ -182,8 +217,13 @@ fn quantity(value: &Quantity) -> String {
         Quantity::Calc(math) => format!("calc({})", arithmetic(math)),
         Quantity::Length(number, length) => format!("{}{}", number_text(*number), unit(*length)),
         Quantity::Number(number) => number_text(*number),
+        Quantity::Max(values) => format!("max({})", list(values, quantity, ", ")),
+        Quantity::Min(values) => format!("min({})", list(values, quantity, ", ")),
         Quantity::Round(value, step) => {
             format!("round({}, {})", quantity(value), quantity(step))
+        }
+        Quantity::RoundUp(value, step) => {
+            format!("round(up, {}, {})", quantity(value), quantity(step))
         }
         Quantity::Var(reference) => var(reference, quantity),
     }
@@ -210,6 +250,7 @@ fn easing(value: &Easing) -> String {
 fn shadow(value: &Shadow) -> String {
     match value {
         Shadow::Layers(layers) => list(layers, layer, ", "),
+        Shadow::List(shadows) => list(shadows, shadow, ", "),
         Shadow::None => "none".to_owned(),
         Shadow::Var(reference) => var(reference, shadow),
     }

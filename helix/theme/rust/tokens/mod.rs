@@ -38,7 +38,7 @@ pub use builder::{parse as parse_builder, print::built as builder_of, Built};
 pub use eval::{Curve, Drop, Effect, Length, Mode, Value};
 pub use expr::{
     Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Kind, Layer, Math,
-    Mix, Oklch, Op, Quantity, Shadow, Shape, Spring, Time, Unit, Var, Weight,
+    Mix, Oklch, Op, Quantity, Shadow, Shape, Space, Spring, Time, Unit, Var, Weight,
 };
 pub use native::{native, Native};
 pub use paint::{to_hex, to_srgb, Lab, Polar};
