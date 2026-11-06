@@ -102,13 +102,18 @@ import {
   type ColumnType,
   type DataTableView,
   emptyView,
+  type Facet,
   type FilterColumn,
+  type FilterOperatorInfo,
+  facetsOf,
   mergeView,
+  operatorsFor,
   type PartialView,
   type PinEdge,
   passesAll,
   readView,
   sameView,
+  textOf,
   type ViewFilter,
   viewJson,
 } from '../view.js'
@@ -139,8 +144,7 @@ const readViewText = (value: string | null): DataTableView =>
     : emptyView()
 
 /** What a column holds, for its filters: its `type` where it has one, and text otherwise. */
-const columnTypeOf = (column: HelixHeadlessTableColumn): ColumnType =>
-  (column as { type?: ColumnType }).type ?? 'text'
+const columnTypeOf = (column: HelixHeadlessTableColumn): ColumnType => column.type ?? 'text'
 
 /** Whether an element inside a cell is a control a reader can work. */
 const isControl = (element: HTMLElement): boolean =>
@@ -1365,7 +1369,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private tree(): Grown {
     const axes = this.axes
     const server = this.mode === 'server'
-    const query = server ? '' : this.filter
+    const query = server ? '' : this.query
     const spec = server ? '' : this.sort
     const key = [
       query,
@@ -1418,12 +1422,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   private arrange(): Arranged {
     const axes = this.axes
-    const key = `${this.filter}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
+    const key = `${this.query}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
     const source = this.source
     if (this.held?.key === key && this.held.source === source) {
       return this.held.value
     }
-    const value = arranged(source, axes, { query: this.filter, spec: this.sort })
+    const value = arranged(source, axes, { query: this.query, spec: this.sort })
     this.held = { key, source, value }
     return value
   }
@@ -1802,7 +1806,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!this.windowed) {
       const view = ordered(this.source, this.axes, {
         page: this.page,
-        query: this.filter,
+        query: this.query,
         size: this.pageSize,
         spec: this.sort,
       })
@@ -1848,7 +1852,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (this.childField) {
       return this.tree().rows.length
     }
-    const query = this.filter.trim()
+    const query = this.query.trim()
     const source = this.source
     if (query === '') {
       return source.length
@@ -2434,6 +2438,59 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.dispatchEvent(new HelixViewChangeEvent({ value: viewJson(view), view }))
   }
 
+  /** The columns a search reads, where some are marked `searchable`. */
+  private get searchedColumns(): HelixHeadlessTableColumn[] | undefined {
+    const marked = this.tableColumns.filter((column) => column.searchable && column.field !== '')
+    return marked.length > 0 ? marked : undefined
+  }
+
+  /**
+   * The query the ordering helpers search with: the search itself, or nothing
+   * where `searchable` columns were searched already.
+   */
+  private get query(): string {
+    return this.searchedColumns && this.mode !== 'server' && !this.childField ? '' : this.filter
+  }
+
+  /**
+   * The comparisons a column's filter offers, for its `type`. Your own filter
+   * picker can list them.
+   */
+  operatorsOf(field: string): readonly FilterOperatorInfo[] {
+    const column = this.tableColumns.find((one) => one.field === field)
+    return operatorsFor(column ? columnTypeOf(column) : 'text')
+  }
+
+  /**
+   * Every value a column holds, with how many rows hold each, most first.
+   *
+   * Counted over the rows that pass the search and every other column's
+   * filter, so each count is how many rows choosing that value would show. In
+   * `server` mode it counts the rows the table holds.
+   */
+  facetsOf(field: string): Facet[] {
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column) {
+      return []
+    }
+    const others = this.filtersState.filter((filter) => filter.field !== field)
+    const columns = this.filterColumns
+    const needle = this.filter.trim().toLocaleLowerCase()
+    const searched = this.searchedColumns ?? this.tableColumns.filter((one) => one.field !== '')
+    const rows =
+      this.mode === 'server'
+        ? this.rows
+        : this.rows.filter(
+            (row) =>
+              passesAll(row, others, columns) &&
+              (needle === '' ||
+                searched.some((one) =>
+                  textOf(one.order(row)).toLocaleLowerCase().includes(needle),
+                )),
+          )
+    return facetsOf(rows, (row) => column.order(row))
+  }
+
   /** What the filters need of each column with a field, by field. */
   private get filterColumns(): Map<string, FilterColumn> {
     return new Map(
@@ -2456,15 +2513,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   private get source(): readonly DataRow[] {
     const filters = this.filtersState
-    if (filters.length === 0 || this.mode === 'server') {
+    const searched = this.searchedColumns
+    const needle = searched ? this.filter.trim().toLocaleLowerCase() : ''
+    if ((filters.length === 0 && needle === '') || this.mode === 'server' || this.childField) {
       return this.rows
     }
     const columns = this.filterColumns
-    const key = `${JSON.stringify(filters)}\u0000${[...columns.values()].map((one) => `${one.field}:${one.type}`).join(',')}`
+    const key = `${JSON.stringify(filters)}\u0000${needle}\u0000${[...columns.values()].map((one) => `${one.field}:${one.type}`).join(',')}`
     if (this.passed?.key === key && this.passed.source === this.rows) {
       return this.passed.value
     }
-    const value = this.rows.filter((row) => passesAll(row, filters, columns))
+    const value = this.rows.filter(
+      (row) =>
+        passesAll(row, filters, columns) &&
+        (needle === '' ||
+          (searched ?? []).some((column) =>
+            textOf(column.order(row)).toLocaleLowerCase().includes(needle),
+          )),
+    )
     this.passed = { key, source: this.rows, value }
     return value
   }
