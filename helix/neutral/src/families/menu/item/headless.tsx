@@ -2,6 +2,7 @@ import {
   boolean,
   cancelable,
   headless,
+  oneOf,
   Pressable,
   Slot,
   set,
@@ -66,6 +67,7 @@ export default headless('menu-item', {
     rel: web(''),
     shortcut: '',
     target: web(''),
+    tone: oneOf(['danger', 'neutral']),
     value: '',
   },
   events: {
