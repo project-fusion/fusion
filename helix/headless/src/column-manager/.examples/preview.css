@@ -35,6 +35,15 @@ helix-headless-column-manager::part(item) {
   min-block-size: 2.25rem;
 }
 
+helix-headless-column-manager::part(grip),
+helix-headless-column-manager::part(pin),
+helix-headless-column-manager::part(reset) {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+
 helix-headless-column-manager::part(grip-mark),
 helix-headless-column-manager::part(pin-mark) {
   block-size: 1rem;
