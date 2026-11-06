@@ -240,18 +240,18 @@ export default styles(
               ),
               insetInline: 0,
               marginInline: 'auto',
-              own: { donutChartRing: '80' },
+              own: { donutChartEdge: '40', donutChartRing: '80' },
             }),
             rule(
               { sweep: 'half' },
               {
                 blockSize: quotient(
-                  product('100%', difference(40, settled)),
-                  sum(40, quotient(settled, 2)),
+                  product('100%', difference(own.donutChartEdge, settled)),
+                  sum(own.donutChartEdge, quotient(settled, 2)),
                 ),
                 insetBlockEnd: quotient(
                   product('100%', quotient(settled, 2)),
-                  sum(40, quotient(settled, 2)),
+                  sum(own.donutChartEdge, quotient(settled, 2)),
                 ),
                 insetBlockStart: 'auto',
               },
