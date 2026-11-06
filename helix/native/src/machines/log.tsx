@@ -232,7 +232,11 @@ const readSource = async (
 /** Reads what the log's props say into its buffer, as the web's setters do. */
 const useBuffer = (
   read: (name: string) => unknown,
-): { readonly buffer: LogBuffer; readonly redraw: () => void; readonly drawn: number } => {
+): {
+  readonly buffer: LogBuffer
+  readonly redraw: (atOnce?: boolean) => void
+  readonly drawn: number
+} => {
   const buffer = useRef<LogBuffer | null>(null)
   buffer.current ??= new LogBuffer()
   const held = buffer.current
@@ -259,16 +263,22 @@ const useBuffer = (
   const began = useRef(0)
   /* The first write of a frame draws at once, and the rest wait: a frame, or as
      long as the last drawing took where that is longer, so a writer faster than
-     the drawing is read in batches and never waits behind a drawing per write. */
-  const redraw = useCallback(() => {
-    if (waiting.current) {
-      return
-    }
+     the drawing is read in batches and never waits behind a drawing per write.
+     **What a reader did draws at once**, as a step they open or close: the wait
+     is for a writer, and a press answered a drawing later reads as missed. */
+  const redraw = useCallback((atOnce = false) => {
     const draw = () => {
       waiting.current = false
       last.current = Date.now()
       began.current = last.current
       setDrawn((one) => one + 1)
+    }
+    if (atOnce) {
+      draw()
+      return
+    }
+    if (waiting.current) {
+      return
     }
     const since = Date.now() - last.current
     const gap = Math.max(16, cost.current)
@@ -758,7 +768,7 @@ const useToggled = (
     readonly isOpen: (id: string) => boolean
     readonly opened: Map<string, boolean>
     readonly query: string
-    readonly redraw: () => void
+    readonly redraw: (atOnce?: boolean) => void
   },
 ) => {
   const toggled = useRef((_id: string, _open: boolean): void => undefined)
@@ -767,7 +777,7 @@ const useToggled = (
       return
     }
     now.opened.set(id, open)
-    now.redraw()
+    now.redraw(true)
     const value = now.all
       .filter((one) => now.isOpen(one.id))
       .map((one) => one.id)
