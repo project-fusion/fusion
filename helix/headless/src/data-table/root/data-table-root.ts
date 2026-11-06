@@ -91,12 +91,15 @@ import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import '../../pagination/index.js'
 import {
   HelixBeforeColumnToggleEvent,
+  HelixBeforeExportEvent,
   HelixBeforeFollowEvent,
   HelixBeforeViewChangeEvent,
   HelixColumnToggleEvent,
+  HelixExportEvent,
   HelixFollowEvent,
   HelixViewChangeEvent,
 } from '../events/index.js'
+import { EXPORT_TYPES, type ExportData, type ExportOptions, exportText } from '../export.js'
 import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
 import {
@@ -219,6 +222,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
  * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
  * | Control or Command with A | Selects every row, in a `selectable` table. |
+ * | Control or Command with C | Copies the selected rows as TSV under their headings, or the value in the cell with focus where no row is selected. |
  * | Right on a row header in a tree grid | Opens a closed row, and moves one cell along an open one. |
  * | Left on a row header in a tree grid | Closes an open row, and moves to the parent of a closed one. |
  * | A letter or a word | Moves to the next row whose row header starts with what you typed. |
@@ -299,6 +303,13 @@ const isControl = (element: HTMLElement): boolean =>
  * nothing while a `sort` is set, since the sort decides the order, and a tree
  * grid draws none.
  *
+ * **Export.** `exportRows` writes the rows as CSV, TSV or JSON, with a choice
+ * of the selected, filtered or all rows, the visible or all columns, and the
+ * values as shown or raw. `download` saves them as a file, and asks first with
+ * `helix-before-export`, which a server can take. `TableExport` is a panel
+ * that asks a reader each choice. XLSX is its own entry, so set `xlsx` to the
+ * `toXlsx` it exports to offer it.
+ *
  * `csv()` returns the result as text: every row that passes the filter, in the
  * order and the columns on screen. Saving the file is up to you.
  *
@@ -335,6 +346,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixBeforeColumnToggleEvent} helix-before-column-toggle - A column is about to be hidden or shown, with its `field` and `hidden`. Cancelable: cancel it to keep the column as it is.
+ * @event {HelixBeforeExportEvent} helix-before-export - A file of the rows is about to be made, from Export or `download`, with the choices, the file's name, and the view. Cancelable: cancel it to make the file on your server.
  * @event {HelixBeforeFilterEvent} helix-before-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixBeforeFollowEvent} helix-before-follow - A press on a link in a cell is about to load its page, in this tab and on this site. Cancelable: cancel it to keep the page, and hand `detail.href` to your router.
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
@@ -344,6 +356,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
  * @event {HelixColumnToggleEvent} helix-column-toggle - Fired after a column is hidden or shown, with its `field` and `hidden`.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
+ * @event {HelixExportEvent} helix-export - Fired as the browser saves a file of the rows, with the same detail.
  * @event {HelixFilterEvent} helix-filter - Fired after the search query changes, with the new query.
  * @event {HelixFollowEvent} helix-follow - Fired as the browser loads the page a link in a cell names, with its path.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
@@ -2276,6 +2289,180 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Draws only the rows in view, with empty space in place of the rest.
+   *
+   * **Not a `mode`.** `mode` says where the rows come from and who filtered
+   * them; this says how many of the ones we hold get drawn. They are
+   * independent: a consumer fetching five thousand rows a chunk at a time wants
+   * `mode="server"` and this at once, and folding this into `mode` would be an
+   * API that forbids that combination for no reason.
+   *
+   * **Composes with `paginated` rather than excluding it.** A window over a
+   * page is coherent -- the page is the slice of the result, the window is the
+   * part of that slice on screen -- and the arithmetic is the same either way,
+   * so there is nothing to forbid. Together they suit a table paging at a
+   * thousand rows, where the page is a reasonable fetch and a poor render.
+   *
+   * Off by default. Windowing costs a scroll listener, a measurement per row
+   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
+   * should pay none of them.
+   *
+   * While windowed, the `table` part scrolls on this tier: it carries
+   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
+   * every shadow root. You still need to give it a block size.
+   */
+  @property({ reflect: true, type: Boolean })
+  windowed = false
+
+  /**
+   * The rows and columns an export holds, before they are written: the
+   * headings, the fields, and each row's values.
+   *
+   * - `rows`: `filtered`, the rows that pass the search and the filters, in
+   *   order, by default; `selected`, the selected rows; or `all`.
+   * - `columns`: `visible`, the columns not hidden, by default; or `all`. A
+   *   column left out at a narrow width is kept, so a file is the same at any
+   *   width. A column with no field has no value and is left out.
+   * - `values`: `shown`, what a cell's `cell` reader gives where it is text or
+   *   a number, by default; or `raw`, the field's value in the row.
+   *
+   * In `server` mode the filtered rows are the page the table holds.
+   */
+  exportData(options: ExportOptions = {}): ExportData {
+    const all = options.columns === 'all'
+    const raw = options.values === 'raw'
+    const columns = this.pinColumns(
+      this.orderedColumns.filter((column) => column.field !== '' && (all || column.shown)),
+    )
+    const which = options.rows ?? 'filtered'
+    const rows =
+      which === 'all'
+        ? this.rows
+        : which === 'selected'
+          ? this.selectedRows()
+          : this.mode === 'server' && !this.childField
+            ? this.rows
+            : this.flat().rows
+    const value = (column: HelixHeadlessTableColumn, row: DataRow): unknown => {
+      if (raw) {
+        return valueAt(row, column.field)
+      }
+      const shown = column.read(row)
+      return typeof shown === 'string' ||
+        typeof shown === 'number' ||
+        typeof shown === 'boolean' ||
+        shown instanceof Date
+        ? shown
+        : valueAt(row, column.field)
+    }
+    return {
+      fields: columns.map((column) => column.field),
+      headings: columns.map((column) => column.textContent?.trim() || column.field),
+      rows: rows.map((row) => columns.map((column) => value(column, row))),
+    }
+  }
+
+  /**
+   * Writes an export as text: CSV by default, or TSV or JSON with `format`.
+   * See `exportData` for the rows, columns and values. XLSX is a file and not
+   * text, which `download` writes.
+   */
+  exportRows(options: ExportOptions = {}): string {
+    const format = options.format === 'tsv' || options.format === 'json' ? options.format : 'csv'
+    return exportText(this.exportData(options), format)
+  }
+
+  /**
+   * Saves an export as a file, as a reader's Export does.
+   *
+   * Asks first with `helix-before-export`, which carries the choices, the
+   * name of the file and the view. Cancel it to make the file on a server, as
+   * a table in `server` mode has to. Then the browser saves the file and
+   * `helix-export` follows. `filename` defaults to the table's `label` and
+   * the format's extension. XLSX needs `xlsx`. Returns whether the file was
+   * made here.
+   */
+  download(options: ExportOptions & { filename?: string } = {}): boolean {
+    const format = options.format ?? 'csv'
+    if (format === 'xlsx' && !this.xlsx) {
+      return false
+    }
+    const data = this.exportData(options)
+    const name = (this.label || 'table')
+      .trim()
+      .toLocaleLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, '-')
+    const detail = {
+      columns: options.columns ?? 'visible',
+      count: data.rows.length,
+      filename: options.filename ?? `${name || 'table'}.${format}`,
+      format,
+      rows: options.rows ?? 'filtered',
+      values: options.values ?? 'shown',
+      view: this.view,
+    } as const
+    if (!this.dispatchEvent(new HelixBeforeExportEvent(detail))) {
+      return false
+    }
+    if (typeof document !== 'undefined' && typeof URL.createObjectURL === 'function') {
+      const body: BlobPart =
+        format === 'xlsx' && this.xlsx
+          ? (this.xlsx(data) as BlobPart)
+          : exportText(data, format === 'xlsx' ? 'csv' : format)
+      const url = URL.createObjectURL(new Blob([body], { type: EXPORT_TYPES[format] }))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = detail.filename
+      link.click()
+      setTimeout(() => URL.revokeObjectURL(url))
+    }
+    this.dispatchEvent(new HelixExportEvent(detail))
+    return true
+  }
+
+  /** The selected rows, in the order of the result. */
+  private selectedRows(): readonly DataRow[] {
+    const chosen = this.chosen
+    if (this.rowKey) {
+      return this.flat().rows.filter((row) => chosen.has(this.keyOf(row, -1)))
+    }
+    return this.flat().rows.filter((row, place) => chosen.has(this.keyOf(row, place)))
+  }
+
+  /**
+   * Copies to the clipboard: the selected rows as TSV under their headings,
+   * where some are selected, and otherwise the value in the cell that holds
+   * focus. Control or Command with C in the grid does this.
+   */
+  private copyCells(place: { column: number; row: number }): void {
+    let text: string
+    if (this.chosen.size > 0) {
+      text = this.exportRows({ format: 'tsv', rows: 'selected' })
+    } else {
+      const column = this.shownColumns[place.column - this.lead]
+      const row = this.drawnPage[place.row]
+      if (!column || !row || column.field === '') {
+        return
+      }
+      /* Through the TSV writer, so a pasted cell is guarded as a pasted row is. */
+      text =
+        exportText(
+          { fields: [''], headings: [''], rows: [[this.shownOf(column, row)]] },
+          'tsv',
+        ).split('\r\n')[1] ?? ''
+    }
+    navigator.clipboard?.writeText(text).catch(() => undefined)
+  }
+
+  /** What a cell shows as text, where its reader gives text, and its field's value otherwise. */
+  private shownOf(column: HelixHeadlessTableColumn, row: DataRow): unknown {
+    const shown = column.read(row)
+    return typeof shown === 'string' || typeof shown === 'number' || typeof shown === 'boolean'
+      ? shown
+      : valueAt(row, column.field)
+  }
+
+  /**
    * Returns the result as CSV: every row that matches the filter, in the order
    * and columns shown, under a line of the column headings.
    *
@@ -2348,30 +2535,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Draws only the rows in view, with empty space in place of the rest.
-   *
-   * **Not a `mode`.** `mode` says where the rows come from and who filtered
-   * them; this says how many of the ones we hold get drawn. They are
-   * independent: a consumer fetching five thousand rows a chunk at a time wants
-   * `mode="server"` and this at once, and folding this into `mode` would be an
-   * API that forbids that combination for no reason.
-   *
-   * **Composes with `paginated` rather than excluding it.** A window over a
-   * page is coherent -- the page is the slice of the result, the window is the
-   * part of that slice on screen -- and the arithmetic is the same either way,
-   * so there is nothing to forbid. Together they suit a table paging at a
-   * thousand rows, where the page is a reasonable fetch and a poor render.
-   *
-   * Off by default. Windowing costs a scroll listener, a measurement per row
-   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
-   * should pay none of them.
-   *
-   * While windowed, the `table` part scrolls on this tier: it carries
-   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
-   * every shadow root. You still need to give it a block size.
+   * A function that writes an XLSX file, which `@fusion.dev/helix/data-table/xlsx`
+   * exports as `toXlsx`. Set it to offer XLSX in `download` and in a bound
+   * `TableExport`. It is its own entry, so a table that never writes a
+   * spreadsheet does not carry the writer.
    */
-  @property({ reflect: true, type: Boolean })
-  windowed = false
+  @property({ attribute: false })
+  xlsx: ((data: ExportData) => Uint8Array) | undefined = undefined
 
   /**
    * Asks for a different view, as a reader's change does: `helix-before-view-change`,
@@ -4094,6 +4264,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     const last = this.drawnPage.length - 1 + (this.moreDrawn ? 1 : 0)
+    if ((event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'c') {
+      event.preventDefault()
+      this.copyCells(place)
+      return
+    }
     if (!event.shiftKey && selectsAll(event) && this.selectable) {
       event.preventDefault()
       this.requestSelected(new Set([...this.chosen, ...this.everyKey]))
