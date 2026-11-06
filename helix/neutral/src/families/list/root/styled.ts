@@ -1,6 +1,6 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import { oneOf } from '../../../render.js'
-import { fn, inherited, token } from '../../../style.js'
+import { fn, inherited, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -27,9 +27,10 @@ export default styles(
       dragPreviewShadow: token('shadow-floating'),
       emptyColor: token('color-foreground-muted'),
       emptyPadding: token('space-md'),
+      errorColor: token('color-danger'),
       gap: token('space-none'),
       loadingColor: token('color-foreground-muted'),
-      loadingPadding: token('space-sm'),
+      loadingPadding: token('space-md'),
       markerGutter: token('space-md'),
     },
     own: { listBleed: null },
@@ -156,6 +157,18 @@ export default styles(
         textAlign: 'center',
       }),
     ]),
+    /* The row after the last while `error-text` is set, in the danger ink: news you
+       act on. What the `error` slot holds sits a step after the words. */
+    on('error', [
+      rule({
+        color: hook.errorColor,
+        fontSize: token('text-sm'),
+        padding: hook.emptyPadding,
+        textAlign: 'center',
+      }),
+      native([rule({ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' })]),
+    ]),
+    on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
     /* The copy of a row a pointer drags, raised over the page while the row
        stays in place, faded. It has no transition, so it follows the pointer
        with nothing animated. */
