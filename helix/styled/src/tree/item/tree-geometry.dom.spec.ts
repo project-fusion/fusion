@@ -256,7 +256,7 @@ describe('tree item density', () => {
       'calc(var(--helix-size-control) - var(--tree-gap, var(--helix-space-2xs)))',
     )
     expect(css).toContain(
-      '--_tree-pad: max(0px, round(down, calc((var(--_tree-row) - 1lh) / 2), 1px))',
+      '--_tree-pad: max(var(--helix-space-none), round(down, calc((var(--_tree-row) - 1lh) / 2), 1px))',
     )
     expect(css).toContain('padding-block: var(--_tree-pad)')
     expect(css).toContain('block-size: var(--_tree-row)')

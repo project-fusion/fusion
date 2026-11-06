@@ -94,9 +94,17 @@ export default styles(
     ]),
     on('tree', [
       rule({ display: 'flex', flexDirection: 'column' }),
-      /* Rows that are already there stay, and dim, while a new set arrives. */
-      rule({ loading: true }, { opacity: token('opacity-busy') }),
+      native([rule({ loading: true }, { opacity: token('opacity-busy') })]),
     ]),
+    /* Written out: rows that are already there stay, and dim, while a new set arrives,
+       and the loading and empty lines keep full ink. */
+    on(
+      {
+        part: 'tree',
+        selector: ':host([loading]) [part="tree"] > :not([part~="loading"], [part~="empty"])',
+      },
+      [web([rule({ opacity: token('opacity-busy') })])],
+    ),
     /* The copy of a row a pointer drags, drawn in the top layer and raised over
        the page while the row itself stays in place, faded. It has no transition,
        so it follows the pointer with nothing animated, whatever the reader's
