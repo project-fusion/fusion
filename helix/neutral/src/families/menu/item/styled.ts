@@ -6,8 +6,10 @@ import {
   hookOf,
   list,
   measured,
+  mix,
   native,
   product,
+  scheme,
   sum,
   token,
   web,
@@ -39,17 +41,20 @@ export default styles(
   row,
   {
     prefix: 'menu',
-    hooks: {
+    hooks: ({ own }) => ({
       itemDescriptionColor: token('color-foreground-muted'),
       itemDetailColor: token('color-foreground-muted'),
       itemEnd: '0px',
-      itemHoverBackgroundColor: token('color-hover'),
+      itemHoverBackgroundColor: first(own.menuItemWash, token('color-hover')),
       itemStart: '0px',
-    },
+    }),
     own: {
       menuBleed: null,
       menuFrom: null,
+      menuItemInk: null,
+      menuItemPress: null,
       menuItemRadius: null,
+      menuItemWash: null,
       menuMaterialBackdrop: null,
       menuMaterialFill: null,
       menuTravel: null,
@@ -69,14 +74,40 @@ export default styles(
       justifySelf: 'end',
     } as const
     return [
-      on('host', [rule({ display: 'block' })]),
+      on('host', [
+        rule({ display: 'block' }),
+        /* **`danger`, kept quiet.** The words and the leading mark take the danger
+         ink, the highlight a wash of it at the hover wash's own strengths, so the
+         row is as loud as its neighbors and only its hue says what it does. A
+         disabled danger row is a disabled row. */
+        rule(
+          { tone: 'danger' },
+          {
+            own: {
+              menuItemInk: token('color-danger'),
+              menuItemPress: scheme(
+                mix(token('color-danger'), 16, 'transparent'),
+                mix(token('color-danger'), 20, 'transparent'),
+              ),
+              menuItemWash: scheme(
+                mix(token('color-danger'), 8, 'transparent'),
+                mix(token('color-danger'), 12, 'transparent'),
+              ),
+            },
+          },
+        ),
+        rule(
+          { has: 'disabled', tone: 'danger' },
+          { own: { menuItemInk: 'initial', menuItemPress: 'initial', menuItemWash: 'initial' } },
+        ),
+      ]),
       include(rowFragment),
       on('item', [
         rule({
           alignItems: 'center',
           textDecoration: 'none',
           borderRadius: own.menuItemRadius(token('radii-none')),
-          color: token('color-foreground'),
+          color: own.menuItemInk(token('color-foreground')),
           web: { cursor: 'pointer' },
           display: 'grid',
           gridTemplateColumns: [hook.itemStart, fn('minmax', 0, '1fr'), 'auto', hook.itemEnd],
@@ -99,14 +130,14 @@ export default styles(
           { has: 'disabled' },
           { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
         ),
-        rule({ active: true }, { backgroundColor: token('color-press') }),
+        rule({ active: true }, { backgroundColor: own.menuItemPress(token('color-press')) }),
       ]),
       on('start', [
         rule({
           '--icon-size': token('size-icon'),
           alignItems: 'center',
           boxSizing: 'border-box',
-          color: token('color-foreground-subtle'),
+          color: own.menuItemInk(token('color-foreground-subtle')),
           display: 'flex',
           justifyContent: 'center',
           paddingInlineEnd: token('space-xs'),
