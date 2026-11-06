@@ -6,10 +6,11 @@ import { derive } from '../../../tree.js'
  * other layer.
  *
  * **The stack is a notice layer.** It stands open while one of its messages
- * shows, above every dialog whenever it opened, and stays read and
- * pressable while a modal holds the reader, as the web's region moves into
- * the open modal. It takes no focus as it opens, and no close request: a
- * message closes on its own.
+ * shows, above every dialog whenever it opened, and stays read while a
+ * modal holds the reader. On a phone it stays pressable there too; on the web
+ * the region is raised above the modal and inert under it, and a press on a
+ * message reaches nothing. It takes no focus as it opens, and no close
+ * request: a message closes on its own.
  *
  * **It stands along the edge `placement` names**, the bottom unless it names
  * `top-`, at the start, the middle, or the end of that edge, and the newest
