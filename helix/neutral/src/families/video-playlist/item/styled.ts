@@ -1,4 +1,4 @@
-import { list, native, product, token, web } from '../../../style.js'
+import { inherited, list, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -118,7 +118,7 @@ export default styles(
           insetInline: 0,
           pointerEvents: 'none',
           position: 'absolute',
-          zIndex: 1,
+          zIndex: token('layer-raised'),
         }),
         rule({ dropBefore: true }, { insetBlockStart: 0 }),
         rule({ dropAfter: true }, { insetBlockEnd: 0 }),
@@ -132,6 +132,8 @@ export default styles(
         inlineSize: hook.mediaSize,
         overflow: 'hidden',
       }),
+      /* No column for a thumbnail where no entry of the list has one. */
+      web([rule({ display: inherited('_video-playlist-media-display', 'block') })]),
     ]),
     on({ region: 'media', slotted: '*' }, [rule(filled)]),
     on('thumbnail', [rule(filled)]),

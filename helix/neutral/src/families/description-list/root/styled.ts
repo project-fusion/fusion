@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { native, token } from '../../../style.js'
+import { native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -28,7 +28,7 @@ export default styles(
       dividerColor: token('color-border'),
       dividerWidth: token('border-thin'),
       gap: null,
-      labelWidth: 'max-content',
+      labelWidth: null,
     },
     own: {
       descriptionListColumnGap: null,
@@ -78,11 +78,25 @@ export default styles(
         { direction: 'row' },
         {
           columnGap: hook.columnGap,
-          gridTemplateColumns: [hook.labelWidth, 'minmax(0, 1fr)'],
           rowGap: own.descriptionListGap,
           own: { descriptionListGap: hook.gap(token('space-sm')) },
         },
       ),
+      /* Up to two fifths of the list on the web, where a long label wraps: at the
+         longest label's width, one label took most of the list and left its value 50
+         pixels. A phone's terms share the widest, which its tracks measure. */
+      web([
+        rule(
+          { direction: 'row' },
+          { gridTemplateColumns: [hook.labelWidth('fit-content(40%)'), 'minmax(0, 1fr)'] },
+        ),
+      ]),
+      native([
+        rule(
+          { direction: 'row' },
+          { gridTemplateColumns: [hook.labelWidth('max-content'), 'minmax(0, 1fr)'] },
+        ),
+      ]),
       rule(
         { direction: 'row', inlineSize: { below: '22rem' } },
         {
