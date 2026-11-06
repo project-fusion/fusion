@@ -249,7 +249,7 @@ export const useVideoPlaylist = (family: Family, props: Props, use: MachineUse):
       moves.request(value, 'press')
     }
   }
-  const entries = clips.map((clip) =>
+  const drawnClip = (clip: Clip) =>
     cloneElement(clip.element, {
       current: clip.value === current?.value,
       key: clip.element.key ?? clip.value,
@@ -262,8 +262,14 @@ export const useVideoPlaylist = (family: Family, props: Props, use: MachineUse):
           choose(clip.value)
         }
       },
-    }),
-  )
+    })
+  /* The entries told which plays, and what else is passed in kept in its place, as a menu of them. */
+  const entries = Children.toArray(props.children as ReactNode).map((child) => {
+    const clip = isValidElement(child)
+      ? clips.find((one) => one.element.key === child.key)
+      : undefined
+    return clip === undefined ? child : drawnClip(clip)
+  })
   const offer: PlaylistOffer = { choose, clips, current: current?.value }
   return {
     marks: moves.ended ? ['ended'] : [],

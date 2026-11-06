@@ -13,8 +13,14 @@ import { afterEach, beforeEach, describe, expect, test } from '@jest/globals'
 import { act, fireEvent, render } from '@testing-library/react-native'
 import { type Ref, useImperativeHandle } from 'react'
 import { Text } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { LayerHostView } from '../root/layers'
 import { HelixTheme } from '../theme/helix-theme'
-import { HelixVideoPlaylist, HelixVideoPlaylistItem } from './video-playlist/index.native'
+import {
+  HelixVideoPlaylist,
+  HelixVideoPlaylistItem,
+  HelixVideoPlaylistMenu,
+} from './video-playlist/index.native'
 
 let drawn: Awaited<ReturnType<typeof render>> | undefined
 let announced: FakeAnnounce
@@ -49,10 +55,10 @@ const playlist = (told: Told, extra: Readonly<Record<string, unknown>> = {}) => 
       {...extra}
     >
       <HelixVideoPlaylistItem src="one.mp4" value="one">
-        First
+        <Text>First</Text>
       </HelixVideoPlaylistItem>
       <HelixVideoPlaylistItem src="two.mp4" value="two">
-        Second
+        <Text>Second</Text>
       </HelixVideoPlaylistItem>
     </HelixVideoPlaylist>
   </HelixTheme>
@@ -122,5 +128,42 @@ describe('Video Playlist', () => {
     await act(async () => (seen.props.onNext as () => void)())
     await frames()
     expect(seen.props.src).toBe('one.mp4')
+  })
+
+  test('the menu of its entries opens on its trigger, and a row plays its entry', async () => {
+    const told: Told = []
+    await draw(
+      <GestureHandlerRootView>
+        <LayerHostView>
+          <HelixTheme mode="light">
+            <HelixVideoPlaylist
+              defaultActive="one"
+              label="Episodes"
+              onActivate={(event: { detail: unknown }) => told.push(['activate', event.detail])}
+              player={<Player />}
+            >
+              <HelixVideoPlaylistMenu label="Clips" />
+              <HelixVideoPlaylistItem src="one.mp4" value="one">
+                <Text>First</Text>
+              </HelixVideoPlaylistItem>
+              <HelixVideoPlaylistItem src="two.mp4" value="two">
+                <Text>Second</Text>
+              </HelixVideoPlaylistItem>
+            </HelixVideoPlaylist>
+          </HelixTheme>
+        </LayerHostView>
+      </GestureHandlerRootView>,
+    )
+    const trigger = drawn?.container.queryAll(
+      (node) => node.props.accessibilityLabel === 'Clips',
+    )[0]
+    expect(trigger).toBeDefined()
+    await act(async () => fireEvent.press(trigger as never))
+    await frames()
+    const seconds = drawn?.getAllByText('Second') ?? []
+    expect(seconds.length).toBe(2)
+    await act(async () => fireEvent.press(seconds[seconds.length - 1] as never))
+    await frames()
+    expect(told.at(-1)).toEqual(['activate', { previous: 'one', value: 'two' }])
   })
 })

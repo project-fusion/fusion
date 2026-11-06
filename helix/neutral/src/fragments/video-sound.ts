@@ -52,7 +52,7 @@ export default fragment(
       ]),
       rule({ flex: [1, 1, 'auto'], minInlineSize: 0 }),
       /* A phone's scrubber keeps a share of the bar however large the reader's text. */
-      native([rule({ minInlineSize: '30%' })]),
+      native([rule({ flexBasis: 0, minInlineSize: '30%' })]),
     ]),
     on('sound', [
       rule({ alignItems: 'center', display: 'flex', flex: [0, 0, 'auto'], position: 'relative' }),

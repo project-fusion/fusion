@@ -3,7 +3,6 @@ import {
   headless,
   Image,
   oneOf,
-  Pressable,
   Repeat,
   Slot,
   Text,
@@ -70,21 +69,23 @@ export default headless('video-playlist-menu', {
       gives={{ label: videoPlaylistMenu.named, placement: props.placement }}
       part="menu"
     >
-      <Pressable
+      {/* An icon button on a phone, whose press the menu around it opens on. */}
+      <Wrap
+        draws="icon-button"
+        exports={{ button: 'native', live: 'native', spinner: 'native', text: 'native' }}
+        gives={{ emphasis: 'plain', label: videoPlaylistMenu.named }}
         into="trigger"
-        label={videoPlaylistMenu.named}
         part="trigger"
-        role="button"
       >
         <Slot name="trigger">
           <View
-            ariaHidden
-            icon="list"
+            draws="icon"
+            gives={{ name: 'list' }}
             part="trigger-mark"
             platform="native"
           />
         </Slot>
-      </Pressable>
+      </Wrap>
       <Repeat
         each={videoPlaylistMenu.rows}
         key="value"
