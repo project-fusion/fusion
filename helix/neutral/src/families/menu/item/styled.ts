@@ -84,15 +84,13 @@ export default styles(
           { tone: 'danger' },
           {
             own: {
-              menuItemInk: token('color-danger'),
-              menuItemPress: scheme(
-                mix(token('color-danger'), 16, 'transparent'),
-                mix(token('color-danger'), 20, 'transparent'),
+              /* Mixed toward the ink in dark, where the danger ink alone read faint. */
+              menuItemInk: scheme(
+                token('color-danger'),
+                mix(token('color-danger'), 75, token('color-foreground')),
               ),
-              menuItemWash: scheme(
-                mix(token('color-danger'), 8, 'transparent'),
-                mix(token('color-danger'), 12, 'transparent'),
-              ),
+              menuItemPress: mix(token('color-danger'), 20, 'transparent'),
+              menuItemWash: mix(token('color-danger'), 12, 'transparent'),
             },
           },
         ),
@@ -108,21 +106,25 @@ export default styles(
           textDecoration: 'none',
           borderRadius: own.menuItemRadius(token('radii-none')),
           color: own.menuItemInk(token('color-foreground')),
-          web: { cursor: 'pointer' },
           display: 'grid',
           gridTemplateColumns: [hook.itemStart, fn('minmax', 0, '1fr'), 'auto', hook.itemEnd],
           /* The inset is padding on the row and nothing else. Under the menu's
              `bleed` it is the bleed, and the margin takes up the rest of the
              step, so the words stay on the headings' column whichever it is. */
-          marginInline: difference(token('space-sm'), own.menuBleed(token('space-sm'))),
-          paddingInline: own.menuBleed(token('space-sm')),
+          marginInline: difference(token('space-field'), own.menuBleed(token('space-field'))),
+          paddingInline: own.menuBleed(token('space-field')),
+          web: { overflowWrap: 'anywhere' },
           transition: ['background-color', fast, token('easing-standard')],
         }),
-        rule({ hover: true }, { backgroundColor: lit }),
+        native([rule({ hover: true }, { backgroundColor: lit })]),
         rule({ highlighted: true }, { backgroundColor: lit }),
         rule(
           { focusVisible: true },
-          { outline: ring, outlineOffset: product(token('size-focus-offset'), '-1') },
+          {
+            borderRadius: token('radii-sm'),
+            outline: ring,
+            outlineOffset: product(token('size-focus-offset'), '-1'),
+          },
         ),
         /* Dimmed by the row's own `disabled`, which holds in a filtered
            menu too, where the web marks the host disabled for the filter. */
@@ -131,6 +133,13 @@ export default styles(
           { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
         ),
         rule({ active: true }, { backgroundColor: own.menuItemPress(token('color-press')) }),
+        /* Forced colors: a disabled row is GrayText, whole. */
+        web([rule({ forcedColors: true, has: 'disabled' }, { color: 'GrayText', opacity: 1 })]),
+      ]),
+      /* Written out: under a pointer, the row that holds focus, since a pointer moves focus
+         to the row it is over and a row it left keeps no wash. */
+      on({ part: 'item', selector: '[part="item"]:hover:focus' }, [
+        web([rule({ backgroundColor: lit })]),
       ]),
       on('start', [
         rule({
