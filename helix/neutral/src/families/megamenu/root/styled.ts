@@ -153,15 +153,12 @@ export default styles(
       /* The caret on the default trigger, turned while the panel is open. */
       on('trigger-indicator', [
         rule({
-          blockSize: '1.2em',
+          blockSize: token('size-icon-sm'),
           flex: '0 0 auto',
-          inlineSize: '1.2em',
+          inlineSize: token('size-icon-sm'),
           transform: 'rotate(0deg)',
           transition: ['transform', fast, token('easing-standard')],
         }),
-        web([
-          rule({ blockSize: fn('round', '1.2em', '2px'), inlineSize: fn('round', '1.2em', '2px') }),
-        ]),
         rule({ open: true }, { transform: 'rotate(180deg)' }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
