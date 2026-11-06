@@ -1,4 +1,5 @@
 import barChartLayout from '../../../fragments/bar-chart-layout.js'
+import barChartTreatments from '../../../fragments/bar-chart-treatments.js'
 import chartStatus from '../../../fragments/chart-status.js'
 import chartTooltip from '../../../fragments/chart-tooltip.js'
 import printExact from '../../../fragments/print-exact.js'
@@ -286,100 +287,7 @@ export default styles(
           vectorEffect: 'non-scaling-stroke',
         }),
       ]),
-      /* The edge, and the fill faded toward the page under it, with no line across the base. */
-      on('bar', [
-        rule(
-          { 'data-emphasis': 'outlined' },
-          {
-            own: { barChartFoot: own.barChartBase },
-            fill: own.barChartShade,
-            stroke: own.barChartSeries,
-            strokeWidth: hook.barStroke,
-            vectorEffect: 'non-scaling-stroke',
-          },
-        ),
-        /* A wash under the same edge, the quiet end of the axis. */
-        rule(
-          { 'data-emphasis': 'subtle' },
-          {
-            own: { barChartArea: 0.2, barChartFoot: own.barChartBase },
-            stroke: own.barChartSeries,
-            strokeWidth: hook.barStroke,
-            vectorEffect: 'non-scaling-stroke',
-          },
-        ),
-        /* Gradient, into the wash the headless tier draws, for each series. */
-        rule({ wash: 'gradient' }, { fill: measured('chart-bar-wash') }),
-        rule(
-          { emphasis: 'outlined', 'data-emphasis': false },
-          {
-            own: { barChartFoot: own.barChartBase },
-            fill: own.barChartShade,
-            stroke: own.barChartSeries,
-            strokeWidth: hook.barStroke,
-            vectorEffect: 'non-scaling-stroke',
-          },
-        ),
-        rule(
-          { emphasis: 'subtle', 'data-emphasis': false },
-          {
-            own: { barChartArea: 0.2, barChartFoot: own.barChartBase },
-            stroke: own.barChartSeries,
-            strokeWidth: hook.barStroke,
-            vectorEffect: 'non-scaling-stroke',
-          },
-        ),
-        /* Glass lets the gridlines read through; frosted admits less. */
-        rule(
-          { 'data-material': 'glass' },
-          {
-            own: { barChartThrough: token('material-glass-opacity') },
-          },
-        ),
-        rule(
-          { material: 'glass', 'data-material': false },
-          {
-            own: { barChartThrough: token('material-glass-opacity') },
-          },
-        ),
-        rule(
-          { material: 'frosted', 'data-material': false },
-          {
-            own: { barChartThrough: token('material-frosted-opacity') },
-          },
-        ),
-        native([rule({ stroke: 'none' })]),
-      ]),
-      /* A phone draws the edge `outlined` and `subtle` ask for as a path of its own, open at the base. */
-      on('bar-edge', [
-        native([
-          rule({
-            fill: 'none',
-            stroke: own.barChartSeries,
-            strokeOpacity: own.barChartThrough(1),
-            strokeWidth: hook.barStroke,
-            vectorEffect: 'non-scaling-stroke',
-          }),
-          rule(
-            { 'data-material': 'glass' },
-            {
-              own: { barChartThrough: token('material-glass-opacity') },
-            },
-          ),
-          rule(
-            { 'data-material': false, material: 'glass' },
-            {
-              own: { barChartThrough: token('material-glass-opacity') },
-            },
-          ),
-          rule(
-            { 'data-material': false, material: 'frosted' },
-            {
-              own: { barChartThrough: token('material-frosted-opacity') },
-            },
-          ),
-        ]),
-      ]),
+      include(barChartTreatments),
       on('bar-wash-start', [
         rule({
           stopColor: measured('chart-series'),
