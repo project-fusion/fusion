@@ -12,3 +12,4 @@ export {
 } from '@fusion.dev/helix-core'
 export * from './events/index.js'
 export { HelixHeadlessDataTable } from './root/data-table-root.js'
+export * from './view.js'
