@@ -3,7 +3,9 @@ import { el, type PropValue, type Scenario, type Setup } from '../format.js'
 /*
  * The scenarios of Lightbox, a modal viewer that shows one item at a time.
  * The record says each move it asks and makes, by the items' values, and
- * whether it stands open. The zoom and the swipe are read from laid-out
+ * whether it stands open. The page opens the one a close request closes,
+ * with focus on a control of the page first, as Dialog's scenarios do, so the
+ * record says where focus comes back. The zoom and the swipe are read from laid-out
  * lengths and a pinch's fingers, so a jest spec of the phone holds those.
  */
 
@@ -46,8 +48,12 @@ export const LIGHTBOX: readonly Scenario[] = [
   },
   {
     family: 'lightbox',
-    intents: [{ by: 'escape', kind: 'dismiss' }],
-    name: 'a close request closes it',
-    setup: lightbox(),
+    intents: [
+      { kind: 'focus', page: true },
+      { kind: 'set', prop: 'open', value: true },
+      { by: 'escape', kind: 'dismiss' },
+    ],
+    name: 'a close request closes it and puts focus back on the page',
+    setup: lightbox({ open: false }),
   },
 ]
