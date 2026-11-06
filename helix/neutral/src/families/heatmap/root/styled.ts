@@ -1,3 +1,4 @@
+import heatmapEdges from '../../../fragments/heatmap-edges.js'
 import { oneOf } from '../../../render.js'
 import { fn, measured, mix, native, product, scheme, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
@@ -76,7 +77,7 @@ export default styles(
     },
     stylesheet: 'heatmap/root/heatmap-root.generated.css',
   },
-  ({ hook, on, own, rule }) => {
+  ({ hook, include, on, own, rule }) => {
     const width = hook.cellInlineSize(hook.cellSize)
     const height = hook.cellHeight(hook.cellSize)
     const paint = own.heatmapPaint(token('color-surface-sunken'))
@@ -365,60 +366,10 @@ export default styles(
       ]),
       on('end', [rule({ textAlign: 'end' })]),
       on(['start', 'end'], [native([rule({ flexShrink: 0 })])]),
-      /* Under the strip, in place of the cells. */
-      on(
-        ['empty', 'error', 'loading'],
-        [
-          rule({
-            color: token('color-foreground-muted'),
-            fontFamily: token('font-sans'),
-            fontSize: token('text-sm'),
-            margin: token('space-none'),
-            textAlign: 'center',
-          }),
-          web([rule({ display: 'grid', gridArea: '1 / 1', placeContent: 'center' })]),
-        ],
-      ),
+      include(heatmapEdges),
+      /* With nothing to draw, the strip and the words share one cell. */
       on('strip', [
         web([rule([{ empty: true }, { error: true }, { loading: true }], { gridArea: '1 / 1' })]),
-      ]),
-      /* The readings did not load: news to act on, in the danger ink. */
-      on('error', [rule({ color: token('color-danger') })]),
-      /* Printed, a hairline makes the cells countable whatever the fills come out like. */
-      on('cell', [
-        web([
-          rule(
-            { print: true },
-            {
-              outline: [token('border-thin'), 'solid', token('color-border')],
-              outlineOffset: inside,
-            },
-          ),
-        ]),
-      ]),
-      /* Forced colors keep the tones, bound by a hairline, the reading and a selection in Highlight. */
-      on('cell', [
-        web([
-          rule(
-            { forcedColors: true },
-            {
-              forcedColorAdjust: 'none',
-              outline: [token('border-thin'), 'solid', 'CanvasText'],
-              outlineOffset: inside,
-            },
-          ),
-          rule(
-            { forcedColors: true, also: { 'cell-active': true } },
-            {
-              outline: [token('border-thick'), 'solid', 'Highlight'],
-              outlineOffset: token('border-thin'),
-            },
-          ),
-          rule(
-            { forcedColors: true, also: { 'cell-selected': true } },
-            { boxShadow: ['inset', 0, 0, 0, token('border-thick'), 'Highlight'] },
-          ),
-        ]),
       ]),
     ]
   },
