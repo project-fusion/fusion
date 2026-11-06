@@ -305,8 +305,8 @@ slot[name="submenu"]::slotted(helix-divider) {
    there measured 3.84:1. 85% of the tone measured 4.57 under the pointer and
    4.09 on the 20% press; 75% measures 5.14 and 4.60, and 5.94 at rest. One ink
    in every state, so the label does not change color as the pointer arrives. */
-:host([tone="danger"]) [part~="item"],
-:host([tone="danger"]) [part="start"] {
+:host([tone="danger"]:not([disabled])) [part~="item"],
+:host([tone="danger"]:not([disabled])) [part="start"] {
   color: light-dark(
     var(--helix-color-danger),
     color-mix(in oklab, var(--helix-color-danger) 75%, var(--helix-color-foreground))
