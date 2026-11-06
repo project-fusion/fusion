@@ -16,33 +16,21 @@ import {
 } from '../../../render.js'
 
 /**
- * Scatter Chart's headless tier: a chart that shows whether two measures move
- * together, with one point per row, read from a table.
+ * Scatter Chart's headless tier: whether two measures move together, one
+ * point per row. **Core draws it, on a phone as on the web.** The table a
+ * `for` names, or `data`, gives its first column of numbers across and every
+ * other one up as a series, less the column `size-by` names, which sizes the points. Each
+ * series is a few layers of paths, a path a size, so 100,000 rows are a few
+ * dozen paths and a cluster reads darker where it is denser. The rules, the
+ * lines of best fit, and both scales stand at the levels core picks.
  *
- * **Core draws it, on a phone as on the web.** The table a `for` names, or
- * `data`, gives its first column of numbers across and every other one up as
- * a series, less the column `size-by` names, which sizes the points. Core
- * gives each series' points as a few layers of paths, a path a size, so the
- * points of 100,000 rows are a few dozen paths, each layer at the points'
- * opacity, so a cluster reads darker where it is denser. The rules
- * `gridlines` asks for, the lines of best fit under `trend`, and the numbers
- * of both scales stand at the levels core picks.
+ * **The points and the reading are two layers**, so moving the reading
+ * leaves the points as they are.
  *
- * **The points and the reading are two layers**, so moving the reading draws
- * the point it rests on and the bubble again and leaves the points as they
- * are.
- *
- * **The plot is read.** On the web it takes focus and the arrow keys walk the
- * points left to right and the series of a row; on a phone a tap shows the
- * point nearest it and presses it, a drag moves to the point nearest the
- * finger, and a screen reader adjusts the plot as one control whose value is
- * the row in words. The bubble is a Tooltip over the point, with its row.
- *
- * **A chart with nothing to draw says so**: `empty-text` in the plot, or
- * `loading-text` while `loading` is set, or what is passed into `empty` and
- * `loading`.
- * `error-text`, set when the readings did not load, stands in place of both,
- * in the danger ink, followed by what is passed into `error`.
+ * **The plot is read**, as Line Chart's is: by the arrow keys on the web, and
+ * on a phone by a tap or a drag to the nearest point and as one adjustable
+ * control. The bubble is a Tooltip over the point, with its row. With nothing
+ * to draw it says so, as the other charts do.
  *
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a reading shown under a mouse, and the plane

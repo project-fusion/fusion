@@ -22,8 +22,9 @@ import {
  * side, drawn by core on a phone as on the web, with `data-emphasis` and
  * `data-material` on the columns of the series `outlined`, `subtle`, and
  * `glass` name. With nothing to draw it says so, `error-text` before
- * `loading-text` and `empty-text`. **Web only:** the hidden table, the summary, the Listen
- * button, a reading under a mouse, and the columns easing in.
+ * `loading-text` and `empty-text`. **Web only:** the hidden table, the
+ * summary, the Listen button, a reading under a mouse, and the columns easing
+ * in.
  */
 export default headless('bar-chart', {
   props: {
