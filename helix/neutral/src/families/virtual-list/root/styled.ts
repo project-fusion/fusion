@@ -89,6 +89,7 @@ export default styles(
     on({ slotted: '[data-index]:focus-visible' }, [
       web([
         rule({
+          borderRadius: token('radii-sm'),
           outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
           outlineOffset: product(token('size-focus-offset'), '-1'),
         }),

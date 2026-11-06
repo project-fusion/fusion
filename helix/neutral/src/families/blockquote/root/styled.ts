@@ -1,6 +1,6 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import { oneOf } from '../../../render.js'
-import { inherit, native, quote, token } from '../../../style.js'
+import { inherit, native, quote, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -60,7 +60,12 @@ export default styles(
        of its own. */
     on('figure', [rule({ margin: token('space-none') })]),
     /* Block, not flex. */
-    on('blockquote', [rule({ display: 'block', margin: token('space-none') })]),
+    /* Its own formatting context, so a quotation's last paragraph keeps its margin inside. */
+    on('blockquote', [
+      rule({ margin: token('space-none') }),
+      native([rule({ display: 'block' })]),
+      web([rule({ display: 'flow-root' })]),
+    ]),
     /* **Under `marks`, one large opening mark beside the passage's first
        lines**, floated, so the passage wraps beside it whether it is text or
        paragraphs. Drawn and not read, and closed at the end without a mark,
