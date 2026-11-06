@@ -1,12 +1,19 @@
 import { describe, expect, test } from 'bun:test'
 import { movedLightness } from './color.js'
-import { COMPARED } from './resolve.js'
+import { COMPARED, ROUNDED } from './resolve.js'
 
 describe('what a phone resolves that CSS writes as a function', () => {
   test('round() goes to the nearest step, a tie going up', () => {
     expect(COMPARED.round?.(25.6, 1)).toBe(26)
     expect(COMPARED.round?.(25.5, 1)).toBe(26)
     expect(COMPARED.round?.(25.4, 1)).toBe(25)
+  })
+
+  test('round() takes a strategy before the value, as a crumb rounds its line up', () => {
+    expect(ROUNDED.down?.(14.95, 2)).toBe(14)
+    expect(ROUNDED.up?.(19.5, 2)).toBe(20)
+    expect(ROUNDED.nearest?.(25.5, 1)).toBe(26)
+    expect(ROUNDED['to-zero']?.(-3.5, 1)).toBe(-3)
   })
 
   test('a relative oklch color moves lightness alone, as Chromium draws it', () => {
