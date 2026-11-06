@@ -1,0 +1,58 @@
+- group "Rows":
+  - text: Rows
+  - radio "Filtered (3)" [checked]
+  - text: Filtered (3)
+  - radio "All (3)"
+  - text: All (3)
+- group "Columns":
+  - text: Columns
+  - radio "Visible (3)" [checked]
+  - text: Visible (3)
+  - radio "All (3)"
+  - text: All (3)
+- group "Values":
+  - text: Values
+  - radio "As shown" [checked]
+  - text: As shown
+  - radio "Raw"
+  - text: Raw
+- group "Format":
+  - text: Format
+  - radio "CSV" [checked]
+  - text: CSV
+  - radio "TSV"
+  - text: TSV
+  - radio "JSON"
+  - text: JSON
+- button "Copy"
+- button "Export 3 rows"
+- rowgroup:
+  - row "Select every row Invoice Customer Amount":
+    - columnheader "Select every row":
+      - checkbox "Select every row"
+      - text: Select every row
+    - columnheader "Invoice"
+    - columnheader "Customer"
+    - columnheader "Amount"
+  - row "INV-2041":
+    - gridcell "Select INV-2041":
+      - checkbox "Select INV-2041"
+      - text: Select INV-2041
+    - rowheader "INV-2041"
+    - gridcell "Acme Corporation"
+    - gridcell "12400"
+  - row "INV-2047":
+    - gridcell "Select INV-2047":
+      - checkbox "Select INV-2047"
+      - text: Select INV-2047
+    - rowheader "INV-2047"
+    - gridcell "Acme Logistics"
+    - gridcell "8250"
+  - row "INV-2052":
+    - gridcell "Select INV-2052":
+      - checkbox "Select INV-2052"
+      - text: Select INV-2052
+    - rowheader "INV-2052"
+    - gridcell "Acme Robotics"
+    - gridcell "6980"
+- status
