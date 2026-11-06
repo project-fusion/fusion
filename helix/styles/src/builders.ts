@@ -265,12 +265,18 @@ export const round = (value: Length, step: Measure, strategy?: 'up'): Value<'qua
       : `round(${text(value)}, ${text(step)})`,
   )
 
-/** The smallest of two or more lengths or numbers. */
-export const min = (...values: [Length, Length, ...Length[]]): Value<'quantity'> =>
+/**
+ * The smallest of two or more lengths or numbers, or of a relative color's
+ * component and a bound: `min(lightness, 0.6)`.
+ */
+export const min = (...values: [Operand, Operand, ...Operand[]]): Value<'quantity'> =>
   built('quantity', `min(${values.map(text).join(', ')})`)
 
-/** The largest of two or more lengths or numbers. */
-export const max = (...values: [Length, Length, ...Length[]]): Value<'quantity'> =>
+/**
+ * The largest of two or more lengths or numbers, or of a relative color's
+ * component and a floor: `max(lightness, 0.65)`.
+ */
+export const max = (...values: [Operand, Operand, ...Operand[]]): Value<'quantity'> =>
   built('quantity', `max(${values.map(text).join(', ')})`)
 
 /** A color by its hex digits, without the `#`. */

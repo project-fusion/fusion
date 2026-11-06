@@ -34,7 +34,6 @@ import {
   type Category,
   type Color,
   chroma,
-  clamp,
   cubicBezier,
   density,
   type Easing,
@@ -491,7 +490,7 @@ export const TOKENS: Token[] = [
      Surface, and Aura each wrote the same formula. */
   [
     'color-primary-strong',
-    relative(ref('color-primary-active'), clamp(0.33, lightness, 1), chroma, hue),
+    relative(ref('color-primary-active'), max(lightness, 0.33), chroma, hue),
     'The far end of a ramp in the brand color, such as the busiest cell of a heatmap.',
   ],
   /* A brand fill, which carries white, and that was the one job no accent
@@ -608,8 +607,8 @@ export const TOKENS: Token[] = [
   [
     'color-focus-ring',
     lightDark(
-      relative(ref('color-primary'), clamp(0, lightness, 0.6), chroma, hue),
-      relative(ref('color-primary'), clamp(0.65, lightness, 1), chroma, hue),
+      relative(ref('color-primary'), min(lightness, 0.6), chroma, hue),
+      relative(ref('color-primary'), max(lightness, 0.65), chroma, hue),
     ),
   ],
   /* The brand as a mark, which is the one place it appears as itself.
