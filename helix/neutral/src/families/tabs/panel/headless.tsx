@@ -1,4 +1,4 @@
-import { headless, property, Slot, set, string, View } from '../../../render.js'
+import { boolean, headless, property, Slot, set, string, View, web } from '../../../render.js'
 
 /**
  * A tab panel's headless tier.
@@ -10,6 +10,8 @@ import { headless, property, Slot, set, string, View } from '../../../render.js'
 export default headless('tab-panel', {
   memberOf: set('tabs'),
   props: {
+    /* Find in page searching an inactive panel is the web's; a phone has none. */
+    hiddenUntilFound: web(boolean()),
     /* The words of the tab that opens it, which the set passes on. */
     label: property(string()),
     lazy: false,

@@ -1,4 +1,4 @@
-import { cancelable, headless, oneOf, Pressable, Slot, string, View } from '../../../render.js'
+import { cancelable, headless, oneOf, Pressable, Slot, string, View, web } from '../../../render.js'
 
 /**
  * A tab set's headless tier: what it takes, what it sends, and its parts.
@@ -19,6 +19,8 @@ export default headless('tabs', {
   props: {
     active: string(),
     defaultActive: '',
+    /* Find in page searching inactive panels is the web's; a phone has none. */
+    hiddenUntilFound: web(true),
     label: '',
     manual: false,
     marker: oneOf(['segmented', 'underlined']),
