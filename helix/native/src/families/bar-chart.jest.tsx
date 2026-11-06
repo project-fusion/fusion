@@ -156,13 +156,7 @@ const canvases = () =>
 
 /* With no scale drawn and no rules, so the tallest column meets the top edge. Drawn by
    default, either one gives the peak room above it, as the web's element does. */
-const Bare = (props: HelixBarChartProps) => (
-  <Chart
-    gridlines="none"
-    valueAxis="none"
-    {...props}
-  />
-)
+const Bare = (props: HelixBarChartProps) => <Chart gridlines="none" valueAxis="none" {...props} />
 
 describe('the columns', () => {
   test('stands each category abreast from zero, a column below zero hanging from the baseline', async () => {
