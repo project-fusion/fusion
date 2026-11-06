@@ -12,8 +12,9 @@ import { join } from 'node:path'
 describe('a checked Switch under a press', () => {
   test('takes the fill step', () => {
     const sheet = readFileSync(join(import.meta.dir, 'switch-root.generated.css'), 'utf8')
+    /* The generated rule, which leaves out a disabled and a read-only switch. */
     const rule =
-      /:host\(:where\(:not\(:disabled\):state\(checked\)\)\) :where\(\[part="field"\]:active\) \[part="track"\] \{([^}]*)\}/.exec(
+      /:host\(:where\(:not\(:disabled\):state\(checked\)(?::not\(\[readonly\]\))?\)\) :where\(\[part="field"\]:active\) \[part="track"\] \{([^}]*)\}/.exec(
         sheet,
       )
     expect(rule?.[1]).toContain('--helix-color-primary-surface-active')
