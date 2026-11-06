@@ -70,6 +70,7 @@ import { TOOLTIP } from './scenarios/tooltip.js'
 import { TOUR } from './scenarios/tour.js'
 import { TREE } from './scenarios/tree.js'
 import { VIDEO } from './scenarios/video.js'
+import { VIDEO_PLAYLIST } from './scenarios/video-playlist.js'
 import { VIRTUAL_LIST } from './scenarios/virtual-list.js'
 
 export * from './clock.js'
@@ -154,6 +155,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   tour: TOUR,
   tree: TREE,
   video: VIDEO,
+  'video-playlist': VIDEO_PLAYLIST,
   'virtual-list': VIRTUAL_LIST,
 }
 

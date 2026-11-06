@@ -113,6 +113,11 @@ import { HelixTour, HelixTourStop } from '../tour/index.native'
 import { HelixTree, HelixTreeItem } from '../tree/index.native'
 import { HelixTrend } from '../trend/index.native'
 import { HelixVideo } from '../video/index.native'
+import {
+  HelixVideoPlaylist,
+  HelixVideoPlaylistItem,
+  HelixVideoPlaylistMenu,
+} from '../video-playlist/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import {
   BulletList,
@@ -364,6 +369,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-tree-item': HelixTreeItem,
   'helix-trend': HelixTrend,
   'helix-video': HelixVideo,
+  'helix-video-playlist': HelixVideoPlaylist,
+  'helix-video-playlist-item': HelixVideoPlaylistItem,
+  'helix-video-playlist-menu': HelixVideoPlaylistMenu,
   'helix-virtual-list': HelixVirtualList,
   hr: Rule,
   i: Emphasis,
