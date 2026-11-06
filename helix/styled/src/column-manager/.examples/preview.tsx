@@ -1,0 +1,62 @@
+import './preview.css'
+
+const rows = [
+  {
+    amount: '$12,400.00',
+    customer: 'Acme Corporation',
+    id: 'INV-2041',
+    status: 'Overdue',
+    terms: 'Net 30',
+  },
+  {
+    amount: '$8,250.00',
+    customer: 'Acme Logistics',
+    id: 'INV-2047',
+    status: 'Paid',
+    terms: 'Net 15',
+  },
+  {
+    amount: '$6,980.00',
+    customer: 'Acme Robotics',
+    id: 'INV-2052',
+    status: 'Draft',
+    terms: 'Net 30',
+  },
+]
+
+export function Example() {
+  return (
+    <div className="columns-pane">
+      <helix-column-manager for="invoices"></helix-column-manager>
+      <helix-data-table
+        id="invoices"
+        label="Invoices"
+        row-key="id"
+        rows={rows}
+        view={{
+          columns: { hidden: ['terms'], order: [], pinned: { id: 'start' }, widths: {} },
+          filters: [],
+          pageSize: 0,
+          query: '',
+          sort: '',
+        }}
+      >
+        <helix-table-column
+          field="id"
+          row-header
+        >
+          Invoice
+        </helix-table-column>
+        <helix-table-column field="customer">Customer</helix-table-column>
+        <helix-table-column field="status">Status</helix-table-column>
+        <helix-table-column
+          field="amount"
+          text-align="end"
+        >
+          Amount
+        </helix-table-column>
+        <helix-table-column field="terms">Terms</helix-table-column>
+      </helix-data-table>
+    </div>
+  )
+}

@@ -1,0 +1,72 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_accent: light-dark(#1d4ed8, #93b4ff);
+}
+
+/* The list beside the table it arranges. */
+.columns-pane {
+  align-items: start;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(16rem, auto) minmax(0, 1fr);
+}
+
+helix-headless-column-manager::part(header) {
+  display: flex;
+  justify-content: space-between;
+  padding-block-end: 0.5rem;
+}
+
+helix-headless-column-manager::part(list) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+helix-headless-column-manager::part(item) {
+  align-items: center;
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  min-block-size: 2.25rem;
+}
+
+helix-headless-column-manager::part(grip-mark),
+helix-headless-column-manager::part(pin-mark) {
+  block-size: 1rem;
+  inline-size: 1rem;
+}
+
+helix-headless-column-manager::part(pin-pinned) {
+  color: var(--_accent);
+}
+
+helix-headless-column-manager::part(note) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+helix-headless-column-manager::part(live) {
+  clip-path: inset(50%);
+  position: absolute;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template);
+}
+
+helix-headless-data-table::part(cell) {
+  border-block-end: 1px solid var(--_gray-edge);
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 40rem) {
+  .columns-pane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
