@@ -1,0 +1,50 @@
+- text: Columns
+- button "Reset"
+- list "Columns":
+  - listitem:
+    - button "Move Invoice"
+    - checkbox "Invoice" [checked]
+    - text: Invoice Pinned
+    - button "Pin Invoice to the end" [pressed]
+  - listitem:
+    - button "Move Customer"
+    - checkbox "Customer" [checked]
+    - text: Customer
+    - button "Pin Customer to the start"
+  - listitem:
+    - button "Move Status"
+    - checkbox "Status" [checked]
+    - text: Status
+    - button "Pin Status to the start"
+  - listitem:
+    - button "Move Amount"
+    - checkbox "Amount" [checked]
+    - text: Amount
+    - button "Pin Amount to the start"
+  - listitem:
+    - button "Move Terms"
+    - checkbox "Terms"
+    - text: Terms
+    - button "Pin Terms to the start"
+- rowgroup:
+  - row "Invoice Customer Status Amount":
+    - columnheader "Invoice"
+    - columnheader "Customer"
+    - columnheader "Status"
+    - columnheader "Amount"
+  - row "INV-2041":
+    - rowheader "INV-2041"
+    - gridcell "Acme Corporation"
+    - gridcell "Overdue"
+    - gridcell "$12,400.00"
+  - row "INV-2047":
+    - rowheader "INV-2047"
+    - gridcell "Acme Logistics"
+    - gridcell "Paid"
+    - gridcell "$8,250.00"
+  - row "INV-2052":
+    - rowheader "INV-2052"
+    - gridcell "Acme Robotics"
+    - gridcell "Draft"
+    - gridcell "$6,980.00"
+- status

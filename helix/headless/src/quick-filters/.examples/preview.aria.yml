@@ -1,0 +1,32 @@
+- toolbar "Invoice views":
+  - button "All 4" [pressed]
+  - button "Overdue 2"
+  - button "Paid 2"
+  - button "Save view"
+- rowgroup:
+  - row "Invoice Customer Status Amount":
+    - columnheader "Invoice"
+    - columnheader "Customer"
+    - columnheader "Status"
+    - columnheader "Amount"
+  - row "INV-2041":
+    - rowheader "INV-2041"
+    - gridcell "Acme Corporation"
+    - gridcell "Overdue"
+    - gridcell "12400"
+  - row "INV-2047":
+    - rowheader "INV-2047"
+    - gridcell "Acme Logistics"
+    - gridcell "Paid"
+    - gridcell "8250"
+  - row "INV-2052":
+    - rowheader "INV-2052"
+    - gridcell "Acme Robotics"
+    - gridcell "Overdue"
+    - gridcell "6980"
+  - row "INV-2063":
+    - rowheader "INV-2063"
+    - gridcell "Acme Foods"
+    - gridcell "Paid"
+    - gridcell "15120"
+- status

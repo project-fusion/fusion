@@ -139,6 +139,11 @@
       - text: Color Picker
       - link "Color Picker documentation":
         - /url: /helix/components/color-picker
+    - treeitem "Column Manager Column Manager documentation Experimental" [level=1]:
+      - text: Column Manager
+      - link "Column Manager documentation":
+        - /url: /helix/components/column-manager
+      - img "Experimental"
     - treeitem "Combobox Combobox documentation" [level=1]:
       - text: Combobox
       - link "Combobox documentation":
@@ -357,6 +362,11 @@
       - text: QR Code
       - link "QR Code documentation":
         - /url: /helix/components/qr-code
+    - treeitem "Quick Filters Quick Filters documentation Experimental" [level=1]:
+      - text: Quick Filters
+      - link "Quick Filters documentation":
+        - /url: /helix/components/quick-filters
+      - img "Experimental"
     - treeitem "Quote Quote documentation" [level=1]:
       - text: Quote
       - link "Quote documentation":
@@ -385,6 +395,11 @@
       - text: Select
       - link "Select documentation":
         - /url: /helix/components/select
+    - treeitem "Selection Bar Selection Bar documentation Experimental" [level=1]:
+      - text: Selection Bar
+      - link "Selection Bar documentation":
+        - /url: /helix/components/selection-bar
+      - img "Experimental"
     - treeitem "Shortcut Overlay Shortcut Overlay documentation Experimental" [level=1]:
       - text: Shortcut Overlay
       - link "Shortcut Overlay documentation":
@@ -465,6 +480,11 @@
       - text: Table
       - link "Table documentation":
         - /url: /helix/components/table
+    - treeitem "Table Export Table Export documentation Experimental" [level=1]:
+      - text: Table Export
+      - link "Table Export documentation":
+        - /url: /helix/components/table-export
+      - img "Experimental"
     - treeitem "Tabs Tabs documentation" [level=1]:
       - text: Tabs
       - link "Tabs documentation":
@@ -534,6 +554,11 @@
       - text: Video Playlist
       - link "Video Playlist documentation":
         - /url: /helix/components/video-playlist
+    - treeitem "View Panel View Panel documentation Experimental" [level=1]:
+      - text: View Panel
+      - link "View Panel documentation":
+        - /url: /helix/components/view-panel
+      - img "Experimental"
     - treeitem "Virtual List Virtual List documentation" [level=1]:
       - text: Virtual List
       - link "Virtual List documentation":
