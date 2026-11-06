@@ -1,4 +1,4 @@
-import { native, token, web } from '../../../style.js'
+import { native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import panel from './headless.js'
 
@@ -30,6 +30,17 @@ export default styles(
       /* Every panel in the one cell: an inactive panel that find in page can
          search keeps a box of its own, which the grid would place a row below. */
       web([rule({ gridArea: '1 / 1' })]),
+      /* The ring inside the panel, so the strip above does not cover it. */
+      web([
+        rule(
+          { focusVisible: true },
+          {
+            borderRadius: token('radii-sm'),
+            outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+            outlineOffset: product(token('size-focus-offset'), '-1'),
+          },
+        ),
+      ]),
       /* A phone has no find in page, so a panel whose tab is not chosen draws nothing. */
       native([rule({ hidden: true }, { display: 'none' })]),
     ]),
