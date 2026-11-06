@@ -282,6 +282,22 @@ export class HelixHeadlessOption extends HelixElement {
   textValue = ''
 
   /**
+   * What the row's action means, from `tone`, the axis for meaning, and a
+   * subset of it: `danger` or `neutral`, unset being neutral.
+   *
+   * **`danger` is for an action that cannot be undone**, such as "Revoke token",
+   * "Remove member" or "Delete permanently": in a command palette, where an
+   * option is an action, placed last in its group. A choice in a listbox is not
+   * an action and keeps the neutral tone. A
+   * removal that can be undone or reviewed afterwards stays neutral: the color
+   * says this one cannot, and it says nothing once every removal wears it. The
+   * other five values say a status or a brand role, which a row that does
+   * something has neither of. Reflected, for the stylesheet, with no default.
+   */
+  @property({ reflect: true })
+  tone?: 'danger' | 'neutral'
+
+  /**
    * The value that identifies the option, and that a form submits.
    */
   @property()

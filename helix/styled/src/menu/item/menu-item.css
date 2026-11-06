@@ -2,6 +2,31 @@
   display: block;
 }
 
+/* **`danger`, kept quiet.** The words and the leading mark take the danger ink,
+   the highlight a wash of it at the hover wash's own strengths, 8 and 12 percent,
+   so the row is as loud as its neighbors and only its hue says what it does. A
+   solid red block reads as the menu's answer rather than one of its choices.
+   The trailing shortcut keeps its muted ink, and the focus ring its own. A
+   disabled danger row is a disabled row: both are cleared, and the row falls
+   back to what every disabled row draws. */
+:host([tone="danger"]) {
+  --_menu-item-ink: var(--helix-color-danger);
+  --_menu-item-wash: light-dark(
+    color-mix(in oklab, var(--helix-color-danger) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+  );
+  --_menu-item-press: light-dark(
+    color-mix(in oklab, var(--helix-color-danger) 16%, transparent),
+    color-mix(in oklab, var(--helix-color-danger) 20%, transparent)
+  );
+}
+
+:host([tone="danger"][disabled]) {
+  --_menu-item-ink: initial;
+  --_menu-item-wash: initial;
+  --_menu-item-press: initial;
+}
+
 [part="item"] {
   align-items: center;
   /* The row is an `<a>` where `href` is set, and the UA underlines those. */
@@ -9,7 +34,7 @@
   /* No corner: a row that reaches both edges of the surface has no outside
      corner to round, and rounding it draws a notch against the surface's own. */
   border-radius: var(--_menu-item-radius, var(--helix-radii-none));
-  color: var(--helix-color-foreground);
+  color: var(--_menu-item-ink, var(--helix-color-foreground));
   cursor: pointer;
   display: grid;
   /* **No `column-gap`, and the seams are inside the tracks instead.** A zero
@@ -38,13 +63,19 @@
 
 /* Relative to the menu's own surface. */
 [part="item"]:hover {
-  background-color: var(--menu-item-hover-background-color, var(--helix-color-hover));
+  background-color: var(
+    --menu-item-hover-background-color,
+    var(--_menu-item-wash, var(--helix-color-hover))
+  );
 }
 
 /* The row the keys reached while focus stays in a filter field, lit as a
    row under the pointer is. */
 :host(:state(highlighted)) [part="item"] {
-  background-color: var(--menu-item-hover-background-color, var(--helix-color-hover));
+  background-color: var(
+    --menu-item-hover-background-color,
+    var(--_menu-item-wash, var(--helix-color-hover))
+  );
 }
 
 [part="item"]:focus-visible {
@@ -71,7 +102,7 @@
      padding rather than as an `inline-size`, so a row with nothing here still
      lands its label where its neighbors do. */
   box-sizing: border-box;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--_menu-item-ink, var(--helix-color-foreground-subtle));
   display: flex;
   justify-content: center;
   padding-inline-end: var(--helix-space-xs);
@@ -247,5 +278,5 @@ slot[name="submenu"]::slotted(helix-divider) {
 }
 
 [part="item"]:active {
-  background-color: var(--helix-color-press);
+  background-color: var(--_menu-item-press, var(--helix-color-press));
 }

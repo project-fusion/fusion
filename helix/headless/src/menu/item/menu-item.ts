@@ -272,6 +272,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
   target = ''
 
   /**
+   * What the row's action means, from `tone`, the axis for meaning, and a
+   * subset of it: `danger` or `neutral`, unset being neutral.
+   *
+   * **`danger` is for an action that cannot be undone**, such as "Revoke token",
+   * "Remove member" or "Delete permanently", placed last, after a divider. A
+   * removal that can be undone or reviewed afterwards stays neutral: the color
+   * says this one cannot, and it says nothing once every removal wears it. The
+   * other five values say a status or a brand role, which a row that does
+   * something has neither of. Reflected, for the stylesheet, with no default.
+   */
+  @property({ reflect: true })
+  tone?: 'danger' | 'neutral'
+
+  /**
    * The row's value, sent in `helix-before-select` when the row is chosen.
    */
   @property()
