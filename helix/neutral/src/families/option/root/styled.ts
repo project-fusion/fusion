@@ -1,6 +1,6 @@
 import printExact from '../../../fragments/print-exact.js'
 import row from '../../../fragments/row.js'
-import { difference, inherited, native, token, web } from '../../../style.js'
+import { difference, first, inherited, mix, native, scheme, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import option from './headless.js'
 
@@ -27,8 +27,8 @@ export default styles(
   option,
   {
     prefix: 'option',
-    hooks: {
-      activeBackgroundColor: token('color-hover'),
+    hooks: ({ own }) => ({
+      activeBackgroundColor: first(own.optionWash, token('color-hover')),
       blockPadding: token('space-2xs'),
       draggingOpacity: 0.5,
       dropColor: token('color-primary'),
@@ -37,20 +37,46 @@ export default styles(
       mediaRadius: token('radii-sm'),
       padding: token('space-field'),
       radius: token('radii-sm'),
-    },
+    }),
+    own: { optionInk: null, optionPress: null, optionWash: null },
     stylesheet: 'option/root/option-root.generated.css',
   },
-  ({ hook, include, on, rule }) => [
+  ({ hook, include, on, own, rule }) => [
     include(row),
     on('host', [rule({ display: 'block' })]),
     /* Written out: an owner hides what a filter leaves out with the attribute, and a
        phone's owner draws nothing for it. */
+    /* **`danger`, kept quiet**, as a menu item draws it: the words in the danger
+       ink, and the highlight a wash of it at the hover wash's own strengths. A
+       disabled danger option is a disabled option. */
+    on('host', [
+      rule(
+        { tone: 'danger' },
+        {
+          own: {
+            optionInk: token('color-danger'),
+            optionPress: scheme(
+              mix(token('color-danger'), 16, 'transparent'),
+              mix(token('color-danger'), 20, 'transparent'),
+            ),
+            optionWash: scheme(
+              mix(token('color-danger'), 8, 'transparent'),
+              mix(token('color-danger'), 12, 'transparent'),
+            ),
+          },
+        },
+      ),
+      rule(
+        { has: 'disabled', tone: 'danger' },
+        { own: { optionInk: 'initial', optionPress: 'initial', optionWash: 'initial' } },
+      ),
+    ]),
     on({ part: 'host', selector: ':host([hidden])' }, [web([rule({ display: 'none' })])]),
     on('item', [
       rule({
         alignItems: 'center',
         borderRadius: hook.radius,
-        color: token('color-foreground'),
+        color: own.optionInk(token('color-foreground')),
         display: 'flex',
         gap: token('space-xs'),
         paddingBlock: hook.blockPadding,
@@ -193,7 +219,10 @@ export default styles(
     ]),
     include(printExact),
     on('item', [
-      rule({ active: true, disabled: false }, { backgroundColor: token('color-press') }),
+      rule(
+        { active: true, disabled: false },
+        { backgroundColor: own.optionPress(token('color-press')) },
+      ),
     ]),
   ],
 )

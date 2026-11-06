@@ -1,4 +1,14 @@
-import { cancelable, headless, Pressable, Slot, string, Text, View, web } from '../../../render.js'
+import {
+  cancelable,
+  headless,
+  oneOf,
+  Pressable,
+  Slot,
+  string,
+  Text,
+  View,
+  web,
+} from '../../../render.js'
 
 /**
  * Option's headless tier: one choice in a list.
@@ -48,6 +58,7 @@ export default headless('option', {
     selected: false,
     target: web(''),
     textValue: '',
+    tone: oneOf(['danger', 'neutral']),
     value: '',
   },
   events: {
