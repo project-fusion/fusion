@@ -79,6 +79,7 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @csspart format - The group that chooses the format.
  * @csspart legend - A group's name.
  * @csspart live - The region that says the rows were copied. Visually hidden in the styled tier.
+ * @csspart options - The choices of a group, after its name.
  * @csspart rows - The group that chooses the rows.
  * @csspart values - The group that chooses the values.
  */
@@ -278,7 +279,7 @@ export class HelixHeadlessTableExport extends HelixElement {
     ]
     return html`<fieldset part="rows">
         <legend part="legend">${this.rowsLabel}</legend>
-        ${this.renderChoices(
+        <div part="options">${this.renderChoices(
           'rows',
           options.rows,
           [
@@ -300,11 +301,11 @@ export class HelixHeadlessTableExport extends HelixElement {
             },
           ],
           (value) => (this.chosenRows = value),
-        )}
+        )}</div>
       </fieldset>
       <fieldset part="columns">
         <legend part="legend">${this.columnsLabel}</legend>
-        ${this.renderChoices(
+        <div part="options">${this.renderChoices(
           'columns',
           options.columns,
           [
@@ -318,11 +319,11 @@ export class HelixHeadlessTableExport extends HelixElement {
             },
           ],
           (value) => (this.chosenColumns = value),
-        )}
+        )}</div>
       </fieldset>
       <fieldset part="values">
         <legend part="legend">${this.valuesLabel}</legend>
-        ${this.renderChoices(
+        <div part="options">${this.renderChoices(
           'values',
           options.values,
           [
@@ -330,11 +331,11 @@ export class HelixHeadlessTableExport extends HelixElement {
             { label: this.rawLabel, value: 'raw' },
           ],
           (value) => (this.chosenValues = value),
-        )}
+        )}</div>
       </fieldset>
       <fieldset part="format">
         <legend part="legend">${this.formatLabel}</legend>
-        ${this.renderChoices('format', options.format, formats, (value) => (this.chosenFormat = value))}
+        <div part="options">${this.renderChoices('format', options.format, formats, (value) => (this.chosenFormat = value))}</div>
       </fieldset>
       ${this.renderActions(count, table !== null)}
       <span part="live" aria-live="polite">${this.said || nothing}</span>`
