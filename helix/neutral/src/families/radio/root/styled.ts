@@ -1,6 +1,6 @@
 import visuallyHidden from '../../../fragments/visually-hidden.js'
 import { oneOf } from '../../../render.js'
-import { difference, list, product, quotient, token, web } from '../../../style.js'
+import { difference, fn, inherited, list, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -52,21 +52,28 @@ export default styles(
     /* The row is the button, so the whole of it is the target. */
     on('item', [
       rule({
-        web: { all: 'unset', cursor: 'pointer' },
-        alignItems: 'center',
+        web: { all: 'unset', cursor: inherited('_radio-cursor', 'pointer') },
+        alignItems: 'start',
         boxSizing: 'border-box',
-        display: 'inline-flex',
+        display: 'flex',
         gap: token('space-xs'),
+        inlineSize: 'fit-content',
         position: 'relative',
       }),
-      web([rule({ has: 'disabled' }, { cursor: 'default' })]),
+      web([rule({ has: 'disabled' }, { cursor: 'not-allowed' })]),
       rule(
         { separation: ['filled', 'outlined'] },
         {
           alignItems: 'start',
-          backgroundColor: hook.cardBackgroundColor,
-          border: [token('border-thin'), 'solid', hook.cardBorderColor],
-          borderRadius: token('radii-sm'),
+          backgroundColor: hook.cardBackgroundColor(
+            inherited('_radio-card-ground', token('color-surface')),
+          ),
+          border: [
+            token('border-thin'),
+            'solid',
+            hook.cardBorderColor(inherited('_radio-card-edge', token('color-border'))),
+          ],
+          borderRadius: token('radii-md'),
           display: 'flex',
           gap: token('space-sm'),
           inlineSize: '100%',
@@ -77,8 +84,18 @@ export default styles(
           ),
         },
       ),
-      /* The ground carries it and the edge goes, transparent so the card keeps its size. */
-      rule({ separation: 'filled' }, { borderColor: 'transparent' }),
+      /* The ground carries it and the edge goes, transparent so the card keeps its size.
+         **The fill is `surface-filled`, the wash every `filled` surface takes**, 1.12:1
+         on every ground where `surface` was nearly the page. */
+      rule(
+        { separation: 'filled' },
+        {
+          backgroundColor: hook.cardBackgroundColor(
+            inherited('_radio-card-ground', token('color-surface-filled')),
+          ),
+          borderColor: inherited('_radio-card-edge', 'transparent'),
+        },
+      ),
       /* An edge and no fill, as `outlined` is wherever it is offered. */
       rule(
         { separation: 'outlined' },
@@ -88,15 +105,25 @@ export default styles(
       rule(
         { separation: ['filled', 'outlined'], selected: true },
         {
-          backgroundColor: token('color-surface-raised'),
-          borderColor: token('color-primary'),
-          boxShadow: ['0', '0', '0', token('border-thick'), token('color-primary')],
+          borderColor: inherited('_radio-card-edge', token('color-primary')),
+          boxShadow: [
+            '0',
+            '0',
+            '0',
+            token('border-thick'),
+            inherited('_radio-card-ring', token('color-primary')),
+          ],
         },
+      ),
+      /* A chosen filled card lifts to the raised rung; an outlined one keeps no fill. */
+      rule(
+        { separation: 'filled', selected: true },
+        { backgroundColor: inherited('_radio-card-ground', token('color-surface-raised')) },
       ),
       /* Under a pointer, the edge is muted, chosen or not: the ring says it is chosen. */
       rule(
         { hover: true, lacks: 'disabled', separation: ['filled', 'outlined'] },
-        { borderColor: token('color-foreground-muted') },
+        { borderColor: inherited('_radio-card-edge', token('color-foreground-muted')) },
       ),
       /* On the whole card, because the card is the target. */
       rule(
@@ -115,7 +142,7 @@ export default styles(
           blockSize: hook.chipSize,
           borderRadius: token('radii-full'),
           color: token('color-foreground-muted'),
-          web: { cursor: 'pointer' },
+          web: { cursor: inherited('_radio-cursor', 'pointer') },
           display: 'inline-flex',
           inlineSize: hook.chipSize,
           justifyContent: 'center',
@@ -125,7 +152,9 @@ export default styles(
             ['box-shadow', token('duration-fast'), token('easing-standard')],
             ['translate', token('duration-fast'), token('easing-standard')],
           ),
-          own: { radioChipLift: '2px' },
+          /* Half the space scale's first rung, so it scales with the density as the
+             chip does. */
+          own: { radioChipLift: quotient(token('space-2xs'), 2) },
         },
       ),
       /* Weight and height carry the choice: solid, and forward. */
@@ -176,7 +205,10 @@ export default styles(
          saying "these are wrong" is not undone by a pointer, chosen or not. */
       rule(
         { lacks: 'disabled', within: { item: { hover: true } } },
-        { borderColor: hook.borderColor(token('color-foreground')) },
+        {
+          backgroundColor: inherited('_radio-hover', token('color-hover')),
+          borderColor: hook.borderColor(token('color-foreground')),
+        },
       ),
       /* Offset, because the ring surrounds a circle whose own edge is not moving. */
       rule(
@@ -190,6 +222,20 @@ export default styles(
         { separation: ['filled', 'outlined'], within: { item: { focusVisible: true } } },
         { outline: 'none' },
       ),
+      web([
+        rule(
+          { chip: false, separation: false },
+          {
+            fontSize: token('text-control'),
+            lineHeight: token('leading-normal'),
+            marginBlockStart: fn(
+              'max',
+              token('space-none'),
+              quotient(difference('1lh', own.radioSize), 2),
+            ),
+          },
+        ),
+      ]),
       /* The circle centers on the label's first line, by a margin, since a
          band would draw an oval. */
       rule(
@@ -206,7 +252,7 @@ export default styles(
       rule({ chip: true }, { display: 'none' }),
       rule(
         { lacks: 'disabled', within: { item: { active: true } } },
-        { backgroundColor: token('color-press') },
+        { backgroundColor: inherited('_radio-press', token('color-press')) },
       ),
     ]),
     /* A dot under half the circle, so the pair reads as a mark in a circle. */
@@ -244,11 +290,24 @@ export default styles(
         fontFamily: token('font-sans'),
         fontSize: token('text-control'),
         fontWeight: token('weight-medium'),
-        lineHeight: token('leading-tight'),
+        lineHeight: token('leading-normal'),
         /* A long unbroken word breaks inside the column it was given. */
         minInlineSize: 0,
-        web: { overflowWrap: 'anywhere' },
+        web: { overflowWrap: 'break-word' },
       }),
+      /* A bare radio's words and circle center on each other, whichever is taller. */
+      web([
+        rule(
+          { chip: false, separation: false },
+          {
+            paddingBlockStart: fn(
+              'max',
+              token('space-none'),
+              quotient(difference(own.radioSize, '1lh'), 2),
+            ),
+          },
+        ),
+      ]),
       /* A card's first line is a sentence somebody reads. */
       rule(
         { separation: ['filled', 'outlined'] },
