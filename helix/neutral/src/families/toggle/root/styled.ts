@@ -126,5 +126,11 @@ export default styles(
       }),
     ]),
     on({ region: 'end', slotted: '*' }, [rule({ marginInlineStart: token('space-xs') })]),
+    /* The words, cut short with an ellipsis where the segment is narrower. */
+    on('label', [
+      rule({ minInlineSize: 0, overflow: 'hidden' }),
+      web([rule({ textOverflow: 'ellipsis', whiteSpace: 'nowrap' })]),
+      native([rule({ flexShrink: 1 })]),
+    ]),
   ],
 )
