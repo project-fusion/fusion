@@ -225,7 +225,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | Control with Home or End | Moves to the first or the last cell of the grid. |
  * | Page Down, Page Up | Moves by the rows that fit in view. |
  * | Enter, F2 | Moves into the cell's controls. Escape moves back to the cell, and Tab moves between the controls of one cell. |
- * | Enter, F2, or a character on an editable cell | Opens the cell for an edit. A character starts the field with what you typed. |
+ * | Enter, F2, or a character on an editable cell, or a double click, or a click with `edit-on="click"` | Opens the cell for an edit. A character starts the field with what you typed. |
  * | Enter in an open cell | Saves and moves down a row. |
  * | Tab, Shift with Tab in an open cell | Saves and moves to the next or the previous cell. |
  * | Escape in an open cell | Puts the old value back and closes the cell. |
@@ -693,6 +693,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
+
+  /**
+   * What opens an editable cell: `double-click`, a spreadsheet's way, or
+   * `click`, where a single press opens it. Enter, F2, and typing open a cell
+   * either way, and a boolean cell toggles on one press whatever this says.
+   */
+  @property({ attribute: 'edit-on' })
+  editOn: 'click' | 'double-click' = 'double-click'
 
   /**
    * The text shown and announced when the rows could not load, such as "The
@@ -3884,8 +3892,31 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return false
   }
 
-  /** A double click on an editable cell opens it. */
+  /** A double click on an editable cell opens it, and a single click does under `edit-on="click"`. */
   private readonly handleDoubleClick = (event: MouseEvent): void => {
+    if (this.editOn === 'double-click') {
+      this.openFromPress(event)
+    }
+  }
+
+  private readonly handleEditClick = (event: MouseEvent): void => {
+    if (
+      this.editOn === 'click' &&
+      event.detail <= 1 &&
+      !event.shiftKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      this.openFromPress(event)
+    }
+  }
+
+  /** Opens the editable cell a press landed on, unless it landed on a control inside the cell. */
+  private openFromPress(event: MouseEvent): void {
+    const target = event.composedPath()[0]
+    if (target instanceof HTMLElement && target.closest('a, button, input, select, textarea')) {
+      return
+    }
     const place = this.placeOf(event)
     const column = place ? this.shownColumns[place.column - this.lead] : undefined
     const row = place ? this.drawnPage[place.row] : undefined
@@ -4383,6 +4414,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
     this.addEventListener('dblclick', this.handleDoubleClick)
+    this.addEventListener('click', this.handleEditClick)
     this.addEventListener('focusout', this.handleEditFocusOut)
     this.addEventListener('helix-before-resize', this.handleResize)
     /* **A child parsed after the table upgraded is sent to its slot too.** The
@@ -4434,6 +4466,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
     this.removeEventListener('dblclick', this.handleDoubleClick)
+    this.removeEventListener('click', this.handleEditClick)
     this.removeEventListener('focusout', this.handleEditFocusOut)
     this.removeEventListener('helix-before-resize', this.handleResize)
     this.arrivals?.disconnect()
