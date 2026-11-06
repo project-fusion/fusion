@@ -410,7 +410,6 @@
     "helix/styled/src/megamenu/root/megamenu-geometry.dom.spec.ts",
     "helix/styled/src/orb/root/orb-root.dom.spec.ts",
     "helix/styled/src/orb/root/orb-root.ts",
-    "helix/styled/src/orb/shapes.ts",
     "helix/styled/src/sandbox/console/sandbox-console.ts",
     "helix/styled/src/sandbox/preview/sandbox-preview.dom.spec.ts",
     "helix/styled/src/sandbox/preview/sandbox-preview.ts",
