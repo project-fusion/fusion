@@ -502,19 +502,13 @@ helix-text[tone="warning"][emphasis="muted"] {
     var(--helix-color-foreground)
   );
 }
-/* Amber under a black label, as the element's is. See its note. */
+/* The solid warning fill under the page's color, as the element's is. See its note. */
 [data-button][data-button-tone="warning"] {
   --_button-edge: var(--helix-color-warning);
-  --_button-fill: var(--helix-color-warning-mark);
-  --_button-fill-hover: light-dark(
-    oklch(from var(--helix-color-warning-mark) calc(l + 0.03) c h),
-    oklch(from var(--helix-color-warning-mark) calc(l - 0.03) c h)
-  );
-  --_button-fill-press: light-dark(
-    oklch(from var(--helix-color-warning-mark) calc(l + 0.06) c h),
-    oklch(from var(--helix-color-warning-mark) calc(l - 0.06) c h)
-  );
-  --_button-on-tone: light-dark(var(--helix-color-foreground), var(--helix-color-background));
+  --_button-fill: var(--helix-color-warning-solid);
+  --_button-fill-hover: oklch(from var(--helix-color-warning-solid) calc(l - 0.03) c h);
+  --_button-fill-press: oklch(from var(--helix-color-warning-solid) calc(l - 0.06) c h);
+  --_button-on-tone: var(--helix-color-background);
   --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-warning);
   --_button-tone-hover: color-mix(

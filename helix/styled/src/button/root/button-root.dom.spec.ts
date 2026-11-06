@@ -47,7 +47,7 @@ describe('a button takes the status tones', () => {
       expect(sheet).toContain(`:host([tone="${tone}"])`)
       expect(sheet).toContain(
         tone === 'warning'
-          ? '--_button-fill: var(--helix-color-warning-mark)'
+          ? '--_button-fill: var(--helix-color-warning-solid)'
           : `--helix-color-${tone}-surface`,
       )
     }
