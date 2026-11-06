@@ -4,6 +4,7 @@ import {
   fn,
   list,
   measured,
+  native,
   product,
   safeArea,
   sum,
@@ -91,7 +92,7 @@ export default styles(
           border: [
             hook.borderWidth(token('border-floating')),
             'solid',
-            hook.borderColor(token('color-border')),
+            hook.borderColor(token('color-border-floating')),
           ],
           borderRadius: token('radii-sm'),
           boxShadow: hook.shadow(token('shadow-floating')),
@@ -156,7 +157,9 @@ export default styles(
       ]),
       on('surface', [
         rule({
-          '--helix-size-icon': token('size-icon-sm'),
+          /* Two fifths of the region's control, an even size: 12, 16 and 20 at `sm`,
+             `md` and `lg`, the tight icon step List and Option rows draw. */
+          '--helix-size-icon': fn('round', product(token('size-control'), 0.4), '2px'),
           '--helix-size-icon-loose': fn('round', product(token('size-icon'), 1.2), '2px'),
           '--helix-size-icon-tight': fn('round', product(token('size-icon'), 0.8), '2px'),
           '--menu-item-start': '0px',
@@ -311,7 +314,16 @@ export default styles(
         ],
       ),
       /* Rows that are already there dim, and hold still, while new ones load. */
-      on('surface', [rule({ loading: true }, { opacity: token('opacity-busy') })]),
+      on('surface', [native([rule({ loading: true }, { opacity: token('opacity-busy') })])]),
+      /* Written out: the rows dim while new ones load, and the loading and empty lines keep
+         full ink. */
+      on(
+        {
+          part: 'surface',
+          selector: ':host([loading]) [part="surface"] > :not([part~="loading"], [part~="empty"])',
+        },
+        [web([rule({ opacity: token('opacity-busy') })])],
+      ),
     ]
   },
 )
