@@ -85,7 +85,11 @@ export default styles(
             announcementTint: hook.toneColor,
           },
           alignItems: 'center',
-          backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
+          /* A step down in light, and the neutral gray in dark, where the
+             sunken rung is darker than the page and reads as a hole. */
+          backgroundColor: hook.backgroundColor(
+            scheme(token('color-surface-sunken'), token('color-neutral-subtle')),
+          ),
           color: hook.foregroundColor,
           display: 'flex',
           fontSize: hook.fontSize,
@@ -118,12 +122,14 @@ export default styles(
           { tone: ['accent', 'danger', 'info', 'primary', 'success', 'warning'] },
           { backgroundImage: fn('linear-gradient', 'to right', tintStart, tintEnd) },
         ),
-        /* A ground of its own, a step up off the page. */
+        /* A ground of its own, the wash every filled surface takes. A tone's
+           tint is still mixed against `surface`, since a mix with a wash would
+           come out translucent. */
         rule(
           { separation: 'filled' },
           {
             own: { announcementGround: token('color-surface') },
-            backgroundColor: hook.backgroundColor(token('color-surface')),
+            backgroundColor: hook.backgroundColor(token('color-surface-filled')),
           },
         ),
         rule(
@@ -138,7 +144,11 @@ export default styles(
             separation: 'outlined',
             tone: ['accent', 'danger', 'info', 'primary', 'success', 'warning'],
           },
-          { borderBlockEndColor: mix(own.announcementTint, 40, own.announcementGround) },
+          /* An edge and no fill, so the tone's gradient goes with the ground. */
+          {
+            backgroundImage: 'none',
+            borderBlockEndColor: mix(own.announcementTint, 40, own.announcementGround),
+          },
         ),
         rule({ waiting: true }, { display: 'none' }),
         rule({ print: true }, { backgroundColor: 'transparent' }),
@@ -209,6 +219,11 @@ export default styles(
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
             outlineOffset: token('size-focus-offset'),
           },
+        ),
+        /* A press, a step past the hover's wash, so a tap shows on a phone. */
+        rule(
+          { active: true },
+          { backgroundColor: token('color-press'), color: token('color-foreground') },
         ),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
