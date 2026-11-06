@@ -1,0 +1,7 @@
+- button "Token" [expanded]
+- menu "Token":
+  - menuitem "Copy token"
+  - menuitem "Rename"
+  - separator
+  - menuitem "Revoke token"
+- status
