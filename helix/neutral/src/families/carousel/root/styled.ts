@@ -64,6 +64,7 @@ export default styles(
     },
     own: {
       carouselBleed: null,
+      carouselDotReach: null,
       carouselControlsAlong: null,
       carouselGap: null,
       carouselIndicatorMotion: null,
@@ -185,6 +186,17 @@ export default styles(
         { canHover: false, coarsePointer: true, controls: { not: 'always' } },
         { own: { carouselIndicatorsAlong: 'center' } },
       ),
+      /* Where a finger presses, the run opens to the target's pitch, and each
+         dot's box takes half the space on either side of it. */
+      web([
+        rule(
+          { coarsePointer: true },
+          {
+            own: { carouselDotReach: difference(token('size-target'), token('space-xs')) },
+            gap: own.carouselDotReach,
+          },
+        ),
+      ]),
       rule(
         { indicatorPlacement: 'top' },
         { paddingBlock: [token('space-none'), token('space-sm')] },
@@ -370,12 +382,23 @@ export default styles(
           justifyContent: 'center',
         }),
         native([rule({ display: 'flex' })]),
+        /* At an end a stepper keeps focus and says so with `aria-disabled`, so
+           it has to look it, and offers no wash under the pointer. */
+        rule(
+          { part: { disabled: true } },
+          { web: { cursor: 'not-allowed' }, opacity: token('opacity-disabled') },
+        ),
         web([
           rule(
-            { hover: true },
+            { hover: true, part: { disabled: false } },
             { backgroundColor: token('color-surface-sunken'), color: token('color-foreground') },
           ),
         ]),
+        /* A step past the hover under a press. */
+        rule(
+          { active: true, part: { disabled: false } },
+          { backgroundColor: token('color-press'), color: token('color-foreground') },
+        ),
         rule({ focusVisible: true }, ring),
         rule(
           { controlsPlacement: 'overlay' },
@@ -386,6 +409,16 @@ export default styles(
           },
         ),
         web([rule({ controlsPlacement: 'overlay' }, { pointerEvents: 'auto' })]),
+        /* At the top or the foot, the arrows stand in from the picture's edge
+           by the bleed and the gap they keep from its sides. */
+        rule(
+          { controlsAlign: 'start', controlsPlacement: 'overlay' },
+          { marginBlockStart: sum(own.carouselBleed, token('space-md')) },
+        ),
+        rule(
+          { controlsAlign: 'end', controlsPlacement: 'overlay' },
+          { marginBlockEnd: sum(own.carouselBleed, token('space-md')) },
+        ),
       ],
     ),
     on({ inner: 'svg', part: 'rotation' }, [web([rule(glyph)])]),
@@ -481,6 +514,14 @@ export default styles(
           insetInline: 0,
           position: 'absolute',
         }),
+        rule({ coarsePointer: true }, { insetInline: quotient(own.carouselDotReach, '-2') }),
+        rule(
+          { coarsePointer: true, lacks: 'indicator-placement', orientation: 'vertical' },
+          {
+            insetBlock: quotient(own.carouselDotReach, '-2'),
+            insetInline: quotient(difference(token('size-target'), '100%'), '-2'),
+          },
+        ),
       ]),
     ]),
     on(
