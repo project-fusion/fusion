@@ -157,8 +157,8 @@ export default styles(
       on('surface', [
         rule({
           '--helix-size-icon': token('size-icon-sm'),
-          '--helix-size-icon-loose': product(token('size-icon'), 1.2),
-          '--helix-size-icon-tight': product(token('size-icon'), 0.8),
+          '--helix-size-icon-loose': fn('round', product(token('size-icon'), 1.2), '2px'),
+          '--helix-size-icon-tight': fn('round', product(token('size-icon'), 0.8), '2px'),
           '--menu-item-start': '0px',
           '--menu-item-end': '0px',
           maxBlockSize: hook.maxBlockSize(measured('floating-available-block-size', 'none')),
