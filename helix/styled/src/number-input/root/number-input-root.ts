@@ -1,8 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNumberInput } from '@fusion.dev/helix-headless/number-input'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
+import { styles as fieldGhostStyles } from '../../shared/field/field-ghost.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './number-input-root.css.js'
 
@@ -42,6 +44,7 @@ import { styles } from './number-input-root.css.js'
  *
  * @cssproperty --number-input-background-color - The fill behind the number.
  * @cssproperty --number-input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
+ * @cssproperty --number-input-ghost-underline - The line under the words of a `ghost` field at rest: `underline` draws it dotted at any pointer. A touch screen draws it whatever this says.
  * @cssproperty --number-input-padding-inline - Space at each side of the number, inside the steppers.
  * @cssproperty --number-input-radius - Corner radius of the field.
  * @cssproperty --number-input-size - Height of the field.
@@ -57,9 +60,19 @@ import { styles } from './number-input-root.css.js'
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {
+  /**
+   * How loud the field is. `ghost` is the inline field: it reads as text at
+   * rest, takes a well and a text cursor under the pointer, and draws a ring
+   * inside its own box while it is edited, so a row it sits in keeps its
+   * height. A `DataTable` opens its edited cells in it, and a details list can
+   * use it outside a table. An error rings it in the danger color.
+   */
+  @property({ reflect: true })
+  emphasis?: 'ghost'
   static override styles: CSSResultGroup = [
     fieldStyles,
     fieldFrameStyles,
+    fieldGhostStyles,
     fieldStackedStyles,
     styles,
   ]

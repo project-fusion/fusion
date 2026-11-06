@@ -739,3 +739,142 @@ slot[name="error"]::slotted(*) {
 [part~="cell-pinned-end"] {
   inset-inline-end: var(--data-table-pin-offset, 0px);
 }
+
+/*
+ *  Editable cells. At rest a cell a reader can edit draws nothing of its own
+ *    until the pointer is on it, when it takes a well and a text cursor. Open,
+ *    it holds the inline field, which rings itself inside the cell, so the row
+ *    stays a control's height.
+ */
+[part~="cell-editable"] {
+  position: relative;
+}
+
+[part~="cell-editable"]:not([part~="cell-editing"], :has([part="cell-toggle"])):hover {
+  background-color: var(--data-table-editable-hover-background-color, var(--helix-color-well));
+  cursor: text;
+}
+
+@media (pointer: coarse) {
+  [part~="cell-editable"]:not([part~="cell-editing"], :has([part="cell-toggle"])) {
+    text-decoration: underline dotted var(--helix-color-foreground-muted);
+    text-underline-offset: 0.25em;
+  }
+}
+
+[part~="cell-editing"] {
+  padding-block: 0;
+}
+
+[part="editor"] {
+  inline-size: 100%;
+}
+
+[part="cell-toggle"] {
+  accent-color: var(--helix-color-primary);
+  block-size: var(--helix-size-checkbox);
+  cursor: pointer;
+  inline-size: var(--helix-size-checkbox);
+  margin: 0;
+}
+
+/* A refused value: the message under the cell, over the rows below it. */
+[part="cell-message"] {
+  background-color: var(--helix-color-surface-raised);
+  border: var(--data-table-message-border-width, var(--helix-border-floating)) solid
+    var(--data-table-message-border-color, var(--helix-color-danger));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--data-table-message-shadow, var(--helix-shadow-floating));
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  inline-size: max-content;
+  inset-block-start: calc(100% + var(--helix-space-2xs));
+  inset-inline-end: 0;
+  max-inline-size: 16rem;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  position: absolute;
+  text-align: start;
+  z-index: var(--helix-layer-raised);
+}
+
+/* Saving: a turning ring at the start of the cell, its words for a screen reader. */
+[part="cell-saving-mark"] {
+  animation: data-table-saving var(--helix-duration-crawl) linear infinite;
+  block-size: var(--helix-size-icon-sm);
+  border: var(--helix-border-thick) solid var(--helix-color-primary);
+  border-inline-end-color: transparent;
+  border-radius: var(--helix-radii-full);
+  color: transparent;
+  font-size: 0;
+  inline-size: var(--helix-size-icon-sm);
+  inset-block-start: calc(50% - var(--helix-size-icon-sm) / 2);
+  inset-inline-start: var(--helix-space-2xs);
+  overflow: hidden;
+  position: absolute;
+}
+
+@keyframes data-table-saving {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="cell-saving-mark"] {
+    animation: none;
+  }
+}
+
+[part~="cell-saving"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* An unsaved change, under `batch-edits`: a wash of the primary and a mark in
+   the corner, so the change reads without its color too. */
+[part~="cell-unsaved"] {
+  background-color: var(--data-table-unsaved-background-color, var(--helix-color-primary-subtle));
+}
+
+[part~="cell-unsaved"]::after {
+  border-block-start: var(--helix-space-xs) solid var(--helix-color-primary);
+  border-inline-start: var(--helix-space-xs) solid transparent;
+  content: "";
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+[part~="cell-unsaved"]:not([part~="cell-editable"]) {
+  position: relative;
+}
+
+[part="edits"] {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-sm);
+  grid-column: 1 / -1;
+  padding-block: var(--helix-space-sm);
+}
+
+[part="edits-save"],
+[part="edits-discard"] {
+  all: unset;
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-primary);
+  cursor: pointer;
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="edits-discard"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="edits-save"]:focus-visible,
+[part="edits-discard"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

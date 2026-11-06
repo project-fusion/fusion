@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDateInput } from '@fusion.dev/helix-headless/date-input'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 /* The headless template names `helix-date-picker` rather than the base tag, so
    without this a consumer importing this family alone got a panel whose calendar
    was an empty inert box. It looked right only because the sandbox imports the
@@ -9,6 +10,7 @@ import '../../date-picker/index.js'
 import '../../tag/root/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
+import { styles as fieldGhostStyles } from '../../shared/field/field-ghost.css.js'
 import { styles as fieldSegmentsStyles } from '../../shared/field/field-segments.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
@@ -56,11 +58,21 @@ import { styles } from './date-input-root.css.js'
  */
 @customElement('helix-date-input')
 export class HelixDateInput extends HelixHeadlessDateInput {
+  /**
+   * How loud the field is. `ghost` is the inline field: it reads as text at
+   * rest, takes a well and a text cursor under the pointer, and draws a ring
+   * inside its own box while it is edited, so a row it sits in keeps its
+   * height. A `DataTable` opens its edited cells in it, and a details list can
+   * use it outside a table. An error rings it in the danger color.
+   */
+  @property({ reflect: true })
+  emphasis?: 'ghost'
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [
     fieldStyles,
     fieldFrameStyles,
+    fieldGhostStyles,
     fieldStackedStyles,
     fieldSegmentsStyles,
     tagRowStyles,

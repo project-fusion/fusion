@@ -18,6 +18,21 @@ import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { ColumnType } from '../column-type.js'
 
+/** What a column's `editor` is given to draw a field for an edited cell. */
+export interface CellEditorContext {
+  /** Puts the old value back and closes the cell. */
+  cancel: () => void
+  /** Saves a new value, as Enter does on the table's own field. */
+  commit: (value: unknown) => void
+  /** The row. */
+  row: Readonly<Record<string, unknown>>
+  /** The value the cell holds now. */
+  value: unknown
+}
+
+/** Draws the field for an edited cell: anything a Lit template can render. */
+export type CellEditor = (context: CellEditorContext) => unknown
+
 /**
  * How a column is read out of a row, once the row is data rather than markup.
  *
@@ -160,6 +175,30 @@ export class HelixHeadlessTableColumn extends HelixElement {
   compare: CellReader | undefined = undefined
 
   /**
+   * Lets a reader edit the column's cells, in a `DataTable`.
+   *
+   * Enter, F2, a double click, or typing opens a cell in the field the
+   * column's `type` picks: a text field, a number field, a date field, or a
+   * select of an enum column's values. A boolean toggles in place. Enter saves
+   * and moves down, Tab saves and moves to the next cell, leaving the cell
+   * saves, and Escape puts the old value back. `required`, `min`, `max`,
+   * `pattern` and `validate` check the value first. Set `rowEditable` to
+   * decide row by row.
+   */
+  @property({ type: Boolean })
+  editable = false
+
+  /**
+   * A function that draws your own field for an edited cell, in place of the
+   * one the column's `type` picks. It is given the row, the value, and
+   * `commit` and `cancel`: call `commit` with the new value to save it, and
+   * `cancel` to put the old one back. Enter, Tab and Escape on your field
+   * work as they do on the table's own.
+   */
+  @property({ attribute: false })
+  editor: CellEditor | undefined = undefined
+
+  /**
    * The key this column reads out of a row.
    *
    * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
@@ -185,6 +224,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @property({ type: Boolean })
   filterable = false
 
+  /** The largest value an edited cell may hold: a number, or a date as `YYYY-MM-DD`. */
+  @property()
+  max = ''
+
   /**
    * Draws a button in the heading that opens a menu of what you can do with the
    * column, in a `DataTable`.
@@ -203,6 +246,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @words
   @property({ attribute: 'menu-label' })
   menuLabel = '{named, select, no {Column menu} other {{name} column menu}}'
+
+  /** The smallest value an edited cell may hold: a number, or a date as `YYYY-MM-DD`. */
+  @property()
+  min = ''
 
   /**
    * The narrowest a `DataTable` can be with this column showing, as a length
@@ -237,6 +284,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @property({ attribute: 'move-label' })
   moveLabel = '{named, select, no {Move column} other {Move {name}}}'
 
+  /** A pattern an edited text cell matches whole, as an input's `pattern` is matched. */
+  @property()
+  pattern = ''
+
+  /** Whether an edited cell may be left empty. */
+  @property({ type: Boolean })
+  required = false
+
   /**
    * Whether the column can be resized.
    *
@@ -255,6 +310,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @words
   @property({ attribute: 'resize-label' })
   resizeLabel = '{named, select, no {Resize column} other {Resize {name}}}'
+
+  /**
+   * A function that decides whether a row's cell in this column can be
+   * edited, for a column that is `editable`. Given the row, it returns `true`
+   * or `false`. A property only, being a function.
+   */
+  @property({ attribute: false })
+  rowEditable: ((row: Readonly<Record<string, unknown>>) => boolean) | undefined = undefined
 
   /**
    * Makes this column's cells the headers of their rows, in `DataTable`.
@@ -337,6 +400,20 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property()
   type?: ColumnType
+
+  /**
+   * A function that checks an edited cell's value, after `required`, `min`,
+   * `max` and `pattern`. Given the value and the row, it returns a message to
+   * refuse the value with, or nothing to accept it, or a promise of either. A
+   * property only, being a function.
+   */
+  @property({ attribute: false })
+  validate:
+    | ((
+        value: unknown,
+        row: Readonly<Record<string, unknown>>,
+      ) => string | undefined | PromiseLike<string | undefined>)
+    | undefined = undefined
 
   /**
    * Where the content of this column's cells sits from top to bottom, when a

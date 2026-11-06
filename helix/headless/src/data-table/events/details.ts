@@ -45,3 +45,27 @@ export interface ExportDetail {
   /** The table's whole view, which a server reads to make the same rows. */
   view: DataTableView
 }
+
+/** Detail carried by `helix-before-cell-edit`. */
+export interface CellEditDetail {
+  /** The column's `field`. */
+  field: string
+  /** The row's key: its `row-key` value, or its place in the result. */
+  key: string
+  /** The row. */
+  row: Readonly<Record<string, unknown>>
+  /** The value the cell holds now. */
+  value: unknown
+}
+
+/** Detail carried by `helix-before-cell-commit` and `helix-cell-commit`. */
+export interface CellCommitDetail extends CellEditDetail {
+  /** The value the cell held before the edit. */
+  previous: unknown
+  /**
+   * Holds the save until a promise settles, such as a check on your server.
+   * Resolve it to a message to refuse the value with that message, and the
+   * cell stays open on it. Only on `helix-before-cell-commit`.
+   */
+  waitUntil: (check: PromiseLike<string | undefined | void>) => void
+}

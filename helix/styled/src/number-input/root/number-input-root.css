@@ -216,3 +216,18 @@ slot[name="increment-icon"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* On a touch screen there is no hover to say a `ghost` field can be changed,
+   so its words carry a dotted underline at rest. The hook draws it at any
+   pointer. */
+:host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+  text-decoration: var(--number-input-ghost-underline, none) dotted
+    var(--helix-color-foreground-muted);
+  text-underline-offset: 0.25em;
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+    text-decoration-line: underline;
+  }
+}

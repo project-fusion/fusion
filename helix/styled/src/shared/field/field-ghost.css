@@ -1,0 +1,33 @@
+/* `emphasis="ghost"`, the inline field: it reads as text at rest, takes a
+   well under the pointer with a text cursor, and while it is being edited it
+   draws a ring inside its own box, so a field in a table cell or in a line of
+   a details list never grows the row it is in. Compose after `field-frame.css`,
+   which it quiets. Four families take it: Input, Number Input, Date Input and
+   Time Input. Select draws its own. */
+
+:host([emphasis="ghost"]) [part="field"],
+:host([emphasis="ghost"]:not(:disabled, [readonly])) [part="field"]:hover {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* The well and the text cursor say the words can be changed, before a press. */
+:host([emphasis="ghost"]:not(:disabled, [readonly], :focus-within)) [part="field"]:hover {
+  background-color: var(--helix-color-well);
+  cursor: text;
+}
+
+/* **A ring inside the box, never an outline around it**, so the field is as tall
+   editing as at rest. The frame's own focus outline is taken away for it. */
+:host([emphasis="ghost"]:focus-within) [part="field"],
+:host([emphasis="ghost"]:focus-within) [part="field"]:hover {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
+  outline: none;
+}
+
+:host([emphasis="ghost"]:state(invalid)) [part="field"],
+:host([emphasis="ghost"]:state(invalid)) [part="field"]:hover {
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-danger);
+}

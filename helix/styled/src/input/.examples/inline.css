@@ -1,0 +1,6 @@
+/* A list of details, each field in the line beside its label. */
+.inline-details {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  max-inline-size: 28rem;
+}
