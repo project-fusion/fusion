@@ -169,6 +169,8 @@ Each component's page lists the events it sends, with the class and the detail.
 |---|---|
 | `helix-before-activate`, `helix-activate` | A set is about to make a different child current, and then did |
 | `helix-before-change` | A value is about to change. `input` and `change` follow |
+| `helix-before-cell-edit`, `helix-cell-edit` | A data table's cell is about to open for an edit, and then did |
+| `helix-before-cell-commit`, `helix-cell-commit` | A data table's edited cell is about to save its new value, and then did |
 | `helix-before-check`, `helix-check` | A checked state is about to change, and then did. A form control sends `change` in place of `helix-check` |
 | `helix-before-collapse`, `helix-collapse` | A splitter's pane is about to shut or reopen, and then did |
 | `helix-before-column-toggle`, `helix-column-toggle` | A data table's column is about to be hidden or shown, and then was |

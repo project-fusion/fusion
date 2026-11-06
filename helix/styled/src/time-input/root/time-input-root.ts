@@ -1,12 +1,14 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTimeInput } from '@fusion.dev/helix-headless/time-input'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 /* Inherited from the base along with the template: this file has neither tag in
    it to remind anyone. */
 import '../../tag/root/index.js'
 import '../../time-picker/index.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
+import { styles as fieldGhostStyles } from '../../shared/field/field-ghost.css.js'
 import { styles as fieldSegmentsStyles } from '../../shared/field/field-segments.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
@@ -51,11 +53,21 @@ import { styles } from './time-input-root.css.js'
  */
 @customElement('helix-time-input')
 export class HelixTimeInput extends HelixHeadlessTimeInput {
+  /**
+   * How loud the field is. `ghost` is the inline field: it reads as text at
+   * rest, takes a well and a text cursor under the pointer, and draws a ring
+   * inside its own box while it is edited, so a row it sits in keeps its
+   * height. A `DataTable` opens its edited cells in it, and a details list can
+   * use it outside a table. An error rings it in the danger color.
+   */
+  @property({ reflect: true })
+  emphasis?: 'ghost'
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [
     fieldStyles,
     fieldFrameStyles,
+    fieldGhostStyles,
     fieldStackedStyles,
     fieldSegmentsStyles,
     tagRowStyles,
