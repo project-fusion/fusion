@@ -62,7 +62,6 @@ export default styles(
            content's min-content width: a code block in an item widened the row past
            its list. */
         gridTemplateColumns: 'auto auto minmax(0, 1fr) auto auto',
-        lineHeight: product(token('text-sm'), token('leading-normal')),
         /* The height of a control at this density, and two lines grow from it. */
         minBlockSize: token('size-control'),
         /* A long unbroken word breaks inside the column it was given. */
@@ -83,6 +82,7 @@ export default styles(
         { coarsePointer: true },
         { minBlockSize: sum(token('size-target'), token('space-2xs')) },
       ),
+      native([rule({ lineHeight: product(token('text-sm'), token('leading-normal')) })]),
       /* A phone's press on a row it chooses. */
       native([
         rule(
