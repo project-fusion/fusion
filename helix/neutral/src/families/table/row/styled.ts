@@ -1,4 +1,14 @@
-import { difference, measured, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  hookOf,
+  inherited,
+  measured,
+  native,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -62,10 +72,16 @@ export default styles(
     ]
     const cell = {
       alignItems: 'center',
-      borderBlockEnd: [token('border-thin'), 'solid', token('color-border')],
+      borderBlockEnd: [
+        token('border-thin'),
+        'solid',
+        hookOf('table', 'rule-color', token('color-border')),
+      ],
       boxSizing: 'border-box',
       display: 'flex',
       minBlockSize: token('size-control'),
+      /* Faded while the table loads, on the cells, since the row draws no box. */
+      opacity: inherited('_table-busy-opacity', 1),
     } as const
     const dragged = [rule({ dragging: true }, { opacity: hook.draggingOpacity })]
     const before = ['inset', '0', hook.dropIndicatorSize, '0', '0', hook.dropIndicatorColor]
@@ -87,6 +103,10 @@ export default styles(
       on('host', [
         web([rule({ display: 'contents' })]),
         native([rule({ display: 'flex', flexDirection: 'row' })]),
+      ]),
+      /* Written out: the last row draws no rule under it, the table's own edge being there. */
+      on({ part: 'host', selector: ':host(:last-of-type)' }, [
+        web([rule({ '--table-rule-color': 'transparent' })]),
       ]),
       on('select', [
         rule({
@@ -118,6 +138,19 @@ export default styles(
           ...cell,
           paddingInline: [token('space-2xs'), token('space-sm')],
         }),
+        /* A finger's target across, where the pointer is coarse. */
+        web([
+          rule(
+            { coarsePointer: true },
+            {
+              paddingInline: quotient(
+                difference(token('size-target'), token('size-icon-tight')),
+                2,
+              ),
+              position: 'relative',
+            },
+          ),
+        ]),
         ...dragged,
         ...landing,
         web(ring),
@@ -137,8 +170,8 @@ export default styles(
       ]),
       on('expand-mark', [
         rule({
-          blockSize: '1em',
-          inlineSize: '1em',
+          blockSize: token('size-icon-tight'),
+          inlineSize: token('size-icon-tight'),
           transition: ['rotate', token('duration-fast'), token('easing-standard')],
         }),
         rule({ expanded: true }, { rotate: '90deg' }),
@@ -163,7 +196,13 @@ export default styles(
       on({ part: 'grip-button', selector: '[part="grip-button"][aria-disabled="true"]' }, [
         web([rule({ cursor: 'default', opacity: hook.gripDisabledOpacity })]),
       ]),
-      on('grip-mark', [rule({ blockSize: '1em', inlineSize: '1em' })]),
+      /* The press covers the cell where the pointer is coarse. */
+      on({ after: 'grip-button' }, [
+        web([rule({ coarsePointer: true }, { content: '""', inset: 0, position: 'absolute' })]),
+      ]),
+      on('grip-mark', [
+        rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
+      ]),
       /* What a phone's row draws around each cell. */
       /* A phone's checkbox stands at its own height, in the middle of the cell. */
       on('checkbox', [native([rule({ alignSelf: 'center' })])]),
@@ -195,6 +234,7 @@ export default styles(
       ]),
       on({ region: 'default', slotted: '*' }, [
         web([
+          rule({ opacity: inherited('_table-busy-opacity', 1) }),
           rule({ selected: true }, { backgroundColor: wash }),
           rule({ has: 'disabled' }, { opacity: hook.rowDisabledOpacity }),
           rule({ link: true }, { cursor: 'pointer' }),
