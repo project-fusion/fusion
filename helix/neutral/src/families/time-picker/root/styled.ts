@@ -41,7 +41,9 @@ export default styles(
       feedbackColor: token('color-danger'),
       hoverBackgroundColor: token('color-surface-sunken'),
       invalidColor: token('color-danger'),
+      listBackgroundColor: token('color-surface'),
       listBlockSize: product(token('size-control-tight'), 7),
+      listBorderWidth: token('border-thin'),
       markRadius: token('radii-sm'),
       nowColor: token('color-primary'),
       rangeColor: scheme(
@@ -49,8 +51,10 @@ export default styles(
         token('color-selected'),
       ),
       rowSize: token('size-control'),
-      selectedBackgroundColor: token('color-surface-inverse'),
-      selectedForegroundColor: token('color-foreground-inverse'),
+      /* The chosen time takes the primary fill, as Date Picker's chosen day does: an
+         ink written as a ground went pale exactly when the page went dark. */
+      selectedBackgroundColor: token('color-primary-surface'),
+      selectedForegroundColor: token('color-foreground-on-primary'),
       wheelBlockSize: product(measured('_time-row', token('size-control')), 5),
       wheelMask: fn(
         'linear-gradient',
@@ -64,7 +68,7 @@ export default styles(
     own: { timeRow: null },
     stylesheet: 'time-picker/root/time-picker-root.generated.css',
   },
-  ({ hook, include, on, rule }) => {
+  ({ hook, include, keyframes, on, rule }) => {
     const ring = [token('size-focus-ring'), 'solid', hook.invalidColor] as const
     const frameless = {
       backgroundColor: 'transparent',
@@ -77,7 +81,7 @@ export default styles(
       margin: [token('space-sm'), token('space-none'), token('space-none')],
     } as const
     return [
-      on('host', [rule({ display: 'block' })]),
+      on('host', [rule({ display: 'block', fontVariantNumeric: 'tabular-nums' })]),
       on('label', [
         rule({
           color: token('color-foreground'),
@@ -89,10 +93,55 @@ export default styles(
           paddingBlockEnd: token('space-2xs'),
         }),
       ]),
-      on('list', [rule({ '--listbox-max-block-size': hook.listBlockSize, display: 'block' })]),
-      on({ part: 'list', selector: '[part="list"]::part(items)' }, [
-        web([rule({ ...frameless, paddingBlock: token('space-none') })]),
+      /* The list in a box of its own, its rows faded at an edge with more behind it. */
+      on('list', [
+        rule({
+          '--listbox-max-block-size': hook.listBlockSize,
+          backgroundColor: hook.listBackgroundColor,
+          border: [hook.listBorderWidth, 'solid', token('color-border')],
+          borderRadius: token('radii-sm'),
+          display: 'block',
+          overflow: 'hidden',
+        }),
       ]),
+      on({ part: 'list', selector: '[part="list"]::part(items)' }, [
+        web([
+          rule({
+            ...frameless,
+            maskImage: fn(
+              'linear-gradient',
+              'to bottom',
+              'transparent',
+              ['#000', measured('_time-picker-fade-start', '0rem')],
+              ['#000', difference('100%', measured('_time-picker-fade-end', '0rem'))],
+              'transparent',
+            ),
+            paddingBlock: token('space-none'),
+          }),
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['time-picker-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self block'),
+            },
+          ),
+          rule({ reducedMotion: true }, { animation: 'none' }),
+        ]),
+      ]),
+      on({ part: 'list', selector: '[part="list"]::part(items):focus-visible' }, [
+        web([rule({ outlineOffset: product(token('size-focus-offset'), '-1') })]),
+      ]),
+      keyframes('time-picker-edges', {
+        '0%': { '--_time-picker-fade-end': token('space-xl'), '--_time-picker-fade-start': '0rem' },
+        '5%, 95%': {
+          '--_time-picker-fade-end': token('space-xl'),
+          '--_time-picker-fade-start': token('space-xl'),
+        },
+        '100%': {
+          '--_time-picker-fade-end': '0rem',
+          '--_time-picker-fade-start': token('space-xl'),
+        },
+      }),
       on(
         {
           part: 'option',
@@ -101,8 +150,8 @@ export default styles(
         [
           web([
             rule({
-              backgroundColor: token('color-surface-inverse'),
-              color: token('color-foreground-inverse'),
+              backgroundColor: token('color-primary-surface'),
+              color: token('color-foreground-on-primary'),
             }),
           ]),
         ],
@@ -134,8 +183,8 @@ export default styles(
           rule(
             { mode: 'range', part: { 'data-selected': true } },
             {
-              backgroundColor: token('color-surface-inverse'),
-              color: token('color-foreground-inverse'),
+              backgroundColor: token('color-primary-surface'),
+              color: token('color-foreground-on-primary'),
             },
           ),
           rule({ part: { 'data-between': true } }, { backgroundColor: hook.rangeColor }),
@@ -269,9 +318,26 @@ export default styles(
         {
           part: 'option',
           selector:
-            ':host([invalid]) [part~="option"]:state(selected)::part(item), :host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label), :host(:state(invalid)) [part~="option"]:state(selected)::part(item), :host(:state(invalid)) [part="column"] [part~="option"]:state(selected)::part(label)',
+            ':host([invalid]) [part="column"] [part~="option"]:state(selected)::part(label), :host(:state(invalid)) [part="column"] [part~="option"]:state(selected)::part(label)',
         },
         [web([rule({ outline: ring, outlineOffset: token('size-focus-offset') })])],
+      ),
+      /* A wrong list's chosen row is ringed inside, since the box clips past its edge. */
+      on(
+        {
+          part: 'option',
+          selector:
+            ':host([invalid]) [part="list"] [part~="option"]:state(selected)::part(item), :host(:state(invalid)) [part="list"] [part~="option"]:state(selected)::part(item)',
+        },
+        [
+          web([
+            rule({
+              borderRadius: token('radii-sm'),
+              outline: ring,
+              outlineOffset: product(token('size-focus-ring'), '-1'),
+            }),
+          ]),
+        ],
       ),
       on(
         ['list', 'columns'],
