@@ -842,6 +842,24 @@ pub const VIDEO_COMPUTED: &[&str] = &[
     "waitWords",
 ];
 
+/// What a playlist that drives a player sends: a move asked and made, and the end
+/// of its last entry. Its props it reads by their own names.
+pub const VIDEO_PLAYLIST: &[(&str, Names)] = &[
+    ("onActivate", Names::Event),
+    ("onBeforeActivate", Names::Event),
+    ("onEnd", Names::Event),
+];
+
+/// What it computes for its parts, each read as `videoPlaylist.x`.
+pub const VIDEO_PLAYLIST_COMPUTED: &[&str] = &["empty", "emptyWords", "named"];
+
+/// What a menu of a playlist's entries sends: an entry chosen. Its props it reads
+/// by their own names.
+pub const VIDEO_PLAYLIST_MENU: &[(&str, Names)] = &[("onBeforeSelect", Names::Event)];
+
+/// What it computes for its parts, each read as `videoPlaylistMenu.x`.
+pub const VIDEO_PLAYLIST_MENU_COMPUTED: &[&str] = &["named", "rows"];
+
 /// What a viewer of one item at a time sends: a move asked and made. Its props it
 /// reads by their own names.
 pub const LIGHTBOX: &[(&str, Names)] = &[
@@ -1395,6 +1413,26 @@ pub fn video(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "video", VIDEO, VIDEO_COMPUTED)
 }
 
+/// `videoPlaylist({ ... })`, each field a name.
+pub fn video_playlist(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "videoPlaylist",
+        VIDEO_PLAYLIST,
+        VIDEO_PLAYLIST_COMPUTED,
+    )
+}
+
+/// `videoPlaylistMenu({ ... })`, each field a name.
+pub fn video_playlist_menu(lit: &Lit) -> Result<TreeChoice, String> {
+    read(
+        lit,
+        "videoPlaylistMenu",
+        VIDEO_PLAYLIST_MENU,
+        VIDEO_PLAYLIST_MENU_COMPUTED,
+    )
+}
+
 /// `lightbox({ ... })`, each field a name.
 pub fn lightbox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "lightbox", LIGHTBOX, LIGHTBOX_COMPUTED)
@@ -1505,6 +1543,8 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "scatterChart" => scatter_chart(value),
         "heatmap" => heatmap(value),
         "lightbox" => lightbox(value),
+        "videoPlaylistMenu" => video_playlist_menu(value),
+        "videoPlaylist" => video_playlist(value),
         "video" => video(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),

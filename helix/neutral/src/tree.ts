@@ -96,6 +96,8 @@ import type {
   TreeChoice,
   TreeItemChoice,
   VideoChoice,
+  VideoPlaylistChoice,
+  VideoPlaylistMenuChoice,
 } from './tree-choice.js'
 import type { Validation } from './validation.js'
 import type { Window } from './window.js'
@@ -374,6 +376,10 @@ export interface Headless {
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */
   readonly video?: VideoChoice
+  /** What the element reads, sends, and computes where it is a playlist that drives a player. */
+  readonly videoPlaylist?: VideoPlaylistChoice
+  /** What the element reads, sends, and computes where it is a menu of a playlist's entries. */
+  readonly videoPlaylistMenu?: VideoPlaylistMenuChoice
   /** What the element reads, sends, and computes where it is a viewer of one item at a time. */
   readonly lightbox?: LightboxChoice
   /** What the element reads, sends, and computes where it is a field of dates or times. */
