@@ -54,7 +54,7 @@ export default headless('notification', {
     dismiss: cancelable(['label']),
     read: ['read'],
   },
-  states: ['actions', 'controls', 'feedFilled', 'feedOutlined', 'read', 'settled'],
+  states: ['actions', 'controls', 'feedFilled', 'feedOutlined', 'read', 'settled', 'time'],
   notificationRow: {
     actionsFilled: 'actionsFilled',
     at: 'at',

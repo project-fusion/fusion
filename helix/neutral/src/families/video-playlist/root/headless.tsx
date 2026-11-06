@@ -48,7 +48,7 @@ export default headless('video-playlist', {
     end: [],
     reorder: ['from', 'key', 'keys', 'kind', 'to', 'value'],
   },
-  states: ['ended', 'settled'],
+  states: ['ended', 'noThumbnails', 'settled'],
   videoPlaylist: {
     empty: 'empty',
     emptyWords: 'emptyWords',

@@ -68,7 +68,7 @@ export default headless('rating', {
     input: bare(),
     preview: ['value'],
   },
-  states: ['invalid', 'settled'],
+  states: ['invalid', 'previewing', 'settled'],
   derived: {
     /* Whether a shape is passed for the unfilled marks, which the track draws. */
     emptied: bind('emptyMark'),
