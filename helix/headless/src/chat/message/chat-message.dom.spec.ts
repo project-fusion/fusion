@@ -1,5 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { setTimers, timers } from '@fusion.dev/helix-core/capabilities/timers'
+import { type FakeTimers, fakeTimers } from '@fusion.dev/helix-core/capabilities/timers/fake'
 import { internalsOf, label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One turn, and the four things that can have happened to it. */
@@ -291,41 +293,48 @@ describe('the name a screen reader gives the turn', () => {
 })
 
 describe('the time moves on', () => {
-  interface Ticker {
-    waiting: Set<{ at: number; run: () => void }>
-  }
-  const ticker = () =>
-    (globalThis as unknown as Record<symbol, Ticker | undefined>)[Symbol.for('helix.ticker')]
+  /* A fake clock set as the timers capability, which the turn's clock runs
+     on, with `Date.now` following it. */
   const realNow = Date.now
+  const heldTimers = timers()
+  let clock: FakeTimers
+
+  /* Set by each test that reads it, and not in a `beforeEach`: the browser
+     harness runs a bundle's `beforeEach` before every test in the bundle,
+     and a fake clock left there stopped the composer's typing timeout. */
+  const stop = (): void => {
+    clock = fakeTimers(realNow())
+    setTimers(clock)
+    Date.now = () => clock.wall()
+  }
 
   afterEach(() => {
     Date.now = realNow
+    setTimers(heldTimers)
   })
 
   /**
    * The reading was computed once, when `at` was set, so a transcript left
-   * open said "now" for the rest of the session. The turn asks the shared
-   * ticker for the moment its words go stale and reads the clock again then.
+   * open said "now" for the rest of the session. The turn's clock wakes at
+   * the moment its words go stale and reads the time again then.
    */
   test('a reading that goes stale is read again, and its name with it', async () => {
+    stop()
     const said = Date.now() - 30_000
     const element = await message(`author="me" at="${new Date(said).toISOString()}"`)
     expect(part(element, 'time')?.textContent).toBe('now')
-    const waiting = [...(ticker()?.waiting ?? [])]
-    expect(waiting.length).toBeGreaterThan(0)
-    Date.now = () => said + 61_000
-    for (const one of waiting) {
-      one.run()
-    }
+    expect(clock.pending().timeouts).toBeGreaterThan(0)
+    clock.advance(31_000)
     await element.updateComplete
     expect(part(element, 'time')?.textContent).toBe('1 minute ago')
     expect(label(element)).toBe('You, 1 minute ago')
   })
 
   test('a turn taken off the page stops asking', async () => {
+    stop()
     const element = await message(`at="${new Date().toISOString()}"`)
-    const before = ticker()?.waiting.size ?? 0
+    const before = clock.pending().timeouts
     element.remove()
-    expect(ticker()?.waiting.size ?? 0).toBeLessThan(before)
+    expect(clock.pending().timeouts).toBeLessThan(before)
   })
 })

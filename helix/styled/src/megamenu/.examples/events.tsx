@@ -35,28 +35,16 @@ export function Example() {
       gap="md"
     >
       <helix-navigation label="Main">
-        <a href="#overview">Overview</a>
+        <helix-navigation-item href="#overview">Overview</helix-navigation-item>
         <helix-megamenu
           label="Products"
           onhelix-before-close={closing}
           onhelix-before-open={opening}
           onToggle={moved}
         >
-          <div data-megamenu-group>
-            <helix-text
-              as="h3"
-              data-megamenu-heading
-              scale="title"
-            >
-              Work
-            </helix-text>
-            <a
-              data-megamenu-item
-              href="#helix"
-            >
-              Projects
-            </a>
-          </div>
+          <helix-megamenu-group label="Work">
+            <helix-megamenu-item href="#helix">Projects</helix-megamenu-item>
+          </helix-megamenu-group>
         </helix-megamenu>
       </helix-navigation>
 
@@ -67,7 +55,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

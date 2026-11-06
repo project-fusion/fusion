@@ -3,13 +3,13 @@ import { HelixHeadlessAppHeader } from '@fusion.dev/helix-headless/app-header'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
-import { styles } from './app-header-root.css.js'
+import { styles } from './app-header-root.generated.css.js'
 
 /**
  * @summary Page-level banner holding brand, navigation, and actions.
  *
  * @description
- * The header is flat, opaque, and in the document flow. Two behaviors are
+ * The header is flat, opaque, and in the document flow. Three behaviors are
  * opt-in:
  *
  * - `sticky` keeps the header in view while the page scrolls. Whether it should
@@ -17,6 +17,8 @@ import { styles } from './app-header-root.css.js'
  * - `material` adds a backdrop filter. The filter makes the header a containing
  *   block for `position: fixed` descendants, so an overlay rendered inside a
  *   material header is positioned against the header.
+ * - `overlay` stands the header over the top of the page, so the section under
+ *   it starts behind it, as a hero under a glass bar does.
  *
  * A separating rule appears once the page has scrolled, so the header sits flat
  * against a hero and lifts off the content afterwards. The header has no
@@ -86,6 +88,20 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'
+
+  /**
+   * Whether the bar stands over the top of the page.
+   *
+   * The bar takes no room in the flow, so the section under it starts behind
+   * it, as a hero under a `glass` or `transparent` bar does, and pads its own
+   * top by the bar's height. Opt in: absent, the bar is in the flow.
+   *
+   * It pairs with `material`, which is what lets the section show through. A
+   * phone takes the same room back, and the safe area the bar stands clear of
+   * at the top of the window too.
+   */
+  @property({ reflect: true, type: Boolean })
+  overlay = false
 
   /**
    * Whether the banner sticks to the top of the viewport.

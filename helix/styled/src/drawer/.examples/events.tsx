@@ -9,16 +9,13 @@ const RESTING: Arrival[] = [{ carried: 'Open the drawer, then close it', name: '
 
 export function Example() {
   const [heard, setHeard] = useState(RESTING)
+  const [open, setOpen] = useState(false)
 
   const say = (name: string, carried: string) => {
     setHeard((before) => {
       const kept = before === RESTING ? [] : before
       return [...kept, { carried, name }].slice(-KEEP)
     })
-  }
-
-  const opening = () => {
-    say('helix-before-open', 'About to open')
   }
 
   const closing = () => {
@@ -30,6 +27,7 @@ export function Example() {
   }
 
   const shut = () => {
+    setOpen(false)
     say('close', 'Closed')
   }
 
@@ -39,29 +37,22 @@ export function Example() {
       gap="md"
     >
       <helix-button
-        command="--show"
-        commandfor="panel"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Open drawer
       </helix-button>
 
       <helix-drawer
-        id="panel"
+        dismissible
         label="Filters"
         onClose={shut}
         onhelix-before-close={closing}
-        onhelix-before-open={opening}
         onToggle={moved}
+        open={open}
       >
         <helix-text>Filter the list by status, owner, and date.</helix-text>
-        <helix-button
-          command="--close"
-          commandfor="panel"
-        >
-          Done
-        </helix-button>
       </helix-drawer>
 
       <helix-list

@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTourStop } from '@fusion.dev/helix-headless/tour'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './tour-stop.css.js'
+import { styles } from './tour-stop.generated.css.js'
 import '../../button/index.js'
 
 /**

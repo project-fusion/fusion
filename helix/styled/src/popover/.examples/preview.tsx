@@ -1,11 +1,15 @@
-import './preview.css'
+import { useState } from 'react'
 
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <helix-popover
-      className="details"
-      id="details"
       label="Project details"
+      onhelix-before-close={() => setOpen(false)}
+      onhelix-before-open={() => setOpen(true)}
+      open={open}
+      style={{ '--popover-inline-size': '20rem' }}
     >
       <helix-button slot="trigger">Project details</helix-button>
       <helix-flex
@@ -17,9 +21,8 @@ export function Example() {
         </helix-text>
         <helix-flex justify-content="end">
           <helix-button
-            command="--close"
-            commandfor="details"
             emphasis="outlined"
+            onClick={() => setOpen(false)}
           >
             Close
           </helix-button>

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLoader } from '@fusion.dev/helix-headless/loader'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './loader-root.css.js'
+import { styles } from './loader-root.generated.css.js'
 
 /**
  * @summary Shows that work of unknown length is in progress.

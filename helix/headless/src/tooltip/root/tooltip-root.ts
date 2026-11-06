@@ -121,6 +121,8 @@ const warmth = (): Warmth => {
  * @csspart surface-right - Added to `surface` while the bubble is right of its trigger.
  * @csspart surface-top - Added to `surface` while the bubble is above its trigger.
  *
+ * @cssstate aligned-end - While the bubble is aligned to the end of the side it sits on.
+ * @cssstate aligned-start - While the bubble is aligned to the start of the side it sits on.
  * @cssstate entering - From the moment the bubble shows until its entrance has finished.
  * @cssstate exiting - From the moment the bubble hides until its exit has finished.
  * @cssstate open - While the tooltip shows.
@@ -411,6 +413,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        a document cannot reach its host's state. */
     onPlace: (placement) => {
       const side = sideOf(placement)
+      /* And the end of that side, as `Popover` records it. */
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')

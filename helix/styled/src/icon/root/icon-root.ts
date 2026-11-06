@@ -2,7 +2,7 @@ import { customElement, numberConverter } from '@fusion.dev/helix-core'
 import { HelixHeadlessIcon } from '@fusion.dev/helix-headless/icon/root'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './icon-root.css.js'
+import { styles } from './icon-root.generated.css.js'
 
 /**
  * @summary A named icon from the Helix set.

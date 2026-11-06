@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFormatDate } from '@fusion.dev/helix-headless/format-date'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './format-date-root.css.js'
+import { styles } from './format-date-root.generated.css.js'
 
 /**
  * @summary A timestamp, formatted for the user's locale.

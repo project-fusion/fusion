@@ -1,62 +1,19 @@
-/* The bar needs something behind it and something to scroll before the two
-   appearances differ at all: a 72% white pane over a white page is an opaque
-   white pane, and a page that never scrolls never draws its separating rule.
-   `opaque.css` is the same file, so flipping between the two examples changes
-   one attribute and nothing else.
+/* The hooks the TSX sets in its styles, for the HTML twin, which takes no
+   inline style. `opaque.css` is the same file, so flipping between the two
+   examples changes one attribute and nothing else.
 
-   The scroller is the frame's own document, which is the one the component
-   listens to: the custom state `scrolled` is set from `window.scrollY`, so a bar inside an
-   overflowing div would never lift. */
-.page {
-  display: flex;
-  flex-direction: column;
-  min-block-size: 240vh;
+   The band is in the tint, so the bar reads over it in either mode, and the
+   header's `overlay` starts it behind the bar. Its padding, one length
+   on every side as a phone takes it, clears the bar. */
+helix-card[separation="filled"] {
+  --card-background-color: var(--helix-color-primary-subtle);
+  --card-color: var(--helix-color-foreground);
+  --card-padding: var(--helix-space-3xl);
+  --card-radius: 0;
 }
 
-/* Ruled rather than plain, because blur is only visible on detail: a smooth
-   gradient blurs to itself, so a band of flat color would show the
-   translucency and none of the blur. The heading is set large for the same
-   reason, so its strokes pass under the bar rather than beside it.
-
-   Pulled up by the height of the bar and padded back down by it, so the band
-   starts *behind* the banner rather than below it. Without that the two
-   appearances are the same picture until the reader scrolls. It is also what a
-   page with a glass header actually does with its hero.
-
-   **In the tint, so the bar reads over it in either mode.** The bar's text is
-   the page's ink, and glass lets the band through. A solid `primary-surface`
-   band is the opposite of the page with no brand set, black in light and
-   near-white in dark, and the bar's text failed against it in both. The tint
-   keeps the page's polarity and still carries the brand where one is set. */
-.band {
-  align-content: center;
-  margin-block-start: calc(var(--helix-size-header) * -1);
-  background-color: var(--helix-color-primary-subtle);
-  background-image:
-    repeating-linear-gradient(
-      to right,
-      transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
-    ),
-    repeating-linear-gradient(
-      to bottom,
-      transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
-    );
-  display: grid;
-  gap: var(--helix-space-sm);
-  min-block-size: 60vh;
-  padding: var(--helix-space-2xl);
-  padding-block-start: calc(var(--helix-size-header) + var(--helix-space-2xl));
-}
-
-.band helix-text {
-  color: var(--helix-color-foreground);
-}
-
-.prose {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-lg);
-  padding: var(--helix-space-2xl);
+helix-card[separation="plain"] {
+  --card-color: var(--helix-color-foreground);
+  --card-gap: var(--helix-space-lg);
+  --card-padding: var(--helix-space-2xl);
 }

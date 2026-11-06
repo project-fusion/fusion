@@ -1,18 +1,22 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
       <helix-button
-        command="--show"
-        commandfor="sheet"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Open filters
       </helix-button>
 
       <helix-drawer
-        id="sheet"
         label="Filters"
+        onClose={() => setOpen(false)}
+        open={open}
         placement="bottom"
         snap-points="0.5 1"
       >
@@ -25,16 +29,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setOpen(false)}>Clear</helix-button>
           <helix-button
-            command="--close"
-            commandfor="sheet"
-          >
-            Clear
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="sheet"
             emphasis="solid"
+            onClick={() => setOpen(false)}
             tone="primary"
           >
             Apply

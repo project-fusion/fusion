@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessPopover } from '@fusion.dev/helix-headless/popover'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './popover-root.css.js'
+import { styles } from './popover-root.generated.css.js'
 
 /**
  * @summary A panel that opens next to its trigger and holds any content.
@@ -12,9 +12,9 @@ import { styles } from './popover-root.css.js'
  * inside it. The panel sets its own inset, as `Dialog` and `Drawer` do, because
  * every use needed the same one.
  *
- * The panel animates in from the side it opened on. The positioning writes
- * `data-placement`, so the panel animates from the trigger's side, including
- * after it flips.
+ * The panel animates in from the side it opened on. The host is in the
+ * `placed-` state of the side the panel landed on, so the panel animates from
+ * the trigger's side, including after it flips.
  *
  * @since 0.1.0
  * @status stable

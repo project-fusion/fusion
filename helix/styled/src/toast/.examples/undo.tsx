@@ -1,19 +1,23 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 const FILES = ['Quarterly report.pdf', 'Roadmap.key']
 
+type Archived = { at: number; name: string }
+
 export function Example() {
   const [files, setFiles] = useState(FILES)
-  const stack = useRef<HTMLElementTagNameMap['helix-toast']>(null)
+  const [archived, setArchived] = useState<Archived[]>([])
 
   /* The action happens at once. The message offers to take it back, which
      replaces asking first. */
   const archive = (name: string) => {
-    const before = files
-    setFiles(files.filter((one) => one !== name))
-    void stack.current?.undoable(`Archived ${name}`, {
-      undo: () => setFiles(before),
-    })
+    setFiles((before) => before.filter((one) => one !== name))
+    setArchived((before) => [...before, { at: FILES.indexOf(name), name }])
+  }
+
+  const undo = (one: Archived) => {
+    setFiles((before) => [...before, one.name].sort((a, b) => FILES.indexOf(a) - FILES.indexOf(b)))
+    setArchived((before) => before.filter((other) => other !== one))
   }
 
   return (
@@ -38,11 +42,24 @@ export function Example() {
         ))}
       </helix-list>
 
-      <helix-toast
-        label="Notifications"
-        placement="bottom-end"
-        ref={stack}
-      />
+      <helix-toast placement="bottom-end">
+        {archived.map((one) => (
+          <helix-toast-item
+            dismissible
+            duration={8000}
+            key={`${one.name}-${one.at}`}
+            onhelix-dismiss={() => setArchived((before) => before.filter((other) => other !== one))}
+          >
+            {`Archived ${one.name}`}
+            <helix-button
+              onClick={() => undo(one)}
+              slot="actions"
+            >
+              Undo
+            </helix-button>
+          </helix-toast-item>
+        ))}
+      </helix-toast>
     </helix-flex>
   )
 }

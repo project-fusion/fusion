@@ -1,56 +1,83 @@
-import './smooth-with-offset.css'
-
 export function Example() {
   return (
-    <div className="layout">
+    <helix-flex
+      align-items="start"
+      gap="xl"
+      layout="flank"
+      style={{ '--flex-flank-size': '12rem' }}
+    >
       <helix-outline
         behavior="smooth"
-        className="nav"
         label="On this page"
         offset={72}
+      ></helix-outline>
+      <helix-grid
+        gap="2xl"
+        style={{
+          '--grid-columns': 'minmax(0, 1fr)',
+          '--grid-rows': 'repeat(3, minmax(30rem, auto))',
+        }}
       >
-        <a href="#install">Install</a>
-        <a href="#usage">Usage</a>
-        <a href="#api">API</a>
-      </helix-outline>
-
-      <div className="prose">
-        <section id="install">
-          <helix-text
-            as="h2"
-            scale="title"
+        <helix-outline-section
+          anchor="install"
+          label="Install"
+        >
+          <helix-flex
+            direction="column"
+            gap="xs"
           >
-            Install
-          </helix-text>
-          <helix-text as="p">
-            Install the package with your package manager, then import it in the entry file of your
-            app.
-          </helix-text>
-        </section>
-        <section id="usage">
-          <helix-text
-            as="h2"
-            scale="title"
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              Install
+            </helix-text>
+            <helix-text as="p">
+              Install the package with your package manager, then import it in the entry file of
+              your app.
+            </helix-text>
+          </helix-flex>
+        </helix-outline-section>
+        <helix-outline-section
+          anchor="usage"
+          label="Usage"
+        >
+          <helix-flex
+            direction="column"
+            gap="xs"
           >
-            Usage
-          </helix-text>
-          <helix-text as="p">
-            Create a client with your API key, then call its methods to read and write your data.
-          </helix-text>
-        </section>
-        <section id="api">
-          <helix-text
-            as="h2"
-            scale="title"
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              Usage
+            </helix-text>
+            <helix-text as="p">
+              Create a client with your API key, then call its methods to read and write your data.
+            </helix-text>
+          </helix-flex>
+        </helix-outline-section>
+        <helix-outline-section
+          anchor="api"
+          label="API"
+        >
+          <helix-flex
+            direction="column"
+            gap="xs"
           >
-            API
-          </helix-text>
-          <helix-text as="p">
-            Each method returns a promise. Errors include a code and a message you can show to your
-            users.
-          </helix-text>
-        </section>
-      </div>
-    </div>
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              API
+            </helix-text>
+            <helix-text as="p">
+              Each method returns a promise. Errors include a code and a message you can show to
+              your users.
+            </helix-text>
+          </helix-flex>
+        </helix-outline-section>
+      </helix-grid>
+    </helix-flex>
   )
 }

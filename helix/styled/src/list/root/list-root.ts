@@ -5,7 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './list-root.css.js'
+import { styles } from './list-root.generated.css.js'
 
 /**
  * @summary A set of rows, announced as a list.
@@ -17,7 +17,7 @@ import { styles } from './list-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category data
- * @aliases Rows, Stack, Menu
+ * @aliases Grid list, Rows, Stack
  * @documentation https://fusion.dev/helix/components/list
  *
  * @cssproperty --list-bleed - How far a row's fill reaches past its words with `bleed`. Defaults to `--helix-space-row-bleed`, which follows the density.
