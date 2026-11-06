@@ -118,7 +118,7 @@ describe('the sentences a data table says in English', () => {
     const element = await table()
     element.filter = 'row'
     await settle(element)
-    expect(said(element)).toBe('1,500 results')
+    expect(said(element)).toBe('1,500 of 1,500 rows')
     element.sort = 'name:asc'
     await settle(element)
     expect(said(element)).toBe('Sorted by Name, ascending')
@@ -131,6 +131,6 @@ describe('the sentences a data table says in English', () => {
     expect(said(element)).toBe('Just 1 row')
     element.filter = 'row 149'
     await settle(element)
-    expect(said(element)).toBe('11 results')
+    expect(said(element)).toBe('11 of 1,500 rows')
   })
 })

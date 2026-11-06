@@ -32,7 +32,7 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
 import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
-import { readFilterText } from '../grammar.js'
+import { type FilterGrammarField, readFilterText } from '../grammar.js'
 import {
   completeTerm,
   currentField,
@@ -42,6 +42,15 @@ import {
   suggests,
   tokenEntry,
 } from '../suggest.js'
+import {
+  type BoundTable,
+  facetOf,
+  filterableColumns,
+  filtersAfter,
+  isBoundTable,
+  tableFields,
+  tableSource,
+} from '../table.js'
 
 /**
  * A picker that holds what is ticked for its fields, which is what `FilterMenu`
@@ -410,6 +419,21 @@ export class HelixHeadlessFilterInput extends MixinVoice(
   source?: FilterSource | undefined
 
   /**
+   * The id of a `DataTable` the field filters, in the same document or
+   * shadow root.
+   *
+   * Bound, the field searches the table as you type and offers each
+   * `filterable` column as a filter. Typing `status:open` makes a chip, and
+   * the suggestions list the columns and then a column's values, each with how
+   * many rows hold it. Every chip is a filter in the table's `view`, and a
+   * change to the view from anywhere else redraws the chips. Filters on
+   * different columns all have to match, and the values in one chip are any
+   * of. A `source` you set wins over the table's suggestions.
+   */
+  @property()
+  for = ''
+
+  /**
    * What a reader hears for one suggestion, where `suggestions-label` should
    * not say it. `{count}` is the count.
    *
@@ -677,6 +701,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     const control = event.target as HTMLInputElement
     this.requestValue(control.value)
     restoreValue(control, this.value)
+    this.searchTable()
     /* Typing is the reader saying something new, so an Escape they pressed over
        the old text no longer stands. The panel comes back on the next render, by
        which time the consumer has answered with suggestions for what is there
@@ -762,10 +787,102 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * notification, which is sent only for a filter that stood.
    */
   private readonly handleFacet = (event: Event): void => {
+    const facet = (event as CustomEvent<FacetDetail>).detail
+    const table = this.boundTable
+    if (table && filterableColumns(table).some((column) => column.field === facet.field)) {
+      /* The table's view holds the filter, and the chips follow the view. */
+      table.requestView({ filters: filtersAfter(table.view.filters, facet) })
+      this.drawTableChips()
+      return
+    }
     if (this.chips) {
-      this.drawChip((event as CustomEvent<FacetDetail>).detail)
+      this.drawChip(facet)
     }
   }
+
+  /** The fields the grammar reads: the ones declared, then a bound table's. */
+  private get vocabularies(): FilterGrammarField[] {
+    const declared = this.fields.map((field) => field.vocabulary)
+    const table = this.boundTable
+    if (!table) {
+      return declared
+    }
+    const names = new Set(declared.map((field) => field.name))
+    return [...declared, ...tableFields(table).filter((field) => !names.has(field.name))]
+  }
+
+  /** The table named by `for`, once it is defined. */
+  private get boundTable(): BoundTable | null {
+    if (this.for === '' || typeof document === 'undefined') {
+      return null
+    }
+    const scope = this.getRootNode() as Document | ShadowRoot
+    const found = scope.getElementById?.(this.for) ?? null
+    return isBoundTable(found) ? found : null
+  }
+
+  /** The table this field listens to, so it can stop. */
+  private listened: BoundTable | null = null
+
+  /** Listens to the table named by `for`, and to no other. */
+  private bindTable(): void {
+    const table = this.boundTable
+    if (table === this.listened) {
+      return
+    }
+    this.listened?.removeEventListener('helix-view-change', this.handleTableView)
+    this.listened = table
+    table?.addEventListener('helix-view-change', this.handleTableView)
+    if (table) {
+      this.drawTableChips()
+    }
+  }
+
+  /** The table's view changed, from this field or from anywhere else. */
+  private readonly handleTableView = (): void => {
+    this.drawTableChips()
+  }
+
+  /** Draws a chip for each filter in the bound table's view, and takes away the rest. */
+  private drawTableChips(): void {
+    const table = this.boundTable
+    if (!table) {
+      return
+    }
+    const fields = new Set(filterableColumns(table).map((column) => column.field))
+    const facets = table.view.filters
+      .map((filter) => facetOf(table, filter))
+      .filter((facet): facet is FacetDetail => facet !== undefined)
+    for (const field of fields) {
+      const facet = facets.find((one) => one.field === field)
+      this.drawChip(
+        facet ?? { arity: 'many', field, label: '', operator: '', operatorLabel: '', values: [] },
+      )
+    }
+  }
+
+  /** Searches a bound table by the text left once the filters are read out. */
+  private searchTable(): void {
+    const table = this.boundTable
+    if (table && table.view.query !== this.value) {
+      table.requestView({ query: this.value })
+    }
+  }
+
+  /** The suggestions: yours where you set `source`, and a bound table's otherwise. */
+  private get suggestionSource(): FilterSource | undefined {
+    if (this.source) {
+      return this.source
+    }
+    if (this.for === '') {
+      return undefined
+    }
+    this.tableSuggestions ??= tableSource(() => this.boundTable, suggests)
+    return this.tableSuggestions
+  }
+
+  /** The table's suggestions, made once so the field does not ask again for a new function. */
+  private tableSuggestions: FilterSource | undefined = undefined
 
   /** Adds, updates or removes the chip for one filter. See `chips`. */
   private drawChip(facet: FacetDetail): void {
@@ -823,8 +940,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
        picker was taken, so a chip for `assignee`, declared outside the menu
        because its values cannot be listed, sent `helix-dismiss` where every
        other declared chip sent `helix-before-facet`. */
-    const declared =
-      field === '' ? undefined : this.fields.find((one) => (one.name ?? '') === field)
+    const declared = field === '' ? undefined : this.vocabularies.find((one) => one.name === field)
     if (!declared) {
       return
     }
@@ -835,7 +951,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
       menu.apply(field, [])
       return
     }
-    const { label, operators } = declared.vocabulary
+    const { label, operators } = declared
     const usual = operators.find((operator) => operator.default) ?? operators[0]
     this.announceFacet({
       arity: usual?.arity ?? 'many',
@@ -861,14 +977,11 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * silently emptied itself of a filter they did not take.
    */
   private readFilters(): number {
-    const fields = this.fields
+    const fields = this.vocabularies
     if (fields.length === 0) {
       return 0
     }
-    const reading = readFilterText(
-      this.value,
-      fields.map((field) => field.vocabulary),
-    )
+    const reading = readFilterText(this.value, fields)
     if (reading.terms.length === 0) {
       return 0
     }
@@ -887,6 +1000,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     }
 
     this.requestValue([...refused, reading.text].filter(Boolean).join(' '))
+    this.searchTable()
     const control = this.control
     if (control) {
       restoreValue(control, this.value)
@@ -981,10 +1095,10 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    */
   private resetSource(): void {
     /* Asked already, as focus arriving with the new source in place does. */
-    if (this.source === this.used) {
+    if (this.suggestionSource === this.used) {
       return
     }
-    this.used = this.source
+    this.used = this.suggestionSource
     this.request?.abort()
     this.request = undefined
     this.fetching = false
@@ -992,14 +1106,17 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     if (this.sourced.length > 0) {
       this.drawSourced([])
     }
-    if (this.source && (this.matches(':focus-within') || this.contains(document.activeElement))) {
+    if (
+      this.suggestionSource &&
+      (this.matches(':focus-within') || this.contains(document.activeElement))
+    ) {
       this.ask()
     }
   }
 
   /** Asks `source` once typing rests for `filterDelay`, or at once without one. */
   private askSoon(): void {
-    if (!this.source) {
+    if (!this.suggestionSource) {
       return
     }
     this.asking.cancel()
@@ -1020,7 +1137,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    */
   private ask(): void {
     this.asking.cancel()
-    const source = this.source
+    const source = this.suggestionSource
     if (!source) {
       return
     }
@@ -1301,7 +1418,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     /* What can be typed here, before anything is: the keys a source offers
        for an empty field. Once for each text, so focus moving between the
        text and a token asks nothing. */
-    if (this.source && this.asked !== this.value) {
+    if (this.suggestionSource && this.asked !== this.value) {
       this.ask()
     }
   }
@@ -1391,6 +1508,8 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     this.removeEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.removeEventListener(HelixFacetEvent.eventName, this.handleFacet)
     this.removeEventListener('helix-before-select', this.handleSourcedSelect)
+    this.listened?.removeEventListener('helix-view-change', this.handleTableView)
+    this.listened = null
     this.request?.abort()
     this.request = undefined
     this.fetching = false
@@ -1452,9 +1571,10 @@ export class HelixHeadlessFilterInput extends MixinVoice(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    if (changed.has('source')) {
+    if (changed.has('source') || changed.has('for')) {
       queueMicrotask(() => this.resetSource())
     }
+    this.bindTable()
     this.releaseCaret?.()
     this.releaseCaret = undefined
     /* The text as the restore state, because with tokens the value is a
