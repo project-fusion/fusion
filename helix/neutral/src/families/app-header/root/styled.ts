@@ -67,7 +67,7 @@ export default styles(
     const easing = token('easing-standard')
     const glass = {
       backdropFilter: hook.backdrop(token('material-backdrop')),
-      backgroundColor: hook.backgroundColor(token('material-translucent')),
+      backgroundColor: hook.backgroundColor(token('material-panel')),
     }
     return [
       include(densitySm),
