@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-subtle: light-dark(#eef4ff, #1d2433);
+}
+
+helix-headless-selection-bar {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  border-radius: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+helix-headless-selection-bar::part(count) {
+  flex: 1;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template);
+}
+
+helix-headless-data-table::part(cell),
+helix-headless-data-table::part(select) {
+  border-block-end: 1px solid var(--_gray-edge);
+  padding: 0.5rem 0.75rem;
+}
