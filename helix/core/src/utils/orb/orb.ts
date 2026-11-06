@@ -9,9 +9,6 @@ import {
   evenSphere,
   fibonacci,
   meshFor,
-  ORB_STATES,
-  type OrbParams,
-  type OrbState,
   orbPoint,
   paramsFor,
   project,
@@ -19,8 +16,10 @@ import {
   stateDistance,
   TRAIL,
 } from './shapes.js'
+import { ORB_STATES, type OrbParams, type OrbState } from './states.js'
 
 export * from './shapes.js'
+export * from './states.js'
 
 /** The shortest change of state, in ms, and what the longest adds to it. */
 const MORPH_NEAR = 380
