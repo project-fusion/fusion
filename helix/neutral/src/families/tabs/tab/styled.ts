@@ -1,4 +1,4 @@
-import { difference, first, list, product, quotient, token, web } from '../../../style.js'
+import { difference, first, fn, list, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import tab from './headless.js'
 
@@ -21,7 +21,8 @@ export default styles(
       dismissColor: 'currentColor',
       fontSize: token('text-control'),
       fontWeight: token('weight-medium'),
-      hoverBackgroundColor: token('color-hover'),
+      /* The set's hover wash, quieter beside the default pill. */
+      hoverBackgroundColor: first(own.tabHoverSurface, token('color-hover')),
       hoverColor: token('color-foreground'),
       maxInlineSize: 'none',
       paddingInline: token('space-sm'),
@@ -31,6 +32,7 @@ export default styles(
     }),
     own: {
       tabHeight: null,
+      tabHoverSurface: null,
       tabInlineSize: 'auto',
       tabJustify: 'center',
       tabRadius: null,
@@ -47,6 +49,10 @@ export default styles(
          Only once a page caps a tab: unset, a tab is its label's width, so a strip
          with more than fits scrolls rather than squeezing every name. */
       rule({ maxInlineSize: '100%', minInlineSize: 0, position: 'relative' }),
+      /* Its own stacking context, so the close mark's press stands over the tab's. */
+      web([rule({ isolation: 'isolate' })]),
+      /* Where the pointer is coarse the presses reach past the tab. */
+      web([rule({ coarsePointer: true }, { overflow: 'visible' })]),
       rule({
         alignItems: 'center',
         backgroundColor: 'transparent',
@@ -120,6 +126,11 @@ export default styles(
         },
       ),
       rule({ active: true, disabled: false }, { backgroundColor: token('color-press') }),
+      /* Forced colors: the selected tab's edge is the system's highlight. */
+      web([
+        rule({ forcedColors: true }, { borderBlockEndColor: 'Canvas' }),
+        rule({ forcedColors: true, selected: true }, { borderBlockEndColor: 'Highlight' }),
+      ]),
     ]),
     /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
        moves. Where the control is already that size the box sits inside it. */
@@ -138,6 +149,7 @@ export default styles(
         minInlineSize: 0,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
+        web: { textAlign: 'match-parent' },
       }),
       /* **The label is centered on its capitals.** Trimmed to its cap height and
          given back half the leading at each end, the label box is one line tall as
@@ -167,6 +179,7 @@ export default styles(
         padding: token('space-none'),
         position: 'relative',
         transition: ['opacity', token('duration-fast'), token('easing-standard')],
+        zIndex: token('layer-raised'),
       }),
       /* The mark shows on the current tab, under the pointer, and while the tab
          holds focus. Where nothing can hover, as on a phone, it always shows. */
@@ -177,18 +190,27 @@ export default styles(
     ]),
     /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
        moves. Where the control is already that size the box sits inside it. */
+    /* Toward the end only, so it does not take the press from the words before it. */
     on({ after: 'dismiss' }, [
       web([
         rule({
           content: '""',
-          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          inlineSize: fn('max', '100%', token('size-target')),
+          insetBlock: quotient(difference(token('size-target'), '100%'), '-2'),
+          insetInlineStart: product(token('space-2xs'), '-1'),
           position: 'absolute',
         }),
       ]),
     ]),
-    on('dismiss-mark', [rule({ blockSize: '1em', inlineSize: '1em' })]),
+    on('dismiss-mark', [
+      rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
+    ]),
     on({ region: 'dismiss-icon', slotted: '*' }, [
-      rule({ '--icon-size': '1em', blockSize: '1em', inlineSize: '1em' }),
+      rule({
+        '--icon-size': token('size-icon-tight'),
+        blockSize: token('size-icon-tight'),
+        inlineSize: token('size-icon-tight'),
+      }),
     ]),
   ],
 )
