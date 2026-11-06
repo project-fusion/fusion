@@ -54,3 +54,8 @@ helix-headless-data-table::part(select) {
   padding-inline: 0 1rem;
   text-align: var(--data-table-cell-align);
 }
+
+helix-headless-selection-bar::part(actions) {
+  display: flex;
+  gap: 0.25rem;
+}
