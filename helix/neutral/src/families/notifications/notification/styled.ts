@@ -8,6 +8,7 @@ import {
   native,
   product,
   quotient,
+  scheme,
   sum,
   token,
   web,
@@ -81,7 +82,6 @@ export default styles(
       { feedFilled: true },
       { feedOutlined: true },
     ]
-    const filled = [{ separation: 'filled' as const }, { feedFilled: true }]
     return [
       on('host', [
         rule({
@@ -108,8 +108,12 @@ export default styles(
             { own: { notificationsSwap: '1' } },
           ),
         ]),
-        rule(filled, {
-          '--avatar-background-color': mix(token('color-foreground'), 8, 'transparent'),
+        /* An avatar's disc steps off the row in light and takes the raised rung in dark. */
+        rule({
+          '--avatar-background-color': scheme(
+            mix(token('color-foreground'), 8, 'transparent'),
+            token('color-surface-raised'),
+          ),
         }),
       ]),
       on('item', [
@@ -131,7 +135,18 @@ export default styles(
           boxShadow: token('shadow-surface'),
         }),
         /* `filled` is the fill alone. */
-        rule(filled, { backgroundColor: hook.itemFill, borderColor: 'transparent' }),
+        rule(
+          { separation: 'filled' },
+          { backgroundColor: hook.itemFill, borderColor: 'transparent' },
+        ),
+        /* In a filled feed, the filled wash, which steps off whatever the feed is on. */
+        rule(
+          { feedFilled: true },
+          {
+            backgroundColor: hook.itemFill(token('color-surface-filled')),
+            borderColor: 'transparent',
+          },
+        ),
         rule(
           { focusVisible: true },
           {
@@ -244,7 +259,7 @@ export default styles(
           rule({
             textDecoration: 'underline',
             textDecorationColor: mix('currentcolor', 35, 'transparent'),
-            textDecorationThickness: '1px',
+            textDecorationThickness: token('border-thin'),
             textUnderlineOffset: '0.25em',
           }),
         ]),
@@ -270,6 +285,8 @@ export default styles(
         native([rule({ flexDirection: 'row', opacity: 1 })]),
       ]),
       on('trailing', [
+        /* With no time and no control, there is nothing to stand at the end. */
+        rule({ controls: false, time: false }, { display: 'none' }),
         rule({
           alignItems: 'center',
           alignSelf: 'start',
@@ -386,6 +403,7 @@ export default styles(
           web: { cursor: 'pointer', placeItems: 'center' },
         }),
         rule({ hover: true }, { backgroundColor: mix('currentcolor', 12, 'transparent') }),
+        rule({ active: true }, { backgroundColor: token('color-press') }),
         rule(
           { focusVisible: true },
           {

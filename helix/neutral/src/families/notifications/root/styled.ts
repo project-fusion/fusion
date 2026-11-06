@@ -64,6 +64,8 @@ export default styles(
         alignItems: 'center',
         borderBlockEnd: [token('border-thin'), 'solid', hook.rule],
         display: 'flex',
+        /* A long heading wraps the mark-all control under it, rather than past the edge. */
+        flexWrap: 'wrap',
         gap: token('space-sm'),
         justifyContent: 'space-between',
         paddingBlock: token('space-sm'),
@@ -75,7 +77,11 @@ export default styles(
     ]),
     on('list', [
       rule({ overflowY: 'auto' }),
-      rule({ separation: ['filled', 'outlined'] }, { paddingBlockStart: hook.itemGap }),
+      /* Boxed, the gap stands before the first box and at the sides too. */
+      rule(
+        { separation: ['filled', 'outlined'] },
+        { paddingBlockStart: hook.itemGap, paddingInline: hook.itemGap },
+      ),
       web([rule({ print: true }, { overflowY: 'visible' })]),
       native([rule({ flexShrink: 1, minBlockSize: 0 })]),
     ]),
@@ -87,6 +93,17 @@ export default styles(
       }),
       rule({ part: { 'data-empty': true } }, { display: 'none' }),
     ]),
+    /* Boxed, the header and the footer keep their words over the boxes' own inset. */
+    on(
+      ['header', 'footer'],
+      [
+        rule(
+          { separation: ['filled', 'outlined'] },
+          { paddingInline: sum(hook.paddingInline, hook.itemGap) },
+        ),
+      ],
+    ),
+    on({ region: 'header', slotted: '*' }, [web([rule({ flex: [1, 1, 'min-content'] })])]),
     on({ part: 'list', selector: '::slotted(helix-notification:last-of-type)' }, [
       web([rule({ '--notifications-rule': 'transparent' })]),
     ]),
@@ -108,6 +125,10 @@ export default styles(
         web: { cursor: 'pointer', whiteSpace: 'nowrap' },
       }),
       rule({ hover: true }, { color: token('color-foreground') }),
+      rule(
+        { active: true },
+        { backgroundColor: token('color-press'), color: token('color-foreground') },
+      ),
       rule(
         { focusVisible: true },
         {
@@ -189,5 +210,7 @@ export default styles(
     ),
     include(collectionError),
     on('error', [rule({ color: hook.errorColor })]),
+    /* What the `error` slot holds, such as a button that tries again, a step after the words. */
+    on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
   ],
 )
