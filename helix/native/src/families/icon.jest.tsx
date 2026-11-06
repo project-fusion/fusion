@@ -75,6 +75,7 @@ const asked = (name: string) => {
 }
 
 /** Shows the theme's foreground, as the theme draws it. */
+const Tight = () => <View testID={`tight ${useTokens()['size-icon-tight']}`} />
 const Foreground = () => <View testID={`foreground ${useTokens()['color-foreground']}`} />
 
 describe('the generated Icon', () => {
@@ -145,15 +146,20 @@ describe('the size', () => {
   test('takes `--icon-size` from the element around it, as a tab sizes its close glyph', async () => {
     await render(
       themed(
-        <HelixTabs>
-          <HelixTab dismissIcon={<HelixIcon name="x-circle" />} dismissible value="a">
-            Alpha
-          </HelixTab>
-        </HelixTabs>,
+        <>
+          <HelixTabs>
+            <HelixTab dismissIcon={<HelixIcon name="x-circle" />} dismissible value="a">
+              Alpha
+            </HelixTab>
+          </HelixTabs>
+          <Tight />
+        </>,
       ),
     )
-    /* An em of the tab's words, `1em` in `--icon-size`. */
-    expect(asked('x-circle').height).toBe(styleOf(screen.getByText('Alpha')).fontSize)
+    /* The tight icon step, which the tab writes in `--icon-size` for its close glyph. */
+    expect(asked('x-circle').height).toBe(
+      Number(screen.getByTestId(/^tight /).props.testID.slice(6)),
+    )
   })
 })
 
