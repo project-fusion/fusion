@@ -78,9 +78,7 @@ export default fragment(
         ),
       ],
     ),
-    on('groove', [
-      rule({ shape: 'ring' }, { stroke: hook.trackColor(token('color-surface-sunken')) }),
-    ]),
+    on('groove', [rule({ shape: 'ring' }, { stroke: hook.trackColor(token('color-track')) })]),
     /* `pathLength="100"` makes the dash the percentage itself. `scale: none`
        undoes the bar's, which would leave the circle a pixel wide. */
     on('indicator', [
@@ -104,7 +102,7 @@ export default fragment(
           animation: [
             'helix-progress-ring-sweep',
             product(own.progressCycle, 0.7),
-            'ease-in-out',
+            token('easing-cycle'),
             'infinite',
           ],
           transition: 'none',

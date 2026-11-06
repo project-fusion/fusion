@@ -38,7 +38,7 @@ export default styles(
       labelSize: token('text-sm'),
       radius: token('radii-full'),
       size: token('size-progress'),
-      trackColor: token('color-surface-sunken'),
+      trackColor: token('color-track'),
       transitionDuration: token('duration-normal'),
       valueColor: token('color-foreground-muted'),
       valueGap: token('space-sm'),
@@ -71,7 +71,13 @@ export default styles(
          motion, a fixed rate, since every duration token is near zero then. */
       rule(
         { indeterminate: true },
-        { own: { progressCrawl: '19.2s', progressCycle: product(token('duration-slow'), 5) } },
+        {
+          /* `duration-crawl`, the rate every other ring crawls at. */
+          own: {
+            progressCrawl: token('duration-crawl'),
+            progressCycle: product(token('duration-slow'), 5),
+          },
+        },
       ),
     ]),
     /* A label above a bar, across the whole row when the reading sits

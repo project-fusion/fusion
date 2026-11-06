@@ -8,6 +8,7 @@ import {
   native,
   product,
   quotient,
+  scheme,
   token,
   web,
 } from '../../../style.js'
@@ -49,13 +50,13 @@ export default styles(
       ringWidth: token('size-progress'),
       size: token('size-meter'),
       tickColor: token('color-background'),
-      trackColor: token('color-surface-sunken'),
+      trackColor: token('color-track'),
       transitionDuration: token('duration-normal'),
       valueColor: token('color-foreground-muted'),
       valueGap: token('space-sm'),
       valueSize: token('text-xs'),
     },
-    own: { meterHue: null, meterSpan: null, meterStroke: null },
+    own: { meterHue: null, meterSpan: null, meterStroke: null, meterSubtle: null },
     props: { emphasis: oneOf(['subtle']) },
     stylesheet: 'meter/root/meter-root.generated.css',
   },
@@ -305,13 +306,35 @@ export default styles(
     /* Subtle, against `--_meter-hue`, so one pair of rules quietens every
        color in every shape. */
     on('indicator', [
-      rule({ emphasis: 'subtle' }, { backgroundColor: mix(own.meterHue, 30, hook.trackColor) }),
+      /* **72% of the hue in light and 65% in dark, so the fill clears 3:1 against
+         its track**, a wash it is mixed into, so the fill steps off a card with
+         the track (November 4, 2026). */
+      rule(
+        { emphasis: 'subtle' },
+        {
+          backgroundColor: own.meterSubtle,
+          own: {
+            meterSubtle: scheme(
+              mix(own.meterHue, 72, hook.trackColor),
+              mix(own.meterHue, 65, hook.trackColor),
+            ),
+          },
+        },
+      ),
       rule(
         [
           { emphasis: 'subtle', shape: 'arc' },
           { emphasis: 'subtle', shape: 'ring' },
         ],
-        { stroke: mix(own.meterHue, 30, hook.trackColor) },
+        {
+          own: {
+            meterSubtle: scheme(
+              mix(own.meterHue, 72, hook.trackColor),
+              mix(own.meterHue, 65, hook.trackColor),
+            ),
+          },
+          stroke: own.meterSubtle,
+        },
       ),
       rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
       rule({ forcedColors: true, 'data-band': true }, { backgroundColor: own.meterHue }),

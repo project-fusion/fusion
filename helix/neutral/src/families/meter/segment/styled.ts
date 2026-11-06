@@ -1,5 +1,14 @@
 import { oneOf } from '../../../render.js'
-import { fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
+import {
+  fn,
+  hookOf,
+  inherited,
+  measured,
+  product,
+  quotient,
+  scheme,
+  token,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import segment from './headless.js'
 
@@ -26,7 +35,7 @@ export default styles(
   {
     prefix: 'meter-segment',
     hooks: ({ own }) => ({
-      color: own.meterSegmentHue(token('color-series-1')),
+      color: own.meterSegmentHue(scheme(token('color-series-1'), token('color-series-9'))),
       gapColor: token('color-background'),
     }),
     own: { meterSegmentHue: null },
@@ -40,17 +49,97 @@ export default styles(
   ({ hook, on, rule }) => [
     on('host', [
       rule({ display: 'contents' }),
-      rule({ ofType: 1 }, { own: { meterSegmentHue: token('color-series-1') } }),
-      rule({ ofType: 2 }, { own: { meterSegmentHue: token('color-series-2') } }),
-      rule({ ofType: 3 }, { own: { meterSegmentHue: token('color-series-3') } }),
-      rule({ ofType: 4 }, { own: { meterSegmentHue: token('color-series-4') } }),
-      rule({ ofType: 5 }, { own: { meterSegmentHue: token('color-series-5') } }),
-      rule({ ofType: 6 }, { own: { meterSegmentHue: token('color-series-6') } }),
-      rule({ ofType: 7 }, { own: { meterSegmentHue: token('color-series-7') } }),
-      rule({ ofType: 8 }, { own: { meterSegmentHue: token('color-series-8') } }),
-      rule({ ofType: 9 }, { own: { meterSegmentHue: token('color-series-9') } }),
-      rule({ ofType: 10 }, { own: { meterSegmentHue: token('color-series-10') } }),
-      rule({ ofType: 11 }, { own: { meterSegmentHue: token('color-series-11') } }),
+      /* **In dark a segment starts from the balanced eight, as a chart does**:
+         the bright eight are drawn for the light page, and the third segment
+         painted #00fede in dark, 16.2:1 on the page beside 5.5 and 5.9. */
+      rule(
+        { ofType: 1 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-1'), token('color-series-9')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 2 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-2'), token('color-series-10')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 3 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-3'), token('color-series-11')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 4 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-4'), token('color-series-12')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 5 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-5'), token('color-series-13')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 6 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-6'), token('color-series-14')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 7 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-7'), token('color-series-15')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 8 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-8'), token('color-series-16')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 9 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-9'), token('color-series-1')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 10 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-10'), token('color-series-2')),
+          },
+        },
+      ),
+      rule(
+        { ofType: 11 },
+        {
+          own: {
+            meterSegmentHue: scheme(token('color-series-11'), token('color-series-3')),
+          },
+        },
+      ),
       rule({ tone: 'accent' }, { own: { meterSegmentHue: token('color-accent') } }),
       rule({ tone: 'danger' }, { own: { meterSegmentHue: token('color-danger') } }),
       rule({ tone: 'info' }, { own: { meterSegmentHue: token('color-info') } }),

@@ -58,11 +58,13 @@ export default styles(
         display: 'inline-grid',
         flexShrink: 0,
         own: {
-          loaderBreathe: '2.4s',
-          loaderCrawl: '4s',
+          /* Three turns, so the breath keeps the turn's rate. The turn and the
+             crawl are the tokens every spinner reads, so two on one page agree. */
+          loaderBreathe: product(token('duration-turn'), 3),
+          loaderCrawl: token('duration-crawl'),
           loaderSize: token('size-loader-md'),
           loaderStroke: 2,
-          loaderTurn: '0.8s',
+          loaderTurn: token('duration-turn'),
         },
         placeItems: 'center',
         verticalAlign: 'middle',
@@ -107,7 +109,7 @@ export default styles(
     ]),
     on('track', [
       rule({
-        animation: ['helix-loader-breathe', own.loaderBreathe, 'ease-in-out', 'infinite'],
+        animation: ['helix-loader-breathe', own.loaderBreathe, token('easing-cycle'), 'infinite'],
         /* The web's circles say `fill="none"` in their markup. */
         fill: 'none',
         opacity: 0.18,
@@ -134,7 +136,12 @@ export default styles(
       rule({
         '--icon-size': own.markSize,
         alignItems: 'center',
-        animation: ['helix-loader-breathe-mark', own.loaderBreathe, 'ease-in-out', 'infinite'],
+        animation: [
+          'helix-loader-breathe-mark',
+          own.loaderBreathe,
+          token('easing-cycle'),
+          'infinite',
+        ],
         blockSize: own.markSize,
         display: 'flex',
         gridArea: '1 / 1',

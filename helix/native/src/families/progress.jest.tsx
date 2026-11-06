@@ -167,7 +167,7 @@ describe('the generated Progress', () => {
       .map((words) => styleOf(words as never).color)
     expect(inks).toEqual([tokens['color-foreground'], tokens['color-foreground']])
     expect(fillOf(all).backgroundColor).toBe(
-      mix(String(tokens['color-primary-surface']), 30, String(tokens['color-surface-sunken'])),
+      mix(String(tokens['color-primary-surface']), 30, String(tokens['color-track'])),
     )
   })
 
@@ -275,7 +275,7 @@ describe('the generated Progress', () => {
     const [, fill] = circlesOf(still.all)
     expect(dashOf(fill)).toBeCloseTo(2 * Math.PI * 28 * 0.25, 2)
     const turning = still.all.find((one) => one.type === 'View' && styleOf(one).width === 64)
-    expect(styleOf(turning as Drawn).animationDuration).toBe(19200)
+    expect(styleOf(turning as Drawn).animationDuration).toBe(tokens['duration-crawl'])
   })
 
   test('grows its words with the reader’s text size, and its bar to the largest standard size', async () => {
