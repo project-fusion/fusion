@@ -3,6 +3,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-2xs);
+  /* **A long answer gives way in a row.** The trigger is a button, whose
+     smallest width is its whole unbroken value, so with the automatic minimum a
+     Select holding a long answer stood 450 pixels wide in a 280 pixel row, in a
+     flex row and in a grid track alike. The value already ends in an ellipsis
+     once there is less room. */
+  min-inline-size: 0;
   position: relative;
 }
 
