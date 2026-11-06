@@ -64,9 +64,9 @@ const drawn = async (element: ReactNode) => {
 /** Each sheen: the layer twice its shape's width. */
 const sheensOf = (all: readonly Drawn[]) => all.filter((one) => styleOf(one).width === '200%')
 
-/** Each shape: the fill a sheen sweeps across. */
+/** Each shape: the fill a sheen sweeps across, 12% of the ink in light. */
 const shapesOf = (all: readonly Drawn[]) =>
-  all.filter((one) => styleOf(one).backgroundColor === 'rgba(0, 0, 0, 0.08)')
+  all.filter((one) => styleOf(one).backgroundColor === 'rgba(0, 0, 0, 0.12)')
 
 describe('the generated Skeleton', () => {
   test('is hidden from screen readers while it is a placeholder with no name', async () => {
@@ -88,11 +88,11 @@ describe('the generated Skeleton', () => {
     expect(host.props.accessibilityElementsHidden).toBeUndefined()
   })
 
-  test('is a block at the control height, a circle at the control step, or a line of text', async () => {
+  test('is a block at the control height, a circle at the avatar step, or a line of text', async () => {
     const block = await drawn(<HelixSkeleton />)
     expect(styleOf(block.host)).toMatchObject({ height: tokens['size-control'] })
     const circle = await drawn(<HelixSkeleton shape="circle" />)
-    expect(styleOf(circle.host)).toMatchObject({ aspectRatio: 1, width: tokens['size-control'] })
+    expect(styleOf(circle.host)).toMatchObject({ aspectRatio: 1, width: tokens['size-avatar'] })
     expect(styleOf(shapesOf(circle.all)[0] as Drawn)).toMatchObject({
       borderRadius: tokens['radii-full'],
     })
@@ -113,7 +113,8 @@ describe('the generated Skeleton', () => {
     expect(sheen).toMatchObject({
       animationDuration: 4 * Number(tokens['duration-slow']),
       animationIterationCount: 'infinite',
-      animationTimingFunction: 'ease-in-out',
+      /* The cycle easing, the in-out curve a loop takes. */
+      animationTimingFunction: { x1: 0.42, x2: 0.58, y1: 0, y2: 1 },
       position: 'absolute',
     })
     const frames = sheen.animationName as Readonly<

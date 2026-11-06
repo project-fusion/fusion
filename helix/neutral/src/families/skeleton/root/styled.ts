@@ -81,13 +81,13 @@ export default styles(
          nothing. */
         rule({ shape: false }, { blockSize: hook.blockSize }),
         /* A line of text is one line tall whatever it is standing in for. */
-        rule(
-          { shape: 'text' },
-          {
-            blockSize: '1em',
-            web: { blockSize: '1lh', boxSizing: 'border-box', paddingBlock: quotient(leading, 2) },
-          },
-        ),
+        native([rule({ shape: 'text' }, { blockSize: '1em' })]),
+        web([
+          rule(
+            { shape: 'text' },
+            { blockSize: '1lh', boxSizing: 'border-box', paddingBlock: quotient(leading, 2) },
+          ),
+        ]),
         native([rule({ paragraph: true }, { blockSize: 'auto' })]),
         /* The control step, not the bare `2.5rem` it works out to, so a circle
          standing in for an avatar keeps its size inside a `data-density`
@@ -158,12 +158,21 @@ export default styles(
         rule({ also: { line: true }, child: ['last', 'later'] }, { inlineSize: hook.lastLineSize }),
       ]),
       on('lines', [
-        rule({
-          display: 'flex',
-          flexDirection: 'column',
-          gap: product(difference(token('leading-normal'), 1), '1em'),
-          web: { gap: leading, paddingBlock: quotient(leading, 2) },
-        }),
+        native([
+          rule({
+            display: 'flex',
+            flexDirection: 'column',
+            gap: product(difference(token('leading-normal'), 1), '1em'),
+          }),
+        ]),
+        web([
+          rule({
+            display: 'flex',
+            flexDirection: 'column',
+            gap: leading,
+            paddingBlock: quotient(leading, 2),
+          }),
+        ]),
         rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
         rule({ loading: false, wrapping: true }, { display: 'none' }),
       ]),
