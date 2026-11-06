@@ -21,7 +21,7 @@ import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './orb-root.css.js'
+import { styles } from './orb-root.generated.css.js'
 
 /** What an unreadable color answers with, mid gray in both modes. */
 const GRAY: ColorBytesAlpha = [128, 128, 128, 1]

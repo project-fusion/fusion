@@ -42,6 +42,7 @@ import { NAVIGATION } from './scenarios/navigation.js'
 import { NOTIFICATIONS } from './scenarios/notifications.js'
 import { NUMBER_INPUT } from './scenarios/number-input.js'
 import { OBJECT_INSPECTOR } from './scenarios/object-inspector.js'
+import { ORB } from './scenarios/orb.js'
 import { OUTLINE } from './scenarios/outline.js'
 import { PAGINATION } from './scenarios/pagination.js'
 import { PIN_INPUT } from './scenarios/pin-input.js'
@@ -126,6 +127,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   notifications: NOTIFICATIONS,
   'number-input': NUMBER_INPUT,
   'object-inspector': OBJECT_INSPECTOR,
+  orb: ORB,
   outline: OUTLINE,
   pagination: PAGINATION,
   'pin-input': PIN_INPUT,
