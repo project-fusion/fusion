@@ -58,7 +58,7 @@ name: "Screens: Tooltip"
     retryTapIfNoChange: false
 - longPressOn: Save changes
 - extendedWaitUntil:
-    visible: Cmd
+    visible: '.*(Command S|Ctrl\+S).*'
     timeout: 5000
 - waitForAnimationToEnd:
     timeout: 5000

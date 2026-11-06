@@ -38,13 +38,13 @@ name: "Screens: Area Chart"
     visible: 'With A Tooltip'
     timeout: 15000
 - takeScreenshot: area-chart-with-a-tooltip-${MODE}-${SIZE}
-- openLink: helix://area-chart/with-a-value-axis/preview
-- extendedWaitUntil:
-    visible: 'With A Value Axis'
-    timeout: 15000
-- takeScreenshot: area-chart-with-a-value-axis-${MODE}-${SIZE}
 - openLink: helix://area-chart/with-gridlines/preview
 - extendedWaitUntil:
     visible: 'With Gridlines'
     timeout: 15000
 - takeScreenshot: area-chart-with-gridlines-${MODE}-${SIZE}
+- openLink: helix://area-chart/without-an-axis/preview
+- extendedWaitUntil:
+    visible: 'Without An Axis'
+    timeout: 15000
+- takeScreenshot: area-chart-without-an-axis-${MODE}-${SIZE}
