@@ -12,6 +12,19 @@ import { scrollingOf } from './scrolling'
 import { turnsAlone } from './turns'
 
 /**
+ * The element's own `value`, where the event a press sends carries one and no
+ * set gives it, as a playlist entry asks to play by its value as the web's does.
+ */
+const ownValue = (
+  family: Family,
+  props: Props,
+  sends: string | undefined,
+): Readonly<Record<string, unknown>> => {
+  const carries = family.api?.events.find((one) => one.name === sends)?.detail.includes('value')
+  return carries === true ? { value: String(given(family, props, 'value') ?? '') } : {}
+}
+
+/**
  * What a press tells and what follows it.
  *
  * **A scroll button pages the box it is in.** **A press on the part that
@@ -35,19 +48,6 @@ import { turnsAlone } from './turns'
  * row sends `select` once its `before-select` stood, before anything the
  * choice does.
  */
-/**
- * The element's own `value`, where the event a press sends carries one and no
- * set gives it, as a playlist entry asks to play by its value as the web's does.
- */
-const ownValue = (
-  family: Family,
-  props: Props,
-  sends: string | undefined,
-): Readonly<Record<string, unknown>> => {
-  const carries = family.api?.events.find((one) => one.name === sends)?.detail.includes('value')
-  return carries === true ? { value: String(given(family, props, 'value') ?? '') } : {}
-}
-
 const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): Told => {
   const part = boundTo(use, 'part', 'part') ?? ''
   const { joined, stacked } = around
