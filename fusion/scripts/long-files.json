@@ -383,6 +383,7 @@
     "helix/native/src/style/style.pure.spec.ts",
     "helix/native/src/style/style.ts",
     "helix/native/tests/conformance/harness.tsx",
+    "helix/neutral/src/families/bar-chart/root/headless.tsx",
     "helix/neutral/src/families/button/root/styled.ts",
     "helix/neutral/src/families/carousel/root/styled.ts",
     "helix/neutral/src/families/chat/composer/styled.ts",

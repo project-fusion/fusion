@@ -186,8 +186,8 @@ describe('a paragraph of lines', () => {
     // Half the leading at each end, so three lines are a three-line
     // paragraph's three line boxes, where they were 4em.
     expect(rule('[part="lines"]')).toContain('padding-block: calc(var(--_skeleton-leading) / 2)')
-    expect(rule('[part~="line"]')).toContain('block-size: 1em')
-    expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
+    expect(rule('[part~="skeleton"][part~="line"]')).toContain('block-size: 1em')
+    expect(rule('[part~="skeleton"][part~="line"]:last-child:not(:first-child)')).toContain(
       'inline-size: var(--skeleton-last-line-size, 60%)',
     )
   })
