@@ -82,6 +82,7 @@ import type {
   NotificationsRootChoice,
   OptionChoice,
   OptionGroupChoice,
+  OrbChoice,
   PaginationRootChoice,
   PaginationSizeChoice,
   PickerFieldChoice,
@@ -376,6 +377,8 @@ export interface Headless {
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */
   readonly video?: VideoChoice
+  /** What the element reads, sends, and computes where it draws an orb. */
+  readonly orb?: OrbChoice
   /** What the element reads, sends, and computes where it is a playlist that drives a player. */
   readonly videoPlaylist?: VideoPlaylistChoice
   /** What the element reads, sends, and computes where it is a menu of a playlist's entries. */

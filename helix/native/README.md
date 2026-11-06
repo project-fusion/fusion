@@ -867,6 +867,7 @@ fake clock drives the web's and a phone's alike.
 | `expo-haptics` | The touch a phone plays as you lift, move, and drop a list row. Optional: without it, nothing plays |
 | `expo-image-picker` | Taking a photo and choosing photos from the library. Optional: without it, every request is `unavailable` |
 | `expo-sharing` | Sharing and saving a file. Optional: without it, a file is `unavailable` to share and a save gives `false` |
+| `@shopify/react-native-skia` 2 | Drawing on the GPU, as an orb's moving dots. Optional: without it, each such family draws its still fallback |
 | `react` 19 | Everything |
 | `react-native` | Everything |
 | `react-native-gesture-handler` 3 | Dragging a row by its grip |
@@ -878,7 +879,7 @@ fake clock drives the web's and a phone's alike.
 **Each peer is optional to npm**, since `@fusion.dev/helix` depends on this
 package and a web app installs it too, and npm installs a dependency's
 required peers. A React Native app needs every peer but
-`@floating-ui/react-native`, `expo-blur`, `expo-clipboard`,
+`@floating-ui/react-native`, `@shopify/react-native-skia`, `expo-blur`, `expo-clipboard`,
 `expo-document-picker`, `expo-file-system`, `expo-haptics`,
 `expo-image-picker`, `expo-sharing`, `react-native-safe-area-context`, and
 `react-native-svg`. Where
@@ -964,6 +965,28 @@ import { useOpenPhase } from '@fusion.dev/helix-native'
 
 const phase = useOpenPhase(open, { duration: 200, easing: 'ease' }, (end) => console.log(end))
 ```
+
+## Drawing on the GPU
+
+**A family that draws a moving picture draws it through react-native-skia**,
+an optional peer, as Orb draws its dots. The GPU drawing capability says
+whether it can: the package is required only once `TurboModuleRegistry`
+finds its native module, so an app built without it never loads it, and
+each family draws its still fallback. Expo Go carries it. Install it where
+your app draws one:
+
+```sh
+npx expo install @shopify/react-native-skia
+```
+
+**A drawing reads its colors from its part's own rules**, as a web canvas
+reads its computed style: a machine's `drawing` is handed the text the part
+draws in, its `color` resolved from `currentColor` among it, and the custom
+properties at the part, so a theme, a hook a page sets, and the color mode
+reach the pixels. A drawing runs a frame a refresh while the app is in front
+and its motion runs, stands on one frame while the app pauses its motion, and
+draws the still frame with reduced motion. What a screen reader hears comes
+from the family's host, never from the drawing.
 
 ## Styles a phone draws
 

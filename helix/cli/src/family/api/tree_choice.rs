@@ -808,6 +808,12 @@ pub const HEATMAP: &[(&str, Names)] = &[
     ("onResize", Names::Event),
 ];
 
+/// What an orb sends: nothing. It reads its props by their own names.
+pub const ORB: &[(&str, Names)] = &[];
+
+/// What it computes for its parts, each read as `orb.x`: the state it draws.
+pub const ORB_COMPUTED: &[&str] = &["shown"];
+
 /// What a player of one video sends: a request for the next or the previous. Its
 /// props it reads by their own names.
 pub const VIDEO: &[(&str, Names)] = &[("onNext", Names::Event), ("onPrevious", Names::Event)];
@@ -1408,6 +1414,11 @@ pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
 }
 
+/// `orb({ ... })`, each field a name.
+pub fn orb(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "orb", ORB, ORB_COMPUTED)
+}
+
 /// `video({ ... })`, each field a name.
 pub fn video(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "video", VIDEO, VIDEO_COMPUTED)
@@ -1546,6 +1557,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),
         "video" => video(value),
+        "orb" => orb(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

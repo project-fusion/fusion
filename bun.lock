@@ -498,6 +498,7 @@
       },
       "peerDependencies": {
         "@floating-ui/react-native": ">=0.10",
+        "@shopify/react-native-skia": ">=2",
         "expo": "*",
         "expo-blur": "*",
         "expo-clipboard": "*",
@@ -517,6 +518,7 @@
       },
       "optionalPeers": [
         "@floating-ui/react-native",
+        "@shopify/react-native-skia",
         "expo",
         "expo-blur",
         "expo-clipboard",
