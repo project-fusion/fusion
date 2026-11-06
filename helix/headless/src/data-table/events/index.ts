@@ -5,22 +5,28 @@
 import { registerEventNames } from '@fusion.dev/helix-core'
 import { HelixBeforeColumnToggleEvent } from './before-column-toggle.js'
 import { HelixBeforeFollowEvent } from './before-follow.js'
+import { HelixBeforeViewChangeEvent } from './before-view-change.js'
 import { HelixColumnToggleEvent } from './column-toggle.js'
 import { HelixFollowEvent } from './follow.js'
+import { HelixViewChangeEvent } from './view-change.js'
 
-export type { ColumnToggleDetail, FollowDetail } from './details.js'
+export type { ColumnToggleDetail, FollowDetail, ViewChangeDetail } from './details.js'
 export {
   HelixBeforeColumnToggleEvent,
   HelixBeforeFollowEvent,
+  HelixBeforeViewChangeEvent,
   HelixColumnToggleEvent,
   HelixFollowEvent,
+  HelixViewChangeEvent,
 }
 
 const registry = {
   HelixBeforeColumnToggleEvent,
   HelixBeforeFollowEvent,
+  HelixBeforeViewChangeEvent,
   HelixColumnToggleEvent,
   HelixFollowEvent,
+  HelixViewChangeEvent,
 } as const
 
 type Registry = typeof registry
