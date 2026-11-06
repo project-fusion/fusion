@@ -50,11 +50,21 @@ export const columnName = (rows: readonly Row[], column: number): string =>
 
 /** What `gridlines` asks for: a bare one, or a word it does not know, rules the levels, as on the web. */
 export const gridlinesAsked = (given: unknown): '' | 'both' | 'category' | 'value' =>
-  given === undefined || given === null || given === false
+  given === 'none' || given === false
     ? ''
     : given === 'both' || given === 'category'
       ? given
       : 'value'
+
+/** Whether a chart draws its axis of numbers, which every `value-axis` but `none` asks for. */
+export const axisAsked = (given: unknown): boolean => given !== 'none' && given !== false
+
+/**
+ * Whether a scale is measured off the chart, by its numbers or its rules at
+ * the levels, so its peak takes room above it, as core's domains give it.
+ */
+export const roomAsked = (axised: boolean, gridlines: string): boolean =>
+  axised || gridlines === 'value' || gridlines === 'both'
 
 /**
  * The rules a `gridlines` asks for, as paths: down through each reading

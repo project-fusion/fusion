@@ -54,6 +54,7 @@ import { showsSeries, useChartSource, useHiddenSeries } from '../render/chart-so
 import type { Family } from '../style/form'
 import { useTheme } from '../theme/theme'
 import {
+  axisAsked,
   axisBehavior,
   axisOf,
   cellsOf,
@@ -64,6 +65,7 @@ import {
   nameSize,
   percent,
   plottedOf,
+  roomAsked,
   statusOf,
   useAxisReading,
   useWidth,
@@ -172,7 +174,12 @@ interface Plotted {
 
 /** Everything the canvas and the names draw, which a move of the reading leaves as it is. */
 const plotOf = (drawn: Drawn, plotted: Plotted, colorOf: Color) => {
-  const domain = lineDomain(drawn.series, drawn.shows, plotted.asked.zero)
+  const domain = lineDomain(
+    drawn.series,
+    drawn.shows,
+    plotted.asked.zero,
+    roomAsked(plotted.axised, plotted.gridlines),
+  )
   const scales = axisScales(domain, Math.max(drawn.count, 1))
   const named = labelsOf(drawn.rows, plotted.width, plotted.size, drawn.count)
   const floor = baselineAt(domain, scales.y)
@@ -193,7 +200,7 @@ const usePlot = (read: Read, drawn: Drawn, width: number, colorOf: Color, lang: 
   /* The device's pixels across the plot, past which a line keeps only the points they show. */
   const columns = Math.round((width || window.width) * PixelRatio.get())
   const gridlines = gridlinesAsked(read('gridlines'))
-  const axised = read('value-axis') === true
+  const axised = axisAsked(read('value-axis'))
   const size = nameSize(useTheme())
   const area = read('area') === true
   const curve = curveOf(read('curve'))

@@ -34,11 +34,14 @@ import { direction } from '../render/styles'
 import type { Family } from '../style/form'
 import { type Theme, useTheme } from '../theme/theme'
 import {
+  axisAsked,
   axisBehavior,
   cellsOf,
+  gridlinesAsked,
   nameSize,
   percent,
   plottedOf,
+  roomAsked,
   statusOf,
   useAxisReading,
   useBox,
@@ -191,7 +194,7 @@ const wantedOf = (read: Read) => ({
   sideways: read('orientation') === 'horizontal',
   stacked: read('stacked') === true,
   subtle: wordsIn(read('subtle')),
-  valueAxis: read('value-axis') === true,
+  valueAxis: axisAsked(read('value-axis')),
 })
 
 /** The plot, worked out again only when what it draws changes. */
@@ -206,6 +209,7 @@ const usePlot = (read: Read, drawn: Drawn, box: Plotted['box'], lang: string) =>
   return useMemo(() => {
     const asked: BarAsked = {
       lined: barNames(lines),
+      room: roomAsked(valueAxis, gridlinesAsked(gridlines)),
       scaled: barNames(secondary),
       sideways,
       stacked,

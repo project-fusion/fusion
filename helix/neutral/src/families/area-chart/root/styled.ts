@@ -1,7 +1,19 @@
 import chartStatus from '../../../fragments/chart-status.js'
 import chartTooltip from '../../../fragments/chart-tooltip.js'
 import printExact from '../../../fragments/print-exact.js'
-import { fn, inherited, measured, mix, native, product, sum, token, web } from '../../../style.js'
+import {
+  fn,
+  inherited,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -17,8 +29,11 @@ import root from './headless.js'
  *
  * **The plot and the names under it are two rows of one grid**, as Line
  * Chart lays them out, and the numbers of `value-axis` stand in a column of
- * their own beside the plot, each centered on its level. The rules stand over
- * the bands, so they read on a fill as well as on the page.
+ * their own beside the plot, each centered on its level, unless `value-axis`
+ * is `none`. The rules stand over the bands, so they read on a fill as well
+ * as on the page. **In dark a band is mixed toward a black of its own hue**,
+ * three quarters of the series, so it keeps its color where a mix toward the
+ * page went gray.
  *
  * **Web only:** the bands fading in and easing to new readings, the
  * crosshair, printing, and the strength `--area-chart-fill-strength` gives a
@@ -62,16 +77,32 @@ export default styles(
       on('area', [
         web([
           rule({
-            fill: fn(
-              'color-mix',
-              ['in', 'oklab'],
-              [series, hook.fillStrength],
-              token('color-background'),
+            fill: scheme(
+              fn(
+                'color-mix',
+                ['in', 'oklab'],
+                [series, hook.fillStrength],
+                token('color-background'),
+              ),
+              fn(
+                'color-mix',
+                ['in', 'oklch'],
+                [series, hook.fillStrength('75%')],
+                fn('oklch', ['from', series, 0, 'c', 'h']),
+              ),
             ),
             stroke: 'none',
           }),
         ]),
-        native([rule({ fill: mix(series, 55, token('color-background')), stroke: 'none' })]),
+        native([
+          rule({
+            fill: scheme(
+              mix(series, 55, token('color-background')),
+              mix(series, 75, token('color-background')),
+            ),
+            stroke: 'none',
+          }),
+        ]),
         /* Drawn from zero, one in front of another, so each lets the ones behind through. */
         rule({ overlap: true }, { fill: series, fillOpacity: hook.overlapOpacity }),
       ]),
@@ -156,21 +187,41 @@ export default styles(
       on('tick', [
         rule({
           insetInlineEnd: 0,
+          lineHeight: 1,
           position: 'absolute',
           translate: [0, '-50%'],
           whiteSpace: 'nowrap',
         }),
         native([rule({ insetBlockStart: measured('chart-tick-y') })]),
       ]),
-      on('host', [web([rule({ valueAxis: true }, { gridTemplateColumns: 'auto 1fr' })])]),
-      on('axis', [web([rule({ valueAxis: true }, { gridColumn: 1, gridRow: 1 })])]),
-      on(['plot', 'labels'], [web([rule({ valueAxis: true }, { gridColumn: 2 })])]),
+      on('host', [
+        /* Half a number's height above the plot, so the top number stands inside the box. */
+        web([
+          rule(
+            { valueAxis: { not: 'none' } },
+            {
+              columnGap: 0,
+              gridTemplateColumns: 'auto 1fr',
+              paddingBlockStart: quotient(token('text-xs'), 2),
+            },
+          ),
+        ]),
+      ]),
+      on('axis', [
+        web([
+          rule(
+            { valueAxis: { not: 'none' } },
+            { gridColumn: 1, gridRow: 1, marginInlineEnd: hook.gap },
+          ),
+        ]),
+      ]),
+      on(['plot', 'labels'], [web([rule({ valueAxis: { not: 'none' } }, { gridColumn: 2 })])]),
       /* A phone stands the axis beside the plot in the room the host leaves at
          its start, as wide as the chart measures the widest number. */
       on('host', [
         native([
           rule(
-            { valueAxis: true },
+            { valueAxis: { not: 'none' } },
             { paddingInlineStart: sum(measured('area-chart-axis-size'), hook.gap) },
           ),
         ]),
@@ -178,7 +229,7 @@ export default styles(
       on('axis', [
         native([
           rule(
-            { valueAxis: true },
+            { valueAxis: { not: 'none' } },
             {
               /* As tall as the plot: the names' row under it is as tall as the axis' own type. */
               bottom: sum('1.4em', hook.gap),

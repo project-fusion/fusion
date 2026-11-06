@@ -142,7 +142,7 @@ export default fragment(
       on('host', [
         web([
           rule(
-            { ...upright, lacks: 'secondary', valueAxis: true },
+            { ...upright, lacks: 'secondary', valueAxis: { not: 'none' } },
             {
               gridTemplateColumns: 'auto 1fr',
             },
@@ -152,7 +152,12 @@ export default fragment(
       on('axis', [
         web([
           rule(
-            { ...upright, part: { 'data-axis': 'primary' }, lacks: 'secondary', valueAxis: true },
+            {
+              ...upright,
+              part: { 'data-axis': 'primary' },
+              lacks: 'secondary',
+              valueAxis: { not: 'none' },
+            },
             {
               gridColumn: 1,
               gridRow: 1,
@@ -162,12 +167,16 @@ export default fragment(
       ]),
       on(
         ['plot', 'labels'],
-        [web([rule({ ...upright, lacks: 'secondary', valueAxis: true }, { gridColumn: 2 })])],
+        [
+          web([
+            rule({ ...upright, lacks: 'secondary', valueAxis: { not: 'none' } }, { gridColumn: 2 }),
+          ]),
+        ],
       ),
       on('host', [
         web([
           rule(
-            { ...sideways, lacks: 'secondary', valueAxis: true },
+            { ...sideways, lacks: 'secondary', valueAxis: { not: 'none' } },
             { gridTemplateRows: '1fr auto' },
           ),
         ]),
@@ -175,7 +184,12 @@ export default fragment(
       on('axis', [
         web([
           rule(
-            { ...sideways, part: { 'data-axis': 'primary' }, lacks: 'secondary', valueAxis: true },
+            {
+              ...sideways,
+              part: { 'data-axis': 'primary' },
+              lacks: 'secondary',
+              valueAxis: { not: 'none' },
+            },
             {
               gridColumn: 2,
               gridRow: 2,
@@ -239,7 +253,7 @@ export default fragment(
       on('host', [
         native([
           rule(
-            { ...upright, valueAxis: true },
+            { ...upright, valueAxis: { not: 'none' } },
             { paddingInlineStart: sum(measured('bar-chart-axis-size'), hook.gap) },
           ),
           rule(
@@ -250,7 +264,10 @@ export default fragment(
             },
           ),
           rule(sideways, { paddingInlineStart: sum(measured('bar-chart-labels-size'), hook.gap) }),
-          rule({ ...sideways, valueAxis: true }, { paddingBlockEnd: sum('1.4em', hook.gap) }),
+          rule(
+            { ...sideways, valueAxis: { not: 'none' } },
+            { paddingBlockEnd: sum('1.4em', hook.gap) },
+          ),
           rule(
             { ...sideways, has: 'secondary' },
             {

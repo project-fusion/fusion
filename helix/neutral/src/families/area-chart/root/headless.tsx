@@ -59,7 +59,7 @@ export default headless('area-chart', {
     emptyText: 'No readings',
     errorText: '',
     for: '',
-    gridlines: oneOf(['both', 'category', 'value']),
+    gridlines: oneOf(['both', 'category', 'none', 'value']),
     label: '',
     loading: false,
     loadingText: 'Loading readings',
@@ -77,7 +77,7 @@ export default headless('area-chart', {
     summary: web(oneOf(['hidden', 'visible'])),
     summaryLabel: '{reading}: {totalLabel} {total}; {shares}.',
     totalLabel: 'Total',
-    valueAxis: false,
+    valueAxis: oneOf(['none']),
   },
   events: {
     readingChange: ['index', 'label', 'pointerType', 'series'],
