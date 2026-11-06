@@ -4,6 +4,7 @@ import printExact from '../../../fragments/print-exact.js'
 import {
   difference,
   first,
+  fn,
   inherited,
   list,
   native,
@@ -44,6 +45,7 @@ export default styles(
       thumbColor: null,
     }),
     own: {
+      fieldControlBlockSize: null,
       fieldControlInlineSize: null,
       fieldDisabledOpacity: null,
       switchHeight: null,
@@ -66,6 +68,8 @@ export default styles(
           /* What `field-inline` indents the hint by, so it starts under the
              words, declared beside the size it derives from. */
           fieldControlInlineSize: own.switchWidth,
+          /* And how tall the mark is, which the row grows past on a touch screen. */
+          fieldControlBlockSize: own.switchHeight,
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
@@ -76,18 +80,24 @@ export default styles(
     ]),
     on('field', [
       rule({
-        alignItems: 'center',
         web: { cursor: 'pointer' },
         display: 'inline-flex',
         gap: token('space-xs'),
         position: 'relative',
       }),
+      /* The track stays beside the first line of a label that wraps, as a
+         Checkbox's box does. */
+      web([rule({ alignItems: 'start' })]),
+      native([rule({ alignItems: 'center' })]),
       /* Rows sit against each other, so a box reaching past a row would take the
          press from the row beside it. On a touch screen the row itself reaches
          the target. */
       rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       /* `:disabled` matches a disabled fieldset around the switch as well. */
-      web([rule({ formDisabled: true }, { cursor: 'default' })]),
+      web([
+        rule({ formDisabled: true }, { cursor: 'not-allowed' }),
+        rule({ readonly: true }, { cursor: 'default' }),
+      ]),
     ]),
     /* The groove. One cell, so the input lies over the whole of it. */
     on('track', [
@@ -123,19 +133,31 @@ export default styles(
       ),
       /* The edge firms up under the pointer, as a Checkbox's and a Radio's do. */
       rule(
-        { formDisabled: false, within: { field: { hover: true } } },
+        { formDisabled: false, readonly: false, within: { field: { hover: true } } },
         { borderColor: token('color-foreground') },
+      ),
+      /* Read-only: the track drops its fill, on and off, and keeps an edge at
+         3:1, as a read-only field keeps its edge. Before the invalid rule,
+         whose red edge still wins. */
+      rule(
+        { readonly: true },
+        { backgroundColor: 'transparent', borderColor: token('color-border-readonly') },
       ),
       rule({ invalid: true }, { borderColor: token('color-danger') }),
       /* A press firms the edge and washes an off groove. */
       rule(
-        { formDisabled: false, within: { field: { active: true } } },
+        { formDisabled: false, readonly: false, within: { field: { active: true } } },
         { backgroundColor: token('color-press') },
       ),
       /* On, the press takes the fill's own step, as a solid Button does. The wash above
          replaced the fill: the thumb fell from 17.76:1 to 1.45:1 under the press. */
       rule(
-        { checked: true, formDisabled: false, within: { field: { active: true } } },
+        {
+          checked: true,
+          formDisabled: false,
+          readonly: false,
+          within: { field: { active: true } },
+        },
         { backgroundColor: inherited('switch-on-color', token('color-primary-surface-active')) },
       ),
       /* A checked track is a fill, which forced colors paint Canvas. */
@@ -200,6 +222,15 @@ export default styles(
       /* A thumb off in light is white on a near-white groove, so it takes the mark
          ink at its edge: thumb against track was 1.12:1. */
       rule({ checked: false }, { borderColor: token('color-foreground-subtle') }),
+      /* Read-only and on, the thumb takes the fill's color itself, since the
+         fill under it is gone. */
+      rule(
+        { checked: true, readonly: true },
+        {
+          backgroundColor: hook.onColor,
+          color: hook.iconColor(token('color-foreground-on-primary')),
+        },
+      ),
       rule(
         { checked: true, forcedColors: true },
         { backgroundColor: 'HighlightText', forcedColorAdjust: 'none' },
@@ -224,6 +255,12 @@ export default styles(
     ]),
     /* Nothing in it, so no box and no gap beside it. */
     on('label', [
+      /* The label's first line centered on the track, which is taller than a line. */
+      web([
+        rule({
+          paddingBlockStart: fn('max', '0px', quotient(difference(own.switchHeight, '1lh'), 2)),
+        }),
+      ]),
       rule({ part: { 'data-empty': true } }, { display: 'none' }),
       /* The web's element marks the region as a slot fills, which a phone reads
          from what it draws. */
