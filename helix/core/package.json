@@ -172,6 +172,10 @@
       "types": "./dist/utils/object-inspector/object-inspector.d.ts",
       "default": "./dist/utils/object-inspector/object-inspector.js"
     },
+    "./orb": {
+      "types": "./dist/utils/orb/orb.d.ts",
+      "default": "./dist/utils/orb/orb.js"
+    },
     "./package.json": "./package.json",
     "./pagination": {
       "types": "./dist/utils/pagination/pagination.d.ts",
