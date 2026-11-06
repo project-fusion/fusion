@@ -59,3 +59,9 @@ helix-headless-selection-bar::part(actions) {
   display: flex;
   gap: 0.25rem;
 }
+
+/* The checkboxes' names are for a screen reader. */
+helix-headless-data-table::part(checkbox-label) {
+  clip-path: inset(50%);
+  position: absolute;
+}
