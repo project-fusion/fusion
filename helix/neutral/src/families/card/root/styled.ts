@@ -1,5 +1,17 @@
 import { oneOf } from '../../../render.js'
-import { fn, list, native, product, scheme, sum, token, web } from '../../../style.js'
+import {
+  first,
+  fn,
+  hookOf,
+  list,
+  mix,
+  native,
+  product,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -20,6 +32,12 @@ import root from './headless.js'
  * element is defined there is no row around them, so the card is a grid of
  * two columns. A phone's view is never undefined, and draws none of it.
  *
+ * **What a card holds steps off it**: inside an elevated card, in dark, the
+ * surfaces, the overlay and the lines restate themselves a step above its
+ * fill, as Dialog's do, and inside an unset or filled card the lines and the
+ * filled wash do. Nothing inside is rounder than the small radius. A ghost
+ * button among the actions stands its words on the card's inset.
+ *
  * **Glass is a pair**: a backdrop filter behind a translucent ground, which a
  * phone draws through expo-blur, as the native README says.
  */
@@ -34,7 +52,7 @@ export default styles(
       borderColor: token('color-border'),
       borderWidth: token('border-surface'),
       color: token('color-foreground-muted'),
-      gap: token('space-sm'),
+      gap: token('space-field'),
       headingColor: token('color-foreground'),
       lineHeight: token('leading-normal'),
       mediaBlockSize: 'auto',
@@ -44,7 +62,20 @@ export default styles(
       radius: token('radii-md'),
       shadow: token('shadow-surface'),
     },
-    own: { cardInset: null, cardMedia: null, headingInk: null },
+    own: {
+      cardCorner: null,
+      cardFill: null,
+      cardGap: null,
+      cardGround: null,
+      cardInset: null,
+      cardLine: null,
+      cardMedia: null,
+      cardNest: null,
+      cardOverlay: null,
+      cardRaised: null,
+      cardSurface: null,
+      headingInk: null,
+    },
     props: {
       material: oneOf(['frosted', 'glass', 'transparent']),
       orientation: oneOf(['horizontal', 'vertical']),
@@ -57,12 +88,12 @@ export default styles(
       rule({
         backgroundColor: hook.backgroundColor(token('color-surface')),
         border: [hook.borderWidth, 'solid', hook.borderColor],
-        borderRadius: hook.radius,
+        borderRadius: own.cardCorner,
         boxShadow: hook.shadow,
         color: hook.color,
         alignContent: hook.align,
         display: 'grid',
-        gap: hook.gap,
+        gap: own.cardGap,
         gridTemplateColumns: 'minmax(0, 1fr)',
         lineHeight: hook.lineHeight,
         /* It clips a long unbroken word too, so the word breaks. */
@@ -74,17 +105,39 @@ export default styles(
           ['box-shadow', token('duration-fast'), token('easing-standard')],
         ),
         own: {
+          cardCorner: hook.radius,
+          cardFill: hook.backgroundColor(token('color-surface')),
+          cardGap: hook.gap,
           cardInset: hook.padding,
+          cardLine: token('color-border'),
+          cardOverlay: token('color-surface-overlay'),
           cardMedia: hook.mediaSize,
           headingInk: hook.headingColor,
         },
       }),
       variants('separation', {
         elevated: {
-          '--card-shadow': token('shadow-md'),
+          /* A hairline of the ink under the lift in light, so a white card on a white
+             page has an edge; dark draws its own border. */
+          '--card-shadow': list(
+            [
+              0,
+              0,
+              0,
+              token('border-thin'),
+              scheme(mix(token('color-foreground'), 8, 'transparent'), 'transparent'),
+            ],
+            token('shadow-md'),
+          ),
           borderColor: scheme('transparent', token('color-border')),
         },
-        filled: { '--card-shadow': 'none', borderColor: 'transparent' },
+        /* `surface-filled`, a wash that steps off whatever the card is on, and again
+           inside another filled card. */
+        filled: {
+          '--card-shadow': 'none',
+          backgroundColor: hook.backgroundColor(token('color-surface-filled')),
+          borderColor: 'transparent',
+        },
         outlined: { backgroundColor: hook.backgroundColor('transparent') },
         plain: {
           '--card-shadow': 'none',
@@ -107,9 +160,8 @@ export default styles(
       variants('material', {
         glass: {
           /* Full ink: muted ink over a busy page falls under 4.5:1 through glass. */
-          color: hook.color(token('color-foreground')),
           backdropFilter: hook.backdrop(token('material-backdrop')),
-          backgroundColor: hook.backgroundColor(token('material-translucent')),
+          backgroundColor: hook.backgroundColor(token('material-panel')),
         },
         frosted: {
           backdropFilter: hook.backdrop(fn('blur', token('material-blur-lg'))),
@@ -117,6 +169,23 @@ export default styles(
         },
         transparent: { backdropFilter: 'none', backgroundColor: 'transparent' },
       }),
+      /* Elevated, the fill is the nesting card's overlay rung in light, and the
+         overlay in dark. */
+      web([
+        rule(
+          { separation: 'elevated' },
+          {
+            own: {
+              cardGround: hook.backgroundColor(
+                scheme(own.cardNest(token('color-surface')), token('color-surface-overlay')),
+              ),
+              cardRaised: token('color-surface-raised'),
+              cardSurface: token('color-surface'),
+            },
+            backgroundColor: own.cardGround,
+          },
+        ),
+      ]),
       /* The lift is a shadow, which printers drop into a gray smear, and the
          edge carries it. */
       rule({ print: true }, { backgroundColor: 'transparent', boxShadow: 'none' }),
@@ -167,7 +236,7 @@ export default styles(
           alignItems: 'center',
           display: 'flex',
           flexWrap: 'wrap',
-          gap: hook.gap,
+          gap: own.cardGap,
           minInlineSize: 0,
         }),
       ],
@@ -187,6 +256,99 @@ export default styles(
       rule({ flex: 'none' }),
       web([rule({ justifySelf: 'end' })]),
       rule({ defined: false }, { alignSelf: 'center', gridColumn: 2, marginInlineStart: hook.gap }),
+    ]),
+    /* What the card holds steps off it in dark, its rungs a step above the fill. */
+    on({ region: '*' }, [
+      web([
+        rule(
+          { separation: 'elevated' },
+          {
+            own: { cardNest: own.cardOverlay },
+            '--helix-color-surface-overlay': scheme(
+              own.cardOverlay,
+              mix(token('color-foreground'), 12, own.cardGround),
+            ),
+            '--helix-color-surface-raised': scheme(
+              own.cardRaised,
+              mix(token('color-foreground'), 9, own.cardGround),
+            ),
+            '--helix-color-surface': scheme(
+              own.cardSurface,
+              mix(token('color-foreground'), 3, own.cardGround),
+            ),
+            '--helix-color-surface-filled': scheme(
+              mix(token('color-foreground'), 5, 'transparent'),
+              mix(token('color-foreground'), 6, 'transparent'),
+            ),
+            '--helix-color-border': scheme(
+              mix(token('color-foreground'), 7, own.cardGround),
+              mix(token('color-foreground'), 12, own.cardGround),
+            ),
+          },
+        ),
+        rule(
+          { material: false, separation: false },
+          {
+            own: { cardNest: own.cardOverlay },
+            '--helix-color-border': scheme(
+              mix(token('color-foreground'), 7, own.cardFill),
+              mix(token('color-foreground'), 14, own.cardFill),
+            ),
+            '--helix-color-surface-overlay': scheme(
+              own.cardOverlay,
+              mix(token('color-foreground'), 12, own.cardFill),
+            ),
+            '--helix-color-surface-filled': scheme(
+              mix(token('color-foreground'), 5, 'transparent'),
+              mix(token('color-foreground'), 6, 'transparent'),
+            ),
+          },
+        ),
+        rule(
+          { material: false, separation: 'filled' },
+          {
+            '--helix-color-border': scheme(
+              mix(token('color-foreground'), 5, own.cardLine),
+              mix(token('color-foreground'), 6, own.cardLine),
+            ),
+          },
+        ),
+        /* Nothing inside is rounder than the small radius, or than the card. */
+        rule(
+          { separation: { not: 'plain' } },
+          { '--helix-radii-md': fn('min', token('radii-sm'), own.cardCorner) },
+        ),
+      ]),
+    ]),
+    /* A ghost button among the actions stands its words on the card's inset. */
+    on(
+      {
+        region: ['footer', 'header-actions', 'footer-actions'],
+        slotted: 'helix-button[emphasis="ghost"]',
+      },
+      [
+        web([
+          rule({
+            marginInlineEnd: product(
+              first(hookOf('button', 'padding-inline'), token('space-control')),
+              '-1',
+            ),
+          }),
+        ]),
+      ],
+    ),
+    on({ region: 'footer', slotted: 'helix-button[emphasis="ghost"]' }, [
+      web([
+        rule(
+          { within: 'footer-row' },
+          {
+            marginInline: [
+              product(first(hookOf('button', 'padding-inline'), token('space-control')), '-1'),
+              0,
+            ],
+          },
+        ),
+      ]),
     ]),
   ],
 )
