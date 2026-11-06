@@ -78,7 +78,7 @@ pub use tree_choice::{
     HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
     NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION,
     PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, TABLE, TABLE_COLUMN,
-    TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO,
+    TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -246,6 +246,12 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a viewer of one item at a time.
     #[serde(rename = "lightbox", skip_serializing_if = "Option::is_none")]
     pub lightbox: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a menu of a playlist's entries.
+    #[serde(rename = "videoPlaylistMenu", skip_serializing_if = "Option::is_none")]
+    pub video_playlist_menu: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it is a playlist that drives a player.
+    #[serde(rename = "videoPlaylist", skip_serializing_if = "Option::is_none")]
+    pub video_playlist: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a player of one video.
     #[serde(rename = "video", skip_serializing_if = "Option::is_none")]
     pub video: Option<TreeChoice>,
@@ -423,6 +429,8 @@ impl Api {
             && self.scatter_chart.is_none()
             && self.heatmap.is_none()
             && self.lightbox.is_none()
+            && self.video_playlist_menu.is_none()
+            && self.video_playlist.is_none()
             && self.video.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
@@ -524,6 +532,8 @@ const FIELDS: &[&str] = &[
     "scatterChart",
     "heatmap",
     "lightbox",
+    "videoPlaylistMenu",
+    "videoPlaylist",
     "video",
     "pickerField",
     "listbox",
@@ -612,6 +622,12 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .transpose()?,
         heatmap: field("heatmap").map(tree_choice::heatmap).transpose()?,
         lightbox: field("lightbox").map(tree_choice::lightbox).transpose()?,
+        video_playlist_menu: field("videoPlaylistMenu")
+            .map(tree_choice::video_playlist_menu)
+            .transpose()?,
+        video_playlist: field("videoPlaylist")
+            .map(tree_choice::video_playlist)
+            .transpose()?,
         video: field("video").map(tree_choice::video).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)

@@ -79,6 +79,7 @@ import { useTreeItem } from './tree-item'
 import { settingTurns, turning, turnsAlone } from './turns'
 import { type Judged, useValidation } from './validation'
 import { useVideo } from './video'
+import { useVideoPlaylist, useVideoPlaylistMenu } from './video-playlist'
 import { useWindow } from './window'
 
 export { scrollingOf } from './scrolling'
@@ -508,6 +509,22 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props, around) =>
             useLightbox(family, props, use, around),
+      ),
+    /* A playlist that drives a player: its entries, its queue, and the player it points. */
+    ...uses
+      .filter((use) => use.machine === 'video-playlist')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useVideoPlaylist(family, props, use),
+      ),
+    /* The menu of a playlist's entries, in a player's bar. */
+    ...uses
+      .filter((use) => use.machine === 'video-playlist-menu')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useVideoPlaylistMenu(family, props, use),
       ),
     /* A player of one video: its picture, its bar, its keys, and its menus. */
     ...uses

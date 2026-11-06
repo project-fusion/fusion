@@ -92,7 +92,7 @@ use crate::family::api::{
     LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
     NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION, PAGINATION_SIZE, PICKER_FIELD,
     SCATTER_CHART, SELECT, SPARKLINE, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE,
-    TREE_ITEM, VIDEO,
+    TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -649,6 +649,12 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.scatter_chart, SCATTER_CHART, "scatter-chart"),
         (&api.heatmap, HEATMAP, "heatmap"),
         (&api.lightbox, LIGHTBOX, "lightbox"),
+        (
+            &api.video_playlist_menu,
+            VIDEO_PLAYLIST_MENU,
+            "video-playlist-menu",
+        ),
+        (&api.video_playlist, VIDEO_PLAYLIST, "video-playlist"),
         (&api.video, VIDEO, "video"),
         (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),

@@ -1064,6 +1064,23 @@ export interface VideoChoice {
   readonly waitWords?: string
 }
 
+/** The names of a playlist that drives a player, each read as `videoPlaylist.x`. */
+export interface VideoPlaylistChoice {
+  readonly empty?: string
+  readonly emptyWords?: string
+  readonly named?: string
+  readonly onActivate?: string
+  readonly onBeforeActivate?: string
+  readonly onEnd?: string
+}
+
+/** The names of a menu of a playlist's entries, each read as `videoPlaylistMenu.x`. */
+export interface VideoPlaylistMenuChoice {
+  readonly named?: string
+  readonly onBeforeSelect?: string
+  readonly rows?: string
+}
+
 /** The names of a viewer of one item at a time, each read as `lightbox.x`. */
 export interface LightboxChoice {
   readonly arrows?: string
