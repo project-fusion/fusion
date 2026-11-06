@@ -1,0 +1,53 @@
+:host {
+  align-items: center;
+  background-color: var(--selection-bar-background-color, var(--helix-color-selected));
+  border-radius: var(--helix-radii-md);
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helix-text-control);
+  gap: var(--helix-space-sm);
+  min-block-size: calc(var(--helix-size-control) + 2 * var(--helix-space-xs));
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--helix-space-md) var(--helix-space-xs);
+}
+
+[part="count"] {
+  flex: 1 1 auto;
+  font-weight: var(--helix-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+[part="actions"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+}
+
+[part="clear"] {
+  all: unset;
+  box-sizing: border-box;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: var(--helix-weight-medium);
+  min-block-size: var(--helix-size-control);
+  padding-inline: var(--helix-space-control);
+}
+
+[part="clear"]:hover {
+  background-color: var(--helix-color-hover);
+}
+
+[part="clear"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* What can be done to the selected rows is done on screen. */
+@media print {
+  :host {
+    display: none;
+  }
+}
