@@ -9,6 +9,7 @@ import {
   native,
   quotient,
   scheme,
+  sum,
   token,
   web,
 } from '../../../style.js'
@@ -66,6 +67,7 @@ export default styles(
       buttonFillPress: null,
       buttonInk: null,
       buttonOnTone: null,
+      buttonSubtleDark: null,
       buttonTone: null,
       buttonToneHover: null,
       buttonTurn: null,
@@ -98,22 +100,16 @@ export default styles(
           buttonInk: mix(own.buttonTone, 78, token('color-foreground')),
           buttonOnTone: token('color-background'),
           buttonTone: token('color-foreground'),
-          /* Loader's own turn and crawl, so two rings on one page agree. No
-             rung of the duration scale is that long. */
-          buttonCrawl: '4s',
-          buttonTurn: '0.8s',
+          /* Loader's own turn and crawl, the two motion tokens, so two rings on one
+             page agree. */
+          buttonCrawl: token('duration-crawl'),
+          buttonTurn: token('duration-turn'),
           /* Softened toward the page, because neutral's tone is already the
-             darkest ink there is and there is nothing past it to go to. */
-          /* Two whole colors, since a scheme is no percentage. Each moves at
-             least 1.3:1 from rest, from a fill with nothing past it. */
-          buttonToneHover: scheme(
-            mix(token('color-foreground'), 72, token('color-background')),
-            mix(token('color-foreground'), 90, token('color-background')),
-          ),
-          buttonFillPress: scheme(
-            mix(token('color-foreground'), 60, token('color-background')),
-            mix(token('color-foreground'), 80, token('color-background')),
-          ),
+             darkest ink there is and there is nothing past it to go to. Every
+             press is a token, so Icon Button and the `data-button` recipe press
+             the same way. */
+          buttonToneHover: token('color-neutral-surface-hover'),
+          buttonFillPress: token('color-neutral-surface-active'),
         },
       }),
       /* Each tone takes the same seven values, so a consumer learns one tone
@@ -135,13 +131,7 @@ export default styles(
             buttonEdge: token('color-accent'),
             buttonFill: token('color-accent-surface'),
             buttonFillHover: token('color-accent-surface-hover'),
-            buttonFillPress: fn('oklch', [
-              'from',
-              token('color-accent-surface-hover'),
-              'calc(l - 0.05)',
-              'c',
-              'h',
-            ]),
+            buttonFillPress: token('color-accent-surface-active'),
             buttonOnTone: token('color-foreground-on-accent'),
             buttonTone: token('color-accent'),
             buttonToneHover: token('color-accent-hover'),
@@ -152,13 +142,8 @@ export default styles(
             buttonEdge: token('color-danger'),
             buttonFill: token('color-danger-surface'),
             buttonFillHover: token('color-danger-surface-hover'),
-            buttonFillPress: fn('oklch', [
-              'from',
-              token('color-danger-surface-hover'),
-              'calc(l - 0.05)',
-              'c',
-              'h',
-            ]),
+            buttonFillPress: token('color-danger-surface-active'),
+            buttonSubtleDark: '22%',
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-danger'),
             /* Mixed toward the ink, for the ink states. */
@@ -171,13 +156,8 @@ export default styles(
             buttonEdge: token('color-info'),
             buttonFill: token('color-info-surface'),
             buttonFillHover: token('color-info-surface-hover'),
-            buttonFillPress: fn('oklch', [
-              'from',
-              token('color-info-surface-hover'),
-              'calc(l - 0.05)',
-              'c',
-              'h',
-            ]),
+            buttonFillPress: token('color-info-surface-active'),
+            buttonSubtleDark: '22%',
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-info'),
             buttonToneHover: mix(token('color-info'), 86, token('color-foreground')),
@@ -188,13 +168,8 @@ export default styles(
             buttonEdge: token('color-success'),
             buttonFill: token('color-success-surface'),
             buttonFillHover: token('color-success-surface-hover'),
-            buttonFillPress: fn('oklch', [
-              'from',
-              token('color-success-surface-hover'),
-              'calc(l - 0.05)',
-              'c',
-              'h',
-            ]),
+            buttonFillPress: token('color-success-surface-active'),
+            buttonSubtleDark: '22%',
             buttonOnTone: token('color-foreground-on-status'),
             buttonTone: token('color-success'),
             buttonToneHover: mix(token('color-success'), 86, token('color-foreground')),
@@ -203,16 +178,24 @@ export default styles(
         warning: {
           own: {
             buttonEdge: token('color-warning'),
-            buttonFill: token('color-warning-surface'),
-            buttonFillHover: token('color-warning-surface-hover'),
-            buttonFillPress: fn('oklch', [
+            /* The warning mark, as a solid warning Tag's is, under the page's ink. */
+            buttonFill: token('color-warning-solid'),
+            buttonFillHover: fn('oklch', [
               'from',
-              token('color-warning-surface-hover'),
-              'calc(l - 0.05)',
+              token('color-warning-solid'),
+              'calc(l - 0.03)',
               'c',
               'h',
             ]),
-            buttonOnTone: token('color-foreground-on-status'),
+            buttonFillPress: fn('oklch', [
+              'from',
+              token('color-warning-solid'),
+              'calc(l - 0.06)',
+              'c',
+              'h',
+            ]),
+            buttonOnTone: token('color-background'),
+            buttonSubtleDark: '22%',
             buttonTone: token('color-warning'),
             buttonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
           },
@@ -357,11 +340,32 @@ export default styles(
       rule(
         { emphasis: 'subtle' },
         {
-          backgroundColor: hook.backgroundColor(mix(own.buttonTone, 14, 'transparent')),
+          backgroundColor: web(
+            hook.backgroundColor(
+              scheme(
+                mix(own.buttonTone, 14, 'transparent'),
+                fn(
+                  'color-mix',
+                  ['in', 'oklab'],
+                  [own.buttonTone, own.buttonSubtleDark('14%')],
+                  'transparent',
+                ),
+              ),
+            ),
+          ),
+          /* **In dark a status tone's wash is 22%, hover 30%, and press 38%.** A status
+             ink is darker than the white foreground, so at neutral's 14% the danger
+             wash measured 1.13:1 on the black page beside neutral's 1.35. */
           borderColor: 'transparent',
           color: hook.foregroundColor(own.buttonInk),
         },
       ),
+      native([
+        rule(
+          { emphasis: 'subtle' },
+          { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 14, 'transparent')) },
+        ),
+      ]),
       rule(
         {
           formDisabled: false,
@@ -369,14 +373,40 @@ export default styles(
           interaction: ['hover', 'active'],
         },
         {
-          backgroundColor: first(
-            hook.backgroundColorHover,
-            hook.backgroundColor,
-            mix(own.buttonTone, 22, 'transparent'),
+          backgroundColor: web(
+            first(
+              hook.backgroundColorHover,
+              hook.backgroundColor,
+              scheme(
+                mix(own.buttonTone, 22, 'transparent'),
+                fn(
+                  'color-mix',
+                  ['in', 'oklab'],
+                  [own.buttonTone, sum(own.buttonSubtleDark('14%'), '8%')],
+                  'transparent',
+                ),
+              ),
+            ),
           ),
           borderColor: 'transparent',
         },
       ),
+      native([
+        rule(
+          {
+            formDisabled: false,
+            emphasis: 'subtle',
+            interaction: ['hover', 'active'],
+          },
+          {
+            backgroundColor: first(
+              hook.backgroundColorHover,
+              hook.backgroundColor,
+              mix(own.buttonTone, 22, 'transparent'),
+            ),
+          },
+        ),
+      ]),
       rule(
         { emphasis: 'ghost' },
         {
@@ -394,20 +424,27 @@ export default styles(
           interaction: ['hover', 'active'],
         },
         {
+          /* 12% in dark, as a row's hover is: at 8% a danger ghost measured 1.065:1 on a
+             black page. */
           backgroundColor: first(
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.buttonTone, 8, 'transparent'),
+            scheme(mix(own.buttonTone, 8, 'transparent'), mix(own.buttonTone, 12, 'transparent')),
           ),
           borderColor: 'transparent',
           color: hook.foregroundColor(own.buttonInk),
         },
       ),
       /* A press, one step past each hover. After the hovers, since a press
-         happens under the pointer. */
+         happens under the pointer. **16% in light and 20% in dark**, where 16% stood
+         1.13:1 from the 12% hover. */
       rule(
         { active: true, formDisabled: false },
-        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 16, 'transparent')) },
+        {
+          backgroundColor: hook.backgroundColor(
+            scheme(mix(own.buttonTone, 16, 'transparent'), mix(own.buttonTone, 20, 'transparent')),
+          ),
+        },
       ),
       rule(
         { active: true, emphasis: 'solid', formDisabled: false },
@@ -415,11 +452,35 @@ export default styles(
       ),
       rule(
         { active: true, emphasis: 'subtle', formDisabled: false },
-        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 30, 'transparent')) },
+        {
+          backgroundColor: web(
+            hook.backgroundColor(
+              scheme(
+                mix(own.buttonTone, 30, 'transparent'),
+                fn(
+                  'color-mix',
+                  ['in', 'oklab'],
+                  [own.buttonTone, sum(own.buttonSubtleDark('14%'), '16%')],
+                  'transparent',
+                ),
+              ),
+            ),
+          ),
+        },
       ),
+      native([
+        rule(
+          { active: true, emphasis: 'subtle', formDisabled: false },
+          { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 30, 'transparent')) },
+        ),
+      ]),
       rule(
         { active: true, emphasis: 'ghost', formDisabled: false },
-        { backgroundColor: hook.backgroundColor(mix(own.buttonTone, 16, 'transparent')) },
+        {
+          backgroundColor: hook.backgroundColor(
+            scheme(mix(own.buttonTone, 16, 'transparent'), mix(own.buttonTone, 20, 'transparent')),
+          ),
+        },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
       rule(
@@ -452,10 +513,13 @@ export default styles(
         ),
         /* A label longer than the button cuts at the end, so the button stays
            inside a narrow column. */
+        /* The end of the label's own direction, since the slot takes `dir="auto"`, and
+           aligned as the button is. */
         rule({
           display: 'block',
           minInlineSize: 0,
           overflow: 'hidden',
+          textAlign: 'match-parent',
           textOverflow: 'ellipsis',
         }),
       ]),
@@ -463,7 +527,11 @@ export default styles(
     /* Icons scale with the label, so a large button does not draw a small
        glyph beside big text. An icon reads `--icon-size`, and a phone stops
        it growing at the largest standard text size. */
-    on({ region: '*', slotted: 'helix-icon' }, [rule({ '--icon-size': '1.15em' })]),
+    on({ region: '*', slotted: 'helix-icon' }, [
+      /* Rounded down to an even pixel on the web, so a glyph's strokes land on whole pixels. */
+      web([rule({ '--icon-size': fn('round', 'down', '1.15em', '2px') })]),
+      native([rule({ '--icon-size': '1.15em' })]),
+    ]),
     on({ region: '*' }, [rule({ pending: true }, { visibility: 'hidden' })]),
     on('spinner', [
       rule({
@@ -496,5 +564,50 @@ export default styles(
       ]),
     ]),
     keyframes('helix-button-turn', { to: { rotate: '1turn' } }),
+    /* **Forced colors keep the emphasis.** Every fill turns Canvas and every edge the
+       text color, so the four were one box. A solid button takes the system's button
+       colors reversed and opts out of forcing, a ghost loses its edge, and the two
+       between keep the box. GrayText is the disabled state, drawn whole. The
+       `[data-button]` recipe says the same. */
+    on('button', [
+      web([
+        rule(
+          [
+            { emphasis: 'solid', forcedColors: true },
+            { emphasis: 'solid', forcedColors: true, formDisabled: false, hover: true },
+            { active: true, emphasis: 'solid', forcedColors: true, formDisabled: false },
+          ],
+          {
+            backgroundColor: 'ButtonText',
+            borderColor: 'ButtonText',
+            color: 'ButtonFace',
+            forcedColorAdjust: 'none',
+          },
+        ),
+        rule(
+          { forcedColors: true, formDisabled: true },
+          {
+            borderColor: 'GrayText',
+            color: 'GrayText',
+            opacity: 1,
+          },
+        ),
+        rule(
+          { emphasis: 'solid', forcedColors: true, formDisabled: true },
+          {
+            backgroundColor: 'GrayText',
+            borderColor: 'GrayText',
+            color: 'ButtonFace',
+          },
+        ),
+        rule(
+          [
+            { emphasis: 'ghost', forcedColors: true },
+            { emphasis: 'ghost', forcedColors: true, formDisabled: false, hover: true },
+          ],
+          { borderColor: 'Canvas' },
+        ),
+      ]),
+    ]),
   ],
 )

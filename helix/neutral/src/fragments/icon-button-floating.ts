@@ -53,9 +53,7 @@ export default fragment(
         { emphasis: { not: 'solid' }, material: 'glass' },
         {
           backdropFilter: hook.backdrop(token('material-backdrop')),
-          backgroundColor: own.iconButtonPressedFill(
-            hook.backgroundColor(token('material-translucent')),
-          ),
+          backgroundColor: own.iconButtonPressedFill(hook.backgroundColor(token('material-panel'))),
         },
       ),
       rule(
@@ -66,6 +64,16 @@ export default fragment(
             hook.backgroundColor(token('material-translucent-strong')),
           ),
         },
+      ),
+      /* **A ghost under a material draws the material's edge**, as every glass or
+         frosted surface does: over a photo the glass square had no edge at all. An
+         outlined button keeps its own. */
+      rule(
+        [
+          { emphasis: false, material: ['frosted', 'glass'] },
+          { emphasis: 'ghost', material: ['frosted', 'glass'] },
+        ],
+        { borderColor: hook.borderColor(token('material-border')) },
       ),
       /* No ground at all: the glyph over the surface, for one quiet enough to
          hold it. */

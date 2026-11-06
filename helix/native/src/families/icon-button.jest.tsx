@@ -152,7 +152,8 @@ describe('what a phone draws of an icon button', () => {
           {close()}
           <Token name="size-control" />
           <Token name="color-foreground-muted" />
-          <Token name="size-icon" />
+          <Token name="size-icon-sm" />
+          <Token name="size-icon-tight" />
         </>,
       ),
     )
@@ -161,7 +162,10 @@ describe('what a phone draws of an icon button', () => {
     expect(String(button.width)).toBe(tokenOf('size-control'))
     expect(button.backgroundColor).toBe('transparent')
     expect(glyphOf('x').backgroundColor).toBe(tokenOf('color-foreground-muted'))
-    expect(String(glyphOf('x').height)).toBe(tokenOf('size-icon'))
+    /* The tight icon, never under the small one, as main's glyph step is. */
+    expect(Number(glyphOf('x').height)).toBe(
+      Math.max(Number(tokenOf('size-icon-sm')), Number(tokenOf('size-icon-tight'))),
+    )
   })
 
   test('a solid primary button is filled with the primary surface', async () => {
