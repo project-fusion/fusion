@@ -47,7 +47,7 @@ export default styles(
       dragPreviewOpacity: 0.9,
       dragPreviewRadius: token('radii-sm'),
       dragPreviewShadow: token('shadow-floating'),
-      errorColor: token('color-foreground'),
+      errorColor: token('color-danger'),
       footerGap: token('space-sm'),
       footerItemGap: token('space-md'),
       headingBackgroundColor: token('color-background'),
@@ -57,7 +57,7 @@ export default styles(
       morePaddingBlock: token('space-2xs'),
       morePaddingInline: token('space-sm'),
       moreRadius: token('radii-sm'),
-      paddingBlock: token('space-sm'),
+      paddingBlock: product(token('space-control'), 0.5),
       paddingInline: null,
       ruleColor: token('color-border'),
       text: token('text-control'),
@@ -70,6 +70,7 @@ export default styles(
       collectionInsetBlock: null,
       collectionInsetInline: null,
       dataTableFade: null,
+      dataTableFadeSize: null,
       tableHeadingBackgroundColor: null,
       tableHeadingColor: null,
       tableHeadingLayer: null,
@@ -94,7 +95,9 @@ export default styles(
     const leadBox = {
       alignItems: 'center',
       borderBlockEnd: [token('border-thin'), 'solid', hook.ruleColor],
+      boxSizing: 'border-box',
       display: 'flex',
+      minBlockSize: token('size-control'),
       justifyContent: 'center',
       paddingBlock: hook.paddingBlock,
       paddingInline: first(hook.paddingInline, token('space-sm')),
@@ -118,9 +121,14 @@ export default styles(
       on(['toolbar', 'table', 'footer'], [web([rule({ gridColumn: '1 / -1' })])]),
       on('table', [
         web([
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['data-table-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self inline'),
+            },
+          ),
           rule({
-            animation: ['data-table-edges', 'linear', 'both'],
-            animationTimeline: fn('scroll', 'self inline'),
             display: 'grid',
             gridTemplateColumns: first(
               hook.columns,
@@ -136,7 +144,11 @@ export default styles(
               'transparent',
             ),
             overflowX: 'auto',
-            own: { dataTableFade: 'to right' },
+            /* The fade at an edge with more behind it, wide enough to read as one. */
+            own: {
+              dataTableFade: 'to right',
+              dataTableFadeSize: sum(token('space-xl'), token('space-md')),
+            },
           }),
           rule({ dir: 'rtl' }, { own: { dataTableFade: 'to left' } }),
           rule({ reducedMotion: true }, { animation: 'none' }),
@@ -148,7 +160,12 @@ export default styles(
           rule({ print: true, windowed: true }, { blockSize: 'auto', overflowY: 'visible' }),
         ]),
         native([rule({ windowed: true }, { blockSize: hook.blockSize })]),
-        rule({ loading: true }, { opacity: token('opacity-busy') }),
+        native([rule({ loading: true }, { opacity: token('opacity-busy') })]),
+      ]),
+      /* Written out: while it loads, the rows' cells dim, since a row draws no box, and the
+         column headings that say what the rows are stay. */
+      on({ part: 'row', selector: ':host([loading]) [part~="row"] > *' }, [
+        web([rule({ opacity: token('opacity-busy') })]),
       ]),
       on('head', [
         web([rule({ display: 'contents' })]),
@@ -178,15 +195,9 @@ export default styles(
       on(
         {
           part: 'row',
-          selector: ':host([row-link]) [part~="row"]:not([aria-selected="true"]):hover > *',
+          selector: '[part~="row"]:not([aria-selected="true"]):hover > *',
         },
-        [
-          web([
-            rule({
-              backgroundColor: hook.rowHoverBackgroundColor,
-            }),
-          ]),
-        ],
+        [web([rule({ canHover: true }, { backgroundColor: hook.rowHoverBackgroundColor })])],
       ),
       on({ part: 'row', selector: '[part~="row"][aria-selected="true"] > *' }, [
         web([
@@ -272,6 +283,17 @@ export default styles(
       on({ part: 'select', selector: '[part~="select"]' }, [web([rule(leadBox)])]),
       on(['select-all', 'grip-head'], [rule(leadBox), web([rule({ windowed: true }, heldHead)])]),
       on('row-grip', [web([rule(leadBox)])]),
+      /* The box column: its checkbox at the start, its padding the row's own. */
+      on({ part: 'select', selector: ':host [part~="select"], :host [part="select-all"]' }, [
+        web([
+          rule({
+            justifyContent: 'flex-start',
+            paddingBlock: token('space-none'),
+            paddingInlineEnd: first(hook.paddingInline, token('space-md')),
+            paddingInlineStart: first(hook.paddingInline, token('space-none')),
+          }),
+        ]),
+      ]),
       on({ part: 'grip-head', selector: '[part="grip-head"]::before' }, [
         web([rule({ content: '""', inlineSize: '1em' })]),
       ]),
@@ -321,6 +343,7 @@ export default styles(
         ],
       ),
       on('error', [rule({ ...said, color: hook.errorColor, web: { gridColumn: '1 / -1' } })]),
+      on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
       on({ part: 'toggle', selector: '[part~="toggle"]' }, [
         web([
           rule({

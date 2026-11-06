@@ -1,4 +1,4 @@
-import { first, product, sum, token, web } from '../style.js'
+import { first, fn, product, sum, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -26,13 +26,14 @@ export default fragment(
     hooks: {
       cellBlockAlign: 'center',
       color: token('color-foreground'),
-      paddingBlock: token('space-sm'),
+      paddingBlock: product(token('space-control'), 0.5),
       paddingInline: null,
       ruleColor: token('color-border'),
       text: token('text-control'),
     },
+    own: { dataTableFadeSize: null },
   },
-  ({ hook, keyframes, on, rule }) => {
+  ({ hook, keyframes, on, own, rule }) => {
     return [
       /* Written out: a row carries several names, and one wins by what follows it. */
       on({ part: 'row', selector: '[part~="row"]' }, [web([rule({ display: 'contents' })])]),
@@ -40,10 +41,13 @@ export default fragment(
         web([
           rule({
             borderBlockEnd: [token('border-thin'), 'solid', hook.ruleColor],
+            boxSizing: 'border-box',
             color: hook.color,
             fontFamily: token('font-sans'),
             fontSize: hook.text,
             fontVariantNumeric: 'tabular-nums',
+            /* A control's height at least, as a Table's cell is. */
+            minBlockSize: token('size-control'),
             paddingBlock: hook.paddingBlock,
             paddingInline: first(hook.paddingInline, [token('space-none'), token('space-md')]),
           }),
@@ -69,7 +73,11 @@ export default fragment(
           rule(
             { supports: '(text-box: trim-both cap alphabetic)' },
             {
-              minBlockSize: sum('1lh', product(hook.paddingBlock, 2), token('border-thin')),
+              minBlockSize: fn(
+                'max',
+                token('size-control'),
+                sum('1lh', product(hook.paddingBlock, 2), token('border-thin')),
+              ),
               textBox: 'trim-both cap alphabetic',
             },
           ),
@@ -95,7 +103,9 @@ export default fragment(
         },
         [
           web([
+            /* At the corner every focus ring takes. */
             rule({
+              borderRadius: token('radii-sm'),
               outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
               outlineOffset: product(token('size-focus-offset'), '-1'),
             }),
@@ -112,12 +122,18 @@ export default fragment(
       on('more', [web([rule({ display: 'contents' })])]),
       on(['before', 'after'], [web([rule({ gridColumn: '1 / -1' })])]),
       keyframes('data-table-edges', {
-        '0%': { '--_data-table-fade-end': token('space-xl'), '--_data-table-fade-start': '0rem' },
-        '5%, 95%': {
-          '--_data-table-fade-end': token('space-xl'),
-          '--_data-table-fade-start': token('space-xl'),
+        '0%': {
+          '--_data-table-fade-end': own.dataTableFadeSize,
+          '--_data-table-fade-start': '0rem',
         },
-        '100%': { '--_data-table-fade-end': '0rem', '--_data-table-fade-start': token('space-xl') },
+        '5%, 95%': {
+          '--_data-table-fade-end': own.dataTableFadeSize,
+          '--_data-table-fade-start': own.dataTableFadeSize,
+        },
+        '100%': {
+          '--_data-table-fade-end': '0rem',
+          '--_data-table-fade-start': own.dataTableFadeSize,
+        },
       }),
     ]
   },
