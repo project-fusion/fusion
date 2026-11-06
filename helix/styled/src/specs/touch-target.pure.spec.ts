@@ -58,8 +58,8 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['notifications/notification/notification.css', '[part="dismiss"]::after'],
   ['chat/composer/chat-composer.css', '[part="send"]::after'],
   ['chat/message/chat-message.css', '[part="retry"]::after'],
-  ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
-  ['lightbox/root/lightbox-root.css', '[part="zoom-out"]::after'],
+  ['video/root/video-root.generated.css', ':host [part="play"]::after'],
+  ['lightbox/root/lightbox-root.generated.css', '[part="zoom-out"]::after'],
   ['color-picker/root/color-picker-root.css', '[part="swatch"]::after'],
 ]
 

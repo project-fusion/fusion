@@ -120,11 +120,25 @@ export default styles(
       ),
       wellBackgroundColor: token('color-surface-media'),
     },
+    own: { videoLevelSize: null, videoRailSize: null, videoSpin: null, videoThumbSize: null },
     stylesheet: 'video/root/video-root.generated.css',
   },
   ({ hook, include, keyframes, on, rule }) => [
     on('host', [
       rule({ colorScheme: 'dark', display: 'block', position: 'relative' }),
+      /* The two rails, their thumbs, the level's height, and the spinner's
+         turn, named once. A rail `4px` thick with a `12px` thumb is a fact
+         about a slider drawn over a picture, thinner than any rung of the
+         size scale, and the turn is Loader's own 0.8s, so two spinners on
+         one page agree. None is a thing a page is invited to move. */
+      rule({
+        own: {
+          videoLevelSize: '4.5rem',
+          videoRailSize: '4px',
+          videoSpin: '0.8s',
+          videoThumbSize: '12px',
+        },
+      }),
       rule({ print: true }, { display: 'none' }),
     ]),
     on('stage', [
@@ -139,7 +153,14 @@ export default styles(
         },
       }),
       /* The picture in the flow, and what stands over it centered on it. */
-      native([rule({ alignItems: 'center', display: 'flex', justifyContent: 'center' })]),
+      native([
+        rule({
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }),
+      ]),
       web([
         rule(
           { focusVisible: true },
@@ -164,9 +185,10 @@ export default styles(
     on('still', [
       native([
         rule({
-          blockSize: '100%',
-          inlineSize: '100%',
+          /* Placed by its four edges, since an absolute box takes no stretch. */
+          insetBlockEnd: 0,
           insetBlockStart: 0,
+          insetInlineEnd: 0,
           insetInlineStart: 0,
           objectFit: 'contain',
           position: 'absolute',
@@ -263,6 +285,19 @@ export default styles(
         }),
       ]),
     ]),
+    /* The speed says its number, and draws no glyph. */
+    on('extra-mark', [native([rule({ part: { hidden: true } }, { display: 'none' })])]),
+    /* A phone's extras, a row of presses in the order written. */
+    on('extras', [
+      native([
+        rule({
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'row',
+          gap: token('space-xs'),
+        }),
+      ]),
+    ]),
     on(PRESSES, [
       native([
         rule({
@@ -306,6 +341,13 @@ export default styles(
         fontSize: token('text-xs'),
         fontVariantNumeric: 'tabular-nums',
       }),
+      /* A phone's words take no ink from the bar around them, so the bar's is
+         named. The reader's text size grows them, so the clock gives way to the
+         scrubber, on one line, before it pushes the controls off the bar. */
+      native([
+        rule({ color: hook.controlsColor, flexShrink: 1, minInlineSize: 0 }),
+        rule({ separation: 'filled' }, { color: token('color-foreground') }),
+      ]),
     ]),
     include(videoSound),
     /* The menu takes no width of its own: what a reader sees is its trigger. */
