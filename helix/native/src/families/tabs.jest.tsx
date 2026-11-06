@@ -1,6 +1,6 @@
 /*
  * The generated Tabs' own glyphs, drawn from the real intermediate forms: the
- * close mark of a dismissible tab is an em of the tab's words, as
+ * close mark of a dismissible tab is the tight icon step, as
  * `[part="dismiss-mark"]` sizes it on the web, and a disabled tab is drawn
  * at half its opacity, as its own `disabled` says. `test:native` writes the
  * components beside this file.
@@ -12,7 +12,7 @@ import { fakeKeys } from '@fusion.dev/helix-core/capabilities/keys/fake'
 import { beforeEach, describe, expect, test } from '@jest/globals'
 import { act, render, screen } from '@testing-library/react-native'
 import { Dimensions, StyleSheet, View } from 'react-native'
-import { HelixTheme } from '../theme/helix-theme'
+import { HelixTheme, useTokens } from '../theme/helix-theme'
 import type { GlyphProps } from '../theme/theme'
 import { HelixTab, HelixTabs } from './tabs/index.native'
 
@@ -38,9 +38,17 @@ beforeEach(() => {
 const styleOf = (view: { props: { style?: unknown } } | null | undefined) =>
   StyleSheet.flatten(view?.props.style as never) as Readonly<Record<string, unknown>>
 
+/** The theme's tokens, handed out of the tree. */
+let tokens: Readonly<Record<string, number | string>> = {}
+const Tokens = () => {
+  tokens = useTokens()
+  return null
+}
+
 const drawn = () =>
   render(
     <HelixTheme Glyph={Recorded} mode="light">
+      <Tokens />
       <HelixTabs>
         <HelixTab dismissible value="a">
           Alpha
@@ -53,9 +61,9 @@ const markHeight = (): number =>
   styleOf(screen.getByTestId('glyph x', { includeHiddenElements: true })).height as number
 
 describe("a dismissible tab's close mark", () => {
-  test('is an em of the words', async () => {
+  test('is the tight icon step', async () => {
     await drawn()
-    expect(markHeight()).toBeCloseTo(styleOf(screen.getByText('Alpha')).fontSize as number, 3)
+    expect(markHeight()).toBeCloseTo(Number(tokens['size-icon-tight']), 3)
   })
 
   test('stops growing at the largest standard text size, 1.353 times', async () => {

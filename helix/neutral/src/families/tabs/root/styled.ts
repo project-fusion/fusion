@@ -1,3 +1,4 @@
+import tabsEdges from '../../../fragments/tabs-edges.js'
 import { oneOf } from '../../../render.js'
 import { difference, fn, list, measured, mix, product, scheme, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
@@ -30,14 +31,13 @@ export default styles(
     }),
     own: {
       indicatorBlock: null,
-      indicatorBorder: null,
-      indicatorBorderColor: null,
       indicatorColor: null,
       indicatorOffset: null,
       indicatorOffsetX: null,
       indicatorRadius: null,
       indicatorShadow: null,
       tabHeight: null,
+      tabHoverSurface: null,
       tabInlineSize: null,
       tabJustify: null,
       tabRadius: null,
@@ -56,7 +56,7 @@ export default styles(
     },
     stylesheet: 'tabs/root/tabs-root.generated.css',
   },
-  ({ hook, on, own, rule }) => [
+  ({ hook, include, on, own, rule }) => [
     on('host', [
       rule({
         display: 'grid',
@@ -71,6 +71,7 @@ export default styles(
            the selected tab and nothing at all behind the row. */
         own: {
           tabsRule: 'none',
+          tabHoverSurface: token('color-hover'),
           tabRadius: token('radii-sm'),
           tabSelectedShadow: token('shadow-sm'),
           tabSelectedSurface: token('color-surface-raised'),
@@ -89,9 +90,16 @@ export default styles(
         },
       ),
       rule({ marker: 'segmented' }, { own: { tabSelectedSurface: 'transparent' } }),
+      /* The default pill is the selected wash, so a hovered tab takes a quieter one. */
       rule(
         { marker: false },
-        { own: { tabSelectedSurface: 'transparent', tabSelectedShadow: 'none' } },
+        {
+          own: {
+            tabHoverSurface: mix(token('color-foreground'), 5, 'transparent'),
+            tabSelectedSurface: 'transparent',
+            tabSelectedShadow: 'none',
+          },
+        },
       ),
       /* Vertical: the tabs in a column at the inline start, the panels beside them. */
       rule(
@@ -187,6 +195,7 @@ export default styles(
         { blockSize: 'auto', justifySelf: 'start', own: { tabHeight: 'initial' } },
       ),
     ]),
+    include(tabsEdges),
     /* The scroll buttons under `scroll-controls` hold to the ends of the strip as
        it scrolls, over the tabs that pass under them. Hidden, they draw no box. */
     on(
@@ -203,7 +212,7 @@ export default styles(
           justifyContent: 'center',
           paddingInline: token('space-2xs'),
           position: 'sticky',
-          zIndex: 1,
+          zIndex: token('layer-sticky'),
         }),
         rule({ part: { hidden: true } }, { display: 'none' }),
         rule({ hover: true }, { color: token('color-foreground') }),
@@ -251,12 +260,6 @@ export default styles(
       rule({
         backgroundColor: own.indicatorColor('transparent'),
         blockSize: own.indicatorBlock(token('border-thick')),
-        /* An edge as well as a fill, because on a light page a fill alone could not
-           tell the mark from a hover. `surface-raised` is 0.97 and the hover wash is
-           five per cent of the foreground over the strip, which composites to 0.966:
-           measured 0.004 apart in OKLCH lightness, so the only thing separating the
-           tab you are on from the tab under your pointer was a `shadow-sm`. */
-        border: [own.indicatorBorder(0), 'solid', own.indicatorBorderColor('transparent')],
         borderRadius: hook.indicatorRadius,
         boxShadow: hook.indicatorShadow,
         inlineSize: measured('indicator-inline-size', 0),
@@ -309,7 +312,7 @@ export default styles(
             indicatorColor: hook.indicatorColor(
               scheme(token('color-surface-overlay'), token('color-press')),
             ),
-            indicatorRadius: difference(token('radii-sm'), token('border-thin')),
+            indicatorRadius: token('radii-inset'),
             indicatorShadow: token('shadow-sm'),
             indicatorOffset: '0px',
           },
@@ -321,15 +324,10 @@ export default styles(
         {
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
-            /* `overlay` with an edge. This pill lies on the page with nothing framing
-               it, and `raised` put it a three per cent step off a white strip: the
-               same place the hover wash lands, so the selected tab and a hovered one
-               read as the same thing. */
-            indicatorBorder: token('border-thin'),
-            indicatorBorderColor: token('color-border'),
-            indicatorColor: hook.indicatorColor(token('color-surface-overlay')),
+            /* The selected wash, with no edge and no shadow: a hovered tab takes five
+               per cent of the ink, a step under it. */
+            indicatorColor: hook.indicatorColor(token('color-selected')),
             indicatorRadius: token('radii-sm'),
-            indicatorShadow: token('shadow-sm'),
             indicatorOffset: '0px',
           },
         },
@@ -359,8 +357,7 @@ export default styles(
         ],
         {
           own: {
-            indicatorBorder: 0,
-            indicatorColor: hook.indicatorColor(mix(token('color-foreground'), 8, 'transparent')),
+            indicatorColor: hook.indicatorColor(token('color-selected')),
             indicatorShadow: 'none',
           },
         },
