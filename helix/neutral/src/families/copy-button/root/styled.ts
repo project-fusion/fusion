@@ -21,15 +21,22 @@ export default styles(
   {
     prefix: 'copy-button',
     over: 'icon-button',
-    hooks: {
+    hooks: ({ own }) => ({
       color: null,
       colorHover: null,
       errorColor: token('color-danger'),
-      iconSize: token('size-icon'),
+      /* At Icon Button's glyph, so the clipboard matches an Icon Button
+         beside it in the same row. */
+      iconSize: own.iconButtonGlyph,
       size: hookOf('icon-button', 'size', token('size-control')),
       successColor: token('color-success'),
+    }),
+    own: {
+      iconButtonGlyph: null,
+      iconButtonInk: null,
+      iconButtonInkHover: null,
+      iconButtonSize: null,
     },
-    own: { iconButtonInk: null, iconButtonInkHover: null, iconButtonSize: null },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
       tone: oneOf(['accent', 'danger', 'neutral', 'primary']),

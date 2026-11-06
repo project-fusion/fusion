@@ -1,6 +1,16 @@
 import visuallyHidden from '../../../fragments/visually-hidden.js'
 import { oneOf } from '../../../render.js'
-import { difference, fn, hookOf, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  hookOf,
+  native,
+  product,
+  safeArea,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -24,7 +34,7 @@ export default styles(
       size: '40rem',
     },
     props: { material: oneOf(['frosted', 'glass']) },
-    own: { commandRow: null },
+    own: { commandListCap: null, commandRow: null },
     stylesheet: 'command/root/command-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -51,6 +61,21 @@ export default styles(
             marginBlockStart: token('space-none'),
             position: 'absolute',
           }),
+        ]),
+        /* At the top on a phone, where the on-screen keyboard rises with the
+           field: the palette keeps its card and takes back what Dialog's
+           sheet changed, its four corners and the rise from below. */
+        web([
+          rule(
+            { window: { below: '30rem' } },
+            {
+              /* And a list short enough to end above the keyboard. */
+              own: { commandListCap: '40svh' },
+              borderRadius: hook.radius,
+              marginBlockStart: sum(token('space-sm'), safeArea('top')),
+              translate: 'none',
+            },
+          ),
         ]),
       ]),
       /* One text column down the whole panel, and the dialog's corners unless a page
@@ -93,9 +118,17 @@ export default styles(
         rule({
           backgroundColor: 'transparent',
           border: 'none',
-          maxBlockSize: hook.listSize,
-          paddingBlock: token('space-xs'),
+          /* No taller than the panel allows, which a phone's keyboard shortens. */
+          maxBlockSize: fn('min', hook.listSize, own.commandListCap(hook.listSize)),
+          /* Above the rows only: under them the footer brings its own inset
+             and rule. */
+          paddingBlock: [token('space-xs'), token('space-2xs')],
         }),
+      ]),
+      /* What the `error` region holds, such as a button that tries again,
+         sits a step after the list's error words, as it does in Table. */
+      on({ region: 'error', slotted: '*' }, [
+        web([rule({ marginInlineStart: token('space-sm') })]),
       ]),
       /* The search is the first thing in the panel, edge to edge. */
       on('listbox-search', [rule({ borderBlockEnd: edge, padding })]),
