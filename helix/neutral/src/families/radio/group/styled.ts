@@ -17,6 +17,15 @@ export default styles(
   {
     prefix: 'radio-group',
     hooks: { gap: null },
+    /* Read by each radio inside, which falls back to its own where the group sets none. */
+    own: {
+      radioCardEdge: null,
+      radioCardGround: null,
+      radioCardRing: null,
+      radioCursor: null,
+      radioHover: null,
+      radioPress: null,
+    },
     stylesheet: 'radio/group/radio-group.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -32,6 +41,22 @@ export default styles(
       ),
       /* Wrong, and the set says so on the controls rather than around them. */
       rule({ invalid: true }, { '--radio-border-color': token('color-danger') }),
+      /* Read-only: the choices are shown and not offered, so a radio takes no pointer,
+         no hover and no press, and a card keeps its plain edge and no ring. */
+      rule(
+        { has: 'readonly' },
+        {
+          own: {
+            radioCardEdge: token('color-border'),
+            radioCardGround: 'transparent',
+            radioCardRing: 'transparent',
+            radioCursor: 'default',
+            radioHover: 'transparent',
+            radioPress: 'transparent',
+          },
+          '--radio-border-color': token('color-border-readonly'),
+        },
+      ),
     ]),
   ],
 )
