@@ -1,15 +1,13 @@
+import drawerDismiss from '../../../fragments/drawer-dismiss.js'
+import drawerPlacement from '../../../fragments/drawer-placement.js'
 import { oneOf } from '../../../render.js'
 import {
-  difference,
   first,
   fn,
   inherited,
   list,
   mix,
-  native,
   product,
-  quotient,
-  safeArea,
   scheme,
   sum,
   token,
@@ -60,8 +58,6 @@ export default styles(
     own: {
       drawerAway: null,
       drawerBorder: null,
-      drawerDismiss: null,
-      drawerDismissGlyph: null,
       drawerGround: null,
       drawerInset: null,
       drawerInsetTop: null,
@@ -76,17 +72,10 @@ export default styles(
     props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'drawer/root/drawer-root.generated.css',
   },
-  ({ hook, on, own, rule }) => {
+  ({ hook, include, on, own, rule }) => {
     const move = token('duration-normal')
     const padding = hook.padding(own.drawerInset)
     const paddingTop = first(hook.paddingBlockStart, hook.padding, own.drawerInsetTop)
-    const dismissSize = own.drawerDismiss
-    /* The padding at an edge the panel meets the window along, clear of the
-       status bar, a notch, and the home indicator there. */
-    const clearTop = sum(paddingTop, safeArea('top'))
-    const clearBottom = sum(padding, safeArea('bottom'))
-    /* The title's first line, where the close control is centered. */
-    const titleLine = product(token('text-lg'), token('leading-tight'))
     /* The rungs a panel restates inside it in dark, as Dialog's do: the Card's lift
        inside a card stops at the panel, a panel opened from inside stands above it, the
        rungs step by 3%, 9%, and 12% of the ink, a line sits the step above the panel that
@@ -209,85 +198,9 @@ export default styles(
             backgroundColor: hook.backgroundColor(token('material-translucent-strong')),
           },
         ),
-        /* Square where it meets the window, curved where it meets the page. */
-        rule([{ placement: false }, { placement: 'end' }], {
-          borderStartEndRadius: token('radii-none'),
-          borderEndEndRadius: token('radii-none'),
-          blockSize: '100%',
-          inlineSize: fn('min', own.drawerSize, '100%'),
-          web: { insetBlock: 0, insetInlineEnd: 0 },
-          own: {
-            drawerAway: fn('translateX', '100%'),
-            drawerLead: clearTop,
-            drawerTrail: clearBottom,
-          },
-        }),
-        rule(
-          { placement: 'start' },
-          {
-            borderStartStartRadius: token('radii-none'),
-            borderEndStartRadius: token('radii-none'),
-            blockSize: '100%',
-            inlineSize: fn('min', own.drawerSize, '100%'),
-            web: { insetBlock: 0, insetInlineStart: 0 },
-            own: {
-              drawerAway: fn('translateX', '-100%'),
-              drawerLead: clearTop,
-              drawerTrail: clearBottom,
-            },
-          },
-        ),
-        rule(
-          { placement: 'bottom' },
-          {
-            borderEndStartRadius: token('radii-none'),
-            borderEndEndRadius: token('radii-none'),
-            blockSize: fn('min', own.drawerSize, '100%'),
-            web: { insetBlockEnd: 0, insetInline: 0 },
-            own: {
-              drawerAway: fn('translateY', '100%'),
-              drawerLead: paddingTop,
-              drawerTrail: clearBottom,
-            },
-          },
-        ),
-        rule(
-          { placement: 'top' },
-          {
-            borderStartStartRadius: token('radii-none'),
-            borderStartEndRadius: token('radii-none'),
-            blockSize: fn('min', own.drawerSize, '100%'),
-            web: { insetBlockStart: 0, insetInline: 0 },
-            own: {
-              drawerAway: fn('translateY', '-100%'),
-              drawerLead: clearTop,
-              drawerTrail: padding,
-            },
-          },
-        ),
-        /* A phone takes no share inside `min()`, which the window it stands
-           in has no length for until it is laid out: the size, and never more
-           than the window across it. */
-        native([
-          rule([{ placement: false }, { placement: ['end', 'start'] }], {
-            inlineSize: own.drawerSize,
-            maxInlineSize: '100%',
-          }),
-          rule(
-            { placement: ['bottom', 'top'] },
-            { blockSize: own.drawerSize, maxBlockSize: '100%' },
-          ),
-        ]),
-        /* The inline edges are logical and `translateX` is physical, so on a
-           right-to-left page the end sits on the left and slides out leftward. */
-        rule(
-          [
-            { dir: 'rtl', placement: false },
-            { dir: 'rtl', placement: 'end' },
-          ],
-          { own: { drawerAway: fn('translateX', '-100%') } },
-        ),
-        rule({ dir: 'rtl', placement: 'start' }, { own: { drawerAway: fn('translateX', '100%') } }),
+      ]),
+      include(drawerPlacement),
+      on('panel', [
         /* Home, less however far a swipe or a snap point has moved it toward
            its edge, which is nothing at rest. */
         rule(
@@ -410,64 +323,7 @@ export default styles(
       on({ part: 'content', selector: '[part="content"] > slot::slotted(*)' }, [
         web([rule({ flexShrink: 0 })]),
       ]),
-      /* In the corner and out of the flow, centered on the title's first line. **The
-         box, its glyph and its inset follow the density** as Dialog's do. */
-      on('dismiss', [
-        rule({
-          own: {
-            drawerDismiss: token('size-control-tight'),
-            drawerDismissGlyph: token('size-icon-tight'),
-          },
-          web: { all: 'unset', cursor: 'pointer' },
-          boxSizing: 'border-box',
-          position: 'absolute',
-          insetBlockStart: sum(
-            own.drawerLead(paddingTop),
-            quotient(difference(titleLine, dismissSize), 2),
-          ),
-          insetInlineEnd: difference(
-            padding,
-            quotient(difference(dismissSize, own.drawerDismissGlyph), 2),
-          ),
-          blockSize: dismissSize,
-          borderRadius: token('radii-sm'),
-          color: token('color-foreground-muted'),
-          display: 'inline-flex',
-          inlineSize: dismissSize,
-          placeContent: 'center',
-          placeItems: 'center',
-          transition: ['color', token('duration-fast'), token('easing-standard')],
-        }),
-        rule(
-          { hover: true },
-          {
-            backgroundColor: token('color-hover'),
-            color: token('color-foreground'),
-          },
-        ),
-        rule(
-          { focusVisible: true },
-          {
-            outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-            outlineOffset: token('size-focus-offset'),
-          },
-        ),
-        rule({ reducedMotion: true }, { transition: 'none' }),
-      ]),
-      /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn
-         moves. Where the control is already that size the box sits inside it. */
-      on({ after: 'dismiss' }, [
-        web([
-          rule({
-            content: '""',
-            inset: quotient(difference(token('size-target'), '100%'), '-2'),
-            position: 'absolute',
-          }),
-        ]),
-      ]),
-      on('dismiss-mark', [
-        rule({ blockSize: own.drawerDismissGlyph, inlineSize: own.drawerDismissGlyph }),
-      ]),
+      include(drawerDismiss),
       /* Room for it at the end of the title, so a long title wraps before it. */
       on({ region: 'header', slotted: '*' }, [
         rule(
