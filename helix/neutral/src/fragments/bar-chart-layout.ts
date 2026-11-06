@@ -144,8 +144,17 @@ export default fragment(
           rule(
             { ...upright, lacks: 'secondary', valueAxis: { not: 'none' } },
             {
+              columnGap: 0,
               gridTemplateColumns: 'auto 1fr',
             },
+          ),
+          /* Half a number's height above the plot, so the top number stands inside the box. */
+          rule(
+            [
+              { ...upright, valueAxis: { not: 'none' } },
+              { ...upright, has: 'secondary' },
+            ],
+            { paddingBlockStart: quotient(token('text-xs'), 2) },
           ),
         ]),
       ]),
@@ -161,6 +170,7 @@ export default fragment(
             {
               gridColumn: 1,
               gridRow: 1,
+              marginInlineEnd: hook.gap,
             },
           ),
         ]),
@@ -222,9 +232,14 @@ export default fragment(
       /* Centered on the level it names. */
       on('tick', [
         rule({ position: 'absolute' }),
-        rule(upright, { insetInlineEnd: 0, translate: [0, '-50%'] }),
+        rule(upright, { insetInlineEnd: 0, lineHeight: 1, translate: [0, '-50%'] }),
         rule(sideways, { translate: ['-50%', 0] }),
         web([rule({ ...sideways, dir: 'rtl' }, { translate: ['50%', 0] })]),
+        /* The last number across ends at the plot's end, rather than past it. */
+        web([
+          rule({ ...sideways, child: 'last' }, { translate: ['-100%', 0] }),
+          rule({ ...sideways, child: 'last', dir: 'rtl' }, { translate: ['100%', 0] }),
+        ]),
         native([
           rule(
             { ...upright, part: { 'data-axis': 'secondary' } },

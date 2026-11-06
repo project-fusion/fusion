@@ -3,7 +3,18 @@ import chartStatus from '../../../fragments/chart-status.js'
 import chartTooltip from '../../../fragments/chart-tooltip.js'
 import printExact from '../../../fragments/print-exact.js'
 import { oneOf } from '../../../render.js'
-import { fn, list, measured, mix, native, product, quotient, token, web } from '../../../style.js'
+import {
+  fn,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -39,7 +50,7 @@ export default styles(
     prefix: 'bar-chart',
     hooks: {
       bandColor: token('color-surface-sunken'),
-      barRadius: '2px',
+      barRadius: quotient(token('radii-sm'), 2),
       barStroke: token('border-thick'),
       blockSize: '12em',
       gap: token('space-2xs'),
@@ -52,7 +63,7 @@ export default styles(
       toneMuted: token('color-foreground-subtle'),
       tonePrimary: token('color-primary'),
       toneSuccess: token('color-success'),
-      toneWarning: token('color-warning'),
+      toneWarning: token('color-warning-mark'),
     },
     own: {
       barChartArea: null,
@@ -107,15 +118,39 @@ export default styles(
             barChartBase: [0, 0, half, 0],
             barChartCorners: [radius, radius, 0, 0],
             barChartSeries: measured('chart-series'),
-            barChartShade: mix(own.barChartSeries, 60, token('color-background')),
           },
           fill: own.barChartSeries,
           fillOpacity: product(own.barChartArea(1), own.barChartThrough(1)),
           strokeOpacity: own.barChartThrough(1),
           web: {
-            clipPath: fn('inset', [own.barChartFoot(0), 'round', own.barChartCorners]),
+            clipPath: [
+              fn('inset', [own.barChartFoot(0), 'round', own.barChartCorners]),
+              'fill-box',
+            ],
           },
         }),
+        /* In dark the shade is a darker step of the series itself, where a mix toward the
+           black page went gray; a phone mixes more of the series instead. */
+        web([
+          rule({
+            own: {
+              barChartShade: scheme(
+                mix(own.barChartSeries, 60, token('color-background')),
+                fn('oklch', ['from', own.barChartSeries, 'calc(l * 0.7)', 'min(c, 0.14)', 'h']),
+              ),
+            },
+          }),
+        ]),
+        native([
+          rule({
+            own: {
+              barChartShade: scheme(
+                mix(own.barChartSeries, 60, token('color-background')),
+                mix(own.barChartSeries, 70, token('color-background')),
+              ),
+            },
+          }),
+        ]),
         rule(sideways, {
           own: { barChartBase: [0, 0, 0, half], barChartCorners: [0, radius, radius, 0] },
         }),
@@ -174,7 +209,7 @@ export default styles(
           '--bar-chart-tone-muted': token('color-foreground-subtle'),
           '--bar-chart-tone-primary': token('color-primary'),
           '--bar-chart-tone-success': token('color-success'),
-          '--bar-chart-tone-warning': token('color-warning'),
+          '--bar-chart-tone-warning': token('color-warning-mark'),
         }),
       ]),
       /* Written out: the categories the bubble is not about, faded, while a group is active. */
@@ -298,19 +333,19 @@ export default styles(
         rule(
           { 'data-material': 'glass' },
           {
-            own: { barChartThrough: product(0.62, token('material-opacity')) },
+            own: { barChartThrough: token('material-glass-opacity') },
           },
         ),
         rule(
           { material: 'glass', 'data-material': false },
           {
-            own: { barChartThrough: product(0.62, token('material-opacity')) },
+            own: { barChartThrough: token('material-glass-opacity') },
           },
         ),
         rule(
           { material: 'frosted', 'data-material': false },
           {
-            own: { barChartThrough: product(0.88, token('material-opacity')) },
+            own: { barChartThrough: token('material-frosted-opacity') },
           },
         ),
         native([rule({ stroke: 'none' })]),
@@ -328,19 +363,19 @@ export default styles(
           rule(
             { 'data-material': 'glass' },
             {
-              own: { barChartThrough: product(0.62, token('material-opacity')) },
+              own: { barChartThrough: token('material-glass-opacity') },
             },
           ),
           rule(
             { 'data-material': false, material: 'glass' },
             {
-              own: { barChartThrough: product(0.62, token('material-opacity')) },
+              own: { barChartThrough: token('material-glass-opacity') },
             },
           ),
           rule(
             { 'data-material': false, material: 'frosted' },
             {
-              own: { barChartThrough: product(0.88, token('material-opacity')) },
+              own: { barChartThrough: token('material-frosted-opacity') },
             },
           ),
         ]),
