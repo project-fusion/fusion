@@ -10,46 +10,18 @@ import {
   words,
   wordsConverter,
 } from '@fusion.dev/helix-core'
+import {
+  ORB_MIN_RADIUS,
+  OrbClock,
+  type OrbState,
+  orbDotColor,
+  orbShown,
+} from '@fusion.dev/helix-core/orb'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import {
-  blendStaged,
-  evenSphere,
-  fibonacci,
-  meshFor,
-  ORB_STATES,
-  type OrbParams,
-  type OrbState,
-  orbPoint,
-  paramsFor,
-  project,
-  smoother,
-  stateDistance,
-  TRAIL,
-} from '../shapes.js'
 import { styles } from './orb-root.css.js'
-
-/** The shortest change of state, in ms, and what the longest adds to it. */
-const MORPH_NEAR = 380
-const MORPH_REACH = 580
-
-/** How far above the equator the traveling light sits. */
-const LIGHT_Y = 0.36
-
-/** The frame the still orb is drawn at: far enough in to have a shape. */
-const STILL_PHASE = 1.4
-
-/** A dot, ready to sort and draw. */
-interface Dot {
-  alpha: number
-  radius: number
-  shade: number
-  x: number
-  y: number
-  z: number
-}
 
 /** What an unreadable color answers with, mid gray in both modes. */
 const GRAY: ColorBytesAlpha = [128, 128, 128, 1]
@@ -247,8 +219,7 @@ export class HelixOrb extends HelixElement {
     },
     onMotion: (reduced) => {
       if (reduced) {
-        this.phase = STILL_PHASE
-        this.morphAt = 0
+        this.clock.still()
         this.paint(0)
       }
     },
@@ -265,30 +236,10 @@ export class HelixOrb extends HelixElement {
   private box = 0
 
   /**
-   * Where the cloud is now, and where it is heading.
-   *
-   * **`from` holds numbers rather than the name of a state**, which is what
-   * makes an interruption free: changing state mid-transition snapshots the
-   * blend that is on the screen at that instant and departs from it. Holding a
-   * name forces a choice between the shape being left and the shape being
-   * approached, and either one is a jump the reader sees.
+   * Where the cloud is now, where it is heading, and the state's own clock,
+   * as core's `OrbClock` keeps them for the web and a phone alike.
    */
-  private from: OrbParams = paramsFor('thinking')
-  private morphAt = 0
-  /** How far the current change travels, `0` to `1`. */
-  private reach = 0
-
-  /**
-   * The state's clock, accumulated rather than derived.
-   *
-   * **`elapsed * rate` looks equivalent and is not.** `rate` is one of the
-   * numbers a transition interpolates, and multiplying a running clock by a
-   * changing rate throws the phase forward by the elapsed time times the
-   * change. A minute in, a rate moving from 2.1 to 2.4 skips the wave thirty
-   * seconds ahead, and the orb lurches on every state change. Integrating the
-   * rate has no such term.
-   */
-  private phase = STILL_PHASE
+  private readonly clock = new OrbClock('thinking')
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
@@ -321,9 +272,7 @@ export class HelixOrb extends HelixElement {
 
   /** The state drawn: `state`, or `thinking` for one it does not draw. */
   private get shown(): OrbState {
-    return (ORB_STATES as readonly string[]).includes(this.state)
-      ? (this.state as OrbState)
-      : 'thinking'
+    return orbShown(this.state)
   }
 
   /** The word for the state drawn, in the page's words where it gave them. */
@@ -473,41 +422,19 @@ export class HelixOrb extends HelixElement {
     return true
   }
 
-  /** Begins a transition from whatever is on the screen right now. */
+  /**
+   * Begins a transition from whatever is on the screen right now.
+   *
+   * **The shape drawn is read before the clock takes the new state**, so the
+   * cloud departs from it. Read after, as it was until November 5, 2026, the
+   * blend already ended at the new state, and every change jumped.
+   */
   private turn(): void {
-    this.from = this.paramsNow()
-    this.reach = stateDistance(this.from, paramsFor(this.state))
-    this.morphAt = performance.now()
+    this.clock.turn(this.state, performance.now())
     if (!this.gate.running) {
       this.paint(0)
       this.gate.play()
     }
-  }
-
-  /**
-   * How long this particular change is given.
-   *
-   * **Near states cross quickly and far ones are not hurried.** One length for
-   * every pair read as rushed going from `waiting` to `done`, which differ in
-   * two small numbers, and slack going from `thinking` to `working`, which is a
-   * sash becoming a ring.
-   */
-  private get span(): number {
-    return MORPH_NEAR + MORPH_REACH * this.reach
-  }
-
-  /** How far through a transition, `1` when there is not one. */
-  private get progress(): number {
-    return this.morphAt === 0 ? 1 : Math.min(1, (performance.now() - this.morphAt) / this.span)
-  }
-
-  private paramsNow(): OrbParams {
-    const to = paramsFor(this.state)
-    const k = this.progress
-    if (k >= 1) {
-      return to
-    }
-    return blendStaged(this.from, to, smoother(k), smoother(Math.max(0, k - TRAIL) / (1 - TRAIL)))
   }
 
   /**
@@ -544,21 +471,13 @@ export class HelixOrb extends HelixElement {
     this.gate.play()
   }
 
-  /**
-   * One frame.
-   *
-   * Painter's algorithm: every dot is sorted by depth and drawn back to front,
-   * because a near dot has to cover a far one for the cloud to read as a solid
-   * rather than as a smear.
-   */
+  /** One frame: core's dots for the clock, painted back to front in the canvas's two colors. */
   private paint(dt: number): void {
     const ctx = this.context
     const size = this.box
     if (!ctx || size <= 0) {
       return
     }
-    const still = this.gate.reduced
-    const params = still ? paramsFor(this.state) : this.paramsNow()
     /* Read off the canvas rather than the host: the stylesheet resolves both
        ends of the ramp onto color-typed properties there, for the reason its
        comment gives. A mid gray is what an unreadable value answers, which is
@@ -566,89 +485,18 @@ export class HelixOrb extends HelixElement {
     const painted = getComputedStyle(ctx.canvas)
     /* Carried on an inert property for the reason the colors are. */
     const speed = Number.parseFloat(painted.animationIterationCount)
-    this.phase += dt * params.rate * (Number.isFinite(speed) ? speed : 1)
     const ink = readColorAlpha(painted.color) ?? GRAY
     const ground = readColorAlpha(painted.textDecorationColor) ?? GRAY
-
-    const mesh = meshFor(size)
-    const even = evenSphere(mesh.lanes, mesh.segs)
-    /* **A light traveling around the ball**, rather than a band crossing it.
-       A ring of evenly spaced dots is unchanged by rotation, so a state that
-       turns has nothing a reader can see turning until something fixed in space
-       passes over it. */
-    const spin = this.phase * 0.9
-    const lx = Math.cos(spin) * 0.9
-    const lz = Math.sin(spin) * 0.9
-    const llen = Math.hypot(lx, LIGHT_Y, lz) || 1
-
-    /* One breath through the change, sized by how far it goes and peaked a
-       little past the middle, so it reads as an exhale into the new state
-       rather than a symmetric bump. */
-    const swell =
-      still || this.progress >= 1
-        ? 1
-        : 1 + (0.035 + 0.1 * this.reach) * Math.sin(Math.PI * this.progress ** 0.82)
-    const shell = swell * (1 + params.breathe * Math.sin(this.phase * 0.62))
-    const dots: Dot[] = []
-
-    for (let i = 0; i < mesh.ghostCount; i++) {
-      const [x, y, z] = fibonacci(i, mesh.ghostCount)
-      const [px, py, pz] = project(size, x, y, z)
-      dots.push({
-        alpha: mesh.ghostAlpha + mesh.ghostAlphaSpan * ((pz + 1) / 2),
-        radius: mesh.ghostRadius * mesh.radiusScale,
-        shade: mesh.ghostShade,
-        x: px,
-        y: py,
-        z: pz,
-      })
-    }
-
-    let index = 0
-    for (let band = 0; band < mesh.lanes; band++) {
-      const u = mesh.lanes < 2 ? 0.5 : band / (mesh.lanes - 1)
-      const edge = params.edge * Math.abs(u - 0.5) * 2
-      for (let s = 0; s < mesh.segs; s++, index++) {
-        const [x, y, z] = orbPoint(u, s / mesh.segs, this.phase, params, index, even)
-        const [px, py, pz] = project(size, x * shell, y * shell, z * shell)
-        const depth = (pz + 1) / 2
-        const facing = (x * lx + y * LIGHT_Y + z * lz) / llen
-        const boost =
-          params.orbit * (facing > 0 ? facing ** 11 : 0) +
-          params.jitter * (0.1 + 0.1 * Math.sin(this.phase * 0.6))
-        dots.push({
-          alpha: mesh.aMin + (1 - mesh.aMin) * depth,
-          radius:
-            (mesh.radiusBase + mesh.radiusDepth * depth) *
-            (1 - 0.25 * edge) *
-            (1 + 0.55 * boost) *
-            mesh.radiusScale,
-          shade: mesh.shadeFar - mesh.shadeSpan * depth + 0.18 * edge - 0.34 * boost,
-          x: px,
-          y: py,
-          z: pz,
-        })
-      }
-    }
-
-    dots.sort((a, b) => a.z - b.z)
+    const dots = this.clock.frame(size, performance.now(), dt, speed, this.gate.reduced)
     ctx.clearRect(0, 0, size, size)
     for (const dot of dots) {
-      if (dot.alpha < 0.02) {
+      const color = orbDotColor(dot, ink, ground)
+      if (color === undefined) {
         continue
       }
-      const t = Math.min(1, Math.max(0, dot.shade))
-      /* Mixed with each end weighted by its alpha, so a see-through ink stays
-         its own color and a clear ground fades a dot out rather than to black. */
-      const alpha = ink[3] + (ground[3] - ink[3]) * t
-      if (alpha <= 0) {
-        continue
-      }
-      const channel = (at: 0 | 1 | 2): number =>
-        Math.round((ink[at] * ink[3] + (ground[at] * ground[3] - ink[at] * ink[3]) * t) / alpha)
-      ctx.fillStyle = `rgba(${channel(0)},${channel(1)},${channel(2)},${dot.alpha * alpha})`
+      ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${color[3]})`
       ctx.beginPath()
-      ctx.arc(dot.x, dot.y, Math.max(0.3, dot.radius), 0, Math.PI * 2)
+      ctx.arc(dot.x, dot.y, Math.max(ORB_MIN_RADIUS, dot.radius), 0, Math.PI * 2)
       ctx.fill()
     }
   }
