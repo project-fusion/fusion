@@ -159,15 +159,7 @@ export const treePlaces = (
     if (unseen(node)) {
       continue
     }
-    const [key, place] = treePlace(node, around)
-    /* **A part drawn again where it may not be drawn at all keeps its first
-       place**, as Skeleton's shape stands at the root and again inside the
-       pieces the web draws only once it has measured a field. What an
-       optional node holds is optional with it. */
-    const before = into.get(key)
-    if (!(place.optional && before !== undefined && !before.optional)) {
-      into.set(key, place)
-    }
+    const place = placed(node, around, into)
     const parent = place.part || around.parent
     treePlaces(
       family,
@@ -177,4 +169,20 @@ export const treePlaces = (
     )
   }
   return into
+}
+
+/**
+ * Places one node in `into`, and returns its place. **A part drawn again
+ * where it may not be drawn at all keeps its first place**, as Skeleton's
+ * shape stands at the root and again inside the pieces the web draws only
+ * once it has measured a field. What an optional node holds is optional
+ * with it.
+ */
+const placed = (node: Node, around: Around, into: Places): Place => {
+  const [key, place] = treePlace(node, around)
+  const before = into.get(key)
+  if (!(place.optional && before !== undefined && !before.optional)) {
+    into.set(key, place)
+  }
+  return place
 }
