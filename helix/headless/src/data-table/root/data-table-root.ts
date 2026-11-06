@@ -370,6 +370,8 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart cell - One cell.
  * @csspart cell-header - Added to `cell` for a cell of the row header column.
+ * @csspart cell-pinned-end - Added to `cell` in a column the view pins to the end of the row.
+ * @csspart cell-pinned-start - Added to `cell` in a column the view pins to the start of the row.
  * @csspart cell-selected - Added to `cell` in a selected row.
  * @csspart checkbox - A row's checkbox, or the checkbox in the heading that selects every row.
  * @csspart checkbox-box - The box drawn for the checkbox's input.
@@ -447,6 +449,7 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
+ * @cssproperty --data-table-pin-offset - How far a pinned column's cell stays from its end of the row, in pixels: the width of the pinned columns before it. The component writes it on each cell of a pinned column, and the stylesheet reads it.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  *
@@ -2444,6 +2447,43 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return `${this.filter}\u0000${JSON.stringify(this.filtersState)}`
   }
 
+  /**
+   * Every row before the search and the filters narrow them: the rows the
+   * table holds, or `total` in `server` mode.
+   */
+  get everyRowCount(): number {
+    return this.everyRow
+  }
+
+  /** The fields of the columns left out at the table's width, for their `min-table-width`. */
+  get droppedFields(): string[] {
+    return this.orderedColumns
+      .filter((column) => this.dropped.has(column) && column.field !== '')
+      .map((column) => column.field)
+  }
+
+  /**
+   * How many rows a view would show, counted from the rows the table holds:
+   * the view with the parts of `part` laid over it, the way `requestView` lays
+   * them. Quick Filters counts each preset with it. Nothing in `server` mode,
+   * where the table holds one page, and in a tree grid.
+   */
+  countView(part: PartialView): number | undefined {
+    if (this.mode === 'server' || this.childField) {
+      return undefined
+    }
+    const view = mergeView(this.view, part)
+    const needle = view.query.trim().toLocaleLowerCase()
+    const columns = this.filterColumns
+    const searched = this.searchedColumns ?? this.tableColumns.filter((one) => one.field !== '')
+    return this.rows.filter(
+      (row) =>
+        passesAll(row, view.filters, columns) &&
+        (needle === '' ||
+          searched.some((one) => textOf(one.order(row)).toLocaleLowerCase().includes(needle))),
+    ).length
+  }
+
   /** Every row before the search and the filters narrow them, for "3 of 40 rows". */
   private get everyRow(): number {
     return this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.rows.length
@@ -2765,6 +2805,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       )
     }
     this.servedLast = this.serving
+    this.placePins()
     this.markSearch()
     this.announceSort()
     this.quietControls()
@@ -2807,6 +2848,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         /* Whether a reader may move it, pushed down for the same reason: the order
            is the table's, and the grip is drawn by the column. */
         column.movable = this.reorderable && column.field !== ''
+        column.pinned = this.pinnedState[column.field]
+        column.pinOffset = this.pinOffsets.get(column.field) ?? 0
         column.menuDrawer = column.field === '' ? undefined : this.drawColumnMenu
         /* A cell of this grid, and its one tab stop when the stop is on it. */
         column.gridCell = true
@@ -3059,15 +3102,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const block = edgeOf(column.verticalAlign)
     /* The depth goes on the row header, which indents, and holds the toggle. */
     const placed = header && this.childField ? this.tree().placed.get(row) : undefined
+    const pin = this.pinnedState[column.field]
     const style = [
       edge ? `--data-table-cell-align: ${edge}` : '',
       block ? `--data-table-cell-block-align: ${block}` : '',
       placed ? `--data-table-level: ${placed.level}` : '',
+      pin ? `--data-table-pin-offset: ${this.pinOffsets.get(column.field) ?? 0}px` : '',
     ]
       .filter(Boolean)
       .join('; ')
     return html`<span
-      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}"
+      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pin ? ` cell-pinned-${pin}` : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
@@ -3578,6 +3623,35 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.arrivals?.disconnect()
     this.sizeObserver?.disconnect()
     markMatches(this, [], '')
+  }
+
+  /** How far each pinned column stays from its end of the row, by field, as last measured. */
+  private pinOffsets: ReadonlyMap<string, number> = new Map()
+
+  /**
+   * Measures the pinned columns and works out how far each stays from its end
+   * of the row: the width of the pinned columns before it on that end. Draws
+   * again only when an offset moved, so it settles.
+   */
+  private placePins(): void {
+    const pinned = this.pinnedState
+    const shown = this.shownColumns
+    const next = new Map<string, number>()
+    for (const edge of ['start', 'end'] as const) {
+      const at = shown.filter((column) => pinned[column.field] === edge)
+      let offset = 0
+      for (const column of edge === 'start' ? at : [...at].reverse()) {
+        next.set(column.field, offset)
+        offset += column.cellBox?.getBoundingClientRect().width ?? 0
+      }
+    }
+    const same =
+      next.size === this.pinOffsets.size &&
+      [...next].every(([field, offset]) => this.pinOffsets.get(field) === offset)
+    if (!same) {
+      this.pinOffsets = next
+      this.requestUpdate()
+    }
   }
 
   /**
