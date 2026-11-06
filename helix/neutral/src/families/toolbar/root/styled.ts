@@ -1,6 +1,6 @@
 import densitySm from '../../../fragments/density-sm.js'
 import { oneOf } from '../../../render.js'
-import { fn, product, token } from '../../../style.js'
+import { difference, fn, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -41,6 +41,7 @@ export default styles(
     include(densitySm),
     on('host', [
       rule({ display: 'inline-flex', maxInlineSize: '100%' }),
+
       variants('size', {
         md: {
           '--helix-size-checkbox': token('size-checkbox-md'),
@@ -99,15 +100,37 @@ export default styles(
         flexWrap: 'wrap',
         gap: hook.gap,
         /* A control wider than the toolbar cuts its label, so the row stays inside it. */
+        flex: '1 1 auto',
         maxInlineSize: '100%',
         minInlineSize: 0,
         padding: hook.padding,
       }),
+      /* Where the pointer is coarse, the gap makes up a control's height to a target. */
+      rule(
+        { coarsePointer: true },
+        {
+          gap: hook.gap(
+            fn('max', token('space-2xs'), difference(token('size-target'), token('size-control'))),
+          ),
+        },
+      ),
       rule(
         { scrollable: true },
         { flexWrap: 'nowrap', overflowX: 'auto', web: { scrollbarWidth: 'none' } },
       ),
       rule({ orientation: 'vertical' }, { flexDirection: 'column' }),
+      /* At the toolbar's own dense size, a glyph never under the small icon step, so it
+         keeps its proportion to the control around it. */
+      rule(
+        { size: false },
+        {
+          '--helix-size-icon-tight': fn(
+            'max',
+            fn('round', product(token('size-icon'), 0.8), '2px'),
+            token('size-icon-sm'),
+          ),
+        },
+      ),
     ]),
     on({ slotted: '*' }, [
       rule({ maxInlineSize: '100%', minInlineSize: 0 }),
@@ -115,6 +138,8 @@ export default styles(
     ]),
     /* A divider between controls, and the space either side of it along the
        toolbar's axis. None unless set: the toolbar's gap already parts them. */
+    /* A divider standing at the wrapped line's edge draws nothing. */
+    on({ slotted: 'helix-divider[data-line-edge]' }, [web([rule({ display: 'none' })])]),
     on({ slotted: 'helix-divider' }, [
       rule({ marginInline: hook.separatorGap }),
       rule(
