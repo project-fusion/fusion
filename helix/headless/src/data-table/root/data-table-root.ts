@@ -383,8 +383,8 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
- * @event {HelixBeforeViewChangeEvent} helix-before-view-change - The view is about to change, with the whole view it would leave in `detail.view` and as JSON in `detail.value`. Sent before the event for the part that changes. Cancelable: cancel it to keep the view, and set `view`, `rows` and `total` from your server.
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
+ * @event {HelixBeforeViewChangeEvent} helix-before-view-change - The view is about to change, with the whole view it would leave in `detail.view` and as JSON in `detail.value`. Sent before the event for the part that changes. Cancelable: cancel it to keep the view, and set `view`, `rows` and `total` from your server.
  * @event {HelixCellCommitEvent} helix-cell-commit - Fired after a cell's new value is saved into a copy of its row in `rows`.
  * @event {HelixCellEditEvent} helix-cell-edit - Fired after a cell opens for an edit.
  * @event {HelixColumnToggleEvent} helix-column-toggle - Fired after a column is hidden or shown, with its `field` and `hidden`.
@@ -521,8 +521,8 @@ const isControl = (element: HTMLElement): boolean =>
  *
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
- * @cssproperty --data-table-pin-offset - How far a pinned column's cell stays from its end of the row, in pixels: the width of the pinned columns before it. The component writes it on each cell of a pinned column, and the stylesheet reads it.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
+ * @cssproperty --data-table-pin-offset - How far a pinned column's cell stays from its end of the row, in pixels: the width of the pinned columns before it. The component writes it on each cell of a pinned column, and the stylesheet reads it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  *
  * @cssstate empty - While there are no rows to show and none are loading.
@@ -3555,7 +3555,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return html`<${select}
         part="editor"
         exportparts="feedback: editor-feedback, hint: editor-hint, indicator: editor-indicator, label: editor-label, listbox: editor-listbox, listbox-empty: editor-listbox-empty, listbox-error: editor-listbox-error, listbox-feedback: editor-listbox-feedback, listbox-filter-icon: editor-listbox-filter-icon, listbox-filter-mark: editor-listbox-filter-mark, listbox-hint: editor-listbox-hint, listbox-items: editor-listbox-items, listbox-label: editor-listbox-label, listbox-live: editor-listbox-live, listbox-loading: editor-listbox-loading, listbox-search: editor-listbox-search, listbox-search-field: editor-listbox-search-field, listbox-voice: editor-listbox-voice, listbox-voice-level: editor-listbox-voice-level, listbox-voice-level-canvas: editor-listbox-voice-level-canvas, listbox-voice-listening: editor-listbox-voice-listening, listbox-voice-status: editor-listbox-voice-status, live: editor-live, surface: editor-surface, trigger: editor-trigger, value: editor-value"
-        label=${name}
+        aria-label=${name}
         .items=${items}
         .value=${String(draft ?? '')}
         aria-describedby=${described}
@@ -3568,7 +3568,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     )
     return html`<${tag}
       part="editor"
-      label=${name}
+      aria-label=${name}
       .value=${draft === null || draft === undefined ? '' : String(draft)}
       ?required=${column.required}
       aria-describedby=${described}

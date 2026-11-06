@@ -766,7 +766,11 @@ slot[name="error"]::slotted(*) {
   padding-block: 0;
 }
 
+/* The field is the cell's height less its rule, so an open cell is no taller
+   than a closed one. */
 [part="editor"] {
+  --input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
+  --number-input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
   inline-size: 100%;
 }
 

@@ -39,6 +39,7 @@ helix-headless-quick-filters::part(count) {
 }
 
 helix-headless-data-table {
+  display: block;
   margin-block-start: 1rem;
 }
 

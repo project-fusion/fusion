@@ -18,7 +18,7 @@ describe('the editing example', () => {
     async () => {
       await example(editing)
       await idle()
-      const table = document.querySelector('helix-data-table') as HTMLElement & {
+      const table = document.querySelector('helix-data-table') as unknown as HTMLElement & {
         editCell: (row: unknown, field: string) => boolean
         rows: Record<string, unknown>[]
       }

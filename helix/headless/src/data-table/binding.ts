@@ -73,6 +73,9 @@ type BoundHost = ReactiveControllerHost & HTMLElement & { for: string }
 export class TableBinding implements ReactiveController {
   private heard: ToolTable | null = null
 
+  /** Whether the tool has drawn once, after which it looks for the table. */
+  private drawn = false
+
   /** What the binding adds to the table it follows. */
   private readonly watcher: ReactiveController = {
     hostUpdated: () => this.host.requestUpdate(),
@@ -88,7 +91,10 @@ export class TableBinding implements ReactiveController {
    * `selection` slot is, takes that table.
    */
   get table(): ToolTable | null {
-    if (typeof document === 'undefined') {
+    /* None on the first render, which hydrates what a server sent and has to
+       be the server's, and the server drew no table. The render after finds
+       it, since the binding asks for one once the first is done. */
+    if (typeof document === 'undefined' || !this.drawn) {
       return null
     }
     if (this.host.for === '') {
@@ -118,6 +124,7 @@ export class TableBinding implements ReactiveController {
   }
 
   hostUpdated(): void {
+    this.drawn = true
     this.listen()
   }
 
