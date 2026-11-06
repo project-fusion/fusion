@@ -4,6 +4,7 @@
  */
 import { ANIMATED, motionOf, moves, time } from './animations.js'
 import { apply, length, type Scale } from './apply.js'
+import { COMPARED } from './compared.js'
 import type { Context } from './context.js'
 import { blurOf, type Clip, clipOf } from './effects.js'
 import type { Family, Value } from './form.js'
@@ -20,7 +21,7 @@ import {
   snapPadding,
   snapType,
 } from './reads.js'
-import { COMPARED, type Resolver } from './resolve.js'
+import type { Resolver } from './resolve.js'
 import type {
   Counting,
   GridForm,

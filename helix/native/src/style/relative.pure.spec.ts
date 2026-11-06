@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { movedLightness } from './color.js'
-import { COMPARED, ROUNDED } from './resolve.js'
+import { COMPARED, ROUNDED } from './compared.js'
 
 describe('what a phone resolves that CSS writes as a function', () => {
   test('round() goes to the nearest step, a tie going up', () => {
