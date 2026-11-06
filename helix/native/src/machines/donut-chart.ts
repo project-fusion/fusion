@@ -43,7 +43,7 @@ import type { Behavior, Props } from '../render/behavior'
 import { showsSeries, useChartSource, useHiddenSeries } from '../render/chart-sources'
 import type { Family } from '../style/form'
 import { useTheme } from '../theme/theme'
-import { boundAll, type Color, paletteOf, sourceOf } from './chart-common'
+import { boundAll, type Color, paletteOf, shownStatus, sourceOf } from './chart-common'
 import { type CursorHeard, useChartCursor } from './chart-cursor'
 import { kebab, wordsIn } from './date-picker-read'
 import { langOf } from './picker-field-kind'
@@ -207,17 +207,15 @@ const statesOf = (
 ): Record<string, boolean | string> => {
   const { any, at, keyed, name, ring } = shown
   const share = drawn.shares[at]
-  const loading = !any && read('loading') === true
   return {
+    ...shownStatus(read, any),
     ...bubbleOf(drawn, share, ring),
     aspect: aspectOf(ring, any),
     centered: any && wordsIn(read('hole')) !== 'none',
     drawn: any,
-    empty: !any && !loading,
     frame: ring.frame,
     labeled: any && read('slice-labels') === true,
     live: keyed && share !== undefined ? said(at) : '',
-    loading,
     named: name,
     role: !any && name !== '' ? 'group' : '',
     stroke: String(ring.thickness),

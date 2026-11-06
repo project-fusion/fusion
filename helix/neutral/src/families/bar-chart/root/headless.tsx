@@ -21,7 +21,8 @@ import {
  * Bar Chart's headless tier: a table's categories as columns, or bars down the
  * side, drawn by core on a phone as on the web, with `data-emphasis` and
  * `data-material` on the columns of the series `outlined`, `subtle`, and
- * `glass` name. **Web only:** the hidden table, the summary, the Listen
+ * `glass` name. With nothing to draw it says so, `error-text` before
+ * `loading-text` and `empty-text`. **Web only:** the hidden table, the summary, the Listen
  * button, a reading under a mouse, and the columns easing in.
  */
 export default headless('bar-chart', {
@@ -29,6 +30,7 @@ export default headless('bar-chart', {
     /* The readings as data, where no table is named, as a phone's app hands them over. */
     data: property(object()),
     emptyText: 'No readings',
+    errorText: '',
     for: '',
     glass: '',
     gridlines: oneOf(['both', 'category', 'value']),
@@ -59,7 +61,7 @@ export default headless('bar-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'empty', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'loading', 'settled'],
   barChart: {
     axes: 'axes',
     bandHeight: 'bandHeight',
@@ -71,6 +73,7 @@ export default headless('bar-chart', {
     cells: 'cells',
     drawn: 'drawn',
     empty: 'empty',
+    error: 'error',
     gridlines: 'gridlines',
     labels: 'labels',
     lines: 'lines',
@@ -259,6 +262,15 @@ export default headless('bar-chart', {
               />
             </Repeat>
           </Svg>
+        )}
+        {barChart.error && (
+          <View
+            part="error"
+            role="alert"
+          >
+            <Text part="error-words">{props.errorText}</Text>
+            <Slot name="error" />
+          </View>
         )}
         {barChart.loading && (
           <View part="loading">
