@@ -1,4 +1,4 @@
-import { token } from '../../../style.js'
+import { native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import panel from './headless.js'
 
@@ -27,7 +27,20 @@ export default styles(
         paddingBlockStart: hook.paddingBlockStart,
         paddingInlineStart: own.tabsPanelPaddingInlineStart(token('space-none')),
       }),
-      rule({ hidden: true }, { display: 'none' }),
+      /* Every panel in the one cell: an inactive panel that find in page can
+         search keeps a box of its own, which the grid would place a row below. */
+      web([rule({ gridArea: '1 / 1' })]),
+      /* A phone has no find in page, so a panel whose tab is not chosen draws nothing. */
+      native([rule({ hidden: true }, { display: 'none' })]),
+    ]),
+    /* Written out: `hidden="until-found"` hides through `content-visibility` and
+       keeps the panel's box, which takes no room in the cell the panels share, and
+       `display: none` would keep find in page out of it. */
+    on({ part: 'panel', selector: ':host [part="panel"][hidden="until-found"]' }, [
+      web([rule({ alignSelf: 'start', padding: 0 })]),
+    ]),
+    on({ part: 'panel', selector: ':host [part="panel"][hidden]:not([hidden="until-found"])' }, [
+      web([rule({ display: 'none' })]),
     ]),
   ],
 )
