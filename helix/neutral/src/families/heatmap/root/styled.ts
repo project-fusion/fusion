@@ -345,7 +345,7 @@ export default styles(
       on(['start', 'end'], [native([rule({ flexShrink: 0 })])]),
       /* Under the strip, in place of the cells. */
       on(
-        ['empty', 'loading'],
+        ['empty', 'error', 'loading'],
         [
           rule({
             color: token('color-foreground-muted'),
@@ -356,6 +356,8 @@ export default styles(
           }),
         ],
       ),
+      /* The readings did not load: news to act on, in the danger ink. */
+      on('error', [rule({ color: token('color-danger') })]),
       /* Printed, a hairline makes the cells countable whatever the fills come out like. */
       on('cell', [
         web([

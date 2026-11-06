@@ -528,6 +528,7 @@ export interface SelectChoice {
   readonly onInput?: string
   readonly placeholder?: string
   readonly position?: string
+  readonly readonly?: string
   readonly said?: string
   readonly status?: string
   /** Whether nothing is chosen, so the words are the placeholder, the name a render binds. */
@@ -922,6 +923,7 @@ export interface DonutChartChoice {
   readonly centered?: string
   readonly drawn?: string
   readonly empty?: string
+  readonly error?: string
   readonly frame?: string
   readonly labeled?: string
   readonly labels?: string
@@ -954,6 +956,7 @@ export interface AxisChartChoice {
   readonly drawn?: string
   readonly empty?: string
   readonly ends?: string
+  readonly error?: string
   readonly gridlines?: string
   readonly guideX?: string
   readonly labels?: string
@@ -987,6 +990,7 @@ export interface BarChartChoice {
   readonly cells?: string
   readonly drawn?: string
   readonly empty?: string
+  readonly error?: string
   readonly gridlines?: string
   readonly labels?: string
   readonly lines?: string
@@ -1011,6 +1015,7 @@ export interface ScatterChartChoice {
   readonly cells?: string
   readonly drawn?: string
   readonly empty?: string
+  readonly error?: string
   readonly gridlines?: string
   readonly layers?: string
   readonly live?: string
@@ -1107,6 +1112,7 @@ export interface HeatmapChoice {
   readonly cells?: string
   readonly drawn?: string
   readonly empty?: string
+  readonly error?: string
   readonly footed?: string
   readonly live?: string
   readonly loading?: string
@@ -1145,13 +1151,16 @@ export interface SparklineChoice {
   readonly bars?: string
   readonly cursorX?: string
   readonly cursorY?: string
+  readonly empty?: string
   readonly ended?: string
+  readonly error?: string
   readonly high?: string
   readonly highX?: string
   readonly highY?: string
   readonly line?: string
   readonly lined?: string
   readonly live?: string
+  readonly loading?: string
   readonly lone?: string
   readonly low?: string
   readonly lowX?: string

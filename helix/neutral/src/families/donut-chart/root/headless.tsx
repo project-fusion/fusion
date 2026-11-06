@@ -41,6 +41,8 @@ import {
  * **A chart with nothing to draw says so**: `empty-text` in the plot, or
  * `loading-text` while `loading` is set, or what is passed into `empty` and
  * `loading`. The middle of the ring holds what is passed in, usually a total.
+ * `error-text`, set when the readings did not load, stands in place of both,
+ * in the danger ink, followed by what is passed into `error`.
  *
  * **Web only:** the hidden table drawn from `data`, the summary sentence, the
  * Listen button `sonify` draws, a slice shown under a mouse, and the ring's
@@ -51,6 +53,7 @@ export default headless('donut-chart', {
     /* The readings as data, where no table is named, as a phone's app hands them over. */
     data: property(object()),
     emptyText: 'No readings',
+    errorText: '',
     for: '',
     hole: oneOf(['large', 'none', 'small']),
     label: '',
@@ -73,13 +76,14 @@ export default headless('donut-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'empty', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'loading', 'settled'],
   donutChart: {
     aspect: 'aspect',
     cells: 'cells',
     centered: 'centered',
     drawn: 'drawn',
     empty: 'empty',
+    error: 'error',
     frame: 'frame',
     labeled: 'labeled',
     labels: 'labels',
@@ -173,6 +177,15 @@ export default headless('donut-chart', {
               <Text part="slice-label-text">{entry.text}</Text>
             </View>
           </Repeat>
+        )}
+        {donutChart.error && (
+          <View
+            part="error"
+            role="alert"
+          >
+            <Text part="error-words">{props.errorText}</Text>
+            <Slot name="error" />
+          </View>
         )}
         {donutChart.loading && (
           <View part="loading">

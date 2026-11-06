@@ -26,7 +26,7 @@ import type { MachineUse } from '../ir.generated'
 import type { Behavior, PartBinding, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { Theme } from '../theme/theme'
-import { boundAll, type Color } from './chart-common'
+import { boundAll, type Color, shownStatus } from './chart-common'
 import { type Cursor, type CursorHeard, type CursorSetup, useChartCursor } from './chart-cursor'
 import { wordsIn } from './date-picker-read'
 import { boundTo, tell } from './props'
@@ -334,11 +334,9 @@ export const axisBehavior = (parts: AxisParts): Behavior => {
 
 /** The words in place of the drawing, the plot's name, and its role, by the names the form binds. */
 export const statusOf = (read: Read, any: boolean, name: string) => {
-  const loading = !any && read('loading') === true
   return {
+    ...shownStatus(read, any),
     drawn: any,
-    empty: !any && !loading,
-    loading,
     named: name,
     role: !any && name !== '' ? 'group' : '',
   }

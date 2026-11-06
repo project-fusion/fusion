@@ -48,6 +48,8 @@ import {
  * **A strip with nothing to draw says so** under the strip: `empty-text`, or
  * `loading-text` while `loading` is set, or what is passed into `empty` and
  * `loading`. The footer holds the `start`, `summary`, and `end` slots.
+ * `error-text`, set when the readings did not load, stands in place of both,
+ * in the danger ink, followed by what is passed into `error`.
  *
  * **Web only:** the grid's rows and cell roles under `selection-mode`, a
  * reading shown under a mouse, the hidden table drawn from `data`, the Listen
@@ -60,6 +62,7 @@ export default headless('heatmap', {
     /* The readings as data, where no table is named, as a phone's app hands them over. */
     data: property(object()),
     emptyText: 'No readings',
+    errorText: '',
     for: '',
     gap: web(number()),
     label: '',
@@ -95,12 +98,13 @@ export default headless('heatmap', {
     readingPress: ['index', 'label', 'pointerType', 'series'],
     resize: ['size'],
   },
-  states: ['active', 'empty', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'loading', 'settled'],
   heatmap: {
     actives: 'actives',
     cells: 'cells',
     drawn: 'drawn',
     empty: 'empty',
+    error: 'error',
     footed: 'footed',
     live: 'live',
     loading: 'loading',
@@ -255,6 +259,15 @@ export default headless('heatmap', {
           {heatmap.live}
         </Announce>
       </View>
+      {heatmap.error && (
+        <View
+          part="error"
+          role="alert"
+        >
+          <Text part="error-words">{props.errorText}</Text>
+          <Slot name="error" />
+        </View>
+      )}
       {heatmap.loading && (
         <View part="loading">
           <Slot name="loading">

@@ -36,6 +36,7 @@ import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { useChartSource } from '../render/chart-sources'
 import type { Family } from '../style/form'
+import { shownStatus } from './chart-common'
 import { type CursorHeard, useChartCursor } from './chart-cursor'
 import { kebab, wordsIn } from './date-picker-read'
 import { langOf } from './picker-field-kind'
@@ -231,9 +232,13 @@ export const useSparkline = (family: Family, props: Props, use: MachineUse): Beh
   const marks = sparklineMarks(plot, writtenList(wordsIn(read('marks'))))
   const overview = named ? overviewOf(read, plot, (index) => reading(index).text) : ''
   const out = here === undefined ? undefined : reading(cursor.at)
+  const status = shownStatus(read, drawn.count > 0)
   const states: Record<string, boolean | string> = {
     ...shapeStates(flag, plot),
     ...markStates(flag, plot, marks, here, plot.terminus !== undefined && plot.bars.length === 0),
+    [flag('empty')]: status.empty,
+    [flag('error')]: status.error,
+    [flag('loading')]: status.loading,
     [flag('live')]: cursor.keyed && here !== undefined ? said(cursor.at) : '',
     [flag('named')]: name,
     [flag('overview')]: overview,

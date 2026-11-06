@@ -138,7 +138,18 @@ export default styles(
       [rule({ forcedColors: true }, { forcedColorAdjust: 'none' })],
     ),
     on('host', [
-      rule({ emphasis: 'subtle' }, { color: mix(own.sparklineInk, 40, token('color-background')) }),
+      /* **In dark, 70% of the ink, so the line still clears 3:1 on the page.** At 40%
+         the eight dark series measured 1.41 to 1.64 on black; at 70% they measure 3.19
+         to 4.43. Light keeps 40%. */
+      rule(
+        { emphasis: 'subtle' },
+        {
+          color: scheme(
+            mix(own.sparklineInk, 40, token('color-background')),
+            mix(own.sparklineInk, 70, token('color-background')),
+          ),
+        },
+      ),
     ]),
     on('bar', [
       rule(
@@ -155,6 +166,8 @@ export default styles(
       rule({ emphasis: 'outlined' }, { opacity: hook.areaOpacity('0.35') }),
       rule({ emphasis: 'solid' }, { opacity: 1 }),
     ]),
+    /* Written out: the vocabulary names no `:focus`. A pointer's focus draws no ring. */
+    on({ part: 'svg', selector: '[part="svg"]:focus' }, [web([rule({ outline: 'none' })])]),
     on('svg', [
       rule(
         { focusVisible: true },
@@ -198,13 +211,13 @@ export default styles(
         fontFamily: token('font-sans'),
         fontSize: hook.readoutFontSize,
         fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1.4,
+        lineHeight: token('leading-snug'),
         padding: [0, token('space-2xs')],
         pointerEvents: 'none',
         position: 'absolute',
         translate: ['-50%', difference('-100%', hook.markSize)],
         whiteSpace: 'nowrap',
-        zIndex: 1,
+        zIndex: token('layer-raised'),
       }),
       /* A phone moves a box by a share of its own size or by points, never
          both at once, so the readout stands its own height up and the mark's
@@ -222,6 +235,33 @@ export default styles(
     on('readout', [
       rule({ dir: 'rtl' }, { translate: ['50%', difference('-100%', hook.markSize)] }),
     ]),
+    /* The words in place of the line, in the middle of the box, cut short on one line,
+       since a sparkline is the height of a line of text. */
+    on(
+      ['empty', 'error', 'loading'],
+      [
+        rule({
+          color: token('color-foreground-muted'),
+          fontFamily: token('font-sans'),
+          fontSize: token('text-xs'),
+          inset: 0,
+          margin: token('space-none'),
+          overflow: 'hidden',
+          position: 'absolute',
+          textAlign: 'center',
+        }),
+        web([
+          rule({
+            alignContent: 'center',
+            display: 'block',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }),
+        ]),
+        native([rule({ alignItems: 'center', justifyContent: 'center' })]),
+      ],
+    ),
+    on('error', [native([rule({ color: token('color-danger'), flexDirection: 'row' })])]),
     /* Said and not shown: the dot and the readout are the picture of it. */
     on('live', [
       web([
