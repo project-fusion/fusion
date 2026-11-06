@@ -179,6 +179,56 @@ pub fn mix(first: &Lab, weight: f64, second: &Lab) -> Lab {
     }
 }
 
+/// `color-mix(in srgb, <first> <weight>, <second>)`: the same premultiplied
+/// blend as `mix`, taken over gamma-encoded sRGB channels.
+pub fn mix_srgb(first: &Lab, weight: f64, second: &Lab) -> Lab {
+    let alpha = first.alpha * weight + second.alpha * (1.0 - weight);
+    let one = lab_to_linear(first).map(encode);
+    let other = lab_to_linear(second).map(encode);
+    let mut blended = [0.0; 3];
+    for (slot, (near, far)) in blended.iter_mut().zip(one.into_iter().zip(other)) {
+        *slot = if alpha == 0.0 {
+            0.0
+        } else {
+            decode((near * first.alpha * weight + far * second.alpha * (1.0 - weight)) / alpha)
+        };
+    }
+    let (l, a, b) = linear_to_lab(blended);
+    Lab {
+        l,
+        a,
+        b,
+        alpha,
+        stated: None,
+    }
+}
+
+/// CIE XYZ, D65, of a color.
+pub fn to_xyz(color: &Lab) -> [f64; 3] {
+    let [red, green, blue] = lab_to_linear(color);
+    [
+        0.412_390_799_3 * red + 0.357_584_339_4 * green + 0.180_480_788_4 * blue,
+        0.212_639_005_9 * red + 0.715_168_678_8 * green + 0.072_192_315_4 * blue,
+        0.019_330_818_7 * red + 0.119_194_779_8 * green + 0.950_532_152_2 * blue,
+    ]
+}
+
+/// A color from its CIE XYZ, D65, and its alpha.
+pub fn from_xyz([x, y, z]: [f64; 3], alpha: f64) -> Lab {
+    let (l, a, b) = linear_to_lab([
+        3.240_969_942 * x - 1.537_383_178 * y - 0.498_610_760_3 * z,
+        -0.969_243_636_3 * x + 1.875_967_502 * y + 0.041_555_057_4 * z,
+        0.055_630_079_7 * x - 0.203_976_958_9 * y + 1.056_971_514 * z,
+    ]);
+    Lab {
+        l,
+        a,
+        b,
+        alpha,
+        stated: None,
+    }
+}
+
 /// Gamma-encoded sRGB from 0 to 1, each channel clipped into gamut first.
 pub fn to_srgb(color: &Lab) -> [f64; 3] {
     lab_to_linear(color).map(|one| encode(one.clamp(0.0, 1.0)))

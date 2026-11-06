@@ -7,8 +7,8 @@
 //! spelling a reader of the builders expects.
 
 use super::super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Layer, Math, Oklch,
-    Op, Quantity, Shadow, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Layer, Math,
+    Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
 };
 use super::Built;
 
@@ -60,23 +60,50 @@ fn color(value: &Color) -> Built {
     match value {
         Color::Hex(digits) => call("hex", vec![Built::Text(digits.clone())]),
         Color::LightDark(light, dark) => call("lightDark", vec![color(light), color(dark)]),
-        Color::Mix(mix) => match (mix.weight, &mix.second) {
-            (Weight::First(percent), Color::Transparent) => {
-                call("alpha", vec![color(&mix.first), Built::Number(percent)])
+        Color::Mix(mix) => {
+            let mut built = match (&mix.weight, &mix.second) {
+                (Weight::First(percent), Color::Transparent) => {
+                    call("alpha", vec![color(&mix.first), Built::Number(*percent)])
+                }
+                (Weight::Scaled(percent, by), _) => call(
+                    "alpha",
+                    vec![color(&mix.first), Built::Number(*percent), quantity(by)],
+                ),
+                (Weight::First(percent), second) => call(
+                    "mix",
+                    vec![color(&mix.first), Built::Number(*percent), color(second)],
+                ),
+                (Weight::Second(percent), second) => call(
+                    "mix",
+                    vec![color(&mix.first), color(second), Built::Number(*percent)],
+                ),
+                (Weight::Even, second) => call("mix", vec![color(&mix.first), color(second)]),
+            };
+            if mix.space == Space::Srgb {
+                if let Built::Call(_, arguments) = &mut built {
+                    arguments.push(Built::Text("srgb".to_owned()));
+                }
             }
-            (Weight::First(percent), second) => call(
-                "mix",
-                vec![color(&mix.first), Built::Number(percent), color(second)],
-            ),
-            (Weight::Second(percent), second) => call(
-                "mix",
-                vec![color(&mix.first), color(second), Built::Number(percent)],
-            ),
-            (Weight::Even, second) => call("mix", vec![color(&mix.first), color(second)]),
-        },
+            built
+        }
         Color::Oklch(oklch) => relative(oklch),
         Color::Transparent => Built::Name("transparent".to_owned()),
         Color::Var(reference) => var(reference, color),
+        Color::Xyz(xyz) => call(
+            "xyz",
+            std::iter::once(color(&xyz.origin))
+                .chain(xyz.channels.iter().map(channel))
+                .collect(),
+        ),
+    }
+}
+
+/// A function's builder name.
+fn func(name: Func) -> &'static str {
+    match name {
+        Func::Clamp => "clamp",
+        Func::Max => "max",
+        Func::Min => "min",
     }
 }
 
@@ -95,6 +122,7 @@ fn channel(value: &Channel) -> Built {
     match value {
         Channel::Calc(math) => arithmetic(math),
         Channel::Clamp(parts) => call("clamp", parts.iter().map(arithmetic).collect()),
+        Channel::Extreme(name, parts) => call(func(*name), parts.iter().map(arithmetic).collect()),
         Channel::Component(name) => component(*name),
         Channel::Number(number) => Built::Number(*number),
         Channel::Var(reference) => var(reference, |channels| {
@@ -109,6 +137,9 @@ fn component(name: Component) -> Built {
             Component::Chroma => "chroma",
             Component::Hue => "hue",
             Component::Lightness => "lightness",
+            Component::X => "x",
+            Component::Y => "y",
+            Component::Z => "z",
         }
         .to_owned(),
     )
@@ -134,6 +165,8 @@ fn arithmetic(math: &Math) -> Built {
             };
             call(name, vec![arithmetic(left), arithmetic(right)])
         }
+        Math::Call(name, parts) => call(func(*name), parts.iter().map(arithmetic).collect()),
+        Math::Nested(inner) => arithmetic(inner),
         Math::Component(name) => component(*name),
         Math::Length(value, unit) => length(*value, *unit),
         Math::Number(value) => Built::Number(*value),
@@ -146,7 +179,17 @@ fn quantity(value: &Quantity) -> Built {
         Quantity::Calc(math) => arithmetic(math),
         Quantity::Length(number, unit) => length(*number, *unit),
         Quantity::Number(number) => Built::Number(*number),
+        Quantity::Max(values) => call("max", values.iter().map(quantity).collect()),
+        Quantity::Min(values) => call("min", values.iter().map(quantity).collect()),
         Quantity::Round(value, step) => call("round", vec![quantity(value), quantity(step)]),
+        Quantity::RoundUp(value, step) => call(
+            "round",
+            vec![
+                quantity(value),
+                quantity(step),
+                Built::Text("up".to_owned()),
+            ],
+        ),
         Quantity::Var(reference) => var(reference, quantity),
     }
 }
@@ -188,6 +231,7 @@ fn shadow(value: &Shadow) -> Built {
             [one] => layer(one),
             many => call("shadows", many.iter().map(layer).collect()),
         },
+        Shadow::List(shadows) => call("shadows", shadows.iter().map(shadow).collect()),
         Shadow::None => Built::Name("none".to_owned()),
         Shadow::Var(reference) => var(reference, shadow),
     }

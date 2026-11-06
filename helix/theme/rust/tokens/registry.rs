@@ -247,7 +247,11 @@ impl Registry {
             Quantity::Calc(math) => self.arithmetic(math, trail),
             Quantity::Length(..) => Ok(Kind::Length),
             Quantity::Number(_) => Ok(Kind::Number),
-            Quantity::Round(value, _) => self.dimension(value, trail),
+            Quantity::Round(value, _) | Quantity::RoundUp(value, _) => self.dimension(value, trail),
+            Quantity::Max(values) | Quantity::Min(values) => match values.first() {
+                Some(first) => self.dimension(first, trail),
+                None => Ok(Kind::Number),
+            },
             Quantity::Var(var) => {
                 if trail.contains(&var.name) {
                     return Err(format!("`{}` resolves through itself", var.name));
@@ -281,6 +285,11 @@ impl Registry {
                     _ => Err("a `calc()` mixes a number and a length".to_owned()),
                 }
             }
+            Math::Call(_, parts) => match parts.first() {
+                Some(first) => self.arithmetic(first, trail),
+                None => Ok(Kind::Number),
+            },
+            Math::Nested(inner) => self.arithmetic(inner, trail),
             Math::Component(_) | Math::Number(_) => Ok(Kind::Number),
             Math::Length(..) => Ok(Kind::Length),
             Math::Var(var) => self.dimension(&Quantity::Var(var.clone()), trail),
