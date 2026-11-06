@@ -147,13 +147,7 @@ const heard = () => {
 
 /* With no scale drawn and no rules, so the top total meets the top edge. Drawn by default,
    either one gives the peak room above it, as the web's element does. */
-const Bare = (props: HelixAreaChartProps) => (
-  <Chart
-    gridlines="none"
-    valueAxis="none"
-    {...props}
-  />
-)
+const Bare = (props: HelixAreaChartProps) => <Chart gridlines="none" valueAxis="none" {...props} />
 
 describe('the bands', () => {
   test('stacks the parts from zero, the widest band first, each an edge and everything under it', async () => {
