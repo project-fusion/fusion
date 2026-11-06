@@ -540,6 +540,10 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'waiting'
     | 'waitWords'
   >
+  /** What a playlist that drives a player computes for its parts. */
+  readonly videoPlaylist: Computes<'empty' | 'emptyWords' | 'named'>
+  /** What a menu of a playlist's entries computes for its parts. */
+  readonly videoPlaylistMenu: Computes<'named' | 'rows'>
   /** What a viewer of one item at a time computes for its parts. */
   readonly lightbox: Computes<
     | 'arrows'

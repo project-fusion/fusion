@@ -1066,6 +1066,21 @@ const VIDEO: &[Field] = &[
     ("waiting", "waiting", Name),
 ];
 
+const VIDEO_PLAYLIST: &[Field] = &[
+    ("empty", "empty", Name),
+    ("emptyWords", "emptyWords", Name),
+    ("named", "named", Name),
+    ("onActivate", "onActivate", Name),
+    ("onBeforeActivate", "onBeforeActivate", Name),
+    ("onEnd", "onEnd", Name),
+];
+
+const VIDEO_PLAYLIST_MENU: &[Field] = &[
+    ("named", "named", Name),
+    ("onBeforeSelect", "onBeforeSelect", Name),
+    ("rows", "rows", Name),
+];
+
 const LIGHTBOX: &[Field] = &[
     ("arrows", "arrows", Name),
     ("atEnd", "atEnd", Name),
@@ -1584,6 +1599,12 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("scatterChart", "scatterChart", SCATTER_CHART),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
+    (
+        "videoPlaylistMenu",
+        "videoPlaylistMenu",
+        VIDEO_PLAYLIST_MENU,
+    ),
+    ("videoPlaylist", "videoPlaylist", VIDEO_PLAYLIST),
     ("video", "video", VIDEO),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),

@@ -853,6 +853,14 @@
       "types": "./dist/video/index.d.ts",
       "default": "./dist/video/index.js"
     },
+    "./video-playlist": {
+      "react-native": {
+        "types": "./dist/video-playlist/index.native.d.ts",
+        "default": "./dist/video-playlist/index.native.js"
+      },
+      "types": "./dist/video-playlist/index.d.ts",
+      "default": "./dist/video-playlist/index.js"
+    },
     "./virtual-list": {
       "react-native": {
         "types": "./dist/virtual-list/index.native.d.ts",
