@@ -1,5 +1,6 @@
 import type { Media } from '@fusion.dev/helix-core/capabilities/media'
 import type { CaptionTrack, NowPlaying, Playback } from '@fusion.dev/helix-core/capabilities/types'
+import type * as Expo from 'expo'
 import type * as ExpoVideo from 'expo-video'
 
 /** The package, loaded the first time a player is made: `null` where the app does not install `expo-video`. */
@@ -9,14 +10,23 @@ let loaded: typeof ExpoVideo | null | undefined
  * Loads `expo-video` once, or gives `null` where the app does not install it
  * or was built without its native module.
  *
- * **A `require` inside a `try`**, which Metro bundles as an optional
- * dependency (`allowOptionalDependencies` is on by default), so an app
- * without the package builds, draws no player, and plays nothing.
+ * **The native module is asked for first, through `expo`**, which answers
+ * `null` without an error where the app was built without it. The package's
+ * first line asks for the module and throws there, and React Native reports
+ * an error a module throws as it loads as fatal even inside a `try`, so the
+ * package is required only once its module stands. **Each `require` sits
+ * inside a `try`**, which Metro bundles as an optional dependency
+ * (`allowOptionalDependencies` is on by default), so an app without the
+ * package builds, draws no player, and plays nothing.
  */
 export const loadVideo = (): typeof ExpoVideo | null => {
   if (loaded === undefined) {
     try {
-      loaded = require('expo-video') as typeof ExpoVideo
+      const expo = require('expo') as typeof Expo
+      loaded =
+        expo.requireOptionalNativeModule('ExpoVideo') === null
+          ? null
+          : (require('expo-video') as typeof ExpoVideo)
     } catch {
       loaded = null
     }
