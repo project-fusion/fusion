@@ -225,7 +225,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | Control with Home or End | Moves to the first or the last cell of the grid. |
  * | Page Down, Page Up | Moves by the rows that fit in view. |
  * | Enter, F2 | Moves into the cell's controls. Escape moves back to the cell, and Tab moves between the controls of one cell. |
- * | Enter, F2, or a character on an editable cell, or a double click, or a click with `edit-on="click"` | Opens the cell for an edit. A character starts the field with what you typed. |
+ * | Enter, F2, or a character on an editable cell, or a double click, or a click, or a double click with `edit-on="double-click"` | Opens the cell for an edit. A character starts the field with what you typed. |
  * | Enter in an open cell | Saves and moves down a row. |
  * | Tab, Shift with Tab in an open cell | Saves and moves to the next or the previous cell. |
  * | Escape in an open cell | Puts the old value back and closes the cell. |
@@ -695,12 +695,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   droppedLabel = 'Dropped'
 
   /**
-   * What opens an editable cell: `double-click`, a spreadsheet's way, or
-   * `click`, where a single press opens it. Enter, F2, and typing open a cell
-   * either way, and a boolean cell toggles on one press whatever this says.
+   * What opens an editable cell: `click`, where a single press opens it, or
+   * `double-click`, a spreadsheet's way, which leaves a press free to select a
+   * row or move focus. Enter, F2, and typing open a cell either way, and a
+   * boolean cell toggles on one press whatever this says.
    */
   @property({ attribute: 'edit-on' })
-  editOn: 'click' | 'double-click' = 'double-click'
+  editOn: 'click' | 'double-click' = 'click'
 
   /**
    * The text shown and announced when the rows could not load, such as "The

@@ -164,8 +164,15 @@ describe('an editable cell', () => {
 })
 
 describe('what opens a cell with the pointer', () => {
-  test('a double click, by default, and a single click does not', async () => {
+  test('a single click, by default', async () => {
     const element = await table()
+    cell(element, 0, 1).click()
+    await settle(element)
+    expect(editor(element)).not.toBeNull()
+  })
+
+  test('a double click under edit-on="double-click", and a single click does not', async () => {
+    const element = await table('edit-on="double-click"')
     cell(element, 0, 1).click()
     await settle(element)
     expect(editor(element)).toBeNull()
@@ -174,15 +181,8 @@ describe('what opens a cell with the pointer', () => {
     expect(editor(element)).not.toBeNull()
   })
 
-  test('a single click under edit-on="click", and a double click is not a second open', async () => {
-    const element = await table('edit-on="click"')
-    cell(element, 0, 1).click()
-    await settle(element)
-    expect(editor(element)).not.toBeNull()
-  })
-
   test('a click on the open field stays in it', async () => {
-    const element = await table('edit-on="click"')
+    const element = await table()
     cell(element, 0, 1).click()
     await settle(element)
     await type(element, 'Mae')
