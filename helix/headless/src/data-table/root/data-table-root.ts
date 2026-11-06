@@ -91,11 +91,27 @@ import '../../pagination/index.js'
 import {
   HelixBeforeColumnToggleEvent,
   HelixBeforeFollowEvent,
+  HelixBeforeViewChangeEvent,
   HelixColumnToggleEvent,
   HelixFollowEvent,
+  HelixViewChangeEvent,
 } from '../events/index.js'
 import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
+import {
+  type ColumnType,
+  type DataTableView,
+  emptyView,
+  type FilterColumn,
+  mergeView,
+  type PartialView,
+  type PinEdge,
+  passesAll,
+  readView,
+  sameView,
+  type ViewFilter,
+  viewJson,
+} from '../view.js'
 
 /** What makes an element a control the grid moves focus into, whatever its tab index. */
 const CONTROL = [
@@ -107,6 +123,24 @@ const CONTROL = [
   '[contenteditable]:not([contenteditable="false"])',
   '[tabindex]',
 ].join(',')
+
+/** Reads a view written as an attribute, as JSON. */
+const readViewText = (value: string | null): DataTableView =>
+  value
+    ? readView(
+        (() => {
+          try {
+            return JSON.parse(value)
+          } catch {
+            return {}
+          }
+        })(),
+      )
+    : emptyView()
+
+/** What a column holds, for its filters: its `type` where it has one, and text otherwise. */
+const columnTypeOf = (column: HelixHeadlessTableColumn): ColumnType =>
+  (column as { type?: ColumnType }).type ?? 'text'
 
 /** Whether an element inside a cell is a control a reader can work. */
 const isControl = (element: HTMLElement): boolean =>
@@ -314,6 +348,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixBeforeViewChangeEvent} helix-before-view-change - The view is about to change, with the whole view it would leave in `detail.view` and as JSON in `detail.value`. Sent before the event for the part that changes. Cancelable: cancel it to keep the view, and set `view`, `rows` and `total` from your server.
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
  * @event {HelixColumnToggleEvent} helix-column-toggle - Fired after a column is hidden or shown, with its `field` and `hidden`.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
@@ -324,6 +359,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {HelixReorderEvent} helix-reorder - Fired after the columns move, with `kind` set to `column` and every field in the new order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
  * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with every selected key, separated by commas.
  * @event {HelixSortEvent} helix-sort - Fired after the sort order changes, with the new order.
+ * @event {HelixViewChangeEvent} helix-view-change - Fired after the view changes, with the whole view in `detail.view` and as JSON in `detail.value`.
  *
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
@@ -1073,6 +1109,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private orderState: string | undefined = undefined
 
   @state()
+  private filtersState: readonly ViewFilter[] = []
+
+  @state()
+  private pinnedState: Readonly<Record<string, PinEdge>> = {}
+
+  @state()
+  private widthsState: Readonly<Record<string, string>> = {}
+
+  /** The rows that passed the filters last, kept against what they were filtered by. */
+  private passed: { key: string; source: readonly DataRow[]; value: readonly DataRow[] } | undefined
+
+  @state()
   private selectedState: string | undefined = undefined
 
   @state()
@@ -1371,11 +1419,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private arrange(): Arranged {
     const axes = this.axes
     const key = `${this.filter}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
-    if (this.held?.key === key && this.held.source === this.rows) {
+    const source = this.source
+    if (this.held?.key === key && this.held.source === source) {
       return this.held.value
     }
-    const value = arranged(this.rows, axes, { query: this.filter, spec: this.sort })
-    this.held = { key, source: this.rows, value }
+    const value = arranged(source, axes, { query: this.filter, spec: this.sort })
+    this.held = { key, source, value }
     return value
   }
 
@@ -1529,7 +1578,27 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * sort, which are by field, so showing it again puts it back where it was.
    */
   private get shownColumns(): HelixHeadlessTableColumn[] {
-    return this.orderedColumns.filter((column) => column.shown && !this.dropped.has(column))
+    return this.pinColumns(
+      this.orderedColumns.filter((column) => column.shown && !this.dropped.has(column)),
+    )
+  }
+
+  /**
+   * The columns with the pinned ones moved to their ends: those pinned to the
+   * start first and those pinned to the end last, each keeping its order.
+   */
+  private pinColumns(columns: HelixHeadlessTableColumn[]): HelixHeadlessTableColumn[] {
+    const pinned = this.pinnedState
+    if (Object.keys(pinned).length === 0) {
+      return columns
+    }
+    const at = (edge: PinEdge) => columns.filter((column) => pinned[column.field] === edge)
+    return [...at('start'), ...columns.filter((column) => !pinned[column.field]), ...at('end')]
+  }
+
+  /** Which end a column is pinned to, if it is. */
+  pinOf(field: string): PinEdge | undefined {
+    return this.pinnedState[field]
   }
 
   /** The table's inline size as last measured, or undefined where nothing has measured it, as on a server. */
@@ -1623,8 +1692,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       written.length === 0
         ? this.columns
         : declared
-            .map((column) =>
-              column.width ? column.track : listed[written.indexOf(column)] || column.track,
+            .map(
+              (column) =>
+                this.widthsState[column.field] ||
+                (column.width ? column.track : listed[written.indexOf(column)] || column.track),
             )
             .join(' ')
     /* The grips and the checkboxes take what they need and no more, ahead of
@@ -1709,7 +1780,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * would be this element filtering a page it was handed, which narrows one
    * screen and calls it a search.
    */
-  private get view(): {
+  private get result(): {
     available: number
     matched: number
     page: readonly DataRow[]
@@ -1729,7 +1800,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return { available: page.length, matched: inOrder.length, page, total }
     }
     if (!this.windowed) {
-      const view = ordered(this.rows, this.axes, {
+      const view = ordered(this.source, this.axes, {
         page: this.page,
         query: this.filter,
         size: this.pageSize,
@@ -1767,8 +1838,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Read it after you assign `rows` or `filter`, as the count beside a search
    * field. A tree grid counts the rows open now.
    *
-   * Separate from `view` because `pages` needs it and `page` needs `pages`:
-   * asking `view` for it would recurse through the clamp in `page`.
+   * Separate from `result` because `pages` needs it and `page` needs `pages`:
+   * asking `result` for it would recurse through the clamp in `page`.
    */
   get matched(): number {
     if (this.mode === 'server') {
@@ -1778,12 +1849,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return this.tree().rows.length
     }
     const query = this.filter.trim()
+    const source = this.source
     if (query === '') {
-      return this.rows.length
+      return source.length
     }
     const axes = this.axes
     const needle = query.toLocaleLowerCase()
-    return this.rows.filter((row) =>
+    return source.filter((row) =>
       axes.some((axis) => {
         const value = axis.order(row)
         return value === null || value === undefined
@@ -1813,7 +1885,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * what this replaced.
    */
   protected override get hasRows(): boolean {
-    return this.view.available > 0 || !this.sourceKnown || this.serving
+    return this.result.available > 0 || !this.sourceKnown || this.serving
   }
 
   /**
@@ -1877,12 +1949,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * consumer refuses the local reorder, fetches, and hands back a new set.
    */
   private requestSort(next: string): boolean {
+    if (!this.askView(mergeView(this.view, { sort: next }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
         this.dispatchEvent(new HelixSortEvent({ value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeSortEvent({ value }),
       host: this,
@@ -1906,6 +1982,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         value,
       }
     }
+    if (!this.askView(mergeView(this.view, { columns: { order: [...fields] } }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const moved = detail(value)
@@ -1913,6 +1992,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         this.orderState = value
         this.requestUpdate('order', previous)
         this.dispatchEvent(new HelixReorderEvent(moved))
+        this.toldView()
       },
       event: (value) => new HelixBeforeReorderEvent(detail(value)),
       host: this,
@@ -2207,12 +2287,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Asks for a different query. */
   private requestFilter(next: string): boolean {
+    if (!this.askView(mergeView(this.view, { query: next }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
         this.dispatchEvent(new HelixFilterEvent({ value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeFilterEvent({ value }),
       host: this,
@@ -2236,6 +2320,153 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       host: this,
       next,
     })
+  }
+
+  /**
+   * Everything a reader can change about how the rows are shown, as one value:
+   * the search in `query`, the column `filters`, the `sort`, the `columns`'
+   * order, hidden fields, pinned ends and widths, and the `pageSize`.
+   *
+   * It round-trips as JSON, so a page can keep it in a URL or in storage and
+   * set it back. Written as an attribute it is read as JSON. `sort`, `filter`,
+   * `order`, `page-size` and each column's `hidden` are parts of it, and
+   * setting one changes the view.
+   *
+   * A reader's change to any part fires `helix-before-view-change` with the
+   * whole view it would leave, before the event for that part. Refuse it to
+   * keep the view, fetch the rows from a server, and set `view`, `rows` and
+   * `total` yourself. `helix-view-change` follows a change nobody refused.
+   * Setting `view` fires neither.
+   *
+   * Filters on different columns all have to match, and a filter's values
+   * are any of. A filter on a field no column declares is left out, and a
+   * tree grid filters by its search alone.
+   */
+  @property({
+    converter: {
+      fromAttribute: (value) => readViewText(value),
+      toAttribute: (value: DataTableView) => viewJson(value),
+    },
+  })
+  get view(): DataTableView {
+    const hidden =
+      this.hiddenWanted ??
+      this.tableColumns
+        .filter((column) => column.field !== '' && !column.shown)
+        .map((column) => column.field)
+    return {
+      columns: {
+        hidden: [...hidden],
+        order: writtenList(this.order),
+        pinned: { ...this.pinnedState },
+        widths: { ...this.widthsState },
+      },
+      filters: this.filtersState.map((filter) => ({ ...filter, values: [...filter.values] })),
+      pageSize: this.pageSize,
+      query: this.filter,
+      sort: this.sort,
+    }
+  }
+
+  set view(next: DataTableView | PartialView) {
+    const previous = this.view
+    this.applyView(mergeView(emptyView(), readView(next)))
+    this.requestUpdate('view', previous)
+  }
+
+  /**
+   * Asks for a different view, as a reader's change does: `helix-before-view-change`,
+   * which can refuse it, then `helix-view-change`. The parts `next` names
+   * replace those parts, whole, and the rest stay, so a preset can name only
+   * its filters. Returns whether the view changed.
+   */
+  requestView(next: PartialView): boolean {
+    const view = mergeView(this.view, next)
+    if (sameView(view, this.view) || !this.askView(view)) {
+      return false
+    }
+    this.applyView(view)
+    this.toldView()
+    return true
+  }
+
+  /** The hidden fields a view named before the columns were known, applied once they are. */
+  private hiddenWanted: readonly string[] | undefined = undefined
+
+  /** Puts every part of a view in force, firing nothing. */
+  private applyView(view: DataTableView): void {
+    this.sortState = view.sort
+    this.filterState = view.query
+    this.orderState = view.columns.order.join(' ')
+    this.pageSizeState = view.pageSize
+    this.filtersState = view.filters
+    this.pinnedState = view.columns.pinned
+    this.widthsState = view.columns.widths
+    this.hiddenWanted = view.columns.hidden
+    this.hideWanted()
+  }
+
+  /** Hides and shows the columns as the view asks, once they are known. */
+  private hideWanted(): void {
+    const wanted = this.hiddenWanted
+    const columns = this.tableColumns
+    if (!wanted || columns.length === 0) {
+      return
+    }
+    this.hiddenWanted = undefined
+    const hidden = new Set(wanted)
+    for (const column of columns) {
+      if (column.field !== '' && column.shown === hidden.has(column.field)) {
+        column.hidden = hidden.has(column.field)
+        column.toggleAttribute('hidden', column.hidden)
+      }
+    }
+  }
+
+  /** Asks whether the view may become `next`. */
+  private askView(next: DataTableView): boolean {
+    return this.dispatchEvent(new HelixBeforeViewChangeEvent({ value: viewJson(next), view: next }))
+  }
+
+  /** Says the view changed. */
+  private toldView(): void {
+    const view = this.view
+    this.dispatchEvent(new HelixViewChangeEvent({ value: viewJson(view), view }))
+  }
+
+  /** What the filters need of each column with a field, by field. */
+  private get filterColumns(): Map<string, FilterColumn> {
+    return new Map(
+      this.tableColumns
+        .filter((column) => column.field !== '')
+        .map((column) => [
+          column.field,
+          {
+            field: column.field,
+            type: columnTypeOf(column),
+            value: (row: DataRow) => column.order(row),
+          },
+        ]),
+    )
+  }
+
+  /**
+   * The rows that pass the column filters, which the search and the sort
+   * then work on. In `server` mode the rows are already the result.
+   */
+  private get source(): readonly DataRow[] {
+    const filters = this.filtersState
+    if (filters.length === 0 || this.mode === 'server') {
+      return this.rows
+    }
+    const columns = this.filterColumns
+    const key = `${JSON.stringify(filters)}\u0000${[...columns.values()].map((one) => `${one.field}:${one.type}`).join(',')}`
+    if (this.passed?.key === key && this.passed.source === this.rows) {
+      return this.passed.value
+    }
+    const value = this.rows.filter((row) => passesAll(row, filters, columns))
+    this.passed = { key, source: this.rows, value }
+    return value
   }
 
   /**
@@ -2382,6 +2613,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   protected override willUpdate(changed: PropertyValues): void {
+    this.hideWanted()
     super.willUpdate(changed)
     this.fit()
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
@@ -2689,15 +2921,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (hidden && this.shownFields.length <= 1) {
       return false
     }
+    const now = this.view.columns.hidden.filter((one) => one !== field)
+    if (
+      !this.askView(mergeView(this.view, { columns: { hidden: hidden ? [...now, field] : now } }))
+    ) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         column.hidden = value
+        /* At once, so the view this sends reads the column's new state. */
+        column.toggleAttribute('hidden', value)
         if (value) {
           this.hiddenByTable.add(field)
         } else {
           this.hiddenByTable.delete(field)
         }
         this.dispatchEvent(new HelixColumnToggleEvent({ field, hidden: value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeColumnToggleEvent({ field, hidden: value }),
       host: this,
@@ -3053,7 +3294,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const { available, matched, page } = this.view
+    const { available, matched, page } = this.result
     const serving = this.serves()
     this.serving = serving
     this.drawnPage = serving ? [] : page
