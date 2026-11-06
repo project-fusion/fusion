@@ -69,7 +69,6 @@ export default styles(
       }),
       native([rule({ flexDirection: 'row' })]),
       web([
-        rule({ disabled: false, hover: true }, { backgroundColor: hook.itemHoverBackgroundColor }),
         rule(
           { focusVisible: true },
           {
@@ -82,6 +81,10 @@ export default styles(
         { current: true },
         { backgroundColor: hook.itemCurrentBackgroundColor, color: token('color-foreground') },
       ),
+      /* Under the pointer, the entry playing too, as the hover's own fill. */
+      web([
+        rule({ disabled: false, hover: true }, { backgroundColor: hook.itemHoverBackgroundColor }),
+      ]),
       rule(
         { disabled: true },
         { opacity: token('opacity-disabled'), web: { cursor: 'not-allowed' } },

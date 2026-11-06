@@ -95,8 +95,8 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['time-picker/root/time-picker-root.generated.css', '[part="hint"]', 'color'],
   ['tree/root/tree-root.generated.css', ':host([nesting="heading"])', '--_tree-heading-ink'],
   [
-    'video-playlist/item/video-playlist-item.css',
-    '[part="label"] ::slotted([slot="meta"])',
+    'video-playlist/item/video-playlist-item.generated.css',
+    'slot[name="meta"]::slotted(*)',
     'color',
   ],
   ['../../styles/src/base.css', '[data-megamenu-heading]', 'color'],
