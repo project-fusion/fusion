@@ -1,7 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenuItem } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
-import { property } from 'lit/decorators.js'
 import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
 import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles as rowStyles } from '../../shared/row/row.css.js'
@@ -40,10 +39,6 @@ import { styles } from './menu-item.css.js'
  */
 @customElement('helix-menu-item')
 export class HelixMenuItem extends HelixHeadlessMenuItem {
-  /** What the row means. `danger` marks a command that destroys something. */
-  @property({ reflect: true })
-  tone?: 'danger'
-
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [
