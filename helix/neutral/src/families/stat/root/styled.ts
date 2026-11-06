@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { native, product, quotient, token } from '../../../style.js'
+import { native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -40,11 +40,15 @@ export default styles(
     on('host', [
       rule({
         alignContent: 'start',
-        alignItems: 'baseline',
+        /* The last line's baseline, so the unit follows a figure that wraps to the
+           line it ends on. */
+        alignItems: 'last baseline',
         display: 'grid',
         gap: hook.gap(token('space-2xs')),
         gridTemplateColumns: 'auto 1fr',
       }),
+      /* With no unit, no gap where it would stand. */
+      web([rule({ hasUnit: false }, { columnGap: token('space-none') })]),
       /* A phone stacks the label, the figure's line and the trend. */
       native([rule({ alignItems: 'stretch', display: 'flex', flexDirection: 'column' })]),
       /* Side by side, on one baseline. */
@@ -98,12 +102,24 @@ export default styles(
         letterSpacing: token('tracking-tight'),
         lineHeight: token('leading-tight'),
       }),
+      /* A figure that reads as a number breaks only after a group separator. */
+      web([rule({ number: true }, { overflowWrap: 'normal' })]),
+      /* A step smaller, and two, where the figure does not fit the stat's width. */
+      rule(
+        { stepped: true },
+        { fontSize: quotient(product(hook.valueSize, token('text-2xl')), token('text-3xl')) },
+      ),
+      rule(
+        { steppedTwice: true },
+        { fontSize: quotient(product(hook.valueSize, token('text-xl')), token('text-3xl')) },
+      ),
     ]),
     on({ region: 'unit', slotted: '*' }, [
       rule({
         color: hook.unitColor,
         fontSize: hook.unitSize,
         fontWeight: token('weight-medium'),
+        justifySelf: 'start',
       }),
     ]),
     on({ region: 'trend', slotted: '*' }, [
