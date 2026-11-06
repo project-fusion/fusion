@@ -709,3 +709,15 @@ slot[name="error"]::slotted(*) {
 [part~="checkbox"]::part(field) {
   align-items: center;
 }
+
+/* A search's matches, painted by the Custom Highlight API. A highlight takes
+   its look from the tree its text is in, and a cell is in this shadow root,
+   so the rule in `base.css` does not reach it. The same look. */
+::highlight(helix-filter-match) {
+  background-color: transparent;
+  color: var(--helix-color-foreground);
+  text-decoration-color: var(--helix-color-primary);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--helix-border-thick);
+  text-underline-offset: 0.2em;
+}

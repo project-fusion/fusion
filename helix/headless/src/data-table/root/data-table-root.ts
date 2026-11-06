@@ -38,6 +38,7 @@ import {
   internalsOf,
   MIRROR_RULE,
   MixinCollection,
+  markMatches,
   markRegion,
   numberConverter,
   onAndroid,
@@ -873,14 +874,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   resultLabel?: string
 
   /**
-   * What screen readers hear when a search narrows the rows. `{count}` is how
-   * many rows are left, written in the locale, and each language writes the
-   * forms it has: `{count, plural, one {# wiersz} few {# wiersze} many
-   * {# wierszy} other {# wiersza}}`.
+   * What screen readers hear when a search or a filter narrows the rows.
+   * `{count}` is how many rows are left and `{total}` how many there are,
+   * written in the locale, and each language writes the forms it has:
+   * `{count} z {total, plural, one {# wiersza} other {# wierszy}}`.
    */
   @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count, plural, one {# result} other {# results}}'
+  resultsLabel = '{count} of {total, plural, one {# row} other {# rows}}'
 
   /** The name of the heading over the row grips, with `reorderable-rows`. */
   @words
@@ -2438,6 +2439,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.dispatchEvent(new HelixViewChangeEvent({ value: viewJson(view), view }))
   }
 
+  /** What narrows the rows: the search and the filters, as one text to tell a change by. */
+  private get narrowedBy(): string {
+    return `${this.filter}\u0000${JSON.stringify(this.filtersState)}`
+  }
+
+  /** Every row before the search and the filters narrow them, for "3 of 40 rows". */
+  private get everyRow(): number {
+    return this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.rows.length
+  }
+
   /** The columns a search reads, where some are marked `searchable`. */
   private get searchedColumns(): HelixHeadlessTableColumn[] | undefined {
     const marked = this.tableColumns.filter((column) => column.searchable && column.field !== '')
@@ -2663,18 +2674,19 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         : this.unsortedLabel
     } else if (this.hasUpdated && selected !== this.heardSelected) {
       said = formatWords(this, 'selectedLabel', { count: this.chosen.size })
-    } else if (this.hasUpdated && this.filter !== this.heardFilter) {
+    } else if (this.hasUpdated && this.narrowedBy !== this.heardFilter) {
       /* A search narrows the rows under a reader who is in the search field,
          so how many it left is said. None left is the empty text, which the
          region says in place of this. */
       const count = this.matched
-      said = this.resultLabel
-        ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
-        : formatWords(this, 'resultsLabel', { count })
+      said =
+        this.resultLabel && count === 1
+          ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
+          : formatWords(this, 'resultsLabel', { count, total: this.everyRow })
     }
     this.heardSort = sort
     this.heardSelected = selected
-    this.heardFilter = this.filter
+    this.heardFilter = this.narrowedBy
     return said
   }
 
@@ -2753,6 +2765,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       )
     }
     this.servedLast = this.serving
+    this.markSearch()
     this.announceSort()
     this.quietControls()
     this.placeFocus()
@@ -3564,6 +3577,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.removeEventListener('helix-before-resize', this.handleResize)
     this.arrivals?.disconnect()
     this.sizeObserver?.disconnect()
+    markMatches(this, [], '')
+  }
+
+  /**
+   * Paints the search where it matches in the cells it reads, with the Custom
+   * Highlight API, as Find does. Nothing is inserted into a cell, so a cell
+   * your template drew comes back as you wrote it.
+   */
+  private markSearch(): void {
+    const needle = this.filter.trim()
+    if (needle === '' || !this.renderRoot.querySelectorAll) {
+      markMatches(this, [], '')
+      return
+    }
+    const searched = this.searchedColumns
+    const places = new Set(
+      this.shownColumns
+        .map((column, index) =>
+          !searched || searched.includes(column) ? String(index + this.lead) : '',
+        )
+        .filter(Boolean),
+    )
+    const cells = [
+      ...this.renderRoot.querySelectorAll<HTMLElement>('[part~="row"] > [part~="cell"]'),
+    ]
+    markMatches(
+      this,
+      cells.filter((cell) => places.has(cell.dataset.column ?? '')),
+      needle,
+    )
   }
 
   /**
