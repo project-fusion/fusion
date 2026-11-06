@@ -3,7 +3,7 @@ import { HelixHeadlessTrend } from '@fusion.dev/helix-headless/trend'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './trend-root.css.js'
+import { styles } from './trend-root.generated.css.js'
 
 /**
  * @summary An indicator that shows which way a measurement moved, and whether the change is good.

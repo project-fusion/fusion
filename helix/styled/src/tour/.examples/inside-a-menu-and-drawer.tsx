@@ -1,5 +1,3 @@
-import './inside-a-menu-and-drawer.css'
-
 import { useState } from 'react'
 
 export function Example() {
@@ -11,16 +9,22 @@ export function Example() {
      boolean attribute that defaults to true and reads as true with any value. */
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)
+  const [settings, setSettings] = useState(false)
 
   /* When the tour closes, no index is current, so the menu and the drawer
      close too. */
   const arranged = open ? index : -1
 
   return (
-    <>
-      <div className="bar">
+    <helix-flex
+      direction="column"
+      gap="xl"
+    >
+      <helix-flex
+        align-items="center"
+        gap="sm"
+      >
         <helix-menu
-          id="actions"
           label="Actions"
           open={arranged === 1}
         >
@@ -41,19 +45,18 @@ export function Example() {
         </helix-menu>
 
         <helix-button
-          command="--show"
-          commandfor="settings"
           emphasis="outlined"
+          onClick={() => setSettings(true)}
         >
           Settings
         </helix-button>
-      </div>
+      </helix-flex>
 
       <helix-drawer
-        id="settings"
         label="Settings"
         modal={false}
-        open={arranged === 2}
+        onClose={() => setSettings(false)}
+        open={settings || arranged === 2}
         placement="end"
       >
         <helix-flex
@@ -65,14 +68,16 @@ export function Example() {
         </helix-flex>
       </helix-drawer>
 
-      <helix-button
-        onClick={() => {
-          setIndex(0)
-          setOpen(true)
-        }}
-      >
-        Take the tour
-      </helix-button>
+      <helix-flex>
+        <helix-button
+          onClick={() => {
+            setIndex(0)
+            setOpen(true)
+          }}
+        >
+          Take the tour
+        </helix-button>
+      </helix-flex>
 
       <helix-tour
         index={index}
@@ -112,6 +117,6 @@ export function Example() {
           </helix-card>
         </helix-tour-stop>
       </helix-tour>
-    </>
+    </helix-flex>
   )
 }

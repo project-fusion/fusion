@@ -10,7 +10,7 @@ export function Example() {
         locale="en-US"
         value={0.124}
       >
-        <span slot="label">Revenue</span>
+        <helix-text slot="label">Revenue</helix-text>
       </helix-trend>
       <helix-trend
         formatOptions={{ maximumFractionDigits: 1, style: 'percent' }}
@@ -18,7 +18,7 @@ export function Example() {
         locale="en-US"
         value={-0.004}
       >
-        <span slot="label">Churn</span>
+        <helix-text slot="label">Churn</helix-text>
       </helix-trend>
       <helix-trend
         formatOptions={{ currency: 'USD', maximumFractionDigits: 0, style: 'currency' }}
@@ -26,7 +26,7 @@ export function Example() {
         locale="en-US"
         value={-1250}
       >
-        <span slot="label">Average order</span>
+        <helix-text slot="label">Average order</helix-text>
       </helix-trend>
     </helix-flex>
   )

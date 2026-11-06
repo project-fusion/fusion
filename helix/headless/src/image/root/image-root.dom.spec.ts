@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -319,7 +319,9 @@ describe('placeholder delay and states', () => {
   }
   const placeholderHidden = (host: HTMLElement): boolean =>
     part(host, 'placeholder')?.hasAttribute('hidden') ?? true
-  const states = (host: HTMLElement): ElementInternals['states'] => internalsOf(host).states
+  const states = (host: HTMLElement) => ({
+    has: (name: string) => hasState(host as unknown as Element, name),
+  })
 
   test('keeps the placeholder hidden until the wait is over', async () => {
     const host = stillLoading(await image('src="/pier.avif" placeholder-delay="30"'))
@@ -361,7 +363,9 @@ describe('placeholder delay and states', () => {
    `:not(:state(loaded)):not(:state(error))`, and the delay before the
    placeholder had no name at all. */
 describe('the states before an answer', () => {
-  const states = (host: HTMLElement): ElementInternals['states'] => internalsOf(host).states
+  const states = (host: HTMLElement) => ({
+    has: (name: string) => hasState(host as unknown as Element, name),
+  })
   /* The browser's own answers are kept from the component, so a picture stays
      on its way until the spec dispatches one. */
   const stillLoading = (host: Picture): Picture => {

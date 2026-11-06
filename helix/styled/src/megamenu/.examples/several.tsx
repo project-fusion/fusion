@@ -1,90 +1,72 @@
+const MENUS = [
+  {
+    groups: [
+      {
+        items: [['#helix', 'cube', 'Projects', 'Plan and track work across teams.']],
+        label: 'Build',
+      },
+      {
+        items: [['#trace', 'pulse', 'Reports', 'See how your projects are doing.']],
+        label: 'Run',
+      },
+    ],
+    label: 'Products',
+  },
+  {
+    groups: [
+      {
+        items: [
+          ['#engineering', 'gear', 'Engineering', 'Plan releases and track bugs.'],
+          ['#design', 'palette', 'Design', 'Share files and collect feedback.'],
+        ],
+        label: 'By team',
+      },
+    ],
+    label: 'Solutions',
+  },
+  {
+    groups: [
+      {
+        items: [['#story', 'building', 'About us', 'Our team and our history.']],
+        label: 'About',
+      },
+    ],
+    label: 'Company',
+  },
+] as const
+
 export function Example() {
   return (
     <helix-navigation label="Main">
-      <a href="#overview">Overview</a>
-      <helix-megamenu label="Products">
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            Build
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#helix"
-          >
-            <helix-icon name="cube"></helix-icon>
-            <strong>Projects</strong>
-            <span>Plan and track work across teams.</span>
-          </a>
-        </div>
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            Run
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#trace"
-          >
-            <helix-icon name="pulse"></helix-icon>
-            <strong>Reports</strong>
-            <span>See how your projects are doing.</span>
-          </a>
-        </div>
-      </helix-megamenu>
-      <helix-megamenu label="Solutions">
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            By team
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#engineering"
-          >
-            <helix-icon name="gear"></helix-icon>
-            <strong>Engineering</strong>
-            <span>Plan releases and track bugs.</span>
-          </a>
-          <a
-            data-megamenu-item
-            href="#design"
-          >
-            <helix-icon name="palette"></helix-icon>
-            <strong>Design</strong>
-            <span>Share files and collect feedback.</span>
-          </a>
-        </div>
-      </helix-megamenu>
-      <helix-megamenu label="Company">
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            About
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#story"
-          >
-            <helix-icon name="building"></helix-icon>
-            <strong>About us</strong>
-            <span>Our team and our history.</span>
-          </a>
-        </div>
-      </helix-megamenu>
-      <a href="#pricing">Pricing</a>
+      <helix-navigation-item href="#overview">Overview</helix-navigation-item>
+      {MENUS.map((menu) => (
+        <helix-megamenu
+          key={menu.label}
+          label={menu.label}
+        >
+          {menu.groups.map((group) => (
+            <helix-megamenu-group
+              key={group.label}
+              label={group.label}
+            >
+              {group.items.map(([href, icon, name, about]) => (
+                <helix-megamenu-item
+                  href={href}
+                  key={href}
+                >
+                  <helix-icon
+                    name={icon}
+                    slot="icon"
+                  ></helix-icon>
+                  {name}
+                  <helix-text slot="description">{about}</helix-text>
+                </helix-megamenu-item>
+              ))}
+            </helix-megamenu-group>
+          ))}
+        </helix-megamenu>
+      ))}
+      <helix-navigation-item href="#pricing">Pricing</helix-navigation-item>
     </helix-navigation>
   )
 }

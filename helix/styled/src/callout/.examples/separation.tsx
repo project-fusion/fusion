@@ -5,21 +5,21 @@ export function Example() {
       gap="sm"
     >
       <helix-callout tone="info">
-        <span slot="heading">Filled</span>
+        <helix-text slot="heading">Filled</helix-text>
         The resting look, a tint of the tone behind the text.
       </helix-callout>
       <helix-callout
         separation="outlined"
         tone="info"
       >
-        <span slot="heading">Outlined</span>
+        <helix-text slot="heading">Outlined</helix-text>
         The tone at the edge, for a page where a tinted box is too much.
       </helix-callout>
       <helix-callout
         separation="plain"
         tone="info"
       >
-        <span slot="heading">Plain</span>
+        <helix-text slot="heading">Plain</helix-text>
         The bar and the mark alone, for an aside in running prose.
       </helix-callout>
     </helix-flex>

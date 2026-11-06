@@ -140,7 +140,7 @@ if (hasLayout()) {
 
       /* **Overlapping rather than merely adjacent, asked of the margin as well
          as of the boxes.** The overlap is the sheet's
-         `calc(-1 * var(--avatar-group-overlap, var(--helix-space-sm)))`, and a
+         a quarter of the avatar's own size, negated, and a
          token that does not resolve makes that calculation invalid, which
          leaves the margin at its initial `0`. The second avatar then starts
          exactly where the first ends, and `b.left < a.right` on its own fails

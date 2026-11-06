@@ -127,6 +127,8 @@ export type TourStopEffect = (
  * @csspart skip-text - The words on that button, trimmed to their capitals and baseline.
  * @csspart surface - The panel that points at the target.
  *
+ * @cssstate aligned-end - While the panel lines up with the end of the side it sits on.
+ * @cssstate aligned-start - While the panel lines up with the start of the side it sits on.
  * @cssstate entering - From the moment the stop is shown until its entrance has finished.
  * @cssstate exiting - From the moment the stop is left until its exit has finished.
  * @cssstate placed-bottom - The panel sits below its target.
@@ -308,6 +310,8 @@ export class HelixHeadlessTourStop extends HelixElement {
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
       this.toggleState('placed-top', side === 'top')
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
       this.side = side
     },
     /* Measured against the target only for a bubble: a dialog and a floating

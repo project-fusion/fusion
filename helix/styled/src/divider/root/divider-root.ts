@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDivider } from '@fusion.dev/helix-headless/divider'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './divider-root.css.js'
+import { styles } from './divider-root.generated.css.js'
 
 /**
  * @summary A line that separates content into groups.

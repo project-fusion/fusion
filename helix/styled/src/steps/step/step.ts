@@ -5,7 +5,7 @@ import type { CSSResultGroup } from 'lit'
    `<helix-button>` in it to remind anyone. */
 import '../../button/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './step.css.js'
+import { styles } from './step.generated.css.js'
 
 /**
  * @summary One stage in a sequence.

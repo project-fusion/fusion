@@ -1,4 +1,5 @@
 <!-- @summary Rows you move by dragging a grip, or with the arrow keys after you press it. -->
+<!-- @react-native-summary Rows you move by dragging a grip, or one place at a time from the grip with a screen reader. -->
 <helix-list
   divided
   id="steps"
@@ -7,19 +8,19 @@
 >
   <helix-list-item value="freeze">
     Freeze the branch
-    <span slot="description">Stop merging new work</span>
+    <helix-text slot="description">Stop merging new work</helix-text>
   </helix-list-item>
   <helix-list-item value="notes">
     Write the release notes
-    <span slot="description">One line for each change</span>
+    <helix-text slot="description">One line for each change</helix-text>
   </helix-list-item>
   <helix-list-item value="tag">
     Tag the release
-    <span slot="description">The version from the changelog</span>
+    <helix-text slot="description">The version from the changelog</helix-text>
   </helix-list-item>
   <helix-list-item value="announce">
     Announce the release
-    <span slot="description">In the changelog and the newsletter</span>
+    <helix-text slot="description">In the changelog and the newsletter</helix-text>
   </helix-list-item>
 </helix-list>
 

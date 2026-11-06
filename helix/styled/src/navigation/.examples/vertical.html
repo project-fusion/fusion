@@ -1,0 +1,21 @@
+<!-- @summary A column of a settings page's sections beside the one shown, the arrow keys moving down it. -->
+<helix-flex
+  align-items="start"
+  gap="lg"
+  layout="flank"
+>
+  <helix-navigation
+    arrows
+    label="Settings"
+    orientation="vertical"
+  >
+    <helix-navigation-item href="#general">General</helix-navigation-item>
+    <helix-navigation-item
+      current="page"
+      href="#members"
+    >Members</helix-navigation-item>
+    <helix-navigation-item href="#billing">Billing</helix-navigation-item>
+    <helix-navigation-item href="#security">Security</helix-navigation-item>
+  </helix-navigation>
+  <helix-text>Who can see and change this workspace.</helix-text>
+</helix-flex>

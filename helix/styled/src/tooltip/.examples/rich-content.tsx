@@ -1,22 +1,11 @@
 export function Example() {
   return (
-    <>
-      <helix-button
-        aria-describedby="rich-content-tip"
-        id="rich-content-trigger"
-      >
-        Save changes
-      </helix-button>
-      <helix-tooltip
-        for="rich-content-trigger"
-        id="rich-content-tip"
-        placement="top"
-      >
-        <span slot="content">
-          Save
-          <helix-kbd keys="mod+s" />
-        </span>
-      </helix-tooltip>
-    </>
+    <helix-tooltip placement="top">
+      <helix-button>Save changes</helix-button>
+      <span slot="content">
+        Save
+        <helix-kbd keys="mod+s" />
+      </span>
+    </helix-tooltip>
   )
 }

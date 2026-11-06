@@ -339,6 +339,26 @@ describe('ranges and replacing', () => {
     expect(list.value).toBe('a,b,d')
   })
 
+  test('Shift with Up back toward the anchor lets go of the rows the range passed, and keeps the rest', async () => {
+    const list = await rows5()
+    const [a, , , , e] = list.rows as [Row, Row, Row, Row, Row]
+    click(cell(e))
+    click(cell(a))
+    await settle(list)
+    cell(a).focus()
+    key(cell(a), 'ArrowDown', { shiftKey: true })
+    await settle(list)
+    key(focused(list) as Element, 'ArrowDown', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a,b,d,e')
+    key(focused(list) as Element, 'ArrowUp', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a,b,e')
+    key(focused(list) as Element, 'ArrowUp', { shiftKey: true })
+    await settle(list)
+    expect(list.value).toBe('a,e')
+  })
+
   test('Shift with a press or Space takes in the rows from the last one pressed', async () => {
     const list = await rows5()
     const [a, , , d, e] = list.rows as [Row, Row, Row, Row, Row]

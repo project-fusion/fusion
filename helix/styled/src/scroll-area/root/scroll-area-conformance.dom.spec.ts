@@ -1,0 +1,28 @@
+import '@fusion.dev/helix-testing/dom/register'
+import { beforeAll, describe, test } from 'bun:test'
+import { keyOf, SCENARIOS, type Step } from '@fusion.dev/helix-testing/conformance'
+import { run } from '@fusion.dev/helix-testing/conformance/web'
+import { hasLayout, registerDom } from '@fusion.dev/helix-testing/dom'
+
+/* The web half of Scroll Area's conformance scenarios, which React Native
+   runs too, and the comparison holds the two records to each other.
+   `helix/testing/src/conformance` has the format. A scroll moves a laid-out
+   box, so this half runs where there is layout. */
+
+/** What this element did in this page in each Scroll Area scenario that has run, by its key. */
+export const conformance: { [scenario: string]: readonly Step[] } = {}
+
+if (hasLayout()) {
+  describe('scroll-area conformance', () => {
+    beforeAll(async () => {
+      registerDom()
+      await import('../index.js')
+    })
+
+    for (const scenario of SCENARIOS['scroll-area']) {
+      test(scenario.name, async () => {
+        conformance[keyOf(scenario)] = await run(scenario)
+      })
+    }
+  })
+}

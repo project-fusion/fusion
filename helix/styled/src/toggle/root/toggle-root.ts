@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToggle } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './toggle-root.css.js'
+import { styles } from './toggle-root.generated.css.js'
 
 /**
  * @summary One option in a toggle group.

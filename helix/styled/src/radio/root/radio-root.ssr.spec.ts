@@ -49,7 +49,7 @@ describe('radio server output', () => {
    * drew as a solid dark shape.
    */
   test('at rest it is an empty outline in the mark ink', () => {
-    const sheet = readFileSync(new URL('./radio-root.css', import.meta.url), 'utf8')
+    const sheet = readFileSync(new URL('./radio-root.generated.css', import.meta.url), 'utf8')
     const rule = sheet.slice(sheet.indexOf('[part="box"] {'))
     const resting = rule.slice(0, rule.indexOf('}'))
     expect(resting).toContain('--helix-color-foreground-subtle')

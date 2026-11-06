@@ -4,7 +4,7 @@ import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { literal, type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import { clampOf } from '../clamp.js'
-import { styles } from './text-root.css.js'
+import { styles } from './text-root.generated.css.js'
 
 /** Tags this may render. Static values, so they can be interpolated as a tag. */
 const TAGS: Record<string, StaticValue> = {

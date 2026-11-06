@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSkipLink } from '@fusion.dev/helix-headless/skip-link'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './skip-link-root.css.js'
+import { styles } from './skip-link-root.generated.css.js'
 
 /**
  * @summary A link at the start of a page that moves keyboard focus past the

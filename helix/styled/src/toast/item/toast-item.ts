@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToastItem } from '@fusion.dev/helix-headless/toast'
 import type { CSSResultGroup } from 'lit'
 import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
-import { styles } from './toast-item.css.js'
+import { styles } from './toast-item.generated.css.js'
 
 /**
  * @summary One message in the toast region.

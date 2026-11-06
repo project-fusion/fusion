@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
-import { styles } from './icon-button-root.css.js'
+import { styles } from './icon-button-root.generated.css.js'
 
 /**
  * @summary A square button whose content is an icon.

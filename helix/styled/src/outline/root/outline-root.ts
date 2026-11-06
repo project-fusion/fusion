@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessOutline } from '@fusion.dev/helix-headless/outline'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './outline-root.css.js'
+import { styles } from './outline-root.generated.css.js'
 
 /**
  * @summary Links to the headings on the page, with the section in view marked.

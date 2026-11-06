@@ -3,7 +3,7 @@ import { HelixHeadlessSpeedDial } from '@fusion.dev/helix-headless/speed-dial'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './speed-dial-root.css.js'
+import { styles } from './speed-dial-root.generated.css.js'
 
 /**
  * @summary A floating button that opens a short list of the main actions on a screen.

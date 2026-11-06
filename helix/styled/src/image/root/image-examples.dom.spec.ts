@@ -8,6 +8,7 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../flex/index.js')
+  await import('../../grid/index.js')
   await import('../../list/index.js')
 })
 

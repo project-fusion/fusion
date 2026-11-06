@@ -1,43 +1,43 @@
 <!-- @summary Your own controls, with a count of the current stop. -->
-<link
-  href="styles.css"
-  rel="stylesheet"
+<helix-flex
+  direction="column"
+  gap="xl"
 >
-<div class="bar">
-  <helix-button
-    emphasis="solid"
-    id="compose"
-    tone="primary"
-  >Compose</helix-button>
-  <helix-button
-    emphasis="outlined"
-    id="filter"
-  >Filter</helix-button>
-  <helix-icon-button
-    id="refresh"
-    label="Refresh"
+  <helix-flex
+    align-items="center"
+    gap="sm"
   >
-    <helix-icon name="arrow-clockwise"></helix-icon>
-  </helix-icon-button>
-</div>
-
-<helix-button id="begin">Take the tour</helix-button>
-
-<helix-tour
-  id="tour"
-  label="Inbox tour"
->
-  <helix-tour-stop
-    for="compose"
-    placement="bottom-start"
-  >
-    <helix-text as="h3">Write a message</helix-text>
-    <helix-text emphasis="muted">Start a new email.</helix-text>
-    <helix-flex
-      align-items="center"
-      gap="xs"
-      slot="actions"
+    <helix-button
+      emphasis="solid"
+      id="compose"
+      tone="primary"
+    >Compose</helix-button>
+    <helix-button
+      emphasis="outlined"
+      id="filter"
+    >Filter</helix-button>
+    <helix-icon-button
+      id="refresh"
+      label="Refresh"
     >
+      <helix-icon name="arrow-clockwise"></helix-icon>
+    </helix-icon-button>
+  </helix-flex>
+
+  <helix-flex>
+    <helix-button id="begin">Take the tour</helix-button>
+  </helix-flex>
+
+  <helix-tour
+    id="tour"
+    label="Inbox tour"
+  >
+    <helix-tour-stop
+      for="compose"
+      placement="bottom-start"
+    >
+      <helix-text as="h3">Write a message</helix-text>
+      <helix-text emphasis="muted">Start a new email.</helix-text>
       <helix-text
         class="count"
         emphasis="muted"
@@ -46,22 +46,17 @@
       <helix-button
         class="on"
         emphasis="solid"
+        slot="actions"
         tone="primary"
       >Next</helix-button>
-    </helix-flex>
-  </helix-tour-stop>
+    </helix-tour-stop>
 
-  <helix-tour-stop
-    for="filter"
-    placement="bottom"
-  >
-    <helix-text as="h3">Filter your inbox</helix-text>
-    <helix-text emphasis="muted">Show only unread, flagged, or starred messages.</helix-text>
-    <helix-flex
-      align-items="center"
-      gap="xs"
-      slot="actions"
+    <helix-tour-stop
+      for="filter"
+      placement="bottom"
     >
+      <helix-text as="h3">Filter your inbox</helix-text>
+      <helix-text emphasis="muted">Show only unread, flagged, or starred messages.</helix-text>
       <helix-text
         class="count"
         emphasis="muted"
@@ -70,26 +65,22 @@
       <helix-button
         class="off"
         emphasis="ghost"
+        slot="actions"
       >Back</helix-button>
       <helix-button
         class="on"
         emphasis="solid"
+        slot="actions"
         tone="primary"
       >Next</helix-button>
-    </helix-flex>
-  </helix-tour-stop>
+    </helix-tour-stop>
 
-  <helix-tour-stop
-    for="refresh"
-    placement="bottom-end"
-  >
-    <helix-text as="h3">Refresh your inbox</helix-text>
-    <helix-text emphasis="muted">Check for new messages.</helix-text>
-    <helix-flex
-      align-items="center"
-      gap="xs"
-      slot="actions"
+    <helix-tour-stop
+      for="refresh"
+      placement="bottom-end"
     >
+      <helix-text as="h3">Refresh your inbox</helix-text>
+      <helix-text emphasis="muted">Check for new messages.</helix-text>
       <helix-text
         class="count"
         emphasis="muted"
@@ -98,19 +89,21 @@
       <helix-button
         class="off"
         emphasis="ghost"
+        slot="actions"
       >Back</helix-button>
       <helix-button
         class="on"
         emphasis="solid"
+        slot="actions"
         tone="primary"
       >Got it</helix-button>
-    </helix-flex>
-  </helix-tour-stop>
-</helix-tour>
+    </helix-tour-stop>
+  </helix-tour>
+</helix-flex>
 
 <script type="module">
-  /* Controls in the `actions` slot replace the ones the stop draws, so they call
-     `next()` and `back()` themselves. The count uses `index` and `length`. */
+  /* Controls in the `actions` slot replace the ones the stop draws, so they
+     move the tour themselves, through its `index` and `open`. */
   const tour = document.querySelector('#tour')
   const label = () => {
     for (const one of tour.querySelectorAll('.count')) {
@@ -122,15 +115,24 @@
     const on = event.target.closest?.('.on')
     const off = event.target.closest?.('.off')
     if (on) {
-      tour.next()
+      if (tour.index < tour.length - 1) {
+        tour.index += 1
+      } else {
+        tour.open = false
+      }
     } else if (off) {
-      tour.back()
+      tour.index = Math.max(0, tour.index - 1)
     }
+    label()
   })
 
   tour.addEventListener('helix-before-activate', (event) => {
     tour.index = Number(event.detail.value)
     label()
+  })
+
+  tour.addEventListener('helix-before-close', () => {
+    tour.open = false
   })
 
   document.querySelector('#begin').addEventListener('click', () => {

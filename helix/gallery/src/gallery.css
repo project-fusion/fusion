@@ -20,7 +20,7 @@
  *  The palette, and every value in it is a semantic token.
  *
  * Ink is the exception and stays a percentage of `foreground`, for the reason
- * the button's own fill gives in `button-root.css`: a percentage of the
+ * the button's own fill gives in its style table: a percentage of the
  * foreground is a step away from whatever it sits on in either mode, which a
  * fixed neutral cannot be. Three steps only, 0.12, 0.28 and 0.55, and the top
  * one is deliberately short of the real text color, because a solid bar

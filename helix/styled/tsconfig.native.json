@@ -1,0 +1,19 @@
+{
+  // The native components: one module per family, which `helix family
+  // components` writes into `native/<family>/index.native.ts` and this
+  // compiles to `dist/<family>/index.native.js`, beside the family's web
+  // entry. Each family's `react-native` export condition names them.
+  //
+  // **Their own project, with React Native's types and no DOM**, because a
+  // native module must not lean on what only a browser has, and the web
+  // project's sources must not see React Native's. They sit outside `src`,
+  // which every check that reads a family walks, and are not committed.
+  "compilerOptions": {
+    "customConditions": ["react-native"],
+    "lib": ["ES2023"],
+    "rootDir": "${configDir}/native",
+    "types": []
+  },
+  "extends": "../../tsconfig.package.json",
+  "include": ["native/*/index.native.ts"]
+}

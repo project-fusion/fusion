@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDescriptionList } from '@fusion.dev/helix-headless/description-list'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './description-list-root.css.js'
+import { styles } from './description-list-root.generated.css.js'
 
 /**
  * @summary A list of labels and their values, such as a details panel.

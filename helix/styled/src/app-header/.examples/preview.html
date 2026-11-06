@@ -1,12 +1,12 @@
 <!-- @summary A brand, a navigation, and actions on the right. -->
 <helix-app-header>
-  <span slot="start">Logo</span>
+  <helix-text slot="start">Logo</helix-text>
   <helix-navigation label="Sections">
-    <a
-      aria-current="page"
+    <helix-navigation-item
+      current="page"
       href="#one"
-    >Overview</a>
-    <a href="#two">Projects</a>
+    >Overview</helix-navigation-item>
+    <helix-navigation-item href="#two">Projects</helix-navigation-item>
   </helix-navigation>
 
   <helix-icon-button

@@ -9,18 +9,18 @@ export function Example() {
         value="one"
       >
         Create account
-        <span slot="description">Email address confirmed</span>
+        <helix-text slot="description">Email address confirmed</helix-text>
       </helix-step>
       <helix-step
         current
         value="two"
       >
         Add your details
-        <span slot="description">Name, role, and time zone</span>
+        <helix-text slot="description">Name, role, and time zone</helix-text>
       </helix-step>
       <helix-step value="three">
         Invite your team
-        <span slot="description">Up to five team members</span>
+        <helix-text slot="description">Up to five team members</helix-text>
       </helix-step>
     </helix-steps>
   )

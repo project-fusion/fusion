@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTour } from '@fusion.dev/helix-headless/tour'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './tour-root.css.js'
+import { styles } from './tour-root.generated.css.js'
 
 /**
  * @summary A guided tour of an interface, one stop at a time.

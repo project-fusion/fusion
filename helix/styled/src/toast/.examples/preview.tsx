@@ -1,9 +1,6 @@
 export function Example() {
   return (
-    <helix-toast
-      label="Notifications"
-      placement="bottom-end"
-    >
+    <helix-toast placement="bottom-end">
       <helix-toast-item
         dismissible
         tone="success"

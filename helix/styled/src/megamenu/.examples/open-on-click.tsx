@@ -1,45 +1,31 @@
 export function Example() {
   return (
     <helix-navigation label="Main">
-      <a href="#overview">Overview</a>
+      <helix-navigation-item href="#overview">Overview</helix-navigation-item>
       <helix-megamenu
         label="Products"
         open-on="click"
       >
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            Build
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#helix"
-          >
-            <helix-icon name="cube"></helix-icon>
-            <strong>Projects</strong>
-            <span>Plan and track work across teams.</span>
-          </a>
-        </div>
-        <div data-megamenu-group>
-          <helix-text
-            as="h3"
-            data-megamenu-heading
-            scale="title"
-          >
-            Run
-          </helix-text>
-          <a
-            data-megamenu-item
-            href="#trace"
-          >
-            <helix-icon name="pulse"></helix-icon>
-            <strong>Reports</strong>
-            <span>See how your projects are doing.</span>
-          </a>
-        </div>
+        <helix-megamenu-group label="Build">
+          <helix-megamenu-item href="#helix">
+            <helix-icon
+              name="cube"
+              slot="icon"
+            ></helix-icon>
+            Projects
+            <helix-text slot="description">Plan and track work across teams.</helix-text>
+          </helix-megamenu-item>
+        </helix-megamenu-group>
+        <helix-megamenu-group label="Run">
+          <helix-megamenu-item href="#trace">
+            <helix-icon
+              name="pulse"
+              slot="icon"
+            ></helix-icon>
+            Reports
+            <helix-text slot="description">See how your projects are doing.</helix-text>
+          </helix-megamenu-item>
+        </helix-megamenu-group>
       </helix-megamenu>
     </helix-navigation>
   )

@@ -20,10 +20,12 @@ import { property } from 'lit/decorators.js'
  * @description
  * A tab is an element, because it manages selection and its own tab stop.
  *
- * With an `href`, the tab is a link: `role="tab"` on an `<a>`, which a press,
- * Enter and the browser's own link gestures follow. `helix-before-select` is sent
- * first, and canceling it keeps the browser from following, so a client-side
- * router follows it instead.
+ * With an `href`, the tab is a link that still controls its panel:
+ * `role="tab"` on an `<a>`, which a press, Enter and the browser's own link
+ * gestures follow. `helix-before-select` is sent first, and canceling it
+ * keeps the browser from following, so a client-side router follows it
+ * instead and renders the route in the tab's panel. Link-only tabs with no panels belong
+ * in Navigation, whose `variant="underlined"` draws the same bar.
  *
  * With `dismissible`, the tab can be closed, as Web Awesome's closable tab
  * can: a press on its `dismiss` mark, or Delete or Backspace while the tab
@@ -92,8 +94,11 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
   override dismissLabel = 'Close'
 
   /**
-   * The URL the tab links to. Setting it renders the tab as a link, for a set
-   * of tabs that are pages of a site.
+   * The URL the tab links to, for tabs a router drives. Setting it renders the
+   * tab as a link, and the tab still controls its panel.
+   *
+   * Link-only tabs with no panels belong in Navigation, whose
+   * `variant="underlined"` draws the same bar.
    */
   @property()
   href?: string

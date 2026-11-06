@@ -1,13 +1,7 @@
-import './preview.css'
-
 export function Example() {
   return (
-    <div className="page">
-      <helix-speed-dial
-        data-dock="bottom-end"
-        data-dock-within
-        label="Actions"
-      >
+    <helix-flex justify-content="end">
+      <helix-speed-dial label="Actions">
         <helix-speed-dial-item value="share">
           Share
           <helix-icon
@@ -33,6 +27,6 @@ export function Example() {
           ></helix-icon>
         </helix-speed-dial-item>
       </helix-speed-dial>
-    </div>
+    </helix-flex>
   )
 }

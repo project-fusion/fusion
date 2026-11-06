@@ -1,9 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessRadioGroup } from '@fusion.dev/helix-headless/radio'
 import type { CSSResultGroup } from 'lit'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './radio-group.css.js'
+import { styles } from './radio-group.generated.css.js'
 
 /**
  * @summary A set of radios where exactly one can be chosen.
@@ -23,7 +21,7 @@ import { styles } from './radio-group.css.js'
  */
 @customElement('helix-radio-group')
 export class HelixRadioGroup extends HelixHeadlessRadioGroup {
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

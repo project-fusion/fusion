@@ -1,18 +1,34 @@
-import './sticky.css'
+import { useState } from 'react'
+
+const SECTIONS = [
+  ['#one', 'Overview'],
+  ['#two', 'Projects'],
+] as const
 
 export function Example() {
+  const [current, setCurrent] = useState('#one')
+
+  // The page says which destination is current, as a router does once it has moved.
+  const go = (event: CustomEvent<{ value: string }>) => {
+    event.preventDefault()
+    setCurrent(event.detail.value)
+  }
+
   return (
-    <div className="page">
+    <helix-flex direction="column">
       <helix-app-header sticky>
-        <span slot="start">Logo</span>
+        <helix-text slot="start">Logo</helix-text>
         <helix-navigation label="Sections">
-          <a
-            aria-current="page"
-            href="#one"
-          >
-            Overview
-          </a>
-          <a href="#two">Projects</a>
+          {SECTIONS.map(([href, label]) => (
+            <helix-navigation-item
+              current={href === current ? 'page' : undefined}
+              href={href}
+              key={href}
+              onhelix-select={go}
+            >
+              {label}
+            </helix-navigation-item>
+          ))}
         </helix-navigation>
         <helix-icon-button
           label="Settings"
@@ -22,7 +38,14 @@ export function Example() {
         </helix-icon-button>
       </helix-app-header>
 
-      <div className="prose">
+      <helix-card
+        separation="plain"
+        style={{
+          '--card-color': 'var(--helix-color-foreground)',
+          '--card-gap': 'var(--helix-space-lg)',
+          '--card-padding': 'var(--helix-space-2xl)',
+        }}
+      >
         <helix-text
           as="h2"
           scale="title"
@@ -48,7 +71,35 @@ export function Example() {
           Billing
         </helix-text>
         <helix-text as="p">Your next invoice is due on October 1, 2026.</helix-text>
-      </div>
-    </div>
+
+        <helix-text
+          as="h2"
+          variant="title"
+        >
+          Integrations
+        </helix-text>
+        <helix-text as="p">
+          Connect the tools your team already uses, and choose what each one can read.
+        </helix-text>
+
+        <helix-text
+          as="h2"
+          variant="title"
+        >
+          Notifications
+        </helix-text>
+        <helix-text as="p">
+          Choose which updates reach you by email and which stay in the app.
+        </helix-text>
+
+        <helix-text
+          as="h2"
+          variant="title"
+        >
+          Security
+        </helix-text>
+        <helix-text as="p">Turn on two-step sign-in for everyone in the workspace.</helix-text>
+      </helix-card>
+    </helix-flex>
   )
 }

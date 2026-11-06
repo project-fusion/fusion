@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTimelineItem } from '@fusion.dev/helix-headless/timeline'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './timeline-item.css.js'
+import { styles } from './timeline-item.generated.css.js'
 
 /**
  * @summary One event on a timeline: when it happened, and what it was.
