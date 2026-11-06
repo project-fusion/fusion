@@ -1,3 +1,4 @@
+import checkboxStrokes from '../../../fragments/checkbox-strokes.js'
 import field from '../../../fragments/field.js'
 import fieldInline from '../../../fragments/field-inline.js'
 import { oneOf } from '../../../render.js'
@@ -364,21 +365,7 @@ export default styles(
         ),
       ]),
       /* A phone strokes the same paths, at the same weight, in the mark's ink. */
-      on(['tick', 'dash-mark'], [native([rule({ blockSize: '100%', inlineSize: '100%' })])]),
-      on(
-        ['tick-line', 'dash-line'],
-        [
-          native([
-            rule({
-              fill: 'none',
-              stroke: hook.markColor,
-              strokeLinecap: 'round',
-              strokeLinejoin: 'round',
-              strokeWidth: 2.5,
-            }),
-          ]),
-        ],
-      ),
+      include(checkboxStrokes),
       on({ region: ['check', 'dash'], slotted: '*' }, [
         rule({ blockSize: hook.iconSize, inlineSize: hook.iconSize }),
       ]),
