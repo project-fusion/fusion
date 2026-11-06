@@ -80,7 +80,9 @@ export default styles(
     hooks: {
       addedColor: token('color-success'),
       backdrop: null,
-      backgroundColor: token('color-background'),
+      /* The ground it sits on, not a sunken panel: the page's own color made a
+         hole in a dark Card or a Dialog. */
+      backgroundColor: 'transparent',
       borderColor: token('color-border'),
       color: token('color-foreground'),
       expandColor: token('color-foreground-muted'),
@@ -112,9 +114,10 @@ export default styles(
       quotient(difference('1lh', token('size-control-sm')), 2),
     )
     const addedWash = mix(hook.addedColor, 14, hook.backgroundColor, 'srgb')
-    const addedDeep = mix(hook.addedColor, 32, hook.backgroundColor, 'srgb')
+    /* 21% laid over the line's 14% is the tone at 32%, on any ground. */
+    const addedDeep = mix(hook.addedColor, 21, 'transparent', 'srgb')
     const removedWash = mix(hook.removedColor, 14, hook.backgroundColor, 'srgb')
-    const removedDeep = mix(hook.removedColor, 32, hook.backgroundColor, 'srgb')
+    const removedDeep = mix(hook.removedColor, 21, 'transparent', 'srgb')
     const addedInk = mix(hook.addedColor, 55, token('color-foreground'))
     const removedInk = mix(hook.removedColor, 55, token('color-foreground'))
     const flatTop = {
@@ -132,6 +135,11 @@ export default styles(
       margin: token('space-none'),
     } as const
     const backdrop = { backdropFilter: first(hook.backdrop, 'none') } as const
+    const reach = fn(
+      'max',
+      token('space-2xs'),
+      quotient(difference(token('size-target'), token('size-control-sm')), 2),
+    )
     const ring = { outline: FOCUS_RING, outlineOffset: token('size-focus-offset') } as const
     const ringInside = {
       outline: FOCUS_RING,
@@ -155,6 +163,9 @@ export default styles(
             codeBlockLeading: hook.lineHeight,
             codeBlockSize: hook.fontSize,
           },
+          /* Code shows the characters written: a ligature hides a `!=`
+             changing to `!==`. */
+          web: { fontVariantLigatures: 'none' },
         }),
         /* What the web's code restates on each part it draws. */
         native([
@@ -199,6 +210,15 @@ export default styles(
             paddingBlock: token('space-2xs'),
             paddingInlineEnd: token('space-2xs'),
           }),
+          /* On a touch screen the inset holds the button's whole press inside
+             the bar. */
+          rule(
+            { coarsePointer: true },
+            {
+              paddingBlock: reach,
+              paddingInlineEnd: reach,
+            },
+          ),
         ]),
       ]),
       on('label', [
@@ -379,7 +399,10 @@ export default styles(
       on('code', [
         rule({
           color: hook.color,
+          /* Code reads left to right whatever the page around it does. */
           web: {
+            direction: 'ltr',
+            unicodeBidi: 'isolate',
             fontFamily: own.codeBlockFace,
             fontSize: own.codeBlockSize,
             lineHeight: own.codeBlockLeading,
