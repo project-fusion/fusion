@@ -12,6 +12,9 @@ export default fragment('field-stacked', { parts: ['label'] }, ({ on, rule }) =>
     rule({
       display: 'block',
       fontSize: token('text-field-label'),
+      /* Tight, as a label over a box is a heading for it. An inline field's
+         label reads at the body's leading instead, in `field-inline`. */
+      lineHeight: token('leading-tight'),
       paddingBlockEnd: token('space-2xs'),
     }),
   ]),

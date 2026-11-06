@@ -20,7 +20,8 @@ export default fragment(
         color: token('color-foreground'),
         fontFamily: token('font-sans'),
         fontWeight: token('weight-medium'),
-        lineHeight: token('leading-tight'),
+        /* The leading is `field-stacked`'s or `field-inline`'s, the one each
+           family takes beside this. */
         /* A long unbroken word breaks inside the column it was given. */
         overflowWrap: 'anywhere',
       }),
