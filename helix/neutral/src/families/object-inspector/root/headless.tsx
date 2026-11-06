@@ -96,7 +96,7 @@ export default headless('object-inspector', {
     filter: ['value'],
     toggle: bare(['newState', 'oldState']),
   },
-  states: ['empty', 'filtered', 'matched', 'settled'],
+  states: ['empty', 'filtered', 'labeled', 'matched', 'settled'],
   text: {
     onBeforeChange: 'beforeFilter',
     onInput: 'filter',
