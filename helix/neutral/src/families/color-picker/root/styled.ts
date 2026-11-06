@@ -37,6 +37,7 @@ export default styles(
       fieldsGap: token('space-xs'),
       gridRadius: token('radii-sm'),
       gridRatio: '1 / 0.7',
+      maxInlineSize: '28rem',
       padding: token('space-none'),
       sampleSize: '36px',
       swatchSize: token('size-icon-loose'),
@@ -104,8 +105,11 @@ export default styles(
       on('host', [
         rule({
           display: 'block',
+          /* A comfortable width at most, and nothing inside drawn past its box. */
+          maxInlineSize: hook.maxInlineSize,
           paddingBlockEnd: hook.padding,
         }),
+        web([rule({ overflow: 'clip' })]),
         web([rule({ own: { colorPickerAlong: 'to right' } })]),
         web([rule({ dir: 'rtl' }, { own: { colorPickerAlong: 'to left' } })]),
       ]),
@@ -141,6 +145,19 @@ export default styles(
           position: 'relative',
           web: { cursor: 'crosshair', touchAction: 'none' },
         }),
+        /* A hairline of the ink inside, so a pale field keeps its edge on the page. */
+        web([
+          rule({
+            boxShadow: [
+              'inset',
+              0,
+              0,
+              0,
+              token('border-thin'),
+              mix(token('color-foreground'), 14, 'transparent'),
+            ],
+          }),
+        ]),
         web([
           rule({
             backgroundImage: list(
@@ -448,6 +465,16 @@ export default styles(
       on({ part: 'sample', selector: '[part="sample"][data-copied]' }, [
         web([rule({ scale: 0.94 })]),
       ]),
+      /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn moves. */
+      on({ before: 'sample' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
+      ]),
       on({ part: 'sample', selector: '[part="sample"][data-copied]::after' }, [
         web([
           rule({
@@ -456,10 +483,11 @@ export default styles(
             content: '""',
             inset: 0,
             maskImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 13l4 4L19 7'/%3E%3C/svg%3E\")",
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E\")",
             maskPosition: 'center',
             maskRepeat: 'no-repeat',
-            maskSize: '60%',
+            /* Checkbox's tick at Checkbox's size. */
+            maskSize: token('size-checkbox'),
             position: 'absolute',
           }),
         ]),
@@ -699,7 +727,11 @@ export default styles(
         [web([rule({ appearance: 'none', margin: 0 })])],
       ),
       /* The tools keep their own width beside the text, and take the row when there is no text. */
-      on('actions', [rule({ display: 'flex', flex: '1 1 auto' })]),
+      on('actions', [rule({ display: 'flex', flex: '0 0 auto' })]),
+      /* Written out: the format button is as wide as its word. */
+      on({ part: 'actions', selector: '[part="actions"] helix-button[part="format"]' }, [
+        web([rule({ '--button-inline-size': 'auto', flex: [0, 0, 'auto'] })]),
+      ]),
       /* Written out: each button splits what the row has left. */
       on({ part: 'actions', selector: '[part="actions"] helix-button' }, [
         web([rule({ flex: '1 1 0' })]),
@@ -737,7 +769,8 @@ export default styles(
           borderBlockStart: [token('border-thin'), 'solid', token('color-border')],
           display: 'flex',
           flexWrap: 'wrap',
-          gap: token('space-2xs'),
+          /* A finger's target between two presets, where they are smaller than one. */
+          gap: fn('max', token('space-2xs'), difference(token('size-target'), hook.swatchSize)),
           marginBlockStart: token('space-sm'),
           paddingBlockStart: token('space-sm'),
           paddingInline: hook.padding,
@@ -755,6 +788,16 @@ export default styles(
           web: { cursor: 'pointer' },
         }),
         web([rule({ readonly: true }, { cursor: 'default' })]),
+        rule({ position: 'relative' }),
+      ]),
+      on({ after: 'swatch' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       on('label', [
         rule({
