@@ -343,6 +343,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
+ * @slot selection - Content that takes the toolbar's place while rows are selected, such as a `SelectionBar` with what you can do to them.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
  * @event {HelixBeforeColumnToggleEvent} helix-before-column-toggle - A column is about to be hidden or shown, with its `field` and `hidden`. Cancelable: cancel it to keep the column as it is.
@@ -2053,6 +2054,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     })
   }
 
+  /** Whether the `selection` slot takes the toolbar's place: rows are selected, and something is in it. */
+  private get selecting(): boolean {
+    return (
+      this.selectable &&
+      this.chosen.size > 0 &&
+      this.knownChildren.some((child) => child.getAttribute('slot') === 'selection')
+    )
+  }
+
+  /**
+   * Selects these rows by key, and no others, as a reader's choice does: it
+   * asks with `helix-before-select`. An empty list clears the selection, which
+   * Clear in a `SelectionBar` does. Returns whether the selection changed.
+   */
+  selectRows(keys: readonly string[]): boolean {
+    const next = new Set(keys)
+    if (next.size === this.chosen.size && [...next].every((key) => this.chosen.has(key))) {
+      return false
+    }
+    return this.requestSelected(next)
+  }
+
   /** The keys selected now. */
   private get chosen(): Set<string> {
     return new Set(commaList(this.selected))
@@ -2817,6 +2840,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const rest = [...this.children].filter((child) => !columns.includes(child as never))
     for (const [name, wanted] of [
       ['toolbar', true],
+      ['selection', true],
       ['footer', true],
       ['empty', true],
       ['error', true],
@@ -2946,7 +2970,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        tree would be a gap a consumer cannot close without knowing to look for
        it. Both stay, since `[hidden]` is a UA rule and a sheet setting `display`
        on these parts outranks it. */
-    markRegion(this.renderRoot, 'toolbar', ['toolbar'])
+    markRegion(this.renderRoot, 'toolbar', this.selecting ? ['selection'] : ['toolbar'])
     /* The footer is not empty while this element is drawing its own pagination
        into it. */
     markRegion(this.renderRoot, 'footer', ['footer'], { occupied: '[part="pagination"]' })
@@ -3637,7 +3661,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       columns: columns.length ? columns.length + this.lead : undefined,
       rows: countKnown ? counted + 1 + (this.moreDrawn ? 1 : 0) : undefined,
     }
-    return html`<div part="toolbar"><slot name="toolbar"></slot></div>
+    const selecting = this.selecting
+    return html`<div part="toolbar"
+        ><slot name="toolbar" ?hidden=${selecting}></slot><slot name="selection" ?hidden=${!selecting}></slot
+      ></div>
       <div
         part="table"
         role="rowgroup"

@@ -38,6 +38,9 @@ export interface ToolTable extends HTMLElement, ReactiveControllerHost {
   requestView(next: PartialView): boolean
   /** The keys of the selected rows, separated by commas. */
   selected: string
+  selectRows(keys: readonly string[]): boolean
+  /** The sort order, as `field:direction`. */
+  sort: string
   readonly tableColumns: readonly ToolColumn[]
   readonly view: DataTableView
 }
@@ -79,10 +82,18 @@ export class TableBinding implements ReactiveController {
     host.addController(this)
   }
 
-  /** The table, once it is in the tree and defined, or nothing. */
+  /**
+   * The table, once it is in the tree and defined, or nothing. Without a
+   * `for`, a tool written inside a table, as a Selection Bar in its
+   * `selection` slot is, takes that table.
+   */
   get table(): ToolTable | null {
-    if (this.host.for === '' || typeof document === 'undefined') {
+    if (typeof document === 'undefined') {
       return null
+    }
+    if (this.host.for === '') {
+      const parent = this.host.parentElement
+      return isToolTable(parent) ? parent : null
     }
     const scope = this.host.getRootNode() as Document | ShadowRoot
     const found = scope.getElementById?.(this.host.for) ?? null
