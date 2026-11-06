@@ -19,7 +19,6 @@ import {
   matchesChord,
   numberConverter,
   onApple,
-  onModalOpen,
   type Raised,
   registerShortcut,
   scrollHolders,
@@ -29,7 +28,6 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../button/index.js'
 import { joinSaid, messageWords } from '../words.js'
-import { type Lent, lend, topModal } from './toast-lend.js'
 
 /**
  * @summary The region that holds toast messages, and the only element that announces them.
@@ -302,7 +300,7 @@ export class HelixHeadlessToast extends HelixElement {
     if (arrived.length === 0) {
       return
     }
-    if (this.lent === undefined && this.blocked()) {
+    if (this.blocked()) {
       this.notify(arrived)
     } else {
       this.announce(arrived)
@@ -680,18 +678,16 @@ export class HelixHeadlessToast extends HelixElement {
   /**
    * Puts the stack in the top layer while a message shows, and on top of it.
    *
-   * Shown again once the region has moved into a modal, because the top
-   * layer is ordered by when each element entered it, and when a message
-   * arrives under a modal it could not move into. Only then, because showing
-   * it again starts every message's entrance over.
+   * Shown again when a message arrives under a modal opened after it, because
+   * the top layer is ordered by when each element entered it. Only then,
+   * because showing it again starts every message's entrance over.
    */
   private place(added: readonly Node[] = []): void {
-    const showing = this.showing
-    const raised = this.follow(showing.length > 0) && this.lent !== undefined
     const region = this.region
     if (!region || typeof region.showPopover !== 'function') {
       return
     }
+    const showing = this.showing
     const open = popoverOpen(region)
     if (showing.length === 0) {
       if (open) {
@@ -702,7 +698,7 @@ export class HelixHeadlessToast extends HelixElement {
     const arrived = added.filter(
       (one): one is HTMLElement => one instanceof HTMLElement && showing.includes(one),
     )
-    const blocked = raised || (arrived.length > 0 && this.lent === undefined && this.blocked())
+    const blocked = arrived.length > 0 && this.blocked()
     if (open && blocked) {
       region.hidePopover()
     }
@@ -864,56 +860,6 @@ export class HelixHeadlessToast extends HelixElement {
     void Promise.all(surfaces.map((one) => animationsSettled(one))).then(() => this.clear())
   }
 
-  /** The modal the region has moved into, and how it goes back. */
-  private lent: { readonly into: HTMLDialogElement; readonly lent: Lent } | undefined
-
-  /** Whether the region is moving, which its own leaving and arriving pass over. */
-  private moving = false
-
-  /**
-   * Moves the region into the modal that opened last, while a message shows,
-   * and back out once that modal closes. Returns whether it moved.
-   */
-  private follow(showing: boolean): boolean {
-    const modal =
-      showing || this.lent !== undefined ? topModal(this.lent?.lent.home ?? this) : undefined
-    if (modal === this.lent?.into) {
-      return false
-    }
-    this.moving = true
-    try {
-      this.lent?.into.removeEventListener('close', this.handleModalClose)
-      this.lent?.lent.back()
-      this.lent = undefined
-      this.style.removeProperty('color-scheme')
-      /* **Inverted where it goes**, as the page's stylesheet inverts it where
-         it stands: that rule names `helix-toast` and does not reach inside
-         the modal's shadow root, so the scheme it computes here goes along. */
-      const scheme = this.hasAttribute('data-color-mode')
-        ? ''
-        : getComputedStyle(this).getPropertyValue('color-scheme')
-      const lent = modal && lend(this, modal)
-      if (modal && lent) {
-        this.lent = { into: modal, lent }
-        if (scheme !== '' && scheme !== 'normal') {
-          this.style.setProperty('color-scheme', scheme)
-        }
-        modal.addEventListener('close', this.handleModalClose)
-      }
-    } finally {
-      this.moving = false
-    }
-    return true
-  }
-
-  private readonly handleModalOpen = (): void => {
-    this.place()
-  }
-
-  private readonly handleModalClose = (): void => {
-    this.place()
-  }
-
   /**
    * Takes the stack out of the top layer once the last message has finished
    * leaving. Hidden at once, the stack would cut the exit short.
@@ -1030,10 +976,6 @@ export class HelixHeadlessToast extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    if (this.moving) {
-      return
-    }
-    this.unhearModals = onModalOpen(this.handleModalOpen)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('focusout', this.handleFocusOut)
     /* On the host, which a pointer enters through any message in the stack. */
@@ -1083,9 +1025,6 @@ export class HelixHeadlessToast extends HelixElement {
   /** Stops keeping the stack above the modal surfaces opened after it. */
   private lower: (() => void) | undefined
 
-  /** Stops hearing modals open. */
-  private unhearModals: (() => void) | undefined
-
   /**
    * The stack as a box kept above every modal surface. A modal opened while a
    * message showed covered the stack with its backdrop until the next message
@@ -1115,25 +1054,6 @@ export class HelixHeadlessToast extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    if (this.moving) {
-      return
-    }
-    /* Taken out with the modal it had moved into: back to its own place,
-       where that place is still on the page. */
-    if (this.lent !== undefined) {
-      this.lent.into.removeEventListener('close', this.handleModalClose)
-      const { lent } = this.lent
-      this.lent = undefined
-      this.moving = true
-      lent.back()
-      this.style.removeProperty('color-scheme')
-      this.moving = false
-      if (this.isConnected) {
-        this.place()
-        return
-      }
-    }
-    this.unhearModals?.()
     this.unregister?.()
     this.lower?.()
     window.removeEventListener('resize', this.handleResize)
