@@ -37,6 +37,17 @@ export const COMPARED: Readonly<Record<string, (...lengths: number[]) => number>
   round: (value = 0, step = 1) => Math.round(value / step) * step,
 }
 
+/**
+ * `round()`'s strategies, a first argument before the value and the step:
+ * `round(down, 13px, 2px)` is 12 and `round(up, 19.5px, 2px)` is 20.
+ */
+export const ROUNDED: Readonly<Record<string, (value?: number, step?: number) => number>> = {
+  down: (value = 0, step = 1) => Math.floor(value / step) * step,
+  nearest: (value = 0, step = 1) => Math.round(value / step) * step,
+  'to-zero': (value = 0, step = 1) => Math.trunc(value / step) * step,
+  up: (value = 0, step = 1) => Math.ceil(value / step) * step,
+}
+
 /** What `resolverFor` reads: the part, the rules that reach it, and its own values. */
 export interface Scope {
   /** Whether a rule is on this part, or on a part it is as well. */
@@ -353,11 +364,16 @@ export const resolverFor = ({
          in points, as a segment keeps three pixels unless it draws less. */
       const compared = COMPARED[value.function.name]
       if (compared !== undefined) {
-        const lengths = value.function.arguments
-          .map(resolve)
-          .map((one) => length(one, spaceRem, context.fontSize ?? spaceRem))
+        const read = value.function.arguments.map(resolve)
+        const strategy =
+          value.function.name === 'round' && typeof read[0] === 'string'
+            ? ROUNDED[read[0]]
+            : undefined
+        const lengths = (strategy === undefined ? read : read.slice(1)).map((one) =>
+          length(one, spaceRem, context.fontSize ?? spaceRem),
+        )
         if (lengths.every((one): one is number => typeof one === 'number')) {
-          return compared(...lengths)
+          return (strategy ?? compared)(...lengths)
         }
       }
       /* An argument of several words, as a gradient's `red 50%`, keeps its
