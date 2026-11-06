@@ -12,7 +12,7 @@ import {
   native,
   product,
   quotient,
-  sum,
+  scheme,
   token,
   web,
 } from '../../../style.js'
@@ -61,11 +61,11 @@ export default styles(
       iconButtonEdge: null,
       iconButtonFill: null,
       iconButtonFillHover: null,
+      iconButtonFillPress: null,
+      iconButtonGlyph: null,
       iconButtonInk: null,
       iconButtonInkHover: null,
       iconButtonOnTone: null,
-      iconButtonPressWay: null,
-      iconButtonSolidPress: null,
       iconButtonPressedFill: null,
       iconButtonPressedInk: null,
       iconButtonSize: null,
@@ -83,13 +83,30 @@ export default styles(
     stylesheet: 'icon-button/root/icon-button-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule }) => [
-    on('host', [rule({ display: 'inline-flex', own: { iconButtonSize: hook.size } })]),
+    on('host', [
+      rule({
+        display: 'inline-flex',
+        own: {
+          /* The glyph's step: the tight icon, and never under the small one, so a glyph
+             keeps its proportion to the box at every density. */
+          iconButtonGlyph: fn('max', token('size-icon-tight'), token('size-icon-sm')),
+          iconButtonSize: hook.size,
+        },
+      }),
+    ]),
+    /* What is passed in reads the glyph's step as its icon size, and the steps derived
+       from it, rounded as the token layer rounds them. */
+    on({ region: '*', slotted: '*' }, [
+      rule({
+        '--helix-size-icon': own.iconButtonGlyph,
+        '--helix-size-icon-loose': fn('round', product(token('size-icon'), 1.2), '2px'),
+        '--helix-size-icon-tight': fn('round', product(token('size-icon'), 0.8), '2px'),
+      }),
+    ]),
     include(iconButtonTones),
     on('host', [
       rule({
         own: {
-          /* Near black has nothing darker, so a neutral press goes toward the page. */
-          iconButtonPressWay: 1,
           iconButtonWash: token('color-hover'),
         },
       }),
@@ -97,8 +114,11 @@ export default styles(
         { has: 'tone', tone: { not: 'neutral' } },
         {
           own: {
-            iconButtonPressWay: '-1',
-            iconButtonWash: mix(own.iconButtonTone, 8, 'transparent'),
+            /* 12% in dark, as a row's hover is. */
+            iconButtonWash: scheme(
+              mix(own.iconButtonTone, 8, 'transparent'),
+              mix(own.iconButtonTone, 12, 'transparent'),
+            ),
           },
         },
       ),
@@ -322,28 +342,22 @@ export default styles(
           backgroundColor: first(
             own.iconButtonPressedFill,
             hook.backgroundColor,
-            mix(own.iconButtonTone, 16, 'transparent'),
+            scheme(
+              mix(own.iconButtonTone, 16, 'transparent'),
+              mix(own.iconButtonTone, 20, 'transparent'),
+            ),
           ),
         },
       ),
-      /* A step past the hover fill, which way the tone's press goes. */
+      /* The tone's press token, a step past its hover fill. */
       rule(
         { active: true, emphasis: 'solid', formDisabled: false },
         {
           backgroundColor: first(
             own.iconButtonPressedFill,
             hook.backgroundColor,
-            own.iconButtonSolidPress,
+            own.iconButtonFillPress,
           ),
-          own: {
-            iconButtonSolidPress: fn('oklch', [
-              'from',
-              own.iconButtonFillHover,
-              sum('l', product('0.05', own.iconButtonPressWay('-1'))),
-              'c',
-              'h',
-            ]),
-          },
         },
       ),
       rule(
@@ -352,7 +366,10 @@ export default styles(
           backgroundColor: first(
             own.iconButtonPressedFill,
             hook.backgroundColor,
-            mix(own.iconButtonTone, 20, 'transparent'),
+            scheme(
+              mix(own.iconButtonTone, 16, 'transparent'),
+              mix(own.iconButtonTone, 20, 'transparent'),
+            ),
           ),
         },
       ),
