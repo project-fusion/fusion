@@ -1013,8 +1013,6 @@ export {
   coversPress,
   keepAbove,
   lockScroll,
-  onModalOpen,
-  openModal,
   type Raised,
   raiseAbove,
   scrollHolders,
