@@ -4,12 +4,14 @@ import printExact from '../../../fragments/print-exact.js'
 import { oneOf } from '../../../render.js'
 import {
   difference,
+  fn,
   list,
   measured,
   mix,
   native,
   product,
   quotient,
+  scheme,
   sum,
   token,
   web,
@@ -69,20 +71,17 @@ export default styles(
         rule({
           display: 'grid',
           inlineSize: hook.size,
+          maxInlineSize: '100%',
           placeItems: 'center',
           position: 'relative',
         }),
+        /* The ring is its own ground, so the words with nothing to draw take none of the
+           shared quiet rules. */
+        web([rule({ '--_chart-status-baseline': 'none', '--_chart-status-ground': 'none' })]),
       ]),
       on('plot', [rule({ gridArea: '1 / 1' })]),
       /* The tooltip's containing block. */
       on('plot', [rule({ inlineSize: '100%', position: 'relative' })]),
-      /* With nothing to draw, the plot keeps the ring's box. */
-      on({ part: 'plot', selector: '[part="plot"]:not(:has(svg))' }, [
-        web([rule({ aspectRatio: 1 })]),
-      ]),
-      on({ part: 'plot', selector: ':host([sweep="half"]) [part="plot"]:not(:has(svg))' }, [
-        web([rule({ aspectRatio: 2 })]),
-      ]),
       /* A phone's plot holds the ring's box always, which the ring fills. */
       on('plot', [native([rule({ aspectRatio: measured('donut-chart-aspect') })])]),
       on('ring', [native([rule({ inset: 0, position: 'absolute' })])]),
@@ -108,7 +107,7 @@ export default styles(
       on('segment', [rule({ strokeLinecap: 'butt', strokeWidth: stroke })]),
       on('segment', [native([rule({ fill: 'none' })])]),
       on({ part: 'center', inner: 'slot' }, [
-        web([rule({ '--stat-value-size': '24cqi', fontSize: '13cqi' })]),
+        web([rule({ '--stat-value-size': fn('round', '24cqi', '1px'), fontSize: '13cqi' })]),
       ]),
       /* A phone has no container units, so the same share of the hole is
          written against the ring's size: the hole is `80 - 2 * thickness`
@@ -197,7 +196,16 @@ export default styles(
         rule(
           { sweep: 'half' },
           {
-            web: { insetBlockEnd: 0, insetBlockStart: 'auto', translate: ['-50%', 0] },
+            /* On the line the ends of the arc stand on, a step above it. */
+            web: {
+              insetBlockEnd: difference(
+                quotient(product('100%', quotient(settled, 2)), sum(40, quotient(settled, 2))),
+                token('space-2xs'),
+              ),
+              insetBlockStart: 'auto',
+              placeItems: ['end', 'center'],
+              translate: ['-50%', 0],
+            },
             blockSize: quotient(
               product('100%', difference(own.donutChartEdge, settled)),
               sum(own.donutChartEdge, quotient(settled, 2)),
@@ -207,8 +215,50 @@ export default styles(
         native([rule({ sweep: 'half' }, { insetBlockStart: 'auto' })]),
       ]),
       on({ part: 'center', inner: 'slot' }, [
-        web([rule({ sweep: 'half' }, { '--stat-value-size': '12cqi', fontSize: '6.5cqi' })]),
+        web([
+          rule(
+            { sweep: 'half' },
+            {
+              '--stat-label-size': token('text-xs'),
+              '--stat-value-size': fn('max', token('text-lg'), fn('round', '12cqi', '1px')),
+              fontSize: fn('max', token('text-sm'), '6.5cqi'),
+            },
+          ),
+        ]),
       ]),
+      /* The words with nothing to draw stand inside the hole, the ring's track around
+         them, and in the half ring's opening. */
+      on(
+        ['empty', 'error', 'loading'],
+        [
+          web([
+            rule({
+              boxSizing: 'border-box',
+              inlineSize: product(
+                quotient(product('100%', difference(own.donutChartRing, product(2, settled))), 100),
+                0.85,
+              ),
+              insetInline: 0,
+              marginInline: 'auto',
+              own: { donutChartRing: '80' },
+            }),
+            rule(
+              { sweep: 'half' },
+              {
+                blockSize: quotient(
+                  product('100%', difference(40, settled)),
+                  sum(40, quotient(settled, 2)),
+                ),
+                insetBlockEnd: quotient(
+                  product('100%', quotient(settled, 2)),
+                  sum(40, quotient(settled, 2)),
+                ),
+                insetBlockStart: 'auto',
+              },
+            ),
+          ]),
+        ],
+      ),
       on('center', [
         web([
           rule({ dir: 'rtl' }, { translate: ['50%', '-50%'] }),
@@ -216,7 +266,13 @@ export default styles(
         ]),
       ]),
       include(printExact),
-      on('segment', [rule({ emphasis: 'subtle' }, { stroke: mix(series, 30, hook.trackColor) })]),
+      /* In dark, 60% of the series, so a slice clears 3:1 on the page. Light keeps 30%. */
+      on('segment', [
+        rule(
+          { emphasis: 'subtle' },
+          { stroke: scheme(mix(series, 30, hook.trackColor), mix(series, 60, hook.trackColor)) },
+        ),
+      ]),
       /* The boundary, drawn only when it is asked for. */
       on('segment-edge', [rule({ fill: 'none', stroke: 'none' })]),
       on('segment', [rule({ emphasis: 'outlined' }, { stroke: mix(series, 55, hook.trackColor) })]),
@@ -235,8 +291,8 @@ export default styles(
         native([rule({ emphasis: 'outlined' }, { strokeWidth: quotient(hook.edgeStroke, 2) })]),
       ]),
       on('segment', [
-        rule({ material: 'glass' }, { strokeOpacity: product(0.62, token('material-opacity')) }),
-        rule({ material: 'frosted' }, { strokeOpacity: product(0.88, token('material-opacity')) }),
+        rule({ material: 'glass' }, { strokeOpacity: token('material-glass-opacity') }),
+        rule({ material: 'frosted' }, { strokeOpacity: token('material-frosted-opacity') }),
       ]),
       /* The summary is said and not shown. */
       on('summary', [

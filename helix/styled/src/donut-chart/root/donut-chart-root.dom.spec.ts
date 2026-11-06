@@ -167,7 +167,7 @@ describe('donut chart sweep', () => {
        over its top, and one ended at the edge drops its figure under the ends. */
     const half = rule(':host([sweep="half"]) [part="center"]')
     expect(half).toMatch(
-      /inset-block-end: calc\(\s*100% \*\s*\(var\(--donut-chart-stroke, 16\) \/ 2\)/,
+      /inset-block-end: calc\(\s*100% \*\s*\(?var\(--donut-chart-stroke, 16\)\)? \/ 2/,
     )
     expect(half).toContain('inset-block-start: auto')
     expect(half).toContain('place-items: end center')
