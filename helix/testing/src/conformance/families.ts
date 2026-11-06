@@ -77,6 +77,7 @@ export type Family =
   | 'heatmap'
   | 'lightbox'
   | 'video'
+  | 'video-playlist'
   | 'sparkline'
   | 'filter-input'
   | 'select'
