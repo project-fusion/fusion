@@ -1,4 +1,4 @@
-import { first, inherited, product, token, web } from '../../../style.js'
+import { first, fn, inherited, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -13,22 +13,32 @@ import item from './headless.js'
  * **An empty region costs nothing.** Its slot is a box with nothing in it, so
  * the space a leading icon keeps after itself is the icon's, and a row with no
  * icon has none.
+ *
+ * **A row that goes somewhere, or that a reader chooses, answers the
+ * pointer**: the hover fill under it, the press fill while it is held, and
+ * one ring inside it for the keyboard. The link covers the whole row, so the
+ * row is the target, and what is passed into `end` stands above it as a
+ * control of its own. A reader's row and a chosen row take the selected wash.
  */
 export default styles(
   item,
   {
     prefix: 'list-item',
     hooks: ({ own }) => ({
-      currentBackgroundColor: token('color-well'),
+      currentBackgroundColor: token('color-selected'),
       disabledOpacity: token('opacity-disabled'),
       draggingOpacity: 0.5,
       dropIndicatorColor: token('color-primary'),
       dropIndicatorSize: token('border-thick'),
       gripColor: token('color-foreground-muted'),
-      padding: [product(token('space-control'), '0.5'), first(own.listBleed, token('space-md'))],
+      hoverBackgroundColor: token('color-hover'),
+      padding: [
+        product(token('space-control'), '0.5'),
+        first(own.listBleed, sum(token('space-field'), token('space-2xs'))),
+      ],
       railContent: '""',
       railDisplay: 'none',
-      selectedBackgroundColor: token('color-primary-subtle'),
+      selectedBackgroundColor: token('color-selected'),
       termWeight: token('weight-regular'),
     }),
     own: { listBleed: null },
@@ -45,9 +55,14 @@ export default styles(
        rail, an icon, or a grip a row does not have takes no space. */
     on('row', [
       rule({
+        alignContent: 'center',
         alignItems: 'center',
         display: 'grid',
-        gridTemplateColumns: 'auto auto 1fr auto auto',
+        /* `minmax(0, 1fr)` for the words, because a bare `1fr` cannot go under its
+           content's min-content width: a code block in an item widened the row past
+           its list. */
+        gridTemplateColumns: 'auto auto minmax(0, 1fr) auto auto',
+        lineHeight: product(token('text-sm'), token('leading-normal')),
         /* The height of a control at this density, and two lines grow from it. */
         minBlockSize: token('size-control'),
         /* A long unbroken word breaks inside the column it was given. */
@@ -57,8 +72,24 @@ export default styles(
            the words stay on the list's edge and the fill reaches past it. None
            by default, where the inset is the row's own. */
         marginInline: product(own.listBleed(token('space-none')), '-1'),
-        web: { overflowWrap: 'anywhere' },
+        position: 'relative',
+        web: {
+          lineHeight: fn('round', 'up', product(token('text-sm'), token('leading-normal')), '1px'),
+          overflowWrap: 'break-word',
+        },
       }),
+      /* A finger's target, and a step more, where the pointer is coarse. */
+      rule(
+        { coarsePointer: true },
+        { minBlockSize: sum(token('size-target'), token('space-2xs')) },
+      ),
+      /* A phone's press on a row it chooses. */
+      native([
+        rule(
+          { formDisabled: false, interaction: ['active'] },
+          { backgroundColor: token('color-press'), borderRadius: token('radii-sm') },
+        ),
+      ]),
       /* The row a reader is on, by the part it is as well, `row-current`, which
          a property sets with no attribute. A chosen row keeps its own ground. */
       rule(
@@ -142,6 +173,8 @@ export default styles(
        `:host` color and turned an avatar's initials muted. */
     on({ part: 'start', slotted: '*' }, [
       rule({
+        /* The tight icon, a step under the words beside it. */
+        '--icon-size': token('size-icon-tight'),
         gridColumn: 2,
         gridRow: '1 / span 2',
         marginInlineEnd: token('space-sm'),
@@ -158,8 +191,18 @@ export default styles(
         gridColumn: 3,
         gridRow: '1 / span 2',
         gridTemplateRows: 'subgrid',
+        minInlineSize: 0,
       }),
     ]),
+    on(
+      ['label', 'description'],
+      [
+        rule({ minInlineSize: 0 }),
+        web([
+          rule({ lineHeight: fn('round', 'up', product('1em', token('leading-normal')), '1px') }),
+        ]),
+      ],
+    ),
     on('label', [
       rule({
         color: token('color-foreground'),
@@ -183,7 +226,10 @@ export default styles(
       web([rule({ margin: token('space-none') })]),
     ]),
     on('end', [rule({ web: { display: 'contents' } })]),
-    on({ part: 'end', slotted: '*' }, [rule({ gridColumn: 4, gridRow: '1 / span 2' })]),
+    /* Above the link's cover, a control of its own. */
+    on({ part: 'end', slotted: '*' }, [
+      rule({ gridColumn: 4, gridRow: '1 / span 2', position: 'relative' }),
+    ]),
     /* The link, when the row has somewhere to go, and it must not look like
        one. **It takes the row's first three tracks and both its lines as a
        subgrid**, so the rail, the leading content, and the body sit where they
@@ -200,6 +246,91 @@ export default styles(
         textDecoration: 'none',
       }),
     ]),
+    /* The link covers the whole row, so the row is its target, and its ring is the
+       row's. */
+    on({ before: 'link' }, [web([rule({ content: '""', inset: 0, position: 'absolute' })])]),
+    on('link', [web([rule({ focusVisible: true }, { outline: 'none' })])]),
+    /* Written out: the row holding a focused link, which the vocabulary has no `:has()` for. */
+    on({ part: 'row', selector: '[part~="row"]:has([part="link"]:focus-visible)' }, [
+      web([
+        rule({
+          borderRadius: token('radii-sm'),
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: product(token('size-focus-offset'), '-1'),
+        }),
+      ]),
+    ]),
+    /* Written out: a row that links somewhere, under the pointer and held. */
+    on(
+      {
+        part: 'row',
+        selector: '[part~="row"]:not([part~="row-current"]):has([part="link"][href]):hover',
+      },
+      [
+        web([
+          rule(
+            { canHover: true },
+            { backgroundColor: hook.hoverBackgroundColor, borderRadius: token('radii-sm') },
+          ),
+        ]),
+      ],
+    ),
+    on(
+      {
+        part: 'row',
+        selector: '[part~="row"]:not([part~="row-current"]):has([part="link"][href]):active',
+      },
+      [web([rule({ backgroundColor: token('color-press'), borderRadius: token('radii-sm') })])],
+    ),
+    /* Written out: a row a reader chooses, the cell that takes focus in a list with a
+       `selection-mode`, under the pointer and held. */
+    on(
+      {
+        part: 'row',
+        selector: ':host(:not([disabled], :state(selected))) [part~="row"][role="gridcell"]:hover',
+      },
+      [
+        web([
+          rule(
+            { canHover: true },
+            { backgroundColor: hook.hoverBackgroundColor, borderRadius: token('radii-sm') },
+          ),
+        ]),
+      ],
+    ),
+    on({ part: 'row', selector: ':host(:not([disabled])) [part~="row"][role="gridcell"]:active' }, [
+      web([rule({ backgroundColor: token('color-press'), borderRadius: token('radii-sm') })]),
+    ]),
+    on({ part: 'row', selector: '[part~="row"][role="gridcell"]' }, [
+      web([rule({ cursor: 'pointer' })]),
+    ]),
+    on({ part: 'row', selector: ':host([disabled]) [part~="row"][role="gridcell"]' }, [
+      web([rule({ cursor: 'not-allowed' })]),
+    ]),
+    on({ part: 'link', selector: ':host([disabled]) [part="link"]' }, [
+      web([rule({ cursor: 'not-allowed' })]),
+    ]),
+    /* A chosen row and the reader's row that links somewhere press darker, past their wash. */
+    on(
+      {
+        part: 'row',
+        selector: ':host(:state(selected):not([disabled])) [part~="row"][role="gridcell"]:active',
+      },
+      [web([rule({ backgroundColor: token('color-press') })])],
+    ),
+    on(
+      {
+        part: 'row',
+        selector: ':host(:state(selected):not([disabled])) [part~="row"][role="gridcell"]:hover',
+      },
+      [web([rule({ canHover: true }, { backgroundColor: token('color-press') })])],
+    ),
+    on({ part: 'row', selector: '[part~="row-current"]:has([part="link"][href]):hover' }, [
+      web([rule({ canHover: true }, { backgroundColor: token('color-press') })]),
+    ]),
+    on({ part: 'row', selector: '[part~="row-current"]:has([part="link"][href]):active' }, [
+      web([rule({ backgroundColor: token('color-press') })]),
+    ]),
     /* The grip, in a `reorderable` list: after `end`, quiet until held. */
     on('grip', [
       rule({
@@ -215,6 +346,8 @@ export default styles(
         gridColumn: 5,
         gridRow: '1 / span 2',
         marginInlineStart: token('space-sm'),
+        /* Above the link's cover, a control of its own. */
+        position: 'relative',
         /* So a drag on a phone moves the row and does not scroll the page. */
       }),
       rule({ active: true }, { web: { cursor: 'grabbing' } }),
