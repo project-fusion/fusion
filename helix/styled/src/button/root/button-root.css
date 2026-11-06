@@ -95,26 +95,18 @@
     var(--helix-color-foreground)
   );
 }
-/* **A solid warning button is amber under a black label**, as a solid warning
-   Tag and Badge are: the status fill, #845500 in light, carries white and reads
-   brown, and the warning mark, #b86d00 in light and #ffaf00 in dark, takes
-   black at 5.23:1 and 11.4. Decided by the owner on November 4, 2026. The
-   label is the page's ink, as neutral's is, so under the pointer the fill
-   softens toward the page as neutral's does: 0.03 and 0.06 of lightness, black
-   at 5.86 and 6.58 in light and 10.6 and 9.60 in dark, the fill at 3.19:1 or
-   more against the white page. */
+/* **A solid warning button takes the solid warning fill under the page's
+   color**, as a solid warning Tag and Badge do: white on a deep amber in light
+   at 5.29:1, black on a bright amber in dark at 11.38. Chosen by the owner on
+   November 5, 2026. Under the pointer the fill darkens in both modes, 0.03 and
+   0.06 of lightness: in light a lighter fill would take the white label under
+   4.5:1. */
 :host([tone="warning"]) {
   --_button-edge: var(--helix-color-warning);
-  --_button-fill: var(--helix-color-warning-mark);
-  --_button-fill-hover: light-dark(
-    oklch(from var(--helix-color-warning-mark) calc(l + 0.03) c h),
-    oklch(from var(--helix-color-warning-mark) calc(l - 0.03) c h)
-  );
-  --_button-fill-press: light-dark(
-    oklch(from var(--helix-color-warning-mark) calc(l + 0.06) c h),
-    oklch(from var(--helix-color-warning-mark) calc(l - 0.06) c h)
-  );
-  --_button-on-tone: light-dark(var(--helix-color-foreground), var(--helix-color-background));
+  --_button-fill: var(--helix-color-warning-solid);
+  --_button-fill-hover: oklch(from var(--helix-color-warning-solid) calc(l - 0.03) c h);
+  --_button-fill-press: oklch(from var(--helix-color-warning-solid) calc(l - 0.06) c h);
+  --_button-on-tone: var(--helix-color-background);
   --_button-subtle-dark: 22%;
   --_button-tone: var(--helix-color-warning);
   --_button-tone-hover: color-mix(

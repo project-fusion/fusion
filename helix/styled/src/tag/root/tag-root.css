@@ -168,15 +168,13 @@ slot:not([name])::slotted(helix-icon) {
   --_tag-on: var(--helix-color-foreground-on-status);
 }
 
-/* **A solid warning tag is amber under a black label.** The status fill is
-   the 600, #845500 in light, which carries white at 6.40:1 and reads brown,
-   and no amber dark enough for a white label reads amber. The warning mark is
-   #b86d00 in light, which takes black at 5.23:1, and the 400 in dark, which
-   takes it at 11.4. Black is the page's ink in light and the page in dark. */
+/* **A solid warning tag takes the solid warning fill under the page's color**:
+   a deep amber under white in light, 5.29:1, and a bright amber under black in
+   dark, 11.38. The status fill, #845500 in light, read brown. */
 :host([tone="warning"]) {
   --_tag-color: var(--helix-color-warning);
-  --_tag-solid: var(--helix-color-warning-mark);
-  --_tag-on: light-dark(var(--helix-color-foreground), var(--helix-color-background));
+  --_tag-solid: var(--helix-color-warning-solid);
+  --_tag-on: var(--helix-color-background);
 }
 
 :host([tone="danger"]) {

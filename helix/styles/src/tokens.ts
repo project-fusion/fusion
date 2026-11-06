@@ -663,6 +663,17 @@ export const TOKENS: Token[] = [
     'light-dark(oklch(from var(--helix-color-warning) calc(l + 0.11) calc(c * 1.5) h), var(--helix-color-warning))',
     'Warning as a mark that is not text, such as a star or a Meter fill.',
   ],
+  /* **Warning as a solid fill under words**: a solid Tag, Badge or Button. In
+     light a step darker and a little less vivid than the mark, #985f00, so a
+     white label clears 5.29:1 and the fill still reads amber, 5.29:1 on the
+     page; the mark itself, #b86d00, carried white at only 4.02. In dark the
+     mark, #ffaf00, under a black label at 11.38. Chosen by the owner on
+     November 5, 2026 over the amber with a black label. */
+  [
+    'color-warning-solid',
+    'light-dark(oklch(from var(--helix-color-warning-mark) calc(l - 0.066) calc(c * 0.87) calc(h + 4)), var(--helix-color-warning-mark))',
+    'Warning as a solid fill under a label, such as a solid warning Tag, Badge or Button. Its label is `color-background`.',
+  ],
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. */
   ['color-danger', 'light-dark(var(--_helix-danger-600), var(--_helix-danger-400))'],
