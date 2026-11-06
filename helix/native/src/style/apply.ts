@@ -62,6 +62,8 @@ const RENAMED: Readonly<Record<string, string>> = {
   position: 'position',
   right: 'right',
   'row-gap': 'rowGap',
+  /* A drawing reads it as the second of its colors, as Orb's ground. */
+  'text-decoration-color': 'textDecorationColor',
   'text-transform': 'textTransform',
   top: 'top',
   'z-index': 'zIndex',

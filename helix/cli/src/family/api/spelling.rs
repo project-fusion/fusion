@@ -1035,6 +1035,8 @@ const SCATTER_CHART: &[Field] = &[
     ("yTicks", "yTicks", Name),
 ];
 
+const ORB: &[Field] = &[("shown", "shown", Name)];
+
 const VIDEO: &[Field] = &[
     ("bar", "bar", Name),
     ("captionMenu", "captionMenu", Name),
@@ -1606,6 +1608,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ),
     ("videoPlaylist", "videoPlaylist", VIDEO_PLAYLIST),
     ("video", "video", VIDEO),
+    ("orb", "orb", ORB),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),

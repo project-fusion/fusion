@@ -50,6 +50,7 @@ import { useNotification } from './notification'
 import { useNotificationGroup } from './notification-group'
 import { useNotifications } from './notifications'
 import { useOption, useOptionGroup } from './option'
+import { useOrb } from './orb'
 import { usePage } from './page'
 import { usePagination, usePaginationSize } from './pagination'
 import { usePickerField } from './picker-field'
@@ -533,6 +534,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useVideo(family, props, use),
+      ),
+    /* An orb: its dots drawn on the GPU, and its state. */
+    ...uses
+      .filter((use) => use.machine === 'orb')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useOrb(family, props, use),
       ),
     /* A strip of cells: its cells from its readings, its reading, and its selection. */
     ...uses

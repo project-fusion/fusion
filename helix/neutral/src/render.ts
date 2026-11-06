@@ -544,6 +544,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly videoPlaylist: Computes<'empty' | 'emptyWords' | 'named'>
   /** What a menu of a playlist's entries computes for its parts. */
   readonly videoPlaylistMenu: Computes<'named' | 'rows'>
+  /** What an orb computes for its parts: the state it draws. */
+  readonly orb: Computes<'shown'>
   /** What a viewer of one item at a time computes for its parts. */
   readonly lightbox: Computes<
     | 'arrows'

@@ -294,6 +294,7 @@ const TEXT = new Set([
   'numberOfLines',
   'textAlign',
   'textBreakStrategy',
+  'textDecorationColor',
   'textDecorationLine',
   'textTransform',
 ])

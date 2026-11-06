@@ -47,6 +47,8 @@ export * from '../format-date/format-date.js'
 export * from '../megamenu/megamenu-derivations.js'
 /* Menu's, how its trigger opens it, its words, its columns, and a row's role. */
 export * from '../menu/menu-derivations.js'
+/* Orb's, what a screen reader hears of it as its state changes. */
+export * from '../orb/orb-derivations.js'
 /* Dialog's and Drawer's, how each is dismissed and named. */
 export * from '../overlay/overlay-derivations.js'
 /* QR Code's, which draw the code from its value. */

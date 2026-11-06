@@ -1032,6 +1032,11 @@ export interface ScatterChartChoice {
   readonly yTicks?: string
 }
 
+/** The names of an orb, each read as `orb.x`. */
+export interface OrbChoice {
+  readonly shown?: string
+}
+
 /** The names of a player of one video, each read as `video.x`. */
 export interface VideoChoice {
   readonly bar?: string
