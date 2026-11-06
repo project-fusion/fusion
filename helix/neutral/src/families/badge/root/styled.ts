@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { first, list, mix, native, quotient, token, web } from '../../../style.js'
+import { first, list, mix, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -45,6 +45,7 @@ export default styles(
       badgeOn: null,
       badgeSize: null,
       badgeText: null,
+      badgeTint: null,
     },
     props: {
       attention: oneOf(['bounce', 'pulse']),
@@ -58,8 +59,11 @@ export default styles(
     on('host', [
       rule({
         display: 'inline-flex',
+        /* A long word in what the badge marks breaks inside the column; the
+           count itself does not wrap. */
+        maxInlineSize: '100%',
         position: 'relative',
-        web: { verticalAlign: 'middle' },
+        web: { overflowWrap: 'anywhere', verticalAlign: 'middle' },
         own: {
           badgeSize: token('size-badge'),
           badgeText: token('text-xs'),
@@ -81,10 +85,20 @@ export default styles(
       variants('tone', {
         info: { own: { badgeFill: token('color-info-surface') } },
         success: { own: { badgeFill: token('color-success-surface') } },
-        warning: { own: { badgeFill: token('color-warning-surface') } },
+        /* The solid warning fill under the page's color, as a solid warning
+           Tag is. */
+        warning: {
+          own: { badgeFill: token('color-warning-solid'), badgeOn: token('color-background') },
+        },
         danger: { own: { badgeFill: token('color-danger-surface') } },
+        /* A quiet gray that stands on the page, and a tint of half of it,
+           since a tint of a fill this quiet would be nothing at all. */
         neutral: {
-          own: { badgeFill: token('color-surface-raised'), badgeOn: token('color-foreground') },
+          own: {
+            badgeFill: token('color-neutral-subtle'),
+            badgeOn: token('color-foreground'),
+            badgeTint: mix(token('color-foreground'), 5, token('color-background'), 'srgb'),
+          },
         },
       }),
       /* In the line, after what it counts, with no ring. */
@@ -171,7 +185,11 @@ export default styles(
           color: hook.color(token('color-foreground')),
         },
         subtle: {
-          backgroundColor: hook.backgroundColor(mix(own.badgeFill, 22, token('color-background'))),
+          /* Mixed in sRGB, as Tag's is, so each tone keeps its hue over the
+             black page. */
+          backgroundColor: hook.backgroundColor(
+            first(own.badgeTint, mix(own.badgeFill, 22, token('color-background'), 'srgb')),
+          ),
           color: hook.color(token('color-foreground')),
         },
       }),
@@ -185,7 +203,7 @@ export default styles(
         {
           animation: [
             'badge-pulse',
-            hook.attentionDuration('1.5s'),
+            hook.attentionDuration(product(token('duration-turn'), 2)),
             token('easing-standard'),
             'infinite',
           ],
@@ -196,7 +214,7 @@ export default styles(
         {
           animation: [
             'badge-bounce',
-            hook.attentionDuration('1s'),
+            hook.attentionDuration(product(token('duration-turn'), 1.25)),
             token('easing-standard'),
             'infinite',
           ],

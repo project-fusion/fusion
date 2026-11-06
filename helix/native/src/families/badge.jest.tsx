@@ -283,9 +283,9 @@ describe('the tones and emphases', () => {
     ['accent', 'color-accent-surface', 'color-foreground-on-accent'],
     ['info', 'color-info-surface', 'color-foreground-on-status'],
     ['success', 'color-success-surface', 'color-foreground-on-status'],
-    ['warning', 'color-warning-surface', 'color-foreground-on-status'],
+    ['warning', 'color-warning-solid', 'color-background'],
     ['danger', 'color-danger-surface', 'color-foreground-on-status'],
-    ['neutral', 'color-surface-raised', 'color-foreground'],
+    ['neutral', 'color-neutral-subtle', 'color-foreground'],
   ])('%s fills with its surface and writes in its ink', async (tone, fill, ink) => {
     const view = await render(on({ tone, value: 5 }))
     expect(styleOf(markOf(view.toJSON())).backgroundColor).toBe(tokens[fill])
@@ -333,7 +333,7 @@ describe('attention', () => {
   test('pulse swells the mark in a loop, on the easing token', async () => {
     const view = await render(on({ attention: 'pulse', value: 4 }))
     expect(styleOf(markOf(view.toJSON()))).toMatchObject({
-      animationDuration: 1500,
+      animationDuration: 1600,
       animationIterationCount: 'infinite',
     })
     expect(JSON.stringify(styleOf(markOf(view.toJSON())).animationName)).toContain('1.18')
