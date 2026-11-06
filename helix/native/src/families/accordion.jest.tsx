@@ -99,11 +99,11 @@ const press = async (words: string) => {
   await act(async () => undefined)
 }
 
-/** How a chevron is turned: the last scale on its height. */
-const turned = (chevron: Drawn): number | undefined =>
+/** How a chevron is turned: the last rotation on it. */
+const turned = (chevron: Drawn): string | undefined =>
   (styleOf(chevron).transform as readonly Readonly<Record<string, unknown>>[])
-    .map((one) => one.scaleY)
-    .filter((one): one is number => typeof one === 'number')
+    .map((one) => one.rotate)
+    .filter((one): one is string => typeof one === 'string')
     .at(-1)
 
 /** The chevrons drawn: the boxes turned by a transform. */
@@ -169,7 +169,7 @@ describe('the generated Accordion', () => {
 
   test('turns the chevron as a section opens, at the end unless placed at the start', async () => {
     const view = await render(drawn({}))
-    expect(chevrons().map(turned)).toEqual([-1, 1, 1])
+    expect(chevrons().map(turned)).toEqual(['180deg', '0deg', '0deg'])
     expect(styleOf(chevrons()[1] ?? { props: {} }).marginStart).toBe('auto')
     await view.rerender(drawn({}, undefined, { chevronPlacement: 'start' }))
     expect(styleOf(chevrons()[1] ?? { props: {} }).marginStart).toBeUndefined()
@@ -177,7 +177,7 @@ describe('the generated Accordion', () => {
     expect(typeof first === 'object' && styleOf(first).transform !== undefined).toBe(true)
   })
 
-  test('draws the chevron in its own subtle ink, as the web does, not the summary’s', async () => {
+  test('draws the chevron in its own muted ink, as the web does, not the summary’s', async () => {
     await render(
       <HelixTheme Glyph={Glyph} mode="light">
         <HelixAccordion>
@@ -190,7 +190,7 @@ describe('the generated Accordion', () => {
     const glyphs = nodes(screen.toJSON())
       .filter((node) => node.type === 'Text')
       .map((node) => node.children?.[0])
-    expect(glyphs).toContain(`caret-down ${light['color-foreground-subtle']}`)
+    expect(glyphs).toContain(`caret-down ${light['color-foreground-muted']}`)
   })
 
   test('draws no chevron under chevron-placement none', async () => {
@@ -198,14 +198,14 @@ describe('the generated Accordion', () => {
     expect(chevrons()).toHaveLength(0)
   })
 
-  test('draws no seam between sections, and a frame around each where outlined', async () => {
+  test('draws a seam between sections, and a frame around each where outlined', async () => {
     const view = await render(drawn({}))
     /* Each section's host, as the accordion draws it. */
     const sections = (): Drawn[] =>
       (nodes(screen.toJSON())[0]?.children ?? []).filter(
         (child): child is Drawn => typeof child !== 'string',
       )
-    expect(sections().map((one) => styleOf(one).borderTopWidth ?? 0)).toEqual([0, 0, 0])
+    expect(sections().map((one) => styleOf(one).borderTopWidth ?? 0)).toEqual([0, 1, 1])
     await view.rerender(drawn({ separation: 'outlined' }))
     expect(sections().map((one) => styleOf(one).borderWidth)).toEqual([1, 1, 1])
     expect(styleOf(sections()[0] ?? { props: {} }).borderColor).toBe(light['color-border'])

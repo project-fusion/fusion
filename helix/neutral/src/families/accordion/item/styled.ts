@@ -1,4 +1,4 @@
-import { fit, product, sum, token } from '../../../style.js'
+import { difference, fit, fn, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -26,46 +26,99 @@ export default styles(
   {
     prefix: 'accordion-item',
     hooks: {
-      chevronColor: token('color-foreground-subtle'),
+      chevronColor: token('color-foreground-muted'),
       chevronHoverColor: token('color-foreground'),
       color: token('color-foreground'),
       contentColor: token('color-foreground-muted'),
       disabledOpacity: token('opacity-disabled'),
       fontSize: token('text-md'),
       fontWeight: token('weight-medium'),
-      hoverBackgroundColor: 'transparent',
-      padding: [product(token('space-control'), 0.5), token('space-md')],
+      hoverBackgroundColor: token('color-hover'),
+      padding: null,
     },
+    own: { accordionPad: null },
     stylesheet: 'accordion/item/accordion-item.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, on, own, rule }) => {
     /* Where the chevron stands, how it turns, and its color under the pointer. */
+    const inset = sum(token('space-field'), token('space-2xs'))
+    const tight = token('size-icon-tight')
     const placed = [
-      rule({ chevronPlacement: { not: 'start' } }, { marginInlineStart: 'auto' }),
-      rule({ open: true }, { transform: 'scaleY(-1)' }),
+      /* At the end, on the line a field's chevron ends on: the field inset
+         and its edge from the trailing side. */
+      rule(
+        { chevronPlacement: { not: 'start' } },
+        {
+          marginInlineEnd: difference(token('border-thin'), token('space-2xs')),
+          marginInlineStart: 'auto',
+        },
+      ),
+      /* Turned, as Tree's and Megamenu's are, so it never passes through a
+         flat line on its way over. A phone turns from a written start. */
+      native([rule({ rotate: '0deg' })]),
+      rule({ open: true }, { rotate: '180deg' }),
       rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
+    /* Centered on the first line, from the top of the row it shares with
+       the summary. */
+    const firstLine = web([
+      rule({ marginBlockStart: fn('round', 'down', quotient(difference('1lh', tight), 2), '1px') }),
+    ])
     return [
-      on('host', [rule({ display: 'block' })]),
+      on('host', [
+        rule({ display: 'block' }),
+        /* The block inset is a whole pixel, and never more than centers one
+           line in the row. A phone has no `round()` or `lh`. */
+        web([
+          rule({
+            own: {
+              accordionPad: fn(
+                'round',
+                'down',
+                fn(
+                  'min',
+                  product(token('space-control'), 0.5),
+                  quotient(difference(token('size-control'), '1lh'), 2),
+                ),
+                '1px',
+              ),
+            },
+          }),
+        ]),
+        native([rule({ own: { accordionPad: product(token('space-control'), 0.5) } })]),
+      ]),
       on('trigger', [
         rule({
           web: { all: 'unset', cursor: 'pointer', overflowWrap: 'anywhere' },
           position: 'relative',
           boxSizing: 'border-box',
-          alignItems: 'center',
           color: hook.color,
-          display: 'flex',
           fontSize: hook.fontSize,
           fontWeight: hook.fontWeight,
           inlineSize: '100%',
-          gap: token('space-xs'),
           minBlockSize: token('size-control'),
           /* A long unbroken word breaks inside the column it was given. */
           minInlineSize: 0,
-          padding: hook.padding,
+          /* The inline inset steps with density, as a List row's. */
+          padding: hook.padding([own.accordionPad, inset]),
           transition: ['background-color', token('duration-fast'), token('easing-standard')],
         }),
-        /* No fill under the pointer, unless a page asks for one. */
+        /* A grid of one row with each item at its top, so the chevron stays
+           on the summary's first line. A phone centers them in a row. */
+        web([
+          rule({
+            alignContent: 'center',
+            alignItems: 'start',
+            columnGap: token('space-xs'),
+            display: 'grid',
+            gridAutoFlow: 'column',
+            gridTemplateColumns: 'minmax(0, 1fr) auto',
+          }),
+          rule({ chevronPlacement: 'start' }, { gridTemplateColumns: 'auto minmax(0, 1fr)' }),
+          rule({ chevronPlacement: 'none' }, { gridTemplateColumns: 'minmax(0, 1fr)' }),
+        ]),
+        native([rule({ alignItems: 'center', display: 'flex', gap: token('space-xs') })]),
+        /* The row's hover wash, as a menu row, a tree row and a tab take. */
         rule({ hover: true, lacks: 'disabled' }, { backgroundColor: hook.hoverBackgroundColor }),
         /* Disabled alone, and not the open section under `single`, which is
            `aria-disabled` and still looks like the others. */
@@ -76,6 +129,7 @@ export default styles(
         rule(
           { focusVisible: true },
           {
+            borderRadius: token('radii-sm'),
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
             outlineOffset: product(token('size-focus-offset'), '-1'),
           },
@@ -83,29 +137,33 @@ export default styles(
         rule({ active: true, lacks: 'disabled' }, { backgroundColor: token('color-press') }),
         /* Rows sit against each other, so a box reaching past a row would take the
            press from the row beside it. On a touch screen the row itself reaches
-           the target. */
-        rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
+           the target, and keeps its density's height where that is taller. */
+        rule(
+          { coarsePointer: true },
+          { minBlockSize: fn('max', token('size-control'), token('size-target')) },
+        ),
       ]),
       on('chevron', [
         rule({
-          blockSize: '1em',
+          blockSize: tight,
           color: hook.chevronColor,
           flex: '0 0 auto',
-          inlineSize: '1em',
-          transform: 'scaleY(1)',
-          transition: ['transform', token('duration-fast'), token('easing-standard')],
+          inlineSize: tight,
+          transition: ['rotate', token('duration-normal'), token('easing-standard')],
         }),
+        firstLine,
         ...placed,
       ]),
       /* An icon passed in its place is sized, colored and turned the same way. */
       on({ region: 'chevron', slotted: '*' }, [
         rule({
-          blockSize: '1em',
+          blockSize: tight,
           color: hook.chevronColor,
           flex: '0 0 auto',
-          inlineSize: '1em',
-          transition: ['transform', token('duration-fast'), token('easing-standard')],
+          inlineSize: tight,
+          transition: ['rotate', token('duration-normal'), token('easing-standard')],
         }),
+        firstLine,
         ...placed,
       ]),
       on('content', [
@@ -129,13 +187,12 @@ export default styles(
           color: hook.contentColor,
           display: 'block',
           lineHeight: token('leading-normal'),
-          padding: hook.padding([token('space-sm'), token('space-md')]),
+          /* A word longer than the line breaks, since the region clips. */
+          web: { overflowWrap: 'break-word' },
+          padding: hook.padding([token('space-sm'), inset]),
           paddingBlockStart: 0,
         }),
-        rule(
-          { chevronPlacement: 'start' },
-          { marginInlineStart: sum(token('text-md'), token('space-xs')) },
-        ),
+        rule({ chevronPlacement: 'start' }, { marginInlineStart: sum(tight, token('space-xs')) }),
       ]),
     ]
   },

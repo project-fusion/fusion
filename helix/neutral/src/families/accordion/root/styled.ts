@@ -6,11 +6,9 @@ import root from './headless.js'
 /**
  * An accordion's styled tier.
  *
- * **Plain by default: nothing between the sections and nothing around the
- * stack.** The held sheet wrote a seam between neighbors as
- * `::slotted(* + *)`, which no browser matches, since `::slotted()` takes a
- * compound selector alone, so no seam was ever drawn, and none is drawn
- * here, on the web or on a phone.
+ * **Plain by default: a hairline seam between neighbors and nothing around
+ * the stack.** The seam is drawn on every section but the first, since
+ * `::slotted()` takes one compound selector and `* + *` matched nothing.
  *
  * **Outlined frames each section, not the stack.** A frame around a stack
  * of sections that seams already separate says again that they are one set.
@@ -26,7 +24,7 @@ export default styles(
     hooks: {
       borderColor: token('color-border'),
       gap: token('space-xs'),
-      radius: token('radii-sm'),
+      radius: token('radii-md'),
     },
     props: { separation: oneOf(['outlined', 'plain']) },
     stylesheet: 'accordion/root/accordion-root.generated.css',
@@ -47,6 +45,14 @@ export default styles(
           /* Clips the trigger's own hover fill to the section's corners. */
           overflow: 'hidden',
         },
+      ),
+    ]),
+    /* One rule between neighbors rather than one per section, so the seam is
+       a single pixel, and none while each section carries its own frame. */
+    on({ region: 'default', slotted: '*' }, [
+      rule(
+        { child: 'later', separation: { not: 'outlined' } },
+        { borderBlockStart: [token('border-thin'), 'solid', hook.borderColor] },
       ),
     ]),
   ],
