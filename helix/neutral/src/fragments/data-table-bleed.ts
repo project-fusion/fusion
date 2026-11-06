@@ -2,27 +2,20 @@ import { difference, first, measured, product, sum, token, web } from '../style.
 import { fragment } from '../table.js'
 
 /**
- * Data Table's `bleed`: the words stay on the table's edge, and each row
- * reaches past it. The table is wider than its host by the bleed on each
- * side, and the first and last box of every row, the headings' included, take
- * the same amount on top of their own inset, so the words stand where they did
- * while each row's fill and the rule under it run on to the same edge. A
- * chosen or hovered row is its fill between the lines. The table's parent has
- * to leave the room, as a list's does. After them, a tree grid's row header
- * steps in by its depth, from the lead the bleed gives it.
+ * Data Table's `bleed`: the rules stay on the words' column, and a row's fill
+ * reaches past both ends of them, rounded where it reaches out, as a list
+ * row's is. A row has no box to take a margin, so the table takes the room as
+ * padding inside the box that scrolls and clips, pulled back out by the same
+ * margin, and the first and last cell of each row paint their own fill into
+ * it. The table's parent has to leave the room, as a list's does. After them,
+ * a tree grid's row header steps in by its depth.
  */
 export default fragment(
   'data-table-bleed',
   {
-    parts: ['cell', 'row', 'select', 'table'],
+    parts: ['cell', 'row', 'table'],
     hooks: { bleed: null, indent: null, toggleGap: null, toggleSize: null },
-    own: {
-      dataTableBleed: null,
-      dataTableDepth: null,
-      dataTableGutter: null,
-      dataTableLead: null,
-      tableHeadingPaddingInline: null,
-    },
+    own: { dataTableBleed: null, dataTableDepth: null, dataTableGutter: null },
     props: ['bleed'],
   },
   ({ hook, on, own, rule }) => [
@@ -34,81 +27,61 @@ export default fragment(
         rule(
           { bleed: true },
           {
-            inlineSize: sum('100%', product(own.dataTableBleed, 2)),
+            boxSizing: 'content-box',
             marginInline: product(own.dataTableBleed, '-1'),
+            paddingInline: own.dataTableBleed,
           },
         ),
       ]),
     ]),
-    /* Written out: the first and last box of every row, the headings' row included. */
+    /* Written out: the first and last cell of every row hold the reach. */
     on(
       {
         part: 'row',
-        selector: ':host([bleed]) :where([part~="row"], [part="head"]) > :first-child',
+        selector:
+          ':host([bleed]) [part~="row"] > :first-child, :host([bleed]) [part~="row"] > :last-child',
+      },
+      [web([rule({ position: 'relative' })])],
+    ),
+    /* Written out: the reach takes the cell's own fill, in every state the rows give it, and
+       runs down over the rule's thickness, so it ends where the line under the row does. */
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed]) [part~="row"] > :first-child::before, :host([bleed]) [part~="row"] > :last-child::after',
       },
       [
         web([
           rule({
-            own: { dataTableLead: own.dataTableBleed },
-            paddingInlineStart: own.dataTableBleed,
+            backgroundColor: 'inherit',
+            content: '""',
+            inlineSize: own.dataTableBleed,
+            insetBlock: [0, product(token('border-thin'), '-1')],
+            pointerEvents: 'none',
+            position: 'absolute',
           }),
         ]),
       ],
     ),
-    on(
-      {
-        part: 'row',
-        selector: ':host([bleed]) :where([part~="row"], [part="head"]) > :last-child',
-      },
-      [web([rule({ paddingInlineEnd: own.dataTableBleed })])],
-    ),
-    /* Written out: a checkbox or a grip leading the row keeps its own step inside the bleed. */
-    on(
-      {
-        part: 'select',
-        selector:
-          ':host([bleed]) :where([part~="row"], [part="head"]) > :is([part~="select"], [part="select-all"], [part="row-grip"], [part="grip-head"]):first-child',
-      },
-      [web([rule({ paddingInlineStart: sum(token('space-sm'), own.dataTableBleed) })])],
-    ),
-    /* Written out: each column draws its heading, and the first and the last are
-       handed the bleed, the first only where nothing leads it. */
-    on(
-      {
-        part: 'row',
-        selector:
-          ':host([bleed]:not([selectable]):not([reorderable-rows])) ::slotted(helix-table-column:first-of-type)',
-      },
-      [
-        web([
-          rule({ own: { tableHeadingPaddingInline: [own.dataTableBleed, token('space-md')] } }),
-        ]),
-      ],
-    ),
-    on({ part: 'row', selector: ':host([bleed]) ::slotted(helix-table-column:last-of-type)' }, [
+    on({ part: 'row', selector: ':host([bleed]) [part~="row"] > :first-child::before' }, [
       web([
         rule({
-          own: { tableHeadingPaddingInline: [token('space-none'), own.dataTableBleed] },
+          borderEndStartRadius: token('radii-sm'),
+          borderStartStartRadius: token('radii-sm'),
+          insetInlineStart: product(own.dataTableBleed, '-1'),
         }),
       ]),
     ]),
-    on(
-      {
-        part: 'row',
-        selector:
-          ':host([bleed]:not([selectable]):not([reorderable-rows])) ::slotted(helix-table-column:only-of-type)',
-      },
-      [web([rule({ own: { tableHeadingPaddingInline: own.dataTableBleed } })])],
-    ),
-    /* Written out: a chosen or hovered row draws no rule across its fill. */
-    on(
-      {
-        part: 'row',
-        selector:
-          ':host([bleed]) [part~="row"][aria-selected="true"] > *, :host([bleed][row-link]) [part~="row"]:hover > *',
-      },
-      [web([rule({ borderBlockEndColor: 'transparent' })])],
-    ),
+    on({ part: 'row', selector: ':host([bleed]) [part~="row"] > :last-child::after' }, [
+      web([
+        rule({
+          borderEndEndRadius: token('radii-sm'),
+          borderStartEndRadius: token('radii-sm'),
+          insetInlineEnd: product(own.dataTableBleed, '-1'),
+        }),
+      ]),
+    ]),
     /* Written out: a row header holds two names, and steps in by its depth. */
     on({ part: 'cell', selector: ':host([child-field]) [part~="cell-header"]' }, [
       web([
@@ -123,7 +96,7 @@ export default fragment(
               hook.toggleGap(token('space-2xs')),
             ),
           },
-          paddingInlineStart: sum(own.dataTableLead(token('space-none')), own.dataTableDepth),
+          paddingInlineStart: own.dataTableDepth,
         }),
       ]),
     ]),
@@ -132,17 +105,7 @@ export default fragment(
         part: 'cell',
         selector: ':host([child-field]) [part~="cell-header"]:not(:has([part~="toggle"]))',
       },
-      [
-        web([
-          rule({
-            paddingInlineStart: sum(
-              own.dataTableLead(token('space-none')),
-              own.dataTableDepth,
-              own.dataTableGutter,
-            ),
-          }),
-        ]),
-      ],
+      [web([rule({ paddingInlineStart: sum(own.dataTableDepth, own.dataTableGutter) })])],
     ),
   ],
 )
