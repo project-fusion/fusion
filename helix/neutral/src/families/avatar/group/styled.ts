@@ -21,7 +21,7 @@ import group from './headless.js'
  * avatar where the next sits over it, so the gap shows the surface the group
  * is on; `--avatar-group-ring-color` fills it with a color instead. A phone
  * draws no mask, so it rings each avatar in that color, or in the page's
- * background. The overlap is `space-sm`, whatever the avatars' size, unless
+ * background. The overlap is `space-2xs`, whatever the avatars' size, unless
  * the hook sets another. Nothing is positioned, so painting follows the order
  * they stand in.
  *
@@ -40,7 +40,7 @@ export default styles(
       overflowBorderColor: token('color-border'),
       overflowColor: token('color-foreground-muted'),
       overflowFontSize: token('text-xs'),
-      overlap: token('space-sm'),
+      overlap: token('space-2xs'),
       ringColor: 'transparent',
     },
     own: {

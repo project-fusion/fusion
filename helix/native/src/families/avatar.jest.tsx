@@ -59,11 +59,11 @@ const initialsShown = (letters: string): boolean => {
 }
 
 describe('the generated Avatar', () => {
-  test('is an image named by its name, a circle of the avatar size in the raised surface', async () => {
+  test('is an image named by its name, a circle of the avatar size in the neutral gray', async () => {
     await render(themed(<HelixAvatar name="Ada Lovelace" />))
     expect(host()?.props.accessibilityRole).toBe('image')
     expect(host()?.props.accessibilityLabel).toBe('Ada Lovelace')
-    expect(styleOf(host() ?? { props: {} }).backgroundColor).toBe(light['color-surface-raised'])
+    expect(styleOf(host() ?? { props: {} }).backgroundColor).toBe(light['color-neutral-subtle'])
     expect(initialsShown('AL')).toBe(true)
   })
 

@@ -22,7 +22,9 @@ export default styles(
   {
     prefix: 'avatar',
     hooks: {
-      backgroundColor: token('color-surface-raised'),
+      /* `neutral-subtle`, the gray a mark stands on the page in, as a neutral Badge's:
+         `surface-raised` was a panel's rung, a disc with no edge on the page. */
+      backgroundColor: token('color-neutral-subtle'),
       color: token('color-foreground'),
       fontWeight: token('weight-medium'),
       size: null,
@@ -44,6 +46,7 @@ export default styles(
         inlineSize: own.avatarSize,
         justifyContent: 'center',
         overflow: 'hidden',
+        web: { justifyContent: 'safe center' },
         own: { avatarSize: hook.size(token('size-avatar')) },
       }),
       rule({ size: 'sm' }, { own: { avatarSize: hook.size(token('size-avatar-sm')) } }),
@@ -71,9 +74,29 @@ export default styles(
         }),
       ]),
     ]),
+    /* Words a page slots straight in are set as the initials are, and neither falls
+       under the smallest text a small avatar holds. */
+    on({ region: 'default' }, [
+      web([
+        rule({
+          fontSize: fn(
+            'max',
+            product(own.avatarSize, 0.4),
+            fn('min', token('text-xs'), product(own.avatarSize, 0.5)),
+          ),
+        }),
+      ]),
+    ]),
     on('initials', [
       rule({
         fontSize: product(own.avatarSize, 0.4),
+        web: {
+          fontSize: fn(
+            'max',
+            product(own.avatarSize, 0.4),
+            fn('min', token('text-xs'), product(own.avatarSize, 0.5)),
+          ),
+        },
         fontWeight: hook.fontWeight,
         letterSpacing: token('tracking-wide'),
         lineHeight: 1,
