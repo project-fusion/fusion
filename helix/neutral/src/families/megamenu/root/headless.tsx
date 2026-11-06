@@ -9,6 +9,7 @@ import {
   Slot,
   set,
   Text,
+  View,
   Wrap,
   web,
 } from '../../../render.js'
@@ -140,6 +141,11 @@ export default headless('megamenu', {
             selects
           >
             <Text part="trigger-words">{props.label}</Text>
+            <View
+              ariaHidden
+              icon="caret-down"
+              part="trigger-indicator"
+            />
           </Pressable>
         </Slot>
       </Wrap>

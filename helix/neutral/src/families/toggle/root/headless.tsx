@@ -1,4 +1,4 @@
-import { bare, cancelable, headless, Pressable, Slot, set } from '../../../render.js'
+import { bare, cancelable, headless, Pressable, Slot, set, View } from '../../../render.js'
 
 /**
  * Toggle's headless tier: a toggle button on its own, and one option of a
@@ -47,7 +47,9 @@ export default headless('toggle', {
       toggles
     >
       <Slot name="start" />
-      <Slot />
+      <View part="label">
+        <Slot />
+      </View>
       <Slot name="end" />
     </Pressable>
   ),
