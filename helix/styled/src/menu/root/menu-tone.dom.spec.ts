@@ -148,7 +148,7 @@ describe('a menu item', () => {
         const surface = surfaceOf(host)
         const wash = paint(getComputedStyle(partOf(danger, 'item')).backgroundColor, rgb(surface))
         const [r = 0, g = 0, b = 0] = wash
-        /* Its hue, not the neutral highlight's grey. */
+        /* Its hue, not the neutral highlight's gray. */
         expect(r).toBeGreaterThan(g + 4)
         expect(r).toBeGreaterThan(b + 4)
         /* Quiet: no further from the surface than a neutral highlight goes, and
