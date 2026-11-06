@@ -1,6 +1,7 @@
 import { createElement, Fragment, type ReactNode } from 'react'
 import type { WindowDrawing } from '../machines/window'
 import type { Family } from '../style/form'
+import type { Resolution, Style } from '../style/resolved'
 import type { Entry } from './entry'
 import type { Layered } from './layered'
 
@@ -66,6 +67,23 @@ export interface PartBinding {
    * `GestureDetector` goes around the view whose touches it hears.
    */
   readonly wrap?: (view: ReactNode) => ReactNode
+  /**
+   * What the part holds, drawn from what its own rules resolve to, as an
+   * orb's dots read the ink and the ground its canvas part's rules give it:
+   * hooks a drawing reads from the theme, as a web canvas reads its computed
+   * style.
+   */
+  readonly drawing?: (look: DrawingLook) => ReactNode
+}
+
+/**
+ * What a part's own rules give a drawing in it: the text it draws in, its
+ * `color` resolved from `currentColor` among them, and the custom
+ * properties at the part, its hooks among them.
+ */
+export interface DrawingLook {
+  readonly custom: Readonly<Record<string, Resolution>>
+  readonly text: Style
 }
 
 /** What every machine an element runs gives its drawing, at one render. */
@@ -209,6 +227,7 @@ const laidOver = (before: PartBinding | undefined, binding: PartBinding): PartBi
   const later = binding.view?.ref
   const layer = binding.layer ?? before?.layer
   const hint = binding.hint ?? before?.hint
+  const drawing = binding.drawing ?? before?.drawing
   const ref =
     typeof earlier === 'function' && typeof later === 'function'
       ? { ref: bothRefs(earlier as RefCallback, later as RefCallback) }
@@ -217,6 +236,7 @@ const laidOver = (before: PartBinding | undefined, binding: PartBinding): PartBi
     ...(before?.animated === true || binding.animated === true ? { animated: true } : {}),
     ...(layer === undefined ? {} : { layer }),
     ...(hint === undefined ? {} : { hint }),
+    ...(drawing === undefined ? {} : { drawing }),
     states: { ...before?.states, ...binding.states },
     ...(before?.lists === undefined && binding.lists === undefined
       ? {}

@@ -546,6 +546,14 @@
       "types": "./dist/option/index.d.ts",
       "default": "./dist/option/index.js"
     },
+    "./orb": {
+      "react-native": {
+        "types": "./dist/orb/index.native.d.ts",
+        "default": "./dist/orb/index.native.js"
+      },
+      "types": "./dist/orb/index.d.ts",
+      "default": "./dist/orb/index.js"
+    },
     "./outline": {
       "react-native": {
         "types": "./dist/outline/index.native.d.ts",

@@ -379,6 +379,7 @@ const drawContent = (
       {node.attributes?.viewBox !== undefined
         ? drawVector(held, node, fromText(inherits), box)
         : inScheme(resolved.scheme, inner(held, node, inherits, resolved.regions, node))}
+      {scope.behavior.parts[node.name]?.drawing?.({ custom: resolved.custom, text: inherits })}
       {drawGenerated(resolved.generated?.after, inherits, `${node.name}-after`)}
     </>
   )

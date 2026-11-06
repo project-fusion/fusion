@@ -76,9 +76,10 @@ pub use tree_choice::{
     TreeChoice, AREA_CHART, BAR_CHART, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT,
     CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU,
     HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
-    NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, PAGINATION,
-    PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, TABLE, TABLE_COLUMN,
-    TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
+    NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB,
+    PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, TABLE,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST,
+    VIDEO_PLAYLIST_MENU,
 };
 pub use validation::Validation;
 pub use window::WindowChoice;
@@ -255,6 +256,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a player of one video.
     #[serde(rename = "video", skip_serializing_if = "Option::is_none")]
     pub video: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it draws an orb.
+    #[serde(rename = "orb", skip_serializing_if = "Option::is_none")]
+    pub orb: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a field of dates or times.
     #[serde(rename = "pickerField", skip_serializing_if = "Option::is_none")]
     pub picker_field: Option<TreeChoice>,
@@ -432,6 +436,7 @@ impl Api {
             && self.video_playlist_menu.is_none()
             && self.video_playlist.is_none()
             && self.video.is_none()
+            && self.orb.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
@@ -535,6 +540,7 @@ const FIELDS: &[&str] = &[
     "videoPlaylistMenu",
     "videoPlaylist",
     "video",
+    "orb",
     "pickerField",
     "listbox",
     "select",
@@ -629,6 +635,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::video_playlist)
             .transpose()?,
         video: field("video").map(tree_choice::video).transpose()?,
+        orb: field("orb").map(tree_choice::orb).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)
             .transpose()?,

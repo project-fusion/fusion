@@ -6,6 +6,7 @@ import { setFiles } from '@fusion.dev/helix-core/capabilities/files'
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
 import { setForm } from '@fusion.dev/helix-core/capabilities/form'
 import { setGesture } from '@fusion.dev/helix-core/capabilities/gesture'
+import { setGpuDrawing } from '@fusion.dev/helix-core/capabilities/gpu-drawing'
 import { setHaptics } from '@fusion.dev/helix-core/capabilities/haptics'
 import { setKeys } from '@fusion.dev/helix-core/capabilities/keys'
 import { setLocale } from '@fusion.dev/helix-core/capabilities/locale'
@@ -25,6 +26,7 @@ import { askReducedMotion, askScreenReader, nativeEnvironment } from './environm
 import { nativeFiles } from './files'
 import { nativeFocus } from './focus'
 import { nativeForm } from './form'
+import { nativeGpuDrawing } from './gpu-drawing'
 import { nativeHaptics } from './haptics'
 import { installIntl } from './intl'
 import { nativeKeys } from './keys'
@@ -55,6 +57,7 @@ export const installNativeCapabilities = (): void => {
   setFocus(nativeFocus)
   setForm(nativeForm)
   setGesture(nativeGesture)
+  setGpuDrawing(nativeGpuDrawing)
   setHaptics(nativeHaptics)
   setKeys(nativeKeys)
   setLocale(nativeLocale)

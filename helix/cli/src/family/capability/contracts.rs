@@ -22,6 +22,7 @@ pub const CAPABILITIES: &[Capability] = &[
     FOCUS,
     FORM,
     GESTURE,
+    GPU_DRAWING,
     HAPTICS,
     KEYS,
     LOCALE,
@@ -173,6 +174,18 @@ const FORM: Capability = Capability {
             returns: Ty::Void,
         },
     ],
+};
+
+const GPU_DRAWING: Capability = Capability {
+    name: "gpu-drawing",
+    interface: "GpuDrawing",
+    doc: "Says whether a family can draw a moving picture on the device's GPU, such as an orb's cloud of dots: a canvas on the web, and react-native-skia on iOS and Android, an optional peer loaded only when a family draws. Where it cannot, the family draws its still fallback, and the server draws none.",
+    members: &[Member {
+        name: "available",
+        doc: "Whether a drawing can be made here: a canvas with a 2D context on the web, and react-native-skia installed and built into the app on a phone.",
+        params: &[],
+        returns: Ty::Boolean,
+    }],
 };
 
 const HAPTICS: Capability = Capability {
