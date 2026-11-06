@@ -26,6 +26,7 @@ import {
   donutBearing,
   donutEdge,
   donutRing,
+  donutSeam,
   donutShares,
   formatNumbers,
   percentIn,
@@ -90,16 +91,20 @@ const shownOf = (shares: readonly DonutShare[]): number[] =>
   shares.flatMap((share, at) => (share.fraction > 0 ? [at] : []))
 
 /** Each slice as the vector draws it: its arc, its wedge, and its color. */
-const slicesOf = (drawn: Drawn, ring: DonutRing, at: number, outlined: boolean, colorOf: Color) =>
-  drawn.shares.map((share, place) => ({
+const slicesOf = (drawn: Drawn, ring: DonutRing, at: number, outlined: boolean, colorOf: Color) => {
+  /* The seam the web leaves between two slices, half at either end of each, so the
+     ring reads as its slices with no stroke drawn between them. */
+  const seam = donutSeam(drawn.shares)
+  return drawn.shares.map((share, place) => ({
     active: place === at,
-    arc: donutArc(share, ring),
+    arc: donutArc(share, ring, seam),
     color: colorOf(place),
     /* Inset by a quarter of the edge's stroke, as the web's clip keeps its inner half. */
-    edge: share.fraction > 0 && outlined ? donutEdge(share, ring, 0.75) : '',
+    edge: share.fraction > 0 && outlined ? donutEdge(share, ring, 0.75, seam) : '',
     key: String(place),
     series: String(seriesIndex(place)),
   }))
+}
 
 /** Each slice's share written on it, where `slice-labels` asks and the slice is big enough. */
 const labelsOf = (drawn: Drawn, ring: DonutRing, format: Intl.NumberFormat, colorOf: Color) =>

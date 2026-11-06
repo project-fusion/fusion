@@ -148,9 +148,10 @@ describe('the ring', () => {
   test('draws the track and a slice for each row, each an arc from twelve o’clock', async () => {
     await render(<Donut />)
     const paths = shapes('RNSVGPath').map((one) => String(one.props.d))
-    /* The track, then each slice's arc and its wedge, which draws nothing until `outlined`. */
+    /* The track, then each slice's arc and its wedge, which draws nothing until `outlined`.
+       Each slice stops half a seam short of twelve and of the next, as the web's do. */
     expect(paths[0]?.startsWith('M 50.000 18.000 A 32 32 0 0 1')).toBe(true)
-    expect(paths[1]).toBe('M 50.000 18.000 A 32 32 0 0 1 65.416 78.042')
+    expect(paths[1]).toBe('M 50.400 18.002 A 32 32 0 0 1 65.765 77.847')
     expect(paths.filter((d) => d.startsWith('M'))).toHaveLength(5)
   })
 
@@ -167,7 +168,7 @@ describe('the ring', () => {
     const arcs = shapes('RNSVGPath').map((one) => String(one.props.d))
     /* Direct draws nothing, and Search starts at twelve now, past six. */
     expect(arcs[1]).toBe('')
-    expect(arcs[3]?.startsWith('M 50.000 18.000 A 32 32 0 1 1 ')).toBe(true)
+    expect(arcs[3]?.startsWith('M 50.400 18.002 A 32 32 0 1 1 ')).toBe(true)
   })
 
   test('says it has no readings, in place of the ring', async () => {
