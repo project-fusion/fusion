@@ -72,6 +72,7 @@ import {
 import { HelixNumberInput } from '../number-input/index.native'
 import { HelixObjectInspector } from '../object-inspector/index.native'
 import { HelixOption, HelixOptionGroup, HelixOptionSeparator } from '../option/index.native'
+import { HelixOrb } from '../orb/index.native'
 import { HelixOutline, HelixOutlineSection } from '../outline/index.native'
 import {
   HelixPagination,
@@ -312,6 +313,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-option': HelixOption,
   'helix-option-group': HelixOptionGroup,
   'helix-option-separator': HelixOptionSeparator,
+  'helix-orb': HelixOrb,
   'helix-outline': HelixOutline,
   'helix-outline-section': HelixOutlineSection,
   'helix-pagination': HelixPagination,
