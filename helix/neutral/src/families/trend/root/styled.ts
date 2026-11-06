@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
 import { oneOf } from '../../../render.js'
-import { native, token } from '../../../style.js'
+import { fn, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -32,7 +32,9 @@ export default styles(
       color: own.trendColor,
       downColor: token('color-fall'),
       gap: token('space-2xs'),
-      iconSize: '1em',
+      /* **An even size, the em rounded to two pixels**: 14 beside the 13 of the
+         figure, so the arrow's center lands on a whole pixel. */
+      iconSize: fn('round', '1em', '2px'),
       labelColor: token('color-foreground-muted'),
       neutralColor: token('color-foreground-muted'),
       upColor: token('color-rise'),
@@ -48,6 +50,9 @@ export default styles(
         alignItems: 'center',
         display: 'inline-flex',
         fontSize: token('text-sm'),
+        /* Figures take one width each, as a Stat's do, so a column of trends
+           lines up digit for digit. */
+        fontVariantNumeric: 'tabular-nums',
         fontWeight: token('weight-medium'),
         gap: hook.gap,
         lineHeight: token('leading-tight'),
@@ -93,8 +98,16 @@ export default styles(
       ),
     ]),
     on('icon', [
-      rule({ '--icon-size': hook.iconSize }),
-      native([rule({ blockSize: hook.iconSize, flex: '0 0 auto', inlineSize: hook.iconSize })]),
+      web([rule({ '--icon-size': hook.iconSize })]),
+      /* A phone takes the em unrounded, which the large-text cap on a glyph reads. */
+      native([
+        rule({
+          '--icon-size': hook.iconSize('1em'),
+          blockSize: hook.iconSize('1em'),
+          flex: '0 0 auto',
+          inlineSize: hook.iconSize('1em'),
+        }),
+      ]),
     ]),
     /* A glyph of the page's own takes the arrow's size and its color. */
     on({ region: ['icon', 'up-icon', 'down-icon', 'neutral-icon'], slotted: '*' }, [

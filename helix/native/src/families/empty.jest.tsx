@@ -168,7 +168,7 @@ describe('the generated Empty', () => {
     })
   })
 
-  test('draws the icon at the large icon step, in the subtle color', async () => {
+  test('draws the icon a third over the large icon step, in the subtle color', async () => {
     await render(
       themed(
         <>
@@ -180,7 +180,8 @@ describe('the generated Empty', () => {
     const glyph = styleOf(screen.getByTestId('glyph folder-open', { includeHiddenElements: true }))
     expect(glyph).toMatchObject({
       backgroundColor: tokens['color-foreground-subtle'],
-      height: tokens['size-icon-lg'],
+      /* A third over the large step, rounded to a pixel, as the web draws it. */
+      height: Math.round((Number(tokens['size-icon-lg']) * 4) / 3),
     })
   })
 

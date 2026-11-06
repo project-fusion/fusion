@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { token } from '../../../style.js'
+import { fn, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -24,7 +24,10 @@ export default styles(
       headingColor: token('color-foreground'),
       headingSize: token('text-lg'),
       iconColor: token('color-foreground-subtle'),
-      iconSize: token('size-icon-lg'),
+      /* A third over the `lg` step, so the icon moves with density: at the step
+         itself it stood under the heading as a detail. 32 is the picture the
+         heading names. */
+      iconSize: fn('round', quotient(product(token('size-icon-lg'), 4), 3), '1px'),
       messageColor: token('color-foreground-muted'),
       messageMeasure: '46ch',
       messageSize: token('text-sm'),

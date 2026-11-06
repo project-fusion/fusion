@@ -209,7 +209,7 @@ describe('the generated Meter', () => {
       <HelixMeter emphasis="subtle" high={80} label="Disk" low={50} optimum={0} value={94} />,
     )
     expect(fillOf(all).backgroundColor).toBe(
-      mix(String(tokens['color-danger']), 30, String(tokens['color-surface-sunken'])),
+      mix(String(tokens['color-danger']), 72, String(tokens['color-track'])),
     )
   })
 
@@ -233,7 +233,7 @@ describe('the generated Meter', () => {
       (one) => wordsOf(one) === 'Tasks done' && styleOf(one).width !== undefined,
     )
     expect(label === undefined ? undefined : styleOf(label).width).toBe('100%')
-    const track = all.find((one) => styleOf(one).backgroundColor === tokens['color-surface-sunken'])
+    const track = all.find((one) => styleOf(one).backgroundColor === tokens['color-track'])
     expect(track === undefined ? undefined : styleOf(track)).toMatchObject({
       flexBasis: 0,
       flexGrow: 1,
