@@ -1,4 +1,4 @@
-import { fn, measured, product, token, web } from '../style.js'
+import { fn, measured, product, quotient, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -47,6 +47,9 @@ export default fragment(
         fontSize: hook.contentSize(token('text-xs')),
         fontVariantNumeric: 'tabular-nums',
         lineHeight: token('leading-tight'),
+        /* Half a step above and below the line, so the bar the words grow has
+           room for their line inside it. */
+        paddingBlock: quotient(token('space-2xs'), 2),
         paddingInline: token('space-xs'),
         position: 'relative',
         whiteSpace: 'nowrap',
@@ -91,6 +94,7 @@ export default fragment(
           insetInlineStart: 0,
           lineHeight: token('leading-tight'),
           overflow: 'hidden',
+          paddingBlock: quotient(token('space-2xs'), 2),
           paddingInline: token('space-xs'),
           position: 'absolute',
           whiteSpace: 'nowrap',

@@ -1,4 +1,4 @@
-import { mix, product, quotient, token } from '../../../style.js'
+import { mix, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -30,7 +30,17 @@ export default styles(
     stylesheet: 'code/root/code-root.generated.css',
   },
   ({ hook, on, rule }) => [
-    on('host', [rule({ display: 'inline' })]),
+    on('host', [
+      rule({
+        /* **A fragment moves to the next line whole** on the web, as a word does:
+           inline, it broke wherever the line ran out, and a hyphen is a place to
+           break. A fragment wider than the line still breaks inside itself. A phone
+           sets it in the line of words. */
+        display: web('inline-block'),
+        maxInlineSize: web('100%'),
+      }),
+      native([rule({ display: 'inline' })]),
+    ]),
     on('code', [
       rule({
         /* The well, which composites the same on either scheme: `surface-raised`
@@ -39,8 +49,7 @@ export default styles(
         backgroundColor: hook.backgroundColor,
         borderRadius: hook.radius,
         /* A fragment longer than the line, a path or an identifier, breaks
-           inside itself where it would run out of the text, and each piece
-           keeps the wash and the padding. */
+           inside itself, and each piece keeps the wash and the padding. */
         web: {
           WebkitBoxDecorationBreak: 'clone',
           boxDecorationBreak: 'clone',
@@ -52,6 +61,8 @@ export default styles(
            10.20. */
         color: hook.foregroundColor,
         fontFamily: hook.fontFamily,
+        /* Code shows the characters written: a ligature hides a `!=` changing to `!==`. */
+        fontVariantLigatures: 'none',
         /* A ratio, not a rung: a fixed 13px inside a 32px heading is 0.41 of
            it and sits on the line like a footnote. `sm` over `md` leaves body
            text unchanged to the pixel. */

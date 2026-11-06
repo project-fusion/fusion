@@ -153,7 +153,7 @@ describe('trend hooks', () => {
     expect(rule('slot[name="label"]')).toContain(
       'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
     )
-    expect(rule('slot[name$="icon"]::slotted(*)')).toContain(
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
       'block-size: var(--trend-icon-size, round(1em, 2px))',
     )
   })
