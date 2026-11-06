@@ -29,17 +29,11 @@ export function Example() {
     <div className="columns-pane">
       <helix-column-manager for="invoices"></helix-column-manager>
       <helix-data-table
+        default-view={JSON.stringify({ columns: { hidden: ['terms'], pinned: { id: 'start' } } })}
         id="invoices"
         label="Invoices"
         row-key="id"
         rows={rows}
-        view={{
-          columns: { hidden: ['terms'], order: [], pinned: { id: 'start' }, widths: {} },
-          filters: [],
-          pageSize: 0,
-          query: '',
-          sort: '',
-        }}
       >
         <helix-table-column
           field="id"

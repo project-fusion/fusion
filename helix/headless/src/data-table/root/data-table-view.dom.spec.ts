@@ -93,8 +93,8 @@ describe('the view', () => {
     expect(again.view).toEqual(element.view)
   })
 
-  test('reads JSON written as an attribute', async () => {
-    const element = await table(`view='{"sort":"size:asc","query":"r"}'`)
+  test('takes its first view from default-view, as JSON', async () => {
+    const element = await table(`default-view='{"sort":"size:asc","query":"r"}'`)
     expect(element.sort).toBe('size:asc')
     expect(element.filter).toBe('r')
   })

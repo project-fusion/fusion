@@ -86,6 +86,16 @@ export class HelixHeadlessColumnManager extends HelixElement {
    */
   static words = 'helix-column-manager'
 
+  /** The note on a column the table leaves out at its width. */
+  @words
+  @property({ attribute: 'dropped-label' })
+  droppedLabel = 'Hidden at this width'
+
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Columns'
+
   /**
    * The id of the `DataTable` whose columns the list holds, in the same
    * document or shadow root.
@@ -93,20 +103,13 @@ export class HelixHeadlessColumnManager extends HelixElement {
   @property()
   for = ''
 
-  /** The list's heading, which also names the list. */
-  @words
+  /**
+   * The name of the list, which a screen reader announces before its items.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Columns'
-
-  /** The note on a column the table leaves out at its width. */
-  @words
-  @property({ attribute: 'dropped-label' })
-  droppedLabel = 'Hidden at this width'
-
-  /** The name of a column's grip. `{name}` is the column's heading. */
-  @words
-  @property({ attribute: 'move-label' })
-  moveLabel = 'Move {name}'
+  label = ''
 
   /**
    * What a screen reader hears after a move. `{name}` is the column's heading,
@@ -116,30 +119,35 @@ export class HelixHeadlessColumnManager extends HelixElement {
   @property({ attribute: 'moved-label' })
   movedLabel = '{name} moved to {position} of {count}'
 
-  /** The name of the pin button on a column that is not pinned. `{name}` is its heading. */
+  /** The name of a column's grip. `{name}` is the column's heading. */
   @words
-  @property({ attribute: 'pin-start-label' })
-  pinStartLabel = 'Pin {name} to the start'
+  @property({ attribute: 'move-label' })
+  moveLabel = 'Move {name}'
 
   /** The name of the pin button on a column pinned to the start. `{name}` is its heading. */
   @words
   @property({ attribute: 'pin-end-label' })
   pinEndLabel = 'Pin {name} to the end'
 
-  /** The name of the pin button on a column pinned to the end. `{name}` is its heading. */
-  @words
-  @property({ attribute: 'unpin-label' })
-  unpinLabel = 'Unpin {name}'
-
   /** The note on a pinned column. */
   @words
   @property({ attribute: 'pinned-label' })
   pinnedLabel = 'Pinned'
 
+  /** The name of the pin button on a column that is not pinned. `{name}` is its heading. */
+  @words
+  @property({ attribute: 'pin-start-label' })
+  pinStartLabel = 'Pin {name} to the start'
+
   /** The words on the button that puts the columns back. */
   @words
   @property({ attribute: 'reset-label' })
   resetLabel = 'Reset'
+
+  /** The name of the pin button on a column pinned to the end. `{name}` is its heading. */
+  @words
+  @property({ attribute: 'unpin-label' })
+  unpinLabel = 'Unpin {name}'
 
   /** What the live region says. */
   @state()
@@ -340,7 +348,7 @@ export class HelixHeadlessColumnManager extends HelixElement {
       ? columns.filter((column) => !table.view.columns.hidden.includes(column.field)).length
       : 0
     return html`<div part="header">
-        <span part="title" id="title">${this.label}</span>
+        <span part="title" id="title">${this.label || this.fallbackLabel}</span>
         <button part="reset" type="button" @click=${() => this.reset()}>${this.resetLabel}</button>
       </div>
       <ul part="list" aria-labelledby="title">
