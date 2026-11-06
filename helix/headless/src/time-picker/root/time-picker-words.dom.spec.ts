@@ -52,7 +52,10 @@ describe('a time picker on a page in another language', () => {
     expect(bubble(await picker('', 'value="nope" locale="en-US"'))).toBe(
       'Enter a time such as 2:30 PM.',
     )
-    expect(bubble(await picker('', 'value="nope" locale="de-DE" seconds mode="multiple"'))).toBe(
+    /* A step of 900 seconds keeps the list at 96 rows. The sentence is the
+       subject here, and a day to the 15 seconds is 5,760 rows to draw. */
+    const german = 'value="nope" locale="de-DE" seconds step="900" mode="multiple"'
+    expect(bubble(await picker('', german))).toBe(
       'Enter times such as 14:30:15, separated by commas.',
     )
     registerWords('pl', {

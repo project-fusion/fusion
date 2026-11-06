@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './events.css'
 
 type Arrival = { carried: string; name: string }
 
@@ -32,41 +31,54 @@ export function Example() {
       <helix-outline
         label="On this page"
         onhelix-activate={reading}
-      >
-        <a href="#install">Install</a>
-        <a href="#usage">Usage</a>
-        <a href="#api">API</a>
-      </helix-outline>
+      ></helix-outline>
 
-      <div className="reading">
-        <section id="install">
-          <helix-text
-            as="h2"
-            scale="title"
+      <helix-scroll-area
+        label="Reading"
+        max-block-size="sm"
+      >
+        <helix-flex
+          direction="column"
+          gap="3xl"
+        >
+          <helix-outline-section
+            anchor="install"
+            label="Install"
           >
-            Install
-          </helix-text>
-          Add the package to your project.
-        </section>
-        <section id="usage">
-          <helix-text
-            as="h2"
-            scale="title"
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              Install
+            </helix-text>
+            <helix-text as="p">Add the package to your project.</helix-text>
+          </helix-outline-section>
+          <helix-outline-section
+            anchor="usage"
+            label="Usage"
           >
-            Usage
-          </helix-text>
-          Create a client with your API key.
-        </section>
-        <section id="api">
-          <helix-text
-            as="h2"
-            scale="title"
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              Usage
+            </helix-text>
+            <helix-text as="p">Create a client with your API key.</helix-text>
+          </helix-outline-section>
+          <helix-outline-section
+            anchor="api"
+            label="API"
           >
-            API
-          </helix-text>
-          Each method lists its parameters.
-        </section>
-      </div>
+            <helix-text
+              as="h2"
+              variant="title"
+            >
+              API
+            </helix-text>
+            <helix-text as="p">Each method lists its parameters.</helix-text>
+          </helix-outline-section>
+        </helix-flex>
+      </helix-scroll-area>
 
       <helix-list
         divided
@@ -75,7 +87,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

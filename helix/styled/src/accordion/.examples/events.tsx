@@ -48,7 +48,7 @@ export function Example() {
             onhelix-before-open={opening(section.name)}
             onToggle={moved(section.name)}
           >
-            <span slot="summary">{section.name}</span>
+            <helix-text slot="summary">{section.name}</helix-text>
             {section.body}
           </helix-accordion-item>
         ))}
@@ -61,7 +61,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

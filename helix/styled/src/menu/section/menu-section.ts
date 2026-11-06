@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenuSection } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './menu-section.css.js'
+import { styles } from './menu-section.generated.css.js'
 
 /**
  * @summary A group of rows in a menu, under a heading.

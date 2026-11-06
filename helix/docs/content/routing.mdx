@@ -109,6 +109,12 @@ first, and canceling that keeps the browser from following, so a client-side
 router can follow it instead. Web Awesome drops the anchor and navigates in
 JavaScript, which loses every item in the list above.
 
+A Helix `Tab` with an `href` puts `role="tab"` on the anchor itself, and the tab
+still controls its panel: each tab links to a route, and your router renders
+that route's content in the tab's panel. Links with no panels, such as the
+sections of a site, belong in `Navigation`, whose `variant="underlined"` draws
+the same bar.
+
 ## Use client-side routing with real anchors
 
 A real anchor causes a full page load, because a framework intercepts only the

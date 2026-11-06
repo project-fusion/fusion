@@ -1,100 +1,71 @@
 <!-- @summary A panel that spans the page from edge to edge, for links too wide to fit under one trigger. -->
 <helix-app-header>
-  <span slot="start">Fusion</span>
+  <helix-text slot="start">Fusion</helix-text>
   <helix-navigation label="Main">
     <helix-megamenu
       label="Products"
       layout="band"
     >
-      <div data-megamenu-group>
-        <helix-text
-          as="h3"
-          data-megamenu-heading
-          scale="title"
-        >Work</helix-text>
-        <a
-          data-megamenu-item
-          href="#helix"
-        >
-          <helix-icon name="cube"></helix-icon>
-          <strong>Projects</strong>
-          <span>Plan and track work across teams.</span>
-        </a>
-        <a
-          data-megamenu-item
-          href="#icons"
-        >
-          <helix-icon name="palette"></helix-icon>
-          <strong>Documents</strong>
-          <span>Write, edit, and share files.</span>
-        </a>
-      </div>
-      <div data-megamenu-group>
-        <helix-text
-          as="h3"
-          data-megamenu-heading
-          scale="title"
-        >Insights</helix-text>
-        <a
-          data-megamenu-item
-          href="#cortex"
-        >
-          <helix-icon name="pulse"></helix-icon>
-          <strong>Reports</strong>
-          <span>See how your projects are doing.</span>
-        </a>
-        <a
-          data-megamenu-item
-          href="#trace"
-        >
-          <helix-icon name="strategy"></helix-icon>
-          <strong>Dashboards</strong>
-          <span>Track the numbers you care about.</span>
-        </a>
-      </div>
-      <div data-megamenu-group>
-        <helix-text
-          as="h3"
-          data-megamenu-heading
-          scale="title"
-        >Connect</helix-text>
-        <a
-          data-megamenu-item
-          href="#grid"
-        >
-          <helix-icon name="lightbulb"></helix-icon>
-          <strong>Integrations</strong>
-          <span>Connect the tools your team uses.</span>
-        </a>
-        <a
-          data-megamenu-item
-          href="#chart"
-        >
-          <helix-icon name="chart-line"></helix-icon>
-          <strong>API</strong>
-          <span>Build on your account data.</span>
-        </a>
-      </div>
-      <div data-megamenu-group>
-        <helix-text
-          as="h3"
-          data-megamenu-heading
-          scale="title"
-        >More</helix-text>
-        <a
-          data-navigation-item
-          href="#docs"
-        >Documentation</a>
-        <a
-          data-navigation-item
-          href="#changelog"
-        >Changelog</a>
-        <a
-          data-navigation-item
-          href="#status"
-        >Status</a>
-      </div>
+      <helix-megamenu-group label="Work">
+        <helix-megamenu-item href="#helix">
+          <helix-icon
+            name="cube"
+            slot="icon"
+          ></helix-icon>
+          Projects
+          <helix-text slot="description">Plan and track work across teams.</helix-text>
+        </helix-megamenu-item>
+        <helix-megamenu-item href="#icons">
+          <helix-icon
+            name="palette"
+            slot="icon"
+          ></helix-icon>
+          Documents
+          <helix-text slot="description">Write, edit, and share files.</helix-text>
+        </helix-megamenu-item>
+      </helix-megamenu-group>
+      <helix-megamenu-group label="Insights">
+        <helix-megamenu-item href="#cortex">
+          <helix-icon
+            name="pulse"
+            slot="icon"
+          ></helix-icon>
+          Reports
+          <helix-text slot="description">See how your projects are doing.</helix-text>
+        </helix-megamenu-item>
+        <helix-megamenu-item href="#trace">
+          <helix-icon
+            name="strategy"
+            slot="icon"
+          ></helix-icon>
+          Dashboards
+          <helix-text slot="description">Track the numbers you care about.</helix-text>
+        </helix-megamenu-item>
+      </helix-megamenu-group>
+      <helix-megamenu-group label="Connect">
+        <helix-megamenu-item href="#grid">
+          <helix-icon
+            name="lightbulb"
+            slot="icon"
+          ></helix-icon>
+          Integrations
+          <helix-text slot="description">Connect the tools your team uses.</helix-text>
+        </helix-megamenu-item>
+        <helix-megamenu-item href="#chart">
+          <helix-icon
+            name="chart-line"
+            slot="icon"
+          ></helix-icon>
+          API
+          <helix-text slot="description">Build on your account data.</helix-text>
+        </helix-megamenu-item>
+      </helix-megamenu-group>
+      <helix-megamenu-group label="More">
+        <helix-megamenu-item href="#docs">Documentation</helix-megamenu-item>
+        <helix-megamenu-item href="#changelog">Changelog</helix-megamenu-item>
+        <helix-megamenu-item href="#status">Status</helix-megamenu-item>
+      </helix-megamenu-group>
     </helix-megamenu>
-    <a href="#pricing">Pricing</a>
+    <helix-navigation-item href="#pricing">Pricing</helix-navigation-item>
   </helix-navigation>
 </helix-app-header>

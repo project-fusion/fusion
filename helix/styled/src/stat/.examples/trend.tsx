@@ -3,27 +3,27 @@ export function Example() {
     <helix-stat-group divided>
       <helix-stat>
         1,284
-        <span slot="label">Active users</span>
+        <helix-text slot="label">Active users</helix-text>
         <helix-trend
           good="up"
           movement="up"
           slot="trend"
         >
           12%
-          <span slot="label">this month</span>
+          <helix-text slot="label">this month</helix-text>
         </helix-trend>
       </helix-stat>
       <helix-stat>
         212
-        <span slot="label">Response time</span>
-        <span slot="unit">ms</span>
+        <helix-text slot="label">Response time</helix-text>
+        <helix-text slot="unit">ms</helix-text>
         <helix-trend
           good="down"
           movement="up"
           slot="trend"
         >
           18ms
-          <span slot="label">this week</span>
+          <helix-text slot="label">this week</helix-text>
         </helix-trend>
       </helix-stat>
     </helix-stat-group>

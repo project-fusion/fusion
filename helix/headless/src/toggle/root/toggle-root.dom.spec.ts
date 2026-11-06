@@ -49,16 +49,19 @@ describe('one toggle', () => {
      refuses too: the group calls that from its own key handling and never sees
      the button. */
   test('refuses from the platform and from the method the group calls', async () => {
-    const host = await toggle('value="a" disabled')
-    let heard = 0
-    host.addEventListener('helix-before-select', () => {
-      heard += 1
-    })
+    for (const host of [await toggle('value="a" disabled'), await held('value="a" disabled')]) {
+      let heard = 0
+      for (const name of ['helix-before-check', 'helix-before-select']) {
+        host.addEventListener(name, () => {
+          heard += 1
+        })
+      }
 
-    expect((part(host, 'item') as HTMLButtonElement).disabled).toBe(true)
-    ;(part(host, 'item') as HTMLElement).click()
-    host.select()
-    expect(heard).toBe(0)
+      expect((part(host, 'item') as HTMLButtonElement).disabled).toBe(true)
+      ;(part(host, 'item') as HTMLElement).click()
+      host.select()
+      expect(heard).toBe(0)
+    }
   })
 
   /* The tab stop normally rides on the selection, so an unanswered group had no
@@ -88,8 +91,8 @@ describe('one toggle', () => {
     expect(host.shadowRoot?.activeElement).toBe(part(host, 'item'))
   })
 
-  test('announces what it stands for when it is chosen', async () => {
-    const host = await toggle()
+  test('announces what it stands for when it is chosen in its group', async () => {
+    const host = await held()
     let value: string | undefined
     host.addEventListener('helix-before-select', (event) => {
       value = (event as CustomEvent<{ value: string }>).detail.value
@@ -121,13 +124,30 @@ describe('a toggle on its own', () => {
     expect(toggle.selected).toBe(true)
     expect(button.getAttribute('aria-pressed')).toBe('true')
     expect(changes).toBe(1)
-    toggle.addEventListener('helix-before-select', (event) => event.preventDefault(), {
+    toggle.addEventListener('helix-before-check', (event) => event.preventDefault(), {
       once: true,
     })
     button.click()
     await toggle.updateComplete
     expect(toggle.selected).toBe(true)
     expect(changes).toBe(1)
+  })
+
+  /* One request for every family that turns on and off, so a handler written
+     for Checkbox and Switch reads a toggle button the same way. `helix-before-select`
+     is the group's word, for a choice among its items. */
+  test('asks with `helix-before-check` and the state it turns to, and never `helix-before-select`', async () => {
+    const host = await toggle('value="bold"')
+    const heard: string[] = []
+    host.addEventListener('helix-before-check', (event) => {
+      const request = event as CustomEvent<{ checked: boolean }>
+      heard.push(`before ${request.detail.checked} ${request.cancelable}`)
+    })
+    host.addEventListener('helix-before-select', () => heard.push('select'))
+    host.addEventListener('change', () => heard.push('change'))
+    ;(part(host, 'item') as HTMLElement).click()
+    ;(part(host, 'item') as HTMLElement).click()
+    expect(heard).toEqual(['before true true', 'change', 'before false true', 'change'])
   })
 
   test('starts pressed where the markup says selected', async () => {

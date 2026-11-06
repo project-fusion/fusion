@@ -13,7 +13,7 @@ export function Example() {
         locale="en-US"
         value={0.0124}
       >
-        <span slot="label">Index</span>
+        <helix-text slot="label">Index</helix-text>
       </helix-trend>
       <helix-trend
         color-by="movement"
@@ -21,7 +21,7 @@ export function Example() {
         locale="en-US"
         value={-0.0087}
       >
-        <span slot="label">Share price</span>
+        <helix-text slot="label">Share price</helix-text>
       </helix-trend>
       <helix-trend
         color-by="movement"
@@ -29,7 +29,7 @@ export function Example() {
         locale="en-US"
         value={0}
       >
-        <span slot="label">Bond yield</span>
+        <helix-text slot="label">Bond yield</helix-text>
       </helix-trend>
     </helix-flex>
   )

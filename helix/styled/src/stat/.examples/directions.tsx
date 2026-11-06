@@ -6,16 +6,16 @@ export function Example() {
     >
       <helix-stat direction="column-reverse">
         1,284
-        <span slot="label">Active users</span>
+        <helix-text slot="label">Active users</helix-text>
       </helix-stat>
       <helix-stat direction="row">
         98.2
-        <span slot="label">Uptime</span>
-        <span slot="unit">%</span>
+        <helix-text slot="label">Uptime</helix-text>
+        <helix-text slot="unit">%</helix-text>
       </helix-stat>
       <helix-stat direction="row-reverse">
         4.7
-        <span slot="label">Rating</span>
+        <helix-text slot="label">Rating</helix-text>
       </helix-stat>
     </helix-flex>
   )

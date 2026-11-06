@@ -238,7 +238,13 @@ export interface HelixMetadata {
    * Only on the root declaration. An example belongs to the family rather than
    * to any one element in it.
    */
-  examples?: { description?: string; layout?: string; min?: number; slug: string }[]
+  examples?: {
+    description?: string
+    layout?: string
+    min?: number
+    platforms?: { 'react-native'?: { description?: string } }
+    slug: string
+  }[]
 
   /** Version the component was introduced in. */
   since?: string

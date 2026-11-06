@@ -760,3 +760,39 @@ describe('the section you are in', () => {
     expect(hasState(host, 'current')).toBe(true)
   })
 })
+
+/* The panel's own destinations, which a page that shares its code with a
+   phone app writes in place of its own anchors. */
+describe('a panel of Megamenu Items', () => {
+  test('is current while an item in it is the page, and as the page moves it', async () => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Docs"><helix-headless-megamenu-item href="#a">A</helix-headless-megamenu-item><helix-headless-megamenu-item href="#b" current="page">B</helix-headless-megamenu-item></helix-headless-megamenu>`,
+    )) as Section
+    expect(hasState(host, 'current')).toBe(true)
+    host.querySelector('[current]')?.removeAttribute('current')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(hasState(host, 'current')).toBe(false)
+    host.querySelector('helix-headless-megamenu-item')?.setAttribute('current', 'page')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(hasState(host, 'current')).toBe(true)
+  })
+
+  test('shuts as a reader takes an item, and stays open where its select was refused', async () => {
+    const host = (await mount(
+      `<helix-headless-megamenu label="Products"><helix-headless-megamenu-item href="#one">One</helix-headless-megamenu-item></helix-headless-megamenu>`,
+    )) as Section
+    await host.updateComplete
+    press(host, 'none', 0)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    const item = host.querySelector('helix-headless-megamenu-item') as HTMLElement
+    item.addEventListener('helix-select', (event) => event.preventDefault(), { once: true })
+    const link = part(item, 'link') as HTMLElement
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }))
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+  })
+})

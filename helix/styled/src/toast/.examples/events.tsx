@@ -30,7 +30,6 @@ export function Example() {
       gap="md"
     >
       <helix-toast
-        label="Notifications"
         onhelix-dismiss={dismissed}
         placement="bottom-end"
       >
@@ -55,7 +54,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

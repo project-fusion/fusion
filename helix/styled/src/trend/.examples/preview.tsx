@@ -1,9 +1,8 @@
-import './preview.css'
-
 export function Example() {
   return (
     <helix-flex
-      gap="xl"
+      column-gap="xl"
+      row-gap="sm"
       wrap
     >
       <helix-trend
@@ -11,31 +10,31 @@ export function Example() {
         movement="up"
       >
         12.4%
-        <span slot="label">Revenue</span>
+        <helix-text slot="label">Revenue</helix-text>
       </helix-trend>
       <helix-trend
         good="down"
         movement="down"
       >
         0.4pt
-        <span slot="label">Churn</span>
+        <helix-text slot="label">Churn</helix-text>
       </helix-trend>
       <helix-trend
         good="up"
         movement="down"
       >
         0.6pt
-        <span slot="label">Conversion</span>
+        <helix-text slot="label">Conversion</helix-text>
       </helix-trend>
       <helix-trend
         good="down"
         movement="up"
       >
         40ms
-        <span slot="label">Response time</span>
+        <helix-text slot="label">Response time</helix-text>
       </helix-trend>
       <helix-trend movement="neutral">
-        0<span slot="label">Open incidents</span>
+        0<helix-text slot="label">Open incidents</helix-text>
       </helix-trend>
     </helix-flex>
   )

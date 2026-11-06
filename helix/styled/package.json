@@ -21,22 +21,498 @@
       "types": "./dist/*/index.d.ts",
       "default": "./dist/*/index.js"
     },
+    "./accordion": {
+      "react-native": {
+        "types": "./dist/accordion/index.native.d.ts",
+        "default": "./dist/accordion/index.native.js"
+      },
+      "types": "./dist/accordion/index.d.ts",
+      "default": "./dist/accordion/index.js"
+    },
+    "./announcement": {
+      "react-native": {
+        "types": "./dist/announcement/index.native.d.ts",
+        "default": "./dist/announcement/index.native.js"
+      },
+      "types": "./dist/announcement/index.d.ts",
+      "default": "./dist/announcement/index.js"
+    },
     "./api.json": "./api.json",
+    "./app-header": {
+      "react-native": {
+        "types": "./dist/app-header/index.native.d.ts",
+        "default": "./dist/app-header/index.native.js"
+      },
+      "types": "./dist/app-header/index.d.ts",
+      "default": "./dist/app-header/index.js"
+    },
+    "./avatar": {
+      "react-native": {
+        "types": "./dist/avatar/index.native.d.ts",
+        "default": "./dist/avatar/index.native.js"
+      },
+      "types": "./dist/avatar/index.d.ts",
+      "default": "./dist/avatar/index.js"
+    },
+    "./badge": {
+      "react-native": {
+        "types": "./dist/badge/index.native.d.ts",
+        "default": "./dist/badge/index.native.js"
+      },
+      "types": "./dist/badge/index.d.ts",
+      "default": "./dist/badge/index.js"
+    },
+    "./blockquote": {
+      "react-native": {
+        "types": "./dist/blockquote/index.native.d.ts",
+        "default": "./dist/blockquote/index.native.js"
+      },
+      "types": "./dist/blockquote/index.d.ts",
+      "default": "./dist/blockquote/index.js"
+    },
+    "./breadcrumbs": {
+      "react-native": {
+        "types": "./dist/breadcrumbs/index.native.d.ts",
+        "default": "./dist/breadcrumbs/index.native.js"
+      },
+      "types": "./dist/breadcrumbs/index.d.ts",
+      "default": "./dist/breadcrumbs/index.js"
+    },
+    "./button": {
+      "react-native": {
+        "types": "./dist/button/index.native.d.ts",
+        "default": "./dist/button/index.native.js"
+      },
+      "types": "./dist/button/index.d.ts",
+      "default": "./dist/button/index.js"
+    },
+    "./button-group": {
+      "react-native": {
+        "types": "./dist/button-group/index.native.d.ts",
+        "default": "./dist/button-group/index.native.js"
+      },
+      "types": "./dist/button-group/index.d.ts",
+      "default": "./dist/button-group/index.js"
+    },
+    "./callout": {
+      "react-native": {
+        "types": "./dist/callout/index.native.d.ts",
+        "default": "./dist/callout/index.native.js"
+      },
+      "types": "./dist/callout/index.d.ts",
+      "default": "./dist/callout/index.js"
+    },
+    "./card": {
+      "react-native": {
+        "types": "./dist/card/index.native.d.ts",
+        "default": "./dist/card/index.native.js"
+      },
+      "types": "./dist/card/index.d.ts",
+      "default": "./dist/card/index.js"
+    },
+    "./checkbox": {
+      "react-native": {
+        "types": "./dist/checkbox/index.native.d.ts",
+        "default": "./dist/checkbox/index.native.js"
+      },
+      "types": "./dist/checkbox/index.d.ts",
+      "default": "./dist/checkbox/index.js"
+    },
+    "./checkbox-group": {
+      "react-native": {
+        "types": "./dist/checkbox-group/index.native.d.ts",
+        "default": "./dist/checkbox-group/index.native.js"
+      },
+      "types": "./dist/checkbox-group/index.d.ts",
+      "default": "./dist/checkbox-group/index.js"
+    },
+    "./code": {
+      "react-native": {
+        "types": "./dist/code/index.native.d.ts",
+        "default": "./dist/code/index.native.js"
+      },
+      "types": "./dist/code/index.d.ts",
+      "default": "./dist/code/index.js"
+    },
+    "./copy-button": {
+      "react-native": {
+        "types": "./dist/copy-button/index.native.d.ts",
+        "default": "./dist/copy-button/index.native.js"
+      },
+      "types": "./dist/copy-button/index.d.ts",
+      "default": "./dist/copy-button/index.js"
+    },
     "./custom-elements.json": "./custom-elements.json",
+    "./description-list": {
+      "react-native": {
+        "types": "./dist/description-list/index.native.d.ts",
+        "default": "./dist/description-list/index.native.js"
+      },
+      "types": "./dist/description-list/index.d.ts",
+      "default": "./dist/description-list/index.js"
+    },
+    "./dialog": {
+      "react-native": {
+        "types": "./dist/dialog/index.native.d.ts",
+        "default": "./dist/dialog/index.native.js"
+      },
+      "types": "./dist/dialog/index.d.ts",
+      "default": "./dist/dialog/index.js"
+    },
+    "./divider": {
+      "react-native": {
+        "types": "./dist/divider/index.native.d.ts",
+        "default": "./dist/divider/index.native.js"
+      },
+      "types": "./dist/divider/index.d.ts",
+      "default": "./dist/divider/index.js"
+    },
+    "./drawer": {
+      "react-native": {
+        "types": "./dist/drawer/index.native.d.ts",
+        "default": "./dist/drawer/index.native.js"
+      },
+      "types": "./dist/drawer/index.d.ts",
+      "default": "./dist/drawer/index.js"
+    },
+    "./drilldown": {
+      "react-native": {
+        "types": "./dist/drilldown/index.native.d.ts",
+        "default": "./dist/drilldown/index.native.js"
+      },
+      "types": "./dist/drilldown/index.d.ts",
+      "default": "./dist/drilldown/index.js"
+    },
+    "./empty": {
+      "react-native": {
+        "types": "./dist/empty/index.native.d.ts",
+        "default": "./dist/empty/index.native.js"
+      },
+      "types": "./dist/empty/index.d.ts",
+      "default": "./dist/empty/index.js"
+    },
     "./examples.json": "./examples.json",
+    "./flex": {
+      "react-native": {
+        "types": "./dist/flex/index.native.d.ts",
+        "default": "./dist/flex/index.native.js"
+      },
+      "types": "./dist/flex/index.d.ts",
+      "default": "./dist/flex/index.js"
+    },
+    "./format-date": {
+      "react-native": {
+        "types": "./dist/format-date/index.native.d.ts",
+        "default": "./dist/format-date/index.native.js"
+      },
+      "types": "./dist/format-date/index.d.ts",
+      "default": "./dist/format-date/index.js"
+    },
+    "./grid": {
+      "react-native": {
+        "types": "./dist/grid/index.native.d.ts",
+        "default": "./dist/grid/index.native.js"
+      },
+      "types": "./dist/grid/index.d.ts",
+      "default": "./dist/grid/index.js"
+    },
+    "./icon": {
+      "react-native": {
+        "types": "./dist/icon/index.native.d.ts",
+        "default": "./dist/icon/index.native.js"
+      },
+      "types": "./dist/icon/index.d.ts",
+      "default": "./dist/icon/index.js"
+    },
+    "./icon-button": {
+      "react-native": {
+        "types": "./dist/icon-button/index.native.d.ts",
+        "default": "./dist/icon-button/index.native.js"
+      },
+      "types": "./dist/icon-button/index.d.ts",
+      "default": "./dist/icon-button/index.js"
+    },
+    "./image": {
+      "react-native": {
+        "types": "./dist/image/index.native.d.ts",
+        "default": "./dist/image/index.native.js"
+      },
+      "types": "./dist/image/index.d.ts",
+      "default": "./dist/image/index.js"
+    },
     "./jsx": "./types/jsx.d.ts",
+    "./jsx-dev-runtime": {
+      "react-native": {
+        "types": "./dist/jsx-dev-runtime/index.native.d.ts",
+        "default": "./dist/jsx-dev-runtime/index.native.js"
+      }
+    },
+    "./jsx-runtime": {
+      "react-native": {
+        "types": "./dist/jsx-runtime/index.native.d.ts",
+        "default": "./dist/jsx-runtime/index.native.js"
+      }
+    },
+    "./kbd": {
+      "react-native": {
+        "types": "./dist/kbd/index.native.d.ts",
+        "default": "./dist/kbd/index.native.js"
+      },
+      "types": "./dist/kbd/index.d.ts",
+      "default": "./dist/kbd/index.js"
+    },
     "./lint.json": "./lint.json",
+    "./list": {
+      "react-native": {
+        "types": "./dist/list/index.native.d.ts",
+        "default": "./dist/list/index.native.js"
+      },
+      "types": "./dist/list/index.d.ts",
+      "default": "./dist/list/index.js"
+    },
+    "./loader": {
+      "react-native": {
+        "types": "./dist/loader/index.native.d.ts",
+        "default": "./dist/loader/index.native.js"
+      },
+      "types": "./dist/loader/index.d.ts",
+      "default": "./dist/loader/index.js"
+    },
+    "./megamenu": {
+      "react-native": {
+        "types": "./dist/megamenu/index.native.d.ts",
+        "default": "./dist/megamenu/index.native.js"
+      },
+      "types": "./dist/megamenu/index.d.ts",
+      "default": "./dist/megamenu/index.js"
+    },
+    "./menu": {
+      "react-native": {
+        "types": "./dist/menu/index.native.d.ts",
+        "default": "./dist/menu/index.native.js"
+      },
+      "types": "./dist/menu/index.d.ts",
+      "default": "./dist/menu/index.js"
+    },
+    "./meter": {
+      "react-native": {
+        "types": "./dist/meter/index.native.d.ts",
+        "default": "./dist/meter/index.native.js"
+      },
+      "types": "./dist/meter/index.d.ts",
+      "default": "./dist/meter/index.js"
+    },
+    "./motion-toggle": {
+      "react-native": {
+        "types": "./dist/motion-toggle/index.native.d.ts",
+        "default": "./dist/motion-toggle/index.native.js"
+      },
+      "types": "./dist/motion-toggle/index.d.ts",
+      "default": "./dist/motion-toggle/index.js"
+    },
+    "./navigation": {
+      "react-native": {
+        "types": "./dist/navigation/index.native.d.ts",
+        "default": "./dist/navigation/index.native.js"
+      },
+      "types": "./dist/navigation/index.d.ts",
+      "default": "./dist/navigation/index.js"
+    },
+    "./outline": {
+      "react-native": {
+        "types": "./dist/outline/index.native.d.ts",
+        "default": "./dist/outline/index.native.js"
+      },
+      "types": "./dist/outline/index.d.ts",
+      "default": "./dist/outline/index.js"
+    },
     "./package.json": "./package.json",
+    "./popover": {
+      "react-native": {
+        "types": "./dist/popover/index.native.d.ts",
+        "default": "./dist/popover/index.native.js"
+      },
+      "types": "./dist/popover/index.d.ts",
+      "default": "./dist/popover/index.js"
+    },
+    "./progress": {
+      "react-native": {
+        "types": "./dist/progress/index.native.d.ts",
+        "default": "./dist/progress/index.native.js"
+      },
+      "types": "./dist/progress/index.d.ts",
+      "default": "./dist/progress/index.js"
+    },
+    "./qr-code": {
+      "react-native": {
+        "types": "./dist/qr-code/index.native.d.ts",
+        "default": "./dist/qr-code/index.native.js"
+      },
+      "types": "./dist/qr-code/index.d.ts",
+      "default": "./dist/qr-code/index.js"
+    },
+    "./quote": {
+      "react-native": {
+        "types": "./dist/quote/index.native.d.ts",
+        "default": "./dist/quote/index.native.js"
+      },
+      "types": "./dist/quote/index.d.ts",
+      "default": "./dist/quote/index.js"
+    },
+    "./radio": {
+      "react-native": {
+        "types": "./dist/radio/index.native.d.ts",
+        "default": "./dist/radio/index.native.js"
+      },
+      "types": "./dist/radio/index.d.ts",
+      "default": "./dist/radio/index.js"
+    },
     "./rehype": {
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
     },
     "./sandbox/compile-worker.js": "./dist/sandbox/compile-worker.js",
+    "./scroll-area": {
+      "react-native": {
+        "types": "./dist/scroll-area/index.native.d.ts",
+        "default": "./dist/scroll-area/index.native.js"
+      },
+      "types": "./dist/scroll-area/index.d.ts",
+      "default": "./dist/scroll-area/index.js"
+    },
     "./shared": null,
     "./shared/*": null,
+    "./skeleton": {
+      "react-native": {
+        "types": "./dist/skeleton/index.native.d.ts",
+        "default": "./dist/skeleton/index.native.js"
+      },
+      "types": "./dist/skeleton/index.d.ts",
+      "default": "./dist/skeleton/index.js"
+    },
     "./skills/*": "./skills/*",
+    "./skip-link": {
+      "react-native": {
+        "types": "./dist/skip-link/index.native.d.ts",
+        "default": "./dist/skip-link/index.native.js"
+      },
+      "types": "./dist/skip-link/index.d.ts",
+      "default": "./dist/skip-link/index.js"
+    },
     "./specs": null,
+    "./speed-dial": {
+      "react-native": {
+        "types": "./dist/speed-dial/index.native.d.ts",
+        "default": "./dist/speed-dial/index.native.js"
+      },
+      "types": "./dist/speed-dial/index.d.ts",
+      "default": "./dist/speed-dial/index.js"
+    },
+    "./stat": {
+      "react-native": {
+        "types": "./dist/stat/index.native.d.ts",
+        "default": "./dist/stat/index.native.js"
+      },
+      "types": "./dist/stat/index.d.ts",
+      "default": "./dist/stat/index.js"
+    },
+    "./steps": {
+      "react-native": {
+        "types": "./dist/steps/index.native.d.ts",
+        "default": "./dist/steps/index.native.js"
+      },
+      "types": "./dist/steps/index.d.ts",
+      "default": "./dist/steps/index.js"
+    },
     "./svelte": "./types/svelte.d.ts",
+    "./switch": {
+      "react-native": {
+        "types": "./dist/switch/index.native.d.ts",
+        "default": "./dist/switch/index.native.js"
+      },
+      "types": "./dist/switch/index.d.ts",
+      "default": "./dist/switch/index.js"
+    },
+    "./tabs": {
+      "react-native": {
+        "types": "./dist/tabs/index.native.d.ts",
+        "default": "./dist/tabs/index.native.js"
+      },
+      "types": "./dist/tabs/index.d.ts",
+      "default": "./dist/tabs/index.js"
+    },
+    "./tag": {
+      "react-native": {
+        "types": "./dist/tag/index.native.d.ts",
+        "default": "./dist/tag/index.native.js"
+      },
+      "types": "./dist/tag/index.d.ts",
+      "default": "./dist/tag/index.js"
+    },
+    "./text": {
+      "react-native": {
+        "types": "./dist/text/index.native.d.ts",
+        "default": "./dist/text/index.native.js"
+      },
+      "types": "./dist/text/index.d.ts",
+      "default": "./dist/text/index.js"
+    },
+    "./timeline": {
+      "react-native": {
+        "types": "./dist/timeline/index.native.d.ts",
+        "default": "./dist/timeline/index.native.js"
+      },
+      "types": "./dist/timeline/index.d.ts",
+      "default": "./dist/timeline/index.js"
+    },
+    "./toast": {
+      "react-native": {
+        "types": "./dist/toast/index.native.d.ts",
+        "default": "./dist/toast/index.native.js"
+      },
+      "types": "./dist/toast/index.d.ts",
+      "default": "./dist/toast/index.js"
+    },
+    "./toggle": {
+      "react-native": {
+        "types": "./dist/toggle/index.native.d.ts",
+        "default": "./dist/toggle/index.native.js"
+      },
+      "types": "./dist/toggle/index.d.ts",
+      "default": "./dist/toggle/index.js"
+    },
+    "./toolbar": {
+      "react-native": {
+        "types": "./dist/toolbar/index.native.d.ts",
+        "default": "./dist/toolbar/index.native.js"
+      },
+      "types": "./dist/toolbar/index.d.ts",
+      "default": "./dist/toolbar/index.js"
+    },
+    "./tooltip": {
+      "react-native": {
+        "types": "./dist/tooltip/index.native.d.ts",
+        "default": "./dist/tooltip/index.native.js"
+      },
+      "types": "./dist/tooltip/index.d.ts",
+      "default": "./dist/tooltip/index.js"
+    },
+    "./tour": {
+      "react-native": {
+        "types": "./dist/tour/index.native.d.ts",
+        "default": "./dist/tour/index.native.js"
+      },
+      "types": "./dist/tour/index.d.ts",
+      "default": "./dist/tour/index.js"
+    },
+    "./trend": {
+      "react-native": {
+        "types": "./dist/trend/index.native.d.ts",
+        "default": "./dist/trend/index.native.js"
+      },
+      "types": "./dist/trend/index.d.ts",
+      "default": "./dist/trend/index.js"
+    },
     "./vue": "./types/vue.d.ts",
     "./words": {
       "types": "./types/words.d.ts",
@@ -56,21 +532,23 @@
   "sideEffects": true,
   "scripts": {
     "analyze": "bun --bun helix-cem",
-    "build": "bun run element-events && bun run compile-worker && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "build": "bun run element-events && bun run components && bun run compile-worker && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json && tsc -p tsconfig.native.json && tsc -p tsconfig.native-types.json",
     "compile-worker": "bun scripts/build-compile-worker.mjs",
+    "components": "helix family components",
     "element-events": "build-element-events --package styled",
-    "styles": "build-styles .",
+    "styles": "helix family stylesheets && build-styles .",
     "test": "bun run element-events && bun run compile-worker && bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test --conditions helix-development dom.spec",
     "test:pure": "bun test --conditions helix-development pure.spec",
     "test:ssr": "bun test --conditions helix-development ssr.spec",
-    "typecheck": "bun run element-events && bun run compile-worker && tsc -p tsconfig.json --noEmit && bun run typecheck:examples",
+    "typecheck": "bun run element-events && bun run components && bun run compile-worker && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.native.json --noEmit && bun run typecheck:examples",
     "typecheck:examples": "tsc -p tsconfig.examples.json"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
     "@fusion.dev/helix-core": "workspace:*",
     "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-native": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
     "tslib": "^2.8.1"
   },
@@ -81,6 +559,7 @@
     "@happy-dom/global-registrator": "^21.0.4",
     "@lit-labs/ssr": "^4.1.0",
     "@types/bun": "^1.4.4",
+    "@types/react": "^19.3.0",
     "lit": "^3.2.1",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
@@ -96,7 +575,29 @@
     "lit"
   ],
   "peerDependencies": {
-    "lit": "^3.2.1"
+    "lit": "^3.2.1",
+    "react": "^19",
+    "react-native": "*",
+    "react-native-gesture-handler": "^3",
+    "react-native-reanimated": "^4",
+    "react-native-worklets": "*"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-gesture-handler": {
+      "optional": true
+    },
+    "react-native-reanimated": {
+      "optional": true
+    },
+    "react-native-worklets": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"

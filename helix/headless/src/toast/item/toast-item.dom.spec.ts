@@ -132,9 +132,14 @@ describe('one toast message', () => {
      before anyone could read it. */
   test('holds its clock while the page is hidden, and runs it again once shown', async () => {
     let hidden = false
-    Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden })
+    /* The timers capability reads `visibilityState`, as the clock a phone
+       runs reads the app's state. */
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (hidden ? 'hidden' : 'visible'),
+    })
     restore = () => {
-      delete (document as unknown as { hidden?: boolean }).hidden
+      delete (document as unknown as { visibilityState?: string }).visibilityState
     }
     const item = await message('duration="60"')
     hidden = true

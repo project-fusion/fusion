@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMegamenu } from '@fusion.dev/helix-headless/megamenu'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './megamenu-root.css.js'
+import { styles } from './megamenu-root.generated.css.js'
 
 /**
  * @summary A section of a navigation with a trigger that opens a panel of links.
@@ -10,8 +10,13 @@ import { styles } from './megamenu-root.css.js'
  * Styles the trigger and lays out the panel it opens as a grid of columns. What
  * opens and closes the panel comes from the base class.
  *
- * **The panel's contents are laid out by `helix.css`**, through attributes you
- * write on your own markup: `data-megamenu-group` on each column,
+ * **The panel holds `MegamenuGroup`s of `MegamenuItem`s**, which draw as the
+ * recipes below draw your own markup, and which a page that shares its code
+ * with a phone app writes. On a phone the panel is the band whatever the
+ * width.
+ *
+ * **Your own markup is laid out by `helix.css`**, through attributes you
+ * write on it: `data-megamenu-group` on each column,
  * `data-megamenu-heading` on a column's heading, and `data-megamenu-item` on a
  * link that carries a title in `<strong>` and a line of description in `<span>`
  * or `<p>`, with an icon before them. A plain `<a>` in a group is drawn as a

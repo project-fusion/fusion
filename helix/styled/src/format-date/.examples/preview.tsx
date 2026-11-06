@@ -25,6 +25,7 @@ export function Example() {
         <helix-format-date
           date={at}
           elapsed
+          frozen
         ></helix-format-date>
       </helix-text>
 

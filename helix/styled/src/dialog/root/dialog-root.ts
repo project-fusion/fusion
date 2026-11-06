@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDialog } from '@fusion.dev/helix-headless/dialog'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './dialog-root.css.js'
+import { styles } from './dialog-root.generated.css.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.

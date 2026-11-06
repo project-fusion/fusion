@@ -12,6 +12,7 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../../button/index.js')
+  await import('../../icon-button/index.js')
 })
 
 /* The stylesheet the element adopts, as text. happy-dom resolves no cascade,
@@ -136,6 +137,42 @@ describe('button group', () => {
     const resolved = rule(':host([selection-mode])')
     expect(resolved).toContain('--button-group-pressed-background-color')
     expect(resolved).toContain('--button-group-pressed-color')
+  })
+
+  test('a pressed icon button takes the same solid fill through its own hooks', async () => {
+    const host =
+      (await mount(`<helix-button-group label="Format" selection-mode="multiple" value="bold">
+        <helix-icon-button label="Bold" value="bold"></helix-icon-button>
+        <helix-icon-button label="Italic" value="italic"></helix-icon-button>
+      </helix-button-group>`)) as Updatable & { requestUpdate(): void; value: string }
+    const buttons = [...host.querySelectorAll('helix-icon-button')] as Updatable[]
+    for (const button of buttons) {
+      await button.updateComplete
+    }
+    const hooks = async (): Promise<string[][]> => {
+      host.requestUpdate()
+      await host.updateComplete
+      await new Promise((done) => setTimeout(done, 0))
+      return buttons.map((button) => {
+        const control = button.shadowRoot?.querySelector<HTMLElement>('[part="button"]')
+        return ['background', 'border', 'foreground'].map(
+          (hook) => control?.style.getPropertyValue(`--icon-button-${hook}-color`) ?? 'no control',
+        )
+      })
+    }
+    expect(await hooks()).toEqual([
+      [
+        'var(--_button-group-pressed-background)',
+        'var(--_button-group-pressed-border)',
+        'var(--_button-group-pressed-foreground)',
+      ],
+      ['', '', ''],
+    ])
+    host.value = ''
+    expect(await hooks()).toEqual([
+      ['', '', ''],
+      ['', '', ''],
+    ])
   })
 
   test('size reaches a native button too, and only under size', () => {

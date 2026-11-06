@@ -1,0 +1,86 @@
+import type { Family, Scenario, Staged } from './format.js'
+import { ACCORDION } from './scenarios/accordion.js'
+import { ANNOUNCEMENT } from './scenarios/announcement.js'
+import { APP_HEADER } from './scenarios/app-header.js'
+import { BUTTON } from './scenarios/button.js'
+import { BUTTON_GROUP } from './scenarios/button-group.js'
+import { CALLOUT } from './scenarios/callout.js'
+import { CHECKBOX_GROUP } from './scenarios/checkbox-group.js'
+import { COPY_BUTTON } from './scenarios/copy-button.js'
+import { DIALOG } from './scenarios/dialog.js'
+import { DRAWER } from './scenarios/drawer.js'
+import { DRILLDOWN } from './scenarios/drilldown.js'
+import { FORMAT_DATE } from './scenarios/format-date.js'
+import { IMAGE } from './scenarios/image.js'
+import { LIST } from './scenarios/list.js'
+import { LOADER } from './scenarios/loader.js'
+import { MEGAMENU } from './scenarios/megamenu.js'
+import { MENU } from './scenarios/menu.js'
+import { NAVIGATION } from './scenarios/navigation.js'
+import { OUTLINE } from './scenarios/outline.js'
+import { POPOVER } from './scenarios/popover.js'
+import { QR_CODE } from './scenarios/qr-code.js'
+import { SCROLL_AREA } from './scenarios/scroll-area.js'
+import { SPEED_DIAL } from './scenarios/speed-dial.js'
+import { TABS } from './scenarios/tabs.js'
+import { TAG_GROUP } from './scenarios/tag-group.js'
+import { TIMELINE } from './scenarios/timeline.js'
+import { TOAST } from './scenarios/toast.js'
+import { CHECKBOX, MOTION_TOGGLE, SWITCH, TOGGLE } from './scenarios/toggle.js'
+import { TOGGLE_GROUP } from './scenarios/toggle-group.js'
+import { TOOLBAR } from './scenarios/toolbar.js'
+import { TOOLTIP } from './scenarios/tooltip.js'
+import { TOUR } from './scenarios/tour.js'
+
+export * from './clock.js'
+export * from './compare.js'
+export * from './format.js'
+export * from './images.js'
+export * from './setup.js'
+
+/** Every family's scenarios, by the family's name. */
+export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
+  accordion: ACCORDION,
+  announcement: ANNOUNCEMENT,
+  'app-header': APP_HEADER,
+  button: BUTTON,
+  'button-group': BUTTON_GROUP,
+  callout: CALLOUT,
+  checkbox: CHECKBOX,
+  'checkbox-group': CHECKBOX_GROUP,
+  'copy-button': COPY_BUTTON,
+  dialog: DIALOG,
+  drawer: DRAWER,
+  drilldown: DRILLDOWN,
+  'format-date': FORMAT_DATE,
+  image: IMAGE,
+  list: LIST,
+  loader: LOADER,
+  megamenu: MEGAMENU,
+  menu: MENU,
+  'motion-toggle': MOTION_TOGGLE,
+  navigation: NAVIGATION,
+  outline: OUTLINE,
+  popover: POPOVER,
+  'qr-code': QR_CODE,
+  'scroll-area': SCROLL_AREA,
+  'speed-dial': SPEED_DIAL,
+  switch: SWITCH,
+  tabs: TABS,
+  'tag-group': TAG_GROUP,
+  timeline: TIMELINE,
+  toast: TOAST,
+  toggle: TOGGLE,
+  'toggle-group': TOGGLE_GROUP,
+  toolbar: TOOLBAR,
+  tooltip: TOOLTIP,
+  tour: TOUR,
+}
+
+/**
+ * The scenarios written before their family's native component exists, by
+ * the family's name. The web half runs them and records them, and neither
+ * React Native nor the comparison reads them until the family moves to
+ * `SCENARIOS`. None is staged now.
+ */
+export const STAGED: Readonly<Record<Staged, readonly Scenario[]>> = {}
