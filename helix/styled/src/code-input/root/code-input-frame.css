@@ -142,7 +142,7 @@
   flex: 0 1000000 auto;
   font-size: max(var(--helix-text-field-min), var(--helix-text-field));
   grid-template-columns: minmax(0, round(12.57em, 1px));
-  margin-inline-start: calc(var(--_field-gap, var(--helix-space-2xs)) * -1);
+  margin-inline-start: calc(var(--helix-space-2xs) * -1);
 }
 
 /* **An icon at either end is the size of the marks the field draws itself**,
