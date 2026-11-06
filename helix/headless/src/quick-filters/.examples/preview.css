@@ -7,6 +7,10 @@
   --_page: light-dark(#ffffff, #121214);
 }
 
+helix-headless-quick-filters {
+  display: block;
+}
+
 helix-headless-quick-filters::part(list) {
   background-color: var(--_gray-subtle);
   border-radius: 999px;
