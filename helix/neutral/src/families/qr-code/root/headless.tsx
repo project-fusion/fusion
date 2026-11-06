@@ -31,7 +31,7 @@ export default headless('qr-code', {
   events: {
     error: { arrives: true, bare: true, follows: 'overflowed' },
   },
-  states: ['overflow', 'settled'],
+  states: ['empty', 'overflow', 'settled'],
   derived: {
     drawn: derive('qr-code-drawn'),
     finders: derive('qr-code-finders'),

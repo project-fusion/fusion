@@ -26,7 +26,7 @@ export default headless('skeleton', {
     loading: false,
   },
   events: {},
-  states: ['settled', 'wrapping'],
+  states: ['settled', 'wrapping', 'wrappingBlock'],
   derived: {
     lineCount: derive('skeleton-lines'),
     paragraph: derive('skeleton-paragraph'),
@@ -68,6 +68,19 @@ export default headless('skeleton', {
           </Repeat>
         </View>
       )}
+      {/* Over a wrapped field, a shape for each of its pieces, which the web's
+          element measures. */}
+      <View
+        part="pieces"
+        platform="web"
+      >
+        <View
+          also={{ piece: true }}
+          part="skeleton"
+        >
+          <View part="sheen" />
+        </View>
+      </View>
     </>
   ),
 })

@@ -15,6 +15,7 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
+import { bind } from '../../../tree.js'
 
 /**
  * Number Input's headless tier: what it takes, what it sends, and its parts.
@@ -90,7 +91,8 @@ export default headless('number-input', {
     change: bare(),
     input: bare(),
   },
-  states: ['atMax', 'atMin', 'invalid', 'scrubbing', 'settled'],
+  states: ['atMax', 'atMin', 'hasEnd', 'hasStart', 'invalid', 'scrubbing', 'settled'],
+  derived: { hasEnd: bind('end'), hasStart: bind('start') },
   text: {
     defaultProp: 'defaultValue',
     onBeforeChange: 'beforeChange',
