@@ -1,4 +1,14 @@
-import { difference, list, native, safeArea, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  native,
+  quotient,
+  safeArea,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -180,8 +190,61 @@ export default styles(
     /* Zoom out and zoom in, under the close control: out first, as a scale reads. */
     on(['zoom-in', 'zoom-out'], [rule({ insetBlockEnd: hook.padding })]),
     on('zoom-in', [rule({ insetInlineEnd: hook.padding })]),
+    /* On a touch screen the two stand a press apart, so neither takes the other's. */
     on('zoom-out', [
-      rule({ insetInlineEnd: sum(hook.padding, hook.controlSize, token('space-xs')) }),
+      rule({
+        insetInlineEnd: sum(
+          hook.padding,
+          hook.controlSize,
+          fn('max', token('space-xs'), difference(token('size-target'), hook.controlSize)),
+        ),
+      }),
+    ]),
+    /* The press reaches `--helix-size-target`, in a transparent box, so nothing drawn moves. */
+    on({ after: 'previous' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'next' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'dismiss' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'zoom-in' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
+    ]),
+    on({ after: 'zoom-out' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on({ inner: 'svg', part: 'previous' }, [web([rule(glyph)])]),
     on({ inner: 'svg', part: 'next' }, [web([rule(glyph)])]),

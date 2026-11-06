@@ -62,7 +62,6 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['menu/section/menu-section.generated.css', '[part="heading"]', 'color'],
   ['notifications/group/notification-group.generated.css', '[part="count"]', 'color'],
   ['notifications/notification/notification.generated.css', '[part="dismiss"]', 'color'],
-  ['log/line/log-line.generated.css', '[part="count"]', 'color'],
   [
     'notifications/notification/notification.generated.css',
     '[part="trailing"] > :not([part="controls"])',
