@@ -15,6 +15,7 @@ import { styles } from './table-column.css.js'
  * @aliases Column header, Th
  * @documentation https://fusion.dev/helix/components/table
  *
+ * @cssproperty --table-column-pinned-background-color - The fill behind a pinned heading, which covers the headings that scroll under it. The page's background by default.
  * @cssproperty --table-padding-block - The space above and below a heading's words. Unset,
  * the heading takes none, and its height comes from its own least height.
  * @cssproperty --table-rule-color - The color of the line under the headings. It takes a

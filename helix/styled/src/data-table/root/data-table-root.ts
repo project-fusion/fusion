@@ -85,6 +85,7 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-more-radius - The corner radius of the button in the `load-more` row.
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
+ * @cssproperty --data-table-pinned-background-color - The fill behind a pinned column's cells, which covers the cells that scroll under them. The page's background by default.
  * @cssproperty --data-table-row-background-color - The fill across a row. A row generates no box, so a `::part(row)` rule sets this for its cells, as `::part(row):hover` does for a hover.
  * @cssproperty --data-table-row-hover-background-color - The fill across a row while the pointer is over it.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a

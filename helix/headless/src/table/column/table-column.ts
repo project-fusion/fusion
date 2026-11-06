@@ -118,7 +118,11 @@ export { edgeOf } from '../edge.js'
  * @csspart sort-mark - The two chevrons on a sortable heading. To remove them, set `display: none` on this part.
  * @csspart sort-up - The upper chevron of `sort-mark`, which shows an ascending sort.
  *
+ * @cssproperty --table-column-pin-offset - How far a pinned column's heading stays from its end of the row, in pixels: the width of the pinned columns before it. The column writes it on `column` while a `DataTable` pins it.
+ *
  * @cssstate has-menu - While the heading draws its menu button.
+ * @cssstate pinned-end - While a `DataTable` pins the column to the end of the row.
+ * @cssstate pinned-start - While a `DataTable` pins the column to the start of the row.
  * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
  * @cssstate sorted-descending - While the table is sorted by this column, largest first.
  */
@@ -415,6 +419,21 @@ export class HelixHeadlessTableColumn extends HelixElement {
   movable = false
 
   /**
+   * @internal The end of the row this column is pinned to, written by the
+   * `DataTable` whose view pins it. Not a consumer's to set: `view.columns`
+   * is the setting.
+   */
+  @state()
+  pinned: 'end' | 'start' | undefined = undefined
+
+  /**
+   * @internal How far from its end of the row a pinned column stays, in
+   * pixels: the width of the pinned columns before it. Written by the table.
+   */
+  @state()
+  pinOffset = 0
+
+  /**
    * @internal Whether the column is a cell of a grid that moves focus between
    * its cells, written by that table. Not a consumer's to set.
    *
@@ -566,6 +585,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
     this.toggleState('has-menu', this.drawsMenu)
     this.toggleState('sorted-ascending', this.sorted === 'ascending')
     this.toggleState('sorted-descending', this.sorted === 'descending')
+    this.toggleState('pinned-start', this.pinned === 'start')
+    this.toggleState('pinned-end', this.pinned === 'end')
   }
 
   /**
@@ -756,6 +777,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     const hasMenu = this.drawsMenu
     return html`<span
       part="column"
+      style=${this.pinned ? `--table-column-pin-offset: ${this.pinOffset}px` : nothing}
       role=${grid ? 'columnheader' : nothing}
       tabindex=${grid ? (this.tabStop ? '0' : '-1') : nothing}
       aria-sort=${grid && this.canSort ? (this.sorted ?? 'none') : nothing}

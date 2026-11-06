@@ -721,3 +721,21 @@ slot[name="error"]::slotted(*) {
   text-decoration-thickness: var(--helix-border-thick);
   text-underline-offset: 0.2em;
 }
+
+/* A pinned column's cells stay at their end of the row while the grid scrolls
+   sideways, on the page's ground so the cells passing under them do not show
+   through. */
+[part~="cell-pinned-start"],
+[part~="cell-pinned-end"] {
+  background-color: var(--data-table-pinned-background-color, var(--helix-color-background));
+  position: sticky;
+  z-index: 1;
+}
+
+[part~="cell-pinned-start"] {
+  inset-inline-start: var(--data-table-pin-offset, 0px);
+}
+
+[part~="cell-pinned-end"] {
+  inset-inline-end: var(--data-table-pin-offset, 0px);
+}
