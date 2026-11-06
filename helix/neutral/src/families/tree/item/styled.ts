@@ -64,9 +64,9 @@ export default styles(
       rowHoverBackgroundColor: token('color-hover'),
       rowHoverColor: token('color-foreground'),
       rowRadius: token('radii-sm'),
-      rowSelectedBackgroundColor: token('color-primary-subtle'),
+      rowSelectedBackgroundColor: token('color-selected'),
       rowSelectedColor: token('color-foreground'),
-      rowSize: token('size-control-tight'),
+      rowSize: null,
     },
     own: {
       treeBleed: null,
@@ -79,6 +79,7 @@ export default styles(
       treeNestedText: null,
       treePad: null,
       treeReserve: null,
+      treeRow: null,
       treeRowFill: null,
       treeRowInk: null,
       treeText: null,
@@ -88,7 +89,8 @@ export default styles(
   ({ hook, keyframes, on, own, rule }) => {
     const step = first(hook.indent, sum(own.treeChevron, token('space-2xs')))
     const inset = sum(own.treeInset, product(difference(measured('tree-level', 1), 1), step))
-    const size = first(hook.checkboxSize, own.treeChevron)
+    /* Checkbox's own size and edge, so a tree's box reads as the box a form draws. */
+    const size = first(hook.checkboxSize, token('size-checkbox'))
     /* An icon passed in the chevron's place is sized, colored and turned the same way. */
     const turned = [
       rule({ transform: 'rotate(-90deg)' }),
@@ -122,11 +124,24 @@ export default styles(
                for one, so a top-level row's words start on the tree's edge, and
                every level steps in from there by the indent as it did. */
             treeInset: own.treeBleed(token('space-xs')),
-            /* From the target size, so `md` is exactly `space-xs`, and a
-               `data-density="sm"` region's rows keep up with its controls. */
-            treePad: quotient(difference(token('size-control-tight'), '1rem'), 2),
+            /* A control's height less the hair between rows, so a row and its gap are
+               one control step, and a `data-density` region's rows keep up. */
+            treeRow: hook.rowSize(difference(token('size-control'), hook.gap)),
           },
         }),
+        /* The padding centers one line in the row, a whole pixel. */
+        web([
+          rule({
+            own: {
+              treePad: fn(
+                'max',
+                token('space-none'),
+                fn('round', 'down', quotient(difference(own.treeRow, '1lh'), 2), '1px'),
+              ),
+            },
+          }),
+        ]),
+        native([rule({ own: { treePad: quotient(difference(own.treeRow, '1rem'), 2) } })]),
       ]),
       on('item', [
         rule({ borderRadius: token('radii-sm') }),
@@ -153,7 +168,7 @@ export default styles(
           /* A hair between rows, on the row, or a parent's under its last child's
              adds up. */
           marginBlockEnd: hook.gap,
-          minBlockSize: hook.rowSize,
+          minBlockSize: own.treeRow,
           /* Out by the bleed on both sides, which the inset above gives back. */
           marginInline: product(own.treeBleed(token('space-none')), '-1'),
           paddingBlock: own.treePad,
@@ -161,8 +176,7 @@ export default styles(
           paddingInlineStart: inset,
           position: 'relative',
           web: {
-            /* One line plus the padding, floored at the target size. */
-            blockSize: fn('max', hook.rowSize, sum('1lh', product(own.treePad, 2))),
+            blockSize: own.treeRow,
             cursor: 'pointer',
             transition: ['background-color', token('duration-fast'), token('easing-standard')],
             userSelect: 'none',
@@ -200,6 +214,23 @@ export default styles(
           { selected: true },
           { backgroundColor: hook.rowSelectedBackgroundColor, color: hook.rowSelectedColor },
         ),
+        /* A chosen row presses darker, past its wash; forced colors outline it. */
+        web([
+          rule(
+            [
+              { active: true, disabled: false, selected: true },
+              { canHover: true, disabled: false, hover: true, selected: true },
+            ],
+            { backgroundColor: token('color-press') },
+          ),
+          rule(
+            { forcedColors: true, selected: true },
+            {
+              outline: [token('border-thick'), 'solid', 'Highlight'],
+              outlineOffset: product(token('border-thick'), '-1'),
+            },
+          ),
+        ]),
         /* A checked row is marked by its box alone, unless a page asks for more. */
         web([
           rule(
@@ -271,7 +302,7 @@ export default styles(
         rule({
           alignSelf: 'center',
           blockSize: own.treeChevron,
-          color: token('color-foreground-subtle'),
+          color: token('color-foreground-muted'),
           flex: '0 0 auto',
           inlineSize: own.treeChevron,
           marginInlineStart: hook.chevronGap,
@@ -291,7 +322,7 @@ export default styles(
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
-          web: { alignSelf: 'stretch' },
+          web: { alignContent: 'center', alignSelf: 'stretch' },
         }),
         native([rule({ part: { 'data-tight': true } }, { flex: '0 1 auto' })]),
       ]),
@@ -381,7 +412,7 @@ export default styles(
         rule({
           alignSelf: 'center',
           blockSize: own.treeChevron,
-          color: token('color-foreground-subtle'),
+          color: token('color-foreground-muted'),
           flex: '0 0 auto',
           inlineSize: own.treeChevron,
           marginInlineStart: hook.chevronGap,
@@ -401,7 +432,7 @@ export default styles(
           border: [
             token('border-thin'),
             'solid',
-            first(hook.checkboxBorderColor, token('color-border')),
+            first(hook.checkboxBorderColor, token('color-foreground-subtle')),
           ],
           borderRadius: token('radii-sm'),
           color: hook.checkboxMarkColor,
@@ -449,7 +480,7 @@ export default styles(
               insetInline: 0,
               pointerEvents: 'none',
               position: 'absolute',
-              zIndex: 1,
+              zIndex: token('layer-raised'),
             },
           ),
         ]),
@@ -466,7 +497,7 @@ export default styles(
               insetInline: 0,
               pointerEvents: 'none',
               position: 'absolute',
-              zIndex: 1,
+              zIndex: token('layer-raised'),
             },
           ),
         ]),
