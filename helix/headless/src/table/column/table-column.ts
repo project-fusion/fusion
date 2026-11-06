@@ -178,6 +178,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   field = ''
 
   /**
+   * Offers the column as a filter, in a `DataTable` bound to a `FilterInput`.
+   * The field lists the column with the comparisons its `type` offers, and an
+   * enum column lists its values with how many rows hold each.
+   */
+  @property({ type: Boolean })
+  filterable = false
+
+  /**
    * Draws a button in the heading that opens a menu of what you can do with the
    * column, in a `DataTable`.
    *
@@ -261,6 +269,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   rowHeader = false
 
   /**
+   * Searches the column's values, in a `DataTable`. While no column sets it,
+   * the search reads every column with a `field`. Once one does, it reads only
+   * the columns that set it, so a search for a name does not match an id.
+   */
+  @property({ type: Boolean })
+  searchable = false
+
+  /**
    * Whether the table can be sorted by this column.
    *
    * Ignored without a `field`, and silently: a column with nothing to sort by
@@ -310,6 +326,19 @@ export class HelixHeadlessTableColumn extends HelixElement {
   textAlign?: 'center' | 'end' | 'start'
 
   /**
+   * What the column holds: `text`, `number`, `date`, `enum` or `boolean`.
+   *
+   * In a `DataTable` the type picks the comparisons the column's filter
+   * offers. Text is contains, is, is not and is empty. Numbers compare as
+   * numbers, with between. Dates compare by the day, with before, after and
+   * between. An enum is any of or none of its values, and the table counts how
+   * many rows hold each value. A boolean is yes or no. Left unset, the column
+   * holds text.
+   */
+  @property()
+  type?: ColumnType
+
+  /**
    * Where the content of this column's cells sits from top to bottom, when a
    * row is taller than it: `start`, `center` or `end`.
    *
@@ -355,35 +384,6 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property()
   width = ''
-
-  /**
-   * What the column holds: `text`, `number`, `date`, `enum` or `boolean`.
-   *
-   * In a `DataTable` the type picks the comparisons the column's filter
-   * offers. Text is contains, is, is not and is empty. Numbers compare as
-   * numbers, with between. Dates compare by the day, with before, after and
-   * between. An enum is any of or none of its values, and the table counts how
-   * many rows hold each value. A boolean is yes or no. Left unset, the column
-   * holds text.
-   */
-  @property()
-  type?: ColumnType
-
-  /**
-   * Offers the column as a filter, in a `DataTable` bound to a `FilterInput`.
-   * The field lists the column with the comparisons its `type` offers, and an
-   * enum column lists its values with how many rows hold each.
-   */
-  @property({ type: Boolean })
-  filterable = false
-
-  /**
-   * Searches the column's values, in a `DataTable`. While no column sets it,
-   * the search reads every column with a `field`. Once one does, it reads only
-   * the columns that set it, so a search for a name does not match an id.
-   */
-  @property({ type: Boolean })
-  searchable = false
 
   /**
    * The text screen readers announce for the column's width. `{width}` is

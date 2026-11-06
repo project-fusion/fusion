@@ -115,3 +115,11 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* A tool that arranges a table on screen has nothing to say on paper, where
+   the table prints as it was arranged. */
+@media print {
+  :host {
+    display: none;
+  }
+}

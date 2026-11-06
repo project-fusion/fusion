@@ -137,6 +137,35 @@ export const readView = (value: unknown): DataTableView => {
   })
 }
 
+/**
+ * Reads a partial view from a value that may have come from anywhere, keeping
+ * only the parts it names, so a preset that names its filters leaves the sort
+ * alone.
+ */
+export const readPartialView = (value: unknown): PartialView => {
+  if (!value || typeof value !== 'object') {
+    return {}
+  }
+  const whole = readView(value)
+  const named = value as Record<string, unknown>
+  const columns = named.columns as Record<string, unknown> | undefined
+  return {
+    ...('filters' in named ? { filters: whole.filters } : {}),
+    ...('pageSize' in named ? { pageSize: whole.pageSize } : {}),
+    ...('query' in named ? { query: whole.query } : {}),
+    ...('sort' in named ? { sort: whole.sort } : {}),
+    ...(columns && typeof columns === 'object'
+      ? {
+          columns: Object.fromEntries(
+            (['hidden', 'order', 'pinned', 'widths'] as const)
+              .filter((key) => key in columns)
+              .map((key) => [key, whole.columns[key]]),
+          ),
+        }
+      : {}),
+  }
+}
+
 /** Reads a view from JSON. Text that is not JSON reads as a view with nothing changed. */
 export const parseView = (json: string): DataTableView => {
   try {

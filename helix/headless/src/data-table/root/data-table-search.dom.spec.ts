@@ -6,21 +6,23 @@ import { mount as mountMarkup, registerDom } from '@fusion.dev/helix-testing/dom
    reads, and says how many of every row it left. happy-dom has no registry,
    so the spec gives it one that keeps the ranges. */
 
-const painted = new Map<string, { ranges: Range[] }>()
+/* A browser keeps the real registry, and the spec reads it there. */
+const painted = new Map<string, Iterable<Range>>()
 
 beforeAll(async () => {
   registerDom()
-  ;(globalThis as { Highlight?: unknown }).Highlight = class {
-    ranges: Range[]
-    constructor(...ranges: Range[]) {
-      this.ranges = ranges
+  if (globalThis.CSS?.highlights === undefined) {
+    ;(globalThis as { Highlight?: unknown }).Highlight = class extends Set<Range> {
+      constructor(...ranges: Range[]) {
+        super(ranges)
+      }
     }
+    /* `CSS` may be a new object on each read, so the registry goes on its prototype. */
+    Object.defineProperty(Object.getPrototypeOf(globalThis.CSS), 'highlights', {
+      configurable: true,
+      get: () => painted,
+    })
   }
-  /* `CSS` may be a new object on each read, so the registry goes on its prototype. */
-  Object.defineProperty(Object.getPrototypeOf(globalThis.CSS), 'highlights', {
-    configurable: true,
-    get: () => painted,
-  })
   await import('../index.js')
   await import('../../table/index.js')
 })
@@ -52,7 +54,10 @@ const settle = async (element: Table): Promise<void> => {
 }
 
 const marked = (): string[] =>
-  (painted.get('helix-filter-match')?.ranges ?? []).map((range) => range.toString())
+  [
+    ...((CSS.highlights as unknown as Map<string, Iterable<Range>>).get('helix-filter-match') ??
+      []),
+  ].map((range) => range.toString())
 
 test('a search marks where it matches, and an empty one takes the marks away', async () => {
   const element = await table()

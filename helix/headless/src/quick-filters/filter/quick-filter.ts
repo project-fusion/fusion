@@ -1,38 +1,7 @@
 import { customElement, HelixElement, numberConverter } from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { type PartialView, readView } from '../../data-table/view.js'
-
-/** Reads a partial view written as JSON, keeping only the parts it names. */
-const readPart = (value: string | null): PartialView => {
-  let given: unknown
-  try {
-    given = JSON.parse(value ?? '')
-  } catch {
-    return {}
-  }
-  if (!given || typeof given !== 'object') {
-    return {}
-  }
-  const whole = readView(given)
-  const named = given as Record<string, unknown>
-  const columns = named.columns as Record<string, unknown> | undefined
-  return {
-    ...('filters' in named ? { filters: whole.filters } : {}),
-    ...('pageSize' in named ? { pageSize: whole.pageSize } : {}),
-    ...('query' in named ? { query: whole.query } : {}),
-    ...('sort' in named ? { sort: whole.sort } : {}),
-    ...(columns && typeof columns === 'object'
-      ? {
-          columns: Object.fromEntries(
-            (['hidden', 'order', 'pinned', 'widths'] as const)
-              .filter((key) => key in columns)
-              .map((key) => [key, whole.columns[key]]),
-          ),
-        }
-      : {}),
-  }
-}
+import { type PartialView, readPartialView } from '../../data-table/view.js'
 
 /**
  * @summary One preset in a Quick Filters row: a name and the parts of a Data Table's view it sets.
@@ -60,13 +29,6 @@ const readPart = (value: string | null): PartialView => {
 @customElement('helix-headless-quick-filter')
 export class HelixHeadlessQuickFilter extends HelixElement {
   /**
-   * The parts of the table's view the preset sets. Written as an attribute it
-   * is read as JSON, and only the parts it names are set.
-   */
-  @property({ converter: { fromAttribute: readPart } })
-  view: PartialView = {}
-
-  /**
    * How many rows the preset shows, where the table cannot count them, as a
    * table in `server` mode cannot. Left unset, the row counts the rows the
    * table holds.
@@ -74,8 +36,25 @@ export class HelixHeadlessQuickFilter extends HelixElement {
   @property({ converter: numberConverter('count', undefined) })
   count?: number
 
+  /**
+   * The parts of the table's view the preset sets, as JSON, such as
+   * `{"filters":[{"field":"status","operator":"any","values":["Overdue"]}]}`.
+   * Only the parts it names are set.
+   */
+  @property()
+  view = ''
+
   /** @internal Read by the row that draws the preset. */
   readonly isQuickFilter = true
+
+  /** The parts of the view the preset sets, read from `view`. Text that is not JSON sets nothing. */
+  get parts(): PartialView {
+    try {
+      return readPartialView(JSON.parse(this.view))
+    } catch {
+      return {}
+    }
+  }
 
   protected override render(): TemplateResult {
     return html`<slot></slot>`

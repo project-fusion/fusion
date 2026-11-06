@@ -372,6 +372,21 @@ export class HelixHeadlessFilterInput extends MixinVoice(
   filterSuggestions = false
 
   /**
+   * The id of a `DataTable` the field filters, in the same document or
+   * shadow root.
+   *
+   * Bound, the field searches the table as you type and offers each
+   * `filterable` column as a filter. Typing `status:open` makes a chip, and
+   * the suggestions list the columns and then a column's values, each with how
+   * many rows hold it. Every chip is a filter in the table's `view`, and a
+   * change to the view from anywhere else redraws the chips. Filters on
+   * different columns all have to match, and the values in one chip are any
+   * of. A `source` you set wins over the table's suggestions.
+   */
+  @property()
+  for = ''
+
+  /**
    * Whether the suggestions are still loading, such as while a request for the
    * values of a typed key is out.
    *
@@ -417,21 +432,6 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    */
   @property({ attribute: false })
   source?: FilterSource | undefined
-
-  /**
-   * The id of a `DataTable` the field filters, in the same document or
-   * shadow root.
-   *
-   * Bound, the field searches the table as you type and offers each
-   * `filterable` column as a filter. Typing `status:open` makes a chip, and
-   * the suggestions list the columns and then a column's values, each with how
-   * many rows hold it. Every chip is a filter in the table's `view`, and a
-   * change to the view from anywhere else redraws the chips. Filters on
-   * different columns all have to match, and the values in one chip are any
-   * of. A `source` you set wins over the table's suggestions.
-   */
-  @property()
-  for = ''
 
   /**
    * What a reader hears for one suggestion, where `suggestions-label` should

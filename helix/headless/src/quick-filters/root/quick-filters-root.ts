@@ -88,29 +88,37 @@ export class HelixHeadlessQuickFilters extends HelixElement {
    */
   static words = 'helix-quick-filters'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Quick filters'
+
   /** The id of the `DataTable` the presets set the view of, in the same document or shadow root. */
   @property()
   for = ''
 
-  /** The name of the row of presets. */
-  @words
+  /**
+   * The name of the list, which a screen reader announces before its items.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Quick filters'
+  label = ''
 
-  /** The words on the button that saves the view. Empty draws no button. */
+  /** The name of the button that removes a saved view. `{name}` is the view's name. */
   @words
-  @property({ attribute: 'save-label' })
-  saveLabel = 'Save view'
+  @property({ attribute: 'remove-label' })
+  removeLabel = 'Remove {name}'
 
   /** The name a saved view is given. `{count}` is how many views are saved, with this one. */
   @words
   @property({ attribute: 'saved-label' })
   savedLabel = 'View {count}'
 
-  /** The name of the button that removes a saved view. `{name}` is the view's name. */
+  /** The words on the button that saves the view. Empty draws no button. */
   @words
-  @property({ attribute: 'remove-label' })
-  removeLabel = 'Remove {name}'
+  @property({ attribute: 'save-label' })
+  saveLabel = 'Save view'
 
   /**
    * Keeps saved views in this browser's storage under this key, and draws them
@@ -151,7 +159,7 @@ export class HelixHeadlessQuickFilters extends HelixElement {
         count: child.count,
         label: child.textContent?.trim() ?? '',
         saved: false,
-        view: child.view,
+        view: child.parts,
       }))
     return [...written, ...this.saved.map((one) => ({ ...one, saved: true }))]
   }
@@ -260,7 +268,7 @@ export class HelixHeadlessQuickFilters extends HelixElement {
   protected override render(): TemplateResult {
     const table = this.table
     let savedAt = -1
-    return html`<div part="list" role="toolbar" aria-label=${this.label}>
+    return html`<div part="list" role="toolbar" aria-label=${this.label || this.fallbackLabel}>
         ${this.presets.map((preset) => {
           if (preset.saved) {
             savedAt += 1

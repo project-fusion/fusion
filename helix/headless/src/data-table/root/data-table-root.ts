@@ -112,6 +112,7 @@ import {
   type PartialView,
   type PinEdge,
   passesAll,
+  readPartialView,
   readView,
   sameView,
   textOf,
@@ -129,20 +130,6 @@ const CONTROL = [
   '[contenteditable]:not([contenteditable="false"])',
   '[tabindex]',
 ].join(',')
-
-/** Reads a view written as an attribute, as JSON. */
-const readViewText = (value: string | null): DataTableView =>
-  value
-    ? readView(
-        (() => {
-          try {
-            return JSON.parse(value)
-          } catch {
-            return {}
-          }
-        })(),
-      )
-    : emptyView()
 
 /** What a column holds, for its filters: its `type` where it has one, and text otherwise. */
 const columnTypeOf = (column: HelixHeadlessTableColumn): ColumnType => column.type ?? 'text'
@@ -584,6 +571,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'default-sort' })
   defaultSort = ''
+
+  /**
+   * The starting view, as JSON, such as `{"sort":"due:asc","columns":{"hidden":["notes"]}}`.
+   * The parts it names are put in force once, before the table first draws,
+   * and `view` holds them after.
+   */
+  @property({ attribute: 'default-view' })
+  defaultView = ''
 
   /**
    * The word for a descending sort, in a `sorted-label` that writes `{order}`.
@@ -1073,30 +1068,52 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   unsortedLabel = 'Not sorted'
 
   /**
-   * Draws only the rows in view, with empty space in place of the rest.
+   * Everything a reader can change about how the rows are shown, as one value:
+   * the search in `query`, the column `filters`, the `sort`, the `columns`'
+   * order, hidden fields, pinned ends and widths, and the `pageSize`.
    *
-   * **Not a `mode`.** `mode` says where the rows come from and who filtered
-   * them; this says how many of the ones we hold get drawn. They are
-   * independent: a consumer fetching five thousand rows a chunk at a time wants
-   * `mode="server"` and this at once, and folding this into `mode` would be an
-   * API that forbids that combination for no reason.
+   * It round-trips as JSON, so a page can keep it in a URL or in storage and
+   * set it back. A property only, being an object: `default-view` seeds it
+   * from JSON in markup. `sort`, `filter`,
+   * `order`, `page-size` and each column's `hidden` are parts of it, and
+   * setting one changes the view.
    *
-   * **Composes with `paginated` rather than excluding it.** A window over a
-   * page is coherent -- the page is the slice of the result, the window is the
-   * part of that slice on screen -- and the arithmetic is the same either way,
-   * so there is nothing to forbid. Together they suit a table paging at a
-   * thousand rows, where the page is a reasonable fetch and a poor render.
+   * A reader's change to any part fires `helix-before-view-change` with the
+   * whole view it would leave, before the event for that part. Refuse it to
+   * keep the view, fetch the rows from a server, and set `view`, `rows` and
+   * `total` yourself. `helix-view-change` follows a change nobody refused.
+   * Setting `view` fires neither.
    *
-   * Off by default. Windowing costs a scroll listener, a measurement per row
-   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
-   * should pay none of them.
-   *
-   * While windowed, the `table` part scrolls on this tier: it carries
-   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
-   * every shadow root. You still need to give it a block size.
+   * Filters on different columns all have to match, and a filter's values
+   * are any of. A filter on a field no column declares is left out, and a
+   * tree grid filters by its search alone.
    */
-  @property({ reflect: true, type: Boolean })
-  windowed = false
+  @property({ attribute: false })
+  get view(): DataTableView {
+    const hidden =
+      this.hiddenWanted ??
+      this.tableColumns
+        .filter((column) => column.field !== '' && !column.shown)
+        .map((column) => column.field)
+    return {
+      columns: {
+        hidden: [...hidden],
+        order: writtenList(this.order),
+        pinned: { ...this.pinnedState },
+        widths: { ...this.widthsState },
+      },
+      filters: this.filtersState.map((filter) => ({ ...filter, values: [...filter.values] })),
+      pageSize: this.pageSize,
+      query: this.filter,
+      sort: this.sort,
+    }
+  }
+
+  set view(next: DataTableView | PartialView) {
+    const previous = this.view
+    this.applyView(mergeView(emptyView(), readView(next)))
+    this.requestUpdate('view', previous)
+  }
 
   @state()
   private sortState: string | undefined = undefined
@@ -2331,56 +2348,30 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
-   * Everything a reader can change about how the rows are shown, as one value:
-   * the search in `query`, the column `filters`, the `sort`, the `columns`'
-   * order, hidden fields, pinned ends and widths, and the `pageSize`.
+   * Draws only the rows in view, with empty space in place of the rest.
    *
-   * It round-trips as JSON, so a page can keep it in a URL or in storage and
-   * set it back. Written as an attribute it is read as JSON. `sort`, `filter`,
-   * `order`, `page-size` and each column's `hidden` are parts of it, and
-   * setting one changes the view.
+   * **Not a `mode`.** `mode` says where the rows come from and who filtered
+   * them; this says how many of the ones we hold get drawn. They are
+   * independent: a consumer fetching five thousand rows a chunk at a time wants
+   * `mode="server"` and this at once, and folding this into `mode` would be an
+   * API that forbids that combination for no reason.
    *
-   * A reader's change to any part fires `helix-before-view-change` with the
-   * whole view it would leave, before the event for that part. Refuse it to
-   * keep the view, fetch the rows from a server, and set `view`, `rows` and
-   * `total` yourself. `helix-view-change` follows a change nobody refused.
-   * Setting `view` fires neither.
+   * **Composes with `paginated` rather than excluding it.** A window over a
+   * page is coherent -- the page is the slice of the result, the window is the
+   * part of that slice on screen -- and the arithmetic is the same either way,
+   * so there is nothing to forbid. Together they suit a table paging at a
+   * thousand rows, where the page is a reasonable fetch and a poor render.
    *
-   * Filters on different columns all have to match, and a filter's values
-   * are any of. A filter on a field no column declares is left out, and a
-   * tree grid filters by its search alone.
+   * Off by default. Windowing costs a scroll listener, a measurement per row
+   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
+   * should pay none of them.
+   *
+   * While windowed, the `table` part scrolls on this tier: it carries
+   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
+   * every shadow root. You still need to give it a block size.
    */
-  @property({
-    converter: {
-      fromAttribute: (value) => readViewText(value),
-      toAttribute: (value: DataTableView) => viewJson(value),
-    },
-  })
-  get view(): DataTableView {
-    const hidden =
-      this.hiddenWanted ??
-      this.tableColumns
-        .filter((column) => column.field !== '' && !column.shown)
-        .map((column) => column.field)
-    return {
-      columns: {
-        hidden: [...hidden],
-        order: writtenList(this.order),
-        pinned: { ...this.pinnedState },
-        widths: { ...this.widthsState },
-      },
-      filters: this.filtersState.map((filter) => ({ ...filter, values: [...filter.values] })),
-      pageSize: this.pageSize,
-      query: this.filter,
-      sort: this.sort,
-    }
-  }
-
-  set view(next: DataTableView | PartialView) {
-    const previous = this.view
-    this.applyView(mergeView(emptyView(), readView(next)))
-    this.requestUpdate('view', previous)
-  }
+  @property({ reflect: true, type: Boolean })
+  windowed = false
 
   /**
    * Asks for a different view, as a reader's change does: `helix-before-view-change`,
@@ -2397,6 +2388,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.toldView()
     return true
   }
+
+  /** Whether `default-view` has been put in force, which it is once. */
+  private viewSeeded = false
 
   /** The hidden fields a view named before the columns were known, applied once they are. */
   private hiddenWanted: readonly string[] | undefined = undefined
@@ -2731,6 +2725,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   protected override willUpdate(changed: PropertyValues): void {
+    if (changed.has('defaultView') && this.defaultView && !this.viewSeeded) {
+      this.viewSeeded = true
+      try {
+        this.applyView(mergeView(this.view, readPartialView(JSON.parse(this.defaultView))))
+      } catch {
+        /* Text that is not JSON seeds nothing. */
+      }
+    }
     this.hideWanted()
     super.willUpdate(changed)
     this.fit()
@@ -3103,6 +3105,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     /* The depth goes on the row header, which indents, and holds the toggle. */
     const placed = header && this.childField ? this.tree().placed.get(row) : undefined
     const pin = this.pinnedState[column.field]
+    const pinnedStart = pin === 'start'
+    const pinnedEnd = pin === 'end'
     const style = [
       edge ? `--data-table-cell-align: ${edge}` : '',
       block ? `--data-table-cell-block-align: ${block}` : '',
@@ -3112,7 +3116,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       .filter(Boolean)
       .join('; ')
     return html`<span
-      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pin ? ` cell-pinned-${pin}` : ''}"
+      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
