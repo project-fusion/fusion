@@ -12,8 +12,9 @@
  * it directly.
  */
 
-/** What a column holds, which picks the comparisons its filter offers. */
-export type ColumnType = 'boolean' | 'date' | 'enum' | 'number' | 'text'
+import type { ColumnType } from '../table/column-type.js'
+
+export type { ColumnType }
 
 /** Which end of the row a pinned column stays at while the table scrolls. */
 export type PinEdge = 'end' | 'start'
