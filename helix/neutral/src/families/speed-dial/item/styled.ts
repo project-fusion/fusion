@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import { inherit, list, mix, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
@@ -11,7 +12,9 @@ import item from './headless.js'
  * round and raised**, a step below the trigger, and lifts under the pointer.
  * **The name sits on a chip** of the overlay surface, since a dial floats
  * over a page, with the shortcut after it in the muted step. One ring shows
- * for the keyboard, on the mark. A disabled action fades.
+ * for the keyboard, on the mark. A disabled action fades. **`tone="danger"`
+ * marks an action that destroys something**, its mark and name in the danger
+ * ink and its mark's fill under the pointer a tint of it.
  */
 export default styles(
   item,
@@ -29,6 +32,7 @@ export default styles(
       shortcutColor: token('color-foreground-muted'),
     },
     own: { speedDialLabelOpacity: null, speedDialRow: null },
+    props: { tone: oneOf(['danger']) },
     stylesheet: 'speed-dial/item/speed-dial-item.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -79,6 +83,17 @@ export default styles(
           },
         ),
       ]),
+      on('icon', [
+        rule({ tone: 'danger' }, { color: hook.itemColor(token('color-danger')) }),
+        rule(
+          { lacks: 'disabled', tone: 'danger', within: { item: { hover: true } } },
+          {
+            backgroundColor: hook.itemHoverBackgroundColor(
+              mix(token('color-danger'), 12, token('color-surface-overlay')),
+            ),
+          },
+        ),
+      ]),
       /* One ring, and on the mark. */
       on('item', [rule({ focusVisible: true }, { outline: 'none' })]),
       on('icon', [
@@ -110,6 +125,7 @@ export default styles(
           { opacity: 1 },
         ),
         rule({ canHover: false }, { opacity: 1 }),
+        rule({ tone: 'danger' }, { color: hook.labelColor(token('color-danger')) }),
       ]),
       on('shortcut', [
         rule({

@@ -44,6 +44,7 @@ export default styles(
       borderWidth: token('border-floating'),
       columnSize: '15rem',
       duration: token('duration-slow'),
+      edge: token('space-xl'),
       fullSize: '80rem',
       gap: token('space-xl'),
       padding: token('space-md'),
@@ -120,7 +121,7 @@ export default styles(
           fontSize: hook.triggerFontSize,
           fontWeight: hook.triggerFontWeight,
           gap: token('space-2xs'),
-          minBlockSize: token('size-control-tight'),
+          minBlockSize: token('size-control-sm'),
           paddingInline: hook.triggerPaddingInline,
           position: 'relative',
           transition: list(
@@ -135,7 +136,8 @@ export default styles(
           { focusVisible: true },
           {
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-            outlineOffset: token('size-focus-offset'),
+            /* Inside the trigger, so a ring in a tight bar is not cut by its neighbors. */
+            outlineOffset: product(token('size-focus-offset'), '-1'),
           },
         ),
         /* Open reads like the current destination. */
@@ -146,6 +148,21 @@ export default styles(
             color: hook.triggerOpenColor,
           },
         ),
+        rule({ reducedMotion: true }, { transition: 'none' }),
+      ]),
+      /* The caret on the default trigger, turned while the panel is open. */
+      on('trigger-indicator', [
+        rule({
+          blockSize: '1.2em',
+          flex: '0 0 auto',
+          inlineSize: '1.2em',
+          transform: 'rotate(0deg)',
+          transition: ['transform', fast, token('easing-standard')],
+        }),
+        web([
+          rule({ blockSize: fn('round', '1.2em', '2px'), inlineSize: fn('round', '1.2em', '2px') }),
+        ]),
+        rule({ open: true }, { transform: 'rotate(180deg)' }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
@@ -176,9 +193,7 @@ export default styles(
           gridAutoFlow: 'column',
           inlineSize: web('max-content'),
           margin: token('space-none'),
-          maxInlineSize: web(
-            fn('min', hook.size, difference('100%', product(token('space-xl'), 2))),
-          ),
+          maxInlineSize: web(fn('min', hook.size, difference('100%', product(hook.edge, 2)))),
           padding: hook.padding,
           transition: list(
             ['clip-path', slow, token('easing-decelerate')],
