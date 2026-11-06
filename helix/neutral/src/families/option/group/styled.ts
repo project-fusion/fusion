@@ -35,7 +35,8 @@ export default styles(
         fontSize: token('text-xs'),
         fontWeight: token('weight-medium'),
         paddingBlock: token('space-2xs'),
-        paddingInline: hookOf('option', 'padding', token('space-xs')),
+        /* The rows' inset, so a heading starts on the words it names. */
+        paddingInline: hookOf('option', 'padding', token('space-field')),
       }),
       native([
         rule({ part: { 'data-later': true } }, { marginBlockStart: token('space-xs') }),

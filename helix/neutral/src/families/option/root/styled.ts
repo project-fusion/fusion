@@ -4,9 +4,11 @@ import { difference, first, inherited, mix, native, scheme, token, web } from '.
 import { styles } from '../../../table.js'
 import option from './headless.js'
 
-/* The tick, a stencil so its color is a token like every other color here. */
+/* The tick, a stencil so its color is a token like every other color here. **Checkbox's
+   tick**, the same path at the same stroke, so a chosen option and a ticked box draw one
+   mark. */
 const tick =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E\")"
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E\")"
 
 /**
  * One choice in a list, in its styled tier.
@@ -31,6 +33,7 @@ export default styles(
       activeBackgroundColor: first(own.optionWash, token('color-hover')),
       blockPadding: token('space-2xs'),
       draggingOpacity: 0.5,
+      hoverBackgroundColor: null,
       dropColor: token('color-primary'),
       dropSize: token('border-thick'),
       mediaAspectRatio: '4 / 3',
@@ -90,7 +93,9 @@ export default styles(
       native([
         rule({ part: { 'data-highlight': true } }, { backgroundColor: hook.activeBackgroundColor }),
       ]),
-      rule({ disabled: false, hover: true }, { backgroundColor: hook.activeBackgroundColor }),
+      native([
+        rule({ disabled: false, hover: true }, { backgroundColor: hook.activeBackgroundColor }),
+      ]),
       rule({ disabled: true }, { opacity: token('opacity-disabled'), web: { cursor: 'default' } }),
       /* A phone's move draws here, and the web's reorder entry adopts a sheet of its own. */
       native([rule({ part: { 'data-dragging': true } }, { opacity: hook.draggingOpacity })]),
@@ -99,6 +104,18 @@ export default styles(
        state of the same name. */
     on({ part: 'item', selector: ':host(:state(active)) [part~="item"]' }, [
       web([rule({ backgroundColor: hook.activeBackgroundColor })]),
+    ]),
+    /* Written out: under the pointer, a row the keys are not on takes the hover wash. */
+    on(
+      {
+        part: 'item',
+        selector: ':host(:not([disabled]):not(:state(active))) [part~="item"]:hover',
+      },
+      [web([rule({ backgroundColor: hook.hoverBackgroundColor(hook.activeBackgroundColor) })])],
+    ),
+    /* A leading icon at the tight step, as List's and Select's rows draw it. */
+    on({ region: 'start', slotted: '*' }, [
+      rule({ '--icon-size': token('size-icon-tight'), flex: [0, 0, 'auto'] }),
     ]),
     on('text', [
       rule({ display: 'flex', flex: '1 1 auto', flexDirection: 'column', minInlineSize: 0 }),
@@ -182,7 +199,7 @@ export default styles(
           maskImage: tick,
           maskPosition: 'center',
           maskRepeat: 'no-repeat',
-          maskSize: 'contain',
+          maskSize: token('size-checkbox'),
         },
       ),
       rule({ hasIndicator: true, platform: 'web' }, { content: 'none' }),
