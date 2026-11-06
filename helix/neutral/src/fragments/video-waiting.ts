@@ -1,9 +1,6 @@
 import { mix, native, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
-/** The ring turns at Loader's own pace, so two spinners on one page agree. */
-const SPIN = '0.8s'
-
 /**
  * Video's messages over the picture while it waits for data and once it
  * fails, in the middle of the picture, the loading one with a ring that
@@ -13,8 +10,8 @@ const SPIN = '0.8s'
  */
 export default fragment(
   'video-waiting',
-  { parts: ['failure', 'loading', 'loading-ring'] },
-  ({ on, rule }) => [
+  { own: { videoSpin: null }, parts: ['failure', 'loading', 'loading-ring'] },
+  ({ on, own, rule }) => [
     on(
       ['loading', 'failure'],
       [
@@ -40,7 +37,7 @@ export default fragment(
     on({ before: 'loading' }, [
       web([
         rule({
-          animation: ['video-spin', SPIN, 'linear', 'infinite'],
+          animation: ['video-spin', own.videoSpin, 'linear', 'infinite'],
           blockSize: token('size-icon-tight'),
           border: [
             token('border-thick'),
@@ -59,7 +56,7 @@ export default fragment(
     on('loading-ring', [
       native([
         rule({
-          animation: ['video-spin', SPIN, 'linear', 'infinite'],
+          animation: ['video-spin', own.videoSpin, 'linear', 'infinite'],
           blockSize: token('size-icon-tight'),
           borderColor: mix(token('color-foreground-media'), 30, 'transparent'),
           borderStyle: 'solid',

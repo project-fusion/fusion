@@ -151,7 +151,10 @@ const statesIn = (run: Run): Pick<Left, 'loaded' | 'result' | 'waiting'> => {
   const { tag } = run.scenario.setup
   const form = formOf(tag)
   const states = HOST_STATES.get(tag) ?? {}
-  const loads = (form.machines ?? []).some((use) => use.machine === 'load')
+  /* The element's own picture, as the web's record reads an image's: a player's
+     poster loads in a part, and says nothing of the element. */
+  const loads =
+    run.scenario.family === 'image' && (form.machines ?? []).some((use) => use.machine === 'load')
   const delay = form.api?.delay
   const copy = form.api?.copy
   return {

@@ -390,6 +390,8 @@
     "helix/neutral/src/families/scroll-area/root/styled.ts",
     "helix/neutral/src/families/slider/root/styled.ts",
     "helix/neutral/src/families/tree/item/styled.ts",
+    "helix/neutral/src/families/video/root/headless.tsx",
+    "helix/neutral/src/families/video/root/styled.ts",
     "helix/neutral/src/render.ts",
     "helix/neutral/src/table.ts",
     "helix/neutral/src/tree-choice.ts",

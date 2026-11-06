@@ -1,15 +1,8 @@
 import { difference, fn, list, measured, mix, native, product, sum, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
-/** The rail `4px` thick with a `12px` thumb on it: a slider drawn over a picture, thinner than any rung of the size scale. */
-const RAIL = '4px'
-const THUMB = '12px'
-
 /** The level fades in and out, as the bar does. */
 const fade = list(['opacity', token('duration-fast'), token('easing-standard')])
-
-/** How far the volume level stands up out of the bar. */
-const LEVEL = '4.5rem'
 
 /**
  * Video's two ranges on the web, real inputs stripped of their paint: the
@@ -21,8 +14,13 @@ const LEVEL = '4.5rem'
  */
 export default fragment(
   'video-sound',
-  { parts: ['scrubber', 'sound', 'volume'], hooks: { accentColor: null }, props: ['separation'] },
-  ({ hook, on, rule }) => [
+  {
+    parts: ['scrubber', 'sound', 'volume'],
+    hooks: { accentColor: null },
+    own: { videoLevelSize: null, videoRailSize: null, videoThumbSize: null },
+    props: ['separation'],
+  },
+  ({ hook, on, own, rule }) => [
     on(
       ['scrubber', 'volume'],
       [
@@ -49,10 +47,12 @@ export default fragment(
             ],
             ['transparent', product(measured('video-progress', 0), '100%')],
           ),
-          blockSize: RAIL,
+          blockSize: own.videoRailSize,
         }),
       ]),
       rule({ flex: [1, 1, 'auto'], minInlineSize: 0 }),
+      /* A phone's scrubber keeps a share of the bar however large the reader's text. */
+      native([rule({ minInlineSize: '30%' })]),
     ]),
     on('sound', [
       rule({ alignItems: 'center', display: 'flex', flex: [0, 0, 'auto'], position: 'relative' }),
@@ -70,10 +70,10 @@ export default fragment(
             ['currentColor', product(measured('video-level', 1), '100%')],
             ['transparent', product(measured('video-level', 1), '100%')],
           ),
-          blockSize: RAIL,
+          blockSize: own.videoRailSize,
           bottom: sum('100%', token('space-2xs')),
           direction: 'rtl',
-          inlineSize: LEVEL,
+          inlineSize: own.videoLevelSize,
           left: '50%',
           opacity: 0,
           padding: token('space-none'),
@@ -120,7 +120,7 @@ export default fragment(
           backgroundColor: token('color-overlay'),
           borderRadius: token('radii-full'),
           content: '""',
-          blockSize: sum(LEVEL, product(token('space-xs'), 2)),
+          blockSize: sum(own.videoLevelSize, product(token('space-xs'), 2)),
           bottom: difference(sum('100%', token('space-2xs')), token('space-xs')),
           inlineSize: token('size-icon-loose'),
           left: '50%',
@@ -153,10 +153,10 @@ export default fragment(
           rule({
             appearance: 'none',
             backgroundColor: 'currentColor',
-            blockSize: THUMB,
+            blockSize: own.videoThumbSize,
             border: 'none',
             borderRadius: token('radii-full'),
-            inlineSize: THUMB,
+            inlineSize: own.videoThumbSize,
           }),
         ]),
       ],
@@ -171,10 +171,10 @@ export default fragment(
         web([
           rule({
             backgroundColor: 'currentColor',
-            blockSize: THUMB,
+            blockSize: own.videoThumbSize,
             border: 'none',
             borderRadius: token('radii-full'),
-            inlineSize: THUMB,
+            inlineSize: own.videoThumbSize,
           }),
         ]),
       ],
