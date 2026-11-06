@@ -300,6 +300,15 @@ const component = (text, origin, key, scale = 1) => {
   if (value.endsWith('%')) {
     return (Number.parseFloat(value) / 100) * scale
   }
+  /* `max(l, 0.65)` and `min(l, 0.6)`: a component held to a floor or a ceiling,
+     each argument a component in its own right. */
+  const extreme = /^(max|min)\(/.exec(value)
+  if (extreme) {
+    const parts = topLevel(body(value, value.indexOf('('))).map((one) =>
+      component(one, origin, key, scale),
+    )
+    return extreme[1] === 'max' ? Math.max(...parts) : Math.min(...parts)
+  }
   const calc = value.startsWith('calc(')
   const expression = calc ? body(value, value.indexOf('(')) : value
   /* `l`, `c` and `h` inside a relative `calc()` are the origin's own
@@ -308,6 +317,37 @@ const component = (text, origin, key, scale = 1) => {
     ? expression.replace(/\b([lch])\b/g, (_, name) => String(origin[name]))
     : expression
   return calc ? arithmetic(substituted) : Number.parseFloat(substituted)
+}
+
+/** Split on top-level commas, so `max(calc(l + 0.1), 0.6)` keeps its `calc()` whole. */
+const topLevel = (text) => {
+  const found = []
+  let depth = 0
+  let start = 0
+  for (let at = 0; at <= text.length; at += 1) {
+    const character = text[at]
+    if (character === '(') {
+      depth += 1
+    } else if (character === ')') {
+      depth -= 1
+    } else if (at === text.length || (depth === 0 && character === ',')) {
+      found.push(text.slice(start, at).trim())
+      start = at + 1
+    }
+  }
+  return found
+}
+
+/** A mix's weight as a share from 0 to 1: a percentage, or `min()`, `max()` or `calc()` of them. */
+const share = (text) => {
+  const value = text.trim()
+  const extreme = /^(max|min)\(/.exec(value)
+  if (extreme) {
+    const parts = topLevel(body(value, value.indexOf('('))).map(share)
+    return extreme[1] === 'max' ? Math.max(...parts) : Math.min(...parts)
+  }
+  const inner = value.startsWith('calc(') ? body(value, value.indexOf('(')) : value
+  return arithmetic(inner.replace(/(\d*\.?\d+)%/g, (_, number) => `(${number} / 100)`))
 }
 
 /** Split on top-level whitespace, so `calc(h + 180)` stays one component. */
@@ -372,10 +412,22 @@ export const evaluate = (value, scheme) => {
     }
     const read = (side) => {
       const percent = /\s(\d*\.?\d+)%$/.exec(side)
-      return {
-        color: evaluate(percent ? side.slice(0, percent.index) : side, scheme),
-        weight: percent ? Number.parseFloat(percent[1]) / 100 : null,
+      if (percent) {
+        return {
+          color: evaluate(side.slice(0, percent.index), scheme),
+          weight: Number.parseFloat(percent[1]) / 100,
+        }
       }
+      /* A weight worked out, `min(100%, 30% * 1)` once its `var()` is substituted. */
+      const all = words(side.trim())
+      const last = all.at(-1) ?? ''
+      if (all.length > 1 && /^(min|max|calc)\(/.test(last)) {
+        return {
+          color: evaluate(all.slice(0, -1).join(' '), scheme),
+          weight: share(last),
+        }
+      }
+      return { color: evaluate(side, scheme), weight: null }
     }
     const one = read(first)
     const other = read(second)
