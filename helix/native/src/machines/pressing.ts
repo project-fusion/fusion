@@ -35,6 +35,19 @@ import { turnsAlone } from './turns'
  * row sends `select` once its `before-select` stood, before anything the
  * choice does.
  */
+/**
+ * The element's own `value`, where the event a press sends carries one and no
+ * set gives it, as a playlist entry asks to play by its value as the web's does.
+ */
+const ownValue = (
+  family: Family,
+  props: Props,
+  sends: string | undefined,
+): Readonly<Record<string, unknown>> => {
+  const carries = family.api?.events.find((one) => one.name === sends)?.detail.includes('value')
+  return carries === true ? { value: String(given(family, props, 'value') ?? '') } : {}
+}
+
 const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): Told => {
   const part = boundTo(use, 'part', 'part') ?? ''
   const { joined, stacked } = around
@@ -46,7 +59,7 @@ const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): 
   const after = sends === undefined ? undefined : followUpOf(family, sends)
   if (joined?.offer === undefined) {
     const linked = linkedBy(family, props, part)
-    const own = joined === undefined ? {} : { value: joined.value }
+    const own = joined === undefined ? ownValue(family, props, sends) : { value: joined.value }
     const detail = { label: wordsOf(props.children), ...linked.detail, ...own }
     if (after === undefined) {
       return { ...linked, detail }
