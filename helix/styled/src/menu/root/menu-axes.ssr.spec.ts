@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hostTag, ssr, styles } from '@fusion.dev/helix-testing/ssr'
+import { hasPart, hostTag, ssr, styles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -39,5 +39,20 @@ describe('menu visual axes', () => {
        The axis here is `material`. */
     const bare = hostTag(ssr(html`<helix-menu></helix-menu>`), TAG)
     expect(bare).not.toContain('material=')
+  })
+})
+
+describe('a menu served with its filter already set', () => {
+  /* The element has no `children` on the server, and the filter's count read
+     them while rendering: the render threw, and the page served no menu. */
+  test('renders, rather than throwing on the rows it cannot see yet', async () => {
+    await import('../filter/index.js')
+    const markup = ssr(
+      html`<helix-menu filterable filter="rev" open><helix-menu-item value="revoke" tone="danger">Revoke token</helix-menu-item></helix-menu>`,
+    )
+    expect(hostTag(markup, TAG)).toContain('filter="rev"')
+    /* And says nothing about a count it cannot make: "No matches" over the
+       row the filter matched stood until the page hydrated. */
+    expect(hasPart(markup, 'empty')).toBe(false)
   })
 })

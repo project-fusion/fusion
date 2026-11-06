@@ -9,13 +9,36 @@
   display: none;
 }
 
+/* **`danger`, kept quiet**, as a menu item draws it: the words and a leading
+   mark in the danger ink, the highlight a wash of it at the hover wash's own
+   strengths, and the caption muted. A disabled danger option is a disabled
+   option. A command palette's rows are options, and an action there is what
+   this is for. */
+:host([tone="danger"]) {
+  --_option-ink: var(--helix-color-danger);
+  --_option-wash: light-dark(
+    color-mix(in oklab, var(--helix-color-danger) 8%, transparent),
+    color-mix(in oklab, var(--helix-color-danger) 12%, transparent)
+  );
+  --_option-press: light-dark(
+    color-mix(in oklab, var(--helix-color-danger) 16%, transparent),
+    color-mix(in oklab, var(--helix-color-danger) 20%, transparent)
+  );
+}
+
+:host([tone="danger"][disabled]) {
+  --_option-ink: initial;
+  --_option-wash: initial;
+  --_option-press: initial;
+}
+
 [part~="item"] {
   align-items: center;
   /* From the container, because the container decides whether this row is inset
      or full-bleed and only a row with space around it has corners worth
      rounding. */
   border-radius: var(--option-radius, var(--helix-radii-sm));
-  color: var(--helix-color-foreground);
+  color: var(--_option-ink, var(--helix-color-foreground));
   cursor: pointer;
   display: flex;
   gap: var(--helix-space-xs);
@@ -134,7 +157,10 @@ slot[name="indicator"]::slotted(*) {
 :host(:not([disabled])) [part~="item"]:hover {
   /* A wash of the foreground rather than a step on the surface ladder, and
      the one the theme engine solves the description's quiet ink against. */
-  background-color: var(--option-active-background-color, var(--helix-color-hover));
+  background-color: var(
+    --option-active-background-color,
+    var(--_option-wash, var(--helix-color-hover))
+  );
 }
 
 :host([disabled]) [part~="item"] {
@@ -162,5 +188,5 @@ slot[name="indicator"]::slotted(*) {
 }
 
 :host(:not([disabled])) [part~="item"]:active {
-  background-color: var(--helix-color-press);
+  background-color: var(--_option-press, var(--helix-color-press));
 }

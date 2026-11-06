@@ -251,7 +251,10 @@ export class MenuFilterController implements ReactiveController {
    */
   status(): TemplateResult | undefined {
     const { host } = this
-    const count = this.filtering ? this.keptRows.length : -1
+    /* **No count where the rows cannot be seen**: a server's element has no
+       children, and a menu served with its filter set said "No matches" over
+       the row it matched, until the page hydrated. Not known is not none. */
+    const count = this.filtering && host.children !== undefined ? this.keptRows.length : -1
     this.inside.announced =
       count === 0
         ? host.noResultsText

@@ -204,6 +204,26 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    /* A danger row at rest, last after a divider, and the same row highlighted:
+       the ink and the wash are what the tone is, so both are pictured. */
+    {
+      files,
+      glob: '{name}/.examples/danger.html',
+      kind: 'html',
+      name: 'danger',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
+    {
+      files,
+      glob: '{name}/.examples/danger-highlighted.html',
+      kind: 'html',
+      name: 'danger-highlighted',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
     /* A row's fill reaching past its words is drawn against what it lines up
        with, a heading and a divider, so it is pictured apart too. */
     {

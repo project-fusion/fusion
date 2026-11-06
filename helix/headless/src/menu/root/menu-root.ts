@@ -329,18 +329,24 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     return this.submenus === 'flyout'
   }
 
-  /** The rows of the top page, read through each section. */
+  /**
+   * The rows of the top page, read through each section.
+   *
+   * **Nothing on the server**, where an element has no `children`: a menu served
+   * with a `filter` already set asked the filter for its count while rendering,
+   * and the render threw on the spread.
+   */
   private get topRows(): HelixHeadlessMenuItem[] {
-    return [...this.children]
+    return [...(this.children ?? [])]
       .filter((child) => child.slot !== 'trigger')
-      .flatMap((child) => (isSection(child) ? [...child.children] : [child]))
+      .flatMap((child) => (isSection(child) ? [...(child.children ?? [])] : [child]))
       .filter(isItem)
   }
 
   /** The rows of a submenu, or of the top page for null. */
   private rowsOf(holder: HelixHeadlessMenuItem | null): HelixHeadlessMenuItem[] {
     return holder
-      ? [...holder.children].filter(
+      ? [...(holder.children ?? [])].filter(
           (child): child is HelixHeadlessMenuItem => child.slot === 'submenu' && isItem(child),
         )
       : this.topRows

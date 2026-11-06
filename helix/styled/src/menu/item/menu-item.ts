@@ -19,6 +19,13 @@ import { styles } from './menu-item.css.js'
  * The reservation is made on the page because each row's styles cover only its
  * own slots.
  *
+ * `tone="danger"` marks an action that cannot be undone, such as "Revoke token",
+ * "Remove member" or "Delete permanently". Put it last, after a divider. Its
+ * words and leading mark take the danger ink and its highlight a quiet wash of
+ * it; the shortcut stays muted, and a disabled danger row looks like any
+ * disabled row. A removal that can be undone, or reviewed before it takes
+ * effect, stays neutral.
+ *
  * @since 0.1.0
  * @status stable
  * @aliases Menu option, Menu row
