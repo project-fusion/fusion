@@ -8,8 +8,8 @@
 use super::super::builder::print::DENSITY;
 use super::super::builder::Built;
 use super::super::expr::{
-    Channel, Color, Easing, Expr, Families, Family, Filter, Filters, Layer, Math, Mix, Oklch, Op,
-    Quantity, Shadow, Shape, Shaped, Space, Spring, Time, Unit, Var, Weight,
+    Channel, Color, Easing, Expr, Families, Family, Filter, Filters, Func, Layer, Math, Mix, Oklch,
+    Op, Quantity, Shadow, Shape, Shaped, Space, Spring, Time, Unit, Var, Weight,
 };
 use super::{component, is_hex, Reader};
 
@@ -222,6 +222,15 @@ impl Reader<'_> {
                     "`{built}` does not hold a minimum, a value and a maximum"
                 )),
             },
+            /* `max(lightness, 0.65)`: a component held to a floor or a ceiling. */
+            Built::Call(name, parts) if name == "min" || name == "max" => {
+                let func = if name == "min" { Func::Min } else { Func::Max };
+                let read = parts
+                    .iter()
+                    .map(|one| self.built_math(one, relative))
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Channel::Extreme(func, read))
+            }
             Built::Call(name, _) if op(name).is_some() => {
                 self.built_math(built, relative).map(Channel::Calc)
             }
