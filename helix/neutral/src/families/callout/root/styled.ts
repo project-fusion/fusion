@@ -1,11 +1,13 @@
 import { oneOf } from '../../../render.js'
 import {
   difference,
+  fn,
   list,
   mix,
   native,
   product,
   quotient,
+  scheme,
   sum,
   token,
   web,
@@ -46,16 +48,25 @@ export default styles(
       backgroundColor: null,
       barThickness: '0px',
       fontSize: token('text-control'),
-      gap: token('space-sm'),
+      gap: token('space-field'),
       padding: token('space-control'),
-      radius: token('radii-sm'),
+      radius: token('radii-md'),
     }),
-    own: { calloutBar: null, calloutColor: null, calloutInset: null, calloutTone: null },
+    own: {
+      calloutBar: null,
+      calloutColor: null,
+      calloutIcon: null,
+      calloutInset: null,
+      calloutLine: null,
+      calloutTone: null,
+    },
     props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'callout/root/callout-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
     const iconSize = token('size-icon')
+    /* The mark's step: the tight icon, never under the small one. */
+    const mark = own.calloutIcon
     const dismissGlyph = {
       '--icon-size': token('size-icon-tight'),
       blockSize: token('size-icon-tight'),
@@ -69,9 +80,16 @@ export default styles(
             calloutColor: hook.accentColor,
             calloutBar: hook.barThickness,
             calloutInset: hook.padding,
+            calloutIcon: fn('max', token('size-icon-tight'), token('size-icon-sm')),
           },
           fontSize: hook.fontSize,
-          backgroundColor: hook.backgroundColor(mix(own.calloutColor, 10, 'transparent')),
+          /* 18% in dark, where 10% of a status ink barely parted from the black page. */
+          backgroundColor: hook.backgroundColor(
+            scheme(
+              mix(own.calloutColor, 10, 'transparent'),
+              mix(own.calloutColor, 18, 'transparent'),
+            ),
+          ),
           /* A hairline of the tone. */
           boxShadow: [
             'inset',
@@ -81,15 +99,36 @@ export default styles(
             token('border-thin'),
             mix(own.calloutColor, 28, token('color-background')),
           ],
-          overflow: 'hidden',
           position: 'relative',
           borderRadius: hook.radius,
+          /* Clipped by the box, the bar with it; `clip` on the web, which starts no
+             scroll container. */
+          web: { overflow: 'clip' },
           color: token('color-foreground'),
           display: 'flex',
           gap: hook.gap,
           padding: own.calloutInset,
           paddingInlineStart: sum(own.calloutInset, own.calloutBar),
         }),
+        /* One line of the content, which the mark centers on: a whole pixel on the web. */
+        web([
+          rule({
+            own: {
+              calloutLine: fn(
+                'round',
+                'up',
+                product(hook.fontSize, token('leading-normal')),
+                '1px',
+              ),
+            },
+          }),
+        ]),
+        native([
+          rule({
+            overflow: 'hidden',
+            own: { calloutLine: product(hook.fontSize, token('leading-normal')) },
+          }),
+        ]),
         variants('tone', {
           danger: { own: { calloutTone: token('color-danger') } },
           neutral: { own: { calloutTone: token('color-foreground-muted') } },
@@ -117,6 +156,9 @@ export default styles(
           {
             own: { calloutBar: hook.barThickness(token('border-thick')) },
             backgroundColor: hook.backgroundColor('transparent'),
+            /* Square, as a quotation's rule is, since nothing else of the box is drawn:
+               the corner clipped the bar at both ends into a crescent. */
+            borderRadius: hook.radius(token('radii-none')),
             boxShadow: 'none',
           },
         ),
@@ -162,19 +204,42 @@ export default styles(
           position: 'absolute',
         }),
       ]),
-      on('icon', [rule({ color: own.calloutColor, display: 'inline-flex', flex: '0 0 auto' })]),
-      on('icon-mark', [rule({ blockSize: iconSize, inlineSize: iconSize })]),
+      /* Centered on the first line of the content, whatever its size. */
+      on('icon', [
+        rule({
+          color: own.calloutColor,
+          display: 'inline-flex',
+          flex: '0 0 auto',
+          web: {
+            marginBlockStart: fn(
+              'max',
+              token('space-none'),
+              fn('round', 'down', quotient(difference(own.calloutLine, mark), 2), '1px'),
+            ),
+          },
+        }),
+        native([
+          rule({
+            marginBlockStart: fn(
+              'max',
+              token('space-none'),
+              quotient(difference(own.calloutLine, mark), 2),
+            ),
+          }),
+        ]),
+      ]),
+      on('icon-mark', [rule({ blockSize: mark, inlineSize: mark })]),
       on({ region: 'icon', slotted: '*' }, [
-        rule({ '--icon-size': iconSize, blockSize: iconSize, inlineSize: iconSize }),
+        rule({ '--icon-size': mark, blockSize: mark, inlineSize: mark }),
       ]),
       /* A view does not shrink as a browser's flex item does, so on a phone
          the content takes the room the dismiss button leaves it. */
       on('content', [
         /* A long unbroken word breaks inside the column it was given. */
         rule({
-          lineHeight: token('leading-normal'),
+          lineHeight: own.calloutLine,
           minInlineSize: 0,
-          web: { overflowWrap: 'anywhere' },
+          web: { overflowWrap: 'break-word' },
         }),
         native([rule({ flex: '1 1 auto' })]),
       ]),
@@ -231,6 +296,18 @@ export default styles(
          Toast draw theirs. */
       on(['dismiss-mark'], [rule(dismissGlyph)]),
       on({ region: 'dismiss-icon', slotted: '*' }, [rule(dismissGlyph)]),
+      /* A link passed in reads as a link: the primary ink, underlined quietly. */
+      on({ region: 'default', slotted: 'a:not([data-link])' }, [
+        web([
+          rule({
+            color: token('color-primary'),
+            textDecoration: 'underline',
+            textDecorationColor: mix('currentColor', 35, 'transparent'),
+            textDecorationThickness: token('border-thin'),
+            textUnderlineOffset: '0.25em',
+          }),
+        ]),
+      ]),
       /* The heading on a line of its own, over the content. */
       on({ region: 'heading', slotted: '*' }, [
         rule({
