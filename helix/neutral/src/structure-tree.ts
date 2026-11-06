@@ -160,9 +160,21 @@ export const treePlaces = (
       continue
     }
     const [key, place] = treePlace(node, around)
-    into.set(key, place)
+    /* **A part drawn again where it may not be drawn at all keeps its first
+       place**, as Skeleton's shape stands at the root and again inside the
+       pieces the web draws only once it has measured a field. What an
+       optional node holds is optional with it. */
+    const before = into.get(key)
+    if (!(place.optional && before !== undefined && !before.optional)) {
+      into.set(key, place)
+    }
     const parent = place.part || around.parent
-    treePlaces(family, node.children ?? [], { ...around, hidden: place.hidden, parent }, into)
+    treePlaces(
+      family,
+      node.children ?? [],
+      { ...around, hidden: place.hidden, loose: place.optional || around.loose === true, parent },
+      into,
+    )
   }
   return into
 }
