@@ -9,7 +9,7 @@ export function Example() {
         show-value
         value={18}
       >
-        <span slot="label">Disk used</span>
+        <helix-text slot="label">Disk used</helix-text>
       </helix-meter>
       <helix-meter
         max={32}
@@ -17,7 +17,7 @@ export function Example() {
         show-value
         value={18}
       >
-        <span slot="label">Disk used</span>
+        <helix-text slot="label">Disk used</helix-text>
       </helix-meter>
     </helix-flex>
   )

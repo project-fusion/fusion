@@ -4,6 +4,7 @@ import {
   formatPercent,
   latinDigits,
   parseNumber,
+  partsOf,
   readingText,
 } from './number-format.js'
 
@@ -118,5 +119,26 @@ describe('digits in ASCII', () => {
   test('are written for the digits of any script, and other text is kept', () => {
     expect(latinDigits('\u0660\u0669 \u06f4 \u0967 x9')).toBe('09 4 1 x9')
     expect(latinDigits('\u{1d7d8}\u{1d7e2}')).toBe('00')
+  })
+})
+
+describe('the parts of a number on an engine with no formatToParts', () => {
+  /** A format that writes as the engine's does, and has no `formatToParts`, as iOS's Hermes. */
+  const bare = (locale: string, options?: Intl.NumberFormatOptions) => {
+    const real = new Intl.NumberFormat(locale, options)
+    return { format: (value: number) => real.format(value) } as unknown as Intl.NumberFormat
+  }
+
+  test('reads the group, the decimal, and the words off what it writes', () => {
+    const parts = partsOf(bare('en-US', { currency: 'USD', style: 'currency' }), -12345.6)
+    expect(parts).toEqual([
+      { type: 'group', value: ',' },
+      { type: 'decimal', value: '.' },
+      { type: 'literal', value: '$' },
+    ])
+    expect(partsOf(bare('de-DE'), 1)).toEqual([
+      { type: 'group', value: '.' },
+      { type: 'decimal', value: ',' },
+    ])
   })
 })

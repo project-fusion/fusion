@@ -49,7 +49,9 @@ describe('the feed’s separation', () => {
     )
     expect(hostTag(served, 'helix-notifications')).toContain('separation="filled"')
     expect(styles(served)).toContain(':host(:state(feed-filled)) [part="item"]')
-    expect(styles(served)).toContain(':host([separation="filled"]) [part="header"]')
+    expect(styles(served)).toContain(
+      ':host(:is([separation="filled"], [separation="outlined"])) [part="header"]',
+    )
   })
 
   test('and a feed that asked for none carries none', () => {

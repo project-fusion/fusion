@@ -1,6 +1,8 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { setTimers, timers } from '@fusion.dev/helix-core/capabilities/timers'
+import { fakeTimers } from '@fusion.dev/helix-core/capabilities/timers/fake'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The reading, after hydration. What is asserted here is what the element
    decides: which of the two modes it is in, where it takes its value from, and
@@ -126,51 +128,23 @@ describe('an elapsed reading to a screen reader', () => {
   })
 })
 
-/* The ticker keeps its state under a global symbol, so a spec outside core can
-   hold it stopped, as the clock controller's own spec does, and move it on by
-   hand. `Date.now` is held too, since the clock reads the time from it: a
-   wall-clock wait for the words to go stale is a flaky spec. */
-const TICKER = Symbol.for('helix.ticker')
-const shared = globalThis as unknown as Record<symbol, unknown>
+/* A fake clock set as the timers capability, which the element's clock runs
+   on, moved on by hand: a wall-clock wait for the words to go stale is a
+   flaky spec. `Date.now` follows it, for what the element reads from it. */
 const realNow = Date.now
-let heldTicker: unknown
+const heldTimers = timers()
 
 afterEach(() => {
   Date.now = realNow
-  shared[TICKER] = heldTicker
+  setTimers(heldTimers)
 })
 
-/** A clock that moves only when told, under both the ticker and `Date.now`. */
+/** A clock that moves only when told, under both the timers capability and `Date.now`. */
 const stopped = () => {
-  heldTicker = shared[TICKER]
-  let now = realNow()
-  let pending: { at: number; run: () => void } | undefined
-  shared[TICKER] = {
-    clock: {
-      clearTimer: () => {
-        pending = undefined
-      },
-      now: () => now,
-      setTimer: (run: () => void, wait: number) => {
-        pending = { at: now + wait, run }
-        return 1
-      },
-    },
-    timer: undefined,
-    waiting: new Set(),
-  }
-  Date.now = () => now
-  return {
-    advance: (ms: number) => {
-      now += ms
-      if (pending && pending.at <= now) {
-        const due = pending
-        pending = undefined
-        due.run()
-      }
-    },
-    now: () => now,
-  }
+  const clock = fakeTimers(realNow())
+  setTimers(clock)
+  Date.now = () => clock.wall()
+  return { advance: clock.advance, now: clock.wall }
 }
 
 describe('a reading left on the page', () => {
@@ -211,7 +185,9 @@ describe('a frozen reading', () => {
 
 describe('which side of now a reading is on', () => {
   test('is a state a page can style, and a date is on neither side', async () => {
-    const states = (element: Stamp) => internalsOf(element).states
+    const states = (element: Stamp) => ({
+      has: (name: string) => hasState(element as unknown as Element, name),
+    })
     const ago = await stamp(
       `<helix-headless-format-date relative="long" date="${at}"></helix-headless-format-date>`,
     )

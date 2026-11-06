@@ -6,60 +6,61 @@ export function Example() {
       <helix-headless-outline
         className="nav"
         label="On this page"
-      >
-        <a href="#install">Install</a>
-        <a
-          data-level="2"
-          href="#requirements"
-        >
-          Requirements
-        </a>
-        <a href="#usage">Usage</a>
-        <a
-          data-level="2"
-          href="#options"
-        >
-          Options
-        </a>
-        <a href="#api">API</a>
-      </helix-headless-outline>
+      ></helix-headless-outline>
 
       <div className="prose">
-        <section id="install">
+        <helix-headless-outline-section
+          anchor="install"
+          label="Install"
+        >
           <h2>Install</h2>
           <p>
             Install the package with your package manager, then import it once in the entry file of
             your app before you use it.
           </p>
-        </section>
-        <section id="requirements">
+        </helix-headless-outline-section>
+        <helix-headless-outline-section
+          anchor="requirements"
+          label="Requirements"
+          level={2}
+        >
           <h2>Requirements</h2>
           <p>
             The package needs a current version of Node.js and a browser that supports custom
             elements and modern JavaScript.
           </p>
-        </section>
-        <section id="usage">
+        </helix-headless-outline-section>
+        <helix-headless-outline-section
+          anchor="usage"
+          label="Usage"
+        >
           <h2>Usage</h2>
           <p>
             Create a client with your API key, then call its methods to read and write the projects,
             files, and users in your account.
           </p>
-        </section>
-        <section id="options">
+        </helix-headless-outline-section>
+        <helix-headless-outline-section
+          anchor="options"
+          label="Options"
+          level={2}
+        >
           <h2>Options</h2>
           <p>
             Pass options when you create the client to set the request timeout, the number of
             retries, and the base URL to use.
           </p>
-        </section>
-        <section id="api">
+        </helix-headless-outline-section>
+        <helix-headless-outline-section
+          anchor="api"
+          label="API"
+        >
           <h2>API</h2>
           <p>
             Each method returns a promise. Errors include a code and a message that you can show to
             the people who use your app.
           </p>
-        </section>
+        </helix-headless-outline-section>
       </div>
     </div>
   )

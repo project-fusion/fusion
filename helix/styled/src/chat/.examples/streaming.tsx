@@ -20,7 +20,7 @@ export function Example() {
   const replay = useCallback(() => setRun((before) => before + 1), [])
 
   useEffect(() => {
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')
 
     /* With reduced motion, the finished answer is shown at once. */
     const settle = () => {
@@ -30,7 +30,7 @@ export function Example() {
 
     const start = () => {
       clearTimeout(timer.current)
-      if (still.matches) {
+      if (still?.matches) {
         settle()
         return
       }
@@ -52,10 +52,10 @@ export function Example() {
     }
 
     start()
-    still.addEventListener('change', start)
+    still?.addEventListener('change', start)
     return () => {
       clearTimeout(timer.current)
-      still.removeEventListener('change', start)
+      still?.removeEventListener('change', start)
     }
   }, [run])
 
@@ -67,6 +67,7 @@ export function Example() {
       <helix-chat
         className="streaming"
         label="Assistant"
+        style={{ '--chat-max-block-size': '18rem' } as React.CSSProperties}
       >
         <strong slot="header">Assistant</strong>
         <helix-chat-message

@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNotificationGroup } from '@fusion.dev/helix-headless/notifications'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './notification-group.css.js'
+import { styles } from './notification-group.generated.css.js'
 
 /**
  * @summary A named set of notifications, which can be collapsed to the first of

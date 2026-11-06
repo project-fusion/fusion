@@ -54,6 +54,7 @@ export function Example() {
       history={history}
       label="Incident channel"
       onhelix-history={load}
+      style={{ '--chat-max-block-size': '20rem' } as React.CSSProperties}
     >
       <strong slot="header">#incident-2231</strong>
       {turns.map(([author, text]) => (

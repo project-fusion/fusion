@@ -1,4 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { installWebTimers } from '../../capabilities/timers/web.js'
+import { type Countdown, countdown } from '../../machines/countdown.js'
 
 /** What a `CountdownController` does when its time runs out, and when it stops and starts. */
 export interface CountdownOptions {
@@ -24,47 +26,24 @@ export interface CountdownOptions {
  * reader partway through is not cut off. Resuming continues from what was
  * left rather than starting over.
  *
- * **Holds are counted, not flagged.** Hover and focus stop the same clock and
- * are independent: a pointer can leave while focus stays. Uncounted, a reader
- * who tabs into a message and then moves the pointer off it has the clock
- * restarted underneath them. Only the last one out starts it again.
+ * **It is core's `countdown` on the timers capability**, the clock a phone
+ * runs, so a fake clock a conformance scenario sets moves it on the web too.
+ * Holds are counted, not flagged: hover and focus stop the same clock, and
+ * only the last one out starts it again.
  *
  * **Leaving the page pauses it**, keeping the time already spent, and drops
  * the holds, since a pointer or focus on a detached element never leaves it.
- * Coming back does not resume on its own: the host says whether it should,
- * such as only while it is still showing.
+ * Coming back does not resume on its own: the host says whether it should.
  *
- * **A hidden page holds it too, where the host asks** with `holdWhileHidden`:
- * RAC's toast queue stops its timers while the window is in the background. `DelayController` is the other wait
- * in core, for a wait that starts over and forgets itself on leaving.
+ * **A hidden page holds it too, where the host asks** with `holdWhileHidden`,
+ * and only while the host is on the page.
  */
 export class CountdownController implements ReactiveController {
-  /** When the current run began, or nothing while the clock is stopped. */
-  private startedAt: number | undefined
+  /** The clock, built as it is first used and again as the host arrives or leaves. */
+  private clock: Countdown | undefined
 
-  /** What is left of the time, so resuming continues rather than restarts. */
-  private remaining: number | undefined
-
-  private timer: ReturnType<typeof setTimeout> | undefined
-
-  /** How many reasons there are to hold the clock. */
-  private holds = 0
-
-  /** Whether a hidden page is one of the holds, with `holdWhileHidden`. */
-  private hidden = false
-
-  /** Holds the clock as the page hides, and lets it go as the page shows. */
-  private readonly handleVisibility = (): void => {
-    if (document.hidden === this.hidden) {
-      return
-    }
-    this.hidden = document.hidden
-    if (this.hidden) {
-      this.hold()
-    } else {
-      this.release()
-    }
-  }
+  /** Whether the host is on the page, so a hidden page is watched. */
+  private connected = false
 
   constructor(
     host: ReactiveControllerHost,
@@ -75,64 +54,34 @@ export class CountdownController implements ReactiveController {
 
   /** Whether the clock is running now. */
   get running(): boolean {
-    return this.timer !== undefined
+    return this.clock?.running ?? false
   }
 
   hostConnected(): void {
-    if (this.options.holdWhileHidden && typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', this.handleVisibility)
-      this.handleVisibility()
+    this.connected = true
+    if (this.options.holdWhileHidden) {
+      this.rebuild()
     }
   }
 
   hostDisconnected(): void {
-    this.pause()
-    this.holds = 0
-    this.hidden = false
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('visibilitychange', this.handleVisibility)
-    }
+    this.connected = false
+    this.rebuild()
   }
 
   /** Starts the clock at `ms`. Nothing, zero or less starts nothing. */
   start(ms: number | undefined): void {
-    if (ms === undefined || !(ms > 0)) {
-      return
-    }
-    this.remaining = ms
-    this.resume()
+    this.current().start(ms)
   }
 
   /** Stops the clock and keeps the time that is left. */
   pause(): void {
-    if (this.timer === undefined || this.startedAt === undefined) {
-      return
-    }
-    clearTimeout(this.timer)
-    this.timer = undefined
-    this.remaining = Math.max((this.remaining ?? 0) - (Date.now() - this.startedAt), 0)
-    this.startedAt = undefined
-    this.options.paused?.(true)
+    this.clock?.pause()
   }
 
   /** Runs the clock again from where it stopped. */
   resume(): void {
-    if (
-      this.hidden ||
-      this.timer !== undefined ||
-      this.remaining === undefined ||
-      this.remaining <= 0
-    ) {
-      return
-    }
-    this.startedAt = Date.now()
-    this.options.paused?.(false)
-    this.timer = setTimeout(() => {
-      /* Spent, so nothing is left to resume: a page that refused the
-         dismissal heard it again one duration after every hover. */
-      this.cancel()
-      this.options.done()
-    }, this.remaining)
+    this.clock?.resume()
   }
 
   /**
@@ -140,23 +89,46 @@ export class CountdownController implements ReactiveController {
    * until the next `start`, so a hold and a release after it run nothing.
    */
   cancel(): void {
-    clearTimeout(this.timer)
-    this.timer = undefined
-    this.remaining = undefined
-    this.startedAt = undefined
+    this.clock?.cancel()
   }
 
   /** One more reason to hold the clock, such as a pointer arriving. */
   hold(): void {
-    this.holds += 1
-    this.pause()
+    this.current().hold()
   }
 
   /** One reason fewer, and the clock runs again once none is left. */
   release(): void {
-    this.holds = Math.max(this.holds - 1, 0)
-    if (this.holds === 0) {
-      this.resume()
+    this.clock?.release()
+  }
+
+  private current(): Countdown {
+    if (this.clock === undefined) {
+      installWebTimers()
+      this.clock = countdown(this.build())
     }
+    return this.clock
+  }
+
+  /** What a new clock is built from: the time the last one left, stopped. */
+  private build(left?: number): Parameters<typeof countdown>[0] {
+    const { done, paused } = this.options
+    return {
+      done,
+      holdWhileHidden: this.options.holdWhileHidden === true && this.connected,
+      ...(left === undefined ? {} : { left }),
+      ...(paused === undefined ? {} : { paused }),
+    }
+  }
+
+  /** Stops the clock, drops its holds and its watch, and carries its time into a new one. */
+  private rebuild(): void {
+    const was = this.clock
+    if (was === undefined) {
+      return
+    }
+    was.dispose()
+    installWebTimers()
+    this.clock = countdown(this.build(was.left))
   }
 }

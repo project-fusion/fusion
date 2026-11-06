@@ -152,14 +152,27 @@ describe('a trail written as data', () => {
 
 describe('a long trail written as data', () => {
   type Trail = HTMLElement & { items: unknown; updateComplete: Promise<unknown> }
+  /* The crumbs the trail draws. */
   const words = (crumbs: HTMLElement): string[] =>
     [...(crumbs.shadowRoot?.querySelectorAll('helix-headless-breadcrumb') ?? [])].map(
       (crumb) => crumb.textContent?.trim() ?? '',
     )
+  /* The first crumb, which draws the fold. */
+  const first = (crumbs: HTMLElement) =>
+    crumbs.shadowRoot?.querySelector('helix-headless-breadcrumb') as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+  /* The rows of the fold's menu, each its link and its words. */
+  const rows = async (crumbs: HTMLElement): Promise<string[]> => {
+    await first(crumbs).updateComplete
+    return [...(first(crumbs).shadowRoot?.querySelectorAll('[part="fold-item"]') ?? [])].map(
+      (row) => `${row.getAttribute('href')} ${row.textContent?.trim()}`,
+    )
+  }
 
-  /* A trail longer than it has room for folds its middle into one crumb, the
-     first crumb and the current page always showing. */
-  test('folds its middle under max-items, and the button shows the whole of it', async () => {
+  /* A trail longer than it has room for folds its middle into a menu its
+     first crumb draws, the first crumb and the current page always showing. */
+  test('folds its middle under max-items into a menu its first crumb draws', async () => {
     const crumbs = (await mount(
       '<helix-headless-breadcrumbs max-items="3"></helix-headless-breadcrumbs>',
     )) as Trail
@@ -168,16 +181,24 @@ describe('a long trail written as data', () => {
       label,
     }))
     await crumbs.updateComplete
-    expect(words(crumbs)).toEqual(['Home', '…', 'Forms', 'Validation'])
-    const button = part(crumbs, 'expand') as HTMLButtonElement
-    expect(button.getAttribute('aria-label')).toBe('Show 2 more')
-    button.click()
+    expect(words(crumbs)).toEqual(['Home', 'Forms', 'Validation'])
+    expect(await rows(crumbs)).toEqual(['#Docs Docs', '#Guides Guides'])
+    const button = part(first(crumbs), 'expand') as HTMLElement
+    expect(button.getAttribute('label')).toBe('Show 2 more')
+    /* The button is the menu's trigger, which a browser's press opens, as
+       the styled tier's fold spec presses it where there is layout. */
+    expect(button.slot).toBe('trigger')
+    /* The mark before the fold is the trail's, as before each crumb. */
+    expect(part(first(crumbs), 'fold-separator-mark')?.tagName.toLowerCase()).toBe('svg')
+    crumbs.setAttribute('separator', 'slash')
     await crumbs.updateComplete
-    expect(words(crumbs)).toEqual(['Home', 'Docs', 'Guides', 'Forms', 'Validation'])
+    await first(crumbs).updateComplete
+    expect(part(first(crumbs), 'fold-separator-mark')?.getAttribute('data-mark')).toBe('slash')
     /* A new trail folds again. */
     crumbs.items = ['A', 'B', 'C', 'D'].map((label) => ({ href: `#${label}`, label }))
     await crumbs.updateComplete
-    expect(words(crumbs)).toEqual(['A', '…', 'C', 'D'])
+    expect(words(crumbs)).toEqual(['A', 'C', 'D'])
+    expect(await rows(crumbs)).toEqual(['#B B'])
   })
 
   test('and a trail no longer than max-items does not fold', async () => {
@@ -187,7 +208,7 @@ describe('a long trail written as data', () => {
     crumbs.items = ['A', 'B', 'C'].map((label) => ({ href: `#${label}`, label }))
     await crumbs.updateComplete
     expect(words(crumbs)).toEqual(['A', 'B', 'C'])
-    expect(part(crumbs, 'expand')).toBeNull()
+    expect(part(first(crumbs), 'expand')).toBeNull()
   })
 })
 
@@ -234,24 +255,23 @@ describe('a long slotted trail', () => {
     </helix-headless-breadcrumbs>`
 
   /* As a drawn trail folds: the first crumb, a button, and the last max-items
-     less one. The button follows the first crumb, so the trail reads in order. */
-  test('folds its middle under max-items, and the button shows the whole of it', async () => {
+     less one. The fold follows the first crumb, so the trail reads in order,
+     and its menu lists the crumbs folded, each a link to its crumb. */
+  test('folds its middle under max-items into a menu its button triggers', async () => {
     const host = (await mount(long)) as Trail
     const crumbs = await settle(host)
     expect(crumbs.map((one) => hasState(one, 'folded'))).toEqual([false, true, true, false, false])
-    const button = part(crumbs[0] as Crumb, 'expand') as HTMLButtonElement
-    expect(button.getAttribute('aria-label')).toBe('Show 2 more')
-    button.click()
-    await settle(host)
-    expect(crumbs.map((one) => hasState(one, 'folded'))).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
+    const first = crumbs[0] as Crumb
+    const button = part(first, 'expand') as HTMLElement
+    expect(button.getAttribute('label')).toBe('Show 2 more')
+    const rows = [...(first.shadowRoot?.querySelectorAll('[part="fold-item"]') ?? [])]
+    expect(rows.map((row) => `${row.getAttribute('href')} ${row.textContent?.trim()}`)).toEqual([
+      '/docs Docs',
+      '/guides Guides',
     ])
-    expect(part(crumbs[0] as Crumb, 'expand')).toBeNull()
-    expect(crumbs[1]?.shadowRoot?.activeElement).toBe(part(crumbs[1] as Crumb, 'link'))
+    expect(button.slot).toBe('trigger')
+    expect(button.parentElement === part(first, 'fold')).toBe(true)
+    expect(crumbs.map((one) => hasState(one, 'folded'))).toEqual([false, true, true, false, false])
   })
 
   test('and a trail no longer than max-items does not fold', async () => {

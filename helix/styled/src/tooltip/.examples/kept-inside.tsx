@@ -1,34 +1,19 @@
 export function Example() {
   return (
-    <div id="tooltipbounds">
-      <helix-flex
-        align-items="center"
-        gap="sm"
+    <helix-flex
+      align-items="center"
+      gap="sm"
+      id="tooltipbounds"
+    >
+      <helix-tooltip
+        content="Change the name of the file"
+        within="tooltipbounds"
       >
-        <helix-button
-          aria-describedby="kept-inside-at-the-edge-tip"
-          id="kept-inside-at-the-edge"
-        >
-          Rename file
-        </helix-button>
-        <helix-tooltip
-          content="Change the name of the file"
-          for="kept-inside-at-the-edge"
-          id="kept-inside-at-the-edge-tip"
-          within="tooltipbounds"
-        ></helix-tooltip>
-        <helix-button
-          aria-describedby="kept-inside-in-the-middle-tip"
-          id="kept-inside-in-the-middle"
-        >
-          Move file
-        </helix-button>
-        <helix-tooltip
-          content="Move the file to another folder"
-          for="kept-inside-in-the-middle"
-          id="kept-inside-in-the-middle-tip"
-        ></helix-tooltip>
-      </helix-flex>
-    </div>
+        <helix-button>Rename file</helix-button>
+      </helix-tooltip>
+      <helix-tooltip content="Move the file to another folder">
+        <helix-button>Move file</helix-button>
+      </helix-tooltip>
+    </helix-flex>
   )
 }

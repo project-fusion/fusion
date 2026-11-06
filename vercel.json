@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bunx turbo run build --filter=@fusion.dev/site...",
+  "buildCommand": "bunx turbo run build helix-app --filter=@fusion.dev/site...",
   "framework": "nextjs",
   "git": {
     "deploymentEnabled": {

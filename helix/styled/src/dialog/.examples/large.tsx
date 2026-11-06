@@ -1,18 +1,22 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
       <helix-button
-        command="--show"
-        commandfor="large-dialog"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Open dialog
       </helix-button>
 
       <helix-dialog
-        id="large-dialog"
         label="Edit profile"
+        onClose={() => setOpen(false)}
+        open={open}
         size="lg"
       >
         <helix-text
@@ -30,16 +34,10 @@ export function Example() {
           layout="spaced"
           slot="footer"
         >
+          <helix-button onClick={() => setOpen(false)}>Cancel</helix-button>
           <helix-button
-            command="--close"
-            commandfor="large-dialog"
-          >
-            Cancel
-          </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="large-dialog"
             emphasis="solid"
+            onClick={() => setOpen(false)}
             tone="primary"
           >
             Save changes

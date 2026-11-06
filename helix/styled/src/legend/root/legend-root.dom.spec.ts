@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { at, mount, registerDom, type Updatable, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,10 +13,12 @@ beforeAll(async () => {
    and are tested there. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-legend') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`. */
@@ -107,7 +109,7 @@ describe('legend', () => {
     expect(sheet()).toContain(
       '--chart-series-1: light-dark(var(--helix-color-series-1), var(--helix-color-series-9))',
     )
-    expect(sheet()).toContain('var(--chart-series)')
+    expect(sheet()).toContain('var(--chart-series, var(--helix-color-primary))')
   })
 
   test('beside a chart the entries stack, and on the end side they read from the swatch inward', () => {

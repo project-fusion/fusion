@@ -1,10 +1,9 @@
-import './grip.css'
-
 export function Example() {
   return (
     <helix-splitter
       default-position="40"
       handle="grip"
+      style={{ blockSize: '12rem' }}
     >
       <helix-card
         separation="plain"

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessProgress } from '@fusion.dev/helix-headless/progress'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './progress-root.css.js'
+import { styles } from './progress-root.generated.css.js'
 
 /**
  * @summary A bar or ring that shows how far along a task is.

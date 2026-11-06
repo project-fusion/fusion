@@ -2,8 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessChatMessage } from '@fusion.dev/helix-headless/chat/message'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as typingStyles } from '../typing.css.js'
-import { styles } from './chat-message.css.js'
+import { styles as orbStyles } from '../orb-size.css.js'
+import { styles } from './chat-message.generated.css.js'
 
 /**
  * @summary One turn in a conversation, with its state, such as sending or failed.
@@ -46,7 +46,7 @@ import { styles } from './chat-message.css.js'
 export class HelixChatMessage extends HelixHeadlessChatMessage {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [typingStyles, styles]
+  static override styles: CSSResultGroup = [styles, orbStyles]
 
   /**
    * How the turn is set apart. `filled` draws a bubble, and `plain` draws the

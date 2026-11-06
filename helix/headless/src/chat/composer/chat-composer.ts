@@ -162,6 +162,7 @@ export function exampleShown(example: string): number {
  * @csspart field - The text field.
  * @csspart idle - The box around the `idle` slot, shown in the send button's place while the draft is empty.
  * @csspart mark - The icon inside the send button, a return key, or a square while `busy`.
+ * @csspart reason - The tooltip that says `send-reason` over the send button.
  * @csspart reason-arrow - The arrow of the bubble that says `send-reason`, forwarded from `Tooltip`.
  * @csspart reason-arrow-bottom - The arrow while the bubble is below the send button, on the bubble's top edge. Set together with `reason-arrow`.
  * @csspart reason-arrow-left - The arrow while the bubble is left of the send button, on the bubble's right edge. Set together with `reason-arrow`.
@@ -869,7 +870,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     if (!reasoned) {
       return control
     }
-    return staticHtml`<${this.tag('tooltip')} id="send-reason" content=${this.sendReason}
+    return staticHtml`<${this.tag('tooltip')} part="reason" id="send-reason" content=${this.sendReason}
       exportparts="arrow: reason-arrow, arrow-bottom: reason-arrow-bottom, arrow-left: reason-arrow-left, arrow-right: reason-arrow-right, arrow-top: reason-arrow-top, surface: reason-surface, surface-bottom: reason-surface-bottom, surface-left: reason-surface-left, surface-right: reason-surface-right, surface-top: reason-surface-top"
       >${control}</${this.tag('tooltip')}>`
   }

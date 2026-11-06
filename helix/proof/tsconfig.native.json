@@ -1,0 +1,14 @@
+{
+  // What a phone alone draws: the `.native.tsx` files, with React Native's
+  // types and no DOM, resolved under the `react-native` condition.
+  "compilerOptions": {
+    "customConditions": ["react-native"],
+    "jsx": "react-jsx",
+    "lib": ["ES2023"],
+    "moduleSuffixes": [".native", ""],
+    "rootDir": "${configDir}",
+    "types": []
+  },
+  "extends": "../../tsconfig.package.json",
+  "include": ["src/**/*.native.tsx"]
+}

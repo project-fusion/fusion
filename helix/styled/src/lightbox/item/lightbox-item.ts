@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLightboxItem } from '@fusion.dev/helix-headless/lightbox'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './lightbox-item.css.js'
+import { styles } from './lightbox-item.generated.css.js'
 
 /**
  * @summary One item a lightbox can show, such as a picture, a video frame, or a chart.

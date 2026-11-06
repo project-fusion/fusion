@@ -18,10 +18,10 @@ import {
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
+import { feedStep } from '@fusion.dev/helix-core/notifications'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixBeforeReadEvent, HelixReadEvent } from '../events/index.js'
-import { feedStep } from '../feed-keys.js'
 import type { HelixHeadlessNotificationGroup } from '../group/notification-group.js'
 import type { HelixHeadlessNotification } from '../notification/notification.js'
 

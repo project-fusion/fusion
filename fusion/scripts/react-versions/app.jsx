@@ -24,6 +24,17 @@ export const POINTS = [
   { lat: 30.2669, lng: -97.7713 },
 ]
 
+/** What the data families hold in a property alone, which a server's markup cannot carry. */
+export const RESPONSE = { id: 'dpl_8f2c', regions: ['iad1', 'sfo1'], state: 'READY' }
+
+export const PEOPLE = [
+  { id: 'p1', name: 'Ada' },
+  { id: 'p2', name: 'Grace' },
+  { id: 'p3', name: 'Lin' },
+]
+
+const ROW = '<div><span data-field="name"></span></div>'
+
 export function App() {
   const [commits, setCommits] = useState(0)
   const count = (name) => () => {
@@ -49,6 +60,22 @@ export function App() {
         <div slot="start">Start</div>
         <div slot="end">End</div>
       </helix-splitter>
+      <helix-object-inspector
+        default-depth="2"
+        id="inspector"
+        label="Response"
+        value={RESPONSE}
+      ></helix-object-inspector>
+      <helix-virtual-list
+        id="people"
+        items={PEOPLE}
+        key-field="id"
+        label="People"
+        selection-mode="multiple"
+        value="p2"
+      >
+        <template dangerouslySetInnerHTML={{ __html: ROW }} slot="row"></template>
+      </helix-virtual-list>
       <button id="commit" onClick={() => setCommits(commits + 1)} type="button">
         Commits: {commits}
       </button>

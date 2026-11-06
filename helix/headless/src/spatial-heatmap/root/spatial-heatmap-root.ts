@@ -6,6 +6,8 @@ import {
   drawTooltip,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
+  heatmapFits,
+  heatmapTone,
   ISOMETRIC,
   isRtl,
   MIRROR_RULE,
@@ -24,7 +26,6 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fits, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
 import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 import {
@@ -307,7 +308,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         height: heights[index] ?? 0,
         label: this.sourceRows[first + index]?.label ?? '',
         row: index % rows,
-        tone: toneOf(cell, bounds, palette),
+        tone: heatmapTone(cell, bounds, palette),
       })),
       columns: Math.ceil(cells.length / rows),
       rows: Math.min(rows, cells.length),
@@ -429,7 +430,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     }
     const pitch = this.cellPx + this.gapPx
     const across = width / ACROSS - this.rowCount * pitch - this.gapPx
-    return fits(
+    return heatmapFits(
       this.points.length,
       Math.max(across, Number.MIN_VALUE),
       this.cellPx,
@@ -470,7 +471,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         at === index,
         chosen.has(keys[index] ?? ''),
         grid,
-        toneOf(cells[index] ?? { value: undefined }, bounds, palette),
+        heatmapTone(cells[index] ?? { value: undefined }, bounds, palette),
       ),
     )
     const { box } = relief

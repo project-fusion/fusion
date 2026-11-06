@@ -6,21 +6,21 @@ export function Example() {
     >
       <helix-trend movement="down">
         8%
-        <span slot="label">Headcount</span>
+        <helix-text slot="label">Headcount</helix-text>
       </helix-trend>
       <helix-trend
         good="down"
         movement="down"
       >
         8%
-        <span slot="label">Churn</span>
+        <helix-text slot="label">Churn</helix-text>
       </helix-trend>
       <helix-trend
         good="up"
         movement="down"
       >
         8%
-        <span slot="label">Conversion</span>
+        <helix-text slot="label">Conversion</helix-text>
       </helix-trend>
     </helix-flex>
   )

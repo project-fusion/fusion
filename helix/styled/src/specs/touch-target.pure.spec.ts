@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -14,14 +14,20 @@ import { join } from 'node:path'
  */
 const SRC = join(import.meta.dir, '..')
 
+/* A family written once in `helix/neutral` draws a generated sheet beside its element. */
+const read = (sheet: string): string => {
+  const path = join(SRC, sheet)
+  return readFileSync(existsSync(path) ? path : path.replace(/\.css$/, '.generated.css'), 'utf8')
+}
+
 const TARGETS: [sheet: string, selector: string][] = [
   ['button/root/button-root.css', '[part="button"]::after'],
   ['icon-button/root/icon-button-root.css', '[part="button"]::after'],
   ['tabs/tab/tab.css', '[part="tab"]::after'],
   ['tabs/tab/tab.css', '[part="dismiss"]::after'],
   ['tag/root/tag-root.css', '[part="dismiss"]::after'],
-  ['date-input/root/date-input-root.css', '[part="trigger"]::after'],
-  ['time-input/root/time-input-root.css', '[part="trigger"]::after'],
+  ['date-input/root/date-input-root.generated.css', '[part="trigger"]'],
+  ['time-input/root/time-input-root.generated.css', '[part="trigger"]::after'],
   ['color-input/root/color-input-root.css', '[part="trigger"]::after'],
   ['input/root/input-root.css', '[part="clear"]::after'],
   ['input/root/input-root.css', '[part~="reveal"]::after'],
@@ -29,11 +35,11 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['number-input/root/number-input-root.css', '[part="increment"]::after'],
   ['number-input/root/number-input-root.css', '[part="decrement"]::after'],
   ['select/root/select-root.css', '[part="trigger"]::after'],
-  ['pagination/root/pagination-root.css', '[part~="page"]::after'],
-  ['pagination/root/pagination-root.css', '[part="previous"]::after'],
-  ['pagination/root/pagination-root.css', '[part="next"]::after'],
-  ['pagination/root/pagination-root.css', '[part="first"]::after'],
-  ['pagination/root/pagination-root.css', '[part="last"]::after'],
+  ['pagination/root/pagination-root.generated.css', '[part~="page"]::after'],
+  ['pagination/root/pagination-root.generated.css', '[part="previous"]::after'],
+  ['pagination/root/pagination-root.generated.css', '[part="next"]::after'],
+  ['pagination/root/pagination-root.generated.css', '[part="first"]::after'],
+  ['pagination/root/pagination-root.generated.css', '[part="last"]::after'],
   ['dialog/root/dialog-root.css', '[part="dismiss"]::after'],
   ['drawer/root/drawer-root.css', '[part="dismiss"]::after'],
   ['toast/item/toast-item.css', '[part="dismiss"]::after'],
@@ -42,19 +48,18 @@ const TARGETS: [sheet: string, selector: string][] = [
   ['toggle/root/toggle-root.css', '[part="item"]::after'],
   ['app-header/root/app-header-root.css', '[part="toggle"]::after'],
   ['carousel/root/carousel-root.css', '[part~="indicator"]::after'],
-  ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
+  ['filter-input/chip/filter-chip.generated.css', '[part="dismiss"]::after'],
   ['rating/root/rating-root.css', '[part="option"]::after'],
-  ['date-picker/root/date-picker-root.css', '[part="previous"]::after'],
-  ['date-picker/root/date-picker-root.css', '[part="next"]::after'],
+  ['date-picker/root/date-picker-root.generated.css', '[part="previous"]::after'],
+  ['date-picker/root/date-picker-root.generated.css', '[part="next"]::after'],
   ['notifications/root/notifications-root.css', '[part="mark-all"]::after'],
   ['megamenu/root/megamenu-root.css', '[part="trigger"]::after'],
   ['table/column/table-column.css', '[part="sort"]::after'],
   ['notifications/notification/notification.css', '[part="dismiss"]::after'],
   ['chat/composer/chat-composer.css', '[part="send"]::after'],
   ['chat/message/chat-message.css', '[part="retry"]::after'],
-  ['video/root/video-root.css', '[part="controls"] :where(a, button)::after'],
-  ['filter-input/chip/filter-chip.css', '[part="dismiss"]::after'],
-  ['lightbox/root/lightbox-root.css', '[part="zoom-out"]::after'],
+  ['video/root/video-root.generated.css', ':host [part="play"]::after'],
+  ['lightbox/root/lightbox-root.generated.css', '[part="zoom-out"]::after'],
   ['color-picker/root/color-picker-root.css', '[part="swatch"]::after'],
 ]
 
@@ -68,7 +73,7 @@ const ROWS = [
   'object-inspector/root/object-inspector-root.css',
   'outline/root/outline-root.css',
   'radio/root/radio-root.css',
-  'shared/row/row.css',
+  'option/root/option-root.css',
   'switch/root/switch-root.css',
   'tree/item/tree-item.css',
 ]
@@ -76,8 +81,8 @@ const ROWS = [
 describe('a control reaches the target', () => {
   for (const [sheet, selector] of TARGETS) {
     test(`${sheet} ${selector}`, () => {
-      const css = readFileSync(join(SRC, sheet), 'utf8')
-      const start = css.indexOf(`${selector} {`)
+      const css = read(sheet)
+      const start = Math.max(css.indexOf(`${selector} {`), css.indexOf(`${selector},`))
       expect(start).toBeGreaterThan(-1)
       expect(css.slice(start, css.indexOf('}', start))).toContain('var(--helix-size-target)')
     })
@@ -85,7 +90,7 @@ describe('a control reaches the target', () => {
 
   for (const sheet of ROWS) {
     test(`${sheet} grows to the target under a coarse pointer`, () => {
-      const css = readFileSync(join(SRC, sheet), 'utf8')
+      const css = read(sheet)
       expect(css).toMatch(
         /@media \(pointer: coarse\)[^@]*min-block-size: [^;]*var\(--helix-size-target\)/,
       )

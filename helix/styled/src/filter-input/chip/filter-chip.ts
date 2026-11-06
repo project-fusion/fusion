@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterChip } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './filter-chip.css.js'
+import { styles } from './filter-chip.generated.css.js'
 
 /**
  * @summary One active filter: a field, a comparison, and the values it is compared to.

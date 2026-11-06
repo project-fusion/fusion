@@ -82,19 +82,19 @@ describe('the styled heatmap', () => {
    * nothing.
    *
    * Read off the sheet rather than off `getComputedStyle`, because happy-dom
-   * does not resolve a custom property declared in an adopted stylesheet's
-   * `:host` and reports every one of these as the empty string. The browser is
-   * where the cascade is exercised; here the fact worth holding is that the
-   * declaration exists at all, which is what was missing.
+   * does not resolve a custom property a stylesheet sets and reports every one
+   * of these as the empty string. The browser is where the cascade is
+   * exercised; here the fact worth holding is that the sheet reads each hook
+   * with the tier's own color behind it, which is what was missing.
    */
   test('this tier is what the names are worth', async () => {
     /* Imported here rather than at the top of the file: the sheet pulls in
        `@fusion.dev/helix-core`, and a module that touches the DOM globals before
        `registerDom` has installed them takes happy-dom's parser down with it. */
-    const { styles } = await import('./heatmap-root.css.js')
+    const { styles } = await import('./heatmap-root.generated.css.js')
     const declared = [styles].flat().map(String).join('\n')
     for (const name of ['success', 'warning', 'danger', '1', '2', '3', '4', '5']) {
-      expect(declared).toContain(`--heatmap-tone-${name}:`)
+      expect(declared).toContain(`var(--heatmap-tone-${name}, `)
     }
   })
 

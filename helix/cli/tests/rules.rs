@@ -172,21 +172,25 @@ fn plant_in(
 
 /// The one setting every rule needs: `prepare` refuses a run whose tiers are
 /// all missing, so even a rule that reads only `layers` gets a tier.
-const TIERS: &str = r#"{ "tiers": ["src"] }"#;
+const TIERS: &str = r#"{ "components": { "tiers": ["src"] } }"#;
 
 /// Two layers, base under styled, which is what the layer-pair rules read.
 const PAIR: &str = r#"{
-  "tiers": ["packages/base/src", "packages/styled/src"],
-  "layers": [
-    { "prefix": "base-", "source": "packages/base/src" },
-    { "prefix": "helix-", "source": "packages/styled/src" }
-  ]
+  "components": {
+    "tiers": ["packages/base/src", "packages/styled/src"],
+    "layers": [
+      { "prefix": "base-", "source": "packages/base/src" },
+      { "prefix": "helix-", "source": "packages/styled/src" }
+    ]
+  }
 }"#;
 
 /// One styled layer beside its manifest.
 const STYLED: &str = r#"{
-  "tiers": ["packages/styled/src"],
-  "layers": [{ "prefix": "helix-", "source": "packages/styled/src" }]
+  "components": {
+    "tiers": ["packages/styled/src"],
+    "layers": [{ "prefix": "helix-", "source": "packages/styled/src" }]
+  }
 }"#;
 
 const READONLY: &str = r"export class HelixInput extends LitElement {
@@ -300,7 +304,7 @@ fn attributes() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "documents": ["docs"] }"#,
+                r#"{ "components": { "tiers": ["src"], "documents": ["docs"] } }"#,
             ),
             (
                 "src/chip/chip.ts",
@@ -657,7 +661,7 @@ fn derived_steps() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "layer": ["styles/base.css"] }"#,
+                r#"{ "components": { "tiers": ["src"], "layer": ["styles/base.css"] } }"#,
             ),
             (
                 "styles/base.css",
@@ -1084,9 +1088,11 @@ fn examples() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["packages/styled/src"],
-  "layouts": ["centered"],
-  "layers": [{ "prefix": "helix-", "source": "packages/styled/src" }]
+  "components": {
+    "tiers": ["packages/styled/src"],
+    "layouts": ["centered"],
+    "layers": [{ "prefix": "helix-", "source": "packages/styled/src" }]
+  }
 }"#,
             ),
             (
@@ -1150,7 +1156,10 @@ fn exportparts() {
     plant(
         "exportparts",
         &[
-            ("helix.json", r#"{ "tiers": ["src"], "outside": ["docs"] }"#),
+            (
+                "helix.json",
+                r#"{ "components": { "tiers": ["src"], "outside": ["docs"] } }"#,
+            ),
             (
                 "src/field/field.ts",
                 r"/**
@@ -1201,7 +1210,7 @@ export class HelixTable extends LitElement {{
     let tree = Tree::new("exportparts-through-a-name");
     tree.write(
         "helix.json",
-        r#"{ "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] }"#,
+        r#"{ "components": { "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] } }"#,
     )
     .write(
         "src/pager/pager.ts",
@@ -1256,7 +1265,7 @@ export class HelixChat extends LitElement {{
     let tree = Tree::new("exportparts-second-names");
     tree.write(
         "helix.json",
-        r#"{ "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] }"#,
+        r#"{ "components": { "tiers": ["src"], "layers": [{ "prefix": "helix-", "source": "src" }] } }"#,
     )
     .write(
         "src/turn/turn.ts",
@@ -1418,7 +1427,7 @@ fn glyphs() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["styled/src"], "layers": [{ "prefix": "hx-", "source": "styled/src" }] }"#,
+                r#"{ "components": { "tiers": ["styled/src"], "layers": [{ "prefix": "hx-", "source": "styled/src" }] } }"#,
             ),
             (
                 "styled/src/button/button.ts",
@@ -1532,7 +1541,7 @@ fn hooks() {
     plant(
         "hooks",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["pkg/styled/src"] } }"#),
             (
                 "pkg/styled/src/button/button.ts",
                 "/**\n * @cssproperty --button-background-color - The fill.\n */\nexport class Button extends HTMLElement {}\n",
@@ -1559,7 +1568,7 @@ fn hooks_in_a_shallower_tier() {
         "hooks-shallow",
         "hooks",
         &[
-            ("helix.json", r#"{ "tiers": ["src/components"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["src/components"] } }"#),
             (
                 "src/components/button/button.ts",
                 "/**\n * @cssproperty --button-background-color - The fill.\n */\nexport class Button extends HTMLElement {}\n",
@@ -1588,7 +1597,7 @@ fn hooks_read_by_the_layer() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["pkg/styled/src"], "layer": ["pkg/styles/src/base.css"] }"#,
+                r#"{ "components": { "tiers": ["pkg/styled/src"], "layer": ["pkg/styles/src/base.css"] } }"#,
             ),
             (
                 "pkg/styled/src/navigation/navigation.ts",
@@ -1619,7 +1628,7 @@ fn hooks_below_the_class_block() {
         "hooks-misplaced",
         "hooks",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["pkg/styled/src"] } }"#),
             (
                 "pkg/styled/src/button/button.ts",
                 "/**\n * @cssproperty --button-background-color - The fill.\n */\n@customElement('x-button')\nexport class Button extends HTMLElement {}\n",
@@ -1757,9 +1766,11 @@ fn overruled() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["styled/src"],
-  "documents": ["app"],
-  "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  "components": {
+    "tiers": ["styled/src"],
+    "documents": ["app"],
+    "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  }
 }"#,
             ),
             ("app/site.css", "hx-button {\n  color: red;\n}\n"),
@@ -1796,7 +1807,7 @@ fn pairings() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "oracle": "oracle.json" }"#,
+                r#"{ "components": { "tiers": ["src"], "oracle": "oracle.json" } }"#,
             ),
             (
                 "oracle.json",
@@ -1842,7 +1853,7 @@ fn pairings_through_a_hook() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "oracle": "oracle.json" }"#,
+                r#"{ "components": { "tiers": ["src"], "oracle": "oracle.json" } }"#,
             ),
             (
                 "oracle.json",
@@ -1879,7 +1890,7 @@ fn pairings_over_a_ground_laid_on_another() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "oracle": "oracle.json" }"#,
+                r#"{ "components": { "tiers": ["src"], "oracle": "oracle.json" } }"#,
             ),
             (
                 "oracle.json",
@@ -1972,9 +1983,11 @@ fn platform_fidelity() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["styled/src"],
-  "platform": "platform.json",
-  "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  "components": {
+    "tiers": ["styled/src"],
+    "platform": "platform.json",
+    "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  }
 }"#,
             ),
             (
@@ -2141,7 +2154,8 @@ export class Column extends HTMLElement {{
 }
 
 /// Exactly two files: the last `layer` sheet and, hardcoded under the last
-/// `layers` source, `button/root/button-root.css`.
+/// `layers` source, `button/root/button-root.generated.css` or, where there
+/// is none, `button/root/button-root.css`.
 #[test]
 fn recipes() {
     let element = |color: &str| {
@@ -2153,9 +2167,11 @@ fn recipes() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["styled/src"],
-  "layer": ["styles/base.css"],
-  "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  "components": {
+    "tiers": ["styled/src"],
+    "layer": ["styles/base.css"],
+    "layers": [{ "prefix": "hx-", "source": "styled/src" }]
+  }
 }"#,
             ),
             (
@@ -2366,7 +2382,10 @@ fn registry() {
         "registry-value",
         "registry",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "helix.json",
+                r#"{ "components": { "tiers": ["pkg/styled/src"] } }"#,
+            ),
             (
                 "pkg/styled/src/card/card.ts",
                 "export class Card extends HTMLElement {}\n",
@@ -2395,7 +2414,10 @@ fn registry_by_omission() {
         "registry-omission",
         "registry",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "helix.json",
+                r#"{ "components": { "tiers": ["pkg/styled/src"] } }"#,
+            ),
             (
                 "pkg/styled/src/card/card.ts",
                 "export class Card extends HTMLElement {}\n",
@@ -2425,7 +2447,10 @@ fn registry_value_table_by_omission() {
         "registry-value-omission",
         "registry",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/styled/src"] }"#),
+            (
+                "helix.json",
+                r#"{ "components": { "tiers": ["pkg/styled/src"] } }"#,
+            ),
             (
                 "pkg/styled/src/card/card.ts",
                 "export class Card extends HTMLElement {}\n",
@@ -2480,7 +2505,7 @@ fn resolved() {
         "resolved",
         "resolved",
         &[
-            ("helix.json", r#"{ "tiers": ["src"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["src"] } }"#),
             (
                 "src/chip/chip.ts",
                 "export type ChipTone = (typeof CHIP_TONES)[number]\nexport class HelixChip extends LitElement {}\n",
@@ -2562,7 +2587,7 @@ fn seams() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["headless/src"], "layers": [{ "prefix": "hx-", "source": "headless/src" }] }"#,
+                r#"{ "components": { "tiers": ["headless/src"], "layers": [{ "prefix": "hx-", "source": "headless/src" }] } }"#,
             ),
             (
                 "headless/src/item/root/item-root.ts",
@@ -2609,9 +2634,11 @@ fn seeds() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["src"],
-  "oracle": "oracle.json",
-  "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  "components": {
+    "tiers": ["src"],
+    "oracle": "oracle.json",
+    "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  }
 }"#,
             ),
             (
@@ -2655,9 +2682,11 @@ fn seeds_over_a_ground_laid_on_another() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["src"],
-  "oracle": "oracle.json",
-  "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  "components": {
+    "tiers": ["src"],
+    "oracle": "oracle.json",
+    "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  }
 }"#,
             ),
             (
@@ -2706,9 +2735,11 @@ fn seeds_without_the_sheet() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["src"],
-  "oracle": "oracle.json",
-  "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  "components": {
+    "tiers": ["src"],
+    "oracle": "oracle.json",
+    "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+  }
 }"#,
             ),
             (
@@ -2971,7 +3002,7 @@ fn slots() {
     plant(
         "slots",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/src"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["pkg/src"] } }"#),
             ("pkg/custom-elements.json", &manifest("header")),
             (
                 "pkg/src/card/card.ts",
@@ -3001,7 +3032,7 @@ fn slots_from_a_shared_tier() {
         "slots-shared",
         "slots",
         &[
-            ("helix.json", r#"{ "tiers": ["pkg/core", "pkg/src"] }"#),
+            ("helix.json", r#"{ "components": { "tiers": ["pkg/core", "pkg/src"] } }"#),
             ("pkg/custom-elements.json", &manifest("header")),
             (
                 "pkg/core/mixins/mixin-field/mixin-field.ts",
@@ -3219,11 +3250,13 @@ fn stable() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["styled/src"],
-  "layers": [
-    { "prefix": "hx-headless-", "source": "headless/src" },
-    { "prefix": "hx-", "source": "styled/src" }
-  ]
+  "components": {
+    "tiers": ["styled/src"],
+    "layers": [
+      { "prefix": "hx-headless-", "source": "headless/src" },
+      { "prefix": "hx-", "source": "styled/src" }
+    ]
+  }
 }"#,
             ),
             ("headless/src/.keep", ""),
@@ -3265,11 +3298,13 @@ fn tier() {
             (
                 "helix.json",
                 r#"{
-  "tiers": ["headless/src", "styled/src"],
-  "layers": [
-    { "prefix": "hx-headless-", "source": "headless/src" },
-    { "prefix": "hx-", "source": "styled/src" }
-  ]
+  "components": {
+    "tiers": ["headless/src", "styled/src"],
+    "layers": [
+      { "prefix": "hx-headless-", "source": "headless/src" },
+      { "prefix": "hx-", "source": "styled/src" }
+    ]
+  }
 }"#,
             ),
             (
@@ -3304,7 +3339,7 @@ fn token_defaults() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["src"], "layer": ["styles/tokens.css"] }"#,
+                r#"{ "components": { "tiers": ["src"], "layer": ["styles/tokens.css"] } }"#,
             ),
             ("styles/tokens.css", ":root {\n  --helix-space-2: 8px;\n}\n"),
             ("src/card/card.css", ":host {\n  padding: var(--helix-space-2);\n}\n"),
@@ -3332,7 +3367,7 @@ fn tokens() {
         &[
             (
                 "helix.json",
-                r#"{ "tiers": ["pkg/src"], "layer": ["styles/src/tokens.css"] }"#,
+                r#"{ "components": { "tiers": ["pkg/src"], "layer": ["styles/src/tokens.css"] } }"#,
             ),
             (
                 "styles/src/tokens.css",

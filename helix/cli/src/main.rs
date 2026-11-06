@@ -20,10 +20,12 @@ mod args;
 mod component;
 mod config;
 mod diagnostics;
+mod family;
 mod manifest;
 mod mcp;
 mod new;
 mod scan;
+mod shared;
 mod theme;
 
 use std::path::PathBuf;
@@ -32,10 +34,14 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
-use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
+use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, System, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
-const PRODUCT: &str = "helix";
+pub const PRODUCT: &str = "helix";
+
+/// The family compiler's folder in the repository, as a module it writes from
+/// its own definitions names its source.
+pub const COMPILER: &str = "helix/cli/src/family";
 
 /// The npm package this binary ships in, which is what tells it its version.
 const PACKAGE: &str = "@fusion.dev/helix-cli";
@@ -97,6 +103,7 @@ fn main() {
                     args.example.as_deref(),
                     args.tier.as_deref(),
                 ),
+                Api::Anatomy(args) => api::anatomy(&from, &args.family, args.tier.as_deref()),
                 Api::Imports(args) => api::imports(&from, &args.tags),
                 Api::Tokens(args) => {
                     api::tokens(&from, args.query.as_deref(), args.category.as_deref())
@@ -120,6 +127,29 @@ fn main() {
         Noun::Diagnostics(args) => diagnostics::run(args, &from, cli.json, paint),
         Noun::New(args) => new::run(args, &from, cli.json, paint),
         Noun::Scan(args) => scan::run(args, &from, cli.json, paint),
+        Noun::Shared(args) => shared::run(args, &from, cli.json, paint),
+        Noun::System { config, verb } => {
+            let config = config.as_deref();
+            match verb {
+                System::Anatomy(args) => family::anatomy(args, config, &from),
+                System::Build(args) => family::build(args, config, &from, cli.json),
+                #[cfg(feature = "internal")]
+                System::Capabilities(args) => family::capabilities(args, config, &from, cli.json),
+                System::Check(args) => family::check(args, config, &from, cli.json),
+                System::Components(args) => family::components(args, config, &from, cli.json),
+                System::Config(args) => family::config(args, config, &from),
+                #[cfg(feature = "internal")]
+                System::DesignTokens(args) => family::design_tokens(args, config, &from, cli.json),
+                #[cfg(feature = "internal")]
+                System::Machines(args) => family::machines(args, config, &from, cli.json),
+                System::Parts(args) => family::parts(args, config, &from, cli.json),
+                System::Platforms(args) => family::platforms(args, config, &from),
+                System::Stylesheets(args) => family::stylesheets(args, config, &from, cli.json),
+                System::Tokens(args) => family::tokens(args, config, &from, cli.json),
+                #[cfg(feature = "internal")]
+                System::Types(args) => family::types(args, config, &from, cli.json),
+            }
+        }
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),

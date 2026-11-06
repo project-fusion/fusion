@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+  unweighted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,10 +20,12 @@ beforeAll(async () => {
    tier's and are tested there. */
 const sheet = (tag: 'helix-breadcrumb' | 'helix-breadcrumbs'): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector` in the crumb's sheet. */

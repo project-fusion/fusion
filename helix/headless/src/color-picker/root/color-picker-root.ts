@@ -4,7 +4,6 @@ import {
   type ColorWords,
   CopyController,
   capturePointer,
-  clamp,
   colorName,
   customElement,
   drawIcon,
@@ -24,43 +23,33 @@ import {
   type PickerFailure,
   parseColor,
   rovingStop,
-  splitValues,
   toCss,
   words,
   wordsConverter,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import {
+  areaAt,
+  areaKeyed,
+  type ChannelName,
+  COLOR_START,
+  channelFields,
+  colorPresets,
+  hueAt,
+  nextColorFormat,
+  writeChannel,
+} from '@fusion.dev/helix-core/color-picker'
 import { eyedropper } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
-import { type ChannelName, channelFields, writeChannel } from '../channels.js'
 import { HelixSampleEndEvent, HelixSampleStartEvent } from '../events/index.js'
-import { areaAt, hueAt } from '../wheel.js'
 /* Relative, so this registers the base slider and the styled file's identical
    import registers the styled one. `tier` picks which the template asks for. */
 import '../../button/index.js'
 import '../../button-group/index.js'
 import '../../slider/index.js'
-
-/**
- * The formats the toggle walks through, in the order it walks them: the CSS
- * syntaxes. `hsb` is not CSS, so it is reached by `format` alone, and the
- * toggle walks on from it to hex.
- */
-const FORMATS: ColorFormat[] = ['hex', 'rgb', 'hsl', 'oklch']
-
-/**
- * Where a picker starts when there is nothing to start from.
- *
- * Not black, which is what `<input type="color">` opens on. Black is
- * `brightness: 0`, and from there the hue ramp moves nothing and the square is
- * one flat color: the whole thing is dead until the reader happens to raise
- * brightness first. Pure red is the nearest color where everything answers the
- * first thing touched.
- */
-const START: Color = { alpha: 100, brightness: 100, hue: 0, saturation: 100 }
 
 /** What `EyeDropper` looks like where the browser has one. */
 interface EyeDropperConstructor {
@@ -716,7 +705,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     /* `settled` between the value and the start, so a half-typed value leaves
        the square where the last whole one put it rather than throwing it back to
        red. Only reached where the value itself is not a color. */
-    return this.moved ?? parseColor(this.value) ?? parseColor(this.settled) ?? START
+    return this.moved ?? parseColor(this.value) ?? parseColor(this.settled) ?? COLOR_START
   }
 
   /**
@@ -739,7 +728,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * which parses.
    */
   private get presets(): string[] {
-    return splitValues(this.swatches, ',').filter((one) => parseColor(one) !== null)
+    return colorPresets(this.swatches)
   }
 
   /**
@@ -892,7 +881,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.readOnly) {
       return
     }
-    this.format = FORMATS[(FORMATS.indexOf(this.format ?? 'hex') + 1) % FORMATS.length] ?? 'hex'
+    this.format = nextColorFormat(this.format)
     if (this.value !== '') {
       this.move({})
       this.settle()
@@ -992,10 +981,10 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.isDisabled || (grid && event.composedPath().includes(grid))) {
       return
     }
+    /* Whether or not the capture took, as the square settles: a pointer the
+       browser would not capture still moved the hue, and `change` was lost. */
     if (event.type === 'pointerup' || event.type === 'pointercancel') {
-      if (wheel.hasPointerCapture(event.pointerId)) {
-        this.settle()
-      }
+      this.settle()
       return
     }
     if (event.type === 'pointerdown') {
@@ -1058,21 +1047,11 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     if (this.isDisabled || this.readOnly) {
       return
     }
-    const color = this.color
-    const along = isRtl(this) ? -1 : 1
-    const held = (at: number): number => clamp(at, 0, 100)
-    const step = event.shiftKey ? 10 : 1
-    const moves: Record<string, Partial<Color>> = {
-      ArrowDown: { brightness: held(color.brightness - step) },
-      ArrowLeft: { saturation: held(color.saturation - along * step) },
-      ArrowRight: { saturation: held(color.saturation + along * step) },
-      ArrowUp: { brightness: held(color.brightness + step) },
-      End: { saturation: held(color.saturation + along * 10) },
-      Home: { saturation: held(color.saturation - along * 10) },
-      PageDown: { brightness: held(color.brightness - 10) },
-      PageUp: { brightness: held(color.brightness + 10) },
-    }
-    const next = moves[event.key]
+    const next = areaKeyed(this.color, {
+      key: event.key,
+      rtl: isRtl(this),
+      shift: event.shiftKey,
+    })
     if (!next) {
       return
     }

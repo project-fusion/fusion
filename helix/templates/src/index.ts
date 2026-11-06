@@ -63,6 +63,15 @@ export const templates: readonly Template[] = [
     named: ['app/layout.tsx', 'package.json'],
     title: 'React (Next.js)',
   },
+  /* **Its own pages, held to nothing.** An app for the web and a phone has a
+     header over routes where the others have a landing page, a table, and a
+     form, so `smoke:scaffold` builds it and leaves it out of the comparison. */
+  {
+    description: 'React and TypeScript on Expo Router: one app for the web, iOS, and Android.',
+    id: 'expo-router',
+    named: ['app.json', 'package.json', 'src/header.tsx'],
+    title: 'Expo Router (web, iOS, Android)',
+  },
   {
     description: 'Vue and TypeScript on Vite.',
     id: 'vue-vite',

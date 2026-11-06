@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSplitter } from '@fusion.dev/helix-headless/splitter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './splitter-root.css.js'
+import { styles } from './splitter-root.generated.css.js'
 
 /**
  * @summary Two panes and a divider that you can move.

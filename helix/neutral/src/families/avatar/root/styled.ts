@@ -1,0 +1,128 @@
+import { oneOf } from '../../../render.js'
+import { fn, native, product, token, web } from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Avatar's styled tier.
+ *
+ * **A circle of the avatar size token**, or a rounded square, filled with
+ * the raised surface: gray, not a brand tint, since an avatar with no
+ * picture is a placeholder for a person, and raised separates from the page
+ * in both schemes. The picture fills it, and initials are sized against it,
+ * so one rule covers every size.
+ *
+ * **The web draws the picture or the initials from its state**, and a phone
+ * hides the one it does not draw: the picture once it fails, and the
+ * initials while the picture is loaded, while `fallback-delay` holds them
+ * back, and while a picture with no delay is on its way.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'avatar',
+    hooks: {
+      /* `neutral-subtle`, the gray a mark stands on the page in, as a neutral Badge's:
+         `surface-raised` was a panel's rung, a disc with no edge on the page. */
+      backgroundColor: token('color-neutral-subtle'),
+      color: token('color-foreground'),
+      fontWeight: token('weight-medium'),
+      size: null,
+    },
+    own: { avatarSize: null },
+    props: { shape: oneOf(['circle', 'rounded']), size: oneOf(['sm', 'md', 'lg']) },
+    stylesheet: 'avatar/root/avatar-root.generated.css',
+  },
+  ({ hook, on, own, rule }) => [
+    on('host', [
+      rule({
+        alignItems: 'center',
+        backgroundColor: hook.backgroundColor,
+        blockSize: own.avatarSize,
+        borderRadius: token('radii-full'),
+        color: hook.color,
+        display: 'inline-flex',
+        flex: '0 0 auto',
+        inlineSize: own.avatarSize,
+        justifyContent: 'center',
+        overflow: 'hidden',
+        web: { justifyContent: 'safe center' },
+        own: { avatarSize: hook.size(token('size-avatar')) },
+      }),
+      rule({ size: 'sm' }, { own: { avatarSize: hook.size(token('size-avatar-sm')) } }),
+      rule({ size: 'lg' }, { own: { avatarSize: hook.size(token('size-avatar-lg')) } }),
+      rule({ shape: 'rounded' }, { borderRadius: token('radii-md') }),
+      rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
+    ]),
+    on({ region: 'default', slotted: '*' }, [
+      rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
+      native([
+        rule(
+          [{ loaded: true }, { loading: true, waiting: true }, { delays: false, loading: true }],
+          { display: 'none' },
+        ),
+      ]),
+    ]),
+    on('image', [
+      rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
+      /* A phone lays the picture over the initials, as the web draws one in
+         place of the other. */
+      native([
+        rule({ inset: 0, position: 'absolute' }),
+        rule([{ error: true }, { delays: true, loading: true, waiting: false }], {
+          display: 'none',
+        }),
+      ]),
+    ]),
+    /* Words a page slots straight in are set as the initials are, and neither falls
+       under the smallest text a small avatar holds. */
+    on({ region: 'default' }, [
+      web([
+        rule({
+          fontSize: fn(
+            'max',
+            product(own.avatarSize, 0.4),
+            fn('min', token('text-xs'), product(own.avatarSize, 0.5)),
+          ),
+        }),
+      ]),
+    ]),
+    on('initials', [
+      rule({
+        fontSize: product(own.avatarSize, 0.4),
+        web: {
+          fontSize: fn(
+            'max',
+            product(own.avatarSize, 0.4),
+            fn('min', token('text-xs'), product(own.avatarSize, 0.5)),
+          ),
+        },
+        fontWeight: hook.fontWeight,
+        letterSpacing: token('tracking-wide'),
+        lineHeight: 1,
+        userSelect: 'none',
+      }),
+      /* A phone's circle is space, which stops growing at the largest
+         standard text size, so the initials, a share of it, stop there too
+         and fit it at every size, as the web's grow with their circle.
+         `min()` of one length is that length in space's points. */
+      native([
+        rule({ fontSize: fn('min', product(own.avatarSize, 0.4)) }),
+        rule(
+          [{ loaded: true }, { loading: true, waiting: true }, { delays: false, loading: true }],
+          { display: 'none' },
+        ),
+      ]),
+      /* **The initials at the middle, on their capitals**, as a button's label
+         is: trimmed to the capitals and the baseline, the box is the letters,
+         and the avatar centers it, with no room kept for descenders capitals
+         do not have. Only where the trim is supported. */
+      web([
+        rule(
+          { supports: '(text-box: trim-both cap alphabetic)' },
+          { textBox: 'trim-both cap alphabetic' },
+        ),
+      ]),
+    ]),
+  ],
+)

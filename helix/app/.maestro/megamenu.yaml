@@ -1,0 +1,65 @@
+# Megamenu: a press on the trigger opens the band of destinations under it,
+# a touch outside closes it, and choosing a destination closes it. The events
+# example logs what the megamenu sends as it opens and as it closes. Recorded.
+# A destination is one label, its name and its description, so a step matches
+# it by a part of its words, as an iOS list row is. An event's row is the same.
+appId: dev.fusion.helix.app
+name: Megamenu
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://megamenu/preview/preview
+      SHOWS: Products
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: megamenu
+- tapOn: Products
+- extendedWaitUntil:
+    visible: .*Plan and track work across teams.*
+    timeout: 5000
+- tapOn:
+    point: 50%, 95%
+- extendedWaitUntil:
+    notVisible: .*Plan and track work across teams.*
+    timeout: 5000
+- tapOn: Products
+- extendedWaitUntil:
+    visible: .*Dashboards.*
+    timeout: 5000
+- tapOn: .*Dashboards.*
+- extendedWaitUntil:
+    notVisible: .*Track the numbers you care about.*
+    timeout: 5000
+# The gallery answers a link in an example with an alert, which a next step
+# cannot reach past: Android's tree holds the alert alone. The words are quoted,
+# since YAML reads an unquoted " #" as the start of a comment.
+- extendedWaitUntil:
+    visible: "Opens #trace"
+    timeout: 5000
+- tapOn: OK
+- openLink: helix://megamenu/events/preview
+- extendedWaitUntil:
+    visible: .*No events yet.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: .*helix-before-open.*
+    timeout: 5000
+# The open panel is named Products too, and stands under its trigger.
+- tapOn:
+    text: Products
+    index: 0
+- extendedWaitUntil:
+    visible: .*helix-before-close.*
+    timeout: 5000
+- assertVisible: .*Changed from open to closed.*
+- stopRecording

@@ -1,18 +1,20 @@
-<!-- @summary A header that stays at the top while the page scrolls under it. -->
+<!-- @summary A header that stays at the top of the window while the page scrolls. -->
 <link
   href="styles.css"
   rel="stylesheet"
 >
 
-<div class="page">
-  <helix-app-header sticky>
-    <span slot="start">Logo</span>
+<helix-flex direction="column">
+  <helix-app-header
+    sticky
+  >
+    <helix-text slot="start">Logo</helix-text>
     <helix-navigation label="Sections">
-      <a
-        aria-current="page"
+      <helix-navigation-item
+        current="page"
         href="#one"
-      >Overview</a>
-      <a href="#two">Projects</a>
+      >Overview</helix-navigation-item>
+      <helix-navigation-item href="#two">Projects</helix-navigation-item>
     </helix-navigation>
     <helix-icon-button
       label="Settings"
@@ -22,29 +24,41 @@
     </helix-icon-button>
   </helix-app-header>
 
-  <div class="prose">
+  <helix-card separation="plain">
     <helix-text
       as="h2"
       scale="title"
     >Recent activity</helix-text>
-    <helix-text as="p">
-      Alex Kim uploaded three files to Website redesign.
-    </helix-text>
+    <helix-text as="p">Alex Kim uploaded three files to Website redesign.</helix-text>
 
     <helix-text
       as="h2"
       scale="title"
     >Team members</helix-text>
-    <helix-text as="p">
-      Invite people to your workspace and choose what each person can edit.
-    </helix-text>
+    <helix-text as="p">Invite people to your workspace and choose what each person can edit.</helix-text>
 
     <helix-text
       as="h2"
       scale="title"
     >Billing</helix-text>
-    <helix-text as="p">
-      Your next invoice is due on October 1, 2026.
-    </helix-text>
-  </div>
-</div>
+    <helix-text as="p">Your next invoice is due on October 1, 2026.</helix-text>
+
+    <helix-text
+      as="h2"
+      scale="title"
+    >Integrations</helix-text>
+    <helix-text as="p">Connect the tools your team already uses, and choose what each one can read.</helix-text>
+
+    <helix-text
+      as="h2"
+      scale="title"
+    >Notifications</helix-text>
+    <helix-text as="p">Choose which updates reach you by email and which stay in the app.</helix-text>
+
+    <helix-text
+      as="h2"
+      scale="title"
+    >Security</helix-text>
+    <helix-text as="p">Turn on two-step sign-in for everyone in the workspace.</helix-text>
+  </helix-card>
+</helix-flex>

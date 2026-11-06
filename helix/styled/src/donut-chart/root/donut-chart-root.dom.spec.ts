@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, type Updatable, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -14,10 +14,12 @@ beforeAll(async () => {
 const sheet = (): string => {
   const declared = (customElements.get('helix-donut-chart') as unknown as { styles: unknown })
     .styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`. */
@@ -165,7 +167,7 @@ describe('donut chart sweep', () => {
        over its top, and one ended at the edge drops its figure under the ends. */
     const half = rule(':host([sweep="half"]) [part="center"]')
     expect(half).toMatch(
-      /inset-block-end: calc\(\s*100% \*\s*\(var\(--donut-chart-stroke, 16\) \/ 2\)/,
+      /inset-block-end: calc\(\s*100% \*\s*\(?var\(--donut-chart-stroke, 16\)\)? \/ 2/,
     )
     expect(half).toContain('inset-block-start: auto')
     expect(half).toContain('place-items: end center')

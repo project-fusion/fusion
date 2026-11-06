@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessVideoPlaylistItem } from '@fusion.dev/helix-headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './video-playlist-item.css.js'
+import { styles } from './video-playlist-item.generated.css.js'
 
 /**
  * @summary One entry in a video playlist.

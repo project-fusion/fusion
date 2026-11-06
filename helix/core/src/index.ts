@@ -1,6 +1,9 @@
 /* The unregistered-child warning, which a production build resolves to a
    function that does nothing. See `utils/audit-children`. */
 export { auditChildren, auditEntry } from '#audit-children'
+/* The static-description warning, which a production build resolves to a
+   function that does nothing. See `utils/audit-description`. */
+export { auditDescription } from '#audit-description'
 /* The missing-name warning, which a production build resolves to a function
    that does nothing. See `utils/audit-name`. */
 export { auditIconControl, auditName } from '#audit-name'
@@ -124,6 +127,10 @@ export {
   PopoverController,
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
+export {
+  PresentationController,
+  type PresentationOptions,
+} from './controllers/presentation-controller/presentation-controller.js'
 export {
   RelativeClockController,
   type RelativeClockOptions,
@@ -326,6 +333,8 @@ export {
   type DrawAutofillOptions,
   drawAutofill,
 } from './utils/autofill-select/autofill-select.js'
+export { initialsOf } from './utils/avatar/avatar.js'
+export { badgeBlank, badgeCapped, badgeText, badgeWords } from './utils/badge-count/badge-count.js'
 export {
   type BoxAxisText,
   type BoxLabel,
@@ -363,6 +372,38 @@ export {
   yearOut,
   yearPageOf,
 } from './utils/calendar/calendar.js'
+export {
+  type DateAnswer,
+  type DateProblem,
+  dateProblem,
+  selectionKind,
+} from './utils/calendar/calendar-answer.js'
+export {
+  type AnchorFrom,
+  calendarAnchor,
+  calendarAtEnd,
+  calendarAtStart,
+  chooseDate,
+  clampDate,
+  type DateMode,
+  type DateRules,
+  type DayCell,
+  type DrawnRange,
+  dateBarred,
+  dateChosen,
+  dateRange,
+  dayKeyMove,
+  drawnRange,
+  firstOfMonth,
+  type MonthGrid,
+  monthCells,
+  monthWeeks,
+  nearestOpenMonth,
+  rangePending,
+  weekOffset,
+  writtenMonth,
+} from './utils/calendar/calendar-grid.js'
+export { type CalendarFormats, calendarFormats } from './utils/calendar/calendar-words.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
 export {
   type AxisLengths,
@@ -372,6 +413,128 @@ export {
   UNMEASURED_LABELS,
 } from './utils/category-labels/category-labels.js'
 export { centerInView } from './utils/center-in-view/center-in-view.js'
+export {
+  type AreaAsked,
+  type AreaBand,
+  type AreaStack,
+  type AxisScales,
+  areaBand,
+  areaDomain,
+  areaPath,
+  areaStack,
+  areaTallied,
+  areaTipY,
+  axisScales,
+  BAR_SHOWN_THICKNESS,
+  type BarAsked,
+  type BarColumn,
+  type BarDraw,
+  type BarFrame,
+  type BarLayout,
+  type BarPath,
+  barBand,
+  barBox,
+  barColumns,
+  barColumnsAt,
+  barDense,
+  barFrame,
+  barHighest,
+  barLayout,
+  barLinePath,
+  barNames,
+  barOutline,
+  barPaths,
+  barRect,
+  barTip,
+  barToned,
+  baselineAt,
+  bubbleWeights,
+  type Column,
+  type ColumnBox,
+  correlation,
+  DONUT_GAP,
+  type DonutBearing,
+  type DonutRing,
+  type DonutShare,
+  donutBearing,
+  donutEdge,
+  donutRing,
+  donutSeam,
+  donutShares,
+  type Fit,
+  type HeatmapOverview,
+  type HeatmapReading,
+  type HeatmapStretch,
+  heatmapCellBox,
+  heatmapFits,
+  heatmapInSequence,
+  heatmapMonthPage,
+  heatmapOverview,
+  heatmapRectangle,
+  heatmapStretch,
+  heatmapTone,
+  isHidden,
+  type Latest,
+  type LineEnd,
+  type LineMarks,
+  latestReadings,
+  latestShares,
+  latestWords,
+  layersOf,
+  leastSquares,
+  levelRules,
+  lineDomain,
+  lineEnds,
+  lineMarks,
+  lineTipAt,
+  lineWash,
+  type Measures,
+  measuresOf,
+  type NameList,
+  namesIn,
+  type Overview,
+  overviewWords,
+  type Placed,
+  percentIn,
+  type Run,
+  readingAt,
+  readingPosition,
+  readingWords,
+  rowsWithShare,
+  SCATTER_LAYERS,
+  type ScatterField,
+  type ScatterLayer,
+  type ScatterPath,
+  type ScatterPoint,
+  type SliceShare,
+  type SparklineInput,
+  type SparklineKind,
+  type SparklinePlot,
+  STRIP_HEIGHT,
+  type StackEnd,
+  scatterField,
+  scatterLayers,
+  scatterNearest,
+  scatterNice,
+  scatterOrder,
+  scatterScales,
+  scatterTicks,
+  scatterTrends,
+  seriesOfRows,
+  seriesRuns,
+  shownSlots,
+  sliceAtPoint,
+  sliceLabelAt,
+  slotOf,
+  slotsOf,
+  sparklineMarks,
+  sparklinePlot,
+  stackEnds,
+  stackedReadings,
+  stackFarEnds,
+  stackSpans,
+  toggledNames,
+} from './utils/chart-plot/chart-plot.js'
 export {
   ariaChord,
   type ChordPress,
@@ -397,6 +560,22 @@ export {
   wheelParts,
   wholeHour,
 } from './utils/clock/clock.js'
+export {
+  halfBarred,
+  hourBarred,
+  type TimeMode,
+  type TimeProblemWords,
+  timeBetween,
+  timeChoice,
+  timeProblem,
+  type WheelPart,
+  wheelHours,
+  wheelMinutes,
+  wheelSeconds,
+  wheelsAt,
+  wheelTurn,
+} from './utils/clock/time-picker.js'
+export { type WheelField, wheelName } from './utils/clock/wheel-name.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
 export { closestName } from './utils/closest-name/closest-name.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
@@ -452,6 +631,12 @@ export {
   segmentName,
 } from './utils/date-segments/date-segments.js'
 export {
+  segmentRowsOf,
+  segmentRowsPartial,
+  segmentRowsValue,
+  withRow,
+} from './utils/date-segments/segment-rows.js'
+export {
   type DrawDismissOptions,
   drawDismiss,
   drawDismissGlyph,
@@ -506,6 +691,20 @@ export {
   type LinkModifiers,
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
+export {
+  type DateDrawn,
+  type DateProps,
+  type DateReading,
+  dateExpires,
+  dateSource,
+  isReading,
+  readDate,
+} from './utils/format-date/format-date.js'
+export {
+  type Asked,
+  DATE_FIELDS,
+  formatOptions,
+} from './utils/format-date/format-date-options.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { glyphPath } from './utils/glyph-path/glyph-path.js'
 export {
@@ -515,6 +714,7 @@ export {
   gridMove,
   pageRows,
 } from './utils/grid-move/grid-move.js'
+export { gridLength, gridTracks } from './utils/grid-template/grid-template.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
@@ -535,7 +735,9 @@ export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { labelsOf } from './utils/labels-of/labels-of.js'
+export { placedStates } from './utils/layers/layers.js'
 export { type Curve, columnPoints, linePath, type Point } from './utils/line-path/line-path.js'
+export { highlightStep } from './utils/listbox/highlight-step.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'
@@ -555,6 +757,7 @@ export {
   readingText,
 } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
+export { over } from './utils/option-over/option-over.js'
 export { applyOwnRule, type OwnRule } from './utils/own-rule/own-rule.js'
 export {
   MOTION_ATTRIBUTE,
@@ -563,6 +766,39 @@ export {
   pauseMotion,
   reducedMotion,
 } from './utils/page-motion/page-motion.js'
+export {
+  committedDates,
+  type DateFaultWords,
+  type DateStyle,
+  dateFault,
+  dateKind,
+  dateSegmentLocale,
+  dateSegmentSystem,
+  EXAMPLE_DATE,
+  writtenDate,
+} from './utils/picker-text/date-text.js'
+export {
+  committedValue,
+  draftKey,
+  heldValues,
+  type PickerKind,
+  type PickerMode,
+  pickedValues,
+  pickerAnswers,
+  pickerDisplay,
+  shownValues,
+  typedValue,
+  withoutValue,
+} from './utils/picker-text/picker-text.js'
+export {
+  committedTimes,
+  exampleTime,
+  type TimeFaultWords,
+  type TimeStyle,
+  timeFieldFault,
+  timeKind,
+  writtenTime,
+} from './utils/picker-text/time-text.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
@@ -582,7 +818,15 @@ export {
   shortNumber,
   solid,
 } from './utils/projection/projection.js'
+export {
+  QR_QUIET,
+  type QrCorrection,
+  type QrStyle,
+  qrModules,
+  qrPath,
+} from './utils/qr-code/qr-code.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
+export { type RangeExtension, rangeExtend } from './utils/range-extend/range-extend.js'
 export {
   type ColorBytes,
   type ColorBytesAlpha,
@@ -736,10 +980,15 @@ export { stopPress } from './utils/stop-press/stop-press.js'
 export {
   edgeOffset,
   FLING,
+  type HandOver,
+  handsOver,
   parseSnapPoints,
+  roomToward,
+  SCROLL_LOCK,
   type SwipeAxis,
   type SwipeEdge,
   type SwipeRelease,
+  scrollsToStart,
   settleSwipe,
   snapTravel,
   swipeAxis,
@@ -749,6 +998,8 @@ export {
 } from './utils/swipe/swipe.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'
+export { joinSaid } from './utils/toast/toast-derivations.js'
+export { type ToggleState, toggled } from './utils/toggled/toggled.js'
 export {
   type HelixStatusTone,
   TONE_MARKS,
@@ -757,6 +1008,13 @@ export {
 } from './utils/tone-marks/tone-marks.js'
 export { toolbarAround, toolbarAxis } from './utils/toolbar-around/toolbar-around.js'
 export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
+export {
+  type CheckableRow,
+  checkedState,
+  checkRows,
+  pressRow,
+} from './utils/tree-selection/tree-selection.js'
+export { figureOf, movementOf } from './utils/trend-figure/trend-figure.js'
 export {
   Typeahead,
   type TypeaheadBy,

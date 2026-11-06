@@ -51,6 +51,7 @@ export function Example() {
         items={files}
         label="Files"
         onhelix-load-more={loadMore}
+        text-field="name"
       >
         <template dangerouslySetInnerHTML={{ __html: ROW }} />
       </helix-virtual-list>

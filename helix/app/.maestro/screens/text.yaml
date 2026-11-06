@@ -1,0 +1,24 @@
+# Text, each example drawn alone: a heading and body, every scale on the
+# scale, and every tone. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Text"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://text/preview/preview
+- extendedWaitUntil:
+    visible: '.*Account settings.*'
+    timeout: 30000
+- takeScreenshot: text-preview-${MODE}-${SIZE}
+- openLink: helix://text/appearances/preview
+- extendedWaitUntil:
+    visible: '.*Display.*'
+    timeout: 15000
+- takeScreenshot: text-appearances-${MODE}-${SIZE}
+- openLink: helix://text/tones/preview
+- extendedWaitUntil:
+    visible: '.*Muted primary.*'
+    timeout: 15000
+- takeScreenshot: text-tones-${MODE}-${SIZE}

@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterMenu } from '@fusion.dev/helix-headless/filter-input/menu'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './filter-menu.css.js'
+import { styles } from './filter-menu.generated.css.js'
 import '../../divider/index.js'
 import '../../menu/index.js'
 

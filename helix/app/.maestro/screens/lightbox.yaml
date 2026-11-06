@@ -1,0 +1,27 @@
+# Lightbox, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`, and the gallery once more after it opens.
+#
+# The preview opens over its own screen, so the flow waits for the words of its
+# first picture's line. The gallery waits for its title, which the preview's
+# open viewer covers, then opens and waits for that line again.
+appId: dev.fusion.helix.app
+name: "Screens: Lightbox"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://lightbox/preview/preview
+- extendedWaitUntil:
+    visible: '.*Shallow water at the beach.*'
+    timeout: 30000
+- takeScreenshot: lightbox-preview-${MODE}-${SIZE}
+- openLink: helix://lightbox/gallery/preview
+- extendedWaitUntil:
+    visible: 'Gallery'
+    timeout: 15000
+- takeScreenshot: lightbox-gallery-${MODE}-${SIZE}
+- tapOn: 'Open gallery'
+- extendedWaitUntil:
+    visible: '.*Shallow water at the beach.*'
+    timeout: 15000
+- takeScreenshot: lightbox-gallery-open-${MODE}-${SIZE}

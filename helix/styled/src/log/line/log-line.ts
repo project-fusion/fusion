@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLogLine } from '@fusion.dev/helix-headless/log'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './log-line.css.js'
+import { styles } from './log-line.generated.css.js'
 
 /**
  * @summary One line of a log, with its number, its time, and its text.

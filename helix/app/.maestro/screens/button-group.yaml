@@ -1,0 +1,24 @@
+# Button Group, each example drawn alone: joined buttons, a selection with
+# one pressed, and a vertical group. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Button Group"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://button-group/preview/preview
+- extendedWaitUntil:
+    visible: '.*Day.*'
+    timeout: 30000
+- takeScreenshot: button-group-preview-${MODE}-${SIZE}
+- openLink: helix://button-group/selection/preview
+- extendedWaitUntil:
+    visible: '.*Italic.*'
+    timeout: 15000
+- takeScreenshot: button-group-selection-${MODE}-${SIZE}
+- openLink: helix://button-group/vertical/preview
+- extendedWaitUntil:
+    visible: '.*Download CSV.*'
+    timeout: 15000
+- takeScreenshot: button-group-vertical-${MODE}-${SIZE}

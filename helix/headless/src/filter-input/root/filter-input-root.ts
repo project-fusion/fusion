@@ -17,6 +17,7 @@ import {
   MixinTokens,
   MixinVoice,
   PopoverController,
+  placedStates,
   reportRuntime,
   restoreValue,
   SPOKEN_RULE,
@@ -26,13 +27,6 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { x } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
-import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
-import { HelixHeadlessFilterField } from '../field/filter-field.js'
-import { readFilterText } from '../grammar.js'
 import {
   completeTerm,
   currentField,
@@ -41,7 +35,14 @@ import {
   type FilterSuggestion,
   suggests,
   tokenEntry,
-} from '../suggest.js'
+} from '@fusion.dev/helix-core/filter-text'
+import { x } from '@fusion.dev/helix-icons'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
+import { type FacetDetail, HelixBeforeFacetEvent, HelixFacetEvent } from '../events/index.js'
+import { HelixHeadlessFilterField } from '../field/filter-field.js'
+import { readFilterText } from '../grammar.js'
 
 /**
  * A picker that holds what is ticked for its fields, which is what `FilterMenu`
@@ -275,11 +276,14 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
  * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
+ * @cssstate aligned-start - While the suggestions line up with the start of the field.
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate listening - While the field listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  * @cssstate loading - While `loading` is set, or a request to `source` is out.
  * @cssstate no-results - `filter-suggestions` hid every suggestion, and `no-results-text` or the `no-results` slot says so.
  * @cssstate open - The suggestions are open.
+ * @cssstate placed-bottom - While the suggestions sit below the field.
+ * @cssstate placed-top - While the suggestions sit above the field, where there was no room below.
  */
 @customElement('helix-headless-filter-input')
 export class HelixHeadlessFilterInput extends MixinVoice(
@@ -573,6 +577,16 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     ],
     offset: () => 4,
     onDismiss: () => this.requestOpen(false),
+    /* The side the list landed on and the end it lines up on, which the
+       shared entrance grows it out of, as Popover records them. */
+    onPlace: (placement) => {
+      /* A panel that asks for `bottom-start` lands below or above, at the
+         start, so these three are the states it can be in. */
+      const placed = placedStates(placement)
+      this.toggleState('aligned-start', placed['aligned-start'] === true)
+      this.toggleState('placed-bottom', placed['placed-bottom'] === true)
+      this.toggleState('placed-top', placed['placed-top'] === true)
+    },
     open: () => this.open,
     placement: 'bottom-start',
     surface: () => this.partNamed('surface'),

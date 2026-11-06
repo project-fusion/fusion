@@ -1,8 +1,9 @@
-import './columns.css'
-
 export function Example() {
   return (
-    <helix-splitter default-position="25">
+    <helix-splitter
+      default-position="25"
+      style={{ blockSize: '14rem' }}
+    >
       <helix-card
         separation="plain"
         slot="start"
@@ -12,6 +13,7 @@ export function Example() {
       <helix-splitter
         default-position="50"
         slot="end"
+        style={{ blockSize: '14rem' }}
       >
         <helix-card
           separation="plain"

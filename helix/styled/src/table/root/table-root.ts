@@ -1,10 +1,9 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTable } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
-import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './table-root.css.js'
+import { styles } from './table-root.generated.css.js'
 import '../../checkbox/index.js'
 
 /**
@@ -52,12 +51,7 @@ import '../../checkbox/index.js'
 export class HelixTable extends HelixHeadlessTable {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    collectionStateStyles,
-    collectionErrorStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }
 
 declare global {

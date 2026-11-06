@@ -1,0 +1,6 @@
+{
+  // The spec Bun runs, which reads the resolver and nothing of React Native,
+  // with Bun's types.
+  "extends": "../../tsconfig.package.json",
+  "include": ["src/**/*.spec.ts"]
+}

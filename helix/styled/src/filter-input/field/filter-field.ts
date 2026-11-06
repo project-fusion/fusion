@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterField } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './filter-field.css.js'
+import { styles } from './filter-field.generated.css.js'
 
 /**
  * @summary A field that a filter can apply to, with its comparisons and values.

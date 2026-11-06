@@ -1,10 +1,8 @@
-import './preview.css'
-
 export function Example() {
   return (
     <helix-drilldown
-      className="panel"
       label="Settings"
+      style={{ '--drilldown-inline-size': '18rem' }}
     >
       <helix-drilldown-item value="appearance">
         Appearance

@@ -1,0 +1,32 @@
+# QR Code, each example drawn alone: a web address as a code, the three
+# shapes, the two correction levels, and a logo in the middle. One
+# screenshot of each, named by the example, `MODE`, and `SIZE`.
+#
+# A code is a picture named by its label or by the word for a code, which a
+# screen reader reaches. The flow waits for the title of each screen.
+appId: dev.fusion.helix.app
+name: "Screens: QR Code"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://qr-code/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: qr-code-preview-${MODE}-${SIZE}
+- openLink: helix://qr-code/shapes/preview
+- extendedWaitUntil:
+    visible: 'Shapes'
+    timeout: 15000
+- takeScreenshot: qr-code-shapes-${MODE}-${SIZE}
+- openLink: helix://qr-code/correction/preview
+- extendedWaitUntil:
+    visible: 'Correction'
+    timeout: 15000
+- takeScreenshot: qr-code-correction-${MODE}-${SIZE}
+- openLink: helix://qr-code/logo/preview
+- extendedWaitUntil:
+    visible: 'Logo'
+    timeout: 15000
+- takeScreenshot: qr-code-logo-${MODE}-${SIZE}

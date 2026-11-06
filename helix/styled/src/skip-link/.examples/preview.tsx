@@ -15,7 +15,7 @@ export function Example() {
       <helix-skip-link></helix-skip-link>
 
       <helix-app-header>
-        <span slot="start">Logo</span>
+        <helix-text slot="start">Logo</helix-text>
         <helix-navigation label="Sections">
           <a
             aria-current="page"

@@ -1,0 +1,59 @@
+# Breadcrumbs: a press on a crumb opens its link through the gallery's own
+# way to follow one, which says where a link to a place on a page leads, as
+# `src/glyph.tsx` writes it. A long trail folds its middle into a menu its
+# first crumb's button opens, and a row of it opens its crumb's link.
+# Recorded.
+#
+# React Native has no state for the current page, so Helix gives the last
+# crumb the value "Current page", which iOS reads after its name and Maestro
+# reads as the element's text. Android keeps the value where Maestro does not
+# read it. The step that reads it is optional until a night shows what iOS
+# gives.
+appId: dev.fusion.helix.app
+name: Breadcrumbs
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://breadcrumbs/links/preview
+      SHOWS: .*Projects.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: breadcrumbs
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: Current page
+- tapOn: .*Projects.*
+- assertVisible: 'Opens #design'
+- takeScreenshot: breadcrumbs-opens-projects
+- tapOn: OK
+- assertNotVisible: 'Opens #design'
+- tapOn: .*Home.*
+- assertVisible: 'Opens #home'
+- tapOn: OK
+- assertNotVisible: 'Opens #home'
+- openLink: helix://breadcrumbs/fold/preview
+- extendedWaitUntil:
+    visible: .*Settings.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- assertNotVisible: .*Projects.*
+- tapOn: Show 2 more
+- extendedWaitUntil:
+    visible: Website redesign
+    timeout: 5000
+- tapOn: Website redesign
+- assertVisible: 'Opens #components'
+- tapOn: OK
+- stopRecording

@@ -1,0 +1,47 @@
+# Image, each example drawn alone: a picture with rounded corners, one that
+# fails with its fallback, a placeholder before there is a source, the
+# events, and the main image of a page. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# A picture's words are its `alt`, which a screen reader reaches. A picture
+# from the network can take a moment, so each screenshot waits for the title
+# of its screen and then for two seconds.
+appId: dev.fusion.helix.app
+name: "Screens: Image"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://image/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: image-preview-${MODE}-${SIZE}
+- openLink: helix://image/fallback/preview
+- extendedWaitUntil:
+    visible: 'Fallback'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: image-fallback-${MODE}-${SIZE}
+- openLink: helix://image/placeholder/preview
+- extendedWaitUntil:
+    visible: 'Placeholder'
+    timeout: 15000
+- takeScreenshot: image-placeholder-${MODE}-${SIZE}
+- openLink: helix://image/events/preview
+- extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: image-events-${MODE}-${SIZE}
+- openLink: helix://image/responsive/preview
+- extendedWaitUntil:
+    visible: 'Responsive'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: image-responsive-${MODE}-${SIZE}

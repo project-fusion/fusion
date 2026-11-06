@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDrilldownItem } from '@fusion.dev/helix-headless/drilldown'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './drilldown-item.css.js'
+import { styles } from './drilldown-item.generated.css.js'
 
 /**
  * @summary One row of a drill-down, which can open a page of its own.

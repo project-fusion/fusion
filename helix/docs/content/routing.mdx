@@ -109,6 +109,12 @@ first, and canceling that keeps the browser from following, so a client-side
 router can follow it instead. Web Awesome drops the anchor and navigates in
 JavaScript, which loses every item in the list above.
 
+A Helix `Tab` with an `href` puts `role="tab"` on the anchor itself, and the tab
+still controls its panel: each tab links to a route, and your router renders
+that route's content in the tab's panel. Links with no panels, such as the
+sections of a site, belong in `Navigation`, whose `marker="underlined"` draws
+the same bar.
+
 ## Use client-side routing with real anchors
 
 A real anchor causes a full page load, because a framework intercepts only the
@@ -163,6 +169,58 @@ const warm = (event) => {
 
 Next prefetches only in production, so this code has no effect in development.
 That is expected.
+
+## Use Expo Router on the web and on a phone
+
+An app on Expo Router can share its pages between a website and a phone app.
+`@fusion.dev/helix/expo-router` connects Helix's links to the router on both
+platforms, so a page names no platform. Install `expo-router` beside
+`@fusion.dev/helix`, then place `HelixAppRoot` around the `Slot` or the
+`Stack` that your root layout, `app/_layout.tsx`, draws.
+[Create an app](./create-an-app) starts an app with all of it in place.
+
+- **On the web, `HelixAppRoot` listens for presses on links.** A plain
+  press on an anchor, an anchor inside a Helix element included, goes
+  through the router. A press with a modifier key, a press with the middle
+  button, a link with a `target` or `download`, and a link to another origin
+  stay with the browser.
+- **On a phone, `HelixAppRoot` is `HelixRoot`.** It also opens each Helix
+  link to a path through the router. A route above the page showing goes
+  back to it, as the system's back does. A route one segment under the root,
+  such as a header's `/activity`, takes the place of the page showing, so
+  moving between sections adds no pages to go back through. Any other route
+  is pushed. An address with a scheme opens in the app that handles it.
+- **A refused request keeps the router where it is.** A Navigation Item, a
+  Breadcrumb, a Tab, or a Menu Item with an `href` sends
+  `helix-before-select` first on both platforms. Cancel it and the press
+  goes nowhere.
+
+`useHelixRoute` reads the route showing. It gives each destination its
+`current`, each link its `href`, and a Breadcrumbs trail its crumbs:
+
+```tsx
+import { useHelixRoute } from '@fusion.dev/helix/expo-router'
+
+export function Header() {
+  const route = useHelixRoute()
+  return (
+    <helix-navigation label="Sections">
+      <helix-navigation-item current={route.current('/projects')} href={route.href('/projects')}>
+        Projects
+      </helix-navigation-item>
+    </helix-navigation>
+  )
+}
+```
+
+| Member | Gives |
+|---|---|
+| `path` | The route showing, such as `/projects/website`, without the base URL |
+| `current(route)` | `page` for the route showing, `true` for a route above it, and nothing for any other route |
+| `href(route)` | The address of a route. On the web it starts with the base URL the app is exported for, so a link opens the same page in a new tab |
+| `trail(label)` | A crumb for each route from the root down to the page that `label` names, with the last crumb current |
+
+The root is above every route, so `current('/')` is `page` on the root alone.
 
 ## Components that take an `href`
 

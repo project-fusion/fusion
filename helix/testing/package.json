@@ -15,6 +15,14 @@
       "types": "./dist/browser.d.ts",
       "default": "./dist/browser.js"
     },
+    "./conformance": {
+      "types": "./dist/conformance/index.d.ts",
+      "default": "./dist/conformance/index.js"
+    },
+    "./conformance/web": {
+      "types": "./dist/conformance/web.d.ts",
+      "default": "./dist/conformance/web.js"
+    },
     "./dom": {
       "types": "./dist/dom.d.ts",
       "default": "./dist/dom.js"
@@ -22,6 +30,10 @@
     "./dom/register": {
       "types": "./dist/register.d.ts",
       "default": "./dist/register.js"
+    },
+    "./sheets": {
+      "types": "./dist/sheets.d.ts",
+      "default": "./dist/sheets.js"
     },
     "./ssr": {
       "types": "./dist/ssr.d.ts",
@@ -33,6 +45,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

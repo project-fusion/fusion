@@ -1,19 +1,31 @@
 import {
   CHART_PLOT,
+  correlation,
   customElement,
   drawTooltip,
+  type Fit,
   formatNumbers,
   formatWords,
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
   isRtl,
+  leastSquares,
   linear,
+  type Measures,
   MixinChartSource,
   MixinChartStatus,
+  measuresOf,
   PLOT_HEIGHT,
   PLOT_WIDTH,
   type Row,
+  type ScatterField,
+  type ScatterPoint,
+  scatterField,
+  scatterLayers,
+  scatterNearest,
+  scatterOrder,
+  scatterTrends,
   seriesIndex,
   ticks,
   words,
@@ -23,26 +35,11 @@ import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'li
 import { property } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
 import '../../tooltip/index.js'
-import { correlation, type Fit, leastSquares } from '../fit.js'
-import { layersOf } from '../layers.js'
-import { bubbleWeights, type Measures, measuresOf } from '../measures.js'
+
+export type { ScatterField, ScatterPoint } from '@fusion.dev/helix-core'
 
 /** How near a pointer has to be to a point to be asking about it, in pixels. */
 const REACH = 24
-
-/** How many layers a series' points are drawn in at most. See `layersOf`. */
-const LAYERS = 4
-
-/**
- * How many steps a point's size under `size-by` is drawn in: its weight to the
- * nearest thirty-second, which is a pixel of diameter between the default
- * point and bubble sizes. A path draws its points at one size, so a series
- * takes a path for each size it has, and this bounds how many.
- */
-const WEIGHTS = 32
-
-/** Two decimals, as a point's path is written, which is more than a 100 unit view box can show. */
-const round = (value: number): number => Math.round(value * 100) / 100
 
 /* Built once per locale and kept, `Intl.NumberFormat` being expensive to
    construct and cheap to call. */
@@ -60,48 +57,6 @@ const coefficientIn = (locale: string): Intl.NumberFormat => {
     COEFFICIENTS.set(locale, found)
   }
   return found
-}
-
-/** One row drawn as a point: which row, which series, and where, in percent of the plot. */
-export interface ScatterPoint {
-  depth: number
-  row: number
-  /**
-   * How large the point is drawn under `size-by`, from 0 to 1: the square root
-   * of its share of the largest size, so its area follows the measure.
-   */
-  weight?: number | undefined
-  x: number
-  y: number
-}
-
-/** The table as the chart reads it: points, both ranges and what each axis is called. */
-export interface ScatterField {
-  points: ScatterPoint[]
-  /** Each series' readings as pairs, for the summary. */
-  pairs: Array<Array<[number, number]>>
-  x: [number, number]
-  xName: string
-  y: [number, number]
-  yNames: string[]
-}
-
-/**
- * A range widened to the round numbers either side of it.
- *
- * So the first and last tick are the edges of the plot rather than somewhere
- * inside it, and no point sits on the border of the box with half of itself
- * outside. Rounded to twelve places, because a step of 0.1 multiplied back out
- * is 0.30000000000000004 and a tick label would say so.
- */
-const nice = ([low, high]: [number, number]): [number, number] => {
-  if (low === high) {
-    return [low - 1, high + 1]
-  }
-  const levels = ticks([low, high])
-  const step = levels.length > 1 ? (levels[1] as number) - (levels[0] as number) : high - low
-  const round = (value: number): number => Number(value.toPrecision(12))
-  return [round(Math.floor(low / step) * step), round(Math.ceil(high / step) * step)]
 }
 
 /**
@@ -524,56 +479,10 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     if (this.fielded?.rows === rows && this.fielded.key === key) {
       return this.fielded.field
     }
-    /* One walk over the rows, which keeps each series' pairs and the rows
-       they came from, and the extent of the series shown. */
-    const pairs: Array<Array<[number, number]>> = ups.map(() => [])
-    const from: number[][] = ups.map(() => [])
-    let [left, right, low, high] = [Infinity, -Infinity, Infinity, -Infinity]
-    rows.forEach((row, index) => {
-      const acrossValue = across === undefined ? undefined : row.cells[across]?.value
-      if (acrossValue === undefined) {
-        return
-      }
-      ups.forEach((column, depth) => {
-        const upValue = row.cells[column]?.value
-        if (upValue === undefined) {
-          return
-        }
-        pairs[depth]?.push([acrossValue, upValue])
-        from[depth]?.push(index)
-        if (shown[depth]) {
-          left = Math.min(left, acrossValue)
-          right = Math.max(right, acrossValue)
-          low = Math.min(low, upValue)
-          high = Math.max(high, upValue)
-        }
-      })
-    })
-    const any = left <= right
-    const x = nice(any ? [left, right] : [0, 0])
-    const y = nice(any ? [low, high] : [0, 0])
-    const along = linear(x, [0, PLOT_WIDTH])
-    const up = linear(y, [PLOT_HEIGHT, 0])
-    /* By area, so a point twice the measure is twice the ink, to the nearest
-       of `WEIGHTS` steps. */
-    const weights = bubbleWeights(
-      rows.map((row) => (size === undefined ? undefined : row.cells[size]?.value)),
-    ).map((one) => (one === undefined ? undefined : Math.round(one * WEIGHTS) / WEIGHTS))
-    const field = {
-      pairs,
-      points: pairs.flatMap((series, depth) =>
-        shown[depth]
-          ? series.map(([one, two], place) => {
-              const row = from[depth]?.[place] as number
-              return { depth, row, weight: weights[row], x: along(one), y: up(two) }
-            })
-          : [],
-      ),
-      x,
-      xName: name(across),
-      y,
-      yNames: ups.map((column) => name(column)),
-    }
+    /* One walk over the rows, core's `scatterField`, which keeps each
+       series' pairs and the rows they came from, and the extent of the series
+       shown. */
+    const field = scatterField(rows, { across, size, ups }, shown, name)
     this.fielded = { field, key, rows }
     return field
   }
@@ -590,10 +499,7 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     if (this.ordered?.rows === rows && this.ordered.across === across) {
       return this.ordered.order
     }
-    const x = (at: number): number =>
-      (across === undefined ? undefined : rows[at]?.cells[across]?.value) ??
-      Number.POSITIVE_INFINITY
-    const order = rows.map((_, at) => at).sort((one, two) => x(one) - x(two) || one - two)
+    const order = scatterOrder(rows, across)
     this.ordered = { across, order, rows }
     return order
   }
@@ -746,48 +652,21 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     const measured = plot !== undefined && widest > 0
     const ringOf = (point: ScatterPoint): number =>
       this.rings.get(point.weight === undefined ? '' : String(point.weight)) ?? widest
-    const series = new Map<number, ScatterPoint[]>()
-    for (const point of field.points) {
-      const held = series.get(point.depth)
-      if (held) {
-        held.push(point)
-      } else {
-        series.set(point.depth, [point])
-      }
-    }
-    const marks = svg`${[...series].flatMap(([depth, points]) => {
-      const placed = points.map((point) => ({
-        width: measured ? ringOf(point) : 0,
-        x: (point.x / PLOT_WIDTH) * width,
-        y: (point.y / PLOT_HEIGHT) * height,
-      }))
+    /* Each series' points as layers of paths, a path a size: core's `scatterLayers`. */
+    const layers = scatterLayers(field, { height, width }, ratio, measured ? ringOf : undefined)
+    const marks = svg`${layers.map(({ depth, paths }) => {
       const index = seriesIndex(depth)
-      return layersOf(placed, measured ? LAYERS : 1, ratio).map((layer) => {
-        /* One path a size, a size being a weight under `size-by` and one
-           size otherwise. */
-        const sized = new Map<number | undefined, string[]>()
-        for (const at of layer) {
-          const point = points[at] as ScatterPoint
-          const held = sized.get(point.weight)
-          const dot = `M${round(point.x)},${round(point.y)}h0`
-          if (held) {
-            held.push(dot)
-          } else {
-            sized.set(point.weight, [dot])
-          }
-        }
-        const paths = [...sized].map(([weight, dots]) => ({
-          d: dots.join(''),
-          style: weight === undefined ? nothing : `--chart-point-weight: ${weight}`,
-        }))
-        return svg`<g
+      const styled = paths.map(({ d, weight }) => ({
+        d,
+        style: weight === undefined ? nothing : `--chart-point-weight: ${weight}`,
+      }))
+      return svg`<g
           data-series=${index}
           part="points"
           style="--chart-series: var(--chart-series-${index})"
-        >${paths.map(
+        >${styled.map(
           ({ d, style }) => svg`<path d=${d} part="point-ring" style=${style} />`,
-        )}${paths.map(({ d, style }) => svg`<path d=${d} part="point" style=${style} />`)}</g>`
-      })
+        )}${styled.map(({ d, style }) => svg`<path d=${d} part="point" style=${style} />`)}</g>`
     })}`
     this.painted = { field, key, marks }
     return marks
@@ -806,28 +685,25 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     if (!this.trend) {
       return nothing
     }
-    const [start, end] = field.x
-    return field.yNames.flatMap((name, depth) => {
-      const fit = this.showsSeries(name) ? this.fitOf(field.pairs[depth] ?? []).fit : undefined
-      if (fit === undefined) {
-        return []
-      }
+    return scatterTrends(
+      field,
+      (name) => this.showsSeries(name),
+      (pairs) => this.fitOf(pairs).fit,
+      { along, up },
+    ).map(({ depth, x1, x2, y1, y2 }) => {
       const index = seriesIndex(depth)
-      return [
-        svg`<line
+      return svg`<line
           data-series=${index}
           part="trend"
           style="--chart-series: var(--chart-series-${index})"
-          x1=${along(start)}
-          x2=${along(end)}
-          y1=${up(fit.intercept + fit.slope * start)}
-          y2=${up(fit.intercept + fit.slope * end)}
-        />`,
-      ]
+          x1=${x1}
+          x2=${x2}
+          y1=${y1}
+          y2=${y2}
+        />`
     })
   }
 
-  /** A series' correlation and line of best fit, worked out once for its pairs. */
   private fitOf(pairs: Array<[number, number]>): {
     correlation: number | undefined
     fit: Fit | undefined
@@ -961,20 +837,12 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
     if (!box || box.width === 0 || box.height === 0) {
       return null
     }
-    const across = event.clientX - box.left
-    const up = event.clientY - box.top
-    let found: ScatterPoint | undefined
-    let best = reach ** 2
-    for (const point of this.drawn) {
-      const distance =
-        ((point.x / PLOT_WIDTH) * box.width - across) ** 2 +
-        ((point.y / PLOT_HEIGHT) * box.height - up) ** 2
-      if (distance <= best) {
-        best = distance
-        found = point
-      }
-    }
-    return found
+    return scatterNearest(
+      this.drawn,
+      box,
+      { x: event.clientX - box.left, y: event.clientY - box.top },
+      reach,
+    )
   }
 
   private readonly handleLeave = (): void => {

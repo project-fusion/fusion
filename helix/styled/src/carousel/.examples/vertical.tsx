@@ -6,6 +6,7 @@ export function Example() {
       className="stack"
       label="Releases"
       orientation="vertical"
+      style={{ '--carousel-block-size': '9rem' } as React.CSSProperties}
     >
       <helix-callout tone="info">New features are available.</helix-callout>
       <helix-callout tone="success">Your changes were saved.</helix-callout>

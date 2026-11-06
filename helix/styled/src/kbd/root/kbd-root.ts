@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessKbd } from '@fusion.dev/helix-headless/kbd'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './kbd-root.css.js'
+import { styles } from './kbd-root.generated.css.js'
 
 /**
  * @summary A keyboard key or chord, set inline with text.
