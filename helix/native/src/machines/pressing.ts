@@ -14,6 +14,7 @@ import { turnsAlone } from './turns'
 /**
  * The element's own `value`, where the event a press sends carries one and no
  * set gives it, as a playlist entry asks to play by its value as the web's does.
+ * A link's address stands over it, as a crumb's `href` does.
  */
 const ownValue = (
   family: Family,
@@ -59,8 +60,12 @@ const toldBy = (family: Family, use: MachineUse, around: Around, props: Props): 
   const after = sends === undefined ? undefined : followUpOf(family, sends)
   if (joined?.offer === undefined) {
     const linked = linkedBy(family, props, part)
-    const own = joined === undefined ? ownValue(family, props, sends) : { value: joined.value }
-    const detail = { label: wordsOf(props.children), ...linked.detail, ...own }
+    const detail = {
+      label: wordsOf(props.children),
+      ...(joined === undefined
+        ? { ...ownValue(family, props, sends), ...linked.detail }
+        : { ...linked.detail, value: joined.value }),
+    }
     if (after === undefined) {
       return { ...linked, detail }
     }
