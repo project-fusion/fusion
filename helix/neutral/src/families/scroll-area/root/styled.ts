@@ -323,7 +323,7 @@ export default styles(
             { within: { host: { focusVisible: true } } },
             {
               outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-              outlineOffset: product(token('size-focus-offset'), '-1'),
+              outlineOffset: token('size-focus-offset'),
               zIndex: sum(token('layer-raised'), 1),
             },
           ),
@@ -388,11 +388,13 @@ export default styles(
          has it. The ring is drawn on the layer over the viewport, since the
          fade mask would take it out at every edge that fades. */
       /* Written out: the vocabulary names no part beside another. */
+      /* Outside the box, at the offset every control's ring takes: inside, it lay on the
+         first letters of every line. */
       on({ part: 'edges', selector: '[part="viewport"]:focus-visible ~ [part="edges"]' }, [
         web([
           rule({
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-            outlineOffset: product(token('size-focus-offset'), '-1'),
+            outlineOffset: token('size-focus-offset'),
           }),
         ]),
       ]),

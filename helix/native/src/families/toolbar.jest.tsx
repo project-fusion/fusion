@@ -69,6 +69,7 @@ const themed = (children: ReactNode) => (
     <Token name="size-control-sm" />
     <Token name="size-icon-sm" />
     <Token name="space-2xs" />
+    <Token name="size-target" />
   </HelixTheme>
 )
 
@@ -269,15 +270,19 @@ describe('the generated Toolbar', () => {
     expect(styleOf(dividers()[0])).toMatchObject({ alignSelf: 'stretch', flexDirection: 'row' })
   })
 
-  test('draws no frame, lays its controls in a row with a small gap, and in a column when vertical', async () => {
+  test('draws no frame, lays its controls in a row with a finger’s gap, and in a column when vertical', async () => {
     const view = await render(<Format />)
     const bar = withRole('toolbar')[0]
     expect(styleOf(bar)).toMatchObject({
       alignItems: 'center',
       borderWidth: 0,
       flexDirection: 'row',
-      gap: token('space-2xs'),
     })
+    /* A phone's pointer is coarse: the gap makes up a control to a target. */
+    expect(styleOf(bar).gap).toBeCloseTo(
+      Math.max(token('space-2xs'), token('size-target') - token('size-control-sm')),
+      3,
+    )
     await view.rerender(<Format orientation="vertical" />)
     expect(styleOf(withRole('toolbar')[0])).toMatchObject({ flexDirection: 'column' })
   })
