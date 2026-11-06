@@ -117,6 +117,10 @@ export default styles(
         },
       ),
       rule(
+        { active: true },
+        { backgroundColor: token('color-press'), color: token('color-foreground') },
+      ),
+      rule(
         { focusVisible: true },
         {
           outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],

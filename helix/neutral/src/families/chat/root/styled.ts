@@ -262,8 +262,9 @@ export default styles(
       ]),
       web([
         rule({
-          animation: ['helix-chat-typing', own.chatTypingCycle, 'infinite', 'ease-in-out'],
-          own: { chatTypingCycle: '1.2s' },
+          animation: ['helix-chat-typing', own.chatTypingCycle, 'infinite', token('easing-cycle')],
+          /* A turn and a half, from the rate every loop in the library is built on. */
+          own: { chatTypingCycle: product(token('duration-turn'), 1.5) },
         }),
         rule({ reducedMotion: true }, { animation: 'none' }),
       ]),
@@ -273,10 +274,10 @@ export default styles(
       [
         native([
           rule({
-            animationDuration: '1.2s',
+            animationDuration: product(token('duration-turn'), 1.5),
             animationIterationCount: 'infinite',
             animationName: 'helix-chat-typing-dot',
-            animationTimingFunction: 'ease-in-out',
+            animationTimingFunction: token('easing-cycle'),
             backgroundColor: 'currentColor',
             blockSize: '0.3em',
             borderRadius: token('radii-full'),
