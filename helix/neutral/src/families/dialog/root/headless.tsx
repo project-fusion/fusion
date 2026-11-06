@@ -63,7 +63,7 @@ export default headless('dialog', {
     close: bare(),
     toggle: bare(['newState', 'oldState']),
   },
-  states: ['entering', 'exiting', 'open', 'settled'],
+  states: ['entering', 'exiting', 'open', 'settled', 'stacked'],
   derived: {
     dismissal: derive('dialog-dismissal'),
     dismissName: derive('dialog-dismiss-name'),
