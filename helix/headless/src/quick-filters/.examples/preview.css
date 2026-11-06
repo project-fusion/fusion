@@ -1,0 +1,49 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_page: light-dark(#ffffff, #121214);
+}
+
+helix-headless-quick-filters::part(list) {
+  background-color: var(--_gray-subtle);
+  border-radius: 999px;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+helix-headless-quick-filters::part(preset),
+helix-headless-quick-filters::part(save) {
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  color: inherit;
+  font: inherit;
+  padding: 0.375rem 0.75rem;
+}
+
+helix-headless-quick-filters::part(preset-pressed) {
+  background-color: var(--_page);
+}
+
+helix-headless-quick-filters::part(count) {
+  color: var(--_gray-muted);
+}
+
+helix-headless-data-table {
+  margin-block-start: 1rem;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template);
+}
+
+helix-headless-data-table::part(cell) {
+  border-block-end: 1px solid var(--_gray-edge);
+  padding: 0.5rem 0.75rem;
+}
