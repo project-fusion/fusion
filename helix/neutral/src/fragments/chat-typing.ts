@@ -1,4 +1,4 @@
-import { web } from '../style.js'
+import { token, web } from '../style.js'
 import { declarations } from '../table.js'
 
 /**
@@ -21,5 +21,5 @@ export default declarations('chat-typing', {
   blockSize: web('1lh'),
   display: web('block'),
   inlineSize: web('1.75em'),
-  opacity: 0.7,
+  opacity: token('opacity-quiet'),
 })

@@ -19,7 +19,7 @@ export default styles(
   {
     prefix: 'breadcrumbs',
     hooks: {
-      fontSize: token('text-sm'),
+      fontSize: token('text-control'),
       gap: token('space-xs'),
       splitDividerColor: token('color-border'),
       splitFill: token('color-well'),
