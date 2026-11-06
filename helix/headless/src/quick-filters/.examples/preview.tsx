@@ -7,9 +7,8 @@ const rows = [
   { amount: 15120, customer: 'Acme Foods', id: 'INV-2063', status: 'Paid' },
 ]
 
-const status = (value: string) => ({
-  filters: [{ field: 'status', operator: 'any', values: [value] }],
-})
+const status = (value: string) =>
+  JSON.stringify({ filters: [{ field: 'status', operator: 'any', values: [value] }] })
 
 export function Example() {
   return (
@@ -18,7 +17,9 @@ export function Example() {
         for="invoices"
         label="Invoice views"
       >
-        <helix-headless-quick-filter view={{ filters: [] }}>All</helix-headless-quick-filter>
+        <helix-headless-quick-filter view={JSON.stringify({ filters: [] })}>
+          All
+        </helix-headless-quick-filter>
         <helix-headless-quick-filter view={status('Overdue')}>Overdue</helix-headless-quick-filter>
         <helix-headless-quick-filter view={status('Paid')}>Paid</helix-headless-quick-filter>
       </helix-headless-quick-filters>

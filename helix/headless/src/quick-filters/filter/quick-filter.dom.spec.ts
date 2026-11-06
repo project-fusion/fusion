@@ -10,6 +10,6 @@ beforeAll(async () => {
 test('a preset reads only the parts of the view its JSON names', async () => {
   const element = (await mount(
     `<helix-headless-quick-filter view='{"sort":"a:asc","columns":{"hidden":["b"]}}'>A</helix-headless-quick-filter>`,
-  )) as HTMLElement & { view: unknown }
-  expect(element.view).toEqual({ columns: { hidden: ['b'] }, sort: 'a:asc' })
+  )) as HTMLElement & { parts: unknown }
+  expect(element.parts).toEqual({ columns: { hidden: ['b'] }, sort: 'a:asc' })
 })
