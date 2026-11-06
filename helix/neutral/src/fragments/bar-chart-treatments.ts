@@ -29,7 +29,7 @@ export default fragment(
     /* The edge, and the fill faded toward the page under it, with no line across the base. */
     on('bar', [
       rule(
-        { 'data-emphasis': 'outlined' },
+        { part: { 'data-emphasis': 'outlined' } },
         {
           own: { barChartFoot: own.barChartBase },
           fill: own.barChartShade,
@@ -40,7 +40,7 @@ export default fragment(
       ),
       /* A wash under the same edge, the quiet end of the axis. */
       rule(
-        { 'data-emphasis': 'subtle' },
+        { part: { 'data-emphasis': 'subtle' } },
         {
           own: { barChartArea: 0.2, barChartFoot: own.barChartBase },
           stroke: own.barChartSeries,
@@ -51,7 +51,7 @@ export default fragment(
       /* Gradient, into the wash the headless tier draws, for each series. */
       rule({ wash: 'gradient' }, { fill: measured('chart-bar-wash') }),
       rule(
-        { emphasis: 'outlined', 'data-emphasis': false },
+        { emphasis: 'outlined', part: { 'data-emphasis': false } },
         {
           own: { barChartFoot: own.barChartBase },
           fill: own.barChartShade,
@@ -61,7 +61,7 @@ export default fragment(
         },
       ),
       rule(
-        { emphasis: 'subtle', 'data-emphasis': false },
+        { emphasis: 'subtle', part: { 'data-emphasis': false } },
         {
           own: { barChartArea: 0.2, barChartFoot: own.barChartBase },
           stroke: own.barChartSeries,
@@ -71,19 +71,19 @@ export default fragment(
       ),
       /* Glass lets the gridlines read through; frosted admits less. */
       rule(
-        { 'data-material': 'glass' },
+        { part: { 'data-material': 'glass' } },
         {
           own: { barChartThrough: token('material-glass-opacity') },
         },
       ),
       rule(
-        { material: 'glass', 'data-material': false },
+        { material: 'glass', part: { 'data-material': false } },
         {
           own: { barChartThrough: token('material-glass-opacity') },
         },
       ),
       rule(
-        { material: 'frosted', 'data-material': false },
+        { material: 'frosted', part: { 'data-material': false } },
         {
           own: { barChartThrough: token('material-frosted-opacity') },
         },
@@ -101,19 +101,19 @@ export default fragment(
           vectorEffect: 'non-scaling-stroke',
         }),
         rule(
-          { 'data-material': 'glass' },
+          { part: { 'data-material': 'glass' } },
           {
             own: { barChartThrough: token('material-glass-opacity') },
           },
         ),
         rule(
-          { 'data-material': false, material: 'glass' },
+          { material: 'glass', part: { 'data-material': false } },
           {
             own: { barChartThrough: token('material-glass-opacity') },
           },
         ),
         rule(
-          { 'data-material': false, material: 'frosted' },
+          { material: 'frosted', part: { 'data-material': false } },
           {
             own: { barChartThrough: token('material-frosted-opacity') },
           },
