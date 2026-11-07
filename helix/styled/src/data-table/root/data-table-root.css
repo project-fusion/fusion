@@ -764,6 +764,7 @@ slot[name="error"]::slotted(*) {
 
 [part~="cell-editing"] {
   padding-block: 0;
+  z-index: 1;
 }
 
 /* The field is the cell's height less its rule, so an open cell is no taller
@@ -771,13 +772,25 @@ slot[name="error"]::slotted(*) {
 [part="editor"] {
   --input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
   --number-input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
+  /* A field that needs more than its column, a date with its calendar, grows
+     over the cell beside it on the page's ground, rather than widening the
+     column or being cut. */
+  background-color: var(--data-table-editing-background-color, var(--helix-color-background));
   inline-size: 100%;
+  min-inline-size: max-content;
+}
+
+/* An ISO date, its segments, and the calendar's button, which the segments
+   clip themselves to fit when they are given less. */
+[part="editor"][data-type="date"] {
+  min-inline-size: 8.5rem;
 }
 
 [part="cell-toggle"] {
   accent-color: var(--helix-color-primary);
   block-size: var(--helix-size-checkbox);
   cursor: pointer;
+  display: block;
   inline-size: var(--helix-size-checkbox);
   margin: 0;
 }

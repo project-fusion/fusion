@@ -3578,6 +3578,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     return html`<${tag}
       part="editor"
       aria-label=${name}
+      date-style=${column.type === 'date' ? 'iso' : nothing}
+      data-type=${column.type ?? 'text'}
       .value=${draft === null || draft === undefined ? '' : String(draft)}
       ?required=${column.required}
       aria-describedby=${described}
@@ -3950,16 +3952,25 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     this.editFocus = undefined
-    editor.focus()
-    const control = editor.shadowRoot?.querySelector('input')
-    if (control) {
-      const end = control.value.length
-      if (how === 'select') {
-        control.select()
-      } else {
-        control.setSelectionRange?.(end, end)
+    /* After the field has drawn its own input, which a field arriving with the
+       cell has not yet: focus sent to it before then has nothing to land on. */
+    const ready =
+      (editor as { updateComplete?: Promise<unknown> }).updateComplete ?? Promise.resolve()
+    void ready.then(() => {
+      if (this.partNamed('editor') !== editor) {
+        return
       }
-    }
+      editor.focus()
+      const control = editor.shadowRoot?.querySelector('input')
+      if (control) {
+        const end = control.value.length
+        if (how === 'select') {
+          control.select()
+        } else {
+          control.setSelectionRange?.(end, end)
+        }
+      }
+    })
   }
 
   /**
