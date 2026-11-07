@@ -1,0 +1,129 @@
+:host {
+  color: var(--helix-color-foreground);
+  display: block;
+  font-size: var(--helix-text-control);
+  min-inline-size: 16rem;
+}
+
+[part="header"] {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+  min-block-size: var(--helix-size-control);
+  padding-inline: var(--helix-space-sm);
+}
+
+[part="title"] {
+  font-weight: var(--helix-weight-semibold);
+}
+
+[part="reset"] {
+  all: unset;
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-primary);
+  cursor: pointer;
+  font-size: var(--helix-text-sm);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[part~="item"] {
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  display: grid;
+  gap: var(--column-manager-gap, var(--helix-space-sm));
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  min-block-size: var(--helix-size-control);
+  padding-inline: var(--helix-space-xs);
+}
+
+[part~="item"]:hover,
+[part~="item"]:focus-within {
+  background-color: var(--column-manager-item-hover-background-color, var(--helix-color-hover));
+}
+
+[part~="item-dragging"] {
+  opacity: var(--helix-opacity-disabled);
+}
+
+[part="grip"],
+[part~="pin"] {
+  all: unset;
+  box-sizing: border-box;
+  align-items: center;
+  block-size: var(--helix-size-icon-loose);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: var(--helix-size-icon-loose);
+  justify-content: center;
+}
+
+[part="grip"] {
+  cursor: grab;
+}
+
+[part="grip-mark"],
+[part="pin-mark"] {
+  block-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon);
+}
+
+[part~="pin"] {
+  grid-column: 4;
+}
+
+[part~="pin-pinned"] {
+  color: var(--column-manager-pinned-color, var(--helix-color-primary));
+}
+
+[part="name"] {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+  min-inline-size: 0;
+}
+
+[part~="item-hidden"] [part="name"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="checkbox"] {
+  accent-color: var(--helix-color-primary);
+  block-size: var(--helix-size-checkbox);
+  inline-size: var(--helix-size-checkbox);
+  margin: 0;
+}
+
+[part="note"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  white-space: nowrap;
+}
+
+[part="reset"]:focus-visible,
+[part="grip"]:focus-visible,
+[part~="pin"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* A tool that arranges a table on screen has nothing to say on paper, where
+   the table prints as it was arranged. */
+@media print {
+  :host {
+    display: none;
+  }
+}

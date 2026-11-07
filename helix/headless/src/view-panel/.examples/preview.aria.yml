@@ -1,0 +1,30 @@
+- text: View
+- button "Reset"
+- toolbar "Quick filters":
+  - button "All 3" [pressed]
+  - button "Overdue 2"
+  - button "Save view"
+- button "Sort Due, ascending"
+- button "Columns Customer, Due, Status"
+- button "Export"
+- button "Show 3 rows"
+- rowgroup:
+  - row "Customer Due Status":
+    - columnheader "Customer":
+      - button "Customer"
+    - columnheader "Due":
+      - button "Due"
+    - columnheader "Status"
+  - row "Acme Corporation":
+    - rowheader "Acme Corporation"
+    - gridcell "2026-10-12"
+    - gridcell "Overdue"
+  - row "Acme Logistics":
+    - rowheader "Acme Logistics"
+    - gridcell "2026-10-18"
+    - gridcell "Paid"
+  - row "Acme Robotics":
+    - rowheader "Acme Robotics"
+    - gridcell "2026-10-21"
+    - gridcell "Overdue"
+- status

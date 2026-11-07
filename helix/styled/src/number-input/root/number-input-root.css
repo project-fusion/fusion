@@ -216,3 +216,25 @@ slot[name="increment-icon"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* On a touch screen there is no hover to say a `ghost` field can be changed,
+   so its words carry a dotted underline at rest. The hook draws it at any
+   pointer. */
+:host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+  text-decoration: var(--number-input-ghost-underline, none) dotted
+    var(--helix-color-foreground-muted);
+  text-underline-offset: 0.25em;
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+    text-decoration-line: underline;
+  }
+}
+
+/* The steppers stay out of an inline field. The arrow keys step it, as they do
+   a spreadsheet's number, and two buttons in a line of text are most of it. */
+:host([emphasis="ghost"]) [part="decrement"],
+:host([emphasis="ghost"]) [part="increment"] {
+  display: none;
+}

@@ -1,9 +1,21 @@
 export {
+  type CellCommitDetail,
+  type CellEditDetail,
   type ColumnToggleDetail,
+  type ExportDetail,
   type FollowDetail,
+  HelixBeforeCellCommitEvent,
+  HelixBeforeCellEditEvent,
   HelixBeforeColumnToggleEvent,
+  HelixBeforeExportEvent,
   HelixBeforeFollowEvent,
+  HelixBeforeViewChangeEvent,
+  HelixCellCommitEvent,
+  HelixCellEditEvent,
   HelixColumnToggleEvent,
+  HelixExportEvent,
   HelixFollowEvent,
+  HelixViewChangeEvent,
+  type ViewChangeDetail,
 } from '@fusion.dev/helix-headless/data-table/events'
 export { HelixDataTable } from './root/data-table-root.js'

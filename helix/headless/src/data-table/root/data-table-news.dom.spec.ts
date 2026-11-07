@@ -66,10 +66,10 @@ describe('a data table saying what changed', () => {
     const element = (await table()) as Table & { filter: string }
     element.filter = 'a'
     await settle(element)
-    expect(said(element)).toBe('3 results')
+    expect(said(element)).toBe('3 of 3 rows')
     element.filter = 'brav'
     await settle(element)
-    expect(said(element)).toBe('1 result')
+    expect(said(element)).toBe('1 of 3 rows')
   })
 
   test('says it in the words it is given', async () => {

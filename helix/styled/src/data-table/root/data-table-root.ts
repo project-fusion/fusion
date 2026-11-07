@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDataTable } from '@fusion.dev/helix-headless/data-table'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as collectionErrorStyles } from '../../shared/collection/error.css.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
@@ -8,9 +8,14 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as recipeStyles } from '../recipes.css.js'
 import { styles } from './data-table-root.css.js'
 import '../../checkbox/index.js'
+import '../../date-input/index.js'
 import '../../divider/index.js'
+import '../../input/index.js'
 import '../../menu/index.js'
+import '../../number-input/index.js'
+import '../../option/index.js'
 import '../../pagination/index.js'
+import '../../select/index.js'
 
 /**
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
@@ -69,6 +74,8 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-dragging-opacity - The opacity of a row being moved, with `reorderable-rows`.
  * @cssproperty --data-table-drop-indicator-color - The color of the line where a moved row would land.
  * @cssproperty --data-table-drop-indicator-size - The thickness of the line where a moved row would land.
+ * @cssproperty --data-table-editable-hover-background-color - The fill of an editable cell under the pointer. The well by default.
+ * @cssproperty --data-table-editing-background-color - The ground under an open cell's field, which covers the cell beside it where the field needs more room than its column. The page's background by default.
  * @cssproperty --data-table-error-color - The color of the words in the line shown while `error-text` is set.
  * @cssproperty --data-table-footer-gap - The space between the grid and the footer below it.
  * @cssproperty --data-table-footer-item-gap - The space between the pieces of the footer, such as a summary and the pagination.
@@ -78,6 +85,9 @@ import '../../pagination/index.js'
  * It is opaque, because rows scroll under the sticky heading. Unset otherwise.
  * @cssproperty --data-table-heading-color - The text color of a heading.
  * @cssproperty --data-table-indent - How far a tree grid's row header steps in for each level. It defaults to the width of the mark that opens a row.
+ * @cssproperty --data-table-message-border-color - The edge of the message under a cell whose value a rule refused. The danger color by default.
+ * @cssproperty --data-table-message-border-width - The width of that message's edge.
+ * @cssproperty --data-table-message-shadow - The shadow under that message.
  * @cssproperty --data-table-more-border-color - The color of the edge around the button in the `load-more` row.
  * @cssproperty --data-table-more-hover-background-color - The fill behind the button in the `load-more` row while the pointer is over it.
  * @cssproperty --data-table-more-padding-block - The space above and below the words of the button in the `load-more` row.
@@ -85,6 +95,7 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-more-radius - The corner radius of the button in the `load-more` row.
  * @cssproperty --data-table-padding-block - The space above and below a cell's content.
  * @cssproperty --data-table-padding-inline - The space on either side of a cell's content.
+ * @cssproperty --data-table-pinned-background-color - The fill behind a pinned column's cells, which covers the cells that scroll under them. The page's background by default.
  * @cssproperty --data-table-row-background-color - The fill across a row. A row generates no box, so a `::part(row)` rule sets this for its cells, as `::part(row):hover` does for a hover.
  * @cssproperty --data-table-row-hover-background-color - The fill across a row while the pointer is over it.
  * @cssproperty --data-table-rule-color - The color of the line between rows. It takes a
@@ -96,6 +107,7 @@ import '../../pagination/index.js'
  * @cssproperty --data-table-toggle-gap - The space between the mark that opens a row of a tree grid and the row's name, also kept by a row with no children.
  * @cssproperty --data-table-toggle-size - The size of the mark that opens and closes a row of a tree grid, and of the room a row with no children keeps for it.
  * @cssproperty --data-table-toolbar-gap - The space between the toolbar and the grid below it.
+ * @cssproperty --data-table-unsaved-background-color - The fill of a cell whose change is held unsaved, under `batch-edits`.
  */
 @customElement('helix-data-table')
 export class HelixDataTable extends HelixHeadlessDataTable {
@@ -120,6 +132,22 @@ export class HelixDataTable extends HelixHeadlessDataTable {
     recipeStyles,
     styles,
   ]
+
+  /**
+   * Draws every editable cell's field in the inline look, `emphasis="ghost"`:
+   * it reads as text, takes a well under the pointer, and rings inside its own
+   * box when it is reached, so the row keeps its height. The headless tier
+   * draws the fields and carries no look, so this tier sets the axis on each
+   * one it drew.
+   */
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    for (const editor of this.renderRoot.querySelectorAll<HTMLElement>('[part="editor"]')) {
+      if ('emphasis' in editor && !editor.hasAttribute('emphasis')) {
+        ;(editor as HTMLElement & { emphasis: string }).emphasis = 'ghost'
+      }
+    }
+  }
 }
 
 declare global {

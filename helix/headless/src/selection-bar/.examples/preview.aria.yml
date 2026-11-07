@@ -1,0 +1,34 @@
+- text: 2 selected
+- button "Archive"
+- button "Export"
+- button "Clear"
+- rowgroup:
+  - row "Select every row Invoice Customer Amount":
+    - columnheader "Select every row":
+      - checkbox "Select every row" [checked=mixed]
+      - text: Select every row
+    - columnheader "Invoice"
+    - columnheader "Customer"
+    - columnheader "Amount"
+  - row "INV-2041" [selected]:
+    - gridcell "Select INV-2041":
+      - checkbox "Select INV-2041" [checked]
+      - text: Select INV-2041
+    - rowheader "INV-2041"
+    - gridcell "Acme Corporation"
+    - gridcell "$12,400.00"
+  - row "INV-2047":
+    - gridcell "Select INV-2047":
+      - checkbox "Select INV-2047"
+      - text: Select INV-2047
+    - rowheader "INV-2047"
+    - gridcell "Acme Logistics"
+    - gridcell "$8,250.00"
+  - row "INV-2052" [selected]:
+    - gridcell "Select INV-2052":
+      - checkbox "Select INV-2052" [checked]
+      - text: Select INV-2052
+    - rowheader "INV-2052"
+    - gridcell "Acme Robotics"
+    - gridcell "$6,980.00"
+- status

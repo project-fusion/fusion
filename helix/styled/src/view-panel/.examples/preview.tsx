@@ -1,0 +1,64 @@
+import './preview.css'
+
+const rows = [
+  { customer: 'Acme Corporation', due: '2026-10-12', id: 'INV-2041', status: 'Overdue' },
+  { customer: 'Acme Logistics', due: '2026-10-18', id: 'INV-2047', status: 'Paid' },
+  { customer: 'Acme Robotics', due: '2026-10-21', id: 'INV-2052', status: 'Overdue' },
+]
+
+const overdue = JSON.stringify({
+  filters: [{ field: 'status', operator: 'any', values: ['Overdue'] }],
+})
+
+export function Example() {
+  return (
+    <>
+      <div className="view-sheet">
+        <helix-view-panel for="invoices">
+          <helix-quick-filters
+            for="invoices"
+            slot="presets"
+          >
+            <helix-quick-filter view={JSON.stringify({ filters: [] })}>All</helix-quick-filter>
+            <helix-quick-filter view={overdue}>Overdue</helix-quick-filter>
+          </helix-quick-filters>
+          <helix-column-manager
+            for="invoices"
+            slot="columns"
+          ></helix-column-manager>
+          <helix-table-export
+            for="invoices"
+            slot="export"
+          ></helix-table-export>
+        </helix-view-panel>
+      </div>
+      <helix-data-table
+        default-view={JSON.stringify({ sort: 'due:asc' })}
+        id="invoices"
+        label="Invoices"
+        row-key="id"
+        rows={rows}
+      >
+        <helix-table-column
+          field="customer"
+          row-header
+          sortable
+        >
+          Customer
+        </helix-table-column>
+        <helix-table-column
+          field="due"
+          sortable
+        >
+          Due
+        </helix-table-column>
+        <helix-table-column
+          field="status"
+          type="enum"
+        >
+          Status
+        </helix-table-column>
+      </helix-data-table>
+    </>
+  )
+}
