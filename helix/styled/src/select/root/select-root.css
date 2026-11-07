@@ -110,16 +110,14 @@
 }
 
 /* Focus still draws an edge, because a control with no resting frame has nothing
-   else to say where the keyboard is. It is a ring inside the box, as the inline
-   text fields draw theirs, so the control is as tall focused as at rest. */
+   else to say where the keyboard is. */
 :host([emphasis="ghost"]) [part="trigger"]:focus-visible {
   border-color: var(--helix-color-focus-ring);
-  border-width: var(--helix-border-thick);
-  outline: none;
 }
 
 :host([emphasis="ghost"][aria-invalid="true"]) [part="trigger"]:focus-visible {
   border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
 }
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed
