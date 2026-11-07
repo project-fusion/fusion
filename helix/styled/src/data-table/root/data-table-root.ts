@@ -134,15 +134,18 @@ export class HelixDataTable extends HelixHeadlessDataTable {
   ]
 
   /**
-   * Opens an edited cell in the inline field, `emphasis="ghost"`, which draws
-   * its ring inside the cell so the row keeps its height. A `Select` takes the
-   * same word for a trigger with no frame.
+   * Draws every editable cell's field in the inline look, `emphasis="ghost"`:
+   * it reads as text, takes a well under the pointer, and rings inside its own
+   * box when it is reached, so the row keeps its height. The headless tier
+   * draws the fields and carries no look, so this tier sets the axis on each
+   * one it drew.
    */
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    const editor = this.renderRoot.querySelector<HTMLElement>('[part="editor"]')
-    if (editor && 'emphasis' in editor && !editor.hasAttribute('emphasis')) {
-      ;(editor as HTMLElement & { emphasis: string }).emphasis = 'ghost'
+    for (const editor of this.renderRoot.querySelectorAll<HTMLElement>('[part="editor"]')) {
+      if ('emphasis' in editor && !editor.hasAttribute('emphasis')) {
+        ;(editor as HTMLElement & { emphasis: string }).emphasis = 'ghost'
+      }
     }
   }
 }

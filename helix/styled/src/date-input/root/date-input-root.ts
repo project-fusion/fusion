@@ -42,6 +42,7 @@ import { styles } from './date-input-root.css.js'
  * @cssproperty --date-input-border-color - The color of the panel's border.
  * @cssproperty --date-input-border-width - The width of the panel's border. It
  *   follows `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
+ * @cssproperty --date-input-ghost-underline - The line under the words of a `ghost` field at rest: `underline` draws it dotted at any pointer. A touch screen draws it whatever this says.
  * @cssproperty --date-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --date-input-segment-focus-color - The text of the segment with
@@ -53,6 +54,7 @@ import { styles } from './date-input-root.css.js'
  * @cssproperty --date-input-shadow - The shadow under the panel. It follows
  *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
  *   shadow by default.
+ * @cssproperty --date-input-size - The least height of the field.
  *
  * @replaces input[type=date]
  */
