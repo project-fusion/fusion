@@ -55,7 +55,7 @@
 :host([emphasis="ghost"]) [part="control"] {
   font-size: var(--helix-text-control);
   font-weight: inherit;
-  padding-inline: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs);
 }
 
 @media (pointer: coarse) {

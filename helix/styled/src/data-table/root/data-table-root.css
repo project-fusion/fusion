@@ -750,39 +750,71 @@ slot[name="error"]::slotted(*) {
   position: relative;
 }
 
-[part~="cell-editable"]:not([part~="cell-editing"], [part~="cell-boolean"]):hover {
+/* A cell that draws no field at rest, because its column draws its own `cell`
+   or `editor`, takes the well and the cursor itself. */
+[part~="cell-editable"]:not(
+  [part~="cell-field"],
+  [part~="cell-editing"],
+  [part~="cell-boolean"]
+):hover {
   background-color: var(--data-table-editable-hover-background-color, var(--helix-color-well));
   cursor: text;
 }
 
 @media (pointer: coarse) {
-  [part~="cell-editable"]:not([part~="cell-editing"], [part~="cell-boolean"]) {
+  [part~="cell-editable"]:not(
+    [part~="cell-field"],
+    [part~="cell-editing"],
+    [part~="cell-boolean"]
+  ) {
     text-decoration: underline dotted var(--helix-color-foreground-muted);
     text-underline-offset: 0.25em;
   }
 }
 
+/* A cell that is its field: the field is a control's tight height and centered
+   in the row, so the cell keeps no padding of its own, and the field's inset is
+   taken back with a margin so its words line up with the heading and the cells
+   around it. */
+[part~="cell-field"] {
+  padding-block: 0;
+}
+
+/* A checkbox is a box in a line, so it sits on the row's middle. */
+[part~="cell-boolean"] {
+  align-items: center;
+  display: flex;
+}
+
+/* The words are underlined with dots, which says the cell can be edited. */
+[part="editor"] {
+  --input-ghost-underline: underline;
+  --number-input-ghost-underline: underline;
+  --date-input-ghost-underline: underline;
+  --select-ghost-underline: underline;
+  inline-size: calc(100% + 2 * var(--helix-space-xs));
+  margin-inline: calc(-1 * var(--helix-space-xs));
+  /* A control's tight step, centered in the row, so an active field sits inside
+     its cell with room above and below, and is not the cell's whole height. */
+  --input-size: var(--helix-size-control-tight);
+  --number-input-size: var(--helix-size-control-tight);
+  --date-input-size: var(--helix-size-control-tight);
+}
+
+/* Open, a field that needs more than its column, a date with its calendar,
+   grows over the cell beside it on the page's ground, and the cell stops
+   counting for its column's width so the column does not move. */
 [part~="cell-editing"] {
+  contain: inline-size;
   padding-block: 0;
   z-index: 1;
 }
 
-/* The field is the cell's height less its rule, so an open cell is no taller
-   than a closed one. */
-[part="editor"] {
-  --input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
-  --number-input-size: calc(var(--helix-size-control) - var(--helix-border-thin));
-  /* A field that needs more than its column, a date with its calendar, grows
-     over the cell beside it on the page's ground, rather than widening the
-     column or being cut. */
+[part~="cell-editing"] > [part="editor"] {
   background-color: var(--data-table-editing-background-color, var(--helix-color-background));
-  inline-size: 100%;
-  min-inline-size: max-content;
 }
 
-/* An ISO date, its segments, and the calendar's button, which the segments
-   clip themselves to fit when they are given less. */
-[part="editor"][data-type="date"] {
+[part~="cell-editing"] > [part="editor"][data-type="date"] {
   min-inline-size: 8.5rem;
 }
 

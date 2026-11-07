@@ -19,7 +19,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--helix-space-2xs);
-  min-block-size: var(--helix-size-control);
+  min-block-size: var(--date-input-size, var(--helix-size-control));
   /* No more than a tag leaves inside the field's own height, as Filter Input
      sets it, so one line keeps the field the control's height. At `sm` on a
      touch screen the 16 pixel text sets a 24 pixel line, and with 4 above and
@@ -281,5 +281,24 @@ slot[name="trigger"]::slotted(*) {
 @media print {
   :host {
     print-color-adjust: exact;
+  }
+}
+
+/* The underline of a `ghost` date at rest, from this family's hook, and the
+   calendar's button only once the field is reached, so a column of dates is as
+   wide as its dates. Its words are the text control's, or the segments'. */
+:host([emphasis="ghost"]:not(:focus-within)) :is([part="control"], [part~="segment"]) {
+  text-decoration: var(--date-input-ghost-underline, none) dotted
+    var(--helix-color-foreground-muted);
+  text-underline-offset: 0.25em;
+}
+
+:host([emphasis="ghost"]:not(:focus-within)) [part="trigger"] {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]:not(:focus-within)) :is([part="control"], [part~="segment"]) {
+    text-decoration-line: underline;
   }
 }

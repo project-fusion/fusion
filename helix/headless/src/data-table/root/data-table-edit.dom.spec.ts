@@ -51,7 +51,7 @@ const cell = (element: Table, row: number, column: number): HTMLElement =>
     `[data-row="${row}"] > [data-column="${column}"]`,
   ) as HTMLElement
 const editor = (element: Table): (HTMLElement & { value: unknown }) | null =>
-  element.shadowRoot?.querySelector('[part="editor"]') ?? null
+  element.shadowRoot?.querySelector('[part~="cell-editing"] [part="editor"]') ?? null
 const press = (target: HTMLElement, key: string, init: KeyboardEventInit = {}): void => {
   target.dispatchEvent(
     new KeyboardEvent('keydown', { bubbles: true, composed: true, key, ...init }),
@@ -69,6 +69,47 @@ describe('an editable cell', () => {
     const element = await table()
     expect(cell(element, 0, 1).getAttribute('part')).toContain('cell-editable')
     expect(cell(element, 0, 0).getAttribute('part')).not.toContain('cell-editable')
+  })
+
+  test('is its field at rest, in every row, and only an open cell is marked open', async () => {
+    const element = await table()
+    expect(cell(element, 0, 1).querySelector('[part="editor"]')?.localName).toBe(
+      'helix-headless-input',
+    )
+    expect(cell(element, 1, 2).querySelector('[part="editor"]')?.localName).toBe(
+      'helix-headless-number-input',
+    )
+    expect(cell(element, 0, 1).getAttribute('part')).toContain('cell-field')
+    expect(cell(element, 0, 1).getAttribute('part')).not.toContain('cell-editing')
+    expect(cell(element, 0, 0).querySelector('[part="editor"]')).toBeNull()
+  })
+
+  test('opens when its field is reached, asking first, and a refusal puts focus on the cell', async () => {
+    const element = await table()
+    const heard: string[] = []
+    element.addEventListener('helix-before-cell-edit', (event) => {
+      heard.push(event.detail.field)
+      event.preventDefault()
+    })
+    cell(element, 0, 1)
+      .querySelector('[part="editor"]')
+      ?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await settle(element)
+    expect(heard).toEqual(['owner'])
+    expect(editor(element)).toBeNull()
+  })
+
+  test('saves the cell it leaves when another is reached', async () => {
+    const element = await table()
+    element.editCell(element.rows[0] as Record<string, unknown>, 'owner')
+    await settle(element)
+    await type(element, 'Mae')
+    cell(element, 1, 2)
+      .querySelector('[part="editor"]')
+      ?.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await settle(element)
+    expect(element.rows[0]?.owner).toBe('Mae')
+    expect(cell(element, 1, 2).getAttribute('part')).toContain('cell-editing')
   })
 
   test('opens with Enter in the field its type picks, and Enter saves and moves down', async () => {
@@ -152,7 +193,10 @@ describe('an editable cell', () => {
     const saving = element.commitEdit()
     await settle(element)
     expect(cell(element, 0, 1).getAttribute('part')).toContain('cell-saving')
-    expect(cell(element, 0, 1).textContent).toContain('Taken')
+    expect(
+      (cell(element, 0, 1).querySelector('[part="editor"]') as HTMLElement & { value: string })
+        .value,
+    ).toBe('Taken')
     settleCheck('That owner has left.')
     expect(await saving).toBe(false)
     await settle(element)

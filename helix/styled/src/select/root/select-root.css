@@ -283,3 +283,25 @@ slot[name="end"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* The underline of a `ghost` select at rest, from this family's hook, and its
+   mark only under the pointer or with focus, so a column of choices reads as
+   a column of words. */
+:host([emphasis="ghost"]) [part="trigger"] {
+  font-weight: inherit;
+}
+
+:host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
+  text-decoration: var(--select-ghost-underline, none) dotted var(--helix-color-foreground-muted);
+  text-underline-offset: 0.25em;
+}
+
+:host([emphasis="ghost"]:not(:hover, :focus-within)) [part="indicator"] {
+  visibility: hidden;
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
+    text-decoration-line: underline;
+  }
+}

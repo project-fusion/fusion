@@ -72,6 +72,7 @@ import {
 import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 /* `static-html`'s `html`, because the pagination's tag is interpolated: a
@@ -405,6 +406,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart cell-boolean - Added to `cell` in an editable boolean column, which holds a checkbox that toggles in place.
  * @csspart cell-editable - Added to `cell` in a column a reader can edit.
  * @csspart cell-editing - Added to `cell` while it is open for an edit.
+ * @csspart cell-field - Added to `cell` in an editable column that draws its field at rest, as every one does that has no `cell` or `editor` of its own.
  * @csspart cell-header - Added to `cell` for a cell of the row header column.
  * @csspart cell-invalid - Added to `cell` while its value breaks a rule, beside `cell-message`.
  * @csspart cell-message - The message for a value a rule refuses, inside the open cell. The field names it as its description.
@@ -695,10 +697,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   droppedLabel = 'Dropped'
 
   /**
-   * What opens an editable cell: `click`, where a single press opens it, or
-   * `double-click`, a spreadsheet's way, which leaves a press free to select a
-   * row or move focus. Enter, F2, and typing open a cell either way, and a
-   * boolean cell toggles on one press whatever this says.
+   * What opens an editable cell that draws no field at rest, because its
+   * column sets `cell` or `editor`: `click`, where a single press opens it, or
+   * `double-click`, a spreadsheet's way. Every other editable cell is its
+   * field already, which a press reaches. Enter, F2, and typing open a cell
+   * either way, and a boolean cell toggles on one press whatever this says.
    */
   @property({ attribute: 'edit-on' })
   editOn: 'click' | 'double-click' = 'click'
@@ -3452,6 +3455,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const pinnedEnd = pin === 'end'
     const editable = this.canEdit(column, row)
     const toggles = editable && column.type === 'boolean'
+    const fielded = editable && this.hasField(column)
     const open = editable && this.editing?.row === row && this.editing.field === column.field
     const edit = this.edits.get(row)?.get(column.field)
     const saving = edit?.state === 'saving'
@@ -3467,17 +3471,17 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       .filter(Boolean)
       .join('; ')
     return html`<span
-      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}${editable ? ' cell-editable' : ''}${toggles ? ' cell-boolean' : ''}${open ? ' cell-editing' : ''}${message ? ' cell-invalid' : ''}${saving ? ' cell-saving' : ''}${unsaved ? ' cell-unsaved' : ''}"
+      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}${editable ? ' cell-editable' : ''}${fielded ? ' cell-field' : ''}${toggles ? ' cell-boolean' : ''}${open ? ' cell-editing' : ''}${message ? ' cell-invalid' : ''}${saving ? ' cell-saving' : ''}${unsaved ? ' cell-unsaved' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
       data-column=${place}
       style=${style || nothing}
       >${placed?.branch ? this.renderToggle(row, placed.open) : nothing}${
-        open
-          ? this.renderEditor(column, row, message)
-          : editable && column.type === 'boolean'
-            ? this.renderBoolean(column, row, shown)
+        toggles
+          ? this.renderBoolean(column, row, shown)
+          : fielded || open
+            ? this.renderEditor(column, row, message)
             : column.read(shown)
       }${saving ? html`<span part="cell-saving-mark" role="status">${this.savingLabel}</span>` : nothing}${
         message
@@ -3486,6 +3490,36 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       }</span
     >`
   }
+
+  /**
+   * Whether the column draws its field at rest: it is the cell, as inline text
+   * a click turns into the field's active look. A column with its own `cell`
+   * reader or its own `editor` draws what you gave it, and opens the field when
+   * a reader starts an edit. A boolean draws its checkbox either way.
+   */
+  private hasField(column: HelixHeadlessTableColumn): boolean {
+    return !column.cell && !column.editor && column.type !== 'boolean'
+  }
+
+  /** Every value an enum column holds, most common first, counted once for every cell that asks. */
+  private distinctValues(column: HelixHeadlessTableColumn): { label: string; value: string }[] {
+    if (this.distinct?.rows !== this.rows) {
+      this.distinct = { byField: new Map(), rows: this.rows }
+    }
+    let held = this.distinct.byField.get(column.field)
+    if (!held) {
+      held = facetsOf(this.rows, (row) => column.order(row)).map(({ value }) => ({
+        label: value,
+        value,
+      }))
+      this.distinct.byField.set(column.field, held)
+    }
+    return held
+  }
+
+  private distinct:
+    | { byField: Map<string, { label: string; value: string }[]>; rows: readonly DataRow[] }
+    | undefined = undefined
 
   /** Whether a reader may edit this column's cell in this row. Not in a tree grid. */
   private canEdit(column: HelixHeadlessTableColumn, row: DataRow): boolean {
@@ -3535,7 +3569,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * `type` picks, with what is typed so far and the message a rule gave.
    */
   protected renderEditor(column: HelixHeadlessTableColumn, row: DataRow, message: string): unknown {
-    const draft = this.editing?.draft
+    const open = this.editing?.row === row && this.editing.field === column.field
+    const draft = open ? this.editing?.draft : valueAt(this.shownRow(row), column.field)
     const name = column.textContent?.trim() || column.field
     if (column.editor) {
       return column.editor({
@@ -3550,8 +3585,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         value: draft,
       })
     }
+    /* A reader reaching the field, by a press or a key, opens the cell: it asks
+       first, and a refusal puts focus back on the cell. */
+    const reach = (event: Event) => {
+      if (!this.beginEdit(row, column.field)) {
+        ;(event.currentTarget as HTMLElement).parentElement?.focus()
+      }
+    }
     const take = (event: Event) => {
-      if (this.editing) {
+      if (this.editing?.row === row && this.editing.field === column.field) {
         this.editing = {
           ...this.editing,
           draft: (event.target as unknown as { value: unknown }).value,
@@ -3562,15 +3604,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const invalid = message ? 'true' : nothing
     if (column.type === 'enum') {
       const select = this.tag('select')
-      const items = this.facetsOf(column.field).map(({ value }) => ({ label: value, value }))
+      const items = this.distinctValues(column)
       return html`<${select}
         part="editor"
         exportparts="feedback: editor-feedback, hint: editor-hint, indicator: editor-indicator, label: editor-label, listbox: editor-listbox, listbox-empty: editor-listbox-empty, listbox-error: editor-listbox-error, listbox-feedback: editor-listbox-feedback, listbox-filter-icon: editor-listbox-filter-icon, listbox-filter-mark: editor-listbox-filter-mark, listbox-hint: editor-listbox-hint, listbox-items: editor-listbox-items, listbox-label: editor-listbox-label, listbox-live: editor-listbox-live, listbox-loading: editor-listbox-loading, listbox-search: editor-listbox-search, listbox-search-field: editor-listbox-search-field, listbox-voice: editor-listbox-voice, listbox-voice-level: editor-listbox-voice-level, listbox-voice-level-canvas: editor-listbox-voice-level-canvas, listbox-voice-listening: editor-listbox-voice-listening, listbox-voice-status: editor-listbox-voice-status, live: editor-live, surface: editor-surface, trigger: editor-trigger, value: editor-value"
         aria-label=${name}
         .items=${items}
-        .value=${String(draft ?? '')}
+        .value=${live(String(draft ?? ''))}
         aria-describedby=${described}
         aria-invalid=${invalid}
+        @focusin=${reach}
         @change=${take}
       ></${select}>`
     }
@@ -3582,10 +3625,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       aria-label=${name}
       date-style=${column.type === 'date' ? 'iso' : nothing}
       data-type=${column.type ?? 'text'}
-      .value=${draft === null || draft === undefined ? '' : String(draft)}
+      .value=${live(draft === null || draft === undefined ? '' : String(draft))}
       ?required=${column.required}
       aria-describedby=${described}
       aria-invalid=${invalid}
+      @focusin=${reach}
       @input=${take}
       @change=${take}
     ></${tag}>`
@@ -3609,11 +3653,43 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
     const value = valueAt(this.shownRow(row), field)
     const detail = { field, key: this.editKey(row), row, value }
+    if (this.editing?.row === row && this.editing.field === field) {
+      this.editing = { ...this.editing, draft: typed ?? this.editing.draft }
+      this.editFocus = typed === undefined ? 'select' : 'end'
+      return true
+    }
     if (!this.dispatchEvent(new HelixBeforeCellEditEvent(detail))) {
       return false
     }
     this.editing = { draft: typed ?? value, field, message: '', row }
     this.editFocus = typed === undefined ? 'select' : 'end'
+    this.dispatchEvent(new HelixCellEditEvent(detail))
+    return true
+  }
+
+  /**
+   * Opens the cell a reader reached with a press or a key, as `editCell` does
+   * for a call. A cell already open is left as it is, and another open cell is
+   * saved first, as leaving it saves it. Returns whether the cell is open.
+   */
+  private beginEdit(row: DataRow, field: string): boolean {
+    const now = this.editing
+    if (now?.row === row && now.field === field) {
+      return true
+    }
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column || !this.canEdit(column, row)) {
+      return false
+    }
+    if (now) {
+      void this.commitEdit(0, 0, false)
+    }
+    const value = valueAt(this.shownRow(row), field)
+    const detail = { field, key: this.editKey(row), row, value }
+    if (!this.dispatchEvent(new HelixBeforeCellEditEvent(detail))) {
+      return false
+    }
+    this.editing = { draft: value, field, message: '', row }
     this.dispatchEvent(new HelixCellEditEvent(detail))
     return true
   }
@@ -3688,7 +3764,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * the row in `rows` and fires `helix-cell-commit`. Under `batch-edits` the
    * value is held as an unsaved change. Returns whether the value was saved.
    */
-  async commitEdit(rows = 0, columns = 0): Promise<boolean> {
+  async commitEdit(rows = 0, columns = 0, refocus = true): Promise<boolean> {
     const editing = this.editing
     const column = editing
       ? this.tableColumns.find((one) => one.field === editing.field)
@@ -3702,12 +3778,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const previous = valueAt(this.shownRow(row), field)
     if (value === previous || (value === '' && (previous === undefined || previous === null))) {
       this.editing = undefined
-      this.focusCell(row, field, rows, columns)
+      if (refocus) {
+        this.focusCell(row, field, rows, columns)
+      }
       return true
     }
     const refuse = (message: string): false => {
       this.editing = { ...editing, message }
-      this.editFocus = 'end'
+      this.editFocus = refocus ? 'end' : undefined
       return false
     }
     const problem = checkEdit(value, type, column)
@@ -3737,7 +3815,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return false
     }
     this.editing = undefined
-    this.focusCell(row, field, rows, columns)
+    if (refocus) {
+      this.focusCell(row, field, rows, columns)
+    }
     if (checks.length > 0) {
       this.markEdit(row, field, { previous, state: 'saving', value })
       let message: string | undefined
@@ -3751,7 +3831,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       this.markEdit(row, field, undefined)
       if (message) {
         this.editing = { draft: value, field, message, row }
-        this.editFocus = 'end'
+        this.editFocus = refocus ? 'end' : undefined
         return false
       }
     }
@@ -3938,18 +4018,22 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     }
     setTimeout(() => {
       const active = deepActiveElement()
-      const editor = this.partNamed('editor')
-      const cell = editor?.parentElement
+      const cell = this.openCell()
       if (this.editing === editing && !(active && cell && deepContains(cell, active))) {
-        void this.commitEdit()
+        void this.commitEdit(0, 0, false)
       }
     })
+  }
+
+  /** The cell open for an edit, once it is drawn. */
+  private openCell(): HTMLElement | null {
+    return this.renderRoot.querySelector<HTMLElement>('[part~="cell-editing"]')
   }
 
   /** Puts focus in the open cell's field once it is drawn. */
   private focusEditor(): void {
     const how = this.editFocus
-    const editor = this.partNamed('editor') as (HTMLElement & { select?: () => void }) | null
+    const editor = this.openCell()?.querySelector<HTMLElement>('[part="editor"]')
     if (!how || !editor) {
       return
     }
@@ -3959,7 +4043,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const ready =
       (editor as { updateComplete?: Promise<unknown> }).updateComplete ?? Promise.resolve()
     void ready.then(() => {
-      if (this.partNamed('editor') !== editor) {
+      if (this.openCell()?.querySelector('[part="editor"]') !== editor) {
         return
       }
       editor.focus()
