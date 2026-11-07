@@ -750,13 +750,13 @@ slot[name="error"]::slotted(*) {
   position: relative;
 }
 
-[part~="cell-editable"]:not([part~="cell-editing"], :has([part="cell-toggle"])):hover {
+[part~="cell-editable"]:not([part~="cell-editing"], [part~="cell-boolean"]):hover {
   background-color: var(--data-table-editable-hover-background-color, var(--helix-color-well));
   cursor: text;
 }
 
 @media (pointer: coarse) {
-  [part~="cell-editable"]:not([part~="cell-editing"], :has([part="cell-toggle"])) {
+  [part~="cell-editable"]:not([part~="cell-editing"], [part~="cell-boolean"]) {
     text-decoration: underline dotted var(--helix-color-foreground-muted);
     text-underline-offset: 0.25em;
   }
@@ -784,15 +784,6 @@ slot[name="error"]::slotted(*) {
    clip themselves to fit when they are given less. */
 [part="editor"][data-type="date"] {
   min-inline-size: 8.5rem;
-}
-
-[part="cell-toggle"] {
-  accent-color: var(--helix-color-primary);
-  block-size: var(--helix-size-checkbox);
-  cursor: pointer;
-  display: block;
-  inline-size: var(--helix-size-checkbox);
-  margin: 0;
 }
 
 /* A refused value: the message under the cell, over the rows below it. */

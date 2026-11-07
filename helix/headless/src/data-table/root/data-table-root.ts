@@ -229,7 +229,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | Enter in an open cell | Saves and moves down a row. |
  * | Tab, Shift with Tab in an open cell | Saves and moves to the next or the previous cell. |
  * | Escape in an open cell | Puts the old value back and closes the cell. |
- * | Space, Enter on an editable boolean cell | Toggles it in place. |
+ * * | Space, Enter on an editable boolean cell | Toggles its checkbox in place. |
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Enter, Space on the `load-more` row | Sends `helix-load-more`. |
  * | Space on a row | Selects the row, in a `selectable` table. Under `selection-behavior="replace"`, selects it alone, and Control or Command with Space adds or takes out the row. |
@@ -402,6 +402,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart cell - One cell.
+ * @csspart cell-boolean - Added to `cell` in an editable boolean column, which holds a checkbox that toggles in place.
  * @csspart cell-editable - Added to `cell` in a column a reader can edit.
  * @csspart cell-editing - Added to `cell` while it is open for an edit.
  * @csspart cell-header - Added to `cell` for a cell of the row header column.
@@ -412,7 +413,6 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart cell-saving - Added to `cell` while a check the page passed to `waitUntil` is under way.
  * @csspart cell-saving-mark - Says a cell is saving, inside it. Read by a screen reader, and drawn as a mark in the styled tier.
  * @csspart cell-selected - Added to `cell` in a selected row.
- * @csspart cell-toggle - The checkbox in an editable boolean cell, which toggles in place.
  * @csspart cell-unsaved - Added to `cell` while its change is held unsaved, under `batch-edits`.
  * @csspart checkbox - A row's checkbox, or the checkbox in the heading that selects every row.
  * @csspart checkbox-box - The box drawn for the checkbox's input.
@@ -3451,6 +3451,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const pinnedStart = pin === 'start'
     const pinnedEnd = pin === 'end'
     const editable = this.canEdit(column, row)
+    const toggles = editable && column.type === 'boolean'
     const open = editable && this.editing?.row === row && this.editing.field === column.field
     const edit = this.edits.get(row)?.get(column.field)
     const saving = edit?.state === 'saving'
@@ -3466,7 +3467,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       .filter(Boolean)
       .join('; ')
     return html`<span
-      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}${editable ? ' cell-editable' : ''}${open ? ' cell-editing' : ''}${message ? ' cell-invalid' : ''}${saving ? ' cell-saving' : ''}${unsaved ? ' cell-unsaved' : ''}"
+      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}${editable ? ' cell-editable' : ''}${toggles ? ' cell-boolean' : ''}${open ? ' cell-editing' : ''}${message ? ' cell-invalid' : ''}${saving ? ' cell-saving' : ''}${unsaved ? ' cell-unsaved' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
@@ -3515,17 +3516,18 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     row: DataRow,
     shown: DataRow,
   ): TemplateResult {
-    return html`<input
-      part="cell-toggle"
-      type="checkbox"
-      tabindex="-1"
-      aria-label=${column.textContent?.trim() || column.field}
-      .checked=${Boolean(valueAt(shown, column.field))}
-      @click=${(event: Event) => {
+    /* The same checkbox a selectable table's rows use, with its own toggle
+       held: the table asks first with `helix-before-cell-commit`, and draws the
+       value that comes back. */
+    return this.renderCheckbox(
+      column.textContent?.trim() || column.field,
+      Boolean(valueAt(shown, column.field)),
+      false,
+      (event) => {
         event.preventDefault()
         this.toggleCell(column, row)
-      }}
-    />`
+      },
+    )
   }
 
   /**
