@@ -113,13 +113,13 @@
    else to say where the keyboard is. It is a ring inside the box, as the inline
    text fields draw theirs, so the control is as tall focused as at rest. */
 :host([emphasis="ghost"]) [part="trigger"]:focus-visible {
-  border-color: transparent;
-  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-focus-ring);
+  border-color: var(--helix-color-focus-ring);
+  border-width: var(--helix-border-thick);
   outline: none;
 }
 
-:host([emphasis="ghost"][aria-invalid="true"]) [part="trigger"] {
-  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-danger);
+:host([emphasis="ghost"][aria-invalid="true"]) [part="trigger"]:focus-visible {
+  border-color: var(--helix-color-danger);
 }
 
 /* One line, cut rather than wrapped, so a long answer does not make the closed

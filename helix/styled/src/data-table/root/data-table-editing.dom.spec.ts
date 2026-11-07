@@ -14,7 +14,7 @@ const run = hasLayout() ? test : (): void => {}
 
 describe('the editing example', () => {
   run(
-    'opens an amount in the inline field, keeps the row its height, and refuses one under zero',
+    'is its field at rest, keeps the row its height when an amount opens, and refuses one under zero',
     async () => {
       await example(editing)
       await idle()
@@ -29,7 +29,7 @@ describe('the editing example', () => {
       table.editCell(table.rows[0], 'amount')
       await idle()
       const editor = table.shadowRoot?.querySelector<HTMLElement & { value: string }>(
-        '[part="editor"]',
+        '[part~="cell-editing"] [part="editor"]',
       )
       expect(editor?.getAttribute('emphasis')).toBe('ghost')
       expect(cell?.getBoundingClientRect().height).toBe(before)
