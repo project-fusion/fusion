@@ -279,15 +279,14 @@ slot[name="scroll-end-icon"]::slotted(*) {
   --_tab-selected-surface: transparent;
 }
 
-/* **The default mark is the selected wash, as Navigation's and App Header's
-   current item is**, and it travels for the same reason. A raised pill with no
-   track was a white tab on a white strip behind a 1.2:1 edge, and the 8% wash
-   under the pointer read stronger than the selection; in dark the pill was
-   #1e1e1e beside a hovered #141414, 1.1:1. Decided by the owner on November 4,
-   2026. */
+/* **The default mark is Navigation's pill**, `surface-sunken`, as App
+   Header's current item is, and it travels for the same reason. The selected
+   wash was tried here after a white raised pill, and the owner chose the pill
+   from before the rounds in Navigation's color, November 10, 2026: over white
+   the hover is #f2f2f2 and the selection #eaeaea. */
 :host(:not([marker])) [part="indicator"] {
   --_indicator-block: var(--indicator-block-size, 0);
-  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-selected));
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-surface-sunken));
   --_indicator-radius: var(--helix-radii-sm);
   --_indicator-offset: 0px;
 }
@@ -295,10 +294,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 :host(:not([marker])) {
   --_tab-selected-surface: transparent;
   --_tab-selected-shadow: none;
-  /* **The pointer takes Navigation's 5% wash, under the selected wash in both
-     modes.** Over white the hover is #f2f2f2 and the selection #dedede, 1.20:1
-     apart; over black #0d0d0d and #292929, 1.34:1. At the row hover, 8% in light
-     and 12% in dark, the two stood 1.13 apart in both. */
+  /* **The pointer takes Navigation's 5% wash**, as a link in Navigation does. */
   --_tab-hover-surface: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
 }
 
@@ -371,8 +367,7 @@ slot[name="scroll-end-icon"]::slotted(*) {
 /* `subtle`: the mark as a tint, with no edge and no shadow. **The selected
    wash, a step past the wash under the pointer**, so the current tab still
    reads as current beside one being hovered. The 8% tint it was stood level
-   with the light hover and under the dark one, 12%, in the segmented track.
-   The unset marker is this wash already, so `subtle` leaves it as it is. */
+   with the light hover and under the dark one, 12%, in the segmented track. */
 :host([emphasis="subtle"]:not([marker])) [part="indicator"],
 :host([emphasis="subtle"][marker="segmented"]) [part="indicator"] {
   --_indicator-color: var(--tabs-indicator-color, var(--helix-color-selected));
