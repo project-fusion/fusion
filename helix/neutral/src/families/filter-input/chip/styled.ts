@@ -35,9 +35,11 @@ export default styles(
     hooks: ({ own }) => ({
       backgroundColor: token('color-surface-sunken'),
       borderColor: mix(token('color-foreground'), 8, own.chipFill),
-      radius: token('radii-sm'),
+      /* Concentric with the field around it, which hands its corner down. */
+      radius: inherited('_filter-input-chip-corner', token('radii-sm')),
     }),
     own: {
+      chipDismiss: null,
       chipFill: null,
     },
     stylesheet: 'filter-input/chip/filter-chip.generated.css',
@@ -108,6 +110,18 @@ export default styles(
         rule({ ...truncated, flexShrink: 1000, fontWeight: token('weight-medium') }),
         rule({ part: { hidden: true } }, { display: 'none' }),
       ]),
+      /* The words are cut inside their slot, in their own direction. */
+      on({ part: 'field', selector: '[part="field"] > slot,\n[part="values"] > slot' }, [
+        web([
+          rule({
+            display: 'block',
+            minInlineSize: 0,
+            overflow: 'hidden',
+            textAlign: 'match-parent',
+            textOverflow: 'ellipsis',
+          }),
+        ]),
+      ]),
       on('dismiss', [
         rule({
           web: { background: 'none', border: '0', cursor: 'pointer' },
@@ -121,18 +135,18 @@ export default styles(
           placeItems: 'center',
           position: 'relative',
         }),
+        /* The library's two washes, hover and then press, as Tag's cross takes. */
         rule(
           { hover: true },
-          {
-            backgroundColor: mix('currentcolor', 12, 'transparent'),
-            color: token('color-foreground'),
-          },
+          { backgroundColor: token('color-hover'), color: token('color-foreground') },
         ),
+        rule({ active: true }, { backgroundColor: token('color-press') }),
+        /* Inside the cross's own box, as Tag draws it. */
         rule(
           { focusVisible: true },
           {
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-            outlineOffset: token('size-focus-offset'),
+            outlineOffset: product(token('size-focus-offset'), '-1'),
           },
         ),
         rule({ print: true }, { display: 'none' }),
@@ -146,10 +160,19 @@ export default styles(
           }),
         ]),
       ]),
+      /* A step under a tag's own icon and never under its text, as Tag's
+         cross is. */
       on('dismiss-mark', [
         rule({
-          blockSize: inherited('icon-size', product(token('size-icon-sm'), 0.75)),
-          inlineSize: inherited('icon-size', product(token('size-icon-sm'), 0.75)),
+          own: {
+            chipDismiss: fn(
+              'max',
+              token('text-xs'),
+              difference(fn('round', quotient(token('size-tag'), 2), '2px'), '2px'),
+            ),
+          },
+          blockSize: inherited('icon-size', own.chipDismiss),
+          inlineSize: inherited('icon-size', own.chipDismiss),
         }),
       ]),
     ]
