@@ -33,7 +33,8 @@ export default styles(
       color: token('color-foreground-muted'),
       direction: 'row',
       entryGap: token('space-2xs'),
-      fontSize: token('text-sm'),
+      /* The size of the chart's own words, as its axis ticks are. */
+      fontSize: token('text-xs'),
       gap: token('space-sm'),
       hiddenOpacity: '0.56',
       swatchRadius: token('radii-sm'),
@@ -155,11 +156,11 @@ export default styles(
         ]),
         /* Glass thins whatever emphasis drew. */
         rule([{ 'data-material': 'glass' }, { 'data-material': false, material: 'glass' }], {
-          own: { legendThrough: product(0.62, token('material-opacity')) },
+          own: { legendThrough: token('material-glass-opacity') },
         }),
         rule(
           { 'data-material': false, material: 'frosted' },
-          { own: { legendThrough: product(0.88, token('material-opacity')) } },
+          { own: { legendThrough: token('material-frosted-opacity') } },
         ),
       ]),
       /* Under `toggles` a name is a button, and it looks like the name it was. */

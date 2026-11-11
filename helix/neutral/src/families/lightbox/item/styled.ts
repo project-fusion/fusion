@@ -56,6 +56,16 @@ export default styles(
     on({ region: 'default', slotted: '*' }, [
       native([rule({ maxBlockSize: '100%', maxInlineSize: '100%' })]),
     ]),
+    /* A picture that failed keeps a picture's room, at 3:2, from the size
+       scale, and never past the viewport. */
+    on({ part: 'item', selector: '[part="item"] ::slotted(helix-image[data-status="error"])' }, [
+      web([
+        rule({
+          '--image-aspect': '3 / 2',
+          inlineSize: fn('min', '100%', product(token('size-button'), 3.84)),
+        }),
+      ]),
+    ]),
     on({ region: 'description', slotted: '*' }, [
       rule({
         color: hook.descriptionColor,

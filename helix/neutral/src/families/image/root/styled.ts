@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { first, native, token, web } from '../../../style.js'
+import { first, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -73,6 +73,14 @@ export default styles(
         opacity: 0,
         transition: ['opacity', hook.fadeDuration, token('easing-standard')],
       }),
+      /* A failed picture with no box of its own keeps a surface around its
+         mark, on the picture and not the host, so a box given a height keeps it. */
+      web([
+        rule(
+          { error: true },
+          { minBlockSize: sum(token('size-icon'), product(token('space-lg'), 2)) },
+        ),
+      ]),
       native([
         rule({ loaded: true }, { opacity: 1 }),
         /* A failed picture lies over the box rather than sizing it, since a
