@@ -289,7 +289,7 @@ slot[name="trigger"]::slotted(*) {
    wide as its dates. Its words are the text control's, or the segments'. */
 :host([emphasis="ghost"]:not(:focus-within)) :is([part="control"], [part~="segment"]) {
   text-decoration: var(--date-input-ghost-underline, none) dotted
-    var(--helix-color-foreground-muted);
+    var(--helix-color-foreground-subtle);
   text-underline-offset: 0.25em;
 }
 

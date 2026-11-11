@@ -767,7 +767,7 @@ slot[name="error"]::slotted(*) {
     [part~="cell-editing"],
     [part~="cell-boolean"]
   ) {
-    text-decoration: underline dotted var(--helix-color-foreground-muted);
+    text-decoration: underline dotted var(--helix-color-foreground-subtle);
     text-underline-offset: 0.25em;
   }
 }
