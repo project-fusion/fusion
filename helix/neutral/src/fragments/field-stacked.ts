@@ -1,4 +1,4 @@
-import { fn, product, token } from '../style.js'
+import { fn, native, product, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -12,13 +12,16 @@ export default fragment('field-stacked', { parts: ['label'] }, ({ on, rule }) =>
     rule({
       display: 'block',
       fontSize: token('text-field-label'),
-      /* Tight, as a label over a box is a heading for it, and **rounded to a
-         whole pixel**, so the field under the label starts on one: unrounded
-         the line was 15.6 at `md`, and every edge and mark below sat between
-         pixels. An inline field's label reads at the body's leading instead,
-         in `field-inline`. */
-      lineHeight: fn('round', product(token('leading-tight'), '1em'), '1px'),
       paddingBlockEnd: token('space-2xs'),
     }),
+    /* Tight, as a label over a box is a heading for it, and on the web
+       **rounded to a whole pixel**, so the field under the label starts on
+       one: unrounded the line was 15.6 at `md`, and every edge and mark below
+       sat between pixels. A phone lays text out in points and scales the em
+       with the reader's text size, so it takes the tight leading as it is.
+       An inline field's label reads at the body's leading instead, in
+       `field-inline`. */
+    web([rule({ lineHeight: fn('round', product(token('leading-tight'), '1em'), '1px') })]),
+    native([rule({ lineHeight: token('leading-tight') })]),
   ]),
 ])
