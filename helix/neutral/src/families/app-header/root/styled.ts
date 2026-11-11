@@ -4,6 +4,7 @@ import {
   difference,
   fn,
   list,
+  measured,
   native,
   product,
   quotient,
@@ -51,7 +52,7 @@ export default styles(
       backgroundColor: null,
       blockSize: token('size-header'),
       borderColor: 'transparent',
-      maxInlineSize: '72rem',
+      maxInlineSize: 'none',
       padding: null,
     },
     props: {
@@ -59,9 +60,10 @@ export default styles(
       overlay: boolean(),
       sticky: boolean(),
     },
+    own: { appHeaderFade: null },
     stylesheet: 'app-header/root/app-header-root.generated.css',
   },
-  ({ hook, include, on, rule, variants }) => {
+  ({ hook, include, keyframes, on, own, rule, variants }) => {
     const header = hook.blockSize
     const pace = token('duration-normal')
     const easing = token('easing-standard')
@@ -71,6 +73,18 @@ export default styles(
     }
     return [
       include(densitySm),
+      /* The tight glyph never under the small icon step, as in a Toolbar,
+         since the bar holds Icon Buttons. On the row, which holds every
+         region, past the dense steps the host takes. */
+      on('row', [
+        rule({
+          '--helix-size-icon-tight': fn(
+            'max',
+            fn('round', product(token('size-icon'), 0.8), '2px'),
+            token('size-icon-sm'),
+          ),
+        }),
+      ]),
       on('host', [
         rule({
           backgroundColor: hook.backgroundColor(token('color-background')),
@@ -97,6 +111,15 @@ export default styles(
         }),
         /* Scrolled, it takes the glass. */
         rule({ material: 'transparent', scrolled: true }, { ...glass }),
+        /* Glass and frosted draw the material's edge under the bar. */
+        rule(
+          [
+            { material: 'glass' },
+            { material: 'frosted' },
+            { material: 'transparent', scrolled: true },
+          ],
+          { borderBlockEndColor: hook.borderColor(token('material-border')) },
+        ),
         /* Over the top of the page: the section under the bar starts
            behind it, drawn under it, by the bar's height and the safe area
            the bar stands clear of. */
@@ -183,6 +206,17 @@ export default styles(
           justifyContent: 'flex-end',
           minInlineSize: 0,
         }),
+        /* On a touch screen the actions stand a press apart. */
+        rule(
+          { coarsePointer: true },
+          {
+            gap: fn(
+              'max',
+              token('space-xs'),
+              difference(token('size-target'), token('size-control')),
+            ),
+          },
+        ),
       ]),
       /* **A phone gives the two outer tracks one share each from nothing**,
          so the middle region stands in the middle of the bar, where the web's
@@ -223,6 +257,30 @@ export default styles(
         }),
         /* A phone's scroll view is as wide as what it holds, so centered is safe. */
         native([rule({ flexShrink: 1, justifyContent: 'center' })]),
+        /* The navigation says when it scrolls: the edge with more behind it
+           fades, as Table's does. */
+        web([
+          rule({
+            own: { appHeaderFade: 'to right' },
+            maskImage: fn(
+              'linear-gradient',
+              own.appHeaderFade,
+              'transparent',
+              ['#000', measured('_app-header-fade-start', '0rem')],
+              ['#000', difference('100%', measured('_app-header-fade-end', '0rem'))],
+              'transparent',
+            ),
+          }),
+          rule({ dir: 'rtl' }, { own: { appHeaderFade: 'to left' } }),
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['app-header-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self inline'),
+            },
+          ),
+          rule({ reducedMotion: true }, { animation: 'none' }),
+        ]),
         rule({ contentAlign: 'start' }, { justifyContent: 'flex-start' }),
         rule(
           { folded: true },
@@ -280,6 +338,17 @@ export default styles(
         ]),
       ]),
       on('toggle-mark', [rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
+      keyframes('app-header-edges', {
+        '0%': { '--_app-header-fade-end': token('space-xl'), '--_app-header-fade-start': '0rem' },
+        '5%, 95%': {
+          '--_app-header-fade-end': token('space-xl'),
+          '--_app-header-fade-start': token('space-xl'),
+        },
+        '100%': {
+          '--_app-header-fade-end': '0rem',
+          '--_app-header-fade-start': token('space-xl'),
+        },
+      }),
     ]
   },
 )
