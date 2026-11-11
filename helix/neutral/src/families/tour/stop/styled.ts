@@ -1,4 +1,4 @@
-import { native, safeArea, sum, token, web } from '../../../style.js'
+import { difference, fn, native, safeArea, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import stop from './headless.js'
 
@@ -26,7 +26,7 @@ export default styles(
     prefix: 'tour',
     hooks: {
       arrowSize: '0.5rem',
-      borderWidth: token('border-thin'),
+      borderWidth: token('border-floating'),
       bubbleSize: '22rem',
       padding: token('space-md'),
       shadow: token('shadow-floating'),
@@ -36,14 +36,16 @@ export default styles(
   },
   ({ hook, on, rule }) => {
     const fill = hook.surfaceBackgroundColor
-    const edge = [token('border-thin'), 'solid', token('color-border')] as const
+    /* The edge, once, for the panel and for the point's two outer sides, as
+       Popover says its own. */
+    const edge = [hook.borderWidth, 'solid', token('color-border-floating')] as const
     const muted = token('color-foreground-muted')
     return [
       on('host', [rule({ display: 'contents' })]),
       on('surface', [
         rule({
           backgroundColor: fill,
-          border: [hook.borderWidth, 'solid', token('color-border')],
+          border: edge,
           borderRadius: token('radii-sm'),
           boxShadow: hook.shadow,
           boxSizing: 'border-box',
@@ -53,7 +55,8 @@ export default styles(
           gap: token('space-md'),
           inlineSize: web('max-content'),
           margin: token('space-none'),
-          maxInlineSize: hook.bubbleSize,
+          /* Never wider than the window less an inset, as Popover caps itself. */
+          maxInlineSize: fn('min', hook.bubbleSize, difference('100vw', token('space-lg'))),
           overflow: 'visible',
           padding: hook.padding,
           position: web('fixed'),
