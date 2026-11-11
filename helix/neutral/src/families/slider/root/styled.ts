@@ -146,6 +146,21 @@ export default styles(
       token('space-2xs'),
       own.sliderHalo,
     ])
+    /* Under the pointer, the halo at half its strength. */
+    const hovered = list(
+      [0, 0, 0, token('border-thick'), hook.thumbRingColor],
+      token('shadow-md'),
+      [0, 0, 0, token('space-2xs'), mix(hook.fillColor, 12, 'transparent')],
+    )
+    /* Read-only, the thumb is a ring of the read-only edge on the ground: the
+       value keeps its place, and the frame is drawn as a read-only field's. */
+    const readOnlyThumb = {
+      backgroundColor: hook.thumbRingColor,
+      boxShadow: list(
+        ['inset', 0, 0, 0, token('border-thick'), token('color-border-readonly')],
+        [0, 0, 0, token('border-thick'), hook.thumbRingColor],
+      ),
+    } as const
     /* Across the track, where a hole in the marks is centered. */
     const middle = quotient(own.sliderTrack, 2)
     /* Everything but a hole the thumb's size where each thumb stands. */
@@ -524,6 +539,19 @@ export default styles(
           }),
         ]),
       ]),
+      /* Written out: the half halo under the pointer, which the held and
+         focused halo below outranks. */
+      on(
+        {
+          part: 'control',
+          selector: '[part="control"]:where(:hover:enabled)::-webkit-slider-thumb',
+        },
+        [web([rule({ boxShadow: hovered })])],
+      ),
+      on(
+        { part: 'control', selector: '[part="control"]:where(:hover:enabled)::-moz-range-thumb' },
+        [web([rule({ boxShadow: hovered })])],
+      ),
       /* Written out: the halo while the thumb is held or has focus the
          keyboard brought. */
       on(
@@ -562,6 +590,14 @@ export default styles(
             outlineOffset: token('size-focus-offset'),
           }),
         ]),
+      ]),
+      /* Written out: a read-only thumb, before the danger ring, which wins. */
+      on(
+        { part: 'control', selector: ':host([readonly]) [part="control"]::-webkit-slider-thumb' },
+        [web([rule(readOnlyThumb)])],
+      ),
+      on({ part: 'control', selector: ':host([readonly]) [part="control"]::-moz-range-thumb' }, [
+        web([rule(readOnlyThumb)]),
       ]),
       /* Written out: a wrong slider rings its thumb in the danger color. */
       on(
@@ -861,12 +897,22 @@ export default styles(
       /* Forced colors drop a background image, which is the whole track, and paint
          the thumb Canvas, so the slider drew nothing at all. The platform's own range
          control is what survives. */
+      /* The track's fill stays, in the system's Highlight on Canvas, so the
+         value still reads. */
+      on('control', [
+        web([
+          rule(
+            { forcedColors: true },
+            { '--slider-fill-color': 'Highlight', own: { sliderTrackColor: 'Canvas' } },
+          ),
+        ]),
+      ]),
       on({ part: 'control', selector: '[part="control"]::-webkit-slider-runnable-track' }, [
         web([
           rule(
             { forcedColors: true },
             {
-              background: 'Canvas',
+              background: own.sliderTrackImage,
               border: [token('border-thin'), 'solid', 'CanvasText'],
               forcedColorAdjust: 'none',
             },
@@ -878,13 +924,37 @@ export default styles(
           rule(
             { forcedColors: true },
             {
-              background: 'Canvas',
+              background: own.sliderTrackImage,
               border: [token('border-thin'), 'solid', 'CanvasText'],
               forcedColorAdjust: 'none',
             },
           ),
         ]),
       ]),
+      /* A range's upper input draws no second track over the first. */
+      on(
+        {
+          part: 'control',
+          selector:
+            ':host([range]) [part="control"]:not([data-thumb="start"])::-webkit-slider-runnable-track',
+        },
+        [
+          web([
+            rule({ forcedColors: true }, { background: 'transparent', borderColor: 'transparent' }),
+          ]),
+        ],
+      ),
+      on(
+        {
+          part: 'control',
+          selector: ':host([range]) [part="control"]:not([data-thumb="start"])::-moz-range-track',
+        },
+        [
+          web([
+            rule({ forcedColors: true }, { background: 'transparent', borderColor: 'transparent' }),
+          ]),
+        ],
+      ),
       on({ part: 'control', selector: '[part="control"]::-webkit-slider-thumb' }, [
         web([rule({ forcedColors: true }, { background: 'Highlight', forcedColorAdjust: 'none' })]),
       ]),

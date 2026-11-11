@@ -51,9 +51,10 @@ export default styles(
       matchBackgroundColor: token('color-primary-subtle'),
       radius: token('radii-md'),
     },
+    own: { objectInspectorToggle: null },
     stylesheet: 'object-inspector/root/object-inspector-root.generated.css',
   },
-  ({ hook, on, rule }) => [
+  ({ hook, on, own, rule }) => [
     on('host', [rule({ display: 'flex', flexDirection: 'column', fontSize: token('text-sm') })]),
     on('header', [
       rule({
@@ -86,6 +87,8 @@ export default styles(
         fontFamily: token('font-mono'),
         lineHeight: token('leading-normal'),
         paddingBlock: token('space-xs'),
+        /* Left to right whatever the page does, and the characters written. */
+        web: { direction: 'ltr', fontVariantLigatures: 'none', unicodeBidi: 'isolate' },
       }),
       rule(
         { windowed: true },
@@ -200,6 +203,7 @@ export default styles(
       rule(
         { focusVisible: true },
         {
+          borderRadius: token('radii-sm'),
           outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
           outlineOffset: product(token('size-focus-offset'), '-1'),
         },
@@ -212,14 +216,19 @@ export default styles(
       rule({ coarsePointer: true }, { minBlockSize: token('size-target') }),
       rule({ hover: true }, { backgroundColor: token('color-hover') }),
     ]),
+    /* An even size, so the caret's center lands on a whole pixel. */
     on('toggle', [
       rule({
-        blockSize: '1em',
+        own: { objectInspectorToggle: fn('round', '1em', '2px') },
+        blockSize: own.objectInspectorToggle,
         color: token('color-foreground-muted'),
-        inlineSize: '1em',
+        inlineSize: own.objectInspectorToggle,
         marginInlineEnd: token('space-2xs'),
         web: { verticalAlign: '-0.125em' },
       }),
+      /* The tree runs left to right on any page, so a shut caret points
+         right there too. */
+      web([rule({ dir: 'rtl', part: { 'data-mirror': true } }, { scale: 'none' })]),
     ]),
     on('key', [
       rule({ color: token('color-syntax-name') }),
@@ -233,8 +242,10 @@ export default styles(
       rule({ color: token('color-syntax-string') }),
       native([rule({ flexShrink: '1' })]),
     ]),
-    on('number', [rule({ color: token('color-syntax-constant') })]),
-    on(['boolean', 'null'], [rule({ color: token('color-syntax-keyword') })]),
+    /* The roles a Code Block gives the same words. */
+    on('number', [rule({ color: token('color-syntax-name') })]),
+    on('boolean', [rule({ color: token('color-syntax-constant') })]),
+    on('null', [rule({ color: token('color-syntax-keyword') })]),
     on(['summary', 'count'], [rule({ color: token('color-foreground-muted') })]),
     on('count', [
       rule({
@@ -252,6 +263,22 @@ export default styles(
         position: 'absolute',
       }),
       rule({ print: true }, { display: 'none' }),
+    ]),
+    /* Written out: in the header, at the end of the bar and at Code Block's
+       size there, and above the tree, so its press reaches past the bar. */
+    on({ part: 'header', selector: '[part="header"]:has(> [part="copy"])' }, [
+      web([rule({ paddingBlock: token('space-2xs'), paddingInlineEnd: token('space-2xs') })]),
+    ]),
+    on({ part: 'copy', selector: '[part="header"] > [part="copy"]' }, [
+      web([
+        rule({
+          '--copy-button-icon-size': token('size-icon-sm'),
+          '--icon-button-size': token('size-control-sm'),
+          marginInlineStart: 'auto',
+          position: 'relative',
+          zIndex: token('layer-raised'),
+        }),
+      ]),
     ]),
     /* What a row does not draw, which a phone keeps in its tree. */
     on(
