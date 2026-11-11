@@ -182,16 +182,11 @@ mod tests {
     /// surface in the default dark theme, 4.32:1 on `primary-subtle` on a
     /// #4a4a4a page, and 3.81:1 on the well over a tint on a #0b2a33 one.
     ///
-    /// **A #4a4a4a dark page cannot carry the press over its overlay**, and the
-    /// theme says so. The overlay stands a rung above the raised surface at
-    /// #595959, and 19% of white over it is #797979, where white measures
-    /// 4.35:1 and the quiet ink, solved for the best worst case, 4.28. No gray
-    /// reaches 4.5 there, so the two pairs are reported as violations and the
-    /// rest of the page is held to the target.
+    /// The #4a4a4a dark page is the hardest of them: it reports no violation
+    /// since the overlay went back to the raised rung. A rung above it, 19% of
+    /// white over the lifted overlay was #797979, where no gray reached 4.5.
     #[test]
     fn a_quiet_line_reads_on_a_lit_row_and_on_a_tinted_one() {
-        let pressed_overlay =
-            |ink: &str| format!("{ink} on color-press over color-surface-overlay");
         for (brand, scheme, page) in [
             ("#3b82f6", Scheme::Light, None),
             ("#3b82f6", Scheme::Dark, None),
@@ -229,12 +224,8 @@ mod tests {
                     laid_over(foreground, WELL.percent(scheme), under),
                 ));
             }
-            let unreachable = page == Some("#4a4a4a");
             for ink in ["color-foreground", "color-foreground-muted"] {
                 for (name, ground) in &grounds {
-                    if unreachable && pressed_overlay(ink) == format!("{ink} on {name}") {
-                        continue;
-                    }
                     let ratio = shipped_contrast_ratio(token(&theme, ink).value, *ground);
                     assert!(
                         ratio >= 4.5,
@@ -247,14 +238,7 @@ mod tests {
                 .iter()
                 .map(|violation| violation.split(':').next().unwrap_or_default())
                 .collect();
-            let expected: Vec<String> = if unreachable {
-                ["color-foreground", "color-foreground-muted"]
-                    .map(pressed_overlay)
-                    .to_vec()
-            } else {
-                Vec::new()
-            };
-            assert_eq!(reported, expected, "{label} in {scheme:?}");
+            assert!(reported.is_empty(), "{label} in {scheme:?}: {reported:?}");
         }
     }
 

@@ -171,8 +171,7 @@
      takes the whole reduction. */
   /* **Two of these four moved, and none of it was the metrics asking.** 800 came
      down from 0.29 to 0.21 and 900 from 0.21 to 0.182, painting dark `surface`
-     #121212 and both `surface-raised` and `surface-overlay` #181818. The overlay
-     has since moved to `neutral-775`, below.
+     #121212 and both `surface-raised` and `surface-overlay` #181818.
 
      Measured in Chromium as painted sRGB, for `surface` against the page, at the
      rungs now shipping:
@@ -202,13 +201,6 @@
      `border-floating` is a width. Closing it needs a new primitive between 1.0
      and 0.985 and buys about seven thousandths of sRGB. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
-  /* Dark `surface-overlay`, one rung above `surface-raised`, decided by the owner
-     on November 4, 2026. At `neutral-800` the two were one color, #181818, so a
-     Popover opened from a raised panel had no fill step at all: 1.00:1. 0.235
-     paints #1e1e1e, the next six codes up the ladder that runs #0c0c0c, #121212
-     and #181818, and sits in the middle of the band that paints it, 0.233 to
-     0.237. It measures 1.06:1 off the raised rung. */
-  --_helix-neutral-775: oklch(0.235 var(--_helix-neutral-cast));
   --_helix-neutral-800: oklch(0.21 var(--_helix-neutral-cast));
   /* 0.182 and not 0.18, which is the same gray to read and not the same gray to
      paint. The band that lands on #121212 runs 0.180 to 0.185, so 0.18 is its
@@ -221,7 +213,7 @@
   /* The dark surface ladder, decided by the owner on October 31, 2026 from pictures
      of four options: cards at `#0c0c0c`, so they read near black on a black page and
      an input or a raised panel stands out on them. Raised stays at
-     `neutral-800`, and overlay sits one rung above it at `neutral-775`. Sunken stays at `neutral-900`, up from the page: there is nothing
+     `neutral-800`, and overlay with it. Sunken stays at `neutral-900`, up from the page: there is nothing
      under black, and `#060606` measured 1.04:1 for a Meter's track. */
   --_helix-neutral-925: oklch(0.154 var(--_helix-neutral-cast));
 
