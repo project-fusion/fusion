@@ -33,7 +33,7 @@ export default styles(
     prefix: 'color-input',
     hooks: {
       backgroundColor: token('color-well'),
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       panelSize: '264px',
       shadow: token('shadow-floating'),
@@ -93,15 +93,18 @@ export default styles(
         rule({ trigger: 'swatch', within: { host: ['focusWithin'] } }, { outline: 'none' }),
         native([rule({ trigger: 'swatch' }, { paddingInlineStart: token('space-none') })]),
       ]),
-      /* The trigger fills the trailing end of the field. */
+      /* The trigger fills the trailing end of the field, a square as tall as
+         the control, and the color sits in it as a chip. */
       on('trigger', [
         rule({
           web: { all: 'unset', boxSizing: 'border-box', cursor: 'pointer' },
           position: 'relative',
-          alignItems: 'stretch',
+          alignItems: 'center',
           alignSelf: 'stretch',
           display: 'flex',
           flex: 'none',
+          inlineSize: token('size-control'),
+          justifyContent: 'center',
         }),
         rule(
           { focusVisible: true },
@@ -124,12 +127,16 @@ export default styles(
           }),
         ]),
       ]),
+      /* A chip at the region's icon size, edged and rounded on every side, as
+         the mark a Select or a Date Input draws at its end. */
       on('preview', [
         rule({
-          borderInlineStart: line,
+          blockSize: token('size-icon'),
+          border: line,
+          borderRadius: token('radii-sm'),
           boxSizing: 'border-box',
           display: 'block',
-          inlineSize: token('size-control'),
+          inlineSize: token('size-icon'),
         }),
         web([
           rule({
@@ -143,7 +150,7 @@ export default styles(
                 [token('color-surface'), 0],
               ),
             ),
-            backgroundSize: list(['100%', '100%'], [token('space-sm'), token('space-sm')]),
+            backgroundSize: list(['100%', '100%'], [token('space-xs'), token('space-xs')]),
           }),
         ]),
         native([rule({ overflow: 'hidden', position: 'relative' })]),
@@ -156,6 +163,19 @@ export default styles(
             inlineSize: '100%',
           },
         ),
+        /* With no color yet, an empty chip with a dashed edge in the mark ink,
+           the place a color goes. The web's element marks it. */
+        web([
+          rule(
+            { part: { 'data-empty': true } },
+            {
+              backgroundColor: 'transparent',
+              backgroundImage: 'none',
+              borderColor: token('color-foreground-subtle'),
+              borderStyle: 'dashed',
+            },
+          ),
+        ]),
       ]),
       on('preview-tile', [
         native([
@@ -192,7 +212,11 @@ export default styles(
           boxShadow: hook.shadow,
           inlineSize: hook.panelSize,
           margin: token('space-none'),
-          overflow: 'hidden',
+          /* No taller than the room it opened into, scrolling inside it, as
+             Date Input's panel and a Select's list are. */
+          maxBlockSize: measured('floating-available-block-size', 'none'),
+          overflowX: 'hidden',
+          overflowY: 'auto',
           padding: token('space-none'),
           web: { inset: 'auto', position: 'absolute' },
         }),

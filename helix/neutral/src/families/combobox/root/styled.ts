@@ -6,7 +6,19 @@ import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
-import { difference, list, measured, native, product, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -32,20 +44,21 @@ export default styles(
     prefix: 'combobox',
     hooks: {
       backgroundColor: token('color-well'),
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       controlSize: '4ch',
       panelSize: 'max-content',
       shadow: token('shadow-floating'),
     },
     own: {
+      comboboxRing: null,
       floatingBorderColor: null,
       floatingBorderWidth: null,
       floatingShadow: null,
     },
     stylesheet: 'combobox/root/combobox-root.generated.css',
   },
-  ({ hook, include, on, rule }) => {
+  ({ hook, include, keyframes, on, own, rule }) => {
     const caret = {
       '--icon-size': token('size-icon-tight'),
       blockSize: token('size-icon-tight'),
@@ -54,7 +67,7 @@ export default styles(
       inlineSize: token('size-icon-tight'),
     } as const
     const turning = {
-      transition: web(['scale', ...ease]),
+      transition: web(['rotate', ...ease]),
     } as const
     return [
       on('live', [rule([visuallyHidden])]),
@@ -145,7 +158,10 @@ export default styles(
           ]),
         ],
       ),
-      on('tag', [rule({ flex: '0 0 auto', maxInlineSize: '100%' })]),
+      /* Concentric with the field, the inset corner. */
+      on('tag', [
+        rule({ '--tag-radius': token('radii-inset'), flex: '0 0 auto', maxInlineSize: '100%' }),
+      ]),
       on('tags', [
         native([
           rule({
@@ -162,26 +178,73 @@ export default styles(
         web([rule({ flex: [1, 1, hook.controlSize] })]),
       ]),
       /* A phone has no `ch`: the text keeps the height of a control across. */
-      on('control', [native([rule({ minInlineSize: token('size-control') })])]),
+      on('control', [
+        native([rule({ minInlineSize: token('size-control') })]),
+        /* A placeholder or an answer longer than the box ends in an ellipsis. */
+        web([rule({ textOverflow: 'ellipsis' })]),
+      ]),
       on('field', [
         rule(
           { formDisabled: true },
           { cursor: web('not-allowed'), opacity: token('opacity-disabled') },
         ),
+        /* A list that could not load says so while the panel is shut, with
+           the danger edge, after the frame's hover and ring. */
+        rule(
+          { error: true },
+          { borderColor: token('color-danger'), outlineColor: token('color-danger') },
+        ),
       ]),
       on('indicator', [rule(caret)]),
       on({ region: 'indicator', slotted: '*' }, [rule(caret)]),
+      /* Turned, as Accordion's chevron is, never through a flat line. */
       on('indicator', [
-        web([rule({ open: true }, { scale: '1 -1' })]),
-        native([rule({ open: true }, { transform: 'scaleY(-1)' })]),
+        native([rule({ rotate: '0deg' })]),
+        rule({ open: true }, { rotate: '180deg' }),
       ]),
-      on({ region: 'indicator', slotted: '*' }, [rule({ open: true }, { scale: '1 -1' })]),
+      on({ region: 'indicator', slotted: '*' }, [rule({ open: true }, { rotate: '180deg' })]),
+      /* Read-only, and the caret says the panel does not open. */
+      on('indicator', [rule({ readonly: true }, { opacity: token('opacity-disabled') })]),
+      on({ region: 'indicator', slotted: '*' }, [
+        rule({ readonly: true }, { opacity: token('opacity-disabled') }),
+      ]),
+      /* Loading, and the closed control says so: the caret turns into the ring
+         every spinner here draws, a step smaller than the caret's box, so it
+         sits in the caret's place. Slowed rather than stopped under reduced
+         motion, as Button's ring is. */
+      on('indicator', [
+        web([
+          rule(
+            { loading: true },
+            {
+              own: {
+                comboboxRing: fn('round', product(token('size-icon-tight'), 0.75), '2px'),
+              },
+              animation: ['helix-combobox-turn', token('duration-turn'), 'linear', 'infinite'],
+              blockSize: own.comboboxRing,
+              border: [token('border-thick'), 'solid', mix('currentColor', 30, 'transparent')],
+              borderBlockStartColor: 'currentColor',
+              borderRadius: token('radii-full'),
+              boxSizing: 'border-box',
+              fill: 'transparent',
+              inlineSize: own.comboboxRing,
+              margin: quotient(difference(token('size-icon-tight'), own.comboboxRing), 2),
+            },
+          ),
+          rule(
+            { loading: true, reducedMotion: true },
+            { animationDuration: token('duration-crawl') },
+          ),
+        ]),
+      ]),
+      keyframes('helix-combobox-turn', { to: { rotate: '1turn' } }),
       /* The color goes on the slot, where what is passed in inherits it: written on
          `::slotted`, it beat a slotted component's own `:host` color. */
       on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
+      /* The tight step every field glyph takes. */
       on({ region: ['start', 'end'], slotted: '*' }, [
         rule({
-          '--icon-size': token('size-icon'),
+          '--icon-size': token('size-icon-tight'),
           flex: '0 0 auto',
         }),
       ]),
@@ -237,6 +300,9 @@ export default styles(
       on('listbox', [
         rule({
           '--listbox-background-color': 'transparent',
+          /* The list's border is on the box that scrolls, off, so the fade
+             has no border to take out with the rows. */
+          '--listbox-border': 'none',
           border: web('none'),
           display: web('block'),
         }),
@@ -249,6 +315,45 @@ export default styles(
             borderRadius: token('radii-none'),
           }),
         ]),
+      ]),
+      /* The end with more past it fades, as Table and Navigation fade theirs,
+         and the list holds Select's inset above the first row and below the
+         last. A list that fits is never masked. */
+      on({ part: 'listbox', selector: '[part="listbox"]::part(items)' }, [
+        web([
+          rule({
+            paddingBlock: token('space-xs'),
+            maskImage: fn(
+              'linear-gradient',
+              'to bottom',
+              'transparent',
+              ['#000', measured('_combobox-fade-start', '0rem')],
+              ['#000', difference('100%', measured('_combobox-fade-end', '0rem'))],
+              'transparent',
+            ),
+          }),
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['combobox-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self block'),
+            },
+          ),
+          rule({ reducedMotion: true }, { animation: 'none' }),
+        ]),
+      ]),
+      keyframes('combobox-edges', {
+        '0%': { '--_combobox-fade-end': token('space-xl'), '--_combobox-fade-start': '0rem' },
+        '5%, 95%': {
+          '--_combobox-fade-end': token('space-xl'),
+          '--_combobox-fade-start': token('space-xl'),
+        },
+        '100%': { '--_combobox-fade-end': '0rem', '--_combobox-fade-start': token('space-xl') },
+      }),
+      /* What the `error` region holds, such as a button that tries again,
+         sits a step after the list's error words, as it does in Table. */
+      on({ region: 'error', slotted: '*' }, [
+        web([rule({ marginInlineStart: token('space-sm') })]),
       ]),
       include(printExact),
     ]
