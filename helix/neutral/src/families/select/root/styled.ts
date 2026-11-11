@@ -8,7 +8,9 @@ import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
+  list,
   measured,
+  mix,
   native,
   product,
   quotient,
@@ -50,13 +52,14 @@ export default styles(
     },
     own: {
       floatingBorderColor: null,
+      selectRing: null,
       floatingBorderWidth: null,
       floatingShadow: null,
     },
     props: { emphasis: oneOf(['ghost']) },
     stylesheet: 'select/root/select-root.generated.css',
   },
-  ({ hook, include, on, rule, variants }) => {
+  ({ hook, include, keyframes, on, own, rule, variants }) => {
     const caret = {
       '--icon-size': token('size-icon-tight'),
       blockSize: token('size-icon-tight'),
@@ -77,6 +80,8 @@ export default styles(
           display: 'flex',
           flexDirection: 'column',
           gap: token('space-2xs'),
+          /* A long answer gives way in a row: the value ends in an ellipsis. */
+          minInlineSize: 0,
           position: web('relative'),
         }),
       ]),
@@ -101,13 +106,20 @@ export default styles(
           gap: token('space-xs'),
           justifyContent: 'space-between',
           paddingInline: token('space-field'),
-          transition: web(['border-color', token('duration-fast'), token('easing-standard')]),
+          transition: web(
+            list(
+              ['background-color', token('duration-fast'), token('easing-standard')],
+              ['border-color', token('duration-fast'), token('easing-standard')],
+            ),
+          ),
         }),
       ]),
-      /* Written out: `:host(:disabled)`, a fieldset's too, and never `[disabled]`. */
-      on({ part: 'trigger', selector: ':host(:not(:disabled)) [part="trigger"]:hover' }, [
-        web([rule({ borderColor: token('color-border-hover') })]),
-      ]),
+      /* Written out: `:host(:disabled)`, a fieldset's too, and never `[disabled]`,
+         and not read-only, which offers nothing to press. */
+      on(
+        { part: 'trigger', selector: ':host(:not(:disabled, [readonly])) [part="trigger"]:hover' },
+        [web([rule({ borderColor: token('color-border-hover') })])],
+      ),
       on('trigger', [
         rule(
           { focusVisible: true },
@@ -126,6 +138,21 @@ export default styles(
       ]),
       on({ part: 'trigger', selector: ':host(:state(invalid)) [part="trigger"]:focus-visible' }, [
         web([rule({ borderColor: token('color-danger'), outlineColor: token('color-danger') })]),
+      ]),
+      /* A list that could not load says so while the panel is shut. */
+      on(
+        {
+          part: 'trigger',
+          selector:
+            ':host(:state(error)) [part="trigger"],\n:host(:state(error)) [part="trigger"]:hover,\n:host(:state(error)) [part="trigger"]:focus-visible',
+        },
+        [web([rule({ borderColor: token('color-danger'), outlineColor: token('color-danger') })])],
+      ),
+      on('trigger', [native([rule({ error: true }, { borderColor: token('color-danger') })])]),
+      /* Read-only: flush with its ground, as a read-only field is, and the
+         caret says the panel does not open. */
+      on('trigger', [
+        rule({ readonly: true }, { backgroundColor: 'transparent', cursor: web('default') }),
       ]),
       on('trigger', [native([rule({ invalid: true }, { borderColor: token('color-danger') })])]),
       on({ part: 'trigger', selector: ':host(:disabled) [part="trigger"]' }, [
@@ -149,7 +176,7 @@ export default styles(
       on(
         {
           part: 'trigger',
-          selector: ':host([emphasis="ghost"]:not(:disabled)) [part="trigger"]:hover',
+          selector: ':host([emphasis="ghost"]:not(:disabled, [readonly])) [part="trigger"]:hover',
         },
         [
           web([
@@ -170,6 +197,8 @@ export default styles(
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
+          /* Aligned to the page's start, whatever direction its letters take. */
+          web: { textAlign: 'match-parent' },
         }),
         /* A phone's zero basis would leave no room in a ghost trigger as wide as its value. */
         native([rule({ flexGrow: 1, flexShrink: 1 })]),
@@ -183,7 +212,7 @@ export default styles(
       on('surface', [
         rule({
           own: {
-            floatingBorderColor: hook.borderColor(token('color-border')),
+            floatingBorderColor: hook.borderColor(token('color-border-floating')),
             floatingBorderWidth: hook.borderWidth(token('border-floating')),
             floatingShadow: hook.shadow(token('shadow-floating')),
           },
@@ -211,20 +240,23 @@ export default styles(
       on({ backdrop: 'surface' }, [
         native([rule({ sheet: true }, { backgroundColor: token('color-overlay') })]),
       ]),
+      /* Turned rather than flipped, so it never passes through a flat line. */
       on('indicator', [
         rule({
-          transition: web(['scale', token('duration-fast'), token('easing-standard')]),
+          transition: web(['rotate', token('duration-fast'), token('easing-standard')]),
         }),
+        native([rule({ rotate: '0deg' })]),
+        rule({ open: true }, { rotate: '180deg' }),
       ]),
       on({ region: 'indicator', slotted: '*' }, [
         rule({
-          transition: web(['scale', token('duration-fast'), token('easing-standard')]),
+          transition: web(['rotate', token('duration-fast'), token('easing-standard')]),
         }),
-        rule({ open: true }, { scale: '1 -1' }),
+        rule({ open: true }, { rotate: '180deg' }),
       ]),
-      on('indicator', [
-        web([rule({ open: true }, { scale: '1 -1' })]),
-        native([rule({ open: true }, { transform: 'scaleY(-1)' })]),
+      on('indicator', [rule({ readonly: true }, { opacity: token('opacity-disabled') })]),
+      on({ region: 'indicator', slotted: '*' }, [
+        rule({ readonly: true }, { opacity: token('opacity-disabled') }),
       ]),
       on('listbox-items', [
         rule({
@@ -242,8 +274,47 @@ export default styles(
          changes the glyph and nothing else. */
       on('indicator', [rule(caret)]),
       on({ region: 'indicator', slotted: '*' }, [rule(caret)]),
+      /* Loading, and the closed control says so: the caret turns into the ring
+         every spinner here draws, slowed rather than stopped under reduced
+         motion. */
+      on('indicator', [
+        web([
+          rule(
+            { loading: true },
+            {
+              own: { selectRing: fn('round', product(token('size-icon-tight'), 0.75), '2px') },
+              animation: ['helix-select-turn', token('duration-turn'), 'linear', 'infinite'],
+              blockSize: own.selectRing,
+              border: [token('border-thick'), 'solid', mix('currentColor', 30, 'transparent')],
+              borderBlockStartColor: 'currentColor',
+              borderRadius: token('radii-full'),
+              boxSizing: 'border-box',
+              fill: 'transparent',
+              inlineSize: own.selectRing,
+              margin: quotient(difference(token('size-icon-tight'), own.selectRing), 2),
+            },
+          ),
+          rule(
+            { loading: true, reducedMotion: true },
+            { animationDuration: token('duration-crawl') },
+          ),
+        ]),
+      ]),
+      keyframes('helix-select-turn', { to: { rotate: '1turn' } }),
+      /* A glyph at either end at the tight step every field glyph takes, in
+         the muted ink. */
+      on({ region: ['start', 'end'], slotted: '*' }, [
+        rule({
+          '--icon-size': token('size-icon-tight'),
+          color: token('color-foreground-muted'),
+          flex: '0 0 auto',
+        }),
+      ]),
       on('trigger', [
-        rule({ active: true, formDisabled: false }, { backgroundColor: token('color-press') }),
+        rule(
+          { active: true, formDisabled: false, readonly: false },
+          { backgroundColor: token('color-press') },
+        ),
       ]),
       /* The press reaches `--helix-size-target`, in a transparent box, so nothing
          drawn moves. Where the control is already that size the box sits inside it. */

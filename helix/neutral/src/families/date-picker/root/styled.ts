@@ -21,9 +21,12 @@ import root from './headless.js'
  * day centered in it, and the space between days belongs to the track, so a
  * range paints the whole track and runs unbroken. **A single date is a ring on
  * its day**, round because the day is square, and a range's ends are the solid
- * mark. Grays, the same call Time's range takes: `surface-inverse` is the ground
- * that stays dark while the page goes light. A day of a neighboring month is
- * quieter and takes no press.
+ * mark, in the primary fill, as a Switch that is on takes it: a chosen date is a
+ * value set. A day of a neighboring month is quieter and takes no press.
+ *
+ * **The track and the row step with density**, a control's height and 4 under
+ * it, and on a touch screen the row grows to the target and a track as far as
+ * the calendar's own box allows.
  *
  * **A phone marks a cell by what it is**, as the web reads its attributes: the
  * day today, chosen, outside the month, or barred, and the cell in a range or its
@@ -41,10 +44,18 @@ export default styles(
       rangeColor: null,
       rangePreviewColor: null,
       rowSize: null,
-      selectedBackgroundColor: token('color-surface-inverse'),
+      selectedBackgroundColor: token('color-primary-surface'),
       trackSize: null,
     },
-    own: { day: null, row: null, track: null },
+    own: {
+      columns: null,
+      day: null,
+      month: null,
+      names: null,
+      reach: null,
+      row: null,
+      track: null,
+    },
     stylesheet: 'date-picker/root/date-picker-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -84,8 +95,9 @@ export default styles(
     const preview = hook.rangePreviewColor(scheme(token('color-well'), token('color-hover')))
     const solid = {
       backgroundColor: hook.selectedBackgroundColor,
-      color: token('color-foreground-inverse'),
+      color: token('color-foreground-on-primary'),
     }
+    const pitch = difference(token('size-control'), token('space-2xs'))
     const spent = { cursor: 'default', opacity: token('opacity-disabled') }
     const startCorners = {
       borderEndStartRadius: token('radii-sm'),
@@ -110,11 +122,29 @@ export default styles(
         rule({
           own: {
             day: hook.daySize(product(token('size-control'), 0.75)),
-            row: hook.rowSize('2.25rem'),
-            track: hook.trackSize('2.5rem'),
+            row: hook.rowSize(pitch),
+            track: hook.trackSize(token('size-control')),
+            /* The names' row keeps the week's pitch as a mouse sees it, since
+               nothing in it is pressed. */
+            names: hook.rowSize(pitch),
+            month: product(own.track, 7),
           },
           display: 'inline-block',
+          /* Figures of one width, so days and years line up digit over digit. */
+          fontVariantNumeric: 'tabular-nums',
         }),
+        /* On a touch screen the row grows to the target, and a track as far as
+           the calendar's own box allows. */
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              row: hook.rowSize(token('size-target')),
+              reach: hook.trackSize(fn('max', token('size-target'), token('size-control'))),
+              month: product(own.reach, 7),
+            },
+          },
+        ),
         rule(
           { formDisabled: true },
           {
@@ -125,18 +155,32 @@ export default styles(
         ),
         rule({ print: true }, { boxShadow: 'none', printColorAdjust: 'exact' }),
       ]),
+      /* Two months to a row, the rest underneath, and one to a row where two
+         do not fit: a row that wraps, held to the width of the columns. */
       on('months', [
-        rule({
-          alignItems: 'start',
-          display: 'grid',
-          gap: token('space-md'),
-          gridTemplateColumns: fn(
-            'repeat',
-            hook.columns(measured('date-picker-column-count', 1)),
-            'max-content',
-          ),
-          justifyContent: 'start',
-        }),
+        rule({ alignItems: 'start', gap: token('space-md') }),
+        web([
+          rule({
+            own: { columns: hook.columns(measured('date-picker-column-count', 1)) },
+            display: 'flex',
+            flexWrap: 'wrap',
+            maxInlineSize: sum(
+              product(own.columns, own.month),
+              product(difference(own.columns, 1), token('space-md')),
+            ),
+          }),
+        ]),
+        native([
+          rule({
+            display: 'grid',
+            gridTemplateColumns: fn(
+              'repeat',
+              hook.columns(measured('date-picker-column-count', 1)),
+              'max-content',
+            ),
+            justifyContent: 'start',
+          }),
+        ]),
       ]),
       /* A phone's month takes the seven tracks the web's widest row is, and its header
          is a row whose heading takes the room between the controls, holding a control's
@@ -148,7 +192,8 @@ export default styles(
           display: 'grid',
           gap: token('space-2xs'),
           gridTemplateColumns: [own.day, '1fr', own.day],
-          marginBlockEnd: token('space-lg'),
+          /* With density, so the title keeps its distance from the names. */
+          marginBlockEnd: sum(token('space-control'), token('space-xs')),
         }),
         native([rule({ display: 'flex', flexDirection: 'row' })]),
       ]),
@@ -239,7 +284,9 @@ export default styles(
           display: 'grid',
           gap: token('space-2xs'),
           inlineSize: product(own.track, 7),
+          maxInlineSize: '100%',
         }),
+        rule({ coarsePointer: true }, { inlineSize: product(own.reach, 7) }),
       ]),
       on('period-row', [
         rule({
@@ -251,6 +298,10 @@ export default styles(
       /* The web bars a month or a year with `aria-disabled`. */
       on({ part: 'period', selector: sel2 }, [
         web([rule({ canHover: true }, { backgroundColor: token('color-surface-sunken') })]),
+      ]),
+      /* The chosen month or year keeps the chosen day's fill under the pointer. */
+      on({ part: 'period', selector: '[part~="period-selected"]:hover:not([aria-disabled])' }, [
+        web([rule({ backgroundColor: hook.selectedBackgroundColor })]),
       ]),
       on('period', [
         rule({
@@ -279,19 +330,32 @@ export default styles(
         ),
         rule({ focusVisible: true }, ring),
       ]),
-      on('week', [rule({ display: 'grid', gridTemplateColumns: fn('repeat', 7, own.track) })]),
+      /* A track gives way down to the day where the box is narrower than
+         seven tracks. */
+      on('week', [
+        rule({ display: 'grid' }),
+        web([
+          rule({ gridTemplateColumns: fn('repeat', 7, fn('minmax', own.day, own.track)) }),
+          rule(
+            { coarsePointer: true },
+            { gridTemplateColumns: fn('repeat', 7, fn('minmax', own.day, own.reach)) },
+          ),
+        ]),
+        native([rule({ gridTemplateColumns: fn('repeat', 7, own.track) })]),
+      ]),
+      /* One row of the grid, the pitch the weeks keep. */
       on('weekday', [
         rule({
           alignItems: 'center',
-          blockSize: own.track,
+          blockSize: own.names,
           color: token('color-foreground-muted'),
           display: 'inline-flex',
           fontSize: token('text-xs'),
           fontWeight: token('weight-medium'),
-          inlineSize: own.track,
           justifyContent: 'center',
-          paddingBlockEnd: quotient(own.track, 2),
         }),
+        web([rule({ inlineSize: 'auto' })]),
+        native([rule({ inlineSize: own.track })]),
       ]),
       on('cell', [
         rule({
@@ -299,10 +363,13 @@ export default styles(
           blockSize: own.row,
           cursor: 'pointer',
           display: 'inline-flex',
-          inlineSize: own.track,
           justifyContent: 'center',
         }),
+        web([rule({ inlineSize: 'auto' })]),
+        native([rule({ inlineSize: own.track })]),
         rule({ part: { 'data-outside': true } }, { cursor: 'default' }),
+        /* A calendar that is off or read-only takes no press. */
+        rule([{ formDisabled: true }, { readonly: true }], { cursor: 'inherit' }),
         native([
           rule(
             [
@@ -325,6 +392,17 @@ export default styles(
       on({ part: 'cell', selector: sel6 }, [web([rule(endCorners)])]),
       on({ part: 'cell', selector: sel7 }, [web([rule({ cursor: 'default' })])]),
       on({ part: 'cell', selector: sel8 }, [web([rule({ outline: 'none' })])]),
+      on({ part: 'cell', selector: '[part~="cell"][aria-selected][data-range-middle]' }, [
+        web([
+          rule(
+            { forcedColors: true },
+            {
+              outline: [token('border-thin'), 'solid', 'Highlight'],
+              outlineOffset: product(token('border-thin'), '-1'),
+            },
+          ),
+        ]),
+      ]),
       on('day', [
         rule({
           alignItems: 'center',
@@ -341,9 +419,13 @@ export default styles(
           { boxShadow: ['inset', 0, 0, 0, token('border-thin'), token('color-border')] },
         ),
         rule({ also: { 'day-outside': true } }, { color: token('color-foreground-muted') }),
+        /* Not on a calendar that is off or read-only, and not on a chosen
+           day, which steps its own fill instead, as a solid Button does. */
         rule(
           {
-            also: { 'day-disabled': false, 'day-outside': false },
+            also: { 'day-disabled': false, 'day-outside': false, 'day-selected': false },
+            formDisabled: false,
+            readonly: false,
             within: { cell: { hover: true } },
           },
           { backgroundColor: token('color-surface-sunken') },
@@ -356,9 +438,54 @@ export default styles(
         ]),
         rule({ also: { 'day-selected': true } }, solid),
         rule(
-          { also: { 'day-disabled': true }, formDisabled: false },
+          {
+            also: { 'day-disabled': false, 'day-outside': false, 'day-selected': true },
+            formDisabled: false,
+            readonly: false,
+            within: { cell: { hover: true } },
+          },
+          { backgroundColor: hook.selectedBackgroundColor(token('color-primary-surface-hover')) },
+        ),
+        /* A step past the hover under a press, not on a chosen day. */
+        rule(
+          {
+            also: { 'day-disabled': false, 'day-outside': false, 'day-selected': false },
+            formDisabled: false,
+            readonly: false,
+            within: { cell: { active: true } },
+          },
+          { backgroundColor: token('color-press') },
+        ),
+        /* Not on a filler day, which keeps the quieter look above. */
+        rule(
+          { also: { 'day-disabled': true, 'day-outside': false }, formDisabled: false },
           { color: token('color-foreground-subtle'), opacity: token('opacity-disabled') },
         ),
+        /* Forced colors paint every fill Canvas: the chosen day takes the
+           Highlight pair, a filler day GrayText, and today an outline in the
+           text color inside the day, which gives way to the focus ring. */
+        web([
+          rule(
+            { also: { 'day-selected': true }, forcedColors: true },
+            { backgroundColor: 'Highlight', color: 'HighlightText', forcedColorAdjust: 'none' },
+          ),
+          rule({ also: { 'day-outside': true }, forcedColors: true }, { color: 'GrayText' }),
+          rule(
+            { also: { 'day-today': true }, forcedColors: true },
+            {
+              outline: [token('border-thin'), 'solid', 'CanvasText'],
+              outlineOffset: product(token('border-thin'), '-1'),
+            },
+          ),
+          rule(
+            {
+              also: { 'day-today': true },
+              forcedColors: true,
+              within: { cell: { focusVisible: true } },
+            },
+            ring,
+          ),
+        ]),
         rule({ within: { cell: { focusVisible: true } } }, ring),
         native([
           rule({ invalid: true, part: { 'data-selected': true } }, danger),

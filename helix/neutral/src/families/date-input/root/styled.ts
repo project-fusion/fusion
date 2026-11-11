@@ -8,11 +8,13 @@ import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
 import {
   difference,
+  fn,
   list,
   measured,
   native,
   product,
   quotient,
+  sum,
   token,
   web,
 } from '../../../style.js'
@@ -21,16 +23,12 @@ import root from './headless.js'
 
 const ease = [token('duration-fast'), token('easing-standard')] as const
 
-/** The calendar the trigger is cut from, a stencil so the field costs no icon of its own. */
-const CALENDAR =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M3 10h18M8 3v4M16 3v4'/%3E%3C/svg%3E\")"
-
 /**
  * Date Input's styled tier.
  *
  * **The frame is the field**, so the trigger sits inside the same box as the text and
- * one ring surrounds the control. **The trigger is a mark in the field**, a stencil on
- * the web and the calendar icon on a phone, with no box of its own. **With several
+ * one ring surrounds the control. **The trigger is a mark in the field**, the calendar
+ * icon at the tight step, in a box that keeps it from widening the field. **With several
  * dates the field grows**, and their tags wrap.
  *
  * **The panel is the floating panel and its entrance**, the calendar's own width: seven
@@ -43,7 +41,7 @@ export default styles(
     prefix: 'date-input',
     hooks: {
       backgroundColor: token('color-well'),
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       segmentFocusBackgroundColor: token('color-primary-surface'),
       segmentFocusColor: token('color-foreground-on-primary'),
@@ -74,11 +72,40 @@ export default styles(
         flexWrap: 'wrap',
         gap: token('space-2xs'),
         minBlockSize: token('size-control'),
-        paddingBlock: token('space-2xs'),
         paddingInline: token('space-field'),
         transition: web(list(['background-color', ...ease], ['border-color', ...ease])),
       }),
-      native([rule({ flexDirection: 'row' })]),
+      /* No more than a tag leaves inside the field's own height, as Filter
+         Input sets it, so one line keeps the field the control's height. A
+         phone has no `clamp()`. */
+      web([
+        rule({
+          paddingBlock: fn(
+            'clamp',
+            '0px',
+            quotient(
+              difference(
+                difference(token('size-control'), token('size-tag')),
+                product(token('border-thin'), 2),
+              ),
+              2,
+            ),
+            token('space-2xs'),
+          ),
+        }),
+      ]),
+      native([rule({ flexDirection: 'row', paddingBlock: token('space-2xs') })]),
+      /* With several dates the trigger stands at the field's end, centered on
+         its height, and opens the panel for the whole field. */
+      web([
+        rule(
+          { mode: 'multiple' },
+          {
+            paddingInlineEnd: sum(token('space-field'), token('size-icon-tight')),
+            position: 'relative',
+          },
+        ),
+      ]),
       /* One line where one date is held, so a narrow field keeps its trigger in place. */
       rule({ mode: { not: 'multiple' } }, { flexWrap: 'nowrap' }),
       native([rule({ mode: 'multiple' }, { alignContent: 'center' })]),
@@ -103,45 +130,72 @@ export default styles(
        `::slotted`, it beat a slotted component's own `:host` color. */
     on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
     on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: 'none' })]),
-    /* A mark in the field, with no box of its own: the press reaches the target. */
+    /* A mark in the field at the tight step every field glyph takes, in a
+       box the clear button's size, whose negative margin keeps it from
+       widening the field; the press reaches the target. */
     on('trigger', [
       rule({
         all: web('unset'),
         position: 'relative',
-        blockSize: token('size-target'),
+        blockSize: token('size-icon-loose'),
         boxSizing: 'border-box',
         color: token('color-foreground-muted'),
         cursor: web('pointer'),
         display: 'grid',
         flex: 'none',
-        inlineSize: token('size-target'),
-        margin: quotient(difference(token('size-icon-sm'), token('size-target')), 2),
+        inlineSize: token('size-icon-loose'),
+        margin: quotient(difference(token('size-icon-tight'), token('size-icon-loose')), 2),
         placeItems: 'center',
-        web: {
-          backgroundColor: 'currentColor',
-          maskImage: CALENDAR,
-          maskPosition: 'center',
-          maskRepeat: 'no-repeat',
-          maskSize: token('size-icon-sm'),
-        },
         transition: web(['color', ...ease]),
       }),
       native([rule({ alignItems: 'center', display: 'flex', justifyContent: 'center' })]),
+      web([
+        rule(
+          { mode: 'multiple' },
+          {
+            insetBlockStart: '50%',
+            insetInlineEnd: token('space-field'),
+            marginBlock: token('space-none'),
+            position: 'absolute',
+            translate: '0 -50%',
+          },
+        ),
+      ]),
+    ]),
+    on({ after: 'trigger' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on({ part: 'trigger-icon', selector: '[part="trigger"] svg' }, [
-      web([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
+      web([rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') })]),
+    ]),
+    on({ region: 'trigger', slotted: '*' }, [
+      web([
+        rule({
+          '--icon-size': token('size-icon-tight'),
+          blockSize: token('size-icon-tight'),
+          inlineSize: token('size-icon-tight'),
+        }),
+      ]),
     ]),
     on('trigger-icon', [
       native([
         rule({
-          '--icon-size': token('size-icon-sm'),
-          blockSize: token('size-icon-sm'),
-          inlineSize: token('size-icon-sm'),
+          '--icon-size': token('size-icon-tight'),
+          blockSize: token('size-icon-tight'),
+          inlineSize: token('size-icon-tight'),
         }),
       ]),
     ]),
     on('trigger', [
-      rule({ hover: true }, { color: token('color-foreground') }),
+      rule({ hover: true, readonly: false }, { color: token('color-foreground') }),
+      /* Read-only, and the mark says the panel does not open. */
+      rule({ readonly: true }, { cursor: web('default'), opacity: token('opacity-disabled') }),
       rule(
         { focusVisible: true },
         {
@@ -194,18 +248,15 @@ export default styles(
           floatingShadow: hook.shadow,
         },
         inlineSize: web('max-content'),
+        /* No taller than the room it opened into, scrolling inside it. */
+        maxBlockSize: measured('floating-available-block-size', 'none'),
+        overflowY: 'auto',
         padding: token('space-sm'),
         position: web('absolute'),
       }),
       /* A phone's reader may set text so large the calendar outgrows the window: the
-         panel keeps inside it and scrolls, its heading in view. */
-      native([
-        rule({
-          maxBlockSize: measured('floating-available-block-size', 'none'),
-          maxInlineSize: difference('100vw', product(token('space-md'), 2)),
-          overflowY: 'auto',
-        }),
-      ]),
+         panel keeps inside it. */
+      native([rule({ maxInlineSize: difference('100vw', product(token('space-md'), 2)) })]),
     ]),
     on({ region: 'panel-header', slotted: '*' }, [
       rule({ display: web('block'), marginBlockEnd: token('space-sm') }),
