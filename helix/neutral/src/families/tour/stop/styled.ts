@@ -32,18 +32,20 @@ export default styles(
       shadow: token('shadow-floating'),
       surfaceBackgroundColor: token('color-surface-overlay'),
     },
+    own: { tourEdge: null },
     stylesheet: 'tour/stop/tour-stop.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, on, own, rule }) => {
     const fill = hook.surfaceBackgroundColor
     /* The edge, once, for the panel and for the point's two outer sides, as
        Popover says its own. */
-    const edge = [hook.borderWidth, 'solid', token('color-border-floating')] as const
+    const edge = own.tourEdge
     const muted = token('color-foreground-muted')
     return [
       on('host', [rule({ display: 'contents' })]),
       on('surface', [
         rule({
+          own: { tourEdge: [hook.borderWidth, 'solid', token('color-border-floating')] },
           backgroundColor: fill,
           border: edge,
           borderRadius: token('radii-sm'),
