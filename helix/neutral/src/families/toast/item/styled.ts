@@ -100,9 +100,7 @@ export default styles(
           /* The region's width, which already keeps the inset off both edges. */
           maxInlineSize: '100%',
         }),
-        /* It makes room as it arrives, the row collapse its leaving runs in
-           reverse, as an animation, since no transition runs in a
-           component's first frame. */
+        /* It makes room as it arrives, by an animation: no first-frame transition. */
         web([
           rule(
             { reducedMotion: false },
@@ -127,9 +125,7 @@ export default styles(
             opacity: 0,
             translate: [0, enter],
             visibility: 'hidden',
-            /* It leaves first, and the gap closes after: the fade and the
-               slide at the fast step, then the row and the margin over the
-               normal step. */
+            /* It leaves first, then the gap closes: fade and slide, then the row. */
             transition: list(
               ['opacity', fast, accelerate],
               ['translate', fast, accelerate],
