@@ -104,23 +104,21 @@ describe('a tag on its own', () => {
     expect(screen.getByText('Design')).toBeTruthy()
   })
 
-  test('fills with a tint of its tone and draws no edge, mixed in sRGB', async () => {
+  test('fills with a translucent tint of its tone and draws no edge, mixed in sRGB', async () => {
     await render(tag({ children: 'Done', tone: 'success' }))
     const look = styleOf(hostOf('Done'))
     const success = color('color-success')
-    expect(look.backgroundColor).toBe(mix(success, 14, color('color-background'), 'srgb'))
+    expect(look.backgroundColor).toBe(mix(success, 14, 'transparent', 'srgb'))
     expect(look.borderTopColor ?? look.borderColor).toBe('transparent')
     expect(styleOf(screen.getByText('Done')).color).toBe(
       mix(success, 55, color('color-foreground')),
     )
   })
 
-  test('fills with its tone under `solid`, with the inverse ink, and draws its edge alone under `outlined`', async () => {
+  test('fills with its tone\'s solid surface under `solid`, with the ink solved for it, and draws its edge alone under `outlined`', async () => {
     const view = await render(tag({ children: 'Late', emphasis: 'solid', tone: 'danger' }))
-    expect(styleOf(hostOf('Late')).backgroundColor).toBe(
-      mix(color('color-danger'), 82, color('color-foreground')),
-    )
-    expect(styleOf(screen.getByText('Late')).color).toBe(color('color-foreground-inverse'))
+    expect(styleOf(hostOf('Late')).backgroundColor).toBe(color('color-danger-surface'))
+    expect(styleOf(screen.getByText('Late')).color).toBe(color('color-foreground-on-status'))
     await view.rerender(tag({ children: 'Late', emphasis: 'outlined', tone: 'danger' }))
     expect(styleOf(hostOf('Late')).backgroundColor).toBe('transparent')
   })
