@@ -9,6 +9,7 @@ import {
   mix,
   native,
   product,
+  quotient,
   sum,
   token,
   web,
@@ -120,25 +121,50 @@ export default styles(
       ),
       wellBackgroundColor: token('color-surface-media'),
     },
-    own: { videoLevelSize: null, videoRailSize: null, videoSpin: null, videoThumbSize: null },
+    own: {
+      videoBarGap: null,
+      videoBarPad: null,
+      videoLevelSize: null,
+      videoRailSize: null,
+      videoSpin: null,
+      videoThumbSize: null,
+    },
     stylesheet: 'video/root/video-root.generated.css',
   },
-  ({ hook, include, keyframes, on, rule }) => [
+  ({ hook, include, keyframes, on, own, rule }) => [
     on('host', [
       rule({ colorScheme: 'dark', display: 'block', position: 'relative' }),
-      /* The two rails, their thumbs, the level's height, and the spinner's
-         turn, named once. A rail `4px` thick with a `12px` thumb is a fact
-         about a slider drawn over a picture, thinner than any rung of the
-         size scale, and the turn is Loader's own 0.8s, so two spinners on
-         one page agree. None is a thing a page is invited to move. */
+      /* The two rails, their thumbs three rails across, the level's height,
+         and the turn every spinner reads, named once, and the bar's padding
+         and gap. None is a thing a page is invited to move. */
       rule({
         own: {
           videoLevelSize: '4.5rem',
-          videoRailSize: '4px',
-          videoSpin: '0.8s',
-          videoThumbSize: '12px',
+          videoRailSize: token('space-2xs'),
+          videoSpin: token('duration-turn'),
+          videoThumbSize: product(own.videoRailSize, 3),
+          videoBarPad: token('space-xs'),
+          videoBarGap: token('space-xs'),
         },
       }),
+      /* On a touch screen both make room for each control's press. */
+      rule(
+        { coarsePointer: true },
+        {
+          own: {
+            videoBarGap: fn(
+              'max',
+              token('space-xs'),
+              difference(token('size-target'), token('size-icon-loose')),
+            ),
+            videoBarPad: fn(
+              'max',
+              token('space-xs'),
+              quotient(difference(token('size-target'), token('size-icon-loose')), 2),
+            ),
+          },
+        },
+      ),
       rule({ print: true }, { display: 'none' }),
     ]),
     on('stage', [
@@ -200,13 +226,15 @@ export default styles(
         alignItems: 'center',
         color: hook.controlsColor,
         display: 'flex',
-        gap: token('space-xs'),
+        gap: own.videoBarGap,
         insetBlockEnd: 0,
         insetInline: 0,
         opacity: 1,
-        padding: [token('space-xs'), token('space-sm')],
+        padding: [own.videoBarPad, token('space-sm')],
         position: 'absolute',
         transition: fade,
+        /* The bar's own width, which the controls ask how much room they have. */
+        web: { containerType: 'inline-size' },
       }),
       native([rule({ flexDirection: 'row' })]),
       rule(
@@ -222,7 +250,14 @@ export default styles(
     /* The shading reaches higher than the bar does. */
     on({ before: 'stage' }, [
       rule({
-        backgroundImage: fn('linear-gradient', 'to top', token('color-overlay'), 'transparent'),
+        /* At full strength behind the bar, then fading above it. */
+        backgroundImage: fn(
+          'linear-gradient',
+          'to top',
+          token('color-overlay'),
+          [token('color-overlay'), sum(token('size-icon-loose'), product(own.videoBarPad, 2))],
+          'transparent',
+        ),
         blockSize: sum(token('size-icon-loose'), token('space-2xl')),
         content: '""',
         insetBlockEnd: 0,
@@ -341,6 +376,8 @@ export default styles(
         fontSize: token('text-xs'),
         fontVariantNumeric: 'tabular-nums',
       }),
+      /* The time goes first when the bar is narrow. */
+      web([rule({ inlineSize: { below: '18rem' } }, { display: 'none' })]),
       /* A phone's words take no ink from the bar around them, so the bar's is
          named. The reader's text size grows them, so the clock gives way to the
          scrubber, on one line, before it pushes the controls off the bar. */
@@ -353,9 +390,10 @@ export default styles(
     /* The menu takes no width of its own: what a reader sees is its trigger. */
     on('overflow', [web([rule({ display: 'contents' })])]),
     on('start', [
-      web([rule({ all: 'unset' })]),
+      /* Rounded to whole even pixels. */
+      web([rule({ all: 'unset', '--icon-size': fn('round', '40%', '2px') })]),
+      native([rule({ '--icon-size': '40%' })]),
       rule({
-        '--icon-size': '40%',
         alignItems: 'center',
         aspectRatio: 1,
         backgroundColor: token('color-overlay'),
@@ -484,17 +522,41 @@ export default styles(
         color: hook.controlsColor,
         display: 'flex',
         gap: token('space-sm'),
-        insetBlockStart: token('space-sm'),
-        insetInlineStart: token('space-sm'),
-        maxInlineSize: difference('100%', product(2, token('space-sm'))),
+        insetBlockStart: 0,
+        insetInline: 0,
         opacity: 'inherit',
+        paddingInline: token('space-sm'),
         position: 'absolute',
         zIndex: token('layer-raised'),
       }),
+      /* On a shade of its own, as the bar is, held across the header's height
+         and fading below it; the picture under it still takes a press. */
+      web([
+        rule({
+          backgroundImage: fn(
+            'linear-gradient',
+            'to bottom',
+            token('color-overlay'),
+            [token('color-overlay'), difference('100%', token('space-lg'))],
+            'transparent',
+          ),
+          pointerEvents: 'none',
+        }),
+      ]),
       native([
         rule({ flexDirection: 'row', opacity: 1, transition: fade }),
         rule({ idle: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
+      ]),
+    ]),
+    /* The space above and below the slotted line, on the line, so an empty
+       header has no height. */
+    on({ region: 'header', slotted: '*' }, [
+      web([
+        rule({
+          marginBlock: [token('space-sm'), token('space-lg')],
+          pointerEvents: 'auto',
+        }),
       ]),
     ]),
     /* Written out: an empty header takes no room. */
