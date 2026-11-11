@@ -30,23 +30,11 @@
   margin-block-start: var(--helix-space-xl);
 }
 
-/* Reading type, as on the site's document pages: 14 on this column ran past 110
-   characters a line.
-
-   **And a reading measure at that size.** The column is 80ch of the 14px it is
-   set in, 743px at 1440, and 18px text across all of it ran 82 to 90
-   characters a line. In `em` rather than `ch`: the face's zero is wide, so 62ch
-   came to 740px and moved nothing. 34em is 612px, about 70 characters of this
-   face. Tables and code keep the column. */
-.prose :is(helix-text[as="p"], ul, ol) {
-  font-size: var(--helix-text-lg);
-  line-height: var(--helix-leading-normal);
-  max-inline-size: 34em;
-}
-
-/* **A list is lines of the text**, with the marker hung in the gutter and the
-   items a step apart, so a one-line item stands 31 below the last at 18px. */
+/* **A list is lines of the text**, at a paragraph's size and across the same
+   column, with the marker hung in the gutter and the items a step apart. */
 .prose :is(ul, ol) {
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-normal);
   margin-block-end: 0;
   padding-inline-start: var(--helix-space-lg);
 }
@@ -58,32 +46,4 @@
 
 .prose li > :is(ul, ol) {
   font-size: inherit;
-}
-
-/* **Tables a step under the reading type**, 16 between the ramp's 14 and 18.
-   A cell takes the control size, 13, which put a table's words five pixels
-   under the 18 of the sentence that introduced it. Set through the token the
-   cells read, so the table keeps its own rhythm and the column it already has. */
-.prose helix-table {
-  --helix-text-control: calc((var(--helix-text-md) + var(--helix-text-lg)) / 2);
-}
-
-/* **One code size on the page, a step under the reading type.** Inline code
-   took 16.71 beside 18px text, a table's code 14.86, and a Code Block 13: three
-   sizes for one face in one column. All three take one size here: the table's
-   16 scaled by 13 over 14, the ratio of code to text on the ramp, which is
-   14.86. At 1440, 49 of 307 blocks scroll sideways against 16 before. At 13,
-   29 scroll, and inline code sat at 0.72 of the sentence around it, small
-   enough to read as a footnote. */
-.prose {
-  --code-block-font-size: calc(
-    var(--helix-text-sm) /
-    var(--helix-text-md) *
-    (var(--helix-text-md) + var(--helix-text-lg)) /
-    2
-  );
-}
-
-.prose :is(helix-text[as="p"], ul, ol, helix-table) {
-  --code-size: var(--code-block-font-size);
 }

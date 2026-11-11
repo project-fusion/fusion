@@ -159,10 +159,9 @@ export const PROSE_COMPONENTS = {
   img: ({ alt, src }: { alt?: string; src?: string }) => (
     <helix-image alt={alt ?? ''} src={src ?? ''}></helix-image>
   ),
-  /* **A docs page's lists are lines of its text.** As List rows they stood 43
-     apart at 18px, a row's padding round a 27 line, and their host ran the
-     column's 743 beside paragraphs held to 612. The page sets them as it sets
-     a paragraph, in `docs/[slug]/page.module.css`. */
+  /* **A docs page's lists are lines of its text.** As List rows each item
+     stood a row's padding apart from the next, a row and not a line. The page
+     sets them as it sets a paragraph, in `docs/[slug]/page.module.css`. */
   li: ({ children }: { children?: ReactNode }) => <li>{children}</li>,
   ol: ({ children }: { children?: ReactNode }) => <ol>{children}</ol>,
   p: ({ children }: { children?: ReactNode }) => <helix-text as="p">{children}</helix-text>,
