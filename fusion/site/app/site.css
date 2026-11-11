@@ -462,8 +462,9 @@ helix-drawer[material="glass"] {
   white-space: nowrap;
 }
 
-/* The glyph is an Icon Button's, the field glyph of the region and never under
-   `size-icon-sm`, so a link between two of them draws the same mark. */
+/* The glyph an Icon Button draws in the header, the field glyph raised to
+   `size-icon-sm` as App Header raises it, so a link between two of them draws
+   the same mark. */
 [data-icon-link] {
   --icon-size: max(var(--helix-size-icon-tight), var(--helix-size-icon-sm));
 

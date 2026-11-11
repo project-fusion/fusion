@@ -133,7 +133,7 @@ describe('skeleton around content', () => {
   })
 
   test('the fill, the sheen, the corner and the pace are hooks that rest on the old values', () => {
-    expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*light-dark\(\s*color-mix/)
+    expect(sheet()).toMatch(/var\(\s*--skeleton-color,\s*color-mix\(in oklab, var\(--helix-color-foreground\) 8%/)
     expect(sheet()).toMatch(/var\(\s*--skeleton-sheen-color,\s*color-mix/)
     expect(sheet()).toMatch(
       /var\(\s*--skeleton-radius,\s*var\(--_skeleton-corner,\s*var\(--helix-radii-sm\)\)\)/,

@@ -51,6 +51,6 @@ describe('app header server output', () => {
 
   test('declarative shadow DOM carries the material', () => {
     expect(rendered(markup, 'helix-app-header')).toContain('shadowrootmode="open"')
-    expect(styles(served)).toContain('--helix-material-panel')
+    expect(styles(served)).toContain('--helix-material-translucent')
   })
 })

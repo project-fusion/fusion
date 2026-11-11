@@ -276,10 +276,11 @@
 /* The caret says the word opens something, as a Select's does. **Sized from
    the word beside it**, which holds at `text-sm` whatever the density, so the
    caret holds too: the tight icon step grew it from 12 to 20 across the three
-   densities beside the same 13 pixel word. 1.2em rounded to an even size is
-   the 16 it drew at `md`, centered on a whole pixel. */
+   densities beside the same 13 pixel word. **1em rounded to an even size**,
+   14 beside the 13 pixel word and centered on a whole pixel: at 1.2em, 16,
+   the owner found it large beside the word, November 2026. */
 [part="trigger-indicator"] {
-  --_megamenu-caret: round(1.2em, 2px);
+  --_megamenu-caret: round(1em, 2px);
 
   block-size: var(--_megamenu-caret);
   flex: 0 0 auto;

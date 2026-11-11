@@ -3,10 +3,10 @@
   /* Dense by nature, and it says so once. */
   /* The icon step with it. Declaring the control size and stopping there draws
      an icon at the `md` step inside `sm` controls: 20 pixels in a 32 pixel row. */
-  /* **The tight glyph never under `size-icon-sm`**, as in a Toolbar, since the
-     bar holds Icon Buttons, whose glyph is never under 16. At the `sm` step's
-     own 12, a search field's glyph stood at 12 beside 16 pixel icon buttons in
-     the same 32 pixel row. */
+  /* **The tight glyph never under `size-icon-sm`**, as in a Toolbar, so the
+     bar's Icon Buttons, a search field's glyph and a caret are all 16 in the
+     same 32 pixel row. At the `sm` step's own 12 they read thin beside the
+     bar's 14 pixel words. */
   --helix-size-icon-tight: max(
     round(calc(var(--helix-size-icon) * 0.8), 2px),
     var(--helix-size-icon-sm)
@@ -35,8 +35,10 @@
    structure. */
 :host([material="glass"]) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  /* The coverage every glass takes, which Card's note explains. */
-  background-color: var(--app-header-background-color, var(--helix-material-panel));
+  /* **The translucent material, 30% of white in light**, under the 72% a
+     panel takes. The bar took the panel's coverage for a round, and the owner
+     put it back at 30% in November 2026, after comparing the two. */
+  background-color: var(--app-header-background-color, var(--helix-material-translucent));
 }
 
 /* **Glass and frosted draw the material's edge under the bar**, as every glass
@@ -64,7 +66,7 @@
 /* Scrolled, it takes the glass rather than the opaque fill. */
 :host([material="transparent"]:state(scrolled)) {
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
-  background-color: var(--app-header-background-color, var(--helix-material-panel));
+  background-color: var(--app-header-background-color, var(--helix-material-translucent));
 }
 
 :host([sticky]) {
