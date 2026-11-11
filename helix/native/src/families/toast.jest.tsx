@@ -335,9 +335,9 @@ describe('the generated Toast', () => {
         .map((node) => styleOf(node).backgroundColor)
         .find((color) => color !== 'transparent')
     await draw(surface())
-    expect(fill()).toBe(dark['color-surface-overlay'])
+    expect(fill()).toBe(dark['color-surface-sunken'])
     await redraw(surface('light'))
-    expect(fill()).toBe(light['color-surface-overlay'])
+    expect(fill()).toBe(light['color-surface-raised'])
   })
 })
 
