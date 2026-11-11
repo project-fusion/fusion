@@ -15,14 +15,15 @@ import { styles } from './tabs-root.css.js'
  *
  * The mark depends on `marker`:
  *
- * - Unset, it is the selected wash on the selected tab, with nothing behind
- *   the row, as `Navigation` marks its current destination.
+ * - Unset, it is a sunken pill on the selected tab, with nothing behind the
+ *   row, as `Navigation` marks its current destination.
  * - `underlined` makes it a bar along the bottom of the strip, on a rule.
  * - `segmented` makes it the size of the tab's box, inside a sunken track.
  *
  * `emphasis="subtle"` makes the mark quieter, for tabs inside other chrome
- * such as a pane's header: the `segmented` thumb becomes the selected wash,
- * with no edge or shadow, and the `underlined` bar takes the foreground's ink.
+ * such as a pane's header: the unset pill and the `segmented` thumb become
+ * the selected wash, with no edge or shadow, and the `underlined` bar takes
+ * the foreground's ink.
  *
  * **Tabs with no panels are a strip.** Where what each tab stands for lives
  * outside the set, such as a pane's pages or shells, leave the panels out: the
@@ -82,8 +83,8 @@ export class HelixTabs extends HelixHeadlessTabs {
    * Unset is the mark `marker` draws at rest. `subtle` is a tint with no
    * edge or shadow: the `segmented` track's raised thumb becomes the selected
    * wash, and the `underlined` bar takes the foreground's ink in place of the
-   * primary color. The unset marker is the selected wash already and stays
-   * as it is. For tabs inside other chrome, where a raised mark reads as a
+   * primary color, and the unset pill becomes the selected wash. For tabs
+   * inside other chrome, where a raised mark reads as a
    * control laid on top of it.
    *
    * Independent of `marker`, since each of its marks has a quiet form: the two

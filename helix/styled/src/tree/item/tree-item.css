@@ -148,11 +148,12 @@ slot[name="children"]::slotted(*) {
   color: var(--tree-row-hover-color, var(--helix-color-foreground));
 }
 
-/* A wash, not the accent, and a step past the hover's. At `primary-subtle` the
-   chosen row measured 1.03:1 against a hovered one in light, so under the
-   pointer the current row could not be told from any other. */
+/* **The brand's subtle tint**, a gray where no brand is set. The selected
+   wash was tried in its place, since at `primary-subtle` the chosen row
+   measured 1.03:1 against a hovered one in light, and the owner chose the
+   tint from before the rounds, November 10, 2026. */
 :host(:state(selected)) [part="row"] {
-  background-color: var(--tree-row-selected-background-color, var(--helix-color-selected));
+  background-color: var(--tree-row-selected-background-color, var(--helix-color-primary-subtle));
   color: var(--tree-row-selected-color, var(--helix-color-foreground));
 }
 
@@ -477,10 +478,9 @@ slot[name="chevron"]::slotted(*) {
   background-color: var(--helix-color-press);
 }
 
-/* **A chosen row answers the pointer and the press too**, with the press wash,
-   three points past the selected one. The selected rule above outranks both
-   rules before it, so the chosen row stayed at 0.14 under either, November 4,
-   2026. */
+/* **A chosen row answers the pointer and the press too**, with the press wash.
+   The selected rule above outranks both rules before it, so the chosen row
+   stayed at its tint under either, November 4, 2026. */
 :host(:state(selected):not([disabled])) [part="row"]:active {
   background-color: var(--helix-color-press);
 }

@@ -85,10 +85,11 @@
 }
 
 /* Behind the destinations and out of flow, so animating it reflows nothing.
-   The selected wash, as a chosen row is: `surface-sunken` measured 1.05:1 on a
-   dark glass header, a pill nobody saw, where the wash measures 1.65. */
+   **A `surface-sunken` pill**, a step past the 5% wash a link takes under the
+   pointer. The selected wash was tried in its place, since the pill measures
+   1.05:1 on a dark glass header, and the owner chose the pill from before the rounds, November 10, 2026. */
 [part="indicator"] {
-  background-color: var(--navigation-indicator-color, var(--helix-color-selected));
+  background-color: var(--navigation-indicator-color, var(--helix-color-surface-sunken));
   block-size: var(--indicator-block-size, 0);
   border-radius: var(--navigation-indicator-radius, var(--helix-radii-sm));
   box-shadow: var(--navigation-indicator-shadow, none);

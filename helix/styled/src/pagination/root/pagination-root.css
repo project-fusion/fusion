@@ -85,9 +85,7 @@
 [part~="page"]:hover,
 [part="previous"]:hover,
 [part="next"]:hover {
-  /* The well, as a navigation link's hover is, a step under the selected wash
-     the page you are on takes. */
-  background-color: var(--pagination-hover-background-color, var(--helix-color-well));
+  background-color: var(--pagination-hover-background-color, var(--helix-color-hover));
   color: var(--pagination-hover-foreground-color, var(--helix-color-foreground));
 }
 
@@ -102,18 +100,13 @@
 }
 
 /*
- *  Where you are: the wash every chosen thing takes, not a brand fill.
- *
- * **`color-selected`, a step past the hover's well**, as a List's current row
- * and a Tree's selected one are. The page you were on was `surface-raised`
- * with an edge, rgb 245 in light against the hovered page's well at 242,
- * 1.03:1 apart: under the pointer every page read as the one you were on. At
- * 14% (18% in dark) the current page stands past the hover's 5% in both
- * modes.
+ * **The page you are on is a raised chip with an edge**, `surface-raised` and
+ * `border`, beside the hover wash on the others. The selected wash was tried in
+ * its place, and the owner chose the pill from before the rounds, November 10, 2026.
  */
 [part~="page"][aria-current="page"],
 [part~="page"][aria-current="page"]:hover {
-  background-color: var(--pagination-current-background-color, var(--helix-color-selected));
+  background-color: var(--pagination-current-background-color, var(--helix-color-surface-raised));
   border-color: var(--pagination-current-border-color, var(--helix-color-border));
   color: var(--pagination-current-foreground-color, var(--helix-color-foreground));
   font-weight: var(--pagination-current-font-weight, var(--helix-weight-semibold));
