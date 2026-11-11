@@ -45,6 +45,30 @@ export interface IndicatorOptions {
 }
 
 /**
+ * How much larger the surface is drawn than it is laid out, along each axis.
+ *
+ * Its on-screen box over its layout box, which is what every ancestor
+ * transform comes to at the surface. `offsetWidth` is rounded to a whole pixel,
+ * so a difference of a pixel or less is that rounding and counts as no scale;
+ * otherwise an unscaled 300.4-pixel strip would shift its mark by a fraction of
+ * a pixel. Under a rotation the on-screen box is the rotated box's bounds, so
+ * the scale is an approximation there: a card tilted on two axes is sheared,
+ * and its bounds grow taller than the scale, so the mark comes out a little
+ * short. Layout offsets would be exact, and they are not available: a slotted
+ * item's `offsetParent` is retargeted past the shadow root, so its offsets are
+ * measured from somewhere outside the component. An element with no layout box, such as one in an
+ * unrendered subtree, measures nothing and counts as unscaled too.
+ */
+const scaleOf = (
+  surface: HTMLElement,
+  own: Pick<DOMRect, 'height' | 'width'>,
+): { sx: number; sy: number } => {
+  const along = (drawn: number, laid: number): number =>
+    laid > 0 && Math.abs(drawn - laid) > 1 ? drawn / laid : 1
+  return { sx: along(own.width, surface.offsetWidth), sy: along(own.height, surface.offsetHeight) }
+}
+
+/**
  * Measures the marked child and writes the geometry onto a traveling mark.
  *
  * Serves `Navigation`, `Tabs`, `Toggle.Group` and `Outline`. The two things
@@ -61,6 +85,14 @@ export interface IndicatorOptions {
  * border of its own puts the mark one border-width out. `clientLeft` and
  * `clientTop` are the border widths, already resolved, which is why they are
  * used here rather than parsing `borderLeftWidth`.
+ *
+ * **The measurement is in screen pixels and the mark is placed in layout
+ * pixels.** `getBoundingClientRect` includes every transform above the
+ * component, so under a zoomed preview, a CSS-scaled embed or a tilted card the
+ * two differ, and writing screen pixels made the mark too wide and too far
+ * along: at a 1.2 scale the last segment's mark ran past the track. Dividing by
+ * the surface's own scale puts it back in layout pixels, and a value in layout
+ * pixels stays right when the transform changes, which no observer reports.
  *
  * **Nothing is written until there is something to measure.** A zero-width box
  * is a component whose children have not upgraded yet, and writing zeroes would
@@ -176,14 +208,16 @@ export class IndicatorController implements ReactiveController {
 
     /* `clientLeft` and `clientTop` are the resolved border widths, which is the
        difference between the border box the measurement gives and the padding
-       box the mark is placed against. */
+       box the mark is placed against. They are layout pixels, so they come off
+       after the scale does. */
+    const { sx, sy } = scaleOf(surface, own)
     const rtl = isRtl(surface)
     const inline = rtl
-      ? own.right - box.right - surface.clientLeft
-      : box.left - own.left - surface.clientLeft
+      ? (own.right - box.right) / sx - surface.clientLeft
+      : (box.left - own.left) / sx - surface.clientLeft
 
     const x = `${rtl ? -inline : inline}px`
-    const y = `${box.top - own.top - surface.clientTop}px`
+    const y = `${(box.top - own.top) / sy - surface.clientTop}px`
 
     /* `data-moving` while it is on its way, so a stylesheet can say something
      * about the travel itself.
@@ -207,8 +241,8 @@ export class IndicatorController implements ReactiveController {
 
     indicator.style.setProperty('--indicator-x', x)
     indicator.style.setProperty('--indicator-y', y)
-    indicator.style.setProperty('--indicator-inline-size', `${box.width}px`)
-    indicator.style.setProperty('--indicator-block-size', `${box.height}px`)
+    indicator.style.setProperty('--indicator-inline-size', `${box.width / sx}px`)
+    indicator.style.setProperty('--indicator-block-size', `${box.height / sy}px`)
     indicator.toggleAttribute('data-placed', true)
 
     if (!moved) {
