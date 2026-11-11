@@ -1,14 +1,4 @@
-import {
-  difference,
-  inherit,
-  native,
-  product,
-  safeArea,
-  scheme,
-  sum,
-  token,
-  web,
-} from '../../../style.js'
+import { inherit, native, product, safeArea, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -41,7 +31,7 @@ export default styles(
       gap: token('space-xs'),
       inset: token('space-lg'),
     },
-    own: { toastEnter: null, toastGap: null, toastInset: null, toastMost: null, toastWidth: null },
+    own: { toastEnter: null, toastGap: null, toastInset: null, toastWidth: null },
     stylesheet: 'toast/root/toast-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -111,9 +101,7 @@ export default styles(
         rule({ placement: ['bottom-start', 'top-start'] }, { alignItems: 'flex-start' }),
         rule({ placement: ['bottom-end', 'top-end'] }, { alignItems: 'flex-end' }),
         rule({ placement: ['bottom-center', 'top-center'] }, { alignItems: 'center' }),
-        /* A message is never wider than the window less a margin. */
-        web([rule({ own: { toastMost: difference('100vw', token('space-xl')) } })]),
-        /* The web's message keeps its own width at every window, capped by `toastMost`,
+        /* The web's message keeps its own width at every window, no wider than the region,
            and a phone's takes the whole width of the stack where its window is narrow. */
         web([rule({ own: { toastWidth: '22rem' } })]),
         native([rule({ window: { below: '30rem' } }, { own: { toastWidth: '100%' } })]),

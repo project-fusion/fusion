@@ -3,9 +3,11 @@ import {
   difference,
   list,
   measured,
+  mix,
   native,
   product,
   quotient,
+  scheme,
   sum,
   token,
   web,
@@ -40,9 +42,12 @@ export default styles(
   {
     prefix: 'toast',
     hooks: ({ own }) => ({
-      backgroundColor: token('color-surface-overlay'),
-      borderColor: token('color-border'),
-      borderWidth: token('border-floating'),
+      /* The inverse ground Tooltip draws, and no edge: the stack takes the
+         opposite scheme, so raised in light and sunken in dark read in its
+         own scheme are the two rungs `surface-inverse` is made of. */
+      backgroundColor: scheme(token('color-surface-raised'), token('color-surface-sunken')),
+      borderColor: 'transparent',
+      borderWidth: 0,
       color: token('color-foreground'),
       descriptionColor: token('color-foreground-muted'),
       dismissColor: token('color-foreground-muted'),
@@ -61,7 +66,6 @@ export default styles(
       toastEnter: null,
       toastGap: null,
       toastLine: null,
-      toastMost: null,
       toastSeverity: null,
       toastWidth: null,
     },
@@ -71,6 +75,9 @@ export default styles(
     const normal = token('duration-normal')
     const decelerate = token('easing-decelerate')
     const accelerate = token('easing-accelerate')
+    const standard = token('easing-standard')
+    const fast = token('duration-fast')
+    const fade = token('duration-fade')
     const padding = hook.itemPadding
     const tone = hook.toneColor
     const enter = own.toastEnter(token('space-lg'))
@@ -90,9 +97,18 @@ export default styles(
             ['translate', normal, decelerate],
           ),
           inlineSize: hook.inlineSize,
-          maxInlineSize: own.toastMost('100%'),
+          /* The region's width, which already keeps the inset off both edges. */
+          maxInlineSize: '100%',
         }),
-        native([rule({ maxInlineSize: '100%' })]),
+        /* It makes room as it arrives, the row collapse its leaving runs in
+           reverse, as an animation, since no transition runs in a
+           component's first frame. */
+        web([
+          rule(
+            { reducedMotion: false },
+            { animation: ['helix-toast-room', normal, decelerate, 'backwards'] },
+          ),
+        ]),
         /* Color on the mark and the bar, never a fill behind the words. */
         variants('tone', {
           danger: { own: { toastSeverity: token('color-danger') } },
@@ -111,12 +127,15 @@ export default styles(
             opacity: 0,
             translate: [0, enter],
             visibility: 'hidden',
+            /* It leaves first, and the gap closes after: the fade and the
+               slide at the fast step, then the row and the margin over the
+               normal step. */
             transition: list(
-              ['grid-template-rows', normal, accelerate],
-              ['margin-block-start', normal, accelerate],
-              ['opacity', normal, accelerate],
-              ['translate', normal, accelerate],
-              ['visibility', normal, 'step-end'],
+              ['opacity', fast, accelerate],
+              ['translate', fast, accelerate],
+              ['grid-template-rows', normal, standard, fast],
+              ['margin-block-start', normal, standard, fast],
+              ['visibility', sum(fast, normal), 'step-end'],
             ),
           },
         ),
@@ -140,6 +159,22 @@ export default styles(
           rule({ closed: true }, { display: 'none' }),
         ]),
         rule({ reducedMotion: true }, { transition: 'none' }),
+        /* Under reduced motion, leaving, it fades and then gives up its room
+           at once, so nothing slides. */
+        web([
+          rule(
+            { closed: true, reducedMotion: true },
+            {
+              transition: list(
+                ['opacity', '0s', fade],
+                ['grid-template-rows', '0s', fade],
+                ['margin-block-start', '0s', fade],
+                ['visibility', '0s', fade],
+              ),
+              translate: 'none',
+            },
+          ),
+        ]),
       ]),
       /* Hidden and still laid out while it leaves. A waiting message takes no box. */
       /* Written out: the vocabulary names no value an attribute does not hold beside a state. */
@@ -190,12 +225,37 @@ export default styles(
           { reducedMotion: false },
           { animation: ['helix-toast-in', normal, decelerate, 'backwards'] },
         ),
+        /* The way back for a message opened again. */
+        web([
+          rule(
+            { closed: false, reducedMotion: false },
+            { transition: ['padding-block', normal, decelerate] },
+          ),
+        ]),
         rule(
           { closed: true },
-          { paddingBlock: 0, transition: ['padding-block', normal, accelerate] },
+          { paddingBlock: 0, transition: ['padding-block', normal, standard, fast] },
         ),
-        rule({ reducedMotion: true }, { animation: 'none' }),
-        rule({ reducedMotion: true, closed: true }, { transition: 'none' }),
+        /* Under reduced motion it fades in, and fades out inside the host. */
+        web([
+          rule(
+            { reducedMotion: true },
+            { animation: ['helix-toast-fade', fade, standard, 'backwards'] },
+          ),
+          rule(
+            { reducedMotion: true, closed: true },
+            {
+              opacity: 0,
+              transition: list(['opacity', fade, accelerate], ['padding-block', '0s', fade]),
+            },
+          ),
+          /* Forced colors draw the edge the inverse ground stood for. */
+          rule({ forcedColors: true }, { border: [token('border-thin'), 'solid', 'CanvasText'] }),
+        ]),
+        native([
+          rule({ reducedMotion: true }, { animation: 'none' }),
+          rule({ reducedMotion: true, closed: true }, { transition: 'none' }),
+        ]),
       ]),
       /* The mark, centered on the first line, with its own gap after it. */
       on('icon', [
@@ -251,6 +311,17 @@ export default styles(
         web([rule({ touchAction: 'pan-y' })]),
       ]),
       on({ region: 'actions', slotted: '*' }, [rule({ marginBlockStart: token('space-xs') })]),
+      /* An outlined button takes an edge that reads on the toast. */
+      on({ region: 'actions', slotted: 'helix-button:not([tone])' }, [
+        web([
+          rule({
+            '--button-border-color': scheme(
+              token('color-border'),
+              mix(token('color-border'), 95, token('color-foreground')),
+            ),
+          }),
+        ]),
+      ]),
       /* The close, in the corner and out of the flow, centered on the first line. */
       on('dismiss', [
         rule({
@@ -276,6 +347,11 @@ export default styles(
         rule(
           { hover: true },
           { backgroundColor: token('color-hover'), color: token('color-foreground') },
+        ),
+        /* A press, a step past the hover, so a tap shows on a phone. */
+        rule(
+          { active: true },
+          { backgroundColor: token('color-press'), color: token('color-foreground') },
         ),
         rule(
           { focusVisible: true },
@@ -316,7 +392,11 @@ export default styles(
         ]),
       ]),
       keyframes('helix-toast-drain', { to: { scale: '0 1' } }),
-      keyframes('helix-toast-in', { from: { opacity: 0, translate: [0, enter] } }),
+      keyframes('helix-toast-in', { from: { opacity: 0, paddingBlock: 0, translate: [0, enter] } }),
+      keyframes('helix-toast-room', {
+        from: { gridTemplateRows: 'minmax(0, 0fr)', marginBlockStart: 0 },
+      }),
+      keyframes('helix-toast-fade', { from: { opacity: 0 } }),
     ]
   },
 )
