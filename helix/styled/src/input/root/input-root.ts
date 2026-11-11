@@ -35,7 +35,8 @@ import '../../voice-level/index.js'
  *
  * @cssproperty --input-background-color - Fill behind the text.
  * @cssproperty --input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
- * @cssproperty --input-ghost-underline - The line under the words of a `ghost` field at rest: `underline` draws it dotted at any pointer. A touch screen draws it whatever this says.
+ * @cssproperty --input-ghost-align - Where a `ghost` value sits in its field at rest: `start`, `center`, or `end`. A `DataTable` sets it to its column's edge.
+ * @cssproperty --input-ghost-underline - The color of the round dots under a `ghost` value at rest, which say it can be edited. None by default, and the subtle foreground on a touch screen. A `DataTable` sets it on every editable cell.
  * @cssproperty --input-padding-inline - Space between the edge of the field and what is inside it.
  * @cssproperty --input-radius - Corner radius of the field.
  * @cssproperty --input-size - Height of the field.
