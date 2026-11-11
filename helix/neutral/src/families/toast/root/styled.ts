@@ -83,6 +83,14 @@ export default styles(
           position: web('fixed'),
           zIndex: web(token('layer-toast')),
         }),
+        /* The stack moves off a modal's surface as the surface arrives, at the
+           pace a bottom sheet rises. */
+        web([
+          rule(
+            { reducedMotion: false },
+            { transition: ['translate', token('duration-normal'), token('easing-decelerate')] },
+          ),
+        ]),
         rule(
           { placement: false },
           { web: { insetBlockEnd: sum(own.toastInset, safeArea('bottom')) } },

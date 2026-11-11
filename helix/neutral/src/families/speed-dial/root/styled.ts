@@ -1,5 +1,5 @@
 import { oneOf } from '../../../render.js'
-import { hookOf, list, native, product, quotient, token, web } from '../../../style.js'
+import { difference, hookOf, list, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -243,6 +243,18 @@ export default styles(
         rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
         /* The lift arrives at once under reduced motion. */
         rule({ reducedMotion: true }, { transition: 'none' }),
+        web([rule({ position: 'relative' })]),
+      ]),
+      /* The press reaches the target, in a transparent box, so nothing drawn
+         moves, as Icon Button's does. */
+      on({ after: 'trigger' }, [
+        web([
+          rule({
+            content: '""',
+            inset: quotient(difference(token('size-target'), '100%'), '-2'),
+            position: 'absolute',
+          }),
+        ]),
       ]),
       /* A glyph of your own takes the plus's size, and so does the plus. */
       on({ region: 'icon', slotted: '*' }, [

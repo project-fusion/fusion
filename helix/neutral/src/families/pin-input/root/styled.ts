@@ -1,7 +1,7 @@
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { native, token } from '../../../style.js'
+import { fn, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import pinInput from './headless.js'
 
@@ -29,7 +29,9 @@ export default styles(
       cellColor: token('color-foreground'),
       cellFontSize: token('text-lg'),
       cellRadius: token('radii-sm'),
-      cellSize: token('size-control'),
+      /* At least the target on a touch screen: the boxes sit close, so the box
+         itself grows. */
+      cellSize: fn('max', token('size-control'), token('size-target')),
       gap: token('space-xs'),
       placeholderColor: token('color-foreground-muted'),
       separatorColor: token('color-foreground-muted'),

@@ -118,7 +118,14 @@ export default styles(
       rule({ '--icon-size': token('size-icon-tight'), flex: [0, 0, 'auto'] }),
     ]),
     on('text', [
-      rule({ display: 'flex', flex: '1 1 auto', flexDirection: 'column', minInlineSize: 0 }),
+      /* A list laid out in cells sets the growth to nothing, so the words and
+         the tick stay together in the cell. */
+      rule({
+        display: 'flex',
+        flex: [inherited('_option-packed', 1), 1, 'auto'],
+        flexDirection: 'column',
+        minInlineSize: 0,
+      }),
     ]),
     on(
       ['description'],
@@ -182,7 +189,7 @@ export default styles(
           display: 'block',
           flex: '0 0 auto',
           inlineSize: token('size-icon-tight'),
-          marginInlineStart: 'auto',
+          marginInlineStart: inherited('_option-tick-start', 'auto'),
         },
       ),
     ]),
@@ -195,7 +202,7 @@ export default styles(
           content: '""',
           flex: '0 0 auto',
           inlineSize: token('size-icon-tight'),
-          marginInlineStart: 'auto',
+          marginInlineStart: inherited('_option-tick-start', 'auto'),
           maskImage: tick,
           maskPosition: 'center',
           maskRepeat: 'no-repeat',

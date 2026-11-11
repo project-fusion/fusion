@@ -2,7 +2,7 @@ import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, list, native, product, quotient, sum, token, web } from '../../../style.js'
+import { difference, fn, list, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import textarea from './headless.js'
 
@@ -44,7 +44,28 @@ export default styles(
         borderRadius: hook.radius,
         display: 'flex',
         gap: token('space-2xs'),
-        padding: hook.padding,
+        /* One row stands as tall as an Input beside it, at every density: the
+           line is the control's, written out. */
+        padding: hook.padding([
+          fn(
+            'min',
+            token('space-field'),
+            difference(
+              quotient(
+                difference(
+                  token('size-control'),
+                  product(
+                    fn('max', token('text-field-min'), token('text-field')),
+                    token('leading-normal'),
+                  ),
+                ),
+                2,
+              ),
+              token('border-thin'),
+            ),
+          ),
+          token('space-field'),
+        ]),
         position: 'relative',
         transition: list(['border-color', ...ease], ['background-color', ...ease]),
       }),
