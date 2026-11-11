@@ -29,10 +29,15 @@ export default styles(
       indicatorThickness: token('border-thick'),
       ruleColor: token('color-border'),
     },
-    own: { navigationItemDisplay: null, navigationItemFloor: null, navigationItemJustify: null },
+    own: {
+      navigationFade: null,
+      navigationItemDisplay: null,
+      navigationItemFloor: null,
+      navigationItemJustify: null,
+    },
     stylesheet: 'navigation/root/navigation-root.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, keyframes, on, own, rule }) => {
     const ruled = hook.ruleColor
     return [
       on('host', [
@@ -107,6 +112,36 @@ export default styles(
           },
         ),
         rule({ orientation: 'vertical', marker: 'segmented' }, { blockSize: 'auto' }),
+        /* The bar scrolls, so on a touch screen it takes the target's height,
+           and a link fills it. */
+        rule(
+          { coarsePointer: true, orientation: { not: 'vertical' } },
+          { blockSize: hook.blockSize(token('size-target')) },
+        ),
+        /* The bar says when it scrolls: the edge with more behind it fades, as
+           Table's does. A bar that fits is never masked. */
+        web([
+          rule({
+            own: { navigationFade: 'to right' },
+            maskImage: fn(
+              'linear-gradient',
+              own.navigationFade,
+              'transparent',
+              ['#000', measured('_navigation-fade-start', '0rem')],
+              ['#000', difference('100%', measured('_navigation-fade-end', '0rem'))],
+              'transparent',
+            ),
+          }),
+          rule({ dir: 'rtl' }, { own: { navigationFade: 'to left' } }),
+          rule(
+            { supports: '(animation-timeline: scroll())' },
+            {
+              animation: ['navigation-edges', 'linear', 'both'],
+              animationTimeline: fn('scroll', 'self inline'),
+            },
+          ),
+          rule({ reducedMotion: true }, { animation: 'none' }),
+        ]),
         /* The rule is a background, which has no logical position, so it
            moves to the left by hand in a right-to-left column. */
         rule(
@@ -136,7 +171,8 @@ export default styles(
       /* Behind the destinations and out of flow, so moving it reflows nothing. */
       on('indicator', [
         rule({
-          backgroundColor: hook.indicatorColor(token('color-surface-sunken')),
+          /* The selected wash, as a List's current row takes it. */
+          backgroundColor: hook.indicatorColor(token('color-selected')),
           blockSize: measured('indicator-block-size', 0),
           borderRadius: hook.indicatorRadius(token('radii-sm')),
           boxShadow: hook.indicatorShadow('none'),
@@ -156,6 +192,11 @@ export default styles(
         /* Hidden until it has somewhere to be, so it fades in rather than
            sliding from a wrong place on first paint. */
         rule({ part: { 'data-placed': true } }, { opacity: 1 }),
+        /* Forced colors paint every fill Canvas: the mark keeps a Highlight
+           edge, and an underline is a Highlight bar. */
+        web([
+          rule({ forcedColors: true }, { border: [token('border-thick'), 'solid', 'Highlight'] }),
+        ]),
         /* A phone's mark travels by the measured place alone, so it stands at
            the destination's top where the web centers it on the bar. Each
            destination fills the bar, so the two are one place. */
@@ -192,7 +233,8 @@ export default styles(
           { marker: 'segmented' },
           {
             backgroundColor: hook.indicatorColor(token('color-surface-overlay')),
-            borderRadius: hook.indicatorRadius(difference(token('radii-sm'), token('border-thin'))),
+            /* Toggle Group's thumb corner, as segmented Tabs take it. */
+            borderRadius: hook.indicatorRadius(token('radii-inset')),
             boxShadow: hook.indicatorShadow(token('shadow-sm')),
           },
         ),
@@ -209,7 +251,21 @@ export default styles(
             translate: [0, measured('indicator-y', 0)],
           },
         ),
+        web([
+          rule(
+            { forcedColors: true, marker: 'underlined' },
+            { backgroundColor: 'Highlight', border: 'none', forcedColorAdjust: 'none' },
+          ),
+        ]),
       ]),
+      keyframes('navigation-edges', {
+        '0%': { '--_navigation-fade-end': token('space-xl'), '--_navigation-fade-start': '0rem' },
+        '5%, 95%': {
+          '--_navigation-fade-end': token('space-xl'),
+          '--_navigation-fade-start': token('space-xl'),
+        },
+        '100%': { '--_navigation-fade-end': '0rem', '--_navigation-fade-start': token('space-xl') },
+      }),
     ]
   },
 )

@@ -48,7 +48,8 @@ export default styles(
       borderColor: token('color-border'),
       color: token('color-foreground'),
       fontFamily: token('font-mono'),
-      fontSize: token('text-xs'),
+      /* Code is 13px in every family that shows it. */
+      fontSize: token('text-sm'),
       lineHeight: token('leading-normal'),
       maxBlockSize: '30rem',
       paddingInline: token('space-md'),
@@ -226,6 +227,10 @@ export default styles(
       rule({
         paddingBlock: token('space-xs'),
         web: {
+          /* Left to right whatever the page does, and the characters written. */
+          direction: 'ltr',
+          unicodeBidi: 'isolate',
+          fontVariantLigatures: 'none',
           gridRow: 3,
           overflow: 'auto',
           overscrollBehavior: 'contain',
@@ -244,6 +249,7 @@ export default styles(
       rule(
         { focusVisible: true },
         {
+          borderRadius: token('radii-sm'),
           outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
           outlineOffset: product(token('size-focus-offset'), '-1'),
         },
@@ -293,7 +299,11 @@ export default styles(
     ]),
     on({ region: 'resume', slotted: '*' }, [
       rule({
-        border: [token('border-floating'), 'solid', hook.borderColor],
+        border: [
+          token('border-floating'),
+          'solid',
+          hook.borderColor(token('color-border-floating')),
+        ],
         boxShadow: token('shadow-floating'),
       }),
     ]),
@@ -304,7 +314,11 @@ export default styles(
         alignItems: 'center',
         backgroundColor: token('color-surface-raised'),
         blockSize: token('size-control-sm'),
-        border: [token('border-floating'), 'solid', hook.borderColor],
+        border: [
+          token('border-floating'),
+          'solid',
+          hook.borderColor(token('color-border-floating')),
+        ],
         borderRadius: token('radii-sm'),
         boxShadow: token('shadow-floating'),
         color: token('color-foreground'),
