@@ -526,9 +526,21 @@
  * `viewBox` and no dimensions is 300x150.
  */
 ::slotted([slot="eyedropper-icon"]) {
-  block-size: var(--icon-size, var(--helix-size-icon));
+  block-size: var(--icon-size, var(--helix-size-icon-tight));
+  display: block;
   flex: 0 0 auto;
-  inline-size: var(--icon-size, var(--helix-size-icon));
+  inline-size: var(--icon-size, var(--helix-size-icon-tight));
+}
+
+/* **The dropper as a block, at the field glyph's size**, as the syntax toggle
+   beside it holds its word. Inline in Button's text, which is trimmed to its
+   capitals, the glyph sat on the trimmed line: its middle measured 5.4 pixels
+   above the button's, and at the region's 20 it stood heavier than the 13
+   pixel word beside it. 16 at `md`, like an Icon Button's. */
+[part="eyedropper"] > slot > svg {
+  block-size: var(--icon-size, var(--helix-size-icon-tight));
+  display: block;
+  inline-size: var(--icon-size, var(--helix-size-icon-tight));
 }
 
 /* Small caps rather than uppercased text: `text-transform` would leave a screen

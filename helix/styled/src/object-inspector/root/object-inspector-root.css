@@ -238,10 +238,13 @@
 
 /* **Above the tree**, so its press reaches past the bar. The bar is 40 tall
    round a 32 pixel button, and the tree drawn after it took the bottom 2
-   pixels of the 44 pixel press on a touch screen: it measured 39. */
+   pixels of the 44 pixel press on a touch screen: it measured 39. **No
+   offset**: relative, the corner's inset still applied and moved the button 4
+   pixels down the bar, its middle at 49 beside the name's 45. */
 [part="header"] > [part="copy"] {
   --copy-button-icon-size: var(--helix-size-icon-sm);
   --icon-button-size: var(--helix-size-control-sm);
+  inset: auto;
   margin-inline-start: auto;
   position: relative;
   z-index: var(--helix-layer-raised);
