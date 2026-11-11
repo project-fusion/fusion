@@ -115,7 +115,7 @@ describe('a tag on its own', () => {
     )
   })
 
-  test('fills with its tone\'s solid surface under `solid`, with the ink solved for it, and draws its edge alone under `outlined`', async () => {
+  test("fills with its tone's solid surface under `solid`, with the ink solved for it, and draws its edge alone under `outlined`", async () => {
     const view = await render(tag({ children: 'Late', emphasis: 'solid', tone: 'danger' }))
     expect(styleOf(hostOf('Late')).backgroundColor).toBe(color('color-danger-surface'))
     expect(styleOf(screen.getByText('Late')).color).toBe(color('color-foreground-on-status'))
