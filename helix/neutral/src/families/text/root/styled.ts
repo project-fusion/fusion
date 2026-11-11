@@ -59,7 +59,9 @@ export default styles(
       rule({
         display: 'inline',
         /* A long unbroken word breaks inside the column it was given. */
-        web: { overflowWrap: 'anywhere' },
+        /* A long word breaks inside its column, and a word in a row stays
+           whole. */
+        web: { overflowWrap: 'break-word' },
         fontFamily: hook.fontFamily(),
         fontSize: hook.fontSize(),
         fontWeight: hook.fontWeight(),
@@ -106,20 +108,18 @@ export default styles(
         letterSpacing: hook.letterSpacing(token('tracking-normal')),
         lineHeight: hook.lineHeight(token('leading-normal')),
       }),
+      rule([{ scale: 'body-strong' }, { as: 'h5', scale: false }, { as: 'h6', scale: false }], {
+        fontFamily: hook.fontFamily(token('font-sans')),
+        fontSize: hook.fontSize(token('text-md')),
+        fontWeight: hook.fontWeight(token('weight-medium')),
+        letterSpacing: hook.letterSpacing(token('tracking-normal')),
+        lineHeight: hook.lineHeight(token('leading-normal')),
+      }),
+      /* Bold inside a run of text, and only bolder: the size, face, and
+         leading are the text's own. */
       rule(
-        [
-          { scale: 'body-strong' },
-          { as: 'h5', scale: false },
-          { as: 'h6', scale: false },
-          { as: 'strong', scale: false },
-        ],
-        {
-          fontFamily: hook.fontFamily(token('font-sans')),
-          fontSize: hook.fontSize(token('text-md')),
-          fontWeight: hook.fontWeight(token('weight-medium')),
-          letterSpacing: hook.letterSpacing(token('tracking-normal')),
-          lineHeight: hook.lineHeight(token('leading-normal')),
-        },
+        { as: 'strong', scale: false },
+        { fontWeight: hook.fontWeight(token('weight-semibold')) },
       ),
       rule(
         { scale: 'caption' },
@@ -142,7 +142,9 @@ export default styles(
       }),
       rule([{ scale: 'code' }, { as: 'code', scale: false }], {
         fontFamily: hook.fontFamily(token('font-mono')),
-        fontSize: hook.fontSize(token('text-xs')),
+        /* At Code's size, with no ligatures. */
+        fontSize: hook.fontSize(token('text-sm')),
+        web: { fontVariantLigatures: 'none' },
         fontWeight: hook.fontWeight(token('weight-regular')),
         letterSpacing: hook.letterSpacing(token('tracking-normal')),
         lineHeight: hook.lineHeight(token('leading-normal')),

@@ -35,7 +35,8 @@ export default styles(
       borderColor: token('color-border'),
       color: token('color-foreground-muted'),
       fontFamily: token('font-mono'),
-      fontSize: '0.85em',
+      /* Rounded to a whole pixel. */
+      fontSize: fn('round', '0.85em', '1px'),
       fontWeight: token('weight-medium'),
       gap: token('space-2xs'),
       paddingInline: '0.4em',
@@ -184,6 +185,13 @@ export default styles(
         ),
         web([
           rule({ caps: true }, { display: 'inline-block', lineHeight: 0, textAlign: 'center' }),
+          /* A symbol key in the sans face, which draws ⌘, ⇧, ⌥ and ⌃ at the
+             height of a capital, as a menu's shortcuts are drawn. The web's
+             element marks it. */
+          rule(
+            { caps: true, part: { 'data-symbol': true } },
+            { fontFamily: hook.fontFamily(token('font-sans')) },
+          ),
         ]),
         native([
           rule(

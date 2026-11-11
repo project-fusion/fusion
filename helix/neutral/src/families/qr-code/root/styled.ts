@@ -57,6 +57,12 @@ export default styles(
       native([
         rule({ alignItems: 'center', flexShrink: 1, justifyContent: 'center', minInlineSize: 0 }),
       ]),
+      /* Never squeezed along one side by a row it sits in on the web: the
+         words beside it wrap instead. */
+      web([rule({ flexShrink: 0 })]),
+      /* No paper under no code: empty, the square keeps its size and takes
+         the ground it sits on. */
+      rule({ empty: true }, { backgroundColor: hook.backgroundColor('transparent') }),
       rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     on('code', [rule({ blockSize: '100%', display: 'block', inlineSize: '100%' })]),

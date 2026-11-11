@@ -201,10 +201,10 @@ describe('turning, flipping and moving', () => {
     ])
   })
 
-  test('spins the whole icon once every three of `duration-slow`', async () => {
+  test('spins the whole icon once a turn, as every spinner does', async () => {
     const view = await render(themed(<HelixIcon animation="spin" name="arrow-clockwise" />))
     expect(styleOf(view.toJSON() as never)).toMatchObject({
-      animationDuration: 960,
+      animationDuration: 800,
       animationIterationCount: 'infinite',
       animationTimingFunction: 'linear',
     })

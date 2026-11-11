@@ -56,7 +56,8 @@ export default styles(
         spin: {
           animation: [
             'helix-icon-spin',
-            hook.animationDuration(product(token('duration-slow'), 3)),
+            /* Paced in turns, as every spinner is. */
+            hook.animationDuration(token('duration-turn')),
             'linear',
             'infinite',
           ],
@@ -64,16 +65,16 @@ export default styles(
         pulse: {
           animation: [
             'helix-icon-pulse',
-            hook.animationDuration(product(token('duration-slow'), 6)),
-            'ease-in-out',
+            hook.animationDuration(product(token('duration-turn'), 2)),
+            token('easing-cycle'),
             'infinite',
           ],
         },
         beat: {
           animation: [
             'helix-icon-beat',
-            hook.animationDuration(product(token('duration-slow'), 3)),
-            'ease-in-out',
+            hook.animationDuration(product(token('duration-turn'), 1.25)),
+            token('easing-cycle'),
             'infinite',
           ],
         },
