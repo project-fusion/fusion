@@ -39,6 +39,13 @@ export default styles(
   ({ hook, on, rule, variants }) => {
     const fast = token('duration-fast')
     const ground = hook.backgroundColor(token('color-surface-inverse'))
+    const fade = token('duration-fade')
+    const fading = list(
+      ['opacity', fade, token('easing-standard')],
+      ['display', fade, 'allow-discrete'],
+      ['overlay', fade, 'allow-discrete'],
+    )
+    const glassy = [{ material: 'frosted' }, { material: 'glass' }] as const
     return [
       /* No box of its own: the trigger is passed in and the bubble is in the top layer. */
       on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
@@ -64,15 +71,30 @@ export default styles(
           opacity: 0,
           padding: hook.padding,
           position: web('fixed'),
-          scale: 0,
+          /* From 0.96, as every floating panel enters, and the way out
+             accelerates away. */
+          scale: 0.96,
           transition: list(
-            ['opacity', fast, token('easing-standard')],
-            ['scale', fast, token('easing-emphasized')],
+            ['opacity', fast, token('easing-accelerate')],
+            ['scale', fast, token('easing-accelerate')],
             ['display', fast, 'allow-discrete'],
             ['overlay', fast, 'allow-discrete'],
           ),
         }),
-        rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1 }),
+        /* The way in, with the overshoot an arrival has. */
+        rule(
+          { part: { 'data-placed': true } },
+          {
+            opacity: 1,
+            scale: 1,
+            transition: list(
+              ['opacity', fast, token('easing-standard')],
+              ['scale', fast, token('easing-emphasized')],
+              ['display', fast, 'allow-discrete'],
+              ['overlay', fast, 'allow-discrete'],
+            ),
+          },
+        ),
       ]),
       /* The point, half buried under the bubble on the edge facing the trigger. */
       on('arrow', [
@@ -83,6 +105,40 @@ export default styles(
           position: 'absolute',
           rotate: '45deg',
         }),
+      ]),
+      /* Through glass the arrow is only its outer half, so the buried half
+         does not show through the bubble. */
+      on('arrow', [
+        web([
+          rule(
+            [
+              { also: { 'arrow-top': true }, material: 'frosted' },
+              { also: { 'arrow-top': true }, material: 'glass' },
+            ],
+            { clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' },
+          ),
+          rule(
+            [
+              { also: { 'arrow-bottom': true }, material: 'frosted' },
+              { also: { 'arrow-bottom': true }, material: 'glass' },
+            ],
+            { clipPath: 'polygon(0 0, 100% 0, 0 100%)' },
+          ),
+          rule(
+            [
+              { also: { 'arrow-left': true }, material: 'frosted' },
+              { also: { 'arrow-left': true }, material: 'glass' },
+            ],
+            { clipPath: 'polygon(0 0, 100% 0, 100% 100%)' },
+          ),
+          rule(
+            [
+              { also: { 'arrow-right': true }, material: 'frosted' },
+              { also: { 'arrow-right': true }, material: 'glass' },
+            ],
+            { clipPath: 'polygon(0 0, 100% 100%, 0 100%)' },
+          ),
+        ]),
       ]),
       /* Glass takes the ink with it, the page's ground being light in light mode. */
       on(
@@ -101,7 +157,7 @@ export default styles(
         ],
       ),
       on('surface', [
-        rule([{ material: 'frosted' }, { material: 'glass' }], {
+        rule(glassy, {
           border: [token('border-thin'), 'solid', hook.borderColor],
           color: hook.color(token('color-foreground')),
         }),
@@ -123,10 +179,17 @@ export default styles(
       on({ part: 'surface', selector: '[part~="surface"]:not(:popover-open)' }, [
         web([rule({ display: 'none' })]),
       ]),
-      /* With motion reduced it simply appears. */
+      /* With motion reduced the scale goes and a short fade stays. */
       on('surface', [
-        rule({ reducedMotion: true }, { scale: 1, transition: 'none' }),
-        rule({ part: { 'data-placed': true }, reducedMotion: true }, { scale: 1 }),
+        rule({ reducedMotion: true }, { scale: 1, transition: fading }),
+        rule(
+          { part: { 'data-placed': true }, reducedMotion: true },
+          { scale: 1, transition: fading },
+        ),
+        /* Forced colors draw the edge the inverse ground stood for. */
+        web([
+          rule({ forcedColors: true }, { border: [token('border-thin'), 'solid', 'CanvasText'] }),
+        ]),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
     ]
