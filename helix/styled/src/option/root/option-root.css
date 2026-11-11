@@ -1,10 +1,10 @@
 :host {
   /* The tick drawn beside a chosen option, as a stencil so the color is a token
-     like every other color here. **Checkbox's tick**, the same path at the
-     same stroke: it was Phosphor's regular check, a 1px line at this size
-     beside Checkbox's 2.08px, so a chosen option and a ticked box drew two
-     different marks. */
-  --_option-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
+     like every other color here. **Phosphor's regular check**, a line about
+     1px wide at this size, lighter than Checkbox's 2.08px tick. Checkbox's tick
+     was tried here in November 2026 and the owner kept the regular one: a
+     chosen row is marked by a light tick, a box by a heavy one. */
+  --_option-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
   display: block;
 }
 
@@ -161,10 +161,7 @@ slot[name="indicator"]::slotted(*) {
   mask-image: var(--_option-check);
   mask-position: center;
   mask-repeat: no-repeat;
-  /* At the checkbox's size, so the stroke is the checkbox's 2.08px at `md`.
-     Fitted to this 16px box it would be 1.67px. The tick spans half the
-     stencil, so it still sits inside the box with room on every side. */
-  mask-size: var(--helix-size-checkbox);
+  mask-size: contain;
 }
 
 :host(:state(has-indicator)) [part~="item"]::after {

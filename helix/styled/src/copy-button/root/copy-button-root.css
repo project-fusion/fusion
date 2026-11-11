@@ -80,7 +80,7 @@ slot[hidden] {
    Measured: both glyphs rendered, both took the right color, and both came out
    0x0, so the button was a correctly sized box containing nothing.
 
-   **At Icon Button's glyph, 16 at `sm` and `md` and 20 at `lg`.** The
+   **At Icon Button's glyph, 12 at `sm`, 16 at `md` and 20 at `lg`.** The
    region's icon step drew the clipboard 20 at `md` beside an Icon Button's 16
    in the same row, and 24 at `lg` beside 20. */
 slot > svg {

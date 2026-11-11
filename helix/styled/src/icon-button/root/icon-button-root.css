@@ -1,22 +1,20 @@
 :host {
-  /* The region's tight icon step, and never under `size-icon-sm`, read here and
-     handed to the glyph below. */
-  --_icon-button-glyph: max(var(--helix-size-icon-tight), var(--helix-size-icon-sm));
+  /* The region's tight icon step, read here and handed to the glyph below. */
+  --_icon-button-glyph: var(--helix-size-icon-tight);
   --_icon-button-size: var(--icon-button-size, var(--helix-size-control));
   display: inline-flex;
 }
 
-/* **The glyph a field draws**, a step under the region's icon: 16 at `md` and
-   20 at `lg`, as a Select's caret and an Input's clear mark are. At the
-   region's own step the plus drew 20 in a 40 button beside a field's 16 and a
-   Button's 14 in one row.
+/* **The glyph a field draws**, a step under the region's icon: 12 at `sm`, 16
+   at `md` and 20 at `lg`, as a Select's caret and an Input's clear mark are.
+   At the region's own step the plus drew 20 in a 40 button beside a field's 16
+   and a Button's 14 in one row.
 
-   **Never under 16, so a small bar keeps a legible mark.** A Toolbar or an App
-   Header sits at `sm`, where the field step is 12, and a 12 glyph in a 32
-   button read thin beside the bar's 14 pixel words. Decided by the owner on
-   November 4, 2026. The step the glyph falls back to, on the glyph, so an
-   `--icon-size` set on the button or around it, as a crumb sets one, still
-   sizes it. */
+   **Three sizes, three glyphs.** A floor of 16 drew `sm` and `md` alike, and
+   the owner put `sm` back at 12 in November 2026. A Toolbar and an App Header
+   raise their own tight step to 16, so the bars keep a 16 pixel glyph. The
+   step the glyph falls back to, on the glyph, so an `--icon-size` set on the
+   button or around it, as a crumb sets one, still sizes it. */
 ::slotted(*) {
   --helix-size-icon: var(--_icon-button-glyph);
   --helix-size-icon-loose: round(calc(var(--helix-size-icon) * 1.2), 2px);

@@ -133,7 +133,7 @@
    `md` and `lg`, and hung from its top: measured, the mark's center 2 pixels
    under the first line's at `lg`.
 
-   **Never under 16, as an Icon Button's glyph is not.** The tight step is 12
+   **Never under 16.** The tight step is 12
    at `sm`, and the tone's mark inked about 10 pixels beside the text it
    introduces; 16 still fits the 18 pixel line there. The offset is rounded to
    a whole pixel: a 20 pixel mark on the 21 pixel line at `lg` stood half a

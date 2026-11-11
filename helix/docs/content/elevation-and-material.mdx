@@ -96,8 +96,10 @@ axes](./visual-axes).
 | `transparent` | None | None |
 
 Every family that takes `material` draws `glass` at the same coverage, a Dialog
-and a Drawer included. `--helix-material-opacity` scales every coverage
-together.
+and a Drawer included, except App Header. Its glass is `material-translucent`,
+30% white in light mode and 72% of the dark ground in dark mode, so a bar across
+the page lets more of what scrolls under it show. `--helix-material-opacity`
+scales every coverage together.
 
 **Use blur with care, because it is expensive.** A `backdrop-filter` makes the
 compositor read what is behind the element again on every frame the element
