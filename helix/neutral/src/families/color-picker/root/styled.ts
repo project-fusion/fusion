@@ -299,6 +299,10 @@ export default styles(
           borderRadius: token('radii-full'),
           marginInline: 'auto',
           maxInlineSize: hook.wheelSize,
+          /* Clipped to the circle, which the band and the mark sit inside: a
+             turned square reaches past the box it turns in, and at 280 the page
+             scrolled sideways by 34 pixels. */
+          overflow: 'clip',
           position: 'relative',
           web: { cursor: 'crosshair', display: 'grid', placeItems: 'center', touchAction: 'none' },
         }),
@@ -540,6 +544,10 @@ export default styles(
               hue300,
               hue360,
             ),
+            /* The thumb is the hue it stands on, in the white ring the square's
+               mark wears, so the mark says the hue it chose. */
+            '--slider-thumb-color': fn('hsl', [measured('color-picker-hue', 0), '100%', '50%']),
+            '--slider-thumb-ring-color': token('color-foreground-media'),
           }),
         ]),
       ]),
