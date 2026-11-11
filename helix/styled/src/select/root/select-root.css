@@ -115,6 +115,11 @@
   border-color: var(--helix-color-focus-ring);
 }
 
+:host([emphasis="ghost"][aria-invalid="true"]) [part="trigger"]:focus-visible {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
 /* One line, cut rather than wrapped, so a long answer does not make the closed
    control taller than the fields beside it. */
 [part="value"] {
@@ -274,5 +279,42 @@ slot[name="end"]::slotted(*) {
 @media print {
   :host {
     print-color-adjust: exact;
+  }
+}
+
+/* The underline of a `ghost` select at rest, from this family's hook, and its
+   mark only under the pointer or with focus, so a column of choices reads as
+   a column of words. */
+:host([emphasis="ghost"]) [part="trigger"] {
+  font-weight: inherit;
+}
+
+:host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
+  background-image: radial-gradient(
+    circle,
+    var(--_select-ghost-dots, transparent) 0.75px,
+    transparent 1px
+  );
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  background-size: 4px 2px;
+  flex: 0 1 auto;
+}
+
+:host([emphasis="ghost"]:not(:focus-within)) [part="trigger"] {
+  justify-content: var(--select-ghost-align, start);
+}
+
+:host {
+  --_select-ghost-dots: var(--select-ghost-underline, transparent);
+}
+
+:host([emphasis="ghost"]:not(:hover, :focus-within)) [part="indicator"] {
+  visibility: hidden;
+}
+
+@media (pointer: coarse) {
+  :host {
+    --_select-ghost-dots: var(--select-ghost-underline, var(--helix-color-foreground-subtle));
   }
 }

@@ -38,6 +38,7 @@ import {
   internalsOf,
   MIRROR_RULE,
   MixinCollection,
+  markMatches,
   markRegion,
   numberConverter,
   onAndroid,
@@ -71,6 +72,7 @@ import {
 import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 /* `static-html`'s `html`, because the pagination's tag is interpolated: a
@@ -84,18 +86,53 @@ import { edgeOf } from '../../table/edge.js'
 import { droppedAt } from '../../table/fit.js'
 import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
+import '../../date-input/index.js'
 import '../../divider/index.js'
+import '../../input/index.js'
 import '../../menu/index.js'
+import '../../number-input/index.js'
+import '../../option/index.js'
 import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import '../../pagination/index.js'
+import '../../select/index.js'
+import { checkEdit, type EditProblem, readEdit, withValue } from '../edit.js'
 import {
+  HelixBeforeCellCommitEvent,
+  HelixBeforeCellEditEvent,
   HelixBeforeColumnToggleEvent,
+  HelixBeforeExportEvent,
   HelixBeforeFollowEvent,
+  HelixBeforeViewChangeEvent,
+  HelixCellCommitEvent,
+  HelixCellEditEvent,
   HelixColumnToggleEvent,
+  HelixExportEvent,
   HelixFollowEvent,
+  HelixViewChangeEvent,
 } from '../events/index.js'
+import { EXPORT_TYPES, type ExportData, type ExportOptions, exportText } from '../export.js'
 import { toggledOpen } from '../keys.js'
 import { type Grown, grow } from '../tree.js'
+import {
+  type ColumnType,
+  type DataTableView,
+  emptyView,
+  type Facet,
+  type FilterColumn,
+  type FilterOperatorInfo,
+  facetsOf,
+  mergeView,
+  operatorsFor,
+  type PartialView,
+  type PinEdge,
+  passesAll,
+  readPartialView,
+  readView,
+  sameView,
+  textOf,
+  type ViewFilter,
+  viewJson,
+} from '../view.js'
 
 /** What makes an element a control the grid moves focus into, whatever its tab index. */
 const CONTROL = [
@@ -107,6 +144,9 @@ const CONTROL = [
   '[contenteditable]:not([contenteditable="false"])',
   '[tabindex]',
 ].join(',')
+
+/** What a column holds, for its filters: its `type` where it has one, and text otherwise. */
+const columnTypeOf = (column: HelixHeadlessTableColumn): ColumnType => column.type ?? 'text'
 
 /** Whether an element inside a cell is a control a reader can work. */
 const isControl = (element: HTMLElement): boolean =>
@@ -186,6 +226,11 @@ const isControl = (element: HTMLElement): boolean =>
  * | Control with Home or End | Moves to the first or the last cell of the grid. |
  * | Page Down, Page Up | Moves by the rows that fit in view. |
  * | Enter, F2 | Moves into the cell's controls. Escape moves back to the cell, and Tab moves between the controls of one cell. |
+ * | Enter, F2, or a character on an editable cell, or a double click, or a click, or a double click with `edit-on="double-click"` | Opens the cell for an edit. A character starts the field with what you typed. |
+ * | Enter in an open cell | Saves and moves down a row. |
+ * | Tab, Shift with Tab in an open cell | Saves and moves to the next or the previous cell. |
+ * | Escape in an open cell | Puts the old value back and closes the cell. |
+ * * | Space, Enter on an editable boolean cell | Toggles its checkbox in place. |
  * | Enter, Space on a sortable heading | Sorts by the column. |
  * | Enter, Space on the `load-more` row | Sends `helix-load-more`. |
  * | Space on a row | Selects the row, in a `selectable` table. Under `selection-behavior="replace"`, selects it alone, and Control or Command with Space adds or takes out the row. |
@@ -193,6 +238,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | Shift with Down or Up | Selects the rows it moves across, in a `selectable` table. |
  * | Shift with Space | Selects every row from the one last chosen, in a `selectable` table. |
  * | Control or Command with A | Selects every row, in a `selectable` table. |
+ * | Control or Command with C | Copies the selected rows as TSV under their headings, or the value in the cell with focus where no row is selected. |
  * | Right on a row header in a tree grid | Opens a closed row, and moves one cell along an open one. |
  * | Left on a row header in a tree grid | Closes an open row, and moves to the parent of a closed one. |
  * | A letter or a word | Moves to the next row whose row header starts with what you typed. |
@@ -273,6 +319,26 @@ const isControl = (element: HTMLElement): boolean =>
  * nothing while a `sort` is set, since the sort decides the order, and a tree
  * grid draws none.
  *
+ * **Editable cells.** `editable` on a column lets a reader edit its cells,
+ * and `rowEditable` decides row by row. The column's `type` picks the field:
+ * text, a number, a date, or a select of an enum's values, and a boolean
+ * toggles in place. A column's `editor` draws a field of your own. The value
+ * is checked against `required`, `min`, `max`, `pattern` and `validate`, and a
+ * refused value keeps the cell open with the message. `helix-before-cell-edit`
+ * asks before a cell opens, `helix-before-cell-commit` before a value is saved,
+ * and its `waitUntil` holds the save for a check on your server while the cell
+ * shows that it is saving. Then the table writes a copy of the row into `rows`
+ * and fires `helix-cell-commit`. `batch-edits` holds the saved cells as
+ * unsaved changes, marked in their corners, until a bar under the grid saves
+ * or discards them. Editing is not offered in a tree grid.
+ *
+ * **Export.** `exportRows` writes the rows as CSV, TSV or JSON, with a choice
+ * of the selected, filtered or all rows, the visible or all columns, and the
+ * values as shown or raw. `download` saves them as a file, and asks first with
+ * `helix-before-export`, which a server can take. `TableExport` is a panel
+ * that asks a reader each choice. XLSX is its own entry, so set `xlsx` to the
+ * `toXlsx` it exports to offer it.
+ *
  * `csv()` returns the result as text: every row that passes the filter, in the
  * order and the columns on screen. Saving the file is up to you.
  *
@@ -306,17 +372,25 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot error - Content shown after `error-text` while it is set, such as a button that tries again.
  * @slot footer - Content below the grid. It replaces the built-in pagination.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
+ * @slot selection - Content that takes the toolbar's place while rows are selected, such as a `SelectionBar` with what you can do to them.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
+ * @event {HelixBeforeCellCommitEvent} helix-before-cell-commit - A cell's new value is about to be saved. Cancelable: cancel it to keep the old value, or pass a check to `detail.waitUntil`.
+ * @event {HelixBeforeCellEditEvent} helix-before-cell-edit - A cell is about to open for an edit. Cancelable: cancel it to keep the cell closed.
  * @event {HelixBeforeColumnToggleEvent} helix-before-column-toggle - A column is about to be hidden or shown, with its `field` and `hidden`. Cancelable: cancel it to keep the column as it is.
+ * @event {HelixBeforeExportEvent} helix-before-export - A file of the rows is about to be made, from Export or `download`, with the choices, the file's name, and the view. Cancelable: cancel it to make the file on your server.
  * @event {HelixBeforeFilterEvent} helix-before-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
  * @event {HelixBeforeFollowEvent} helix-before-follow - A press on a link in a cell is about to load its page, in this tab and on this site. Cancelable: cancel it to keep the page, and hand `detail.href` to your router.
  * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
  * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
+ * @event {HelixBeforeViewChangeEvent} helix-before-view-change - The view is about to change, with the whole view it would leave in `detail.view` and as JSON in `detail.value`. Sent before the event for the part that changes. Cancelable: cancel it to keep the view, and set `view`, `rows` and `total` from your server.
+ * @event {HelixCellCommitEvent} helix-cell-commit - Fired after a cell's new value is saved into a copy of its row in `rows`.
+ * @event {HelixCellEditEvent} helix-cell-edit - Fired after a cell opens for an edit.
  * @event {HelixColumnToggleEvent} helix-column-toggle - Fired after a column is hidden or shown, with its `field` and `hidden`.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
+ * @event {HelixExportEvent} helix-export - Fired as the browser saves a file of the rows, with the same detail.
  * @event {HelixFilterEvent} helix-filter - Fired after the search query changes, with the new query.
  * @event {HelixFollowEvent} helix-follow - Fired as the browser loads the page a link in a cell names, with its path.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
@@ -324,12 +398,24 @@ const isControl = (element: HTMLElement): boolean =>
  * @event {HelixReorderEvent} helix-reorder - Fired after the columns move, with `kind` set to `column` and every field in the new order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
  * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with every selected key, separated by commas.
  * @event {HelixSortEvent} helix-sort - Fired after the sort order changes, with the new order.
+ * @event {HelixViewChangeEvent} helix-view-change - Fired after the view changes, with the whole view in `detail.view` and as JSON in `detail.value`.
  *
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
  * @csspart cell - One cell.
+ * @csspart cell-boolean - Added to `cell` in an editable boolean column, which holds a checkbox that toggles in place.
+ * @csspart cell-editable - Added to `cell` in a column a reader can edit.
+ * @csspart cell-editing - Added to `cell` while it is open for an edit.
+ * @csspart cell-field - Added to `cell` in an editable column that draws its field at rest, as every one does that has no `cell` or `editor` of its own.
  * @csspart cell-header - Added to `cell` for a cell of the row header column.
+ * @csspart cell-invalid - Added to `cell` while its value breaks a rule, beside `cell-message`.
+ * @csspart cell-message - The message for a value a rule refuses, inside the open cell. The field names it as its description.
+ * @csspart cell-pinned-end - Added to `cell` in a column the view pins to the end of the row.
+ * @csspart cell-pinned-start - Added to `cell` in a column the view pins to the start of the row.
+ * @csspart cell-saving - Added to `cell` while a check the page passed to `waitUntil` is under way.
+ * @csspart cell-saving-mark - Says a cell is saving, inside it. Read by a screen reader, and drawn as a mark in the styled tier.
  * @csspart cell-selected - Added to `cell` in a selected row.
+ * @csspart cell-unsaved - Added to `cell` while its change is held unsaved, under `batch-edits`.
  * @csspart checkbox - A row's checkbox, or the checkbox in the heading that selects every row.
  * @csspart checkbox-box - The box drawn for the checkbox's input.
  * @csspart checkbox-control - The checkbox's input.
@@ -342,6 +428,37 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart checkbox-mark-dash - Added to `checkbox-mark` while it draws the dash, which it keeps until its box is checked.
  * @csspart checkbox-mark-indeterminate - Added to `checkbox-mark` while only some rows are selected.
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the row is let go, with `reorderable-rows`. A column's grip moves the column itself. Hidden from assistive technology.
+ * @csspart editor - The field an open cell edits in: an `Input`, a `NumberInput`, a `DateInput`, or a `Select`, as the column's `type` picks.
+ * @csspart editor-feedback - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-hint - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-indicator - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-label - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox - Forwarded from the select an enum cell opens in: its list.
+ * @csspart editor-listbox-empty - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-error - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-feedback - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-filter-icon - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-filter-mark - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-hint - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-items - Forwarded from the select an enum cell opens in: the options in its list.
+ * @csspart editor-listbox-label - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-live - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-loading - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-listbox-search - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-search-field - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-voice - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-voice-level - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-voice-level-canvas - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-voice-listening - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-listbox-voice-status - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no search or voice.
+ * @csspart editor-live - Forwarded from the select an enum cell opens in. Not shown in the cell, whose select has no label, hint, search, or voice.
+ * @csspart editor-surface - Forwarded from the select an enum cell opens in: the panel its list opens in.
+ * @csspart editor-trigger - Forwarded from the select an enum cell opens in: the button that opens its list.
+ * @csspart editor-value - Forwarded from the select an enum cell opens in: the value it shows.
+ * @csspart edits - The bar under the grid that saves or discards the unsaved changes, under `batch-edits`.
+ * @csspart edits-count - Says how many changes are unsaved.
+ * @csspart edits-discard - The button that drops every unsaved change.
+ * @csspart edits-save - The button that saves every unsaved change.
  * @csspart empty - Shown when there are no rows, because none arrived or the filter matches none. While rows are loading, the `loading` part is shown in its place.
  * @csspart error - Shown after the rows while `error-text` is set, in place of the empty and loading lines.
  * @csspart footer - The region below the grid.
@@ -407,6 +524,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @cssproperty --data-table-cell-align - The alignment of the cell's column: `start`, `center`, or `end`. Unset when the column sets none. The component writes it on each cell it draws, and the stylesheet reads it. `Table` sets `--table-cell-align` for the same purpose.
  * @cssproperty --data-table-cell-block-align - Where a cell's content sits from top to bottom in a row taller than it: `start`, `center` or `end`. `center` by default. Set it on the table, or on a row through `::part(row)`; a column's `vertical-align` writes it on each of that column's cells, and wins.
  * @cssproperty --data-table-level - How deep a row is in a tree grid, from 1. The component writes it on each row header cell, and the stylesheet indents by it.
+ * @cssproperty --data-table-pin-offset - How far a pinned column's cell stays from its end of the row, in pixels: the width of the pinned columns before it. The component writes it on each cell of a pinned column, and the stylesheet reads it.
  * @cssproperty --data-table-template - The column track list, worked out from the columns. The component writes it inline on the element that reads it, so setting it has no effect. Set a column's `width` to change it.
  *
  * @cssstate empty - While there are no rows to show and none are loading.
@@ -451,6 +569,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'ascending-label' })
   ascendingLabel = 'ascending'
+
+  /**
+   * Holds each saved cell as an unsaved change, marked in its corner, and
+   * draws a bar under the grid that saves or discards every one at once.
+   * Off, a cell saves as you leave it.
+   */
+  @property({ attribute: 'batch-edits', type: Boolean })
+  batchEdits = false
 
   /**
    * What screen readers hear when a held row is put back, or a move is
@@ -542,6 +668,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   defaultSort = ''
 
   /**
+   * The starting view, as JSON, such as `{"sort":"due:asc","columns":{"hidden":["notes"]}}`.
+   * The parts it names are put in force once, before the table first draws,
+   * and `view` holds them after.
+   */
+  @property({ attribute: 'default-view' })
+  defaultView = ''
+
+  /**
    * The word for a descending sort, in a `sorted-label` that writes `{order}`.
    *
    * @deprecated Write the whole sentence for each order in `sorted-label`, with
@@ -552,10 +686,25 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'descending-label' })
   descendingLabel = 'descending'
 
+  /** The words on the bar's button that discards the unsaved changes, with `batch-edits`. */
+  @words
+  @property({ attribute: 'discard-edits-label' })
+  discardEditsLabel = 'Discard'
+
   /** What screen readers hear when a row is dropped, with `reorderable-rows`. */
   @words
   @property({ attribute: 'dropped-label' })
   droppedLabel = 'Dropped'
+
+  /**
+   * What opens an editable cell that draws no field at rest, because its
+   * column sets `cell` or `editor`: `click`, where a single press opens it, or
+   * `double-click`, a spreadsheet's way. Every other editable cell is its
+   * field already, which a press reaches. Enter, F2, and typing open a cell
+   * either way, and a boolean cell toggles on one press whatever this says.
+   */
+  @property({ attribute: 'edit-on' })
+  editOn: 'click' | 'double-click' = 'click'
 
   /**
    * The text shown and announced when the rows could not load, such as "The
@@ -656,6 +805,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property()
   locale = ''
 
+  /** The message for an edited cell over its column's `max`. `{max}` is the largest value. */
+  @words
+  @property({ attribute: 'max-message' })
+  maxMessage = 'Enter {max} or less.'
+
+  /** The message for an edited cell under its column's `min`. `{min}` is the smallest value. */
+  @words
+  @property({ attribute: 'min-message' })
+  minMessage = 'Enter {min} or more.'
+
   /**
    * Where filtering, sorting, and paging happen. `client` does them in the
    * table, and `server` leaves them to your code.
@@ -701,6 +860,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'next-label' })
   nextLabel = 'Next page'
+
+  /** The message for an edited number cell that holds something other than a number. */
+  @words
+  @property({ attribute: 'number-message' })
+  numberMessage = 'Enter a number.'
 
   /**
    * The column order, as field names separated by spaces.
@@ -793,6 +957,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'pagination-label' })
   paginationLabel = 'Pagination'
 
+  /** The message for an edited cell that does not match its column's `pattern`. */
+  @words
+  @property({ attribute: 'pattern-message' })
+  patternMessage = 'Enter a value in the form this column takes.'
+
   /**
    * What screen readers hear when a key or a click picks up a row, with
    * `reorderable-rows`. `{name}` is the row's name.
@@ -822,6 +991,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ attribute: 'reorderable-rows', type: Boolean })
   reorderableRows = false
 
+  /** The message for an edited `required` cell left empty. */
+  @words
+  @property({ attribute: 'required-message' })
+  requiredMessage = 'Enter a value.'
+
   /**
    * What screen readers hear when a search leaves one row, where
    * `results-label` should not say it. `{count}` is the count.
@@ -833,14 +1007,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   resultLabel?: string
 
   /**
-   * What screen readers hear when a search narrows the rows. `{count}` is how
-   * many rows are left, written in the locale, and each language writes the
-   * forms it has: `{count, plural, one {# wiersz} few {# wiersze} many
-   * {# wierszy} other {# wiersza}}`.
+   * What screen readers hear when a search or a filter narrows the rows.
+   * `{count}` is how many rows are left and `{total}` how many there are,
+   * written in the locale, and each language writes the forms it has:
+   * `{count} z {total, plural, one {# wiersza} other {# wierszy}}`.
    */
   @words
   @property({ attribute: 'results-label' })
-  resultsLabel = '{count, plural, one {# result} other {# results}}'
+  resultsLabel = '{count} of {total, plural, one {# row} other {# rows}}'
 
   /** The name of the heading over the row grips, with `reorderable-rows`. */
   @words
@@ -898,6 +1072,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: false })
   rows: readonly DataRow[] = []
+
+  /** The words on the bar's button that saves the unsaved changes, with `batch-edits`. */
+  @words
+  @property({ attribute: 'save-edits-label' })
+  saveEditsLabel = 'Save'
+
+  /** What a screen reader hears beside a cell that is saving. */
+  @words
+  @property({ attribute: 'saving-label' })
+  savingLabel = 'Saving'
 
   /**
    * Adds a column of checkboxes for selecting rows.
@@ -1023,36 +1207,63 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   @property({ converter: numberConverter('total', 0) })
   total = 0
 
+  /** What the bar says, with `batch-edits`. `{count}` is how many changes are unsaved. */
+  @words
+  @property({ attribute: 'unsaved-label' })
+  unsavedLabel = '{count, plural, one {# unsaved change} other {# unsaved changes}}'
+
   /** What screen readers hear when the table stops being sorted. */
   @words
   @property({ attribute: 'unsorted-label' })
   unsortedLabel = 'Not sorted'
 
   /**
-   * Draws only the rows in view, with empty space in place of the rest.
+   * Everything a reader can change about how the rows are shown, as one value:
+   * the search in `query`, the column `filters`, the `sort`, the `columns`'
+   * order, hidden fields, pinned ends and widths, and the `pageSize`.
    *
-   * **Not a `mode`.** `mode` says where the rows come from and who filtered
-   * them; this says how many of the ones we hold get drawn. They are
-   * independent: a consumer fetching five thousand rows a chunk at a time wants
-   * `mode="server"` and this at once, and folding this into `mode` would be an
-   * API that forbids that combination for no reason.
+   * It round-trips as JSON, so a page can keep it in a URL or in storage and
+   * set it back. A property only, being an object: `default-view` seeds it
+   * from JSON in markup. `sort`, `filter`,
+   * `order`, `page-size` and each column's `hidden` are parts of it, and
+   * setting one changes the view.
    *
-   * **Composes with `paginated` rather than excluding it.** A window over a
-   * page is coherent -- the page is the slice of the result, the window is the
-   * part of that slice on screen -- and the arithmetic is the same either way,
-   * so there is nothing to forbid. Together they suit a table paging at a
-   * thousand rows, where the page is a reasonable fetch and a poor render.
+   * A reader's change to any part fires `helix-before-view-change` with the
+   * whole view it would leave, before the event for that part. Refuse it to
+   * keep the view, fetch the rows from a server, and set `view`, `rows` and
+   * `total` yourself. `helix-view-change` follows a change nobody refused.
+   * Setting `view` fires neither.
    *
-   * Off by default. Windowing costs a scroll listener, a measurement per row
-   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
-   * should pay none of them.
-   *
-   * While windowed, the `table` part scrolls on this tier: it carries
-   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
-   * every shadow root. You still need to give it a block size.
+   * Filters on different columns all have to match, and a filter's values
+   * are any of. A filter on a field no column declares is left out, and a
+   * tree grid filters by its search alone.
    */
-  @property({ reflect: true, type: Boolean })
-  windowed = false
+  @property({ attribute: false })
+  get view(): DataTableView {
+    const hidden =
+      this.hiddenWanted ??
+      this.tableColumns
+        .filter((column) => column.field !== '' && !column.shown)
+        .map((column) => column.field)
+    return {
+      columns: {
+        hidden: [...hidden],
+        order: writtenList(this.order),
+        pinned: { ...this.pinnedState },
+        widths: { ...this.widthsState },
+      },
+      filters: this.filtersState.map((filter) => ({ ...filter, values: [...filter.values] })),
+      pageSize: this.pageSize,
+      query: this.filter,
+      sort: this.sort,
+    }
+  }
+
+  set view(next: DataTableView | PartialView) {
+    const previous = this.view
+    this.applyView(mergeView(emptyView(), readView(next)))
+    this.requestUpdate('view', previous)
+  }
 
   @state()
   private sortState: string | undefined = undefined
@@ -1071,6 +1282,33 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   @state()
   private orderState: string | undefined = undefined
+
+  @state()
+  private filtersState: readonly ViewFilter[] = []
+
+  /** The cell open for an edit: its row, its field, what is typed, and the message a rule gave. */
+  @state()
+  private editing: { draft: unknown; field: string; message: string; row: DataRow } | undefined =
+    undefined
+
+  /** The edits not yet in `rows`: saving, or held unsaved under `batch-edits`, by row and field. */
+  @state()
+  private edits: ReadonlyMap<
+    DataRow,
+    ReadonlyMap<string, { previous: unknown; state: 'saving' | 'unsaved'; value: unknown }>
+  > = new Map()
+
+  /** Whether the next update moves focus into the open cell's field. */
+  private editFocus: 'end' | 'select' | undefined = undefined
+
+  @state()
+  private pinnedState: Readonly<Record<string, PinEdge>> = {}
+
+  @state()
+  private widthsState: Readonly<Record<string, string>> = {}
+
+  /** The rows that passed the filters last, kept against what they were filtered by. */
+  private passed: { key: string; source: readonly DataRow[]; value: readonly DataRow[] } | undefined
 
   @state()
   private selectedState: string | undefined = undefined
@@ -1317,7 +1555,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   private tree(): Grown {
     const axes = this.axes
     const server = this.mode === 'server'
-    const query = server ? '' : this.filter
+    const query = server ? '' : this.query
     const spec = server ? '' : this.sort
     const key = [
       query,
@@ -1370,12 +1608,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   private arrange(): Arranged {
     const axes = this.axes
-    const key = `${this.filter}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
-    if (this.held?.key === key && this.held.source === this.rows) {
+    const key = `${this.query}\u0000${this.sort}\u0000${axes.map((axis) => axis.field).join('\u0001')}`
+    const source = this.source
+    if (this.held?.key === key && this.held.source === source) {
       return this.held.value
     }
-    const value = arranged(this.rows, axes, { query: this.filter, spec: this.sort })
-    this.held = { key, source: this.rows, value }
+    const value = arranged(source, axes, { query: this.query, spec: this.sort })
+    this.held = { key, source, value }
     return value
   }
 
@@ -1529,7 +1768,27 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * sort, which are by field, so showing it again puts it back where it was.
    */
   private get shownColumns(): HelixHeadlessTableColumn[] {
-    return this.orderedColumns.filter((column) => column.shown && !this.dropped.has(column))
+    return this.pinColumns(
+      this.orderedColumns.filter((column) => column.shown && !this.dropped.has(column)),
+    )
+  }
+
+  /**
+   * The columns with the pinned ones moved to their ends: those pinned to the
+   * start first and those pinned to the end last, each keeping its order.
+   */
+  private pinColumns(columns: HelixHeadlessTableColumn[]): HelixHeadlessTableColumn[] {
+    const pinned = this.pinnedState
+    if (Object.keys(pinned).length === 0) {
+      return columns
+    }
+    const at = (edge: PinEdge) => columns.filter((column) => pinned[column.field] === edge)
+    return [...at('start'), ...columns.filter((column) => !pinned[column.field]), ...at('end')]
+  }
+
+  /** Which end a column is pinned to, if it is. */
+  pinOf(field: string): PinEdge | undefined {
+    return this.pinnedState[field]
   }
 
   /** The table's inline size as last measured, or undefined where nothing has measured it, as on a server. */
@@ -1623,8 +1882,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       written.length === 0
         ? this.columns
         : declared
-            .map((column) =>
-              column.width ? column.track : listed[written.indexOf(column)] || column.track,
+            .map(
+              (column) =>
+                this.widthsState[column.field] ||
+                (column.width ? column.track : listed[written.indexOf(column)] || column.track),
             )
             .join(' ')
     /* The grips and the checkboxes take what they need and no more, ahead of
@@ -1709,7 +1970,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * would be this element filtering a page it was handed, which narrows one
    * screen and calls it a search.
    */
-  private get view(): {
+  private get result(): {
     available: number
     matched: number
     page: readonly DataRow[]
@@ -1729,9 +1990,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return { available: page.length, matched: inOrder.length, page, total }
     }
     if (!this.windowed) {
-      const view = ordered(this.rows, this.axes, {
+      const view = ordered(this.source, this.axes, {
         page: this.page,
-        query: this.filter,
+        query: this.query,
         size: this.pageSize,
         spec: this.sort,
       })
@@ -1767,8 +2028,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Read it after you assign `rows` or `filter`, as the count beside a search
    * field. A tree grid counts the rows open now.
    *
-   * Separate from `view` because `pages` needs it and `page` needs `pages`:
-   * asking `view` for it would recurse through the clamp in `page`.
+   * Separate from `result` because `pages` needs it and `page` needs `pages`:
+   * asking `result` for it would recurse through the clamp in `page`.
    */
   get matched(): number {
     if (this.mode === 'server') {
@@ -1777,13 +2038,14 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (this.childField) {
       return this.tree().rows.length
     }
-    const query = this.filter.trim()
+    const query = this.query.trim()
+    const source = this.source
     if (query === '') {
-      return this.rows.length
+      return source.length
     }
     const axes = this.axes
     const needle = query.toLocaleLowerCase()
-    return this.rows.filter((row) =>
+    return source.filter((row) =>
       axes.some((axis) => {
         const value = axis.order(row)
         return value === null || value === undefined
@@ -1813,7 +2075,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * what this replaced.
    */
   protected override get hasRows(): boolean {
-    return this.view.available > 0 || !this.sourceKnown || this.serving
+    return this.result.available > 0 || !this.sourceKnown || this.serving
   }
 
   /**
@@ -1877,12 +2139,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * consumer refuses the local reorder, fetches, and hands back a new set.
    */
   private requestSort(next: string): boolean {
+    if (!this.askView(mergeView(this.view, { sort: next }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
         this.dispatchEvent(new HelixSortEvent({ value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeSortEvent({ value }),
       host: this,
@@ -1906,6 +2172,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         value,
       }
     }
+    if (!this.askView(mergeView(this.view, { columns: { order: [...fields] } }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const moved = detail(value)
@@ -1913,6 +2182,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         this.orderState = value
         this.requestUpdate('order', previous)
         this.dispatchEvent(new HelixReorderEvent(moved))
+        this.toldView()
       },
       event: (value) => new HelixBeforeReorderEvent(detail(value)),
       host: this,
@@ -1933,6 +2203,28 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       host: this,
       next: inRowOrder(keys, this.everyKey).join(','),
     })
+  }
+
+  /** Whether the `selection` slot takes the toolbar's place: rows are selected, and something is in it. */
+  private get selecting(): boolean {
+    return (
+      this.selectable &&
+      this.chosen.size > 0 &&
+      this.knownChildren.some((child) => child.getAttribute('slot') === 'selection')
+    )
+  }
+
+  /**
+   * Selects these rows by key, and no others, as a reader's choice does: it
+   * asks with `helix-before-select`. An empty list clears the selection, which
+   * Clear in a `SelectionBar` does. Returns whether the selection changed.
+   */
+  selectRows(keys: readonly string[]): boolean {
+    const next = new Set(keys)
+    if (next.size === this.chosen.size && [...next].every((key) => this.chosen.has(key))) {
+      return false
+    }
+    return this.requestSelected(next)
   }
 
   /** The keys selected now. */
@@ -2171,6 +2463,180 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Draws only the rows in view, with empty space in place of the rest.
+   *
+   * **Not a `mode`.** `mode` says where the rows come from and who filtered
+   * them; this says how many of the ones we hold get drawn. They are
+   * independent: a consumer fetching five thousand rows a chunk at a time wants
+   * `mode="server"` and this at once, and folding this into `mode` would be an
+   * API that forbids that combination for no reason.
+   *
+   * **Composes with `paginated` rather than excluding it.** A window over a
+   * page is coherent -- the page is the slice of the result, the window is the
+   * part of that slice on screen -- and the arithmetic is the same either way,
+   * so there is nothing to forbid. Together they suit a table paging at a
+   * thousand rows, where the page is a reasonable fetch and a poor render.
+   *
+   * Off by default. Windowing costs a scroll listener, a measurement per row
+   * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
+   * should pay none of them.
+   *
+   * While windowed, the `table` part scrolls on this tier: it carries
+   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
+   * every shadow root. You still need to give it a block size.
+   */
+  @property({ reflect: true, type: Boolean })
+  windowed = false
+
+  /**
+   * The rows and columns an export holds, before they are written: the
+   * headings, the fields, and each row's values.
+   *
+   * - `rows`: `filtered`, the rows that pass the search and the filters, in
+   *   order, by default; `selected`, the selected rows; or `all`.
+   * - `columns`: `visible`, the columns not hidden, by default; or `all`. A
+   *   column left out at a narrow width is kept, so a file is the same at any
+   *   width. A column with no field has no value and is left out.
+   * - `values`: `shown`, what a cell's `cell` reader gives where it is text or
+   *   a number, by default; or `raw`, the field's value in the row.
+   *
+   * In `server` mode the filtered rows are the page the table holds.
+   */
+  exportData(options: ExportOptions = {}): ExportData {
+    const all = options.columns === 'all'
+    const raw = options.values === 'raw'
+    const columns = this.pinColumns(
+      this.orderedColumns.filter((column) => column.field !== '' && (all || column.shown)),
+    )
+    const which = options.rows ?? 'filtered'
+    const rows =
+      which === 'all'
+        ? this.rows
+        : which === 'selected'
+          ? this.selectedRows()
+          : this.mode === 'server' && !this.childField
+            ? this.rows
+            : this.flat().rows
+    const value = (column: HelixHeadlessTableColumn, row: DataRow): unknown => {
+      if (raw) {
+        return valueAt(row, column.field)
+      }
+      const shown = column.read(row)
+      return typeof shown === 'string' ||
+        typeof shown === 'number' ||
+        typeof shown === 'boolean' ||
+        shown instanceof Date
+        ? shown
+        : valueAt(row, column.field)
+    }
+    return {
+      fields: columns.map((column) => column.field),
+      headings: columns.map((column) => column.textContent?.trim() || column.field),
+      rows: rows.map((row) => columns.map((column) => value(column, row))),
+    }
+  }
+
+  /**
+   * Writes an export as text: CSV by default, or TSV or JSON with `format`.
+   * See `exportData` for the rows, columns and values. XLSX is a file and not
+   * text, which `download` writes.
+   */
+  exportRows(options: ExportOptions = {}): string {
+    const format = options.format === 'tsv' || options.format === 'json' ? options.format : 'csv'
+    return exportText(this.exportData(options), format)
+  }
+
+  /**
+   * Saves an export as a file, as a reader's Export does.
+   *
+   * Asks first with `helix-before-export`, which carries the choices, the
+   * name of the file and the view. Cancel it to make the file on a server, as
+   * a table in `server` mode has to. Then the browser saves the file and
+   * `helix-export` follows. `filename` defaults to the table's `label` and
+   * the format's extension. XLSX needs `xlsx`. Returns whether the file was
+   * made here.
+   */
+  download(options: ExportOptions & { filename?: string } = {}): boolean {
+    const format = options.format ?? 'csv'
+    if (format === 'xlsx' && !this.xlsx) {
+      return false
+    }
+    const data = this.exportData(options)
+    const name = (this.label || 'table')
+      .trim()
+      .toLocaleLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, '-')
+    const detail = {
+      columns: options.columns ?? 'visible',
+      count: data.rows.length,
+      filename: options.filename ?? `${name || 'table'}.${format}`,
+      format,
+      rows: options.rows ?? 'filtered',
+      values: options.values ?? 'shown',
+      view: this.view,
+    } as const
+    if (!this.dispatchEvent(new HelixBeforeExportEvent(detail))) {
+      return false
+    }
+    if (typeof document !== 'undefined' && typeof URL.createObjectURL === 'function') {
+      const body: BlobPart =
+        format === 'xlsx' && this.xlsx
+          ? (this.xlsx(data) as BlobPart)
+          : exportText(data, format === 'xlsx' ? 'csv' : format)
+      const url = URL.createObjectURL(new Blob([body], { type: EXPORT_TYPES[format] }))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = detail.filename
+      link.click()
+      setTimeout(() => URL.revokeObjectURL(url))
+    }
+    this.dispatchEvent(new HelixExportEvent(detail))
+    return true
+  }
+
+  /** The selected rows, in the order of the result. */
+  private selectedRows(): readonly DataRow[] {
+    const chosen = this.chosen
+    if (this.rowKey) {
+      return this.flat().rows.filter((row) => chosen.has(this.keyOf(row, -1)))
+    }
+    return this.flat().rows.filter((row, place) => chosen.has(this.keyOf(row, place)))
+  }
+
+  /**
+   * Copies to the clipboard: the selected rows as TSV under their headings,
+   * where some are selected, and otherwise the value in the cell that holds
+   * focus. Control or Command with C in the grid does this.
+   */
+  private copyCells(place: { column: number; row: number }): void {
+    let text: string
+    if (this.chosen.size > 0) {
+      text = this.exportRows({ format: 'tsv', rows: 'selected' })
+    } else {
+      const column = this.shownColumns[place.column - this.lead]
+      const row = this.drawnPage[place.row]
+      if (!column || !row || column.field === '') {
+        return
+      }
+      /* Through the TSV writer, so a pasted cell is guarded as a pasted row is. */
+      text =
+        exportText(
+          { fields: [''], headings: [''], rows: [[this.shownOf(column, row)]] },
+          'tsv',
+        ).split('\r\n')[1] ?? ''
+    }
+    navigator.clipboard?.writeText(text).catch(() => undefined)
+  }
+
+  /** What a cell shows as text, where its reader gives text, and its field's value otherwise. */
+  private shownOf(column: HelixHeadlessTableColumn, row: DataRow): unknown {
+    const shown = column.read(row)
+    return typeof shown === 'string' || typeof shown === 'number' || typeof shown === 'boolean'
+      ? shown
+      : valueAt(row, column.field)
+  }
+
+  /**
    * Returns the result as CSV: every row that matches the filter, in the order
    * and columns shown, under a line of the column headings.
    *
@@ -2207,12 +2673,16 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /** Asks for a different query. */
   private requestFilter(next: string): boolean {
+    if (!this.askView(mergeView(this.view, { query: next }))) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
         this.dispatchEvent(new HelixFilterEvent({ value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeFilterEvent({ value }),
       host: this,
@@ -2236,6 +2706,222 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       host: this,
       next,
     })
+  }
+
+  /**
+   * A function that writes an XLSX file, which `@fusion.dev/helix/data-table/xlsx`
+   * exports as `toXlsx`. Set it to offer XLSX in `download` and in a bound
+   * `TableExport`. It is its own entry, so a table that never writes a
+   * spreadsheet does not carry the writer.
+   */
+  @property({ attribute: false })
+  xlsx: ((data: ExportData) => Uint8Array) | undefined = undefined
+
+  /**
+   * Asks for a different view, as a reader's change does: `helix-before-view-change`,
+   * which can refuse it, then `helix-view-change`. The parts `next` names
+   * replace those parts, whole, and the rest stay, so a preset can name only
+   * its filters. Returns whether the view changed.
+   */
+  requestView(next: PartialView): boolean {
+    const view = mergeView(this.view, next)
+    if (sameView(view, this.view) || !this.askView(view)) {
+      return false
+    }
+    this.applyView(view)
+    this.toldView()
+    return true
+  }
+
+  /** Whether `default-view` has been put in force, which it is once. */
+  private viewSeeded = false
+
+  /** The hidden fields a view named before the columns were known, applied once they are. */
+  private hiddenWanted: readonly string[] | undefined = undefined
+
+  /** Puts every part of a view in force, firing nothing. */
+  private applyView(view: DataTableView): void {
+    this.sortState = view.sort
+    this.filterState = view.query
+    this.orderState = view.columns.order.join(' ')
+    this.pageSizeState = view.pageSize
+    this.filtersState = view.filters
+    this.pinnedState = view.columns.pinned
+    this.widthsState = view.columns.widths
+    this.hiddenWanted = view.columns.hidden
+    this.hideWanted()
+  }
+
+  /** Hides and shows the columns as the view asks, once they are known. */
+  private hideWanted(): void {
+    const wanted = this.hiddenWanted
+    const columns = this.tableColumns
+    if (!wanted || columns.length === 0) {
+      return
+    }
+    this.hiddenWanted = undefined
+    const hidden = new Set(wanted)
+    for (const column of columns) {
+      if (column.field !== '' && column.shown === hidden.has(column.field)) {
+        column.hidden = hidden.has(column.field)
+        column.toggleAttribute('hidden', column.hidden)
+      }
+    }
+  }
+
+  /** Asks whether the view may become `next`. */
+  private askView(next: DataTableView): boolean {
+    return this.dispatchEvent(new HelixBeforeViewChangeEvent({ value: viewJson(next), view: next }))
+  }
+
+  /** Says the view changed. */
+  private toldView(): void {
+    const view = this.view
+    this.dispatchEvent(new HelixViewChangeEvent({ value: viewJson(view), view }))
+  }
+
+  /** What narrows the rows: the search and the filters, as one text to tell a change by. */
+  private get narrowedBy(): string {
+    return `${this.filter}\u0000${JSON.stringify(this.filtersState)}`
+  }
+
+  /**
+   * Every row before the search and the filters narrow them: the rows the
+   * table holds, or `total` in `server` mode.
+   */
+  get everyRowCount(): number {
+    return this.everyRow
+  }
+
+  /** The fields of the columns left out at the table's width, for their `min-table-width`. */
+  get droppedFields(): string[] {
+    return this.orderedColumns
+      .filter((column) => this.dropped.has(column) && column.field !== '')
+      .map((column) => column.field)
+  }
+
+  /**
+   * How many rows a view would show, counted from the rows the table holds:
+   * the view with the parts of `part` laid over it, the way `requestView` lays
+   * them. Quick Filters counts each preset with it. Nothing in `server` mode,
+   * where the table holds one page, and in a tree grid.
+   */
+  countView(part: PartialView): number | undefined {
+    if (this.mode === 'server' || this.childField) {
+      return undefined
+    }
+    const view = mergeView(this.view, part)
+    const needle = view.query.trim().toLocaleLowerCase()
+    const columns = this.filterColumns
+    const searched = this.searchedColumns ?? this.tableColumns.filter((one) => one.field !== '')
+    return this.rows.filter(
+      (row) =>
+        passesAll(row, view.filters, columns) &&
+        (needle === '' ||
+          searched.some((one) => textOf(one.order(row)).toLocaleLowerCase().includes(needle))),
+    ).length
+  }
+
+  /** Every row before the search and the filters narrow them, for "3 of 40 rows". */
+  private get everyRow(): number {
+    return this.mode === 'server' ? Math.max(this.total, this.rows.length) : this.rows.length
+  }
+
+  /** The columns a search reads, where some are marked `searchable`. */
+  private get searchedColumns(): HelixHeadlessTableColumn[] | undefined {
+    const marked = this.tableColumns.filter((column) => column.searchable && column.field !== '')
+    return marked.length > 0 ? marked : undefined
+  }
+
+  /**
+   * The query the ordering helpers search with: the search itself, or nothing
+   * where `searchable` columns were searched already.
+   */
+  private get query(): string {
+    return this.searchedColumns && this.mode !== 'server' && !this.childField ? '' : this.filter
+  }
+
+  /**
+   * The comparisons a column's filter offers, for its `type`. Your own filter
+   * picker can list them.
+   */
+  operatorsOf(field: string): readonly FilterOperatorInfo[] {
+    const column = this.tableColumns.find((one) => one.field === field)
+    return operatorsFor(column ? columnTypeOf(column) : 'text')
+  }
+
+  /**
+   * Every value a column holds, with how many rows hold each, most first.
+   *
+   * Counted over the rows that pass the search and every other column's
+   * filter, so each count is how many rows choosing that value would show. In
+   * `server` mode it counts the rows the table holds.
+   */
+  facetsOf(field: string): Facet[] {
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column) {
+      return []
+    }
+    const others = this.filtersState.filter((filter) => filter.field !== field)
+    const columns = this.filterColumns
+    const needle = this.filter.trim().toLocaleLowerCase()
+    const searched = this.searchedColumns ?? this.tableColumns.filter((one) => one.field !== '')
+    const rows =
+      this.mode === 'server'
+        ? this.rows
+        : this.rows.filter(
+            (row) =>
+              passesAll(row, others, columns) &&
+              (needle === '' ||
+                searched.some((one) =>
+                  textOf(one.order(row)).toLocaleLowerCase().includes(needle),
+                )),
+          )
+    return facetsOf(rows, (row) => column.order(row))
+  }
+
+  /** What the filters need of each column with a field, by field. */
+  private get filterColumns(): Map<string, FilterColumn> {
+    return new Map(
+      this.tableColumns
+        .filter((column) => column.field !== '')
+        .map((column) => [
+          column.field,
+          {
+            field: column.field,
+            type: columnTypeOf(column),
+            value: (row: DataRow) => column.order(row),
+          },
+        ]),
+    )
+  }
+
+  /**
+   * The rows that pass the column filters, which the search and the sort
+   * then work on. In `server` mode the rows are already the result.
+   */
+  private get source(): readonly DataRow[] {
+    const filters = this.filtersState
+    const searched = this.searchedColumns
+    const needle = searched ? this.filter.trim().toLocaleLowerCase() : ''
+    if ((filters.length === 0 && needle === '') || this.mode === 'server' || this.childField) {
+      return this.rows
+    }
+    const columns = this.filterColumns
+    const key = `${JSON.stringify(filters)}\u0000${needle}\u0000${[...columns.values()].map((one) => `${one.field}:${one.type}`).join(',')}`
+    if (this.passed?.key === key && this.passed.source === this.rows) {
+      return this.passed.value
+    }
+    const value = this.rows.filter(
+      (row) =>
+        passesAll(row, filters, columns) &&
+        (needle === '' ||
+          (searched ?? []).some((column) =>
+            textOf(column.order(row)).toLocaleLowerCase().includes(needle),
+          )),
+    )
+    this.passed = { key, source: this.rows, value }
+    return value
   }
 
   /**
@@ -2305,6 +2991,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const rest = [...this.children].filter((child) => !columns.includes(child as never))
     for (const [name, wanted] of [
       ['toolbar', true],
+      ['selection', true],
       ['footer', true],
       ['empty', true],
       ['error', true],
@@ -2366,22 +3053,32 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         : this.unsortedLabel
     } else if (this.hasUpdated && selected !== this.heardSelected) {
       said = formatWords(this, 'selectedLabel', { count: this.chosen.size })
-    } else if (this.hasUpdated && this.filter !== this.heardFilter) {
+    } else if (this.hasUpdated && this.narrowedBy !== this.heardFilter) {
       /* A search narrows the rows under a reader who is in the search field,
          so how many it left is said. None left is the empty text, which the
          region says in place of this. */
       const count = this.matched
-      said = this.resultLabel
-        ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
-        : formatWords(this, 'resultsLabel', { count })
+      said =
+        this.resultLabel && count === 1
+          ? countLabel(count, this.resultLabel, this.resultsLabel, wordsLocale(this))
+          : formatWords(this, 'resultsLabel', { count, total: this.everyRow })
     }
     this.heardSort = sort
     this.heardSelected = selected
-    this.heardFilter = this.filter
+    this.heardFilter = this.narrowedBy
     return said
   }
 
   protected override willUpdate(changed: PropertyValues): void {
+    if (changed.has('defaultView') && this.defaultView && !this.viewSeeded) {
+      this.viewSeeded = true
+      try {
+        this.applyView(mergeView(this.view, readPartialView(JSON.parse(this.defaultView))))
+      } catch {
+        /* Text that is not JSON seeds nothing. */
+      }
+    }
+    this.hideWanted()
     super.willUpdate(changed)
     this.fit()
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
@@ -2424,7 +3121,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
        tree would be a gap a consumer cannot close without knowing to look for
        it. Both stay, since `[hidden]` is a UA rule and a sheet setting `display`
        on these parts outranks it. */
-    markRegion(this.renderRoot, 'toolbar', ['toolbar'])
+    markRegion(this.renderRoot, 'toolbar', this.selecting ? ['selection'] : ['toolbar'])
     /* The footer is not empty while this element is drawing its own pagination
        into it. */
     markRegion(this.renderRoot, 'footer', ['footer'], { occupied: '[part="pagination"]' })
@@ -2455,6 +3152,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       )
     }
     this.servedLast = this.serving
+    this.focusEditor()
+    this.placePins()
+    this.markSearch()
     this.announceSort()
     this.quietControls()
     this.placeFocus()
@@ -2496,6 +3196,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         /* Whether a reader may move it, pushed down for the same reason: the order
            is the table's, and the grip is drawn by the column. */
         column.movable = this.reorderable && column.field !== ''
+        column.pinned = this.pinnedState[column.field]
+        column.pinOffset = this.pinOffsets.get(column.field) ?? 0
         column.menuDrawer = column.field === '' ? undefined : this.drawColumnMenu
         /* A cell of this grid, and its one tab stop when the stop is on it. */
         column.gridCell = true
@@ -2689,15 +3391,24 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (hidden && this.shownFields.length <= 1) {
       return false
     }
+    const now = this.view.columns.hidden.filter((one) => one !== field)
+    if (
+      !this.askView(mergeView(this.view, { columns: { hidden: hidden ? [...now, field] : now } }))
+    ) {
+      return false
+    }
     return requestChange({
       apply: (value) => {
         column.hidden = value
+        /* At once, so the view this sends reads the column's new state. */
+        column.toggleAttribute('hidden', value)
         if (value) {
           this.hiddenByTable.add(field)
         } else {
           this.hiddenByTable.delete(field)
         }
         this.dispatchEvent(new HelixColumnToggleEvent({ field, hidden: value }))
+        this.toldView()
       },
       event: (value) => new HelixBeforeColumnToggleEvent({ field, hidden: value }),
       host: this,
@@ -2739,22 +3450,616 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const block = edgeOf(column.verticalAlign)
     /* The depth goes on the row header, which indents, and holds the toggle. */
     const placed = header && this.childField ? this.tree().placed.get(row) : undefined
+    const pin = this.pinnedState[column.field]
+    const pinnedStart = pin === 'start'
+    const pinnedEnd = pin === 'end'
+    const editable = this.canEdit(column, row)
+    const toggles = editable && column.type === 'boolean'
+    const fielded = editable && this.hasField(column)
+    const open = editable && this.editing?.row === row && this.editing.field === column.field
+    const edit = this.edits.get(row)?.get(column.field)
+    const saving = edit?.state === 'saving'
+    const unsaved = edit?.state === 'unsaved'
+    const message = open ? (this.editing?.message ?? '') : ''
+    const shown = this.shownRow(row)
     const style = [
       edge ? `--data-table-cell-align: ${edge}` : '',
       block ? `--data-table-cell-block-align: ${block}` : '',
       placed ? `--data-table-level: ${placed.level}` : '',
+      pin ? `--data-table-pin-offset: ${this.pinOffsets.get(column.field) ?? 0}px` : '',
     ]
       .filter(Boolean)
       .join('; ')
     return html`<span
-      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}"
+      part="cell${picked ? ' cell-selected' : ''}${header ? ' cell-header' : ''}${pinnedStart ? ' cell-pinned-start' : ''}${pinnedEnd ? ' cell-pinned-end' : ''}${editable ? ' cell-editable' : ''}${fielded ? ' cell-field' : ''}${toggles ? ' cell-boolean' : ''}${open ? ' cell-editing' : ''}${message ? ' cell-invalid' : ''}${saving ? ' cell-saving' : ''}${unsaved ? ' cell-unsaved' : ''}"
       role=${header ? 'rowheader' : 'gridcell'}
       id=${id ?? nothing}
       tabindex=${stop ? '0' : '-1'}
       data-column=${place}
       style=${style || nothing}
-      >${placed?.branch ? this.renderToggle(row, placed.open) : nothing}${column.read(row)}</span
+      >${placed?.branch ? this.renderToggle(row, placed.open) : nothing}${
+        toggles
+          ? this.renderBoolean(column, row, shown)
+          : fielded || open
+            ? this.renderEditor(column, row, message)
+            : column.read(shown)
+      }${saving ? html`<span part="cell-saving-mark" role="status">${this.savingLabel}</span>` : nothing}${
+        message
+          ? html`<span part="cell-message" id="edit-message" role="alert">${message}</span>`
+          : nothing
+      }</span
     >`
+  }
+
+  /**
+   * Whether the column draws its field at rest: it is the cell, as inline text
+   * a click turns into the field's active look. A column with its own `cell`
+   * reader or its own `editor` draws what you gave it, and opens the field when
+   * a reader starts an edit. A boolean draws its checkbox either way.
+   */
+  private hasField(column: HelixHeadlessTableColumn): boolean {
+    return !column.cell && !column.editor && column.type !== 'boolean'
+  }
+
+  /** Every value an enum column holds, most common first, counted once for every cell that asks. */
+  private distinctValues(column: HelixHeadlessTableColumn): { label: string; value: string }[] {
+    if (this.distinct?.rows !== this.rows) {
+      this.distinct = { byField: new Map(), rows: this.rows }
+    }
+    let held = this.distinct.byField.get(column.field)
+    if (!held) {
+      held = facetsOf(this.rows, (row) => column.order(row)).map(({ value }) => ({
+        label: value,
+        value,
+      }))
+      this.distinct.byField.set(column.field, held)
+    }
+    return held
+  }
+
+  private distinct:
+    | { byField: Map<string, { label: string; value: string }[]>; rows: readonly DataRow[] }
+    | undefined = undefined
+
+  /** Whether a reader may edit this column's cell in this row. Not in a tree grid. */
+  private canEdit(column: HelixHeadlessTableColumn, row: DataRow): boolean {
+    return (
+      column.editable &&
+      column.field !== '' &&
+      !this.childField &&
+      (column.rowEditable ? column.rowEditable(row) : true)
+    )
+  }
+
+  /** A row with the edits not yet in `rows` laid over it, as its cells show it. */
+  private shownRow(row: DataRow): DataRow {
+    const edits = this.edits.get(row)
+    if (!edits) {
+      return row
+    }
+    let shown: DataRow = row
+    for (const [field, edit] of edits) {
+      shown = withValue(shown, field, edit.value)
+    }
+    return shown
+  }
+
+  /** A boolean cell, which toggles in place: a checkbox a press or Space flips. */
+  private renderBoolean(
+    column: HelixHeadlessTableColumn,
+    row: DataRow,
+    shown: DataRow,
+  ): TemplateResult {
+    /* The same checkbox a selectable table's rows use, with its own toggle
+       held: the table asks first with `helix-before-cell-commit`, and draws the
+       value that comes back. */
+    return this.renderCheckbox(
+      column.textContent?.trim() || column.field,
+      Boolean(valueAt(shown, column.field)),
+      false,
+      (event) => {
+        event.preventDefault()
+        this.toggleCell(column, row)
+      },
+    )
+  }
+
+  /**
+   * The field for the open cell: the column's own `editor`, or the field its
+   * `type` picks, with what is typed so far and the message a rule gave.
+   */
+  protected renderEditor(column: HelixHeadlessTableColumn, row: DataRow, message: string): unknown {
+    const open = this.editing?.row === row && this.editing.field === column.field
+    const draft = open ? this.editing?.draft : valueAt(this.shownRow(row), column.field)
+    const name = column.textContent?.trim() || column.field
+    if (column.editor) {
+      return column.editor({
+        cancel: () => this.cancelEdit(),
+        commit: (value) => {
+          if (this.editing) {
+            this.editing = { ...this.editing, draft: value }
+            void this.commitEdit()
+          }
+        },
+        row,
+        value: draft,
+      })
+    }
+    /* A reader reaching the field, by a press or a key, opens the cell: it asks
+       first, and a refusal puts focus back on the cell. */
+    const reach = (event: Event) => {
+      if (!this.beginEdit(row, column.field)) {
+        ;(event.currentTarget as HTMLElement).parentElement?.focus()
+      }
+    }
+    const take = (event: Event) => {
+      if (this.editing?.row === row && this.editing.field === column.field) {
+        this.editing = {
+          ...this.editing,
+          draft: (event.target as unknown as { value: unknown }).value,
+        }
+      }
+    }
+    const described = message ? 'edit-message' : nothing
+    const invalid = message ? 'true' : nothing
+    if (column.type === 'enum') {
+      const select = this.tag('select')
+      const items = this.distinctValues(column)
+      return html`<${select}
+        part="editor"
+        exportparts="feedback: editor-feedback, hint: editor-hint, indicator: editor-indicator, label: editor-label, listbox: editor-listbox, listbox-empty: editor-listbox-empty, listbox-error: editor-listbox-error, listbox-feedback: editor-listbox-feedback, listbox-filter-icon: editor-listbox-filter-icon, listbox-filter-mark: editor-listbox-filter-mark, listbox-hint: editor-listbox-hint, listbox-items: editor-listbox-items, listbox-label: editor-listbox-label, listbox-live: editor-listbox-live, listbox-loading: editor-listbox-loading, listbox-search: editor-listbox-search, listbox-search-field: editor-listbox-search-field, listbox-voice: editor-listbox-voice, listbox-voice-level: editor-listbox-voice-level, listbox-voice-level-canvas: editor-listbox-voice-level-canvas, listbox-voice-listening: editor-listbox-voice-listening, listbox-voice-status: editor-listbox-voice-status, live: editor-live, surface: editor-surface, trigger: editor-trigger, value: editor-value"
+        aria-label=${name}
+        .items=${items}
+        .value=${live(String(draft ?? ''))}
+        aria-describedby=${described}
+        aria-invalid=${invalid}
+        @focusin=${reach}
+        @change=${take}
+      ></${select}>`
+    }
+    const tag = this.tag(
+      column.type === 'number' ? 'number-input' : column.type === 'date' ? 'date-input' : 'input',
+    )
+    return html`<${tag}
+      part="editor"
+      aria-label=${name}
+      date-style=${column.type === 'date' ? 'iso' : nothing}
+      data-type=${column.type ?? 'text'}
+      .value=${live(draft === null || draft === undefined ? '' : String(draft))}
+      ?required=${column.required}
+      aria-describedby=${described}
+      aria-invalid=${invalid}
+      @focusin=${reach}
+      @input=${take}
+      @change=${take}
+    ></${tag}>`
+  }
+
+  /** The row key a cell event carries. */
+  private editKey(row: DataRow): string {
+    const place = this.flat().rows.indexOf(row)
+    return this.keyOf(row, place < 0 ? -1 : place)
+  }
+
+  /**
+   * Opens a cell for an edit, as Enter, F2, a double click or typing does.
+   * Asks first with `helix-before-cell-edit`. `typed` starts the field with
+   * those characters in place of the value. Returns whether the cell opened.
+   */
+  editCell(row: DataRow, field: string, typed?: string): boolean {
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column || !this.canEdit(column, row) || column.type === 'boolean') {
+      return false
+    }
+    const value = valueAt(this.shownRow(row), field)
+    const detail = { field, key: this.editKey(row), row, value }
+    if (this.editing?.row === row && this.editing.field === field) {
+      this.editing = { ...this.editing, draft: typed ?? this.editing.draft }
+      this.editFocus = typed === undefined ? 'select' : 'end'
+      return true
+    }
+    if (!this.dispatchEvent(new HelixBeforeCellEditEvent(detail))) {
+      return false
+    }
+    this.editing = { draft: typed ?? value, field, message: '', row }
+    this.editFocus = typed === undefined ? 'select' : 'end'
+    this.dispatchEvent(new HelixCellEditEvent(detail))
+    return true
+  }
+
+  /**
+   * Opens the cell a reader reached with a press or a key, as `editCell` does
+   * for a call. A cell already open is left as it is, and another open cell is
+   * saved first, as leaving it saves it. Returns whether the cell is open.
+   */
+  private beginEdit(row: DataRow, field: string): boolean {
+    const now = this.editing
+    if (now?.row === row && now.field === field) {
+      return true
+    }
+    const column = this.tableColumns.find((one) => one.field === field)
+    if (!column || !this.canEdit(column, row)) {
+      return false
+    }
+    if (now) {
+      void this.commitEdit(0, 0, false)
+    }
+    const value = valueAt(this.shownRow(row), field)
+    const detail = { field, key: this.editKey(row), row, value }
+    if (!this.dispatchEvent(new HelixBeforeCellEditEvent(detail))) {
+      return false
+    }
+    this.editing = { draft: value, field, message: '', row }
+    this.dispatchEvent(new HelixCellEditEvent(detail))
+    return true
+  }
+
+  /** Closes the open cell and puts its old value back, as Escape does. */
+  cancelEdit(): void {
+    const editing = this.editing
+    if (!editing) {
+      return
+    }
+    this.editing = undefined
+    this.focusCell(editing.row, editing.field, 0, 0)
+  }
+
+  /** Moves the grid's tab stop to the cell of a row and a field, by some rows and columns. */
+  private focusCell(row: DataRow, field: string, rows: number, columns: number): void {
+    const at = this.drawnPage.indexOf(row)
+    const column = this.shownColumns.findIndex((one) => one.field === field)
+    if (at < 0 || column < 0) {
+      return
+    }
+    const last = this.drawnPage.length - 1
+    const width = this.width - 1
+    this.moveTo(
+      Math.max(0, Math.min(last, at + rows)),
+      Math.max(0, Math.min(width, column + this.lead + columns)),
+    )
+  }
+
+  /** The words for the rule a value broke. */
+  private problemSaid(problem: EditProblem): string {
+    switch (problem.kind) {
+      case 'max':
+        return formatWords(this, 'maxMessage', { max: problem.max })
+      case 'min':
+        return formatWords(this, 'minMessage', { min: problem.min })
+      case 'number':
+        return this.numberMessage
+      case 'pattern':
+        return this.patternMessage
+      default:
+        return this.requiredMessage
+    }
+  }
+
+  /** Sets one edit's state for a row and field, or takes it away with `undefined`. */
+  private markEdit(
+    row: DataRow,
+    field: string,
+    edit: { previous: unknown; state: 'saving' | 'unsaved'; value: unknown } | undefined,
+  ): void {
+    const next = new Map(this.edits)
+    const fields = new Map(next.get(row))
+    if (edit) {
+      fields.set(field, edit)
+    } else {
+      fields.delete(field)
+    }
+    if (fields.size > 0) {
+      next.set(row, fields)
+    } else {
+      next.delete(row)
+    }
+    this.edits = next
+  }
+
+  /**
+   * Saves the open cell, as Enter, Tab or leaving it does, and moves the tab
+   * stop by `rows` and `columns`. Checks `required`, `min`, `max`, `pattern`
+   * and `validate`, asks with `helix-before-cell-commit`, waits on any check
+   * its listener passed to `waitUntil`, then writes the value into a copy of
+   * the row in `rows` and fires `helix-cell-commit`. Under `batch-edits` the
+   * value is held as an unsaved change. Returns whether the value was saved.
+   */
+  async commitEdit(rows = 0, columns = 0, refocus = true): Promise<boolean> {
+    const editing = this.editing
+    const column = editing
+      ? this.tableColumns.find((one) => one.field === editing.field)
+      : undefined
+    if (!editing || !column) {
+      return false
+    }
+    const { field, row } = editing
+    const type = column.type ?? 'text'
+    const value = readEdit(editing.draft, type)
+    const previous = valueAt(this.shownRow(row), field)
+    if (value === previous || (value === '' && (previous === undefined || previous === null))) {
+      this.editing = undefined
+      if (refocus) {
+        this.focusCell(row, field, rows, columns)
+      }
+      return true
+    }
+    const refuse = (message: string): false => {
+      this.editing = { ...editing, message }
+      this.editFocus = refocus ? 'end' : undefined
+      return false
+    }
+    const problem = checkEdit(value, type, column)
+    if (problem) {
+      return refuse(this.problemSaid(problem))
+    }
+    const checks: PromiseLike<string | undefined | void>[] = []
+    const own = column.validate?.(value, row)
+    if (typeof own === 'string' && own) {
+      return refuse(own)
+    }
+    if (own && typeof (own as PromiseLike<unknown>).then === 'function') {
+      checks.push(own as PromiseLike<string | undefined>)
+    }
+    const detail = {
+      field,
+      key: this.editKey(row),
+      previous,
+      row,
+      value,
+      waitUntil: (check: PromiseLike<string | undefined | void>) => {
+        checks.push(check)
+      },
+    }
+    if (!this.dispatchEvent(new HelixBeforeCellCommitEvent(detail))) {
+      this.cancelEdit()
+      return false
+    }
+    this.editing = undefined
+    if (refocus) {
+      this.focusCell(row, field, rows, columns)
+    }
+    if (checks.length > 0) {
+      this.markEdit(row, field, { previous, state: 'saving', value })
+      let message: string | undefined
+      try {
+        message = (await Promise.all(checks)).find(
+          (one): one is string => typeof one === 'string' && one !== '',
+        )
+      } catch (error) {
+        message = error instanceof Error ? error.message : String(error)
+      }
+      this.markEdit(row, field, undefined)
+      if (message) {
+        this.editing = { draft: value, field, message, row }
+        this.editFocus = refocus ? 'end' : undefined
+        return false
+      }
+    }
+    if (this.batchEdits) {
+      this.markEdit(row, field, { previous, state: 'unsaved', value })
+      return true
+    }
+    this.writeEdit(row, field, value, previous)
+    return true
+  }
+
+  /** Writes a saved value into a copy of its row, and says so. */
+  private writeEdit(row: DataRow, field: string, value: unknown, previous: unknown): void {
+    const next = withValue(row, field, value)
+    const key = this.editKey(row)
+    this.rows = this.rows.map((one) => (one === row ? next : one))
+    this.dispatchEvent(
+      new HelixCellCommitEvent({
+        field,
+        key,
+        previous,
+        row: next,
+        value,
+        waitUntil: () => undefined,
+      }),
+    )
+  }
+
+  /** Flips a boolean cell, asking with `helix-before-cell-commit` as an edit does. */
+  private toggleCell(column: HelixHeadlessTableColumn, row: DataRow): void {
+    if (!this.canEdit(column, row)) {
+      return
+    }
+    const value = !valueAt(this.shownRow(row), column.field)
+    this.editing = { draft: value, field: column.field, message: '', row }
+    void this.commitEdit()
+  }
+
+  /** How many changes are held unsaved, under `batch-edits`. */
+  get unsavedCount(): number {
+    let count = 0
+    for (const fields of this.edits.values()) {
+      for (const edit of fields.values()) {
+        count += edit.state === 'unsaved' ? 1 : 0
+      }
+    }
+    return count
+  }
+
+  /** Writes every unsaved change into `rows`, as the bar's Save does, under `batch-edits`. */
+  saveEdits(): void {
+    const held = [...this.edits].flatMap(([row, fields]) =>
+      [...fields]
+        .filter(([, edit]) => edit.state === 'unsaved')
+        .map(([field, edit]) => ({ edit, field, row })),
+    )
+    for (const { edit, field, row } of held) {
+      this.markEdit(row, field, undefined)
+      const now = this.rows.find((one) => one === row) ?? row
+      this.writeEdit(now, field, edit.value, edit.previous)
+    }
+  }
+
+  /** Drops every unsaved change, as the bar's Discard does, under `batch-edits`. */
+  discardEdits(): void {
+    this.edits = new Map(
+      [...this.edits]
+        .map(
+          ([row, fields]) =>
+            [row, new Map([...fields].filter(([, edit]) => edit.state !== 'unsaved'))] as const,
+        )
+        .filter(([, fields]) => fields.size > 0),
+    )
+  }
+
+  /** The bar that saves or discards every unsaved change, under `batch-edits`. */
+  private renderEdits(): TemplateResult | typeof nothing {
+    const count = this.unsavedCount
+    if (!this.batchEdits || count === 0) {
+      return nothing
+    }
+    return html`<div part="edits">
+      <span part="edits-count">${formatWords(this, 'unsavedLabel', { count })}</span>
+      <button part="edits-save" type="button" @click=${() => this.saveEdits()}>${this.saveEditsLabel}</button>
+      <button part="edits-discard" type="button" @click=${() => this.discardEdits()}>${this.discardEditsLabel}</button>
+    </div>`
+  }
+
+  /** The keys of an open cell's field: Enter and Tab save and move, Escape puts the value back. */
+  private handleEditKey(event: KeyboardEvent): boolean {
+    if (!this.editing || !this.partIn(event, 'editor') || event.defaultPrevented) {
+      return false
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.cancelEdit()
+      return true
+    }
+    if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+      event.preventDefault()
+      void this.commitEdit(1, 0)
+      return true
+    }
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      void this.commitEdit(0, event.shiftKey ? -1 : 1)
+      return true
+    }
+    return true
+  }
+
+  /** The keys on an editable cell that open it, or flip a boolean. */
+  private handleEditableKey(event: KeyboardEvent, place: { column: number; row: number }): boolean {
+    const column = this.shownColumns[place.column - this.lead]
+    const row = this.drawnPage[place.row]
+    if (
+      !column ||
+      !row ||
+      !this.canEdit(column, row) ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
+      return false
+    }
+    if (column.type === 'boolean') {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        this.toggleCell(column, row)
+        return true
+      }
+      return false
+    }
+    if (event.key === 'Enter' || event.key === 'F2') {
+      event.preventDefault()
+      return this.editCell(row, column.field)
+    }
+    if (typesCharacter(event) && event.key !== ' ') {
+      event.preventDefault()
+      return this.editCell(row, column.field, event.key)
+    }
+    return false
+  }
+
+  /** A double click on an editable cell opens it, and a single click does under `edit-on="click"`. */
+  private readonly handleDoubleClick = (event: MouseEvent): void => {
+    if (this.editOn === 'double-click') {
+      this.openFromPress(event)
+    }
+  }
+
+  private readonly handleEditClick = (event: MouseEvent): void => {
+    if (event.detail > 1 || event.shiftKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    /* A cell that is its field opens on one press whatever `edit-on` says:
+       the press is on the field. */
+    if (this.editOn === 'click' || this.partIn(event, 'editor')) {
+      this.openFromPress(event)
+    }
+  }
+
+  /** Opens the editable cell a press landed on, unless it landed on a control inside the cell. */
+  private openFromPress(event: MouseEvent): void {
+    const target = event.composedPath()[0]
+    if (target instanceof HTMLElement && target.closest('a, button, input, select, textarea')) {
+      return
+    }
+    const place = this.placeOf(event)
+    const column = place ? this.shownColumns[place.column - this.lead] : undefined
+    const row = place ? this.drawnPage[place.row] : undefined
+    /* A press inside a field's box but beside its words opens the cell too:
+       a field at rest is as wide as its value, and the rest of its box is
+       still the cell. A press on the words is the field's own. */
+    const open = this.editing?.row === row && this.editing?.field === column?.field
+    if (column && row && !open) {
+      this.editCell(row, column.field)
+    }
+  }
+
+  /** Focus leaving an open cell saves it, as leaving a spreadsheet's cell does. */
+  private readonly handleEditFocusOut = (): void => {
+    const editing = this.editing
+    if (!editing) {
+      return
+    }
+    setTimeout(() => {
+      const active = deepActiveElement()
+      const cell = this.openCell()
+      if (this.editing === editing && !(active && cell && deepContains(cell, active))) {
+        void this.commitEdit(0, 0, false)
+      }
+    })
+  }
+
+  /** The cell open for an edit, once it is drawn. */
+  private openCell(): HTMLElement | null {
+    return this.renderRoot.querySelector<HTMLElement>('[part~="cell-editing"]')
+  }
+
+  /** Puts focus in the open cell's field once it is drawn. */
+  private focusEditor(): void {
+    const how = this.editFocus
+    const editor = this.openCell()?.querySelector<HTMLElement>('[part="editor"]')
+    if (!how || !editor) {
+      return
+    }
+    this.editFocus = undefined
+    /* After the field has drawn its own input, which a field arriving with the
+       cell has not yet: focus sent to it before then has nothing to land on. */
+    const ready =
+      (editor as { updateComplete?: Promise<unknown> }).updateComplete ?? Promise.resolve()
+    void ready.then(() => {
+      if (this.openCell()?.querySelector('[part="editor"]') !== editor) {
+        return
+      }
+      editor.focus()
+      const control = editor.shadowRoot?.querySelector('input')
+      if (control) {
+        const end = control.value.length
+        if (how === 'select') {
+          control.select()
+        } else {
+          control.setSelectionRange?.(end, end)
+        }
+      }
+    })
   }
 
   /**
@@ -3053,7 +4358,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const { available, matched, page } = this.view
+    const { available, matched, page } = this.result
     const serving = this.serves()
     this.serving = serving
     this.drawnPage = serving ? [] : page
@@ -3098,7 +4403,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       columns: columns.length ? columns.length + this.lead : undefined,
       rows: countKnown ? counted + 1 + (this.moreDrawn ? 1 : 0) : undefined,
     }
-    return html`<div part="toolbar"><slot name="toolbar"></slot></div>
+    const selecting = this.selecting
+    return html`<div part="toolbar"
+        ><slot name="toolbar" ?hidden=${selecting}></slot><slot name="selection" ?hidden=${!selecting}></slot
+      ></div>
       <div
         part="table"
         role="rowgroup"
@@ -3145,6 +4453,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         ${this.renderMore(page)}${this.errorText === '' ? this.renderStatus(filled, 'gridcell') : this.renderError()}
       </div>
       ${this.errorText === '' ? this.renderLive(filled) : html`<span part="live" role="status">${this.errorText}</span>`}
+      ${this.renderEdits()}
       <div part="footer" ?data-held=${held}>
         <slot name="footer"></slot>
         ${
@@ -3205,6 +4514,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.renderRoot.addEventListener('focusin', this.handleFocusIn as EventListener)
     this.addEventListener('keydown', this.handleGridKey)
     this.addEventListener('keydown', this.handleGripKey)
+    this.addEventListener('dblclick', this.handleDoubleClick)
+    this.addEventListener('click', this.handleEditClick)
+    this.addEventListener('focusout', this.handleEditFocusOut)
     this.addEventListener('helix-before-resize', this.handleResize)
     /* **A child parsed after the table upgraded is sent to its slot too.** The
        slots are assigned by hand on each update, and markup the parser was
@@ -3254,9 +4566,71 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     this.renderRoot.removeEventListener('focusin', this.handleFocusIn as EventListener)
     this.removeEventListener('keydown', this.handleGridKey)
     this.removeEventListener('keydown', this.handleGripKey)
+    this.removeEventListener('dblclick', this.handleDoubleClick)
+    this.removeEventListener('click', this.handleEditClick)
+    this.removeEventListener('focusout', this.handleEditFocusOut)
     this.removeEventListener('helix-before-resize', this.handleResize)
     this.arrivals?.disconnect()
     this.sizeObserver?.disconnect()
+    markMatches(this, [], '')
+  }
+
+  /** How far each pinned column stays from its end of the row, by field, as last measured. */
+  private pinOffsets: ReadonlyMap<string, number> = new Map()
+
+  /**
+   * Measures the pinned columns and works out how far each stays from its end
+   * of the row: the width of the pinned columns before it on that end. Draws
+   * again only when an offset moved, so it settles.
+   */
+  private placePins(): void {
+    const pinned = this.pinnedState
+    const shown = this.shownColumns
+    const next = new Map<string, number>()
+    for (const edge of ['start', 'end'] as const) {
+      const at = shown.filter((column) => pinned[column.field] === edge)
+      let offset = 0
+      for (const column of edge === 'start' ? at : [...at].reverse()) {
+        next.set(column.field, offset)
+        offset += column.cellBox?.getBoundingClientRect().width ?? 0
+      }
+    }
+    const same =
+      next.size === this.pinOffsets.size &&
+      [...next].every(([field, offset]) => this.pinOffsets.get(field) === offset)
+    if (!same) {
+      this.pinOffsets = next
+      this.requestUpdate()
+    }
+  }
+
+  /**
+   * Paints the search where it matches in the cells it reads, with the Custom
+   * Highlight API, as Find does. Nothing is inserted into a cell, so a cell
+   * your template drew comes back as you wrote it.
+   */
+  private markSearch(): void {
+    const needle = this.filter.trim()
+    if (needle === '' || !this.renderRoot.querySelectorAll) {
+      markMatches(this, [], '')
+      return
+    }
+    const searched = this.searchedColumns
+    const places = new Set(
+      this.shownColumns
+        .map((column, index) =>
+          !searched || searched.includes(column) ? String(index + this.lead) : '',
+        )
+        .filter(Boolean),
+    )
+    const cells = [
+      ...this.renderRoot.querySelectorAll<HTMLElement>('[part~="row"] > [part~="cell"]'),
+    ]
+    markMatches(
+      this,
+      cells.filter((cell) => places.has(cell.dataset.column ?? '')),
+      needle,
+    )
   }
 
   /**
@@ -3661,11 +5035,22 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     if (!place) {
       return
     }
+    if (this.handleEditKey(event)) {
+      return
+    }
     if (event.composedPath()[0] !== place.cell) {
       this.handleControlKey(event, place)
       return
     }
+    if (this.handleEditableKey(event, place)) {
+      return
+    }
     const last = this.drawnPage.length - 1 + (this.moreDrawn ? 1 : 0)
+    if ((event.metaKey || event.ctrlKey) && !event.shiftKey && event.key.toLowerCase() === 'c') {
+      event.preventDefault()
+      this.copyCells(place)
+      return
+    }
     if (!event.shiftKey && selectsAll(event) && this.selectable) {
       event.preventDefault()
       this.requestSelected(new Set([...this.chosen, ...this.everyKey]))

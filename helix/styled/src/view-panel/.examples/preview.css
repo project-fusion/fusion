@@ -1,0 +1,9 @@
+/* The panel as a bottom sheet holds it, at a phone's width. */
+.view-sheet {
+  background-color: var(--helix-color-surface-raised);
+  border-radius: var(--helix-radii-lg) var(--helix-radii-lg) 0 0;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-block-end: var(--helix-space-lg);
+  max-inline-size: 24rem;
+  padding: var(--helix-space-md) var(--helix-space-lg) var(--helix-space-lg);
+}

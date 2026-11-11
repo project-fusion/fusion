@@ -709,3 +709,217 @@ slot[name="error"]::slotted(*) {
 [part~="checkbox"]::part(field) {
   align-items: center;
 }
+
+/* A search's matches, painted by the Custom Highlight API. A highlight takes
+   its look from the tree its text is in, and a cell is in this shadow root,
+   so the rule in `base.css` does not reach it. The same look. */
+::highlight(helix-filter-match) {
+  background-color: transparent;
+  color: var(--helix-color-foreground);
+  text-decoration-color: var(--helix-color-primary);
+  text-decoration-line: underline;
+  text-decoration-thickness: var(--helix-border-thick);
+  text-underline-offset: 0.2em;
+}
+
+/* A pinned column's cells stay at their end of the row while the grid scrolls
+   sideways, on the page's ground so the cells passing under them do not show
+   through. */
+[part~="cell-pinned-start"],
+[part~="cell-pinned-end"] {
+  background-color: var(--data-table-pinned-background-color, var(--helix-color-background));
+  position: sticky;
+  z-index: 1;
+}
+
+[part~="cell-pinned-start"] {
+  inset-inline-start: var(--data-table-pin-offset, 0px);
+}
+
+[part~="cell-pinned-end"] {
+  inset-inline-end: var(--data-table-pin-offset, 0px);
+}
+
+/*
+ *  Editable cells. At rest a cell a reader can edit draws nothing of its own
+ *    until the pointer is on it, when it takes a well and a text cursor. Open,
+ *    it holds the inline field, which rings itself inside the cell, so the row
+ *    stays a control's height.
+ */
+[part~="cell-editable"] {
+  position: relative;
+}
+
+/* A cell that draws no field at rest, because its column draws its own `cell`
+   or `editor`, takes the well and the cursor itself. */
+[part~="cell-editable"]:not(
+  [part~="cell-field"],
+  [part~="cell-editing"],
+  [part~="cell-boolean"]
+):hover {
+  background-color: var(--data-table-editable-hover-background-color, var(--helix-color-well));
+  cursor: text;
+}
+
+@media (pointer: coarse) {
+  [part~="cell-editable"]:not(
+    [part~="cell-field"],
+    [part~="cell-editing"],
+    [part~="cell-boolean"]
+  ) {
+    text-decoration: underline dotted var(--helix-color-foreground-subtle);
+    text-underline-offset: 0.25em;
+  }
+}
+
+/* A cell that is its field: the field is a control's tight height and centered
+   in the row, so the cell keeps no padding of its own, and the field's inset is
+   taken back with a margin so its words line up with the heading and the cells
+   around it. */
+[part~="cell-field"] {
+  padding-block: 0;
+}
+
+/* A checkbox is a box in a line, so it sits on the row's middle. */
+[part~="cell-boolean"] {
+  align-items: center;
+  display: flex;
+}
+
+/* Round dots under each value say the cell can be edited. */
+[part="editor"] {
+  --input-ghost-underline: var(--helix-color-foreground-subtle);
+  --number-input-ghost-underline: var(--helix-color-foreground-subtle);
+  --date-input-ghost-underline: var(--helix-color-foreground-subtle);
+  --select-ghost-underline: var(--helix-color-foreground-subtle);
+  /* The value at its column's edge, which the table writes on each cell. */
+  --input-ghost-align: var(--data-table-cell-align, start);
+  --number-input-ghost-align: var(--data-table-cell-align, start);
+  --date-input-ghost-align: var(--data-table-cell-align, start);
+  --select-ghost-align: var(--data-table-cell-align, start);
+  inline-size: calc(100% + 2 * var(--helix-space-xs));
+  margin-inline: calc(-1 * var(--helix-space-xs));
+  /* A control's tight step, centered in the row, so an active field sits inside
+     its cell with room above and below, and is not the cell's whole height. */
+  --input-size: var(--helix-size-control-tight);
+  --number-input-size: var(--helix-size-control-tight);
+  --date-input-size: var(--helix-size-control-tight);
+}
+
+/* Open, a field that needs more than its column, a date with its calendar,
+   grows over the cell beside it on the page's ground, and the cell stops
+   counting for its column's width so the column does not move. */
+[part~="cell-editing"] {
+  contain: inline-size;
+  padding-block: 0;
+  z-index: 1;
+}
+
+[part~="cell-editing"] > [part="editor"] {
+  background-color: var(--data-table-editing-background-color, var(--helix-color-background));
+}
+
+[part~="cell-editing"] > [part="editor"][data-type="date"] {
+  min-inline-size: 8.5rem;
+}
+
+/* A refused value: the message under the cell, over the rows below it. */
+[part="cell-message"] {
+  background-color: var(--helix-color-surface-raised);
+  border: var(--data-table-message-border-width, var(--helix-border-floating)) solid
+    var(--data-table-message-border-color, var(--helix-color-danger));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--data-table-message-shadow, var(--helix-shadow-floating));
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  inline-size: max-content;
+  inset-block-start: calc(100% + var(--helix-space-2xs));
+  inset-inline-end: 0;
+  max-inline-size: 16rem;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  position: absolute;
+  text-align: start;
+  z-index: var(--helix-layer-raised);
+}
+
+/* Saving: a turning ring at the start of the cell, its words for a screen reader. */
+[part="cell-saving-mark"] {
+  animation: data-table-saving var(--helix-duration-crawl) linear infinite;
+  block-size: var(--helix-size-icon-sm);
+  border: var(--helix-border-thick) solid var(--helix-color-primary);
+  border-inline-end-color: transparent;
+  border-radius: var(--helix-radii-full);
+  color: transparent;
+  font-size: 0;
+  inline-size: var(--helix-size-icon-sm);
+  inset-block-start: calc(50% - var(--helix-size-icon-sm) / 2);
+  inset-inline-start: var(--helix-space-2xs);
+  overflow: hidden;
+  position: absolute;
+}
+
+@keyframes data-table-saving {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="cell-saving-mark"] {
+    animation: none;
+  }
+}
+
+[part~="cell-saving"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* An unsaved change, under `batch-edits`: a wash of the primary and a mark in
+   the corner, so the change reads without its color too. */
+[part~="cell-unsaved"] {
+  background-color: var(--data-table-unsaved-background-color, var(--helix-color-primary-subtle));
+}
+
+[part~="cell-unsaved"]::after {
+  border-block-start: var(--helix-space-xs) solid var(--helix-color-primary);
+  border-inline-start: var(--helix-space-xs) solid transparent;
+  content: "";
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+[part~="cell-unsaved"]:not([part~="cell-editable"]) {
+  position: relative;
+}
+
+[part="edits"] {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-sm);
+  grid-column: 1 / -1;
+  padding-block: var(--helix-space-sm);
+}
+
+[part="edits-save"],
+[part="edits-discard"] {
+  all: unset;
+  box-sizing: border-box;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-primary);
+  cursor: pointer;
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="edits-discard"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+[part="edits-save"]:focus-visible,
+[part="edits-discard"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}

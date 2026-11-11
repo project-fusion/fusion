@@ -119,3 +119,18 @@ slot[name="end"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* The dots under a `ghost` value at rest, in the color this family's hook
+   gives, which a touch screen draws in the subtle foreground when the hook is
+   unset, there being no hover there to say a field can be changed. The value
+   lines up as the hook for its alignment says. */
+:host {
+  --_field-ghost-align: var(--input-ghost-align, start);
+  --_field-ghost-dots: var(--input-ghost-underline, transparent);
+}
+
+@media (pointer: coarse) {
+  :host {
+    --_field-ghost-dots: var(--input-ghost-underline, var(--helix-color-foreground-subtle));
+  }
+}

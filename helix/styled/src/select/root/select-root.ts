@@ -33,6 +33,8 @@ import '../../listbox/index.js'
  * @cssproperty --select-border-color - Color of the panel's edge.
  * @cssproperty --select-border-width - Width of the panel's edge. Defaults to
  *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
+ * @cssproperty --select-ghost-align - Where a `ghost` value sits in its field at rest: `start`, `center`, or `end`. A `DataTable` sets it to its column's edge.
+ * @cssproperty --select-ghost-underline - The color of the round dots under a `ghost` value at rest, which say it can be edited. None by default, and the subtle foreground on a touch screen. A `DataTable` sets it on every editable cell.
  * @cssproperty --select-shadow - Shadow under the panel. Defaults to
  *   `--helix-shadow-floating`, because the panel can sit over any content.
  * @cssproperty --select-surface-max-block-size - Maximum height of the panel.

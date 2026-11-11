@@ -1,0 +1,40 @@
+const rows = [
+  { amount: '$12,400.00', customer: 'Acme Corporation', id: 'INV-2041' },
+  { amount: '$8,250.00', customer: 'Acme Logistics', id: 'INV-2047' },
+  { amount: '$6,980.00', customer: 'Acme Robotics', id: 'INV-2052' },
+]
+
+export function Example() {
+  return (
+    <helix-data-table
+      default-selected="INV-2041,INV-2052"
+      label="Invoices"
+      row-key="id"
+      rows={rows}
+      selectable
+    >
+      <helix-input
+        aria-label="Search invoices"
+        slot="toolbar"
+        type="search"
+      ></helix-input>
+      <helix-selection-bar slot="selection">
+        <helix-button>Archive</helix-button>
+        <helix-button>Export</helix-button>
+      </helix-selection-bar>
+      <helix-table-column
+        field="id"
+        row-header
+      >
+        Invoice
+      </helix-table-column>
+      <helix-table-column field="customer">Customer</helix-table-column>
+      <helix-table-column
+        field="amount"
+        text-align="end"
+      >
+        Amount
+      </helix-table-column>
+    </helix-data-table>
+  )
+}

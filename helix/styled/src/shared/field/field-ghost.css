@@ -1,0 +1,124 @@
+/* `emphasis="ghost"`, the inline field: it reads as text at rest, takes a
+   well under the pointer with a text cursor, and while it is being edited it
+   draws a ring inside its own box, so a field in a table cell or in a line of
+   a details list never grows the row it is in. Compose after `field-frame.css`,
+   which it quiets. Four families take it: Input, Number Input, Date Input and
+   Time Input. Select draws its own. */
+
+:host([emphasis="ghost"]) [part="field"],
+:host([emphasis="ghost"]:not(:disabled, [readonly])) [part="field"]:hover {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+/* The well and the text cursor say the words can be changed, before a press. */
+:host([emphasis="ghost"]:not(:disabled, [readonly], :focus-within)) [part="field"]:hover {
+  background-color: var(--helix-color-well);
+  cursor: text;
+}
+
+/* **A ring inside the box, never an outline around it**, so the field is as tall
+   editing as at rest. The frame's own focus outline is taken away for it. */
+:host([emphasis="ghost"]:focus-within) [part="field"],
+:host([emphasis="ghost"]:focus-within) [part="field"]:hover {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-primary);
+  outline: none;
+}
+
+:host([emphasis="ghost"]:state(invalid)) [part="field"],
+:host([emphasis="ghost"]:state(invalid)) [part="field"]:hover {
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-danger);
+}
+
+/* A value its host's page refuses, which says so as `aria-invalid` where the
+   field's own validity is not what refused it: a table's rule, or a server. */
+:host([emphasis="ghost"][aria-invalid="true"]) [part="field"],
+:host([emphasis="ghost"][aria-invalid="true"]:focus-within) [part="field"] {
+  box-shadow: inset 0 0 0 var(--helix-border-thick) var(--helix-color-danger);
+}
+
+/* **Sized by the place it is in, never by itself.** A field has a resting width
+   of twenty characters, and a number field two buttons besides, which is right
+   on a form and wrong in a table cell: the column's track is as wide as its
+   widest content, so opening an editor widened the column. A ghost field takes
+   what it is given. */
+:host([emphasis="ghost"]) [part="control"]:not([type="file"]) {
+  contain-intrinsic-inline-size: 0;
+}
+
+/* **Dense, at the text around it.** The field's own type is a step over the
+   label's, which suits a form and makes a value in a row look larger than the
+   cells beside it. A ghost field reads at the control size and the weight of
+   its surroundings, and a touch screen keeps the size iOS will not zoom. */
+:host([emphasis="ghost"]) [part="control"] {
+  font-size: var(--helix-text-control);
+  font-weight: inherit;
+  padding-inline: var(--helix-space-xs);
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]) [part="control"] {
+    font-size: max(var(--helix-text-field-min), var(--helix-text-control));
+  }
+}
+
+/* The frame holds a box after the control that carries the twenty characters of
+   resting width, and it is what a column's track measures. */
+:host([emphasis="ghost"]) [part="field"]::after {
+  content: none;
+}
+
+/* The words line up as the place around them does, a column of numbers at its
+   end, where a number field centers its own. */
+:host([emphasis="ghost"]) [part="control"] {
+  text-align: inherit;
+}
+
+/* The ring is the edge, and the text sits a step inside it, so the frame's own
+   inset is taken off and the control's padding is the only one. */
+:host([emphasis="ghost"]) [part="field"] {
+  padding-inline: 0;
+}
+
+/*
+ *  The dots under a value at rest, which say the field can be edited: round
+ *    dots one and a half pixels across, four apart, under the words alone. The
+ *    control is sized to its words with `field-sizing`, so the dots are drawn
+ *    on the control's own box, and the field lines it up as the place around
+ *    it does. Each family hands over its hook as `--_field-ghost-dots`, the dots'
+ *    color, and `--_field-ghost-align`. A browser with no `field-sizing` draws
+ *    the dots as a dotted underline, which a text decoration keeps to the words.
+ */
+:host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+  text-decoration: underline dotted var(--_field-ghost-dots, transparent);
+  text-underline-offset: 0.25em;
+}
+
+@supports (field-sizing: content) {
+  :host([emphasis="ghost"]:not(:focus-within)) [part="field"] {
+    justify-content: var(--_field-ghost-align, start);
+  }
+
+  :host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+    background-clip: content-box;
+    background-image: radial-gradient(
+      circle,
+      var(--_field-ghost-dots, transparent) 0.75px,
+      transparent 1px
+    );
+    background-origin: content-box;
+    background-position: 0 100%;
+    background-repeat: repeat-x;
+    background-size: 4px 2px;
+    /* The frame contains the control's width so a resting field takes none of
+       its own, and that would size the words to nothing. */
+    contain: none;
+    field-sizing: content;
+    flex: 0 1 auto;
+    inline-size: auto;
+    max-inline-size: 100%;
+    text-decoration-line: none;
+  }
+}

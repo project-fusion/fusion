@@ -1,0 +1,13 @@
+/* The list beside the table it arranges, as a panel would hold it. */
+.columns-pane {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: minmax(16rem, auto) minmax(0, 1fr);
+}
+
+@media (max-width: 40rem) {
+  .columns-pane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

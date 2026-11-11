@@ -1,0 +1,83 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+}
+
+/* The panel beside the table it exports. */
+.export-pane {
+  align-items: start;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(18rem, auto) minmax(0, 1fr);
+}
+
+helix-headless-table-export {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+helix-headless-table-export::part(legend) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+helix-headless-table-export::part(choice) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+helix-headless-table-export::part(live) {
+  clip-path: inset(50%);
+  position: absolute;
+}
+
+@media (max-width: 40rem) {
+  .export-pane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The grid, as the Data Table's own example draws it: the headings and rows
+   take no box, so their cells lay out in the table's tracks. */
+helix-headless-data-table {
+  display: block;
+}
+
+helix-headless-data-table::part(table) {
+  display: grid;
+  grid-template-columns: var(--data-table-template, minmax(0, 1fr));
+  inline-size: 100%;
+}
+
+helix-headless-data-table::part(head),
+helix-headless-data-table::part(row),
+helix-headless-table-column:not([hidden]) {
+  display: contents;
+}
+
+helix-headless-table-column::part(column) {
+  align-items: center;
+  color: var(--_gray-muted);
+  display: flex;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  min-block-size: 2.5rem;
+}
+
+helix-headless-data-table::part(cell),
+helix-headless-data-table::part(select) {
+  border-block-start: 1px solid var(--_gray-edge);
+  font-size: 0.8125rem;
+  padding-block: 0.5rem;
+  padding-inline: 0 1rem;
+  text-align: var(--data-table-cell-align);
+}
+
+/* The checkboxes' names are for a screen reader. */
+helix-headless-data-table::part(checkbox-label) {
+  clip-path: inset(50%);
+  position: absolute;
+}

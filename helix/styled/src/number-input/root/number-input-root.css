@@ -216,3 +216,25 @@ slot[name="increment-icon"]::slotted(*) {
     print-color-adjust: exact;
   }
 }
+
+/* The steppers stay out of an inline field. The arrow keys step it, as they do
+   a spreadsheet's number, and two buttons in a line of text are most of it. */
+:host([emphasis="ghost"]) [part="decrement"],
+:host([emphasis="ghost"]) [part="increment"] {
+  display: none;
+}
+
+/* The dots under a `ghost` value at rest, in the color this family's hook
+   gives, which a touch screen draws in the subtle foreground when the hook is
+   unset, there being no hover there to say a field can be changed. The value
+   lines up as the hook for its alignment says. */
+:host {
+  --_field-ghost-align: var(--number-input-ghost-align, start);
+  --_field-ghost-dots: var(--number-input-ghost-underline, transparent);
+}
+
+@media (pointer: coarse) {
+  :host {
+    --_field-ghost-dots: var(--number-input-ghost-underline, var(--helix-color-foreground-subtle));
+  }
+}

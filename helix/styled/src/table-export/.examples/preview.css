@@ -1,0 +1,13 @@
+/* The panel beside the table it exports, as a popover would hold it. */
+.export-pane {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: minmax(18rem, auto) minmax(0, 1fr);
+}
+
+@media (max-width: 40rem) {
+  .export-pane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

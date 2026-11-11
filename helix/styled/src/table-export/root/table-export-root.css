@@ -1,0 +1,104 @@
+:host {
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-direction: column;
+  font-size: var(--helix-text-control);
+  gap: var(--table-export-gap, var(--helix-space-lg));
+  min-inline-size: 18rem;
+}
+
+fieldset {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+[part="legend"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin-block-end: var(--helix-space-2xs);
+  padding: 0;
+}
+
+[part~="choice"] {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+[part="choice-input"] {
+  accent-color: var(--helix-color-primary);
+  margin: 0;
+}
+
+/* The columns, the values, and the format are segmented: the inputs stay in
+   the tree for the keys and the screen reader, and the label is the segment. */
+[part="options"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-xs);
+}
+
+[part="columns"] [part="options"],
+[part="values"] [part="options"],
+[part="format"] [part="options"] {
+  background-color: var(--table-export-segment-background-color, var(--helix-color-surface-sunken));
+  border-radius: var(--helix-radii-md);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: var(--helix-space-2xs);
+}
+
+[part="columns"] [part~="choice"],
+[part="values"] [part~="choice"],
+[part="format"] [part~="choice"] {
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  justify-content: center;
+  min-block-size: var(--helix-size-control-tight);
+  position: relative;
+}
+
+[part="columns"] [part="choice-input"],
+[part="values"] [part="choice-input"],
+[part="format"] [part="choice-input"] {
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+[part="columns"] [part~="choice-checked"],
+[part="values"] [part~="choice-checked"],
+[part="format"] [part~="choice-checked"] {
+  background-color: var(--helix-color-surface-raised);
+  box-shadow: var(--helix-shadow-sm);
+  color: var(--helix-color-foreground);
+}
+
+[part~="choice"]:has(:focus-visible) {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="actions"] {
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: flex-end;
+}
+
+/* A panel that saves a file has nothing to say on paper. */
+@media print {
+  :host {
+    display: none;
+  }
+}

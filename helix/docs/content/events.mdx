@@ -169,11 +169,14 @@ Each component's page lists the events it sends, with the class and the detail.
 |---|---|
 | `helix-before-activate`, `helix-activate` | A set is about to make a different child current, and then did |
 | `helix-before-change` | A value is about to change. `input` and `change` follow |
+| `helix-before-cell-edit`, `helix-cell-edit` | A data table's cell is about to open for an edit, and then did |
+| `helix-before-cell-commit`, `helix-cell-commit` | A data table's edited cell is about to save its new value, and then did |
 | `helix-before-check`, `helix-check` | A checked state is about to change, and then did. A form control sends `change` in place of `helix-check` |
 | `helix-before-collapse`, `helix-collapse` | A splitter's pane is about to shut or reopen, and then did |
 | `helix-before-column-toggle`, `helix-column-toggle` | A data table's column is about to be hidden or shown, and then was |
 | `helix-before-edit`, `helix-edit` | A sandbox's source is about to be edited, and then was |
 | `helix-before-expand`, `helix-expand` | Rows of a table are about to open or close in place, and then did |
+| `helix-before-export`, `helix-export` | A data table is about to make a file of its rows, and then the browser saved it |
 | `helix-before-facet`, `helix-facet` | A filter input's field is about to be filtered by other values, and then was |
 | `helix-before-filter`, `helix-filter` | A list or a table is about to narrow what it shows, and then did |
 | `helix-before-follow`, `helix-follow` | A press on a link in a table cell is about to load its page, and then is |
@@ -193,6 +196,8 @@ Each component's page lists the events it sends, with the class and the detail.
 | `helix-before-select`, `helix-select` | An item in a set is about to be chosen, and then a selection changed |
 | `helix-before-sort`, `helix-sort` | A table is about to change its order, and then did |
 | `helix-before-split`, `helix-split` | The divider between a sandbox's panes is about to move, and then did |
+| `helix-before-view-change`, `helix-view-change` | A data table's view is about to change, and then did: its search, filters, sort, columns, or page size |
+| `helix-before-view-save`, `helix-view-save` | Quick Filters is about to save a data table's view, and then did |
 
 ### Command events
 

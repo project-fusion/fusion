@@ -16,6 +16,22 @@ import { dotsSixVertical, dotsThree } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type ReactiveElement, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import type { ColumnType } from '../column-type.js'
+
+/** What a column's `editor` is given to draw a field for an edited cell. */
+export interface CellEditorContext {
+  /** Puts the old value back and closes the cell. */
+  cancel: () => void
+  /** Saves a new value, as Enter does on the table's own field. */
+  commit: (value: unknown) => void
+  /** The row. */
+  row: Readonly<Record<string, unknown>>
+  /** The value the cell holds now. */
+  value: unknown
+}
+
+/** Draws the field for an edited cell: anything a Lit template can render. */
+export type CellEditor = (context: CellEditorContext) => unknown
 
 /**
  * How a column is read out of a row, once the row is data rather than markup.
@@ -117,7 +133,11 @@ export { edgeOf } from '../edge.js'
  * @csspart sort-mark - The two chevrons on a sortable heading. To remove them, set `display: none` on this part.
  * @csspart sort-up - The upper chevron of `sort-mark`, which shows an ascending sort.
  *
+ * @cssproperty --table-column-pin-offset - How far a pinned column's heading stays from its end of the row, in pixels: the width of the pinned columns before it. The column writes it on `column` while a `DataTable` pins it.
+ *
  * @cssstate has-menu - While the heading draws its menu button.
+ * @cssstate pinned-end - While a `DataTable` pins the column to the end of the row.
+ * @cssstate pinned-start - While a `DataTable` pins the column to the start of the row.
  * @cssstate sorted-ascending - While the table is sorted by this column, smallest first.
  * @cssstate sorted-descending - While the table is sorted by this column, largest first.
  */
@@ -155,6 +175,30 @@ export class HelixHeadlessTableColumn extends HelixElement {
   compare: CellReader | undefined = undefined
 
   /**
+   * Lets a reader edit the column's cells, in a `DataTable`.
+   *
+   * Enter, F2, a double click, or typing opens a cell in the field the
+   * column's `type` picks: a text field, a number field, a date field, or a
+   * select of an enum column's values. A boolean toggles in place. Enter saves
+   * and moves down, Tab saves and moves to the next cell, leaving the cell
+   * saves, and Escape puts the old value back. `required`, `min`, `max`,
+   * `pattern` and `validate` check the value first. Set `rowEditable` to
+   * decide row by row.
+   */
+  @property({ type: Boolean })
+  editable = false
+
+  /**
+   * A function that draws your own field for an edited cell, in place of the
+   * one the column's `type` picks. It is given the row, the value, and
+   * `commit` and `cancel`: call `commit` with the new value to save it, and
+   * `cancel` to put the old one back. Enter, Tab and Escape on your field
+   * work as they do on the table's own.
+   */
+  @property({ attribute: false })
+  editor: CellEditor | undefined = undefined
+
+  /**
    * The key this column reads out of a row.
    *
    * Dot paths resolve, so `field="owner.name"` reads a nested value: a result
@@ -171,6 +215,18 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property()
   field = ''
+
+  /**
+   * Offers the column as a filter, in a `DataTable` bound to a `FilterInput`.
+   * The field lists the column with the comparisons its `type` offers, and an
+   * enum column lists its values with how many rows hold each.
+   */
+  @property({ type: Boolean })
+  filterable = false
+
+  /** The largest value an edited cell may hold: a number, or a date as `YYYY-MM-DD`. */
+  @property()
+  max = ''
 
   /**
    * Draws a button in the heading that opens a menu of what you can do with the
@@ -190,6 +246,10 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @words
   @property({ attribute: 'menu-label' })
   menuLabel = '{named, select, no {Column menu} other {{name} column menu}}'
+
+  /** The smallest value an edited cell may hold: a number, or a date as `YYYY-MM-DD`. */
+  @property()
+  min = ''
 
   /**
    * The narrowest a `DataTable` can be with this column showing, as a length
@@ -224,6 +284,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   @property({ attribute: 'move-label' })
   moveLabel = '{named, select, no {Move column} other {Move {name}}}'
 
+  /** A pattern an edited text cell matches whole, as an input's `pattern` is matched. */
+  @property()
+  pattern = ''
+
+  /** Whether an edited cell may be left empty. */
+  @property({ type: Boolean })
+  required = false
+
   /**
    * Whether the column can be resized.
    *
@@ -244,6 +312,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
   resizeLabel = '{named, select, no {Resize column} other {Resize {name}}}'
 
   /**
+   * A function that decides whether a row's cell in this column can be
+   * edited, for a column that is `editable`. Given the row, it returns `true`
+   * or `false`. A property only, being a function.
+   */
+  @property({ attribute: false })
+  rowEditable: ((row: Readonly<Record<string, unknown>>) => boolean) | undefined = undefined
+
+  /**
    * Makes this column's cells the headers of their rows, in `DataTable`.
    *
    * A screen reader moving along a row or down a column names the row by its
@@ -254,6 +330,14 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ attribute: 'row-header', type: Boolean })
   rowHeader = false
+
+  /**
+   * Searches the column's values, in a `DataTable`. While no column sets it,
+   * the search reads every column with a `field`. Once one does, it reads only
+   * the columns that set it, so a search for a name does not match an id.
+   */
+  @property({ type: Boolean })
+  searchable = false
 
   /**
    * Whether the table can be sorted by this column.
@@ -303,6 +387,33 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @property({ attribute: 'text-align', reflect: true })
   textAlign?: 'center' | 'end' | 'start'
+
+  /**
+   * What the column holds: `text`, `number`, `date`, `enum` or `boolean`.
+   *
+   * In a `DataTable` the type picks the comparisons the column's filter
+   * offers. Text is contains, is, is not and is empty. Numbers compare as
+   * numbers, with between. Dates compare by the day, with before, after and
+   * between. An enum is any of or none of its values, and the table counts how
+   * many rows hold each value. A boolean is yes or no. Left unset, the column
+   * holds text.
+   */
+  @property()
+  type?: ColumnType
+
+  /**
+   * A function that checks an edited cell's value, after `required`, `min`,
+   * `max` and `pattern`. Given the value and the row, it returns a message to
+   * refuse the value with, or nothing to accept it, or a promise of either. A
+   * property only, being a function.
+   */
+  @property({ attribute: false })
+  validate:
+    | ((
+        value: unknown,
+        row: Readonly<Record<string, unknown>>,
+      ) => string | undefined | PromiseLike<string | undefined>)
+    | undefined = undefined
 
   /**
    * Where the content of this column's cells sits from top to bottom, when a
@@ -383,6 +494,21 @@ export class HelixHeadlessTableColumn extends HelixElement {
    */
   @state()
   movable = false
+
+  /**
+   * @internal The end of the row this column is pinned to, written by the
+   * `DataTable` whose view pins it. Not a consumer's to set: `view.columns`
+   * is the setting.
+   */
+  @state()
+  pinned: 'end' | 'start' | undefined = undefined
+
+  /**
+   * @internal How far from its end of the row a pinned column stays, in
+   * pixels: the width of the pinned columns before it. Written by the table.
+   */
+  @state()
+  pinOffset = 0
 
   /**
    * @internal Whether the column is a cell of a grid that moves focus between
@@ -536,6 +662,8 @@ export class HelixHeadlessTableColumn extends HelixElement {
     this.toggleState('has-menu', this.drawsMenu)
     this.toggleState('sorted-ascending', this.sorted === 'ascending')
     this.toggleState('sorted-descending', this.sorted === 'descending')
+    this.toggleState('pinned-start', this.pinned === 'start')
+    this.toggleState('pinned-end', this.pinned === 'end')
   }
 
   /**
@@ -726,6 +854,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     const hasMenu = this.drawsMenu
     return html`<span
       part="column"
+      style=${this.pinned ? `--table-column-pin-offset: ${this.pinOffset}px` : nothing}
       role=${grid ? 'columnheader' : nothing}
       tabindex=${grid ? (this.tabStop ? '0' : '-1') : nothing}
       aria-sort=${grid && this.canSort ? (this.sorted ?? 'none') : nothing}

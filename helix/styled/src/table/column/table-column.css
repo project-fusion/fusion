@@ -335,3 +335,20 @@
 [part="sort"]:hover {
   color: var(--helix-color-foreground);
 }
+
+/* A column a Data Table's view pins stays at its end of the row while the
+   table scrolls sideways, over the cells that pass under it. */
+:host(:state(pinned-start)) [part="column"],
+:host(:state(pinned-end)) [part="column"] {
+  background-color: var(--table-column-pinned-background-color, var(--helix-color-background));
+  position: sticky;
+  z-index: 1;
+}
+
+:host(:state(pinned-start)) [part="column"] {
+  inset-inline-start: var(--table-column-pin-offset, 0px);
+}
+
+:host(:state(pinned-end)) [part="column"] {
+  inset-inline-end: var(--table-column-pin-offset, 0px);
+}
