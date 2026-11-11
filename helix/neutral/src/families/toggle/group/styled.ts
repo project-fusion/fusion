@@ -3,6 +3,9 @@ import fieldStacked from '../../../fragments/field-stacked.js'
 import { oneOf } from '../../../render.js'
 import {
   difference,
+  first,
+  fn,
+  hookOf,
   list,
   measured,
   native,
@@ -48,6 +51,7 @@ export default styles(
       togglePressedShadow: null,
       togglePressedSurface: null,
       toggleRadius: null,
+      toggleRadiusHooked: null,
     },
     props: { separation: oneOf(['plain']) },
     stylesheet: 'toggle/group/toggle-group.generated.css',
@@ -136,7 +140,18 @@ export default styles(
           boxShadow: token('shadow-surface'),
           borderRadius: hook.radius,
           own: {
-            toggleRadius: hook.itemRadius(difference(hook.radius, token('border-thin'))),
+            /* Concentric, the inset corner Tabs and Navigation take, never
+               squarer than 2 pixels or half the track's corner where a page
+               rounds the track through `--toggle-group-radius`. */
+            toggleRadiusHooked: fn(
+              'max',
+              fn('min', product(hookOf('toggle-group', 'radius'), 0.5), '2px'),
+              difference(
+                difference(hookOf('toggle-group', 'radius'), token('border-thin')),
+                token('space-2xs'),
+              ),
+            ),
+            toggleRadius: hook.itemRadius(first(own.toggleRadiusHooked, token('radii-inset'))),
             /* The border joins the padding in what the row gives back. */
             toggleHeight: difference(
               token('size-control'),

@@ -47,6 +47,8 @@ export default styles(
       collectionInsetInline: null,
       fieldDisabledOpacity: null,
       optionBleed: null,
+      optionPacked: null,
+      optionTickStart: null,
     },
     props: { bleed: oneOf(['none']) },
     stylesheet: 'listbox/root/listbox-root.generated.css',
@@ -71,10 +73,19 @@ export default styles(
         /* As in a menu: the words stay on the field's column, and the fill
            reaches the bleed past them. Read by every option. */
         rule({ bleed: { not: 'none' } }, { own: { optionBleed: hook.bleed } }),
+        /* In cells, the tick beside the words it marks: the words stop
+           growing and the tick follows them. Read by every option. */
+        rule(
+          { layout: 'grid' },
+          { own: { optionPacked: 0, optionTickStart: token('space-none') } },
+        ),
       ]),
       on('items', [
         rule({
           '--option-radius': token('radii-none'),
+          /* The highlight follows the pointer here, so a hovered row is the
+             active row and draws the active wash. */
+          '--option-hover-background-color': 'transparent',
           backgroundColor: hook.backgroundColor,
           border: hook.border,
           borderRadius: token('radii-sm'),
@@ -96,7 +107,8 @@ export default styles(
           { borderColor: token('color-danger'), outlineColor: token('color-danger') },
         ),
         rule({ formDisabled: true, platform: 'web' }, { cursor: 'not-allowed' }),
-        rule({ loading: true }, { opacity: token('opacity-busy') }),
+        /* Busy, the rows fade and the loading words do not. */
+        native([rule({ loading: true }, { opacity: token('opacity-busy') })]),
         /* A phone's move draws on the option, and the web's reorder entry adopts a sheet. */
         native([
           rule({
@@ -123,11 +135,26 @@ export default styles(
           }),
         ],
       ),
+      /* Written out: the rows and what is passed in fade, and not the
+         loading, empty or error words beside them. */
+      on(
+        {
+          part: 'items',
+          selector:
+            ':host([loading]) [part="items"] > :not([part~="loading"], [part~="empty"], [part~="error"]),\n:host([loading]) ::slotted(:not([slot]))',
+        },
+        [web([rule({ opacity: token('opacity-busy') })])],
+      ),
       on('error', [
         rule({
           color: hook.errorColor,
           padding: token('space-xs'),
         }),
+      ]),
+      /* What the `error` region holds, such as a button that tries again,
+         sits a step after the words, as it does in Table. */
+      on({ region: 'error', slotted: '*' }, [
+        web([rule({ marginInlineStart: token('space-sm') })]),
       ]),
       on('filter-icon', [
         rule({

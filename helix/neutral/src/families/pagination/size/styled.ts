@@ -1,4 +1,4 @@
-import { hookOf, token } from '../../../style.js'
+import { fn, hookOf, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import size from './headless.js'
 
@@ -22,7 +22,18 @@ export default styles(
     on('control', [rule({ alignItems: 'center', flexDirection: 'row', gap: hook.gap })]),
     on('control-label', [rule({ paddingBlockEnd: token('space-none'), whiteSpace: 'nowrap' })]),
     on('control-trigger', [
-      rule({ blockSize: hookOf('pagination', 'size', token('size-control')) }),
+      rule({ blockSize: hookOf('pagination', 'size', token('size-control-tight')) }),
+      /* On a touch screen it grows with the pages beside it, to the target. */
+      rule(
+        { coarsePointer: true },
+        {
+          blockSize: fn(
+            'max',
+            hookOf('pagination', 'size', token('size-control-tight')),
+            token('size-target'),
+          ),
+        },
+      ),
     ]),
   ],
 )

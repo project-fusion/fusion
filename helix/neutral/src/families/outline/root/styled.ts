@@ -108,6 +108,9 @@ export default styles(
       ]),
       /* The mark that travels: it springs, and the height trails it. */
       on('indicator', [
+        web([
+          rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
+        ]),
         rule({
           own: { markWidth: token('border-thin') },
           backgroundColor: hook.indicatorColor,
@@ -271,6 +274,12 @@ export default styles(
               backgroundColor: hook.tickCurrentColor,
             },
           ),
+          /* Forced colors paint every fill Canvas: the current tick takes
+             Highlight. */
+          rule(
+            { forcedColors: true, marker: 'rail', part: { 'data-current': true } },
+            { backgroundColor: 'Highlight', forcedColorAdjust: 'none' },
+          ),
         ]),
       ]),
       /* Over the rail, hidden until the pointer or focus is in the outline. Never
@@ -283,7 +292,7 @@ export default styles(
             {
               backdropFilter: hook.surfaceBackdrop,
               backgroundColor: hook.surfaceBackgroundColor,
-              border: [token('border-floating'), 'solid', token('color-border')],
+              border: [token('border-floating'), 'solid', token('color-border-floating')],
               borderRadius: token('radii-sm'),
               boxShadow: token('shadow-floating'),
               boxSizing: 'border-box',
