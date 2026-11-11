@@ -360,3 +360,65 @@ describe('what makes it measure again', () => {
     }).not.toThrow()
   })
 })
+
+describe('under a transformed ancestor', () => {
+  /* `getBoundingClientRect` includes every transform above the component and
+     the mark is placed in layout pixels. A surface laid out 200 wide and drawn
+     300 wide is under a 1.5 scale, so every measured distance shrinks by it. */
+  const laidOut = (surface: HTMLElement, width: number, height: number): void => {
+    Object.defineProperty(surface, 'offsetWidth', { configurable: true, value: width })
+    Object.defineProperty(surface, 'offsetHeight', { configurable: true, value: height })
+  }
+
+  test('a 1.5 scale is taken off the position and the size', () => {
+    const { indicator, place, surface } = scene({
+      active: box(60, 15, 90, 30),
+      own: box(0, 0, 300, 60),
+    })
+    laidOut(surface, 200, 40)
+    place()
+    expect(at(indicator)).toEqual({
+      'block-size': '20px',
+      'inline-size': '60px',
+      x: '40px',
+      y: '10px',
+    })
+  })
+
+  test('the border comes off in layout pixels, after the scale', () => {
+    const { indicator, place, surface } = scene({
+      active: box(63, 0, 90, 60),
+      border: 2,
+      own: box(0, 0, 300, 60),
+    })
+    laidOut(surface, 200, 40)
+    place()
+    expect(at(indicator).x).toBe('40px')
+  })
+
+  test('right to left measures from the right edge, scaled', () => {
+    const { indicator, place, surface } = scene({
+      active: box(150, 0, 90, 60),
+      own: box(0, 0, 300, 60),
+      rtl: true,
+    })
+    laidOut(surface, 200, 40)
+    place()
+    expect(at(indicator).x).toBe('-40px')
+  })
+
+  test('a difference of a pixel or less is offsetWidth rounding, not a scale', () => {
+    const { indicator, place, surface } = scene({
+      active: box(40, 0, 60, 30),
+      own: box(0, 0, 300.4, 30),
+    })
+    laidOut(surface, 300, 30)
+    place()
+    expect(at(indicator)).toEqual({
+      'block-size': '30px',
+      'inline-size': '60px',
+      x: '40px',
+      y: '0px',
+    })
+  })
+})
