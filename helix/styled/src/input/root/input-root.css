@@ -124,7 +124,7 @@ slot[name="end"]::slotted(*) {
    so its words carry a dotted underline at rest. The hook draws it at any
    pointer. */
 :host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
-  text-decoration: var(--input-ghost-underline, none) dotted var(--helix-color-foreground-muted);
+  text-decoration: var(--input-ghost-underline, none) dotted var(--helix-color-foreground-subtle);
   text-underline-offset: 0.25em;
 }
 
