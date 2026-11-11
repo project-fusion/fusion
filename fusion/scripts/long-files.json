@@ -117,6 +117,7 @@
     "helix/core/src/controllers/chart-pointer-controller/chart-pointer-controller.ts",
     "helix/core/src/controllers/dismiss-controller/dismiss-controller.dom.spec.ts",
     "helix/core/src/controllers/floating-controller/floating-controller.ts",
+    "helix/core/src/controllers/indicator-controller/indicator-controller.dom.spec.ts",
     "helix/core/src/controllers/keyboard-navigation-controller/keyboard-navigation-controller.dom.spec.ts",
     "helix/core/src/controllers/popover-controller/popover-controller.ts",
     "helix/core/src/controllers/reorder-controller/reorder-controller.dom.spec.ts",
