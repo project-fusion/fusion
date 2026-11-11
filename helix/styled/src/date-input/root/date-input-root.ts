@@ -42,7 +42,8 @@ import { styles } from './date-input-root.css.js'
  * @cssproperty --date-input-border-color - The color of the panel's border.
  * @cssproperty --date-input-border-width - The width of the panel's border. It
  *   follows `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
- * @cssproperty --date-input-ghost-underline - The line under the words of a `ghost` field at rest: `underline` draws it dotted at any pointer. A touch screen draws it whatever this says.
+ * @cssproperty --date-input-ghost-align - Where a `ghost` value sits in its field at rest: `start`, `center`, or `end`. A `DataTable` sets it to its column's edge.
+ * @cssproperty --date-input-ghost-underline - The color of the round dots under a `ghost` value at rest, which say it can be edited. None by default, and the subtle foreground on a touch screen. A `DataTable` sets it on every editable cell.
  * @cssproperty --date-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --date-input-segment-focus-color - The text of the segment with
