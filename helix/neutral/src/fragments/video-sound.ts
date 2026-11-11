@@ -1,4 +1,16 @@
-import { difference, fn, list, measured, mix, native, product, sum, token, web } from '../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../style.js'
 import { fragment } from '../table.js'
 
 /** The level fades in and out, as the bar does. */
@@ -17,7 +29,13 @@ export default fragment(
   {
     parts: ['scrubber', 'sound', 'volume'],
     hooks: { accentColor: null },
-    own: { videoLevelSize: null, videoRailSize: null, videoThumbSize: null },
+    own: {
+      videoLevelSize: null,
+      videoRailSize: null,
+      videoScrubReach: null,
+      videoThumbSize: null,
+      videoVolumeReach: null,
+    },
     props: ['separation'],
   },
   ({ hook, on, own, rule }) => [
@@ -48,7 +66,24 @@ export default fragment(
             ['transparent', product(measured('video-progress', 0), '100%')],
           ),
           blockSize: own.videoRailSize,
+          /* The bar's ink, which the rail and the thumb paint from. */
+          color: 'inherit',
         }),
+        /* On a touch screen the scrubber takes a press the target's height,
+           in a transparent border round its rail. */
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              videoScrubReach: quotient(difference(token('size-target'), own.videoRailSize), 2),
+            },
+            backgroundClip: 'padding-box',
+            blockSize: token('size-target'),
+            borderBlock: [own.videoScrubReach, 'solid', 'transparent'],
+            boxSizing: 'border-box',
+            marginBlock: product(own.videoScrubReach, '-1'),
+          },
+        ),
       ]),
       rule({ flex: [1, 1, 'auto'], minInlineSize: 0 }),
       /* A phone's scrubber keeps a share of the bar however large the reader's text. */
@@ -179,5 +214,23 @@ export default fragment(
         ]),
       ],
     ),
+    /* On a touch screen the level takes a press the target's width, as the
+       scrubber does. */
+    on('volume', [
+      web([
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              videoVolumeReach: quotient(difference(token('size-target'), own.videoRailSize), 2),
+            },
+            backgroundClip: 'padding-box',
+            blockSize: token('size-target'),
+            borderBlock: [own.videoVolumeReach, 'solid', 'transparent'],
+            boxSizing: 'border-box',
+          },
+        ),
+      ]),
+    ]),
   ],
 )
