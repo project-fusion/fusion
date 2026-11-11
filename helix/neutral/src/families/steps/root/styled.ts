@@ -64,6 +64,8 @@ export default styles(
       stepsMarkerJustify: null,
       stepsMarkerWeight: null,
       stepsRailMargin: null,
+      stepsRingReachBlock: null,
+      stepsRingReachInline: null,
       stepsRowGap: null,
       stepsTrailBlockSize: null,
       stepsTrailBlockStart: null,
@@ -98,6 +100,10 @@ export default styles(
           stepsBodyRow: 2,
           stepsBodyAlign: 'center',
           stepsRowGap: token('space-xs'),
+          /* How far the focus ring reaches back from the name to take in the
+             mark: over it in a row, beside it in a column. */
+          stepsRingReachBlock: sum(own.stepsMarkBox, own.stepsRowGap),
+          stepsRingReachInline: token('space-none'),
           stepsContent: 'none',
           stepsLeadInlineStart: quotient(hook.gap, '-2'),
           stepsLeadInlineSize: difference(
@@ -130,6 +136,8 @@ export default styles(
             stepsBodyRow: 1,
             stepsBodyAlign: 'start',
             stepsRowGap: token('space-2xs'),
+            stepsRingReachBlock: token('space-none'),
+            stepsRingReachInline: sum(own.stepsMarkBox, token('space-2xs')),
             stepsContent: 'grid',
             stepsLeadInlineStart: quotient(own.stepsMarkBox, 2),
             stepsLeadInlineSize: token('border-thin'),
