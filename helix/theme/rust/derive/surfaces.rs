@@ -39,6 +39,9 @@ pub fn ladder(mechanism: Option<Mechanism>) -> f64 {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Surfaces {
     pub raw_background: Oklch,
+    /// The ground an elevated Card fills in dark, a step above `overlay`, which
+    /// text lands on and no token names. White in light, as `overlay` is.
+    pub raw_elevated: Oklch,
     pub raw_overlay: Oklch,
     pub raw_raised: Oklch,
     pub raw_sunken: Oklch,
@@ -57,13 +60,14 @@ impl Surfaces {
     /// surface ships a palette that passes on the page and fails inside every
     /// card.
     ///
-    /// **`overlay` is among them, last.** It was left out while it was pure
-    /// white in light and equal to `raised` in dark, where it added nothing.
-    /// In dark it now stands a rung above `raised`, the lightest ground a dark
-    /// page has, so a light ink solved without it falls short in every menu and
-    /// popover. Last, because a tie keeps the earlier candidate: in light it
-    /// is white, the lightest ground there, and the candidate it adds does not
-    /// beat the page's.
+    /// **The elevated Card's ground is among them, last**, in place of
+    /// `overlay`, which is white in light and the raised rung in dark and adds
+    /// no ground the others lack. In dark an elevated Card fills a step above
+    /// the overlay, 0.235 to its 0.21, the lightest ground a dark page has, so
+    /// a light ink solved without it falls short on every elevated card. Last,
+    /// because a tie keeps the earlier candidate: in light it is white, the
+    /// lightest ground there, and the candidate it adds does not beat the
+    /// page's.
     #[must_use]
     pub fn solved_against(self) -> [Oklch; 5] {
         [
@@ -71,7 +75,7 @@ impl Surfaces {
             fit_to_gamut(self.raw_surface, GAMUT_STEPS),
             fit_to_gamut(self.raw_raised, GAMUT_STEPS),
             fit_to_gamut(self.raw_sunken, GAMUT_STEPS),
-            fit_to_gamut(self.raw_overlay, GAMUT_STEPS),
+            fit_to_gamut(self.raw_elevated, GAMUT_STEPS),
         ]
     }
 
@@ -147,23 +151,23 @@ pub fn surfaces_on(scheme: Scheme, page: Option<Oklch>, neutral: Cast, rung: f64
     });
     let step = |from: f64| neutral.at(on_page(from));
 
+    let white = Oklch {
+        chroma: 0.0,
+        hue: 0.0,
+        lightness: 1.0,
+    };
     Surfaces {
         raw_background,
+        /* `styled/src/card/root/card-root.css` draws it: 0.025 over the
+        overlay in dark. */
+        raw_elevated: if dark { step(0.235) } else { white },
         /* `overlay` is pure white in light and takes no cast, matching
         `neutral-0`: a menu on a white page is white, which is what every desktop
-        menu does. **In dark it is one rung above `raised`**, `neutral-775` at
-        0.235, so a popover opened from a raised panel steps off it: at 0.21 the
-        two were both #181818, 1.00:1, and at 0.235 the overlay is #1e1e1e,
-        1.06:1 off the raised rung. */
-        raw_overlay: if dark {
-            step(0.235)
-        } else {
-            Oklch {
-                chroma: 0.0,
-                hue: 0.0,
-                lightness: 1.0,
-            }
-        },
+        menu does. **In dark it is the raised rung**, `neutral-800` at 0.21,
+        #181818: a menu, a popover and a dialog are as dark as a raised panel
+        and set apart by their edge and their shadow. A rung above, 0.235, was
+        tried and the owner kept the darker panel, November 2026. */
+        raw_overlay: if dark { step(0.21) } else { white },
         raw_raised: step(if dark { 0.21 } else { 0.97 }),
         raw_sunken: step(if dark { 0.182 } else { 0.94 }),
         /* Declared after the ladder, since `surface` is on it: it is the ground a

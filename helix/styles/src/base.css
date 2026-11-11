@@ -1504,12 +1504,16 @@ helix-toggle[disabled]::part(item) {
 
 /* *What sets a surface apart from what is behind it**, which is the question
    `separation` asks and the four mechanisms `ThemeIntent.separation` names. */
-/* The same fills `Card` draws: elevated takes the overlay rung in dark, where
-   a shadow draws nothing on the black page, and filled the wash that steps off
-   any ground. Both read `surface`, so a filled region and an elevated one in
-   dark were one fill, #0c0c0c, told apart by a shadow nobody could see. */
+/* The same fills `Card` draws: elevated takes a step above the overlay rung in
+   dark, where a shadow draws nothing on the black page, and filled the wash
+   that steps off any ground. Both read `surface`, so a filled region and an
+   elevated one in dark were one fill, #0c0c0c, told apart by a shadow nobody
+   could see. */
 [data-separation="elevated"] {
-  background-color: light-dark(var(--helix-color-surface), var(--helix-color-surface-overlay));
+  background-color: light-dark(
+    var(--helix-color-surface),
+    oklch(from var(--helix-color-surface-overlay) calc(l + 0.025) c h)
+  );
   border-color: transparent;
   border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-md);
@@ -1586,12 +1590,13 @@ helix-toggle[disabled]::part(item) {
    a Popover, and an elevated Card restate the dark rungs for what they hold, as
    steps of the ink over their own fill: surface 3%, raised 9%, and overlay 12%.
    The filled wash steps further off a lighter ground, since it is translucent:
-   the page's 8.5% measures 1.16:1 on black and 1.28 on the #1e1e1e panel, past
-   an elevated card beside it. At 6%, over the panel, measured on November 4,
-   2026: surface #232323 at 1.06, filled #2c2c2c at 1.19, raised #2f2f2f at
-   1.25, and overlay #343434 at 1.34. On the host, so it reaches what the panel
-   holds, which none of the three restates. An elevated card takes the overlay
-   rung, so it reads 1.13:1 above a filled one. Light keeps the page's 5%. */
+   the page's 8.5% measures 1.16:1 on black and stood past an elevated card on
+   a lighter panel. At 6%, over the #181818 panel, measured on November 10,
+   2026: surface #1e1e1e at 1.07, filled #262626 at 1.17, raised #292929 at
+   1.22, and overlay #2f2f2f at 1.33. On the host, so it reaches what the panel
+   holds, which none of the three restates. An elevated card takes a step above
+   the overlay rung, #353535, so it reads 1.23:1 above a filled one. Light
+   keeps the page's 5%. */
 :where(helix-dialog, helix-drawer, helix-popover) {
   --helix-color-surface-filled: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),

@@ -78,10 +78,11 @@ step darker to be seen. A lit row is different: it takes `hover`, a wash measure
 against whatever it sits on. `overlay` works the other way. Its edge and its shadow separate it, so on
 a white page it is white.
 
-**In dark mode, a surface over a raised one steps up from it.** A shadow does
-not show on a black page, so `overlay` stands one rung above `raised`: #1e1e1e
-over #181818, 1.07:1. An elevated Card fills the `overlay` rung in dark, so it
-reads above a filled card: #1e1e1e against #161616 on the page. Inside a Dialog,
+**In dark mode, `overlay` is the `raised` rung**, #181818, so a menu, a popover,
+and a dialog are as dark as a raised panel and set apart by their edge. A shadow
+does not show on a black page, so an elevated Card fills a step above `overlay`
+in dark and reads above a filled card: #1e1e1e against #161616 on the page.
+Inside a Dialog,
 a Drawer, a Popover, or an elevated Card, the rungs are washes of `foreground`
 over the panel: `overlay` 12%, `raised` 9%, `surface` 3%, and `border` 12%.
 Inside a default Card, `overlay` is 12% and the filled wash 6%. An elevated

@@ -89,13 +89,14 @@ export const TOKENS: Token[] = [
     'light-dark(var(--_helix-neutral-100), var(--_helix-neutral-800))',
     'A panel raised inside a surface, such as a card inside a card. Its fill is one step down the ramp.',
   ],
-  /* **One rung above `surface-raised` in dark**, so a Popover opened from a
-     raised panel steps off it: the two were #181818, 1.00:1. `neutral-775`
-     paints #1e1e1e, 1.06:1 off the raised rung. Decided by the owner on
-     November 4, 2026. */
+  /* **The raised rung in dark, #181818**, so a menu, a popover, a dialog and a
+     command palette are as dark as a raised panel and set apart by their edge
+     and their shadow. A rung above it, #1e1e1e, was tried in November 2026 and
+     the owner kept the darker panel. An elevated Card keeps that step on its
+     own, so it still reads above a filled one. */
   [
     'color-surface-overlay',
-    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-775))',
+    'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
     'A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
@@ -156,7 +157,7 @@ export const TOKENS: Token[] = [
      on a filled card over `surface-sunken`, where 6% measured 4.43.
      **8.5% in dark**, where 5% painted #0d0d0d on the black page, 1.08:1 and
      weaker than a default card with its edge. 8.5% paints #161616, 1.16:1,
-     under the elevated card's #1e1e1e, the overlay rung, 1.08 above it.
+     under the elevated card's #1e1e1e, a step above the overlay rung, 1.08 above it.
      Decided by the owner on November 4, 2026. A panel, an elevated card, and a
      sunken region restate it at 6%, since a translucent wash steps further off
      a lighter ground. Two whole colors, since `light-dark()` is not valid in a
@@ -742,8 +743,8 @@ export const TOKENS: Token[] = [
      3.80 or more against the page.
 
      **At rest in dark, a step up from the 600**, so a solid fill clears 3:1 on
-     a panel as well as on the page: the 600 measured 2.56:1 on the #1e1e1e
-     overlay rung, a danger Button in a Popover. `+ 0.04` measures 3.01 there
+     a panel as well as on the page: the 600 measured 2.56:1 on #1e1e1e, a
+     danger Button on an elevated card. `+ 0.04` measures 3.01 there
      and 5.53 under white, and the hover and the press move up by 0.02 each from
      it, so white still reads 4.65:1 on the press. */
   [
@@ -839,7 +840,7 @@ export const TOKENS: Token[] = [
      `surface-raised` and `surface-overlay`, the ground of a menu or a popover.
      **Inside a Dialog, a Drawer, or a Popover the overlay rung steps up to
      #343434**, a list opened inside one, where `neutral-550` measured 2.37, so
-     the dark thumb is `neutral-500`: 5.32 on the page, 4.21 on the overlay rung,
+     the dark thumb is `neutral-500`: 5.32 on the page, 4.21 on an elevated card,
      and 3.15 on that panel's own.
 
      The hover step is the thumb while the pointer is over its scroller, the
