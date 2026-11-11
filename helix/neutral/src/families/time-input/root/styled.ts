@@ -8,6 +8,7 @@ import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
 import {
   difference,
+  fn,
   list,
   measured,
   native,
@@ -40,7 +41,7 @@ export default styles(
     prefix: 'time-input',
     hooks: {
       backgroundColor: token('color-well'),
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       segmentFocusBackgroundColor: token('color-primary-surface'),
       segmentFocusColor: token('color-foreground-on-primary'),
@@ -71,11 +72,28 @@ export default styles(
         flexWrap: 'wrap',
         gap: token('space-2xs'),
         minBlockSize: token('size-control'),
-        paddingBlock: token('space-2xs'),
         paddingInline: token('space-field'),
         transition: web(list(['background-color', ...ease], ['border-color', ...ease])),
       }),
-      native([rule({ flexDirection: 'row' })]),
+      /* No more than a tag leaves inside the field's own height, as Filter
+         Input sets it. A phone has no `clamp()`. */
+      web([
+        rule({
+          paddingBlock: fn(
+            'clamp',
+            '0px',
+            quotient(
+              difference(
+                difference(token('size-control'), token('size-tag')),
+                product(token('border-thin'), 2),
+              ),
+              2,
+            ),
+            token('space-2xs'),
+          ),
+        }),
+      ]),
+      native([rule({ flexDirection: 'row', paddingBlock: token('space-2xs') })]),
       /* One line where one time is held: a field with no tags has nothing to wrap,
          and wrapping it put the clock on a line of its own. */
       rule({ mode: { not: 'multiple' } }, { flexWrap: 'nowrap' }),
@@ -100,31 +118,35 @@ export default styles(
        `::slotted`, it beat a slotted component's own `:host` color. */
     on({ region: ['start', 'end'] }, [rule({ color: token('color-foreground-muted') })]),
     on({ region: ['start', 'end'], slotted: '*' }, [rule({ flex: 'none' })]),
-    /* A mark in the field, with no box of its own: the press reaches the target. */
+    /* A mark in the field at the step every field's indicator takes, in a box
+       a step past the glyph whose negative margin keeps it from widening the
+       field; the press reaches the target past it. */
     on('trigger', [
       rule({
         all: web('unset'),
-        '--icon-size': token('size-icon-sm'),
+        '--icon-size': token('size-icon-tight'),
         alignItems: 'center',
-        blockSize: token('size-target'),
+        blockSize: token('size-icon-loose'),
         boxSizing: 'border-box',
         color: token('color-foreground-muted'),
         cursor: web('pointer'),
         display: 'flex',
         flex: 'none',
-        inlineSize: token('size-target'),
+        inlineSize: token('size-icon-loose'),
         justifyContent: 'center',
-        margin: quotient(difference(token('size-icon-sm'), token('size-target')), 2),
+        margin: quotient(difference(token('size-icon-tight'), token('size-icon-loose')), 2),
         position: 'relative',
         transition: web(['color', ...ease]),
       }),
     ]),
     on('trigger-icon', [
-      rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') }),
-      native([rule({ '--icon-size': token('size-icon-sm') })]),
+      rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
+      native([rule({ '--icon-size': token('size-icon-tight') })]),
     ]),
     on('trigger', [
-      rule({ hover: true }, { color: token('color-foreground') }),
+      rule({ hover: true, readonly: false }, { color: token('color-foreground') }),
+      /* Read-only, and the trigger says the panel does not open. */
+      rule({ readonly: true }, { cursor: web('default'), opacity: token('opacity-disabled') }),
       rule(
         { focusVisible: true },
         {
@@ -204,6 +226,14 @@ export default styles(
           maxInlineSize: difference('100vw', product(token('space-md'), 2)),
         }),
       ]),
+    ]),
+    /* The list sits in this panel, which is already its frame, so the list
+       draws none of its own. */
+    on('picker', [
+      rule({
+        '--time-picker-list-background-color': 'transparent',
+        '--time-picker-list-border-width': 0,
+      }),
     ]),
     on({ region: 'panel-header', slotted: '*' }, [
       rule({
