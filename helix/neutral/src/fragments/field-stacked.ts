@@ -1,4 +1,4 @@
-import { token } from '../style.js'
+import { fn, product, token } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -12,9 +12,12 @@ export default fragment('field-stacked', { parts: ['label'] }, ({ on, rule }) =>
     rule({
       display: 'block',
       fontSize: token('text-field-label'),
-      /* Tight, as a label over a box is a heading for it. An inline field's
-         label reads at the body's leading instead, in `field-inline`. */
-      lineHeight: token('leading-tight'),
+      /* Tight, as a label over a box is a heading for it, and **rounded to a
+         whole pixel**, so the field under the label starts on one: unrounded
+         the line was 15.6 at `md`, and every edge and mark below sat between
+         pixels. An inline field's label reads at the body's leading instead,
+         in `field-inline`. */
+      lineHeight: fn('round', product(token('leading-tight'), '1em'), '1px'),
       paddingBlockEnd: token('space-2xs'),
     }),
   ]),
