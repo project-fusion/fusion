@@ -742,11 +742,14 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
            do not count a host that delegates focus, where Chromium's do.
            Measured on a modal drawer with no `dismissible` and nothing marked,
            Chromium focused the first control and WebKit the panel, so the
-           first control is focused here when the browser chose none. */
+           first control is focused here when the browser chose none. **A
+           drawer that is not modal too**: `show()` runs the same focusing
+           steps, and the conformance record had Chromium on the drawer's
+           action and WebKit on its host. */
         const chose =
           this.matches(':focus-within') &&
           !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === panel)
-        const fallback = this.modal && !chose ? focusableElements(this)[0] : undefined
+        const fallback = chose ? undefined : focusableElements(this)[0]
         if (fallback) {
           focusAs(fallback, focusing)
         } else {
