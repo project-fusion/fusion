@@ -290,8 +290,23 @@ slot[name="end"]::slotted(*) {
 }
 
 :host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
-  text-decoration: var(--select-ghost-underline, none) dotted var(--helix-color-foreground-subtle);
-  text-underline-offset: 0.25em;
+  background-image: radial-gradient(
+    circle,
+    var(--_select-ghost-dots, transparent) 0.75px,
+    transparent 1px
+  );
+  background-position: 0 100%;
+  background-repeat: repeat-x;
+  background-size: 4px 2px;
+  flex: 0 1 auto;
+}
+
+:host([emphasis="ghost"]:not(:focus-within)) [part="trigger"] {
+  justify-content: var(--select-ghost-align, start);
+}
+
+:host {
+  --_select-ghost-dots: var(--select-ghost-underline, transparent);
 }
 
 :host([emphasis="ghost"]:not(:hover, :focus-within)) [part="indicator"] {
@@ -299,7 +314,7 @@ slot[name="end"]::slotted(*) {
 }
 
 @media (pointer: coarse) {
-  :host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
-    text-decoration-line: underline;
+  :host {
+    --_select-ghost-dots: var(--select-ghost-underline, var(--helix-color-foreground-subtle));
   }
 }

@@ -81,3 +81,44 @@
 :host([emphasis="ghost"]) [part="field"] {
   padding-inline: 0;
 }
+
+/*
+ *  The dots under a value at rest, which say the field can be edited: round
+ *    dots one and a half pixels across, four apart, under the words alone. The
+ *    control is sized to its words with `field-sizing`, so the dots are drawn
+ *    on the control's own box, and the field lines it up as the place around
+ *    it does. Each family hands over its hook as `--_field-ghost-dots`, the dots'
+ *    color, and `--_field-ghost-align`. A browser with no `field-sizing` draws
+ *    the dots as a dotted underline, which a text decoration keeps to the words.
+ */
+:host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+  text-decoration: underline dotted var(--_field-ghost-dots, transparent);
+  text-underline-offset: 0.25em;
+}
+
+@supports (field-sizing: content) {
+  :host([emphasis="ghost"]:not(:focus-within)) [part="field"] {
+    justify-content: var(--_field-ghost-align, start);
+  }
+
+  :host([emphasis="ghost"]:not(:focus-within)) [part="control"] {
+    background-clip: content-box;
+    background-image: radial-gradient(
+      circle,
+      var(--_field-ghost-dots, transparent) 0.75px,
+      transparent 1px
+    );
+    background-origin: content-box;
+    background-position: 0 100%;
+    background-repeat: repeat-x;
+    background-size: 4px 2px;
+    /* The frame contains the control's width so a resting field takes none of
+       its own, and that would size the words to nothing. */
+    contain: none;
+    field-sizing: content;
+    flex: 0 1 auto;
+    inline-size: auto;
+    max-inline-size: 100%;
+    text-decoration-line: none;
+  }
+}

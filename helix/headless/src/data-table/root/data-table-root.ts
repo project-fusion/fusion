@@ -3985,13 +3985,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   private readonly handleEditClick = (event: MouseEvent): void => {
-    if (
-      this.editOn === 'click' &&
-      event.detail <= 1 &&
-      !event.shiftKey &&
-      !event.ctrlKey &&
-      !event.metaKey
-    ) {
+    if (event.detail > 1 || event.shiftKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    /* A cell that is its field opens on one press whatever `edit-on` says:
+       the press is on the field. */
+    if (this.editOn === 'click' || this.partIn(event, 'editor')) {
       this.openFromPress(event)
     }
   }
@@ -4005,7 +4004,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const place = this.placeOf(event)
     const column = place ? this.shownColumns[place.column - this.lead] : undefined
     const row = place ? this.drawnPage[place.row] : undefined
-    if (column && row && !this.partIn(event, 'editor')) {
+    /* A press inside a field's box but beside its words opens the cell too:
+       a field at rest is as wide as its value, and the rest of its box is
+       still the cell. A press on the words is the field's own. */
+    const open = this.editing?.row === row && this.editing?.field === column?.field
+    if (column && row && !open) {
       this.editCell(row, column.field)
     }
   }

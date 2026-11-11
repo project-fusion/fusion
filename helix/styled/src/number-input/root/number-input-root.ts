@@ -44,7 +44,8 @@ import { styles } from './number-input-root.css.js'
  *
  * @cssproperty --number-input-background-color - The fill behind the number.
  * @cssproperty --number-input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
- * @cssproperty --number-input-ghost-underline - The line under the words of a `ghost` field at rest: `underline` draws it dotted at any pointer. A touch screen draws it whatever this says.
+ * @cssproperty --number-input-ghost-align - Where a `ghost` value sits in its field at rest: `start`, `center`, or `end`. A `DataTable` sets it to its column's edge.
+ * @cssproperty --number-input-ghost-underline - The color of the round dots under a `ghost` value at rest, which say it can be edited. None by default, and the subtle foreground on a touch screen. A `DataTable` sets it on every editable cell.
  * @cssproperty --number-input-padding-inline - Space at each side of the number, inside the steppers.
  * @cssproperty --number-input-radius - Corner radius of the field.
  * @cssproperty --number-input-size - Height of the field.

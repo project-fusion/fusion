@@ -786,12 +786,17 @@ slot[name="error"]::slotted(*) {
   display: flex;
 }
 
-/* The words are underlined with dots, which says the cell can be edited. */
+/* Round dots under each value say the cell can be edited. */
 [part="editor"] {
-  --input-ghost-underline: underline;
-  --number-input-ghost-underline: underline;
-  --date-input-ghost-underline: underline;
-  --select-ghost-underline: underline;
+  --input-ghost-underline: var(--helix-color-foreground-subtle);
+  --number-input-ghost-underline: var(--helix-color-foreground-subtle);
+  --date-input-ghost-underline: var(--helix-color-foreground-subtle);
+  --select-ghost-underline: var(--helix-color-foreground-subtle);
+  /* The value at its column's edge, which the table writes on each cell. */
+  --input-ghost-align: var(--data-table-cell-align, start);
+  --number-input-ghost-align: var(--data-table-cell-align, start);
+  --date-input-ghost-align: var(--data-table-cell-align, start);
+  --select-ghost-align: var(--data-table-cell-align, start);
   inline-size: calc(100% + 2 * var(--helix-space-xs));
   margin-inline: calc(-1 * var(--helix-space-xs));
   /* A control's tight step, centered in the row, so an active field sits inside

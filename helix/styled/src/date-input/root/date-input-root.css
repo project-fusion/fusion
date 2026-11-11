@@ -284,21 +284,24 @@ slot[name="trigger"]::slotted(*) {
   }
 }
 
-/* The underline of a `ghost` date at rest, from this family's hook, and the
-   calendar's button only once the field is reached, so a column of dates is as
-   wide as its dates. Its words are the text control's, or the segments'. */
-:host([emphasis="ghost"]:not(:focus-within)) :is([part="control"], [part~="segment"]) {
-  text-decoration: var(--date-input-ghost-underline, none) dotted
-    var(--helix-color-foreground-subtle);
-  text-underline-offset: 0.25em;
-}
-
+/* A `ghost` date's dots at rest come from this family's hooks, and the
+   calendar's button shows only once the field is reached, so a column of
+   dates is as wide as its dates. */
 :host([emphasis="ghost"]:not(:focus-within)) [part="trigger"] {
   display: none;
 }
 
+/* The dots under a `ghost` value at rest, in the color this family's hook
+   gives, which a touch screen draws in the subtle foreground when the hook is
+   unset, there being no hover there to say a field can be changed. The value
+   lines up as the hook for its alignment says. */
+:host {
+  --_field-ghost-align: var(--date-input-ghost-align, start);
+  --_field-ghost-dots: var(--date-input-ghost-underline, transparent);
+}
+
 @media (pointer: coarse) {
-  :host([emphasis="ghost"]:not(:focus-within)) :is([part="control"], [part~="segment"]) {
-    text-decoration-line: underline;
+  :host {
+    --_field-ghost-dots: var(--date-input-ghost-underline, var(--helix-color-foreground-subtle));
   }
 }

@@ -49,7 +49,10 @@ describe('a ghost field', () => {
     expect(css).toContain('font-size: var(--helix-text-control)')
   })
 
-  test('underlines its words from its hook', () => {
-    expect(cssOf('helix-input')).toContain('var(--input-ghost-underline, none) dotted')
+  test('draws round dots under its value alone, in the color its hook gives', () => {
+    const css = cssOf('helix-input')
+    expect(css).toContain('var(--input-ghost-underline, transparent)')
+    expect(css).toContain('radial-gradient')
+    expect(css).toContain('field-sizing: content')
   })
 })
