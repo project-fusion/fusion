@@ -273,6 +273,32 @@
   transform: translate(var(--drawer-swipe-x, 0), var(--drawer-swipe-y, 0));
 }
 
+/* **An edge only where it meets the page**, as the corners are square only
+   where it meets the window. The edges that run along the window drew a line
+   at the window's own edge, which shows nothing a reader needs: a start or
+   end panel keeps the side facing the page, a sheet keeps the top it rises to,
+   and a top panel the bottom it drops to. */
+:host(:state(open):not([placement])) [part="panel"],
+:host(:state(open)[placement="end"]) [part="panel"] {
+  border-block-width: 0;
+  border-inline-end-width: 0;
+}
+
+:host(:state(open)[placement="start"]) [part="panel"] {
+  border-block-width: 0;
+  border-inline-start-width: 0;
+}
+
+:host(:state(open)[placement="bottom"]) [part="panel"] {
+  border-block-end-width: 0;
+  border-inline-width: 0;
+}
+
+:host(:state(open)[placement="top"]) [part="panel"] {
+  border-block-start-width: 0;
+  border-inline-width: 0;
+}
+
 /* **The page's own panning stays off the swipe's axis.** A touch the browser
    reads as a pan is taken from the page and the swipe is canceled, so a panel
    that slides across leaves only the vertical pan to the browser, and one that
