@@ -64,6 +64,8 @@ export default styles(
       stepsM: null,
       stepsMark: null,
       stepsMarkBox: null,
+      stepsRingReachBlock: null,
+      stepsRingReachInline: null,
       stepsMarkerColor: null,
       stepsMarkerColumn: null,
       stepsMarkerJustify: null,
@@ -108,8 +110,23 @@ export default styles(
         backgroundColor: hook.connectorColor,
         content: '""',
         position: 'absolute',
-        zIndex: 0,
+        zIndex: token('layer-base'),
       }),
+      /* The way already traveled is drawn in the mark ink. */
+      rule([{ complete: true }, { current: true }], {
+        backgroundColor: hook.connectorColor(token('color-foreground-subtle')),
+      }),
+      /* Forced colors keep the line, and the progress in it. */
+      web([
+        rule({ forcedColors: true }, { backgroundColor: 'GrayText', forcedColorAdjust: 'none' }),
+        rule(
+          [
+            { complete: true, forcedColors: true },
+            { current: true, forcedColors: true },
+          ],
+          { backgroundColor: 'CanvasText' },
+        ),
+      ]),
       web([
         rule({
           blockSize: own.stepsLeadBlockSize(token('border-thin')),
@@ -137,8 +154,16 @@ export default styles(
         backgroundColor: hook.connectorColor,
         content: '""',
         position: 'absolute',
-        zIndex: 0,
+        zIndex: token('layer-base'),
       }),
+      rule(
+        { complete: true },
+        { backgroundColor: hook.connectorColor(token('color-foreground-subtle')) },
+      ),
+      web([
+        rule({ forcedColors: true }, { backgroundColor: 'GrayText', forcedColorAdjust: 'none' }),
+        rule({ complete: true, forcedColors: true }, { backgroundColor: 'CanvasText' }),
+      ]),
       web([
         rule({
           blockSize: own.stepsTrailBlockSize(token('border-thin')),
@@ -180,7 +205,7 @@ export default styles(
         justifyContent: 'center',
         position: 'relative',
         transition: ['color', token('duration-fast'), token('easing-standard')],
-        zIndex: 1,
+        zIndex: token('layer-raised'),
       }),
       native([rule({ alignSelf: own.stepsMarkerJustify('center') })]),
       rule(
@@ -236,7 +261,7 @@ export default styles(
         flexDirection: 'column',
         minInlineSize: 0,
         position: 'relative',
-        zIndex: 1,
+        zIndex: token('layer-raised'),
       }),
       native([
         rule({
@@ -303,6 +328,25 @@ export default styles(
       ]),
     ]),
     /* The same inset the name takes as padding, so the two start on one line. */
+    /* Written out: the ring goes round the mark and the name together, since
+       the step is one control, reaching back from the name over the mark. */
+    on({ part: 'label', selector: '[part="label"]::part(button):focus-visible' }, [
+      web([rule({ outline: 'none' })]),
+    ]),
+    on({ part: 'label', selector: '[part="label"]::part(button):focus-visible::before' }, [
+      web([
+        rule({
+          borderRadius: token('radii-sm'),
+          content: '""',
+          insetBlock: [product(own.stepsRingReachBlock(token('space-none')), '-1'), 0],
+          insetInline: [product(own.stepsRingReachInline(token('space-none')), '-1'), 0],
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+          pointerEvents: 'none',
+          position: 'absolute',
+        }),
+      ]),
+    ]),
     on('description', [
       rule({
         color: token('color-foreground-muted'),
