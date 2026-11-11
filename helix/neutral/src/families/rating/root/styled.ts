@@ -2,17 +2,34 @@ import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
 import { oneOf } from '../../../render.js'
-import { difference, measured, native, product, quotient, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import rating from './headless.js'
 
 /**
  * The star the stylesheet draws where no shape is passed, as a mask: the
- * same path a phone draws as a vector.
+ * same path a phone draws as a vector, stroked so a filled star and an
+ * outlined one are the same size.
  */
 const star = web(
-  'url(\'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"/></svg>\')',
+  'url(\'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z" stroke="black" stroke-width="2" stroke-linejoin="round"/></svg>\')',
 )
+
+/** An empty star, an outline, so filled and empty differ in shape as well as ink. */
+const emptyStar =
+  'url(\'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="black" stroke-width="2" stroke-linejoin="round"/></svg>\')'
 
 /**
  * Rating's styled tier.
@@ -66,6 +83,17 @@ export default styles(
         gap: token('space-2xs'),
         own: { ratingMarkGap: hook.gap, ratingMarkSize: hook.size },
       }),
+      /* On a touch screen the marks open to the target's pitch. */
+      rule(
+        { coarsePointer: true },
+        {
+          own: {
+            ratingMarkGap: hook.gap(
+              fn('max', token('space-2xs'), difference(token('size-target'), own.ratingMarkSize)),
+            ),
+          },
+        },
+      ),
     ]),
     /* The marks and the score beside them, a step further apart than the marks. */
     on('field', [rule({ alignItems: 'center', display: 'inline-flex', gap: token('space-xs') })]),
@@ -74,7 +102,11 @@ export default styles(
       rule({ display: 'inline-flex', position: 'relative', web: { touchAction: 'pan-y' } }),
     ]),
     on(['track', 'fill'], [rule({ display: 'inline-flex', gap: own.ratingMarkGap })]),
-    on('track', [rule({ color: hook.emptyColor })]),
+    on('track', [
+      rule({ color: hook.emptyColor }),
+      /* Read-only, the empty marks take the read-only edge, at 3:1. */
+      rule({ readonly: true }, { color: hook.emptyColor(token('color-border-readonly')) }),
+    ]),
     /* The filled marks, clipped to the score: whole marks at the full pitch,
        and the rest across the mark itself. */
     on('fill', [
@@ -89,6 +121,21 @@ export default styles(
         overflow: 'hidden',
         position: 'absolute',
       }),
+      /* A previewed score is drawn apart from a chosen one, a step toward the
+         ink, and a press takes the chosen color. */
+      rule(
+        { previewing: true },
+        {
+          color: scheme(
+            mix(hook.color, 75, token('color-foreground')),
+            mix(hook.color, 50, token('color-foreground')),
+          ),
+        },
+      ),
+      rule(
+        { formDisabled: false, readonly: false, within: { marks: { active: true } } },
+        { color: hook.color },
+      ),
     ]),
     /* A shape painted in the mark's color, which never shrinks, so the clip
        cuts it and does not squash it. */
@@ -157,6 +204,19 @@ export default styles(
       rule({ readonly: true }, { web: { cursor: 'default' } }),
     ]),
     /* A shape passed in, drawn as itself: no mask, and no paint behind it. */
+    /* Written out: the empty row's marks, which the fill's share a part
+       name with. An empty dot is a ring. */
+    on({ part: 'mark', selector: '[part="track"] [part="mark"]' }, [
+      web([rule({ own: { ratingStar: emptyStar } })]),
+    ]),
+    on({ part: 'mark', selector: ':host([shape="dots"]) [part="track"] [part="mark"]' }, [
+      web([
+        rule({
+          backgroundColor: 'transparent',
+          boxShadow: ['inset', 0, 0, 0, token('border-thick'), 'currentcolor'],
+        }),
+      ]),
+    ]),
     on({ part: 'mark', selector: '[data-slotted] [part="mark"]' }, [
       web([rule({ backgroundColor: 'transparent', maskImage: 'none' })]),
     ]),

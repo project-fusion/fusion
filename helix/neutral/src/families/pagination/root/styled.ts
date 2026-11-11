@@ -1,4 +1,4 @@
-import { difference, list, native, product, quotient, token, web } from '../../../style.js'
+import { difference, fn, list, native, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -20,18 +20,20 @@ export default styles(
   {
     prefix: 'pagination',
     hooks: {
-      currentBackgroundColor: token('color-surface-raised'),
+      /* The wash every chosen thing takes, a step past the hover's well. */
+      currentBackgroundColor: token('color-selected'),
       currentBorderColor: token('color-border'),
       currentFontWeight: token('weight-semibold'),
       currentForegroundColor: token('color-foreground'),
       disabledForegroundColor: token('color-foreground-subtle'),
       disabledOpacity: token('opacity-disabled'),
       ellipsisForegroundColor: token('color-foreground-muted'),
-      fontSize: token('text-sm'),
+      /* The control step, as the buttons it labels step. */
+      fontSize: token('text-control'),
       fontWeight: token('weight-medium'),
       foregroundColor: token('color-foreground-muted'),
       gap: token('space-2xs'),
-      hoverBackgroundColor: token('color-hover'),
+      hoverBackgroundColor: token('color-well'),
       hoverForegroundColor: token('color-foreground'),
       iconSize: token('size-icon-tight'),
       padding: token('space-2xs'),
@@ -70,13 +72,14 @@ export default styles(
           alignItems: 'center',
           display: 'flex',
           gap: hook.gap,
-          maxInlineSize: '100%',
+          /* Room either side for a focus ring the scroll would clip. */
+          maxInlineSize: sum('100%', product(token('space-2xs'), 2)),
           overflowX: 'auto',
           paddingBlock: token('space-2xs'),
           web: { listStyle: 'none', scrollbarWidth: 'none' },
           marginBlock: product(token('space-2xs'), '-1'),
-          marginInline: token('space-none'),
-          paddingInline: token('space-none'),
+          marginInline: product(token('space-2xs'), '-1'),
+          paddingInline: token('space-2xs'),
         }),
       ]),
       on('item', [rule({ display: 'inline-flex' })]),
@@ -103,6 +106,15 @@ export default styles(
               ['color', token('duration-fast'), token('easing-standard')],
             ),
           }),
+          /* Pages sit against each other, so on a touch screen the page itself
+             grows to the target. */
+          rule(
+            { coarsePointer: true },
+            {
+              blockSize: fn('max', hook.size, token('size-target')),
+              minInlineSize: fn('max', hook.size, token('size-target')),
+            },
+          ),
           rule(
             { hover: true },
             { backgroundColor: hook.hoverBackgroundColor, color: hook.hoverForegroundColor },

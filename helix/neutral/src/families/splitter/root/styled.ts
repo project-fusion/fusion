@@ -1,5 +1,15 @@
 import { oneOf } from '../../../render.js'
-import { difference, list, measured, native, quotient, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  native,
+  quotient,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import splitter from './headless.js'
 
@@ -30,7 +40,8 @@ export default styles(
       color: token('color-border'),
       corner: token('space-md'),
       dragColor: token('color-primary'),
-      gripColor: token('color-foreground-muted'),
+      /* Shown at rest in the quiet mark ink, firming under approach. */
+      gripColor: token('color-foreground-subtle'),
       gripLength: '2rem',
       gripThickness: token('border-thick'),
       handleColor: token('color-foreground-muted'),
@@ -46,6 +57,23 @@ export default styles(
   ({ hook, on, own, rule }) => {
     const fade = token('duration-fast')
     const ease = token('easing-standard')
+    const reach = fn('min', token('space-lg'), '50%')
+    const fadeRight = {
+      maskImage: fn(
+        'linear-gradient',
+        'to right',
+        ['#000', difference('100%', reach)],
+        'transparent',
+      ),
+    } as const
+    const fadeLeft = {
+      maskImage: fn(
+        'linear-gradient',
+        'to left',
+        ['#000', difference('100%', reach)],
+        'transparent',
+      ),
+    } as const
     return [
       /* For the corner, which is placed against this box. */
       on('host', [
@@ -201,9 +229,8 @@ export default styles(
             backgroundColor: hook.gripColor,
             borderRadius: token('radii-full'),
             content: '""',
-            opacity: 0,
             position: 'absolute',
-            transition: list(['background-color', fade, ease], ['opacity', fade, ease]),
+            transition: ['background-color', fade, ease],
           },
         ),
         /* Along the run, centered, and to the leading side of the line. */
@@ -234,7 +261,7 @@ export default styles(
             { focusVisible: true, handle: 'grip' },
             { dragging: true, handle: 'grip' },
           ],
-          { opacity: 1 },
+          { backgroundColor: hook.gripColor(token('color-foreground-muted')) },
         ),
         rule({ dragging: true, handle: 'grip' }, { backgroundColor: hook.dragColor }),
       ]),
@@ -243,6 +270,41 @@ export default styles(
       on({ region: 'handle', slotted: '*' }, [
         rule({ color: hook.handleColor, pointerEvents: 'none', position: 'relative' }),
       ]),
+      /* Written out: the web's element says which pane is shut in
+         `data-collapsed`. A collapsed pane keeps its content at its own width,
+         clipped, and across the run fades at the edge the divider closed over. */
+      on(
+        {
+          part: 'start',
+          selector:
+            ':host([data-collapsed="start"]) [part="start"],\n:host([data-collapsed="end"]) [part="end"]',
+        },
+        [web([rule({ overflow: 'hidden' })])],
+      ),
+      on(
+        {
+          part: 'start',
+          selector:
+            ':host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"])) ::slotted([slot="start"]),\n:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"])) ::slotted([slot="end"])',
+        },
+        [web([rule({ minInlineSize: 'max-content' })])],
+      ),
+      on(
+        {
+          part: 'start',
+          selector:
+            ':host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"])) [part="start"],\n:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"])) [part="end"]',
+        },
+        [web([rule(fadeRight)])],
+      ),
+      on(
+        {
+          part: 'start',
+          selector:
+            ':host([data-collapsed="start"]:not([orientation="vertical"], [data-axis="vertical"]):dir(rtl)) [part="start"],\n:host([data-collapsed="end"]:not([orientation="vertical"], [data-axis="vertical"]):dir(rtl)) [part="end"]',
+        },
+        [web([rule(fadeLeft)])],
+      ),
       /* Out of the pointer's way while the divider moves. */
       on(['start', 'end'], [rule({ dragging: true }, { pointerEvents: 'none' })]),
       on('host', [rule({ print: true }, { overflow: 'visible' })]),

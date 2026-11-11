@@ -2,7 +2,7 @@ import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, list, quotient, token, web } from '../../../style.js'
+import { difference, fn, list, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import numberInput from './headless.js'
 
@@ -29,7 +29,8 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
-      paddingInline: token('space-field'),
+      /* A step under a field's inset: the value only keeps off the rules. */
+      paddingInline: token('space-2xs'),
       radius: token('radii-sm'),
       size: token('size-control'),
       stepperBackgroundColor: 'transparent',
@@ -37,8 +38,10 @@ export default styles(
       stepperBorderColor: token('color-border'),
       stepperColor: token('color-foreground-muted'),
       stepperColorHover: token('color-foreground'),
-      stepperIconSize: token('size-icon'),
-      stepperSize: token('size-control'),
+      /* The step every field's indicator takes. */
+      stepperIconSize: token('size-icon-tight'),
+      /* Less the rule it draws, so the mark centers on a whole pixel. */
+      stepperSize: difference(token('size-control'), token('border-thin')),
     },
     stylesheet: 'number-input/root/number-input-root.generated.css',
   },
@@ -54,8 +57,8 @@ export default styles(
         borderRadius: hook.radius,
         boxSizing: 'border-box',
         display: 'flex',
-        /* The field clips its own corners, which rounds the steppers. */
-        overflow: 'hidden',
+        /* Nothing clips here, so a stepper's press box reaches the target:
+           the steppers round their own outer corners. */
         transition: ['border-color', ...ease],
       }),
     ]),
@@ -81,6 +84,9 @@ export default styles(
         paddingInline: hook.paddingInline,
         textAlign: 'center',
       }),
+      /* A unit stands beside its number. */
+      rule({ hasEnd: true, hasStart: false }, { textAlign: 'end' }),
+      rule({ hasEnd: false, hasStart: true }, { textAlign: 'start' }),
     ]),
     /* A unit or an icon at either end: quieter than the number, and never shrinking. */
     /* The color goes on the slot, where what is passed in inherits it: written on
@@ -107,13 +113,33 @@ export default styles(
           justifyContent: 'center',
           transition: list(['background-color', ...ease], ['color', ...ease]),
         }),
+        /* Narrower in a narrow field, to three tenths of it on a whole pixel
+           and no less than its mark and 4 either side. */
+        web([
+          rule({
+            maxInlineSize: fn(
+              'max',
+              sum(hook.stepperIconSize, product(token('space-2xs'), 2)),
+              fn('round', '30%', '1px'),
+            ),
+          }),
+        ]),
       ],
     ),
+    /* The field's corner, less its edge, on the corners the field has. */
     on('decrement', [
-      rule({ borderInlineEnd: [token('border-thin'), 'solid', hook.stepperBorderColor] }),
+      rule({
+        borderInlineEnd: [token('border-thin'), 'solid', hook.stepperBorderColor],
+        borderEndStartRadius: difference(hook.radius, token('border-thin')),
+        borderStartStartRadius: difference(hook.radius, token('border-thin')),
+      }),
     ]),
     on('increment', [
-      rule({ borderInlineStart: [token('border-thin'), 'solid', hook.stepperBorderColor] }),
+      rule({
+        borderInlineStart: [token('border-thin'), 'solid', hook.stepperBorderColor],
+        borderEndEndRadius: difference(hook.radius, token('border-thin')),
+        borderStartEndRadius: difference(hook.radius, token('border-thin')),
+      }),
     ]),
     on(
       ['decrement', 'increment'],

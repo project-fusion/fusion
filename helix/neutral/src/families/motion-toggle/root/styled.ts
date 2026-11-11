@@ -1,4 +1,4 @@
-import { mix, native, token, web } from '../../../style.js'
+import { difference, fn, mix, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -33,9 +33,10 @@ export default styles(
       rule({
         alignItems: 'center',
         backgroundColor: hook.backgroundColor,
-        border: [token('border-floating'), 'solid', token('color-border')],
+        border: [token('border-floating'), 'solid', token('color-border-floating')],
         borderRadius: token('radii-sm'),
         boxShadow: token('shadow-floating'),
+        position: 'relative',
         color: token('color-foreground'),
         web: { cursor: 'pointer' },
         display: 'inline-flex',
@@ -69,11 +70,32 @@ export default styles(
           backgroundColor: mix(token('color-foreground'), 16, hook.backgroundColor),
         },
       ),
+      /* A press, a step past the hover, laid over whatever fill is under it. */
+      web([
+        rule(
+          { active: true },
+          {
+            backgroundImage: fn('linear-gradient', token('color-press'), token('color-press')),
+          },
+        ),
+      ]),
+      native([rule({ active: true }, { backgroundColor: token('color-press') })]),
       rule({ forcedColors: true }, { web: { borderColor: 'ButtonText' } }),
       rule(
         { forcedColors: true, paused: true },
         { web: { backgroundColor: 'Highlight', color: 'HighlightText' } },
       ),
+    ]),
+    /* The press reaches the target, in a transparent box, so nothing drawn
+       moves. */
+    on({ after: 'button' }, [
+      web([
+        rule({
+          content: '""',
+          inset: quotient(difference(token('size-target'), '100%'), '-2'),
+          position: 'absolute',
+        }),
+      ]),
     ]),
     on('icon', [rule({ display: 'inline-flex' })]),
     /* Written out: an element the tree does not draw, beside what a region holds. */
