@@ -7,7 +7,18 @@ import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
-import { difference, list, measured, mix, native, product, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -38,7 +49,7 @@ export default styles(
       actionPaddingInline: token('space-xs'),
       actionSize: token('size-tag'),
       backgroundColor: token('color-well'),
-      borderColor: token('color-border'),
+      borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
       clearColor: token('color-foreground-muted'),
       clearColorHover: token('color-foreground'),
@@ -54,6 +65,7 @@ export default styles(
     own: {
       collectionInsetBlock: null,
       collectionInsetInline: null,
+      filterInputChipCorner: null,
       filterInputSize: null,
       floatingBorderColor: null,
       floatingBorderWidth: null,
@@ -75,7 +87,20 @@ export default styles(
       include(floatingPanel),
       include(floatingEntrance),
       include(collectionState),
-      on('host', [rule({ own: { filterInputSize: hook.size } })]),
+      on('host', [
+        rule({
+          own: {
+            filterInputSize: hook.size,
+            /* A chip's corner, concentric with the field, never squarer than 2
+               pixels or half the field's corner. Handed to the chips. */
+            filterInputChipCorner: fn(
+              'max',
+              fn('min', product(hook.radius, 0.5), '2px'),
+              difference(difference(hook.radius, token('border-thin')), token('space-2xs')),
+            ),
+          },
+        }),
+      ]),
       on('held', [native([rule({ display: 'none' })])]),
       on('field', [
         rule({
@@ -88,11 +113,41 @@ export default styles(
           flexWrap: 'wrap',
           gap: token('space-2xs'),
           minBlockSize: own.filterInputSize,
-          paddingBlock: token('space-2xs'),
           paddingInline: hook.paddingInline,
           transition: web(list(['border-color', ...ease], ['background-color', ...ease])),
         }),
-        native([rule({ alignContent: 'center', flexDirection: 'row' })]),
+        /* No more than a token leaves inside the field's own height, so one
+           row of tokens keeps the field the control's height. */
+        web([
+          rule({
+            paddingBlock: fn(
+              'clamp',
+              '0px',
+              quotient(
+                difference(
+                  difference(own.filterInputSize, token('size-tag')),
+                  product(token('border-thin'), 2),
+                ),
+                2,
+              ),
+              token('space-2xs'),
+            ),
+          }),
+        ]),
+        native([
+          rule({ alignContent: 'center', flexDirection: 'row', paddingBlock: token('space-2xs') }),
+        ]),
+        /* Rows of chips stand a press apart on a touch screen. */
+        rule(
+          { coarsePointer: true },
+          {
+            rowGap: fn(
+              'max',
+              token('space-2xs'),
+              difference(token('size-target'), token('size-tag')),
+            ),
+          },
+        ),
         rule(
           { formDisabled: true },
           { cursor: web('not-allowed'), opacity: token('opacity-disabled') },
@@ -106,7 +161,11 @@ export default styles(
       on({ part: 'control', selector: '[part="field"] [part="control"]' }, [
         web([rule({ flex: [1, 1, hook.controlSize] })]),
       ]),
-      on('control', [native([rule({ flex: [1, 1, hook.controlSize] })])]),
+      on('control', [
+        native([rule({ flex: [1, 1, hook.controlSize] })]),
+        /* A placeholder cut by the chips ends in an ellipsis. */
+        web([rule({ textOverflow: 'ellipsis' })]),
+      ]),
       /* A phone has no `ch`: the text keeps the height of a control across. */
       on('control', [native([rule({ minInlineSize: token('size-control') })])]),
       on('lead', [
