@@ -119,6 +119,14 @@ describe('the generated Pagination', () => {
   test('a page-size control shows the size in force, and the first where it offers no other', async () => {
     await draw(<HelixPaginationSize defaultValue={7} label="Rows" sizes="10,25" />)
     expect(screen.getByText('10')).toBeTruthy()
+    expect(screen.getByText('Rows')).toBeTruthy()
+  })
+
+  test('a page-size control without a label draws its fallback words beside the size', async () => {
+    await draw(<HelixPaginationSize />)
+    expect(screen.getByText('Per page')).toBeTruthy()
+    await draw(<HelixPaginationSize fallbackLabel="Rows per page" />)
+    expect(screen.getByText('Rows per page')).toBeTruthy()
   })
 
   test('a summary holds a page past the end to the last page', async () => {

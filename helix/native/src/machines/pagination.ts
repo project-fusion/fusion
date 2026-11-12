@@ -266,7 +266,11 @@ export const usePaginationSize = (family: Family, props: Props, use: MachineUse)
   return {
     marks: [],
     parts: {
-      control: { view: { onBeforeChange } },
+      /* The label the web's select draws beside the size: the element's own,
+         or its fallback words where it has none. */
+      control: {
+        view: { label: wordsIn(read('label')) || wordsIn(read('fallbackLabel')), onBeforeChange },
+      },
       host: {
         lists: { [flag('options')]: options },
         states: {
