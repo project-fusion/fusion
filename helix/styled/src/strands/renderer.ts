@@ -1,5 +1,4 @@
-import type { StrandsPalette } from './palette.js'
-import { SPREAD } from './path.js'
+import { SPREAD, type StrandsPalette } from '@fusion.dev/helix-core/strands'
 import {
   BLUR_FRAGMENT,
   COMPOSITE_FRAGMENT,

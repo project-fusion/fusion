@@ -1,4 +1,5 @@
-import type { ColorBytes, TokenColor } from '@fusion.dev/helix-core'
+import type { TokenColor } from '../../controllers/token-color-controller/token-color-controller.js'
+import type { ColorBytes } from '../read-color/read-color.js'
 
 /** The colors the ribbon is drawn and composited in, as channels in `0..1`. */
 export interface StrandsPalette {

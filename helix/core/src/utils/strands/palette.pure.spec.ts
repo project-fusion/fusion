@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { ColorBytes } from '@fusion.dev/helix-core'
+import type { ColorBytes } from '../read-color/read-color.js'
 import { paletteOf, RESTING_PALETTE, type StrandsPaletteStyle } from './palette.js'
 
 /** Reads `rgb(r, g, b)`, the form a computed color comes back in, and nothing else. */
