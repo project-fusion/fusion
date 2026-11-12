@@ -207,16 +207,24 @@
   }
 }
 
+/* **The scrim leaves on the panel's curve.** On `standard` it was 88% gone at
+   100 milliseconds of 200 while the panel was 37% gone, so the panel floated
+   on a bare page for the rest of the way out. It arrives on the panel's
+   opacity curve, as before. */
 [part="surface"]::backdrop {
   opacity: 0;
   transition:
-    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    opacity var(--helix-duration-normal) var(--helix-easing-accelerate),
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
 }
 
 [part="surface"][open]::backdrop {
   opacity: 1;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
 }
 
 @starting-style {
@@ -297,7 +305,8 @@
 @media (prefers-reduced-motion: reduce) {
   [part="surface"],
   [part="surface"][open],
-  [part="surface"]::backdrop {
+  [part="surface"]::backdrop,
+  [part="surface"][open]::backdrop {
     transition:
       opacity var(--helix-duration-fade) var(--helix-easing-standard),
       display var(--helix-duration-fade) allow-discrete,
@@ -453,7 +462,8 @@
 
 @supports not (overlay: auto) {
   [part="surface"],
-  [part="surface"]::backdrop {
+  [part="surface"]::backdrop,
+  [part="surface"][open]::backdrop {
     transition-behavior: normal;
   }
 }

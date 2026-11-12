@@ -28,18 +28,25 @@
    order, so a starting style written first loses even for the opening frame and
    the scrim arrives at full strength while the panel is still sliding: measured,
    every sample from 16ms on read 1.00 while the panel traveled 640 to 480. */
+/* **The scrim leaves on the panel's curve**, `accelerate`, as Dialog's does.
+   On `standard` it was 88% gone at 100 milliseconds of 200 while the panel had
+   gone 37% of the way, sliding over a bare page. */
 [part="panel"]::backdrop {
   background-color: var(--drawer-scrim, var(--_drawer-scrim));
   opacity: 0;
   transition:
-    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    opacity var(--helix-duration-normal) var(--helix-easing-accelerate),
     display var(--helix-duration-normal) allow-discrete,
     overlay var(--helix-duration-normal) allow-discrete;
 }
 
-/* Closing, the scrim has to hold too. */
+/* Closing, the scrim has to hold too. It arrives on `standard`, as before. */
 [part="panel"][open]::backdrop {
   opacity: 1;
+  transition:
+    opacity var(--helix-duration-normal) var(--helix-easing-standard),
+    display var(--helix-duration-normal) allow-discrete,
+    overlay var(--helix-duration-normal) allow-discrete;
 }
 
 @starting-style {
@@ -482,7 +489,8 @@
       overlay var(--helix-duration-fade) allow-discrete;
   }
 
-  [part="panel"]::backdrop {
+  [part="panel"]::backdrop,
+  [part="panel"][open]::backdrop {
     transition:
       opacity var(--helix-duration-fade) var(--helix-easing-standard),
       display var(--helix-duration-fade) allow-discrete,
@@ -509,7 +517,8 @@
    There it closes at once instead, and still fades in. */
 @supports not (overlay: auto) {
   [part="panel"],
-  [part="panel"]::backdrop {
+  [part="panel"]::backdrop,
+  [part="panel"][open]::backdrop {
     transition-behavior: normal;
   }
 }
