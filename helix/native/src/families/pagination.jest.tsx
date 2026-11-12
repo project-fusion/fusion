@@ -129,6 +129,14 @@ describe('the generated Pagination', () => {
     expect(screen.getByText('Rows per page')).toBeTruthy()
   })
 
+  test('a page-size control the page names draws no label, and its select takes the name', async () => {
+    await draw(<HelixPaginationSize aria-label="Rows shown" />)
+    expect(screen.queryByText('Per page')).toBeNull()
+    expect(screen.getByLabelText(/^Rows shown/)).toBeTruthy()
+    await draw(<HelixPaginationSize aria-label="Rows shown" label="Rows" />)
+    expect(screen.queryByText('Rows')).toBeNull()
+  })
+
   test('a summary holds a page past the end to the last page', async () => {
     await draw(<HelixPaginationSummary page={99} pageSize={25} total={248} />)
     expect(screen.getByText('226-248 of 248')).toBeTruthy()

@@ -226,6 +226,23 @@ export const usePagination = (family: Family, props: Props, use: MachineUse): Be
   }
 }
 
+/**
+ * What names the size's select: the page's name for the element, its
+ * `aria-label`, with no label drawn beside it, as the
+ * web draws none where the page names the element (`aria-label` as JSX
+ * writes it, or as the styled runtime passes it); otherwise the label the
+ * web draws, the element's own or its fallback words.
+ */
+const labelOf = (
+  read: (name: string) => unknown,
+  props: Props,
+): { readonly ariaLabel?: string; readonly label: string } => {
+  const named = wordsIn(props['aria-label']) || wordsIn(props.ariaLabel)
+  return named === ''
+    ? { label: wordsIn(read('label')) || wordsIn(read('fallbackLabel')) }
+    : { ariaLabel: named, label: '' }
+}
+
 /** Hosts a page-size control. */
 export const usePaginationSize = (family: Family, props: Props, use: MachineUse): Behavior => {
   const read = (name: string): unknown => given(family, props, boundTo(use, name, 'prop'))
@@ -266,11 +283,7 @@ export const usePaginationSize = (family: Family, props: Props, use: MachineUse)
   return {
     marks: [],
     parts: {
-      /* The label the web's select draws beside the size: the element's own,
-         or its fallback words where it has none. */
-      control: {
-        view: { label: wordsIn(read('label')) || wordsIn(read('fallbackLabel')), onBeforeChange },
-      },
+      control: { view: { ...labelOf(read, props), onBeforeChange } },
       host: {
         lists: { [flag('options')]: options },
         states: {
