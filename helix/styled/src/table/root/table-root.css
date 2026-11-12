@@ -229,6 +229,15 @@ slot[name="error"]::slotted(*) {
   grid-column: 1 / -1;
 }
 
+/* **The error line wraps inside the columns it spans.** Spanning every column,
+   its words on one line set the columns' widths: at 280 a 58 character message
+   and a button to try again widened the tracks to 500, and the host scrolled
+   them both out of sight. With no width of its own the line takes the width
+   the columns already have and wraps there, as List and Listbox do. */
+[part="error"] {
+  contain: inline-size;
+}
+
 /* Print: rows of text, which print. The striping an earlier answer flattened is
    Data Table's, and nothing here draws a fill. */
 @media print {
