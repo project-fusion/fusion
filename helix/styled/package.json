@@ -699,6 +699,14 @@
       "types": "./dist/sparkline/index.d.ts",
       "default": "./dist/sparkline/index.js"
     },
+    "./spatial-scatter-chart": {
+      "react-native": {
+        "types": "./dist/spatial-scatter-chart/index.native.d.ts",
+        "default": "./dist/spatial-scatter-chart/index.native.js"
+      },
+      "types": "./dist/spatial-scatter-chart/index.d.ts",
+      "default": "./dist/spatial-scatter-chart/index.js"
+    },
     "./specs": null,
     "./speed-dial": {
       "react-native": {

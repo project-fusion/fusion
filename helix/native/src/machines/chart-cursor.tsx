@@ -104,6 +104,13 @@ export interface CursorSetup {
    * with Shift hears it.
    */
   readonly keyed?: (key: KeyPress, at: number, from: number) => void
+  /** Told a key first, which it takes by answering true, as Shift with an arrow turns a spatial chart's view. */
+  readonly claim?: (key: KeyPress) => boolean
+  /** Told each step of a drag that turns a spatial chart's view, and its end: a tap alone then moves the reading. */
+  readonly turn?: {
+    readonly by: (from: TrackPoint, to: TrackPoint) => void
+    readonly end: () => void
+  }
 }
 
 /** What a chart's cursor gives its chart. */
@@ -243,9 +250,16 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     const along = axis === 'block' ? point.y : fraction
     return pick === undefined ? readingAt(along, count) : pick(point)
   }
+  const turning = useRef<{ at: TrackPoint; down: number }>({ at: { x: 0, y: 0 }, down: 0 })
   const tracking = useTrack({
     drag: (fraction, point) => {
+      const turn = latest.current.setup.turn
       dragged.current = true
+      if (turn !== undefined) {
+        turn.by(turning.current.at, point)
+        turning.current.at = point
+        return
+      }
       flush()
       const at = under(fraction, point)
       if (at >= 0) {
@@ -255,12 +269,19 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     enabled: setup.touches,
     press: (fraction, point) => {
       dragged.current = false
-      const at = under(fraction, point)
+      const at = latest.current.setup.turn === undefined ? under(fraction, point) : -1
+      turning.current = { at: point, down: under(fraction, point) }
       if (at >= 0) {
         move(at, 'touch', true)
       }
     },
     release: () => {
+      const turn = latest.current.setup.turn
+      if (turn !== undefined && dragged.current) {
+        turn.end()
+      } else if (turn !== undefined && turning.current.down >= 0) {
+        move(turning.current.down, 'touch', true)
+      }
       if (!dragged.current) {
         press('touch')
       }
@@ -308,7 +329,10 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
       listening.current = undefined
       node.current = found
       if (found !== null) {
-        listening.current = keys().listen(found, heard)
+        listening.current = keys().listen(
+          found,
+          (key) => latest.current.setup.claim?.(key) === true || heard(key),
+        )
       }
     },
     [heard],

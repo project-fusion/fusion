@@ -90,6 +90,7 @@ import type {
   ScatterChartChoice,
   SelectChoice,
   SparklineChoice,
+  SpatialChartChoice,
   StrandsChoice,
   TableChoice,
   TableColumnChoice,
@@ -383,6 +384,8 @@ export interface Headless {
   readonly aura?: AuraChoice
   /** What the element reads, sends, and computes where it draws an orb. */
   readonly orb?: OrbChoice
+  /** What the element reads, sends, and computes where it draws a chart in a box seen in 3D. */
+  readonly spatialChart?: SpatialChartChoice
   /** What the element reads, sends, and computes where it draws a ribbon of strands. */
   readonly strands?: StrandsChoice
   /** What the element reads, sends, and computes where it is a playlist that drives a player. */

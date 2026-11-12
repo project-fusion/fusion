@@ -221,6 +221,11 @@ export interface ReadingSetup {
   readonly pick?: CursorSetup['pick']
   /** Whether the plot is drawn left to right on every page. */
   readonly ltr?: boolean
+  /** The row of the table a reading is told by, where the readings are not the rows, as a spatial chart's points. */
+  readonly rowOf?: (at: number) => number
+  /** A drag that turns the view, and the keys that do, as a spatial chart's, which the cursor hands them. */
+  readonly turn?: CursorSetup['turn']
+  readonly claim?: CursorSetup['claim']
 }
 
 /** The reading of an axis chart: the cursor, the words it says, and the series the keys walk. */
@@ -248,7 +253,7 @@ const sender =
     }
     const column = among[series]
     tell(family, props, event, {
-      index: at,
+      index: at < 0 ? -1 : (setup.rowOf?.(at) ?? at),
       label: setup.rows[at]?.label ?? '',
       pointerType: by,
       series: at < 0 || column === undefined ? '' : columnName(setup.rows, column),
@@ -287,6 +292,8 @@ export const useAxisReading = (
     ...(setup.ltr === undefined ? {} : { ltr: setup.ltr }),
     ...(setup.order === undefined ? {} : { order: setup.order }),
     ...(setup.pick === undefined ? {} : { pick: setup.pick }),
+    ...(setup.turn === undefined ? {} : { turn: setup.turn }),
+    ...(setup.claim === undefined ? {} : { claim: setup.claim }),
     said: (at) => said(at),
     series: among.length,
     tell: sender(family, props, use, setup, among),
