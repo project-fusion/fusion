@@ -21,7 +21,7 @@ import {
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { fieldOf, type PlotField, type PlotPoint } from '../field.js'
+import { fieldOf, type PlotField, type PlotPoint } from '@fusion.dev/helix-core/spatial'
 import {
   type BoxPoint,
   boundsOf,

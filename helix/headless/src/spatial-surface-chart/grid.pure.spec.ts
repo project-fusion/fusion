@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { FieldRow } from '../spatial-scatter-chart/field.js'
+import type { FieldRow } from '@fusion.dev/helix-core/spatial'
 import { levelOf, surfaceOf } from './grid.js'
 
 const row = (label: string, hour: number, day: number, load?: number): FieldRow => ({

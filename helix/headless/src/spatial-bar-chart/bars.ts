@@ -16,7 +16,7 @@ import {
   solid,
   ticks,
 } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
+import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
 import { type BoxExtent, inBox } from '../spatial-scatter-chart/view.js'
 
 /** How tall the box stands, as a share of its longer side along the floor. */

@@ -7,7 +7,7 @@
  */
 
 import { ticks } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
+import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
 
 /** One place on the grid: where it stands across and in depth, and its reading, where the table has one. */
 export interface SurfaceCell {

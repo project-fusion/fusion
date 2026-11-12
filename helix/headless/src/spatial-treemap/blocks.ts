@@ -8,7 +8,7 @@
  */
 
 import { type Drawn, type PagePoint, type Projection, solid, ticks } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
+import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
 import { type BoxExtent, inBox } from '../spatial-scatter-chart/view.js'
 
 /** How tall the box stands over its floor where a column gives each block a height. */
