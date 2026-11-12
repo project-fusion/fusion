@@ -221,6 +221,10 @@
       "types": "./dist/utils/slider/slider.d.ts",
       "default": "./dist/utils/slider/slider.js"
     },
+    "./spatial": {
+      "types": "./dist/utils/spatial/spatial.d.ts",
+      "default": "./dist/utils/spatial/spatial.js"
+    },
     "./splitter": {
       "types": "./dist/utils/splitter/splitter.d.ts",
       "default": "./dist/utils/splitter/splitter.js"

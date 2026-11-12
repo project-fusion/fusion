@@ -15,6 +15,7 @@ import {
   type Projection,
   pathData,
 } from '@fusion.dev/helix-core'
+import type { FieldRow } from '@fusion.dev/helix-core/spatial'
 import {
   type BarCell,
   type BarField,
@@ -22,7 +23,6 @@ import {
   barsBetween,
   barsOf,
 } from '../spatial-bar-chart/bars.js'
-import type { FieldRow } from '../spatial-scatter-chart/field.js'
 import { inBox } from '../spatial-scatter-chart/view.js'
 
 /** How tall the box stands, as a share of its length across. */

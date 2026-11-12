@@ -304,7 +304,6 @@
     "helix/headless/src/spatial-heatmap/root/spatial-heatmap-root.ts",
     "helix/headless/src/spatial-ribbon-chart/root/spatial-ribbon-chart-root.ts",
     "helix/headless/src/spatial-scatter-chart/root/spatial-scatter-chart-root.ts",
-    "helix/headless/src/spatial-scatter-chart/view.ts",
     "helix/headless/src/spatial-surface-chart/.examples/preview.tsx",
     "helix/headless/src/spatial-surface-chart/root/spatial-surface-chart-root.ts",
     "helix/headless/src/spatial-treemap/root/spatial-treemap-root.ts",

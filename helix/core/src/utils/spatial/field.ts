@@ -1,4 +1,4 @@
-/**
+/*
  * A 3D scatter's table read as points, axes, and groups.
  *
  * Kept apart from the element because it is arithmetic a picture hides: a
@@ -6,14 +6,12 @@
  * the edge of the box, and a row read into the wrong axis looks like data.
  */
 
-import {
-  keysOf,
-  type MotionItem,
-  type MotionShares,
-  mix,
-  mixAxis,
-  ticks,
-} from '@fusion.dev/helix-core'
+import type {
+  MotionItem,
+  MotionShares,
+} from '../../controllers/readings-motion-controller/readings-motion-controller.js'
+import { keysOf, mix, mixAxis } from '../readings-motion/readings-motion.js'
+import { ticks } from '../scale/ticks.js'
 
 /** What the field reads of a row: its label and its cells, with their headings and numbers. */
 export interface FieldRow {
