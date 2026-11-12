@@ -285,3 +285,110 @@ export const dragged = (camera: Camera, dx: number, dy: number): Camera => ({
   tilt: Math.min(Math.max(camera.tilt + dy * TILT_PER_PIXEL, 15), 90),
   turn: camera.turn - dx * TURN_PER_PIXEL,
 })
+
+/** The part of the page a drawing shows, as its `viewBox`: its left, top, width, and height. */
+export interface Frame {
+  height: number
+  width: number
+  x: number
+  y: number
+}
+
+/** How long the drawing takes to settle into its frame once a drag ends, in milliseconds, as long as the renderer's turn. */
+export const SETTLE = 250
+
+/** The time now, in milliseconds. */
+const now = (): number => globalThis.performance?.now() ?? Date.now()
+
+/** Fast at first and slow to rest. */
+const easeOut = (t: number): number => 1 - (1 - t) ** 3
+
+/**
+ * The frame a drawing shows while a drag turns its view, and as it settles
+ * once the drag ends.
+ *
+ * **The drawing turns in place.** Through a drag, the frame holds the drawing
+ * at the size it had when the drag began, with the middle of the data where
+ * it stood, as the renderer's camera turns round its target. The drawing may
+ * reach past its edges as it turns, and nothing on the page moves. Once the
+ * drag ends, it settles into the frame that fits it over `SETTLE`, or at once
+ * where motion is reduced.
+ */
+export class TurnFrame {
+  /** The frame and the middle of the data, as the last render drew them. */
+  private last: { frame: Frame; middle: PagePoint } | undefined
+
+  /** The frame held through a drag, and where the middle of the data stands in it. */
+  private kept: { frame: Frame; middle: PagePoint } | undefined
+
+  /** The frame a drag ended on, and when it ended, while the drawing settles. */
+  private settling: { from: Frame; start: number } | undefined
+
+  /**
+   * The frame to draw in, given the one that fits the drawing now, where the
+   * middle of the data stands on the page, and whether a drag is turning the
+   * view. `settling` says the drawing is still on its way, and asks for
+   * another render.
+   */
+  frame(
+    fits: Frame,
+    middle: PagePoint,
+    moving: boolean,
+    still: boolean,
+  ): { settling: boolean; shown: Frame } {
+    let shown = fits
+    if (moving) {
+      this.settling = undefined
+      const from = this.last ?? { frame: fits, middle }
+      this.kept ??= {
+        frame: from.frame,
+        middle: { x: from.middle.x - from.frame.x, y: from.middle.y - from.frame.y },
+      }
+      const { frame, middle: at } = this.kept
+      shown = { height: frame.height, width: frame.width, x: middle.x - at.x, y: middle.y - at.y }
+    } else if (this.kept) {
+      this.kept = undefined
+      this.settling = still || !this.last ? undefined : { from: this.last.frame, start: now() }
+    }
+    let settling = false
+    if (this.settling && !moving) {
+      const { from, start } = this.settling
+      const t = (now() - start) / SETTLE
+      if (t >= 1) {
+        this.settling = undefined
+      } else {
+        const k = easeOut(Math.max(0, t))
+        const toward = (a: number, b: number): number => a + (b - a) * k
+        shown = {
+          height: toward(from.height, fits.height),
+          width: toward(from.width, fits.width),
+          x: toward(from.x, fits.x),
+          y: toward(from.y, fits.y),
+        }
+        settling = true
+      }
+    }
+    this.last = { frame: shown, middle }
+    return { settling, shown }
+  }
+}
+
+/**
+ * A frame widened to the shape of a box `width` by `height`, about its middle,
+ * as an SVG `viewBox` meets its box, so a place in it is the same share of the
+ * box it is of the frame: a phone stands its words over the drawing by those
+ * shares.
+ */
+export const frameIn = (frame: Frame, width: number, height: number): Frame => {
+  if (!(width > 0 && height > 0 && frame.width > 0 && frame.height > 0)) {
+    return frame
+  }
+  const scale = Math.min(width / frame.width, height / frame.height)
+  const [w, h] = [width / scale, height / scale]
+  return {
+    height: h,
+    width: w,
+    x: frame.x - (w - frame.width) / 2,
+    y: frame.y - (h - frame.height) / 2,
+  }
+}

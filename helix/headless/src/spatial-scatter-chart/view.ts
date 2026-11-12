@@ -12,9 +12,11 @@ import {
   type BoxView,
   DRAG,
   dragged,
+  type Frame,
   NAME_SIZE,
   type PlotRoom,
   TICK_SIZE,
+  TurnFrame,
 } from '@fusion.dev/helix-core/spatial'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { type SVGTemplateResult, svg } from 'lit'
@@ -25,6 +27,7 @@ export {
   type BoxView,
   boundsOf,
   boxView,
+  type Frame,
   inBox,
   NAME_SIZE,
   type PlotRoom,
@@ -126,23 +129,6 @@ export const nearestTo = (
   return found
 }
 
-/** How long the drawing takes to settle into its frame once a drag ends, in milliseconds, as long as the renderer's turn. */
-const SETTLE = 250
-
-/** The part of the page a drawing shows, as its `viewBox`: its left, top, width, and height. */
-export interface Frame {
-  height: number
-  width: number
-  x: number
-  y: number
-}
-
-/** The time now, in milliseconds. */
-const now = (): number => globalThis.performance?.now() ?? Date.now()
-
-/** Fast at first and slow to rest. */
-const easeOut = (t: number): number => 1 - (1 - t) ** 3
-
 /**
  * A drag across a spatial chart's own drawing, which turns its view as the
  * pointer moves: across turns it, and down tilts it. **A press that moves
@@ -162,14 +148,8 @@ const easeOut = (t: number): number => 1 - (1 - t) ** 3
 export class DragTurn {
   private held: { id: number; moved: boolean; x: number; y: number } | undefined
 
-  /** The frame and the middle of the data, as the last render drew them. */
-  private last: { frame: Frame; middle: PagePoint } | undefined
-
-  /** The frame held through a drag, and where the middle of the data stands in it. */
-  private kept: { frame: Frame; middle: PagePoint } | undefined
-
-  /** The frame a drag ended on, and when it ended, while the drawing settles. */
-  private settling: { from: Frame; start: number } | undefined
+  /** The frame held through a drag, and the drawing settling into its own once it ends. */
+  private readonly frames = new TurnFrame()
 
   /** Whether the press that ended last was a drag. */
   dragged = false
@@ -242,39 +222,11 @@ export class DragTurn {
    * the middle of the data stands on the page. Called on every render.
    */
   frame(fits: Frame, middle: PagePoint): Frame {
-    let shown = fits
-    if (this.moving) {
-      this.settling = undefined
-      const from = this.last ?? { frame: fits, middle }
-      this.kept ??= {
-        frame: from.frame,
-        middle: { x: from.middle.x - from.frame.x, y: from.middle.y - from.frame.y },
-      }
-      const { frame, middle: at } = this.kept
-      shown = { height: frame.height, width: frame.width, x: middle.x - at.x, y: middle.y - at.y }
-    } else if (this.kept) {
-      this.kept = undefined
-      const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-      this.settling = still || !this.last ? undefined : { from: this.last.frame, start: now() }
+    const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    const { settling, shown } = this.frames.frame(fits, middle, this.moving, still)
+    if (settling) {
+      globalThis.requestAnimationFrame?.(() => this.redraw())
     }
-    if (this.settling && !this.moving) {
-      const { from, start } = this.settling
-      const t = (now() - start) / SETTLE
-      if (t >= 1) {
-        this.settling = undefined
-      } else {
-        const k = easeOut(Math.max(0, t))
-        const toward = (a: number, b: number): number => a + (b - a) * k
-        shown = {
-          height: toward(from.height, fits.height),
-          width: toward(from.width, fits.width),
-          x: toward(from.x, fits.x),
-          y: toward(from.y, fits.y),
-        }
-        globalThis.requestAnimationFrame?.(() => this.redraw())
-      }
-    }
-    this.last = { frame: shown, middle }
     return shown
   }
 

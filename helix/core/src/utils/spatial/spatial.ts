@@ -4,5 +4,7 @@
  * web's elements draw them in SVG, and a phone in react-native-svg, so both
  * stand every reading at one place.
  */
+
+export { type Camera, type PagePoint, shortNumber } from '../projection/projection.js'
 export * from './box.js'
 export * from './field.js'
