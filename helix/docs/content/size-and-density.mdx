@@ -126,13 +126,16 @@ Use a `-tight` or `-loose` step for something that is meant to differ from its
 neighbors, such as a row in a floating panel or a caret inside a trigger. Use
 `-sm`, `-md`, or `-lg` for a size that does not follow density.
 
-Two sizes do not follow a region's density. Like every size, they still scale
+Three sizes do not follow a region's density. Like every size, they still scale
 with `--helix-seed-density`:
 
 - `--helix-size-button` is 200px, a standard width for a button. Set it as a
   button's `--button-inline-size`.
 - `--helix-size-badge` is 16px, the size of a Badge's mark. A badge is pinned
   to something else, such as an avatar, so it does not take a control's size.
+- `--helix-size-control-xs` is 26px, the step under `--helix-size-control-sm`,
+  for a strip denser than a toolbar. Find and the Editor's link bar set
+  it as their own control height. It is not a density step.
 
 ## On a touch screen
 

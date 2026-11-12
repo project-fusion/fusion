@@ -54,7 +54,7 @@ its own steps:
 
 An Icon Button takes the same washes.
 
-Three more washes are laid over a ground the same way:
+Four more washes are laid over a ground the same way:
 
 - `press` lights a control under a press, a step past `hover`: 16% of
   `foreground` in light and 19% in dark. A Button's own press is 20% in dark,
@@ -64,6 +64,9 @@ Three more washes are laid over a ground the same way:
   `foreground` in light and 16% in dark.
 - `primary-wash` is the bubble of your own message in Chat. It is 20% of
   `primary` with a brand color, and 16% of `foreground` with none.
+- `track` is the unfilled length of a bar, such as a Progress or Meter track.
+  It is 8% of `foreground` in light and 7% in dark, which on the page is the
+  `surface-sunken` rung, and it steps the same distance off a card or a panel.
 
 Three more grounds sit outside the ladder:
 
@@ -97,7 +100,8 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
 - Text on a filled color takes the ink named for that fill:
   - `foreground-on-primary` on `primary-surface`
   - `foreground-on-accent` on `accent-surface`
-  - `foreground-on-status` on the four status fills
+  - `foreground-on-status` on the four status `-surface` fills
+  - `background` on `warning-solid`
 
 ### Lines and focus
 
@@ -106,6 +110,11 @@ Inks are the colors that go on grounds. The base ink is `foreground`.
 - `border-floating` is the edge of a surface that floats over content, such as a
   menu or a popover. It is `border` in light mode and 10% of white in dark mode,
   so the edge still shows where a shadow cannot.
+- `border-readonly` is the edge of a read-only mark that carries a value, such
+  as a read-only Checkbox's box, a Radio's circle, a Switch's track, a Slider's
+  thumb, or a Rating's empty stars. It is 44% of `foreground` in light and 36%
+  in dark, from 3.1:1 to 3.4:1 on every ground, so the value still reads where
+  the field edge is 1.23:1.
 - `border-hover` is the edge of a field under the pointer. It is the brand color
   when one is set, and a gray at about 3:1 on the white page when none is.
 - `focus-ring` is the color of the focus ring. It is `primary`, held at a
@@ -123,9 +132,10 @@ Intent colors show what something means.
   the fill under the pointer and a `-surface-active` variant for the fill under
   a press.
 - `info`, `success`, `warning`, and `danger` are for status. Each has a
-  `-surface` variant, the filled ground that carries `foreground-on-status`,
-  such as a danger button or a badge in a status tone, with the same
-  `-surface-hover` and `-surface-active` variants.
+  `-surface` variant, a filled ground that carries `foreground-on-status`, with
+  the same `-surface-hover` and `-surface-active` variants. A solid info,
+  success, or danger Button, Tag, Badge, or Icon Button fills its `-surface`
+  variant. A solid warning one fills `warning-solid`.
 - `primary-strong` is the far end of a ramp drawn in the brand color, such as
   the busiest cell of a heatmap. It is `primary-active` held at a lightness of
   0.33 or more, so the top of the ramp never reads as black.
@@ -143,6 +153,10 @@ Intent colors show what something means.
   fill, or a Callout's icon. `warning` is solved for text and reads brown as a
   shape, so in light mode a mark takes a lighter, more saturated step that
   measures at least 3:1 on the page. In dark mode it is `warning`.
+- `warning-solid` is the warning fill under a label: a solid warning Button,
+  Tag, Badge, or Icon Button, and a warning Map Marker or Map Points. Its label
+  is `background`. In light mode it is a deep amber, #985f00, under white at
+  5.29:1. In dark mode it is `warning-mark`, #ffaf00, under black at 11.38:1.
 - `brand-mark` is the brand color for a graphic. The engine solves `primary` to
   the theme's contrast target for text, and solves `brand-mark` to the 3:1 a
   graphic needs, so `brand-mark` stays closer to the color you chose. With no
