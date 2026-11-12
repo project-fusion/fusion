@@ -78,8 +78,8 @@ pub const DARK_FILL_STEPS: (f64, f64) = (1.15, 1.3);
 /// arithmetic does. The hover and the press are the same color at
 /// [`DARK_FILL_STEPS`] times the resting luminance.
 ///
-/// **Every seed takes this branch.** The stylesheet keeps a seed at L 0.68 or
-/// more at its own lightness less 0.05, with a black label. This engine solves
+/// **Every seed takes this branch.** The stylesheet keeps a seed lighter than L 0.68
+/// at its own lightness less 0.05, with a black label. This engine solves
 /// one near-white label for every colored fill, so a light seed is held in the
 /// same band as a dark one and carries the same white.
 #[must_use]
