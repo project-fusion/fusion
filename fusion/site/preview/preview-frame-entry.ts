@@ -368,15 +368,30 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
  * chase its own result and never settle. A viewport-anchored overlay is sized
  * by the viewport by definition, so it is not content the frame can be fitted
  * to. What the frame owes such an example is room for its trigger, which is in
- * flow and is measured.
+ * flow and is measured. That holds for a top-level child as much as for a
+ * descendant.
+ *
+ * **A visually hidden element is excluded too**, because it draws nothing. A
+ * chart's data table is clipped to `inset(50%)` and `fixed`, and a table keeps
+ * the height of its rows whatever block size it is given: counted, it made the
+ * Spatial Surface preview 2196 tall around a 592 chart, and Spatial Scatter
+ * 1221.
  */
+const shown = (node: Element): boolean => {
+  const style = getComputedStyle(node)
+  return style.position !== 'fixed' && style.clipPath !== 'inset(50%)'
+}
+
 const drawn = (child: Element): DOMRect[] => {
+  if (!shown(child)) {
+    return []
+  }
   const own = child.getBoundingClientRect()
   if (own.width > 0 || own.height > 0) {
     return [own]
   }
   return [...child.querySelectorAll('*')]
-    .filter((node) => getComputedStyle(node).position !== 'fixed')
+    .filter(shown)
     .map((node) => node.getBoundingClientRect())
     .filter((box) => box.width > 0 || box.height > 0)
 }

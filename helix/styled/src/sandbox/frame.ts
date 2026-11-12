@@ -101,16 +101,27 @@ const runScripts = (root: HTMLElement): void => {
 
 /**
  * The boxes one top-level child draws. A `display: contents` element draws
- * none of its own, so its descendants are asked, leaving out a `fixed` one,
- * which the viewport sizes and which would otherwise chase the frame's height.
+ * none of its own, so its descendants are asked. A `fixed` element is left
+ * out, at the top level and below it, because the viewport sizes it and it
+ * would otherwise chase the frame's height. A visually hidden one, clipped to
+ * `inset(50%)`, is left out because it draws nothing: a chart's data table
+ * is both, and counted at its full height it made the Spatial Surface
+ * preview 2196 tall around a 592 chart.
  */
 const drawn = (child: Element): DOMRect[] => {
+  const shown = (node: Element): boolean => {
+    const style = getComputedStyle(node)
+    return style.position !== 'fixed' && style.clipPath !== 'inset(50%)'
+  }
+  if (!shown(child)) {
+    return []
+  }
   const own = child.getBoundingClientRect()
   if (own.width > 0 || own.height > 0) {
     return [own]
   }
   return [...child.querySelectorAll('*')]
-    .filter((node) => getComputedStyle(node).position !== 'fixed')
+    .filter(shown)
     .map((node) => node.getBoundingClientRect())
     .filter((box) => box.width > 0 || box.height > 0)
 }
