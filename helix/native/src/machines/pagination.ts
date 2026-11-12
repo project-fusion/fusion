@@ -6,7 +6,9 @@
  * show and where each gap goes. A page's press keeps focus on that page, since
  * the row is keyed by page. A gap points somewhere new once the row moves, and a
  * step is disabled at the end it reached, so after either focus goes to the
- * current page. It says the new page as the page moves, whoever moved it.
+ * current page. It says the new page as the page moves, whoever moved it. Where
+ * its own width cannot hold the full row, it folds into the compact form, as
+ * `usePaginationFold` measures.
  *
  * **A page-size control is a Select**, its options the sizes it offers. It holds
  * the size in force, and a refusal leaves the Select where it stood.
@@ -28,6 +30,7 @@ import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Entry } from '../render/entry'
 import type { Family } from '../style/form'
+import { usePaginationFold } from './pagination-fold'
 import { boundTo, given, tell } from './props'
 
 const wordsIn = (value: unknown): string => (typeof value === 'string' ? value : '')
@@ -106,6 +109,14 @@ export const usePagination = (family: Family, props: Props, use: MachineUse): Be
       }
     })
   }, [boundaries, count, gapLabel, lang, page, pageLabel, pressed, siblings])
+  const drawn = read('ends') === true ? ['first', 'previous', 'next', 'last'] : ['previous', 'next']
+  const fold = usePaginationFold(
+    family,
+    props,
+    read('compact') === true,
+    drawn,
+    rows.map((row) => row.key),
+  )
 
   const nodes = useRef(new Map<string, unknown>())
   const steps = useRef(new Map<string, unknown>())
@@ -156,6 +167,7 @@ export const usePagination = (family: Family, props: Props, use: MachineUse): Be
     (item: Entry) => {
       const key = String(item.fields.key)
       return {
+        onLayout: fold.pageLaid(key),
         onPress: () => go(Number(item.fields.to), item.fields.gap === true, nodes.current.get(key)),
         onTouchCancel: () => setPressed(undefined),
         onTouchEnd: () => setPressed(undefined),
@@ -169,10 +181,11 @@ export const usePagination = (family: Family, props: Props, use: MachineUse): Be
         },
       }
     },
-    [go],
+    [fold.pageLaid, go],
   )
   const step = (name: string, to: number) => ({
     view: {
+      onLayout: fold.stepLaid(name),
       onPress: () => go(to, to <= 1 || to >= count, steps.current.get(name)),
       ref: (node: unknown) => {
         if (node === null) {
@@ -196,9 +209,13 @@ export const usePagination = (family: Family, props: Props, use: MachineUse): Be
           [flag('atEnd')]: atEnd,
           [flag('atStart')]: atStart,
           [flag('empty')]: count <= 1,
+          [flag('folded')]: fold.folded,
           [flag('status')]: status,
         },
-        view: { accessibilityLabel: wordsIn(read('label')) || wordsIn(read('fallbackLabel')) },
+        view: {
+          accessibilityLabel: wordsIn(read('label')) || wordsIn(read('fallbackLabel')),
+          onLayout: fold.hostLaid,
+        },
       },
       last: step('last', count),
       list: { lists: { [flag('slots')]: rows } },

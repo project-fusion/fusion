@@ -809,6 +809,7 @@ const PAGINATION_ROOT: &[Field] = &[
     ("ends", "ends", Name),
     ("fallbackLabel", "fallbackLabel", Name),
     ("firstLabel", "firstLabel", Name),
+    ("folded", "folded", Name),
     ("gapLabel", "gapLabel", Name),
     ("label", "label", Name),
     ("lastLabel", "lastLabel", Name),
