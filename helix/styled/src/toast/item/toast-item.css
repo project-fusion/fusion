@@ -104,8 +104,11 @@
   /* Its own trailing gap, so an absent mark costs nothing. */
   margin-inline-end: var(--helix-space-sm);
   /* Half the difference between the first line and the glyph, so the two share a
-     center however many lines follow. */
-  margin-block-start: calc((var(--_toast-line) - var(--helix-size-icon)) / 2);
+     center however many lines follow. **Rounded to the pixel**, so the glyph is
+     drawn on whole pixels: half of 21 less 16 put it 2.5 down, on a half pixel,
+     and the nearest whole one is no more than half a pixel off the line's
+     center. */
+  margin-block-start: round(calc((var(--_toast-line) - var(--helix-size-icon)) / 2), 1px);
 }
 
 /* Size only. Stroke width belongs to the glyph: the set is drawn on a 256 box at
@@ -202,10 +205,11 @@ slot[name="icon"]::slotted(*) {
      so the close is the same 32px as an action beside it. It read `-tight` for
      years and came out 32 only because that was the root's step, substituted at
      the root; once the step is derived here, `-tight` is 25.6. */
+  /* Rounded as the mark's offset is, so the close's glyph lands on the same
+     whole pixel as the mark. */
   inset-block-start: calc(
     var(--toast-item-padding, var(--helix-space-sm)) +
-    (var(--_toast-line) - var(--helix-size-control)) /
-    2
+    round(calc((var(--_toast-line) - var(--helix-size-control)) / 2), 1px)
   );
   inset-inline-end: var(--helix-space-sm);
   block-size: var(--helix-size-control);

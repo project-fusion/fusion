@@ -63,8 +63,12 @@
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
   /* Centered on the first line, from the top of the row it shares with the
-     summary. */
-  margin-block-start: round(down, calc((1lh - var(--helix-size-icon-tight)) / 2), 1px);
+     summary. **Unrounded**, because the row is what sits on the half pixel: a
+     21 pixel line centered in an even trigger starts at 9.5 in a 40 pixel one,
+     and the exact half of the difference brings the chevron back to 12, a
+     whole pixel at the middle of the trigger and of the line. Rounded down it
+     sat at 11.5, half a pixel high, at every density. */
+  margin-block-start: calc((1lh - var(--helix-size-icon-tight)) / 2);
   transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
@@ -74,7 +78,7 @@
   color: var(--accordion-item-chevron-color, var(--helix-color-foreground-muted));
   flex: 0 0 auto;
   inline-size: var(--helix-size-icon-tight);
-  margin-block-start: round(down, calc((1lh - var(--helix-size-icon-tight)) / 2), 1px);
+  margin-block-start: calc((1lh - var(--helix-size-icon-tight)) / 2);
   transition: rotate var(--helix-duration-normal) var(--helix-easing-standard);
 }
 
