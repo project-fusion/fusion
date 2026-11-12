@@ -308,6 +308,24 @@ slot[name="start"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* **A tag that can be chosen answers the pointer**, as a selectable row does:
+   the pointer, the hover wash over its fill, and the press a step past it. In a
+   group that selects, the focus ring was the only sign a tag could be chosen.
+   A tag in a group that does not select stays a label. */
+:host(:state(selectable):not([disabled])) [part="cell"] {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  :host(:state(selectable):not([disabled])) [part="cell"]:hover {
+    background-color: var(--helix-color-hover);
+  }
+}
+
+:host(:state(selectable):not([disabled])) [part="cell"]:active {
+  background-color: var(--helix-color-press);
+}
+
 /* Selected in a group that selects: the tone filled, as `solid` draws it. */
 :host(:state(selected)) {
   --_tag-fill: var(

@@ -40,8 +40,9 @@ import { property } from 'lit/decorators.js'
  * selected. Its remove button leaves the tab order there, Delete and Backspace
  * doing its job from the row.
  *
- * **Styling a tag by what is happening to it.** `:state(selected)` while it is
- * selected, `:state(focus-visible)` while its cell shows keyboard focus,
+ * **Styling a tag by what is happening to it.** `:state(selectable)` while its
+ * group selects, `:state(selected)` while it is selected,
+ * `:state(focus-visible)` while its cell shows keyboard focus,
  * `[disabled]` while it is out of reach, and the host's own `:hover` and
  * `:active` under the pointer, as React Aria's `data-hovered` and
  * `data-pressed` are.
@@ -66,6 +67,7 @@ import { property } from 'lit/decorators.js'
  * @csspart start - The category before the label.
  *
  * @cssstate focus-visible - The tag's cell has keyboard focus that the browser shows, in a `Tag.Group`.
+ * @cssstate selectable - The tag can be selected, in a `Tag.Group` that selects.
  * @cssstate selected - The tag is selected in a `Tag.Group` that selects.
  */
 @customElement('helix-headless-tag')
@@ -191,6 +193,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
     })
     internalsOf(this).ariaSelected = this.selected === undefined ? null : String(this.selected)
     internalsOf(this).ariaDisabled = this.disabled ? 'true' : null
+    this.toggleState('selectable', this.selected !== undefined)
     this.toggleState('selected', this.selected === true)
   }
 
