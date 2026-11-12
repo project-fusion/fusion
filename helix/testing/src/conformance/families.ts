@@ -78,6 +78,7 @@ export type Family =
   | 'lightbox'
   | 'video'
   | 'orb'
+  | 'aura'
   | 'video-playlist'
   | 'sparkline'
   | 'filter-input'

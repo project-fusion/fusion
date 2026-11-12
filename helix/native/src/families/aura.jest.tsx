@@ -6,7 +6,7 @@
  * toggle that holds the field and says `change`.
  */
 import { afterEach, describe, expect, jest, test } from '@jest/globals'
-import { act, fireEvent, render, screen } from '@testing-library/react-native'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 import { TurboModuleRegistry } from 'react-native'
 import { forgetSkia } from '../capabilities/gpu-drawing'
 import { HelixTheme } from '../theme/helix-theme'
@@ -109,6 +109,12 @@ describe('Aura with react-native-skia', () => {
       </HelixTheme>,
     )
     await layOut(drawn, 320, 200)
+    /* The first frame is recorded after the layout, on a loaded machine a little later. */
+    await waitFor(() =>
+      expect(drawn?.queryAllByTestId('skia-picture', { includeHiddenElements: true })).toHaveLength(
+        1,
+      ),
+    )
     expect(mockMade.sources.length).toBe(1)
     expect(mockMade.sources[0]).toContain('vec4 main(vec2 fragCoord)')
     expect(mockMade.sources[0]).not.toContain('gl_FragCoord')
@@ -119,7 +125,6 @@ describe('Aura with react-native-skia', () => {
     /* `rays` is the shader's second shape. */
     expect(uniforms[3]).toBe(1)
     expect(mockMade.blends).toContain(6)
-    expect(drawn.queryAllByTestId('skia-picture', { includeHiddenElements: true })).toHaveLength(1)
   })
 })
 

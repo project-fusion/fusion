@@ -3,6 +3,7 @@ import { ACCORDION } from './scenarios/accordion.js'
 import { ANNOUNCEMENT } from './scenarios/announcement.js'
 import { APP_HEADER } from './scenarios/app-header.js'
 import { AREA_CHART } from './scenarios/area-chart.js'
+import { AURA } from './scenarios/aura.js'
 import { BAR_CHART } from './scenarios/bar-chart.js'
 import { BUTTON } from './scenarios/button.js'
 import { BUTTON_GROUP } from './scenarios/button-group.js'
@@ -86,6 +87,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   announcement: ANNOUNCEMENT,
   'app-header': APP_HEADER,
   'area-chart': AREA_CHART,
+  aura: AURA,
   'bar-chart': BAR_CHART,
   button: BUTTON,
   'button-group': BUTTON_GROUP,

@@ -2,11 +2,10 @@ import './aurora.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        pattern="aurora"
-        tilt={0}
-      ></helix-aura>
-    </div>
+    <helix-aura
+      pattern="aurora"
+      style={{ blockSize: '20rem' }}
+      tilt={0}
+    ></helix-aura>
   )
 }

@@ -2,11 +2,10 @@ import './caustics.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        interactive
-        pattern="caustics"
-      ></helix-aura>
-    </div>
+    <helix-aura
+      interactive
+      pattern="caustics"
+      style={{ blockSize: '20rem' }}
+    ></helix-aura>
   )
 }

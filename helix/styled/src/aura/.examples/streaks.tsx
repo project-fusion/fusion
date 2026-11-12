@@ -2,11 +2,10 @@ import './streaks.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        interactive
-        pattern="streaks"
-      ></helix-aura>
-    </div>
+    <helix-aura
+      interactive
+      pattern="streaks"
+      style={{ blockSize: '20rem' }}
+    ></helix-aura>
   )
 }

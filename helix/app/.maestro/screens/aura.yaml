@@ -1,0 +1,95 @@
+# Aura, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Aura"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://aura/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: aura-preview-${MODE}-${SIZE}
+- openLink: helix://aura/aurora/preview
+- extendedWaitUntil:
+    visible: 'Aurora'
+    timeout: 15000
+- takeScreenshot: aura-aurora-${MODE}-${SIZE}
+- openLink: helix://aura/caustics/preview
+- extendedWaitUntil:
+    visible: 'Caustics'
+    timeout: 15000
+- takeScreenshot: aura-caustics-${MODE}-${SIZE}
+- openLink: helix://aura/constellation/preview
+- extendedWaitUntil:
+    visible: 'Constellation'
+    timeout: 15000
+- takeScreenshot: aura-constellation-${MODE}-${SIZE}
+- openLink: helix://aura/drift/preview
+- extendedWaitUntil:
+    visible: 'Drift'
+    timeout: 15000
+- takeScreenshot: aura-drift-${MODE}-${SIZE}
+- openLink: helix://aura/flow/preview
+- extendedWaitUntil:
+    visible: 'Flow'
+    timeout: 15000
+- takeScreenshot: aura-flow-${MODE}-${SIZE}
+- openLink: helix://aura/fracture/preview
+- extendedWaitUntil:
+    visible: 'Fracture'
+    timeout: 15000
+- takeScreenshot: aura-fracture-${MODE}-${SIZE}
+- openLink: helix://aura/gain-and-scale/preview
+- extendedWaitUntil:
+    visible: 'Gain and scale'
+    timeout: 15000
+- takeScreenshot: aura-gain-and-scale-${MODE}-${SIZE}
+- openLink: helix://aura/hero/preview
+- extendedWaitUntil:
+    visible: 'Hero'
+    timeout: 15000
+- takeScreenshot: aura-hero-${MODE}-${SIZE}
+- openLink: helix://aura/interaction/preview
+- extendedWaitUntil:
+    visible: 'Interaction'
+    timeout: 15000
+- takeScreenshot: aura-interaction-${MODE}-${SIZE}
+- openLink: helix://aura/lattice/preview
+- extendedWaitUntil:
+    visible: 'Lattice'
+    timeout: 15000
+- takeScreenshot: aura-lattice-${MODE}-${SIZE}
+- openLink: helix://aura/particles/preview
+- extendedWaitUntil:
+    visible: 'Particles'
+    timeout: 15000
+- takeScreenshot: aura-particles-${MODE}-${SIZE}
+- openLink: helix://aura/rays/preview
+- extendedWaitUntil:
+    visible: 'Rays'
+    timeout: 15000
+- takeScreenshot: aura-rays-${MODE}-${SIZE}
+- openLink: helix://aura/streaks/preview
+- extendedWaitUntil:
+    visible: 'Streaks'
+    timeout: 15000
+- takeScreenshot: aura-streaks-${MODE}-${SIZE}
+- openLink: helix://aura/terminus/preview
+- extendedWaitUntil:
+    visible: 'Terminus'
+    timeout: 15000
+- takeScreenshot: aura-terminus-${MODE}-${SIZE}
+- openLink: helix://aura/threads/preview
+- extendedWaitUntil:
+    visible: 'Threads'
+    timeout: 15000
+- takeScreenshot: aura-threads-${MODE}-${SIZE}
+- openLink: helix://aura/waves/preview
+- extendedWaitUntil:
+    visible: 'Waves'
+    timeout: 15000
+- takeScreenshot: aura-waves-${MODE}-${SIZE}
