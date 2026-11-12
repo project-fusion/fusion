@@ -53,11 +53,11 @@ export function Overview() {
               scroll the table sideways to read a value. Each track here has a
               floor and a share: the floor is what the words need, and the share
               is how the spare width is divided. Measured November 4, 2026, at
-              390 in a box of 366: nothing is cut, and no name on the first page
-              wraps with a mouse or on a touch screen, where the text steps up
-              from 13 to 14. On touch "Kwame Asante", the longest name, takes two
-              lines. The floors alone come to 342 with a mouse, so at a 366
-              pixel window they exactly fit, and below it the table scrolls its
+              390 in a box of 358: nothing is cut, and no name wraps with a
+              mouse. On a touch screen, where the text steps up from 13 to 14,
+              "Ada Okonkwo" and "Kwame Asante" take two lines. The floors alone
+              come to 342 with a mouse, so the box holds them with room to spare,
+              and in a narrower one the table scrolls its
               own box and fades whichever edge has more behind it. The last is `max-content`, since a column of numerals has one
               right width. On the table, so a page rendered on a server is laid
               out at these widths before the script runs. */}
