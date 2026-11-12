@@ -400,13 +400,12 @@ helix-app-header {
  * **Narrow, the gutter gives first.** 24 pixels either side of a 390 window
  * spend 48 of 390 on margin, and the table needs 355 of what is left. At `lg`
  * it was 13 pixels short, and the last column sat outside the box until you
- * scrolled the table sideways. At `md`, 16, the table had 358, and on a touch
- * screen, where its text steps up from 13 to 14, "Ada Okonkwo" took two lines
- * and its row was 47.9 against 45. At `sm`, 12, the table has 366 and every
- * row on the first page holds one line, 40 under a mouse and 45 on a touch
- * screen, in Chromium and WebKit alike. On the second page "Kwame Asante", the
- * longest name, takes two lines on a touch screen, as the table's own note in
- * the overview says. The header, the page, and the footer keep one edge.
+ * scrolled the table sideways. At `md`, 16, the table has 358, and every row
+ * holds one line under a mouse. On a touch screen, where the table's text steps
+ * up from 13 to 14, "Ada Okonkwo" and "Kwame Asante" take two lines, as a long
+ * name in a narrow table does. 16 is the usual phone margin, and this edge is
+ * the one an app built from the template keeps, so the owner chose it over 12
+ * on November 12, 2026. The header, the page, and the footer keep one edge.
  */
 @media (width < 40rem) {
   /* **Room under the card for the pause control**: the control, and a 12-pixel
@@ -438,15 +437,15 @@ helix-app-header {
 
   .page {
     padding-block: var(--helix-space-xl) var(--helix-space-2xl);
-    padding-inline: var(--helix-space-sm);
+    padding-inline: var(--helix-space-md);
   }
 
   .footer-row {
-    padding-inline: var(--helix-space-sm);
+    padding-inline: var(--helix-space-md);
   }
 
   helix-app-header {
-    --app-header-padding: var(--helix-space-sm);
+    --app-header-padding: var(--helix-space-md);
   }
 }
 
