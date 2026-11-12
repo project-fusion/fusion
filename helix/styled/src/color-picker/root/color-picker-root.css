@@ -705,3 +705,29 @@
   box-shadow: inset 0 0 0 var(--helix-border-thin)
     color-mix(in oklab, var(--helix-color-foreground) 14%, transparent);
 }
+
+/* **Forced colors keep the colors being picked.** They take every gradient
+   off, so the square, the ring, the chip, and the presets drew as empty boxes
+   and the picker showed no color at all. The colors are the content here, so
+   those parts keep them. The chip and the presets take their edge, and every
+   part its focus ring, in the reader's own colors; the square keeps its own
+   inset edge. */
+@media (forced-colors: active) {
+  [part="grid"],
+  [part="sample"],
+  [part="swatch"],
+  [part="wheel"] {
+    forced-color-adjust: none;
+  }
+
+  [part="sample"],
+  [part="swatch"] {
+    border-color: CanvasText;
+  }
+
+  [part="grid"]:has(:focus-visible),
+  [part="sample"]:focus-visible,
+  [part="wheel"]:has([part="wheel-hue"]:focus-visible) {
+    outline-color: Highlight;
+  }
+}
