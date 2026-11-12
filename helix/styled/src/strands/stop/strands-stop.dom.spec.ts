@@ -42,7 +42,7 @@ describe('strands stop', () => {
   })
 
   test('takes no room in the content box it is slotted into', async () => {
-    const { styles } = await import('./strands-stop.css.js')
+    const { styles } = await import('./strands-stop.generated.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
     expect(sheet).toMatch(/:host\s*\{\s*display: none;?\s*\}/)
   })

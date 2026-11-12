@@ -97,6 +97,7 @@ import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../spee
 import { HelixSplitter } from '../splitter/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
 import { HelixStep } from '../steps/index.native'
+import { HelixStrands } from '../strands/index.native'
 import { HelixSwitch } from '../switch/index.native'
 import { HelixTable, HelixTableCell, HelixTableColumn, HelixTableRow } from '../table/index.native'
 import { HelixTab, HelixTabPanel } from '../tabs/index.native'
@@ -305,6 +306,11 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-stat-group': HelixStatGroup,
   'helix-step': HelixStep,
   'helix-steps': Steps,
+  'helix-strands': HelixStrands,
+  /* A stop says where a ribbon laid down a page turns. A phone has no page to
+     lay a ribbon down, so a stop draws nothing there, as it draws nothing on
+     the web. */
+  'helix-strands-stop': () => null,
   'helix-switch': HelixSwitch,
   'helix-tab': HelixTab,
   'helix-tab-panel': HelixTabPanel,

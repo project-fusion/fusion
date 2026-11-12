@@ -79,6 +79,7 @@ export type Family =
   | 'video'
   | 'orb'
   | 'aura'
+  | 'strands'
   | 'video-playlist'
   | 'sparkline'
   | 'filter-input'
