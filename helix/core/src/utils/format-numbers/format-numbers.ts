@@ -28,11 +28,19 @@ export const formatNumbers = (locale: string): ((value: number) => string) => {
      shorter and sits lower, so "-8,000" on a chart's axis read as a dash
      beside a number (November 4, 2026). A locale that writes its own minus
      keeps it. */
-  return (value) =>
-    value < 0 || Object.is(value, -0)
+  /* **Hermes in Expo Go has no `formatToParts`**, and a chart with a negative
+     number threw while it drew there (November 12, 2026). Without it, the
+     hyphen the locale writes becomes the minus sign in the written number. */
+  const parts = typeof found.formatToParts === 'function'
+  return (value) => {
+    if (!(value < 0 || Object.is(value, -0))) {
+      return found.format(value)
+    }
+    return parts
       ? found
           .formatToParts(value)
           .map((part) => (part.type === 'minusSign' && part.value === '-' ? '\u2212' : part.value))
           .join('')
-      : found.format(value)
+      : found.format(value).replace('-', '\u2212')
+  }
 }
