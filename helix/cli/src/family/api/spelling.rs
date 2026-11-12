@@ -1048,6 +1048,8 @@ const AURA: &[Field] = &[("glyph", "glyph", Name), ("held", "held", Name)];
 
 const ORB: &[Field] = &[("shown", "shown", Name)];
 
+const STRANDS: &[Field] = &[];
+
 const VIDEO: &[Field] = &[
     ("bar", "bar", Name),
     ("captionMenu", "captionMenu", Name),
@@ -1622,6 +1624,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("video", "video", VIDEO),
     ("aura", "aura", AURA),
     ("orb", "orb", ORB),
+    ("strands", "strands", STRANDS),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),

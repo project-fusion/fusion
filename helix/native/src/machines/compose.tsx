@@ -70,6 +70,7 @@ import { useSparkline } from './sparkline'
 import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
 import { stackRow } from './stack-row'
+import { useStrands } from './strands'
 import { useTable } from './table'
 import { useTableColumn, useTableRow } from './table-row'
 import { useTail } from './tail'
@@ -543,6 +544,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useAura(family, props, use),
+      ),
+    /* A ribbon of strands: its strands drawn on the GPU. */
+    ...uses
+      .filter((use) => use.machine === 'strands')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useStrands(family, props, use),
       ),
     /* An orb: its dots drawn on the GPU, and its state. */
     ...uses

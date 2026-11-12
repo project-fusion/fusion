@@ -1044,6 +1044,9 @@ export interface AuraChoice {
   readonly held?: string
 }
 
+/** The names of a ribbon of strands: none, since it binds nothing by a name. */
+export type StrandsChoice = Readonly<Record<string, never>>
+
 /** The names of an orb, each read as `orb.x`. */
 export interface OrbChoice {
   readonly shown?: string

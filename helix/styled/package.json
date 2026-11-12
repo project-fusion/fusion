@@ -733,6 +733,14 @@
       "default": "./dist/steps/index.js"
     },
     "./svelte": "./types/svelte.d.ts",
+    "./strands": {
+      "react-native": {
+        "types": "./dist/strands/index.native.d.ts",
+        "default": "./dist/strands/index.native.js"
+      },
+      "types": "./dist/strands/index.d.ts",
+      "default": "./dist/strands/index.js"
+    },
     "./switch": {
       "react-native": {
         "types": "./dist/switch/index.native.d.ts",

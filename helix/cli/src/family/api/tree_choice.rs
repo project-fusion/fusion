@@ -826,6 +826,12 @@ pub const AURA_COMPUTED: &[&str] = &["glyph", "held"];
 /// What an orb sends: nothing. It reads its props by their own names.
 pub const ORB: &[(&str, Names)] = &[];
 
+/// What a ribbon of strands sends: nothing by a bound name. It reads its props by their own names.
+pub const STRANDS: &[(&str, Names)] = &[];
+
+/// What it computes for its parts: nothing. Its drawing and its fallback are its states.
+pub const STRANDS_COMPUTED: &[&str] = &[];
+
 /// What it computes for its parts, each read as `orb.x`: the state it draws.
 pub const ORB_COMPUTED: &[&str] = &["shown"];
 
@@ -1440,6 +1446,11 @@ pub fn orb(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "orb", ORB, ORB_COMPUTED)
 }
 
+/// `strands({})`, which binds no names.
+pub fn strands(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "strands", STRANDS, STRANDS_COMPUTED)
+}
+
 /// `video({ ... })`, each field a name.
 pub fn video(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "video", VIDEO, VIDEO_COMPUTED)
@@ -1580,6 +1591,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "video" => video(value),
         "aura" => aura(value),
         "orb" => orb(value),
+        "strands" => strands(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

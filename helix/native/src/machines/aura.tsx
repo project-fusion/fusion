@@ -39,7 +39,7 @@ import type { SkiaModule, SkRuntimeEffect } from '../render/skia-types'
 import { svg } from '../render/vector'
 import { mix } from '../style/color'
 import type { Family } from '../style/form'
-import { colorBytes } from './orb'
+import { bytesOf, carriedColors, fadeOf } from './drawing-look'
 import { boundTo, given, tell } from './props'
 
 /** The effect, compiled once, or `null` where it does not compile. */
@@ -58,38 +58,8 @@ const numberOf = (value: unknown, otherwise: number): number => {
 const wordsOf = (value: unknown): string | undefined =>
   typeof value === 'string' && value !== '' ? value : undefined
 
-/** The fade `--aura-fade` sets, as a share of the height, `0.15` where it sets none. */
-const fadeOf = (look: DrawingLook): number => {
-  const written = String(look.custom['aura-fade'] ?? '15%').trim()
-  const share = Number.parseFloat(written)
-  if (!Number.isFinite(share)) {
-    return 0.15
-  }
-  return Math.min(0.5, Math.max(0, written.endsWith('%') ? share / 100 : share))
-}
-
 /** The four stops, read off the canvas part's colors, as the web's `paletteOf` reads them. */
-const paletteFrom = (look: DrawingLook): AuraPalette => {
-  const box = (look.box ?? {}) as Readonly<Record<string, unknown>>
-  const text = look.text as Readonly<Record<string, unknown>>
-  const words = (value: unknown) => (typeof value === 'string' ? value : '')
-  return paletteOf(
-    {
-      caretColor: words(box.caretColor),
-      color: words(text.color),
-      columnRuleColor: words(box.columnRuleColor),
-      outlineColor: words(box.outlineColor),
-      textDecorationColor: words(text.textDecorationColor),
-    },
-    (value) => {
-      if (value === '') {
-        return undefined
-      }
-      const [red, green, blue] = colorBytes(value)
-      return [red, green, blue]
-    },
-  )
-}
+const paletteFrom = (look: DrawingLook): AuraPalette => paletteOf(carriedColors(look), bytesOf)
 
 /** The mask's stops, the web's, as a share of the height and an alpha. */
 const MASK = [
@@ -221,7 +191,7 @@ const AuraDrawing = ({ drawable, held, look, settings }: FieldProps) => {
   const reduced = useReducedMotion()
   const paused = useMotionPaused()
   const palette = paletteFrom(look)
-  const fade = fadeOf(look)
+  const fade = fadeOf(look, 'aura-fade', 0.15)
   return (
     <GpuDrawing
       drawable={drawable}

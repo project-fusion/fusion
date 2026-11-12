@@ -77,7 +77,7 @@ pub use tree_choice::{
     CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU,
     HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
     NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB,
-    PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, TABLE,
+    PAGINATION, PAGINATION_SIZE, PICKER_FIELD, SCATTER_CHART, SELECT, SPARKLINE, STRANDS, TABLE,
     TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST,
     VIDEO_PLAYLIST_MENU,
 };
@@ -262,6 +262,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it draws an orb.
     #[serde(rename = "orb", skip_serializing_if = "Option::is_none")]
     pub orb: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it draws a ribbon of strands.
+    #[serde(rename = "strands", skip_serializing_if = "Option::is_none")]
+    pub strands: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it is a field of dates or times.
     #[serde(rename = "pickerField", skip_serializing_if = "Option::is_none")]
     pub picker_field: Option<TreeChoice>,
@@ -441,6 +444,7 @@ impl Api {
             && self.video.is_none()
             && self.aura.is_none()
             && self.orb.is_none()
+            && self.strands.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
             && self.select.is_none()
@@ -546,6 +550,7 @@ const FIELDS: &[&str] = &[
     "video",
     "aura",
     "orb",
+    "strands",
     "pickerField",
     "listbox",
     "select",
@@ -642,6 +647,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
         video: field("video").map(tree_choice::video).transpose()?,
         aura: field("aura").map(tree_choice::aura).transpose()?,
         orb: field("orb").map(tree_choice::orb).transpose()?,
+        strands: field("strands").map(tree_choice::strands).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)
             .transpose()?,

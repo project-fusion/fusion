@@ -104,6 +104,7 @@ const GIVEN: &[&str] = &[
     "video",
     "aura",
     "orb",
+    "strands",
     "pickerField",
     "listbox",
     "select",

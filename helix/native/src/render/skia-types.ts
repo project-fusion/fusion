@@ -49,8 +49,30 @@ export interface SkCanvas {
   drawPaint(paint: SkPaint): void
   drawPath(path: SkPath, paint: SkPaint): void
   drawRect(rect: SkRect, paint: SkPaint): void
+  drawVertices(vertices: SkVertices, mode: number, paint: SkPaint): void
   restore(): void
-  saveLayer(paint?: SkPaint): number
+  save(): number
+  scale(x: number, y: number): void
+  saveLayer(
+    paint?: SkPaint,
+    bounds?: SkRect | null,
+    backdrop?: SkImageFilter | null,
+    flags?: number,
+  ): number
+}
+
+/** A point, as Skia's vertices take one. */
+export interface SkPoint {
+  readonly x: number
+  readonly y: number
+}
+
+/** Triangles a canvas draws in one call, as Strands' strips. */
+export type SkVertices = object
+
+/** A runtime effect with its uniforms set, which an image filter runs. */
+export interface SkRuntimeShaderBuilder {
+  setUniform(name: string, value: readonly number[]): void
 }
 
 /** A recorded drawing, which the `Picture` component draws. */
@@ -71,12 +93,35 @@ export interface SkRuntimeEffect {
 export interface SkiaApi {
   Color(color: string): SkColor
   ImageFilter: {
+    MakeArithmetic(
+      k1: number,
+      k2: number,
+      k3: number,
+      k4: number,
+      enforcePMColor: boolean,
+      background?: SkImageFilter | null,
+      foreground?: SkImageFilter | null,
+    ): SkImageFilter
     MakeBlur(x: number, y: number, mode: number, input: SkImageFilter | null): SkImageFilter
+    MakeRuntimeShader(
+      builder: SkRuntimeShaderBuilder,
+      childShaderName: string | null,
+      input?: SkImageFilter | null,
+    ): SkImageFilter
   }
+  MakeVertices(
+    mode: number,
+    positions: readonly SkPoint[],
+    textureCoordinates?: readonly SkPoint[] | null,
+    colors?: readonly (readonly number[])[] | null,
+    indices?: readonly number[] | null,
+    isVolatile?: boolean,
+  ): SkVertices
   Paint(): SkPaint
   Path: { Make(): SkPath }
   PictureRecorder(): SkPictureRecorder
   RuntimeEffect: { Make(source: string): SkRuntimeEffect | null }
+  RuntimeShaderBuilder(effect: SkRuntimeEffect): SkRuntimeShaderBuilder
   Shader: {
     MakeLinearGradient(
       start: { readonly x: number; readonly y: number },
@@ -101,4 +146,6 @@ export interface SkiaModule {
   readonly Skia: SkiaApi
   /** How a blur treats the edge of what it blurs, by name, as `TileMode.Decal`. */
   readonly TileMode: Readonly<Record<string, number>>
+  /** How vertices make triangles, by name, as `VertexMode.TriangleStrip`. */
+  readonly VertexMode?: Readonly<Record<string, number>>
 }
