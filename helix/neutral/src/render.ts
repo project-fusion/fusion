@@ -553,6 +553,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly aura: Computes<'glyph' | 'held'>
   /** What an orb computes for its parts: the state it draws. */
   readonly orb: Computes<'shown'>
+  /** What a ribbon of strands computes for its parts: nothing, since its drawing and its fallback are its states. */
+  readonly strands: Computes<never>
   /** What a viewer of one item at a time computes for its parts. */
   readonly lightbox: Computes<
     | 'arrows'

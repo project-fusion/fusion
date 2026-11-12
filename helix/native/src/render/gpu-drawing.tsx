@@ -42,6 +42,12 @@ export interface GpuDrawingProps {
   readonly drawable?: boolean
   /** Anything whose change draws a standing frame again, as new colors do. */
   readonly still?: unknown
+  /**
+   * The least time between two frames drawn while it runs, in seconds, as
+   * Strands draws at most thirty a second, as its web element does. Each
+   * frame drawn is told the time since the last one drawn.
+   */
+  readonly interval?: number
 }
 
 /** Whether the app is in front, where a frame is worth drawing. */
@@ -67,7 +73,7 @@ const record = (skia: SkiaModule, paint: Painter, box: DrawingBox, dt: number): 
 /** The frames a drawing shows while the peer stands: one a refresh while running, or one. */
 const useFrames = (
   skia: SkiaModule,
-  { paint, running, still }: GpuDrawingProps,
+  { interval = 0, paint, running, still }: GpuDrawingProps,
   box: DrawingBox | undefined,
 ): SkPicture | undefined => {
   const [picture, setPicture] = useState<SkPicture>()
@@ -88,14 +94,16 @@ const useFrames = (
     let frame = 0
     const tick = () => {
       const now = Date.now()
-      const dt = Math.min(MAX_STEP, (now - last) / 1000)
-      last = now
-      setPicture(record(skia, painter.current, box, dt))
+      const since = (now - last) / 1000
+      if (since >= interval) {
+        last = now
+        setPicture(record(skia, painter.current, box, Math.min(MAX_STEP, since)))
+      }
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [box, runs, skia, still])
+  }, [box, interval, runs, skia, still])
   return picture
 }
 
