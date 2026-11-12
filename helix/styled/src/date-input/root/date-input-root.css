@@ -116,9 +116,23 @@ slot[name="trigger"]::slotted(*) {
   opacity: var(--helix-opacity-disabled);
 }
 
+/* **One ring, the field's.** The field draws its ring while anything in it
+   has focus, so a ring on the trigger as well drew a square 2px outline inside
+   the field's rounded one once the panel closed with Escape and focus came
+   back. The trigger says it holds the focus by its ink and the hover wash. */
 [part="trigger"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
+  background-color: var(--helix-color-hover);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  outline: none;
+}
+
+/* Forced colors paint the wash the canvas, so there the trigger keeps a ring. */
+@media (forced-colors: active) {
+  [part="trigger"]:focus-visible {
+    outline: var(--helix-size-focus-ring) solid Highlight;
+    outline-offset: calc(var(--helix-size-focus-offset) * -1);
+  }
 }
 
 /* The clear button, under `clearable`: Input's, a mark in the field beside
