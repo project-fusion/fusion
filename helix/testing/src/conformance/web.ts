@@ -593,6 +593,8 @@ const nameOf = (type: string, family: string): string | undefined => {
  * an event is read as refused once its intent has run. A scenario that
  * moves the fake clock is given `clock`, set as the timers capability first.
  */
+export { drawInSoftware } from './web-renderer.js'
+
 export const run = async (scenario: Scenario, clock?: Clock): Promise<Step[]> => {
   const root = build(scenario.setup)
   const { heard, mounted } = mountSetup(root, scenario.family)
