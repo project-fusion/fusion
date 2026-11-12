@@ -344,7 +344,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   /** What a group of options computes for its parts. */
   readonly optionGroup: Computes<'emptied' | 'later'>
   /** What a row of pages computes for its parts. */
-  readonly paginationRoot: Computes<'atEnd' | 'atStart' | 'empty' | 'slots' | 'status'>
+  readonly paginationRoot: Computes<'atEnd' | 'atStart' | 'empty' | 'folded' | 'slots' | 'status'>
   /** What a page-size control computes for its parts. */
   readonly paginationSize: Computes<'empty' | 'options' | 'shown'>
   /** What a month calendar computes for its parts. */

@@ -18,7 +18,9 @@ import {
  * through a request a handler may refuse. Core's arithmetic says which pages show
  * and where a gap stands. A gap is a control that goes to the middle of what it
  * hides. The first, previous, next, and last controls are inert at the end each
- * points at. `compact` shows the page and the count in place of the numbers.
+ * points at. `compact` shows the page and the count in place of the numbers, and
+ * the row folds into that form wherever its own width cannot hold the full row
+ * on one line, as the web's does.
  *
  * **A phone keeps a reader on the page they chose.** After a gap or a step that
  * reached its end, focus goes to the current page. The move is said politely,
@@ -70,6 +72,7 @@ export default headless('pagination', {
     ends: 'ends',
     fallbackLabel: 'fallbackLabel',
     firstLabel: 'firstLabel',
+    folded: 'folded',
     gapLabel: 'gapLabel',
     label: 'label',
     lastLabel: 'lastLabel',
@@ -120,7 +123,7 @@ export default headless('pagination', {
           />
         </Slot>
       </Pressable>
-      {props.compact ? (
+      {paginationRoot.folded ? (
         <View part="status">
           <Text
             part="status-words"

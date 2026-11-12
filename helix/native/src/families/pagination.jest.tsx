@@ -95,6 +95,27 @@ describe('the generated Pagination', () => {
     expect(screen.getByText('7 of 24')).toBeTruthy()
   })
 
+  test('folds into the compact row where its own width cannot hold the full row, and back where it can', async () => {
+    await draw(<HelixPagination defaultPage={4} pages={12} />)
+    const laid = (node: unknown, width: number) =>
+      act(async () => {
+        fireEvent(node as never, 'layout', {
+          nativeEvent: { layout: { height: 44, width, x: 0, y: 0 } },
+        })
+      })
+    const row = ['Previous page', 'Page 1', 'Page 2', 'Page 3', 'Page 4', 'Page 5']
+    for (const name of [...row, 'Skip to page 9', 'Page 12', 'Next page']) {
+      await laid(screen.getByLabelText(name), 44)
+    }
+    await laid(screen.getByLabelText('Pagination'), 1000)
+    expect(screen.queryByText('4 of 12')).toBeNull()
+    await laid(screen.getByLabelText('Pagination'), 200)
+    expect(screen.getByText('4 of 12')).toBeTruthy()
+    expect(screen.queryByLabelText('Skip to page 9')).toBeNull()
+    await laid(screen.getByLabelText('Pagination'), 1000)
+    expect(screen.getByLabelText('Skip to page 9')).toBeTruthy()
+  })
+
   test('a page-size control shows the size in force, and the first where it offers no other', async () => {
     await draw(<HelixPaginationSize defaultValue={7} label="Rows" sizes="10,25" />)
     expect(screen.getByText('10')).toBeTruthy()

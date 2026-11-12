@@ -836,6 +836,7 @@ export interface PaginationRootChoice {
   readonly ends?: string
   readonly fallbackLabel?: string
   readonly firstLabel?: string
+  readonly folded?: string
   readonly gapLabel?: string
   readonly label?: string
   readonly lastLabel?: string

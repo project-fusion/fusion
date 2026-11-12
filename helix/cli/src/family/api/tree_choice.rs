@@ -542,7 +542,8 @@ pub const PAGINATION: &[(&str, Names)] = &[
 ];
 
 /// What a pagination computes for its parts, each read as `paginationRoot.x`.
-pub const PAGINATION_COMPUTED: &[&str] = &["atEnd", "atStart", "empty", "slots", "status"];
+pub const PAGINATION_COMPUTED: &[&str] =
+    &["atEnd", "atStart", "empty", "folded", "slots", "status"];
 
 /// What a month calendar reads and sends, by the name the machine binds. Its other
 /// props it reads by their own names.

@@ -1,5 +1,6 @@
 # Pagination, its examples drawn alone, one screenshot of each, named by the
-# example, `MODE`, and `SIZE`, and the row again once a gap has moved it.
+# example, `MODE`, and `SIZE`, and the row again once a gap has moved it where
+# the full row shows.
 # Each example after the first is waited for by its title in the header first: a
 # wait on words the example before also draws passes while the link is still opening,
 # and pictures or presses the screen on its way out.
@@ -16,14 +17,20 @@ name: "Screens: Pagination"
 - waitForAnimationToEnd:
     timeout: 5000
 - takeScreenshot: pagination-preview-${MODE}-${SIZE}
-- tapOn:
-    point: 50%, 90%
-    retryTapIfNoChange: false
-- tapOn: Skip to page 9
-- extendedWaitUntil:
-    visible: Skip to page 5
-    timeout: 5000
-- takeScreenshot: pagination-preview-moved-${MODE}-${SIZE}
+# A row too wide for the screen folds into its compact form, as the web's does,
+# so the gap is pressed only where the full row shows.
+- runFlow:
+    when:
+      visible: Skip to page 9
+    commands:
+      - tapOn:
+          point: 50%, 90%
+          retryTapIfNoChange: false
+      - tapOn: Skip to page 9
+      - extendedWaitUntil:
+          visible: Skip to page 5
+          timeout: 5000
+      - takeScreenshot: pagination-preview-moved-${MODE}-${SIZE}
 - openLink: helix://pagination/compact/preview
 - extendedWaitUntil:
     visible: 'Compact'
