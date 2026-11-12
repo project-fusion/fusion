@@ -101,6 +101,40 @@ slot[name="label"]::slotted(*) {
   );
 }
 
+/* **A slotted figure the stat cannot break is a box of its own**, so the rule
+   below can hold it. Through the slot alone its text was a box nothing could
+   style. Only while it is a number, the one case where the slot shows the
+   figure itself. */
+:host(:state(number)) slot[part="value"] {
+  display: block;
+}
+
+/* **Two steps down and still too wide, the figure stays in its column.**
+   Inside the owner's rule of November 3, 2026, which breaks a figure only after
+   a group separator, two cases were left over.
+
+   - **A figure with no separator** cannot break at all, and "123456789012" at
+     the 6rem floor ran 67 pixels past its column onto the next one. It ends in
+     an ellipsis at the column's edge, with the unit still beside it. A break
+     between two digits would show every digit, and it is the break the
+     owner's rule refuses. The whole figure is still what a screen reader says.
+   - **A figure that breaks after its separators** ended its last line well
+     short of the column, and the unit stood at the column's end, 35 pixels
+     from the last digit. Its lines are set to the column's end, so the last
+     digit meets the unit and the digits line up by place, as figures in a
+     column do.
+
+   Only two steps down, where a figure can be too wide for its column, and
+   only for a number: slotted words keep breaking where they must. */
+:host(:state(stepped-twice)) [part="value"]:not(slot),
+:host(:state(stepped-twice):state(number)) slot[part="value"] {
+  min-inline-size: 0;
+  overflow-x: clip;
+  overflow-clip-margin: var(--helix-border-thick);
+  text-align: end;
+  text-overflow: ellipsis;
+}
+
 /* Quieter and smaller than the number it qualifies. */
 slot[name="unit"]::slotted(*) {
   /* **Beside the figure, whatever the text alignment.** The unit's column takes
