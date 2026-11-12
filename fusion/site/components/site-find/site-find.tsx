@@ -253,6 +253,19 @@ export function SiteFind({
         placeholder="Search the site"
         ref={palette}
       >
+        {/* **A close control on a phone**, where the hints below are hidden and
+            a tap on the scrim was the only way out: with the on-screen keyboard
+            up, little of the scrim is left to tap. Command draws no close
+            control of its own, so the site puts an icon button in its `header`
+            slot, shown below 40rem, the width the hints hide at. */}
+        <div className={styles.siteCommandClose} slot="header">
+          <helix-icon-button
+            label="Close search"
+            onClick={() => palette.current?.requestOpen(false)}
+          >
+            <helix-icon name="x"></helix-icon>
+          </helix-icon-button>
+        </div>
         {/* **The catalog arrives when it is asked for.** Every component and
             every article is the whole of what a palette can reach and none of
             what it should open with: a reader summoning it sees a hundred rows
