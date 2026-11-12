@@ -78,6 +78,17 @@ slot {
   }
 }
 
+/* **Forced colors draw the disc as an edge.** They paint every background the
+   page's Canvas color, so the gray disc went and initials stood loose on the
+   page. A CanvasText ring, inside the box, traces the disc or the rounded
+   square in the reader's own colors, and a picture keeps its edge too. */
+@media (forced-colors: active) {
+  :host {
+    outline: var(--helix-border-thin) solid CanvasText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+}
+
 /* Print: a picture or initials, both of which print.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
