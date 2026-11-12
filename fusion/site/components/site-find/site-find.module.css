@@ -101,6 +101,30 @@
   }
 }
 
+/* **The close control at the end of the search row**, shown only where the
+   hints are hidden. In the `header` slot it took a row of its own, 44 pixels
+   of a phone panel above the field. Laid over the row's trailing end instead,
+   it stands in the row's middle, and the field ends a gap before it, so typed
+   words never run under it. Its press area reaches 44 on a touch screen, as
+   every icon button's does. */
+.siteCommandClose {
+  display: none;
+}
+
+@media (max-width: 40rem) {
+  .siteCommandClose {
+    display: flex;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    padding: var(--helix-space-xs) var(--helix-space-sm);
+    position: absolute;
+  }
+
+  .siteCommand::part(listbox-search) {
+    padding-inline-end: calc(var(--helix-space-sm) * 2 + var(--helix-size-control-sm));
+  }
+}
+
 /* The field the search button focuses as it is pressed, so a phone raises its
    keyboard. Out of sight and out of the way of the pointer, and fixed, so
    focusing it scrolls nothing. **16px**, because iOS zooms the page into a
