@@ -503,6 +503,13 @@
   text-align: center;
 }
 
+/* **The error line wraps inside the columns it spans**, as Table's does. On
+   one line its words set the columns' widths: at 280 a 58 character message
+   and a button to try again widened the grid to 500. */
+[part="error"] {
+  contain: inline-size;
+}
+
 /* What the `error` slot holds, such as a button that tries again, sits after
    the words a step away from them. The words stay: with the slot in their
    place, a page following the documented example showed a button and no
