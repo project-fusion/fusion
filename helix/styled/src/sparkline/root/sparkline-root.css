@@ -262,6 +262,36 @@
   text-align: center;
 }
 
+/* **The mark hangs at the start, and both lines of words share one edge.**
+   Centered, a second line started under the spinner and the block read ragged.
+   A hanging indent rather than a grid, so the words stay one block the clamp
+   can stop at two lines: the start padding is the mark and its gap, and the
+   first line is pulled back by the same. As wide as the words and centered in
+   the box, so a word that fits one line still sits in the middle. Decided by
+   the owner on November 12, 2026, against the centered words and the mark
+   alone. */
+[part="error"],
+[part="loading"] {
+  --_sparkline-hang: calc(var(--_sparkline-mark) + var(--helix-space-xs));
+
+  box-sizing: border-box;
+  inline-size: fit-content;
+  margin: auto;
+  max-inline-size: 100%;
+  padding-inline-start: var(--_sparkline-hang);
+  text-align: start;
+  text-indent: calc(var(--_sparkline-hang) * -1);
+}
+
+/* The two marks' own widths, from the chart status sheet. */
+[part="loading"] {
+  --_sparkline-mark: 1em;
+}
+
+[part="error"] {
+  --_sparkline-mark: 1.125em;
+}
+
 /* Said and not shown: the dot and the readout are the picture of it. Out of
    sight and in the accessibility tree, the recipe the charts use for their
    summary. */
