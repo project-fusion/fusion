@@ -129,14 +129,19 @@
     var(--helix-color-foreground)
   );
 }
+/* **A solid warning icon button takes the solid warning fill under the page's
+   color**, as a solid warning Button, Tag, and Badge do: a white glyph on a
+   deep amber in light and a black one on a bright amber in dark. It filled
+   `warning-surface`, which measured #906106 under white in dark, 3.90:1 on
+   the page. Under the pointer the fill darkens by the steps Button takes. */
 :host([tone="warning"]) {
   --_icon-button-edge: var(--helix-color-warning);
   --_icon-button-ink: var(--helix-color-warning);
   --_icon-button-ink-hover: var(--helix-color-warning);
-  --_icon-button-fill: var(--helix-color-warning-surface);
-  --_icon-button-fill-hover: var(--helix-color-warning-surface-hover);
-  --_icon-button-fill-press: var(--helix-color-warning-surface-active);
-  --_icon-button-on-tone: var(--helix-color-foreground-on-status);
+  --_icon-button-fill: var(--helix-color-warning-solid);
+  --_icon-button-fill-hover: oklch(from var(--helix-color-warning-solid) calc(l - 0.03) c h);
+  --_icon-button-fill-press: oklch(from var(--helix-color-warning-solid) calc(l - 0.06) c h);
+  --_icon-button-on-tone: var(--helix-color-background);
   --_icon-button-tone: var(--helix-color-warning);
   --_icon-button-tone-hover: color-mix(
     in oklab,

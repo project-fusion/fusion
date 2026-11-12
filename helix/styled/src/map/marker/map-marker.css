@@ -430,10 +430,15 @@
   --_map-marker-fill: var(--helix-color-success-surface);
   --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
 }
+/* **Warning fills its point with the solid warning fill under the page's
+   color**, as a solid warning Button, Tag, and Badge do, since the point
+   carries a dot or a letter: white on a deep amber in light and black on a
+   bright amber in dark. `warning-surface` measured #906106 under white in
+   dark, 3.90:1 on the page, and the mark's #b86d00 carries white at 4.02. */
 :host([tone="warning"]) {
   --_map-marker-color: var(--helix-color-warning);
-  --_map-marker-fill: var(--helix-color-warning-surface);
-  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-foreground-on-status));
+  --_map-marker-fill: var(--helix-color-warning-solid);
+  --_map-marker-ink: var(--map-marker-ink, var(--helix-color-background));
 }
 
 /* **A place already passed is muted, not faded**, the way the route behind
