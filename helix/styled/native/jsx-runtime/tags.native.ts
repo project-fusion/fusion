@@ -5,13 +5,13 @@ import { HelixAccordion, HelixAccordionItem } from '../accordion/index.native'
 import { HelixAnnouncement } from '../announcement/index.native'
 import { HelixAppHeader } from '../app-header/index.native'
 import { HelixAreaChart } from '../area-chart/index.native'
+import { HelixAura } from '../aura/index.native'
 import { HelixAvatar, HelixAvatarGroup } from '../avatar/index.native'
 import { HelixBadge } from '../badge/index.native'
 import { HelixBarChart } from '../bar-chart/index.native'
 import { HelixBlockquote } from '../blockquote/index.native'
 import { HelixBreadcrumb, HelixBreadcrumbs } from '../breadcrumbs/index.native'
 import { HelixButton } from '../button/index.native'
-import { HelixButtonGroup } from '../button-group/index.native'
 import { HelixCallout } from '../callout/index.native'
 import { HelixCard } from '../card/index.native'
 import { HelixCarousel } from '../carousel/index.native'
@@ -55,7 +55,7 @@ import { HelixKbd } from '../kbd/index.native'
 import { HelixLegend } from '../legend/index.native'
 import { HelixLightbox, HelixLightboxItem } from '../lightbox/index.native'
 import { HelixLineChart } from '../line-chart/index.native'
-import { HelixList, HelixListItem } from '../list/index.native'
+import { HelixListItem } from '../list/index.native'
 import { HelixListbox } from '../listbox/index.native'
 import { HelixLoader } from '../loader/index.native'
 import { HelixLog, HelixLogGroup, HelixLogLine } from '../log/index.native'
@@ -96,11 +96,11 @@ import { HelixSparkline } from '../sparkline/index.native'
 import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../speed-dial/index.native'
 import { HelixSplitter } from '../splitter/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
-import { HelixStep, HelixSteps } from '../steps/index.native'
+import { HelixStep } from '../steps/index.native'
 import { HelixSwitch } from '../switch/index.native'
 import { HelixTable, HelixTableCell, HelixTableColumn, HelixTableRow } from '../table/index.native'
-import { HelixTab, HelixTabPanel, HelixTabs } from '../tabs/index.native'
-import { HelixTag, HelixTagGroup } from '../tag/index.native'
+import { HelixTab, HelixTabPanel } from '../tabs/index.native'
+import { HelixTag } from '../tag/index.native'
 import { HelixText } from '../text/index.native'
 import { HelixTextarea } from '../textarea/index.native'
 import { HelixTimeInput } from '../time-input/index.native'
@@ -120,6 +120,7 @@ import {
   HelixVideoPlaylistMenu,
 } from '../video-playlist/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
+import { ButtonGroup, List, Steps, Tabs, TagGroup } from './held.native'
 import {
   BulletList,
   Caption,
@@ -151,45 +152,6 @@ import {
   Strong,
   SVG_SHAPES,
 } from './words.native'
-
-type Heard = { detail?: { value?: unknown }; target?: { value?: unknown } }
-
-/* **A set's choice is held as the element holds it under React.** The
-   attribute starts it, a press moves it, and the example setting a new value
-   moves it again. Native, the prop is controlled, and a list written
-   `value="report"` would never take a press. */
-const held = (Target: unknown, chosen: string, after: string, read: (event: Heard) => unknown) => {
-  const Held = (props: Props) => {
-    const given = props[chosen]
-    const [now, setNow] = React.useState(given)
-    const last = React.useRef(given)
-    if (given !== last.current) {
-      last.current = given
-      setNow(given)
-    }
-    const heard = props[after]
-    return React.createElement(Target as React.ElementType, {
-      ...props,
-      [after]: (event: Heard) => {
-        setNow(read(event))
-        if (typeof heard === 'function') {
-          heard(event)
-        }
-      },
-      [chosen]: given === undefined ? undefined : now,
-    })
-  }
-  return Held
-}
-
-/* A list's change carries the list's value under `target`, and a tab set's
-   activate carries the tab under `detail`, as on the web. So do a button
-   group's change and a tag group's. */
-const ButtonGroup = held(HelixButtonGroup, 'value', 'onChange', (event) => event.target?.value)
-const List = held(HelixList, 'value', 'onChange', (event) => event.target?.value)
-const Tabs = held(HelixTabs, 'active', 'onActivate', (event) => event.detail?.value)
-const Steps = held(HelixSteps, 'active', 'onActivate', (event) => event.detail?.value)
-const TagGroup = held(HelixTagGroup, 'value', 'onChange', (event) => event.target?.value)
 
 /** An `a` under the `data-button` recipe is a Button, with the recipe's emphasis and tone. */
 const Link = (props: Props) =>
@@ -232,6 +194,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-announcement': HelixAnnouncement,
   'helix-app-header': HelixAppHeader,
   'helix-area-chart': HelixAreaChart,
+  'helix-aura': HelixAura,
   'helix-avatar': HelixAvatar,
   'helix-avatar-group': HelixAvatarGroup,
   'helix-badge': HelixBadge,

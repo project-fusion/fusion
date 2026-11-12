@@ -2,11 +2,10 @@ import './particles.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        interactive
-        pattern="particles"
-      ></helix-aura>
-    </div>
+    <helix-aura
+      interactive
+      pattern="particles"
+      style={{ blockSize: '20rem' }}
+    ></helix-aura>
   )
 }

@@ -22,7 +22,7 @@ import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixAuraFallbackEvent } from '../events/index.js'
-import { styles } from './aura-root.css.js'
+import { styles } from './aura-root.generated.css.js'
 
 /**
  * The widest either edge of the drawing buffer may get, in device pixels.

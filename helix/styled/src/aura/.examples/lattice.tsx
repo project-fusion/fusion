@@ -2,11 +2,10 @@ import './lattice.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        interactive
-        pattern="lattice"
-      ></helix-aura>
-    </div>
+    <helix-aura
+      interactive
+      pattern="lattice"
+      style={{ blockSize: '20rem' }}
+    ></helix-aura>
   )
 }

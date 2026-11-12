@@ -270,13 +270,12 @@ describe('aura', () => {
        evaluation, and a static import would run that before `registerDom` has
        installed a DOM to build a stylesheet against. Doing it statically took
        out five unrelated tests in this file. */
-    const { styles } = await import('./aura-root.css.js')
+    const { styles } = await import('./aura-root.generated.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
-    expect(sheet).toContain('color-mix(in oklab, var(--_aura-glow) 38%')
-    expect(sheet).toContain(
-      '--_aura-glow: var(--aura-glow, light-dark(var(--helix-color-primary-subtle), var(--helix-color-primary)))',
-    )
-    expect(sheet).not.toMatch(/var\(--_aura-glow\)\s+0%/)
+    const glow =
+      'var(--aura-glow, light-dark(var(--helix-color-primary-subtle), var(--helix-color-primary)))'
+    expect(sheet).toContain(`color-mix(in oklab, ${glow} 38%`)
+    expect(sheet).not.toContain(`${glow} 0%`)
   })
 
   test('paused is a property that starts cleared, and the attribute sets it', async () => {
