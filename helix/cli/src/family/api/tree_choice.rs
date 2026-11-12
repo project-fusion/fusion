@@ -832,6 +832,39 @@ pub const STRANDS: &[(&str, Names)] = &[];
 /// What it computes for its parts: nothing. Its drawing and its fallback are its states.
 pub const STRANDS_COMPUTED: &[&str] = &[];
 
+/// What a spatial chart sends: what a chart of lines does.
+pub const SPATIAL_CHART: &[(&str, Names)] = LINE_CHART;
+
+/// What a spatial chart computes for its parts, each read as `spatialChart.x`: its box,
+/// its numbers and names, the readings it draws in it, and its reading.
+pub const SPATIAL_CHART_COMPUTED: &[&str] = &[
+    "cells",
+    "drawn",
+    "edges",
+    "empty",
+    "error",
+    "faces",
+    "floor",
+    "grid",
+    "live",
+    "loading",
+    "markX",
+    "markY",
+    "marks",
+    "named",
+    "names",
+    "placement",
+    "points",
+    "ring",
+    "role",
+    "summary",
+    "ticks",
+    "tipLabel",
+    "tipped",
+    "viewBox",
+    "words",
+];
+
 /// What it computes for its parts, each read as `orb.x`: the state it draws.
 pub const ORB_COMPUTED: &[&str] = &["shown"];
 
@@ -1446,6 +1479,11 @@ pub fn orb(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "orb", ORB, ORB_COMPUTED)
 }
 
+/// `spatialChart({ ... })`, each field a name.
+pub fn spatial_chart(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "spatialChart", SPATIAL_CHART, SPATIAL_CHART_COMPUTED)
+}
+
 /// `strands({})`, which binds no names.
 pub fn strands(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "strands", STRANDS, STRANDS_COMPUTED)
@@ -1592,6 +1630,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "aura" => aura(value),
         "orb" => orb(value),
         "strands" => strands(value),
+        "spatialChart" => spatial_chart(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),
         "select" => select(value),

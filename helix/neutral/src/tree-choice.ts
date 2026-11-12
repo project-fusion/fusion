@@ -1044,6 +1044,37 @@ export interface AuraChoice {
   readonly held?: string
 }
 
+/** The names of a chart in a box seen in 3D, each read as `spatialChart.x`. */
+export interface SpatialChartChoice {
+  readonly cells?: string
+  readonly drawn?: string
+  readonly edges?: string
+  readonly empty?: string
+  readonly error?: string
+  readonly faces?: string
+  readonly floor?: string
+  readonly grid?: string
+  readonly live?: string
+  readonly loading?: string
+  readonly markX?: string
+  readonly markY?: string
+  readonly marks?: string
+  readonly named?: string
+  readonly names?: string
+  readonly onReadingChange?: string
+  readonly onReadingPress?: string
+  readonly placement?: string
+  readonly points?: string
+  readonly ring?: string
+  readonly role?: string
+  readonly summary?: string
+  readonly ticks?: string
+  readonly tipLabel?: string
+  readonly tipped?: string
+  readonly viewBox?: string
+  readonly words?: string
+}
+
 /** The names of a ribbon of strands: none, since it binds nothing by a name. */
 export type StrandsChoice = Readonly<Record<string, never>>
 

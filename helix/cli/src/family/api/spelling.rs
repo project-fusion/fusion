@@ -1050,6 +1050,36 @@ const ORB: &[Field] = &[("shown", "shown", Name)];
 
 const STRANDS: &[Field] = &[];
 
+const SPATIAL_CHART: &[Field] = &[
+    ("cells", "cells", Name),
+    ("drawn", "drawn", Name),
+    ("edges", "edges", Name),
+    ("empty", "empty", Name),
+    ("error", "error", Name),
+    ("faces", "faces", Name),
+    ("floor", "floor", Name),
+    ("grid", "grid", Name),
+    ("live", "live", Name),
+    ("loading", "loading", Name),
+    ("markX", "markX", Name),
+    ("markY", "markY", Name),
+    ("marks", "marks", Name),
+    ("named", "named", Name),
+    ("names", "names", Name),
+    ("onReadingChange", "onReadingChange", Name),
+    ("onReadingPress", "onReadingPress", Name),
+    ("placement", "placement", Name),
+    ("points", "points", Name),
+    ("ring", "ring", Name),
+    ("role", "role", Name),
+    ("summary", "summary", Name),
+    ("ticks", "ticks", Name),
+    ("tipLabel", "tipLabel", Name),
+    ("tipped", "tipped", Name),
+    ("viewBox", "viewBox", Name),
+    ("words", "words", Name),
+];
+
 const VIDEO: &[Field] = &[
     ("bar", "bar", Name),
     ("captionMenu", "captionMenu", Name),
@@ -1625,6 +1655,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("aura", "aura", AURA),
     ("orb", "orb", ORB),
     ("strands", "strands", STRANDS),
+    ("spatialChart", "spatialChart", SPATIAL_CHART),
     ("pickerField", "pickerField", PICKER_FIELD),
     ("listbox", "listbox", LISTBOX),
     ("select", "select", SELECT),

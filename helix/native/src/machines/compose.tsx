@@ -67,6 +67,7 @@ import { scrollersOf } from './scrolling'
 import { useSelect } from './select'
 import { setting } from './setting'
 import { useSparkline } from './sparkline'
+import { useSpatial } from './spatial-kinds'
 import { spinShaping, useSpin } from './spin'
 import { stacking } from './stack'
 import { stackRow } from './stack-row'
@@ -504,6 +505,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useScatterChart(family, props, use),
+      ),
+    /* A chart in a box seen in 3D: its box and readings, its view, and its reading. */
+    ...uses
+      .filter((use) => use.machine === 'spatial-chart')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useSpatial(family, props, use),
       ),
     /* A viewer of one item at a time: its items, its zoom, and its chrome. */
     ...uses

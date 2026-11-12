@@ -91,8 +91,8 @@ use crate::family::api::{
     DONUT_CHART, FILTER_INPUT, FILTER_MENU, HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART,
     LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
     NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB, PAGINATION, PAGINATION_SIZE, PICKER_FIELD,
-    SCATTER_CHART, SELECT, SPARKLINE, STRANDS, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER,
-    TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
+    SCATTER_CHART, SELECT, SPARKLINE, SPATIAL_CHART, STRANDS, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL,
+    TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
 };
 use crate::family::ir::DERIVATIONS;
 use crate::family::vocabulary::kinds::{SCALE, SPLIT};
@@ -659,6 +659,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.aura, AURA, "aura"),
         (&api.orb, ORB, "orb"),
         (&api.strands, STRANDS, "strands"),
+        (&api.spatial_chart, SPATIAL_CHART, "spatial-chart"),
         (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),
         (&api.select, SELECT, "select"),
