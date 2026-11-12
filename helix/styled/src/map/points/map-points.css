@@ -94,7 +94,9 @@
   outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
 }
 
+/* Warning takes the solid warning fill under the page's color, for the
+   marker's reason: a cluster writes its count on it. */
 :host([tone="warning"]) {
-  color: var(--helix-color-warning-surface);
-  outline-color: var(--map-points-ink, var(--helix-color-foreground-on-status));
+  color: var(--helix-color-warning-solid);
+  outline-color: var(--map-points-ink, var(--helix-color-background));
 }
