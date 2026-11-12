@@ -25,8 +25,12 @@ const RENAMED: Readonly<Record<string, string>> = {
   'border-start-start-radius': 'borderTopStartRadius',
   /* The physical offsets, which React Native takes as they are. */
   bottom: 'bottom',
+  /* A drawing reads it as the dark page's peak, as Aura's. */
+  'caret-color': 'caretColor',
   color: 'color',
   'column-gap': 'columnGap',
+  /* A drawing reads it as the light page's peak, as Aura's. */
+  'column-rule-color': 'columnRuleColor',
   'flex-basis': 'flexBasis',
   'flex-direction': 'flexDirection',
   'flex-grow': 'flexGrow',
@@ -51,6 +55,8 @@ const RENAMED: Readonly<Record<string, string>> = {
   'min-block-size': 'minHeight',
   'min-inline-size': 'minWidth',
   opacity: 'opacity',
+  /* An outline's color, and a drawing's ground, as Aura's. */
+  'outline-color': 'outlineColor',
   'outline-offset': 'outlineOffset',
   padding: 'padding',
   'padding-block': 'paddingVertical',

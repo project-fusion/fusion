@@ -10,6 +10,7 @@ import {
 import type { Pager } from '../render/scroll'
 import type { Family } from '../style/form'
 import { useAreaChart } from './area-chart'
+import { useAura } from './aura'
 import { aroundToolbar } from './axis'
 import { useBarChart } from './bar-chart'
 import type { Around, Binder } from './binder'
@@ -534,6 +535,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useVideo(family, props, use),
+      ),
+    /* An aura: its field drawn on the GPU, and its pause control. */
+    ...uses
+      .filter((use) => use.machine === 'aura')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useAura(family, props, use),
       ),
     /* An orb: its dots drawn on the GPU, and its state. */
     ...uses

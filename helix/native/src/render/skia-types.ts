@@ -77,6 +77,15 @@ export interface SkiaApi {
   Path: { Make(): SkPath }
   PictureRecorder(): SkPictureRecorder
   RuntimeEffect: { Make(source: string): SkRuntimeEffect | null }
+  Shader: {
+    MakeLinearGradient(
+      start: { readonly x: number; readonly y: number },
+      end: { readonly x: number; readonly y: number },
+      colors: readonly SkColor[],
+      positions: readonly number[] | null,
+      mode: number,
+    ): SkShader
+  }
   XYWHRect(x: number, y: number, width: number, height: number): SkRect
 }
 
