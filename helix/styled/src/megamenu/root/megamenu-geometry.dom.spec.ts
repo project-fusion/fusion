@@ -5,6 +5,8 @@ import { at, hasLayout, mount, part, registerDom, settled } from '@fusion.dev/he
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../app-header/index.js')
+  await import('../../navigation/index.js')
 })
 
 type Section = HTMLElement & { open: boolean; updateComplete: Promise<boolean> }
@@ -464,6 +466,55 @@ if (hasLayout()) {
          else's trigger rather than an item in the row. */
       const host = await opened()
       expect(host.getBoundingClientRect().width).toBeGreaterThan(0)
+    })
+  })
+
+  /* **The panel continues the bar it hangs from**, as the owner decided on
+     November 12, 2026: the page's ground under an opaque bar and the bar's
+     glass under a glass one. A black panel under glass read as a hole over the
+     cards beneath it. A transparent bar has no fill to continue, so its panel
+     takes the glass the bar takes once scrolled. Read from the closed panel,
+     whose computed style resolves all the same. */
+  describe('a megamenu panel under an App Header', () => {
+    type Ground = { backdropFilter: string; backgroundColor: string }
+
+    /* Copied out, since a computed style is live and the next mount takes this
+       bar out of the document, which empties it. */
+    const ground = (element: Element): Ground => {
+      const { backdropFilter, backgroundColor } = getComputedStyle(element)
+      return { backdropFilter, backgroundColor }
+    }
+
+    const under = async (material: string): Promise<{ bar: Ground; panel: Ground }> => {
+      const bar = await mount(
+        `<helix-app-header${material ? ` material="${material}"` : ''}>
+          <helix-navigation label="Main">
+            <helix-megamenu label="Products">
+              <div data-megamenu-group><a href="#one">One</a></div>
+            </helix-megamenu>
+          </helix-navigation>
+        </helix-app-header>`,
+      )
+      const host = bar.querySelector('helix-megamenu') as Section
+      await host.updateComplete
+      await settled(part(host, 'surface'))
+      return { bar: ground(bar), panel: ground(part(host, 'surface') as HTMLElement) }
+    }
+
+    for (const material of ['', 'glass', 'frosted']) {
+      test(`takes the ${material || 'opaque'} bar's fill and filter`, async () => {
+        const { bar, panel } = await under(material)
+        expect(panel.backgroundColor).toBe(bar.backgroundColor)
+        expect(panel.backdropFilter).toBe(bar.backdropFilter)
+      })
+    }
+
+    test("takes the glass under a transparent bar, never the bar's missing fill", async () => {
+      const glass = await under('glass')
+      const { bar, panel } = await under('transparent')
+      expect(bar.backgroundColor).toBe('rgba(0, 0, 0, 0)')
+      expect(panel.backgroundColor).toBe(glass.panel.backgroundColor)
+      expect(panel.backdropFilter).toBe(glass.panel.backdropFilter)
     })
   })
 }

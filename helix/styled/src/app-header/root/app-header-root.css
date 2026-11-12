@@ -12,6 +12,14 @@
     var(--helix-size-icon-sm)
   );
 
+  /* **What a panel hanging from the bar takes**, read by Megamenu so its panel
+     continues the bar: the page's ground under an opaque bar, glass under
+     glass. Decided by the owner on November 12, 2026, against a black panel
+     under every bar and the #181818 of Menu. Inherited, so it reaches a
+     Megamenu inside Navigation, and set once per material below. */
+  --_app-header-panel-fill: var(--app-header-background-color, var(--helix-color-background));
+  --_app-header-panel-backdrop: none;
+
   background-color: var(--app-header-background-color, var(--helix-color-background));
   border-block-end: var(--helix-border-thin) solid var(--app-header-border-color, transparent);
   /* What the narrow row below measures itself against: the bar's own width,
@@ -34,6 +42,9 @@
    while a tall panel directly beneath it running the same blur keeps its
    structure. */
 :host([material="glass"]) {
+  --_app-header-panel-fill: var(--app-header-background-color, var(--helix-material-translucent));
+  --_app-header-panel-backdrop: var(--app-header-backdrop, var(--helix-material-backdrop));
+
   backdrop-filter: var(--app-header-backdrop, var(--helix-material-backdrop));
   /* **The translucent material, 30% of white in light**, under the 72% a
      panel takes. The bar took the panel's coverage for a round, and the owner
@@ -54,12 +65,23 @@
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
    the heavier blur is what stops a ground that opaque reading as a smear. */
 :host([material="frosted"]) {
+  --_app-header-panel-fill: var(
+    --app-header-background-color,
+    var(--helix-material-translucent-strong)
+  );
+  --_app-header-panel-backdrop: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
+
   backdrop-filter: var(--app-header-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--app-header-background-color, var(--helix-material-translucent-strong));
 }
 
-/* Nothing behind it at all, until there is something to be legible over. */
+/* Nothing behind it at all, until there is something to be legible over.
+   **A panel under it takes the glass the bar takes once scrolled**, at rest as
+   well: a transparent panel would set its links straight on the page. */
 :host([material="transparent"]) {
+  --_app-header-panel-fill: var(--helix-material-translucent);
+  --_app-header-panel-backdrop: var(--app-header-backdrop, var(--helix-material-backdrop));
+
   background-color: var(--app-header-background-color, transparent);
 }
 

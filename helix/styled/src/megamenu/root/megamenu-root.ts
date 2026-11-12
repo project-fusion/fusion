@@ -24,9 +24,12 @@ import { styles } from './megamenu-root.css.js'
  * @aliases Mega menu, Flyout, Nav panel
  * @documentation https://fusion.dev/helix/components/megamenu
  *
- * @cssproperty --megamenu-backdrop - The filter behind the panel, `none` by default. This family
- *   has no `material` property, so this and `--megamenu-background-color` set the panel's material.
- * @cssproperty --megamenu-background-color - The panel's fill.
+ * @cssproperty --megamenu-backdrop - The filter behind the panel. Inside an App Header it is the
+ *   bar's own filter, so a glass bar's panel is glass too, and elsewhere `none`. This family has no
+ *   `material` property, so this and `--megamenu-background-color` set the panel's material.
+ * @cssproperty --megamenu-background-color - The panel's fill. Inside an App Header it is the bar's
+ *   fill, the page's ground under an opaque bar and the bar's glass under a glass one, and
+ *   elsewhere the page's ground.
  * @cssproperty --megamenu-border-width - The width of the panel's edge. Follows
  *   `--helix-border-floating`, a hairline, which is drawn in dark mode only. Set it to `0` for
  *   the shadow alone.
