@@ -60,6 +60,10 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
    *   should reach the top of the window and the bar should only become a
    *   surface once it has to be legible over moving content.
    *
+   * A Megamenu in the bar takes the same material for its panel, so the panel
+   * continues the bar. Under `transparent` the panel takes the glass at once,
+   * since a panel with no fill would set its links on the page.
+   *
    * **This belongs to `material` and not to a shape or an appearance.** The
    * library's test is the one `Card` states: `separation` is where a surface
    * ends, `tone` is what it means, `material` is what it is made of, and a

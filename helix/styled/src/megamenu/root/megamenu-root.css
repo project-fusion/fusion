@@ -67,12 +67,20 @@
    `data-megamenu-*` recipes, a `::slotted()` rule losing to any document rule
    whatever its specificity. */
 [part="surface"] {
-  /* The page's ground, not a raised surface: `surface-overlay` put a gray card
-     in front of a black page. Hooks rather than an `appearance` value, `full`
-     already occupying that axis. Declared rather than absent, so turning the
-     filter on cannot change what it composites against. */
-  backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background-color, var(--helix-color-background));
+  /* **The App Header's ground, so the panel continues the bar it hangs from**:
+     the page's ground under an opaque bar, and glass under a glass one, which
+     the bar publishes as `--_app-header-panel-*`. The owner decided this on
+     November 12, 2026: a black panel under a glass bar read as a hole over the
+     cards beneath it. Outside an App Header it is the page's ground, never a
+     raised surface: `surface-overlay` put a gray card in front of a black page.
+     Hooks rather than an `appearance` value, `full` already occupying that
+     axis. Declared rather than absent, so turning the filter on cannot change
+     what it composites against. */
+  backdrop-filter: var(--megamenu-backdrop, var(--_app-header-panel-backdrop, none));
+  background-color: var(
+    --megamenu-background-color,
+    var(--_app-header-panel-fill, var(--helix-color-background))
+  );
   /* A hairline in the dark, nothing in the light: a shadow darkens what is
      behind it, and in the dark that is `oklch(0 0 0)` on `oklch(0 0 0)`.
      Written out in full, because the UA gives `[popover]` a border of its own
@@ -178,8 +186,11 @@
 :host(:state(narrow)) [part="surface"] {
   /* The header's ground, so the band reads as it continuing. Both follow the
      hooks, or a glass bar over an opaque band leaves a seam. */
-  backdrop-filter: var(--megamenu-backdrop, none);
-  background-color: var(--megamenu-background-color, var(--helix-color-background));
+  backdrop-filter: var(--megamenu-backdrop, var(--_app-header-panel-backdrop, none));
+  background-color: var(
+    --megamenu-background-color,
+    var(--_app-header-panel-fill, var(--helix-color-background))
+  );
   /* No edge: the shadow says where the band ends, and a hairline across a
      translucent surface is the one opaque thing on it. */
   border: none;
