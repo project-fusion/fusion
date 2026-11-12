@@ -1,8 +1,8 @@
 import { customElement, HelixElement, numberConverter } from '@fusion.dev/helix-core'
+import type { StrandsPattern } from '@fusion.dev/helix-core/strands'
 import type { CSSResultGroup } from 'lit'
 import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { StrandsPattern } from '../path.js'
 import { styles } from './strands-stop.css.js'
 
 /**

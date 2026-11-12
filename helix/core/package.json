@@ -229,6 +229,10 @@
       "types": "./dist/utils/stack/stack.d.ts",
       "default": "./dist/utils/stack/stack.js"
     },
+    "./strands": {
+      "types": "./dist/utils/strands/strands.d.ts",
+      "default": "./dist/utils/strands/strands.js"
+    },
     "./swipe": {
       "types": "./dist/utils/swipe/swipe.d.ts",
       "default": "./dist/utils/swipe/swipe.js"
