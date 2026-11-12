@@ -1578,8 +1578,8 @@ helix-toggle[disabled]::part(item) {
     color-mix(in oklab, var(--helix-color-foreground) 8%, var(--_helix-sunken-overlay))
   );
   /* The filled wash at the step a panel takes, so a filled card on the well
-     comes out #202020, 1.15:1, and under the elevated #272727. At the page's
-     8.5% it painted #262626, one code under the elevated card. */
+     comes out #202020, 1.15:1, and under the elevated #2d2d2d. At the page's
+     8.5% it painted #262626, 1.10:1 under the elevated card. */
   --helix-color-surface-filled: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
     color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
