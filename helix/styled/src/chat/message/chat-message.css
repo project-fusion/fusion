@@ -233,9 +233,17 @@
    the brand's hue, and 28% because that is where it weighs the same as the one
    above: 1.43 to 1.54 against every ground in both modes, where the neutral wash
    is 1.35 to 1.57. */
+:host([author="me"]) [part="content"] {
+  background-color: var(--chat-message-background-color-me, var(--helix-color-primary-wash));
+  color: var(--chat-message-color-me, var(--chat-message-color, var(--helix-color-foreground)));
+}
+
 /* *`plain` takes the ground away and leaves the words.** Not the padding: the
    inline padding goes, because there is no box left for it to be inside, and the
-   block padding stays so a run of plain turns keeps the rhythm a bubble gave it. */
+   block padding stays so a run of plain turns keeps the rhythm a bubble gave it.
+   **The reader's own turn too**, which `plain` describes as having no ground:
+   written after this rule, the wash above restated the fill on a turn with no
+   padding left, so the words touched the fill's edges. */
 :host([separation="plain"]) [part="content"] {
   background-color: transparent;
   padding-inline: var(--helix-space-none);
@@ -254,11 +262,6 @@
 
 :host([separation="plain"]) [part="content"] {
   inline-size: auto;
-}
-
-:host([author="me"]) [part="content"] {
-  background-color: var(--chat-message-background-color-me, var(--helix-color-primary-wash));
-  color: var(--chat-message-color-me, var(--chat-message-color, var(--helix-color-foreground)));
 }
 
 /* *Centered, because this line holds two things of different heights.** It is
