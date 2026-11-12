@@ -85,8 +85,12 @@ in dark and reads above a filled card: #1e1e1e against #161616 on the page.
 Inside a Dialog,
 a Drawer, a Popover, or an elevated Card, the rungs are washes of `foreground`
 over the panel: `overlay` 12%, `raised` 9%, `surface` 3%, and `border` 12%.
-Inside a default Card, `overlay` is 12% and the filled wash 6%. An elevated
-Card inside any of these reads above a filled one. A Menu opened from an
+Inside a default Card, `overlay` is 12% and the filled wash 6%. Inside a
+filled Card, the rungs are the same washes as in an elevated Card, laid over
+the `raised` rung, since the filled card's own fill is a wash: on the page, a
+default Card inside is #1e1e1e, a filled one #242424, and an elevated one
+#353535, on the #161616 card. An elevated Card inside any of these reads above
+a filled one. A Menu opened from an
 elevated Card stands a step above the card, and a Dialog opened over another
 Dialog stands 8% above it. Light mode keeps its rungs, where a shadow sets an
 overlay apart. An elevated Card inside another card fills the `overlay` rung in
@@ -108,10 +112,10 @@ does off the page: 1.23:1 in light and 1.29:1 in dark.
 **In dark mode, a surface inside a sunken region steps up a rung.** The card
 rung, #0c0c0c, is darker than the #121212 well, so a Card there would read as a
 hole. Inside the region, `surface` takes the `raised` rung, #181818, and the
-rungs above it step with it: `raised` is #272727 and `overlay` is #2d2d2d. An
-elevated Card still stands above a default one, and a menu opened inside stands
-above both. Light mode keeps its rungs, where a card is already lighter than
-the well. Canvas's board is a sunken region too.
+rungs above it step with it: `raised` is #212121 and `overlay` is #272727. An
+elevated Card, #2d2d2d, still stands above a default one and above a filled
+one, #202020, and a menu opened inside stands above both. Light mode keeps its
+rungs, where a card is already lighter than the well. Canvas's board is a sunken region too.
 
 ## Using the page color inside a component
 

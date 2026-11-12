@@ -91,7 +91,7 @@ axes](./visual-axes).
 
 | Value | Ground | Backdrop filter |
 | --- | --- | --- |
-| `glass` | `material-panel`: 72% white in light mode, and 72% of the dark ground in dark mode | `material-backdrop`: a 16px blur and 1.5 times the saturation |
+| `glass` | `material-panel`: 72% white in light mode, and 72% of the dark ground in dark mode | `material-backdrop`: a 16px blur and 1.5 times the saturation. A glass Dialog or Drawer adds a brightness of `material-scrim-lift` |
 | `frosted` | `material-translucent-strong`: 88% of the ground in both modes | A 32px blur, `material-blur-lg`, with no change to saturation |
 | `transparent` | None | None |
 
@@ -100,6 +100,13 @@ and a Drawer included, except App Header. Its glass is `material-translucent`,
 30% white in light mode and 72% of the dark ground in dark mode, so a bar across
 the page lets more of what scrolls under it show. `--helix-material-opacity`
 scales every coverage together.
+
+A modal Dialog or Drawer paints its scrim behind the panel, so a glass panel's
+filter samples the page with the scrim already over it. In light mode the white
+page came through as a gray. `material-scrim-lift` is the brightness the
+filter adds to undo the scrim: 1 / 0.6 in light mode, where the scrim is 40% of
+the ink, and 1 in dark mode, where the glass is drawn over the dimmed page. The
+color mode sets it, and a Dialog and a Drawer read it in their own filters.
 
 **Use blur with care, because it is expensive.** A `backdrop-filter` makes the
 compositor read what is behind the element again on every frame the element

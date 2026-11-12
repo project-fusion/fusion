@@ -69,19 +69,26 @@ for text on each surface.
 
 - **Light mode.** The primary color is held at L 0.5 or less. A seed at 0.5 or
   darker is drawn exactly. A lighter seed is darkened to 0.5, so a very light
-  brand draws a darker primary color than the one you set.
+  brand draws a darker primary color than the one you set. A color at L 0.5
+  that is outside sRGB, such as a vivid cyan or green, is drawn by the screen
+  as the nearest color it can show, which can be a little lighter: a `#06b6d4`
+  seed draws at L 0.516.
 - **Dark mode.** The primary color is the seed lightened by 0.13, at least
   0.68, and no lighter than 0.87 or the seed, whichever is lighter. A seed at
   0.87 or lighter is drawn exactly: on a `#ffe600` seed, primary text is
   `#ffe600` and measures 16.57:1 on the black page. A darker seed is drawn
   lighter than the one you set.
 - **A filled control in dark mode.** A seed at L 0.68 or darker fills at a
-  luminance between 0.115 and 0.135, with its hue and chroma kept. Lightness
-  alone is a different luminance in each hue, so a green filled at the same
-  lightness as a blue carried a white label at 4.43:1. At that luminance the
-  fill clears 3:1 against a card, and a white label clears 4.5:1 on it at rest,
-  under the pointer, and pressed, which step lighter. A lighter seed fills 0.05 darker than itself
-  and takes a black label.
+  luminance between 0.115 and 0.135, with its hue and chroma kept, and takes a
+  white label. Lightness alone is a different luminance in each hue, so a green
+  filled at the same lightness as a blue carried a white label at 4.43:1. At
+  that luminance the fill clears 3:1 against a card, and a white label clears
+  4.5:1 on it at rest, under the pointer, and pressed, which step lighter. A
+  fill outside sRGB, such as a green or a cyan, is drawn by the screen as the
+  nearest color it can show, which can sit a little above the band: a
+  `#16a34a` seed fills at 0.138, and `oklch(0.6 0.12 200)` at 0.142, where a
+  white label measures 4.49:1 pressed. A seed lighter than L 0.68 fills 0.05
+  darker than itself and takes a black label.
 
 The accent seed is held to the same limits.
 
