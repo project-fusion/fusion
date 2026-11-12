@@ -39,6 +39,15 @@
   padding-inline-start: var(--helix-space-lg);
 }
 
+/* **No reading measure on a docs page.** The prose recipe stops a paragraph, a
+   list and a quote at 50ch, which held a list to 464 pixels of the 743 pixel
+   column at 1440 while the paragraphs beside it, set as Text, ran the whole
+   column. The owner decided on November 10, 2026 that docs text spans the full
+   column. */
+.prose :is(p, ul, ol, blockquote) {
+  max-inline-size: none;
+}
+
 .prose li + li,
 .prose li > :is(ul, ol) {
   margin-block-start: var(--helix-space-2xs);
