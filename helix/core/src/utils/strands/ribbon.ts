@@ -12,7 +12,7 @@ import {
 } from './centerline.js'
 import type { StrandsPalette } from './palette.js'
 
-/**
+/*
  * The ribbon as triangles laid on the CPU, for a drawing with no vertex
  * stage: a phone's react-native-skia. The web's vertex shaders lay the same
  * strands and dust on its GPU.

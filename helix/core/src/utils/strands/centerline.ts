@@ -1,6 +1,6 @@
 import { catmull } from './path.js'
 
-/**
+/*
  * The ribbon's centerline and one strand's place around it, as the web's
  * shader computes them in `strandAt`, for a drawing that lays its strands on
  * the CPU: a phone, whose GPU drawing has no vertex stage.
