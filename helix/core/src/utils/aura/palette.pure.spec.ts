@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { ColorBytes } from '@fusion.dev/helix-core'
+import type { ColorBytes } from '../read-color/read-color.js'
 import { type PaletteStyle, paletteOf, RESTING_PALETTE } from './palette.js'
 
 /** A reader that knows a few named colors, the way the engine resolves them. */

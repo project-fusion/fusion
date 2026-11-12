@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { exitOf, FRAGMENT, tiltFor } from '@fusion.dev/helix-core/aura'
 import {
   framesBooked,
   hasLayout,
@@ -8,8 +9,6 @@ import {
   readyToMove,
   registerDom,
 } from '@fusion.dev/helix-testing/dom'
-import { exitOf, tiltFor } from '../axis.js'
-import { FRAGMENT } from '../shader.js'
 
 /* Registered before the module is evaluated, and the import is dynamic for
    exactly that reason: `@customElement` runs at evaluation, and a static import
