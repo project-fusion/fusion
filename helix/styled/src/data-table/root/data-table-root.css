@@ -1,8 +1,13 @@
 /*
  *  The grid scrolls its own box rather than squeezing its columns.
  */
+/* **No floor of its own in a grid or flex track**, as Table's host has, whose
+   `overflow-x: auto` takes the floor away. The columns' widths were the host's
+   minimum, so in a 280 pixel track the table took 381 and widened the page;
+   with none it takes the track and its grid scrolls inside it. */
 :host {
   display: block;
+  min-inline-size: 0;
 }
 
 /* **Across the whole host, whatever the host is.** Before the table upgrades, a
