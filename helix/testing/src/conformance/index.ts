@@ -57,6 +57,7 @@ import { SLIDER } from './scenarios/slider.js'
 import { SPARKLINE } from './scenarios/sparkline.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
 import { SPLITTER } from './scenarios/splitter.js'
+import { STRANDS } from './scenarios/strands.js'
 import { TABLE } from './scenarios/table.js'
 import { TABS } from './scenarios/tabs.js'
 import { TAG_GROUP } from './scenarios/tag-group.js'
@@ -143,6 +144,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   sparkline: SPARKLINE,
   'speed-dial': SPEED_DIAL,
   splitter: SPLITTER,
+  strands: STRANDS,
   switch: SWITCH,
   table: TABLE,
   tabs: TABS,

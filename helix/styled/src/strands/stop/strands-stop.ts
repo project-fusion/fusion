@@ -3,7 +3,7 @@ import type { StrandsPattern } from '@fusion.dev/helix-core/strands'
 import type { CSSResultGroup } from 'lit'
 import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './strands-stop.css.js'
+import { styles } from './strands-stop.generated.css.js'
 
 /**
  * @summary Pins a form of the ribbon to a section of the page.

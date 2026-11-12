@@ -34,7 +34,7 @@ import {
   MIN_STRANDS,
   StrandsRenderer,
 } from '../renderer.js'
-import { styles } from './strands-root.css.js'
+import { styles } from './strands-root.generated.css.js'
 
 /** The widest either edge of the drawing buffer may get, in device pixels. Aura's ceiling, for Aura's reason. */
 const MAX_CANVAS_EDGE = 4096

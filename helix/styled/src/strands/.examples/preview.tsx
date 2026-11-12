@@ -1,9 +1,5 @@
 import './preview.css'
 
 export function Example() {
-  return (
-    <div className="stage">
-      <helix-strands></helix-strands>
-    </div>
-  )
+  return <helix-strands style={{ blockSize: '20rem' }}></helix-strands>
 }
