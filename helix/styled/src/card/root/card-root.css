@@ -170,7 +170,41 @@
   --_card-nest: var(--_card-overlay);
 }
 
+/* **In dark, what stands on a filled card steps up from it, as it does on an
+   elevated one**: 3% of the ink for a card, 9% for the raised rung, and 12%
+   for an overlay, with an elevated card a step above that and a filled card's
+   wash at 6%. The page's rungs left a default card inside at #0c0c0c, a hole
+   in the #161616 card, and an elevated card at #1e1e1e under a filled one at
+   #2a2a2a. **The steps are taken from the raised rung as it stands outside**,
+   since the card's own fill is a wash with no color of its own: the raised
+   rung sits on or a code above that wash on the page, in a well, in a panel,
+   and in another card, so nothing stepped from it falls under the card. Light
+   keeps its rungs, and an elevated card inside takes the overlay rung, as the
+   elevated rule above says. */
+:host([separation="filled"]:not([material])) {
+  --_card-ground: var(--card-background-color, var(--helix-color-surface-raised));
+  --_card-raised: var(--helix-color-surface-raised);
+  --_card-surface: var(--helix-color-surface);
+}
+
 :host([separation="filled"]:not([material])) slot {
+  --_card-nest: var(--_card-overlay);
+  --helix-color-surface-overlay: light-dark(
+    var(--_card-overlay),
+    color-mix(in oklab, var(--helix-color-foreground) 12%, var(--_card-ground))
+  );
+  --helix-color-surface-raised: light-dark(
+    var(--_card-raised),
+    color-mix(in oklab, var(--helix-color-foreground) 9%, var(--_card-ground))
+  );
+  --helix-color-surface: light-dark(
+    var(--_card-surface),
+    color-mix(in oklab, var(--helix-color-foreground) 3%, var(--_card-ground))
+  );
+  --helix-color-surface-filled: light-dark(
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent),
+    color-mix(in oklab, var(--helix-color-foreground) 6%, transparent)
+  );
   --helix-color-border: light-dark(
     color-mix(in oklab, var(--helix-color-foreground) 5%, var(--_card-line)),
     color-mix(in oklab, var(--helix-color-foreground) 6%, var(--_card-line))
