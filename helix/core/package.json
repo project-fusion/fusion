@@ -71,6 +71,10 @@
       "helix-development": "./dist/utils/audit-source/audit-source.js",
       "default": "./dist/utils/audit-source/audit-source-off.js"
     },
+    "./aura": {
+      "types": "./dist/utils/aura/aura.d.ts",
+      "default": "./dist/utils/aura/aura.js"
+    },
     "./calendar": {
       "types": "./dist/utils/calendar/dates.d.ts",
       "default": "./dist/utils/calendar/dates.js"
