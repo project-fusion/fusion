@@ -237,6 +237,31 @@ slot[name="check"]::slotted(*) {
   color: var(--helix-color-foreground);
 }
 
+/* **Phosphor's regular check, as Option draws it**, decided by the owner on
+   November 11, 2026: a checked row is marked by a light tick, and a box, as
+   Checkbox draws one, by a heavy one. The glyph the row writes is the bold
+   check, so its path is hidden and the regular check is painted through a
+   stencil in its place, in the same ink. */
+slot[name="check"] > svg[part="mark"] {
+  background-color: currentColor;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E");
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+slot[name="check"] > svg[part="mark"] > * {
+  display: none;
+}
+
+/* Forced colors paint every background the canvas, which would take the
+   stencil's fill with it. The ink it reads is already the forced one. */
+@media (forced-colors: active) {
+  slot[name="check"] > svg[part="mark"] {
+    forced-color-adjust: none;
+  }
+}
+
 /* A submenu is shown by the menu, on its own rows, so this element renders
    nothing for it here. */
 slot[name="submenu"] {
