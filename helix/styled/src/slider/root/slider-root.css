@@ -1,5 +1,10 @@
 /* Stacked the same way as every other field. See the input's note. */
+/* **The slider's layers stay inside it.** The control is raised over the
+   marks, and the thumbs and tooltips over the control, and with no stacking
+   context of its own those steps rose over the page: at 60rem the theme
+   builder's slider painted over its sticky heading and its Reset button. */
 :host {
+  isolation: isolate;
   /* The same token the progress bar takes, which is the same object: a
      horizontal bar a proportion is read off. At a bare 4px the fill and the
      rules in a table beside it are the same weight. */
