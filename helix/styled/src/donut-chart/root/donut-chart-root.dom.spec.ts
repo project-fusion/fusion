@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -138,6 +138,33 @@ describe('donut chart', () => {
 /* `sweep` shipped publicly in `arc.html` and was asserted on neither tier. The
    headless spec holds the drawing; these are the three things this tier has to
    say about it, and its docblock names all three as the reason it reflects. */
+describe('donut chart status lines', () => {
+  test('the words in the hole stop at three lines, and the mark stands in the first', () => {
+    /* Six lines of a long error ran out of the hole onto the ring, and the
+       error line wrapped as a flex row, so its mark stood above the words while
+       the loading ring stood beside them. */
+    expect(sheet()).toContain('-webkit-line-clamp: 3')
+    expect(sheet()).toContain('display: -webkit-box')
+  })
+
+  test('something slotted into error is recorded, so the line is drawn whole and the button stays', async () => {
+    await mount(
+      '<helix-donut-chart error-text="The readings did not load"><button slot="error">Try again</button></helix-donut-chart>',
+    )
+    const slotted = document.querySelector('helix-donut-chart') as Chart
+    await slotted.updateComplete
+    expect(hasState(slotted, 'has-error-content')).toBe(true)
+    expect(rule(':host(:state(has-error-content)) [part="error"]')).toContain(
+      '-webkit-line-clamp: none',
+    )
+
+    await mount('<helix-donut-chart error-text="The readings did not load"></helix-donut-chart>')
+    const plain = document.querySelector('helix-donut-chart') as Chart
+    await plain.updateComplete
+    expect(hasState(plain, 'has-error-content')).toBe(false)
+  })
+})
+
 describe('donut chart sweep', () => {
   test('reflects, since the sheet has three things to say about it', async () => {
     const host = (await chart()) as Chart & { sweep?: string }

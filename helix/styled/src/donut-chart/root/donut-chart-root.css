@@ -253,13 +253,24 @@
    crossed the ring on both sides (November 4, 2026). The box is 85% of the
    hole's diameter, the width of a chord a line and a half from the center, so
    three lines of words still clear the inner edge. Centered by its margins, so
-   it needs nothing more on a right-to-left page. */
+   it needs nothing more on a right-to-left page.
+
+   **Three lines, then an ellipsis**, so a long error stays in the hole: six
+   lines of it ran out over the ring. **The mark stands in the line before the
+   words**, the loading ring and the error mark alike: the error line wrapped
+   as a flex row and put its mark above the words, while the loading ring
+   stood beside them. A clamped block has no `align-content`, so the box is as
+   tall as its lines and centered by its margins. */
 [part="empty"],
 [part="error"],
 [part="loading"] {
   --_donut-chart-ring: 80;
 
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  block-size: fit-content;
   box-sizing: border-box;
+  display: -webkit-box;
   inline-size: calc(
     100% *
     (var(--_donut-chart-ring) - 2 * var(--donut-chart-stroke, 16)) /
@@ -267,14 +278,18 @@
     0.85
   );
   inset-inline: 0;
-  margin-inline: auto;
+  margin: auto;
+  overflow: hidden;
 }
 
-/* In a half ring the lines stand in the opening, as the middle does. */
+/* In a half ring the lines stand at the foot of the opening, as the middle
+   does, and two of them fit it. */
 :host([sweep="half"]) [part="empty"],
 :host([sweep="half"]) [part="error"],
 :host([sweep="half"]) [part="loading"] {
-  block-size: calc(
+  -webkit-line-clamp: 2;
+  margin-block: auto var(--helix-space-none);
+  max-block-size: calc(
     100% *
     (40 - var(--donut-chart-stroke, 16)) /
     (40 + var(--donut-chart-stroke, 16) / 2)
@@ -285,6 +300,24 @@
     (40 + var(--donut-chart-stroke, 16) / 2)
   );
   inset-block-start: auto;
+}
+
+/* **Whole, with something in the `error` slot**, because a clamped line hides
+   what follows it, and the button that tries again went with the words past
+   the third line. The button takes its own line under the words, in a half
+   ring too. */
+:host(:state(has-error-content)) [part="error"] {
+  -webkit-line-clamp: none;
+  max-block-size: none;
+}
+
+:host(:state(has-error-content)) slot[name="error"] {
+  display: block;
+  margin-block-start: var(--helix-space-xs);
+}
+
+:host(:state(has-error-content)) slot[name="error"]::slotted(*) {
+  margin-inline-start: var(--helix-space-none);
 }
 
 /* Placed from the inline start, which is the right on a right-to-left page, so

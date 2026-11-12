@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDonutChart } from '@fusion.dev/helix-headless/donut-chart'
-import type { CSSResultGroup } from 'lit'
+import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
@@ -41,6 +41,8 @@ import '../../tooltip/index.js'
  * @cssproperty --donut-chart-slice-label-color - Color of a slice's share, under `slice-labels`.
  * @cssproperty --donut-chart-slice-label-font-size - Size of a slice's share, under `slice-labels`.
  * @cssproperty --donut-chart-track-color - Color of the ring under the slices.
+ *
+ * @cssstate has-error-content - Something is slotted into `error`, so the error line is not cut short.
  */
 @customElement('helix-donut-chart')
 export class HelixDonutChart extends HelixHeadlessDonutChart {
@@ -111,6 +113,38 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
+
+  /**
+   * **Says whether the page slotted something into `error`**, such as a button
+   * that tries again. The words in the hole end in an ellipsis after three
+   * lines, and a clamped line hides whatever follows it, so with something
+   * slotted the line is drawn whole and the button stays. Read after every
+   * render, which draws the slot, and on `slotchange`.
+   */
+  private readonly readError = (): void => {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="error"]')
+    this.toggleState(
+      'has-error-content',
+      (slot?.assignedNodes() ?? []).some(
+        (node) => node.nodeType === Node.ELEMENT_NODE || node.textContent?.trim() !== '',
+      ),
+    )
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.renderRoot.addEventListener('slotchange', this.readError)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.renderRoot.removeEventListener('slotchange', this.readError)
+  }
+
+  protected override updated(changed: PropertyValues<this>): void {
+    super.updated(changed)
+    this.readError()
+  }
 
   static override styles: CSSResultGroup = [
     seriesStyles,
