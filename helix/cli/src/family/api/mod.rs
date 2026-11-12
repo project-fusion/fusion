@@ -73,7 +73,7 @@ pub use total::Total;
 pub use tour::{Stop, Tour};
 pub use tree::{Attribute, Binding, NodeKind};
 pub use tree_choice::{
-    TreeChoice, AREA_CHART, BAR_CHART, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT,
+    TreeChoice, AREA_CHART, AURA, BAR_CHART, CAROUSEL, CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT,
     CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER, DONUT_CHART, FILTER_INPUT, FILTER_MENU,
     HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT,
     NOTIFICATIONS_ROOT, NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB,
@@ -256,6 +256,9 @@ pub struct Api {
     /// What the element reads, sends, and computes where it is a player of one video.
     #[serde(rename = "video", skip_serializing_if = "Option::is_none")]
     pub video: Option<TreeChoice>,
+    /// What the element reads, sends, and computes where it draws an aura.
+    #[serde(rename = "aura", skip_serializing_if = "Option::is_none")]
+    pub aura: Option<TreeChoice>,
     /// What the element reads, sends, and computes where it draws an orb.
     #[serde(rename = "orb", skip_serializing_if = "Option::is_none")]
     pub orb: Option<TreeChoice>,
@@ -436,6 +439,7 @@ impl Api {
             && self.video_playlist_menu.is_none()
             && self.video_playlist.is_none()
             && self.video.is_none()
+            && self.aura.is_none()
             && self.orb.is_none()
             && self.picker_field.is_none()
             && self.listbox.is_none()
@@ -540,6 +544,7 @@ const FIELDS: &[&str] = &[
     "videoPlaylistMenu",
     "videoPlaylist",
     "video",
+    "aura",
     "orb",
     "pickerField",
     "listbox",
@@ -635,6 +640,7 @@ fn logged<'a>(field: &impl Fn(&str) -> Option<&'a Lit>) -> Result<Api, String> {
             .map(tree_choice::video_playlist)
             .transpose()?,
         video: field("video").map(tree_choice::video).transpose()?,
+        aura: field("aura").map(tree_choice::aura).transpose()?,
         orb: field("orb").map(tree_choice::orb).transpose()?,
         picker_field: field("pickerField")
             .map(tree_choice::picker_field)

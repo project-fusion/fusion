@@ -86,7 +86,7 @@ use ts_rs::TS;
 
 use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
-    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, AREA_CHART, BAR_CHART, CAROUSEL,
+    TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, AREA_CHART, AURA, BAR_CHART, CAROUSEL,
     CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER,
     DONUT_CHART, FILTER_INPUT, FILTER_MENU, HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART,
     LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
@@ -656,6 +656,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         ),
         (&api.video_playlist, VIDEO_PLAYLIST, "video-playlist"),
         (&api.video, VIDEO, "video"),
+        (&api.aura, AURA, "aura"),
         (&api.orb, ORB, "orb"),
         (&api.picker_field, PICKER_FIELD, "picker-field"),
         (&api.listbox, LISTBOX, "listbox"),

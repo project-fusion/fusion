@@ -82,6 +82,8 @@ export interface PartBinding {
  * properties at the part, its hooks among them.
  */
 export interface DrawingLook {
+  /** The part's own box style, the colors it carries for a drawing among them, as Aura's ground and peaks. */
+  readonly box?: Style
   readonly custom: Readonly<Record<string, Resolution>>
   readonly text: Style
 }

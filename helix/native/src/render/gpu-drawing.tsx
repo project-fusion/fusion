@@ -38,6 +38,8 @@ export interface GpuDrawingProps {
   readonly paint: Painter
   /** Whether it runs a frame a refresh, or stands on one frame. */
   readonly running: boolean
+  /** Whether the drawing can be made, where the package stands: `false` draws the fallback, as Aura's does where its effect does not compile. */
+  readonly drawable?: boolean
   /** Anything whose change draws a standing frame again, as new colors do. */
   readonly still?: unknown
 }
@@ -140,5 +142,9 @@ const Fallback = ({ fallback }: Pick<GpuDrawingProps, 'fallback'>) => {
 /** Draws `paint` on the GPU where react-native-skia stands, and `fallback` where it does not. */
 export const GpuDrawing = (props: GpuDrawingProps) => {
   const skia = loadSkia()
-  return skia === null ? <Fallback fallback={props.fallback} /> : <Drawn {...props} skia={skia} />
+  return skia === null || props.drawable === false ? (
+    <Fallback fallback={props.fallback} />
+  ) : (
+    <Drawn {...props} skia={skia} />
+  )
 }

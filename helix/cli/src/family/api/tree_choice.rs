@@ -817,6 +817,12 @@ pub const HEATMAP: &[(&str, Names)] = &[
     ("onResize", Names::Event),
 ];
 
+/// What an aura sends: nothing by a bound name. It reads its props by their own names.
+pub const AURA: &[(&str, Names)] = &[];
+
+/// What it computes for its parts, each read as `aura.x`: the pause glyph, and whether it is paused.
+pub const AURA_COMPUTED: &[&str] = &["glyph", "held"];
+
 /// What an orb sends: nothing. It reads its props by their own names.
 pub const ORB: &[(&str, Names)] = &[];
 
@@ -1424,6 +1430,11 @@ pub fn scatter_chart(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "scatterChart", SCATTER_CHART, SCATTER_CHART_COMPUTED)
 }
 
+/// `aura({ ... })`, each field a name.
+pub fn aura(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "aura", AURA, AURA_COMPUTED)
+}
+
 /// `orb({ ... })`, each field a name.
 pub fn orb(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "orb", ORB, ORB_COMPUTED)
@@ -1567,6 +1578,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),
         "video" => video(value),
+        "aura" => aura(value),
         "orb" => orb(value),
         "pickerField" => picker_field(value),
         "listbox" => listbox(value),

@@ -1038,6 +1038,12 @@ export interface ScatterChartChoice {
   readonly yTicks?: string
 }
 
+/** The names of an aura, each read as `aura.x`. */
+export interface AuraChoice {
+  readonly glyph?: string
+  readonly held?: string
+}
+
 /** The names of an orb, each read as `orb.x`. */
 export interface OrbChoice {
   readonly shown?: string

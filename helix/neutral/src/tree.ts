@@ -55,6 +55,7 @@ import type { Toolbar } from './toolbar.js'
 import type { Total } from './total.js'
 import type { Stop, Tour } from './tour.js'
 import type {
+  AuraChoice,
   AxisChartChoice,
   BarChartChoice,
   CarouselChoice,
@@ -377,6 +378,8 @@ export interface Headless {
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */
   readonly video?: VideoChoice
+  /** What the element reads, sends, and computes where it draws an aura. */
+  readonly aura?: AuraChoice
   /** What the element reads, sends, and computes where it draws an orb. */
   readonly orb?: OrbChoice
   /** What the element reads, sends, and computes where it is a playlist that drives a player. */
