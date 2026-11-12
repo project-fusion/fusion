@@ -130,7 +130,7 @@ slot[name="trigger"]::slotted(*) {
 /* Forced colors paint the wash the canvas, so there the trigger keeps a ring. */
 @media (forced-colors: active) {
   [part="trigger"]:focus-visible {
-    outline: var(--helix-size-focus-ring) solid Highlight;
+    outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
     outline-offset: calc(var(--helix-size-focus-offset) * -1);
   }
 }
