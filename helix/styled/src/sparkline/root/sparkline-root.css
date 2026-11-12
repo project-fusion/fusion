@@ -238,23 +238,28 @@
 /* **The words the charts show with nothing to draw, at a sparkline's size.** An
    empty sparkline drew a blank 98 by 35 box. The charts set their words at
    `text-sm` in the middle of the plot; `text-xs` is the step a 2.5em box holds,
-   the size the readout already takes, and one line, so a narrow cell ends the
-   words in an ellipsis and never grows a second line. */
+   the size the readout already takes. **Two lines at the tight leading fit the
+   box**, so the words wrap and end in an ellipsis only after the second: on one
+   line a 98 pixel sparkline said "Loading read…" and "The deploy…", and nothing
+   said what had failed. Centered in the box by their margins, as a clamped
+   block has no `align-content`. */
 [part="empty"],
 [part="error"],
 [part="loading"] {
-  align-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  block-size: fit-content;
   color: var(--helix-color-foreground-muted);
-  display: block;
+  display: -webkit-box;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   inset: 0;
-  margin: var(--helix-space-none);
+  line-height: var(--helix-leading-tight);
+  margin: auto var(--helix-space-none);
   overflow: hidden;
+  overflow-wrap: anywhere;
   position: absolute;
   text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* Said and not shown: the dot and the readout are the picture of it. Out of
