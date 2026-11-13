@@ -55,6 +55,7 @@ export default fragment(
         native([
           rule({
             fontFamily: token('font-sans'),
+            fontSize: measured('spatial-label-size', token('text-xs')),
             left: measured('spatial-label-x'),
             lineHeight: 1,
             pointerEvents: 'none',
@@ -70,20 +71,18 @@ export default fragment(
       native([
         rule({
           color: token('color-foreground-muted'),
-          fontSize: token('text-xs'),
           fontVariantNumeric: 'tabular-nums',
           fontWeight: token('weight-medium'),
         }),
       ]),
     ]),
-    /* A name is the web's 0.15 against a tick's 0.13 of the box, on a plate of the ground. */
+    /* A name, on a plate of the ground. */
     on('axis-name', [
       native([
         rule({
           backgroundColor: token('color-background'),
           borderRadius: token('radii-sm'),
           color: token('color-foreground'),
-          fontSize: product(token('text-xs'), 1.1538),
           fontWeight: token('weight-semibold'),
           paddingInline: product(token('text-xs'), 0.125),
         }),
