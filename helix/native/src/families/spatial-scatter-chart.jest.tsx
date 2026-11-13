@@ -11,7 +11,7 @@ import { type FakeKeys, fakeKeys } from '@fusion.dev/helix-core/capabilities/key
 import { beforeEach, describe, expect, test } from '@jest/globals'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { useEffect } from 'react'
-import { Dimensions } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler'
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils'
 import { publishChartSource } from '../render/chart-sources'
@@ -227,6 +227,19 @@ describe('the box and its points', () => {
     expect(screen.getByText('Load', { includeHiddenElements: true })).toBeTruthy()
     expect(screen.getByText('Memory', { includeHiddenElements: true })).toBeTruthy()
     expect(screen.getAllByText('100', { includeHiddenElements: true }).length).toBeGreaterThan(0)
+  })
+
+  test('writes no number or name at no size before the plot is laid out', async () => {
+    await render(<Chart />)
+    await act(async () => {
+      fireEvent(plot(), 'layout', { nativeEvent: { layout: { height: 0, width: 0, x: 0, y: 0 } } })
+    })
+    const sizes = (screen.root?.queryAll((node) => node.type === 'Text') ?? []).map(
+      (node) => StyleSheet.flatten(node.props.style)?.fontSize,
+    )
+    expect(sizes.some((size) => size !== undefined && !(Number(size) > 0))).toBe(false)
+    await layOut()
+    expect(screen.getByText('Load', { includeHiddenElements: true })).toBeTruthy()
   })
 
   test('draws a line from each point to the floor under drop-lines', async () => {

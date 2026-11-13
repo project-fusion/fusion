@@ -122,10 +122,25 @@ export const fitted = <Model>(
   return picture
 }
 
+/**
+ * How tall a word `size` of the box's units stands on the screen, in points,
+ * or `undefined` where it stands at no size: before the box is measured, or
+ * a word scaled to nothing. **No word is drawn then**, since Android refuses a
+ * font size that is not positive and ends the app.
+ */
+export const pointsAt = (size: number, frame: Frame, width: number): number | undefined => {
+  const points = size * (width / Math.max(frame.width, 1e-6))
+  return Number.isFinite(points) && points > 0 ? points : undefined
+}
+
 /** A number or a name over the drawing, at its share of the frame. */
 export const wordsAt = (view: BoxView, frame: Frame, width: number, name: boolean) => {
   /* As large as the web writes it in the box, in points: its share of the box at the drawing's scale. */
-  const size = `${(name ? NAME_SIZE : TICK_SIZE) * view.words * (width / Math.max(frame.width, 1e-6))}px`
+  const points = pointsAt((name ? NAME_SIZE : TICK_SIZE) * view.words, frame, width)
+  if (points === undefined) {
+    return []
+  }
+  const size = `${points}px`
   return view.labels
     .filter((one) => one.name === name)
     .map((one, key) => {
@@ -163,12 +178,16 @@ export const nearestOf =
 
 /** Each word a family writes in its drawing, at its share of the frame, in points as large as the web writes it. */
 export const wordsOver = (words: readonly SpatialWord[] | undefined, frame: Frame, width: number) =>
-  (words ?? []).map((one, key) => {
+  (words ?? []).flatMap((one, key) => {
+    const points = pointsAt(one.size, frame, width)
+    if (points === undefined) {
+      return []
+    }
     const at = shareOf({ bounds: frame } as BoxView, one)
     return {
       color: one.color ?? '',
       key: String(key),
-      size: `${one.size * (width / Math.max(frame.width, 1e-6))}px`,
+      size: `${points}px`,
       text: one.text,
       toned: one.color !== undefined,
       x: percent(at.x * 100),
