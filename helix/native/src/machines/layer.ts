@@ -18,7 +18,8 @@
  *   takes each.
  * - A press outside: on a modal layer's scrim or a sheet's, and on the app
  *   outside every layer for any other. A press on the layer's anchor is the
- *   anchor's.
+ *   anchor's, and one in the region a view around it takes, as a chart's
+ *   plot is its bubble's, is the layer's own (`layer-within.ts`).
  *
  * **A layer that `refuses` answers a press outside it that `closedby`
  * keeps open**: its part is `data-refused` for the length of the motion its
@@ -67,6 +68,7 @@ import { useCloseRequests } from './layer-requests'
 import { openOf, placedOf, shownBy, statedBy, statesOf } from './layer-states'
 import { type Swiper, useLayerSwipe, useStill } from './layer-swipe'
 import { answeredFirst, partView, tellBack } from './layer-view'
+import { useWithin } from './layer-within'
 import { dismisses, inside } from './layering'
 import { boundTo } from './props'
 import type { Turned } from './toggle'
@@ -211,13 +213,16 @@ export const useLayer = (
   })
   /* One of a kind open at a time, where the node says so, as a megamenu's. */
   const onKin = useAlone(kindOf(family, node), { anchor: () => anchor, open, toggled })
+  /* The region the layer takes as its own, as a chart's plot is its bubble's. */
+  const within = useWithin(open, placed.at)
   const outside = useCallback(
     (x: number, y: number) => {
-      if (!inside(anchorBox.current, x, y) && !onKin(x, y)) {
+      const own = inside(anchorBox.current, x, y) || inside(within.current, x, y)
+      if (!own && !onKin(x, y)) {
         dismiss('outside')
       }
     },
-    [dismiss, onKin],
+    [dismiss, onKin, within],
   )
   /* Where the anchor stands, read again as the layer opens and moves. */
   // biome-ignore lint/correctness/useExhaustiveDependencies: a new place is a moved anchor

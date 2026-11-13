@@ -24,7 +24,7 @@
 import { haptics } from '@fusion.dev/helix-core/capabilities/haptics'
 import { keys } from '@fusion.dev/helix-core/capabilities/keys'
 import type { KeyPress, Stop } from '@fusion.dev/helix-core/capabilities/types'
-import { readingAt, stepReading } from '@fusion.dev/helix-core/chart'
+import { readingAt } from '@fusion.dev/helix-core/chart'
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AccessibilityActionEvent } from 'react-native'
 import { GestureDetector } from 'react-native-gesture-handler'
@@ -32,6 +32,8 @@ import { useFocusVisible } from '../capabilities/focus-visible'
 import { type TrackPoint, useTrack } from '../drivers/track'
 import type { PartBinding } from '../render/behavior'
 import { direction } from '../render/styles'
+import { keyedTo, shownOf } from './chart-cursor-keys'
+import { LayerWithin } from './layer-within'
 
 /** What moved the reading, as the web's reading detail names it. */
 export type MovedBy = 'keyboard' | 'touch'
@@ -136,60 +138,6 @@ const ACTIONS = [
   { label: 'increment', name: 'increment' },
   { label: 'decrement', name: 'decrement' },
 ] as const
-
-/** How far Page Up and Page Down move: four columns of a grid, or a tenth of the readings, at least one. */
-const pageOf = (count: number, grid: number): number =>
-  grid > 1 ? grid * 4 : Math.max(1, Math.round(count / 10))
-
-/** The places of the readings drawn, which the keys walk. */
-const shownOf = (setup: CursorSetup): number[] =>
-  (setup.order ?? Array.from({ length: setup.count }, (_, at) => at)).filter(
-    (at) => setup.shows?.(at) !== false,
-  )
-
-/** Where the keys rest: a reading, and the series within it. */
-interface Place {
-  readonly at: number
-  readonly series: number
-}
-
-/**
- * The reading and the series a key moves to from `from`, or `undefined` for
- * a key that moves nothing: stepped by place among the readings drawn, so a
- * hidden one is never landed on, as the web's chart steps. `series` is how
- * many series the cross pair of arrows walks.
- */
-const keyedTo = (
-  key: string,
-  from: Place,
-  setup: CursorSetup,
-  series = setup.series ?? 1,
-): Place | undefined => {
-  const shown = shownOf(setup)
-  const count = shown.length
-  /* A page the chart measures itself, such as a month of days, from a reading shown. */
-  const paged =
-    (key === 'PageDown' || key === 'PageUp') && from.at >= 0
-      ? setup.pageFrom?.(from.at, key === 'PageDown')
-      : undefined
-  if (paged !== undefined && shown.includes(paged)) {
-    return { at: paged, series: from.series }
-  }
-  const grid = Math.max(1, setup.grid ?? 1)
-  const next = stepReading(
-    key,
-    { at: shown.indexOf(from.at), series: from.series },
-    {
-      axis: setup.axis ?? 'inline',
-      count,
-      grid,
-      page: pageOf(count, grid),
-      rtl: setup.ltr !== true && direction() === 'rtl',
-      series,
-    },
-  )
-  return next === undefined ? undefined : { at: shown[next.at] ?? -1, series: next.series }
-}
 
 /** Holds the reading a finger, a key, or a screen reader rests on. */
 export const useChartCursor = (setup: CursorSetup): Cursor => {
@@ -338,6 +286,10 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
     [heard],
   )
   const ringed = useFocusVisible(() => node.current)
+  const region = useCallback(() => node.current, [])
+  const keep = useCallback((found: unknown) => {
+    node.current = found
+  }, [])
   /* Focus a key brought shows the first reading, and focus leaving puts away a reading the keys chose. */
   useEffect(() => {
     const { setup: now, shown: was } = latest.current
@@ -381,12 +333,16 @@ export const useChartCursor = (setup: CursorSetup): Cursor => {
             onLayout: tracking.measure,
             ref,
           }
-        : { onLayout: tracking.measure },
+        : { onLayout: tracking.measure, ref: keep },
+      /* The plot is its bubble's own: a touch in it moves the reading, and
+         leaves the bubble open, as the web's pointer in the plot does. */
       wrap: (drawn: ReactNode) => (
-        <GestureDetector gesture={tracking.gesture}>{drawn}</GestureDetector>
+        <LayerWithin.Provider value={region}>
+          <GestureDetector gesture={tracking.gesture}>{drawn}</GestureDetector>
+        </LayerWithin.Provider>
       ),
     }),
-    [onAccessibilityAction, ref, ringed, setup.enabled, tracking, words],
+    [keep, onAccessibilityAction, ref, region, ringed, setup.enabled, tracking, words],
   )
   /* A reading the keys chose is put away by a key, a hardware Escape the bubble's layer heard, and told so, as the web tells it. */
   const away = useCallback(

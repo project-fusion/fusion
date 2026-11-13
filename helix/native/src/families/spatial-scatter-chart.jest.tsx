@@ -264,7 +264,7 @@ describe('the reading', () => {
     expect(plot().props.accessibilityValue?.text).toMatch(/\(\d of 4\)$/)
   })
 
-  test('a drag that turns the view keeps the reading, and its bubble once the drag lifts', async () => {
+  test('a drag that turns the view keeps the reading and its bubble', async () => {
     const { events, props } = heard()
     await render(<Chart {...props} />)
     await layOut()
@@ -283,6 +283,31 @@ describe('the reading', () => {
     })
     expect(circles()).toHaveLength(5)
     expect(screen.getByText(label, { includeHiddenElements: true })).toBeTruthy()
+  })
+
+  test('a touch in the plot leaves the bubble open, and a touch past it puts it away', async () => {
+    const { events, props } = heard()
+    await render(<Chart {...props} />)
+    await layOut()
+    /* The plot's view, which the keys listen on, measured where it is laid out. */
+    const plotted = listening.at(-1) as { measureInWindow?: unknown }
+    plotted.measureInWindow = (done: (x: number, y: number, w: number, h: number) => void) =>
+      done(0, 0, 432, 432)
+    const at = onPlot(circles()[0] ?? '')
+    await tapAt(at.x, at.y)
+    const label = (events[0] ?? '').split(' ').pop() ?? ''
+    const page = screen.root?.queryAll(
+      (node) => typeof node.props.onTouchStartCapture === 'function',
+    )[0]
+    const touch = async (x: number, y: number) => {
+      await act(async () => {
+        fireEvent(page as never, 'touchStartCapture', { nativeEvent: { pageX: x, pageY: y } })
+      })
+    }
+    await touch(200, 300)
+    expect(screen.getByText(label, { includeHiddenElements: true })).toBeTruthy()
+    await touch(200, 600)
+    expect(screen.queryByText(label, { includeHiddenElements: true })).toBeNull()
   })
 
   test('a tap far from every point moves nothing', async () => {

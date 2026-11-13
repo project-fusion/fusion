@@ -300,8 +300,8 @@ export const useSpatialChart = <Model>(
     markY: mark === undefined ? '' : percent(mark.y * 100),
     placement: 'top',
     tipLabel: active === undefined ? '' : (ordered[cursor.at]?.label ?? ''),
-    /* The bubble stands aside while a drag turns the view. */
-    tipped: active !== undefined && !view.moving,
+    /* The bubble follows the reading while a drag turns the view, as the web's does. */
+    tipped: active !== undefined,
     viewBox: `${frame.x} ${frame.y} ${frame.width} ${frame.height}`,
   }
   const lists = {
