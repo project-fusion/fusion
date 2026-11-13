@@ -39,7 +39,7 @@ interface Scatter {
 export const spatialScatter: SpatialKind<Scatter> = {
   among: (model) => model.columns,
   count: (model) => model.field.points.length,
-  marks: (model, picture, at, colorOf) => {
+  marks: (model, picture, at, { colorOf }) => {
     const painted = model.inside
       .map((point, index) => ({ depth: picture.view.depth(point), index, point }))
       .sort((one, other) => one.depth - other.depth)

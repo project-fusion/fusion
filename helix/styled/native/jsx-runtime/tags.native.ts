@@ -93,6 +93,7 @@ import { HelixSkeleton } from '../skeleton/index.native'
 import { HelixSkipLink } from '../skip-link/index.native'
 import { HelixSlider } from '../slider/index.native'
 import { HelixSparkline } from '../sparkline/index.native'
+import { HelixSpatialBarChart } from '../spatial-bar-chart/index.native'
 import { HelixSpatialScatterChart } from '../spatial-scatter-chart/index.native'
 import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../speed-dial/index.native'
 import { HelixSplitter } from '../splitter/index.native'
@@ -299,6 +300,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-skip-link': HelixSkipLink,
   'helix-slider': HelixSlider,
   'helix-sparkline': HelixSparkline,
+  'helix-spatial-bar-chart': HelixSpatialBarChart,
   'helix-spatial-scatter-chart': HelixSpatialScatterChart,
   'helix-speed-dial': HelixSpeedDial,
   'helix-speed-dial-group': HelixSpeedDialGroup,

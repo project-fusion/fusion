@@ -16,24 +16,16 @@
  * the web's does. A tap puts the reading on the reading nearest it.
  */
 
-import { environment } from '@fusion.dev/helix-core/capabilities/environment'
 import { formatNumbers, type Row } from '@fusion.dev/helix-core/chart'
 import {
   type BoxView,
   type Camera,
-  dragged,
   type Frame,
   frameIn,
-  NAME_SIZE,
   type PagePoint,
-  SPATIAL_VIEW,
   shareOf,
-  TICK_SIZE,
-  TurnFrame,
-  turned,
 } from '@fusion.dev/helix-core/spatial'
-import { useMemo, useRef, useState } from 'react'
-import type { TrackPoint } from '../drivers/track'
+import { useMemo } from 'react'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import { useChartSource } from '../render/chart-sources'
@@ -53,6 +45,15 @@ import { type Color, paletteOf, sourceOf } from './chart-common'
 import { kebab, wordsIn } from './date-picker-read'
 import { langOf } from './picker-field-kind'
 import { boundTo, given } from './props'
+import {
+  fitted,
+  lengthOf,
+  NO_WORDS,
+  pickOf,
+  useCamera,
+  useRoom,
+  wordLists,
+} from './spatial-chart-parts'
 
 /** What a family reads of its props, by their web names. */
 export type Read = (name: string) => unknown
@@ -68,10 +69,34 @@ export interface SpatialPicture {
   readonly places: readonly PagePoint[]
 }
 
+/** A word a family writes in its drawing, in the box's units: a row's name, or a value over its reading. */
+export interface SpatialWord {
+  readonly text: string
+  readonly x: number
+  readonly y: number
+  /** How tall it is written, in the box's units. */
+  readonly size: number
+  /** The color it takes, where it is a reading's own, as a toned bar's name. */
+  readonly color?: string | undefined
+}
+
 /** What the reading a family draws again over the rest is, and the lists its parts repeat. */
 export interface SpatialMarks {
   readonly lists: Readonly<Record<string, readonly object[]>>
   readonly states: Readonly<Record<string, string>>
+  /** The words the family writes in its drawing, which a phone stands over it: names, and values over readings. */
+  readonly words?: readonly SpatialWord[]
+  readonly values?: readonly SpatialWord[]
+}
+
+/** The box a family's drawing fills, its font size, and how long its readings have grown in, in milliseconds. */
+export interface SpatialRoom {
+  readonly font: number
+  readonly height: number
+  readonly width: number
+  readonly grown: number
+  /** The hooks the element sets on itself, as a row's bar size. */
+  readonly hooks: Readonly<Record<string, unknown>>
 }
 
 /** A family of spatial chart: how it reads its table, and how it draws it in the box. */
@@ -86,143 +111,50 @@ export interface SpatialKind<Model> {
   /** The columns Up and Down walk among, as the measures the readout says first. */
   readonly among: (model: Model) => readonly number[]
   /** The family's drawing seen from `camera`, its words at `words` of their written size. */
-  readonly picture: (model: Model, camera: Camera, words: number, lang: string) => SpatialPicture
+  readonly picture: (
+    model: Model,
+    camera: Camera,
+    words: number,
+    lang: string,
+    room: SpatialRoom,
+  ) => SpatialPicture
+  /** Whether `picture` fits its words to the room itself, as a bar chart's row does, so it is drawn once. */
+  readonly fitsWords?: boolean
   /** What the family's parts repeat, and the ring on the reading at `at`, or `-1`. */
   readonly marks: (
     model: Model,
     picture: SpatialPicture,
     at: number,
-    colorOf: Color,
+    paint: { readonly colorOf: Color; readonly theme: Theme },
   ) => SpatialMarks
+  /** The reading a point of the drawing is on, front first, or `-1`: a bar's block, where a point stands nearest. */
+  readonly hit?: (model: Model, picture: SpatialPicture, at: PagePoint) => number
+  /** How long the readings grow in for, in milliseconds, where the family grows them; zero for none. */
+  readonly grows?: (model: Model) => number
+  /** How many readings stand in a column the across arrows step over, as a category's series. */
+  readonly grid?: (model: Model) => number
+  /** The column a reading is said by, and the words for a place with no value. */
+  readonly columnOf?: (model: Model, at: number) => number | undefined
+  readonly open?: (model: Model, at: number, read: Read) => string | undefined
+  /** Whether the reading at `at` holds a value, which a place with none does not, as an empty cell of a bar chart. */
+  readonly valued?: (model: Model, at: number) => boolean
 }
 
-/** How near a finger has to be to a reading to be asking about it, in points, as the web's tap. */
-const REACH = 24
-
-/** The arrow keys that turn the view while Shift is held, and which way each turns it. */
-const TURNS: Readonly<Record<string, { across: number; up: number }>> = {
-  ArrowDown: { across: 0, up: -1 },
-  ArrowLeft: { across: -1, up: 0 },
-  ArrowRight: { across: 1, up: 0 },
-  ArrowUp: { across: 0, up: 1 },
-}
-
-/** A length of the theme in points, from a `rem` or a `px` length. */
-const lengthOf = (theme: Theme, token: string, fallback: number): number => {
-  const written = String(theme.tokens[token] ?? '')
-  const value = Number.parseFloat(written)
-  if (!Number.isFinite(value)) {
-    return fallback
-  }
-  return written.endsWith('rem') ? value * theme.rem : value
-}
-
-/** The camera, the frame it holds through a drag, and the drag and the keys that turn it. */
-const useCamera = (box: { readonly height: number; readonly width: number }) => {
-  const [camera, setCamera] = useState<Camera>(SPATIAL_VIEW)
-  const [moving, setMoving] = useState(false)
-  const [, redraw] = useState(0)
-  const frames = useRef(new TurnFrame())
-  const turn = {
-    by: (from: TrackPoint, to: TrackPoint) => {
-      setMoving(true)
-      setCamera((was) => dragged(was, (to.x - from.x) * box.width, (to.y - from.y) * box.height))
-    },
-    end: () => setMoving(false),
-  }
-  const claim = (key: {
-    readonly key: string
-    readonly shift: boolean
-    readonly alt: boolean
-    readonly control: boolean
-    readonly meta: boolean
-  }) => {
-    const step = TURNS[key.key]
-    if (!key.shift || step === undefined || key.alt || key.control || key.meta) {
-      return false
-    }
-    setCamera((was) => turned(was, step.across, step.up))
-    return true
-  }
-  /** The frame to draw in, which asks for another draw while the drawing settles. */
-  const frameOf = (fits: Frame, middle: PagePoint): Frame => {
-    const still = environment().read().reducedMotion
-    const { settling, shown } = frames.current.frame(fits, middle, moving, still)
-    if (settling) {
-      requestAnimationFrame(() => redraw((count) => count + 1))
-    }
-    return shown
-  }
-  return { camera, claim, frameOf, moving, turn }
-}
-
-/**
- * The picture whose words stand at the box's type size on the screen, as the
- * web's `wordsFitted` measures them: the drawing scales to its box, so a word
- * written in the box's units is sized again on the frame it widened.
- */
-const fitted = <Model>(
+/** What a family's reading reads of the family beside the host's: its grid, its columns, and its places with no value. */
+const kindReading = <Model>(
   kind: SpatialKind<Model>,
   model: Model,
-  camera: Camera,
-  room: { readonly font: number; readonly height: number; readonly width: number },
-  lang: string,
-): SpatialPicture => {
-  let picture = kind.picture(model, camera, 1, lang)
-  if (!(room.width > 0 && room.height > 0)) {
-    return picture
+  read: Read,
+  order: readonly number[],
+) => {
+  const grid = kind.grid?.(model)
+  return {
+    columnOf: (at: number) => kind.columnOf?.(model, at),
+    ...(grid === undefined ? {} : { grid }),
+    open: (at: number) => kind.open?.(model, at, read),
+    rowOf: (at: number) => (kind.valued?.(model, at) === false ? -1 : (order[at] ?? -1)),
   }
-  for (let pass = 0; pass < 4; pass += 1) {
-    const { height, width } = picture.fits
-    const pixel = 1 / Math.min(room.width / width, room.height / height)
-    picture = kind.picture(
-      model,
-      camera,
-      Math.min(3, Math.max(0.25, (room.font * pixel) / 0.13)),
-      lang,
-    )
-  }
-  return picture
 }
-
-/** A number or a name over the drawing, at its share of the frame. */
-const wordsAt = (view: BoxView, frame: Frame, width: number, name: boolean) => {
-  /* As large as the web writes it in the box, in points: its share of the box at the drawing's scale. */
-  const size = `${(name ? NAME_SIZE : TICK_SIZE) * view.words * (width / Math.max(frame.width, 1e-6))}px`
-  return view.labels
-    .filter((one) => one.name === name)
-    .map((one, key) => {
-      const at = shareOf({ ...view, bounds: frame }, one)
-      return {
-        key: String(key),
-        size,
-        text: one.text,
-        x: percent(at.x * 100),
-        y: percent(at.y * 100),
-      }
-    })
-}
-
-/** The reading under a finger: the one whose place is nearest it on the screen, within `REACH`. */
-const nearestOf =
-  (
-    places: readonly PagePoint[],
-    frame: Frame,
-    box: { readonly height: number; readonly width: number },
-  ) =>
-  (point: TrackPoint): number => {
-    let found = -1
-    let distance = REACH
-    places.forEach((place, at) => {
-      const share = shareOf({ bounds: frame } as BoxView, place)
-      const away = Math.hypot((share.x - point.x) * box.width, (share.y - point.y) * box.height)
-      if (away < distance) {
-        distance = away
-        found = at
-      }
-    })
-    return found
-  }
 
 /** Hosts a spatial chart of `kind`: its box and readings from its table, its view, and its reading. */
 export const useSpatialChart = <Model>(
@@ -251,7 +183,7 @@ export const useSpatialChart = <Model>(
     width: Math.max(0, plot.width - 2 * inset),
   }
   const view = useCamera(box)
-  const room = { font: nameSize(theme), height: box.height, width: box.width }
+  const room = useRoom(kind, model, { box, font: nameSize(theme), hooks: props.hooks })
   const picture = fitted(kind, model, view.camera, room, lang)
   const frame = frameIn(view.frameOf(picture.fits, picture.middle), box.width, box.height)
   const order = useMemo(
@@ -261,28 +193,20 @@ export const useSpatialChart = <Model>(
   const ordered = order.map((row) => rows[row] ?? { cells: [], label: '' })
   const among = kind.among(model)
   const reading = useAxisReading(family, props, use, read, {
+    ...kindReading(kind, model, read, order),
     axis: 'none',
     claim: view.claim,
     columns: among,
     count,
     ltr: true,
-    pick: (point) =>
-      nearestOf(
-        picture.places,
-        frame,
-        box,
-      )({
-        x: (point.x * plot.width - inset) / Math.max(1, box.width),
-        y: (point.y * plot.height - inset) / Math.max(1, box.height),
-      }),
-    rowOf: (at) => order[at] ?? -1,
+    pick: pickOf(kind, model, picture, frame, { box, inset, plot }),
     rows: ordered,
     shows: () => true,
     turn: view.turn,
     write: formatNumbers(lang),
   })
   const { cursor } = reading
-  const marks = kind.marks(model, picture, cursor.at, colorOf)
+  const marks = kind.marks(model, picture, cursor.at, { colorOf, theme })
   const active = picture.places[cursor.at]
   const mark = active === undefined ? undefined : shareOf({ bounds: frame } as BoxView, active)
   const any = count > 0
@@ -307,8 +231,7 @@ export const useSpatialChart = <Model>(
   const lists = {
     ...marks.lists,
     cells: cellsOf(ordered, [], cursor.at, undefined, colorOf),
-    names: any ? wordsAt(picture.view, frame, box.width, true) : [],
-    ticks: any ? wordsAt(picture.view, frame, box.width, false) : [],
+    ...(any ? wordLists(picture.view, marks, frame, box.width) : NO_WORDS),
   }
   const behavior = axisBehavior({
     flag: (one) => boundTo(use, one, 'state') ?? kebab(one),

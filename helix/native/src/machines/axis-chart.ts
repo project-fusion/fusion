@@ -226,6 +226,11 @@ export interface ReadingSetup {
   /** A drag that turns the view, and the keys that do, as a spatial chart's, which the cursor hands them. */
   readonly turn?: CursorSetup['turn']
   readonly claim?: CursorSetup['claim']
+  /** How many readings stand in a column, as a spatial bar chart's series of a category. */
+  readonly grid?: number
+  /** The column a reading is said by, where a reading is one cell, and the words for a place with no value. */
+  readonly columnOf?: (at: number) => number | undefined
+  readonly open?: (at: number) => string | undefined
 }
 
 /** The reading of an axis chart: the cursor, the words it says, and the series the keys walk. */
@@ -282,7 +287,12 @@ export const useAxisReading = (
       setup.count,
       setup.write,
     )
-    return row === undefined ? '' : spokenReading(row, among[series], shows, position)
+    const open = setup.open?.(at)
+    if (open !== undefined) {
+      return open
+    }
+    const column = series >= 0 ? among[series] : setup.columnOf?.(at)
+    return row === undefined ? '' : spokenReading(row, column, shows, position)
   }
   const any = setup.count > 0
   const cursor = useChartCursor({
@@ -294,6 +304,7 @@ export const useAxisReading = (
     ...(setup.pick === undefined ? {} : { pick: setup.pick }),
     ...(setup.turn === undefined ? {} : { turn: setup.turn }),
     ...(setup.claim === undefined ? {} : { claim: setup.claim }),
+    ...(setup.grid === undefined ? {} : { grid: setup.grid }),
     said: (at) => said(at),
     series: among.length,
     tell: sender(family, props, use, setup, among),
