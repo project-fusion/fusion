@@ -22,7 +22,7 @@ import {
   barKeys,
   barsBetween,
   barsOf,
-} from '../spatial-bar-chart/bars.js'
+} from '@fusion.dev/helix-core/spatial'
 import { inBox } from '../spatial-scatter-chart/view.js'
 
 /** How tall the box stands, as a share of its length across. */

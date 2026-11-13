@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
+import { floorOf, namesOf } from './bar-row.js'
 import {
   barItems,
   barKeys,
@@ -8,14 +8,13 @@ import {
   barsOf,
   climbing,
   type DrawnBar,
-  floorOf,
   heightened,
-  namesOf,
   paintOrder,
   rowFits,
   tallestTimes,
   widthOf,
 } from './bars.js'
+import { boxView, SPATIAL_VIEW } from './box.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({

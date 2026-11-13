@@ -508,6 +508,8 @@ export {
   type HeatmapOverview,
   type HeatmapReading,
   type HeatmapStretch,
+  heatBetween,
+  heatItems,
   heatmapCellBox,
   heatmapFits,
   heatmapInSequence,
@@ -516,8 +518,6 @@ export {
   heatmapRectangle,
   heatmapStretch,
   heatmapTone,
-  heatBetween,
-  heatItems,
   isHidden,
   type Latest,
   type LineEnd,
@@ -831,6 +831,7 @@ export {
   type PageChangeOptions,
   type PageTransition,
 } from './utils/page-transition/page-transition.js'
+export {
   committedDates,
   type DateFaultWords,
   type DateStyle,

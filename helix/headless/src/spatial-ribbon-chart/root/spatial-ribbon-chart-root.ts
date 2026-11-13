@@ -28,7 +28,7 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { barItems } from '../../spatial-bar-chart/bars.js'
+import { barItems } from '@fusion.dev/helix-core/spatial'
 import {
   boundsOf,
   boxView,
