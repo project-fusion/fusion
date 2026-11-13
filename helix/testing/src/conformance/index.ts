@@ -55,6 +55,7 @@ import { SCROLL_AREA } from './scenarios/scroll-area.js'
 import { SELECT } from './scenarios/select.js'
 import { SLIDER } from './scenarios/slider.js'
 import { SPARKLINE } from './scenarios/sparkline.js'
+import { SPATIAL_BAR_CHART } from './scenarios/spatial-bar-chart.js'
 import { SPATIAL_SCATTER_CHART } from './scenarios/spatial-scatter-chart.js'
 import { SPEED_DIAL } from './scenarios/speed-dial.js'
 import { SPLITTER } from './scenarios/splitter.js'
@@ -143,6 +144,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   select: SELECT,
   slider: SLIDER,
   sparkline: SPARKLINE,
+  'spatial-bar-chart': SPATIAL_BAR_CHART,
   'spatial-scatter-chart': SPATIAL_SCATTER_CHART,
   'speed-dial': SPEED_DIAL,
   splitter: SPLITTER,
