@@ -1,0 +1,50 @@
+# Spatial Bar Chart, each example drawn alone, one screenshot of each,
+# named by the example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Spatial Bar Chart"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://spatial-bar-chart/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: spatial-bar-chart-preview-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/diagonal/preview
+- extendedWaitUntil:
+    visible: 'Diagonal'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-diagonal-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/one-bar-lit/preview
+- extendedWaitUntil:
+    visible: 'One bar lit'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-one-bar-lit-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/row/preview
+- extendedWaitUntil:
+    visible: 'Row'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-row-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/stacked/preview
+- extendedWaitUntil:
+    visible: 'Stacked'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-stacked-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/three/preview
+- extendedWaitUntil:
+    visible: 'Three'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-three-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/week/preview
+- extendedWaitUntil:
+    visible: 'Week'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-week-${MODE}-${SIZE}
+- openLink: helix://spatial-bar-chart/without-a-box/preview
+- extendedWaitUntil:
+    visible: 'Without a box'
+    timeout: 15000
+- takeScreenshot: spatial-bar-chart-without-a-box-${MODE}-${SIZE}

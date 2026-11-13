@@ -75,7 +75,7 @@ export default headless('spatial-bar-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'drawn', 'empty', 'error', 'loading'],
+  states: ['active', 'drawn', 'empty', 'error', 'loading', 'settled'],
   spatialChart: {
     cells: 'cells',
     drawn: 'drawn',
