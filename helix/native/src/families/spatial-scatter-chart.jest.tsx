@@ -264,6 +264,27 @@ describe('the reading', () => {
     expect(plot().props.accessibilityValue?.text).toMatch(/\(\d of 4\)$/)
   })
 
+  test('a drag that turns the view keeps the reading, and its bubble once the drag lifts', async () => {
+    const { events, props } = heard()
+    await render(<Chart {...props} />)
+    await layOut()
+    const [first] = circles()
+    const at = onPlot(first ?? '')
+    await tapAt(at.x, at.y)
+    const label = (events[0] ?? '').split(' ').pop() ?? ''
+    expect(screen.getByText(label, { includeHiddenElements: true })).toBeTruthy()
+    await act(async () => {
+      fireGestureHandler(gestures()[0] as never, [
+        { state: State.BEGAN, translationX: 0, translationY: 0, x: 200, y: 200 },
+        { state: State.ACTIVE, translationX: 10, translationY: 0, x: 210, y: 200 },
+        { state: State.ACTIVE, translationX: 60, translationY: 0, x: 260, y: 200 },
+        { state: State.END, translationX: 60, translationY: 0, x: 260, y: 200 },
+      ])
+    })
+    expect(circles()).toHaveLength(5)
+    expect(screen.getByText(label, { includeHiddenElements: true })).toBeTruthy()
+  })
+
   test('a tap far from every point moves nothing', async () => {
     const { events, props } = heard()
     await render(<Chart {...props} />)

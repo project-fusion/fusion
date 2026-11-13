@@ -149,7 +149,11 @@ export default headless('spatial-scatter-chart', {
               <View
                 part="tick"
                 platform="native"
-                style={{ '--spatial-label-x': entry.x, '--spatial-label-y': entry.y }}
+                style={{
+                  '--spatial-label-size': entry.size,
+                  '--spatial-label-x': entry.x,
+                  '--spatial-label-y': entry.y,
+                }}
               >
                 <Text part="tick-words">{entry.text}</Text>
               </View>
@@ -162,7 +166,11 @@ export default headless('spatial-scatter-chart', {
               <View
                 part="axis-name"
                 platform="native"
-                style={{ '--spatial-label-x': entry.x, '--spatial-label-y': entry.y }}
+                style={{
+                  '--spatial-label-size': entry.size,
+                  '--spatial-label-x': entry.x,
+                  '--spatial-label-y': entry.y,
+                }}
               >
                 <Text part="axis-name-words">{entry.text}</Text>
               </View>

@@ -24,9 +24,11 @@ import {
   dragged,
   type Frame,
   frameIn,
+  NAME_SIZE,
   type PagePoint,
   SPATIAL_VIEW,
   shareOf,
+  TICK_SIZE,
   TurnFrame,
   turned,
 } from '@fusion.dev/helix-core/spatial'
@@ -151,7 +153,7 @@ const useCamera = (box: { readonly height: number; readonly width: number }) => 
     }
     return shown
   }
-  return { camera, claim, frameOf, turn }
+  return { camera, claim, frameOf, moving, turn }
 }
 
 /**
@@ -184,13 +186,22 @@ const fitted = <Model>(
 }
 
 /** A number or a name over the drawing, at its share of the frame. */
-const wordsAt = (view: BoxView, frame: Frame, name: boolean) =>
-  view.labels
+const wordsAt = (view: BoxView, frame: Frame, width: number, name: boolean) => {
+  /* As large as the web writes it in the box, in points: its share of the box at the drawing's scale. */
+  const size = `${(name ? NAME_SIZE : TICK_SIZE) * view.words * (width / Math.max(frame.width, 1e-6))}px`
+  return view.labels
     .filter((one) => one.name === name)
     .map((one, key) => {
       const at = shareOf({ ...view, bounds: frame }, one)
-      return { key: String(key), text: one.text, x: percent(at.x * 100), y: percent(at.y * 100) }
+      return {
+        key: String(key),
+        size,
+        text: one.text,
+        x: percent(at.x * 100),
+        y: percent(at.y * 100),
+      }
     })
+}
 
 /** The reading under a finger: the one whose place is nearest it on the screen, within `REACH`. */
 const nearestOf =
@@ -289,14 +300,15 @@ export const useSpatialChart = <Model>(
     markY: mark === undefined ? '' : percent(mark.y * 100),
     placement: 'top',
     tipLabel: active === undefined ? '' : (ordered[cursor.at]?.label ?? ''),
-    tipped: active !== undefined,
+    /* The bubble stands aside while a drag turns the view. */
+    tipped: active !== undefined && !view.moving,
     viewBox: `${frame.x} ${frame.y} ${frame.width} ${frame.height}`,
   }
   const lists = {
     ...marks.lists,
     cells: cellsOf(ordered, [], cursor.at, undefined, colorOf),
-    names: any ? wordsAt(picture.view, frame, true) : [],
-    ticks: any ? wordsAt(picture.view, frame, false) : [],
+    names: any ? wordsAt(picture.view, frame, box.width, true) : [],
+    ticks: any ? wordsAt(picture.view, frame, box.width, false) : [],
   }
   const behavior = axisBehavior({
     flag: (one) => boundTo(use, one, 'state') ?? kebab(one),
