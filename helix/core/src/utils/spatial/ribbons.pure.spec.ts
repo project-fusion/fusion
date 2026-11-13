@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { projectionOf } from '@fusion.dev/helix-core'
+import { projectionOf } from '../projection/projection.js'
 import { ribbonsDrawn, ribbonsOf } from './ribbons.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({

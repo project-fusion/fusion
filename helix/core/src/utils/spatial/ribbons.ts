@@ -8,10 +8,10 @@
  * data never did.
  */
 
-import { type PagePoint, type Projection, pathData } from '@fusion.dev/helix-core'
-import type { FieldRow } from '@fusion.dev/helix-core/spatial'
-import { type BarCell, type BarField, barsOf } from '@fusion.dev/helix-core/spatial'
-import { inBox } from '../spatial-scatter-chart/view.js'
+import { type PagePoint, type Projection, pathData } from '../projection/projection.js'
+import { type BarCell, type BarField, barsOf } from './bars.js'
+import { inBox } from './box.js'
+import type { FieldRow } from './field.js'
 
 /** How tall the box stands, as a share of its length across. */
 const HEIGHT = 0.6
