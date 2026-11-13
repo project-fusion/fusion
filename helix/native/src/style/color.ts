@@ -118,6 +118,12 @@ export const movedLightness = (written: string, step: number): string | undefine
   return `rgba(${red}, ${green}, ${blue}, ${color[3]})`
 }
 
+/** `written`'s OKLCH lightness, from 0 to 1. Undefined where it is not a color. */
+export const lightnessOf = (written: string): number | undefined => {
+  const color = parse(written)
+  return color === undefined ? undefined : oklab(color)[0]
+}
+
 /** What a written color's `var()` reads, by its name without the two dashes. */
 type ReadVariable = (name: string) => unknown
 
