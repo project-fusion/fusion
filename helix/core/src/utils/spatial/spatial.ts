@@ -6,5 +6,8 @@
  */
 
 export { type Camera, type PagePoint, shortNumber } from '../projection/projection.js'
+export * from './bar-picture.js'
+export * from './bar-row.js'
+export * from './bars.js'
 export * from './box.js'
 export * from './field.js'

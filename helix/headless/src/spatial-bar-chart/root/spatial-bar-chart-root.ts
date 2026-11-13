@@ -31,33 +31,17 @@ import {
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
-  boundsOf,
-  boxView,
-  DragTurn,
-  drawBox,
-  type Frame,
-  SPATIAL_VIEW,
-  TICK_SIZE,
-  turned,
-  wordsFitted,
-} from '../../spatial-scatter-chart/view.js'
-import {
+  type BarCell,
   type BarField,
-  type BarLayout,
-  barsDrawn,
+  barPicture,
+  barPixel,
   barsOf,
-  climbing,
   type DrawnBar,
-  floorOf,
   grownAt,
   growTime,
-  heightened,
-  namesOf,
-  paintOrder,
   rowFits,
-  tallestTimes,
-  widthOf,
-} from '../bars.js'
+} from '@fusion.dev/helix-core/spatial'
+import { DragTurn, drawBox, SPATIAL_VIEW, turned } from '../../spatial-scatter-chart/view.js'
 
 /**
  * The width a row's bars are asked to stand at, in pixels, or `undefined`:
@@ -69,15 +53,6 @@ const barSizeOf = (style: CSSStyleDeclaration): number | undefined => {
   const size = Number.parseFloat(style.columnGap)
   return Number.isFinite(size) && size > 0 ? size : undefined
 }
-
-/**
- * How the names and the value take up the height of a sized row, in lines
- * of the box's font: the names under the floor, and the value over the bar.
- */
-const WORD_LINES = 3.6
-
-/** The most of a sized plot's height a `diagonal` row climbs across it. */
-const CLIMB_SHARE = 0.25
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -97,14 +72,6 @@ const SERIES = 24
  */
 const toned = (tone: string | undefined): string | undefined =>
   tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
-
-/** The frame that holds `frame` and every one of `points`. */
-const around = (frame: Frame, points: readonly { x: number; y: number }[]): Frame => {
-  const xs = [frame.x, frame.x + frame.width, ...points.map((point) => point.x)]
-  const ys = [frame.y, frame.y + frame.height, ...points.map((point) => point.y)]
-  const [left, top] = [Math.min(...xs), Math.min(...ys)]
-  return { height: Math.max(...ys) - top, width: Math.max(...xs) - left, x: left, y: top }
-}
 
 /**
  * @summary A bar chart drawn in three dimensions, each bar a block as tall as its value, for categories in one or more series.
@@ -606,51 +573,6 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     return bar && width > 0 ? rowFits(width, bar) : undefined
   }
 
-  /**
-   * A row with a bar size of its own: how many of the drawing's units make a
-   * pixel, so each bar is as wide as asked, and the field with its value axis
-   * as tall as fills the plot's height with the names and the value. Where
-   * the row is too long for the plot, its bars narrow until it fits.
-   */
-  private sized(
-    read: BarField,
-    projection: Parameters<typeof barsDrawn>[1],
-    layout: Exclude<BarLayout, 'grid'>,
-    room: { bar?: number; font: number; height: number; width: number },
-  ): { field: BarField; unit: number } | undefined {
-    const first = barsDrawn(read, projection, layout)[0]
-    if (!first || !room.bar) {
-      return undefined
-    }
-    const frameOf = (field: BarField, grown?: () => number): Frame => {
-      const floor = this.noBox ? [] : floorOf(field, projection, layout)
-      const drawn = barsDrawn(field, projection, layout, grown)
-      return boundsOf(
-        [...drawn.flatMap((bar) => bar.corners), ...floor.flatMap((one) => one.corners)],
-        0,
-      )
-    }
-    const unit = Math.max(
-      widthOf(first) / room.bar,
-      frameOf(read, () => 0).width / Math.max(1, room.width - room.font * 2),
-    )
-    /* A diagonal climbs at most a quarter of the plot, so the bars of a long
-       row keep their height. */
-    const field = climbing(read, room.height * CLIMB_SHARE * unit, frameOf(read, () => 0).width)
-    const low = frameOf(field, () => 0)
-    const high = frameOf(field)
-    const tall = (room.height - room.font * WORD_LINES) * unit
-    const rises = high.height - low.height
-    const fills = rises > 0 ? Math.max(0.05, (tall - low.height) / rises) : 1
-    /* A row of one or two stands no taller than it is long and a quarter
-       again, so a lone bar stands as a block. */
-    const times = Math.min(
-      fills,
-      tallestTimes(field, projection, barsDrawn(field, projection, layout)),
-    )
-    return { field: heightened(field, times), unit }
-  }
-
   /** Starts the bars growing once the chart comes into view, and draws each frame until they stand. */
   private watchGrowth(): void {
     if (!this.growth || this.growth.since !== undefined || this.seen) {
@@ -846,103 +768,35 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(read: BarField, at: number): TemplateResult {
-    const layout: BarLayout = this.layout ?? 'grid'
-    const lined = layout === 'grid' ? undefined : layout
-    const bare = this.noBox || lined !== undefined
-    const view = wordsFitted(this.room, (words) =>
-      boxView(read.axes, this.camera, [], bare, words, wordsLocale(this)),
-    )
-    /* A row whose bars have a size is drawn at the scale that makes them
-       that wide, its value axis as tall as the plot has room for. */
-    const room = this.room
-    const sized = lined && room?.bar ? this.sized(read, view.projection, lined, room) : undefined
-    const field = sized?.field ?? read
-    /* The frame and the words are measured on the bars at their height, so
-       the drawing holds still while they grow. */
-    const full = barsDrawn(field, view.projection, layout)
     const growth = this.growth
     const since = growth?.since
     const elapsed = since === undefined ? 0 : performance.now() - since
-    const categories = field.categories.length
+    const categories = read.categories.length
     const now = performance.now()
-    const bars = growth
-      ? barsDrawn(field, view.projection, layout, (one) => grownAt(one.across, categories, elapsed))
+    const grown = growth
+      ? (one: BarCell) => grownAt(one.across, categories, elapsed)
       : this.fresh.size > 0
-        ? barsDrawn(field, view.projection, layout, (one) => {
+        ? (one: BarCell) => {
             const added = this.fresh.get(one.label)
             return added ? grownAt(added.index, added.count, now - added.since) : 1
-          })
-        : full
-    const floor = lined && !this.noBox ? floorOf(field, view.projection, lined) : []
+          }
+        : undefined
+    const room = this.room
+    const picture = barPicture(read, {
+      camera: this.camera,
+      grown,
+      lang: wordsLocale(this),
+      layout: this.layout ?? 'grid',
+      noBox: this.noBox,
+      room,
+      valueText: (one) => this.sourceRows[one.row]?.cells[one.column]?.text,
+    })
+    const { bare, bars, field, floor, names, view } = picture
     const active = bars.find((bar) => bar.index === at)
     const cell = field.cells[at]
-    const base = bare
-      ? boundsOf(
-          [...full.flatMap((bar) => bar.corners), ...floor.flatMap((one) => one.corners)],
-          0.1,
-        )
-      : view.bounds
-    /* Words are written at the box's own font size, in CSS pixels, whatever
-       the drawing's scale: measured on a frame, which the words then widen
-       a little, and measured again on that. */
-    const pixelOf = (frame: Frame): number | undefined => {
-      const fitted = room && 1 / Math.min(room.width / frame.width, room.height / frame.height)
-      /* A sized row holds its scale until its words reach past the plot, and then
-         it shrinks to fit as any does, so the words are measured at that scale. */
-      return sized ? Math.max(sized.unit, fitted ?? 0) : fitted
-    }
-    const sizeOf = (frame: Frame): number => {
-      const pixel = pixelOf(frame)
-      return room && pixel !== undefined ? room.font * pixel : TICK_SIZE
-    }
-    const wordsAt = (size: number) => {
-      const names = floor.length > 0 ? namesOf(field, floor, size) : []
-      const values = full.flatMap((bar) => {
-        const one = field.cells[bar.index]
-        const text = one?.tone ? this.sourceRows[one.row]?.cells[one.column]?.text : undefined
-        return one && text
-          ? [
-              {
-                index: bar.index,
-                text,
-                tone: one.tone,
-                x: bar.drawn.peak.x,
-                y: bar.drawn.crown - size,
-              },
-            ]
-          : []
-      })
-      const extents = [...names, ...values].flatMap((word) => {
-        const half = (word.text.length * size * 0.62) / 2
-        return [
-          { x: word.x - half, y: word.y - size * 0.7 },
-          { x: word.x + half, y: word.y + size * 0.7 },
-        ]
-      })
-      return { frame: around(base, extents), names, values }
-    }
-    /* Three passes, each on the frame the last one widened: a name stood at 10.4
-       pixels at 390 wide when the frame was read once. */
-    let size = sizeOf(wordsAt(sizeOf(base)).frame)
-    size = sizeOf(wordsAt(size).frame)
-    size = sizeOf(wordsAt(size).frame)
-    const { frame: fits, names, values } = wordsAt(size)
-    /* A sized row is centered in a frame the plot's own size at its scale,
-       unless its words reach past it, when it shrinks to fit as any does. */
-    const wide = sized && room ? room.width * sized.unit : 0
-    const high = sized && room ? room.height * sized.unit : 0
-    const placed: Frame =
-      sized && fits.width <= wide + 1e-9 && fits.height <= high + 1e-9
-        ? {
-            height: high,
-            width: wide,
-            x: fits.x + (fits.width - wide) / 2,
-            y: fits.y + (fits.height - high) / 2,
-          }
-        : fits
-    const bounds = this.drag.frame(placed, view.on([0, 0, 0]))
-    const pixel = pixelOf(bounds)
-    const font = Math.round(size * 10_000) / 10_000
+    const bounds = this.drag.frame(picture.placed, view.on([0, 0, 0]))
+    const pixel = barPixel(room, picture.unit, bounds)
+    const font = Math.round(picture.size * 10_000) / 10_000
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
       <svg
         part="drawing"
@@ -967,17 +821,16 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
       )}${names.map(
         (name) =>
           svg`<text data-tone=${name.tone ?? nothing} dominant-baseline="central" font-size=${font} part="tick" style="${name.tone ? `--chart-series: var(--spatial-bar-chart-tone-${name.tone})` : ''}" text-anchor="middle" x=${shortNumber(name.x)} y=${shortNumber(name.y)}>${name.text}</text>`,
-      )}${paintOrder(view.projection, bars).map(
+      )}${picture.painted.map(
         (bar) =>
           /* The ring straight after its bar, so the bars in front cover it as
              they cover the bar: drawn over them all, it traced their faces
              and read as theirs. */
           svg`${field.cells[bar.index]?.tone ? svg`<path d=${bar.drawn.outline} fill="none" filter="url(#helix-spatial-bar-chart-glow)" part="glow" style="--chart-series: var(--spatial-bar-chart-tone-${field.cells[bar.index]?.tone})"></path>` : nothing}${this.renderBar(field, bar, at)}${bar === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
-      )}${values.map((value) => {
-        /* Over the bar as it stands, so the value rises as the bar grows. */
-        const crown = bars.find((bar) => bar.index === value.index)?.drawn.crown ?? value.y + size
-        return svg`<text data-tone=${value.tone ?? nothing} dominant-baseline="central" font-size=${font} part="value" text-anchor="middle" x=${shortNumber(value.x)} y=${shortNumber(crown - size)}>${value.text}</text>`
-      })}${
+      )}${picture.values.map(
+        (value) =>
+          svg`<text data-tone=${value.tone ?? nothing} dominant-baseline="central" font-size=${font} part="value" text-anchor="middle" x=${shortNumber(value.x)} y=${shortNumber(value.y)}>${value.text}</text>`,
+      )}${
         /* Over everything, faint and dashed, so a bar the keys reach behind
            others is still found: where it shows, the ring above covers it.
            The tooltip is centered on the bar's top and points down at it

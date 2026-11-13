@@ -10,7 +10,7 @@
 
 import { type PagePoint, type Projection, pathData } from '@fusion.dev/helix-core'
 import type { FieldRow } from '@fusion.dev/helix-core/spatial'
-import { type BarCell, type BarField, barsOf } from '../spatial-bar-chart/bars.js'
+import { type BarCell, type BarField, barsOf } from '@fusion.dev/helix-core/spatial'
 import { inBox } from '../spatial-scatter-chart/view.js'
 
 /** How tall the box stands, as a share of its length across. */

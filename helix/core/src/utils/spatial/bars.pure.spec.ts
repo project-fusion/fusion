@@ -1,20 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
+import { floorOf, grownAt, growTime, namesOf } from './bar-row.js'
 import {
   barsDrawn,
   barsOf,
   climbing,
   type DrawnBar,
-  floorOf,
-  grownAt,
-  growTime,
   heightened,
-  namesOf,
   paintOrder,
   rowFits,
   tallestTimes,
   widthOf,
 } from './bars.js'
+import { boxView, SPATIAL_VIEW } from './box.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({

@@ -296,7 +296,6 @@
     "helix/headless/src/slider/root/slider-root.ts",
     "helix/headless/src/sparkline/root/sparkline-root.dom.spec.ts",
     "helix/headless/src/sparkline/root/sparkline-root.ts",
-    "helix/headless/src/spatial-bar-chart/bars.ts",
     "helix/headless/src/spatial-bar-chart/root/spatial-bar-chart-root.dom.spec.ts",
     "helix/headless/src/spatial-bar-chart/root/spatial-bar-chart-root.ts",
     "helix/headless/src/spatial-heatmap/.examples/preview.tsx",
