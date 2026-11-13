@@ -81,6 +81,7 @@ export const isChart = (tag: string): boolean => {
     api?.areaChart !== undefined ||
     api?.barChart !== undefined ||
     api?.scatterChart !== undefined ||
+    api?.spatialChart !== undefined ||
     api?.heatmap !== undefined
   )
 }

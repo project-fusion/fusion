@@ -581,6 +581,10 @@ const nameOf = (type: string, family: string): string | undefined => {
   if (type === 'helix-load-more' || type === 'helix-range-change') {
     return undefined
   }
+  /* What a spatial chart tells the three.js renderer it connects, which a phone draws without. */
+  if (type === 'helix-plot-change' || type === 'helix-plot-turn') {
+    return undefined
+  }
   if (type.startsWith('helix-')) {
     return type.slice('helix-'.length)
   }

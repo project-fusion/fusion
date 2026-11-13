@@ -74,6 +74,7 @@ export type Family =
   | 'area-chart'
   | 'bar-chart'
   | 'scatter-chart'
+  | 'spatial-scatter-chart'
   | 'heatmap'
   | 'lightbox'
   | 'video'
