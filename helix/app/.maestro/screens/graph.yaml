@@ -43,9 +43,11 @@ name: "Screens: Graph"
     timeout: 30000
 - takeScreenshot: graph-large-${MODE}-${SIZE}
 - openLink: helix://graph/live/preview
+# Given as long as Large, since the phone lets go of Large's twenty thousand
+# notes before it draws Live.
 - extendedWaitUntil:
     visible: 'Live'
-    timeout: 15000
+    timeout: 60000
 - takeScreenshot: graph-live-${MODE}-${SIZE}
 - openLink: helix://graph/network/preview
 - extendedWaitUntil:
