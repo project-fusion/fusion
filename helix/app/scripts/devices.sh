@@ -162,6 +162,17 @@ driver_late() {
   grep -q "driver not ready in time" "$out/debug/$1.log" 2> /dev/null
 }
 
+# Whether the iOS pass named by the argument lost Maestro's driver on the
+# simulator: its XCUITest runner failed to stop the gallery, and every flow
+# after failed with "Device became unreachable" within seconds. Both shares of
+# screens-dark-default did so on Button's first step in run 43643786751, and
+# screens-dark-largest in run 43603760179. The gallery is stopped here, and the
+# pass runs once more on a new driver.
+driver_lost() {
+  [[ $platform == ios ]] &&
+    grep -qs "Device became unreachable" "$out/reports/$1.xml"
+}
+
 # What Maestro's log of a flow says when the emulator dropped off adb, which a
 # CI runner's emulator does: "device offline", that the device was not found,
 # or that Maestro's server on it died (runs 39622908821 and 39640601450). Its
@@ -346,6 +357,13 @@ pass() {
       say "Maestro's driver did not start; running $name again"
       driver=--reinstall-driver
       rm -rf "$out/debug/$name"
+      run_maestro "$name" "$@" || result=failed
+    elif driver_lost "$name"; then
+      say "Maestro lost the simulator; running $name again"
+      xcrun simctl terminate "$device" "$package" > /dev/null 2>&1 || true
+      driver=--reinstall-driver
+      interrupted+=("$name-first")
+      mv "$out/debug/$name" "$out/debug/$name-first"
       run_maestro "$name" "$@" || result=failed
     elif none_ran "$name" && { [[ $platform == ios ]] || emulator_ready; }; then
       say "No flow of $name ran a command; running $name again"
