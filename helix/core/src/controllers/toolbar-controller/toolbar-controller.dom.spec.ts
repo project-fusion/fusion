@@ -141,6 +141,24 @@ describe('a row of controls a component draws itself', () => {
     expect(stops(host).filter((id) => !button(host, id).hasAttribute('disabled'))).toEqual(['up'])
   })
 
+  test('hands the stop on, and skips the control, when the one holding it is hidden', async () => {
+    /* A control that folded into an overflow menu is `hidden` on the row,
+       and holding the stop there it would take Tab into nothing. */
+    const host = await pad()
+    press(button(host, 'up'), 'End')
+    expect(stops(host)).toEqual(['zoom'])
+    button(host, 'zoom').hidden = true
+    await settled()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    /* A hidden button takes no focus whatever its `tabindex` says. */
+    const reachable = (): string[] => stops(host).filter((id) => !button(host, id).hidden)
+    expect(reachable()).toEqual(['up'])
+    press(button(host, 'up'), 'ArrowRight')
+    expect(reachable()).toEqual(['down'])
+    press(button(host, 'down'), 'ArrowRight')
+    expect(reachable()).toEqual(['up'])
+  })
+
   test('moves forward on Right and Down and back on Left and Up, for a row that wraps', async () => {
     const host = await pad('arrows="both"')
     press(button(host, 'up'), 'ArrowDown')

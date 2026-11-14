@@ -5,6 +5,7 @@ import {
   formatWords,
   HelixElement,
   MIRROR_RULE,
+  OverflowController,
   onApple,
   stopPress,
   words,
@@ -15,6 +16,7 @@ import {
   caretDown,
   check,
   code,
+  dotsThree,
   type HelixIcon,
   link,
   linkBreak,
@@ -22,6 +24,7 @@ import {
   listNumbers,
   magnifyingGlass,
   quotes,
+  textAa,
   textB,
   textItalic,
   textStrikethrough,
@@ -119,9 +122,61 @@ const TOOL_PARTS = [
   'ordered-list',
   'quote',
   'find-toggle',
+  'more',
 ]
   .map((name) => `[part~="${name}"]`)
   .join(', ')
+
+/**
+ * What stands on the toolbar, in the order it is drawn: each tool, the block
+ * menu as `block`, and the Find button as `find`. A narrow toolbar folds them
+ * from the end into the overflow menu, one at a time.
+ */
+const BAR = [
+  'undo',
+  'redo',
+  'block',
+  'bold',
+  'italic',
+  'strike',
+  'code',
+  'link',
+  'bullet-list',
+  'ordered-list',
+  'quote',
+  'find',
+] as const
+
+/** One thing on the toolbar that can fold into the overflow menu. */
+type BarTool = (typeof BAR)[number]
+
+/**
+ * The toolbar's groups as the bar draws them, each parted from the next by a
+ * line on the bar and in the overflow menu. The lists and the quote are one
+ * group, as they are on the bar.
+ */
+const BAR_GROUPS: readonly (readonly BarTool[])[] = [
+  ['undo', 'redo'],
+  ['block'],
+  ['bold', 'italic', 'strike', 'code'],
+  ['link'],
+  ['bullet-list', 'ordered-list', 'quote'],
+  ['find'],
+]
+
+/** The glyph of each tool on its button and on its row in the overflow menu, past Undo and Redo, which point along the line. */
+const GLYPHS: Record<Exclude<BarTool, 'redo' | 'undo'>, HelixIcon> = {
+  block: textAa,
+  bold: textB,
+  'bullet-list': listBullets,
+  code,
+  find: magnifyingGlass,
+  italic: textItalic,
+  link,
+  'ordered-list': listNumbers,
+  quote: quotes,
+  strike: textStrikethrough,
+}
 
 /** What the frame asks of whatever draws the document, as the frame's settings stand. */
 export interface EditorSettings {
@@ -226,6 +281,15 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * selection is disabled. A tool returns focus to the document once it has run.
  * With `readonly`, the document cannot be edited and the toolbar is not drawn.
  *
+ * **A toolbar too narrow for its tools folds them into a menu.** The tools
+ * fold from the end, one at a time, into a menu behind a button after the
+ * last tool on the bar, named by `more-label`, until the row fits, so Undo
+ * and Redo stay on the bar longest. Your `actions` stay at the end of the
+ * row. In the menu the tools keep their groups, a mark, a list, or the quote
+ * is checked while its format holds, the block types are a submenu, and Link
+ * and Find open their bars as their buttons do. A server draws every tool on
+ * the row, and the browser folds what does not fit once it has measured it.
+ *
  * Command+F opens a find bar under the toolbar, a Find that searches the
  * document through the renderer, marks every match, and selects one. It
  * replaces unless the document is `readonly`, which it searches too.
@@ -264,6 +328,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @slot footer - Content under the document, such as a word count or whether it is saved.
  * @slot italic-icon - Replaces the glyph inside the Italic button.
  * @slot link-icon - Replaces the glyph inside the Link button.
+ * @slot more-icon - Replaces the glyph on the button that opens the overflow menu.
  * @slot ordered-list-icon - Replaces the glyph inside the Numbered list button.
  * @slot quote-icon - Replaces the glyph inside the Quote button.
  * @slot redo-icon - Replaces the glyph inside the Redo button.
@@ -417,12 +482,37 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart link-remove-text - The box the Remove button's icon sits in.
  * @csspart link-spinner - The ring the Link button turns while it is pending.
  * @csspart link-text - The box the Link button's icon sits in.
+ * @csspart more - The button that opens the overflow menu, drawn after the last tool on the bar while any tool has folded.
+ * @csspart more-button - The overflow button's inner button.
+ * @csspart more-live - The overflow button's live region, which speaks while the button is pending.
+ * @csspart more-spinner - The ring the overflow button turns while it is pending.
+ * @csspart more-text - The box the overflow button's icon sits in.
  * @csspart ordered-list - The Numbered list button. Pressed while the selection is in a numbered list.
  * @csspart ordered-list-button - The Numbered list button's inner button.
  * @csspart ordered-list-live - The Numbered list button's live region, which speaks while the button is pending.
  * @csspart ordered-list-pressed - The Numbered list button while the selection is in a numbered list, beside `ordered-list`.
  * @csspart ordered-list-spinner - The ring the Numbered list button turns while it is pending.
  * @csspart ordered-list-text - The box the Numbered list button's icon sits in.
+ * @csspart overflow - The menu of the tools that do not fit on the toolbar.
+ * @csspart overflow-back - The control that returns from the block types' submenu.
+ * @csspart overflow-back-mark - The glyph on the back control of a submenu.
+ * @csspart overflow-empty - The text shown when the menu has no items.
+ * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-live - The overflow menu's live region, which repeats the empty and loading text for screen readers.
+ * @csspart overflow-loading - The text shown while the items are loading.
+ * @csspart overflow-option - One tool in the overflow menu. A mark, a list, or the quote is checked while its format holds.
+ * @csspart overflow-option-end - A tool's trailing column.
+ * @csspart overflow-option-item - A tool's row.
+ * @csspart overflow-option-mark - The check beside a tool whose format holds, or the caret of the block types' row.
+ * @csspart overflow-option-shortcut - A tool's key.
+ * @csspart overflow-option-shortcut-kbd - The key inside it.
+ * @csspart overflow-option-shortcut-key - One key of a tool's chord.
+ * @csspart overflow-option-shortcut-separator - The `+` between two keys of a tool's chord.
+ * @csspart overflow-option-start - A tool's leading column, which holds its glyph.
+ * @csspart overflow-option-surface - The block types' submenu panel, under `submenus="flyout"`.
+ * @csspart overflow-search-field - The overflow menu's filter field, drawn with `filterable`.
+ * @csspart overflow-surface - The floating panel the overflow menu is drawn on.
+ * @csspart overflow-title - The name of the submenu that is showing.
  * @csspart quote - The Quote button. Pressed while the selection is in a quote.
  * @csspart quote-button - The Quote button's inner button.
  * @csspart quote-live - The Quote button's live region, which speaks while the button is pending.
@@ -441,7 +531,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart strike-pressed - The Strikethrough button while the selection is struck through, beside `strike`.
  * @csspart strike-spinner - The ring the Strikethrough button turns while it is pending.
  * @csspart strike-text - The box the Strikethrough button's icon sits in.
- * @csspart tools - A group of several tools, which a narrow toolbar wraps as one: Undo and Redo, the marks, or the lists and the quote.
+ * @csspart tools - A group of several tools: Undo and Redo, the marks, or the lists and the quote.
  * @csspart undo - The Undo button. Disabled while there is nothing to undo.
  * @csspart undo-button - The Undo button's inner button.
  * @csspart undo-live - The Undo button's live region, which speaks while the button is pending.
@@ -557,6 +647,11 @@ export class HelixHeadlessEditor extends HelixElement {
   @property({ attribute: 'link-remove-label' })
   linkRemoveLabel = 'Remove link'
 
+  /** The name of the button that opens the overflow menu, and of the menu. */
+  @words
+  @property({ attribute: 'more-label' })
+  moreLabel = 'More tools'
+
   /** The Numbered list button's label. */
   @words
   @property({ attribute: 'ordered-list-label' })
@@ -636,8 +731,23 @@ export class HelixHeadlessEditor extends HelixElement {
   /** Escape was the last key in the document, so Tab leaves it. */
   private escaped = false
 
-  /** A choice in the block menu is waiting for the menu to close before focus goes back to the document. */
-  private chosen = false
+  /**
+   * What runs once a menu in the toolbar has closed: focus back to the
+   * document after a choice, or a bar opened from the overflow menu. It waits
+   * for the close, because the menu puts focus back on its trigger as it
+   * closes.
+   */
+  private afterMenu: (() => void) | undefined
+
+  /**
+   * Folds the tools that do not fit on the toolbar into the overflow menu,
+   * from the end: step `n` folds the last `n` of `onBar`.
+   */
+  private readonly overflow = new OverflowController(this, {
+    apply: (step) => this.fold(step),
+    box: () => this.partNamed('controls'),
+    steps: () => this.onBar.length,
+  })
 
   /**
    * Hands the frame what draws the document. The frame sends it the settings
@@ -853,7 +963,7 @@ export class HelixHeadlessEditor extends HelixElement {
    */
   private focusToolbar(): void {
     const tools = [...this.renderRoot.querySelectorAll<HTMLElement>(TOOL_PARTS)].filter(
-      (one) => !one.hasAttribute('disabled'),
+      (one) => !one.hasAttribute('disabled') && one.closest('[hidden]') === null,
     )
     const stop = tools.find((one) => one.shadowRoot?.querySelector('[tabindex="0"]')) ?? tools[0]
     stop?.focus()
@@ -995,14 +1105,67 @@ export class HelixHeadlessEditor extends HelixElement {
   /** A block type was chosen in the menu. */
   private choose(tool: EditorTool): void {
     this.run(tool)
-    this.chosen = true
+    this.afterMenu = () => this.returnFocus()
   }
 
-  /** The block menu closed: focus goes back to the document after a choice. */
+  /** A tool was chosen in the overflow menu: it runs, and focus goes back to the document. */
+  private chooseFolded(tool: EditorTool): void {
+    if (this.disabled(tool)) {
+      return
+    }
+    this.run(tool)
+    this.afterMenu = () => this.returnFocus()
+  }
+
+  /** A menu in the toolbar closed: what was waiting for it runs. */
   private readonly handleMenuToggle = (event: Event): void => {
-    if ((event as ToggleEvent).newState === 'closed' && this.chosen) {
-      this.chosen = false
-      this.returnFocus()
+    if ((event as ToggleEvent).newState === 'closed' && this.afterMenu) {
+      const after = this.afterMenu
+      this.afterMenu = undefined
+      after()
+    }
+  }
+
+  /** What stands on the toolbar now, in the order it is drawn: nothing while `readonly`. */
+  private get onBar(): BarTool[] {
+    if (this.readOnly) {
+      return []
+    }
+    return BAR.filter((tool) =>
+      tool === 'block'
+        ? EDITOR_BLOCKS.some((one) => this.draws(one))
+        : tool === 'find'
+          ? this.drawsFind
+          : this.draws(tool),
+    )
+  }
+
+  /** The tools step `step` folds: the last `step` on the bar. */
+  private foldedAt(step: number): Set<BarTool> {
+    const bar = this.onBar
+    return new Set(step <= 0 ? [] : bar.slice(Math.max(0, bar.length - step)))
+  }
+
+  /** Whether every one of `tools` has folded, which hides what holds them on the bar. */
+  private allFolded(tools: readonly BarTool[]): boolean {
+    const folded = this.foldedAt(this.overflow.step)
+    return tools.length > 0 && tools.every((tool) => folded.has(tool))
+  }
+
+  /**
+   * Writes a step onto the toolbar as its render draws it: each tool, group,
+   * and line whose tools have all folded is hidden, and the overflow menu
+   * shows while anything has folded.
+   */
+  private fold(step: number): void {
+    const folded = this.foldedAt(step)
+    for (const element of this.renderRoot.querySelectorAll<HTMLElement>('[data-fold]')) {
+      const tools = (element.dataset.fold ?? '').split(' ') as BarTool[]
+      element.hidden = tools.every((tool) => folded.has(tool))
+    }
+    const menu = this.partNamed('overflow')
+    if (menu) {
+      menu.hidden = folded.size === 0
     }
   }
 
@@ -1060,6 +1223,14 @@ export class HelixHeadlessEditor extends HelixElement {
     }
     this.toggleState('link-open', this.linkOpen)
     this.toggleState('find-open', this.findOpen)
+    /* What the selection is and what the reader is writing change no width on
+       the bar, so a keystroke in the document measures nothing. */
+    if (
+      [...changed.keys()].some((key) => key !== 'formats' && key !== 'draft') ||
+      changed.size === 0
+    ) {
+      this.overflow.request()
+    }
   }
 
   /**
@@ -1085,23 +1256,53 @@ export class HelixHeadlessEditor extends HelixElement {
     </svg>`
   }
 
+  /** A tool's glyph, on its button or on its row in the overflow menu. */
+  private glyphOf(tool: BarTool): TemplateResult {
+    if (tool === 'undo') {
+      return this.renderPointing(arrowCounterClockwise)
+    }
+    if (tool === 'redo') {
+      return this.renderPointing(arrowClockwise)
+    }
+    return drawIcon(GLYPHS[tool])
+  }
+
+  /**
+   * A tool's glyph on its button: inside the slot that replaces it while the
+   * tool is on the bar, and alone once it has folded, when the slot moves to
+   * the tool's row in the overflow menu. A slot takes its content in one place.
+   */
+  private barIcon(tool: BarTool): TemplateResult {
+    return this.foldedAt(this.overflow.step).has(tool)
+      ? this.glyphOf(tool)
+      : html`<slot name=${`${tool}-icon`}>${this.glyphOf(tool)}</slot>`
+  }
+
+  /** Those of `tools` that stand on the bar. */
+  private drawnOf(tools: readonly BarTool[]): BarTool[] {
+    const bar = this.onBar
+    return tools.filter((tool) => bar.includes(tool))
+  }
+
   /** Undo and Redo. */
   protected renderHistory(): TemplateResult | typeof nothing {
     if (!this.draws('undo') && !this.draws('redo')) {
       return nothing
     }
     const button = this.tag('icon-button')
-    return html`<div part="tools">${
+    return html`<div part="tools" data-fold=${this.drawnOf(['undo', 'redo']).join(' ')} ?hidden=${this.allFolded(this.drawnOf(['undo', 'redo']))}>${
       this.draws('undo')
         ? html`<${button}
             part="undo"
             exportparts="button: undo-button, live: undo-live, spinner: undo-spinner, text: undo-text"
+            data-fold="undo"
+            ?hidden=${this.allFolded(['undo'])}
             ?disabled=${this.disabled('undo')}
             label=${this.undoLabel}
             @click=${() => this.press('undo')}
             @helix-press=${stopPress}
           >
-            <slot name="undo-icon">${this.renderPointing(arrowCounterClockwise)}</slot>
+            ${this.barIcon('undo')}
           </${button}>`
         : nothing
     }${
@@ -1109,12 +1310,14 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="redo"
             exportparts="button: redo-button, live: redo-live, spinner: redo-spinner, text: redo-text"
+            data-fold="redo"
+            ?hidden=${this.allFolded(['redo'])}
             ?disabled=${this.disabled('redo')}
             label=${this.redoLabel}
             @click=${() => this.press('redo')}
             @helix-press=${stopPress}
           >
-            <slot name="redo-icon">${this.renderPointing(arrowClockwise)}</slot>
+            ${this.barIcon('redo')}
           </${button}>`
         : nothing
     }</div>`
@@ -1126,18 +1329,20 @@ export class HelixHeadlessEditor extends HelixElement {
       return nothing
     }
     const button = this.tag('icon-button')
-    return html`<div part="tools">${
+    return html`<div part="tools" data-fold=${this.drawnOf(['bold', 'italic', 'strike', 'code']).join(' ')} ?hidden=${this.allFolded(this.drawnOf(['bold', 'italic', 'strike', 'code']))}>${
       this.draws('bold')
         ? html`<${button}
             part="bold${this.pressed('bold') ? ' bold-pressed' : ''}"
             exportparts="button: bold-button, live: bold-live, spinner: bold-spinner, text: bold-text"
+            data-fold="bold"
+            ?hidden=${this.allFolded(['bold'])}
             aria-pressed=${this.pressed('bold') ? 'true' : 'false'}
             ?disabled=${this.disabled('bold')}
             label=${this.boldLabel}
             @click=${() => this.press('bold')}
             @helix-press=${stopPress}
           >
-            <slot name="bold-icon">${drawIcon(textB)}</slot>
+            ${this.barIcon('bold')}
           </${button}>`
         : nothing
     }${
@@ -1145,13 +1350,15 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="italic${this.pressed('italic') ? ' italic-pressed' : ''}"
             exportparts="button: italic-button, live: italic-live, spinner: italic-spinner, text: italic-text"
+            data-fold="italic"
+            ?hidden=${this.allFolded(['italic'])}
             aria-pressed=${this.pressed('italic') ? 'true' : 'false'}
             ?disabled=${this.disabled('italic')}
             label=${this.italicLabel}
             @click=${() => this.press('italic')}
             @helix-press=${stopPress}
           >
-            <slot name="italic-icon">${drawIcon(textItalic)}</slot>
+            ${this.barIcon('italic')}
           </${button}>`
         : nothing
     }${
@@ -1159,13 +1366,15 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="strike${this.pressed('strike') ? ' strike-pressed' : ''}"
             exportparts="button: strike-button, live: strike-live, spinner: strike-spinner, text: strike-text"
+            data-fold="strike"
+            ?hidden=${this.allFolded(['strike'])}
             aria-pressed=${this.pressed('strike') ? 'true' : 'false'}
             ?disabled=${this.disabled('strike')}
             label=${this.strikeLabel}
             @click=${() => this.press('strike')}
             @helix-press=${stopPress}
           >
-            <slot name="strike-icon">${drawIcon(textStrikethrough)}</slot>
+            ${this.barIcon('strike')}
           </${button}>`
         : nothing
     }${
@@ -1173,13 +1382,15 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="code${this.pressed('code') ? ' code-pressed' : ''}"
             exportparts="button: code-button, live: code-live, spinner: code-spinner, text: code-text"
+            data-fold="code"
+            ?hidden=${this.allFolded(['code'])}
             aria-pressed=${this.pressed('code') ? 'true' : 'false'}
             ?disabled=${this.disabled('code')}
             label=${this.codeLabel}
             @click=${() => this.press('code')}
             @helix-press=${stopPress}
           >
-            <slot name="code-icon">${drawIcon(code)}</slot>
+            ${this.barIcon('code')}
           </${button}>`
         : nothing
     }</div>`
@@ -1198,6 +1409,8 @@ export class HelixHeadlessEditor extends HelixElement {
     return html`<${button}
       part="link${linked ? ' link-pressed' : ''}"
       exportparts="button: link-button, live: link-live, spinner: link-spinner, text: link-text"
+            data-fold="link"
+            ?hidden=${this.allFolded(['link'])}
       aria-pressed=${linked ? 'true' : 'false'}
       .expanded=${this.linkOpen}
       ?disabled=${this.disabled('link')}
@@ -1205,7 +1418,7 @@ export class HelixHeadlessEditor extends HelixElement {
       @click=${() => (this.linkOpen ? this.closeLink() : this.openLink())}
       @helix-press=${stopPress}
     >
-      <slot name="link-icon">${drawIcon(link)}</slot>
+      ${this.barIcon('link')}
     </${button}>`
   }
 
@@ -1220,13 +1433,15 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="bullet-list${this.pressed('bullet-list') ? ' bullet-list-pressed' : ''}"
             exportparts="button: bullet-list-button, live: bullet-list-live, spinner: bullet-list-spinner, text: bullet-list-text"
+            data-fold="bullet-list"
+            ?hidden=${this.allFolded(['bullet-list'])}
             aria-pressed=${this.pressed('bullet-list') ? 'true' : 'false'}
             ?disabled=${this.disabled('bullet-list')}
             label=${this.bulletListLabel}
             @click=${() => this.press('bullet-list')}
             @helix-press=${stopPress}
           >
-            <slot name="bullet-list-icon">${drawIcon(listBullets)}</slot>
+            ${this.barIcon('bullet-list')}
           </${button}>`
         : nothing
     }${
@@ -1234,13 +1449,15 @@ export class HelixHeadlessEditor extends HelixElement {
         ? html`<${button}
             part="ordered-list${this.pressed('ordered-list') ? ' ordered-list-pressed' : ''}"
             exportparts="button: ordered-list-button, live: ordered-list-live, spinner: ordered-list-spinner, text: ordered-list-text"
+            data-fold="ordered-list"
+            ?hidden=${this.allFolded(['ordered-list'])}
             aria-pressed=${this.pressed('ordered-list') ? 'true' : 'false'}
             ?disabled=${this.disabled('ordered-list')}
             label=${this.orderedListLabel}
             @click=${() => this.press('ordered-list')}
             @helix-press=${stopPress}
           >
-            <slot name="ordered-list-icon">${drawIcon(listNumbers)}</slot>
+            ${this.barIcon('ordered-list')}
           </${button}>`
         : nothing
     }`
@@ -1248,14 +1465,14 @@ export class HelixHeadlessEditor extends HelixElement {
 
   /**
    * The lists and the quote, one group: each wraps the blocks it holds, so
-   * they stand together on the toolbar, and a narrow one wraps them as one.
+   * they stand together on the toolbar and in the overflow menu.
    */
   protected renderBlocks(): TemplateResult | typeof nothing {
     const lists = this.renderLists()
     const quote = this.renderQuote()
     return lists === nothing && quote === nothing
       ? nothing
-      : html`<div part="tools">${lists}${quote}</div>`
+      : html`<div part="tools" data-fold=${this.drawnOf(['bullet-list', 'ordered-list', 'quote']).join(' ')} ?hidden=${this.allFolded(this.drawnOf(['bullet-list', 'ordered-list', 'quote']))}>${lists}${quote}</div>`
   }
 
   /** Quote, pressed while the selection is in one. */
@@ -1267,13 +1484,15 @@ export class HelixHeadlessEditor extends HelixElement {
     return html`<${button}
       part="quote${this.pressed('quote') ? ' quote-pressed' : ''}"
       exportparts="button: quote-button, live: quote-live, spinner: quote-spinner, text: quote-text"
+            data-fold="quote"
+            ?hidden=${this.allFolded(['quote'])}
       aria-pressed=${this.pressed('quote') ? 'true' : 'false'}
       ?disabled=${this.disabled('quote')}
       label=${this.quoteLabel}
       @click=${() => this.press('quote')}
       @helix-press=${stopPress}
     >
-      <slot name="quote-icon">${drawIcon(quotes)}</slot>
+      ${this.barIcon('quote')}
     </${button}>`
   }
 
@@ -1291,12 +1510,13 @@ export class HelixHeadlessEditor extends HelixElement {
       return nothing
     }
     const menu = this.tag('menu')
-    const item = this.tag('menu-item')
     const button = this.tag('button')
     const current = this.formats.block
     const shown = current === '' ? 'paragraph' : current
     return html`<${menu}
       part="block-menu"
+      data-fold="block"
+      ?hidden=${this.allFolded(['block'])}
       exportparts="back: block-menu-back, back-mark: block-menu-back-mark, empty: block-menu-empty,
         header: block-menu-header, live: block-menu-live, loading: block-menu-loading,
         search-field: block-menu-search-field, surface: block-menu-surface,
@@ -1318,34 +1538,47 @@ export class HelixHeadlessEditor extends HelixElement {
         </span>
         ${drawIcon(caretDown, { slot: 'end' })}
       </${button}>
-      ${blocks.map(
-        (tool) => html`<${item}
-          part="block-option"
-          exportparts="end: block-option-end, item: block-option-item, mark: block-option-mark,
-            shortcut: block-option-shortcut, shortcut-kbd: block-option-shortcut-kbd,
-            shortcut-key: block-option-shortcut-key, shortcut-separator: block-option-shortcut-separator,
-            start: block-option-start, surface: block-option-surface"
-          value=${tool}
-          checkable
-          exclusive
-          ?checked=${tool === current}
-          ?disabled=${this.disabled(tool)}
-          shortcut=${SHORTCUTS[tool] ?? nothing}
-          @helix-before-check=${this.keepTick}
-          @helix-before-select=${() => this.choose(tool)}
-        >
-          ${this.nameOf(tool)}
-        </${item}>`,
-      )}
+      ${this.renderBlockOptions()}
     </${menu}>`
   }
 
-  /** A line between two groups of tools. */
-  protected renderDivider(): TemplateResult {
+  /**
+   * A row for each block type, the selection's checked: in the block menu,
+   * or in the submenu of the overflow menu's block row with `slot`.
+   */
+  protected renderBlockOptions(slot?: string): TemplateResult[] {
+    const item = this.tag('menu-item')
+    const current = this.formats.block
+    return EDITOR_BLOCKS.filter((tool) => this.draws(tool)).map(
+      (tool) => html`<${item}
+        part="block-option"
+        exportparts="end: block-option-end, item: block-option-item, mark: block-option-mark,
+          shortcut: block-option-shortcut, shortcut-kbd: block-option-shortcut-kbd,
+          shortcut-key: block-option-shortcut-key, shortcut-separator: block-option-shortcut-separator,
+          start: block-option-start, surface: block-option-surface"
+        slot=${slot ?? nothing}
+        value=${tool}
+        checkable
+        exclusive
+        ?checked=${tool === current}
+        ?disabled=${this.disabled(tool)}
+        shortcut=${SHORTCUTS[tool] ?? nothing}
+        @helix-before-check=${this.keepTick}
+        @helix-before-select=${() => this.choose(tool)}
+      >
+        ${this.nameOf(tool)}
+      </${item}>`,
+    )
+  }
+
+  /** A line between two groups of tools, before `tools`, hidden once they have all folded. */
+  protected renderDivider(tools: readonly BarTool[] = []): TemplateResult {
     const divider = this.tag('divider')
     return html`<${divider}
       part="divider"
       exportparts="content: divider-content, line: divider-line"
+      data-fold=${tools.length > 0 ? tools.join(' ') : nothing}
+      ?hidden=${this.allFolded(tools)}
       orientation="vertical"
     ></${divider}>`
   }
@@ -1359,13 +1592,15 @@ export class HelixHeadlessEditor extends HelixElement {
     return html`<${button}
       part="find-toggle"
       exportparts="button: find-toggle-button, live: find-toggle-live, spinner: find-toggle-spinner, text: find-toggle-text"
+      data-fold="find"
+      ?hidden=${this.allFolded(['find'])}
       .expanded=${this.findOpen}
       ?disabled=${!this.renderer}
       label=${this.findLabel}
       @click=${() => (this.findOpen ? this.find?.element.hide() : void this.openFind())}
       @helix-press=${stopPress}
     >
-      <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
+      ${this.barIcon('find')}
     </${button}>`
   }
 
@@ -1401,20 +1636,125 @@ export class HelixHeadlessEditor extends HelixElement {
    */
   protected renderControls(): TemplateResult {
     const toolbar = this.tag('toolbar')
+    const drawn = [
+      this.renderHistory(),
+      this.renderBlockMenu(),
+      this.renderMarks(),
+      this.renderLinkTool(),
+      this.renderBlocks(),
+      this.renderFindTool(),
+    ]
     const groups = this.readOnly
       ? []
-      : [
-          this.renderHistory(),
-          this.renderBlockMenu(),
-          this.renderMarks(),
-          this.renderLinkTool(),
-          this.renderBlocks(),
-          this.renderFindTool(),
-        ].filter((group) => group !== nothing)
+      : BAR_GROUPS.map((tools, at) => ({ template: drawn[at], tools: this.drawnOf(tools) })).filter(
+          (group) => group.template !== nothing,
+        )
     return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel} @keydown=${this.handleToolbarKeys}>
-      ${groups.map((group, at) => (at === 0 ? group : html`${this.renderDivider()}${group}`))}
+      ${groups.map((group, at) =>
+        at === 0 ? group.template : html`${this.renderDivider(group.tools)}${group.template}`,
+      )}
+      ${this.renderOverflow()}
       <slot name="actions" part="actions" ?hidden=${!this.hasActions} @slotchange=${this.handleActions}></slot>
     </${toolbar}>`
+  }
+
+  /**
+   * The overflow menu, after the last tool on the bar: the tools that do not
+   * fit, in their groups with a line between two. Kept in the tree while
+   * nothing has folded, hidden, so a measure can show it at once.
+   */
+  protected renderOverflow(): TemplateResult | typeof nothing {
+    const bar = this.onBar
+    if (bar.length === 0) {
+      return nothing
+    }
+    const menu = this.tag('menu')
+    const button = this.tag('icon-button')
+    const divider = this.tag('divider')
+    const folded = this.foldedAt(this.overflow.step)
+    const groups = BAR_GROUPS.map((tools) => tools.filter((tool) => folded.has(tool))).filter(
+      (tools) => tools.length > 0,
+    )
+    return html`<${menu}
+      part="overflow"
+      exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
+        header: overflow-header, live: overflow-live, loading: overflow-loading,
+        search-field: overflow-search-field, surface: overflow-surface,
+        title: overflow-title"
+      label=${this.moreLabel}
+      placement="bottom-end"
+      ?hidden=${folded.size === 0}
+      @toggle=${this.handleMenuToggle}
+    >
+      <${button}
+        part="more"
+        exportparts="button: more-button, live: more-live, spinner: more-spinner, text: more-text"
+        slot="trigger"
+        label=${this.moreLabel}
+        @helix-press=${stopPress}
+      >
+        <slot name="more-icon">${drawIcon(dotsThree)}</slot>
+      </${button}>
+      ${groups.map(
+        (tools, at) =>
+          html`${at === 0 ? nothing : html`<${divider}></${divider}>`}${tools.map((tool) => this.renderFolded(tool))}`,
+      )}
+    </${menu}>`
+  }
+
+  /**
+   * A tool's row in the overflow menu, with the glyph its button has. A mark,
+   * a list, or the quote is checked while its format holds; the block types
+   * are a submenu; Link and Find open their bars once the menu has closed.
+   */
+  protected renderFolded(tool: BarTool): TemplateResult {
+    const item = this.tag('menu-item')
+    const icon = html`<slot name=${`${tool}-icon`} slot="start">${this.glyphOf(tool)}</slot>`
+    const parts = `end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
+      shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
+      shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
+      start: overflow-option-start, surface: overflow-option-surface`
+    if (tool === 'block') {
+      return html`<${item}
+        part="overflow-option"
+        exportparts=${parts}
+        value="block"
+        ?disabled=${!this.renderer}
+      >
+        ${drawIcon(textAa, { slot: 'start' })}
+        ${this.blockLabel}
+        ${this.renderBlockOptions('submenu')}
+      </${item}>`
+    }
+    if (tool === 'link' || tool === 'find') {
+      const open = tool === 'link' ? () => this.openLink() : () => void this.openFind()
+      return html`<${item}
+        part="overflow-option"
+        exportparts=${parts}
+        value=${tool}
+        ?disabled=${tool === 'link' ? this.disabled('link') : !this.renderer}
+        @helix-before-select=${() => {
+          this.afterMenu = open
+        }}
+      >
+        ${icon}
+        ${tool === 'link' ? this.linkLabel : this.findLabel}
+      </${item}>`
+    }
+    const checks = tool !== 'undo' && tool !== 'redo'
+    return html`<${item}
+      part="overflow-option"
+      exportparts=${parts}
+      value=${tool}
+      ?checkable=${checks}
+      ?checked=${checks && this.pressed(tool)}
+      ?disabled=${this.disabled(tool)}
+      @helix-before-check=${this.keepTick}
+      @helix-before-select=${() => this.chooseFolded(tool)}
+    >
+      ${icon}
+      ${this.nameOf(tool)}
+    </${item}>`
   }
 
   /**

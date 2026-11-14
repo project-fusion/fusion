@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNavigation } from '@fusion.dev/helix-headless/navigation'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './navigation-root.css.js'
+import '../../menu/index.js'
 
 /**
  * @summary A set of destinations, with a marker on the current one.
@@ -45,6 +46,7 @@ import { styles } from './navigation-root.css.js'
 @customElement('helix-navigation')
 export class HelixNavigation extends HelixHeadlessNavigation {
   static override styles: CSSResultGroup = styles
+  static override tier = 'helix-'
 }
 
 declare global {

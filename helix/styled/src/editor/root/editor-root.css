@@ -88,21 +88,23 @@
   display: none;
 }
 
-/* A narrow frame wraps the tools onto more rows rather than hiding any, a
-   group at a time, so Bold never ends one row with Italic starting the next.
-   The groups are parted by a line, and by a wider gap where the strip may be
-   too narrow for every group on one row, so no line ends a row. */
+/* **A narrow frame folds the tools that do not fit into the overflow menu**,
+   one at a time from the end, so the toolbar is always one row: wrapped, it
+   was three rows at 390. The groups are parted by a line, and by a wider gap
+   where the strip may be too narrow for every group on one row. */
 [part="controls"] {
   --toolbar-separator-gap: var(--helix-space-2xs);
 
   display: flex;
+  /* The strip's width and not the tools', which is what the fold measures. */
+  min-inline-size: 0;
 }
 
 /* As wide as the strip, so your actions stand at its end. */
 [part="controls"]::part(toolbar) {
   flex: 1 1 auto;
-  flex-wrap: wrap;
-  row-gap: var(--helix-space-2xs);
+  flex-wrap: nowrap;
+  min-inline-size: 0;
 }
 
 [part="tools"] {
@@ -110,19 +112,26 @@
   gap: var(--helix-space-2xs);
 }
 
+/* Nothing on the row shrinks: a row too narrow overflows, and the fold
+   measures the overflow to know what to fold. */
+[part="controls"] > * {
+  flex-shrink: 0;
+}
+
+/* A tool, a group, or a line that has folded takes no room on the row. Its
+   host's own `display` would otherwise win over `hidden`. */
+[data-fold][hidden],
+[part="overflow"][hidden] {
+  display: none;
+}
+
 /* **On a touch screen the tools stand a target apart**, as Toolbar's own
    controls do. The toolbar opens its gap between the groups and not inside
    them, so the buttons of one group kept the `2xs` gap: measured at 390 on a
-   phone, 36 pixels to press across a 32 button where the target is 44. Rows
-   that wrap open the same way, so a press below a button does not land on the
-   row under it. */
+   phone, 36 pixels to press across a 32 button where the target is 44. */
 @media (pointer: coarse) {
   [part="tools"] {
     gap: max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-control));
-  }
-
-  [part="controls"]::part(toolbar) {
-    row-gap: max(var(--helix-space-2xs), var(--helix-size-target) - var(--helix-size-control));
   }
 }
 

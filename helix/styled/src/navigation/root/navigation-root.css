@@ -1,5 +1,9 @@
 :host {
   display: block;
+  /* As a flex item, in App Header's middle region, the host yields to the
+     region rather than holding every destination's width, so the row can
+     measure what does not fit and fold it. */
+  min-inline-size: 0;
 }
 
 [part="nav"] {
@@ -11,14 +15,18 @@
   block-size: var(--navigation-block-size, var(--helix-size-control-sm));
   display: flex;
   gap: var(--navigation-gap, var(--helix-space-2xs));
-  /* Long navigation scrolls inside the bar instead of widening the page. */
+  /* Long navigation folds into the overflow menu, or scrolls inside the bar
+     under `overflow="scroll"`, instead of widening the page. Folding measures
+     this box, so it takes its width from the host and never from the
+     destinations. */
   min-inline-size: 0;
   overflow-x: auto;
   /* The marker is positioned against this. */
   position: relative;
 }
 
-/* **The bar says when it scrolls.** A wider strip fades the edge with more behind it, as Table does: cut
+/* **The bar says when it scrolls**, under `overflow="scroll"`, or where even
+   a folded row does not fit. A wider strip fades the edge with more behind it, as Table does: cut
    flat, a link at 280 read "Pr" and at 390 two of three were out of view with
    nothing to say so. A timeline over a strip with nothing to scroll is
    inactive, so a strip that fits is never masked. */
@@ -82,6 +90,100 @@
   align-items: stretch;
   block-size: auto;
   flex-direction: column;
+}
+
+/* **A destination that folded takes no room on the row.** `!important`,
+   because the base layer gives every link in the bar a `display`, and the
+   page's rules outrank this sheet's for what is slotted. */
+::slotted([hidden]) {
+  /* biome-ignore lint/complexity/noImportantStyles: a document rule beats a shadow root's normal one for what is slotted, and only an important one here wins it back. */
+  display: none !important;
+}
+
+/* **The overflow button stands in the row as a destination does**: the same
+   height, words, weight, and hover, with a caret after the words. */
+[part="overflow"] {
+  align-items: center;
+  block-size: 100%;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+[part="overflow"][hidden],
+[part="more"] [hidden] {
+  display: none;
+}
+
+[part="more"] {
+  align-items: center;
+  background: none;
+  block-size: 100%;
+  border: none;
+  border-radius: var(--navigation-item-radius, var(--helix-radii-sm));
+  color: var(--navigation-item-color, var(--helix-color-foreground-muted));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--navigation-item-font-size, var(--helix-text-sm));
+  font-weight: var(--navigation-item-font-weight, var(--helix-weight-medium));
+  gap: var(--helix-space-2xs);
+  min-block-size: var(--helix-size-control-sm);
+  padding-block: var(--helix-space-none);
+  padding-inline: var(--navigation-item-padding-inline, var(--helix-space-sm)) var(--helix-space-xs);
+  position: relative;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="more"]:hover,
+[part="more"][aria-expanded="true"] {
+  background-color: var(
+    --navigation-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  color: var(--navigation-item-hover-color, var(--helix-color-foreground));
+}
+
+[part="more"]:active {
+  background-color: var(--helix-color-press);
+}
+
+/* Naming the current destination, it reads as the current one does. */
+[part="more"][data-current] {
+  color: var(--navigation-item-current-color, var(--helix-color-foreground));
+  font-weight: var(--navigation-item-current-font-weight, var(--helix-weight-semibold));
+}
+
+/* The ring turns inward, as a link's does, because the bar has no room to
+   draw it outside. */
+[part="more"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="more-mark"],
+::slotted([slot="more-icon"]) {
+  block-size: var(--helix-size-icon-tight);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon-tight);
+}
+
+/* Too narrow for words, the button is a square around a glyph, as App
+   Header's toggle is. */
+[part="more"][data-compact] {
+  inline-size: var(--helix-size-control-sm);
+  justify-content: center;
+  padding-inline: var(--helix-space-none);
+}
+
+[part="more-glyph"],
+::slotted([slot="menu-icon"]) {
+  block-size: var(--helix-size-icon);
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-icon);
 }
 
 /* Behind the destinations and out of flow, so animating it reflows nothing.
