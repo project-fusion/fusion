@@ -64,7 +64,7 @@ export default styles(
       rowHoverBackgroundColor: token('color-hover'),
       rowHoverColor: token('color-foreground'),
       rowRadius: token('radii-sm'),
-      rowSelectedBackgroundColor: token('color-selected'),
+      rowSelectedBackgroundColor: token('color-primary-subtle'),
       rowSelectedColor: token('color-foreground'),
       rowSize: null,
     },

@@ -171,8 +171,11 @@ export default styles(
       /* Behind the destinations and out of flow, so moving it reflows nothing. */
       on('indicator', [
         rule({
-          /* The selected wash, as a List's current row takes it. */
-          backgroundColor: hook.indicatorColor(token('color-selected')),
+          /* **A `surface-sunken` pill**, a step past the 5% wash a link takes
+             under the pointer. The selected wash was tried in its place, since
+             the pill measures 1.05:1 on a dark glass header, and the owner
+             chose the pill from before the rounds, November 10, 2026. */
+          backgroundColor: hook.indicatorColor(token('color-surface-sunken')),
           blockSize: measured('indicator-block-size', 0),
           borderRadius: hook.indicatorRadius(token('radii-sm')),
           boxShadow: hook.indicatorShadow('none'),

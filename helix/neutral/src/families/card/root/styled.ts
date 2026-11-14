@@ -64,6 +64,7 @@ export default styles(
     },
     own: {
       cardCorner: null,
+      cardElevated: null,
       cardFill: null,
       cardGap: null,
       cardGround: null,
@@ -169,20 +170,43 @@ export default styles(
         },
         transparent: { backdropFilter: 'none', backgroundColor: 'transparent' },
       }),
-      /* Elevated, the fill is the nesting card's overlay rung in light, and the
-         overlay in dark. */
+      /* Elevated, the fill is the nesting card's overlay rung in light, and
+         in dark **a step above the overlay rung**, 0.025 of lightness over
+         it: #1e1e1e on the page. At the overlay rung, #181818, the card stood
+         beside a filled card's #161616 at 1.02:1, the same card twice;
+         #1e1e1e is 1.08 above it. From the overlay rung, which each panel and
+         well below restates, so the step holds inside them. Decided by the
+         owner on November 4, 2026, and kept when the panels went back to
+         #181818. */
       web([
         rule(
           { separation: 'elevated' },
           {
             own: {
-              cardGround: hook.backgroundColor(
-                scheme(own.cardNest(token('color-surface')), token('color-surface-overlay')),
+              cardElevated: scheme(
+                own.cardNest(token('color-surface')),
+                fn('oklch', ['from', token('color-surface-overlay'), sum('l', 0.025), 'c', 'h']),
               ),
+              cardGround: hook.backgroundColor(own.cardElevated),
               cardRaised: token('color-surface-raised'),
               cardSurface: token('color-surface'),
             },
-            backgroundColor: own.cardGround,
+            backgroundColor: hook.backgroundColor(own.cardElevated),
+          },
+        ),
+        /* **A filled card's steps are taken from the raised rung as it stands
+           outside**, since its own fill is a wash with no color of its own:
+           the raised rung sits on or a code above that wash on the page, in a
+           well, in a panel, and in another card, so nothing stepped from it
+           falls under the card. */
+        rule(
+          { material: false, separation: 'filled' },
+          {
+            own: {
+              cardGround: hook.backgroundColor(token('color-surface-raised')),
+              cardRaised: token('color-surface-raised'),
+              cardSurface: token('color-surface'),
+            },
           },
         ),
       ]),
@@ -304,9 +328,33 @@ export default styles(
             ),
           },
         ),
+        /* **In dark, what stands on a filled card steps up from it, as it
+           does on an elevated one**: 3% of the ink for a card, 9% for the
+           raised rung, and 12% for an overlay, with an elevated card a step
+           above that and a filled card's wash at 6%. The page's rungs left a
+           default card inside at #0c0c0c, a hole in the #161616 card, and an
+           elevated card at #1e1e1e under a filled one at #2a2a2a. Light keeps
+           its rungs, and an elevated card inside takes the overlay rung. */
         rule(
           { material: false, separation: 'filled' },
           {
+            own: { cardNest: own.cardOverlay },
+            '--helix-color-surface-overlay': scheme(
+              own.cardOverlay,
+              mix(token('color-foreground'), 12, own.cardGround),
+            ),
+            '--helix-color-surface-raised': scheme(
+              own.cardRaised,
+              mix(token('color-foreground'), 9, own.cardGround),
+            ),
+            '--helix-color-surface': scheme(
+              own.cardSurface,
+              mix(token('color-foreground'), 3, own.cardGround),
+            ),
+            '--helix-color-surface-filled': scheme(
+              mix(token('color-foreground'), 5, 'transparent'),
+              mix(token('color-foreground'), 6, 'transparent'),
+            ),
             '--helix-color-border': scheme(
               mix(token('color-foreground'), 5, own.cardLine),
               mix(token('color-foreground'), 6, own.cardLine),

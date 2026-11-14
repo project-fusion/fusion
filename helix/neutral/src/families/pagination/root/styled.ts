@@ -20,8 +20,11 @@ export default styles(
   {
     prefix: 'pagination',
     hooks: {
-      /* The wash every chosen thing takes, a step past the hover's well. */
-      currentBackgroundColor: token('color-selected'),
+      /* **The page you are on is a raised chip with an edge**, `surface-raised` and
+         `border`, beside the hover wash on the others. The selected wash was
+         tried in its place, and the owner chose the chip from before the
+         rounds, November 10, 2026. */
+      currentBackgroundColor: token('color-surface-raised'),
       currentBorderColor: token('color-border'),
       currentFontWeight: token('weight-semibold'),
       currentForegroundColor: token('color-foreground'),
@@ -33,7 +36,7 @@ export default styles(
       fontWeight: token('weight-medium'),
       foregroundColor: token('color-foreground-muted'),
       gap: token('space-2xs'),
-      hoverBackgroundColor: token('color-well'),
+      hoverBackgroundColor: token('color-hover'),
       hoverForegroundColor: token('color-foreground'),
       iconSize: token('size-icon-tight'),
       padding: token('space-2xs'),
