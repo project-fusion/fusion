@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import type { CanvasEdge, CanvasNode } from '@fusion.dev/helix-core/canvas'
 import { arrangement } from './arrange.js'
-import type { CanvasEdge, CanvasNode } from './root/canvas-document.js'
 
 const card = (id: string, x: number, y: number, width = 100, height = 50): CanvasNode => ({
   height,
