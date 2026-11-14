@@ -1118,12 +1118,27 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
     this.toggleState('has-end', filled('end'))
   }
 
+  /**
+   * A press on the field's own box, beside the text, puts focus in the text,
+   * as a press on a native field's padding does. Without it a field drawn
+   * narrower than its box, as a field sized to its value is, took no focus
+   * from most of its box.
+   */
+  private readonly handleFieldPress = (event: MouseEvent): void => {
+    const control = this.partNamed('control')
+    if (event.composedPath()[0] !== event.currentTarget || !control || this.disabled) {
+      return
+    }
+    event.preventDefault()
+    control.focus()
+  }
+
   protected override render(): TemplateResult {
     const parsed = this.numeric
     const atMin = parsed !== null && this.min !== undefined && parsed <= this.min
     const atMax = parsed !== null && this.max !== undefined && parsed >= this.max
     return html`${this.renderLabel()}
-      <div part="field" role="group" aria-labelledby=${this.labeled ? this.labelId : nothing}>
+      <div part="field" role="group" aria-labelledby=${this.labeled ? this.labelId : nothing} @mousedown=${this.handleFieldPress}>
         <button
           part="decrement"
           id="decrement"
