@@ -84,11 +84,10 @@ for text on each surface.
   filled at the same lightness as a blue carried a white label at 4.43:1. At
   that luminance the fill clears 3:1 against a card, and a white label clears
   4.5:1 on it at rest, under the pointer, and pressed, which step lighter. A
-  fill outside sRGB, such as a green or a cyan, is drawn by the screen as the
-  nearest color it can show, which can sit a little above the band: a
-  `#16a34a` seed fills at 0.138, and `oklch(0.6 0.12 200)` at 0.142, where a
-  white label measures 4.49:1 pressed. A seed lighter than L 0.68 fills 0.05
-  darker than itself and takes a black label.
+  fill outside sRGB, such as a vivid green or cyan, is brought into sRGB before
+  its luminance is set, so the band holds for it too: across 589 seeds, a white
+  label measures 5.6:1 or more at rest and 4.6:1 or more pressed. A seed
+  lighter than L 0.68 fills 0.05 darker than itself and takes a black label.
 
 The accent seed is held to the same limits.
 
