@@ -267,24 +267,6 @@ export class HelixHeadlessNavigation extends HelixElement {
   })
 
   /**
-   * The words on the button that opens the overflow menu, and the menu's name.
-   */
-  @words
-  @property({ attribute: 'more-label' })
-  moreLabel = 'More'
-
-  /**
-   * What a row too narrow for its destinations does. Unset, the destinations
-   * that do not fit fold into the overflow menu. `scroll` keeps them all on
-   * the row and scrolls it inside itself, for a strip read by swiping.
-   *
-   * Reflected and left unset by default, so the host carries nothing a
-   * consumer's server markup does not already have.
-   */
-  @property({ reflect: true })
-  overflow?: 'scroll'
-
-  /**
    * How the destinations are drawn, with `Tabs`' three values and for the same
    * reasons.
    *
@@ -309,12 +291,30 @@ export class HelixHeadlessNavigation extends HelixElement {
   marker?: 'segmented' | 'underlined'
 
   /**
+   * The words on the button that opens the overflow menu, and the menu's name.
+   */
+  @words
+  @property({ attribute: 'more-label' })
+  moreLabel = 'More'
+
+  /**
    * Stacks the destinations in a column, for a sidebar, where unset is a row
    * for a header or a footer. The marker follows the current destination down
    * the column as it does along the row.
    */
   @property({ reflect: true })
   orientation?: 'vertical'
+
+  /**
+   * What a row too narrow for its destinations does. Unset, the destinations
+   * that do not fit fold into the overflow menu. `scroll` keeps them all on
+   * the row and scrolls it inside itself, for a strip read by swiping.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
+   */
+  @property({ reflect: true })
+  overflow?: 'scroll'
 
   private current: MutationObserver | undefined
 

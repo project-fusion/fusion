@@ -496,6 +496,9 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart overflow - The menu of the tools that do not fit on the toolbar.
  * @csspart overflow-back - The control that returns from the block types' submenu.
  * @csspart overflow-back-mark - The glyph on the back control of a submenu.
+ * @csspart overflow-divider - The rule between two groups of tools in the overflow menu.
+ * @csspart overflow-divider-content - The content set into that rule, which the editor sets none into.
+ * @csspart overflow-divider-line - The line of that rule.
  * @csspart overflow-empty - The text shown when the menu has no items.
  * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
  * @csspart overflow-live - The overflow menu's live region, which repeats the empty and loading text for screen readers.
@@ -1272,7 +1275,7 @@ export class HelixHeadlessEditor extends HelixElement {
    * tool is on the bar, and alone once it has folded, when the slot moves to
    * the tool's row in the overflow menu. A slot takes its content in one place.
    */
-  private barIcon(tool: BarTool): TemplateResult {
+  protected renderBarIcon(tool: BarTool): TemplateResult {
     return this.foldedAt(this.overflow.step).has(tool)
       ? this.glyphOf(tool)
       : html`<slot name=${`${tool}-icon`}>${this.glyphOf(tool)}</slot>`
@@ -1302,7 +1305,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('undo')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('undo')}
+            ${this.renderBarIcon('undo')}
           </${button}>`
         : nothing
     }${
@@ -1317,7 +1320,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('redo')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('redo')}
+            ${this.renderBarIcon('redo')}
           </${button}>`
         : nothing
     }</div>`
@@ -1342,7 +1345,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('bold')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('bold')}
+            ${this.renderBarIcon('bold')}
           </${button}>`
         : nothing
     }${
@@ -1358,7 +1361,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('italic')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('italic')}
+            ${this.renderBarIcon('italic')}
           </${button}>`
         : nothing
     }${
@@ -1374,7 +1377,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('strike')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('strike')}
+            ${this.renderBarIcon('strike')}
           </${button}>`
         : nothing
     }${
@@ -1390,7 +1393,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('code')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('code')}
+            ${this.renderBarIcon('code')}
           </${button}>`
         : nothing
     }</div>`
@@ -1418,7 +1421,7 @@ export class HelixHeadlessEditor extends HelixElement {
       @click=${() => (this.linkOpen ? this.closeLink() : this.openLink())}
       @helix-press=${stopPress}
     >
-      ${this.barIcon('link')}
+      ${this.renderBarIcon('link')}
     </${button}>`
   }
 
@@ -1441,7 +1444,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('bullet-list')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('bullet-list')}
+            ${this.renderBarIcon('bullet-list')}
           </${button}>`
         : nothing
     }${
@@ -1457,7 +1460,7 @@ export class HelixHeadlessEditor extends HelixElement {
             @click=${() => this.press('ordered-list')}
             @helix-press=${stopPress}
           >
-            ${this.barIcon('ordered-list')}
+            ${this.renderBarIcon('ordered-list')}
           </${button}>`
         : nothing
     }`
@@ -1492,7 +1495,7 @@ export class HelixHeadlessEditor extends HelixElement {
       @click=${() => this.press('quote')}
       @helix-press=${stopPress}
     >
-      ${this.barIcon('quote')}
+      ${this.renderBarIcon('quote')}
     </${button}>`
   }
 
@@ -1600,7 +1603,7 @@ export class HelixHeadlessEditor extends HelixElement {
       @click=${() => (this.findOpen ? this.find?.element.hide() : void this.openFind())}
       @helix-press=${stopPress}
     >
-      ${this.barIcon('find')}
+      ${this.renderBarIcon('find')}
     </${button}>`
   }
 
@@ -1697,7 +1700,7 @@ export class HelixHeadlessEditor extends HelixElement {
       </${button}>
       ${groups.map(
         (tools, at) =>
-          html`${at === 0 ? nothing : html`<${divider}></${divider}>`}${tools.map((tool) => this.renderFolded(tool))}`,
+          html`${at === 0 ? nothing : html`<${divider} part="overflow-divider" exportparts="content: overflow-divider-content, line: overflow-divider-line"></${divider}>`}${tools.map((tool) => this.renderFolded(tool))}`,
       )}
     </${menu}>`
   }
@@ -1710,14 +1713,13 @@ export class HelixHeadlessEditor extends HelixElement {
   protected renderFolded(tool: BarTool): TemplateResult {
     const item = this.tag('menu-item')
     const icon = html`<slot name=${`${tool}-icon`} slot="start">${this.glyphOf(tool)}</slot>`
-    const parts = `end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
-      shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
-      shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
-      start: overflow-option-start, surface: overflow-option-surface`
     if (tool === 'block') {
       return html`<${item}
         part="overflow-option"
-        exportparts=${parts}
+        exportparts="end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
+          shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
+          shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
+          start: overflow-option-start, surface: overflow-option-surface"
         value="block"
         ?disabled=${!this.renderer}
       >
@@ -1730,7 +1732,10 @@ export class HelixHeadlessEditor extends HelixElement {
       const open = tool === 'link' ? () => this.openLink() : () => void this.openFind()
       return html`<${item}
         part="overflow-option"
-        exportparts=${parts}
+        exportparts="end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
+          shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
+          shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
+          start: overflow-option-start, surface: overflow-option-surface"
         value=${tool}
         ?disabled=${tool === 'link' ? this.disabled('link') : !this.renderer}
         @helix-before-select=${() => {
@@ -1744,7 +1749,10 @@ export class HelixHeadlessEditor extends HelixElement {
     const checks = tool !== 'undo' && tool !== 'redo'
     return html`<${item}
       part="overflow-option"
-      exportparts=${parts}
+      exportparts="end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
+          shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
+          shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
+          start: overflow-option-start, surface: overflow-option-surface"
       value=${tool}
       ?checkable=${checks}
       ?checked=${checks && this.pressed(tool)}

@@ -25,8 +25,16 @@ describe('navigation server output', () => {
     /* `toContain('href="/one"')` passed on the spec's own `<a>`, which sits in
        the host's light DOM and reaches a crawler whatever the component
        renders. The claim is the unnamed slot inside the landmark: that is what
-       puts the links in the `<nav>` rather than beside it. */
-    expect(rendered(markup, 'helix-navigation')).toMatch(/<slot\s*><\/slot>\s*<\/nav>/)
+       puts the links in the `<nav>` rather than beside it. The overflow menu
+       follows the slot inside the landmark, so More stays among the links it
+       holds. */
+    expect(rendered(markup, 'helix-navigation')).toMatch(
+      /<nav\s[^>]*>(?:(?!<\/nav>)[\s\S])*<slot\s*><\/slot>(?:(?!<\/nav>)[\s\S])*<\/nav>/,
+    )
+  })
+
+  test('the overflow menu ships hidden, since a server cannot measure what fits', () => {
+    expect(partTag(markup, 'overflow')).toMatch(/\shidden[\s>]/)
   })
 
   test('the marker ships unplaced, since a server cannot measure', () => {
