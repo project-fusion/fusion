@@ -1044,6 +1044,15 @@ export const TOKENS: Token[] = [
      solid. The glass and frosted fills below take it as well, capped at 100%;
      before November 3, 2026 it reached chart marks and no surface. */
   ['material-opacity', '1', 'How opaque a translucent surface is.'],
+  /* *How much a glass modal brightens the page it samples*, decided by the
+     color mode in `_modes.css`, since a filter takes no `light-dark()`: 1 / 0.6
+     in light, which hands the filter the page as it stands under the 40%
+     scrim, and 1 in dark. */
+  [
+    'material-scrim-lift',
+    'var(--_helix-material-scrim-lift)',
+    'How much a glass Dialog or Drawer brightens the page behind its scrim.',
+  ],
   /* **What `glass` and `frosted` cover, as a scalar, for a family that fades a
      mark.** A chart's glass group was drawn at 0.62 and every glass surface at
      0.72, so glass meant two coverages. A chart reads these to draw the one. */
