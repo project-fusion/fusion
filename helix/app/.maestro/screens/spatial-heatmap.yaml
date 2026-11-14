@@ -1,0 +1,36 @@
+# Spatial Heatmap, each example drawn alone, one screenshot of each,
+# named by the example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws,
+# and a year of readings for the screen to settle, since a phone reads the
+# year's table and draws its prisms after the title.
+appId: dev.fusion.helix.app
+name: "Screens: Spatial Heatmap"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://spatial-heatmap/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: spatial-heatmap-preview-${MODE}-${SIZE}
+- openLink: helix://spatial-heatmap/three/preview
+- extendedWaitUntil:
+    visible: 'Three'
+    timeout: 15000
+- takeScreenshot: spatial-heatmap-three-${MODE}-${SIZE}
+- openLink: helix://spatial-heatmap/without-labels/preview
+- extendedWaitUntil:
+    visible: 'Without labels'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: spatial-heatmap-without-labels-${MODE}-${SIZE}
+- openLink: helix://spatial-heatmap/year/preview
+- extendedWaitUntil:
+    visible: 'Year'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: spatial-heatmap-year-${MODE}-${SIZE}

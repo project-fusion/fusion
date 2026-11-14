@@ -94,6 +94,7 @@ import { HelixSkipLink } from '../skip-link/index.native'
 import { HelixSlider } from '../slider/index.native'
 import { HelixSparkline } from '../sparkline/index.native'
 import { HelixSpatialBarChart } from '../spatial-bar-chart/index.native'
+import { HelixSpatialHeatmap } from '../spatial-heatmap/index.native'
 import { HelixSpatialRibbonChart } from '../spatial-ribbon-chart/index.native'
 import { HelixSpatialScatterChart } from '../spatial-scatter-chart/index.native'
 import { HelixSpatialSurfaceChart } from '../spatial-surface-chart/index.native'
@@ -304,6 +305,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-slider': HelixSlider,
   'helix-sparkline': HelixSparkline,
   'helix-spatial-bar-chart': HelixSpatialBarChart,
+  'helix-spatial-heatmap': HelixSpatialHeatmap,
   'helix-spatial-ribbon-chart': HelixSpatialRibbonChart,
   'helix-spatial-scatter-chart': HelixSpatialScatterChart,
   'helix-spatial-surface-chart': HelixSpatialSurfaceChart,

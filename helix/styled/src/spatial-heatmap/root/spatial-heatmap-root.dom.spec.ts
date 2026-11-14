@@ -42,15 +42,11 @@ const sheet = (tag: string): string => {
   )
 }
 
-/** The `--heatmap-tone-*` declarations in a sheet, with the spacing taken out. */
-const tones = (text: string): string[] =>
-  (text.match(/--heatmap-tone-[\w-]+:[^;]+;/g) ?? []).map((one) => one.replace(/\s+/g, ''))
-
 /**
- * The ramp as Heatmap's sheet holds it: each cell reads its tone with the
- * ramp's step behind it, `var(--heatmap-tone-1, <step>)`, so a page sets a
- * tone on any ancestor. Written back as a declaration, to compare with this
- * family's.
+ * The ramp as a sheet holds it: each cell reads its tone through Heatmap's
+ * hook with the ramp's step behind it, `var(--heatmap-tone-1, <step>)`, so a
+ * page sets a tone on any ancestor. Written back as a declaration, to compare
+ * the two families'.
  */
 const readTones = (text: string): string[] => {
   const found = new Map<string, string>()
@@ -91,16 +87,16 @@ describe('the styled spatial heatmap', () => {
   })
 
   /**
-   * **The tone ramp is a copy of Heatmap's, and this is what keeps it one.** A
-   * family may not compose another family's sheet, and moving the ramp into
-   * `shared/` would grow Heatmap's bundle, so the two sheets each write it.
-   * A ramp changed in one and not the other would color the same table two
-   * ways on one page.
+   * **The tone ramp is Heatmap's, and this is what keeps it one.** Each
+   * family's source writes the ramp, and a ramp changed in one and not the
+   * other would color the same table two ways on one page. The far end is
+   * each family's own private value, so it is compared by its place.
    */
   test("its tones are the flat heatmap's, declaration for declaration", () => {
-    const own = tones(sheet('helix-spatial-heatmap'))
+    const far = (text: string) => text.replace(/--_[\w-]+-far/g, '--_far')
+    const own = readTones(sheet('helix-spatial-heatmap')).map(far)
     expect(own).toHaveLength(12)
-    expect([...own].sort()).toEqual(readTones(sheet('helix-heatmap')).sort())
+    expect([...own].sort()).toEqual(readTones(sheet('helix-heatmap')).map(far).sort())
   })
 
   test("the sides are shaded from the top face's tone", () => {

@@ -22,6 +22,7 @@
  * the cell's row in words, described by the busiest reading and the total.
  */
 
+import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
 import {
   formatNumbers,
   heatmapCellBox,
@@ -53,6 +54,7 @@ import {
   pointsOf,
   stripSize,
 } from './heatmap-cells'
+import { RELIEF, reliefFits, reliefLook, useRelief } from './heatmap-relief'
 import { useHeatmapSelection } from './heatmap-selection'
 import { langOf } from './picker-field-kind'
 import { boundTo, given, tell } from './props'
@@ -194,6 +196,37 @@ const shownOf = (at: number, cells: readonly Cell[], placing: Placing) => {
   }
 }
 
+/** How many readings fit the strip's width as whole columns, newest kept, flat or as a relief. */
+const roomOf = (raised: boolean, count: number, width: number, lengths: Lengths, rows: number) =>
+  raised
+    ? reliefFits(count, width, rows)
+    : heatmapFits(count, width || Number.NaN, lengths.cell, lengths.gap, rows)
+
+/**
+ * What a relief's cursor reads beside a flat strip's: the prism under a
+ * finger, the drag that turns the view, and Shift with an arrow, which turns
+ * it too, but under `selection-mode="multiple"`, where it selects a range.
+ */
+const reliefWays = (relief: ReturnType<typeof useRelief>, read: Read) => ({
+  claim: (key: KeyPress): boolean =>
+    wordsIn(read('selection-mode')) !== 'multiple' && relief.claim(key),
+  pick: relief.pick,
+  turn: relief.turn,
+})
+
+/** A flat strip's cells, the cell the reading rests on drawn again over them, and its size. */
+const flatLook = (
+  shown: ReturnType<typeof shownOf>,
+  cells: readonly Cell[],
+  size: { readonly height: number; readonly width: number },
+) => ({
+  lists: { actives: shown.actives, base: [], cells },
+  measured: { 'heatmap-strip-height': size.height, 'heatmap-strip-width': size.width },
+  parts: {},
+  shown,
+  states: {},
+})
+
 /** Hosts a heatmap: its cells from its readings, its reading, and its selection. */
 export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behavior => {
   const read: Read = (name) => given(family, props, kebab(name))
@@ -204,9 +237,19 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
   const host = useWidth()
   const rows = rowCount(read('rows'))
   const all = points.readings
-  const room = heatmapFits(all.length, host.width || Number.NaN, lengths.cell, lengths.gap, rows)
+  const raised = family.name === RELIEF
+  const room = roomOf(raised, all.length, host.width, lengths, rows)
   const dropped = Math.max(0, all.length - room)
   const drawn = useMemo(() => all.slice(dropped), [all, dropped])
+  const relief = useRelief({
+    all,
+    drawn,
+    flat: read('flat') === true,
+    relief: Number(read('relief') ?? 2),
+    rows,
+    theme,
+    width: host.width,
+  })
   const tableRows = points.rows
   const keys = useMemo(() => tableRows.map((row) => row.when ?? row.label), [tableRows])
   const selection = useHeatmapSelection(family, props, use, read, {
@@ -241,7 +284,9 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
         at,
         forward,
       ),
-    pick: (point: TrackPoint) => cellUnder(point, size, lengths, rows, drawn.length),
+    ...(raised
+      ? reliefWays(relief, read)
+      : { pick: (point: TrackPoint) => cellUnder(point, size, lengths, rows, drawn.length) }),
     said,
     tell: (heard, reading) => {
       tellReading(heard, reading)
@@ -253,7 +298,11 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
   })
   useResize(family, props, use, host.width > 0 ? drawn.length : undefined)
   const at = cursor.at
-  const shown = shownOf(at, cells, { dropped, lengths, rows, tableRows })
+  const flat = shownOf(at, cells, { dropped, lengths, rows, tableRows })
+  const look = raised
+    ? reliefLook(relief, flat, at, { ...asked, chosen: selection.chosen, drawn })
+    : flatLook(flat, cells, size)
+  const shown = look.shown
   const name = wordsIn(read('aria-label')) || wordsIn(read('label')) || caption
   const named = name || wordsIn(read('strip-label'))
   const states = {
@@ -263,17 +312,17 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
     live: cursor.keyed && at >= 0 && !selection.asked ? said(at) : '',
     overview: any ? overviewOf(read, tableRows, points.column, lang, drawn.length) : '',
     selection: selection.said,
+    ...look.states,
   }
   const behavior = axisBehavior({
     flag: (one) => boundTo(use, one, 'state') ?? kebab(one),
-    lists: { actives: shown.actives, cells, tipCells: shown.tipCells },
+    lists: { ...look.lists, tipCells: shown.tipCells },
     measured: {
+      ...look.measured,
       'chart-mark-x': states.markX,
       'chart-mark-y': states.markY,
       'heatmap-cell-height': lengths.height,
       'heatmap-cell-width': lengths.cell,
-      'heatmap-strip-height': size.height,
-      'heatmap-strip-width': size.width,
     },
     name: named,
     onLayout: () => undefined,
@@ -288,6 +337,7 @@ export const useHeatmap = (family: Family, props: Props, use: MachineUse): Behav
       ...parts,
       host: { ...parts.host, view: { onLayout: host.onLayout } },
       strip: plot ?? {},
+      ...look.parts,
     },
   }
 }

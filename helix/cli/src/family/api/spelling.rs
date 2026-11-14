@@ -1142,9 +1142,12 @@ const LIGHTBOX: &[Field] = &[
 
 const HEATMAP: &[Field] = &[
     ("actives", "actives", Name),
+    ("base", "base", Name),
     ("cells", "cells", Name),
     ("drawn", "drawn", Name),
     ("empty", "empty", Name),
+    ("endX", "endX", Name),
+    ("endY", "endY", Name),
     ("error", "error", Name),
     ("footed", "footed", Name),
     ("live", "live", Name),
@@ -1161,9 +1164,12 @@ const HEATMAP: &[Field] = &[
     ("placement", "placement", Name),
     ("role", "role", Name),
     ("selection", "selection", Name),
+    ("startX", "startX", Name),
+    ("startY", "startY", Name),
     ("tipCells", "tipCells", Name),
     ("tipLabel", "tipLabel", Name),
     ("tipped", "tipped", Name),
+    ("viewBox", "viewBox", Name),
 ];
 
 const PAGINATION_SIZE: &[Field] = &[

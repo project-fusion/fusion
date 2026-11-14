@@ -5,7 +5,7 @@
  * stand every reading at one place.
  */
 
-export { type Camera, type PagePoint, shortNumber } from '../projection/projection.js'
+export { type Camera, ISOMETRIC, type PagePoint, shortNumber } from '../projection/projection.js'
 export * from './bar-picture.js'
 export * from './bar-row.js'
 export * from './bars.js'
