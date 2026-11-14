@@ -109,6 +109,13 @@ describe('Map on a phone without MapLibre Native', () => {
     expect(screen.getByText('OpenFreeMap © OpenMapTiles Data from OpenStreetMap')).toBeTruthy()
   })
 
+  test('the viewport says the map is whole once the still picture is drawn', async () => {
+    await render(<Frame />)
+    expect(screen.queryByTestId('helix-map-drawn')).toBeNull()
+    await layOut()
+    expect(screen.getByTestId('helix-map-drawn')).toBeTruthy()
+  })
+
   test("keeps the page's own credit where it wrote one", async () => {
     await render(<Frame attribution={<Text>© OpenStreetMap contributors</Text>} />)
     await layOut()
@@ -178,6 +185,8 @@ describe('Map on a phone without MapLibre Native', () => {
 /** What MapLibre Native's camera was asked to ease to, and the style its map was given. */
 const eased: unknown[] = []
 let styled: Record<string, unknown> | undefined
+/** What MapLibre Native's map calls once its tiles are drawn. */
+let finished: (() => void) | undefined
 
 /** MapLibre Native's camera, as a spec stands it in: it writes down each move. */
 const MockCamera = forwardRef((_: unknown, ref) => {
@@ -189,8 +198,13 @@ const MockCamera = forwardRef((_: unknown, ref) => {
 })
 
 /** MapLibre Native's map, as a spec stands it in: it keeps its style. */
-const MockMap = (props: { children?: ReactNode; mapStyle: Record<string, unknown> }) => {
+const MockMap = (props: {
+  children?: ReactNode
+  mapStyle: Record<string, unknown>
+  onDidFinishRenderingMapFully?: () => void
+}) => {
   styled = props.mapStyle
+  finished = props.onDidFinishRenderingMapFully
   return createElement('MLRNMapView', null, props.children)
 }
 
@@ -255,6 +269,14 @@ describe('Map on a phone with MapLibre Native', () => {
     await press('Zoom in')
     expect(eased).toHaveLength(1)
     expect(eased[0]).toMatchObject({ duration: 200 })
+  })
+
+  test('the viewport says the map is whole only once MapLibre has drawn it fully', async () => {
+    await render(<Frame />)
+    await layOut()
+    expect(screen.queryByTestId('helix-map-drawn')).toBeNull()
+    await act(async () => finished?.())
+    expect(screen.getByTestId('helix-map-drawn')).toBeTruthy()
   })
 })
 

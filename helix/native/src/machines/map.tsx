@@ -16,7 +16,7 @@
 import { renderer } from '@fusion.dev/helix-core/capabilities/renderer'
 import { composedStyle, type MapView, mapLibreStyle, screenOf } from '@fusion.dev/helix-core/map'
 import { createContext, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { Text, View } from 'react-native'
+import { type LayoutChangeEvent, Text, View } from 'react-native'
 import { loadMapLibre } from '../capabilities/renderer'
 import type { MachineUse } from '../ir.generated'
 import { useInheritedText } from '../render/around'
@@ -71,6 +71,19 @@ const Credit = () => (
     {MAP_CREDIT}
   </Text>
 )
+
+/** The viewport's id once the map in it is whole, which a device run's screens flow waits for. */
+export const MAP_DRAWN = 'helix-map-drawn'
+
+/**
+ * The viewport, measured for the view. **It says once the map is whole**,
+ * MapLibre Native's tiles drawn or the still picture, by the id a device
+ * run waits for, since a map waiting on its tiles stands as still as a
+ * drawn one. It stays its own view so the id reaches the phone's tree.
+ */
+const viewportOf = (ready: boolean, measure: (event: LayoutChangeEvent) => void): PartBinding => ({
+  view: { collapsable: false, onLayout: measure, testID: ready ? MAP_DRAWN : undefined },
+})
 
 /** A press binding: what the press does. */
 const pressed = (go: () => void): PartBinding => ({ view: { onPress: go } })
@@ -221,7 +234,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       'rotate-left': pressed(() => moves.turn({ by: -ROTATE_STEP })),
       'rotate-right': pressed(() => moves.turn({ by: ROTATE_STEP })),
       tilt: pressed(() => moves.tilt(Math.round(pitch) > 0 ? 0 : TILTED)),
-      viewport: { view: { onLayout: measure } },
+      viewport: viewportOf(ready, measure),
       'zoom-in': pressed(() => moves.zoom(1)),
       'zoom-out': pressed(() => moves.zoom(-1)),
     },

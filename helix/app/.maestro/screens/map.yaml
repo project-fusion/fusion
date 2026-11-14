@@ -3,8 +3,12 @@
 #
 # The flow waits for the title of each screen, which no example before it
 # draws, and which the screen draws whether MapLibre Native draws the map
-# or the frame draws its still picture, then for the screen to stand still,
-# since MapLibre Native draws its style and tiles after the screen is up.
+# or the frame draws its still picture, then for the screen to come to rest
+# so the screen before it is gone, then for the map to say it is whole,
+# since MapLibre Native draws its style and tiles after the screen is up and
+# a map waiting on its tiles stands as still as a drawn one, then for the
+# screen to stand still. A map whose tiles never come is pictured as it
+# stands.
 appId: dev.fusion.helix.app
 name: "Screens: Map"
 ---
@@ -17,11 +21,25 @@ name: "Screens: Map"
     timeout: 30000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-preview-${MODE}-${SIZE}
 - openLink: helix://map/areas/preview
 - extendedWaitUntil:
     visible: 'Areas'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-areas-${MODE}-${SIZE}
@@ -31,11 +49,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-behind-content-${MODE}-${SIZE}
 - openLink: helix://map/buildings/preview
 - extendedWaitUntil:
     visible: 'Buildings'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-buildings-${MODE}-${SIZE}
@@ -45,11 +77,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-clusters-${MODE}-${SIZE}
 - openLink: helix://map/controls-and-placement/preview
 - extendedWaitUntil:
     visible: 'Controls and placement'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-controls-and-placement-${MODE}-${SIZE}
@@ -59,11 +105,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-events-${MODE}-${SIZE}
 - openLink: helix://map/framed/preview
 - extendedWaitUntil:
     visible: 'Framed'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-framed-${MODE}-${SIZE}
@@ -73,11 +133,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-globe-${MODE}-${SIZE}
 - openLink: helix://map/points/preview
 - extendedWaitUntil:
     visible: 'Points'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-points-${MODE}-${SIZE}
@@ -87,11 +161,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-route-with-stops-${MODE}-${SIZE}
 - openLink: helix://map/satellite/preview
 - extendedWaitUntil:
     visible: 'Satellite'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-satellite-${MODE}-${SIZE}
@@ -101,6 +189,13 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-terrain-${MODE}-${SIZE}
 - openLink: helix://map/weather/preview
 - extendedWaitUntil:
@@ -108,11 +203,25 @@ name: "Screens: Map"
     timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
 - takeScreenshot: map-weather-${MODE}-${SIZE}
 - openLink: helix://map/without-controls/preview
 - extendedWaitUntil:
     visible: 'Without controls'
     timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: helix-map-drawn
+    timeout: 20000
+    optional: true
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: map-without-controls-${MODE}-${SIZE}
