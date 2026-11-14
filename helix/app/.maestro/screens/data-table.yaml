@@ -53,6 +53,9 @@ name: "Screens: Data Table"
     timeout: 20000
 - takeScreenshot: data-table-column-menu-descending-${MODE}-${SIZE}
 - openLink: helix://data-table/nested-rows/preview
+- extendedWaitUntil:
+    visible: 'Nested rows'
+    timeout: 15000
 - waitForAnimationToEnd:
-    timeout: 5000
+    timeout: 15000
 - takeScreenshot: data-table-nested-rows-${MODE}-${SIZE}
