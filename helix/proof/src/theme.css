@@ -5,7 +5,7 @@
   --helix-color-foreground: light-dark(#000000, #ffffff);
   --helix-color-foreground-muted: light-dark(#525252, #b8b8b8);
   --helix-color-surface-raised: light-dark(#f5f5f5, #181818);
-  --helix-color-surface-overlay: light-dark(#ffffff, #1e1e1e);
+  --helix-color-surface-overlay: light-dark(#ffffff, #181818);
   --helix-color-surface-sunken: light-dark(#ebebeb, #121212);
   --helix-color-primary: light-dark(#3451b2, #5d80e5);
   --helix-color-foreground-on-primary: #f8f8f8;

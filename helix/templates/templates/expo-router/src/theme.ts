@@ -47,7 +47,7 @@ export const theme = {
     'color-success-surface-hover': '#007340',
     'color-surface': '#0c0c0c',
     'color-surface-inverse': '#eeeeee',
-    'color-surface-overlay': '#1e1e1e',
+    'color-surface-overlay': '#181818',
     'color-surface-raised': '#181818',
     'color-surface-sunken': '#121212',
     'color-warning': '#b47900',
