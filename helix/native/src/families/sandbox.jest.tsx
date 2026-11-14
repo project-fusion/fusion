@@ -142,6 +142,47 @@ describe('the generated Sandbox Console', () => {
     await act(async () => fireEvent.press(screen.getByText('Clear')))
     expect(screen.queryByText('Again')).toBeNull()
   })
+
+  test('level hides the quieter lines, and the filter shows the level held', async () => {
+    const ref = createRef<SandboxConsoleHandle>()
+    await draw(<Console controls level="warn" ref={ref} />)
+    await act(async () => ref.current?.write({ level: 'log', text: 'Plain' }))
+    await act(async () => ref.current?.write({ level: 'error', text: 'Broke' }))
+    expect(screen.queryByText('Plain')).toBeNull()
+    expect(screen.getByText('Broke')).toBeTruthy()
+    expect(screen.getByText('Warnings and errors')).toBeTruthy()
+    expect(screen.getByLabelText(/^Levels shown/)).toBeTruthy()
+  })
+
+  test('a level chosen in the filter asks first, and a refusal keeps the level', async () => {
+    const ref = createRef<SandboxConsoleHandle>()
+    const asked = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
+    const changed = jest.fn()
+    await draw(
+      <Console
+        controls
+        levelWords={{ error: 'Only errors' }}
+        onBeforeChange={asked}
+        onChange={changed}
+        ref={ref}
+      />,
+    )
+    await act(async () => ref.current?.write({ level: 'log', text: 'Plain' }))
+    await act(async () => ref.current?.write({ level: 'error', text: 'Broke' }))
+    await act(async () => fireEvent.press(screen.getByText('All levels')))
+    const choose = () => act(async () => fireEvent.press(screen.getByText('Only errors')))
+    await choose()
+    expect(asked).toHaveBeenCalledTimes(1)
+    expect(asked.mock.calls[0]?.[0]).toMatchObject({ detail: { value: 'error' } })
+    expect(changed).not.toHaveBeenCalled()
+    expect(screen.getByText('Plain')).toBeTruthy()
+    asked.mockImplementation(() => undefined)
+    await choose()
+    expect(changed).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('Plain')).toBeNull()
+    expect(screen.getByText('Broke')).toBeTruthy()
+    expect(screen.queryByText('Info and above')).toBeNull()
+  })
 })
 
 describe('the generated Sandbox Status Bar', () => {

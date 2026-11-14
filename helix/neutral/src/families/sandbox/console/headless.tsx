@@ -22,15 +22,12 @@ import {
  *
  * **`level` hides the quieter lines**, and `controls` draws a filter for it
  * with a button that clears the log. A change of level asks with
- * `before-change` and tells with `change`.
+ * `before-change` and tells with `change`. The filter is a `<select>` on the
+ * web and Helix's Select on a phone, with the same levels in the same order.
  *
  * **What a screen reader hears.** The newest five lines that differ from the
  * one before, each after its level's word from `spoken-words`, so a burst of
  * output is not read as a backlog. The log itself is quiet.
- *
- * **The web's**: the level filter, a `<select>` beside the clear button, since
- * a phone's sandbox is read only and its console shows the level the page
- * sets.
  *
  * **Held to `helix-sandbox-console`.** `helix system check` compares the
  * props, the events, the states, and the parts with what the manifest says
@@ -69,6 +66,11 @@ export default headless('sandbox-console', {
             label={props.levelLabel}
             part="filter"
             platform="web"
+          />
+          <Wrap
+            draws="select"
+            part="level-filter"
+            platform="native"
           />
           <Wrap
             draws="button"

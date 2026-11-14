@@ -21,7 +21,8 @@ Device Screen pictures another device in a frame on a web page, and Sandbox
 Preview runs a page of HTML, CSS and JavaScript a phone has no document for.
 A sandbox on a phone is read only: its panes stack as the web stacks them in
 a narrow window, its file tabs choose the pane shown, and its source is text a
-reader selects and copies, with no editor.
+reader selects and copies, with no editor. Its console's level filter is a
+Select, with the web's levels, words and events.
 
 ```sh
 npx expo install @fusion.dev/helix react-native-gesture-handler react-native-reanimated react-native-worklets

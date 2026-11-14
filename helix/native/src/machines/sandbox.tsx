@@ -10,6 +10,7 @@
 import type { LogLine } from '@fusion.dev/helix-core/log'
 import {
   CONSOLE_HEARD,
+  CONSOLE_LEVELS,
   CONSOLE_LIMIT,
   type ConsoleLevel,
   caretWords,
@@ -159,9 +160,50 @@ const spokenOf = (read: Read, level: ConsoleLevel): string => {
   return wordsIn(own[level] ?? fallback[level])
 }
 
-/** Hosts a console: the lines `write` gives it, `clear`, and what a reader hears. */
-const useConsole = (props: Props, use: MachineUse, read: Read): Behavior => {
+/** The words a level's choice in the filter reads, from `level-words`. */
+const LEVEL_WORDS: Readonly<Record<ConsoleLevel, string>> = {
+  error: 'Errors',
+  info: 'Info and above',
+  log: 'All levels',
+  warn: 'Warnings and errors',
+}
+
+/** The filter's options, a choice a level, in the order the web lists them. */
+const levelOptions = (read: Read) => {
+  const words = read('level-words')
+  const own = typeof words === 'object' && words !== null ? (words as Record<string, unknown>) : {}
+  return CONSOLE_LEVELS.map((level) => ({
+    key: level,
+    label: wordsIn(own[level]) || LEVEL_WORDS[level],
+    value: level,
+  }))
+}
+
+/** The level a prop names, or `undefined` for every line. */
+const levelIn = (value: unknown): ConsoleLevel | undefined =>
+  value === 'error' || value === 'info' || value === 'warn' ? value : undefined
+
+/**
+ * Hosts a console: the lines `write` gives it, `clear`, what a reader hears,
+ * and the level its filter holds, which follows `level` and moves through a
+ * request a handler may refuse, as the web's `<select>`.
+ */
+const useConsole = (family: Family, props: Props, use: MachineUse, read: Read): Behavior => {
   const [kept, setKept] = useState<Kept>(NONE)
+  const [level, setLevel] = useFollowed(levelIn(read('level')))
+  const request = useRequest(family, props, use)
+  const onBeforeChange = (event: {
+    readonly detail?: { readonly value?: string }
+    preventDefault?: () => void
+  }) => {
+    /* The Select holds what this element says, and closes only on a level taken. */
+    const next = event.detail?.value ?? 'log'
+    if (next !== (level ?? 'log') && request('onBeforeChange', 'onChange', { value: next })) {
+      setLevel(levelIn(next))
+    } else {
+      event.preventDefault?.()
+    }
+  }
   useImperativeHandle(
     props.ref as Ref<SandboxConsoleHandle> | undefined,
     (): SandboxConsoleHandle => ({
@@ -187,7 +229,15 @@ const useConsole = (props: Props, use: MachineUse, read: Read): Behavior => {
     parts: {
       clear: { view: { onPress: () => setKept(NONE) } },
       host: { states: statesOf(use, { heard: kept.heard.at(-1) ?? '', named, said }) },
-      output: { view: { lines: kept.lines } },
+      'level-filter': {
+        view: {
+          ariaLabel: wordsIn(read('level-label')),
+          items: levelOptions(read),
+          onBeforeChange,
+          value: level ?? 'log',
+        },
+      },
+      output: { view: { level, lines: kept.lines } },
     },
   }
 }
@@ -231,7 +281,7 @@ export const sandboxHook = (family: Family): SandboxHook => {
     case 'sandbox-source':
       return (_, props, use) => useSource(use, reader(family, props))
     case 'sandbox-console':
-      return (_, props, use) => useConsole(props, use, reader(family, props))
+      return (_, props, use) => useConsole(family, props, use, reader(family, props))
     case 'sandbox-status-bar':
       return (_, props, use) => useStatusBar(use, reader(family, props))
     default:
