@@ -8,6 +8,7 @@ use super::eval::{Evaluation, Fault, Mode, Value};
 use super::expr::{Expr, Kind, Math, Op, Quantity, Shape};
 use super::print;
 use super::read::Reader;
+use super::reading::refused_reference;
 
 /// A token's value as it is written: builder calls, as `tokens.ts` writes
 /// them, or CSS, as a stylesheet does.
@@ -19,13 +20,13 @@ pub enum Written {
 
 /// A value ready to read: builder calls already parsed, or CSS.
 #[derive(Clone, Debug)]
-enum Source {
+pub(super) enum Source {
     Built(Built),
     Css(String),
 }
 
 impl Source {
-    fn read(&self, reader: &mut Reader, shape: Shape) -> Result<Expr, String> {
+    pub(super) fn read(&self, reader: &mut Reader, shape: Shape) -> Result<Expr, String> {
         match self {
             Self::Built(built) => reader.read_built(built, shape),
             Self::Css(text) => reader.read(text, shape),
@@ -33,7 +34,7 @@ impl Source {
     }
 
     /// Whether this is the CSS `initial`, the guaranteed-invalid value.
-    fn initial(&self) -> bool {
+    pub(super) fn initial(&self) -> bool {
         matches!(self, Self::Css(text) if text.trim() == "initial")
     }
 }
@@ -127,6 +128,8 @@ impl Registry {
         for (name, written) in tokens {
             let source = match written {
                 Written::Builder(text) => match builder::parse(text) {
+                    // A string is CSS, as a reference to a property set per mode.
+                    Ok(Built::Text(css)) => Source::Css(css),
                     Ok(built) => Source::Built(built),
                     Err(why) => {
                         refusals.push(format!("`--helix-{name}`: {why}"));
@@ -143,7 +146,7 @@ impl Registry {
         let mut typed = BTreeMap::new();
         let mut read = Vec::new();
         for (name, source) in &entries {
-            match first_reading(&mut reader, name, source) {
+            match first_reading(&mut reader, &sources, name, source) {
                 Ok((expr, shape, expected)) => {
                     let key = (format!("--helix-{name}"), shape);
                     typed.insert(key, Declared::Typed(expr.clone()));
@@ -244,7 +247,7 @@ impl Registry {
     /// Whether a quantity is a number or a length, through its references.
     fn dimension(&self, quantity: &Quantity, trail: &mut Vec<String>) -> Result<Kind, String> {
         match quantity {
-            Quantity::Calc(math) => self.arithmetic(math, trail),
+            Quantity::Calc(math) | Quantity::Clamp(math) => self.arithmetic(math, trail),
             Quantity::Length(..) => Ok(Kind::Length),
             Quantity::Number(_) => Ok(Kind::Number),
             Quantity::Round(value, _) | Quantity::RoundUp(value, _) => self.dimension(value, trail),
@@ -328,9 +331,11 @@ fn reach(
     }
 }
 
-/// A token read as the first shape its category admits that reads it.
+/// A token read as the first shape its category admits that reads it, its
+/// references too: `var(--_helix-material-scrim-lift)` is what that holds.
 fn first_reading(
     reader: &mut Reader,
+    sources: &BTreeMap<String, Source>,
     name: &str,
     source: &Source,
 ) -> Result<(Expr, Shape, Option<Kind>), String> {
@@ -340,8 +345,15 @@ fn first_reading(
     })?;
     let mut why = Vec::new();
     for shape in shapes {
+        let mark = reader.references.len();
         match source.read(reader, *shape) {
-            Ok(expr) => return Ok((expr, *shape, expected)),
+            Ok(expr) => match refused_reference(reader, sources, mark) {
+                Some(sentence) if shapes.len() > 1 => {
+                    reader.references.truncate(mark);
+                    why.push(sentence);
+                }
+                _ => return Ok((expr, *shape, expected)),
+            },
             Err(sentence) => why.push(sentence),
         }
     }

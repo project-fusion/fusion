@@ -292,3 +292,49 @@ fn a_sign_starts_a_number_a_name_or_an_operator() {
     );
     assert!(syntax::parse("calc(1rem").is_err());
 }
+
+#[test]
+fn a_token_that_names_a_property_set_per_mode_is_what_the_property_holds() {
+    let declared = [(
+        "--_helix-material-scrim-lift".to_owned(),
+        "calc(1 / 0.6)".to_owned(),
+    )];
+    let tokens = [(
+        "material-scrim-lift".to_owned(),
+        Written::Builder("'var(--_helix-material-scrim-lift)'".to_owned()),
+    )];
+    let registry = Registry::written(&declared, &tokens).expect("the reference is typed");
+    let token = &registry.tokens()[0];
+    assert_eq!(token.kind, Kind::Number);
+    assert_eq!(token.css, "var(--_helix-material-scrim-lift)");
+    let Native::Number(lift) = value(&registry, "material-scrim-lift", Mode::Light) else {
+        panic!("the lift is a number");
+    };
+    assert!((lift - 1.0 / 0.6).abs() < 1e-9);
+}
+
+#[test]
+fn a_relative_color_in_srgb_or_xyz_states_its_alpha() {
+    let declared = [
+        ("--_seed".to_owned(), "#3366cc".to_owned()),
+        (
+            "--_source".to_owned(),
+            "color(from oklch(from var(--_seed) l c h / 0.5) srgb clamp(0, r, 1) clamp(0, g, 1) clamp(0, b, 1) / alpha)"
+                .to_owned(),
+        ),
+        (
+            "--_light".to_owned(),
+            "clamp(0, (alpha - 0.75) * 1000, 1)".to_owned(),
+        ),
+    ];
+    let tokens = [(
+        "color-fill".to_owned(),
+        "color(from var(--_source) xyz-d65 calc(x * (0.5 + var(--_light))) calc(y * (0.5 + var(--_light))) calc(z * (0.5 + var(--_light))) / 1)"
+            .to_owned(),
+    )];
+    let registry = Registry::new(&declared, &tokens).expect("the relative colors are typed");
+    assert_eq!(registry.tokens()[0].css, tokens[0].1);
+    /* The source's alpha is 0.5, so the step reads 0, the fill is the seed at
+    half its luminance, and the `/ 1` makes it opaque again. */
+    assert_eq!(value(&registry, "color-fill", Mode::Light), text("#234995"));
+}

@@ -95,11 +95,23 @@ pub enum Weight {
     Second(f64),
 }
 
-/// `color(from <origin> xyz-d65 <x> <y> <z>)`.
+/// `color(from <origin> xyz-d65 <x> <y> <z>)`, or `srgb <r> <g> <b>`,
+/// with an alpha after a `/` where one is written.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Xyz {
     pub origin: Color,
+    pub space: Gamut,
     pub channels: Vec<Channel>,
+    pub alpha: Option<Channel>,
+}
+
+/// The space a relative `color()` reads its origin in.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Gamut {
+    /// CIE XYZ, D65, where a fill is scaled in luminance.
+    Xyz,
+    /// Gamma-encoded sRGB, where a color is clipped into the gamut.
+    Srgb,
 }
 
 /// A function of arithmetic that `calc()` and a component can hold.
@@ -119,6 +131,8 @@ pub struct Oklch {
     pub origin: Option<Color>,
     /// Three once every spread reference is substituted.
     pub channels: Vec<Channel>,
+    /// The alpha after a `/`, where one is written.
+    pub alpha: Option<Channel>,
 }
 
 /// One component of `oklch()`.
@@ -146,12 +160,21 @@ pub enum Component {
     X,
     Y,
     Z,
+    /// The origin's sRGB components, in `color(from ... srgb ...)`.
+    Red,
+    Green,
+    Blue,
+    /// The origin's alpha.
+    Alpha,
 }
 
 /// A number or a length, outside `calc()` or as a whole `calc()`.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Quantity {
     Calc(Math),
+    /// `clamp(<min>, <value>, <max>)` written alone, outside `calc()`, as a
+    /// step a relative color reads its origin's components through.
+    Clamp(Math),
     Length(f64, Unit),
     Number(f64),
     /// The largest of two or more quantities, `max(...)`.

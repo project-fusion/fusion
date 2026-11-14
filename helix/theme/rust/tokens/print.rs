@@ -7,8 +7,8 @@
 //! form is held to what `tokens.ts` writes.
 
 use super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Layer, Math,
-    Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Gamut, Layer,
+    Math, Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
 };
 use super::syntax::number_text;
 
@@ -92,9 +92,14 @@ fn color(value: &Color) -> String {
         Color::Transparent => "transparent".to_owned(),
         Color::Var(reference) => var(reference, color),
         Color::Xyz(xyz) => format!(
-            "color(from {} xyz-d65 {})",
+            "color(from {} {} {}{})",
             color(&xyz.origin),
-            list(&xyz.channels, channel, " ")
+            match xyz.space {
+                Gamut::Xyz => "xyz-d65",
+                Gamut::Srgb => "srgb",
+            },
+            list(&xyz.channels, channel, " "),
+            alpha(xyz.alpha.as_ref())
         ),
     }
 }
@@ -109,11 +114,16 @@ fn func(name: Func) -> &'static str {
 }
 
 fn relative(oklch: &Oklch) -> String {
-    let channels = list(&oklch.channels, channel, " ");
+    let channels = list(&oklch.channels, channel, " ") + &alpha(oklch.alpha.as_ref());
     match &oklch.origin {
         Some(origin) => format!("oklch(from {} {channels})", color(origin)),
         None => format!("oklch({channels})"),
     }
+}
+
+/// ` / <alpha>`, where an alpha is written.
+fn alpha(value: Option<&Channel>) -> String {
+    value.map_or_else(String::new, |one| format!(" / {}", channel(one)))
 }
 
 fn channel(value: &Channel) -> String {
@@ -145,6 +155,10 @@ fn component(name: Component) -> &'static str {
         Component::X => "x",
         Component::Y => "y",
         Component::Z => "z",
+        Component::Red => "r",
+        Component::Green => "g",
+        Component::Blue => "b",
+        Component::Alpha => "alpha",
     }
 }
 
@@ -215,6 +229,7 @@ fn arithmetic(math: &Math) -> String {
 fn quantity(value: &Quantity) -> String {
     match value {
         Quantity::Calc(math) => format!("calc({})", arithmetic(math)),
+        Quantity::Clamp(math) => arithmetic(math),
         Quantity::Length(number, length) => format!("{}{}", number_text(*number), unit(*length)),
         Quantity::Number(number) => number_text(*number),
         Quantity::Max(values) => format!("max({})", list(values, quantity, ", ")),

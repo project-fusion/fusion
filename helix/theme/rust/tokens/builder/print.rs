@@ -7,8 +7,8 @@
 //! spelling a reader of the builders expects.
 
 use super::super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Layer, Math,
-    Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Gamut, Layer,
+    Math, Oklch, Op, Quantity, Shadow, Space, Time, Unit, Var, Weight,
 };
 use super::Built;
 
@@ -90,9 +90,13 @@ fn color(value: &Color) -> Built {
         Color::Transparent => Built::Name("transparent".to_owned()),
         Color::Var(reference) => var(reference, color),
         Color::Xyz(xyz) => call(
-            "xyz",
+            match xyz.space {
+                Gamut::Xyz => "xyz",
+                Gamut::Srgb => "srgb",
+            },
             std::iter::once(color(&xyz.origin))
                 .chain(xyz.channels.iter().map(channel))
+                .chain(xyz.alpha.iter().map(channel))
                 .collect(),
         ),
     }
@@ -140,6 +144,10 @@ fn component(name: Component) -> Built {
             Component::X => "x",
             Component::Y => "y",
             Component::Z => "z",
+            Component::Red => "r",
+            Component::Green => "g",
+            Component::Blue => "b",
+            Component::Alpha => "alpha",
         }
         .to_owned(),
     )
@@ -176,7 +184,7 @@ fn arithmetic(math: &Math) -> Built {
 
 fn quantity(value: &Quantity) -> Built {
     match value {
-        Quantity::Calc(math) => arithmetic(math),
+        Quantity::Calc(math) | Quantity::Clamp(math) => arithmetic(math),
         Quantity::Length(number, unit) => length(*number, *unit),
         Quantity::Number(number) => Built::Number(*number),
         Quantity::Max(values) => call("max", values.iter().map(quantity).collect()),
