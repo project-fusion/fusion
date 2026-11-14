@@ -1171,6 +1171,33 @@ export interface GraphChoice {
   readonly zooms?: string
 }
 
+/** The names of a frame around a map, or a place on one, each read as `map.x`. */
+export interface MapChoice {
+  readonly compassed?: string
+  readonly entries?: string
+  readonly layered?: string
+  readonly layers?: string
+  readonly named?: string
+  readonly onActivate?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly onMapPan?: string
+  readonly onMapReady?: string
+  readonly onMapRotate?: string
+  readonly onMapTilt?: string
+  readonly onMapZoom?: string
+  readonly open?: string
+  readonly pans?: string
+  readonly places?: string
+  readonly rotates?: string
+  readonly said?: string
+  readonly tilted?: string
+  readonly tilts?: string
+  readonly typed?: string
+  readonly types?: string
+  readonly zooms?: string
+}
+
 /** The names of a board of cards, or a card on one, each read as `canvas.x`. */
 export interface CanvasChoice {
   readonly drafting?: string

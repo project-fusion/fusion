@@ -68,6 +68,9 @@ followTheme(map, frame, style)
 - The renderer's own keyboard handling and zoom buttons are turned off, so the
   frame's controls are the only ones.
 - The renderer's credit is shown in the frame's footer.
+- The map opens at the frame's `view`, written as `lat,lng,zoom` with the
+  tilt and the turn in degrees after them where you want them, such as
+  `view="55.95,-3.19,13"`.
 - `connection.fit()` frames every place on the map.
 - `connection.disconnect()` puts back everything `connectMap` changed.
 

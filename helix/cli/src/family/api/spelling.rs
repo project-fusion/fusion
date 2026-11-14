@@ -1163,6 +1163,32 @@ const GRAPH: &[Field] = &[
     ("zooms", "zooms", Name),
 ];
 
+const MAP: &[Field] = &[
+    ("compassed", "compassed", Name),
+    ("entries", "entries", Name),
+    ("layered", "layered", Name),
+    ("layers", "layers", Name),
+    ("named", "named", Name),
+    ("onActivate", "onActivate", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onChange", "onChange", Name),
+    ("onMapPan", "onMapPan", Name),
+    ("onMapReady", "onMapReady", Name),
+    ("onMapRotate", "onMapRotate", Name),
+    ("onMapTilt", "onMapTilt", Name),
+    ("onMapZoom", "onMapZoom", Name),
+    ("open", "open", Name),
+    ("pans", "pans", Name),
+    ("places", "places", Name),
+    ("rotates", "rotates", Name),
+    ("said", "said", Name),
+    ("tilted", "tilted", Name),
+    ("tilts", "tilts", Name),
+    ("typed", "typed", Name),
+    ("types", "types", Name),
+    ("zooms", "zooms", Name),
+];
+
 const CANVAS: &[Field] = &[
     ("drafting", "drafting", Name),
     ("groupName", "groupName", Name),
@@ -1697,6 +1723,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("scatterChart", "scatterChart", SCATTER_CHART),
     ("graph", "graph", GRAPH),
     ("canvas", "canvas", CANVAS),
+    ("map", "map", MAP),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
     (

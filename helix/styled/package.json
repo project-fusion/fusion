@@ -498,6 +498,14 @@
       "types": "./dist/log/index.d.ts",
       "default": "./dist/log/index.js"
     },
+    "./map": {
+      "react-native": {
+        "types": "./dist/map/index.native.d.ts",
+        "default": "./dist/map/index.native.js"
+      },
+      "types": "./dist/map/index.d.ts",
+      "default": "./dist/map/index.js"
+    },
     "./megamenu": {
       "react-native": {
         "types": "./dist/megamenu/index.native.d.ts",

@@ -614,6 +614,24 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'viewBox'
     | 'zooms'
   >
+  /** What a frame around a map computes for its parts: its controls, its layers, and what it says; and its places'. */
+  readonly map: Computes<
+    | 'compassed'
+    | 'entries'
+    | 'layered'
+    | 'layers'
+    | 'named'
+    | 'open'
+    | 'pans'
+    | 'places'
+    | 'rotates'
+    | 'said'
+    | 'tilted'
+    | 'tilts'
+    | 'typed'
+    | 'types'
+    | 'zooms'
+  >
   /** What a board of cards, or a card on one, computes for its parts: the lines, the labels, the minimap, the controls, and the names. */
   readonly canvas: Computes<
     | 'drafting'

@@ -1,7 +1,0 @@
-/* Nothing drawn here. The renderer draws the lines, and the connector reads
-   their color from this element: `color-contour`, the brown contours are
-   printed in. */
-:host {
-  color: var(--map-contours-color, var(--helix-color-contour));
-  display: none;
-}

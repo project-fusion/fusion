@@ -130,6 +130,7 @@ import {
 } from '../video-playlist/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
 import { ButtonGroup, List, Steps, Tabs, TagGroup } from './held.native'
+import { MAP_TAGS } from './map-tags.native'
 import {
   BulletList,
   Caption,
@@ -279,6 +280,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-log': HelixLog,
   'helix-log-group': HelixLogGroup,
   'helix-log-line': HelixLogLine,
+  ...MAP_TAGS,
   'helix-megamenu': HelixMegamenu,
   'helix-megamenu-group': HelixMegamenuGroup,
   'helix-megamenu-item': HelixMegamenuItem,

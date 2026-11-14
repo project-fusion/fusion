@@ -124,6 +124,38 @@ describe('connectMap', () => {
     ])
   })
 
+  test("opens at the frame's view, its place and zoom, then its turn and tilt, at once", async () => {
+    const host = await frame()
+    host.setAttribute('view', '55.95,-3.19,13,40,-20')
+    await host.updateComplete
+    const { driver, seen } = recorder()
+    driver.show = ({ lat, lng, zoom }, motion) => {
+      seen.calls.push(`show ${lat} ${lng} ${zoom} ${paced(motion)}`)
+    }
+    driver.rotate = ({ to }, motion) => {
+      seen.calls.push(`rotate ${to} ${paced(motion)}`)
+    }
+    driver.tilt = ({ to }, motion) => {
+      seen.calls.push(`tilt ${to} ${paced(motion)}`)
+    }
+    connectMap(host, driver)
+    expect(seen.calls.filter((call) => !call.includes('zoom') || call.startsWith('show'))).toEqual([
+      'show 55.95 -3.19 13 jump',
+      'rotate -20 jump',
+      'tilt 40 jump',
+    ])
+  })
+
+  test('without a view, moves the renderer nowhere as it connects', async () => {
+    const host = await frame()
+    const { driver, seen } = recorder()
+    driver.show = () => {
+      seen.calls.push('show')
+    }
+    connectMap(host, driver)
+    expect(seen.calls).toEqual(['replace zoom'])
+  })
+
   test('on a right-to-left page, start is right and end is left', async () => {
     const host = await frame()
     host.style.direction = 'rtl'

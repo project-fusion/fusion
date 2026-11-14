@@ -1,0 +1,87 @@
+# Map, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it
+# draws, and which the screen draws whether MapLibre Native draws the map
+# or the frame draws its still picture.
+appId: dev.fusion.helix.app
+name: "Screens: Map"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://map/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: map-preview-${MODE}-${SIZE}
+- openLink: helix://map/areas/preview
+- extendedWaitUntil:
+    visible: 'Areas'
+    timeout: 15000
+- takeScreenshot: map-areas-${MODE}-${SIZE}
+- openLink: helix://map/behind-content/preview
+- extendedWaitUntil:
+    visible: 'Behind content'
+    timeout: 15000
+- takeScreenshot: map-behind-content-${MODE}-${SIZE}
+- openLink: helix://map/buildings/preview
+- extendedWaitUntil:
+    visible: 'Buildings'
+    timeout: 15000
+- takeScreenshot: map-buildings-${MODE}-${SIZE}
+- openLink: helix://map/clusters/preview
+- extendedWaitUntil:
+    visible: 'Clusters'
+    timeout: 15000
+- takeScreenshot: map-clusters-${MODE}-${SIZE}
+- openLink: helix://map/controls-and-placement/preview
+- extendedWaitUntil:
+    visible: 'Controls and placement'
+    timeout: 15000
+- takeScreenshot: map-controls-and-placement-${MODE}-${SIZE}
+- openLink: helix://map/events/preview
+- extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- takeScreenshot: map-events-${MODE}-${SIZE}
+- openLink: helix://map/framed/preview
+- extendedWaitUntil:
+    visible: 'Framed'
+    timeout: 15000
+- takeScreenshot: map-framed-${MODE}-${SIZE}
+- openLink: helix://map/globe/preview
+- extendedWaitUntil:
+    visible: 'Globe'
+    timeout: 15000
+- takeScreenshot: map-globe-${MODE}-${SIZE}
+- openLink: helix://map/points/preview
+- extendedWaitUntil:
+    visible: 'Points'
+    timeout: 15000
+- takeScreenshot: map-points-${MODE}-${SIZE}
+- openLink: helix://map/route-with-stops/preview
+- extendedWaitUntil:
+    visible: 'Route with stops'
+    timeout: 15000
+- takeScreenshot: map-route-with-stops-${MODE}-${SIZE}
+- openLink: helix://map/satellite/preview
+- extendedWaitUntil:
+    visible: 'Satellite'
+    timeout: 15000
+- takeScreenshot: map-satellite-${MODE}-${SIZE}
+- openLink: helix://map/terrain/preview
+- extendedWaitUntil:
+    visible: 'Terrain'
+    timeout: 15000
+- takeScreenshot: map-terrain-${MODE}-${SIZE}
+- openLink: helix://map/weather/preview
+- extendedWaitUntil:
+    visible: 'Weather'
+    timeout: 15000
+- takeScreenshot: map-weather-${MODE}-${SIZE}
+- openLink: helix://map/without-controls/preview
+- extendedWaitUntil:
+    visible: 'Without controls'
+    timeout: 15000
+- takeScreenshot: map-without-controls-${MODE}-${SIZE}

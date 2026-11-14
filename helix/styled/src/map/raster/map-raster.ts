@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapRaster } from '@fusion.dev/helix-headless/map/raster'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './map-raster.css.js'
+import { styles } from './map-raster.generated.css.js'
 
 /**
  * @summary Map tiles laid over a map, such as weather radar.

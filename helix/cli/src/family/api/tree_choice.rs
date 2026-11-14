@@ -881,6 +881,42 @@ pub const CANVAS_COMPUTED: &[&str] = &[
     "zooms",
 ];
 
+/// What a frame around a map sends: a marker or a place pressed, a map type asked and
+/// chosen, the view moved by a control, and the map drawn whole. Its props it reads by
+/// their own names.
+pub const MAP: &[(&str, Names)] = &[
+    ("onActivate", Names::Event),
+    ("onBeforeChange", Names::Event),
+    ("onChange", Names::Event),
+    ("onMapPan", Names::Event),
+    ("onMapReady", Names::Event),
+    ("onMapRotate", Names::Event),
+    ("onMapTilt", Names::Event),
+    ("onMapZoom", Names::Event),
+];
+
+/// What a frame around a map computes for its parts, each read as `map.x`: its name, the
+/// controls it draws, the layers list and menu, the map types, and what a screen reader
+/// hears; and for a marker, a position, or a points layer on one, its name, what it says,
+/// and the places in view.
+pub const MAP_COMPUTED: &[&str] = &[
+    "compassed",
+    "entries",
+    "layered",
+    "layers",
+    "named",
+    "open",
+    "pans",
+    "places",
+    "rotates",
+    "said",
+    "tilted",
+    "tilts",
+    "typed",
+    "types",
+    "zooms",
+];
+
 /// What an aura sends: nothing by a bound name. It reads its props by their own names.
 pub const AURA: &[(&str, Names)] = &[];
 
@@ -1600,6 +1636,11 @@ pub fn canvas(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "canvas", CANVAS, CANVAS_COMPUTED)
 }
 
+/// `map({ ... })`, each field a name.
+pub fn map(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "map", MAP, MAP_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1706,6 +1747,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "heatmap" => heatmap(value),
         "graph" => graph(value),
         "canvas" => canvas(value),
+        "map" => map(value),
         "lightbox" => lightbox(value),
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),

@@ -60,7 +60,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['log/group/log-group.generated.css', '[part="status"]', 'color'],
   ['log/line/log-line.generated.css', '[part~="line"][part~="line-debug"]', 'color'],
   ['log/root/log-root.generated.css', ':host', '--log-ansi-bright-black'],
-  ['map/root/map-root.css', '::slotted([slot="attribution"])', 'color'],
+  ['map/root/map-root.generated.css', '::slotted([slot="attribution"])', 'color'],
   ['menu/item/menu-item.generated.css', '[part="end"]', 'color'],
   ['menu/item/menu-item.generated.css', 'slot[name="description"]', 'color'],
   ['menu/section/menu-section.generated.css', '[part="heading"]', 'color'],

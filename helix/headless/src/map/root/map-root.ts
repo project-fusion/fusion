@@ -535,6 +535,17 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   override usingLabel = 'Using the map. Press Escape to scroll the page again.'
 
   /**
+   * Where the map opens, as `lat,lng,zoom`, with its tilt and its turn in
+   * degrees after them where they are given: `55.95,-3.19,13` or
+   * `40.71,-74.01,15,60,-20`. `connectMap` moves the renderer there as it
+   * connects, and a phone opens there. Unset, the map is framed around every
+   * place it holds on a phone, and stays where the page made its renderer on
+   * the web.
+   */
+  @property()
+  view?: string | undefined
+
+  /**
    * The hint shown when the wheel scrolls past the map with
    * `gestures="cooperative"`. `{key}` is ⌘ on a Mac and Ctrl elsewhere.
    */

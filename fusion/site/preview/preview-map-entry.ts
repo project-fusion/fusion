@@ -17,6 +17,7 @@
  * MapLibre's weight for nothing.
  */
 
+import { aimOf } from '@fusion.dev/helix-core/map'
 import { connectMap, fontReady, mapColorsFrom, mapFontFrom } from '@fusion.dev/helix-map'
 import {
   followTheme,
@@ -103,16 +104,18 @@ const start = (frame: HTMLElement, root: HTMLElement): (() => void) => {
       language,
     }) as never
   /* **A fixed view where the example gives one**, for a layer with no places
-     to frame, such as buildings seen tilted or radar over a region. Written
-     as `data-preview-map-view="lat,lng,zoom,pitch,bearing"`, the last two
-     optional. */
-  const [lat, lng, zoom, pitch = 0, bearing = 0] = (frame.dataset.previewMapView ?? '')
-    .split(',')
-    .map(Number)
-  const view =
-    Number.isFinite(lat) && Number.isFinite(lng) && Number.isFinite(zoom)
-      ? { bearing, center: [lng, lat] as [number, number], pitch, zoom }
-      : undefined
+     to frame, such as buildings seen tilted or radar over a region: the
+     frame's own `view`, `lat,lng,zoom,pitch,bearing` with the last two
+     optional, which `connectMap` also opens at. */
+  const aim = aimOf((frame as HTMLElement & { view?: string }).view)
+  const view = aim
+    ? {
+        bearing: aim.bearing,
+        center: [aim.center.lng, aim.center.lat] as [number, number],
+        pitch: aim.pitch,
+        zoom: aim.zoom,
+      }
+    : undefined
   const map = new maplibregl.Map({
     attributionControl: false,
     container: box,

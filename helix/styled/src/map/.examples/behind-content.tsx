@@ -8,10 +8,10 @@ export function Example() {
         credit-placement="bottom-end"
         data-preview-map
         data-preview-map-landmarks="false"
-        data-preview-map-view="30.2672,-97.7431,13.5,40,0"
         fill
         gestures="cooperative"
         label="Downtown Austin"
+        view="30.2672,-97.7431,13.5,40,0"
       >
         <div data-preview-map-canvas></div>
       </helix-map>

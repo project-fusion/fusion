@@ -99,6 +99,7 @@ const GIVEN: &[&str] = &[
     "scatterChart",
     "graph",
     "canvas",
+    "map",
     "heatmap",
     "lightbox",
     "videoPlaylistMenu",

@@ -80,6 +80,7 @@ import type {
   LogGroupChoice,
   LogLineChoice,
   LogRootChoice,
+  MapChoice,
   NotificationGroupChoice,
   NotificationRowChoice,
   NotificationsRootChoice,
@@ -382,6 +383,8 @@ export interface Headless {
   readonly graph?: GraphChoice
   /** What the element reads, sends, and computes where it is a board of cards, or a card on one. */
   readonly canvas?: CanvasChoice
+  /** What the element reads, sends, and computes where it frames a map, or is a place on one. */
+  readonly map?: MapChoice
   /** What the element reads, sends, and computes where it is a strip of cells. */
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */

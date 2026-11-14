@@ -46,6 +46,8 @@ import { useListbox } from './listbox'
 import { useLog } from './log'
 import { useLogGroup } from './log-group'
 import { useLogLine } from './log-line'
+import { useMap } from './map'
+import { useMapMarker, useMapPoints, useMapPosition } from './map-places'
 import { mixedItem } from './mixed-item'
 import { mixingSet } from './mixed-set'
 import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
@@ -579,6 +581,22 @@ export const behaviorFor = (family: Family): UseBehavior => {
       .map((use): Binder => {
         /* A card is hosted by its own machine, the board by the board's. */
         const host = family.name === 'canvas-node' ? useCanvasNode : useCanvas
+        return (props) => host(family, props, use)
+      }),
+    /* A frame around a map, and a marker, a position, or a points layer on
+       one: the map drawn through the renderer capability, its controls, and
+       each place stood on the view. */
+    ...uses
+      .filter((use) => use.machine === 'map')
+      .map((use): Binder => {
+        const host =
+          family.name === 'map-marker'
+            ? useMapMarker
+            : family.name === 'map-position'
+              ? useMapPosition
+              : family.name === 'map-points'
+                ? useMapPoints
+                : useMap
         return (props) => host(family, props, use)
       }),
     /* A frame around a graph: its picture, its list, its legend, and its zoom. */

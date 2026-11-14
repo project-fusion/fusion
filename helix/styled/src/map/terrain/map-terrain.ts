@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMapTerrain } from '@fusion.dev/helix-headless/map/terrain'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './map-terrain.css.js'
+import { styles } from './map-terrain.generated.css.js'
 
 /**
  * @summary Hills and mountains on a map, shaded and raised in 3D.
