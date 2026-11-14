@@ -236,6 +236,7 @@ const dataOf = (setup: Setup): Readonly<Record<string, unknown>> => ({
   ...logProps(setup),
   ...chatProps(setup),
   ...(setup.value === undefined ? {} : { value: setup.value }),
+  ...(setup.graph === undefined ? {} : { links: setup.graph.links, nodes: setup.graph.nodes }),
   ...(setup.data === undefined ? {} : { data: setup.data }),
 })
 

@@ -66,6 +66,11 @@ export interface Setup {
   readonly logGroups?: readonly object[] | undefined
   /** A log's lines as data. The web sets them as a property, and a phone passes a prop. */
   readonly logLines?: readonly object[]
+  /**
+   * The notes and links a graph holds, as its `nodes` and `links` take them.
+   * The web sets each as a property, and a phone passes each as a prop.
+   */
+  readonly graph?: { readonly links: readonly object[]; readonly nodes: readonly object[] }
   /** The turns a chat holds as data. */
   readonly turns?: readonly object[]
   /**

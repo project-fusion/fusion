@@ -136,6 +136,9 @@ const build = (setup: Setup): Updatable => {
   if (setup.value !== undefined) {
     ;(made as Updatable & { value?: unknown }).value = setup.value
   }
+  if (setup.graph !== undefined) {
+    Object.assign(made, { links: setup.graph.links, nodes: setup.graph.nodes })
+  }
   if (setup.slot !== undefined) {
     made.setAttribute('slot', setup.slot)
   }
@@ -583,6 +586,10 @@ const nameOf = (type: string, family: string): string | undefined => {
   }
   /* What a spatial chart tells the three.js renderer it connects, which a phone draws without. */
   if (type === 'helix-plot-change' || type === 'helix-plot-turn') {
+    return undefined
+  }
+  /* What a graph tells the renderer `connectGraph` connects, which a phone draws without. */
+  if (type === 'helix-graph-part-change') {
     return undefined
   }
   if (type.startsWith('helix-')) {
