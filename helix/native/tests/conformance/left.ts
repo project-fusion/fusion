@@ -14,6 +14,7 @@ import { logLeft } from './log'
 import { feedLeft, feeds } from './notifications'
 import { paginationLeft } from './pagination'
 import { rangeLeft } from './range'
+import { sandboxLeft } from './sandbox'
 import { tableLeft } from './table'
 import { textLeft } from './text'
 import { treeLeft } from './tree'
@@ -264,6 +265,7 @@ export const leftBy = (run: Run, opened: number): Left => {
     ...feedLeft(run),
     ...tableLeft(run),
     ...codeBlockLeft(run),
+    ...sandboxLeft(run),
     ...colorLeft(run),
     ...chartLeft(setup),
   }

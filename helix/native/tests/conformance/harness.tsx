@@ -46,6 +46,7 @@ import { namedPress } from './named'
 import { feedFocus, feedPress, feeds } from './notifications'
 import { paginates, paginationPress } from './pagination'
 import { adjustBy, rangeFocus, ranges, scrubLabel, slideTo } from './range'
+import { sandboxes, sandboxPresses } from './sandbox'
 import { laySections } from './sections'
 import { focusStop, isTable, moveRow, tablePress } from './table'
 import { focusField, leave, pressBox, typeInto } from './text'
@@ -298,9 +299,11 @@ const flush = async (): Promise<void> => {
 const pressRow = async (setup: Setup, at: number): Promise<void> => {
   const row = codeBlocks(setup)
     ? codeBlockPresses()[at]
-    : logs(setup)
-      ? logPress(logRows(setup)[at])
-      : inspectorRows()[at]
+    : sandboxes(setup)
+      ? sandboxPresses()[at]
+      : logs(setup)
+        ? logPress(logRows(setup)[at])
+        : inspectorRows()[at]
   if (row !== undefined) {
     await tap(row)
   }

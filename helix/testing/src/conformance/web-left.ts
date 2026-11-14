@@ -115,6 +115,23 @@ const codeBlockOf = (mounted: Mounted): NonNullable<Left['codeBlock']> => {
   }
 }
 
+/** What a sandbox says, as the record holds it: its file tabs and the source shown. */
+const sandboxOf = (mounted: Mounted): NonNullable<Left['sandbox']> => {
+  const panes = [...mounted.root.children].filter(
+    (child) => child.localName === 'helix-sandbox-source',
+  )
+  const shown = panes.find((pane) => !pane.hasAttribute('hidden')) as
+    | (Element & { readonly value?: string })
+    | undefined
+  return {
+    code: (shown?.value ?? '').replace(/\s/g, ''),
+    tabs: [...(mounted.root.shadowRoot?.querySelectorAll('[part~="file"]') ?? [])].map((tab) => ({
+      selected: tab.getAttribute('aria-selected') === 'true',
+      words: squeezed(tab),
+    })),
+  }
+}
+
 /** What each row of a log says, as the record holds it. */
 const logRows = (mounted: Mounted): NonNullable<Left['log']> => {
   const shadow = mounted.root.shadowRoot
@@ -513,6 +530,7 @@ export const leftBy = (mounted: Mounted, opened: readonly string[], family: stri
   ...(family === 'carousel' ? { carousel: carouselOf(mounted) } : {}),
   ...(family === 'pagination' ? { pagination: paginationOf(mounted) } : {}),
   ...(family === 'code-block' ? { codeBlock: codeBlockOf(mounted) } : {}),
+  ...(family === 'sandbox' ? { sandbox: sandboxOf(mounted) } : {}),
   ...(family === 'chat'
     ? {
         chat: chatOf(mounted),

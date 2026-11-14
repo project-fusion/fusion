@@ -354,6 +354,10 @@ const rowAt = (mounted: Mounted, row: number): HTMLElement | null => {
       ][row] ?? null
     )
   }
+  if (mounted.root.localName === 'helix-sandbox') {
+    /* The file tabs over a sandbox's source panes. */
+    return mounted.root.shadowRoot?.querySelectorAll<HTMLElement>('[part~="file"]')[row] ?? null
+  }
   if (mounted.root.localName === 'helix-notifications') {
     const items = (mounted.root as unknown as { readonly items: readonly HTMLElement[] }).items
     const drawn = items.filter((one) => one.assignedSlot !== null)[row]

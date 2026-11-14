@@ -416,6 +416,14 @@ export interface Left {
     readonly pressed: boolean
     readonly tabs: readonly { readonly selected: boolean; readonly words: string }[]
   }
+  /**
+   * What a sandbox says: its file tabs, and the source of the pane shown.
+   * Words hold no spaces.
+   */
+  readonly sandbox?: {
+    readonly code: string
+    readonly tabs: readonly { readonly selected: boolean; readonly words: string }[]
+  }
   /** What a row of pages says of its controls, the page it is on, and which steps are spent. */
   readonly pagination?: {
     readonly controls: readonly string[]
