@@ -124,5 +124,21 @@ export default styles(
         ),
       ]),
     ]),
+    /* **Forced colors draw the disc as an edge.** They paint every background
+       the page's Canvas color, so the gray disc went and initials stood loose
+       on the page. A CanvasText ring, inside the box, traces the disc or the
+       rounded square in the reader's own colors, and a picture keeps its edge
+       too. */
+    on('host', [
+      web([
+        rule(
+          { forcedColors: true },
+          {
+            outline: [token('border-thin'), 'solid', 'CanvasText'],
+            outlineOffset: product(token('border-thin'), '-1'),
+          },
+        ),
+      ]),
+    ]),
   ],
 )

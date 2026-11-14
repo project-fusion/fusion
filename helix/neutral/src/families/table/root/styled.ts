@@ -210,7 +210,13 @@ export default styles(
         ]),
       ]),
       include(collectionError),
-      on('error', [rule({ color: hook.errorColor })]),
+      /* **The error line wraps inside the columns it spans.** Spanning every
+         column, its words on one line set the columns' widths: at 280 a 58
+         character message and a button to try again widened the tracks to
+         500, and the host scrolled them both out of sight. With no width of
+         its own the line takes the width the columns already have and wraps
+         there, as List and Listbox do. */
+      on('error', [rule({ color: hook.errorColor }), web([rule({ contain: 'inline-size' })])]),
       on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
       on('loading', [native([rule(said)])]),
       /* The message spans the columns, as Data Table's does. */

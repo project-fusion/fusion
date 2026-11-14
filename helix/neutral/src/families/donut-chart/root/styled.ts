@@ -227,25 +227,39 @@ export default styles(
         ]),
       ]),
       /* The words with nothing to draw stand inside the hole, the ring's track around
-         them, and in the half ring's opening. */
+         them, and in the half ring's opening. **Three lines, then an ellipsis**,
+         so a long error stays in the hole: six lines of it ran out over the
+         ring. **The mark stands in the line before the words**, the loading
+         ring and the error mark alike: the error line wrapped as a flex row
+         and put its mark above the words, while the loading ring stood beside
+         them. A clamped block has no `align-content`, so the box is as tall
+         as its lines and centered by its margins. In a half ring the lines
+         stand at the foot of the opening, and two of them fit it. */
       on(
         ['empty', 'error', 'loading'],
         [
           web([
             rule({
+              WebkitBoxOrient: 'vertical',
+              WebkitLineClamp: 3,
+              blockSize: 'fit-content',
               boxSizing: 'border-box',
+              display: '-webkit-box',
               inlineSize: product(
                 quotient(product('100%', difference(own.donutChartRing, product(2, settled))), 100),
                 0.85,
               ),
               insetInline: 0,
-              marginInline: 'auto',
+              margin: 'auto',
+              overflow: 'hidden',
               own: { donutChartEdge: '40', donutChartRing: '80' },
             }),
             rule(
               { sweep: 'half' },
               {
-                blockSize: quotient(
+                WebkitLineClamp: 2,
+                marginBlock: ['auto', token('space-none')],
+                maxBlockSize: quotient(
                   product('100%', difference(own.donutChartEdge, settled)),
                   sum(own.donutChartEdge, quotient(settled, 2)),
                 ),
@@ -259,6 +273,24 @@ export default styles(
           ]),
         ],
       ),
+      /* **Whole, with something in the `error` slot**, because a clamped line
+         hides what follows it, and the button that tries again went with the
+         words past the third line. The button takes its own line under the
+         words, in a half ring too. */
+      on('error', [
+        web([rule({ hasErrorContent: true }, { WebkitLineClamp: 'none', maxBlockSize: 'none' })]),
+      ]),
+      on({ region: 'error' }, [
+        web([
+          rule(
+            { hasErrorContent: true },
+            { display: 'block', marginBlockStart: token('space-xs') },
+          ),
+        ]),
+      ]),
+      on({ region: 'error', slotted: '*' }, [
+        web([rule({ hasErrorContent: true }, { marginInlineStart: token('space-none') })]),
+      ]),
       on('center', [
         web([
           rule({ dir: 'rtl' }, { translate: ['50%', '-50%'] }),

@@ -10,6 +10,7 @@ import {
   product,
   quotient,
   scheme,
+  sum,
   token,
   web,
 } from '../../../style.js'
@@ -56,7 +57,13 @@ export default styles(
       readoutFontSize: token('text-xs'),
       width: null,
     },
-    own: { chartTerminusInner: null, sparklineInk: null, sparklineWeight: null },
+    own: {
+      chartTerminusInner: null,
+      sparklineHang: null,
+      sparklineInk: null,
+      sparklineMark: null,
+      sparklineWeight: null,
+    },
     props: {
       emphasis: oneOf(['outlined', 'solid', 'subtle']),
       terminus: oneOf(['none', 'ring', 'square', 'triangle']),
@@ -235,8 +242,12 @@ export default styles(
     on('readout', [
       rule({ dir: 'rtl' }, { translate: ['50%', difference('-100%', hook.markSize)] }),
     ]),
-    /* The words in place of the line, in the middle of the box, cut short on one line,
-       since a sparkline is the height of a line of text. */
+    /* The words in place of the line, in the middle of the box, at the step a
+       2.5em box holds. **Two lines at the tight leading fit the box**, so the
+       words wrap and end in an ellipsis only after the second: on one line a
+       98 pixel sparkline said "Loading read…" and "The deploy…", and nothing
+       said what had failed. Centered in the box by their margins, as a clamped
+       block has no `align-content`. */
     on(
       ['empty', 'error', 'loading'],
       [
@@ -245,22 +256,54 @@ export default styles(
           fontFamily: token('font-sans'),
           fontSize: token('text-xs'),
           inset: 0,
-          margin: token('space-none'),
           overflow: 'hidden',
           position: 'absolute',
           textAlign: 'center',
         }),
         web([
           rule({
-            alignContent: 'center',
-            display: 'block',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+            blockSize: 'fit-content',
+            display: '-webkit-box',
+            lineHeight: token('leading-tight'),
+            margin: ['auto', token('space-none')],
+            overflowWrap: 'anywhere',
           }),
         ]),
-        native([rule({ alignItems: 'center', justifyContent: 'center' })]),
+        native([
+          rule({ alignItems: 'center', justifyContent: 'center', margin: token('space-none') }),
+        ]),
       ],
     ),
+    /* **The mark hangs at the start, and both lines of words share one
+       edge.** Centered, a second line started under the spinner and the block
+       read ragged. A hanging indent rather than a grid, so the words stay one
+       block the clamp can stop at two lines: the start padding is the mark and
+       its gap, and the first line is pulled back by the same. As wide as the
+       words and centered in the box, so a word that fits one line still sits
+       in the middle. Decided by the owner on November 12, 2026, against the
+       centered words and the mark alone. The two marks' own widths come from
+       the chart status sheet. */
+    on(
+      ['error', 'loading'],
+      [
+        web([
+          rule({
+            own: { sparklineHang: sum(own.sparklineMark, token('space-xs')) },
+            boxSizing: 'border-box',
+            inlineSize: 'fit-content',
+            margin: 'auto',
+            maxInlineSize: '100%',
+            paddingInlineStart: own.sparklineHang,
+            textAlign: 'start',
+            textIndent: product(own.sparklineHang, '-1'),
+          }),
+        ]),
+      ],
+    ),
+    on('loading', [web([rule({ own: { sparklineMark: '1em' } })])]),
+    on('error', [web([rule({ own: { sparklineMark: '1.125em' } })])]),
     on('error', [native([rule({ color: token('color-danger'), flexDirection: 'row' })])]),
     /* Said and not shown: the dot and the readout are the picture of it. */
     on('live', [

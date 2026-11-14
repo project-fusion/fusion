@@ -329,6 +329,22 @@ export default styles(
             outlineOffset: token('size-focus-offset'),
           },
         ),
+        /* **A tag that can be chosen answers the pointer**, as a selectable
+           row does: the pointer, the hover wash over its fill, and the press a
+           step past it. In a group that selects, the focus ring was the only
+           sign a tag could be chosen. A tag in a group that does not select
+           stays a label. */
+        web([
+          rule({ disabled: false, selectable: true }, { cursor: 'pointer' }),
+          rule(
+            { disabled: false, hover: true, selectable: true },
+            { backgroundColor: token('color-hover') },
+          ),
+          rule(
+            { active: true, disabled: false, selectable: true },
+            { backgroundColor: token('color-press') },
+          ),
+        ]),
       ]),
     ]
   },
