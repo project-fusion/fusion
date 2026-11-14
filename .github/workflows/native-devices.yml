@@ -450,12 +450,19 @@ jobs:
       # **Android 15 on a Pixel 6's screen, with a hardware keyboard.**
       # Animations stay on: with them off, Android reports reduced motion, and
       # the videos would show none.
+      #
+      # **The runner's four cores and 4 GB of its 16**, where the action gives
+      # two and 2.5 GB. The emulator draws in software, and on two cores it
+      # dropped off adb while Graph and Orb drew, Maestro's server dying as it
+      # read the screen (runs 43626140354 and 43643786751).
       - name: Run the ${{ matrix.part }} on an emulator
         id: emulator
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 35
           arch: x86_64
+          cores: 4
+          ram-size: 4096M
           disable-animations: false
           emulator-boot-timeout: 600
           enable-hw-keyboard: true
