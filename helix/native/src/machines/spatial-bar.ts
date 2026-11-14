@@ -105,7 +105,7 @@ const colorOfBar = (cell: BarCell | undefined, theme: Theme, colorOf: Color): st
 }
 
 /** What one face is painted in: its fill and its edge, as the web's sheet works them out under each emphasis. */
-const faceInk = (
+export const faceInk = (
   color: string,
   shade: number,
   ask: { readonly emphasis: string; readonly lit: boolean; readonly theme: Theme },

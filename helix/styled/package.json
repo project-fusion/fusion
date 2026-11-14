@@ -707,6 +707,14 @@
       "types": "./dist/spatial-bar-chart/index.d.ts",
       "default": "./dist/spatial-bar-chart/index.js"
     },
+    "./spatial-ribbon-chart": {
+      "react-native": {
+        "types": "./dist/spatial-ribbon-chart/index.native.d.ts",
+        "default": "./dist/spatial-ribbon-chart/index.native.js"
+      },
+      "types": "./dist/spatial-ribbon-chart/index.d.ts",
+      "default": "./dist/spatial-ribbon-chart/index.js"
+    },
     "./spatial-scatter-chart": {
       "react-native": {
         "types": "./dist/spatial-scatter-chart/index.native.d.ts",
