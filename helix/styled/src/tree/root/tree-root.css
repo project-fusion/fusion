@@ -49,10 +49,13 @@
    outline, so a section in a sidebar and a title over an outline are the same
    thing drawn the same way. Its ink is `foreground-muted`, because a heading is
    read and the quieter `foreground-subtle` is not solved against a theme's
-   grounds. Handed down as the three values rather than as the attribute, for
-   the reason above it: only the item sheet can tell a branch from a leaf. */
+   grounds. The leaves take the full foreground, so a heading and the rows under
+   it differ in ink as well as size. Handed down as values rather than as the
+   attribute, for the reason above it: only the item sheet can tell a branch
+   from a leaf. */
 :host([nesting="heading"]) {
   --_tree-heading-ink: var(--helix-color-foreground-muted);
+  --_tree-leaf-ink: var(--helix-color-foreground);
   --_tree-heading-text: var(--helix-text-xs);
   --_tree-heading-tracking: var(--helix-tracking-wide);
 }

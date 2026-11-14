@@ -40,7 +40,13 @@
      for one, and the hover below still wins over it. */
   background-color: var(--_tree-row-fill, transparent);
   border-radius: var(--tree-row-radius, var(--helix-radii-sm));
-  color: var(--_tree-row-ink, var(--tree-row-color, var(--helix-color-foreground-muted)));
+  /* The ink the row rests in, named once so a disabled row under the pointer
+     goes back to it. A heading tree hands its rows the full ink. */
+  --_tree-rest-ink: var(
+    --tree-row-color,
+    var(--_tree-leaf-ink, var(--helix-color-foreground-muted))
+  );
+  color: var(--_tree-row-ink, var(--_tree-rest-ink));
   cursor: pointer;
   display: flex;
   /* The row's own size, which the tree's `nesting` decides. At `peer` nothing
@@ -112,13 +118,18 @@
    is not a destination and that leaf is, and drawing them alike puts the row
    you can press and the label you cannot at the same weight.
 
+   **So the two take different inks.** The heading keeps the muted label ink,
+   and every leaf rests in the full foreground the hover lifts a row to. In the
+   muted ink at both, a heading at 12 pixels and a row at 13 were one pixel
+   apart and read as the same thing.
+
    The hover and the pointer stay for the reverse of that reason. A branch with
    no `href` toggles from anywhere in its row, so an affordance taken off a
    heading would leave the chevron as the only way into what it holds. */
 [part="row"]:has([part="toggle"]) {
-  color: var(
-    --_tree-row-ink,
-    var(--_tree-heading-ink, var(--tree-row-color, var(--helix-color-foreground-muted)))
+  --_tree-rest-ink: var(
+    --_tree-heading-ink,
+    var(--tree-row-color, var(--helix-color-foreground-muted))
   );
   font-size: var(--_tree-heading-text, var(--_tree-text, var(--helix-text-control)));
   font-weight: var(--helix-weight-medium);
@@ -454,7 +465,7 @@ slot[name="chevron"]::slotted(*) {
 
 :host([disabled]) [part="row"]:hover {
   background-color: transparent;
-  color: var(--tree-row-color, var(--helix-color-foreground-muted));
+  color: var(--_tree-rest-ink);
 }
 
 /* A branch waiting for its children breathes, so the press reads as heard. */

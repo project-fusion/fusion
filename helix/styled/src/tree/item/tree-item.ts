@@ -67,7 +67,7 @@ import '../../checkbox/index.js'
  * @cssproperty --tree-indent - Indent added per level.
  * @cssproperty --tree-row-checked-background-color - Fill of a checked row, in a tree with `selection-mode="multiple"`. Unset, the box alone marks it.
  * @cssproperty --tree-row-checked-color - Text color of a checked row, in a tree with `selection-mode="multiple"`.
- * @cssproperty --tree-row-color - Text color of a row at rest.
+ * @cssproperty --tree-row-color - Text color of a row at rest. Muted, except for a leaf in a `nesting="heading"` tree, which takes the full foreground.
  * @cssproperty --tree-row-disabled-opacity - How faint a disabled row is drawn.
  * @cssproperty --tree-row-hover-background-color - Fill of a row under the pointer.
  * @cssproperty --tree-row-hover-color - Text color of a row under the pointer.
