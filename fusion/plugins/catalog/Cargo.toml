@@ -1,0 +1,21 @@
+[package]
+name = "fusion-plugin-catalog"
+description = "The fusion:catalog world of the Fusion Work Protocol: records such as products read from a service, kept current, and written back, and the suite every catalog passes."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`: a version is a fact about a domain and this
+# workspace holds two. A crate that inherits one fails the build.
+version = "0.0.0-dev"
+
+[dependencies]
+fusion-plugin-host = { workspace = true, features = ["loader"] }
+# **The record types serialize**, so a host stores what a catalog handed it as
+# it was handed.
+serde = { workspace = true }
+# **The suite reads a binding's schema**, which is JSON.
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

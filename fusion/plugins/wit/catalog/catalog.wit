@@ -1,0 +1,231 @@
+package fusion:catalog@1.0.0;
+
+/// The records a catalog hands a host, and what can go wrong.
+///
+/// A catalog holds records kept in another service, such as products, events,
+/// or listings. Every piece of text a person wrote in that service arrives as
+/// `untrusted`, so a host keeps it apart from instructions all the way to
+/// whatever reads it.
+interface types {
+  /// Text a person wrote in the service: data to show or store, never
+  /// instructions to follow.
+  record untrusted {
+    text: string,
+  }
+
+  /// An amount of money, exact. `amount` is a decimal string such as
+  /// `"29.00"`, so no float rounds a price, and `currency` is its ISO 4217
+  /// code, such as `USD`.
+  record money {
+    amount: string,
+    currency: string,
+  }
+
+  /// Whether a record is offered. A catalog shows its service's own states
+  /// through these three.
+  enum state {
+    /// Offered.
+    active,
+    /// Kept in the service, and not offered yet.
+    draft,
+    /// No longer offered, and kept for the record.
+    archived,
+  }
+
+  /// The value of one field.
+  variant value {
+    text(untrusted),
+    number(f64),
+    flag(bool),
+    price(money),
+    /// An address, such as a page or a file.
+    link(string),
+    /// Several values of one field, such as tags.
+    many(list<untrusted>),
+  }
+
+  /// One named field of a record or a variant.
+  record field {
+    /// The field's name in the catalog's own words, such as `vendor`.
+    name: string,
+    value: value,
+  }
+
+  /// A picture of a record.
+  record image {
+    address: string,
+    /// What the picture shows, as the service holds it. None where it holds
+    /// none.
+    alt: option<untrusted>,
+  }
+
+  /// One way a record is offered, such as a size and color of a shirt.
+  record %variant {
+    /// The service's own id.
+    id: string,
+    title: untrusted,
+    /// The stock-keeping code, where the service has one.
+    sku: option<string>,
+    price: option<money>,
+    /// Whether it can be bought now. None where the service does not say.
+    available: option<bool>,
+    /// The choices that name this variant, such as `Size` is `M`.
+    options: list<field>,
+  }
+
+  /// One record, as the service holds it.
+  record %record {
+    /// The service's own id, which every call about the record takes.
+    id: string,
+    /// Changes whenever the record does. `update` sends back the one it read.
+    version: string,
+    /// Where a person opens it in the service, where it has an address.
+    address: option<string>,
+    /// A short name for it in addresses, such as `camp-tee`. None where the
+    /// service has none.
+    handle: option<string>,
+    title: untrusted,
+    description: untrusted,
+    state: state,
+    fields: list<field>,
+    images: list<image>,
+    /// Each way it is offered. A record offered one way has one.
+    variants: list<%variant>,
+  }
+
+  /// Where a listing ended. A host stores it as it is, and only after it has
+  /// stored the records that came before it.
+  type cursor = string;
+
+  /// The records that changed since a cursor.
+  record page {
+    /// Each record at most once.
+    records: list<%record>,
+    /// The ids of records removed from the service since the cursor.
+    removed: list<string>,
+    next: cursor,
+    /// Whether more had changed than this page holds. A host lists again from
+    /// `next` at once.
+    more: bool,
+  }
+
+  /// What a binding's credential allows, as `check` finds it.
+  record access {
+    /// Whether `list`, `get` and `search` work.
+    read: bool,
+    /// Whether an editor's `update` writes.
+    write: bool,
+    /// Whether an editor's `create` makes a record.
+    create: bool,
+  }
+
+  /// A delivery the service sent to say records changed, such as a webhook,
+  /// as the host received it.
+  record delivery {
+    /// The headers, each name in lower case.
+    headers: list<tuple<string, string>>,
+    body: list<u8>,
+  }
+
+  /// Why a call did not do what it was asked, each with a sentence.
+  variant error {
+    /// No record has that id.
+    not-found(string),
+    /// The version sent is no longer the record's, so the write was not made.
+    conflict(string),
+    /// The credential or the grant does not allow it.
+    denied(string),
+    /// The catalog does not do this at all.
+    unsupported(string),
+    /// The binding's settings, or an argument, is not one the catalog takes.
+    invalid(string),
+    /// The service did not respond, or asked to be called later.
+    unavailable(string),
+  }
+}
+
+/// What a host lends a catalog.
+interface binding {
+  /// The binding's settings, as JSON matching the schema `spec` returns.
+  settings: func() -> string;
+
+  /// The value of a secret the person granted the binding, such as the key a
+  /// service signs its deliveries with. A name the grant does not cover is
+  /// refused with a sentence.
+  secret: func(name: string) -> result<string, string>;
+}
+
+/// Reading records from a service.
+interface catalog {
+  use types.{access, cursor, delivery, error, page, %record};
+
+  /// The JSON Schema of a binding's settings.
+  spec: func() -> string;
+
+  /// Tests the binding's credential and the permissions it holds.
+  check: func() -> result<access, error>;
+
+  /// The records that changed since `since`, or every record where it is
+  /// none.
+  %list: func(since: option<cursor>) -> result<page, error>;
+
+  /// One record, with its current version.
+  get: func(id: string) -> result<%record, error>;
+
+  /// The records whose text matches `query`, best first, at most `limit`.
+  search: func(query: string, limit: u32) -> result<list<%record>, error>;
+
+  /// Reads a delivery the service sent, and returns the ids of the records
+  /// it says changed. A delivery the catalog cannot verify, such as one with
+  /// a wrong signature, is refused with `denied`, and the host changes
+  /// nothing.
+  receive: func(delivery: delivery) -> result<list<string>, error>;
+}
+
+/// Writing records back to the service.
+interface editor {
+  use types.{error, field, image, money, %record, state, untrusted};
+
+  /// One way a record is offered, as a write sets it. A variant with an id
+  /// changes that variant; one without adds a variant.
+  record variant-draft {
+    id: option<string>,
+    title: string,
+    sku: option<string>,
+    price: option<money>,
+    options: list<field>,
+  }
+
+  /// What a write sets. A field left none is left as it is.
+  record draft {
+    title: option<string>,
+    description: option<string>,
+    state: option<state>,
+    handle: option<string>,
+    fields: list<field>,
+    variants: list<variant-draft>,
+  }
+
+  /// Makes a record, which lands in the state the draft names, or as a draft
+  /// where it names none. A catalog that makes nothing returns `unsupported`.
+  create: func(draft: draft) -> result<%record, error>;
+
+  /// Writes a change, and returns the record as it now stands. `version` is
+  /// the one the host read, and a catalog whose service checks versions
+  /// refuses a stale one with `conflict`, writing nothing.
+  update: func(id: string, version: string, draft: draft) -> result<%record, error>;
+}
+
+/// A component that reads records: a host's way in from a store, a ticketing
+/// service, or anything else that holds things it offers.
+world reader {
+  import binding;
+  export catalog;
+}
+
+/// A component that reads records and writes back to the service that holds
+/// them.
+world writer {
+  include reader;
+  export editor;
+}
