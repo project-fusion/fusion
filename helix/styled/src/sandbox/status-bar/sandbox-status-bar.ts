@@ -1,22 +1,9 @@
 import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
+import { languageName } from '@fusion.dev/helix-core/sandbox'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './sandbox-status-bar.css.js'
-
-/**
- * How a language is written out, for the ones an editor knows.
- *
- * A map rather than the raw value, because `html` in a status bar reads as a
- * variable name where `HTML` reads as a language. Anything unlisted shows as
- * given, so a consumer naming their own language is not silently blanked.
- */
-const LABELS: Record<string, string> = {
-  css: 'CSS',
-  html: 'HTML',
-  javascript: 'JavaScript',
-  tsx: 'TSX',
-}
 
 /**
  * @summary A bar that shows the cursor position and the language being edited.
@@ -104,16 +91,7 @@ export class HelixSandboxStatusBar extends HelixElement {
       ${
         language === undefined
           ? nothing
-          : html`<span part="language">${
-              /* `Object.hasOwn`, not a truthy index. `LABELS[language]` reaches
-                 `Object.prototype`, and every inherited key comes back truthy,
-                 so `language="constructor"` painted the whole source of
-                 `Object` into the bar where the fallback should have put the
-                 word back unchanged. This is any string a consumer writes, not
-                 a union, which is what makes the reach ordinary rather than
-                 contrived. `Text` records the same trap over its tag map. */
-              Object.hasOwn(LABELS, language) ? LABELS[language] : language
-            }</span>`
+          : html`<span part="language">${languageName(language)}</span>`
       }
       <slot name="end"></slot>`
   }

@@ -6,11 +6,12 @@ import {
   restoreValue,
   words,
 } from '@fusion.dev/helix-core'
+import { linesOfRuns, sourceRuns } from '@fusion.dev/helix-core/sandbox'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { HelixBeforeEditEvent, HelixCaretEvent, HelixEditEvent } from '../events/index.js'
-import { drawnRuns, type SandboxToken, type SandboxTokenizer } from '../tokens.js'
+import type { SandboxToken, SandboxTokenizer } from '../tokens.js'
 import {
   breakLine,
   type Completions,
@@ -93,22 +94,6 @@ const cut = (runs: readonly SandboxToken[], marks: ReadonlyMap<number, Mark>): P
     pieces.push({ mark: marks.get(point), text: '' })
   }
   return pieces
-}
-
-/** Runs of text cut at each line break, a line to an array. */
-const linesOf = (runs: readonly Piece[]): Piece[][] => {
-  const lines: Piece[][] = [[]]
-  for (const { kind, mark, text } of runs) {
-    text.split('\n').forEach((piece, at) => {
-      if (at > 0) {
-        lines.push([])
-      }
-      if (piece !== '' || mark === 'anchor') {
-        lines.at(-1)?.push({ kind, mark, text: piece })
-      }
-    })
-  }
-  return lines
 }
 
 /**
@@ -752,16 +737,7 @@ export class HelixSandboxSource extends HelixElement {
     if (!this.tokenize && !this.lineNumbers && !this.matchBrackets && !this.complete) {
       return field
     }
-    /* A throw is the page's fault and must not cost the reader the field, so
-       it is reported as uncaught and the source is drawn plain, as runs that
-       do not add up are. */
-    let given: readonly SandboxToken[] = []
-    try {
-      given = this.tokenize?.(this.value, this.name) ?? []
-    } catch (error) {
-      globalThis.reportError?.(error)
-    }
-    const runs = this.mark(drawnRuns(this.value, given))
+    const runs = this.mark(sourceRuns(this.value, this.name, this.tokenize))
     const draw = (some: readonly Piece[]) =>
       some.map(({ kind, mark, text }) => {
         const lone = mark === 'unmatched'
@@ -777,7 +753,7 @@ export class HelixSandboxSource extends HelixElement {
       /* A line to a block, so a line that wraps is one block and its number
          stands beside its first row. The gutter is as wide as the last
          number. */
-      const lines = linesOf(runs)
+      const lines = linesOfRuns(runs)
       return html`<div part="field" style="--_sandbox-source-gutter: ${String(lines.length).length}ch">
         <pre part="highlight" aria-hidden="true">${lines.map(
           (line) => html`<span part="line">${draw(line)}</span>`,
