@@ -195,6 +195,19 @@ cut_short() {
     ! grep -qsE '"status" *: *"FAILED"' "$tests"/*/"$2"/commands.json
 }
 
+# Whether the report of run `$1` names a drop in the failure of flow `$2`. A
+# drop can end a flow's log on the command still running, with Maestro's server
+# dying named only in the report: in run 43626140354 Graph's log ended on a wait
+# for its title, its report said "Device server died", and the device said
+# adbd's link to the runner broke, as no other flow of that run named a drop.
+report_drop() {
+  awk -v id="<testcase id=\"$2\"" '
+    index($0, id) > 0 { held = 1 }
+    held { print }
+    held && /<\/testcase>|\/>[[:space:]]*$/ { exit }
+  ' "$out/reports/$1.xml" 2> /dev/null | grep -qsE "$drop_words"
+}
+
 # After a run of a pass failed: runs again each flow whose own log names a drop,
 # up to three times, and says whether nothing else is left failed.
 #
@@ -202,7 +215,8 @@ cut_short() {
 # meantime: run 41374589645 lost 15 flows in 0.3 s and passed the next 20 on the
 # same emulator. Running the whole pass once more can lose others, and gives a
 # flow that failed before the drop a second chance. A flow whose log names no
-# drop stays failed, unless `cut_short` says the drop cut its log off, and so does
+# drop stays failed, unless its failure in the report names one or `cut_short`
+# says the drop cut its log off, and so does
 # one whose log is missing. The first argument is
 # the pass's name, the last the folder or file it ran, and the ones between go to
 # `maestro test`.
@@ -213,7 +227,7 @@ rerun_dropped() {
     again=()
     while IFS=$'\t' read -r id file; do
       if grep -qsE "$drop_words" "$out/debug/$run/.maestro/tests"/*/"$id"/logs/maestro.log ||
-        cut_short "$run" "$id"; then
+        report_drop "$run" "$id" || cut_short "$run" "$id"; then
         again+=("$file")
       else
         stayed+=("$id")
