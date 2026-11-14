@@ -245,7 +245,10 @@ pub(super) fn window_rule(rule: &Rule, names: &Names) -> Option<String> {
         Some("reads `window`")
     } else if rule.inner.as_deref() == Some("::backdrop") {
         Some("is on a `backdrop`")
-    } else if values().any(viewport) {
+    } else if !rule.web_only && values().any(viewport) {
+        /* A rule the web alone writes stands in a browser's window, which a
+        viewport length measures wherever the part is: only a phone places a
+        part in the window by its layer. */
         Some("writes a viewport length")
     } else if !on_host && values().any(|value| EDGES.iter().any(|edge| safe_area(value, edge))) {
         Some("reads the safe area")

@@ -41,7 +41,7 @@ export default styles(
       borderColor: token('color-border'),
       chosenColor: token('color-primary-surface'),
       layersMenuGap: token('space-sm'),
-      layersMenuInlineSize: product(token('size-control-lg'), 6),
+      layersMenuInlineSize: fn('min', product(token('size-control-lg'), 6), '70vw'),
       layersMenuPadding: token('space-sm'),
       needleNorthColor: token('color-danger'),
       needleSouthColor: token('color-foreground-muted'),
@@ -611,7 +611,6 @@ export default styles(
           color: token('color-foreground'),
           display: web('grid'),
           gap: hook.layersMenuGap,
-          inlineSize: web(hook.layersMenuInlineSize),
           insetBlockStart: 0,
           insetInlineEnd: web(sum('100%', token('space-2xs'))),
           /* **No taller than the map, and scrolled past that.** The frame
@@ -629,6 +628,9 @@ export default styles(
             overflowY: 'auto',
           },
         }),
+        /* Six large controls across, and no wider than most of a narrow
+           window. */
+        web([rule({ inlineSize: hook.layersMenuInlineSize })]),
         web([
           rule(
             { fill: true },

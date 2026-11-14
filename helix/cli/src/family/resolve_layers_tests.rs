@@ -166,6 +166,13 @@ fn only_a_layers_rules_read_the_window_its_backdrop_or_a_viewport_length() {
         found.contains(&"a rule on `content` reads `window`, and only a layer's rules do, as only a layer is placed in the window".to_owned()),
         "{found:?}"
     );
+    /* A rule the web alone writes measures the browser's window wherever
+    its part is, as a map's layers menu is held to most of a narrow one. */
+    let web = family(
+        POPOVER,
+        "{ on: 'content', platform: 'web', set: [['inline-size', 'min(18rem, 70vw)']] }",
+    );
+    assert_eq!(unresolved(&web), Vec::<String>::new());
 }
 
 #[test]

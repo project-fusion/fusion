@@ -396,7 +396,7 @@ const OPEN_LINK: Capability = Capability {
 const RENDERER: Capability = Capability {
     name: "renderer",
     interface: "Renderer",
-    doc: "Says whether a family can hand its drawing to a renderer outside Helix, such as a map's tiles or a terminal's screen: the page's own renderer on the web, which it connects to the family, and an optional peer on iOS and Android, such as MapLibre Native, loaded only when a family draws. Where there is none, the family draws its still fallback, and the server draws none.",
+    doc: "Says whether a family can hand its drawing to a renderer that is no part of the family, such as a map's tiles or a terminal's screen: the page's own renderer on the web, which it connects to the family, and an optional peer on iOS and Android, such as MapLibre Native, loaded only when a family draws. Where there is none, the family draws its still fallback, and the server draws none.",
     members: &[Member {
         name: "available",
         doc: "Whether a renderer of `kind` can draw here: on the web, the one the page connects, and on a phone, the peer installed and built into the app.",
