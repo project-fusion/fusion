@@ -65,6 +65,7 @@ import { boundTo } from './props'
 import { useRange } from './range'
 import { useReorderItem } from './reorder-item'
 import { useSplit } from './resize'
+import { sandboxHook } from './sandbox'
 import { useScale } from './scale'
 import { useScatterChart } from './scatter-chart'
 import { scrollersOf } from './scrolling'
@@ -597,6 +598,13 @@ export const behaviorFor = (family: Family): UseBehavior => {
               : family.name === 'map-points'
                 ? useMapPoints
                 : useMap
+        return (props) => host(family, props, use)
+      }),
+    /* A sandbox, read only on a phone, a source pane, a console, and a status bar. */
+    ...uses
+      .filter((use) => use.machine === 'sandbox')
+      .map((use): Binder => {
+        const host = sandboxHook(family)
         return (props) => host(family, props, use)
       }),
     /* A frame around a graph: its picture, its list, its legend, and its zoom. */

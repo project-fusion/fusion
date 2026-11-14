@@ -671,6 +671,14 @@
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
     },
+    "./sandbox": {
+      "react-native": {
+        "types": "./dist/sandbox/index.native.d.ts",
+        "default": "./dist/sandbox/index.native.js"
+      },
+      "types": "./dist/sandbox/index.d.ts",
+      "default": "./dist/sandbox/index.js"
+    },
     "./sandbox/compile-worker.js": "./dist/sandbox/compile-worker.js",
     "./scatter-chart": {
       "react-native": {

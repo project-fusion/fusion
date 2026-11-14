@@ -3,7 +3,7 @@ import { languageName } from '@fusion.dev/helix-core/sandbox'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './sandbox-status-bar.css.js'
+import { styles } from './sandbox-status-bar.generated.css.js'
 
 /**
  * @summary A bar that shows the cursor position and the language being edited.

@@ -14,9 +14,9 @@
  * granted clipboard write, fullscreen, and the microphone.
  */
 
+export * from './events/index.js'
 export { registerCompilerWorker } from './compile.js'
 export * from './console/sandbox-console.js'
-export * from './events/index.js'
 export {
   isRender,
   LAYOUT_RULES,

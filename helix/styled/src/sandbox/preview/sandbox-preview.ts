@@ -10,7 +10,7 @@ import {
   type SpeechSession,
   words,
 } from '@fusion.dev/helix-core'
-import { HelixConsoleEvent } from '../events/index.js'
+import { HelixConsoleEvent } from '@fusion.dev/helix-headless/sandbox-events'
 
 /**
  * How long the source has to stop changing before the frame is asked to render,
@@ -42,7 +42,7 @@ import {
   relayFetch,
   relayPrefixes,
 } from '../relay.js'
-import { styles as sheet } from './sandbox-preview.css.js'
+import { styles as sheet } from './sandbox-preview.generated.css.js'
 
 /** What the frame is allowed, here and in a tab `open()` makes. */
 const SANDBOX = 'allow-scripts allow-forms'

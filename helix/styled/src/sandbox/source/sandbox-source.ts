@@ -7,10 +7,14 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import { linesOfRuns, sourceRuns } from '@fusion.dev/helix-core/sandbox'
+import {
+  HelixBeforeEditEvent,
+  HelixCaretEvent,
+  HelixEditEvent,
+} from '@fusion.dev/helix-headless/sandbox-events'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { HelixBeforeEditEvent, HelixCaretEvent, HelixEditEvent } from '../events/index.js'
 import type { SandboxToken, SandboxTokenizer } from '../tokens.js'
 import {
   breakLine,
@@ -25,7 +29,7 @@ import {
   syntaxOf,
   toggleComment,
 } from './editing.js'
-import { styles } from './sandbox-source.css.js'
+import { styles } from './sandbox-source.generated.css.js'
 
 /** Keys that only ever modify another, and so are not a press of their own. */
 const MODIFIERS = new Set(['Alt', 'AltGraph', 'Control', 'Meta', 'Shift'])

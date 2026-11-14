@@ -18,7 +18,7 @@ import {
   type HelixConsoleEvent,
   HelixPanelResizeEvent,
   HelixSplitEvent,
-} from '../events/index.js'
+} from '@fusion.dev/helix-headless/sandbox-events'
 import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
@@ -26,7 +26,7 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixSandboxConsole } from '../console/sandbox-console.js'
 import type { HelixSandboxPreview } from '../preview/sandbox-preview.js'
 import type { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
-import { styles } from './sandbox-root.css.js'
+import { styles } from './sandbox-root.generated.css.js'
 
 /** Where the divider sits, and how tall the panel is, before anyone moves them.
     Named because the properties default to them and the getters that reset them

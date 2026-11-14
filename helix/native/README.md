@@ -12,12 +12,16 @@ Checkbox Group, Code, Color Input, Color Picker, Copy Button, Description List, 
 Drilldown, Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image, Input, Kbd,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
-Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
+Pin Input, Progress, QR Code, Quote, Radio, Rating, Sandbox, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, Trend, and Virtual List are drawn on React Native so far, and each is experimental there. Skip
-Link and Device Screen are the web's alone, and each one's component draws
-nothing on a phone: a skip link answers a page's header, and Device Screen
-pictures another device in a frame on a web page.
+Link, Device Screen and Sandbox Preview are the web's alone, and each one's
+component draws nothing on a phone: a skip link answers a page's header,
+Device Screen pictures another device in a frame on a web page, and Sandbox
+Preview runs a page of HTML, CSS and JavaScript a phone has no document for.
+A sandbox on a phone is read only: its panes stack as the web stacks them in
+a narrow window, its file tabs choose the pane shown, and its source is text a
+reader selects and copies, with no editor.
 
 ```sh
 npx expo install @fusion.dev/helix react-native-gesture-handler react-native-reanimated react-native-worklets

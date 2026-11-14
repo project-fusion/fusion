@@ -150,6 +150,7 @@ import {
   TableHead,
   Turn,
 } from './prose.native'
+import { SANDBOX_TAGS } from './sandbox-tags.native'
 import {
   Anchor,
   Box,
@@ -314,6 +315,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-radio': HelixRadio,
   'helix-radio-group': HelixRadioGroup,
   'helix-rating': HelixRating,
+  ...SANDBOX_TAGS,
   'helix-scatter-chart': HelixScatterChart,
   'helix-scroll-area': HelixScrollArea,
   'helix-select': HelixSelect,

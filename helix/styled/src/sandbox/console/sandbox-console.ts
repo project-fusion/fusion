@@ -9,16 +9,16 @@ import {
 } from '@fusion.dev/helix-core'
 import { CONSOLE_HEARD, CONSOLE_LEVELS, CONSOLE_LIMIT } from '@fusion.dev/helix-core/sandbox'
 import { levelSaid } from '@fusion.dev/helix-headless/log'
+import type { ConsoleDetail } from '@fusion.dev/helix-headless/sandbox-events'
 import type { CSSResultGroup, TemplateResult } from 'lit'
 import { nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
-import type { ConsoleDetail } from '../events/index.js'
 import '../../button/index.js'
 import '../../log/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './sandbox-console.css.js'
+import { styles } from './sandbox-console.generated.css.js'
 
 /** A console level, from the quietest to the loudest. */
 type ConsoleLevel = ConsoleDetail['level']
