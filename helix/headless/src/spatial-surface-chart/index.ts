@@ -6,5 +6,5 @@ export {
   type SurfaceCell,
   type SurfaceField,
   surfaceOf,
-} from './grid.js'
+} from '@fusion.dev/helix-core/spatial'
 export { HelixHeadlessSpatialSurfaceChart } from './root/spatial-surface-chart-root.js'

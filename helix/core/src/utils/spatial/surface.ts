@@ -6,8 +6,13 @@
  * did, and a missing reading drawn as zero digs a pit that is not there.
  */
 
-import { type MotionItem, type MotionShares, mix, mixAxis, ticks } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
+import type {
+  MotionItem,
+  MotionShares,
+} from '../../controllers/readings-motion-controller/readings-motion-controller.js'
+import { mix, mixAxis } from '../readings-motion/readings-motion.js'
+import { ticks } from '../scale/ticks.js'
+import { type FieldRow, niceRange, type PlotAxis } from './field.js'
 
 /** One place on the grid: where it stands across and in depth, and its reading, where the table has one. */
 export interface SurfaceCell {
