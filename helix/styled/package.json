@@ -723,6 +723,14 @@
       "types": "./dist/spatial-scatter-chart/index.d.ts",
       "default": "./dist/spatial-scatter-chart/index.js"
     },
+    "./spatial-surface-chart": {
+      "react-native": {
+        "types": "./dist/spatial-surface-chart/index.native.d.ts",
+        "default": "./dist/spatial-surface-chart/index.native.js"
+      },
+      "types": "./dist/spatial-surface-chart/index.d.ts",
+      "default": "./dist/spatial-surface-chart/index.js"
+    },
     "./specs": null,
     "./speed-dial": {
       "react-native": {

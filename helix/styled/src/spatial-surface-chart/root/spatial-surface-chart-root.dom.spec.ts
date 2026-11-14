@@ -46,7 +46,7 @@ describe('the styled spatial surface chart', () => {
   })
 
   test('under forced colors, the place the keys rest on is ringed in the highlight', () => {
-    const forced = sheet().split('@media (forced-colors: active)')[1] ?? ''
+    const forced = sheet().split('@media (forced-colors: active)').slice(1).join('')
     expect(forced).toContain('Highlight')
   })
 })

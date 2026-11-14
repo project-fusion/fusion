@@ -71,7 +71,7 @@ const pointsOf = (written: unknown): number | undefined => {
 }
 
 /** Whether a point stands inside the hull of a block's corners, which is its outline on the page. */
-const within = (corners: readonly PagePoint[], at: PagePoint): boolean => {
+export const within = (corners: readonly PagePoint[], at: PagePoint): boolean => {
   const sorted = [...corners].sort((one, other) => one.x - other.x || one.y - other.y)
   const cross = (o: PagePoint, a: PagePoint, b: PagePoint) =>
     (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
