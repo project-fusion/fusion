@@ -64,9 +64,9 @@ const drawn = async (element: ReactNode) => {
 /** Each sheen: the layer twice its shape's width. */
 const sheensOf = (all: readonly Drawn[]) => all.filter((one) => styleOf(one).width === '200%')
 
-/** Each shape: the fill a sheen sweeps across, 12% of the ink in light. */
+/** Each shape: the fill a sheen sweeps across, 8% of the ink. */
 const shapesOf = (all: readonly Drawn[]) =>
-  all.filter((one) => styleOf(one).backgroundColor === 'rgba(0, 0, 0, 0.12)')
+  all.filter((one) => styleOf(one).backgroundColor === 'rgba(0, 0, 0, 0.08)')
 
 describe('the generated Skeleton', () => {
   test('is hidden from screen readers while it is a placeholder with no name', async () => {

@@ -1,6 +1,7 @@
 import densitySm from '../../../fragments/density-sm.js'
 import {
   difference,
+  fn,
   list,
   measured,
   mix,
@@ -82,6 +83,12 @@ export default styles(
     const tone = hook.toneColor
     const enter = own.toastEnter(token('space-lg'))
     const drain = ['helix-toast-drain', measured('toast-duration', '0ms'), 'linear', 'forwards']
+    /* How far the mark and the close sit down the first line, to center on it.
+       **Rounded to the pixel** on the web, so both glyphs land on the same
+       whole pixel: half of 21 less 16 put the mark 2.5 down. A phone has no
+       `round()`. */
+    const markDrop = quotient(difference(own.toastLine, token('size-icon')), 2)
+    const closeDrop = quotient(difference(own.toastLine, token('size-control')), 2)
     return [
       include(densitySm),
       on('host', [
@@ -260,9 +267,9 @@ export default styles(
           display: 'inline-flex',
           gridArea: '1 / 1',
           marginInlineEnd: token('space-sm'),
-          marginBlockStart: quotient(difference(own.toastLine, token('size-icon')), 2),
         }),
-        web([rule({ touchAction: 'pan-y' })]),
+        web([rule({ marginBlockStart: fn('round', markDrop, '1px'), touchAction: 'pan-y' })]),
+        native([rule({ marginBlockStart: markDrop })]),
       ]),
       on('icon-mark', [rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
       /* A mark passed in is sized like the tone's. */
@@ -318,16 +325,13 @@ export default styles(
           }),
         ]),
       ]),
-      /* The close, in the corner and out of the flow, centered on the first line. */
+      /* The close, in the corner and out of the flow, centered on the first
+         line, its offset after the web's unset, which would wipe it. */
       on('dismiss', [
         rule({
           web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           position: 'absolute',
-          insetBlockStart: sum(
-            padding,
-            quotient(difference(own.toastLine, token('size-control')), 2),
-          ),
           insetInlineEnd: token('space-sm'),
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),
@@ -339,7 +343,13 @@ export default styles(
           placeItems: 'center',
           transition: ['color', token('duration-fast'), token('easing-standard')],
         }),
-        web([rule({ touchAction: 'pan-y' })]),
+        web([
+          rule({
+            insetBlockStart: sum(padding, fn('round', closeDrop, '1px')),
+            touchAction: 'pan-y',
+          }),
+        ]),
+        native([rule({ insetBlockStart: sum(padding, closeDrop) })]),
         rule(
           { hover: true },
           { backgroundColor: token('color-hover'), color: token('color-foreground') },

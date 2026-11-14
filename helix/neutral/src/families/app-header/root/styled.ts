@@ -67,14 +67,20 @@ export default styles(
     const header = hook.blockSize
     const pace = token('duration-normal')
     const easing = token('easing-standard')
+    /* **The translucent material, 30% of white in light**, under the 72% a
+       panel takes. The bar took the panel's coverage for a round, and the
+       owner put it back at 30% in November 2026, after comparing the two. */
     const glass = {
       backdropFilter: hook.backdrop(token('material-backdrop')),
-      backgroundColor: hook.backgroundColor(token('material-panel')),
+      backgroundColor: hook.backgroundColor(token('material-translucent')),
     }
+    const blurred = hook.backdrop(token('material-backdrop'))
     return [
       include(densitySm),
       /* The tight glyph never under the small icon step, as in a Toolbar,
-         since the bar holds Icon Buttons. On the row, which holds every
+         so the bar's Icon Buttons, a search field's glyph and a caret are
+         all 16 in the same 32 pixel row: at the small step's own 12 they read
+         thin beside the bar's 14 pixel words. On the row, which holds every
          region, past the dense steps the host takes. */
       on('row', [
         rule({
@@ -109,6 +115,44 @@ export default styles(
           },
           transparent: { backgroundColor: hook.backgroundColor('transparent') },
         }),
+        /* **What a panel hanging from the bar takes**, read by Megamenu so
+           its panel continues the bar: the page's ground under an opaque bar,
+           glass under glass. Decided by the owner on November 12, 2026,
+           against a black panel under every bar and the #181818 of Menu.
+           Inherited, so it reaches a Megamenu inside Navigation, and set once
+           per material. **A panel under a transparent bar takes the glass the
+           bar takes once scrolled**, at rest as well: a transparent panel
+           would set its links straight on the page. A phone's Megamenu reads
+           no property of another family. */
+        web([
+          rule({
+            '--_app-header-panel-fill': hook.backgroundColor(token('color-background')),
+            '--_app-header-panel-backdrop': 'none',
+          }),
+          rule(
+            { material: 'glass' },
+            {
+              '--_app-header-panel-fill': hook.backgroundColor(token('material-translucent')),
+              '--_app-header-panel-backdrop': blurred,
+            },
+          ),
+          rule(
+            { material: 'frosted' },
+            {
+              '--_app-header-panel-fill': hook.backgroundColor(
+                token('material-translucent-strong'),
+              ),
+              '--_app-header-panel-backdrop': hook.backdrop(fn('blur', token('material-blur-lg'))),
+            },
+          ),
+          rule(
+            { material: 'transparent' },
+            {
+              '--_app-header-panel-fill': token('material-translucent'),
+              '--_app-header-panel-backdrop': blurred,
+            },
+          ),
+        ]),
         /* Scrolled, it takes the glass. */
         rule({ material: 'transparent', scrolled: true }, { ...glass }),
         /* Glass and frosted draw the material's edge under the bar. */

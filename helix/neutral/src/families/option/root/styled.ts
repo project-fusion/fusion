@@ -4,11 +4,12 @@ import { difference, first, inherited, mix, native, scheme, token, web } from '.
 import { styles } from '../../../table.js'
 import option from './headless.js'
 
-/* The tick, a stencil so its color is a token like every other color here. **Checkbox's
-   tick**, the same path at the same stroke, so a chosen option and a ticked box draw one
-   mark. */
+/* The tick, a stencil so its color is a token like every other color here. **Phosphor's
+   regular check**, a line about 1px wide at this size, lighter than Checkbox's 2.08px tick.
+   Checkbox's tick was tried here in November 2026 and the owner kept the regular one: a
+   chosen row is marked by a light tick, a box by a heavy one. */
 const tick =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E\")"
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E\")"
 
 /**
  * One choice in a list, in its styled tier.
@@ -206,7 +207,7 @@ export default styles(
           maskImage: tick,
           maskPosition: 'center',
           maskRepeat: 'no-repeat',
-          maskSize: token('size-checkbox'),
+          maskSize: 'contain',
         },
       ),
       rule({ hasIndicator: true, platform: 'web' }, { content: 'none' }),

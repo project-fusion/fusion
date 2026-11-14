@@ -1,15 +1,5 @@
 import { number, oneOf } from '../../../render.js'
-import {
-  difference,
-  fn,
-  mix,
-  native,
-  product,
-  quotient,
-  scheme,
-  token,
-  web,
-} from '../../../style.js'
+import { difference, fn, mix, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -45,10 +35,11 @@ export default styles(
     prefix: 'skeleton',
     hooks: ({ own }) => ({
       blockSize: token('size-control'),
-      color: scheme(
-        mix(token('color-foreground'), 12, 'transparent'),
-        mix(token('color-foreground'), 14, 'transparent'),
-      ),
+      /* **8% of the ink, a light placeholder**, 1.20:1 on a white page and
+         1.15:1 on black. 12% and 14% were tried in November 2026 and the
+         owner kept the lighter shape: a placeholder stands in for content and
+         is not read. */
+      color: mix(token('color-foreground'), 8, 'transparent'),
       duration: product(token('duration-slow'), 4),
       lastLineSize: '60%',
       /* A piece over a field takes the corner the web's element measured on it. */

@@ -227,6 +227,29 @@ export default styles(
       ]),
       on({ region: 'chevron', slotted: '*' }, [rule({ color: token('color-foreground-subtle') })]),
       on({ region: 'check', slotted: '*' }, [rule({ color: token('color-foreground') })]),
+      /* **Phosphor's regular check, as Option draws it**, decided by the owner
+         on November 11, 2026: a checked row is marked by a light tick, and a
+         box, as Checkbox draws one, by a heavy one. The glyph the row writes
+         is the bold check, so its path is hidden and the regular check is
+         painted through a stencil in its place, in the same ink. Forced
+         colors paint every background the canvas, which would take the
+         stencil's fill with it; the ink it reads is already the forced one. */
+      on({ part: 'mark', selector: 'slot[name="check"] > svg[part="mark"]' }, [
+        web([
+          rule({
+            backgroundColor: 'currentColor',
+            maskImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M104 192a8 8 0 0 1-5.7-2.3l-56-56a8 8 0 0 1 11.4-11.4L104 172.7 210.3 66.3a8 8 0 0 1 11.4 11.4l-112 112A8 8 0 0 1 104 192Z'/%3E%3C/svg%3E\")",
+            maskPosition: 'center',
+            maskRepeat: 'no-repeat',
+            maskSize: 'contain',
+          }),
+          rule({ forcedColors: true }, { forcedColorAdjust: 'none' }),
+        ]),
+      ]),
+      on({ part: 'mark', selector: 'slot[name="check"] > svg[part="mark"] > *' }, [
+        web([rule({ display: 'none' })]),
+      ]),
       /* A row's page draws where the row stood. */
       on({ region: 'submenu' }, [web([rule({ display: 'contents' })])]),
       on({ region: 'submenu', slotted: 'helix-divider' }, [
