@@ -60,7 +60,7 @@ export default styles(
       overlay: boolean(),
       sticky: boolean(),
     },
-    own: { appHeaderFade: null },
+    own: { appHeaderFade: null, appHeaderPanelBackdrop: null, appHeaderPanelFill: null },
     stylesheet: 'app-header/root/app-header-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule, variants }) => {
@@ -120,39 +120,41 @@ export default styles(
            glass under glass. Decided by the owner on November 12, 2026,
            against a black panel under every bar and the #181818 of Menu.
            Inherited, so it reaches a Megamenu inside Navigation, and set once
-           per material. **A panel under a transparent bar takes the glass the
-           bar takes once scrolled**, at rest as well: a transparent panel
-           would set its links straight on the page. A phone's Megamenu reads
-           no property of another family. */
-        web([
-          rule({
-            '--_app-header-panel-fill': hook.backgroundColor(token('color-background')),
-            '--_app-header-panel-backdrop': 'none',
-          }),
-          rule(
-            { material: 'glass' },
-            {
-              '--_app-header-panel-fill': hook.backgroundColor(token('material-translucent')),
-              '--_app-header-panel-backdrop': blurred,
+           per material, on a phone as on the web. **A transparent bar's panel
+           takes the glass at rest**, or its links would stand on the page. */
+        rule({
+          own: {
+            appHeaderPanelFill: hook.backgroundColor(token('color-background')),
+            appHeaderPanelBackdrop: 'none',
+          },
+        }),
+        rule(
+          { material: 'glass' },
+          {
+            own: {
+              appHeaderPanelFill: hook.backgroundColor(token('material-translucent')),
+              appHeaderPanelBackdrop: blurred,
             },
-          ),
-          rule(
-            { material: 'frosted' },
-            {
-              '--_app-header-panel-fill': hook.backgroundColor(
-                token('material-translucent-strong'),
-              ),
-              '--_app-header-panel-backdrop': hook.backdrop(fn('blur', token('material-blur-lg'))),
+          },
+        ),
+        rule(
+          { material: 'frosted' },
+          {
+            own: {
+              appHeaderPanelFill: hook.backgroundColor(token('material-translucent-strong')),
+              appHeaderPanelBackdrop: hook.backdrop(fn('blur', token('material-blur-lg'))),
             },
-          ),
-          rule(
-            { material: 'transparent' },
-            {
-              '--_app-header-panel-fill': token('material-translucent'),
-              '--_app-header-panel-backdrop': blurred,
+          },
+        ),
+        rule(
+          { material: 'transparent' },
+          {
+            own: {
+              appHeaderPanelFill: token('material-translucent'),
+              appHeaderPanelBackdrop: blurred,
             },
-          ),
-        ]),
+          },
+        ),
         /* Scrolled, it takes the glass. */
         rule({ material: 'transparent', scrolled: true }, { ...glass }),
         /* Glass and frosted draw the material's edge under the bar. */
