@@ -42,7 +42,12 @@ import type { Finder, FindSink, HelixHeadlessFind } from '../../find/index.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
 import '../../toolbar/index.js'
-import { isTab, shortcutOf, spokenChord, type TerminalShortcut } from '../keys.js'
+import {
+  isTab,
+  shortcutOf,
+  spokenChord,
+  type TerminalShortcut,
+} from '@fusion.dev/helix-core/terminal'
 
 /** How a search through a terminal's output moves. */
 export interface TerminalFindOptions {

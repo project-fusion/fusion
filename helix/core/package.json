@@ -261,6 +261,10 @@
       "types": "./dist/utils/table/table.d.ts",
       "default": "./dist/utils/table/table.js"
     },
+    "./terminal": {
+      "types": "./dist/utils/terminal/terminal.d.ts",
+      "default": "./dist/utils/terminal/terminal.js"
+    },
     "./tree": {
       "types": "./dist/utils/tree-selection/tree.d.ts",
       "default": "./dist/utils/tree-selection/tree.js"

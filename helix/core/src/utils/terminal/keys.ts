@@ -1,4 +1,4 @@
-import { ariaChord, type ChordPress, matchesChord } from '@fusion.dev/helix-core'
+import { ariaChord, type ChordPress, matchesChord } from '../chord/chord.js'
 
 /** What a terminal frame does with a key press before the program sees it. */
 export type TerminalShortcut = 'copy' | 'find' | 'paste' | 'tab-focus'
