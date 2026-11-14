@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, jest, test } from '@jest/globals'
 import { TurboModuleRegistry } from 'react-native'
-import { forgetMapLibre, loadMapLibre, nativeRenderer } from './renderer'
+import { forgetMapLibre, forgetXterm, loadMapLibre, loadXterm, nativeRenderer } from './renderer'
 
 afterEach(() => {
   jest.restoreAllMocks()
   forgetMapLibre()
+  forgetXterm()
 })
 
 describe('nativeRenderer', () => {
@@ -29,7 +30,22 @@ describe('nativeRenderer', () => {
     jest.dontMock('@maplibre/maplibre-react-native')
   })
 
-  test('has no terminal renderer yet', () => {
+  test('draws a terminal through @xterm/headless where the app installs it, and leaves no process title behind', () => {
+    const before = 'title' in process
+    expect(nativeRenderer.available('terminal')).toBe(true)
+    expect(typeof loadXterm()?.Terminal).toBe('function')
+    expect('title' in process).toBe(before)
+  })
+
+  test('draws no terminal where the package is not installed', () => {
+    jest.doMock(
+      '@xterm/headless',
+      () => {
+        throw new Error('Cannot find module')
+      },
+      { virtual: true },
+    )
     expect(nativeRenderer.available('terminal')).toBe(false)
+    jest.dontMock('@xterm/headless')
   })
 })
