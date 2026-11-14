@@ -15,6 +15,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { createElement, forwardRef, type ReactNode, useImperativeHandle } from 'react'
 import { Text, TurboModuleRegistry } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { absoluteUrl, setBaseUrl } from '../capabilities/base-url'
 import { forgetMapLibre } from '../capabilities/renderer'
 import { LayerHostView } from '../root/layers'
 import { HelixTheme } from '../theme/helix-theme'
@@ -24,6 +25,19 @@ import { HelixMap, HelixMapMarker, type HelixMapProps } from './map/index.native
 const Route = Object.assign((_: Readonly<Record<string, unknown>>) => null, {
   tag: 'helix-map-route',
 })
+
+/** A raster layer, as the gallery's tag writes one. */
+const Raster = Object.assign((_: Readonly<Record<string, unknown>>) => null, {
+  tag: 'helix-map-raster',
+})
+
+const RADAR = '/maps/radar/0/{z}/{x}/{y}.png'
+
+/** The tiles every source of the style MapLibre was handed asks for. */
+const tilesOf = () =>
+  Object.values((styled?.sources ?? {}) as Record<string, { tiles?: string[] }>).flatMap(
+    (source) => source.tiles ?? [],
+  )
 
 const WALK = [
   { lat: 30.2746, lng: -97.7406 },
@@ -201,6 +215,7 @@ describe('Map on a phone with MapLibre Native', () => {
 
   afterEach(() => {
     jest.restoreAllMocks()
+    setBaseUrl(undefined)
   })
 
   test('draws MapLibre in the themed style with the route in it, and no still picture', async () => {
@@ -212,11 +227,47 @@ describe('Map on a phone with MapLibre Native', () => {
     expect(Object.keys(sources)).toContain('helix-layers')
   })
 
+  test("a renderer's box the page passes in is the web's, and draws nothing over the map", async () => {
+    await render(<Frame extra={<Text>Map stand-in</Text>} />)
+    await layOut()
+    expect(screen.queryByText('Map stand-in', { includeHiddenElements: true })).toBeNull()
+    expect(screen.getByLabelText('Texas Capitol')).toBeTruthy()
+  })
+
+  test('a relative tile source resolves against the base URL the app sets', async () => {
+    setBaseUrl('https://example.com/app/')
+    await render(<Frame extra={<Raster frames={[RADAR]} label="Weather radar" />} />)
+    await layOut()
+    await act(async () => undefined)
+    expect(tilesOf()).toContain('https://example.com/maps/radar/0/{z}/{x}/{y}.png')
+  })
+
+  test('a relative tile source is left out where the app sets no base URL', async () => {
+    await render(<Frame extra={<Raster frames={[RADAR]} label="Weather radar" />} />)
+    await layOut()
+    await act(async () => undefined)
+    expect(tilesOf().some((tile) => tile.includes('/maps/radar/'))).toBe(false)
+  })
+
   test('a control moves the camera over the page’s pace', async () => {
     await render(<Frame />)
     await layOut()
     await press('Zoom in')
     expect(eased).toHaveLength(1)
     expect(eased[0]).toMatchObject({ duration: 200 })
+  })
+})
+
+describe('absoluteUrl', () => {
+  test('resolves an address as a page does, and gives none without a base', () => {
+    expect(absoluteUrl('https://a.test/x.png', undefined)).toBe('https://a.test/x.png')
+    expect(absoluteUrl('/t/{z}.png', 'https://site.test/app/page')).toBe(
+      'https://site.test/t/{z}.png',
+    )
+    expect(absoluteUrl('t/{z}.png', 'https://site.test/app/page')).toBe(
+      'https://site.test/app/t/{z}.png',
+    )
+    expect(absoluteUrl('//cdn.test/t.png', 'https://site.test')).toBe('https://cdn.test/t.png')
+    expect(absoluteUrl('/t.png', undefined)).toBeUndefined()
   })
 })

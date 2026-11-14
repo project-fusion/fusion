@@ -1172,6 +1172,21 @@ loads. A picture that fails with no `--image-aspect` is a thin strip that holds
 the fallback, on a phone and on the web. With `--image-aspect` it keeps that
 ratio.
 
+## Relative addresses
+
+A page resolves an address such as `/maps/radar/0/{z}/{x}/{y}.png` against
+its own address, and an app has none. Set the site's address once as the app
+starts, and a map's tile sources resolve against it as a page's would:
+
+```ts
+import { setBaseUrl } from '@fusion.dev/helix-native'
+
+setBaseUrl('https://example.com')
+```
+
+Without it, a map leaves out a source written as a relative address, since
+MapLibre Native refuses an address with no host.
+
 ## Lists
 
 A part a component draws once for each entry of a list, such as each key

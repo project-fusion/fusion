@@ -14,6 +14,7 @@
  */
 import './peers'
 
+export { absoluteUrl, baseUrl, setBaseUrl } from './capabilities/base-url'
 export { type DateTimeSupport, dateTimeSupport } from './capabilities/intl'
 export { useLocale } from './capabilities/locale'
 export { type NumberSupport, numberSupport } from './capabilities/number-format'

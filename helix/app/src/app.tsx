@@ -1,5 +1,5 @@
 import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
-import { HelixRoot, useTokens } from '@fusion.dev/helix-native'
+import { HelixRoot, setBaseUrl, useTokens } from '@fusion.dev/helix-native'
 import {
   createNavigationContainerRef,
   DarkTheme,
@@ -102,6 +102,9 @@ function Gallery() {
   if (!linksSet) {
     linksSet = true
     setOpenLink(galleryLinks)
+    /* The examples' own sources, such as the weather radar's tiles, are
+       written for the site that serves them, as the sandbox runs them. */
+    setBaseUrl('https://fusion.dev')
   }
   const scheme = useColorScheme() === 'dark' ? 'dark' : 'light'
   const tokens = useTokens()

@@ -23,6 +23,7 @@ import {
   pointsFrom,
 } from '@fusion.dev/helix-core/map'
 import { Children, Fragment, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { absoluteUrl } from '../capabilities/base-url'
 
 type Element = ReactElement<Readonly<Record<string, unknown>>>
 
@@ -371,3 +372,26 @@ export const inkOf =
     const land = parseColor(String(tokens['color-surface'] ?? '#fafafa'))
     return ink && land ? cssColor(mix(ink, land, 0.5)) : '#808080'
   }
+
+/**
+ * A layer's tile sources resolved against the app's base URL, as a page
+ * resolves them against its own address: a raster's frames and a terrain's
+ * elevation. **A relative source with no base is left out**, an empty frame
+ * the style draws nothing for, since MapLibre Native refuses an address with
+ * no host.
+ */
+export const locatedSpec = (spec: MapLayerSpec): MapLayerSpec =>
+  spec.kind === 'raster' && spec.frames !== undefined
+    ? { ...spec, frames: spec.frames.map((frame) => absoluteUrl(frame) ?? '') }
+    : spec.kind === 'terrain' && spec.src !== undefined
+      ? { ...spec, src: absoluteUrl(spec.src) }
+      : spec
+
+/**
+ * What the frame's default region draws on a phone: the Helix elements in it,
+ * its markers, position and points. **Anything else there is the web's
+ * renderer box**, the element a page's renderer draws the map in, which a
+ * phone's frame draws itself, so a stand-in's words are not drawn over it.
+ */
+export const placedChildren = (children: readonly Element[]): readonly Element[] =>
+  children.filter((child) => tagOf(child) !== undefined)

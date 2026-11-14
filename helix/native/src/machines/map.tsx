@@ -28,7 +28,7 @@ import { kebab, wordsIn } from './date-picker-read'
 import { MapLive, MapStill } from './map-drawing'
 import { menuOf, useMapType, useShown } from './map-menu'
 import { controlsOf, ROTATE_STEP, TILTED } from './map-moves'
-import { childrenOf, inkOf, layersOf, placesOf } from './map-read'
+import { childrenOf, inkOf, layersOf, locatedSpec, placedChildren, placesOf } from './map-read'
 import { useMapView } from './map-view'
 import { langOf } from './picker-field-kind'
 import { boundTo, given, tell } from './props'
@@ -104,7 +104,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
   const specs = useMemo(
     () =>
       layers
-        .map((one) => one.spec)
+        .map((one) => locatedSpec(one.spec))
         .filter((spec) => !(spec.kind === 'raster' && spec.ground && mapType === 'standard')),
     [layers, mapType],
   )
@@ -225,11 +225,14 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       'zoom-in': pressed(() => moves.zoom(1)),
       'zoom-out': pressed(() => moves.zoom(-1)),
     },
-    ...(props.attribution !== undefined && props.attribution !== null
-      ? {}
-      : { regions: { attribution: <Credit /> } }),
     provide: (drawnFrame: ReactNode) => (
       <MapBoardContext.Provider value={board}>{drawnFrame}</MapBoardContext.Provider>
     ),
+    regions: {
+      ...(props.attribution !== undefined && props.attribution !== null
+        ? {}
+        : { attribution: <Credit /> }),
+      default: placedChildren(children),
+    },
   }
 }
