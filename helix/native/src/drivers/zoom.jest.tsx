@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { View } from 'react-native'
 import { GestureDetector, GestureHandlerRootView, State } from 'react-native-gesture-handler'
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils'
-import { useZoom, type Zooming } from './zoom'
+import { useZoom, type Zooming, type ZoomSetup } from './zoom'
 
 /** Where a spec keeps what the box draws with, and what it was told. */
 interface Held {
@@ -11,8 +11,20 @@ interface Held {
   zooming?: Zooming
 }
 
-const Box = ({ held, max }: { readonly held: Held; readonly max: number }) => {
+/** What a board asks of the driver beyond the most it may grow. */
+type Board = Pick<ZoomSetup, 'doubleStep' | 'item' | 'min'>
+
+const Box = ({
+  board,
+  held,
+  max,
+}: {
+  readonly board?: Board | undefined
+  readonly held: Held
+  readonly max: number
+}) => {
   const zooming = useZoom({
+    ...board,
     changed: (zoom) => held.told.push(['changed', zoom]),
     enabled: true,
     max,
@@ -29,11 +41,11 @@ const Box = ({ held, max }: { readonly held: Held; readonly max: number }) => {
 }
 
 /** A box 400 points wide and 300 tall, zoomable to `max`. */
-const drawn = async (max = 3): Promise<Held> => {
+const drawn = async (max = 3, board?: Board): Promise<Held> => {
   const held: Held = { told: [] }
   await render(
     <GestureHandlerRootView>
-      <Box held={held} max={max} />
+      <Box board={board} held={held} max={max} />
     </GestureHandlerRootView>,
   )
   await act(async () => {
@@ -139,6 +151,54 @@ describe('useZoom', () => {
       expect(held.zooming?.panBy({ x: 10, y: 0 })).toBe(false)
     })
     expect(held.told.filter((one) => (one as unknown[])[0] === 'changed')).toHaveLength(3)
+  })
+
+  test('a board pinches out below 1, as far as its least, and stays inside the box', async () => {
+    const held = await drawn(8, { item: { height: 200, width: 1000 }, min: 0.1 })
+    fireGestureHandler(parts(held).pinch as never, [
+      { focalX: 200, focalY: 150, scale: 1, state: State.BEGAN },
+      { focalX: 200, focalY: 150, scale: 1, state: State.ACTIVE },
+      { focalX: 200, focalY: 150, scale: 0.5 },
+      { focalX: 200, focalY: 150, scale: 0.5, state: State.END },
+    ])
+    await settle()
+    expect(zoomOf(held)?.scale).toBe(0.5)
+    await act(async () => held.zooming?.zoomTo(0.01))
+    expect(zoomOf(held)?.scale).toBe(0.1)
+  })
+
+  test('one finger moves a board larger than the box at its own size, and a smaller one inside it', async () => {
+    const held = await drawn(8, { item: { height: 200, width: 1000 }, min: 0.1 })
+    const drag = [
+      { state: State.BEGAN, translationX: 0, translationY: 0 },
+      { state: State.ACTIVE, translationX: -40, translationY: 0 },
+      { translationX: -900, translationY: 80 },
+      { state: State.END, translationX: -900, translationY: 80 },
+    ]
+    fireGestureHandler(parts(held).pan as never, drag)
+    await settle()
+    /* The plane is 600 wider than the box and 100 shorter: 300 across, 50 down. */
+    expect(zoomOf(held)).toEqual({ pan: { x: -300, y: 50 }, scale: 1 })
+    expect(held.told.some((one) => (one as unknown[])[0] === 'swiped')).toBe(false)
+    await act(async () => held.zooming?.zoomTo(0.2))
+    await act(async () => {
+      expect(held.zooming?.panBy({ x: 500, y: 0 })).toBe(true)
+    })
+    /* At a fifth the plane is 200 by 40 in the box: 100 across, 130 down. */
+    expect(zoomOf(held)?.pan.x).toBe(100)
+  })
+
+  test('a board’s double tap zooms in by its step about the point', async () => {
+    const held = await drawn(8, { doubleStep: 2, item: { height: 200, width: 1000 }, min: 0.1 })
+    const tap = [
+      { state: State.BEGAN, x: 250, y: 150 },
+      { state: State.ACTIVE, x: 250, y: 150 },
+      { state: State.END, x: 250, y: 150 },
+    ]
+    fireGestureHandler(parts(held).double as never, tap)
+    expect(zoomOf(held)).toEqual({ pan: { x: -50, y: 0 }, scale: 2 })
+    fireGestureHandler(parts(held).double as never, tap)
+    expect(zoomOf(held)?.scale).toBe(4)
   })
 
   test('a single tap is told where it landed, from the middle of the box', async () => {
