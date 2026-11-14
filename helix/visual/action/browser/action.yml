@@ -78,10 +78,15 @@ runs:
           echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
         fi
 
+    # **By the runner image, not by `runner.os`.** Playwright downloads a build
+    # for the operating system it finds, and `runner.os` is `Linux` on every
+    # image: when `ubuntu-latest` moved to 26.04, the cache handed back the
+    # WebKit built for 24.04, which links a `libicudata.so.74` 26.04 does not
+    # ship, and no WebKit spec could launch.
     - name: Restore the browser
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
-        key: playwright${{ steps.version.outputs.kind }}-${{ runner.os }}-${{ steps.version.outputs.version }}
+        key: playwright${{ steps.version.outputs.kind }}-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
         path: ~/.cache/ms-playwright
 
     - name: Restore the system packages
