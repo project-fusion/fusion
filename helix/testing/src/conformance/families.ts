@@ -77,6 +77,7 @@ export type Family =
   | 'spatial-bar-chart'
   | 'spatial-ribbon-chart'
   | 'spatial-scatter-chart'
+  | 'spatial-surface-chart'
   | 'heatmap'
   | 'lightbox'
   | 'video'
