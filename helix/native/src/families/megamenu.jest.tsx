@@ -4,8 +4,9 @@
  * expanded, leaving focus on it, a band of groups under it across the
  * window, Down that takes focus into it, Escape that closes it with focus
  * back on the trigger, a destination that asks with `before-select`, opens its link,
- * and closes it, and the navigation around that is open while it is and
- * whose arrow keys reach its trigger. `test:native` writes the components
+ * and closes it, the navigation around that is open while it is and
+ * whose arrow keys reach its trigger, and a panel that continues the App
+ * Header it hangs from. `test:native` writes the components
  * beside this file.
  */
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
@@ -19,10 +20,11 @@ import { type FakeTimers, fakeTimers } from '@fusion.dev/helix-core/capabilities
 import { afterEach, beforeEach, describe, expect, test } from '@jest/globals'
 import { act, fireEvent, render } from '@testing-library/react-native'
 import type { ReactNode } from 'react'
-import { Dimensions, Text } from 'react-native'
+import { Dimensions, StyleSheet, Text } from 'react-native'
 import { LayerHostView } from '../root/layers'
 import { light } from '../theme/light.generated'
 import { ThemeProvider } from '../theme/theme'
+import { HelixAppHeader } from './app-header/index.native'
 import { HelixMegamenu, HelixMegamenuGroup, HelixMegamenuItem } from './megamenu/index.native'
 import { HelixNavigation, HelixNavigationItem } from './navigation/index.native'
 
@@ -324,5 +326,25 @@ describe('the generated Megamenu', () => {
       keys.press(products, 'ArrowRight')
     })
     expect(focus.focused() === pricing).toBe(true)
+  })
+
+  /** The open panel's fill in an App Header of `material`, through the navigation around it as on the web. */
+  const fillUnder = async (material?: 'glass') => {
+    await draw(
+      <HelixAppHeader {...(material === undefined ? {} : { material })}>
+        <HelixNavigation label="Main">{megamenu({ defaultOpen: true })}</HelixNavigation>
+      </HelixAppHeader>,
+    )
+    const style = StyleSheet.flatten(panel()?.props.style) as { backgroundColor?: string }
+    drawn?.unmount()
+    return style?.backgroundColor
+  }
+
+  test('its panel continues a glass App Header it hangs from in the same glass', async () => {
+    expect(await fillUnder('glass')).toBe(light['material-translucent'])
+  })
+
+  test('its panel under an opaque App Header is the page’s ground', async () => {
+    expect(await fillUnder()).toBe(light['color-background'])
   })
 })
