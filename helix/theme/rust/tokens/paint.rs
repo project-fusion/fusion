@@ -229,6 +229,25 @@ pub fn from_xyz([x, y, z]: [f64; 3], alpha: f64) -> Lab {
     }
 }
 
+/// Gamma-encoded sRGB, each channel as it stands, outside 0 to 1 where the
+/// color is outside the gamut, as a relative `color(from ... srgb ...)`
+/// reads it.
+pub fn to_srgb_unclipped(color: &Lab) -> [f64; 3] {
+    lab_to_linear(color).map(encode)
+}
+
+/// A color from its gamma-encoded sRGB and its alpha.
+pub fn from_srgb([red, green, blue]: [f64; 3], alpha: f64) -> Lab {
+    let (l, a, b) = linear_to_lab([decode(red), decode(green), decode(blue)]);
+    Lab {
+        l,
+        a,
+        b,
+        alpha,
+        stated: None,
+    }
+}
+
 /// Gamma-encoded sRGB from 0 to 1, each channel clipped into gamut first.
 pub fn to_srgb(color: &Lab) -> [f64; 3] {
     lab_to_linear(color).map(|one| encode(one.clamp(0.0, 1.0)))

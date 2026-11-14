@@ -27,6 +27,7 @@ mod native;
 mod paint;
 mod print;
 mod read;
+mod reading;
 mod registry;
 mod sheet;
 mod syntax;

@@ -196,7 +196,11 @@ impl Reader<'_> {
             .iter()
             .map(|one| self.built_channel(one, relative))
             .collect::<Result<_, _>>()?;
-        Ok(Color::Oklch(Box::new(Oklch { origin, channels })))
+        Ok(Color::Oklch(Box::new(Oklch {
+            origin,
+            channels,
+            alpha: None,
+        })))
     }
 
     fn built_channel(&mut self, built: &Built, relative: bool) -> Result<Channel, String> {

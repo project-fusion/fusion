@@ -9,8 +9,8 @@
 //! a browser and in `paint.mjs`.
 
 use super::expr::{
-    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Kind, Math,
-    Oklch, Op, Quantity, Shadow, Shaped, Space, Time, Unit, Var, Weight,
+    Channel, Color, Component, Easing, Expr, Families, Family, Filter, Filters, Func, Gamut, Kind,
+    Math, Oklch, Op, Quantity, Shadow, Shaped, Space, Time, Unit, Var, Weight, Xyz,
 };
 use super::paint::{self, Lab, Polar};
 use super::registry::{Declared, Registry};
@@ -189,28 +189,56 @@ impl Evaluation<'_> {
                 })
             }
             Color::Oklch(oklch) => self.oklch(oklch, trail),
-            Color::Xyz(xyz) => {
-                let origin = self.color(&xyz.origin, trail)?;
-                let [x, y, z] = paint::to_xyz(&origin);
-                /* The components ride in a polar's three slots, which `read`
-                hands back for `x`, `y` and `z`. */
-                let held = Polar {
-                    l: x,
-                    c: y,
-                    h: z,
-                    alpha: origin.alpha,
-                };
-                let mut values = Vec::new();
-                for channel in &xyz.channels {
-                    values.extend(self.channel(channel, Some(&held), trail)?);
-                }
-                let [x, y, z] = values[..] else {
-                    return Err(refused("a `color()` in xyz-d65 holds three components"));
-                };
-                Ok(paint::from_xyz([x, y, z], origin.alpha))
-            }
+            Color::Xyz(xyz) => self.relative_color(xyz, trail),
             Color::Transparent => Ok(paint::TRANSPARENT),
             Color::Var(var) => self.through(var, trail, &|one, trail| self.color(one, trail)),
+        }
+    }
+
+    /// `color(from <origin> xyz-d65 ...)` or `srgb ...`: the origin's
+    /// components in that space, worked, and read back.
+    fn relative_color(&self, xyz: &Xyz, trail: &[String]) -> Result<Lab, Fault> {
+        let origin = self.color(&xyz.origin, trail)?;
+        let [one, two, three] = match xyz.space {
+            Gamut::Xyz => paint::to_xyz(&origin),
+            Gamut::Srgb => paint::to_srgb_unclipped(&origin),
+        };
+        /* The components ride in a polar's three slots, which `read` hands
+        back for `x`, `y` and `z`, or `r`, `g` and `b`. */
+        let held = Polar {
+            l: one,
+            c: two,
+            h: three,
+            alpha: origin.alpha,
+        };
+        let mut values = Vec::new();
+        for channel in &xyz.channels {
+            values.extend(self.channel(channel, Some(&held), trail)?);
+        }
+        let [one, two, three] = values[..] else {
+            return Err(refused("a relative `color()` holds three components"));
+        };
+        let alpha = self.alpha(xyz.alpha.as_ref(), Some(&held), origin.alpha, trail)?;
+        Ok(match xyz.space {
+            Gamut::Xyz => paint::from_xyz([one, two, three], alpha),
+            Gamut::Srgb => paint::from_srgb([one, two, three], alpha),
+        })
+    }
+
+    /// The alpha written after a `/`, from 0 to 1, or `inherited` where none is.
+    fn alpha(
+        &self,
+        written: Option<&Channel>,
+        origin: Option<&Polar>,
+        inherited: f64,
+        trail: &[String],
+    ) -> Result<f64, Fault> {
+        let Some(channel) = written else {
+            return Ok(inherited);
+        };
+        match self.channel(channel, origin, trail)?[..] {
+            [alpha] => Ok(alpha.clamp(0.0, 1.0)),
+            _ => Err(refused("an alpha is one number")),
         }
     }
 
@@ -229,12 +257,9 @@ impl Evaluation<'_> {
                 values.len()
             )));
         };
-        Ok(paint::to_lab(Polar {
-            l,
-            c,
-            h,
-            alpha: origin.map_or(1.0, |origin| origin.alpha),
-        }))
+        let inherited = origin.map_or(1.0, |origin| origin.alpha);
+        let alpha = self.alpha(oklch.alpha.as_ref(), origin.as_ref(), inherited, trail)?;
+        Ok(paint::to_lab(Polar { l, c, h, alpha }))
     }
 
     fn channel(
@@ -340,7 +365,7 @@ impl Evaluation<'_> {
         trail: &[String],
     ) -> Result<Amount, Fault> {
         match quantity {
-            Quantity::Calc(math) => self.math(math, origin, trail),
+            Quantity::Calc(math) | Quantity::Clamp(math) => self.math(math, origin, trail),
             Quantity::Var(var) => self.through(var, trail, &|one, trail| {
                 self.quantity_in(one, origin, trail)
             }),
@@ -350,7 +375,7 @@ impl Evaluation<'_> {
 
     fn quantity(&self, quantity: &Quantity, trail: &[String]) -> Result<Amount, Fault> {
         match quantity {
-            Quantity::Calc(math) => self.math(math, None, trail),
+            Quantity::Calc(math) | Quantity::Clamp(math) => self.math(math, None, trail),
             Quantity::Length(value, unit) => Ok(Amount::Length(length(*value, *unit))),
             Quantity::Number(value) => Ok(Amount::Number(*value)),
             Quantity::Max(values) => self.extreme(values, trail, f64::max),
@@ -535,9 +560,10 @@ fn read(name: Component, origin: Option<&Polar>) -> Result<f64, Fault> {
     let origin = origin.ok_or_else(|| refused("a component is read outside a relative color"))?;
     Ok(match name {
         /* An XYZ origin rides in the polar's slots, `x` in `l`. */
-        Component::Chroma | Component::Y => origin.c,
-        Component::Hue | Component::Z => origin.h,
-        Component::Lightness | Component::X => origin.l,
+        Component::Chroma | Component::Y | Component::Green => origin.c,
+        Component::Hue | Component::Z | Component::Blue => origin.h,
+        Component::Lightness | Component::X | Component::Red => origin.l,
+        Component::Alpha => origin.alpha,
     })
 }
 

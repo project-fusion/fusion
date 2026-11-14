@@ -137,6 +137,10 @@ fn component(name: &str) -> Option<Component> {
         "x" => Some(Component::X),
         "y" => Some(Component::Y),
         "z" => Some(Component::Z),
+        "r" => Some(Component::Red),
+        "g" => Some(Component::Green),
+        "b" => Some(Component::Blue),
+        "alpha" => Some(Component::Alpha),
         _ => None,
     }
 }

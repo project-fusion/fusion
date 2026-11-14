@@ -24,6 +24,9 @@ impl Reader<'_> {
             Node::Function(name, arguments) if name == "calc" => {
                 self.calc(&arguments, true).map(Quantity::Calc)
             }
+            Node::Function(ref name, _) if name == "clamp" => self
+                .calc(from_ref(&single(nodes).map_err(|()| not())?), true)
+                .map(Quantity::Clamp),
             Node::Function(name, arguments) if name == "round" => match commas(&arguments)[..] {
                 [ref value, ref step] => Ok(Quantity::Round(
                     Box::new(self.quantity(value)?),

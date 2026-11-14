@@ -4,7 +4,7 @@
 
 use std::slice::from_ref;
 
-use super::super::expr::{Channel, Color, Func, Math, Mix, Oklch, Op, Space, Weight, Xyz};
+use super::super::expr::{Channel, Color, Func, Gamut, Math, Mix, Oklch, Op, Space, Weight, Xyz};
 use super::super::syntax::{self, commas, words, Node};
 use super::{component, is_hex, length_unit, single, Reader};
 
@@ -86,12 +86,9 @@ impl Reader<'_> {
 
     fn oklch(&mut self, arguments: &[Node]) -> Result<Oklch, String> {
         let source = || syntax::source(arguments);
-        if arguments
-            .iter()
-            .any(|node| matches!(node, Node::Operator('/') | Node::Comma))
-        {
+        if arguments.iter().any(|node| matches!(node, Node::Comma)) {
             return Err(format!(
-                "`oklch({})` states an alpha or separates with commas, which is not typed",
+                "`oklch({})` separates with commas, which is not typed",
                 source()
             ));
         }
@@ -103,6 +100,7 @@ impl Reader<'_> {
             rest => (None, rest),
         };
         let relative = origin.is_some();
+        let (rest, alpha) = self.alpha(rest, relative, &source)?;
         let channels = rest
             .iter()
             .map(|node| self.channel(node, relative))
@@ -114,23 +112,40 @@ impl Reader<'_> {
                 source()
             ));
         }
-        Ok(Oklch { origin, channels })
+        Ok(Oklch {
+            origin,
+            channels,
+            alpha,
+        })
     }
 
-    /// `color(from <origin> xyz-d65 <x> <y> <z>)`, the one form of `color()`
-    /// the layer writes.
+    /// `color(from <origin> xyz-d65 <x> <y> <z>)` or `color(from <origin>
+    /// srgb <r> <g> <b>)`, each with an alpha after a `/` where one is
+    /// written: the forms of `color()` the layer writes.
     fn xyz(&mut self, arguments: &[Node]) -> Result<Xyz, String> {
+        let source = || syntax::source(arguments);
         let list = words(arguments);
         let [Node::Ident(from), origin, Node::Ident(space), rest @ ..] = list.as_slice() else {
             return Err(format!(
                 "`color({})` is not relative to an origin, which is not typed",
-                syntax::source(arguments)
+                source()
             ));
         };
-        if from != "from" || space != "xyz-d65" || rest.len() != 3 {
+        let space = match space.as_str() {
+            "xyz-d65" => Gamut::Xyz,
+            "srgb" => Gamut::Srgb,
+            _ => {
+                return Err(format!(
+                    "`color({})` is not in xyz-d65 or srgb, which is not typed",
+                    source()
+                ))
+            }
+        };
+        let (rest, alpha) = self.alpha(rest, true, &source)?;
+        if from != "from" || rest.len() != 3 {
             return Err(format!(
-                "`color({})` is not three components in xyz-d65 from an origin",
-                syntax::source(arguments)
+                "`color({})` is not three components from an origin",
+                source()
             ));
         }
         let origin = self.color(from_ref(origin))?;
@@ -138,7 +153,32 @@ impl Reader<'_> {
             .iter()
             .map(|node| self.channel(node, true))
             .collect::<Result<Vec<_>, _>>()?;
-        Ok(Xyz { origin, channels })
+        Ok(Xyz {
+            origin,
+            space,
+            channels,
+            alpha,
+        })
+    }
+
+    /// The components before a `/`, and the alpha after it, where one is
+    /// written. One value follows the `/`, or the color is refused.
+    fn alpha<'n>(
+        &mut self,
+        list: &'n [Node],
+        relative: bool,
+        source: &dyn Fn() -> String,
+    ) -> Result<(&'n [Node], Option<Channel>), String> {
+        let Some(slash) = list.iter().position(|node| *node == Node::Operator('/')) else {
+            return Ok((list, None));
+        };
+        match &list[slash + 1..] {
+            [alpha] => Ok((&list[..slash], Some(self.channel(alpha, relative)?))),
+            _ => Err(format!(
+                "`{}` does not state one alpha after its `/`",
+                source()
+            )),
+        }
     }
 
     fn channel(&mut self, node: &Node, relative: bool) -> Result<Channel, String> {
