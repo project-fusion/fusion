@@ -29,6 +29,7 @@ import { FieldsetDisabled, HelixRoot } from '../../src/index'
 import type { HelixEvent } from '../../src/machines/props'
 import { camel, handlerOf } from '../../src/machines/props'
 import { publishChartSource } from '../../src/render/chart-sources'
+import { canvasEdge, isCanvasEdge } from './canvas'
 import { carouselDot, carouselPress, carousels } from './carousel'
 import { focusPlot, isChart, tapPlot } from './chart'
 import { chatPress, chatProps, chats } from './chat'
@@ -223,6 +224,9 @@ const drawChild = (run: Run, child: Setup | string): ReactElement | string => {
   /* An element with no value is heard as the web hears it, from `''`, and
      one with an `href` and no value from its `href`, as a destination. */
   const value = knownBy(child) ?? ''
+  if (isCanvasEdge(child)) {
+    return canvasEdge(child)
+  }
   return isElement(child.tag) ? draw(run, child, value) : plain(child)
 }
 

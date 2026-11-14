@@ -53,9 +53,11 @@ export const remember = (family: Family, Component: ComponentType<Props>): Compo
 /**
  * Whether a tag is a Helix element, which a generated component draws, and
  * not a plain element a setup passes into one, as a section's `<span>` of
- * words passed into its `summary`.
+ * words passed into its `summary`, nor a declaration no component draws, as
+ * a board's connection, which the board reads by its tag.
  */
-export const isElement = (tag: string): boolean => tag.startsWith('helix-')
+export const isElement = (tag: string): boolean =>
+  tag.startsWith('helix-') && tag !== 'helix-canvas-edge'
 
 /** The form of the element with this tag. */
 export const formOf = (tag: string): Family => {

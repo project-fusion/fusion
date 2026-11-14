@@ -82,6 +82,7 @@ export type Family =
   | 'spatial-treemap'
   | 'heatmap'
   | 'graph'
+  | 'canvas'
   | 'lightbox'
   | 'video'
   | 'orb'

@@ -8,6 +8,7 @@ import { BAR_CHART } from './scenarios/bar-chart.js'
 import { BUTTON } from './scenarios/button.js'
 import { BUTTON_GROUP } from './scenarios/button-group.js'
 import { CALLOUT } from './scenarios/callout.js'
+import { CANVAS } from './scenarios/canvas.js'
 import { CAROUSEL } from './scenarios/carousel.js'
 import { CHAT } from './scenarios/chat.js'
 import { CHECKBOX_GROUP } from './scenarios/checkbox-group.js'
@@ -100,6 +101,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   button: BUTTON,
   'button-group': BUTTON_GROUP,
   callout: CALLOUT,
+  canvas: CANVAS,
   carousel: CAROUSEL,
   chat: CHAT,
   checkbox: CHECKBOX,
