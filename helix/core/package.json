@@ -79,6 +79,10 @@
       "types": "./dist/utils/calendar/dates.d.ts",
       "default": "./dist/utils/calendar/dates.js"
     },
+    "./canvas": {
+      "types": "./dist/utils/canvas/canvas.d.ts",
+      "default": "./dist/utils/canvas/canvas.js"
+    },
     "./capabilities/*": {
       "types": "./dist/capabilities/*/index.d.ts",
       "default": "./dist/capabilities/*/index.js"

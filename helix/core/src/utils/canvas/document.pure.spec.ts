@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { distanceTo, groupOf } from './canvas-document.js'
+import { distanceTo, groupOf } from './document.js'
 
 /**
  * Which group a card sits in, which moving a group moves it with.

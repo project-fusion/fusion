@@ -1,7 +1,7 @@
 import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import type { CanvasEnd, CanvasSide } from '@fusion.dev/helix-core/canvas'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
 
 /**
  * @summary A connector between two cards on a canvas.
