@@ -1150,9 +1150,12 @@ export interface LightboxChoice {
 /** The names of a strip of cells, each read as `heatmap.x`. */
 export interface HeatmapChoice {
   readonly actives?: string
+  readonly base?: string
   readonly cells?: string
   readonly drawn?: string
   readonly empty?: string
+  readonly endX?: string
+  readonly endY?: string
   readonly error?: string
   readonly footed?: string
   readonly live?: string
@@ -1169,9 +1172,12 @@ export interface HeatmapChoice {
   readonly placement?: string
   readonly role?: string
   readonly selection?: string
+  readonly startX?: string
+  readonly startY?: string
   readonly tipCells?: string
   readonly tipLabel?: string
   readonly tipped?: string
+  readonly viewBox?: string
 }
 
 /** A chart key's names, each read as `legend.x`. */

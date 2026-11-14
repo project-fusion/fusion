@@ -53,9 +53,16 @@ export const lengthOf = (theme: Theme, token: string, fallback: number): number 
   return written.endsWith('rem') ? value * theme.rem : value
 }
 
-/** The camera, the frame it holds through a drag, and the drag and the keys that turn it. */
-export const useCamera = (box: { readonly height: number; readonly width: number }) => {
-  const [camera, setCamera] = useState<Camera>(SPATIAL_VIEW)
+/**
+ * The camera, from `start`, the frame it holds through a drag, and the drag
+ * and the keys that turn it. `box` is read as a drag moves, so a caller that
+ * sizes its box from the frame may write it after this returns.
+ */
+export const useCamera = (
+  box: { readonly height: number; readonly width: number },
+  start: Camera = SPATIAL_VIEW,
+) => {
+  const [camera, setCamera] = useState<Camera>(start)
   const [moving, setMoving] = useState(false)
   const [, redraw] = useState(0)
   const frames = useRef(new TurnFrame())

@@ -707,6 +707,14 @@
       "types": "./dist/spatial-bar-chart/index.d.ts",
       "default": "./dist/spatial-bar-chart/index.js"
     },
+    "./spatial-heatmap": {
+      "react-native": {
+        "types": "./dist/spatial-heatmap/index.native.d.ts",
+        "default": "./dist/spatial-heatmap/index.native.js"
+      },
+      "types": "./dist/spatial-heatmap/index.d.ts",
+      "default": "./dist/spatial-heatmap/index.js"
+    },
     "./spatial-ribbon-chart": {
       "react-native": {
         "types": "./dist/spatial-ribbon-chart/index.native.d.ts",

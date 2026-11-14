@@ -940,12 +940,16 @@ pub const LIGHTBOX_COMPUTED: &[&str] = &[
     "zooms",
 ];
 
-/// What a strip of cells computes for its parts, each read as `heatmap.x`.
+/// What a strip of cells computes for its parts, each read as `heatmap.x`, and what a
+/// relief of them adds: its slab, its frame, and where its first and last labels stand.
 pub const HEATMAP_COMPUTED: &[&str] = &[
     "actives",
+    "base",
     "cells",
     "drawn",
     "empty",
+    "endX",
+    "endY",
     "error",
     "footed",
     "live",
@@ -957,9 +961,12 @@ pub const HEATMAP_COMPUTED: &[&str] = &[
     "placement",
     "role",
     "selection",
+    "startX",
+    "startY",
     "tipCells",
     "tipLabel",
     "tipped",
+    "viewBox",
 ];
 
 /// What a page-size control reads and sends, by the name the machine binds.

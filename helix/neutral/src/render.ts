@@ -598,9 +598,12 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   /** What a strip of cells computes for its parts. */
   readonly heatmap: Computes<
     | 'actives'
+    | 'base'
     | 'cells'
     | 'drawn'
     | 'empty'
+    | 'endX'
+    | 'endY'
     | 'error'
     | 'footed'
     | 'live'
@@ -612,9 +615,12 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'placement'
     | 'role'
     | 'selection'
+    | 'startX'
+    | 'startY'
     | 'tipCells'
     | 'tipLabel'
     | 'tipped'
+    | 'viewBox'
   >
   /** What a chart's key computes for its parts: its entries, and its list's name and role. */
   readonly legend: Computes<'entries' | 'named' | 'role'>
