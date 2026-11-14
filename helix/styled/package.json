@@ -731,6 +731,14 @@
       "types": "./dist/spatial-surface-chart/index.d.ts",
       "default": "./dist/spatial-surface-chart/index.js"
     },
+    "./spatial-treemap": {
+      "react-native": {
+        "types": "./dist/spatial-treemap/index.native.d.ts",
+        "default": "./dist/spatial-treemap/index.native.js"
+      },
+      "types": "./dist/spatial-treemap/index.d.ts",
+      "default": "./dist/spatial-treemap/index.js"
+    },
     "./specs": null,
     "./speed-dial": {
       "react-native": {
