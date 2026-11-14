@@ -164,6 +164,10 @@
       "types": "./dist/machines/*.d.ts",
       "default": "./dist/machines/*.js"
     },
+    "./map": {
+      "types": "./dist/utils/map/map.d.ts",
+      "default": "./dist/utils/map/map.js"
+    },
     "./menu-items": {
       "types": "./dist/utils/menu-items/menu-items.d.ts",
       "default": "./dist/utils/menu-items/menu-items.js"

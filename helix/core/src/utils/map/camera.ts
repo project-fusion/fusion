@@ -1,4 +1,4 @@
-import type { MapPlace } from '../connect-map/index.js'
+import type { MapPlace } from './driver.js'
 
 /**
  * Where a map is looking and how big it is drawn: what MapLibre is given as

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { pointsFrom } from './points.js'
+import { pointsFrom } from '@fusion.dev/helix-core/map'
 
 describe('pointsFrom', () => {
   test('GeoJSON points are places, latitude first, named by the key asked and reported by their id', () => {

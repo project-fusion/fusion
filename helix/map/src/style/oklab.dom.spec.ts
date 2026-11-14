@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { contrast, cssColor, mix, parseColor, rehue } from './oklab.js'
+import { contrast, cssColor, mix, parseColor, rehue } from '@fusion.dev/helix-core/map'
 
 describe('the color arithmetic', () => {
   test('reads hex and rgb in the forms a style is handed', () => {

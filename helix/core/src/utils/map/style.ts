@@ -10,7 +10,7 @@ import {
   tree,
   trophy,
 } from '@fusion.dev/helix-icons'
-import type { MapColors } from './map-colors.js'
+import type { MapColors } from './colors.js'
 import { cssColor, legible as legibleOn, mix, parseColor, type Rgb, rehue } from './oklab.js'
 
 /** Where the tiles and the type come from, where not OpenFreeMap, and how legible the type is. */

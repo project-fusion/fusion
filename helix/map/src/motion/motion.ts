@@ -1,22 +1,6 @@
-/**
- * How a move is animated: the page's own duration and curve.
- *
- * `null` where it is a jump instead, which is what a reader who asked for
- * less motion gets and what a theme whose durations are zero, the `instant`
- * character, asks for.
- */
-export interface MapMotion {
-  /** In milliseconds. */
-  duration: number
-  /** Progress through the time in, progress through the move out, both 0 to 1. */
-  easing(t: number): number
-}
+import type { MapMotion, MapPace } from '@fusion.dev/helix-core/map'
 
-/**
- * Which of the page's paces a move is: a step, a pan or a zoom a reader asked
- * for one press at a time, or a travel, the view carried to a place.
- */
-export type MapPace = 'step' | 'travel'
+export type { MapMotion, MapPace } from '@fusion.dev/helix-core/map'
 
 /**
  * The shipped values, for a page with no Helix tokens on it, which still

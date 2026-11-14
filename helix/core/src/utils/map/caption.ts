@@ -1,4 +1,4 @@
-import type { MapPlace } from './connect-map.js'
+import type { MapPlace } from './driver.js'
 
 /** Where an area's caption stands, and which part of it stands there. */
 export interface CaptionSpot {

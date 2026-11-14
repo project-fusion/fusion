@@ -1,7 +1,7 @@
+import { cameraOf, type MapView, type ScreenPoint } from '@fusion.dev/helix-core/map'
 import { VectorTile } from '@mapbox/vector-tile'
 import { PbfReader } from 'pbf'
 import { type CreditPart, creditMarkup, creditParts } from '../credit/credit.js'
-import { cameraOf, type MapView, type ScreenPoint } from './camera.js'
 
 /** The token a snapshot layer's color is the land moved toward. */
 export type SnapshotToward = 'foreground' | 'info' | 'primary' | 'success'

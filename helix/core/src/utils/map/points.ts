@@ -1,4 +1,4 @@
-import type { MapPlace } from '../connect-map/connect-map.js'
+import type { MapPlace } from './driver.js'
 
 /** A points layer's places as a renderer draws them and a press reports them. */
 export interface MapPoints {
