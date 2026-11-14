@@ -17,6 +17,7 @@ members = [
 	"cortex/provider",
 	"cortex/recall",
 	"fusion/cli",
+	"fusion/plugins/catalog",
 	"fusion/plugins/host",
 	"fusion/plugins/rules",
 	"fusion/plugins/sources",
@@ -102,6 +103,7 @@ fusion-helix-theme = { path = "helix/theme" }
 # lines take the rules world, and other products embed the rest. The loader
 # crate's features are `loader` for the worlds and `net` for the address guard,
 # and each member names the ones it takes.
+fusion-plugin-catalog = { path = "fusion/plugins/catalog" }
 fusion-plugin-host = { path = "fusion/plugins/host", default-features = false }
 fusion-plugin-rules = { path = "fusion/plugins/rules" }
 fusion-plugin-sources = { path = "fusion/plugins/sources" }
