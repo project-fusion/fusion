@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { contourLevels, contoursOf, surfaceOf } from './grid.js'
+import { contourLevels, contoursOf, surfaceOf } from './surface.js'
 
 /* A grid of three by three, with `heights` across first. */
 const field = (heights: number[]) =>

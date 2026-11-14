@@ -6,8 +6,8 @@
  * did, and a missing reading drawn as zero digs a pit that is not there.
  */
 
-import { ticks } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
+import { ticks } from '../scale/ticks.js'
+import { type FieldRow, niceRange, type PlotAxis } from './field.js'
 
 /** One place on the grid: where it stands across and in depth, and its reading, where the table has one. */
 export interface SurfaceCell {
