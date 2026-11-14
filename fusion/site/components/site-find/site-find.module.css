@@ -37,12 +37,15 @@
 
 /* The mark in the search row takes the brand, which is the one place a small
    amount of color reads as identity rather than as decoration: it is the thing
-   the eye lands on first and it is already the panel's subject. */
-.siteCommand::part(search) {
+   the eye lands on first and it is already the panel's subject. **By the names
+   Command forwards**, `listbox-` and the Listbox's own part: written as
+   `search` and `search-field`, both rules matched nothing from the day they
+   were written. */
+.siteCommand::part(listbox-filter-icon) {
   color: var(--helix-color-accent);
 }
 
-.siteCommand::part(search-field) {
+.siteCommand::part(listbox-search-field) {
   /* The field carries the panel's voice. */
   font-family: var(--helix-font-display);
 }
