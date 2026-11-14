@@ -85,6 +85,7 @@ export type Family =
   | 'canvas'
   | 'map'
   | 'sandbox'
+  | 'terminal'
   | 'lightbox'
   | 'video'
   | 'orb'

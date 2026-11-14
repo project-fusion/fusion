@@ -38,7 +38,7 @@ import { leave, scrubBy, stepByKey, typeInto, watchFocus } from './web-text.js'
 
 /** The innermost element of a tree whose words are these, as an option says its time. */
 const worded = (tree: Element | ShadowRoot, label: string): Element | undefined =>
-  [...tree.querySelectorAll('[role="option"], [value], button')].find(
+  [...tree.querySelectorAll('[role="option"], [value], button, helix-button')].find(
     (one) => one.textContent?.trim() === label,
   )
 

@@ -71,6 +71,7 @@ import { STRANDS } from './scenarios/strands.js'
 import { TABLE } from './scenarios/table.js'
 import { TABS } from './scenarios/tabs.js'
 import { TAG_GROUP } from './scenarios/tag-group.js'
+import { TERMINAL } from './scenarios/terminal.js'
 import { TEXTAREA } from './scenarios/textarea.js'
 import { TIME_INPUT } from './scenarios/time-input.js'
 import { TIME_PICKER } from './scenarios/time-picker.js'
@@ -169,6 +170,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   table: TABLE,
   tabs: TABS,
   'tag-group': TAG_GROUP,
+  terminal: TERMINAL,
   textarea: TEXTAREA,
   'time-input': TIME_INPUT,
   'time-picker': TIME_PICKER,
