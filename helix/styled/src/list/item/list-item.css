@@ -207,8 +207,11 @@ slot[name="end"]::slotted(*) {
   border-radius: var(--helix-radii-sm);
 }
 
+/* Pressed to select or act, as a button is, so its words are not selectable.
+   A list without `selection-mode` keeps them selectable, for copying. */
 [part~="row"][role="gridcell"] {
   cursor: pointer;
+  user-select: none;
 }
 
 /* Out of reach, and the pointer says so where the row would otherwise take a

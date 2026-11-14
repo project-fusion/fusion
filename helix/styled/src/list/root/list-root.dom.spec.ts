@@ -254,3 +254,35 @@ describe('the drag preview of a reorderable list', () => {
     expect(preview).not.toContain('transition')
   })
 })
+
+/* A list with `selection-mode` is pressed to select or act on, so its rows
+   take a button's pointer and keep their words from a text selection. A list
+   a reader reads keeps both of the browser's own. */
+describe('the cursor over a row', () => {
+  test('a row of a list that selects takes the pointer and no text selection', () => {
+    const choosable = rule('helix-list-item', '[part~="row"][role="gridcell"]')
+    expect(choosable).toContain('cursor: pointer')
+    expect(choosable).toContain('user-select: none')
+    const plain = rule('helix-list-item', '[part~="row"]')
+    expect(plain).not.toContain('cursor')
+    expect(plain).not.toContain('user-select')
+  })
+
+  for (const [what, attrs, cursor, select] of [
+    ['a list that selects', 'selection-mode="single"', 'pointer', 'none'],
+    ['a list a reader reads', '', 'auto', 'auto'],
+  ] as const) {
+    run(`over the words, in ${what}`, async () => {
+      const host = (await mount(
+        `<helix-list label="Files" ${attrs}><helix-list-item value="report"><span>Report</span></helix-list-item></helix-list>`,
+      )) as Updatable
+      await idle()
+      const item = host.querySelector('helix-list-item') as HTMLElement & Updatable
+      await item.updateComplete
+      const row = part(item, 'row') as HTMLElement
+      expect(getComputedStyle(item.querySelector('span') as HTMLElement).cursor).toBe(cursor)
+      expect(getComputedStyle(row).userSelect).toBe(select)
+      host.remove()
+    })
+  }
+})
