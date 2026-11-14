@@ -1187,9 +1187,24 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     />`
   }
 
+  /**
+   * A press on the field's own box, beside the text, puts focus in the text,
+   * as a press on a native field's padding does. Without it a field drawn
+   * narrower than its box, as a field sized to its value is, took no focus
+   * from most of its box.
+   */
+  private readonly handleFieldPress = (event: MouseEvent): void => {
+    const control = this.partNamed('control')
+    if (event.composedPath()[0] !== event.currentTarget || !control || this.disabled) {
+      return
+    }
+    event.preventDefault()
+    control.focus()
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
-      <div part="field" @keydown=${this.handleKeydown}>
+      <div part="field" @keydown=${this.handleKeydown} @mousedown=${this.handleFieldPress}>
         <slot name="start"></slot>
         ${
           this.mode === 'multiple'
