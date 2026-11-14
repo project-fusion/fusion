@@ -1232,14 +1232,23 @@ in the color the component asks for:
 
 ```tsx
 import * as icons from '@fusion.dev/helix-icons'
+import * as regular from '@fusion.dev/helix-icons/regular'
 import { glyphs, HelixRoot } from '@fusion.dev/helix-native'
 
+const exported = (name) => name.replace(/-(\w)/g, (_, letter) => letter.toUpperCase())
+
 const Glyph = glyphs(
-  (name) => icons[name.replace(/-(\w)/g, (_, letter) => letter.toUpperCase())],
+  (name) => icons[exported(name)],
+  (name) => regular[exported(name)],
 )
 
 <HelixRoot Glyph={Glyph}>
 ```
+
+The second function is optional: it finds an icon at the regular weight,
+which a part that draws a lighter glyph than the set's bold asks for, as a
+checked Menu Item and a selected Option draw the regular check. Without it,
+those parts draw the bold one.
 
 `HelixIcon`, from `@fusion.dev/helix/icon`, draws the icon its `name` names
 with that `Glyph`, in the color of the words around it. Its size is the

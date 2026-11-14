@@ -8,6 +8,7 @@
    colors with no theme engine, Expo Go included. */
 import { HelixAppRoot } from '@fusion.dev/helix/expo-router'
 import * as icons from '@fusion.dev/helix-icons'
+import * as regular from '@fusion.dev/helix-icons/regular'
 import { glyphs } from '@fusion.dev/helix-native'
 import { StatusBar } from 'expo-status-bar'
 import type { ReactNode } from 'react'
@@ -15,13 +16,17 @@ import { theme } from './theme'
 
 type Icon = { readonly content: string; readonly viewBox: string }
 
-/** A Helix icon by its web name, `caret-end` as `caretEnd`. */
-const named = (name: string): Icon | undefined =>
-  (icons as unknown as Readonly<Record<string, Icon | undefined>>)[
-    name.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
-  ]
+/** An icon's export name, from its web name: `caret-end` is `caretEnd`. */
+const exported = (name: string): string =>
+  name.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
 
-const Glyph = glyphs(named)
+/** A Helix icon by its web name, and the same at the regular weight, which a checked menu row draws. */
+const named = (name: string): Icon | undefined =>
+  (icons as unknown as Readonly<Record<string, Icon | undefined>>)[exported(name)]
+const light = (name: string): Icon | undefined =>
+  (regular as unknown as Readonly<Record<string, Icon | undefined>>)[exported(name)]
+
+const Glyph = glyphs(named, light)
 
 export function Root({ children }: { readonly children?: ReactNode }) {
   return (

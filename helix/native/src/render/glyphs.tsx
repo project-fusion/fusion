@@ -21,19 +21,29 @@ export interface Icon {
  * asks for. Each icon's own strokes and fills are kept, with a `var()` they
  * name read from the theme, and what it does not paint is drawn in the color. `named` finds an icon by the name a component
  * gives, such as `caret-end`. A name it finds nothing for draws nothing.
+ * `regular`, where it is given, finds an icon at the regular weight, which a
+ * part that asks for that weight draws, as a checked menu row's light tick;
+ * the default weight's stands in where it finds none.
  *
  * ```tsx
  * import * as icons from '@fusion.dev/helix-icons'
+ * import * as light from '@fusion.dev/helix-icons/regular'
  *
- * const Glyph = glyphs((name) => icons[camelCase(name)])
+ * const Glyph = glyphs(
+ *   (name) => icons[camelCase(name)],
+ *   (name) => light[camelCase(name)],
+ * )
  *
  * <HelixRoot Glyph={Glyph}>
  * ```
  */
-export const glyphs = (named: (name: string) => Icon | undefined): ComponentType<GlyphProps> => {
-  const drawing = ({ color, name, size }: GlyphProps) => {
+export const glyphs = (
+  named: (name: string) => Icon | undefined,
+  regular?: (name: string) => Icon | undefined,
+): ComponentType<GlyphProps> => {
+  const drawing = ({ color, name, size, weight }: GlyphProps) => {
     const tokens = useTokens()
-    const icon = named(name)
+    const icon = (weight === 'regular' ? regular?.(name) : undefined) ?? named(name)
     if (icon === undefined) {
       return null
     }

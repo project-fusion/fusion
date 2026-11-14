@@ -155,7 +155,35 @@ afterEach(() => {
 
 type Told = { detail: Readonly<Record<string, unknown>>; preventDefault: () => void }
 
+/** Each glyph a part asks for, by its name and weight. */
+const asked: string[] = []
+
+/** A `Glyph` that draws nothing and writes down what it was asked for. */
+const AskedGlyph = ({ name, weight }: { readonly name: string; readonly weight?: string }) => {
+  asked.push(`${name} ${weight ?? 'default'}`)
+  return null
+}
+
 describe('the generated Menu', () => {
+  test('a checked row draws the regular check, as the web paints it, where a bold one would be the default', async () => {
+    asked.length = 0
+    drawn = await render(
+      <ThemeProvider Glyph={AskedGlyph} tokens={light}>
+        <LayerHostView>
+          <HelixMenu label="View options" trigger={button}>
+            <HelixMenuItem checkable checked value="hidden">
+              Show hidden files
+            </HelixMenuItem>
+          </HelixMenu>
+        </LayerHostView>
+      </ThemeProvider>,
+    )
+    await frames()
+    await press(trigger())
+    expect(asked).toContain('check regular')
+    expect(asked).not.toContain('check default')
+  })
+
   test('a press on the trigger opens a menu named by its label, with focus on its first row', async () => {
     const heard: string[] = []
     await draw(

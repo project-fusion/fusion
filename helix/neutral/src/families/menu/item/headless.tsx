@@ -168,6 +168,7 @@ export default headless('menu-item', {
               <View
                 ariaHidden
                 icon="check"
+                iconWeight="regular"
                 part="mark"
               />
             </Slot>

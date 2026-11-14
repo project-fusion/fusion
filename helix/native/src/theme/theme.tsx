@@ -10,6 +10,12 @@ export interface GlyphProps {
   readonly name: string
   /** How wide and tall it is, in points. */
   readonly size: number
+  /**
+   * The weight to draw it at, where a part asks for one that is not the icon
+   * set's default, as a checked menu row asks for the regular check. A
+   * `Glyph` with no such weight draws its default one.
+   */
+  readonly weight?: 'regular'
 }
 
 /** One mode of a theme, as the elements draw with it. */

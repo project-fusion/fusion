@@ -260,6 +260,7 @@ const drawGlyph = (
   if (typeof name !== 'string' || name === '' || Glyph === undefined) {
     return null
   }
+  const weight = node.attributes?.['glyph-weight'] === 'regular' ? 'regular' : undefined
   const color = text.color ?? tokens['color-foreground'] ?? ''
   const filled = host !== undefined && fills(box) ? host : {}
   const size = [box.height, box.width, filled.height, filled.width].find(
@@ -272,6 +273,7 @@ const drawGlyph = (
       size={
         size ?? (typeof text.fontSize === 'number' ? (text.fontSize * spaceRem) / rem : spaceRem)
       }
+      {...(weight === undefined ? {} : { weight })}
     />
   )
 }

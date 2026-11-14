@@ -104,6 +104,12 @@ fn live_words_are_said_on_arrival_or_as_a_value_they_follow_changes() {
 }
 
 #[test]
+fn a_glyph_weight_is_regular_alone() {
+    assert!(attribute(NodeKind::Box, "mark", "glyph-weight", &text("regular")).is_ok());
+    assert!(attribute(NodeKind::Box, "mark", "glyph-weight", &text("thin")).is_err());
+}
+
+#[test]
 fn a_glyph_is_named_or_bound_to_the_prop_that_names_it() {
     assert!(attribute(NodeKind::Box, "mark", "glyph", &text("x")).is_ok());
     assert!(attribute(NodeKind::Box, "svg", "glyph", &bind("name")).is_ok());

@@ -19,6 +19,7 @@ const RENAMED: &[(&str, &str)] = &[
     ("autoGrow", "grows"),
     ("enterKeyHint", "enterkeyhint"),
     ("icon", "glyph"),
+    ("iconWeight", "glyph-weight"),
     ("initialFocus", "enters"),
     ("inputMode", "inputmode"),
     ("longPress", "holds"),

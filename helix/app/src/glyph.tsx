@@ -1,5 +1,6 @@
 import type { OpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
 import * as icons from '@fusion.dev/helix-icons'
+import * as regular from '@fusion.dev/helix-icons/regular'
 import { glyphs } from '@fusion.dev/helix-native'
 import { Alert, I18nManager, Linking } from 'react-native'
 
@@ -13,15 +14,21 @@ const SIDED: Readonly<Record<string, Icon>> = {
   'caret-start': I18nManager.isRTL ? icons.caretRight : icons.caretLeft,
 }
 
+/** An icon's export name, from its web name: `caret-end` is `caretEnd`. */
+const exported = (name: string): string =>
+  name.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
+
 const named = (name: string): Icon | undefined =>
-  SIDED[name] ??
-  (icons as unknown as Readonly<Record<string, Icon | undefined>>)[
-    name.replace(/-([a-z0-9])/g, (_, letter: string) => letter.toUpperCase())
-  ]
+  SIDED[name] ?? (icons as unknown as Readonly<Record<string, Icon | undefined>>)[exported(name)]
+
+/* The regular weight, which a part asks for where it draws a lighter glyph than
+   the set's bold, as a checked menu row's tick. */
+const light = (name: string): Icon | undefined =>
+  (regular as unknown as Readonly<Record<string, Icon | undefined>>)[exported(name)]
 
 /** Draws a Helix icon by its web name, in a color and at a size, with each
     path's own transform and paint, as the brand mark needs. */
-export const Glyph = glyphs(named)
+export const Glyph = glyphs(named, light)
 
 /* **Where a link goes in the gallery.** An address with a scheme opens with
    the phone's own handler. The examples link to places on a page, such as
