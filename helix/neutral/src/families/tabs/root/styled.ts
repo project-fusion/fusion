@@ -324,9 +324,13 @@ export default styles(
         {
           own: {
             indicatorBlock: measured('indicator-block-size', 0),
-            /* The selected wash, with no edge and no shadow: a hovered tab takes five
-               per cent of the ink, a step under it. */
-            indicatorColor: hook.indicatorColor(token('color-selected')),
+            /* **Navigation's pill**, `surface-sunken`, with no edge and no
+               shadow, as App Header's current item is. The selected wash was
+               tried here after a white raised pill, and the owner chose the
+               pill from before the rounds in Navigation's color, November 10,
+               2026: over white the hover is #f2f2f2 and the selection
+               #eaeaea. */
+            indicatorColor: hook.indicatorColor(token('color-surface-sunken')),
             indicatorRadius: token('radii-sm'),
             indicatorOffset: '0px',
           },
