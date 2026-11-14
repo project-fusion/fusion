@@ -9,6 +9,7 @@ export { type Camera, type PagePoint, shortNumber } from '../projection/projecti
 export * from './bar-picture.js'
 export * from './bar-row.js'
 export * from './bars.js'
+export * from './blocks.js'
 export * from './box.js'
 export * from './field.js'
 export * from './ribbons.js'

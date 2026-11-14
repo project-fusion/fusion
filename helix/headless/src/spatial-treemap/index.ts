@@ -1,11 +1,11 @@
 export {
+  blockOrder as paintOrder,
   blocksDrawn,
   type DrawnBlock,
   type FloorArea,
-  paintOrder,
   squarified,
   type TreemapBlock,
   type TreemapField,
   treemapOf,
-} from './blocks.js'
+} from '@fusion.dev/helix-core/spatial'
 export { HelixHeadlessSpatialTreemap } from './root/spatial-treemap-root.js'
