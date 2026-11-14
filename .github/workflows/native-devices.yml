@@ -242,8 +242,15 @@ jobs:
     timeout-minutes: 60
     strategy:
       fail-fast: false
+      # **Each pass of the screenshots in two shares**, each on a simulator of
+      # its own: one pass of every family ran into the 60 minutes (run
+      # 43626140354). Android's emulators take one pass each in about 40.
       matrix:
         part: [flows, screens-light-default, screens-light-largest, screens-dark-default, screens-dark-largest]
+        share: [1-of-2, 2-of-2]
+        exclude:
+          - part: flows
+            share: 2-of-2
     env:
       MAESTRO_CLI_NO_ANALYTICS: 1
       # Maestro's driver starts slowly on a simulator's first boot.
@@ -299,8 +306,9 @@ jobs:
       - name: Run the ${{ matrix.part }}
         env:
           PART: ${{ matrix.part }}
+          SHARE: ${{ matrix.part != 'flows' && matrix.share || '' }}
           UDID: ${{ steps.simulator.outputs.udid }}
-        run: helix/app/scripts/devices.sh ios "$UDID" "$RUNNER_TEMP/Helix.app" "$RUNNER_TEMP/devices" "$PART"
+        run: helix/app/scripts/devices.sh ios "$UDID" "$RUNNER_TEMP/Helix.app" "$RUNNER_TEMP/devices" "$PART" "$SHARE"
 
       - name: Ready what a stopped job left for the upload
         if: always() && steps.simulator.outcome == 'success'
@@ -321,7 +329,7 @@ jobs:
           # Maestro writes a failed flow's screenshots and hierarchy under a
           # `.maestro` folder, which the upload leaves out unless asked.
           include-hidden-files: true
-          name: native-devices-ios-${{ matrix.part }}
+          name: native-devices-ios-${{ matrix.part }}${{ matrix.part != 'flows' && format('-{0}', matrix.share) || '' }}
           path: ${{ runner.temp }}/devices
           retention-days: 7
 

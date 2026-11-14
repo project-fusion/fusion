@@ -3,7 +3,7 @@
 # with a release build of the gallery, and writes what they make into one
 # folder. `.github/workflows/native-devices.yml` runs it each night.
 #
-#   helix/app/scripts/devices.sh <ios|android> <device> <app> <out> [part]
+#   helix/app/scripts/devices.sh <ios|android> <device> <app> <out> [part] [share]
 #   helix/app/scripts/devices.sh keep <out>
 #
 # <device> is the simulator's UDID or the emulator's serial, such as
@@ -13,6 +13,12 @@
 # `screens-dark-largest`, or `all`, which is the default. The workflow runs
 # `flows` and each pass of the screens on a device of its own, at once, each
 # with its own timeout.
+#
+# [share] is `<n>-of-<m>`, such as `1-of-2`, and runs the nth of m shares of
+# the screens' flows, so one pass can run on m devices at once: a pass of all
+# 92 families on an iOS simulator ran into its job's 60 minutes (run
+# 43626140354). Button's flow, which each pass starts with, runs in every
+# share, and the others are dealt out in turn by file name.
 #
 # `keep <out>` readies a folder the job was stopped in for the upload, which a
 # finished run has done already. It writes no summary of its own, so the
@@ -93,6 +99,7 @@ device=$2
 app=$3
 out=$4
 part=${5:-all}
+share=${6:-}
 flows=helix/app/.maestro
 package=dev.fusion.helix.app
 started=$SECONDS
@@ -427,7 +434,29 @@ if [[ $part == all || $part == flows ]]; then
   echo "${readout:-The screen of 1,000 rows gave no frame rate.}" > "$out/frame-rate/screen.txt"
 fi
 
+# The folder of screens flows a pass runs: all of them, or with a `share`, a
+# folder of their config, Button's flow, and every mth of the rest from the
+# nth, by file name.
+screens_folder() {
+  if [[ -z $share ]]; then
+    echo "$flows/screens"
+    return
+  fi
+  local n=${share%%-of-*} m=${share##*-of-} at=0 file folder
+  folder=$(mktemp -d)
+  cp "$flows/screens/config.yaml" "$flows/screens/button.yaml" "$folder/"
+  for file in "$flows"/screens/*.yaml; do
+    case ${file##*/} in config.yaml | button.yaml) continue ;; esac
+    if [[ $((at % m + 1)) -eq $n ]]; then
+      cp "$file" "$folder/"
+    fi
+    at=$((at + 1))
+  done
+  echo "$folder"
+}
+
 if [[ $part != flows ]]; then
+  screens=$(screens_folder)
   # A new simulator asks before a link opens the gallery the first time, and
   # `interactions` has not run on it to accept.
   if [[ $part != all && $platform == ios ]]; then
@@ -442,7 +471,7 @@ if [[ $part != flows ]]; then
       say "Setting $mode mode and the $size text size"
       appearance "$mode"
       text_size "$size"
-      pass "screens-$mode-$size" -e "MODE=$mode" -e "SIZE=$size" "$flows/screens"
+      pass "screens-$mode-$size" -e "MODE=$mode" -e "SIZE=$size" "$screens"
     done
   done
   say "Setting light mode and the default text size"
