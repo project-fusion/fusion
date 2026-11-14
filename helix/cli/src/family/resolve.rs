@@ -84,6 +84,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.canvas,
         &api.map,
         &api.sandbox,
+        &api.terminal,
         &api.heatmap,
         &api.lightbox,
         &api.video_playlist_menu,
@@ -283,6 +284,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
         ("canvas", &family.api.canvas, api::CANVAS),
         ("map", &family.api.map, api::MAP),
         ("sandbox", &family.api.sandbox, api::SANDBOX),
+        ("terminal", &family.api.terminal, api::TERMINAL),
         ("heatmap", &family.api.heatmap, api::HEATMAP),
         ("lightbox", &family.api.lightbox, api::LIGHTBOX),
         (
@@ -614,6 +616,7 @@ fn entry(family: &Family, names: &Names, found: &mut Vec<String>) {
             || family.api.combobox.is_some()
             || family.api.filter_input.is_some()
             || family.api.graph.is_some()
+            || family.api.terminal.is_some()
             || family.api.picker_field.is_some();
         for name in fields.into_iter().filter(|_| !holds) {
             found.push(format!(

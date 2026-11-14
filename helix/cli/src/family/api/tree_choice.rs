@@ -938,6 +938,24 @@ pub const SANDBOX_COMPUTED: &[&str] = &[
     "several",
 ];
 
+/// What a terminal sends: what the reader typed, the grid's size, the bell, the title, a
+/// restart asked for, and where a search stands. Its props it reads by their own names.
+pub const TERMINAL: &[(&str, Names)] = &[
+    ("onFound", Names::Event),
+    ("onTerminalBell", Names::Event),
+    ("onTerminalInput", Names::Event),
+    ("onTerminalResize", Names::Event),
+    ("onTerminalRestart", Names::Event),
+    ("onTerminalTitle", Names::Event),
+];
+
+/// What a terminal computes for its parts, each read as `terminal.x`: the screen's lines of
+/// runs, its name, the find bar and its count, the status line, and what it says.
+pub const TERMINAL_COMPUTED: &[&str] = &[
+    "clears", "count", "exited", "findOpen", "finds", "headed", "lines", "named", "said", "status",
+    "title",
+];
+
 /// What an aura sends: nothing by a bound name. It reads its props by their own names.
 pub const AURA: &[(&str, Names)] = &[];
 
@@ -1667,6 +1685,11 @@ pub fn sandbox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "sandbox", SANDBOX, SANDBOX_COMPUTED)
 }
 
+/// `terminal({ ... })`, each field a name.
+pub fn terminal(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "terminal", TERMINAL, TERMINAL_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1775,6 +1798,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "canvas" => canvas(value),
         "map" => map(value),
         "sandbox" => sandbox(value),
+        "terminal" => terminal(value),
         "lightbox" => lightbox(value),
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),

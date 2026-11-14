@@ -101,6 +101,7 @@ const GIVEN: &[&str] = &[
     "canvas",
     "map",
     "sandbox",
+    "terminal",
     "heatmap",
     "lightbox",
     "videoPlaylistMenu",
@@ -146,8 +147,7 @@ const GIVEN: &[&str] = &[
     "validation",
 ];
 
-/// What reading a render needs: the source for lines, and what the keys
-/// before `render` declare.
+/// What reading a render needs: the source for lines, and what the keys before `render` declare.
 struct Render<'s> {
     source: &'s str,
     given: Vec<String>,

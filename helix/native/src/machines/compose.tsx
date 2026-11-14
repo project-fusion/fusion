@@ -80,6 +80,7 @@ import { useStrands } from './strands'
 import { useTable } from './table'
 import { useTableColumn, useTableRow } from './table-row'
 import { useTail } from './tail'
+import { useTerminal } from './terminal'
 import { useTimePicker } from './time-picker'
 import { useTour } from './tour'
 import { useTourStop } from './tour-stop'
@@ -607,6 +608,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         const host = sandboxHook(family)
         return (props) => host(family, props, use)
       }),
+    /* A frame around a terminal: its screen from the emulator, its find bar, and its status line. */
+    ...uses
+      .filter((use) => use.machine === 'terminal')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useTerminal(family, props, use),
+      ),
     /* A frame around a graph: its picture, its list, its legend, and its zoom. */
     ...uses
       .filter((use) => use.machine === 'graph')

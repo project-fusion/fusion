@@ -1214,6 +1214,27 @@ export interface SandboxChoice {
   readonly several?: string
 }
 
+/** The names of a terminal, each read as `terminal.x`. */
+export interface TerminalChoice {
+  readonly clears?: string
+  readonly count?: string
+  readonly exited?: string
+  readonly findOpen?: string
+  readonly finds?: string
+  readonly headed?: string
+  readonly lines?: string
+  readonly named?: string
+  readonly onFound?: string
+  readonly onTerminalBell?: string
+  readonly onTerminalInput?: string
+  readonly onTerminalResize?: string
+  readonly onTerminalRestart?: string
+  readonly onTerminalTitle?: string
+  readonly said?: string
+  readonly status?: string
+  readonly title?: string
+}
+
 /** The names of a board of cards, or a card on one, each read as `canvas.x`. */
 export interface CanvasChoice {
   readonly drafting?: string

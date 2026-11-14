@@ -861,6 +861,14 @@
       "types": "./dist/tag/index.d.ts",
       "default": "./dist/tag/index.js"
     },
+    "./terminal": {
+      "react-native": {
+        "types": "./dist/terminal/index.native.d.ts",
+        "default": "./dist/terminal/index.native.js"
+      },
+      "types": "./dist/terminal/index.d.ts",
+      "default": "./dist/terminal/index.js"
+    },
     "./text": {
       "react-native": {
         "types": "./dist/text/index.native.d.ts",

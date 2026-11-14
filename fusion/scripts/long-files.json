@@ -406,6 +406,8 @@
     "helix/neutral/src/families/notifications/notification/styled.ts",
     "helix/neutral/src/families/scroll-area/root/styled.ts",
     "helix/neutral/src/families/slider/root/styled.ts",
+    "helix/neutral/src/families/terminal/root/headless.tsx",
+    "helix/neutral/src/families/terminal/root/styled.ts",
     "helix/neutral/src/families/toast/item/styled.ts",
     "helix/neutral/src/families/tree/item/styled.ts",
     "helix/neutral/src/families/video/root/headless.tsx",

@@ -108,6 +108,7 @@
     "@floating-ui/react-native": ">=0.10",
     "@maplibre/maplibre-react-native": ">=11",
     "@shopify/react-native-skia": ">=2",
+    "@xterm/headless": ">=6",
     "expo": "*",
     "expo-blur": "*",
     "expo-clipboard": "*",
@@ -133,6 +134,9 @@
       "optional": true
     },
     "@shopify/react-native-skia": {
+      "optional": true
+    },
+    "@xterm/headless": {
       "optional": true
     },
     "expo": {

@@ -129,6 +129,7 @@ import {
   HelixVideoPlaylistMenu,
 } from '../video-playlist/index.native'
 import { HelixVirtualList } from '../virtual-list/index.native'
+import { CODE_TAGS } from './code-tags.native'
 import { ButtonGroup, List, Steps, Tabs, TagGroup } from './held.native'
 import { MAP_TAGS } from './map-tags.native'
 import {
@@ -150,7 +151,6 @@ import {
   TableHead,
   Turn,
 } from './prose.native'
-import { SANDBOX_TAGS } from './sandbox-tags.native'
 import {
   Anchor,
   Box,
@@ -315,7 +315,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-radio': HelixRadio,
   'helix-radio-group': HelixRadioGroup,
   'helix-rating': HelixRating,
-  ...SANDBOX_TAGS,
+  ...CODE_TAGS,
   'helix-scatter-chart': HelixScatterChart,
   'helix-scroll-area': HelixScrollArea,
   'helix-select': HelixSelect,

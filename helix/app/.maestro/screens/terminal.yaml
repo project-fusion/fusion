@@ -1,0 +1,54 @@
+# Terminal, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it
+# draws, then for the screen to stand still, since an example writes its
+# output once it has drawn and the screen's lines come a frame after.
+appId: dev.fusion.helix.app
+name: "Screens: Terminal"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://terminal/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-preview-${MODE}-${SIZE}
+- openLink: helix://terminal/ansi-colors/preview
+- extendedWaitUntil:
+    visible: 'ANSI colors'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-ansi-colors-${MODE}-${SIZE}
+- openLink: helix://terminal/exited/preview
+- extendedWaitUntil:
+    visible: 'Exited'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-exited-${MODE}-${SIZE}
+- openLink: helix://terminal/in-a-pane/preview
+- extendedWaitUntil:
+    visible: 'In a pane'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-in-a-pane-${MODE}-${SIZE}
+- openLink: helix://terminal/plain/preview
+- extendedWaitUntil:
+    visible: 'Plain'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-plain-${MODE}-${SIZE}
+- openLink: helix://terminal/transcript/preview
+- extendedWaitUntil:
+    visible: 'Transcript'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 15000
+- takeScreenshot: terminal-transcript-${MODE}-${SIZE}

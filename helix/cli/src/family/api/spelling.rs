@@ -1204,6 +1204,26 @@ const SANDBOX: &[Field] = &[
     ("several", "several", Name),
 ];
 
+const TERMINAL: &[Field] = &[
+    ("clears", "clears", Name),
+    ("count", "count", Name),
+    ("exited", "exited", Name),
+    ("findOpen", "findOpen", Name),
+    ("finds", "finds", Name),
+    ("headed", "headed", Name),
+    ("lines", "lines", Name),
+    ("named", "named", Name),
+    ("onFound", "onFound", Name),
+    ("onTerminalBell", "onTerminalBell", Name),
+    ("onTerminalInput", "onTerminalInput", Name),
+    ("onTerminalResize", "onTerminalResize", Name),
+    ("onTerminalRestart", "onTerminalRestart", Name),
+    ("onTerminalTitle", "onTerminalTitle", Name),
+    ("said", "said", Name),
+    ("status", "status", Name),
+    ("title", "title", Name),
+];
+
 const CANVAS: &[Field] = &[
     ("drafting", "drafting", Name),
     ("groupName", "groupName", Name),
@@ -1740,6 +1760,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("canvas", "canvas", CANVAS),
     ("map", "map", MAP),
     ("sandbox", "sandbox", SANDBOX),
+    ("terminal", "terminal", TERMINAL),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
     (

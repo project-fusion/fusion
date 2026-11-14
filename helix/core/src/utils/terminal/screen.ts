@@ -4,7 +4,7 @@
  * as text, so a screen reader reads them and a reader selects them, where the
  * web's renderer paints a canvas.
  */
-import { type FindQuery, findRanges } from '../find-text/find-text.js'
+import { type FindQuery, findPattern, findRanges } from '../find-text/find-text.js'
 import { ANSI_NAMES, type LogRun, paletteColor } from '../log/ansi.js'
 
 /** One cell of an emulator's buffer, as `@xterm/headless` hands it out. */
@@ -182,6 +182,9 @@ export interface TerminalMatch {
  */
 export const findInLines = (lines: readonly string[], query: FindQuery): TerminalMatch[] =>
   lines.flatMap((text, line) => findRanges(text, query).map(([from, to]) => ({ from, line, to })))
+
+/** Whether a query reads as a search: not empty, and, as a regular expression, one JavaScript reads. */
+export const queryReads = (query: FindQuery): boolean => findPattern(query) !== undefined
 
 /**
  * A line's runs cut where the matches on it start and end, each piece in a

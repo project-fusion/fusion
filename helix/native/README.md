@@ -13,7 +13,7 @@ Drilldown, Empty, File Input, Flex, Format Date, Grid, Icon, Icon Button, Image,
 List, Loader, Megamenu, Megamenu Group, Megamenu Item, Menu, Meter, Motion
 Toggle, Navigation, Number Input, Outline, Popover,
 Pin Input, Progress, QR Code, Quote, Radio, Rating, Sandbox, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
-Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
+Steps, Switch, Tabs, Tag, Tag Group, Terminal, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, Trend, and Virtual List are drawn on React Native so far, and each is experimental there. Skip
 Link, Device Screen and Sandbox Preview are the web's alone, and each one's
 component draws nothing on a phone: a skip link answers a page's header,
@@ -22,7 +22,13 @@ Preview runs a page of HTML, CSS and JavaScript a phone has no document for.
 A sandbox on a phone is read only: its panes stack as the web stacks them in
 a narrow window, its file tabs choose the pane shown, and its source is text a
 reader selects and copies, with no editor. Its console's level filter is a
-Select, with the web's levels, words and events.
+Select, with the web's levels, words and events. A terminal on a phone draws
+its screen as text from `@xterm/headless`, an optional peer: each line in the
+theme's ANSI colors, the scrollback in a window that follows the newest line,
+the reader's keys through a field a press on the screen focuses, and a find
+bar. Without the peer it draws what was written as read-only lines. Copy,
+fullscreen, the find bar's options, links and the keyboard chords are the
+web's.
 
 ```sh
 npx expo install @fusion.dev/helix react-native-gesture-handler react-native-reanimated react-native-worklets
@@ -874,6 +880,7 @@ fake clock drives the web's and a phone's alike.
 | `expo-haptics` | The touch a phone plays as you lift, move, and drop a list row. Optional: without it, nothing plays |
 | `expo-image-picker` | Taking a photo and choosing photos from the library. Optional: without it, every request is `unavailable` |
 | `expo-sharing` | Sharing and saving a file. Optional: without it, a file is `unavailable` to share and a save gives `false` |
+| `@xterm/headless` 6 | A terminal's screen: xterm's parser and buffer, plain JavaScript. Optional: without it, a terminal draws what was written as read-only lines |
 | `@shopify/react-native-skia` 2 | Drawing on the GPU, as an orb's moving dots. Optional: without it, each such family draws its still fallback |
 | `react` 19 | Everything |
 | `react-native` | Everything |
@@ -886,7 +893,7 @@ fake clock drives the web's and a phone's alike.
 **Each peer is optional to npm**, since `@fusion.dev/helix` depends on this
 package and a web app installs it too, and npm installs a dependency's
 required peers. A React Native app needs every peer but
-`@floating-ui/react-native`, `@shopify/react-native-skia`, `expo-blur`, `expo-clipboard`,
+`@floating-ui/react-native`, `@shopify/react-native-skia`, `@xterm/headless`, `expo-blur`, `expo-clipboard`,
 `expo-document-picker`, `expo-file-system`, `expo-haptics`,
 `expo-image-picker`, `expo-sharing`, `react-native-safe-area-context`, and
 `react-native-svg`. Where

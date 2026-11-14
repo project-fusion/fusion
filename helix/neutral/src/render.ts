@@ -645,6 +645,20 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'said'
     | 'several'
   >
+  /** What a terminal computes for its parts: its lines, its name, the find bar, and the status line. */
+  readonly terminal: Computes<
+    | 'clears'
+    | 'count'
+    | 'exited'
+    | 'findOpen'
+    | 'finds'
+    | 'headed'
+    | 'lines'
+    | 'named'
+    | 'said'
+    | 'status'
+    | 'title'
+  >
   /** What a board of cards, or a card on one, computes for its parts: the lines, the labels, the minimap, the controls, and the names. */
   readonly canvas: Computes<
     | 'drafting'

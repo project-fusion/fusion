@@ -92,7 +92,7 @@ use crate::family::api::{
     LIGHTBOX, LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, MAP, NOTIFICATIONS_ROOT,
     NOTIFICATION_GROUP, NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB, PAGINATION, PAGINATION_SIZE,
     PICKER_FIELD, SANDBOX, SCATTER_CHART, SELECT, SPARKLINE, SPATIAL_CHART, STRANDS, TABLE,
-    TABLE_COLUMN, TABLE_ROW, TAIL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST,
+    TABLE_COLUMN, TABLE_ROW, TAIL, TERMINAL, TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST,
     VIDEO_PLAYLIST_MENU,
 };
 use crate::family::ir::DERIVATIONS;
@@ -652,6 +652,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.canvas, CANVAS, "canvas"),
         (&api.map, MAP, "map"),
         (&api.sandbox, SANDBOX, "sandbox"),
+        (&api.terminal, TERMINAL, "terminal"),
         (&api.heatmap, HEATMAP, "heatmap"),
         (&api.lightbox, LIGHTBOX, "lightbox"),
         (
