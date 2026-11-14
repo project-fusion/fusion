@@ -92,6 +92,7 @@ describe('useZoom', () => {
       { focalX: 200, focalY: 150, scale: 8 },
       { focalX: 200, focalY: 150, scale: 8, state: State.END },
     ])
+    await settle()
     expect(zoomOf(held)?.scale).toBe(3)
   })
 
@@ -103,8 +104,10 @@ describe('useZoom', () => {
       { state: State.END, x: 250, y: 130 },
     ]
     fireGestureHandler(parts(held).double as never, tap)
+    await settle()
     expect(zoomOf(held)).toEqual({ pan: { x: -100, y: 40 }, scale: 3 })
     fireGestureHandler(parts(held).double as never, tap)
+    await settle()
     expect(zoomOf(held)).toEqual({ pan: { x: 0, y: 0 }, scale: 1 })
   })
 
@@ -196,9 +199,23 @@ describe('useZoom', () => {
       { state: State.END, x: 250, y: 150 },
     ]
     fireGestureHandler(parts(held).double as never, tap)
+    await settle()
     expect(zoomOf(held)).toEqual({ pan: { x: -50, y: 0 }, scale: 2 })
     fireGestureHandler(parts(held).double as never, tap)
+    await settle()
     expect(zoomOf(held)?.scale).toBe(4)
+  })
+
+  test('places a zoom at once, and builds a zoom and a pan in a row on each other', async () => {
+    const held = await drawn(8, { item: { height: 200, width: 1000 }, min: 0.1 })
+    await act(async () => held.zooming?.place({ pan: { x: 40, y: 900 }, scale: 0.5 }))
+    /* At a half the plane is 500 by 100 in the box: 50 across, 100 down. */
+    expect(zoomOf(held)).toEqual({ pan: { x: 40, y: 100 }, scale: 0.5 })
+    await act(async () => {
+      held.zooming?.zoomTo(2)
+      held.zooming?.panBy({ x: -1000, y: 0 })
+    })
+    expect(zoomOf(held)).toEqual({ pan: { x: -800, y: 50 }, scale: 2 })
   })
 
   test('a single tap is told where it landed, from the middle of the box', async () => {

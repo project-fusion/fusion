@@ -15,8 +15,13 @@
  * the UI thread and drawn by an animated style, so a pinch moves no React
  * state and draws nothing again until it ends. The JavaScript thread hears
  * each change once it stands: at the end of a pinch or a drag, at a double
- * tap, and at each `zoomTo`, `panBy`, and `reset`, as the web says its
- * scale once a reader stops zooming.
+ * tap, and at each `zoomTo`, `panBy`, `place`, and `reset`, as the web says
+ * its scale once a reader stops zooming.
+ *
+ * **The JavaScript thread keeps the zoom as it stands**, from what it wrote
+ * and what it heard, since a shared value it writes reaches the UI thread
+ * later: a `zoomTo` and a `panBy` in a row build on each other, where the
+ * second read back the scale from before the first.
  *
  * **Shaped for every surface that pans and zooms**, as a lightbox's item, and
  * a canvas, a graph, and a map after it: the box is measured by `measure`,
@@ -26,20 +31,17 @@
  */
 
 import {
-  clampPan,
   clampScale,
   doublePressed,
   dragged,
-  fromMiddle,
   type Offset,
   panRoom,
   pinched,
   type Zoom,
-  type ZoomStart,
   zoomAt,
   zoomedBy,
 } from '@fusion.dev/helix-core/zoom'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import type { LayoutChangeEvent } from 'react-native'
 import {
   type ComposedGesture,
@@ -52,8 +54,9 @@ import {
   useSimultaneousGestures,
   useTapGesture,
 } from 'react-native-gesture-handler'
-import { type SharedValue, useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
+import { type SharedValue, useAnimatedStyle } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
+import { middled, movable, startAt, useShared, write } from './zoom-shared'
 
 /** How far one finger travels before a press is a drag, in points, as the web's swipe waits. */
 export const ZOOM_SLOP = 8
@@ -92,6 +95,8 @@ export interface Zooming {
   readonly measure: (event: LayoutChangeEvent) => void
   /** Moves the pan by `by`, held to the box, and gives whether it moved. Nothing where the item has no room to move. */
   readonly panBy: (by: Offset) => boolean
+  /** Moves and scales to `zoom` at once, held to the range and the box. */
+  readonly place: (zoom: Zoom) => void
   /** Back to the item at its own size, in the middle. */
   readonly reset: () => void
   /** The scale, 1 at rest, on the UI thread. */
@@ -108,127 +113,6 @@ export interface Zooming {
   readonly zoomTo: (scale: number, at?: Offset) => void
 }
 
-/** What the gestures' worklets read and write on the UI thread. */
-interface Shared {
-  readonly from: SharedValue<ZoomStart>
-  readonly height: SharedValue<number>
-  /** The item's size at a scale of 1, 0 for the box's own. */
-  readonly itemHeight: SharedValue<number>
-  readonly itemWidth: SharedValue<number>
-  readonly max: SharedValue<number>
-  readonly min: SharedValue<number>
-  /** Whether two fingers have been down since this touch began, which makes it no swipe. */
-  readonly pinching: SharedValue<boolean>
-  readonly scale: SharedValue<number>
-  readonly width: SharedValue<number>
-  readonly x: SharedValue<number>
-  readonly y: SharedValue<number>
-}
-
-/** How far the item may move either way at `scale`. */
-const roomAt = (shared: Shared, scale: number): Offset => {
-  'worklet'
-  const width = shared.width.value
-  const height = shared.height.value
-  return panRoom(
-    scale,
-    width,
-    height,
-    shared.itemWidth.value || width,
-    shared.itemHeight.value || height,
-  )
-}
-
-/** Whether one finger moves the item at `scale`, which it does wherever there is room. */
-const movable = (shared: Shared, scale: number): boolean => {
-  'worklet'
-  const room = roomAt(shared, scale)
-  return room.x > 0 || room.y > 0
-}
-
-/** Writes `zoom`, its pan held to the box, and gives whether anything moved. */
-const write = (shared: Shared, zoom: Zoom): boolean => {
-  'worklet'
-  const width = shared.width.value
-  const height = shared.height.value
-  const pan = clampPan(
-    zoom.pan,
-    zoom.scale,
-    width,
-    height,
-    shared.itemWidth.value || width,
-    shared.itemHeight.value || height,
-  )
-  const moved =
-    zoom.scale !== shared.scale.value || pan.x !== shared.x.value || pan.y !== shared.y.value
-  shared.scale.value = zoom.scale
-  shared.x.value = pan.x
-  shared.y.value = pan.y
-  return moved
-}
-
-/** Where the zoom stands now, as a gesture starts from it. */
-const startAt = (shared: Shared, at: Offset, apart: number): ZoomStart => {
-  'worklet'
-  return {
-    at,
-    pan: { x: shared.x.value, y: shared.y.value },
-    scale: shared.scale.value,
-    spread: apart,
-  }
-}
-
-/** A point the box measures from its top left corner, from its middle. */
-const middled = (shared: Shared, x: number, y: number): Offset => {
-  'worklet'
-  return fromMiddle(x, y, shared.width.value, shared.height.value)
-}
-
-/** The shared values the gestures read, made once. */
-const useShared = (setup: ZoomSetup): Shared => {
-  const { item, max } = setup
-  const min = setup.min ?? 1
-  const from = useSharedValue<ZoomStart>({
-    at: { x: 0, y: 0 },
-    pan: { x: 0, y: 0 },
-    scale: 1,
-    spread: 0,
-  })
-  const height = useSharedValue(0)
-  const itemHeight = useSharedValue(item?.height ?? 0)
-  const itemWidth = useSharedValue(item?.width ?? 0)
-  const most = useSharedValue(max)
-  const least = useSharedValue(min)
-  const pinching = useSharedValue(false)
-  const scale = useSharedValue(1)
-  const width = useSharedValue(0)
-  const x = useSharedValue(0)
-  const y = useSharedValue(0)
-  /* Written after the render, as Reanimated asks of a shared value. */
-  useEffect(() => {
-    most.value = max
-    least.value = min
-    itemWidth.value = item?.width ?? 0
-    itemHeight.value = item?.height ?? 0
-  }, [item?.height, item?.width, itemHeight, itemWidth, least, max, min, most])
-  return useMemo(
-    () => ({
-      from,
-      height,
-      itemHeight,
-      itemWidth,
-      max: most,
-      min: least,
-      pinching,
-      scale,
-      width,
-      x,
-      y,
-    }),
-    [from, height, itemHeight, itemWidth, least, most, pinching, scale, width, x, y],
-  )
-}
-
 /** Makes a surface's pan and pinch. */
 export const useZoom = (setup: ZoomSetup): Zooming => {
   const shared = useShared(setup)
@@ -236,7 +120,12 @@ export const useZoom = (setup: ZoomSetup): Zooming => {
   latest.current = setup
   const zooms = setup.enabled && setup.max > (setup.min ?? 1)
   const step = setup.doubleStep ?? 0
-  const tell = useCallback((zoom: Zoom) => latest.current.changed?.(zoom), [])
+  /* The zoom as it stands, and the box, as the JavaScript thread knows them. */
+  const mirror = useRef({ height: 0, pan: { x: 0, y: 0 }, scale: 1, width: 0 })
+  const tell = useCallback((zoom: Zoom) => {
+    mirror.current = { ...mirror.current, pan: zoom.pan, scale: zoom.scale }
+    latest.current.changed?.(zoom)
+  }, [])
   const stir = useCallback(() => latest.current.touched?.(), [])
   const swipe = useCallback(
     (dx: number, dy: number, vx: number) => latest.current.swiped?.(dx, dy, vx),
@@ -244,41 +133,62 @@ export const useZoom = (setup: ZoomSetup): Zooming => {
   )
   const tap = useCallback((at: Offset) => latest.current.tapped?.(at), [])
   const zoom = useCallback(
-    (): Zoom => ({ pan: { x: shared.x.value, y: shared.y.value }, scale: shared.scale.value }),
-    [shared],
+    (): Zoom => ({ pan: mirror.current.pan, scale: mirror.current.scale }),
+    [],
   )
-  /* A change from the JavaScript thread, told once it stands. */
+  /* How far the item may move at `scale`, from the box and the item as the JavaScript thread knows them. */
+  const room = useCallback((scale: number): Offset => {
+    const { height, width } = mirror.current
+    const item = latest.current.item
+    return panRoom(scale, width, height, item?.width || width, item?.height || height)
+  }, [])
+  /* A change from the JavaScript thread, held to the range and the box, and told once it stands. */
   const set = useCallback(
     (next: Zoom) => {
-      if (write(shared, next)) {
-        tell(zoom())
+      const scale = clampScale(next.scale, latest.current.max, latest.current.min ?? 1)
+      const reach = room(scale)
+      const pan = {
+        x: Math.min(Math.max(next.pan.x, -reach.x), reach.x) || 0,
+        y: Math.min(Math.max(next.pan.y, -reach.y), reach.y) || 0,
       }
+      const was = mirror.current
+      if (scale === was.scale && pan.x === was.pan.x && pan.y === was.pan.y) {
+        return
+      }
+      mirror.current = { ...was, pan, scale }
+      shared.scale.value = scale
+      shared.x.value = pan.x
+      shared.y.value = pan.y
+      tell({ pan, scale })
     },
-    [shared, tell, zoom],
+    [room, shared, tell],
   )
   const zoomTo = useCallback(
     (to: number, at: Offset = { x: 0, y: 0 }) => {
-      const scale = clampScale(to, shared.max.value, shared.min.value)
-      set({ pan: zoomAt(at, shared.scale.value, scale, zoom().pan), scale })
+      const now = zoom()
+      const scale = clampScale(to, latest.current.max, latest.current.min ?? 1)
+      set({ pan: zoomAt(at, now.scale, scale, now.pan), scale })
     },
-    [set, shared, zoom],
+    [set, zoom],
   )
   const panBy = useCallback(
     (by: Offset): boolean => {
       const before = zoom()
-      if (!movable(shared, before.scale)) {
+      const reach = room(before.scale)
+      if (reach.x === 0 && reach.y === 0) {
         return false
       }
       set({ pan: { x: before.pan.x + by.x, y: before.pan.y + by.y }, scale: before.scale })
       const after = zoom().pan
       return after.x !== before.pan.x || after.y !== before.pan.y
     },
-    [set, shared, zoom],
+    [room, set, zoom],
   )
   const reset = useCallback(() => set({ pan: { x: 0, y: 0 }, scale: 1 }), [set])
   const measure = useCallback(
     (event: LayoutChangeEvent) => {
       const { height, width } = event.nativeEvent.layout
+      mirror.current = { ...mirror.current, height, width }
       shared.width.value = width
       shared.height.value = height
     },
@@ -403,6 +313,7 @@ export const useZoom = (setup: ZoomSetup): Zooming => {
     gesture,
     measure,
     panBy,
+    place: set,
     reset,
     scale: shared.scale,
     style,
