@@ -286,7 +286,17 @@ slot[name="end"]::slotted(*) {
    mark only under the pointer or with focus, so a column of choices reads as
    a column of words. */
 :host([emphasis="ghost"]) [part="trigger"] {
+  /* At the size of the text around it, as a ghost text field is, so a choice
+     in a row reads as the cells beside it. A touch screen keeps the size iOS
+     will not zoom. */
+  font-size: var(--helix-text-control);
   font-weight: inherit;
+}
+
+@media (pointer: coarse) {
+  :host([emphasis="ghost"]) [part="trigger"] {
+    font-size: max(var(--helix-text-field-min), var(--helix-text-control));
+  }
 }
 
 :host([emphasis="ghost"]:not(:focus-within)) [part="value"] {
