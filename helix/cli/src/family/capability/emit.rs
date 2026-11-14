@@ -9,8 +9,8 @@ use ts_rs::{Config, TypeVisitor, TS};
 
 use super::types::{
     CaptionTrack, Conditions, DragSetup, Dragged, FilePick, FileSave, Flag, Frame, Haptic,
-    KeyPress, NowPlaying, Picked, Playback, Point, Rect, Saved, Scrolled, Shareable, Shared,
-    Transition, Urgency,
+    KeyPress, NowPlaying, Picked, Playback, Point, Rect, RendererKind, Saved, Scrolled, Shareable,
+    Shared, Transition, Urgency,
 };
 use super::{Capability, Param, Ty};
 use crate::{COMPILER, PRODUCT};
@@ -87,6 +87,7 @@ pub fn types_module() -> String {
     declarations.visit::<Playback>();
     declarations.visit::<Point>();
     declarations.visit::<Rect>();
+    declarations.visit::<RendererKind>();
     declarations.visit::<Saved>();
     declarations.visit::<Scrolled>();
     declarations.visit::<Shareable>();

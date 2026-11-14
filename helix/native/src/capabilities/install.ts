@@ -14,6 +14,7 @@ import { setMeasure } from '@fusion.dev/helix-core/capabilities/measure'
 import { setMedia } from '@fusion.dev/helix-core/capabilities/media'
 import { setMotion } from '@fusion.dev/helix-core/capabilities/motion'
 import { setOpenLink } from '@fusion.dev/helix-core/capabilities/open-link'
+import { setRenderer } from '@fusion.dev/helix-core/capabilities/renderer'
 import { setScroll } from '@fusion.dev/helix-core/capabilities/scroll'
 import { setShare } from '@fusion.dev/helix-core/capabilities/share'
 import { setTimers } from '@fusion.dev/helix-core/capabilities/timers'
@@ -34,6 +35,7 @@ import { nativeLocale } from './locale'
 import { nativeMeasure } from './measure'
 import { nativeMedia } from './media'
 import { nativeOpenLink } from './open-link'
+import { nativeRenderer } from './renderer'
 import { nativeScroll } from './scroll'
 import { nativeShare } from './share'
 import { nativeTimers } from './timers'
@@ -65,6 +67,7 @@ export const installNativeCapabilities = (): void => {
   setMedia(nativeMedia)
   setMotion(nativeMotion)
   setOpenLink(nativeOpenLink)
+  setRenderer(nativeRenderer)
   setScroll(nativeScroll)
   setShare(nativeShare)
   setTimers(nativeTimers)

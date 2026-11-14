@@ -209,6 +209,12 @@ export type Point = { x: number, y: number, };
 export type Rect = { height: number, width: number, x: number, y: number, };
 
 /**
+ * What an external renderer draws for a family: a map's tiles, or a
+ * terminal's screen.
+ */
+export type RendererKind = "map" | "terminal";
+
+/**
  * What became of a save: the platform took the file, the sheet a phone
  * saves through opened and the platform does not say whether it took it, or
  * the platform cannot save it.

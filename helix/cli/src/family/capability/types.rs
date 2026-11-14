@@ -53,6 +53,15 @@ pub enum Urgency {
     Polite,
 }
 
+/// What an external renderer draws for a family: a map's tiles, or a
+/// terminal's screen.
+#[derive(Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+pub enum RendererKind {
+    Map,
+    Terminal,
+}
+
 /// A touch the device plays. The web has none, by design.
 #[derive(Serialize, TS)]
 #[serde(rename_all = "lowercase")]
