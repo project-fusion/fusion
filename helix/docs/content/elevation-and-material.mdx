@@ -71,6 +71,7 @@ These tokens describe translucency:
 | --- | --- | --- |
 | `--helix-material-backdrop` | `blur(var(--helix-material-blur-md)) saturate(1.5)` | The blur and saturation behind a translucent surface. |
 | `--helix-material-opacity` | `1` | How opaque a translucent surface is. |
+| `--helix-material-scrim-lift` | `var(--_helix-material-scrim-lift)` | How much a glass Dialog or Drawer brightens the page behind its scrim. |
 | `--helix-material-glass-opacity` | `calc(0.72 * var(--helix-material-opacity))` | How much of a mark a glass material covers. |
 | `--helix-material-frosted-opacity` | `calc(0.88 * var(--helix-material-opacity))` | How much of a mark a frosted material covers. |
 | `--helix-material-blur-sm` | `8px` | The lightest backdrop blur. |
@@ -103,7 +104,7 @@ scales every coverage together.
 
 A modal Dialog or Drawer paints its scrim behind the panel, so a glass panel's
 filter samples the page with the scrim already over it. In light mode the white
-page came through as a gray. `material-scrim-lift` is the brightness the
+page came through as a gray. `--helix-material-scrim-lift` is the brightness the
 filter adds to undo the scrim: 1 / 0.6 in light mode, where the scrim is 40% of
 the ink, and 1 in dark mode, where the glass is drawn over the dimmed page. The
 color mode sets it, and a Dialog and a Drawer read it in their own filters.
