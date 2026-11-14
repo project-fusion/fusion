@@ -274,6 +274,10 @@ export default styles(
         rule({
           '--copy-button-icon-size': token('size-icon-sm'),
           '--icon-button-size': token('size-control-sm'),
+          /* **No offset**: relative, the corner's inset still applied and
+             moved the button 4 pixels down the bar, its middle at 49 beside
+             the name's 45. */
+          inset: 'auto',
           marginInlineStart: 'auto',
           position: 'relative',
           zIndex: token('layer-raised'),

@@ -765,9 +765,25 @@ export default styles(
       on({ region: 'eyedropper-icon', slotted: '*' }, [
         web([
           rule({
-            blockSize: inherited('icon-size', token('size-icon')),
+            blockSize: inherited('icon-size', token('size-icon-tight')),
+            display: 'block',
             flex: '0 0 auto',
-            inlineSize: inherited('icon-size', token('size-icon')),
+            inlineSize: inherited('icon-size', token('size-icon-tight')),
+          }),
+        ]),
+      ]),
+      /* **The dropper as a block, at the field glyph's size**, as the syntax
+         toggle beside it holds its word. Inline in Button's text, which is
+         trimmed to its capitals, the glyph sat on the trimmed line: its middle
+         measured 5.4 pixels above the button's, and at the region's 20 it
+         stood heavier than the 13 pixel word beside it. 16 at `md`, like an
+         Icon Button's. */
+      on({ part: 'eyedropper', selector: '[part="eyedropper"] > slot > svg' }, [
+        web([
+          rule({
+            blockSize: inherited('icon-size', token('size-icon-tight')),
+            display: 'block',
+            inlineSize: inherited('icon-size', token('size-icon-tight')),
           }),
         ]),
       ]),
@@ -861,6 +877,29 @@ export default styles(
       /* The fields inside are disabled with the picker, and the picker has already
          faded, so they keep full strength and fade once. */
       on('channel', [rule({ formDisabled: true }, { '--helix-opacity-disabled': 1 })]),
+      /* **Forced colors keep the colors being picked.** They take every
+         gradient off, so the square, the ring, the chip, and the presets drew
+         as empty boxes and the picker showed no color at all. The colors are
+         the content here, so those parts keep them. The chip and the presets
+         take their edge, and every part its focus ring, in the reader's own
+         colors; the square keeps its own inset edge. */
+      on(
+        ['grid', 'sample', 'swatch', 'wheel'],
+        [web([rule({ forcedColors: true }, { forcedColorAdjust: 'none' })])],
+      ),
+      on(
+        ['sample', 'swatch'],
+        [web([rule({ forcedColors: true }, { borderColor: 'CanvasText' })])],
+      ),
+      on({ part: 'grid', selector: '[part="grid"]:has(:focus-visible)' }, [
+        web([rule({ forcedColors: true }, { outlineColor: 'Highlight' })]),
+      ]),
+      on({ part: 'sample', selector: '[part="sample"]:focus-visible' }, [
+        web([rule({ forcedColors: true }, { outlineColor: 'Highlight' })]),
+      ]),
+      on({ part: 'wheel', selector: '[part="wheel"]:has([part="wheel-hue"]:focus-visible)' }, [
+        web([rule({ forcedColors: true }, { outlineColor: 'Highlight' })]),
+      ]),
     ]
   },
 )

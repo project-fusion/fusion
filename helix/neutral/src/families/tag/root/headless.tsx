@@ -53,7 +53,7 @@ export default headless('tag', {
   events: {
     dismiss: cancelable(['label']),
   },
-  states: ['focusVisible', 'selected', 'settled'],
+  states: ['focusVisible', 'selectable', 'selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
       disabled={props.disabled}

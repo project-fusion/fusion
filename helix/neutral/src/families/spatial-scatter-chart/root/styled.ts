@@ -55,6 +55,13 @@ export default styles(
       include(chartSpatial),
       include(chartStatus),
       include(chartTooltip),
+      /* **The row stops where the plot does.** The plot's cap is a share of
+         the row, and a row with no height set cannot resolve that share while
+         it is sized, so the row took the plot's square: at 640 the host was
+         592 tall around a 364 plot, an empty band of 228 under the chart.
+         Fitted to the plot and held to the same cap, the row is the plot's
+         height, and a smaller height set on the host is still the row's. */
+      on('host', [web([rule({ gridTemplateRows: fn('fit-content', hook.blockSize('26em')) })])]),
       on('plot', [
         rule({
           aspectRatio: 1,

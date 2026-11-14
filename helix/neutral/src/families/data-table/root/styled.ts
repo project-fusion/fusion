@@ -109,9 +109,15 @@ export default styles(
       zIndex: token('layer-sticky'),
     } as const
     return [
+      /* **No floor of its own in a grid or flex track**, as Table's host has,
+         whose `overflow-x: auto` takes the floor away. The columns' widths
+         were the host's minimum, so in a 280 pixel track the table took 381
+         and widened the page; with none it takes the track and its grid
+         scrolls inside it. */
       on('host', [
         rule({
           display: 'block',
+          minInlineSize: 0,
           own: {
             collectionInsetBlock: token('space-md'),
             collectionInsetInline: token('space-sm'),
@@ -342,7 +348,13 @@ export default styles(
           native([rule({ ...said, color: token('color-foreground-muted') })]),
         ],
       ),
-      on('error', [rule({ ...said, color: hook.errorColor, web: { gridColumn: '1 / -1' } })]),
+      /* **The error line wraps inside the columns it spans**, as Table's does.
+         On one line its words set the columns' widths: at 280 a 58 character
+         message and a button to try again widened the grid to 500. */
+      on('error', [
+        rule({ ...said, color: hook.errorColor, web: { gridColumn: '1 / -1' } }),
+        web([rule({ contain: 'inline-size' })]),
+      ]),
       on({ region: 'error', slotted: '*' }, [rule({ marginInlineStart: token('space-sm') })]),
       on({ part: 'toggle', selector: '[part~="toggle"]' }, [
         web([

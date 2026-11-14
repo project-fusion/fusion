@@ -189,18 +189,22 @@ export default styles(
         web: { overflowWrap: 'break-word', overflowX: 'auto' },
       }),
       rule(
+        { author: 'me' },
+        {
+          backgroundColor: hook.messageBackgroundColorMe,
+          color: hook.messageColorMe(hook.messageColor),
+        },
+      ),
+      /* `plain` takes the ground away and leaves the words, **the reader's own
+         turn too**, which `plain` describes as having no ground: written
+         before the wash above, the wash restated the fill on a turn with no
+         padding left, so the words touched the fill's edges. */
+      rule(
         { separation: 'plain' },
         {
           backgroundColor: 'transparent',
           inlineSize: web('auto'),
           paddingInline: token('space-none'),
-        },
-      ),
-      rule(
-        { author: 'me' },
-        {
-          backgroundColor: hook.messageBackgroundColorMe,
-          color: hook.messageColorMe(hook.messageColor),
         },
       ),
       native([rule({ part: { 'data-sending': true } }, { opacity: 0.6 })]),

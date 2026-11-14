@@ -114,6 +114,41 @@ export default styles(
         { fontSize: quotient(product(hook.valueSize, token('text-xl')), token('text-3xl')) },
       ),
     ]),
+    /* **A slotted figure the stat cannot break is a box of its own**, so the
+       rule below can hold it. Through the slot alone its text was a box
+       nothing could style. Only while it is a number, the one case where the
+       slot shows the figure itself. */
+    on({ part: 'value', selector: ':host(:state(number)) slot[part="value"]' }, [
+      web([rule({ display: 'block' })]),
+    ]),
+    /* **Two steps down and still too wide, the figure stays in its column.**
+       Inside the owner's rule of November 3, 2026, which breaks a figure only
+       after a group separator, two cases were left over: a figure with no
+       separator cannot break at all, and "123456789012" at the 6rem floor ran
+       67 pixels past its column, so it ends in an ellipsis at the column's
+       edge with the unit still beside it; and a figure that breaks after its
+       separators ended its last line well short of the column, the unit 35
+       pixels from the last digit, so its lines are set to the column's end.
+       Only two steps down, and only for a number: slotted words keep breaking
+       where they must. The whole figure is still what a screen reader says. */
+    on(
+      {
+        part: 'value',
+        selector:
+          ':host(:state(stepped-twice)) [part="value"]:not(slot), :host(:state(stepped-twice):state(number)) slot[part="value"]',
+      },
+      [
+        web([
+          rule({
+            minInlineSize: 0,
+            overflowX: 'clip',
+            overflowClipMargin: token('border-thick'),
+            textAlign: 'end',
+            textOverflow: 'ellipsis',
+          }),
+        ]),
+      ],
+    ),
     on({ region: 'unit', slotted: '*' }, [
       rule({
         color: hook.unitColor,

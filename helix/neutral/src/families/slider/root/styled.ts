@@ -201,7 +201,13 @@ export default styles(
     return [
       include(field),
       include(fieldStacked),
+      /* **The slider's layers stay inside it.** The control is raised over
+         the marks, and the thumbs and tooltips over the control, and with no
+         stacking context of its own those steps rose over the page: at 60rem
+         the theme builder's slider painted over its sticky heading and its
+         Reset button. A phone stacks inside each view already. */
       on('host', [
+        web([rule({ isolation: 'isolate' })]),
         rule({
           display: 'flex',
           flexDirection: 'column',

@@ -76,7 +76,7 @@ export default headless('donut-chart', {
     readingChange: ['index', 'label', 'pointerType', 'series'],
     readingPress: ['index', 'label', 'pointerType', 'series'],
   },
-  states: ['active', 'empty', 'error', 'loading', 'settled'],
+  states: ['active', 'empty', 'error', 'hasErrorContent', 'loading', 'settled'],
   donutChart: {
     aspect: 'aspect',
     cells: 'cells',

@@ -80,8 +80,13 @@ export default styles(
           display: 'flex',
           flexDirection: 'column',
           gap: token('space-2xs'),
-          /* A long answer gives way in a row: the value ends in an ellipsis. */
-          minInlineSize: 0,
+          /* A long answer gives way in a row: the value ends in an ellipsis.
+             **Never under three control heights**, 120 at `md`: with no floor
+             a Select in a `1fr` track beside a long Tag shrank to nothing, its
+             label one letter to a line. A length and not `min(100%, …)`,
+             which Chromium resolves against the track while sizing it, to
+             nothing. */
+          minInlineSize: product(token('size-control'), 3),
           position: web('relative'),
         }),
       ]),
