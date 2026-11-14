@@ -9,7 +9,9 @@
  * inside the box and stays inside it, and with an `item` size of its own, as
  * a canvas's plane has, one finger moves it whenever it is larger or smaller
  * than the box, at any scale. A `doubleStep` makes a double tap zoom in by
- * that step about the point, as a board's double click does on the web.
+ * that step about the point, as a board's double click does on the web, and
+ * a `slack` lets it move a share of the box past its edges, so a fit can keep
+ * the first cards clear of the controls.
  *
  * **The scale and the pan are shared values**, written under the finger on
  * the UI thread and drawn by an animated style, so a pinch moves no React
@@ -73,6 +75,11 @@ export interface ZoomSetup {
   readonly item?: { readonly width: number; readonly height: number }
   /** What a double tap zooms in by, about the point tapped: all the way in and back out where it is left out. */
   readonly doubleStep?: number
+  /**
+   * The share of the box the item may move past where its edges meet the
+   * box's, as a board pans past its cards: none where it is left out.
+   */
+  readonly slack?: number
   /** Told the zoom once it stands, on the JavaScript thread. */
   readonly changed?: (zoom: Zoom) => void
   /** Told as a touch starts, on the JavaScript thread, as a viewer's chrome comes back. */
@@ -140,7 +147,9 @@ export const useZoom = (setup: ZoomSetup): Zooming => {
   const room = useCallback((scale: number): Offset => {
     const { height, width } = mirror.current
     const item = latest.current.item
-    return panRoom(scale, width, height, item?.width || width, item?.height || height)
+    const slack = latest.current.slack ?? 0
+    const room = panRoom(scale, width, height, item?.width || width, item?.height || height)
+    return { x: room.x + slack * width, y: room.y + slack * height }
   }, [])
   /* A change from the JavaScript thread, held to the range and the box, and told once it stands. */
   const set = useCallback(
