@@ -15,7 +15,9 @@ Toggle, Navigation, Number Input, Outline, Popover,
 Pin Input, Progress, QR Code, Quote, Radio, Rating, Scroll Area, Skeleton, Slider, Speed Dial, Splitter, Stat,
 Steps, Switch, Tabs, Tag, Tag Group, Text, Textarea, Timeline, Toast, Toast Item,
 Toggle, Toggle Group, Toolbar, Tooltip, Tour, Tour Stop, Trend, and Virtual List are drawn on React Native so far, and each is experimental there. Skip
-Link is the web's alone, and its component draws nothing on a phone.
+Link and Device Screen are the web's alone, and each one's component draws
+nothing on a phone: a skip link answers a page's header, and Device Screen
+pictures another device in a frame on a web page.
 
 ```sh
 npx expo install @fusion.dev/helix react-native-gesture-handler react-native-reanimated react-native-worklets

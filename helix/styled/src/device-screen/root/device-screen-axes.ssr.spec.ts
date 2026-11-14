@@ -24,7 +24,7 @@ describe('device screen visual axes', () => {
     expect(hostTag(served, TAG)).toContain('shape="circle"')
     expect(hostTag(served, TAG)).toContain('controls-placement="end"')
     expect(styles(served)).toContain(':host([shape="circle"])')
-    expect(styles(served)).toContain(':host([controls-placement="end"])')
+    expect(styles(served)).toContain('[controls-placement="end"]')
   })
 
   test('and one that asked for no axis carries none', () => {

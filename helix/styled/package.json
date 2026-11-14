@@ -263,6 +263,14 @@
       "types": "./dist/description-list/index.d.ts",
       "default": "./dist/description-list/index.js"
     },
+    "./device-screen": {
+      "react-native": {
+        "types": "./dist/device-screen/index.native.d.ts",
+        "default": "./dist/device-screen/index.native.js"
+      },
+      "types": "./dist/device-screen/index.d.ts",
+      "default": "./dist/device-screen/index.js"
+    },
     "./dialog": {
       "react-native": {
         "types": "./dist/dialog/index.native.d.ts",
