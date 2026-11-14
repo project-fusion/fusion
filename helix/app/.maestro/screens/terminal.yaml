@@ -3,7 +3,9 @@
 #
 # The flow waits for the title of each screen, which no example before it
 # draws, then for the screen to stand still, since an example writes its
-# output once it has drawn and the screen's lines come a frame after.
+# output once it has drawn and the screen's lines come a frame after. The
+# first screen's title is every family's first, so the flow waits for the
+# terminal's name too.
 appId: dev.fusion.helix.app
 name: "Screens: Terminal"
 ---
@@ -14,6 +16,9 @@ name: "Screens: Terminal"
 - extendedWaitUntil:
     visible: 'Preview'
     timeout: 30000
+- extendedWaitUntil:
+    visible: '~/fusion'
+    timeout: 15000
 - waitForAnimationToEnd:
     timeout: 15000
 - takeScreenshot: terminal-preview-${MODE}-${SIZE}
