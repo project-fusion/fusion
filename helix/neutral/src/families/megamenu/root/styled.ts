@@ -59,9 +59,10 @@ export default styles(
       triggerPaddingInline: token('space-xs'),
       triggerRadius: token('radii-sm'),
     },
+    own: { megamenuCaret: null },
     stylesheet: 'megamenu/root/megamenu-root.generated.css',
   },
-  ({ hook, on, rule }) => {
+  ({ hook, on, own, rule }) => {
     const slow = hook.duration
     const fast = token('duration-fast')
     /* **The App Header's ground, so the panel continues the bar it hangs
@@ -158,11 +159,21 @@ export default styles(
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* The caret on the default trigger, turned while the panel is open. */
+      /* The caret says the word opens something, as a Select's does. **Sized
+         from the word beside it**, which holds at `text-sm` whatever the
+         density, so the caret holds too: the tight icon step grew it from 12
+         to 20 across the three densities beside the same 13 pixel word. **1em
+         rounded to an even size** on the web, 14 beside the 13 pixel word and
+         centered on a whole pixel: at 1.2em, 16, the owner found it large
+         beside the word, November 2026. A phone has no `round()`, and takes
+         the word's em. */
       on('trigger-indicator', [
+        web([rule({ own: { megamenuCaret: fn('round', '1em', '2px') } })]),
+        native([rule({ own: { megamenuCaret: '1em' } })]),
         rule({
-          blockSize: token('size-icon-sm'),
+          blockSize: own.megamenuCaret,
           flex: '0 0 auto',
-          inlineSize: token('size-icon-sm'),
+          inlineSize: own.megamenuCaret,
           transform: 'rotate(0deg)',
           transition: ['transform', fast, token('easing-standard')],
         }),
