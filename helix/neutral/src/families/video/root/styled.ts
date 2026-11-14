@@ -386,6 +386,19 @@ export default styles(
         rule({ separation: 'filled' }, { color: token('color-foreground') }),
       ]),
     ]),
+    /* **A bar holding extra controls lets the clock go sooner**, by what two
+       of them take on a touch screen, 41 pixels each with their gap. A
+       playlist's player draws previous and next, and at 390 on a phone its bar
+       was 342 wide with the clock still on it, so the scrubber was 16 pixels.
+       Without the clock it is 98. A phone's clock gives way by shrinking. */
+    on(
+      {
+        part: 'time',
+        selector:
+          '[part="controls"]:has(> :is([part~="previous"], [part~="next"], [part~="rewind"], [part~="forward"], [part~="speed"], [part~="pip"], [part~="remote"], [part~="download"])) [part="time"]',
+      },
+      [web([rule({ inlineSize: { below: '23.5rem' } }, { display: 'none' })])],
+    ),
     include(videoSound),
     /* The menu takes no width of its own: what a reader sees is its trigger. */
     on('overflow', [web([rule({ display: 'contents' })])]),
