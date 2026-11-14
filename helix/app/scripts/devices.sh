@@ -259,6 +259,11 @@ rerun_dropped() {
     interrupted+=("$name" "$run")
     reran=$((reran + ${#again[@]}))
     status=0
+    # Stopped, so the first flow run again opens the gallery afresh: left
+    # running, it stood on the screen the drop cut off, whose title "Preview"
+    # the next flow's first wait took for its own, and that flow's next screen
+    # came after its wait (Orb and Spatial Ribbon Chart, run 43637898465).
+    adb -s "$device" shell am force-stop "$package" > /dev/null 2>&1 || true
     run_maestro "$run" ${options[@]+"${options[@]}"} "${again[@]}" || status=$?
   done
   if [[ ${#stayed[@]} -gt 0 ]]; then
