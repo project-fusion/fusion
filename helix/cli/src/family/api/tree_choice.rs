@@ -817,6 +817,37 @@ pub const HEATMAP: &[(&str, Names)] = &[
     ("onResize", Names::Event),
 ];
 
+/// What a frame around a graph sends: a note selected, asked and done, and a group shown
+/// or hidden, asked and done. Its props it reads by their own names.
+pub const GRAPH: &[(&str, Names)] = &[
+    ("onActivate", Names::Event),
+    ("onBeforeActivate", Names::Event),
+    ("onBeforeGraphFilter", Names::Event),
+    ("onGraphFilter", Names::Event),
+];
+
+/// What a frame around a graph computes for its parts, each read as `graph.x`: its name,
+/// the list's rows and count, the legend's groups, the controls it draws, the picture
+/// a phone draws, and what a screen reader hears.
+pub const GRAPH_COMPUTED: &[&str] = &[
+    "count",
+    "drawn",
+    "groups",
+    "legended",
+    "lines",
+    "marks",
+    "named",
+    "names",
+    "notes",
+    "panelHidden",
+    "pans",
+    "regions",
+    "said",
+    "toggles",
+    "viewBox",
+    "zooms",
+];
+
 /// What an aura sends: nothing by a bound name. It reads its props by their own names.
 pub const AURA: &[(&str, Names)] = &[];
 
@@ -1526,6 +1557,11 @@ pub fn lightbox(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "lightbox", LIGHTBOX, LIGHTBOX_COMPUTED)
 }
 
+/// `graph({ ... })`, each field a name.
+pub fn graph(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "graph", GRAPH, GRAPH_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1630,6 +1666,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "barChart" => bar_chart(value),
         "scatterChart" => scatter_chart(value),
         "heatmap" => heatmap(value),
+        "graph" => graph(value),
         "lightbox" => lightbox(value),
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),

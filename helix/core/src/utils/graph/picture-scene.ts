@@ -41,6 +41,12 @@ export interface GraphPictureOptions {
    * it. The box around the notes by default.
    */
   bounds?: { x: readonly [number, number]; y: readonly [number, number] } | null | undefined
+  /**
+   * Every group's name, which the series colors are handed out over: the
+   * notes' own by default. A drawing that leaves a group's notes out passes
+   * every group, so each keeps its color.
+   */
+  groups?: readonly string[] | undefined
   /** How heavily a note is drawn where it does not say. */
   emphasis?: GraphNodeEmphasis | undefined
   /** Whether each group's name is drawn over its notes. On by default. */
@@ -203,7 +209,9 @@ export const sceneOf = (
     selected === undefined ? undefined : reachOf(selected, drawn, options.reach ?? 'links')
   const near = reached?.near ?? new Set<string>()
   /* Groups take the series in the order of their names, as the drawing gives them. */
-  const groups = [...new Set(nodes.flatMap((node) => (node.group ? [node.group] : [])))].sort()
+  const groups = [
+    ...new Set(options.groups ?? nodes.flatMap((node) => (node.group ? [node.group] : []))),
+  ].sort()
   const series = new Map(
     groups.map((group, index): [string, GraphInk] => [
       group,

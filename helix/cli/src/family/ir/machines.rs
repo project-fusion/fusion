@@ -88,8 +88,8 @@ use crate::family::api::{
     Api, Attribute, Binding, Collection, ColorChoice, ColorField, FileChoice, Node, NodeKind,
     TextEntry, Toggle, TreeChoice, ValueRange, WindowChoice, AREA_CHART, AURA, BAR_CHART, CAROUSEL,
     CHAT_COMPOSER, CHAT_MESSAGE, CHAT_ROOT, CODE_BLOCK, COMBOBOX, COMMAND, DATA_TABLE, DATE_PICKER,
-    DONUT_CHART, FILTER_INPUT, FILTER_MENU, HEATMAP, INSPECTOR, LEGEND, LIGHTBOX, LINE_CHART,
-    LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
+    DONUT_CHART, FILTER_INPUT, FILTER_MENU, GRAPH, HEATMAP, INSPECTOR, LEGEND, LIGHTBOX,
+    LINE_CHART, LISTBOX, LOG_GROUP, LOG_LINE, LOG_ROOT, NOTIFICATIONS_ROOT, NOTIFICATION_GROUP,
     NOTIFICATION_ROW, OPTION, OPTION_GROUP, ORB, PAGINATION, PAGINATION_SIZE, PICKER_FIELD,
     SCATTER_CHART, SELECT, SPARKLINE, SPATIAL_CHART, STRANDS, TABLE, TABLE_COLUMN, TABLE_ROW, TAIL,
     TIME_PICKER, TREE, TREE_ITEM, VIDEO, VIDEO_PLAYLIST, VIDEO_PLAYLIST_MENU,
@@ -647,6 +647,7 @@ fn logged(api: &Api) -> Vec<MachineUse> {
         (&api.area_chart, AREA_CHART, "area-chart"),
         (&api.bar_chart, BAR_CHART, "bar-chart"),
         (&api.scatter_chart, SCATTER_CHART, "scatter-chart"),
+        (&api.graph, GRAPH, "graph"),
         (&api.heatmap, HEATMAP, "heatmap"),
         (&api.lightbox, LIGHTBOX, "lightbox"),
         (
