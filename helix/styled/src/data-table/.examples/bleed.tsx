@@ -13,7 +13,7 @@ export function Example() {
       <helix-divider></helix-divider>
       <helix-data-table
         bleed
-        default-selected="web"
+        default-selected="web,worker"
         label="Services"
         row-key="name"
         rows={rows}
