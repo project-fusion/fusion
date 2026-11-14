@@ -100,9 +100,8 @@ const served = async (attributes: string, selected: string): Promise<Table> => {
 describe('a data table that bleeds', () => {
   geometry('puts a leading checkbox on the column the words of the table start on', async () => {
     const host = await served('bleed', 'web')
-    const box = (rows(host)[0]?.firstElementChild as HTMLElement).querySelector(
-      'helix-checkbox, input',
-    ) as HTMLElement
+    const lead = rows(host)[0]?.firstElementChild as HTMLElement
+    const box = lead.querySelector('helix-checkbox, input') as HTMLElement
     expect(box.getBoundingClientRect().left).toBeCloseTo(host.getBoundingClientRect().left, 0)
   })
 
