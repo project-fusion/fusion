@@ -12,7 +12,7 @@ interface Held {
 }
 
 /** What a board asks of the driver beyond the most it may grow. */
-type Board = Pick<ZoomSetup, 'doubleStep' | 'item' | 'min'>
+type Board = Pick<ZoomSetup, 'doubleStep' | 'item' | 'min' | 'slack'>
 
 const Box = ({
   board,
@@ -216,6 +216,13 @@ describe('useZoom', () => {
       held.zooming?.panBy({ x: -1000, y: 0 })
     })
     expect(zoomOf(held)).toEqual({ pan: { x: -800, y: 50 }, scale: 2 })
+  })
+
+  test('a board with slack moves that share of the box past its edges', async () => {
+    const held = await drawn(8, { item: { height: 200, width: 1000 }, min: 0.1, slack: 0.5 })
+    await act(async () => held.zooming?.place({ pan: { x: 900, y: -900 }, scale: 1 }))
+    /* 300 across and 50 down to its edges, and half the box, 200 and 150, past them. */
+    expect(zoomOf(held)).toEqual({ pan: { x: 500, y: -200 }, scale: 1 })
   })
 
   test('a single tap is told where it landed, from the middle of the box', async () => {
