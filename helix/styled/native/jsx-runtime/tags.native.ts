@@ -97,6 +97,7 @@ import { HelixSpatialBarChart } from '../spatial-bar-chart/index.native'
 import { HelixSpatialRibbonChart } from '../spatial-ribbon-chart/index.native'
 import { HelixSpatialScatterChart } from '../spatial-scatter-chart/index.native'
 import { HelixSpatialSurfaceChart } from '../spatial-surface-chart/index.native'
+import { HelixSpatialTreemap } from '../spatial-treemap/index.native'
 import { HelixSpeedDial, HelixSpeedDialGroup, HelixSpeedDialItem } from '../speed-dial/index.native'
 import { HelixSplitter } from '../splitter/index.native'
 import { HelixStat, HelixStatGroup } from '../stat/index.native'
@@ -306,6 +307,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-spatial-ribbon-chart': HelixSpatialRibbonChart,
   'helix-spatial-scatter-chart': HelixSpatialScatterChart,
   'helix-spatial-surface-chart': HelixSpatialSurfaceChart,
+  'helix-spatial-treemap': HelixSpatialTreemap,
   'helix-speed-dial': HelixSpeedDial,
   'helix-speed-dial-group': HelixSpeedDialGroup,
   'helix-speed-dial-item': HelixSpeedDialItem,

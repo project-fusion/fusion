@@ -50,7 +50,7 @@ describe('the styled spatial treemap', () => {
   })
 
   test('under forced colors, the block the keys rest on is outlined in the highlight', () => {
-    const forced = sheet().split('@media (forced-colors: active)')[1] ?? ''
+    const forced = sheet().split('@media (forced-colors: active)').slice(1).join('')
     expect(forced).toContain('Highlight')
   })
 })
