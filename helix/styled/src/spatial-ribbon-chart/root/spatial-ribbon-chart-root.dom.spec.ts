@@ -50,7 +50,7 @@ describe('the styled spatial ribbon chart', () => {
   })
 
   test('under forced colors, the reading the keys rest on is ringed in the highlight', () => {
-    const forced = sheet().split('@media (forced-colors: active)')[1] ?? ''
+    const forced = sheet().split('@media (forced-colors: active)').slice(1).join('')
     expect(forced).toContain('Highlight')
   })
 })
