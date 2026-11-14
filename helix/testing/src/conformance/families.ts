@@ -83,6 +83,7 @@ export type Family =
   | 'heatmap'
   | 'graph'
   | 'canvas'
+  | 'map'
   | 'lightbox'
   | 'video'
   | 'orb'

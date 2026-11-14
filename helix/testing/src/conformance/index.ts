@@ -39,6 +39,7 @@ import { LIST } from './scenarios/list.js'
 import { LISTBOX } from './scenarios/listbox.js'
 import { LOADER } from './scenarios/loader.js'
 import { LOG } from './scenarios/log.js'
+import { MAP } from './scenarios/map.js'
 import { MEGAMENU } from './scenarios/megamenu.js'
 import { MENU } from './scenarios/menu.js'
 import { NAVIGATION } from './scenarios/navigation.js'
@@ -133,6 +134,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   listbox: LISTBOX,
   loader: LOADER,
   log: LOG,
+  map: MAP,
   megamenu: MEGAMENU,
   menu: MENU,
   'motion-toggle': MOTION_TOGGLE,
