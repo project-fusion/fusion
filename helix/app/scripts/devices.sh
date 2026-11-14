@@ -88,8 +88,9 @@ case ${5:-all} in
   all | flows | screens | screens-light-default | screens-light-largest | screens-dark-default | screens-dark-largest) known=yes ;;
   *) known=no ;;
 esac
-if [[ ($# -ne 4 && $# -ne 5) || ($1 != ios && $1 != android) || $known == no ]]; then
-  echo "Usage: $0 <ios|android> <device> <app> <out> [flows|screens|screens-<light|dark>-<default|largest>|all]" >&2
+[[ ${6:-} =~ ^([1-9][0-9]*-of-[1-9][0-9]*)?$ ]] || known=no
+if [[ ($# -lt 4 || $# -gt 6) || ($1 != ios && $1 != android) || $known == no ]]; then
+  echo "Usage: $0 <ios|android> <device> <app> <out> [flows|screens|screens-<light|dark>-<default|largest>|all] [<n>-of-<m>]" >&2
   echo "       $0 keep <out>" >&2
   exit 2
 fi
