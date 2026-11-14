@@ -8,7 +8,7 @@ import {
   sortedOf,
   within,
   withoutGroups,
-} from './graph-model.js'
+} from './model.js'
 
 const nodes = [
   { id: 'a', label: 'Alpha' },

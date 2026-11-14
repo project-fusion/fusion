@@ -1,9 +1,9 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { DrawnLink, DrawnNode, GraphChanges, GraphDriver } from './connect-graph.js'
-import type { GraphPoint } from './seed.js'
 
 /* Imported after the DOM is registered, like the elements: the connector
    reaches `@fusion.dev/helix-core`, which evaluates Lit, and Lit's element

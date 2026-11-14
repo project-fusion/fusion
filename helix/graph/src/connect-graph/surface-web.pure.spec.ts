@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import type { GraphPoint } from './seed.js'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import { surfaceWeb } from './surface-web.js'
 
 /* Two flat sheets, one above the other: 8 apart through the air, nearer than
