@@ -129,20 +129,38 @@ export default styles(
         rule({ print: true }, { display: 'none' }),
       ]),
       /* The scrim fades in as the panel slides, and out as it leaves. */
+      /* **The scrim leaves on the panel's curve.** On `standard` it was 88%
+           gone at 100 milliseconds of 200 while the panel was 37% gone, so
+           the panel floated on a bare page for the rest of the way out. It
+           arrives on the panel's opacity curve, as before. */
       on({ backdrop: 'panel' }, [
         rule({
           backgroundColor: hook.scrim,
           opacity: 0,
           transition: list(
-            ['opacity', move, token('easing-standard')],
+            ['opacity', move, token('easing-accelerate')],
             ['display', move, 'allow-discrete'],
             ['overlay', move, 'allow-discrete'],
           ),
         }),
-        rule({ open: true }, { opacity: 1 }),
+        rule(
+          { open: true },
+          {
+            opacity: 1,
+            transition: list(
+              ['opacity', move, token('easing-standard')],
+              ['display', move, 'allow-discrete'],
+              ['overlay', move, 'allow-discrete'],
+            ),
+          },
+        ),
         rule({ startingStyle: true, open: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: fading }),
-        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
+        rule({ open: true, reducedMotion: true }, { transition: fading }),
+        web([
+          rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
+          rule({ open: true, supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
+        ]),
       ]),
       on('panel', [step]),
       on('panel', [
@@ -216,6 +234,24 @@ export default styles(
             ),
           },
         ),
+        /* **An edge only where it meets the page**, as the corners are square
+           only where it meets the window. The edges that run along the window
+           drew a line at the window's own edge, which shows nothing a reader
+           needs: a start or end panel keeps the side facing the page, a sheet
+           keeps the top it rises to, and a top panel the bottom it drops to. */
+        rule(
+          [
+            { open: true, placement: false },
+            { open: true, placement: 'end' },
+          ],
+          { borderBlockWidth: 0, borderInlineEndWidth: 0 },
+        ),
+        rule(
+          { open: true, placement: 'start' },
+          { borderBlockWidth: 0, borderInlineStartWidth: 0 },
+        ),
+        rule({ open: true, placement: 'bottom' }, { borderBlockEndWidth: 0, borderInlineWidth: 0 }),
+        rule({ open: true, placement: 'top' }, { borderBlockStartWidth: 0, borderInlineWidth: 0 }),
       ]),
       /* A modal drawer's glass lifts the page back from under its scrim in light, as a
          glass Dialog's does. `:modal`, since only a modal panel has the scrim. */

@@ -272,24 +272,42 @@ export default styles(
         rule({ part: { 'data-refused': true }, reducedMotion: true }, { animation: 'none' }),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
+      /* **The scrim leaves on the panel's curve.** On `standard` it was 88%
+           gone at 100 milliseconds of 200 while the panel was 37% gone, so
+           the panel floated on a bare page for the rest of the way out. It
+           arrives on the panel's opacity curve, as before. */
       on({ backdrop: 'surface' }, [
         rule({
           opacity: 0,
           transition: list(
-            ['opacity', move, token('easing-standard')],
+            ['opacity', move, token('easing-accelerate')],
             ['display', move, 'allow-discrete'],
             ['overlay', move, 'allow-discrete'],
           ),
         }),
-        rule({ open: true }, { opacity: 1 }),
+        rule(
+          { open: true },
+          {
+            opacity: 1,
+            transition: list(
+              ['opacity', move, token('easing-standard')],
+              ['display', move, 'allow-discrete'],
+              ['overlay', move, 'allow-discrete'],
+            ),
+          },
+        ),
         rule({ startingStyle: true, open: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: fading }),
+        rule({ open: true, reducedMotion: true }, { transition: fading }),
         /* Where `overlay` cannot be transitioned, as in WebKit, a closing
            panel leaves the top layer at once while `display` holds it for the
            fade, and a fixed panel out of the top layer is placed against the
            nearest ancestor with a filter or a transform. There it closes at
            once. */
-        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
+        web([
+          rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
+          rule({ open: true, supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' }),
+        ]),
       ]),
       keyframes('helix-dialog-refuse', { '50%': { scale: 1.02 } }),
       /* The mark above the title, for a dialog that warns. */
