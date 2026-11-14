@@ -31,7 +31,7 @@ const FIELDS: [sheet: string, selector: string][] = [
   ['chat/composer/chat-composer.generated.css', ':host [part="field"] {'],
   ['object-inspector/root/object-inspector-root.generated.css', ':host [part="search-field"] {'],
   ['graph/root/graph-root.generated.css', ':host [part="search-field"] {'],
-  ['canvas/root/canvas-root.css', '[part="label-editor"] {'],
+  ['canvas/root/canvas-root.generated.css', ':host [part="label-editor"] {'],
   ['sandbox/source/sandbox-source.css', '[part="source"] {'],
   ['sandbox/console/sandbox-console.css', '[part="filter"] {'],
 ]

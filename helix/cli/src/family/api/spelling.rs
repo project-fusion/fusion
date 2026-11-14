@@ -1163,6 +1163,29 @@ const GRAPH: &[Field] = &[
     ("zooms", "zooms", Name),
 ];
 
+const CANVAS: &[Field] = &[
+    ("drafting", "drafting", Name),
+    ("groupName", "groupName", Name),
+    ("labels", "labels", Name),
+    ("lines", "lines", Name),
+    ("minimapFrame", "minimapFrame", Name),
+    ("minimapNodes", "minimapNodes", Name),
+    ("minimapView", "minimapView", Name),
+    ("minimapped", "minimapped", Name),
+    ("named", "named", Name),
+    ("onBeforeSelect", "onBeforeSelect", Name),
+    ("onCanvasPan", "onCanvasPan", Name),
+    ("onCanvasView", "onCanvasView", Name),
+    ("onCanvasZoom", "onCanvasZoom", Name),
+    ("onSelect", "onSelect", Name),
+    ("outlined", "outlined", Name),
+    ("pans", "pans", Name),
+    ("ruled", "ruled", Name),
+    ("said", "said", Name),
+    ("viewBox", "viewBox", Name),
+    ("zooms", "zooms", Name),
+];
+
 const HEATMAP: &[Field] = &[
     ("actives", "actives", Name),
     ("base", "base", Name),
@@ -1673,6 +1696,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("barChart", "barChart", BAR_CHART),
     ("scatterChart", "scatterChart", SCATTER_CHART),
     ("graph", "graph", GRAPH),
+    ("canvas", "canvas", CANVAS),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
     (

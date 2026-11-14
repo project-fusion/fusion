@@ -63,6 +63,32 @@ export default styles(
     )
     return [
       include(viewportControls),
+      /* The notes button, a raised square in the zoom stack's column, after
+         the zoom controls, as the fragment draws them. */
+      on('notes-toggle', [
+        native([
+          rule({
+            alignItems: 'center',
+            backgroundColor: first(
+              inherited('viewport-control-background-color'),
+              token('color-surface-overlay'),
+            ),
+            blockSize: token('size-target'),
+            borderColor: token('color-border'),
+            borderRadius: token('radii-sm'),
+            borderStyle: 'solid',
+            borderWidth: token('border-floating'),
+            boxShadow: token('shadow-floating'),
+            color: token('color-foreground'),
+            display: 'flex',
+            inlineSize: token('size-target'),
+            justifyContent: 'center',
+            '--icon-size': product(token('size-target'), 0.5),
+          }),
+          rule({ gridColumn: 1, gridRow: 3 }),
+          rule({ nth: 7 }, { gridColumn: 4 }),
+        ]),
+      ]),
       on('host', [web([rule({ display: 'contents' })])]),
       /* **A frame of its own**, and its own size container: the list moves
          below the drawing where the frame is narrow, whatever the page is. */

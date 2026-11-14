@@ -21,16 +21,7 @@ import { fragment } from '../table.js'
 export default fragment(
   'viewport-controls',
   {
-    parts: [
-      'controls',
-      'notes-toggle',
-      'pan-down',
-      'pan-end',
-      'pan-start',
-      'pan-up',
-      'zoom-in',
-      'zoom-out',
-    ],
+    parts: ['controls', 'pan-down', 'pan-end', 'pan-start', 'pan-up', 'zoom-in', 'zoom-out'],
     props: ['controlsPlacement'],
   },
   ({ on, rule }) => [
@@ -65,7 +56,7 @@ export default fragment(
     ]),
     /* Each control a raised square a finger's target across. */
     on(
-      ['pan-up', 'pan-start', 'pan-end', 'pan-down', 'zoom-in', 'zoom-out', 'notes-toggle'],
+      ['pan-up', 'pan-start', 'pan-end', 'pan-down', 'zoom-in', 'zoom-out'],
       [
         native([
           rule({
@@ -99,9 +90,6 @@ export default fragment(
     ]),
     on('zoom-out', [
       native([rule({ gridColumn: 1, gridRow: 2 }), rule({ nth: 6 }, { gridColumn: 4 })]),
-    ]),
-    on('notes-toggle', [
-      native([rule({ gridColumn: 1, gridRow: 3 }), rule({ nth: 7 }, { gridColumn: 4 })]),
     ]),
   ],
 )
