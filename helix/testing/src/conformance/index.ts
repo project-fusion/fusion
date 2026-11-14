@@ -27,6 +27,7 @@ import { DRILLDOWN } from './scenarios/drilldown.js'
 import { FILE_INPUT } from './scenarios/file-input.js'
 import { FILTER_INPUT } from './scenarios/filter-input.js'
 import { FORMAT_DATE } from './scenarios/format-date.js'
+import { GRAPH } from './scenarios/graph.js'
 import { HEATMAP } from './scenarios/heatmap.js'
 import { IMAGE } from './scenarios/image.js'
 import { INPUT } from './scenarios/input.js'
@@ -119,6 +120,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   'file-input': FILE_INPUT,
   'filter-input': FILTER_INPUT,
   'format-date': FORMAT_DATE,
+  graph: GRAPH,
   heatmap: HEATMAP,
   image: IMAGE,
   input: INPUT,
