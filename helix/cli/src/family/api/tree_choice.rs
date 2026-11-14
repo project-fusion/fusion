@@ -917,6 +917,27 @@ pub const MAP_COMPUTED: &[&str] = &[
     "zooms",
 ];
 
+/// What a sandbox sends: a file tab asked for and shown, and a console's level asked for.
+/// Its props it reads by their own names.
+pub const SANDBOX: &[(&str, Names)] =
+    &[("onBeforeChange", Names::Event), ("onChange", Names::Event)];
+
+/// What a sandbox, its source pane, its console and its status bar compute for their
+/// parts, each read as `sandbox.x`: the file tabs, the source's lines of runs, the
+/// console's lines and what it says, and the bar's readouts.
+pub const SANDBOX_COMPUTED: &[&str] = &[
+    "files",
+    "heard",
+    "language",
+    "lines",
+    "named",
+    "position",
+    "previewLeads",
+    "rows",
+    "said",
+    "several",
+];
+
 /// What an aura sends: nothing by a bound name. It reads its props by their own names.
 pub const AURA: &[(&str, Names)] = &[];
 
@@ -1641,6 +1662,11 @@ pub fn map(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "map", MAP, MAP_COMPUTED)
 }
 
+/// `sandbox({ ... })`, each field a name.
+pub fn sandbox(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "sandbox", SANDBOX, SANDBOX_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1748,6 +1774,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "graph" => graph(value),
         "canvas" => canvas(value),
         "map" => map(value),
+        "sandbox" => sandbox(value),
         "lightbox" => lightbox(value),
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),

@@ -1189,6 +1189,21 @@ const MAP: &[Field] = &[
     ("zooms", "zooms", Name),
 ];
 
+const SANDBOX: &[Field] = &[
+    ("files", "files", Name),
+    ("heard", "heard", Name),
+    ("language", "language", Name),
+    ("lines", "lines", Name),
+    ("named", "named", Name),
+    ("onBeforeChange", "onBeforeChange", Name),
+    ("onChange", "onChange", Name),
+    ("position", "position", Name),
+    ("previewLeads", "previewLeads", Name),
+    ("rows", "rows", Name),
+    ("said", "said", Name),
+    ("several", "several", Name),
+];
+
 const CANVAS: &[Field] = &[
     ("drafting", "drafting", Name),
     ("groupName", "groupName", Name),
@@ -1724,6 +1739,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("graph", "graph", GRAPH),
     ("canvas", "canvas", CANVAS),
     ("map", "map", MAP),
+    ("sandbox", "sandbox", SANDBOX),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
     (

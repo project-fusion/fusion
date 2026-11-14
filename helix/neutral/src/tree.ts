@@ -90,6 +90,7 @@ import type {
   PaginationRootChoice,
   PaginationSizeChoice,
   PickerFieldChoice,
+  SandboxChoice,
   ScatterChartChoice,
   SelectChoice,
   SparklineChoice,
@@ -385,6 +386,8 @@ export interface Headless {
   readonly canvas?: CanvasChoice
   /** What the element reads, sends, and computes where it frames a map, or is a place on one. */
   readonly map?: MapChoice
+  /** What the element reads, sends, and computes where it is a sandbox or one of its panes and bars. */
+  readonly sandbox?: SandboxChoice
   /** What the element reads, sends, and computes where it is a strip of cells. */
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */

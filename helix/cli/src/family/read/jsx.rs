@@ -100,6 +100,7 @@ const GIVEN: &[&str] = &[
     "graph",
     "canvas",
     "map",
+    "sandbox",
     "heatmap",
     "lightbox",
     "videoPlaylistMenu",

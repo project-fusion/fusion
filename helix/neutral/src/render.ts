@@ -632,6 +632,19 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'types'
     | 'zooms'
   >
+  /** What a sandbox, its source pane, its console and its status bar compute for their parts. */
+  readonly sandbox: Computes<
+    | 'files'
+    | 'heard'
+    | 'language'
+    | 'lines'
+    | 'named'
+    | 'position'
+    | 'previewLeads'
+    | 'rows'
+    | 'said'
+    | 'several'
+  >
   /** What a board of cards, or a card on one, computes for its parts: the lines, the labels, the minimap, the controls, and the names. */
   readonly canvas: Computes<
     | 'drafting'

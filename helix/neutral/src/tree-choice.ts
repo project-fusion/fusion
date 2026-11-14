@@ -1198,6 +1198,22 @@ export interface MapChoice {
   readonly zooms?: string
 }
 
+/** The names of a sandbox, or one of its panes and bars, each read as `sandbox.x`. */
+export interface SandboxChoice {
+  readonly files?: string
+  readonly heard?: string
+  readonly language?: string
+  readonly lines?: string
+  readonly named?: string
+  readonly onBeforeChange?: string
+  readonly onChange?: string
+  readonly position?: string
+  readonly previewLeads?: string
+  readonly rows?: string
+  readonly said?: string
+  readonly several?: string
+}
+
 /** The names of a board of cards, or a card on one, each read as `canvas.x`. */
 export interface CanvasChoice {
   readonly drafting?: string
