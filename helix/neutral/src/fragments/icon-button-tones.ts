@@ -1,4 +1,4 @@
-import { mix, token } from '../style.js'
+import { fn, mix, token } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -137,10 +137,28 @@ export default fragment(
             iconButtonEdge: token('color-warning'),
             iconButtonInk: token('color-warning'),
             iconButtonInkHover: token('color-warning'),
-            iconButtonFill: token('color-warning-surface'),
-            iconButtonFillHover: token('color-warning-surface-hover'),
-            iconButtonFillPress: token('color-warning-surface-active'),
-            iconButtonOnTone: token('color-foreground-on-status'),
+            /* **The solid warning fill under the page's color**, as a solid
+               warning Button, Tag, and Badge take: a white glyph on a deep
+               amber in light and a black one on a bright amber in dark. It
+               filled `warning-surface`, which measured #906106 under white in
+               dark, 3.90:1 on the page. Under the pointer the fill darkens by
+               the steps Button takes. */
+            iconButtonFill: token('color-warning-solid'),
+            iconButtonFillHover: fn('oklch', [
+              'from',
+              token('color-warning-solid'),
+              'calc(l - 0.03)',
+              'c',
+              'h',
+            ]),
+            iconButtonFillPress: fn('oklch', [
+              'from',
+              token('color-warning-solid'),
+              'calc(l - 0.06)',
+              'c',
+              'h',
+            ]),
+            iconButtonOnTone: token('color-background'),
             iconButtonTone: token('color-warning'),
             iconButtonToneHover: mix(token('color-warning'), 86, token('color-foreground')),
           },

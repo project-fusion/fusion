@@ -64,8 +64,15 @@ export default styles(
   ({ hook, on, rule }) => {
     const slow = hook.duration
     const fast = token('duration-fast')
-    const fill = hook.backgroundColor
-    const filter = hook.backdrop
+    /* **The App Header's ground, so the panel continues the bar it hangs
+       from**: the page's ground under an opaque bar, and glass under a glass
+       one, which the bar publishes as `--_app-header-panel-*`. The owner
+       decided this on November 12, 2026: a black panel under a glass bar read
+       as a hole over the cards beneath it. Outside an App Header it is the
+       page's ground, never a raised surface. A phone's bar publishes nothing,
+       so a phone's panel keeps the page's ground. */
+    const fill = hook.backgroundColor(measured('_app-header-panel-fill', token('color-background')))
+    const filter = hook.backdrop(measured('_app-header-panel-backdrop', 'none'))
     const columns = fn('minmax', hook.columnSize, '1fr')
     /* The band, from edge to edge under the bar: the header's ground, no
        edge, a shadow below only, the groups in tracks that line up row on

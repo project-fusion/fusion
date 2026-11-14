@@ -87,8 +87,12 @@ export default styles(
       rule({
         display: 'inline-flex',
         own: {
-          /* The glyph's step: the tight icon, never under the small one. */
-          iconButtonGlyph: fn('max', token('size-icon-tight'), token('size-icon-sm')),
+          /* The glyph's step, the region's tight icon: 12 at `sm`, 16 at `md`
+             and 20 at `lg`. **Three sizes, three glyphs**: a floor of 16 drew
+             `sm` and `md` alike, and the owner put `sm` back at 12 in November
+             2026. A Toolbar and an App Header raise their own tight step to
+             16, so the bars keep a 16 pixel glyph. */
+          iconButtonGlyph: token('size-icon-tight'),
           iconButtonSize: hook.size,
         },
       }),

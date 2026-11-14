@@ -60,10 +60,12 @@ export default styles(
       rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
     /* Centered on the first line, from the top of the row it shares with
-       the summary. */
-    const firstLine = web([
-      rule({ marginBlockStart: fn('round', 'down', quotient(difference('1lh', tight), 2), '1px') }),
-    ])
+       the summary. **Unrounded**, because the row is what sits on the half
+       pixel: a 21 pixel line centered in an even trigger starts at 9.5 in a
+       40 pixel one, and the exact half of the difference brings the chevron
+       back to 12, a whole pixel at the middle of the trigger and of the line.
+       Rounded down it sat at 11.5, half a pixel high, at every density. */
+    const firstLine = web([rule({ marginBlockStart: quotient(difference('1lh', tight), 2) })])
     return [
       on('host', [
         rule({ display: 'block' }),
