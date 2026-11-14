@@ -1,0 +1,33 @@
+<!-- @summary A table in a card with an inset bleed: the chosen rows a rounded fill kept off the rules, as a menu draws its highlight. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="panel card">
+  <p class="heading">Services</p>
+  <helix-divider></helix-divider>
+  <helix-data-table
+    bleed="inset"
+    default-selected="web,worker"
+    id="bleed-inset-table"
+    label="Services"
+    row-key="name"
+    selectable
+  >
+    <helix-table-column field="name">Name</helix-table-column>
+    <helix-table-column field="region">Region</helix-table-column>
+    <helix-table-column
+      field="count"
+      text-align="end"
+    >Instances</helix-table-column>
+  </helix-data-table>
+</div>
+
+<script>
+  document.getElementById('bleed-inset-table').rows = [
+    { count: 12, name: 'api', region: 'eu-central-1' },
+    { count: 3, name: 'web', region: 'us-east-1' },
+    { count: 5, name: 'worker', region: 'us-west-2' },
+  ]
+</script>

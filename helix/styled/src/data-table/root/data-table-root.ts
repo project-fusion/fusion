@@ -12,6 +12,14 @@ import '../../divider/index.js'
 import '../../menu/index.js'
 import '../../pagination/index.js'
 
+/** Present is on, `inset` is the inset form, and absent is off, written back the same way. */
+const bleedConverter = {
+  fromAttribute: (value: string | null): boolean | 'inset' =>
+    value === null ? false : value === 'inset' ? 'inset' : true,
+  toAttribute: (value: boolean | 'inset'): string | null =>
+    value === 'inset' ? 'inset' : value ? '' : null,
+}
+
 /**
  * @summary A table drawn from an array of rows, with sorting, filtering, and paging.
  *
@@ -107,9 +115,16 @@ export class HelixDataTable extends HelixHeadlessDataTable {
    * by a negative margin and the same padding, so nothing moves. The parent has
    * to leave that room: inside `overflow: hidden` with no inline padding, the
    * fill and the focus ring are cut at the table's edge.
+   *
+   * `inset` keeps the fill off the rules, a gap above and below it, rounded at
+   * both ends as a menu draws its highlight: for a table set inside a card or
+   * a panel of its own, where a fill meeting the lines reads as a band.
+   *
+   * Chosen rows next to each other read as one block in either form, with no
+   * rule across it and no corners inside it.
    */
-  @property({ reflect: true, type: Boolean })
-  bleed = false
+  @property({ converter: bleedConverter, reflect: true })
+  bleed: boolean | 'inset' = false
 
   static override tier = 'helix-'
 
