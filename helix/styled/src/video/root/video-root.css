@@ -118,6 +118,29 @@
   }
 }
 
+/* **A bar holding extra controls lets the clock go sooner**, by what two of
+   them take on a touch screen, 41 pixels each with their gap. A playlist's
+   player draws previous and next, and at 390 on a phone its bar was 342 wide
+   with the clock still on it, so the scrubber was 16 pixels. Without the clock
+   it is 98. */
+@container (inline-size < 23.5rem) {
+  [part="controls"]:has(
+      > :is(
+          [part~="previous"],
+          [part~="next"],
+          [part~="rewind"],
+          [part~="forward"],
+          [part~="speed"],
+          [part~="pip"],
+          [part~="remote"],
+          [part~="download"]
+        )
+    )
+    [part="time"] {
+    display: none;
+  }
+}
+
 /* A bar with a ground of its own, for a video embedded in a document rather
    than a video that is the page. The gradient goes with it: two grounds is one
    too many, and the point of this separation is that the controls are a bar and
