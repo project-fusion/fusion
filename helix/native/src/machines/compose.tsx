@@ -14,6 +14,7 @@ import { useAura } from './aura'
 import { aroundToolbar } from './axis'
 import { useBarChart } from './bar-chart'
 import type { Around, Binder } from './binder'
+import { useCanvas, useCanvasNode } from './canvas'
 import { useCarousel } from './carousel'
 import { useChat } from './chat'
 import { useChatComposer } from './chat-composer'
@@ -571,6 +572,15 @@ export const behaviorFor = (family: Family): UseBehavior => {
           (props) =>
             useOrb(family, props, use),
       ),
+    /* A board of cards, read-only, and a card on one: the plane, its lines,
+       its zoom, and what a screen reader hears. */
+    ...uses
+      .filter((use) => use.machine === 'canvas')
+      .map((use): Binder => {
+        /* A card is hosted by its own machine, the board by the board's. */
+        const host = family.name === 'canvas-node' ? useCanvasNode : useCanvas
+        return (props) => host(family, props, use)
+      }),
     /* A frame around a graph: its picture, its list, its legend, and its zoom. */
     ...uses
       .filter((use) => use.machine === 'graph')

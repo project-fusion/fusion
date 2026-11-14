@@ -1171,6 +1171,30 @@ export interface GraphChoice {
   readonly zooms?: string
 }
 
+/** The names of a board of cards, or a card on one, each read as `canvas.x`. */
+export interface CanvasChoice {
+  readonly drafting?: string
+  readonly groupName?: string
+  readonly labels?: string
+  readonly lines?: string
+  readonly minimapFrame?: string
+  readonly minimapNodes?: string
+  readonly minimapView?: string
+  readonly minimapped?: string
+  readonly named?: string
+  readonly onBeforeSelect?: string
+  readonly onCanvasPan?: string
+  readonly onCanvasView?: string
+  readonly onCanvasZoom?: string
+  readonly onSelect?: string
+  readonly outlined?: string
+  readonly pans?: string
+  readonly ruled?: string
+  readonly said?: string
+  readonly viewBox?: string
+  readonly zooms?: string
+}
+
 /** The names of a strip of cells, each read as `heatmap.x`. */
 export interface HeatmapChoice {
   readonly actives?: string

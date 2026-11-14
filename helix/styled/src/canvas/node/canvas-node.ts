@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvasNode } from '@fusion.dev/helix-headless/canvas'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './canvas-node.css.js'
+import { styles } from './canvas-node.generated.css.js'
 
 /**
  * @summary One card or group on a canvas.

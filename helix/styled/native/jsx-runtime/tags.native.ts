@@ -13,6 +13,7 @@ import { HelixBlockquote } from '../blockquote/index.native'
 import { HelixBreadcrumb, HelixBreadcrumbs } from '../breadcrumbs/index.native'
 import { HelixButton } from '../button/index.native'
 import { HelixCallout } from '../callout/index.native'
+import { HelixCanvas, HelixCanvasNode } from '../canvas/index.native'
 import { HelixCard } from '../card/index.native'
 import { HelixCarousel } from '../carousel/index.native'
 import { HelixChat, HelixChatComposer, HelixChatMessage } from '../chat/index.native'
@@ -179,6 +180,15 @@ const Link = (props: Props) =>
 const ChatMessage = (props: React.ComponentProps<typeof HelixChatMessage>) =>
   React.createElement(Turn, null, React.createElement(HelixChatMessage, props))
 
+/**
+ * A connection a board reads, which draws nothing itself, as on the web: the
+ * board finds it among its children by its tag.
+ */
+const CanvasEdge = Object.assign(() => null, {
+  displayName: 'helix-canvas-edge',
+  tag: 'helix-canvas-edge',
+})
+
 /** The components a passage under `data-prose` spaces as its own blocks. */
 export const PROSE_SPACED: ReadonlySet<unknown> = new Set([
   HelixCallout,
@@ -213,6 +223,9 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-button': HelixButton,
   'helix-button-group': ButtonGroup,
   'helix-callout': HelixCallout,
+  'helix-canvas': HelixCanvas,
+  'helix-canvas-edge': CanvasEdge,
+  'helix-canvas-node': HelixCanvasNode,
   'helix-card': HelixCard,
   'helix-carousel': HelixCarousel,
   'helix-chat': HelixChat,

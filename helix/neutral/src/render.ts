@@ -614,6 +614,24 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'viewBox'
     | 'zooms'
   >
+  /** What a board of cards, or a card on one, computes for its parts: the lines, the labels, the minimap, the controls, and the names. */
+  readonly canvas: Computes<
+    | 'drafting'
+    | 'groupName'
+    | 'labels'
+    | 'lines'
+    | 'minimapFrame'
+    | 'minimapNodes'
+    | 'minimapView'
+    | 'minimapped'
+    | 'named'
+    | 'outlined'
+    | 'pans'
+    | 'ruled'
+    | 'said'
+    | 'viewBox'
+    | 'zooms'
+  >
   /** What a strip of cells computes for its parts. */
   readonly heatmap: Computes<
     | 'actives'

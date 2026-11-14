@@ -229,6 +229,7 @@
                   "HelixBreadcrumb",
                   "HelixButton",
                   "HelixCallout",
+                  "HelixCanvasNode",
                   "HelixCard",
                   "HelixCheckbox",
                   "HelixCode",

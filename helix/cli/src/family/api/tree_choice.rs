@@ -848,6 +848,39 @@ pub const GRAPH_COMPUTED: &[&str] = &[
     "zooms",
 ];
 
+/// What a board of cards sends: a selection, asked and done, and its view, a step of
+/// its pan and of its zoom. A card on it sends nothing. Each reads its props by their
+/// own names.
+pub const CANVAS: &[(&str, Names)] = &[
+    ("onBeforeSelect", Names::Event),
+    ("onCanvasPan", Names::Event),
+    ("onCanvasView", Names::Event),
+    ("onCanvasZoom", Names::Event),
+    ("onSelect", Names::Event),
+];
+
+/// What a board of cards computes for its parts, each read as `canvas.x`: its name,
+/// each connection's line and label, the minimap, the ruling, the controls it draws,
+/// and what a screen reader hears; and for a card on it, its name, its group's name,
+/// and whether it draws an outline.
+pub const CANVAS_COMPUTED: &[&str] = &[
+    "drafting",
+    "groupName",
+    "labels",
+    "lines",
+    "minimapFrame",
+    "minimapNodes",
+    "minimapView",
+    "minimapped",
+    "named",
+    "outlined",
+    "pans",
+    "ruled",
+    "said",
+    "viewBox",
+    "zooms",
+];
+
 /// What an aura sends: nothing by a bound name. It reads its props by their own names.
 pub const AURA: &[(&str, Names)] = &[];
 
@@ -1562,6 +1595,11 @@ pub fn graph(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "graph", GRAPH, GRAPH_COMPUTED)
 }
 
+/// `canvas({ ... })`, each field a name.
+pub fn canvas(lit: &Lit) -> Result<TreeChoice, String> {
+    read(lit, "canvas", CANVAS, CANVAS_COMPUTED)
+}
+
 /// `heatmap({ ... })`, each field a name.
 pub fn heatmap(lit: &Lit) -> Result<TreeChoice, String> {
     read(lit, "heatmap", HEATMAP, HEATMAP_COMPUTED)
@@ -1667,6 +1705,7 @@ pub(super) fn by_key(key: &str, value: &Lit) -> Result<TreeChoice, String> {
         "scatterChart" => scatter_chart(value),
         "heatmap" => heatmap(value),
         "graph" => graph(value),
+        "canvas" => canvas(value),
         "lightbox" => lightbox(value),
         "videoPlaylistMenu" => video_playlist_menu(value),
         "videoPlaylist" => video_playlist(value),

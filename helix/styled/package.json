@@ -126,6 +126,14 @@
       "types": "./dist/callout/index.d.ts",
       "default": "./dist/callout/index.js"
     },
+    "./canvas": {
+      "react-native": {
+        "types": "./dist/canvas/index.native.d.ts",
+        "default": "./dist/canvas/index.native.js"
+      },
+      "types": "./dist/canvas/index.d.ts",
+      "default": "./dist/canvas/index.js"
+    },
     "./card": {
       "react-native": {
         "types": "./dist/card/index.native.d.ts",

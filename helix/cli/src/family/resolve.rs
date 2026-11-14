@@ -81,6 +81,7 @@ fn later_choices(api: &api::Api) -> impl Iterator<Item = &api::TreeChoice> {
         &api.bar_chart,
         &api.scatter_chart,
         &api.graph,
+        &api.canvas,
         &api.heatmap,
         &api.lightbox,
         &api.video_playlist_menu,
@@ -277,6 +278,7 @@ fn logs_and_feeds(family: &Family, names: &Names, found: &mut Vec<String>) {
             api::SCATTER_CHART,
         ),
         ("graph", &family.api.graph, api::GRAPH),
+        ("canvas", &family.api.canvas, api::CANVAS),
         ("heatmap", &family.api.heatmap, api::HEATMAP),
         ("lightbox", &family.api.lightbox, api::LIGHTBOX),
         (

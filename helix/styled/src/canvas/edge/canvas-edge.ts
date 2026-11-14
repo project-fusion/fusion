@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvasEdge } from '@fusion.dev/helix-headless/canvas'
-import { type CSSResultGroup, css } from 'lit'
+import type { CSSResultGroup } from 'lit'
+import { styles } from './canvas-edge.generated.css.js'
 
 /**
  * @summary A connector between two cards on a canvas.
@@ -18,14 +19,10 @@ import { type CSSResultGroup, css } from 'lit'
  */
 @customElement('helix-canvas-edge')
 export class HelixCanvasEdge extends HelixHeadlessCanvasEdge {
-  /* A declaration occupies no space, so it is `none` rather than `contents`:
-     `contents` would leave it a box-less participant in the board's layout and
-     this has nothing to contribute to one. */
-  static override styles: CSSResultGroup = css`
-    :host {
-      display: none;
-    }
-  `
+  /* A declaration occupies no space, so it is `none` rather than `contents`,
+     in its generated sheet: `contents` would leave it a box-less participant
+     in the board's layout and this has nothing to contribute to one. */
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {
