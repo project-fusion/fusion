@@ -325,6 +325,9 @@ slot[name="end"]::slotted(*) {
 
 @media (pointer: coarse) {
   :host {
-    --_select-ghost-dots: var(--select-ghost-underline, var(--helix-color-foreground-subtle));
+    --_select-ghost-dots: var(
+      --select-ghost-underline,
+      color-mix(in oklab, var(--helix-color-foreground-subtle) 60%, transparent)
+    );
   }
 }

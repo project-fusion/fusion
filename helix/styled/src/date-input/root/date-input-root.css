@@ -302,6 +302,9 @@ slot[name="trigger"]::slotted(*) {
 
 @media (pointer: coarse) {
   :host {
-    --_field-ghost-dots: var(--date-input-ghost-underline, var(--helix-color-foreground-subtle));
+    --_field-ghost-dots: var(
+      --date-input-ghost-underline,
+      color-mix(in oklab, var(--helix-color-foreground-subtle) 60%, transparent)
+    );
   }
 }

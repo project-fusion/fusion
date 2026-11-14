@@ -786,12 +786,29 @@ slot[name="error"]::slotted(*) {
   display: flex;
 }
 
-/* Round dots under each value say the cell can be edited. */
+/* Round dots under each value say the cell can be edited, a step quieter than
+   the subtle foreground so a column of them does not read as a rule. */
 [part="editor"] {
-  --input-ghost-underline: var(--helix-color-foreground-subtle);
-  --number-input-ghost-underline: var(--helix-color-foreground-subtle);
-  --date-input-ghost-underline: var(--helix-color-foreground-subtle);
-  --select-ghost-underline: var(--helix-color-foreground-subtle);
+  --input-ghost-underline: color-mix(
+    in oklab,
+    var(--helix-color-foreground-subtle) 60%,
+    transparent
+  );
+  --number-input-ghost-underline: color-mix(
+    in oklab,
+    var(--helix-color-foreground-subtle) 60%,
+    transparent
+  );
+  --date-input-ghost-underline: color-mix(
+    in oklab,
+    var(--helix-color-foreground-subtle) 60%,
+    transparent
+  );
+  --select-ghost-underline: color-mix(
+    in oklab,
+    var(--helix-color-foreground-subtle) 60%,
+    transparent
+  );
   /* The value at its column's edge, which the table writes on each cell. */
   --input-ghost-align: var(--data-table-cell-align, start);
   --number-input-ghost-align: var(--data-table-cell-align, start);
