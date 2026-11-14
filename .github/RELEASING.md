@@ -108,8 +108,8 @@ and skips the rest.
 |---|---|---|
 | `helix-cli-darwin-arm64` | `macos-15` | `aarch64-apple-darwin` |
 | `helix-cli-darwin-x64` | `macos-15` | `x86_64-apple-darwin`, cross-compiled |
-| `helix-cli-linux-arm64` | `ubuntu-24.04-arm` | `aarch64-unknown-linux-musl` |
-| `helix-cli-linux-x64` | `ubuntu-24.04` | `x86_64-unknown-linux-musl` |
+| `helix-cli-linux-arm64` | `ubuntu-26.04-arm` | `aarch64-unknown-linux-musl` |
+| `helix-cli-linux-x64` | `ubuntu-26.04` | `x86_64-unknown-linux-musl` |
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
 
 **`@fusion.dev/cortex-cli` ships `cortex` the same way**, with a
