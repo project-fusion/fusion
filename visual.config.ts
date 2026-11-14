@@ -235,6 +235,15 @@ export default defineConfig({
       scripts: ['/frame.js'],
       styles: ['/frame.css'],
     },
+    {
+      files,
+      glob: '{name}/.examples/bleed-inset.html',
+      kind: 'html',
+      name: 'bleed-inset',
+      root: SOURCE.styled,
+      scripts: ['/frame.js'],
+      styles: ['/frame.css'],
+    },
   ],
   /* `verify`'s browser jobs and `measure-browser.mjs` name a file here, and
      `measure:browser --from` merges a run's worth of them. */
