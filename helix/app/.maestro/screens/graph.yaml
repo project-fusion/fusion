@@ -1,0 +1,64 @@
+# Graph, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it
+# draws. Large holds twenty thousand notes, so it is given longer, and the
+# screen waits for its picture to stand.
+appId: dev.fusion.helix.app
+name: "Screens: Graph"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://graph/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: graph-preview-${MODE}-${SIZE}
+- openLink: helix://graph/architecture/preview
+- extendedWaitUntil:
+    visible: 'Architecture'
+    timeout: 15000
+- takeScreenshot: graph-architecture-${MODE}-${SIZE}
+- openLink: helix://graph/brain/preview
+- extendedWaitUntil:
+    visible: 'Brain'
+    timeout: 15000
+- takeScreenshot: graph-brain-${MODE}-${SIZE}
+- openLink: helix://graph/brain-3d/preview
+- extendedWaitUntil:
+    visible: 'Brain 3D'
+    timeout: 15000
+- takeScreenshot: graph-brain-3d-${MODE}-${SIZE}
+- openLink: helix://graph/knot/preview
+- extendedWaitUntil:
+    visible: 'Knot'
+    timeout: 15000
+- takeScreenshot: graph-knot-${MODE}-${SIZE}
+- openLink: helix://graph/large/preview
+- extendedWaitUntil:
+    visible: 'Large'
+    timeout: 60000
+- waitForAnimationToEnd:
+    timeout: 30000
+- takeScreenshot: graph-large-${MODE}-${SIZE}
+- openLink: helix://graph/live/preview
+- extendedWaitUntil:
+    visible: 'Live'
+    timeout: 15000
+- takeScreenshot: graph-live-${MODE}-${SIZE}
+- openLink: helix://graph/network/preview
+- extendedWaitUntil:
+    visible: 'Network'
+    timeout: 15000
+- takeScreenshot: graph-network-${MODE}-${SIZE}
+- openLink: helix://graph/pipeline/preview
+- extendedWaitUntil:
+    visible: 'Pipeline'
+    timeout: 15000
+- takeScreenshot: graph-pipeline-${MODE}-${SIZE}
+- openLink: helix://graph/turning/preview
+- extendedWaitUntil:
+    visible: 'Turning'
+    timeout: 15000
+- takeScreenshot: graph-turning-${MODE}-${SIZE}

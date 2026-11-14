@@ -1140,6 +1140,29 @@ const LIGHTBOX: &[Field] = &[
     ("zooms", "zooms", Name),
 ];
 
+const GRAPH: &[Field] = &[
+    ("count", "count", Name),
+    ("drawn", "drawn", Name),
+    ("groups", "groups", Name),
+    ("legended", "legended", Name),
+    ("lines", "lines", Name),
+    ("marks", "marks", Name),
+    ("named", "named", Name),
+    ("names", "names", Name),
+    ("notes", "notes", Name),
+    ("onActivate", "onActivate", Name),
+    ("onBeforeActivate", "onBeforeActivate", Name),
+    ("onBeforeGraphFilter", "onBeforeGraphFilter", Name),
+    ("onGraphFilter", "onGraphFilter", Name),
+    ("panelHidden", "panelHidden", Name),
+    ("pans", "pans", Name),
+    ("regions", "regions", Name),
+    ("said", "said", Name),
+    ("toggles", "toggles", Name),
+    ("viewBox", "viewBox", Name),
+    ("zooms", "zooms", Name),
+];
+
 const HEATMAP: &[Field] = &[
     ("actives", "actives", Name),
     ("base", "base", Name),
@@ -1649,6 +1672,7 @@ pub const FEATURES: &[(&str, &str, &[Field])] = &[
     ("areaChart", "areaChart", AXIS_CHART),
     ("barChart", "barChart", BAR_CHART),
     ("scatterChart", "scatterChart", SCATTER_CHART),
+    ("graph", "graph", GRAPH),
     ("heatmap", "heatmap", HEATMAP),
     ("lightbox", "lightbox", LIGHTBOX),
     (

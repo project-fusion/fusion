@@ -46,9 +46,13 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['filter-input/root/filter-input-root.generated.css', '[part="clear"]', 'color'],
   ['filter-input/root/filter-input-root.generated.css', '[part="field"]', 'color'],
   ['filter-input/root/filter-input-root.generated.css', 'slot[name="start"]', 'color'],
-  ['graph/root/graph-root.css', '[part~="legend-item-hidden"]', 'color'],
-  ['graph/root/graph-root.css', '[part="search-field"]::placeholder', 'color'],
-  ['graph/root/graph-root.css', '[part="settling"]', 'color'],
+  [
+    'graph/root/graph-root.generated.css',
+    '[part~="legend-item"][part~="legend-item-hidden"]',
+    'color',
+  ],
+  ['graph/root/graph-root.generated.css', '[part="search-field"]::placeholder', 'color'],
+  ['graph/root/graph-root.generated.css', '[part="settling"]', 'color'],
   ['image/root/image-root.generated.css', '[part="fallback"]', 'color'],
   ['input/root/input-root.generated.css', '[part="field"]', 'color'],
   ['input/root/input-root.generated.css', 'slot[name="start"]', 'color'],
@@ -144,7 +148,7 @@ const PLACEHOLDERS: [sheet: string, selector: string][] = [
   ['shared/field/field.css', '::placeholder'],
   ['time-input/root/time-input-root.generated.css', '[part~="segment-placeholder"]'],
   ['combobox/root/combobox-root.generated.css', '[part="control"]::placeholder'],
-  ['graph/root/graph-root.css', '[part="search-field"]::placeholder'],
+  ['graph/root/graph-root.generated.css', '[part="search-field"]::placeholder'],
   ['pin-input/root/pin-input-root.generated.css', '[part="placeholder"]'],
 ]
 

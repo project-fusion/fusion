@@ -32,6 +32,7 @@ import { type Entered, useEntry } from './entry'
 import { useFiles } from './files'
 import { useFilterInput } from './filter-input'
 import { useFilterMenu } from './filter-menu'
+import { useGraph } from './graph'
 import { useHeatmap } from './heatmap'
 import { HOOKS, leaving } from './hosted'
 import { useInspector } from './inspector'
@@ -569,6 +570,14 @@ export const behaviorFor = (family: Family): UseBehavior => {
         (use): Binder =>
           (props) =>
             useOrb(family, props, use),
+      ),
+    /* A frame around a graph: its picture, its list, its legend, and its zoom. */
+    ...uses
+      .filter((use) => use.machine === 'graph')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useGraph(family, props, use),
       ),
     /* A strip of cells: its cells from its readings, its reading, and its selection. */
     ...uses

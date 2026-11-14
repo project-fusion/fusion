@@ -45,6 +45,7 @@ import {
 } from '../filter-input/index.native'
 import { HelixFlex } from '../flex/index.native'
 import { HelixFormatDate } from '../format-date/index.native'
+import { HelixGraph } from '../graph/index.native'
 import { HelixGrid } from '../grid/index.native'
 import { HelixHeatmap } from '../heatmap/index.native'
 import { HelixIcon } from '../icon/index.native'
@@ -246,6 +247,7 @@ export const TAGS: Readonly<Record<string, unknown>> = {
   'helix-filter-operator': HelixFilterOperator,
   'helix-flex': HelixFlex,
   'helix-format-date': HelixFormatDate,
+  'helix-graph': HelixGraph,
   'helix-grid': HelixGrid,
   'helix-heatmap': HelixHeatmap,
   'helix-icon': HelixIcon,

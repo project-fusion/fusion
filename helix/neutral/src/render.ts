@@ -595,6 +595,25 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'zoomOutOff'
     | 'zooms'
   >
+  /** What a frame around a graph computes for its parts: the list, the legend, the controls, and the picture. */
+  readonly graph: Computes<
+    | 'count'
+    | 'drawn'
+    | 'groups'
+    | 'legended'
+    | 'lines'
+    | 'marks'
+    | 'named'
+    | 'names'
+    | 'notes'
+    | 'panelHidden'
+    | 'pans'
+    | 'regions'
+    | 'said'
+    | 'toggles'
+    | 'viewBox'
+    | 'zooms'
+  >
   /** What a strip of cells computes for its parts. */
   readonly heatmap: Computes<
     | 'actives'

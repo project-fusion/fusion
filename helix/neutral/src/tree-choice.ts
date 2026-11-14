@@ -1147,6 +1147,30 @@ export interface LightboxChoice {
   readonly zooms?: string
 }
 
+/** The names of a frame around a graph, each read as `graph.x`. */
+export interface GraphChoice {
+  readonly count?: string
+  readonly drawn?: string
+  readonly groups?: string
+  readonly legended?: string
+  readonly lines?: string
+  readonly marks?: string
+  readonly named?: string
+  readonly names?: string
+  readonly notes?: string
+  readonly onActivate?: string
+  readonly onBeforeActivate?: string
+  readonly onBeforeGraphFilter?: string
+  readonly onGraphFilter?: string
+  readonly panelHidden?: string
+  readonly pans?: string
+  readonly regions?: string
+  readonly said?: string
+  readonly toggles?: string
+  readonly viewBox?: string
+  readonly zooms?: string
+}
+
 /** The names of a strip of cells, each read as `heatmap.x`. */
 export interface HeatmapChoice {
   readonly actives?: string

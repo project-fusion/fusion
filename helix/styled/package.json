@@ -352,6 +352,14 @@
       "types": "./dist/format-date/index.d.ts",
       "default": "./dist/format-date/index.js"
     },
+    "./graph": {
+      "react-native": {
+        "types": "./dist/graph/index.native.d.ts",
+        "default": "./dist/graph/index.native.js"
+      },
+      "types": "./dist/graph/index.d.ts",
+      "default": "./dist/graph/index.js"
+    },
     "./grid": {
       "react-native": {
         "types": "./dist/grid/index.native.d.ts",

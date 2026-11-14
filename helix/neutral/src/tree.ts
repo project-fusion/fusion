@@ -70,6 +70,7 @@ import type {
   DonutChartChoice,
   FilterInputChoice,
   FilterMenuChoice,
+  GraphChoice,
   HeatmapChoice,
   InspectorChoice,
   LegendChoice,
@@ -376,6 +377,8 @@ export interface Headless {
   /** What the element reads, sends, and computes where it is a chart of columns. */
   readonly barChart?: BarChartChoice
   readonly scatterChart?: ScatterChartChoice
+  /** What the element reads, sends, and computes where it frames a graph. */
+  readonly graph?: GraphChoice
   /** What the element reads, sends, and computes where it is a strip of cells. */
   readonly heatmap?: HeatmapChoice
   /** What the element reads, sends, and computes where it is a player of one video. */
