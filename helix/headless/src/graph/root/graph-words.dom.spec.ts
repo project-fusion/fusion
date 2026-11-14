@@ -4,8 +4,8 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
+import type { GraphNode } from '@fusion.dev/helix-core/graph'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
-import type { GraphNode } from './graph-model.js'
 
 /** The native button inside a control, which is what a screen reader is on. */
 const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {

@@ -1,4 +1,5 @@
 import { type Holder, motionPaused, pageBudget, reportRuntime } from '@fusion.dev/helix-core'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import type { Simulation, SimulationNode } from 'd3-force-3d'
 import {
   AdditiveBlending,
@@ -40,7 +41,6 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import { linkKey } from '../connect-graph/diff.js'
 import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
-import type { GraphPoint } from '../connect-graph/seed.js'
 import type { StencilFrame } from '../connect-graph/stencil.js'
 import {
   ease,

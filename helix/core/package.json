@@ -140,6 +140,10 @@
       "types": "./dist/utils/follow-tail/follow-tail.d.ts",
       "default": "./dist/utils/follow-tail/follow-tail.js"
     },
+    "./graph": {
+      "types": "./dist/utils/graph/graph.d.ts",
+      "default": "./dist/utils/graph/graph.js"
+    },
     "./layers": {
       "types": "./dist/utils/layers/layers.d.ts",
       "default": "./dist/utils/layers/layers.js"

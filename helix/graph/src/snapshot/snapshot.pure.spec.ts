@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { pixelsOf } from '../connect-graph/sizes.js'
+import { pixelsOf } from '@fusion.dev/helix-core/graph'
 import { graphSnapshot } from './snapshot.js'
 
 /** Three notes in a row, two groups, and a link from each end to the middle. */

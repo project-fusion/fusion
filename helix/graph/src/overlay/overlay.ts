@@ -1,6 +1,9 @@
 import { isRtl, type ViewportGestureMode } from '@fusion.dev/helix-core'
+import { type Box, clearOf } from '@fusion.dev/helix-core/graph'
 import type { GraphGroup } from '../connect-graph/connect-graph.js'
 import { type GraphLooks, mixRgb, rgbOf } from '../connect-graph/looks.js'
+
+export { type Box, clearOf }
 
 /*
  * What a driver draws over its renderer, the same whatever the renderer: the
@@ -189,14 +192,6 @@ export const isLight = (color: string): boolean => {
 
 /** Eases in and out, so a signal leaves and arrives gently. */
 export const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)
-
-/** A name's box on screen, in pixels. */
-export interface Box {
-  bottom: number
-  left: number
-  right: number
-  top: number
-}
 
 /** How many of a group's notes say where its name goes. */
 const SAMPLED = 96
@@ -472,16 +467,6 @@ export const chromeOver = (container: HTMLElement): Box[] => {
   }
   return boxes
 }
-
-/** Whether a box overlaps none of `others`. */
-export const clearOf = (box: Box, others: readonly Box[]): boolean =>
-  others.every(
-    (other) =>
-      box.right < other.left ||
-      box.left > other.right ||
-      box.bottom < other.top ||
-      box.top > other.bottom,
-  )
 
 /**
  * Where a note's name starts, its left edge on screen: after the note in

@@ -1,7 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import type { GraphLink, GraphNode } from '@fusion.dev/helix-core/graph'
 import { mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
-import type { GraphLink, GraphNode } from './graph-model.js'
 
 /**
  * The frame's half of the contract with a renderer, held by a renderer that

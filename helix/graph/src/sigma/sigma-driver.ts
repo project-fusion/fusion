@@ -1,3 +1,5 @@
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
+import { pixelsOf } from '@fusion.dev/helix-core/graph'
 import type {
   DrawnLink,
   DrawnNode,
@@ -5,8 +7,6 @@ import type {
   GraphDriver,
 } from '../connect-graph/connect-graph.js'
 import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
-import type { GraphPoint } from '../connect-graph/seed.js'
-import { pixelsOf } from '../connect-graph/sizes.js'
 import {
   ease,
   gesturesHeld,

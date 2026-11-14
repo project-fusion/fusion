@@ -1,3 +1,4 @@
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import type {
   DrawnLink,
   DrawnNode,
@@ -6,7 +7,6 @@ import type {
 } from '../connect-graph/connect-graph.js'
 import { linkKey } from '../connect-graph/diff.js'
 import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
-import type { GraphPoint } from '../connect-graph/seed.js'
 import {
   gesturesHeld,
   groupsOver,

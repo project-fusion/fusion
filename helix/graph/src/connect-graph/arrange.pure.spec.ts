@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import { arrangeByGroup } from './arrange.js'
-import type { GraphPoint } from './seed.js'
 
 /* Two groups, each a hub with notes hanging from it. */
 const nodes = ['a', 'b'].flatMap((group) => [
