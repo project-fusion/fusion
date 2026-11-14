@@ -125,6 +125,7 @@ export default headless('option', {
         <View
           ariaHidden
           icon="check"
+          iconWeight="regular"
           part="check"
           platform="native"
         />

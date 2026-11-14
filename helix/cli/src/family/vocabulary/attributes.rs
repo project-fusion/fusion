@@ -215,6 +215,11 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     `Glyph` draws it. A prop that holds the name, as an icon's `name`, binds
     it. */
     ("glyph", BOX, Shape::Words),
+    /* The weight a phone's `Glyph` draws the glyph at, where it is not the
+    set's default: `regular`, as a checked menu row's light tick, which the
+    web paints through a stencil. A `Glyph` that has no such weight draws the
+    default one. */
+    ("glyph-weight", BOX, Shape::OneOf(&["regular"])),
     /* A box drawn and not shown, or a region that draws nothing while it
     holds, as a switch's `on` region while the switch is off. */
     ("hidden", &[NodeKind::Box, NodeKind::Region], Shape::Flag),

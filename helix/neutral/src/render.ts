@@ -1012,6 +1012,8 @@ export interface ViewAttributes extends Named, Drawing {
   readonly hidden?: Given
   /** A glyph a phone draws in the box, by its name. */
   readonly icon?: Given
+  /** The weight a phone draws the glyph at, where it is not the icon set's default. */
+  readonly iconWeight?: 'regular'
   /** The box stands at the item its set has selected, as a tab set's moving mark does. */
   readonly indicator?: boolean
   readonly inert?: Given
