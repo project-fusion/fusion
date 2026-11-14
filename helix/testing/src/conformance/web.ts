@@ -588,6 +588,10 @@ const nameOf = (type: string, family: string): string | undefined => {
   if (type === 'helix-plot-change' || type === 'helix-plot-turn') {
     return undefined
   }
+  /* The view a board reports, measured in each platform's own box. */
+  if (type === 'helix-canvas-view') {
+    return undefined
+  }
   /* What a graph tells the renderer `connectGraph` connects, which a phone draws without. */
   if (type === 'helix-graph-part-change') {
     return undefined
