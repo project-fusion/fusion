@@ -159,11 +159,18 @@ export default styles(
              the connector turns the globe to show it. */
           rule({ behind: true }, { opacity: 0, pointerEvents: 'none' }),
         ]),
-        /* A phone's frame writes where the place falls. */
+        /* **A phone's frame writes where the place falls, and the host is the
+           point's box on it**, raised by the lift: a touch lands only inside
+           its view's own box on a phone, so a host of no size took none. */
         native([
           rule({
-            insetBlockStart: measured('_map-marker-y', '0px'),
-            left: measured('_map-marker-x', '0px'),
+            blockSize: own.mapMarkerSize,
+            inlineSize: own.mapMarkerSize,
+            insetBlockStart: difference(
+              difference(measured('_map-marker-y', '0px'), quotient(own.mapMarkerSize, 2)),
+              own.mapMarkerLift,
+            ),
+            left: difference(measured('_map-marker-x', '0px'), quotient(own.mapMarkerSize, 2)),
           }),
           rule({ placed: false }, { opacity: 0 }),
         ]),
@@ -206,13 +213,13 @@ export default styles(
              after it. */
           rule({ start: true }, { flexDirection: 'row-reverse' }),
         ]),
-        /* A phone has no share of the box to move by, so the button is drawn
-           back by half the point, and up by its lift. */
+        /* A phone has no share of the box to move by: the host stands the
+           point's box on the place, and the button fills it. */
         native([
           rule({
             flexDirection: 'row',
-            left: product(own.mapMarkerSize, '-0.5'),
-            top: difference(product(own.mapMarkerSize, '-0.5'), own.mapMarkerLift),
+            left: 0,
+            top: 0,
           }),
         ]),
       ]),
@@ -247,6 +254,12 @@ export default styles(
             display: 'flex',
             justifyContent: 'center',
           }),
+          /* **The letter keeps to the point** at every text size: a phone's
+             point stops growing at the largest standard size, where its
+             text does not, and a letter grew out of its point. Half the
+             point at the default size, as the web's. */
+          rule({ fontSize: '11px' }),
+          rule({ shape: 'pin' }, { fontSize: '13px' }),
         ]),
       ]),
       /* **A point holding a letter, a number or an icon shows it in place of

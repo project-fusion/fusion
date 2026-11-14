@@ -44,8 +44,8 @@ export default styles(
         insetBlockStart: 0,
         left: 0,
         outlineColor: hook.ink,
-        pointerEvents: 'none',
         position: 'absolute',
+        web: { pointerEvents: 'none' },
       }),
     ]),
     /* **A button on each point in view, invisible until focused.** The

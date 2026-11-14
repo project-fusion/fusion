@@ -66,7 +66,11 @@ const colorsOf = (ink: (token: string) => string) => ({
  */
 const MAP_CREDIT = 'OpenFreeMap © OpenMapTiles Data from OpenStreetMap'
 
-const Credit = () => <Text style={useInheritedText()}>{MAP_CREDIT}</Text>
+const Credit = () => (
+  <Text allowFontScaling={false} style={useInheritedText()}>
+    {MAP_CREDIT}
+  </Text>
+)
 
 /** A press binding: what the press does. */
 const pressed = (go: () => void): PartBinding => ({ view: { onPress: go } })
