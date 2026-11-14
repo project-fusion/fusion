@@ -395,6 +395,7 @@ const CHARTS: ReadonlySet<string> = new Set([
   'spatial-ribbon-chart',
   'spatial-scatter-chart',
   'spatial-surface-chart',
+  'spatial-treemap',
 ])
 
 /** What a chart's reading says: its readout's words, and its live region's. */

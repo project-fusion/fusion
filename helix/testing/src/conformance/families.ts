@@ -78,6 +78,7 @@ export type Family =
   | 'spatial-ribbon-chart'
   | 'spatial-scatter-chart'
   | 'spatial-surface-chart'
+  | 'spatial-treemap'
   | 'heatmap'
   | 'lightbox'
   | 'video'
