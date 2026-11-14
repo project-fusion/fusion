@@ -56,6 +56,7 @@ import { SELECT } from './scenarios/select.js'
 import { SLIDER } from './scenarios/slider.js'
 import { SPARKLINE } from './scenarios/sparkline.js'
 import { SPATIAL_BAR_CHART } from './scenarios/spatial-bar-chart.js'
+import { SPATIAL_HEATMAP } from './scenarios/spatial-heatmap.js'
 import { SPATIAL_RIBBON_CHART } from './scenarios/spatial-ribbon-chart.js'
 import { SPATIAL_SCATTER_CHART } from './scenarios/spatial-scatter-chart.js'
 import { SPATIAL_SURFACE_CHART } from './scenarios/spatial-surface-chart.js'
@@ -148,6 +149,7 @@ export const SCENARIOS: Readonly<Record<Family, readonly Scenario[]>> = {
   slider: SLIDER,
   sparkline: SPARKLINE,
   'spatial-bar-chart': SPATIAL_BAR_CHART,
+  'spatial-heatmap': SPATIAL_HEATMAP,
   'spatial-ribbon-chart': SPATIAL_RIBBON_CHART,
   'spatial-scatter-chart': SPATIAL_SCATTER_CHART,
   'spatial-surface-chart': SPATIAL_SURFACE_CHART,

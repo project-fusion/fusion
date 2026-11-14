@@ -75,6 +75,7 @@ export type Family =
   | 'bar-chart'
   | 'scatter-chart'
   | 'spatial-bar-chart'
+  | 'spatial-heatmap'
   | 'spatial-ribbon-chart'
   | 'spatial-scatter-chart'
   | 'spatial-surface-chart'

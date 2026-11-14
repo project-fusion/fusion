@@ -392,6 +392,7 @@ const CHARTS: ReadonlySet<string> = new Set([
   'scatter-chart',
   'sparkline',
   'spatial-bar-chart',
+  'spatial-heatmap',
   'spatial-ribbon-chart',
   'spatial-scatter-chart',
   'spatial-surface-chart',
