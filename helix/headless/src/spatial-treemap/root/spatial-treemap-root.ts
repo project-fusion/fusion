@@ -28,6 +28,13 @@ import {
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
+  blockOrder,
+  blocksDrawn,
+  type DrawnBlock,
+  type TreemapField,
+  treemapOf,
+} from '@fusion.dev/helix-core/spatial'
+import {
   boundsOf,
   boxView,
   DragTurn,
@@ -37,13 +44,6 @@ import {
   turned,
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
-import {
-  blocksDrawn,
-  type DrawnBlock,
-  paintOrder,
-  type TreemapField,
-  treemapOf,
-} from '../blocks.js'
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -464,7 +464,7 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, blocks).map(
+      >${this.noBox ? nothing : drawBox(view)}${blockOrder(view.projection, blocks).map(
         (block) =>
           /* The ring straight after its block, so the blocks in front cover
              it as they cover the block: drawn over them all, it traced their

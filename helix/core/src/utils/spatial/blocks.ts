@@ -7,9 +7,10 @@
  * front of them.
  */
 
-import { type Drawn, type PagePoint, type Projection, solid, ticks } from '@fusion.dev/helix-core'
-import { type FieldRow, niceRange, type PlotAxis } from '@fusion.dev/helix-core/spatial'
-import { type BoxExtent, inBox } from '../spatial-scatter-chart/view.js'
+import { type Drawn, type PagePoint, type Projection, solid } from '../projection/projection.js'
+import { ticks } from '../scale/ticks.js'
+import { type BoxExtent, inBox } from './box.js'
+import { type FieldRow, niceRange, type PlotAxis } from './field.js'
 
 /** How tall the box stands over its floor where a column gives each block a height. */
 const HEIGHT = 0.6
@@ -297,7 +298,7 @@ const LEVEL = 1e-9
  * though its near end stands in front. Where two lines give opposite orders,
  * no view sees one block through the other, and neither is held first.
  */
-export const paintOrder = (projection: Projection, blocks: readonly DrawnBlock[]): DrawnBlock[] => {
+export const blockOrder = (projection: Projection, blocks: readonly DrawnBlock[]): DrawnBlock[] => {
   const [ax, ay] = projection.toward
   /** `-1` where `one` goes first, `1` where `other` does, and `0` where either may. */
   const along = (

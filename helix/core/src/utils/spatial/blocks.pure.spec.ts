@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { projectionOf } from '@fusion.dev/helix-core'
-import { blocksDrawn, type FloorArea, paintOrder, squarified, treemapOf } from './blocks.js'
+import { projectionOf } from '../projection/projection.js'
+import { blockOrder, blocksDrawn, type FloorArea, squarified, treemapOf } from './blocks.js'
 
 const row = (label: string, team: string, ...values: Array<number | undefined>) => ({
   cells: [
@@ -103,7 +103,7 @@ describe('the order of painting', () => {
     const field = treemapOf([row('Long', '', 9, 1), row('Small', '', 1, 1)], [1, 2])
     const projection = projectionOf({ tilt: 30, turn: 40 })
     const drawn = blocksDrawn(field, projection)
-    const order = paintOrder(projection, drawn).map((block) => field.blocks[block.index]?.label)
+    const order = blockOrder(projection, drawn).map((block) => field.blocks[block.index]?.label)
     const [long, small] = [drawn[0], drawn[1]]
     const nearer = (one: typeof long, other: typeof long): boolean => {
       if (!one || !other) {
@@ -130,7 +130,7 @@ describe('the order of painting', () => {
       'Team',
     )
     const projection = projectionOf({ tilt: 30, turn: 130 })
-    const order = paintOrder(projection, blocksDrawn(field, projection))
+    const order = blockOrder(projection, blocksDrawn(field, projection))
     expect(new Set(order.map((block) => block.index)).size).toBe(30)
   })
 })
