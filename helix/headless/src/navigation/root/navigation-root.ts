@@ -3,15 +3,23 @@ import {
   customElement,
   focusableElements,
   focusItemOf,
+  formatWords,
   HelixElement,
   IndicatorController,
+  insideBox,
   KeyboardNavigationController,
   type NavigableItem,
+  OverflowController,
   reportRuntime,
+  untilReactHydrated,
   words,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { caretDown, list } from '@fusion.dev/helix-icons'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
+import '../../menu/index.js'
 
 /** What can take focus itself, which a destination usually is. */
 const FOCUSABLE = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -50,6 +58,16 @@ const navigable = (item: HTMLElement): NavigableItem => {
   })
 }
 
+/** The link a destination leads to: the destination itself, or the link inside a list item. */
+const linkOf = (item: HTMLElement): HTMLAnchorElement | null =>
+  item.matches('a[href]')
+    ? (item as HTMLAnchorElement)
+    : item.querySelector<HTMLAnchorElement>(':scope > a[href]')
+
+/** A destination's name, as its link gives it. */
+const nameOf = (link: HTMLAnchorElement): string =>
+  (link.getAttribute('aria-label') ?? link.textContent ?? '').replace(/\s+/g, ' ').trim()
+
 /** The navigations on the page, to tell two with one name apart. */
 const connected = new Set<HelixHeadlessNavigation>()
 
@@ -85,6 +103,22 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * Set `orientation="vertical"` to stack the destinations in a column, for a
  * sidebar.
  *
+ * **A row too narrow for its destinations folds them into a menu.** The
+ * destinations fold from the end, one at a time, into a menu behind a button
+ * after the last one on the row, named by `more-label`, until the row fits.
+ * The current destination stays on the row, so the marker has somewhere to
+ * be: where it would fold, the one before it folds instead. Where the button
+ * and the current destination do not both fit, every destination folds and
+ * the button names the current one. Where even that does not fit, the button
+ * is a glyph alone, named for the current one. Each row in the menu is a link
+ * to the same address, and the current one is checked.
+ *
+ * A destination that folds is `hidden`: the link, or the list item that holds
+ * it. A destination that is no link, such as a `Megamenu`, stays on the row.
+ * A server serves every destination on the row, and the browser folds what
+ * does not fit once it has measured it. Set `overflow="scroll"` to scroll a
+ * long row inside itself instead. A column never folds.
+ *
  * Set `arrows` and the arrow keys move focus between the destinations, as
  * Radix's navigation menu does: left and right along a row, up and down a
  * column, Home and End to the ends. A `Megamenu` among them is reached at its
@@ -109,10 +143,38 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  *
  * @slot - The destinations, as your own links.
  * @slot indicator - A marker of your own, drawn inside the `indicator` part, where the current destination's place and size reach it.
+ * @slot menu-icon - Replaces the glyph on the overflow button where it is too narrow for words.
+ * @slot more-icon - Replaces the caret on the button that opens the overflow menu.
  *
  * @csspart indicator - The marker that moves to the current destination. It carries the destination's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed.
+ * @csspart more - The button that opens the overflow menu, drawn after the last destination on the row while any has folded.
+ * @csspart more-current - The current destination's name on the button, while every destination has folded.
+ * @csspart more-glyph - The glyph on the button where it is too narrow for words, where none is slotted.
+ * @csspart more-label - The button's name, `more-label`, while the current destination is still on the row.
+ * @csspart more-mark - The caret on the button, where none is slotted.
  * @csspart nav - The navigation landmark.
+ * @csspart overflow - The menu of the destinations that do not fit on the row.
+ * @csspart overflow-back - The control that returns from a submenu.
+ * @csspart overflow-back-mark - The glyph on the back control of a submenu.
+ * @csspart overflow-empty - The text shown when the menu has no items.
+ * @csspart overflow-header - The bar above a submenu, holding the way back and its name.
+ * @csspart overflow-live - The overflow menu's live region, which repeats the empty and loading text for screen readers.
+ * @csspart overflow-loading - The text shown while the items are loading.
+ * @csspart overflow-option - One destination in the overflow menu, a link to its address. Checked where it is the current one.
+ * @csspart overflow-option-end - A destination's trailing column.
+ * @csspart overflow-option-item - A destination's row, an `<a>`.
+ * @csspart overflow-option-mark - The check beside the current destination.
+ * @csspart overflow-option-shortcut - A destination's key.
+ * @csspart overflow-option-shortcut-kbd - The key inside it.
+ * @csspart overflow-option-shortcut-key - One key of a destination's chord.
+ * @csspart overflow-option-shortcut-separator - The `+` between two keys of a destination's chord.
+ * @csspart overflow-option-start - A destination's leading column.
+ * @csspart overflow-option-surface - A destination's submenu panel, which a destination does not open.
+ * @csspart overflow-search-field - The overflow menu's filter field, drawn with `filterable`.
+ * @csspart overflow-surface - The floating panel the overflow menu is drawn on.
+ * @csspart overflow-title - The name of the submenu that is showing.
  *
+ * @cssstate folded - While any destination has folded into the overflow menu.
  * @cssstate open - While a megamenu or another disclosure among the destinations is open.
  */
 @customElement('helix-headless-navigation')
@@ -133,13 +195,18 @@ export class HelixHeadlessNavigation extends HelixElement {
         const current = markOf(item)?.getAttribute('aria-current')
         return current !== null && current !== undefined && current !== 'false'
       }
-      return (
+      const current =
         items.find((item) => markOf(item)?.getAttribute('aria-current') === 'page') ??
         items.find(marked)
-      )
+      /* A current destination that folded is named by the button. */
+      if (current?.hidden) {
+        const button = this.buttonAt(this.fold.step)
+        return button.named && !button.compact ? (this.partNamed('more') ?? undefined) : undefined
+      }
+      return current
     },
     indicator: () => this.partNamed('indicator'),
-    observe: () => this.items,
+    observe: () => [...this.items, ...[this.partNamed('more')].filter((one) => one !== null)],
     surface: () => this.partNamed('nav'),
   })
 
@@ -151,6 +218,15 @@ export class HelixHeadlessNavigation extends HelixElement {
    */
   @property({ type: Boolean })
   arrows = false
+
+  /**
+   * The name of the button that opens the overflow menu, where every
+   * destination has folded. `{name}` is the current destination's, which the
+   * button shows.
+   */
+  @words
+  @property({ attribute: 'current-label' })
+  currentLabel = '{name}, more destinations'
 
   /** The name the element gives itself where `label` is empty. */
   @words
@@ -173,7 +249,10 @@ export class HelixHeadlessNavigation extends HelixElement {
      choosing nothing, stopping at the ends. Only the axis the destinations run
      along: the other is the page's to scroll with and an open panel's. */
   protected readonly keys = new KeyboardNavigationController(this, {
-    items: () => (this.arrows ? this.items.map(navigable) : []),
+    items: () =>
+      this.arrows
+        ? [...this.items.filter((item) => !item.hidden), ...this.shownMore].map(navigable)
+        : [],
     origin: 'focus',
     reserved: () =>
       this.orientation === 'vertical' ? ['ArrowLeft', 'ArrowRight'] : ['ArrowDown', 'ArrowUp'],
@@ -186,6 +265,24 @@ export class HelixHeadlessNavigation extends HelixElement {
     label: true,
     target: () => this.partNamed('nav'),
   })
+
+  /**
+   * The words on the button that opens the overflow menu, and the menu's name.
+   */
+  @words
+  @property({ attribute: 'more-label' })
+  moreLabel = 'More'
+
+  /**
+   * What a row too narrow for its destinations does. Unset, the destinations
+   * that do not fit fold into the overflow menu. `scroll` keeps them all on
+   * the row and scrolls it inside itself, for a strip read by swiping.
+   *
+   * Reflected and left unset by default, so the host carries nothing a
+   * consumer's server markup does not already have.
+   */
+  @property({ reflect: true })
+  overflow?: 'scroll'
 
   /**
    * How the destinations are drawn, with `Tabs`' three values and for the same
@@ -224,6 +321,32 @@ export class HelixHeadlessNavigation extends HelixElement {
   /** The disclosures among the destinations that are open. */
   private readonly opened = new Set<EventTarget>()
 
+  /** The destinations this element hid by folding them, so unfolding shows only those. */
+  private readonly hid = new WeakSet<HTMLElement>()
+
+  /**
+   * Folds the destinations that do not fit on the row into the overflow
+   * menu: step `n` folds the first `n` of `foldOrder`.
+   */
+  private readonly fold = new OverflowController(this, {
+    apply: (step) => this.applyFold(step),
+    box: () => (this.folds ? this.partNamed('nav') : null),
+    /* The destinations on the row and the button, read one by one: the marker
+       is placed after a measure, so it still stands where the last step put
+       it, and under a current destination at the end of the row it reaches
+       past the bar. */
+    fits: (box) => {
+      const menu = this.partNamed('overflow')
+      const more = menu && !menu.hidden ? this.partNamed('more') : null
+      return insideBox(box, [...this.items.filter((item) => !item.hidden), ...(more ? [more] : [])])
+    },
+    observe: () => this.items,
+    /* The destinations are the page's, and a write before React hydrates them
+       is a mismatch React reports and never repairs. */
+    ready: () => untilReactHydrated(this),
+    steps: () => (this.folds && this.foldOrder.length > 0 ? this.foldOrder.length + 1 : 0),
+  })
+
   /**
    * Hears a disclosure among the destinations open or close. In capture,
    * because `toggle` does not bubble.
@@ -239,6 +362,123 @@ export class HelixHeadlessNavigation extends HelixElement {
       this.opened.delete(target)
     }
     this.toggleState('open', this.opened.size > 0)
+  }
+
+  /** Whether the row folds what does not fit: a row, without `overflow="scroll"`. */
+  private get folds(): boolean {
+    return this.orientation !== 'vertical' && this.overflow !== 'scroll'
+  }
+
+  /** The destinations that can fold: each a link, and none the page hid itself. */
+  private get foldable(): HTMLElement[] {
+    return this.items.filter(
+      (item) => linkOf(item) !== null && (!item.hidden || this.hid.has(item)),
+    )
+  }
+
+  /** The current destination among those that can fold, where it is one. */
+  private get currentFoldable(): HTMLElement | undefined {
+    const foldable = this.foldable
+    const current = (item: HTMLElement): string | null | undefined =>
+      markOf(item)?.getAttribute('aria-current')
+    return (
+      foldable.find((item) => current(item) === 'page') ??
+      foldable.find((item) => {
+        const value = current(item)
+        return value !== null && value !== undefined && value !== 'false'
+      })
+    )
+  }
+
+  /**
+   * The order destinations fold in: from the end, the current one last, so a
+   * step that folds it folds every destination.
+   */
+  private get foldOrder(): HTMLElement[] {
+    const current = this.currentFoldable
+    const rest = this.foldable.filter((item) => item !== current).reverse()
+    return current ? [...rest, current] : rest
+  }
+
+  /** The destinations step `step` folds. */
+  private foldedAt(step: number): Set<HTMLElement> {
+    return new Set(step <= 0 ? [] : this.foldOrder.slice(0, step))
+  }
+
+  /**
+   * How the overflow button reads at step `step`. Once every destination has
+   * folded it is `named` for the current one, and past that, where even that
+   * does not fit, it is `compact`: a glyph alone, named for screen readers.
+   */
+  private buttonAt(step: number): { compact: boolean; label: string; named: boolean } {
+    /* Nothing folded reads no destination, as on a server, which has none to read. */
+    if (step === 0) {
+      return { compact: false, label: this.moreLabel, named: false }
+    }
+    const order = this.foldOrder
+    const current = this.currentFoldable
+    const compact = order.length > 0 && step > order.length
+    const named = current !== undefined && order.length > 0 && step >= order.length
+    const link = named && current ? linkOf(current) : null
+    const name = link ? nameOf(link) : ''
+    return {
+      compact,
+      label: named ? formatWords(this, 'currentLabel', { name }) : this.moreLabel,
+      named,
+    }
+  }
+
+  /** The overflow button while it shows, for the arrow keys. */
+  private get shownMore(): HTMLElement[] {
+    const more = this.partNamed('more')
+    return more && this.fold.step > 0 ? [more] : []
+  }
+
+  /**
+   * Writes a step onto the row as the render draws it: the folded
+   * destinations `hidden`, the menu shown while any has folded, and the
+   * button naming the current destination once every one has.
+   */
+  private applyFold(step: number): void {
+    const folded = this.foldedAt(step)
+    for (const item of this.foldable) {
+      if (folded.has(item)) {
+        if (!item.hidden) {
+          item.hidden = true
+          this.hid.add(item)
+        }
+      } else if (this.hid.has(item)) {
+        item.hidden = false
+        this.hid.delete(item)
+      }
+    }
+    const { compact, label, named } = this.buttonAt(step)
+    const menu = this.partNamed('overflow')
+    if (menu) {
+      menu.hidden = folded.size === 0
+    }
+    const more = this.partNamed('more')
+    if (more) {
+      more.toggleAttribute('data-current', named && !compact)
+      more.toggleAttribute('data-compact', compact)
+      if (named || compact) {
+        more.setAttribute('aria-label', label)
+      } else {
+        more.removeAttribute('aria-label')
+      }
+    }
+    const words = this.partNamed('more-label')
+    const current = this.partNamed('more-current')
+    const caret = this.renderRoot.querySelector<HTMLElement>('slot[name="more-icon"]')
+    const glyph = this.renderRoot.querySelector<HTMLElement>('slot[name="menu-icon"]')
+    if (words && current && caret && glyph) {
+      words.hidden = named || compact
+      current.hidden = !named || compact
+      caret.hidden = compact
+      glyph.hidden = !compact
+    }
+    this.toggleState('folded', folded.size > 0)
+    this.indicator.place()
   }
 
   /** The landmark's name as a screen reader lists it. */
@@ -311,8 +551,13 @@ export class HelixHeadlessNavigation extends HelixElement {
     this.indicator.place()
 
     // Client-side routing changes `aria-current` in place rather than
-    // reloading, so nothing else would tell the marker to move.
-    this.current = new MutationObserver(() => this.indicator.place())
+    // reloading, so nothing else would tell the marker to move. A current
+    // destination that moves into the menu changes what folds, too.
+    this.current = new MutationObserver(() => {
+      this.indicator.place()
+      this.fold.request()
+      this.requestUpdate()
+    })
     for (const item of this.items) {
       /* The subtree too, for the link inside a list item. */
       this.current.observe(item, { attributeFilter: ['aria-current'], subtree: true })
@@ -351,10 +596,109 @@ export class HelixHeadlessNavigation extends HelixElement {
     this.auditTwin()
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* A label, the orientation, or `overflow` can change what fits or whether
+       anything folds. */
+    this.fold.request()
+  }
+
+  /** The destinations changed: watched again, and what fits measured again. */
+  private readonly handleSlotChange = (): void => {
+    this.watch()
+    this.fold.request()
+    this.requestUpdate()
+  }
+
+  /**
+   * The overflow menu, after the last destination: a row for each destination
+   * that folded, a link to the same address. Kept in the tree while nothing
+   * has folded, hidden, so a measure can show it at once.
+   *
+   * **The button is drawn as a destination**, words and a caret, since it
+   * stands in the row of links and the words say what it holds. Once every
+   * destination has folded, it names the current one, so the row still says
+   * where the reader is.
+   */
+  protected renderOverflow(): TemplateResult | typeof nothing {
+    if (!this.folds) {
+      return nothing
+    }
+    const menu = this.tag('menu')
+    const item = this.tag('menu-item')
+    const step = this.fold.step
+    const { compact, label, named } = this.buttonAt(step)
+    const current = named ? this.currentFoldable : undefined
+    const currentLink = current ? linkOf(current) : null
+    const currentName = currentLink ? nameOf(currentLink) : ''
+    const folded = step > 0 ? this.foldedAt(step) : new Set<HTMLElement>()
+    const rows = step > 0 ? this.foldable.filter((one) => folded.has(one)) : []
+    return html`<${menu}
+      part="overflow"
+      exportparts="back: overflow-back, back-mark: overflow-back-mark, empty: overflow-empty,
+        header: overflow-header, live: overflow-live, loading: overflow-loading,
+        search-field: overflow-search-field, surface: overflow-surface,
+        title: overflow-title"
+      label=${this.moreLabel}
+      placement=${named || compact ? 'bottom-start' : 'bottom-end'}
+      ?hidden=${step === 0}
+    >
+      <button
+        part="more"
+        slot="trigger"
+        type="button"
+        aria-label=${named || compact ? label : nothing}
+        ?data-current=${named && !compact}
+        ?data-compact=${compact}
+      >
+        <span part="more-label" ?hidden=${named || compact}>${this.moreLabel}</span>
+        <span part="more-current" ?hidden=${!named || compact}>${currentName}</span>
+        <slot name="menu-icon" ?hidden=${!compact}
+          ><svg part="more-glyph" aria-hidden="true" data-glyph fill="currentColor" viewBox=${list.viewBox}>
+            ${unsafeSVG(list.content)}
+          </svg></slot
+        >
+        <slot name="more-icon" ?hidden=${compact}
+          ><svg part="more-mark" aria-hidden="true" data-glyph fill="currentColor" viewBox=${caretDown.viewBox}>
+            ${unsafeSVG(caretDown.content)}
+          </svg></slot
+        >
+      </button>
+      ${rows.map((one) => {
+        const link = linkOf(one) as HTMLAnchorElement
+        return html`<${item}
+          part="overflow-option"
+          exportparts="end: overflow-option-end, item: overflow-option-item, mark: overflow-option-mark,
+            shortcut: overflow-option-shortcut, shortcut-kbd: overflow-option-shortcut-kbd,
+            shortcut-key: overflow-option-shortcut-key, shortcut-separator: overflow-option-shortcut-separator,
+            start: overflow-option-start, surface: overflow-option-surface"
+          href=${link.getAttribute('href') ?? ''}
+          target=${link.getAttribute('target') ?? nothing}
+          rel=${link.getAttribute('rel') ?? nothing}
+          ?checkable=${named}
+          ?exclusive=${named}
+          ?checked=${one === current}
+          @helix-before-check=${this.keepCheck}
+        >
+          ${nameOf(link)}
+        </${item}>`
+      })}
+    </${menu}>`
+  }
+
+  /** Keeps the check on the current destination: choosing a row follows its link and changes no check. */
+  private readonly keepCheck = (event: Event): void => {
+    if (event.target === event.currentTarget) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
   protected override render(): TemplateResult {
     return html`<nav part="nav" aria-label=${this.label || this.fallbackLabel}>
       <div part="indicator" aria-hidden="true"><slot name="indicator"></slot></div>
-      <slot @slotchange=${() => this.watch()}></slot>
+      <slot @slotchange=${this.handleSlotChange}></slot>
+      ${this.renderOverflow()}
     </nav>`
   }
 }

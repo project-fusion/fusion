@@ -112,6 +112,11 @@ export {
   type OptionWindowOptions,
 } from './controllers/option-window-controller/option-window-controller.js'
 export {
+  insideBox,
+  OverflowController,
+  type OverflowOptions,
+} from './controllers/overflow-controller/overflow-controller.js'
+export {
   MAX_FRAME_STEP,
   PaintGateController,
   type PaintGateOptions,

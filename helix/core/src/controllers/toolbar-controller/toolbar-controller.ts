@@ -26,6 +26,14 @@ const disabledOut = (node: HTMLElement): boolean =>
   node.hasAttribute('disabled') &&
   (node as HTMLElement & { focusableWhenDisabled?: unknown }).focusableWhenDisabled !== true
 
+/**
+ * Whether a control is out of the toolbar: disabled, `aria-hidden`, or
+ * `hidden`. A control that folded into an overflow menu is `hidden` on the
+ * row, and holding the tab stop there it would take Tab into nothing.
+ */
+const leftOut = (node: HTMLElement): boolean =>
+  disabledOut(node) || node.hasAttribute('hidden') || node.getAttribute('aria-hidden') === 'true'
+
 /** Elements the browser focuses with no help. */
 const NATIVE =
   'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]'
@@ -53,11 +61,7 @@ const innerStops = new WeakMap<HTMLElement, HTMLElement>()
  * menu's host passes focus to nothing: its trigger is the control.
  */
 const takesFocus = (node: Element): boolean => {
-  if (
-    !(node instanceof HTMLElement) ||
-    disabledOut(node) ||
-    node.getAttribute('aria-hidden') === 'true'
-  ) {
+  if (!(node instanceof HTMLElement) || leftOut(node)) {
     return false
   }
   return (
@@ -175,7 +179,7 @@ export interface ToolbarControllerOptions {
    */
   words?: (control: HTMLElement) => string
   /**
-   * Where a change to `disabled` or `aria-hidden` is watched for, which is
+   * Where a change to `disabled`, `aria-hidden`, or `hidden` is watched for, which is
    * what moves the stop off a control that leaves the set. The host by
    * default, whose light DOM a page's toolbar holds; the render root for
    * controls the host draws itself.
@@ -274,11 +278,7 @@ export class ToolbarController implements ReactiveController {
   private get controls(): Control[] {
     const controls: Control[] = []
     for (const child of this.members) {
-      if (
-        !(child instanceof HTMLElement) ||
-        disabledOut(child) ||
-        child.getAttribute('aria-hidden') === 'true'
-      ) {
+      if (!(child instanceof HTMLElement) || leftOut(child)) {
         continue
       }
       if (takesFocus(child)) {
@@ -638,14 +638,14 @@ export class ToolbarController implements ReactiveController {
     this.host.addEventListener('keydown', this.handleCompositeKeydown, true)
     this.host.addEventListener('keydown', this.handleKeydown)
     this.host.addEventListener('focusin', this.handleFocusIn)
-    /* `disabled`, `focusable-when-disabled` and `aria-hidden` are what
-       `controls` filters on, so a change to any of them is a change to the set
-       the stop has to live in. Nothing else is watched, which also keeps
+    /* `disabled`, `focusable-when-disabled`, `aria-hidden` and `hidden` are
+       what `controls` filters on, so a change to any of them is a change to the
+       set the stop has to live in. Nothing else is watched, which also keeps
        `setTabStop` writing `tabindex` from feeding back into this. */
     const watched = this.options.watch?.() ?? this.host
     this.watcher = new MutationObserver(() => this.restore())
     this.watcher.observe(watched, {
-      attributeFilter: ['disabled', 'focusable-when-disabled', 'aria-hidden'],
+      attributeFilter: ['disabled', 'focusable-when-disabled', 'aria-hidden', 'hidden'],
       attributes: true,
       subtree: true,
     })

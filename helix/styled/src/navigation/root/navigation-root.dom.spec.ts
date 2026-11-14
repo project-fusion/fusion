@@ -191,3 +191,173 @@ describe('navigation', () => {
     expect((await mount(bar)).getAttributeNames()).toEqual(['label'])
   })
 })
+
+/** Waits until `check` holds, a frame at a time, for at most a second. */
+const until = async (check: () => boolean): Promise<void> => {
+  for (let turn = 0; turn < 60 && !check(); turn += 1) {
+    await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+  }
+}
+
+/** Six destinations, the current one named by `current`. */
+const six = (current = 'overview', attributes = ''): string => {
+  const names = ['Overview', 'Projects', 'Activity', 'Team', 'Billing', 'Settings']
+  return `<helix-navigation label="Sections" ${attributes}>${names
+    .map(
+      (name) =>
+        `<a href="#${name.toLowerCase()}"${name.toLowerCase() === current ? ' aria-current="page"' : ''}>${name}</a>`,
+    )
+    .join('')}</helix-navigation>`
+}
+
+describe('a row too narrow for its destinations', () => {
+  test('draws the overflow menu, hidden while nothing has folded', async () => {
+    const nav = await mount(six())
+    const menu = part(nav, 'overflow') as HTMLElement
+    expect(menu?.localName).toBe('helix-menu')
+    expect(menu.hidden).toBe(true)
+    expect(part(nav, 'more-label')?.textContent).toBe('More')
+  })
+
+  test('draws no overflow menu down a column, or where the row scrolls', async () => {
+    expect(part(await mount(six('overview', 'orientation="vertical"')), 'overflow')).toBeNull()
+    const scrolling = await mount(six('overview', 'overflow="scroll"'))
+    expect(part(scrolling, 'overflow')).toBeNull()
+    expect(scrolling.getAttribute('overflow')).toBe('scroll')
+  })
+
+  if (hasLayout()) {
+    /** Six destinations in a box `width` pixels wide, once the row has measured. */
+    const narrow = async (
+      width: number,
+      current = 'overview',
+      attributes = '',
+    ): Promise<HTMLElement> => {
+      document.body.innerHTML = `<div style="inline-size: ${width}px">${six(current, attributes)}</div>`
+      const nav = document.body.querySelector('helix-navigation') as HTMLElement & {
+        updateComplete: Promise<unknown>
+      }
+      await nav.updateComplete
+      await until(
+        () => (part(nav, 'overflow') as HTMLElement | null)?.hidden === false || width > 800,
+      )
+      await new Promise((done) => requestAnimationFrame(() => done(undefined)))
+      return nav
+    }
+
+    const links = (nav: HTMLElement): HTMLAnchorElement[] => [...nav.querySelectorAll('a')]
+
+    /** The addresses the overflow menu's rows lead to. */
+    const rows = (nav: HTMLElement): string[] =>
+      [...(nav.shadowRoot?.querySelectorAll('[part="overflow-option"]') ?? [])].map(
+        (row) => row.getAttribute('href') ?? '',
+      )
+
+    test('in a browser, folds from the end into More and keeps one row, every destination on it or in the menu', async () => {
+      const nav = await narrow(300)
+      const box = part(nav, 'nav') as HTMLElement
+      expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth)
+      const shown = links(nav).filter((link) => !link.hidden)
+      const folded = links(nav).filter((link) => link.hidden)
+      expect(folded.length).toBeGreaterThan(0)
+      expect(shown[0]?.textContent).toBe('Overview')
+      expect(rows(nav)).toEqual(folded.map((link) => link.getAttribute('href') ?? ''))
+      const more = part(nav, 'more') as HTMLElement
+      const top = more.getBoundingClientRect().top
+      for (const link of shown) {
+        expect(Math.abs(link.getBoundingClientRect().top - top)).toBeLessThan(1)
+        expect(link.getBoundingClientRect().right).toBeLessThanOrEqual(
+          more.getBoundingClientRect().left + 1,
+        )
+      }
+    })
+
+    test('in a browser, keeps the current destination on the row where it would fold', async () => {
+      const nav = await narrow(300, 'settings')
+      const settings = links(nav).at(-1) as HTMLAnchorElement
+      expect(settings.hidden).toBe(false)
+      expect(links(nav)[0]?.hidden).toBe(false)
+      expect(rows(nav)).not.toContain('#settings')
+    })
+
+    test('in a browser, folds every destination where More and the current one do not both fit, and names the current one', async () => {
+      const nav = await narrow(120)
+      expect(links(nav).every((link) => link.hidden)).toBe(true)
+      const more = part(nav, 'more') as HTMLElement
+      expect(part(nav, 'more-current')?.textContent).toBe('Overview')
+      expect((part(nav, 'more-label') as HTMLElement).hidden).toBe(true)
+      expect(more.getAttribute('aria-label')).toBe('Overview, more destinations')
+      expect(rows(nav)).toHaveLength(6)
+      const current = nav.shadowRoot?.querySelector(
+        '[part="overflow-option"][href="#overview"]',
+      ) as HTMLElement & {
+        checked: boolean
+      }
+      expect(current.checked).toBe(true)
+      /* The marker sits behind the button that names the current destination. */
+      const marker = (part(nav, 'indicator') as HTMLElement).getBoundingClientRect()
+      expect(Math.abs(marker.left - more.getBoundingClientRect().left)).toBeLessThan(1)
+    })
+
+    test('in a browser, draws the button as a glyph alone where even the name does not fit', async () => {
+      const nav = await narrow(48)
+      const more = part(nav, 'more') as HTMLElement
+      expect(more.hasAttribute('data-compact')).toBe(true)
+      expect(more.getAttribute('aria-label')).toBe('Overview, more destinations')
+      expect((part(nav, 'more-current') as HTMLElement).hidden).toBe(true)
+    })
+
+    test('in a browser, shows every destination again once the row widens', async () => {
+      const nav = await narrow(300)
+      ;(nav.parentElement as HTMLElement).style.inlineSize = '1000px'
+      await until(() => links(nav).every((link) => !link.hidden))
+      expect(links(nav).every((link) => !link.hidden)).toBe(true)
+      expect((part(nav, 'overflow') as HTMLElement).hidden).toBe(true)
+    })
+
+    test('in a browser, a scrolling row folds nothing', async () => {
+      const nav = await narrow(120, 'overview', 'overflow="scroll"')
+      expect(links(nav).every((link) => !link.hidden)).toBe(true)
+    })
+
+    test('in a browser, the arrow keys reach More after the last destination on the row', async () => {
+      const nav = await narrow(300, 'overview', 'arrows')
+      const first = links(nav)[0] as HTMLAnchorElement
+      first.focus()
+      first.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'End',
+        }),
+      )
+      expect(nav.shadowRoot?.activeElement).toBe(part(nav, 'more'))
+    })
+
+    test('in a browser, folds a list of destinations by its items', async () => {
+      document.body.innerHTML = `<div style="inline-size: 260px"><helix-navigation label="Sections"><ul role="list">${[
+        'Overview',
+        'Projects',
+        'Activity',
+        'Team',
+        'Billing',
+      ]
+        .map(
+          (name, at) =>
+            `<li><a href="#${at}"${at === 0 ? ' aria-current="page"' : ''}>${name}</a></li>`,
+        )
+        .join('')}</ul></helix-navigation></div>`
+      const nav = document.body.querySelector('helix-navigation') as HTMLElement
+      await until(() => (part(nav, 'overflow') as HTMLElement | null)?.hidden === false)
+      const items = [...nav.querySelectorAll('li')]
+      expect(items.some((item) => item.hidden)).toBe(true)
+      expect(items[0]?.hidden).toBe(false)
+      expect(rows(nav)).toEqual(
+        items
+          .filter((item) => item.hidden)
+          .map((item) => item.querySelector('a')?.getAttribute('href') ?? ''),
+      )
+    })
+  }
+})
