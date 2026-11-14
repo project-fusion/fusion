@@ -5,8 +5,8 @@
  * edges. Without it, it draws the web's band in react-native-svg and never
  * requires the package.
  */
-import { afterEach, describe, expect, jest, test } from '@jest/globals'
-import { act, render, waitFor } from '@testing-library/react-native'
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals'
+import { act, render } from '@testing-library/react-native'
 import { TurboModuleRegistry } from 'react-native'
 import { forgetSkia } from '../capabilities/gpu-drawing'
 import { HelixTheme } from '../theme/helix-theme'
@@ -114,11 +114,31 @@ jest
 
 let drawn: Awaited<ReturnType<typeof render>> | undefined
 
+/* **The clock is the test's**, and what the fake package made is cleared:
+   the frames a drawing asks for are drawn only when a test moves the clock,
+   so a busy machine draws the same frames and nothing leaks between tests. */
+beforeEach(() => {
+  for (const list of Object.values(mockMade)) {
+    list.length = 0
+  }
+  mockSkia = true
+  jest.useFakeTimers()
+})
+
 afterEach(async () => {
   await drawn?.unmount()
   drawn = undefined
   forgetSkia()
+  jest.useRealTimers()
 })
+
+/** Moves the clock on by `ms`, a frame at a time, and draws what the frames ask for. */
+const frames = (ms: number) =>
+  act(async () => {
+    for (let at = 0; at < ms; at += 16) {
+      jest.advanceTimersByTime(16)
+    }
+  })
 
 /** Lays the drawing out at `width` by `height` points, as a phone's layout would. */
 const layOut = async (tree: Awaited<ReturnType<typeof render>>, width: number, height: number) => {
@@ -142,21 +162,21 @@ describe('Strands with react-native-skia', () => {
       </HelixTheme>,
     )
     await layOut(drawn, 320, 200)
-    await waitFor(() =>
-      expect(drawn?.queryAllByTestId('skia-picture', { includeHiddenElements: true })).toHaveLength(
-        1,
-      ),
-    )
+    await frames(100)
+    expect(drawn.queryAllByTestId('skia-picture', { includeHiddenElements: true })).toHaveLength(1)
     /* The strands' profile, the specks', and the composite, each compiled once. */
     expect(mockMade.sources).toHaveLength(3)
     expect(mockMade.sources.some((source) => source.includes('uniform shader scene'))).toBe(true)
-    const strips = mockMade.vertices.filter((one) => one.colors === null)
+    /* The first frame: its strips, then its specks. Later frames repeat it. */
+    const specksAt = mockMade.vertices.findIndex((one) => one.colors !== null)
+    const strips = mockMade.vertices.slice(0, specksAt)
     const specks = mockMade.vertices.filter((one) => one.colors !== null)
     expect(strips.length).toBeGreaterThan(0)
     expect(strips.every((one) => one.mode === 1 && one.textures === one.positions)).toBe(true)
-    /* Sixty strands at a density of 0, 65 stations of two vertices each, joined by two. */
-    const vertices = strips.slice(0, 4).reduce((sum, one) => sum + one.positions, 0)
-    expect(vertices).toBe(60 * 65 * 2 + (60 - Math.min(4, strips.length)) * 2)
+    /* Sixty strands at a density of 0, 65 stations of two vertices each, a
+       strip of them joined by two vertices between each strand and the next. */
+    const vertices = strips.reduce((sum, one) => sum + one.positions, 0)
+    expect(vertices).toBe(60 * 65 * 2 + (60 - strips.length) * 2)
     /* Sixty specks at a dust of 0.1, four vertices each, joined by two. */
     expect(specks[0]?.positions).toBe(60 * 4 + 59 * 2)
     expect(mockMade.blends).toContain(12)
@@ -171,14 +191,14 @@ describe('Strands with react-native-skia', () => {
   })
 
   test('clear composites the light without the ground, and a light page turns it to ink', async () => {
-    mockMade.builders.length = 0
     drawn = await render(
       <HelixTheme mode="light">
         <HelixStrands clear />
       </HelixTheme>,
     )
     await layOut(drawn, 320, 200)
-    await waitFor(() => expect(mockMade.builders.length).toBeGreaterThan(0))
+    await frames(100)
+    expect(mockMade.builders.length).toBeGreaterThan(0)
     const composite = mockMade.builders.at(-1) ?? {}
     expect(composite.uClear).toEqual([1])
     expect(composite.uLight).toEqual([1])

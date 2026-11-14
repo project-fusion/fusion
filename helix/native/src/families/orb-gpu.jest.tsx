@@ -73,15 +73,19 @@ jest
 
 let drawn: Awaited<ReturnType<typeof render>> | undefined
 
+/* **The clock is the test's**: the frames a drawing asks for are drawn only
+   when a test moves the clock, so a busy machine draws the same frames. */
 beforeEach(() => {
   mockFrames.length = 0
   forgetSkia()
+  jest.useFakeTimers()
 })
 
 afterEach(async () => {
   await drawn?.unmount()
   drawn = undefined
   pauseMotion(false)
+  jest.useRealTimers()
 })
 
 /** Lays the drawing out at `size` points, as a phone's layout would. */
@@ -98,8 +102,13 @@ const layOut = async (tree: Awaited<ReturnType<typeof render>>, size: number) =>
   })
 }
 
-/** Waits `ms` of real time, for frames to be drawn. */
-const wait = (ms: number) => act(() => new Promise<void>((done) => setTimeout(done, ms)))
+/** Moves the clock on by `ms`, a frame at a time, and draws what the frames ask for. */
+const wait = (ms: number) =>
+  act(async () => {
+    for (let at = 0; at < ms; at += 16) {
+      jest.advanceTimersByTime(16)
+    }
+  })
 
 /** The red channel less the green of a color's words. */
 const redness = (color: string): number => {
