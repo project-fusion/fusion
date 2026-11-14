@@ -44,21 +44,51 @@ const held = (value: number, low: number, high: number): number => {
   return Math.min(Math.max(value, low), high) || 0
 }
 
-/** A scale held between 1, the item at its own size, and `max`. */
-export const clampScale = (scale: number, max: number): number => {
+/**
+ * A scale held between `min`, 1 where it is left out, the item at its own
+ * size, and `max`. A board that zooms out takes a `min` below 1.
+ */
+export const clampScale = (scale: number, max: number, min = 1): number => {
   'worklet'
-  return held(scale, 1, Math.max(max, 1))
+  return held(scale, min, Math.max(max, min))
 }
 
 /**
- * How far a zoomed item may move, kept so its edges never come inside the
- * viewer's: at a scale of 2 in a box 400 wide, 200 either way.
+ * How far an item may move either way from the middle of the viewer: half of
+ * how much wider and taller than the viewer it is drawn, or narrower and
+ * shorter. The item is the viewer's size where its own is left out, so at a
+ * scale of 2 in a box 400 wide it moves 200 either way, and at 1 not at all.
  */
-export const clampPan = (pan: Offset, scale: number, width: number, height: number): Offset => {
+export const panRoom = (
+  scale: number,
+  width: number,
+  height: number,
+  itemWidth = width,
+  itemHeight = height,
+): Offset => {
   'worklet'
-  const x = ((scale - 1) * width) / 2
-  const y = ((scale - 1) * height) / 2
-  return { x: held(pan.x, -x, x), y: held(pan.y, -y, y) }
+  return {
+    x: Math.abs(itemWidth * scale - width) / 2,
+    y: Math.abs(itemHeight * scale - height) / 2,
+  }
+}
+
+/**
+ * How far an item may move, kept so a larger item's edges never come inside
+ * the viewer's, and a smaller one's never go outside it: at a scale of 2 in a
+ * box 400 wide, 200 either way.
+ */
+export const clampPan = (
+  pan: Offset,
+  scale: number,
+  width: number,
+  height: number,
+  itemWidth = width,
+  itemHeight = height,
+): Offset => {
+  'worklet'
+  const room = panRoom(scale, width, height, itemWidth, itemHeight)
+  return { x: held(pan.x, -room.x, room.x), y: held(pan.y, -room.y, room.y) }
 }
 
 /**
@@ -88,13 +118,13 @@ export const between = (a: Offset, b: Offset): Offset => {
 
 /**
  * The zoom two fingers give, `apart` from each other with `at` between them,
- * from where the pinch started: the scale grown as the fingers spread, held to
- * `max`, about the point they started at, and moved with them. The pan is not
+ * from where the pinch started: the scale grown as the fingers spread, held
+ * between `min` and `max`, about the point they started at, and moved with them. The pan is not
  * yet held to the viewer.
  */
-export const pinched = (from: ZoomStart, apart: number, at: Offset, max: number): Zoom => {
+export const pinched = (from: ZoomStart, apart: number, at: Offset, max: number, min = 1): Zoom => {
   'worklet'
-  const scale = clampScale((from.scale * apart) / from.spread, max)
+  const scale = clampScale((from.scale * apart) / from.spread, max, min)
   const about = zoomAt(from.at, from.scale, scale, from.pan)
   return { pan: { x: about.x + at.x - from.at.x, y: about.y + at.y - from.at.y }, scale }
 }
@@ -115,6 +145,16 @@ export const doublePressed = (zoom: Zoom, at: Offset, max: number): Zoom => {
     return { pan: { x: 0, y: 0 }, scale: 1 }
   }
   const scale = clampScale(max, max)
+  return { pan: zoomAt(at, zoom.scale, scale, zoom.pan), scale }
+}
+
+/**
+ * The zoom `by` times the scale about the point pressed, held between `min`
+ * and `max`, as a board's double press zooms in by a step.
+ */
+export const zoomedBy = (zoom: Zoom, at: Offset, by: number, max: number, min = 1): Zoom => {
+  'worklet'
+  const scale = clampScale(zoom.scale * by, max, min)
   return { pan: zoomAt(at, zoom.scale, scale, zoom.pan), scale }
 }
 

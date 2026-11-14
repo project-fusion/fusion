@@ -6,10 +6,12 @@ import {
   doublePressed,
   dragged,
   fromMiddle,
+  panRoom,
   percentOf,
   pinched,
   spread,
   zoomAt,
+  zoomedBy,
 } from './zoom.js'
 
 describe('zoom', () => {
@@ -57,6 +59,32 @@ describe('zoom', () => {
     const zoomed = doublePressed(rest, { x: 50, y: -20 }, 3)
     expect(zoomed).toEqual({ pan: { x: -100, y: 40 }, scale: 3 })
     expect(doublePressed(zoomed, { x: 0, y: 0 }, 3)).toEqual(rest)
+  })
+
+  test('a board that zooms out takes a least scale below 1', () => {
+    expect(clampScale(0.05, 8, 0.1)).toBe(0.1)
+    expect(clampScale(0.5, 8, 0.1)).toBe(0.5)
+    expect(clampScale(9, 8, 0.1)).toBe(8)
+    const from = { at: { x: 0, y: 0 }, pan: { x: 0, y: 0 }, scale: 1, spread: 100 }
+    expect(pinched(from, 25, { x: 0, y: 0 }, 8, 0.1).scale).toBe(0.25)
+    expect(pinched(from, 1, { x: 0, y: 0 }, 8, 0.1).scale).toBe(0.1)
+  })
+
+  test('an item of its own size moves as far as keeps it inside a larger viewer, or over a smaller one', () => {
+    expect(panRoom(2, 400, 300)).toEqual({ x: 200, y: 150 })
+    expect(panRoom(1, 400, 300)).toEqual({ x: 0, y: 0 })
+    /* A plane 1000 by 200 at a half in a box 400 by 300: 50 across, 100 down. */
+    expect(panRoom(0.5, 400, 300, 1000, 200)).toEqual({ x: 50, y: 100 })
+    expect(clampPan({ x: 500, y: -500 }, 0.5, 400, 300, 1000, 200)).toEqual({ x: 50, y: -100 })
+  })
+
+  test('a double press on a board zooms by a step about the point, held to the range', () => {
+    const rest = { pan: { x: 0, y: 0 }, scale: 1 }
+    expect(zoomedBy(rest, { x: 50, y: -20 }, 2, 8, 0.1)).toEqual({
+      pan: { x: -50, y: 20 },
+      scale: 2,
+    })
+    expect(zoomedBy({ pan: { x: 0, y: 0 }, scale: 6 }, { x: 0, y: 0 }, 2, 8, 0.1).scale).toBe(8)
   })
 
   test('a point from the top left corner is measured from the middle', () => {
