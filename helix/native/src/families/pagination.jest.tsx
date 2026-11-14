@@ -122,6 +122,30 @@ describe('the generated Pagination', () => {
     expect(screen.getByText('Rows')).toBeTruthy()
   })
 
+  test('a size chosen in a page-size control closes the list, and a refused one keeps it open', async () => {
+    const asked = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
+    const changed = jest.fn()
+    await draw(
+      <HelixPaginationSize
+        defaultValue={10}
+        onBeforeChange={asked}
+        onChange={changed}
+        sizes="10,25,50"
+      />,
+    )
+    await act(async () => fireEvent.press(screen.getByText('10')))
+    const choose = () => act(async () => fireEvent.press(screen.getByText('25')))
+    await choose()
+    expect(asked).toHaveBeenCalledTimes(1)
+    expect(changed).not.toHaveBeenCalled()
+    expect(screen.getByText('50')).toBeTruthy()
+    asked.mockImplementation(() => undefined)
+    await choose()
+    expect(changed).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('50')).toBeNull()
+    expect(screen.getByText('25')).toBeTruthy()
+  })
+
   test('a page-size control without a label draws its fallback words beside the size', async () => {
     await draw(<HelixPaginationSize />)
     expect(screen.getByText('Per page')).toBeTruthy()

@@ -263,14 +263,18 @@ export const usePaginationSize = (family: Family, props: Props, use: MachineUse)
     readonly detail?: { readonly value?: string }
     preventDefault?: () => void
   }) => {
-    /* The Select holds what this element says, so it never moves on its own. */
-    event.preventDefault?.()
+    /* The Select moves, and closes, only on a size this element takes: a
+       request it refuses stands as the Select's own refusal, which keeps the
+       list open on the size in force. Refusing every request kept the list
+       open after each pick. */
     const next = Number.parseInt(event.detail?.value ?? '', 10)
     if (!Number.isFinite(next) || next === current) {
+      event.preventDefault?.()
       return
     }
     const value = String(next)
     if (before !== undefined && !tell(family, props, before, { value })) {
+      event.preventDefault?.()
       return
     }
     setSize(next)
