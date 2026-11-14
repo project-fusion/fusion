@@ -188,6 +188,50 @@ describe('depth and the type scale', () => {
     expect(tracking(three as HTMLElement)).toBe(0)
   })
 
+  const ink = (item: HTMLElement): string =>
+    getComputedStyle(part(item, 'row') as HTMLElement).color
+
+  /** What a color token resolves to on this page, in the form `color` reads back. */
+  const resolved = (token: string): string => {
+    const probe = document.createElement('span')
+    probe.style.color = `var(${token})`
+    document.body.append(probe)
+    const color = getComputedStyle(probe).color
+    probe.remove()
+    return color
+  }
+
+  /* In the muted ink at both, a heading at 12 pixels and a row at 13 were one
+     pixel apart and read as the same thing. */
+  geometry('a heading tree rests its rows in the full ink, under muted headings', async () => {
+    const [one, two, three, leaf] = items(await mount(deep('nesting="heading"')))
+    const muted = resolved('--helix-color-foreground-muted')
+    const full = resolved('--helix-color-foreground')
+    expect(muted).not.toBe(full)
+    expect(ink(one as HTMLElement)).toBe(muted)
+    expect(ink(two as HTMLElement)).toBe(muted)
+    expect(ink(three as HTMLElement)).toBe(full)
+    /* A top-level leaf is a row too, so it takes the rows' ink. */
+    expect(ink(leaf as HTMLElement)).toBe(full)
+  })
+
+  geometry('a peer tree and a subordinate tree rest every row in the muted ink', async () => {
+    for (const attrs of ['', 'nesting="subordinate"']) {
+      const muted = resolved('--helix-color-foreground-muted')
+      for (const item of items(await mount(deep(attrs)))) {
+        expect(ink(item)).toBe(muted)
+      }
+    }
+  })
+
+  geometry("a page's row color still wins in a heading tree", async () => {
+    const tree = await mount(deep('nesting="heading" style="--tree-row-color: rgb(1, 2, 3)"'))
+    const [one, , three] = items(tree)
+    expect(ink(three as HTMLElement)).toBe('rgb(1, 2, 3)')
+    /* The heading keeps its own ink, as it did before the rows had theirs. */
+    expect(ink(one as HTMLElement)).toBe(resolved('--helix-color-foreground-muted'))
+  })
+
   for (const [what, attrs] of [
     ['heading', 'nesting="heading"'],
     ['peer', ''],
@@ -236,8 +280,8 @@ describe('a shut branch', () => {
 
 /* The stylesheet the item adopts, as text. happy-dom resolves no cascade, so
    what can be held here is that a rule exists rather than that it applied. */
-const sheet = (): string => {
-  const declared = (customElements.get('helix-tree-item') as unknown as { styles: unknown }).styles
+const sheet = (tag: 'helix-tree' | 'helix-tree-item' = 'helix-tree-item'): string => {
+  const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
   return (Array.isArray(declared) ? declared : [declared])
     .flat(Number.POSITIVE_INFINITY)
     .map((one) => String((one as { cssText?: string }).cssText ?? ''))
@@ -270,5 +314,25 @@ describe('tree item density', () => {
     const small = height(await mount(`<div data-density="sm">${mixed}</div>`))
     expect(small).toBeGreaterThan(0)
     expect(small).toBeLessThan(rest)
+  })
+})
+
+/** The declarations of the first rule written for `selector`. */
+const rule = (tag: 'helix-tree' | 'helix-tree-item', selector: string): string =>
+  sheet(tag).split(`${selector} {`)[1]?.split('}')[0] ?? ''
+
+/* The ink a row rests in is named once on the row, so a branch and a leaf set
+   it apart and every state that returns to rest reads the same value. */
+describe('tree item ink', () => {
+  test('a heading tree hands its leaves the full ink and its branches the muted one', () => {
+    const heading = rule('helix-tree', ':host([nesting="heading"])')
+    expect(heading).toContain('--_tree-leaf-ink: var(--helix-color-foreground)')
+    expect(heading).toContain('--_tree-heading-ink: var(--helix-color-foreground-muted)')
+  })
+
+  test('a disabled row under the pointer keeps the ink it rests in', () => {
+    expect(rule('helix-tree-item', ':host([disabled]) [part="row"]:hover')).toContain(
+      'color: var(--_tree-rest-ink)',
+    )
   })
 })

@@ -284,8 +284,9 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    * every stylesheet deleted it is still true that this tree ranks its depths,
    * that this one heads them, and that a file explorer does neither. The styled
    * tier steps a subordinate row once down the type scale and sets a heading
-   * branch as a label; a headless consumer reads the attribute and the
-   * `--tree-level` each row carries, and draws either however they like.
+   * branch as a label, in the muted ink over leaves in the full foreground; a
+   * headless consumer reads the attribute and the `--tree-level` each row
+   * carries, and draws either however they like.
    *
    * **Optional, with no default**, per the reflected-property rule: a value
    * written here appears in the served markup of every tree anybody renders.
