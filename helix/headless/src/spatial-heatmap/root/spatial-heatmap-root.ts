@@ -26,8 +26,6 @@ import {
 } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
-import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 import {
   ACROSS,
   type Base,
@@ -39,7 +37,9 @@ import {
   type Prism,
   type Relief,
   reliefOf,
-} from '../projection.js'
+} from '@fusion.dev/helix-core/spatial'
+import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
+import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 
 /** How far a label stands below what it clears, in pixels. */
 const LABEL_GAP = 4
