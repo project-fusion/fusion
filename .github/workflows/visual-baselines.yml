@@ -3,7 +3,7 @@
 #
 # **A baseline is a Linux artifact and development is darwin.** No headless
 # example sets `font-family`, so the font stack, rasterizer and antialiasing all
-# differ and a baseline taken on a Mac fails on `ubuntu-24.04` at nearly every
+# differ and a baseline taken on a Mac fails on `ubuntu-26.04` at nearly every
 # glyph. `helix visual`, which `check:spec:visual` runs, refuses to compare
 # across platforms rather than widening a threshold until real faults fit under
 # it, and records the environment the baselines were taken in beside them, in
@@ -73,7 +73,7 @@ permissions:
 
 jobs:
   retake:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # A timeout that kills a retake halfway leaves a branch holding part of a
     # set that is only meaningful whole.
     timeout-minutes: 30
