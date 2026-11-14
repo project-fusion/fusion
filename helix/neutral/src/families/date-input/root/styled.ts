@@ -196,13 +196,30 @@ export default styles(
       rule({ hover: true, readonly: false }, { color: token('color-foreground') }),
       /* Read-only, and the mark says the panel does not open. */
       rule({ readonly: true }, { cursor: web('default'), opacity: token('opacity-disabled') }),
+      /* **One ring, the field's.** The field draws its ring while anything
+         in it has focus, so a ring on the trigger as well drew a square 2px
+         outline inside the field's rounded one once the panel closed with
+         Escape and focus came back. The trigger says it holds the focus by
+         its ink and the hover wash. */
       rule(
         { focusVisible: true },
         {
-          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-          outlineOffset: token('size-focus-offset'),
+          backgroundColor: token('color-hover'),
+          borderRadius: token('radii-sm'),
+          color: token('color-foreground'),
+          outline: 'none',
         },
       ),
+      /* Forced colors paint the wash the canvas, so there the trigger keeps a ring. */
+      web([
+        rule(
+          { focusVisible: true, forcedColors: true },
+          {
+            outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+            outlineOffset: product(token('size-focus-offset'), '-1'),
+          },
+        ),
+      ]),
     ]),
     /* Input's clear button, a mark in the field beside the trigger. */
     on('clear', [
