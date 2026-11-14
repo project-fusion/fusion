@@ -1,0 +1,27 @@
+# Tabs from a hardware keyboard, on Android. Right moves to the next tab and
+# shows its panel, which the system's own focus search would not do, Left
+# comes back, and Down moves as Right does: the arrow keys of both axes move
+# between tabs, as on the web. The example opens alone, at `/preview`, so the
+# gallery's own Preview and Code tabs are not above it.
+appId: dev.fusion.helix.app
+name: Tabs from a keyboard
+---
+- stopApp
+- openLink: helix://tabs/underlined/preview
+- extendedWaitUntil:
+    visible: A summary of the project and the people on it.
+    timeout: 30000
+- repeat:
+    times: 4
+    while:
+      notVisible:
+        text: Overview
+        focused: true
+    commands:
+      - pressKey: Remote Dpad Down
+- pressKey: Remote Dpad Right
+- assertVisible: Recent changes to the project and its files.
+- pressKey: Remote Dpad Left
+- assertVisible: A summary of the project and the people on it.
+- pressKey: Remote Dpad Down
+- assertVisible: Recent changes to the project and its files.

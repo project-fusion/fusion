@@ -6,6 +6,7 @@ export function Example() {
       className="panel"
       label="Site"
       navigation
+      style={{ '--drilldown-inline-size': '18rem' }}
     >
       <helix-drilldown-item value="docs">
         Documentation

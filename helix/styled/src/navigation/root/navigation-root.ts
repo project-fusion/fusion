@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessNavigation } from '@fusion.dev/helix-headless/navigation'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './navigation-root.css.js'
+import { styles } from './navigation-root.generated.css.js'
 
 /**
  * @summary A set of destinations, with a marker on the current one.

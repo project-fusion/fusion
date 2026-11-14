@@ -47,6 +47,10 @@ const table = async (around = '', attrs = ''): Promise<Table> => {
   return element
 }
 
+/* Each of these draws and filters 1,500 rows, which took up to 5.9 seconds in
+   CI against the 5 second limit every spec has by default. */
+const HEAVY = 20_000
+
 const said = (element: Table): string =>
   element.shadowRoot?.querySelector('[part="live"]')?.textContent?.trim() ?? ''
 
@@ -62,36 +66,48 @@ const POLISH = {
 }
 
 describe('a data table on a page in another language', () => {
-  test('counts the rows a search leaves with the language’s own forms', async () => {
-    registerWords('pl', POLISH)
-    const element = await table('lang="pl"')
-    element.filter = 'row 1'
-    await settle(element)
-    /* "row 1", "row 1x", "row 1xx" and "row 1xxx" to 1499: 611 rows. */
-    expect(said(element)).toBe('611 wierszy')
-    element.filter = 'row 12'
-    await settle(element)
-    expect(said(element)).toBe('111 wierszy')
-    element.filter = 'row 1499'
-    await settle(element)
-    expect(said(element)).toBe('1 wiersz')
-  })
+  test(
+    'counts the rows a search leaves with the language’s own forms',
+    async () => {
+      registerWords('pl', POLISH)
+      const element = await table('lang="pl"')
+      element.filter = 'row 1'
+      await settle(element)
+      /* "row 1", "row 1x", "row 1xx" and "row 1xxx" to 1499: 611 rows. */
+      expect(said(element)).toBe('611 wierszy')
+      element.filter = 'row 12'
+      await settle(element)
+      expect(said(element)).toBe('111 wierszy')
+      element.filter = 'row 1499'
+      await settle(element)
+      expect(said(element)).toBe('1 wiersz')
+    },
+    HEAVY,
+  )
 
-  test('writes its numbers in the locale', async () => {
-    registerWords('de', { 'helix-data-table': { selectedLabel: '{count} ausgewählt' } })
-    const element = await table('lang="de"')
-    element.selected = Array.from({ length: 1200 }, (_, at) => `r${at}`).join(',')
-    await settle(element)
-    expect(said(element)).toBe('1.200 ausgewählt')
-  })
+  test(
+    'writes its numbers in the locale',
+    async () => {
+      registerWords('de', { 'helix-data-table': { selectedLabel: '{count} ausgewählt' } })
+      const element = await table('lang="de"')
+      element.selected = Array.from({ length: 1200 }, (_, at) => `r${at}`).join(',')
+      await settle(element)
+      expect(said(element)).toBe('1.200 ausgewählt')
+    },
+    HEAVY,
+  )
 
-  test('says a whole sentence for each sort order', async () => {
-    registerWords('pl', POLISH)
-    const element = await table('lang="pl"')
-    element.sort = 'name:desc'
-    await settle(element)
-    expect(said(element)).toBe('Posortowano malejąco według Name')
-  })
+  test(
+    'says a whole sentence for each sort order',
+    async () => {
+      registerWords('pl', POLISH)
+      const element = await table('lang="pl"')
+      element.sort = 'name:desc'
+      await settle(element)
+      expect(said(element)).toBe('Posortowano malejąco według Name')
+    },
+    HEAVY,
+  )
 
   test('speaks its `locale` before the nearest `lang`, and tells its pagination', async () => {
     registerWords('pl', POLISH)
@@ -114,23 +130,31 @@ describe('a data table on a page in another language', () => {
 })
 
 describe('the sentences a data table says in English', () => {
-  test('are unchanged, with numbers grouped', async () => {
-    const element = await table()
-    element.filter = 'row'
-    await settle(element)
-    expect(said(element)).toBe('1,500 results')
-    element.sort = 'name:asc'
-    await settle(element)
-    expect(said(element)).toBe('Sorted by Name, ascending')
-  })
+  test(
+    'are unchanged, with numbers grouped',
+    async () => {
+      const element = await table()
+      element.filter = 'row'
+      await settle(element)
+      expect(said(element)).toBe('1,500 results')
+      element.sort = 'name:asc'
+      await settle(element)
+      expect(said(element)).toBe('Sorted by Name, ascending')
+    },
+    HEAVY,
+  )
 
-  test('still take the deprecated sentence for one row, where a page sets it', async () => {
-    const element = await table('', 'result-label="Just {count} row"')
-    element.filter = 'row 1499'
-    await settle(element)
-    expect(said(element)).toBe('Just 1 row')
-    element.filter = 'row 149'
-    await settle(element)
-    expect(said(element)).toBe('11 results')
-  })
+  test(
+    'still take the deprecated sentence for one row, where a page sets it',
+    async () => {
+      const element = await table('', 'result-label="Just {count} row"')
+      element.filter = 'row 1499'
+      await settle(element)
+      expect(said(element)).toBe('Just 1 row')
+      element.filter = 'row 149'
+      await settle(element)
+      expect(said(element)).toBe('11 results')
+    },
+    HEAVY,
+  )
 })

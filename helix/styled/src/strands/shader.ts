@@ -1,4 +1,4 @@
-import { MAX_POINTS } from './path.js'
+import { MAX_POINTS } from '@fusion.dev/helix-core/strands'
 
 /** The most elements a ribbon dims behind, through the root's \`quiet\`. */
 export const MAX_QUIET = 4

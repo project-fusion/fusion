@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import type { GraphLink, GraphNode } from '@fusion.dev/helix-core/graph'
 import {
   hasLayout,
   hasState,
@@ -10,7 +11,6 @@ import {
   settle,
   slotted,
 } from '@fusion.dev/helix-testing/dom'
-import type { GraphLink, GraphNode } from './graph-model.js'
 
 /** The native button inside a control, which is what a screen reader is on. */
 const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {

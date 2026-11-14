@@ -23,6 +23,7 @@ export function Example() {
   const log = useRef<HelixLog>(null)
 
   useEffect(() => {
+    log.current?.clear()
     log.current?.write(OUTPUT.join('\n'))
   }, [])
 

@@ -141,8 +141,11 @@ import '../../color-picker/index.js'
  *
  * @cssproperty --color-input-swatch - The chosen color, painted over the checkerboard that shows transparency.
  *
+ * @cssstate aligned-start - While the picker lines up with the start of the field.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate open - While the picker is open.
+ * @cssstate placed-bottom - While the picker sits below the field.
+ * @cssstate placed-top - While the picker sits above the field, where there was no room below.
  */
 @customElement('helix-headless-color-input')
 export class HelixHeadlessColorInput extends MixinPickerField(

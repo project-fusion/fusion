@@ -1,14 +1,14 @@
 export function Example() {
   return (
     <helix-toggle-group
-      label="Format"
-      name="format"
+      label="Status"
+      name="status"
       selection-mode="multiple"
-      value="bold"
+      value="open"
     >
-      <helix-toggle value="bold">Bold</helix-toggle>
-      <helix-toggle value="italic">Italic</helix-toggle>
-      <helix-toggle value="underline">Underline</helix-toggle>
+      <helix-toggle value="open">Open</helix-toggle>
+      <helix-toggle value="review">In review</helix-toggle>
+      <helix-toggle value="closed">Closed</helix-toggle>
     </helix-toggle-group>
   )
 }

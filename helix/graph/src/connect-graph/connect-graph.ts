@@ -8,6 +8,13 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
+import {
+  type GraphPoint,
+  type GraphReach,
+  reachOf,
+  seedPositions,
+  sizeOf,
+} from '@fusion.dev/helix-core/graph'
 import type {
   HelixGraphPartChangeEvent,
   HelixGraphSignalEvent,
@@ -29,13 +36,10 @@ import {
   type NoteFacts,
   toneColor,
 } from './looks.js'
-import { type GraphReach, reachOf } from './reach.js'
-import { type GraphPoint, seedPositions } from './seed.js'
-import { sizeOf } from './sizes.js'
 import { fieldOf, fitInStencil, type GraphStencil, type StencilFrame } from './stencil.js'
 
+export type { GraphReach } from '@fusion.dev/helix-core/graph'
 export type { DrawnLink, DrawnNode, GraphChanges } from './diff.js'
-export type { GraphReach } from './reach.js'
 
 /**
  * What a renderer has to answer for the frame to drive it, and nothing that is

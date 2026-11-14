@@ -1,9 +1,6 @@
 export function Example() {
   return (
-    <helix-toast
-      label="Notifications"
-      placement="top-center"
-    >
+    <helix-toast placement="top-center">
       <helix-toast-item
         dismissible
         duration={8000}

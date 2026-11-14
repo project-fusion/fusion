@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToggle } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './toggle-root.css.js'
+import { styles } from './toggle-root.generated.css.js'
 
 /**
  * @summary One option in a toggle group.
@@ -13,7 +13,7 @@ import { styles } from './toggle-root.css.js'
  * @since 0.1.0
  * @status stable
  * @category actions
- * @aliases Segment, NavItem, Option
+ * @aliases Option, Segment, Toggle button
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.

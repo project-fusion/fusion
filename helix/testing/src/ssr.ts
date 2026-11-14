@@ -1,6 +1,7 @@
 import { render } from '@lit-labs/ssr'
 import { collectResultSync } from '@lit-labs/ssr/lib/render-result.js'
 import type { TemplateResult } from 'lit'
+import { unweighted } from './sheets.js'
 
 /** Renders a template the way the server does, to a string. */
 export const ssr = (template: TemplateResult): string => collectResultSync(render(template))
@@ -34,9 +35,12 @@ export const withoutStyles = (markup: string): string =>
  * attribute, the way the whole document can, and it is the stronger assertion
  * besides: `toContain('--helix-color-surface')` on the whole document would be
  * satisfied by a host attribute of that name.
+ *
+ * **Read as [`unweighted`] reads a sheet**, so a generated rule's selector is
+ * the one a reader writes, `:host([tone="primary"])`.
  */
 export const styles = (markup: string): string =>
-  [...markup.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((one) => one[1]).join('\n')
+  unweighted([...markup.matchAll(/<style>([\s\S]*?)<\/style>/g)].map((one) => one[1]).join('\n'))
 
 /**
  * The host element's opening tag, for asserting on its attributes.

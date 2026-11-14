@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, registerDom } from '@fusion.dev/helix-testing/dom'
 import preview from '../.examples/preview.html' with { type: 'text' }
+import relative from '../.examples/relative.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -20,5 +21,16 @@ describe('the preview example', () => {
     const [stamp] = document.querySelectorAll('.stamp')
     const text = stamp?.shadowRoot?.querySelector('time')?.textContent ?? ''
     expect(text).toMatch(/42/)
+  })
+})
+
+describe('the relative example', () => {
+  run('the page dates each reading, which read three hours ago and in two days', async () => {
+    await example(relative)
+    await idle()
+    const words = [...document.querySelectorAll('helix-format-date')].map(
+      (stamp) => stamp.shadowRoot?.querySelector('time')?.getAttribute('aria-label') ?? '',
+    )
+    expect(words).toEqual(['3 hours ago', '3 hours ago', '3 hours ago', 'in 2 days'])
   })
 })

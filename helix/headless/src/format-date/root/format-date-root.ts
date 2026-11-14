@@ -2,25 +2,19 @@ import {
   calendarLocale,
   customElement,
   type DateCalendar,
-  elapsedTime,
+  type DateDrawn,
+  dateExpires,
+  dateSource,
   HelixElement,
   type MonthCalendar,
   numberConverter,
-  type Relative,
   RelativeClockController,
-  relativeTime,
+  readDate,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { drawFields } from '../fields.js'
-import { formatOptions } from '../options.js'
-
-/** A date with no time of day, `YYYY-MM-DD`, which names a day rather than an instant. */
-const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
-
-/** The styles `relative` names; anything else, an empty flag among them, reads `long`. */
-const STYLES: readonly Intl.RelativeTimeFormatStyle[] = ['long', 'narrow', 'short']
 
 /**
  * @summary A timestamp, formatted for the user's locale.
@@ -325,15 +319,9 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * an item hours old once an hour, and an item showing a date never.
    */
   private readonly clock = new RelativeClockController(this, {
-    expires: (now) => {
-      const moment = this.moment
-      if (!moment || !this.reading) {
-        return undefined
-      }
-      /* Drawn against now, and never woken: the clock schedules nothing for
-         a reading that does not expire. */
-      return this.frozen ? Infinity : this.readingAt(moment, now).next
-    },
+    /* Drawn against now, and never woken while `frozen`: the clock schedules
+       nothing for a reading that does not expire. */
+    expires: (now) => dateExpires(this.drawnFrom, this.language, now.getTime()),
   })
 
   /**
@@ -346,53 +334,46 @@ export class HelixHeadlessFormatDate extends HelixElement {
 
   private watching?: MutationObserver
 
-  /** Whether the timestamp is a day with no time, which is formatted in UTC. */
-  private get dateOnly(): boolean {
-    return DATE_ONLY.test(this.source)
-  }
-
-  /** The timestamp, or nothing where there is not one to read. */
-  private get moment(): Date | undefined {
-    const source = this.source
-    if (source === '') {
-      return undefined
+  /**
+   * The props core draws a Format Date from, by their attribute names, as a
+   * phone's component gives them, with the timestamp as written in the
+   * property, the attribute or the light DOM.
+   *
+   * A `Date` or a number is read as its ISO string, the way an attribute is.
+   * Measured before this: assigning `new Date()` threw, since only a string
+   * has `trim`, where Shoelace and Web Awesome take a `Date`.
+   */
+  private get drawnFrom(): Readonly<Record<string, unknown>> {
+    return {
+      date: typeof this.date === 'string' ? this.date || this.written : dateSource(this.date),
+      'date-style': this.dateStyle,
+      day: this.day,
+      'day-period': this.dayPeriod,
+      elapsed: this.elapsed,
+      era: this.era,
+      fields: this.fields === true,
+      'fractional-second-digits': this.fractionalSecondDigits,
+      frozen: this.frozen,
+      hour: this.hour,
+      'hour-cycle': this.hourCycle,
+      minute: this.minute,
+      month: this.month,
+      numeric: this.numeric,
+      relative: this.relative,
+      second: this.second,
+      'time-style': this.timeStyle,
+      'time-zone': this.timeZone,
+      'time-zone-name': this.timeZoneName,
+      weekday: this.weekday,
+      year: this.year,
     }
-    const parsed = new Date(source)
-    return Number.isNaN(parsed.getTime()) ? undefined : parsed
   }
 
   /**
-   * The timestamp as written, in the property, the attribute or the light DOM.
-   *
-   * A `Date` or a number is written as its ISO string, so it is read the way an
-   * attribute is. Measured before this: assigning `new Date()` threw, since
-   * only a string has `trim`, where Shoelace and Web Awesome take a `Date`.
+   * What is drawn against the clock's time, or nothing where there is no
+   * moment: read once in each update, before the render draws it.
    */
-  private get source(): string {
-    const date = this.date
-    if (typeof date === 'string') {
-      return (date || this.written).trim()
-    }
-    const at = new Date(date)
-    return Number.isNaN(at.getTime()) ? '' : at.toISOString()
-  }
-
-  /** Whether the reading is how long ago rather than the date. */
-  private get reading(): boolean {
-    return this.elapsed || this.relative !== undefined
-  }
-
-  /** What the reading says now, and when it stops being true. */
-  private readingAt(moment: Date, now: Date): Relative {
-    return this.elapsed
-      ? elapsedTime(this.language)(moment, now)
-      : relativeTime(this.language, {
-          numeric: this.numeric ?? 'auto',
-          style: STYLES.includes(this.relative as Intl.RelativeTimeFormatStyle)
-            ? (this.relative as Intl.RelativeTimeFormatStyle)
-            : 'long',
-        })(moment, now)
-  }
+  private drawn: DateDrawn | undefined = undefined
 
   override connectedCallback(): void {
     super.connectedCallback()
@@ -437,7 +418,8 @@ export class HelixHeadlessFormatDate extends HelixElement {
     /* Which side of now a reading is on, so a page can mark what is overdue
        or still to come from CSS. Read against the clock the text is drawn
        against, so the two cannot disagree. */
-    const ahead = this.reading ? (this.moment?.getTime() ?? NaN) - this.clock.now : NaN
+    this.drawn = readDate(this.drawnFrom, { language: this.language, now: this.clock.now })
+    const ahead = this.drawn?.reading?.ahead ?? NaN
     this.toggleState('past', ahead <= 0)
     this.toggleState('future', ahead > 0)
   }
@@ -462,48 +444,25 @@ export class HelixHeadlessFormatDate extends HelixElement {
   }
 
   protected override render(): TemplateResult | typeof nothing {
-    const moment = this.moment
-    if (!moment) {
+    const drawn = this.drawn
+    if (drawn === undefined) {
       return nothing
     }
-    const datetime = this.dateOnly ? this.source : moment.toISOString()
-    if (!this.reading) {
+    const { datetime, parts, reading, text } = drawn
+    if (reading === undefined) {
       /* Every `Intl` option a consumer set, and none they did not. One text
          node unless `fields` asks for a part to each field: in Chromium a
          date split into nodes is set a fraction of a pixel wider, so the
          split is not made where nobody styles the parts. */
-      const format = new Intl.DateTimeFormat(
-        this.language || undefined,
-        formatOptions(this, this.dateOnly),
-      )
-      return html`<time part="time" datetime=${datetime}>${this.fields ? drawFields(format.formatToParts(moment)) : format.format(moment)}</time>`
+      return html`<time part="time" datetime=${datetime}>${parts === undefined ? text : drawFields(parts)}</time>`
     }
     /* The compact reading is what a feed shows, and "3h" is what a screen
        reader read for it, with the instant in `datetime` exposed to nobody. So
-       the reading is named in full, "3 hours ago", and the whole date is its
-       title. `time` is a role that takes a name. */
-    const now = new Date(this.clock.now)
-    /* The whole date in the locale's long pattern, through the same options
-       as a date reading, so its clock and its zone are the reading's. */
-    const whole = new Intl.DateTimeFormat(
-      this.language || undefined,
-      formatOptions(
-        {
-          dateStyle: 'long',
-          hourCycle: this.hourCycle,
-          timeStyle: this.dateOnly ? undefined : 'short',
-          timeZone: this.timeZone,
-        },
-        this.dateOnly,
-      ),
-    ).format(moment)
-    /* Named in full whatever is shown, so "3h ago" at `narrow` is heard as
-       "3 hours ago", with the same choice of word or number. */
-    const spoken = relativeTime(this.language, { numeric: this.numeric ?? 'auto' })(
-      moment,
-      now,
-    ).text
-    return html`<time part="time" datetime=${datetime} aria-label=${spoken} title=${whole}>${this.readingAt(moment, now).text}</time>`
+       the reading is named in full, "3 hours ago", with the same choice of
+       word or number, and the whole date, in the locale's long pattern with
+       the reading's clock and zone, is its title. `time` is a role that takes
+       a name. */
+    return html`<time part="time" datetime=${datetime} aria-label=${reading.spoken} title=${reading.whole}>${text}</time>`
   }
 }
 

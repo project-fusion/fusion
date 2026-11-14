@@ -2,12 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSelect } from '@fusion.dev/helix-headless/select'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
-import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
-import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './select-root.css.js'
+import { styles } from './select-root.generated.css.js'
 /* The list the panel draws. Without it, a consumer importing
    `@fusion.dev/helix/select` alone gets a select whose panel never upgrades.
    The options are the page's to import, from `@fusion.dev/helix/option`. */
@@ -43,14 +38,7 @@ import '../../listbox/index.js'
 export class HelixSelect extends HelixHeadlessSelect {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    fieldStyles,
-    fieldStackedStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = styles
 
   /**
    * How strongly the trigger is drawn. Leave it unset for a framed field, or

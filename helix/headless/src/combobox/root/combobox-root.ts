@@ -22,6 +22,7 @@ import {
   MixinTokens,
   onApple,
   PopoverController,
+  placedStates,
   reportValues,
   StatusController,
   submitImplicitly,
@@ -30,6 +31,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { completionFor, creationFor } from '@fusion.dev/helix-core/listbox'
 import { caretDown } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -194,12 +196,15 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tag-start - The category before the label.
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
+ * @cssstate aligned-start - While the list lines up with the start of the field.
  * @cssstate blank - While nothing is chosen.
  * @cssstate error - While `error-text` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate loading - While `loading` is set.
  * @cssstate no-results - What was typed hid every option of a list that has some.
  * @cssstate open - While the list is open.
+ * @cssstate placed-bottom - While the list sits below the field.
+ * @cssstate placed-top - While the list sits above the field, where there was no room below.
  */
 @customElement('helix-headless-combobox')
 export class HelixHeadlessCombobox extends MixinControllerOpen(
@@ -618,6 +623,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       this.commitEmptied()
       this.close()
     },
+    /* The side the list landed on and the end it lines up on, which the
+       shared entrance grows it out of, as Popover records them. */
+    onPlace: (placement) => {
+      /* A panel that asks for `bottom-start` lands below or above, at the
+         start, so these three are the states it can be in. */
+      const placed = placedStates(placement)
+      this.toggleState('aligned-start', placed['aligned-start'] === true)
+      this.toggleState('placed-bottom', placed['placed-bottom'] === true)
+      this.toggleState('placed-top', placed['placed-top'] === true)
+    },
     open: () => this.open,
     placement: 'bottom-start',
     surface: () => this.partNamed('surface'),
@@ -742,14 +757,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * copy of what they are looking at.
    */
   private get creation(): string {
-    const typed = this.typed.trim()
-    if (!this.creatable || typed === '') {
-      return ''
-    }
-    const exists = (this.listbox?.options ?? []).some(
-      (option) => option.text.trim().toLowerCase() === typed.toLowerCase(),
-    )
-    return exists ? '' : typed
+    return creationFor(this.typed, this.creatable, this.listbox?.options ?? [])
   }
 
   /**
@@ -984,15 +992,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * the whole point of showing it.
    */
   private completionFor(typed: string): string {
-    if (typed === '') {
-      return ''
-    }
-    const needle = typed.toLowerCase()
-    const match = (this.listbox?.options ?? []).find(
-      (option) =>
-        !option.hidden && !option.disabled && option.text.toLowerCase().startsWith(needle),
-    )
-    return match && match.text.length > typed.length ? match.text : ''
+    return completionFor(typed, this.listbox?.options ?? [])
   }
 
   /**

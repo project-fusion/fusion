@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpeedDialGroup } from '@fusion.dev/helix-headless/speed-dial'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './speed-dial-group.css.js'
+import { styles } from './speed-dial-group.generated.css.js'
 
 /**
  * @summary A named set of actions inside a speed dial, set apart from the rest.

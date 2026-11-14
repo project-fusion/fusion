@@ -1,5 +1,11 @@
-import type { StrandsPalette } from './palette.js'
-import { SPREAD } from './path.js'
+import {
+  DUST,
+  MAX_DUST,
+  MAX_STRANDS,
+  MIN_STRANDS,
+  SPREAD,
+  type StrandsPalette,
+} from '@fusion.dev/helix-core/strands'
 import {
   BLUR_FRAGMENT,
   COMPOSITE_FRAGMENT,
@@ -12,22 +18,10 @@ import {
   QUAD_VERTEX,
 } from './shader.js'
 
-export { MAX_QUIET }
-
-/** The most strands a ribbon draws, at `density` 1. */
-export const MAX_STRANDS = 340
-
-/** The fewest, at `density` 0. Fewer stops reading as a ribbon at all. */
-export const MIN_STRANDS = 60
+export { DUST, MAX_DUST, MAX_QUIET, MAX_STRANDS, MIN_STRANDS }
 
 /** Segments along each strand, across whatever stretch of the path is on screen. */
 const SEGMENTS = 320
-
-/** Specks of dust around the strands at a `dust` of `1`. */
-export const DUST = 600
-
-/** The most specks a frame draws, at a `dust` of `4`. */
-export const MAX_DUST = DUST * 4
 
 /*
  * What a multiplier of `1` draws. `spread`, `bloom`, and `gain` each scale

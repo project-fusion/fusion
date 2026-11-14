@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { PLAYER_SKIP_SECONDS } from '../../utils/player/player.js'
 
 /**
  * Which player currently owns the page's one media session.
@@ -23,7 +24,7 @@ let owner: HTMLElement | undefined
  * platform names in `seekbackward` and `seekforward` when it hands over a
  * default. A different length here would be correct only on this player.
  */
-export const SKIP_SECONDS = 10
+export const SKIP_SECONDS = PLAYER_SKIP_SECONDS
 
 /** What a headset's buttons do, handed over by the player that owns them. */
 export interface SessionHandlers {

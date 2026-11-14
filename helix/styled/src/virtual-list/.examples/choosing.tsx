@@ -48,6 +48,7 @@ export function Example() {
           setChosen(event.currentTarget.value)
         }
         selection-mode="multiple"
+        text-field="name"
         value={chosen}
       >
         <template dangerouslySetInnerHTML={{ __html: ROW }} />

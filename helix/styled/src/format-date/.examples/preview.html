@@ -9,6 +9,7 @@
     <helix-format-date
       class="stamp"
       elapsed
+      frozen
     ></helix-format-date>
   </helix-text>
 
@@ -46,8 +47,8 @@
 </helix-flex>
 
 <script>
-  /* The elapsed time is set from script to 42 minutes ago, so it always reads
-     "42m". The other dates are fixed and name a `time-zone`, so they look the
+  /* The elapsed time is set from script to 42 minutes ago, and `frozen` keeps
+     it from moving on, so it always reads "42m". The other dates are fixed and name a `time-zone`, so they look the
      same wherever the preview renders. */
   const at = new Date(Date.now() - 42 * 60_000).toISOString()
   for (const stamp of document.querySelectorAll('.stamp')) {

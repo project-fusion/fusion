@@ -1,0 +1,34 @@
+# Meter, each example drawn alone: a bar, the ring and arc vectors, the low,
+# high, and optimum bands, the subtle emphasis, and a bar of segments. One
+# screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Meter"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://meter/preview/preview
+- extendedWaitUntil:
+    visible: '.*Disk used.*'
+    timeout: 30000
+- takeScreenshot: meter-preview-${MODE}-${SIZE}
+- openLink: helix://meter/shapes/preview
+- extendedWaitUntil:
+    visible: '.*Signal.*'
+    timeout: 15000
+- takeScreenshot: meter-shapes-${MODE}-${SIZE}
+- openLink: helix://meter/low-high-optimum/preview
+- extendedWaitUntil:
+    visible: '.*Disk used.*'
+    timeout: 15000
+- takeScreenshot: meter-low-high-optimum-${MODE}-${SIZE}
+- openLink: helix://meter/emphasis/preview
+- extendedWaitUntil:
+    visible: '.*Network.*'
+    timeout: 15000
+- takeScreenshot: meter-emphasis-${MODE}-${SIZE}
+- openLink: helix://meter/segments/preview
+- extendedWaitUntil:
+    visible: '.*Context window.*'
+    timeout: 15000
+- takeScreenshot: meter-segments-${MODE}-${SIZE}

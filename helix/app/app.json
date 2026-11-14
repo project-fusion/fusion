@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "android": {
+      "package": "dev.fusion.helix.app"
+    },
+    "ios": {
+      "bundleIdentifier": "dev.fusion.helix.app"
+    },
+    "name": "Helix",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "$(PRODUCT_NAME) uses the camera to take the photos you attach.",
+          "microphonePermission": false,
+          "photosPermission": "$(PRODUCT_NAME) attaches the photos you choose from your library."
+        }
+      ]
+    ],
+    "scheme": "helix",
+    "slug": "helix-app",
+    "userInterfaceStyle": "automatic"
+  }
+}

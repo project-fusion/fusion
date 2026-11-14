@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLogGroup } from '@fusion.dev/helix-headless/log'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './log-group.css.js'
+import { styles } from './log-group.generated.css.js'
 
 /**
  * @summary One step of a log, which folds its lines under a heading with its status and how long it took.

@@ -70,11 +70,16 @@ const rules = (tag: string): Map<string, string> => {
   return found
 }
 
-/** Whether any rule whose selector list names `selector` declares a `color`. */
+/**
+ * Whether any rule whose selector list names `selector` declares a `color`. A
+ * sheet generated from a neutral source writes the slot under `:host`, as
+ * `:host slot[name="start"]`, which names the same slot.
+ */
 const colors = (sheet: Map<string, string>, selector: string): boolean =>
   [...sheet].some(
     ([list, body]) =>
-      list.split(',').some((one) => one.trim() === selector) && /(^|[;\s])color:/.test(body),
+      list.split(',').some((one) => one.trim().replace(/^:host /, '') === selector) &&
+      /(^|[;\s])color:/.test(body),
   )
 
 const host = async (tag: string, slot: string, inner: string): Promise<HTMLElement> => {

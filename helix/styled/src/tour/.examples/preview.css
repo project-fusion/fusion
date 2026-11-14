@@ -1,51 +1,31 @@
-/* A shell to point at. Nothing here is the component: a tour needs an interface
-   to be a tour of, and an example with three buttons in a row shows the anchor
-   logic and none of the reason it exists. */
-.app {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-md);
-  display: grid;
-  grid-template-columns: 11rem minmax(0, 1fr);
-  margin-block-end: var(--helix-space-lg);
-  overflow: hidden;
+/* A shell to point at, written in families so a phone draws it. The hooks below
+   are the ones the TSX sets in its styles. */
+.frame {
+  --card-color: var(--helix-color-foreground);
+  --card-padding: 0;
+  --card-shadow: none;
 }
 
-.rail {
-  background-color: var(--helix-color-surface-sunken);
-  border-inline-end: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
-  padding: var(--helix-space-md);
+/* The rail stands beside the document at every width, so the one vertical rule
+   is the right one on a phone too, which reads no stylesheet and no page width. */
+.shell {
+  --flex-flank-min: 0;
+  --flex-flank-size: 8rem;
+}
+
+#rail {
+  --card-background-color: var(--helix-color-surface-sunken);
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-md);
+  --card-radius: 0;
 }
 
 .bar {
-  align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--helix-space-sm);
-  padding: var(--helix-space-sm) var(--helix-space-md);
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-md);
 }
 
-/* On a phone the rail goes over the document rather than beside it, which is
-   what an app does there. Beside it, the document is left 170px and the bar
-   runs out through the frame. The page's width, so a media query: this is the
-   page's layout and not the component's. */
-@media (width < 32rem) {
-  .app {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .rail {
-    border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-    border-inline-end: 0;
-  }
-}
-
-.sheet {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-sm);
-  padding: var(--helix-space-lg) var(--helix-space-md);
+#sheet {
+  --card-border-width: 0;
+  --card-padding: var(--helix-space-md);
 }

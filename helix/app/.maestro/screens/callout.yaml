@@ -1,0 +1,27 @@
+# Callout, each example drawn alone: each tone, each separation, and a
+# dismissible callout. One screenshot of each, named by the example, `MODE`,
+# and `SIZE`. At the largest text the warning is below the screen, so the
+# flow scrolls to it.
+appId: dev.fusion.helix.app
+name: "Screens: Callout"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://callout/tones/preview
+- scrollUntilVisible:
+    centerElement: true
+    element: '.*Warning.*'
+    timeout: 60000
+    visibilityPercentage: 25
+- takeScreenshot: callout-tones-${MODE}-${SIZE}
+- openLink: helix://callout/separation/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: callout-separation-${MODE}-${SIZE}
+- openLink: helix://callout/dismissible/preview
+- extendedWaitUntil:
+    visible: '.*Tip.*'
+    timeout: 15000
+- takeScreenshot: callout-dismissible-${MODE}-${SIZE}

@@ -52,7 +52,7 @@ describe('the styled log', () => {
   })
 
   test('turns a group’s caret as it opens', () => {
-    expect(cssOf('helix-log-group')).toContain(':host(:state(open)) [part="mark"]')
+    expect(cssOf('helix-log-group')).toMatch(/:host[^{]*:state\(open\)[^{]*\[part="mark"\]/)
   })
 
   test('sets a plain log’s steps as rows of an agent’s work', () => {
@@ -61,8 +61,8 @@ describe('the styled log', () => {
     expect(root).toContain('--_log-step-max-block-size: var(--log-step-max-block-size, 20rem)')
     const group = cssOf('helix-log-group')
     expect(group).toContain('order: var(--_log-caret-order, 0)')
-    expect(group).toContain(':host(:not(:state(steps))) [part="content"]')
-    expect(group).toContain(':host(:state(steps)) [part="content"]')
+    expect(group).toMatch(/:not\(:state\(steps\)\)[^{]*\[part="content"\]/)
+    expect(group).toMatch(/:state\(steps\)[^{]*\[part="content"\]/)
   })
 })
 

@@ -105,6 +105,10 @@ jobs:
       - name: Build
         if: inputs.run == ''
         run: bun run build
+        env:
+          # Read-only. `@fusion.dev/helix-speech`'s build downloads a release
+          # asset with it, which a private repository refuses without one.
+          GH_TOKEN: ${{ github.token }}
 
       # **An App token, because `GITHUB_TOKEN` opens a pull request nothing
       # will check.** GitHub does not run `pull_request` workflows for events

@@ -10,23 +10,30 @@ import {
   stopPress,
   words,
 } from '@fusion.dev/helix-core'
-import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
-import { html } from 'lit/static-html.js'
-import '../../copy-button/index.js'
-import { highlightedLines } from '../highlight.js'
-import { HighlighterController, registeredHighlighter } from '../highlighter.js'
-import { keyedLines } from '../keyed-lines.js'
-import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import {
+  type CodeBlockTokens,
   type DiffFile,
   type DiffHunk,
   type DiffLine,
   type DiffRun,
   foldContext,
+  gutterNumbers,
+  hearTokens,
+  highlightedLines,
+  lineCount,
+  lineRuns,
+  lineSpans,
   pairLines,
   parsePatch,
-} from '../patch.js'
+  registeredTokens,
+  runsMarkup,
+} from '@fusion.dev/helix-core/code-block'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { property, state } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
+import '../../copy-button/index.js'
+import { HighlighterController, registeredHighlighter } from '../highlighter.js'
+import { keyedLines } from '../keyed-lines.js'
 
 /** Whether an element is a Code Block, of either tier, by its tag. */
 const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>
@@ -187,6 +194,7 @@ const nameOf = (block: Element): string => {
  * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
  * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
+ * @csspart copy-tooltip - The tooltip around the copy button, forwarded from it.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, which points at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Applied with `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Applied with `copy-tooltip-arrow`.
@@ -471,6 +479,20 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   @words
   @property({ attribute: 'show-unchanged-label' })
   showUnchangedLabel = '{count, plural, one {Show # unchanged line} other {Show # unchanged lines}}'
+
+  /**
+   * Turns the code into runs of one look each, where a highlighter gives those
+   * and not HTML, such as `shikiTokens` over Shiki's `codeToTokensWithThemes`.
+   * Called with the code as written and the block's `language`, and returning
+   * nothing for a language it does not read, which the block draws plain. A
+   * `highlight` wins over it. It is what a phone draws, as a phone has no HTML
+   * to draw, and a phone reads a `highlight` as well, from the tags and inline
+   * styles of what it returns. Not called on a server, nor for a diff.
+   *
+   * Absent, the block draws with what `registerTokens` gave every block.
+   */
+  @property({ attribute: false })
+  tokens?: CodeBlockTokens
 
   /**
    * Whether long lines wrap. Without it they scroll.
@@ -915,6 +937,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       this.observer ??= new MutationObserver(() => this.requestUpdate())
       this.observer.observe(this, { characterData: true, childList: true, subtree: true })
     }
+    this.stopTokens = hearTokens(() => this.requestUpdate())
   }
 
   override disconnectedCallback(): void {
@@ -922,6 +945,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     this.sizes?.disconnect()
     this.sizes = undefined
     this.observer?.disconnect()
+    this.stopTokens?.()
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -931,6 +955,9 @@ export class HelixHeadlessCodeBlock extends HelixElement {
 
   /** On the page's list of elements a highlighter registration reaches. */
   protected readonly highlighting = new HighlighterController(this)
+
+  /** Stops hearing the page register other tokens. */
+  private stopTokens: (() => void) | undefined
 
   /** The page registered another highlighter: draws again with it. */
   highlighterChanged(): void {
@@ -951,9 +978,8 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        is reported as uncaught and the code is drawn plain, as Sandbox Source
        draws its source. */
     let highlighted: string | undefined
-    const highlight = this.highlight ?? registeredHighlighter()
     try {
-      const markup = highlight && text !== '' ? highlight(text, this.language) : undefined
+      const markup = text === '' ? undefined : this.markup(text)
       highlighted = markup === undefined ? undefined : highlightedLines(markup)
     } catch (error) {
       globalThis.reportError?.(error)
@@ -1021,6 +1047,19 @@ export class HelixHeadlessCodeBlock extends HelixElement {
         <pre id="block" part="block" translate="no">${gutter}${code}</pre>
         ${this.headed(drawn) ? nothing : this.renderCopy()}
       </div>${this.renderExpand()}`
+  }
+
+  /**
+   * What the block draws its code with: its own `highlight`, then its own
+   * `tokens`, then what the page registered, in the same order.
+   */
+  private markup(text: string): string | undefined {
+    const highlight = this.highlight ?? (this.tokens ? undefined : registeredHighlighter())
+    if (highlight) {
+      return highlight(text, this.language)
+    }
+    const runs = (this.tokens ?? registeredTokens())?.(text, this.language)
+    return runs === undefined ? undefined : runsMarkup(runs)
   }
 
   /**
@@ -1140,7 +1179,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   ): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip-surface: copy-tooltip-surface,
+      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip: copy-tooltip, tooltip-surface: copy-tooltip-surface,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-surface-bottom: copy-tooltip-surface-bottom,

@@ -5,45 +5,27 @@ export function Example() {
       gap="lg"
       wrap
     >
-      <helix-button
-        aria-describedby="timing-eager-tip"
-        id="timing-eager"
-      >
-        Copy link
-      </helix-button>
       <helix-tooltip
         content="Copy the link to your clipboard"
         delay={0}
         delay-out="600"
-        for="timing-eager"
-        id="timing-eager-tip"
-      ></helix-tooltip>
-
-      <helix-button
-        aria-describedby="timing-patient-tip"
-        id="timing-patient"
       >
-        Share file
-      </helix-button>
+        <helix-button>Copy link</helix-button>
+      </helix-tooltip>
+
       <helix-tooltip
         content="Share the file with your team"
         delay={700}
-        for="timing-patient"
-        id="timing-patient-tip"
-      ></helix-tooltip>
-
-      <helix-button
-        aria-describedby="timing-roomy-tip"
-        id="timing-roomy"
       >
-        Edit profile
-      </helix-button>
+        <helix-button>Share file</helix-button>
+      </helix-tooltip>
+
       <helix-tooltip
         content="Change your name and photo"
-        for="timing-roomy"
-        id="timing-roomy-tip"
         offset={16}
-      ></helix-tooltip>
+      >
+        <helix-button>Edit profile</helix-button>
+      </helix-tooltip>
     </helix-flex>
   )
 }

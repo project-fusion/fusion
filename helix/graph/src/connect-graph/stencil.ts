@@ -1,6 +1,6 @@
 import { reportRuntime } from '@fusion.dev/helix-core'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import { fieldFromInside, fieldFromPath, type ShapeField } from '../shapes/shape-field.js'
-import type { GraphPoint } from './seed.js'
 import { surfaceWeb } from './surface-web.js'
 
 /**

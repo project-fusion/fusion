@@ -1,8 +1,8 @@
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import type { GraphDriver, GraphGroup } from '../connect-graph/connect-graph.js'
 import { type DrawnLink, type DrawnNode, linkKey } from '../connect-graph/diff.js'
 import { type GraphLooks, mixRgb, type NodeLook } from '../connect-graph/looks.js'
-import type { GraphPoint } from '../connect-graph/seed.js'
 import { type Box, clearOf, ease, gesturesHeld, isLight } from '../overlay/overlay.js'
 import {
   type Camera,

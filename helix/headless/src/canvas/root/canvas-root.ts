@@ -46,14 +46,6 @@ import {
 } from '../events/index.js'
 import '../../icon-button/index.js'
 import '../../tooltip/index.js'
-import { arrangement, type CanvasArrangeOptions } from '../arrange.js'
-import { descriptionOf } from '../describe.js'
-import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
-import { EdgePan } from '../edge-pan.js'
-import { neighborOf } from '../neighbor.js'
-import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
-import { parseCanvas, pasteInto } from '../paste.js'
-import { snapBox, snapTo, stepTo } from '../snap.js'
 import {
   type CanvasDocument,
   type CanvasEdge,
@@ -64,17 +56,34 @@ import {
   type CanvasTone,
   colorOf,
   connector,
+  descriptionOf,
   distanceTo,
   ends,
   extent,
+  FIT_MIN,
+  fitted,
   fromJsonCanvas,
+  heads,
   inside,
+  edgeKeyBase as keyBase,
+  MARGIN,
+  onPlane,
+  planeOf,
   port,
   reading,
+  ruling,
   sideNear,
-} from './canvas-document.js'
+  ZOOM_MAX,
+  ZOOM_MIN,
+} from '@fusion.dev/helix-core/canvas'
+import { arrangement, type CanvasArrangeOptions } from '../arrange.js'
+import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
+import { EdgePan } from '../edge-pan.js'
+import { neighborOf } from '../neighbor.js'
+import { HelixHeadlessCanvasNode } from '../node/canvas-node.js'
+import { parseCanvas, pasteInto } from '../paste.js'
+import { snapBox, snapTo, stepTo } from '../snap.js'
 
-export type { CanvasArrangeOptions } from '../arrange.js'
 export type {
   CanvasDocument,
   CanvasEdge,
@@ -87,19 +96,9 @@ export type {
   CanvasRouteEnds,
   CanvasSide,
   CanvasTone,
-} from './canvas-document.js'
-export { fromJsonCanvas } from './canvas-document.js'
-
-/**
- * The breathing room the plane keeps around the document's own extent.
- *
- * **A board drawn exactly to its extent clips what sits outside it**, and two
- * things do: a group's name, which is drawn above the box it names, and a
- * connector, whose curve bows past the cards it joins. The margin is the same on
- * every side and in the document's own units, so it scales with the zoom like
- * everything else.
- */
-const MARGIN = 32
+} from '@fusion.dev/helix-core/canvas'
+export { fromJsonCanvas } from '@fusion.dev/helix-core/canvas'
+export type { CanvasArrangeOptions } from '../arrange.js'
 
 /**
  * The arrowhead, named once inside this shadow root.
@@ -125,39 +124,6 @@ const MIN_WIDTH = 48
 const MIN_HEIGHT = 32
 
 /**
- * How far out and how far in the board zooms.
- *
- * **A tenth to eight times.** A quarter was too near to see a large board
- * whole, and four times too far to read what a small card holds, a chart or a
- * picture, at the size it was worth drawing.
- */
-const ZOOM_MIN = 0.1
-const ZOOM_MAX = 8
-
-/**
- * The least the automatic fit zooms out to: a card's 13 pixel text draws at
- * about 10 pixels and a 12 pixel name at 9. Fitted whole, a five-card board in
- * a 280 pixel column landed at 0.36 and drew its text at 4.7 pixels, and the
- * minimap example's board at 0.11 and 1.4. **0.75, a step up from 0.6**, which
- * drew the preview's names at 7.2 pixels at 390 wide, measured November 3,
- * 2026, and read as a picture of a board more than as one. The reader can
- * still zoom out to `ZOOM_MIN`.
- */
-const FIT_MIN = 0.75
-
-/**
- * The zoom the ruling is drawn at, which steps by doubling as the board zooms
- * out so the lines stay far enough apart to be lines.
- *
- * At a tenth, a ruling every 32 units is a line every three pixels, which reads
- * as a gray wash rather than a grid. Doubling the spacing each time it would
- * fall below half keeps every line the coarser ruling draws on one the finer
- * ruling drew, so a card on a line stays on a line.
- */
-const ruling = (zoom: number): number =>
-  zoom >= 0.5 ? zoom : zoom * 2 ** Math.ceil(Math.log2(0.5 / zoom))
-
-/**
  * How far a pointer travels on a card before a press becomes a drag.
  *
  * A card is also something a reader clicks to focus, or clicks through to a
@@ -174,26 +140,6 @@ const SLOP = 3
  * been dropped on nothing. React Flow's `connectionRadius` is the same 20.
  */
 const REACH = 20
-
-/** Whether an end carries an arrowhead, the format defaulting the two differently. */
-const heads = (edge: CanvasEdge): { start: boolean; end: boolean } => ({
-  end: (edge.toEnd ?? 'arrow') === 'arrow',
-  start: edge.fromEnd === 'arrow',
-})
-
-/**
- * What a connection is called in the walk and on the tab stop, before a second
- * one between the same two cards is told apart: see `keyOf` on the board.
- */
-const keyBase = (edge: CanvasEdge): string =>
-  `edge:${edge.id || `${edge.fromNode}->${edge.toNode}`}`
-
-/** A card moved onto the plane, whose corner is `origin` in the document's units. */
-const onPlane = (node: CanvasNode, origin: { x: number; y: number }): CanvasNode => ({
-  ...node,
-  x: node.x - origin.x,
-  y: node.y - origin.y,
-})
 
 /**
  * Whether an event began on something inside a card that answers a press
@@ -3924,21 +3870,11 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (board.width === 0 || free.width === 0 || free.height === 0) {
       return
     }
-    const zoom = Math.max(
-      Math.min(1, free.width / whole.width, free.height / whole.height),
-      FIT_MIN,
-    )
-    if (!Number.isFinite(zoom) || zoom <= 0) {
-      return
-    }
     /* Centered along each side it fits, and from its start along a side it
        does not, so the first cards are the ones in view. */
-    const along = (room: number, length: number, from: number): number =>
-      length * zoom > room ? from : from + (room - length * zoom) / 2
-    const next = {
-      x: along(free.width, whole.width, free.x),
-      y: along(free.height, whole.height, free.y),
-      zoom,
+    const next = fitted(whole, free)
+    if (!Number.isFinite(next.zoom) || next.zoom <= 0) {
+      return
     }
     /* **Only where it moved**, or this never stops. A fit runs after every
        render and assigning a fresh object is a change whatever is in it, so an
@@ -4710,10 +4646,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    const nodes = this.nodes
-    const drawn = extent(nodes)
-    const box = { height: drawn.height + MARGIN * 2, width: drawn.width + MARGIN * 2 }
-    const origin = { x: drawn.x - MARGIN, y: drawn.y - MARGIN }
+    const { box, origin } = planeOf(this.nodes)
     return html`<div
       part="region"
       role="group"

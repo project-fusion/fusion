@@ -1,9 +1,10 @@
 import {
+  axisScales,
+  baselineAt,
   byRow,
   CategoryAxisController,
   CHART_PLOT,
   type Curve,
-  columnPoints,
   commaList,
   customElement,
   drawTooltip,
@@ -12,29 +13,32 @@ import {
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
-  headroom,
-  linear,
-  linePath,
+  latestReadings,
+  latestWords,
+  levelRules,
+  lineDomain,
+  lineEnds,
+  lineMarks,
+  lineTipAt,
+  lineWash,
   MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
-  type Point,
+  type Run,
   type Series,
   type SeriesPoint,
   seriesIndex,
   seriesKey,
-  ticks,
+  seriesRuns,
+  slotOf,
   unbroken,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-
-/** Two decimals, as a line's path is written, which is more than a 100 unit view box can show. */
-const round = (value: number): number => Math.round(value * 100) / 100
 
 /**
  * @summary A chart that draws series over time as lines, read from a table.
@@ -362,27 +366,12 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (this.ranged?.series === series && this.ranged.key === key) {
       return this.ranged.domain
     }
-    /* A walk over the readings, which builds no array of every value the
-       way handing them to `extent` would. */
-    let low = Number.POSITIVE_INFINITY
-    let high = Number.NEGATIVE_INFINITY
-    for (const one of series) {
-      if (!this.showsSeries(one.name)) {
-        continue
-      }
-      for (const point of one.points) {
-        low = Math.min(low, point.value)
-        high = Math.max(high, point.value)
-      }
-    }
-    const [floor, top] = low <= high ? [low, high] : [0, 0]
-    const extent: [number, number] = this.zero
-      ? [Math.min(0, floor), Math.max(0, top)]
-      : [floor, top]
-    /* Room above the peak wherever the scale is drawn, so the top edge is a
-       numbered level and the highest reading stands clear of it. A chart with
-       no axis and no rules is read as a shape, and keeps the whole height. */
-    const domain = this.drawsAxis || this.rulesValue ? headroom(extent) : extent
+    const domain = lineDomain(
+      series,
+      (name) => this.showsSeries(name),
+      this.zero,
+      this.drawsAxis || this.rulesValue,
+    )
     this.ranged = { domain, key, series }
     return domain
   }
@@ -414,7 +403,6 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     ) {
       return held
     }
-    const y = linear(domain, [PLOT_HEIGHT, 0])
     /* **A reading sits in the middle of its own slot, not at the edge of the
        box**, which is what makes the names underneath line up with it.
      *
@@ -423,14 +411,8 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
      * while the readings would sit at the boundaries between those shares:
      * measured, the first name centered at a twelfth of the width with its
      * point at zero. Every label is off by half a slot and the error grows
-     * toward the middle.
-     *
-     * Insetting by half a slot also means a line chart and a bar chart drawn
-     * from the same table stack, which is the arrangement anybody comparing a
-     * total to its parts wants. The cost is that the line stops short of both
-     * edges, and that is the smaller thing to give up. */
-    const slot = PLOT_WIDTH / count
-    const x = linear([0, Math.max(count - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
+     * toward the middle. See `axisScales`. */
+    const { x, y } = axisScales(domain, count)
     this.scales = { count, domain, x, y }
     return this.scales
   }
@@ -450,18 +432,14 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
       columns: number
       curve: Curve
       marks?: { lone: string; markers: boolean; marks: string }
-      runs: Array<{ path: string; points: Point[] }>
+      runs: Run[]
       x: (value: number) => number
       y: (value: number) => number
     }
   >()
 
   /** A series' unbroken runs as paths, from the held drawing where it still holds. */
-  private runsOf(
-    one: Series,
-    x: (value: number) => number,
-    y: (value: number) => number,
-  ): Array<{ path: string; points: Point[] }> {
+  private runsOf(one: Series, x: (value: number) => number, y: (value: number) => number): Run[] {
     const curve = this.curve ?? 'smooth'
     /* The device's pixels across the plot, which a path of more readings than
        that is drawn at. Before the plot is measured, the window's: that render
@@ -473,12 +451,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (held && held.x === x && held.y === y && held.curve === curve && held.columns === columns) {
       return held.runs
     }
-    const runs = this.unbrokenOf(one)
-      .map((run) => {
-        const points: Point[] = run.map((point) => [x(point.at), y(point.value)])
-        return { path: linePath(columnPoints(points, columns, PLOT_WIDTH), curve), points }
-      })
-      .filter((run) => run.path !== '')
+    const runs = seriesRuns(this.unbrokenOf(one), { x, y }, curve, columns)
     this.drawn.set(one, { columns, curve, runs, x, y })
     return runs
   }
@@ -537,24 +510,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     x: (value: number) => number,
     y: (value: number) => number,
   ): Array<{ index: number; x: number; y: number }> {
-    return series.flatMap((one, depth) => {
-      const last = one.points.at(-1)
-      if (!this.showsSeries(one.name)) {
-        return []
-      }
-      /* A single reading is a point rather than a line, and a mark on the end of
-         something with no length is a mark on nothing. */
-      if (!last || one.points.length < 2) {
-        return []
-      }
-      return [
-        {
-          index: seriesIndex(depth),
-          x: (x(last.at) / PLOT_WIDTH) * 100,
-          y: (y(last.value) / PLOT_HEIGHT) * 100,
-        },
-      ]
-    })
+    /* A single reading is a point rather than a line, and a mark on the end of
+       something with no length is a mark on nothing. */
+    return lineEnds(series, (name) => this.showsSeries(name), { x, y })
   }
 
   protected override render(): TemplateResult {
@@ -599,22 +557,16 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   protected renderSummary(series: Series[]): TemplateResult {
     const rows = this.sourceRows
     const columns = this.plottedColumns
-    const latest = series.flatMap((one, depth) => {
-      const last = one.points.at(-1)
-      if (last === undefined || !this.showsSeries(one.name)) {
-        return []
-      }
-      const text = rows[last.at]?.cells[columns[depth] ?? -1]?.text ?? String(last.value)
-      return [{ label: last.label, reading: `${one.name} ${text}` }]
-    })
+    const latest = latestReadings(
+      series,
+      (name) => this.showsSeries(name),
+      (depth, at) => rows[at]?.cells[columns[depth] ?? -1]?.text,
+    )
     /* One label where every series ended on the same row, which is the usual
        table, and each its own where they did not. The readings are listed as
        the locale lists, which in English is with commas. */
-    const shared = latest.every((one) => one.label === latest[0]?.label)
     const listed = new Intl.ListFormat(wordsLocale(this), { style: 'short', type: 'unit' })
-    const body = shared
-      ? `${latest[0]?.label ?? ''}: ${listed.format(latest.map((one) => one.reading))}`
-      : latest.map((one) => `${one.label}: ${one.reading}`).join('; ')
+    const body = latestWords(latest, (items) => listed.format(items))
     const named = this.named ? `${this.named}, ` : ''
     return html`<p id="helix-chart-summary" part="summary">${named}${body}.</p>`
   }
@@ -634,7 +586,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     /* Drawn only where zero is inside the range. A rule at the foot of a chart
        whose lowest reading is 980 is not the zero line, it is the bottom of the
        box wearing the zero line's clothes, and a reader takes it for one. */
-    const floor = domain[0] <= 0 && domain[1] >= 0 ? y(0) : undefined
+    const floor = baselineAt(domain, y)
 
     const ends = this.terminus === 'none' ? [] : this.ends(series, x, y)
     /* Built here rather than in the sheet, because a stylesheet cannot count
@@ -726,9 +678,8 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
           )
       : []
     const across = this.rulesValue
-      ? ticks(domain).map(
-          (level) =>
-            svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${y(level)} y2=${y(level)} />`,
+      ? levelRules(domain, y).map(
+          (level) => svg`<line part="gridline" x1="0" x2=${PLOT_WIDTH} y1=${level} y2=${level} />`,
         )
       : []
     return svg`${down}${across}`
@@ -752,8 +703,8 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (at < 0 || count === 0) {
       return nothing
     }
-    const slot = PLOT_WIDTH / count
-    return svg`<rect height=${PLOT_HEIGHT} part="band" width=${slot} x=${at * slot} y="0" />`
+    const slot = slotOf(at, count)
+    return svg`<rect height=${PLOT_HEIGHT} part="band" width=${slot.width} x=${slot.x} y="0" />`
   }
 
   /**
@@ -871,18 +822,10 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (kept && kept.markers === this.markers) {
       return kept
     }
-    const dot = (point: Point): string => `M${point[0]},${point[1]}h0`
-    let marks = ''
-    let lone = ''
-    for (const run of this.unbrokenOf(one)) {
-      const points = run.map((point): Point => [round(x(point.at)), round(y(point.value))])
-      if (points.length === 1) {
-        lone += dot(points[0] as Point)
-      } else if (this.markers) {
-        marks += points.map(dot).join('')
-      }
+    const found = {
+      ...lineMarks(this.unbrokenOf(one), { x, y }, this.markers),
+      markers: this.markers,
     }
-    const found = { lone, markers: this.markers, marks }
     if (held && runs === held.runs) {
       held.marks = found
     }
@@ -924,13 +867,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        fills the region between the stroke and the straight line joining its
        first point to its last. One closed shape per run, so a gap is not
        washed either. */
-    const wash = runs
-      .map((run) => {
-        const first = run.points[0] as Point
-        const last = run.points.at(-1) as Point
-        return `${run.path}L${last[0]},${PLOT_HEIGHT}L${first[0]},${PLOT_HEIGHT}Z`
-      })
-      .join('')
+    const wash = lineWash(runs)
     if (piece === 'area') {
       return this.area
         ? svg`<path
@@ -998,21 +935,12 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        the highest, and no readings at all would make `Math.min` return
        Infinity. */
     const { y: scale } = this.scalesOf(this.range(series), this.readings)
-    const tops = series
-      .filter((one) => this.showsSeries(one.name))
-      .map((one) => this.slotsOf(one)[at]?.value)
-      .filter((one): one is number => one !== undefined)
-      .map((one) => scale(one))
-    const slot = 100 / this.readings
+    const slots = series.filter((one) => this.showsSeries(one.name)).map((one) => this.slotsOf(one))
     return drawTooltip(
       this.sourceRows,
       at,
       this.tag('tooltip'),
-      {
-        placement: 'top',
-        x: `${at * slot + slot / 2}%`,
-        y: `${tops.length > 0 ? Math.min(...tops) : 0}%`,
-      },
+      { placement: 'top', ...lineTipAt(slots, at, this.readings, scale) },
       (cell) => this.seriesOf(cell),
       this.pointer,
     )

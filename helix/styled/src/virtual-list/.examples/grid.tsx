@@ -40,6 +40,7 @@ export function Example() {
         estimate={72}
         items={swatches}
         label="Swatches"
+        text-field="name"
       >
         <template dangerouslySetInnerHTML={{ __html: CELL }} />
       </helix-virtual-list>

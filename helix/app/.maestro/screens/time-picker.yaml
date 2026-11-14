@@ -1,0 +1,49 @@
+# Time Picker, its examples drawn alone: the list of times, a time chosen, a range,
+# the times a rule bars, and the wheels. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`. A time is named by its words, so each wait matches
+# the words inside. Each example is waited for by its title in the header, and then
+# by a time it draws: a wait on words every example draws passed on the screen
+# before while the link was still opening, and pictured that screen.
+appId: dev.fusion.helix.app
+name: "Screens: Time Picker"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://time-picker/preview/preview
+      - extendedWaitUntil:
+          visible: '.*9:30.AM.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-picker-preview-${MODE}-${SIZE}
+- openLink: helix://time-picker/range/preview
+- extendedWaitUntil:
+    visible: 'Range'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*AM.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-picker-range-${MODE}-${SIZE}
+- openLink: helix://time-picker/disable-times/preview
+- extendedWaitUntil:
+    visible: 'Disable Times'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*AM.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-picker-disable-times-${MODE}-${SIZE}
+- openLink: helix://time-picker/wheels/preview
+- extendedWaitUntil:
+    visible: 'Wheels'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*PM.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-picker-wheels-${MODE}-${SIZE}

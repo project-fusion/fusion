@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
-import { styles } from './pagination-summary.css.js'
+import { styles } from './pagination-summary.generated.css.js'
 
 describe('pagination summary server output', () => {
   test('the reading is in the served markup, not worked out on hydration', () => {

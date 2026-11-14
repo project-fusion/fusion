@@ -10,7 +10,7 @@ beforeAll(async () => {
 /* The hidden page a spec stands in for is the document's own property, so
    the prototype's answer comes back after each spec. */
 afterEach(() => {
-  delete (document as unknown as { hidden?: boolean }).hidden
+  delete (document as unknown as { visibilityState?: string }).visibilityState
 })
 
 describe('announcement', () => {
@@ -169,7 +169,11 @@ describe('announcement', () => {
     expect(hasState(announcement, 'paused')).toBe(false)
 
     let away = true
-    Object.defineProperty(document, 'hidden', { configurable: true, get: () => away })
+    /* The timers capability reads `visibilityState`. */
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (away ? 'hidden' : 'visible'),
+    })
     document.dispatchEvent(new Event('visibilitychange'))
     expect(hasState(announcement, 'paused')).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 80))

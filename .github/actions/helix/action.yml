@@ -48,8 +48,10 @@ runs:
       with:
         # `1.97` is the toolchain below, said again because a key cannot read a
         # step's input. A bump there without one here would restore a binary
-        # the new toolchain did not build.
-        key: helix-${{ runner.os }}-${{ runner.arch }}-1.97-release-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/src/**', 'helix/visual/Cargo.toml', 'helix/visual/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
+        # the new toolchain did not build. The theme crate's Rust is under
+        # `helix/theme/rust` (its `lib` path), so a change to the token model
+        # there builds a new binary.
+        key: helix-${{ runner.os }}-${{ runner.arch }}-1.97-release-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'helix/cli/Cargo.toml', 'helix/cli/src/**', 'helix/theme/Cargo.toml', 'helix/theme/rust/**', 'helix/theme/src/**','helix/visual/Cargo.toml', 'helix/visual/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
         path: target/ci/helix
 
     - name: Install Rust

@@ -37,6 +37,43 @@ describe('what a press or a key leaves selected', () => {
     )
   })
 
+  test('Shift selects the range in place of the last one, as React Aria does', () => {
+    // Back toward the anchor lets go of the rows the last range passed.
+    expect(
+      choiceValue({
+        ...base,
+        anchor: 'b',
+        extend: true,
+        pressed: 'c',
+        reached: 'e',
+        value: 'b,c,d,e',
+      }),
+    ).toBe('b,c')
+    // What was selected before the range began stays.
+    expect(
+      choiceValue({
+        ...base,
+        anchor: 'c',
+        extend: true,
+        pressed: 'c',
+        reached: 'd',
+        value: 'a,c,d',
+      }),
+    ).toBe('a,c')
+    // A disabled row in the last range is let go of too, as React Aria lets go of every key in it.
+    expect(
+      choiceValue({
+        ...base,
+        anchor: 'a',
+        extend: true,
+        pressed: 'b',
+        reached: 'd',
+        rows: ['a', 'b', 'x', 'c', 'd', 'e'],
+        value: 'a,b,x,c,d',
+      }),
+    ).toBe('a,b')
+  })
+
   test('toggle adds or takes out a pressed row, and a key only moves', () => {
     expect(choiceValue({ ...base, pressed: 'c', value: 'a' })).toBe('a,c')
     expect(choiceValue({ ...base, pressed: 'a', value: 'a,c' })).toBe('c')

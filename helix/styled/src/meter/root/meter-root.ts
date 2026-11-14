@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMeter } from '@fusion.dev/helix-headless/meter'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './meter-root.css.js'
+import { styles } from './meter-root.generated.css.js'
 
 /**
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.

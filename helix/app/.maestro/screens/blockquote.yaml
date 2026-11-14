@@ -1,0 +1,23 @@
+# Blockquote, each example drawn alone: a quote with its attribution, and two
+# pull quotes with marks, one in German. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The first pull quote says what the preview says, and the words after it can
+# fall below the screen at the largest text size, so the flow waits for the
+# title of their screen.
+appId: dev.fusion.helix.app
+name: "Screens: Blockquote"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://blockquote/preview/preview
+- extendedWaitUntil:
+    visible: '.*Our team moved.*'
+    timeout: 30000
+- takeScreenshot: blockquote-preview-${MODE}-${SIZE}
+- openLink: helix://blockquote/pull-quote/preview
+- extendedWaitUntil:
+    visible: 'Pull Quote'
+    timeout: 15000
+- takeScreenshot: blockquote-pull-quote-${MODE}-${SIZE}

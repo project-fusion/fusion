@@ -726,8 +726,9 @@ fn parameters(taken: &[Parameter], tags: &[(String, String)]) -> Vec<Value> {
 /// and markup has no doc blocks. Anywhere in the file, not only at its head:
 /// two of the slider's examples open with the stylesheet they need and write
 /// the directive under it, and reading only the opening lines lost those. `@summary` says what it
-/// shows, `@min` the height it needs to be worth looking at, and `@layout` the
-/// frame it wants around it.
+/// shows, `@react-native-summary` what it shows in React Native where that
+/// differs, `@min` the height it needs to be worth looking at, and `@layout`
+/// the frame it wants around it.
 ///
 /// Read until the first line that is not one, so a comment further down is
 /// markup a consumer wrote rather than something said about the example.
@@ -810,6 +811,20 @@ fn examples_in(directory: &Path) -> Vec<Value> {
             }
             if let Some(layout) = said.get("layout").filter(|one| !one.is_empty()) {
                 entry.insert("layout".to_owned(), json!(layout));
+            }
+            /* **What it shows on another platform**, keyed by the platform,
+            where the summary names something that platform does not have, such
+            as the arrow keys in React Native. "Native" alone already means the
+            browser's own elements in Helix, so the key names the platform.
+            Absent on every example whose summary is true everywhere. */
+            if let Some(summary) = said
+                .get("react-native-summary")
+                .filter(|one| !one.is_empty())
+            {
+                entry.insert(
+                    "platforms".to_owned(),
+                    json!({ "react-native": { "description": summary } }),
+                );
             }
             entry.insert("slug".to_owned(), json!(slug));
             Value::Object(entry)

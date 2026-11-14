@@ -26,7 +26,7 @@ export function Example() {
   const replay = useCallback(() => setRun((before) => before + 1), [])
 
   useEffect(() => {
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')
 
     const say = (next: OrbState, what: string) => {
       setState(next)
@@ -58,7 +58,7 @@ export function Example() {
 
     const start = () => {
       clearTimeout(timer.current)
-      if (still.matches) {
+      if (still?.matches) {
         settle()
         return
       }
@@ -81,10 +81,10 @@ export function Example() {
     }
 
     start()
-    still.addEventListener('change', start)
+    still?.addEventListener('change', start)
     return () => {
       clearTimeout(timer.current)
-      still.removeEventListener('change', start)
+      still?.removeEventListener('change', start)
     }
   }, [run])
 

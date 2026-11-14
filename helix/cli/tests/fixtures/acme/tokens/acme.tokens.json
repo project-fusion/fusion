@@ -1,0 +1,47 @@
+{
+  "$description": "Acme's tokens in light mode. acme.dark.tokens.json sets the colors that move in dark mode.",
+  "color": {
+    "$type": "color",
+    "accent": {
+      "$value": { "colorSpace": "srgb", "components": [0.1, 0.3, 0.9], "hex": "#1a4de6" }
+    },
+    "background": { "$value": "#ffffff" },
+    "focus": { "$value": "{color.accent}" },
+    "ink": { "$value": "#1c1c1c" },
+    "line": { "$value": { "alpha": 0.5, "colorSpace": "srgb", "components": [0, 0, 0] } },
+    "muted": { "$value": "#5c5c5c" },
+    "on-accent": { "$value": "#ffffff" }
+  },
+  "duration": {
+    "$type": "duration",
+    "quick": { "$value": { "unit": "ms", "value": 120 } }
+  },
+  "easing": {
+    "$type": "cubicBezier",
+    "out": { "$value": [0, 0, 0, 1] }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "body": { "$value": ["Inter", "Segoe UI", "sans-serif"] }
+  },
+  "radius": {
+    "$type": "dimension",
+    "control": { "$value": { "unit": "rem", "value": 0.375 } },
+    "pill": { "$value": { "unit": "px", "value": 999 } }
+  },
+  "space": {
+    "$type": "dimension",
+    "md": { "$value": { "unit": "rem", "value": 1 } },
+    "sm": { "$value": { "unit": "rem", "value": 0.5 } },
+    "xs": { "$value": { "unit": "px", "value": 4 } }
+  },
+  "text": {
+    "$type": "dimension",
+    "md": { "$value": { "unit": "rem", "value": 0.875 } },
+    "sm": { "$value": { "unit": "rem", "value": 0.75 } }
+  },
+  "weight": {
+    "$type": "fontWeight",
+    "bold": { "$value": 600 }
+  }
+}

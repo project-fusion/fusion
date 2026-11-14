@@ -10,7 +10,7 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessBreadcrumb } from '../breadcrumb/breadcrumb.js'
@@ -51,18 +51,17 @@ export interface BreadcrumbItem {
  * array of `{ label, href }`, drawn as crumbs in order, the last one as the
  * current page. Slotted crumbs follow them. Use one way or the other in a trail.
  *
- * With `max-items`, a trail that is longer folds its middle into one place:
- * the first crumb, a button, then the last `max-items` less one. The button is
- * named by `expand-label` and shows the whole trail, moving focus to the first
- * crumb it brought back. A trail drawn from `items` draws the button as a
- * crumb of its own, and a new `items` folds again. A slotted trail hides the
- * crumbs it folds, which take no room, and its first crumb draws the button
- * after its link; a change to the crumbs folds again.
+ * With `max-items`, a trail that is longer folds its middle into a menu: the
+ * first crumb, a button, then the last `max-items` less one. The button is a
+ * ghost icon button named by `expand-label`, and opens a menu whose rows are
+ * the crumbs folded, each a link to its crumb, drawn by the first crumb
+ * after its link. A slotted trail hides the crumbs it folds, which take no
+ * room; a change to the crumbs, or a new `items`, folds again.
  *
  * **Keyboard.** Each crumb with an `href` is a link and one tab stop, and
  * Enter follows it. The current page and the separators are not in the tab
- * order. In a folded trail, Enter or Space on the fold's button shows the
- * whole trail and moves focus to the first crumb it brought back.
+ * order. In a folded trail, Enter, Space, or Down on the fold's button opens
+ * its menu on its first row, and the menu's keys move among the rows.
  *
  * @since 0.1.0
  * @status stable
@@ -74,14 +73,38 @@ export interface BreadcrumbItem {
  * the crumb that holds the folded items where the gap should appear.
  *
  * @csspart crumb - Each crumb drawn from `items`.
- * @csspart crumb-collapsed - The crumb that holds the folded middle of a trail longer than `max-items`.
  * @csspart crumb-current - The crumb drawn from `items` for the current page.
- * @csspart crumb-expand - The fold button a crumb draws after the first crumb of a folded slotted trail. A trail drawn from `items` draws its fold as a crumb of its own, `crumb-collapsed`, so this one is never drawn there.
- * @csspart crumb-fold-separator - The chevron before that button.
+ * @csspart crumb-expand - The button of the fold the first crumb drawn from `items` draws, which opens its menu.
+ * @csspart crumb-expand-button - The `expand-button` part of a crumb drawn from `items`.
+ * @csspart crumb-expand-live - The `expand-live` part of a crumb drawn from `items`.
+ * @csspart crumb-expand-mark - The `expand-mark` part of a crumb drawn from `items`.
+ * @csspart crumb-expand-spinner - The `expand-spinner` part of a crumb drawn from `items`.
+ * @csspart crumb-expand-text - The `expand-text` part of a crumb drawn from `items`.
+ * @csspart crumb-fold - The `fold` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-back - The `fold-back` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-back-mark - The `fold-back-mark` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-empty - The `fold-empty` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-header - The `fold-header` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item - The `fold-item` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-end - The `fold-item-end` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-item - The `fold-item-item` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-mark - The `fold-item-mark` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-shortcut - The `fold-item-shortcut` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-shortcut-kbd - The `fold-item-shortcut-kbd` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-shortcut-key - The `fold-item-shortcut-key` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-shortcut-separator - The `fold-item-shortcut-separator` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-start - The `fold-item-start` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-item-surface - The `fold-item-surface` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-live - The `fold-live` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-loading - The `fold-loading` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-search-field - The `fold-search-field` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-separator - The box before that button, which holds its mark.
+ * @csspart crumb-fold-separator-mark - The chevron before that button, or the slash under `separator="slash"`.
+ * @csspart crumb-fold-surface - The `fold-surface` part of a crumb drawn from `items`.
+ * @csspart crumb-fold-title - The `fold-title` part of a crumb drawn from `items`.
  * @csspart crumb-link - The link, or the current page's words, of a crumb drawn from `items`.
  * @csspart crumb-separator - The separator before a crumb drawn from `items`.
  * @csspart crumb-separator-mark - The chevron, or the slash under `separator="slash"`, before a crumb drawn from `items`.
- * @csspart expand - The button in the folded crumb that shows the whole trail.
  * @csspart list - The ordered list.
  */
 @customElement('helix-headless-breadcrumbs')
@@ -151,36 +174,11 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   @property({ reflect: true })
   separator?: 'slash'
 
-  /** Whether a reader has asked to see the whole of a folded trail. */
-  @state()
-  private expanded = false
-
   /** The crumbs slotted into the trail, in order. */
   private get slotted(): HelixHeadlessBreadcrumb[] {
     return (
       this.renderRoot?.querySelector<HTMLSlotElement>('slot:not([name])')?.assignedElements() ?? []
     ).filter((one): one is HelixHeadlessBreadcrumb => one instanceof HelixHeadlessBreadcrumb)
-  }
-
-  /** Shows the whole of a folded slotted trail and moves focus to the first crumb it brought back. */
-  private readonly unfold = (): void => {
-    this.expanded = true
-    this.updateComplete.then(() => {
-      const crumb = this.slotted[1]
-      const link =
-        crumb?.shadowRoot?.querySelector<HTMLElement>('a[part="link"]') ??
-        crumb?.querySelector<HTMLElement>('a[href]')
-      link?.focus()
-    })
-  }
-
-  /** Shows the whole trail and moves focus to the first crumb it brought back. */
-  private readonly expand = (): void => {
-    this.expanded = true
-    this.updateComplete.then(() => {
-      const crumb = this.renderRoot.querySelectorAll('[part~="crumb"]')[1]
-      crumb?.shadowRoot?.querySelector<HTMLElement>('a, [part="link"]')?.focus()
-    })
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -189,9 +187,6 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     // an author's `aria-label` names it without anything being copied inward.
     // The default name goes the same way, and an attribute beats internals.
     hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'navigation' })
-    if (changed.has('items') && changed.get('items') !== undefined) {
-      this.expanded = false
-    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -203,7 +198,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   private get folded(): number {
     const most = this.maxItems ?? 0
     const count = this.items.length
-    return !this.expanded && most >= 2 && count > most ? count - most : 0
+    return most >= 2 && count > most ? count - most : 0
   }
 
   /**
@@ -218,17 +213,19 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
        up to the last `max-items` less one. */
     const most = this.maxItems ?? 0
     const fold =
-      !this.expanded && this.items.length === 0 && most >= 2 && crumbs.length > most
-        ? crumbs.length - most
-        : 0
+      this.items.length === 0 && most >= 2 && crumbs.length > most ? crumbs.length - most : 0
+    const folded = crumbs.slice(1, 1 + fold).map((crumb) => ({
+      href: crumb.href ?? '',
+      label: (crumb.textContent ?? '').trim(),
+    }))
     const label = fold > 0 ? formatWords(this, 'expandLabel', { count: fold }) : ''
     crumbs.forEach((crumb, index) => {
       whenHydrated(crumb, () => {
         crumb.implied = !marked && this.items.length === 0 && index === crumbs.length - 1
         crumb.folded = index > 0 && index <= fold
         crumb.fold = index === 0 ? fold : 0
+        crumb.foldCrumbs = index === 0 ? folded : []
         crumb.foldLabel = index === 0 ? label : ''
-        crumb.onFold = index === 0 && fold > 0 ? this.unfold : undefined
         crumb.mark = this.separator ?? 'chevron'
       })
     })
@@ -236,7 +233,6 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
 
   /** New crumbs fold again, as a new `items` does. */
   private readonly handleSlotChange = (): void => {
-    this.expanded = false
     this.markLast()
   }
 
@@ -251,43 +247,28 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     const crumb = this.tag('breadcrumb')
     const last = this.items.length - 1
     const folded = this.folded
-    /* The first crumb, then the fold, then the rest from past what it holds. */
+    const label = folded > 0 ? formatWords(this, 'expandLabel', { count: folded }) : ''
+    /* The first crumb, which draws the fold, then the rest from past what it holds. */
     const shown = this.items
       .map((item, index) => ({ index, item }))
       .filter(({ index }) => folded === 0 || index === 0 || index > folded)
-    const fold =
-      folded === 0
-        ? nothing
-        : html`<${crumb}
-            part="crumb crumb-collapsed"
-            exportparts="expand: crumb-expand, fold-separator: crumb-fold-separator, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
-            .mark=${this.separator ?? 'chevron'}
-            ><button
-              part="expand"
-              type="button"
-              aria-label=${formatWords(this, 'expandLabel', { count: folded })}
-              @click=${this.expand}
-            >
-              …
-            </button></${crumb}
-          >`
-    const first = shown.slice(0, 1)
-    const rest = shown.slice(1)
+    const crumbs = this.items
+      .slice(1, 1 + folded)
+      .map((item) => ({ href: item.href ?? '', label: item.label }))
     const draw = ({ index, item }: { index: number; item: BreadcrumbItem }) => html`<${crumb}
         part="crumb${index === last ? ' crumb-current' : ''}"
-        exportparts="expand: crumb-expand, fold-separator: crumb-fold-separator, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
+        exportparts="expand: crumb-expand, expand-button: crumb-expand-button, expand-live: crumb-expand-live, expand-mark: crumb-expand-mark, expand-spinner: crumb-expand-spinner, expand-text: crumb-expand-text, fold: crumb-fold, fold-back: crumb-fold-back, fold-back-mark: crumb-fold-back-mark, fold-empty: crumb-fold-empty, fold-header: crumb-fold-header, fold-item: crumb-fold-item, fold-item-end: crumb-fold-item-end, fold-item-item: crumb-fold-item-item, fold-item-mark: crumb-fold-item-mark, fold-item-shortcut: crumb-fold-item-shortcut, fold-item-shortcut-kbd: crumb-fold-item-shortcut-kbd, fold-item-shortcut-key: crumb-fold-item-shortcut-key, fold-item-shortcut-separator: crumb-fold-item-shortcut-separator, fold-item-start: crumb-fold-item-start, fold-item-surface: crumb-fold-item-surface, fold-live: crumb-fold-live, fold-loading: crumb-fold-loading, fold-search-field: crumb-fold-search-field, fold-separator: crumb-fold-separator, fold-separator-mark: crumb-fold-separator-mark, fold-surface: crumb-fold-surface, fold-title: crumb-fold-title, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
         href=${index === last ? nothing : (item.href ?? nothing)}
         rel=${item.rel ?? nothing}
         target=${item.target ?? nothing}
         ?current=${index === last}
+        .fold=${index === 0 ? folded : 0}
+        .foldCrumbs=${index === 0 ? crumbs : []}
+        .foldLabel=${index === 0 ? label : ''}
         .mark=${this.separator ?? 'chevron'}
         >${item.label}</${crumb}
       >`
-    return html`${repeat(first, ({ index }) => index, draw)}${fold}${repeat(
-      rest,
-      ({ index }) => index,
-      draw,
-    )}`
+    return html`${repeat(shown, ({ index }) => index, draw)}`
   }
 
   protected override render(): TemplateResult {

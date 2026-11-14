@@ -25,6 +25,9 @@
  * - **Did React find the markup it rendered?** A Kbd's `for`, a feed's count and
  *   a listbox's highlight write nothing React reports, and a Kbd's chord still
  *   arrives. `helix-splitter` takes a camelCase prop in both orders.
+ * - **Did the data arrive?** An Object Inspector's `value` and a Virtual List's
+ *   `items` are properties alone, and each is drawn on the hydrated page. A
+ *   Virtual List's `value` is the words React wrote.
  *
  * Both builds, production and development, since only a development build
  * carries the error `auditReactMissing` prints. Both orders: definitions
@@ -185,11 +188,28 @@ const measure = async (browser, origin, order) => {
     shortcut: document.getElementById('search').getAttribute('aria-keyshortcuts'),
   }))
 
+  /* The data families that take a property: whether it arrived on a page a
+     server rendered, and whether what it holds is drawn. */
+  const data = await page.evaluate(() => {
+    const words = (node) =>
+      [node, ...node.querySelectorAll('*')]
+        .flatMap((one) => [one.shadowRoot?.textContent ?? '', one.textContent])
+        .join(' ')
+    const inspector = document.getElementById('inspector')
+    const people = document.getElementById('people')
+    return {
+      inspector: inspector.value?.id === 'dpl_8f2c' && words(inspector).includes('dpl_8f2c'),
+      items: people.items?.length === 3 && words(people).includes('Grace'),
+      value: people.value,
+    }
+  })
+
   await context.close()
   const helix = errors.filter((one) => /Helix|helix-/.test(one))
   const mismatches = errors.filter((one) => /hydrat|did(?:n't| not) match/i.test(one))
   return {
     afterCommit: presses,
+    data,
     errors,
     first: first === 1,
     mismatches,
@@ -200,6 +220,9 @@ const measure = async (browser, origin, order) => {
     works:
       first === 1 &&
       property &&
+      data.inspector &&
+      data.items &&
+      data.value === 'p2' &&
       presses.every((one) => one === 1) &&
       helix.length === 0 &&
       mismatches.length === 0 &&
@@ -296,7 +319,7 @@ for (const [spec, runs] of rows) {
   const notes = broken.map((one) =>
     one.error !== undefined
       ? `could not run: ${cell(one.error)}`
-      : `${one.mode}, ${one.order}: first press ${yes(one.first)}, array ${yes(one.property)}, calls after commits ${one.afterCommit.join(' and ')}, splitter at ${one.written.position}, chord ${one.written.shortcut}${one.errors.length > 0 ? `, errors: ${one.errors.map(cell).join(' / ')}` : ''}`,
+      : `${one.mode}, ${one.order}: first press ${yes(one.first)}, array ${yes(one.property)}, calls after commits ${one.afterCommit.join(' and ')}, inspector ${yes(one.data.inspector)}, list ${yes(one.data.items)} holding ${one.data.value}, splitter at ${one.written.position}, chord ${one.written.shortcut}${one.errors.length > 0 ? `, errors: ${one.errors.map(cell).join(' / ')}` : ''}`,
   )
   lines.push(
     `| ${version} (\`${spec}\`) | ${yes(supported)} | ${yes(needed)} | ${yes(broken.length === 0)} | ${notes.join('<br>')} |`,

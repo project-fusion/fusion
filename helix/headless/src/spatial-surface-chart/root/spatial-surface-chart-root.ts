@@ -28,34 +28,24 @@ import {
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
+  contoursIn,
+  type SurfaceField,
+  surfaceOf,
+  surfacePicture,
+} from '@fusion.dev/helix-core/spatial'
+import {
   type BoxPoint,
   boundsOf,
   boxView,
   DragTurn,
   drawBox,
-  inBox,
   nearestTo,
   type Placed,
   PlotRoomWatch,
   SPATIAL_VIEW,
-  shape,
   turned,
   wordsFitted,
 } from '../../spatial-scatter-chart/view.js'
-import { levelOf, type SurfaceField, surfaceOf } from '../grid.js'
-
-/**
- * Where the light comes from, in the box: from the left, above, and a little
- * in front, so a slope facing the upper left of the page reads lightest.
- */
-const LIGHT: BoxPoint = (() => {
-  const [x, y, z] = [-0.45, 1, 0.35]
-  const length = Math.hypot(x, y, z)
-  return [x / length, y / length, z / length]
-})()
-
-/** How much a face turned fully from the light is darkened, as a share of lightness. */
-const SHADE = 0.3
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -485,51 +475,8 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     const view = wordsFitted(this.plotRoom.room, (words) =>
       boxView(field.axes, this.camera, [], this.noBox, words, wordsLocale(this)),
     )
-    const depths = field.depths.length
-    const boxed = field.cells.map((cell): BoxPoint | undefined =>
-      cell.value === undefined
-        ? undefined
-        : [
-            inBox(field.axes.x, cell.x),
-            inBox(field.axes.y, cell.value),
-            inBox(field.axes.z, cell.z),
-          ],
-    )
-    const places = boxed.flatMap((box, index) => (box ? [{ index, ...view.on(box) }] : []))
+    const { faces, places } = surfacePicture(field, view)
     this.placed = places
-    const faces: Array<{
-      corners: number[]
-      depth: number
-      level: number
-      points: BoxPoint[]
-      shade: number
-      square: number
-    }> = []
-    for (let across = 0; across + 1 < field.acrosses.length; across++) {
-      for (let depth = 0; depth + 1 < depths; depth++) {
-        const here = across * depths + depth
-        const corners = [here, here + depths, here + depths + 1, here + 1].filter(
-          (index) => boxed[index] !== undefined,
-        )
-        if (corners.length < 3) {
-          continue
-        }
-        const points = corners.map((index) => boxed[index] as BoxPoint)
-        faces.push({
-          corners,
-          depth: points.reduce((sum, point) => sum + view.depth(point), 0) / points.length,
-          level:
-            corners.reduce(
-              (sum, index) => sum + (levelOf(field, field.cells[index] as never) ?? 0),
-              0,
-            ) / corners.length,
-          points,
-          shade: shadeOf(points),
-          square: here,
-        })
-      }
-    }
-    faces.sort((one, other) => one.depth - other.depth)
     const active = places.find((place) => place.index === at)
     const row = field.cells[at]?.row
     const bounds = this.drag.frame(
@@ -551,7 +498,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerup=${this.onDrawingTap}
       >${this.noBox ? nothing : drawBox(view)}${faces.map(
         (face) =>
-          svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>${this.contours ? this.renderContoursIn(field, face.square, view.on) : nothing}`,
+          svg`<path d=${face.d} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>${this.contours ? this.renderContoursIn(field, face.square, view.on) : nothing}`,
       )}${
         active
           ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(row)}</foreignObject>`
@@ -570,28 +517,11 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     square: number,
     on: (point: BoxPoint) => { x: number; y: number },
   ): SVGTemplateResult[] {
-    const { highest, lowest } = field
     const short = (value: number): number => Math.round(value * 1000) / 1000
-    return field.contours.flatMap((contour) => {
-      const pieces = contour.segments.filter((_, at) => contour.squares[at] === square)
-      if (pieces.length === 0) {
-        return []
-      }
-      const height = inBox(field.axes.y, contour.level)
-      const d = pieces
-        .map(([from, to]) => {
-          const [a, b] = [
-            on([inBox(field.axes.x, from[0]), height, inBox(field.axes.z, from[1])]),
-            on([inBox(field.axes.x, to[0]), height, inBox(field.axes.z, to[1])]),
-          ]
-          return `M${short(a.x)} ${short(a.y)}L${short(b.x)} ${short(b.y)}`
-        })
-        .join('')
-      const level = highest === lowest ? 0.5 : (contour.level - lowest) / (highest - lowest)
-      return [
-        svg`<path d=${d} part="contour" style="--spatial-surface-chart-level: ${short(level)}"></path>`,
-      ]
-    })
+    return contoursIn(field, square, on).map(
+      (contour) =>
+        svg`<path d=${contour.d} part="contour" style="--spatial-surface-chart-level: ${short(contour.level)}"></path>`,
+    )
   }
 
   /** The readout: the reading at the place in words, once the keys have moved to one. */
@@ -674,29 +604,6 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     })
     return html`<p id="helix-chart-summary" part="summary">${said}</p>`
   }
-}
-
-/**
- * How far a face turns from the light, as a share of lightness to take from
- * its color: none for a face toward the light, and `SHADE` for one turned
- * fully away. Its upward side counts, so a face seen from below is shaded as
- * the same slope seen from above.
- */
-const shadeOf = (points: readonly BoxPoint[]): number => {
-  const [a, b, c] = points as [BoxPoint, BoxPoint, BoxPoint]
-  const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]]
-  const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]]
-  let n = [
-    (u[1] as number) * (v[2] as number) - (u[2] as number) * (v[1] as number),
-    (u[2] as number) * (v[0] as number) - (u[0] as number) * (v[2] as number),
-    (u[0] as number) * (v[1] as number) - (u[1] as number) * (v[0] as number),
-  ] as [number, number, number]
-  if (n[1] < 0) {
-    n = [-n[0], -n[1], -n[2]]
-  }
-  const length = Math.hypot(...n) || 1
-  const lit = (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]) / length
-  return Math.min(SHADE, Math.max(0, (1 - lit) * SHADE))
 }
 
 declare global {

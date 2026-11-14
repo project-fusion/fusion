@@ -3,29 +3,17 @@ import {
   DelayController,
   HelixElement,
   hostAria,
+  initialsOf,
   internalsOf,
   timeConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
-/** Initials for a name: first letter of the first and last words. */
-export const initialsOf = (name: string): string => {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  if (words.length === 0) {
-    return ''
-  }
-  /* By code point, not by code unit.
-   *
-   * `word[0]` indexes UTF-16, so a name beginning with anything outside the
-   * basic plane, an emoji or most of the world's less common scripts, yields a
-   * lone surrogate and the avatar paints U+FFFD. Spreading a string iterates
-   * code points, which is what a first letter means. */
-  const initial = (word: string | undefined): string => [...(word ?? '')][0] ?? ''
-  const first = initial(words[0])
-  const last = words.length > 1 ? initial(words[words.length - 1]) : ''
-  return (first + last).toUpperCase()
-}
+/* Core's, which a phone's Avatar reads its initials from too. `word[0]`
+   indexes UTF-16, so core spreads by code point, which keeps a name that
+   starts outside the basic plane whole. */
+export { initialsOf }
 
 /**
  * @summary A person or entity, shown as an image or as their initials.
@@ -68,6 +56,7 @@ export const initialsOf = (name: string): string => {
  * @cssstate error - The picture failed, or there is none, and the initials show.
  * @cssstate loaded - The picture arrived.
  * @cssstate loading - The picture is on its way.
+ * @cssstate waiting - `fallback-delay` still holds the initials back while the picture is on its way.
  */
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
@@ -240,6 +229,8 @@ export class HelixHeadlessAvatar extends HelixElement {
     if (changed.has('src') || changed.has('fallbackDelay')) {
       this.startWait()
     }
+    /* While `fallback-delay` runs, as a phone's delay machine says it. */
+    this.toggleState('waiting', this.wait.pending)
     /* The mirror, written here rather than reflected, the way `Image` writes
        it: `loading` is the resting state and writes nothing.
 

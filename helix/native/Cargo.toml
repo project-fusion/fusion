@@ -1,0 +1,39 @@
+[package]
+name = "fusion-helix-native"
+description = "Helix's theme engine as a native library for React Native, reached through UniFFI."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`: a version is a fact about a domain and this
+# workspace holds two. A crate that inherits one fails the build.
+version = "0.0.0-dev"
+
+# One package, two source trees, as in `helix/theme`: `src/` is TypeScript.
+[lib]
+path = "rust/lib.rs"
+# `staticlib` goes into the iOS XCFramework, `cdylib` is the `.so` Android
+# loads and what the bindings are generated from, and `rlib` is what
+# `cargo test` links the tests against.
+crate-type = ["cdylib", "rlib", "staticlib"]
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "rust/bindgen.rs"
+required-features = ["bindgen"]
+
+[features]
+# The bindings generator, for the build script only. Off by default, so a
+# library built for a phone carries none of it.
+bindgen = ["uniffi/cli", "uniffi/cargo-metadata"]
+
+[dependencies]
+fusion-helix-theme = { workspace = true, features = ["json"] }
+thiserror.workspace = true
+uniffi = { version = "0.32.2", default-features = false }
+
+[dev-dependencies]
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+
+[lints]
+workspace = true

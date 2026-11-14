@@ -1,10 +1,13 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
       <helix-button
-        command="--show"
-        commandfor="panel"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="primary"
       >
         Open drawer
@@ -12,8 +15,9 @@ export function Example() {
 
       <helix-drawer
         dismissible
-        id="panel"
         label="Project details"
+        onClose={() => setOpen(false)}
+        open={open}
         placement="end"
       >
         <span slot="header">Project details</span>
@@ -26,9 +30,8 @@ export function Example() {
             See who owns the project, who can edit it, and when it last changed.
           </helix-text>
           <helix-button
-            command="--close"
-            commandfor="panel"
             emphasis="solid"
+            onClick={() => setOpen(false)}
             tone="primary"
           >
             Close

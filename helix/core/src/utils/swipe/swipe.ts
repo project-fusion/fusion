@@ -116,3 +116,5 @@ export const swipeStep = (dx: number, vx: number, width: number, rtl: boolean): 
   }
   return 0
 }
+
+export * from './hand-off.js'

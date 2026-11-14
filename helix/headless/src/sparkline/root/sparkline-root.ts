@@ -3,21 +3,21 @@ import {
   ChartPointerController,
   type Curve,
   customElement,
-  extent,
-  extremesOf,
   formatNumbers,
   formatWords,
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
-  linear,
-  linePath,
   MIRROR_RULE,
+  overviewWords,
   PLOT_WIDTH,
-  type Point,
+  type Placed,
+  readingWords,
   type Series,
   SourceController,
-  unbroken,
+  STRIP_HEIGHT,
+  sparklineMarks,
+  sparklinePlot,
   words,
   wordsLocale,
   writtenList,
@@ -25,16 +25,6 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { areaPath, overviewWords, readingWords, slotsOf } from '../readings.js'
-
-/**
- * How tall the strip is drawn, which is the one coordinate this family states.
- *
- * A sparkline is a line beside a number rather than a plot, so it is the one
- * drawing here that is not square: the width is `PLOT_WIDTH` like every other
- * chart's, and this is 32 against that 100.
- */
-const STRIP_HEIGHT = 32
 
 /**
  * @summary A small chart with no axes that shows the shape of a series beside its number.
@@ -456,85 +446,13 @@ export class HelixHeadlessSparkline extends HelixElement {
 
   protected override render(): TemplateResult {
     const { count, series } = this.drawn()
-    const slots = slotsOf(series.points, count)
-    const points = slots.filter((value): value is number => value !== undefined)
     const band = this.band
-    /* Two points minimum, because one is not a trend and zero is not a line.
-       An `<svg>` given a `d` of `M NaN,NaN` draws nothing and reports nothing,
-       so the empty case is stated here rather than left to look like a bug. */
-    const x = linear([0, Math.max(count - 1, 1)], [0, PLOT_WIDTH])
-    /* **A bar measures from zero and a line measures from its own range**, and
-       that is a correctness difference rather than a preference. A bar's
-       *length* is the value, so a baseline anywhere but zero makes the lengths
-       proportional to nothing. Drawn over the data's extent, the smallest
-       reading lands exactly on the floor and its column has no height at all:
-       seven readings between 1,102 and 1,408 come out as six columns and a gap,
-       which looks like missing data and is really a scale saying the minimum is
-       nothing.
-
-       The zero is included at both ends, so a series that goes negative gets a
-       baseline inside the box and its columns hang below it. */
-    const [low, high] = extent(points.length > 0 ? [...points, ...(band ?? [])] : [0])
-    const y =
-      this.plot === 'bar'
-        ? linear([Math.min(0, low), Math.max(0, high)], [STRIP_HEIGHT, 0])
-        : linear([low, high], [STRIP_HEIGHT, 0])
-    /* One path per unbroken run, so a blank reading is a gap in the line. A series with no blank is one run, and draws what it did. */
-    const runs =
-      this.plot === 'bar'
-        ? []
-        : unbroken(series)
-            .map((run) => run.map((point): Point => [x(point.at), y(point.value)]))
-            .map((run) => ({ path: linePath(run, this.curve ?? 'smooth'), run }))
-            .filter((one) => one.path !== '')
-    const path = runs.map((one) => one.path).join('')
-
-    /* The same line closed down to the floor of its own range, which is where
-       the wash goes. Its own path rather than a fill on the line, because a
-       closed path strokes its closing edges too: filling the line itself would
-       draw a rule along the bottom of the box and up both sides.
-
-       The floor is the smallest reading and not a true zero, because the scale
-       runs over the data's own extent. */
-    /* Asked negatively, because absent *is* an area here and the class doc
-       above says why. This is the one property in the family where the resting
-       arrangement is not the plainest thing, so the test has to answer true for
-       the value nobody set, and `=== 'area'` would answer false. */
-    const area =
-      this.plot !== 'bar' && this.plot !== 'line' && path !== '' ? areaPath(runs, STRIP_HEIGHT) : ''
-
-    /* One column per reading, inset so neighbors do not touch.
-     *
-     * A rect rather than a thick stroked line, because a bar has two ends and a
-     * stroke has a cap: `stroke-linecap` would round or square both ends of
-     * every column together, and the floor end should always be flat.
-     *
-     * The width is a share of the slot rather than a fixed number, so a series
-     * of seven and a series of forty both fill the box. Fourteen percent of the
-     * gap is the smallest separation that still reads as separate columns at
-     * the sizes a sparkline is drawn at, and it comes off the slot rather than
-     * off the bar so a two-reading series does not get two enormous slabs. */
-    const slot = PLOT_WIDTH / Math.max(count, 1)
-    const floor = y(0)
-    const bars =
-      this.plot === 'bar'
-        ? slots.flatMap((value, index) =>
-            value === undefined
-              ? []
-              : [
-                  {
-                    /* From the baseline to the reading, whichever of the two is
-               higher up the box. A reading of exactly zero is a column of no
-               height, which paints nothing, and that is the honest drawing of
-               nothing rather than a hairline implying something. */
-                    height: Math.abs(floor - y(value)),
-                    width: slot * 0.72,
-                    x: index * slot + slot * 0.14,
-                    y: Math.min(floor, y(value)),
-                  },
-                ],
-          )
-        : []
+    /* Core draws it, as a phone does: the line, its wash, the columns, the
+       band, and where each mark stands. Two points minimum make a line. */
+    const drawing = sparklinePlot({ band, count, curve: this.curve, plot: this.plot, series })
+    const { area, bars, slots } = drawing
+    const path = drawing.line
+    const points = slots.filter((value): value is number => value !== undefined)
 
     /* Where the series ended, as percentages of the box.
      *
@@ -545,22 +463,14 @@ export class HelixHeadlessSparkline extends HelixElement {
      * they inherit down and never sideways, the two elements are siblings, and
      * the host cannot be styled from a template without a wrapper element that
      * carries nothing else. */
-    const lastAt = slots.findLastIndex((value) => value !== undefined)
     const end =
-      points.length < 2
+      drawing.terminus === undefined
         ? undefined
-        : `--chart-terminus-x: ${(x(lastAt) / PLOT_WIDTH) * 100}%; --chart-terminus-y: ${
-            (y(slots[lastAt] as number) / STRIP_HEIGHT) * 100
-          }%`
+        : `--chart-terminus-x: ${drawing.terminus.x}%; --chart-terminus-y: ${drawing.terminus.y}%`
     /* Where a reading stands in the box, as percentages from the inline start
        and the top: on the line for a line, and on the top of its column for a
        bar. */
-    const at = (index: number, value: number): string => {
-      const across = this.plot === 'bar' ? index * slot + slot / 2 : x(index)
-      return `inset-inline-start: ${(across / PLOT_WIDTH) * 100}%; inset-block-start: ${
-        (y(value) / STRIP_HEIGHT) * 100
-      }%`
-    }
+    const at = (index: number, value: number): string => placed(drawing.place(index, value))
     const name = this.named
     const named = name !== ''
     const overview = named
@@ -603,14 +513,14 @@ export class HelixHeadlessSparkline extends HelixElement {
           </defs>`
         }
         ${
-          band === undefined
+          drawing.band === undefined
             ? nothing
             : svg`<rect
-                height=${Math.abs(y(band[0]) - y(band[1]))}
+                height=${drawing.band.height}
                 part="range"
                 width=${PLOT_WIDTH}
                 x="0"
-                y=${Math.min(y(band[0]), y(band[1]))}
+                y=${drawing.band.y}
               />`
         }
         ${
@@ -657,7 +567,7 @@ export class HelixHeadlessSparkline extends HelixElement {
         points.length < 2 || this.plot === 'bar'
           ? nothing
           : html`<span aria-hidden="true" part="terminus" style=${end ?? nothing}></span>`
-      }${this.renderLone(points.length < 2 ? undefined : series, at)}${this.renderMarks(slots, at)}${this.renderReading(slots, at)}${
+      }${this.renderLone(drawing.lone)}${this.renderMarks(sparklineMarks(drawing, writtenList(this.marks)))}${this.renderReading(slots, at)}${
         named && count > 0 ? this.renderLive(slots) : nothing
       }${
         overview === ''
@@ -689,38 +599,27 @@ export class HelixHeadlessSparkline extends HelixElement {
    * reach, so a line and an area show it as `LineChart` does. Not on a bar
    * plot, whose column already shows it.
    */
-  protected renderLone(
-    series: Series | undefined,
-    at: (index: number, value: number) => string,
-  ): TemplateResult | typeof nothing {
-    if (!series || this.plot === 'bar') {
-      return nothing
-    }
-    const alone = unbroken(series).filter((run) => run.length === 1)
+  protected renderLone(alone: readonly Placed[]): TemplateResult | typeof nothing {
     return alone.length === 0
       ? nothing
       : html`${alone.map(
-          ([point]) =>
-            html`<span aria-hidden="true" part="lone" style=${at(point?.at ?? 0, point?.value ?? 0)}></span>`,
+          (place) => html`<span aria-hidden="true" part="lone" style=${placed(place)}></span>`,
         )}`
   }
 
   /** The marks `marks` asks for, on the highest and the lowest reading. */
-  protected renderMarks(
-    slots: (number | undefined)[],
-    at: (index: number, value: number) => string,
-  ): TemplateResult | typeof nothing {
-    const asked = writtenList(this.marks)
-    if (asked.length === 0) {
+  protected renderMarks(found: {
+    readonly high?: Placed
+    readonly low?: Placed
+  }): TemplateResult | typeof nothing {
+    const { high, low } = found
+    if (high === undefined && low === undefined) {
       return nothing
     }
-    const found = extremesOf(slots)
-    const place = (index: number | undefined, name: 'high' | 'low'): string | undefined =>
-      asked.includes(name) && index !== undefined ? at(index, slots[index] as number) : undefined
-    const high = place(found.high, 'high')
-    const low = place(found.low, 'low')
-    return html`${high === undefined ? nothing : html`<span aria-hidden="true" part="high" style=${high}></span>`}${
-      low === undefined ? nothing : html`<span aria-hidden="true" part="low" style=${low}></span>`
+    return html`${high === undefined ? nothing : html`<span aria-hidden="true" part="high" style=${placed(high)}></span>`}${
+      low === undefined
+        ? nothing
+        : html`<span aria-hidden="true" part="low" style=${placed(low)}></span>`
     }`
   }
 
@@ -729,7 +628,7 @@ export class HelixHeadlessSparkline extends HelixElement {
    * beside it. Hidden from a screen reader, which hears the `live` part.
    */
   protected renderReading(
-    slots: (number | undefined)[],
+    slots: readonly (number | undefined)[],
     at: (index: number, value: number) => string,
   ): TemplateResult | typeof nothing {
     const index = this.pointer.at
@@ -750,7 +649,7 @@ export class HelixHeadlessSparkline extends HelixElement {
    * with where it stands. Rendered from the first drawing and empty until a
    * key moves the reading, so it is heard when its words change.
    */
-  protected renderLive(slots: (number | undefined)[]): TemplateResult {
+  protected renderLive(slots: readonly (number | undefined)[]): TemplateResult {
     const index = this.pointer.at
     const said = this.pointer.keyed && index >= 0 ? this.reading(index, slots[index]) : undefined
     return html`<span aria-live="polite" part="live" role="status"
@@ -758,6 +657,10 @@ export class HelixHeadlessSparkline extends HelixElement {
     >`
   }
 }
+
+/** A mark's place as the inline style it is written in. */
+const placed = (place: Placed): string =>
+  `inset-inline-start: ${place.x}%; inset-block-start: ${place.y}%`
 
 declare global {
   interface HTMLElementTagNameMap {

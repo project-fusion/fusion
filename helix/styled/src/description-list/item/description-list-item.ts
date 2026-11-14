@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDescriptionListItem } from '@fusion.dev/helix-headless/description-list'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './description-list-item.css.js'
+import { styles } from './description-list-item.generated.css.js'
 
 /**
  * @summary One label and its value.

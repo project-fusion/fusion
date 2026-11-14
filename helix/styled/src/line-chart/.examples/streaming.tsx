@@ -23,7 +23,7 @@ export function Example() {
     at.current = WINDOW
     setRows(window_(WINDOW))
     /* With reduced motion on, the chart shows one full window and stops. */
-    if (globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       return
     }
     timer.current = setInterval(() => {

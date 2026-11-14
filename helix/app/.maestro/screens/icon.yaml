@@ -1,0 +1,22 @@
+# Icon, each example drawn alone: icons and a labeled one, then turned,
+# flipped, and spinning icons. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+#
+# The turned icons carry no words, so the flow waits for the title of their
+# screen.
+appId: dev.fusion.helix.app
+name: "Screens: Icon"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://icon/preview/preview
+- extendedWaitUntil:
+    visible: '.*Warning.*'
+    timeout: 30000
+- takeScreenshot: icon-preview-${MODE}-${SIZE}
+- openLink: helix://icon/turned/preview
+- extendedWaitUntil:
+    visible: 'Turned'
+    timeout: 15000
+- takeScreenshot: icon-turned-${MODE}-${SIZE}

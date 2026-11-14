@@ -2,11 +2,10 @@ import './constellation.css'
 
 export function Example() {
   return (
-    <div className="stage">
-      <helix-aura
-        interactive
-        pattern="constellation"
-      ></helix-aura>
-    </div>
+    <helix-aura
+      interactive
+      pattern="constellation"
+      style={{ blockSize: '20rem' }}
+    ></helix-aura>
   )
 }

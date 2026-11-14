@@ -1,0 +1,58 @@
+# Accordion: a press on a closed section opens it and shows its words, a
+# press under `single` on another section closes the open one, and the
+# events example lists what each press sent. Recorded.
+#
+# Closed words stay drawn and out of a screen reader's reach, so Maestro,
+# which reads the accessibility tree, does not see them until the section
+# opens.
+appId: dev.fusion.helix.app
+name: Accordion
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://accordion/preview/preview
+      SHOWS: .*Shipping.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: accordion
+- assertNotVisible: .*return an item within 30 days.*
+- tapOn: .*Returns.*
+- assertVisible: .*return an item within 30 days.*
+- takeScreenshot: accordion-preview-returns
+- openLink: helix://accordion/single/preview
+# The screen before it draws the same words and stays in the tree through the
+# move, so a step waits for the new screen's title and the move's end.
+- extendedWaitUntil:
+    visible: Single
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
+- extendedWaitUntil:
+    visible: .*Orders ship within two business days.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: .*Returns.*
+- assertVisible: .*return an item within 30 days.*
+- assertNotVisible: .*Orders ship within two business days.*
+- takeScreenshot: accordion-single-returns
+- openLink: helix://accordion/events/preview
+- extendedWaitUntil:
+    visible: .*No events yet.*
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: .*Deployment.*
+- assertVisible: .*Deployment is about to open.*
+- tapOn: .*Deployment.*
+- assertVisible: .*Deployment is about to close.*
+- takeScreenshot: accordion-events
+- stopRecording

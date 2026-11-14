@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './log-root.css.js'
+import { styles } from './log-root.generated.css.js'
 import '../group/log-group.js'
 import '../line/log-line.js'
 

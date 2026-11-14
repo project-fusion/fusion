@@ -1,0 +1,22 @@
+{
+  // The runtime, its Jest specs, and the components `helix system components`
+  // writes for them into `src/families`: React Native's types and JSX, and no
+  // DOM. The one spec Bun runs needs Bun's types, which a React Native module
+  // must not lean on, so `tsconfig.pure.json` checks it.
+  //
+  // **The package's own name resolves to its source**, as Jest's
+  // `moduleNameMapper` resolves it, because the components written for the
+  // specs import the runtime by name, as the ones `@fusion.dev/helix` ships do.
+  "compilerOptions": {
+    "customConditions": ["react-native"],
+    "jsx": "react-jsx",
+    "lib": ["ES2023"],
+    "paths": {
+      "@fusion.dev/helix-native": ["./src/index.ts"]
+    },
+    "types": []
+  },
+  "exclude": ["src/**/*.spec.ts"],
+  "extends": "../../tsconfig.package.json",
+  "include": ["src/**/*"]
+}

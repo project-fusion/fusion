@@ -32,7 +32,7 @@ export function Example() {
           value={step.value}
         >
           {step.label}
-          <span slot="description">{step.description}</span>
+          <helix-text slot="description">{step.description}</helix-text>
         </helix-list-item>
       ))}
     </helix-list>

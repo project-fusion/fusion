@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMotionToggle } from '@fusion.dev/helix-headless/motion-toggle'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './motion-toggle-root.css.js'
+import { styles } from './motion-toggle-root.generated.css.js'
 
 /**
  * @summary A button that pauses every motion on the page that starts by itself, and lets it run again.

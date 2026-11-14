@@ -21,6 +21,8 @@ Or take the pieces, in the order of the first four rows:
 | `elements.css` | hides each Helix element until its definition loads |
 | `helix.css` | the four files above, in that order |
 | `tokens.json` | the same token names for a build step that needs them |
+| `helix.tokens.json` | the tokens as a W3C Design Tokens Format Module 2025.10 file, in light mode at the default density, for a design tool or a token translator |
+| `helix.resolver.json` | the Design Tokens resolver that adds dark mode and the `sm` and `lg` densities to `helix.tokens.json` |
 
 The tokens are the contract every Helix component reads, so overriding one here
 moves every component that answers it.

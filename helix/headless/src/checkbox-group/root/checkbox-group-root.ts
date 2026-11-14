@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import { HelixHeadlessCheckbox } from '../../checkbox/root/checkbox-root.js'
 import '../../checkbox/index.js'
-import { type SetBox, selectAllPress, selectAllState } from '../select-all.js'
+import { type SetBox, selectAllPress, selectAllState } from '@fusion.dev/helix-core/select-all'
 
 /**
  * @summary A group of related checkboxes under one label, with one value for the set.

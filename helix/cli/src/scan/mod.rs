@@ -23,7 +23,7 @@
 mod analyze;
 mod config;
 mod css;
-mod files;
+pub(crate) mod files;
 mod fix;
 mod identity;
 mod installed;

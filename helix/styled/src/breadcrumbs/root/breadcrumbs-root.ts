@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBreadcrumbs } from '@fusion.dev/helix-headless/breadcrumbs'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './breadcrumbs-root.css.js'
+import { styles } from './breadcrumbs-root.generated.css.js'
 import '../breadcrumb/breadcrumb.js'
 
 /**
@@ -20,7 +20,6 @@ import '../breadcrumb/breadcrumb.js'
  *
  * @slot - The trail's items, in order from root to current page.
  *
- * @csspart expand - The button in the folded crumb that shows the whole trail.
  * @csspart list - The ordered list.
  *
  * @cssproperty --breadcrumbs-font-size - Size of the trail's text.

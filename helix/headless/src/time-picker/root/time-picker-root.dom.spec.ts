@@ -817,7 +817,9 @@ describe('a time picker in a page written in another language', () => {
 
 describe('a time picker’s states', () => {
   test('`blank` while no time is chosen', async () => {
-    const states = (host: Time) => internalsOf(host).states
+    const states = (host: Time) => ({
+      has: (name: string) => hasState(host as unknown as Element, name),
+    })
     const empty = await picker()
     expect(states(empty).has('blank')).toBe(true)
     const chosen = await picker('value="09:15"')
@@ -825,7 +827,9 @@ describe('a time picker’s states', () => {
   })
 
   test('`range-pending` while a range holds one time', async () => {
-    const states = (host: Time) => internalsOf(host).states
+    const states = (host: Time) => ({
+      has: (name: string) => hasState(host as unknown as Element, name),
+    })
     expect(states(await picker('mode="range" value="09:15"')).has('range-pending')).toBe(true)
     expect(states(await picker('mode="range" value="09:15,10:00"')).has('range-pending')).toBe(
       false,

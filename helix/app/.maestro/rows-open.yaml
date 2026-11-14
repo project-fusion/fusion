@@ -1,0 +1,16 @@
+# Opens the list of 1,000 rows and waits until it is drawn. The frame rate
+# counts from the next flow, `rows-scroll.yaml`, so drawing the rows is no
+# part of it. On Android, `scripts/devices.sh` resets the system's frame
+# count between the two.
+appId: dev.fusion.helix.app
+name: Open the rows
+---
+- stopApp
+- openLink: helix://rows
+- extendedWaitUntil:
+    visible: Row 1.*
+    timeout: 60000
+- extendedWaitUntil:
+    visible:
+      id: rows-frame-rate
+    timeout: 10000

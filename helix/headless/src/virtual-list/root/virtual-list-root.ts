@@ -24,14 +24,22 @@ import {
   Waterfall,
   words,
 } from '@fusion.dev/helix-core'
+import {
+  entryOf,
+  headOf,
+  itemsIn,
+  type Sections,
+  sectionAt,
+  sectionsOf,
+  skipDisabled,
+  stepIndex,
+} from '@fusion.dev/helix-core/virtual-list'
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { holdControls, releaseControls } from '../controls.js'
 import { HelixRangeChangeEvent } from '../events/index.js'
 import { fillHoles, keyOf, textsOf } from '../fill.js'
-import { skipDisabled, stepIndex } from '../keys.js'
 import { drawPlan, itemsOf, stopAfter } from '../plan.js'
-import { entryOf, headOf, itemsIn, type Sections, sectionAt, sectionsOf } from '../sections.js'
 
 /**
  * Draws one item into its row, for a list given `renderItem`.

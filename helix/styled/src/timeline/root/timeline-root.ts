@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTimeline } from '@fusion.dev/helix-headless/timeline'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './timeline-root.css.js'
+import { styles } from './timeline-root.generated.css.js'
 
 /**
  * @summary A list of events, in the order they happened.
@@ -23,6 +23,9 @@ import { styles } from './timeline-root.css.js'
  * - `orientation="horizontal"` runs the line across the top, with the entries
  *   side by side in the order they are read, and the time over what happened
  *   under each mark. Use it for a few entries, since they share the width.
+ *   An entry is never narrower than its longest word, so a timeline with no
+ *   room for its entries overflows. Put it in a Scroll Area with
+ *   `orientation="horizontal"` to scroll it sideways.
  *
  * An entry's custom properties, such as `--timeline-rail-color` and
  * `--timeline-marker-size`, inherit, so setting them on the timeline changes

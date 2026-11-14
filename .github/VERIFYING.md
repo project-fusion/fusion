@@ -275,6 +275,24 @@ path. On 35052888764 the gate waited on the longest browser shard with `warm`
 two minutes done. A share moved up now buys money with wall clock, and moved
 down buys wall clock with money.
 
+## The conformance comparison waits on two jobs
+
+The conformance suite holds a family's web element and its React Native
+component to one behavior, and
+[helix/testing](../helix/testing/README.md#conformance) describes it. Each half
+writes its record in the job that runs it, and no record is committed:
+
+- the specs shards, in Chromium and in WebKit, for the web, each shard writing
+  what its own families did
+- `tests`, for React Native
+
+Each uploads its file, and `conformance` downloads them all once both jobs
+are done and compares them. It is the one step that needs both, so it is a
+small job of its own: a checkout, the install, a cached build of
+`helix-testing`, and a comparison that takes under a second. It skips with the
+browser matrix, and it runs beside a failure in either job it needs, so a
+difference shows in the same run as an unrelated failure.
+
 ## A tree is verified once
 
 A pull request's run verifies the merge of its head into its base. Merged by

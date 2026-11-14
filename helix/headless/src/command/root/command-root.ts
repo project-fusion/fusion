@@ -164,6 +164,7 @@ const CONTROL = 'helix-control:'
  * @csspart controls - The group of controls on screen.
  * @csspart controls-items - What holds the group's controls.
  * @csspart controls-label - The group's heading.
+ * @csspart dialog - The dialog the palette opens in. Its box is `dialog-surface`.
  * @csspart dialog-body - The dialog's slot for its content, which holds the list. It draws no box until you give it one.
  * @csspart dialog-dismiss - The dialog's close control, drawn when the dialog is `dismissible`.
  * @csspart dialog-dismiss-mark - The glyph on the dialog's close control, where none is slotted.
@@ -863,7 +864,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   protected renderDialog(): TemplateResult {
     return html`<${this.tag('dialog')}
-    exportparts="body: dialog-body, dismiss: dialog-dismiss, dismiss-mark: dialog-dismiss-mark,
+      part="dialog"
+      exportparts="body: dialog-body, dismiss: dialog-dismiss, dismiss-mark: dialog-dismiss-mark,
       footer: dialog-footer, header: dialog-header, surface: dialog-surface"
       label=${this.label || this.fallbackLabel}
       .open=${this.open}
@@ -1002,9 +1004,10 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   }
 
   protected override render(): TemplateResult {
-    /* No part of its own on the host, and the dialog's own box forwarded in the
-       `dialog` role: `::part(dialog-surface)` then reaches the thing with the
-       shadow and the padding, rather than a host that is only a wrapper. `align`
+    /* The dialog's own box forwarded as `dialog-surface`, so `::part(dialog-surface)`
+       reaches the thing with the shadow and the padding, rather than the `dialog`
+       part, a host that is only a wrapper. The styled sheet reaches the box through
+       that part, as `[part="dialog"]::part(surface)`. `align`
        is not set here either, being a styled-tier property: where the panel sits
        is presentation, and this tier renders no CSS. */
     if (this.inline) {

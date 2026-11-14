@@ -1,0 +1,22 @@
+{
+  // Acme's sources, typed as a design system outside this repository types
+  // its own: each reaches the helpers through the entry points
+  // `@fusion.dev/helix-neutral` publishes, and its JSX through
+  // `@fusion.dev/helix-neutral/jsx-runtime`. `@fusion.dev/helix-neutral`'s
+  // `typecheck` runs it after that package's `build`.
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@fusion.dev/helix-neutral",
+    "lib": ["DOM", "ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": [],
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*"]
+}

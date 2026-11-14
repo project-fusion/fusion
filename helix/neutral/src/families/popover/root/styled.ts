@@ -1,0 +1,274 @@
+import { oneOf } from '../../../render.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
+import { styles } from '../../../table.js'
+import root from './headless.js'
+
+/**
+ * Popover's styled tier.
+ *
+ * **The panel is the floating surface**, with its edge, its shadow and the
+ * house radius, as wide as what it holds and never wider than the window
+ * less a margin. What it holds scrolls inside its `content`, with the inset
+ * there, so a focus ring at the content's edge stays inside the box that
+ * scrolls. `separation="plain"` takes the inset away. `glass` and `frosted`
+ * are the translucent grounds over the theme's blur, and the point takes
+ * the same fill.
+ *
+ * **It grows out of the side it opened on**, from a little smaller and a
+ * little toward its trigger, once it is placed, and out of the arrow where
+ * it has one. It arrives at once under reduced motion. The point draws the
+ * panel's edge on its two outer sides. Print leaves the popover out, and is
+ * the web's.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'popover',
+    hooks: {
+      arrowSize: '0.5rem',
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border-floating'),
+      borderWidth: token('border-floating'),
+      inlineSize: web('max-content'),
+      maxBlockSize: measured('floating-available-block-size', 'none'),
+      padding: null,
+      shadow: token('shadow-floating'),
+    },
+    own: {
+      popoverBorder: null,
+      popoverEdge: null,
+      popoverFrom: null,
+      popoverGround: null,
+      popoverMd: null,
+      popoverRaised: null,
+      popoverSurface: null,
+      popoverTravel: null,
+    },
+    props: { material: oneOf(['frosted', 'glass']), separation: oneOf(['plain']) },
+    stylesheet: 'popover/root/popover-root.generated.css',
+  },
+  ({ hook, on, own, rule, variants }) => {
+    const fast = token('duration-fast')
+    const width = hook.borderWidth
+    const ink = hook.borderColor
+    /* The panel's own fill, read off the host: inside the surface
+       `surface-overlay` is the step a nested list takes. */
+    const fill = own.popoverGround
+    const fade = token('duration-fade')
+    return [
+      /* No box of its own: the trigger is passed in and the panel is in the top
+         layer. The page's own rungs, read here for the panel to restate. */
+      on('host', [
+        rule({
+          own: {
+            popoverGround: hook.backgroundColor(token('color-surface-overlay')),
+            popoverRaised: token('color-surface-raised'),
+            popoverSurface: token('color-surface'),
+            popoverBorder: token('color-border'),
+            popoverMd: token('radii-md'),
+          },
+          display: 'contents',
+        }),
+        rule({ print: true }, { display: 'none' }),
+      ]),
+      /* The trigger's box on a phone, as wide as the trigger, which the panel is placed against. */
+      on('trigger', [native([rule({ inlineSize: 'fit-content' })])]),
+      /* **The rungs inside step off the panel in dark**, by 3%, 9% and 12% of
+         the ink, as Dialog's do, a line inside sits the step above the panel
+         that it sits above the page, and nothing inside is rounder than it. */
+      on('surface', [
+        rule({
+          '--_card-nest': 'initial',
+          '--helix-color-surface-overlay': scheme(
+            own.popoverGround,
+            mix(token('color-foreground'), 12, own.popoverGround),
+          ),
+          '--helix-color-surface-raised': scheme(
+            own.popoverRaised,
+            mix(token('color-foreground'), 9, own.popoverGround),
+          ),
+          '--helix-color-surface': scheme(
+            own.popoverSurface,
+            mix(token('color-foreground'), 3, own.popoverGround),
+          ),
+          '--helix-color-border': scheme(
+            own.popoverBorder,
+            mix(token('color-foreground'), 12, own.popoverGround),
+          ),
+          '--helix-radii-md': fn('min', own.popoverMd, token('radii-sm')),
+        }),
+      ]),
+      on('surface', [
+        rule({
+          overflow: 'visible',
+          backgroundColor: fill,
+          border: [width, 'solid', ink],
+          own: { popoverEdge: [width, 'solid', ink] },
+          borderRadius: token('radii-sm'),
+          boxShadow: hook.shadow,
+          boxSizing: 'border-box',
+          color: token('color-foreground'),
+          web: { inset: 'auto' },
+          margin: token('space-none'),
+          maxInlineSize: difference('100vw', token('space-lg')),
+          padding: token('space-none'),
+          inlineSize: hook.inlineSize,
+        }),
+      ]),
+      /* A closed popover is not drawn, as the UA's sheet has it, which the
+         rules above outrank. */
+      /* Written out: the vocabulary names no `:popover-open`. */
+      on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
+        web([rule({ display: 'none' })]),
+      ]),
+      /* It travels a little out of the edge it opened against. */
+      on('surface', [
+        rule({
+          own: { popoverTravel: product(token('space-2xs'), '-1'), popoverFrom: 0.96 },
+          opacity: 0,
+          transform: fn('translateY', own.popoverTravel),
+          scale: own.popoverFrom,
+          /* Leaving, a panel accelerates away. */
+          transition: list(
+            ['opacity', fast, token('easing-accelerate')],
+            ['scale', fast, token('easing-accelerate')],
+            ['transform', fast, token('easing-accelerate')],
+            ['display', fast, 'allow-discrete'],
+            ['overlay', fast, 'allow-discrete'],
+          ),
+        }),
+        /* Opening upward, it comes up from the trigger. */
+        rule({ placedTop: true }, { own: { popoverTravel: token('space-2xs') } }),
+        rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
+        /* Out of the near edge, and out of the arrow where there is one. */
+        rule(
+          { placedTop: true },
+          { transformOrigin: [measured('floating-arrow-x', '50%'), '100%'] },
+        ),
+        rule({ placedBottom: true }, { transformOrigin: [measured('floating-arrow-x', '50%'), 0] }),
+        rule(
+          { placedLeft: true },
+          { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
+        ),
+        rule({ placedRight: true }, { transformOrigin: [0, measured('floating-arrow-y', '50%')] }),
+        /* Under reduced motion it fades and does not move. */
+        rule(
+          { reducedMotion: true },
+          {
+            scale: 1,
+            transform: 'none',
+            transition: list(
+              ['opacity', fade, token('easing-standard')],
+              ['display', fade, 'allow-discrete'],
+              ['overlay', fade, 'allow-discrete'],
+            ),
+          },
+        ),
+      ]),
+      /* Written out: the small overshoot is an arrival's, on the open panel. */
+      on({ part: 'surface', selector: '[part="surface"]:popover-open' }, [
+        web([
+          rule({
+            transition: list(
+              ['opacity', fast, token('easing-standard')],
+              ['scale', fast, token('easing-emphasized')],
+              ['transform', fast, token('easing-emphasized')],
+              ['display', fast, 'allow-discrete'],
+              ['overlay', fast, 'allow-discrete'],
+            ),
+          }),
+          rule(
+            { reducedMotion: true },
+            {
+              transition: list(
+                ['opacity', fade, token('easing-standard')],
+                ['display', fade, 'allow-discrete'],
+                ['overlay', fade, 'allow-discrete'],
+              ),
+            },
+          ),
+        ]),
+      ]),
+      /* The scrolling happens in here, with the inset inside it. */
+      on('content', [
+        rule({
+          maxBlockSize: hook.maxBlockSize,
+          overflow: 'auto',
+          /* The inset Card takes, with the density. */
+          padding: hook.padding(token('space-control')),
+        }),
+        /* Glass opened inside the popover steps off it in dark. */
+        web([
+          rule({
+            '--helix-material-panel': fn(
+              'color-mix',
+              'in oklab',
+              [
+                token('color-surface-overlay'),
+                fn('min', '100%', product(token('material-glass-opacity'), '100%')),
+              ],
+              'transparent',
+            ),
+          }),
+        ]),
+        rule({ separation: 'plain' }, { padding: hook.padding(token('space-none')) }),
+      ]),
+      /* No ring on the panel itself, which takes focus only where it holds nothing that can. */
+      on('surface', [rule({ outline: 'none' })]),
+      /* The point, half outside the panel on the edge facing the trigger,
+         drawing the panel's edge on the two sides turned outward. */
+      on('arrow', [
+        rule({
+          backgroundColor: fill,
+          blockSize: hook.arrowSize,
+          inlineSize: hook.arrowSize,
+          position: 'absolute',
+          rotate: '45deg',
+        }),
+        /* Physical sides, as a placement is, in either direction. */
+        rule({ dir: 'ltr', placedBottom: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ dir: 'rtl', placedBottom: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ placedBottom: true }, { borderBlockStart: own.popoverEdge }),
+        rule({ dir: 'ltr', placedTop: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ dir: 'rtl', placedTop: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ placedTop: true }, { borderBlockEnd: own.popoverEdge }),
+        rule({ dir: 'ltr', placedRight: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ dir: 'rtl', placedRight: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ placedRight: true }, { borderBlockEnd: own.popoverEdge }),
+        rule({ dir: 'ltr', placedLeft: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ dir: 'rtl', placedLeft: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ placedLeft: true }, { borderBlockStart: own.popoverEdge }),
+      ]),
+      on(
+        ['surface', 'arrow'],
+        [
+          variants('material', {
+            glass: {
+              backdropFilter: hook.backdrop(token('material-backdrop')),
+              backgroundColor: hook.backgroundColor(token('material-panel')),
+            },
+            frosted: {
+              backdropFilter: hook.backdrop(fn('blur', token('material-blur-lg'))),
+              backgroundColor: hook.backgroundColor(token('material-translucent-strong')),
+            },
+          }),
+        ],
+      ),
+      on('surface', [
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
+      ]),
+    ]
+  },
+)

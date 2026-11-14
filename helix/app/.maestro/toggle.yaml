@@ -1,0 +1,76 @@
+# Toggle Group: a press chooses a toggle and clears the one chosen before, on
+# the events example, whose log lists what each press sent. Then a group that
+# chooses several, where a press adds to the set. Recorded.
+#
+# A toggle is a toggle button, and Android gives its checked state, which the
+# flow requires. On iOS React Native gives a checked toggle the value
+# "checked", which Maestro reads as the element's text: that step is optional
+# until a night shows what iOS gives. `keys/toggle.yaml` moves through a group
+# with the arrow keys on Android.
+appId: dev.fusion.helix.app
+name: Toggle
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://toggle/events/preview
+      SHOWS: Compact
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: toggle
+- tapOn: Compact
+- assertVisible: '.*"sm", sent when the value is committed.*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Compact
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: checked
+- takeScreenshot: toggle-events-compact
+- tapOn: Comfortable
+- assertVisible: '.*"lg", sent when the value is committed.*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Comfortable
+      - assertVisible:
+          checked: false
+          text: Compact
+- takeScreenshot: toggle-events-comfortable
+# Open starts chosen, and Closed joins it.
+- openLink: helix://toggle/multiple/preview
+- extendedWaitUntil:
+    visible: Closed
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Closed
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Open
+      - assertVisible:
+          checked: true
+          text: Closed
+- takeScreenshot: toggle-multiple
+- stopRecording

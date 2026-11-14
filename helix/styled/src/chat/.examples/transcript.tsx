@@ -18,6 +18,7 @@ export function Example() {
     <helix-chat
       className="transcript"
       label="Build agent"
+      style={{ '--chat-max-block-size': '22rem' } as React.CSSProperties}
       turns={turns}
     >
       <strong slot="header">Build agent</strong>

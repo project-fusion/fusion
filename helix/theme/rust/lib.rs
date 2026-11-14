@@ -17,6 +17,7 @@ pub mod derive;
 pub mod intent;
 pub mod model;
 pub mod oklch;
+pub mod tokens;
 
 #[cfg(feature = "serde")]
 mod wire;
@@ -24,8 +25,8 @@ mod wire;
 #[cfg(any(feature = "wasm", test))]
 mod shape;
 
-#[cfg(any(feature = "wasm", all(test, feature = "serde")))]
-mod read;
+#[cfg(any(feature = "json", all(test, feature = "serde")))]
+pub mod read;
 
 #[cfg(feature = "wasm")]
 mod wasm;

@@ -139,24 +139,26 @@ describe('strands', () => {
     host.clear = true
     await host.updateComplete
     expect(host.hasAttribute('clear')).toBe(true)
-    const { styles } = await import('./strands-root.css.js')
+    const { styles } = await import('./strands-root.generated.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
-    expect(sheet).toContain(':host([clear])')
-    expect(sheet).toContain(':host([clear]:state(fallback))')
+    expect(sheet).toContain(':host(:where([clear]))::before')
+    expect(sheet).toContain(':host(:where(:state(fallback)[clear]))::before')
   })
 
   test('the sheet keeps it out of the way: no pointer, and behind the page in travel', async () => {
     /* Imported here rather than at the top for the reason Aura's spec gives:
        this module builds a stylesheet at evaluation. */
-    const { styles } = await import('./strands-root.css.js')
+    const { styles } = await import('./strands-root.generated.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
     expect(sheet).toContain('pointer-events: none')
-    expect(sheet).toMatch(/:host\(\[travel\]\)\s*\{[^}]*position: fixed/)
-    expect(sheet).toMatch(/:host\(\[travel\]\)\s*\{[^}]*z-index: var\(--helix-layer-beneath\)/)
+    expect(sheet).toMatch(/:host\(:where\(\[travel\]\)\)\s*\{[^}]*position: fixed/)
+    expect(sheet).toMatch(
+      /:host\(:where\(\[travel\]\)\)\s*\{[^}]*z-index: var\(--helix-layer-beneath\)/,
+    )
   })
 
   test('each color hook reaches the canvas, which is where the script reads it', async () => {
-    const { styles } = await import('./strands-root.css.js')
+    const { styles } = await import('./strands-root.generated.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
     for (const hook of ['--strands-glow', '--strands-ground', '--strands-peak', '--strands-tint']) {
       expect(sheet).toContain(`var(${hook},`)

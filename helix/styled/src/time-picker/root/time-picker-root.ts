@@ -5,7 +5,7 @@ import type { CSSResultGroup } from 'lit'
    it to remind anyone. */
 import '../../listbox/index.js'
 import '../../option/root/index.js'
-import { styles } from './time-picker-root.css.js'
+import { styles } from './time-picker-root.generated.css.js'
 
 /**
  * @summary A control for choosing a time from a list or from wheels.

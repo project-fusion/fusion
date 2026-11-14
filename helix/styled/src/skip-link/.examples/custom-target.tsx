@@ -4,7 +4,7 @@ export function Example() {
       <helix-skip-link href="#results">Skip to results</helix-skip-link>
 
       <helix-app-header>
-        <span slot="start">Logo</span>
+        <helix-text slot="start">Logo</helix-text>
       </helix-app-header>
 
       <section

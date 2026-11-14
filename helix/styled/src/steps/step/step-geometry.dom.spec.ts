@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasLayout, mount, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -112,10 +112,12 @@ describe('a closed stage down a column', () => {
     }
     /* happy-dom resolves no cascade, so the rule the element adopts is read. */
     const declared = (customElements.get('helix-step') as unknown as { styles: unknown }).styles
-    const text = (Array.isArray(declared) ? declared : [declared])
-      .flat(Number.POSITIVE_INFINITY)
-      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-      .join('\n')
+    const text = unweighted(
+      (Array.isArray(declared) ? declared : [declared])
+        .flat(Number.POSITIVE_INFINITY)
+        .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+        .join('\n'),
+    )
     expect(text).toMatch(/\[part="content"\] \{[^}]*visibility: hidden[;}]/)
     expect(text).toMatch(/:host\(\[current\]\) \[part="content"\] \{[^}]*visibility: visible\}/)
   })

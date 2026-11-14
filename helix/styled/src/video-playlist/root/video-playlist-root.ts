@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessVideoPlaylist } from '@fusion.dev/helix-headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './video-playlist-root.css.js'
+import { styles } from './video-playlist-root.generated.css.js'
 
 /**
  * @summary A list of video clips that play one after another in a single player.

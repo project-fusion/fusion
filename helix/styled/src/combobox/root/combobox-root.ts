@@ -5,14 +5,7 @@ import type { CSSResultGroup } from 'lit'
    `<helix-listbox>` in it to remind anyone. */
 import '../../listbox/index.js'
 import '../../tag/root/index.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
-import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
-import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
-import { styles } from './combobox-root.css.js'
+import { styles } from './combobox-root.generated.css.js'
 
 /**
  * @summary A text field that filters a list of options as you type.
@@ -41,16 +34,7 @@ import { styles } from './combobox-root.css.js'
 export class HelixCombobox extends HelixHeadlessCombobox {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    fieldStyles,
-    fieldFrameStyles,
-    fieldStackedStyles,
-    tagRowStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

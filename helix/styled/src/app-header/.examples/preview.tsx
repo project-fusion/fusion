@@ -1,15 +1,33 @@
+import { useState } from 'react'
+
+const SECTIONS = [
+  ['#one', 'Overview'],
+  ['#two', 'Projects'],
+] as const
+
 export function Example() {
+  const [current, setCurrent] = useState('#one')
+
+  // The page says which destination is current, as a router does once it has moved.
+  const go = (event: CustomEvent<{ value: string }>) => {
+    event.preventDefault()
+    setCurrent(event.detail.value)
+  }
+
   return (
     <helix-app-header>
-      <span slot="start">Logo</span>
+      <helix-text slot="start">Logo</helix-text>
       <helix-navigation label="Sections">
-        <a
-          aria-current="page"
-          href="#one"
-        >
-          Overview
-        </a>
-        <a href="#two">Projects</a>
+        {SECTIONS.map(([href, label]) => (
+          <helix-navigation-item
+            current={href === current ? 'page' : undefined}
+            href={href}
+            key={href}
+            onhelix-before-select={go}
+          >
+            {label}
+          </helix-navigation-item>
+        ))}
       </helix-navigation>
 
       <helix-icon-button

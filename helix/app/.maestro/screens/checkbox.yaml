@@ -1,0 +1,29 @@
+# Checkbox, each example drawn alone: the tick, the dash of a mixed box, an
+# invalid box, and boxes drawn as cards. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Checkbox"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://checkbox/preview/preview
+- extendedWaitUntil:
+    visible: '.*Email me about product updates.*'
+    timeout: 30000
+- takeScreenshot: checkbox-preview-${MODE}-${SIZE}
+- openLink: helix://checkbox/indeterminate/preview
+- extendedWaitUntil:
+    visible: '.*Select all.*'
+    timeout: 15000
+- takeScreenshot: checkbox-indeterminate-${MODE}-${SIZE}
+- openLink: helix://checkbox/invalid/preview
+- extendedWaitUntil:
+    visible: '.*I accept the terms.*'
+    timeout: 15000
+- takeScreenshot: checkbox-invalid-${MODE}-${SIZE}
+- openLink: helix://checkbox/cards/preview
+- extendedWaitUntil:
+    visible: '.*Backups.*'
+    timeout: 15000
+- takeScreenshot: checkbox-cards-${MODE}-${SIZE}

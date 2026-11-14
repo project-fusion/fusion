@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLightbox } from '@fusion.dev/helix-headless/lightbox'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './lightbox-root.css.js'
+import { styles } from './lightbox-root.generated.css.js'
 
 /**
  * @summary A viewer that shows one item at a time over the page.

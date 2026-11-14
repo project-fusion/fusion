@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessFilterOperator } from '@fusion.dev/helix-headless/filter-input'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './filter-operator.css.js'
+import { styles } from './filter-operator.generated.css.js'
 
 /**
  * @summary One way a filter can compare a field to its values.

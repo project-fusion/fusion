@@ -5,7 +5,6 @@ import {
   formValue,
   hasLayout,
   hasState,
-  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -988,6 +987,9 @@ describe('choosing the option already chosen', () => {
 
 describe('the statuses a combobox hands its list', () => {
   const list = (host: Updatable): HTMLElement => part(host as HTMLElement, 'listbox') as HTMLElement
+  /* Read by matching `:state()` in a browser: WebKit's `states.has` reads false for
+     a state once the set's wrapper is collected, while the state still matches. */
+  const holds = (host: Updatable, name: string) => hasState(host as unknown as Element, name)
 
   test('`no-results-text` and `error-text` reach the list', async () => {
     const host = await combobox('no-results-text="Nothing like it" error-text="Offline"')
@@ -1005,60 +1007,57 @@ describe('the statuses a combobox hands its list', () => {
   /* Removing the attribute gives the property null, which the combobox read
      as an error: its own `error` state stayed on. */
   test('removing `error-text`, or setting it to null, clears the error state', async () => {
-    const states = (host: Updatable) => internalsOf(host).states
     const host = (await combobox('error-text="Offline"')) as Updatable & {
       errorText: string | null
     }
     await settle(host)
-    expect(states(host).has('error')).toBe(true)
+    expect(holds(host, 'error')).toBe(true)
     ;(host as unknown as HTMLElement).removeAttribute('error-text')
     await settle(host)
     await settle(list(host) as unknown as Updatable)
-    expect(states(host).has('error')).toBe(false)
+    expect(holds(host, 'error')).toBe(false)
     expect(part(list(host), 'error')).toBeNull()
     host.errorText = 'Offline'
     await settle(host)
-    expect(states(host).has('error')).toBe(true)
+    expect(holds(host, 'error')).toBe(true)
     host.errorText = null
     await settle(host)
     await settle(list(host) as unknown as Updatable)
-    expect(states(host).has('error')).toBe(false)
+    expect(holds(host, 'error')).toBe(false)
     expect(part(list(host), 'error')).toBeNull()
   })
 
   /* Measured before this: only the list inside had them, which no page
      stylesheet reaches. */
   test('`error` and `no-results` are states of the host as well', async () => {
-    const states = (host: Updatable) => internalsOf(host).states
     const failing = await combobox('error-text="Offline"')
     await settle(failing)
-    expect(states(failing).has('error')).toBe(true)
+    expect(holds(failing, 'error')).toBe(true)
     const host = await combobox()
-    expect(states(host).has('no-results')).toBe(false)
+    expect(holds(host, 'no-results')).toBe(false)
     await type(host, 'zzz')
     await settle(list(host) as unknown as Updatable)
     await settle(host)
-    expect(states(host).has('no-results')).toBe(true)
-    expect(states(host).has('error')).toBe(false)
+    expect(holds(host, 'no-results')).toBe(true)
+    expect(holds(host, 'error')).toBe(false)
     await type(host, 'r')
     await settle(list(host) as unknown as Updatable)
     await settle(host)
-    expect(states(host).has('no-results')).toBe(false)
+    expect(holds(host, 'no-results')).toBe(false)
   })
 
   /* WA's combobox styles its loading and empty states from the host. */
   test('`loading` and `blank` are states of the host', async () => {
-    const states = (host: Updatable) => internalsOf(host).states
     const loading = await combobox('loading')
     await settle(list(loading) as unknown as Updatable)
     await settle(loading)
-    expect(states(loading).has('loading')).toBe(true)
-    expect(states(loading).has('blank')).toBe(true)
+    expect(holds(loading, 'loading')).toBe(true)
+    expect(holds(loading, 'blank')).toBe(true)
     const chosen = await combobox('value="rs"')
     await settle(list(chosen) as unknown as Updatable)
     await settle(chosen)
-    expect(states(chosen).has('loading')).toBe(false)
-    expect(states(chosen).has('blank')).toBe(false)
+    expect(holds(chosen, 'loading')).toBe(false)
+    expect(holds(chosen, 'blank')).toBe(false)
   })
 
   test('a slotted no-results is handed on only while there is one', async () => {

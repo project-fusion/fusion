@@ -109,7 +109,11 @@ impl Tree {
         let _ = std::fs::remove_dir_all(&at);
         std::fs::create_dir_all(at.join("src/card")).expect("a source tree");
         std::fs::write(at.join(".git"), "").expect("a root marker");
-        std::fs::write(at.join("helix.json"), r#"{ "tiers": ["src"] }"#).expect("the settings");
+        std::fs::write(
+            at.join("helix.json"),
+            r#"{ "components": { "tiers": ["src"] } }"#,
+        )
+        .expect("the settings");
         std::fs::write(
             at.join("src/card/card.ts"),
             "export class HelixCard extends LitElement {}\n",

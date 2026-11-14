@@ -12,6 +12,7 @@ import {
   numberConverter,
   type Placement,
   PopoverController,
+  sideOf,
   slottedWords,
   tellDisclosure,
   typeaheadByWords,
@@ -114,7 +115,13 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  * @csspart actions - The region the actions are drawn in.
  * @csspart trigger - The default trigger, drawn when none is slotted.
  *
+ * @cssstate aligned-end - While the actions line up on the end of the side they opened on.
+ * @cssstate aligned-start - While the actions line up on the start of the side they opened on.
  * @cssstate open - While the actions are out.
+ * @cssstate placed-bottom - While the actions open below the trigger.
+ * @cssstate placed-left - While the actions open to the left of the trigger.
+ * @cssstate placed-right - While the actions open to the right of the trigger.
+ * @cssstate placed-top - While the actions open above the trigger.
  */
 @customElement('helix-headless-speed-dial')
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
@@ -212,6 +219,17 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     boundary: () => this,
     offset: () => this.offset,
     onDismiss: () => this.close(),
+    /* The side the actions landed on and the end they line up on, which the
+       sheet fans them out by, as `Popover` records them. */
+    onPlace: (placement) => {
+      const side = sideOf(placement)
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
+      this.toggleState('placed-bottom', side === 'bottom')
+      this.toggleState('placed-left', side === 'left')
+      this.toggleState('placed-right', side === 'right')
+      this.toggleState('placed-top', side === 'top')
+    },
     open: () => this.open,
     placement: () => this.placement,
     surface: () => this.partNamed('actions'),

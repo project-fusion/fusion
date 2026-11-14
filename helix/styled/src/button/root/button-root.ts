@@ -4,7 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
-import { styles } from './button-root.css.js'
+import { styles } from './button-root.generated.css.js'
 
 /**
  * @summary Triggers an action, submits a form, or navigates.

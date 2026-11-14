@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTreeItem } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './tree-item.css.js'
+import { styles } from './tree-item.generated.css.js'
 
 /**
  * @summary One node in a tree.

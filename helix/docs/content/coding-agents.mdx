@@ -210,12 +210,13 @@ the file your client reads and keeps every other server in it:
 | `vscode` | `.vscode/mcp.json` |
 
 The server runs `npx @fusion.dev/helix-cli mcp`, which is the copy in your
-project. It has nine tools:
+project. It has ten tools:
 
 | Tool | What it returns |
 |---|---|
 | `helix_find` | The families that answer a name, an alias, a tag, or a purpose, best first |
 | `helix_family` | One family's tags, properties and their unions, events and their React props, slots, parts, custom properties, words, and import lines |
+| `helix_anatomy` | What each styled element of a family draws: the tree in its shadow root, each part and slot by its name, and the tree its React Native component draws |
 | `helix_example` | One example as HTML and TSX, with its stylesheet, the import lines it needs, and links to its pictures |
 | `helix_imports` | The import lines for a list of tags, and the closest tag to any unknown one |
 | `helix_tokens` | The semantic tokens, by a word in the name or description and by category |
@@ -226,14 +227,15 @@ project. It has nine tools:
 
 Each result is structured, with an output schema, and the same JSON as text.
 A name that matches more than one family, such as `Dropdown`, returns an error
-listing each family. The theme tools take the same JSON that a
-`helix.theme.json` file holds.
+listing each family. The theme tools take the same JSON as the `theme` of
+`helix.json`.
 
 Each lookup is also a command, for a script or a person:
 
 ```sh
 helix api find dropdown
 helix api family select
+helix api anatomy select
 helix api example select
 helix api imports helix-select helix-option
 helix api tokens surface --category color

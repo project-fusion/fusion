@@ -3,7 +3,7 @@ import { HelixHeadlessLegend } from '@fusion.dev/helix-headless/legend'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
-import { styles } from './legend-root.css.js'
+import { styles } from './legend-root.generated.css.js'
 
 /**
  * @summary A list of the series in a chart, each name beside the color it is drawn in.

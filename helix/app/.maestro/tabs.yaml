@@ -1,0 +1,28 @@
+# Tabs: a press on a tab shows its panel, on the example's tabs and on the
+# gallery's own Preview and Code tabs, which are Helix tabs too, recorded.
+appId: dev.fusion.helix.app
+name: Tabs
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://tabs/underlined
+      SHOWS: A summary of the project and the people on it.
+# The first touch on a screen that has just opened is lost on the iOS
+# simulator, a drag's as well: three times in three on October 11, 2026. A tap
+# on the empty space below the example takes it.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: tabs
+- tapOn: Activity
+- assertVisible: Recent changes to the project and its files.
+- tapOn: Overview
+- assertVisible: A summary of the project and the people on it.
+- tapOn: Code
+- assertVisible: The source the sandbox shows.*
+- tapOn: Preview
+- assertVisible: A summary of the project and the people on it.
+- stopRecording

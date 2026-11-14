@@ -33,12 +33,12 @@ import {
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
+import { type Offset, percentOf } from '@fusion.dev/helix-core/zoom'
 import { caretLeft, caretRight, minus, plus } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessLightboxItem } from '../item/lightbox-item.js'
-import { type Offset, percentOf } from '../zoom.js'
 import { ZoomController } from '../zoom-controller.js'
 
 /**

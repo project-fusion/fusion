@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessVideoPlaylistMenu } from '@fusion.dev/helix-headless/video-playlist'
 import type { CSSResultGroup } from 'lit'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
-import { styles } from './video-playlist-menu.css.js'
+import { styles } from './video-playlist-menu.generated.css.js'
 import '../../menu/index.js'
 
 /**

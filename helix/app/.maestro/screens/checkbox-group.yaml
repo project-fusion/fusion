@@ -1,0 +1,19 @@
+# Checkbox Group, each example drawn alone: a group with two boxes checked,
+# and an invalid group. One screenshot of each, named by the example, `MODE`,
+# and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Checkbox Group"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://checkbox-group/preview/preview
+- extendedWaitUntil:
+    visible: '.*Text message.*'
+    timeout: 30000
+- takeScreenshot: checkbox-group-preview-${MODE}-${SIZE}
+- openLink: helix://checkbox-group/invalid/preview
+- extendedWaitUntil:
+    visible: '.*Deploys.*'
+    timeout: 15000
+- takeScreenshot: checkbox-group-invalid-${MODE}-${SIZE}

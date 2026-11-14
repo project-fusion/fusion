@@ -34,8 +34,6 @@ import { HelixHeadlessMeter } from '../root/meter-root.js'
  * @category feedback
  * @documentation https://fusion.dev/helix/components/meter
  *
- * @slot - Nothing. A segment draws its share and has no content.
- *
  * @csspart fill - The slice of the bar the segment takes.
  *
  * @cssproperty --meter-segment-value - How much of the range the segment takes, in the meter's own units.

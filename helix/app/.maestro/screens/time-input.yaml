@@ -1,0 +1,99 @@
+# Time Input, its examples drawn alone: the field, the list its trigger opens on the
+# time it holds, the field after a pick, its segments, several times as tags, a
+# range, the wheels open, and a time the bounds refuse. One screenshot of each,
+# named by the example, `MODE`, and `SIZE`. Each example after the first is waited
+# for by its title in the header first, and then by words only it draws: a wait on
+# words the example before also draws passes while the link is still opening, and
+# pictures or presses the screen on its way out. A time is named by its words, with
+# any space before AM or PM.
+appId: dev.fusion.helix.app
+name: "Screens: Time Input"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://time-input/preview/preview
+      - extendedWaitUntil:
+          visible: '.*Choose a time or type one.*'
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-preview-${MODE}-${SIZE}
+- openLink: helix://time-input/bounded/preview
+- extendedWaitUntil:
+    visible: 'Bounded'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*every 30 minutes.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-bounded-${MODE}-${SIZE}
+- tapOn:
+    text: '.*Choose a time.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    visible: '.*10:00.AM.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-bounded-open-${MODE}-${SIZE}
+- tapOn:
+    text: '.*10:00.AM.*'
+    retryTapIfNoChange: false
+- extendedWaitUntil:
+    notVisible: '.*10:30.AM.*'
+    timeout: 10000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-bounded-picked-${MODE}-${SIZE}
+- openLink: helix://time-input/segmented/preview
+- extendedWaitUntil:
+    visible: 'Segmented'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*Type the digits.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-segmented-${MODE}-${SIZE}
+- openLink: helix://time-input/multiple/preview
+- extendedWaitUntil:
+    visible: 'Multiple'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*Any number of times.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-multiple-${MODE}-${SIZE}
+- openLink: helix://time-input/range/preview
+- extendedWaitUntil:
+    visible: 'Range'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*A start and an end.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-range-${MODE}-${SIZE}
+- openLink: helix://time-input/wheels/preview
+- extendedWaitUntil:
+    visible: 'Wheels'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*Choose an hour and a minute.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-wheels-${MODE}-${SIZE}
+- openLink: helix://time-input/invalid/preview
+- extendedWaitUntil:
+    visible: 'Invalid'
+    timeout: 15000
+- extendedWaitUntil:
+    visible: '.*at or after 9:00.AM.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: time-input-invalid-${MODE}-${SIZE}

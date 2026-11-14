@@ -10,6 +10,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
+import { pageSizes } from '@fusion.dev/helix-core/pagination'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
@@ -172,10 +173,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
 
   /** The sizes, parsed once, with anything that is not a size dropped. */
   private get options(): number[] {
-    return this.sizes
-      .split(',')
-      .map((one) => Number.parseInt(one.trim(), 10))
-      .filter((one) => Number.isFinite(one) && one > 0)
+    return pageSizes(this.sizes)
   }
 
   /** The one in force, which is the first offered where nothing named one. */

@@ -1,0 +1,33 @@
+# Scroll Area: the release notes are a region named by their label, and a
+# swipe brings the last note into view. Recorded.
+#
+# The example's `max-block-size` stands the area 12rem tall at the top of the
+# screen, so the page has nothing to scroll and a drag goes on the area itself.
+# Android's tree holds only what the area shows, so there the last note appears
+# only once it has scrolled.
+appId: dev.fusion.helix.app
+name: Scroll Area
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://scroll-area/preview/preview
+      SHOWS: .*export reports.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: scroll-area
+- repeat:
+    times: 3
+    commands:
+      - swipe:
+          start: 50%, 30%
+          end: 50%, 14%
+          duration: 400
+- assertVisible: .*remove members.*
+- takeScreenshot: scroll-area-scrolled
+- stopRecording

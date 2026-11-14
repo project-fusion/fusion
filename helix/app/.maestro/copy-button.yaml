@@ -1,0 +1,55 @@
+# Copy Button: a press copies the preview's command and shows Copied in its
+# tooltip for a moment, then the button is named Copy again; the label
+# example draws its words beside the icon and swaps them for the result.
+# The events example logs the copied text. Recorded.
+# An iOS list row is one label, its name and its description, so a step
+# matches a row by a part of its words, on either platform.
+appId: dev.fusion.helix.app
+name: Copy Button
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://copy-button/preview/preview
+      SHOWS: Copy
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: copy-button
+# "Copied" stands 1.6 seconds, and Maestro's tap on Android can return after that,
+# even with `waitToSettleTimeoutMs: 200`: in run 41361727088 it returned 4.4
+# seconds after the press, and the video shows "Copied" come and go inside it.
+# The check `standing-copy` draws the same buttons with a confirmation that stands
+# 20 seconds, so nothing here races the tap. Jest holds the 1.6 seconds.
+- openLink: helix://checks/standing-copy
+- extendedWaitUntil:
+    visible: Copy link
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Copy
+- extendedWaitUntil:
+    visible: Copied
+    timeout: 5000
+- takeScreenshot: copy-button-copied
+- extendedWaitUntil:
+    notVisible: Copied
+    timeout: 30000
+- tapOn: Copy link
+- extendedWaitUntil:
+    visible: Copied
+    timeout: 5000
+- openLink: helix://copy-button/events/preview
+- extendedWaitUntil:
+    visible: .*No events yet.*
+    timeout: 15000
+- tapOn: Copy
+- extendedWaitUntil:
+    visible: .*Copied "bun add @fusion.dev/helix".*
+    timeout: 5000
+- stopRecording

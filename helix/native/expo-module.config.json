@@ -1,0 +1,9 @@
+{
+  "android": {
+    "modules": ["dev.fusion.helix.keys.HelixKeysModule", "dev.fusion.helix.theme.HelixThemeModule"]
+  },
+  "apple": {
+    "modules": ["HelixKeysModule", "HelixThemeModule"]
+  },
+  "platforms": ["apple", "android"]
+}

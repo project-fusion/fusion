@@ -1,5 +1,16 @@
+import {
+  between,
+  clampPan,
+  clampScale,
+  doublePressed,
+  dragged,
+  type Offset,
+  pinched,
+  spread,
+  type ZoomStart,
+  zoomAt,
+} from '@fusion.dev/helix-core/zoom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
-import { between, clampPan, clampScale, type Offset, spread, zoomAt } from './zoom.js'
 
 export interface ZoomOptions {
   /** The most the item may grow, as a scale. 1 or less turns zooming off. */
@@ -33,7 +44,7 @@ export class ZoomController implements ReactiveController {
   private readonly pointers = new Map<number, Offset>()
 
   /** What the gesture under way started from. */
-  private from: { at: Offset; pan: Offset; scale: number; spread: number } | undefined
+  private from: ZoomStart | undefined
 
   /** The scale, 1 at rest. */
   scale = 1
@@ -165,12 +176,10 @@ export class ZoomController implements ReactiveController {
     this.pointers.set(event.pointerId, this.offset(event))
     const [a, b] = [...this.pointers.values()]
     if (a && b && from.spread > 0) {
-      const at = between(a, b)
-      const scale = clampScale((from.scale * spread(a, b)) / from.spread, this.options.max())
-      const about = zoomAt(from.at, from.scale, scale, from.pan)
-      this.set(scale, { x: about.x + at.x - from.at.x, y: about.y + at.y - from.at.y })
+      const zoom = pinched(from, spread(a, b), between(a, b), this.options.max())
+      this.set(zoom.scale, zoom.pan)
     } else if (a && this.scale > 1) {
-      this.set(this.scale, { x: from.pan.x + a.x - from.at.x, y: from.pan.y + a.y - from.at.y })
+      this.set(this.scale, dragged(from, a))
     }
   }
 
@@ -215,11 +224,12 @@ export class ZoomController implements ReactiveController {
     if (this.options.max() <= 1 || !this.inside(event)) {
       return
     }
-    if (this.scale > 1) {
-      this.reset()
-    } else {
-      this.zoomTo(this.options.max(), this.offset(event))
-    }
+    const zoom = doublePressed(
+      { pan: this.pan, scale: this.scale },
+      this.offset(event),
+      this.options.max(),
+    )
+    this.set(zoom.scale, zoom.pan)
   }
 
   private release(): void {

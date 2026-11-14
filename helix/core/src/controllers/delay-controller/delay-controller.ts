@@ -1,4 +1,6 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { installWebTimers } from '../../capabilities/timers/web.js'
+import { type Delay, delay } from '../../machines/countdown.js'
 
 /** What a `DelayController` is for. */
 export interface DelayOptions {
@@ -16,9 +18,10 @@ export interface DelayOptions {
  *
  * Avatar's `fallback-delay`, Image's `placeholder-delay` and Loader's `delay`
  * each hold a region back until a wait is over, and Listbox's `filter-delay`
- * holds a filter back until typing pauses. Each kept a timer, a flag and the
- * clean-up by hand; this keeps the three together, and clears the timer when
- * the element leaves the page.
+ * holds a filter back until typing pauses.
+ *
+ * **It is core's `delay` on the timers capability**, the wait a phone runs,
+ * so a fake clock a conformance scenario sets moves it on the web too.
  *
  * `elapsed` is what a template reads, and the host updates when it moves,
  * unless `renders` is false.
@@ -26,23 +29,25 @@ export interface DelayOptions {
  * loader moved to another place in the page does not wait again.
  */
 export class DelayController implements ReactiveController {
-  /** Whether the last wait started has run out. */
-  elapsed = false
+  private readonly wait: Delay
 
-  private timer: ReturnType<typeof setTimeout> | undefined = undefined
-
-  private done: (() => void) | undefined = undefined
-
-  constructor(
-    private readonly host: ReactiveControllerHost,
-    private readonly options: DelayOptions = {},
-  ) {
+  constructor(host: ReactiveControllerHost, options: DelayOptions = {}) {
+    this.wait = delay(() => {
+      if (options.renders !== false) {
+        host.requestUpdate()
+      }
+    })
     host.addController(this)
+  }
+
+  /** Whether the last wait started has run out. */
+  get elapsed(): boolean {
+    return this.wait.elapsed
   }
 
   /** Whether a wait is running. */
   get pending(): boolean {
-    return this.timer !== undefined
+    return this.wait.pending
   }
 
   hostConnected(): void {}
@@ -57,46 +62,17 @@ export class DelayController implements ReactiveController {
    * leaves `elapsed` false.
    */
   start(ms?: number, done?: () => void): void {
-    this.cancel()
-    this.mark(false)
-    if (ms === undefined) {
-      return
-    }
-    this.done = done
-    this.timer = setTimeout(() => this.finish(), ms)
+    installWebTimers()
+    this.wait.start(ms, done)
   }
 
   /** Stops a running wait, leaving `elapsed` as it is. */
   cancel(): void {
-    clearTimeout(this.timer)
-    this.timer = undefined
-    this.done = undefined
+    this.wait.cancel()
   }
 
   /** Ends a running wait now, as though it had run out. Nothing happens where none is running. */
   flush(): void {
-    if (this.timer === undefined) {
-      return
-    }
-    clearTimeout(this.timer)
-    this.finish()
-  }
-
-  private finish(): void {
-    const done = this.done
-    this.timer = undefined
-    this.done = undefined
-    this.mark(true)
-    done?.()
-  }
-
-  private mark(elapsed: boolean): void {
-    if (elapsed === this.elapsed) {
-      return
-    }
-    this.elapsed = elapsed
-    if (this.options.renders !== false) {
-      this.host.requestUpdate()
-    }
+    this.wait.flush()
   }
 }

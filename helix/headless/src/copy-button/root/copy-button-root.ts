@@ -75,6 +75,7 @@ import '../../tooltip/index.js'
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the icon. It is rendered only while the button is pending.
  * @csspart text - The words beside the icon, under `show-label`. It holds all three, `label`, `copied-label` and `error-label`, with all but the current one hidden.
+ * @csspart tooltip - The tooltip around the button, which shows its name and the result of a press. Not drawn under `tooltip="none"`.
  * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the button, on the bubble's top edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The arrow while the bubble is left of the button, on the bubble's right edge. Set together with `tooltip-arrow`.
@@ -467,7 +468,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
        nothing to show, and `updated` opens it on a result. */
     const content = this.tooltip === 'copy' && !this.copied && !this.failed ? '' : this.says
     return html`<${this.tag('tooltip')} content=${content} persist
-    data-copy-tooltip placement=${this.tooltipPlacement}
+    data-copy-tooltip part="tooltip" placement=${this.tooltipPlacement}
     exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
       arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
       arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom,

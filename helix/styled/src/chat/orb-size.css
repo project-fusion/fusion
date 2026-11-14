@@ -1,0 +1,8 @@
+/* The mark in a message's `indicator` comes down with the words it sits beside: a
+   24px orb against a 12px line is a badge with a sentence stuck to it.
+
+   **Written by hand until Orb is written in `helix/neutral`**: a neutral table may
+   set only a hook of a family the compiler knows. */
+slot[name="indicator"]::slotted(*) {
+  --orb-size: var(--helix-size-icon-sm);
+}

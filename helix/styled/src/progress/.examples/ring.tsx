@@ -1,5 +1,3 @@
-import './ring.css'
-
 export function Example() {
   return (
     <helix-flex
@@ -18,10 +16,10 @@ export function Example() {
         shape="ring"
       ></helix-progress>
       <helix-progress
-        className="storage"
         label="Storage"
         shape="ring"
         show-value
+        style={{ '--progress-ring-size': '6rem', '--progress-ring-width': '0.75rem' }}
         value={42}
       ></helix-progress>
     </helix-flex>

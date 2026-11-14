@@ -1,7 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import type { LogGroup, LogLine, LogParser } from '@fusion.dev/helix-core/log'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
-import type { LogGroup, LogLine, LogParser } from '../buffer.js'
 import type { LogSource } from './log-root.js'
 
 /* A log handed text: what it draws, what it keeps, and what it says. */

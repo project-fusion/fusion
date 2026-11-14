@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessQuote } from '@fusion.dev/helix-headless/quote'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './quote-root.css.js'
+import { styles } from './quote-root.generated.css.js'
 
 /**
  * @summary A short quotation, set inline with the text around it.

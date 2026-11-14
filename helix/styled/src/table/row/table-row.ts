@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTableRow } from '@fusion.dev/helix-headless/table'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './table-row.css.js'
+import { styles } from './table-row.generated.css.js'
 import '../../checkbox/index.js'
 
 /**

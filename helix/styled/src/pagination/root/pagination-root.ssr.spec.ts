@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hasPart, hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
-import { styles } from './pagination-root.css.js'
+import { styles } from './pagination-root.generated.css.js'
 
 const buttons = html`<helix-pagination default-page="7" pages="12"></helix-pagination>`
 const links = html`<helix-pagination

@@ -1,0 +1,23 @@
+# Image: the events example draws a picture that loads and one that fails,
+# and its log lists what each sent. Recorded.
+#
+# The picture that fails names a host that does not exist, so it fails at
+# once with no network. The one that loads needs the network, so its line is
+# optional. iOS reads a log line as one text, as in "error, Could not load
+# the image", so the line is matched with the words around it.
+appId: dev.fusion.helix.app
+name: Image
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://image/events/preview
+      SHOWS: .*Events.*
+- extendedWaitUntil:
+    visible: .*Could not load the image.*
+    timeout: 15000
+- assertVisible:
+    optional: true
+    text: load

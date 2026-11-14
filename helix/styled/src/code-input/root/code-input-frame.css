@@ -1,0 +1,163 @@
+/* The frame a text-like field wears: the stack, the hover edge, the focus ring,
+   the invalid state and the stripped control. Code Input is the last family to
+   read it as a sheet; every family written in helix/neutral takes the
+   `field-frame` fragment instead. Compose with `field.css` and the family's own
+   sheet, never instead of either. */
+
+/* A column, so the label, the field and whatever is under it stack without any
+   of them needing a margin. **Flex rather than grid, and the inline axis is
+   why.** A grid's single auto column is floored at the min-content of what is in
+   it, and what is in it is a real `<input>`, whose min-content is its default
+   twenty-character width. Measured on Input at 208px inside a 203px host, which
+   ate the gap after it and overlapped the control beside it by a pixel.
+   `minmax(0, 1fr)` fixes that and breaks the other end, because an `fr` track
+   contributes nothing intrinsically, so the host collapsed to zero the moment
+   its width came from its content.
+
+   **No family restates `display`**, because `flex-direction` and `gap` do
+   nothing on a box that is not flex and the stack would be quietly lost.
+   Settled 14 Sep 2026: Date Input had never set one and sat at the UA's
+   `inline`, Time Input and Color Input said `block`, and nothing recorded a
+   reason for any of the three, so they take the stack the others measured. */
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+}
+
+/* `:host(:disabled)`, not `:host([disabled])`: the pseudo-class matches the
+   element's own attribute and an ancestor `<fieldset disabled>` alike, where the
+   attribute selector only ever sees the first. **Not read-only either**, whose
+   edge darkened from 1.23:1 to the hover's under a pointer and so offered an
+   edit the field refuses. */
+:host(:not(:disabled, [readonly])) [part="field"]:hover {
+  border-color: var(--helix-color-border-hover);
+}
+
+/* On the box, because `delegatesFocus` puts focus on the input inside it and a
+   ring around that would sit within the frame rather than around it. Named with
+   `:hover` as well, or a focused field under the pointer takes the hover border
+   back and reads as a gray edge inside a blue ring: being focused outranks being
+   pointed at, so it has to say so.
+
+   No offset, so the ring thickens the edge instead of drawing a second one. The
+   border and the ring both read `focus-ring`: at an offset the pair read as two
+   lines with a gap of page between them, a double-struck border rather than a
+   focused field. Against the edge they are one 3px edge in one color, and a theme
+   that sets `focus-ring` apart from `primary` keeps it one. */
+:host(:focus-within) [part="field"],
+:host(:focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-focus-ring);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
+/* Wrong, and the field says so. `:state(invalid)` is the platform's verdict,
+   which the host copies from the input, so this follows whatever the browser
+   decided rather than a second opinion.
+
+   Four selectors, because the focus rule owns the `outline`: changing the border
+   alone gives a focused field with an error a red border inside a blue ring.
+   And named with `:hover`, because unnamed this was (0,3,0) against hover's
+   (0,4,0), so running a pointer over a field with an error in it put the gray
+   border back. */
+:host(:state(invalid)) [part="field"],
+:host(:state(invalid)) [part="field"]:hover,
+:host(:state(invalid):focus-within) [part="field"],
+:host(:state(invalid):focus-within) [part="field"]:hover {
+  border-color: var(--helix-color-danger);
+  outline-color: var(--helix-color-danger);
+}
+
+/* Flush with its ground, which is what `transparent` says and no absolute color
+   can: read-only on a raised panel would otherwise rise out of the surface it
+   belongs to. In this sheet so every field that takes the frame draws it. */
+:host([readonly]) [part="field"] {
+  background-color: transparent;
+}
+
+/* Stripped rather than replaced, so the caret, the selection and the keyboard a
+   phone chooses are all the platform's. `all: unset` takes `box-sizing` with it,
+   back to `content-box`, and the `border-box` every shadow root is given comes
+   from a rule this one outranks, so it is restored here.
+
+   `--helix-text-field`, one size for every field and a step over the label in
+   `field.css` at every density: a value set at the label's size reads as a
+   second caption in a box. Settled 14 Sep 2026 at `text-md` everywhere, and
+   October 31, 2026 for `sm`, where label 12 and value 13 keep the step and sit
+   beside a 12 button. On a touch screen the type is
+   at least `--helix-text-field-min`, 16px, the size below which iOS Safari
+   zooms the page into a focused field. */
+[part="control"] {
+  all: unset;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
+  font-weight: var(--helix-weight-medium);
+  /* **A percentage width, so the field shrinks to its column.** An input's
+     min-content is its default twenty characters whatever its minimum says, and
+     that floored the host: measured at 390, Input 202, Textarea 212, Date
+     Input 222, Combobox 226 and Number Input 266 against Select's 98.6, so a
+     300 pixel grid of two columns ran to 500. A form control with a percentage
+     width contributes nothing to min-content and its own width to max-content,
+     so a host sized by its content keeps the input's width. */
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+/* **The resting width is said here, so both engines draw the same one.** That
+   width was the browser's own twenty characters, and each engine measures a
+   character its own way: on November 4, 2026, an unsized Input was 202 pixels
+   in Chromium and 216 in WebKit, and a Textarea 212 and 186. Size containment
+   sets the control's width from content aside. The width is Chromium's twenty
+   characters of Fusion Sans, 176 at the 14 pixel field text, so a Chromium
+   page keeps its width and WebKit comes to it. A Textarea takes the same width
+   as an Input, where it was 10 pixels wider in Chromium. A field in a column,
+   or given a width, fills it as before. A file control is a hidden input
+   behind a drop zone, so it is left out. */
+[part="control"]:not([type="file"]) {
+  contain: inline-size;
+  contain-intrinsic-inline-size: round(12.57em, 1px);
+}
+
+/* **And the field still gives way in a row.** WebKit counts a contained
+   control's width as its minimum as well, where Chromium lets a control with
+   a percentage width go to nothing: measured on November 4, 2026, an Input
+   and a Button in a 280 pixel row were 177 and 95 in Chromium and 202 and 95
+   in WebKit, and two Date Inputs were 222 each, 452 in all. So a control the
+   field holds directly takes no width of its own, and an empty box after it
+   carries the twenty characters. A grid track of `minmax(0, …)` is that width
+   at most and nothing at least, in both engines, and it gives way before the
+   control does. The margin takes back the field's gap, which the box would
+   otherwise add. A field with a row of tokens undoes both in `tags.css`. */
+[part="field"] > [part="control"]:not([type="file"]) {
+  contain-intrinsic-inline-size: 0px;
+}
+
+[part="field"]:has(> [part="control"]:not([type="file"]))::after {
+  content: "";
+  display: grid;
+  flex: 0 1000000 auto;
+  font-size: max(var(--helix-text-field-min), var(--helix-text-field));
+  grid-template-columns: minmax(0, round(12.57em, 1px));
+  margin-inline-start: calc(var(--helix-space-2xs) * -1);
+}
+
+/* **An icon at either end is the size of the marks the field draws itself**,
+   the clear and reveal buttons' tight step, 16 at the default. A slotted icon
+   took the region's icon size, so a search field drew a 20 magnifier beside a
+   16 clear mark in the same 40 pixel box. A page that sets `--icon-size` on
+   its own icon still wins. */
+::slotted([slot="start"]),
+::slotted([slot="end"]) {
+  --icon-size: var(--helix-size-icon-tight);
+}
+
+/* A danger edge is painted the system color, so a wrong field thickens its edge. */
+@media (forced-colors: active) {
+  :host(:state(invalid)) [part="field"] {
+    border-width: var(--helix-border-thick);
+  }
+}

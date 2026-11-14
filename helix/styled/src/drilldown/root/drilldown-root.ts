@@ -1,9 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDrilldown } from '@fusion.dev/helix-headless/drilldown'
 import type { CSSResultGroup } from 'lit'
-import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './drilldown-root.css.js'
+import { styles } from './drilldown-root.generated.css.js'
 
 /**
  * @summary A stack of pages that shows one at a time, with a back button.
@@ -37,7 +36,7 @@ import { styles } from './drilldown-root.css.js'
  */
 @customElement('helix-drilldown')
 export class HelixDrilldown extends HelixHeadlessDrilldown {
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

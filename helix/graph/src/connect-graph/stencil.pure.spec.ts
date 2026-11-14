@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import type { GraphPoint } from '@fusion.dev/helix-core/graph'
 import { fieldFromInside } from '../shapes/shape-field.js'
 import { arrangeByGroup, hubsOf } from './arrange.js'
-import type { GraphPoint } from './seed.js'
 import { fitInStencil, fitToStencil, type GraphStencil } from './stencil.js'
 
 /** A square of notes from 0 to 100 each way, `side` to a row. */

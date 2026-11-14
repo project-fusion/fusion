@@ -81,6 +81,16 @@ updates:
     multi-ecosystem-group: dependencies
     package-ecosystem: npm
     patterns: ['*']
+  # Expo Router's template pins the versions of one Expo SDK, as the proof app
+  # does. `expo-router` stays at 58.0.17: 58.0.18 and later need
+  # react-native-screens 4.30, which SDK 58 does not take.
+  - directory: /helix/templates/templates/expo-router
+    ignore:
+      - dependency-name: '@fusion.dev/*'
+      - dependency-name: 'expo-router'
+    multi-ecosystem-group: dependencies
+    package-ecosystem: npm
+    patterns: ['*']
   - directory: /helix/templates/templates/react-nextjs
     ignore:
       - dependency-name: '@fusion.dev/*'

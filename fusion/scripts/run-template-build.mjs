@@ -58,7 +58,7 @@ import {
 } from 'node:fs'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
-import { extname, join, relative } from 'node:path'
+import { extname, join, relative, resolve } from 'node:path'
 import { awaitStill, awaitUpgrades } from '@fusion.dev/scripts/settle'
 import { manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 import pixelmatch from 'pixelmatch'
@@ -70,8 +70,24 @@ const REFERENCE = 'react-vite'
 
 const only = process.argv.slice(2).find((argument) => !argument.startsWith('--'))
 
-const run = (command, args, cwd) =>
-  execFileSync(command, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+const run = (command, args, cwd, env = process.env) =>
+  execFileSync(command, args, { cwd, encoding: 'utf8', env, stdio: ['ignore', 'pipe', 'pipe'] })
+
+/**
+ * The `helix` this tree built, newest of release and debug, as `bin.mjs`
+ * picks it in a checkout. **A project's own scripts run it**, such as the
+ * Expo Router template's theme check. Installed from the tarballs, `bin.mjs`
+ * finds no target in the project and runs the platform package's binary,
+ * which is the release on the registry and lacks what this tree added.
+ */
+const helix = () => {
+  const target = resolve(root, process.env.CARGO_TARGET_DIR ?? 'target')
+  return ['release', 'debug']
+    .map((profile) => join(target, profile, process.platform === 'win32' ? 'helix.exe' : 'helix'))
+    .filter((path) => existsSync(path))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)
+    .at(0)
+}
 
 const scratch = mkdtempSync(join(tmpdir(), 'helix-scaffold-'))
 const tarballs = join(scratch, 'tarballs')
@@ -123,7 +139,11 @@ for (const id of templates) {
 
   try {
     run('bun', ['install'], project)
-    run('bun', ['run', 'build'], project)
+    const binary = helix()
+    run('bun', ['run', 'build'], project, {
+      ...process.env,
+      ...(binary === undefined ? {} : { HELIX_BIN: binary }),
+    })
     built.set(id, project)
     console.log(`  ${id}: installed and built`)
   } catch (error) {
@@ -176,6 +196,8 @@ const framework = (name, docs, entry) => ({
  *   them to what they hold.
  * - `text` and `values`: the template's own words, in text and in attribute
  *   values, each with React on Vite's in its place.
+ * - `own`: the template draws pages of its own, so it is built and held to
+ *   nothing. Expo Router's app has a header over its own routes.
  */
 const PARITY = {
   angular: {
@@ -184,6 +206,7 @@ const PARITY = {
     served: 'dist/browser',
     ...framework('Angular', 'https://fusion.dev/helix/docs/angular', 'src/main.ts'),
   },
+  'expo-router': { own: true },
   'react-nextjs': {
     paths: true,
     started: ['run', 'start', '--', '--port'],
@@ -540,15 +563,18 @@ const compare = (a, b) => {
   return { diff, moved }
 }
 
+/** The templates held to React on Vite, which draw its three pages. */
+const held = [...built.keys()].filter((id) => !PARITY[id].own)
+
 const findings = []
-if (built.has(REFERENCE) && built.size > 1) {
+if (built.has(REFERENCE) && held.length > 1) {
   rmSync(DIFFS, { force: true, recursive: true })
   const served = await serve(REFERENCE, built.get(REFERENCE))
   const reference = await take(REFERENCE, served.origin).finally(served.stop)
   for (const route of ROUTES) {
     findings.push(...reference[route].problems.map((one) => `${REFERENCE} ${route}: ${one}`))
   }
-  for (const id of built.keys()) {
+  for (const id of held) {
     if (id === REFERENCE) {
       continue
     }
@@ -603,8 +629,12 @@ if (findings.length > 0) {
   console.error(`\ntemplates: ${findings.length} differences.\n\n  ${findings.join('\n\n  ')}\n`)
   process.exit(1)
 }
-if (built.has(REFERENCE) && built.size > 1) {
+/* **The scratch tree goes once everything passed**, since each run leaves a
+   project and its `node_modules` per template, and the runs filled the disk on
+   October 5, 2026. A failure leaves it, to be looked at. */
+rmSync(scratch, { force: true, recursive: true })
+if (built.has(REFERENCE) && held.length > 1) {
   console.log(
-    `templates: ${built.size - 1} held to React on Vite on ${ROUTES.length} routes, in markup and in ${SHOTS.length} pictures each`,
+    `templates: ${held.length - 1} held to React on Vite on ${ROUTES.length} routes, in markup and in ${SHOTS.length} pictures each`,
   )
 }

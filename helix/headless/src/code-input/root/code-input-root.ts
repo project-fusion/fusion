@@ -1,7 +1,7 @@
 import { customElement, LAYERS_RULE, SCROLLER_RULE, SPOKEN_RULE } from '@fusion.dev/helix-core'
+import { highlightedLines } from '@fusion.dev/helix-core/code-block'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { highlightedLines } from '../../code-block/highlight.js'
 import {
   type CodeBlockHighlighter,
   HighlighterController,

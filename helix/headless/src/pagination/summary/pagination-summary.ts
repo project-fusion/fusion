@@ -5,6 +5,7 @@ import {
   numberConverter,
   words,
 } from '@fusion.dev/helix-core'
+import { pageRange } from '@fusion.dev/helix-core/pagination'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -86,26 +87,11 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
        with no text in it: a footer laid out as a grid keeps its column, and a
        count that appears when the total loads does not move the controls beside
        it. */
-    if (this.total <= 0 || this.pageSize <= 0) {
+    const range = pageRange(this.page, this.pageSize, this.total)
+    if (range === undefined) {
       return html``
     }
-    const size = Math.max(1, Math.floor(this.pageSize))
-    /* **The page is clamped to the range, not just the window inside it.**
-       Only the end was, so a `page` past the last one produced a start past the
-       total and an end pinned to it: at page 99 of a 10-page result this read
-       "2,451-248 of 248", a range running backwards. That is the worst kind of
-       wrong here, because a count is the one number in a footer a reader cannot
-       check against anything else on screen.
-    
-       A page past the end is not far-fetched either: it is a bookmarked query
-       after the result shrank, and the run beside this clamps it silently, so
-       the two would disagree with only this one visibly broken. */
-    const pages = Math.max(1, Math.ceil(this.total / size))
-    const page = Math.min(pages, Math.max(1, Math.floor(this.page) || 1))
-    const from = (page - 1) * size + 1
-    /* And the end is clamped to the total, because the last page is rarely
-       full: 248 items at 25 a page end at 248, not at 250. */
-    const to = Math.min(this.total, from + size - 1)
+    const { from, to } = range
     return html`${formatWords(this, 'format', { from, to, total: this.total })}`
   }
 }

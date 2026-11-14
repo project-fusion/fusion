@@ -1,14 +1,14 @@
-import './two-panes-over-one.css'
-
 export function Example() {
   return (
     <helix-splitter
       default-position="70"
       orientation="vertical"
+      style={{ blockSize: '18rem' }}
     >
       <helix-splitter
         default-position="45"
         slot="start"
+        style={{ blockSize: '18rem' }}
       >
         <helix-card
           separation="plain"

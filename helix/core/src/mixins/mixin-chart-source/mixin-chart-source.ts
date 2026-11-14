@@ -22,39 +22,11 @@ import { formatWords, words } from '../../words/words.js'
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
 
-/**
- * How many colors the series palette has, and so where it starts over.
- *
- * Here rather than in each chart, because a number two files have to agree on
- * is a number that will stop agreeing: when the palette went from eight to
- * twenty-four, one of five copies was missed and drew every ninth series in the
- * first color while the legend beside it named the ninth.
- */
-export const PALETTE = 24
+/* The palette's size and a series' slot in it, in core's chart arithmetic, which a phone reads too. */
+import { seriesIndex } from '../../utils/chart-plot/plot-box.js'
 
-/** The palette slot for the nth series, counting from one and wrapping. */
-export const seriesIndex = (depth: number): number => (depth % PALETTE) + 1
-
-/**
- * The drawing's own coordinates, which a `viewBox` maps onto whatever box CSS
- * gives it.
- *
- * Here for the reason `PALETTE` is here, one paragraph up: six families drew
- * into the same square and declared it six times under three names, and one of
- * them wrote the same number as a literal on one axis and as its own constant
- * on the other, in one attribute. A round hundred so a `d` attribute is
- * readable in the inspector.
- *
- * **Two names for one number, because the axes are two facts.** `x2=${PLOT_WIDTH}`
- * and `y2=${PLOT_HEIGHT}` say which edge they reach; one name used twice says
- * nothing, and the day a chart is not square the call sites are already right.
- * `Sparkline` is that day already: it is a strip rather than a plot, so it takes
- * this width and states its own height beside it.
- */
-export const PLOT_WIDTH = 100
-
-/** The drawing's own coordinates. See `PLOT_WIDTH`. */
-export const PLOT_HEIGHT = 100
+/* The drawing's own coordinates, in core's chart arithmetic, which a phone reads too. */
+export { PALETTE, PLOT_HEIGHT, PLOT_WIDTH, seriesIndex } from '../../utils/chart-plot/plot-box.js'
 
 /**
  * A list of series names, as the attributes that take one are written.

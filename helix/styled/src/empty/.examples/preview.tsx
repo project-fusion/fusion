@@ -1,5 +1,3 @@
-import './preview.css'
-
 export function Example() {
   return (
     <helix-empty>
@@ -17,6 +15,7 @@ export function Example() {
       <helix-button
         emphasis="solid"
         slot="actions"
+        style={{ '--button-inline-size': 'var(--helix-size-button)' }}
         tone="primary"
       >
         New project

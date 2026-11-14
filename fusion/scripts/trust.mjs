@@ -169,6 +169,7 @@ for (const name of packages) {
 
          Only on `EOTP`. Retrying a 403 interactively asks a person to watch a
          permission error arrive a second time. */
+      let error = first
       if (/EOTP|one-time password/i.test(String(first.stderr ?? first.message))) {
         try {
           console.log(`  ${name} <- ${file} (${environment}): npm wants a one-time password`)
@@ -176,10 +177,21 @@ for (const name of packages) {
           console.log(`  ${name} <- ${file} (${environment})`)
           continue
         } catch {
-          /* Fall through and report it the way anything else is reported. */
+          /* **The answered challenge's refusal went to the terminal**, where
+             this cannot read it, so the call is made once more, piped, now that
+             the session has passed the challenge. A conflict there is the
+             registration already being there: on October 11, 2026 a run
+             reported `@fusion.dev/cortex-docs` failed with the first call's
+             `EOTP`, when the retry had been refused with a 409. */
+          try {
+            execFileSync('npm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+            console.log(`  ${name} <- ${file} (${environment})`)
+            continue
+          } catch (again) {
+            error = again
+          }
         }
       }
-      const error = first
       /* npm's own message, rather than "Command failed". Getting this wrong is
          how a registry error becomes an afternoon. */
       const output = String(error.stderr ?? error.message)

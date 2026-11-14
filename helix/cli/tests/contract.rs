@@ -61,7 +61,8 @@ fn code(output: &Output) -> i32 {
     output.status.code().expect("the process exited normally")
 }
 
-/// A directory holding one intent, cleaned up when it drops.
+/// A directory holding one intent as the `theme` of its `helix.json`, cleaned
+/// up when it drops.
 struct Sandbox(PathBuf);
 
 impl Sandbox {
@@ -74,10 +75,21 @@ impl Sandbox {
         rule and the test would be at the mercy of the host machine without it. */
         std::fs::write(path.join(".git"), "").expect("a root marker");
         if let Some(intent) = intent {
-            std::fs::write(path.join("helix.theme.json"), intent).expect("an intent");
+            std::fs::write(path.join("helix.json"), configuration(intent)).expect("an intent");
         }
         Self(path)
     }
+}
+
+/// `helix.json` holding `intent` as its `theme`.
+fn configuration(intent: &str) -> String {
+    format!("{{ \"theme\": {intent} }}\n")
+}
+
+/// The `theme` of the `helix.json` in `directory`.
+fn theme_of(directory: &Path) -> serde_json::Value {
+    let text = std::fs::read_to_string(directory.join("helix.json")).expect("init wrote the file");
+    serde_json::from_str::<serde_json::Value>(&text).expect("the file is JSON")["theme"].clone()
 }
 
 impl Drop for Sandbox {
@@ -111,9 +123,7 @@ fn an_intent_with_no_brand_builds_ink_in_both_modes() {
     let sandbox = Sandbox::new("ink", None);
     let init = run(&sandbox.0, &["theme", "init"]);
     assert_eq!(code(&init), 0, "{}", err(&init));
-    let written =
-        std::fs::read_to_string(sandbox.0.join("helix.theme.json")).expect("init wrote the file");
-    assert_eq!(written.trim(), "{}");
+    assert_eq!(theme_of(&sandbox.0), serde_json::json!({}));
 
     let build = run(&sandbox.0, &["theme", "build"]);
     assert_eq!(code(&build), 0, "{}", err(&build));
@@ -181,11 +191,7 @@ fn a_missing_intent_is_not_a_violation() {
     let sandbox = Sandbox::new("missing", None);
     let output = run(&sandbox.0, &["theme", "check"]);
     assert_eq!(code(&output), 3);
-    assert!(
-        err(&output).contains("helix.theme.json"),
-        "{}",
-        err(&output)
-    );
+    assert!(err(&output).contains("helix.json"), "{}", err(&output));
     assert!(
         err(&output).contains("helix theme init"),
         "no hint at the command that fixes it"
@@ -295,6 +301,135 @@ fn the_artifact_is_the_only_thing_on_stdout() {
     );
 }
 
+/// **The module a phone reads is the stylesheet's colors**, each mode's under
+/// its own key, so a phone without the engine draws what the web draws.
+#[test]
+fn the_native_format_writes_each_mode_s_colors_as_the_stylesheet_does() {
+    let sandbox = Sandbox::new("native", Some(r##"{ "brand": "#3451b2" }"##));
+    let css = out(&run(&sandbox.0, &["theme", "build"]));
+    let output = run(&sandbox.0, &["theme", "build", "--format", "native"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    let module = out(&output);
+    assert!(module.contains("export const theme = {"), "{module}");
+    let (dark, light) = module
+        .split_once("  light: {")
+        .expect("a light block after the dark one");
+    assert!(dark.contains("  dark: {"), "{module}");
+    /* Each color the stylesheet writes as a pair is the light half under
+    `light` and the dark half under `dark`. */
+    let mut pairs = 0;
+    for line in css.lines() {
+        let Some((name, rest)) = line.trim().split_once(": light-dark(") else {
+            continue;
+        };
+        let Some(name) = name
+            .strip_prefix("--helix-")
+            .filter(|name| name.starts_with("color-"))
+        else {
+            continue;
+        };
+        let (bright, dim) = rest
+            .trim_end_matches(");")
+            .split_once(", ")
+            .expect("a pair");
+        assert!(
+            light.contains(&format!("'{name}': '{bright}',")),
+            "{name} in light"
+        );
+        assert!(
+            dark.contains(&format!("'{name}': '{dim}',")),
+            "{name} in dark"
+        );
+        pairs += 1;
+    }
+    assert!(pairs > 20, "only {pairs} pairs compared");
+}
+
+/// **A check passes on the file a build wrote, and fails once the intent
+/// moves**, and writes nothing either way.
+#[test]
+fn a_check_fails_when_the_written_theme_is_behind_its_intent() {
+    let sandbox = Sandbox::new("build-check", Some(CLEAN));
+    for format in ["css", "native"] {
+        let missing = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&missing), 1, "{format}: {}", err(&missing));
+        assert!(
+            !sandbox.0.join("theme.out").exists(),
+            "{format}: a check wrote"
+        );
+
+        let built = run(
+            &sandbox.0,
+            &["theme", "build", "--format", format, "--out", "theme.out"],
+        );
+        assert_eq!(code(&built), 0, "{format}: {}", err(&built));
+        let checked = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&checked), 0, "{format}: {}", err(&checked));
+        assert_eq!(out(&checked), "", "{format}: a passing check printed");
+        assert_eq!(err(&checked), "", "{format}: a passing check printed");
+
+        std::fs::write(
+            sandbox.0.join("helix.json"),
+            configuration(r##"{ "brand": "#c1272d" }"##),
+        )
+        .expect("a new intent");
+        let stale = run(
+            &sandbox.0,
+            &[
+                "theme",
+                "build",
+                "--check",
+                "--format",
+                format,
+                "--out",
+                "theme.out",
+            ],
+        );
+        assert_eq!(code(&stale), 1, "{format}");
+        assert_eq!(
+            out(&stale),
+            "",
+            "{format}: a failing check printed to stdout"
+        );
+        assert!(
+            err(&stale).contains("out of date"),
+            "{format}: {}",
+            err(&stale)
+        );
+
+        std::fs::write(sandbox.0.join("helix.json"), configuration(CLEAN)).expect("the intent");
+        std::fs::remove_file(sandbox.0.join("theme.out")).expect("the file");
+    }
+    let unaimed = run(&sandbox.0, &["theme", "build", "--check"]);
+    assert_eq!(
+        code(&unaimed),
+        2,
+        "a check with nothing to read is a usage error"
+    );
+}
+
 #[test]
 fn init_writes_a_file_the_next_command_can_read() {
     let sandbox = Sandbox::new("init", None);
@@ -321,8 +456,8 @@ fn init_refuses_to_overwrite_without_force() {
     let refused = run(&sandbox.0, &["theme", "init", "--brand", "#c1272d"]);
     assert_eq!(code(&refused), 3);
     assert_eq!(
-        std::fs::read_to_string(sandbox.0.join("helix.theme.json")).expect("still there"),
-        CLEAN,
+        std::fs::read_to_string(sandbox.0.join("helix.json")).expect("still there"),
+        configuration(CLEAN),
         "the intent was overwritten anyway"
     );
 
@@ -331,9 +466,85 @@ fn init_refuses_to_overwrite_without_force() {
         &["theme", "init", "--brand", "#c1272d", "--force"],
     );
     assert_eq!(code(&forced), 0);
-    assert!(std::fs::read_to_string(sandbox.0.join("helix.theme.json"))
-        .expect("rewritten")
-        .contains("#c1272d"));
+    assert_eq!(theme_of(&sandbox.0)["brand"], "#c1272d");
+}
+
+/// **`init` writes the theme and keeps the rest of the file.** `helix.json`
+/// holds every section, so a theme written into it leaves the component
+/// settings as they were.
+#[test]
+fn init_keeps_the_other_sections_of_the_file() {
+    let sandbox = Sandbox::new("init-sections", None);
+    std::fs::write(
+        sandbox.0.join("helix.json"),
+        r#"{ "components": { "tiers": ["src"] } }"#,
+    )
+    .expect("a configuration");
+    let written = run(&sandbox.0, &["theme", "init", "--brand", "#c1272d"]);
+    assert_eq!(code(&written), 0, "{}", err(&written));
+    let text = std::fs::read_to_string(sandbox.0.join("helix.json")).expect("the file");
+    let held: serde_json::Value = serde_json::from_str(&text).expect("JSON");
+    assert_eq!(held["components"]["tiers"][0], "src");
+    assert_eq!(held["theme"]["brand"], "#c1272d");
+}
+
+/// **A theme file named by `helix.json` is read**, relative to it, which is
+/// how a theme file handed out on its own stays a file of its own.
+#[test]
+fn a_theme_named_by_its_path_is_read_from_that_file() {
+    let sandbox = Sandbox::new("theme-path", None);
+    std::fs::create_dir_all(sandbox.0.join("design")).expect("a folder");
+    std::fs::write(sandbox.0.join("design/brand.json"), FAILING).expect("a theme file");
+    std::fs::write(
+        sandbox.0.join("helix.json"),
+        r#"{ "theme": "design/brand.json" }"#,
+    )
+    .expect("a configuration");
+    let output = run(&sandbox.0, &["theme", "check"]);
+    assert_eq!(
+        code(&output),
+        1,
+        "the file's failing pair: {}",
+        err(&output)
+    );
+}
+
+/// **`helix.theme.json` is read for one more release**, with a notice on
+/// stderr that says where its intent moves.
+#[test]
+fn a_theme_file_of_the_old_name_is_read_with_a_notice() {
+    let sandbox = Sandbox::new("legacy", None);
+    std::fs::write(sandbox.0.join("helix.theme.json"), CLEAN).expect("an intent");
+    let output = run(&sandbox.0, &["theme", "build"]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    assert!(out(&output).starts_with(":root {"), "{}", out(&output));
+    assert!(
+        err(&output).contains("read for one more release"),
+        "{}",
+        err(&output)
+    );
+}
+
+/// **The `helix` key of `fusion.json` is read before `helix.json`**, in the
+/// same directory, and `init` does not write a theme nothing would read.
+#[test]
+fn the_helix_key_of_fusion_json_is_read_first() {
+    let sandbox = Sandbox::new("product", Some(CLEAN));
+    std::fs::write(
+        sandbox.0.join("fusion.json"),
+        format!(r#"{{ "helix": {} }}"#, configuration(FAILING).trim()),
+    )
+    .expect("the product's file");
+    let output = run(&sandbox.0, &["theme", "check"]);
+    assert_eq!(
+        code(&output),
+        1,
+        "fusion.json's failing theme: {}",
+        err(&output)
+    );
+    let refused = run(&sandbox.0, &["theme", "init", "--force"]);
+    assert_eq!(code(&refused), 3);
+    assert!(err(&refused).contains("fusion.json"), "{}", err(&refused));
 }
 
 /// A bare noun prints help and exits 2, rather than guessing at a verb.
@@ -351,21 +562,21 @@ fn an_incomplete_command_is_a_usage_error() {
 #[test]
 fn a_usage_error_under_json_is_a_json_error_with_the_choices() {
     let sandbox = Sandbox::new("usage-json", Some(CLEAN));
+    let commands = vec![
+        "mcp",
+        "api",
+        "component",
+        "diagnostics",
+        "manifest",
+        "new",
+        "scan",
+        "shared",
+        "system",
+        "theme",
+        "visual",
+    ];
     for (args, choices) in [
-        (
-            vec!["--json", "frobnicate"],
-            vec![
-                "mcp",
-                "api",
-                "component",
-                "diagnostics",
-                "manifest",
-                "new",
-                "scan",
-                "theme",
-                "visual",
-            ],
-        ),
+        (vec!["--json", "frobnicate"], commands),
         (
             vec!["--json", "theme"],
             vec!["init", "build", "audit", "check"],
@@ -421,7 +632,7 @@ fn init_refuses_a_brand_it_cannot_read() {
     assert_eq!(code(&refused), 3);
     assert!(err(&refused).contains("red"), "{}", err(&refused));
     assert!(
-        !sandbox.0.join("helix.theme.json").exists(),
+        !sandbox.0.join("helix.json").exists(),
         "the file was written anyway"
     );
 }
@@ -1854,6 +2065,7 @@ fn an_example_opens_with_what_it_needs_said() {
          \x20    that wrapped. -->\n\
          <!-- @min 300 -->\n\
          <!-- @layout fullscreen -->\n\
+         <!-- @react-native-summary A month of visits, on a phone. -->\n\
          <helix-chart></helix-chart>\n\
          <!-- @min 999 -->\n",
     )
@@ -1872,6 +2084,15 @@ fn an_example_opens_with_what_it_needs_said() {
     /* A height is a number in the manifest and a word in the markup. */
     assert!(said.contains("\"min\": 300"), "read as a number: {said}");
     assert!(said.contains("\"layout\": \"fullscreen\""), "{said}");
+    /* What it shows in React Native, keyed by the platform. */
+    assert!(
+        said.contains("\"react-native\": {"),
+        "keyed by the platform: {said}"
+    );
+    assert!(
+        said.contains("\"description\": \"A month of visits, on a phone.\""),
+        "{said}"
+    );
     /* A directive is read wherever it sits, because two of the slider's
     examples open with the stylesheet they need and write theirs under it. The
     first of a name wins, so a second `@min` further down is markup a consumer

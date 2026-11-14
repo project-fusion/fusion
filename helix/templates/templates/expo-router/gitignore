@@ -1,0 +1,16 @@
+# Installed by npm install
+node_modules
+
+# Written by Expo while it runs
+.expo
+expo-env.d.ts
+
+# Written by npm run build
+dist
+
+# Written by a development build, npx expo run:ios or npx expo run:android
+ios
+android
+
+# Environment files for this machine alone, such as .env.local
+*.local

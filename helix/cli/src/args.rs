@@ -84,7 +84,7 @@ pub enum Noun {
     repository's builds carry Helix's own conventions as well. */
     /// Hold components to the conventions Helix is built on.
     ///
-    /// Reads the tiers named by `helix.json`.
+    /// Reads the tiers the `components` of `helix.json` names.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Component {
         #[command(subcommand)]
@@ -131,6 +131,40 @@ pub enum Noun {
     /// beside the runs `helix diagnostics` writes there. Exits 1 on a finding
     /// at `error`.
     Scan(Scan),
+
+    /* **A noun with no verb, like `scan`**: it does one thing to the code an
+    app shares between the web and a phone. */
+    /// Check the code an app shares between the web and a phone for what only the web has.
+    ///
+    /// Reads each module under the paths given, or under the directory it runs
+    /// in, except the files named for one platform, such as page.web.tsx and
+    /// page.native.tsx. Reports the browser's globals, DOM elements, CSS, and
+    /// the Helix families, props, and events a phone does not have, judged
+    /// against the Helix packages you installed. Exits 1 on a finding.
+    Shared(Shared),
+
+    /* **Public, and named for what it builds.** It compiles a design
+    system's families, written in the neutral form, for each platform, so a
+    design system that is not Helix runs it as Helix does. The verbs that
+    write into Helix's own runtime are this repository's alone, for the reason
+    `manifest build` gives, and a published build leaves them out. */
+    /// Compile a design system's families for the web and for React Native.
+    ///
+    /// Reads the `system` of `helix.json`, or of the `helix` key in
+    /// `fusion.json`, from the working directory or the nearest directory
+    /// above it: the design system's prefixes, its token source, its
+    /// families, and where each output is written.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    System {
+        /// The configuration to read, in place of the one found from the
+        /// working directory: a `helix.json`, or a `fusion.json` with a
+        /// `helix` key.
+        #[arg(long, global = true, value_name = "PATH")]
+        config: Option<PathBuf>,
+
+        #[command(subcommand)]
+        verb: System,
+    },
 
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
@@ -185,6 +219,14 @@ pub struct Diagnostics {
     pub once: Vec<String>,
 }
 
+/// What `helix shared` takes.
+#[derive(Args, Debug)]
+pub struct Shared {
+    /// The files and folders to read. Defaults to the directory it runs in.
+    #[arg(value_name = "PATH")]
+    pub paths: Vec<PathBuf>,
+}
+
 /// What `helix scan` takes.
 #[derive(Args, Debug)]
 pub struct Scan {
@@ -229,7 +271,7 @@ pub struct Scan {
 pub enum Theme {
     /// Write a starter intent.
     Init(Init),
-    /// Emit the theme as CSS.
+    /// Emit the theme as CSS, or as a module React Native reads.
     ///
     /// Both modes as one block of `light-dark()` pairs, unless the intent
     /// names a `scheme`.
@@ -249,7 +291,7 @@ pub enum Theme {
 /// What every theme verb that reads an intent takes.
 #[derive(Args, Debug)]
 pub struct Common {
-    /// The intent to read. Defaults to the nearest `helix.theme.json`.
+    /// A theme file to read. Defaults to the `theme` of the nearest `helix.json`.
     pub intent: Option<PathBuf>,
 
     /// Read the intent from here instead of searching.
@@ -282,6 +324,17 @@ pub struct Build {
     #[arg(long, short, value_name = "PATH")]
     pub out: Option<PathBuf>,
 
+    /// What to write: CSS for the web, or a module for React Native.
+    #[arg(long, value_enum, default_value_t = ThemeFormat::Css)]
+    pub format: ThemeFormat,
+
+    /// Fail if the file at `--out` is missing or differs from what the theme
+    /// builds, and write nothing.
+    ///
+    /// For a build step that keeps a committed theme in step with its intent.
+    #[arg(long, requires = "out")]
+    pub check: bool,
+
     /// The selector the block is written under.
     ///
     /// `:root` ties the selectors Helix's own stylesheet declares its tokens
@@ -303,9 +356,24 @@ pub struct Build {
     pub force: bool,
 }
 
+/// What `helix theme build` writes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, clap::ValueEnum)]
+pub enum ThemeFormat {
+    /// A block of custom properties, for the web.
+    Css,
+    /// A TypeScript module exporting `theme`, each color in light and dark
+    /// mode by its token name, for the `tokens` of `HelixRoot` in
+    /// `@fusion.dev/helix-native`. A phone draws it with no theme engine, Expo
+    /// Go included.
+    Native,
+}
+
 #[derive(Args, Debug)]
 pub struct Init {
-    /// Where to write it. Defaults to `helix.theme.json` here.
+    /// Write the intent to this file of its own.
+    ///
+    /// Without it, the intent is written as the `theme` of `helix.json`
+    /// here, and the file's other sections are kept.
     #[arg(long, short, value_name = "PATH")]
     pub out: Option<PathBuf>,
 
@@ -340,6 +408,264 @@ pub enum Manifest {
     /// Writes to stdout.
     #[cfg(feature = "internal")]
     Build(ManifestBuild),
+}
+
+/// The verbs of `helix system`.
+#[derive(Debug, Subcommand)]
+pub enum System {
+    /// Print what each element is made of on each platform, as JSON.
+    ///
+    /// For each element, by its tag: the attributes the web element takes,
+    /// its custom states and events, and the tree in its shadow root, and,
+    /// where Helix draws it on React Native, the props the component takes
+    /// and the tree it draws. `analyze` writes it into the styled package's
+    /// `api.json`, which `helix api anatomy` prints.
+    Anatomy(SystemArgs),
+
+    /// Write each family's intermediate form and web stylesheet to the system's `outputs.build`.
+    ///
+    /// The families package's `build` folder unless it names another. With `--check`, writes nothing and exits 1 when a written one differs
+    /// from what the sources compile to, so a build and a check are two
+    /// builds compared.
+    Build(SystemBuild),
+
+    /// Write each capability's contract into core's sources.
+    ///
+    /// Writes `src/capabilities/<capability>/contract.generated.ts` and the
+    /// types they share, from the contracts the compiler defines. With
+    /// `--check`, writes nothing and exits 1 when one is missing or out of
+    /// date.
+    #[cfg(feature = "internal")]
+    Capabilities(SystemCapabilities),
+
+    /// Hold each element's API to the manifest.
+    ///
+    /// Exits 1 when an element's attributes, events, slots, parts or states
+    /// differ from the manifest's.
+    Check(SystemArgs),
+
+    /// Print the design system the `system` of `helix.json` describes, with every default filled in.
+    ///
+    /// Every path is absolute, and every key the section leaves out holds the
+    /// value the compiler uses for it. With `--schema`, prints the JSON Schema
+    /// of `helix.json`, which an editor validates the file with.
+    Config(SystemConfig),
+
+    /// Write each family's native components, with their props typed, for the styled package.
+    ///
+    /// Writes `<family>/index.native.ts` under `--out`: each element's
+    /// intermediate form, its props type, and its component, which draws the
+    /// form with the native runtime the system's `runtime.native` names,
+    /// `@fusion.dev/helix-native` unless it names another. Each prop, slot and
+    /// event is described from the styled manifest, and each event's detail is
+    /// typed from the event classes the system's `events` names. With
+    /// `--check`, writes nothing and exits 1 when a written module is missing
+    /// or out of date.
+    Components(SystemComponents),
+
+    /// Write the token layer as a Design Tokens Format Module file, with a resolver for its modes.
+    ///
+    /// Reads the token layer in the system's styles package and writes
+    /// `<prefix>.tokens.json`, light mode at the default density, and
+    /// `<prefix>.resolver.json`, which adds dark mode and each density stop,
+    /// into the system's `outputs.designTokens`. Refuses a token whose CSS
+    /// differs from what `tokens.ts` writes for it, which `dist/tokens.json`
+    /// records. With `--check`, writes nothing and exits 1 when a written file
+    /// is missing or out of date.
+    #[cfg(feature = "internal")]
+    DesignTokens(SystemDesignTokens),
+
+    /// Write the names of the parts each render draws, for its style table's typecheck.
+    ///
+    /// Reads each `headless.tsx` and writes `src/parts.generated/` in the
+    /// package holding the sources, which `styles()` reads, so a table naming a
+    /// part its render does not draw fails its typecheck. Never committed: run it
+    /// before `tsc`, or with `--watch` while you write. With `--check`, writes
+    /// nothing and exits 1 when a module is missing or out of date.
+    Parts(SystemParts),
+
+    /// Print what each element is called on each platform, as JSON.
+    ///
+    /// For each element with a native component: the component's name, and
+    /// the name each property, slot, and event of the web element takes as a
+    /// prop. `analyze` writes it into the styled package's `api.json`, which
+    /// `helix api` and the MCP server read.
+    Platforms(SystemArgs),
+
+    /// Write each generated stylesheet into the styled package's sources.
+    ///
+    /// With `--check`, writes nothing and exits 1 when one is missing or out of
+    /// date.
+    Stylesheets(SystemStylesheets),
+
+    /// Compile each machine in core to the flat module beside it.
+    ///
+    /// Reads `src/machines/<machine>/machine.ts` and writes
+    /// `<machine>.generated.ts` beside it. Refuses a machine that is not total,
+    /// has a state it can never enter, or names anything it does not define.
+    /// With `--check`, writes nothing and exits 1 when a written module is
+    /// missing or out of date.
+    #[cfg(feature = "internal")]
+    Machines(SystemMachines),
+
+    /// Write each mode's native token module into the package's sources.
+    ///
+    /// Reads the system's token source, a styles package or a Design Tokens
+    /// Format Module file, types every token, and writes `light.generated.ts`,
+    /// `dark.generated.ts`, and `kinds.generated.ts` with each token's value
+    /// as the native renderer takes it. Refuses a token whose value it cannot
+    /// type. With `--check`, writes nothing and exits 1 when a written module
+    /// is missing or out of date.
+    Tokens(SystemTokens),
+
+    /// Write the intermediate form's TypeScript types into the package's sources.
+    ///
+    /// With `--check`, writes nothing and exits 1 when the written types are
+    /// missing or out of date.
+    #[cfg(feature = "internal")]
+    Types(SystemTypes),
+}
+
+/// What `system capabilities` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct SystemCapabilities {
+    /// Say which written contracts are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the capabilities, which is the directory holding its
+    /// `src`: the system's `runtime.sources.core` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system config` takes.
+#[derive(Args, Debug)]
+pub struct SystemConfig {
+    /// Print the JSON Schema of `helix.json`, and read no configuration.
+    #[arg(long)]
+    pub schema: bool,
+}
+
+/// What `system components` takes.
+#[derive(Args, Debug)]
+pub struct SystemComponents {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The directory each family's module is written under, as
+    /// `<family>/index.native.ts`: the system's `outputs.components` unless
+    /// given.
+    #[arg(long, value_name = "DIR")]
+    pub out: Option<PathBuf>,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system design-tokens` takes.
+#[derive(Args, Debug)]
+pub struct SystemDesignTokens {
+    /// Say which written files are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The styles package, which is the directory holding its `src`: the
+    /// system's `tokens.styles` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system machines` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct SystemMachines {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the machines, which is the directory holding its
+    /// `src`: the system's `runtime.sources.core` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system tokens` takes.
+#[derive(Args, Debug)]
+pub struct SystemTokens {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package the modules are written into, under its `src/theme`: the
+    /// system's `outputs.tokens` folder unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system types` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct SystemTypes {
+    /// Say whether the written types are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package the types are written into, which is the directory holding
+    /// its `src`: the system's `runtime.sources.native` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system parts` takes.
+#[derive(Args, Debug)]
+pub struct SystemParts {
+    /// Say which modules are missing or out of date, and write nothing.
+    #[arg(long, conflicts_with = "watch")]
+    pub check: bool,
+
+    /// Keep writing them as the headless sources change, until stopped.
+    #[arg(long)]
+    pub watch: bool,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system stylesheets` takes.
+#[derive(Args, Debug)]
+pub struct SystemStylesheets {
+    /// Say which generated stylesheets are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The directory a stylesheet's path is under: the project's
+    /// `outputs.stylesheets` unless given.
+    #[arg(long, value_name = "DIR")]
+    pub out: Option<PathBuf>,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system build` takes.
+#[derive(Args, Debug)]
+pub struct SystemBuild {
+    /// Say which written outputs differ from what the sources compile to, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
+}
+
+/// What `system check` takes.
+#[derive(Args, Debug)]
+pub struct SystemArgs {
+    /// The package holding the sources, which is the directory holding its
+    /// `src`: the system's `families` unless given.
+    pub package: Option<PathBuf>,
 }
 
 /// What `manifest build` takes.
@@ -502,6 +828,12 @@ pub enum Api {
     Find(ApiFind),
     /// One family's API: tags, properties, events, slots, parts, words, and imports.
     Family(ApiFamily),
+    /// What each element of a family is made of, on the web and on React Native.
+    ///
+    /// For each styled element: the attributes it takes, its custom states
+    /// and events, and the tree in its shadow root, then, where Helix draws
+    /// it on a phone, the props its component takes and the tree it draws.
+    Anatomy(ApiFamily),
     /// One example of a family, with the import lines it needs.
     Example(ApiExample),
     /// The import lines that register the given tags.

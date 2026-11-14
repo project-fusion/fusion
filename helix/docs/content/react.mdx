@@ -53,6 +53,12 @@ does not bind them. An event fired before the next render reaches no listener.
 The element reads the handlers React stored on the node and binds them, so a
 handler works from the first paint.
 
+The element binds them as it sends an event, on itself and on each element the
+event bubbles to. An `onhelix-action` on a list therefore hears a press on any
+of its items in a page the server drew. A handler on a plain element above,
+such as a `div`, is bound the same way. React does not have to render again
+first.
+
 ### Object and function properties
 
 React drops object and function properties on both sides. The server renderer

@@ -1,0 +1,50 @@
+# Heatmap, each example drawn alone, one screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The flow waits for the title of each screen, which no example before it draws.
+appId: dev.fusion.helix.app
+name: "Screens: Heatmap"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://heatmap/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: heatmap-preview-${MODE}-${SIZE}
+- openLink: helix://heatmap/continuous/preview
+- extendedWaitUntil:
+    visible: 'Continuous'
+    timeout: 15000
+- takeScreenshot: heatmap-continuous-${MODE}-${SIZE}
+- openLink: helix://heatmap/contributions/preview
+- extendedWaitUntil:
+    visible: 'Contributions'
+    timeout: 15000
+- takeScreenshot: heatmap-contributions-${MODE}-${SIZE}
+- openLink: helix://heatmap/empty/preview
+- extendedWaitUntil:
+    visible: 'Empty'
+    timeout: 15000
+- takeScreenshot: heatmap-empty-${MODE}-${SIZE}
+- openLink: helix://heatmap/events/preview
+- extendedWaitUntil:
+    visible: 'Events'
+    timeout: 15000
+- takeScreenshot: heatmap-events-${MODE}-${SIZE}
+- openLink: helix://heatmap/hours/preview
+- extendedWaitUntil:
+    visible: 'Hours'
+    timeout: 15000
+- takeScreenshot: heatmap-hours-${MODE}-${SIZE}
+- openLink: helix://heatmap/rectangle-selection/preview
+- extendedWaitUntil:
+    visible: 'Rectangle Selection'
+    timeout: 15000
+- takeScreenshot: heatmap-rectangle-selection-${MODE}-${SIZE}
+- openLink: helix://heatmap/sizes/preview
+- extendedWaitUntil:
+    visible: 'Sizes'
+    timeout: 15000
+- takeScreenshot: heatmap-sizes-${MODE}-${SIZE}

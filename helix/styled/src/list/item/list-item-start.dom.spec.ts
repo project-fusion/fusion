@@ -42,8 +42,8 @@ const item = async (start: string): Promise<HTMLElement> => {
 
 describe('the start slot', () => {
   test('mutes through inheritance, so a slotted component keeps its own color', () => {
-    expect(rule('slot[name="start"]')).toContain('color:')
-    expect(rule('slot[name="start"]::slotted(*)')).not.toContain('color:')
+    expect(rule(':host [part="start"]')).toContain('color:')
+    expect(rule(':host [part="start"]::slotted(*)')).not.toContain('color:')
   })
 
   geometry('an avatar keeps the color it draws its initials in', async () => {

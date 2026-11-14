@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessStat } from '@fusion.dev/helix-headless/stat'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './stat-root.css.js'
+import { styles } from './stat-root.generated.css.js'
 
 /**
  * @summary One measurement, with a label that names what it measures.

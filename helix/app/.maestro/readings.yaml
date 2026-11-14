@@ -1,0 +1,52 @@
+# Readings: what Meter and Progress are read as. A meter and a bar that show
+# their value write it, which the flow requires. A screen reader hears the
+# reading as the element's value, which iOS gives and Maestro reads as the
+# element's text, and Android keeps where Maestro does not read it. The steps
+# that read a value no example writes are optional until a night shows what
+# iOS gives.
+appId: dev.fusion.helix.app
+name: Readings
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://meter/preview/preview
+      SHOWS: .*Disk used.*
+- assertVisible: 42%
+- openLink: helix://meter/value-text/preview
+- extendedWaitUntil:
+    visible: .*Storage.*
+    timeout: 15000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: 18 GB of 32 GB
+# A meter that holds segments draws each as a slice of its bar, and writes
+# the words its `value-text` gives.
+- openLink: helix://meter/segments/preview
+- extendedWaitUntil:
+    visible: .*Context window.*
+    timeout: 15000
+- assertVisible: 620 of 1,000 tokens
+- openLink: helix://progress/preview/preview
+- extendedWaitUntil:
+    visible: .*Uploading.*
+    timeout: 15000
+- assertVisible: 62%
+- openLink: helix://progress/value-text/preview
+- extendedWaitUntil:
+    visible: .*Importing records.*
+    timeout: 15000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: 3 of 8 records
+- takeScreenshot: readings-progress-value-text

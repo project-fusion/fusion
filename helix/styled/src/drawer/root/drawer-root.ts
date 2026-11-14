@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDrawer } from '@fusion.dev/helix-headless/drawer'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './drawer-root.css.js'
+import { styles } from './drawer-root.generated.css.js'
 
 /**
  * @summary A panel that slides in from an edge.

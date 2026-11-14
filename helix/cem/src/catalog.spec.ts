@@ -1,5 +1,13 @@
 import { describe, expect, test } from 'bun:test'
-import { catalog, type ExampleSource, findInCatalog, publishedBy, rendersOf } from './catalog.js'
+import {
+  catalog,
+  type ExampleSource,
+  findInCatalog,
+  publishedBy,
+  rendersOf,
+  withAnatomy,
+  withPlatforms,
+} from './catalog.js'
 import type { HelixManifest } from './types.js'
 
 const manifest: HelixManifest = {
@@ -10,7 +18,13 @@ const manifest: HelixManifest = {
           helix: {
             aliases: ['pager'],
             category: 'navigation',
-            examples: [{ description: 'Counts written short.', slug: 'compact' }],
+            examples: [
+              {
+                description: 'Counts written short.',
+                platforms: { 'react-native': { description: 'Counts written short, on a phone.' } },
+                slug: 'compact',
+              },
+            ],
             part: 'root',
           },
           members: [
@@ -173,6 +187,13 @@ describe('examples', () => {
   test('the description comes from the manifest, keyed by slug', () => {
     expect(pagination?.examples[2]?.description).toBe('Counts written short.')
     expect(pagination?.examples[0]?.description).toBe('')
+  })
+
+  test('what an example shows on a phone comes from the manifest, where it differs', () => {
+    expect(pagination?.examples[2]?.platforms?.['react-native']?.description).toBe(
+      'Counts written short, on a phone.',
+    )
+    expect(pagination?.examples[0]).not.toHaveProperty('platforms')
   })
 
   test('an example belongs only to its own family', () => {
@@ -621,6 +642,90 @@ describe('publishedBy', () => {
   test('names no package where none read holds the root', () => {
     const [alone] = publishedBy(catalog([sandbox]), '@fusion.dev/helix-sandbox')
     expect(alone && 'package' in alone).toBe(false)
+  })
+})
+
+describe('withPlatforms', () => {
+  const tabs: HelixManifest = {
+    helix: { package: '@fusion.dev/helix' },
+    modules: [
+      {
+        declarations: [{ helix: { status: 'stable' }, name: 'HelixTabs', tagName: 'helix-tabs' }],
+        path: 'src/tabs/root/tabs-root.ts',
+      },
+      {
+        declarations: [{ name: 'HelixTabsScroller', tagName: 'helix-tabs-scroller' }],
+        path: 'src/tabs/scroller/tabs-scroller.ts',
+      },
+      {
+        declarations: [
+          {
+            helix: { status: 'stable' },
+            name: 'HelixHeadlessTabs',
+            tagName: 'helix-headless-tabs',
+          },
+        ],
+        path: 'src/tabs/root/headless-tabs-root.ts',
+      },
+      {
+        declarations: [
+          { helix: { status: 'deprecated' }, name: 'HelixCard', tagName: 'helix-card' },
+        ],
+        path: 'src/card/root/card-root.ts',
+      },
+    ],
+  }
+  const named = {
+    component: 'HelixTabs',
+    events: [{ name: 'helix-activate', prop: 'onActivate' }],
+    omitted: [],
+    properties: ['active'],
+    slots: [{ name: '', prop: 'children' }],
+  }
+  const native = { 'react-native': { elements: { 'helix-tabs': named }, status: 'experimental' } }
+  const read = withPlatforms(publishedBy(catalog([tabs]), '@fusion.dev/helix'), native)
+  const of = (slug: string) => {
+    const found = read.find((family) => family.slug === slug)
+    return found && !('contributes' in found) ? found : undefined
+  }
+
+  test('gives each family its status on the web, and on React Native where it is drawn there', () => {
+    expect(of('tabs')?.platforms).toEqual({
+      'react-native': { status: 'experimental' },
+      web: { status: 'stable' },
+    })
+    expect(of('card')?.platforms).toEqual({ web: { status: 'deprecated' } })
+  })
+
+  test('names a styled element on React Native, and leaves the rest as they were', () => {
+    const elements = of('tabs')?.elements ?? []
+    const by = (tag: string) => elements.find((element) => element.tagName === tag)
+    expect(by('helix-tabs')?.platforms).toEqual({ 'react-native': named })
+    expect(by('helix-tabs-scroller')?.platforms).toBeUndefined()
+    expect(by('helix-headless-tabs')?.platforms).toBeUndefined()
+  })
+
+  test('gives a styled element the anatomy its tag has, and leaves the rest as they were', () => {
+    const anatomy = {
+      web: { takes: [], tree: [{ draws: 'box part="tabs"', kind: 'box', name: 'tabs' }] },
+    }
+    const elements =
+      withAnatomy(catalog([tabs]), {
+        'helix-headless-tabs': anatomy,
+        'helix-tabs': anatomy,
+      }).find((family) => family.slug === 'tabs')?.elements ?? []
+    const by = (tag: string) => elements.find((element) => element.tagName === tag)
+    expect(by('helix-tabs')?.anatomy).toEqual(anatomy)
+    expect(by('helix-tabs-scroller')?.anatomy).toBeUndefined()
+    expect(by('helix-headless-tabs')?.anatomy).toBeUndefined()
+  })
+
+  test('names the web alone where nothing is drawn natively', () => {
+    const web = withPlatforms(catalog([tabs]), {})
+    expect(web.map((family) => ('platforms' in family ? family.platforms : undefined))).toEqual([
+      { web: { status: 'deprecated' } },
+      { web: { status: 'stable' } },
+    ])
   })
 })
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { reachOf } from '@fusion.dev/helix-core/graph'
 import { type GraphColors, looksOf, mixRgb } from './looks.js'
-import { reachOf } from './reach.js'
 
 const colors: GraphColors = {
   accent: 'rgb(200, 0, 200)',

@@ -110,7 +110,7 @@ describe("the viewport's scrollbar colors", () => {
   })
 
   test('step up while the pointer is over the list', () => {
-    const hovered = sheet().split('[part="viewport"]:hover {')[1]?.split('}')[0] ?? ''
+    const hovered = sheet().split('[part="viewport"]:where(:hover) {')[1]?.split('}')[0] ?? ''
     expect(hovered).toContain('scrollbar-color')
     expect(hovered).toContain('--helix-scrollbar-thumb-hover-color')
   })

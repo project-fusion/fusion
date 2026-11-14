@@ -3,11 +3,13 @@
 
    The row template is set with `innerHTML` because the component clones the
    template's `content`, and React puts JSX children on the `<template>` itself. */
-const ORDINAL = new Intl.PluralRules('en-US', { type: 'ordinal' })
-const SUFFIX: Record<string, string> = { few: 'rd', one: 'st', other: 'th', two: 'nd' }
+const ordinal = (count: number): string => {
+  const teen = count % 100 >= 11 && count % 100 <= 13
+  return (!teen && { 1: 'st', 2: 'nd', 3: 'rd' }[count % 10]) || 'th'
+}
 const rows = Array.from({ length: 2000 }, (_, index) => ({
   name: `Row ${index + 1}`,
-  note: `the ${(index + 1).toLocaleString('en-US')}${SUFFIX[ORDINAL.select(index + 1)]} of two thousand`,
+  note: `the ${(index + 1).toLocaleString('en-US')}${ordinal(index + 1)} of two thousand`,
 }))
 
 /* The same stylesheet as the HTML example's `<style>` block. It is set with
@@ -30,17 +32,12 @@ export function Example() {
 
       <helix-virtual-list
         estimate={32}
-        for="people"
+        items={rows}
         label="Two thousand rows"
+        text-field="name"
       >
         <template dangerouslySetInnerHTML={{ __html: ROW }} />
       </helix-virtual-list>
-
-      <script
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(rows) }}
-        id="people"
-        type="application/json"
-      />
     </>
   )
 }

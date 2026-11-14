@@ -3,8 +3,7 @@ import { HelixHeadlessChat } from '@fusion.dev/helix-headless/chat/root'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles as typingStyles } from '../typing.css.js'
-import { styles } from './chat-root.css.js'
+import { styles } from './chat-root.generated.css.js'
 import '../message/chat-message.js'
 
 /**
@@ -51,7 +50,7 @@ import '../message/chat-message.js'
 export class HelixChat extends HelixHeadlessChat {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, typingStyles, styles]
+  static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }
 
 declare global {

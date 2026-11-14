@@ -24,6 +24,7 @@ members = [
 	"fusion/plugins/tracker",
 	"fusion/rules",
 	"helix/cli",
+	"helix/native",
 	"helix/theme",
 	"helix/visual",
 ]

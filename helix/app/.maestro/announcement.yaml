@@ -1,0 +1,24 @@
+# Announcement: a press on the dismiss button of the events example sends
+# dismiss with the words of the message, which the log below it shows. The
+# announcement stays, since the page takes it out. Recorded.
+appId: dev.fusion.helix.app
+name: Announcement
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://announcement/events/preview
+      SHOWS: .*A new version is available.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: announcement
+- tapOn: Dismiss
+- assertVisible: .*was dismissed.*
+- assertVisible: .*A new version is available.*
+- takeScreenshot: announcement-dismissed
+- stopRecording

@@ -1,14 +1,7 @@
-/* Only the far edge fades. A list that is scrolled to the top has nothing above
-   it worth saying so about, and a fade there covers the first row for no reason. */
-helix-scroll-area {
-  --scroll-area-fade-block-start: 0;
-
-  block-size: 10rem;
-  inline-size: 20rem;
-  /* No wider than the column: at 20rem it ran past a 280 column. */
-  max-inline-size: 100%;
+helix-grid {
+  --grid-columns: minmax(0, 20rem);
 }
 
-helix-scroll-area helix-text {
-  margin: 0 0 var(--helix-space-sm);
+helix-scroll-area {
+  --scroll-area-fade-block-start: 0;
 }

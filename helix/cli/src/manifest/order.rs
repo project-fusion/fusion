@@ -112,7 +112,7 @@ fn shape(fields: &Map<String, Value>, under: &str) -> Vec<&'static str> {
         "slots" | "cssParts" | "cssProperties" | "cssStates" => {
             vec!["description", "name", "inheritedFrom"]
         }
-        "examples" => vec!["description", "layout", "min", "slug"],
+        "examples" => vec!["description", "layout", "min", "platforms", "slug"],
         "references" => vec!["label", "url"],
         "helix" => vec![
             "category",

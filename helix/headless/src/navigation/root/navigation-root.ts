@@ -22,16 +22,36 @@ const isList = (element: Element): boolean =>
   element.localName === 'ol' ||
   element.getAttribute('role') === 'list'
 
+/** A `NavigationItem`, which says it is current by its own `current`. */
+const ITEM = 'helix-navigation-item, helix-headless-navigation-item'
+
 /**
- * The element on a destination that says it is current: the destination
- * itself, or the link inside a list item.
+ * What says a destination is current: a link's `aria-current`, or an item's
+ * `current`, a Navigation Item's or a Megamenu Item's in a megamenu's panel.
  */
-const markOf = (item: HTMLElement): Element | null =>
-  item.hasAttribute('aria-current') ? item : item.querySelector('[aria-current]')
+const MARKED = `[aria-current], :is(${ITEM}, helix-megamenu-item, helix-headless-megamenu-item)[current]`
+
+/**
+ * The value that says a destination is current, or `null` where nothing
+ * does: on the destination itself, or on the link or the item inside a list
+ * item. An item's bare `current` is `true`.
+ */
+const currentOf = (item: HTMLElement): string | null => {
+  const mark = item.matches(MARKED) ? item : item.querySelector(MARKED)
+  if (mark === null) {
+    return null
+  }
+  const current = mark.getAttribute('aria-current') ?? mark.getAttribute('current')
+  return current === '' ? 'true' : current
+}
+
+/** What carries its own control, as a `NavigationItem` and a `Megamenu` do. */
+type Controlled = HTMLElement & { navigationControl?: HTMLElement | undefined }
 
 /**
  * A destination as the keyboard controller moves through it: the link itself,
- * a `Megamenu`'s trigger, or the first thing inside it that takes focus.
+ * a `NavigationItem`'s link, a `Megamenu`'s trigger, or the first thing
+ * inside it that takes focus.
  *
  * `contains` is that control and what is inside it, and not the whole
  * destination, so an arrow pressed among the links of an open megamenu panel
@@ -39,7 +59,8 @@ const markOf = (item: HTMLElement): Element | null =>
  */
 const navigable = (item: HTMLElement): NavigableItem => {
   const control = (): HTMLElement | undefined =>
-    (item as HTMLElement & { navigationControl?: HTMLElement }).navigationControl ??
+    (item as Controlled).navigationControl ??
+    item.querySelector<Controlled>(ITEM)?.navigationControl ??
     (item.matches(FOCUSABLE) ? item : focusableElements(item)[0])
   return focusItemOf(item, {
     focus: () => control()?.focus(),
@@ -64,16 +85,18 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * Navigation is its own component, separate from `AppHeader`, so you can use it
  * in a header, a footer, or a sidebar.
  *
- * **It renders no links.** Bring your own, mark the current one with
- * `aria-current="page"`, and style them with the `data-navigation-item` recipe.
- * A router renders its own anchors and cannot render them inside the
- * component's shadow root.
+ * **The destinations are links you pass in**: `NavigationItem`s, or links of
+ * your own. An item draws its link and says it is current with its `current`,
+ * so a page whose code a phone app shares writes no anchor. A link of your
+ * own says it with `aria-current="page"`, and the `data-navigation-item`
+ * recipe styles it as an item is styled, for a router that renders its own
+ * anchors, which it cannot render inside the component's shadow root.
  *
  * The component moves a marker to the current item. It finds the current item
- * by reading `aria-current`, so the attribute that screen readers announce also
- * places the marker. Any value but `false` counts, so a sidebar of sections on
- * one page can mark the section in view with `aria-current="location"`. Where
- * several are marked, `page` wins.
+ * by reading an item's `current` or a link's `aria-current`, so what screen
+ * readers announce also places the marker. Any value but `false` counts, so a
+ * sidebar of sections on one page can mark the section in view as
+ * `location`. Where several are marked, `page` wins.
  *
  * **The destinations can be a list.** Slot a `<ul>` or an `<ol>` of `<li>`
  * elements, each holding a link, and a screen reader says how many there are
@@ -107,7 +130,7 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
  * @aliases Nav, NavList, Tabs
  * @documentation https://fusion.dev/helix/components/navigation
  *
- * @slot - The destinations, as your own links.
+ * @slot - The destinations: `NavigationItem`s, or links of your own.
  * @slot indicator - A marker of your own, drawn inside the `indicator` part, where the current destination's place and size reach it.
  *
  * @csspart indicator - The marker that moves to the current destination. It carries the destination's place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and `--indicator-block-size`, and `data-placed` once it has been placed.
@@ -130,13 +153,10 @@ export class HelixHeadlessNavigation extends HelixElement {
     active: () => {
       const items = this.items
       const marked = (item: HTMLElement): boolean => {
-        const current = markOf(item)?.getAttribute('aria-current')
-        return current !== null && current !== undefined && current !== 'false'
+        const current = currentOf(item)
+        return current !== null && current !== 'false'
       }
-      return (
-        items.find((item) => markOf(item)?.getAttribute('aria-current') === 'page') ??
-        items.find(marked)
-      )
+      return items.find((item) => currentOf(item) === 'page') ?? items.find(marked)
     },
     indicator: () => this.partNamed('indicator'),
     observe: () => this.items,
@@ -314,8 +334,9 @@ export class HelixHeadlessNavigation extends HelixElement {
     // reloading, so nothing else would tell the marker to move.
     this.current = new MutationObserver(() => this.indicator.place())
     for (const item of this.items) {
-      /* The subtree too, for the link inside a list item. */
-      this.current.observe(item, { attributeFilter: ['aria-current'], subtree: true })
+      /* The subtree too, for the link inside a list item, and an item's own
+         `current`, which it reflects. */
+      this.current.observe(item, { attributeFilter: ['aria-current', 'current'], subtree: true })
     }
   }
 

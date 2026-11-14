@@ -28,7 +28,8 @@ export function Example() {
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
+    const { newState, oldState } = event
+    say('toggle', `Changed from ${oldState} to ${newState}`)
   }
 
   return (

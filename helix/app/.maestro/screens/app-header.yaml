@@ -1,0 +1,80 @@
+# App Header, its examples drawn alone, after the touch the iOS simulator
+# loses on a new screen. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`, and one of the preview with another destination
+# current. No example folds the bar at a phone's width, so none opens.
+#
+# **At the largest text size the brand and the actions leave the navigation
+# little of the bar**, which scrolls across: about 28 points on an iOS 27
+# simulator, and no room at all beside a Sign in button. A destination there
+# cannot be pressed by its words, so the steps on a destination run at the
+# default size, and each screen's own words say it drew at both.
+appId: dev.fusion.helix.app
+name: "Screens: App Header"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://app-header/preview/preview
+      - extendedWaitUntil:
+          visible: Logo
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-preview-${MODE}-${SIZE}
+- runFlow:
+    when:
+      true: ${SIZE == 'default'}
+    commands:
+      - tapOn:
+          point: 50%, 90%
+          retryTapIfNoChange: false
+      - tapOn: Projects
+      - waitForAnimationToEnd:
+          timeout: 5000
+      - takeScreenshot: app-header-preview-moved-${MODE}-${SIZE}
+- openLink: helix://app-header/navigation-at-the-start/preview
+- extendedWaitUntil:
+    visible: Sign in
+    timeout: 15000
+- runFlow:
+    when:
+      true: ${SIZE == 'default'}
+    commands:
+      - assertVisible: Insights
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-navigation-at-the-start-${MODE}-${SIZE}
+- openLink: helix://app-header/opaque/preview
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-opaque-${MODE}-${SIZE}
+- openLink: helix://app-header/glass/preview
+- extendedWaitUntil:
+    visible: Glass
+    timeout: 15000
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-glass-${MODE}-${SIZE}
+- openLink: helix://app-header/transparent/preview
+- extendedWaitUntil:
+    visible: Transparent
+    timeout: 15000
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-transparent-${MODE}-${SIZE}
+- openLink: helix://app-header/sticky/preview
+- extendedWaitUntil:
+    visible: Recent activity
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-sticky-${MODE}-${SIZE}

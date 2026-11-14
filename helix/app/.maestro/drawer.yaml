@@ -1,0 +1,207 @@
+# Drawer: the sheet opens from its button and a swipe down on its title
+# takes it out; the list example's sheet, resting half open, opens further
+# under a drag up on its list, scrolls its list once whole, and hands its
+# drag back to the sheet only once the list stands at its top and has stood
+# still. Recorded.
+appId: dev.fusion.helix.app
+name: Drawer
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://drawer/sheet/preview
+      SHOWS: Open filters
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: drawer
+- tapOn: Open filters
+- extendedWaitUntil:
+    visible: .*Show projects by owner.*
+    timeout: 5000
+# The sheet rests half open, as the web's does, with its title low on the
+# screen. Maestro drags from a title to 90% of the screen, which is too short
+# to pass the snap point at a quarter, so this drag names its points, on the
+# sheet's header.
+- swipe:
+    start: 50%, 86%
+    end: 50%, 99%
+    duration: 1500
+- extendedWaitUntil:
+    notVisible: .*Show projects by owner.*
+    timeout: 5000
+- openLink: helix://drawer/list/preview
+- extendedWaitUntil:
+    visible: Open recent files
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Open recent files
+- extendedWaitUntil:
+    visible: .*Quarterly report.*
+    timeout: 5000
+# The sheet is still rising when its words first show, and this wait can end
+# inside the rise.
+- waitForAnimationToEnd:
+    timeout: 3000
+# Half open, a drag up on the list opens the sheet to the whole before the list
+# scrolls. The whole sheet is 320 points, about a third of the screen. The drag names
+# its points, on the first row and shorter than the rise, so nothing is left over to
+# scroll the list. The first and the fourth file show together only in the whole
+# sheet: half open, the fourth stands past the screen, and a scrolled list has lost
+# the first.
+- swipe:
+    start: 50%, 94%
+    end: 50%, 79%
+    duration: 600
+- waitForAnimationToEnd:
+    timeout: 3000
+- assertVisible: .*Quarterly report.*
+- assertVisible: .*Brand guidelines.*
+# Whole, a drag up scrolls the list, and it stays the list's after the finger
+# leaves the list. This drag runs from the first row to 10% of the screen, past the
+# list's top almost at once. Maestro's iOS reads a row the list has clipped while its
+# frame stands on the screen: in run 41457272036 the list stood at its end, the picture
+# shows the first file gone, and the hierarchy kept it at y 335 with the sheet's top at
+# 554. So only Android can read the first file's absence, and on iOS the last file
+# coming onto the screen below proves the scroll.
+- swipe:
+    from: .*Quarterly report.*
+    direction: UP
+    duration: 600
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - repeat:
+          times: 4
+          while:
+            visible: .*Quarterly report.*
+          commands:
+            - swipe:
+                start: 50%, 88%
+                end: 50%, 76%
+                duration: 300
+      - extendedWaitUntil:
+          notVisible: .*Quarterly report.*
+          timeout: 5000
+# Maestro's `scrollUntilVisible` drags from the middle of the screen, which is the
+# scrim above this sheet, so these drags name points on the list.
+- repeat:
+    times: 12
+    while:
+      notVisible: .*Onboarding checklist.*
+    commands:
+      - swipe:
+          start: 50%, 88%
+          end: 50%, 76%
+          duration: 300
+- assertVisible: .*Onboarding checklist.*
+- assertVisible: .*Recent files.*
+- takeScreenshot: drawer-list-scrolled
+# Back at its top, and still for half a second, a drag down takes the sheet. The first
+# file's frame is on the screen wherever this list stands on iOS, so iOS reads a lower
+# file: Team offsite's frame leaves the bottom of the screen 33 points short of the top.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - repeat:
+          times: 12
+          while:
+            notVisible: .*Quarterly report.*
+          commands:
+            - swipe:
+                start: 50%, 76%
+                end: 50%, 88%
+                duration: 300
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - repeat:
+          times: 12
+          while:
+            visible: .*Team offsite.*
+          commands:
+            - swipe:
+                start: 50%, 76%
+                end: 50%, 88%
+                duration: 300
+# On iOS a step above is 105 points, and one longer drag ends at the top. Android reads the
+# first file as shown with any part of its 105 pixel row in the list: in run 41457272036
+# the list stood short of its top, the drag below only scrolled it there, and the sheet
+# stayed whole. A drag of 168 pixels ends at the top from anywhere that row shows. Where
+# the list is at its top already, the sheet takes it and goes back, 210 pixels being the
+# middle between the whole and the half of an 840 pixel sheet.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 76%
+          end: 50%, 90%
+          duration: 300
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 50%, 76%
+          end: 50%, 83%
+          duration: 300
+- waitForAnimationToEnd:
+    timeout: 3000
+# A drag rests the sheet at the nearest point: this one ends nearer the half than the
+# whole, with the list still shown.
+# The simulator can stall: in run 41489332691 this drag took 41 seconds, the sheet stood
+# whole after it, and the commands around it waited 80 seconds. The drag goes again while
+# the sheet has not come down. At the half the fourth file's frame is off the screen, so
+# the repeat ends there, and a drag never lands on a sheet that already rests.
+- repeat:
+    times: 3
+    while:
+      visible: .*Brand guidelines.*
+    commands:
+      - swipe:
+          start: 50%, 78%
+          end: 50%, 90%
+          duration: 600
+      - waitForAnimationToEnd:
+          timeout: 3000
+- assertVisible: .*Quarterly report.*
+- assertNotVisible: .*Brand guidelines.*
+# A drag from the header, which stands near 85% at half open, ends past the middle of
+# what is left, and takes the sheet out. No flow proves a fling on Android. `input
+# swipe` waits for the app to finish each move, and a slow frame leaves more than the
+# 40 ms between its last move and its release after which Android's `VelocityTracker`
+# reads no speed. In run 41374589645 a drag of this length over 200 ms stopped at about
+# a quarter shown and came back. In run 41480320795 one over 600 ms stood about 160
+# pixels down in the last frames seen, of the 336 it asks, and came back. `input swipe`
+# sends no move at its end, so a slow frame costs the last of the drag. Over 2 seconds
+# the same frame costs less of it.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 99%
+          duration: 600
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          start: 50%, 85%
+          end: 50%, 99%
+          duration: 2000
+- extendedWaitUntil:
+    notVisible: .*Quarterly report.*
+    timeout: 5000
+- stopRecording

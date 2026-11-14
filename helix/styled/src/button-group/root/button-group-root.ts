@@ -2,16 +2,21 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessButtonGroup } from '@fusion.dev/helix-headless/button-group'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './button-group-root.css.js'
+import { styles } from './button-group-root.generated.css.js'
 
 /**
  * The button's own hooks a pressed button takes, each to the look this sheet
- * resolves on the group from the group's hooks.
+ * resolves on the group from the group's hooks. A Button reads the
+ * `--button-*` hooks and an Icon Button the `--icon-button-*` ones, so a
+ * pressed Icon Button takes the same solid fill.
  */
 const PRESSED = [
   ['--button-background-color', 'var(--_button-group-pressed-background)'],
   ['--button-border-color', 'var(--_button-group-pressed-border)'],
   ['--button-foreground-color', 'var(--_button-group-pressed-foreground)'],
+  ['--icon-button-background-color', 'var(--_button-group-pressed-background)'],
+  ['--icon-button-border-color', 'var(--_button-group-pressed-border)'],
+  ['--icon-button-foreground-color', 'var(--_button-group-pressed-foreground)'],
 ] as const
 
 /**
@@ -32,14 +37,21 @@ const PRESSED = [
  * group does, and a button's own size still wins. A native `<button>` in a
  * sized group takes the height and the text size.
  *
- * With `selection-mode`, a pressed button takes the solid fill:
+ * With `selection-mode`, a pressed Button or Icon Button takes the solid fill:
  * `--button-group-pressed-background-color` behind it and
  * `--button-group-pressed-color` for its words, set on the group or above it.
+ *
+ * **Button Group or Toggle Group.** A Button Group with `selection-mode` is a
+ * row of joined Buttons and Icon Buttons that stay pressed, such as a
+ * formatting toolbar, drawn with Button's tones, emphasis, sizes, and
+ * icon-only buttons. Toggle Group is a segmented control: one track, a marker
+ * on the choice, and Toggle items. Use Toggle Group for a choice between
+ * options, or for one that belongs in a form.
  *
  * @since 0.1.0
  * @status stable
  * @category actions
- * @aliases Segmented buttons, Split button, Toggle buttons
+ * @aliases Split button, Toggle buttons
  * @documentation https://fusion.dev/helix/components/button-group
  *
  * @slot - The buttons in the group.

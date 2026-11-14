@@ -1,13 +1,13 @@
-import { customElement, seriesIndex, seriesNames } from '@fusion.dev/helix-core'
+import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBarChart } from '@fusion.dev/helix-headless/bar-chart'
-import type { CSSResultGroup, PropertyValues } from 'lit'
+import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as statusMarkStyles } from '../../shared/chart/status-mark.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
-import { styles } from './bar-chart-root.css.js'
+import { styles } from './bar-chart-root.generated.css.js'
 import '../../tooltip/index.js'
 
 /**
@@ -76,21 +76,6 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   emphasis?: 'outlined' | 'solid' | 'subtle'
 
   /**
-   * The names of the series drawn in glass.
-   *
-   * Matched the way `outlined` is, against the column headings the table gives.
-   *
-   * **Per series for the reason `emphasis` is.** A
-   * chart-wide material puts every column in the same substance, which is right
-   * when the whole chart is joining the page's language and wrong the moment one
-   * series is a different kind of fact from the others. The two axes take the
-   * same shape because they answer the same question about the same thing: what
-   * is *this series* made of, and how much ink does *this series* claim.
-   */
-  @property()
-  glass?: string
-
-  /**
    * The material the columns are drawn in. Leave it unset for solid columns, or
    * set `glass` or `frosted`.
    *
@@ -132,39 +117,6 @@ export class HelixBarChart extends HelixHeadlessBarChart {
   material?: 'frosted' | 'glass'
 
   /**
-   * The names of the series drawn as an outline.
-   *
-   * Separated by whitespace or commas and matched against the column headings
-   * the table gives, the way `lines` and `secondary` are, so a chart says
-   * `outlined="Forecast"` rather than counting columns. Names because they are
-   * what the table already carries and what the legend already shows.
-   *
-   * All five read one splitter, `seriesNames` in `core`, because the sentence
-   * above was true of the matching and false of the splitting: these three took
-   * a comma and those two did not, so `lines="Gateway, Billing"` drew no line
-   * and said nothing.
-   *
-   * **The case this exists for is a series that is not a measurement.** A
-   * forecast, a target, a budget: something drawn on the same axis as the
-   * others and not the same kind of fact, which an outline says without a
-   * second legend or a note under the chart.
-   *
-   * Per series and not per bar, because a bar is a mark inside a drawing and
-   * nobody writes markup for one, which is the same reason `material` sits on
-   * the chart.
-   */
-  @property()
-  outlined?: string
-
-  /**
-   * The names of the series drawn as a wash of their color.
-   *
-   * Matched as `outlined` is.
-   */
-  @property()
-  subtle?: string
-
-  /**
    * How a column's fill is distributed across it.
    *
    * `gradient` fades each column toward its base, into the wash the headless
@@ -179,55 +131,6 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    */
   @property({ reflect: true })
   wash?: 'gradient'
-
-  /**
-   * Marks each column with the treatments its series asked for.
-   *
-   * **Stamped after render rather than rendered, because the tier that draws
-   * the columns is the one that must not know about treatments.** The headless
-   * tier already writes `data-series` on every column, a rect or a path of
-   * them, so a stylesheet can color it; this reads the same mark, resolves the names against the series the
-   * table gave, and writes `data-emphasis` beside it. The stylesheet does the
-   * rest, so nothing about painting crosses the tier boundary.
-   *
-   * The mark is the palette slot rather than the series ordinal, so past the
-   * palette's width two series share one. They share a color there too, which
-   * is the same limit arriving in a second place rather than a new one.
-   */
-  protected override updated(changed: PropertyValues<this>): void {
-    super.updated(changed)
-
-    const slots = (list?: string): Set<number> =>
-      new Set(
-        seriesNames(list).flatMap((name) => {
-          const at = this.series.findIndex((one) => one.name.trim().toLowerCase() === name)
-          return at < 0 ? [] : [seriesIndex(at)]
-        }),
-      )
-
-    /* Written only where it differs, because this runs on every move of the
-       pointer and a write of the same value still asks the browser to style
-       the column again. */
-    const mark = (bar: SVGElement, name: string, value: string | undefined): void => {
-      if (bar.getAttribute(`data-${name}`) === (value || null)) {
-        return
-      }
-      if (value) {
-        bar.setAttribute(`data-${name}`, value)
-      } else {
-        bar.removeAttribute(`data-${name}`)
-      }
-    }
-
-    const outlined = slots(this.outlined)
-    const subtle = slots(this.subtle)
-    const glass = slots(this.glass)
-    for (const bar of this.renderRoot.querySelectorAll<SVGElement>('[part~="bar"]')) {
-      const at = Number(bar.dataset.series)
-      mark(bar, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
-      mark(bar, 'material', glass.has(at) ? 'glass' : undefined)
-    }
-  }
 
   static override styles: CSSResultGroup = [
     seriesStyles,

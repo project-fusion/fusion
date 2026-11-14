@@ -96,7 +96,14 @@ export default defineConfig({
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only
-     Helix's own elements are awaited, and each of them is required. */
+     Helix's own elements are awaited, and each of them is required.
+
+     **The theme builder's stage and the sandbox's main pane carry a
+     `whenSettled` of their own**, which resolves once the sandbox preview has
+     drawn. The preview's own resolves while its frame is still loading, and
+     the theme's phone shot was pictured with the preview empty on both takes
+     in two runs on October 11, 2026. `usePreviewSettled` has the
+     measurements. */
   settle: { elements: 'helix-', readyProperty: 'whenSettled' },
   /* Dark before phone, so dark is taken on the wide page in place and only
      phone loads it again. */

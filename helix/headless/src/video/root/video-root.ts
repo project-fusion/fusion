@@ -27,8 +27,8 @@ import {
   timeConverter,
   words,
   writtenList,
-  writtenNumbers,
 } from '@fusion.dev/helix-core'
+import { clock, speedAfter } from '@fusion.dev/helix-core/player'
 import {
   airplay,
   arrowClockwise,
@@ -59,27 +59,6 @@ import { HelixHeadlessMenu } from '../../menu/root/menu-root.js'
 import { relayMedia } from '../media-events.js'
 import { barControls, type Conditions, menuControls, ownFile } from './extra-controls.js'
 import { PLAYER_KEYS, takeKey } from './keys.js'
-
-/**
- * Seconds as a clock, with an hour only when there is one.
- *
- * `0:42` and not `00:00:42`. A reader comparing the position to the duration is
- * reading two numbers at a glance, and leading zeroes that never change are
- * digits in the way of the ones that do.
- */
-const clock = (seconds: number): string => {
-  if (!Number.isFinite(seconds) || seconds < 0) {
-    return '0:00'
-  }
-  const whole = Math.floor(seconds)
-  const hours = Math.floor(whole / 3600)
-  const minutes = Math.floor((whole % 3600) / 60)
-  const rest = whole % 60
-  const padded = `${String(rest).padStart(2, '0')}`
-  return hours > 0
-    ? `${hours}:${String(minutes).padStart(2, '0')}:${padded}`
-    : `${minutes}:${padded}`
-}
 
 /**
  * @summary A video player with controls drawn by Helix.
@@ -1326,15 +1305,11 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /** Steps through the speeds offered, which is what one button can do. */
   private cycleSpeed(): void {
-    /* A playback rate of zero is not a rate, which is video's own fact and not
-       the utility's. */
-    const speeds = writtenNumbers(this.speeds).filter((one) => one > 0)
     const video = this.video
-    if (!video || speeds.length === 0) {
+    const next = video ? speedAfter(this.speeds, video.playbackRate) : undefined
+    if (!video || next === undefined) {
       return
     }
-    const at = speeds.indexOf(video.playbackRate)
-    const next = speeds[(at + 1) % speeds.length] ?? 1
     video.playbackRate = next
     this.rate = next
   }

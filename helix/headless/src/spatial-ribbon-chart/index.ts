@@ -5,5 +5,5 @@ export {
   type RibbonField,
   ribbonsDrawn,
   ribbonsOf,
-} from './ribbons.js'
+} from '@fusion.dev/helix-core/spatial'
 export { HelixHeadlessSpatialRibbonChart } from './root/spatial-ribbon-chart-root.js'

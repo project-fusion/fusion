@@ -21,6 +21,7 @@ import {
 import { eye, eyeSlash, x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { live } from 'lit/directives/live.js'
 
 /** What the control accepts, which is text of one kind or another. */
 export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
@@ -612,14 +613,21 @@ export class HelixHeadlessInput extends MixinVoice(
     /* Label, field, and one line under it.
        The hint and the feedback share that line rather than stacking, so a
        field is the same height either way and nothing below it moves when the
-       message changes. */
+       message changes.
+
+       **The text is written only where the field holds other text**, through
+       `live()`. Writing the same text marks it as written by the page, and
+       Chromium then stops checking `minlength` and `maxlength`, which hold
+       only against a reader's edits: measured on October 27, 2026, a field
+       typed `ab` under `minlength="4"` reported `tooShort` until its own text
+       was written back into it. */
     return html`${this.renderLabel()}
     <div part="field">
       <slot name="start"></slot>
       <input
         part="control"
         id=${this.controlId}
-        .value=${this.value}
+        .value=${live(this.value)}
         type=${this.effectiveType}
         name=${this.name || nothing}
         placeholder=${this.placeholder || nothing}

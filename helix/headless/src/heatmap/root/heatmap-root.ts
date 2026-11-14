@@ -6,10 +6,17 @@ import {
   customElement,
   drawTooltip,
   formatWords,
+  type HeatmapReading,
   HelixElement,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
   HelixResizeEvent,
+  heatmapCellBox,
+  heatmapFits,
+  heatmapMonthPage,
+  heatmapOverview,
+  heatmapStretch,
+  heatmapTone,
   MixinChartSource,
   MixinChartStatus,
   markRegion,
@@ -27,8 +34,6 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { inSequence, rectangleOf } from '../rectangle.js'
-import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
 
 /**
  * A `<time datetime>` value as its day and short month in `locale`, such as
@@ -469,7 +474,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * carries in a `<time datetime>`, or the header's words where it carries
    * none.
    */
-  protected keysOf(cells: readonly Reading[]): string[] {
+  protected keysOf(cells: readonly HeatmapReading[]): string[] {
     const offset = this.points.length - cells.length
     const rows = this.sourceRows
     return cells.map((_, index) => {
@@ -520,15 +525,15 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       const corner = all[this.anchor]
       this.base = commaList(this.value).filter((one) => one !== corner)
     }
-    /* Over every row, shifted so the columns fall where the strip draws them:
-       the strip drops whole columns, so the shift is the same at every width.
-       An anchor in a column no longer drawn still takes in its corner. */
-    const rows = this.rowCount
-    const shift = (rows - (dropped % rows)) % rows
-    const taken = rectangleOf(all.length + shift, rows, this.anchor + shift, dropped + to + shift)
-      .filter((at) => at >= shift)
-      .map((at) => all[at - shift] ?? '')
-    this.choose(inSequence([...this.base, ...taken].filter(Boolean), all).join(', '))
+    const taken = heatmapStretch({
+      all,
+      anchor: this.anchor,
+      base: this.base,
+      dropped,
+      rows: this.rowCount,
+      to,
+    })
+    this.choose(taken.join(', '))
     this.shaped = this.value
   }
 
@@ -599,7 +604,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * cell along, while the tooltip still counted rows and named the day beside
    * the one under the pointer.
    */
-  protected get points(): Reading[] {
+  protected get points(): HeatmapReading[] {
     const series = this.series[0]
     if (!series) {
       return []
@@ -636,7 +641,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
 
   /** How many cells the container has room for, as a whole number of columns. */
   protected get room(): number {
-    return fits(
+    return heatmapFits(
       this.points.length,
       this.width ?? Number.NaN,
       this.cellPx,
@@ -691,7 +696,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * The tail rather than the head: a status strip that drops the newest days to
    * keep the oldest is answering a question nobody asked.
    */
-  protected get drawn(): Reading[] {
+  protected get drawn(): HeatmapReading[] {
     const all = this.points
     return all.slice(Math.max(0, all.length - this.room))
   }
@@ -728,7 +733,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    */
   pageFrom(at: number, forward: boolean): number | undefined {
     const offset = this.points.length - this.drawn.length
-    return monthPage(
+    return heatmapMonthPage(
       this.sourceRows.slice(offset).map((row) => row.when),
       at,
       forward,
@@ -841,7 +846,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     const keys = this.selectionMode ? this.keysOf(cells) : []
     const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
     const drawn = cells.map((reading, index) => {
-      const tone = toneOf(reading, bounds, palette)
+      const tone = heatmapTone(reading, bounds, palette)
       const active = this.pointer.at === index
       const picked = chosen.has(keys[index] ?? '')
       if (grid) {
@@ -970,11 +975,11 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * described by it, so a reader landing on the strip hears what it holds
    * before walking it.
    */
-  protected renderOverview(cells: Reading[]): TemplateResult {
+  protected renderOverview(cells: HeatmapReading[]): TemplateResult {
     const rows = this.sourceRows
     const offset = this.points.length - cells.length
     const column = this.plottedColumns[0] ?? -1
-    const { busiest, total } = overviewOf(cells)
+    const { busiest, total } = heatmapOverview(cells)
     const row = rows[offset + busiest]
     /* The day and its count apart, so "Jan 6, 12" is not heard as one date. */
     const text = row?.cells[column]?.text ?? ''
@@ -1029,17 +1034,15 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
        still on screen, so nothing about it looks wrong. */
     const offset = this.points.length - this.drawn.length
     const cell = this.cellPx
-    const gap = this.gapPx
-    const column = Math.floor(at / this.rowCount)
-    const row = at % this.rowCount
+    const box = heatmapCellBox(at, this.rowCount, cell, this.gapPx)
     return drawTooltip(
       this.sourceRows,
       offset + at,
       this.tag('tooltip'),
       {
         placement: 'top',
-        x: `${column * (cell + gap) + cell / 2}px`,
-        y: `${row * (cell + gap)}px`,
+        x: `${box.x + cell / 2}px`,
+        y: `${box.y}px`,
       },
       undefined,
       grid ? undefined : this.pointer,

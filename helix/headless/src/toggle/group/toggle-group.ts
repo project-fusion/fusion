@@ -46,6 +46,12 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  * `orientation="vertical"` runs the items down a column, says so to the
  * accessibility tree, and the up and down arrows move between them.
  *
+ * **Toggle Group or Button Group.** A Toggle Group is a segmented control: one
+ * track, a marker on the choice, and Toggle items, with a form value. For a
+ * row of joined Buttons and Icon Buttons that stay pressed, such as a
+ * formatting toolbar, with Button's tones, emphasis, sizes, and icon-only
+ * buttons, use a Button Group with `selection-mode`.
+ *
  * **Keyboard.** The group is one tab stop: the chosen item, or the first that
  * can be chosen, as in a radio group, and in a multiple group the item focus
  * was last on.
@@ -65,7 +71,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  *
  * @since 0.1.0
  * @status stable
- * @aliases SegmentedControl, Segmented, Navigation, Switcher
+ * @aliases Segmented, Segmented picker, SegmentedControl
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.

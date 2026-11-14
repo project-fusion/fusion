@@ -2,6 +2,11 @@
 export interface DataOption {
   /** Whether the keyboard is on it. The list writes this. */
   active: boolean
+  /**
+   * Whether it stands between the two ends of a range its owner holds, as a time
+   * in a time list's range does. Its row carries `data-between`.
+   */
+  between: boolean
   /** Whether it can be chosen. */
   disabled: boolean
   /** Whether a filter hides it. The list writes this. */
@@ -17,12 +22,13 @@ export interface DataOption {
 /**
  * An option as a page hands it over: its value alone, which is also its words,
  * or a record with a `value`, the `label` a reader sees (the value where it is
- * left out) and `disabled`.
+ * left out), `disabled`, and `between`, which marks it between the two ends of a
+ * range its owner holds.
  */
 export type DataOptionItem =
   | number
   | string
-  | { disabled?: boolean; label?: string; value: number | string }
+  | { between?: boolean; disabled?: boolean; label?: string; value: number | string }
 
 /**
  * The options a page handed over as data, as a list reads them, built once per
@@ -36,6 +42,7 @@ export const dataOptions = (items: readonly DataOptionItem[]): DataOption[] =>
     const record = typeof item === 'object' ? item : { value: item }
     return {
       active: false,
+      between: 'between' in record && record.between === true,
       disabled: Boolean(record.disabled),
       hidden: false,
       selected: false,
@@ -106,6 +113,7 @@ export const drawOptions = (
     if (element.textContent !== row.text) {
       element.textContent = row.text
     }
+    element.toggleAttribute('data-between', row.between)
     element.setAttribute('aria-posinset', String(index + 1))
     element.setAttribute('aria-setsize', String(rows.length))
   })

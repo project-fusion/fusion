@@ -9,11 +9,18 @@ import {
   StatusController,
   words,
 } from '@fusion.dev/helix-core'
+import {
+  type Queue,
+  type QueueMove,
+  queueEnded,
+  queueRemoved,
+  queueStep,
+  type Repeat,
+} from '@fusion.dev/helix-core/queue'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { HelixEndEvent } from '../events/index.js'
 import { HelixHeadlessVideoPlaylistItem } from '../item/video-playlist-item.js'
-import { playOrder, type Repeat, stepTo } from '../order.js'
 
 /**
  * What the playlist asks of the player it drives, whichever tag it is.
@@ -310,7 +317,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * came. Dropped when shuffle turns off, so turning it on again deals a new
    * order from wherever the reader is.
    */
-  private dealt: string[] | undefined
+  private dealt: readonly string[] | undefined
 
   /**
    * The entries, in the order the consumer wrote them.
@@ -414,17 +421,34 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   }
 
   /**
-   * The entry a step of `by` lands on, in the order the playlist plays in, or
-   * `undefined` past an end. Disabled entries are not in the order, so a step
-   * passes over them.
+   * The queue core answers the playlist's moves from: the entries that can
+   * play, in the order written, the current one, and the settings. Disabled
+   * entries are not in it, so a step passes over them.
    */
-  private following(by: number): { current: string | undefined; next: string | undefined } {
+  private queue(): Queue {
     const items = this.items.filter((one) => !one.disabled)
-    const values = items.map((one) => one.value)
-    const current = this.resolveActive(items)?.value
-    this.dealt = this.shuffle ? playOrder(values, true, this.dealt, current) : undefined
-    const order = this.dealt ?? values
-    return { current, next: stepTo(order, current, by, this.repeat === 'all') }
+    return {
+      current: this.resolveActive(items)?.value,
+      dealt: this.dealt,
+      repeat: this.repeat,
+      shuffle: this.shuffle,
+      values: items.map((one) => one.value),
+    }
+  }
+
+  /** Applies a move core's queue gives, for `cause`. */
+  private apply(move: QueueMove, cause: 'ended' | 'next' | 'previous'): void {
+    if (move.kind === 'replay') {
+      this.replay()
+    } else if (move.kind === 'end') {
+      this.toggleState('ended', true)
+      this.dispatchEvent(new HelixEndEvent())
+    } else if (move.kind === 'play') {
+      this.chased = true
+      if (!this.requestActive(move.to, cause)) {
+        this.chased = false
+      }
+    }
   }
 
   /**
@@ -434,19 +458,10 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * A move a consumer refuses with `helix-before-activate` plays nothing, and
    * leaves nothing behind to play on a later change.
    */
-  private step(by: number, cause: 'ended' | 'next' | 'previous'): void {
-    const { current, next } = this.following(by)
-    if (next === undefined) {
-      return
-    }
-    if (next === current) {
-      this.replay()
-      return
-    }
-    this.chased = true
-    if (!this.requestActive(next, cause)) {
-      this.chased = false
-    }
+  private step(by: number, cause: 'next' | 'previous'): void {
+    const { dealt, move } = queueStep(this.queue(), by)
+    this.dealt = dealt
+    this.apply(move, cause)
   }
 
   /**
@@ -552,13 +567,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     const items = this.items
     const present = new Set(items.filter((one) => !one.disabled).map((one) => one.value))
     if (current !== undefined && !items.some((one) => one.value === current)) {
-      const at = values.indexOf(current)
-      const next =
-        values.slice(at + 1).find((value) => present.has(value)) ??
-        values
-          .slice(0, at)
-          .reverse()
-          .find((value) => present.has(value))
+      const next = queueRemoved(values, current, present)
       if (next !== undefined) {
         this.chased = this.player?.paused === false
         if (!this.requestActive(next, 'removed')) {
@@ -682,18 +691,9 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     if (event.target !== this.player) {
       return
     }
-    if (this.repeat === 'one') {
-      this.replay()
-      return
-    }
-    if (this.following(1).next === undefined) {
-      this.toggleState('ended', true)
-      this.dispatchEvent(new HelixEndEvent())
-      return
-    }
-    if (!this.noAdvance) {
-      this.step(1, 'ended')
-    }
+    const { dealt, move } = queueEnded(this.queue(), !this.noAdvance)
+    this.dealt = dealt
+    this.apply(move, 'ended')
   }
 
   override connectedCallback(): void {

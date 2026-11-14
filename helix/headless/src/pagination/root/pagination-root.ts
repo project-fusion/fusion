@@ -16,6 +16,14 @@ import {
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import {
+  gapKey,
+  gapTarget,
+  type Hidden,
+  pageCount,
+  paginationSlots,
+  type Slot,
+} from '@fusion.dev/helix-core/pagination'
+import {
   caretDoubleLeft,
   caretDoubleRight,
   caretLeft,
@@ -49,17 +57,6 @@ interface StepParts {
   /** Whether it points off the end. */
   spent: boolean
 }
-
-/** A run of pages nobody can see, and what a gap stands over. */
-interface Hidden {
-  /** First page it covers. */
-  from: number
-  /** Last page it covers. */
-  to: number
-}
-
-/** What a slot in the run holds: a page number, or the pages between two runs. */
-type Slot = Hidden | number
 
 /**
  * Fills `{page}` and `{pages}` in `href`, with the numbers as digits.
@@ -423,13 +420,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * later and pushes the layout down.
    */
   private get count(): number {
-    if (this.pages > 0) {
-      return Math.max(1, Math.floor(this.pages))
-    }
-    if (this.total > 0 && this.pageSize > 0) {
-      return Math.max(1, Math.ceil(this.total / this.pageSize))
-    }
-    return 1
+    return pageCount(this.pages, this.total, this.pageSize)
   }
 
   /** The page on show, which `page` has already clamped. */
@@ -451,46 +442,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * `most` slots, which is what holds the width still.
    */
   private get slots(): Slot[] {
-    const total = this.count
-    const current = this.current
-    const boundaries = Math.max(0, Math.floor(this.boundaries) || 0)
-    const siblings = Math.max(0, Math.floor(this.siblings) || 0)
-    const run = 2 * siblings + 1
-    const most = 2 * boundaries + run + 2
-
-    const range = (from: number, to: number): number[] =>
-      Array.from({ length: Math.max(0, to - from + 1) }, (_, index) => from + index)
-
-    if (total <= most) {
-      return range(1, total)
-    }
-
-    const before = current - siblings > boundaries + 2
-    const after = current + siblings < total - boundaries - 1
-
-    /* A gap carries the run it stands over rather than being a bare marker,
-       because it is a control now and a control has to say where it goes. */
-    const gap = (from: number, to: number): Hidden => ({ from, to })
-
-    if (!before) {
-      const head = most - boundaries - 1
-      return [
-        ...range(1, head),
-        gap(head + 1, total - boundaries),
-        ...range(total - boundaries + 1, total),
-      ]
-    }
-    if (!after) {
-      const tail = total - (most - boundaries - 2)
-      return [...range(1, boundaries), gap(boundaries + 1, tail - 1), ...range(tail, total)]
-    }
-    return [
-      ...range(1, boundaries),
-      gap(boundaries + 1, current - siblings - 1),
-      ...range(current - siblings, current + siblings),
-      gap(current + siblings + 1, total - boundaries),
-      ...range(total - boundaries + 1, total),
-    ]
+    return paginationSlots(this.count, this.current, this)
   }
 
   /**
@@ -772,7 +724,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * affordance.
    */
   private renderGap(hidden: Hidden): TemplateResult {
-    const to = Math.round((hidden.from + hidden.to) / 2)
+    const to = gapTarget(hidden)
     const name = formatWords(this, 'gapLabel', { page: to, pages: this.count })
     return html`<li part="item">
       ${
@@ -937,12 +889,7 @@ export class HelixHeadlessPagination extends HelixElement {
              is keyed by its side of the current page. */
           repeat(
             this.slots,
-            (slot) =>
-              typeof slot === 'number'
-                ? slot
-                : slot.from < this.current
-                  ? 'gap-before'
-                  : 'gap-after',
+            (slot) => (typeof slot === 'number' ? slot : gapKey(slot, this.current)),
             (slot) => (typeof slot === 'number' ? this.renderPage(slot) : this.renderGap(slot)),
           )
         }

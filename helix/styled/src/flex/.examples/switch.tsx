@@ -1,11 +1,9 @@
-import './switch.css'
-
 export function Example() {
   return (
     <helix-flex
-      className="plans"
       gap="md"
       layout="switch"
+      style={{ '--flex-switch-at': '36rem' }}
     >
       <helix-card separation="outlined">
         <helix-text

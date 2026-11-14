@@ -75,11 +75,14 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * control also carries
  * `--button-group-pressed`, `1` or `0`, for a `::part(button)` rule of yours.
  *
- * Use Toggle Group instead for a choice that belongs in a form, or one where
- * the arrow keys choose as they move: it is a `radiogroup` of options with a
- * form value, `required` and validation. A Button Group in a selection mode is
- * a set of actions that stay on, such as bold and italic, or a view that a
- * press switches, and it submits nothing.
+ * **Button Group or Toggle Group.** A Button Group with `selection-mode` is a
+ * row of joined Buttons and Icon Buttons that stay pressed, such as a
+ * formatting toolbar. Each button keeps Button's tones, emphasis, sizes, and
+ * icon-only form, and the group submits nothing. Toggle Group is a segmented
+ * control: one track, a marker on the choice, and Toggle items. Use Toggle
+ * Group for a choice between options, for one that belongs in a form, or for
+ * one where the arrow keys choose as they move. It has a form value,
+ * `required`, and validation.
  *
  * **Keyboard.** In a selection mode the group is one tab stop: the button
  * focus was last on, then the first pressed one, then the first one.
@@ -106,7 +109,7 @@ const isGroupButton = (child: Element): child is GroupButton =>
  * @since 0.1.0
  * @status stable
  * @category actions
- * @aliases Segmented buttons, Split button, Toggle buttons
+ * @aliases Split button, Toggle buttons
  * @documentation https://fusion.dev/helix/components/button-group
  *
  * @slot - The buttons in the group.

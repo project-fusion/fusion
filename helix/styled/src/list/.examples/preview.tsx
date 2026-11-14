@@ -10,7 +10,7 @@ export function Example() {
           slot="start"
         ></helix-icon>
         Quarterly report
-        <span slot="description">Edited today</span>
+        <helix-text slot="description">Edited today</helix-text>
       </helix-list-item>
       <helix-list-item>
         <helix-icon
@@ -18,7 +18,7 @@ export function Example() {
           slot="start"
         ></helix-icon>
         Team handbook
-        <span slot="description">Edited 3 days ago</span>
+        <helix-text slot="description">Edited 3 days ago</helix-text>
       </helix-list-item>
     </helix-list>
   )

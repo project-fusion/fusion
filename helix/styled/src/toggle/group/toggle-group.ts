@@ -2,9 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToggleGroup } from '@fusion.dev/helix-headless/toggle'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './toggle-group.css.js'
+import { styles } from './toggle-group.generated.css.js'
 
 /**
  * @summary A row of options with the selection marked by a moving indicator.
@@ -18,9 +16,15 @@ import { styles } from './toggle-group.css.js'
  * of flow and its width reflows nothing else. Scaling would distort the corner
  * radius.
  *
+ * **Toggle Group or Button Group.** A Toggle Group is a segmented control: one
+ * track, a marker on the choice, and Toggle items. For a row of joined Buttons
+ * and Icon Buttons that stay pressed, such as a formatting toolbar, with
+ * Button's tones, emphasis, sizes, and icon-only buttons, use a Button Group
+ * with `selection-mode`.
+ *
  * @since 0.1.0
  * @status stable
- * @aliases SegmentedControl, Segmented, Navigation, Switcher
+ * @aliases Segmented, Segmented picker, SegmentedControl
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The group's items.
@@ -58,7 +62,7 @@ export class HelixToggleGroup extends HelixHeadlessToggleGroup {
   @property({ reflect: true })
   separation?: 'plain'
 
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

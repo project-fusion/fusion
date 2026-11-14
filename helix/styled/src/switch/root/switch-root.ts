@@ -1,9 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSwitch } from '@fusion.dev/helix-headless/switch'
 import { type CSSResultGroup, html, type TemplateResult } from 'lit'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldInlineStyles } from '../../shared/field/field-inline.css.js'
-import { styles } from './switch-root.css.js'
+import { styles } from './switch-root.generated.css.js'
 
 /**
  * @summary A control that turns something on or off.
@@ -54,7 +52,7 @@ import { styles } from './switch-root.css.js'
  */
 @customElement('helix-switch')
 export class HelixSwitch extends HelixHeadlessSwitch {
-  static override styles: CSSResultGroup = [fieldStyles, fieldInlineStyles, styles]
+  static override styles: CSSResultGroup = styles
 
   /**
    * The thumb as an element, so it is a part and holds an icon for each state.
