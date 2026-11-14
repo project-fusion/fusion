@@ -1602,7 +1602,7 @@ export const TOKENS: Token[] = [
      scrim, and 1 in dark. */
   [
     'material-scrim-lift',
-    'var(--_helix-material-scrim-lift)',
+    primitive('material-scrim-lift'),
     'How much a glass Dialog or Drawer brightens the page behind its scrim.',
   ],
   /* **What `glass` and `frosted` cover, as a scalar, for a family that fades a
