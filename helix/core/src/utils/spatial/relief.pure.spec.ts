@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { hullOf } from '@fusion.dev/helix-core'
+import { hullOf } from '../projection/projection.js'
 import {
   ACROSS,
   heightsOf,
@@ -9,7 +9,7 @@ import {
   type Point,
   reliefOf,
   THICKNESS,
-} from './projection.js'
+} from './relief.js'
 
 /** The corners of path data written `Mx yLx y…Z`, as numbers. */
 const corners = (data: string): Array<[number, number]> =>

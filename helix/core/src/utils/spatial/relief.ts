@@ -25,7 +25,7 @@ import {
   pathData,
   projectionOf,
   solid,
-} from '@fusion.dev/helix-core'
+} from '../projection/projection.js'
 
 /** How far across the page one step along either axis goes: the cosine of 30 degrees. */
 export const ACROSS = Math.sqrt(3) / 2
