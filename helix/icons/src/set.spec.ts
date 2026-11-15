@@ -1,12 +1,17 @@
 import { describe, expect, test } from 'bun:test'
-import { keyboard, sparkle } from './bold.js'
+import { keyboard, sparkle, tray } from './bold.js'
 import { icons } from './generated.js'
-import { keyboard as rootKeyboard, sparkle as rootSparkle } from './index.js'
-import { keyboard as regularKeyboard, sparkle as regularSparkle } from './regular.js'
+import { keyboard as rootKeyboard, sparkle as rootSparkle, tray as rootTray } from './index.js'
+import {
+  keyboard as regularKeyboard,
+  sparkle as regularSparkle,
+  tray as regularTray,
+} from './regular.js'
 
 const GLYPHS = [
   { bold: keyboard, regular: regularKeyboard, root: rootKeyboard },
   { bold: sparkle, regular: regularSparkle, root: rootSparkle },
+  { bold: tray, regular: regularTray, root: rootTray },
 ]
 
 describe('the set', () => {
