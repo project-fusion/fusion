@@ -164,6 +164,7 @@ text-italic
 text-strikethrough
 train
 trash
+tray
 tree
 trophy
 upload-simple
