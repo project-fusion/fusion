@@ -11,6 +11,7 @@ export function Example() {
     <div className="export-pane">
       <helix-table-export for="invoices"></helix-table-export>
       <helix-data-table
+        bleed
         id="invoices"
         label="Invoices"
         row-key="id"

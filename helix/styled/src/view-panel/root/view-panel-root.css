@@ -55,9 +55,9 @@
 }
 
 [part="section-mark"] {
-  block-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon-tight);
   color: var(--helix-color-foreground-muted);
-  inline-size: var(--helix-size-icon);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 [part="sort"] {

@@ -7,6 +7,7 @@ const rows = [
 export function Example() {
   return (
     <helix-data-table
+      bleed
       default-selected="INV-2041,INV-2052"
       label="Invoices"
       row-key="id"

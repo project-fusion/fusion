@@ -12,6 +12,7 @@ export function Example() {
   return (
     <>
       <helix-data-table
+        bleed
         default-selected="asset-002.webp"
         label="Assets"
         onhelix-select={(event: CustomEvent<{ value: string }>) =>
