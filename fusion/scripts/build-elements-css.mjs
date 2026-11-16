@@ -165,7 +165,7 @@ helix-data-table:not(:defined):is(${LEAD}) {
 helix-data-table:not(:defined)${BOTH} {
   --_data-table-lead: calc(1em + 2 * var(--data-table-padding-inline, var(--helix-space-sm)))
     calc(
-      var(--checkbox-size, var(--helix-size-checkbox)) +
+      var(--checkbox-size, var(--helix-size-checkbox-tight)) +
       var(--data-table-padding-inline, var(--helix-space-none)) +
       var(--data-table-padding-inline, var(--helix-space-md))
     );
@@ -192,10 +192,11 @@ helix-data-table:where(${LEAD}) > helix-table-row:not([hidden])::before {
 }
 
 /* The checkbox cell's own box: no block padding, flush at the start and a
-   step at the end, as the table draws it once it upgrades. */
+   step at the end, at the tight step a table's checkbox takes, as the table
+   draws it once it upgrades. */
 helix-data-table[selectable] > helix-table-row:not([hidden])::before {
-  block-size: var(--checkbox-size, var(--helix-size-checkbox));
-  inline-size: var(--checkbox-size, var(--helix-size-checkbox));
+  block-size: var(--checkbox-size, var(--helix-size-checkbox-tight));
+  inline-size: var(--checkbox-size, var(--helix-size-checkbox-tight));
   padding-block: var(--helix-space-none);
   padding-inline-end: var(--data-table-padding-inline, var(--helix-space-md));
   padding-inline-start: var(--data-table-padding-inline, var(--helix-space-none));
@@ -228,12 +229,12 @@ helix-table:not(:defined)[reorderable] {
 }
 
 helix-table:not(:defined)[selectable] {
-  --_table-lead: calc(var(--checkbox-size, var(--helix-size-checkbox)) + var(--helix-space-md));
+  --_table-lead: calc(var(--checkbox-size, var(--helix-size-checkbox-tight)) + var(--helix-space-md));
 }
 
 helix-table:not(:defined)[reorderable][selectable] {
   --_table-lead: calc(var(--helix-space-2xs) + 1em + var(--helix-space-sm))
-    calc(var(--checkbox-size, var(--helix-size-checkbox)) + var(--helix-space-md));
+    calc(var(--checkbox-size, var(--helix-size-checkbox-tight)) + var(--helix-space-md));
 }
 
 helix-table:not(:defined):is([reorderable], [selectable]) > helix-table-row:not([hidden])::before {
