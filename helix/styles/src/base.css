@@ -1687,6 +1687,18 @@ helix-toast:not([data-color-mode]) {
   max-inline-size: 50ch;
 }
 
+/* **A chat turn and an editor's document fill their column.** Each has a
+   measure of its own. A Chat sets its reading measure on the column, as
+   `fullscreen` does at 80ch, and an Editor centers its document in
+   `--editor-measure`, 72ch by default. With the 50ch above, a plain answer
+   filled 409 pixels of an 800 pixel turn, and an editor's lines wrapped at
+   about two thirds of its own measure. This comes before `reading`, so a
+   document set for reading still stops at 34em. */
+:where(helix-chat-message, helix-headless-chat-message, helix-editor, helix-headless-editor)
+  :where(p, ul, ol, blockquote) {
+  max-inline-size: none;
+}
+
 /* **A document set for reading, at `lg`.** The recipe's 14 is the size of a
    reply in a chat bubble or a note in a panel, and a documentation page or an
    article set at 14 across its column ran past 110 characters a line, so the
