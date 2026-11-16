@@ -1,16 +1,19 @@
 import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
+import fieldGhost from '../../../fragments/field-ghost.js'
 import fieldSegments from '../../../fragments/field-segments.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import floatingEntrance from '../../../fragments/floating-entrance.js'
 import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
   list,
   measured,
+  mix,
   native,
   product,
   quotient,
@@ -43,13 +46,18 @@ export default styles(
       backgroundColor: token('color-well'),
       borderColor: token('color-border-floating'),
       borderWidth: token('border-floating'),
+      ghostAlign: null,
+      ghostUnderline: null,
       segmentFocusBackgroundColor: token('color-primary-surface'),
       segmentFocusColor: token('color-foreground-on-primary'),
       segmentLiteralColor: token('color-foreground-muted'),
       segmentPlaceholderColor: token('color-foreground-muted'),
       shadow: token('shadow-floating'),
+      size: token('size-control'),
     },
     own: {
+      fieldGhostAlign: null,
+      fieldGhostDots: null,
       floatingBorderColor: null,
       floatingBorderWidth: null,
       floatingShadow: null,
@@ -58,6 +66,7 @@ export default styles(
       segmentLiteralColor: null,
       segmentPlaceholderColor: null,
     },
+    props: { emphasis: oneOf(['ghost']) },
     stylesheet: 'date-input/root/date-input-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -71,7 +80,7 @@ export default styles(
         display: 'flex',
         flexWrap: 'wrap',
         gap: token('space-2xs'),
-        minBlockSize: token('size-control'),
+        minBlockSize: hook.size,
         paddingInline: token('space-field'),
         transition: web(list(['background-color', ...ease], ['border-color', ...ease])),
       }),
@@ -111,6 +120,31 @@ export default styles(
       native([rule({ mode: 'multiple' }, { alignContent: 'center' })]),
     ]),
     include(fieldFrame),
+    include(fieldGhost),
+    /* The dots under a `ghost` value at rest, in the color this family's hook
+       gives, which a touch screen draws in the subtle foreground while the hook
+       is unset, there being no hover there to say a field can be changed. The
+       value lines up as the hook for its alignment says. */
+    on('host', [
+      web([
+        rule({
+          own: {
+            fieldGhostAlign: hook.ghostAlign('start'),
+            fieldGhostDots: hook.ghostUnderline('transparent'),
+          },
+        }),
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              fieldGhostDots: hook.ghostUnderline(
+                mix(token('color-foreground-subtle'), 60, 'transparent'),
+              ),
+            },
+          },
+        ),
+      ]),
+    ]),
     /* Wrong, and the field says so, over the hover and the focus edges. */
     on('field', [
       rule(
@@ -319,5 +353,14 @@ export default styles(
     ]),
     /* A phone's segment is a field of its own, in the row's words. */
     include(printExact),
+    /* A `ghost` date's calendar button shows only once the field is reached,
+       so a column of dates is as wide as its dates. */
+    on(
+      {
+        part: 'trigger',
+        selector: ':host([emphasis="ghost"]:not(:focus-within)) [part="trigger"]',
+      },
+      [web([rule({ display: 'none' })])],
+    ),
   ],
 )

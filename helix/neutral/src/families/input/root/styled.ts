@@ -1,8 +1,10 @@
 import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
+import fieldGhost from '../../../fragments/field-ghost.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, list, native, quotient, token, web } from '../../../style.js'
+import { oneOf } from '../../../render.js'
+import { difference, list, mix, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import input from './headless.js'
 
@@ -27,11 +29,14 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
+      ghostAlign: null,
+      ghostUnderline: null,
       paddingInline: token('space-field'),
       radius: token('radii-sm'),
       size: token('size-control'),
     },
-    own: { inputSize: null },
+    own: { fieldGhostAlign: null, fieldGhostDots: null, inputSize: null },
+    props: { emphasis: oneOf(['ghost']) },
     stylesheet: 'input/root/input-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -53,6 +58,31 @@ export default styles(
       }),
     ]),
     include(fieldFrame),
+    include(fieldGhost),
+    /* The dots under a `ghost` value at rest, in the color this family's hook
+       gives, which a touch screen draws in the subtle foreground while the hook
+       is unset, there being no hover there to say a field can be changed. The
+       value lines up as the hook for its alignment says. */
+    on('host', [
+      web([
+        rule({
+          own: {
+            fieldGhostAlign: hook.ghostAlign('start'),
+            fieldGhostDots: hook.ghostUnderline('transparent'),
+          },
+        }),
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              fieldGhostDots: hook.ghostUnderline(
+                mix(token('color-foreground-subtle'), 60, 'transparent'),
+              ),
+            },
+          },
+        ),
+      ]),
+    ]),
     on('field', [
       /* Wrong, and the frame says so: its edge, and its ring while focused. */
       rule(

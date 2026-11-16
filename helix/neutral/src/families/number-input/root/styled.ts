@@ -1,8 +1,10 @@
 import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
+import fieldGhost from '../../../fragments/field-ghost.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, fn, list, product, quotient, sum, token, web } from '../../../style.js'
+import { oneOf } from '../../../render.js'
+import { difference, fn, list, mix, product, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import numberInput from './headless.js'
 
@@ -29,6 +31,8 @@ export default styles(
     hooks: {
       backgroundColor: token('color-well'),
       borderColor: token('color-border'),
+      ghostAlign: null,
+      ghostUnderline: null,
       /* A step under a field's inset: the value only keeps off the rules. */
       paddingInline: token('space-2xs'),
       radius: token('radii-sm'),
@@ -43,6 +47,8 @@ export default styles(
       /* Less the rule it draws, so the mark centers on a whole pixel. */
       stepperSize: difference(token('size-control'), token('border-thin')),
     },
+    own: { fieldGhostAlign: null, fieldGhostDots: null },
+    props: { emphasis: oneOf(['ghost']) },
     stylesheet: 'number-input/root/number-input-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -63,6 +69,31 @@ export default styles(
       }),
     ]),
     include(fieldFrame),
+    include(fieldGhost),
+    /* The dots under a `ghost` value at rest, in the color this family's hook
+       gives, which a touch screen draws in the subtle foreground while the hook
+       is unset, there being no hover there to say a field can be changed. The
+       value lines up as the hook for its alignment says. */
+    on('host', [
+      web([
+        rule({
+          own: {
+            fieldGhostAlign: hook.ghostAlign('start'),
+            fieldGhostDots: hook.ghostUnderline('transparent'),
+          },
+        }),
+        rule(
+          { coarsePointer: true },
+          {
+            own: {
+              fieldGhostDots: hook.ghostUnderline(
+                mix(token('color-foreground-subtle'), 60, 'transparent'),
+              ),
+            },
+          },
+        ),
+      ]),
+    ]),
     on('field', [
       /* Wrong, and the frame says so: its edge, and its ring while focused. */
       rule(
@@ -194,5 +225,16 @@ export default styles(
     ]),
     /* A control prints the value it holds. */
     include(printExact),
+    /* The steppers stay out of an inline field. The arrow keys step it, as
+       they do a spreadsheet's number, and two buttons in a line of text are
+       most of it. */
+    on(
+      {
+        part: 'decrement',
+        selector:
+          ':host([emphasis="ghost"]) [part="decrement"], :host([emphasis="ghost"]) [part="increment"]',
+      },
+      [web([rule({ display: 'none' })])],
+    ),
   ],
 )

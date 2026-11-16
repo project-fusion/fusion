@@ -67,6 +67,8 @@ export default headless('filter-input', {
     feedback: '',
     filterDelay: 0,
     filterSuggestions: false,
+    /* The id of the Data Table it filters, which the web binds by. */
+    for: web(''),
     hint: '',
     label: '',
     listeningLabel: web('Listening'),

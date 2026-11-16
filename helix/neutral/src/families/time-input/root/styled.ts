@@ -1,11 +1,13 @@
 import field from '../../../fragments/field.js'
 import fieldFrame from '../../../fragments/field-frame.js'
+import fieldGhost from '../../../fragments/field-ghost.js'
 import fieldSegments from '../../../fragments/field-segments.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
 import floatingEntrance from '../../../fragments/floating-entrance.js'
 import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
 import tags from '../../../fragments/tags.js'
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
@@ -50,6 +52,8 @@ export default styles(
       shadow: token('shadow-floating'),
     },
     own: {
+      fieldGhostAlign: null,
+      fieldGhostDots: null,
       floatingBorderColor: null,
       floatingBorderWidth: null,
       floatingShadow: null,
@@ -58,6 +62,7 @@ export default styles(
       segmentLiteralColor: null,
       segmentPlaceholderColor: null,
     },
+    props: { emphasis: oneOf(['ghost']) },
     stylesheet: 'time-input/root/time-input-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -100,6 +105,10 @@ export default styles(
       native([rule({ mode: 'multiple' }, { alignContent: 'center' })]),
     ]),
     include(fieldFrame),
+    include(fieldGhost),
+    /* A `ghost` time draws no dots, and its value at its start, as no hook of
+       this family hands any over. */
+    on('host', [web([rule({ own: { fieldGhostAlign: 'start', fieldGhostDots: 'transparent' } })])]),
     /* Wrong, and the field says so, over the hover and the focus edges. */
     on('field', [
       rule(

@@ -8,6 +8,7 @@ import {
   Slot,
   Svg,
   View,
+  web,
 } from '../../../render.js'
 
 /**
@@ -45,16 +46,25 @@ export default headless('table-column', {
   props: {
     cell: callback('(row: Readonly<Record<string, unknown>>) => unknown'),
     compare: callback('(row: Readonly<Record<string, unknown>>) => unknown'),
+    /* What a Data Table's view and editing read of the column, the web's. */
+    editable: web(false),
     field: '',
+    filterable: web(false),
+    max: web(''),
     menu: false,
     menuLabel: '{named, select, no {Column menu} other {{name} column menu}}',
+    min: web(''),
     minTableWidth: '',
     moveLabel: '{named, select, no {Move column} other {Move {name}}}',
+    pattern: web(''),
+    required: web(false),
     resizable: false,
     resizeLabel: '{named, select, no {Resize column} other {Resize {name}}}',
     rowHeader: false,
+    searchable: web(false),
     sortable: false,
     textAlign: oneOf(['center', 'end', 'start']),
+    type: web(oneOf(['boolean', 'date', 'enum', 'number', 'text'])),
     /* Where the column's cells sit from top to bottom; the web writes it on each cell. */
     verticalAlign: oneOf(['center', 'end', 'start']),
     width: '',
@@ -64,7 +74,7 @@ export default headless('table-column', {
     beforeResize: cancelable(['value']),
     resized: ['value'],
   },
-  states: ['hasMenu', 'settled', 'sortedAscending', 'sortedDescending'],
+  states: ['hasMenu', 'pinnedEnd', 'pinnedStart', 'settled', 'sortedAscending', 'sortedDescending'],
   tableColumn: {
     field: 'field',
     movable: 'movable',

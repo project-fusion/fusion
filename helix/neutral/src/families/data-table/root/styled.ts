@@ -1,4 +1,5 @@
 import dataTableBleed from '../../../fragments/data-table-bleed.js'
+import dataTableEditing from '../../../fragments/data-table-editing.js'
 import dataTableRows from '../../../fragments/data-table-rows.js'
 import {
   difference,
@@ -407,6 +408,7 @@ export default styles(
           }),
         ]),
       ]),
+      include(dataTableEditing),
     ]
   },
 )

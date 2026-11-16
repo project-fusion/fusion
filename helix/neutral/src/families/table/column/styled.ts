@@ -2,6 +2,7 @@ import {
   difference,
   first,
   fn,
+  inherited,
   list,
   measured,
   native,
@@ -357,6 +358,26 @@ export default styles(
           }),
           rule({ hover: true }, { borderInlineEndColor: token('color-foreground-muted') }),
           rule({ focusVisible: true }, { borderInlineEndColor: token('color-foreground-muted') }),
+        ]),
+      ]),
+      /* A column a Data Table's view pins stays at its end of the row while the
+         table scrolls sideways, over the cells that pass under it. */
+      on('column', [
+        web([
+          rule([{ pinnedStart: true }, { pinnedEnd: true }], {
+            /* The column's own hook, read by name, since the family's prefix is Table's. */
+            backgroundColor: inherited(
+              'table-column-pinned-background-color',
+              token('color-background'),
+            ),
+            position: 'sticky',
+            zIndex: 1,
+          }),
+          rule(
+            { pinnedStart: true },
+            { insetInlineStart: measured('table-column-pin-offset', '0px') },
+          ),
+          rule({ pinnedEnd: true }, { insetInlineEnd: measured('table-column-pin-offset', '0px') }),
         ]),
       ]),
     ]

@@ -15,6 +15,7 @@ import {
   Text,
   View,
   Wrap,
+  web,
 } from '../../../render.js'
 
 /**
@@ -27,7 +28,9 @@ import {
  * lines up and draws. The web draws its rows in its own root.
  *
  * **The web's**: the rows a page serves, `estimate`, `cellStyles`, the drag's
- * preview, a column moved by its grip, and `row-parts`.
+ * preview, a column moved by its grip, `row-parts`, the view a page saves and
+ * restores, the export, the `selection` region, and the cells a reader edits
+ * in place, with their rules, saves, and `batch-edits`.
  *
  * **Held to `helix-data-table`.** `helix system check` compares the props, the
  * events, the states, the regions, and the parts with what the manifest says.
@@ -35,6 +38,7 @@ import {
 export default headless('data-table', {
   props: {
     ascendingLabel: 'ascending',
+    batchEdits: web(false),
     canceledLabel: 'Canceled',
     cellStyles: property(object()),
     childField: string(),
@@ -46,8 +50,11 @@ export default headless('data-table', {
     defaultPageSize: 0,
     defaultSelected: '',
     defaultSort: '',
+    defaultView: web(''),
     descendingLabel: 'descending',
+    discardEditsLabel: web('Discard'),
     droppedLabel: 'Dropped',
+    editOn: web(oneOf(['click', 'double-click'], 'click')),
     emptyText: '',
     errorText: '',
     estimate: 32,
@@ -61,22 +68,27 @@ export default headless('data-table', {
     loadMore: false,
     loadMoreLabel: 'Load more',
     locale: '',
+    maxMessage: web('Enter {max} or less.'),
+    minMessage: web('Enter {min} or more.'),
     mode: oneOf(['client', 'server'], 'client'),
     movedLabel: '{name} moved to position {position} of {count}',
     moveLeftLabel: 'Move left',
     moveRightLabel: 'Move right',
     moveRowLabel: 'Move {row}',
     nextLabel: 'Next page',
+    numberMessage: web('Enter a number.'),
     order: string(),
     page: number(),
     pageLabel: 'Page {page}',
     pageSize: number(),
     paginated: false,
     paginationLabel: 'Pagination',
+    patternMessage: web('Enter a value in the form this column takes.'),
     pickedUpLabel: 'Picked up {name}',
     previousLabel: 'Previous page',
     reorderable: false,
     reorderableRows: false,
+    requiredMessage: web('Enter a value.'),
     resultLabel: string(),
     resultsLabel: '{count, plural, one {# result} other {# results}}',
     rowGripsLabel: 'Move rows',
@@ -84,6 +96,8 @@ export default headless('data-table', {
     rowLink: false,
     rowParts: callback('(row: Readonly<Record<string, unknown>>, index: number) => string'),
     rows: property(object()),
+    saveEditsLabel: web('Save'),
+    savingLabel: web('Saving'),
     selectable: false,
     selectAllLabel: 'Select every row',
     selected: string(),
@@ -97,19 +111,29 @@ export default headless('data-table', {
     sortedLabel:
       '{direction, select, ascending {Sorted by {column}, ascending} descending {Sorted by {column}, descending} other {Sorted by {column}}}',
     total: 0,
+    unsavedLabel: web('{count, plural, one {# unsaved change} other {# unsaved changes}}'),
     unsortedLabel: 'Not sorted',
     windowed: false,
   },
   events: {
+    beforeCellCommit: web(cancelable(['field', 'key', 'previous', 'row', 'value', 'waitUntil'])),
+    beforeCellEdit: web(cancelable(['field', 'key', 'row', 'value'])),
     beforeColumnToggle: cancelable(['field', 'hidden']),
+    beforeExport: web(
+      cancelable(['columns', 'count', 'filename', 'format', 'rows', 'values', 'view']),
+    ),
     beforeFilter: cancelable(['value']),
     beforeFollow: cancelable(['href']),
     beforeNavigate: cancelable(['page', 'value']),
     beforeReorder: cancelable(['from', 'key', 'keys', 'kind', 'to', 'value']),
     beforeSelect: cancelable(['value']),
     beforeSort: cancelable(['value']),
+    beforeViewChange: web(cancelable(['value', 'view'])),
+    cellCommit: web(['field', 'key', 'previous', 'row', 'value']),
+    cellEdit: web(['field', 'key', 'row', 'value']),
     columnToggle: ['field', 'hidden'],
     expand: ['value'],
+    export: web(['columns', 'count', 'filename', 'format', 'rows', 'values', 'view']),
     filter: ['value'],
     follow: ['href'],
     loadMore: [],
@@ -117,6 +141,7 @@ export default headless('data-table', {
     reorder: ['from', 'key', 'keys', 'kind', 'to', 'value'],
     select: ['value'],
     sort: ['value'],
+    viewChange: web(['value', 'view']),
   },
   states: ['empty', 'error', 'loading', 'settled'],
   dataTableRoot: {
@@ -134,6 +159,10 @@ export default headless('data-table', {
     <>
       <View part="toolbar">
         <Slot name="toolbar" />
+        <Slot
+          name="selection"
+          platform="web"
+        />
       </View>
       <View
         busy={props.loading}
@@ -227,7 +256,19 @@ export default headless('data-table', {
             role="cell"
           />
           <View
-            also={{ 'cell-header': props.rowLink, 'cell-selected': props.selectable }}
+            also={{
+              'cell-boolean': props.batchEdits,
+              'cell-editable': props.batchEdits,
+              'cell-editing': props.batchEdits,
+              'cell-field': props.batchEdits,
+              'cell-header': props.rowLink,
+              'cell-invalid': props.batchEdits,
+              'cell-pinned-end': props.batchEdits,
+              'cell-pinned-start': props.batchEdits,
+              'cell-saving': props.batchEdits,
+              'cell-selected': props.selectable,
+              'cell-unsaved': props.batchEdits,
+            }}
             part="cell"
             role="cell"
           >
@@ -241,6 +282,47 @@ export default headless('data-table', {
                 viewBox="0 0 256 256"
               />
             </Pressable>
+            {/* An open cell's field, a Select for a column of choices. */}
+            <Wrap
+              draws="select"
+              exports={{
+                feedback: true,
+                hint: true,
+                indicator: true,
+                label: true,
+                listbox: true,
+                'listbox-empty': true,
+                'listbox-error': true,
+                'listbox-feedback': true,
+                'listbox-filter-icon': true,
+                'listbox-filter-mark': true,
+                'listbox-hint': true,
+                'listbox-items': true,
+                'listbox-label': true,
+                'listbox-live': true,
+                'listbox-loading': true,
+                'listbox-search': true,
+                'listbox-search-field': true,
+                'listbox-voice': true,
+                'listbox-voice-level': true,
+                'listbox-voice-level-canvas': true,
+                'listbox-voice-listening': true,
+                'listbox-voice-status': true,
+                live: true,
+                surface: true,
+                trigger: true,
+                value: true,
+              }}
+              part="editor"
+            />
+            <View
+              part="cell-saving-mark"
+              role="status"
+            />
+            <View
+              part="cell-message"
+              role="alert"
+            />
           </View>
         </View>
         <Slot platform="web" />
@@ -304,6 +386,21 @@ export default headless('data-table', {
         part="live"
         platform="web"
       />
+      {/* The bar that saves or discards every unsaved change. */}
+      <View
+        part="edits"
+        platform="web"
+      >
+        <View part="edits-count" />
+        <Pressable
+          part="edits-save"
+          role="button"
+        />
+        <Pressable
+          part="edits-discard"
+          role="button"
+        />
+      </View>
       <View part="footer">
         <Slot name="footer" />
         {dataTableRoot.pagination && (

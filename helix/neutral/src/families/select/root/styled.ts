@@ -3,6 +3,7 @@ import fieldStacked from '../../../fragments/field-stacked.js'
 import floatingEntrance from '../../../fragments/floating-entrance.js'
 import floatingPanel from '../../../fragments/floating-panel.js'
 import printExact from '../../../fragments/print-exact.js'
+import selectGhost from '../../../fragments/select-ghost.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
 import { oneOf } from '../../../render.js'
 import {
@@ -196,6 +197,14 @@ export default styles(
         { part: 'trigger', selector: ':host([emphasis="ghost"]) [part="trigger"]:focus-visible' },
         [web([rule({ borderColor: token('color-focus-ring') })])],
       ),
+      /* A value its page refuses, as `aria-invalid` says, rings in the danger color. */
+      on(
+        {
+          part: 'trigger',
+          selector: ':host([emphasis="ghost"][aria-invalid="true"]) [part="trigger"]:focus-visible',
+        },
+        [web([rule({ borderColor: token('color-danger'), outlineColor: token('color-danger') })])],
+      ),
       on('value', [
         rule({
           flex: web(1),
@@ -333,6 +342,7 @@ export default styles(
         ]),
       ]),
       include(printExact),
+      include(selectGhost),
     ]
   },
 )
