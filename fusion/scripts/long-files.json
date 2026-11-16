@@ -265,6 +265,7 @@
     "helix/headless/src/menu/root/menu-root.ts",
     "helix/headless/src/meter/root/meter-root.dom.spec.ts",
     "helix/headless/src/meter/root/meter-root.ts",
+    "helix/headless/src/navigation/root/navigation-root.ts",
     "helix/headless/src/notifications/notification/notification.dom.spec.ts",
     "helix/headless/src/notifications/notification/notification.ts",
     "helix/headless/src/notifications/root/notifications-root.dom.spec.ts",

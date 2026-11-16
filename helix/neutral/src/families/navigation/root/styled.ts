@@ -1,4 +1,15 @@
-import { difference, fn, list, measured, native, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  hookOf,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import navigation from './headless.js'
 
@@ -39,9 +50,32 @@ export default styles(
   },
   ({ hook, keyframes, on, own, rule }) => {
     const ruled = hook.ruleColor
+    /* The overflow button reads a Navigation Item's hooks, so it matches the
+       destinations beside it. */
+    const washed = {
+      backgroundColor: hookOf(
+        'navigation-item',
+        'hover-background-color',
+        mix(token('color-foreground'), 5, 'transparent'),
+      ),
+      color: hookOf('navigation-item', 'hover-color', token('color-foreground')),
+    }
+    const tight = {
+      blockSize: token('size-icon-tight'),
+      flex: '0 0 auto',
+      inlineSize: token('size-icon-tight'),
+    }
+    const glyph = {
+      blockSize: token('size-icon'),
+      flex: '0 0 auto',
+      inlineSize: token('size-icon'),
+    }
     return [
       on('host', [
         rule({ display: 'block' }),
+        /* In App Header's middle region the host yields to the region, so
+           the row can measure what does not fit and fold it. */
+        web([rule({ minInlineSize: 0 })]),
         /* Down a column an item fills it and reads from its start, as every
            sidebar's does. */
         rule(
@@ -62,7 +96,9 @@ export default styles(
           blockSize: hook.blockSize(token('size-control-sm')),
           display: 'flex',
           gap: hook.gap,
-          /* Long navigation scrolls inside the bar instead of widening the page. */
+          /* Long navigation folds into the overflow menu, or scrolls under
+             `overflow="scroll"`, instead of widening the page. Folding
+             measures this box, so its width is the host's. */
           minInlineSize: 0,
           overflowX: 'auto',
           /* The marker is positioned against this. */
@@ -118,8 +154,9 @@ export default styles(
           { coarsePointer: true, orientation: { not: 'vertical' } },
           { blockSize: hook.blockSize(token('size-target')) },
         ),
-        /* The bar says when it scrolls: the edge with more behind it fades, as
-           Table's does. A bar that fits is never masked. */
+        /* The bar says when it scrolls, under `overflow="scroll"`, or where
+           even a folded row does not fit: the edge with more behind it fades,
+           as Table's does. A bar that fits is never masked. */
         web([
           rule({
             own: { navigationFade: 'to right' },
@@ -168,6 +205,95 @@ export default styles(
           ),
         ]),
       ]),
+      /* **A destination that folded takes no room on the row.** Important,
+         because the base layer gives every link in the bar a `display`, and
+         the page's rules outrank this sheet's for what is slotted. */
+      on({ slotted: '[hidden]' }, [web([rule({ display: 'none !important' })])]),
+      /* **The overflow button stands in the row as a destination does**: the
+         same height, words, weight, and hover, with a caret after the words. */
+      on('overflow', [
+        web([
+          rule({ alignItems: 'center', blockSize: '100%', display: 'flex', flex: '0 0 auto' }),
+          rule({ part: { hidden: true } }, { display: 'none' }),
+        ]),
+      ]),
+      on({ part: 'more', inner: '[hidden]' }, [web([rule({ display: 'none' })])]),
+      on('more', [
+        web([
+          rule({
+            alignItems: 'center',
+            background: 'none',
+            blockSize: '100%',
+            border: 'none',
+            borderRadius: hookOf('navigation-item', 'radius', token('radii-sm')),
+            color: hookOf('navigation-item', 'color', token('color-foreground-muted')),
+            cursor: 'pointer',
+            display: 'inline-flex',
+            fontFamily: token('font-sans'),
+            fontSize: hookOf('navigation-item', 'font-size', token('text-sm')),
+            fontWeight: hookOf('navigation-item', 'font-weight', token('weight-medium')),
+            gap: token('space-2xs'),
+            minBlockSize: token('size-control-sm'),
+            paddingBlock: token('space-none'),
+            paddingInline: [
+              hookOf('navigation-item', 'padding-inline', token('space-sm')),
+              token('space-xs'),
+            ],
+            position: 'relative',
+            transition: list(
+              ['background-color', token('duration-fast'), token('easing-standard')],
+              ['color', token('duration-fast'), token('easing-standard')],
+            ),
+            whiteSpace: 'nowrap',
+            zIndex: token('layer-raised'),
+          }),
+          rule({ hover: true }, washed),
+        ]),
+      ]),
+      /* Open, the button keeps the wash it takes under the pointer. */
+      on({ part: 'more', selector: ':host [part="more"]:where([aria-expanded="true"])' }, [
+        web([rule(washed)]),
+      ]),
+      on('more', [
+        web([
+          rule({ active: true }, { backgroundColor: token('color-press') }),
+          /* Naming the current destination, it reads as the current one does. */
+          rule(
+            { part: { 'data-current': true } },
+            {
+              color: hookOf('navigation-item', 'current-color', token('color-foreground')),
+              fontWeight: hookOf(
+                'navigation-item',
+                'current-font-weight',
+                token('weight-semibold'),
+              ),
+            },
+          ),
+          /* The ring turns inward, as a link's does, because the bar has no
+             room to draw it outside. */
+          rule(
+            { focusVisible: true },
+            {
+              outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+              outlineOffset: product(token('size-focus-offset'), '-1'),
+            },
+          ),
+          /* Too narrow for words, the button is a square around a glyph, as
+             App Header's toggle is. */
+          rule(
+            { part: { 'data-compact': true } },
+            {
+              inlineSize: token('size-control-sm'),
+              justifyContent: 'center',
+              paddingInline: token('space-none'),
+            },
+          ),
+        ]),
+      ]),
+      on('more-mark', [web([rule(tight)])]),
+      on({ region: 'more-icon', slotted: '*' }, [web([rule(tight)])]),
+      on('more-glyph', [web([rule(glyph)])]),
+      on({ region: 'menu-icon', slotted: '*' }, [web([rule(glyph)])]),
       /* Behind the destinations and out of flow, so moving it reflows nothing. */
       on('indicator', [
         rule({

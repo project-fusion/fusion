@@ -1,4 +1,4 @@
-import { boolean, headless, oneOf, Slot, View } from '../../../render.js'
+import { boolean, headless, oneOf, Pressable, Slot, View, Wrap, web } from '../../../render.js'
 import { derive } from '../../../tree.js'
 
 /**
@@ -27,8 +27,13 @@ import { derive } from '../../../tree.js'
  *
  * **What the web alone does**: a list of destinations slotted as a `<ul>`,
  * the styling of your own links through the `data-navigation-item` recipe,
- * and the `duplicate-name` warning where two navigations of one document
- * share a name, since a phone has no document to compare them in.
+ * the `duplicate-name` warning where two navigations of one document
+ * share a name, since a phone has no document to compare them in, and the
+ * overflow menu: a row too narrow for its destinations folds those that do
+ * not fit into a menu that a button after the last one opens, named by
+ * `more-label`, or by `current-label` with the current destination's name
+ * once every destination has folded, and `overflow="scroll"` scrolls the row
+ * instead. The navigation is `folded` while any destination has.
  *
  * **Held to `helix-navigation`.** `helix system check` compares the props,
  * the states, the regions, and the parts with what the manifest says the
@@ -38,13 +43,16 @@ export default headless('navigation', {
   props: {
     /* Unset is no value, so the arrows rove only while it is set. */
     arrows: boolean(),
+    currentLabel: web('{name}, more destinations'),
     fallbackLabel: 'Main',
     label: '',
     marker: oneOf(['segmented', 'underlined']),
+    moreLabel: web('More'),
     orientation: oneOf(['vertical']),
+    overflow: web(oneOf(['scroll'])),
   },
   events: {},
-  states: ['open', 'settled'],
+  states: ['folded', 'open', 'settled'],
   derived: {
     name: derive('navigation-name'),
   },
@@ -73,6 +81,62 @@ export default headless('navigation', {
         <Slot name="indicator" />
       </View>
       <Slot />
+      {/* The menu of the destinations that do not fit on the row, and the
+          button after the last one that opens it. */}
+      <Wrap
+        draws="menu"
+        exports={{
+          back: true,
+          'back-mark': true,
+          empty: true,
+          header: true,
+          live: true,
+          loading: true,
+          'search-field': true,
+          surface: true,
+          title: true,
+        }}
+        part="overflow"
+        platform="web"
+      >
+        <Pressable
+          into="trigger"
+          part="more"
+          role="button"
+        >
+          <View part="more-label" />
+          <View part="more-current" />
+          <Slot name="menu-icon">
+            <View
+              ariaHidden
+              icon="list"
+              part="more-glyph"
+            />
+          </Slot>
+          <Slot name="more-icon">
+            <View
+              ariaHidden
+              icon="caret-down"
+              part="more-mark"
+            />
+          </Slot>
+        </Pressable>
+        <Wrap
+          draws="menu-item"
+          exports={{
+            end: true,
+            item: true,
+            mark: true,
+            shortcut: true,
+            'shortcut-kbd': true,
+            'shortcut-key': true,
+            'shortcut-separator': true,
+            start: true,
+            surface: true,
+          }}
+          part="overflow-option"
+        />
+      </Wrap>
     </View>
   ),
 })
