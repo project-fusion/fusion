@@ -251,6 +251,14 @@ slot[name="error"]::slotted(*) {
    where a label's first line would be. A table's checkbox has no visible label,
    so the box rose 12 pixels above the row's center (measured November 4, 2026,
    in Data Table at 390). */
+/* **A table's checkbox is a step under the density's.** A row's words are the
+   control text, 13 at the default density, and a 20 pixel box beside them read
+   half again their size. The tight step is 16 there, as an icon button's glyph
+   is. Only the drawn box: the press still takes the whole target. */
+[part~="checkbox"] {
+  --checkbox-size: var(--helix-size-checkbox-tight);
+}
+
 [part~="checkbox"]::part(field) {
   align-items: center;
 }

@@ -76,8 +76,8 @@
 
 [part="grip-mark"],
 [part="pin-mark"] {
-  block-size: var(--helix-size-icon);
-  inline-size: var(--helix-size-icon);
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
 }
 
 [part~="pin"] {
@@ -102,8 +102,8 @@
 
 [part="checkbox"] {
   accent-color: var(--helix-color-primary);
-  block-size: var(--helix-size-checkbox);
-  inline-size: var(--helix-size-checkbox);
+  block-size: var(--helix-size-checkbox-tight);
+  inline-size: var(--helix-size-checkbox-tight);
   margin: 0;
 }
 
