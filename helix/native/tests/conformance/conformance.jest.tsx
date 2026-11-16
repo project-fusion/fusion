@@ -213,10 +213,14 @@ const declaredBy = (scenarios: readonly Scenario[]): Record<string, DeclaredEven
       .sort()
       .map((tag) => [
         tag,
-        (formOf(tag).api?.events ?? []).map((event) => ({
-          detail: [...event.detail],
-          name: event.name,
-        })),
+        /* An event only the web element sends, as a Data Table's
+           `view-change`, is the web's own, and kept out of the comparison. */
+        (formOf(tag).api?.events ?? [])
+          .filter((event) => event.platform !== 'web')
+          .map((event) => ({
+            detail: [...event.detail],
+            name: event.name,
+          })),
       ]),
   )
 
