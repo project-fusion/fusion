@@ -1678,26 +1678,14 @@ helix-toast:not([data-color-mode]) {
   margin-block: var(--helix-space-none) var(--helix-space-sm);
 }
 
-/* **A comfortable measure.** Paragraphs, lists and quotes stop at 50ch, which
-   measured 63 characters a line of running text in Fusion Sans, whose average
-   character is 0.46em against the 0.66em of a `0`. With none, a paragraph in a
-   wide column ran to 188 characters a line. A table, a code block or a picture
-   keeps the column's whole width. */
-:where([data-prose] p, [data-prose] ul, [data-prose] ol, [data-prose] blockquote) {
-  max-inline-size: 50ch;
-}
-
-/* **A chat turn and an editor's document fill their column.** Each has a
-   measure of its own. A Chat sets its reading measure on the column, as
-   `fullscreen` does at 80ch, and an Editor centers its document in
-   `--editor-measure`, 72ch by default. With the 50ch above, a plain answer
-   filled 409 pixels of an 800 pixel turn, and an editor's lines wrapped at
-   about two thirds of its own measure. This comes before `reading`, so a
-   document set for reading still stops at 34em. */
-:where(helix-chat-message, helix-headless-chat-message, helix-editor, helix-headless-editor)
-  :where(p, ul, ol, blockquote) {
-  max-inline-size: none;
-}
+/* **Plain prose fills its column, and the column sets the measure.** Helix
+   0.237.0 stopped paragraphs, lists, and quotes at 50ch, and every surface that
+   used `data-prose` undid it. A Chat sets its measure on the column, an Editor
+   centers its document in `--editor-measure`, and the docs span their column.
+   Under the 50ch a plain chat answer filled 409 pixels of an 800 pixel turn, and
+   a docs list stopped at 464 pixels of a 743 pixel column beside paragraphs that
+   ran the whole of it. Decided by the owner on November 15, 2026. A page that
+   wants prose to carry its own measure sets `data-prose="reading"`, below. */
 
 /* **A document set for reading, at `lg`.** The recipe's 14 is the size of a
    reply in a chat bubble or a note in a panel, and a documentation page or an
