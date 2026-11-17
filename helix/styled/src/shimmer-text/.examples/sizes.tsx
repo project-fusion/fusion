@@ -1,0 +1,27 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-text
+        as="p"
+        scale="heading"
+      >
+        <helix-shimmer-text>Planning the release</helix-shimmer-text>
+      </helix-text>
+      <helix-text
+        as="p"
+        scale="title"
+      >
+        <helix-shimmer-text>Reading the project files</helix-shimmer-text>
+      </helix-text>
+      <helix-text
+        as="p"
+        scale="body"
+      >
+        <helix-shimmer-text>Running the tests</helix-shimmer-text>
+      </helix-text>
+    </helix-flex>
+  )
+}

@@ -1,0 +1,21 @@
+/* The sweep in a color of its own: the color mixed toward the page between
+   sweeps, so the band that crosses the words is the full color, from the two
+   hooks the element reads. The status colors carry a hue in every theme,
+   where a theme's primary may be ink. */
+.info {
+  --shimmer-text-color: color-mix(
+    in oklab,
+    var(--helix-color-info) 65%,
+    var(--helix-color-background)
+  );
+  --shimmer-text-highlight-color: var(--helix-color-info);
+}
+
+.success {
+  --shimmer-text-color: color-mix(
+    in oklab,
+    var(--helix-color-success) 65%,
+    var(--helix-color-background)
+  );
+  --shimmer-text-highlight-color: var(--helix-color-success);
+}
