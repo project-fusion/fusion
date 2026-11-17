@@ -173,6 +173,16 @@ driver_lost() {
     grep -qs "Device became unreachable" "$out/reports/$1.xml"
 }
 
+# Whether a link the iOS pass named by the argument opened timed out in
+# `simctl openurl` (error 60, ETIMEDOUT), which the links pass did on a new
+# simulator's first link in run 44014347190, and every screen after it passed.
+# The links pass runs once more. A screens pass is not run again for it, since
+# a second run of one would pass the job's 60 minutes.
+link_timed_out() {
+  [[ $platform == ios && $1 == links ]] &&
+    grep -rqs "NSPOSIXErrorDomain, code=60" "$out/debug/$1"
+}
+
 # What Maestro's log of a flow says when the emulator dropped off adb, which a
 # CI runner's emulator does: "device offline", that the device was not found,
 # or that Maestro's server on it died (runs 39622908821 and 39640601450). Its
@@ -362,6 +372,11 @@ pass() {
       say "Maestro lost the simulator; running $name again"
       xcrun simctl terminate "$device" "$package" > /dev/null 2>&1 || true
       driver=--reinstall-driver
+      interrupted+=("$name-first")
+      mv "$out/debug/$name" "$out/debug/$name-first"
+      run_maestro "$name" "$@" || result=failed
+    elif link_timed_out "$name"; then
+      say "A link of $name timed out on the simulator; running $name again"
       interrupted+=("$name-first")
       mv "$out/debug/$name" "$out/debug/$name-first"
       run_maestro "$name" "$@" || result=failed
