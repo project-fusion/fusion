@@ -247,6 +247,48 @@ slot[name="scroll-end-icon"]::slotted(*) {
   z-index: var(--helix-layer-raised);
 }
 
+/* Each tab's own wash goes while the shape draws it. Set on the tabs, so the
+   shape, which reads the strip's value, keeps it. */
+:host(:state(gliding)) ::slotted(helix-tab) {
+  --_tab-hover-surface: transparent;
+  --tabs-tab-hover-background-color: transparent;
+}
+
+/* **The hover wash, as one shape that glides** from tab to tab while a mouse
+   or pen moves along the strip, in place of each tab's own, which goes under
+   `:state(gliding)`. Placed where the pointer arrives and faded in; it slides
+   only once `data-gliding` says it has arrived, so it never slides in from
+   where it was last. Before the tabs, so it draws behind them. */
+[part="highlight"] {
+  background-color: var(
+    --tabs-tab-hover-background-color,
+    var(--_tab-hover-surface, var(--helix-color-hover))
+  );
+  block-size: var(--indicator-block-size, 0);
+  border-radius: var(--tabs-tab-radius, var(--_tab-radius, var(--helix-radii-none)));
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: var(--indicator-x, 0px) var(--indicator-y, 0px);
+  z-index: var(--helix-layer-base);
+}
+
+[part="highlight"][data-placed] {
+  opacity: 1;
+}
+
+[part="highlight"][data-gliding] {
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* Underline: a bar along the bottom of the strip, on the rule it replaces. */
 :host([marker="underlined"]) [part="indicator"] {
   --_indicator-block: var(--tabs-indicator-thickness, var(--helix-border-thick));

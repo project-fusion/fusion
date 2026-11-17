@@ -1,0 +1,118 @@
+import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { IndicatorController } from '../indicator-controller/indicator-controller.js'
+
+/** What a `HoverMarkController` needs of its host. */
+export interface HoverMarkOptions {
+  /**
+   * Told when the mark arrives over the items and when it leaves them, so the
+   * host can hold `:state(gliding)` for its stylesheet.
+   */
+  gliding: (on: boolean) => void
+
+  /** The item a pointer is over, from what is under it, or nothing where it is between items. */
+  item: (under: readonly EventTarget[]) => HTMLElement | undefined
+
+  /** The mark that travels to the item under the pointer. */
+  mark: () => HTMLElement | null | undefined
+
+  /** Elements whose size moves the mark, beyond the host, as `IndicatorController` takes them. */
+  observe?: () => readonly Element[]
+
+  /** The box the mark is positioned against, as `IndicatorController` takes it. */
+  surface: () => HTMLElement | null | undefined
+}
+
+/**
+ * Moves one mark to whichever item a mouse or pen is over, so the wash under
+ * the pointer glides from item to item instead of going out on one and coming
+ * on at the next. Serves `Navigation` and `Tabs`.
+ *
+ * **Placed by `IndicatorController`**, so the mark carries the same four
+ * properties a selection mark does, `--indicator-x`, `--indicator-y`,
+ * `--indicator-inline-size` and `--indicator-block-size`, signed in a
+ * right-to-left document and in layout pixels under a transform, and
+ * `data-placed` while it is over an item.
+ *
+ * **It glides only between items.** Arriving from outside, it is placed where
+ * the pointer is and fades in, and `data-gliding` comes a frame later, so a
+ * stylesheet that moves the mark only under `data-gliding` never slides it in
+ * from where it was last. `gliding` hears the arrival and the departure, so
+ * the host can hold `:state(gliding)` between them, which a stylesheet reads
+ * to take each item's own hover wash away while the mark draws it.
+ *
+ * **A touch is not followed**, since a finger leaves no hover to draw.
+ */
+export class HoverMarkController implements ReactiveController {
+  private readonly host: ReactiveControllerHost & HTMLElement
+
+  private readonly options: HoverMarkOptions
+
+  /** The item the mark is over. */
+  hovered: HTMLElement | undefined
+
+  /** The frame that lets the mark glide, after its first placement. */
+  private frame = 0
+
+  private readonly placer: IndicatorController
+
+  constructor(host: ReactiveControllerHost & HTMLElement, options: HoverMarkOptions) {
+    this.host = host
+    this.options = options
+    this.placer = new IndicatorController(host, {
+      active: () => this.hovered,
+      indicator: options.mark,
+      ...(options.observe ? { observe: options.observe } : {}),
+      surface: options.surface,
+    })
+    host.addController(this)
+  }
+
+  hostConnected(): void {
+    this.host.addEventListener('pointerover', this.over)
+    this.host.addEventListener('pointerleave', this.leave)
+  }
+
+  hostDisconnected(): void {
+    this.host.removeEventListener('pointerover', this.over)
+    this.host.removeEventListener('pointerleave', this.leave)
+    this.leave()
+  }
+
+  private readonly over = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      return
+    }
+    const item = this.options.item(event.composedPath())
+    if (item === this.hovered) {
+      return
+    }
+    if (!item) {
+      this.leave()
+      return
+    }
+    const arriving = this.hovered === undefined
+    this.hovered = item
+    this.placer.place()
+    if (!arriving) {
+      return
+    }
+    this.options.gliding(true)
+    cancelAnimationFrame(this.frame)
+    this.frame = requestAnimationFrame(() => {
+      this.frame = 0
+      this.options.mark()?.toggleAttribute('data-gliding', this.hovered !== undefined)
+    })
+  }
+
+  private readonly leave = (): void => {
+    cancelAnimationFrame(this.frame)
+    this.frame = 0
+    if (this.hovered === undefined) {
+      return
+    }
+    this.hovered = undefined
+    this.placer.place()
+    this.options.mark()?.removeAttribute('data-gliding')
+    this.options.gliding(false)
+  }
+}

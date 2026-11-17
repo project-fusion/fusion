@@ -6,6 +6,7 @@ import {
   glyphPath,
   HelixActivateEvent,
   HelixElement,
+  HoverMarkController,
   IndicatorController,
   isRtl,
   KeyboardNavigationController,
@@ -105,6 +106,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
+ * @csspart highlight - The wash under the pointer, which glides from tab to tab while a mouse or pen moves along them. It carries the tab's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives.
  * @csspart indicator - The marker that moves to the selected tab. It carries the selected tab's
  *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
  *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
@@ -115,6 +117,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @csspart scroll-start - The button that scrolls the strip toward its start, shown under `scroll-controls` while there is more that way.
  * @csspart scroll-start-mark - The glyph on that button, where none is slotted.
  * @csspart tabs - The tab list.
+ *
+ * @cssstate gliding - While a mouse or pen is over a tab, so the highlight draws the hover wash in place of each tab's own.
  */
 @customElement('helix-headless-tabs')
 export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
@@ -142,6 +146,21 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   private readonly indicator = new IndicatorController(this, {
     active: () => this.tabs.find((tab) => tab.selected),
     indicator: () => this.partNamed('indicator'),
+    observe: () => this.tabs,
+    surface: () => this.partNamed('tabs'),
+  })
+
+  /** Moves the hover wash to whichever tab is under the pointer. A disabled tab takes none. */
+  protected readonly highlight = new HoverMarkController(this, {
+    gliding: (on) => this.toggleState('gliding', on),
+    item: (under) => {
+      const tabs = this.tabs
+      return under.find(
+        (one): one is HelixHeadlessTab =>
+          one instanceof HelixHeadlessTab && tabs.includes(one) && !one.disabled,
+      )
+    },
+    mark: () => this.partNamed('highlight'),
     observe: () => this.tabs,
     surface: () => this.partNamed('tabs'),
   })
@@ -585,6 +604,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
         @scroll=${this.scrollControls ? this.measure : nothing}
       >
         ${this.renderScroll(-1)}
+        <span part="highlight" aria-hidden="true"></span>
         <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
         ${this.renderScroll(1)}
