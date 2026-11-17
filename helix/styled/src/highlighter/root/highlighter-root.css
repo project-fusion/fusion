@@ -1,0 +1,47 @@
+:host {
+  display: inline;
+}
+
+/* **A band behind the words, waiting at no width** at the inline start. Each
+   line of the words takes a band of its own, so words across two lines are
+   drawn on both. */
+[part="mark"] {
+  -webkit-box-decoration-break: clone;
+  background-color: transparent;
+  background-image: linear-gradient(
+    var(--highlighter-color, color-mix(in oklab, var(--helix-color-warning) 35%, transparent)),
+    var(--highlighter-color, color-mix(in oklab, var(--helix-color-warning) 35%, transparent))
+  );
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  border-radius: var(--helix-radii-inset);
+  box-decoration-break: clone;
+  color: inherit;
+  padding-inline: var(--helix-space-2xs);
+  transition: background-size var(--highlighter-duration, calc(var(--helix-duration-slow) * 2.5))
+    var(--helix-easing-decelerate);
+}
+
+:host(:dir(rtl)) [part="mark"] {
+  background-position: right center;
+}
+
+:host(:state(drawn)) [part="mark"] {
+  background-size: 100% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="mark"] {
+    transition: none;
+  }
+}
+
+/* The band prints, since it is the meaning: a printer drops backgrounds by
+   default. Drawn in full on paper, whether or not it scrolled into view. */
+@media print {
+  [part="mark"] {
+    background-size: 100% 100%;
+    print-color-adjust: exact;
+  }
+}

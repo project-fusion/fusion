@@ -1,0 +1,44 @@
+:host {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+[part="value"] {
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+/* **One figure showing in each column**, the rest of the strip clipped above
+   and below it. */
+[part="digit"] {
+  block-size: 1lh;
+  display: inline-block;
+  overflow: hidden;
+}
+
+[part="strip"] {
+  display: flex;
+  flex-direction: column;
+  transition: translate var(--sliding-number-duration, var(--helix-duration-slow))
+    var(--sliding-number-easing, var(--helix-easing-emphasized));
+  translate: 0 calc(var(--_figure, 0) * -1lh);
+}
+
+[part="strip"] > span {
+  block-size: 1lh;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="strip"] {
+    transition: none;
+  }
+}
+
+/* The figures print as they stand: nothing here lifts, scrolls, or carries its
+   state in a fill, and the clip shows the one figure each column holds. */
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}
