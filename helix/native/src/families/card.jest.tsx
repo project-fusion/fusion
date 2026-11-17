@@ -187,10 +187,10 @@ describe('the generated Card', () => {
 
   test('reads a padding hook of four lengths, a calc() of tokens among them, as CSS does', async () => {
     /* A hook as a style key, which a page passes and the props type leaves out. */
-    const Hero = HelixCard as unknown as (given: Record<string, unknown>) => ReactNode
+    const Panel = HelixCard as unknown as (given: Record<string, unknown>) => ReactNode
     const hero = await render(
       themed(
-        <Hero
+        <Panel
           separation="plain"
           style={{
             '--card-padding':
@@ -198,7 +198,7 @@ describe('the generated Card', () => {
           }}
         >
           Body
-        </Hero>,
+        </Panel>,
       ),
     )
     const points = (token: string) => tokens[token] as number
