@@ -11,13 +11,13 @@
   transform: rotateX(calc(var(--_tilt-y, 0) * var(--tilt-angle, 8deg) * -1))
     rotateY(calc(var(--_tilt-x, 0) * var(--tilt-angle, 8deg)));
   transition: transform var(--helix-duration-slow) var(--helix-easing-decelerate);
-  will-change: transform;
 }
 
 /* Close behind the pointer while it moves, and settling back over a longer
    time once it leaves. */
 :host(:state(tilting)) [part="surface"] {
   transition-duration: var(--helix-duration-fast);
+  will-change: transform;
 }
 
 /* The inline end is the left on a right-to-left page, so the turn about the
