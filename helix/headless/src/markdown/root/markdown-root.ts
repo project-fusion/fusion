@@ -2,6 +2,7 @@ import { customElement, HelixElement, internalsOf, words } from '@fusion.dev/hel
 import { type CSSResultGroup, css, html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../callout/index.js'
+import '../../checkbox/index.js'
 import '../../code-block/index.js'
 import { MarkdownWriter } from '../writer.js'
 
@@ -143,7 +144,11 @@ export class HelixHeadlessMarkdown extends HelixElement {
         tip: this.tipHeading,
         warning: this.warningHeading,
       },
-      tags: { callout: `${tier}callout`, codeBlock: `${tier}code-block` },
+      tags: {
+        callout: `${tier}callout`,
+        checkbox: `${tier}checkbox`,
+        codeBlock: `${tier}code-block`,
+      },
     }
     if (!this.writer) {
       this.writer = new MarkdownWriter(this, options)

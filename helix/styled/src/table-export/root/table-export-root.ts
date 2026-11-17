@@ -5,6 +5,7 @@ import { html } from 'lit/static-html.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './table-export-root.css.js'
 import '../../button/index.js'
+import '../../radio/index.js'
 
 /**
  * @summary A panel that exports a Data Table's rows: which rows, which columns, which values, and the format.

@@ -13,6 +13,7 @@ import { html } from 'lit/static-html.js'
 import { columnName, TableBinding, type ToolTable } from '../../data-table/binding.js'
 import type { DataTableView } from '../../data-table/view.js'
 import '../../button/index.js'
+import '../../radio/index.js'
 
 /** The sections the panel lists, in order. */
 type Section = 'columns' | 'export' | 'filters' | 'sort'
@@ -70,8 +71,11 @@ const closable = (element: Element): element is Closable =>
  * @slot presets - A `QuickFilters` row for the table, shown above the sections.
  *
  * @csspart back - The button that returns from a section to the list.
- * @csspart choice - One sort order, its input and its words.
- * @csspart choice-input - The radio input of a sort order.
+ * @csspart choice - One sort order, a `Radio`.
+ * @csspart choice-box - The circle of a sort order's `Radio`.
+ * @csspart choice-checked - Added to `choice` while it is the table's sort.
+ * @csspart choice-item - The button of a sort order's `Radio`, which covers its row.
+ * @csspart choice-label - The words of a sort order's `Radio`.
  * @csspart header - The row that holds the title, or Back, and Reset.
  * @csspart page - The open section.
  * @csspart reset - The button that clears the search, the filters, and the sort.
@@ -84,7 +88,11 @@ const closable = (element: Element): element is Closable =>
  * @csspart show-live - Forwarded from the button. Not shown in the panel, whose button does not load.
  * @csspart show-spinner - Forwarded from the button. Not shown in the panel, whose button does not load.
  * @csspart show-text - Forwarded from the button: the words inside `show`.
- * @csspart sort - The sort orders the panel draws.
+ * @csspart sort - The `Radio Group` of sort orders the panel draws, named by its `aria-label`.
+ * @csspart sort-feedback - Forwarded from the radio group. Not shown, since a sort is never wrong.
+ * @csspart sort-hint - Forwarded from the radio group. Not shown, since the sort has no help.
+ * @csspart sort-items - The sort orders inside `sort`.
+ * @csspart sort-label - The name of `sort`, clipped, since the panel's heading already says it.
  * @csspart summary - What a section holds now.
  * @csspart title - The panel's heading.
  */
@@ -258,21 +266,25 @@ export class HelixHeadlessViewPanel extends HelixElement {
           })),
         ),
     ]
-    return html`<fieldset part="sort">
-      <legend>${this.sortLabel}</legend>
-      ${orders.map(
-        (order) => html`<label part="choice"
-          ><input
-            part="choice-input"
-            type="radio"
-            name="sort"
-            .value=${order.value}
-            .checked=${table.view.sort === order.value}
-            @change=${() => table.requestView({ sort: order.value })}
-          />${order.label}</label
+    const group = this.tag('radio-group')
+    const radio = this.tag('radio')
+    return html`<${group}
+      part="sort"
+      exportparts="feedback: sort-feedback, hint: sort-hint, items: sort-items, label: sort-label"
+      aria-label=${this.sortLabel}
+      .value=${table.view.sort}
+      @change=${(event: Event) => {
+        table.requestView({ sort: (event.target as HTMLElement & { value: string }).value })
+      }}
+      >${orders.map(
+        (order) => html`<${radio}
+          part="choice${table.view.sort === order.value ? ' choice-checked' : ''}"
+          exportparts="box: choice-box, item: choice-item, label: choice-label"
+          value=${order.value}
+          >${order.label}</${radio}
         >`,
-      )}
-    </fieldset>`
+      )}</${group}
+    >`
   }
 
   /** Show, as this tier's button. */

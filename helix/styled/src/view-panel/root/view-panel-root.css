@@ -60,30 +60,11 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
+/* The sort orders are a `Radio Group`, so the radios are the ones every other
+   set in the library draws. It is named by its `aria-label`, so it draws no
+   label of its own. */
 [part="sort"] {
-  border: 0;
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-}
-
-[part="sort"] legend {
-  clip-path: inset(50%);
-  position: absolute;
-}
-
-[part="choice"] {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  gap: var(--helix-space-sm);
-  min-block-size: var(--helix-size-target);
-}
-
-[part="choice-input"] {
-  accent-color: var(--helix-color-primary);
-  margin: 0;
+  display: block;
 }
 
 [part="reset"]:focus-visible,

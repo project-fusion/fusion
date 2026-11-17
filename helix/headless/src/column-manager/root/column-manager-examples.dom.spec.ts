@@ -22,7 +22,7 @@ describe('the preview example', () => {
       view: { columns: { hidden: string[]; pinned: Record<string, string> } }
     }
     expect(table.view.columns.pinned).toEqual({ id: 'start' })
-    const box = manager.shadowRoot?.querySelector<HTMLInputElement>(
+    const box = manager.shadowRoot?.querySelector<HTMLElement>(
       '[data-field="terms"] [part="checkbox"]',
     )
     box?.click()

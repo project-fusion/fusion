@@ -9,7 +9,8 @@ describe('table export server output', () => {
   )
 
   test('serves its groups and buttons, disabled until the table is found', () => {
-    expect(partTag(markup, 'rows')).toContain('<fieldset')
+    expect(partTag(markup, 'rows')).toContain('<helix-headless-radio-group')
+    expect(partTag(markup, 'columns')).toContain('<fieldset')
     expect(partTag(markup, 'export')).toContain('disabled')
   })
 

@@ -12,6 +12,7 @@ import type {
   ExportValues,
 } from '../../data-table/export.js'
 import '../../button/index.js'
+import '../../radio/index.js'
 
 /** What the panel needs of a table beyond what every tool does. */
 interface ExportTable extends ToolTable {
@@ -62,9 +63,12 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @documentation https://fusion.dev/helix/components/table-export
  *
  * @csspart actions - The row that holds Copy and Export.
- * @csspart choice - One choice: its input and its words.
+ * @csspart choice - One choice. Among the rows it is a `Radio`; among the columns, the values and the format it is a segment holding its input and its words.
+ * @csspart choice-box - The circle of a row choice's `Radio`.
  * @csspart choice-checked - Added to `choice` while it is chosen.
- * @csspart choice-input - The radio input of a choice.
+ * @csspart choice-input - The hidden radio input of a segment.
+ * @csspart choice-item - The button of a row choice's `Radio`, which covers its row.
+ * @csspart choice-label - The words of a row choice's `Radio`.
  * @csspart columns - The group that chooses the columns.
  * @csspart copy - The button that copies the rows.
  * @csspart copy-button - Forwarded from the button: the button inside `copy`.
@@ -80,7 +84,11 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @csspart legend - A group's name.
  * @csspart live - The region that says the rows were copied. Visually hidden in the styled tier.
  * @csspart options - The choices of a group, after its name.
- * @csspart rows - The group that chooses the rows.
+ * @csspart rows - The `Radio Group` that chooses the rows.
+ * @csspart rows-feedback - Forwarded from the radio group. Not shown, since a choice of rows is never wrong.
+ * @csspart rows-hint - Forwarded from the radio group. Not shown, since the rows have no help.
+ * @csspart rows-items - The row choices inside `rows`.
+ * @csspart rows-label - The name of `rows`.
  * @csspart values - The group that chooses the values.
  */
 @customElement('helix-headless-table-export')
@@ -277,32 +285,43 @@ export class HelixHeadlessTableExport extends HelixElement {
       { label: 'JSON', value: 'json' },
       ...(exports(table) && table.xlsx ? [{ label: 'XLSX', value: 'xlsx' as const }] : []),
     ]
-    return html`<fieldset part="rows">
-        <legend part="legend">${this.rowsLabel}</legend>
-        <div part="options">${this.renderChoices(
-          'rows',
-          options.rows,
-          [
-            ...(selected > 0
-              ? [
-                  {
-                    label: formatWords(this, 'selectedRowsLabel', { count: selected }),
-                    value: 'selected' as const,
-                  },
-                ]
-              : []),
+    const group = this.tag('radio-group')
+    const radio = this.tag('radio')
+    const rows: { label: string; value: ExportOptions['rows'] }[] = [
+      ...(selected > 0
+        ? [
             {
-              label: formatWords(this, 'filteredRowsLabel', { count: table?.matched ?? 0 }),
-              value: 'filtered' as const,
+              label: formatWords(this, 'selectedRowsLabel', { count: selected }),
+              value: 'selected' as const,
             },
-            {
-              label: formatWords(this, 'allRowsLabel', { count: table?.everyRowCount ?? 0 }),
-              value: 'all' as const,
-            },
-          ],
-          (value) => (this.chosenRows = value),
-        )}</div>
-      </fieldset>
+          ]
+        : []),
+      {
+        label: formatWords(this, 'filteredRowsLabel', { count: table?.matched ?? 0 }),
+        value: 'filtered' as const,
+      },
+      {
+        label: formatWords(this, 'allRowsLabel', { count: table?.everyRowCount ?? 0 }),
+        value: 'all' as const,
+      },
+    ]
+    return html`<${group}
+        part="rows"
+        exportparts="feedback: rows-feedback, hint: rows-hint, items: rows-items, label: rows-label"
+        label=${this.rowsLabel}
+        .value=${options.rows}
+        @change=${(event: Event) => {
+          this.chosenRows = (event.target as HTMLElement & { value: ExportOptions['rows'] }).value
+        }}
+        >${rows.map(
+          (row) => html`<${radio}
+            part="choice${row.value === options.rows ? ' choice-checked' : ''}"
+            exportparts="box: choice-box, item: choice-item, label: choice-label"
+            value=${row.value}
+            >${row.label}</${radio}
+          >`,
+        )}</${group}
+      >
       <fieldset part="columns">
         <legend part="legend">${this.columnsLabel}</legend>
         <div part="options">${this.renderChoices(

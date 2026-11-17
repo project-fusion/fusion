@@ -17,8 +17,9 @@ export interface MarkdownOptions {
   /** Each alert's heading by its kind. English by default. */
   headings?: Partial<Record<MarkdownAlertKind, string>> | undefined
   /**
-   * The tags for a fence and an alert, which name the tier they are drawn in.
-   * `helix-code-block` and `helix-callout` by default.
+   * The tags for a fence, an alert and a task's box, which name the tier they
+   * are drawn in. `helix-code-block`, `helix-callout` and `helix-checkbox` by
+   * default.
    */
   tags?: Partial<MarkdownTags> | undefined
 }
@@ -32,6 +33,7 @@ export interface MarkdownFilled {
 /** The elements a document draws from another family. */
 export interface MarkdownTags {
   callout: string
+  checkbox: string
   codeBlock: string
 }
 
@@ -159,12 +161,14 @@ const itemNode = (item: MarkdownItem, open: boolean, options: MarkdownFilled): M
   if (item.checked === undefined) {
     return element('li', [...lead, ...tail])
   }
+  /* The library's `Checkbox`, read-only: a task's box says whether it is done
+     and takes no press, which is what read-only means, where a disabled
+     native box drew the browser's own grayed square, unlike every other box
+     on the page. */
   const box = element(
-    'input',
+    options.tags.checkbox,
     [],
-    item.checked
-      ? { checked: '', disabled: '', type: 'checkbox' }
-      : { disabled: '', type: 'checkbox' },
+    item.checked ? { checked: '', readonly: '' } : { readonly: '' },
   )
   return element('li', [box, ' ', ...lead, ...tail], { 'data-task': '' })
 }
@@ -257,7 +261,12 @@ export const blockNode = (
 /** The options with every default filled in. */
 export const withDefaults = (options: MarkdownOptions = {}): MarkdownFilled => ({
   headings: { ...HEADINGS, ...options.headings },
-  tags: { callout: 'helix-callout', codeBlock: 'helix-code-block', ...options.tags },
+  tags: {
+    callout: 'helix-callout',
+    checkbox: 'helix-checkbox',
+    codeBlock: 'helix-code-block',
+    ...options.tags,
+  },
 })
 
 /** A finished document's nodes. */

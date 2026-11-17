@@ -70,9 +70,9 @@ describe('a column manager', () => {
 
   test('hides a column with its checkbox, and only view.columns changes', async () => {
     const { manager, table } = await page()
-    const box = part(manager, 'customer', 'checkbox') as HTMLInputElement
-    box.checked = false
-    box.dispatchEvent(new Event('change', { bubbles: true }))
+    // The row's box is a `Checkbox`, so the press is on the input inside it.
+    const box = part(manager, 'customer', 'checkbox')
+    box.shadowRoot?.querySelector<HTMLInputElement>('[part="control"]')?.click()
     await settle(manager, table)
     expect(table.view.columns.hidden).toEqual(['customer'])
     expect(table.querySelector('[field="customer"]')?.hasAttribute('hidden')).toBe(true)
@@ -87,7 +87,9 @@ describe('a column manager', () => {
       columns: { ...table.view.columns, hidden: ['customer', 'amount'] },
     }
     await settle(manager, table)
-    expect((part(manager, 'id', 'checkbox') as HTMLInputElement).disabled).toBe(true)
+    expect((part(manager, 'id', 'checkbox') as HTMLElement & { disabled: boolean }).disabled).toBe(
+      true,
+    )
   })
 
   test('moves a column with Alt and an arrow, and says where it went', async () => {

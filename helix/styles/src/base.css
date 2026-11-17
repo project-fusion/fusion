@@ -1874,7 +1874,7 @@ helix-toast:not([data-color-mode]) {
   list-style: none;
 }
 
-:where([data-prose] li[data-task] > input[type="checkbox"]) {
+:where([data-prose] li[data-task] > :first-child) {
   margin-block: var(--helix-space-none);
   margin-inline: calc(var(--helix-space-md) * -1) var(--helix-space-2xs);
   vertical-align: middle;

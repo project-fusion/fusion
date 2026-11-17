@@ -26,7 +26,7 @@ describe('markdownToHtml', () => {
     expect(markdownToHtml('- a\n- b')).toBe('<ul><li>a</li><li>b</li></ul>')
     expect(markdownToHtml('- a\n\n- b')).toBe('<ul><li>a</li><li>b</li></ul>')
     expect(markdownToHtml('- [x] done')).toBe(
-      '<ul><li data-task=""><input checked="" disabled="" type="checkbox"> done</li></ul>',
+      '<ul><li data-task=""><helix-checkbox checked="" readonly=""></helix-checkbox> done</li></ul>',
     )
   })
 
