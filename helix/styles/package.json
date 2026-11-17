@@ -19,6 +19,7 @@
     "./elements.css": "./dist/elements.css",
     "./helix.css": "./dist/helix.css",
     "./package.json": "./package.json",
+    "./page-transitions.css": "./dist/page-transitions.css",
     "./primitives.css": "./dist/primitives.css",
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./dist/tokens.json"

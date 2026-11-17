@@ -21,6 +21,7 @@ Or take the pieces, in the order of the first four rows:
 | `elements.css` | hides each Helix element until its definition loads |
 | `helix.css` | the four files above, in that order |
 | `tokens.json` | the same token names for a build step that needs them |
+| `page-transitions.css` | moves between the pages of a site, as a fade or a slide. `helix.css` leaves it out, so a site imports it on each page that takes part |
 
 The tokens are the contract every Helix component reads, so overriding one here
 moves every component that answers it.

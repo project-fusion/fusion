@@ -215,4 +215,41 @@ changing it is the one move that is the document's to make. `Theme Toggle` and
 `setColorMode` from `@fusion.dev/helix-core` spread the new mode in a circle
 from the button, wipe it across, or fade it, and change it at once under
 reduced motion. Any other view transition is yours to start from your own
-code.
+code, and the next section covers the one most sites want.
+
+## Moving between pages
+
+A site can move from one page to the next as a fade or a slide. Import the
+page transition sheet after `helix.css`, on every page that takes part:
+
+```css
+@import '@fusion.dev/helix-styles/helix.css';
+@import '@fusion.dev/helix-styles/page-transitions.css';
+```
+
+A link to another page on the same origin then fades the new page over the
+old one, with no script, in browsers with cross-document view transitions.
+Other browsers load the new page as before. The sheet stays out of `helix.css`
+because the rule that turns it on speaks for the whole document and cannot be
+scoped, so it is a site's choice to make. Under reduced motion the sheet turns
+nothing on.
+
+For a slide, write `data-page-transition="slide"` on the `html` element of the
+page being arrived at. The new page comes in from the inline end and the old
+one leaves toward the inline start. `slide-back` travels the other way, for a
+step back, and right-to-left pages mirror both. The move takes
+`--helix-duration-slow`.
+
+A router that changes the page in place, without loading a new document,
+calls `changePage` from `@fusion.dev/helix-core` around the change:
+
+```ts
+import { changePage } from '@fusion.dev/helix-core'
+
+await changePage(() => router.show(next), { transition: 'slide' })
+```
+
+It names the way for the length of the move, changes the page at once under
+reduced motion or where the browser has no view transitions, and rejects
+where the change does. To keep a header still while the rest of the page
+moves, give it a `view-transition-name` of its own on every page.
