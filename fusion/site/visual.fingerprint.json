@@ -1,6 +1,6 @@
 {
   "browser": "chromium 156.0.8078.4",
-  "fonts": "90 fonts, d93ed8347ae01f6c",
-  "os": "ubuntu 24.04",
+  "fonts": "90 fonts, fa9c0b5a293c51d5",
+  "os": "ubuntu 26.04",
   "platform": "linux"
 }
