@@ -187,16 +187,17 @@ export default styles(
           ),
         ]),
       ]),
+      include(dataTableRows),
       on('checkbox', [
         /* **A table's checkbox is a step under the density's.** A row's words
            are the control text, 13 at the default density, and a 20 pixel box
            beside them read half again their size. The tight step is 16 there,
            as an icon button's glyph is. Only the drawn box: the press still
-           takes the whole target. */
+           takes the whole target. After the rows, since the head and the rows
+           share their `display: contents` rule. */
         web([rule({ '--checkbox-size': token('size-checkbox-tight') })]),
         native([rule({ alignSelf: 'center' })]),
       ]),
-      include(dataTableRows),
       on({ part: 'cell', selector: '[part~="cell"]' }, [
         web([rule({ textAlign: hook.cellAlign })]),
       ]),
