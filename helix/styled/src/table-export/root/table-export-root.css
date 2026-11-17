@@ -7,31 +7,13 @@
   min-inline-size: 18rem;
 }
 
-fieldset {
-  border: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
-  margin: 0;
-  min-inline-size: 0;
-  padding: 0;
-}
-
-[part="legend"] {
+/* Every group is a `Radio Group`, so its choices are the ones every other set
+   in the library draws. A group's name is muted and small, and sits the
+   group's own gap above its choices, so the four names sit alike. */
+:is([part="rows"], [part="columns"], [part="values"], [part="format"])::part(label) {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  margin-block-end: var(--helix-space-2xs);
-  padding: 0;
-}
-
-/* The rows are a `Radio Group`, so the radios are the ones every other set in
-   the library draws. Its name is set as the other groups' legends are. */
-[part="rows"]::part(label) {
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  margin-block-end: var(--helix-space-2xs);
 }
 
 /* The rows' radios are the size of Column Manager's boxes, a step under the
@@ -45,24 +27,10 @@ fieldset {
   font-weight: var(--helix-weight-regular);
 }
 
-[part="options"] [part~="choice"] {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  gap: var(--helix-space-sm);
-}
-
-/* The columns, the values, and the format are segmented: the inputs stay in
-   the tree for the keys and the screen reader, and the label is the segment. */
-[part="options"] {
-  display: flex;
-  flex-direction: column;
-  gap: var(--helix-space-xs);
-}
-
-[part="columns"] [part="options"],
-[part="values"] [part="options"],
-[part="format"] [part="options"] {
+/* The columns, the values, and the format are segmented: the radios lose
+   their circles, and each one's button is a segment in a track, the chosen one
+   raised out of it. */
+:is([part="columns"], [part="values"], [part="format"])::part(items) {
   background-color: var(--table-export-segment-background-color, var(--helix-color-surface-sunken));
   border-radius: var(--helix-radii-md);
   display: grid;
@@ -72,35 +40,38 @@ fieldset {
   padding: var(--helix-space-2xs);
 }
 
-[part="columns"] [part~="choice"],
-[part="values"] [part~="choice"],
-[part="format"] [part~="choice"] {
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice"] {
+  min-inline-size: 0;
+}
+
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice"]::part(box) {
+  display: none;
+}
+
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice"]::part(item) {
+  align-items: center;
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  font-size: var(--helix-text-sm);
-  font-weight: var(--helix-weight-medium);
+  inline-size: 100%;
   justify-content: center;
   min-block-size: var(--helix-size-control-tight);
-  position: relative;
 }
 
-[part="columns"] [part="choice-input"],
-[part="values"] [part="choice-input"],
-[part="format"] [part="choice-input"] {
-  inset: 0;
-  opacity: 0;
-  position: absolute;
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice"]::part(label) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  padding-block-start: 0;
 }
 
-[part="columns"] [part~="choice-checked"],
-[part="values"] [part~="choice-checked"],
-[part="format"] [part~="choice-checked"] {
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice-checked"]::part(item) {
   background-color: var(--helix-color-surface-raised);
   box-shadow: var(--helix-shadow-sm);
+}
+
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice-checked"]::part(label) {
   color: var(--helix-color-foreground);
 }
 
-[part="options"] [part~="choice"]:has(:focus-visible) {
+:is([part="columns"], [part="values"], [part="format"]) [part~="choice"]::part(item):focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
