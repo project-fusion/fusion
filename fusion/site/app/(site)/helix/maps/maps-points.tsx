@@ -161,7 +161,7 @@ export function MapsPoints({ credit }: { credit: readonly CreditPart[] }) {
         label={`Food and drink in Austin, ${COUNTED} places`}
         ref={frame}
       >
-        <div className={styles.mapsCanvas} ref={container} />
+        <div className={styles.mapsCanvas} data-site-points-canvas ref={container} />
         {failed ? (
           <helix-text scale="caption" slot="footer">
             {MAP_FAILED}

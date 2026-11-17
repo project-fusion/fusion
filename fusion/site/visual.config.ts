@@ -91,8 +91,23 @@ export default defineConfig({
      so each one's pull request turned the home page red in four shots. The
      catalog and the gallery's checks own the count. Held at four digits'
      width while each picture is taken, so a count that gains a digit moves
-     nothing after it. */
-  mask: ['[data-site-footer] helix-tag', '[data-site-measure]', '[data-site-count]'],
+     nothing after it.
+
+     **And the food and drink map's canvas on the maps page**, which draws
+     only once the page nears it. It sits about 1,700 pixels down, past the
+     reach of an 800 pixel viewport the harness never scrolls, so it started
+     only when the whole-page picture grew the viewport, and drew or not by
+     which finished first: on November 17, 2026 two accepted baselines held it
+     empty and the next run, drawn, failed against them. Waiting for its
+     clusters timed out on every run, since nothing brings it near. Its frame,
+     controls and credit are still pictured, and the map family's own browser
+     specs draw the clusters. */
+  mask: [
+    '[data-site-footer] helix-tag',
+    '[data-site-measure]',
+    '[data-site-count]',
+    '[data-site-points-canvas]',
+  ],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only
@@ -115,21 +130,7 @@ export default defineConfig({
         { name: 'button', path: '/helix/components/button' },
         { name: 'sandbox', path: '/helix/sandbox' },
         { name: 'theme', path: '/helix/theme', selector: '[data-preview-drawn]' },
-        /* **The food and drink map is awaited until it has drawn whole.**
-           It starts when it nears the viewport, then asks for its snapshot,
-           loads MapLibre and draws, and a whole-page picture taken before it
-           finished showed its frame empty: on November 17, 2026 two accepted
-           baselines held an empty map and the next run, drawn, failed
-           against them. Each count the map draws in view is written as a
-           `count` button in the points layer once the map settles, so the
-           wait is for the clusters themselves. Not `:state(ready)`, which
-           also waits for every tile, and the harness refuses the tile
-           server's requests, so it never turned on. */
-        {
-          name: 'maps',
-          path: '/helix/maps',
-          selector: 'helix-map-points[cluster] [part~="count"]',
-        },
+        { name: 'maps', path: '/helix/maps' },
         { name: 'components-loading', path: '/stand-ins/components' },
         { name: 'insights-loading', path: '/stand-ins/insights' },
         { name: 'reference-loading', path: '/stand-ins/reference' },
