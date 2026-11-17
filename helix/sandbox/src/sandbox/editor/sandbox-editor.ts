@@ -128,10 +128,6 @@ const LANGUAGES = {
 } as const satisfies Record<HighlightLanguage, () => Extension>
 
 /**
- * Marks a change the editor makes for a `value` set from outside, which is the
- * source the editor is given and is no edit.
- */
-/**
  * The editor measured again each time a face finishes loading.
  *
  * **CodeMirror measures its lines once more when `document.fonts.ready`
@@ -167,6 +163,10 @@ const remeasureOnFonts: Extension = ViewPlugin.fromClass(
   },
 )
 
+/**
+ * Marks a change the editor makes for a `value` set from outside, which is the
+ * source the editor is given and is no edit.
+ */
 const given = Annotation.define<boolean>()
 
 /**

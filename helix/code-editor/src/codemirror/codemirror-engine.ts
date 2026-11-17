@@ -96,7 +96,6 @@ export const languageName = (name: string): string | undefined => {
 export const languageNames = (): string[] =>
   [...Object.keys(LANGUAGES), ...Object.keys(ALIASES)].sort()
 
-/** Marks a change the editor made itself, which is not the reader's and goes through no request. */
 /**
  * The editor measured again each time a face finishes loading.
  *
@@ -133,6 +132,7 @@ const remeasureOnFonts: Extension = ViewPlugin.fromClass(
   },
 )
 
+/** Marks a change the editor made itself, which is not the reader's and goes through no request. */
 const given = Annotation.define<boolean>()
 
 /**
