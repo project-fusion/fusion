@@ -231,7 +231,7 @@ describe('edges', () => {
   test('a radius written after the corners sets every corner, as the shorthand does', () => {
     expect(
       drawn(['border-start-start-radius', text('4px')], ['border-radius', text('9999px')]).style,
-    ).toEqual({ borderRadius: 9999 })
+    ).toEqual({ borderRadius: 9999, borderTopStartRadius: 9999 })
     expect(
       drawn(['border-radius', text('9999px')], ['border-start-start-radius', text('4px')]).style,
     ).toEqual({ borderRadius: 9999, borderTopStartRadius: 4 })

@@ -251,8 +251,20 @@ export const apply = (
      over it whatever their order: an icon button whose corners a group
      sets is round under `shape="circle"`. */
   if (property === 'border-radius') {
+    /* A corner set before takes the shorthand's radius, and is not deleted:
+       a key that leaves a view's style between draws is reset with a null,
+       which Android logs as "Unsupported type for radius property: Null". */
+    const set = CORNERS.filter((corner) => out[corner] !== undefined)
     for (const corner of CORNERS) {
       delete out[corner]
+    }
+    const radius = length(value, scale.spaceRem, scale.spaceEm)
+    if (radius !== undefined) {
+      out.borderRadius = radius
+      for (const corner of set) {
+        out[corner] = radius
+      }
+      return undefined
     }
   }
   /* A transform, a shadow, an edge, a text's lines, a shape's paint, and a
