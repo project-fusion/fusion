@@ -1,0 +1,39 @@
+:host {
+  display: inline-block;
+}
+
+/* The pointer's share is mirrored on a right-to-left page before it arrives
+   here, so a share toward the inline end is a drift toward it. */
+[part="surface"] {
+  transition: translate var(--helix-duration-slow) var(--helix-easing-spring);
+  translate: calc(var(--_magnetic-x, 0) * var(--magnetic-reach, var(--helix-space-sm)))
+    calc(var(--_magnetic-y, 0) * var(--magnetic-reach, var(--helix-space-sm)));
+}
+
+:host(:dir(rtl)) [part="surface"] {
+  translate: calc(var(--_magnetic-x, 0) * var(--magnetic-reach, var(--helix-space-sm)) * -1)
+    calc(var(--_magnetic-y, 0) * var(--magnetic-reach, var(--helix-space-sm)));
+}
+
+/* Close behind the pointer while it moves, and springing back once it
+   leaves. */
+:host(:state(pulled)) [part="surface"] {
+  transition-duration: var(--helix-duration-fast);
+  transition-timing-function: var(--helix-easing-decelerate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="surface"],
+  :host(:dir(rtl)) [part="surface"] {
+    transition: none;
+    translate: none;
+  }
+}
+
+/* Flat on paper: a printed page has no pointer over it, so the content
+   prints in its own place. */
+@media print {
+  [part="surface"] {
+    translate: none;
+  }
+}

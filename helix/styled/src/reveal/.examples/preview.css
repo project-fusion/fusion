@@ -1,0 +1,24 @@
+/* A framed box short enough to scroll, with room above the sections so they
+   start below the view and come in as the box is scrolled. */
+.page {
+  block-size: 16rem;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: grid;
+  gap: var(--helix-space-md);
+  overflow: auto;
+  padding: var(--helix-space-md);
+}
+
+.lead {
+  min-block-size: 18rem;
+}
+
+/* Each card a little after the one before. */
+.second {
+  --reveal-delay: 80ms;
+}
+
+.third {
+  --reveal-delay: 160ms;
+}

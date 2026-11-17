@@ -131,6 +131,10 @@ export {
 } from './controllers/paint-gate-controller/paint-gate-controller.js'
 export { PlacementController } from './controllers/placement-controller/placement-controller.js'
 export {
+  PointerFollowController,
+  type PointerFollowOptions,
+} from './controllers/pointer-follow-controller/pointer-follow-controller.js'
+export {
   hintInside,
   hintMayShow,
   onPanelOpen,

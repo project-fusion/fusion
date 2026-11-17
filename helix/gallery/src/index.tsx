@@ -61,6 +61,7 @@ import { listArt } from './art/list'
 import { listboxArt } from './art/listbox'
 import { loaderArt } from './art/loader'
 import { logArt } from './art/log'
+import { magneticArt } from './art/magnetic'
 import { mapArt } from './art/map'
 import { markdownArt } from './art/markdown'
 import { marqueeArt } from './art/marquee'
@@ -84,6 +85,7 @@ import { quickFiltersArt } from './art/quick-filters'
 import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
+import { revealArt } from './art/reveal'
 import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
@@ -91,6 +93,7 @@ import { scrollProgressArt } from './art/scroll-progress'
 import { selectArt } from './art/select'
 import { selectionBarArt } from './art/selection-bar'
 import { shimmerTextArt } from './art/shimmer-text'
+import { shineArt } from './art/shine'
 import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
@@ -116,6 +119,7 @@ import { terminalArt } from './art/terminal'
 import { textArt } from './art/text'
 import { textareaArt } from './art/textarea'
 import { themeToggleArt } from './art/theme-toggle'
+import { tiltArt } from './art/tilt'
 import { timeInputArt } from './art/time-input'
 import { timePickerArt } from './art/time-picker'
 import { timelineArt } from './art/timeline'
@@ -235,6 +239,7 @@ const art: Record<string, ReactNode> = {
   listbox: listboxArt,
   loader: loaderArt,
   log: logArt,
+  magnetic: magneticArt,
   map: mapArt,
   markdown: markdownArt,
   marquee: marqueeArt,
@@ -258,6 +263,7 @@ const art: Record<string, ReactNode> = {
   quote: quoteArt,
   radio: radioArt,
   rating: ratingArt,
+  reveal: revealArt,
   sandbox: sandboxArt,
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
@@ -265,6 +271,7 @@ const art: Record<string, ReactNode> = {
   select: selectArt,
   'selection-bar': selectionBarArt,
   'shimmer-text': shimmerTextArt,
+  shine: shineArt,
   'shortcut-overlay': shortcutOverlayArt,
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
@@ -290,6 +297,7 @@ const art: Record<string, ReactNode> = {
   text: textArt,
   textarea: textareaArt,
   'theme-toggle': themeToggleArt,
+  tilt: tiltArt,
   'time-input': timeInputArt,
   'time-picker': timePickerArt,
   timeline: timelineArt,
