@@ -1,0 +1,26 @@
+export function Example() {
+  return (
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-marquee>
+        <helix-badge>Accessible</helix-badge>
+        <helix-badge>Themeable</helix-badge>
+        <helix-badge>Server rendered</helix-badge>
+        <helix-badge>Framework free</helix-badge>
+        <helix-badge>Right to left</helix-badge>
+      </helix-marquee>
+      <helix-marquee
+        reverse
+        speed={24}
+      >
+        <helix-badge tone="primary">Lists</helix-badge>
+        <helix-badge tone="primary">Tables</helix-badge>
+        <helix-badge tone="primary">Charts</helix-badge>
+        <helix-badge tone="primary">Maps</helix-badge>
+        <helix-badge tone="primary">Editors</helix-badge>
+      </helix-marquee>
+    </helix-flex>
+  )
+}
