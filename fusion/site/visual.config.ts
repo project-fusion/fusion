@@ -105,8 +105,9 @@ export default defineConfig({
      only when the whole-page picture grew the viewport, and drew or not by
      which finished first: on November 17, 2026 two accepted baselines held it
      empty and the next run, drawn, failed against them. Waiting for its
-     clusters timed out on every run, since nothing brings it near. Its frame,
-     controls and credit are still pictured, and the map family's own browser
+     clusters timed out on every run, since nothing brings it near. The mask
+     covers the zoom and compass controls drawn over the canvas too; the
+     frame and credit are still pictured, and the map family's own browser
      specs draw the clusters. */
   mask: [
     '[data-site-footer] helix-tag',
