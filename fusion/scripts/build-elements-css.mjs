@@ -70,6 +70,65 @@ const selector = sorted.map((tag) => `${tag}:not(:defined)`).join(',\n')
    already covered. */
 const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
 
+/* **`visibility` keeps a box, and for these the box is the wrong one.** An
+   element waiting for its definition is laid out by its light-DOM children, so
+   a closed menu takes the height of every item it holds, a tooltip the width of
+   its words, and a dialog the whole of its content, inline where it was
+   written. Each gives that room back when it upgrades and everything after it
+   moves. Measured in a Next.js app: a sidebar holding three menus, a tooltip
+   and a closed palette scored a layout shift of 0.05 on every cold load, all of
+   it from these.
+
+   So each takes the box it will have. What sits in the top layer or floats over
+   the page takes no room, open or not, because upgrading takes it out of the
+   flow either way. The icon button takes the square its stylesheet draws, so a
+   toolbar is its final width before a definition lands.
+
+   Here rather than beside each component, for the reason the table rules below
+   are: the selector reaches the component's light DOM, which no component
+   stylesheet can. A tag that stops existing fails the build rather than leaving
+   a rule that matches nothing. */
+const PENDING = [
+  {
+    rule: 'display: none;',
+    select: (tag) => `${tag}:not(:defined)`,
+    tags: ['helix-dialog', 'helix-drawer'],
+  },
+  /* A palette drawn `inline` stands in the page, so only the one in a dialog. */
+  {
+    rule: 'display: none;',
+    select: (tag) => `${tag}:not(:defined):not([inline])`,
+    tags: ['helix-command'],
+  },
+  {
+    rule: 'display: none;',
+    select: (tag) => `${tag}:not(:defined) > :not([slot="trigger"])`,
+    tags: ['helix-megamenu', 'helix-menu', 'helix-popover', 'helix-speed-dial'],
+  },
+  {
+    rule: 'display: none;',
+    select: (tag) => `${tag}:not(:defined) > [slot="content"]`,
+    tags: ['helix-tooltip'],
+  },
+  {
+    rule: `block-size: var(--icon-button-size, var(--helix-size-control));
+  display: inline-flex;
+  inline-size: var(--icon-button-size, var(--helix-size-control));
+  overflow: hidden;`,
+    select: (tag) => `${tag}:not(:defined)`,
+    tags: ['helix-icon-button'],
+  },
+]
+const unknown = PENDING.flatMap((one) => one.tags).filter((tag) => !tags.has(tag))
+if (unknown.length > 0) {
+  throw new Error(
+    `elements.css: no element registers ${unknown.join(', ')}. Take it out of PENDING.`,
+  )
+}
+const pending = PENDING.map(
+  (one) => `${one.tags.map(one.select).join(',\n')} {\n  ${one.rule}\n}`,
+).join('\n\n')
+
 /* **A data table's first page, served as rows.** The page writes the first page
    as `helix-table-row` and `helix-table-cell` children under the columns, so the
    values are in the HTML a server sends. These rules lay that markup out as the
@@ -540,6 +599,12 @@ ${selector} {
   visibility: hidden;
 }
 
+/* Where keeping the box in place is wrong: what floats or sits in the top
+ * layer takes no room before it upgrades, and an icon button takes its square.
+ * The reasoning is beside \`PENDING\` in the generator.
+ */
+${pending}
+
 /* \`align\` is a legacy presentational hint, and a browser applies it to any
  * element it appears on, including one it has never heard of. So a component
  * with an \`align\` property for its own layout silently gets \`text-align\` as
@@ -548,7 +613,7 @@ ${selector} {
  *
  * Neutralized here rather than in each component, so the next component with an
  * \`align\` property does not have to remember. Enumerated for the same reason
- * the rule above is: CSS cannot select "any custom element".
+ * the hiding rule is: CSS cannot select "any custom element".
  *
  * \`:where()\` keeps this at zero specificity, so a consumer setting
  * \`text-align\` on the same element still wins.
