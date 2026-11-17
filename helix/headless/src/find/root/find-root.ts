@@ -12,23 +12,15 @@ import {
   formatWords,
   HelixElement,
   HelixFoundEvent,
-  MIRROR_RULE,
   MixinControllerOpen,
   matchesChord,
   onApple,
+  SHUT_RULE,
   stopPress,
   textFinder,
   words,
 } from '@fusion.dev/helix-core'
-import {
-  asterisk,
-  caretDown,
-  caretRight,
-  caretUp,
-  textAa,
-  textAUnderline,
-  x,
-} from '@fusion.dev/helix-icons'
+import { asterisk, caretDown, caretUp, textAa, textAUnderline, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
@@ -155,6 +147,7 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  * @csspart replace-text - The box the Replace button's words sit in.
  * @csspart replace-toggle - The button that shows the replace row. Expanded while it shows.
  * @csspart replace-toggle-button - The replace toggle's inner button.
+ * @csspart replace-toggle-mark - The caret on the replace toggle, which points down while the replace row shows and along the line while it is shut.
  * @csspart replace-toggle-live - The replace toggle's live region, which speaks while the button is pending.
  * @csspart replace-toggle-spinner - The ring the replace toggle turns while it is pending.
  * @csspart replace-toggle-text - The box the replace toggle's icon sits in.
@@ -170,7 +163,7 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  */
 @customElement('helix-headless-find')
 export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
-  protected static override markRules = [MIRROR_RULE]
+  protected static override markRules = [SHUT_RULE]
 
   /**
    * The key this family's words are registered under, its styled tag:
@@ -732,7 +725,7 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
       }}
       @helix-press=${stopPress}
     >
-      ${this.replacing ? drawIcon(caretDown) : html`<span data-mirror>${drawIcon(caretRight)}</span>`}
+      <span part="replace-toggle-mark" ?data-shut=${!this.replacing}>${drawIcon(caretDown)}</span>
     </${button}>`
   }
 

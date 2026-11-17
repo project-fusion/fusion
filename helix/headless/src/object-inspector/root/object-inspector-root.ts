@@ -14,11 +14,11 @@ import {
   HelixElement,
   HelixFilterEvent,
   inlineStep,
-  MIRROR_RULE,
   numberConverter,
   pageRows,
   requestChange,
   SCROLLER_RULE,
+  SHUT_RULE,
   StatusController,
   scrollItemIntoView,
   scrollRoom,
@@ -30,7 +30,7 @@ import {
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight } from '@fusion.dev/helix-icons'
+import { caretDown } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
@@ -219,7 +219,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
-  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, MIRROR_RULE]
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, SHUT_RULE]
 
   /**
    * The key this family's words are registered under, its styled tag:
@@ -1077,12 +1077,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       row.branch
         ? html`<svg
               part="toggle"
-              ?data-mirror=${!row.open}
+              ?data-shut=${!row.open}
               fill="currentColor"
-              viewBox=${(row.open ? caretDown : caretRight).viewBox}
+              viewBox=${caretDown.viewBox}
               aria-hidden="true"
             >
-              ${unsafeSVG((row.open ? caretDown : caretRight).content)}
+              ${unsafeSVG(caretDown.content)}
             </svg>`
         : nothing
     }${row.key === undefined ? nothing : html`<span part="key">${row.key}</span>: `}${this.drawValue(row)}</div>

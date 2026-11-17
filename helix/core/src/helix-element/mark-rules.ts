@@ -172,6 +172,26 @@ export const SPOKEN_RULE =
 export const MIRROR_RULE = ':host(:dir(rtl)) [data-mirror]{scale:-1 1}'
 
 /**
+ * Turns a disclosure's caret, drawn pointing down, to point along the line
+ * while what it discloses is shut: right on a left-to-right page and left on a
+ * right-to-left one.
+ *
+ * **One glyph, turned, so a stylesheet can move it.** A caret drawn as a
+ * second glyph while shut pointed the right way on the headless tier and
+ * jumped between the two on the styled one, where Tree's, Accordion's and
+ * Log's turned on a transition. The mark keeps both: the component drawing the
+ * caret knows whether it is shut, so the headless tier points it the right way
+ * with no stylesheet, and a styled sheet adds a transition on `rotate`.
+ *
+ * `rotate` rather than `transform`, so a consumer's `transform` on the same
+ * part composes with it, and a consumer's `rotate` there wins, a shadow rule
+ * losing to a document one. Its own direction rather than `data-mirror`'s
+ * `scale`, which applies after `rotate` and would leave a turned caret
+ * pointing right on both pages. A component marks the caret `data-shut`.
+ */
+export const SHUT_RULE = '[data-shut]{rotate:-90deg}:host(:dir(rtl)) [data-shut]{rotate:90deg}'
+
+/**
  * Hands every touch on an element to the component, which reads each one as
  * input of its own.
  *

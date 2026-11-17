@@ -37,6 +37,7 @@ const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ['LAYERS_RULE', /data-layers/],
   ['SPOKEN_RULE', /data-spoken|\bMixinVoice\(/],
   ['MIRROR_RULE', /data-mirror/],
+  ['SHUT_RULE', /data-shut/],
   ['TOUCHES_RULE', /data-touches/],
 ]
 
@@ -97,5 +98,6 @@ describe('the rules for the marks an element writes', () => {
     expect(writers('SPOKEN_RULE')).toContain('kbd/root/kbd-root.ts')
     expect(writers('SPOKEN_RULE')).toContain('textarea/root/textarea-root.ts')
     expect(writers('MIRROR_RULE')).toContain('icon/root/icon-root.ts')
+    expect(writers('SHUT_RULE')).toContain('object-inspector/root/object-inspector-root.ts')
   })
 })
