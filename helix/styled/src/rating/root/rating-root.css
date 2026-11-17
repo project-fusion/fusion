@@ -84,6 +84,11 @@
   inset-inline-start: 0;
   overflow: hidden;
   position: absolute;
+  /* **The fill follows the pointer across the marks** rather than jumping from
+     one to the next, and takes the preview's color the same way. */
+  transition:
+    color var(--helix-duration-fast) var(--helix-easing-standard),
+    inline-size var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* A shape, masked, so the color above paints it and any mark works.

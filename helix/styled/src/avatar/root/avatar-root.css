@@ -48,6 +48,26 @@
   object-fit: cover;
 }
 
+/* **The picture fades in over the disc once it arrives**, as Image's does.
+   Hidden only while `loading`, a state the browser sets, so a picture a server
+   sent is shown before the script runs and a cached one is already loaded on
+   the first frame, when transitions are still off. A picture slow enough that
+   the initials stood in comes back from `display: none` as it loads, which
+   the starting style below fades. */
+[part="image"] {
+  transition: opacity var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host(:state(loading)) [part="image"] {
+  opacity: 0;
+}
+
+@starting-style {
+  [part="image"] {
+    opacity: 0;
+  }
+}
+
 /* Sized against the avatar rather than per size, so one rule covers every size
    including a custom `--avatar-size`. **On the slot as well**, so words a page
    slots straight in are set as the initials are; at the page's own 16 pixels
