@@ -147,8 +147,8 @@ const SEARCHED = ['for', 'matchCase', 'open', 'query', 'regex', 'skip', 'wholeWo
  * @csspart replace-text - The box the Replace button's words sit in.
  * @csspart replace-toggle - The button that shows the replace row. Expanded while it shows.
  * @csspart replace-toggle-button - The replace toggle's inner button.
- * @csspart replace-toggle-mark - The caret on the replace toggle, which points down while the replace row shows and along the line while it is shut.
  * @csspart replace-toggle-live - The replace toggle's live region, which speaks while the button is pending.
+ * @csspart replace-toggle-mark - The caret on the replace toggle, which points down while the replace row shows and along the line while it is shut.
  * @csspart replace-toggle-spinner - The ring the replace toggle turns while it is pending.
  * @csspart replace-toggle-text - The box the replace toggle's icon sits in.
  * @csspart whole-word - The button that matches whole words only. Pressed while it does.
