@@ -122,7 +122,7 @@ const STRIP_HEIGHT = 32
  * @csspart range - The band between the two values of `range`, drawn behind the line.
  * @csspart readout - The reading a pointer or a key rests on, as the table or `values` writes it, rendered only while there is one. Placed as `cursor` is.
  * @csspart svg - The drawing, which takes focus to be read by key where there is a `label`.
- * @csspart terminus - The mark on the last value.
+ * @csspart terminus - The mark on the last value. It carries `data-jumped` for the drawing where the line took a new shape at once, with a value more or fewer, so a stylesheet moving the mark can move it at once too.
  * @csspart wash-end - The far stop of the area's gradient.
  * @csspart wash-start - The stop of the area's gradient that meets the line.
  *
@@ -337,6 +337,9 @@ export class HelixHeadlessSparkline extends HelixElement {
      out for itself. */
   protected readonly source = new SourceController(this)
 
+  /** How many values the line was last drawn with, so its terminus can tell a line that moves from one that jumps. */
+  private drawnCount: number | undefined
+
   /**
    * @internal Finds the reading a pointer or a key rests on, as it does for
    * every chart, so a sparkline is read the way they are.
@@ -546,6 +549,11 @@ export class HelixHeadlessSparkline extends HelixElement {
      * the host cannot be styled from a template without a wrapper element that
      * carries nothing else. */
     const lastAt = slots.findLastIndex((value) => value !== undefined)
+    /* **A line moves to its new shape only through the same number of
+       readings**, so where it has one more or fewer, its terminus is told, and
+       jumps with it rather than gliding away from it. */
+    const jumped = this.drawnCount !== undefined && this.drawnCount !== points.length
+    this.drawnCount = points.length
     const end =
       points.length < 2
         ? undefined
@@ -656,7 +664,12 @@ export class HelixHeadlessSparkline extends HelixElement {
            dot on top of it would be a second mark saying the same thing. */
         points.length < 2 || this.plot === 'bar'
           ? nothing
-          : html`<span aria-hidden="true" part="terminus" style=${end ?? nothing}></span>`
+          : html`<span
+              aria-hidden="true"
+              ?data-jumped=${jumped}
+              part="terminus"
+              style=${end ?? nothing}
+            ></span>`
       }${this.renderLone(points.length < 2 ? undefined : series, at)}${this.renderMarks(slots, at)}${this.renderReading(slots, at)}${
         named && count > 0 ? this.renderLive(slots) : nothing
       }${

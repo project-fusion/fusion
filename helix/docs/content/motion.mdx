@@ -208,8 +208,9 @@ new: the bars of a `Bar Chart` and a `Sparkline`, the line and area of a
 `Donut Chart`, and the points of a `Scatter Chart`. A `Heatmap` cell takes its
 new color the same way. Every move uses `--helix-easing-decelerate`, which
 never passes the value it is heading for, so no frame draws a reading the data
-does not hold. Safari does not transition a path's shape, so lines, areas, and
-points there take their new shape at once.
+does not hold. The mark on the end of a line rides with it. Safari does not
+transition a path's shape, so lines, areas, points, and the mark on a line's
+end there take their new place at once.
 
 ## Starting styles and view transitions
 

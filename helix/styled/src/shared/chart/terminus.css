@@ -27,6 +27,26 @@
   translate: 50% -50%;
 }
 
+/* **The mark rides the end of its line** while the readings change: the line
+   takes its new shape over `--helix-duration-normal` along `decelerate`, and
+   its last point travels straight from the old place to the new at the same
+   pace, so the mark moving the same way stays on it. Only where the browser
+   moves a path's shape at all, and not where the line jumped, with a reading
+   more or fewer. A ring stays put: the hole cut for it in the drawing is a
+   gradient that cannot travel with it, and a ring gliding off its hole shows
+   the line through it. */
+@supports (d: path("M0 0")) {
+  [part="terminus"]:not([data-jumped]) {
+    transition:
+      inset-block-start var(--helix-duration-normal) var(--helix-easing-decelerate),
+      inset-inline-start var(--helix-duration-normal) var(--helix-easing-decelerate);
+  }
+
+  :host([terminus="ring"]) [part="terminus"] {
+    transition: none;
+  }
+}
+
 /* A dot is what an absent attribute draws. A reflecting property with a default
    would write its attribute onto a consumer-rendered host, which React reports
    as a hydration mismatch. */
