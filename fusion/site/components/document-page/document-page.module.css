@@ -49,7 +49,7 @@
 /* The title on the band, which is a display size rather than a heading size. */
 .documentHeroTitle {
   font-family: var(--helix-font-display);
-  font-size: clamp(var(--helix-text-3xl), 5.5vw, var(--site-text-section));
+  font-size: var(--site-text-title);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
   text-wrap: balance;
@@ -117,7 +117,7 @@
    where a fixed number gives the right one at a single point in it. */
 .documentTitle {
   font-family: var(--helix-font-display);
-  font-size: clamp(var(--helix-text-2xl), 4vw, var(--helix-text-3xl));
+  font-size: var(--site-text-title);
   letter-spacing: var(--helix-tracking-tight);
   text-wrap: balance;
 }

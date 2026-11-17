@@ -176,7 +176,9 @@ export function InsightBrowser({
         className={styles.insightsHero}
       >
         <helix-flex align-items="center" data-density="sm" direction="column" gap="sm">
-          <helix-text as="h1">Insights</helix-text>
+          <helix-text as="h1" data-page-title>
+            Insights
+          </helix-text>
           <helix-text as="p" className={pageHero.pageHeroLede}>
             The arguments behind what we build, written where they can be checked.
           </helix-text>

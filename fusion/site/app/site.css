@@ -99,7 +99,16 @@
   /* Display type past the component scale's top step. Helix stops at `3xl`
      because that is the largest size a component should ever set for itself. */
   --site-text-hero: clamp(2.75rem, 9vw, 6.5rem);
-  --site-text-section: clamp(2rem, 4.5vw, 3.25rem);
+  /* **One heading scale across the site's pages**, the owner's call of
+     November 17, 2026. A landing page's display title keeps its own size
+     (67.2 at 1440). Every other page title is `title`, 52 at 1440, and every
+     section heading under it is `section`, 37.12, the landing pages' band
+     heading. Before, Services and Contact set h1 and h2 both at 52, Insights
+     and the document pages titled at 42, and Maps and Graph at 57.6. The
+     title's floor is 40, so on a phone it stays above a document's own 32
+     headings and under the display title's 42. */
+  --site-text-title: clamp(2.5rem, 4.5vw, 3.25rem);
+  --site-text-section: clamp(var(--helix-text-xl), 3vw, calc(var(--helix-text-2xl) * 1.16));
 
   /* The wordmark, which is between two steps of the scale on purpose and so is
      named here with the other sizes that are the site's rather than Helix's. */
@@ -322,6 +331,15 @@ helix-drawer[material="glass"] {
 /* A section's own heading block: eyebrow, title, one line of context. */
 [data-section-title] {
   font-size: var(--site-text-section);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: var(--helix-leading-tight);
+  text-wrap: balance;
+}
+
+/* A page's own title, the step above its sections. */
+[data-page-title],
+[data-section-title][as="h1"] {
+  font-size: var(--site-text-title);
   letter-spacing: var(--helix-tracking-tight);
   line-height: var(--helix-leading-tight);
   text-wrap: balance;

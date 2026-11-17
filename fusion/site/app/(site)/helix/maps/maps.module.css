@@ -156,7 +156,7 @@
 .mapsTitle {
   /* A column's hero rather than the landing page's full-width line, which
      set this claim five words to a line. */
-  font-size: clamp(var(--helix-text-2xl), 4vw, calc(var(--helix-text-3xl) * 1.4));
+  font-size: var(--site-text-title);
   letter-spacing: var(--helix-tracking-tight);
   line-height: 1.02;
   text-wrap: balance;

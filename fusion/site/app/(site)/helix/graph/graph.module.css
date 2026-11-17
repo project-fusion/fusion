@@ -78,7 +78,7 @@
 }
 
 .graphTitle {
-  font-size: clamp(var(--helix-text-2xl), 4vw, calc(var(--helix-text-3xl) * 1.4));
+  font-size: var(--site-text-title);
   letter-spacing: var(--helix-tracking-tight);
   line-height: 1.02;
   text-wrap: balance;
