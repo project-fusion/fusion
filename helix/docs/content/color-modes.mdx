@@ -43,6 +43,23 @@ Because `color-scheme` inherits, **the attribute works on any element**:
 The theme builder uses the same attribute to show a component in light and dark
 mode side by side in one document.
 
+## Switch the mode from the page
+
+`Theme Toggle` is a button that switches the page between light and dark. A
+press spreads the new mode in a circle from the button, and `transition` picks
+`wipe`, `fade`, or `none` instead. To switch from your own code, call
+`setColorMode`, which takes the same transitions:
+
+```js
+import { colorMode, setColorMode } from '@fusion.dev/helix-core'
+
+setColorMode(colorMode() === 'dark' ? 'light' : 'dark', { transition: 'fade' })
+```
+
+Both write `data-color-mode` on the document element, and change it at once
+under reduced motion. To keep a reader's choice across visits, listen for the
+toggle's `change` event and write the mode into the page you serve next.
+
 ## Follow the operating system
 
 When you do not set a mode, `:root` declares `color-scheme: light dark`, and the

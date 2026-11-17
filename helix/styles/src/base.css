@@ -2158,6 +2158,81 @@ helix-toast:not([data-color-mode]) {
   overflow-x: auto;
 }
 
+/* **The page moving from one color mode to the other**, the one view transition
+   Helix starts, from `setColorMode` and `Theme Toggle`. The browser draws the
+   page in the old mode and the new, and these say how the new one arrives over
+   the old: spreading in a circle from the button pressed, wiping across from
+   the inline start, or fading. The circle's point and reach are written on the
+   document element as it starts and taken off when it ends, and the mode
+   changes at once where the reader asked for reduced motion, which never
+   starts one. **No blend between the two pictures**, so a picture is never a
+   mix of two modes at half strength. */
+:root[data-helix-color-transition]::view-transition-old(root),
+:root[data-helix-color-transition]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-helix-color-transition="circle"]::view-transition-new(root) {
+  animation: helix-color-circle calc(var(--helix-duration-slow) * 1.5)
+    var(--helix-easing-decelerate);
+}
+
+:root[data-helix-color-transition="wipe"]::view-transition-new(root) {
+  animation: helix-color-wipe calc(var(--helix-duration-slow) * 1.5) var(--helix-easing-decelerate);
+}
+
+:root[data-helix-color-transition="wipe"]:dir(rtl)::view-transition-new(root) {
+  animation-name: helix-color-wipe-rtl;
+}
+
+:root[data-helix-color-transition="fade"]::view-transition-new(root) {
+  animation: helix-color-fade var(--helix-duration-slow) var(--helix-easing-standard);
+}
+
+@keyframes helix-color-circle {
+  from {
+    clip-path: circle(0 at var(--theme-toggle-origin-x, 50%) var(--theme-toggle-origin-y, 50%));
+  }
+
+  to {
+    clip-path: circle(
+      var(--theme-toggle-radius, 150%) at var(--theme-toggle-origin-x, 50%)
+        var(--theme-toggle-origin-y, 50%)
+    );
+  }
+}
+
+@keyframes helix-color-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes helix-color-wipe-rtl {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes helix-color-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 /* The only place !important is correct: a user asking the OS to reduce motion is
    overriding author intent, so it has to beat author specificity. **It reaches
    the document and nothing else.** `*` does not cross a shadow boundary, so this

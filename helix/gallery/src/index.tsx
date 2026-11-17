@@ -113,6 +113,7 @@ import { tagArt } from './art/tag'
 import { terminalArt } from './art/terminal'
 import { textArt } from './art/text'
 import { textareaArt } from './art/textarea'
+import { themeToggleArt } from './art/theme-toggle'
 import { timeInputArt } from './art/time-input'
 import { timePickerArt } from './art/time-picker'
 import { timelineArt } from './art/timeline'
@@ -284,6 +285,7 @@ const art: Record<string, ReactNode> = {
   terminal: terminalArt,
   text: textArt,
   textarea: textareaArt,
+  'theme-toggle': themeToggleArt,
   'time-input': timeInputArt,
   'time-picker': timePickerArt,
   timeline: timelineArt,
