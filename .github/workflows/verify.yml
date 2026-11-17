@@ -1458,11 +1458,26 @@ jobs:
           NUMBER: ${{ github.event.pull_request.number }}
         run: |
           [ -s "$RUNNER_TEMP/summary.md" ] || exit 0
+          # **The entries that failed, by the names `/retake` takes.** An
+          # example family is pictured in several groups (Menu in `styled`,
+          # `danger`, `danger-highlighted` and `bleed`), and `/retake
+          # styled/menu` takes only the first, so a retake named by hand left
+          # the other three as they were. Each shot is `<entry>, <shot>`.
+          shopt -s nullglob
+          runs=(reports/*/.helix/visual/run.json)
+          failed=""
+          if [ "${#runs[@]}" -gt 0 ]; then
+            failed=$(jq -r '.groups[]?.members[]?' "${runs[@]}" | sed 's/, [^,]*$//' | sort -u | tr '\n' ' ')
+          fi
           {
             echo '<!-- helix-visual -->'
             cat "$RUNNER_TEMP/summary.md"
             echo
             echo 'Look at each picture first. When every change was meant, comment `/accept` to commit the captures of this run onto the branch as the baselines. To take entries again, comment `/retake` and their names, such as `/retake styled/badge site/home`.'
+            if [ -n "${failed// /}" ]; then
+              echo
+              echo "To take every example that failed here again: \`/retake ${failed% }\`"
+            fi
           } > "$RUNNER_TEMP/comment.md"
           existing=$(gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments?per_page=100" --jq '[.[] | select(.body | startswith("<!-- helix-visual -->"))][0].id // empty')
           if [ -n "$existing" ]; then

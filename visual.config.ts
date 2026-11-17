@@ -146,7 +146,7 @@ export default defineConfig({
      the build writes. */
   manifest: ['helix/headless/custom-elements.json', 'helix/styled/custom-elements.json'],
   retake:
-    'Comment `/retake` and the entries on the pull request, or dispatch the `Visual baselines` workflow on your branch to retake every one, and review the commit it makes on the branch.',
+    'Comment `/retake` and the entries on the pull request, as the run names them (`danger/menu`) or by the family alone (`menu`) for every group it is pictured in, or dispatch the `Visual baselines` workflow on your branch to retake every one, and review the commit it makes on the branch.',
   serve: {
     '/fonts/': 'fusion/site/public/fonts/',
     '/frame.css': 'fusion/site/public/sandbox/frame.css',
