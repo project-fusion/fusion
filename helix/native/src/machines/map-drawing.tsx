@@ -4,20 +4,34 @@
  * a still picture of the frame's own shapes on the land's color, where it
  * does not, as Expo Go does not.
  *
- * **The still picture holds no streets.** It draws each area, route and
- * points layer from core's projection at the view the controls move, in the
- * colors and widths MapLibre draws them in, so the frame's own shapes stand
- * where they would on the real map. Imagery, shading, land cover and
- * buildings are tiles, which it leaves out.
+ * **The still picture is the web's snapshot, and the frame's shapes on it.**
+ * It draws the land, then the streets, water, parks and buildings from the
+ * style's own vector tiles in the layers and colors the web's first paint
+ * draws them in (`map-tiles.ts`), then each area, route and points layer
+ * from core's projection at the view the controls move, in the colors and
+ * widths MapLibre draws them in, a points layer that clusters as MapLibre's
+ * counts. Labels, landmarks and signs, imagery, shading, raised buildings,
+ * and the frame's own land cover are MapLibre's alone.
  */
-import { type MapLayerSpec, type MapView, screenOf } from '@fusion.dev/helix-core/map'
+import {
+  clusterRadiusOf,
+  countAbbreviated,
+  type MapDrawnPoint,
+  type MapLayerSpec,
+  type MapView,
+  pointsDrawn,
+  type ScreenPoint,
+  screenOf,
+  snapshotWidth,
+} from '@fusion.dev/helix-core/map'
 import { memo, type ReactNode, type Ref, useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import type { CameraRef, MapLibreModule, ViewStateChangeEvent } from '../render/maplibre-types'
 import { svg } from '../render/vector'
+import type { StillBase } from './map-tiles'
 
-/** The most points the still picture draws of one layer, past which it draws every so many. */
-const MOST_DOTS = 800
+/** The most places of one layer the still picture draws in view, past which it draws every so many. */
+const MOST_DOTS = 5000
 
 /** A route's width and its edge's at a zoom, as the style's `interpolate` widens them from 4 to 14. */
 const widthAt = (zoom: number, low: number, high: number): number =>
@@ -38,20 +52,37 @@ const pathOf = (view: MapView, spec: MapLayerSpec, closed: boolean): string => {
   return pieces.length > 1 ? pieces.join('') : ''
 }
 
-/** A points layer's dots in view as one path of small circles. */
-const dotsOf = (view: MapView, spec: MapLayerSpec, radius: number): string => {
-  const step = Math.max(1, Math.ceil(spec.points.length / MOST_DOTS))
+/** Where one place or count falls in view, or `undefined` where it is out of it by more than `radius`. */
+export const inViewOf = (
+  view: MapView,
+  one: MapDrawnPoint,
+  radius: number,
+): ScreenPoint | undefined => {
+  const point = screenOf(view, one.place)
+  return point === undefined ||
+    point[0] < -radius ||
+    point[1] < -radius ||
+    point[0] > view.width + radius ||
+    point[1] > view.height + radius
+    ? undefined
+    : point
+}
+
+/** How wide a place apart is drawn at a zoom, and its edge, as the points layer's `interpolate` widens them from 8 to 15. */
+export const dotAt = (zoom: number): { edge: number; radius: number } => {
+  const share = Math.min(Math.max(zoom - 8, 0), 7) / 7
+  return { edge: 1 + 0.5 * share, radius: 3 + 3 * share }
+}
+
+/** A points layer's places apart in view as one path of small circles. */
+const dotsOf = (view: MapView, drawn: readonly MapDrawnPoint[], radius: number): string => {
+  const apart = drawn.filter((one) => one.kind === 'point')
+  const step = Math.max(1, Math.ceil(apart.length / MOST_DOTS))
   const pieces: string[] = []
-  for (let at = 0; at < spec.points.length; at += step) {
-    const place = spec.points[at]
-    const point = place === undefined ? undefined : screenOf(view, place)
-    if (
-      point === undefined ||
-      point[0] < -radius ||
-      point[1] < -radius ||
-      point[0] > view.width + radius ||
-      point[1] > view.height + radius
-    ) {
+  for (let at = 0; at < apart.length; at += step) {
+    const one = apart[at]
+    const point = one === undefined ? undefined : inViewOf(view, one, radius)
+    if (point === undefined) {
       continue
     }
     const [x, y] = point
@@ -62,8 +93,11 @@ const dotsOf = (view: MapView, spec: MapLayerSpec, radius: number): string => {
   return pieces.join('')
 }
 
-/** What the still picture draws: the land, then each layer in the order MapLibre stacks them. */
+/** What the still picture draws: the land, the tiles' layers, then each of the frame's in the order MapLibre stacks them. */
 interface StillProps {
+  readonly base: readonly StillBase[]
+  /** A tiles' layer's color: the land moved toward its token. */
+  readonly colorOf: (layer: StillBase['layer']) => string
   readonly land: string
   readonly specs: readonly MapLayerSpec[]
   readonly view: MapView
@@ -160,22 +194,94 @@ const routeShapes = ({ Path }: SvgModule, view: MapView, spec: MapLayerSpec): Re
   ]
 }
 
-/** A points layer's dots in view, as wide as the style draws them at the zoom. */
-const pointsShapes = ({ Path }: SvgModule, view: MapView, spec: MapLayerSpec): ReactNode[] => {
-  const radius = Math.min(6, Math.max(3, 3 + ((view.zoom - 8) * 3) / 7))
-  const d = dotsOf(view, spec, radius)
-  return d === ''
-    ? []
-    : [
-        <Path
-          d={d}
-          fill={spec.color}
-          key={spec.id}
-          stroke={spec.casing ?? spec.color}
-          strokeWidth={1.5}
-        />,
-      ]
+/**
+ * A points layer at the view's zoom, as its style layers draw it: each count
+ * a disc in a halo of its own color, sized by the step of how many it holds,
+ * with its figures in the count's ink; and the places apart as dots in the
+ * layer's color, ringed in the land.
+ */
+const pointsShapes = (module: SvgModule, view: MapView, spec: MapLayerSpec): ReactNode[] => {
+  const { Circle, Path, Text } = module
+  const drawn = pointsDrawn(spec, view.zoom)
+  const { edge, radius } = dotAt(view.zoom)
+  const d = dotsOf(view, drawn, radius)
+  const counts = drawn.flatMap((one) => {
+    if (one.kind !== 'cluster') {
+      return []
+    }
+    const size = clusterRadiusOf(one.count)
+    const at = inViewOf(view, one, size + 6)
+    return at === undefined
+      ? []
+      : [
+          <Circle
+            cx={at[0]}
+            cy={at[1]}
+            fill={spec.color}
+            fillOpacity={0.22}
+            key={`${spec.id}-${one.key}-halo`}
+            r={size + 6}
+          />,
+          <Circle
+            cx={at[0]}
+            cy={at[1]}
+            fill={spec.color}
+            key={`${spec.id}-${one.key}`}
+            r={size}
+            stroke={spec.casing ?? spec.color}
+            strokeWidth={2}
+          />,
+          <Text
+            fill={spec.ink ?? '#ffffff'}
+            fontSize={12}
+            key={`${spec.id}-${one.key}-count`}
+            textAnchor="middle"
+            x={at[0]}
+            y={at[1] + 12 * 0.35}
+          >
+            {countAbbreviated(one.count)}
+          </Text>,
+        ]
+  })
+  return [
+    ...(d === ''
+      ? []
+      : [
+          <Path
+            d={d}
+            fill={spec.color}
+            key={spec.id}
+            stroke={spec.casing ?? spec.color}
+            strokeWidth={edge}
+          />,
+        ]),
+    ...counts,
+  ]
 }
+
+/** The tiles' layers, each one path in its color: a fill, or a line as wide as the style draws it at the zoom. */
+const baseShapes = (
+  { Path }: SvgModule,
+  view: MapView,
+  base: readonly StillBase[],
+  colorOf: StillProps['colorOf'],
+): ReactNode[] =>
+  base.map(({ layer, path }) =>
+    layer.kind === 'fill' ? (
+      /* Nonzero, since tiles overlap, as the web's snapshot fills them. */
+      <Path d={path} fill={colorOf(layer)} key={`base-${layer.id}`} />
+    ) : (
+      <Path
+        d={path}
+        fill="none"
+        key={`base-${layer.id}`}
+        stroke={colorOf(layer)}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={snapshotWidth(layer, view.zoom)}
+      />
+    ),
+  )
 
 /** What each kind of layer draws in the still picture: the tiles' kinds draw nothing. */
 const SHAPES: Partial<
@@ -186,9 +292,13 @@ const SHAPES: Partial<
 > = { area: areaShapes, points: pointsShapes, route: routeShapes }
 
 /** The still picture, drawn again only when the view or the layers change. */
-export const MapStill = memo(({ land, specs, view }: StillProps) => {
+export const MapStill = memo(({ base, colorOf, land, specs, view }: StillProps) => {
   const module = svg()
   const { Rect, Svg } = module
+  const ground = useMemo(
+    () => baseShapes(module, view, base, colorOf),
+    [module, view, base, colorOf],
+  )
   const shapes = useMemo(
     () => [
       ...specs.flatMap((spec) => SHAPES[spec.kind]?.(module, view, spec) ?? []),
@@ -199,6 +309,7 @@ export const MapStill = memo(({ land, specs, view }: StillProps) => {
   return (
     <Svg height={view.height} style={StyleSheet.absoluteFill} width={view.width}>
       <Rect fill={land} height={view.height} width={view.width} x={0} y={0} />
+      {ground}
       {shapes}
     </Svg>
   )
@@ -211,6 +322,8 @@ interface LiveProps {
   /** Where it opens; later moves go through the camera. */
   readonly opening: MapView
   readonly moved: (state: ViewStateChangeEvent, settled: boolean) => void
+  /** A tap on the map, where it landed in the box. */
+  readonly pressed: (at: ScreenPoint) => void
   readonly ready: () => void
   readonly style: object
 }
@@ -220,13 +333,14 @@ interface LiveProps {
  * controls and its credit, and its own tilt by two fingers on, as the web's
  * renderer has it.
  */
-export const MapLive = ({ camera, lib, moved, opening, ready, style }: LiveProps) => (
+export const MapLive = ({ camera, lib, moved, opening, pressed, ready, style }: LiveProps) => (
   <lib.Map
     attribution={false}
     compass={false}
     logo={false}
     mapStyle={style}
     onDidFinishRenderingMapFully={ready}
+    onPress={(event) => pressed([event.nativeEvent.point[0], event.nativeEvent.point[1]])}
     onRegionDidChange={(event) => moved(event.nativeEvent, true)}
     onRegionIsChanging={(event) => moved(event.nativeEvent, false)}
     scaleBar={false}

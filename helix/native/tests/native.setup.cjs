@@ -62,3 +62,8 @@ require('react-native-gesture-handler/jestSetup')
     window: { ...Dimensions.get('window'), fontScale: 1 },
   })
 }
+
+/* **No spec reaches the network.** A map's still picture asks for its
+   vector tiles with the platform's `fetch`; a spec that wants them sets its
+   own with `setMapTileFetch`. */
+require('../src/capabilities/map-tiles').setMapTileFetch(undefined)

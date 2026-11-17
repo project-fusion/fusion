@@ -19,13 +19,14 @@ import {
  * so the places in view are buttons, each on its dot and invisible until
  * focused, from core's projection: the connector stands them on the web, and
  * a phone's frame works them out from its camera as the view settles. A
- * press sends `activate` from the frame with the place's id, name, or index.
+ * press on a place, or a tap on its dot, sends `activate` from the layer
+ * with the place's id, name, or index; a press on a count zooms in to it.
  *
- * **A phone reaches each place up to a few dozen in view**; past that the
- * layer is one element that says how many places are in view, and zooming
- * in brings them within reach, as the web's counts do.
+ * **A phone reaches each place and count up to a few dozen in view**; past
+ * that the layer is one element that says how many places are in view, and
+ * zooming in brings them within reach. Its dots and counts still take a tap.
  *
- * **Web only:** the counts a cluster draws as buttons, the arrow keys
+ * **Web only:** `map-cluster` from a count's button, the arrow keys
  * between the places, and `src`, a GeoJSON file the web fetches.
  *
  * **Held to `helix-map-points`.**
@@ -43,13 +44,14 @@ export default headless('map-points', {
     src: web(string()),
   },
   events: {
-    activate: web(['value']),
+    activate: ['value'],
     mapCluster: web(['key', 'labels']),
     mapPartChange: web(['kind']),
   },
   states: ['settled'],
   map: {
     named: 'named',
+    onActivate: 'activate',
     places: 'places',
   },
   render: ({ entry, map }) => (

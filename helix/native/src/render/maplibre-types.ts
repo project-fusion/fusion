@@ -31,6 +31,12 @@ export type ViewStateChangeEvent = ViewState & {
   readonly userInteraction: boolean
 }
 
+/** A tap on the map: where on the world, and where in the map's box, in points. */
+export interface PressEvent {
+  readonly lngLat: LngLat
+  readonly point: readonly [number, number]
+}
+
 /** How far in from each edge the view's center stands, in points. */
 export interface ViewPadding {
   readonly bottom?: number
@@ -65,6 +71,7 @@ export interface MapProps {
   /** A style URL, or the style itself. */
   readonly mapStyle: string | object
   readonly onDidFinishRenderingMapFully?: (event: NativeSyntheticEvent<null>) => void
+  readonly onPress?: (event: NativeSyntheticEvent<PressEvent>) => void
   readonly onRegionDidChange?: (event: NativeSyntheticEvent<ViewStateChangeEvent>) => void
   readonly onRegionIsChanging?: (event: NativeSyntheticEvent<ViewStateChangeEvent>) => void
   readonly scaleBar?: boolean

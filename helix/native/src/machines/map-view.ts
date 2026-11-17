@@ -70,10 +70,10 @@ export const useMapView = ({ family, lang, places, props, read, use }: Asked) =>
   const go = (
     next: MapAim | undefined,
     moved: Moved,
-    name: string,
+    name: string | undefined,
     detail: Record<string, unknown>,
   ) => {
-    const bound = boundTo(use, name, 'event')
+    const bound = name === undefined ? undefined : boundTo(use, name, 'event')
     if (bound !== undefined) {
       tell(family, latest.current, bound, detail)
     }
@@ -98,6 +98,16 @@ export const useMapView = ({ family, lang, places, props, read, use }: Asked) =>
         { kind: 'pan', to },
         'onMapPan',
         { by: panStep, to },
+      ),
+    /* **A count's press zooms in to where it comes apart**, as the web's
+       renderer does on a click, which no control asked for and no event
+       tells. */
+    show: (center: MapPlace, zoom: number) =>
+      go(
+        opening && { ...opening, center, zoom: Math.min(zoom, 20) },
+        { kind: 'zoom' },
+        undefined,
+        {},
       ),
     tilt: (to: number) => go(opening && tilted(opening, to), { kind: 'tilt' }, 'onMapTilt', { to }),
     turn: (asked: { by?: number; to?: number }) =>

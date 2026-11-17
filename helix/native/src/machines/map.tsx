@@ -14,9 +14,16 @@
  * once it lands, never the drawing.
  */
 import { renderer } from '@fusion.dev/helix-core/capabilities/renderer'
-import { composedStyle, type MapView, mapLibreStyle, screenOf } from '@fusion.dev/helix-core/map'
+import {
+  composedStyle,
+  type MapPlace,
+  type MapView,
+  mapLibreStyle,
+  type ScreenPoint,
+  screenOf,
+} from '@fusion.dev/helix-core/map'
 import { createContext, type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { type LayoutChangeEvent, Text, View } from 'react-native'
+import { type LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native'
 import { loadMapLibre } from '../capabilities/renderer'
 import type { MachineUse } from '../ir.generated'
 import { useInheritedText } from '../render/around'
@@ -29,18 +36,34 @@ import { MapLive, MapStill } from './map-drawing'
 import { menuOf, useMapType, useShown } from './map-menu'
 import { controlsOf, ROTATE_STEP, TILTED } from './map-moves'
 import { childrenOf, inkOf, layersOf, locatedSpec, placedChildren, placesOf } from './map-read'
+import { useStillGround } from './map-tiles'
 import { useMapView } from './map-view'
 import { langOf } from './picker-field-kind'
 import { boundTo, given, tell } from './props'
+
+/**
+ * What a tap on the map finds of one layer: how far from the tap the
+ * nearest thing it draws is, and what pressing it does, or `undefined`
+ * where it draws nothing within a finger's reach.
+ */
+export type MapHit = (
+  at: ScreenPoint,
+) => { readonly away: number; readonly go: () => void } | undefined
 
 /** What a place on the map reads of its frame: the view, and the one stop a press holds. */
 export interface MapBoard {
   /** The key of the marker or place a press last took, whose name shows. */
   readonly current: string
+  /** Holds the stop on a key, whose name then shows, or on none with `''`. */
+  readonly hold: (key: string) => void
+  /** Adds what a tap on the map finds of a layer, and gives back its removal. */
+  readonly listen: (hit: MapHit) => () => void
   /** Where a place falls in the frame's box, or `undefined` before the box is measured or behind the camera. */
   readonly project: (place: { lat: number; lng: number }) => [number, number] | undefined
-  /** A marker's or a place's press: it holds the stop, and the frame sends `activate`. */
+  /** A marker's press: it holds the stop, and the frame sends `activate`. */
   readonly press: (key: string, value: string) => void
+  /** Moves the view to a place at a zoom, as a count's press zooms in to it. */
+  readonly show: (place: MapPlace, zoom: number) => void
   readonly view: MapView | undefined
 }
 
@@ -72,6 +95,9 @@ const Credit = () => (
   </Text>
 )
 
+/** The still picture's id, which a tap on the map lands on where MapLibre Native is not in the app. */
+export const MAP_STILL = 'helix-map-still'
+
 /** The viewport's id once the map in it is whole, which a device run's screens flow waits for. */
 export const MAP_DRAWN = 'helix-map-drawn'
 
@@ -84,6 +110,24 @@ export const MAP_DRAWN = 'helix-map-drawn'
 const viewportOf = (ready: boolean, measure: (event: LayoutChangeEvent) => void): PartBinding => ({
   view: { collapsable: false, onLayout: measure, testID: ready ? MAP_DRAWN : undefined },
 })
+
+/** A tap on the map: the nearest thing a layer draws within reach is pressed, or `missed` runs. */
+const tapOf =
+  (hits: Iterable<MapHit>, missed: () => void) =>
+  (at: ScreenPoint): void => {
+    let nearest: ReturnType<MapHit>
+    for (const hit of hits) {
+      const found = hit(at)
+      if (found && (nearest === undefined || found.away < nearest.away)) {
+        nearest = found
+      }
+    }
+    if (nearest) {
+      nearest.go()
+    } else {
+      missed()
+    }
+  }
 
 /** A press binding: what the press does. */
 const pressed = (go: () => void): PartBinding => ({ view: { onPress: go } })
@@ -112,6 +156,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
   })
   const latest = useRef(props)
   latest.current = props
+  const hits = useRef(new Set<MapHit>())
 
   const layers = useMemo(() => layersOf(children, ink, shown.hidden), [children, ink, shown.hidden])
   const specs = useMemo(
@@ -144,6 +189,10 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       }
     }
   }
+  /* **The still picture's streets, water and land**, from the style's own
+     tiles, in the layers and colors of the web's snapshot. */
+  const ground = useStillGround(view, style, mapType, ink, lib === null)
+
   /* The still picture is whole as soon as it is drawn. */
   const still = lib === null && view !== undefined
   useEffect(() => {
@@ -152,8 +201,21 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
     }
   })
 
+  /* **A tap on the map presses the nearest dot or count a layer draws
+     within a finger's reach**, as a click on the web's renderer does, and a
+     tap on none puts away the name a press showed. A marker stands over
+     the map and takes its own tap. */
+  const tapped = tapOf(hits.current, () => setCurrent(''))
+
   const board: MapBoard = {
     current,
+    hold: setCurrent,
+    listen: (hit) => {
+      hits.current.add(hit)
+      return () => {
+        hits.current.delete(hit)
+      }
+    },
     press: (key, value) => {
       setCurrent(key)
       const bound = boundTo(use, 'onActivate', 'event')
@@ -162,6 +224,7 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       }
     },
     project: (place) => (view === undefined ? undefined : screenOf(view, place)),
+    show: moves.show,
     view,
   }
 
@@ -192,13 +255,30 @@ export const useMap = (family: Family, props: Props, use: MachineUse): Behavior 
       drawing: {
         drawing: () =>
           view === undefined ? null : lib === null ? (
-            <MapStill land={ink('color-surface')} specs={specs} view={view} />
+            <Pressable
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              onPress={(event) =>
+                tapped([event.nativeEvent.locationX, event.nativeEvent.locationY])
+              }
+              style={StyleSheet.absoluteFill}
+              testID={MAP_STILL}
+            >
+              <MapStill
+                base={ground.base}
+                colorOf={ground.colorOf}
+                land={ink('color-surface')}
+                specs={specs}
+                view={view}
+              />
+            </Pressable>
           ) : (
             <MapLive
               camera={camera}
               lib={lib}
               moved={moved}
               opening={view}
+              pressed={tapped}
               ready={drawn}
               style={style}
             />
