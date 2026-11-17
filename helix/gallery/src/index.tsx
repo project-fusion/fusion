@@ -48,6 +48,7 @@ import { formatDateArt } from './art/format-date'
 import { graphArt } from './art/graph'
 import { gridArt } from './art/grid'
 import { heatmapArt } from './art/heatmap'
+import { highlighterArt } from './art/highlighter'
 import { hoverCardArt } from './art/hover-card'
 import { iconArt } from './art/icon'
 import { iconButtonArt } from './art/icon-button'
@@ -87,6 +88,7 @@ import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
 import { revealArt } from './art/reveal'
+import { rotatingTextArt } from './art/rotating-text'
 import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
@@ -99,6 +101,7 @@ import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
+import { slidingNumberArt } from './art/sliding-number'
 import { sparklineArt } from './art/sparkline'
 import { spatialBarChartArt } from './art/spatial-bar-chart'
 import { spatialHeatmapArt } from './art/spatial-heatmap'
@@ -227,6 +230,7 @@ const art: Record<string, ReactNode> = {
   graph: graphArt,
   grid: gridArt,
   heatmap: heatmapArt,
+  highlighter: highlighterArt,
   'hover-card': hoverCardArt,
   icon: iconArt,
   'icon-button': iconButtonArt,
@@ -266,6 +270,7 @@ const art: Record<string, ReactNode> = {
   radio: radioArt,
   rating: ratingArt,
   reveal: revealArt,
+  'rotating-text': rotatingTextArt,
   sandbox: sandboxArt,
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
@@ -278,6 +283,7 @@ const art: Record<string, ReactNode> = {
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
   slider: sliderArt,
+  'sliding-number': slidingNumberArt,
   sparkline: sparklineArt,
   'spatial-bar-chart': spatialBarChartArt,
   'spatial-heatmap': spatialHeatmapArt,

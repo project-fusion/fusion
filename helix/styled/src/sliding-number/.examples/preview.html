@@ -1,0 +1,18 @@
+<!-- @summary A count whose changing digits roll to their new figures, while the rest hold still. -->
+<helix-text scale="display">
+  <helix-sliding-number
+    id="sales"
+    value="1284"
+  ></helix-sliding-number>
+</helix-text>
+
+<helix-button id="sell">Add a sale</helix-button>
+
+<script type="module">
+  const sales = document.getElementById('sales')
+
+  // Set a new value and each digit that changes rolls to its new figure.
+  document.getElementById('sell').addEventListener('click', () => {
+    sales.value += 1 + Math.floor(Math.random() * 20)
+  })
+</script>

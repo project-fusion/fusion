@@ -1,0 +1,54 @@
+:host {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+/* **Every word in one cell**, so the host is as wide as the widest and the
+   line round it never shifts. Each waits below its place, faded. */
+::slotted(*) {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition:
+    opacity var(--helix-duration-slow) var(--helix-easing-standard),
+    translate var(--helix-duration-slow) var(--helix-easing-emphasized);
+  translate: 0 var(--rotating-text-distance, 0.6em);
+}
+
+/* The first word, before the words begin to turn, which is what a server
+   sends and what a reader who asked for less movement keeps. */
+:host(:not(:state(rotating))) ::slotted(:first-child),
+:host(:state(show-1)) ::slotted(:nth-child(1)),
+:host(:state(show-2)) ::slotted(:nth-child(2)),
+:host(:state(show-3)) ::slotted(:nth-child(3)),
+:host(:state(show-4)) ::slotted(:nth-child(4)),
+:host(:state(show-5)) ::slotted(:nth-child(5)),
+:host(:state(show-6)) ::slotted(:nth-child(6)) {
+  opacity: 1;
+  translate: none;
+}
+
+/* The word leaving rises out, above its place. */
+:host(:state(leave-1)) ::slotted(:nth-child(1)),
+:host(:state(leave-2)) ::slotted(:nth-child(2)),
+:host(:state(leave-3)) ::slotted(:nth-child(3)),
+:host(:state(leave-4)) ::slotted(:nth-child(4)),
+:host(:state(leave-5)) ::slotted(:nth-child(5)),
+:host(:state(leave-6)) ::slotted(:nth-child(6)) {
+  opacity: 0;
+  translate: 0 calc(var(--rotating-text-distance, 0.6em) * -1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::slotted(*) {
+    transition: none;
+  }
+}
+
+/* On paper, the word showing as it stands: nothing here lifts, scrolls, or
+   carries its state in a fill. */
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}
