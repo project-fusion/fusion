@@ -392,7 +392,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
       .map(
         (use): Binder =>
           (props, around) => {
-            const { behavior, value } = useSelect(
+            const { behavior, handle, value } = useSelect(
               family,
               props,
               use,
@@ -401,6 +401,7 @@ export const behaviorFor = (family: Family): UseBehavior => {
               around.layering,
             )
             around.chosen.current = value
+            around.handle.current = handle as unknown as Readonly<Record<string, unknown>>
             return behavior
           },
       ),

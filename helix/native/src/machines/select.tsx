@@ -16,7 +16,7 @@ import {
   dataOptions,
   Typeahead,
 } from '@fusion.dev/helix-core/listbox'
-import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { I18nManager, Platform } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
@@ -221,6 +221,34 @@ export const requesterOf =
     return true
   }
 
+/** What a page reads and writes on a Select by its ref, as on the web element. */
+export interface SelectHandle {
+  /** The value. Writing it seeds or corrects the choice, and sends no event, as on the web. */
+  value: string
+}
+
+/**
+ * A Select an element draws as its control, put back on `value` after a draw
+ * where it moved off it. **The Select takes each pick and closes, and the
+ * element decides**, as the web's Pagination Size puts its select back where
+ * it refused the size. `asked` draws the element again after a pick, so a
+ * refused one is put back; `ref` goes on the Select's view.
+ */
+export const usePutBack = (value: string) => {
+  const select = useRef<SelectHandle | null>(null)
+  const [, redraw] = useState(0)
+  useLayoutEffect(() => {
+    if (select.current !== null && select.current.value !== value) {
+      select.current.value = value
+    }
+  })
+  const asked = useCallback(() => redraw((at) => at + 1), [])
+  const ref = useCallback((node: SelectHandle | null) => {
+    select.current = node
+  }, [])
+  return { asked, ref }
+}
+
 /** Closes a toggle that stands open. */
 export const closeIf = (toggled: Turned | undefined): void => {
   if (toggled?.checked === true) {
@@ -252,7 +280,7 @@ export const useSelect = (
   toggled: Turned | undefined,
   touch: () => void,
   layering: Around['layering'],
-): { readonly behavior: Behavior; readonly value: string } => {
+): { readonly behavior: Behavior; readonly handle: SelectHandle; readonly value: string } => {
   const read = (name: string): unknown => given(family, props, boundTo(use, name, 'prop'))
   const multiple = read('multiple') === true
   const disabled = read('disabled') === true
@@ -261,6 +289,19 @@ export const useSelect = (
   const written = read('value')
   const seed = wordsIn(read('defaultValue'))
   const [value, setValue] = useWritten(written, seed)
+  const latest = useRef({ setValue, value })
+  latest.current = { setValue, value }
+  const handle = useMemo<SelectHandle>(
+    () => ({
+      get value() {
+        return latest.current.value
+      },
+      set value(next: string) {
+        latest.current.setValue(next)
+      },
+    }),
+    [],
+  )
   const { held, schedule } = useMembers()
   useOrder(held, schedule)
   const items = read('items') as readonly DataOptionItem[] | undefined
@@ -380,6 +421,7 @@ export const useSelect = (
         <OptionOwnerContext.Provider value={owner}>{inside}</OptionOwnerContext.Provider>
       ),
     },
+    handle,
     value,
   }
 }

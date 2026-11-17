@@ -11,7 +11,8 @@
  * `usePaginationFold` measures.
  *
  * **A page-size control is a Select**, its options the sizes it offers. It holds
- * the size in force, and a refusal leaves the Select where it stood.
+ * the size in force: the Select takes each pick and closes, and where the
+ * element refuses the size the Select is put back on the one in force.
  */
 import { announce } from '@fusion.dev/helix-core/capabilities/announce'
 import { focus } from '@fusion.dev/helix-core/capabilities/focus'
@@ -32,6 +33,7 @@ import type { Entry } from '../render/entry'
 import type { Family } from '../style/form'
 import { usePaginationFold } from './pagination-fold'
 import { boundTo, given, tell } from './props'
+import { usePutBack } from './select'
 
 const wordsIn = (value: unknown): string => (typeof value === 'string' ? value : '')
 
@@ -259,22 +261,18 @@ export const usePaginationSize = (family: Family, props: Props, use: MachineUse)
   const before = boundTo(use, 'onBeforeChange', 'event')
   const input = boundTo(use, 'onInput', 'event')
   const change = boundTo(use, 'onChange', 'event')
-  const onBeforeChange = (event: {
-    readonly detail?: { readonly value?: string }
-    preventDefault?: () => void
-  }) => {
-    /* The Select moves, and closes, only on a size this element takes: a
-       request it refuses stands as the Select's own refusal, which keeps the
-       list open on the size in force. Refusing every request kept the list
-       open after each pick. */
+  const putBack = usePutBack(String(current))
+  const onBeforeChange = (event: { readonly detail?: { readonly value?: string } }) => {
+    /* The Select takes each pick and closes, as the web's select does. The
+       size moves only where this element takes it, and the Select is put back
+       on the size in force after the draw, as the web puts its select back. */
+    putBack.asked()
     const next = Number.parseInt(event.detail?.value ?? '', 10)
     if (!Number.isFinite(next) || next === current) {
-      event.preventDefault?.()
       return
     }
     const value = String(next)
     if (before !== undefined && !tell(family, props, before, { value })) {
-      event.preventDefault?.()
       return
     }
     setSize(next)
@@ -287,7 +285,7 @@ export const usePaginationSize = (family: Family, props: Props, use: MachineUse)
   return {
     marks: [],
     parts: {
-      control: { view: { ...labelOf(read, props), onBeforeChange } },
+      control: { view: { ...labelOf(read, props), onBeforeChange, ref: putBack.ref } },
       host: {
         lists: { [flag('options')]: options },
         states: {

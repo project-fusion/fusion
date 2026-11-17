@@ -122,7 +122,7 @@ describe('the generated Pagination', () => {
     expect(screen.getByText('Rows')).toBeTruthy()
   })
 
-  test('a size chosen in a page-size control closes the list, and a refused one keeps it open', async () => {
+  test('a size chosen in a page-size control closes the list, and a refused one closes it on the size in force', async () => {
     const asked = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
     const changed = jest.fn()
     await draw(
@@ -133,17 +133,41 @@ describe('the generated Pagination', () => {
         sizes="10,25,50"
       />,
     )
-    await act(async () => fireEvent.press(screen.getByText('10')))
-    const choose = () => act(async () => fireEvent.press(screen.getByText('25')))
-    await choose()
+    const choose = async (from: string) => {
+      await act(async () => fireEvent.press(screen.getByText(from)))
+      await act(async () => fireEvent.press(screen.getByText('25')))
+    }
+    await choose('10')
     expect(asked).toHaveBeenCalledTimes(1)
     expect(changed).not.toHaveBeenCalled()
-    expect(screen.getByText('50')).toBeTruthy()
+    expect(screen.queryByText('50')).toBeNull()
+    expect(screen.queryByText('25')).toBeNull()
+    expect(screen.getByText('10')).toBeTruthy()
     asked.mockImplementation(() => undefined)
-    await choose()
+    await choose('10')
     expect(changed).toHaveBeenCalledTimes(1)
     expect(screen.queryByText('50')).toBeNull()
     expect(screen.getByText('25')).toBeTruthy()
+  })
+
+  test('a page-size control the page sets stands on the size in force where the page refuses a pick', async () => {
+    const asked = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
+    await draw(<HelixPaginationSize onBeforeChange={asked} sizes="10,25,50" value={25} />)
+    await act(async () => fireEvent.press(screen.getByText('25')))
+    await act(async () => fireEvent.press(screen.getByText('50')))
+    expect(asked).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('10')).toBeNull()
+    expect(screen.queryByText('50')).toBeNull()
+    expect(screen.getByText('25')).toBeTruthy()
+  })
+
+  test('a page-size control the page sets takes a pick the page lets stand, as the web element does', async () => {
+    await draw(<HelixPaginationSize sizes="10,25,50" value={25} />)
+    await act(async () => fireEvent.press(screen.getByText('25')))
+    await act(async () => fireEvent.press(screen.getByText('50')))
+    expect(screen.queryByText('10')).toBeNull()
+    expect(screen.queryByText('25')).toBeNull()
+    expect(screen.getByText('50')).toBeTruthy()
   })
 
   test('a page-size control without a label draws its fallback words beside the size', async () => {

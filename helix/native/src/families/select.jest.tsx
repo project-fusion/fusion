@@ -1,6 +1,8 @@
 import { describe, expect, it, jest } from '@jest/globals'
-import { fireEvent, render, screen } from '@testing-library/react-native'
+import { act, fireEvent, render, screen } from '@testing-library/react-native'
+import { createRef } from 'react'
 import { HelixRoot } from '../index'
+import type { SelectHandle } from '../machines/select'
 import { HelixOption } from './option/index.native'
 import { HelixSelect } from './select/index.native'
 
@@ -22,6 +24,19 @@ describe('Select on a phone', () => {
     await draw({})
     expect(screen.getByText('Choose')).toBeTruthy()
     expect(screen.queryByText('Apple')).toBeNull()
+  })
+
+  it('reads its value by its ref, and a value written there corrects the choice', async () => {
+    const ref = createRef<SelectHandle>()
+    await draw({ defaultValue: 'banana', ref })
+    expect(ref.current?.value).toBe('banana')
+    await act(async () => {
+      if (ref.current) {
+        ref.current.value = 'apple'
+      }
+    })
+    expect(ref.current?.value).toBe('apple')
+    expect(screen.getByText('Apple')).toBeTruthy()
   })
 
   it('reads the chosen words from options a closed list does not draw', async () => {
