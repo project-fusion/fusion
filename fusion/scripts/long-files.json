@@ -27,6 +27,7 @@
     "fusion/cli/src/prose/documented.rs",
     "fusion/cli/src/rules/publishable.rs",
     "fusion/cli/tests/rules.rs",
+    "fusion/plugins/catalog/src/lib.rs",
     "fusion/plugins/host/src/loader.rs",
     "fusion/plugins/host/src/net.rs",
     "fusion/plugins/tools/src/lib.rs",
