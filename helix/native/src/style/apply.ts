@@ -1,6 +1,7 @@
 /** One CSS declaration written into a React Native style. */
 import { rounded, termsOf } from './calc.js'
 import { fontLonghands } from './font.js'
+import { NUMBERS, numberOf } from './mapping.js'
 import { DRAWN } from './properties.js'
 import type { Layout, Resolution } from './resolved.js'
 
@@ -45,7 +46,6 @@ const RENAMED: Readonly<Record<string, string>> = {
   'inset-inline-start': 'start',
   'justify-content': 'justifyContent',
   left: 'left',
-  margin: 'margin',
   'margin-block-end': 'marginBottom',
   'margin-block-start': 'marginTop',
   'margin-inline-end': 'marginEnd',
@@ -58,11 +58,8 @@ const RENAMED: Readonly<Record<string, string>> = {
   /* An outline's color, and a drawing's ground, as Aura's. */
   'outline-color': 'outlineColor',
   'outline-offset': 'outlineOffset',
-  padding: 'padding',
-  'padding-block': 'paddingVertical',
   'padding-block-end': 'paddingBottom',
   'padding-block-start': 'paddingTop',
-  'padding-inline': 'paddingHorizontal',
   'padding-inline-end': 'paddingEnd',
   'padding-inline-start': 'paddingStart',
   position: 'position',
@@ -107,7 +104,6 @@ const LENGTHS = new Set([
   'inset-block-start',
   'inset-inline-end',
   'inset-inline-start',
-  'margin',
   'margin-block-end',
   'margin-block-start',
   'margin-inline-end',
@@ -117,11 +113,8 @@ const LENGTHS = new Set([
   'min-block-size',
   'min-inline-size',
   'outline-offset',
-  'padding',
-  'padding-block',
   'padding-block-end',
   'padding-block-start',
-  'padding-inline',
   'padding-inline-end',
   'padding-inline-start',
   'row-gap',
@@ -149,29 +142,6 @@ export interface Scale {
    * How the box's parent lays it out.
    */
   readonly within: Layout
-}
-
-/** The native names of the two ends of a margin or a padding along one axis. */
-const AXIS_ENDS: Readonly<Record<string, readonly [string, string]>> = {
-  'margin-block': ['marginTop', 'marginBottom'],
-  'margin-inline': ['marginStart', 'marginEnd'],
-  'padding-block': ['paddingTop', 'paddingBottom'],
-  'padding-inline': ['paddingStart', 'paddingEnd'],
-}
-
-/** The properties a view reads as a number, and draws as if unset when given words. */
-const NUMBERS: ReadonlySet<string> = new Set(['flex-grow', 'flex-shrink', 'opacity'])
-
-/** `value` as a number, a percentage as its share of one, or `undefined` where it is neither. */
-const numberOf = (value: Resolution): number | undefined => {
-  if (typeof value === 'number') {
-    return value
-  }
-  if (typeof value !== 'string' || value.trim() === '') {
-    return undefined
-  }
-  const amount = value.endsWith('%') ? Number(value.slice(0, -1)) / 100 : Number(value)
-  return Number.isNaN(amount) ? undefined : amount
 }
 
 /** Writes one CSS declaration into a React Native style, or says why it cannot. */
@@ -272,33 +242,6 @@ export const apply = (
   const drawn = DRAWN[property]
   if (drawn !== undefined) {
     return drawn(out, value, (each) => length(each, scale.spaceRem, scale.spaceEm))
-  }
-  /* One to four lengths, clockwise from the top, as CSS reads them. */
-  if ((property === 'padding' || property === 'margin') && Array.isArray(value)) {
-    const sides = value.map((side) => length(side, scale.spaceRem, scale.spaceEm))
-    if (sides.some((side) => side === undefined) || sides.length > 4) {
-      return 'not one to four lengths'
-    }
-    const [top, right = top, bottom = top, left = right] = sides as (number | string)[]
-    const prefix = property
-    out[`${prefix}Top`] = top as number | string
-    out[`${prefix}End`] = right as number | string
-    out[`${prefix}Bottom`] = bottom as number | string
-    out[`${prefix}Start`] = left as number | string
-    return undefined
-  }
-  /* A margin or a padding along one axis, whose two lengths are its two ends. */
-  const ends = AXIS_ENDS[property]
-  if (ends !== undefined && (property === 'margin-inline' || Array.isArray(value))) {
-    const [start, end = start] = Array.isArray(value) ? value : [value]
-    const before = length(start, scale.spaceRem, scale.spaceEm)
-    const after = length(end, scale.spaceRem, scale.spaceEm)
-    if (before === undefined || after === undefined) {
-      return 'not a length'
-    }
-    out[ends[0]] = before
-    out[ends[1]] = after
-    return undefined
   }
   if (property === 'font-family') {
     if (typeof value !== 'string') {

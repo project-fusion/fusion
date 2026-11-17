@@ -8,7 +8,7 @@
  * that only takes a new name stays in `RENAMED`, in `apply.ts`.
  */
 
-import { EDGES, fourSides } from './edges.js'
+import { EDGES, fourSides, SPACING } from './edges.js'
 import {
   factor,
   flexed,
@@ -82,6 +82,7 @@ const repeatingOf = (written: string): Readonly<Record<string, string>> | undefi
 /** Each mapping, by CSS property. */
 export const DRAWN: Readonly<Record<string, Mapping>> = {
   ...EDGES,
+  ...SPACING,
   ...TYPOGRAPHY,
   'align-content': (out, value) => {
     const aligned = flexed(wordsOf(value)[0])

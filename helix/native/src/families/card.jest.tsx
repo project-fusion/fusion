@@ -184,6 +184,29 @@ describe('the generated Card', () => {
     const clear = await render(themed(<HelixCard material="transparent">Body</HelixCard>))
     expect(intensities(clear)).toEqual([])
   })
+
+  test('reads a padding hook of four lengths, a calc() of tokens among them, as CSS does', async () => {
+    const hero = await render(
+      themed(
+        <HelixCard
+          separation="plain"
+          style={{
+            '--card-padding':
+              'var(--helix-space-2xl) calc(var(--helix-size-control-sm) + var(--helix-space-lg) + var(--helix-space-lg)) var(--helix-space-3xl) var(--helix-space-lg)',
+          }}
+        >
+          Body
+        </HelixCard>,
+      ),
+    )
+    const points = (token: string) => tokens[token] as number
+    expect(styleOf(hostOf(hero.toJSON()))).toMatchObject({
+      paddingBottom: points('space-3xl'),
+      paddingEnd: points('size-control-sm') + 2 * points('space-lg'),
+      paddingStart: points('space-lg'),
+      paddingTop: points('space-2xl'),
+    })
+  })
 })
 
 describe('what a screen reader hears', () => {

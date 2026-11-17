@@ -19,6 +19,7 @@ import { numeral } from './reads.js'
 import { relativeLightness } from './relative-lightness.js'
 import type { Resolution } from './resolved.js'
 import { derive, quotationMark } from './values.js'
+import { withVariables } from './variables.js'
 
 /** A hook's value that names a Helix token alone, `var(--helix-text-md)`. */
 const TOKEN_REF = /^var\(\s*--helix-([a-z0-9-]+)\s*\)$/
@@ -216,11 +217,16 @@ export const resolverFor = ({
   }
   /* **A hook set to a `color-mix()` is the color it works out to**, as an
      author's fill is in a chat's `author-styles`: a device draws nothing for
-     the words. */
+     the words. **Any other `var()` in a hook's words is what it names**, so
+     `var(--helix-space-md) 2rem` is two lengths. */
   const variable = (name: string) =>
     custom().get(name) ?? (name.startsWith('helix-') ? context.tokens[name.slice(6)] : undefined)
   const writtenMix = (set: Resolution): Resolution =>
-    typeof set === 'string' && set.includes('color-mix(') ? writtenColor(set, variable) : set
+    typeof set !== 'string'
+      ? set
+      : set.includes('color-mix(')
+        ? writtenColor(set, variable)
+        : withVariables(set, variable)
   const resolve = (value: Value): Resolution => {
     if ('text' in value) {
       /* A native view inherits no color, so `currentColor` is resolved here,

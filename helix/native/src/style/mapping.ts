@@ -14,15 +14,44 @@ export type Space = (value: Resolution) => number | string | undefined
 /** Writes one declaration into `out`, or says why it cannot. */
 export type Mapping = (out: Out, value: Resolution, space: Space) => string | undefined
 
+/**
+ * Written words split at the spaces outside parentheses, as CSS reads a
+ * value's components: `calc(1rem + var(--x)) 2rem` is two.
+ */
+const topLevel = (written: string): string[] => {
+  const words = ['']
+  let depth = 0
+  for (const character of written) {
+    depth += character === '(' ? 1 : character === ')' ? -1 : 0
+    if (depth <= 0 && /\s/.test(character)) {
+      words.push('')
+    } else {
+      words[words.length - 1] += character
+    }
+  }
+  return words.filter((word) => word !== '')
+}
+
 /** A value's words: `1 1 auto` as three, a lone value as one. */
 export const wordsOf = (value: Resolution): (number | string)[] =>
   (Array.isArray(value) ? value : [value]).flatMap((word): (number | string)[] =>
-    typeof word === 'number'
-      ? [word]
-      : typeof word === 'string'
-        ? word.split(/\s+(?![^(]*\))/).filter((part) => part !== '')
-        : [],
+    typeof word === 'number' ? [word] : typeof word === 'string' ? topLevel(word) : [],
   )
+
+/** The properties a view reads as a number, and draws as if unset when given words. */
+export const NUMBERS: ReadonlySet<string> = new Set(['flex-grow', 'flex-shrink', 'opacity'])
+
+/** `value` as a number, a percentage as its share of one, or `undefined` where it is neither. */
+export const numberOf = (value: Resolution): number | undefined => {
+  if (typeof value === 'number') {
+    return value
+  }
+  if (typeof value !== 'string' || value.trim() === '') {
+    return undefined
+  }
+  const amount = value.endsWith('%') ? Number(value.slice(0, -1)) / 100 : Number(value)
+  return Number.isNaN(amount) ? undefined : amount
+}
 
 /** `150%` or `1.5` as a factor. */
 export const factor = (word: number | string | undefined): number | undefined => {

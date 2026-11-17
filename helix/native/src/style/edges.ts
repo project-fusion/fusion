@@ -107,6 +107,40 @@ export const fourSides =
     return undefined
   }
 
+/**
+ * One or two lengths along an axis, its two ends as `names`. One length is
+ * `whole` where the axis has a name for both ends, as `paddingVertical`.
+ */
+const twoEnds =
+  (names: readonly [string, string], whole?: string): Mapping =>
+  (out, value, space) => {
+    const ends = wordsOf(value).map(space)
+    if (ends.length === 0 || ends.length > 2 || ends.some((end) => end === undefined)) {
+      return 'not one or two lengths'
+    }
+    if (ends.length === 1 && whole !== undefined) {
+      out[whole] = ends[0] as number | string
+      return undefined
+    }
+    const [start, end = start] = ends as (number | string)[]
+    out[names[0]] = start as number | string
+    out[names[1]] = end as number | string
+    return undefined
+  }
+
+/**
+ * **A box's margin and padding, from a list or from words**, as a hook set
+ * to `1rem 2rem 3rem 4rem` arrives: split at the spaces outside parentheses,
+ * so a `calc()` with spaces in it is one length.
+ */
+export const SPACING: Readonly<Record<string, Mapping>> = {
+  margin: fourSides(['marginTop', 'marginEnd', 'marginBottom', 'marginStart'], 'margin'),
+  'margin-inline': twoEnds(['marginStart', 'marginEnd']),
+  padding: fourSides(['paddingTop', 'paddingEnd', 'paddingBottom', 'paddingStart'], 'padding'),
+  'padding-block': twoEnds(['paddingTop', 'paddingBottom'], 'paddingVertical'),
+  'padding-inline': twoEnds(['paddingStart', 'paddingEnd'], 'paddingHorizontal'),
+}
+
 /** A shadow list's lengths in points, as React Native's shadow parser reads them. */
 const shadowOf = (entry: Resolution, space: Space): string | undefined => {
   const words: string[] = []
