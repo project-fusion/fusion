@@ -22,9 +22,9 @@
     - rowheader "web"
     - gridcell "us-east-1"
     - gridcell "3"
-  - row "worker":
+  - row "worker" [selected]:
     - gridcell "Select worker":
-      - checkbox "Select worker"
+      - checkbox "Select worker" [checked]
       - text: Select worker
     - rowheader "worker"
     - gridcell "us-west-2"
