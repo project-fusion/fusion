@@ -16,6 +16,7 @@ export function Example() {
 
   return (
     <helix-flex
+      align-items="start"
       direction="column"
       gap="md"
     >

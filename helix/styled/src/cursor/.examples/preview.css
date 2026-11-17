@@ -1,6 +1,7 @@
 /* A shared board for the pointers to move over, positioned so they are
    placed against it. */
 .board {
+  align-self: stretch;
   background-color: var(--helix-color-surface-sunken);
   block-size: 14rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);

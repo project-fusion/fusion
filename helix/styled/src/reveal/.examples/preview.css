@@ -1,5 +1,6 @@
-/* A framed box short enough to scroll, with room above the sections so they
-   start below the view and come in as the box is scrolled. */
+/* A framed box short enough to scroll, with room above the sections so the
+   first card peeks in at the bottom, already shown, and the others start below
+   the view and come in as the box is scrolled. */
 .page {
   block-size: 16rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
@@ -11,7 +12,7 @@
 }
 
 .lead {
-  min-block-size: 18rem;
+  min-block-size: 11rem;
 }
 
 /* Each card a little after the one before. */
