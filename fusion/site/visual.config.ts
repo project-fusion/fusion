@@ -46,8 +46,14 @@ export default defineConfig({
      even when no pixel moved. **A loading stand-in is left out of it**, as
      `inert` leaves it out of what a screen reader hears: Playwright's snapshot
      does not read `inert`, and recorded the words each card holds to size its
-     bars. The stand-in's spoken status sits outside it and stays. */
-  aria: { hide: ['[inert]:has([data-skeleton])'] },
+     bars. The stand-in's spoken status sits outside it and stays.
+
+     **And the food and drink map's canvas**, masked in the pictures below for
+     the same reason: MapLibre adds its "Map" region only once the map starts,
+     which a run reaches or not by when the whole-page picture grows the
+     viewport, so the snapshot held the region on one run and lost it on the
+     next. */
+  aria: { hide: ['[inert]:has([data-skeleton])', '[data-site-points-canvas]'] },
   /* The page check that needs no baseline: a code block the highlighter left
      in one color, which is the October 8 fault on any page, pictured or not.
      A highlighted block is a `helix-code-block` holding the highlighter's one
