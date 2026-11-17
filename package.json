@@ -76,12 +76,12 @@
   },
   "devDependencies": {
     "@anthropic-ai/sdk": "1.3.0",
-    "@biomejs/biome": "^2.6.3",
+    "@biomejs/biome": "^2.6.8",
     "@fusion.dev/scripts": "workspace:*",
     "@happy-dom/global-registrator": "^21.0.4",
     "@types/bun": "^1.4.4",
     "@types/node": "^22.20.5",
-    "turbo": "^2.11.10",
+    "turbo": "^2.11.11",
     "typescript": "^7.0.2"
   },
   "engines": {
