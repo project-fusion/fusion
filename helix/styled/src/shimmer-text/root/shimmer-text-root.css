@@ -1,0 +1,72 @@
+:host {
+  display: inline;
+}
+
+/* **A band of the full ink crosses the words in their quiet ink**, painted as
+   the words' own fill: the gradient is clipped to the glyphs, so the sweep
+   follows every letter and the box around them stays clear. Twice as wide as
+   the words, so the band enters from one side and leaves by the other with the
+   quiet ink on either side of it. */
+[part="text"] {
+  animation: helix-shimmer-text var(--shimmer-text-duration, calc(var(--helix-duration-turn) * 2))
+    var(--helix-easing-cycle) infinite;
+  background-clip: text;
+  background-image: linear-gradient(
+    90deg,
+    var(--shimmer-text-color, var(--helix-color-foreground-muted)) 35%,
+    var(--shimmer-text-highlight-color, var(--helix-color-foreground)) 50%,
+    var(--shimmer-text-color, var(--helix-color-foreground-muted)) 65%
+  );
+  background-size: 200% 100%;
+  color: transparent;
+}
+
+/* From the inline end to the inline start, the way a reader's eye leaves the
+   words. Flipped on a right-to-left page, where the words run the other way. */
+@keyframes helix-shimmer-text {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: 0% 0;
+  }
+}
+
+:host(:dir(rtl)) [part="text"] {
+  animation-direction: reverse;
+}
+
+/* Held where it is while the page's motion is paused. */
+:host(:state(paused)) [part="text"] {
+  animation-play-state: paused;
+}
+
+/* **No sweep for a reader who asked for less movement**: the words in the
+   full ink, which is also what a sweep crosses them in, so nothing is lost. */
+@media (prefers-reduced-motion: reduce) {
+  [part="text"] {
+    animation: none;
+    background-image: none;
+    color: var(--shimmer-text-highlight-color, var(--helix-color-foreground));
+  }
+}
+
+/* A clipped background is no ink at all under forced colors, which drop
+   background images, so the words take the system's text color. */
+@media (forced-colors: active) {
+  [part="text"] {
+    background-image: none;
+    color: CanvasText;
+  }
+}
+
+/* Flattens: a printed page holds no sweep, so the words print in the full
+   ink. */
+@media print {
+  [part="text"] {
+    animation: none;
+    background-image: none;
+    color: var(--shimmer-text-highlight-color, var(--helix-color-foreground));
+  }
+}

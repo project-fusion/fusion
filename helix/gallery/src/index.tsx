@@ -87,6 +87,7 @@ import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
 import { selectionBarArt } from './art/selection-bar'
+import { shimmerTextArt } from './art/shimmer-text'
 import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
@@ -256,6 +257,7 @@ const art: Record<string, ReactNode> = {
   'scroll-area': scrollAreaArt,
   select: selectArt,
   'selection-bar': selectionBarArt,
+  'shimmer-text': shimmerTextArt,
   'shortcut-overlay': shortcutOverlayArt,
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
