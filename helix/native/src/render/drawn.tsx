@@ -29,8 +29,10 @@ import { collection } from '../machines/collection'
 import { type HelixEvent, handlerOf, tell } from '../machines/props'
 import type { Node } from '../style/form'
 import type { Style } from '../style/resolved'
+import { holds } from './announced'
 import { type Around, AroundContext, type GivenStyle, useInheritedText } from './around'
 import { type Made, madeFor } from './made'
+import { silent } from './semantics'
 import { bound, boxFlags, camel, resolve, type Scope, split } from './styles'
 import { drawText } from './words-node'
 
@@ -194,7 +196,8 @@ const RegionText = ({ node, scope }: { readonly node: Node; readonly scope: Scop
 /**
  * What the region around an item another element draws gives it, with the
  * style its node's own rules give where it stands laid over, as a tour
- * stop's Skip, a Button, keeps to the start of its row.
+ * stop's Skip, a Button, keeps to the start of its row, and the rules on the
+ * parts its box exports, as a tree's check mark keeps its row at the box's height.
  */
 const Placed = ({
   around,
@@ -205,9 +208,25 @@ const Placed = ({
 }) => {
   const outer = useContext(AroundContext)
   const value: Around =
-    outer === undefined ? around : { ...outer, children: { ...outer.children, ...around.children } }
+    outer === undefined
+      ? around
+      : {
+          ...outer,
+          children: { ...outer.children, ...around.children },
+          ...(around.parts === undefined ? {} : { parts: around.parts }),
+        }
   return <AroundContext.Provider value={value}>{children}</AroundContext.Provider>
 }
+
+/** An item drawn inside an element another one draws, with what its box gives it, where it gives any. */
+const placedInSet = (around: Around, node: Node, element: ReactNode): ReactNode =>
+  Object.keys(around.children).length === 0 && around.parts === undefined ? (
+    element
+  ) : (
+    <Placed around={around} key={node.name}>
+      {element}
+    </Placed>
+  )
 
 /** The handlers that tell the element around the events `node` bubbles, by React's names. */
 const bubbledBy = (scope: Scope, node: Node): Record<string, (heard: HelixEvent) => void> => {
@@ -239,6 +258,8 @@ const copyViewOf = (scope: Scope, node: Node): Readonly<Record<string, unknown>>
  * Draws the element `node` draws, with what a wrap holds passed in as its
  * default region, or nothing where no component was made for it. `draws` is
  * the element's tag, as the form names it.
+ * **An inert element only draws**: a press on it lands on the part around it,
+ * and a screen reader reaches nothing in it, as `inert` leaves it on the web.
  */
 export const drawDrawn = (
   scope: Scope,
@@ -246,6 +267,24 @@ export const drawDrawn = (
   draws: string,
   children?: ReactNode,
   regions: Readonly<Record<string, ReactNode>> = {},
+): ReactNode => {
+  const element = drawPlaced(scope, node, draws, children, regions)
+  return element !== null && holds(scope, node, 'inert') ? (
+    <View key={node.name} pointerEvents="none" {...silent}>
+      {element}
+    </View>
+  ) : (
+    element
+  )
+}
+
+/** The element `node` draws, placed in the sets and the regions around it. */
+const drawPlaced = (
+  scope: Scope,
+  node: Node,
+  draws: string,
+  children: ReactNode,
+  regions: Readonly<Record<string, ReactNode>>,
 ): ReactNode => {
   const made = madeFor(draws)
   /* `hidden` is the rule's on a box, and an element drawn here has no box of its
@@ -277,13 +316,7 @@ export const drawDrawn = (
      a crumb's fold draws its rows in the menu it draws. */
   const of = made.family.api?.item?.of
   if (of !== undefined && of !== scope.family.name) {
-    return Object.keys(around.children).length === 0 ? (
-      element
-    ) : (
-      <Placed around={around} key={node.name}>
-        {element}
-      </Placed>
-    )
+    return placedInSet(around, node, element)
   }
   const drawn =
     node.attributes?.[PASSED] === true ? (
