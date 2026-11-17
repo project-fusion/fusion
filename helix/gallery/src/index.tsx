@@ -85,6 +85,7 @@ import { ratingArt } from './art/rating'
 import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
+import { scrollProgressArt } from './art/scroll-progress'
 import { selectArt } from './art/select'
 import { selectionBarArt } from './art/selection-bar'
 import { shimmerTextArt } from './art/shimmer-text'
@@ -255,6 +256,7 @@ const art: Record<string, ReactNode> = {
   sandbox: sandboxArt,
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
+  'scroll-progress': scrollProgressArt,
   select: selectArt,
   'selection-bar': selectionBarArt,
   'shimmer-text': shimmerTextArt,

@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+[part="track"] {
+  background-color: var(--scroll-progress-track-color, transparent);
+  block-size: var(--scroll-progress-size, var(--helix-border-thick));
+  display: block;
+  overflow: hidden;
+}
+
+/* **Scaled, never resized**, so following a scroll moves no layout: the bar is
+   the track's full length, drawn from the inline start to the share scrolled. */
+[part="bar"] {
+  background-color: var(--scroll-progress-color, var(--helix-color-primary));
+  block-size: 100%;
+  display: block;
+  scale: var(--scroll-progress-value, 0) 1;
+  transform-origin: left center;
+}
+
+/* From the inline start, which is the right on a right-to-left page. */
+:host(:dir(rtl)) [part="bar"] {
+  transform-origin: right center;
+}
+
+/* The bar is drawn in a system color under forced colors, which drop the
+   fill. */
+@media (forced-colors: active) {
+  [part="bar"] {
+    background-color: CanvasText;
+  }
+}
+
+/* Hides: a printed page is not scrolled, and the bar would say how far the
+   screen was when it printed. */
+@media print {
+  :host {
+    display: none;
+  }
+}
