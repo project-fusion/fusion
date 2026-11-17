@@ -77,7 +77,16 @@ export const setColorMode = async (
     return
   }
   const root = document.documentElement
-  const apply = (): void => root.setAttribute(COLOR_MODE_ATTRIBUTE, mode)
+  /* **And an inline `color-scheme`, where the page wrote one**, which outranks
+     the stylesheet's rule for the attribute: the sandbox's frame writes both,
+     and there the attribute turned dark while every `light-dark()` stayed
+     light. A page that wrote none is left without one. */
+  const apply = (): void => {
+    root.setAttribute(COLOR_MODE_ATTRIBUTE, mode)
+    if (root.style.colorScheme !== '') {
+      root.style.colorScheme = mode
+    }
+  }
   const transition = options.transition ?? 'circle'
   const start = (
     document as Document & {
