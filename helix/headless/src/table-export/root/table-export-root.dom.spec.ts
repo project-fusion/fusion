@@ -56,8 +56,7 @@ const choices = (panel: Panel, group: string): string[] =>
     (one) => one.textContent?.trim() ?? '',
   )
 const pick = (panel: Panel, group: string, value: string): void => {
-  // An input among the segments, and a `Radio` among the rows: a click on
-  // either chooses it.
+  // Every choice is a `Radio`, and a click on one chooses it.
   const choice = panel.shadowRoot?.querySelector<HTMLElement>(
     `[part="${group}"] [value="${value}"]`,
   )

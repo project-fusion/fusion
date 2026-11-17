@@ -7,7 +7,7 @@ describe('styled table export server output', () => {
   const markup = ssr(html`<helix-table-export for="invoices"></helix-table-export>`)
 
   test('serves the panel as the headless tier does', () => {
-    expect(partTag(markup, 'format')).toContain('<fieldset')
+    expect(partTag(markup, 'format')).toContain('<helix-radio-group')
   })
 
   test('the host carries only what the page wrote', () => {

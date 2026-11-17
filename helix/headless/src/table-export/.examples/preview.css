@@ -19,7 +19,10 @@ helix-headless-table-export {
   gap: 1rem;
 }
 
-helix-headless-table-export::part(legend) {
+helix-headless-table-export::part(rows-label),
+helix-headless-table-export::part(columns-label),
+helix-headless-table-export::part(values-label),
+helix-headless-table-export::part(format-label) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
 }

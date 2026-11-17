@@ -63,13 +63,16 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @documentation https://fusion.dev/helix/components/table-export
  *
  * @csspart actions - The row that holds Copy and Export.
- * @csspart choice - One choice. Among the rows it is a `Radio`; among the columns, the values and the format it is a segment holding its input and its words.
- * @csspart choice-box - The circle of a row choice's `Radio`.
+ * @csspart choice - One choice, a `Radio`.
+ * @csspart choice-box - The circle of a choice's `Radio`.
  * @csspart choice-checked - Added to `choice` while it is chosen.
- * @csspart choice-input - The hidden radio input of a segment.
- * @csspart choice-item - The button of a row choice's `Radio`, which covers its row.
- * @csspart choice-label - The words of a row choice's `Radio`.
- * @csspart columns - The group that chooses the columns.
+ * @csspart choice-item - The button of a choice's `Radio`, which covers it.
+ * @csspart choice-label - The words of a choice's `Radio`.
+ * @csspart columns - The `Radio Group` that chooses the columns.
+ * @csspart columns-feedback - Forwarded from the radio group. Not shown, since a choice of columns is never wrong.
+ * @csspart columns-hint - Forwarded from the radio group. Not shown, since the columns have no help.
+ * @csspart columns-items - The column choices inside `columns`.
+ * @csspart columns-label - The name of `columns`.
  * @csspart copy - The button that copies the rows.
  * @csspart copy-button - Forwarded from the button: the button inside `copy`.
  * @csspart copy-live - Forwarded from the button. Not shown in the panel, whose buttons do not load.
@@ -80,16 +83,22 @@ const exports = (table: ToolTable | null): table is ExportTable =>
  * @csspart export-live - Forwarded from the button. Not shown in the panel, whose buttons do not load.
  * @csspart export-spinner - Forwarded from the button. Not shown in the panel, whose buttons do not load.
  * @csspart export-text - Forwarded from the button: the words inside `export`.
- * @csspart format - The group that chooses the format.
- * @csspart legend - A group's name.
+ * @csspart format - The `Radio Group` that chooses the format.
+ * @csspart format-feedback - Forwarded from the radio group. Not shown, since a choice of format is never wrong.
+ * @csspart format-hint - Forwarded from the radio group. Not shown, since the format has no help.
+ * @csspart format-items - The format choices inside `format`.
+ * @csspart format-label - The name of `format`.
  * @csspart live - The region that says the rows were copied. Visually hidden in the styled tier.
- * @csspart options - The choices of a group, after its name.
  * @csspart rows - The `Radio Group` that chooses the rows.
  * @csspart rows-feedback - Forwarded from the radio group. Not shown, since a choice of rows is never wrong.
  * @csspart rows-hint - Forwarded from the radio group. Not shown, since the rows have no help.
  * @csspart rows-items - The row choices inside `rows`.
  * @csspart rows-label - The name of `rows`.
- * @csspart values - The group that chooses the values.
+ * @csspart values - The `Radio Group` that chooses the values.
+ * @csspart values-feedback - Forwarded from the radio group. Not shown, since a choice of values is never wrong.
+ * @csspart values-hint - Forwarded from the radio group. Not shown, since the values have no help.
+ * @csspart values-items - The value choices inside `values`.
+ * @csspart values-label - The name of `values`.
  */
 @customElement('helix-headless-table-export')
 export class HelixHeadlessTableExport extends HelixElement {
@@ -233,23 +242,18 @@ export class HelixHeadlessTableExport extends HelixElement {
     return true
   }
 
-  /** The choices of one group, each a radio input in its label. */
+  /** The choices of one group, each a `Radio`. */
   protected renderChoices<T extends string>(
-    name: string,
     current: T,
     choices: readonly { label: string; value: T }[],
-    choose: (value: T) => void,
   ): TemplateResult[] {
+    const radio = this.tag('radio')
     return choices.map(
-      (choice) => html`<label part="choice${choice.value === current ? ' choice-checked' : ''}"
-        ><input
-          part="choice-input"
-          type="radio"
-          name=${name}
-          .value=${choice.value}
-          .checked=${choice.value === current}
-          @change=${() => choose(choice.value)}
-        />${choice.label}</label
+      (choice) => html`<${radio}
+        part="choice${choice.value === current ? ' choice-checked' : ''}"
+        exportparts="box: choice-box, item: choice-item, label: choice-label"
+        value=${choice.value}
+        >${choice.label}</${radio}
       >`,
     )
   }
@@ -286,8 +290,7 @@ export class HelixHeadlessTableExport extends HelixElement {
       ...(exports(table) && table.xlsx ? [{ label: 'XLSX', value: 'xlsx' as const }] : []),
     ]
     const group = this.tag('radio-group')
-    const radio = this.tag('radio')
-    const rows: { label: string; value: ExportOptions['rows'] }[] = [
+    const rows: { label: string; value: ExportRows }[] = [
       ...(selected > 0
         ? [
             {
@@ -305,57 +308,55 @@ export class HelixHeadlessTableExport extends HelixElement {
         value: 'all' as const,
       },
     ]
+    // Each group's choice, read off the group that changed.
+    const value = <T>(event: Event): T => (event.target as HTMLElement & { value: T }).value
     return html`<${group}
         part="rows"
         exportparts="feedback: rows-feedback, hint: rows-hint, items: rows-items, label: rows-label"
         label=${this.rowsLabel}
         .value=${options.rows}
-        @change=${(event: Event) => {
-          this.chosenRows = (event.target as HTMLElement & { value: ExportOptions['rows'] }).value
-        }}
-        >${rows.map(
-          (row) => html`<${radio}
-            part="choice${row.value === options.rows ? ' choice-checked' : ''}"
-            exportparts="box: choice-box, item: choice-item, label: choice-label"
-            value=${row.value}
-            >${row.label}</${radio}
-          >`,
-        )}</${group}
+        @change=${(event: Event) => (this.chosenRows = value(event))}
+        >${this.renderChoices(options.rows, rows)}</${group}
       >
-      <fieldset part="columns">
-        <legend part="legend">${this.columnsLabel}</legend>
-        <div part="options">${this.renderChoices(
-          'columns',
-          options.columns,
-          [
-            {
-              label: formatWords(this, 'visibleColumnsLabel', { count: visible }),
-              value: 'visible',
-            },
-            {
-              label: formatWords(this, 'allColumnsLabel', { count: columns.length }),
-              value: 'all',
-            },
-          ],
-          (value) => (this.chosenColumns = value),
-        )}</div>
-      </fieldset>
-      <fieldset part="values">
-        <legend part="legend">${this.valuesLabel}</legend>
-        <div part="options">${this.renderChoices(
-          'values',
-          options.values,
-          [
-            { label: this.shownLabel, value: 'shown' },
-            { label: this.rawLabel, value: 'raw' },
-          ],
-          (value) => (this.chosenValues = value),
-        )}</div>
-      </fieldset>
-      <fieldset part="format">
-        <legend part="legend">${this.formatLabel}</legend>
-        <div part="options">${this.renderChoices('format', options.format, formats, (value) => (this.chosenFormat = value))}</div>
-      </fieldset>
+      <${group}
+        part="columns"
+        exportparts="feedback: columns-feedback, hint: columns-hint, items: columns-items, label: columns-label"
+        label=${this.columnsLabel}
+        orientation="horizontal"
+        .value=${options.columns}
+        @change=${(event: Event) => (this.chosenColumns = value(event))}
+        >${this.renderChoices(options.columns, [
+          {
+            label: formatWords(this, 'visibleColumnsLabel', { count: visible }),
+            value: 'visible',
+          },
+          {
+            label: formatWords(this, 'allColumnsLabel', { count: columns.length }),
+            value: 'all',
+          },
+        ])}</${group}
+      >
+      <${group}
+        part="values"
+        exportparts="feedback: values-feedback, hint: values-hint, items: values-items, label: values-label"
+        label=${this.valuesLabel}
+        orientation="horizontal"
+        .value=${options.values}
+        @change=${(event: Event) => (this.chosenValues = value(event))}
+        >${this.renderChoices(options.values, [
+          { label: this.shownLabel, value: 'shown' },
+          { label: this.rawLabel, value: 'raw' },
+        ])}</${group}
+      >
+      <${group}
+        part="format"
+        exportparts="feedback: format-feedback, hint: format-hint, items: format-items, label: format-label"
+        label=${this.formatLabel}
+        orientation="horizontal"
+        .value=${options.format}
+        @change=${(event: Event) => (this.chosenFormat = value(event))}
+        >${this.renderChoices(options.format, formats)}</${group}
+      >
       ${this.renderActions(count, table !== null)}
       <span part="live" aria-live="polite">${this.said || nothing}</span>`
   }
