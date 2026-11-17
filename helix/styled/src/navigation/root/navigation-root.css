@@ -208,6 +208,47 @@
   z-index: var(--helix-layer-base);
 }
 
+/* **The hover wash, as one shape that glides** from destination to destination
+   while a mouse or pen moves along the bar, in place of each destination's
+   own, which `base.css` takes away under `:state(gliding)`. Placed where the
+   pointer arrives and faded in; it slides only once `data-gliding` says it
+   has arrived, so it never slides in from where it was last. */
+[part="highlight"] {
+  background-color: var(
+    --navigation-item-hover-background-color,
+    color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)
+  );
+  block-size: var(--indicator-block-size, 0);
+  border-radius: var(--navigation-item-radius, var(--helix-radii-sm));
+  inline-size: var(--indicator-inline-size, 0);
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  translate: var(--indicator-x, 0) -50%;
+  z-index: var(--helix-layer-base);
+}
+
+[part="highlight"][data-placed] {
+  opacity: 1;
+}
+
+[part="highlight"][data-gliding] {
+  transition:
+    translate var(--helix-duration-normal) var(--helix-easing-emphasized),
+    inline-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    block-size var(--helix-duration-normal) var(--helix-easing-emphasized),
+    opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The overflow button's own wash goes too while the shape draws it, unless
+   its menu is open, which it marks on its own. */
+:host(:state(gliding)) [part="more"]:hover:not([aria-expanded="true"]) {
+  background-color: transparent;
+}
+
 /* Hidden until it has somewhere to be, so it fades in rather than sliding from
    a wrong place on first paint. The server cannot measure, so the current
    destination is legible from its own weight until this arrives. */
@@ -227,6 +268,11 @@
 }
 
 :host([orientation="vertical"]) [part="indicator"] {
+  inset-block-start: 0;
+  translate: var(--indicator-x, 0) var(--indicator-y, 0);
+}
+
+:host([orientation="vertical"]) [part="highlight"] {
   inset-block-start: 0;
   translate: var(--indicator-x, 0) var(--indicator-y, 0);
 }
@@ -270,6 +316,10 @@
 /* **Toggle Group's thumb corner**, as segmented Tabs take it: `radii-inset`,
    the track's corner less its edge and padding. Less the edge alone it was 3
    pixels in the same 4 pixel track at the same 5 pixel inset. */
+:host([marker="segmented"]) [part="highlight"] {
+  border-radius: var(--navigation-item-radius, var(--helix-radii-inset));
+}
+
 :host([marker="segmented"]) [part="indicator"] {
   background-color: var(--navigation-indicator-color, var(--helix-color-surface-overlay));
   border-radius: var(--navigation-indicator-radius, var(--helix-radii-inset));

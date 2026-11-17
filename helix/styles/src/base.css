@@ -1171,6 +1171,13 @@ helix-toggle[disabled]::part(item) {
   color: var(--navigation-item-hover-color, var(--helix-color-foreground));
 }
 
+/* **While Navigation's highlight glides under the pointer, it draws the
+   wash**, so a destination's own would be a second one under it. Before the
+   press, so a pressed link still takes the press wash. */
+:where(helix-navigation:state(gliding)) :where([data-navigation-item], a):hover {
+  background-color: transparent;
+}
+
 /* After the hover, at the same weight, so a press reads as a step past it: it
    sat before and the hover won, and a pressed link showed the hover wash. */
 :where([data-navigation-item], helix-navigation a):active {

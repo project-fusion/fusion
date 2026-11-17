@@ -180,6 +180,16 @@ even where a hook holds a duration of its own.
 `Toast` makes room for a message and closes the gap after one in its own
 stylesheet, so its stack has no hooks of this kind.
 
+## The wash under the pointer
+
+In `Navigation` and `Tabs`, the hover wash is one shape that glides from item
+to item as a mouse or pen moves along the row, and fades out when the pointer
+leaves. It takes the place of each item's own wash, in the same color, from
+`--navigation-item-hover-background-color` or
+`--tabs-tab-hover-background-color`. Arriving from outside the row, it appears
+under the pointer without sliding. A touch draws no wash, and under reduced
+motion the wash moves at once.
+
 ## Figures that count
 
 A new `value` on a `Stat` or a `Trend` counts to the new number from the one

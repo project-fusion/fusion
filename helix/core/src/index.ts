@@ -85,6 +85,10 @@ export {
 } from './controllers/focus-scope-controller/focus-scope-controller.js'
 export { FullscreenController } from './controllers/fullscreen-controller/fullscreen-controller.js'
 export { HostClickController } from './controllers/host-click-controller/host-click-controller.js'
+export {
+  HoverMarkController,
+  type HoverMarkOptions,
+} from './controllers/hover-mark-controller/hover-mark-controller.js'
 export { IdleController } from './controllers/idle-controller/idle-controller.js'
 export {
   IndicatorController,
