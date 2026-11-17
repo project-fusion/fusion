@@ -1492,6 +1492,54 @@ describe('connectMap walking a points layer', () => {
     expect(expanded).toHaveLength(1)
     expect(expanded[0]).toMatch(/ 4$/)
   })
+
+  test('a count walked carries where it is and the zoom it comes apart at, and a click on one is sent from its layer and zoomed in to', async () => {
+    const host = await frame(
+      '<helix-headless-map-points cluster label="Cafés"></helix-headless-map-points>',
+    )
+    const points = host.querySelector('helix-headless-map-points') as unknown as HTMLElement & {
+      data?: unknown
+      updateComplete: Promise<boolean>
+      walk: { key: string; place?: unknown; zoom?: number }[]
+    }
+    points.data = [{ label: 'Low', lat: 9, lng: 1 }]
+    await points.updateComplete
+    let events: Parameters<NonNullable<MapDriver['layers']>>[1]
+    let layer = ''
+    const expanded: unknown[] = []
+    connectMap(host, {
+      layers: (read, heard) => {
+        events = heard
+        layer = read()[0]?.id ?? ''
+        return {
+          apartAt: async (id, cluster) => (id === layer && cluster === 4 ? 13 : undefined),
+          expand: (id, cluster, place) => expanded.push([id === layer, cluster, place]),
+          inView: () => [{ cluster: 4, count: 30, place: { lat: 5, lng: 9 } }],
+          stop: () => {},
+          update: () => {},
+        }
+      },
+      panBy: () => {},
+      project: ({ lat, lng }) => ({ x: lng * 10, y: lat * 10 }),
+      zoomBy: () => {},
+    })
+    events?.settled?.()
+    await new Promise((done) => setTimeout(done, 0))
+    expect(points.walk).toMatchObject([{ key: 'c:4', place: { lat: 5, lng: 9 }, zoom: 13 }])
+
+    const heard: unknown[] = []
+    host.addEventListener('helix-map-cluster', (event) => heard.push(event.detail))
+    events?.cluster?.(layer, {
+      cluster: 4,
+      count: 30,
+      place: { lat: 5, lng: 9 },
+      zoom: 13,
+    })
+    expect(heard).toEqual([
+      { count: 30, key: 'c:4', labels: [], place: { lat: 5, lng: 9 }, zoom: 13 },
+    ])
+    expect(expanded).toEqual([[true, 4, { lat: 5, lng: 9 }]])
+  })
 })
 
 describe('connectMap with rotate and tilt', () => {

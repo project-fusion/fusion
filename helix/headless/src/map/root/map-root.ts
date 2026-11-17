@@ -234,7 +234,7 @@ const SETTLES = 400
  * @event {HelixBeforeChangeEvent} helix-before-change - A map type was chosen in the layers menu, with its name: `standard`, `hybrid`, or `satellite`. Cancelable: cancel it to keep the current type.
  * @event {HelixBeforeCheckEvent} helix-before-check - A layer's tile in the layers menu was pressed. Sent from the layer, with `checked` true when it is to be shown. Cancelable: cancel it to keep the layer as it is.
  * @event {HelixCheckEvent} helix-check - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice, with `checked` true when it is shown.
- * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
+ * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places, or from the points layer whose count it is.
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
  * @event {HelixMapReadyEvent} helix-map-ready - The map has been drawn whole: its style, every tile the view needs, and the ground where it has terrain. Sent once per connection. Show a map that is finished on it, where it would otherwise draw in stages.
@@ -997,7 +997,13 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   private activate(marker: HelixHeadlessMapMarker): void {
     if (marker.gathered.length > 1) {
-      marker.dispatchEvent(new HelixMapClusterEvent({ labels: [...marker.gathered] }))
+      marker.dispatchEvent(
+        new HelixMapClusterEvent({
+          count: marker.gathered.length,
+          labels: [...marker.gathered],
+          place: { lat: marker.lat ?? Number.NaN, lng: marker.lng ?? Number.NaN },
+        }),
+      )
       return
     }
     this.dispatchEvent(new HelixActivateEvent({ value: marker.name || marker.label || '' }))

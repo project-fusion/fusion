@@ -1217,10 +1217,12 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         draw()
       }
     }
-    /* **A press on a count zooms in to where it comes apart**, at the page's
-       pace for a trip; **a press on a point is the page's**, told through the
-       connector. What is under the pointer is asked in a box a finger wide,
-       since a point is a few pixels across. */
+    /* **The zoom a count comes apart at**, as MapLibre's source says. */
+    const apartAt = async (id: string, cluster: number): Promise<number | undefined> =>
+      map
+        .getSource(pointsSource(id))
+        ?.getClusterExpansionZoom?.(cluster)
+        .catch(() => undefined)
     /* **A count comes apart where it is**, zoomed in to the zoom MapLibre
        says it does at, over the page's pace for a trip. */
     const expand = (id: string, cluster: number, center?: [number, number]): void => {
@@ -1240,17 +1242,17 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       if (!at) {
         return
       }
-      void map
-        .getSource(pointsSource(id))
-        ?.getClusterExpansionZoom?.(cluster)
-        .then((zoom) => {
-          const motion = events?.motion() ?? null
-          if (motion) {
-            map.easeTo({ center: at, zoom, ...animation(motion) })
-          } else {
-            map.jumpTo({ center: at, zoom })
-          }
-        })
+      void apartAt(id, cluster).then((zoom) => {
+        if (zoom === undefined) {
+          return
+        }
+        const motion = events?.motion() ?? null
+        if (motion) {
+          map.easeTo({ center: at, zoom, ...animation(motion) })
+        } else {
+          map.jumpTo({ center: at, zoom })
+        }
+      })
     }
     /* **What is drawn in view, each once**: a tile boundary can draw one
        point or count twice, and the walk takes it once. */
@@ -1310,6 +1312,10 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
         { layers },
       )[0]
     }
+    /* **A press on a count is told with the zoom it comes apart at**, and
+       the connector zooms in to it; **a press on a point is the page's**,
+       told through the connector. What is under the pointer is asked in a
+       box a finger wide, since a point is a few pixels across. */
     const pressed = (event?: MapLibreEvent): void => {
       const found = hit(event)
       if (!found) {
@@ -1319,7 +1325,15 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
       const cluster = found.properties?.cluster_id
       if (typeof cluster === 'number') {
         const [lng, lat] = found.geometry.coordinates as [number, number]
-        expand(id, cluster, [lng, lat])
+        const told = events?.cluster
+        if (!told) {
+          expand(id, cluster, [lng, lat])
+          return
+        }
+        const count = Number(found.properties?.point_count ?? 0)
+        void apartAt(id, cluster).then((zoom) =>
+          told(id, { cluster, count, place: { lat, lng }, zoom }),
+        )
         return
       }
       const at = found.properties?.at
@@ -1345,7 +1359,9 @@ export const mapLibreDriver = (map: MapLibreMap): MapDriver => ({
     map.on('moveend', moved)
     draw()
     return {
-      expand: (id, cluster) => expand(id, cluster),
+      apartAt,
+      expand: (id, cluster, place) =>
+        expand(id, cluster, place ? [place.lng, place.lat] : undefined),
       inView,
       stop: () => {
         map.off('styledata', restore)

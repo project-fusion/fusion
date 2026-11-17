@@ -1181,6 +1181,7 @@ export interface MapChoice {
   readonly onActivate?: string
   readonly onBeforeChange?: string
   readonly onChange?: string
+  readonly onMapCluster?: string
   readonly onMapPan?: string
   readonly onMapReady?: string
   readonly onMapRotate?: string

@@ -1172,6 +1172,7 @@ const MAP: &[Field] = &[
     ("onActivate", "onActivate", Name),
     ("onBeforeChange", "onBeforeChange", Name),
     ("onChange", "onChange", Name),
+    ("onMapCluster", "onMapCluster", Name),
     ("onMapPan", "onMapPan", Name),
     ("onMapReady", "onMapReady", Name),
     ("onMapRotate", "onMapRotate", Name),

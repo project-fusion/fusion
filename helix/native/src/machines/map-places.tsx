@@ -201,9 +201,19 @@ export const useMapPoints = (family: Family, props: Props, use: MachineUse): Beh
   const latest = useRef(props)
   latest.current = props
   /* **A place pressed is the page's**, sent from the layer with its id or
-     its name; **a count pressed zooms in** to where it comes apart. */
+     its name; **a count pressed is sent** from the layer with how many it
+     holds, where it is and the zoom it comes apart at, as the web's is,
+     **and zooms in** to there. */
   const press = (one: MapDrawnPoint) => {
     if (one.kind === 'cluster') {
+      const told = boundTo(use, 'onMapCluster', 'event')
+      if (told !== undefined) {
+        tell(family, latest.current, told, {
+          count: one.count,
+          place: { lat: one.place.lat, lng: one.place.lng },
+          zoom: one.zoom,
+        })
+      }
       board?.show(one.place, one.zoom)
       return
     }

@@ -750,6 +750,46 @@ describe('mapLibreDriver', () => {
     expect(pressed).toHaveLength(1)
   })
 
+  test('a count pressed is told to a connector that hears counts, with how many, where, and the zoom it comes apart at', async () => {
+    const { asked, fire, map, sources } = stand()
+    const told: unknown[] = []
+    map.queryRenderedFeatures = () => [
+      {
+        geometry: { coordinates: [2, 1], type: 'Point' },
+        layer: { id: 'helix-points-p1-clusters' },
+        properties: { cluster_id: 7, point_count: 12 },
+      },
+    ]
+    const drawn = maplibre.mapLibreDriver(map).layers?.(
+      () => [
+        {
+          cluster: true,
+          color: 'rgb(0, 0, 255)',
+          id: 'p1',
+          kind: 'points',
+          label: 'Cafés',
+          points: [{ lat: 1, lng: 2 }],
+        },
+      ],
+      {
+        cluster: (id, found) => told.push({ id, ...found }),
+        motion: () => null,
+        press: () => {},
+      },
+    )
+    ;(
+      sources['helix-points-p1'] as { getClusterExpansionZoom?(id: number): Promise<number> }
+    ).getClusterExpansionZoom = async (id) => (id === 7 ? 14 : 0)
+    fire('click', { point: { x: 10, y: 10 } })
+    await new Promise((done) => setTimeout(done, 0))
+    expect(told).toEqual([{ cluster: 7, count: 12, id: 'p1', place: { lat: 1, lng: 2 }, zoom: 14 }])
+    expect(asked.some((one) => one.startsWith('jumpTo'))).toBe(false)
+    expect(await drawn?.apartAt?.('p1', 7)).toBe(14)
+    drawn?.expand?.('p1', 7, { lat: 1, lng: 2 })
+    await new Promise((done) => setTimeout(done, 0))
+    expect(asked.at(-1)).toBe('jumpTo 2,1 14')
+  })
+
   test('what is drawn in view is each point and count once, and a still map says so', () => {
     const { fire, map } = stand()
     const found: ReturnType<MapLibreMap['queryRenderedFeatures']> = [

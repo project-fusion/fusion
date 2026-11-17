@@ -30,7 +30,16 @@ describe('map points', () => {
 
 describe('map points in view', () => {
   type Walking = Points & {
-    walk: { count?: number; key: string; label?: string; value?: string; x: number; y: number }[]
+    walk: {
+      count?: number
+      key: string
+      label?: string
+      place?: { lat: number; lng: number }
+      value?: string
+      x: number
+      y: number
+      zoom?: number
+    }[]
   }
 
   const walking = async (): Promise<{ host: Frame; points: Walking }> => {
@@ -43,7 +52,7 @@ describe('map points in view', () => {
     const points = host.querySelector('helix-headless-map-points') as Walking
     points.walk = [
       { key: 'p:0', label: 'Fleet Coffee', value: 'fleet', x: 10, y: 10 },
-      { count: 12, key: 'c:7', x: 40, y: 20 },
+      { count: 12, key: 'c:7', place: { lat: 30.27, lng: -97.74 }, x: 40, y: 20, zoom: 15 },
       { key: 'p:2', label: 'Jupiter', value: 'jupiter', x: 80, y: 60 },
     ]
     await points.updateComplete
@@ -83,6 +92,16 @@ describe('map points in view', () => {
     press(places(points)[2] as HTMLElement, ' ')
     press(places(points)[2] as HTMLElement, ' ', 'keyup')
     expect(pressed).toEqual(['fleet', 'count c:7', 'jupiter'])
+  })
+
+  test("a count pressed sends how many it holds, where it is, the zoom it comes apart at, and the renderer's key", async () => {
+    const { host, points } = await walking()
+    const heard: unknown[] = []
+    host.addEventListener('helix-map-cluster', (event) => heard.push(event.detail))
+    press(places(points)[1] as HTMLElement, 'Enter')
+    expect(heard).toEqual([
+      { count: 12, key: 'c:7', labels: [], place: { lat: 30.27, lng: -97.74 }, zoom: 15 },
+    ])
   })
 
   test('a focused count gone from view hands the focus to what stands nearest where it was', async () => {

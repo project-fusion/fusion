@@ -164,16 +164,47 @@ describe('a points layer on a phone without MapLibre Native', () => {
     expect(figures?.length).toBeGreaterThan(0)
   })
 
-  test('a tap on a count zooms in to where it comes apart, and sends no activate', async () => {
+  test('a tap on a count sends map-cluster from the layer and zooms in to where it comes apart, and sends no activate', async () => {
     const pointed = jest.fn()
+    const opened = jest.fn()
     await render(
       <Frame view="30.261,-97.741,12">
-        <HelixMapPoints cluster data={NEAR} label="Stops" onActivate={pointed} />
+        <HelixMapPoints
+          cluster
+          data={NEAR}
+          label="Stops"
+          onActivate={pointed}
+          onMapCluster={opened}
+        />
       </Frame>,
     )
     await layOut()
     await tapAt(middleOf('3 places', 48))
     expect(pointed).not.toHaveBeenCalled()
+    expect(opened).toHaveBeenCalledTimes(1)
+    const detail = detailOf(opened) as {
+      count: number
+      place: { lat: number; lng: number }
+      zoom: number
+    }
+    expect(Object.keys(detail).sort()).toEqual(['count', 'place', 'zoom'])
+    expect(detail.count).toBe(3)
+    expect(detail.place.lat).toBeCloseTo(30.2747, 3)
+    expect(detail.place.lng).toBeCloseTo(-97.7405, 3)
+    expect(detail.zoom).toBeGreaterThanOrEqual(14)
+    expect(announced.said.at(-1)?.message.trim()).toMatch(/^Zoom level 1[4-9]/)
+  })
+
+  test("a press on a count's button sends the same map-cluster as a tap on it", async () => {
+    const opened = jest.fn()
+    await render(
+      <Frame view="30.261,-97.741,12">
+        <HelixMapPoints cluster data={NEAR} label="Stops" onMapCluster={opened} />
+      </Frame>,
+    )
+    await layOut()
+    await act(async () => fireEvent.press(button('3 places')))
+    expect(detailOf(opened)).toMatchObject({ count: 3 })
     expect(announced.said.at(-1)?.message.trim()).toMatch(/^Zoom level 1[4-9]/)
   })
 })
@@ -214,17 +245,19 @@ const WATER_TILE = new Uint8Array(
   ]),
 )
 
+/** What a server answers, as far as the still picture reads it. */
+const answerOf = (body: unknown) =>
+  ({
+    arrayBuffer: async () => (body as Uint8Array).slice().buffer,
+    json: async () => body,
+    ok: true,
+    status: 200,
+  }) as unknown as Response
+
 describe("the still picture's streets, water and land", () => {
   test("draws the style's vector tiles once they answer, asking the style's TileJSON first", async () => {
     const asked: string[] = []
-    /* What a server answers, as far as the still picture reads it. */
-    const answer = (body: unknown) =>
-      ({
-        arrayBuffer: async () => (body as Uint8Array).slice().buffer,
-        json: async () => body,
-        ok: true,
-        status: 200,
-      }) as unknown as Response
+    const answer = answerOf
     const fetched: MapTileFetch = async (url) => {
       asked.push(url)
       return url.endsWith('/planet')

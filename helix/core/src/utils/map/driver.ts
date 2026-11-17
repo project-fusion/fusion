@@ -103,8 +103,13 @@ export interface MapDriver {
     read: () => MapLayerSpec[],
     events?: MapLayerEvents,
   ): {
-    /** Zooms in to where a points layer's count comes apart, at the page's pace. */
-    expand?(id: string, cluster: number): void
+    /**
+     * The zoom a points layer's count comes apart at, by the renderer's id
+     * for it, or `undefined` where the renderer cannot say.
+     */
+    apartAt?(id: string, cluster: number): Promise<number | undefined>
+    /** Zooms in to where a points layer's count comes apart, at the page's pace, centered on `place` where given. */
+    expand?(id: string, cluster: number, place?: MapPlace): void
     /** A points layer's points and counts drawn in view, which the keyboard walks. */
     inView?(id: string): MapInView[]
     stop(): void
@@ -177,6 +182,22 @@ export interface MapDriver {
 
 /** What a driver drawing layers tells the connector, and asks of it. */
 export interface MapLayerEvents {
+  /**
+   * A reader pressed a points layer's count: which layer, by its spec's
+   * `id`, the renderer's id for the count, how many places it holds, where it
+   * is, and the zoom it comes apart at. The connector sends
+   * `helix-map-cluster` and zooms in to it. Without it, a driver zooms in
+   * itself.
+   */
+  cluster?(
+    id: string,
+    found: {
+      cluster: number
+      count: number
+      place: MapPlace
+      zoom?: number | undefined
+    },
+  ): void
   /** The page's motion for a trip, for a cluster of points a press zooms in to. */
   motion(): MapMotion | null
   /** A reader pressed a point: which points layer, by its spec's `id`, and which of its points. */

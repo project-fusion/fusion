@@ -20,14 +20,17 @@ import {
  * focused, from core's projection: the connector stands them on the web, and
  * a phone's frame works them out from its camera as the view settles. A
  * press on a place, or a tap on its dot, sends `activate` from the layer
- * with the place's id, name, or index; a press on a count zooms in to it.
+ * with the place's id, name, or index. A press on a count, or a tap on it,
+ * sends `map-cluster` from the layer with how many places it holds, where
+ * it is, and the zoom it comes apart at, and zooms in to it.
  *
  * **A phone reaches each place and count up to a few dozen in view**; past
  * that the layer is one element that says how many places are in view, and
  * zooming in brings them within reach. Its dots and counts still take a tap.
  *
- * **Web only:** `map-cluster` from a count's button, the arrow keys
- * between the places, and `src`, a GeoJSON file the web fetches.
+ * **Web only:** `map-cluster`'s `key`, MapLibre's id for the count, and
+ * `labels`, which a count leaves empty; the arrow keys between the places;
+ * and `src`, a GeoJSON file the web fetches.
  *
  * **Held to `helix-map-points`.**
  */
@@ -45,13 +48,14 @@ export default headless('map-points', {
   },
   events: {
     activate: ['value'],
-    mapCluster: web(['key', 'labels']),
+    mapCluster: ['count', 'place', 'zoom'],
     mapPartChange: web(['kind']),
   },
   states: ['settled'],
   map: {
     named: 'named',
     onActivate: 'activate',
+    onMapCluster: 'mapCluster',
     places: 'places',
   },
   render: ({ entry, map }) => (

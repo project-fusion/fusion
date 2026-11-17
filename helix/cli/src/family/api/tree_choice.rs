@@ -881,13 +881,14 @@ pub const CANVAS_COMPUTED: &[&str] = &[
     "zooms",
 ];
 
-/// What a frame around a map sends: a marker or a place pressed, a map type asked and
-/// chosen, the view moved by a control, and the map drawn whole. Its props it reads by
-/// their own names.
+/// What a frame around a map sends: a marker or a place pressed, a points layer's count
+/// pressed, a map type asked and chosen, the view moved by a control, and the map drawn
+/// whole. Its props it reads by their own names.
 pub const MAP: &[(&str, Names)] = &[
     ("onActivate", Names::Event),
     ("onBeforeChange", Names::Event),
     ("onChange", Names::Event),
+    ("onMapCluster", Names::Event),
     ("onMapPan", Names::Event),
     ("onMapReady", Names::Event),
     ("onMapRotate", Names::Event),

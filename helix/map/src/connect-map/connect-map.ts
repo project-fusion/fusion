@@ -306,9 +306,11 @@ interface Walked {
   count?: number | undefined
   key: string
   label?: string | undefined
+  place: MapPlace
   value?: string | undefined
   x: number
   y: number
+  zoom?: number | undefined
 }
 
 /** The most points and counts a layer walks: past it, a reader zooms in or the layer clusters. */
@@ -338,6 +340,9 @@ const sameWalk = (had: readonly Walked[] | undefined, walk: readonly Walked[]): 
       Math.round(was.y) === Math.round(one.y) &&
       was.label === one.label &&
       was.value === one.value &&
+      was.zoom === one.zoom &&
+      was.place.lat === one.place.lat &&
+      was.place.lng === one.place.lng &&
       was.count === one.count
     )
   })
@@ -754,14 +759,33 @@ export const connectMap = (
      still: in reading order, top to bottom and along each line the way text
      runs, at most `WALKED` of them, each by a key that stays its own while it
      stays in view. */
-  let seen = new Map<Layer, (Omit<Walked, 'x' | 'y'> & { place: MapPlace })[]>()
+  let seen = new Map<Layer, Omit<Walked, 'x' | 'y'>[]>()
+  /* **The zoom each count in view comes apart at**, asked of the renderer
+     once a count, by its layer and key, and forgotten when the layers are
+     drawn again, since the renderer numbers its counts anew. */
+  const apart = new Map<string, number>()
+  const asking = new Set<string>()
+  const askApart = (layer: Layer, key: string): void => {
+    const known = `${idOf(layer)} ${key}`
+    if (!drawn?.apartAt || apart.has(known) || asking.has(known)) {
+      return
+    }
+    asking.add(known)
+    void drawn.apartAt(idOf(layer), Number(key.slice(2))).then((zoom) => {
+      asking.delete(known)
+      if (live && zoom !== undefined) {
+        apart.set(known, zoom)
+        place()
+      }
+    })
+  }
   const look = (): void => {
     if (!live || !drawn?.inView || !driver.project) {
       return
     }
     const project = driver.project
     const rtl = isRtl(frame)
-    const next = new Map<Layer, (Omit<Walked, 'x' | 'y'> & { place: MapPlace })[]>()
+    const next = new Map<Layer, Omit<Walked, 'x' | 'y'>[]>()
     for (const [id, layer] of pointLayers) {
       if (layer.parentElement !== frame) {
         continue
@@ -793,6 +817,13 @@ export const connectMap = (
       }
     }
     seen = next
+    for (const [layer, found] of next) {
+      for (const one of found) {
+        if (one.count !== undefined) {
+          askApart(layer, one.key)
+        }
+      }
+    }
     place()
   }
   /* **The theme's land and ink, read once** for the captions' colors, and
@@ -1004,6 +1035,24 @@ export const connectMap = (
   /* **A point pressed is a place pressed**, reported as a marker's press is,
      from the points layer it belongs to, with its id or its name. */
   const drawn = driver.layers?.(readLayers, {
+    /* **A count pressed is sent from its layer**, as one pressed from the
+       keyboard is, and zoomed in to where it is heard. Headless is only a
+       type here, so the event is built as its class builds it. */
+    cluster: (id, { cluster, count, place: at, zoom }) => {
+      const detail: HelixMapClusterEvent['detail'] = {
+        count,
+        key: `c:${cluster}`,
+        labels: [],
+        place: at,
+        zoom,
+      }
+      pointLayers.get(id)?.dispatchEvent(
+        new CustomEvent('helix-map-cluster' satisfies keyof HTMLElementEventMap, {
+          bubbles: true,
+          detail,
+        }),
+      )
+    },
     motion: () => motionOf(frame, 'travel'),
     press: (id, index) => {
       const layer = pointLayers.get(id)
@@ -1261,7 +1310,12 @@ export const connectMap = (
        asked of the renderer when it last went still, and a pan in between
        carries them rather than asking again every frame. */
     for (const [layer, found] of seen) {
-      const walk = found.map(({ place, ...one }) => ({ ...one, ...project(place) }))
+      const id = idOf(layer)
+      const walk = found.map((one) => ({
+        ...one,
+        ...project(one.place),
+        ...(one.count === undefined ? {} : { zoom: apart.get(`${id} ${one.key}`) }),
+      }))
       if (!sameWalk(layer.walk, walk)) {
         layer.walk = walk
       }
@@ -1337,6 +1391,7 @@ export const connectMap = (
     }
     if (drawing) {
       drawing = false
+      apart.clear()
       drawn?.update()
     }
   }
@@ -1445,9 +1500,9 @@ export const connectMap = (
     /* A points layer's count, pressed from the keyboard: the renderer's own
        zoom to where it comes apart. */
     const layer = event.target as Layer
-    const key = (event as HelixMapClusterEvent).detail.key
+    const { key, place: at } = (event as HelixMapClusterEvent).detail
     if (isLayer(layer) && layer.layerKind === 'points' && key?.startsWith('c:')) {
-      drawn?.expand?.(idOf(layer), Number(key.slice(2)))
+      drawn?.expand?.(idOf(layer), Number(key.slice(2)), at)
       return
     }
     const members = clusters.get(event.target as Marker)
