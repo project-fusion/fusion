@@ -374,7 +374,6 @@
     "helix/native/src/machines/range.tsx",
     "helix/native/src/machines/reorder.jest.tsx",
     "helix/native/src/machines/resize.tsx",
-    "helix/native/src/machines/select.tsx",
     "helix/native/src/machines/table-row.tsx",
     "helix/native/src/machines/table.tsx",
     "helix/native/src/machines/window.ts",

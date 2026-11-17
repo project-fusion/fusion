@@ -7,8 +7,6 @@
  * is closed holds nothing**, so the options also join a hidden copy of themselves,
  * which the trigger's words, its keys, and the verdict read.
  */
-import { keys } from '@fusion.dev/helix-core/capabilities/keys'
-import type { KeyPress } from '@fusion.dev/helix-core/capabilities/types'
 import {
   chosenValues,
   type DataOption,
@@ -16,14 +14,16 @@ import {
   dataOptions,
   Typeahead,
 } from '@fusion.dev/helix-core/listbox'
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { I18nManager, Platform } from 'react-native'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Platform } from 'react-native'
 import type { MachineUse } from '../ir.generated'
 import type { Behavior, Props } from '../render/behavior'
 import type { Family } from '../style/form'
 import type { Around } from './binder'
 import type { ListOpening, ListOwner } from './list-owner'
 
+export { type SelectHandle, usePutBack } from './select-handle'
+export { closedKey } from './select-keys'
 export type { ListOpening, ListOwner }
 
 import { holdMember, useOrder } from './listbox'
@@ -31,8 +31,9 @@ import { useMembers, useWritten, wordsIn } from './listbox-hooks'
 import { type Entry, entriesOf, type Held } from './listbox-model'
 import { type OptionMember, type OptionOwner, OptionOwnerContext } from './option'
 import { boundTo, given, type HelixEvent, senderOf, tell, told } from './props'
+import type { SelectHandle } from './select-handle'
+import { type Closed, triggerRef } from './select-keys'
 import type { Turned } from './toggle'
-import { reachable } from './virtual-focus'
 
 /** What the hidden copy of the options joins. Nothing there is pressed, and nothing shows. */
 export const heldOwner = (held: Held, schedule: () => void): OptionOwner => ({
@@ -64,83 +65,6 @@ const wordsFor = (chosen: readonly Entry[], placeholder: string): string => {
   return typeof Intl.ListFormat === 'function'
     ? new Intl.ListFormat(undefined, { style: 'short', type: 'unit' }).format(words)
     : words.join(', ')
-}
-
-const OPENS: Readonly<Record<string, ListOpening['where']>> = {
-  ' ': 'selected',
-  ArrowDown: 'selected',
-  ArrowUp: 'last',
-  End: 'last',
-  Enter: 'selected',
-  Home: 'first',
-}
-
-/** What the closed trigger's keys read at one draw. */
-interface Closed {
-  readonly choose: (value: string) => void
-  readonly disabled: boolean
-  readonly entries: readonly Entry[]
-  readonly multiple: boolean
-  readonly open: (opening: ListOpening) => void
-  readonly standing: boolean
-  readonly typeahead: Typeahead
-  readonly value: string
-}
-
-/** Whether a key types one character, with nothing held that makes it a command. */
-const typesOne = (press: KeyPress): boolean =>
-  !press.alt && !press.control && !press.meta && [...press.key].length === 1
-
-/** A typed letter: chooses, or under `multiple` opens the list on what it matched. */
-const typed = (press: KeyPress, now: Closed): boolean => {
-  const shown = reachable(now.entries)
-  const at = now.typeahead.match(
-    press.key,
-    shown.map((one) => one.text),
-    shown.findIndex((one) => one.value === now.value),
-  )
-  const match = shown[at]?.value
-  if (match !== undefined && now.multiple) {
-    now.open({ value: match, where: 'selected' })
-  } else if (match !== undefined) {
-    now.choose(match)
-  }
-  return true
-}
-
-/** The inline arrows step the choice, the other way round on a right-to-left page. */
-const stepped = (press: KeyPress, now: Closed): boolean => {
-  const forward = press.key === 'ArrowRight' ? 1 : -1
-  const by = I18nManager.isRTL ? -forward : forward
-  const shown = reachable(now.entries)
-  const next = shown[Math.max(0, shown.findIndex((one) => one.value === now.value) + by)]
-  if (next !== undefined) {
-    now.choose(next.value)
-  }
-  return true
-}
-
-/** What a key does to the closed trigger, and whether it took it. */
-export const closedKey = (press: KeyPress, now: Closed): boolean => {
-  if (now.disabled || now.standing) {
-    return false
-  }
-  if (typesOne(press) && (press.key !== ' ' || now.typeahead.typing())) {
-    return typed(press, now)
-  }
-  const inline = press.key === 'ArrowLeft' || press.key === 'ArrowRight'
-  if (inline && !now.multiple && !press.alt && !press.control && !press.meta) {
-    return stepped(press, now)
-  }
-  const where = OPENS[press.key]
-  if (where === undefined) {
-    return false
-  }
-  /* Up opens on the chosen option where there is one, and on the last where there is none. */
-  now.open({
-    where: where === 'last' && press.key === 'ArrowUp' && now.value !== '' ? 'selected' : where,
-  })
-  return true
 }
 
 /** What the options wrote `selected` on says the value is. */
@@ -221,56 +145,12 @@ export const requesterOf =
     return true
   }
 
-/** What a page reads and writes on a Select by its ref, as on the web element. */
-export interface SelectHandle {
-  /** The value. Writing it seeds or corrects the choice, and sends no event, as on the web. */
-  value: string
-}
-
-/**
- * A Select an element draws as its control, put back on `value` after a draw
- * where it moved off it. **The Select takes each pick and closes, and the
- * element decides**, as the web's Pagination Size puts its select back where
- * it refused the size. `asked` draws the element again after a pick, so a
- * refused one is put back; `ref` goes on the Select's view.
- */
-export const usePutBack = (value: string) => {
-  const select = useRef<SelectHandle | null>(null)
-  const [, redraw] = useState(0)
-  useLayoutEffect(() => {
-    if (select.current !== null && select.current.value !== value) {
-      select.current.value = value
-    }
-  })
-  const asked = useCallback(() => redraw((at) => at + 1), [])
-  const ref = useCallback((node: SelectHandle | null) => {
-    select.current = node
-  }, [])
-  return { asked, ref }
-}
-
 /** Closes a toggle that stands open. */
 export const closeIf = (toggled: Turned | undefined): void => {
   if (toggled?.checked === true) {
     toggled.turn()
   }
 }
-
-/** A view's keys on the closed trigger, heard as the view is drawn and let go as it goes. */
-const triggerRef =
-  (
-    listening: { current: (() => void) | undefined },
-    closed: { readonly current: Closed | undefined },
-  ) =>
-  (node: unknown): void => {
-    listening.current?.()
-    listening.current =
-      node === null
-        ? undefined
-        : keys().listen(node, (press) =>
-            closed.current === undefined ? false : closedKey(press, closed.current),
-          )
-  }
 
 /** Hosts a field that opens a list of options. */
 export const useSelect = (
