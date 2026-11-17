@@ -106,7 +106,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
  * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
- * @csspart highlight - The wash under the pointer, which glides from tab to tab while a mouse or pen moves along them. It carries the tab's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives.
+ * @csspart highlight - The wash under the pointer, which glides from tab to tab while a mouse or pen moves along them. It carries the tab's place and size as the indicator does, `data-placed` while it is over one, and `data-gliding` from the frame after it arrives. Hidden until a stylesheet shows it, so the headless tier lays out as it did without it.
  * @csspart indicator - The marker that moves to the selected tab. It carries the selected tab's
  *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
  *   `--indicator-block-size`, and `data-placed` once it has been placed, for a mark you draw
@@ -604,7 +604,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
         @scroll=${this.scrollControls ? this.measure : nothing}
       >
         ${this.renderScroll(-1)}
-        <span part="highlight" aria-hidden="true"></span>
+        <span part="highlight" aria-hidden="true" hidden></span>
         <slot @slotchange=${this.handleSlotChange}></slot>
         <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
         ${this.renderScroll(1)}
