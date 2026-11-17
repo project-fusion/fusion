@@ -287,8 +287,15 @@ fn takes_a_data_flag_on_a_box_and_a_press() {
         &Attribute::Flag(true)
     )
     .is_ok());
-    let worded = attribute(NodeKind::Box, "indicator", "data-dot", &text("yes")).unwrap_err();
-    assert!(worded.contains("`data-dot` takes `true`, `false`, `bind()` or `not()`"));
+    assert!(attribute(NodeKind::Box, "turn", "data-author", &text("me")).is_ok());
+    let numbered = attribute(
+        NodeKind::Box,
+        "indicator",
+        "data-dot",
+        &Attribute::Number(1.0),
+    )
+    .unwrap_err();
+    assert!(numbered.contains("`data-dot` takes `true`, `false`, `bind()` or `not()` or words"));
     assert!(attribute(NodeKind::Pressable, "row", "data-dot", &bind("unset")).is_ok());
     let word = attribute(NodeKind::Text, "words", "data-dot", &bind("unset")).unwrap_err();
     assert!(word.contains("does not take `data-dot`"));

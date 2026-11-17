@@ -1359,6 +1359,7 @@ const CHAT_ROOT: &[Field] = &[
     ("onSend", "onSend", Name),
     ("said", "said", Name),
     ("loadingShown", "loadingShown", Name),
+    ("placeholderShown", "placeholderShown", Name),
     ("scrolls", "scrolls", Name),
     ("statusEmpty", "statusEmpty", Name),
     ("windowed", "windowed", Name),

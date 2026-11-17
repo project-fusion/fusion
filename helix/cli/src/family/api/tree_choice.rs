@@ -1182,6 +1182,7 @@ pub const CHAT_ROOT_COMPUTED: &[&str] = &[
     "list",
     "loadingShown",
     "named",
+    "placeholderShown",
     "said",
     "scrolls",
     "statusEmpty",

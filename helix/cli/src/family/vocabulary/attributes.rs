@@ -399,12 +399,15 @@ pub fn attribute(kind: NodeKind, node: &str, name: &str, value: &Attribute) -> R
     /* A `data-` attribute is a flag the web writes on a box's part, which a
     rule's `part` condition reads, as `[data-dot]`, and a phone reads as the
     part's state. A field takes one too, as a date's segment is hidden in a
-    copy that draws a literal. */
+    copy that draws a literal. Words written in the source are the value a
+    rule reads as `[data-author="me"]`, as a chat's turn in outline says
+    whose it is. */
     if name.len() > "data-".len() && name.starts_with("data-") {
-        return match (kind, fits(Shape::Flag, value)) {
+        let fitting = fits(Shape::Flag, value) || matches!(value, Attribute::Text(_));
+        return match (kind, fitting) {
             (NodeKind::Box | NodeKind::Field | NodeKind::Pressable, true) => Ok(()),
             (NodeKind::Box | NodeKind::Field | NodeKind::Pressable, false) => Err(format!(
-                "`{kind}('{node}')`: `{name}` takes {}",
+                "`{kind}('{node}')`: `{name}` takes {} or words",
                 describe(Shape::Flag)
             )),
             _ => Err(format!(

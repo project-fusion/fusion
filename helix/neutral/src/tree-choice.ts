@@ -669,6 +669,7 @@ export interface ChatRootChoice {
   readonly onHistory?: string
   readonly onSend?: string
   readonly loadingShown?: string
+  readonly placeholderShown?: string
   readonly said?: string
   readonly scrolls?: string
   readonly statusEmpty?: string

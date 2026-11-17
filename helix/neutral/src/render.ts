@@ -769,6 +769,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
     | 'list'
     | 'loadingShown'
     | 'named'
+    | 'placeholderShown'
     | 'said'
     | 'scrolls'
     | 'statusEmpty'
