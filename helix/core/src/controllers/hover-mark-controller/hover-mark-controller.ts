@@ -82,12 +82,19 @@ export class HoverMarkController implements ReactiveController {
     if (event.pointerType === 'touch') {
       return
     }
-    const item = this.options.item(event.composedPath())
+    const under = event.composedPath()
+    const item = this.options.item(under)
     if (item === this.hovered) {
       return
     }
+    /* **Between two items the mark holds where it is**, so a pointer crossing
+       the gap glides on to the next rather than the wash going out and
+       coming back. Off the strip, such as over a tab's panel, it leaves. */
     if (!item) {
-      this.leave()
+      const surface = this.options.surface()
+      if (!surface || !under.includes(surface)) {
+        this.leave()
+      }
       return
     }
     const arriving = this.hovered === undefined

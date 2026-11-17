@@ -84,6 +84,22 @@ describe('the mark under the pointer', () => {
     expect(element.heard).toEqual([true, false])
   })
 
+  test('holds over the gap between items, and leaves off the strip', async () => {
+    const { items, mark, strip: element } = await strip()
+    over(items[0])
+    await frame()
+    const surface = element.renderRoot.querySelector('[part="surface"]') as HTMLElement
+    surface.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    expect(mark.hasAttribute('data-placed')).toBe(true)
+    expect(element.glide.hovered).toBe(items[0])
+    element.dispatchEvent(
+      new PointerEvent('pointerover', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    expect(mark.hasAttribute('data-placed')).toBe(false)
+  })
+
   test('follows no touch', async () => {
     const { items, mark } = await strip()
     over(items[0], 'touch')
