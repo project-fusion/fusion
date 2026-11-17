@@ -146,20 +146,21 @@ they settle.
 A graph layout that runs past five seconds also offers its own button, in the
 graph's frame, that stops it where the notes stand.
 
-## Rows and tags that move
+## Rows, tags, and items that move
 
-When you sort, add, remove, or hide the rows of a `List` or the tags of a
-`Tag.Group`, each one slides from where it was to where it is now. A row or a
-tag you add fades in. A list you render again with all new elements appears at
-once.
+When you sort, add, remove, or hide the rows of a `List`, the tags of a
+`Tag.Group`, or the items of a `Tree`, each one slides from where it was to
+where it is now. A tree's branch carries its rows with it. A row, a tag, or an
+item you add fades in. A list you render again with all new elements appears
+at once.
 
 Each family times the move from two hooks of its own, which the styled tier
 sets from the tokens:
 
 | Hook | Default |
 | --- | --- |
-| `--list-move-duration`, `--tag-group-move-duration` | `--helix-duration-normal` |
-| `--list-move-easing`, `--tag-group-move-easing` | `--helix-easing-standard` |
+| `--list-move-duration`, `--tag-group-move-duration`, `--tree-move-duration` | `--helix-duration-normal` |
+| `--list-move-easing`, `--tag-group-move-easing`, `--tree-move-easing` | `--helix-easing-standard` |
 
 Set them on the element to change one list, or on a selector to change many:
 
@@ -170,12 +171,21 @@ helix-list {
 }
 ```
 
-`0ms` turns the move off. The headless tier sets neither hook, so its rows do
-not move until you set them. With reduced motion set, nothing moves, even
-where a hook holds a duration of its own.
+`0ms` turns the move off. The headless tier sets none of the hooks, so its
+rows do not move until you set them. With reduced motion set, nothing moves,
+even where a hook holds a duration of its own.
 
 `Toast` makes room for a message and closes the gap after one in its own
 stylesheet, so its stack has no hooks of this kind.
+
+## Figures that count
+
+A new `value` on a `Stat` counts to the new number from the one before. A
+screen reader reads only the new number. The count takes
+`--stat-count-duration`, `--helix-duration-slow` by default, along
+`--stat-count-easing`, `--helix-easing-decelerate` by default, so the figure
+slows as it arrives. `0ms` changes the figure at once, as reduced motion does.
+A figure you put in the slot changes at once.
 
 ## Starting styles and view transitions
 
