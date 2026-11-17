@@ -38,6 +38,8 @@ import { styles } from './trend-root.css.js'
  *
  * @cssproperty --trend-better-color - Color of a move that `good` says is an improvement.
  * @cssproperty --trend-color - Color of the arrow and the metric. Setting it overrides the color that `good` or `color-by` sets.
+ * @cssproperty --trend-count-duration - How long a new `value` takes to count from the one before. Defaults to `--helix-duration-slow`. `0ms` shows the change at once.
+ * @cssproperty --trend-count-easing - The curve a new `value` counts along. Defaults to `--helix-easing-decelerate`, so the change slows as it arrives.
  * @cssproperty --trend-down-color - Color of a move down under `color-by="movement"`.
  * @cssproperty --trend-gap - Space between the arrow, the metric and the label.
  * @cssproperty --trend-icon-size - Size of the arrow, or of a glyph in one of the icon slots.

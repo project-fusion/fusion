@@ -1,4 +1,5 @@
 import {
+  CountController,
   customElement,
   formatNumber,
   formatNumberParts,
@@ -6,7 +7,6 @@ import {
   hostAria,
   internalsOf,
   numberConverter,
-  reducedMotion,
   reportRuntime,
   SPOKEN_RULE,
   slotFilled,
@@ -21,22 +21,6 @@ const SEPARATORS = new Set([',', '.', "'", '\u2019', ' ', '\u00a0', '\u2009', '\
 
 /** Text that reads as a figure: digits, the separators, signs, currency and percent. */
 const FIGURE = /^[\p{N}\p{Sc}\p{Zs}.,'\u2019+\-\u2212%\u2030]+$/u
-
-/** Reads a duration as milliseconds. Anything that does not read as one is 0. */
-const milliseconds = (value: string): number => {
-  const amount = Number.parseFloat(value)
-  if (!Number.isFinite(amount)) {
-    return 0
-  }
-  return value.trim().endsWith('ms') ? amount : amount * 1000
-}
-
-/** How many digits a number has after its point, as it is written. */
-const decimals = (value: number): number => {
-  const written = String(value)
-  const point = written.indexOf('.')
-  return point === -1 || written.includes('e') ? 0 : written.length - point - 1
-}
 
 /** What a Stat asks of the group around it: the step its figure takes. */
 interface StepSharing {
@@ -178,14 +162,16 @@ export class HelixHeadlessStat extends HelixElement {
   @property({ converter: numberConverter('value', undefined) })
   value?: number
 
-  /** The figure drawn while a new `value` counts to it, or `undefined` at rest. */
-  private counting: number | undefined
-
-  /**
-   * The count in flight. An animation with no keyframes, so the browser runs
-   * the curve the stylesheet names, which a frame loop reads as its progress.
-   */
-  private clock: Animation | undefined
+  /** Counting a new `value` from the one before. */
+  protected readonly count = new CountController(this, {
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--stat-count-duration'),
+        easing: style.getPropertyValue('--stat-count-easing'),
+      }
+    },
+  })
 
   /* Named by what is slotted as the label: by reference where the engine
      reflects elements, so an edit to the label's text renames the group, and
@@ -201,7 +187,7 @@ export class HelixHeadlessStat extends HelixElement {
        server's: the update after it reads the figure. */
     const was = changed.get('value') as number | undefined
     if (changed.has('value') && this.hasUpdated && was !== undefined) {
-      this.count(this.counting ?? was)
+      this.count.start(was, this.value)
     }
     if (this.childrenKnown && (!this.figureRead || changed.has('locale'))) {
       this.figureRead = true
@@ -380,7 +366,7 @@ export class HelixHeadlessStat extends HelixElement {
     this.readPieces()
     /* Fitted to the number it rests on, so the size does not step on every
        frame of a count. */
-    if (this.counting === undefined) {
+    if (this.count.counting === undefined) {
       this.fit()
     }
     const given = this.direction as string | undefined
@@ -459,57 +445,11 @@ export class HelixHeadlessStat extends HelixElement {
     this.toggleState('has-trend', filled('trend'))
   }
 
-  /**
-   * Counts the figure from `from` to `value`, once a frame, along the curve the
-   * stylesheet names.
-   *
-   * **The browser runs the curve.** An animation with no keyframes changes
-   * nothing on screen, and its eased progress is the share of the way the
-   * figure has come, so `linear()` and `cubic-bezier()` count exactly as a
-   * transition with the same curve moves. Each figure is rounded to as many
-   * decimals as the two numbers have, so a count to 1,284 shows no fractions.
-   */
-  private count(from: number): void {
-    const to = this.value
-    this.clock?.cancel()
-    this.clock = undefined
-    this.counting = undefined
-    if (to === undefined || !Number.isFinite(to) || !Number.isFinite(from) || from === to) {
-      return
-    }
-    const style = getComputedStyle(this)
-    const duration = milliseconds(style.getPropertyValue('--stat-count-duration'))
-    if (duration < 1 || reducedMotion() || typeof this.animate !== 'function') {
-      return
-    }
-    const easing = style.getPropertyValue('--stat-count-easing').trim() || 'ease'
-    const places = 10 ** Math.max(decimals(from), decimals(to))
-    const clock = this.animate([], { duration, easing })
-    this.clock = clock
-    this.counting = from
-    const frame = (): void => {
-      if (this.clock !== clock) {
-        return
-      }
-      const progress = clock.effect?.getComputedTiming().progress
-      if (clock.playState === 'finished' || typeof progress !== 'number') {
-        this.clock = undefined
-        this.counting = undefined
-        this.requestUpdate()
-        return
-      }
-      this.counting = Math.round((from + (to - from) * progress) * places) / places
-      this.requestUpdate()
-      requestAnimationFrame(frame)
-    }
-    requestAnimationFrame(frame)
-  }
-
   protected override render(): TemplateResult {
     /* The label's slot asks for the update that names the group, since a
        label arriving later changes no property; that update reads the
        pieces, and the unit's and the trend's slots read them directly. */
-    const value = this.counting ?? this.value
+    const value = this.count.counting ?? this.value
     const figure =
       value === undefined || !Number.isFinite(value)
         ? ''
@@ -557,7 +497,7 @@ export class HelixHeadlessStat extends HelixElement {
    */
   private drawFigure(pieces: (string | TemplateResult)[]): TemplateResult {
     const to = this.value
-    if (this.counting === undefined || to === undefined) {
+    if (this.count.counting === undefined || to === undefined) {
       return html`<span part="value">${pieces}</span>`
     }
     return html`<span part="value" aria-hidden="true">${pieces}</span><span data-spoken>${formatNumber(to, wordsLocale(this), this.formatOptions)}</span>`

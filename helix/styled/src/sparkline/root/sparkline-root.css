@@ -100,6 +100,23 @@
   rx: var(--sparkline-bar-radius, 0.5);
 }
 
+/* **The drawing moves from the last readings to the new**, as Line Chart's
+   and Bar Chart's do, on `decelerate`, which is monotonic, so no frame draws a
+   value the data does not hold. A line with a different number of points takes
+   its new shape at once, there being nothing to move between. */
+[part="line"],
+[part="area"] {
+  transition: d var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+[part="bar"] {
+  transition:
+    height var(--helix-duration-normal) var(--helix-easing-decelerate),
+    width var(--helix-duration-normal) var(--helix-easing-decelerate),
+    x var(--helix-duration-normal) var(--helix-easing-decelerate),
+    y var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
 /* The hole in the ring, cut out of the drawing so it is one. **On the `<svg>`
    and not on `[part="line"]`, which is the whole trick.** The ring is an HTML
    element in CSS pixels and the line is in a coordinate space
