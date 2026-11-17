@@ -106,6 +106,11 @@ export default headless('tab', {
   and the field that names the prop holding a feature's state is `prop`, with
   `defaultProp` the one that seeds it, as Radix's controllable state names
   them.
+- **A long API can sit in a module beside the source.** With
+  `import { props } from './api.js'`, the key `props` reads the
+  `export const props` of `api.ts` in the same folder. That module holds
+  literals and helper calls, and names nothing. Data Table's root keeps its
+  props and events there.
 - `helix system` refuses anything else with its line and the form to write
   it in, and an older spelling with the one that replaced it.
 

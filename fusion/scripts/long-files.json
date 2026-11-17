@@ -398,7 +398,6 @@
     "helix/neutral/src/families/code-block/root/styled.ts",
     "helix/neutral/src/families/color-picker/root/headless.tsx",
     "helix/neutral/src/families/color-picker/root/styled.ts",
-    "helix/neutral/src/families/data-table/root/headless.tsx",
     "helix/neutral/src/families/data-table/root/styled.ts",
     "helix/neutral/src/families/graph/root/headless.tsx",
     "helix/neutral/src/families/graph/root/styled.ts",

@@ -143,6 +143,9 @@ impl<'a> Reader<'a, '_> {
             Expression::Identifier(name) if self.names_everywhere || self.styles => {
                 self.named(&name.name, name.span)
             }
+            Expression::Identifier(name) if self.jsx && self.folder.is_some() => {
+                self.beside(&name.name, name.span)
+            }
             Expression::Identifier(name) => Err(self.refused(name.span, "a name")),
             other => {
                 Err(self.refused(other.span(), "an expression the compiler would have to run"))

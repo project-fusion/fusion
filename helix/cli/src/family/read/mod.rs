@@ -25,8 +25,15 @@
 //! **A headless source written with `render` is `headless.tsx`**, read with
 //! JSX, and its part tree is read by [`jsx`] into the compiler's own nodes,
 //! so everything after reading sees one shape.
+//!
+//! **A headless source may name a constant a module beside it exports**, as
+//! the value of a key before `render`: `import { props } from './props.js'`
+//! reads the `export const props` of `props.ts` in the same folder in its
+//! place, so a long API splits across files. That module holds a table and
+//! nothing else, and names nothing.
 
 use std::collections::BTreeMap;
+use std::path::Path;
 
 use oxc_allocator::Allocator;
 use oxc_ast::ast::{
@@ -91,6 +98,8 @@ pub(super) struct Reader<'a, 's> {
     styles: bool,
     /// Whether the module is a `headless.tsx`, whose `render` is JSX.
     jsx: bool,
+    /// The folder a `headless.tsx` sits in, whose modules it may name.
+    folder: Option<&'s Path>,
 }
 
 /// The module's default export.
@@ -100,7 +109,7 @@ pub(super) struct Reader<'a, 's> {
 /// A sentence naming the line, when the module does not parse, has no default
 /// export, or holds anything a table may not.
 pub fn default_export(source: &str) -> Result<Lit, String> {
-    export_of(source, false)
+    export_of(source, false, None)
 }
 
 /// A `headless.tsx` module's default export, with its `render` read into
@@ -109,12 +118,25 @@ pub fn default_export(source: &str) -> Result<Lit, String> {
 /// # Errors
 ///
 /// As [`default_export`] says, and a sentence naming the line of anything
-/// in the render that is not in the JSX form's grammar.
+/// in the render that is not in the JSX form's grammar. A source read this
+/// way names no module beside it, as a test's has none.
+#[cfg(test)]
 pub fn headless_tsx(source: &str) -> Result<Lit, String> {
-    export_of(source, true)
+    export_of(source, true, None)
 }
 
-fn export_of(source: &str, jsx: bool) -> Result<Lit, String> {
+/// A `headless.tsx` module's default export, as [`headless_tsx`] reads it,
+/// with each name it imports from a module in `folder` read in place.
+///
+/// # Errors
+///
+/// As [`headless_tsx`] says, and a sentence naming the module when one it
+/// names cannot be read or does not export that constant as a table.
+pub fn headless_tsx_in(source: &str, folder: &Path) -> Result<Lit, String> {
+    export_of(source, true, Some(folder))
+}
+
+fn export_of(source: &str, jsx: bool, folder: Option<&Path>) -> Result<Lit, String> {
     let allocator = Allocator::default();
     let kind = if jsx {
         SourceType::tsx()
@@ -132,6 +154,7 @@ fn export_of(source: &str, jsx: bool) -> Result<Lit, String> {
                 return Err("the default export is a declaration, not a table".to_owned());
             };
             let mut reader = Reader {
+                folder,
                 jsx,
                 names_everywhere: false,
                 reading: Vec::new(),
@@ -237,6 +260,7 @@ pub fn machine_module(source: &str) -> Result<MachineModule, String> {
     };
     let functions = scope.functions.clone();
     let mut reader = Reader {
+        folder: None,
         jsx: false,
         names_everywhere: true,
         reading: Vec::new(),
@@ -355,6 +379,7 @@ pub(super) fn refused(span: Span, source: &str, what: &str) -> String {
     )
 }
 
+mod beside;
 mod jsx;
 mod reader;
 

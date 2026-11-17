@@ -107,7 +107,7 @@
         "helix/cli/tests/fixtures/*/src/families/**/headless.tsx",
         "helix/cli/tests/fixtures/*/src/families/**/styled.ts",
         "helix/neutral/src/families/**/headless.tsx",
-        "helix/neutral/src/families/**/styled.ts",
+        "helix/neutral/src/families/**/*.ts",
         "helix/neutral/src/fragments/**"
       ]
     },

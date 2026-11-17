@@ -79,3 +79,38 @@ fn refuses_a_name_a_machine_does_not_define() {
         "{refused}"
     );
 }
+
+#[test]
+fn reads_a_constant_a_headless_source_imports_from_a_module_beside_it() {
+    let folder = std::env::temp_dir().join(format!("helix-beside-{}", std::process::id()));
+    std::fs::create_dir_all(&folder).unwrap();
+    std::fs::write(
+        folder.join("api.ts"),
+        "import { web } from '../../../render.js'\nexport const props = { label: '', open: web(false) }\n",
+    )
+    .unwrap();
+    let render = "render: () => <View part=\"x\" />";
+    let written = |import: &str, key: &str| {
+        format!("import {{ {key} }} from '{import}'\nexport default headless('x', {{ {key}, {render} }})")
+    };
+    let split = headless_tsx_in(&written("./api.js", "props"), &folder);
+    let inline = headless_tsx(&format!(
+        "export default headless('x', {{ props: {{ label: '', open: web(false) }}, {render} }})"
+    ));
+    let elsewhere = headless_tsx_in(&written("../api.js", "props"), &folder);
+    let missing = headless_tsx_in(&written("./api.js", "events"), &folder);
+    let unread = headless_tsx(&written("./api.js", "props"));
+    std::fs::remove_dir_all(&folder).unwrap();
+    assert_eq!(split.unwrap(), inline.unwrap());
+    let elsewhere = elsewhere.unwrap_err();
+    assert!(
+        elsewhere.contains("imported from a module beside"),
+        "{elsewhere}"
+    );
+    let missing = missing.unwrap_err();
+    assert!(
+        missing.contains("exports no constant `events`"),
+        "{missing}"
+    );
+    assert!(unread.unwrap_err().contains("a name"));
+}

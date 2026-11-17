@@ -220,7 +220,7 @@ fn headless_of(folder: &Path) -> Result<Option<api::Headless>, Failure> {
                 format!("{}: {error}", rendered.display()),
             )
         })?;
-        read::headless_tsx(&text)
+        read::headless_tsx_in(&text, folder)
             .and_then(|export| {
                 if !api::rendered::is_rendered(&export) {
                     return Err("`headless.tsx` declares its parts in `render`".to_owned());
