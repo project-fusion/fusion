@@ -301,6 +301,10 @@ const STYLESHEETS = [
     path: 'helix/styles/dist/helix.css',
   },
   {
+    note: 'Moves between the pages of a site. `helix.css` leaves it out, so a site opts in.',
+    path: 'helix/styles/dist/page-transitions.css',
+  },
+  {
     note: 'The primitive layer. It is private, and it ships because `tokens.css` refers to it.',
     path: 'helix/styles/dist/primitives.css',
   },

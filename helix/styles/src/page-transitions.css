@@ -1,0 +1,91 @@
+/*
+ * **Moving between the pages of a site, as one page settling into the next.**
+ * Opt in by importing this sheet, after `helix.css`, on every page that should
+ * take part: `@fusion.dev/helix-styles/page-transitions.css`. The browser
+ * then draws the page it is leaving and the page it arrives at, and runs a
+ * view transition between them, with no script, for a link to a page on the
+ * same origin.
+ *
+ * **A sheet of its own, and not part of `helix.css`**, because the rule that
+ * turns it on cannot be scoped: `@view-transition` speaks for the whole
+ * document, so in `helix.css` it would have moved every page of every site
+ * that uses Helix, whether the site wanted it or not.
+ *
+ * **Not under reduced motion**, which never turns it on: a reader who asked
+ * for less movement gets the new page at once, as without this sheet.
+ *
+ * The default is a fade. `data-page-transition="slide"` on the document
+ * element of the page being arrived at slides the new page in from the inline
+ * end and the old one out to the inline start, and `slide-back` the other way,
+ * for a step back. `changePage` in `@fusion.dev/helix-core` sets either for a
+ * page a client-side router changes in place. Elements a site keeps on every
+ * page, such as its header, can stay still while the rest moves: give each a
+ * `view-transition-name` of its own, once per page.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+/* Not while the color mode is changing, which draws its own transition on the
+   same pictures. */
+:root:not([data-helix-color-transition])::view-transition-old(root),
+:root:not([data-helix-color-transition])::view-transition-new(root) {
+  animation-duration: var(--helix-duration-slow);
+  animation-timing-function: var(--helix-easing-standard);
+}
+
+/* A step back travels the other way, and so does a step forward on a
+   right-to-left page, where the inline end is the left. */
+:root:is([data-page-transition="slide"]:dir(ltr), [data-page-transition="slide-back"]:dir(rtl)):not(
+  [data-helix-color-transition]
+)::view-transition-old(root) {
+  animation: helix-page-out var(--helix-duration-slow) var(--helix-easing-accelerate) both;
+}
+
+:root:is([data-page-transition="slide"]:dir(ltr), [data-page-transition="slide-back"]:dir(rtl)):not(
+  [data-helix-color-transition]
+)::view-transition-new(root) {
+  animation: helix-page-in var(--helix-duration-slow) var(--helix-easing-decelerate) both;
+}
+
+:root:is([data-page-transition="slide"]:dir(rtl), [data-page-transition="slide-back"]:dir(ltr)):not(
+  [data-helix-color-transition]
+)::view-transition-old(root) {
+  animation: helix-page-out-back var(--helix-duration-slow) var(--helix-easing-accelerate) both;
+}
+
+:root:is([data-page-transition="slide"]:dir(rtl), [data-page-transition="slide-back"]:dir(ltr)):not(
+  [data-helix-color-transition]
+)::view-transition-new(root) {
+  animation: helix-page-in-back var(--helix-duration-slow) var(--helix-easing-decelerate) both;
+}
+
+@keyframes helix-page-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--helix-space-xl) * -1) 0;
+  }
+}
+
+@keyframes helix-page-in {
+  from {
+    opacity: 0;
+    translate: var(--helix-space-xl) 0;
+  }
+}
+
+@keyframes helix-page-out-back {
+  to {
+    opacity: 0;
+    translate: var(--helix-space-xl) 0;
+  }
+}
+
+@keyframes helix-page-in-back {
+  from {
+    opacity: 0;
+    translate: calc(var(--helix-space-xl) * -1) 0;
+  }
+}

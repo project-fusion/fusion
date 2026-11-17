@@ -587,6 +587,12 @@ export {
   pauseMotion,
   reducedMotion,
 } from './utils/page-motion/page-motion.js'
+export {
+  changePage,
+  PAGE_TRANSITION_ATTRIBUTE,
+  type PageChangeOptions,
+  type PageTransition,
+} from './utils/page-transition/page-transition.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
