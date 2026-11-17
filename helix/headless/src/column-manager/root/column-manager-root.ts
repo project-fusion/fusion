@@ -1,9 +1,16 @@
-import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatWords,
+  type HelixBeforeCheckEvent,
+  HelixElement,
+  words,
+} from '@fusion.dev/helix-core'
 import { dotsSixVertical, pushPin, pushPinSlash } from '@fusion.dev/helix-icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { nothing, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html } from 'lit/static-html.js'
 import {
   columnName,
   TableBinding,
@@ -11,6 +18,7 @@ import {
   type ToolTable,
 } from '../../data-table/binding.js'
 import type { ViewColumns } from '../../data-table/view.js'
+import '../../checkbox/index.js'
 
 /** The next end a pin button moves a column to: none, the start, the end, then none again. */
 const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined =>
@@ -61,7 +69,17 @@ const nextPin = (now: 'end' | 'start' | undefined): 'end' | 'start' | undefined 
  * @aliases Column picker, Column chooser
  * @documentation https://fusion.dev/helix/components/column-manager
  *
- * @csspart checkbox - The checkbox that shows or hides a column.
+ * @csspart checkbox - The `Checkbox` that shows or hides a column.
+ * @csspart checkbox-box - The box drawn for a row's checkbox.
+ * @csspart checkbox-control - The native input inside a row's checkbox.
+ * @csspart checkbox-feedback - Forwarded from the checkbox. Not shown, since a column's box is never wrong.
+ * @csspart checkbox-field - The row inside a checkbox that holds its box and the column's name.
+ * @csspart checkbox-hint - Forwarded from the checkbox. Not shown, since a column's box has no help.
+ * @csspart checkbox-label - The label beside a row's box, which holds `name`.
+ * @csspart checkbox-mark - The check mark on a row's box.
+ * @csspart checkbox-mark-checked - Added to `checkbox-mark` while the column shows.
+ * @csspart checkbox-mark-dash - Forwarded from the checkbox. Not shown, since a column is shown or hidden.
+ * @csspart checkbox-mark-indeterminate - Forwarded from the checkbox. Not shown, since a column is shown or hidden.
  * @csspart grip - The button that moves a column.
  * @csspart grip-mark - The icon on the grip.
  * @csspart header - The row above the list that holds the title and the reset button.
@@ -311,6 +329,7 @@ export class HelixHeadlessColumnManager extends HelixElement {
     const note = pin ? this.pinnedLabel : dropped ? this.droppedLabel : ''
     const pinName = pin === 'start' ? 'pinEndLabel' : pin === 'end' ? 'unpinLabel' : 'pinStartLabel'
     const icon = pin === 'end' ? pushPinSlash : pushPin
+    const checkbox = this.tag('checkbox')
     return html`<li
       part="item${this.dragging === field ? ' item-dragging' : ''}${shown ? '' : ' item-hidden'}"
       data-field=${field}
@@ -323,14 +342,20 @@ export class HelixHeadlessColumnManager extends HelixElement {
     >
       <button part="grip" type="button" aria-label=${formatWords(this, 'moveLabel', { name })}
         ><svg aria-hidden="true" fill="currentColor" part="grip-mark" viewBox=${dotsSixVertical.viewBox}>${unsafeSVG(dotsSixVertical.content)}</svg></button
-      ><label part="name"
-        ><input
-          part="checkbox"
-          type="checkbox"
-          .checked=${shown}
-          ?disabled=${shown && onlyShown}
-          @change=${(event: Event) => this.toggleColumn(field, (event.target as HTMLInputElement).checked)}
-        />${name}</label
+      ><${checkbox}
+        part="checkbox"
+        exportparts="box: checkbox-box, control: checkbox-control, feedback: checkbox-feedback,
+          field: checkbox-field, hint: checkbox-hint, label: checkbox-label, mark: checkbox-mark,
+          mark-checked: checkbox-mark-checked, mark-dash: checkbox-mark-dash,
+          mark-indeterminate: checkbox-mark-indeterminate"
+        .checked=${shown}
+        ?disabled=${shown && onlyShown}
+        @helix-before-check=${(event: HelixBeforeCheckEvent) => {
+          // The table's view decides, and the box follows it on the next render.
+          event.preventDefault()
+          this.toggleColumn(field, event.detail.checked)
+        }}
+        ><span part="name">${name}</span></${checkbox}
       >${note ? html`<span part="note">${note}</span>` : nothing}<button
         part="pin${pin ? ' pin-pinned' : ''}"
         type="button"

@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMarkdown } from '@fusion.dev/helix-headless/markdown'
 import type { CSSResultGroup } from 'lit'
 import '../../callout/index.js'
+import '../../checkbox/index.js'
 import '../../code-block/index.js'
 import { styles } from './markdown-root.css.js'
 

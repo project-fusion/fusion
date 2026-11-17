@@ -4,6 +4,7 @@ import type { CSSResultGroup, TemplateResult } from 'lit'
 import { html } from 'lit/static-html.js'
 import { styles } from './view-panel-root.css.js'
 import '../../button/index.js'
+import '../../radio/index.js'
 
 /**
  * @summary A panel that changes a Data Table's whole view on a phone: its presets, filters, sort, columns, and export.

@@ -88,23 +88,31 @@
   color: var(--column-manager-pinned-color, var(--helix-color-primary));
 }
 
-[part="name"] {
+/* The row's `Checkbox`, holding the box and the column's name, so the box is
+   the one every other checkbox in the library draws. */
+[part="checkbox"] {
+  /* A step under the density's, as a table's row boxes are. */
+  --checkbox-size: var(--helix-size-checkbox-tight);
+
+  min-inline-size: 0;
+}
+
+/* The box sits on the row's middle, where the grip and the pin are. On a touch
+   screen the checkbox's own row grows to the target and would keep the box at
+   its top, as `Data Table` measured for its own. */
+[part="checkbox"]::part(field) {
   align-items: center;
-  cursor: pointer;
-  display: flex;
-  gap: var(--helix-space-sm);
+}
+
+/* The words are the panel's, at a control's size, and not the checkbox
+   label's. */
+[part="name"] {
+  font-size: var(--helix-text-control);
   min-inline-size: 0;
 }
 
 [part~="item-hidden"] [part="name"] {
   color: var(--helix-color-foreground-muted);
-}
-
-[part="checkbox"] {
-  accent-color: var(--helix-color-primary);
-  block-size: var(--helix-size-checkbox-tight);
-  inline-size: var(--helix-size-checkbox-tight);
-  margin: 0;
 }
 
 [part="note"] {

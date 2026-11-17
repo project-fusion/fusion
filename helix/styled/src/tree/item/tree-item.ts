@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTreeItem } from '@fusion.dev/helix-headless/tree'
 import type { CSSResultGroup } from 'lit'
+import { styles as checkStyles } from '../../shared/check/check.css.js'
 import { styles } from './tree-item.css.js'
 
 /**
@@ -66,7 +67,7 @@ import { styles } from './tree-item.css.js'
  */
 @customElement('helix-tree-item')
 export class HelixTreeItem extends HelixHeadlessTreeItem {
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [checkStyles, styles]
 }
 
 declare global {

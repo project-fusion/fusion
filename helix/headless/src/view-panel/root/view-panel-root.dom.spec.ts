@@ -100,7 +100,7 @@ describe('a view panel', () => {
     const { panel, table } = await page()
     panel.shadowRoot?.querySelector<HTMLElement>('[part="section"]')?.click()
     await settle(panel, table)
-    const labels = [...(panel.shadowRoot?.querySelectorAll('[part="choice"]') ?? [])].map((one) =>
+    const labels = [...(panel.shadowRoot?.querySelectorAll('[part~="choice"]') ?? [])].map((one) =>
       one.textContent?.trim(),
     )
     expect(labels).toEqual([
@@ -110,7 +110,7 @@ describe('a view panel', () => {
       'Due, ascending',
       'Due, descending',
     ])
-    panel.shadowRoot?.querySelector<HTMLInputElement>('input[value="customer:desc"]')?.click()
+    panel.shadowRoot?.querySelector<HTMLElement>('[part~="choice"][value="customer:desc"]')?.click()
     await settle(panel, table)
     expect(table.view.sort).toBe('customer:desc')
   })

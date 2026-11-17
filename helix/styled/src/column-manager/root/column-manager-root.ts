@@ -3,6 +3,7 @@ import { HelixHeadlessColumnManager } from '@fusion.dev/helix-headless/column-ma
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './column-manager-root.css.js'
+import '../../checkbox/index.js'
 
 /**
  * @summary A list of a Data Table's columns, to show, hide, reorder, and pin them.
@@ -25,6 +26,9 @@ import { styles } from './column-manager-root.css.js'
  */
 @customElement('helix-column-manager')
 export class HelixColumnManager extends HelixHeadlessColumnManager {
+  /** Composes the styled `Checkbox`, as the styled tier's families do. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [liveStyles, styles]
 }
 

@@ -1,6 +1,8 @@
 /* Stacked the same way and for the same reason as the input. */
 :host {
   --_checkbox-size: var(--checkbox-size, var(--helix-size-checkbox));
+  /* What `shared/check/check.css` sizes the corner by. */
+  --_check-size: var(--_checkbox-size);
   /* What `field-inline.css` indents the hint by, so it starts under the words
      rather than under the box. */
   --_field-control-inline-size: var(--_checkbox-size);
@@ -64,11 +66,8 @@
      around the box in a card in dark mode, so it read as a filled square. */
   border: var(--helix-border-thin) solid
     var(--checkbox-border-color, var(--helix-color-foreground-subtle));
-  /* **Never past a quarter of the box**, so a box stays a box whatever the
-     theme's corners: at `--helix-seed-radii: 1rem` the 16 pixel box took an 8
-     pixel corner and was a circle, a Radio. A quarter is the 4 the shipped
-     corner already draws on the 16 pixel box. */
-  border-radius: min(var(--helix-radii-sm), calc(var(--_checkbox-size) / 4));
+  /* Never past a quarter of the box: `shared/check/check.css` says why. */
+  border-radius: var(--_check-radius);
   cursor: inherit;
   inline-size: var(--_checkbox-size);
   margin: var(--helix-space-none);
@@ -133,7 +132,7 @@
      scale 1, background white. Holding it with a delayed `mask-image` transition
      was tried and does nothing, discrete property or not: Chrome 148 swaps it
      regardless. The dash is held the other way, below. */
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5 10.2 16.7 18 8.4'/%3E%3C/svg%3E");
+  mask-image: var(--_check-tick);
   mask-position: center;
   mask-repeat: no-repeat;
   mask-size: 100%;
@@ -157,7 +156,7 @@
    mixed set flashed a tick. The element keeps `mark-dash` until the box is
    checked. */
 [part~="mark-dash"] {
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E");
+  mask-image: var(--_check-dash);
 }
 
 /* A slotted icon is the mark for its shape, so the mask and the fill go and the

@@ -261,7 +261,11 @@ describe('markdown streamed one character at a time', () => {
     const { markdownToHtml } = await import('../tree.js')
     expect(element.innerHTML).toBe(
       markdownToHtml(REPLY, {
-        tags: { callout: 'helix-headless-callout', codeBlock: 'helix-headless-code-block' },
+        tags: {
+          callout: 'helix-headless-callout',
+          checkbox: 'helix-headless-checkbox',
+          codeBlock: 'helix-headless-code-block',
+        },
       }),
     )
   })

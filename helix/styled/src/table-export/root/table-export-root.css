@@ -25,16 +25,20 @@ fieldset {
   padding: 0;
 }
 
-[part~="choice"] {
+/* The rows are a `Radio Group`, so the radios are the ones every other set in
+   the library draws. Its name is set as the other groups' legends are. */
+[part="rows"]::part(label) {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  margin-block-end: var(--helix-space-2xs);
+}
+
+[part="options"] [part~="choice"] {
   align-items: center;
   cursor: pointer;
   display: flex;
   gap: var(--helix-space-sm);
-}
-
-[part="choice-input"] {
-  accent-color: var(--helix-color-primary);
-  margin: 0;
 }
 
 /* The columns, the values, and the format are segmented: the inputs stay in
@@ -85,7 +89,7 @@ fieldset {
   color: var(--helix-color-foreground);
 }
 
-[part~="choice"]:has(:focus-visible) {
+[part="options"] [part~="choice"]:has(:focus-visible) {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
