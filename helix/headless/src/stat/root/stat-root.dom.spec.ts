@@ -256,3 +256,53 @@ describe('a stat with a label', () => {
     expect(names).toEqual(['label', '', 'unit', 'trend'])
   })
 })
+
+describe('a new value', () => {
+  /** A count the test moves by hand: each figure is the one for the progress set here. */
+  const clocked = (stat: HTMLElement) => {
+    const clock = { canceled: false, finished: false, progress: 0 }
+    stat.animate = (() =>
+      ({
+        cancel: () => {
+          clock.canceled = true
+        },
+        effect: { getComputedTiming: () => ({ progress: clock.finished ? null : clock.progress }) },
+        get playState() {
+          return clock.finished ? 'finished' : 'running'
+        },
+      }) as unknown as Animation) as HTMLElement['animate']
+    return clock
+  }
+  const frame = () => new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+
+  test('counts to the new number, and a screen reader reads only the new number', async () => {
+    const stat = (await mount(
+      '<helix-headless-stat value="100" style="--stat-count-duration: 320ms"></helix-headless-stat>',
+    )) as HTMLElement & Updatable & { value: number }
+    const clock = clocked(stat)
+    stat.value = 200
+    await stat.updateComplete
+    clock.progress = 0.5
+    await frame()
+    await stat.updateComplete
+    expect(part(stat, 'value')?.textContent).toBe('150')
+    expect(part(stat, 'value')?.getAttribute('aria-hidden')).toBe('true')
+    expect(stat.shadowRoot?.querySelector('[data-spoken]')?.textContent).toBe('200')
+    clock.finished = true
+    await frame()
+    await stat.updateComplete
+    expect(part(stat, 'value')?.textContent).toBe('200')
+    expect(part(stat, 'value')?.hasAttribute('aria-hidden')).toBe(false)
+    expect(stat.shadowRoot?.querySelector('[data-spoken]')).toBeNull()
+  })
+
+  test('changes at once where no stylesheet sets the duration, as on the headless tier', async () => {
+    const stat = (await mount(
+      '<helix-headless-stat value="100"></helix-headless-stat>',
+    )) as HTMLElement & Updatable & { value: number }
+    clocked(stat)
+    stat.value = 200
+    await stat.updateComplete
+    expect(part(stat, 'value')?.textContent).toBe('200')
+  })
+})

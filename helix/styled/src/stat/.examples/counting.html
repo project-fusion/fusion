@@ -1,0 +1,30 @@
+<!-- @summary Figures that count to their new values when the page refreshes them. -->
+<helix-stat-group divided>
+  <helix-stat
+    id="readers"
+    value="12480"
+  >
+    <span slot="label">Monthly readers</span>
+  </helix-stat>
+  <helix-stat
+    format-options='{"maximumFractionDigits":1}'
+    id="uptime"
+    value="98.2"
+  >
+    <span slot="label">Uptime</span>
+    <span slot="unit">%</span>
+  </helix-stat>
+</helix-stat-group>
+
+<helix-button id="refresh">Refresh</helix-button>
+
+<script type="module">
+  const readers = document.getElementById('readers')
+  const uptime = document.getElementById('uptime')
+
+  // Set a new value and the figure counts to it from the one before.
+  document.getElementById('refresh').addEventListener('click', () => {
+    readers.value = Math.round(readers.value * (0.85 + Math.random() * 0.3))
+    uptime.value = Math.round((95 + Math.random() * 5) * 10) / 10
+  })
+</script>
