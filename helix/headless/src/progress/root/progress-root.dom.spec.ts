@@ -45,6 +45,28 @@ describe('the value shown', () => {
   })
 })
 
+describe('a new value', () => {
+  test('counts the number shown at the pace of the fill, while the bar reports the new reading', async () => {
+    const bar = (await progress()) as Progress & { showValue: boolean }
+    bar.showValue = true
+    bar.style.setProperty('--progress-count-duration', '320ms')
+    await bar.updateComplete
+    const clock = { progress: 0.5 }
+    bar.animate = (() =>
+      ({
+        cancel: () => {},
+        effect: { getComputedTiming: () => ({ progress: clock.progress }) },
+        playState: 'running',
+      }) as unknown as Animation) as HTMLElement['animate']
+    bar.value = 82
+    await bar.updateComplete
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)))
+    await bar.updateComplete
+    expect(part(bar, 'value')?.textContent?.trim()).toBe('72%')
+    expect(internalsOf(bar).ariaValueNow).toBe('82')
+  })
+})
+
 /* React Aria's ProgressBar takes Intl `formatOptions`; a percentage was the
    only thing this could write. */
 describe('format-options', () => {

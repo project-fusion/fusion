@@ -1,4 +1,5 @@
 import {
+  CountController,
   customElement,
   drawStatus,
   HelixCompleteEvent,
@@ -66,6 +67,8 @@ import { property } from 'lit/decorators.js'
  * @csspart track - The full length the work is measured against.
  * @csspart value - The value shown beside the bar when `show-value` is set.
  *
+ * @cssproperty --progress-count-duration - How long the number shown under `show-value` takes to count to a new value. Unset, it changes at once.
+ * @cssproperty --progress-count-easing - The curve the number shown counts along.
  * @cssproperty --progress-fraction - The value as a fraction of the range, 0 to 1. Pinned to 1 while indeterminate.
  *
  * @cssstate complete - The value is at `max` and the bar is not indeterminate.
@@ -246,8 +249,34 @@ export class HelixHeadlessProgress extends HelixElement {
     return Math.min(Math.max((this.value - min) / (max - min), 0), 1) || 0
   }
 
+  /**
+   * Counting the number shown under `show-value` from the one before, so it
+   * keeps pace with the fill. Only the shown number counts: the host's
+   * `aria-valuenow` and `aria-valuetext` hold the new reading throughout.
+   */
+  protected readonly count = new CountController(this, {
+    timing: () => {
+      const style = getComputedStyle(this)
+      return {
+        duration: style.getPropertyValue('--progress-count-duration'),
+        easing: style.getPropertyValue('--progress-count-easing'),
+      }
+    },
+  })
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
+    const was = changed.get('value') as number | undefined
+    if (
+      changed.has('value') &&
+      this.hasUpdated &&
+      was !== undefined &&
+      this.showValue &&
+      !this.valueText &&
+      !this.indeterminate
+    ) {
+      this.count.start(was, this.value)
+    }
     hostAria(internalsOf(this), {
       label: slottedWords(this, ['label']) || this.label || this.fallbackLabel,
       role: 'progressbar',
@@ -315,6 +344,22 @@ export class HelixHeadlessProgress extends HelixElement {
     )
   }
 
+  /** The number shown under `show-value`: the count while one runs, and the reading at rest. */
+  private get shownText(): string {
+    const counting = this.count.counting
+    if (counting === undefined) {
+      return this.text
+    }
+    const { max, min } = this.range
+    const held = Math.min(Math.max(counting, min), max)
+    return readingText(
+      held,
+      Math.min(Math.max((held - min) / (max - min), 0), 1) || 0,
+      wordsLocale(this),
+      this.formatOptions,
+    )
+  }
+
   /** A label's words changed, so the name is written again. */
   private readonly renamed = (): void => {
     this.requestUpdate()
@@ -371,7 +416,7 @@ export class HelixHeadlessProgress extends HelixElement {
            fact. It is here to be looked at, not to be read out. */
         this.showValue && !this.indeterminate
           ? html`<span part="value" aria-hidden="true"
-              >${this.text}</span
+              >${this.shownText}</span
             >`
           : ''
       }${drawStatus(this.status)}`

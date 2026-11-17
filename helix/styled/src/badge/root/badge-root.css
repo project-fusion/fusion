@@ -1,4 +1,6 @@
 :host {
+  --badge-bump-duration: var(--helix-duration-normal);
+
   /* Tokens, like every other component's sizing, and never `em`. The mark does
      not scale with what it decorates: the badge inherits `font-size` from the
      page and an avatar sizes itself from `size`, so an em-sized mark measures
