@@ -27,6 +27,7 @@ import type { Family } from '../style/form'
 import { kebab, numberIn, wordsIn } from './date-picker-read'
 import { useFileTabs, useFollowed, useRequest } from './file-tabs'
 import { boundTo, given } from './props'
+import { usePutBack } from './select'
 
 type Read = (name: string) => unknown
 
@@ -192,16 +193,15 @@ const useConsole = (family: Family, props: Props, use: MachineUse, read: Read): 
   const [kept, setKept] = useState<Kept>(NONE)
   const [level, setLevel] = useFollowed(levelIn(read('level')))
   const request = useRequest(family, props, use)
-  const onBeforeChange = (event: {
-    readonly detail?: { readonly value?: string }
-    preventDefault?: () => void
-  }) => {
-    /* The Select holds what this element says, and closes only on a level taken. */
+  const shown = level ?? 'log'
+  const putBack = usePutBack(shown)
+  const onBeforeChange = (event: { readonly detail?: { readonly value?: string } }) => {
+    /* The Select takes each pick and closes, as the web's native `<select>`
+       does, and is put back on the level in force where a handler refuses it. */
+    putBack.asked()
     const next = event.detail?.value ?? 'log'
-    if (next !== (level ?? 'log') && request('onBeforeChange', 'onChange', { value: next })) {
+    if (next !== shown && request('onBeforeChange', 'onChange', { value: next })) {
       setLevel(levelIn(next))
-    } else {
-      event.preventDefault?.()
     }
   }
   useImperativeHandle(
@@ -234,7 +234,8 @@ const useConsole = (family: Family, props: Props, use: MachineUse, read: Read): 
           ariaLabel: wordsIn(read('level-label')),
           items: levelOptions(read),
           onBeforeChange,
-          value: level ?? 'log',
+          ref: putBack.ref,
+          value: shown,
         },
       },
       output: { view: { level, lines: kept.lines } },

@@ -154,7 +154,7 @@ describe('the generated Sandbox Console', () => {
     expect(screen.getByLabelText(/^Levels shown/)).toBeTruthy()
   })
 
-  test('a level chosen in the filter asks first, and a refusal keeps the level', async () => {
+  test('a level chosen in the filter asks first, and a refusal closes the list on the level held', async () => {
     const ref = createRef<SandboxConsoleHandle>()
     const asked = jest.fn((event: { preventDefault: () => void }) => event.preventDefault())
     const changed = jest.fn()
@@ -169,13 +169,18 @@ describe('the generated Sandbox Console', () => {
     )
     await act(async () => ref.current?.write({ level: 'log', text: 'Plain' }))
     await act(async () => ref.current?.write({ level: 'error', text: 'Broke' }))
-    await act(async () => fireEvent.press(screen.getByText('All levels')))
-    const choose = () => act(async () => fireEvent.press(screen.getByText('Only errors')))
+    const choose = async () => {
+      await act(async () => fireEvent.press(screen.getByText('All levels')))
+      await act(async () => fireEvent.press(screen.getByText('Only errors')))
+    }
     await choose()
     expect(asked).toHaveBeenCalledTimes(1)
     expect(asked.mock.calls[0]?.[0]).toMatchObject({ detail: { value: 'error' } })
     expect(changed).not.toHaveBeenCalled()
     expect(screen.getByText('Plain')).toBeTruthy()
+    expect(screen.queryByText('Only errors')).toBeNull()
+    expect(screen.queryByText('Info and above')).toBeNull()
+    expect(screen.getByText('All levels')).toBeTruthy()
     asked.mockImplementation(() => undefined)
     await choose()
     expect(changed).toHaveBeenCalledTimes(1)
