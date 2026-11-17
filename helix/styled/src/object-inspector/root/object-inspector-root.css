@@ -161,16 +161,18 @@
   color: var(--helix-color-foreground-muted);
   inline-size: var(--_object-inspector-toggle);
   margin-inline-end: var(--helix-space-2xs);
+  /* **The caret turns as its row opens and shuts**, as a tree's chevron does. */
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
   vertical-align: -0.125em;
 }
 
 /* **The tree runs left to right on any page, so a shut caret points right on
-   any page.** The mirror every family's drawings take follows the page, and on
-   a right-to-left page it turned the caret to point left, away from the row it
-   opens, at the left edge of a left-to-right tree. The keys follow the tree as
-   well: the right arrow opens. */
-:host(:dir(rtl)) [part="toggle"][data-mirror] {
-  scale: none;
+   any page.** The turn a shut caret takes follows the page, and on a
+   right-to-left page it pointed the caret left, away from the row it opens, at
+   the left edge of a left-to-right tree. The keys follow the tree as well: the
+   right arrow opens. */
+:host(:dir(rtl)) [part="toggle"][data-shut] {
+  rotate: -90deg;
 }
 
 /* Each type in its own ink, from the syntax set the code blocks use, so a

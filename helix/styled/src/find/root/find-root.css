@@ -49,6 +49,13 @@
   display: none;
 }
 
+/* **The replace toggle's caret turns as the replace row opens and shuts.** A
+   box of its own, since an inline box takes no turn. */
+[part="replace-toggle-mark"] {
+  display: inline-flex;
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
 /* **The bar settles in from the edge it sits on as it opens**, and leaves the
    way it came, on the curves things arriving and leaving take. `display` is
    carried through the leaving, so the bar is drawn until it has gone. */

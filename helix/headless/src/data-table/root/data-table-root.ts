@@ -37,7 +37,6 @@ import {
   inRowOrder,
   internalsOf,
   LayoutMotionController,
-  MIRROR_RULE,
   MixinCollection,
   markMatches,
   markRegion,
@@ -54,6 +53,7 @@ import {
   requestChange,
   requestReorder,
   SCROLLER_RULE,
+  SHUT_RULE,
   scrollingAncestor,
   scrollRoom,
   selectsAll,
@@ -70,7 +70,7 @@ import {
   wordsLocale,
   writtenList,
 } from '@fusion.dev/helix-core'
-import { caretDown, caretRight, dotsSixVertical } from '@fusion.dev/helix-icons'
+import { caretDown, dotsSixVertical } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
@@ -546,7 +546,7 @@ const isControl = (element: HTMLElement): boolean =>
  */
 @customElement('helix-headless-data-table')
 export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
-  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, MIRROR_RULE]
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, SHUT_RULE]
 
   /**
    * Nothing is assigned by name, so the columns can be put in a header row.
@@ -4102,12 +4102,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * the header that names the row.
    */
   private renderToggle(row: DataRow, open: boolean): TemplateResult {
-    const glyph = open ? caretDown : caretRight
     return html`<span
       part="toggle${open ? ' toggle-open' : ''}"
       aria-hidden="true"
       @click=${() => this.toggleOpen(row, !open)}
-    ><svg part="toggle-mark" ?data-mirror=${!open} fill="currentColor" viewBox=${glyph.viewBox}>${unsafeSVG(glyph.content)}</svg></span>`
+    ><svg part="toggle-mark" ?data-shut=${!open} fill="currentColor" viewBox=${caretDown.viewBox}>${unsafeSVG(caretDown.content)}</svg></span>`
   }
 
   /**

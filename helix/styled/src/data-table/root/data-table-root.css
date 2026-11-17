@@ -667,6 +667,8 @@ slot[name="error"]::slotted(*) {
 [part="toggle-mark"] {
   block-size: 100%;
   inline-size: 100%;
+  /* **The caret turns as its row opens and shuts**, as a tree's chevron does. */
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
 /* The row that asks for more rows: one cell across every column, with its
