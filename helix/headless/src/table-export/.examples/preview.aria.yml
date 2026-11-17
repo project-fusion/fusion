@@ -27,19 +27,19 @@
       - text: Select INV-2041
     - rowheader "INV-2041"
     - gridcell "Acme Corporation"
-    - gridcell "12400"
+    - gridcell "$12,400.00"
   - row "INV-2047":
     - gridcell "Select INV-2047":
       - checkbox "Select INV-2047"
       - text: Select INV-2047
     - rowheader "INV-2047"
     - gridcell "Acme Logistics"
-    - gridcell "8250"
+    - gridcell "$8,250.00"
   - row "INV-2052":
     - gridcell "Select INV-2052":
       - checkbox "Select INV-2052"
       - text: Select INV-2052
     - rowheader "INV-2052"
     - gridcell "Acme Robotics"
-    - gridcell "6980"
+    - gridcell "$6,980.00"
 - status
