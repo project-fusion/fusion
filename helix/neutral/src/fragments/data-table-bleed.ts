@@ -1,4 +1,4 @@
-import { difference, first, measured, product, sum, token, web } from '../style.js'
+import { difference, first, measured, product, quotient, sum, token, web } from '../style.js'
 import { fragment } from '../table.js'
 
 /**
@@ -82,6 +82,147 @@ export default fragment(
         }),
       ]),
     ]),
+    /* **A leading checkbox or grip on the words' column**, rather than a step
+       in from it. The step was the room between the table's edge and its
+       first box, which the bleed now gives, and the box sat centered in its
+       track: start aligned with no start padding, it stands where the text of
+       a table with no such column would. The track keeps its width, so nothing
+       after it moves. */
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed]) :where([part~="row"], [part="head"]) > :is([part~="select"], [part="select-all"], [part="row-grip"], [part="grip-head"]):first-child',
+      },
+      [web([rule({ justifyContent: 'flex-start', paddingInlineStart: token('space-none') })])],
+    ),
+    /* **Chosen rows next to each other are one block**, as a run of chosen
+       rows in a list is one selection: no rule across it and no corners
+       inside it, only at its first row's top and its last row's bottom. */
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed]) [part~="row"][aria-selected="true"]:has(+ [part~="row"][aria-selected="true"]) > *',
+      },
+      [web([rule({ borderBlockEndColor: 'transparent' })])],
+    ),
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed]) [part~="row"][aria-selected="true"]:has(+ [part~="row"][aria-selected="true"]) > :first-child::before, :host([bleed]) [part~="row"][aria-selected="true"]:has(+ [part~="row"][aria-selected="true"]) > :last-child::after',
+      },
+      [
+        web([
+          rule({
+            borderEndEndRadius: token('radii-none'),
+            borderEndStartRadius: token('radii-none'),
+          }),
+        ]),
+      ],
+    ),
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed]) [part~="row"][aria-selected="true"] + [part~="row"][aria-selected="true"] > :first-child::before, :host([bleed]) [part~="row"][aria-selected="true"] + [part~="row"][aria-selected="true"] > :last-child::after',
+      },
+      [
+        web([
+          rule({
+            borderStartEndRadius: token('radii-none'),
+            borderStartStartRadius: token('radii-none'),
+          }),
+        ]),
+      ],
+    ),
+    /* **`bleed="inset"`: the fill kept off the rules**, rounded at both ends,
+       as a menu draws its highlight, for a table set inside a card or a panel
+       of its own. The reach past the words is the bleed's; the gap above and
+       below it is half the bleed, so a fill never touches the line it sits
+       between.
+
+       A row has no box of its own, so each cell draws its share. The cell
+       keeps the background-color every state above gives it and clips it to
+       its own glyphs, where the words cover it, so it paints nothing; a
+       pseudo-element inherits that color and draws it inset. Hover, selection
+       and dragging need no rules of their own here. */
+    on({ part: 'row', selector: ':host([bleed="inset"]) [part~="row"] > *' }, [
+      web([rule({ backgroundClip: 'text', isolation: 'isolate', position: 'relative' })]),
+    ]),
+    on({ part: 'row', selector: ':host([bleed="inset"]) [part~="row"] > *::before' }, [
+      web([
+        rule({
+          backgroundColor: 'inherit',
+          borderRadius: token('radii-none'),
+          content: '""',
+          insetBlock: quotient(own.dataTableBleed, 2),
+          insetInline: token('space-none'),
+          pointerEvents: 'none',
+          position: 'absolute',
+          zIndex: token('layer-beneath'),
+        }),
+      ]),
+    ]),
+    on({ part: 'row', selector: ':host([bleed="inset"]) [part~="row"] > :first-child::before' }, [
+      web([
+        rule({
+          insetBlock: quotient(own.dataTableBleed, 2),
+          borderEndStartRadius: token('radii-sm'),
+          borderStartStartRadius: token('radii-sm'),
+          inlineSize: 'auto',
+          insetInlineStart: product(own.dataTableBleed, '-1'),
+        }),
+      ]),
+    ]),
+    on({ part: 'row', selector: ':host([bleed="inset"]) [part~="row"] > :last-child::before' }, [
+      web([
+        rule({
+          insetBlock: quotient(own.dataTableBleed, 2),
+          borderEndEndRadius: token('radii-sm'),
+          borderStartEndRadius: token('radii-sm'),
+          insetInlineEnd: product(own.dataTableBleed, '-1'),
+        }),
+      ]),
+    ]),
+    on({ part: 'row', selector: ':host([bleed="inset"]) [part~="row"] > :last-child::after' }, [
+      web([rule({ content: 'none' })]),
+    ]),
+    /* A run of chosen rows in the inset form is one block too: the gap
+       between two of them closes, over the rule that no longer draws. */
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed="inset"]) [part~="row"][aria-selected="true"]:has(+ [part~="row"][aria-selected="true"]) > *::before',
+      },
+      [
+        web([
+          rule({
+            borderEndEndRadius: token('radii-none'),
+            borderEndStartRadius: token('radii-none'),
+            insetBlockEnd: product(token('border-thin'), '-1'),
+          }),
+        ]),
+      ],
+    ),
+    on(
+      {
+        part: 'row',
+        selector:
+          ':host([bleed="inset"]) [part~="row"][aria-selected="true"] + [part~="row"][aria-selected="true"] > *::before',
+      },
+      [
+        web([
+          rule({
+            borderStartEndRadius: token('radii-none'),
+            borderStartStartRadius: token('radii-none'),
+            insetBlockStart: token('space-none'),
+          }),
+        ]),
+      ],
+    ),
     /* Written out: a row header holds two names, and steps in by its depth. */
     on({ part: 'cell', selector: ':host([child-field]) [part~="cell-header"]' }, [
       web([

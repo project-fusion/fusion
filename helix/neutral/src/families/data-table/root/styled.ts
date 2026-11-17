@@ -1,6 +1,7 @@
 import dataTableBleed from '../../../fragments/data-table-bleed.js'
 import dataTableEditing from '../../../fragments/data-table-editing.js'
 import dataTableRows from '../../../fragments/data-table-rows.js'
+import { oneOf } from '../../../render.js'
 import {
   difference,
   first,
@@ -81,7 +82,7 @@ export default styles(
       tableHeadingRuleColor: null,
       tableHeadingText: null,
     },
-    props: { bleed: false },
+    props: { bleed: oneOf([true, 'inset'], false) },
     stylesheet: 'data-table/root/data-table-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => {
