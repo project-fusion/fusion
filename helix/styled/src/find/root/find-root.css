@@ -49,6 +49,32 @@
   display: none;
 }
 
+/* **The bar settles in from the edge it sits on as it opens**, and leaves the
+   way it came, on the curves things arriving and leaving take. `display` is
+   carried through the leaving, so the bar is drawn until it has gone. */
+[part="bar"] {
+  transition:
+    display var(--helix-duration-fast) allow-discrete,
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate),
+    translate var(--helix-duration-fast) var(--helix-easing-decelerate);
+}
+
+[part="bar"][hidden] {
+  opacity: 0;
+  transition:
+    display var(--helix-duration-fast) allow-discrete,
+    opacity var(--helix-duration-fast) var(--helix-easing-accelerate),
+    translate var(--helix-duration-fast) var(--helix-easing-accelerate);
+  translate: 0 calc(-1 * var(--helix-space-xs));
+}
+
+@starting-style {
+  [part="bar"] {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--helix-space-xs));
+  }
+}
+
 [part="field"],
 [part="replace-field"] {
   appearance: none;

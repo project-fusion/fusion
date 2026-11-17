@@ -55,6 +55,24 @@ slot[hidden] {
   display: none;
 }
 
+/* **The mark that takes over arrives**: the check scales up into place as the
+   clipboard gives way to it, and the clipboard does the same when it comes
+   back, on the curve a floating panel opens on. A slot coming back from
+   `display: none` gives its mark a first style, which is what the starting
+   style below starts from. */
+[part="mark"] {
+  transition:
+    opacity var(--helix-duration-fast) var(--helix-easing-decelerate),
+    scale var(--helix-duration-fast) var(--helix-easing-emphasized);
+}
+
+@starting-style {
+  [part="mark"] {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
 /* The confirmation is the one moment this control is allowed to be loud. */
 [part="button"][data-copied] {
   color: var(--copy-button-success-color, var(--helix-color-success));
