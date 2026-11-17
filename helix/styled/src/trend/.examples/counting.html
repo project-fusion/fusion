@@ -1,0 +1,37 @@
+<!-- @summary A change that counts to its new value when the page refreshes it, beside the figure it qualifies, which counts too. -->
+
+<helix-flex
+  align-items="start"
+  direction="column"
+  gap="md"
+>
+  <helix-stat
+    id="revenue"
+    value="48200"
+  >
+    <span slot="label">Revenue this week</span>
+    <helix-trend
+      format-options='{"style":"percent","maximumFractionDigits":1}'
+      good="up"
+      id="change"
+      locale="en-US"
+      slot="trend"
+      value="0.124"
+    >
+      <span slot="label">on last week</span>
+    </helix-trend>
+  </helix-stat>
+  <helix-button id="refresh">Refresh</helix-button>
+</helix-flex>
+
+<script type="module">
+  const revenue = document.getElementById('revenue')
+  const change = document.getElementById('change')
+
+  // Set new values, and each counts to its own from the one before.
+  document.getElementById('refresh').addEventListener('click', () => {
+    const next = Math.round(revenue.value * (0.85 + Math.random() * 0.3))
+    change.value = Math.round(((next - revenue.value) / revenue.value) * 1000) / 1000
+    revenue.value = next
+  })
+</script>
