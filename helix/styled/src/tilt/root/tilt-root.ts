@@ -30,7 +30,7 @@ import { styles } from './tilt-root.css.js'
  * @cssproperty --tilt-angle - How far the content turns at an edge. Defaults to `8deg`.
  * @cssproperty --tilt-perspective - How far away the eye is, so a smaller distance turns more steeply. Defaults to `60rem`.
  *
- * @cssstate tilting - A pointer is over the content, which follows it closely, rather than settling back.
+ * @cssstate tilting - A pointer is over the content, which follows it closely. It settles back once the pointer leaves.
  */
 @customElement('helix-tilt')
 export class HelixTilt extends HelixElement {

@@ -73,7 +73,7 @@ export interface ColorModeOptions {
  * **The one view transition in Helix, and why it may be one.** A view
  * transition draws the whole document twice and runs between the two, so a
  * component cannot own one: two would cancel each other, and the page's own
- * would be cancelled by a component's. The color mode is the document's own
+ * would be canceled by a component's. The color mode is the document's own
  * state, which the page decides once, so changing it is the one move that is
  * the document's to make. The page's code can call this as well as the button.
  *

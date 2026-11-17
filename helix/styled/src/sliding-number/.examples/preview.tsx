@@ -7,12 +7,16 @@ export function Example() {
   const sell = () => setSales((before) => before + 1 + Math.floor(Math.random() * 20))
 
   return (
-    <>
+    <helix-flex
+      align-items="start"
+      direction="column"
+      gap="md"
+    >
       <helix-text scale="display">
         <helix-sliding-number value={sales}></helix-sliding-number>
       </helix-text>
 
       <helix-button onClick={sell}>Add a sale</helix-button>
-    </>
+    </helix-flex>
   )
 }

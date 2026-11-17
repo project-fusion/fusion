@@ -34,7 +34,7 @@ import { property, state } from 'lit/decorators.js'
  * **The one Helix component that starts a view transition.** A view transition
  * draws the whole document twice and runs between the two pictures, so a
  * component that started one for its own sake would cancel the page's, or
- * have its own cancelled. The color mode is the document's own state, so
+ * have its own canceled. The color mode is the document's own state, so
  * changing it is the one move that is the document's to make. Where the
  * reader asked for reduced motion, or the browser has no view transitions,
  * the mode changes at once.
